@@ -1,20 +1,17 @@
-
-
 &star_job
 
-      show_log_description_at_start = .false. 
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'co_wd_settled.mod'
-      ! comes from final.mod produced by make_co_wd as of version 14731
+load_saved_model = .true.
+load_model_filename = 'co_wd_settled.mod'
+! comes from final.mod produced by make_co_wd as of version 14731
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'Teff_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'Teff_lower_limit'
 
-
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
+pgstar_flag = .true.
+save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -23,85 +20,83 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 &controls
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 2000
+! limit max_model_number as part of test_suite
+max_model_number = 2000
 
-      energy_eqn_option = 'eps_grav'
+energy_eqn_option = 'eps_grav'
 
-      Teff_lower_limit = 9d3
-      
-      min_dq = 1d-20
-      mesh_delta_coeff = 0.75
-      !varcontrol_target = 2d-4
-      max_timestep_factor = 1.05d0 ! 1.2d0
-      
+Teff_lower_limit = 9d3
 
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'iterated'
+min_dq = 1d-20
+mesh_delta_coeff = 0.75
+!varcontrol_target = 2d-4
+max_timestep_factor = 1.05d0 ! 1.2d0
 
-      MLT_option = 'ML2'
-      mixing_length_alpha = 0.8d0
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'iterated'
 
-
-      ! element diffusion
-                     
-      show_diffusion_info = .true. ! terminal output for diffusion
-
-      do_element_diffusion = .true.
-      diffusion_use_cgs_solver = .true.
-
-      ! Bypasses the need to set up diffusion classes.
-      diffusion_use_full_net = .true.
-
-      ! Timestep controls to prevent steps that are difficult for diffusion.
-      diffusion_steps_limit = 10
-      diffusion_steps_hard_limit = 50
-      diffusion_iters_limit = 50
-      diffusion_iters_hard_limit = 100
-
-      ! Solver controls.
-      ! diffusion_use_isolve = .true.
-      ! diffusion_rtol_for_isolve = 1d-4
-      ! diffusion_atol_for_isolve = 1d-5
-      ! diffusion_maxsteps_for_isolve = 1000
-      ! diffusion_isolve_solver = 'ros2_solver'
+MLT_option = 'ML2'
+mixing_length_alpha = 0.8d0
 
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 1
-      terminal_interval = 10
-      write_header_frequency = 10
+! element diffusion
+
+show_diffusion_info = .true. ! terminal output for diffusion
+
+do_element_diffusion = .true.
+diffusion_use_cgs_solver = .true.
+
+! Bypasses the need to set up diffusion classes.
+diffusion_use_full_net = .true.
+
+! Timestep controls to prevent steps that are difficult for diffusion.
+diffusion_steps_limit = 10
+diffusion_steps_hard_limit = 50
+diffusion_iters_limit = 50
+diffusion_iters_hard_limit = 100
+
+! Solver controls.
+! diffusion_use_isolve = .true.
+! diffusion_rtol_for_isolve = 1d-4
+! diffusion_atol_for_isolve = 1d-5
+! diffusion_maxsteps_for_isolve = 1000
+! diffusion_isolve_solver = 'ros2_solver'
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 1
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 &pgstar
-        
-        ! Profile_Panels2_win_flag = .true.
-        Profile_Panels2_file_flag = .true.
-        Profile_Panels2_file_interval = 100000
-        Profile_Panels2_yaxis_name(2) = 'eE_div_mg_element_diffusion'
-        Profile_Panels2_title = 'Abundance-Efield'
-        Profile_Panels2_xaxis_name = 'logxm'
-        Profile_Panels2_xaxis_reversed = .true.
-        Profile_Panels2_xmin = -8
-        Profile_Panels2_xmax = 0
-        Profile_Panels2_show_mix_regions_on_xaxis = .true.
-        
+
+! Profile_Panels2_win_flag = .true.
+Profile_Panels2_file_flag = .true.
+Profile_Panels2_file_interval = 100000
+Profile_Panels2_yaxis_name(2) = 'eE_div_mg_element_diffusion'
+Profile_Panels2_title = 'Abundance-Efield'
+Profile_Panels2_xaxis_name = 'logxm'
+Profile_Panels2_xaxis_reversed = .true.
+Profile_Panels2_xmin = -8
+Profile_Panels2_xmax = 0
+Profile_Panels2_show_mix_regions_on_xaxis = .true.
+
 
 / ! end of pgstar namelist

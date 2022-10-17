@@ -1,5 +1,5 @@
 &controls
 
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
 /

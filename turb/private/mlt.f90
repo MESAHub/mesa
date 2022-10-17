@@ -25,14 +25,14 @@
 
 
 module MLT
-
-implicit none
-
-private
-public :: calc_MLT
+   
+   implicit none
+   
+   private
+   public :: calc_MLT
 
 contains
-
+   
    !> Calculates the outputs of convective mixing length theory.
    !!
    !! @param MLT_option A string specifying which MLT option to use. Currently supported are Cox, Henyey, ML1, ML2, Mihalas. Note that 'TDC' is also a valid input and will return the Cox result. This is for use when falling back from TDC -> MLT, as Cox is the most-similar prescription to TDC.
@@ -58,105 +58,105 @@ contains
    !! @param mixing_type Set to convective if convection operates (output).
    !! @param ierr Tracks errors (output).
    subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
-                     chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
-                     gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
+      gradr, grada, gradL, &
+      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
       use const_def
       use num_lib
       use utils_lib
       use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
-      character(len=*), intent(in) :: MLT_option
+      character(len = *), intent(in) :: MLT_option
       real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
-
+      
       real(dp) :: ff1, ff2, ff3, ff4
       type(auto_diff_real_star_order1) :: &
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
          f, f0, f1, f2, radiative_conductivity, convective_conductivity
-      include 'formats' 
+      include 'formats'
       if (gradr > gradL) then
          ! Convection zone
-
-         Q = chiT/chiRho ! 'Q' param  C&G 14.24
+         
+         Q = chiT / chiRho ! 'Q' param  C&G 14.24
          if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then ! this assumes optically thick
-            a0 = 9d0/4d0
+            a0 = 9d0 / 4d0
             convective_conductivity = &
-               Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0 ! erg / (K cm sec)
+               Cp * grav * pow2(Lambda) * rho * (sqrt(Q * rho / (2d0 * P))) / 9d0 ! erg / (K cm sec)
             radiative_conductivity = &
-               (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
+               (4d0 / 3d0 * crad * clight) * pow3(T) / (opacity * rho) ! erg / (K cm sec)
             A = convective_conductivity / radiative_conductivity !  unitless.
          else
             select case(trim(MLT_option))
             case ('Henyey')
-               ff1=1.0d0/Henyey_MLT_nu_param
-               ff2=0.5d0 
-               ff3=8.0d0/Henyey_MLT_y_param
-               ff4=1.0d0/Henyey_MLT_y_param
+               ff1 = 1.0d0 / Henyey_MLT_nu_param
+               ff2 = 0.5d0
+               ff3 = 8.0d0 / Henyey_MLT_y_param
+               ff4 = 1.0d0 / Henyey_MLT_y_param
             case ('ML1')
-               ff1=0.125d0 
-               ff2=0.5d0 
-               ff3=24.0d0
-               ff4=0.0d0
+               ff1 = 0.125d0
+               ff2 = 0.5d0
+               ff3 = 24.0d0
+               ff4 = 0.0d0
             case ('ML2')
-               ff1=1.0d0
-               ff2=2.0d0
-               ff3=16.0d0
-               ff4=0.0d0
+               ff1 = 1.0d0
+               ff2 = 2.0d0
+               ff3 = 16.0d0
+               ff4 = 0.0d0
             case ('Mihalas')
-               ff1=0.125d0 
-               ff2=0.5d0 
-               ff3=16.0d0
-               ff4=2.0d0
+               ff1 = 0.125d0
+               ff2 = 0.5d0
+               ff3 = 16.0d0
+               ff4 = 2.0d0
             case default
-               write(*,'(3a)') 'Error: ', trim(MLT_option), ' is not an allowed MLT option'
-               call mesa_error(__FILE__,__LINE__)
+               write(*, '(3a)') 'Error: ', trim(MLT_option), ' is not an allowed MLT option'
+               call mesa_error(__FILE__, __LINE__)
             end select
-
-            omega = Lambda*rho*opacity
-            ff4_omega2_plus_1 = ff4/pow2(omega) + 1d0
-            a0 = (3d0/16d0)*ff2*ff3/ff4_omega2_plus_1
-            A_1 = 4d0*Cp*sqrt(ff1*P*Q*rho)
-            A_2 = mixing_length_alpha*omega*ff4_omega2_plus_1
-            A_numerator = A_1*A_2
-            A_denom = ff3*crad*clight*pow3(T)
-            A = A_numerator/A_denom   
-         end if 
-
+            
+            omega = Lambda * rho * opacity
+            ff4_omega2_plus_1 = ff4 / pow2(omega) + 1d0
+            a0 = (3d0 / 16d0) * ff2 * ff3 / ff4_omega2_plus_1
+            A_1 = 4d0 * Cp * sqrt(ff1 * P * Q * rho)
+            A_2 = mixing_length_alpha * omega * ff4_omega2_plus_1
+            A_numerator = A_1 * A_2
+            A_denom = ff3 * crad * clight * pow3(T)
+            A = A_numerator / A_denom
+         end if
+         
          ! 'B' param  C&G 14.81
-         Bcubed = (pow2(A)/a0)*(gradr - gradL)   
-
+         Bcubed = (pow2(A) / a0) * (gradr - gradL)
+         
          ! now solve cubic equation for convective efficiency, Gamma
          ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82,
          ! leave it to Mathematica to find an expression for the root we want      
-         delta = a0*Bcubed               
-         f = -2d0 + 9d0*a0 + 27d0*a0*a0*delta
+         delta = a0 * Bcubed
+         f = -2d0 + 9d0 * a0 + 27d0 * a0 * a0 * delta
          if (f > 1d100) then
             f0 = f
          else
-            f0 = pow2(f) + 4d0*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)*(-1d0 + 3d0*a0)
+            f0 = pow2(f) + 4d0 * (-1d0 + 3d0 * a0) * (-1d0 + 3d0 * a0) * (-1d0 + 3d0 * a0)
             if (f0 <= 0d0) then
                f0 = f
             else
-               f0 = sqrt(f0)         
+               f0 = sqrt(f0)
             end if
          end if
-         f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
+         f1 = -2d0 + 9d0 * a0 + 27d0 * a0 * a0 * delta + f0
          if (f1 <= 0d0) return
-         f1 = pow(f1,one_third)     
-         f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
-         Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
-
+         f1 = pow(f1, one_third)
+         f2 = 2d0 * two_13 * (1d0 - 3d0 * a0) / f1
+         Gamma = (four_13 * f1 + f2 - 2d0) / (6d0 * a0)
+         
          if (Gamma <= 0d0) return
-
+         
          ! average convection velocity   C&G 14.86b
-         conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
-         D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
-
+         conv_vel = mixing_length_alpha * sqrt(Q * P / (8d0 * rho)) * Gamma / A
+         D = conv_vel * Lambda / 3d0     ! diffusion coefficient [cm^2/sec]
+         
          !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
-         Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
+         Zeta = exp(3d0 * log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
       else
          ! Radiative zone, because this means that gradr < gradL
          Gamma = -1d99
@@ -164,7 +164,7 @@ contains
          conv_vel = 0d0
          D = 0d0
       end if
-
+      
       ! Zeta must be >= 0 and <= 1.
       ! By construction (above) it cannot be less than zero,
       ! so we just check that it is a valid number and is not greater
@@ -172,15 +172,15 @@ contains
       if (is_bad(Zeta%val)) return
       if (Zeta > 1d0) then
          Zeta = 1d0
-      end if            
+      end if
       
-      gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
+      gradT = (1d0 - Zeta) * gradr + Zeta * gradL ! C&G 14.79
       Y_face = gradT - gradL
       
       if (Y_face > 0d0) then
          mixing_type = convective_mixing
       end if
-
-   end subroutine calc_MLT   
+   
+   end subroutine calc_MLT
 
 end module MLT

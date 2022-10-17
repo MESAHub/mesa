@@ -19,20 +19,20 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
-      module run_star_extras
 
-      use star_lib
-      use star_def
-      use const_def
-      use math_lib
-      
-      implicit none
-      
-      ! these routines are called by the standard run_star check_model
-      contains
-      
-      include 'standard_run_star_extras.inc'
+module run_star_extras
+   
+   use star_lib
+   use star_def
+   use const_def
+   use math_lib
+   
+   implicit none
+   
+   ! these routines are called by the standard run_star check_model
+contains
 
-      end module run_star_extras
+include 'standard_run_star_extras.inc'
+
+end module run_star_extras
       

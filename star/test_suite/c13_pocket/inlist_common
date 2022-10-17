@@ -1,14 +1,14 @@
 &star_job
 
 ! network
-      change_net = .true.
-      new_net_name = 'agb.net'
+change_net = .true.
+new_net_name = 'agb.net'
 
 ! opacities
-      initial_zfracs = 6
+initial_zfracs = 6
 
 ! timing
-      first_model_for_timing = 1
+first_model_for_timing = 1
 
 
 / !end of star_job namelist
@@ -19,13 +19,13 @@
 
 
 &kap
-      Zbase = 0.01d0
+Zbase = 0.01d0
 
-      use_Type2_opacities = .true.
-      kap_file_prefix = 'a09'
-      kap_CO_prefix = 'a09_co'
-      kap_lowT_prefix = 'AESOPUS'
-      AESOPUS_filename = 'AESOPUS_AGSS09.h5'
+use_Type2_opacities = .true.
+kap_file_prefix = 'a09'
+kap_CO_prefix = 'a09_co'
+kap_lowT_prefix = 'AESOPUS'
+AESOPUS_filename = 'AESOPUS_AGSS09.h5'
 
 / ! end of kap namelist
 
@@ -33,63 +33,62 @@
 &controls
 
 ! starting specifications
-      initial_mass = 2.0
-      initial_y = 0.26
-      initial_z = 0.01
+initial_mass = 2.0
+initial_y = 0.26
+initial_z = 0.01
 
 ! MLT
-      mixing_length_alpha = 1.73
+mixing_length_alpha = 1.73
 
 ! opacities
 
 ! options for energy conservation (see MESA V, Section 3)
-      energy_eqn_option = 'eps_grav'
-      use_time_centered_eps_grav = .true.
-      include_composition_in_eps_grav = .true.
-      limit_for_rel_error_in_energy_conservation = 1d99
-      hard_limit_for_rel_error_in_energy_conservation = 1d99
+energy_eqn_option = 'eps_grav'
+use_time_centered_eps_grav = .true.
+include_composition_in_eps_grav = .true.
+limit_for_rel_error_in_energy_conservation = 1d99
+hard_limit_for_rel_error_in_energy_conservation = 1d99
 
-
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
 ! timestep tolerances
 
-      varcontrol_target = 1d-3
+varcontrol_target = 1d-3
 
-      delta_lgRho_cntr_limit = 0.05
-      delta_lgRho_cntr_hard_limit = 0.1
+delta_lgRho_cntr_limit = 0.05
+delta_lgRho_cntr_hard_limit = 0.1
 
-      delta_lgT_cntr_limit = 0.01
-      delta_lgT_cntr_hard_limit = 0.02
+delta_lgT_cntr_limit = 0.01
+delta_lgT_cntr_hard_limit = 0.02
 
-      delta_lgTeff_limit = 0.01
-      delta_lgTeff_hard_limit = 0.02
+delta_lgTeff_limit = 0.01
+delta_lgTeff_hard_limit = 0.02
 
-      delta_lgL_limit = 0.1
-      delta_lgL_hard_limit = 0.2
+delta_lgL_limit = 0.1
+delta_lgL_hard_limit = 0.2
 
 ! atmosphere option
-      atm_option = 'table'
-      atm_table = 'photosphere'
-      atm_off_table_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'iterated'
+atm_option = 'table'
+atm_table = 'photosphere'
+atm_off_table_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'iterated'
 
 ! mass loss
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5d0
-      Blocker_scaling_factor = 0.05d0
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.5d0
+Blocker_scaling_factor = 0.05d0
 
 ! output
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 
 / ! end of controls namelist

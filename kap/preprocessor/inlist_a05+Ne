@@ -1,14 +1,14 @@
 &kappa
 
-         data_dir = 'kap_input_data/opal'		
-         type1_table = 'A05+Ne'
-         logT_file = 'logT_points_highT_8.7'
-         logR_min = -8.00d0
-         logR_max = 1.00d0
-         logR_points = 37
-         output_dir = 'data/kap_data'
-         table_prefix = 'a05+Ne'
-         header_info = 'fixed metal distribution --  AGS05 composition + Ne enhancement based on Cunha et al. 2005'
-         table_version= 38
+data_dir = 'kap_input_data/opal'
+type1_table = 'A05+Ne'
+logT_file = 'logT_points_highT_8.7'
+logR_min = -8.00d0
+logR_max = 1.00d0
+logR_points = 37
+output_dir = 'data/kap_data'
+table_prefix = 'a05+Ne'
+header_info = 'fixed metal distribution --  AGS05 composition + Ne enhancement based on Cunha et al. 2005'
+table_version = 38
 
 /

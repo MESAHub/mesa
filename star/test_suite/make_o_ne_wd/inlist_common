@@ -1,21 +1,20 @@
-
 &star_job
-      show_log_description_at_start = .false.
-      
-      change_initial_net = .true.      
-      new_net_name = 'co_burn_plus.net'
+show_log_description_at_start = .false.
 
-      num_special_rate_factors = 2
-      reaction_for_special_factor(1) = 'r_c12_ag_o16'
-      special_rate_factor(1) = 1
-      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+change_initial_net = .true.
+new_net_name = 'co_burn_plus.net'
 
-      reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
-      special_rate_factor(2) = 1
-      filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+num_special_rate_factors = 2
+reaction_for_special_factor(1) = 'r_c12_ag_o16'
+special_rate_factor(1) = 1
+filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+special_rate_factor(2) = 1
+filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
 
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -25,66 +24,66 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 &controls
 
-      initial_mass = 11
-      initial_z = 0.02d0 
+initial_mass = 11
+initial_z = 0.02d0
 
 ! when to stop
 
 ! wind
 
 ! atmosphere
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'fixed'
 
 ! rotation
 
 ! element diffusion
 
 ! mlt
-      mixing_length_alpha = 2
-      use_Ledoux_criterion = .true.
-      thermohaline_option = 'Kippenhahn'
-      thermohaline_coeff = 100
-      MLT_option = 'Cox'
+mixing_length_alpha = 2
+use_Ledoux_criterion = .true.
+thermohaline_option = 'Kippenhahn'
+thermohaline_coeff = 100
+MLT_option = 'Cox'
 
 ! mixing
-       overshoot_scheme(1) = 'exponential'
-       overshoot_zone_type(1) = 'burn_Z'
-       overshoot_zone_loc(1) = 'shell'
-       overshoot_bdy_loc(1) = 'bottom'
-       overshoot_f(1) = 0.014
-       overshoot_f0(1) = 0.004
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'burn_Z'
+overshoot_zone_loc(1) = 'shell'
+overshoot_bdy_loc(1) = 'bottom'
+overshoot_f(1) = 0.014
+overshoot_f0(1) = 0.004
 
 ! timesteps
-      varcontrol_target = 1d-3
-      dX_nuc_drop_limit = 1d-2
+varcontrol_target = 1d-3
+dX_nuc_drop_limit = 1d-2
 
 ! mesh
-      mesh_delta_coeff = 1.5     
+mesh_delta_coeff = 1.5
 
 ! solver
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
 ! output
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 
 / ! end of controls namelist

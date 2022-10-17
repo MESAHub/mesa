@@ -1,15 +1,15 @@
 ! inlist_c_burn
- 
+
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'agb.mod'
+load_saved_model = .true.
+load_model_filename = 'agb.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'c_burn.mod'
-      required_termination_code_string = 'star_species_mass_max_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'c_burn.mod'
+required_termination_code_string = 'star_species_mass_max_limit'
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -22,24 +22,24 @@
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 3000
+! limit max_model_number as part of test_suite
+max_model_number = 3000
 
 ! when to stop
-      star_species_mass_max_limit = 0.3d0 ! Msun
-      star_species_mass_max_limit_iso = 'ne20'
+star_species_mass_max_limit = 0.3d0 ! Msun
+star_species_mass_max_limit_iso = 'ne20'
 
 ! wind
-      cool_wind_full_on_T = 1d6
-      hot_wind_full_on_T = 1d6 
-      hot_wind_scheme = ''
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5 ! 0d0  
-      Blocker_scaling_factor = 50d0
-      max_wind = 1d0 ! no need for faster AGB winds than this
-      T_mix_limit = 1d5 ! helps keep mixing near surface simple during AGB winds
+cool_wind_full_on_T = 1d6
+hot_wind_full_on_T = 1d6
+hot_wind_scheme = ''
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.5 ! 0d0
+Blocker_scaling_factor = 50d0
+max_wind = 1d0 ! no need for faster AGB winds than this
+T_mix_limit = 1d5 ! helps keep mixing near surface simple during AGB winds
 
 ! atmosphere
 
@@ -50,124 +50,124 @@
 ! mlt
 
 ! mixing (from cburn_inward test case)
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'burn_H'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'top'
-      overshoot_f(1) = 0.01
-      overshoot_f0(1) = 0.005
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'burn_H'
+overshoot_zone_loc(1) = 'any'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.01
+overshoot_f0(1) = 0.005
 
-      overshoot_scheme(2) = 'exponential'
-      overshoot_zone_type(2) = 'burn_He'
-      overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'top'
-      overshoot_f(2) = 0.01
-      overshoot_f0(2) = 0.005
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'burn_He'
+overshoot_zone_loc(2) = 'any'
+overshoot_bdy_loc(2) = 'top'
+overshoot_f(2) = 0.01
+overshoot_f0(2) = 0.005
 
-      overshoot_scheme(3) = 'exponential'
-      overshoot_zone_type(3) = 'burn_Z'
-      overshoot_zone_loc(3) = 'shell'
-      overshoot_bdy_loc(3) = 'top'
-      overshoot_f(3) = 0.01
-      overshoot_f0(3) = 0.005
+overshoot_scheme(3) = 'exponential'
+overshoot_zone_type(3) = 'burn_Z'
+overshoot_zone_loc(3) = 'shell'
+overshoot_bdy_loc(3) = 'top'
+overshoot_f(3) = 0.01
+overshoot_f0(3) = 0.005
 
 ! timesteps
-      delta_HR_limit = -1
+delta_HR_limit = -1
 
 ! mesh
 
 ! solver
-      op_split_burn = .true.
-      op_split_burn_min_T = 3d8
+op_split_burn = .true.
+op_split_burn_min_T = 3d8
 
-      op_split_burn_eps = 1d-7
-      op_split_burn_odescal = 1d-8
+op_split_burn_eps = 1d-7
+op_split_burn_odescal = 1d-8
 
-      convergence_ignore_equL_residuals = .false.
-      make_gradr_sticky_in_solver_iters = .false.
+convergence_ignore_equL_residuals = .false.
+make_gradr_sticky_in_solver_iters = .false.
 
 ! output
-      num_trace_history_values = 6
-      trace_history_value_name(1) = 'total_mass he4'
-      trace_history_value_name(2) = 'total_mass c12'
-      trace_history_value_name(3) = 'total_mass o16'
-      trace_history_value_name(4) = 'total_mass ne20'
-      trace_history_value_name(5) = 'rel_E_err'
-      trace_history_value_name(6) = 'log_rel_run_E_err'
+num_trace_history_values = 6
+trace_history_value_name(1) = 'total_mass he4'
+trace_history_value_name(2) = 'total_mass c12'
+trace_history_value_name(3) = 'total_mass o16'
+trace_history_value_name(4) = 'total_mass ne20'
+trace_history_value_name(5) = 'rel_E_err'
+trace_history_value_name(6) = 'log_rel_run_E_err'
 
-      
-      !photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
-      !trace_evolve = .true.
-      !fill_arrays_with_NaNs = .true.
+!report_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
+!trace_evolve = .true.
+!fill_arrays_with_NaNs = .true.
 
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+!solver_save_photo_call_number = 0
+! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 4142
-      !solver_test_partials_k = 2616
-      !solver_test_partials_iter_number = 4
-      !solver_test_partials_dx_0 = 1d-6
-      !solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
+!solver_test_partials_call_number = 4142
+!solver_test_partials_k = 2616
+!solver_test_partials_iter_number = 4
+!solver_test_partials_dx_0 = 1d-6
+!solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets
+!solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets
+!solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+!solver_test_partials_show_dx_var_name = 'h1'
 
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
+! equ name can also be one of these
+! 'lnE', 'lnP', 'grad_ad' to test eos
+! 'eps_nuc' to test net
+! 'non_nuc_neu' to test neu
+! 'gradT', 'mlt_vc' to test mlt
+! 'opacity' to test kap
 
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_net_partials = .true.
-      !solver_test_atm_partials = .true.
+!solver_test_partials_write_eos_call_info = .true.
 
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
+!solver_test_partials_k_low = -1
+!solver_test_partials_k_high = -1
 
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
+!solver_test_eos_partials = .true.
+!solver_test_kap_partials = .true.
+!solver_test_net_partials = .true.
+!solver_test_atm_partials = .true.
+
+!report_all_dt_limits = .true.
+!report_solver_dt_info = .true.
+
+!show_mesh_changes = .true.
+!mesh_dump_call_number = 5189
+!okay_to_remesh = .false.
+
+!energy_conservation_dump_model_number = -1
+
+!use_DGESVX_in_bcyclic = .true.
+!use_equilibration_in_DGESVX = .true.
+!report_min_rcond_from_DGESXV = .true.
+
+! solver debugging
+!solver_check_everything = .true.
+
+!solver_epsder_struct = 1d-6
+!solver_epsder_chem = 1d-6
+
+!report_solver_dt_info = .true.
+!report_dX_nuc_drop_dt_limits = .true.
+!report_bad_negative_xa = .true.
 
 / ! end of controls namelist
 
 
 
 &pgstar
-      !pause = .true.
-      !Profile_Panels3_xmax = 3 !  -101d0 ! only used if /= -101d0
+!pause = .true.
+!Profile_Panels3_xmax = 3 !  -101d0 ! only used if /= -101d0
 
 / ! end of pgstar namelist

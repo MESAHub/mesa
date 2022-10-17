@@ -56,53 +56,56 @@
 #! Abort execution
 #!!
 
-#:def ABORT(message=None)
-   write(UNIT=ERROR_UNIT, FMT=*) 'ABORT at line ${_LINE_}$ of ${_FILE_}$'
-   #:if message
-      write(UNIT=ERROR_UNIT, FMT=*) '${message}$'
-   #:endif
-   error stop
+#:def ABORT(message = None)
+write(UNIT = ERROR_UNIT, FMT = *) 'ABORT at line ${_LINE_}$ of ${_FILE_}$'
+#:if message
+write(UNIT = ERROR_UNIT, FMT = *) '${message}$'
+#:endif
+error stop
 #:enddef
 
 #!!
 #! Assert that cond is satisfied
 #!!
 
-#:def ASSERT(cond, message=None)
-   if (.NOT. (${cond}$)) then
-      #:set cond_str = cond.replace("'", "''")
-      #:if message
-         $:ABORT(f'assertion "{cond_str}" failed with message "{message}"')
-      #:else
-         $:ABORT(f'assertion "{cond_str}" failed')
-      #:endif
-   end if
-#:enddef
-
-#!!
-#! Same as ASSERT, but only if DEBUG is set
-#!!
-
-#:def ASSERT_DEBUG(cond, message=None)
-   #:if defined('DEBUG')
-      $:ASSERT(cond, message)
-   #:endif
-#:enddef
-
-#!!
-#! Used for bounds checking
-#!!
-
-#:def CHECK_BOUNDS(x, y)
-   $:ASSERT_DEBUG(x+'=='+y, 'bounds mismatch')
-#:enddef
-
-#!!
-#! Create a deferred shape array specification list
-#!!
-
-#:def ARRAY_SPEC(rank, str=':')
-   #:if rank > 0
+#:def ASSERT(cond, message = None)
+if (.NOT. (
+   ${cond}$)) then
+   #:set cond_str = cond.replace("'", "''")
+   #:if message
+   $:ABORT(f'assertion "{cond_str}" failed with message "{message}"')
+   #:
+else
+   $:ABORT(f'assertion "{cond_str}" failed')
+   #:
+endif
+end if
+      #:enddef
+      
+      #!!
+      #! Same as ASSERT, but only if DEBUG is set
+      #!!
+            
+            #:def ASSERT_DEBUG(cond, message = None)
+            #:if defined('DEBUG')
+            $:ASSERT(cond, message)
+            #:endif
+            #:enddef
+            
+            #!!
+            #! Used for bounds checking
+            #!!
+            
+            #:def CHECK_BOUNDS(x, y)
+      $:ASSERT_DEBUG(x+'=='+y, 'bounds mismatch')
+      #:enddef
+      
+      #!!
+      #! Create a deferred shape array specification list
+      #!!
+      
+      #:def ARRAY_SPEC(rank, str = ':')
+      #:if rank > 0
       $:'(' + ','.join([str.format(i) for i in range(1, rank+1)]) + ')'
-   #:endif
-#:enddef
+      #:endif
+      #:enddef

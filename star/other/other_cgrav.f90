@@ -22,37 +22,37 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_cgrav
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_cgrav = .true.
-      ! procedure pointer: s% other_cgrav => my_routine
+module other_cgrav
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_cgrav = .true.
+   ! procedure pointer: s% other_cgrav => my_routine
+   
+   ! note that other_cgrav only changes G in the stellar structure
+   ! the binary module is unaffected by changes in cgrav
+   
+   use star_def
+   
+   implicit none
 
-      ! note that other_cgrav only changes G in the stellar structure
-      ! the binary module is unaffected by changes in cgrav
 
-      use star_def
+contains
+   
+   
+   subroutine default_other_cgrav(id, ierr)
+      use const_def, only : standard_cgrav
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s% cgrav(:) = standard_cgrav
+   end subroutine default_other_cgrav
 
-      implicit none
-
-      
-      contains
-      
-      
-      subroutine default_other_cgrav(id, ierr)
-         use const_def, only: standard_cgrav
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% cgrav(:) = standard_cgrav
-      end subroutine default_other_cgrav
-
-      end module other_cgrav
+end module other_cgrav
       
       
       

@@ -1,15 +1,15 @@
 &kappa
 
-         data_dir = 'kap_input_data/wichita/a09phot'		
-         lowT_flag = .true.
-         logT_file = 'logT_points_lowT_2.7'
-         logR_min = -8.00d0
-         logR_max = 1.00d0
-         logR_points = 46
-         type1_table = 'A09photo'
-         output_dir = 'data/kap_data'
-         table_prefix = 'lowT_fa05_a09p'
-         header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with AGSS09 photospheric metals'
-         table_version = 38
+data_dir = 'kap_input_data/wichita/a09phot'
+lowT_flag = .true.
+logT_file = 'logT_points_lowT_2.7'
+logR_min = -8.00d0
+logR_max = 1.00d0
+logR_points = 46
+type1_table = 'A09photo'
+output_dir = 'data/kap_data'
+table_prefix = 'lowT_fa05_a09p'
+header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with AGSS09 photospheric metals'
+table_version = 38
 
 /

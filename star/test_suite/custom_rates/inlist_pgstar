@@ -1,68 +1,67 @@
 &pgstar
 
-      ! history of central temperature vs. density
+! history of central temperature vs. density
 
-      Abundance_win_flag = .false.
-      Abundance_xaxis_name = 'logRho'
-      Abundance_xaxis_reversed = .true.
-      Abundance_xmin = 5.5
-      Abundance_xmax = 7.5
+Abundance_win_flag = .false.
+Abundance_xaxis_name = 'logRho'
+Abundance_xaxis_reversed = .true.
+Abundance_xmin = 5.5
+Abundance_xmax = 7.5
 
-      Abundance_title = 'custom_rates'
-      Abundance_file_flag = .true.
-      Abundance_file_interval = 100000
-      
+Abundance_title = 'custom_rates'
+Abundance_file_flag = .true.
+Abundance_file_interval = 100000
 
-      TRho_win_flag = .false.
+TRho_win_flag = .false.
 
-      TRho_win_width = 6
-      TRho_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+TRho_win_width = 6
+TRho_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
 
-      TRho_xleft = 0.15
-      TRho_xright = 0.85
-      TRho_ybot = 0.15
-      TRho_ytop = 0.85
-      TRho_txt_scale = 1.0
-      TRho_title = 'custom_rates'
+TRho_xleft = 0.15
+TRho_xright = 0.85
+TRho_ybot = 0.15
+TRho_ytop = 0.85
+TRho_txt_scale = 1.0
+TRho_title = 'custom_rates'
 
-      ! axis limits -- to override system default selections
-      TRho_logT_min = 7.4 ! only used if /= -101d0
-      TRho_logT_max = 8.0 ! only used if /= -101d0
-      TRho_logRho_min = 6.5 ! only used if /= -101d0
-      TRho_logRho_max = 8.0 ! only used if /= -101d0
+! axis limits -- to override system default selections
+TRho_logT_min = 7.4 ! only used if /= -101d0
+TRho_logT_max = 8.0 ! only used if /= -101d0
+TRho_logRho_min = 6.5 ! only used if /= -101d0
+TRho_logRho_max = 8.0 ! only used if /= -101d0
 
-      TRho_logT_margin = 0.1
-      TRho_logRho_margin = 0.1
-      TRho_logRho_dlogRho_min = -1
-      TRho_logT_dlogT_min = -1
+TRho_logT_margin = 0.1
+TRho_logRho_margin = 0.1
+TRho_logRho_dlogRho_min = -1
+TRho_logT_dlogT_min = -1
 
-      TRho_step_min = -1 ! only plot models with model number >= this
-      TRho_step_max = 999999 ! only plot models with model number <= this
+TRho_step_min = -1 ! only plot models with model number >= this
+TRho_step_max = 999999 ! only plot models with model number <= this
 
-      show_TRho_annotation1 = .true.
+show_TRho_annotation1 = .true.
 
-      annotation1_ci = 8 ! color index
-      annotation1_ch = 2.0 ! character height
-      annotation1_lw = 1 ! line width
-      annotation1_cf = 1 ! character font (1=sans serif, 2=roman, 3=italic, 4=script)
-      annotation1_side = 'T' ! T, B, L, or R
-      annotation1_disp = -4 ! displacement perpendicular to axis
-      annotation1_coord = 0.8 ! fractional location along axis
-      annotation1_fjust = 0.5 ! 0 => left justified, 0.5 => centered, 1 => right justified
-      annotation1_text = 'reaclib'
+annotation1_ci = 8 ! color index
+annotation1_ch = 2.0 ! character height
+annotation1_lw = 1 ! line width
+annotation1_cf = 1 ! character font (1=sans serif, 2=roman, 3=italic, 4=script)
+annotation1_side = 'T' ! T, B, L, or R
+annotation1_disp = -4 ! displacement perpendicular to axis
+annotation1_coord = 0.8 ! fractional location along axis
+annotation1_fjust = 0.5 ! 0 => left justified, 0.5 => centered, 1 => right justified
+annotation1_text = 'reaclib'
 
-      show_TRho_annotation2 = .false.
-      show_TRho_annotation3 = .false.
+show_TRho_annotation2 = .false.
+show_TRho_annotation3 = .false.
 
-      TRho_fname = 'TRho-unmodified.data' ! file name for extra TRho data
+TRho_fname = 'TRho-unmodified.data' ! file name for extra TRho data
 
-      ! file output
-      TRho_file_flag = .true.
-      TRho_file_dir = 'png'
-      TRho_file_prefix = 'trho_'
-      TRho_file_interval = 100000 ! output when mod(model_number,TRho_file_interval)==0
-      TRho_file_width = -1 ! (inches) negative means use same value as for window
-      TRho_file_aspect_ratio = -1 ! negative means use same value as for window
+! file output
+TRho_file_flag = .true.
+TRho_file_dir = 'png'
+TRho_file_prefix = 'trho_'
+TRho_file_interval = 100000 ! output when mod(model_number,TRho_file_interval)==0
+TRho_file_width = -1 ! (inches) negative means use same value as for window
+TRho_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
 / ! end of pgstar namelist

@@ -24,19 +24,19 @@
 !
 ! ***********************************************************************
 
-      module star_data_lib
-      
-      implicit none
+module star_data_lib
+   
+   implicit none
 
-      contains           
-            
-      subroutine star_data_init(mesa_dir_init,ierr)
-         use star_data_def, only: do_star_def_init
-         character (len=*), intent(in) :: mesa_dir_init
-         integer, intent(out) :: ierr
-         ierr = 0
-         call do_star_def_init(mesa_dir_init,ierr)
-      end subroutine star_data_init
+contains
+   
+   subroutine star_data_init(mesa_dir_init, ierr)
+      use star_data_def, only : do_star_def_init
+      character (len = *), intent(in) :: mesa_dir_init
+      integer, intent(out) :: ierr
+      ierr = 0
+      call do_star_def_init(mesa_dir_init, ierr)
+   end subroutine star_data_init
 
-      end module star_data_lib
+end module star_data_lib
 

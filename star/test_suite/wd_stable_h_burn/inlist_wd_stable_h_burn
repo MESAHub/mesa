@@ -1,44 +1,43 @@
-
 ! inlist_wd_stable_h_burn
 
 
 &star_job
-      show_log_description_at_start = .false.
-      
-      load_saved_model = .true.
-      load_model_filename = 'co_wd_1.00M.mod' ! from make_co_wd, 13738, initial_mass = 6.4d0
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'star_mass_max_limit'
+load_saved_model = .true.
+load_model_filename = 'co_wd_1.00M.mod' ! from make_co_wd, 13738, initial_mass = 6.4d0
 
-      change_initial_net = .true.      
-      new_net_name = 'cno_extras.net'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'star_mass_max_limit'
 
-      change_v_flag = .true.
-      new_v_flag = .true.
+change_initial_net = .true.
+new_net_name = 'cno_extras.net'
 
-      relax_initial_tau_factor = .true.
-      relax_to_this_tau_factor = 3d2
-      dlogtau_factor = 0.03d0
+change_v_flag = .true.
+new_v_flag = .true.
 
-      new_mass = 1.00d0
-      relax_initial_mass_scale = .true.
-      dlgm_per_step = 1d-3
+relax_initial_tau_factor = .true.
+relax_to_this_tau_factor = 3d2
+dlogtau_factor = 0.03d0
 
-      set_initial_age = .true.
-      initial_age = 0
+new_mass = 1.00d0
+relax_initial_mass_scale = .true.
+dlgm_per_step = 1d-3
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d-2
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_dt = .true.
+years_for_initial_dt = 1d-2
 
-      !pgstar_flag = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -48,96 +47,94 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      use_Type2_opacities = .true.
-      use_Zbase_for_Type1 = .false.
+use_Type2_opacities = .true.
+use_Zbase_for_Type1 = .false.
 
 / ! end of kap namelist
 
 
 &controls
-            
-      star_mass_max_limit = 1.0001d0
 
-      mass_change = 2.5d-7 ! rate of accretion (Msun/year)
+star_mass_max_limit = 1.0001d0
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+mass_change = 2.5d-7 ! rate of accretion (Msun/year)
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 6000
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      use_Ledoux_criterion = .false.
-      
+! limit max_model_number as part of test_suite
+max_model_number = 6000
 
-      gamma_center_limit = 1000 ! FOR THIS TEST
+use_Ledoux_criterion = .false.
 
-      max_center_cell_dq = 1d-6
-      max_surface_cell_dq = 1d-8
-      mesh_delta_coeff = 2
-      
-      min_timestep_limit = 1d-12
-      
-      accrete_same_as_surface = .false. 
-      accretion_h1 = 0.749D+00
-      accretion_h2 = 0
-      accretion_he3 = 0.292910D-04
-      accretion_he4 = 0.237D+00
-      accretion_zfracs = 4 ! Lodders 03
+gamma_center_limit = 1000 ! FOR THIS TEST
 
-      MLT_option = 'Cox'
+max_center_cell_dq = 1d-6
+max_surface_cell_dq = 1d-8
+mesh_delta_coeff = 2
 
-      xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
-		xa_function_weight(1) = 20
-		xa_function_param(1) = 1d-6
-      xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
-		xa_function_weight(2) = 20
-		xa_function_param(2) = 1d-2
+min_timestep_limit = 1d-12
 
-      !dH_div_H_limit = 0.8d0   ! 10.7 101 3 2137
+accrete_same_as_surface = .false.
+accretion_h1 = 0.749D+00
+accretion_h2 = 0
+accretion_he3 = 0.292910D-04
+accretion_he4 = 0.237D+00
+accretion_zfracs = 4 ! Lodders 03
 
-      delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
-      delta_lgL_H_hard_limit = 0.5
-      lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
+MLT_option = 'Cox'
 
-      delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
-      delta_lgL_He_hard_limit = 1
-      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
+xa_function_weight(1) = 20
+xa_function_param(1) = 1d-6
+xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
+xa_function_weight(2) = 20
+xa_function_param(2) = 1d-2
 
-      delta_lgT_limit = 0.5  ! limit for magnitude of max change in log10 temperature at any point
-      delta_lgT_hard_limit = 1
-      
-      delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
-      delta_lgRho_hard_limit = -1
+!dH_div_H_limit = 0.8d0   ! 10.7 101 3 2137
 
-      delta_lgTeff_limit = 0.05  
-         ! limit for magnitude of max change in log10 temperature at photosphere   
-      delta_lgTeff_hard_limit = 0.1
-   
-      ! limit for magnitude of change in log10(L/Lsun)
-      delta_lgL_limit = 0.05
-      delta_lgL_hard_limit = 0.15
+delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
+delta_lgL_H_hard_limit = 0.5
+lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
 
-      varcontrol_target = 1d-2
-      
-      super_eddington_scaling_factor = 1
-      super_eddington_wind_Ledd_factor = 5
-      
-      net_logTcut_lo = 0
-      net_logTcut_lim = 0
-      
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
-      Pextra_factor = 1200 ! 4 * tau_factor
+delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
+delta_lgL_He_hard_limit = 1
+lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
 
+delta_lgT_limit = 0.5  ! limit for magnitude of max change in log10 temperature at any point
+delta_lgT_hard_limit = 1
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
+delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
+delta_lgRho_hard_limit = -1
+
+delta_lgTeff_limit = 0.05
+! limit for magnitude of max change in log10 temperature at photosphere
+delta_lgTeff_hard_limit = 0.1
+
+! limit for magnitude of change in log10(L/Lsun)
+delta_lgL_limit = 0.05
+delta_lgL_hard_limit = 0.15
+
+varcontrol_target = 1d-2
+
+super_eddington_scaling_factor = 1
+super_eddington_wind_Ledd_factor = 5
+
+net_logTcut_lo = 0
+net_logTcut_lim = 0
+
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'fixed'
+Pextra_factor = 1200 ! 4 * tau_factor
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
 
 / ! end of controls namelist
 
@@ -146,12 +143,12 @@
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+! top level controls
+
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
+
 
 
 / ! end of pgstar namelist

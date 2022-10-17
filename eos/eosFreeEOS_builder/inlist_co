@@ -1,26 +1,26 @@
 &eos_table
 
-        !file that contains mass fractions of metals C thru Ni
-	mass_list = 'mass_frac_CO.txt'
-	
-        !MESA/eos table version number
-	table_version = 51
+!file that contains mass fractions of metals C thru Ni
+mass_list = 'mass_frac_CO.txt'
 
-        !FreeEOS option suite, see FreeEOS README for details
-	eos_version = 1
+!MESA/eos table version number
+table_version = 51
 
-	!set log10T range
-	log10Tmin = 2.1d0
-        log10Tmax = 8.2d0
-        dlog10T = 0.02d0        !default 0.02
+!FreeEOS option suite, see FreeEOS README for details
+eos_version = 1
 
-        !for eosDT: set log10Q range ( log10Q = log10Rho - 2*log10T + 12 )
-        log10Qmin = -10.09d0
-        log10Qmax =  5.69d0
-        dlog10Q = 0.03d0   
+!set log10T range
+log10Tmin = 2.1d0
+log10Tmax = 8.2d0
+dlog10T = 0.02d0        !default 0.02
+
+!for eosDT: set log10Q range ( log10Q = log10Rho - 2*log10T + 12 )
+log10Qmin = -10.09d0
+log10Qmax = 5.69d0
+dlog10Q = 0.03d0
 /
 
 &eos
-   use_FreeEOS = .false.
+use_FreeEOS = .false.
 /
 

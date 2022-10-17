@@ -410,25 +410,25 @@ neon burning.
     ! to set a different termination code depending on which
     ! condition was triggered.  MESA provides 9 customizeable
     ! termination codes, named t_xtra1 .. t_xtra9.  You can
-    ! customize the messages that will be printed upon exit by
-    ! setting the corresponding termination_code_str value.
-    ! termination_code_str(t_xtra1) = 'my termination condition'
-  
-    ! determine the category of maximum burning
-    i_burn_max = maxloc(s% L_by_category,1)
-  
-    ! stop if the luminosity is dominated by neon burning
-    if ( i_burn_max .eq. i_burn_ne) then
-       extras_check_model = terminate
-       s% termination_code = t_xtra1
-       termination_code_str(t_xtra1) = 'neon burning is dominant'
-       return
-    end if
-  
-    ! by default, indicate where (in the code) MESA terminated
-    if (extras_check_model == terminate) s% termination_code = t_extras_check_model
-  
-  end function extras_check_model
+! customize the messages that will be printed upon exit by
+! setting the corresponding termination_code_str value.
+! termination_code_str(t_xtra1) = 'my termination condition'
+
+! determine the category of maximum burning
+i_burn_max = maxloc(s% L_by_category,1)
+
+! stop if the luminosity is dominated by neon burning
+if ( i_burn_max .eq. i_burn_ne) then
+extras_check_model = terminate
+s% termination_code = t_xtra1
+termination_code_str(t_xtra1) = 'neon burning is dominant'
+return
+end if
+
+! by default, indicate where (in the code) MESA terminated
+if (extras_check_model == terminate) s% termination_code = t_extras_check_model
+
+end function extras_check_model
 
 
 Using the "other" hooks

@@ -1,14 +1,14 @@
 ! inlist_mass_Z
 
 &star_job
-   new_Z = 0.02d0
+new_Z = 0.02d0
 / ! end of star_job namelist
 
 &kap
-   Zbase = 0.02d0
+Zbase = 0.02d0
 / ! end of kap namelist
 
 &controls
-   initial_z = 0.02d0
-   initial_mass = 15
+initial_z = 0.02d0
+initial_mass = 15
 / ! end of controls namelist

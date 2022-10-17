@@ -1,6 +1,6 @@
 &star_job
-      
-  show_log_description_at_start = .false. 
+
+show_log_description_at_start = .false.
 
 / !end of star_job namelist
 
@@ -10,33 +10,33 @@
 
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
 
-  initial_z = 0.02
+initial_z = 0.02
 
-  ! GYRE output controls
-  
-  x_integer_ctrl(1) = 0 ! output GYRE info at this step interval (zero disables)
+! GYRE output controls
 
-  energy_eqn_option = 'dedt'
-  
-  calculate_Brunt_N2 = .true.
+x_integer_ctrl(1) = 0 ! output GYRE info at this step interval (zero disables)
 
-  num_trace_history_values = 2
-  trace_history_value_name(1) = 'rel_E_err'
-  trace_history_value_name(2) = 'log_rel_run_E_err'
-   
-  ! check for retries and backups as part of test_suite
+energy_eqn_option = 'dedt'
 
-  ! output. note that profile_interval sets how often gyre is called
+calculate_Brunt_N2 = .true.
 
-  photo_interval = 50
-  profile_interval = 100
-  history_interval = 10
-  terminal_interval = 10
-  write_header_frequency = 10
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+
+! check for retries and backups as part of test_suite
+
+! output. note that profile_interval sets how often gyre is called
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist

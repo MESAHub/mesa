@@ -1,26 +1,26 @@
 ! inlist_to_agb
- 
+
 &star_job
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod'
-      
-      save_model_when_terminate = .true.
-      save_model_filename = 'agb.mod'
-      required_termination_code_string = 'log_max_temp_upper_limit'
+load_saved_model = .true.
+load_model_filename = 'zams.mod'
 
-      set_initial_age = .true.
-      initial_age = 0
+save_model_when_terminate = .true.
+save_model_filename = 'agb.mod'
+required_termination_code_string = 'log_max_temp_upper_limit'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 10
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_dt = .true.
+years_for_initial_dt = 10
 
-      !pgstar_flag = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -32,22 +32,22 @@
 
 &controls
 
-      log_max_temp_upper_limit = 8.6d0
+log_max_temp_upper_limit = 8.6d0
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1600
+! limit max_model_number as part of test_suite
+max_model_number = 1600
 
 ! when to stop
 
 ! wind
-      cool_wind_full_on_T = 1d6
-      hot_wind_full_on_T = 1d6 
-      hot_wind_scheme = ''
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5  
-      Blocker_scaling_factor = 0.5
+cool_wind_full_on_T = 1d6
+hot_wind_full_on_T = 1d6
+hot_wind_scheme = ''
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.5
+Blocker_scaling_factor = 0.5
 
 ! atmosphere
 
@@ -60,7 +60,7 @@
 ! mixing
 
 ! timesteps
-      delta_HR_limit = 0.05
+delta_HR_limit = 0.05
 
 ! mesh
 

@@ -1,125 +1,122 @@
 &pgstar
 
-  Grid1_title = '1.3M_ms_high_Z'
-  Grid1_win_flag = .false.
+Grid1_title = '1.3M_ms_high_Z'
+Grid1_win_flag = .false.
 
-  Grid1_win_width = 12
-  Grid1_win_aspect_ratio = 0.4 ! aspect_ratio = height/width
+Grid1_win_width = 12
+Grid1_win_aspect_ratio = 0.4 ! aspect_ratio = height/width
 
-  Grid1_xleft = 0.05 ! fraction of full window width for margin on left
-  Grid1_xright = 0.95 ! fraction of full window width for margin on right
-  Grid1_ybot = 0.08 ! fraction of full window width for margin on bottom
-  Grid1_ytop = 0.92 ! fraction of full window width for margin on top
+Grid1_xleft = 0.05 ! fraction of full window width for margin on left
+Grid1_xright = 0.95 ! fraction of full window width for margin on right
+Grid1_ybot = 0.08 ! fraction of full window width for margin on bottom
+Grid1_ytop = 0.92 ! fraction of full window width for margin on top
 
-  Grid1_num_cols = 5 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 1 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 2 ! <= 10
+Grid1_num_cols = 5 ! divide plotting region into this many equal width cols
+Grid1_num_rows = 1 ! divide plotting region into this many equal height rows
+Grid1_num_plots = 2 ! <= 10
 
+Grid1_plot_name(1) = 'HR'
+Grid1_plot_row(1) = 1 ! number from 1 at top
+Grid1_plot_rowspan(1) = 1 ! plot spans this number of rows
+Grid1_plot_col(1) = 1 ! number from 1 at left
+Grid1_plot_colspan(1) = 2 ! plot spans this number of columns
+Grid1_plot_pad_left(1) = 0.025 ! fraction of full window width for padding on left
+Grid1_plot_pad_right(1) = 0.05 ! fraction of full window width for padding on right
+Grid1_plot_pad_top(1) = 0.05 ! fraction of full window height for padding at top
+Grid1_plot_pad_bot(1) = 0.05 ! fraction of full window height for padding at bottom
+Grid1_txt_scale_factor(1) = 1.0 ! multiply txt_scale for subplot by this
 
-  Grid1_plot_name(1) = 'HR'
-  Grid1_plot_row(1) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(1) = 1 ! plot spans this number of rows
-  Grid1_plot_col(1) =  1 ! number from 1 at left
-  Grid1_plot_colspan(1) = 2 ! plot spans this number of columns
-  Grid1_plot_pad_left(1) = 0.025 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.05 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 1.0 ! multiply txt_scale for subplot by this
+Grid1_plot_name(2) = 'Profile_Panels1'
+Grid1_plot_row(2) = 1 ! number from 1 at top
+Grid1_plot_rowspan(2) = 1 ! plot spans this number of rows
+Grid1_plot_col(2) = 3 ! number from 1 at left
+Grid1_plot_colspan(2) = 3 ! plot spans this number of columns
+Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
+Grid1_plot_pad_right(2) = 0.025 ! fraction of full window width for padding on right
+Grid1_plot_pad_top(2) = 0.05 ! fraction of full window height for padding at top
+Grid1_plot_pad_bot(2) = 0.05 ! fraction of full window height for padding at bottom
+Grid1_txt_scale_factor(2) = 1.0 ! multiply txt_scale for subplot by this
 
+! file output
+Grid1_file_flag = .true.
+Grid1_file_dir = 'png'
+Grid1_file_prefix = 'grid1'
+Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_width = -1 ! negative means use same value as for window
+Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+! MESA uses PGPLOT for live plotting and gives the user a tremendous
+! amount of control of the presentation of the information.
 
-  Grid1_plot_name(2) = 'Profile_Panels1'
-  Grid1_plot_row(2) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(2) = 1 ! plot spans this number of rows
-  Grid1_plot_col(2) = 3 ! number from 1 at left
-  Grid1_plot_colspan(2) = 3 ! plot spans this number of columns
-  Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.025 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 1.0 ! multiply txt_scale for subplot by this
+! show HR diagram
+! this plots the history of L,Teff over many timesteps
+HR_win_flag = .false.
 
-  ! file output
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1'
-  Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = -1 ! negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
-  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
-  ! amount of control of the presentation of the information.
+! set static plot bounds
+HR_logT_min = 3.55
+HR_logT_max = 3.85
+HR_logL_min = 0.1
+HR_logL_max = 1.0
 
-  ! show HR diagram
-  ! this plots the history of L,Teff over many timesteps
-  HR_win_flag = .false.
+! show OPAL results
+HR_fname = 'HR_OPAL.dat' ! file name for extra HR data
 
-  ! set static plot bounds
-  HR_logT_min = 3.55
-  HR_logT_max = 3.85
-  HR_logL_min = 0.1
-  HR_logL_max = 1.0
+! set window size (aspect_ratio = height/width)
+HR_win_width = 6
+HR_win_aspect_ratio = 1.0
 
-  ! show OPAL results
-  HR_fname = 'HR_OPAL.dat' ! file name for extra HR data
+Profile_Panels1_win_flag = .false.
 
-  ! set window size (aspect_ratio = height/width)
-  HR_win_width = 6
-  HR_win_aspect_ratio = 1.0
+Profile_Panels1_win_width = 6
+Profile_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
 
+Profile_Panels1_xleft = 0.15
+Profile_Panels1_xright = 0.85
+Profile_Panels1_ybot = 0.15
+Profile_Panels1_ytop = 0.85
+Profile_Panels1_txt_scale = 1.0
+Profile_Panels1_title = 'Profile Panels1'
 
-  Profile_Panels1_win_flag = .false.
+Profile_Panels1_xaxis_name = 'mass'
+Profile_Panels1_xaxis_reversed = .false.
+Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
+Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
+Profile_Panels1_xmargin = 0d0
+Profile_Panels1_show_mix_regions_on_xaxis = .false.
 
-  Profile_Panels1_win_width = 6
-  Profile_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+Profile_Panels1_yaxis_name(:) = ''
+Profile_Panels1_yaxis_reversed(:) = .false.
+Profile_Panels1_yaxis_log(:) = .false. ! show log10 of abs value
+Profile_Panels1_ymin(:) = -101d0 ! only used if /= -101d0
+Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0
+Profile_Panels1_ymargin(:) = 0.1
+Profile_Panels1_dymin(:) = -1
 
-  Profile_Panels1_xleft = 0.15
-  Profile_Panels1_xright = 0.85
-  Profile_Panels1_ybot = 0.15
-  Profile_Panels1_ytop = 0.85
-  Profile_Panels1_txt_scale = 1.0
-  Profile_Panels1_title = 'Profile Panels1'
+Profile_Panels1_other_yaxis_name(:) = ''
+Profile_Panels1_other_yaxis_reversed(:) = .false.
+Profile_Panels1_other_yaxis_log(:) = .false. ! show log10 of abs value
+Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(:) = 0.1
+Profile_Panels1_other_dymin(:) = -1
 
-  Profile_Panels1_xaxis_name = 'mass'
-  Profile_Panels1_xaxis_reversed = .false.
-  Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
-  Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
-  Profile_Panels1_xmargin = 0d0
-  Profile_Panels1_show_mix_regions_on_xaxis = .false.
+Profile_Panels1_show_grid = .false.
 
-  Profile_Panels1_yaxis_name(:) = ''
-  Profile_Panels1_yaxis_reversed(:) = .false.
-  Profile_Panels1_yaxis_log(:) = .false. ! show log10 of abs value
-  Profile_Panels1_ymin(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_ymargin(:) = 0.1
-  Profile_Panels1_dymin(:) = -1
+! setup default plot
+Profile_Panels1_num_panels = 1
+Profile_Panels1_yaxis_name(1) = 'z_mass_fraction_metals'
+Profile_Panels1_ymin(1) = 0.038 ! only used if /= -101d0
+Profile_Panels1_ymax(1) = 0.042 ! only used if /= -101d0
 
-  Profile_Panels1_other_yaxis_name(:) = ''
-  Profile_Panels1_other_yaxis_reversed(:) = .false.
-  Profile_Panels1_other_yaxis_log(:) = .false. ! show log10 of abs value
-  Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_other_ymargin(:) = 0.1
-  Profile_Panels1_other_dymin(:) = -1
+! Profile_Panels1_other_yaxis_name(1) = 'entropy'
+! Profile_Panels1_yaxis_name(2) = 'logRho'
+! Profile_Panels1_other_yaxis_name(2) = 'logP'
 
-  Profile_Panels1_show_grid = .false.
-
-  ! setup default plot
-  Profile_Panels1_num_panels = 1
-  Profile_Panels1_yaxis_name(1) = 'z_mass_fraction_metals'
-  Profile_Panels1_ymin(1) = 0.038 ! only used if /= -101d0
-  Profile_Panels1_ymax(1) = 0.042 ! only used if /= -101d0
-
-  ! Profile_Panels1_other_yaxis_name(1) = 'entropy'
-  ! Profile_Panels1_yaxis_name(2) = 'logRho'
-  ! Profile_Panels1_other_yaxis_name(2) = 'logP'
-
-  ! file output
-  Profile_Panels1_file_flag = .false.
-  Profile_Panels1_file_dir = 'png'
-  Profile_Panels1_file_prefix = 'profile_panels1_'
-  Profile_Panels1_file_interval = 5 ! output when mod(model_number,Profile_Panels1_file_interval)==0
-  Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
-  Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+! file output
+Profile_Panels1_file_flag = .false.
+Profile_Panels1_file_dir = 'png'
+Profile_Panels1_file_prefix = 'profile_panels1_'
+Profile_Panels1_file_interval = 5 ! output when mod(model_number,Profile_Panels1_file_interval)==0
+Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
+Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
 
 / ! end of pgstar namelist

@@ -22,33 +22,33 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_pgstar_plots
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_pgstar_plots = .true.
-      ! procedure pointer: s% other_pgstar_plots_info => my_routine
-
-
-      ! see star/other/sample_pgstar_plot.f90
-        
-      use star_def
-
-      implicit none
-
-                  
-      contains
-      
-      
-      ! default does nothing
-      subroutine null_other_pgstar_plots_info(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_other_pgstar_plots_info
+module other_pgstar_plots
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_pgstar_plots = .true.
+   ! procedure pointer: s% other_pgstar_plots_info => my_routine
+   
+   
+   ! see star/other/sample_pgstar_plot.f90
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_pgstar_plots
+contains
+   
+   
+   ! default does nothing
+   subroutine null_other_pgstar_plots_info(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine null_other_pgstar_plots_info
+
+
+end module other_pgstar_plots
       
       
       

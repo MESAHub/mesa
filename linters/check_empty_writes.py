@@ -7,7 +7,8 @@ from pathlib import Path
 
 MESA_DIR = os.environ["MESA_DIR"]
 
-# Search files for instances on an empty writing usin* as the format i.e write(*,*) 
+# Search files for instances on an empty writing usin* as the format i.e
+# write(*,*)
 # and replace with calls to write(*,'(A)') 
 # This makes writes more portable to ifort
 
@@ -31,22 +32,23 @@ def check_skip(path):
 
 write = re.compile("^ *write\([*a-zA-Z0-9]+\,[*]\)$")
 
+
 def replace(match):
     return match.string.split(',')[0] + ",'(A)')"
+
 
 if len(sys.argv) > 1:
     files = sys.argv[1:]
 else:
     files = Path("./").rglob("*.f90")
 
-
 for file in Path("./").rglob("*.f90"):
     if check_skip(file):
         continue
-
+    
     with open(file, "r") as f:
         lines = f.readlines()
-
+    
     modified = False
     for ldx, line in enumerate(lines):
         if "write(" in line:
@@ -55,7 +57,7 @@ for file in Path("./").rglob("*.f90"):
                 line = re.sub(write, replace, line)
                 lines[ldx] = line
                 modified = True
-
+    
     if modified:
         with open(file, "w") as f:
             f.writelines(lines)

@@ -1,434 +1,433 @@
-&astero_search_controls 
-   ! example based on HD49385, but modified for testing various new stuff
+&astero_search_controls
+! example based on HD49385, but modified for testing various new stuff
 
-      chi2_seismo_fraction = 0.667d0
-      normalize_chi2_spectro = .true.
+chi2_seismo_fraction = 0.667d0
+normalize_chi2_spectro = .true.
 
-      constraint_name(1) = 'Teff'
-      constraint_target(1) = 6095d0
-      constraint_sigma(1) = 65d0
-      include_constraint_in_chi2_spectro(1) = .true.
-      sigmas_coeff_for_constraint_limit(1) = -5 ! disable by setting to 0
+constraint_name(1) = 'Teff'
+constraint_target(1) = 6095d0
+constraint_sigma(1) = 65d0
+include_constraint_in_chi2_spectro(1) = .true.
+sigmas_coeff_for_constraint_limit(1) = -5 ! disable by setting to 0
 
-      constraint_name(2) = 'log_g'
-      constraint_target(2) = 3.97d0
-      constraint_sigma(2) = 0.02d0
-      include_constraint_in_chi2_spectro(2) = .false.
-      sigmas_coeff_for_constraint_limit(2) = -5 ! disable by setting to 0
+constraint_name(2) = 'log_g'
+constraint_target(2) = 3.97d0
+constraint_sigma(2) = 0.02d0
+include_constraint_in_chi2_spectro(2) = .false.
+sigmas_coeff_for_constraint_limit(2) = -5 ! disable by setting to 0
 
-      constraint_name(3) = 'log_L'
-      constraint_target(3) = 0.67d0
-      constraint_sigma(3) = 0.05d0
-      include_constraint_in_chi2_spectro(3) = .true.
-      sigmas_coeff_for_constraint_limit(3) = 5 ! disable by setting to 0
+constraint_name(3) = 'log_L'
+constraint_target(3) = 0.67d0
+constraint_sigma(3) = 0.05d0
+include_constraint_in_chi2_spectro(3) = .true.
+sigmas_coeff_for_constraint_limit(3) = 5 ! disable by setting to 0
 
-      constraint_name(4) = 'M_H'
-      constraint_target(4) = 0.09
-      constraint_sigma(4) = 0.05
-      include_constraint_in_chi2_spectro(4) = .true.
-      
-      ! we calculate model [M/H] as = log10((Z/X)/Z_div_X_solar)
-      ! using model surface average values for Z and X.
-      Z_div_X_solar = 0.02293d0
+constraint_name(4) = 'M_H'
+constraint_target(4) = 0.09
+constraint_sigma(4) = 0.05
+include_constraint_in_chi2_spectro(4) = .true.
 
-      constraint_name(5) = 'log_R'
+! we calculate model [M/H] as = log10((Z/X)/Z_div_X_solar)
+! using model surface average values for Z and X.
+Z_div_X_solar = 0.02293d0
 
-      constraint_name(6) = 'Rcz'
+constraint_name(5) = 'log_R'
 
-      include_age_in_chi2_spectro = .false.
-      age_target = 4.5695d9 ! (see Bahcall, Serenelli, and Basu, 2006)
-      age_sigma = 0.0065d9
-      
-      num_smaller_steps_before_age_target = 50 ! only used if > 0
-      dt_for_smaller_steps_before_age_target = 0.0065d8 ! 1/10 age_sigma
-         ! this should be << age_sigma
-      
-   ! chi2_seismo is a weighted combination of
-         ! frequencies, ratios of frequencies, delta_nu, and nu_max
-         
-      ! you specify the weighting of the terms in chi2_seismo by setting the following
-   
-      chi2_seismo_delta_nu_fraction = 0d0  
-      chi2_seismo_nu_max_fraction = 0d0    
-      chi2_seismo_r_010_fraction = 0d0
-      chi2_seismo_r_02_fraction = 0d0
-      
-      trace_chi2_seismo_delta_nu_info = .false. ! if true, output info to terminal
-      trace_chi2_seismo_nu_max_info = .false. ! if true, output info to terminal
-      trace_chi2_seismo_ratios_info = .false. ! if true, output info to terminal
-      trace_chi2_seismo_frequencies_info = .false. ! if true, output info to terminal
+constraint_name(6) = 'Rcz'
 
-      trace_chi2_spectro_info = .false. ! if true, output info to terminal
-      
-      normalize_chi2_seismo_frequencies = .true.
-      normalize_chi2_seismo_r_010 = .true.
-      normalize_chi2_seismo_r_02 = .true.
+include_age_in_chi2_spectro = .false.
+age_target = 4.5695d9 ! (see Bahcall, Serenelli, and Basu, 2006)
+age_sigma = 0.0065d9
 
-   ! seismic data (frequencies in microHz)
+num_smaller_steps_before_age_target = 50 ! only used if > 0
+dt_for_smaller_steps_before_age_target = 0.0065d8 ! 1/10 age_sigma
+! this should be << age_sigma
 
-      nu_max = 1010
-      nu_max_sigma = -1
+! chi2_seismo is a weighted combination of
+! frequencies, ratios of frequencies, delta_nu, and nu_max
 
-      delta_nu = 56.28
-      delta_nu_sigma = 1.0
-      sigmas_coeff_for_delta_nu_limit = 0 ! -5 ! disable by setting to 0
+! you specify the weighting of the terms in chi2_seismo by setting the following
 
-      ! observed l=0 modes to match to model
-         nl(0) = 9
-         freq_target(0,1) = 799.70d0
-         freq_target(0,2) = 855.30d0
-         freq_target(0,3) = 909.92d0
-         freq_target(0,4) = 965.16d0
-         freq_target(0,5) = 1021.81d0
-         freq_target(0,6) = 1078.97d0
-         freq_target(0,7) = 1135.32d0
-         freq_target(0,8) = 1192.12d0
-         freq_target(0,9) = 1250.12d0
-         freq_sigma(0,1) = 0.27d0
-         freq_sigma(0,2) = 0.73d0
-         freq_sigma(0,3) = 0.26d0
-         freq_sigma(0,4) = 0.36d0
-         freq_sigma(0,5) = 0.28d0
-         freq_sigma(0,6) = 0.33d0
-         freq_sigma(0,7) = 0.34d0
-         freq_sigma(0,8) = 0.45d0
-         freq_sigma(0,9) = 0.89d0
-   
-      ! observed l=1 modes to match to model
-         nl(1) = 10
-         freq_target(1,1) = 748.60d0
-         freq_target(1,2) = 777.91d0
-         freq_target(1,3) = 828.21d0
-         freq_target(1,4) = 881.29d0
-         freq_target(1,5) = 935.90d0
-         freq_target(1,6) = 991.09d0
-         freq_target(1,7) = 1047.79d0
-         freq_target(1,8) = 1104.68d0
-         freq_target(1,9) = 1161.27d0
-         freq_target(1,10) = 1216.95d0
-         freq_sigma(1,1) = 0.23d0
-         freq_sigma(1,2) = 0.24d0
-         freq_sigma(1,3) = 0.42d0
-         freq_sigma(1,4) = 0.29d0
-         freq_sigma(1,5) = 0.23d0
-         freq_sigma(1,6) = 0.22d0
-         freq_sigma(1,7) = 0.24d0
-         freq_sigma(1,8) = 0.22d0
-         freq_sigma(1,9) = 0.33d0
-         freq_sigma(1,10) = 0.53d0
-   
-      ! observed l=2 modes to match to model
-         nl(2) = 8
-         freq_target(2,1) = 794.55d0
-         freq_target(2,2) = 905.31d0
-         freq_target(2,3) = 961.47d0
-         freq_target(2,4) = 1017.56d0
-         freq_target(2,5) = 1075.01d0
-         freq_target(2,6) = 1130.79d0
-         freq_target(2,7) = 1187.55d0
-         freq_target(2,8) = 1246.78d0
-         freq_sigma(2,1) = 0.52d0
-         freq_sigma(2,2) = 0.35d0
-         freq_sigma(2,3) = 0.49d0
-         freq_sigma(2,4) = 0.27d0
-         freq_sigma(2,5) = 0.27d0
-         freq_sigma(2,6) = 0.61d0
-         freq_sigma(2,7) = 0.32d0
-         freq_sigma(2,8) = 0.84d0
-   
-      ! observed l=3 modes for matching to model
-         nl(3) = 0
-         freq_target(3,:) = 0
-         freq_sigma(3,:) = 0
-   
-   
-   ! search controls
-      
-      eval_chi2_at_target_age_only = .false.
-      ! set this true if you want chi2 only for a specific age and no others,
-         ! in addition,
-         ! set max_age
-         ! set max_years_for_timestep
-         ! set num_adjusted_dt_steps_before_max_age
-                  
-      ! use these if you only want to evaluate chi2 for a given range of ages
-      min_age_for_chi2 = -1 ! (years) only use if > 0
-      max_age_for_chi2 = -1 ! (years) only use if > 0
-    
-      
-      search_type = 'use_first_values'
-         ! this option means no search
-         ! just do a single run using "first" values for mass, alpha, Y, ...
-         
-      !search_type = 'scan_grid'
-         scan_grid_output_filename = 'scan_grid_results.data'
-         restart_scan_grid_from_file = .false.
+chi2_seismo_delta_nu_fraction = 0d0
+chi2_seismo_nu_max_fraction = 0d0
+chi2_seismo_r_010_fraction = 0d0
+chi2_seismo_r_02_fraction = 0d0
 
-      !search_type = 'simplex'
-         simplex_itermax = 1000 ! each iteration revises the simplex
-         simplex_fcn_calls_max = 10000 ! may use several function calls per iteration
-         simplex_x_atol = 1d-10 ! tolerance for absolute differences
-         simplex_x_rtol = 1d-10 ! tolerance for relative differences
-         simplex_centroid_weight_power = 0d0
-         simplex_enforce_bounds = .false.
-         simplex_adaptive_random_search = .false.
+trace_chi2_seismo_delta_nu_info = .false. ! if true, output info to terminal
+trace_chi2_seismo_nu_max_info = .false. ! if true, output info to terminal
+trace_chi2_seismo_ratios_info = .false. ! if true, output info to terminal
+trace_chi2_seismo_frequencies_info = .false. ! if true, output info to terminal
 
-         simplex_output_filename = 'simplex_results.data'
-         
-         restart_simplex_from_file = .false.
-         
-         simplex_seed = 1074698122 ! seed for random number generation
+trace_chi2_spectro_info = .false. ! if true, output info to terminal
 
-         ! coefficients for various steps of the downhill simplex algorithm
-         simplex_alpha = 1d0    ! reflect
-         simplex_beta = 2d0     ! expand
-         simplex_gamma = 0.5d0  ! contract
-         simplex_delta = 0.5d0  ! shrink
-         
-      !search_type = 'newuoa'
-         newuoa_output_filename = 'newuoa_results.data'
-         newuoa_rhoend = 1d-6 
-         
-      !search_type = 'bobyqa'
-         bobyqa_output_filename = 'bobyqa_results.data'
-         bobyqa_rhoend = 1d-6 
-      
-      !search_type = 'from_file'
-         filename_for_parameters = 'undefined'
-         max_num_from_file = -1 ! if > 0, then stop after doing this many lines from file.
+normalize_chi2_seismo_frequencies = .true.
+normalize_chi2_seismo_r_010 = .true.
+normalize_chi2_seismo_r_02 = .true.
 
-         file_column_for_param(1) = 3
-         file_column_for_param(2) = 4
-         file_column_for_param(3) = 5
-         file_column_for_param(4) = 6
-         file_column_for_param(5) = 7
-         file_column_for_param(6) = 8
-         file_column_for_param(7) = 9
-         file_column_for_param(8) = 10
+! seismic data (frequencies in microHz)
 
-         from_file_output_filename = 'from_file_results.data'
-         
-      ! status of Y -- parameter or function of Z
-         
-         Y_depends_on_Z = .false. 
-            ! if false, then Y is a parameter like FeH.
-               ! you should set vary_Y, first_Y, min_Y, and max_Y.
-            ! if true, then Y depends on Z as follows: Y = Y0 + dYdZ*Z
-               ! in this case, set vary_Y = .false. 
-               ! first_Y, min_Y, and max_Y are unused.
-         Y0 = 0.248d0
-         dYdZ = 1.4d0
-      
-      ! composition control
-         Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
-         
-      ! overshoot_f0 is changed along with overshoot_f
-         ! f0_ov = f0_ov_div_f_ov * f_ov
-         f0_ov_div_f_ov = 1  ! THIS SHOULD BE < 1
+nu_max = 1010
+nu_max_sigma = -1
 
-      ! parameters
-         param_name(1) = 'initial_mass'
-         first_param(1) = 1.2713303424d0
-         vary_param(1) = .true.
-         min_param(1) = 1.24d0
-         max_param(1) = 1.32d0
-         delta_param(1) = 0.01d0
+delta_nu = 56.28
+delta_nu_sigma = 1.0
+sigmas_coeff_for_delta_nu_limit = 0 ! -5 ! disable by setting to 0
 
-         param_name(2) = 'initial_Y'
-         first_param(2) = 0.2668448980d0
-         vary_param(2) = .true.
-         min_param(2) = 0.24d0
-         max_param(2) = 0.30d0
-         delta_param(2) = 0.01d0
+! observed l=0 modes to match to model
+nl(0) = 9
+freq_target(0, 1) = 799.70d0
+freq_target(0, 2) = 855.30d0
+freq_target(0, 3) = 909.92d0
+freq_target(0, 4) = 965.16d0
+freq_target(0, 5) = 1021.81d0
+freq_target(0, 6) = 1078.97d0
+freq_target(0, 7) = 1135.32d0
+freq_target(0, 8) = 1192.12d0
+freq_target(0, 9) = 1250.12d0
+freq_sigma(0, 1) = 0.27d0
+freq_sigma(0, 2) = 0.73d0
+freq_sigma(0, 3) = 0.26d0
+freq_sigma(0, 4) = 0.36d0
+freq_sigma(0, 5) = 0.28d0
+freq_sigma(0, 6) = 0.33d0
+freq_sigma(0, 7) = 0.34d0
+freq_sigma(0, 8) = 0.45d0
+freq_sigma(0, 9) = 0.89d0
 
-         param_name(3) = 'initial_FeH'
-         first_param(3) = 0.0725374166d0
-         vary_param(3) = .true.
-         min_param(3) = 0.0d0
-         max_param(3) = 0.17d0
-         delta_param(3) = 0.03d0
+! observed l=1 modes to match to model
+nl(1) = 10
+freq_target(1, 1) = 748.60d0
+freq_target(1, 2) = 777.91d0
+freq_target(1, 3) = 828.21d0
+freq_target(1, 4) = 881.29d0
+freq_target(1, 5) = 935.90d0
+freq_target(1, 6) = 991.09d0
+freq_target(1, 7) = 1047.79d0
+freq_target(1, 8) = 1104.68d0
+freq_target(1, 9) = 1161.27d0
+freq_target(1, 10) = 1216.95d0
+freq_sigma(1, 1) = 0.23d0
+freq_sigma(1, 2) = 0.24d0
+freq_sigma(1, 3) = 0.42d0
+freq_sigma(1, 4) = 0.29d0
+freq_sigma(1, 5) = 0.23d0
+freq_sigma(1, 6) = 0.22d0
+freq_sigma(1, 7) = 0.24d0
+freq_sigma(1, 8) = 0.22d0
+freq_sigma(1, 9) = 0.33d0
+freq_sigma(1, 10) = 0.53d0
 
-         param_name(4) = 'alpha'
-         first_param(4) = 1.6534734832d0
-         vary_param(4) = .true.
-         min_param(4) = 1.5d0
-         max_param(4) = 1.9d0
-         delta_param(4) = 0.1d0
+! observed l=2 modes to match to model
+nl(2) = 8
+freq_target(2, 1) = 794.55d0
+freq_target(2, 2) = 905.31d0
+freq_target(2, 3) = 961.47d0
+freq_target(2, 4) = 1017.56d0
+freq_target(2, 5) = 1075.01d0
+freq_target(2, 6) = 1130.79d0
+freq_target(2, 7) = 1187.55d0
+freq_target(2, 8) = 1246.78d0
+freq_sigma(2, 1) = 0.52d0
+freq_sigma(2, 2) = 0.35d0
+freq_sigma(2, 3) = 0.49d0
+freq_sigma(2, 4) = 0.27d0
+freq_sigma(2, 5) = 0.27d0
+freq_sigma(2, 6) = 0.61d0
+freq_sigma(2, 7) = 0.32d0
+freq_sigma(2, 8) = 0.84d0
 
-         param_name(5) = 'f_ov'
-         first_param(5) = 0.015d0
-         vary_param(5) = .false.
-         min_param(5) = 0d0
-         max_param(5) = 0.03d0
-         delta_param(5) = 0d0
-      
-         ! don't consider models that aren't old enough
-            min_age_limit = 1d6
-         
-         ! don't consider models with L_nuc/L less than this limit
-            Lnuc_div_L_limit = 0.95 ! this rules out pre-zams models
-
-         ! don't consider models with chi2_spectroscopic above this limit 
-            chi2_spectroscopic_limit = 20
-
-         ! don't consider models with chi2_delta_nu above this limit 
-            chi2_delta_nu_limit = 20
-
-         ! don't consider models with chi2_radial above this limit 
-            chi2_radial_limit = 30
-      
-         ! only calculate full chi^2 if pass all these limit checks
-         
-      
-      ! adjust max timestep depending on how close to target
-      
-         ! these are just default values -- you will probably need to adjust them for your problem.
-         max_yrs_dt_when_cold = 1d7 ! when fail Lnuc/L, chi2_spectro, or ch2_delta_nu
-         max_yrs_dt_when_warm = 1d6 ! when pass previous but fail chi2_radial; < max_yrs_dt_when_cold
-         max_yrs_dt_when_hot = 1d5 ! when pass chi2_radial; < max_yrs_dt_when_warm
-         
-         max_yrs_dt_chi2_small_limit = 5d4 ! < max_yrs_dt_when_hot
-         chi2_limit_for_small_timesteps = 30
-         
-         max_yrs_dt_chi2_smaller_limit = 5d4 ! < max_yrs_dt_chi2_small_limit
-         chi2_limit_for_smaller_timesteps = -1d99 ! < chi2_limit_for_small_timesteps
-         
-         max_yrs_dt_chi2_smallest_limit = 3d4 ! < max_yrs_dt_chi2_smaller_limit
-         chi2_limit_for_smallest_timesteps = -1d99 ! < chi2_limit_for_smaller_timesteps
-      
-      
-      ! only calculate chi^2 if pass all the checks
-   
-      ! you can stop the run if chi^2 is rising.
-         
-         ! here is a relative limit
-         limit_num_chi2_too_big = 50
-         chi2_relative_increase_limit = 100.
-         
-         ! and here is an absolute limit
-         chi2_search_limit1 = 3.0
-         chi2_search_limit2 = 4.0
-         ! if best chi2 for the run is <= chi2_search_limit1,
-         ! then stop the run if chi2 >= chi2_search_limit2.
-         
-         min_num_samples_for_avg = 2 ! want at least this many samples to form averages
-         max_num_samples_for_avg = 10 ! use this many of the best chi^2 samples for averages
-         
-         ! these use results for the best chi^2 model of the previous best samples
-         avg_age_sigma_limit = 5 ! stop if age > avg age + this limit times sigma of avg age
-         avg_model_number_sigma_limit = 5 ! ditto for model number
-   
-   
-   ! surface corrections
-      correction_scheme = 'kjeldsen'
-      correction_factor = 1 
-      l0_n_obs(:) = -1 ! the observed radial orders (ignored if < 0)
-      correction_b = 4.25d0
-
-      surf_coef1_name = 'a_div_r'
-      surf_coef2_name = 'correction_r'
-
-      save_next_best_at_higher_frequency = .true.
-      save_next_best_at_lower_frequency = .true.
-      
-      ! note: to set nu_max_sun or delta_nu_sun, see star/defaults/controls.defaults
-      
-   ! output controls
-   
-      write_best_model_data_for_each_sample = .true.
-      num_digits = 4 ! number of digits in sample number (with leading 0's)
-      sample_results_prefix = 'sample_'
-         ! note that you can include a directory in the prefix if desired
-      sample_results_postfix = '.data'
-      
-      model_num_digits = 4 ! number of digits in model number (with leading 0's)
-
-      write_fgong_for_each_model = .false.
-      fgong_prefix = 'fgong_' 
-         ! note that you can include a directory in the prefix if desired
-      fgong_postfix = '.data'
-      
-      write_fgong_for_best_model = .false.
-      best_model_fgong_filename = ''
-
-      write_gyre_for_each_model = .false.
-      gyre_prefix = 'gyre_' 
-         ! note that you can include a directory in the prefix if desired
-      gyre_postfix = '.data'
-      max_num_gyre_points = -1 ! only used if > 1
-      
-      write_gyre_for_best_model = .false.
-      best_model_gyre_filename = ''
-      
-      write_profile_for_best_model = .false.
-      best_model_profile_filename = ''
-      
-      save_model_for_best_model = .false.
-      best_model_save_model_filename = ''
-      
-      save_info_for_last_model = .false. ! if true, treat final model as "best"
-      last_model_save_info_filename = '' ! and save info about final model to this file.
-      
-   
-   ! miscellaneous
-   
-      ! trace limits
-         trace_limits = .false.
-   
-      ! save all control settings to file
-         save_controls = .false. ! dumps &astero_search_controls controls to file
-         save_controls_filename = '' ! if empty, uses a default name
-
-      ! options for input model to pulsation codes
-         add_atmosphere = .false.
-         keep_surface_point = .false.
-         add_center_point = .true. 
-      
-      ! oscillation analysis
-
-         oscillation_code = 'adipls' ! or 'gyre'   <<< lowercase
-            
-         trace_time_in_oscillation_code = .false.
-         
-      ! gyre controls
-      
-         gyre_input_file = 'gyre.in'
-
-      ! adipls controls
-         
-         do_redistribute_mesh = .false.
-            
-         ! iscan for adipls = the following factor times the given number of observed modes
-         iscan_factor(0) = 15
-         iscan_factor(1) = 15
-         iscan_factor(2) = 15
-         iscan_factor(3) = 15
-         ! frequency range is set from observed frequencies times these factors
-         nu_lower_factor = 0.8
-         nu_upper_factor = 1.2
+! observed l=3 modes for matching to model
+nl(3) = 0
+freq_target(3, :) = 0
+freq_sigma(3, :) = 0
 
 
-   ! include other inlists
-   
-         read_extra_astero_search_inlist1 = .false.
-         extra_astero_search_inlist1_name = 'undefined'
-            ! if read_extra_astero_search_inlist1 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist2 = .false.
-         extra_astero_search_inlist2_name = 'undefined'
-            ! if read_extra_astero_search_inlist2 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist3 = .false.
-         extra_astero_search_inlist3_name = 'undefined'
-            ! if read_extra_astero_search_inlist3 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist4 = .false.
-         extra_astero_search_inlist4_name = 'undefined'
-            ! if read_extra_astero_search_inlist4 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist5 = .false.
-         extra_astero_search_inlist5_name = 'undefined'
-            ! if read_extra_astero_search_inlist5 is true, then read this namelist file
+! search controls
+
+eval_chi2_at_target_age_only = .false.
+! set this true if you want chi2 only for a specific age and no others,
+! in addition,
+! set max_age
+! set max_years_for_timestep
+! set num_adjusted_dt_steps_before_max_age
+
+! use these if you only want to evaluate chi2 for a given range of ages
+min_age_for_chi2 = -1 ! (years) only use if > 0
+max_age_for_chi2 = -1 ! (years) only use if > 0
+
+search_type = 'use_first_values'
+! this option means no search
+! just do a single run using "first" values for mass, alpha, Y, ...
+
+!search_type = 'scan_grid'
+scan_grid_output_filename = 'scan_grid_results.data'
+restart_scan_grid_from_file = .false.
+
+!search_type = 'simplex'
+simplex_itermax = 1000 ! each iteration revises the simplex
+simplex_fcn_calls_max = 10000 ! may use several function calls per iteration
+simplex_x_atol = 1d-10 ! tolerance for absolute differences
+simplex_x_rtol = 1d-10 ! tolerance for relative differences
+simplex_centroid_weight_power = 0d0
+simplex_enforce_bounds = .false.
+simplex_adaptive_random_search = .false.
+
+simplex_output_filename = 'simplex_results.data'
+
+restart_simplex_from_file = .false.
+
+simplex_seed = 1074698122 ! seed for random number generation
+
+! coefficients for various steps of the downhill simplex algorithm
+simplex_alpha = 1d0    ! reflect
+simplex_beta = 2d0     ! expand
+simplex_gamma = 0.5d0  ! contract
+simplex_delta = 0.5d0  ! shrink
+
+!search_type = 'newuoa'
+newuoa_output_filename = 'newuoa_results.data'
+newuoa_rhoend = 1d-6
+
+!search_type = 'bobyqa'
+bobyqa_output_filename = 'bobyqa_results.data'
+bobyqa_rhoend = 1d-6
+
+!search_type = 'from_file'
+filename_for_parameters = 'undefined'
+max_num_from_file = -1 ! if > 0, then stop after doing this many lines from file.
+
+file_column_for_param(1) = 3
+file_column_for_param(2) = 4
+file_column_for_param(3) = 5
+file_column_for_param(4) = 6
+file_column_for_param(5) = 7
+file_column_for_param(6) = 8
+file_column_for_param(7) = 9
+file_column_for_param(8) = 10
+
+from_file_output_filename = 'from_file_results.data'
+
+! status of Y -- parameter or function of Z
+
+Y_depends_on_Z = .false.
+! if false, then Y is a parameter like FeH.
+! you should set vary_Y, first_Y, min_Y, and max_Y.
+! if true, then Y depends on Z as follows: Y = Y0 + dYdZ*Z
+! in this case, set vary_Y = .false.
+! first_Y, min_Y, and max_Y are unused.
+Y0 = 0.248d0
+dYdZ = 1.4d0
+
+! composition control
+Y_frac_he3 = 1d-4 ! = xhe3/(xhe3 + xhe4); Y = xhe3 + xhe4
+
+! overshoot_f0 is changed along with overshoot_f
+! f0_ov = f0_ov_div_f_ov * f_ov
+f0_ov_div_f_ov = 1  ! THIS SHOULD BE < 1
+
+! parameters
+param_name(1) = 'initial_mass'
+first_param(1) = 1.2713303424d0
+vary_param(1) = .true.
+min_param(1) = 1.24d0
+max_param(1) = 1.32d0
+delta_param(1) = 0.01d0
+
+param_name(2) = 'initial_Y'
+first_param(2) = 0.2668448980d0
+vary_param(2) = .true.
+min_param(2) = 0.24d0
+max_param(2) = 0.30d0
+delta_param(2) = 0.01d0
+
+param_name(3) = 'initial_FeH'
+first_param(3) = 0.0725374166d0
+vary_param(3) = .true.
+min_param(3) = 0.0d0
+max_param(3) = 0.17d0
+delta_param(3) = 0.03d0
+
+param_name(4) = 'alpha'
+first_param(4) = 1.6534734832d0
+vary_param(4) = .true.
+min_param(4) = 1.5d0
+max_param(4) = 1.9d0
+delta_param(4) = 0.1d0
+
+param_name(5) = 'f_ov'
+first_param(5) = 0.015d0
+vary_param(5) = .false.
+min_param(5) = 0d0
+max_param(5) = 0.03d0
+delta_param(5) = 0d0
+
+! don't consider models that aren't old enough
+min_age_limit = 1d6
+
+! don't consider models with L_nuc/L less than this limit
+Lnuc_div_L_limit = 0.95 ! this rules out pre-zams models
+
+! don't consider models with chi2_spectroscopic above this limit
+chi2_spectroscopic_limit = 20
+
+! don't consider models with chi2_delta_nu above this limit
+chi2_delta_nu_limit = 20
+
+! don't consider models with chi2_radial above this limit
+chi2_radial_limit = 30
+
+! only calculate full chi^2 if pass all these limit checks
+
+
+! adjust max timestep depending on how close to target
+
+! these are just default values -- you will probably need to adjust them for your problem.
+max_yrs_dt_when_cold = 1d7 ! when fail Lnuc/L, chi2_spectro, or ch2_delta_nu
+max_yrs_dt_when_warm = 1d6 ! when pass previous but fail chi2_radial; < max_yrs_dt_when_cold
+max_yrs_dt_when_hot = 1d5 ! when pass chi2_radial; < max_yrs_dt_when_warm
+
+max_yrs_dt_chi2_small_limit = 5d4 ! < max_yrs_dt_when_hot
+chi2_limit_for_small_timesteps = 30
+
+max_yrs_dt_chi2_smaller_limit = 5d4 ! < max_yrs_dt_chi2_small_limit
+chi2_limit_for_smaller_timesteps = -1d99 ! < chi2_limit_for_small_timesteps
+
+max_yrs_dt_chi2_smallest_limit = 3d4 ! < max_yrs_dt_chi2_smaller_limit
+chi2_limit_for_smallest_timesteps = -1d99 ! < chi2_limit_for_smaller_timesteps
+
+
+! only calculate chi^2 if pass all the checks
+
+! you can stop the run if chi^2 is rising.
+
+! here is a relative limit
+limit_num_chi2_too_big = 50
+chi2_relative_increase_limit = 100.
+
+! and here is an absolute limit
+chi2_search_limit1 = 3.0
+chi2_search_limit2 = 4.0
+! if best chi2 for the run is <= chi2_search_limit1,
+! then stop the run if chi2 >= chi2_search_limit2.
+
+min_num_samples_for_avg = 2 ! want at least this many samples to form averages
+max_num_samples_for_avg = 10 ! use this many of the best chi^2 samples for averages
+
+! these use results for the best chi^2 model of the previous best samples
+avg_age_sigma_limit = 5 ! stop if age > avg age + this limit times sigma of avg age
+avg_model_number_sigma_limit = 5 ! ditto for model number
+
+
+! surface corrections
+correction_scheme = 'kjeldsen'
+correction_factor = 1
+l0_n_obs(:) = -1 ! the observed radial orders (ignored if < 0)
+correction_b = 4.25d0
+
+surf_coef1_name = 'a_div_r'
+surf_coef2_name = 'correction_r'
+
+save_next_best_at_higher_frequency = .true.
+save_next_best_at_lower_frequency = .true.
+
+! note: to set nu_max_sun or delta_nu_sun, see star/defaults/controls.defaults
+
+! output controls
+
+write_best_model_data_for_each_sample = .true.
+num_digits = 4 ! number of digits in sample number (with leading 0's)
+sample_results_prefix = 'sample_'
+! note that you can include a directory in the prefix if desired
+sample_results_postfix = '.data'
+
+model_num_digits = 4 ! number of digits in model number (with leading 0's)
+
+write_fgong_for_each_model = .false.
+fgong_prefix = 'fgong_'
+! note that you can include a directory in the prefix if desired
+fgong_postfix = '.data'
+
+write_fgong_for_best_model = .false.
+best_model_fgong_filename = ''
+
+write_gyre_for_each_model = .false.
+gyre_prefix = 'gyre_'
+! note that you can include a directory in the prefix if desired
+gyre_postfix = '.data'
+max_num_gyre_points = -1 ! only used if > 1
+
+write_gyre_for_best_model = .false.
+best_model_gyre_filename = ''
+
+write_profile_for_best_model = .false.
+best_model_profile_filename = ''
+
+save_model_for_best_model = .false.
+best_model_save_model_filename = ''
+
+save_info_for_last_model = .false. ! if true, treat final model as "best"
+last_model_save_info_filename = '' ! and save info about final model to this file.
+
+
+! miscellaneous
+
+! trace limits
+trace_limits = .false.
+
+! save all control settings to file
+save_controls = .false. ! dumps &astero_search_controls controls to file
+save_controls_filename = '' ! if empty, uses a default name
+
+! options for input model to pulsation codes
+add_atmosphere = .false.
+keep_surface_point = .false.
+add_center_point = .true.
+
+! oscillation analysis
+
+oscillation_code = 'adipls' ! or 'gyre'   <<< lowercase
+
+trace_time_in_oscillation_code = .false.
+
+! gyre controls
+
+gyre_input_file = 'gyre.in'
+
+! adipls controls
+
+do_redistribute_mesh = .false.
+
+! iscan for adipls = the following factor times the given number of observed modes
+iscan_factor(0) = 15
+iscan_factor(1) = 15
+iscan_factor(2) = 15
+iscan_factor(3) = 15
+! frequency range is set from observed frequencies times these factors
+nu_lower_factor = 0.8
+nu_upper_factor = 1.2
+
+
+! include other inlists
+
+read_extra_astero_search_inlist1 = .false.
+extra_astero_search_inlist1_name = 'undefined'
+! if read_extra_astero_search_inlist1 is true, then read this namelist file
+
+read_extra_astero_search_inlist2 = .false.
+extra_astero_search_inlist2_name = 'undefined'
+! if read_extra_astero_search_inlist2 is true, then read this namelist file
+
+read_extra_astero_search_inlist3 = .false.
+extra_astero_search_inlist3_name = 'undefined'
+! if read_extra_astero_search_inlist3 is true, then read this namelist file
+
+read_extra_astero_search_inlist4 = .false.
+extra_astero_search_inlist4_name = 'undefined'
+! if read_extra_astero_search_inlist4 is true, then read this namelist file
+
+read_extra_astero_search_inlist5 = .false.
+extra_astero_search_inlist5_name = 'undefined'
+! if read_extra_astero_search_inlist5 is true, then read this namelist file
 
 
 / ! end astero_search_controls
@@ -437,72 +436,72 @@
 
 &astero_pgstar_controls
 
-   ! PGSTAR Echelle plot
-   
-         echelle_win_flag = .true.
+! PGSTAR Echelle plot
 
-         echelle_win_width = 14
-         echelle_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
-                  
-         echelle_xleft = 0.15
-         echelle_xright = 0.85
-         echelle_ybot = 0.15
-         echelle_ytop = 0.85
-         echelle_txt_scale = 1.0
-         echelle_title = 'Echelle'      
-         
-         echelle_delta_nu = 0 ! <= 0 means use seismic delta_nu from search inlist
-         
-         !show_echelle_next_best_at_higher_frequency = .true.
-         !show_echelle_next_best_at_lower_frequency = .true.
-         !echelle_model_alt_y_shift = 0 ! shift the alt y coord by this much on plot
+echelle_win_flag = .true.
 
-         !show_echelle_annotation1 = .true.
-         show_echelle_annotation2 = .false.
-         show_echelle_annotation3 = .false.
-         
-         ! file output
-         !echelle_file_flag = .true.
-         echelle_file_dir = 'png'
-         echelle_file_prefix = 'echelle'
-         echelle_best_model_file_prefix = 'best_echelle' ! if non-empty save best chi^2 model file
-            ! e.g. 'best_echelle'
-            ! note: this is enabled even if echelle_file_flag = .false.
-         echelle_file_interval = 1 ! output when mod(model_number,echelle_file_interval)==0
-         echelle_file_width = -1 ! negative means use same value as for window
-         echelle_file_aspect_ratio = -1 ! negative means use same value as for window
+echelle_win_width = 14
+echelle_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+echelle_xleft = 0.15
+echelle_xright = 0.85
+echelle_ybot = 0.15
+echelle_ytop = 0.85
+echelle_txt_scale = 1.0
+echelle_title = 'Echelle'
+
+echelle_delta_nu = 0 ! <= 0 means use seismic delta_nu from search inlist
+
+!show_echelle_next_best_at_higher_frequency = .true.
+!show_echelle_next_best_at_lower_frequency = .true.
+!echelle_model_alt_y_shift = 0 ! shift the alt y coord by this much on plot
+
+!show_echelle_annotation1 = .true.
+show_echelle_annotation2 = .false.
+show_echelle_annotation3 = .false.
+
+! file output
+!echelle_file_flag = .true.
+echelle_file_dir = 'png'
+echelle_file_prefix = 'echelle'
+echelle_best_model_file_prefix = 'best_echelle' ! if non-empty save best chi^2 model file
+! e.g. 'best_echelle'
+! note: this is enabled even if echelle_file_flag = .false.
+echelle_file_interval = 1 ! output when mod(model_number,echelle_file_interval)==0
+echelle_file_width = -1 ! negative means use same value as for window
+echelle_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
-   ! PGSTAR ratios plot
-   
-         !ratios_win_flag = .true.
+! PGSTAR ratios plot
 
-         ratios_win_width = 6
-         ratios_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
-         
-         ratios_xleft = 0.15
-         ratios_xright = 0.85
-         ratios_ybot = 0.15
-         ratios_ytop = 0.85
-         ratios_txt_scale = 1.0
-         ratios_title = 'Ratios'      
-         
-         ratios_margin_sig_factor = 1 ! controls horizontal margin in units of max sigma
+!ratios_win_flag = .true.
 
-         show_ratios_annotation1 = .true.
-         show_ratios_annotation2 = .false.
-         show_ratios_annotation3 = .false.
-         
-         ! file output
-         ratios_file_flag = .false.
-         ratios_file_dir = 'png'
-         ratios_file_prefix = 'ratios'
-         ratios_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
-            ! e.g., 'best_model_ratios'
-            ! note: this is enabled even if ratios_file_flag = .false.
-         ratios_file_interval = 5 ! output when mod(model_number,ratios_file_interval)==0
-         ratios_file_width = -1 ! negative means use same value as for window
-         ratios_file_aspect_ratio = -1 ! negative means use same value as for window
+ratios_win_width = 6
+ratios_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
+
+ratios_xleft = 0.15
+ratios_xright = 0.85
+ratios_ybot = 0.15
+ratios_ytop = 0.85
+ratios_txt_scale = 1.0
+ratios_title = 'Ratios'
+
+ratios_margin_sig_factor = 1 ! controls horizontal margin in units of max sigma
+
+show_ratios_annotation1 = .true.
+show_ratios_annotation2 = .false.
+show_ratios_annotation3 = .false.
+
+! file output
+ratios_file_flag = .false.
+ratios_file_dir = 'png'
+ratios_file_prefix = 'ratios'
+ratios_best_model_file_prefix = '' ! if non-empty save best chi^2 model file
+! e.g., 'best_model_ratios'
+! note: this is enabled even if ratios_file_flag = .false.
+ratios_file_interval = 5 ! output when mod(model_number,ratios_file_interval)==0
+ratios_file_width = -1 ! negative means use same value as for window
+ratios_file_aspect_ratio = -1 ! negative means use same value as for window
 
 
 / ! end astero_pgstar_controls

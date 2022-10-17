@@ -2,12 +2,12 @@
 
 &star_job
 
-      set_initial_tau_factor = .true.
-      set_to_this_tau_factor = 1d0
+set_initial_tau_factor = .true.
+set_to_this_tau_factor = 1d0
 
-      profile_starting_model = .true.
+profile_starting_model = .true.
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -15,35 +15,35 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+Zbase = 0.02d0
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
-&controls  
+&controls
 
-      x_character_ctrl(1) = 'basic.net'
-      ! specify abundances
-      initial_z = 0.02d0
-      accrete_same_as_surface = .false.
-      accretion_h1 = 0.68d0
-      accretion_h2 = 0d0
-      accretion_he3 = 0d0
-      accretion_he4 = 0.30d0
-      accretion_zfracs = 6
-      
-      x_integer_ctrl(1) = 1000 ! initial nz
-      x_ctrl(5) = -4d0 ! -12.3d0 ! initial log(dq(1))
-            
-      x_logical_ctrl(1) = .true. ! build starting model
-      ! 
-         x_ctrl(1) = 20d0 ! star mass (Msun)
-         x_ctrl(2) = 0.013d0 ! model mass as fraction of star mass
-         x_logical_ctrl(2) = .false. ! get R using L = 4*pi*R^2*boltz_sigma*Teff**4
-         x_ctrl(3) = 3500 ! Teff    3400 bad
-         x_ctrl(4) = 1d5  ! L/Lsun
-         x_ctrl(6) = 1d0 ! tau_factor for building env
-   
+x_character_ctrl(1) = 'basic.net'
+! specify abundances
+initial_z = 0.02d0
+accrete_same_as_surface = .false.
+accretion_h1 = 0.68d0
+accretion_h2 = 0d0
+accretion_he3 = 0d0
+accretion_he4 = 0.30d0
+accretion_zfracs = 6
+
+x_integer_ctrl(1) = 1000 ! initial nz
+x_ctrl(5) = -4d0 ! -12.3d0 ! initial log(dq(1))
+
+x_logical_ctrl(1) = .true. ! build starting model
+!
+x_ctrl(1) = 20d0 ! star mass (Msun)
+x_ctrl(2) = 0.013d0 ! model mass as fraction of star mass
+x_logical_ctrl(2) = .false. ! get R using L = 4*pi*R^2*boltz_sigma*Teff**4
+x_ctrl(3) = 3500 ! Teff    3400 bad
+x_ctrl(4) = 1d5  ! L/Lsun
+x_ctrl(6) = 1d0 ! tau_factor for building env
+
 
 
 / ! end of controls namelist

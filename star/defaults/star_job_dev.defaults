@@ -7,129 +7,129 @@
 !  CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 !  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
-      ! change_RSP2_flag
-      ! ~~~~~~~~~~~~~~~~
-      ! change_initial_RSP2_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! change_RSP2_flag_at_model_number
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_RSP2_flag
-      ! ~~~~~~~~~~~~~
-      ! create_RSP2_model
-      ! ~~~~~~~~~~~~~~~~~
+! change_RSP2_flag
+! ~~~~~~~~~~~~~~~~
+! change_initial_RSP2_flag
+! ~~~~~~~~~~~~~~~~~~~~~~~~
+! change_RSP2_flag_at_model_number
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! new_RSP2_flag
+! ~~~~~~~~~~~~~
+! create_RSP2_model
+! ~~~~~~~~~~~~~~~~~
 
-      ! WARNING: These controls are not ready for use.
-      ! w is turbulent velocity according to RSP2
+! WARNING: These controls are not ready for use.
+! w is turbulent velocity according to RSP2
 
-      ! ::
+! ::
 
-    change_RSP2_flag = .false.
-    change_initial_RSP2_flag = .false.
-    change_RSP2_flag_at_model_number = -111
-    new_RSP2_flag = .false.
-    create_RSP2_model = .false.
-    
-    
-      ! remove_surface_by_relax_to_star_cut
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_jrot
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_do_entropy
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remove_surface_turn_off_energy_sources_and_sinks
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-      
-    remove_surface_by_relax_to_star_cut = .false.
-    remove_surface_do_jrot = .false.
-    remove_surface_do_entropy = .true.
-    remove_surface_turn_off_energy_sources_and_sinks = .true.
+change_RSP2_flag = .false.
+change_initial_RSP2_flag = .false.
+change_RSP2_flag_at_model_number = -111
+new_RSP2_flag = .false.
+create_RSP2_model = .false.
 
 
-      ! change_w_div_wc_flag
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! change_initial_w_div_wc_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_w_div_wc_flag
-      ! ~~~~~~~~~~~~~~~~~
+! remove_surface_by_relax_to_star_cut
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! remove_surface_do_jrot
+! ~~~~~~~~~~~~~~~~~~~~~~
+! remove_surface_do_entropy
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+! remove_surface_turn_off_energy_sources_and_sinks
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! w_div_wc variables
-      ! ``w_div_wc_flag`` is true if we are using w_div_wc as a solver variable
+! ::
 
-      ! ::
-
-    change_w_div_wc_flag = .false.
-    change_initial_w_div_wc_flag = .false.
-    new_w_div_wc_flag = .false.
-
-
-      ! change_j_rot_flag
-      ! ~~~~~~~~~~~~~~~~~
-      ! change_initial_j_rot_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_j_rot_flag
-      ! ~~~~~~~~~~~~~~
-
-      ! j_rot variables
-      ! ``j-rot_flag`` is true if we are using j_rot as a solver variable
-
-      ! ::
-
-    change_j_rot_flag = .false.
-    change_initial_j_rot_flag = .false.
-    new_j_rot_flag = .false.
+remove_surface_by_relax_to_star_cut = .false.
+remove_surface_do_jrot = .false.
+remove_surface_do_entropy = .true.
+remove_surface_turn_off_energy_sources_and_sinks = .true.
 
 
-      ! use_w_div_wc_flag_with_rotation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_j_rot_flag_with_rotation
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! change_w_div_wc_flag
+! ~~~~~~~~~~~~~~~~~~~~
+! change_initial_w_div_wc_flag
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! new_w_div_wc_flag
+! ~~~~~~~~~~~~~~~~~
 
-      ! allows the use of rotation corrections and am transport to be computed with the
-      ! general newton solver
+! w_div_wc variables
+! ``w_div_wc_flag`` is true if we are using w_div_wc as a solver variable
 
-      ! ::
+! ::
 
-    use_w_div_wc_flag_with_rotation = .false.
-    use_j_rot_flag_with_rotation = .false.
+change_w_div_wc_flag = .false.
+change_initial_w_div_wc_flag = .false.
+new_w_div_wc_flag = .false.
+
+
+! change_j_rot_flag
+! ~~~~~~~~~~~~~~~~~
+! change_initial_j_rot_flag
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
+! new_j_rot_flag
+! ~~~~~~~~~~~~~~
+
+! j_rot variables
+! ``j-rot_flag`` is true if we are using j_rot as a solver variable
+
+! ::
+
+change_j_rot_flag = .false.
+change_initial_j_rot_flag = .false.
+new_j_rot_flag = .false.
+
+
+! use_w_div_wc_flag_with_rotation
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! use_j_rot_flag_with_rotation
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! allows the use of rotation corrections and am transport to be computed with the
+! general newton solver
+
+! ::
+
+use_w_div_wc_flag_with_rotation = .false.
+use_j_rot_flag_with_rotation = .false.
 
 
 
-      ! load_saved_photo
-      ! ~~~~~~~~~~~~~~~~
-      ! saved_photo_name
-      ! ~~~~~~~~~~~~~~~~
+! load_saved_photo
+! ~~~~~~~~~~~~~~~~
+! saved_photo_name
+! ~~~~~~~~~~~~~~~~
 
-      ! ::
+! ::
 
-    load_saved_photo = .false.
-    saved_photo_name = 'undefined'
+load_saved_photo = .false.
+saved_photo_name = 'undefined'
 
-      ! save_photo_number
-      ! ~~~~~~~~~~~~~~~~~
-      ! save_photo_filename
-      ! ~~~~~~~~~~~~~~~~~~~
-      ! save_photo_when_terminate
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+! save_photo_number
+! ~~~~~~~~~~~~~~~~~
+! save_photo_filename
+! ~~~~~~~~~~~~~~~~~~~
+! save_photo_when_terminate
+! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ::
+! ::
 
-    save_photo_number = -1
-    save_photo_filename = ''
+save_photo_number = -1
+save_photo_filename = ''
 !   !save_photo_when_terminate = .true.
 
-      ! create_merger_model !!! EXPERIMENTAL
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_for_merger_1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_for_merger_2
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+! create_merger_model !!! EXPERIMENTAL
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! saved_model_for_merger_1
+! ~~~~~~~~~~~~~~~~~~~~~~~~
+! saved_model_for_merger_2
+! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If ``create_merger_model`` is true, then create a star by merging the two models provided.
+! If ``create_merger_model`` is true, then create a star by merging the two models provided.
 
-      ! ::
+! ::
 
-    create_merger_model = .false.
-    saved_model_for_merger_1 = 'undefined'
-    saved_model_for_merger_2 = 'undefined'
+create_merger_model = .false.
+saved_model_for_merger_1 = 'undefined'
+saved_model_for_merger_2 = 'undefined'

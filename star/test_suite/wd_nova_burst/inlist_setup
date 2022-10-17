@@ -1,38 +1,37 @@
-
 ! inlist_setup
 
 
 &star_job
 
-      show_log_description_at_start = .false.
-      
-      load_saved_model = .true.
-      load_model_filename = '1.1M_lgTc_7.7.mod'  ! from make_o_ne_wd test case
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'ready.mod'
-      required_termination_code_string = 'max_age'
-      
-      change_initial_net = .true.      
-      new_net_name = 'cno_extras_o18_to_mg26_plus_fe56.net'
-      auto_extend_net = .false.
+load_saved_model = .true.
+load_model_filename = '1.1M_lgTc_7.7.mod'  ! from make_o_ne_wd test case
 
-      change_v_flag = .true.
-      new_v_flag = .true.
+save_model_when_terminate = .true.
+save_model_filename = 'ready.mod'
+required_termination_code_string = 'max_age'
 
-      set_tau_factor = .true.
-      set_to_this_tau_factor = 30
+change_initial_net = .true.
+new_net_name = 'cno_extras_o18_to_mg26_plus_fe56.net'
+auto_extend_net = .false.
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d6
+change_v_flag = .true.
+new_v_flag = .true.
 
-      set_initial_age = .true.
-      initial_age = 0
+set_tau_factor = .true.
+set_to_this_tau_factor = 30
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_dt = .true.
+years_for_initial_dt = 1d6
 
-       !pgstar_flag = .true.
+set_initial_age = .true.
+initial_age = 0
+
+set_initial_model_number = .true.
+initial_model_number = 0
+
+!pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -42,125 +41,118 @@
 /
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      use_Type2_opacities = .true.
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1800 ! 1300
-      
-      max_age = 1d7
-      
+! limit max_model_number as part of test_suite
+max_model_number = 1800 ! 1300
+
+max_age = 1d7
+
 ! solver
-      energy_eqn_option = 'eps_grav'
+energy_eqn_option = 'eps_grav'
 
-      limit_for_rel_error_in_energy_conservation = 1d-5
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+limit_for_rel_error_in_energy_conservation = 1d-5
+hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-      use_gold_tolerances = .false.
-      warning_limit_for_max_residual = 1d99
-      convergence_ignore_equL_residuals = .true.
+use_gold_tolerances = .false.
+warning_limit_for_max_residual = 1d99
+convergence_ignore_equL_residuals = .true.
 
+mass_change_full_on_dt = 1d-6 ! (seconds)
+mass_change_full_off_dt = 1d-6 ! (seconds)
 
-      mass_change_full_on_dt = 1d-6 ! (seconds)
-      mass_change_full_off_dt = 1d-6 ! (seconds)
+! NOTE: for super eddington wind,
+! we use Ledd averaged over mass to optical depth tau = 100
+super_eddington_scaling_factor = 1
+! parameter for mass loss driven by super Eddington luminosity
+super_eddington_wind_Ledd_factor = 1
+! multiply Ledd by this factor when computing super Eddington wind
+! e.g., if this is 2, then only get wind when L > 2*Ledd
 
-      ! NOTE: for super eddington wind,
-      ! we use Ledd averaged over mass to optical depth tau = 100
-      super_eddington_scaling_factor = 1
-         ! parameter for mass loss driven by super Eddington luminosity        
-      super_eddington_wind_Ledd_factor = 1
-         ! multiply Ledd by this factor when computing super Eddington wind
-         ! e.g., if this is 2, then only get wind when L > 2*Ledd
+mixing_length_alpha = 1.9
+MLT_option = 'Henyey'
 
-      mixing_length_alpha = 1.9
-      MLT_option = 'Henyey'
+use_Ledoux_criterion = .true.
+alpha_semiconvection = 1d-3
+thermohaline_coeff = 1d3
 
-      use_Ledoux_criterion = .true.
-      alpha_semiconvection = 1d-3
-      thermohaline_coeff = 1d3         
+star_mass_max_limit = 1.301d0
 
-      star_mass_max_limit = 1.301d0
-   
-      !mass_change = 1d-9
-      accrete_same_as_surface = .false. 
-      accretion_h1 = 0.7000 ! Estimate Nomoto 2007
-      accretion_h2 = 0
-      accretion_he3 = 0.292910D-04
-      accretion_he4 = 0.279971 ! Estimated Nomoto 2007
-      accretion_zfracs = 4 ! Lodders 03
-      
-      min_timestep_limit = 1d-12
+!mass_change = 1d-9
+accrete_same_as_surface = .false.
+accretion_h1 = 0.7000 ! Estimate Nomoto 2007
+accretion_h2 = 0
+accretion_he3 = 0.292910D-04
+accretion_he4 = 0.279971 ! Estimated Nomoto 2007
+accretion_zfracs = 4 ! Lodders 03
 
-      xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
-      xa_function_weight(1) = 20
-      xa_function_param(1) = 1d-6
-      xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
-      xa_function_weight(2) = 20
-      xa_function_param(2) = 1d-2
+min_timestep_limit = 1d-12
 
-      delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
-      lgL_H_burn_min = -0.5 ! ignore changes in lgL_H if value is less than this
+xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
+xa_function_weight(1) = 20
+xa_function_param(1) = 1d-6
+xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
+xa_function_weight(2) = 20
+xa_function_param(2) = 1d-2
 
-      delta_lgL_He_limit = 0.25 ! limit for magnitude of change in lgL_He
-      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
-      
-      delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
-      delta_lgRho_hard_limit = -1
+delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
+lgL_H_burn_min = -0.5 ! ignore changes in lgL_H if value is less than this
 
-      delta_lgT_limit = 0.5
-      delta_lgL_limit = 0.05
-      delta_lgTeff_limit = 0.10 
-      
-      delta_lgL_nuc_limit = 0.05
-      delta_lgL_nuc_hard_limit = 0.10
-      lgL_nuc_burn_min = -3d0
+delta_lgL_He_limit = 0.25 ! limit for magnitude of change in lgL_He
+lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
 
+delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
+delta_lgRho_hard_limit = -1
 
+delta_lgT_limit = 0.5
+delta_lgL_limit = 0.05
+delta_lgTeff_limit = 0.10
 
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
-      Pextra_factor = 4
+delta_lgL_nuc_limit = 0.05
+delta_lgL_nuc_hard_limit = 0.10
+lgL_nuc_burn_min = -3d0
 
-      !varcontrol_target = 3d-4
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'fixed'
+Pextra_factor = 4
 
-      mesh_delta_coeff = 1.0
-      max_allowed_nz = 20000
+!varcontrol_target = 3d-4
 
+mesh_delta_coeff = 1.0
+max_allowed_nz = 20000
 
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-
-
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 5
-      terminal_interval = 10 
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 50
+history_interval = 5
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 
 &pgstar
-         Grid8_win_flag = .true.
-         Grid8_win_width = 7
-         Summary_Burn_xaxis_name = 'logxq' 
-         Summary_Burn_xaxis_reversed = .true.
-         Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
-         Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
-         Abundance_xaxis_name = 'logxq' 
-         Abundance_xaxis_reversed = .true.
-         Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
-         Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
+Grid8_win_flag = .true.
+Grid8_win_width = 7
+Summary_Burn_xaxis_name = 'logxq'
+Summary_Burn_xaxis_reversed = .true.
+Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
+Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
+Abundance_xaxis_name = 'logxq'
+Abundance_xaxis_reversed = .true.
+Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
 / ! end of pgstar namelist
 

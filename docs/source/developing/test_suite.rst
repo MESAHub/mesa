@@ -396,9 +396,9 @@ To make more efficient the usage of these machines they will respond to certain 
 commit message.
 
 .. note ::
-    It is up to each person providing the computing resources to implement each keyword. Thus some 
-    machines will ignore these keywords and run the test suite normally. Therefore, these are only
-    "requests" for the computing machines not "orders".
+It is up to each person providing the computing resources to implement each keyword. Thus some
+machines will ignore these keywords and run the test suite normally. Therefore, these are only
+"requests" for the computing machines not "orders".
 
 The message (with brackets) may appear anywhere in the commit message. 
 

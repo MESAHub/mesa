@@ -1,13 +1,13 @@
 name: Build on Linux with SDK
 
-on: [push, pull_request, release]
+on: [ push, pull_request, release ]
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["sdk"]
+        sdk: [ "sdk" ]
 
     runs-on: ubuntu-latest
 
@@ -36,12 +36,12 @@ jobs:
       - name: Get SDK ${{ runner.os }}
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
+          wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
         shell: bash
 
       - name: Unpack SDK ${{ runner.os }}
         run: |
-            tar xvf mesasdk-x86_64-linux-20.12.1.tar.gz
+          tar xvf mesasdk-x86_64-linux-20.12.1.tar.gz
         shell: bash
 
       - name: Compile

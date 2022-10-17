@@ -1,52 +1,52 @@
 &star_job
 
-  ! begin with a pre-main sequence model
-    create_pre_main_sequence_model = .true.
+! begin with a pre-main sequence model
+create_pre_main_sequence_model = .true.
 
-  ! save a model at the end of the run
-    save_model_when_terminate = .true.
-    save_model_filename = 'pms.mod'
+! save a model at the end of the run
+save_model_when_terminate = .true.
+save_model_filename = 'pms.mod'
 
-  ! display on-screen plots
-    pgstar_flag = .false.
+! display on-screen plots
+pgstar_flag = .false.
 
 / ! end of star_job namelist
 
 
 &eos
-  ! use all HELM
-    use_FreeEOS = .true.
-    use_OPAL_SCVH = .false.
-    use_PC = .false.
-    use_Skye = .false.
+! use all HELM
+use_FreeEOS = .true.
+use_OPAL_SCVH = .false.
+use_PC = .false.
+use_Skye = .false.
 
 / ! end of eos namelist
 
 
 &kap
-    Zbase = 0d0
+Zbase = 0d0
 / ! end of kap namelist
 
 
 &controls
 
-  ! starting specifications
-    initial_mass = 1.3 ! in Msun units
-    initial_y = 1d0
-    initial_z = 0d0
+! starting specifications
+initial_mass = 1.3 ! in Msun units
+initial_y = 1d0
+initial_z = 0d0
 
-  ! don't need
-    use_gold_tolerances = .false.
+! don't need
+use_gold_tolerances = .false.
 
-  ! electron scattering
-    use_simple_es_for_kap = .true.
+! electron scattering
+use_simple_es_for_kap = .true.
 
-  ! when to stop
-    log_center_density_limit = -1.5
+! when to stop
+log_center_density_limit = -1.5
 
-  ! turn off nuclear reactions
-    eps_nuc_factor = 0
-    dxdt_nuc_factor = 0
+! turn off nuclear reactions
+eps_nuc_factor = 0
+dxdt_nuc_factor = 0
 
 / ! end of controls namelist
 

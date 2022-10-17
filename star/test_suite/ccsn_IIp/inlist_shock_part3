@@ -1,13 +1,13 @@
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'shock_part2.mod'
+load_saved_model = .true.
+load_model_filename = 'shock_part2.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'shock_part3.mod'
-      required_termination_code_string = 'extras_finish_step'
+save_model_when_terminate = .true.
+save_model_filename = 'shock_part3.mod'
+required_termination_code_string = 'extras_finish_step'
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -20,33 +20,33 @@
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 15000
-         
-      x_integer_ctrl(1) = 3 ! part number
+! limit max_model_number as part of test_suite
+max_model_number = 15000
 
-      x_ctrl(12) = 0.028d0 ! Ni
+x_integer_ctrl(1) = 3 ! part number
 
-      x_ctrl(35) = 0
-      x_ctrl(36) = -0.6
-      x_ctrl(37) = 1d5 ! will discard center cells with u < this (cm/s), so don't count for Ni56.
+x_ctrl(12) = 0.028d0 ! Ni
+
+x_ctrl(35) = 0
+x_ctrl(36) = -0.6
+x_ctrl(37) = 1d5 ! will discard center cells with u < this (cm/s), so don't count for Ni56.
 
 ! RTI      
 
 ! equation controls
-      use_momentum_outer_BC = .true.
+use_momentum_outer_BC = .true.
 
 ! timestep controls
 
 ! solver controls
 
 ! mesh controls
-      split_merge_amr_okay_to_split_nz = .false.
+split_merge_amr_okay_to_split_nz = .false.
 
 / ! end of controls namelist
 
-&pgstar        
-         
+&pgstar
+
 !pause = .true.
 
 Grid2_win_flag = .true.

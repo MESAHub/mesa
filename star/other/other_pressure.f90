@@ -22,36 +22,35 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_pressure
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_pressure = .true.
-      ! procedure pointer: s% other_pressure => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_pressure(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% extra_pressure(:) = 0d0
-         return
-      end subroutine default_other_pressure
+module other_pressure
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_pressure = .true.
+   ! procedure pointer: s% other_pressure => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_pressure
+contains
+   
+   
+   subroutine default_other_pressure(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s% extra_pressure(:) = 0d0
+      return
+   end subroutine default_other_pressure
+
+
+end module other_pressure
       
       
       

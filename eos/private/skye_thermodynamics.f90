@@ -1,15 +1,15 @@
 module skye_thermodynamics
    use math_lib
    use auto_diff
-
+   
    implicit none
-
+   
    private
-
+   
    public :: compute_derived_quantities, pack_for_export, thermodynamics_from_free_energy
 
-   contains
-
+contains
+   
    !> Computes the entropy, internal energy, and pressure of a system
    !! given its free energy, temperature, and density.
    !!
@@ -23,21 +23,21 @@ module skye_thermodynamics
       type(auto_diff_real_2var_order3), intent(in) :: F
       type(auto_diff_real_2var_order3), intent(in) :: temp, den
       type(auto_diff_real_2var_order3), intent(out) :: s, e, p
-
+      
       ! Entropy
       ! s = - F/dT
       s = -differentiate_1(F)
-
+      
       ! Pgas
       ! p = -dF/dV = -(1/V)dF/dlnV = (1/V)dF/dlnRho = Rho dF/dlnRho = Rho^2 dF/dRho
       p = pow2(den) * differentiate_2(F)
-
+      
       ! Energy
       ! E = F + T * S
       e = F + temp * s
-
+   
    end subroutine thermodynamics_from_free_energy
-
+   
    !> Computes various thermodynamic derivatives and related quantities given
    !! the entropy, internal energy, pressure, temperature, and density of a system.
    !!
@@ -56,30 +56,30 @@ module skye_thermodynamics
    !! @param nabad Adiabatic gradient (dlnT/dlnP at constant entropy)
    !! @param cs Sound speed (cm/s)
    subroutine compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
-      use const_def, only: clight
+      use const_def, only : clight
       type(auto_diff_real_2var_order3), intent(in) :: temp, dens, s, e, p
       type(auto_diff_real_2var_order3), intent(out) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
-
+      
       ! Susceptibilities
       chit = differentiate_1(p) * temp / p
       chid = differentiate_2(p) * dens / p
-
+      
       ! Specific heat at constant volume
       cv = differentiate_1(e)
-
+      
       ! Adiabatic indices
       gam3 = 1d0 + (p / dens) * chit / (temp * cv)
       gam1 = chid + (gam3 - 1d0) * chit
       nabad = (gam3 - 1d0) / gam1
       gam2 = 1d0 - nabad
-
+      
       ! Specific heat at constant pressure
       cp = cv * gam1 / chid
-
+      
       ! Sound speed
       cs = clight * sqrt(gam1 / (1d0 + (dens / p) * (e + clight**2)))
    end subroutine compute_derived_quantities
-
+   
    !> Computes thermodynamic quantities from Skye and packs them into the EOS return vectors.
    !!
    !! @param F_ideal_ion Ideal ion free energy (erg/g)
@@ -101,52 +101,51 @@ module skye_thermodynamics
    !! @param d_dlnRho The derivative of the EOS return vector with respect to lnRho.
    !! @param d_dlnT The derivative of the EOS return vector with respect to lnT.
    subroutine pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele, abar, zbar, &
-                                          phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
+      phase, latent_ddlnT, latent_ddlnRho, res, d_dlnRho, d_dlnT, ierr)
       use eos_def
       type(auto_diff_real_2var_order3), intent(in) :: F_ideal_ion, F_coul, F_rad, F_ele, temp, dens, xnefer, etaele
       type(auto_diff_real_2var_order3), intent(in) :: phase, latent_ddlnT, latent_ddlnRho
       real(dp), intent(in) :: abar, zbar
-
+      
       integer, intent(out) :: ierr
-
+      
       ! Intermediates
       type(auto_diff_real_2var_order3) :: srad, erad, prad, sgas, egas, pgas, p, e, s
       type(auto_diff_real_2var_order3) :: F_gas, lnS, lnE, lnPgas, mu, lnfree_e
       type(auto_diff_real_2var_order3) :: cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs
-
+      
       ! Outputs
       real(dp), intent(inout) :: res(nv)
       real(dp), intent(inout) :: d_dlnRho(nv)
       real(dp), intent(inout) :: d_dlnT(nv)
-
+      
       ierr = 0
-
+      
       ! Form the electron-positron-ion gas plus Coulomb corrections
       F_gas = F_ideal_ion + F_coul + F_ele
-
+      
       ! Compute base thermodynamic quantities
       call thermodynamics_from_free_energy(F_gas, temp, dens, sgas, egas, pgas)
       call thermodynamics_from_free_energy(F_rad, temp, dens, srad, erad, prad)
       p = prad + pgas
       e = erad + egas
       s = srad + sgas
-
-      if(s<0 .or. e<0 .or. pgas <0 ) then
+      
+      if(s<0 .or. e<0 .or. pgas <0) then
          ierr = -1
          return
       end if
-
+      
       lnS = log(s)
       lnE = log(e)
       lnPgas = log(pgas)
       
       ! assuming complete ionization
       mu = abar / (1d0 + zbar)
-      lnfree_e = log(max(1d-99, xnefer)/(avo*dens))
-
-
+      lnfree_e = log(max(1d-99, xnefer) / (avo * dens))
+      
       call compute_derived_quantities(temp, dens, s, e, p, cv, cp, chit, chid, gam1, gam2, gam3, nabad, cs)
-
+      
       res(i_lnS) = lnS%val
       res(i_lnE) = lnE%val
       res(i_lnPgas) = lnPgas%val
@@ -166,7 +165,7 @@ module skye_thermodynamics
       res(i_phase) = phase%val
       res(i_latent_ddlnT) = latent_ddlnT%val
       res(i_latent_ddlnRho) = latent_ddlnRho%val
-
+      
       d_dlnT(i_lnS) = lnS%d1val1 * temp%val
       d_dlnT(i_lnE) = lnE%d1val1 * temp%val
       d_dlnT(i_lnPgas) = lnPgas%d1val1 * temp%val
@@ -185,8 +184,8 @@ module skye_thermodynamics
       d_dlnT(i_eta) = etaele%d1val1 * temp%val
       d_dlnT(i_phase) = phase%d1val1 * temp%val
       d_dlnT(i_latent_ddlnT) = latent_ddlnT%d1val1 * temp%val
-      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val     
-
+      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val
+      
       d_dlnRho(i_lnS) = lnS%d1val2 * dens%val
       d_dlnRho(i_lnE) = lnE%d1val2 * dens%val
       d_dlnRho(i_lnPgas) = lnPgas%d1val2 * dens%val
@@ -206,9 +205,8 @@ module skye_thermodynamics
       d_dlnRho(i_phase) = phase%d1val2 * dens%val
       d_dlnRho(i_latent_ddlnT) = latent_ddlnT%d1val2 * dens%val
       d_dlnRho(i_latent_ddlnRho) = latent_ddlnRho%d1val2 * dens%val
-
+   
    end subroutine pack_for_export
-
 
 
 end module skye_thermodynamics

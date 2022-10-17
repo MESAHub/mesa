@@ -19,32 +19,32 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
-      module run_star_extras
 
-      use star_lib
-      use star_def
-      use const_def
+module run_star_extras
+   
+   use star_lib
+   use star_def
+   use const_def
+   
+   implicit none
+   
+   ! these routines are called by the standard run_star check_model
+contains
+   
+   subroutine extras_controls(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
       
-      implicit none
-      
-      ! these routines are called by the standard run_star check_model
-      contains
-      
-      subroutine extras_controls(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-            
-         write(*,*) 'matched target'
-         write(*,*) 'GYRE not installed, pretending to pass'
-         write(*,*) 'this test was intentionally skipped'
-         ierr = -1
-         
-      end subroutine extras_controls
+      write(*, *) 'matched target'
+      write(*, *) 'GYRE not installed, pretending to pass'
+      write(*, *) 'this test was intentionally skipped'
+      ierr = -1
+   
+   end subroutine extras_controls
 
-      end module run_star_extras
+end module run_star_extras
       

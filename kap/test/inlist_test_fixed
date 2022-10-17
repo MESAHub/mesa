@@ -1,10 +1,10 @@
 &eos
-  ! use defaults
+! use defaults
 /
 
 &kap
 
-  use_Type2_opacities = .false.
-  Zbase = 0d0
+use_Type2_opacities = .false.
+Zbase = 0d0
 
 /

@@ -22,37 +22,36 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_remove_surface
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_remove_surface = .true.
-      ! procedure pointer: s% other_remove_surface => my_routine
+module other_remove_surface
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_remove_surface = .true.
+   ! procedure pointer: s% other_remove_surface => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      use star_def
-
-      implicit none
+contains
+   
+   
+   subroutine default_other_remove_surface(id, ierr, k)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      integer, intent(out) :: k
       
-            
-      contains
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
       
-      
-      subroutine default_other_remove_surface(id, ierr, k)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         integer, intent(out) :: k
-
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-
-         k = 0 ! The cell to remove down to.
-      end subroutine default_other_remove_surface
+      k = 0 ! The cell to remove down to.
+   end subroutine default_other_remove_surface
 
 
-      end module other_remove_surface
+end module other_remove_surface
       
       
       

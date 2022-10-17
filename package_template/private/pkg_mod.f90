@@ -1,7 +1,6 @@
+module mod_xxx
+   
+   implicit none
 
-      module mod_xxx
-      
-      implicit none
-
-      end module mod_xxx
+end module mod_xxx
 

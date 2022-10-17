@@ -1,16 +1,16 @@
 &star_job
-      
-  ! load the starting model
 
-  load_saved_model = .true.
-  load_model_filename = 'removed.mod'
+! load the starting model
 
-  ! save a model at the end of the run
+load_saved_model = .true.
+load_model_filename = 'removed.mod'
 
-  save_model_when_terminate = .true.
-  save_model_filename = 'pulse.mod'
+! save a model at the end of the run
 
-  steps_to_take_before_terminate = 5
+save_model_when_terminate = .true.
+save_model_filename = 'pulse.mod'
+
+steps_to_take_before_terminate = 5
 
 / !end of star_job namelist
 
@@ -19,26 +19,26 @@
 / ! end of eos namelist
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
 
-  initial_z = 0.02
-  calculate_Brunt_N2 = .true.
+initial_z = 0.02
+calculate_Brunt_N2 = .true.
 
-  ! GYRE output controls
-  
-  x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-  x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+! GYRE output controls
 
-  x_integer_ctrl(2) = 2 ! max number of modes to output per call
-  x_logical_ctrl(2) = .false. ! output eigenfunction files
+x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
-  x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-                        ! should match gyre.in mode l
-  x_integer_ctrl(4) = 1 ! order
-  x_ctrl(1) = 0.62d-4 ! freq ~ this (Hz)
-  x_ctrl(2) = 0.2d3  ! growth < this (days)
+x_integer_ctrl(2) = 2 ! max number of modes to output per call
+x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+! should match gyre.in mode l
+x_integer_ctrl(4) = 1 ! order
+x_ctrl(1) = 0.62d-4 ! freq ~ this (Hz)
+x_ctrl(2) = 0.2d3  ! growth < this (days)
 
 / ! end of controls namelist

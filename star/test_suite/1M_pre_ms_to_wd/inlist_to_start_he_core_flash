@@ -1,20 +1,18 @@
-
 &star_job
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'end_core_h_burn.mod'
+load_saved_model = .true.
+load_model_filename = 'end_core_h_burn.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'start_he_core_flash.mod'
-      required_termination_code_string = 'power_he_burn_upper_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'start_he_core_flash.mod'
+required_termination_code_string = 'power_he_burn_upper_limit'
 
+change_D_omega_flag = .true.
+new_D_omega_flag = .true.
 
-      change_D_omega_flag = .true.
-      new_D_omega_flag = .true.
-
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -23,72 +21,71 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 &controls
 
-      power_he_burn_upper_limit = 10d0
+power_he_burn_upper_limit = 10d0
 
-      energy_eqn_option = 'eps_grav'
+energy_eqn_option = 'eps_grav'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 11000
-         
-      initial_mass = 1.0
-      initial_z = 0.02d0
-      
+! limit max_model_number as part of test_suite
+max_model_number = 11000
 
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d0
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
-      
-      varcontrol_target = 1d-3
-      delta_lgL_He_limit = 0.01d0
-     
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10 
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.4d0  
-      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+initial_mass = 1.0
+initial_z = 0.02d0
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+am_nu_visc_factor = 0
+am_D_mix_factor = 0.0333333333333333d0
+D_DSI_factor = 0
+D_SH_factor = 1
+D_SSI_factor = 1
+D_ES_factor = 1
+D_GSF_factor = 1
+D_ST_factor = 1
 
-      !photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+varcontrol_target = 1d-3
+delta_lgL_He_limit = 0.01d0
+
+cool_wind_full_on_T = 9.99d9
+hot_wind_full_on_T = 1d10
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.4d0
+Blocker_scaling_factor = 0.7d0 ! 0.8d0
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
+
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_hydro_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+!report_hydro_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
 
-      !hydro_get_a_numerical_partial = 1d-4
-      !hydro_test_partials_k = 138
-      !hydro_test_partials_call_number = 33
-      !hydro_test_partials_iter_number = 11
-      !hydro_test_partials_write_eos_call_info = .true.
+!hydro_get_a_numerical_partial = 1d-4
+!hydro_test_partials_k = 138
+!hydro_test_partials_call_number = 33
+!hydro_test_partials_iter_number = 11
+!hydro_test_partials_write_eos_call_info = .true.
 
 / ! end of controls namelist
 
@@ -96,39 +93,39 @@
 
 &pgstar
 
-         
 
-         
-      Grid6_win_flag = .true.
-      Grid6_win_width = 11
-         
-      !Grid6_file_flag = .true.
-      Grid6_file_dir = 'png'
-      Grid6_file_prefix = 'grid6_'
-      Grid6_file_interval = 5 ! output when mod(model_number,Grid6_file_interval)==0
-      Grid6_file_width = -1 ! (inches) negative means use same value as for window
-      Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
 
-      Summary_Burn_xaxis_name = 'mass' 
-      Summary_Burn_xaxis_reversed = .false.
-      Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Summary_Burn_xmax = 2.1  ! only used if /= -101d0
-      
-      Abundance_xaxis_name = 'mass' 
-      Abundance_xaxis_reversed = .false.
-      ! power xaxis limits -- to override system default selections
-      Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Abundance_xmax = -101d0 ! only used if /= -101d0
-      Abundance_log_mass_frac_min = -6 ! only used if < 0
 
-      !Profile_Panels4_win_flag = .true.
-      !Profile_Panels4_win_width = 6
-         
-      ! Abundance window -- current model abundance profiles
-      
-         !Abundance_win_flag = .true.
-      
-         Abundance_win_width = 9
-         Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-   
+Grid6_win_flag = .true.
+Grid6_win_width = 11
+
+!Grid6_file_flag = .true.
+Grid6_file_dir = 'png'
+Grid6_file_prefix = 'grid6_'
+Grid6_file_interval = 5 ! output when mod(model_number,Grid6_file_interval)==0
+Grid6_file_width = -1 ! (inches) negative means use same value as for window
+Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
+
+Summary_Burn_xaxis_name = 'mass'
+Summary_Burn_xaxis_reversed = .false.
+Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+Summary_Burn_xmax = 2.1  ! only used if /= -101d0
+
+Abundance_xaxis_name = 'mass'
+Abundance_xaxis_reversed = .false.
+! power xaxis limits -- to override system default selections
+Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = -101d0 ! only used if /= -101d0
+Abundance_log_mass_frac_min = -6 ! only used if < 0
+
+!Profile_Panels4_win_flag = .true.
+!Profile_Panels4_win_width = 6
+
+! Abundance window -- current model abundance profiles
+
+!Abundance_win_flag = .true.
+
+Abundance_win_width = 9
+Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
 / ! end of pgstar namelist

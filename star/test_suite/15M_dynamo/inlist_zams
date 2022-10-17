@@ -1,18 +1,17 @@
-
 ! inlist_zams - stops when reach Lnuc_div_L_zams_limit
 
 &star_job
 
-      show_log_description_at_start = .false. 
+show_log_description_at_start = .false.
 
-      create_pre_main_sequence_model = .true.
+create_pre_main_sequence_model = .true.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'zams.mod'
-      required_termination_code_string = 'Lnuc_div_L_zams_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'zams.mod'
+required_termination_code_string = 'Lnuc_div_L_zams_limit'
 
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -28,14 +27,14 @@
 
 &controls
 
-   ! stopping conditions
+! stopping conditions
 
-      stop_near_zams = .true.
-      Lnuc_div_L_zams_limit = 0.9d0
-      
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1000
-      
+stop_near_zams = .true.
+Lnuc_div_L_zams_limit = 0.9d0
+
+! limit max_model_number as part of test_suite
+max_model_number = 1000
+
 
 / ! end of controls namelist
 

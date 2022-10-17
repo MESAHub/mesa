@@ -9,23 +9,23 @@
 
 &controls
 
-   RSP2_T_anchor = 2.8e4
+RSP2_T_anchor = 2.8e4
 
 ! GYRE
-   x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
-   x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-   x_integer_ctrl(2) = 2 ! max number of modes to output per call
-   x_logical_ctrl(2) = .false. ! output eigenfunction files   
-   x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
-   x_integer_ctrl(3) = 0 ! mode_l
-   x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
-      ! < 0 means report best over all gyre results for any order
-   
+x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+x_integer_ctrl(2) = 2 ! max number of modes to output per call
+x_logical_ctrl(2) = .false. ! output eigenfunction files
+x_ctrl(2) = 1 ! must be > 0 for GYRE to report growth information
+x_integer_ctrl(3) = 0 ! mode_l
+x_integer_ctrl(4) = -1 ! report info for min growth/period for this order
+! < 0 means report best over all gyre results for any order
+
 ! output controls
-   !photo_interval = 10
-   !profile_interval = 1
-   !history_interval = 1
-   !terminal_interval = 1
+!photo_interval = 10
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 / ! end of controls namelist
 

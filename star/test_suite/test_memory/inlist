@@ -1,15 +1,15 @@
 &star_job
-  ! use defaults
+! use defaults
 /
 
 &eos
-  ! use defaults
+! use defaults
 /
 
 &kap
-  use_Type2_opacities = .false.
+use_Type2_opacities = .false.
 /
 
 &controls
-  ! use defaults
+! use defaults
 /

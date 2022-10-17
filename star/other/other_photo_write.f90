@@ -22,29 +22,27 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_photo_write
+
+module other_photo_write
+   
+   use star_def
+   
+   implicit none
+   
+   ! note: there is no flag "use_other_photo_write".
+   ! the other routine is always called when a photo is written.
+   ! see private/model_out.f
+
+contains
+   
+   
+   subroutine default_other_photo_write(id, iounit)
+      integer, intent(in) :: id, iounit
+      !write(iounit) stuff
+   end subroutine default_other_photo_write
 
 
-      use star_def
-
-      implicit none
-
-      ! note: there is no flag "use_other_photo_write".  
-      ! the other routine is always called when a photo is written.
-      ! see private/model_out.f
-      
-      contains
-      
-
-      subroutine default_other_photo_write(id, iounit)
-         integer, intent(in) :: id, iounit
-         !write(iounit) stuff
-      end subroutine default_other_photo_write
-
-
-
-      end module other_photo_write
+end module other_photo_write
       
       
       

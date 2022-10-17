@@ -3,32 +3,32 @@
 &star_job
 
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = "planet_create_0.9685_MJ_2.0_RJ.mod"
+load_saved_model = .true.
+load_model_filename = "planet_create_0.9685_MJ_2.0_RJ.mod"
 
-      save_model_when_terminate = .true.
-      save_model_filename = "planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod"
-      required_termination_code_string = 'max_age'
-      
-      !set_initial_age = .true.
-      !initial_age = 0.0 ! in years
-      !set_initial_dt = .true.
-      !years_for_initial_dt = 1.d-5 ! in years
+save_model_when_terminate = .true.
+save_model_filename = "planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod"
+required_termination_code_string = 'max_age'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+!set_initial_age = .true.
+!initial_age = 0.0 ! in years
+!set_initial_dt = .true.
+!years_for_initial_dt = 1.d-5 ! in years
 
-      ! controls for adding core of a certain density (alternatively, could fix radius)
-      relax_core = .true.
-      new_core_mass = 3.00120651518e-05 ! 25 Mearth in Msun units
-      core_avg_rho = 10.d0 ! g/cm^3
-      core_avg_eps = 0.d0 ! ergs/g/sec
-      dlg_core_mass_per_step = 0.05d0     ! decrease if convergence problems
-      relax_core_years_for_dt = 0.1d0     ! increase(?) if convergence problems
-      
-      !pgstar_flag = .true.
+set_initial_model_number = .true.
+initial_model_number = 0
+
+! controls for adding core of a certain density (alternatively, could fix radius)
+relax_core = .true.
+new_core_mass = 3.00120651518e-05 ! 25 Mearth in Msun units
+core_avg_rho = 10.d0 ! g/cm^3
+core_avg_eps = 0.d0 ! ergs/g/sec
+dlg_core_mass_per_step = 0.05d0     ! decrease if convergence problems
+relax_core_years_for_dt = 0.1d0     ! increase(?) if convergence problems
+
+!pgstar_flag = .true.
 
 / !end of star_job
 
@@ -38,53 +38,53 @@
 
 
 &kap
-         Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      kap_lowT_prefix = 'lowT_Freedman11'
+kap_file_prefix = 'gs98'
+kap_lowT_prefix = 'lowT_Freedman11'
 
 / ! end of kap namelist
 
 &controls
 
 
-         warning_limit_for_max_residual = 1d99 ! off until evolve
-         warn_when_large_virial_thm_rel_err = 2d-2
+warning_limit_for_max_residual = 1d99 ! off until evolve
+warn_when_large_virial_thm_rel_err = 2d-2
 
-      ! limit max_model_number as part of test_suite
-         max_model_number = 520
+! limit max_model_number as part of test_suite
+max_model_number = 520
 
-        ! surface heating
-        !column_depth_for_irradiation = 100.0
-        !irradiation_flux = 1.d9     ! day side flux!!! Bill puts in 1/4 by hand
+! surface heating
+!column_depth_for_irradiation = 100.0
+!irradiation_flux = 1.d9     ! day side flux!!! Bill puts in 1/4 by hand
 
-	! when to stop
-	max_age = 2.d3
+! when to stop
+max_age = 2.d3
 
-	! knobs
-	!use_lnE_for_eps_grav = .false.
-	T_mix_limit = 0
-   
-   use_gold2_tolerances = .false.
-   use_gold_tolerances = .false.
+! knobs
+!use_lnE_for_eps_grav = .false.
+T_mix_limit = 0
 
-	! output to files and terminal
-	photo_interval = 50
-	profile_interval = 100
-	max_num_profile_models=1000
-	history_interval = 2
-	terminal_interval = 10
-	write_header_frequency = 10
+use_gold2_tolerances = .false.
+use_gold_tolerances = .false.
+
+! output to files and terminal
+photo_interval = 50
+profile_interval = 100
+max_num_profile_models = 1000
+history_interval = 2
+terminal_interval = 10
+write_header_frequency = 10
 
 /
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+! top level controls
+
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
+
 
 / ! end of pgstar namelist

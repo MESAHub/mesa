@@ -22,29 +22,28 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_D_mix
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_D_mix = .true.
-      ! procedure pointer: s% other_D_mix => my_routine
+module other_D_mix
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_D_mix = .true.
+   ! procedure pointer: s% other_D_mix => my_routine
+   
+   use star_def
+   
+   implicit none
+
+contains
+   
+   
+   subroutine null_other_D_mix(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine null_other_D_mix
 
 
-      use star_def
-
-      implicit none
-      
-      contains
-      
-      
-      subroutine null_other_D_mix(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_other_D_mix
-
-
-      end module other_D_mix
+end module other_D_mix
       
       
       

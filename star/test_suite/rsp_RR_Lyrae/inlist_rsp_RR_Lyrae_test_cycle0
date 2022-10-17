@@ -4,27 +4,27 @@
 
 &star_job
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      create_RSP_model = .false.
-      load_saved_model = .true.
-      load_model_filename = 'rsp_RR_Lyrae_cycle0.mod'
+create_RSP_model = .false.
+load_saved_model = .true.
+load_model_filename = 'rsp_RR_Lyrae_cycle0.mod'
 
-      initial_zfracs = 6
+initial_zfracs = 6
 
-      color_num_files=2
-      color_file_names(2)='blackbody_johnson.dat'
-      color_num_colors(2)=5
+color_num_files = 2
+color_file_names(2) = 'blackbody_johnson.dat'
+color_num_colors(2) = 5
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
-      
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
-   
+set_initial_model_number = .true.
+initial_model_number = 0
+
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
 / ! end of star_job namelist
 
 &eos
@@ -32,55 +32,55 @@
 
 
 &kap
-   Zbase = 0.0004d0
+Zbase = 0.0004d0
 
-      kap_file_prefix = 'a09'
-      kap_lowT_prefix = 'lowT_fa05_a09p'
-      kap_CO_prefix = 'a09_co'
+kap_file_prefix = 'a09'
+kap_lowT_prefix = 'lowT_fa05_a09p'
+kap_CO_prefix = 'a09_co'
 
 / ! end of kap namelist
 
 
 &controls
 
-   ! limit max_model_number as part of test_suite
-   max_model_number = 15000
+! limit max_model_number as part of test_suite
+max_model_number = 15000
 
 ! RSP controls
 
-   x_integer_ctrl(1) = 10 ! which period to check
-   x_ctrl(1) = 0.71262d0 ! expected period (in days) 
+x_integer_ctrl(1) = 10 ! which period to check
+x_ctrl(1) = 0.71262d0 ! expected period (in days)
 
-   RSP_mass = 0.65d0
-   RSP_Teff = 6500d0
-   RSP_L = 60d0
-   RSP_X = 0.75d0
-   RSP_Z = 0.0004d0
-      
+RSP_mass = 0.65d0
+RSP_Teff = 6500d0
+RSP_L = 60d0
+RSP_X = 0.75d0
+RSP_Z = 0.0004d0
+
 
 ! output controls
-   
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
 
-      !num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+terminal_show_age_units = 'days'
+terminal_show_timestep_units = 'secs'
+terminal_show_log_dt = .false.
+terminal_show_log_age = .false.
 
-   ! for cases in which you have a run that has reached steady pulses
-   ! and you want to look at plots of just a few periods to see the details,
-   ! i suggest the following method. interrupt the run soon after
-   ! it makes a photo.  remove or delete LOGS/history.data to force
-   ! creation of a new one when restart.  edit the inlist to set
-   ! history_interval to 1 to get maximum time resolution.  
-   ! restart the run and let it go for as many periods as desired.   
+!num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      photo_interval = 1000
-      profile_interval = 4000
-      history_interval = 10
-      terminal_interval = 4000
+! for cases in which you have a run that has reached steady pulses
+! and you want to look at plots of just a few periods to see the details,
+! i suggest the following method. interrupt the run soon after
+! it makes a photo.  remove or delete LOGS/history.data to force
+! creation of a new one when restart.  edit the inlist to set
+! history_interval to 1 to get maximum time resolution.
+! restart the run and let it go for as many periods as desired.
+
+photo_interval = 1000
+profile_interval = 4000
+history_interval = 10
+terminal_interval = 4000
 
 / ! end of controls namelist
 
@@ -88,32 +88,30 @@
 
 &pgstar
 
-      !pause = .true.
+!pause = .true.
 
-      pgstar_interval = 25
-         
-      Grid2_win_flag = .true.
+pgstar_interval = 25
 
+Grid2_win_flag = .true.
 
-      Grid2_title = '0.65 M\d\(2281)\u  Z=0.0004  RR Lyrae'
+Grid2_title = '0.65 M\d\(2281)\u  Z=0.0004  RR Lyrae'
 
-      
-      History_Panels1_xaxis_name='star_age_day'
-      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+History_Panels1_xaxis_name = 'star_age_day'
+History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-      !  Grid2_file_flag = .true.
-      file_digits = 7
-      Grid2_file_dir = 'png'
-      Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-      
-      !Profile_Panels1_show_grid = .true.
+!  Grid2_file_flag = .true.
+file_digits = 7
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid'
+Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
 
-      Profile_Panels1_xaxis_name = 'logtau'
-      Profile_Panels1_xaxis_reversed = .true.
-      Profile_Panels1_xmin = -101D0
-      Profile_Panels1_xmax = -101D0
+!Profile_Panels1_show_grid = .true.
 
-      Profile_Panels1_dymin(4) = 0.02
+Profile_Panels1_xaxis_name = 'logtau'
+Profile_Panels1_xaxis_reversed = .true.
+Profile_Panels1_xmin = -101D0
+Profile_Panels1_xmax = -101D0
+
+Profile_Panels1_dymin(4) = 0.02
 
 / ! end of pgstar namelist

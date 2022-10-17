@@ -1,35 +1,34 @@
-
 &star_job
-   !save_star_job_namelist = .true.
-   !star_job_namelist_name = 'namelist_star_job_he_flash'
+!save_star_job_namelist = .true.
+!star_job_namelist_name = 'namelist_star_job_he_flash'
 
-   show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-   load_saved_model = .true.
-   load_model_filename = 'start_he_core_flash.mod'
-   !load_model_filename = 'test.mod'
+load_saved_model = .true.
+load_model_filename = 'start_he_core_flash.mod'
+!load_model_filename = 'test.mod'
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
-   required_termination_code_string = 'Teff_upper_limit' ! 'xa_central_lower_limit'
-   !required_termination_code_string = 'max_model_number'
-      
-   set_initial_age = .true.
-   initial_age = 0
-   
-   set_initial_model_number = .true.
-   initial_model_number = 0
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'Teff_upper_limit' ! 'xa_central_lower_limit'
+!required_termination_code_string = 'max_model_number'
 
-   !change_initial_v_flag = .true.
-   !new_v_flag = .true.
+set_initial_age = .true.
+initial_age = 0
 
-   change_D_omega_flag = .true.
-   new_D_omega_flag = .true.
-   
-   set_initial_cumulative_energy_error = .true.
-   new_cumulative_energy_error = 0d0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-   pgstar_flag = .true.
+!change_initial_v_flag = .true.
+!new_v_flag = .true.
+
+change_D_omega_flag = .true.
+new_D_omega_flag = .true.
+
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -39,193 +38,193 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
-&controls      
-   !save_controls_namelist = .true.
-   !controls_namelist_name = 'namelist_controls_he_flash'
-      
-   max_model_number = 12000
-   max_number_retries = 1000
-      
-   initial_mass = 1.0
-   initial_z = 0.02d0
+&controls
+!save_controls_namelist = .true.
+!controls_namelist_name = 'namelist_controls_he_flash'
 
-    !Teff_upper_limit = 3300
+max_model_number = 12000
+max_number_retries = 1000
+
+initial_mass = 1.0
+initial_z = 0.02d0
+
+!Teff_upper_limit = 3300
 !      xa_central_lower_limit_species(1) = 'he4'
 !      xa_central_lower_limit(1) = 0.0001
 
 ! wind
-   cool_wind_full_on_T = 9.99d9
-   hot_wind_full_on_T = 1d10 
-   cool_wind_RGB_scheme = 'Reimers'
-   cool_wind_AGB_scheme = 'Blocker'
-   RGB_to_AGB_wind_switch = 1d-4
-   Reimers_scaling_factor = 0.8d0  
-   Blocker_scaling_factor = 0.7d0 ! 0.8d0        
+cool_wind_full_on_T = 9.99d9
+hot_wind_full_on_T = 1d10
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.8d0
+Blocker_scaling_factor = 0.7d0 ! 0.8d0
 
 ! rotation
-   am_nu_visc_factor = 0
-   am_D_mix_factor = 0.0333333333333333d0
-   D_DSI_factor = 0
-   D_SH_factor = 1
-   D_SSI_factor = 1
-   D_ES_factor = 1
-   D_GSF_factor = 1
-   D_ST_factor = 1
-      
-! TDC
-   max_X_for_conv_timescale = 1d-8
+am_nu_visc_factor = 0
+am_D_mix_factor = 0.0333333333333333d0
+D_DSI_factor = 0
+D_SH_factor = 1
+D_SSI_factor = 1
+D_ES_factor = 1
+D_GSF_factor = 1
+D_ST_factor = 1
 
-   max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
-   max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
-   
-   alpha_TDC_DAMP = 1d0
-   alpha_TDC_DAMPR = 0d0
+! TDC
+max_X_for_conv_timescale = 1d-8
+
+max_dt_div_tau_conv_for_TDC = 1d99 ! 1d99 ! 1d-2
+max_dt_years_for_TDC = 1d99 ! 11d99 ! 1d-1
+
+alpha_TDC_DAMP = 1d0
+alpha_TDC_DAMPR = 0d0
 
 ! mix
-   mlt_make_surface_no_mixing = .true.
+mlt_make_surface_no_mixing = .true.
 
 ! mlt
-   MLT_option = 'Henyey'
-   Henyey_MLT_y_param = 0.33333333d0
-   Henyey_MLT_nu_param = 8
+MLT_option = 'Henyey'
+Henyey_MLT_y_param = 0.33333333d0
+Henyey_MLT_nu_param = 8
 
 ! timesteps
-   !delta_lgL_He_limit = 0.003d0
-   delta_lgL_He_limit = 0.006d0
+!delta_lgL_He_limit = 0.003d0
+delta_lgL_He_limit = 0.006d0
 
 ! mesh
-   !okay_to_remesh = .false.
-   !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
+!okay_to_remesh = .false.
+!remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
-   use_momentum_outer_BC = .true.
-   set_rho_to_dm_div_dV = .false.
+use_momentum_outer_BC = .true.
+set_rho_to_dm_div_dV = .false.
 
-   use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
+use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .true.
 
-   energy_eqn_option = 'dedt'
-   convergence_ignore_equL_residuals = .true.
+energy_eqn_option = 'dedt'
+convergence_ignore_equL_residuals = .true.
 
 ! output
-   num_trace_history_values = 4
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
-   trace_history_value_name(3) = 'dt_div_max_tau_conv'
-   trace_history_value_name(4) = 'using_TDC'
+num_trace_history_values = 4
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+trace_history_value_name(3) = 'dt_div_max_tau_conv'
+trace_history_value_name(4) = 'using_TDC'
 
-   terminal_show_age_units = 'years'
-   terminal_show_timestep_units = 'seconds'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
+terminal_show_age_units = 'years'
+terminal_show_timestep_units = 'seconds'
+terminal_show_log_dt = .false.
+terminal_show_log_age = .false.
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
-      
-      photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 1
-      
-      !compare_TDC_to_MLT = .true.
-      
-      !x_integer_ctrl(19) = 1033 ! k
-      !x_integer_ctrl(20) = 0 ! solver iter
-      !x_integer_ctrl(21) = 1731 ! model_number
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
+
+photo_interval = 10
+!profile_interval = 1
+!history_interval = 1
+terminal_interval = 1
+
+!compare_TDC_to_MLT = .true.
+
+!x_integer_ctrl(19) = 1033 ! k
+!x_integer_ctrl(20) = 0 ! solver iter
+!x_integer_ctrl(21) = 1731 ! model_number
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
-      !trace_evolve = .true.
-      !fill_arrays_with_NaNs = .true.
+!report_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
+!trace_evolve = .true.
+!fill_arrays_with_NaNs = .true.
 
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+!solver_save_photo_call_number = 0
+! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 126
-      !solver_test_partials_k = 1576
-      !solver_test_partials_iter_number = 3
-      !solver_test_partials_dx_0 = 1d-5
-      !solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'w_face' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
+!solver_test_partials_call_number = 126
+!solver_test_partials_k = 1576
+!solver_test_partials_iter_number = 3
+!solver_test_partials_dx_0 = 1d-5
+!solver_test_partials_var_name = 'all' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets
+!solver_test_partials_equ_name = 'w_face' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets
+!solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+!solver_test_partials_show_dx_var_name = 'h1'
 
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
+! equ name can also be one of these
+! 'lnE', 'lnP', 'grad_ad' to test eos
+! 'eps_nuc' to test net
+! 'non_nuc_neu' to test neu
+! 'gradT', 'mlt_vc' to test mlt
+! 'opacity' to test kap
 
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_net_partials = .true.
-      !solver_test_atm_partials = .true.
+!solver_test_partials_write_eos_call_info = .true.
 
-      !report_solver_dt_info = .true.
-      !report_dt_hard_limit_retries = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
+!solver_test_partials_k_low = -1
+!solver_test_partials_k_high = -1
 
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
+!solver_test_eos_partials = .true.
+!solver_test_kap_partials = .true.
+!solver_test_net_partials = .true.
+!solver_test_atm_partials = .true.
+
+!report_solver_dt_info = .true.
+!report_dt_hard_limit_retries = .true.
+
+!show_mesh_changes = .true.
+!mesh_dump_call_number = 5189
+!okay_to_remesh = .false.
+
+!energy_conservation_dump_model_number = -1
+
+!use_DGESVX_in_bcyclic = .true.
+!use_equilibration_in_DGESVX = .true.
+!report_min_rcond_from_DGESXV = .true.
+
+! solver debugging
+!solver_check_everything = .true.
+
+!solver_epsder_struct = 1d-6
+!solver_epsder_chem = 1d-6
+
+!report_solver_dt_info = .true.
+!report_dX_nuc_drop_dt_limits = .true.
+!report_bad_negative_xa = .true.
 
 / ! end of controls namelist
 
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 10
-   pgstar_interval = 1
-   
-   Profile_Panels1_xaxis_name = 'mass'
-   Profile_Panels1_xaxis_reversed = .false.
-   !Profile_Panels1_xaxis_name = 'zone'
-   !Profile_Panels1_xaxis_reversed = .true.
-   
-   !Profile_Panels1_xmin = 1580
-   !Profile_Panels1_xmax = 1650
-   Profile_Panels1_show_mix_regions_on_xaxis = .true.
+!pause = .true.
+!pause_interval = 10
+pgstar_interval = 1
 
-   Grid2_title = 'TDC He core flash'
-   
-   !Grid2_file_flag = .true.
-   Grid2_file_dir = 'png'
-   Grid2_file_prefix = 'he_flash'
-   Grid2_file_interval = 1 ! output when mod(model_number,Grid2_file_interval)==0
+Profile_Panels1_xaxis_name = 'mass'
+Profile_Panels1_xaxis_reversed = .false.
+!Profile_Panels1_xaxis_name = 'zone'
+!Profile_Panels1_xaxis_reversed = .true.
+
+!Profile_Panels1_xmin = 1580
+!Profile_Panels1_xmax = 1650
+Profile_Panels1_show_mix_regions_on_xaxis = .true.
+
+Grid2_title = 'TDC He core flash'
+
+!Grid2_file_flag = .true.
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'he_flash'
+Grid2_file_interval = 1 ! output when mod(model_number,Grid2_file_interval)==0
 
 / ! end of pgstar namelist

@@ -19,39 +19,37 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
-
-      module gyre_support
-
-      use star_lib
-      use star_def
-      
-      implicit none
-      
-      logical, parameter :: GYRE_IS_ENABLED = .false.
-
-      
-      contains
-      
-      
-      subroutine init_gyre(gyre_file,ierr)
-         character(*), intent(in) :: gyre_file
-         integer, intent(out) :: ierr
-         ierr = -1
-      end subroutine init_gyre
-      
-      
-      
-      subroutine do_gyre_get_modes (s, el, store_model, ierr)
-      
-         type (star_info), pointer :: s
-         integer, intent(in)       :: el
-         logical, intent(in)       :: store_model
-         integer, intent(out)      :: ierr
-         
-         ierr = -1
-      end subroutine do_gyre_get_modes
 
 
+module gyre_support
+   
+   use star_lib
+   use star_def
+   
+   implicit none
+   
+   logical, parameter :: GYRE_IS_ENABLED = .false.
 
-      end module gyre_support
+
+contains
+   
+   
+   subroutine init_gyre(gyre_file, ierr)
+      character(*), intent(in) :: gyre_file
+      integer, intent(out) :: ierr
+      ierr = -1
+   end subroutine init_gyre
+   
+   
+   subroutine do_gyre_get_modes (s, el, store_model, ierr)
+      
+      type (star_info), pointer :: s
+      integer, intent(in) :: el
+      logical, intent(in) :: store_model
+      integer, intent(out) :: ierr
+      
+      ierr = -1
+   end subroutine do_gyre_get_modes
+
+
+end module gyre_support

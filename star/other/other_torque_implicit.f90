@@ -22,42 +22,41 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_torque_implicit
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_torque_implicit = .true.
-      ! procedure pointer: s% other_torque_implicit => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_torque_implicit(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% extra_jdot(:) = 0
-         s% extra_omegadot(:) = 0
-         s% d_extra_jdot_domega_m1(:) = 0
-         s% d_extra_omegadot_domega_m1(:) = 0
-         s% d_extra_jdot_domega_00(:) = 0
-         s% d_extra_omegadot_domega_00(:) = 0
-         s% d_extra_jdot_domega_p1(:) = 0
-         s% d_extra_omegadot_domega_p1(:) = 0
-      end subroutine default_other_torque_implicit
+module other_torque_implicit
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_torque_implicit = .true.
+   ! procedure pointer: s% other_torque_implicit => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_torque_implicit
+contains
+   
+   
+   subroutine default_other_torque_implicit(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s% extra_jdot(:) = 0
+      s% extra_omegadot(:) = 0
+      s% d_extra_jdot_domega_m1(:) = 0
+      s% d_extra_omegadot_domega_m1(:) = 0
+      s% d_extra_jdot_domega_00(:) = 0
+      s% d_extra_omegadot_domega_00(:) = 0
+      s% d_extra_jdot_domega_p1(:) = 0
+      s% d_extra_omegadot_domega_p1(:) = 0
+   end subroutine default_other_torque_implicit
+
+
+end module other_torque_implicit
       
       
       

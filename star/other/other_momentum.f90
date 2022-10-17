@@ -22,37 +22,36 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_momentum
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_momentum = .true.
-      ! procedure pointer: s% other_momentum => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_momentum(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         do k = 1, s% nz
-            !s% extra_grav(k) = 0d0 ! this is added to -G*m/r^2
-         end do
-      end subroutine default_other_momentum
+module other_momentum
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_momentum = .true.
+   ! procedure pointer: s% other_momentum => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_momentum
+contains
+   
+   
+   subroutine default_other_momentum(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      do k = 1, s% nz
+         !s% extra_grav(k) = 0d0 ! this is added to -G*m/r^2
+      end do
+   end subroutine default_other_momentum
+
+
+end module other_momentum
       
       
       

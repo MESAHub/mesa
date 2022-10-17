@@ -22,34 +22,34 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_accreting_state
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_accreting_state = .true.
-      ! procedure pointer: s% other_accreting_state => my_routine
-
-      implicit none
-      
-            
-      contains
-      
-      ! Note that your routine will be called before many star variables have been set.
-      ! If you rely on these, you should call the star_set_vars_in_part1 routine from star_lib
-      ! to ensure that they are set.      
-      subroutine null_other_accreting_state(id, total_specific_energy, accretion_pressure, accretion_density, ierr)
-         use star_def
-         integer, intent(in) :: id
-         real(dp), intent(out) :: total_specific_energy, accretion_pressure, accretion_density
-         integer, intent(out) :: ierr
-         total_specific_energy = 0d0 ! erg/g
-         accretion_pressure = 0d0 ! erg/cm^3
-         accretion_density = 0d0 ! g/cm^3
-         ierr = 0
-      end subroutine null_other_accreting_state
+module other_accreting_state
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_accreting_state = .true.
+   ! procedure pointer: s% other_accreting_state => my_routine
+   
+   implicit none
 
 
-      end module other_accreting_state
+contains
+   
+   ! Note that your routine will be called before many star variables have been set.
+   ! If you rely on these, you should call the star_set_vars_in_part1 routine from star_lib
+   ! to ensure that they are set.
+   subroutine null_other_accreting_state(id, total_specific_energy, accretion_pressure, accretion_density, ierr)
+      use star_def
+      integer, intent(in) :: id
+      real(dp), intent(out) :: total_specific_energy, accretion_pressure, accretion_density
+      integer, intent(out) :: ierr
+      total_specific_energy = 0d0 ! erg/g
+      accretion_pressure = 0d0 ! erg/cm^3
+      accretion_density = 0d0 ! g/cm^3
+      ierr = 0
+   end subroutine null_other_accreting_state
+
+
+end module other_accreting_state
       
       
       

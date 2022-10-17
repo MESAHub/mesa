@@ -1,17 +1,17 @@
 &star_job
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      change_rotation_flag = .true.
-      new_rotation_flag = .true.
-      new_omega_div_omega_crit = 0.2
-      set_initial_omega_div_omega_crit = .true.
-      !set_omega_div_omega_crit_step_limit = 1
+change_rotation_flag = .true.
+new_rotation_flag = .true.
+new_omega_div_omega_crit = 0.2
+set_initial_omega_div_omega_crit = .true.
+!set_omega_div_omega_crit_step_limit = 1
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1 ! in years
+set_initial_dt = .true.
+years_for_initial_dt = 1 ! in years
 
 
 / ! end of star_job namelist
@@ -19,35 +19,35 @@
 
 &kap
 
-      Zbase = 0.02
+Zbase = 0.02
 
 / ! end of kap namelist
 
 
 &controls
 
-      ! check for retries as part of test_suite
-      ! you can/should delete this for use outside of test_suite
-         max_number_retries = 8
-      ! you probably want to change this
-      max_age = 1e10
+! check for retries as part of test_suite
+! you can/should delete this for use outside of test_suite
+max_number_retries = 8
+! you probably want to change this
+max_age = 1e10
 
-      extra_terminal_output_file = 'log1' 
-      log_directory = 'LOGS1'
+extra_terminal_output_file = 'log1'
+log_directory = 'LOGS1'
 
-      use_other_torque = .true.
+use_other_torque = .true.
 
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
-      
-      varcontrol_target = 1d-3
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
+
+varcontrol_target = 1d-3
 
 / ! end of controls namelist
 
 
 &pgstar
-         
+
 
 / ! end of pgstar namelist

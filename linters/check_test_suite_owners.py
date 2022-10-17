@@ -1,7 +1,8 @@
-import os
 import glob
+import os
 
-# Checks whether a test case has a owner and warns for test cases with only one owner
+# Checks whether a test case has a owner and warns for test cases with only
+# one owner
 
 MESA_DIR = os.environ["MESA_DIR"]
 
@@ -16,7 +17,8 @@ def get_test_cases(folder):
     # Get test cases
     x = list(glob.glob(os.path.join(folder, "*/")))
     return set(
-        [i.removeprefix(MESA_DIR).removesuffix("/").removeprefix("/") for i in x]
+        [i.removeprefix(MESA_DIR).removesuffix("/").removeprefix("/") for i in
+         x]
     )
 
 
@@ -28,14 +30,14 @@ def get_do1(folder):
             if line.startswith("#") or not len(line) or line == "return":
                 continue
             test_cases.append(line.split()[1])
-
+    
     return set(test_cases)
 
 
 def parse_codeowners(filename):
     with open(filename) as f:
         lines = f.readlines()
-
+    
     result = {
         "star": {},
         "binary": {},
@@ -45,9 +47,9 @@ def parse_codeowners(filename):
     for line in lines:
         if line.startswith("#") or len(line.strip()) == 0:
             continue
-
+        
         case = line.split()
-
+        
         if case[0].startswith("star/test_suite"):
             result["star"][case[0]] = case[1:]
         elif case[0].startswith("binary/test_suite"):
@@ -56,7 +58,7 @@ def parse_codeowners(filename):
             result["astero"][case[0]] = case[1:]
         else:
             result["module"][case[0]] = case[1:]
-
+    
     return result
 
 
@@ -94,7 +96,7 @@ def check_owners(code, num=0):
     for key, value in code.items():
         if len(value) == num:
             result.append(key)
-
+    
     if len(result):
         print_section(f"Test cases with only {num} CODEOWNERS")
         print_options(result)
@@ -104,25 +106,25 @@ if __name__ == "__main__":
     star_cases = get_test_cases(STAR)
     binary_cases = get_test_cases(BINARY)
     astero_cases = get_test_cases(ASTERO)
-
+    
     star_do1 = get_test_cases(STAR)
     binary_do1 = get_test_cases(BINARY)
     astero_do1 = get_test_cases(ASTERO)
-
+    
     codeowner = parse_codeowners(CODEOWNERS)
-
+    
     not_listed(star_cases, codeowner["star"])
     not_listed(binary_cases, codeowner["binary"])
     not_listed(astero_cases, codeowner["astero"])
-
+    
     no_longer_exists(star_do1, codeowner["star"])
     no_longer_exists(binary_do1, codeowner["binary"])
     no_longer_exists(astero_do1, codeowner["astero"])
-
+    
     check_owners(codeowner["star"], 0)
     check_owners(codeowner["binary"], 0)
     check_owners(codeowner["astero"], 0)
-
+    
     check_owners(codeowner["star"], 1)
     check_owners(codeowner["binary"], 1)
     check_owners(codeowner["astero"], 1)

@@ -1,30 +1,30 @@
 &star_job
 
-   show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-   pause_before_terminate = .false.
-   pgstar_flag = .false.
+pause_before_terminate = .false.
+pgstar_flag = .false.
 
-   history_columns_file = 'history_columns.list' 
-   profile_columns_file = 'profile_columns.list'
+history_columns_file = 'history_columns.list'
+profile_columns_file = 'profile_columns.list'
 
-   ! Abundances
+! Abundances
 
-   initial_zfracs = 3 ! GS98_zfracs = 3
+initial_zfracs = 3 ! GS98_zfracs = 3
 
-   ! Initial model
+! Initial model
 
-   load_saved_model = .true.
-   load_model_filename = 'start.mod'
+load_saved_model = .true.
+load_model_filename = 'start.mod'
 
-   set_initial_cumulative_energy_error = .true.
-   new_cumulative_energy_error = 0d0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-   ! Final model
+! Final model
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'tams.mod'
-   required_termination_code_string = 'xa_central_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'tams.mod'
+required_termination_code_string = 'xa_central_lower_limit'
 
 /
 
@@ -32,144 +32,143 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 2d-2
+Zbase = 2d-2
 
-   use_Type2_opacities = .true.
+use_Type2_opacities = .true.
 
 /
 
 &controls
-   
-   ! IMPORTANT NOTE: if you use these files for non-testing purposes, note
-   ! that some timestep and resolution controls may be adjusted to make the test
-   ! faster at the cost of converged results. For each of these, recommended
-   ! values are commented out. Use with caution.
-   ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-   ! Mass & metalicity
+! IMPORTANT NOTE: if you use these files for non-testing purposes, note
+! that some timestep and resolution controls may be adjusted to make the test
+! faster at the cost of converged results. For each of these, recommended
+! values are commented out. Use with caution.
+! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-   initial_mass = 16d0
-   initial_z = 2d-2
+! Mass & metalicity
 
-   ! When to stop
+initial_mass = 16d0
+initial_z = 2d-2
 
-   xa_central_lower_limit_species(1) = 'h1'
-   xa_central_lower_limit(1) = 1E-6
+! When to stop
 
-   ! Opacities
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 1E-6
+
+! Opacities
 
 
-   ! Mixing
+! Mixing
 
-   mixing_length_alpha = 1.8d0
-   MLT_option = 'Henyey'
+mixing_length_alpha = 1.8d0
+MLT_option = 'Henyey'
 
-   num_cells_for_smooth_gradL_composition_term = 10
-   threshold_for_smooth_gradL_composition_term = 0.02
+num_cells_for_smooth_gradL_composition_term = 10
+threshold_for_smooth_gradL_composition_term = 0.02
 
-   num_cells_for_smooth_brunt_B = 10
-   threshold_for_smooth_brunt_B = 0.1
+num_cells_for_smooth_brunt_B = 10
+threshold_for_smooth_brunt_B = 0.1
 
-   use_ledoux_criterion = .true.
+use_ledoux_criterion = .true.
 
-   predictive_mix(1) = .true.
-   predictive_zone_type(1) = 'any'
-   predictive_zone_loc(1) = 'core'
-   predictive_bdy_loc(1) = 'top'
+predictive_mix(1) = .true.
+predictive_zone_type(1) = 'any'
+predictive_zone_loc(1) = 'core'
+predictive_bdy_loc(1) = 'top'
 
-   ! Timestep and grid
+! Timestep and grid
 
-   ! RELAXED VALUE FOR TEST SUITE
-      max_years_for_timestep = 1d5 ! 1d4
-     
-   mesh_delta_coeff = 0.5
+! RELAXED VALUE FOR TEST SUITE
+max_years_for_timestep = 1d5 ! 1d4
 
-   ! Output
+mesh_delta_coeff = 0.5
 
-   photo_interval = 50 ! 500
-   photo_digits = 3
-   profile_interval = 100 ! 1000
-   history_interval = 10
-   terminal_interval = 10
-   write_header_frequency = 10
-   
-   ! Eos
-   
+! Output
 
-   energy_eqn_option = 'dedt'
+photo_interval = 50 ! 500
+photo_digits = 3
+profile_interval = 100 ! 1000
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
+! Eos
 
-   ! limit max_model_number as part of test_suite
-   max_model_number = 2000
-      
-      !photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+energy_eqn_option = 'dedt'
+
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+
+! limit max_model_number as part of test_suite
+max_model_number = 2000
+
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
-      !trace_evolve = .true.
-      !fill_arrays_with_NaNs = .true.
+!report_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
+!trace_evolve = .true.
+!fill_arrays_with_NaNs = .true.
 
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+!solver_save_photo_call_number = 0
+! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 4142
-      !solver_test_partials_k = 2616
-      !solver_test_partials_iter_number = 4
-      !solver_test_partials_dx_0 = 1d-6
-      !solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
+!solver_test_partials_call_number = 4142
+!solver_test_partials_k = 2616
+!solver_test_partials_iter_number = 4
+!solver_test_partials_dx_0 = 1d-6
+!solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets
+!solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets
+!solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+!solver_test_partials_show_dx_var_name = 'h1'
 
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
+! equ name can also be one of these
+! 'lnE', 'lnP', 'grad_ad' to test eos
+! 'eps_nuc' to test net
+! 'non_nuc_neu' to test neu
+! 'gradT', 'mlt_vc' to test mlt
+! 'opacity' to test kap
 
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_net_partials = .true.
-      !solver_test_atm_partials = .true.
+!solver_test_partials_write_eos_call_info = .true.
 
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
+!solver_test_partials_k_low = -1
+!solver_test_partials_k_high = -1
 
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
+!solver_test_eos_partials = .true.
+!solver_test_kap_partials = .true.
+!solver_test_net_partials = .true.
+!solver_test_atm_partials = .true.
+
+!report_all_dt_limits = .true.
+!report_solver_dt_info = .true.
+
+!show_mesh_changes = .true.
+!mesh_dump_call_number = 5189
+!okay_to_remesh = .false.
+
+!energy_conservation_dump_model_number = -1
+
+!use_DGESVX_in_bcyclic = .true.
+!use_equilibration_in_DGESVX = .true.
+!report_min_rcond_from_DGESXV = .true.
+
+! solver debugging
+!solver_check_everything = .true.
+
+!solver_epsder_struct = 1d-6
+!solver_epsder_chem = 1d-6
+
+!report_solver_dt_info = .true.
+!report_dX_nuc_drop_dt_limits = .true.
+!report_bad_negative_xa = .true.
 
 /
 

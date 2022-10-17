@@ -5,75 +5,75 @@
 ! all of the other controls that simply have their default values.
 
 &star_job
-  ! see star/defaults/star_job.defaults
+! see star/defaults/star_job.defaults
 
-  ! begin with a pre-main sequence model
-    create_pre_main_sequence_model = .true.
+! begin with a pre-main sequence model
+create_pre_main_sequence_model = .true.
 
-  ! save a model at the end of the run
-    save_model_when_terminate = .false.
-    save_model_filename = '15M_at_TAMS.mod'
+! save a model at the end of the run
+save_model_when_terminate = .false.
+save_model_filename = '15M_at_TAMS.mod'
 
-  ! display on-screen plots
-    pgstar_flag = .true.
+! display on-screen plots
+pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 
 &eos
-  ! eos options
-  ! see eos/defaults/eos.defaults
+! eos options
+! see eos/defaults/eos.defaults
 
 / ! end of eos namelist
 
 
 &kap
-  ! kap options
-  ! see kap/defaults/kap.defaults
-  use_Type2_opacities = .true.
-  Zbase = 0.02
+! kap options
+! see kap/defaults/kap.defaults
+use_Type2_opacities = .true.
+Zbase = 0.02
 
 / ! end of kap namelist
 
 
 &controls
-  ! see star/defaults/controls.defaults
+! see star/defaults/controls.defaults
 
-  ! starting specifications
-    initial_mass = 15 ! in Msun units
-    initial_z = 0.02
+! starting specifications
+initial_mass = 15 ! in Msun units
+initial_z = 0.02
 
-  ! when to stop
+! when to stop
 
-    ! stop when the star nears ZAMS (Lnuc/L > 0.99)
-    Lnuc_div_L_zams_limit = 0.99d0
-    stop_near_zams = .true.
+! stop when the star nears ZAMS (Lnuc/L > 0.99)
+Lnuc_div_L_zams_limit = 0.99d0
+stop_near_zams = .true.
 
-    ! stop when the center mass fraction of h1 drops below this limit
-    xa_central_lower_limit_species(1) = 'h1'
-    xa_central_lower_limit(1) = 1d-3
+! stop when the center mass fraction of h1 drops below this limit
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 1d-3
 
-  ! wind
+! wind
 
-  ! atmosphere
+! atmosphere
 
-  ! rotation
+! rotation
 
-  ! element diffusion
+! element diffusion
 
-  ! mlt
+! mlt
 
-  ! mixing
+! mixing
 
-  ! timesteps
+! timesteps
 
-  ! mesh
+! mesh
 
-  ! solver
-     ! options for energy conservation (see MESA V, Section 3)
-     energy_eqn_option = 'dedt'
-     use_gold_tolerances = .true.
+! solver
+! options for energy conservation (see MESA V, Section 3)
+energy_eqn_option = 'dedt'
+use_gold_tolerances = .true.
 
-  ! output
+! output
 
 / ! end of controls namelist

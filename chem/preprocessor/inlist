@@ -1,15 +1,15 @@
 &chem
-	! directories
-	data_dir = 'chem_input_data'
-	output_dir = 'data/chem_data'
-	
-	! input files
-	masstable_filename = 'masslib_library_5.data'
-	winvn_filename = 'winvne_v2.data'
-	
-	! header information
-	masstable_header_length = 15
-	winvn_header_length = 4
-	number_nuclides = 7853
-	
+! directories
+data_dir = 'chem_input_data'
+output_dir = 'data/chem_data'
+
+! input files
+masstable_filename = 'masslib_library_5.data'
+winvn_filename = 'winvne_v2.data'
+
+! header information
+masstable_header_length = 15
+winvn_header_length = 4
+number_nuclides = 7853
+
 /

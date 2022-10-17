@@ -1,7 +1,6 @@
-
 &star_job
 
-   !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -11,14 +10,14 @@
 &kap
 / ! end of kap namelist
 
-&controls  
+&controls
 
 ! solver
 
 ! output
 
-   photo_directory = 'photos1'
-   log_directory = 'LOGS1'
+photo_directory = 'photos1'
+log_directory = 'LOGS1'
 
 
 / ! end of controls namelist
@@ -26,15 +25,15 @@
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 10
-   pgstar_interval = 1
+!pause = .true.
+!pause_interval = 10
+pgstar_interval = 1
 
-   Grid1_title = 'star1 - with overshooting'
-   
-   !Grid1_file_flag = .true.
-   Grid1_file_dir = 'png1'
-   Grid1_file_prefix = 'star1'
-   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_title = 'star1 - with overshooting'
+
+!Grid1_file_flag = .true.
+Grid1_file_dir = 'png1'
+Grid1_file_prefix = 'star1'
+Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
 
 / ! end of pgstar namelist

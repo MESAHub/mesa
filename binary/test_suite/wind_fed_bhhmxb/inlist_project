@@ -1,34 +1,34 @@
 &binary_job
 
-   inlist_names(1) = 'inlist1' 
-   inlist_names(2) = 'inlist2'
+inlist_names(1) = 'inlist1'
+inlist_names(2) = 'inlist2'
 
-   evolve_both_stars = .false.
+evolve_both_stars = .false.
 
 / ! end of binary_job namelist
 
 &binary_controls
-         
-   m1 = 20d0  ! donor mass in Msun
-   m2 = 10d0 ! companion mass in Msun
-   initial_period_in_days = 1.5d0
-   initial_bh_spin = 2d0
 
-   mdot_scheme = "Kolb"
+m1 = 20d0  ! donor mass in Msun
+m2 = 10d0 ! companion mass in Msun
+initial_period_in_days = 1.5d0
+initial_bh_spin = 2d0
 
-   fr = 0.05
-   fr_limit = 1d-2
-   fj = 0.005d0
+mdot_scheme = "Kolb"
 
-   limit_retention_by_mdot_edd = .true.
-   do_wind_mass_transfer_1 = .true.
-   do_jdot_mb = .false.
+fr = 0.05
+fr_limit = 1d-2
+fj = 0.005d0
 
-   report_rlo_solver_progress = .true.
+limit_retention_by_mdot_edd = .true.
+do_wind_mass_transfer_1 = .true.
+do_jdot_mb = .false.
 
-   ! test as well that the solver works at high accuracy
-   implicit_scheme_tolerance = 1d-8
-   implicit_scheme_tiny_factor = 0d0
-   max_tries_to_achieve = 20
-         
+report_rlo_solver_progress = .true.
+
+! test as well that the solver works at high accuracy
+implicit_scheme_tolerance = 1d-8
+implicit_scheme_tiny_factor = 0d0
+max_tries_to_achieve = 20
+
 / ! end of binary_controls namelist

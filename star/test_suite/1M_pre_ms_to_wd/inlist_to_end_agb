@@ -1,20 +1,18 @@
-
 &star_job
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'end_core_he_burn.mod'
+load_saved_model = .true.
+load_model_filename = 'end_core_he_burn.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'end_agb.mod'
-      required_termination_code_string = 'envelope_mass_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'end_agb.mod'
+required_termination_code_string = 'envelope_mass_limit'
 
+change_D_omega_flag = .true.
+new_D_omega_flag = .true.
 
-      change_D_omega_flag = .true.
-      new_D_omega_flag = .true.
-
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -24,91 +22,90 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 &controls
 
-      envelope_mass_limit = 1d-2 ! Msun
+envelope_mass_limit = 1d-2 ! Msun
 
-      energy_eqn_option = 'eps_grav'
+energy_eqn_option = 'eps_grav'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 20000
-         
-      initial_mass = 1.0
-      initial_z = 0.02d0
-      
+! limit max_model_number as part of test_suite
+max_model_number = 20000
 
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d0
-      D_DSI_factor = 0
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
-      
-      varcontrol_target = 1d-3
-      delta_lgL_He_limit = 0.01d0
-     
-      cool_wind_full_on_T = 9.99d9
-      hot_wind_full_on_T = 1d10 
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.8d0  
-      Blocker_scaling_factor = 0.7d0 ! 0.8d0        
-      
+initial_mass = 1.0
+initial_z = 0.02d0
+
+am_nu_visc_factor = 0
+am_D_mix_factor = 0.0333333333333333d0
+D_DSI_factor = 0
+D_SH_factor = 1
+D_SSI_factor = 1
+D_ES_factor = 1
+D_GSF_factor = 1
+D_ST_factor = 1
+
+varcontrol_target = 1d-3
+delta_lgL_He_limit = 0.01d0
+
+cool_wind_full_on_T = 9.99d9
+hot_wind_full_on_T = 1d10
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 0.8d0
+Blocker_scaling_factor = 0.7d0 ! 0.8d0
+
 
 ! mixing
-      
-      ! the mixing used here is a demonstration of options, not a specific endorsement.
-      ! for your own use, you should experiment with the options.
-      
-         use_other_mesh_delta_coeff_factor = .true.
-         ! use xtra_coeff_os option.  see run_star_extras.
- 
-         mesh_dlog_pp_dlogP_extra = 0.25
-         mesh_dlog_cno_dlogP_extra = 0.25
-      
-         mesh_dlog_3alf_dlogP_extra = 0.225
-         mesh_dlog_burn_c_dlogP_extra = 0.225
-         mesh_dlog_burn_n_dlogP_extra = 0.225
-         mesh_dlog_burn_o_dlogP_extra = 0.225
-      
-         mesh_logX_species(1) = 'h1'
-         mesh_logX_min_for_extra(1) = -6
-         mesh_dlogX_dlogP_extra(1) = 0.25
-      
-         mesh_logX_species(1) = 'he4'
-         mesh_logX_min_for_extra(1) = -6
-         mesh_dlogX_dlogP_extra(1) = 0.25
-       
-         overshoot_scheme(1) = 'exponential'
-         overshoot_zone_type(1) = 'any'
-         overshoot_zone_loc(1) = 'any'
-         overshoot_bdy_loc(1) = 'any'
-         overshoot_f(1) = 0.014
-         overshoot_f0(1) = 0.004
-      
-         T_mix_limit = 1d4
+
+! the mixing used here is a demonstration of options, not a specific endorsement.
+! for your own use, you should experiment with the options.
+
+use_other_mesh_delta_coeff_factor = .true.
+! use xtra_coeff_os option.  see run_star_extras.
+
+mesh_dlog_pp_dlogP_extra = 0.25
+mesh_dlog_cno_dlogP_extra = 0.25
+
+mesh_dlog_3alf_dlogP_extra = 0.225
+mesh_dlog_burn_c_dlogP_extra = 0.225
+mesh_dlog_burn_n_dlogP_extra = 0.225
+mesh_dlog_burn_o_dlogP_extra = 0.225
+
+mesh_logX_species(1) = 'h1'
+mesh_logX_min_for_extra(1) = -6
+mesh_dlogX_dlogP_extra(1) = 0.25
+
+mesh_logX_species(1) = 'he4'
+mesh_logX_min_for_extra(1) = -6
+mesh_dlogX_dlogP_extra(1) = 0.25
+
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'any'
+overshoot_zone_loc(1) = 'any'
+overshoot_bdy_loc(1) = 'any'
+overshoot_f(1) = 0.014
+overshoot_f0(1) = 0.004
+
+T_mix_limit = 1d4
 
 ! output
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 
 / ! end of controls namelist
@@ -117,39 +114,39 @@
 
 &pgstar
 
-         
 
-         
-      Grid6_win_flag = .true.
-      Grid6_win_width = 11
-         
-      !Grid6_file_flag = .true.
-      Grid6_file_dir = 'png'
-      Grid6_file_prefix = 'grid6_'
-      Grid6_file_interval = 5 ! output when mod(model_number,Grid6_file_interval)==0
-      Grid6_file_width = -1 ! (inches) negative means use same value as for window
-      Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
 
-      Summary_Burn_xaxis_name = 'mass' 
-      Summary_Burn_xaxis_reversed = .false.
-      Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Summary_Burn_xmax = 2.1  ! only used if /= -101d0
-      
-      Abundance_xaxis_name = 'mass' 
-      Abundance_xaxis_reversed = .false.
-      ! power xaxis limits -- to override system default selections
-      Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Abundance_xmax = -101d0 ! only used if /= -101d0
-      Abundance_log_mass_frac_min = -6 ! only used if < 0
 
-      !Profile_Panels4_win_flag = .true.
-      !Profile_Panels4_win_width = 6
-         
-      ! Abundance window -- current model abundance profiles
-      
-         !Abundance_win_flag = .true.
-      
-         Abundance_win_width = 9
-         Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-   
+Grid6_win_flag = .true.
+Grid6_win_width = 11
+
+!Grid6_file_flag = .true.
+Grid6_file_dir = 'png'
+Grid6_file_prefix = 'grid6_'
+Grid6_file_interval = 5 ! output when mod(model_number,Grid6_file_interval)==0
+Grid6_file_width = -1 ! (inches) negative means use same value as for window
+Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
+
+Summary_Burn_xaxis_name = 'mass'
+Summary_Burn_xaxis_reversed = .false.
+Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+Summary_Burn_xmax = 2.1  ! only used if /= -101d0
+
+Abundance_xaxis_name = 'mass'
+Abundance_xaxis_reversed = .false.
+! power xaxis limits -- to override system default selections
+Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = -101d0 ! only used if /= -101d0
+Abundance_log_mass_frac_min = -6 ! only used if < 0
+
+!Profile_Panels4_win_flag = .true.
+!Profile_Panels4_win_width = 6
+
+! Abundance window -- current model abundance profiles
+
+!Abundance_win_flag = .true.
+
+Abundance_win_width = 9
+Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
 / ! end of pgstar namelist

@@ -1,7 +1,6 @@
-
-&star_job   
-   load_saved_model = .true.
-   pgstar_flag = .false.
+&star_job
+load_saved_model = .true.
+pgstar_flag = .false.
 / ! end of star_job namelist
 
 &eos
@@ -10,343 +9,342 @@
 &kap
 / ! end of kap namelist
 
-&controls  
+&controls
 
 ! RSP
 
-   RSP_mass = 6d0
-   RSP_Teff = 5623
-   RSP_L = 3311d0
-   RSP_X = 0.736d0
-   RSP_Z = 0.008d0
+RSP_mass = 6d0
+RSP_Teff = 5623
+RSP_L = 3311d0
+RSP_X = 0.736d0
+RSP_Z = 0.008d0
 
-   RSP_fixed_Psurf = .true.
-   RSP_Psurf = 0d0   
-   RSP_initial_dt_factor = 1d0
-   
-   RSP_report_undercorrections = .true.
-   RSP_report_check_omega_changes = .true.
-   RSP_report_limit_dt = .true.
+RSP_fixed_Psurf = .true.
+RSP_Psurf = 0d0
+RSP_initial_dt_factor = 1d0
+
+RSP_report_undercorrections = .true.
+RSP_report_check_omega_changes = .true.
+RSP_report_limit_dt = .true.
 
 ! RSP controls   
-         
-   ! Parameters of the convection model.
-   ! Note that RSP_alfap, RSP_alfas, RSP_alfac, RSP_alfad and RSP_gammar
-   ! are expressed in the units of standard values.
-   ! Standard values are the ones for which static version of the Kuhfuss
-   ! model reduces to standard MLT.
-   ! See Table 1 in Smolec & Moskalik 2008
-   ! http://adsabs.harvard.edu/abs/2008AcA....58..193S
-   ! for standard values and the description of the parameters.
-   
-   RSP_alfa =      1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
-   RSP_alfac =     1.0d0         ! convective flux; Lc ~ RSP_alfac
-   RSP_alfas =     1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
-   RSP_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
-   RSP_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-   RSP_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
-   RSP_alfam =     0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
-   RSP_gammar =    0.0d0         ! radiative losses; dampR ~ RSP_gammar          
-            
+
+! Parameters of the convection model.
+! Note that RSP_alfap, RSP_alfas, RSP_alfac, RSP_alfad and RSP_gammar
+! are expressed in the units of standard values.
+! Standard values are the ones for which static version of the Kuhfuss
+! model reduces to standard MLT.
+! See Table 1 in Smolec & Moskalik 2008
+! http://adsabs.harvard.edu/abs/2008AcA....58..193S
+! for standard values and the description of the parameters.
+
+RSP_alfa = 1.5d0         ! mixing length; alfa = 0 gives a purely radiative model.
+RSP_alfac = 1.0d0         ! convective flux; Lc ~ RSP_alfac
+RSP_alfas = 1.0d0         ! turbulent source; Lc ~ 1/ALFAS; PII ~ RSP_alfas
+RSP_alfad = 1.0d0         ! turbulent dissipation; damp ~ RSP_alfad
+RSP_alfap = 0.0d0         ! turbulent pressure; Pt ~ alfap
+RSP_alfat = 0.0d0         ! turbulent flux; Lt ~ RSP_alfat; overshooting.
+RSP_alfam = 0.25d0        ! eddy viscosity; Chi & Eq ~ RSP_alfam
+RSP_gammar = 0.0d0         ! radiative losses; dampR ~ RSP_gammar
+
 
 
 ! TESTING
-   !RSP_do_check_omega = .false.
+!RSP_do_check_omega = .false.
 
-   !RSP_min_deltaR_for_periods = 1d0
+!RSP_min_deltaR_for_periods = 1d0
 
 
-   ! time weighting for end-of-step vs start-of-step values in equations.
-   ! 1 corresponds to fully implicit scheme - stable, but can have large numerical damping.
-   ! 0.5 corresponds to trapezoidal rule integration - gives least numerical damping.
-   ! do not use values less than 0.5.  strongly recommend 0.5 for theta and thetat.
-   ! don't mess with any of these unless you know what you are doing or like to watch the code crash.
-   
-   RSP_theta =      0.5d0        ! Pgas and Prad
-   RSP_thetat =     0.5d0        ! Pturb
-   RSP_thetae =     0.5d0        ! erad in terms using f_Edd
-   RSP_thetaq =     1.0d0        ! Pvsc
-   RSP_thetau =     1.0d0        ! Eq and Uq
-   RSP_wtr =        0.6667d0     ! Lr
-   RSP_wtc =        0.6667d0     ! Lc
-   RSP_wtt =        0.6667d0     ! Lt
-   RSP_gam =        1.0d0        ! Et src_snk
+! time weighting for end-of-step vs start-of-step values in equations.
+! 1 corresponds to fully implicit scheme - stable, but can have large numerical damping.
+! 0.5 corresponds to trapezoidal rule integration - gives least numerical damping.
+! do not use values less than 0.5.  strongly recommend 0.5 for theta and thetat.
+! don't mess with any of these unless you know what you are doing or like to watch the code crash.
 
-   ! controls for building the initial model
-   RSP_nz = 150 ! total number of zones in initial model
-   RSP_nz_outer = 40 ! number of zones in outer region of initial model
-   RSP_T_anchor = 11d3 ! approx temperature at base of outer region
-   RSP_T_inner = 2d6 ! T at inner boundary of initial model
-   
-   RSP_max_outer_dm_tries = 100 ! give up if fail to find outer dm in this many attempts
-   RSP_max_inner_scale_tries = 100 ! give up if fail to find inner dm scale factor in this many attempts
-   RSP_T_anchor_tolerance = 1d-8 
-      ! allowed relative difference between T at base of outer region and T_anchor
-      ! if fail trying to create initial model, try increasing this to 1d-6 or more
-   RSP_T_inner_tolerance = 1d-8 
-      ! allowed relative difference between T at inner boundary and T_inner
-      ! if fail trying to create initial model, try increasing this to 1d-6 or more
-   
-   RSP_relax_initial_model = .true.
-   RSP_relax_alfap_before_alfat = .true. ! else reverse the order         
-   RSP_relax_max_tries = 1000   
-   RSP_relax_dm_tolerance = 1d-6
-   
-   
-   use_RSP_new_start_scheme = .false.
-   !RSP_relax_max_abs_rel_hse_err = 1d-3
+RSP_theta = 0.5d0        ! Pgas and Prad
+RSP_thetat = 0.5d0        ! Pturb
+RSP_thetae = 0.5d0        ! erad in terms using f_Edd
+RSP_thetaq = 1.0d0        ! Pvsc
+RSP_thetau = 1.0d0        ! Eq and Uq
+RSP_wtr = 0.6667d0     ! Lr
+RSP_wtc = 0.6667d0     ! Lc
+RSP_wtt = 0.6667d0     ! Lt
+RSP_gam = 1.0d0        ! Et src_snk
 
-            
-   ! Initial kick makes use of the scaled linear velocity eigenvector
-   ! of a given mode or of the linear combination of the eigenvectors
-   ! for the fundamental mode and first two radial overtones. 
-   ! The surface velocity is set to RSP_kick_vsurf_km_per_sec and
-   ! the mode content is set by RSP_fraction_1st_overtone and RSP_fraction_2nd_overtone
-   RSP_kick_vsurf_km_per_sec = 0.1d0 ! can be negative
-   RSP_fraction_1st_overtone = 0d0
-   RSP_fraction_2nd_overtone = 0d0
-   ! fraction from fundamental = 1d0 - (1st + 2nd)
-   ! Note: This is important for models in which two or more modes are linearly unstable.
-   ! Appropriate setting may help to arrive at the desired mode, since the final pulsation
-   ! state may depend on initial conditions set by the three parameters above.
-   ! Integration of the same model with different initial kicks is a way to study
-   ! the nonlinear mode selection -
-   ! for an example see Fig. 1 in Smolec & Moskalik 2010
-   ! http://adsabs.harvard.edu/abs/2010A%26A...524A..40S .
-   
-   ! random initial velocity profile.  added to any kick from eigenvector.
-   RSP_Avel = 0d0 ! kms. linear in mesh points from 0 at inner boundary to this at surface
-   RSP_Arnd = 0d0 ! kms. random fluctuation at each mesh point.
-   
-   ! period controls
-   RSP_target_steps_per_cycle = 600
-   RSP_min_max_R_for_periods = -1 ! skip if < 0; Rsun units.
-   RSP_min_PERIOD_div_PERIODLIN = 0.5d0
-   RSP_mode_for_setting_PERIODLIN = 1 ! 0, 1, or 2 for fundamental, 1st, and 2nd overtones.
-   RSP_default_PERIODLIN = 34560 ! 4 days
+! controls for building the initial model
+RSP_nz = 150 ! total number of zones in initial model
+RSP_nz_outer = 40 ! number of zones in outer region of initial model
+RSP_T_anchor = 11d3 ! approx temperature at base of outer region
+RSP_T_inner = 2d6 ! T at inner boundary of initial model
 
-   ! when to stop
-   RSP_max_num_periods = -1 ! ignore if < 0
-   RSP_GREKM_avg_abs_frac_new = 0.1d0 ! fraction of new for updating avg at each cycle.
-   RSP_GREKM_avg_abs_limit = -1 ! 0.01d0 ! ignore if < 0; else stop when GREKM_avg_abs < this limit.
-   
-   ! timestep limiting
-   RSP_initial_dt_factor = 1d-2 ! set initial timestep to this times linear period/target_steps_per_cycle
-      ! start with smaller timestep to give time for initial model to adjust
-   !RSP_Uq_threshold_for_dt_limit = 100d0
-   RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
-   RSP_max_dt_times_min_dr_div_cs = 2d0 ! limit dt by this
-      ! i.e., make dt <= this times min sound crossing time dr/cs
-      !      for cells with abs(Uq) > threshold
-   RSP_max_dt = -1 ! seconds
-   RSP_report_limit_dt = .false.
+RSP_max_outer_dm_tries = 100 ! give up if fail to find outer dm in this many attempts
+RSP_max_inner_scale_tries = 100 ! give up if fail to find inner dm scale factor in this many attempts
+RSP_T_anchor_tolerance = 1d-8
+! allowed relative difference between T at base of outer region and T_anchor
+! if fail trying to create initial model, try increasing this to 1d-6 or more
+RSP_T_inner_tolerance = 1d-8
+! allowed relative difference between T at inner boundary and T_inner
+! if fail trying to create initial model, try increasing this to 1d-6 or more
 
-   ! artificial viscosity controls
-   ! for the equations see: Appendix C in Stellingwerf 1975
-   ! http://adsabs.harvard.edu/abs/1975ApJ...195..441S.
-   ! In principle, for not too-non-adiabatic convective models artificial viscosity is not
-   ! needed or should be very small. Hence a large cut-off parameter below (in purely
-   ! radiative models the default value for cut-off was 0.01)
-   RSP_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
-   RSP_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
-      ! zsh > 0 delays onset of artificial viscosity
-      ! can eliminate most/all interior dissipation while still providing for extreme cases.
-      ! using this parameter the dependence of limiting amplitude on cq is very weak.
-   ! for Tscharnuter & Winkler form of artificial viscosity
-   RSP_Qvisc_linear = 0d0 
-   RSP_Qvisc_quadratic = 0d0
-      ! as described in section 4.2 of mesa3, 2015.
-      ! RSP_Qvisc_linear is analogous to shock_spread_linear
-      ! RSP_Qvisc_quadratic is analogous to shock_spread_quadratic
-      ! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
-      ! note that this form also uses RSP_zsh to delay onset of artficial viscosity
-   
-   ! surface pressure.  provides outer boundary condition for momentum equation.
-   RSP_use_Prad_for_Psurf = .false.
-   RSP_use_atm_grey_with_kap_for_Psurf = .false.
-   RSP_tau_surf_for_atm_grey_with_kap = 3d-3 ! for atm_grey_with_kap
-   RSP_fixed_Psurf = .true.
-   RSP_Psurf = 0d0 ! ignore if < 0.  else use as surface pressure.
-   set_RSP_Psurf_to_multiple_of_initial_P1 = -1 ! ignore if < 0. 
-      ! set RSP_Psurf to this times initial surface cell pressure
-   RSP_surface_tau = 0.67d0 ! 0.001d0
-   
-   ! solver controls
-   RSP_tol_max_corr = 1d-8
-   RSP_tol_max_resid = 1d-6
-   !RSP_max_iters_per_step = 100
-   RSP_max_retries_per_step = 8
-   RSP_report_undercorrections = .false.
-   RSP_nz_div_IBOTOM = 30d0 ! set IBOTOM = RSP_nz/RSP_nz_div_IBOTOM
-   RSP_min_tau_for_turbulent_flux = 2d2 ! optionally turn off turbulent flux near surface 
-   
-   ! output data for work integrals during a particular period
-   RSP_work_period = -1
-   RSP_work_filename = 'work.data'
-   
-   ! output data for 3d map.  format same as for gnuplot pm3d 
-   RSP_write_map = .false.
-   RSP_map_columns_filename = 'map_columns.list' ! subset of profile columns list
-      ! items listed in your map columns must also appear in your profile columns
-   RSP_map_filename = 'map.data'
-   RSP_map_first_period = -1
-   RSP_map_last_period = -1
-   RSP_map_zone_interval = 2
-   RSP_map_history_filename = 'map_history.data'
-   
-   ! rsp hooks
-   !use_other_RSP_linear_analysis = .false.         
-   !use_other_RSP_eddington_factor = .false.
-   !use_other_RSP_build_model = .false.
+RSP_relax_initial_model = .true.
+RSP_relax_alfap_before_alfat = .true. ! else reverse the order
+RSP_relax_max_tries = 1000
+RSP_relax_dm_tolerance = 1d-6
 
-   ! for special tests
-   ! can set ALFA = 0 for pure radiative with no turbulence or convection.
-   ! can set gamma_law_hydro > 0 and it will be used by rsp for eos.
-   ! can set zero_gravity = .true.
-   ! can set opacity to be constant times density.
-   RSP_kap_density_factor = -1 ! ignore if < 0
-      ! else set opacity to this times density
-   
-   ! rsp misc
-   RSP_efl0 =      1.0d2        
-   RSP_nmodes = 3 ! number of modes LINA will calculate for initial model
-   RSP_trace_RSP_build_model = .false.
-   !RSP_use_nlin_constants = .false.
+use_RSP_new_start_scheme = .false.
+!RSP_relax_max_abs_rel_hse_err = 1d-3
 
-   ! -------- following are not ready for general use --------
-   
-   ! initial model log_tau params
-   !RSP_initial_model_outer_log_tau = -1d99 ! -2d0
-   !RSP_initial_model_inner_log_tau = -1d99 ! 8d0
-   
-   !RSP_Qvisc_linear_static = 0d0
-   
-   ! rad hydro - not ready
-   !RSP_use_diffusion_limit = .true.
-   !RSP_use_T_form_of_erad_eqn = .true.
-   !RSP_use_T_form_of_Fr_eqn = .true.
-   !RSP_accel_eqn_use_Prad_instead_of_Fr_term = .true.
-   !RSP_erad_eqn_dt_term_limit = 1d7 ! to avoid numeric issues when heat exchange time scale << dt
-   !RSP_Fr_eqn_always_use_d_Prad_dm = .true. ! even for cases where f_Edd /= 1/3
-   
-   ! f_Edd - not ready
-   !RSP_nz_div_number_of_core_rays_for_f_Edd = 5d0 ! adjust number of core rays to nz
-   !RSP_max_tau_for_variable_f_Edd = 1d2 ! for tau > this, set f_Edd = 1/3
-   !RSP_iterations_for_smoothing_f_Edd = 2
-   
-   ! parameters for radiative energy equation - not ready
-   !RSP_kapE_factor = 1d0 ! absorption mean opacity is approximated by this factor times Rosseland
-   !RSP_kapP_factor = 1d0 ! Planck mean opacity is approximated by this factor times Rosseland
-            
-   ! mesh adjustment - not ready
-   ! note that rsp remeshing is off if okay_to_remesh is false
-   !RSP_remesh_interval = 2 ! remesh when mod(model_number,this) == 0
-   !RSP_max_periods_for_remeshing = 0 ! 0 means no remeshing; ignore this param if < 0
-   !RSP_max_model_number_for_remeshing = -1 ! ignore this param if < 0
-   !RSP_stop_remesh_after_set_velocities = .true.
-   !RSP_do_global_remapping_corrections = .false.
-   
-   ! default mesh function weights
-   !RSP_mesh_fcn_weight_lnd = 0d0
-   !RSP_mesh_fcn_weight_lnT = 0d0
-   !RSP_mesh_fcn_weight_lnP = 0d0
-   !RSP_mesh_fcn_weight_lnE = 1d0
-   !RSP_mesh_fcn_weight_lnm = 0d0
-   !RSP_mesh_fcn_weight_lnkap = 0d0
-   !RSP_mesh_fcn_weight_grada = 0d0
-   !RSP_mesh_fcn_weight_lntau = 0d0
-   !RSP_mesh_fcn_weight_avg_charge_H = 0d0
-   !RSP_mesh_fcn_weight_avg_charge_He = 0d0
-   !
-   !RSP_remesh_fraction = 1d0 ! move mesh by this fraction of full remesh movement
-   !RSP_limit_abs_max_dlnr = 1d-4 ! undercorrect if necessary to limit changes to this abs(dr)/r
-   !RSP_no_remesh_inner_fraction_zones = 0.3330d0 ! remesh will keep these at fixed radial locations
-   !RSP_no_remesh_outer_fraction_zones = 0.020d0 ! remesh will keep these at fixed radial locations
-   !RSP_remesh_space_smoothing_alpha = 1.5d0
-   !RSP_remesh_v_blend_fraction_for_KE = 1.0d0 ! < 0 means set v = v_div_r * r
-   !
-   !RSP_remesh_test_partials = .false.
-   !trace_RSP_remesh = .false.
-   
+
+! Initial kick makes use of the scaled linear velocity eigenvector
+! of a given mode or of the linear combination of the eigenvectors
+! for the fundamental mode and first two radial overtones.
+! The surface velocity is set to RSP_kick_vsurf_km_per_sec and
+! the mode content is set by RSP_fraction_1st_overtone and RSP_fraction_2nd_overtone
+RSP_kick_vsurf_km_per_sec = 0.1d0 ! can be negative
+RSP_fraction_1st_overtone = 0d0
+RSP_fraction_2nd_overtone = 0d0
+! fraction from fundamental = 1d0 - (1st + 2nd)
+! Note: This is important for models in which two or more modes are linearly unstable.
+! Appropriate setting may help to arrive at the desired mode, since the final pulsation
+! state may depend on initial conditions set by the three parameters above.
+! Integration of the same model with different initial kicks is a way to study
+! the nonlinear mode selection -
+! for an example see Fig. 1 in Smolec & Moskalik 2010
+! http://adsabs.harvard.edu/abs/2010A%26A...524A..40S .
+
+! random initial velocity profile.  added to any kick from eigenvector.
+RSP_Avel = 0d0 ! kms. linear in mesh points from 0 at inner boundary to this at surface
+RSP_Arnd = 0d0 ! kms. random fluctuation at each mesh point.
+
+! period controls
+RSP_target_steps_per_cycle = 600
+RSP_min_max_R_for_periods = -1 ! skip if < 0; Rsun units.
+RSP_min_PERIOD_div_PERIODLIN = 0.5d0
+RSP_mode_for_setting_PERIODLIN = 1 ! 0, 1, or 2 for fundamental, 1st, and 2nd overtones.
+RSP_default_PERIODLIN = 34560 ! 4 days
+
+! when to stop
+RSP_max_num_periods = -1 ! ignore if < 0
+RSP_GREKM_avg_abs_frac_new = 0.1d0 ! fraction of new for updating avg at each cycle.
+RSP_GREKM_avg_abs_limit = -1 ! 0.01d0 ! ignore if < 0; else stop when GREKM_avg_abs < this limit.
+
+! timestep limiting
+RSP_initial_dt_factor = 1d-2 ! set initial timestep to this times linear period/target_steps_per_cycle
+! start with smaller timestep to give time for initial model to adjust
+!RSP_Uq_threshold_for_dt_limit = 100d0
+RSP_v_div_cs_threshold_for_dt_limit = 0.8d0
+RSP_max_dt_times_min_dr_div_cs = 2d0 ! limit dt by this
+! i.e., make dt <= this times min sound crossing time dr/cs
+!      for cells with abs(Uq) > threshold
+RSP_max_dt = -1 ! seconds
+RSP_report_limit_dt = .false.
+
+! artificial viscosity controls
+! for the equations see: Appendix C in Stellingwerf 1975
+! http://adsabs.harvard.edu/abs/1975ApJ...195..441S.
+! In principle, for not too-non-adiabatic convective models artificial viscosity is not
+! needed or should be very small. Hence a large cut-off parameter below (in purely
+! radiative models the default value for cut-off was 0.01)
+RSP_cq = 4.0d0 ! viscosity parameter (viscosity pressure proportional to cq)
+RSP_zsh = 0.1d0 ! "turn-on" compression in units of sound speed.
+! zsh > 0 delays onset of artificial viscosity
+! can eliminate most/all interior dissipation while still providing for extreme cases.
+! using this parameter the dependence of limiting amplitude on cq is very weak.
+! for Tscharnuter & Winkler form of artificial viscosity
+RSP_Qvisc_linear = 0d0
+RSP_Qvisc_quadratic = 0d0
+! as described in section 4.2 of mesa3, 2015.
+! RSP_Qvisc_linear is analogous to shock_spread_linear
+! RSP_Qvisc_quadratic is analogous to shock_spread_quadratic
+! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
+! note that this form also uses RSP_zsh to delay onset of artficial viscosity
+
+! surface pressure.  provides outer boundary condition for momentum equation.
+RSP_use_Prad_for_Psurf = .false.
+RSP_use_atm_grey_with_kap_for_Psurf = .false.
+RSP_tau_surf_for_atm_grey_with_kap = 3d-3 ! for atm_grey_with_kap
+RSP_fixed_Psurf = .true.
+RSP_Psurf = 0d0 ! ignore if < 0.  else use as surface pressure.
+set_RSP_Psurf_to_multiple_of_initial_P1 = -1 ! ignore if < 0.
+! set RSP_Psurf to this times initial surface cell pressure
+RSP_surface_tau = 0.67d0 ! 0.001d0
+
+! solver controls
+RSP_tol_max_corr = 1d-8
+RSP_tol_max_resid = 1d-6
+!RSP_max_iters_per_step = 100
+RSP_max_retries_per_step = 8
+RSP_report_undercorrections = .false.
+RSP_nz_div_IBOTOM = 30d0 ! set IBOTOM = RSP_nz/RSP_nz_div_IBOTOM
+RSP_min_tau_for_turbulent_flux = 2d2 ! optionally turn off turbulent flux near surface
+
+! output data for work integrals during a particular period
+RSP_work_period = -1
+RSP_work_filename = 'work.data'
+
+! output data for 3d map.  format same as for gnuplot pm3d
+RSP_write_map = .false.
+RSP_map_columns_filename = 'map_columns.list' ! subset of profile columns list
+! items listed in your map columns must also appear in your profile columns
+RSP_map_filename = 'map.data'
+RSP_map_first_period = -1
+RSP_map_last_period = -1
+RSP_map_zone_interval = 2
+RSP_map_history_filename = 'map_history.data'
+
+! rsp hooks
+!use_other_RSP_linear_analysis = .false.
+!use_other_RSP_eddington_factor = .false.
+!use_other_RSP_build_model = .false.
+
+! for special tests
+! can set ALFA = 0 for pure radiative with no turbulence or convection.
+! can set gamma_law_hydro > 0 and it will be used by rsp for eos.
+! can set zero_gravity = .true.
+! can set opacity to be constant times density.
+RSP_kap_density_factor = -1 ! ignore if < 0
+! else set opacity to this times density
+
+! rsp misc
+RSP_efl0 = 1.0d2
+RSP_nmodes = 3 ! number of modes LINA will calculate for initial model
+RSP_trace_RSP_build_model = .false.
+!RSP_use_nlin_constants = .false.
+
+! -------- following are not ready for general use --------
+
+! initial model log_tau params
+!RSP_initial_model_outer_log_tau = -1d99 ! -2d0
+!RSP_initial_model_inner_log_tau = -1d99 ! 8d0
+
+!RSP_Qvisc_linear_static = 0d0
+
+! rad hydro - not ready
+!RSP_use_diffusion_limit = .true.
+!RSP_use_T_form_of_erad_eqn = .true.
+!RSP_use_T_form_of_Fr_eqn = .true.
+!RSP_accel_eqn_use_Prad_instead_of_Fr_term = .true.
+!RSP_erad_eqn_dt_term_limit = 1d7 ! to avoid numeric issues when heat exchange time scale << dt
+!RSP_Fr_eqn_always_use_d_Prad_dm = .true. ! even for cases where f_Edd /= 1/3
+
+! f_Edd - not ready
+!RSP_nz_div_number_of_core_rays_for_f_Edd = 5d0 ! adjust number of core rays to nz
+!RSP_max_tau_for_variable_f_Edd = 1d2 ! for tau > this, set f_Edd = 1/3
+!RSP_iterations_for_smoothing_f_Edd = 2
+
+! parameters for radiative energy equation - not ready
+!RSP_kapE_factor = 1d0 ! absorption mean opacity is approximated by this factor times Rosseland
+!RSP_kapP_factor = 1d0 ! Planck mean opacity is approximated by this factor times Rosseland
+
+! mesh adjustment - not ready
+! note that rsp remeshing is off if okay_to_remesh is false
+!RSP_remesh_interval = 2 ! remesh when mod(model_number,this) == 0
+!RSP_max_periods_for_remeshing = 0 ! 0 means no remeshing; ignore this param if < 0
+!RSP_max_model_number_for_remeshing = -1 ! ignore this param if < 0
+!RSP_stop_remesh_after_set_velocities = .true.
+!RSP_do_global_remapping_corrections = .false.
+
+! default mesh function weights
+!RSP_mesh_fcn_weight_lnd = 0d0
+!RSP_mesh_fcn_weight_lnT = 0d0
+!RSP_mesh_fcn_weight_lnP = 0d0
+!RSP_mesh_fcn_weight_lnE = 1d0
+!RSP_mesh_fcn_weight_lnm = 0d0
+!RSP_mesh_fcn_weight_lnkap = 0d0
+!RSP_mesh_fcn_weight_grada = 0d0
+!RSP_mesh_fcn_weight_lntau = 0d0
+!RSP_mesh_fcn_weight_avg_charge_H = 0d0
+!RSP_mesh_fcn_weight_avg_charge_He = 0d0
+!
+!RSP_remesh_fraction = 1d0 ! move mesh by this fraction of full remesh movement
+!RSP_limit_abs_max_dlnr = 1d-4 ! undercorrect if necessary to limit changes to this abs(dr)/r
+!RSP_no_remesh_inner_fraction_zones = 0.3330d0 ! remesh will keep these at fixed radial locations
+!RSP_no_remesh_outer_fraction_zones = 0.020d0 ! remesh will keep these at fixed radial locations
+!RSP_remesh_space_smoothing_alpha = 1.5d0
+!RSP_remesh_v_blend_fraction_for_KE = 1.0d0 ! < 0 means set v = v_div_r * r
+!
+!RSP_remesh_test_partials = .false.
+!trace_RSP_remesh = .false.
+
 ! output
 
-   photo_directory = 'photos1'
-   log_directory = 'LOGS1'
+photo_directory = 'photos1'
+log_directory = 'LOGS1'
 
-      !photo_interval = 1000
-      !profile_interval = 4000
-      !history_interval = 40
-      !terminal_interval = 100
+!photo_interval = 1000
+!profile_interval = 4000
+!history_interval = 40
+!terminal_interval = 100
 
-      !fill_arrays_with_NaNs = .true.
-      
-      
-      !max_model_number = 2
+!fill_arrays_with_NaNs = .true.
+
+
+!max_model_number = 2
 
 ! FOR DEBUGGING
-      
-      !max_number_retries = 0
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
+!max_number_retries = 0
 
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+!report_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
 
-      !solver_test_partials_call_number = 1
-      !solver_test_partials_k = 49
-      !solver_test_partials_iter_number = 1
-      !solver_test_partials_dx_0 = 1d-5
-      !solver_test_partials_var_name = '' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = '' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
+!solver_save_photo_call_number = 0
+! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
+!solver_test_partials_call_number = 1
+!solver_test_partials_k = 49
+!solver_test_partials_iter_number = 1
+!solver_test_partials_dx_0 = 1d-5
+!solver_test_partials_var_name = '' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets
+!solver_test_partials_equ_name = '' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets
+!solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+!solver_test_partials_show_dx_var_name = 'h1'
 
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_nRSP2_partials = .true.
-      !solver_test_atm_partials = .true.
+! equ name can also be one of these
+! 'lnE', 'lnP', 'grad_ad' to test eos
+! 'eps_nuc' to test net
+! 'non_nuc_neu' to test neu
+! 'gradT', 'mlt_vc' to test mlt
+! 'opacity' to test kap
 
-      !report_why_dt_limits = .true.
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !trace_evolve = .true.
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
+!solver_test_partials_write_eos_call_info = .true.
+
+!solver_test_partials_k_low = -1
+!solver_test_partials_k_high = -1
+
+!solver_test_eos_partials = .true.
+!solver_test_kap_partials = .true.
+!solver_test_nRSP2_partials = .true.
+!solver_test_atm_partials = .true.
+
+!report_why_dt_limits = .true.
+!report_all_dt_limits = .true.
+!report_solver_dt_info = .true.
+
+!show_mesh_changes = .true.
+!mesh_dump_call_number = 5189
+!okay_to_remesh = .false.
+
+!energy_conservation_dump_model_number = -1
+
+!trace_evolve = .true.
+
+!use_DGESVX_in_bcyclic = .true.
+!use_equilibration_in_DGESVX = .true.
+!report_min_rcond_from_DGESXV = .true.
 
 
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
+! solver debugging
+!solver_check_everything = .true.
+
+!solver_epsder_struct = 1d-6
+!solver_epsder_chem = 1d-6
+
+!report_solver_dt_info = .true.
+!report_dX_nuc_drop_dt_limits = .true.
+!report_bad_negative_xa = .true.
 
 
 / ! end of controls namelist
@@ -354,51 +352,51 @@
 
 &pgstar
 
-   !pause = .true.
-   !pause_interval = 100
-   pgstar_interval = 1
+!pause = .true.
+!pause_interval = 100
+pgstar_interval = 1
 
 ! window 1
 
-   !Grid1_win_flag = .true.
-   Grid1_title = 'Cepheid Grid Profiles'
+!Grid1_win_flag = .true.
+Grid1_title = 'Cepheid Grid Profiles'
 
-   !Grid1_file_flag = .true.
-   Grid1_file_dir = 'png1'
-   Grid1_file_prefix = 'grid1'
-   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
-   
-   Profile_Panels1_xaxis_name = 'zone'
-   Profile_Panels1_xaxis_reversed = .true.
-   !Profile_Panels1_xmin = 50 ! -101D0
-   !Profile_Panels1_xmax = 65 ! -101D0
-   
+!Grid1_file_flag = .true.
+Grid1_file_dir = 'png1'
+Grid1_file_prefix = 'grid1'
+Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+
+Profile_Panels1_xaxis_name = 'zone'
+Profile_Panels1_xaxis_reversed = .true.
+!Profile_Panels1_xmin = 50 ! -101D0
+!Profile_Panels1_xmax = 65 ! -101D0
+
 ! window 2
-      
-   Grid2_win_flag = .true.
-   Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP/TDC'
-   
-   History_Panels2_xaxis_name='day'
-   History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-   ! Grid2_file_flag = .true.
-   file_digits = 7
-   Grid2_file_dir = 'png'
-   Grid2_file_prefix = 'grid2'
-   Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
-   
-   !Profile_Panels2_show_grid = .true.
+Grid2_win_flag = .true.
+Grid2_title = '6 M\d\(2281)\u Z=0.018 Cepheid RSP/TDC'
 
-   !Profile_Panels2_xaxis_name = 'logtau'
-   !Profile_Panels2_xaxis_reversed = .true.
-   !Profile_Panels2_xmin = -101d0
-   !Profile_Panels2_xmax = -101D0
+History_Panels2_xaxis_name = 'day'
+History_Panels2_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-   Profile_Panels2_xaxis_name = 'logxm'
-   Profile_Panels2_xaxis_reversed = .true.
-   Profile_Panels2_xmin = -6
-   Profile_Panels2_xmax = -0.1
+! Grid2_file_flag = .true.
+file_digits = 7
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid2'
+Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
 
-   Profile_Panels2_dymin(4) = 0.02
-   
+!Profile_Panels2_show_grid = .true.
+
+!Profile_Panels2_xaxis_name = 'logtau'
+!Profile_Panels2_xaxis_reversed = .true.
+!Profile_Panels2_xmin = -101d0
+!Profile_Panels2_xmax = -101D0
+
+Profile_Panels2_xaxis_name = 'logxm'
+Profile_Panels2_xaxis_reversed = .true.
+Profile_Panels2_xmin = -6
+Profile_Panels2_xmax = -0.1
+
+Profile_Panels2_dymin(4) = 0.02
+
 / ! end of pgstar namelist

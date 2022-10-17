@@ -1,42 +1,42 @@
 &star_job
-   read_extra_star_job_inlist1 = .true.
-   extra_star_job_inlist1_name = 'inlist_common'
+read_extra_star_job_inlist1 = .true.
+extra_star_job_inlist1_name = 'inlist_common'
 / ! end of star_job namelist
 
 &eos
-   read_extra_eos_inlist1 = .true.
-   extra_eos_inlist1_name = 'inlist_common'
+read_extra_eos_inlist1 = .true.
+extra_eos_inlist1_name = 'inlist_common'
 / !end of eos namelist
 
 &kap
-   read_extra_kap_inlist1 = .true.
-   extra_kap_inlist1_name = 'inlist_common'
+read_extra_kap_inlist1 = .true.
+extra_kap_inlist1_name = 'inlist_common'
 / ! end of kap namelist
 
 &controls
-   read_extra_controls_inlist1 = .true.
-   extra_controls_inlist1_name = 'inlist_common'
+read_extra_controls_inlist1 = .true.
+extra_controls_inlist1_name = 'inlist_common'
 
 ! mlt
 
-   !use_other_alpha_mlt = .true. ! implemented in run_star_extras
-   x_ctrl(21) = 3.0 ! alpha_H
-   x_ctrl(22) = 1.5 ! alpha_other
-   x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
-   x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
-   
-! solver
-   use_gold2_tolerances = .true.
-   use_gold_tolerances = .true.
-   gold2_tol_max_residual2 = 5d-7
-   gold2_tol_max_residual3 = 5d-4
-   gold_tol_max_residual2 = 5d-4
+!use_other_alpha_mlt = .true. ! implemented in run_star_extras
+x_ctrl(21) = 3.0 ! alpha_H
+x_ctrl(22) = 1.5 ! alpha_other
+x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
+x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
 
-   convergence_ignore_equL_residuals = .true. 
-   make_gradr_sticky_in_solver_iters = .true.
-   xa_scale = 1d-5
-   iter_for_resid_tol2 = 10
-   min_timestep_limit = 1d-12 ! (seconds)
+! solver
+use_gold2_tolerances = .true.
+use_gold_tolerances = .true.
+gold2_tol_max_residual2 = 5d-7
+gold2_tol_max_residual3 = 5d-4
+gold_tol_max_residual2 = 5d-4
+
+convergence_ignore_equL_residuals = .true.
+make_gradr_sticky_in_solver_iters = .true.
+xa_scale = 1d-5
+iter_for_resid_tol2 = 10
+min_timestep_limit = 1d-12 ! (seconds)
 
 / ! end of controls namelist
 

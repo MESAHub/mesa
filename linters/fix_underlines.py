@@ -21,15 +21,14 @@ DEFAULTS_FILES = (
 
 
 def fix_underlines(filename):
-
     path = os.path.join(MESA_DIR, filename)
-
+    
     with open(path, "r") as f:
         lines = f.readlines()
-
+    
     # go through lines
     prev_line = None
-
+    
     with open(path, "w") as f:
         for line in lines:
             if line.endswith("~\n"):

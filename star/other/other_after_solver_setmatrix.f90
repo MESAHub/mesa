@@ -22,22 +22,22 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_after_solver_setmatrix
 
-      implicit none
-      
-            
-      contains
-         
-      subroutine default_other_after_solver_setmatrix(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine default_other_after_solver_setmatrix
+module other_after_solver_setmatrix
+   
+   implicit none
 
 
-      end module other_after_solver_setmatrix
+contains
+   
+   subroutine default_other_after_solver_setmatrix(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine default_other_after_solver_setmatrix
+
+
+end module other_after_solver_setmatrix
       
       
       

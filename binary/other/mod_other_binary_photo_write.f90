@@ -23,23 +23,23 @@
 !
 ! ***********************************************************************
 
-      module mod_other_binary_photo_write
+module mod_other_binary_photo_write
+   
+   use binary_def
+   
+   implicit none
+   
+   ! note: there is no flag "use_other_binary_photo_write".
+   ! the other routine is always called when a photo is written.
+   ! see private/binary_photos.f90
 
-      use binary_def
-
-      implicit none
-
-      ! note: there is no flag "use_other_binary_photo_write".
-      ! the other routine is always called when a photo is written.
-      ! see private/binary_photos.f90
-
-      contains
+contains
+   
+   
+   subroutine default_other_binary_photo_write(binary_id, iounit)
+      integer, intent(in) :: binary_id, iounit
+      !write(iounit) stuff
+   end subroutine default_other_binary_photo_write
 
 
-      subroutine default_other_binary_photo_write(binary_id, iounit)
-         integer, intent(in) :: binary_id, iounit
-         !write(iounit) stuff
-      end subroutine default_other_binary_photo_write
-
-
-      end module mod_other_binary_photo_write
+end module mod_other_binary_photo_write

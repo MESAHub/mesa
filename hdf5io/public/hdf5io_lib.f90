@@ -24,11 +24,11 @@
 ! ***********************************************************************
 
 module hdf5io_lib
-
+   
    use hdf5io_m
-
+   
    private
-
+   
    public :: hdf5io_t
    public :: OPEN_FILE_RO
    public :: OPEN_FILE_RW

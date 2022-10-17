@@ -1,29 +1,28 @@
 ! inlist_to_he_core
- 
+
 &star_job
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      
-      show_log_description_at_start = .false. 
+show_log_description_at_start = .false.
 
-      create_pre_main_sequence_model = .true.
+create_pre_main_sequence_model = .true.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'has_he_core.mod'
-      required_termination_code_string = 'he_core_mass_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'has_he_core.mod'
+required_termination_code_string = 'he_core_mass_limit'
 
-      set_uniform_initial_composition = .true.
-      initial_h1 = 0.72
-      initial_h2 = 0
-      initial_he3 = 0
-      initial_he4 = 0.27
-      initial_zfracs = 3 ! GS98_zfracs = 3
+set_uniform_initial_composition = .true.
+initial_h1 = 0.72
+initial_h2 = 0
+initial_he3 = 0
+initial_he4 = 0.27
+initial_zfracs = 3 ! GS98_zfracs = 3
 
-      change_initial_net = .true.      
-      new_net_name = 'o18_and_ne22.net'
+change_initial_net = .true.
+new_net_name = 'o18_and_ne22.net'
 
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -34,54 +33,53 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.01d0
+Zbase = 0.01d0
 
-      kap_file_prefix = 'gs98'
+kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
 
 &controls
 
-      he_core_mass_limit = 0.15
+he_core_mass_limit = 0.15
 
-      energy_eqn_option = 'eps_grav'
-      use_time_centered_eps_grav = .true.
-      include_composition_in_eps_grav = .true.
+energy_eqn_option = 'eps_grav'
+use_time_centered_eps_grav = .true.
+include_composition_in_eps_grav = .true.
 
-      warn_when_large_rel_run_E_err = 1d99
-      max_abs_rel_run_E_err = 1d99
-      limit_for_rel_error_in_energy_conservation = 1d-5
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+warn_when_large_rel_run_E_err = 1d99
+max_abs_rel_run_E_err = 1d99
+limit_for_rel_error_in_energy_conservation = 1d-5
+hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1400
+! limit max_model_number as part of test_suite
+max_model_number = 1400
 
-      initial_mass = 1.5
-      initial_z = 0.01d0
+initial_mass = 1.5
+initial_z = 0.01d0
 
-      
-      mixing_length_alpha = 1.89
+mixing_length_alpha = 1.89
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
-      
-      max_age = 10d9
-      max_years_for_timestep = 1d9
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
+
+max_age = 10d9
+max_years_for_timestep = 1d9
 
 / ! end of controls namelist
 
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+! top level controls
+
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
+
 
 
 / ! end of pgstar namelist

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
+import glob
 import os
 import re
-import glob
 from collections.abc import MutableSet
 
 MESA_DIR = "../"
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
+
 
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
@@ -16,22 +17,22 @@ class CaseInsensitiveSet(MutableSet):
         self._fold = str.casefold
         for v in iterable:
             self.add(v)
-
+    
     def __repr__(self):
         return repr(self._values.values())
-
+    
     def __contains__(self, value):
         return self._fold(value) in self._values
-
+    
     def __iter__(self):
         return iter(self._values.values())
-
+    
     def __len__(self):
         return len(self._values)
-
+    
     def add(self, value):
         self._values[self._fold(value)] = value
-
+    
     def discard(self, value):
         v = self._fold(value)
         if v in self._values:
@@ -81,58 +82,60 @@ def delete_command(options, filename):
 
 def get_history_columns(filename="star/defaults/history_columns.list"):
     # extract column names from history_columns.list
-
+    
     # these lines look like:
     #  ! star_mass ! in Msun units
     #  ? ^^^^^^^^^ ???????????????
     # that is, they may or may not be commented out
     # and may or may not have a trailing comment
-
+    
     regexp = "^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
-
+    
     return get_columns(filename, regexp)
 
 
 def get_star_history_def(filename="star/private/star_history_def.f90"):
     # extract column names from star_history_def.f90
-
+    
     # these lines look like:
     #   history_column_name(h_star_mass) = 'star_mass'
     #                                       ^^^^^^^^^
     regexp = "history_column_name\\(h_\w+\\)[ ]*=[&\s]*'(\w+)'"
-
+    
     return get_options(filename, regexp)
 
 
 def get_star_history(filename="star/private/history.f90"):
     # extract column names from history.f90
-
+    
     # these lines look like:
     #   case(h_star_mass)
     #          ^^^^^^^^^
     regexp = "case[ ]*\\(h_(\w+)\\)"
-
+    
     return get_options(filename, regexp)
 
 
 def check_history():
     """Run checks on history columns"""
-
+    
     vals_history = get_star_history()
-
+    
     vals_star_history_def = get_star_history_def()
-
+    
     vals_history_list = get_history_columns()
-
+    
     # make reports
-
+    
     # Values that are in history.f90 but not in star_history_def.f90
-    print_section("Values that are in history.f90 but not in star_history_def.f90")
+    print_section(
+        "Values that are in history.f90 but not in star_history_def.f90")
     print_options(vals_history - vals_star_history_def)
-
+    
     # Values that are in star_history_def.f90 but not in history.f90
-    print_section("Values that are in star_history_def.f90 but not in history.f90")
-
+    print_section(
+        "Values that are in star_history_def.f90 but not in history.f90")
+    
     # define false positives
     known_false_positives = {
         "burn_relr_regions",
@@ -141,14 +144,14 @@ def check_history():
         "mixing_regions",
         "rti_regions",
     }
-
+    
     print_options(vals_star_history_def - vals_history - known_false_positives)
-
+    
     # Values that are in are in history.f90 but not in history_columns.list
     print_section(
         "Values that are in are in history.f90 but not in history_columns.list"
     )
-
+    
     known_false_positives = {
         "C_cntr",
         "Fe_core",
@@ -175,14 +178,14 @@ def check_history():
         "v_div_cs",
         "zones",
     }
-
+    
     print_options(vals_history - vals_history_list - known_false_positives)
-
+    
     # Values that are in are in history_columns.list but not in history.f90
     print_section(
         "Values that are in are in history_columns.list but not in history.f90"
     )
-
+    
     known_false_positives = {
         "add_abs_mag",
         "add_average_abundances",
@@ -247,13 +250,15 @@ def check_history():
         "timescales",
         "asteroseismology",
     }
-
+    
     print_options(vals_history_list - vals_history - known_false_positives)
-
+    
     if ENABLE_TEST_SUITE_HIST_CHECKS:
-        # Value in each test case's history_columns.list but not in star/default/history_columns.list
+        # Value in each test case's history_columns.list but not in
+        # star/default/history_columns.list
         for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "history_columns.list")
+                os.path.join(MESA_DIR, "star", "test_suite", "*",
+                             "history_columns.list")
         ):
             test_case = get_history_columns(i.removeprefix(MESA_DIR))
             result = test_case - vals_history_list - known_false_positives
@@ -269,48 +274,47 @@ def check_history():
 
 def get_profile_getval(filename="star/private/profile_getval.f90"):
     # extract column names from profile_getval.f90
-
+    
     # these lines look like:
     #   case(p_zone)
     #          ^^^^
     regexp = "case[ ]*\\(p_(\w+)\\)"
-
+    
     return get_options(filename, regexp)
 
 
 def get_profile_def(filename="star/private/star_profile_def.f90"):
-
     # extract column names from star_profile_def.f90
-
+    
     # these lines look like:
     #   profile_column_name(p_zone) = 'zone'
     #                                  ^^^^^
     regexp = "profile_column_name\\(p_\w+\\)[ ]*=[&\s]*'(\w+)'"
-
+    
     return get_options(filename, regexp)
 
 
 def get_profile_columns(filename="star/defaults/profile_columns.list"):
     # extract column names from profile_columns.list
-
+    
     # these lines look like:
     #  ! star_mass ! in Msun units
     #  ? ^^^^^^^^^ ???????????????
     # that is, they may or may not be commented out
     # and may or may not have a trailing comment
-
+    
     regexp = "^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
-
+    
     return get_columns(filename, regexp)
 
 
 def check_profile():
     """Run checks on profile columns"""
-
+    
     vals_profile = get_profile_getval()
-
+    
     vals_star_profile_def = get_profile_def()
-
+    
     # the following general info is included in a profile file
     # it looks like profile columns, but isn't, so exclude it
     general_info = {
@@ -391,28 +395,30 @@ def check_profile():
         "add_eps_nuc_rates",
         "add_screened_rates",
     }
-
+    
     vals_profile_list = get_profile_columns() - general_info
-
+    
     # make reports
-
+    
     # Values that are in star_profile_def.f90 but not in profile_getval.f90
     print_section(
         "Values that are in star_profile_def.f90 but not in profile_getval.f90"
     )
     print_options(vals_star_profile_def - vals_profile)
-
+    
     # Values that are in profile_getval.f90 but not in star_profile_def.f90
     print_section(
         "Values that are in profile_getval.f90 but not in star_profile_def.f90"
     )
     print_options(vals_profile - vals_star_profile_def)
-
-    # Values that are in are in profile_columns.list but not in profile_getval.f90
+    
+    # Values that are in are in profile_columns.list but not in
+    # profile_getval.f90
     print_section(
-        "Values that are in are in profile_columns.list but not in profile_getval.f90"
+        "Values that are in are in profile_columns.list but not in "
+        "profile_getval.f90"
     )
-
+    
     known_false_positives = {
         "add_abundances",
         "add_log_abundances",
@@ -428,23 +434,28 @@ def check_profile():
         "cno",
         "tri_alfa",
     }
-
+    
     print_options(vals_profile_list - vals_profile - known_false_positives)
-
-    # Values that are in are in profile_getval.f90 but not in profile_columns.list
+    
+    # Values that are in are in profile_getval.f90 but not in
+    # profile_columns.list
     print_section(
-        "Values that are in are in profile_getval.f90 but not in profile_columns.list"
+        "Values that are in are in profile_getval.f90 but not in "
+        "profile_columns.list"
     )
     print_options(vals_profile - vals_profile_list)
-
+    
     if ENABLE_TEST_SUITE_PROF_CHECKS:
-        # Value in each test case's profile_columns.list but not in star/default/profile_columns.list
+        # Value in each test case's profile_columns.list but not in
+        # star/default/profile_columns.list
         for i in glob.glob(
-            os.path.join(MESA_DIR, "star", "test_suite", "*", "profile_columns.list")
+                os.path.join(MESA_DIR, "star", "test_suite", "*",
+                             "profile_columns.list")
         ):
             test_case = get_profile_columns(i.removeprefix(MESA_DIR))
             result = (
-                test_case - vals_profile_list - known_false_positives - general_info
+                    test_case - vals_profile_list - known_false_positives -
+                    general_info
             )
             if len(result):
                 print_section(

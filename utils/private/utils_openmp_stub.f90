@@ -23,27 +23,26 @@
 !
 ! ***********************************************************************
 
-      module utils_openmp
-      
-      implicit none
-      
+module utils_openmp
+   
+   implicit none
 
 
-      contains
-      
-      
-      integer function eval_OMP_GET_THREAD_NUM()
-         eval_OMP_GET_THREAD_NUM = 0
-      end function eval_OMP_GET_THREAD_NUM
-      
-      
-      integer function eval_OMP_GET_MAX_THREADS()
-         eval_OMP_GET_MAX_THREADS = 1
-      end function eval_OMP_GET_MAX_THREADS
-      
-      subroutine eval_OMP_SET_NUM_THREADS(threads)
-         integer, intent(in) :: threads
-      end subroutine eval_OMP_SET_NUM_THREADS  
-      
-      end module utils_openmp
+contains
+   
+   
+   integer function eval_OMP_GET_THREAD_NUM()
+      eval_OMP_GET_THREAD_NUM = 0
+   end function eval_OMP_GET_THREAD_NUM
+   
+   
+   integer function eval_OMP_GET_MAX_THREADS()
+      eval_OMP_GET_MAX_THREADS = 1
+   end function eval_OMP_GET_MAX_THREADS
+   
+   subroutine eval_OMP_SET_NUM_THREADS(threads)
+      integer, intent(in) :: threads
+   end subroutine eval_OMP_SET_NUM_THREADS
+
+end module utils_openmp
 

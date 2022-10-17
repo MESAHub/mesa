@@ -1,15 +1,15 @@
 &kappa
 
-         data_dir = 'kap_input_data/wichita/ags04'		
-         lowT_flag = .true.
-         logT_file = 'logT_points_lowT_2.7'
-         logR_min = -8.00d0
-         logR_max = 1.00d0
-         logR_points = 46
-         type1_table = 'ags04'
-         output_dir = 'data/kap_data'
-         table_prefix = 'lowT_fa05_ags04'
-         header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with Asplund, Grevesse and Sauval 2004 metals'
-         table_version= 38
+data_dir = 'kap_input_data/wichita/ags04'
+lowT_flag = .true.
+logT_file = 'logT_points_lowT_2.7'
+logR_min = -8.00d0
+logR_max = 1.00d0
+logR_points = 46
+type1_table = 'ags04'
+output_dir = 'data/kap_data'
+table_prefix = 'lowT_fa05_ags04'
+header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with Asplund, Grevesse and Sauval 2004 metals'
+table_version = 38
 
 /

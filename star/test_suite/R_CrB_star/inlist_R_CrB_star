@@ -1,38 +1,38 @@
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'R_CrB_from_He_star.mod'
+load_saved_model = .true.
+load_model_filename = 'R_CrB_from_He_star.mod'
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'Teff_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'Teff_lower_limit'
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / !end of star_job namelist
 
 
 &controls
-      
-      ! limit max_model_number as part of test_suite
-      max_model_number = 400
 
-      ! stop at 6000 K
-      Teff_lower_limit = 6000
-      delta_lgTeff_limit = 0.003d0
+! limit max_model_number as part of test_suite
+max_model_number = 400
 
-      energy_eqn_option = 'dedt'
+! stop at 6000 K
+Teff_lower_limit = 6000
+delta_lgTeff_limit = 0.003d0
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 5
-      terminal_interval = 10 
-      write_header_frequency = 50
+energy_eqn_option = 'dedt'
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 5
+terminal_interval = 10
+write_header_frequency = 50
 
 / ! end of controls namelist

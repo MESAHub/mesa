@@ -1,29 +1,27 @@
-
-
 &star_job
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'late_pre_zams.mod'
-      
-      save_model_when_terminate = .true.
-      save_model_filename = 'zams.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+load_saved_model = .true.
+load_model_filename = 'late_pre_zams.mod'
 
-      set_initial_age = .true.
-      initial_age = 0
+save_model_when_terminate = .true.
+save_model_filename = 'zams.mod'
+required_termination_code_string = 'xa_central_lower_limit'
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_age = .true.
+initial_age = 0
 
-      change_initial_Z = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-      new_rotation_flag = .true.
-      near_zams_relax_omega_div_omega_crit = .true.
-      change_rotation_flag = .false.  ! rotation off until near zams
-      num_steps_to_relax_rotation = 50
+change_initial_Z = .true.
 
-      pgstar_flag = .false.
+new_rotation_flag = .true.
+near_zams_relax_omega_div_omega_crit = .true.
+change_rotation_flag = .false.  ! rotation off until near zams
+num_steps_to_relax_rotation = 50
+
+pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -36,55 +34,55 @@
 
 &controls
 
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.68d0
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 0.68d0
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 6000
-      !max_number_retries = 58
-      
-      Lnuc_div_L_zams_limit = 0.4 ! for very high mass
-      
+! limit max_model_number as part of test_suite
+max_model_number = 6000
+!max_number_retries = 58
+
+Lnuc_div_L_zams_limit = 0.4 ! for very high mass
+
 ! wind
-      ! delay wind until reach zams
-      Dutch_scaling_factor = 0
+! delay wind until reach zams
+Dutch_scaling_factor = 0
 
 ! atmosphere
 
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
+alpha_semiconvection = 0.01
+thermohaline_coeff = 2
 
 ! mixing
 
 ! timesteps
-      delta_XHe_cntr_hard_limit = 0.02d0
-      delta_XC_cntr_hard_limit = 0.02d0
-      delta_XNe_cntr_hard_limit = 0.02d0
-      delta_XO_cntr_hard_limit = 0.02d0
-      delta_XSi_cntr_hard_limit = 0.02d0
+delta_XHe_cntr_hard_limit = 0.02d0
+delta_XC_cntr_hard_limit = 0.02d0
+delta_XNe_cntr_hard_limit = 0.02d0
+delta_XO_cntr_hard_limit = 0.02d0
+delta_XSi_cntr_hard_limit = 0.02d0
 
 ! mesh
 
 ! solver
-      solver_iters_timestep_limit = 20
-      
+solver_iters_timestep_limit = 20
+
 ! GYRE output controls
-      !write_pulse_data_with_profile = .true.
+!write_pulse_data_with_profile = .true.
 
 ! output
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      
-      !photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      x_integer_ctrl(1) = 2 ! Inlist part
+!photo_interval = 10
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
+
+x_integer_ctrl(1) = 2 ! Inlist part
 
 / ! end of controls namelist
 

@@ -47,122 +47,122 @@
 !   extra 18
 !   extra 19
 !   extra 20
-   
-   zone ! numbers start with 1 at the surface
-   
-   logT ! log10(temperature) at center of zone
-   temperature
-   logRho ! log10(rho) at center of zone
-   rho
-   logP ! log10(pressure) at center of zone
-   pressure
-   logE ! log10(specific internal energy) at center of zone
-   logR_cm
-   entropy ! specific entropy divided by (avo*kerg)
-   !ye
-   !abar ! average atomic weight (g/mole)
+
+zone ! numbers start with 1 at the surface
+
+logT ! log10(temperature) at center of zone
+temperature
+logRho ! log10(rho) at center of zone
+rho
+logP ! log10(pressure) at center of zone
+pressure
+logE ! log10(specific internal energy) at center of zone
+logR_cm
+entropy ! specific entropy divided by (avo*kerg)
+!ye
+!abar ! average atomic weight (g/mole)
 
 
 
 
 
-   
-   logR ! log10(radius/Rsun) at outer boundary of zone
-   
-   
-   !conv_vel
-   !conv_L_div_L
-   !log_conv_L_div_L
-   !lum_rad
-   !lum_conv
-   luminosity ! luminosity at outer boundary of zone (in Lsun units)
-   
-   logL ! log(max(1d-6,L/Lsun))
-   log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
-   gamma1
-   !mix_type ! mixing types are defined in mesa/const
-   csound ! sound speed
-   !log_csound
-   !acoustic_depth
-   !dr_div_cs
-   log_dr_div_cs
-   !log_cell_collapse_time
-   !total_energy
-   
-   !velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
-   vel_km_per_s
 
-   v_div_csound ! velocity divided by sound speed
-   
-   !scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
-   !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
-   !mu ! mean molecular weight per gas particle (ions + free electrons)
-   logdq ! log10(dq)
-   dq_ratio ! dq(k-1)/dq(k)
-   q ! fraction of star mass interior to outer boundary of this zone
-   radius ! radius at outer boundary of zone (in Rsun units)
-   !radius_cm
-   temperature ! temperature at center of zone
-      
-   Hp_face
-   Y_face
-   PII_face
-   Chi
-   COUPL
-   SOURCE
-   DAMP
-   DAMPR
-   Eq
-   Uq
-   Lr_div_L
-   Lc_div_L
-   Lr
-   Lc
-   log_w
-   w
-   v
-   etrb
-   log_etrb
-   
-   
-
-   tau ! optical depth
-   logtau ! log10(optical depth) at center of zone
-   pressure ! total pressure at center of zone (pgas + prad)
-   !xtau
-   !xlogtau
-   !logtau_sub_xlogtau
-   !pgas ! gas pressure at center of zone (electrons and ions)
-   pgas_div_ptotal ! pgas/pressure
-   logPgas ! log10(pgas)
-   !logPrad
-   !log_erad
-   !log_egas
-   energy ! internal energy (ergs/g)
-
-   opacity ! opacity measured at center of zone
-   log_opacity ! log10(opacity)
-
-   mass ! m/Msun. mass coordinate of outer boundary of cell.
-   log_mass
-   !mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
-   !logM ! log10(m/Msun)
-   !xm ! mass exterior to point (Msun units)
-   !dq ! mass of zone as a fraction of total star mass
-   logxq ! log10(1-q)
-   dq
-   log_dq
-
-      ergs_error
-      ergs_error_integral
-      ergs_rel_error_integral
+logR ! log10(radius/Rsun) at outer boundary of zone
 
 
-      dt_cs_div_dr
-      log_dt_cs_div_dr
+!conv_vel
+!conv_L_div_L
+!log_conv_L_div_L
+!lum_rad
+!lum_conv
+luminosity ! luminosity at outer boundary of zone (in Lsun units)
 
-   pressure
-   temperature
-   
-   xq
-   xm
+logL ! log(max(1d-6,L/Lsun))
+log_L_div_Ledd ! log10(max(1d-12,L/Leddington))
+gamma1
+!mix_type ! mixing types are defined in mesa/const
+csound ! sound speed
+!log_csound
+!acoustic_depth
+!dr_div_cs
+log_dr_div_cs
+!log_cell_collapse_time
+!total_energy
+
+!velocity ! velocity at outer boundary of zone -- 0 if no velocity variable
+vel_km_per_s
+
+v_div_csound ! velocity divided by sound speed
+
+!scale_height ! pressure scale height; P / (g rho)   (in Rsun units)
+!eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
+!mu ! mean molecular weight per gas particle (ions + free electrons)
+logdq ! log10(dq)
+dq_ratio ! dq(k-1)/dq(k)
+q ! fraction of star mass interior to outer boundary of this zone
+radius ! radius at outer boundary of zone (in Rsun units)
+!radius_cm
+temperature ! temperature at center of zone
+
+Hp_face
+Y_face
+PII_face
+Chi
+COUPL
+SOURCE
+DAMP
+DAMPR
+Eq
+Uq
+Lr_div_L
+Lc_div_L
+Lr
+Lc
+log_w
+w
+v
+etrb
+log_etrb
+
+
+
+tau ! optical depth
+logtau ! log10(optical depth) at center of zone
+pressure ! total pressure at center of zone (pgas + prad)
+!xtau
+!xlogtau
+!logtau_sub_xlogtau
+!pgas ! gas pressure at center of zone (electrons and ions)
+pgas_div_ptotal ! pgas/pressure
+logPgas ! log10(pgas)
+!logPrad
+!log_erad
+!log_egas
+energy ! internal energy (ergs/g)
+
+opacity ! opacity measured at center of zone
+log_opacity ! log10(opacity)
+
+mass ! m/Msun. mass coordinate of outer boundary of cell.
+log_mass
+!mmid ! mass at midpoint of cell (average of mass coords of the cell boundaries)  Msun units.
+!logM ! log10(m/Msun)
+!xm ! mass exterior to point (Msun units)
+!dq ! mass of zone as a fraction of total star mass
+logxq ! log10(1-q)
+dq
+log_dq
+
+ergs_error
+ergs_error_integral
+ergs_rel_error_integral
+
+
+dt_cs_div_dr
+log_dt_cs_div_dr
+
+pressure
+temperature
+
+xq
+xm

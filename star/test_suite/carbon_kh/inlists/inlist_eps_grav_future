@@ -1,12 +1,12 @@
 &controls
 
-      energy_eqn_option = 'eps_grav'
-      use_time_centered_eps_grav = .true.
+energy_eqn_option = 'eps_grav'
+use_time_centered_eps_grav = .true.
 
 ! turn off energy error related things
-      limit_for_rel_error_in_energy_conservation = 1d99
-      hard_limit_for_rel_error_in_energy_conservation = 1d99
-      max_abs_rel_run_E_err = 1d99
-      warn_when_large_rel_run_E_err = 1d99
+limit_for_rel_error_in_energy_conservation = 1d99
+hard_limit_for_rel_error_in_energy_conservation = 1d99
+max_abs_rel_run_E_err = 1d99
+warn_when_large_rel_run_E_err = 1d99
 
 /

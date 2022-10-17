@@ -1,17 +1,15 @@
-
-
 &star_job
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'after_core_he_burn.mod'
+load_saved_model = .true.
+load_model_filename = 'after_core_he_burn.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'after_core_c_burn.mod'
-      required_termination_code_string = 'star_species_mass_max_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'after_core_c_burn.mod'
+required_termination_code_string = 'star_species_mass_max_limit'
 
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
+set_initial_model_number = .false.
+set_initial_number_retries = .false.
 
 / ! end of star_job namelist
 
@@ -23,12 +21,12 @@
 
 &controls
 
-      star_species_mass_max_limit = 0.55d0
-      star_species_mass_max_limit_iso = 'ne20'
+star_species_mass_max_limit = 0.55d0
+star_species_mass_max_limit_iso = 'ne20'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 10000
-      !max_number_retries = 37
+! limit max_model_number as part of test_suite
+max_model_number = 10000
+!max_number_retries = 37
 
 ! wind
 
@@ -37,8 +35,8 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
+alpha_semiconvection = 0
+thermohaline_coeff = 0
 
 ! mixing
 
@@ -47,26 +45,26 @@
 ! mesh
 
 ! solver
-      
+
 ! GYRE output controls
-      !write_pulse_data_with_profile = .true.
+!write_pulse_data_with_profile = .true.
 
 ! output
-      terminal_show_age_units = 'years'
-      terminal_show_timestep_units = 'days'
-      terminal_show_log_dt = .false.
-      terminal_show_log_age = .false.
+terminal_show_age_units = 'years'
+terminal_show_timestep_units = 'days'
+terminal_show_log_dt = .false.
+terminal_show_log_age = .false.
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
-      !profile_interval = 2
-      !history_interval = 1
-      !terminal_interval = 1
+!photo_interval = 10
+!profile_interval = 2
+!history_interval = 1
+!terminal_interval = 1
 
-       x_integer_ctrl(1) = 4 ! Inlist part
+x_integer_ctrl(1) = 4 ! Inlist part
 
 / ! end of controls namelist
 

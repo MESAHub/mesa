@@ -1,25 +1,25 @@
 &star_job
 
-      change_initial_RTI_flag = .true.
-      new_RTI_flag = .true.
+change_initial_RTI_flag = .true.
+new_RTI_flag = .true.
 
-      change_initial_u_flag = .true.
-      change_initial_v_flag = .true.
-      new_v_flag = .false.
-      new_u_flag = .true.
+change_initial_u_flag = .true.
+change_initial_v_flag = .true.
+new_v_flag = .false.
+new_u_flag = .true.
 
-      remove_fallback_at_each_step = .true.
-      fallback_check_total_energy = .true. ! .false.
+remove_fallback_at_each_step = .true.
+fallback_check_total_energy = .true. ! .false.
 
-      remove_fallback_speed_limit = 0.1d0
+remove_fallback_speed_limit = 0.1d0
 
-      remove_center_set_zero_v_center = .true. !False
+remove_center_set_zero_v_center = .true. !False
 
-      set_initial_age = .false.
-      set_initial_model_number = .false.
+set_initial_age = .false.
+set_initial_model_number = .false.
 
-      pgstar_flag = .false.
-      
+pgstar_flag = .false.
+
 / ! end of star_job namelist
 
 &eos
@@ -30,100 +30,100 @@
 
 &controls
 
-      fe_core_infall_limit = 1d99
+fe_core_infall_limit = 1d99
 
-      x_ctrl(1) = -1 ! expect shock location > this
-      x_ctrl(2) = -1 ! stop when shock reaches this location
+x_ctrl(1) = -1 ! expect shock location > this
+x_ctrl(2) = -1 ! stop when shock reaches this location
 
-      x_ctrl(16) = 0.11 ! stop_m <= star_mass minus this (Msun)
+x_ctrl(16) = 0.11 ! stop_m <= star_mass minus this (Msun)
 
-      ! inner_bc_v_max = 1d7 ! cm/s
+! inner_bc_v_max = 1d7 ! cm/s
 
 
 ! RTI
-      RTI_A = 1d-3
-      RTI_B = 2.5d0
-      RTI_C = 0.2d0
-      RTI_D = 3d0
+RTI_A = 1d-3
+RTI_B = 2.5d0
+RTI_C = 0.2d0
+RTI_D = 3d0
 
-      RTI_max_alpha = 10d0
-      RTI_dm_for_center_eta_nondecreasing = 0.01
-      RTI_min_dm_behind_shock_for_full_on = 0.01
-      RTI_D_mix_floor = 0d0
+RTI_max_alpha = 10d0
+RTI_dm_for_center_eta_nondecreasing = 0.01
+RTI_min_dm_behind_shock_for_full_on = 0.01
+RTI_D_mix_floor = 0d0
 
-      RTI_smooth_mass = 1d-2
-      RTI_smooth_iterations = 1
-      RTI_smooth_fraction = -1
+RTI_smooth_mass = 1d-2
+RTI_smooth_iterations = 1
+RTI_smooth_fraction = -1
 
-      RTI_C_X0_frac = 0.90d0
-      RTI_C_X_factor = 0
+RTI_C_X0_frac = 0.90d0
+RTI_C_X_factor = 0
 
-      RTI_log_max_boost = 0d0
-      RTI_m_full_boost = 1.65d0
-      RTI_m_no_boost = 3.5d0
+RTI_log_max_boost = 0d0
+RTI_m_full_boost = 1.65d0
+RTI_m_no_boost = 3.5d0
 
-      RTI_energy_floor = 1d13
+RTI_energy_floor = 1d13
 
 ! equation controls
-      energy_eqn_option = 'dedt'
-      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+energy_eqn_option = 'dedt'
+use_dPrad_dm_form_of_T_gradient_eqn = .true.
 
-      ! turn off energy from nuclear reactions and neutrinos
-      eps_nuc_factor = 0d0
-      non_nuc_neu_factor = 0d0
+! turn off energy from nuclear reactions and neutrinos
+eps_nuc_factor = 0d0
+non_nuc_neu_factor = 0d0
 
 ! mixing controls
-      mixing_length_alpha = 1.9
-      MLT_option = 'none'
-      thermohaline_coeff = 0
-      okay_to_reduce_gradT_excess = .false.
+mixing_length_alpha = 1.9
+MLT_option = 'none'
+thermohaline_coeff = 0
+okay_to_reduce_gradT_excess = .false.
 
 ! mesh controls
-      okay_to_remesh = .true.
-      use_split_merge_amr = .true.
-      split_merge_amr_log_zoning = .true.
-      split_merge_amr_nz_baseline = 1200
-      split_merge_amr_MaxLong = 1.5d0
-      split_merge_amr_MaxShort = 1.5d0
-      split_merge_amr_max_iters = 1000
-      !trace_split_merge_amr = .true.
+okay_to_remesh = .true.
+use_split_merge_amr = .true.
+split_merge_amr_log_zoning = .true.
+split_merge_amr_nz_baseline = 1200
+split_merge_amr_MaxLong = 1.5d0
+split_merge_amr_MaxShort = 1.5d0
+split_merge_amr_max_iters = 1000
+!trace_split_merge_amr = .true.
 
 ! timestep controls
-      delta_lgL_He_limit = 0.5
-      delta_lgT_cntr_limit = -1
-      delta_lgP_cntr_limit = -1
-      delta_lgRho_cntr_limit = -1
-      dX_nuc_drop_limit_at_high_T = 1d-2
-      varcontrol_target = 1d-2
-      dt_div_min_dr_div_cs_limit = 0.7d0
+delta_lgL_He_limit = 0.5
+delta_lgT_cntr_limit = -1
+delta_lgP_cntr_limit = -1
+delta_lgRho_cntr_limit = -1
+dX_nuc_drop_limit_at_high_T = 1d-2
+varcontrol_target = 1d-2
+dt_div_min_dr_div_cs_limit = 0.7d0
 
 ! solver controls
 
-      xa_scale = 1d0
-      tiny_corr_coeff_limit = 999999
-      solver_itermin_until_reduce_min_corr_coeff = 999999
-      max_resid_jump_limit = 1d99 ! turn this off until fix residuals
-      convergence_ignore_equL_residuals = .true.   
+xa_scale = 1d0
+tiny_corr_coeff_limit = 999999
+solver_itermin_until_reduce_min_corr_coeff = 999999
+max_resid_jump_limit = 1d99 ! turn this off until fix residuals
+convergence_ignore_equL_residuals = .true.
 
 ! output controls
 
-      warn_rates_for_high_temp = .false.
+warn_rates_for_high_temp = .false.
 
-      max_num_profile_models = 1000
-      terminal_show_age_units = 'days'
+max_num_profile_models = 1000
+terminal_show_age_units = 'days'
 
-      num_trace_history_values = 6
-      trace_history_value_name(1) = 'm_center'
-      trace_history_value_name(2) = 'r_center_km'
-      trace_history_value_name(3) = 'shock_mass'
-      trace_history_value_name(4) = 'total_energy'
-      trace_history_value_name(5) = 'rel_E_err'
-      trace_history_value_name(6) = 'log_rel_run_E_err'
+num_trace_history_values = 6
+trace_history_value_name(1) = 'm_center'
+trace_history_value_name(2) = 'r_center_km'
+trace_history_value_name(3) = 'shock_mass'
+trace_history_value_name(4) = 'total_energy'
+trace_history_value_name(5) = 'rel_E_err'
+trace_history_value_name(6) = 'log_rel_run_E_err'
 
-      photo_interval = 50
-      profile_interval = 300
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 300
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist

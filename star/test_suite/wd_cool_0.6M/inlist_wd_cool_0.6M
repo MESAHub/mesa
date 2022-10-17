@@ -1,41 +1,40 @@
-
 ! inlist_wd_cool_0.6M
 
 
 
 &star_job
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'co_wd_settled.mod'
-      ! comes from final.mod produced by make_co_wd as of version 14731
+load_saved_model = .true.
+load_model_filename = 'co_wd_settled.mod'
+! comes from final.mod produced by make_co_wd as of version 14731
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'log_center_temp_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'log_center_temp_lower_limit'
 
-         ! modify this to select a different set of preprocessed opacity tables
+! modify this to select a different set of preprocessed opacity tables
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d2 ! in years
+set_initial_dt = .true.
+years_for_initial_dt = 1d2 ! in years
 
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
+pgstar_flag = .true.
+save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
 
 
 &eos
-	  use_Skye = .true.
-          use_PC = .false.
-          
-          ! For more accurate C/O phase diagram
-          Skye_solid_mixing_rule = "Ogata"
+use_Skye = .true.
+use_PC = .false.
 
-   !dbg = .true.
+! For more accurate C/O phase diagram
+Skye_solid_mixing_rule = "Ogata"
+
+!dbg = .true.
 !   logT_lo = 6.59473
 !   logT_hi = 6.59473
 / ! end of eos namelist
@@ -43,114 +42,113 @@
 
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 &controls
-      log_center_temp_lower_limit = 6d0
+log_center_temp_lower_limit = 6d0
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1500
+! limit max_model_number as part of test_suite
+max_model_number = 1500
 
-      energy_eqn_option = 'eps_grav'
-      use_time_centered_eps_grav = .true.
-         ! since have energy_eqn_option = 'eps_grav'
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+energy_eqn_option = 'eps_grav'
+use_time_centered_eps_grav = .true.
+! since have energy_eqn_option = 'eps_grav'
+limit_for_rel_error_in_energy_conservation = 1d-4
+hard_limit_for_rel_error_in_energy_conservation = 1d-3
 
-      atm_option = 'table'
-      atm_table = 'WD_tau_25'
+atm_option = 'table'
+atm_table = 'WD_tau_25'
 
-      ! Diffusion controls
-      do_element_diffusion = .true.
-      diffusion_use_full_net = .true.
-      do_WD_sedimentation_heating = .true.
-      do_diffusion_heating = .false.
+! Diffusion controls
+do_element_diffusion = .true.
+diffusion_use_full_net = .true.
+do_WD_sedimentation_heating = .true.
+do_diffusion_heating = .false.
 
-      mesh_delta_coeff = 0.75
-      
-      when_to_stop_rtol = 1d-3
-      when_to_stop_atol = 1d-3
-      
-      thermohaline_coeff = 1000  
+mesh_delta_coeff = 0.75
 
-      MLT_option = 'ML2'
+when_to_stop_rtol = 1d-3
+when_to_stop_atol = 1d-3
 
-      mixing_length_alpha = 1.8
+thermohaline_coeff = 1000
 
-      clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this 
-              
-      prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
-      remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
-      
-               ! the following controls are for different kinds of "glitches" that can be removed
-            
+MLT_option = 'ML2'
 
-               okay_to_remove_mixing_singleton = .true.
-         
-               min_convective_gap = -1 ! 0.1 
-                  ! close gap between convective regions if smaller than this (< 0 means skip this)
-                  ! gap measured radially in units of pressure scale height
-         
-               min_thermohaline_gap = 0
-                  ! close gap between thermohaline mixing regions if smaller than this (< 0 means skip this)
-                  ! gap measured radially in units of pressure scale height
-               
-               min_thermohaline_dropout = 0
-               max_dropout_gradL_sub_grada = 1d-3
-                  ! if find radiative region embedded in thermohaline,
-                  ! and max(gradL - grada) in region is everywhere < max_dropout_gradL_sub_grada
-                  ! and region height is < min_thermohaline_dropout
-                  ! then convert the region to thermohaline
-         
-               min_semiconvection_gap = 0 
-                  ! close gap between semiconvective mixing regions if smaller than this (< 0 means skip this)
-                  ! gap measured radially in units of pressure scale height
-         
-               remove_embedded_semiconvection = .false.
-                  ! if have a semiconvection region bounded on each side by convection,
-                  ! convert it to be convective too.
-         
-      photo_interval = 50 
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+mixing_length_alpha = 1.8
+
+clip_D_limit = 0 ! zero mixing diffusion coeffs that are smaller than this
+
+prune_bad_cz_min_Hp_height = 0 ! lower limit on radial extent of cz
+remove_mixing_glitches = .true. ! if true, then okay to remove gaps and singletons
+
+! the following controls are for different kinds of "glitches" that can be removed
+
+okay_to_remove_mixing_singleton = .true.
+
+min_convective_gap = -1 ! 0.1
+! close gap between convective regions if smaller than this (< 0 means skip this)
+! gap measured radially in units of pressure scale height
+
+min_thermohaline_gap = 0
+! close gap between thermohaline mixing regions if smaller than this (< 0 means skip this)
+! gap measured radially in units of pressure scale height
+
+min_thermohaline_dropout = 0
+max_dropout_gradL_sub_grada = 1d-3
+! if find radiative region embedded in thermohaline,
+! and max(gradL - grada) in region is everywhere < max_dropout_gradL_sub_grada
+! and region height is < min_thermohaline_dropout
+! then convert the region to thermohaline
+
+min_semiconvection_gap = 0
+! close gap between semiconvective mixing regions if smaller than this (< 0 means skip this)
+! gap measured radially in units of pressure scale height
+
+remove_embedded_semiconvection = .false.
+! if have a semiconvection region bounded on each side by convection,
+! convert it to be convective too.
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 &pgstar
-         
-         ! Grid2_win_flag = .true.
-         Grid2_win_width = 10
 
-         Grid2_file_flag = .true.
-         Grid2_file_width = 12
-         Grid2_file_interval = 100000
+! Grid2_win_flag = .true.
+Grid2_win_width = 10
 
-         ! TRho_Profile_win_flag = .true.
-         show_TRho_Profile_kap_regions = .false.
-         show_TRho_Profile_eos_regions = .true.
-         show_TRho_Profile_degeneracy_line = .true.
-         show_TRho_Profile_Pgas_Prad_line = .true.
-         show_TRho_Profile_burn_lines = .true.
-         show_TRho_Profile_burn_labels = .true.
-         show_TRho_Profile_text_info = .false.
+Grid2_file_flag = .true.
+Grid2_file_width = 12
+Grid2_file_interval = 100000
 
-         ! Abundance_win_flag = .true.
-         Abundance_xaxis_name = 'logxm'
-         Abundance_xaxis_reversed = .true.
-         Abundance_xmin = -8
-         Abundance_xmax = 0
+! TRho_Profile_win_flag = .true.
+show_TRho_Profile_kap_regions = .false.
+show_TRho_Profile_eos_regions = .true.
+show_TRho_Profile_degeneracy_line = .true.
+show_TRho_Profile_Pgas_Prad_line = .true.
+show_TRho_Profile_burn_lines = .true.
+show_TRho_Profile_burn_labels = .true.
+show_TRho_Profile_text_info = .false.
+
+! Abundance_win_flag = .true.
+Abundance_xaxis_name = 'logxm'
+Abundance_xaxis_reversed = .true.
+Abundance_xmin = -8
+Abundance_xmax = 0
 
 
 / ! end of pgstar namelist

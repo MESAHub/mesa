@@ -1,31 +1,30 @@
-
 &star_job
-      
-      show_log_description_at_start = .false. 
 
-      load_saved_model = .true.
-      load_model_filename = 'planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod' ! from make_planets, 14631
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'start.mod'
-      required_termination_code_string = 'log_Psurf_upper_limit'
+load_saved_model = .true.
+load_model_filename = 'planet_core_1.0_MJ_10.0_ME_2.0_RJ.mod' ! from make_planets, 14631
 
-      change_initial_net = .true.      
-      new_net_name = 'basic.net'
+save_model_when_terminate = .true.
+save_model_filename = 'start.mod'
+required_termination_code_string = 'log_Psurf_upper_limit'
 
-      relax_initial_irradiation = .true.
-      relax_irradiation_min_steps = 200
-      relax_irradiation_max_yrs_dt = 1d-1
+change_initial_net = .true.
+new_net_name = 'basic.net'
 
-      relax_to_this_irrad_flux = 1d7 ! erg s^-1 cm^-2
-      irrad_col_depth = 1 ! g cm^-2
+relax_initial_irradiation = .true.
+relax_irradiation_min_steps = 200
+relax_irradiation_max_yrs_dt = 1d-1
 
-      relax_to_this_tau_factor = 10
-      dlogtau_factor = 0.01d0
-      relax_initial_tau_factor = .true.
+relax_to_this_irrad_flux = 1d7 ! erg s^-1 cm^-2
+irrad_col_depth = 1 ! g cm^-2
 
-      !pgstar_flag = .true.
-      
+relax_to_this_tau_factor = 10
+dlogtau_factor = 0.01d0
+relax_initial_tau_factor = .true.
+
+!pgstar_flag = .true.
+
 / ! end of star_job namelist
 
 
@@ -35,50 +34,50 @@
 
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
-      kap_lowT_prefix = 'lowT_Freedman11'
-      use_Type2_opacities = .false.
+kap_file_prefix = 'gs98'
+kap_lowT_prefix = 'lowT_Freedman11'
+use_Type2_opacities = .false.
 
 / ! end of kap namelist
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 400
+! limit max_model_number as part of test_suite
+max_model_number = 400
 
-      initial_mass = 0.001
-      initial_z = 0.02d0
-      
-      log_Psurf_upper_limit = 6
+initial_mass = 0.001
+initial_z = 0.02d0
 
-      mixing_length_alpha = 1.89d0
-      MLT_option = 'Henyey'
-      
-      max_age = 15d9
-      max_years_for_timestep = 1d9
-      
-      T_mix_limit = 0
-      
-      calculate_Brunt_N2 = .false.
-      
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 100
-      terminal_interval = 10
-      write_header_frequency = 10
+log_Psurf_upper_limit = 6
+
+mixing_length_alpha = 1.89d0
+MLT_option = 'Henyey'
+
+max_age = 15d9
+max_years_for_timestep = 1d9
+
+T_mix_limit = 0
+
+calculate_Brunt_N2 = .false.
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 100
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+! top level controls
+
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
+
 
 / ! end of pgstar namelist

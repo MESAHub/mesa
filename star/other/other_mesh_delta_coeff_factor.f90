@@ -22,35 +22,33 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_mesh_delta_coeff_factor
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_mesh_delta_coeff_factor = .true.
-      ! procedure pointer: s% other_mesh_delta_coeff_factor => my_routine
+module other_mesh_delta_coeff_factor
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_mesh_delta_coeff_factor = .true.
+   ! procedure pointer: s% other_mesh_delta_coeff_factor => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
+contains
+   
+   
+   subroutine default_other_mesh_delta_coeff_factor(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s% mesh_delta_coeff_factor(:) = 1d0
+   end subroutine default_other_mesh_delta_coeff_factor
 
-      use star_def
-
-      implicit none
-
-      
-      contains
-      
-      
-      subroutine default_other_mesh_delta_coeff_factor(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% mesh_delta_coeff_factor(:) = 1d0
-      end subroutine default_other_mesh_delta_coeff_factor
-
-      end module other_mesh_delta_coeff_factor
+end module other_mesh_delta_coeff_factor
       
       
       

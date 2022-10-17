@@ -22,36 +22,33 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_adjust_mlt_gradT_fraction
 
-      ! consult star/other/README for general usage instructions
-      ! Note: there is no flag use_other_mlt_gradT_fraction
-      ! procedure pointer: s% other_adjust_mlt_gradT_fraction => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-      
-      contains
-      
-      
-      
-      subroutine default_other_adjust_mlt_gradT_fraction(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-      end subroutine default_other_adjust_mlt_gradT_fraction
+module other_adjust_mlt_gradT_fraction
+   
+   ! consult star/other/README for general usage instructions
+   ! Note: there is no flag use_other_mlt_gradT_fraction
+   ! procedure pointer: s% other_adjust_mlt_gradT_fraction => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
+contains
+   
+   
+   subroutine default_other_adjust_mlt_gradT_fraction(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine default_other_adjust_mlt_gradT_fraction
 
-      end module other_adjust_mlt_gradT_fraction
+
+end module other_adjust_mlt_gradT_fraction
       
       
       

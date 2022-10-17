@@ -1,25 +1,25 @@
 &star_job
-  ! pgstar_flag = .true.
+! pgstar_flag = .true.
 
-  save_model_when_terminate = .true.
-  save_model_filename = 'he_core.mod'
-  required_termination_code_string = 'he_core_mass_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'he_core.mod'
+required_termination_code_string = 'he_core_mass_limit'
 
-  load_saved_model = .false.
+load_saved_model = .false.
 
-  create_pre_main_sequence_model = .true.
+create_pre_main_sequence_model = .true.
 
 / ! end of star_job namelist
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
-  initial_mass = 2
-  initial_z = 0.02
+initial_mass = 2
+initial_z = 0.02
 
-  he_core_mass_limit = 0.3
+he_core_mass_limit = 0.3
 
 / ! end of controls namelist
 

@@ -1,18 +1,17 @@
-
 &star_job
 
-   show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-   load_saved_model = .true.
-   load_model_filename = 'start.mod'
+load_saved_model = .true.
+load_model_filename = 'start.mod'
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'final.mod'
-   required_termination_code_string = 'star_species_mass_min_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'star_species_mass_min_limit'
 
-   initial_zfracs = 6
-   
-   !pgstar_flag = .true. 
+initial_zfracs = 6
+
+!pgstar_flag = .true.
 
 / !end of star_job namelist
 
@@ -21,211 +20,208 @@
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.008
+Zbase = 0.008
 
-   use_Type2_opacities = .true.
-   kap_file_prefix = 'a09'
-   kap_lowT_prefix = 'lowT_fa05_a09p'
-   kap_CO_prefix = 'a09_co'
+use_Type2_opacities = .true.
+kap_file_prefix = 'a09'
+kap_lowT_prefix = 'lowT_fa05_a09p'
+kap_CO_prefix = 'a09_co'
 
 / !end of kap namelist
 
 
 &controls
-   
-   ! limit max_model_number as part of test_suite
-   max_model_number = 6000
 
-   ! approximate Cepheid instability strip edges
-   
-   ! blue edge
-   x_ctrl(2) = 3.76 ! logT1
-   x_ctrl(3) = 4.5 ! logL1   
-   x_ctrl(4) = 3.83 ! logT2
-   x_ctrl(5) = 2.4 ! logL2
-   
-   ! red edge
-   x_ctrl(6) = 3.65 ! logT3
-   x_ctrl(7) = 4.5 ! logL3   
-   x_ctrl(8) = 3.77 ! logT4
-   x_ctrl(9) = 2.4 ! logL4            
+! limit max_model_number as part of test_suite
+max_model_number = 6000
 
+! approximate Cepheid instability strip edges
 
+! blue edge
+x_ctrl(2) = 3.76 ! logT1
+x_ctrl(3) = 4.5 ! logL1
+x_ctrl(4) = 3.83 ! logT2
+x_ctrl(5) = 2.4 ! logL2
 
-   initial_mass = 5 ! in Msun units
-   initial_Y = 0.256d0
-   initial_Z = 0.008d0
-   
-   energy_eqn_option = 'dedt'
+! red edge
+x_ctrl(6) = 3.65 ! logT3
+x_ctrl(7) = 4.5 ! logL3
+x_ctrl(8) = 3.77 ! logT4
+x_ctrl(9) = 2.4 ! logL4
 
-   mixing_length_alpha = 1.8d0
-   MLT_option = 'TDC'
+initial_mass = 5 ! in Msun units
+initial_Y = 0.256d0
+initial_Z = 0.008d0
 
-   use_Ledoux_criterion = .true.
-   alpha_semiconvection = 0.1
+energy_eqn_option = 'dedt'
 
-    overshoot_scheme(1) = 'exponential'
-    overshoot_zone_type(1) = 'burn_H'
-    overshoot_zone_loc(1) = 'core'
-    overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.012
-    overshoot_f0(1) = 0.002
+mixing_length_alpha = 1.8d0
+MLT_option = 'TDC'
 
-    overshoot_scheme(2) = 'exponential'
-    overshoot_zone_type(2) = 'nonburn'
-    overshoot_zone_loc(2) = 'shell'
-    overshoot_bdy_loc(2) = 'bottom'
-    overshoot_f(2) = 0.022
-    overshoot_f0(2) = 0.002
+use_Ledoux_criterion = .true.
+alpha_semiconvection = 0.1
 
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'burn_H'
+overshoot_zone_loc(1) = 'core'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.012
+overshoot_f0(1) = 0.002
 
-   predictive_mix(1) = .true.
-   predictive_zone_type(1) = 'any'
-   predictive_zone_loc(1) = 'core' 
-   predictive_bdy_loc(1) = 'any'
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'nonburn'
+overshoot_zone_loc(2) = 'shell'
+overshoot_bdy_loc(2) = 'bottom'
+overshoot_f(2) = 0.022
+overshoot_f0(2) = 0.002
 
-   predictive_mix(2) = .true.
-   predictive_zone_type(2) = 'any'
-   predictive_zone_loc(2) = 'surf' 
-   predictive_bdy_loc(2) = 'any'
+predictive_mix(1) = .true.
+predictive_zone_type(1) = 'any'
+predictive_zone_loc(1) = 'core'
+predictive_bdy_loc(1) = 'any'
+
+predictive_mix(2) = .true.
+predictive_zone_type(2) = 'any'
+predictive_zone_loc(2) = 'surf'
+predictive_bdy_loc(2) = 'any'
 make_gradr_sticky_in_solver_iters = .true.
 
-	 
+
 ! for core He-burning, to prevent splitting of the core convection zone and/or core breathing pulses
 
-   predictive_superad_thresh(1) = 0.01
-   predictive_avoid_reversal(1) = 'he4'
+predictive_superad_thresh(1) = 0.01
+predictive_avoid_reversal(1) = 'he4'
 
-   !varcontrol_target = 1d-4
+!varcontrol_target = 1d-4
 
-   delta_HR_limit = 0.002
+delta_HR_limit = 0.002
 
 ! stop when the center mass fraction of he4 drops below this limit
-    xa_central_lower_limit_species(1) = 'he4'
-    xa_central_lower_limit(1) = 1d-4
+xa_central_lower_limit_species(1) = 'he4'
+xa_central_lower_limit(1) = 1d-4
 
 
 ! output controls
 
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
 
-   !photo_interval = 1
-   !profile_interval = 1
-   !history_interval = 1
-   !terminal_interval = 1
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
-      
-      !photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
-      
-      !x_integer_ctrl(19) = -1
+
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
+
+!x_integer_ctrl(19) = -1
 
 ! FOR DEBUGGING
 
-      !report_solver_progress = .true. ! set true to see info about solver iterations
-      !report_ierr = .true. ! if true, produce terminal output when have some internal error
-      !stop_for_bad_nums = .true.
-      !trace_evolve = .true.
-      !fill_arrays_with_NaNs = .true.
+!report_solver_progress = .true. ! set true to see info about solver iterations
+!report_ierr = .true. ! if true, produce terminal output when have some internal error
+!stop_for_bad_nums = .true.
+!trace_evolve = .true.
+!fill_arrays_with_NaNs = .true.
 
-      !solver_save_photo_call_number = 0
-         ! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
-         ! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
+!solver_save_photo_call_number = 0
+! Saves a photo when solver_call_number = solver_save_photo_call_number - 1
+! e.g., useful for testing partials to set solver_call_number = solver_test_partials_call_number - 1
 
-      !solver_test_partials_call_number = 4142
-      !solver_test_partials_k = 2616
-      !solver_test_partials_iter_number = 4
-      !solver_test_partials_dx_0 = 1d-6
-      !solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets 
-      !solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets 
-      !solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
-      !solver_test_partials_show_dx_var_name = 'h1'
+!solver_test_partials_call_number = 4142
+!solver_test_partials_k = 2616
+!solver_test_partials_iter_number = 4
+!solver_test_partials_dx_0 = 1d-6
+!solver_test_partials_var_name = 'o16' ! 'all' or 'lnd', 'lnT', 'lnR', 'L', 'v', etc.    '' means code sets
+!solver_test_partials_equ_name = 'lnP' ! 'all' or 'dlnE_dt', 'dlnd_dt', 'dlnR_dt', 'equL', etc   '' means code sets
+!solver_test_partials_sink_name = 'si28' ! iso name to use for "sink" to keep sum = 1
+!solver_test_partials_show_dx_var_name = 'h1'
 
-         ! equ name can also be one of these
-            ! 'lnE', 'lnP', 'grad_ad' to test eos
-            ! 'eps_nuc' to test net
-            ! 'non_nuc_neu' to test neu
-            ! 'gradT', 'mlt_vc' to test mlt
-            ! 'opacity' to test kap
+! equ name can also be one of these
+! 'lnE', 'lnP', 'grad_ad' to test eos
+! 'eps_nuc' to test net
+! 'non_nuc_neu' to test neu
+! 'gradT', 'mlt_vc' to test mlt
+! 'opacity' to test kap
 
-      !solver_test_partials_write_eos_call_info = .true.
-      
-      !solver_test_partials_k_low = -1
-      !solver_test_partials_k_high = -1
-      
-      !solver_test_eos_partials = .true.
-      !solver_test_kap_partials = .true.
-      !solver_test_net_partials = .true.
-      !solver_test_atm_partials = .true.
+!solver_test_partials_write_eos_call_info = .true.
 
-      !report_all_dt_limits = .true.
-      !report_solver_dt_info = .true.
-      
-      !show_mesh_changes = .true.
-      !mesh_dump_call_number = 5189
-      !okay_to_remesh = .false.
-      
-      !energy_conservation_dump_model_number = -1
-      
-      !use_DGESVX_in_bcyclic = .true.
-      !use_equilibration_in_DGESVX = .true.
-      !report_min_rcond_from_DGESXV = .true.
+!solver_test_partials_k_low = -1
+!solver_test_partials_k_high = -1
 
-      ! solver debugging
-      !solver_check_everything = .true.
-      
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
-      
-      !report_solver_dt_info = .true.
-      !report_dX_nuc_drop_dt_limits = .true.
-      !report_bad_negative_xa = .true.
+!solver_test_eos_partials = .true.
+!solver_test_kap_partials = .true.
+!solver_test_net_partials = .true.
+!solver_test_atm_partials = .true.
+
+!report_all_dt_limits = .true.
+!report_solver_dt_info = .true.
+
+!show_mesh_changes = .true.
+!mesh_dump_call_number = 5189
+!okay_to_remesh = .false.
+
+!energy_conservation_dump_model_number = -1
+
+!use_DGESVX_in_bcyclic = .true.
+!use_equilibration_in_DGESVX = .true.
+!report_min_rcond_from_DGESXV = .true.
+
+! solver debugging
+!solver_check_everything = .true.
+
+!solver_epsder_struct = 1d-6
+!solver_epsder_chem = 1d-6
+
+!report_solver_dt_info = .true.
+!report_dX_nuc_drop_dt_limits = .true.
+!report_bad_negative_xa = .true.
 
 
 / ! end of controls namelist
 
 &pgstar
-   
-   Grid2_win_flag = .true.
 
-   ! HR window -- lg_L vs. lg_Teff
+Grid2_win_flag = .true.
 
-   !HR_win_flag = .true.
+! HR window -- lg_L vs. lg_Teff
 
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+!HR_win_flag = .true.
 
-   ! axis limits -- to override system default selections
-   HR_logT_min = 3.6 ! -101 ! only used if > -100
-   HR_logT_max = 3.95 ! only used if > -100
-   HR_logL_min = 2.99 ! -101 ! only used if > -100
-   HR_logL_max = 3.4 ! -101 ! only used if > -100
+HR_win_width = 8
+HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
-   show_HR_classical_instability_strip = .true.
-   show_HR_target_box = .false.
-   HR_target_n_sigma = -3
-   HR_target_logL = 0.67d0
-   HR_target_logL_sigma = 0.05d0
-   HR_target_logT = 3.785d0
-   HR_target_logT_sigma = 0.00461d0
+! axis limits -- to override system default selections
+HR_logT_min = 3.6 ! -101 ! only used if > -100
+HR_logT_max = 3.95 ! only used if > -100
+HR_logL_min = 2.99 ! -101 ! only used if > -100
+HR_logL_max = 3.4 ! -101 ! only used if > -100
 
-   ! file output
-   HR_file_flag = .false.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
+show_HR_classical_instability_strip = .true.
+show_HR_target_box = .false.
+HR_target_n_sigma = -3
+HR_target_logL = 0.67d0
+HR_target_logL_sigma = 0.05d0
+HR_target_logT = 3.785d0
+HR_target_logT_sigma = 0.00461d0
+
+! file output
+HR_file_flag = .false.
+HR_file_dir = 'pgstar_out'
+HR_file_prefix = 'hr'
+HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+HR_file_width = -1 ! negative means use same value as for window
+HR_file_aspect_ratio = -1 ! negative means use same value as for window
+
 
 / ! end of pgstar namelist
 

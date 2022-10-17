@@ -1,3 +1,2 @@
-         
-         ! setup for stella
-         call read_inlist_stella(ierr)
+! setup for stella
+call read_inlist_stella(ierr)

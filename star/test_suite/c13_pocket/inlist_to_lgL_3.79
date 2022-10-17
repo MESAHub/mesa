@@ -1,27 +1,27 @@
 &star_job
 
 ! begin with saved model from end of core He burning
-      load_saved_model = .true.
-      load_model_filename = '2M_3DUP.mod'
+load_saved_model = .true.
+load_model_filename = '2M_3DUP.mod'
 
 ! save a model and profile at the end of the run
-      save_model_when_terminate = .true.
-      save_model_filename = 'lgL_3.79.mod'
-      required_termination_code_string = 'log_L_upper_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'lgL_3.79.mod'
+required_termination_code_string = 'log_L_upper_limit'
 
-      write_profile_when_terminate = .true.
-      filename_for_profile_when_terminate = 'final_profile.data'
+write_profile_when_terminate = .true.
+filename_for_profile_when_terminate = 'final_profile.data'
 
 ! restart counters
-      set_initial_age = .true.
-      initial_age = 0
-      set_initial_model_number = .true.
-      initial_model_number = 0
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_age = .true.
+initial_age = 0
+set_initial_model_number = .true.
+initial_model_number = 0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
 ! display on-screen plots
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / !end of star_job namelist
 
@@ -35,16 +35,16 @@
 
 &controls
 ! stopping condition
-      log_L_upper_limit = 3.79d0
+log_L_upper_limit = 3.79d0
 
 ! see inlist_common and inlist_TP_AGB
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 2500
+! limit max_model_number as part of test_suite
+max_model_number = 2500
 
 ! relax temporal resolution to spend less time in interpulse
 
-      dH_div_H_limit_min_H = 1d-3
-      dH_div_H_limit = 0.9
+dH_div_H_limit_min_H = 1d-3
+dH_div_H_limit = 0.9
 
 / ! end of controls namelist

@@ -1,16 +1,15 @@
-   
-      model_number ! counting from the start of the run
-      star_age_day ! elapsed simulated time in days since the start of the run
-      log_dt_sec ! log10 time_step in seconds
-      time_step_sec
-      log_rel_run_E_err
-      v_surf_km_s
-      radius
-      effective_T
-      log_Teff
-      log_L
-      v_surf_km_s
-      num_retries ! total during the run
+model_number ! counting from the start of the run
+star_age_day ! elapsed simulated time in days since the start of the run
+log_dt_sec ! log10 time_step in seconds
+time_step_sec
+log_rel_run_E_err
+v_surf_km_s
+radius
+effective_T
+log_Teff
+log_L
+v_surf_km_s
+num_retries ! total during the run
       
 
 

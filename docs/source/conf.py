@@ -12,8 +12,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('./_ext/'))
 
+sys.path.insert(0, os.path.abspath('./_ext/'))
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +22,6 @@ copyright = '2021, The MESA Team'
 author = 'The MESA Team'
 release = 'main'
 version = 'main'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,7 +40,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -83,14 +81,18 @@ html_css_files = [
     'theme_overrides.css',  # overrides for wide tables in RTD theme
 ]
 
-
 # standard substitutions
 rst_prolog = r"""
-.. |MESA I| replace:: `MESA I <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
-.. |MESA II| replace:: `MESA II <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`__
-.. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
-.. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
-.. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
+.. |MESA I| replace:: `MESA I
+<https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
+.. |MESA II| replace:: `MESA II
+<https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`__
+.. |MESA III| replace:: `MESA III
+<https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
+.. |MESA IV| replace:: `MESA IV
+<https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
+.. |MESA V| replace:: `MESA V
+<https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
 .. |Msun| replace:: :math:`{\rm M}_\odot`
 .. |Lsun| replace:: :math:`{\rm L}_\odot`
 .. |Rsun| replace:: :math:`{\rm R}_\odot`

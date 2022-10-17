@@ -1,68 +1,67 @@
-
 &star_job
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'rsg_21M.mod'
+load_saved_model = .true.
+load_model_filename = 'rsg_21M.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'to_instability.mod'
+save_model_when_terminate = .true.
+save_model_filename = 'to_instability.mod'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   use_Skye = .true.
+use_Skye = .true.
 / !end of eos namelist
 
 &kap
-      Zbase = 0.02
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+Zbase = 0.02
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 20
-      
-      ! GYRE output controls
+! limit max_model_number as part of test_suite
+max_model_number = 20
 
-      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+! GYRE output controls
 
-      x_integer_ctrl(2) = 1 ! max number of modes to output per call
-      x_logical_ctrl(2) = .false. ! output eigenfunction files
+x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
-      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-         ! should match gyre.in mode l
-      x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.2323E-07 ! freq ~ this (Hz)
-      x_ctrl(2) = 15d+03 ! growth < this (days)
+x_integer_ctrl(2) = 1 ! max number of modes to output per call
+x_logical_ctrl(2) = .false. ! output eigenfunction files
 
-      energy_eqn_option = 'dedt'
+x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+! should match gyre.in mode l
+x_integer_ctrl(4) = 1 ! order
+x_ctrl(1) = 0.2323E-07 ! freq ~ this (Hz)
+x_ctrl(2) = 15d+03 ! growth < this (days)
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+energy_eqn_option = 'dedt'
+
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
 ! output controls
-      photo_interval = 10
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10 
-      write_header_frequency = 10
+photo_interval = 10
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
@@ -73,154 +72,143 @@
 
 !pause = .true.
 
-      Grid1_win_flag = .true.
-         Grid1_win_width = 9
-         Grid1_win_aspect_ratio = 0.9 ! aspect_ratio = height/width
+Grid1_win_flag = .true.
+Grid1_win_width = 9
+Grid1_win_aspect_ratio = 0.9 ! aspect_ratio = height/width
 
-         Grid1_plot_pad_bot(4) = -0.05 ! fraction of full window height for padding at bottom
-         Grid1_txt_scale_factor(4) = 0.2 ! multiply txt_scale for subplot by this
+Grid1_plot_pad_bot(4) = -0.05 ! fraction of full window height for padding at bottom
+Grid1_txt_scale_factor(4) = 0.2 ! multiply txt_scale for subplot by this
 
-         Grid1_plot_name(2) = 'logL_Teff'
+Grid1_plot_name(2) = 'logL_Teff'
 
-         !Grid7_title = '25 M\d\(2281)\u Piston Driven Shock'
+!Grid7_title = '25 M\d\(2281)\u Piston Driven Shock'
 
 !Grid7_win_flag = .true.
-         Grid7_win_width = 11
-         Grid7_win_aspect_ratio = 0.7 ! aspect_ratio = height/width
+Grid7_win_width = 11
+Grid7_win_aspect_ratio = 0.7 ! aspect_ratio = height/width
 
-         Grid7_num_cols = 2 ! divide plotting region into this many equal width cols
-         Grid7_num_rows = 5 ! divide plotting region into this many equal height rows
-         Grid7_num_plots = 3 ! <= 10
-         
-         
-         Grid7_plot_name(1) = 'Profile_Panels1'
-         Grid7_plot_row(1) = 1 ! number from 1 at top
-         Grid7_plot_rowspan(1) = 4 ! plot spans this number of rows
-         Grid7_plot_col(1) =  1 ! number from 1 at left
-         Grid7_plot_colspan(1) = 1 ! plot spans this number of columns 
-         Grid7_plot_pad_left(1) = 0.0 ! fraction of full window width for padding on left
-         Grid7_plot_pad_right(1) = 0.09 ! fraction of full window width for padding on right
-         Grid7_plot_pad_top(1) = 0.0 ! fraction of full window height for padding at top
-         Grid7_plot_pad_bot(1) = 0.06 ! fraction of full window height for padding at bottom
-         Grid7_txt_scale_factor(1) = 0.6 ! multiply txt_scale for subplot by this
+Grid7_num_cols = 2 ! divide plotting region into this many equal width cols
+Grid7_num_rows = 5 ! divide plotting region into this many equal height rows
+Grid7_num_plots = 3 ! <= 10
 
-         
-         Grid7_plot_name(2) = 'Profile_Panels2'
-         Grid7_plot_row(2) = 1 ! number from 1 at top
-         Grid7_plot_rowspan(2) = 4 ! plot spans this number of rows
-         Grid7_plot_col(2) =  2 ! number from 1 at left
-         Grid7_plot_colspan(2) = 1 ! plot spans this number of columns 
-         Grid7_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-         Grid7_plot_pad_right(2) = 0.04 ! fraction of full window width for padding on right
-         Grid7_plot_pad_top(2) = 0.0 ! fraction of full window height for padding at top
-         Grid7_plot_pad_bot(2) = 0.06 ! fraction of full window height for padding at bottom
-         Grid7_txt_scale_factor(2) = 0.6 ! multiply txt_scale for subplot by this
+Grid7_plot_name(1) = 'Profile_Panels1'
+Grid7_plot_row(1) = 1 ! number from 1 at top
+Grid7_plot_rowspan(1) = 4 ! plot spans this number of rows
+Grid7_plot_col(1) = 1 ! number from 1 at left
+Grid7_plot_colspan(1) = 1 ! plot spans this number of columns
+Grid7_plot_pad_left(1) = 0.0 ! fraction of full window width for padding on left
+Grid7_plot_pad_right(1) = 0.09 ! fraction of full window width for padding on right
+Grid7_plot_pad_top(1) = 0.0 ! fraction of full window height for padding at top
+Grid7_plot_pad_bot(1) = 0.06 ! fraction of full window height for padding at bottom
+Grid7_txt_scale_factor(1) = 0.6 ! multiply txt_scale for subplot by this
 
+Grid7_plot_name(2) = 'Profile_Panels2'
+Grid7_plot_row(2) = 1 ! number from 1 at top
+Grid7_plot_rowspan(2) = 4 ! plot spans this number of rows
+Grid7_plot_col(2) = 2 ! number from 1 at left
+Grid7_plot_colspan(2) = 1 ! plot spans this number of columns
+Grid7_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
+Grid7_plot_pad_right(2) = 0.04 ! fraction of full window width for padding on right
+Grid7_plot_pad_top(2) = 0.0 ! fraction of full window height for padding at top
+Grid7_plot_pad_bot(2) = 0.06 ! fraction of full window height for padding at bottom
+Grid7_txt_scale_factor(2) = 0.6 ! multiply txt_scale for subplot by this
 
-         
-         Grid7_plot_name(3) = 'Text_Summary1'
-         Grid7_plot_row(3) = 5 ! number from 1 at top
-         Grid7_plot_rowspan(3) = 1 ! plot spans this number of rows
-         Grid7_plot_col(3) =  1 ! number from 1 at left
-         Grid7_plot_colspan(3) = 2 ! plot spans this number of columns 
-         Grid7_plot_pad_left(3) = -0.08 ! fraction of full window width for padding on left
-         Grid7_plot_pad_right(3) = -0.03 ! fraction of full window width for padding on right
-         Grid7_plot_pad_top(3) = 0.02 ! fraction of full window height for padding at top
-         Grid7_plot_pad_bot(3) = -0.05 ! fraction of full window height for padding at bottom
-         Grid7_txt_scale_factor(3) = 0.21 ! multiply txt_scale for subplot by this
+Grid7_plot_name(3) = 'Text_Summary1'
+Grid7_plot_row(3) = 5 ! number from 1 at top
+Grid7_plot_rowspan(3) = 1 ! plot spans this number of rows
+Grid7_plot_col(3) = 1 ! number from 1 at left
+Grid7_plot_colspan(3) = 2 ! plot spans this number of columns
+Grid7_plot_pad_left(3) = -0.08 ! fraction of full window width for padding on left
+Grid7_plot_pad_right(3) = -0.03 ! fraction of full window width for padding on right
+Grid7_plot_pad_top(3) = 0.02 ! fraction of full window height for padding at top
+Grid7_plot_pad_bot(3) = -0.05 ! fraction of full window height for padding at bottom
+Grid7_txt_scale_factor(3) = 0.21 ! multiply txt_scale for subplot by this
 
 
 
-         ! file output
+! file output
 !Grid7_file_flag = .true.
-         Grid7_file_dir = 'png'
-         Grid7_file_prefix = 'shock_'
-         Grid7_file_interval = 2 ! output when mod(model_number,Grid7_file_cnt)==0
-         
-         
-         
-         
-         
-         Profile_Panels1_title = '' ! 'Shock Profiles'      
-         Profile_Panels2_title = '' ! 'Abundances + Power'      
+Grid7_file_dir = 'png'
+Grid7_file_prefix = 'shock_'
+Grid7_file_interval = 2 ! output when mod(model_number,Grid7_file_cnt)==0
 
-         
+Profile_Panels1_title = '' ! 'Shock Profiles'
+Profile_Panels2_title = '' ! 'Abundances + Power'
+
 Profile_Panels_show_Mach_1_location = .true.
 !Profile_Panels_xwidth_left_of_shock = -1
 !Profile_Panels_xwidth_right_of_shock = 1
 Profile_Panels_xwidth_left_div_shock_value = 0.04
 Profile_Panels_xwidth_right_div_shock_value = 0.04
-         
 
-         Profile_Panels1_xaxis_name = 'mass' !  'logR_cm' ! 
+Profile_Panels1_xaxis_name = 'mass' !  'logR_cm' !
 Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
 Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
 !Profile_Panels1_xmin = 3.99853 ! only used if /= -101d0
 !Profile_Panels1_xmax = 11 ! 3.99855 ! only used if /= -101d0
 
-         Profile_Panels1_num_panels = 3         
+Profile_Panels1_num_panels = 3
 
-         Profile_Panels1_yaxis_name(1) = 'logRho'         
-            Profile_Panels1_ymin(1) = -101d0 ! -1.2 ! only used if /= -101d0
-            Profile_Panels1_ymax(1) = -101d0 ! 3 ! only used if /= -101d0
-            Profile_Panels1_ymargin(1) = 0.1
-      
-         Profile_Panels1_other_yaxis_name(1) = 'entropy' ! 'entropy'   
-            Profile_Panels1_other_ymin(1) = -101d0 ! -1e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymax(1) = -101d0 ! 2e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymargin(1) = 0.1
-          
-         Profile_Panels1_yaxis_name(2) = 'logT'
-            Profile_Panels1_ymin(2) = -101d0 ! -1.2 ! only used if /= -101d0
-            Profile_Panels1_ymax(2) = -101d0 ! 3 ! only used if /= -101d0
-            Profile_Panels1_ymargin(2) = 0.1
-         
-         Profile_Panels1_other_yaxis_name(2) = 'eps_visc' ! 'total_energy' 
-            Profile_Panels1_other_ymin(2) = -101d0 ! -1e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymax(2) = -101d0 ! 2e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymargin(2) = 0.1
+Profile_Panels1_yaxis_name(1) = 'logRho'
+Profile_Panels1_ymin(1) = -101d0 ! -1.2 ! only used if /= -101d0
+Profile_Panels1_ymax(1) = -101d0 ! 3 ! only used if /= -101d0
+Profile_Panels1_ymargin(1) = 0.1
 
-         Profile_Panels1_yaxis_name(3) = 'v_div_csound' ! 'velocity'        
-            Profile_Panels1_ymin(3) = -101d0 ! -1.2 ! only used if /= -101d0
-            Profile_Panels1_ymax(3) = -101d0 ! 3 ! only used if /= -101d0
-            Profile_Panels1_ymargin(3) = 0.1
+Profile_Panels1_other_yaxis_name(1) = 'entropy' ! 'entropy'
+Profile_Panels1_other_ymin(1) = -101d0 ! -1e4 ! only used if /= -101d0
+Profile_Panels1_other_ymax(1) = -101d0 ! 2e4 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(1) = 0.1
 
-         Profile_Panels1_other_yaxis_name(3) = 'dvdt_visc' 
-            Profile_Panels1_other_ymin(3) = -101d0 ! -1e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymax(3) = -101d0 ! 2e4 ! only used if /= -101d0
-            Profile_Panels1_other_ymargin(3) = 0.1
+Profile_Panels1_yaxis_name(2) = 'logT'
+Profile_Panels1_ymin(2) = -101d0 ! -1.2 ! only used if /= -101d0
+Profile_Panels1_ymax(2) = -101d0 ! 3 ! only used if /= -101d0
+Profile_Panels1_ymargin(2) = 0.1
 
+Profile_Panels1_other_yaxis_name(2) = 'eps_visc' ! 'total_energy'
+Profile_Panels1_other_ymin(2) = -101d0 ! -1e4 ! only used if /= -101d0
+Profile_Panels1_other_ymax(2) = -101d0 ! 2e4 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(2) = 0.1
 
-         Profile_Panels2_xaxis_name = 'mass' !  'logR_cm' !  'mass' ! 
-         Profile_Panels2_xaxis_reversed = .false.
+Profile_Panels1_yaxis_name(3) = 'v_div_csound' ! 'velocity'
+Profile_Panels1_ymin(3) = -101d0 ! -1.2 ! only used if /= -101d0
+Profile_Panels1_ymax(3) = -101d0 ! 3 ! only used if /= -101d0
+Profile_Panels1_ymargin(3) = 0.1
+
+Profile_Panels1_other_yaxis_name(3) = 'dvdt_visc'
+Profile_Panels1_other_ymin(3) = -101d0 ! -1e4 ! only used if /= -101d0
+Profile_Panels1_other_ymax(3) = -101d0 ! 2e4 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(3) = 0.1
+
+Profile_Panels2_xaxis_name = 'mass' !  'logR_cm' !  'mass' !
+Profile_Panels2_xaxis_reversed = .false.
 Profile_Panels2_xmin = -101d0 ! only used if /= -101d0
 Profile_Panels2_xmax = -101d0 ! only used if /= -101d0
 !Profile_Panels2_xmin = 7 ! 3.9985 ! only used if /= -101d0
 !Profile_Panels2_xmax = 2.2 ! 3.9986 ! only used if /= -101d0
 
-         Profile_Panels2_num_panels = 4         
+Profile_Panels2_num_panels = 4
 
-         Profile_Panels2_yaxis_name(1) = 'Abundance'   
-               
-         Profile_Panels2_yaxis_name(2) = 'Power'  
-               
-         Profile_Panels2_yaxis_name(3) = 'Mixing'  
-         Mixing_legend_txt_scale_factor = 1
+Profile_Panels2_yaxis_name(1) = 'Abundance'
 
-         Profile_Panels2_yaxis_name(4) = 'velocity' ! 'zone'   
-            Profile_Panels2_ymin(4) = -101d0 ! -1.2 ! only used if /= -101d0
-            Profile_Panels2_ymax(4) = -101d0 ! 3 ! only used if /= -101d0
-            Profile_Panels2_ymargin(4) = 0.1
+Profile_Panels2_yaxis_name(2) = 'Power'
 
-         Profile_Panels2_other_yaxis_name(4) = 'logR_cm' ! 'mass' 
-            Profile_Panels2_other_ymin(4) = -101d0 ! -1e4 ! only used if /= -101d0
-            Profile_Panels2_other_ymax(4) = -101d0 ! 2e4 ! only used if /= -101d0
-            Profile_Panels2_other_ymargin(4) = 0.1
+Profile_Panels2_yaxis_name(3) = 'Mixing'
+Mixing_legend_txt_scale_factor = 1
 
-         Power_legend_max_cnt = 10
-         Power_legend_txt_scale_factor = 1.3 ! relative to other text
-         Power_ymin = 6 ! only used if /= -101d0
-      
+Profile_Panels2_yaxis_name(4) = 'velocity' ! 'zone'
+Profile_Panels2_ymin(4) = -101d0 ! -1.2 ! only used if /= -101d0
+Profile_Panels2_ymax(4) = -101d0 ! 3 ! only used if /= -101d0
+Profile_Panels2_ymargin(4) = 0.1
+
+Profile_Panels2_other_yaxis_name(4) = 'logR_cm' ! 'mass'
+Profile_Panels2_other_ymin(4) = -101d0 ! -1e4 ! only used if /= -101d0
+Profile_Panels2_other_ymax(4) = -101d0 ! 2e4 ! only used if /= -101d0
+Profile_Panels2_other_ymargin(4) = 0.1
+
+Power_legend_max_cnt = 10
+Power_legend_txt_scale_factor = 1.3 ! relative to other text
+Power_ymin = 6 ! only used if /= -101d0
+
 !         Text_Summary1_name(2,1) = 'star_age_sec'
 !         Text_Summary1_name(3,1) = 'time_step_sec'
 !         Text_Summary1_name(7,1) = 'total_energy'
@@ -239,6 +227,6 @@ Profile_Panels2_xmax = -101d0 ! only used if /= -101d0
 !         Text_Summary1_name(7,3) = 'max_abs_v_mass'
 !         Text_Summary1_name(8,3) = 'max_abs_v_radius'
 
-      Grid2_win_flag = .false.
+Grid2_win_flag = .false.
 
 / ! end of pgstar namelist

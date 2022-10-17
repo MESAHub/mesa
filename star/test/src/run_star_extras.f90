@@ -20,18 +20,18 @@
 !
 ! ***********************************************************************
 
-      module run_star_extras
+module run_star_extras
+   
+   use star_lib
+   use star_def
+   use const_def
+   use math_lib
+   
+   implicit none
+   
+   ! these routines are called by the standard run_star
+contains
 
-      use star_lib
-      use star_def
-      use const_def
-      use math_lib
+include '../../job/standard_run_star_extras.inc'
 
-      implicit none
-
-      ! these routines are called by the standard run_star
-      contains
-
-      include '../../job/standard_run_star_extras.inc'
-
-      end module run_star_extras
+end module run_star_extras

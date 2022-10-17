@@ -23,15 +23,15 @@
 !
 ! ***********************************************************************
 
-      module mod_random
-      use const_def, only: dp
+module mod_random
+   use const_def, only : dp
+
+
+contains
+   
+   
+   subroutine get_seed (seed)
       
-
-      contains
-
-
-      subroutine get_seed ( seed )
-
       !*****************************************************************************80
       !
       !! GET_SEED returns a seed for the random number generator.
@@ -59,53 +59,53 @@
       !
       !    Output, integer ( kind = 4 ) SEED, a pseudorandom seed value.
       !
-        implicit none
-
-        integer ( kind = 4 ) seed
-        real ( kind = 8 ) temp
-        character ( len = 10 ) time
-        character ( len = 8 ) today
-        integer ( kind = 4 ) values(8)
-        character ( len = 5 ) zone
-
-        call date_and_time ( today, time, zone, values )
-
-        temp = 0.0D+00
-
-        temp = temp + real ( values(2) - 1, kind = 8 ) /  11.0D+00
-        temp = temp + real ( values(3) - 1, kind = 8 ) /  30.0D+00
-        temp = temp + real ( values(5),     kind = 8 ) /  23.0D+00
-        temp = temp + real ( values(6),     kind = 8 ) /  59.0D+00
-        temp = temp + real ( values(7),     kind = 8 ) /  59.0D+00
-        temp = temp + real ( values(8),     kind = 8 ) / 999.0D+00
-        temp = temp                                    /   6.0D+00
-
-        do while ( temp <= 0.0D+00 )
-          temp = temp + 1.0D+00
-        end do
-
-        do while ( 1.0D+00 < temp )
-          temp = temp - 1.0D+00
-        end do
-
-        seed = int ( real ( huge ( 1 ), kind = 8 ) * temp )
+      implicit none
+      
+      integer (kind = 4) seed
+      real (kind = 8) temp
+      character (len = 10) time
+      character (len = 8) today
+      integer (kind = 4) values(8)
+      character (len = 5) zone
+      
+      call date_and_time (today, time, zone, values)
+      
+      temp = 0.0D+00
+      
+      temp = temp + real (values(2) - 1, kind = 8) / 11.0D+00
+      temp = temp + real (values(3) - 1, kind = 8) / 30.0D+00
+      temp = temp + real (values(5), kind = 8) / 23.0D+00
+      temp = temp + real (values(6), kind = 8) / 59.0D+00
+      temp = temp + real (values(7), kind = 8) / 59.0D+00
+      temp = temp + real (values(8), kind = 8) / 999.0D+00
+      temp = temp / 6.0D+00
+      
+      do while (temp <= 0.0D+00)
+         temp = temp + 1.0D+00
+      end do
+      
+      do while (1.0D+00 < temp)
+         temp = temp - 1.0D+00
+      end do
+      
+      seed = int (real (huge (1), kind = 8) * temp)
       !
       !  Never use a seed of 0 or maximum integer ( kind = 4 ).
       !
-        if ( seed == 0 ) then
-          seed = 1
-        end if
-
-        if ( seed == huge ( 1 ) ) then
-          seed = seed - 1
-        end if
-
-        return
-      end subroutine get_seed
-
-
-      function i4_uniform ( a, b, seed )
-
+      if (seed == 0) then
+         seed = 1
+      end if
+      
+      if (seed == huge (1)) then
+         seed = seed - 1
+      end if
+      
+      return
+   end subroutine get_seed
+   
+   
+   function i4_uniform (a, b, seed)
+      
       !*****************************************************************************80
       !
       !! I4_UNIFORM returns a scaled pseudorandom I4.
@@ -167,54 +167,54 @@
       !
       !    Output, integer ( kind = 4 ) I4_UNIFORM, a number between A and B.
       !
-        implicit none
-
-        integer ( kind = 4 ) a
-        integer ( kind = 4 ) b
-        integer ( kind = 4 ), parameter :: i4_huge = 2147483647
-        integer ( kind = 4 ) i4_uniform
-        integer ( kind = 4 ) k
-        real ( kind = 4 ) r
-        integer ( kind = 4 ) seed
-        integer ( kind = 4 ) value
-
-        if ( seed == 0 ) then
-          write ( *, '(a)' ) ' '
-          write ( *, '(a)' ) 'I4_UNIFORM - Fatal error!'
-          write ( *, '(a)' ) '  Input value of SEED = 0.'
-          stop
-        end if
-
-        k = seed / 127773
-
-        seed = 16807 * ( seed - k * 127773 ) - k * 2836
-
-        if ( seed < 0 ) then
-          seed = seed + i4_huge
-        end if
-
-        r = real ( seed, kind = 4 ) * 4.656612875E-10
+      implicit none
+      
+      integer (kind = 4) a
+      integer (kind = 4) b
+      integer (kind = 4), parameter :: i4_huge = 2147483647
+      integer (kind = 4) i4_uniform
+      integer (kind = 4) k
+      real (kind = 4) r
+      integer (kind = 4) seed
+      integer (kind = 4) value
+      
+      if (seed == 0) then
+         write (*, '(a)') ' '
+         write (*, '(a)') 'I4_UNIFORM - Fatal error!'
+         write (*, '(a)') '  Input value of SEED = 0.'
+         stop
+      end if
+      
+      k = seed / 127773
+      
+      seed = 16807 * (seed - k * 127773) - k * 2836
+      
+      if (seed < 0) then
+         seed = seed + i4_huge
+      end if
+      
+      r = real (seed, kind = 4) * 4.656612875E-10
       !
       !  Scale R to lie between A-0.5 and B+0.5.
       !
-        r = ( 1.0E+00 - r ) * ( real ( min ( a, b ), kind = 4 ) - 0.5E+00 ) &
-          +             r   * ( real ( max ( a, b ), kind = 4 ) + 0.5E+00 )
+      r = (1.0E+00 - r) * (real (min (a, b), kind = 4) - 0.5E+00) &
+         + r * (real (max (a, b), kind = 4) + 0.5E+00)
       !
       !  Use rounding to convert R to an integer between A and B.
       !
-        value = nint ( r, kind = 4 )
-
-        value = max ( value, min ( a, b ) )
-        value = min ( value, max ( a, b ) )
-
-        i4_uniform = value
-
-        return
-      end function i4_uniform
-
-
-      subroutine perm_uniform ( n, base, seed, p )
-
+      value = nint (r, kind = 4)
+      
+      value = max (value, min (a, b))
+      value = min (value, max (a, b))
+      
+      i4_uniform = value
+      
+      return
+   end function i4_uniform
+   
+   
+   subroutine perm_uniform (n, base, seed, p)
+      
       !*****************************************************************************80
       !
       !! PERM_UNIFORM selects a random permutation of N objects.
@@ -251,35 +251,34 @@
       !    Output, integer ( kind = 4 ) P(N), the permutation.  P(I) is the "new"
       !    location of the object originally at I.
       !
-        implicit none
-
-        integer ( kind = 4 ) n
-
-        integer ( kind = 4 ) base
-        integer ( kind = 4 ) i
-        integer ( kind = 4 ) j
-        integer ( kind = 4 ) k
-        integer ( kind = 4 ) p(n)
-        integer ( kind = 4 ) seed
-
-        do i = 1, n
-          p(i) = ( i - 1 ) + base
-        end do
-
-        do i = 1, n
-          j = i4_uniform ( i, n, seed )
-          k    = p(i)
-          p(i) = p(j)
-          p(j) = k
-        end do
-
-        return
-      end subroutine perm_uniform
-
-
-
-      function r8_uniform_01 ( seed )
-
+      implicit none
+      
+      integer (kind = 4) n
+      
+      integer (kind = 4) base
+      integer (kind = 4) i
+      integer (kind = 4) j
+      integer (kind = 4) k
+      integer (kind = 4) p(n)
+      integer (kind = 4) seed
+      
+      do i = 1, n
+         p(i) = (i - 1) + base
+      end do
+      
+      do i = 1, n
+         j = i4_uniform (i, n, seed)
+         k = p(i)
+         p(i) = p(j)
+         p(j) = k
+      end do
+      
+      return
+   end subroutine perm_uniform
+   
+   
+   function r8_uniform_01 (seed)
+      
       !*****************************************************************************80
       !
       !! R8_UNIFORM_01 returns a unit pseudorandom R8.
@@ -351,37 +350,37 @@
       !    Output, real ( kind = 8 ) R8_UNIFORM_01, a new pseudorandom variate,
       !    strictly between 0 and 1.
       !
-        implicit none
-
-        integer ( kind = 4 ) k
-        real ( kind = 8 ) r8_uniform_01
-        integer ( kind = 4 ) seed
-
-        if ( seed == 0 ) then
-          write ( *, '(a)' ) ' '
-          write ( *, '(a)' ) 'R8_UNIFORM_01 - Fatal error!'
-          write ( *, '(a)' ) '  Input value of SEED = 0.'
-          stop
-        end if
-
-        k = seed / 127773
-
-        seed = 16807 * ( seed - k * 127773 ) - k * 2836
-
-        if ( seed < 0 ) then
-          seed = seed + 2147483647
-        end if
+      implicit none
+      
+      integer (kind = 4) k
+      real (kind = 8) r8_uniform_01
+      integer (kind = 4) seed
+      
+      if (seed == 0) then
+         write (*, '(a)') ' '
+         write (*, '(a)') 'R8_UNIFORM_01 - Fatal error!'
+         write (*, '(a)') '  Input value of SEED = 0.'
+         stop
+      end if
+      
+      k = seed / 127773
+      
+      seed = 16807 * (seed - k * 127773) - k * 2836
+      
+      if (seed < 0) then
+         seed = seed + 2147483647
+      end if
       !
       !  Although SEED can be represented exactly as a 32 bit integer ( kind = 4 ),
       !  it generally cannot be represented exactly as a 32 bit real number!
       !
-        r8_uniform_01 = real ( seed, kind = 8 ) * 4.656612875D-10
+      r8_uniform_01 = real (seed, kind = 8) * 4.656612875D-10
+      
+      return
+   end function r8_uniform_01
 
-        return
-      end function r8_uniform_01
 
-
-      end module mod_random
+end module mod_random
 
 
 

@@ -1,14 +1,13 @@
-
 &star_job
 
 / !end of star_job namelist
 
 
 &controls
-    !inlist is currently unused, things can be added here
-    !to be loaded after the first pulse begins
-    max_years_for_timestep = 0.5d0
-    !max_q_for_convection_with_hydro_on = 0.9999d0
+!inlist is currently unused, things can be added here
+!to be loaded after the first pulse begins
+max_years_for_timestep = 0.5d0
+!max_q_for_convection_with_hydro_on = 0.9999d0
 
 / ! end of controls namelist
 

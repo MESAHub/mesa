@@ -1,18 +1,17 @@
-
 &kappa
 
-         data_dir = 'kap_input_data/wichita/gs98'		
-         lowT_flag = .true.
-         Freedman_flag = .true.
-         logT_file = 'logT_points_lowT_Freedman11'
-         freedman_data_dir = 'kap_input_data/freedman'
-         logR_min = -8.00d0
-         logR_max = 9.00d0
-         logR_points = 86
-         type1_table = 'g98'
-         output_dir = 'data/kap_data'
-         table_prefix = 'lowT_Freedman11'
-         header_info = 'low temperature opacities from Freedman (2011) and Ferguson, Alexander, et al (2005) with gs98 metals'
-         table_version= 38
+data_dir = 'kap_input_data/wichita/gs98'
+lowT_flag = .true.
+Freedman_flag = .true.
+logT_file = 'logT_points_lowT_Freedman11'
+freedman_data_dir = 'kap_input_data/freedman'
+logR_min = -8.00d0
+logR_max = 9.00d0
+logR_points = 86
+type1_table = 'g98'
+output_dir = 'data/kap_data'
+table_prefix = 'lowT_Freedman11'
+header_info = 'low temperature opacities from Freedman (2011) and Ferguson, Alexander, et al (2005) with gs98 metals'
+table_version = 38
 
 /

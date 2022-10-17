@@ -1,25 +1,24 @@
-
 &xtrans_mesh_factor
 
 
-         !### xtra_coef_above_xtrans
-         !### xtra_coef_below_xtrans
+!### xtra_coef_above_xtrans
+!### xtra_coef_below_xtrans
 
-         ! Multiply `mesh_delta_coeff` near any change in most abundant species by this factor.
-         ! Value < 1 gives increased resolution.
+! Multiply `mesh_delta_coeff` near any change in most abundant species by this factor.
+! Value < 1 gives increased resolution.
 
-      xtra_coef_above_xtrans = 1d0
-      xtra_coef_below_xtrans = 1d0
+xtra_coef_above_xtrans = 1d0
+xtra_coef_below_xtrans = 1d0
 
 
-         !### xtra_dist_above_xtrans
-         !### xtra_dist_below_xtrans
+!### xtra_dist_above_xtrans
+!### xtra_dist_below_xtrans
 
-         ! Increase resolution up to this distance away from the abundance transition
-         ! with distance measured in units of the pressure scale height at the boundary.
+! Increase resolution up to this distance away from the abundance transition
+! with distance measured in units of the pressure scale height at the boundary.
 
-      xtra_dist_above_xtrans = 0.2d0
-      xtra_dist_below_xtrans = 0.2d0
-      
+xtra_dist_above_xtrans = 0.2d0
+xtra_dist_below_xtrans = 0.2d0
+
 
 / ! end of xtrans_mesh_factor

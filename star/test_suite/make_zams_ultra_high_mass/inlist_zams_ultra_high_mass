@@ -5,25 +5,24 @@
 
 &star_job
 
-      show_log_description_at_start = .false. 
-      
-      load_saved_model = .true.
-      load_model_filename = 'late_pre_zams_90M.mod'
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'zams.mod'
-      required_termination_code_string = 'Lnuc_div_L_zams_limit'
+load_saved_model = .true.
+load_model_filename = 'late_pre_zams_90M.mod'
 
-      relax_initial_mass_scale = .true.
-      dlgm_per_step = 2d-3
-      new_mass = 250  ! NOTE: change initial_mass in &controls to match
-      change_mass_years_for_dt = 1d-2
+save_model_when_terminate = .true.
+save_model_filename = 'zams.mod'
+required_termination_code_string = 'Lnuc_div_L_zams_limit'
 
-      
-      set_initial_cumulative_energy_error = .true.
-      !set_cumulative_energy_error_at_step = -1
-      !set_cumulative_energy_error_each_step_if_age_less_than = -1d99 ! years
-      new_cumulative_energy_error = 0d0
+relax_initial_mass_scale = .true.
+dlgm_per_step = 2d-3
+new_mass = 250  ! NOTE: change initial_mass in &controls to match
+change_mass_years_for_dt = 1d-2
+
+set_initial_cumulative_energy_error = .true.
+!set_cumulative_energy_error_at_step = -1
+!set_cumulative_energy_error_each_step_if_age_less_than = -1d99 ! years
+new_cumulative_energy_error = 0d0
 
 / ! end of star_job namelist
 
@@ -32,31 +31,31 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 1d-4
+Zbase = 1d-4
 
-      kap_file_prefix = 'gs98'
+kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
 
 &controls
 
-      initial_mass = 250  ! NOTE: change new_mass in &star_job to match
-      initial_z = 1d-4
-      
-      stop_near_zams = .true.
-      Lnuc_div_L_zams_limit = 0.9d0
-      
-      ! limit max_model_number as part of test_suite
-      max_model_number = 10000
-      
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+initial_mass = 250  ! NOTE: change new_mass in &star_job to match
+initial_z = 1d-4
 
-      photo_interval = 100
-      profile_interval = 100
-      history_interval = 50
-      terminal_interval = 10
+stop_near_zams = .true.
+Lnuc_div_L_zams_limit = 0.9d0
+
+! limit max_model_number as part of test_suite
+max_model_number = 10000
+
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+
+photo_interval = 100
+profile_interval = 100
+history_interval = 50
+terminal_interval = 10
 
 / ! end of controls namelist
 

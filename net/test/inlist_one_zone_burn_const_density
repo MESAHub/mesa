@@ -1,107 +1,102 @@
-
 &one_zone
-      
-      mesa_dir = '../..'   	
 
-      net_name = 'approx21_cr60_plus_co56.net' 
+mesa_dir = '../..'
 
-      trace = .true.
-      !burn_dbg = .true.
-   	stptry = 0
-      use_pivoting = .true.
-      !use_pivoting = .false.
+net_name = 'approx21_cr60_plus_co56.net'
 
-      burn_at_constant_density = .true.
+trace = .true.
+!burn_dbg = .true.
+stptry = 0
+use_pivoting = .true.
+!use_pivoting = .false.
 
+burn_at_constant_density = .true.
 
 burn_logT = 9.7714486335232777D+00 ! starting temp
 
 !burn_logT = 9.82D+00 ! <<<<<<<<<<< TEST
 
-
 burn_logRho = 8.2586740078478176D+00 ! constant density
-                                              burn_Cv =    0
-                                       burn_d_Cv_dlnT =    0
-                                             burn_eta =    0
-                                       burn_deta_dlnT =    0
+burn_Cv = 0
+burn_d_Cv_dlnT = 0
+burn_eta = 0
+burn_deta_dlnT = 0
 
 num_isos_for_Xinit = 22
-names_of_isos_for_Xinit( 1) = "neut"
-values_for_Xinit( 1) =     1.9615092621881698D-06
-names_of_isos_for_Xinit( 2) = "h1"
-values_for_Xinit( 2) =     0.0000000000000000D+00
-names_of_isos_for_Xinit( 3) = "prot"
-values_for_Xinit( 3) =     3.3544919533130298D-04
-names_of_isos_for_Xinit( 4) = "he3"
-values_for_Xinit( 4) =     0.0000000000000000D+00
-names_of_isos_for_Xinit( 5) = "he4"
-values_for_Xinit( 5) =     9.6491906054115388D-03
-names_of_isos_for_Xinit( 6) = "c12"
-values_for_Xinit( 6) =     4.4455299753403973D-07
-names_of_isos_for_Xinit( 7) = "n14"
-values_for_Xinit( 7) =     0.0000000000000000D+00
-names_of_isos_for_Xinit( 8) = "o16"
-values_for_Xinit( 8) =     7.0439210492179401D-07
-names_of_isos_for_Xinit( 9) = "ne20"
-values_for_Xinit( 9) =     4.5369892002182717D-09
+names_of_isos_for_Xinit(1) = "neut"
+values_for_Xinit(1) = 1.9615092621881698D-06
+names_of_isos_for_Xinit(2) = "h1"
+values_for_Xinit(2) = 0.0000000000000000D+00
+names_of_isos_for_Xinit(3) = "prot"
+values_for_Xinit(3) = 3.3544919533130298D-04
+names_of_isos_for_Xinit(4) = "he3"
+values_for_Xinit(4) = 0.0000000000000000D+00
+names_of_isos_for_Xinit(5) = "he4"
+values_for_Xinit(5) = 9.6491906054115388D-03
+names_of_isos_for_Xinit(6) = "c12"
+values_for_Xinit(6) = 4.4455299753403973D-07
+names_of_isos_for_Xinit(7) = "n14"
+values_for_Xinit(7) = 0.0000000000000000D+00
+names_of_isos_for_Xinit(8) = "o16"
+values_for_Xinit(8) = 7.0439210492179401D-07
+names_of_isos_for_Xinit(9) = "ne20"
+values_for_Xinit(9) = 4.5369892002182717D-09
 names_of_isos_for_Xinit(10) = "mg24"
-values_for_Xinit(10) =     8.0018732551576689D-07
+values_for_Xinit(10) = 8.0018732551576689D-07
 names_of_isos_for_Xinit(11) = "si28"
-values_for_Xinit(11) =     3.3697411043955434D-04
+values_for_Xinit(11) = 3.3697411043955434D-04
 names_of_isos_for_Xinit(12) = "s32"
-values_for_Xinit(12) =     2.7239844165292807D-04
+values_for_Xinit(12) = 2.7239844165292807D-04
 names_of_isos_for_Xinit(13) = "ar36"
-values_for_Xinit(13) =     1.4240894544492388D-04
+values_for_Xinit(13) = 1.4240894544492388D-04
 names_of_isos_for_Xinit(14) = "ca40"
-values_for_Xinit(14) =     1.5156321095874170D-04
+values_for_Xinit(14) = 1.5156321095874170D-04
 names_of_isos_for_Xinit(15) = "ti44"
-values_for_Xinit(15) =     4.3979509377388036D-06
+values_for_Xinit(15) = 4.3979509377388036D-06
 names_of_isos_for_Xinit(16) = "cr48"
-values_for_Xinit(16) =     2.8113145151721771D-05
+values_for_Xinit(16) = 2.8113145151721771D-05
 names_of_isos_for_Xinit(17) = "cr60"
-values_for_Xinit(17) =     4.1810609055173498D-03
+values_for_Xinit(17) = 4.1810609055173498D-03
 names_of_isos_for_Xinit(18) = "fe52"
-values_for_Xinit(18) =     1.8928784597602586D-04
+values_for_Xinit(18) = 1.8928784597602586D-04
 names_of_isos_for_Xinit(19) = "fe54"
-values_for_Xinit(19) =     2.6996971418369603D-01
+values_for_Xinit(19) = 2.6996971418369603D-01
 names_of_isos_for_Xinit(20) = "fe56"
-values_for_Xinit(20) =     7.0702963220409232D-01
+values_for_Xinit(20) = 7.0702963220409232D-01
 names_of_isos_for_Xinit(21) = "co56"
-values_for_Xinit(21) =     6.8333792315189530D-03
+values_for_Xinit(21) = 6.8333792315189530D-03
 names_of_isos_for_Xinit(22) = "ni56"
-values_for_Xinit(22) =     8.7251484519146338D-04
+values_for_Xinit(22) = 8.7251484519146338D-04
 
 burn_tend = 4.8879254236041725D-01 ! mesa/star timestep
 
-
 eps = 1d-5
 odescal = 1d-5
-   	
-   	max_step_size = 0
-      max_steps     = 10000000        
 
-   	
-   	data_heading_line = ''
-      
-      min_for_show_peak_abundances = 0 ! 1d-6 ! output peak value if it is > this
-      max_num_for_show_peak_abundances = 21
-      show_peak_x_and_time = .false. 
+max_step_size = 0
+max_steps = 10000000
 
-      data_filename = 'one_zone_burn.data'
-      
-      save_final_abundances = .true.
-      final_abundances_filename = 'abundances.data'
+data_heading_line = ''
 
-      num_names_of_isos_to_show = -1
-      
-      cache_suffix = '' ! use this only for reactions from rate_tables
+min_for_show_peak_abundances = 0 ! 1d-6 ! output peak value if it is > this
+max_num_for_show_peak_abundances = 21
+show_peak_x_and_time = .false.
 
-      ! reaction rate factors
-         num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
-         reaction_for_special_factor(:) = ''
-         special_rate_factor(:) = 1
-      
-      quiet = .false.
-      show_ye_stuff = .true.
+data_filename = 'one_zone_burn.data'
+
+save_final_abundances = .true.
+final_abundances_filename = 'abundances.data'
+
+num_names_of_isos_to_show = -1
+
+cache_suffix = '' ! use this only for reactions from rate_tables
+
+! reaction rate factors
+num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
+reaction_for_special_factor(:) = ''
+special_rate_factor(:) = 1
+
+quiet = .false.
+show_ye_stuff = .true.
 
 / 

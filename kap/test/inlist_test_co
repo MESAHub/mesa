@@ -1,12 +1,12 @@
 &eos
-  ! use defaults
+! use defaults
 /
 
 &kap
 
-  kap_co_prefix = 'gn93_co'
+kap_co_prefix = 'gn93_co'
 
-  use_Type2_opacities = .true.
-  Zbase = 0.018
-  
+use_Type2_opacities = .true.
+Zbase = 0.018
+
 /

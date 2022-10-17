@@ -1,46 +1,46 @@
 &star_job
 
-  ! begin with a pre-main sequence model
-    create_pre_main_sequence_model = .true.
+! begin with a pre-main sequence model
+create_pre_main_sequence_model = .true.
 
-  ! save a model at the end of the run
-    save_model_when_terminate = .true.
-    save_model_filename = '1.325M_Y1.mod'
-    required_termination_code_string = 'log_center_density_limit'
+! save a model at the end of the run
+save_model_when_terminate = .true.
+save_model_filename = '1.325M_Y1.mod'
+required_termination_code_string = 'log_center_density_limit'
 
-  ! change net
-    change_net = .true.
-    new_net_name = 'wd_aic.net'
+! change net
+change_net = .true.
+new_net_name = 'wd_aic.net'
 
-  ! display on-screen plots
-    pgstar_flag = .false.
+! display on-screen plots
+pgstar_flag = .false.
 
 / !end of star_job namelist
 
 
 
 &kap
-    Zbase = 0d0
+Zbase = 0d0
 / ! end of kap namelist
 
 &controls
 
-  ! starting specifications
-    initial_mass = 1.325 ! in Msun units
-    initial_y = 1d0
-    initial_z = 0d0
+! starting specifications
+initial_mass = 1.325 ! in Msun units
+initial_y = 1d0
+initial_z = 0d0
 
-  ! don't need
-    use_gold_tolerances = .false.
+! don't need
+use_gold_tolerances = .false.
 
-  ! relax timestep
-    varcontrol_target = 1e-3
+! relax timestep
+varcontrol_target = 1e-3
 
-  ! when to stop
-    log_center_density_limit = 3
+! when to stop
+log_center_density_limit = 3
 
-  ! turn off nuclear reactions
-    eps_nuc_factor = 0
-    dxdt_nuc_factor = 0
+! turn off nuclear reactions
+eps_nuc_factor = 0
+dxdt_nuc_factor = 0
 
 / ! end of controls namelist

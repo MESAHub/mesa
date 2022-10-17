@@ -4,5 +4,5 @@ logical :: test_suite_restart_flag
 
 ! testhub information
 integer, parameter :: NUM_TESTHUB_EXTRAS = 10
-character (len=80) :: testhub_extras_names(NUM_TESTHUB_EXTRAS)
+character (len = 80) :: testhub_extras_names(NUM_TESTHUB_EXTRAS)
 real(dp) :: testhub_extras_vals(NUM_TESTHUB_EXTRAS)

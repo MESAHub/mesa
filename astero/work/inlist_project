@@ -10,10 +10,10 @@
 ! all of the other controls that simply have their default values.
 
 &star_job
-  ! see star/defaults/star_job.defaults
+! see star/defaults/star_job.defaults
 
-  ! begin with a pre-main sequence model
-    create_pre_main_sequence_model = .true.
+! begin with a pre-main sequence model
+create_pre_main_sequence_model = .true.
 
 / ! end of star_job namelist
 
@@ -23,21 +23,21 @@
 
 
 &kap
-  ! kap options
-  ! see kap/defaults/kap.defaults
-  use_Type2_opacities = .true.
-  Zbase = 0.02
+! kap options
+! see kap/defaults/kap.defaults
+use_Type2_opacities = .true.
+Zbase = 0.02
 
 / ! end of kap namelist
 
 
 &controls
-  ! see star/defaults/controls.defaults
+! see star/defaults/controls.defaults
 
-  ! options for energy conservation (see MESA V, Section 3)
-    energy_eqn_option = 'dedt'
-    use_gold_tolerances = .true.
+! options for energy conservation (see MESA V, Section 3)
+energy_eqn_option = 'dedt'
+use_gold_tolerances = .true.
 
-    calculate_Brunt_N2 = .true. 
+calculate_Brunt_N2 = .true.
 
 / ! end of controls namelist

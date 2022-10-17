@@ -1,19 +1,19 @@
 &star_job
 
-      show_log_description_at_start = .false. 
-      
-      load_saved_model = .true.
-      load_model_filename = '1.4M_XC_0.5.mod'
-      
-      set_initial_model_number = .true.
-      initial_model_number = 0
+show_log_description_at_start = .false.
 
-      first_model_for_timing = 2
+load_saved_model = .true.
+load_model_filename = '1.4M_XC_0.5.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      !pgstar_flag = .true.
+first_model_for_timing = 2
+
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -23,144 +23,144 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.0142857
+Zbase = 0.0142857
 
-      ! opacities with AGSS09 abundances
-      kap_file_prefix = 'a09'
-      kap_lowT_prefix = 'lowT_fa05_a09p'
-      kap_CO_prefix = 'a09_co'
+! opacities with AGSS09 abundances
+kap_file_prefix = 'a09'
+kap_lowT_prefix = 'lowT_fa05_a09p'
+kap_CO_prefix = 'a09_co'
 
-      use_Type2_opacities = .true.
-      kap_Type2_full_off_X = 1d-3
-      kap_Type2_full_on_X = 1d-6
+use_Type2_opacities = .true.
+kap_Type2_full_off_X = 1d-3
+kap_Type2_full_on_X = 1d-6
 
 / ! end of kap namelist
 
 &controls
 
-      report_ierr = .true.
+report_ierr = .true.
 
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 10
+! limit max_model_number as part of test_suite
+max_model_number = 10
 
-      ! we expect to be stopped by max_model_number before this
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.01
+! we expect to be stopped by max_model_number before this
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 0.01
 
 
-      ! use environment variables for these
-      !op_mono_data_path = ...
-      !op_mono_data_cache_filename = ...
-         
-      high_logT_op_mono_full_off = 6.3d0
-      high_logT_op_mono_full_on = 5.8d0
+! use environment variables for these
+!op_mono_data_path = ...
+!op_mono_data_cache_filename = ...
 
-      use_op_mono_alt_get_kap = .false.
+high_logT_op_mono_full_off = 6.3d0
+high_logT_op_mono_full_on = 5.8d0
 
-      use_Ledoux_criterion = .true.
-      alpha_semiconvection = 0.0d0
-      thermohaline_coeff = 0.0d0
-      
-      mixing_length_alpha = 1.84d0
-      mlt_option = 'Henyey'
-      
-      ! H core overshoot calibrated to M67
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'any'
-      overshoot_zone_loc(1) = 'core'
-      overshoot_bdy_loc(1) = 'top'
-      overshoot_f(1) = 0.016
-      overshoot_f0(1) = 0.008
+use_op_mono_alt_get_kap = .false.
 
-      ! envelope overshoot calibrated to the sun
-      overshoot_scheme(2) = 'exponential'
-      overshoot_zone_type(2) = 'any'
-      overshoot_zone_loc(2) = 'shell'
-      overshoot_bdy_loc(2) = 'any'
-      overshoot_f(2) = 0.0162
-      overshoot_f0(2) = 0.0081
-     
-      ! CO enhanced opacities
-      
-      ! limits based on total integrated power at surface
-      ! for all nuclear reactions excluding photodistintegrations
-      delta_lgL_nuc_limit = 0.025
-      delta_lgL_nuc_hard_limit = 0.1
-      lgL_nuc_burn_min = 1.5
-      
-      ! limit for magnitude of max change
-      delta_lgTeff_limit = 0.005
-      delta_lgTeff_hard_limit = 0.01
-      delta_lgL_limit = 0.02
-      delta_lgL_hard_limit = 0.05
+use_Ledoux_criterion = .true.
+alpha_semiconvection = 0.0d0
+thermohaline_coeff = 0.0d0
 
-      photo_interval = 10
-      profile_interval = 100
-      history_interval = 5
-      terminal_interval = 10 
-      write_header_frequency = 50
+mixing_length_alpha = 1.84d0
+mlt_option = 'Henyey'
+
+! H core overshoot calibrated to M67
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'any'
+overshoot_zone_loc(1) = 'core'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.016
+overshoot_f0(1) = 0.008
+
+! envelope overshoot calibrated to the sun
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'any'
+overshoot_zone_loc(2) = 'shell'
+overshoot_bdy_loc(2) = 'any'
+overshoot_f(2) = 0.0162
+overshoot_f0(2) = 0.0081
+
+! CO enhanced opacities
+
+! limits based on total integrated power at surface
+! for all nuclear reactions excluding photodistintegrations
+delta_lgL_nuc_limit = 0.025
+delta_lgL_nuc_hard_limit = 0.1
+lgL_nuc_burn_min = 1.5
+
+! limit for magnitude of max change
+delta_lgTeff_limit = 0.005
+delta_lgTeff_hard_limit = 0.01
+delta_lgL_limit = 0.02
+delta_lgL_hard_limit = 0.05
+
+photo_interval = 10
+profile_interval = 100
+history_interval = 5
+terminal_interval = 10
+write_header_frequency = 50
 
 / ! end of controls namelist
 
 &pgstar
 
-    pgstar_interval = 1
+pgstar_interval = 1
 
-    Profile_Panels1_win_flag = .true.
+Profile_Panels1_win_flag = .true.
 
-    Profile_Panels1_win_width = 6
-    Profile_Panels1_win_aspect_ratio = 0.75
+Profile_Panels1_win_width = 6
+Profile_Panels1_win_aspect_ratio = 0.75
 
-    Profile_Panels1_xleft = 0.15
-    Profile_Panels1_xright = 0.85
-    Profile_Panels1_ybot = 0.15
-    Profile_Panels1_ytop = 0.85
-    Profile_Panels1_txt_scale = 1.0
-    Profile_Panels1_title = 'Profile Panels1'
+Profile_Panels1_xleft = 0.15
+Profile_Panels1_xright = 0.85
+Profile_Panels1_ybot = 0.15
+Profile_Panels1_ytop = 0.85
+Profile_Panels1_txt_scale = 1.0
+Profile_Panels1_title = 'Profile Panels1'
 
-    Profile_Panels1_xaxis_name = 'logT'
-    Profile_Panels1_xaxis_reversed = .false.
-    Profile_Panels1_xmin = -101d0
-    Profile_Panels1_xmax = -101d0
-    Profile_Panels1_xmargin = 0d0
-    Profile_Panels1_show_mix_regions_on_xaxis = .false.
+Profile_Panels1_xaxis_name = 'logT'
+Profile_Panels1_xaxis_reversed = .false.
+Profile_Panels1_xmin = -101d0
+Profile_Panels1_xmax = -101d0
+Profile_Panels1_xmargin = 0d0
+Profile_Panels1_show_mix_regions_on_xaxis = .false.
 
-    ! Profile_Panels1_yaxis_name(:) = ''
-    ! Profile_Panels1_yaxis_reversed(:) = .false.
-    ! Profile_Panels1_yaxis_log(:) = .false.
-    ! Profile_Panels1_ymin(:) = -101d0
-    ! Profile_Panels1_ymax(:) = -101d0
-    ! Profile_Panels1_ycenter(:) = -101d0
-    ! Profile_Panels1_ymargin(:) = 0.1
-    ! Profile_Panels1_dymin(:) = -1
+! Profile_Panels1_yaxis_name(:) = ''
+! Profile_Panels1_yaxis_reversed(:) = .false.
+! Profile_Panels1_yaxis_log(:) = .false.
+! Profile_Panels1_ymin(:) = -101d0
+! Profile_Panels1_ymax(:) = -101d0
+! Profile_Panels1_ycenter(:) = -101d0
+! Profile_Panels1_ymargin(:) = 0.1
+! Profile_Panels1_dymin(:) = -1
 
-    ! Profile_Panels1_other_yaxis_name(:) = ''
-    ! Profile_Panels1_other_yaxis_reversed(:) = .false.
-    ! Profile_Panels1_other_yaxis_log(:) = .false.
-    ! Profile_Panels1_other_ymin(:) = -101d0
-    ! Profile_Panels1_other_ymax(:) = -101d0
-    ! Profile_Panels1_other_ycenter(:) = -101d0
-    ! Profile_Panels1_other_ymargin(:) = 0.1
-    ! Profile_Panels1_other_dymin(:) = -1
+! Profile_Panels1_other_yaxis_name(:) = ''
+! Profile_Panels1_other_yaxis_reversed(:) = .false.
+! Profile_Panels1_other_yaxis_log(:) = .false.
+! Profile_Panels1_other_ymin(:) = -101d0
+! Profile_Panels1_other_ymax(:) = -101d0
+! Profile_Panels1_other_ycenter(:) = -101d0
+! Profile_Panels1_other_ymargin(:) = 0.1
+! Profile_Panels1_other_dymin(:) = -1
 
-    Profile_Panels1_show_grid = .false.
+Profile_Panels1_show_grid = .false.
 
-    Profile_Panels1_num_panels = 2
-    Profile_Panels1_yaxis_name(1) = 'kap_frac_op_mono'
-    Profile_Panels1_other_yaxis_name(1) = 'log_opacity'
-    Profile_Panels1_yaxis_name(2) = 'dlnkap_dlnd'
-    Profile_Panels1_other_yaxis_name(2) = 'dlnkap_dlnT'
+Profile_Panels1_num_panels = 2
+Profile_Panels1_yaxis_name(1) = 'kap_frac_op_mono'
+Profile_Panels1_other_yaxis_name(1) = 'log_opacity'
+Profile_Panels1_yaxis_name(2) = 'dlnkap_dlnd'
+Profile_Panels1_other_yaxis_name(2) = 'dlnkap_dlnT'
 
-    Profile_Panels1_use_decorator = .false.
+Profile_Panels1_use_decorator = .false.
 
-    Profile_Panels1_file_flag = .false.
-    Profile_Panels1_file_dir = 'png'
-    Profile_Panels1_file_prefix = 'profile_panels1_'
-    Profile_Panels1_file_interval = 5
-    Profile_Panels1_file_width = -1
-    Profile_Panels1_file_aspect_ratio = -1
+Profile_Panels1_file_flag = .false.
+Profile_Panels1_file_dir = 'png'
+Profile_Panels1_file_prefix = 'profile_panels1_'
+Profile_Panels1_file_interval = 5
+Profile_Panels1_file_width = -1
+Profile_Panels1_file_aspect_ratio = -1
 
 
 / ! end of pgstar namelist

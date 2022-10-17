@@ -24,24 +24,24 @@
 ! ***********************************************************************
 
 module utils_nan
-
-  ! Uses
-
-  use utils_nan_sp
-  use utils_nan_dp
-  use utils_nan_qp
-
-  ! No implicit typing
-      
-  implicit none
-
-  ! Access specifiers
-
-  private
-
-  public :: is_nan
-  public :: is_inf
-  public :: is_bad
-  public :: set_nan
+   
+   ! Uses
+   
+   use utils_nan_sp
+   use utils_nan_dp
+   use utils_nan_qp
+   
+   ! No implicit typing
+   
+   implicit none
+   
+   ! Access specifiers
+   
+   private
+   
+   public :: is_nan
+   public :: is_inf
+   public :: is_bad
+   public :: set_nan
 
 end module utils_nan

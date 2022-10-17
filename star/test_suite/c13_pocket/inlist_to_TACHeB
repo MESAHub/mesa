@@ -1,24 +1,24 @@
 &star_job
 
 ! begin with saved pre-main sequence model
-      load_saved_model = .true.
-      load_model_filename = '2M_pre_ms.mod'
+load_saved_model = .true.
+load_model_filename = '2M_pre_ms.mod'
 
 ! save a model at the end of the run
-      save_model_when_terminate = .true.
-      save_model_filename = '2M_TACHeB.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = '2M_TACHeB.mod'
+required_termination_code_string = 'xa_central_lower_limit'
 
 ! start counters
-      set_initial_age = .true.
-      initial_age = 0
-      set_initial_model_number = .true.
-      initial_model_number = 0
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_age = .true.
+initial_age = 0
+set_initial_model_number = .true.
+initial_model_number = 0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
 ! display on-screen plots
-      pgstar_flag = .false.
+pgstar_flag = .false.
 
 / !end of star_job namelist
 
@@ -33,15 +33,15 @@
 &controls
 
 ! overshooting
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'any'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'any'
-      overshoot_f(1) = 0.014
-      overshoot_f0(1) = 0.004
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'any'
+overshoot_zone_loc(1) = 'any'
+overshoot_bdy_loc(1) = 'any'
+overshoot_f(1) = 0.014
+overshoot_f0(1) = 0.004
 
 ! stopping criterion
-      xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 1d-4
+xa_central_lower_limit_species(1) = 'he4'
+xa_central_lower_limit(1) = 1d-4
 
 / ! end of controls namelist

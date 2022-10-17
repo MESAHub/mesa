@@ -1,91 +1,86 @@
-
 &one_zone
 
-      !show_net_reactions_info = .true.
-      !show_Qs = .true.
-      
-      mesa_dir = '../..'   	
-      net_name = 'mesa_78.net'
+!show_net_reactions_info = .true.
+!show_Qs = .true.
 
-   	burn_temp             = 9.6d9 ! 10e9 ! 
-   	burn_rho              = 6.0d9 ! 10d9 !
-   	burn_tend             = 1d6 ! 50 ! 1d-1 ! seconds 
+mesa_dir = '../..'
+net_name = 'mesa_78.net'
 
+burn_temp = 9.6d9 ! 10e9 !
+burn_rho = 6.0d9 ! 10d9 !
+burn_tend = 1d6 ! 50 ! 1d-1 ! seconds
 
-      num_isos_for_Xinit = 1
-      names_of_isos_for_Xinit(1) = 'si28'
-      values_for_Xinit(1) = 1d0
+num_isos_for_Xinit = 1
+names_of_isos_for_Xinit(1) = 'si28'
+values_for_Xinit(1) = 1d0
 
-   	
-   	max_step_size = 0
-      max_steps     = 10000000        
+max_step_size = 0
+max_steps = 10000000
 
-   	
-   	data_heading_line = ''
-      
-      min_for_show_peak_abundances = 1d-5 ! output peak value if it is > this
-      show_peak_x_and_time = .false.
+data_heading_line = ''
 
-      data_filename = 'one_zone_burn.data'
-      !data_output_min_t = 1d-6
-      
-      save_final_abundances = .true.
-      final_abundances_filename = 'abundances.data'
-      
-      !read_initial_abundances = .true.
-      !initial_abundances_filename = 'x_at_1_second.data'
-      
-      !uniform_Xinit = .true. ! for debugging
+min_for_show_peak_abundances = 1d-5 ! output peak value if it is > this
+show_peak_x_and_time = .false.
 
-      num_names_of_isos_to_show = -1
+data_filename = 'one_zone_burn.data'
+!data_output_min_t = 1d-6
 
-      decsol_switch = 500
-         ! if current number of species <= switch,
-            ! then use small_mtx_decsol,
-            ! else use large_mtx_decsol.
-      small_mtx_decsol = 'lapack'
-      large_mtx_decsol = 'bcyclic_dble'
-      
-      cache_suffix = '' ! use this only for reactions from rate_tables
+save_final_abundances = .true.
+final_abundances_filename = 'abundances.data'
 
-      ! reaction category rate factors
-         net_pp_rate_factor = 1
-         net_cno_rate_factor = 1
-         net_3alf_rate_factor = 1
-         net_burn_c_rate_factor = 1
-         net_burn_n_rate_factor = 1      
-         net_burn_o_rate_factor = 1
-         net_burn_ne_rate_factor = 1
-         net_burn_na_rate_factor = 1
-         net_burn_mg_rate_factor = 1
-         net_burn_si_rate_factor = 1
-         net_burn_s_rate_factor = 1
-         net_burn_ar_rate_factor = 1
-         net_burn_ca_rate_factor = 1
-         net_burn_ti_rate_factor = 1
-         net_burn_cr_rate_factor = 1
-         net_burn_fe_rate_factor = 1
-         net_cc_rate_factor = 1
-         net_co_rate_factor = 1
-         net_oo_rate_factor = 1
-         net_pnhe4_rate_factor = 1
-         net_photo_rate_factor = 1
-         net_other_rate_factor = 1
-         
-      ! reaction rate factors
-         num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
-         reaction_for_special_factor(:) = ''
-         special_rate_factor(:) = 1
-         ! e.g.
-            !num_special_rate_factors = 1
-            !reaction_for_special_factor(:) = 'r_c12_ag_o16'
-            !special_rate_factor(1) = 1.1
+!read_initial_abundances = .true.
+!initial_abundances_filename = 'x_at_1_second.data'
 
-	          
-      turn_on_T_limits = .false.
-      turn_off_T_limits = .true.
-      
-      !trace = .true.
-      quiet = .true.
+!uniform_Xinit = .true. ! for debugging
+
+num_names_of_isos_to_show = -1
+
+decsol_switch = 500
+! if current number of species <= switch,
+! then use small_mtx_decsol,
+! else use large_mtx_decsol.
+small_mtx_decsol = 'lapack'
+large_mtx_decsol = 'bcyclic_dble'
+
+cache_suffix = '' ! use this only for reactions from rate_tables
+
+! reaction category rate factors
+net_pp_rate_factor = 1
+net_cno_rate_factor = 1
+net_3alf_rate_factor = 1
+net_burn_c_rate_factor = 1
+net_burn_n_rate_factor = 1
+net_burn_o_rate_factor = 1
+net_burn_ne_rate_factor = 1
+net_burn_na_rate_factor = 1
+net_burn_mg_rate_factor = 1
+net_burn_si_rate_factor = 1
+net_burn_s_rate_factor = 1
+net_burn_ar_rate_factor = 1
+net_burn_ca_rate_factor = 1
+net_burn_ti_rate_factor = 1
+net_burn_cr_rate_factor = 1
+net_burn_fe_rate_factor = 1
+net_cc_rate_factor = 1
+net_co_rate_factor = 1
+net_oo_rate_factor = 1
+net_pnhe4_rate_factor = 1
+net_photo_rate_factor = 1
+net_other_rate_factor = 1
+
+! reaction rate factors
+num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
+reaction_for_special_factor(:) = ''
+special_rate_factor(:) = 1
+! e.g.
+!num_special_rate_factors = 1
+!reaction_for_special_factor(:) = 'r_c12_ag_o16'
+!special_rate_factor(1) = 1.1
+
+turn_on_T_limits = .false.
+turn_off_T_limits = .true.
+
+!trace = .true.
+quiet = .true.
 
 / 

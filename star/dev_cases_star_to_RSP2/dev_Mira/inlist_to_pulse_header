@@ -1,39 +1,38 @@
-
 &star_job
-   read_extra_star_job_inlist1 = .true.
-   extra_star_job_inlist1_name = '../shared/inlist_to_pulse_header'
-   read_extra_star_job_inlist2 = .true.
-   extra_star_job_inlist2_name = 'inlist_to_pulse'
+read_extra_star_job_inlist1 = .true.
+extra_star_job_inlist1_name = '../shared/inlist_to_pulse_header'
+read_extra_star_job_inlist2 = .true.
+extra_star_job_inlist2_name = 'inlist_to_pulse'
 / ! end of star_job namelist
 
 
 &eos
-   read_extra_eos_inlist1 = .true.
-   extra_eos_inlist1_name = '../shared/inlist_to_pulse_header'
-   read_extra_eos_inlist2 = .true.
-   extra_eos_inlist2_name = 'inlist_to_pulse'
+read_extra_eos_inlist1 = .true.
+extra_eos_inlist1_name = '../shared/inlist_to_pulse_header'
+read_extra_eos_inlist2 = .true.
+extra_eos_inlist2_name = 'inlist_to_pulse'
 / ! end of eos namelist
 
 
 &kap
-   read_extra_kap_inlist1 = .true.
-   extra_kap_inlist1_name = '../shared/inlist_to_pulse_header'
-   read_extra_kap_inlist2 = .true.
-   extra_kap_inlist2_name = 'inlist_to_pulse'
+read_extra_kap_inlist1 = .true.
+extra_kap_inlist1_name = '../shared/inlist_to_pulse_header'
+read_extra_kap_inlist2 = .true.
+extra_kap_inlist2_name = 'inlist_to_pulse'
 / ! end of kap namelist
 
 
 &controls
-   read_extra_controls_inlist1 = .true.
-   extra_controls_inlist1_name = '../shared/inlist_to_pulse_header'
-   read_extra_controls_inlist2 = .true.
-   extra_controls_inlist2_name = 'inlist_to_pulse'
+read_extra_controls_inlist1 = .true.
+extra_controls_inlist1_name = '../shared/inlist_to_pulse_header'
+read_extra_controls_inlist2 = .true.
+extra_controls_inlist2_name = 'inlist_to_pulse'
 / ! end of controls namelist
 
 
 &pgstar
-   read_extra_pgstar_inlist1 = .true.
-   extra_pgstar_inlist1_name = '../shared/inlist_to_pulse_header'
-   read_extra_pgstar_inlist2 = .true.
-   extra_pgstar_inlist2_name = 'inlist_to_pulse'
+read_extra_pgstar_inlist1 = .true.
+extra_pgstar_inlist1_name = '../shared/inlist_to_pulse_header'
+read_extra_pgstar_inlist2 = .true.
+extra_pgstar_inlist2_name = 'inlist_to_pulse'
 / ! end of pgstar namelist

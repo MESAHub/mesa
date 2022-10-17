@@ -1,17 +1,17 @@
 &pgstar
 
-  ! show temperature/density profile
-  ! this plots the internal structure at single timestep
-    TRho_Profile_win_flag = .true.
+! show temperature/density profile
+! this plots the internal structure at single timestep
+TRho_Profile_win_flag = .true.
 
-  ! add legend explaining colors
-    show_TRho_Profile_legend = .true.
+! add legend explaining colors
+show_TRho_Profile_legend = .true.
 
-  ! display numerical info about the star
-    show_TRho_Profile_text_info = .true.
+! display numerical info about the star
+show_TRho_Profile_text_info = .true.
 
-  ! set window size (aspect_ratio = height/width)
-    TRho_Profile_win_width = 8
-    TRho_Profile_win_aspect_ratio = 0.75
+! set window size (aspect_ratio = height/width)
+TRho_Profile_win_width = 8
+TRho_Profile_win_aspect_ratio = 0.75
 
 / ! end of pgstar namelist

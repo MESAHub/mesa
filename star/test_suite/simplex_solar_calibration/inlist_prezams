@@ -1,17 +1,17 @@
 &star_job
 
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      create_pre_main_sequence_model = .true.
-      pre_ms_relax_to_start_radiative_core = .true.
-      pre_ms_relax_num_steps = 100
-      
-      save_model_when_terminate = .true.
-      save_model_filename = 'late_pre_zams_1.0M.mod'
+create_pre_main_sequence_model = .true.
+pre_ms_relax_to_start_radiative_core = .true.
+pre_ms_relax_num_steps = 100
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
-      
+save_model_when_terminate = .true.
+save_model_filename = 'late_pre_zams_1.0M.mod'
+
+set_initial_model_number = .true.
+initial_model_number = 0
+
 
 / ! end of star_job namelist
 
@@ -21,36 +21,36 @@
 
 
 &kap
-      use_Type2_opacities = .false.
-      kap_file_prefix = 'OP_gs98'
-      kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
+use_Type2_opacities = .false.
+kap_file_prefix = 'OP_gs98'
+kap_lowT_prefix = 'lowT_fa05_gs98' ! for lower temperatures.
 / ! end of kap namelist
 
 &controls
 
-      initial_mass = 1d0
-      initial_Z = 0.02
-      
-      max_age = 1d6
+initial_mass = 1d0
+initial_Z = 0.02
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1200
+max_age = 1d6
 
-      max_years_for_timestep = 1d6           
-      varcontrol_target = 1d-3
+! limit max_model_number as part of test_suite
+max_model_number = 1200
 
-      ! mesh adjustment
-      mesh_delta_coeff = 2.0
-      
-      ! solver
-      mlt_Pturb_factor = 1
-      MLT_option = 'TDC'
-      steps_before_use_TDC = 10      
+max_years_for_timestep = 1d6
+varcontrol_target = 1d-3
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
+! mesh adjustment
+mesh_delta_coeff = 2.0
+
+! solver
+mlt_Pturb_factor = 1
+MLT_option = 'TDC'
+steps_before_use_TDC = 10
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
 
 / ! end of controls namelist
 

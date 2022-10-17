@@ -1,7 +1,6 @@
-
 &astero_search_controls
 
-   oscillation_code = 'gyre'
+oscillation_code = 'gyre'
 
 / ! end astero_search_controls
 

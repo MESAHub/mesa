@@ -1,5 +1,5 @@
 &controls
 
-      use_op_mono_alt_get_kap = .true.
+use_op_mono_alt_get_kap = .true.
 
 / ! end of controls namelist

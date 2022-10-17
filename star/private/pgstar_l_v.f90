@@ -23,77 +23,77 @@
 !
 ! ***********************************************************************
 
-      module pgstar_l_v
-
-      use star_private_def
-      use const_def
-      use pgstar_support
-      use star_pgstar
-
-      implicit none
-
-
-      contains
+module pgstar_l_v
+   
+   use star_private_def
+   use const_def
+   use pgstar_support
+   use star_pgstar
+   
+   implicit none
 
 
-      subroutine L_v_Plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
+contains
+   
+   
+   subroutine L_v_Plot(id, device_id, ierr)
+      integer, intent(in) :: id, device_id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call get_star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      
+      call pgslct(device_id)
+      call pgbbuf()
+      call pgeras()
+      
+      call do_L_v_Plot(s, id, device_id, &
+         s% pg% L_v_xleft, s% pg% L_v_xright, &
+         s% pg% L_v_ybot, s% pg% L_v_ytop, .false., &
+         s% pg% L_v_title, s% pg% L_v_txt_scale, ierr)
+      if (ierr /= 0) return
+      
+      call pgebuf()
+   
+   end subroutine L_v_Plot
+   
+   
+   subroutine do_L_v_Plot(s, id, device_id, &
+      xleft, xright, ybot, ytop, subplot, &
+      title, txt_scale, ierr)
+      use pgstar_hist_track, only : null_decorate, do_Hist_Track
+      type (star_info), pointer :: s
+      integer, intent(in) :: id, device_id
+      real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
+      logical, intent(in) :: subplot
+      character (len = *), intent(in) :: title
+      integer, intent(out) :: ierr
+      logical, parameter :: &
+         reverse_xaxis = .false., reverse_yaxis = .false.
+      ierr = 0
+      call do_Hist_Track(s, id, device_id, &
+         xleft, xright, ybot, ytop, subplot, title, txt_scale, &
+         'v_surf_km_s', 'luminosity', &
+         'v km/s', 'L/L\d\(2281)', &
+         s% pg% L_v_v_min, s% pg% L_v_v_max, &
+         s% pg% L_v_v_margin, s% pg% L_v_dv_min, &
+         s% pg% L_v_L_min, s% pg% L_v_L_max, &
+         s% pg% L_v_L_margin, s% pg% L_v_dL_min, &
+         s% pg% L_v_step_min, s% pg% L_v_step_max, &
+         reverse_xaxis, reverse_yaxis, .false., .false., &
+         s% pg% show_L_v_target_box, s% pg% L_v_target_n_sigma, &
+         s% pg% L_v_target_v, s% pg% L_v_target_L, &
+         s% pg% L_v_target_v_sigma, s% pg% L_v_target_L_sigma, &
+         s% pg% show_L_v_annotation1, &
+         s% pg% show_L_v_annotation2, &
+         s% pg% show_L_v_annotation3, &
+         s% pg% L_v_fname, &
+         s% pg% L_v_use_decorator, &
+         s% pg% L_v_pgstar_decorator, &
+         null_decorate, ierr)
+   end subroutine do_L_v_Plot
 
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
 
-         call do_L_v_Plot(s, id, device_id, &
-            s% pg% L_v_xleft, s% pg% L_v_xright, &
-            s% pg% L_v_ybot, s% pg% L_v_ytop, .false., &
-            s% pg% L_v_title, s% pg% L_v_txt_scale, ierr)
-         if (ierr /= 0) return
-
-         call pgebuf()
-
-      end subroutine L_v_Plot
-
-
-      subroutine do_L_v_Plot(s, id, device_id, &
-            xleft, xright, ybot, ytop, subplot, &
-            title, txt_scale, ierr)
-         use pgstar_hist_track, only: null_decorate, do_Hist_Track
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         logical, parameter :: &
-            reverse_xaxis = .false., reverse_yaxis = .false.
-         ierr = 0
-         call do_Hist_Track(s, id, device_id, &
-            xleft, xright, ybot, ytop, subplot, title, txt_scale, &
-            'v_surf_km_s', 'luminosity', &
-            'v km/s', 'L/L\d\(2281)', &
-            s% pg% L_v_v_min, s% pg% L_v_v_max, &
-            s% pg% L_v_v_margin, s% pg% L_v_dv_min, &
-            s% pg% L_v_L_min, s% pg% L_v_L_max, &
-            s% pg% L_v_L_margin, s% pg% L_v_dL_min, &
-            s% pg% L_v_step_min, s% pg% L_v_step_max, &
-            reverse_xaxis, reverse_yaxis, .false., .false., &
-            s% pg% show_L_v_target_box, s% pg% L_v_target_n_sigma, &
-            s% pg% L_v_target_v, s% pg% L_v_target_L, &
-            s% pg% L_v_target_v_sigma, s% pg% L_v_target_L_sigma, &
-            s% pg% show_L_v_annotation1, &
-            s% pg% show_L_v_annotation2, &
-            s% pg% show_L_v_annotation3, &
-            s% pg% L_v_fname, &
-            s% pg% L_v_use_decorator, &
-            s% pg% L_v_pgstar_decorator, &
-            null_decorate, ierr)
-      end subroutine do_L_v_Plot
-
-
-      end module pgstar_l_v
+end module pgstar_l_v
 

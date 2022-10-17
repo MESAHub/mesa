@@ -22,47 +22,46 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_mlt_results
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_mlt_results = .true.
-      ! procedure pointer: s% other_mlt_results => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine null_other_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
-            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            alpha_semiconvection, thermohaline_coeff, &
-            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
-         use const_def, only: dp
-         use auto_diff
-         integer, intent(in) :: id
-         integer, intent(in) :: k
-         character (len=*), intent(in) :: MLT_option
-         type(auto_diff_real_star_order1), intent(in) :: &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
-         integer, intent(in) :: iso
-         real(dp), intent(in) :: &
-            XH1, cgrav, m, gradL_composition_term, &
-            mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
-         integer, intent(out) :: mixing_type
-         type(auto_diff_real_star_order1), intent(out) :: &
-            gradT, Y_face, conv_vel, D, Gamma
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_other_mlt_results
+module other_mlt_results
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_mlt_results = .true.
+   ! procedure pointer: s% other_mlt_results => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_mlt_results
+contains
+   
+   
+   subroutine null_other_mlt_results(id, k, MLT_option, &  ! NOTE: k=0 is a valid arg
+      r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
+      iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+      alpha_semiconvection, thermohaline_coeff, &
+      mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+      use const_def, only : dp
+      use auto_diff
+      integer, intent(in) :: id
+      integer, intent(in) :: k
+      character (len = *), intent(in) :: MLT_option
+      type(auto_diff_real_star_order1), intent(in) :: &
+         r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height
+      integer, intent(in) :: iso
+      real(dp), intent(in) :: &
+         XH1, cgrav, m, gradL_composition_term, &
+         mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
+      integer, intent(out) :: mixing_type
+      type(auto_diff_real_star_order1), intent(out) :: &
+         gradT, Y_face, conv_vel, D, Gamma
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine null_other_mlt_results
+
+
+end module other_mlt_results
       
       
       

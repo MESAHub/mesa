@@ -23,35 +23,34 @@
 !
 ! ***********************************************************************
 
-      module utils_openmp
-      
-      implicit none
-      
+module utils_openmp
+   
+   implicit none
+   
+   integer :: omp_max_threads = -1
 
-      integer :: omp_max_threads = -1
+
+contains
+   
+   
+   integer function eval_OMP_GET_THREAD_NUM()
+      use omp_lib, only : OMP_GET_THREAD_NUM
+      eval_OMP_GET_THREAD_NUM = OMP_GET_THREAD_NUM()
+   end function eval_OMP_GET_THREAD_NUM
+   
+   integer function eval_OMP_GET_MAX_THREADS()
+      use omp_lib, only : OMP_GET_MAX_THREADS
+      if (omp_max_threads < 0) &
+         omp_max_threads = OMP_GET_MAX_THREADS()
+      eval_OMP_GET_MAX_THREADS = omp_max_threads
+   end function eval_OMP_GET_MAX_THREADS
+   
+   subroutine eval_OMP_SET_NUM_THREADS(threads)
+      use omp_lib, only : OMP_SET_NUM_THREADS
+      integer, intent(in) :: threads
+      call OMP_SET_NUM_THREADS(threads)
+   end subroutine eval_OMP_SET_NUM_THREADS
 
 
-      contains
-      
-
-      integer function eval_OMP_GET_THREAD_NUM()
-         use omp_lib, only: OMP_GET_THREAD_NUM
-         eval_OMP_GET_THREAD_NUM = OMP_GET_THREAD_NUM()
-      end function eval_OMP_GET_THREAD_NUM
-      
-      integer function eval_OMP_GET_MAX_THREADS()
-         use omp_lib, only: OMP_GET_MAX_THREADS
-         if (omp_max_threads < 0) &
-            omp_max_threads = OMP_GET_MAX_THREADS()
-         eval_OMP_GET_MAX_THREADS = omp_max_threads
-      end function eval_OMP_GET_MAX_THREADS
-      
-      subroutine eval_OMP_SET_NUM_THREADS(threads)
-         use omp_lib, only: OMP_SET_NUM_THREADS
-         integer, intent(in) :: threads
-         call OMP_SET_NUM_THREADS(threads)
-      end subroutine eval_OMP_SET_NUM_THREADS      
-        
-      
-      end module utils_openmp
+end module utils_openmp
 

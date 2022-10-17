@@ -1,20 +1,19 @@
 &eos
-  ! use defaults
+! use defaults
 /
 
 &kap
 
-  kap_file_prefix = 'a09'
-  kap_co_prefix = 'a09_co'
-  kap_lowT_prefix = 'AESOPUS'
-  AESOPUS_filename = 'AESOPUS_AGSS09.h5'
+kap_file_prefix = 'a09'
+kap_co_prefix = 'a09_co'
+kap_lowT_prefix = 'AESOPUS'
+AESOPUS_filename = 'AESOPUS_AGSS09.h5'
 
-
-  cubic_interpolation_in_X =  .false.
-  cubic_interpolation_in_Z =  .false.
-  include_electron_conduction =  .true.
-  use_Zbase_for_Type1 =  .true.
-  use_Type2_opacities =  .true.
-  Zbase = 0.014d0
+cubic_interpolation_in_X = .false.
+cubic_interpolation_in_Z = .false.
+include_electron_conduction = .true.
+use_Zbase_for_Type1 = .true.
+use_Type2_opacities = .true.
+Zbase = 0.014d0
 
 /

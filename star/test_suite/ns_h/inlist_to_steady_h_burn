@@ -3,123 +3,123 @@
 &star_job
 
 
-      show_log_description_at_start = .false. 
-      
-      load_saved_model = .true.
-      load_model_filename = 'ns_plus_he_layer.mod'
-      
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'max_age'
-      
-      !change_initial_v_flag = .true.
-      !new_v_flag = .true.
+show_log_description_at_start = .false.
 
-      set_tau_factor = .true.
-      set_to_this_tau_factor = 100
+load_saved_model = .true.
+load_model_filename = 'ns_plus_he_layer.mod'
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
-   
-      set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-4
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'max_age'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+!change_initial_v_flag = .true.
+!new_v_flag = .true.
 
-      set_initial_age = .true.
-      initial_age = 0
+set_tau_factor = .true.
+set_to_this_tau_factor = 100
 
-      !pgstar_flag = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+set_initial_dt = .true.
+seconds_for_initial_dt = 1d-4
+
+set_initial_model_number = .true.
+initial_model_number = 0
+
+set_initial_age = .true.
+initial_age = 0
+
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
-   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
+logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
+logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
 / ! end of eos namelist
 
 &kap
-   Zbase = 0.02d0
-   kap_file_prefix = 'gs98'
-   use_Type2_opacities = .true.
+Zbase = 0.02d0
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
 
-      use_other_cgrav = .true. ! for GR factor with gravity
-           
-      mass_change = 5d-11 ! this gives steady h burn
-      max_years_for_timestep = 1d-3
-      !max_timestep = 1d-1
-      max_age_in_seconds = 2d5 ! long enough to reach steady h burn
+use_other_cgrav = .true. ! for GR factor with gravity
 
-      use_gold2_tolerances = .false.
-      use_gold_tolerances = .false.
+mass_change = 5d-11 ! this gives steady h burn
+max_years_for_timestep = 1d-3
+!max_timestep = 1d-1
+max_age_in_seconds = 2d5 ! long enough to reach steady h burn
 
-      max_number_retries = 200
-      max_model_number = 2000
-         
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      
-      delta_lgL_nuc_limit = 0.01
-      delta_lgL_nuc_hard_limit = 0.05
-      lgL_nuc_burn_min = -2d0
+use_gold2_tolerances = .false.
+use_gold_tolerances = .false.
 
-      accrete_same_as_surface = .false. 
-      accrete_given_mass_fractions = .false. 
-      accretion_h1 = 0.72
-      accretion_h2 = 0
-      accretion_he3 = 0
-      accretion_he4 = 0.26
-      accretion_zfracs = 3
-      
-      energy_eqn_option = 'eps_grav'
+max_number_retries = 200
+max_model_number = 2000
 
-      max_abar_for_burning = 55
-      
-      initial_z = 0.02d0
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      mixing_length_alpha = 1.5
-      MLT_option = 'TDC'
+delta_lgL_nuc_limit = 0.01
+delta_lgL_nuc_hard_limit = 0.05
+lgL_nuc_burn_min = -2d0
 
-      use_Ledoux_criterion = .false.  
-      alpha_semiconvection = 0.1
-      thermohaline_coeff = 2
-      thermohaline_option = 'Kippenhahn'
-   
-      merge_if_dlnR_too_small = .true.
-      mesh_min_dlnR = 1d-9
+accrete_same_as_surface = .false.
+accrete_given_mass_fractions = .false.
+accretion_h1 = 0.72
+accretion_h2 = 0
+accretion_he3 = 0
+accretion_he4 = 0.26
+accretion_zfracs = 3
 
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
-      Pextra_factor = 2
-   
-      varcontrol_target = 1d-3 
-      
-      !mesh_delta_coeff = 0.5
+energy_eqn_option = 'eps_grav'
 
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
-      warning_limit_for_max_residual = 1d99
+max_abar_for_burning = 55
 
-      terminal_show_age_units = 'seconds'
+initial_z = 0.02d0
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 20
-      terminal_interval = 10
-      write_header_frequency = 10
+mixing_length_alpha = 1.5
+MLT_option = 'TDC'
+
+use_Ledoux_criterion = .false.
+alpha_semiconvection = 0.1
+thermohaline_coeff = 2
+thermohaline_option = 'Kippenhahn'
+
+merge_if_dlnR_too_small = .true.
+mesh_min_dlnR = 1d-9
+
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'fixed'
+Pextra_factor = 2
+
+varcontrol_target = 1d-3
+
+!mesh_delta_coeff = 0.5
+
+limit_for_rel_error_in_energy_conservation = 1d-4
+hard_limit_for_rel_error_in_energy_conservation = 1d-3
+warning_limit_for_max_residual = 1d99
+
+terminal_show_age_units = 'seconds'
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 20
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 
 &pgstar
-         
+
 !pause = .true.
 
 Grid2_win_flag = .true.

@@ -1,26 +1,26 @@
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'initialized.mod' 
-   
-      change_initial_RSP2_flag = .true.
-      new_RSP2_flag = .true.
+load_saved_model = .true.
+load_model_filename = 'initialized.mod'
 
-      !save_model_when_terminate = .true.
-      !save_model_filename = 'final.mod'
-      !required_termination_code_string = 'v_div_csound_surf_limit'
+change_initial_RSP2_flag = .true.
+new_RSP2_flag = .true.
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+!save_model_when_terminate = .true.
+!save_model_filename = 'final.mod'
+!required_termination_code_string = 'v_div_csound_surf_limit'
 
-      set_initial_number_retries = .true.
-      initial_number_retries = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_number_retries = .true.
+initial_number_retries = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_age = .true.
+initial_age = 0
+
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
 / ! end of star_job namelist
 
@@ -32,18 +32,18 @@
 
 &controls
 
-   max_model_number = 50000000
-   
-! output controls
-   terminal_show_age_units = 'days'
-   terminal_show_timestep_units = 'secs'
-   terminal_show_log_dt = .false.
-   terminal_show_log_age = .false.
+max_model_number = 50000000
 
-   photo_interval = 4000
-   profile_interval = 4000
-   history_interval = 30
-   terminal_interval = 1000
+! output controls
+terminal_show_age_units = 'days'
+terminal_show_timestep_units = 'secs'
+terminal_show_log_dt = .false.
+terminal_show_log_age = .false.
+
+photo_interval = 4000
+profile_interval = 4000
+history_interval = 30
+terminal_interval = 1000
 
 / ! end of controls namelist
 

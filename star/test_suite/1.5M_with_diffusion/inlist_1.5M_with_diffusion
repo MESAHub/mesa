@@ -1,31 +1,30 @@
-
 ! inlist_1.5M_with_diffusion
 
 
 &star_job
-      
-      show_log_description_at_start = .false. 
 
-      load_saved_model = .true.
-      load_model_filename = '1.5_zams.mod'
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+load_saved_model = .true.
+load_model_filename = '1.5_zams.mod'
 
-      set_initial_age = .true.
-      initial_age = 0
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'xa_central_lower_limit'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_age = .true.
+initial_age = 0
 
-      history_columns_file = 'history_columns.list' 
-      profile_columns_file = 'profile_columns.list' 
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+history_columns_file = 'history_columns.list'
+profile_columns_file = 'profile_columns.list'
 
-      !pgstar_flag = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+!pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -40,127 +39,126 @@
 
 
 &kap
-      Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
-   
-   ! IMPORTANT NOTE: if you use these files for non-testing purposes, note
-   ! that some timestep and resolution controls are adjusted to make the test
-   ! faster at the cost of converged results. For each of these, recommended
-   ! values are commented out. Use with caution.
-   ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-      energy_eqn_option = 'dedt'
-      convergence_ignore_equL_residuals = .true.
-            
-      limit_for_rel_error_in_energy_conservation = -1
-      hard_limit_for_rel_error_in_energy_conservation = -1
-      max_abs_rel_run_E_err = 1d99
-      warn_when_large_rel_run_E_err = 1d0
+! IMPORTANT NOTE: if you use these files for non-testing purposes, note
+! that some timestep and resolution controls are adjusted to make the test
+! faster at the cost of converged results. For each of these, recommended
+! values are commented out. Use with caution.
+! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+energy_eqn_option = 'dedt'
+convergence_ignore_equL_residuals = .true.
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1000
+limit_for_rel_error_in_energy_conservation = -1
+hard_limit_for_rel_error_in_energy_conservation = -1
+max_abs_rel_run_E_err = 1d99
+warn_when_large_rel_run_E_err = 1d0
 
-      initial_mass = 1.5
-      initial_z = 0.02
-   	
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+
+! limit max_model_number as part of test_suite
+max_model_number = 1000
+
+initial_mass = 1.5
+initial_z = 0.02
+
 ! when to stop      
 
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.01
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 0.01
 
-      max_age = 2d10 
-      
-      use_Ledoux_criterion = .true.
-      !alpha_semiconvection = 1d-1
-      !semiconvection_option = 'Langer_85'
+max_age = 2d10
 
-      mixing_length_alpha = 1.8d0
-      MLT_option = 'Henyey'
+use_Ledoux_criterion = .true.
+!alpha_semiconvection = 1d-1
+!semiconvection_option = 'Langer_85'
+
+mixing_length_alpha = 1.8d0
+MLT_option = 'Henyey'
+
+predictive_mix(1) = .true.
+predictive_zone_type(1) = 'any'
+predictive_zone_loc(1) = 'core'
+predictive_bdy_loc(1) = 'any'
+predictive_superad_thresh(1) = 0.005
+
+predictive_mix(2) = .true.
+predictive_zone_type(2) = 'any'
+predictive_zone_loc(2) = 'surf'
+predictive_bdy_loc(2) = 'any'
+predictive_superad_thresh(2) = 0.005
+
+num_cells_for_smooth_gradL_composition_term = 10
+threshold_for_smooth_gradL_composition_term = 0.02
+num_cells_for_smooth_brunt_B = 10
+threshold_for_smooth_brunt_B = 0.1
+
+!show_diffusion_info = .true. ! terminal output for diffusion
+!show_diffusion_substep_info = .true. ! terminal output for diffusion
+
+do_element_diffusion = .true. ! determines whether or not we do diffusion
+diffusion_dt_limit = 3.15d7 ! no element diffusion if dt < this limit (in seconds)
+
+diffusion_T_full_on = 1d3
+diffusion_T_full_off = 1d3
+
+D_mix_ignore_diffusion = 1d2 ! turn off diffusion in any region with D_mix greater than this
+
+diffusion_calculates_ionization = .true.
+
+diffusion_num_classes = 8 ! number of classes of species for diffusion calculations
+diffusion_class_representative(1) = 'h1'
+diffusion_class_representative(2) = 'he3'
+diffusion_class_representative(3) = 'he4'
+diffusion_class_representative(4) = 'c12'
+diffusion_class_representative(5) = 'n14'
+diffusion_class_representative(6) = 'o16'
+diffusion_class_representative(7) = 'ne20'
+diffusion_class_representative(8) = 'mg24'
+
+! in ascending order.  species goes into 1st class with A_max >= species A
+diffusion_class_A_max(1) = 2
+diffusion_class_A_max(2) = 3
+diffusion_class_A_max(3) = 4
+diffusion_class_A_max(4) = 12
+diffusion_class_A_max(5) = 14
+diffusion_class_A_max(6) = 16
+diffusion_class_A_max(7) = 20
+diffusion_class_A_max(8) = 10000
+
+diffusion_use_isolve = .true.
+diffusion_rtol_for_isolve = 1d-4
+diffusion_atol_for_isolve = 1d-5
+diffusion_maxsteps_for_isolve = 1000
+diffusion_isolve_solver = 'ros2_solver'
 
 
-      predictive_mix(1) = .true.
-      predictive_zone_type(1) = 'any'
-      predictive_zone_loc(1) = 'core'
-      predictive_bdy_loc(1) = 'any'
-      predictive_superad_thresh(1) = 0.005
-
-      predictive_mix(2) = .true.
-      predictive_zone_type(2) = 'any'
-      predictive_zone_loc(2) = 'surf'
-      predictive_bdy_loc(2) = 'any'
-      predictive_superad_thresh(2) = 0.005
-
-      num_cells_for_smooth_gradL_composition_term = 10
-      threshold_for_smooth_gradL_composition_term = 0.02
-      num_cells_for_smooth_brunt_B = 10
-      threshold_for_smooth_brunt_B = 0.1
-     
-      !show_diffusion_info = .true. ! terminal output for diffusion
-      !show_diffusion_substep_info = .true. ! terminal output for diffusion
-      
-      do_element_diffusion = .true. ! determines whether or not we do diffusion
-      diffusion_dt_limit = 3.15d7 ! no element diffusion if dt < this limit (in seconds)
-      
-      diffusion_T_full_on = 1d3
-      diffusion_T_full_off = 1d3
-
-      D_mix_ignore_diffusion = 1d2 ! turn off diffusion in any region with D_mix greater than this
-      
-      diffusion_calculates_ionization = .true.
-      
-      diffusion_num_classes = 8 ! number of classes of species for diffusion calculations
-      diffusion_class_representative(1) = 'h1'
-      diffusion_class_representative(2) = 'he3'
-      diffusion_class_representative(3) = 'he4'
-      diffusion_class_representative(4) = 'c12'
-      diffusion_class_representative(5) = 'n14'
-      diffusion_class_representative(6) = 'o16'
-      diffusion_class_representative(7) = 'ne20'
-      diffusion_class_representative(8) = 'mg24'
-   
-      ! in ascending order.  species goes into 1st class with A_max >= species A
-      diffusion_class_A_max(1) = 2
-      diffusion_class_A_max(2) = 3
-      diffusion_class_A_max(3) = 4
-      diffusion_class_A_max(4) = 12
-      diffusion_class_A_max(5) = 14
-      diffusion_class_A_max(6) = 16
-      diffusion_class_A_max(7) = 20
-      diffusion_class_A_max(8) = 10000
-         
-      diffusion_use_isolve = .true.
-      diffusion_rtol_for_isolve = 1d-4
-      diffusion_atol_for_isolve = 1d-5
-      diffusion_maxsteps_for_isolve = 1000
-      diffusion_isolve_solver = 'ros2_solver'
-      
- 
 ! timestep and mesh:
-      
-   ! RELAXED VALUE FOR TEST SUITE
-      max_years_for_timestep = 5d6 ! 1d6
-      mesh_delta_coeff = 0.5
+
+! RELAXED VALUE FOR TEST SUITE
+max_years_for_timestep = 5d6 ! 1d6
+mesh_delta_coeff = 0.5
 
 ! output controls
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 
 / ! end of controls namelist
 
 
 &pgstar
-         
+
 Grid2_win_flag = .true.
 
 / ! end of pgstar namelist

@@ -22,56 +22,55 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_surface_PT
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_surface_PT = .true.
-      ! procedure pointer: s% other_surface_PT => my_routine
+module other_surface_PT
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_surface_PT = .true.
+   ! procedure pointer: s% other_surface_PT => my_routine
+   
+   use star_def
+   
+   implicit none
 
-
-      use star_def
-
-      implicit none
+contains
+   
+   ! star_utils:set_phot_info sets s% Teff before this is called
+   ! see hydro_vars:set_Teff_info_for_eqns
+   
+   subroutine null_other_surface_PT(id, &
+      skip_partials, &
+      lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+      lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+      use const_def, only : dp
+      !use star_lib, only: star_get_surf_PT
+      integer, intent(in) :: id
+      logical, intent(in) :: skip_partials
+      real(dp), intent(out) :: &
+         lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+         lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
+      integer, intent(out) :: ierr
+      lnT_surf = 0
+      dlnT_dL = 0
+      dlnT_dlnR = 0
+      dlnT_dlnM = 0
+      dlnT_dlnkap = 0
+      lnP_surf = 0
+      dlnP_dL = 0
+      dlnP_dlnR = 0
+      dlnP_dlnM = 0
+      dlnP_dlnkap = 0
+      ierr = -1
       
-      contains
-      
-      ! star_utils:set_phot_info sets s% Teff before this is called
-      ! see hydro_vars:set_Teff_info_for_eqns
-      
-      subroutine null_other_surface_PT(id, &
-            skip_partials, &
-            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
-         use const_def, only: dp
-         !use star_lib, only: star_get_surf_PT
-         integer, intent(in) :: id
-         logical, intent(in) :: skip_partials
-         real(dp), intent(out) :: &
-            lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-            lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
-         integer, intent(out) :: ierr
-         lnT_surf = 0
-         dlnT_dL = 0
-         dlnT_dlnR = 0
-         dlnT_dlnM = 0
-         dlnT_dlnkap = 0
-         lnP_surf = 0
-         dlnP_dL = 0
-         dlnP_dlnR = 0
-         dlnP_dlnM = 0
-         dlnP_dlnkap = 0
-         ierr = -1
-         
-         !call star_get_surf_PT(id, &
-         !   skip_partials, &
-         !   Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
-         !   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
-         
-      end subroutine null_other_surface_PT
+      !call star_get_surf_PT(id, &
+      !   skip_partials, &
+      !   Teff, lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
+      !   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
+   
+   end subroutine null_other_surface_PT
 
 
-      end module other_surface_PT
+end module other_surface_PT
       
 
 

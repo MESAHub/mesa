@@ -1,25 +1,24 @@
-   
-      model_number ! counting from the start of the run
-      day ! elapsed simulated time in days since the start of the run
-      log_dt_sec ! log10 time_step in seconds
+model_number ! counting from the start of the run
+day ! elapsed simulated time in days since the start of the run
+log_dt_sec ! log10 time_step in seconds
 
-      radius
-      log_R
-      v_surf_km_s ! (km/s)
-      v_div_cs ! velocity divided by sound speed at outermost grid point
-      v_div_vesc
-      luminosity ! luminosity in Lsun units
-      log_L ! log10 luminosity in Lsun units
-      Teff
-      effective_T
-      log_Teff ! log10 effective temperature
-   
-      log_rel_run_E_err
-      log_tot_KE
-      log_center_T ! temperature
-      log_center_Rho ! density
+radius
+log_R
+v_surf_km_s ! (km/s)
+v_div_cs ! velocity divided by sound speed at outermost grid point
+v_div_vesc
+luminosity ! luminosity in Lsun units
+log_L ! log10 luminosity in Lsun units
+Teff
+effective_T
+log_Teff ! log10 effective temperature
 
-      num_retries ! total during the run
-      rsp_num_periods
+log_rel_run_E_err
+log_tot_KE
+log_center_T ! temperature
+log_center_Rho ! density
+
+num_retries ! total during the run
+rsp_num_periods
       
 

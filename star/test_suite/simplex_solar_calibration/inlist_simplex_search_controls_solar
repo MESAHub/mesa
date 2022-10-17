@@ -1,218 +1,216 @@
-
 ! for info on the solar model, see https://arxiv.org/abs/1601.07179
 
-&simplex_search_controls 
-   
-   ! defaults are set in routine set_simplex_search_defaults
-   ! in star/job/simplex_search_run_star_extras.inc.
-   ! do not edit that file directly.
-   !
-   ! defaults/simplex_search.defaults contains a list of default options
-   !
-   ! can reset the default values simply by adding lines below
-   ! or you can copy sections from the public file to here to customize for your case.
+&simplex_search_controls
 
-   just_do_first_values = .true.  ! if true, then no simplex search
-         ! true for test suite.   set false for real optimization runs.
+! defaults are set in routine set_simplex_search_defaults
+! in star/job/simplex_search_run_star_extras.inc.
+! do not edit that file directly.
+!
+! defaults/simplex_search.defaults contains a list of default options
+!
+! can reset the default values simply by adding lines below
+! or you can copy sections from the public file to here to customize for your case.
+
+just_do_first_values = .true.  ! if true, then no simplex search
+! true for test suite.   set false for real optimization runs.
 
 
 ! specify parameters to be varied in search, with initial values and bounds
-         
-      ! user defined parameters
-      ! see routine "will_set_my_param" in run_star_extras
-      
-         vary_my_param1 = .false.
-         first_my_param1 = 0
-         min_my_param1 = 0
-         max_my_param1 = 0
-         my_param1_name = '' 
-         
-         vary_my_param2 = .false.
-         first_my_param2 = 0
-         min_my_param2 = 0
-         max_my_param2 = 0
-         my_param2_name = '' 
-         
-         vary_my_param3 = .false.
-         first_my_param3 = 0
-         min_my_param3 = 0
-         max_my_param3 = 0
-         my_param3_name = '' 
-      
-      ! built-in parameters  
-         first_FeH = 0.0995779410d0
-         first_Y = 0.2772395386d0
-         first_alpha = 1.9446893445d0
-         first_f_ov = 0.0314081331d0
 
-         vary_FeH = .true. ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)
-         min_FeH = 0.09
-         max_FeH = 0.11
+! user defined parameters
+! see routine "will_set_my_param" in run_star_extras
 
-         vary_Y = .true.
-         min_Y = 0.269
-         max_Y = 0.289
+vary_my_param1 = .false.
+first_my_param1 = 0
+min_my_param1 = 0
+max_my_param1 = 0
+my_param1_name = ''
 
-         ! alpha done using my_param1 (see below)
-         vary_alpha = .true.  
-         min_alpha = 1.80
-         max_alpha =  2.00
-      
-         vary_f_ov = .true.
-         min_f_ov = 0.014
-         max_f_ov = 0.022
-      
-         vary_mass = .false.
-         first_mass = 1d0
-         min_mass = 1d0
-         max_mass = 1d0
+vary_my_param2 = .false.
+first_my_param2 = 0
+min_my_param2 = 0
+max_my_param2 = 0
+my_param2_name = ''
 
-      ! as example of a user defined parameter, do alpha as my_param1
-         !vary_alpha = .false.
-         !vary_my_param1 = .true.
-         !first_my_param1 = 1.9033976646700377D+00 ! 1.8840679947853980D+00 for OPAL/SCVH
-         !min_my_param1 = 1.80
-         !max_my_param1 =  2.05
-         !my_param1_name = 'my_alpha_mlt' 
-         
-   
-      ! Y is independent parameter along with FeH
-         Y_depends_on_Z = .false. 
-            ! if false, then Y is a parameter like FeH.
-               ! you should set vary_Y, first_Y, min_Y, and max_Y.
-            ! if true, then Y depends on Z as follows: Y = Y0 + dYdZ*Z
-               ! in this case, set vary_Y = .false. 
-               ! first_Y, min_Y, and max_Y are unused.
-         Y0 = 0.248d0
-         dYdZ = 1.4d0
-         
-      ! overshoot_f0 is changed along with overshoot_f
-         ! f0_ov = f0_ov_div_f_ov * f_ov
-         f0_ov_div_f_ov = 1
+vary_my_param3 = .false.
+first_my_param3 = 0
+min_my_param3 = 0
+max_my_param3 = 0
+my_param3_name = ''
+
+! built-in parameters
+first_FeH = 0.0995779410d0
+first_Y = 0.2772395386d0
+first_alpha = 1.9446893445d0
+first_f_ov = 0.0314081331d0
+
+vary_FeH = .true. ! FeH = [Fe/H] = log10((Z/X)/Z_div_X_solar)
+min_FeH = 0.09
+max_FeH = 0.11
+
+vary_Y = .true.
+min_Y = 0.269
+max_Y = 0.289
+
+! alpha done using my_param1 (see below)
+vary_alpha = .true.
+min_alpha = 1.80
+max_alpha = 2.00
+
+vary_f_ov = .true.
+min_f_ov = 0.014
+max_f_ov = 0.022
+
+vary_mass = .false.
+first_mass = 1d0
+min_mass = 1d0
+max_mass = 1d0
+
+! as example of a user defined parameter, do alpha as my_param1
+!vary_alpha = .false.
+!vary_my_param1 = .true.
+!first_my_param1 = 1.9033976646700377D+00 ! 1.8840679947853980D+00 for OPAL/SCVH
+!min_my_param1 = 1.80
+!max_my_param1 =  2.05
+!my_param1_name = 'my_alpha_mlt'
+
+
+! Y is independent parameter along with FeH
+Y_depends_on_Z = .false.
+! if false, then Y is a parameter like FeH.
+! you should set vary_Y, first_Y, min_Y, and max_Y.
+! if true, then Y depends on Z as follows: Y = Y0 + dYdZ*Z
+! in this case, set vary_Y = .false.
+! first_Y, min_Y, and max_Y are unused.
+Y0 = 0.248d0
+dYdZ = 1.4d0
+
+! overshoot_f0 is changed along with overshoot_f
+! f0_ov = f0_ov_div_f_ov * f_ov
+f0_ov_div_f_ov = 1
 
 
 ! specify terms for chi^2 
-   
-   ! chi2 is an evenly weighted combination of terms
-      ! only need to give values for target and sigma if include in chi^2
 
-      ! do Teff as my_var1 as illustration (see below)
-      !include_Teff_in_chi2 = .true.
-      !Teff_target = 5777d0
-      !Teff_sigma = 65d0
+! chi2 is an evenly weighted combination of terms
+! only need to give values for target and sigma if include in chi^2
 
-      include_logR_in_chi2 = .false. ! redundant wrt Teff and logL
-      logR_target = -1
-      logR_sigma = -1
+! do Teff as my_var1 as illustration (see below)
+!include_Teff_in_chi2 = .true.
+!Teff_target = 5777d0
+!Teff_sigma = 65d0
 
-      include_logg_in_chi2 = .false.
-      logg_target = -1
-      logg_sigma = -1
-   
-      include_logL_in_chi2 = .true.
-      logL_target = 0.00d0
-      logL_sigma = 0.05d0
-      
-      ! NOTE: for plotting with pgstar loggTe window -- logg vs. Teff
-         ! you can set the following pgstar controls
-         ! loggTe_target_logg
-         ! loggTe_target_logg_sigma
-         ! loggTe_target_Teff
-         ! loggTe_target_Teff_sigma
-      ! same if you are plotting HR window -- lg_L vs. lg_Teff
-         ! you can set the following pgstar controls
-         ! HR_target_logL
-         ! HR_target_logL_sigma
-         ! HR_target_Teff
-         ! HR_target_Teff_sigma      
-      
-      include_FeH_in_chi2 = .false. ! [Fe/H]
-      FeH_target = 0.00
-      FeH_sigma = 0.05
-      
-         ! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
-         ! using model surface average values for Z and X.
-         Z_div_X_solar = 0.02293d0
-         
-      include_age_in_chi2 = .false.
-      eval_chi2_at_target_age_only = .true. ! for solar model, only want chi2 at final age
-      ! if either of these are set true, then you must set the following too.
-         ! note: do not set max_age or num_adjusted_dt_steps_before_max_age.
+include_logR_in_chi2 = .false. ! redundant wrt Teff and logL
+logR_target = -1
+logR_sigma = -1
 
-      age_target = 4.61d9 ! 4.57d9 after zams + 4d7 for pre-main-sequence
-      age_sigma = 1d7
-         ! see Bahcall, Serenelli, and Basu, 2006; Bahcall and Pinsonneault, 1995
-      num_smaller_steps_before_age_target = 200 ! only used if > 0
-      dt_for_smaller_steps_before_age_target = 1d6 ! 1/10 age_sigma
+include_logg_in_chi2 = .false.
+logg_target = -1
+logg_sigma = -1
 
-      min_age_for_chi2 = 4.54d9 ! target - 7*sigma
-      max_age_for_chi2 = 4.68d9 ! target + 7*sigma
-      
-      include_surface_Z_div_X_in_chi2 = .true. ! redundant wrt FeH
-      surface_Z_div_X_target = 2.292d-2 ! GS98 value
-      !surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
-      surface_Z_div_X_sigma = 1d-3
-         ! reminder: surface_Z_div_X = surface_Z/surface_X
-         ! and FeH = log10(surface_Z_div_X/Z_div_X_solar)
-         ! where Z_div_X_solar is a parameter specified in this inlist
-   
-      include_surface_He_in_chi2 = .true.
-      surface_He_target = 0.2485d0 ! Basu & Antia 2004
-      surface_He_sigma = 0.0035
-   
-      include_Rcz_in_chi2 = .true. ! radius of base of convective zone
-      Rcz_target = 0.713d0 ! Basu & Antia 1997
-      Rcz_sigma = 1d-3
-   
-      include_solar_cs_rms_in_chi2 = .true. ! check sound profile
-      solar_cs_rms_target = 0
-      solar_cs_rms_sigma = 2d-4
-      report_solar_cs_rms = .false.
+include_logL_in_chi2 = .true.
+logL_target = 0.00d0
+logL_sigma = 0.05d0
 
-      ! to include user-defined variables in chi^2 spectro
-      ! set the "my_var" variable in your extras_check_model routine set_my_vars
-      !     use simplex_data, only: my_var1, my_var2, my_var3
-      !     my_var1 = ......
-   
-      ! do Teff as my_var1 as illustration
-      include_Teff_in_chi2 = .false.
-      include_my_var1_in_chi2 = .true.
-      my_var1_target = 5772d0
-      my_var1_sigma = 65d0
-      my_var1_name = 'my_Teff'
-   
-      include_my_var2_in_chi2 = .false.
-      my_var2_target = 0
-      my_var2_sigma = 0
-      my_var2_name = 'my_var2'
-   
-      include_my_var3_in_chi2 = .false.
-      my_var3_target = 0
-      my_var3_sigma = 0
-      my_var3_name = 'my_var3'
+! NOTE: for plotting with pgstar loggTe window -- logg vs. Teff
+! you can set the following pgstar controls
+! loggTe_target_logg
+! loggTe_target_logg_sigma
+! loggTe_target_Teff
+! loggTe_target_Teff_sigma
+! same if you are plotting HR window -- lg_L vs. lg_Teff
+! you can set the following pgstar controls
+! HR_target_logL
+! HR_target_logL_sigma
+! HR_target_Teff
+! HR_target_Teff_sigma
 
-      ! adjust max timestep depending on chi2
-      
-         ! NOTE: if you set the timestep limits too large you run the risk of missing good chi^2 cases.
-         ! but if they are very small, you will spend a lot of runtime calculating lots of frequencies
-         ! for lots of models.  There is no standard set of best values for this.
-         ! The choice will depend on the stage of evolution and how fast things are changing
-         ! in the general region of the models with good chi2 values.  
-         ! There is no alternative to trying things and tuning the controls for your problem.
-         
-         ! the following values are selected for the solar model case.  may not be right for you.
-         
-         chi2_limit_for_small_timesteps = 50
-         max_yrs_dt_chi2_small_limit = 3d5 ! < max_yrs_dt_when_hot
-         
-         chi2_limit_for_smaller_timesteps = 20 ! < chi2_limit_for_small_timesteps
-         max_yrs_dt_chi2_smaller_limit = 1d5 ! < max_yrs_dt_chi2_small_limit
-         
-         chi2_limit_for_smallest_timesteps = 10 ! < chi2_limit_for_smaller_timesteps
-         max_yrs_dt_chi2_smallest_limit = 5d4 ! < max_yrs_dt_chi2_smaller_limit
-   
+include_FeH_in_chi2 = .false. ! [Fe/H]
+FeH_target = 0.00
+FeH_sigma = 0.05
 
-      chi2_limit = 1d99 ! default is 1000 but that seems to interfere with optimization runs
+! we calculate model [Fe/H] as = log10((Z/X)/Z_div_X_solar)
+! using model surface average values for Z and X.
+Z_div_X_solar = 0.02293d0
+
+include_age_in_chi2 = .false.
+eval_chi2_at_target_age_only = .true. ! for solar model, only want chi2 at final age
+! if either of these are set true, then you must set the following too.
+! note: do not set max_age or num_adjusted_dt_steps_before_max_age.
+
+age_target = 4.61d9 ! 4.57d9 after zams + 4d7 for pre-main-sequence
+age_sigma = 1d7
+! see Bahcall, Serenelli, and Basu, 2006; Bahcall and Pinsonneault, 1995
+num_smaller_steps_before_age_target = 200 ! only used if > 0
+dt_for_smaller_steps_before_age_target = 1d6 ! 1/10 age_sigma
+
+min_age_for_chi2 = 4.54d9 ! target - 7*sigma
+max_age_for_chi2 = 4.68d9 ! target + 7*sigma
+
+include_surface_Z_div_X_in_chi2 = .true. ! redundant wrt FeH
+surface_Z_div_X_target = 2.292d-2 ! GS98 value
+!surface_Z_div_X_target = 1.81d-2 ! Asplund 09 value
+surface_Z_div_X_sigma = 1d-3
+! reminder: surface_Z_div_X = surface_Z/surface_X
+! and FeH = log10(surface_Z_div_X/Z_div_X_solar)
+! where Z_div_X_solar is a parameter specified in this inlist
+
+include_surface_He_in_chi2 = .true.
+surface_He_target = 0.2485d0 ! Basu & Antia 2004
+surface_He_sigma = 0.0035
+
+include_Rcz_in_chi2 = .true. ! radius of base of convective zone
+Rcz_target = 0.713d0 ! Basu & Antia 1997
+Rcz_sigma = 1d-3
+
+include_solar_cs_rms_in_chi2 = .true. ! check sound profile
+solar_cs_rms_target = 0
+solar_cs_rms_sigma = 2d-4
+report_solar_cs_rms = .false.
+
+! to include user-defined variables in chi^2 spectro
+! set the "my_var" variable in your extras_check_model routine set_my_vars
+!     use simplex_data, only: my_var1, my_var2, my_var3
+!     my_var1 = ......
+
+! do Teff as my_var1 as illustration
+include_Teff_in_chi2 = .false.
+include_my_var1_in_chi2 = .true.
+my_var1_target = 5772d0
+my_var1_sigma = 65d0
+my_var1_name = 'my_Teff'
+
+include_my_var2_in_chi2 = .false.
+my_var2_target = 0
+my_var2_sigma = 0
+my_var2_name = 'my_var2'
+
+include_my_var3_in_chi2 = .false.
+my_var3_target = 0
+my_var3_sigma = 0
+my_var3_name = 'my_var3'
+
+! adjust max timestep depending on chi2
+
+! NOTE: if you set the timestep limits too large you run the risk of missing good chi^2 cases.
+! but if they are very small, you will spend a lot of runtime calculating lots of frequencies
+! for lots of models.  There is no standard set of best values for this.
+! The choice will depend on the stage of evolution and how fast things are changing
+! in the general region of the models with good chi2 values.
+! There is no alternative to trying things and tuning the controls for your problem.
+
+! the following values are selected for the solar model case.  may not be right for you.
+
+chi2_limit_for_small_timesteps = 50
+max_yrs_dt_chi2_small_limit = 3d5 ! < max_yrs_dt_when_hot
+
+chi2_limit_for_smaller_timesteps = 20 ! < chi2_limit_for_small_timesteps
+max_yrs_dt_chi2_smaller_limit = 1d5 ! < max_yrs_dt_chi2_small_limit
+
+chi2_limit_for_smallest_timesteps = 10 ! < chi2_limit_for_smaller_timesteps
+max_yrs_dt_chi2_smallest_limit = 5d4 ! < max_yrs_dt_chi2_smaller_limit
+
+chi2_limit = 1d99 ! default is 1000 but that seems to interfere with optimization runs
 
 / ! end simplex_search_controls
 

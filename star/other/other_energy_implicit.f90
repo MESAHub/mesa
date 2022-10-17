@@ -22,37 +22,36 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_energy_implicit
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_energy_implicit = .true.
-      ! procedure pointer: s% other_energy_implicit => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_energy_implicit(id, ierr)
-         use const_def, only: Rsun
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k, nz
-         ierr = 0
-         ! call star_ptr(id, s, ierr)
-         ! if (ierr /= 0) return
-         ! s% extra_heat(1:s%nz) = 1d0 ! erg/g/sec
-         ! note that extra_heat is type(auto_diff_real_star_order1) so includes partials.
-      end subroutine default_other_energy_implicit
+module other_energy_implicit
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_energy_implicit = .true.
+   ! procedure pointer: s% other_energy_implicit => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_energy_implicit
+contains
+   
+   
+   subroutine default_other_energy_implicit(id, ierr)
+      use const_def, only : Rsun
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k, nz
+      ierr = 0
+      ! call star_ptr(id, s, ierr)
+      ! if (ierr /= 0) return
+      ! s% extra_heat(1:s%nz) = 1d0 ! erg/g/sec
+      ! note that extra_heat is type(auto_diff_real_star_order1) so includes partials.
+   end subroutine default_other_energy_implicit
+
+
+end module other_energy_implicit
       
       
       

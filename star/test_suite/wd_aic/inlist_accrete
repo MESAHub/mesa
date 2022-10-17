@@ -1,39 +1,39 @@
 &star_job
 
-  ! start from previous part
-    load_saved_model = .true.
-    load_model_filename = '1.325M_ONeMg.mod'
+! start from previous part
+load_saved_model = .true.
+load_model_filename = '1.325M_ONeMg.mod'
 
-  ! save a model at the end of the run
-    save_model_when_terminate = .true.
-    save_model_filename = 'wd_aic.mod'
-    required_termination_code_string = 'log_center_density_limit'
+! save a model at the end of the run
+save_model_when_terminate = .true.
+save_model_filename = 'wd_aic.mod'
+required_termination_code_string = 'log_center_density_limit'
 
-  ! display on-screen plots
-    pgstar_flag = .false.
+! display on-screen plots
+pgstar_flag = .false.
 
 / !end of star_job namelist
 
 &kap
-    use_Type2_opacities = .true.
-    Zbase = 0.02
+use_Type2_opacities = .true.
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
 
-  ! accrete
-    accrete_same_as_surface = .true.
-    mass_change = 1d-6
+! accrete
+accrete_same_as_surface = .true.
+mass_change = 1d-6
 
-  ! use eps_grav form
-    use_gold_tolerances = .true.
+! use eps_grav form
+use_gold_tolerances = .true.
 
-  ! when to stop
-    log_center_density_limit = 9.45
+! when to stop
+log_center_density_limit = 9.45
 
-  ! turn off nuclear reactions
-    eps_nuc_factor = 0
-    dxdt_nuc_factor = 0
+! turn off nuclear reactions
+eps_nuc_factor = 0
+dxdt_nuc_factor = 0
 
 / ! end of controls namelist
 

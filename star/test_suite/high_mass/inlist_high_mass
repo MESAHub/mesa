@@ -1,16 +1,15 @@
-
 &star_job
-      show_log_description_at_start = .false.
-      
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod' ! from make_zams_ultra_high_mass, 13830.
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'xa_central_lower_limit'
+load_saved_model = .true.
+load_model_filename = 'zams.mod' ! from make_zams_ultra_high_mass, 13830.
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'xa_central_lower_limit'
+
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
 / ! end of star_job namelist
 
@@ -18,51 +17,49 @@
 /
 
 &kap
-      Zbase = 1d-5
+Zbase = 1d-5
 / ! end of kap namelist
 
 &controls
 
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-      
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1550  
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      initial_mass = 300
-      initial_z = 1d-5
-      
-      mixing_length_alpha = 2
+! limit max_model_number as part of test_suite
+max_model_number = 1550
 
-      conv_core_gap_dq_limit = 0.1
-      
-      xa_central_lower_limit_species(1) = 'h1'
-      xa_central_lower_limit(1) = 0.05
-           
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'nonburn'
-      overshoot_zone_loc(1) = 'shell'
-      overshoot_bdy_loc(1) = 'bottom'
-      overshoot_f(1) = 0.128
-      overshoot_f0(1) = 0.100
+initial_mass = 300
+initial_z = 1d-5
 
-      overshoot_scheme(2) = 'exponential'
-      overshoot_zone_type(2) = 'any'
-      overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'any'
-      overshoot_f(2) = 0.014
-      overshoot_f0(2) = 0.004
-     
-      
+mixing_length_alpha = 2
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 100
+conv_core_gap_dq_limit = 0.1
+
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 0.05
+
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'nonburn'
+overshoot_zone_loc(1) = 'shell'
+overshoot_bdy_loc(1) = 'bottom'
+overshoot_f(1) = 0.128
+overshoot_f0(1) = 0.100
+
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'any'
+overshoot_zone_loc(2) = 'any'
+overshoot_bdy_loc(2) = 'any'
+overshoot_f(2) = 0.014
+overshoot_f0(2) = 0.004
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 100
 
 
 / ! end of controls namelist

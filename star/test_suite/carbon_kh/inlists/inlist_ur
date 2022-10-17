@@ -1,10 +1,10 @@
 &controls
 
-  ! UR
-  delta_lgRho_cntr_limit = 3d-5
-  delta_lgRho_cntr_hard_limit = 1d-4
+! UR
+delta_lgRho_cntr_limit = 3d-5
+delta_lgRho_cntr_hard_limit = 1d-4
 
-  history_interval = 100
-  terminal_interval = 500
+history_interval = 100
+terminal_interval = 500
 
 / ! end of controls namelist

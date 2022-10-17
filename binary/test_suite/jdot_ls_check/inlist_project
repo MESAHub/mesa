@@ -1,23 +1,23 @@
 &binary_job
 
-   inlist_names(1) = 'inlist1' 
-   inlist_names(2) = 'inlist2'
+inlist_names(1) = 'inlist1'
+inlist_names(2) = 'inlist2'
 
-   evolve_both_stars = .false.
+evolve_both_stars = .false.
 
 / ! end of binary_job namelist
 
 &binary_controls
-         
-   m1 = 1.0d0  ! donor mass in Msun
-   m2 = 0.8d0 ! companion mass in Msun
-   initial_period_in_days = 1.0d0
 
-   !rotation controls
-   do_tidal_sync = .true.
+m1 = 1.0d0  ! donor mass in Msun
+m2 = 0.8d0 ! companion mass in Msun
+initial_period_in_days = 1.0d0
 
-   do_initial_orbit_sync_1 = .true.
+!rotation controls
+do_tidal_sync = .true.
 
-   do_jdot_mb = .false.
+do_initial_orbit_sync_1 = .true.
+
+do_jdot_mb = .false.
 
 / ! end of binary_controls namelist

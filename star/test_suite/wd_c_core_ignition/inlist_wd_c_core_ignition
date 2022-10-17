@@ -1,40 +1,40 @@
 ! inlist_wd_c_core_ignition
 
 &star_job
-      show_log_description_at_start = .false.
-      
-      load_saved_model = .true.
-      load_model_filename = 'wd_c_core_ignition.mod'
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'power_nuc_burn_upper_limit'
+load_saved_model = .true.
+load_model_filename = 'wd_c_core_ignition.mod'
 
-      change_initial_net = .true.      
-      new_net_name = 'approx21.net'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'power_nuc_burn_upper_limit'
 
-      use_3a_fl87 = .true.      
+change_initial_net = .true.
+new_net_name = 'approx21.net'
 
-      show_log_description_at_start = .false. 
+use_3a_fl87 = .true.
 
-      change_v_flag = .true.
-      new_v_flag = .true.
+show_log_description_at_start = .false.
 
-      ! move the surface down to larger optical depth
-      set_tau_factor = .true.
-      set_to_this_tau_factor = 30
+change_v_flag = .true.
+new_v_flag = .true.
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+! move the surface down to larger optical depth
+set_tau_factor = .true.
+set_to_this_tau_factor = 30
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1e4
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-      pgstar_flag = .false.
-      
+set_initial_dt = .true.
+years_for_initial_dt = 1e4
+
+pgstar_flag = .false.
+
 / ! end of star_job namelist
 
 
@@ -42,58 +42,58 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-      use_Type2_opacities = .true.
+Zbase = 0.02d0
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
 
 &controls
 
-      ! energy equation options
-      energy_eqn_option = 'eps_grav'
-      use_time_centered_eps_grav = .true.
+! energy equation options
+energy_eqn_option = 'eps_grav'
+use_time_centered_eps_grav = .true.
 
-      limit_for_rel_error_in_energy_conservation = 1d99
-      hard_limit_for_rel_error_in_energy_conservation = 1d99
-      max_abs_rel_run_E_err = 1d99
+limit_for_rel_error_in_energy_conservation = 1d99
+hard_limit_for_rel_error_in_energy_conservation = 1d99
+max_abs_rel_run_E_err = 1d99
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1000
+! limit max_model_number as part of test_suite
+max_model_number = 1000
 
-      power_nuc_burn_upper_limit = 1d8 
-      
-      varcontrol_target = 1d-3
+power_nuc_burn_upper_limit = 1d8
 
-      min_timestep_limit = 1d-4 ! seconds
+varcontrol_target = 1d-3
 
-      delta_lgRho_cntr_limit = 0.01
-      delta_lgRho_cntr_hard_limit = 0.02
+min_timestep_limit = 1d-4 ! seconds
 
-      delta_lgL_nuc_limit = 0.01
-      delta_lgL_nuc_hard_limit = 0.05
-      lgL_nuc_burn_min = 0d0
+delta_lgRho_cntr_limit = 0.01
+delta_lgRho_cntr_hard_limit = 0.02
 
-      T_mix_limit = 1d4
-       
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'iterated'
+delta_lgL_nuc_limit = 0.01
+delta_lgL_nuc_hard_limit = 0.05
+lgL_nuc_burn_min = 0d0
 
-      accrete_same_as_surface = .true.
+T_mix_limit = 1d4
 
-      mass_change = 1d-9 ! rate of accretion (Msun/year)
-      
-      convergence_ignore_equL_residuals = .true.
+atm_option = 'T_tau'
+atm_T_tau_relation = 'Eddington'
+atm_T_tau_opacity = 'iterated'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+accrete_same_as_surface = .true.
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10 
-      write_header_frequency = 10
+mass_change = 1d-9 ! rate of accretion (Msun/year)
+
+convergence_ignore_equL_residuals = .true.
+
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
@@ -103,27 +103,27 @@
 
 !pause = .true.
 
-         TRho_Profile_win_flag = .true.
-         TRho_Profile_xmin = -5.0
-         TRho_Profile_xmax = 11.0
-         TRho_Profile_ymin = 4.0
-         TRho_Profile_ymax = 10.0        
+TRho_Profile_win_flag = .true.
+TRho_Profile_xmin = -5.0
+TRho_Profile_xmax = 11.0
+TRho_Profile_ymin = 4.0
+TRho_Profile_ymax = 10.0
 
-         show_TRho_Profile_text_info = .true.
+show_TRho_Profile_text_info = .true.
 
-         !History_Panels1_win_flag = .true.
-         History_Panels1_yaxis_name(3) = 'log_R' 
-         History_Panels1_other_yaxis_name(3) = 'v_div_csound_surf'
+!History_Panels1_win_flag = .true.
+History_Panels1_yaxis_name(3) = 'log_R'
+History_Panels1_other_yaxis_name(3) = 'v_div_csound_surf'
 
-         Abundance_win_flag = .true.
-         Abundance_xaxis_name = 'zone'
+Abundance_win_flag = .true.
+Abundance_xaxis_name = 'zone'
 
-         Profile_Panels1_win_flag = .true.
+Profile_Panels1_win_flag = .true.
 
-         Profile_Panels1_num_panels = 2
-         Profile_Panels1_yaxis_name(1) = 'logT'
-         Profile_Panels1_other_yaxis_name(1) = 'entropy'
-         Profile_Panels1_yaxis_name(2) = 'logRho'
-         Profile_Panels1_other_yaxis_name(2) = 'log_D_mix'
+Profile_Panels1_num_panels = 2
+Profile_Panels1_yaxis_name(1) = 'logT'
+Profile_Panels1_other_yaxis_name(1) = 'entropy'
+Profile_Panels1_yaxis_name(2) = 'logRho'
+Profile_Panels1_other_yaxis_name(2) = 'log_D_mix'
 
 / ! end of pgstar namelist

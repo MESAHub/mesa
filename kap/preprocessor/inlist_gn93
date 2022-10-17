@@ -1,14 +1,14 @@
 &kappa
 
-         data_dir = 'kap_input_data/opal'		
-         type1_table = 'GN93hz'
-         logT_file = 'logT_points_highT_8.7'
-         logR_min = -8.00d0
-         logR_max = 1.00d0
-         logR_points = 37
-         output_dir = 'data/kap_data'
-         table_prefix = 'gn93'
-         header_info = 'fixed metal distribution -- based on Grevesse & Noels (1993) solar abundances'
-         table_version= 38
+data_dir = 'kap_input_data/opal'
+type1_table = 'GN93hz'
+logT_file = 'logT_points_highT_8.7'
+logR_min = -8.00d0
+logR_max = 1.00d0
+logR_points = 37
+output_dir = 'data/kap_data'
+table_prefix = 'gn93'
+header_info = 'fixed metal distribution -- based on Grevesse & Noels (1993) solar abundances'
+table_version = 38
 
 /

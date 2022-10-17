@@ -22,36 +22,34 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_brunt
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_brunt = .true.
-      ! procedure pointer: s% other_brunt => my_routine
-
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_brunt(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% brunt_N2(1:s% nz) = 0
-      end subroutine default_other_brunt
+module other_brunt
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_brunt = .true.
+   ! procedure pointer: s% other_brunt => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_brunt
+contains
+   
+   
+   subroutine default_other_brunt(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s% brunt_N2(1:s% nz) = 0
+   end subroutine default_other_brunt
+
+
+end module other_brunt
       
       
       

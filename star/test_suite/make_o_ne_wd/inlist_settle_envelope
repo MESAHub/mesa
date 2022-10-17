@@ -1,15 +1,15 @@
 ! inlist_settle_envelope
- 
+
 &star_job
 
-      load_saved_model = .true.
-      load_model_filename = 'o_ne_wd.mod'
+load_saved_model = .true.
+load_model_filename = 'o_ne_wd.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'settled_envelope.mod'
-      required_termination_code_string = 'log_L_lower_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'settled_envelope.mod'
+required_termination_code_string = 'log_L_lower_limit'
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -22,74 +22,74 @@
 
 &controls
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 4000
+! limit max_model_number as part of test_suite
+max_model_number = 4000
 
 
 ! when to stop
-      log_L_lower_limit = 0d0
+log_L_lower_limit = 0d0
 
 ! wind
-      hot_wind_scheme = ''
-      cool_wind_RGB_scheme = ''
-      cool_wind_AGB_scheme = ''
+hot_wind_scheme = ''
+cool_wind_RGB_scheme = ''
+cool_wind_AGB_scheme = ''
 
 ! atmosphere
 
 ! rotation
 
 ! element diffusion
-      ! turn on diffusion to allow He atmosphere to form
-      do_element_diffusion = .true.
-      show_diffusion_info = .true.
-      diffusion_min_dq_at_surface = 1d-8
-      ! diffusion_use_full_net = .true. ! more realistic atmosphere stratification
-      diffusion_num_classes = 5
-      diffusion_class_representative(1) = 'h1'
-      diffusion_class_representative(2) = 'he3'
-      diffusion_class_representative(3) = 'he4'
-      diffusion_class_representative(4) = 'o16'
-      diffusion_class_representative(5) = 'ne20'
-      diffusion_class_A_max(1) = 2
-      diffusion_class_A_max(2) = 3
-      diffusion_class_A_max(3) = 4
-      diffusion_class_A_max(4) = 16
-      diffusion_class_A_max(5) = 10000
+! turn on diffusion to allow He atmosphere to form
+do_element_diffusion = .true.
+show_diffusion_info = .true.
+diffusion_min_dq_at_surface = 1d-8
+! diffusion_use_full_net = .true. ! more realistic atmosphere stratification
+diffusion_num_classes = 5
+diffusion_class_representative(1) = 'h1'
+diffusion_class_representative(2) = 'he3'
+diffusion_class_representative(3) = 'he4'
+diffusion_class_representative(4) = 'o16'
+diffusion_class_representative(5) = 'ne20'
+diffusion_class_A_max(1) = 2
+diffusion_class_A_max(2) = 3
+diffusion_class_A_max(3) = 4
+diffusion_class_A_max(4) = 16
+diffusion_class_A_max(5) = 10000
 
 ! mlt
 
 ! mixing
 
 ! timesteps 
-     delta_XH_cntr_hard_limit = -1
-     delta_XHe_cntr_hard_limit = -1
-     delta_XC_cntr_hard_limit = -1
-     delta_XNe_cntr_hard_limit = -1
-     delta_XO_cntr_hard_limit = -1
-     delta_XSi_cntr_hard_limit = -1
+delta_XH_cntr_hard_limit = -1
+delta_XHe_cntr_hard_limit = -1
+delta_XC_cntr_hard_limit = -1
+delta_XNe_cntr_hard_limit = -1
+delta_XO_cntr_hard_limit = -1
+delta_XSi_cntr_hard_limit = -1
 
 ! mesh
 
 ! solver      
-      op_split_burn = .true.
-      op_split_burn_min_T = 3d8
+op_split_burn = .true.
+op_split_burn_min_T = 3d8
 
-      op_split_burn_eps = 1d-7
-      op_split_burn_odescal = 1d-8
+op_split_burn_eps = 1d-7
+op_split_burn_odescal = 1d-8
 
-      convergence_ignore_equL_residuals = .true.
-      make_gradr_sticky_in_solver_iters = .true.
+convergence_ignore_equL_residuals = .true.
+make_gradr_sticky_in_solver_iters = .true.
 
 ! output
-      num_trace_history_values = 5
-      trace_history_value_name(1) = 'total_mass c12'
-      trace_history_value_name(2) = 'total_mass o16'
-      trace_history_value_name(3) = 'total_mass ne20'
-      trace_history_value_name(4) = 'rel_E_err'
-      trace_history_value_name(5) = 'log_rel_run_E_err'
-      
-      photo_interval = 20
-      
+num_trace_history_values = 5
+trace_history_value_name(1) = 'total_mass c12'
+trace_history_value_name(2) = 'total_mass o16'
+trace_history_value_name(3) = 'total_mass ne20'
+trace_history_value_name(4) = 'rel_E_err'
+trace_history_value_name(5) = 'log_rel_run_E_err'
+
+photo_interval = 20
+
 
 / ! end of controls namelist
 
@@ -97,10 +97,10 @@
 
 &pgstar
 
-        ! override the pgstar x-axis settings for this phase of evolution
-        Profile_Panels3_xaxis_name = 'logxm'
-        Profile_Panels3_xmin = -8d0
-        Profile_Panels3_xmax = 0d0 ! 2.2
-        Profile_Panels3_xaxis_reversed = .true.
+! override the pgstar x-axis settings for this phase of evolution
+Profile_Panels3_xaxis_name = 'logxm'
+Profile_Panels3_xmin = -8d0
+Profile_Panels3_xmax = 0d0 ! 2.2
+Profile_Panels3_xaxis_reversed = .true.
 
 / ! end of pgstar namelist

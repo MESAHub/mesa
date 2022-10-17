@@ -1,92 +1,92 @@
 &star_job
 
-   show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-   pause_before_terminate = .false.
-   pgstar_flag = .false.
+pause_before_terminate = .false.
+pgstar_flag = .false.
 
-   history_columns_file = 'history_columns.list' 
-   profile_columns_file = 'profile_columns.list'
+history_columns_file = 'history_columns.list'
+profile_columns_file = 'profile_columns.list'
 
-   ! Abundances
+! Abundances
 
-   initial_zfracs = 6
+initial_zfracs = 6
 
-   ! Initial model
+! Initial model
 
-   create_pre_main_sequence_model = .true.
+create_pre_main_sequence_model = .true.
 
-   ! Final model
+! Final model
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'start.mod'
-   required_termination_code_string = 'max_model_number'
+save_model_when_terminate = .true.
+save_model_filename = 'start.mod'
+required_termination_code_string = 'max_model_number'
 
 /
 
 &kap
-   Zbase = 2d-2
-   kap_file_prefix = 'a09'
-   kap_CO_prefix = 'a09_co'
-   use_Type2_opacities = .true.
+Zbase = 2d-2
+kap_file_prefix = 'a09'
+kap_CO_prefix = 'a09_co'
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
 
-   ! IMPORTANT NOTE: if you use these files for non-testing purposes, note
-   ! that some timestep and resolution controls may be adjusted to make the test
-   ! faster at the cost of converged results. For each of these, recommended
-   ! values are commented out. Use with caution.
-   ! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
-   
-   ! Mass & metalicity
+! IMPORTANT NOTE: if you use these files for non-testing purposes, note
+! that some timestep and resolution controls may be adjusted to make the test
+! faster at the cost of converged results. For each of these, recommended
+! values are commented out. Use with caution.
+! look for the string 'RELAXED VALUE FOR TEST SUITE' to find the adjusted values
 
-   initial_mass = 16d0
-   initial_z = 2d-2
+! Mass & metalicity
 
-   ! When to stop
+initial_mass = 16d0
+initial_z = 2d-2
 
-   xa_central_lower_limit_species(1) = 'h1'
-   xa_central_lower_limit(1) = 1E-6
+! When to stop
 
-   ! Opacities
+xa_central_lower_limit_species(1) = 'h1'
+xa_central_lower_limit(1) = 1E-6
+
+! Opacities
 
 
-   ! Mixing
+! Mixing
 
-   mixing_length_alpha = 1.8d0
-   MLT_option = 'Henyey'
+mixing_length_alpha = 1.8d0
+MLT_option = 'Henyey'
 
-   num_cells_for_smooth_gradL_composition_term = 20
-   threshold_for_smooth_gradL_composition_term = 0.02
+num_cells_for_smooth_gradL_composition_term = 20
+threshold_for_smooth_gradL_composition_term = 0.02
 
-   num_cells_for_smooth_brunt_B = 20
-   threshold_for_smooth_brunt_B = 1E-4
+num_cells_for_smooth_brunt_B = 20
+threshold_for_smooth_brunt_B = 1E-4
 
-   use_ledoux_criterion = .true.
+use_ledoux_criterion = .true.
 
-   do_conv_premix = .true.
+do_conv_premix = .true.
 
-   ! Timestep and grid
+! Timestep and grid
 
-   ! RELAXED VALUE FOR TEST SUITE
-   max_years_for_timestep = 1d5 ! 1d4
+! RELAXED VALUE FOR TEST SUITE
+max_years_for_timestep = 1d5 ! 1d4
 
-   ! RELAXED VALUE FOR TEST SUITE
-   mesh_delta_coeff = 0.5 ! 0.2
+! RELAXED VALUE FOR TEST SUITE
+mesh_delta_coeff = 0.5 ! 0.2
 
-   ! Output
+! Output
 
-   photo_interval = 100 ! 500
-   photo_digits = 3
-   profile_interval = 100 ! 1000
-   history_interval = 10
-   terminal_interval = 50 ! 10
-   write_header_frequency = 10
+photo_interval = 100 ! 500
+photo_digits = 3
+profile_interval = 100 ! 1000
+history_interval = 10
+terminal_interval = 50 ! 10
+write_header_frequency = 10
 
-   
-   ! limit max_model_number as part of test_suite
-   max_model_number = 10 !  2500
+
+! limit max_model_number as part of test_suite
+max_model_number = 10 !  2500
 
 /
 

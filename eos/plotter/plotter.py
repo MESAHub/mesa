@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import copy
-import numpy as np
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
+import numpy as np
+
 
 def parse(fname):
     nY, nX = np.loadtxt(fname, max_rows=1, skiprows=3, unpack=True, dtype=int)
     data = np.loadtxt(fname, skiprows=4)
     data = np.reshape(data, ((nX, nY, -1)))
-    Yran = np.array(data[0,:,0])
-    Xran = np.array(data[:,0,1])
+    Yran = np.array(data[0, :, 0])
+    Xran = np.array(data[:, 0, 1])
     data = np.swapaxes(data, 0, 1)
     return data, Yran, Xran
 
@@ -24,7 +25,7 @@ with open('eos_plotter.dat') as f:
 eosDT, Yran, Xran = parse('eos_plotter.dat')
 
 # set up plot and labels
-fig, ax = plt.subplots(figsize=(5,4))
+fig, ax = plt.subplots(figsize=(5, 4))
 ax.set_title(title)
 ax.set_xlabel(xlabel)
 ax.set_ylabel(ylabel)
@@ -42,7 +43,8 @@ cmap.set_bad('grey')
 cbar_min = None
 cbar_max = None
 
-pcol = ax.pcolormesh(Xran, Yran, eosDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)
+pcol = ax.pcolormesh(Xran, Yran, eosDT[..., 2], shading='nearest', cmap=cmap,
+                     vmin=cbar_min, vmax=cbar_max)
 pcol.set_edgecolor('face')
 cax = fig.colorbar(pcol, extend='both')
 cax.set_label('')
@@ -51,4 +53,3 @@ cax.set_label('')
 fig.savefig('eos_plotter.png', dpi=150)
 
 plt.show()
-

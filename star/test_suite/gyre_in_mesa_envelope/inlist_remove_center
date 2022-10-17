@@ -1,22 +1,22 @@
 &star_job
-      
-  ! load the starting model
 
-  load_saved_model = .true.
-  load_model_filename = 'tams.mod'
+! load the starting model
 
-  ! save a model at the end of the run
+load_saved_model = .true.
+load_model_filename = 'tams.mod'
 
-  save_model_when_terminate = .true.
-  save_model_filename = 'removed.mod'
+! save a model at the end of the run
 
-  ! remove the core
+save_model_when_terminate = .true.
+save_model_filename = 'removed.mod'
 
-  remove_initial_center_by_temperature = 2d6
+! remove the core
 
-  ! terminate immediately
+remove_initial_center_by_temperature = 2d6
 
-  steps_to_take_before_terminate = 0
+! terminate immediately
+
+steps_to_take_before_terminate = 0
 
 / !end of star_job namelist
 
@@ -25,17 +25,17 @@
 / ! end of eos namelist
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
 
-  initial_z = 0.02
-      
-      photo_interval = 1
-      !profile_interval = 1
-      !history_interval = 1
-      terminal_interval = 10 
+initial_z = 0.02
+
+photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+terminal_interval = 10
 
 
 / ! end of controls namelist

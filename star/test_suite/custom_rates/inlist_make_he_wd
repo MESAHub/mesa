@@ -1,32 +1,32 @@
 &star_job
-  ! pgstar_flag = .true.
+! pgstar_flag = .true.
 
-  save_model_when_terminate = .true.
-  save_model_filename = 'he_wd.mod'
-  required_termination_code_string = 'max_age'
+save_model_when_terminate = .true.
+save_model_filename = 'he_wd.mod'
+required_termination_code_string = 'max_age'
 
-  load_saved_model = .true.
-  load_model_filename = 'he_core.mod'
+load_saved_model = .true.
+load_model_filename = 'he_core.mod'
 
-  relax_mass = .true.
-  new_mass = 0.301
+relax_mass = .true.
+new_mass = 0.301
 
-  set_initial_age = .true.
-  initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
 / ! end of star_job namelist
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
-  initial_mass = 2
+initial_mass = 2
 
-  varcontrol_target = 5d-03
+varcontrol_target = 5d-03
 
-  mass_change = -1d-8
-  max_age = 1d5
+mass_change = -1d-8
+max_age = 1d5
 
 / ! end of controls namelist
 

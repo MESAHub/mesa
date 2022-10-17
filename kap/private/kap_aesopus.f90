@@ -24,591 +24,590 @@
 ! ***********************************************************************
 
 module kap_aesopus
-
-  use hdf5io_lib
-  use math_lib
-  use kap_def
-
-  implicit none
-
-  logical, parameter :: debug = .false.
-
-  ! for 2-D interpolation
-  integer :: ibcx=0, ibcy=0, ilinx=1, iliny=1
-  integer :: ict(6) = [ 1, 1, 1, 0, 0, 0 ]
-  real(dp), parameter :: bc(100) = 0d0
+   
+   use hdf5io_lib
+   use math_lib
+   use kap_def
+   
+   implicit none
+   
+   logical, parameter :: debug = .false.
+   
+   ! for 2-D interpolation
+   integer :: ibcx = 0, ibcy = 0, ilinx = 1, iliny = 1
+   integer :: ict(6) = [ 1, 1, 1, 0, 0, 0 ]
+   real(dp), parameter :: bc(100) = 0d0
 
 contains
-
-  subroutine kap_aesopus_init(rq, ierr)
-    use const_def, only: mesa_data_dir
-    use kap_def, only: kap_aesopus_is_initialized
-    type (Kap_General_Info), pointer :: rq
-    integer, intent(out) :: ierr
-
-    ! real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT
-
-    call read_kap_aesopus_tables(rq, ierr)
-
-    ! call AESOPUS_get(0.02d0, 0.7d0, 0d0, 0d0, 0d0, -10d0, 4d0, &
-    !      kap, dlnkap_dlnRho, dlnkap_dlnT,ierr)
-
-    ! write(*,*) kap, dlnkap_dlnRho, dlnkap_dlnT
-
-    if (ierr == 0) kap_aesopus_is_initialized = .true.
-
-  end subroutine kap_aesopus_init
-
-
-  subroutine kap_aesopus_shutdown
-    use kap_def, only: kap_aesopus_is_initialized
-    kap_aesopus_is_initialized = .false.
-  end subroutine kap_aesopus_shutdown
-
-
-  subroutine read_kap_aesopus_tables(rq, ierr)
-
-    use interp_2d_lib_db, only: interp_mkbicub_db
-
-    type (Kap_General_Info), pointer :: rq
-    integer, intent(out) :: ierr
-
-    character(len=256) :: filename
-    integer :: n, io
-    integer :: iX, iCO, iC, iN
-
-    type(hdf5io_t) :: hi, hi_ts
-
-    real(dp), allocatable :: table_data(:,:,:,:,:,:)
-    integer :: table_size
-
-    character(len=80) :: group_name ! output buffer
-
-    character(len=30) :: efmt = '(A14, 99ES12.3)'
-    character(len=30) :: ffmt = '(A14, 99F8.3)'
-    character(len=30) :: ifmt = '(A14, I4)'
-
-    logical :: file_exists 
-
-    ! get the filename
-    filename = trim(aesopus_filename)
-    if (filename == '') then
-       write(*,*) 'failed to specify AESOPUS_filename'
-       ierr = -1
-       return
-    end if
-
-    ! first try local directory
-    inquire(file=trim(filename), exist=file_exists)
-    if (.not. file_exists) then
-       ! then try MESA directory
-       filename = trim(kap_dir) // '/' // filename
-       inquire(file=trim(filename), exist=file_exists)
-       if (.not. file_exists) then
-          write(*,*) 'failed to open AESOPUS file ' // trim(filename)
-          ierr = -1
-          return
-       end if
-    end if
-
-    if (rq% show_info) write(*,*) 'read filename <' // trim(filename) // '>'
-
-    ierr = 0
-
-    ! open file (read-only)
-    hi = hdf5io_t(filename, OPEN_FILE_RO)
-    
-    if (rq% show_info) write(*,*) 'AESOPUS composition parameters'
-
-    ! read composition parameters
-
-    call hi% read_dset('Zsun', kA% Zsun)
-    if (rq% show_info) write(*,efmt) 'Zsun =', kA % Zsun
-
-    call hi% read_dset('fCO_ref', kA% fCO_ref)
-    if (rq% show_info) write(*,ffmt) 'fCO_ref =', kA % fCO_ref
-
-    call hi% read_dset('fC_ref', kA% fC_ref)
-    if (rq% show_info) write(*,ffmt) 'fC_ref =', kA % fC_ref
-
-    call hi% read_dset('fN_ref', kA% fN_ref)
-    if (rq% show_info) write(*,ffmt) 'fN_ref =', kA % fN_ref
-
-    if (rq% show_info) then
-       write(*,'(A)')
-       write(*,*) 'AESOPUS logT and logR range (logR = logRho - 3 * logT + 18)'
-    end if
-
-    ! read logT
-
-    call hi% alloc_read_dset('logTs', kA% logTs)
-    kA% num_logTs = SIZE(kA% logTs)
-    if (rq% show_info) write(*,ifmt) "num logTs =", kA% num_logTs
-
-    kA% min_logT = minval(kA% logTs)
-    kA% max_logT = maxval(kA% logTs)
-
-    if (rq% show_info) then
-       write(*,ffmt) 'logTs =', kA% logTs
-    end if
-
-    ! read logR
-
-    call hi% alloc_read_dset('logRs', kA% logRs)
-    kA% num_logRs = SIZE(kA% logRs)
-    if (rq% show_info) write(*,ifmt) "num logRs =", kA% num_logRs
-
-    kA% min_logR = minval(kA% logRs)
-    kA% max_logR = maxval(kA% logRs)
-
-    if (rq% show_info) then
-       write(*,ffmt) 'logRs =', kA% logRs
-    end if
-
-    if (rq% show_info) then
-       write(*,'(A)')
-       write(*,*) 'AESOPUS metallicities'
-       write(*,*) '(These Z values are the reference metallicities)'
-    end if
-
-    ! read Zs
-
-    call hi% alloc_read_dset('Zs', kA% Zs)
-    kA% num_Zs = SIZE(kA% Zs)
-    if (rq% show_info) write(*,ifmt) "num Zs =", kA% num_Zs
-    
-    if (debug) write(*,*) 'Zs', kA% Zs
-
-    if (rq% show_info) then
-       write(*,efmt) "Zs =", kA% Zs
-    end if
-
-    ! pre-compute logZs
-
-    allocate(kA% logZs(kA % num_Zs))
-    do n = 1, kA % num_Zs
-       kA% logZs(n) = safe_log10(kA% Zs(n))
-    end do
-
-    ! now, there is one group for each Z
-    ! walk through these and construct a AESOPUS_TableSet for each one
-
-    allocate(kA% ts(kA% num_Zs))
-
-    do n = 1, kA% num_Zs
-
-       associate(ts => kA% ts(n))
-
-       ! get group name and open group
-
-       write(group_name, 100) kA% Zs(n)
-100    format(F8.6)  
-
-       if (rq% show_info) then
-          write(*,'(A)')
-          write(*,'(3A, ES9.3)') "Table ",  trim(group_name), ": Z = ", kA% Zs(n)
-       end if
-
-       hi_ts = hdf5io_t(hi, group_name)
-
-       ! read Xs
-
-       call hi_ts%  alloc_read_dset('Xs', ts% Xs)
-       if (debug) write(*,*) "Xs", ts% Xs
-       ts% num_Xs = SIZE(ts% Xs)
-       if (rq% show_info) write(*,ifmt) "num Xs =", ts% num_Xs
-
-       if (rq% show_info) then
-          write(*,ffmt) "Xs =", ts% Xs
-       end if
-
-       ! read fCOs
-
-       call hi_ts% alloc_read_dset('fCOs', ts% fCOs)
-       if (debug) write(*,*) "fCOs", ts% fCOs
-       ts% num_fCOs = SIZE(ts% fCOs)
-       if (rq% show_info) write(*,ifmt) "num fCOs =", ts% num_fCOs
-
-       if (rq% show_info) then
-          write(*,ffmt) "fCOs =", ts% fCOs
-       end if
-
-       ! read fCs
-
-       call hi_ts% alloc_read_dset('fCs', ts% fCs)
-       if (debug) write(*,*) "fCs", ts% fCs
-       ts% num_fCs = SIZE(ts% fCs)
-       if (rq% show_info) write(*,ifmt) "num fCs =", ts% num_fCs
-
-       if (rq% show_info) then
-          write(*,ffmt) "fCs =", ts% fCs
-       end if
-
-       ! read fNs
-
-       call hi_ts% alloc_read_dset('fNs', ts% fNs)
-       if (debug) write(*,*) "fNs", ts% fNs
-       ts% num_fNs = SIZE(ts% fNs)
-       if (rq% show_info) write(*,ifmt) "num fNs =", ts% num_fNs
-
-       if (rq% show_info) then
-          write(*,ffmt) "fNs =", ts% fNs
-       end if
-
-       ! read opacities
-
-       call hi_ts% alloc_read_dset('kap', table_data)
-
-       allocate(ts% t(ts % num_Xs, ts % num_fCOs, ts % num_fCs, ts % num_fNs))
-
-       do iX = 1, ts % num_Xs
-          do iCO = 1, ts % num_fCOs
-             do iC = 1, ts % num_fCs
-                do iN = 1, ts % num_fNs
-
-                   associate(t=> ts% t(iX, iCO, iC, iN))
-
-                     !allocate(t% kap(4, kA% num_logRs, kA% num_logTs))
-
-                     table_size = kA% num_logRs*kA% num_logTs
-                     allocate(t% kap(4*table_size))
-
-                     ! insert data
-                     t% kap(1:4*table_size:4) = reshape(table_data(iN, iC, iCO, iX, :, :), [table_size])
-                     t% X = ts% Xs(iX)
-                     t% Z = kA% Zs(n)
-                     t% fCO = ts% fCOs(iCO)
-                     t% fC = ts% fCs(iC)
-                     t% fN = ts% fNs(iN)
-
-                     ! create interpolant
-                     call interp_mkbicub_db(kA% logRs, kA% num_logRs, &
-                          ka% logTs, kA% num_logTs, &
-                          t% kap, ka% num_logRs, &
-                          ibcx, bc, ibcx, bc, &
-                          ibcy, bc, ibcy, bc, &
-                          ilinx, iliny, ierr)
-
-                     ! if (debug) call interp_evbicub_db(0d0, 3.85d0, &
-                     !      kA% logRs, kA% num_logRs, &
-                     !      ka% logTs, kA% num_logTs, &
-                     !      ilinx, iliny, &
-                     !      t% kap, ka% num_logRs, &
-                     !      ict, res, ierr)
-                     ! if (debug) write(*,'(10F10.4)') kA% logRs(17), kA% logTs(54), &
-                     !      t% X, t% fCO, t% fC, t% fN, &
-                     !      table_data(iN, iC, iCO, iX, 17, 54), res(1)
-
-                   end associate
-
-                end do
-             end do
-          end do
-       end do
-
-       deallocate(table_data)
-
-       call hi_ts%final()
-
-       end associate
-
-    end do
-
-    ! close file
-
-    call hi%final()
-
-    if (rq% show_info) then
-       write(*,'(A)')
-       write(*,*) 'Finished reading AESOPUS tables'
-       write(*,'(A)')
-    end if
-
-
-  end subroutine read_kap_aesopus_tables
-
-
-  subroutine AESOPUS_interp(Zref, X, XC, XN, XO, logR, logT, res, ierr)
-    !result=(logKappa, dlogKappa/dlogR, dlogKappa/dlogT)
-    use interp_1d_def, only: pm_work_size
-    use interp_1d_lib, only: interpolate_vector, interp_pm
-    use num_lib, only: binary_search
-    real(dp), intent(in) :: Zref, X, XC, XN, XO, logR, logT
-    real(dp), intent(out) :: res(3)
-    integer, intent(out) :: ierr
-    real(dp), pointer :: Z_ary(:), work1(:)
-    integer, parameter :: nZ = 3
-    integer :: i,iZ
-    real(dp) :: my_Z, raw_res(3, nZ), x_new(1), v_new(1)
-    character(len=32) :: junk
-    logical :: clipped
-
-    ! result=0d0; iZ=0; ierr=0
-
-    if (outside_R_and_T_bounds(logR,logT)) then
-       write(*,*) 'AESOPUS_interp: logR, logT outside of table bounds'
-       ierr = -1
-       return
-    endif
-
-    ! restrict to range
-    clipped = .false.
-    if (Zref .le. kA% Zs(1)) then
-       my_Z = kA% Zs(1)
-       iZ = 1
-       clipped = .true.
-    else if (Zref .ge. kA% Zs(kA% num_Zs)) then
-       my_Z = kA% Zs(kA% num_Zs)
-       iZ = kA% num_Zs
-       clipped = .true.
-    endif
-
-    ! if clipped in Z, then just need one call
-    if (clipped) then
-       call AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
-       return
-    endif
-
-    my_Z = Zref
-
-    ! it might be easier just to do linear interpolation
-    ! but for now, we use an adapted version of what kapCN does
-
-    ! require at least 3 Zs for interpolation
-    if (nZ .gt. kA% num_Zs) then
-       write(*,*) 'AESOPUS_interp: insufficient number of Z values for interpolation'
-       write(*,'(I2, A, I2, A)') nZ, ' values are required; ', kA% num_Zs, ' were provided'
-       ierr = -1
-       return
-    endif
-
-    ! binary_search returns iZ between 1 and num_Zs-1
-    ! such that Zs(iZ) <= Z < Zs(iZ+1)
-    iZ = binary_search(kA% num_Zs, kA% Zs, 0, my_Z)
-
-    ! make sure this is in an acceptable range
-    ! unless that would go off the ends
-    ! this check is hard-coded assuming nZ = 3
-    iZ = min(kA% num_Zs-1, max(iZ, 2))
-
-    ! want to call at [iZ-1, iZ, iZ+1]
-    do i = 1, nZ
-       call AESOPUS_interp_fixedZref(iZ+i-2, X, XC, XN, XO, logR, logT, raw_res(:,i), ierr)
-    enddo
-
-    nullify(work1)
-    allocate(work1(nZ*pm_work_size))
-    x_new(1)=safe_log10(my_Z)
-
-    ! do the Z interpolation
-    ! loop does over kap and its derivatives
-    do i = 1, 3
-       call interpolate_vector(nZ, kA% logZs(iZ-1:iZ+1), 1, &
-            x_new, raw_res(i,:), v_new, &
+   
+   subroutine kap_aesopus_init(rq, ierr)
+      use const_def, only : mesa_data_dir
+      use kap_def, only : kap_aesopus_is_initialized
+      type (Kap_General_Info), pointer :: rq
+      integer, intent(out) :: ierr
+      
+      ! real(dp) :: kap, dlnkap_dlnRho, dlnkap_dlnT
+      
+      call read_kap_aesopus_tables(rq, ierr)
+      
+      ! call AESOPUS_get(0.02d0, 0.7d0, 0d0, 0d0, 0d0, -10d0, 4d0, &
+      !      kap, dlnkap_dlnRho, dlnkap_dlnT,ierr)
+      
+      ! write(*,*) kap, dlnkap_dlnRho, dlnkap_dlnT
+      
+      if (ierr == 0) kap_aesopus_is_initialized = .true.
+   
+   end subroutine kap_aesopus_init
+   
+   
+   subroutine kap_aesopus_shutdown
+      use kap_def, only : kap_aesopus_is_initialized
+      kap_aesopus_is_initialized = .false.
+   end subroutine kap_aesopus_shutdown
+   
+   
+   subroutine read_kap_aesopus_tables(rq, ierr)
+      
+      use interp_2d_lib_db, only : interp_mkbicub_db
+      
+      type (Kap_General_Info), pointer :: rq
+      integer, intent(out) :: ierr
+      
+      character(len = 256) :: filename
+      integer :: n, io
+      integer :: iX, iCO, iC, iN
+      
+      type(hdf5io_t) :: hi, hi_ts
+      
+      real(dp), allocatable :: table_data(:, :, :, :, :, :)
+      integer :: table_size
+      
+      character(len = 80) :: group_name ! output buffer
+      
+      character(len = 30) :: efmt = '(A14, 99ES12.3)'
+      character(len = 30) :: ffmt = '(A14, 99F8.3)'
+      character(len = 30) :: ifmt = '(A14, I4)'
+      
+      logical :: file_exists
+      
+      ! get the filename
+      filename = trim(aesopus_filename)
+      if (filename == '') then
+         write(*, *) 'failed to specify AESOPUS_filename'
+         ierr = -1
+         return
+      end if
+      
+      ! first try local directory
+      inquire(file = trim(filename), exist = file_exists)
+      if (.not. file_exists) then
+         ! then try MESA directory
+         filename = trim(kap_dir) // '/' // filename
+         inquire(file = trim(filename), exist = file_exists)
+         if (.not. file_exists) then
+            write(*, *) 'failed to open AESOPUS file ' // trim(filename)
+            ierr = -1
+            return
+         end if
+      end if
+      
+      if (rq% show_info) write(*, *) 'read filename <' // trim(filename) // '>'
+      
+      ierr = 0
+      
+      ! open file (read-only)
+      hi = hdf5io_t(filename, OPEN_FILE_RO)
+      
+      if (rq% show_info) write(*, *) 'AESOPUS composition parameters'
+      
+      ! read composition parameters
+      
+      call hi% read_dset('Zsun', kA% Zsun)
+      if (rq% show_info) write(*, efmt) 'Zsun =', kA % Zsun
+      
+      call hi% read_dset('fCO_ref', kA% fCO_ref)
+      if (rq% show_info) write(*, ffmt) 'fCO_ref =', kA % fCO_ref
+      
+      call hi% read_dset('fC_ref', kA% fC_ref)
+      if (rq% show_info) write(*, ffmt) 'fC_ref =', kA % fC_ref
+      
+      call hi% read_dset('fN_ref', kA% fN_ref)
+      if (rq% show_info) write(*, ffmt) 'fN_ref =', kA % fN_ref
+      
+      if (rq% show_info) then
+         write(*, '(A)')
+         write(*, *) 'AESOPUS logT and logR range (logR = logRho - 3 * logT + 18)'
+      end if
+      
+      ! read logT
+      
+      call hi% alloc_read_dset('logTs', kA% logTs)
+      kA% num_logTs = SIZE(kA% logTs)
+      if (rq% show_info) write(*, ifmt) "num logTs =", kA% num_logTs
+      
+      kA% min_logT = minval(kA% logTs)
+      kA% max_logT = maxval(kA% logTs)
+      
+      if (rq% show_info) then
+         write(*, ffmt) 'logTs =', kA% logTs
+      end if
+      
+      ! read logR
+      
+      call hi% alloc_read_dset('logRs', kA% logRs)
+      kA% num_logRs = SIZE(kA% logRs)
+      if (rq% show_info) write(*, ifmt) "num logRs =", kA% num_logRs
+      
+      kA% min_logR = minval(kA% logRs)
+      kA% max_logR = maxval(kA% logRs)
+      
+      if (rq% show_info) then
+         write(*, ffmt) 'logRs =', kA% logRs
+      end if
+      
+      if (rq% show_info) then
+         write(*, '(A)')
+         write(*, *) 'AESOPUS metallicities'
+         write(*, *) '(These Z values are the reference metallicities)'
+      end if
+      
+      ! read Zs
+      
+      call hi% alloc_read_dset('Zs', kA% Zs)
+      kA% num_Zs = SIZE(kA% Zs)
+      if (rq% show_info) write(*, ifmt) "num Zs =", kA% num_Zs
+      
+      if (debug) write(*, *) 'Zs', kA% Zs
+      
+      if (rq% show_info) then
+         write(*, efmt) "Zs =", kA% Zs
+      end if
+      
+      ! pre-compute logZs
+      
+      allocate(kA% logZs(kA % num_Zs))
+      do n = 1, kA % num_Zs
+         kA% logZs(n) = safe_log10(kA% Zs(n))
+      end do
+      
+      ! now, there is one group for each Z
+      ! walk through these and construct a AESOPUS_TableSet for each one
+      
+      allocate(kA% ts(kA% num_Zs))
+      
+      do n = 1, kA% num_Zs
+         
+         associate(ts => kA% ts(n))
+            
+            ! get group name and open group
+            
+            write(group_name, 100) kA% Zs(n)
+            100    format(F8.6)
+            
+            if (rq% show_info) then
+               write(*, '(A)')
+               write(*, '(3A, ES9.3)') "Table ", trim(group_name), ": Z = ", kA% Zs(n)
+            end if
+            
+            hi_ts = hdf5io_t(hi, group_name)
+            
+            ! read Xs
+            
+            call hi_ts%  alloc_read_dset('Xs', ts% Xs)
+            if (debug) write(*, *) "Xs", ts% Xs
+            ts% num_Xs = SIZE(ts% Xs)
+            if (rq% show_info) write(*, ifmt) "num Xs =", ts% num_Xs
+            
+            if (rq% show_info) then
+               write(*, ffmt) "Xs =", ts% Xs
+            end if
+            
+            ! read fCOs
+            
+            call hi_ts% alloc_read_dset('fCOs', ts% fCOs)
+            if (debug) write(*, *) "fCOs", ts% fCOs
+            ts% num_fCOs = SIZE(ts% fCOs)
+            if (rq% show_info) write(*, ifmt) "num fCOs =", ts% num_fCOs
+            
+            if (rq% show_info) then
+               write(*, ffmt) "fCOs =", ts% fCOs
+            end if
+            
+            ! read fCs
+            
+            call hi_ts% alloc_read_dset('fCs', ts% fCs)
+            if (debug) write(*, *) "fCs", ts% fCs
+            ts% num_fCs = SIZE(ts% fCs)
+            if (rq% show_info) write(*, ifmt) "num fCs =", ts% num_fCs
+            
+            if (rq% show_info) then
+               write(*, ffmt) "fCs =", ts% fCs
+            end if
+            
+            ! read fNs
+            
+            call hi_ts% alloc_read_dset('fNs', ts% fNs)
+            if (debug) write(*, *) "fNs", ts% fNs
+            ts% num_fNs = SIZE(ts% fNs)
+            if (rq% show_info) write(*, ifmt) "num fNs =", ts% num_fNs
+            
+            if (rq% show_info) then
+               write(*, ffmt) "fNs =", ts% fNs
+            end if
+            
+            ! read opacities
+            
+            call hi_ts% alloc_read_dset('kap', table_data)
+            
+            allocate(ts% t(ts % num_Xs, ts % num_fCOs, ts % num_fCs, ts % num_fNs))
+            
+            do iX = 1, ts % num_Xs
+               do iCO = 1, ts % num_fCOs
+                  do iC = 1, ts % num_fCs
+                     do iN = 1, ts % num_fNs
+                        
+                        associate(t => ts% t(iX, iCO, iC, iN))
+                           
+                           !allocate(t% kap(4, kA% num_logRs, kA% num_logTs))
+                           
+                           table_size = kA% num_logRs * kA% num_logTs
+                           allocate(t% kap(4 * table_size))
+                           
+                           ! insert data
+                           t% kap(1:4 * table_size:4) = reshape(table_data(iN, iC, iCO, iX, :, :), [table_size])
+                           t% X = ts% Xs(iX)
+                           t% Z = kA% Zs(n)
+                           t% fCO = ts% fCOs(iCO)
+                           t% fC = ts% fCs(iC)
+                           t% fN = ts% fNs(iN)
+                           
+                           ! create interpolant
+                           call interp_mkbicub_db(kA% logRs, kA% num_logRs, &
+                              ka% logTs, kA% num_logTs, &
+                              t% kap, ka% num_logRs, &
+                              ibcx, bc, ibcx, bc, &
+                              ibcy, bc, ibcy, bc, &
+                              ilinx, iliny, ierr)
+                           
+                           ! if (debug) call interp_evbicub_db(0d0, 3.85d0, &
+                           !      kA% logRs, kA% num_logRs, &
+                           !      ka% logTs, kA% num_logTs, &
+                           !      ilinx, iliny, &
+                           !      t% kap, ka% num_logRs, &
+                           !      ict, res, ierr)
+                           ! if (debug) write(*,'(10F10.4)') kA% logRs(17), kA% logTs(54), &
+                           !      t% X, t% fCO, t% fC, t% fN, &
+                           !      table_data(iN, iC, iCO, iX, 17, 54), res(1)
+                        
+                        end associate
+                     
+                     end do
+                  end do
+               end do
+            end do
+            
+            deallocate(table_data)
+            
+            call hi_ts%final()
+         
+         end associate
+      
+      end do
+      
+      ! close file
+      
+      call hi%final()
+      
+      if (rq% show_info) then
+         write(*, '(A)')
+         write(*, *) 'Finished reading AESOPUS tables'
+         write(*, '(A)')
+      end if
+   
+   end subroutine read_kap_aesopus_tables
+   
+   
+   subroutine AESOPUS_interp(Zref, X, XC, XN, XO, logR, logT, res, ierr)
+      !result=(logKappa, dlogKappa/dlogR, dlogKappa/dlogT)
+      use interp_1d_def, only : pm_work_size
+      use interp_1d_lib, only : interpolate_vector, interp_pm
+      use num_lib, only : binary_search
+      real(dp), intent(in) :: Zref, X, XC, XN, XO, logR, logT
+      real(dp), intent(out) :: res(3)
+      integer, intent(out) :: ierr
+      real(dp), pointer :: Z_ary(:), work1(:)
+      integer, parameter :: nZ = 3
+      integer :: i, iZ
+      real(dp) :: my_Z, raw_res(3, nZ), x_new(1), v_new(1)
+      character(len = 32) :: junk
+      logical :: clipped
+      
+      ! result=0d0; iZ=0; ierr=0
+      
+      if (outside_R_and_T_bounds(logR, logT)) then
+         write(*, *) 'AESOPUS_interp: logR, logT outside of table bounds'
+         ierr = -1
+         return
+      endif
+      
+      ! restrict to range
+      clipped = .false.
+      if (Zref .le. kA% Zs(1)) then
+         my_Z = kA% Zs(1)
+         iZ = 1
+         clipped = .true.
+      else if (Zref .ge. kA% Zs(kA% num_Zs)) then
+         my_Z = kA% Zs(kA% num_Zs)
+         iZ = kA% num_Zs
+         clipped = .true.
+      endif
+      
+      ! if clipped in Z, then just need one call
+      if (clipped) then
+         call AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
+         return
+      endif
+      
+      my_Z = Zref
+      
+      ! it might be easier just to do linear interpolation
+      ! but for now, we use an adapted version of what kapCN does
+      
+      ! require at least 3 Zs for interpolation
+      if (nZ .gt. kA% num_Zs) then
+         write(*, *) 'AESOPUS_interp: insufficient number of Z values for interpolation'
+         write(*, '(I2, A, I2, A)') nZ, ' values are required; ', kA% num_Zs, ' were provided'
+         ierr = -1
+         return
+      endif
+      
+      ! binary_search returns iZ between 1 and num_Zs-1
+      ! such that Zs(iZ) <= Z < Zs(iZ+1)
+      iZ = binary_search(kA% num_Zs, kA% Zs, 0, my_Z)
+      
+      ! make sure this is in an acceptable range
+      ! unless that would go off the ends
+      ! this check is hard-coded assuming nZ = 3
+      iZ = min(kA% num_Zs - 1, max(iZ, 2))
+      
+      ! want to call at [iZ-1, iZ, iZ+1]
+      do i = 1, nZ
+         call AESOPUS_interp_fixedZref(iZ + i - 2, X, XC, XN, XO, logR, logT, raw_res(:, i), ierr)
+      enddo
+      
+      nullify(work1)
+      allocate(work1(nZ * pm_work_size))
+      x_new(1) = safe_log10(my_Z)
+      
+      ! do the Z interpolation
+      ! loop does over kap and its derivatives
+      do i = 1, 3
+         call interpolate_vector(nZ, kA% logZs(iZ - 1:iZ + 1), 1, &
+            x_new, raw_res(i, :), v_new, &
             interp_pm, pm_work_size, &
             work1, junk, ierr)
-       res(i) = v_new(1)
-    enddo
-
-    deallocate(work1)
-
-  end subroutine AESOPUS_interp
-
-
-  logical function outside_R_and_T_bounds(logR,logT)
-    real(dp), intent(in) :: logR, logT
-    outside_R_and_T_bounds = &
+         res(i) = v_new(1)
+      enddo
+      
+      deallocate(work1)
+   
+   end subroutine AESOPUS_interp
+   
+   
+   logical function outside_R_and_T_bounds(logR, logT)
+      real(dp), intent(in) :: logR, logT
+      outside_R_and_T_bounds = &
          logR < kA% min_logR .or. logR > kA% max_logR .or. &
-         logT < kA% min_logT .or. logT > kA% max_logT
-  end function outside_R_and_T_bounds
-
-
-  subroutine AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
-    ! simple interpolation in each of X, fCO, fC, fN
-    ! at present, interpolation is linear (order = 2)
-    integer, intent(in) :: iZ
-    real(dp), intent(in) :: X, XC, XN, XO, logR, logT
-    real(dp), intent(out) :: res(3)
-    integer, intent(out) :: ierr
-
-    integer, parameter :: npts = 2
-    real(dp), dimension(npts) :: wX, wfCO, wfC, wfN
-    real(dp) :: raw_res(3)
-    integer :: iX, ifCO, ifC, ifN
-    integer :: i, j, k, l
-
-    real(dp) :: Zref, fCO, fC, fN
-    logical :: clipped_X, clipped_fCO, clipped_fC, clipped_fN
-
-    ierr = 0
-    res = 0d0
-    iX=0; ifCO=0; ifC=0; ifN=0
-
-    ! AESOPUS defines these quantities as follows
-
-    ! fCO=log10(XC/XO)-log10(XC/XO)ref
-    ! fC=log10(XC)-log10(XC)ref
-    ! fN=log10(XN)-log10(XN)ref
-
-    ! Note that the reference values are different for different solar abundance patterns
-
-    Zref = kA% Zs(iZ)
-    fCO = safe_log10(XC/XO) - kA% fCO_ref
-    fC = safe_log10(XC/Zref) - kA% fC_ref
-    fN = safe_log10(XN/Zref) - kA% fN_ref
-
-    if (debug) then
-       write(*,*) 'call to AESOPUS_interp_RT'
-       write(*,*) 'logR = ', logR
-       write(*,*) 'logT = ', logT
-       write(*,*) 'Zref = ', Zref
-       write(*,*) 'X = ', X
-       write(*,*) 'fCO = ', fCO
-       write(*,*) 'fC = ', fC
-       write(*,*) 'fN = ', fN
-    end if
-
-    associate(ts => kA% ts(iZ))
-
-      ! get weights for a clipped linear interpolation in each parameter
-      call clipped_linear_weights(X, ts% num_Xs, ts% Xs, iX, wX, clipped_X)
-      call clipped_linear_weights(fCO, ts% num_fCOs, ts% fCOs, ifCO, wfCO, clipped_fCO)
-      call clipped_linear_weights(fC, ts% num_fCs, ts% fCs, ifC, wfC, clipped_fC)
-      call clipped_linear_weights(fN, ts% num_fNs, ts% fNs, ifN, wfN, clipped_fN)
-
-      ! cycles prevent wastefully calling interp_RT with zero weights
-      do i = 1, npts
-         if (wX(i) .eq. 0) cycle
-         do j = 1, npts
-            if (wfCO(j) .eq. 0) cycle
-            do k = 1, npts
-               if (wfC(k) .eq. 0) cycle
-               do l = 1, npts
-                  if (wfN(l) .eq. 0) cycle
-
-                  if (debug) then
-                     write(*,*) 'call to AESOPUS_interp_RT'
-                     write(*,*) iX+i-1, ifCO+j-1, ifC+k-1,ifN+l-1
-                     write(*,*) 'X = ', X, ts% Xs(iX+i-1), wX(i)
-                     write(*,*) 'fCO = ', fCO, ts% fCOs(ifCO+j-1), wfCO(j)
-                     write(*,*) 'fC = ', fC, ts% fCs(ifC+k-1), wfC(k)
-                     write(*,*) 'fN = ', fN, ts% fNs(ifN+l-1), wfN(l)
-                  end if
-
-                  ! now do the call and collect the results
-
-                  call AESOPUS_interp_RT(ts% t(iX+i-1,ifCO+j-1,ifC+k-1,ifN+l-1), logR, logT, raw_res, ierr)
-                  if (ierr .ne. 0) return
-
-                  res = res + wX(i)*wfCO(j)*wfC(k)*wfN(l) * raw_res
-
+            logT < kA% min_logT .or. logT > kA% max_logT
+   end function outside_R_and_T_bounds
+   
+   
+   subroutine AESOPUS_interp_fixedZref(iZ, X, XC, XN, XO, logR, logT, res, ierr)
+      ! simple interpolation in each of X, fCO, fC, fN
+      ! at present, interpolation is linear (order = 2)
+      integer, intent(in) :: iZ
+      real(dp), intent(in) :: X, XC, XN, XO, logR, logT
+      real(dp), intent(out) :: res(3)
+      integer, intent(out) :: ierr
+      
+      integer, parameter :: npts = 2
+      real(dp), dimension(npts) :: wX, wfCO, wfC, wfN
+      real(dp) :: raw_res(3)
+      integer :: iX, ifCO, ifC, ifN
+      integer :: i, j, k, l
+      
+      real(dp) :: Zref, fCO, fC, fN
+      logical :: clipped_X, clipped_fCO, clipped_fC, clipped_fN
+      
+      ierr = 0
+      res = 0d0
+      iX = 0; ifCO = 0; ifC = 0; ifN = 0
+      
+      ! AESOPUS defines these quantities as follows
+      
+      ! fCO=log10(XC/XO)-log10(XC/XO)ref
+      ! fC=log10(XC)-log10(XC)ref
+      ! fN=log10(XN)-log10(XN)ref
+      
+      ! Note that the reference values are different for different solar abundance patterns
+      
+      Zref = kA% Zs(iZ)
+      fCO = safe_log10(XC / XO) - kA% fCO_ref
+      fC = safe_log10(XC / Zref) - kA% fC_ref
+      fN = safe_log10(XN / Zref) - kA% fN_ref
+      
+      if (debug) then
+         write(*, *) 'call to AESOPUS_interp_RT'
+         write(*, *) 'logR = ', logR
+         write(*, *) 'logT = ', logT
+         write(*, *) 'Zref = ', Zref
+         write(*, *) 'X = ', X
+         write(*, *) 'fCO = ', fCO
+         write(*, *) 'fC = ', fC
+         write(*, *) 'fN = ', fN
+      end if
+      
+      associate(ts => kA% ts(iZ))
+         
+         ! get weights for a clipped linear interpolation in each parameter
+         call clipped_linear_weights(X, ts% num_Xs, ts% Xs, iX, wX, clipped_X)
+         call clipped_linear_weights(fCO, ts% num_fCOs, ts% fCOs, ifCO, wfCO, clipped_fCO)
+         call clipped_linear_weights(fC, ts% num_fCs, ts% fCs, ifC, wfC, clipped_fC)
+         call clipped_linear_weights(fN, ts% num_fNs, ts% fNs, ifN, wfN, clipped_fN)
+         
+         ! cycles prevent wastefully calling interp_RT with zero weights
+         do i = 1, npts
+            if (wX(i) .eq. 0) cycle
+            do j = 1, npts
+               if (wfCO(j) .eq. 0) cycle
+               do k = 1, npts
+                  if (wfC(k) .eq. 0) cycle
+                  do l = 1, npts
+                     if (wfN(l) .eq. 0) cycle
+                     
+                     if (debug) then
+                        write(*, *) 'call to AESOPUS_interp_RT'
+                        write(*, *) iX + i - 1, ifCO + j - 1, ifC + k - 1, ifN + l - 1
+                        write(*, *) 'X = ', X, ts% Xs(iX + i - 1), wX(i)
+                        write(*, *) 'fCO = ', fCO, ts% fCOs(ifCO + j - 1), wfCO(j)
+                        write(*, *) 'fC = ', fC, ts% fCs(ifC + k - 1), wfC(k)
+                        write(*, *) 'fN = ', fN, ts% fNs(ifN + l - 1), wfN(l)
+                     end if
+                     
+                     ! now do the call and collect the results
+                     
+                     call AESOPUS_interp_RT(ts% t(iX + i - 1, ifCO + j - 1, ifC + k - 1, ifN + l - 1), logR, logT, raw_res, ierr)
+                     if (ierr .ne. 0) return
+                     
+                     res = res + wX(i) * wfCO(j) * wfC(k) * wfN(l) * raw_res
+                  
+                  end do
                end do
             end do
          end do
-      end do
-
-    end associate
-
-  contains
-
-    subroutine clipped_linear_weights(val, len, vec, loc, weights, clipped)
-
-      ! calculate the weights for a linear interpolation
-      ! clip to table edges
-
-      use num_lib, only: binary_search
-
-      real(dp), intent(in) :: val ! value
-      integer, intent(in) :: len ! number of tabulated values
-      real(dp), dimension(:), intent(in) :: vec ! tabulated values
-      integer,  intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
-      real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
-      logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
-
-      integer :: i
-
-      weights = 0
-
-      ! clip to range, if needed
-      clipped = .false.
-      if (val .le. vec(1)) then
-         loc = 1
-         weights(1) = 1d0
-         weights(2) = 0d0
-         clipped = .true.
-      else if (val .ge. vec(len)) then
-         loc = len
-         weights(1) = 1d0
-         weights(2) = 0d0
-         clipped = .true.
-      endif
-
-      ! find location and calculate linear weights
-      if (.not. clipped) then
-         ! binary_search returns k between 1 and n-1 such that vec(k) <= val < vec(k+1)
-         loc = binary_search(len, vec, len/2, val)
-         weights(2) = (val - vec(loc)) / (vec(loc+1) - vec(loc))
-         weights(1) = 1d0 - weights(2)
-      endif
-
-    end subroutine clipped_linear_weights
-
-  end subroutine AESOPUS_interp_fixedZref
-
-
-  subroutine AESOPUS_interp_RT(t, logR, logT, res, ierr)
-    use interp_2d_lib_db, only: interp_evbicub_db
-    type(AESOPUS_Table) :: t
-    real(dp), intent(in) :: logR, logT
-    real(dp), intent(out) :: res(3)
-    integer, intent(out) :: ierr
-    real(dp) :: raw_res(6)
-
-    if (debug) then
-       write(*,*) 'inside call to AESOPUS_interp_RT'
-       write(*,*) 'X = ', t% X
-       write(*,*) 'Z = ', t% Z
-       write(*,*) 'fCO = ', t% fCO
-       write(*,*) 'fC = ', t% fC
-       write(*,*) 'fN = ', t% fN
-    end if
-
-    call interp_evbicub_db(logR, logT, &
+      
+      end associate
+   
+   contains
+      
+      subroutine clipped_linear_weights(val, len, vec, loc, weights, clipped)
+         
+         ! calculate the weights for a linear interpolation
+         ! clip to table edges
+         
+         use num_lib, only : binary_search
+         
+         real(dp), intent(in) :: val ! value
+         integer, intent(in) :: len ! number of tabulated values
+         real(dp), dimension(:), intent(in) :: vec ! tabulated values
+         integer, intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
+         real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
+         logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
+         
+         integer :: i
+         
+         weights = 0
+         
+         ! clip to range, if needed
+         clipped = .false.
+         if (val .le. vec(1)) then
+            loc = 1
+            weights(1) = 1d0
+            weights(2) = 0d0
+            clipped = .true.
+         else if (val .ge. vec(len)) then
+            loc = len
+            weights(1) = 1d0
+            weights(2) = 0d0
+            clipped = .true.
+         endif
+         
+         ! find location and calculate linear weights
+         if (.not. clipped) then
+            ! binary_search returns k between 1 and n-1 such that vec(k) <= val < vec(k+1)
+            loc = binary_search(len, vec, len / 2, val)
+            weights(2) = (val - vec(loc)) / (vec(loc + 1) - vec(loc))
+            weights(1) = 1d0 - weights(2)
+         endif
+      
+      end subroutine clipped_linear_weights
+   
+   end subroutine AESOPUS_interp_fixedZref
+   
+   
+   subroutine AESOPUS_interp_RT(t, logR, logT, res, ierr)
+      use interp_2d_lib_db, only : interp_evbicub_db
+      type(AESOPUS_Table) :: t
+      real(dp), intent(in) :: logR, logT
+      real(dp), intent(out) :: res(3)
+      integer, intent(out) :: ierr
+      real(dp) :: raw_res(6)
+      
+      if (debug) then
+         write(*, *) 'inside call to AESOPUS_interp_RT'
+         write(*, *) 'X = ', t% X
+         write(*, *) 'Z = ', t% Z
+         write(*, *) 'fCO = ', t% fCO
+         write(*, *) 'fC = ', t% fC
+         write(*, *) 'fN = ', t% fN
+      end if
+      
+      call interp_evbicub_db(logR, logT, &
          kA% logRs, kA% num_logRs, &
          ka% logTs, kA% num_logTs, &
          ilinx, iliny, &
          t% kap, ka% num_logRs, &
          ict, raw_res, ierr)
-
-    res = raw_res(1:3)
-
-  end subroutine AESOPUS_interp_RT
-
-
-  subroutine AESOPUS_get(Zref, X, XC, XN, XO, logRho, logT, kap, &
-       dlnkap_dlnRho, dlnkap_dlnT,ierr)
-    real(dp), intent(in) :: Zref, X, XC, XN, XO
-    real(dp), intent(in) :: logRho, logT
-    real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
-    integer, intent(out) :: ierr
-    real(dp) :: logR, res(3)
-
-    ierr = 0
-    logR = logRho - 3d0*logT + 18d0
-
-    if (debug) write(*,*) Zref, X, XC, XN, XO, logR, logT
-    call AESOPUS_interp(Zref, X, XC, XN, XO, logR, logT, res, ierr)
-    if (ierr == 0) then
-       kap = exp10(res(1))
-       dlnkap_dlnRho = res(2)
-       dlnkap_dlnT = res(3) - 3d0*res(2)
-    else
-       kap = -1d0
-       dlnkap_dlnRho = 0d0
-       dlnkap_dlnT = 0d0
-    endif
-
-  end subroutine AESOPUS_get
+      
+      res = raw_res(1:3)
+   
+   end subroutine AESOPUS_interp_RT
+   
+   
+   subroutine AESOPUS_get(Zref, X, XC, XN, XO, logRho, logT, kap, &
+      dlnkap_dlnRho, dlnkap_dlnT, ierr)
+      real(dp), intent(in) :: Zref, X, XC, XN, XO
+      real(dp), intent(in) :: logRho, logT
+      real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
+      integer, intent(out) :: ierr
+      real(dp) :: logR, res(3)
+      
+      ierr = 0
+      logR = logRho - 3d0 * logT + 18d0
+      
+      if (debug) write(*, *) Zref, X, XC, XN, XO, logR, logT
+      call AESOPUS_interp(Zref, X, XC, XN, XO, logR, logT, res, ierr)
+      if (ierr == 0) then
+         kap = exp10(res(1))
+         dlnkap_dlnRho = res(2)
+         dlnkap_dlnT = res(3) - 3d0 * res(2)
+      else
+         kap = -1d0
+         dlnkap_dlnRho = 0d0
+         dlnkap_dlnT = 0d0
+      endif
+   
+   end subroutine AESOPUS_get
 
 
 end module kap_aesopus

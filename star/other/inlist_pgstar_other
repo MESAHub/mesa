@@ -3,29 +3,29 @@
 
 &pgstar_other
 
-      Other_win_flag = .true.
-      Other_win_width = 8
-      Other_win_aspect_ratio = 0.62
-   
-      Other_file_flag = .false.
-      Other_file_dir = 'png'
-      Other_file_prefix = 'other'
-      Other_file_interval = 1
-      Other_file_width = -1 ! negative means use same value as for window
-      Other_file_aspect_ratio = -1 ! negative means use same value as for window
+Other_win_flag = .true.
+Other_win_width = 8
+Other_win_aspect_ratio = 0.62
 
-      Other_xaxis_by = 'by_mass' ! same choices as for main window xaxis_by
-      Other_xaxis_reversed = .false.
-      Other_xmin = -101 ! only used if > -100
-      Other_xmax = -101 ! only used if > -100
+Other_file_flag = .false.
+Other_file_dir = 'png'
+Other_file_prefix = 'other'
+Other_file_interval = 1
+Other_file_width = -1 ! negative means use same value as for window
+Other_file_aspect_ratio = -1 ! negative means use same value as for window
 
-      Other_ymax_right = -101 ! only used if > -100
-      Other_ymin_right = -101 ! only used if > -100
-      Other_dymin_right = -101 ! only used if > -100
-      
-      Other_ymax_left = -101 ! only used if > -100
-      Other_ymin_left = -101 ! only used if > -100
-      Other_dymin_left = -101 ! only used if > -100
-      
+Other_xaxis_by = 'by_mass' ! same choices as for main window xaxis_by
+Other_xaxis_reversed = .false.
+Other_xmin = -101 ! only used if > -100
+Other_xmax = -101 ! only used if > -100
+
+Other_ymax_right = -101 ! only used if > -100
+Other_ymin_right = -101 ! only used if > -100
+Other_dymin_right = -101 ! only used if > -100
+
+Other_ymax_left = -101 ! only used if > -100
+Other_ymin_left = -101 ! only used if > -100
+Other_dymin_left = -101 ! only used if > -100
+
 
 / ! end of pgstar_other namelist

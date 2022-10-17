@@ -23,55 +23,55 @@
 !
 ! ***********************************************************************
 
-      module neu_lib
-      ! library for calculating neutrino losses from non-nuclear-burning sources
-      ! neutrino losses that occur during nuclear reactions are included in the nuclear library
-      ! the data interface for the library is defined in neu_def
-      
-      use const_def, only: dp
-      
-      implicit none
+module neu_lib
+   ! library for calculating neutrino losses from non-nuclear-burning sources
+   ! neutrino losses that occur during nuclear reactions are included in the nuclear library
+   ! the data interface for the library is defined in neu_def
+   
+   use const_def, only : dp
+   
+   implicit none
 
 
-      contains ! the procedure interface for the library
-      ! client programs should only call these routines.
-
+contains ! the procedure interface for the library
+   ! client programs should only call these routines.
+   
+   
+   subroutine neu_get(T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, flags, &
+      loss, sources, info)
+      use neu_def
+      use mod_neu, only : neutrinos
       
-      subroutine neu_get(T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, flags, &
-               loss, sources, info)
-         use neu_def
-         use mod_neu, only : neutrinos
-
-         ! this routine computes neutrino losses from the analytic fits of
-         ! itoh et al. apjs 102, 411, 1996, and also returns their derivatives. 
+      ! this routine computes neutrino losses from the analytic fits of
+      ! itoh et al. apjs 102, 411, 1996, and also returns their derivatives.
       
-         ! provide T or log10_T or both (the code needs both, so pass 'em if you've got 'em!)
-         ! same for Rho and log10_Rho
+      ! provide T or log10_T or both (the code needs both, so pass 'em if you've got 'em!)
+      ! same for Rho and log10_Rho
       
-         real(dp), intent(in) :: T ! temperature
-         real(dp), intent(in) :: log10_T ! log10 of temperature
-         real(dp), intent(in) :: Rho ! density
-         real(dp), intent(in) :: log10_Rho ! log10 of density
-         real(dp), intent(in) :: abar ! mean atomic weight
-         real(dp), intent(in) :: zbar ! mean charge
-         real(dp), intent(in) :: log10_Tlim 
-         ! log10 of temperature at which begin to cutoff results
-         !    NOTE: the Itoh et al data has a lower temperature limit of 10^7
-         !    so for T < 10^7, the neutrino losses are simply set to 0
-         !    Rather than have an abrupt cutoff, the values are multiplied by a coefficient
-         !    that reaches 0 at T = 10^7 and is equal to 1 for log10T > log10_Tlim
-         ! log10_Tlim of 7.5 is a reasonable choice.
-         logical, intent(in) :: flags(num_neu_types) ! true if should include the type of loss
-
-         real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
-         real(dp), intent(inout) :: sources(num_neu_types, num_neu_rvs)
-         integer, intent(out) :: info ! 0 means AOK.
-         
-         call neutrinos(T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim,  &
-                  flags, loss, sources, info)
-         
-      end subroutine neu_get
+      real(dp), intent(in) :: T ! temperature
+      real(dp), intent(in) :: log10_T ! log10 of temperature
+      real(dp), intent(in) :: Rho ! density
+      real(dp), intent(in) :: log10_Rho ! log10 of density
+      real(dp), intent(in) :: abar ! mean atomic weight
+      real(dp), intent(in) :: zbar ! mean charge
+      real(dp), intent(in) :: log10_Tlim
+      ! log10 of temperature at which begin to cutoff results
+      !    NOTE: the Itoh et al data has a lower temperature limit of 10^7
+      !    so for T < 10^7, the neutrino losses are simply set to 0
+      !    Rather than have an abrupt cutoff, the values are multiplied by a coefficient
+      !    that reaches 0 at T = 10^7 and is equal to 1 for log10T > log10_Tlim
+      ! log10_Tlim of 7.5 is a reasonable choice.
+      logical, intent(in) :: flags(num_neu_types) ! true if should include the type of loss
       
+      real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
+      real(dp), intent(inout) :: sources(num_neu_types, num_neu_rvs)
+      integer, intent(out) :: info ! 0 means AOK.
+      
+      call neutrinos(T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, &
+         flags, loss, sources, info)
+   
+   end subroutine neu_get
 
-      end module neu_lib
+
+end module neu_lib
 

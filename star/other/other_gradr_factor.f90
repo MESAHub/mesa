@@ -22,36 +22,36 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_gradr_factor
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_gradr_factor = .true.
-      ! procedure pointer: s% other_gradr_factor => my_routine
-      
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine null_other_gradr_factor(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         do k = 1, s% nz
-            s% gradr_factor(k) = 1d0
-         end do         
-      end subroutine null_other_gradr_factor
+module other_gradr_factor
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_gradr_factor = .true.
+   ! procedure pointer: s% other_gradr_factor => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_gradr_factor
+contains
+   
+   
+   subroutine null_other_gradr_factor(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      do k = 1, s% nz
+         s% gradr_factor(k) = 1d0
+      end do
+   end subroutine null_other_gradr_factor
+
+
+end module other_gradr_factor
       
       
       

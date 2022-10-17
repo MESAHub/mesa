@@ -1,40 +1,38 @@
-
-! inlist_to_he_burn - stops when reach power_he_burn_upper_limit 
+! inlist_to_he_burn - stops when reach power_he_burn_upper_limit
 
 &star_job
 
-      show_log_description_at_start = .false. 
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod'
+load_saved_model = .true.
+load_model_filename = 'zams.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'he_burn.mod'
-      required_termination_code_string = 'power_he_burn_upper_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'he_burn.mod'
+required_termination_code_string = 'power_he_burn_upper_limit'
 
+change_D_omega_flag = .true.
+new_D_omega_flag = .true.
 
-      change_D_omega_flag = .true.
-      new_D_omega_flag = .true.
-               
-      change_initial_v_flag = .true.
-      new_v_flag = .true.
-               
-      change_rotation_flag = .true.
-      new_rotation_flag = .true.
-      
-      set_initial_surface_rotation_v = .true.
-      new_surface_rotation_v = 200 ! km/sec   << saved model is rotating 
+change_initial_v_flag = .true.
+new_v_flag = .true.
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+change_rotation_flag = .true.
+new_rotation_flag = .true.
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_surface_rotation_v = .true.
+new_surface_rotation_v = 200 ! km/sec   << saved model is rotating
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      !pgstar_flag = .true.
+set_initial_age = .true.
+initial_age = 0
+
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -49,39 +47,39 @@
 &controls
 
 ! stopping condition
-      power_he_burn_upper_limit = 10d0
+power_he_burn_upper_limit = 10d0
 
 ! limit max_model_number as part of test_suite
-      max_model_number = 5000
+max_model_number = 5000
 
 
 ! time resolution
 
-      dX_nuc_drop_max_A_limit = 52
-      dX_nuc_drop_min_X_limit = 1d-4
-      dX_nuc_drop_limit = 5d-3
-      dX_nuc_drop_hard_limit = 1d99
+dX_nuc_drop_max_A_limit = 52
+dX_nuc_drop_min_X_limit = 1d-4
+dX_nuc_drop_limit = 5d-3
+dX_nuc_drop_hard_limit = 1d99
 
-      delta_lgRho_cntr_limit = 0.001       ! default 0.05d0   old 0.01
-      delta_lgRho_cntr_hard_limit = 0.01   ! default -1       old 0.02
+delta_lgRho_cntr_limit = 0.001       ! default 0.05d0   old 0.01
+delta_lgRho_cntr_hard_limit = 0.01   ! default -1       old 0.02
 
-      delta_lgT_cntr_limit = 0.001         ! default 0.01d0    old 0.01
-      delta_lgT_cntr_hard_limit = 0.01     ! default -1        old 0.02
+delta_lgT_cntr_limit = 0.001         ! default 0.01d0    old 0.01
+delta_lgT_cntr_hard_limit = 0.01     ! default -1        old 0.02
 
-      delta_lgTeff_limit = 0.01
-      delta_lgTeff_hard_limit = 0.02
+delta_lgTeff_limit = 0.01
+delta_lgTeff_hard_limit = 0.02
 
-      delta_lgL_limit = 0.1
-      delta_lgL_hard_limit = 0.2
+delta_lgL_limit = 0.1
+delta_lgL_hard_limit = 0.2
 
-      delta_XH_cntr_limit = 0.005d0
-      delta_XH_cntr_hard_limit = 0.01d0
+delta_XH_cntr_limit = 0.005d0
+delta_XH_cntr_hard_limit = 0.01d0
 
-      delta_XHe_cntr_limit = 0.005d0
-      delta_XHe_cntr_hard_limit = 0.01d0
+delta_XHe_cntr_limit = 0.005d0
+delta_XHe_cntr_hard_limit = 0.01d0
 
-      delta_lgL_nuc_limit = 0.1
-      delta_lgL_nuc_hard_limit = 0.2
+delta_lgL_nuc_limit = 0.1
+delta_lgL_nuc_hard_limit = 0.2
 
 
 / ! end of controls namelist

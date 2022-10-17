@@ -23,18 +23,17 @@
 !
 ! ***********************************************************************
 
-      module interp_1d_def
+module interp_1d_def
+   
+   implicit none
+   
+   integer, parameter :: mp_work_size = 14
+   integer, parameter :: pm_work_size = 3
+   
+   ! these are the limiter options for the monotonicity preserving interpolation
+   
+   integer, parameter :: average = 1
+   integer, parameter :: quartic = 2
+   integer, parameter :: super_bee = 3
 
-      implicit none
-      
-      
-      integer, parameter :: mp_work_size = 14
-      integer, parameter :: pm_work_size = 3
-
-      ! these are the limiter options for the monotonicity preserving interpolation
-      
-      integer, parameter :: average = 1
-      integer, parameter :: quartic = 2
-      integer, parameter :: super_bee = 3
-
-      end module interp_1d_def
+end module interp_1d_def

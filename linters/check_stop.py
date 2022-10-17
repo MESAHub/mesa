@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import os
-import sys
 import re
+import sys
 from pathlib import Path
 
 MESA_DIR = os.environ["MESA_DIR"]
@@ -43,19 +43,19 @@ def mesa_error(message=None):
     else:
         return f"call mesa_error(__FILE__,__LINE__,{message})"
 
+
 if len(sys.argv) > 1:
     files = sys.argv[1:]
 else:
     files = Path("./").rglob("*.f90")
 
-
 for file in files:
     if check_skip(file):
         continue
-
+    
     with open(file, "r") as f:
         lines = f.readlines()
-
+    
     modified = False
     for ldx, line in enumerate(lines):
         if "stop " in line:
@@ -65,11 +65,11 @@ for file in files:
             elif str_stop.search(line):
                 # String type, preserve error message
                 match = str_stop.search(line).group()
-                match = match[len("stop ") :]
+                match = match[len("stop "):]
                 line = re.sub(str_stop, mesa_error(match), line)
             lines[ldx] = line
             modified = True
-
+    
     if modified:
         with open(file, "w") as f:
             f.writelines(lines)

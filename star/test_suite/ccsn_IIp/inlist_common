@@ -1,19 +1,19 @@
 ! inlist_common
 
 &star_job
-   read_extra_star_job_inlist1 = .true.
-   extra_star_job_inlist1_name = 'inlist_mass_Z'
- 
-   show_log_description_at_start = .false.
+read_extra_star_job_inlist1 = .true.
+extra_star_job_inlist1_name = 'inlist_mass_Z'
+
+show_log_description_at_start = .false.
 
 !   change_v_flag = .true.
 !   new_v_flag = .true.
 
-   set_initial_age = .true.
-   initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-   set_initial_model_number = .true.
-   initial_model_number = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
 / ! end of star_job namelist
 
@@ -22,296 +22,290 @@ use_Skye = .false.
 / ! end of eos namelist
 
 &kap
-   read_extra_kap_inlist1 = .true.
-   extra_kap_inlist1_name = 'inlist_mass_Z'
+read_extra_kap_inlist1 = .true.
+extra_kap_inlist1_name = 'inlist_mass_Z'
 
-   kap_file_prefix = 'gs98'
-   use_Type2_opacities = .false.
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .false.
 / ! end of kap namelist
 
 &controls
-   read_extra_controls_inlist1 = .true.
-   extra_controls_inlist1_name = 'inlist_mass_Z'
+read_extra_controls_inlist1 = .true.
+extra_controls_inlist1_name = 'inlist_mass_Z'
 
-   ! high center T limit to avoid negative mass fractions
-   sig_min_factor_for_high_Tcenter = 0.01
-    ! inactive when >= 1d0
-      ! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
-      ! then okay to reduce sig by as much as this factor
-      ! as needed to prevent causing negative abundances
-   Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-      ! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
-      ! this should be > Tcenter_max_for_sig_min_factor_full_off.
-   Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-      ! if Tcenter <= this, factor = 1, so has no effect
-      ! this should be < Tcenter_min_for_sig_min_factor_full_on.
-   ! for T > full_off and < full_on, factor changes linearly with Tcenter
+! high center T limit to avoid negative mass fractions
+sig_min_factor_for_high_Tcenter = 0.01
+! inactive when >= 1d0
+! if Tcenter >= Tcenter_min_for_sig_min_factor_full_on,
+! then okay to reduce sig by as much as this factor
+! as needed to prevent causing negative abundances
+Tcenter_min_for_sig_min_factor_full_on = 3.2d9
+! if Tcenter >= this, factor = sig_min_factor_for_neg_abundances
+! this should be > Tcenter_max_for_sig_min_factor_full_off.
+Tcenter_max_for_sig_min_factor_full_off = 2.8d9
+! if Tcenter <= this, factor = 1, so has no effect
+! this should be < Tcenter_min_for_sig_min_factor_full_on.
+! for T > full_off and < full_on, factor changes linearly with Tcenter
 
-   mesh_delta_coeff = 1.5
-   mesh_delta_coeff_for_highT = 2.5
-   logT_max_for_standard_mesh_delta_coeff = 9.0 
-   logT_min_for_highT_mesh_delta_coeff = 9.5 
-   
-   varcontrol_target = 1d-3
-   
-   dX_nuc_drop_limit = 5d-2
-   dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
-   
-   delta_Ye_highT_limit = 1d-3
+mesh_delta_coeff = 1.5
+mesh_delta_coeff_for_highT = 2.5
+logT_max_for_standard_mesh_delta_coeff = 9.0
+logT_min_for_highT_mesh_delta_coeff = 9.5
 
-   okay_to_reduce_gradT_excess = .true. 
-   gradT_excess_f1 = 1d-4
-   gradT_excess_f2 = 1d-2
-   gradT_excess_age_fraction = 0.9d0
-   gradT_excess_lambda1 = 1.0
-   gradT_excess_beta1 = 0.35
-   gradT_excess_lambda2 = 0.5
-   gradT_excess_beta2 = 0.25
-   gradT_excess_dlambda = 0.1
-   gradT_excess_dbeta = 0.1
+varcontrol_target = 1d-3
 
-   hot_wind_scheme = '' ! 'Dutch'
-   hot_wind_full_on_T = 1d0
-   cool_wind_full_on_T = 0d0
-   Dutch_scaling_factor = 0.8
+dX_nuc_drop_limit = 5d-2
+dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
 
-   include_composition_in_eps_grav = .true.
+delta_Ye_highT_limit = 1d-3
 
-   make_gradr_sticky_in_solver_iters = .true.
+okay_to_reduce_gradT_excess = .true.
+gradT_excess_f1 = 1d-4
+gradT_excess_f2 = 1d-2
+gradT_excess_age_fraction = 0.9d0
+gradT_excess_lambda1 = 1.0
+gradT_excess_beta1 = 0.35
+gradT_excess_lambda2 = 0.5
+gradT_excess_beta2 = 0.25
+gradT_excess_dlambda = 0.1
+gradT_excess_dbeta = 0.1
 
-   use_gold2_tolerances = .false.
-   use_gold_tolerances = .true.
+hot_wind_scheme = '' ! 'Dutch'
+hot_wind_full_on_T = 1d0
+cool_wind_full_on_T = 0d0
+Dutch_scaling_factor = 0.8
 
-   xa_scale = 1d-5
-   solver_itermin = 2
+include_composition_in_eps_grav = .true.
 
-   mixing_length_alpha = 1.5
-   MLT_option = 'none'
+make_gradr_sticky_in_solver_iters = .true.
 
-   use_Ledoux_criterion = .true.
-   alpha_semiconvection = 0.01
-   thermohaline_coeff = 2
-   thermohaline_option = 'Kippenhahn'
+use_gold2_tolerances = .false.
+use_gold_tolerances = .true.
 
-   use_other_alpha_mlt = .true. ! implemented in run_star_extras
-   x_ctrl(21) = 3.0 ! alpha_H
-   x_ctrl(22) = 1.5 ! alpha_other
-   x_ctrl(23) = 0.5 ! H_limit 
-      ! use alpha_H if cell X >= H_limit; else use alpha_other
-   x_ctrl(24) = 9d0 ! mass limit (Msun)
-      ! use other_alpfa_mlt only if star_mass >= this limit.
+xa_scale = 1d-5
+solver_itermin = 2
 
-   min_overshoot_q = 0d0
+mixing_length_alpha = 1.5
+MLT_option = 'none'
 
-   screening_mode = 'extended'
-   
-   min_timestep_limit = 1d-12 ! (seconds)
+use_Ledoux_criterion = .true.
+alpha_semiconvection = 0.01
+thermohaline_coeff = 2
+thermohaline_option = 'Kippenhahn'
 
-   delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
+use_other_alpha_mlt = .true. ! implemented in run_star_extras
+x_ctrl(21) = 3.0 ! alpha_H
+x_ctrl(22) = 1.5 ! alpha_other
+x_ctrl(23) = 0.5 ! H_limit
+! use alpha_H if cell X >= H_limit; else use alpha_other
+x_ctrl(24) = 9d0 ! mass limit (Msun)
+! use other_alpfa_mlt only if star_mass >= this limit.
 
-   dX_nuc_drop_max_A_limit = 52
-   dX_nuc_drop_min_X_limit = 1d-4
-   dX_nuc_drop_hard_limit = 1d99
-   
-   delta_lgTeff_limit = 0.5  
-   delta_lgL_limit = 0.5
-   delta_lgRho_cntr_limit = 0.02  
+min_overshoot_q = 0d0
 
-   T_mix_limit = 0
+screening_mode = 'extended'
+
+min_timestep_limit = 1d-12 ! (seconds)
+
+delta_lgL_He_limit = 0.1 ! limit for magnitude of change in lgL_He
+
+dX_nuc_drop_max_A_limit = 52
+dX_nuc_drop_min_X_limit = 1d-4
+dX_nuc_drop_hard_limit = 1d99
+
+delta_lgTeff_limit = 0.5
+delta_lgL_limit = 0.5
+delta_lgRho_cntr_limit = 0.02
+
+T_mix_limit = 0
 
 / ! end of controls namelist
 
 
 &pgstar
 
-         
+
 !pause = .true.
-      
 
 pgstar_age_disp = 2.5
 pgstar_model_disp = 2.5
-      pgstar_lw = 8
-         
-      Grid2_win_flag = .true.
+pgstar_lw = 8
 
+Grid2_win_flag = .true.
 
-         Grid2_win_width = 12
-         Grid2_win_aspect_ratio = 0.5 ! aspect_ratio = height/width
+Grid2_win_width = 12
+Grid2_win_aspect_ratio = 0.5 ! aspect_ratio = height/width
 
+Grid2_num_cols = 7 ! divide plotting region into this many equal width cols
+Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
+Grid2_num_plots = 5 ! <= 10
 
-         Grid2_num_cols = 7 ! divide plotting region into this many equal width cols
-         Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
-         Grid2_num_plots = 5 ! <= 10
-         
-         Grid2_plot_name(1) = 'TRho'
-         Grid2_plot_row(1) = 1 ! number from 1 at top
-         Grid2_plot_rowspan(1) = 6 ! plot spans this number of rows
-         Grid2_plot_col(1) =  1 ! number from 1 at left
-         Grid2_plot_colspan(1) = 2 ! plot spans this number of columns 
-         Grid2_plot_pad_left(1) = 0.00 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(1) = 0.00 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(1) = 0.00 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(1) = 0.0 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(1) = 0.65 ! multiply txt_scale for subplot by this
-         
-         Grid2_plot_name(2) = 'Text_Summary1'
-         Grid2_plot_row(2) = 7 ! number from 1 at top
-         Grid2_plot_rowspan(2) = 2 ! plot spans this number of rows
-         Grid2_plot_col(2) = 1 ! number from 1 at left
-         Grid2_plot_colspan(2) = 4 ! plot spans this number of columns 
-         Grid2_plot_pad_left(2) = -0.08 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(2) = -0.12 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(2) = 0.08 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(2) = -0.04 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(2) = 0.19 ! multiply txt_scale for subplot by this
-         
-         Grid2_plot_name(3) = 'Abundance'
-         
-         Grid2_plot_row(3) = 1 ! number from 1 at top
-         Grid2_plot_rowspan(3) = 3 ! plot spans this number of rows
-         Grid2_plot_col(3) = 3 ! plot spans this number of columns 
-         Grid2_plot_colspan(3) = 3 ! plot spans this number of columns 
-         
-         Grid2_plot_pad_left(3) = 0.07 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(3) = 0.07 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(3) = 0.0 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(3) = 0.06 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(3) = 0.65 ! multiply txt_scale for subplot by this
+Grid2_plot_name(1) = 'TRho'
+Grid2_plot_row(1) = 1 ! number from 1 at top
+Grid2_plot_rowspan(1) = 6 ! plot spans this number of rows
+Grid2_plot_col(1) = 1 ! number from 1 at left
+Grid2_plot_colspan(1) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(1) = 0.00 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(1) = 0.00 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(1) = 0.00 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(1) = 0.0 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(1) = 0.65 ! multiply txt_scale for subplot by this
+
+Grid2_plot_name(2) = 'Text_Summary1'
+Grid2_plot_row(2) = 7 ! number from 1 at top
+Grid2_plot_rowspan(2) = 2 ! plot spans this number of rows
+Grid2_plot_col(2) = 1 ! number from 1 at left
+Grid2_plot_colspan(2) = 4 ! plot spans this number of columns
+Grid2_plot_pad_left(2) = -0.08 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(2) = -0.12 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(2) = 0.08 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(2) = -0.04 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(2) = 0.19 ! multiply txt_scale for subplot by this
+
+Grid2_plot_name(3) = 'Abundance'
+
+Grid2_plot_row(3) = 1 ! number from 1 at top
+Grid2_plot_rowspan(3) = 3 ! plot spans this number of rows
+Grid2_plot_col(3) = 3 ! plot spans this number of columns
+Grid2_plot_colspan(3) = 3 ! plot spans this number of columns
+
+Grid2_plot_pad_left(3) = 0.07 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(3) = 0.07 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(3) = 0.0 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(3) = 0.06 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(3) = 0.65 ! multiply txt_scale for subplot by this
 
 Abundance_xmax = 2.4 ! -101 ! only used if /= -101d0
 Power_xmax = 2.4 ! -101 ! only used if /= -101d0
-         
-         Grid2_plot_name(4) = 'Power'
-         
-         Grid2_plot_row(4) = 4 ! number from 1 at top
-         Grid2_plot_rowspan(4) = 3 ! plot spans this number of rows
-         Grid2_plot_col(4) =  3 ! number from 1 at left
-         Grid2_plot_colspan(4) = 3 ! plot spans this number of columns 
-         
-         Grid2_plot_pad_left(4) = 0.07 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(4) = 0.07 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(4) = 0.06 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(4) = 0.0 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(4) = 0.65 ! multiply txt_scale for subplot by this
 
+Grid2_plot_name(4) = 'Power'
 
+Grid2_plot_row(4) = 4 ! number from 1 at top
+Grid2_plot_rowspan(4) = 3 ! plot spans this number of rows
+Grid2_plot_col(4) = 3 ! number from 1 at left
+Grid2_plot_colspan(4) = 3 ! plot spans this number of columns
 
-         Grid2_plot_name(5) = 'Profile_Panels1'
-         Grid2_plot_row(5) = 1 ! number from 1 at top
-         Grid2_plot_rowspan(5) = 8 ! plot spans this number of rows
-         Grid2_plot_col(5) =  6 ! number from 1 at left
-         Grid2_plot_colspan(5) = 2 ! plot spans this number of columns 
-         Grid2_plot_pad_left(5) = 0.05 ! fraction of full window width for padding on left
-         Grid2_plot_pad_right(5) = 0.03 ! fraction of full window width for padding on right
-         Grid2_plot_pad_top(5) = 0.0 ! fraction of full window height for padding at top
-         Grid2_plot_pad_bot(5) = 0.0 ! fraction of full window height for padding at bottom
-         Grid2_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
+Grid2_plot_pad_left(4) = 0.07 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(4) = 0.07 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(4) = 0.06 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(4) = 0.0 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(4) = 0.65 ! multiply txt_scale for subplot by this
 
-         TRho_logRho_dlogRho_min = 0.01 
-         TRho_logT_dlogT_min = 0.02 
-         HR_dlogT_min = 0.02
-         HR_dlogL_min = 0.01
+Grid2_plot_name(5) = 'Profile_Panels1'
+Grid2_plot_row(5) = 1 ! number from 1 at top
+Grid2_plot_rowspan(5) = 8 ! plot spans this number of rows
+Grid2_plot_col(5) = 6 ! number from 1 at left
+Grid2_plot_colspan(5) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(5) = 0.05 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(5) = 0.03 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(5) = 0.0 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(5) = 0.0 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
 
-         Text_Summary1_name(2,1) = 'star_age'
+TRho_logRho_dlogRho_min = 0.01
+TRho_logT_dlogT_min = 0.02
+HR_dlogT_min = 0.02
+HR_dlogL_min = 0.01
+
+Text_Summary1_name(2, 1) = 'star_age'
 
 ! file output
 !Grid2_file_flag = .true.
-   Grid2_file_dir = 'png'
-   Grid2_file_prefix = 'grid_'
-   Grid2_file_interval = 10 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
-   Grid2_file_width = -1 ! negative means use same value as for window
-   Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
-      
-      
-      show_TRho_Profile_eos_regions = .false.
-      TRho_Profile_xmin = -5.1
-      TRho_Profile_xmax = 10.2
-      TRho_Profile_ymin = 5.1
-      TRho_Profile_ymax = 10.2        
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid_'
+Grid2_file_interval = 10 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
+Grid2_file_width = -1 ! negative means use same value as for window
+Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
 
-         Text_Summary1_name(1,3) = 'log_cntr_Rho'
-         Text_Summary1_name(2,3) = 'log_cntr_T'
-         Text_Summary1_name(3,3) = ''
-         Text_Summary1_name(4,3) = ''
-         Text_Summary1_name(5,3) = ''
+show_TRho_Profile_eos_regions = .false.
+TRho_Profile_xmin = -5.1
+TRho_Profile_xmax = 10.2
+TRho_Profile_ymin = 5.1
+TRho_Profile_ymax = 10.2
 
-         !Text_Summary1_name(6,3) = 'center_ye'
-         
-         !Text_Summary1_name(7,3) = 'iron_core_infall'
-         !Text_Summary1_name(8,3) = 'non_iron_core_infall'
-         
-         !Text_Summary1_name(8,1) = 'center o16'
-         Text_Summary1_name(8,1) = 'species'
-      
-      !Abundance_win_flag = .true.
-      Abundance_win_width = 6
-      Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
-      
-      
+Text_Summary1_name(1, 3) = 'log_cntr_Rho'
+Text_Summary1_name(2, 3) = 'log_cntr_T'
+Text_Summary1_name(3, 3) = ''
+Text_Summary1_name(4, 3) = ''
+Text_Summary1_name(5, 3) = ''
+
+!Text_Summary1_name(6,3) = 'center_ye'
+
+!Text_Summary1_name(7,3) = 'iron_core_infall'
+!Text_Summary1_name(8,3) = 'non_iron_core_infall'
+
+!Text_Summary1_name(8,1) = 'center o16'
+Text_Summary1_name(8, 1) = 'species'
+
+!Abundance_win_flag = .true.
+Abundance_win_width = 6
+Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
+
+
 
 !      Abundance_xaxis_name = 'logR' 
 !      Abundance_xaxis_reversed = .false.
 !      Abundance_xmin = -4 ! only used if /= -101d0
 !      Abundance_xmax = -2 ! -101 ! only used if /= -101d0
 
-      Abundance_xaxis_name = 'mass' 
-      Abundance_xaxis_reversed = .false.
-      Abundance_xmin = 0 ! only used if /= -101d0
+Abundance_xaxis_name = 'mass'
+Abundance_xaxis_reversed = .false.
+Abundance_xmin = 0 ! only used if /= -101d0
 
 Abundance_xmax = 2.4 ! -101 ! only used if /= -101d0
-      
-      Abundance_line_txt_scale_factor = 1.1 ! relative to other text
-      Abundance_legend_txt_scale_factor = 1.1 ! relative to other text
 
-         Abundance_legend_max_cnt = 0
-      
-      Abundance_log_mass_frac_min = -3 ! only used if < 0
-      
-      
-      
-      !Abundance_file_flag = .true.
-      Abundance_file_dir = 'png'
-      Abundance_file_prefix = 'abund_'
-      Abundance_file_interval = 5 ! output when mod(model_number,Abundance_file_interval)==0
-      Abundance_file_width = -1 ! (inches) negative means use same value as for window
-      Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
-      
-      
-      !Profile_Panels1_win_flag = .true.
-      Profile_Panels1_win_width = 6
-      Profile_Panels1_win_aspect_ratio = 1 ! aspect_ratio = height/width
+Abundance_line_txt_scale_factor = 1.1 ! relative to other text
+Abundance_legend_txt_scale_factor = 1.1 ! relative to other text
 
-      Profile_Panels1_title = 'Profile Panels'      
-      Profile_Panels1_num_panels = 3         
-      Profile_Panels1_yaxis_name(1) = 'logT'         
-      Profile_Panels1_other_yaxis_name(1) = 'entropy'   
-         Profile_Panels1_other_ymin(1) = -101d0 ! 0 ! only used if /= -101d0
-         Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
-         Profile_Panels1_other_ymargin(1) = 0.1
-            
-      Profile_Panels1_yaxis_name(2) = 'logRho'
-      Profile_Panels1_other_yaxis_name(2) = 'logR_cm' 
-         Profile_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
-         Profile_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
-         Profile_Panels1_other_ymargin(2) = 0.1
-      
-      Profile_Panels1_yaxis_name(3) = 'ye'         
-         Profile_Panels1_ymin(3) = -101d0 ! 0.43 ! only used if /= -101d0
-         Profile_Panels1_ymax(3) = -101d0 ! 0.51 ! only used if /= -101d0        
-         Profile_Panels1_ymargin(3) = 0.1 
-      Profile_Panels1_other_yaxis_name(3) = 'vel_km_per_s' 
-         Profile_Panels1_other_ymin(3) = -101d0 ! -1200 ! only used if /= -101d0
-         Profile_Panels1_other_ymax(3) = -101d0 ! 300d0 ! only used if /= -101d0
-         Profile_Panels1_other_ymargin(3) = 0.1 ! 10
-         Profile_Panels1_other_dymin(3) = 50
-  
-      Profile_Panels1_xaxis_name = 'mass'
-      Profile_Panels1_xaxis_reversed = .false.
-      Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
-      
-      Profile_Panels1_xmax = 2.4 ! -101d0 ! only used if /= -101d0
-      
-      Profile_Panels1_xmargin = 0d0
+Abundance_legend_max_cnt = 0
+
+Abundance_log_mass_frac_min = -3 ! only used if < 0
+
+
+
+!Abundance_file_flag = .true.
+Abundance_file_dir = 'png'
+Abundance_file_prefix = 'abund_'
+Abundance_file_interval = 5 ! output when mod(model_number,Abundance_file_interval)==0
+Abundance_file_width = -1 ! (inches) negative means use same value as for window
+Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+!Profile_Panels1_win_flag = .true.
+Profile_Panels1_win_width = 6
+Profile_Panels1_win_aspect_ratio = 1 ! aspect_ratio = height/width
+
+Profile_Panels1_title = 'Profile Panels'
+Profile_Panels1_num_panels = 3
+Profile_Panels1_yaxis_name(1) = 'logT'
+Profile_Panels1_other_yaxis_name(1) = 'entropy'
+Profile_Panels1_other_ymin(1) = -101d0 ! 0 ! only used if /= -101d0
+Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(1) = 0.1
+
+Profile_Panels1_yaxis_name(2) = 'logRho'
+Profile_Panels1_other_yaxis_name(2) = 'logR_cm'
+Profile_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(2) = 0.1
+
+Profile_Panels1_yaxis_name(3) = 'ye'
+Profile_Panels1_ymin(3) = -101d0 ! 0.43 ! only used if /= -101d0
+Profile_Panels1_ymax(3) = -101d0 ! 0.51 ! only used if /= -101d0
+Profile_Panels1_ymargin(3) = 0.1
+Profile_Panels1_other_yaxis_name(3) = 'vel_km_per_s'
+Profile_Panels1_other_ymin(3) = -101d0 ! -1200 ! only used if /= -101d0
+Profile_Panels1_other_ymax(3) = -101d0 ! 300d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(3) = 0.1 ! 10
+Profile_Panels1_other_dymin(3) = 50
+
+Profile_Panels1_xaxis_name = 'mass'
+Profile_Panels1_xaxis_reversed = .false.
+Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
+
+Profile_Panels1_xmax = 2.4 ! -101d0 ! only used if /= -101d0
+
+Profile_Panels1_xmargin = 0d0
 
 
 

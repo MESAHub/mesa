@@ -1,30 +1,28 @@
 ! This inlist is desgined to make the initial model for cburn_inward
 
 &star_job
-      
-      show_log_description_at_start = .false. 
 
-      create_pre_main_sequence_model = .true.
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'end_core_he_burn.mod'
+create_pre_main_sequence_model = .true.
 
+save_model_when_terminate = .true.
+save_model_filename = 'end_core_he_burn.mod'
 
-      change_initial_net = .true.      
-      !change_net = .true.      
-      new_net_name = 'sagb_NeNa_MgAl.net'
+change_initial_net = .true.
+!change_net = .true.
+new_net_name = 'sagb_NeNa_MgAl.net'
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
-
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 
 / ! end of star_job namelist
@@ -36,226 +34,218 @@
 
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      kap_file_prefix = 'gs98'
+kap_file_prefix = 'gs98'
 
 / ! end of kap namelist
 
 &controls
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      initial_mass = 7.75d0
-      initial_z = 0.02d0
-      
-      xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 1d-5
+initial_mass = 7.75d0
+initial_z = 0.02d0
 
-      use_ledoux_criterion = .true.
+xa_central_lower_limit_species(1) = 'he4'
+xa_central_lower_limit(1) = 1d-5
 
-      overshoot_scheme(1) = 'exponential'
-      overshoot_zone_type(1) = 'nonburn'
-      overshoot_zone_loc(1) = 'any'
-      overshoot_bdy_loc(1) = 'top'
-      overshoot_f(1) = 0.01
-      overshoot_f0(1) = 0.005
+use_ledoux_criterion = .true.
 
-      overshoot_scheme(2) = 'exponential'
-      overshoot_zone_type(2) = 'burn_H'
-      overshoot_zone_loc(2) = 'any'
-      overshoot_bdy_loc(2) = 'top'
-      overshoot_f(2) = 0.01
-      overshoot_f0(2) = 0.005
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'nonburn'
+overshoot_zone_loc(1) = 'any'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.01
+overshoot_f0(1) = 0.005
 
-      overshoot_scheme(3) = 'exponential'
-      overshoot_zone_type(3) = 'burn_He'
-      overshoot_zone_loc(3) = 'any'
-      overshoot_bdy_loc(3) = 'top'
-      overshoot_f(3) = 0.01
-      overshoot_f0(3) = 0.005
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'burn_H'
+overshoot_zone_loc(2) = 'any'
+overshoot_bdy_loc(2) = 'top'
+overshoot_f(2) = 0.01
+overshoot_f0(2) = 0.005
 
-      mesh_delta_coeff = 1.0
-      varcontrol_target = 1d-3
+overshoot_scheme(3) = 'exponential'
+overshoot_zone_type(3) = 'burn_He'
+overshoot_zone_loc(3) = 'any'
+overshoot_bdy_loc(3) = 'top'
+overshoot_f(3) = 0.01
+overshoot_f0(3) = 0.005
 
+mesh_delta_coeff = 1.0
+varcontrol_target = 1d-3
 
-      hot_wind_scheme = 'Dutch'
-      cool_wind_RGB_scheme = 'Dutch'
-      cool_wind_AGB_scheme = 'Dutch'
-      Dutch_scaling_factor = 0.8d0
+hot_wind_scheme = 'Dutch'
+cool_wind_RGB_scheme = 'Dutch'
+cool_wind_AGB_scheme = 'Dutch'
+Dutch_scaling_factor = 0.8d0
 
-      
-      mixing_length_alpha = 1.8d0
-      MLT_option = 'TDC'
-      
-      max_age = 10d9
-      max_years_for_timestep = 1d9
+mixing_length_alpha = 1.8d0
+MLT_option = 'TDC'
 
-      report_solver_progress = .false. ! set true to see info about solver iterations
-      report_ierr = .false. ! if true, produce terminal output when have some internal error
+max_age = 10d9
+max_years_for_timestep = 1d9
 
-      !trace_evolve = .true.
+report_solver_progress = .false. ! set true to see info about solver iterations
+report_ierr = .false. ! if true, produce terminal output when have some internal error
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 5
-      terminal_interval = 10 
-      write_header_frequency = 10
-      
-      x_integer_ctrl(1) = 1 ! Part number
+!trace_evolve = .true.
+
+photo_interval = 50
+profile_interval = 100
+history_interval = 5
+terminal_interval = 10
+write_header_frequency = 10
+
+x_integer_ctrl(1) = 1 ! Part number
 
 / ! end of controls namelist
 
 
 &pgstar
 
-         
+
 !pause = .true.
-         
-    Grid2_win_flag = .true.
-    
-    Grid2_win_width = 14
-    Grid2_win_aspect_ratio = 0.5 ! aspect_ratio = height/width
-    
-    
-    Grid2_num_cols = 7 ! divide plotting region into this many equal width cols
-    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
-    Grid2_num_plots = 6 ! <= 10
-    
-    Grid2_plot_pad_right(5) = 0.00 ! fraction of full window width for padding on right
-    Grid2_plot_colspan(5) = 3 ! plot spans this number of columns 
-    Grid2_plot_colspan(4) = 5 ! plot spans this number of columns 
-    
-    Grid2_plot_name(6) = 'Profile_Panels1'
-    Grid2_plot_row(6) = 1 ! number from 1 at top
-    Grid2_plot_rowspan(6) = 8 ! plot spans this number of rows
-    Grid2_plot_col(6) =  6 ! number from 1 at left
-    Grid2_plot_colspan(6) = 2 ! plot spans this number of columns 
-    Grid2_plot_pad_left(6) = 0.06 ! fraction of full window width for padding on left
-    Grid2_plot_pad_right(6) = 0.03 ! fraction of full window width for padding on right
-    Grid2_plot_pad_top(6) = 0.0 ! fraction of full window height for padding at top
-    Grid2_plot_pad_bot(6) = 0.0 ! fraction of full window height for padding at bottom
-    Grid2_txt_scale_factor(6) = 0.65 ! multiply txt_scale for subplot by this
-    
-    TRho_logRho_dlogRho_min = 0.01 
-    TRho_logT_dlogT_min = 0.02 
-    HR_dlogT_min = 0.02
-    HR_dlogL_min = 0.01
-    
-    Text_Summary1_name(2,1) = 'star_age'
-    
-    ! file output
-    !Grid2_file_flag = .true.
-    Grid2_file_dir = 'png'
-    Grid2_file_prefix = 'grid_'
-    Grid2_file_interval = 1 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
-    Grid2_file_width = -1 ! negative means use same value as for window
-    Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
-    
-    
-    show_TRho_Profile_eos_regions = .false.
-    TRho_Profile_xmin = -5.1
-    TRho_Profile_xmax = 10.2
-    TRho_Profile_ymin = 5.1
-    TRho_Profile_ymax = 10.2        
-    
-    Text_Summary1_name(1,3) = 'log_cntr_Rho'
-    Text_Summary1_name(2,3) = 'log_cntr_T'
-    Text_Summary1_name(3,3) = 'center h1'
-    Text_Summary1_name(4,3) = 'center he4'
-    Text_Summary1_name(5,3) = ''
-    
-    !Text_Summary1_name(6,3) = 'center_ye'
-    
-    !Text_Summary1_name(7,3) = 'iron_core_infall'
-    !Text_Summary1_name(8,3) = 'non_iron_core_infall'
-    
-    !Text_Summary1_name(8,1) = 'center o16'
-    Text_Summary1_name(8,1) = 'species'
-    
-    !Abundance_win_flag = .true.
-    Abundance_win_width = 6
-    Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
-    
-    
-    
-    !      Abundance_xaxis_name = 'logR' 
-    !      Abundance_xaxis_reversed = .false.
-    !      Abundance_xmin = -4 ! only used if /= -101d0
-    !      Abundance_xmax = -2 ! -101 ! only used if /= -101d0
-    
-    Abundance_xaxis_name = 'mass' 
-    Abundance_xaxis_reversed = .false.
-    Abundance_xmin = 0 ! only used if /= -101d0
-    
-    
-    Abundance_line_txt_scale_factor = 1.1 ! relative to other text
-    Abundance_legend_txt_scale_factor = 1.1 ! relative to other text
-    
-    Abundance_legend_max_cnt = 0
-    
-    Abundance_log_mass_frac_min = -3 ! only used if < 0
-    
-    
-    
-    !Abundance_file_flag = .true.
-    Abundance_file_dir = 'png'
-    Abundance_file_prefix = 'abund_'
-    Abundance_file_interval = 5 ! output when mod(model_number,Abundance_file_interval)==0
-    Abundance_file_width = -1 ! (inches) negative means use same value as for window
-    Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
-    
-    
-    !Profile_Panels1_win_flag = .true.
-    Profile_Panels1_win_width = 6
-    Profile_Panels1_win_aspect_ratio = 1 ! aspect_ratio = height/width
-    
-    Profile_Panels1_title = 'Profile Panels'      
-    Profile_Panels1_num_panels = 3  
-    
-    Profile_Panels1_yaxis_name(1) = 'logT'         
-    Profile_Panels1_other_yaxis_name(1) = 'entropy'   
-    Profile_Panels1_other_ymin(1) = 0 ! only used if /= -101d0
-    Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
-    Profile_Panels1_other_ymargin(1) = 1
-    
-    Profile_Panels1_yaxis_name(2) = 'logRho'
-    Profile_Panels1_other_yaxis_name(2) = 'logR_cm' 
-    Profile_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
-    Profile_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
-    Profile_Panels1_other_ymargin(2) = 0
-    
-    Profile_Panels1_yaxis_name(3) = 'log_abs_eps_nuc'         
-    Profile_Panels1_ymin(3) = 5 ! only used if /= -101d0
-    !Profile_Panels1_ymax(3) = 0.51 ! only used if /= -101d0        
-    !Profile_Panels1_ymargin(3) = 0.1 
-    Profile_Panels1_other_yaxis_name(3) = 'log_D_mix' 
-    Profile_Panels1_other_ymin(3) = 5 ! only used if /= -101d0
-    !Profile_Panels1_other_ymax(3) = 300d0 ! only used if /= -101d0
-    !Profile_Panels1_other_ymargin(3) = 10
-    
-    
-    
-    !      Profile_Panels1_xaxis_name = 'logR'
-    !      Profile_Panels1_xaxis_reversed = .false.
-    !      Profile_Panels1_xmin = -4 ! only used if /= -101d0
-    !      Profile_Panels1_xmax = -2 ! -101d0 ! only used if /= -101d0
-    
-    Profile_Panels1_xaxis_name = 'mass'
-    Profile_Panels1_xaxis_reversed = .false.
-    Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
-    
-    Profile_Panels1_xmargin = 0d0
-    
-    
-    
-    Profile_Panels1_xmax = 0.5 ! -101d0 ! only used if /= -101d0
-    Abundance_xmax = 0.5 ! -101 ! only used if /= -101d0
-    
-    
-    kipp_win_flag = .true.
+
+Grid2_win_flag = .true.
+
+Grid2_win_width = 14
+Grid2_win_aspect_ratio = 0.5 ! aspect_ratio = height/width
+
+Grid2_num_cols = 7 ! divide plotting region into this many equal width cols
+Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
+Grid2_num_plots = 6 ! <= 10
+
+Grid2_plot_pad_right(5) = 0.00 ! fraction of full window width for padding on right
+Grid2_plot_colspan(5) = 3 ! plot spans this number of columns
+Grid2_plot_colspan(4) = 5 ! plot spans this number of columns
+
+Grid2_plot_name(6) = 'Profile_Panels1'
+Grid2_plot_row(6) = 1 ! number from 1 at top
+Grid2_plot_rowspan(6) = 8 ! plot spans this number of rows
+Grid2_plot_col(6) = 6 ! number from 1 at left
+Grid2_plot_colspan(6) = 2 ! plot spans this number of columns
+Grid2_plot_pad_left(6) = 0.06 ! fraction of full window width for padding on left
+Grid2_plot_pad_right(6) = 0.03 ! fraction of full window width for padding on right
+Grid2_plot_pad_top(6) = 0.0 ! fraction of full window height for padding at top
+Grid2_plot_pad_bot(6) = 0.0 ! fraction of full window height for padding at bottom
+Grid2_txt_scale_factor(6) = 0.65 ! multiply txt_scale for subplot by this
+
+TRho_logRho_dlogRho_min = 0.01
+TRho_logT_dlogT_min = 0.02
+HR_dlogT_min = 0.02
+HR_dlogL_min = 0.01
+
+Text_Summary1_name(2, 1) = 'star_age'
+
+! file output
+!Grid2_file_flag = .true.
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid_'
+Grid2_file_interval = 1 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
+Grid2_file_width = -1 ! negative means use same value as for window
+Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
+
+show_TRho_Profile_eos_regions = .false.
+TRho_Profile_xmin = -5.1
+TRho_Profile_xmax = 10.2
+TRho_Profile_ymin = 5.1
+TRho_Profile_ymax = 10.2
+
+Text_Summary1_name(1, 3) = 'log_cntr_Rho'
+Text_Summary1_name(2, 3) = 'log_cntr_T'
+Text_Summary1_name(3, 3) = 'center h1'
+Text_Summary1_name(4, 3) = 'center he4'
+Text_Summary1_name(5, 3) = ''
+
+!Text_Summary1_name(6,3) = 'center_ye'
+
+!Text_Summary1_name(7,3) = 'iron_core_infall'
+!Text_Summary1_name(8,3) = 'non_iron_core_infall'
+
+!Text_Summary1_name(8,1) = 'center o16'
+Text_Summary1_name(8, 1) = 'species'
+
+!Abundance_win_flag = .true.
+Abundance_win_width = 6
+Abundance_win_aspect_ratio = 1 ! aspect_ratio = height/width
+
+
+
+!      Abundance_xaxis_name = 'logR'
+!      Abundance_xaxis_reversed = .false.
+!      Abundance_xmin = -4 ! only used if /= -101d0
+!      Abundance_xmax = -2 ! -101 ! only used if /= -101d0
+
+Abundance_xaxis_name = 'mass'
+Abundance_xaxis_reversed = .false.
+Abundance_xmin = 0 ! only used if /= -101d0
+
+Abundance_line_txt_scale_factor = 1.1 ! relative to other text
+Abundance_legend_txt_scale_factor = 1.1 ! relative to other text
+
+Abundance_legend_max_cnt = 0
+
+Abundance_log_mass_frac_min = -3 ! only used if < 0
+
+
+
+!Abundance_file_flag = .true.
+Abundance_file_dir = 'png'
+Abundance_file_prefix = 'abund_'
+Abundance_file_interval = 5 ! output when mod(model_number,Abundance_file_interval)==0
+Abundance_file_width = -1 ! (inches) negative means use same value as for window
+Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+!Profile_Panels1_win_flag = .true.
+Profile_Panels1_win_width = 6
+Profile_Panels1_win_aspect_ratio = 1 ! aspect_ratio = height/width
+
+Profile_Panels1_title = 'Profile Panels'
+Profile_Panels1_num_panels = 3
+
+Profile_Panels1_yaxis_name(1) = 'logT'
+Profile_Panels1_other_yaxis_name(1) = 'entropy'
+Profile_Panels1_other_ymin(1) = 0 ! only used if /= -101d0
+Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(1) = 1
+
+Profile_Panels1_yaxis_name(2) = 'logRho'
+Profile_Panels1_other_yaxis_name(2) = 'logR_cm'
+Profile_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
+Profile_Panels1_other_ymargin(2) = 0
+
+Profile_Panels1_yaxis_name(3) = 'log_abs_eps_nuc'
+Profile_Panels1_ymin(3) = 5 ! only used if /= -101d0
+!Profile_Panels1_ymax(3) = 0.51 ! only used if /= -101d0
+!Profile_Panels1_ymargin(3) = 0.1
+Profile_Panels1_other_yaxis_name(3) = 'log_D_mix'
+Profile_Panels1_other_ymin(3) = 5 ! only used if /= -101d0
+!Profile_Panels1_other_ymax(3) = 300d0 ! only used if /= -101d0
+!Profile_Panels1_other_ymargin(3) = 10
+
+
+
+!      Profile_Panels1_xaxis_name = 'logR'
+!      Profile_Panels1_xaxis_reversed = .false.
+!      Profile_Panels1_xmin = -4 ! only used if /= -101d0
+!      Profile_Panels1_xmax = -2 ! -101d0 ! only used if /= -101d0
+
+Profile_Panels1_xaxis_name = 'mass'
+Profile_Panels1_xaxis_reversed = .false.
+Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
+
+Profile_Panels1_xmargin = 0d0
+
+Profile_Panels1_xmax = 0.5 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = 0.5 ! -101 ! only used if /= -101d0
+
+kipp_win_flag = .true.
 
 
 / ! end of pgstar namelist

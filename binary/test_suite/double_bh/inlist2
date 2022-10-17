@@ -1,148 +1,147 @@
-
 &star_job
 
-    show_log_description_at_start = .false.
-    save_model_when_terminate = .true.
-    save_model_filename = 'final.mod'
+show_log_description_at_start = .false.
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
 
-    new_rotation_flag = .true.
-    change_rotation_flag = .true.
-    set_initial_surface_rotation_v = .true.
-    ! this is just a random number, tidal sync takes care of it
-    new_surface_rotation_v = 50
+new_rotation_flag = .true.
+change_rotation_flag = .true.
+set_initial_surface_rotation_v = .true.
+! this is just a random number, tidal sync takes care of it
+new_surface_rotation_v = 50
 
-    set_uniform_initial_composition = .true.
-    initial_h1 = 0.70d0
-    initial_h2 = 0d0
-    initial_he3 = 0d0
-    initial_he4 = 0.28d0
+set_uniform_initial_composition = .true.
+initial_h1 = 0.70d0
+initial_h2 = 0d0
+initial_he3 = 0d0
+initial_he4 = 0.28d0
 
-    relax_initial_Z = .true.
-    new_Z = 0.00034
-    relax_initial_Y = .true.
-    new_Y = 0.248246d0
+relax_initial_Z = .true.
+new_Z = 0.00034
+relax_initial_Y = .true.
+new_Y = 0.248246d0
 
-    set_cumulative_energy_error_at_step = 1
-    new_cumulative_energy_error = 0d0
+set_cumulative_energy_error_at_step = 1
+new_cumulative_energy_error = 0d0
 
-    !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 
 &eos
-    !logRho_min_for_all_OPAL = -9.5d0
-    !logRho_min_for_any_OPAL = -9.6d0
+!logRho_min_for_all_OPAL = -9.5d0
+!logRho_min_for_any_OPAL = -9.6d0
 / ! end of eos namelist
 
 
 &kap
-    Zbase = 0.00034d0
+Zbase = 0.00034d0
 
-    use_Type2_opacities = .true.
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 
 &controls
 
-    w_div_wcrit_max = 0.5d0
+w_div_wcrit_max = 0.5d0
 
-    redo_limit = -1
+redo_limit = -1
 
-    !! Recommended: extra spatial resolution
-    !! to make the test runs fast we use low spatial resolution
-    !mesh_delta_coeff = 0.8
-    !max_dq = 0.001
-    !xtra_coef_above_xtrans = 0.2
-    !xtra_coef_below_xtrans = 0.2
-    !min_dq_for_xa = 1d-5
-    mesh_delta_coeff = 2
+!! Recommended: extra spatial resolution
+!! to make the test runs fast we use low spatial resolution
+!mesh_delta_coeff = 0.8
+!max_dq = 0.001
+!xtra_coef_above_xtrans = 0.2
+!xtra_coef_below_xtrans = 0.2
+!min_dq_for_xa = 1d-5
+mesh_delta_coeff = 2
 
-    solver_iters_timestep_limit = 10
+solver_iters_timestep_limit = 10
 
-    max_model_number = 2000
+max_model_number = 2000
 
-    ! extra controls for timestep
-    ! these are for changes in mdot, to avoid violent increase in mass transfer rate
-    delta_mdot_atol = 1d-6
-    delta_mdot_rtol = 0.1
-    delta_mdot_limit = 1
-    delta_mdot_hard_limit = 5
-    ! these are to properly resolve core hydrogen depletion
-    delta_lg_XH_cntr_max = 0.0d0
-    delta_lg_XH_cntr_min = -5.0d0
-    ! these are to properly resolve core helium depletion
-    delta_lg_XHe_cntr_max = 0.0d0
-    delta_lg_XHe_cntr_min = -5.0d0
-    ! avoid large jumps in the HR diagram
-    delta_HR_limit = 0.005d0
+! extra controls for timestep
+! these are for changes in mdot, to avoid violent increase in mass transfer rate
+delta_mdot_atol = 1d-6
+delta_mdot_rtol = 0.1
+delta_mdot_limit = 1
+delta_mdot_hard_limit = 5
+! these are to properly resolve core hydrogen depletion
+delta_lg_XH_cntr_max = 0.0d0
+delta_lg_XH_cntr_min = -5.0d0
+! these are to properly resolve core helium depletion
+delta_lg_XHe_cntr_max = 0.0d0
+delta_lg_XHe_cntr_min = -5.0d0
+! avoid large jumps in the HR diagram
+delta_HR_limit = 0.005d0
 
-    log_directory = 'LOGS2'
+log_directory = 'LOGS2'
 
-    profile_interval = 50
-    history_interval = 1
-    terminal_interval = 10
-    write_header_frequency = 10
+profile_interval = 50
+history_interval = 1
+terminal_interval = 10
+write_header_frequency = 10
 
-    use_ledoux_criterion = .true.
-    mixing_length_alpha = 1.5d0
-    alpha_semiconvection = 1d0
-    thermohaline_coeff = 1d0
-    MLT_option = "Cox"
+use_ledoux_criterion = .true.
+mixing_length_alpha = 1.5d0
+alpha_semiconvection = 1d0
+thermohaline_coeff = 1d0
+MLT_option = "Cox"
 
-  ! rotational mixing coeffs
-    am_nu_ST_factor = 1.0
-    D_visc_factor = 0.0
-    am_nu_SH_factor = 0.0
-    D_ST_factor = 0.0
-    D_SH_factor = 0.0
-    D_GSF_factor = 1.0
-    D_ES_factor = 1.0
-    D_SSI_factor = 1.0
-    D_DSI_factor = 1.0
-    am_D_mix_factor = 0.0333333d0
-    am_gradmu_factor = 0.1d0
-    num_cells_for_smooth_gradL_composition_term = 2
+! rotational mixing coeffs
+am_nu_ST_factor = 1.0
+D_visc_factor = 0.0
+am_nu_SH_factor = 0.0
+D_ST_factor = 0.0
+D_SH_factor = 0.0
+D_GSF_factor = 1.0
+D_ES_factor = 1.0
+D_SSI_factor = 1.0
+D_DSI_factor = 1.0
+am_D_mix_factor = 0.0333333d0
+am_gradmu_factor = 0.1d0
+num_cells_for_smooth_gradL_composition_term = 2
 
-  ! premix omega to avoid doing the solver with crazily shearing material
-    premix_omega = .true.
+! premix omega to avoid doing the solver with crazily shearing material
+premix_omega = .true.
 
-  ! wind options
-    ! winds implemented as in Brott et al. 2011
-    use_other_wind = .true.
-    ! use implicit wind close to critical
-    surf_avg_tau_min = 0
-    surf_avg_tau = 10
-    max_mdot_redo_cnt = 200
-    min_years_dt_for_redo_mdot = 0
-    surf_omega_div_omega_crit_limit = 0.98d0
-    surf_omega_div_omega_crit_tol = 0.02d0
-    rotational_mdot_boost_fac = 1d10
-    rotational_mdot_kh_fac = 1d10
-    mdot_revise_factor = 1.1
-    implicit_mdot_boost = 0.05
+! wind options
+! winds implemented as in Brott et al. 2011
+use_other_wind = .true.
+! use implicit wind close to critical
+surf_avg_tau_min = 0
+surf_avg_tau = 10
+max_mdot_redo_cnt = 200
+min_years_dt_for_redo_mdot = 0
+surf_omega_div_omega_crit_limit = 0.98d0
+surf_omega_div_omega_crit_tol = 0.02d0
+rotational_mdot_boost_fac = 1d10
+rotational_mdot_kh_fac = 1d10
+mdot_revise_factor = 1.1
+implicit_mdot_boost = 0.05
 
-  ! custom opacity that scales with iron abundance
+! custom opacity that scales with iron abundance
 
-  ! we use step overshooting
-    overshoot_scheme(1) = 'step'
-    overshoot_zone_type(1) = 'burn_H'
-    overshoot_zone_loc(1) = 'core'
-    overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.345
-    overshoot_f0(1) = 0.01
+! we use step overshooting
+overshoot_scheme(1) = 'step'
+overshoot_zone_type(1) = 'burn_H'
+overshoot_zone_loc(1) = 'core'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.345
+overshoot_f0(1) = 0.01
 
 !
-  ! this is to avoid odd behaviour when a star switches from accreting to mass losing
-    max_mdot_jump_for_rotation = 1.1
+! this is to avoid odd behaviour when a star switches from accreting to mass losing
+max_mdot_jump_for_rotation = 1.1
 
 / ! end of controls namelist
 
 
 &pgstar
-    read_extra_pgstar_inlist1 = .true.
-    extra_pgstar_inlist1_name = 'inlist_pgstar'
-      
+read_extra_pgstar_inlist1 = .true.
+extra_pgstar_inlist1_name = 'inlist_pgstar'
+
 / ! end of pgstar namelist
 

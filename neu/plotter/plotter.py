@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
 import copy
-import numpy as np
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
+import numpy as np
+
 
 def parse(fname):
     nY, nX = np.loadtxt(fname, max_rows=1, skiprows=3, unpack=True, dtype=int)
     data = np.loadtxt(fname, skiprows=4)
     data = np.reshape(data, ((nX, nY, -1)))
-    Yran = data[0,:,0]
-    Xran = data[:,0,1]
+    Yran = data[0, :, 0]
+    Xran = data[:, 0, 1]
     data = np.swapaxes(data, 0, 1)
     return data, Yran, Xran
 
@@ -41,7 +42,8 @@ cmap.set_under('black')
 cbar_min = None
 cbar_max = None
 
-pcol = ax.pcolormesh(Xran, Yran, neuDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)
+pcol = ax.pcolormesh(Xran, Yran, neuDT[..., 2], shading='nearest', cmap=cmap,
+                     vmin=cbar_min, vmax=cbar_max)
 pcol.set_edgecolor('face')
 cax = fig.colorbar(pcol, extend='both')
 cax.set_label('')

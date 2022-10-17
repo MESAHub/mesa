@@ -22,41 +22,40 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_solver_monitor
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_solver_monitor = .true.
-      ! procedure pointer: s% other_solver_monitor => my_routine
-
-
-      use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_solver_monitor( &
-            id, iter, passed_tol_tests, &
-            correction_norm, max_correction, &
-            residual_norm, max_residual, ierr)
-         integer, intent(in) :: id, iter 
-            ! iter is the number of the iteration we have just finished
-         logical, intent(in) :: passed_tol_tests
-         real(dp), intent(in) :: correction_norm, max_correction, &
-            residual_norm, max_residual
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-      end subroutine default_other_solver_monitor
+module other_solver_monitor
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_solver_monitor = .true.
+   ! procedure pointer: s% other_solver_monitor => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      end module other_solver_monitor
+contains
+   
+   
+   subroutine default_other_solver_monitor(&
+      id, iter, passed_tol_tests, &
+      correction_norm, max_correction, &
+      residual_norm, max_residual, ierr)
+      integer, intent(in) :: id, iter
+      ! iter is the number of the iteration we have just finished
+      logical, intent(in) :: passed_tol_tests
+      real(dp), intent(in) :: correction_norm, max_correction, &
+         residual_norm, max_residual
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine default_other_solver_monitor
+
+
+end module other_solver_monitor
       
       
       

@@ -23,13 +23,11 @@
 !
 ! ***********************************************************************
 
-      module star_def
-      
-      use star_data_def
+module star_def
+   
+   use star_data_def
+   
+   implicit none
 
-      
-      implicit none      
-      
-      
-      end module star_def
+end module star_def
 

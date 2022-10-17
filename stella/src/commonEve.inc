@@ -1,5 +1,5 @@
 /*
-      include for eve and strad
+include for eve and strad
 */
-   Common/NiAdap/tday,t_eve,XNifor(Mzon),AMeveNi,KNadap;   
+Common/NiAdap/tday, t_eve, XNifor(Mzon), AMeveNi, KNadap;
    

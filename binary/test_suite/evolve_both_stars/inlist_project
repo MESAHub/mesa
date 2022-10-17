@@ -1,21 +1,21 @@
 &binary_job
 
-   inlist_names(1) = 'inlist1' 
-   inlist_names(2) = 'inlist2'
+inlist_names(1) = 'inlist1'
+inlist_names(2) = 'inlist2'
 
-   evolve_both_stars = .true.
+evolve_both_stars = .true.
 
 / ! end of binary_job namelist
 
 &binary_controls
-         
-   m1 = 1.0d0  ! donor mass in Msun
-   m2 = 0.8d0 ! companion mass in Msun
-   initial_period_in_days = 0.5d0
 
-   fr = 0.01
-   fr_limit = 1d-3
+m1 = 1.0d0  ! donor mass in Msun
+m2 = 0.8d0 ! companion mass in Msun
+initial_period_in_days = 0.5d0
 
-   limit_retention_by_mdot_edd = .false.
-         
+fr = 0.01
+fr_limit = 1d-3
+
+limit_retention_by_mdot_edd = .false.
+
 / ! end of binary_controls namelist

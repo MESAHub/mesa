@@ -1,16 +1,16 @@
 &kappa
-         
-         data_dir = 'kap_input_data/wichita/af94'		
-         lowT_flag = .true.
-         AF94_lowT = .true.
-         logT_file = 'logT_points_lowT_3.0'
-         logR_min = -7.00d0
-         logR_max = 1.00d0
-         logR_points = 41
-         type1_table = 'g'
-         output_dir = 'data/kap_data'
-         table_prefix = 'lowT_af94_gn93'
-         header_info = 'low temperature opacities from Alexander & Ferguson (1995) with gn93 metals'
-         table_version= 38
+
+data_dir = 'kap_input_data/wichita/af94'
+lowT_flag = .true.
+AF94_lowT = .true.
+logT_file = 'logT_points_lowT_3.0'
+logR_min = -7.00d0
+logR_max = 1.00d0
+logR_points = 41
+type1_table = 'g'
+output_dir = 'data/kap_data'
+table_prefix = 'lowT_af94_gn93'
+header_info = 'low temperature opacities from Alexander & Ferguson (1995) with gn93 metals'
+table_version = 38
 
 /

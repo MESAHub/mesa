@@ -1,27 +1,26 @@
-
 &star_job
 
 / !end of star_job namelist
 
 
 &controls
-   use_other_wind = .false.
+use_other_wind = .false.
 
-   !use_ODE_var_eqn_pairing = .true.      
-   use_dPrad_dm_form_of_T_gradient_eqn = .true.
-   use_momentum_outer_BC = .true.
-   
-   use_split_merge_amr = .true.
+!use_ODE_var_eqn_pairing = .true.
+use_dPrad_dm_form_of_T_gradient_eqn = .true.
+use_momentum_outer_BC = .true.
 
-   max_surface_cell_dq = 1d0
-   split_merge_amr_dq_min = 1d-16
+use_split_merge_amr = .true.
 
-   max_mdot_redo_cnt = 0
+max_surface_cell_dq = 1d0
+split_merge_amr_dq_min = 1d-16
 
-   restore_mesh_on_retry = .true.
-   num_steps_to_hold_mesh_after_retry = 5
+max_mdot_redo_cnt = 0
 
-   MLT_option = "none"
+restore_mesh_on_retry = .true.
+num_steps_to_hold_mesh_after_retry = 5
+
+MLT_option = "none"
 
 / ! end of controls namelist
 

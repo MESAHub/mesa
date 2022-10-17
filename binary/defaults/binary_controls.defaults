@@ -14,7 +14,7 @@
 
 ! ::
 
-    m1 = 1.0d0
+m1 = 1.0d0
 
 
 ! m2
@@ -25,7 +25,7 @@
 
 ! ::
 
-    m2 = 0.8d0
+m2 = 0.8d0
 
 
 ! initial_period_in_days
@@ -35,7 +35,7 @@
 
 ! ::
 
-    initial_period_in_days = 0.5d0
+initial_period_in_days = 0.5d0
 
 
 ! initial_separation_in_Rsuns
@@ -45,7 +45,7 @@
 
 ! ::
 
-    initial_separation_in_Rsuns = 100
+initial_separation_in_Rsuns = 100
 
 
 ! initial_eccentricity
@@ -55,7 +55,7 @@
 
 ! ::
 
-    initial_eccentricity = 0.0d0
+initial_eccentricity = 0.0d0
 
 ! controls for output
 ! ===================
@@ -68,7 +68,7 @@
 
 ! ::
 
-    history_name = 'binary_history.data'
+history_name = 'binary_history.data'
 
 
 ! history_interval
@@ -79,7 +79,7 @@
 
 ! ::
 
-    history_interval = 5
+history_interval = 5
 
 
 ! append_to_star_history
@@ -91,7 +91,7 @@
 
 ! ::
 
-    append_to_star_history = .true.
+append_to_star_history = .true.
 
 
 ! log_directory
@@ -101,7 +101,7 @@
 
 ! ::
 
-    log_directory = '.'
+log_directory = '.'
 
 
 ! history_dbl_format
@@ -115,9 +115,9 @@
 
 ! ::
 
-    history_dbl_format = '(1pes32.16e3, 1x)'
-    history_int_format = '(i32, 1x)'
-    history_txt_format = '(a32, 1x)'
+history_dbl_format = '(1pes32.16e3, 1x)'
+history_int_format = '(i32, 1x)'
+history_txt_format = '(a32, 1x)'
 
 
 ! photo_interval
@@ -132,9 +132,9 @@
 
 ! ::
 
-    photo_interval = 50
-    photo_digits = 3
-    photo_directory = 'photos'
+photo_interval = 50
+photo_digits = 3
+photo_directory = 'photos'
 
 
 ! terminal_interval
@@ -144,7 +144,7 @@
 
 ! ::
 
-    terminal_interval = 1
+terminal_interval = 1
 
 
 ! write_header_frequency
@@ -155,7 +155,7 @@
 
 ! ::
 
-    write_header_frequency = 10
+write_header_frequency = 10
 
 
 ! extra_binary_terminal_output_file
@@ -170,7 +170,7 @@
 
 ! ::
 
-    extra_binary_terminal_output_file = ''
+extra_binary_terminal_output_file = ''
 
 ! timestep controls
 ! =================
@@ -236,16 +236,16 @@
 
 ! ::
 
-    fm = 0.01d0
-    fm_hard = -1d0
-    fa = 0.01d0
-    fa_hard = 0.02d0
-    fr = 0.10d0
-    fr_hard = -1d0
-    fj = 0.001d0
-    fj_hard = 0.01d0
-    fe = 0.01d0
-    fe_hard = -1d0
+fm = 0.01d0
+fm_hard = -1d0
+fa = 0.01d0
+fa_hard = 0.02d0
+fr = 0.10d0
+fr_hard = -1d0
+fj = 0.001d0
+fj_hard = 0.01d0
+fe = 0.01d0
+fe_hard = -1d0
 
 
 ! fm_limit
@@ -269,9 +269,9 @@
 
 ! ::
 
-    fm_limit = 1d-3
-    fr_limit = 1d-2
-    fe_limit = 1d-1
+fm_limit = 1d-3
+fr_limit = 1d-2
+fe_limit = 1d-1
 
 
 ! fr_dt_limit
@@ -281,7 +281,7 @@
 
 ! ::
 
-    fr_dt_limit = 10d0
+fr_dt_limit = 10d0
 
 
 ! fdm
@@ -295,8 +295,8 @@
 
 ! ::
 
-    fdm = 0.005d0
-    fdm_hard = 0.01d0
+fdm = 0.005d0
+fdm_hard = 0.01d0
 
 
 ! dt_softening_factor
@@ -314,7 +314,7 @@
 
 ! ::
 
-    dt_softening_factor = 0.5d0
+dt_softening_factor = 0.5d0
 
 
 ! varcontrol_{stage}
@@ -332,10 +332,10 @@
 
 ! ::
 
-    varcontrol_case_a = -1d0
-    varcontrol_case_b = -1d0
-    varcontrol_ms = -1d0
-    varcontrol_post_ms = -1d0
+varcontrol_case_a = -1d0
+varcontrol_case_b = -1d0
+varcontrol_ms = -1d0
+varcontrol_post_ms = -1d0
 
 
 ! dt_reduction_factor_for_j
@@ -347,7 +347,7 @@
 
 ! ::
 
-    dt_reduction_factor_for_j = 0.1d0
+dt_reduction_factor_for_j = 0.1d0
 
 ! when to stop
 ! ============
@@ -360,7 +360,7 @@
 
 ! ::
 
-    accretor_overflow_terminate = 0.0d0
+accretor_overflow_terminate = 0.0d0
 
 
 ! terminate_if_initial_overflow
@@ -370,7 +370,7 @@
 
 ! ::
 
-    terminate_if_initial_overflow = .true.
+terminate_if_initial_overflow = .true.
 
 
 ! terminate_if_L2_overflow
@@ -381,7 +381,7 @@
 
 ! ::
 
-    terminate_if_L2_overflow = .false.
+terminate_if_L2_overflow = .false.
 
 ! mass transfer controls
 ! ======================
@@ -405,10 +405,10 @@
 
 ! ::
 
-    mass_transfer_alpha = 0.0d0
-    mass_transfer_beta = 0.0d0
-    mass_transfer_delta = 0.0d0
-    mass_transfer_gamma = 0.0d0
+mass_transfer_alpha = 0.0d0
+mass_transfer_beta = 0.0d0
+mass_transfer_delta = 0.0d0
+mass_transfer_gamma = 0.0d0
 
 
 ! limit_retention_by_mdot_edd
@@ -448,7 +448,7 @@
 
 ! ::
 
-    limit_retention_by_mdot_edd = .false.
+limit_retention_by_mdot_edd = .false.
 
 
 ! use_es_opacity_for_mdot_edd
@@ -459,7 +459,7 @@
 
 ! ::
 
-    use_es_opacity_for_mdot_edd = .true.
+use_es_opacity_for_mdot_edd = .true.
 
 
 ! use_this_for_mdot_edd_eta
@@ -470,7 +470,7 @@
 
 ! ::
 
-    use_this_for_mdot_edd_eta = -1
+use_this_for_mdot_edd_eta = -1
 
 
 ! use_radiation_corrected_transfer_rate
@@ -485,7 +485,7 @@
 
 ! ::
 
-    use_radiation_corrected_transfer_rate = .true.
+use_radiation_corrected_transfer_rate = .true.
 
 
 ! initial_bh_spin
@@ -496,7 +496,7 @@
 
 ! ::
 
-    initial_bh_spin = 0
+initial_bh_spin = 0
 
 
 ! use_this_for_mdot_edd
@@ -506,7 +506,7 @@
 
 ! ::
 
-    use_this_for_mdot_edd = -1
+use_this_for_mdot_edd = -1
 
 
 ! mdot_scheme
@@ -523,7 +523,7 @@
 
 ! ::
 
-    mdot_scheme = 'Ritter'
+mdot_scheme = 'Ritter'
 
 
 ! explicit mass transfer computation.
@@ -547,7 +547,7 @@
 
 ! ::
 
-    cur_mdot_frac = 0.5d0
+cur_mdot_frac = 0.5d0
 
 
 ! max_explicit_abs_mdot
@@ -557,7 +557,7 @@
 
 ! ::
 
-    max_explicit_abs_mdot = 1d-7
+max_explicit_abs_mdot = 1d-7
 
 
 ! implicit mass transfer computation.
@@ -573,7 +573,7 @@
 
 ! ::
 
-    max_tries_to_achieve = 20
+max_tries_to_achieve = 20
 
 
 ! solver_type
@@ -591,7 +591,7 @@
 
 ! ::
 
-    solver_type = 'both'
+solver_type = 'both'
 
 
 ! implicit_scheme_tolerance
@@ -612,7 +612,7 @@
 
 ! ::
 
-    implicit_scheme_tolerance = 1d-2
+implicit_scheme_tolerance = 1d-2
 
 
 ! implicit_scheme_tiny_factor
@@ -625,7 +625,7 @@
 
 ! ::
 
-    implicit_scheme_tiny_factor = 1d-6
+implicit_scheme_tiny_factor = 1d-6
 
 
 ! initial_change_factor
@@ -664,9 +664,9 @@
 
 ! ::
 
-    initial_change_factor = 1.5d0
-    change_factor_fraction = 0.9d0
-    implicit_lambda = 0.25d0
+initial_change_factor = 1.5d0
+change_factor_fraction = 0.9d0
+implicit_lambda = 0.25d0
 
 
 ! max_change_factor
@@ -680,8 +680,8 @@
 
 ! ::
 
-    max_change_factor = 1.5d0
-    min_change_factor = 1.05d0
+max_change_factor = 1.5d0
+min_change_factor = 1.05d0
 
 
 ! num_tries_for_increase_change_factor
@@ -697,8 +697,8 @@
 
 ! ::
 
-    num_tries_for_increase_change_factor = 20
-    change_factor_increase = 1.1d0
+num_tries_for_increase_change_factor = 20
+change_factor_increase = 1.1d0
 
 
 ! starting_mdot
@@ -709,7 +709,7 @@
 
 ! ::
 
-    starting_mdot = 1d-12
+starting_mdot = 1d-12
 
 
 ! roche_min_mdot
@@ -721,7 +721,7 @@
 
 ! ::
 
-    roche_min_mdot = 1d-16
+roche_min_mdot = 1d-16
 
 
 ! min_mdot_for_implicit
@@ -734,7 +734,7 @@
 
 ! ::
 
-    min_mdot_for_implicit = 1d-16
+min_mdot_for_implicit = 1d-16
 
 
 ! max_implicit_abs_mdot
@@ -744,7 +744,7 @@
 
 ! ::
 
-    max_implicit_abs_mdot = 1d99
+max_implicit_abs_mdot = 1d99
 
 
 ! report_rlo_solver_progress
@@ -754,7 +754,7 @@
 
 ! ::
 
-    report_rlo_solver_progress = .false.
+report_rlo_solver_progress = .false.
 
 
 ! Tidal wind enhancement
@@ -775,8 +775,8 @@
 
 ! ::
 
-    do_enhance_wind_1 = .false.
-    do_enhance_wind_2 = .false.
+do_enhance_wind_1 = .false.
+do_enhance_wind_2 = .false.
 
 
 ! tout_B_wind_*
@@ -789,8 +789,8 @@
 
 ! ::
 
-    tout_B_wind_1 = 1d4
-    tout_B_wind_2 = 1d4
+tout_B_wind_1 = 1d4
+tout_B_wind_2 = 1d4
 
 
 ! Wind mass accretion
@@ -806,8 +806,8 @@
 
 ! ::
 
-    do_wind_mass_transfer_1 = .false.
-    do_wind_mass_transfer_2 = .false.
+do_wind_mass_transfer_1 = .false.
+do_wind_mass_transfer_2 = .false.
 
 
 ! wind_BH_alpha_*
@@ -820,8 +820,8 @@
 
 ! ::
 
-    wind_BH_alpha_1 = 1.5d0
-    wind_BH_alpha_2 = 1.5d0
+wind_BH_alpha_1 = 1.5d0
+wind_BH_alpha_2 = 1.5d0
 
 
 ! max_wind_transfer_fraction_*
@@ -832,8 +832,8 @@
 
 ! ::
 
-    max_wind_transfer_fraction_1 = 0.5d0
-    max_wind_transfer_fraction_2 = 0.5d0
+max_wind_transfer_fraction_1 = 0.5d0
+max_wind_transfer_fraction_2 = 0.5d0
 
 ! orbital jdot controls
 ! =====================
@@ -846,7 +846,7 @@
 
 ! ::
 
-    do_jdot_gr = .true.
+do_jdot_gr = .true.
 
 
 ! do_jdot_ml
@@ -858,7 +858,7 @@
 
 ! ::
 
-    do_jdot_ml = .true.
+do_jdot_ml = .true.
 
 
 ! do_jdot_ls
@@ -870,7 +870,7 @@
 
 ! ::
 
-    do_jdot_ls = .true.
+do_jdot_ls = .true.
 
 
 ! do_jdot_missing_wind
@@ -886,7 +886,7 @@
 
 ! ::
 
-    do_jdot_missing_wind = .false.
+do_jdot_missing_wind = .false.
 
 
 ! do_jdot_mb
@@ -896,7 +896,7 @@
 
 ! ::
 
-    do_jdot_mb = .true.
+do_jdot_mb = .true.
 
 
 ! include_accretor_mb
@@ -907,7 +907,7 @@
 
 ! ::
 
-    include_accretor_mb = .false.
+include_accretor_mb = .false.
 
 
 ! magnetic_braking_gamma
@@ -917,7 +917,7 @@
 
 ! ::
 
-    magnetic_braking_gamma = 3.0d0
+magnetic_braking_gamma = 3.0d0
 
 
 ! keep_mb_on
@@ -927,7 +927,7 @@
 
 ! ::
 
-    keep_mb_on = .false.
+keep_mb_on = .false.
 
 
 ! jdot_mb_min_qconv_env
@@ -955,11 +955,11 @@
 
 ! ::
 
-    jdot_mb_min_qconv_env = 1d-6
-    jdot_mb_max_qconv_env = 0.99d0
-    jdot_mb_max_qconv_core = 1d-2
-    jdot_mb_qlim_for_check_rad_core = 1d-3
-    jdot_mb_qlim_for_check_conv_env = 0.999d0
+jdot_mb_min_qconv_env = 1d-6
+jdot_mb_max_qconv_env = 0.99d0
+jdot_mb_max_qconv_core = 1d-2
+jdot_mb_qlim_for_check_rad_core = 1d-3
+jdot_mb_qlim_for_check_conv_env = 0.999d0
 
 
 ! jdot_mb_scale_for_low_qconv_env
@@ -973,8 +973,8 @@
 
 ! ::
 
-    jdot_mb_scale_for_low_qconv_env = .true.
-    jdot_mb_mass_frac_for_scale = 0.02d0
+jdot_mb_scale_for_low_qconv_env = .true.
+jdot_mb_mass_frac_for_scale = 0.02d0
 
 
 ! jdot_multiplier
@@ -985,7 +985,7 @@
 
 ! ::
 
-    jdot_multiplier = 1d0
+jdot_multiplier = 1d0
 
 ! rotation and sync controls
 ! ==========================
@@ -1000,7 +1000,7 @@
 
 ! ::
 
-    do_j_accretion = .false.
+do_j_accretion = .false.
 
 
 ! do_tidal_sync
@@ -1010,7 +1010,7 @@
 
 ! ::
 
-    do_tidal_sync = .false.
+do_tidal_sync = .false.
 
 
 ! sync_type_*
@@ -1030,8 +1030,8 @@
 
 ! ::
 
-    sync_type_1 = 'Hut_conv'
-    sync_type_2 = 'Hut_conv'
+sync_type_1 = 'Hut_conv'
+sync_type_2 = 'Hut_conv'
 
 
 ! sync_mode_*
@@ -1045,8 +1045,8 @@
 
 ! ::
 
-    sync_mode_1 = 'Uniform'
-    sync_mode_2 = 'Uniform'
+sync_mode_1 = 'Uniform'
+sync_mode_2 = 'Uniform'
 
 
 ! Ftid_*
@@ -1057,8 +1057,8 @@
 
 ! ::
 
-    Ftid_1 = 1d0
-    Ftid_2 = 1d0
+Ftid_1 = 1d0
+Ftid_2 = 1d0
 
 
 ! do_initial_orbit_sync_*
@@ -1069,8 +1069,8 @@
 
 ! ::
 
-    do_initial_orbit_sync_1 = .false.
-    do_initial_orbit_sync_2 = .false.
+do_initial_orbit_sync_1 = .false.
+do_initial_orbit_sync_2 = .false.
 
 
 ! tidal_reduction
@@ -1086,7 +1086,7 @@
 
 ! ::
 
-    tidal_reduction = 2.0d0
+tidal_reduction = 2.0d0
 
 ! eccentricity controls
 ! =====================
@@ -1099,7 +1099,7 @@
 
 ! ::
 
-    do_tidal_circ = .false.
+do_tidal_circ = .false.
 
 
 ! circ_type_*
@@ -1116,8 +1116,8 @@
 
 ! ::
 
-    circ_type_1 = 'Hut_conv'
-    circ_type_2 = 'Hut_conv'
+circ_type_1 = 'Hut_conv'
+circ_type_2 = 'Hut_conv'
 
 
 ! use_eccentricity_enhancement
@@ -1127,7 +1127,7 @@
 
 ! ::
 
-    use_eccentricity_enhancement = .false.
+use_eccentricity_enhancement = .false.
 
 
 ! max_abs_edot_tidal
@@ -1138,7 +1138,7 @@
 
 ! ::
 
-    max_abs_edot_tidal = 1d-6
+max_abs_edot_tidal = 1d-6
 
 
 ! max_abs_edot_enhance
@@ -1149,7 +1149,7 @@
 
 ! ::
 
-    max_abs_edot_enhance = 1d-6
+max_abs_edot_enhance = 1d-6
 
 
 ! min_eccentricity
@@ -1159,7 +1159,7 @@
 
 ! ::
 
-    min_eccentricity = 0.0d0
+min_eccentricity = 0.0d0
 
 
 ! max_eccentricity
@@ -1169,7 +1169,7 @@
 
 ! ::
 
-    max_eccentricity = 0.99d0
+max_eccentricity = 0.99d0
 
 
 ! anomaly_steps
@@ -1181,7 +1181,7 @@
 
 ! ::
 
-    anomaly_steps = 500
+anomaly_steps = 500
 
 ! irradiation controls
 ! ====================
@@ -1194,7 +1194,7 @@
 
 ! ::
 
-    accretion_powered_irradiation = .false.
+accretion_powered_irradiation = .false.
 
 
 ! col_depth_for_eps_extra
@@ -1205,7 +1205,7 @@
 
 ! ::
 
-    col_depth_for_eps_extra = -1
+col_depth_for_eps_extra = -1
 
 
 ! use_accretor_luminosity_for_irrad
@@ -1216,7 +1216,7 @@
 
 ! ::
 
-    use_accretor_luminosity_for_irrad = .false.
+use_accretor_luminosity_for_irrad = .false.
 
 
 ! irrad_flux_at_std_distance
@@ -1235,8 +1235,8 @@
 
 ! ::
 
-    irrad_flux_at_std_distance = -1
-    std_distance_for_irradiation = -1
+irrad_flux_at_std_distance = -1
+std_distance_for_irradiation = -1
 
 
 ! max_F_irr
@@ -1246,7 +1246,7 @@
 
 ! ::
 
-    max_F_irr = 5d12
+max_F_irr = 5d12
 
 ! common envelope controls (EXPERIMENTAL, DON'T USE)
 ! ==================================================
@@ -1259,7 +1259,7 @@
 
 ! ::
 
-    CE_alpha = 1d0
+CE_alpha = 1d0
 
 
 ! CE_alpha_th
@@ -1269,7 +1269,7 @@
 
 ! ::
 
-    CE_alpha_th = 1d0
+CE_alpha_th = 1d0
 
 
 ! CE_alpha_core
@@ -1280,7 +1280,7 @@
 
 ! ::
 
-    CE_alpha_core = 0d0
+CE_alpha_core = 0d0
 
 
 ! CE_mass_loss_rate_high
@@ -1290,7 +1290,7 @@
 
 ! ::
 
-    CE_mass_loss_rate_high = 1d-1
+CE_mass_loss_rate_high = 1d-1
 
 
 ! CE_mass_loss_rate_low
@@ -1300,7 +1300,7 @@
 
 ! ::
 
-    CE_mass_loss_rate_low = 1d-6
+CE_mass_loss_rate_low = 1d-6
 
 
 ! CE_rel_rlo_for_detachment
@@ -1312,7 +1312,7 @@
 
 ! ::
 
-    CE_rel_rlo_for_detachment = 0.02d0
+CE_rel_rlo_for_detachment = 0.02d0
 
 
 ! CE_years_detached_to_terminate
@@ -1325,7 +1325,7 @@
 
 ! ::
 
-    CE_years_detached_to_terminate = 1d-1
+CE_years_detached_to_terminate = 1d-1
 
 
 ! CE_begin_at_max_implicit_abs_mdot
@@ -1335,7 +1335,7 @@
 
 ! ::
 
-    CE_begin_at_max_implicit_abs_mdot = .false.
+CE_begin_at_max_implicit_abs_mdot = .false.
 
 
 ! CE_xa_diff_to_terminate
@@ -1347,7 +1347,7 @@
 
 ! ::
 
-    CE_xa_diff_to_terminate = 0.01d0
+CE_xa_diff_to_terminate = 0.01d0
 
 
 ! CE_terminate_when_core_overflows
@@ -1358,7 +1358,7 @@
 
 ! ::
 
-    CE_terminate_when_core_overflows = .true.
+CE_terminate_when_core_overflows = .true.
 
 
 ! CE_min_period_in_days
@@ -1369,7 +1369,7 @@
 
 ! ::
 
-    CE_min_period_in_minutes = 5d0
+CE_min_period_in_minutes = 5d0
 
 
 ! CE_energy_factor_HII_toHI
@@ -1380,7 +1380,7 @@
 
 ! ::
 
-    CE_energy_factor_HII_toHI = 1d0
+CE_energy_factor_HII_toHI = 1d0
 
 
 ! CE_energy_factor_HeII_toHeI
@@ -1391,7 +1391,7 @@
 
 ! ::
 
-    CE_energy_factor_HeII_toHeI = 1d0
+CE_energy_factor_HeII_toHeI = 1d0
 
 
 ! CE_energy_factor_HeIII_toHeII
@@ -1402,7 +1402,7 @@
 
 ! ::
 
-    CE_energy_factor_HeIII_toHeII = 1d0
+CE_energy_factor_HeIII_toHeII = 1d0
 
 
 ! CE_energy_factor_H2
@@ -1413,7 +1413,7 @@
 
 ! ::
 
-    CE_energy_factor_H2 = 0d0
+CE_energy_factor_H2 = 0d0
 
 
 ! CE_fixed_lambda
@@ -1425,7 +1425,7 @@
 
 ! ::
 
-    CE_fixed_lambda = -1d0
+CE_fixed_lambda = -1d0
 
 ! miscellaneous controls
 ! ======================
@@ -1438,7 +1438,7 @@
 
 ! ::
 
-    keep_donor_fixed = .true.
+keep_donor_fixed = .true.
 
 
 ! mdot_limit_donor_switch
@@ -1449,7 +1449,7 @@
 
 ! ::
 
-    mdot_limit_donor_switch = 1d-20
+mdot_limit_donor_switch = 1d-20
 
 
 ! use_other_{hook}
@@ -1459,26 +1459,26 @@
 
 ! ::
 
-    use_other_rlo_mdot = .false.
-    use_other_check_implicit_rlo = .false.
-    use_other_implicit_function_to_solve = .false.
-    use_other_tsync = .false.
-    use_other_sync_spin_to_orbit = .false.
-    use_other_mdot_edd = .false.
-    use_other_adjust_mdots = .false.
-    use_other_accreted_material_j = .false.
-    use_other_jdot_gr = .false.
-    use_other_jdot_ml = .false.
-    use_other_jdot_ls = .false.
-    use_other_jdot_missing_wind = .false.
-    use_other_jdot_mb = .false.
-    use_other_extra_jdot = .false.
-    use_other_binary_wind_transfer = .false.
-    use_other_edot_tidal = .false.
-    use_other_edot_enhance = .false.
-    use_other_extra_edot = .false.
-    use_other_CE_init = .false.
-    use_other_CE_rlo_mdot = .false.
-    use_other_CE_binary_evolve_step = .false.
-    use_other_CE_binary_finish_step = .false.
-    use_other_e2 = .false.
+use_other_rlo_mdot = .false.
+use_other_check_implicit_rlo = .false.
+use_other_implicit_function_to_solve = .false.
+use_other_tsync = .false.
+use_other_sync_spin_to_orbit = .false.
+use_other_mdot_edd = .false.
+use_other_adjust_mdots = .false.
+use_other_accreted_material_j = .false.
+use_other_jdot_gr = .false.
+use_other_jdot_ml = .false.
+use_other_jdot_ls = .false.
+use_other_jdot_missing_wind = .false.
+use_other_jdot_mb = .false.
+use_other_extra_jdot = .false.
+use_other_binary_wind_transfer = .false.
+use_other_edot_tidal = .false.
+use_other_edot_enhance = .false.
+use_other_extra_edot = .false.
+use_other_CE_init = .false.
+use_other_CE_rlo_mdot = .false.
+use_other_CE_binary_evolve_step = .false.
+use_other_CE_binary_finish_step = .false.
+use_other_e2 = .false.

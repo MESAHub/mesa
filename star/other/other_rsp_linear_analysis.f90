@@ -22,35 +22,33 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_rsp_linear_analysis
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_RSP_linear_analysis = .true.
-      ! procedure pointer: s% other_rsp_linear_analysis => my_routine
+module other_rsp_linear_analysis
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_RSP_linear_analysis = .true.
+   ! procedure pointer: s% other_rsp_linear_analysis => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-      use star_def
-
-      implicit none
+contains
+   
+   
+   subroutine null_other_rsp_linear_analysis(id, restart, ierr)
+      integer, intent(in) :: id ! star id if available; 0 otherwise
+      logical, intent(in) :: restart
+      integer, intent(out) :: ierr ! 0 means AOK.
       
-            
-      contains
+      write(*, *) 'no implementation for other_rsp_linear_analysis'
+      ierr = -1
+   
+   end subroutine null_other_rsp_linear_analysis
 
 
-      subroutine null_other_rsp_linear_analysis(id, restart, ierr)
-         integer, intent(in) :: id ! star id if available; 0 otherwise
-         logical, intent(in) :: restart
-         integer, intent(out) :: ierr ! 0 means AOK.
-         
-         write(*,*) 'no implementation for other_rsp_linear_analysis'
-         ierr = -1
-
-      end subroutine null_other_rsp_linear_analysis
-      
-
-
-      end module other_rsp_linear_analysis
+end module other_rsp_linear_analysis
       
       
       

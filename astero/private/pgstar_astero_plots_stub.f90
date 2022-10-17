@@ -22,36 +22,36 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module pgstar_astero_plots
-      use star_lib
-      use star_def
-      use star_pgstar
 
-      implicit none
-         
-
-      contains
-      
-      
-      subroutine astero_pgstar_plots_info(id, ierr)
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine astero_pgstar_plots_info
+module pgstar_astero_plots
+   use star_lib
+   use star_def
+   use star_pgstar
+   
+   implicit none
 
 
-      subroutine write_plot_to_file(s, p, file_prefix, number, ierr)
-         type (star_info), pointer :: s
-         type (pgstar_win_file_data), pointer :: p
-         character (len=*), intent(in) :: file_prefix
-         integer, intent(in) :: number
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine write_plot_to_file
+contains
+   
+   
+   subroutine astero_pgstar_plots_info(id, ierr)
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine astero_pgstar_plots_info
+   
+   
+   subroutine write_plot_to_file(s, p, file_prefix, number, ierr)
+      type (star_info), pointer :: s
+      type (pgstar_win_file_data), pointer :: p
+      character (len = *), intent(in) :: file_prefix
+      integer, intent(in) :: number
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine write_plot_to_file
 
 
-      end module pgstar_astero_plots
+end module pgstar_astero_plots
       
       
       

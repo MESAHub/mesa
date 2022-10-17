@@ -1,164 +1,163 @@
-
 ! inlist_he_shell_ignition
 
 
 &star_job
-      show_log_description_at_start = .false.
-      
-      load_saved_model = .true.
-      load_model_filename = 'co_wd_0.96M.mod' ! from make_co_wd, 13738, initial_mass = 6.0d0
+show_log_description_at_start = .false.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'power_he_burn_upper_limit'
+load_saved_model = .true.
+load_model_filename = 'co_wd_0.96M.mod' ! from make_co_wd, 13738, initial_mass = 6.0d0
 
-      change_initial_net = .true.      
-      new_net_name = 'co_burn.net'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+required_termination_code_string = 'power_he_burn_upper_limit'
 
-      use_3a_fl87 = .true.      
+change_initial_net = .true.
+new_net_name = 'co_burn.net'
 
-      change_v_flag = .true.
-      new_v_flag = .false.
+use_3a_fl87 = .true.
 
-      relax_initial_tau_factor = .true.
-      relax_to_this_tau_factor = 1d2
-      dlogtau_factor = 0.02d0
+change_v_flag = .true.
+new_v_flag = .false.
 
-      set_initial_age = .true.
-      initial_age = 0
+relax_initial_tau_factor = .true.
+relax_to_this_tau_factor = 1d2
+dlogtau_factor = 0.02d0
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d-4
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_dt = .true.
+years_for_initial_dt = 1d-4
 
-      pgstar_flag = .true.
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
+
+pgstar_flag = .true.
 
 
 / ! end of star_job namelist
 
 &eos
 
-      use_Skye = .true.
+use_Skye = .true.
 
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
+Zbase = 0.02d0
 
-      use_Type2_opacities = .true.
+use_Type2_opacities = .true.
 
 / ! end of kap namelist
 
 
 &controls
-      
-      power_he_burn_upper_limit = 1d12
 
-      energy_eqn_option = 'eps_grav'
-      ! can't make it through the flash at the end with this true
-      ! check again after composition derivatives exist
-      include_composition_in_eps_grav = .false.
+power_he_burn_upper_limit = 1d12
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+energy_eqn_option = 'eps_grav'
+! can't make it through the flash at the end with this true
+! check again after composition derivatives exist
+include_composition_in_eps_grav = .false.
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 4000
-      mlt_option = 'TDC'      
-         
-      gamma_center_limit = 1000 ! FOR THIS TEST
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      max_center_cell_dq = 1d-6
-      max_surface_cell_dq = 1d-8
-      
-      min_timestep_limit = 1d-12
-      
-      accrete_same_as_surface = .false. 
-      accrete_given_mass_fractions = .true. 
-      num_accretion_species = 1
-      accretion_species_id(1) = 'he4'
-      accretion_species_xa(1) = 1
+! limit max_model_number as part of test_suite
+max_model_number = 4000
+mlt_option = 'TDC'
 
-      xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
-      xa_function_weight(1) = 20
-      xa_function_param(1) = 1d-6
-      xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
-      xa_function_weight(2) = 20
-      xa_function_param(2) = 1d-2
+gamma_center_limit = 1000 ! FOR THIS TEST
 
-      delta_lgL_H_limit = 0.02 ! limit for magnitude of change in lgL_H
-      delta_lgL_H_hard_limit = 0.5
-      lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
+max_center_cell_dq = 1d-6
+max_surface_cell_dq = 1d-8
 
-      delta_lgL_He_limit = 0.02 ! limit for magnitude of change in lgL_He
-      delta_lgL_He_hard_limit = 0.5
-      lgL_He_burn_min = -6 ! ignore changes in lgL_He if value is less than this
-   
-      delta_lgL_limit = 0.02
-      delta_lgL_hard_limit = 0.15
+min_timestep_limit = 1d-12
 
-      delta_lgT_limit = 0.2
-      delta_lgT_hard_limit = 1
-      
-      delta_lgRho_limit = 1
-      delta_lgRho_hard_limit = -1
+accrete_same_as_surface = .false.
+accrete_given_mass_fractions = .true.
+num_accretion_species = 1
+accretion_species_id(1) = 'he4'
+accretion_species_xa(1) = 1
 
-      delta_lgTeff_limit = 0.1  
-      delta_lgTeff_hard_limit = 0.3
+xa_function_species(1) = 'h1'  ! name of nuclide as defined in chem_def
+xa_function_weight(1) = 20
+xa_function_param(1) = 1d-6
+xa_function_species(2) = 'he4'  ! name of nuclide as defined in chem_def
+xa_function_weight(2) = 20
+xa_function_param(2) = 1d-2
 
-      delta_lgT_max_limit = 0.003
-      delta_lgT_max_limit_lgT_min = 8d0
-      delta_lg_star_mass_limit = 5d-4
- 
-      relax_hard_limits_after_retry = .false.
+delta_lgL_H_limit = 0.02 ! limit for magnitude of change in lgL_H
+delta_lgL_H_hard_limit = 0.5
+lgL_H_burn_min = 1.5 ! ignore changes in lgL_H if value is less than this
 
-      mesh_delta_coeff = 1.0
-      varcontrol_target = 1d-3
-      
-      super_eddington_scaling_factor = 1
-      super_eddington_wind_Ledd_factor = 5
-      
-      net_logTcut_lo = 0
-      net_logTcut_lim = 0
-   	
-      mass_change = 1d-9 ! rate of accretion (Msun/year)
+delta_lgL_He_limit = 0.02 ! limit for magnitude of change in lgL_He
+delta_lgL_He_hard_limit = 0.5
+lgL_He_burn_min = -6 ! ignore changes in lgL_He if value is less than this
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 10
-      terminal_interval = 10
-      write_header_frequency = 10
+delta_lgL_limit = 0.02
+delta_lgL_hard_limit = 0.15
+
+delta_lgT_limit = 0.2
+delta_lgT_hard_limit = 1
+
+delta_lgRho_limit = 1
+delta_lgRho_hard_limit = -1
+
+delta_lgTeff_limit = 0.1
+delta_lgTeff_hard_limit = 0.3
+
+delta_lgT_max_limit = 0.003
+delta_lgT_max_limit_lgT_min = 8d0
+delta_lg_star_mass_limit = 5d-4
+
+relax_hard_limits_after_retry = .false.
+
+mesh_delta_coeff = 1.0
+varcontrol_target = 1d-3
+
+super_eddington_scaling_factor = 1
+super_eddington_wind_Ledd_factor = 5
+
+net_logTcut_lo = 0
+net_logTcut_lim = 0
+
+mass_change = 1d-9 ! rate of accretion (Msun/year)
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
+write_header_frequency = 10
 
 / ! end of controls namelist
 
 
 
 &pgstar
-         
-      !pause = .true. 
-         ! if true, the code waits for user to enter a RETURN on the command line
 
-      Grid8_win_flag = .true.
-      Grid8_win_width = 11.5
-      Summary_Burn_xaxis_name = 'logxq' 
-      Summary_Burn_xaxis_reversed = .true.
-      Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
-      Summary_Burn_xmax = 0 ! -101d0 ! only used if /= -101d0
-      Abundance_xaxis_name = 'logxq' 
-      Abundance_xaxis_reversed = .true.
-      Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
-      Abundance_xmax = 0 ! -101d0 ! only used if /= -101d0
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
 
-    Text_Summary1_name(5,2) = 'time_step_sec'
-    Text_Summary1_name(6,2) = 'max_tau_conv'
-    !Text_Summary1_name(7,2) = 'cz_bot_radius'
-    !Text_Summary1_name(8,2) = 'cz_top_radius'
+Grid8_win_flag = .true.
+Grid8_win_width = 11.5
+Summary_Burn_xaxis_name = 'logxq'
+Summary_Burn_xaxis_reversed = .true.
+Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
+Summary_Burn_xmax = 0 ! -101d0 ! only used if /= -101d0
+Abundance_xaxis_name = 'logxq'
+Abundance_xaxis_reversed = .true.
+Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
+Abundance_xmax = 0 ! -101d0 ! only used if /= -101d0
+
+Text_Summary1_name(5, 2) = 'time_step_sec'
+Text_Summary1_name(6, 2) = 'max_tau_conv'
+!Text_Summary1_name(7,2) = 'cz_bot_radius'
+!Text_Summary1_name(8,2) = 'cz_top_radius'
 
 Profile_Panels1_win_flag = .true.
 Profile_Panels1_yaxis_name(1) = 'tdc_num_iters'

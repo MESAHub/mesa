@@ -1,5 +1,5 @@
-import os
 import glob
+import os
 
 import check_columns as cc
 
@@ -45,7 +45,8 @@ profile_options = cc.CaseInsensitiveSet(
     ]
 )
 
-# Ignores color_magnitude plots as its hard to work out if the names are in the history output
+# Ignores color_magnitude plots as its hard to work out if the names are in
+# the history output
 history_options = cc.CaseInsensitiveSet(
     [
         "Summary_History_name",
@@ -117,8 +118,8 @@ history_options = cc.CaseInsensitiveSet(
     ]
 )
 
-
-profile_false_positives = cc.CaseInsensitiveSet(["Abundance", "Mixing", "Power"])
+profile_false_positives = cc.CaseInsensitiveSet(
+    ["Abundance", "Mixing", "Power"])
 
 history_false_positives = cc.CaseInsensitiveSet(
     [
@@ -153,7 +154,6 @@ history_false_positives = cc.CaseInsensitiveSet(
     ]
 )
 
-
 profile_defaults = cc.get_profile_columns()
 history_defaults = cc.get_history_columns()
 
@@ -161,48 +161,49 @@ history_defaults = cc.get_history_columns()
 def check_pgstar(filename, options, defaults, false_positives):
     if not os.path.isfile(filename):
         return
-
+    
     with open(filename, "r") as f:
         lines = f.readlines()
-
+    
     result = []
     for line in lines:
         line = line.strip()
         if (
-            not len(line)
-            or line.startswith("!")
-            or line.startswith("&")
-            or line.startswith("/")
+                not len(line)
+                or line.startswith("!")
+                or line.startswith("&")
+                or line.startswith("/")
         ):
             continue
-
+        
         line = line.split("!")[0]
-
+        
         column, *value = line.split("=")  # Things like x = 'mass'
         value = "".join(
             value
-        )  # Handles things with several = signs i.e semiconvection_option = 'Langer_85 mixing; gradT = gradr'
-
+        )  # Handles things with several = signs i.e semiconvection_option =
+        # 'Langer_85 mixing; gradT = gradr'
+        
         column_check = column.split("(")[0]  # Things like x(1) = 'mass'
-
+        
         value = value.strip().replace("'", "").replace('"', "")
-
+        
         if not len(value):
             continue
-
+        
         if "(:)" in column:
             continue
-
+        
         if column_check in options:
             if value not in defaults and value not in false_positives:
                 result.append((column, value))
-
+    
     return result
 
 
 def check_all_pgstars(options, defualts, false_postives):
     for filename in glob.glob(
-        os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
+            os.path.join(MESA_DIR, "star", "test_suite", "*", "inlist*")
     ):
         values = check_pgstar(filename, options, defualts, false_postives)
         if values is None:
@@ -216,11 +217,13 @@ def check_all_pgstars(options, defualts, false_postives):
 
 
 def check_all_history_pgstars():
-    check_all_pgstars(history_options, history_defaults, history_false_positives)
+    check_all_pgstars(history_options, history_defaults,
+                      history_false_positives)
 
 
 def check_all_profile_pgstars():
-    check_all_pgstars(profile_options, profile_defaults, profile_false_positives)
+    check_all_pgstars(profile_options, profile_defaults,
+                      profile_false_positives)
 
 
 if __name__ == "__main__":

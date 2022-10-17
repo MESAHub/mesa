@@ -1,5 +1,5 @@
 &star_job
-      required_termination_code_string(5) = 'log_L_upper_limit'
+required_termination_code_string(5) = 'log_L_upper_limit'
 / ! end of star_job namelist
 
 &eos
@@ -10,53 +10,53 @@
 
 &controls
 
-   log_L_upper_limit = 4.40
+log_L_upper_limit = 4.40
 
 ! output controls
-   !photo_interval = 10
-   !profile_interval = 1
-   !history_interval = 1
-   !terminal_interval = 1
+!photo_interval = 10
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 / ! end of controls namelist
 
 &pgstar
 
-   !pause = .true.
+!pause = .true.
 
-   ! HR window -- lg_L vs. lg_Teff
-   
-   pgstar_interval = 2
+! HR window -- lg_L vs. lg_Teff
 
-   HR_win_flag = .true.
-   
-   HR_title = '12 M\d\(2281)\u  Z=0.02  beta Cepheid'
+pgstar_interval = 2
 
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+HR_win_flag = .true.
 
-   ! axis limits -- to override system default selections
-   HR_logT_min = 4.27 ! -101 ! only used if > -100
-   HR_logT_max = 4.47 ! only used if > -100
-   HR_logL_min = 3.9 ! -101 ! only used if > -100
-   HR_logL_max = 4.6 ! -101 ! only used if > -100
+HR_title = '12 M\d\(2281)\u  Z=0.02  beta Cepheid'
 
-   !show_HR_classical_instability_strip = .true.
-   show_HR_target_box = .true.
-   HR_target_n_sigma = -3
-   HR_target_logL = 4.45d0
-   HR_target_logL_sigma = 0.02d0
-   HR_target_logT = 4.35d0
-   HR_target_logT_sigma = 0.005d0
+HR_win_width = 8
+HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
-   ! file output
-   !HR_file_flag = .true.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
-         
-         
+! axis limits -- to override system default selections
+HR_logT_min = 4.27 ! -101 ! only used if > -100
+HR_logT_max = 4.47 ! only used if > -100
+HR_logL_min = 3.9 ! -101 ! only used if > -100
+HR_logL_max = 4.6 ! -101 ! only used if > -100
+
+!show_HR_classical_instability_strip = .true.
+show_HR_target_box = .true.
+HR_target_n_sigma = -3
+HR_target_logL = 4.45d0
+HR_target_logL_sigma = 0.02d0
+HR_target_logT = 4.35d0
+HR_target_logT_sigma = 0.005d0
+
+! file output
+!HR_file_flag = .true.
+HR_file_dir = 'pgstar_out'
+HR_file_prefix = 'hr'
+HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
+HR_file_width = -1 ! negative means use same value as for window
+HR_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
+
 / ! end of pgstar namelist

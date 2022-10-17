@@ -24,100 +24,100 @@
 ! ***********************************************************************
 
 module math_io
-
-  ! Uses
-
-  use const_lib, only: dp
-
-  ! No implicit typing
-
-  implicit none
-
-  ! Access specifiers
-
-  private
-
-  public :: str_to_vector
-  public :: str_to_double
-  public :: double_to_str
-
-  ! Procedures
+   
+   ! Uses
+   
+   use const_lib, only : dp
+   
+   ! No implicit typing
+   
+   implicit none
+   
+   ! Access specifiers
+   
+   private
+   
+   public :: str_to_vector
+   public :: str_to_double
+   public :: double_to_str
+   
+   ! Procedures
 
 contains
-
-  subroutine str_to_vector (str, vec, n, ierr)
-
-    character (len=*), intent(in)    :: str
-    real(dp), pointer, intent(inout) :: vec(:)
-    integer, intent(out)             :: n
-    integer, intent(out)             :: ierr
-
-    integer :: maxlen
-    integer :: i
-    integer :: j
-    integer :: k
-    integer :: l
-
-    maxlen = size(vec,dim=1)
-
-    n = 0
-    ierr = 0
-
-    l = len_trim(str)
-
-    j = 1
-
-    do i=1,maxlen
-
-       do while (j < l .and. str(j:j) == ' ')
-          j = j+1
-       end do
-
-       k = j
-
-       do while (k < l .and. str(k:k) /= ' ')
-          k = k+1
-       end do
-
-       call str_to_double(str(j:k),vec(i),ierr)
-       if (ierr /= 0) then
-          return
-       end if
-
-       n = i
-
-       if (k == l) exit
-
-       j = k+1
-
-    end do
-       
-  end subroutine str_to_vector
-
-  !****
+   
+   subroutine str_to_vector (str, vec, n, ierr)
       
-  subroutine str_to_double (str, x, ierr)
-
-    character(*), intent(in) :: str
-    real(dp), intent(out)    :: x
-    integer, intent(out)     :: ierr
-
-    read(str, *, ROUND='COMPATIBLE', IOSTAT=ierr) x
-
-  end subroutine str_to_double
+      character (len = *), intent(in) :: str
+      real(dp), pointer, intent(inout) :: vec(:)
+      integer, intent(out) :: n
+      integer, intent(out) :: ierr
+      
+      integer :: maxlen
+      integer :: i
+      integer :: j
+      integer :: k
+      integer :: l
+      
+      maxlen = size(vec, dim = 1)
+      
+      n = 0
+      ierr = 0
+      
+      l = len_trim(str)
+      
+      j = 1
+      
+      do i = 1, maxlen
          
-  !****
+         do while (j < l .and. str(j:j) == ' ')
+            j = j + 1
+         end do
+         
+         k = j
+         
+         do while (k < l .and. str(k:k) /= ' ')
+            k = k + 1
+         end do
+         
+         call str_to_double(str(j:k), vec(i), ierr)
+         if (ierr /= 0) then
+            return
+         end if
+         
+         n = i
+         
+         if (k == l) exit
+         
+         j = k + 1
+      
+      end do
+   
+   end subroutine str_to_vector
+   
+   !****
+   
+   subroutine str_to_double (str, x, ierr)
+      
+      character(*), intent(in) :: str
+      real(dp), intent(out) :: x
+      integer, intent(out) :: ierr
+      
+      read(str, *, ROUND = 'COMPATIBLE', IOSTAT = ierr) x
+   
+   end subroutine str_to_double
+   
+   !****
+   
+   subroutine double_to_str (x, str)
+      
+      integer, parameter :: l = 26
+      
+      real(dp), intent(in) :: x
+      character(len = l), intent(out) :: str
+      
+      write(str, 100, ROUND = 'COMPATIBLE') x
+      100 format(1PD26.16)
+   
+   end subroutine double_to_str
 
-  subroutine double_to_str (x, str)
-
-    integer, parameter :: l=26
-
-    real(dp), intent(in)          :: x
-    character(len=l), intent(out) :: str
-
-    write(str, 100, ROUND='COMPATIBLE') x
-100 format(1PD26.16)
-
-  end subroutine double_to_str
-  
 end module math_io

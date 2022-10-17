@@ -24,54 +24,54 @@
 ! ***********************************************************************
 
 module coulomb
-
-  use const_def
-  use rates_def
-  use math_lib
-  use utils_lib, only: is_bad
-  use auto_diff
-
-  implicit none
+   
+   use const_def
+   use rates_def
+   use math_lib
+   use utils_lib, only : is_bad
+   use auto_diff
+   
+   implicit none
 
 contains
-
-  subroutine do_coulomb_set_context( &
-       cc, temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar)
-    type (Coulomb_Info), pointer :: cc
-    real(dp), intent(in) ::  &
-       temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar
-    real(dp) :: ye
-    type(auto_diff_real_2var_order1) :: temp, den
-
-    include 'formats'
-
-    ! auto_diff variables have
-    ! var1: lnT
-    ! var2: lnRho
-
-    temp = temp_in
-    temp% d1val1 = temp_in
-    temp% d1val2 = 0d0
-
-    den = den_in
-    den% d1val1 = 0d0
-    den% d1val2 = den_in
-
-    cc% temp  = temp_in
-    cc% den   = den_in
-    cc% logT  = logT_in
-    cc% logRho = logRho_in
-    cc% zbar  = zbar
-    cc% abar  = abar
-    cc% z2bar = z2bar
-
-    ye = zbar / abar
-
-    ! calculate key plasma paramters
-    cc% gamma_e = 2.275d5 * pow(ye * den, one_third) / temp
-    cc% rs = 1.388_dp * pow(ye * den, -one_third)
-
-  end subroutine do_coulomb_set_context
+   
+   subroutine do_coulomb_set_context(&
+      cc, temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar)
+      type (Coulomb_Info), pointer :: cc
+      real(dp), intent(in) :: &
+         temp_in, den_in, logT_in, logRho_in, zbar, abar, z2bar
+      real(dp) :: ye
+      type(auto_diff_real_2var_order1) :: temp, den
+      
+      include 'formats'
+      
+      ! auto_diff variables have
+      ! var1: lnT
+      ! var2: lnRho
+      
+      temp = temp_in
+      temp% d1val1 = temp_in
+      temp% d1val2 = 0d0
+      
+      den = den_in
+      den% d1val1 = 0d0
+      den% d1val2 = den_in
+      
+      cc% temp = temp_in
+      cc% den = den_in
+      cc% logT = logT_in
+      cc% logRho = logRho_in
+      cc% zbar = zbar
+      cc% abar = abar
+      cc% z2bar = z2bar
+      
+      ye = zbar / abar
+      
+      ! calculate key plasma paramters
+      cc% gamma_e = 2.275d5 * pow(ye * den, one_third) / temp
+      cc% rs = 1.388_dp * pow(ye * den, -one_third)
+   
+   end subroutine do_coulomb_set_context
 
 end module coulomb
 

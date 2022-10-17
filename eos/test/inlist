@@ -1,16 +1,15 @@
-
 &eos
 
-   ! debugging
-   !dbg = .true.
-   logT_lo = 3.9999d0
-   logT_hi = 4.0001d0
-   logRho_lo = -1d99
-   logRho_hi = 1d99
-   X_lo = 0d0
-   X_hi = 0d0
-   Z_lo = 0d0
-   Z_hi = 0d0
+! debugging
+!dbg = .true.
+logT_lo = 3.9999d0
+logT_hi = 4.0001d0
+logRho_lo = -1d99
+logRho_hi = 1d99
+X_lo = 0d0
+X_hi = 0d0
+Z_lo = 0d0
+Z_hi = 0d0
 
 / ! end of eos namelist
 

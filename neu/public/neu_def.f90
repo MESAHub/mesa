@@ -23,30 +23,30 @@
 !
 ! ***********************************************************************
 
-      module neu_def
-      use const_def
-      implicit none
-
-      real(dp), parameter :: log10Tmin_neu = 7d0, Tmin_neu = 1d7
-         ! for T less than this, neu results are all 0
-
-      ! results returned
-      
-      integer, parameter :: ineu        = 1     ! loss rate (nonnegative) in units of ergs / gram / second
-      integer, parameter :: idneu_dT    = 2     ! partial of rate wrt temperature
-      integer, parameter :: idneu_dRho  = 3     ! partial of rate wrt density
-      integer, parameter :: idneu_dabar = 4     ! partial of rate wrt mean atomic weight
-      integer, parameter :: idneu_dzbar = 5     ! partial of rate wrt mean charge
+module neu_def
+   use const_def
+   implicit none
    
-      integer, parameter :: num_neu_rvs = 5     ! number of result values per rate
-      
-      integer, parameter :: pair_neu_type = 1   ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
-      integer, parameter :: plas_neu_type = 2   ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
-      integer, parameter :: phot_neu_type = 3   ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
-      integer, parameter :: brem_neu_type = 4   ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
-      integer, parameter :: reco_neu_type = 5   ! recombination (for reactions like e- (continuum) => e- (bound) + nu_e + nubar_e)
-      
-      integer, parameter :: num_neu_types = 5
+   real(dp), parameter :: log10Tmin_neu = 7d0, Tmin_neu = 1d7
+   ! for T less than this, neu results are all 0
+   
+   ! results returned
+   
+   integer, parameter :: ineu = 1     ! loss rate (nonnegative) in units of ergs / gram / second
+   integer, parameter :: idneu_dT = 2     ! partial of rate wrt temperature
+   integer, parameter :: idneu_dRho = 3     ! partial of rate wrt density
+   integer, parameter :: idneu_dabar = 4     ! partial of rate wrt mean atomic weight
+   integer, parameter :: idneu_dzbar = 5     ! partial of rate wrt mean charge
+   
+   integer, parameter :: num_neu_rvs = 5     ! number of result values per rate
+   
+   integer, parameter :: pair_neu_type = 1   ! pair production (for reactions like e+ + e- => nu_e + nubar_e)
+   integer, parameter :: plas_neu_type = 2   ! plasmon neutrinos (for collective reactions like gamma_plasmon => nu_e + nubar_e)
+   integer, parameter :: phot_neu_type = 3   ! photon neutrinos (for reactions like e- + gamma => e- + nu_e + nubar_e)
+   integer, parameter :: brem_neu_type = 4   ! bremsstrahlung (for reactions like e- + (z,a) => e- + (z,a) + nu + nubar)
+   integer, parameter :: reco_neu_type = 5   ! recombination (for reactions like e- (continuum) => e- (bound) + nu_e + nubar_e)
+   
+   integer, parameter :: num_neu_types = 5
 
-      end module neu_def
+end module neu_def
 

@@ -1,9 +1,9 @@
 &star_job
-      required_termination_code_string(5) = 'star_mass_min_limit'
-      
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d2
-      
+required_termination_code_string(5) = 'star_mass_min_limit'
+
+set_initial_dt = .true.
+years_for_initial_dt = 1d2
+
 / ! end of star_job namelist
 
 &eos
@@ -13,62 +13,62 @@
 / ! end of kap namelist
 
 &controls
-   star_mass_min_limit = 1.35
+star_mass_min_limit = 1.35
 
 ! wind
-   cool_wind_full_on_T = 9.99d9
-   hot_wind_full_on_T = 1d10 
-   cool_wind_RGB_scheme = 'Reimers'
-   cool_wind_AGB_scheme = 'Blocker'
-   RGB_to_AGB_wind_switch = 1d-4
-   Reimers_scaling_factor = 2d0  
-   Blocker_scaling_factor = 10d0   
+cool_wind_full_on_T = 9.99d9
+hot_wind_full_on_T = 1d10
+cool_wind_RGB_scheme = 'Reimers'
+cool_wind_AGB_scheme = 'Blocker'
+RGB_to_AGB_wind_switch = 1d-4
+Reimers_scaling_factor = 2d0
+Blocker_scaling_factor = 10d0
 
 ! timesteps
-   delta_lgL_He_limit = 0.01d0
+delta_lgL_He_limit = 0.01d0
 
 ! mesh
-   mesh_delta_coeff = 1.5
+mesh_delta_coeff = 1.5
 
 ! solver
-   convergence_ignore_equL_residuals = .true.
+convergence_ignore_equL_residuals = .true.
 
 ! output controls
-   !photo_interval = 10
-   !profile_interval = 1
-   !history_interval = 1
-   !terminal_interval = 1
+!photo_interval = 10
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 / ! end of controls namelist
 
 &pgstar
 
-   !pause = .true.
-   
-   pgstar_interval = 1 ! 25
+!pause = .true.
 
-   HR_win_flag = .true.
-   
-   HR_title = '2 M\d\(2281)\u  Z=0.02  Mira'
+pgstar_interval = 1 ! 25
 
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+HR_win_flag = .true.
 
-   ! axis limits -- to override system default selections
-   HR_logT_min = 3.47 ! -101 ! only used if > -100
-   HR_logT_max = 3.68 ! only used if > -100
-   HR_logL_min = 1.5 ! -101 ! only used if > -100
-   HR_logL_max = 3.82 ! -101 ! only used if > -100
-   
-   !show_HR_classical_instability_strip = .true.
+HR_title = '2 M\d\(2281)\u  Z=0.02  Mira'
 
-   ! file output
-   !HR_file_flag = .true.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
-         
+HR_win_width = 8
+HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+
+! axis limits -- to override system default selections
+HR_logT_min = 3.47 ! -101 ! only used if > -100
+HR_logT_max = 3.68 ! only used if > -100
+HR_logL_min = 1.5 ! -101 ! only used if > -100
+HR_logL_max = 3.82 ! -101 ! only used if > -100
+
+!show_HR_classical_instability_strip = .true.
+
+! file output
+!HR_file_flag = .true.
+HR_file_dir = 'pgstar_out'
+HR_file_prefix = 'hr'
+HR_file_interval = 1 ! output when mod(model_number,HR_file_interval)==0
+HR_file_width = -1 ! negative means use same value as for window
+HR_file_aspect_ratio = -1 ! negative means use same value as for window
+
+
 / ! end of pgstar namelist

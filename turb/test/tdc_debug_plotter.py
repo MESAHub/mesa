@@ -8,12 +8,12 @@ visualizing this function can be helpful.
 Here we plot (-Y, Q(Y)), just because the non-trivial cases all have Y < 0
 and it's easier to see using a log scale.
 '''
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 data = np.loadtxt('out.data')
 
-plt.plot(-data[:,0],data[:,1])
+plt.plot(-data[:, 0], data[:, 1])
 plt.xscale('log')
 plt.yscale('symlog', linthreshy=1e30)
 plt.show()

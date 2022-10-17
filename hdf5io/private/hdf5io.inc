@@ -21,11 +21,11 @@
 #!!
 
 #:def HDF5_CALL(proc, *vars_pos, **vars_kw)
-   #:set vars = vars_pos + ['hdf_err'] + ['{:s}={:s}'.format(key, value) for key, value in vars_kw.items()]
-   #:set arg_list = '(' + ','.join(vars) + ')'
-   call ${proc}$${arg_list}$
-   if (hdf_err == -1) then
-      call h5eprint_f(hdf_err)
-      @:ABORT(error in call to ${proc}$)
-   endif
+#:set vars = vars_pos + ['hdf_err'] + ['{:s}={:s}'.format(key, value) for key, value in vars_kw.items()]
+#:set arg_list = '(' + ','.join(vars) + ')'
+call ${proc}$${arg_list}$
+if (hdf_err == -1) then
+   call h5eprint_f(hdf_err)
+   @:ABORT(error in call to ${proc}$)
+endif
 #:enddef

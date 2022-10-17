@@ -70,7 +70,7 @@ cz_scale_height
 cz_top_mass ! mass coordinate of top (Msun)
 cz_top_mass ! mass coordinate of top (Msun)
 cz_top_radius ! Rsun
-cz_top_scale_height 
+cz_top_scale_height
 !cz_xm ! mass exterior to base (Msun)
 cz_zone
 
@@ -175,7 +175,7 @@ power_he_burn
 star_mdot ! d(star_mass)/dt (in msolar per year)
 surface b11
 surface be9
-surface c12 
+surface c12
 surface c13
 surface ca40
 surface f19
@@ -261,7 +261,7 @@ surf_avg_Lrad_div_Ledd ! ratio of surface radiative luminosity to eddington lumi
 v_div_csound_surf ! velocity divided by sound speed at outermost grid point
 
 ! mass fractions near surface (averaged over the outer 1e−6% of the total stellar mass)
- 
+
 surface h1
 surface he3
 surface he4

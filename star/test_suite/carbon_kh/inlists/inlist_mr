@@ -1,7 +1,7 @@
 &controls
 
-  ! MR
-  time_delta_coeff = 0.3
-  history_interval = 3
+! MR
+time_delta_coeff = 0.3
+history_interval = 3
 
 / ! end of controls namelist

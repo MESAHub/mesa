@@ -23,25 +23,25 @@
 !
 ! ***********************************************************************
 
-      module mod_other_binary_photo_read
+module mod_other_binary_photo_read
+   
+   use binary_def
+   
+   implicit none
+   
+   ! note: there is no flag "use_other_binary_photo_read".
+   ! the other routine is always called when a photo is read.
+   ! see private/binary_photos.f90
 
-      use binary_def
-
-      implicit none
-
-      ! note: there is no flag "use_other_binary_photo_read".
-      ! the other routine is always called when a photo is read.
-      ! see private/binary_photos.f90
-
-      contains
-
-
-      subroutine default_other_binary_photo_read(binary_id, iounit, ierr)
-         integer, intent(in) :: binary_id, iounit
-         integer, intent(out) :: ierr
-         ierr = 0
-         !read(iounit,iostat=ierr) stuff
-      end subroutine default_other_binary_photo_read
+contains
+   
+   
+   subroutine default_other_binary_photo_read(binary_id, iounit, ierr)
+      integer, intent(in) :: binary_id, iounit
+      integer, intent(out) :: ierr
+      ierr = 0
+      !read(iounit,iostat=ierr) stuff
+   end subroutine default_other_binary_photo_read
 
 
-      end module mod_other_binary_photo_read
+end module mod_other_binary_photo_read

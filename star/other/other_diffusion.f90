@@ -22,40 +22,38 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_diffusion
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_diffusion = .true.
-      ! procedure pointer: s% other_diffusion => my_routine
+module other_diffusion
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_diffusion = .true.
+   ! procedure pointer: s% other_diffusion => my_routine
+   
+   use star_def
+   
+   implicit none
 
 
-
+contains
+   
+   
+   subroutine null_other_diffusion(id, dt, ierr)
       use star_def
-
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine null_other_diffusion(id, dt, ierr)
-         use star_def
-         integer, intent(in) :: id
-         real(dp), intent(in) :: dt 
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         !write(*,*) 'null_other_diffusion'
-         !write(*,*) 'associated(s% edv)', associated(s% edv)
-         s% edv(:,1:s% nz) = 0
-         !write(*,*) 'done null_other_diffusion'
-      end subroutine null_other_diffusion
+      integer, intent(in) :: id
+      real(dp), intent(in) :: dt
+      integer, intent(out) :: ierr
+      type (star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      !write(*,*) 'null_other_diffusion'
+      !write(*,*) 'associated(s% edv)', associated(s% edv)
+      s% edv(:, 1:s% nz) = 0
+      !write(*,*) 'done null_other_diffusion'
+   end subroutine null_other_diffusion
 
 
-      end module other_diffusion
+end module other_diffusion
       
       
       

@@ -1,103 +1,103 @@
 ! inlist to accrete until an NCO ignition occurs.
 
 &star_job
-      show_log_description_at_start = .false.
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'he_wd_cooled.mod'
+load_saved_model = .true.
+load_model_filename = 'he_wd_cooled.mod'
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'before_flash.mod'
-      required_termination_code_string = 'max_age'
+save_model_when_terminate = .true.
+save_model_filename = 'before_flash.mod'
+required_termination_code_string = 'max_age'
 
-      ! Nuclear Reactions
+! Nuclear Reactions
 
-      rate_tables_dir = 'tables_hashimoto'
-      rate_cache_suffix = 'hashimoto'
-      ion_coulomb_corrections = 'PCR2009'
-      electron_coulomb_corrections = 'Itoh2002'
+rate_tables_dir = 'tables_hashimoto'
+rate_cache_suffix = 'hashimoto'
+ion_coulomb_corrections = 'PCR2009'
+electron_coulomb_corrections = 'Itoh2002'
 
-      use_3a_fl87 = .true.
+use_3a_fl87 = .true.
 
-      change_net = .true.
-      new_net_name = 'nco.net'
+change_net = .true.
+new_net_name = 'nco.net'
 
-      show_net_reactions_info = .true.
-      show_net_species_info = .true.
+show_net_reactions_info = .true.
+show_net_species_info = .true.
 
-      relax_initial_tau_factor = .true.
-      relax_to_this_tau_factor = 300
+relax_initial_tau_factor = .true.
+relax_to_this_tau_factor = 300
 
-      set_initial_age = .true.
-      initial_age = 0d0
+set_initial_age = .true.
+initial_age = 0d0
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d3
+set_initial_dt = .true.
+years_for_initial_dt = 1d3
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-      ! pgstar_flag = .true.
+! pgstar_flag = .true.
 
 / !end of star_job namelist
 
 
 &kap
-  Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
 
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
-      max_age = 44d7
+max_age = 44d7
 
-      ! Should not reach this until next inlist
-      log_center_temp_limit = 7.8
+! Should not reach this until next inlist
+log_center_temp_limit = 7.8
 
-      ! Accretion Controls
-      accrete_same_as_surface = .false.
-      accrete_given_mass_fractions = .true.
-      num_accretion_species = 2
-      accretion_species_id(1) = 'he4'
-      accretion_species_xa(1) = 0.986987d0 ! 0.99
-      accretion_species_id(2) = 'n14'
-      accretion_species_xa(2) = 0.012313d0 ! 0.01
+! Accretion Controls
+accrete_same_as_surface = .false.
+accrete_given_mass_fractions = .true.
+num_accretion_species = 2
+accretion_species_id(1) = 'he4'
+accretion_species_xa(1) = 0.986987d0 ! 0.99
+accretion_species_id(2) = 'n14'
+accretion_species_xa(2) = 0.012313d0 ! 0.01
 
-      mass_change = 1d-9
+mass_change = 1d-9
 
-      ! A few broad resolution controls
-      mesh_delta_coeff = 0.4 !1.2
-      max_allowed_nz = 12000
-      !varcontrol_target = 1d-4
-
-
-      ! Some more specific resolution controls inspired by wd3
-      max_center_cell_dq = 1d-6
-      max_surface_cell_dq = 1d-8
-
-      delta_lgL_limit = 0.05
-      delta_lgL_hard_limit = 0.5
-
-      delta_lgRho_limit = 1
-      delta_lgRho_hard_limit = -1
-
-      delta_lgTeff_limit = 0.05
-      delta_lgTeff_hard_limit = 0.3
-
-      delta_lgR_limit = 1  !0.05
-
-      ! Don't let strong rates go to zero for any temperature. Also inspired by wd3.
-      net_logTcut_lo = 0
-      net_logTcut_lim = 0
+! A few broad resolution controls
+mesh_delta_coeff = 0.4 !1.2
+max_allowed_nz = 12000
+!varcontrol_target = 1d-4
 
 
-      ! Controls for output
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
-      
-      write_header_frequency = 10
+! Some more specific resolution controls inspired by wd3
+max_center_cell_dq = 1d-6
+max_surface_cell_dq = 1d-8
+
+delta_lgL_limit = 0.05
+delta_lgL_hard_limit = 0.5
+
+delta_lgRho_limit = 1
+delta_lgRho_hard_limit = -1
+
+delta_lgTeff_limit = 0.05
+delta_lgTeff_hard_limit = 0.3
+
+delta_lgR_limit = 1  !0.05
+
+! Don't let strong rates go to zero for any temperature. Also inspired by wd3.
+net_logTcut_lo = 0
+net_logTcut_lim = 0
+
+
+! Controls for output
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
+
+write_header_frequency = 10
 
 / ! end of controls namelist

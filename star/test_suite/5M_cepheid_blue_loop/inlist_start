@@ -1,20 +1,19 @@
-
 &star_job
 
-   show_log_description_at_start = .false.
-   
-   create_pre_main_sequence_model = .true.
+show_log_description_at_start = .false.
 
-   save_model_when_terminate = .true.
-   save_model_filename = 'start.mod'
-   required_termination_code_string = 'xa_central_upper_limit'
+create_pre_main_sequence_model = .true.
 
-   change_initial_net = .true.      
-   new_net_name = 'pp_cno_extras_o18_ne22.net'
+save_model_when_terminate = .true.
+save_model_filename = 'start.mod'
+required_termination_code_string = 'xa_central_upper_limit'
 
-   initial_zfracs = 6
-   
-   pgstar_flag = .true.
+change_initial_net = .true.
+new_net_name = 'pp_cno_extras_o18_ne22.net'
+
+initial_zfracs = 6
+
+pgstar_flag = .true.
 
 / !end of star_job namelist
 
@@ -24,82 +23,82 @@
 
 &kap
 
-   kap_file_prefix = 'a09'
-   kap_lowT_prefix = 'lowT_fa05_a09p'
-   kap_CO_prefix = 'a09_co'
+kap_file_prefix = 'a09'
+kap_lowT_prefix = 'lowT_fa05_a09p'
+kap_CO_prefix = 'a09_co'
 
-   Zbase = 0.008
+Zbase = 0.008
 
-   use_Type2_opacities = .true.
+use_Type2_opacities = .true.
 
 / !end of kap namelist
 
 
 &controls
 
-   xa_central_upper_limit_species(1) = 'c12'
-   xa_central_upper_limit(1) = 0.2d0
-   
-   ! limit max_model_number as part of test_suite
-   max_model_number = 6000
+xa_central_upper_limit_species(1) = 'c12'
+xa_central_upper_limit(1) = 0.2d0
 
-   initial_mass = 5 ! in Msun units
-   initial_Y = 0.256d0
-   initial_Z = 0.008d0
-   
-   energy_eqn_option = 'dedt'
+! limit max_model_number as part of test_suite
+max_model_number = 6000
 
-   mixing_length_alpha = 1.8d0
+initial_mass = 5 ! in Msun units
+initial_Y = 0.256d0
+initial_Z = 0.008d0
+
+energy_eqn_option = 'dedt'
+
+mixing_length_alpha = 1.8d0
 !   MLT_option = 'Cox'
 steps_before_use_TDC = 10
 
-   use_Ledoux_criterion = .true.
-   alpha_semiconvection = 0.1
+use_Ledoux_criterion = .true.
+alpha_semiconvection = 0.1
 
-    overshoot_scheme(1) = 'exponential'
-    overshoot_zone_type(1) = 'burn_H'
-    overshoot_zone_loc(1) = 'core'
-    overshoot_bdy_loc(1) = 'top'
-    overshoot_f(1) = 0.012
-    overshoot_f0(1) = 0.002
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'burn_H'
+overshoot_zone_loc(1) = 'core'
+overshoot_bdy_loc(1) = 'top'
+overshoot_f(1) = 0.012
+overshoot_f0(1) = 0.002
 
-    overshoot_scheme(2) = 'exponential'
-    overshoot_zone_type(2) = 'nonburn'
-    overshoot_zone_loc(2) = 'shell'
-    overshoot_bdy_loc(2) = 'bottom'
-    overshoot_f(2) = 0.022
-    overshoot_f0(2) = 0.002
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'nonburn'
+overshoot_zone_loc(2) = 'shell'
+overshoot_bdy_loc(2) = 'bottom'
+overshoot_f(2) = 0.022
+overshoot_f0(2) = 0.002
 
-   predictive_mix(1) = .true.
-   predictive_zone_type(1) = 'any'
-   predictive_zone_loc(1) = 'core' 
-   predictive_bdy_loc(1) = 'any'
+predictive_mix(1) = .true.
+predictive_zone_type(1) = 'any'
+predictive_zone_loc(1) = 'core'
+predictive_bdy_loc(1) = 'any'
 
-   predictive_mix(2) = .true.
-   predictive_zone_type(2) = 'any'
-   predictive_zone_loc(2) = 'surf' 
-   predictive_bdy_loc(2) = 'any'
+predictive_mix(2) = .true.
+predictive_zone_type(2) = 'any'
+predictive_zone_loc(2) = 'surf'
+predictive_bdy_loc(2) = 'any'
 
-   !varcontrol_target = 1d-4
+!varcontrol_target = 1d-4
 
-   delta_HR_limit = 0.002
+delta_HR_limit = 0.002
 
 
 ! output controls
 
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-   photo_interval = 50
-   profile_interval = 100
-   history_interval = 10
-   terminal_interval = 10
+photo_interval = 50
+profile_interval = 100
+history_interval = 10
+terminal_interval = 10
 
-   !photo_interval = 1
-   !profile_interval = 1
-   !history_interval = 1
-   !terminal_interval = 1
+!photo_interval = 1
+!profile_interval = 1
+!history_interval = 1
+!terminal_interval = 1
 
 
 
@@ -107,35 +106,35 @@ steps_before_use_TDC = 10
 
 &pgstar
 
-   ! HR window -- lg_L vs. lg_Teff
+! HR window -- lg_L vs. lg_Teff
 
-   HR_win_flag = .true.
+HR_win_flag = .true.
 
-   HR_win_width = 8
-   HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
+HR_win_width = 8
+HR_win_aspect_ratio = 0.62 ! aspect_ratio = height/width
 
-   ! axis limits -- to override system default selections
-   HR_logT_min = 3.4 ! -101 ! only used if > -100
-   HR_logT_max = 4.5 ! only used if > -100
-   HR_logL_min = 1.8 ! -101 ! only used if > -100
-   HR_logL_max = 4.5 ! -101 ! only used if > -100
+! axis limits -- to override system default selections
+HR_logT_min = 3.4 ! -101 ! only used if > -100
+HR_logT_max = 4.5 ! only used if > -100
+HR_logL_min = 1.8 ! -101 ! only used if > -100
+HR_logL_max = 4.5 ! -101 ! only used if > -100
 
-   show_HR_classical_instability_strip = .true.
-   show_HR_target_box = .false.
-   HR_target_n_sigma = -3
-   HR_target_logL = 0.67d0
-   HR_target_logL_sigma = 0.05d0
-   HR_target_logT = 3.785d0
-   HR_target_logT_sigma = 0.00461d0
+show_HR_classical_instability_strip = .true.
+show_HR_target_box = .false.
+HR_target_n_sigma = -3
+HR_target_logL = 0.67d0
+HR_target_logL_sigma = 0.05d0
+HR_target_logT = 3.785d0
+HR_target_logT_sigma = 0.00461d0
 
-   ! file output
-   HR_file_flag = .false.
-   HR_file_dir = 'pgstar_out'
-   HR_file_prefix = 'hr'
-   HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
-   HR_file_width = -1 ! negative means use same value as for window
-   HR_file_aspect_ratio = -1 ! negative means use same value as for window
-         
+! file output
+HR_file_flag = .false.
+HR_file_dir = 'pgstar_out'
+HR_file_prefix = 'hr'
+HR_file_interval = 5 ! output when mod(model_number,HR_file_interval)==0
+HR_file_width = -1 ! negative means use same value as for window
+HR_file_aspect_ratio = -1 ! negative means use same value as for window
+
 
 / ! end of pgstar namelist
 

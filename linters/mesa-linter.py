@@ -1,8 +1,7 @@
 from __future__ import print_function
 
-import sys
-import os
 import re
+import sys
 
 
 def search(filename, checks, summary=False):
@@ -57,9 +56,9 @@ def check_real_op(line):
 def check_real_exp(line):
     # Look for 1e+1, 1e-1, 1e1
     if (
-        re.search("[0-9][eE][+]?[-]?[0-9]", line)
-        and "write" not in line
-        and "format(" not in line
+            re.search("[0-9][eE][+]?[-]?[0-9]", line)
+            and "write" not in line
+            and "format(" not in line
     ):
         return "Found use of exponent E, use D instead"
     return None
@@ -69,10 +68,10 @@ def check_real_d(line):
     # Look for 1.5 but not 1.5d0
     if "write" not in line and "format(" not in line:
         for i in re.split(
-            " |\+|\-|\=|\*|\/", line
+                " |\+|\-|\=|\*|\/", line
         ):  # Split up string into things approximately like a number
             if len(i) and re.search(
-                "\d+[.](?!.*[_Dd]).*", i
+                    "\d+[.](?!.*[_Dd]).*", i
             ):  # test if missing double precision qualifier
                 return "Missing D on float"
     return None
@@ -84,11 +83,11 @@ def check_real(line):
         return "Declared real use real(dp) instead"
     return None
 
+
 def check_dp(line):
     if "double precision" in line:
         return "Found double precision use real(dp) instead"
     return None
-
 
 
 allchecks = [

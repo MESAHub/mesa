@@ -1,6 +1,6 @@
 program run
-   use run_star_support, only: do_read_star_job
-   use run_star, only: do_run_star
+   use run_star_support, only : do_read_star_job
+   use run_star, only : do_run_star
    
    implicit none
    
@@ -11,6 +11,5 @@ program run
    if (ierr /= 0) stop 1
    
    call do_run_star
-   
+
 end program
-   

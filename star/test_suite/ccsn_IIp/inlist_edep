@@ -1,29 +1,28 @@
-
 &star_job
 
-  save_model_when_terminate = .true.
-  save_model_filename = 'done_with_edep.mod'
-  required_termination_code_string = 'max_age'
+save_model_when_terminate = .true.
+save_model_filename = 'done_with_edep.mod'
+required_termination_code_string = 'max_age'
 
-  load_saved_model = .true.
-  load_model_filename = 'ready_for_edep.mod'
+load_saved_model = .true.
+load_model_filename = 'ready_for_edep.mod'
 
-  set_initial_model_number = .true.
-  initial_model_number = 0
-  set_initial_dt = .true.
+set_initial_model_number = .true.
+initial_model_number = 0
+set_initial_dt = .true.
 
-  seconds_for_initial_dt = 1d-10
+seconds_for_initial_dt = 1d-10
 
-  change_initial_RTI_flag = .true.
-  new_RTI_flag = .false.
+change_initial_RTI_flag = .true.
+new_RTI_flag = .false.
 
-  change_initial_v_flag = .true.
-  new_v_flag = .false.
+change_initial_v_flag = .true.
+new_v_flag = .false.
 
-  change_initial_u_flag = .true.
-  new_u_flag = .true.
+change_initial_u_flag = .true.
+new_u_flag = .true.
 
-  !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -35,93 +34,92 @@
 
 &controls
 
-  initial_mass = 20
-  initial_z = 0.02
+initial_mass = 20
+initial_z = 0.02
 
-  terminal_show_age_units = 'seconds'
+terminal_show_age_units = 'seconds'
 
-  num_trace_history_values = 1
-  trace_history_value_name(1) = 'total_energy'
+num_trace_history_values = 1
+trace_history_value_name(1) = 'total_energy'
 
-  max_num_profile_models = 1000
+max_num_profile_models = 1000
 
-  max_model_number = 5000
+max_model_number = 5000
 
-  inject_until_reach_model_with_total_energy = 8d+50
-  ! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
-  max_age_in_seconds = 0.2d0
-  total_mass_for_inject_extra_ergs_sec = 0.2d0
-  max_timestep = 1d-3
-  
-  start_time_for_inject_extra_ergs_sec = 0d0
-  base_of_inject_extra_ergs_sec = -1d0
+inject_until_reach_model_with_total_energy = 8d+50
+! make max_age_in_seconds and total_mass_for_inject_extra_ergs_sec large enough so max logT < 10.3
+max_age_in_seconds = 0.2d0
+total_mass_for_inject_extra_ergs_sec = 0.2d0
+max_timestep = 1d-3
 
-  fe_core_infall_limit = 1d+99
+start_time_for_inject_extra_ergs_sec = 0d0
+base_of_inject_extra_ergs_sec = -1d0
 
-  mixing_length_alpha = 1.9
+fe_core_infall_limit = 1d+99
 
-  thermohaline_coeff = 0
+mixing_length_alpha = 1.9
 
-  MLT_option = 'none'
+thermohaline_coeff = 0
 
-  okay_to_reduce_gradT_excess = .false.
+MLT_option = 'none'
 
-  mix_factor = 0
+okay_to_reduce_gradT_excess = .false.
 
-  use_fixed_vsurf_outer_BC = .true.
-  fixed_vsurf = 0
+mix_factor = 0
 
-  okay_to_remesh = .true.
-  use_split_merge_amr = .true.
-  split_merge_amr_log_zoning = .true.
-  split_merge_amr_nz_baseline = 1000
-  split_merge_amr_MaxLong = 1.5
-  split_merge_amr_max_iters = 10
+use_fixed_vsurf_outer_BC = .true.
+fixed_vsurf = 0
 
-  dxdt_nuc_factor = 0
+okay_to_remesh = .true.
+use_split_merge_amr = .true.
+split_merge_amr_log_zoning = .true.
+split_merge_amr_nz_baseline = 1000
+split_merge_amr_MaxLong = 1.5
+split_merge_amr_max_iters = 10
 
-  energy_eqn_option = 'dedt'
+dxdt_nuc_factor = 0
 
-  non_nuc_neu_factor = 0
-  eps_nuc_factor = 0
+energy_eqn_option = 'dedt'
 
-  use_dPrad_dm_form_of_T_gradient_eqn = .true.
+non_nuc_neu_factor = 0
+eps_nuc_factor = 0
 
-  convergence_ignore_equL_residuals = .true.
+use_dPrad_dm_form_of_T_gradient_eqn = .true.
 
-  limit_for_rel_error_in_energy_conservation = 1d99
-  hard_limit_for_rel_error_in_energy_conservation = 1d99
+convergence_ignore_equL_residuals = .true.
 
-  varcontrol_target = 0.01
+limit_for_rel_error_in_energy_conservation = 1d99
+hard_limit_for_rel_error_in_energy_conservation = 1d99
 
-  dX_nuc_drop_limit_at_high_T = 0.01
+varcontrol_target = 0.01
 
-  delta_lgL_He_limit = 0.5
+dX_nuc_drop_limit_at_high_T = 0.01
 
-  delta_lgT_cntr_limit = 0.2
+delta_lgL_He_limit = 0.5
 
-  delta_lgRho_cntr_limit = 0.5
+delta_lgT_cntr_limit = 0.2
 
-  warn_when_large_rel_run_E_err = 1d99
-  warning_limit_for_max_residual = 1d99
-  max_abs_rel_run_E_err = 1d99
+delta_lgRho_cntr_limit = 0.5
 
-  split_merge_amr_MaxShort = 2
+warn_when_large_rel_run_E_err = 1d99
+warning_limit_for_max_residual = 1d99
+max_abs_rel_run_E_err = 1d99
 
-  ! TESTING -- NEED A WORKAROUND
-  use_gold2_tolerances = .false.
-  use_gold_tolerances = .false.
-   
+split_merge_amr_MaxShort = 2
 
-  photo_interval = 50
-  profile_interval = 50
-  history_interval = 10
-  terminal_interval = 10
+! TESTING -- NEED A WORKAROUND
+use_gold2_tolerances = .false.
+use_gold_tolerances = .false.
+
+photo_interval = 50
+profile_interval = 50
+history_interval = 10
+terminal_interval = 10
 
 / ! end of controls namelist
 
 &pgstar
-         
+
 !pause = .true.
 
 Grid2_win_flag = .true.

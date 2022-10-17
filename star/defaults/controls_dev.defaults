@@ -7,198 +7,198 @@
 !  CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
 !  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.      
 
-      ! TDC options
-      ! ~~~~~~~~~~~
-      ! ::
+! TDC options
+! ~~~~~~~~~~~
+! ::
 
-      compare_TDC_to_MLT = .false.
+compare_TDC_to_MLT = .false.
 
-      ! RSP2 parameters
-      ! ~~~~~~~~~~~~~~~
-         
-      !|   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
-      !|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
-      !|   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
-      !|   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-      !|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar    
-      !      
-      ! RSP2 time weighting is determined by the velocity_time_centering controls.
-      !
-      !     + for Pt and Lt in turbulent energy equation
-      !     + for P and grav in momentum equation
-      !     + for P and L in energy equation
-      !     + for area when multiplied by P
-      !
-      ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
-      ! RSP2_use_Stellingwerf_Lr as in RSP
-      !   
+! RSP2 parameters
+! ~~~~~~~~~~~~~~~
 
-      ! ::
+!|   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad
+!|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap
+!|   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
+!|   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
+!|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar
+!
+! RSP2 time weighting is determined by the velocity_time_centering controls.
+!
+!     + for Pt and Lt in turbulent energy equation
+!     + for P and grav in momentum equation
+!     + for P and L in energy equation
+!     + for area when multiplied by P
+!
+! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
+! RSP2_use_Stellingwerf_Lr as in RSP
+!
 
-    RSP2_alfad = 1.0d0
-    RSP2_alfap = 0.0d0
-    RSP2_alfat = 0.0d0
-    RSP2_alfam = 0.25d0
-    RSP2_alfar = 0.0d0
-    
-    RSP2_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
-    RSP2_min_Lc_div_L_for_convective_mixing_type = 1d-4
+! ::
 
-    RSP2_Lsurf_factor = 0.5d0
-    
-    RSP2_report_adjust_w = .false.
-    RSP2_use_L_eqn_at_surface = .true.
-    RSP2_assume_HSE = .true.
-    RSP2_use_RSP_eqn_for_Y_face = .true.
-    RSP2_use_mass_interp_face_values = .false.
-    RSP2_use_Stellingwerf_Lr = .true.
-    
-    RSP2_num_outermost_cells_forced_nonturbulent = 0
-    RSP2_num_innermost_cells_forced_nonturbulent = 0
+RSP2_alfad = 1.0d0
+RSP2_alfap = 0.0d0
+RSP2_alfat = 0.0d0
+RSP2_alfam = 0.25d0
+RSP2_alfar = 0.0d0
 
-   RSP2_w_fix_if_neg = 5d-5
-   RSP2_w_min_for_damping = 1d2
-   RSP2_source_seed = 0d0
-     
-   RSP2_remesh_when_load = .true.
-     
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
-     
-   RSP2_nz_div_IBOTOM = 30d0
-     
+RSP2_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
+RSP2_min_Lc_div_L_for_convective_mixing_type = 1d-4
 
-      ! period controls
+RSP2_Lsurf_factor = 0.5d0
 
-      ! ::
+RSP2_report_adjust_w = .false.
+RSP2_use_L_eqn_at_surface = .true.
+RSP2_assume_HSE = .true.
+RSP2_use_RSP_eqn_for_Y_face = .true.
+RSP2_use_mass_interp_face_values = .false.
+RSP2_use_Stellingwerf_Lr = .true.
 
-    RSP2_target_steps_per_cycle = 600
-    RSP2_min_max_R_for_periods = -1
+RSP2_num_outermost_cells_forced_nonturbulent = 0
+RSP2_num_innermost_cells_forced_nonturbulent = 0
 
-      ! when to stop
+RSP2_w_fix_if_neg = 5d-5
+RSP2_w_min_for_damping = 1d2
+RSP2_source_seed = 0d0
 
-      ! ::
+RSP2_remesh_when_load = .true.
 
-    RSP2_max_num_periods = -1
-    RSP2_GREKM_avg_abs_frac_new = 0.1d0
-    RSP2_GREKM_avg_abs_limit = -1
+RSP2_nz = 150
+RSP2_nz_outer = 40
+RSP2_T_anchor = 11d3
+RSP2_dq_1_factor = 2d0
 
-      ! output data for work integrals during a particular period
+RSP2_nz_div_IBOTOM = 30d0
 
-      ! ::
 
-    RSP2_work_period = -1
-    RSP2_work_filename = 'work.data'
+! period controls
 
-      ! output data for 3d map.  format same as for gnuplot pm3d
+! ::
 
-      ! ::
+RSP2_target_steps_per_cycle = 600
+RSP2_min_max_R_for_periods = -1
 
-    RSP2_write_map = .false.
-    RSP2_map_columns_filename = 'map_columns.list'
+! when to stop
 
-      ! items listed in your map columns must also appear in your profile columns
+! ::
 
-      ! ::
+RSP2_max_num_periods = -1
+RSP2_GREKM_avg_abs_frac_new = 0.1d0
+RSP2_GREKM_avg_abs_limit = -1
 
-    RSP2_map_filename = 'map.data'
-    RSP2_map_first_period = -1
-    RSP2_map_last_period = -1
-    RSP2_map_zone_interval = 2
-    RSP2_map_history_filename = 'map_history.data'
+! output data for work integrals during a particular period
+
+! ::
+
+RSP2_work_period = -1
+RSP2_work_filename = 'work.data'
+
+! output data for 3d map.  format same as for gnuplot pm3d
+
+! ::
+
+RSP2_write_map = .false.
+RSP2_map_columns_filename = 'map_columns.list'
+
+! items listed in your map columns must also appear in your profile columns
+
+! ::
+
+RSP2_map_filename = 'map.data'
+RSP2_map_first_period = -1
+RSP2_map_last_period = -1
+RSP2_map_zone_interval = 2
+RSP2_map_history_filename = 'map_history.data'
 
 
 ! mass corrections
 ! ================
 
 
-      ! use_mass_corrections
-      ! ~~~~~~~~~~~~~~~~~~~~
+! use_mass_corrections
+! ~~~~~~~~~~~~~~~~~~~~
 
-      ! Gravitational vs baryonic mass corrections.
+! Gravitational vs baryonic mass corrections.
 
-      ! The Lagrangian coordinate (:math:`m`) in MESA is the baryonic
-      ! mass and the density (:math:`\rho`) is the baryonic mass
-      ! density.
+! The Lagrangian coordinate (:math:`m`) in MESA is the baryonic
+! mass and the density (:math:`\rho`) is the baryonic mass
+! density.
 
-      ! If false, then no distinction between gravitational and baryonic mass.
-      ! If true, then the gravitational mass is calculated using mass corrections
-      ! and the momentum equation, total energy equation, and Brunt are modified.
+! If false, then no distinction between gravitational and baryonic mass.
+! If true, then the gravitational mass is calculated using mass corrections
+! and the momentum equation, total energy equation, and Brunt are modified.
 
-      ! The variable ``mass_correction`` is the quantity you multiply
-      ! the baryonic mass density by to get the gravitational mass
-      ! density:
+! The variable ``mass_correction`` is the quantity you multiply
+! the baryonic mass density by to get the gravitational mass
+! density:
 
-      !     (mass density) = (baryon density) * amu * mass_correction
+!     (mass density) = (baryon density) * amu * mass_correction
 
-      ! Given the mass fractions in a cell, the value of
-      ! mass_correction is provided by the ``chem`` module.
+! Given the mass fractions in a cell, the value of
+! mass_correction is provided by the ``chem`` module.
 
-      ! MESA holds m_grav fixed during the newton iterations.  This results
-      ! in an energy conservation error, because the specific potential energy
-      ! changes when m_grav is updated afterwards.  A message showing
-      ! the relative energy error incurred due to this assumption
-      ! will be printed to the terminal.
+! MESA holds m_grav fixed during the newton iterations.  This results
+! in an energy conservation error, because the specific potential energy
+! changes when m_grav is updated afterwards.  A message showing
+! the relative energy error incurred due to this assumption
+! will be printed to the terminal.
 
-      ! Not compatible with RSP.
+! Not compatible with RSP.
 
-      ! ::
+! ::
 
-    use_mass_corrections = .false.
+use_mass_corrections = .false.
 
 
 ! WD phase separation
 ! ===================
 
-      ! do_phase_separation
-      ! ~~~~~~~~~~~~~~~~~~~
+! do_phase_separation
+! ~~~~~~~~~~~~~~~~~~~
 
-      ! Phase separation upon crystallization in WD cores
-      ! (currently only for C/O white dwarf cores)
-      ! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+! Phase separation upon crystallization in WD cores
+! (currently only for C/O white dwarf cores)
+! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
 
-      ! ::
+! ::
 
-    do_phase_separation = .false.
+do_phase_separation = .false.
 
-      ! do_phase_separation_heating
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! do_phase_separation_heating
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if true, calculate heating term associated with changes in
-      ! internal energy due to any abundance changes from phase
-      ! separation, and include this term in the energy equation.
+! if true, calculate heating term associated with changes in
+! internal energy due to any abundance changes from phase
+! separation, and include this term in the energy equation.
 
-      ! ::
+! ::
 
-    do_phase_separation_heating = .true.
+do_phase_separation_heating = .true.
 
-      ! phase_separation_mixing_use_brunt
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! phase_separation_mixing_use_brunt
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if true, the phase separation mixing recalculates relevant
-      ! EOS quantities and evaluates the Ledoux criterion,
-      ! including the brunt B term that depends on the composition
-      ! gradient. This can be somewhat expensive, so this option can
-      ! be set to false to instead just mix outward until there is
-      ! no more negative mu gradient. These will produce similar
-      ! final chemical profiles, but setting this option to true
-      ! is the only way to properly evaluate the physical criterion.
+! if true, the phase separation mixing recalculates relevant
+! EOS quantities and evaluates the Ledoux criterion,
+! including the brunt B term that depends on the composition
+! gradient. This can be somewhat expensive, so this option can
+! be set to false to instead just mix outward until there is
+! no more negative mu gradient. These will produce similar
+! final chemical profiles, but setting this option to true
+! is the only way to properly evaluate the physical criterion.
 
-      ! ::
+! ::
 
-    phase_separation_mixing_use_brunt = .true.
-    
-      ! phase_separation_no_diffusion
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+phase_separation_mixing_use_brunt = .true.
 
-      ! if true and element diffusion is on, prevent element diffusion
-      ! from occurring in the layers where phase separation mixing
-      ! is present (experimental)
+! phase_separation_no_diffusion
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! ::
+! if true and element diffusion is on, prevent element diffusion
+! from occurring in the layers where phase separation mixing
+! is present (experimental)
 
-    phase_separation_no_diffusion = .false.
+! ::
+
+phase_separation_no_diffusion = .false.
 
 

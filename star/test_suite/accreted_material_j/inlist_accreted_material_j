@@ -1,35 +1,35 @@
 &star_job
 
-      show_log_description_at_start = .false. 
+show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod'
+load_saved_model = .true.
+load_model_filename = 'zams.mod'
 
-      new_rotation_flag = .true.
-      change_rotation_flag = .true.
-      !relax_initial_omega_div_omega_crit = .true.
-      set_initial_omega_div_omega_crit = .true.
-      new_omega_div_omega_crit = 0.1
+new_rotation_flag = .true.
+change_rotation_flag = .true.
+!relax_initial_omega_div_omega_crit = .true.
+set_initial_omega_div_omega_crit = .true.
+new_omega_div_omega_crit = 0.1
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1
+set_initial_dt = .true.
+years_for_initial_dt = 1
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+set_initial_model_number = .true.
+initial_model_number = 0
 
-      set_initial_age = .true.
-      initial_age = 0
+set_initial_age = .true.
+initial_age = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+set_initial_cumulative_energy_error = .true.
+new_cumulative_energy_error = 0d0
 
-      !change_D_omega_flag = .true.
-      !new_D_omega_flag = .true.
+!change_D_omega_flag = .true.
+!new_D_omega_flag = .true.
 
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      !required_termination_code_string = 'xa_central_lower_limit'
-      required_termination_code_string = 'star_mass_max_limit'
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+!required_termination_code_string = 'xa_central_lower_limit'
+required_termination_code_string = 'star_mass_max_limit'
 
 / !end of star_job
 
@@ -39,79 +39,79 @@
 
 
 &kap
-      Zbase = 0.02
+Zbase = 0.02
 / ! end of kap namelist
 
 &controls
-      scale_max_correction = 0.1d0
-      ignore_species_in_max_correction = .true.
+scale_max_correction = 0.1d0
+ignore_species_in_max_correction = .true.
 
-      energy_eqn_option = 'dedt'
+energy_eqn_option = 'dedt'
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
+num_trace_history_values = 2
+trace_history_value_name(1) = 'rel_E_err'
+trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      ! limit max_model_number as part of test_suite
-      max_model_number = 1000
-            
-      premix_omega = .true.
-      
-      am_nu_visc_factor = 0
-      am_D_mix_factor = 0.0333333333333333d00
-      D_DSI_factor = 1
-      D_SH_factor = 1
-      D_SSI_factor = 1
-      D_ES_factor = 1
-      D_GSF_factor = 1
-      D_ST_factor = 1
+! limit max_model_number as part of test_suite
+max_model_number = 1000
 
-      !set_min_D_mix = .true.
-      !min_D_mix = 1d10
-      
-  ! starting specifications
-      initial_mass = 20 ! in Msun units
-      initial_Z = 0.02
+premix_omega = .true.
 
-      max_mdot_redo_cnt = 200
-      min_years_dt_for_redo_mdot = 1d-5
-      surf_omega_div_omega_crit_limit = 0.999d0
-      surf_omega_div_omega_crit_tol = 0.055
-      rotational_mdot_boost_fac = 1d10
-      rotational_mdot_kh_fac = 1d10
-      mdot_revise_factor = 1.1
-      implicit_mdot_boost = 0.1
+am_nu_visc_factor = 0
+am_D_mix_factor = 0.0333333333333333d00
+D_DSI_factor = 1
+D_SH_factor = 1
+D_SSI_factor = 1
+D_ES_factor = 1
+D_GSF_factor = 1
+D_ST_factor = 1
 
-      use_accreted_material_j = .true.
-      use_other_adjust_mdot = .true.
+!set_min_D_mix = .true.
+!min_D_mix = 1d10
 
-      ! ratio of accreted am to keplerian
-      x_ctrl(1) = 0.1d0
-      ! log10 accretion rate in msun/secyer
-      x_ctrl(2) = -3d0
+! starting specifications
+initial_mass = 20 ! in Msun units
+initial_Z = 0.02
 
-      star_mass_max_limit = 25d0
+max_mdot_redo_cnt = 200
+min_years_dt_for_redo_mdot = 1d-5
+surf_omega_div_omega_crit_limit = 0.999d0
+surf_omega_div_omega_crit_tol = 0.055
+rotational_mdot_boost_fac = 1d10
+rotational_mdot_kh_fac = 1d10
+mdot_revise_factor = 1.1
+implicit_mdot_boost = 0.1
 
-      !varcontrol_target = 5d-4
-      delta_lg_star_mass_limit = 2d-4
-      delta_lg_star_mass_hard_limit = 4d-4
-   
-   ! output to files and terminal
-      photo_interval = 50
-      profile_interval = 100
-      max_num_profile_models = 3000
-      history_interval = 10
-      terminal_interval = 10
-      
-      write_header_frequency = 10
-      
-      !report_solver_progress = .true.
+use_accreted_material_j = .true.
+use_other_adjust_mdot = .true.
+
+! ratio of accreted am to keplerian
+x_ctrl(1) = 0.1d0
+! log10 accretion rate in msun/secyer
+x_ctrl(2) = -3d0
+
+star_mass_max_limit = 25d0
+
+!varcontrol_target = 5d-4
+delta_lg_star_mass_limit = 2d-4
+delta_lg_star_mass_hard_limit = 4d-4
+
+! output to files and terminal
+photo_interval = 50
+profile_interval = 100
+max_num_profile_models = 3000
+history_interval = 10
+terminal_interval = 10
+
+write_header_frequency = 10
+
+!report_solver_progress = .true.
 
 /
 
 
 &pgstar
-         
+
 
 
 / ! end of pgstar namelist

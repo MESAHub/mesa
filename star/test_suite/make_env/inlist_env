@@ -2,12 +2,12 @@
 
 &star_job
 
-      set_tau_factor = .true.
-      set_to_this_tau_factor = 100
+set_tau_factor = .true.
+set_to_this_tau_factor = 100
 
-      !profile_starting_model = .true.
+!profile_starting_model = .true.
 
-      !pgstar_flag = .true.
+!pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -15,66 +15,62 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-      kap_file_prefix = 'gs98'
-      use_Type2_opacities = .true.
+Zbase = 0.02d0
+kap_file_prefix = 'gs98'
+use_Type2_opacities = .true.
 / ! end of kap namelist
 
 &controls
-      x_character_ctrl(1) = 'cno_extras_plus_fe56.net'
-      ! specify abundances
-      initial_z = 0.02d0
-      accrete_same_as_surface = .false.
-      accretion_h1 = 0d0
-      accretion_h2 = 0d0
-      accretion_he3 = 0d0
-      accretion_he4 = 0d0
-      accretion_zfracs = 0
-      z_fraction_fe = 1d0
-            
-      x_integer_ctrl(1) = 1500 ! initial nz
-      x_ctrl(5) = -15d0 ! initial log(dq(1))
-      
-      x_logical_ctrl(1) = .true. ! build starting model
-      ! neutron star
-         x_ctrl(1) = 1.4 ! star mass (Msun)
-         x_ctrl(2) = 1d-11 ! model mass as fraction of star mass
-         x_logical_ctrl(2) = .false. ! get R using L = 4*pi*R^2*boltz_sigma*Teff**4
-         x_ctrl(3) = 1.936E+06 ! Teff
+x_character_ctrl(1) = 'cno_extras_plus_fe56.net'
+! specify abundances
+initial_z = 0.02d0
+accrete_same_as_surface = .false.
+accretion_h1 = 0d0
+accretion_h2 = 0d0
+accretion_he3 = 0d0
+accretion_he4 = 0d0
+accretion_zfracs = 0
+z_fraction_fe = 1d0
 
-         ! x_ctrl(4) = 2.612330198537095 for ns_h and ns_he
-         ! x_ctrl(4) = 26.12330198537095 for ns_c
-         x_ctrl(4) = 2.612330198537095 ! L/Lsun
+x_integer_ctrl(1) = 1500 ! initial nz
+x_ctrl(5) = -15d0 ! initial log(dq(1))
 
-         x_ctrl(6) = 1d0 ! 1d2 ! initial tau_factor
+x_logical_ctrl(1) = .true. ! build starting model
+! neutron star
+x_ctrl(1) = 1.4 ! star mass (Msun)
+x_ctrl(2) = 1d-11 ! model mass as fraction of star mass
+x_logical_ctrl(2) = .false. ! get R using L = 4*pi*R^2*boltz_sigma*Teff**4
+x_ctrl(3) = 1.936E+06 ! Teff
 
-      max_years_for_timestep = 1d6
-      max_age = 1d7
+! x_ctrl(4) = 2.612330198537095 for ns_h and ns_he
+! x_ctrl(4) = 26.12330198537095 for ns_c
+x_ctrl(4) = 2.612330198537095 ! L/Lsun
 
-      energy_eqn_option = 'dedt'
+x_ctrl(6) = 1d0 ! 1d2 ! initial tau_factor
 
-      max_abar_for_burning = 55
-   
-      merge_if_dlnR_too_small = .true.
-      mesh_min_dlnR = 1d-9
+max_years_for_timestep = 1d6
+max_age = 1d7
+
+energy_eqn_option = 'dedt'
+
+max_abar_for_burning = 55
+
+merge_if_dlnR_too_small = .true.
+mesh_min_dlnR = 1d-9
+
+varcontrol_target = 1d-3
+min_allowed_varcontrol_target = 5d-4
+never_skip_hard_limits = .true.
+relax_hard_limits_after_retry = .false.
+!mlt_make_surface_no_mixing = .true.
+
+gold2_tol_residual_norm2 = 1d-8
+gold2_tol_max_residual2 = 1d-5
+gold2_iter_for_resid_tol3 = 999
+gold2_tol_residual_norm3 = 0
+gold2_tol_max_residual3 = 0
 
 
-
-      varcontrol_target = 1d-3
-      min_allowed_varcontrol_target = 5d-4
-      never_skip_hard_limits = .true.
-      relax_hard_limits_after_retry = .false.
-      !mlt_make_surface_no_mixing = .true. 
-
-
-
-      gold2_tol_residual_norm2 = 1d-8
-      gold2_tol_max_residual2 = 1d-5
-      gold2_iter_for_resid_tol3 = 999
-      gold2_tol_residual_norm3 = 0
-      gold2_tol_max_residual3 = 0
-
-      
 
 
 / ! end of controls namelist
@@ -82,12 +78,12 @@
 
 
 &pgstar
-         
-      ! top level controls
 
-         !pause = .true. 
-            ! if true, the code waits for user to enter a RETURN on the command line
-      
+! top level controls
+
+!pause = .true.
+! if true, the code waits for user to enter a RETURN on the command line
+
 
 
 / ! end of pgstar namelist

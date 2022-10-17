@@ -22,30 +22,30 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_timestep_limit
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_timestep_limit = .true.
-      ! procedure pointer: s% other_timestep_limit => my_routine
+module other_timestep_limit
+   
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_timestep_limit = .true.
+   ! procedure pointer: s% other_timestep_limit => my_routine
+   
+   use star_def
+   
+   implicit none
 
-      use star_def
+contains
+   
+   integer function null_other_timestep_limit(&
+      id, skip_hard_limit, dt, dt_limit_ratio)
+      use const_def, only : dp
+      integer, intent(in) :: id
+      logical, intent(in) :: skip_hard_limit
+      real(dp), intent(in) :: dt
+      real(dp), intent(inout) :: dt_limit_ratio
+      null_other_timestep_limit = keep_going
+   end function null_other_timestep_limit
 
-      implicit none      
-            
-      contains
-      
-      integer function null_other_timestep_limit( &
-         id, skip_hard_limit, dt, dt_limit_ratio)
-         use const_def, only: dp
-         integer, intent(in) :: id
-         logical, intent(in) :: skip_hard_limit
-         real(dp), intent(in) :: dt
-         real(dp), intent(inout) :: dt_limit_ratio
-         null_other_timestep_limit = keep_going
-      end function null_other_timestep_limit
-
-      end module other_timestep_limit
+end module other_timestep_limit
       
       
       
