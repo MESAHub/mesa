@@ -21,8 +21,8 @@ SRCS = \
    akima760_db.f \
    renka790_sg.f \
    renka790_db.f \
-   interp_2d_lib_db.f90 \
-   interp_2d_lib_sg.f90
+   interp_2d_lib_db.f \
+   interp_2d_lib_sg.f
 
 #################################################################
 #
