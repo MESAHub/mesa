@@ -245,14 +245,13 @@ module auto_diff_real_15var_order1_module
       module procedure mul_int_self
    end interface operator(*)
    
-   interface operator
-      (/)
-   module procedure div_self
-   module procedure div_self_real
-   module procedure div_real_self
-   module procedure div_self_int
-   module procedure div_int_self
-end interface operator(/)
+   interface operator(/)
+      module procedure div_self
+      module procedure div_self_real
+      module procedure div_real_self
+      module procedure div_self_int
+      module procedure div_int_self
+   end interface operator(/)
    
    interface operator(**)
       module procedure pow_self
@@ -260,41 +259,41 @@ end interface operator(/)
       module procedure pow_real_self
       module procedure pow_self_int
       module procedure pow_int_self
-      end interface operator(**)
+   end interface operator(**)
       
-      interface max
+   interface max
       module procedure max_self
       module procedure max_self_real
       module procedure max_real_self
       module procedure max_self_int
       module procedure max_int_self
-      end interface max
+   end interface max
       
-      interface min
+   interface min
       module procedure min_self
       module procedure min_self_real
       module procedure min_real_self
-   module procedure min_self_int
-   module procedure min_int_self
+      module procedure min_self_int
+      module procedure min_int_self
    end interface min
    
    interface dim
-   module procedure dim_self
-   module procedure dim_self_real
-   module procedure dim_real_self
+      module procedure dim_self
+      module procedure dim_self_real
+      module procedure dim_real_self
       module procedure dim_self_int
       module procedure dim_int_self
-      end interface dim
+   end interface dim
    
    interface pow
-   module procedure pow_self
-   module procedure pow_self_real
-   module procedure pow_real_self
-   module procedure pow_self_int
+      module procedure pow_self
+      module procedure pow_self_real
+      module procedure pow_real_self
+      module procedure pow_self_int
       module procedure pow_int_self
-      end interface pow
+   end interface pow
       
-      contains
+contains
       
       subroutine assign_from_self(this, other)
       type(auto_diff_real_15var_order1), intent(out) :: this

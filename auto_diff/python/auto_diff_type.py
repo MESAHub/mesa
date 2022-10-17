@@ -42,12 +42,13 @@ class AutoDiffType:
         self.binary_partials = sorted(list(
             Partial((i, j), False) for i in range(self.max_order + 1) for j in
             range(self.max_order + 1) if i + j <= self.max_order),
-                                      key=lambda p: [p.net_order, tuple(
-                                          -o for o in p.orders)])
+            key=lambda p: [p.net_order, tuple(
+                -o for o in p.orders)])
     
     def declare_name(self, ref=None):
         if (not self.array) or (
-        not self.array_length is None):  # Either no array type or else it's
+                not self.array_length is None):  # Either no array type or
+            # else it's
             # a fixed length.
             return 'type(' + str(self.name) + ')'
         else:
@@ -327,10 +328,13 @@ class AutoDiffType:
     def specific_binary_operator_function_real_dp(self, operator_name,
                                                   operator):
         '''
-        Returns functions which implements the specified binary operator with a real(dp) object
+        Returns functions which implements the specified binary operator
+        with a real(dp) object
         in the two possible orders (this,real), (real,this).
-        This is done by producing a unary operator that implements operator(this type, real), treating the
-        real as a constant symbol, and then using the specific operator unary chain rule on that.
+        This is done by producing a unary operator that implements operator(
+        this type, real), treating the
+        real as a constant symbol, and then using the specific operator
+        unary chain rule on that.
         '''
         
         # (this, real)
@@ -369,10 +373,13 @@ class AutoDiffType:
     
     def specific_binary_operator_function_int(self, operator_name, operator):
         '''
-        Returns functions which implements the specified binary operator with an integer.
+        Returns functions which implements the specified binary operator
+        with an integer.
         in the two possible orders (this,int), (int,this).
-        This is done by producing a unary operator that implements operator(this type, int), treating the
-        int as a constant symbol, and then using the specific operator unary chain rule on that.
+        This is done by producing a unary operator that implements operator(
+        this type, int), treating the
+        int as a constant symbol, and then using the specific operator unary
+        chain rule on that.
         '''
         
         # (this, int)

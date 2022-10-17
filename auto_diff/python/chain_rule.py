@@ -67,7 +67,7 @@ def binary_generic_chain_rule(auto_diff_type, fixed_length=None):
         # (z_syms) with
         # respect to the x and y.
         z = sum(sym * x ** p.orders[0] * y ** p.orders[1] / (
-                    factorial(p.orders[0]) * factorial(p.orders[1])) for sym, p
+                factorial(p.orders[0]) * factorial(p.orders[1])) for sym, p
                 in zip(*(z_syms, auto_diff_type.binary_partials)))
         return z
     
@@ -372,15 +372,18 @@ def binary_specific_chain_rule(auto_diff_type, operator, xval=None, yval=None,
                     if s in is_array:
                         if is_array[s]:
                             is_array[
-                                sym] = True  # Intermediate is defined in terms of an array type and so is an array type.
+                                sym] = True  # Intermediate is defined in
+                            # terms of an array type and so is an array type.
     
     # Write the lines defining the sub-expressions
     for sym, sub_expr in common_sub_expressions[0][
-                         ::-1]:  # Have to go in reverse order because we're prepending.
+                         ::-1]:  # Have to go in reverse order because we're
+        # prepending.
         if is_array[sym]:  # # Intermediate is an array type.
             if fixed_length is None:
                 sym_str = str(
-                    sym) + '(1:x%n)'  # All of these expressions have x defined as an auto_diff type, so it has an %n property.
+                    sym) + '(1:x%n)'  # All of these expressions have x
+                # defined as an auto_diff type, so it has an %n property.
             else:
                 sym_str = str(sym) + '(1:' + str(fixed_length) + ')'
         else:

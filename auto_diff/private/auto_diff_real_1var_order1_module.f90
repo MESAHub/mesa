@@ -315,14 +315,15 @@ module auto_diff_real_1var_order1_module
       module procedure mul_int_self
    end interface operator(*)
    
-   interface operator
-      (/)
-   module procedure div_self
-   module procedure div_self_real
-   module procedure div_real_self
-   module procedure div_self_int
-   module procedure div_int_self
-end interface operator(/)
+   !@formatter:off
+   interface operator(/)
+      module procedure div_self
+      module procedure div_self_real
+      module procedure div_real_self
+      module procedure div_self_int
+      module procedure div_int_self
+   end interface operator(/)
+   !@formatter:on
    
    interface pow
    module procedure pow_self
@@ -352,38 +353,38 @@ end interface operator(/)
       module procedure dim_self
       module procedure dim_self_real
       module procedure dim_real_self
-      module procedure dim_self_int
-      module procedure dim_int_self
+   module procedure dim_self_int
+   module procedure dim_int_self
       end interface dim
       
       interface differentiate_1
       module procedure differentiate_auto_diff_real_1var_order1_1
-         end interface differentiate_1
-         
-         contains
-         
-         subroutine assign_from_self(this, other)
-         type(auto_diff_real_1var_order1), intent(out) :: this
+      end interface differentiate_1
+      
+      contains
+      
+      subroutine assign_from_self(this, other)
+      type(auto_diff_real_1var_order1), intent(out) :: this
       type(auto_diff_real_1var_order1), intent(in) :: other
-      this%val = other%val
-         this%d1val1 = other%d1val1
-         end subroutine assign_from_self
-         
-         subroutine assign_from_real_dp(this, other)
-         type(auto_diff_real_1var_order1), intent(out) :: this
-      real(dp), intent(in) :: other
-      this%val = other
-      this%d1val1 = 0_dp
-      end subroutine assign_from_real_dp
+   this%val = other%val
+      this%d1val1 = other%d1val1
+      end subroutine assign_from_self
       
-      subroutine assign_from_int(this, other)
-         type(auto_diff_real_1var_order1), intent(out) :: this
-      integer, intent(in) :: other
-      this%val = other
-      this%d1val1 = 0_dp
-      end subroutine assign_from_int
-      
-      function equal_self(this, other) result(z)
+      subroutine assign_from_real_dp(this, other)
+      type(auto_diff_real_1var_order1), intent(out) :: this
+   real(dp), intent(in) :: other
+   this%val = other
+   this%d1val1 = 0_dp
+   end subroutine assign_from_real_dp
+   
+   subroutine assign_from_int(this, other)
+      type(auto_diff_real_1var_order1), intent(out) :: this
+   integer, intent(in) :: other
+   this%val = other
+   this%d1val1 = 0_dp
+   end subroutine assign_from_int
+   
+   function equal_self(this, other) result(z)
       type(auto_diff_real_1var_order1), intent(in) :: this
       type(auto_diff_real_1var_order1), intent(in) :: other
       logical :: z

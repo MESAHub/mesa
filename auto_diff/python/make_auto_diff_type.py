@@ -182,7 +182,8 @@ def make_auto_diff_type(auto_diff_type, unary_operators, binary_operators,
     begin[-1] = begin[-1][:-3]  # Remove ending ', &'
     begin.append('')
     
-    # De-duplicate begin. This is necessary because the unary_minus operator and subtraction have the same interface, but get added twice.
+    # De-duplicate begin. This is necessary because the unary_minus operator
+    # and subtraction have the same interface, but get added twice.
     begin_de_duplicated = []
     for b in begin:
         if b not in begin_de_duplicated:

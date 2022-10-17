@@ -324,8 +324,7 @@ module auto_diff_real_2var_order3_module
       module procedure mul_int_self
    end interface operator(*)
    
-   interface operator
-      (/)
+   interface operator(/)
    module procedure div_self
    module procedure div_self_real
    module procedure div_real_self

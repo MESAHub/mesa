@@ -222,7 +222,8 @@ def py_to_fort(expr):
     expr = expr.replace('safe_log(10.0_dp)', 'ln10')
     expr = expr.replace('log(10.0_dp)', 'ln10')
     
-    # Next we replace 'colon' with ':' because sympy doesn't like colons in the middle of variable names.
+    # Next we replace 'colon' with ':' because sympy doesn't like colons in
+    # the middle of variable names.
     expr = expr.replace('colon', ':')
     
     return expr

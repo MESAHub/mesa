@@ -64,7 +64,8 @@ class Partial:
     
     def increment_order(self, variable_index):
         '''
-        Returns the partial with the derivative order of the specified variable incremented.
+        Returns the partial with the derivative order of the specified
+        variable incremented.
         '''
         
         orders = list(self.orders)

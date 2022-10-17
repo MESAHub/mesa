@@ -83,7 +83,8 @@ def weighted_count_ops(expr_original, verbose=False):
                 parts[str(a)] = 1
             else:
                 parts[str(a.args[1])] = a.args[
-                    0]  # First argument is the number of times the op was used. Second is op name.
+                    0]  # First argument is the number of times the op was
+                # used. Second is op name.
     
     if verbose:
         print(expr_original)
