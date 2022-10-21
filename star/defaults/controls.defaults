@@ -575,6 +575,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if true, write atmosphere to pulse files
+      ! This is not valid when ``atm_option = 'table'``
 
       ! ::
 
