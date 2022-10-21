@@ -5,6 +5,8 @@
 
    evolve_both_stars = .true.
 
+!   pgbinary_flag = .true.
+
 / ! end of binary_job namelist
 
 &binary_controls

@@ -24,16 +24,16 @@
 ! ***********************************************************************
 
 module pgbinary_orbit
-
+   
    use binary_private_def
    use pgbinary_support
-
+   
    implicit none
 
 
 contains
-
-
+   
+   
    subroutine Orbit_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
@@ -51,8 +51,8 @@ contains
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Orbit_plot
-
-
+   
+   
    subroutine do_Orbit_plot(b, id, device_id, &
       winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
@@ -64,11 +64,11 @@ contains
       call orbit_panel(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
    end subroutine do_Orbit_plot
-
-
+   
+   
    subroutine orbit_panel(b, device_id, &
       winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
-
+      
       use num_lib, only : safe_root_with_guess
       use math_lib, only : pow
       
@@ -88,10 +88,10 @@ contains
       integer, pointer :: ipar(:) ! (lipar)
       real(dp), pointer :: rpar(:) ! (lrpar)
       real(dp) :: cosp, q, this_psi, xl1
-
+      
       include 'formats'
-
-     ierr = 0
+      
+      ierr = 0
       call pgsave
       call pgsvp(winxmin, winxmax, winymin, winymax)
       if (.not. subplot) then
@@ -130,10 +130,10 @@ contains
       x2max = maxval(abs(x2s))
       xmax = max(x1max, x2max)
       
-      if (b% Orbit_show_RL .and. abs(log10(q)) <= 2) then
+      q = b% m(2) / b% m(1)
+      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
          call pgsci(clr_Goldenrod)
          call pgpt1(x1s(1), y1s(1), -1)
-         q = b% m(2) / b% m(1)
          if (b% point_mass_i /= 1) then
             this_psi = Psi_fit(b% r(1) / b% separation, q)
             xl1 = xl1_fit(q)
@@ -160,7 +160,7 @@ contains
                y1s_RL(i) = y1s_RL(icut)
             end do
             do i = 1, num_points  ! displace the xs
-               x1s_RL(i) = x1s_RL(i) - a1 * (1-e)
+               x1s_RL(i) = x1s_RL(i) - a1 * (1 - e)
                x1s_RL(2 * num_points - i + 1) = x1s_RL(i)
             end do
             x1s_RL(2 * num_points + 1) = x1s_RL(1)  ! close contour
@@ -196,7 +196,7 @@ contains
                y2s_RL(i) = y2s_RL(icut)
             end do
             do i = 1, num_points  ! displace the xs
-               x2s_RL(i) = -(x2s_RL(i) - a2 * (1-e))  ! flip x for 2nd star!
+               x2s_RL(i) = -(x2s_RL(i) - a2 * (1 - e))  ! flip x for 2nd star!
                x2s_RL(2 * num_points - i + 1) = x2s_RL(i)
             end do
             x2s_RL(2 * num_points + 1) = x2s_RL(1)
@@ -204,7 +204,7 @@ contains
             x2max = maxval(abs(x2s_RL))
             xmax = max(x2max, xmax)
          end if
-      else if (b% Orbit_show_RL .and. abs(log10(q)) > 2) then
+      else if (b% pg% Orbit_show_RL .and. abs(log10(q)) > 2) then
          write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
       end if
       
@@ -223,10 +223,10 @@ contains
       call pgslw(1)
       call pgmtxt('T', -2.0, 0.05, 0.0, 'Star 1')
       call pgsci(clr_LightSkyBlue)
-      call pgslw(b% pg% pgbinary_lw)
+      call pgslw(b% pg% pgbinary_lw / 2)
       call pgline(2 * num_points + 1, x2s, y2s)
       
-      if (b% Orbit_show_RL .and. abs(log10(q)) <= 2) then
+      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
          call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
          call pgsfs(3)
          call pgshs(45.0, 0.33, 0.0)

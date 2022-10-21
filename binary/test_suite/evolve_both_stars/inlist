@@ -20,6 +20,6 @@
 &pgbinary
 
       read_extra_pgbinary_inlist1 = .true.
-      extra_pgbinary_inlist1_name = 'inlist_project'
+      extra_pgbinary_inlist1_name = 'inlist_pgbinary'
 
 / ! end of pgbinary namelist
