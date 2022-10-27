@@ -12,6 +12,31 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCE FILES
 
+ifeq ($(USE_PGSTAR),YES)
+   PGSTAR_SRCS = \
+   pgbinary_decorator.f90 \
+   pgbinary_support.f90 \
+   pgbinary_ctrls_io.f90 \
+   pgbinary_summary.f90 \
+   pgbinary_summary_history.f90 \
+   pgbinary_hist_track.f90 \
+   pgbinary_history_panels.f90 \
+   pgbinary_orbit.f90 \
+   pgbinary_star.f90 \
+   pgbinary_grid.f90 \
+   pgbinary_lib.f90 \
+   pgbinary.f90
+   ifneq ($(MAKECMDGOALS),clean)
+      $(shell ln -sf $(MOD_PRIVATE_DIR)/pgbinary_full.f90 pgbinary.f90)
+   endif
+else
+   PGSTAR_SRCS = pgbinary.f90 pgbinary_decorator.f90
+   ifneq ($(MAKECMDGOALS),clean)
+      $(shell ln -sf $(MOD_PRIVATE_DIR)/pgbinary_stub.f90 pgbinary.f90)
+   endif
+endif
+
+
 SRCS = \
    binary_pgbinary.f90\
    binary_def.f90 \
@@ -32,20 +57,9 @@ SRCS = \
    binary_ce.f90\
    binary_job_ctrls_io.f90\
    binary_do_one_utils.f90\
-   pgbinary_decorator.f90 \
-   pgbinary_support.f90 \
-   pgbinary_ctrls_io.f90 \
-   pgbinary_summary.f90 \
-   pgbinary_summary_history.f90 \
-   pgbinary_hist_track.f90 \
-   pgbinary_history_panels.f90 \
-   pgbinary_orbit.f90 \
-   pgbinary_star.f90 \
-   pgbinary_grid.f90 \
-   pgbinary.f90 \
-   pgbinary_lib.f90 \
    run_binary_support.f90 \
    binary_lib.f90 \
+   $(PGSTAR_SRCS) \
    mod_other_rlo_mdot.f90 \
    mod_other_tsync.f90 \
    mod_other_sync_spin_to_orbit.f90 \
@@ -61,7 +75,7 @@ SRCS = \
    mod_other_binary_photo_read.f90 \
    mod_other_binary_photo_write.f90 \
    mod_other_e2.f90 \
-   mod_other_pgbinary_plots.f90
+   mod_other_pgbinary_plots.f90 
 
 #################################################################
 #
@@ -71,6 +85,11 @@ ifeq ($(USE_SHARED), YES)
      LIBS_OTHER = $(LIBS_MESA_STAR)
      DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
      LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MESA_STAR)
+
+ifeq ($(USE_PGSTAR), YES)
+    LOAD_OTHER +=  $(LOAD_PGPLOT) 
+endif
+
 endif
 
 #################################################################
@@ -90,7 +109,7 @@ else
 endif
 
 clean:
-	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
+	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod *.f90
 
 install:
 	@$(CP_IF_NEWER) binary_lib.mod $(MESA_DIR)/include
@@ -143,12 +162,15 @@ SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_OTHER_DIR)
 
 vpath %.f90 $(SRC_PATH)
 vpath %.inc $(SRC_PATH)
+vpath %.defaults $(MOD_DEFAULTS_DIR)
 
 vpath %.mod $(MESA_DIR)/include
 
 NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
 
 ifeq ($(NODEPS),)
+
+  DEPEND_DIRS = .:$(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):$(MOD_DEFAULTS_DIR):$(MOD_JOB_DIR):$(MOD_OTHER_DIR)
 
   .depend :
   ifneq ($(QUIET),)

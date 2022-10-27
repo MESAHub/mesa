@@ -37,6 +37,49 @@ module pgbinary
 
 contains
 
+   ! pgbinary interface
+   subroutine start_new_run_for_pgbinary(b, ierr) ! reset logs
+      use binary_def, only : binary_info
+      type (binary_info), pointer :: b
+      integer, intent(out) :: ierr
+      call do_start_new_run_for_pgbinary(b, ierr)
+   end subroutine start_new_run_for_pgbinary
+
+
+   subroutine restart_run_for_pgbinary(b, ierr)
+      use binary_def, only : binary_info
+      type (binary_info), pointer :: b
+      integer, intent(out) :: ierr
+      call do_restart_run_for_pgbinary(b, ierr)
+   end subroutine restart_run_for_pgbinary
+
+
+   subroutine read_pgbinary_controls(b, ierr)
+      use binary_def, only : binary_info
+      type (binary_info), pointer :: b
+      integer, intent(out) :: ierr
+      call do_read_pgbinary_controls(b, 'inlist', ierr)
+   end subroutine read_pgbinary_controls
+
+
+   subroutine read_pgbinary_inlist(b, inlist_fname, ierr)
+      use binary_def, only : binary_info
+      type (binary_info), pointer :: b
+      character(*), intent(in) :: inlist_fname
+      integer, intent(out) :: ierr
+      call do_read_pgbinary_controls(b, inlist_fname, ierr)
+   end subroutine read_pgbinary_inlist
+
+   subroutine update_pgbinary_plots(b, must_write_files, ierr)
+      use binary_def, only : binary_info
+      type (binary_info), pointer :: b
+      logical, intent(in) :: must_write_files
+      integer, intent(out) :: ierr
+      call do_pgbinary_plots(&
+         b, must_write_files, &
+         ierr)
+   end subroutine update_pgbinary_plots
+
 
    subroutine do_create_file_name(b, dir, prefix, name)
       use pgbinary_support, only : create_file_name
