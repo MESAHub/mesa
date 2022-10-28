@@ -1,6 +1,7 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013-2022  Bill Paxton, Pablo Marchant, Matthias Fabry
+!   Copyright (C) 2013-2022  The MESA Team, Bill Paxton, Pablo Marchant
+!                                                           & Matthias Fabry
 !
 !   this file is part of mesa.
 !

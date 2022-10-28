@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2013  Pablo Marchant
+!   Copyright (C) 2013-2022  The MESA Team, Pablo Marchant & Matthias Fabry
 !
 !   this file is part of mesa.
 !

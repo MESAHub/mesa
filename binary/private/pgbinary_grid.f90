@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2014-2022  Bill Paxton, Matthias Fabry
+!   Copyright (C) 2014-2022  The MESA Team, Bill Paxton & Matthias Fabry
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO

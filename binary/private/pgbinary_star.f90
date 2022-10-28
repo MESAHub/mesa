@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2022  Matthias Fabry
+!   Copyright (C) 2022  The MESA Team & Matthias Fabry
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
