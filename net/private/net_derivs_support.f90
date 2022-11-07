@@ -151,8 +151,8 @@
         rvs(i_rate_dT) = r * n% rate_screened_dT(i)
         rvs(i_rate_dRho) = r * n% rate_screened_dRho(i)
 
-        n% raw_rate(i) = n% rate_raw(i) * r
-        n% screened_rate(i) = n% rate_screened(i) * r
+        n% raw_rate(i) = n% rate_raw(i) * r * avo
+        n% screened_rate(i) = n% rate_screened(i) * r * avo
         n% eps_nuc_rate(i) = n% rate_screened(i) * r * (Q - Qneu)  * Qconv
         n% eps_neu_rate(i) = n% rate_screened(i) * r * Qneu  * Qconv
 
