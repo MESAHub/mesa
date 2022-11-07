@@ -284,11 +284,11 @@
             dydt(i_rate,i1) = dydt(i_rate,i1) - c1*b
             dydt(i_rate,i2) = dydt(i_rate,i2) + c2*b
 
-            n% raw_rate(i) = d_f * n% rate_raw(i)
-            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            n% raw_rate(i) = d_f * n% rate_raw(i) * avo
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
 
-            n% screened_rate(i) = d_f * n% rate_screened(i)
-            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            n% screened_rate(i) = d_f * n% rate_screened(i) * avo
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
             if (just_dydt) return
 
@@ -450,11 +450,11 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - c2*b
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
 
-            n% raw_rate(i) = d_f * n% rate_raw(i)
-            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            n% raw_rate(i) = d_f * n% rate_raw(i) * avo
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
             
-            n% screened_rate(i) = d_f * n% rate_screened(i)
-            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            n% screened_rate(i) = d_f * n% rate_screened(i) * avo
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
             if (just_dydt) return
 
@@ -699,11 +699,11 @@
             dydt(i_rate,i3) = dydt(i_rate,i3) + c3*b
             dydt(i_rate,i4) = dydt(i_rate,i4) + c4*b
 
-            n% raw_rate(i) = d_f * n% rate_raw(i)
-            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            n% raw_rate(i) = d_f * n% rate_raw(i) * avo
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
             
-            n% screened_rate(i) = d_f * n% rate_screened(i)
-            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            n% screened_rate(i) = d_f * n% rate_screened(i) * avo
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
             if (just_dydt) return
 
@@ -847,11 +847,11 @@
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
             dydt(i_rate,i4) = dydt(i_rate,i4) + b
 
-            n% raw_rate(i) = d_f * n% rate_raw(i)
-            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            n% raw_rate(i) = d_f * n% rate_raw(i) * avo
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
             
-            n% screened_rate(i) = d_f * n% rate_screened(i)
-            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            n% screened_rate(i) = d_f * n% rate_screened(i) * avo
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
             if (just_dydt) return
 
@@ -989,11 +989,11 @@
             dydt(i_rate,i2) = dydt(i_rate,i2) - b
             dydt(i_rate,i3) = dydt(i_rate,i3) + b
 
-            n% raw_rate(i) = d_f * n% rate_raw(i)
-            n% raw_rate(r_i) = d_r * n% rate_raw(r_i)
+            n% raw_rate(i) = d_f * n% rate_raw(i) * avo
+            n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
             
-            n% screened_rate(i) = d_f * n% rate_screened(i)
-            n% screened_rate(r_i) = d_r * n% rate_screened(r_i)
+            n% screened_rate(i) = d_f * n% rate_screened(i) * avo
+            n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
             
             if (just_dydt) return
 
