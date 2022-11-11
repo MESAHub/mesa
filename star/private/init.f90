@@ -867,6 +867,9 @@
 
          initial_mass = s% initial_mass
          initial_z = s% initial_z
+
+         if (s% initial_y < 0) s% initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
+
          s% dt = 0
          s% termination_code = -1
 
