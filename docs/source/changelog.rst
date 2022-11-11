@@ -3,12 +3,10 @@ Changelog
 *********
 
 
-Changes in main
-===============
+Changes in r22.11.1
+===================
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r22.11.1:
 
 Backwards-incompatible changes
 ------------------------------
