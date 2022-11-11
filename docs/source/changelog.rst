@@ -6,7 +6,7 @@ Changelog
 Changes in r22.11.1
 ===================
 
-.. _Backwards-incompatible changes r22.11.1:
+.. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
 ------------------------------
