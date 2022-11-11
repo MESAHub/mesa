@@ -92,8 +92,9 @@ would read ``s.x = 3`` in C.)
 
 The ``star_info`` structure contains the stellar model itself (i.e.,
 zoning information, thermodynamic profile, composition profile).
-These components are listed in the file
-``$MESA_DIR/star/public/star_data.inc``.  In addition, ``star_info``
+These components are listed in the files
+``$MESA_DIR/star_data/public/star_data_*.inc``, which are separated into a few
+different categories documented in the ``star_data.inc`` file.  In addition, ``star_info``
 contains the values for the parameters that you set in your ``controls``
 inlist (i.e., ``initial_mass``, ``xa_central_lower_limit``).  Recall that
 the list of controls is located in
