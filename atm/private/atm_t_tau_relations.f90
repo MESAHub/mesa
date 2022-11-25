@@ -398,7 +398,7 @@ contains
 
     real(dp) :: x
 
-    ! Evaluate q'(τ) for Ball (2021, RNAAS ...)
+    ! Evaluate q'(τ) for Ball (2021, RNAAS 5, 7)
     ! using fit to solar simulation by
     ! Trampedach et al. (2014, MNRAS 442, 805–820)
 
