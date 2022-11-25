@@ -189,12 +189,11 @@
             allocate(abun(1:s%species),init_comp(1:s%species))
             abun=0.d0
 
-            !Get initial composotion
+            !Get initial composition
 
             !Stolen from star/private/create_initial_model
             initial_z = s% initial_z
             initial_y = s% initial_y
-            if (initial_y < 0) initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
             initial_h1 = max(0d0, min(1d0, 1d0 - (initial_z + initial_y)))
             initial_h2 = chem_Xsol('h2')
             xsol_he3 = chem_Xsol('he3')
