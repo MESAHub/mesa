@@ -11,12 +11,13 @@ External packages (ADIPLS, GYRE, STELLA)
 MESA happily provides specific versions of external software
 instruments such as GYRE, ADIPLS, and STELLA.  While the MESA
 developers do not actively support these external packages, we do
-support interfaces to them.  See, for example, mesa/astero/test_suite
-astero_adipls and astero_gyre for how to make calls to those packages
+support interfaces to them.  See, for example, 
+`astero_adipls` and `astero_gyre` within `$MESA_DIR/astero/test_suite` 
+for how to make calls to those packages
 during a stellar evolution run. Also see
-mesa/star/test_suite/ccsn_IIp for how to prepare input for STELLA
+`$MESA_DIR/star/test_suite/ccsn_IIp` for how to prepare input for STELLA
 from the output of mesa/star run. Finally,
-mesa/stella/res/stella_extras.f90 has routines for converting some of
+`$MESA_DIR/stella/res/stella_extras.f90` has routines for converting some of
 the output of STELLA into a more "MESA friendly" form. Again, we
 support all of these interfaces and continue to welcome questions
 about using them and suggestions for making them better.
