@@ -7576,7 +7576,7 @@
 
       ! ::
 
-    delta_Pg_mode_freq = 0d0
+    delta_Pg_mode_freq = 1d-99
 
 
    ! Brunt controls

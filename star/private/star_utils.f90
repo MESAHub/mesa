@@ -795,7 +795,7 @@
          ! g-mode period spacing for l=1
          real(dp) :: integral, N2, omega2, kr2, L2, el, &
             dr, r, r2, cs2, sl2, I_integral, I_integral_limit
-         integer :: k, k_sl2
+         integer :: k
          logical, parameter :: dbg = .false.
          include 'formats'
          if (dbg) then
@@ -810,29 +810,24 @@
          I_integral = 0
          I_integral_limit = 0.5d0
          omega2 = pow2(2*pi*nu_max/1d6)
+         if (nu_max <= 1d-99) omega2 = 0
          if (dbg) write(*,1) 'log omega2', log10(omega2)
          el = 1
          L2 = el*(el+1)
-         k_sl2 = 0
          do k = 2, s% nz
-            N2 = s% brunt_N2(k)
-            r = s% r(k)
-            r2 = r*r
+            N2  = s% brunt_N2(k)
+            r   = s% r(k)
+            dr  = s% rmid(k-1) - s% rmid(k)
             cs2 = s% csound_face(k)*s% csound_face(k)
-            sl2 = L2*cs2/r2
-            dr = s% rmid(k-1) - s% rmid(k)
+            sl2 = L2*cs2/(r*r)
             if (omega2 >= sl2) then
                cycle
-            end if
-            if (k_sl2 == 0) then
-               k_sl2 = k
-               if (dbg) write(*,2) 'k_sl2', k
             end if
             if (N2 > omega2) then ! in g-cavity
                if (dbg .and. integral == 0) write(*,2) 'enter g-cavity', k
                integral = integral + sqrt(N2)*dr/r
             else ! in decay region
-               if (integral == 0) cycle ! ! haven't been in g-cavity yet
+               if (integral == 0) cycle ! haven't been in g-cavity yet
                if (dbg .and. I_integral == 0) write(*,2) 'enter decay', k
                ! in decay region below g-cavity; I_integral estimates decay
                kr2 = (1 - n2/omega2)*(1 - Sl2/omega2)*omega2/cs2
