@@ -50,3 +50,8 @@ Once the PR is opened, the developers will review your code and make a
 decision about whether to merge it into the repo, perhaps after some
 changes are made.
 
+Becoming a developer
+--------------------
+
+If you simply wish to fix a bug or add new code to MESA then you do not need to become a developer.
+However, if you wish to take a more active role in managing the project then please see the instructions :doc:`here <developing/new_developers>`.
