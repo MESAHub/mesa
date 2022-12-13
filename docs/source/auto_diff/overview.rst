@@ -36,8 +36,13 @@ Similar types are included supporting higher-order and mixed-partial
 derivatives.  These derivatives are accessed via e.g. ``d2val1``
 (:math:`\partial^2 f/\partial x^2`), ``d1val1_d2val2`` (:math:`\partial^3 f/\partial x \partial y^2`).
 
-An additional special type ``auto_diff_real_star_order1`` provides support for first-order derivatives accessed using arrays.
-This type contains a value (``x%val``) and an array of first partial derivatives with respect to 27 independent variables  (``x%d1Array(1:27)``).
-This type is meant to make it easy to write equations and then, after the fact, change the basis of independent variables or re-index them.
-The number `27` is chosen to provide as many independent variables as the ``MESA/star`` solver uses,
-as this type is meant for use in writing the equations of stellar evolution.
+An additional special type ``auto_diff_real_star_order1`` provides support
+for first-order derivatives accessed using arrays.
+This type contains a value (``x%val``) and an array of first partial derivatives
+with respect to at least as many variables as the solver in ``MESA/star``.
+This type is meant to make it easy to write equations and then, after the fact,
+change the basis of independent variables or re-index them.
+The current indices are defined in ``star_data/public/star_data_def.inc``.
+E.g., if ``my_var`` is of type ``auto_diff_real_star_order1``,
+then ``my_var% d1Array(i_lnT_00)`` contains the derivative of ``my_var``
+with respect to ``lnT`` at the same mesh point.
