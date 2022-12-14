@@ -409,6 +409,10 @@
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
 
+         if (len_trim(s% emesh_data_for_op_mono_path) == 0) &
+            call get_environment_variable( &
+               "MESA_OP_MONO_MASTER_GRID", s% emesh_data_for_op_mono_path)
+
          s% extras_startup => null_extras_startup
          s% extras_check_model => null_extras_check_model
          s% extras_start_step => null_extras_start_step
@@ -653,13 +657,13 @@
       end subroutine before_step_loop
 
 
-      subroutine after_step_loop(id, inlist_fname, &
-             dbg, result, ierr)
+      subroutine after_step_loop(id, inlist_fname, dbg, result, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s         
          character (len=*) :: inlist_fname
          logical, intent(in) :: dbg
-         integer, intent(out) :: result, ierr
+         integer, intent(out) :: ierr
+         integer, intent(inout) :: result
          logical :: will_read_pgstar_inlist
 
          real(dp) :: tmp

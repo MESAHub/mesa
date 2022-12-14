@@ -110,36 +110,6 @@
     RSP2_map_history_filename = 'map_history.data'
 
 
-
-
-    
-
-
-      ! use_superad_reduction
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Implicit alternative to okay_to_reduce_gradT_excess, EXPERIMENTAL
-
-      ! ::
-
-    use_superad_reduction = .false.
-    superad_reduction_Gamma_limit = 0.5d0
-    superad_reduction_Gamma_limit_scale = 5d0
-    superad_reduction_Gamma_inv_scale = 5d0
-    superad_reduction_diff_grads_limit = 1d-3
-    superad_reduction_limit = -1d0
-
-
 ! mass corrections
 ! ================
 

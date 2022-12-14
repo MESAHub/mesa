@@ -69,6 +69,7 @@
     log_center_density_lower_limit, center_entropy_limit, center_entropy_lower_limit, &
     max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
+    fe_core_infall_mass, non_fe_core_infall_mass, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
     v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit, v_surf_div_v_esc_limit, v_surf_kms_limit, &
     stop_near_zams, Lnuc_div_L_zams_limit, Pgas_div_P_limit, Pgas_div_P_limit_max_q, gamma1_limit, gamma1_limit_max_q, &
@@ -316,6 +317,7 @@
     diffusion_max_T_for_radaccel, diffusion_min_T_for_radaccel, diffusion_max_Z_for_radaccel, &
     diffusion_min_Z_for_radaccel, diffusion_screening_for_radaccel, &
     op_mono_data_path, op_mono_data_cache_filename, &
+    emesh_data_for_op_mono_path, op_mono_method, &
     show_diffusion_info, show_diffusion_substep_info, show_diffusion_timing, &
     diffusion_num_classes, diffusion_class_representative, diffusion_class_A_max, &
     diffusion_class_typical_charge, diffusion_class_factor, &
@@ -408,7 +410,7 @@
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, RSP2_min_Lt_div_L_for_overshooting_mixing_type, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
-    fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, solver_test_partials_k_low, &
+    fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, absolute_cumulative_energy_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, RSP2_remesh_when_load, &
     RSP2_alfad, RSP2_num_outermost_cells_forced_nonturbulent, RSP2_num_innermost_cells_forced_nonturbulent, &
@@ -852,9 +854,11 @@
  s% max_entropy_lower_limit = max_entropy_lower_limit
 
  s% fe_core_infall_limit = fe_core_infall_limit
+ s% fe_core_infall_mass = fe_core_infall_mass
  s% center_Ye_lower_limit = center_Ye_lower_limit
  s% center_R_lower_limit = center_R_lower_limit
  s% non_fe_core_infall_limit = non_fe_core_infall_limit
+ s% non_fe_core_infall_mass = non_fe_core_infall_mass
  s% non_fe_core_rebound_limit = non_fe_core_rebound_limit
  s% v_div_csound_surf_limit = v_div_csound_surf_limit
  s% v_div_csound_max_limit = v_div_csound_max_limit
@@ -1805,6 +1809,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% diffusion_screening_for_radaccel = diffusion_screening_for_radaccel
  s% op_mono_data_path = op_mono_data_path
  s% op_mono_data_cache_filename = op_mono_data_cache_filename
+ s% emesh_data_for_op_mono_path = emesh_data_for_op_mono_path
+ s% op_mono_method = op_mono_method
 
  s% show_diffusion_info = show_diffusion_info
  s% show_diffusion_substep_info = show_diffusion_substep_info
@@ -2079,6 +2085,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% fill_arrays_with_NaNs = fill_arrays_with_NaNs
  s% zero_when_allocate = zero_when_allocate
  s% warn_when_large_rel_run_E_err = warn_when_large_rel_run_E_err
+ s% absolute_cumulative_energy_err = absolute_cumulative_energy_err
  s% warn_when_large_virial_thm_rel_err = warn_when_large_virial_thm_rel_err
  s% warn_when_get_a_bad_eos_result = warn_when_get_a_bad_eos_result
  s% warn_rates_for_high_temp = warn_rates_for_high_temp
@@ -2540,9 +2547,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  max_entropy_lower_limit = s% max_entropy_lower_limit
 
  fe_core_infall_limit = s% fe_core_infall_limit
+ fe_core_infall_mass = s% fe_core_infall_mass
  center_Ye_lower_limit = s% center_Ye_lower_limit
  center_R_lower_limit = s% center_R_lower_limit
  non_fe_core_infall_limit = s% non_fe_core_infall_limit
+ non_fe_core_infall_mass = s% non_fe_core_infall_mass
  non_fe_core_rebound_limit = s% non_fe_core_rebound_limit
  v_div_csound_surf_limit = s% v_div_csound_surf_limit
  v_div_csound_max_limit = s% v_div_csound_max_limit
@@ -3490,6 +3499,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_screening_for_radaccel = s% diffusion_screening_for_radaccel
  op_mono_data_path = s% op_mono_data_path
  op_mono_data_cache_filename = s% op_mono_data_cache_filename
+ emesh_data_for_op_mono_path = s% emesh_data_for_op_mono_path
+ op_mono_method = s% op_mono_method
 
  show_diffusion_info = s% show_diffusion_info
  show_diffusion_substep_info = s% show_diffusion_substep_info
@@ -3756,6 +3767,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  fill_arrays_with_NaNs = s% fill_arrays_with_NaNs
  zero_when_allocate = s% zero_when_allocate
  warn_when_large_rel_run_E_err = s% warn_when_large_rel_run_E_err
+ absolute_cumulative_energy_err = s% absolute_cumulative_energy_err
  warn_when_large_virial_thm_rel_err = s% warn_when_large_virial_thm_rel_err
  warn_when_get_a_bad_eos_result = s% warn_when_get_a_bad_eos_result
  warn_rates_for_high_temp = s% warn_rates_for_high_temp

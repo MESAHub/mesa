@@ -566,7 +566,7 @@
                write(*,1) 'pocket_mass_c13', pocket_mass_c13
                write(*,1) 'expected', pocket_mass_c13_expected
                write(*,1) 'pocket_mass_c13-expected', pocket_mass_c13-pocket_mass_c13_expected
-            else if (abs(delta_surface_c12 - delta_surface_c12_expected) > 2d-4) then
+            else if (abs(delta_surface_c12 - delta_surface_c12_expected) > 6d-4) then
                write(*,*) 'bad value for delta_surface_c12'
                write(*,1) 'delta_surface_c12', delta_surface_c12
                write(*,1) 'expected', delta_surface_c12_expected

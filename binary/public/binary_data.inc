@@ -19,7 +19,7 @@
              ! star masses
              m(2), m_old(2), &
              dt, dt_old, &
-             env, env_old, &
+             env(2), env_old(2), &
              period, period_old, & 
              max_timestep, max_timestep_old, &
              change_factor, change_factor_old, &
@@ -242,6 +242,9 @@
 
       procedure(other_edot_interface), pointer, nopass :: &
           other_extra_edot => null()
+
+          procedure(other_e2_interface), pointer, nopass :: &
+          other_e2 => null()
 
       procedure(other_CE_init_interface), pointer, nopass :: &
           other_CE_init => null()

@@ -1980,7 +1980,7 @@
             age = age*secyer/(60*60)
             units_str = 'hrs'
          else if (s% pg% pgstar_show_age_in_days) then
-            age = age*secyer/(60*60*24)
+            age = age*secyer/secday
             units_str = 'days'
          else if (s% pg% pgstar_show_age_in_years) then
             !age = age
@@ -1994,11 +1994,11 @@
          else if (age*secyer < 60*60) then
             age = age*secyer/60
             units_str = 'mins'
-         else if (age*secyer < 60*60*24) then
+         else if (age*secyer < secday) then
             age = age*secyer/(60*60)
             units_str = 'hrs'
-         else if (age*secyer < 60*60*24*500) then
-            age = age*secyer/(60*60*24)
+         else if (age*secyer < secday*500) then
+            age = age*secyer/secday
             units_str = 'days'
          else
             !age = age

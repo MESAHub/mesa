@@ -92,8 +92,9 @@ would read ``s.x = 3`` in C.)
 
 The ``star_info`` structure contains the stellar model itself (i.e.,
 zoning information, thermodynamic profile, composition profile).
-These components are listed in the file
-``$MESA_DIR/star/public/star_data.inc``.  In addition, ``star_info``
+These components are listed in the files
+``$MESA_DIR/star_data/public/star_data_*.inc``, which are separated into a few
+different categories documented in the ``star_data.inc`` file.  In addition, ``star_info``
 contains the values for the parameters that you set in your ``controls``
 inlist (i.e., ``initial_mass``, ``xa_central_lower_limit``).  Recall that
 the list of controls is located in
@@ -107,8 +108,9 @@ User-specified inlist controls
 
 There is one set of controls that will prove useful time and time
 again when using ``run_star_extras.f90`` and that is ``x_ctrl``,
-``x_integer_ctrl``, and ``x_logical_ctrl``.  These are arrays (of length
-100 by default) of double precision, integer, and boolean values.  You
+``x_integer_ctrl``, ``x_logical_ctrl``, and ``x_character_ctrl``.  
+These are arrays (of length 100 by default) of double precision, 
+integer, boolean, and character values.  You
 can set the elements in your inlists::
 
   &controls
@@ -116,6 +118,7 @@ can set the elements in your inlists::
     x_ctrl(2) = 2.78
     x_integer_ctrl(1) = 42
     x_logical_ctrl(1) = .true.
+    x_character_ctrl(1) = 'hello world'
   / ! end of controls inlist
 
 and access them later on as part of the star structure (i.e., ``s%

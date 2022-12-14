@@ -8,7 +8,13 @@ else
 LOAD_GYRE = 
 endif
 
-LOAD_MESA = $(LOAD_EXTRAS1) -L$(MESA_LIB_DIR) -lastero -ladipls $(LOAD_MESA_STAR) -lastero $(LOAD_GYRE) $(LOAD_EXTRAS)
+ifeq ($(USE_ADIPLS),YES)
+ADIPLS_LIB = -ladipls
+else
+ADIPLS_LIB = 
+endif
+
+LOAD_MESA = $(LOAD_EXTRAS1) -L$(MESA_LIB_DIR) -lastero $(ADIPLS_LIB) $(LOAD_MESA_STAR) -lastero $(LOAD_GYRE) $(LOAD_EXTRAS)
 # the replication of -lastero is required to deal with the lack of "hooks" in adipls.  
 # it needs astero, and astero needs it and order of loading matters on linux.  so need to list it twice.
 # check this again someday to see if the problem has gone away.

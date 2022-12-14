@@ -458,7 +458,7 @@
                int_val = b% d_i
                is_int_val = .true.
             case(bh_period_days)
-               val = b% period/(60d0*60d0*24d0)
+               val = b% period/secday
             case(bh_period_hr)
                val = b% period/(60d0*60d0)
             case(bh_period_minutes)

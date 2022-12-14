@@ -1,0 +1,147 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! Author: M Joyce
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+&star_job
+    history_columns_file = 'history_master.list'
+    profile_columns_file = 'profile_master.list'
+    
+    required_termination_code_string = 'max_age' 
+
+    save_pulse_data_when_terminate = .false.
+
+    create_pre_main_sequence_model = .true.
+    pre_ms_relax_to_start_radiative_core = .false. !.true. ! by default, but it should not be!!! 
+
+
+    ! save a model at the end of the run
+    save_model_when_terminate = .true.
+    save_model_filename = 'final.mod'
+
+    new_rotation_flag = .false.
+
+    pre_ms_T_c = 3d5 ! default -- any lower doesn't work
+    pre_ms_check_radiative_core_min_mass = 0.3d0 ! default is 0.3d0
+    pre_ms_check_radiative_core_Lnuc_div_L_limit = 1d-6
+
+
+    set_uniform_initial_composition = .true.
+
+    initial_h1 = 0.7349
+    initial_h2 = 2.75d-5  ! Lodders 2009
+    initial_he3 = 8.5d-5  ! Lodders 2009 
+    initial_he4 = 0.24 
+
+
+    initial_zfracs = 6 !! scaling of the rest of the elements according to someone's solar abundance
+
+    ! display on-screen plots
+    pgstar_flag = .false.
+
+    !network 
+    change_net = .true.
+    new_net_name= 'pp_extras.net' !
+
+/ !end of star_job namelist
+
+
+&eos
+/
+
+&kap
+    Zbase = 0.0200 !0.014
+
+    !opacities with AGSS09 abundances
+    kap_file_prefix = 'a09' 
+    kap_lowT_prefix = 'lowT_fa05_a09p'
+    kap_CO_prefix = 'a09_co'
+/
+
+&controls
+    star_history_name = 'history.data'
+
+    max_age = 0.8d9 
+
+    use_other_mlt_results = .true. !.true.
+    use_other_surface_PT = .true. !.True.
+
+    x_ctrl(1) = 0.34d0 ! fspot
+    x_ctrl(2) = 0.85d0 ! xspot
+
+    atm_option = 'table'        
+    atm_table = 'photosphere'   
+   
+
+    warn_when_large_rel_run_E_err = 99d0 !0.02d0
+    log_directory = 'LOGS'
+    write_profiles_flag = .false.
+
+
+    max_num_profile_models = -1
+    history_interval = 1
+    terminal_interval = 100
+    write_header_frequency = 10
+    photo_digits = 5
+    photo_interval = 100
+
+    ! starting specifications
+    initial_mass = 1.0 ! in Msun units
+    min_timestep_limit=0
+    max_model_number = -1!1500 
+    
+
+    cool_wind_RGB_scheme = 'Reimers'
+    cool_wind_AGB_scheme = 'Blocker'
+    RGB_to_AGB_wind_switch = 1d-4
+    Reimers_scaling_factor = 0.1
+    Blocker_scaling_factor = 0.2
+    max_wind = 1d-3
+
+    mixing_length_alpha = 1.9500 !1.95 
+    MLT_option = 'Henyey'
+
+    do_element_diffusion = .false.
+    report_solver_progress = .false.
+    
+    ! Timestep and grid
+    mesh_delta_coeff = 0.8
+    time_delta_coeff = 1.0 !0.8 !0.5
+
+    varcontrol_target = 1e-4 
+    !max_allowed_nz = 50000
+
+    !to help with convergence
+    okay_to_reduce_gradT_excess = .true.
+    Pextra_factor = 2.0
+
+!-------------------------------------------
+!! convective overshoot, new formalism
+!-------------------------------------------
+    overshoot_scheme(:)    = 'exponential' ! ``exponential``, ``step``, ``other``
+    overshoot_zone_type(:) = 'any' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
+    overshoot_zone_loc(:)  = 'any' ! ``core``, ``shell``, ``any``
+    overshoot_bdy_loc(:)   = 'any' ! ``bottom``, ``top``, ``any``
+
+      ! Amount of overshooting from edge of convective zone
+      ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
+      ! ``star_data/public/star_data_def.inc`` (currently 16)
+
+    overshoot_f(:)  = 0.014d0
+    overshoot_f0(:) = 0.004d0
+
+    ! Convergence checking
+    use_gold_tolerances = .true.
+    
+
+    max_number_retries = -1 !1000 !100!100
+    max_model_number = 10000 !-1  
+
+    !better resolution of the Henyey hook
+    delta_lg_XH_cntr_max = -1
+
+
+
+/ ! end of controls namelist
+

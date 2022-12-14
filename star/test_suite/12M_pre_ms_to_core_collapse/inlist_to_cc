@@ -98,7 +98,7 @@
       !history_interval = 1
       terminal_interval = 10 
 
-
+      x_integer_ctrl(1) = 6 ! Inlist part
 
 / ! end of controls namelist
 

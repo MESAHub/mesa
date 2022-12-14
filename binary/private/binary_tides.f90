@@ -334,7 +334,7 @@
          real(dp), intent(in) :: osep ! orbital separation (cm)
          real(dp), intent(out) :: t_sync
          integer, intent(out) :: ierr
-         real(dp) :: rGyr_squared, moment_of_inertia
+         real(dp) :: rGyr_squared, moment_of_inertia, kdivt
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
          integer :: k
@@ -362,12 +362,20 @@
          rGyr_squared = (moment_of_inertia/(m*r_phot*r_phot))
          if (sync_type == "Hut_conv") then
             ! eq. (11) of Hut, P. 1981, A&A, 99, 126
-            t_sync = 3d0*k_div_T(b, s, .true.)*(qratio*qratio/rGyr_squared)*pow6(r_phot/osep)
+
+            kdivt = k_div_T(b, s, .true., ierr)
+            if(ierr/=0) return
+
+            t_sync = 3d0*kdivt*(qratio*qratio/rGyr_squared)*pow6(r_phot/osep)
             ! invert it.
             t_sync = 1d0/t_sync
          else if (sync_type == "Hut_rad") then
             ! eq. (11) of Hut, P. 1981, A&A, 99, 126
-            t_sync = 3d0*k_div_T(b, s,.false.)*(qratio*qratio/rGyr_squared)*pow6(r_phot/osep)
+
+            kdivt = k_div_T(b, s, .false., ierr)
+            if(ierr/=0) return
+
+            t_sync = 3d0*kdivt*(qratio*qratio/rGyr_squared)*pow6(r_phot/osep)
             ! invert it.
             t_sync = 1d0/t_sync
          else if (sync_type == "Orb_period") then ! sync on timescale of orbital period
@@ -380,13 +388,17 @@
          t_sync = t_sync / Ftid
       end subroutine get_tsync
 
-      real(dp) function k_div_T(b, s, has_convective_envelope)
+      real(dp) function k_div_T(b, s, has_convective_envelope, ierr)
          type(binary_info), pointer :: b
          type(star_info), pointer :: s
          logical, intent(in) :: has_convective_envelope
+         integer, intent(out) :: ierr
 
          integer :: k
          real(dp) osep, qratio, m, r_phot,porb, m_env, r_env, tau_conv, P_tid, f_conv
+         real(dp) :: e2
+
+         ierr = 0
 
          ! k/T computed as in Hurley, J., Tout, C., Pols, O. 2002, MNRAS, 329, 897
          ! Kudos to Francesca Valsecchi for help implementing and testing this
@@ -432,7 +444,18 @@
             !Sepinsky+ 2007
             k_div_T = 1.9782d4*sqrt(m*r_phot*r_phot/pow5(osep)/(Msun/pow3(Rsun)))
             k_div_T = k_div_T*pow(1d0+qratio,5d0/6d0)
-            k_div_T = k_div_T*1.592d-9*pow(m/Msun,2.84d0)/secyer
+
+            if (b% use_other_e2) then
+               call b% other_e2(s% id, e2, ierr)
+               if(ierr/=0) then
+                  write(*,*) "Error when computing other_e2 ",ierr
+                  return
+               end if
+            else
+               ! E2 from Hurley 2002 eq 43 based on Zahn 1975
+               e2 = 1.592d-9*pow(m/Msun,2.84d0)
+            end if
+            k_div_T = k_div_T*e2/secyer 
          end if
           
       end function k_div_T

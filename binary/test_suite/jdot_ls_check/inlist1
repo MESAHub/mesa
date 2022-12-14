@@ -1,5 +1,4 @@
 &star_job
-      mesa_dir = '../../..'
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
 

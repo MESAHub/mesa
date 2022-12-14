@@ -119,11 +119,12 @@
          
          else if (oscillation_code == 'adipls') then 
 
-            call run_adipls(s, .true., .false., &
-               add_center_point, keep_surface_point, add_atmosphere, &
-               do_redistribute_mesh, ierr)
-            if (ierr /= 0) return
-            
+            if(adipls_is_enabled) then
+               call run_adipls(s, .true., .false., &
+                  add_center_point, keep_surface_point, add_atmosphere, &
+                  do_redistribute_mesh, ierr)
+               if (ierr /= 0) return
+            end if
          else
          
             write(*,'(a)') 'invalid oscillation_code: ' // trim(oscillation_code)
@@ -414,7 +415,10 @@
                  
          contains
          
-         
+
+         ! if param_name(k) == '', then param isn't set
+         ! we want that so that FPE trapping can detect
+         ! when we use an undefined variable
          subroutine set_starting_values
             do i = 1, max_parameters
                if (param_name(i) /= '') then
@@ -434,8 +438,17 @@
             integer :: cnt
             cnt = 0
             ierr = 0
-            do while (param(k) <= max_param(k) + eps .or. .not. vary_param(k))
-               if (vary_param(k)) next_param_to_try(k) = param(k)
+
+            ! if param_name(k) == '', then param isn't set
+            ! so we must catch that explicitly to avoid FPEs
+            do
+               if (vary_param(k) .and. param_name(k) /= '') then
+                  if (param(k) > max_param(k) + eps) then
+                     exit
+                  else
+                     next_param_to_try(k) = param(k)
+                  end if
+               end if
                if (k == 1) then
                   call do1_grid(ierr)
                else
@@ -443,9 +456,10 @@
                end if
                if (ierr /= 0) return
                cnt = cnt+1
-               if (delta_param(k) <= 0 .or. .not. vary_param(k)) exit
+               if (delta_param(k) <= 0 .or. .not. vary_param(k) .or. param_name(k) == '') exit
                param(k) = param(k) + delta_param(k)
             end do
+
             if (num_param(k) == 0) num_param(k) = cnt
             if (vary_param(k)) param(k) = min_param(k)
          end subroutine do_param

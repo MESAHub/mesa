@@ -211,18 +211,18 @@
          logical, intent(out) :: apply_jdot_mb
          real(dp), intent(out) :: qconv_env
          
-         real(dp) :: qrad_core
+         real(dp) :: qconv_core
          integer :: i, k, id
 
          include 'formats'
 
          ! calculate how much of inner region is convective
-         qrad_core = 0d0
+         qconv_core = 0d0
          do k = s% nz, 1, -1
             if (s% q(k) > b% jdot_mb_qlim_for_check_rad_core .and. & 
-               (qrad_core == 0d0 .or. s% mixing_type(k) /= convective_mixing)) exit
+               (qconv_core == 0d0 .or. s% mixing_type(k) /= convective_mixing)) exit
             if (s% mixing_type(k) == convective_mixing) &
-               qrad_core = qrad_core + s% dq(k)
+               qconv_core = qconv_core + s% dq(k)
          end do
 
          ! calculate how much of the envelope
@@ -245,7 +245,7 @@
             return
          end if
 
-         if (qrad_core > b% jdot_mb_max_qrad_core) then
+         if (qconv_core > b% jdot_mb_max_qconv_core) then
             apply_jdot_mb = .false.
             return
          end if

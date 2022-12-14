@@ -90,49 +90,50 @@
          write(iounit) star_def_version
 
          write(iounit, iostat=ierr) &
-             b% binary_age, b% binary_age_old, &
-             b% model_number, b% model_number_old, &
-             b% mtransfer_rate, b% mtransfer_rate_old, &
-             b% angular_momentum_j, b% angular_momentum_j_old, & 
-             b% separation, b% separation_old, &
-             b% eccentricity, b% eccentricity_old, &
-             b% rl_relative_gap(1), b% rl_relative_gap_old(1), &
-             b% rl_relative_gap(2), b% rl_relative_gap_old(2), &
-             b% r(1), b% r_old(1), &
-             b% r(2), b% r_old(2), &
-             b% rl(1), b% rl_old(1), &
-             b% rl(2), b% rl_old(2), &
-             b% m(1), b% m_old(1), &
-             b% m(2), b% m_old(2), &
-             b% dt, b% dt_old, &
-             b% env, b% env_old, &
-             b% eq_initial_bh_mass, &
-             b% period, b% period_old, & 
-             b% max_timestep, b% max_timestep_old, &
-             b% change_factor, b% change_factor_old, &
-             b% min_binary_separation, &
-             b% using_jdot_mb(1), b% using_jdot_mb_old(1), &
-             b% using_jdot_mb(2), b% using_jdot_mb_old(2), &
-             b% d_i, b% d_i_old, b% a_i, b% a_i_old, &
-             b% point_mass_i, b% point_mass_i_old, &
-             b% ignore_rlof_flag, b% ignore_rlof_flag_old, &
-             b% model_twins_flag, b% model_twins_flag_old, &
-             b% dt_why_reason, b% dt_why_reason_old, &
-             b% have_star_1, b% have_star_2, &
-             b% CE_flag, b% CE_flag_old, &
-             b% CE_init, b% CE_init_old, &
-             b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
-             b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
-             b% CE_b_initial_age, b% CE_b_initial_model_number, &
-             b% CE_num1, b% CE_num1_old, &
-             b% CE_num2, b% CE_num2_old, &
-             b% CE_lambda1, b% CE_lambda1_old, &
-             b% CE_lambda2, b% CE_lambda2_old, &
-             b% CE_Ebind1, b% CE_Ebind1_old, &
-             b% CE_Ebind2, b% CE_Ebind2_old, &
-             b% ixtra(:), b% ixtra_old(:), &
-             b% xtra(:), b% xtra_old(:), &
-             b% lxtra(:), b% lxtra_old(:)
+            b% binary_age, b% binary_age_old, &
+            b% model_number, b% model_number_old, &
+            b% mtransfer_rate, b% mtransfer_rate_old, &
+            b% angular_momentum_j, b% angular_momentum_j_old, &
+            b% separation, b% separation_old, &
+            b% eccentricity, b% eccentricity_old, &
+            b% rl_relative_gap(1), b% rl_relative_gap_old(1), &
+            b% rl_relative_gap(2), b% rl_relative_gap_old(2), &
+            b% r(1), b% r_old(1), &
+            b% r(2), b% r_old(2), &
+            b% rl(1), b% rl_old(1), &
+            b% rl(2), b% rl_old(2), &
+            b% m(1), b% m_old(1), &
+            b% m(2), b% m_old(2), &
+            b% dt, b% dt_old, &
+            b% env(1), b% env_old(1), &
+            b% env(2), b% env_old(2), &
+            b% eq_initial_bh_mass, &
+            b% period, b% period_old, &
+            b% max_timestep, b% max_timestep_old, &
+            b% change_factor, b% change_factor_old, &
+            b% min_binary_separation, &
+            b% using_jdot_mb(1), b% using_jdot_mb_old(1), &
+            b% using_jdot_mb(2), b% using_jdot_mb_old(2), &
+            b% d_i, b% d_i_old, b% a_i, b% a_i_old, &
+            b% point_mass_i, b% point_mass_i_old, &
+            b% ignore_rlof_flag, b% ignore_rlof_flag_old, &
+            b% model_twins_flag, b% model_twins_flag_old, &
+            b% dt_why_reason, b% dt_why_reason_old, &
+            b% have_star_1, b% have_star_2, &
+            b% CE_flag, b% CE_flag_old, &
+            b% CE_init, b% CE_init_old, &
+            b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
+            b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
+            b% CE_b_initial_age, b% CE_b_initial_model_number, &
+            b% CE_num1, b% CE_num1_old, &
+            b% CE_num2, b% CE_num2_old, &
+            b% CE_lambda1, b% CE_lambda1_old, &
+            b% CE_lambda2, b% CE_lambda2_old, &
+            b% CE_Ebind1, b% CE_Ebind1_old, &
+            b% CE_Ebind2, b% CE_Ebind2_old, &
+            b% ixtra(:), b% ixtra_old(:), &
+            b% xtra(:), b% xtra_old(:), &
+            b% lxtra(:), b% lxtra_old(:)
 
          if (b% CE_init) then
             write(iounit, iostat=ierr) &
@@ -193,49 +194,50 @@
             return
          end if
          read(iounit, iostat=ierr) &
-             b% binary_age, b% binary_age_old, &
-             b% model_number, b% model_number_old, &
-             b% mtransfer_rate, b% mtransfer_rate_old, &
-             b% angular_momentum_j, b% angular_momentum_j_old, & 
-             b% separation, b% separation_old, &
-             b% eccentricity, b% eccentricity_old, &
-             b% rl_relative_gap(1), b% rl_relative_gap_old(1), &
-             b% rl_relative_gap(2), b% rl_relative_gap_old(2), &
-             b% r(1), b% r_old(1), &
-             b% r(2), b% r_old(2), &
-             b% rl(1), b% rl_old(1), &
-             b% rl(2), b% rl_old(2), &
-             b% m(1), b% m_old(1), &
-             b% m(2), b% m_old(2), &
-             b% dt, b% dt_old, &
-             b% env, b% env_old, &
-             b% eq_initial_bh_mass, &
-             b% period, b% period_old, & 
-             b% max_timestep, b% max_timestep_old, &
-             b% change_factor, b% change_factor_old, &
-             b% min_binary_separation, &
-             b% using_jdot_mb(1), b% using_jdot_mb_old(1), &
-             b% using_jdot_mb(2), b% using_jdot_mb_old(2), &
-             b% d_i, b% d_i_old, b% a_i, b% a_i_old, &
-             b% point_mass_i, b% point_mass_i_old, &
-             b% ignore_rlof_flag, b% ignore_rlof_flag_old, &
-             b% model_twins_flag, b% model_twins_flag_old, &
-             b% dt_why_reason, b% dt_why_reason_old, &
-             b% have_star_1, b% have_star_2, &
-             b% CE_flag, b% CE_flag_old, &
-             b% CE_init, b% CE_init_old, &
-             b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
-             b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
-             b% CE_b_initial_age, b% CE_b_initial_model_number, &
-             b% CE_num1, b% CE_num1_old, &
-             b% CE_num2, b% CE_num2_old, &
-             b% CE_lambda1, b% CE_lambda1_old, &
-             b% CE_lambda2, b% CE_lambda2_old, &
-             b% CE_Ebind1, b% CE_Ebind1_old, &
-             b% CE_Ebind2, b% CE_Ebind2_old, &
-             b% ixtra(:), b% ixtra_old(:), &
-             b% xtra(:), b% xtra_old(:), &
-             b% lxtra(:), b% lxtra_old(:)
+            b% binary_age, b% binary_age_old, &
+            b% model_number, b% model_number_old, &
+            b% mtransfer_rate, b% mtransfer_rate_old, &
+            b% angular_momentum_j, b% angular_momentum_j_old, &
+            b% separation, b% separation_old, &
+            b% eccentricity, b% eccentricity_old, &
+            b% rl_relative_gap(1), b% rl_relative_gap_old(1), &
+            b% rl_relative_gap(2), b% rl_relative_gap_old(2), &
+            b% r(1), b% r_old(1), &
+            b% r(2), b% r_old(2), &
+            b% rl(1), b% rl_old(1), &
+            b% rl(2), b% rl_old(2), &
+            b% m(1), b% m_old(1), &
+            b% m(2), b% m_old(2), &
+            b% dt, b% dt_old, &
+            b% env(1), b% env_old(1), &
+            b% env(2), b% env_old(2), &
+            b% eq_initial_bh_mass, &
+            b% period, b% period_old, &
+            b% max_timestep, b% max_timestep_old, &
+            b% change_factor, b% change_factor_old, &
+            b% min_binary_separation, &
+            b% using_jdot_mb(1), b% using_jdot_mb_old(1), &
+            b% using_jdot_mb(2), b% using_jdot_mb_old(2), &
+            b% d_i, b% d_i_old, b% a_i, b% a_i_old, &
+            b% point_mass_i, b% point_mass_i_old, &
+            b% ignore_rlof_flag, b% ignore_rlof_flag_old, &
+            b% model_twins_flag, b% model_twins_flag_old, &
+            b% dt_why_reason, b% dt_why_reason_old, &
+            b% have_star_1, b% have_star_2, &
+            b% CE_flag, b% CE_flag_old, &
+            b% CE_init, b% CE_init_old, &
+            b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
+            b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
+            b% CE_b_initial_age, b% CE_b_initial_model_number, &
+            b% CE_num1, b% CE_num1_old, &
+            b% CE_num2, b% CE_num2_old, &
+            b% CE_lambda1, b% CE_lambda1_old, &
+            b% CE_lambda2, b% CE_lambda2_old, &
+            b% CE_Ebind1, b% CE_Ebind1_old, &
+            b% CE_Ebind2, b% CE_Ebind2_old, &
+            b% ixtra(:), b% ixtra_old(:), &
+            b% xtra(:), b% xtra_old(:), &
+            b% lxtra(:), b% lxtra_old(:)
 
          if (b% CE_flag .and. b% CE_init) then
             nz = b% CE_nz

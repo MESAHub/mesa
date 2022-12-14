@@ -959,8 +959,9 @@
             ierr = 0
             read(iounit, fmt=*, iostat=ierr) nT8s
             if (ierr == 0) exit
+            if (is_iostat_end(ierr)) exit
          end do
-         if (failed('skip to find line starting with an integer for nT8s')) return
+         if (failed('Failed to find line starting with an integer for nT8s')) return
 
          allocate(T8s(nT8s), f1(4*nT8s), stat=ierr)
          if (failed('allocate')) return

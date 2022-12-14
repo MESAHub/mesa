@@ -79,7 +79,8 @@
             !    val = s% delta_Pg
             ! fall back to history column if user doesn't define name
             case default
-               val = star_get_history_output(s, name)
+               val = star_get_history_output(s, name, ierr)
+               if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
          end select
 
       end subroutine set_constraint_value
@@ -123,6 +124,7 @@
       
       
       subroutine extras_after_evolve(id, ierr)
+         use astero_lib, only: astero_adipls_is_enabled
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -147,18 +149,21 @@
             order_to_save = 5
             save_mode_filename = 'eigen.data'
          
-            call get_adipls_frequency_info( &
-               s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
-               save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
-            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-            if (okay) then
-               write(*,'(a,2f20.2)') 'got ok match for expected frequency', freq, expected_freq
+            if(astero_adipls_is_enabled) then
+               call get_adipls_frequency_info( &
+                  s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
+                  save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+               if (okay) then
+                  write(*,'(a,2f20.2)') 'got ok match for expected frequency', freq, expected_freq
+               else
+                  write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', freq, expected_freq
+               end if
             else
-               write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', freq, expected_freq
+               write(*,*) 'not using adipls: pretend got ok match for expected frequency.'
             end if
          
          end if
-
          call test_suite_after_evolve(s, ierr)
          
       end subroutine extras_after_evolve
@@ -166,6 +171,7 @@
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
+         use astero_lib, only: astero_adipls_is_enabled
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
@@ -179,6 +185,12 @@
          if (ierr /= 0) return
          
          extras_check_model = keep_going
+
+
+         if (.not. astero_adipls_is_enabled) then
+            extras_check_model = terminate
+            return
+         end if
          
          if (s% x_ctrl(1) > 0d0) then
          
@@ -331,6 +343,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+
       end function extras_finish_step
       
       

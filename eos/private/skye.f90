@@ -351,7 +351,7 @@ module skye
          ! Ideal ion free energy, only depends on abar
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
 
-         F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
+         F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
@@ -373,7 +373,8 @@ module skye
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
          call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
-                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
+                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
+         if(ierr/=0) return
 
       end subroutine skye_eos
 

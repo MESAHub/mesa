@@ -118,3 +118,18 @@
     save_photo_number = -1
     save_photo_filename = ''
 !   !save_photo_when_terminate = .true.
+
+      ! create_merger_model !!! EXPERIMENTAL
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! saved_model_for_merger_1
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! saved_model_for_merger_2
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If ``create_merger_model`` is true, then create a star by merging the two models provided.
+
+      ! ::
+
+    create_merger_model = .false.
+    saved_model_for_merger_1 = 'undefined'
+    saved_model_for_merger_2 = 'undefined'

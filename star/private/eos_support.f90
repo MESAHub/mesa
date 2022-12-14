@@ -86,6 +86,14 @@ contains
     if (s% doing_timing) &
        s% timing_num_get_eos_calls = s% timing_num_get_eos_calls + 1
 
+    if(logRho < -25) then
+      ! Provide some hard lower limit on what we would even try to evalue the eos at
+      ! Going to low causes FPE's when we try to evaluate certain derviatives that need (rho**power)
+      s% retry_message = 'eos evaluted at too low a density'
+      ierr = -1
+      return
+    end if
+
     call eosDT_get( &
        s% eos_handle, s% species, s% chem_id, s% net_iso, xa, &
        Rho, logRho, T, logT, &

@@ -64,6 +64,7 @@
          use mod_other_binary_extras
          use mod_other_binary_photo_read
          use mod_other_binary_photo_write
+         use mod_other_e2
          use binary_timestep
          use binary_history
          use binary_history_specs
@@ -190,6 +191,7 @@
          b% other_CE_rlo_mdot => null_other_CE_rlo_mdot
          b% other_CE_binary_evolve_step => null_other_CE_binary_evolve_step
          b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
+         b% other_e2 => null_other_e2
 
          b% extras_binary_startup => null_extras_binary_startup
          b% extras_binary_start_step => null_extras_binary_start_step
@@ -272,6 +274,20 @@
 
          end do
 
+         ! Error if users set the saved model to the same filename
+         if(b% have_star_1 .and. b% have_star_2) then
+            if(b% s1% job% save_model_when_terminate .and. b% s2% job% save_model_when_terminate) then
+               if(len_trim(b% s1% job% save_model_filename) > 0 .and. len_trim(b% s2% job% save_model_filename) >0) then
+                  if(trim(b% s1% job% save_model_filename) == trim(b% s2% job% save_model_filename)) then
+                     write(*,*) "ERROR: Both stars are set to write save_model_filename to the same file"
+                     call mesa_error(__FILE__,__LINE__)
+                  end if
+               end if
+            end if
+         end if
+
+
+
          ! binary data must be initiated after stars, such that masses are available
          ! if using saved models
          call binarydata_init(b, doing_restart)
@@ -343,6 +359,12 @@
                if (failed('star_ptr',ierr)) return
                call before_step_loop(id, ierr)
                if (ierr /= 0) return
+
+               result = s% extras_start_step(id)  
+               if (result /= keep_going) then
+                  continue_evolve_loop = .false.
+                  exit evolve_loop
+               end if       
             end do
 
             first_try = .true.
@@ -913,10 +935,10 @@
 
          if (b% job% change_period_eccentricity .or. &
             (b% job% change_initial_period_eccentricity .and. .not. restart)) then
-            if (b% period /= b% job% new_period*60d0*60d0*24d0 .or. &
+            if (b% period /= b% job% new_period*secday .or. &
                   b% eccentricity /= b% job% new_eccentricity) then
                call set_period_eccentricity(binary_id, &
-                  b% job% new_period*60d0*60d0*24d0, b% job% new_eccentricity, ierr)
+                  b% job% new_period*secday, b% job% new_eccentricity, ierr)
                if (ierr /= 0) then
                   write(*,*) "error in set_period_eccentricity"
                   return

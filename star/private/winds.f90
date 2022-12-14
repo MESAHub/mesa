@@ -54,9 +54,9 @@
                if (s% report_ierr) write(*, *) 'other_adjust_mdot'
                return
             end if
-         end if         
+         end if
       end subroutine set_mdot
-      
+
 
       subroutine do_set_mdot(s, L_phot, M_phot, T_phot, ierr)
          use chem_def
@@ -197,7 +197,7 @@
          end if
 
          if (dbg) write(*,1) 'wind_mdot 1', wind_mdot
-         
+
          if (using_wind_scheme_mdot) then
             if (s% no_wind_if_no_rotation .and. .not. s% rotation_flag) then
                s% mstar_dot = 0
@@ -338,7 +338,14 @@
                 end if
                 X = surface_h1
                 Y = surface_he4
-                Z = 1 - (X + Y)
+                ! use the Zbase as a proxy for Fe-group abundances
+                ! unlikely to change during the stellar evolution
+                if (s% kap_rq% Zbase >= 0) then
+                   Z = s% kap_rq% Zbase
+                else
+                   if (dbg) write(*,*) 'Zbase not set, using present-day Z for wind'
+                   Z = 1 - (X + Y)
+                end if
 
                 if (use_other) then
                    if (dbg) write(*,*) 'call other_wind'
@@ -652,7 +659,7 @@
          scale_height = s% rlo_wind_scale_height
          if (scale_height <= 0) then
             scale_height = s% Peos(1) / (s% cgrav(1)*s% m(1)*s% rho(1) / (s% r(1)**2)) / Rsun
-         end if 
+         end if
          roche_lobe_radius = s% rlo_wind_roche_lobe_radius
          ratio = R/roche_lobe_radius
          !write(*,2) 'R/roche_lobe_radius', s% model_number, ratio
@@ -671,7 +678,7 @@
          mdot = s% rlo_wind_base_mdot* &
             exp(min(6*ln10,(R - roche_lobe_radius)/scale_height))
          eval_rlo_wind = s% rlo_scaling_factor*mdot ! Msun/year
-         
+
          !write(*,1) 's% rlo_wind_base_mdot', s% rlo_wind_base_mdot
          !write(*,1) 'R - roche_lobe_radius', R - roche_lobe_radius, R, roche_lobe_radius
          !write(*,1) 'scale_height', scale_height

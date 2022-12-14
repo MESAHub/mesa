@@ -201,7 +201,7 @@
             b% s1% star_age < 1d2)) then
             ! if here, still not in ZAMS, keep period fixed
             call binary_set_period_eccentricity(b% binary_id, &
-               b% initial_period_in_days*(24d0*60d0*60d0), 0d0, ierr)
+               b% initial_period_in_days*secday, 0d0, ierr)
             if (ierr /= 0) then
                return
             end if

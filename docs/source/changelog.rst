@@ -2,6 +2,7 @@
 Changelog
 *********
 
+
 Changes in main
 ===============
 
@@ -36,18 +37,20 @@ or fall back to computing the matching history column (e.g. for
 ``log_g``).  So whereas an effective temperature constraint would
 previously be included using, say ::
 
-    include_Teff_in_chi2_spectro = .false.
+    include_Teff_in_chi2_spectro = .true.
     Teff_target = 6000
     Teff_sigma = 100
 
 you would now use ::
 
     constraint_name(1) = 'Teff'
+    include_constraint_in_chi2_spectro(1) = .true.
     constraint_target(1) = 6000
     constraint_sigma(1) = 100
 
 The maximum number of such constraints is currently 100 but can
-trivially be increased at compile time by modifying ``astero_def``.
+trivially be increased at compile time by modifying
+``max_constraints`` in ``astero/public/astero_def.f90``.
 
 Similarly, each parameter now has a name, initial value, minimum,
 maximum and grid-spacing.  So whereas the mixing-length parameter
@@ -62,13 +65,15 @@ was previously controlled with something like ::
 you would now use ::
 
     param_name(1) = 'alpha'
+    vary_param(1) = .true.
     first_param(1) = 1.7
     min_param(1) = 1.5
     max_param(1) = 1.9
     delta_param(1) = 0.1
 
 Again, the maximum number of parameters is 100 and can be increased at
-compile time by modifying ``astero_def``.
+compile time by modifying ``max_parameters`` in
+``astero/public/astero_def.f90``.
 
 The default ``run_star_extras.f90`` defines the hooks
 ``set_constraint_value`` and ``set_param`` so that the old options
@@ -79,6 +84,41 @@ The output files contain information for constraints or parameters
 with names that are not ``''``.  Thus, the column order now varies but
 the same information is present and now follows the same structure as
 histories and profiles.
+
+star
+----
+
+For wind mass loss, schemes that scale with metallicity now employ
+``Zbase`` rather than ``Z`` (as long as ``Zbase`` is set to a non-negative value,
+otherwise we fall back to ``Z``). This reflects the fact that wind recipes primarily
+account for the opacity of iron-group elements, which have surface abundances that
+are unlikely to change during evolution. This change therefore avoids
+unphysical influence on winds by, e.g., evolution of surface CNO abundances.
+
+test_suite
+----------
+
+All test cases have now had the inlist option, makefile variable, and shell script variable, ``MESA_DIR`` removed.
+This means that you no longer need to do anything to make a ``MESA`` test case work outside of the test suite.
+Test cases now infer their ``MESA_DIR`` variable entirely by the environment variable ``$MESA_DIR``. 
+
+The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
+
+net
+---
+
+The derived type net_info (conventional given the symbol ``n``) is no longer a pointer. If you declare a local copy of the variable, you should also ensure to do ``n% g => g`` to make sure that net_info knows
+about the ``net_general_info`` derived type. ``g`` can be had from a call to ``get_net_ptr(handle, g, ierr)``.
+
+The pointer array ``net_work`` and its size ``net_lwork`` have been removed from the net interface, thus these variables should be removed form any ``other_net_get`` and ``other_split_burn`` hooks.
+The following routines have also been removed as they are no longer needed ``net_work_size``, ``get_net_rate_ptrs``, ``net_1_zone_burn_work_size``, ``get_burn_work_array_pointers``, ``net_1_zone_burn_const_density_work_size``, and ``get_burn_const_density_work_array_pointers``
+
+Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicity.
+
+ADIPLS
+------
+
+ADIPLS now has a ``USE_ADIPLS`` flag in ``utils/makefile_header`` to enable is build to be disabled.
 
 
 Changes in r22.05.1

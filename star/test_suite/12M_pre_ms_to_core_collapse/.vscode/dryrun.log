@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/rob/mesa/mesa/mesa-git/star/test_suite/12M_pre_ms_to_core_collapse'
+make: Leaving directory '/home/rob/mesa/mesa/mesa-git/star/test_suite/12M_pre_ms_to_core_collapse'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

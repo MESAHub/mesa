@@ -97,7 +97,6 @@
          ierr = 0
          initial_z = s% initial_z
          initial_y = s% initial_y
-         if (initial_y < 0) initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
          s% M_center = 0
          s% L_center = 0
          s% R_center = 0

@@ -1,7 +1,6 @@
 
 &star_job
 
-      mesa_dir = '../../..'
 
       read_extra_star_job_inlist1 = .true.
       extra_star_job_inlist1_name = 'inlist_rsp_common'

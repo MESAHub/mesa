@@ -412,7 +412,7 @@ program main
             write(*,*) 'eta', k, eta, logT, logRho, n_Fe
             call mesa_error(__FILE__,__LINE__)
          end if
-         time_sec = time*60*60*24
+         time_sec = time*secday
          tau_sob = pi*qe*qe/(me*clight)*n_Fe*eta*f*time_sec*lambda0
          
          if ((tau_sob > tau_sob_lo .or. k==2) .and. v_sob_lo_tau == 0d0) then

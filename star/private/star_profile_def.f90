@@ -439,8 +439,9 @@
       integer, parameter :: p_mlt_log_abs_Y = p_mlt_gradT + 1
       integer, parameter :: p_tdc_num_iters = p_mlt_log_abs_Y + 1
       integer, parameter :: p_mlt_Y_face = p_tdc_num_iters + 1
+      integer, parameter :: p_dvc_dt_TDC_div_g = p_mlt_Y_face + 1
 
-      integer, parameter :: p_delta_r = p_mlt_Y_face + 1
+      integer, parameter :: p_delta_r = p_dvc_dt_TDC_div_g + 1
       integer, parameter :: p_delta_L = p_delta_r + 1
       integer, parameter :: p_delta_cell_vol = p_delta_L + 1
       integer, parameter :: p_delta_entropy = p_delta_cell_vol + 1
@@ -1125,6 +1126,7 @@
          profile_column_name(p_mlt_Y_face) = 'mlt_Y_face'
          profile_column_name(p_mlt_log_abs_Y) = 'mlt_log_abs_Y'
          profile_column_name(p_tdc_num_iters) = 'tdc_num_iters'
+         profile_column_name(p_dvc_dt_TDC_div_g) = 'dvc_dt_TDC_div_g'
 
          profile_column_name(p_delta_r) = 'delta_r'
          profile_column_name(p_delta_L) = 'delta_L'

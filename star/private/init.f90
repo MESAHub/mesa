@@ -500,6 +500,7 @@
          s% species = 0
          s% num_reactions = 0
 
+         s% fix_Pgas = .false.
          s% v_flag = .false.
          s% u_flag = .false.
          s% rotation_flag = .false.
@@ -866,6 +867,9 @@
 
          initial_mass = s% initial_mass
          initial_z = s% initial_z
+
+         if (s% initial_y < 0) s% initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
+
          s% dt = 0
          s% termination_code = -1
 

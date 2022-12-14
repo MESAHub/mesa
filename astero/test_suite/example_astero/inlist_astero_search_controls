@@ -228,28 +228,28 @@
 
       ! parameters
          param_name(1) = 'initial_mass'
-         first_param(1) = 1.2724010961d0
+         first_param(1) = 1.2713303424d0
          vary_param(1) = .true.
          min_param(1) = 1.24d0
          max_param(1) = 1.32d0
          delta_param(1) = 0.01d0
 
          param_name(2) = 'initial_Y'
-         first_param(2) = 0.2651812580d0
+         first_param(2) = 0.2668448980d0
          vary_param(2) = .true.
          min_param(2) = 0.24d0
          max_param(2) = 0.30d0
          delta_param(2) = 0.01d0
 
          param_name(3) = 'initial_FeH'
-         first_param(3) = 0.064226926d0
+         first_param(3) = 0.0725374166d0
          vary_param(3) = .true.
          min_param(3) = 0.0d0
          max_param(3) = 0.17d0
          delta_param(3) = 0.03d0
 
          param_name(4) = 'alpha'
-         first_param(4) = 1.6550575946d0
+         first_param(4) = 1.6534734832d0
          vary_param(4) = .true.
          min_param(4) = 1.5d0
          max_param(4) = 1.9d0

@@ -262,7 +262,7 @@
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
-      tri_alfa
+      tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha
@@ -281,6 +281,19 @@
       !photo
       !pnhe4
       !other    
+
+   ! adds columns for all of the reactions that are in the current net 
+   ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
+   !add_raw_rates      ! raw reaction rates,       reactions/second
+   !add_screened_rates ! screened reaction rates reactions/second
+   !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+   !add_eps_neu_rates  ! Neutrino losses             erg/s
+
+   ! individual reactions (as many as desired)
+   ! use list_net_reactions = .true. in star_job to list all reactions in the current net    
+   ! reactions/second
+      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_wk_h2
 
    burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
@@ -489,6 +502,7 @@
    !mlt_log_abs_Y
    !mlt_vc
    !log_mlt_vc
+   !dvc_dt_TDC_div_g 
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc
@@ -629,7 +643,8 @@
    !log_g_rad he4   ! log10 acceleration from radiative levitation
    !log_g_rad ne20   ! log10 acceleration from radiative levitation
 
-
+!# Phase Separation
+   !eps_phase_separation
 
 !# Oscillations
    !brunt_N2 ! brunt-vaisala frequency squared

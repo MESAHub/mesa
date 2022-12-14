@@ -92,6 +92,7 @@ MKL_INCLUDE =
 
 # for now, GYRE is only available with the mesasdk 
 USE_GYRE = NO
+USE_ADIPLS = YES
 
 # See http://www.gnu.org/software/make/manual/make.html#Testing-Flags for findstring
 ifneq (,$(findstring ifort,$(FC)))

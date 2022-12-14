@@ -577,7 +577,7 @@
    ! * ``f_ov``
 
    ! param_name
-   ! ~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~
    ! Names for parameters that will searched/optimized.  Empty names ``''``
    ! are ignored. ::
 

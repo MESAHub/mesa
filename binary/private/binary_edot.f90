@@ -123,18 +123,22 @@
 
        if (b% point_mass_i /= 1) then
           if (b% circ_type_1 == "Hut_conv") then
-             b% edot_tidal = edot_tidal_Hut(b, b% s1, .true.)
+             b% edot_tidal = edot_tidal_Hut(b, b% s1, .true., ierr)
+             if(ierr/=0) return
           else if (b% circ_type_1 == "Hut_rad") then
-             b% edot_tidal = edot_tidal_Hut(b, b% s1, .false.)
+             b% edot_tidal = edot_tidal_Hut(b, b% s1, .false., ierr)
+             if(ierr/=0) return
           else
              write(*,*) "Unrecognized circ_type_1", b% circ_type_1
           end if
        end if
        if (b% point_mass_i /= 2) then
           if (b% circ_type_2 == "Hut_conv") then
-             b% edot_tidal = b% edot_tidal + edot_tidal_Hut(b, b% s2, .true.)
+             b% edot_tidal = b% edot_tidal + edot_tidal_Hut(b, b% s2, .true., ierr)
+             if(ierr/=0) return
           else if (b% circ_type_2 == "Hut_rad") then
-             b% edot_tidal = b% edot_tidal + edot_tidal_Hut(b, b% s2, .false.)
+             b% edot_tidal = b% edot_tidal + edot_tidal_Hut(b, b% s2, .false., ierr)
+             if(ierr/=0) return
           else
              write(*,*) "Unrecognized circ_type_2", b% circ_type_2
           end if
@@ -145,11 +149,12 @@
        end if
     end subroutine edot_tidal
 
-    real(dp) function edot_tidal_Hut(b, s , has_convective_envelope) result(edot_tidal)
+    real(dp) function edot_tidal_Hut(b, s , has_convective_envelope, ierr) result(edot_tidal)
        type (binary_info), pointer :: b
        type (star_info), pointer :: s
        logical, intent(in) :: has_convective_envelope
-       real(dp) :: m, porb, r_phot, osep, qratio, omega_s, omega_sync
+       real(dp) :: m, porb, r_phot, osep, qratio, omega_s, omega_sync, kdivt
+       integer, intent(out) :: ierr
 
        edot_tidal = 0d0
 
@@ -172,7 +177,9 @@
        edot_tidal = -27.0d0*qratio*(1+qratio)*pow8(r_phot/osep) &
            * b% eccentricity*pow(1-pow2(b% eccentricity),-6.5d0)*b% Ftid_1
        ! add multiplication by (k/T), eq. (29) of Hurley et al. 2002
-       edot_tidal = edot_tidal*k_div_T(b, s, has_convective_envelope)
+       kdivt = k_div_T(b, s, has_convective_envelope, ierr)
+       if(ierr/=0) return
+       edot_tidal = edot_tidal * kdivt
        ! add terms dependant on omega
        edot_tidal = edot_tidal*(f3(b% eccentricity) - &
            11d0/18d0 * omega_s / omega_sync * f4(b% eccentricity) * &

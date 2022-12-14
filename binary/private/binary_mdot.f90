@@ -47,7 +47,7 @@
          type (star_info), pointer :: s
          real(dp) :: function_to_solve, explicit_mdot, q, slope_contact
          integer :: ierr
-         logical :: use_sum, detached
+         logical :: use_sum
          character (len=90) :: rlo_result
          
          include 'formats'
@@ -59,7 +59,6 @@
          end if
          s => b% s_donor
          use_sum = .false.
-         detached = .false.
          
          ! NOTE: keep in mind that for mass loss, mdot is negative.
          ! b% mtransfer_rate will be considered valid if function_to_solve = 0
