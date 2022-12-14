@@ -2,36 +2,6 @@
 Changelog
 *********
 
-Changes in r22.XX.YY
-====================
-
-Hi everyone,
-
-We are pleased to announce a beta public release of MESA, r22.XX.XX.
-
-This beta release contains bug fixes and all the features described in MESA VI:
-
-1) The elimination of the lnPgas_flag option in r22.05.1 inadvertently impacted the convective pre-mixing (CPM) implementation, by forcing the mixing to occur at constant (rho,T) rather than at constant (P,T). This meant that CPM no longer functioned as intended, and as demonstrated in MESA V. We have made changes to the implementation to restore the “old” behavior; although results are not identical to before, convective cores can once again grow as they should with CPM.
-
-2) The test suite has now been purged of MESA_DIR. That means you no longer need to edit any files when moving a test case outside of $MESA_DIR for it to run.
-
-3) The inlist controls for the astero module have changed significantly. The new scheme allows a substantial refactoring while also making the astero module more versatile in terms of what properties of a star can be used as parameters or constraints. The changes are explained in more detail in the changelog and documented in the defaults files.
-
-4) This release corresponds with the release of the MESA VI instrument paper https://ui.adsabs.harvard.edu/abs/2022arXiv220803651J/abstract and we refer readers to the paper for full details on the new material.
-
-5) A detailed list of changes can also be found in the changelog:
-https://docs.mesastar.org/en/release-r22.XX.XX/changelog.html
-
-6) The release candidate can be downloaded from Zenodo:
-
-With thanks to the following members of the community for contributions:
-Joshua Aiken, Philipp Edelmann, Matthias Fabry, Joey Mombarg, 曾耀田, and the MESA Summer School 2022.
-
-We welcome contributions from the community. If you want to contribute to MESA we have a guide https://docs.mesastar.org/en/latest/contributing.html . Contributions can take many forms, from bug reports, documentation fixes, and new code or science. Not everyone has to be a coder to contribute. If you have something you want to contribute but have doubts about it, then feel free to reach out to any of the MESA developers and we can provide help and guidance.
-
-Thanks!
-
-
 
 Changes in main
 ===============

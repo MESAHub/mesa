@@ -10,6 +10,7 @@ Developing MESA
    :maxdepth: 1
 
    developing/collaboration
+   developing/new_developers
    developing/contributing
    developing/documentation
    developing/code_style
