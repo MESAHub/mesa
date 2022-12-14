@@ -1,0 +1,3001 @@
+! ======
+! pgbinary
+! ======
+
+
+! general options
+! ===============
+
+
+! window updates
+! ______________
+
+
+! pgbinary_interval
+! ~~~~~~~~~~~~~~~
+
+! update windows when ``mod(model_number,pgbinary_interval) == 0``
+! note: this replaces the obsolete control ``pgbinary_cnt``.
+! better performance for binary with this > 1.
+! make it as large as you can while still getting adequate plot updates.
+! Does not alter the rate at which pgplots are saved to disk, use the
+! ``*_file_interval`` options instead.
+
+! ::
+
+pgbinary_interval = 1
+
+
+! pause
+! ~~~~~
+
+! if true, then after refresh windows, wait for user to hit RETURN
+
+! ::
+
+pause = .false.
+
+
+! pause_interval
+! ~~~~~~~~~~~~~~
+
+! if > 0, then pause when ``mod(model_number, pause_interval) = 0``.
+
+! ::
+
+pause_interval = -1
+
+
+! pgbinary_sleep
+! ~~~~~~~~~~~~
+
+! after refresh windows, sleep this long (in seconds; can be noninteger)
+
+! ::
+
+pgbinary_sleep = 0.0
+
+
+! clear_history
+! ~~~~~~~~~~~~~
+
+! ::
+
+clear_history = .false.
+
+
+! white_on_black flags
+! ____________________
+
+! true means white foreground color on black background
+
+
+! file_white_on_black_flag
+! ~~~~~~~~~~~~~~~~~~~~~~~~
+! win_white_on_black_flag
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+file_white_on_black_flag = .true.
+win_white_on_black_flag = .true.
+
+
+! file output
+! ___________
+
+
+! file_device
+! ~~~~~~~~~~~
+! file_extension
+! ~~~~~~~~~~~~~~
+
+! 'png' is Portable Network Graphics format; can also use 'pdf'
+
+! ::
+
+file_device = 'png'
+file_extension = 'png'
+
+
+! file_digits
+! ~~~~~~~~~~~
+
+! number of digits for ``model_number`` in filenames
+
+! ::
+
+file_digits = 6
+
+! ::
+
+pgbinary_report_writing_files = .true.
+
+! for terminal output report when write plot file
+
+
+! title, age, and model number
+! ____________________________
+
+! placement details
+! scale is for character size
+! disp, coord, fjust are args for PGMTXT
+
+! + DISP :
+! the displacement of the character string from the
+! specified edge of the viewport, measured outwards
+! from the viewport in units of the character
+! height. Use a negative value to write inside the
+! viewport, a positive value to write outside.
+! + COORD :
+! the location of the character string along the
+! specified edge of the viewport, as a fraction of
+! the length of the edge.
+! + FJUST :
+! controls justification of the string parallel to
+! the specified edge of the viewport. If
+! FJUST = 0.0, the left-hand end of the string will
+! be placed at COORD; if JUST = 0.5, the center of
+! the string will be placed at COORD; if JUST = 1.0,
+! the right-hand end of the string will be placed at
+! at COORD.
+
+! ### model_number
+
+! ::
+
+pgbinary_show_model_number = .true.
+
+! only shown for full window, not for subplots
+
+! ::
+
+pgbinary_model_scale = 0.8
+pgbinary_model_lw = 3
+pgbinary_model_disp = 3.0
+pgbinary_model_coord = 1.01
+pgbinary_model_fjust = 1.0
+
+
+! age
+! ~~~
+
+! ::
+
+pgbinary_show_age = .true.
+
+! if all of those are false, then picks units based on magnitude of age
+
+! ::
+
+pgbinary_show_age_in_seconds = .false.
+pgbinary_show_age_in_minutes = .false.
+pgbinary_show_age_in_hours = .false.
+pgbinary_show_age_in_days = .false.
+pgbinary_show_age_in_years = .false.
+pgbinary_show_log_age_in_years = .false.
+
+! only shown for full window, not for subplots
+
+! ::
+
+pgbinary_age_scale = 0.8
+pgbinary_age_lw = 3
+pgbinary_age_disp = 3.0
+pgbinary_age_coord = -0.04
+pgbinary_age_fjust = 0.0
+
+! ### axes line weight
+
+! ::
+
+pgbinary_box_lw = 3
+
+
+! titles
+! ~~~~~~
+
+! these apply to all plots except grids.
+
+! ::
+
+pgbinary_show_title = .true.
+pgbinary_title_scale = 1.3
+pgbinary_title_lw = 3
+pgbinary_title_disp = 1.1
+pgbinary_title_coord = 0.5
+pgbinary_title_fjust = 0.5
+
+
+! grid titles
+! ~~~~~~~~~~~
+
+! these apply to the top of the grid, not to the subplots within the grid.
+
+! ::
+
+pgbinary_grid_show_title = .true.
+pgbinary_grid_title_scale = 1.2
+pgbinary_grid_title_lw = 3
+pgbinary_grid_title_disp = 1.8
+pgbinary_grid_title_coord = 0.5
+pgbinary_grid_title_fjust = 0.5
+
+
+! scale for axis labels
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+pgbinary_xaxis_label_scale = 1.5
+pgbinary_left_yaxis_label_scale = 1.5
+pgbinary_right_yaxis_label_scale = 1.5
+pgbinary_xaxis_label_lw = 4
+pgbinary_left_yaxis_label_lw = 4
+pgbinary_right_yaxis_label_lw = 4
+
+
+! displacements for axis labels
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+pgbinary_xaxis_label_disp = 2.2
+pgbinary_left_yaxis_label_disp = 3.1
+pgbinary_right_yaxis_label_disp = 4.1
+
+
+! relative scale of axis numbers
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+pgbinary_num_scale = 1.2
+
+
+! line width for data
+! ~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+pgbinary_lw = 8
+
+
+! Summary History window
+! ======================
+
+! ::
+
+Summary_History_win_flag = .false.
+
+! ::
+
+Summary_History_win_width = 6
+Summary_History_win_aspect_ratio = 0.75
+
+! ::
+
+Summary_History_xleft = 0.15
+Summary_History_xright = 0.85
+Summary_History_ybot = 0.15
+Summary_History_ytop = 0.85
+Summary_History_txt_scale = 1.0
+Summary_History_title = 'Summary_History'
+
+! ::
+
+Summary_History_xmax = -1
+Summary_History_xmin = -1
+Summary_History_max_width = -1
+
+! ::
+
+Summary_History_name(:) = ''
+
+! if name len=0, then skip this one
+
+! ::
+
+Summary_History_legend(:) = ''
+Summary_History_scaled_value(:) = .true.
+
+! if true, show values scaled max to 1.0 and min to 0.0
+! if false, show the unmapped values (which should be in range 0.0 to 1.0)
+! typically set .false. for mass fractions; .true. for everything else.
+
+! ::
+
+Summary_History_num_lines = 5
+
+! ::
+
+Summary_History_name(1) = 'period'
+Summary_History_legend(1) = 'p'
+
+! ::
+
+Summary_History_name(2) = 'separation'
+Summary_History_legend(2) = 'a'
+
+! ::
+
+Summary_History_name(3) = 'lg_mtransfer_rate'
+Summary_History_legend(3) = 'log Mdot\dtrans\u'
+
+! ::
+
+Summary_History_name(4) = 'eccentricity'
+Summary_History_legend(4) = 'e'
+
+! ::
+
+Summary_History_name(5) = 'angular_momentum_j'
+Summary_History_legend(5) = 'j\dorb\u'
+
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+Summary_History_use_decorator = .false.
+
+! file output
+
+! ::
+
+Summary_History_file_flag = .false.
+Summary_History_file_dir = 'png'
+Summary_History_file_prefix = 'Summary_History_'
+Summary_History_file_interval = 5
+Summary_History_file_width = -1
+Summary_History_file_aspect_ratio = -1
+
+! History Tracks
+! ==============
+
+
+! History_Track1
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track1_win_flag = .false.
+History_Track1_win_width = 6
+History_Track1_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track1_xleft = 0.15
+History_Track1_xright = 0.85
+History_Track1_ybot = 0.15
+History_Track1_ytop = 0.85
+History_Track1_txt_scale = 1.0
+History_Track1_title = 'History_Track1'
+
+! set default
+
+! ::
+
+History_Track1_xname = 'log_center_T'
+History_Track1_yname = 'log_L'
+History_Track1_xaxis_label = 'log T\dcenter'
+History_Track1_yaxis_label = 'log L/L\d\(2281)'
+History_Track1_reverse_xaxis = .true.
+History_Track1_reverse_yaxis = .false.
+History_Track1_log_xaxis = .false.
+History_Track1_log_yaxis = .false.
+
+! ::
+
+History_Track1_xmin = -101d0
+History_Track1_xmax = -101d0
+History_Track1_ymin = -101d0
+History_Track1_ymax = -101d0
+
+! ::
+
+History_Track1_xmargin = 0.1
+History_Track1_ymargin = 0.1
+History_Track1_dxmin = -1
+History_Track1_dymin = -1
+
+! ::
+
+History_Track1_step_min = -1
+History_Track1_step_max = -1
+
+! ::
+
+show_History_Track1_target_box = .false.
+History_Track1_n_sigma = -3
+History_Track1_xtarget = 0
+History_Track1_xsigma = 0
+History_Track1_ytarget = 0
+History_Track1_ysigma = 0
+
+! ::
+
+show_History_Track1_annotation1 = .false.
+show_History_Track1_annotation2 = .false.
+show_History_Track1_annotation3 = .false.
+
+! ::
+
+History_Track1_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track1_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track1_file_flag = .false.
+History_Track1_file_dir = 'png'
+History_Track1_file_prefix = 'track1_'
+History_Track1_file_interval = 5
+History_Track1_file_width = -1
+History_Track1_file_aspect_ratio = -1
+
+
+! History_Track2
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track2_win_flag = .false.
+History_Track2_win_width = 6
+History_Track2_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track2_xleft = 0.15
+History_Track2_xright = 0.85
+History_Track2_ybot = 0.15
+History_Track2_ytop = 0.85
+History_Track2_txt_scale = 1.0
+History_Track2_title = 'History_Track2'
+
+! ::
+
+History_Track2_xname = ''
+History_Track2_yname = ''
+History_Track2_xaxis_label = ''
+History_Track2_yaxis_label = ''
+History_Track2_reverse_xaxis = .false.
+History_Track2_reverse_yaxis = .false.
+History_Track2_log_xaxis = .false.
+History_Track2_log_yaxis = .false.
+
+! ::
+
+History_Track2_xmin = -101d0
+History_Track2_xmax = -101d0
+History_Track2_ymin = -101d0
+History_Track2_ymax = -101d0
+
+! ::
+
+History_Track2_xmargin = 0.1
+History_Track2_ymargin = 0.1
+History_Track2_dxmin = -1
+History_Track2_dymin = -1
+
+! ::
+
+History_Track2_step_min = -1
+History_Track2_step_max = -1
+
+! ::
+
+show_History_Track2_target_box = .false.
+History_Track2_n_sigma = -3
+History_Track2_xtarget = 0
+History_Track2_xsigma = 0
+History_Track2_ytarget = 0
+History_Track2_ysigma = 0
+
+! ::
+
+show_History_Track2_annotation1 = .false.
+show_History_Track2_annotation2 = .false.
+show_History_Track2_annotation3 = .false.
+
+! ::
+
+History_Track2_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track2_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track2_file_flag = .false.
+History_Track2_file_dir = 'png'
+History_Track2_file_prefix = 'track2_'
+History_Track2_file_interval = 5
+History_Track2_file_width = -1
+History_Track2_file_aspect_ratio = -1
+
+
+! History_Track3
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track3_win_flag = .false.
+History_Track3_win_width = 6
+History_Track3_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track3_xleft = 0.15
+History_Track3_xright = 0.85
+History_Track3_ybot = 0.15
+History_Track3_ytop = 0.85
+History_Track3_txt_scale = 1.0
+History_Track3_title = 'History_Track3'
+
+! ::
+
+History_Track3_xname = ''
+History_Track3_yname = ''
+History_Track3_xaxis_label = ''
+History_Track3_yaxis_label = ''
+History_Track3_reverse_xaxis = .false.
+History_Track3_reverse_yaxis = .false.
+History_Track3_log_xaxis = .false.
+History_Track3_log_yaxis = .false.
+
+! ::
+
+History_Track3_xmin = -101d0
+History_Track3_xmax = -101d0
+History_Track3_ymin = -101d0
+History_Track3_ymax = -101d0
+
+! ::
+
+History_Track3_xmargin = 0.1
+History_Track3_ymargin = 0.1
+History_Track3_dxmin = -1
+History_Track3_dymin = -1
+
+! ::
+
+History_Track3_step_min = -1
+History_Track3_step_max = -1
+
+! ::
+
+show_History_Track3_target_box = .false.
+History_Track3_n_sigma = -3
+History_Track3_xtarget = 0
+History_Track3_xsigma = 0
+History_Track3_ytarget = 0
+History_Track3_ysigma = 0
+
+! ::
+
+show_History_Track3_annotation1 = .false.
+show_History_Track3_annotation2 = .false.
+show_History_Track3_annotation3 = .false.
+
+! ::
+
+History_Track3_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track3_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track3_file_flag = .false.
+History_Track3_file_dir = 'png'
+History_Track3_file_prefix = 'track3_'
+History_Track3_file_interval = 5
+History_Track3_file_width = -1
+History_Track3_file_aspect_ratio = -1
+
+
+! History_Track4
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track4_win_flag = .false.
+History_Track4_win_width = 6
+History_Track4_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track4_xleft = 0.15
+History_Track4_xright = 0.85
+History_Track4_ybot = 0.15
+History_Track4_ytop = 0.85
+History_Track4_txt_scale = 1.0
+History_Track4_title = 'History_Track4'
+
+! ::
+
+History_Track4_xname = ''
+History_Track4_yname = ''
+History_Track4_xaxis_label = ''
+History_Track4_yaxis_label = ''
+History_Track4_reverse_xaxis = .false.
+History_Track4_reverse_yaxis = .false.
+History_Track4_log_xaxis = .false.
+History_Track4_log_yaxis = .false.
+
+! ::
+
+History_Track4_xmin = -101d0
+History_Track4_xmax = -101d0
+History_Track4_ymin = -101d0
+History_Track4_ymax = -101d0
+
+! ::
+
+History_Track4_xmargin = 0.1
+History_Track4_ymargin = 0.1
+History_Track4_dxmin = -1
+History_Track4_dymin = -1
+
+! ::
+
+History_Track4_step_min = -1
+History_Track4_step_max = -1
+
+! ::
+
+show_History_Track4_target_box = .false.
+History_Track4_n_sigma = -3
+History_Track4_xtarget = 0
+History_Track4_xsigma = 0
+History_Track4_ytarget = 0
+History_Track4_ysigma = 0
+
+! ::
+
+show_History_Track4_annotation1 = .false.
+show_History_Track4_annotation2 = .false.
+show_History_Track4_annotation3 = .false.
+
+! ::
+
+History_Track4_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track4_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track4_file_flag = .false.
+History_Track4_file_dir = 'png'
+History_Track4_file_prefix = 'track4_'
+History_Track4_file_interval = 5
+History_Track4_file_width = -1
+History_Track4_file_aspect_ratio = -1
+
+
+! History_Track5
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track5_win_flag = .false.
+History_Track5_win_width = 6
+History_Track5_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track5_xleft = 0.15
+History_Track5_xright = 0.85
+History_Track5_ybot = 0.15
+History_Track5_ytop = 0.85
+History_Track5_txt_scale = 1.0
+History_Track5_title = 'History_Track5'
+
+! ::
+
+History_Track5_xname = ''
+History_Track5_yname = ''
+History_Track5_xaxis_label = ''
+History_Track5_yaxis_label = ''
+History_Track5_reverse_xaxis = .false.
+History_Track5_reverse_yaxis = .false.
+History_Track5_log_xaxis = .false.
+History_Track5_log_yaxis = .false.
+
+! ::
+
+History_Track5_xmin = -101d0
+History_Track5_xmax = -101d0
+History_Track5_ymin = -101d0
+History_Track5_ymax = -101d0
+
+! ::
+
+History_Track5_xmargin = 0.1
+History_Track5_ymargin = 0.1
+History_Track5_dxmin = -1
+History_Track5_dymin = -1
+
+! ::
+
+History_Track5_step_min = -1
+History_Track5_step_max = -1
+
+! ::
+
+show_History_Track5_target_box = .false.
+History_Track5_n_sigma = -3
+History_Track5_xtarget = 0
+History_Track5_xsigma = 0
+History_Track5_ytarget = 0
+History_Track5_ysigma = 0
+
+! ::
+
+show_History_Track5_annotation1 = .false.
+show_History_Track5_annotation2 = .false.
+show_History_Track5_annotation3 = .false.
+
+! ::
+
+History_Track5_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track5_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track5_file_flag = .false.
+History_Track5_file_dir = 'png'
+History_Track5_file_prefix = 'track5_'
+History_Track5_file_interval = 5
+History_Track5_file_width = -1
+History_Track5_file_aspect_ratio = -1
+
+
+! History_Track6
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track6_win_flag = .false.
+History_Track6_win_width = 6
+History_Track6_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track6_xleft = 0.15
+History_Track6_xright = 0.85
+History_Track6_ybot = 0.15
+History_Track6_ytop = 0.85
+History_Track6_txt_scale = 1.0
+History_Track6_title = 'History_Track6'
+
+! ::
+
+History_Track6_xname = ''
+History_Track6_yname = ''
+History_Track6_xaxis_label = ''
+History_Track6_yaxis_label = ''
+History_Track6_reverse_xaxis = .false.
+History_Track6_reverse_yaxis = .false.
+History_Track6_log_xaxis = .false.
+History_Track6_log_yaxis = .false.
+
+! ::
+
+History_Track6_xmin = -101d0
+History_Track6_xmax = -101d0
+History_Track6_ymin = -101d0
+History_Track6_ymax = -101d0
+
+! ::
+
+History_Track6_xmargin = 0.1
+History_Track6_ymargin = 0.1
+History_Track6_dxmin = -1
+History_Track6_dymin = -1
+
+! ::
+
+History_Track6_step_min = -1
+History_Track6_step_max = -1
+
+! ::
+
+show_History_Track6_target_box = .false.
+History_Track6_n_sigma = -3
+History_Track6_xtarget = 0
+History_Track6_xsigma = 0
+History_Track6_ytarget = 0
+History_Track6_ysigma = 0
+
+! ::
+
+show_History_Track6_annotation1 = .false.
+show_History_Track6_annotation2 = .false.
+show_History_Track6_annotation3 = .false.
+
+! ::
+
+History_Track6_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track6_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track6_file_flag = .false.
+History_Track6_file_dir = 'png'
+History_Track6_file_prefix = 'track6_'
+History_Track6_file_interval = 5
+History_Track6_file_width = -1
+History_Track6_file_aspect_ratio = -1
+
+
+! History_Track7
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track7_win_flag = .false.
+History_Track7_win_width = 6
+History_Track7_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track7_xleft = 0.15
+History_Track7_xright = 0.85
+History_Track7_ybot = 0.15
+History_Track7_ytop = 0.85
+History_Track7_txt_scale = 1.0
+History_Track7_title = 'History_Track7'
+
+! ::
+
+History_Track7_xname = ''
+History_Track7_yname = ''
+History_Track7_xaxis_label = ''
+History_Track7_yaxis_label = ''
+History_Track7_reverse_xaxis = .false.
+History_Track7_reverse_yaxis = .false.
+History_Track7_log_xaxis = .false.
+History_Track7_log_yaxis = .false.
+
+! ::
+
+History_Track7_xmin = -101d0
+History_Track7_xmax = -101d0
+History_Track7_ymin = -101d0
+History_Track7_ymax = -101d0
+
+! ::
+
+History_Track7_xmargin = 0.1
+History_Track7_ymargin = 0.1
+History_Track7_dxmin = -1
+History_Track7_dymin = -1
+
+! ::
+
+History_Track7_step_min = -1
+History_Track7_step_max = -1
+
+! ::
+
+show_History_Track7_target_box = .false.
+History_Track7_n_sigma = -3
+History_Track7_xtarget = 0
+History_Track7_xsigma = 0
+History_Track7_ytarget = 0
+History_Track7_ysigma = 0
+
+! ::
+
+show_History_Track7_annotation1 = .false.
+show_History_Track7_annotation2 = .false.
+show_History_Track7_annotation3 = .false.
+
+! ::
+
+History_Track7_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track7_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track7_file_flag = .false.
+History_Track7_file_dir = 'png'
+History_Track7_file_prefix = 'track7_'
+History_Track7_file_interval = 5
+History_Track7_file_width = -1
+History_Track7_file_aspect_ratio = -1
+
+
+! History_Track8
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track8_win_flag = .false.
+History_Track8_win_width = 6
+History_Track8_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track8_xleft = 0.15
+History_Track8_xright = 0.85
+History_Track8_ybot = 0.15
+History_Track8_ytop = 0.85
+History_Track8_txt_scale = 1.0
+History_Track8_title = 'History_Track8'
+
+! ::
+
+History_Track8_xname = ''
+History_Track8_yname = ''
+History_Track8_xaxis_label = ''
+History_Track8_yaxis_label = ''
+History_Track8_reverse_xaxis = .false.
+History_Track8_reverse_yaxis = .false.
+History_Track8_log_xaxis = .false.
+History_Track8_log_yaxis = .false.
+
+! ::
+
+History_Track8_xmin = -101d0
+History_Track8_xmax = -101d0
+History_Track8_ymin = -101d0
+History_Track8_ymax = -101d0
+
+! ::
+
+History_Track8_xmargin = 0.1
+History_Track8_ymargin = 0.1
+History_Track8_dxmin = -1
+History_Track8_dymin = -1
+
+! ::
+
+History_Track8_step_min = -1
+History_Track8_step_max = -1
+
+! ::
+
+show_History_Track8_target_box = .false.
+History_Track8_n_sigma = -3
+History_Track8_xtarget = 0
+History_Track8_xsigma = 0
+History_Track8_ytarget = 0
+History_Track8_ysigma = 0
+
+! ::
+
+show_History_Track8_annotation1 = .false.
+show_History_Track8_annotation2 = .false.
+show_History_Track8_annotation3 = .false.
+
+! ::
+
+History_Track8_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track8_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track8_file_flag = .false.
+History_Track8_file_dir = 'png'
+History_Track8_file_prefix = 'track8_'
+History_Track8_file_interval = 5
+History_Track8_file_width = -1
+History_Track8_file_aspect_ratio = -1
+
+
+! History_Track9
+! ~~~~~~~~~~~~~~
+
+! ::
+
+History_Track9_win_flag = .false.
+History_Track9_win_width = 6
+History_Track9_win_aspect_ratio = 0.75
+
+! ::
+
+History_Track9_xleft = 0.15
+History_Track9_xright = 0.85
+History_Track9_ybot = 0.15
+History_Track9_ytop = 0.85
+History_Track9_txt_scale = 1.0
+History_Track9_title = 'History_Track9'
+
+! ::
+
+History_Track9_xname = ''
+History_Track9_yname = ''
+History_Track9_xaxis_label = ''
+History_Track9_yaxis_label = ''
+History_Track9_reverse_xaxis = .false.
+History_Track9_reverse_yaxis = .false.
+History_Track9_log_xaxis = .false.
+History_Track9_log_yaxis = .false.
+
+! ::
+
+History_Track9_xmin = -101d0
+History_Track9_xmax = -101d0
+History_Track9_ymin = -101d0
+History_Track9_ymax = -101d0
+
+! ::
+
+History_Track9_xmargin = 0.1
+History_Track9_ymargin = 0.1
+History_Track9_dxmin = -1
+History_Track9_dymin = -1
+
+! ::
+
+History_Track9_step_min = -1
+History_Track9_step_max = -1
+
+! ::
+
+show_History_Track9_target_box = .false.
+History_Track9_n_sigma = -3
+History_Track9_xtarget = 0
+History_Track9_xsigma = 0
+History_Track9_ytarget = 0
+History_Track9_ysigma = 0
+
+! ::
+
+show_History_Track9_annotation1 = .false.
+show_History_Track9_annotation2 = .false.
+show_History_Track9_annotation3 = .false.
+
+! ::
+
+History_Track9_fname = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Track9_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Track9_file_flag = .false.
+History_Track9_file_dir = 'png'
+History_Track9_file_prefix = 'track9_'
+History_Track9_file_interval = 5
+History_Track9_file_width = -1
+History_Track9_file_aspect_ratio = -1
+
+! History Panels
+! ==============
+
+
+! History_Panels1
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels1_win_flag = .false.
+
+! ::
+
+History_Panels1_win_width = 6
+History_Panels1_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels1_xleft = 0.15
+History_Panels1_xright = 0.85
+History_Panels1_ybot = 0.15
+History_Panels1_ytop = 0.85
+History_Panels1_txt_scale = 1.0
+History_Panels1_title = 'History_Panels1'
+
+! ::
+
+History_Panels1_xaxis_name = 'model_number'
+History_Panels1_xmin = -101d0
+History_Panels1_xmax = -101d0
+History_Panels1_max_width = 100
+History_Panels1_dxmin = -1
+History_Panels1_xaxis_reversed = .false.
+History_Panels1_xaxis_log = .false.
+History_Panels1_xmargin = 0.0
+
+! ::
+
+History_Panels1_yaxis_name(:) = ''
+History_Panels1_yaxis_reversed(:) = .false.
+History_Panels1_yaxis_log(:) = .false.
+History_Panels1_ymin(:) = -101d0
+History_Panels1_ymax(:) = -101d0
+History_Panels1_ymargin(:) = 0.1
+History_Panels1_dymin(:) = -1
+
+! ::
+
+History_Panels1_other_yaxis_name(:) = ''
+History_Panels1_other_yaxis_reversed(:) = .false.
+History_Panels1_other_yaxis_log(:) = .false.
+History_Panels1_other_ymin(:) = -101d0
+History_Panels1_other_ymax(:) = -101d0
+History_Panels1_other_ymargin(:) = 0.1
+History_Panels1_other_dymin(:) = -1
+
+! ::
+
+History_Panels1_points_name(:) = ''
+
+! setup default
+
+! ::
+
+History_Panels1_num_panels = 1
+
+! ::
+
+History_Panels1_yaxis_name(1) = 'lg_mtransfer_rate'
+History_Panels1_yaxis_reversed(1) = .false.
+History_Panels1_ymin(1) = -101d0
+History_Panels1_ymax(1) = -101d0
+History_Panels1_dymin(1) = -1
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels1_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels1_file_flag = .false.
+History_Panels1_file_dir = 'png'
+History_Panels1_file_prefix = 'History_Panels1_'
+History_Panels1_file_interval = 5
+History_Panels1_file_width = -1
+History_Panels1_file_aspect_ratio = -1
+
+
+! History_Panels2
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels2_win_flag = .false.
+
+! ::
+
+History_Panels2_win_width = 6
+History_Panels2_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels2_xleft = 0.15
+History_Panels2_xright = 0.85
+History_Panels2_ybot = 0.15
+History_Panels2_ytop = 0.85
+History_Panels2_txt_scale = 1.0
+History_Panels2_title = 'History_Panels2'
+
+! ::
+
+History_Panels2_xaxis_name = 'model_number'
+History_Panels2_xmin = -101d0
+History_Panels2_xmax = -101d0
+History_Panels2_max_width = 100
+History_Panels2_dxmin = -1
+History_Panels2_xaxis_reversed = .false.
+History_Panels2_xaxis_log = .false.
+History_Panels2_xmargin = 0.0
+
+! ::
+
+History_Panels2_num_panels = 0
+
+! ::
+
+History_Panels2_yaxis_name(:) = ''
+History_Panels2_yaxis_reversed(:) = .false.
+History_Panels2_yaxis_log(:) = .false.
+History_Panels2_ymin(:) = -101d0
+History_Panels2_ymax(:) = -101d0
+History_Panels2_ymargin(:) = 0.1
+History_Panels2_dymin(:) = -1
+
+! ::
+
+History_Panels2_other_yaxis_name(:) = ''
+History_Panels2_other_yaxis_reversed(:) = .false.
+History_Panels2_other_yaxis_log(:) = .false.
+History_Panels2_other_ymin(:) = -101d0
+History_Panels2_other_ymax(:) = -101d0
+History_Panels2_other_ymargin(:) = 0.1
+History_Panels2_other_dymin(:) = -1
+
+! ::
+
+History_Panels2_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels2_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels2_file_flag = .false.
+History_Panels2_file_dir = 'png'
+History_Panels2_file_prefix = 'History_Panels2_'
+History_Panels2_file_interval = 5
+History_Panels2_file_width = -1
+History_Panels2_file_aspect_ratio = -1
+
+
+! History_Panels3
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels3_win_flag = .false.
+
+! ::
+
+History_Panels3_win_width = 6
+History_Panels3_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels3_xleft = 0.15
+History_Panels3_xright = 0.85
+History_Panels3_ybot = 0.15
+History_Panels3_ytop = 0.85
+History_Panels3_txt_scale = 1.0
+History_Panels3_title = 'History_Panels3'
+
+! ::
+
+History_Panels3_xaxis_name = 'model_number'
+History_Panels3_xmin = -101d0
+History_Panels3_xmax = -101d0
+History_Panels3_max_width = 100
+History_Panels3_dxmin = -1
+History_Panels3_xaxis_reversed = .false.
+History_Panels3_xaxis_log = .false.
+History_Panels3_xmargin = 0.0
+
+! ::
+
+History_Panels3_num_panels = 0
+
+! ::
+
+History_Panels3_yaxis_name(:) = ''
+History_Panels3_yaxis_reversed(:) = .false.
+History_Panels3_yaxis_log(:) = .false.
+History_Panels3_ymin(:) = -101d0
+History_Panels3_ymax(:) = -101d0
+History_Panels3_ymargin(:) = 0.1
+History_Panels3_dymin(:) = -1
+
+! ::
+
+History_Panels3_other_yaxis_name(:) = ''
+History_Panels3_other_yaxis_reversed(:) = .false.
+History_Panels3_other_yaxis_log(:) = .false.
+History_Panels3_other_ymin(:) = -101d0
+History_Panels3_other_ymax(:) = -101d0
+History_Panels3_other_ymargin(:) = 0.1
+History_Panels3_other_dymin(:) = -1
+
+! ::
+
+History_Panels3_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels3_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels3_file_flag = .false.
+History_Panels3_file_dir = 'png'
+History_Panels3_file_prefix = 'History_Panels3_'
+History_Panels3_file_interval = 5
+History_Panels3_file_width = -1
+History_Panels3_file_aspect_ratio = -1
+
+
+! History_Panels4
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels4_win_flag = .false.
+
+! ::
+
+History_Panels4_win_width = 6
+History_Panels4_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels4_xleft = 0.15
+History_Panels4_xright = 0.85
+History_Panels4_ybot = 0.15
+History_Panels4_ytop = 0.85
+History_Panels4_txt_scale = 1.0
+History_Panels4_title = 'History_Panels4'
+
+! ::
+
+History_Panels4_xaxis_name = 'model_number'
+History_Panels4_xmin = -101d0
+History_Panels4_xmax = -101d0
+History_Panels4_max_width = 100
+History_Panels4_dxmin = -1
+History_Panels4_xaxis_reversed = .false.
+History_Panels4_xaxis_log = .false.
+
+! ::
+
+History_Panels4_num_panels = 0
+
+! ::
+
+History_Panels4_yaxis_name(:) = ''
+History_Panels4_yaxis_reversed(:) = .false.
+History_Panels4_yaxis_log(:) = .false.
+History_Panels4_ymin(:) = -101d0
+History_Panels4_ymax(:) = -101d0
+History_Panels4_ymargin(:) = 0.1
+History_Panels4_dymin(:) = -1
+History_Panels4_xmargin = 0.0
+
+! ::
+
+History_Panels4_other_yaxis_name(:) = ''
+History_Panels4_other_yaxis_reversed(:) = .false.
+History_Panels4_other_yaxis_log(:) = .false.
+History_Panels4_other_ymin(:) = -101d0
+History_Panels4_other_ymax(:) = -101d0
+History_Panels4_other_ymargin(:) = 0.1
+History_Panels4_other_dymin(:) = -1
+
+! ::
+
+History_Panels4_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels4_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels4_file_flag = .false.
+History_Panels4_file_dir = 'png'
+History_Panels4_file_prefix = 'History_Panels4_'
+History_Panels4_file_interval = 5
+History_Panels4_file_width = -1
+History_Panels4_file_aspect_ratio = -1
+
+
+! History_Panels5
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels5_win_flag = .false.
+
+! ::
+
+History_Panels5_win_width = 6
+History_Panels5_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels5_xleft = 0.15
+History_Panels5_xright = 0.85
+History_Panels5_ybot = 0.15
+History_Panels5_ytop = 0.85
+History_Panels5_txt_scale = 1.0
+History_Panels5_title = 'History_Panels5'
+
+! ::
+
+History_Panels5_xaxis_name = 'model_number'
+History_Panels5_xmin = -101d0
+History_Panels5_xmax = -101d0
+History_Panels5_max_width = 100
+History_Panels5_dxmin = -1
+History_Panels5_xaxis_reversed = .false.
+History_Panels5_xaxis_log = .false.
+History_Panels5_xmargin = 0.0
+
+! ::
+
+History_Panels5_num_panels = 0
+
+! ::
+
+History_Panels5_yaxis_name(1) = 'num_zones'
+History_Panels5_yaxis_reversed(1) = .false.
+History_Panels5_ymin(1) = -101d0
+History_Panels5_ymax(1) = -101d0
+History_Panels5_dymin(1) = -1
+
+! ::
+
+History_Panels5_yaxis_name(:) = ''
+History_Panels5_yaxis_reversed(:) = .false.
+History_Panels5_yaxis_log(:) = .false.
+History_Panels5_ymin(:) = -101d0
+History_Panels5_ymax(:) = -101d0
+History_Panels5_ymargin(:) = 0.1
+History_Panels5_dymin(:) = -1
+
+! ::
+
+History_Panels5_other_yaxis_name(:) = ''
+History_Panels5_other_yaxis_reversed(:) = .false.
+History_Panels6_other_yaxis_log(:) = .false.
+History_Panels5_other_ymin(:) = -101d0
+History_Panels5_other_ymax(:) = -101d0
+History_Panels5_other_ymargin(:) = 0.1
+History_Panels5_other_dymin(:) = -1
+
+! ::
+
+History_Panels5_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels5_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels5_file_flag = .false.
+History_Panels5_file_dir = 'png'
+History_Panels5_file_prefix = 'History_Panels5_'
+History_Panels5_file_interval = 5
+History_Panels5_file_width = -1
+History_Panels5_file_aspect_ratio = -1
+
+! History_Panels6
+
+! ::
+
+History_Panels6_win_flag = .false.
+
+! ::
+
+History_Panels6_win_width = 6
+History_Panels6_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels6_xleft = 0.15
+History_Panels6_xright = 0.85
+History_Panels6_ybot = 0.15
+History_Panels6_ytop = 0.85
+History_Panels6_txt_scale = 1.0
+History_Panels6_title = 'History_Panels6'
+
+! ::
+
+History_Panels6_xaxis_name = 'model_number'
+History_Panels6_xmin = -101d0
+History_Panels6_xmax = -101d0
+History_Panels6_max_width = 100
+History_Panels6_dxmin = -1
+History_Panels6_xaxis_reversed = .false.
+History_Panels6_xaxis_log = .false.
+History_Panels6_xmargin = 0.0
+
+! ::
+
+History_Panels6_num_panels = 0
+
+! ::
+
+History_Panels6_yaxis_name(:) = ''
+History_Panels6_yaxis_reversed(:) = .false.
+History_Panels6_yaxis_log(:) = .false.
+History_Panels6_ymin(:) = -101d0
+History_Panels6_ymax(:) = -101d0
+History_Panels6_ymargin(:) = 0.1
+History_Panels6_dymin(:) = -1
+
+! ::
+
+History_Panels6_other_yaxis_name(:) = ''
+History_Panels6_other_yaxis_reversed(:) = .false.
+History_Panels6_other_yaxis_log(:) = .false.
+History_Panels6_other_ymin(:) = -101d0
+History_Panels6_other_ymax(:) = -101d0
+History_Panels6_other_ymargin(:) = 0.1
+History_Panels6_other_dymin(:) = -1
+
+! ::
+
+History_Panels6_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels6_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels6_file_flag = .false.
+History_Panels6_file_dir = 'png'
+History_Panels6_file_prefix = 'History_Panels6_'
+History_Panels6_file_interval = 5
+History_Panels6_file_width = -1
+History_Panels6_file_aspect_ratio = -1
+
+
+! History_Panels7
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels7_win_flag = .false.
+
+! ::
+
+History_Panels7_win_width = 6
+History_Panels7_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels7_xleft = 0.15
+History_Panels7_xright = 0.85
+History_Panels7_ybot = 0.15
+History_Panels7_ytop = 0.85
+History_Panels7_txt_scale = 1.0
+History_Panels7_title = 'History_Panels7'
+
+! ::
+
+History_Panels7_xaxis_name = 'model_number'
+History_Panels7_xmin = -101d0
+History_Panels7_xmax = -101d0
+History_Panels7_max_width = 100
+History_Panels7_dxmin = -1
+History_Panels7_xaxis_reversed = .false.
+History_Panels7_xaxis_log = .false.
+History_Panels7_xmargin = 0.0
+
+! ::
+
+History_Panels7_num_panels = 0
+
+! ::
+
+History_Panels7_yaxis_name(:) = ''
+History_Panels7_yaxis_reversed(:) = .false.
+History_Panels7_yaxis_log(:) = .false.
+History_Panels7_ymin(:) = -101d0
+History_Panels7_ymax(:) = -101d0
+History_Panels7_ymargin(:) = 0.1
+History_Panels7_dymin(:) = -1
+
+! ::
+
+History_Panels7_other_yaxis_name(:) = ''
+History_Panels7_other_yaxis_reversed(:) = .false.
+History_Panels7_other_yaxis_log(:) = .false.
+History_Panels7_other_ymin(:) = -101d0
+History_Panels7_other_ymax(:) = -101d0
+History_Panels7_other_ymargin(:) = 0.1
+History_Panels7_other_dymin(:) = -1
+
+! ::
+
+History_Panels7_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels7_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels7_file_flag = .false.
+History_Panels7_file_dir = 'png'
+History_Panels7_file_prefix = 'History_Panels7_'
+History_Panels7_file_interval = 5
+History_Panels7_file_width = -1
+History_Panels7_file_aspect_ratio = -1
+
+
+! History_Panels8
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels8_win_flag = .false.
+
+! ::
+
+History_Panels8_win_width = 6
+History_Panels8_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels8_xleft = 0.15
+History_Panels8_xright = 0.85
+History_Panels8_ybot = 0.15
+History_Panels8_ytop = 0.85
+History_Panels8_txt_scale = 1.0
+History_Panels8_title = 'History_Panels8'
+
+! ::
+
+History_Panels8_xaxis_name = 'model_number'
+History_Panels8_xmin = -101d0
+History_Panels8_xmax = -101d0
+History_Panels8_max_width = 100
+History_Panels8_dxmin = -1
+History_Panels8_xaxis_reversed = .false.
+History_Panels8_xaxis_log = .false.
+History_Panels8_xmargin = 0.0
+
+! ::
+
+History_Panels8_num_panels = 0
+
+! ::
+
+History_Panels8_yaxis_name(:) = ''
+History_Panels8_yaxis_reversed(:) = .false.
+History_Panels8_yaxis_log(:) = .false.
+History_Panels8_ymin(:) = -101d0
+History_Panels8_ymax(:) = -101d0
+History_Panels8_ymargin(:) = 0.1
+History_Panels8_dymin(:) = -1
+
+! ::
+
+History_Panels8_other_yaxis_name(:) = ''
+History_Panels8_other_yaxis_reversed(:) = .false.
+History_Panels8_other_yaxis_log(:) = .false.
+History_Panels8_other_ymin(:) = -101d0
+History_Panels8_other_ymax(:) = -101d0
+History_Panels8_other_ymargin(:) = 0.1
+History_Panels8_other_dymin(:) = -1
+
+! ::
+
+History_Panels8_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels8_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels8_file_flag = .false.
+History_Panels8_file_dir = 'png'
+History_Panels8_file_prefix = 'History_Panels8_'
+History_Panels8_file_interval = 5
+History_Panels8_file_width = -1
+History_Panels8_file_aspect_ratio = -1
+
+
+! History_Panels9
+! ~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panels9_win_flag = .false.
+
+! ::
+
+History_Panels9_win_width = 6
+History_Panels9_win_aspect_ratio = 0.75
+
+! ::
+
+History_Panels9_xleft = 0.15
+History_Panels9_xright = 0.85
+History_Panels9_ybot = 0.15
+History_Panels9_ytop = 0.85
+History_Panels9_txt_scale = 1.0
+History_Panels9_title = 'History_Panels9'
+
+! ::
+
+History_Panels9_xaxis_name = 'model_number'
+History_Panels9_xmin = -101d0
+History_Panels9_xmax = -101d0
+History_Panels9_max_width = 100
+History_Panels9_dxmin = -1
+History_Panels9_xaxis_reversed = .false.
+History_Panels9_xaxis_log = .false.
+History_Panels9_xmargin = 0.0
+
+! ::
+
+History_Panels9_num_panels = 0
+
+! ::
+
+History_Panels9_yaxis_name(:) = ''
+History_Panels9_yaxis_reversed(:) = .false.
+History_Panels9_yaxis_log(:) = .false.
+History_Panels9_ymin(:) = -101d0
+History_Panels9_ymax(:) = -101d0
+History_Panels9_ymargin(:) = 0.1
+History_Panels9_dymin(:) = -1
+
+! ::
+
+History_Panels9_other_yaxis_name(:) = ''
+History_Panels9_other_yaxis_reversed(:) = .false.
+History_Panels9_other_yaxis_log(:) = .false.
+History_Panels9_other_ymin(:) = -101d0
+History_Panels9_other_ymax(:) = -101d0
+History_Panels9_other_ymargin(:) = 0.1
+History_Panels9_other_dymin(:) = -1
+
+! ::
+
+History_Panels9_points_name(:) = ''
+
+! Enables calling a subroutine to add extra information to a plot
+! see ``$MESA_DIR/binary/other/pgbinary_decorator.f90``
+
+! ::
+
+History_Panels9_use_decorator = .false.
+
+! file output
+
+! ::
+
+History_Panels9_file_flag = .false.
+History_Panels9_file_dir = 'png'
+History_Panels9_file_prefix = 'History_Panels9_'
+History_Panels9_file_interval = 5
+History_Panels9_file_width = -1
+History_Panels9_file_aspect_ratio = -1
+
+
+! History_Panel_points_error_bars
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! History_Panel_points_interval
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! History_Panel_points_marker
+! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+! History_Panel_points_ci
+! ~~~~~~~~~~~~~~~~~~~~~~~
+! History_Panel_points_lw
+! ~~~~~~~~~~~~~~~~~~~~~~~
+! History_Panel_points_ch
+! ~~~~~~~~~~~~~~~~~~~~~~~
+
+! ::
+
+History_Panel_points_error_bars = .true.
+History_Panel_points_interval = 1
+History_Panel_points_marker = 5
+History_Panel_points_ci = 1
+History_Panel_points_lw = 1
+History_Panel_points_ch = 1.0
+
+
+! Text Summary
+! ============
+
+
+! Text_Summary 1
+! ~~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary1_win_flag = .false.
+Text_Summary1_win_width = 10
+Text_Summary1_win_aspect_ratio = 0.15
+
+! ::
+
+Text_Summary1_xleft = 0.02
+Text_Summary1_xright = 0.98
+Text_Summary1_ybot = 0.08
+Text_Summary1_ytop = 0.98
+Text_Summary1_txt_scale = 4.5
+Text_Summary1_title = ''
+
+! setup default
+
+! ::
+
+Text_Summary1_num_rows = 8
+Text_Summary1_num_cols = 4
+Text_Summary1_name(:, :) = ''
+
+! ::
+
+Text_Summary1_name(1, 1) = 'model_number'
+
+! file output
+
+! ::
+
+Text_Summary1_file_flag = .false.
+Text_Summary1_file_dir = 'png'
+Text_Summary1_file_prefix = 'Text_Summary1_'
+Text_Summary1_file_interval = 5
+Text_Summary1_file_width = -1
+Text_Summary1_file_aspect_ratio = -1
+
+
+! Text_Summary2
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary2_win_flag = .false.
+Text_Summary2_win_width = 6
+Text_Summary2_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary2_xleft = 0.02
+Text_Summary2_xright = 0.98
+Text_Summary2_ybot = 0.08
+Text_Summary2_ytop = 0.98
+Text_Summary2_txt_scale = 4.5
+Text_Summary2_title = ''
+
+! ::
+
+Text_Summary2_num_rows = 0
+Text_Summary2_num_cols = 0
+Text_Summary2_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary2_file_flag = .false.
+Text_Summary2_file_dir = 'png'
+Text_Summary2_file_prefix = 'Text_Summary2_'
+Text_Summary2_file_interval = 5
+Text_Summary2_file_width = -1
+Text_Summary2_file_aspect_ratio = -1
+
+
+! Text_Summary3
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary3_win_flag = .false.
+Text_Summary3_win_width = 6
+Text_Summary3_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary3_xleft = 0.02
+Text_Summary3_xright = 0.98
+Text_Summary3_ybot = 0.08
+Text_Summary3_ytop = 0.98
+Text_Summary3_txt_scale = 4.5
+Text_Summary3_title = ''
+
+! ::
+
+Text_Summary3_num_rows = 0
+Text_Summary3_num_cols = 0
+Text_Summary3_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary3_file_flag = .false.
+Text_Summary3_file_dir = 'png'
+Text_Summary3_file_prefix = 'Text_Summary3_'
+Text_Summary3_file_interval = 5
+Text_Summary3_file_width = -1
+Text_Summary3_file_aspect_ratio = -1
+
+
+! Text_Summary4
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary4_win_flag = .false.
+Text_Summary4_win_width = 6
+Text_Summary4_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary4_xleft = 0.02
+Text_Summary4_xright = 0.98
+Text_Summary4_ybot = 0.08
+Text_Summary4_ytop = 0.98
+Text_Summary4_txt_scale = 4.5
+Text_Summary4_title = ''
+
+! ::
+
+Text_Summary4_num_rows = 0
+Text_Summary4_num_cols = 0
+Text_Summary4_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary4_file_flag = .false.
+Text_Summary4_file_dir = 'png'
+Text_Summary4_file_prefix = 'Text_Summary4_'
+Text_Summary4_file_interval = 5
+Text_Summary4_file_width = -1
+Text_Summary4_file_aspect_ratio = -1
+
+
+! Text_Summary5
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary5_win_flag = .false.
+Text_Summary5_win_width = 6
+Text_Summary5_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary5_xleft = 0.02
+Text_Summary5_xright = 0.98
+Text_Summary5_ybot = 0.08
+Text_Summary5_ytop = 0.98
+Text_Summary5_txt_scale = 4.5
+Text_Summary5_title = ''
+
+! ::
+
+Text_Summary5_num_rows = 0
+Text_Summary5_num_cols = 0
+Text_Summary5_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary5_file_flag = .false.
+Text_Summary5_file_dir = 'png'
+Text_Summary5_file_prefix = 'Text_Summary5_'
+Text_Summary5_file_interval = 5
+Text_Summary5_file_width = -1
+Text_Summary5_file_aspect_ratio = -1
+
+
+! Text_Summary6
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary6_win_flag = .false.
+Text_Summary6_win_width = 6
+Text_Summary6_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary6_xleft = 0.02
+Text_Summary6_xright = 0.98
+Text_Summary6_ybot = 0.08
+Text_Summary6_ytop = 0.98
+Text_Summary6_txt_scale = 4.5
+Text_Summary6_title = ''
+
+! ::
+
+Text_Summary6_num_rows = 0
+Text_Summary6_num_cols = 0
+Text_Summary6_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary6_file_flag = .false.
+Text_Summary6_file_dir = 'png'
+Text_Summary6_file_prefix = 'Text_Summary6_'
+Text_Summary6_file_interval = 5
+Text_Summary6_file_width = -1
+Text_Summary6_file_aspect_ratio = -1
+
+
+! Text_Summary7
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary7_win_flag = .false.
+Text_Summary7_win_width = 6
+Text_Summary7_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary7_xleft = 0.02
+Text_Summary7_xright = 0.98
+Text_Summary7_ybot = 0.08
+Text_Summary7_ytop = 0.98
+Text_Summary7_txt_scale = 4.5
+Text_Summary7_title = ''
+
+! ::
+
+Text_Summary7_num_rows = 0
+Text_Summary7_num_cols = 0
+Text_Summary7_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary7_file_flag = .false.
+Text_Summary7_file_dir = 'png'
+Text_Summary7_file_prefix = 'Text_Summary7_'
+Text_Summary7_file_interval = 5
+Text_Summary7_file_width = -1
+Text_Summary7_file_aspect_ratio = -1
+
+
+! Text_Summary8
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary8_win_flag = .false.
+Text_Summary8_win_width = 6
+Text_Summary8_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary8_xleft = 0.02
+Text_Summary8_xright = 0.98
+Text_Summary8_ybot = 0.08
+Text_Summary8_ytop = 0.98
+Text_Summary8_txt_scale = 4.5
+Text_Summary8_title = ''
+
+! ::
+
+Text_Summary8_num_rows = 0
+Text_Summary8_num_cols = 0
+Text_Summary8_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary8_file_flag = .false.
+Text_Summary8_file_dir = 'png'
+Text_Summary8_file_prefix = 'Text_Summary8_'
+Text_Summary8_file_interval = 5
+Text_Summary8_file_width = -1
+Text_Summary8_file_aspect_ratio = -1
+
+
+! Text_Summary9
+! ~~~~~~~~~~~~~
+
+! ::
+
+Text_Summary9_win_flag = .false.
+Text_Summary9_win_width = 6
+Text_Summary9_win_aspect_ratio = 1.5
+
+! ::
+
+Text_Summary9_xleft = 0.02
+Text_Summary9_xright = 0.98
+Text_Summary9_ybot = 0.08
+Text_Summary9_ytop = 0.98
+Text_Summary9_txt_scale = 4.5
+Text_Summary9_title = ''
+
+! ::
+
+Text_Summary9_num_rows = 0
+Text_Summary9_num_cols = 0
+Text_Summary9_name(:, :) = ''
+
+! file output
+
+! ::
+
+Text_Summary9_file_flag = .false.
+Text_Summary9_file_dir = 'png'
+Text_Summary9_file_prefix = 'Text_Summary9_'
+Text_Summary9_file_interval = 5
+Text_Summary9_file_width = -1
+Text_Summary9_file_aspect_ratio = -1
+
+! Grid
+! ====
+
+
+! Grid1
+! ~~~~~
+
+! ::
+
+Grid1_win_flag = .false.
+
+! ::
+
+Grid1_win_width = 6
+Grid1_win_aspect_ratio = 1
+
+! ::
+
+Grid1_xleft = 0.12
+Grid1_xright = 0.95
+Grid1_ybot = 0.08
+Grid1_ytop = 0.92
+Grid1_title = ''
+
+! ::
+
+Grid1_plot_name(:) = ''
+Grid1_plot_row(:) = 1
+Grid1_plot_rowspan(:) = 1
+Grid1_plot_col(:) = 1
+Grid1_plot_colspan(:) = 1
+Grid1_plot_pad_left(:) = 0.0
+Grid1_plot_pad_right(:) = 0.0
+Grid1_plot_pad_top(:) = 0.0
+Grid1_plot_pad_bot(:) = 0.0
+Grid1_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid1_num_cols = 2
+Grid1_num_rows = 8
+Grid1_num_plots = 4
+
+! ::
+
+Grid1_plot_name(4) = 'Text_Summary1'
+Grid1_plot_row(4) = 7
+Grid1_plot_rowspan(4) = 2
+Grid1_plot_col(4) = 1
+Grid1_plot_colspan(4) = 2
+Grid1_plot_pad_left(4) = -0.08
+Grid1_plot_pad_right(4) = 0.0
+Grid1_plot_pad_top(4) = 0.08
+Grid1_plot_pad_bot(4) = -0.05
+Grid1_txt_scale_factor(4) = 0.2
+
+! file output
+
+! ::
+
+Grid1_file_flag = .false.
+Grid1_file_dir = 'png'
+Grid1_file_prefix = 'grid1_'
+Grid1_file_interval = 5
+Grid1_file_width = 9
+Grid1_file_aspect_ratio = -1
+
+
+! Grid2
+! ~~~~~
+
+! ::
+
+Grid2_win_flag = .false.
+
+! ::
+
+Grid2_win_width = 6
+Grid2_win_aspect_ratio = 1
+
+! ::
+
+Grid2_xleft = 0.12
+Grid2_xright = 0.95
+Grid2_ybot = 0.08
+Grid2_ytop = 0.92
+Grid2_title = ''
+
+! ::
+
+Grid2_plot_name(:) = ''
+Grid2_plot_row(:) = 1
+Grid2_plot_rowspan(:) = 1
+Grid2_plot_col(:) = 1
+Grid2_plot_colspan(:) = 1
+Grid2_plot_pad_left(:) = 0.0
+Grid2_plot_pad_right(:) = 0.0
+Grid2_plot_pad_top(:) = 0.0
+Grid2_plot_pad_bot(:) = 0.0
+Grid2_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid2_win_width = 9
+Grid2_win_aspect_ratio = 0.6
+
+! ::
+
+Grid2_num_cols = 4
+Grid2_num_rows = 8
+Grid2_num_plots = 5
+
+! ::
+
+Grid2_plot_name(4) = 'Text_Summary1'
+Grid2_plot_row(4) = 7
+Grid2_plot_rowspan(4) = 2
+Grid2_plot_col(4) = 1
+Grid2_plot_colspan(4) = 4
+Grid2_plot_pad_left(4) = -0.08
+Grid2_plot_pad_right(4) = 0.0
+Grid2_plot_pad_top(4) = 0.08
+Grid2_plot_pad_bot(4) = -0.04
+Grid2_txt_scale_factor(4) = 0.19
+
+! file output
+
+! ::
+
+Grid2_file_flag = .false.
+Grid2_file_dir = 'png'
+Grid2_file_prefix = 'grid2_'
+Grid2_file_interval = 5
+Grid2_file_width = 9
+Grid2_file_aspect_ratio = -1
+
+
+! Grid3
+! ~~~~~
+
+! ::
+
+Grid3_win_flag = .false.
+
+! ::
+
+Grid3_win_width = 6
+Grid3_win_aspect_ratio = 1.2
+
+! ::
+
+Grid3_xleft = 0.10
+Grid3_xright = 0.89
+Grid3_ybot = 0.08
+Grid3_ytop = 0.92
+Grid3_title = ''
+
+! ::
+
+Grid3_num_cols = 1
+Grid3_num_rows = 1
+Grid3_num_plots = 1
+
+! ::
+
+Grid3_plot_name(:) = ''
+Grid3_plot_row(:) = 1
+Grid3_plot_rowspan(:) = 1
+Grid3_plot_col(:) = 1
+Grid3_plot_colspan(:) = 1
+Grid3_plot_pad_left(:) = 0.0
+Grid3_plot_pad_right(:) = 0.0
+Grid3_plot_pad_top(:) = 0.0
+Grid3_plot_pad_bot(:) = 0.0
+Grid3_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid3_num_cols = 1
+Grid3_num_rows = 7
+Grid3_num_plots = 3
+
+! file output
+
+! ::
+
+Grid3_file_flag = .false.
+Grid3_file_dir = 'png'
+Grid3_file_prefix = 'grid3_'
+Grid3_file_interval = 5
+Grid3_file_width = -1
+Grid3_file_aspect_ratio = -1
+
+
+! Grid4
+! ~~~~~
+
+! ::
+
+Grid4_win_flag = .false.
+
+! ::
+
+Grid4_win_width = 7
+Grid4_win_aspect_ratio = 1
+
+! ::
+
+Grid4_xleft = 0.12
+Grid4_xright = 0.95
+Grid4_ybot = 0.08
+Grid4_ytop = 0.92
+Grid4_title = ''
+
+! ::
+
+Grid4_plot_name(:) = ''
+Grid4_plot_row(:) = 1
+Grid4_plot_rowspan(:) = 1
+Grid4_plot_col(:) = 1
+Grid4_plot_colspan(:) = 1
+Grid4_plot_pad_left(:) = 0.0
+Grid4_plot_pad_right(:) = 0.0
+Grid4_plot_pad_top(:) = 0.0
+Grid4_plot_pad_bot(:) = 0.0
+Grid4_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid4_num_cols = 10
+Grid4_num_rows = 9
+Grid4_num_plots = 6
+
+! ::
+
+Grid4_plot_name(6) = 'Text_Summary1'
+Grid4_plot_row(6) = 8
+Grid4_plot_rowspan(6) = 2
+Grid4_plot_col(6) = 1
+Grid4_plot_colspan(6) = 10
+Grid4_plot_pad_left(6) = -0.08
+Grid4_plot_pad_right(6) = 0.0
+Grid4_plot_pad_top(6) = 0.03
+Grid4_plot_pad_bot(6) = 0.0
+Grid4_txt_scale_factor(6) = 0.17
+
+! file output
+
+! ::
+
+Grid4_file_flag = .false.
+Grid4_file_dir = 'png'
+Grid4_file_prefix = 'grid4_'
+Grid4_file_interval = 5
+Grid4_file_width = -1
+Grid4_file_aspect_ratio = -1
+
+
+! Grid5
+! ~~~~~
+
+! ::
+
+Grid5_win_flag = .false.
+
+! ::
+
+Grid5_win_width = 7
+Grid5_win_aspect_ratio = 1
+
+! ::
+
+Grid5_xleft = 0.12
+Grid5_xright = 0.95
+Grid5_ybot = 0.08
+Grid5_ytop = 0.92
+Grid5_title = ''
+
+! ::
+
+Grid5_plot_name(:) = ''
+Grid5_plot_row(:) = 1
+Grid5_plot_rowspan(:) = 1
+Grid5_plot_col(:) = 1
+Grid5_plot_colspan(:) = 1
+Grid5_plot_pad_left(:) = 0.0
+Grid5_plot_pad_right(:) = 0.0
+Grid5_plot_pad_top(:) = 0.0
+Grid5_plot_pad_bot(:) = 0.0
+Grid5_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid5_num_cols = 10
+Grid5_num_rows = 7
+Grid5_num_plots = 5
+
+! file output
+
+! ::
+
+Grid5_file_flag = .false.
+Grid5_file_dir = 'png'
+Grid5_file_prefix = 'grid5_'
+Grid5_file_interval = 5
+Grid5_file_width = -1
+Grid5_file_aspect_ratio = -1
+
+
+! Grid6
+! ~~~~~
+
+! ::
+
+Grid6_win_flag = .false.
+
+! ::
+
+Grid6_win_width = 9
+Grid6_win_aspect_ratio = 0.7
+
+! ::
+
+Grid6_xleft = 0.12
+Grid6_xright = 0.95
+Grid6_ybot = 0.08
+Grid6_ytop = 0.89
+Grid6_title = ''
+
+! ::
+
+Grid6_num_cols = 1
+Grid6_num_rows = 1
+Grid6_num_plots = 1
+
+! ::
+
+Grid6_plot_name(:) = ''
+Grid6_plot_row(:) = 1
+Grid6_plot_rowspan(:) = 1
+Grid6_plot_col(:) = 1
+Grid6_plot_colspan(:) = 1
+Grid6_plot_pad_left(:) = 0.0
+Grid6_plot_pad_right(:) = 0.03
+Grid6_plot_pad_top(:) = 0.0
+Grid6_plot_pad_bot(:) = 0.09
+Grid6_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid6_num_cols = 3
+Grid6_num_rows = 3
+Grid6_num_plots = 5
+
+! ::
+
+Grid6_plot_name(5) = 'Text_Summary1'
+Grid6_plot_row(5) = 3
+Grid6_plot_rowspan(5) = 1
+Grid6_plot_col(5) = 1
+Grid6_plot_colspan(5) = 3
+Grid6_plot_pad_left(5) = -0.07
+Grid6_plot_pad_right(5) = -0.02
+Grid6_plot_pad_top(5) = 0.1
+Grid6_plot_pad_bot(5) = 0.00
+Grid6_txt_scale_factor(5) = 0.21
+
+! file output
+
+! ::
+
+Grid6_file_flag = .false.
+Grid6_file_dir = 'png'
+Grid6_file_prefix = 'grid6_'
+Grid6_file_interval = 5
+Grid6_file_width = -1
+Grid6_file_aspect_ratio = -1
+
+
+! Grid7
+! ~~~~~
+
+! ::
+
+Grid7_win_flag = .false.
+
+! ::
+
+Grid7_win_width = 6
+Grid7_win_aspect_ratio = 1.5
+
+! ::
+
+Grid7_xleft = 0.12
+Grid7_xright = 0.95
+Grid7_ybot = 0.08
+Grid7_ytop = 0.91
+Grid7_title = ''
+
+! ::
+
+Grid7_num_cols = 1
+Grid7_num_rows = 1
+Grid7_num_plots = 1
+
+! ::
+
+Grid7_plot_name(:) = ''
+Grid7_plot_row(:) = 1
+Grid7_plot_rowspan(:) = 1
+Grid7_plot_col(:) = 1
+Grid7_plot_colspan(:) = 1
+Grid7_plot_pad_left(:) = 0.0
+Grid7_plot_pad_right(:) = 0.0
+Grid7_plot_pad_top(:) = 0.0
+Grid7_plot_pad_bot(:) = 0.0
+Grid7_txt_scale_factor(:) = 0.9
+
+! set default
+
+! ::
+
+Grid7_num_cols = 1
+Grid7_num_rows = 3
+Grid7_num_plots = 3
+
+! ::
+
+Grid7_plot_name(3) = 'Text_Summary1'
+Grid7_plot_row(3) = 3
+Grid7_plot_rowspan(3) = 1
+Grid7_plot_col(3) = 1
+Grid7_plot_colspan(3) = 1
+Grid7_plot_pad_left(3) = -0.08
+Grid7_plot_pad_right(3) = 0.0
+Grid7_plot_pad_top(3) = 0.1
+Grid7_plot_pad_bot(3) = 0.0
+Grid7_txt_scale_factor(3) = 0.16
+
+! file output
+
+! ::
+
+Grid7_file_flag = .false.
+Grid7_file_dir = 'png'
+Grid7_file_prefix = 'grid7_'
+Grid7_file_interval = 5
+Grid7_file_width = -1
+Grid7_file_aspect_ratio = -1
+
+
+! Grid8
+! ~~~~~
+
+! ::
+
+Grid8_win_flag = .false.
+
+! ::
+
+Grid8_win_width = 7
+Grid8_win_aspect_ratio = 1.2
+
+! ::
+
+Grid8_xleft = 0.12
+Grid8_xright = 0.95
+Grid8_ybot = 0.08
+Grid8_ytop = 0.91
+Grid8_title = ''
+
+! ::
+
+Grid8_num_cols = 1
+Grid8_num_rows = 1
+Grid8_num_plots = 1
+
+! ::
+
+Grid8_plot_name(:) = ''
+Grid8_plot_row(:) = 1
+Grid8_plot_rowspan(:) = 1
+Grid8_plot_col(:) = 1
+Grid8_plot_colspan(:) = 1
+Grid8_plot_pad_left(:) = 0.0
+Grid8_plot_pad_right(:) = 0.03
+Grid8_plot_pad_top(:) = 0.0
+Grid8_plot_pad_bot(:) = 0.09
+Grid8_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid8_num_cols = 3
+Grid8_num_rows = 14
+Grid8_num_plots = 6
+
+! ::
+
+Grid8_plot_name(6) = 'Text_Summary1'
+Grid8_plot_row(6) = 12
+Grid8_plot_rowspan(6) = 3
+Grid8_plot_col(6) = 1
+Grid8_plot_colspan(6) = 3
+Grid8_plot_pad_left(6) = -0.08
+Grid8_plot_pad_right(6) = 0.0
+Grid8_plot_pad_top(6) = 0.06
+Grid8_plot_pad_bot(6) = 0.0
+Grid8_txt_scale_factor(6) = 0.16
+
+! file output
+
+! ::
+
+Grid8_file_flag = .false.
+Grid8_file_dir = 'png'
+Grid8_file_prefix = 'grid8_'
+Grid8_file_interval = 5
+Grid8_file_width = -1
+Grid8_file_aspect_ratio = -1
+
+
+! Grid9
+! ~~~~~
+
+! ::
+
+Grid9_win_flag = .false.
+
+! ::
+
+Grid9_win_width = 7
+Grid9_win_aspect_ratio = 0.8
+
+! ::
+
+Grid9_xleft = 0.15
+Grid9_xright = 0.85
+Grid9_ybot = 0.12
+Grid9_ytop = 0.91
+Grid9_title = ''
+
+! ::
+
+Grid9_num_cols = 1
+Grid9_num_rows = 1
+Grid9_num_plots = 1
+
+! ::
+
+Grid9_plot_name(:) = ''
+Grid9_plot_row(:) = 1
+Grid9_plot_rowspan(:) = 1
+Grid9_plot_col(:) = 1
+Grid9_plot_colspan(:) = 1
+Grid9_plot_pad_left(:) = 0.0
+Grid9_plot_pad_right(:) = 0.0
+Grid9_plot_pad_top(:) = 0.0
+Grid9_plot_pad_bot(:) = 0.0
+Grid9_txt_scale_factor(:) = 0.7
+
+! set default
+
+! ::
+
+Grid9_num_cols = 3
+Grid9_num_rows = 11
+Grid9_num_plots = 5
+
+! ::
+
+Grid9_plot_name(5) = 'Text_Summary1'
+Grid9_plot_row(5) = 9
+Grid9_plot_rowspan(5) = 3
+Grid9_plot_col(5) = 1
+Grid9_plot_colspan(5) = 3
+Grid9_plot_pad_left(5) = -0.08
+Grid9_plot_pad_right(5) = 0.0
+Grid9_plot_pad_top(5) = 0.08
+Grid9_plot_pad_bot(5) = 0.0
+Grid9_txt_scale_factor(5) = 0.14
+
+! file output
+
+! ::
+
+Grid9_file_flag = .false.
+Grid9_file_dir = 'png'
+Grid9_file_prefix = 'grid9_'
+Grid9_file_interval = 5
+Grid9_file_width = -1
+Grid9_file_aspect_ratio = -1
+
+Star1_win_flag = .false.
+Star1_file_flag = .false.
+Star1_file_interval = 5
+Star1_file_dir = 'png'
+Star1_file_prefix = 'star1_'
+Star1_win_width = 7
+Star1_win_aspect_ratio = 0.8
+Star1_xleft = 0.10
+Star1_xright = 0.90
+Star1_ybot = 0.10
+Star1_ytop = 0.90
+Star1_file_width = -1
+Star1_file_aspect_ratio = -1
+Star1_txt_scale_factor = 0.7
+Star1_title = 'Star 1'
+Star1_plot_name = ''
+
+do_star1_box = .false.
+star1_box_pad_left = -0.01
+star1_box_pad_right = 0.01
+star1_box_pad_bot = -0.01
+star1_box_pad_top = 0.01
+
+Star2_win_flag = .false.
+Star2_file_flag = .false.
+Star2_file_interval = 5
+Star2_file_dir = 'png'
+Star2_file_prefix = 'star2_'
+Star2_win_width = 7
+Star2_win_aspect_ratio = 0.8
+Star2_xleft = 0.10
+Star2_xright = 0.90
+Star2_ybot = 0.10
+Star2_ytop = 0.90
+Star2_file_width = -1
+Star2_file_aspect_ratio = -1
+Star2_txt_scale_factor = 0.7
+Star2_title = 'Star 2'
+Star2_plot_name = ''
+
+do_star2_box = .false.
+star2_box_pad_left = -0.01
+star2_box_pad_right = 0.01
+star2_box_pad_bot = -0.01
+star2_box_pad_top = 0.01
+
+show_mtrans_status = .true.
+
+Orbit_win_flag = .false.
+Orbit_file_flag = .false.
+Orbit_file_interval = 1
+Orbit_file_dir = 'png'
+Orbit_file_prefix = 'orbit_'
+Orbit_title = 'Orbit'
+Orbit_win_width = 7
+Orbit_win_aspect_ratio = 0.9
+Orbit_xleft = 0.1
+Orbit_xright = 0.9
+Orbit_ybot = 0.1
+Orbit_ytop = 0.9
+Orbit_file_width = -1
+Orbit_file_aspect_ratio = -1
+Orbit_txt_scale = 1.0
+Orbit_show_RL = .true.
+
+! "annotation" strings -- provide args for PGMTXT
+
+! ::
+
+!          Write text at a position specified relative to the viewport (outside
+!          or inside).  The text is written using the current values of
+!          attributes color-index, line-width, character-height, and
+!          character-font.
+
+! ::
+
+!           SIDE            : must include one of the characters 'B', 'L', 'T',
+!                             or 'R' signifying the Bottom, Left, Top, or Right
+!                             margin of the viewport. If it includes 'LV' or
+!                             'RV', the string is written perpendicular to the
+!                             frame rather than parallel to it.
+!           DISP            : the displacement of the character string from the
+!                             specified edge of the viewport, measured outwards
+!                             from the viewport in units of the character
+!                             height. Use a negative value to write inside the
+!                             viewport, a positive value to write outside.
+!           COORD           : the location of the character string along the
+!                             specified edge of the viewport, as a fraction of
+!                             the length of the edge.
+!           FJUST           : controls justification of the string parallel to
+!                             the specified edge of the viewport. If
+!                             FJUST = 0.0, the left-hand end of the string will
+!                             be placed at COORD; if JUST = 0.5, the center of
+!                             the string will be placed at COORD; if JUST = 1.0,
+!                             the right-hand end of the string will be placed at
+!                             at COORD. Other values between 0 and 1 give inter-
+!                             mediate placing, but they are not very useful.
+!           TEXT           :  the text string to be plotted. Trailing spaces are
+!                             ignored when justifying the string, but leading
+!                             spaces are significant.
+
+! ::
+
+annotation1_ci = 1
+annotation1_ch = 1
+annotation1_lw = 1
+annotation1_cf = 1
+annotation1_side = 'T'
+annotation1_disp = 0
+annotation1_coord = 0
+annotation1_fjust = 0.0
+annotation1_text = ''
+
+! ::
+
+annotation2_ci = 1
+annotation2_ch = 1
+annotation2_lw = 1
+annotation2_cf = 1
+annotation2_side = 'T'
+annotation2_disp = 0
+annotation2_coord = 0
+annotation2_fjust = 0.0
+annotation2_text = ''
+
+! ::
+
+annotation3_ci = 1
+annotation3_ch = 1
+annotation3_lw = 1
+annotation3_cf = 1
+annotation3_side = 'T'
+annotation3_disp = 0
+annotation3_coord = 0
+annotation3_fjust = 0.0
+annotation3_text = ''
+
+! pgbinary_extras
+! =============
+
+! the PGbinary extras work the same as for the binary controls
+
+! ::
+
+read_extra_pgbinary_inlist1 = .false.
+extra_pgbinary_inlist1_name = 'undefined'
+
+! if ``read_extra_pgbinary_inlist1`` is true, then read &pgbinary from this namelist file
+
+! ::
+
+read_extra_pgbinary_inlist2 = .false.
+extra_pgbinary_inlist2_name = 'undefined'
+
+! if ``read_extra_pgbinary_inlist2`` is true, then read &pgbinary from this namelist file
+
+! ::
+
+read_extra_pgbinary_inlist3 = .false.
+extra_pgbinary_inlist3_name = 'undefined'
+
+! if ``read_extra_pgbinary_inlist3`` is true, then read &pgbinary from this namelist file
+
+! ::
+
+read_extra_pgbinary_inlist4 = .false.
+extra_pgbinary_inlist4_name = 'undefined'
+
+! if ``read_extra_pgbinary_inlist4`` is true, then read &pgbinary from this namelist file
+
+! ::
+
+read_extra_pgbinary_inlist5 = .false.
+extra_pgbinary_inlist5_name = 'undefined'
+
+! if ``read_extra_pgbinary_inlist5`` is true, then read &pgbinary from this namelist file

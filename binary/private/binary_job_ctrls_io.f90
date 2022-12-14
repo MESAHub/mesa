@@ -72,7 +72,8 @@
          change_initial_period_eccentricity, &
          new_separation, &
          new_period, &
-         new_eccentricity
+         new_eccentricity, &
+         pgbinary_flag
 
       contains
 
@@ -232,6 +233,7 @@
          b% job% new_separation = new_separation
          b% job% new_period = new_period
          b% job% new_eccentricity = new_eccentricity
+         b% job% pgbinary_flag = pgbinary_flag
 
       end subroutine store_binary_job_controls
 
@@ -284,6 +286,7 @@
          new_separation = b% job% new_separation
          new_period = b% job% new_period
          new_eccentricity = b% job% new_eccentricity
+         pgbinary_flag = b% job% pgbinary_flag
 
       end subroutine set_binary_job_controls_for_writing
 
