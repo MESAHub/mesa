@@ -47,7 +47,7 @@
          type (star_info), pointer :: s
          real(dp) :: function_to_solve, explicit_mdot, q, slope_contact
          integer :: ierr
-         logical :: use_sum
+         logical :: use_sum, detached
          character (len=90) :: rlo_result
          
          include 'formats'
