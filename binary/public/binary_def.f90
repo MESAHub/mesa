@@ -65,11 +65,11 @@
             real(dp), intent(out) :: new_mdot
          end function other_check_implicit_rlo_interface
 
-         subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, detachment, ierr)
+         subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, detached, ierr)
             use const_def, only: dp
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: function_to_solve
-            logical, intent(out) :: use_sum, detachment
+            logical, intent(out) :: use_sum, detached
             integer, intent(out) :: ierr
          end subroutine other_implicit_function_to_solve_interface
 
@@ -186,14 +186,14 @@
             integer, intent(in) :: binary_id, iounit
             integer, intent(out) :: ierr
          end subroutine other_binary_photo_read_interface
-
+               
          subroutine other_e2_interface(id, e2, ierr)
             use const_def, only: dp
             integer, intent(in) :: id
             real(dp),intent (out) :: e2
             integer, intent(out) :: ierr
          end subroutine other_e2_interface
-               
+         
       end interface
 
       type binary_job_controls
