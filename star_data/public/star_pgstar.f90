@@ -27,7 +27,7 @@
 module star_pgstar
 
    use const_def
-   use chem_def
+   use chem_def, only : iso_name_length
 
    implicit none
 
@@ -291,8 +291,6 @@ module star_pgstar
             trho_pgstar_decorator => null(), &
             tmaxrho_pgstar_decorator => null(), &
             trho_profile_pgstar_decorator => null()
-
-
 
    end type pgstar_controls
 
