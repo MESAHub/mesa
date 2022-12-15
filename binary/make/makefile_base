@@ -114,6 +114,7 @@ clean:
 install:
 	@$(CP_IF_NEWER) binary_lib.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) binary_def.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) binary_pgbinary.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 	@$(CP_IF_NEWER) ../job/*.inc $(MESA_DIR)/include
 
