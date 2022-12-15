@@ -92,7 +92,7 @@ contains
       type (pgbinary_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
       integer, intent(out) :: ierr
-      
+      ierr = 0
    end subroutine do_write_plot_to_file
 
 
@@ -137,7 +137,7 @@ contains
    subroutine set_win_file_data(b, ierr)
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
-
+      ierr = 0
       
    end subroutine set_win_file_data
 
