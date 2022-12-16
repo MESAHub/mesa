@@ -59,6 +59,7 @@
          end if
          s => b% s_donor
          use_sum = .false.
+         detached = .false.
          
          ! NOTE: keep in mind that for mass loss, mdot is negative.
          ! b% mtransfer_rate will be considered valid if function_to_solve = 0
