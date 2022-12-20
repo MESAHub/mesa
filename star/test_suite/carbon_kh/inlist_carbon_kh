@@ -74,11 +74,11 @@
   trace_history_value_name(2) = 'log_rel_run_E_err'
 
   ! for convergence studies
-      read_extra_controls_inlist2 = .false.
-      extra_controls_inlist2_name = 'inlist_resolution'
+      read_extra_controls_inlist(2) = .false.
+      extra_controls_inlist_name(2)= 'inlist_resolution'
 
-      read_extra_controls_inlist3 = .false.
-      extra_controls_inlist3_name = 'inlist_equations'
+      read_extra_controls_inlist(3) = .false.
+      extra_controls_inlist_name(3)= 'inlist_equations'
 
 / ! end of controls namelist
 

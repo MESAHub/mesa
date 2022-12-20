@@ -36,18 +36,18 @@
 
       x_integer_ctrl(1) = 0 ! part number
 
-      read_extra_controls_inlist1 = .true.
-      extra_controls_inlist1_name = 'inlist_common'
+      read_extra_controls_inlist(1) = .true.
+      extra_controls_inlist_name(1)= 'inlist_common'
 
-      read_extra_controls_inlist2 = .true.
-      extra_controls_inlist2_name = 'inlist_pre_ms'
+      read_extra_controls_inlist(2) = .true.
+      extra_controls_inlist_name(2)= 'inlist_pre_ms'
 
 / ! end of controls namelist
 
 
 &pgstar
 
-      read_extra_pgstar_inlist1 = .true.
-      extra_pgstar_inlist1_name = 'inlist_pgstar'
+      read_extra_pgstar_inlist(1) = .true.
+      extra_pgstar_inlist_name(1)= 'inlist_pgstar'
 
 / ! end of pgstar namelist

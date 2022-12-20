@@ -11731,71 +11731,17 @@
       ! BTW: it works recursively, so the extras can read extras too.
 
 
-      ! read_extra_controls_inlist1
+      ! read_extra_controls_inlist(1..5)
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! extra_controls_inlist1_name
+      ! extra_controls_inlist_name(1..5)
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If ``read_extra_controls_inlist1`` is true, then read &controls from this namelist file.
+      ! If ``read_extra_controls_inlist(1)`` is true, then read &controls from this namelist file.
 
       ! ::
 
-    read_extra_controls_inlist1 = .false.
-    extra_controls_inlist1_name = 'undefined'
-
-
-      ! read_extra_controls_inlist2
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! extra_controls_inlist2_name
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``read_extra_controls_inlist2`` is true, then read &controls from this namelist file.
-
-      ! ::
-
-    read_extra_controls_inlist2 = .false.
-    extra_controls_inlist2_name = 'undefined'
-
-      ! read_extra_controls_inlist3
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! extra_controls_inlist3_name
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``read_extra_controls_inlist3`` is true, then read &controls from this namelist file.
-
-      ! ::
-
-    read_extra_controls_inlist3 = .false.
-    extra_controls_inlist3_name = 'undefined'
-
-
-      ! read_extra_controls_inlist4
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! extra_controls_inlist4_name
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``read_extra_controls_inlist4`` is true, then read &controls from this namelist file.
-
-      ! ::
-
-    read_extra_controls_inlist4 = .false.
-    extra_controls_inlist4_name = 'undefined'
-
-
-      ! read_extra_controls_inlist5
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! extra_controls_inlist5_name
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``read_extra_controls_inlist5`` is true, then read &controls from this namelist file.
-
-      ! ::
-
-    read_extra_controls_inlist5 = .false.
-    extra_controls_inlist5_name = 'undefined'
-
-
-
+    read_extra_controls_inlist(:) = .false.
+    extra_controls_inlist_name(:) = 'undefined'
 
       ! save_controls_namelist
       ! ~~~~~~~~~~~~~~~~~~~~~~
