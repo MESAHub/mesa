@@ -952,20 +952,8 @@ character (len = 356) :: annotation3_text
 character :: annotation3_side
 real :: annotation3_disp, annotation3_coord, annotation3_fjust
 
-logical :: read_extra_pgbinary_inlist1
-character (len = strlen) :: extra_pgbinary_inlist1_name
-
-logical :: read_extra_pgbinary_inlist2
-character (len = strlen) :: extra_pgbinary_inlist2_name
-
-logical :: read_extra_pgbinary_inlist3
-character (len = strlen) :: extra_pgbinary_inlist3_name
-
-logical :: read_extra_pgbinary_inlist4
-character (len = strlen) :: extra_pgbinary_inlist4_name
-
-logical :: read_extra_pgbinary_inlist5
-character (len = strlen) :: extra_pgbinary_inlist5_name
+logical, dimension(max_extra_inlists) :: read_extra_pgbinary_inlist
+character (len=strlen), dimension(max_extra_inlists) :: extra_pgbinary_inlist_name
 
 logical :: History_Panels1_use_decorator, &
       History_Panels2_use_decorator, &
