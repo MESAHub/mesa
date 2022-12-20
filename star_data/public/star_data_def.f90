@@ -41,12 +41,7 @@
       implicit none      
       
       include "star_data_def.inc"
-      
-      integer, parameter :: max_extras_params = 20, max_extras_cpar_len = strlen
-      integer, parameter :: max_num_special_rate_factors = 20
-
-      integer, parameter :: star_num_xtra_vals = 30
-
+      include "star_job_controls_params.inc"
       type star_job_controls
          include "star_job_controls.inc"
          include "star_job_controls_dev.inc"
