@@ -6,14 +6,14 @@
 
 
 &eos
-      read_extra_eos_inlist1 = .true.
-      extra_eos_inlist1_name = 'inlist_to_end_core_he_burn'
+      read_extra_eos_inlist(1) = .true.
+      extra_eos_inlist_name(1) = 'inlist_to_end_core_he_burn'
 / ! end of eos namelist
 
 
 &kap
-      read_extra_kap_inlist1 = .true.
-      extra_kap_inlist1_name = 'inlist_to_end_core_he_burn'
+      read_extra_kap_inlist(1) = .true.
+      extra_kap_inlist_name(1) = 'inlist_to_end_core_he_burn'
 / ! end of kap namelist
 
 

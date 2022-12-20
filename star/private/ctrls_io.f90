@@ -35,6 +35,8 @@
 
  logical, dimension(max_extra_inlists) :: read_extra_controls_inlist
  character (len=strlen), dimension(max_extra_inlists) :: extra_controls_inlist_name
+ logical :: save_controls_namelist
+ character (len=strlen) :: controls_namelist_name
 
  namelist /controls/ &
  
