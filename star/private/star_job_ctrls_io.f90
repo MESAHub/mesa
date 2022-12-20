@@ -495,16 +495,8 @@
          jina_reaclib_min_T9, &
          rate_tables_dir, &
          rate_cache_suffix, &
-         read_extra_star_job_inlist1, &
-         extra_star_job_inlist1_name, &
-         read_extra_star_job_inlist2, &
-         extra_star_job_inlist2_name, &
-         read_extra_star_job_inlist3, &
-         extra_star_job_inlist3_name, &
-         read_extra_star_job_inlist4, &
-         extra_star_job_inlist4_name, &
-         read_extra_star_job_inlist5, &
-         extra_star_job_inlist5_name, &
+         read_extra_star_job_inlist, &
+         extra_star_job_inlist_name, &
          set_abundance_nzlo, &
          set_abundance_nzhi, &
          set_abundance, &
@@ -569,9 +561,10 @@
          type (star_info), pointer :: s
          integer, intent(in) :: level
          integer, intent(out) :: ierr
-         logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-         character (len=strlen) :: message, extra1, extra2, extra3, extra4, extra5
-         integer :: unit
+         logical, dimension(max_extra_inlists) :: read_extra
+         character (len=strlen) :: message
+         character (len=strlen), dimension(max_extra_inlists) :: extra
+         integer :: unit, i
 
          ierr = 0
 
@@ -609,56 +602,18 @@
          call store_star_job_controls(s, ierr)
 
          ! recursive calls to read other inlists
+         do i=1, max_extra_inlists
+            read_extra(i) = read_extra_star_job_inlist(i)
+            read_extra_star_job_inlist(i) = .false.
+            extra(i) = extra_star_job_inlist_name(i)
+            extra_star_job_inlist_name(i) = 'undefined'
+            
+            if (read_extra(i)) then
+               call read_star_job_file(s, extra(i), level+1, ierr)
+               if (ierr /= 0) return
+            end if
+         end do
 
-         read_extra1 = read_extra_star_job_inlist1
-         read_extra_star_job_inlist1 = .false.
-         extra1 = extra_star_job_inlist1_name
-         extra_star_job_inlist1_name = 'undefined'
-
-         read_extra2 = read_extra_star_job_inlist2
-         read_extra_star_job_inlist2 = .false.
-         extra2 = extra_star_job_inlist2_name
-         extra_star_job_inlist2_name = 'undefined'
-
-         read_extra3 = read_extra_star_job_inlist3
-         read_extra_star_job_inlist3 = .false.
-         extra3 = extra_star_job_inlist3_name
-         extra_star_job_inlist3_name = 'undefined'
-
-         read_extra4 = read_extra_star_job_inlist4
-         read_extra_star_job_inlist4 = .false.
-         extra4 = extra_star_job_inlist4_name
-         extra_star_job_inlist4_name = 'undefined'
-
-         read_extra5 = read_extra_star_job_inlist5
-         read_extra_star_job_inlist5 = .false.
-         extra5 = extra_star_job_inlist5_name
-         extra_star_job_inlist5_name = 'undefined'
-
-         if (read_extra1) then
-            call read_star_job_file(s, extra1, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-
-         if (read_extra2) then
-            call read_star_job_file(s, extra2, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-
-         if (read_extra3) then
-            call read_star_job_file(s, extra3, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-
-         if (read_extra4) then
-            call read_star_job_file(s, extra4, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-
-         if (read_extra5) then
-            call read_star_job_file(s, extra5, level+1, ierr)
-            if (ierr /= 0) return
-         end if
 
       end subroutine read_star_job_file
 
@@ -1125,16 +1080,8 @@
          s% job% jina_reaclib_min_T9 = jina_reaclib_min_T9
          s% job% rate_tables_dir = rate_tables_dir
          s% job% rate_cache_suffix = rate_cache_suffix
-         s% job% read_extra_star_job_inlist1 = read_extra_star_job_inlist1
-         s% job% extra_star_job_inlist1_name = extra_star_job_inlist1_name
-         s% job% read_extra_star_job_inlist2 = read_extra_star_job_inlist2
-         s% job% extra_star_job_inlist2_name = extra_star_job_inlist2_name
-         s% job% read_extra_star_job_inlist3 = read_extra_star_job_inlist3
-         s% job% extra_star_job_inlist3_name = extra_star_job_inlist3_name
-         s% job% read_extra_star_job_inlist4 = read_extra_star_job_inlist4
-         s% job% extra_star_job_inlist4_name = extra_star_job_inlist4_name
-         s% job% read_extra_star_job_inlist5 = read_extra_star_job_inlist5
-         s% job% extra_star_job_inlist5_name = extra_star_job_inlist5_name
+         s% job% read_extra_star_job_inlist = read_extra_star_job_inlist
+         s% job% extra_star_job_inlist_name = extra_star_job_inlist_name
          s% job% set_abundance_nzlo = set_abundance_nzlo
          s% job% set_abundance_nzhi = set_abundance_nzhi
          s% job% set_abundance = set_abundance
@@ -1681,16 +1628,8 @@
          jina_reaclib_min_T9 = s% job% jina_reaclib_min_T9
          rate_tables_dir = s% job% rate_tables_dir
          rate_cache_suffix = s% job% rate_cache_suffix
-         read_extra_star_job_inlist1 = s% job% read_extra_star_job_inlist1
-         extra_star_job_inlist1_name = s% job% extra_star_job_inlist1_name
-         read_extra_star_job_inlist2 = s% job% read_extra_star_job_inlist2
-         extra_star_job_inlist2_name = s% job% extra_star_job_inlist2_name
-         read_extra_star_job_inlist3 = s% job% read_extra_star_job_inlist3
-         extra_star_job_inlist3_name = s% job% extra_star_job_inlist3_name
-         read_extra_star_job_inlist4 = s% job% read_extra_star_job_inlist4
-         extra_star_job_inlist4_name = s% job% extra_star_job_inlist4_name
-         read_extra_star_job_inlist5 = s% job% read_extra_star_job_inlist5
-         extra_star_job_inlist5_name = s% job% extra_star_job_inlist5_name
+         read_extra_star_job_inlist = s% job% read_extra_star_job_inlist
+         extra_star_job_inlist_name = s% job% extra_star_job_inlist_name
          set_abundance_nzlo = s% job% set_abundance_nzlo
          set_abundance_nzhi = s% job% set_abundance_nzhi
          set_abundance = s% job% set_abundance

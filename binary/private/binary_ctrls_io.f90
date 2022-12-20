@@ -32,20 +32,8 @@
       
       include "binary_controls.inc"      
       
-      logical :: read_extra_binary_controls_inlist1
-      character (len=256) :: extra_binary_controls_inlist1_name 
-   
-      logical :: read_extra_binary_controls_inlist2
-      character (len=256) :: extra_binary_controls_inlist2_name 
-   
-      logical :: read_extra_binary_controls_inlist3
-      character (len=256) :: extra_binary_controls_inlist3_name 
-   
-      logical :: read_extra_binary_controls_inlist4
-      character (len=256) :: extra_binary_controls_inlist4_name 
-   
-      logical :: read_extra_binary_controls_inlist5
-      character (len=256) :: extra_binary_controls_inlist5_name 
+      logical, dimension(max_extra_inlists) :: read_extra_binary_controls_inlist
+      character (len=strlen), dimension(max_extra_inlists) :: extra_binary_controls_inlist_name
       
       namelist /binary_controls/ &
          ! specifications for starting model
@@ -235,11 +223,7 @@
          use_other_CE_binary_finish_step, &
 
          ! extra files
-         read_extra_binary_controls_inlist1, extra_binary_controls_inlist1_name, &
-         read_extra_binary_controls_inlist2, extra_binary_controls_inlist2_name, &
-         read_extra_binary_controls_inlist3, extra_binary_controls_inlist3_name, &
-         read_extra_binary_controls_inlist4, extra_binary_controls_inlist4_name, &
-         read_extra_binary_controls_inlist5, extra_binary_controls_inlist5_name
+         read_extra_binary_controls_inlist, extra_binary_controls_inlist_name
 
       contains
       
@@ -283,11 +267,12 @@
          use utils_lib
          character(*), intent(in) :: filename
          type (binary_info), pointer :: b
-         integer, intent(in) :: level  
+         integer, intent(in) :: level
          integer, intent(out) :: ierr
-         logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-         character (len=256) :: message, extra1, extra2, extra3, extra4, extra5
-         integer :: unit 
+         logical, dimension(max_extra_inlists) :: read_extra
+         character (len=strlen) :: message
+         character (len=strlen), dimension(max_extra_inlists) :: extra
+         integer :: unit, i
          
          ierr = 0        
          
@@ -325,61 +310,17 @@
          call store_binary_controls(b, ierr)
          
          ! recursive calls to read other inlists
-         
-         read_extra1 = read_extra_binary_controls_inlist1
-         read_extra_binary_controls_inlist1 = .false.
-         extra1 = extra_binary_controls_inlist1_name
-         extra_binary_controls_inlist1_name = 'undefined'
-         
-         read_extra2 = read_extra_binary_controls_inlist2
-         read_extra_binary_controls_inlist2 = .false.
-         extra2 = extra_binary_controls_inlist2_name
-         extra_binary_controls_inlist2_name = 'undefined'
-         
-         read_extra3 = read_extra_binary_controls_inlist3
-         read_extra_binary_controls_inlist3 = .false.
-         extra3 = extra_binary_controls_inlist3_name
-         extra_binary_controls_inlist3_name = 'undefined'
-         
-         read_extra4 = read_extra_binary_controls_inlist4
-         read_extra_binary_controls_inlist4 = .false.
-         extra4 = extra_binary_controls_inlist4_name
-         extra_binary_controls_inlist4_name = 'undefined'
-         
-         read_extra5 = read_extra_binary_controls_inlist5
-         read_extra_binary_controls_inlist5 = .false.
-         extra5 = extra_binary_controls_inlist5_name
-         extra_binary_controls_inlist5_name = 'undefined'
-         
-         if (read_extra1) then
-            write(*,*) 'read ' // trim(extra1)
-            call read_binary_controls_file(b, extra1, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra2) then
-            write(*,*) 'read ' // trim(extra2)
-            call read_binary_controls_file(b, extra2, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra3) then
-            write(*,*) 'read ' // trim(extra3)
-            call read_binary_controls_file(b, extra3, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra4) then
-            write(*,*) 'read ' // trim(extra4)
-            call read_binary_controls_file(b, extra4, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra5) then
-            write(*,*) 'read ' // trim(extra5)
-            call read_binary_controls_file(b, extra5, level+1, ierr)
-            if (ierr /= 0) return
-         end if
+         do i=1, max_extra_inlists
+            read_extra(i) = read_extra_binary_controls_inlist(i)
+            read_extra_binary_controls_inlist(i) = .false.
+            extra(i) = extra_binary_controls_inlist_name(i)
+            extra_binary_controls_inlist_name(i) = 'undefined'
+            
+            if (read_extra(i)) then
+               call read_binary_controls_file(b, extra(i), level+1, ierr)
+               if (ierr /= 0) return
+            end if
+         end do
          
       end subroutine read_binary_controls_file
 
