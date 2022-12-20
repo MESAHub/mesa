@@ -2,8 +2,8 @@
 &star_job
 
 
-      read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_relax_composition'
+      read_extra_star_job_inlist(2) = .true.
+      extra_star_job_inlist_name(2) = 'inlist_relax_composition'
 
 / ! end of star_job namelist
 

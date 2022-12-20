@@ -3,8 +3,8 @@
 
       mesa_dir = '../../..'
 
-      read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_starspots'
+      read_extra_star_job_inlist(2) = .true.
+      extra_star_job_inlist_name(2) = 'inlist_starspots'
 
 / ! end of star_job namelist
 

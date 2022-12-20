@@ -1,11 +1,11 @@
 
 &star_job
 
-      read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_common'
+      read_extra_star_job_inlist(2) = .true.
+      extra_star_job_inlist_name(2) = 'inlist_common'
 
-      read_extra_star_job_inlist3 = .true.
-      extra_star_job_inlist3_name = 'inlist_infall'
+      read_extra_star_job_inlist(3) = .true.
+      extra_star_job_inlist_name(3) = 'inlist_infall'
 
 / ! end of star_job namelist
 

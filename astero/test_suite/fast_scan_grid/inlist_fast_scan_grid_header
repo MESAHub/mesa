@@ -2,8 +2,8 @@
 &star_job
 
 
-      read_extra_star_job_inlist2 = .true.
-      extra_star_job_inlist2_name = 'inlist_fast_scan_grid'
+      read_extra_star_job_inlist(2) = .true.
+      extra_star_job_inlist_name(2) = 'inlist_fast_scan_grid'
 
 / ! end of star_job namelist
 
