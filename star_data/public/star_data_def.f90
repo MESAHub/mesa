@@ -29,7 +29,7 @@
       use rates_def, only: rates_reaction_id_max, other_screening_interface, other_rate_get_interface
       use utils_def, only: integer_dict
       use chem_def, only: num_categories, iso_name_length
-      use const_def, only: sp, dp, qp, strlen
+      use const_def, only: sp, dp, qp, strlen, max_extra_inlists
       use rates_def, only: maxlen_reaction_Name
       use eos_def, only: EoS_General_Info
       use kap_def, only: Kap_General_Info
@@ -41,12 +41,7 @@
       implicit none      
       
       include "star_data_def.inc"
-      
-      integer, parameter :: max_extras_params = 20, max_extras_cpar_len = strlen
-      integer, parameter :: max_num_special_rate_factors = 20
-
-      integer, parameter :: star_num_xtra_vals = 30
-
+      include "star_job_controls_params.inc"
       type star_job_controls
          include "star_job_controls.inc"
          include "star_job_controls_dev.inc"
