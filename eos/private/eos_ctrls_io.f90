@@ -133,20 +133,8 @@
    real(dp) :: X_lo, X_hi
    real(dp) :: Z_lo, Z_hi
 
-   logical :: read_extra_eos_inlist1
-   character (len=128) :: extra_eos_inlist1_name
-
-   logical :: read_extra_eos_inlist2
-   character (len=128) :: extra_eos_inlist2_name
-
-   logical :: read_extra_eos_inlist3
-   character (len=128) :: extra_eos_inlist3_name
-
-   logical :: read_extra_eos_inlist4
-   character (len=128) :: extra_eos_inlist4_name
-
-   logical :: read_extra_eos_inlist5
-   character (len=128) :: extra_eos_inlist5_name
+   logical, dimension(max_extra_inlists) :: read_extra_eos_inlist
+   character (len=strlen), dimension(max_extra_inlists) :: extra_eos_inlist_name
 
 
    namelist /eos/ &
@@ -262,11 +250,7 @@
       X_lo, X_hi, &
       Z_lo, Z_hi, &
       
-      read_extra_eos_inlist1, extra_eos_inlist1_name, &
-      read_extra_eos_inlist2, extra_eos_inlist2_name, &
-      read_extra_eos_inlist3, extra_eos_inlist3_name, &
-      read_extra_eos_inlist4, extra_eos_inlist4_name, &
-      read_extra_eos_inlist5, extra_eos_inlist5_name
+      read_extra_eos_inlist, extra_eos_inlist_name
 
 
    contains
@@ -299,9 +283,10 @@
       type (EoS_General_Info), pointer :: rq
       integer, intent(in) :: level
       integer, intent(out) :: ierr
-      logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-      character (len=128) :: message, extra1, extra2, extra3, extra4, extra5
-      integer :: unit
+      logical, dimension(max_extra_inlists) :: read_extra
+      character (len=strlen) :: message
+      character (len=strlen), dimension(max_extra_inlists) :: extra
+      integer :: unit, i
 
       ierr = 0
       if (level >= 10) then
@@ -350,56 +335,18 @@
       if (len_trim(filename) == 0) return
 
       ! recursive calls to read other inlists
+      do i=1, max_extra_inlists
+         read_extra(i) = read_extra_eos_inlist(i)
+         read_extra_eos_inlist(i) = .false.
+         extra(i) = extra_eos_inlist_name(i)
+         extra_eos_inlist_name(i) = 'undefined'
+   
+         if (read_extra(i)) then
+            call read_controls_file(rq, extra(i), level+1, ierr)
+            if (ierr /= 0) return
+         end if
+      end do
 
-      read_extra1 = read_extra_eos_inlist1
-      read_extra_eos_inlist1 = .false.
-      extra1 = extra_eos_inlist1_name
-      extra_eos_inlist1_name = 'undefined'
-
-      read_extra2 = read_extra_eos_inlist2
-      read_extra_eos_inlist2 = .false.
-      extra2 = extra_eos_inlist2_name
-      extra_eos_inlist2_name = 'undefined'
-
-      read_extra3 = read_extra_eos_inlist3
-      read_extra_eos_inlist3 = .false.
-      extra3 = extra_eos_inlist3_name
-      extra_eos_inlist3_name = 'undefined'
-
-      read_extra4 = read_extra_eos_inlist4
-      read_extra_eos_inlist4 = .false.
-      extra4 = extra_eos_inlist4_name
-      extra_eos_inlist4_name = 'undefined'
-
-      read_extra5 = read_extra_eos_inlist5
-      read_extra_eos_inlist5 = .false.
-      extra5 = extra_eos_inlist5_name
-      extra_eos_inlist5_name = 'undefined'
-
-      if (read_extra1) then
-         call read_controls_file(rq, extra1, level+1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra2) then
-         call read_controls_file(rq, extra2, level+1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra3) then
-         call read_controls_file(rq, extra3, level+1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra4) then
-         call read_controls_file(rq, extra4, level+1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra5) then
-         call read_controls_file(rq, extra5, level+1, ierr)
-         if (ierr /= 0) return
-      end if
 
    end subroutine read_controls_file
 

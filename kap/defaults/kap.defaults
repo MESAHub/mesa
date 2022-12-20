@@ -446,6 +446,26 @@
 
       use_other_radiative_opacity = .false.
 
+! Extra inlist controls
+! ---------------------
+
+   ! One can split a kap inlist into pieces using the following parameters.
+   ! It works recursively, so the extras can read extras too.
+
+
+         ! read_extra_kap_inlist(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~
+         ! extra_kap_inlist_name(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~
+
+         ! If ``read_extra_kap_inlist(i)`` is true, then read &eos from the file ``extra_kap_inlist_name(i)``.
+         ! ::
+
+      read_extra_kap_inlist(:) = .false.
+      extra_kap_inlist_name(:) = 'undefined'
+      
+      
+      
 
 ! Debugging controls
 ! ------------------

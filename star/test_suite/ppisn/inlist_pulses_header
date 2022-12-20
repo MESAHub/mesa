@@ -10,16 +10,16 @@
 
 &eos
 
-      read_extra_eos_inlist1 = .true.
-      extra_eos_inlist1_name = 'inlist_pulses'
+      read_extra_eos_inlist(1) = .true.
+      extra_eos_inlist_name(1) = 'inlist_pulses'
 
 / ! end of eos namelist
 
 
 &kap
 
-      read_extra_kap_inlist1 = .true.
-      extra_kap_inlist1_name = 'inlist_pulses'
+      read_extra_kap_inlist(1) = .true.
+      extra_kap_inlist_name(1) = 'inlist_pulses'
 
 / ! end of kap namelist
 
