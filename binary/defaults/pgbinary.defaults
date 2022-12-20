@@ -2967,35 +2967,7 @@ annotation3_text = ''
 
 ! ::
 
-read_extra_pgbinary_inlist1 = .false.
-extra_pgbinary_inlist1_name = 'undefined'
+read_extra_pgbinary_inlist(:) = .false.
+extra_pgbinary_inlist_name(:) = 'undefined'
 
-! if ``read_extra_pgbinary_inlist1`` is true, then read &pgbinary from this namelist file
-
-! ::
-
-read_extra_pgbinary_inlist2 = .false.
-extra_pgbinary_inlist2_name = 'undefined'
-
-! if ``read_extra_pgbinary_inlist2`` is true, then read &pgbinary from this namelist file
-
-! ::
-
-read_extra_pgbinary_inlist3 = .false.
-extra_pgbinary_inlist3_name = 'undefined'
-
-! if ``read_extra_pgbinary_inlist3`` is true, then read &pgbinary from this namelist file
-
-! ::
-
-read_extra_pgbinary_inlist4 = .false.
-extra_pgbinary_inlist4_name = 'undefined'
-
-! if ``read_extra_pgbinary_inlist4`` is true, then read &pgbinary from this namelist file
-
-! ::
-
-read_extra_pgbinary_inlist5 = .false.
-extra_pgbinary_inlist5_name = 'undefined'
-
-! if ``read_extra_pgbinary_inlist5`` is true, then read &pgbinary from this namelist file
+! if ``read_extra_pgbinary_inlist(i)`` is true, then read &pgbinary from this namelist file

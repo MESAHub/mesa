@@ -1364,20 +1364,8 @@ module pgbinary_ctrls_io
       annotation3_coord, &
       annotation3_fjust, &
 
-      read_extra_pgbinary_inlist1, &
-      extra_pgbinary_inlist1_name, &
-
-      read_extra_pgbinary_inlist2, &
-      extra_pgbinary_inlist2_name, &
-
-      read_extra_pgbinary_inlist3, &
-      extra_pgbinary_inlist3_name, &
-
-      read_extra_pgbinary_inlist4, &
-      extra_pgbinary_inlist4_name, &
-
-      read_extra_pgbinary_inlist5, &
-      extra_pgbinary_inlist5_name
+      read_extra_pgbinary_inlist, &
+      extra_pgbinary_inlist_name
 
 
 contains
@@ -1404,9 +1392,10 @@ contains
       type (binary_info), pointer :: b
       integer, intent(in) :: level
       integer, intent(out) :: ierr
-      logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-      character (len = strlen) :: message, extra1, extra2, extra3, extra4, extra5
-      integer :: unit
+      logical, dimension(max_extra_inlists) :: read_extra
+      character (len=strlen) :: message
+      character (len=strlen), dimension(max_extra_inlists) :: extra
+      integer :: unit, i
 
       ierr = 0
 
@@ -1440,57 +1429,18 @@ contains
 
       call store_pgbinary_controls(b, ierr)
 
-      ! recursive calls to read other inlists
-
-      read_extra1 = read_extra_pgbinary_inlist1
-      read_extra_pgbinary_inlist1 = .false.
-      extra1 = extra_pgbinary_inlist1_name
-      extra_pgbinary_inlist1_name = 'undefined'
-
-      read_extra2 = read_extra_pgbinary_inlist2
-      read_extra_pgbinary_inlist2 = .false.
-      extra2 = extra_pgbinary_inlist2_name
-      extra_pgbinary_inlist2_name = 'undefined'
-
-      read_extra3 = read_extra_pgbinary_inlist3
-      read_extra_pgbinary_inlist3 = .false.
-      extra3 = extra_pgbinary_inlist3_name
-      extra_pgbinary_inlist3_name = 'undefined'
-
-      read_extra4 = read_extra_pgbinary_inlist4
-      read_extra_pgbinary_inlist4 = .false.
-      extra4 = extra_pgbinary_inlist4_name
-      extra_pgbinary_inlist4_name = 'undefined'
-
-      read_extra5 = read_extra_pgbinary_inlist5
-      read_extra_pgbinary_inlist5 = .false.
-      extra5 = extra_pgbinary_inlist5_name
-      extra_pgbinary_inlist5_name = 'undefined'
-
-      if (read_extra1) then
-         call read_pgbinary_file(b, extra1, level + 1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra2) then
-         call read_pgbinary_file(b, extra2, level + 1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra3) then
-         call read_pgbinary_file(b, extra3, level + 1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra4) then
-         call read_pgbinary_file(b, extra4, level + 1, ierr)
-         if (ierr /= 0) return
-      end if
-
-      if (read_extra5) then
-         call read_pgbinary_file(b, extra5, level + 1, ierr)
-         if (ierr /= 0) return
-      end if
+ ! recursive calls to read other inlists
+         do i=1, max_extra_inlists
+            read_extra(i) = read_extra_pgbinary_inlist(i)
+            read_extra_pgbinary_inlist(i) = .false.
+            extra(i) = extra_pgbinary_inlist_name(i)
+            extra_pgbinary_inlist_name(i) = 'undefined'
+            
+            if (read_extra(i)) then
+               call read_pgbinary_file(b, extra(i), level+1, ierr)
+               if (ierr /= 0) return
+            end if
+         end do
 
    end subroutine read_pgbinary_file
 
@@ -2888,20 +2838,8 @@ contains
       pg% annotation3_coord = annotation3_coord
       pg% annotation3_fjust = annotation3_fjust
 
-      pg% read_extra_pgbinary_inlist1 = read_extra_pgbinary_inlist1
-      pg% extra_pgbinary_inlist1_name = extra_pgbinary_inlist1_name
-
-      pg% read_extra_pgbinary_inlist2 = read_extra_pgbinary_inlist2
-      pg% extra_pgbinary_inlist2_name = extra_pgbinary_inlist2_name
-
-      pg% read_extra_pgbinary_inlist3 = read_extra_pgbinary_inlist3
-      pg% extra_pgbinary_inlist3_name = extra_pgbinary_inlist3_name
-
-      pg% read_extra_pgbinary_inlist4 = read_extra_pgbinary_inlist4
-      pg% extra_pgbinary_inlist4_name = extra_pgbinary_inlist4_name
-
-      pg% read_extra_pgbinary_inlist5 = read_extra_pgbinary_inlist5
-      pg% extra_pgbinary_inlist5_name = extra_pgbinary_inlist5_name
+      pg% read_extra_pgbinary_inlist = read_extra_pgbinary_inlist
+      pg% extra_pgbinary_inlist_name = extra_pgbinary_inlist_name
 
    end subroutine store_pgbinary_controls
 
