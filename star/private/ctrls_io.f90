@@ -33,23 +33,8 @@
  include 'star_controls.inc'
  include 'star_controls_dev.inc'
 
- logical :: read_extra_controls_inlist1
- character (len=strlen) :: extra_controls_inlist1_name
-
- logical :: read_extra_controls_inlist2
- character (len=strlen) :: extra_controls_inlist2_name
-
- logical :: read_extra_controls_inlist3
- character (len=strlen) :: extra_controls_inlist3_name
-
- logical :: read_extra_controls_inlist4
- character (len=strlen) :: extra_controls_inlist4_name
-
- logical :: read_extra_controls_inlist5
- character (len=strlen) :: extra_controls_inlist5_name
-
- logical :: save_controls_namelist
- character (len=strlen) :: controls_namelist_name
+ logical, dimension(max_extra_inlists) :: read_extra_controls_inlist
+ character (len=strlen), dimension(max_extra_inlists) :: extra_controls_inlist_name
 
  namelist /controls/ &
  
@@ -541,9 +526,7 @@
     x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
     
     ! extra files
-    read_extra_controls_inlist1, extra_controls_inlist1_name, read_extra_controls_inlist2, &
-    extra_controls_inlist2_name, read_extra_controls_inlist3, extra_controls_inlist3_name, &
-    read_extra_controls_inlist4, extra_controls_inlist4_name, read_extra_controls_inlist5, extra_controls_inlist5_name, &
+    read_extra_controls_inlist, extra_controls_inlist_name, &
     save_controls_namelist, controls_namelist_name
 
 
@@ -652,9 +635,10 @@
  type (star_info), pointer :: s
  integer, intent(in) :: level
  integer, intent(out) :: ierr
- logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
- character (len=strlen) :: message, extra1, extra2, extra3, extra4, extra5
- integer :: unit
+ logical, dimension(max_extra_inlists) :: read_extra
+ character (len=strlen) :: message
+ character (len=strlen), dimension(max_extra_inlists) :: extra
+ integer :: unit, i
 
  ierr = 0
 
@@ -690,61 +674,19 @@
  call store_controls(s, ierr)
 
  ! recursive calls to read other inlists
+ do i=1, max_extra_inlists
+    read_extra(i) = read_extra_controls_inlist(i)
+    read_extra_controls_inlist(i) = .false.
+    extra(i) = extra_controls_inlist_name(i)
+    extra_controls_inlist_name(i) = 'undefined'
+   
+    if (read_extra(i)) then
+       write(*,*) 'read ' // trim(extra(i))
+       call read_controls_file(s, extra(i), level+1, ierr)
+       if (ierr /= 0) return
+    end if
+ end do
 
- read_extra1 = read_extra_controls_inlist1
- read_extra_controls_inlist1 = .false.
- extra1 = extra_controls_inlist1_name
- extra_controls_inlist1_name = 'undefined'
-
- read_extra2 = read_extra_controls_inlist2
- read_extra_controls_inlist2 = .false.
- extra2 = extra_controls_inlist2_name
- extra_controls_inlist2_name = 'undefined'
-
- read_extra3 = read_extra_controls_inlist3
- read_extra_controls_inlist3 = .false.
- extra3 = extra_controls_inlist3_name
- extra_controls_inlist3_name = 'undefined'
-
- read_extra4 = read_extra_controls_inlist4
- read_extra_controls_inlist4 = .false.
- extra4 = extra_controls_inlist4_name
- extra_controls_inlist4_name = 'undefined'
-
- read_extra5 = read_extra_controls_inlist5
- read_extra_controls_inlist5 = .false.
- extra5 = extra_controls_inlist5_name
- extra_controls_inlist5_name = 'undefined'
-
- if (read_extra1) then
- write(*,*) 'read ' // trim(extra1)
- call read_controls_file(s, extra1, level+1, ierr)
- if (ierr /= 0) return
- end if
-
- if (read_extra2) then
- write(*,*) 'read ' // trim(extra2)
- call read_controls_file(s, extra2, level+1, ierr)
- if (ierr /= 0) return
- end if
-
- if (read_extra3) then
- write(*,*) 'read ' // trim(extra3)
- call read_controls_file(s, extra3, level+1, ierr)
- if (ierr /= 0) return
- end if
-
- if (read_extra4) then
-    write(*,*) 'read ' // trim(extra4)
-    call read_controls_file(s, extra4, level+1, ierr)
-    if (ierr /= 0) return
- end if
-
- if (read_extra5) then
-    write(*,*) 'read ' // trim(extra5)
-    call read_controls_file(s, extra5, level+1, ierr)
-    if (ierr /= 0) return
- end if
 
  end subroutine read_controls_file
  
@@ -4201,7 +4143,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       call set_controls_for_writing(s, ierr)
       if(ierr/=0) return
 
-      ! Write namelist to temporay file
+      ! Write namelist to temporary file
       open(newunit=iounit,status='scratch')
       write(iounit,nml=controls)
       rewind(iounit)

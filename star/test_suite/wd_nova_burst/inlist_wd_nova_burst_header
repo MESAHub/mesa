@@ -27,8 +27,8 @@
 
 &controls
 
-      read_extra_controls_inlist2 = .true.
-      extra_controls_inlist2_name = 'inlist_wd_nova_burst'
+      read_extra_controls_inlist(2) = .true.
+      extra_controls_inlist_name(2)= 'inlist_wd_nova_burst'
 
 / ! end of controls namelist
 
@@ -36,7 +36,7 @@
 
 &pgstar
 
-      read_extra_pgstar_inlist2 = .true.
-      extra_pgstar_inlist2_name = 'inlist_wd_nova_burst'
+      read_extra_pgstar_inlist(2) = .true.
+      extra_pgstar_inlist_name(2)= 'inlist_wd_nova_burst'
 
 / ! end of pgstar namelist

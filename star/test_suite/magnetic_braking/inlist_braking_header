@@ -10,8 +10,8 @@
 
 &controls
 
-      read_extra_controls_inlist1 = .true.
-      extra_controls_inlist1_name = 'inlist_braking'
+      read_extra_controls_inlist(1) = .true.
+      extra_controls_inlist_name(1)= 'inlist_braking'
 
 / ! end of controls namelist
 
@@ -33,7 +33,7 @@
 
 
 &pgstar
-      read_extra_pgstar_inlist1 = .true.
-      extra_pgstar_inlist1_name = 'inlist_braking_pgstar'
+      read_extra_pgstar_inlist(1) = .true.
+      extra_pgstar_inlist_name(1)= 'inlist_braking_pgstar'
 
 / ! end of pgstar namelist

@@ -2076,22 +2076,8 @@
       character :: annotation3_side
       real :: annotation3_disp, annotation3_coord, annotation3_fjust
 
-
-
-      logical :: read_extra_pgstar_inlist1
-      character (len=strlen) :: extra_pgstar_inlist1_name
-
-      logical :: read_extra_pgstar_inlist2
-      character (len=strlen) :: extra_pgstar_inlist2_name
-
-      logical :: read_extra_pgstar_inlist3
-      character (len=strlen) :: extra_pgstar_inlist3_name
-
-      logical :: read_extra_pgstar_inlist4
-      character (len=strlen) :: extra_pgstar_inlist4_name
-
-      logical :: read_extra_pgstar_inlist5
-      character (len=strlen) :: extra_pgstar_inlist5_name
+      logical, dimension(max_extra_inlists) :: read_extra_pgstar_inlist
+      character (len=strlen), dimension(max_extra_inlists) :: extra_pgstar_inlist_name
 
       logical :: Abundance_use_decorator, &
             Color_Magnitude1_use_decorator, &
