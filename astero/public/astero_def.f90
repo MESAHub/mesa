@@ -273,23 +273,9 @@
          ! frequency range for adipls is set from observed frequencies times these            
       integer :: & ! misc adipls parameters
          adipls_irotkr, adipls_nprtkr, adipls_igm1kr, adipls_npgmkr
-
       
-      logical :: read_extra_astero_search_inlist1
-      character (len=256) :: extra_astero_search_inlist1_name 
-      
-      logical :: read_extra_astero_search_inlist2
-      character (len=256) :: extra_astero_search_inlist2_name 
-      
-      logical :: read_extra_astero_search_inlist3
-      character (len=256) :: extra_astero_search_inlist3_name 
-      
-      logical :: read_extra_astero_search_inlist4
-      character (len=256) :: extra_astero_search_inlist4_name 
-      
-      logical :: read_extra_astero_search_inlist5
-      character (len=256) :: extra_astero_search_inlist5_name 
-
+      logical, dimension(max_extra_inlists) :: read_extra_astero_search_inlist
+      character (len=strlen), dimension(max_extra_inlists) :: extra_astero_search_inlist_name
 
       namelist /astero_search_controls/ &
          normalize_chi2_spectro, &
@@ -422,16 +408,8 @@
          iscan_factor, &
          adipls_irotkr, adipls_nprtkr, adipls_igm1kr, adipls_npgmkr, &
          nu_lower_factor, nu_upper_factor, &
-         read_extra_astero_search_inlist1, &
-         extra_astero_search_inlist1_name, &
-         read_extra_astero_search_inlist2, &
-         extra_astero_search_inlist2_name, &
-         read_extra_astero_search_inlist3, &
-         extra_astero_search_inlist3_name, &
-         read_extra_astero_search_inlist4, &
-         extra_astero_search_inlist4_name, &
-         read_extra_astero_search_inlist5, &
-         extra_astero_search_inlist5_name
+         read_extra_astero_search_inlist, &
+         extra_astero_search_inlist_name
             
       
       ! pgstar plots
@@ -466,20 +444,8 @@
          show_ratios_annotation2, &
          show_ratios_annotation3      
       
-      logical :: read_extra_astero_pgstar_inlist1
-      character (len=256) :: extra_astero_pgstar_inlist1_name 
-      
-      logical :: read_extra_astero_pgstar_inlist2
-      character (len=256) :: extra_astero_pgstar_inlist2_name 
-      
-      logical :: read_extra_astero_pgstar_inlist3
-      character (len=256) :: extra_astero_pgstar_inlist3_name 
-      
-      logical :: read_extra_astero_pgstar_inlist4
-      character (len=256) :: extra_astero_pgstar_inlist4_name 
-      
-      logical :: read_extra_astero_pgstar_inlist5
-      character (len=256) :: extra_astero_pgstar_inlist5_name 
+      logical, dimension(max_extra_inlists) :: read_extra_astero_pgstar_inlist
+      character (len=strlen), dimension(max_extra_inlists) :: extra_astero_pgstar_inlist_name
          
       namelist /astero_pgstar_controls/ &
          echelle_win_flag, echelle_file_flag, &
@@ -505,11 +471,7 @@
          show_ratios_annotation1, &
          show_ratios_annotation2, &
          show_ratios_annotation3, &
-         read_extra_astero_pgstar_inlist1, extra_astero_pgstar_inlist1_name, &
-         read_extra_astero_pgstar_inlist2, extra_astero_pgstar_inlist2_name, &
-         read_extra_astero_pgstar_inlist3, extra_astero_pgstar_inlist3_name, &
-         read_extra_astero_pgstar_inlist4, extra_astero_pgstar_inlist4_name, &
-         read_extra_astero_pgstar_inlist5, extra_astero_pgstar_inlist5_name
+         read_extra_astero_pgstar_inlist, extra_astero_pgstar_inlist_name
 
 
 
@@ -896,9 +858,10 @@
          integer, intent(in) :: level  
          integer, intent(out) :: ierr
          
-         logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-         character (len=256) :: message, extra1, extra2, extra3, extra4, extra5
-         integer :: unit
+         logical, dimension(max_extra_inlists) :: read_extra
+         character (len=strlen) :: message
+         character (len=strlen), dimension(max_extra_inlists) :: extra
+         integer :: unit, i
          
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
@@ -933,61 +896,18 @@
          if (ierr /= 0) return
          
          ! recursive calls to read other inlists
-         
-         read_extra1 = read_extra_astero_search_inlist1
-         read_extra_astero_search_inlist1 = .false.
-         extra1 = extra_astero_search_inlist1_name
-         extra_astero_search_inlist1_name = 'undefined'
-         
-         read_extra2 = read_extra_astero_search_inlist2
-         read_extra_astero_search_inlist2 = .false.
-         extra2 = extra_astero_search_inlist2_name
-         extra_astero_search_inlist2_name = 'undefined'
-         
-         read_extra3 = read_extra_astero_search_inlist3
-         read_extra_astero_search_inlist3 = .false.
-         extra3 = extra_astero_search_inlist3_name
-         extra_astero_search_inlist3_name = 'undefined'
-         
-         read_extra4 = read_extra_astero_search_inlist4
-         read_extra_astero_search_inlist4 = .false.
-         extra4 = extra_astero_search_inlist4_name
-         extra_astero_search_inlist4_name = 'undefined'
-         
-         read_extra5 = read_extra_astero_search_inlist5
-         read_extra_astero_search_inlist5 = .false.
-         extra5 = extra_astero_search_inlist5_name
-         extra_astero_search_inlist5_name = 'undefined'
-         
-         if (read_extra1) then
-            !write(*,*) 'read extra astero_search inlist1 from ' // trim(extra1)
-            call read1_astero_search_inlist(extra1, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra2) then
-            !write(*,*) 'read extra astero_search inlist2 from ' // trim(extra2)
-            call read1_astero_search_inlist(extra2, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra3) then
-            !write(*,*) 'read extra astero_search inlist3 from ' // trim(extra3)
-            call read1_astero_search_inlist(extra3, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra4) then
-            !write(*,*) 'read extra astero_search inlist4 from ' // trim(extra4)
-            call read1_astero_search_inlist(extra4, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra5) then
-            write(*,*) 'read extra astero_search inlist5 from ' // trim(extra5)
-            call read1_astero_search_inlist(extra5, level+1, ierr)
-            if (ierr /= 0) return
-         end if
+         do i=1, max_extra_inlists
+            read_extra(i) = read_extra_astero_search_inlist(i)
+            read_extra_astero_search_inlist(i) = .false.
+            extra(i) = extra_astero_search_inlist_name(i)
+            extra_astero_search_inlist_name(i) = 'undefined'
+            
+            if (read_extra(i)) then
+               call read1_astero_search_inlist(extra(i), level+1, ierr)
+               if (ierr /= 0) return
+            end if
+         end do
+        
          
       end subroutine read1_astero_search_inlist
 
@@ -1042,9 +962,10 @@
          integer, intent(in) :: level  
          integer, intent(out) :: ierr
          
-         logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
-         character (len=256) :: message, extra1, extra2, extra3, extra4, extra5
-         integer :: unit
+         logical, dimension(max_extra_inlists) :: read_extra
+         character (len=strlen) :: message
+         character (len=strlen), dimension(max_extra_inlists) :: extra
+         integer :: unit, i
          
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
@@ -1077,62 +998,18 @@
          call free_iounit(unit)
          if (ierr /= 0) return
          
-         ! recursive calls to read other inlists
-         
-         read_extra1 = read_extra_astero_pgstar_inlist1
-         read_extra_astero_pgstar_inlist1 = .false.
-         extra1 = extra_astero_pgstar_inlist1_name
-         extra_astero_pgstar_inlist1_name = 'undefined'
-         
-         read_extra2 = read_extra_astero_pgstar_inlist2
-         read_extra_astero_pgstar_inlist2 = .false.
-         extra2 = extra_astero_pgstar_inlist2_name
-         extra_astero_pgstar_inlist2_name = 'undefined'
-         
-         read_extra3 = read_extra_astero_pgstar_inlist3
-         read_extra_astero_pgstar_inlist3 = .false.
-         extra3 = extra_astero_pgstar_inlist3_name
-         extra_astero_pgstar_inlist3_name = 'undefined'
-         
-         read_extra4 = read_extra_astero_pgstar_inlist4
-         read_extra_astero_pgstar_inlist4 = .false.
-         extra4 = extra_astero_pgstar_inlist4_name
-         extra_astero_pgstar_inlist4_name = 'undefined'
-         
-         read_extra5 = read_extra_astero_pgstar_inlist5
-         read_extra_astero_pgstar_inlist5 = .false.
-         extra5 = extra_astero_pgstar_inlist5_name
-         extra_astero_pgstar_inlist5_name = 'undefined'
-         
-         if (read_extra1) then
-            !write(*,*) 'read extra astero_pgstar inlist1 from ' // trim(extra1)
-            call read1_astero_pgstar_inlist(extra1, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra2) then
-            !write(*,*) 'read extra astero_pgstar inlist2 from ' // trim(extra2)
-            call read1_astero_pgstar_inlist(extra2, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra3) then
-            !write(*,*) 'read extra astero_pgstar inlist3 from ' // trim(extra3)
-            call read1_astero_pgstar_inlist(extra3, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra4) then
-            !write(*,*) 'read extra astero_pgstar inlist4 from ' // trim(extra4)
-            call read1_astero_pgstar_inlist(extra4, level+1, ierr)
-            if (ierr /= 0) return
-         end if
-         
-         if (read_extra5) then
-            write(*,*) 'read extra astero_pgstar inlist5 from ' // trim(extra5)
-            call read1_astero_pgstar_inlist(extra5, level+1, ierr)
-            if (ierr /= 0) return
-         end if
+                  ! recursive calls to read other inlists
+         do i=1, max_extra_inlists
+            read_extra(i) = read_extra_astero_pgstar_inlist(i)
+            read_extra_astero_pgstar_inlist(i) = .false.
+            extra(i) = extra_astero_pgstar_inlist_name(i)
+            extra_astero_pgstar_inlist_name(i) = 'undefined'
+            
+            if (read_extra(i)) then
+               call read1_astero_pgstar_inlist(extra(i), level+1, ierr)
+               if (ierr /= 0) return
+            end if
+         end do
          
       end subroutine read1_astero_pgstar_inlist
 

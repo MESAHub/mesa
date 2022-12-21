@@ -1246,40 +1246,13 @@
    ! Include other inlists
    ! ---------------------
 
-   ! read_extra_astero_search_inlist1
+   ! read_extra_astero_search_inlist(1..5)
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_astero_search_inlist1_name
+   ! extra_astero_search_inlist_name(1..5)
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! read_extra_astero_search_inlist2
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_astero_search_inlist2_name
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! read_extra_astero_search_inlist3
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_astero_search_inlist3_name
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! read_extra_astero_search_inlist4
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_astero_search_inlist4_name
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! read_extra_astero_search_inlist5
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! extra_astero_search_inlist5_name
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! If ``read_extra_astero_search_inlistN`` is ``.true.``, then read the namelist
-   ! in file ``extra_astero_search_inlistN_name``.  ::
+   ! If ``read_extra_astero_search_inlist(i)`` is ``.true.``, then read the namelist
+   ! in file ``extra_astero_search_inlist_name(i)``.  ::
 
-      read_extra_astero_search_inlist1 = .false.
-      extra_astero_search_inlist1_name = 'undefined'
+      read_extra_astero_search_inlist(:) = .false.
+      extra_astero_search_inlist_name(:) = 'undefined'
 
-      read_extra_astero_search_inlist2 = .false.
-      extra_astero_search_inlist2_name = 'undefined'
-
-      read_extra_astero_search_inlist3 = .false.
-      extra_astero_search_inlist3_name = 'undefined'
-
-      read_extra_astero_search_inlist4 = .false.
-      extra_astero_search_inlist4_name = 'undefined'
-
-      read_extra_astero_search_inlist5 = .false.
-      extra_astero_search_inlist5_name = 'undefined'
