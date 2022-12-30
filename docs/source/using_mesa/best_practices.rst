@@ -455,7 +455,7 @@ that is:
 .. code-block:: latex
 
   Modules for Experiments in Stellar Astrophysics
-  \citep[MESA][]{Paxton2011, Paxton2013, Paxton2015, Paxton2018, Paxton2019}.
+  \citep[MESA][]{Paxton2011, Paxton2013, Paxton2015, Paxton2018, Paxton2019, Jermyn2023}.
 
 
 MESA critically rests on the hard work of many researchers who have
