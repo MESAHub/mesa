@@ -96,8 +96,8 @@ The missions of the MESA Team are:
   facilitating and encouraging appropriate scientific collaborative
 
 
-1st Author
-----------
+1st Author Emeritus
+-------------------
 
 * `Bill Paxton <https://www.kitp.ucsb.edu/paxton>`__
 
@@ -112,7 +112,6 @@ Developers
 * Aaron Dotter
 * `Robert Farmer <http://rjfarmer.io/>`__
 * Eoin Farrell
-* `Adam Jermyn <http://adamjermyn.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
@@ -126,6 +125,7 @@ Past Developers
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
+* `Adam Jermyn <http://adamjermyn.com/>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__ (2013-2021)
 
 
