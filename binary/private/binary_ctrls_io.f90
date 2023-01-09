@@ -137,6 +137,8 @@
          do_wind_mass_transfer_2, &
          wind_BH_alpha_1, &
          wind_BH_alpha_2, &
+         wind_BH_beta_1, &
+         wind_BH_beta_2, &
          max_wind_transfer_fraction_1, &
          max_wind_transfer_fraction_2, &
 
