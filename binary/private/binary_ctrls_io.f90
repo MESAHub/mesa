@@ -489,6 +489,8 @@
          b% do_wind_mass_transfer_2 = do_wind_mass_transfer_2
          b% wind_BH_alpha_1 = wind_BH_alpha_1
          b% wind_BH_alpha_2 = wind_BH_alpha_2
+         b% wind_BH_beta_1 = wind_BH_beta_1
+         b% wind_BH_beta_2 = wind_BH_beta_2
          b% max_wind_transfer_fraction_1 = max_wind_transfer_fraction_1
          b% max_wind_transfer_fraction_2 = max_wind_transfer_fraction_2
 
@@ -679,6 +681,8 @@
          do_wind_mass_transfer_2 = b% do_wind_mass_transfer_2
          wind_BH_alpha_1 = b% wind_BH_alpha_1
          wind_BH_alpha_2 = b% wind_BH_alpha_2
+         wind_BH_beta_1 = b% wind_BH_beta_1
+         wind_BH_beta_2 = b% wind_BH_beta_2
          max_wind_transfer_fraction_1 = b% max_wind_transfer_fraction_1
          max_wind_transfer_fraction_2 = b% max_wind_transfer_fraction_2
 
