@@ -22,6 +22,7 @@
 
    limit_retention_by_mdot_edd = .true.
    do_wind_mass_transfer_1 = .true.
+   wind_BH_beta_1 = 7d0  ! 7 since donor is O star
    do_jdot_mb = .false.
 
    report_rlo_solver_progress = .true.
