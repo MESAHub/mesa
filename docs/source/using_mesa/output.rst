@@ -233,7 +233,7 @@ To plot a temperature-density profile, the process is very similar:
    import mesa_reader as mr
 
    # load entire LOG directory information
-   l = MesaLogDir('./LOGS')
+   l = mr.MesaLogDir('./LOGS')
    # grab the last profile
    p = l.profile_data()
 
