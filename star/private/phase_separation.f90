@@ -36,9 +36,6 @@
 
       logical, parameter :: dbg = .false.
 
-      integer, parameter :: FIXED_PT_MODE = 5
-      integer, parameter :: FIXED_DT_MODE = 6      
-
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
@@ -126,9 +123,6 @@
         
         real(dp) :: XC, XO, XC1, XO1, dXO, Xfac, dqsum
         integer :: net_ic12, net_io16
-        integer :: update_mode(s%nz)
-        
-        update_mode(:) = FIXED_DT_MODE
         
         dq_crystal = dq_crystal + s% dq(k)
         
@@ -156,7 +150,7 @@
         s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
         s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
 
-        call update_model_(s,update_mode,k-1,s%nz,.true.)
+        call update_model_(s,k-1,s%nz,.true.)
         
       end subroutine move_one_zone
       
@@ -170,10 +164,8 @@
         real(dp) :: avg_xa(s%species)
         real(dp) :: mass, XHe_out, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
         integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
-        integer :: update_mode(s%nz)
         logical :: use_brunt
         
-        update_mode(:) = FIXED_DT_MODE
         use_brunt = s% phase_separation_mixing_use_brunt
         net_ihe4 = s% net_iso(ihe4)
         net_ic12 = s% net_iso(ic12)
@@ -220,7 +212,7 @@
            ! updates, eos, opacities, mu, etc now that abundances have changed,
            ! but only in the cells near the boundary where we need to check here.
            ! Will call full update over mixed region after exiting loop.
-           call update_model_(s, update_mode, ktop-1, ktop+1, use_brunt)
+           call update_model_(s, ktop-1, ktop+1, use_brunt)
 
            if(use_brunt) then
               B_term = s% unsmoothed_brunt_B(ktop)
@@ -240,7 +232,7 @@
         end do
 
         ! Call a final update over all mixed cells now.
-        call update_model_(s, update_mode, ktop, kbot, .true.)
+        call update_model_(s, ktop, kbot, .true.)
        
       end subroutine mix_outward
 
@@ -276,14 +268,13 @@
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
       
-      subroutine update_model_ (s, update_mode, kc_t, kc_b, do_brunt)
+      subroutine update_model_ (s, kc_t, kc_b, do_brunt)
 
         use turb_info, only: set_mlt_vars
         use brunt, only: do_brunt_B
         use micro
         
         type(star_info), pointer :: s
-        integer, intent(in)      :: update_mode(:)
         integer, intent(in)      :: kc_t
         integer, intent(in)      :: kc_b
         logical, intent(in)      :: do_brunt
@@ -291,11 +282,14 @@
         integer  :: ierr
         integer  :: kf_t
         integer  :: kf_b
+
+        logical :: mask(s%nz)
+
+        mask(:) = .true.
         
         ! Update the model to reflect changes in the abundances across
-        ! cells kc_t:kc_b
-        
-        call set_eos_with_mask(s, kc_t, kc_b, update_mode==FIXED_DT_MODE, ierr)
+        ! cells kc_t:kc_b (the mask part of this call is unused, mask=true for all zones)        
+        call set_eos_with_mask(s, kc_t, kc_b, mask, ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: error from call to set_eos_with_mask'
            stop
