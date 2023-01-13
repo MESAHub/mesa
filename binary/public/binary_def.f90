@@ -19,15 +19,16 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 
       module binary_def
 
       use star_lib
       use star_def
       use const_def
-      
-      implicit none
+      use binary_pgbinary
+
+   implicit none
 
       real(dp) :: initial_binary_period ! (seconds)
       real(dp) :: min_binary_period ! (seconds)
@@ -65,11 +66,11 @@
             real(dp), intent(out) :: new_mdot
          end function other_check_implicit_rlo_interface
 
-         subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, ierr)
+         subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, detachment, ierr)
             use const_def, only: dp
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: function_to_solve
-            logical, intent(out) :: use_sum
+            logical, intent(out) :: use_sum, detachment
             integer, intent(out) :: ierr
          end subroutine other_implicit_function_to_solve_interface
 
@@ -186,7 +187,19 @@
             integer, intent(in) :: binary_id, iounit
             integer, intent(out) :: ierr
          end subroutine other_binary_photo_read_interface
+
+         subroutine other_e2_interface(id, e2, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: id
+            real(dp),intent (out) :: e2
+            integer, intent(out) :: ierr
+         end subroutine other_e2_interface
                
+         subroutine other_pgbinary_plots_info_interface(id, ierr)
+            integer, intent(in) :: id
+            integer, intent(out) :: ierr
+         end subroutine other_pgbinary_plots_info_interface
+
       end interface
 
       type binary_job_controls
@@ -203,6 +216,8 @@
          type (binary_job_controls) :: job
          include 'binary_data.inc'
          include 'binary_controls.inc'
+
+         type (pgbinary_controls) :: pg
       end type
 
       logical :: have_initialized_binary_handles = .false.

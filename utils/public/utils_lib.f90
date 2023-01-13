@@ -1172,6 +1172,42 @@ contains
     
     end function switch_str
 
+   subroutine split_line(line, num, out)
+      ! Given a string line, split on whitespace, into num sub-strings storing them in out
+      character(len=*),intent(in) :: line
+      integer, intent(in) :: num
+      character(len=*),dimension(:) :: out
+
+      integer :: i,kstart,k
+
+      if(size(out)<num) call mesa_error(__FILE__,__LINE__,'out array not large enough for num sub-strings')
+
+      out = ''
+
+      k = 1
+      kstart = 1
+      outer: do i=1, num
+         inner: do
+            if(k < len(line)) then
+               if(line(k:k)==' ' .and. line(k+1:k+1)==' ') then
+                  k = k+1
+                  cycle inner
+               end if
+            end if
+
+            if(line(k:k)==' ' .or. k >= len(line))then
+               !write(*,*) '*',i,kstart,k,line(kstart:k-1)
+               out(i) = line(kstart:k-1)
+               k = k+1
+               kstart = k
+               cycle outer
+            end if
+            k = k + 1
+         end do inner
+      end do outer
+
+      end subroutine split_line
+
       
    ! backward compatibility so Bill can debug older versions of files without changing these calls
       logical function is_bad_num(x)

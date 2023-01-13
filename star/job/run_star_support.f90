@@ -36,7 +36,6 @@
       use net_def
       use net_lib
       use other_extras
-      use rates_lib, only: set_which_rate_1212
 
       implicit none
       
@@ -55,7 +54,7 @@
       public :: failed
       public :: id_from_read_star_job
       public :: MESA_INLIST_RESOLVED
-      public :: do_star_job_controls_after
+      public :: do_star_job_controls_before, do_star_job_controls_after
       
       ! deprecated, but kept around for use by binary
       public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
@@ -409,6 +408,25 @@
          if (len_trim(s% op_mono_data_cache_filename) == 0) &
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
+
+         if (len_trim(s% emesh_data_for_op_mono_path) == 0) &
+            call get_environment_variable( &
+               "MESA_OP_MONO_MASTER_GRID", s% emesh_data_for_op_mono_path)
+
+         s% extras_startup => null_extras_startup
+         s% extras_check_model => null_extras_check_model
+         s% extras_start_step => null_extras_start_step
+         s% extras_finish_step => null_extras_finish_step
+         s% extras_after_evolve => null_extras_after_evolve
+         s% how_many_extra_history_columns => null_how_many_extra_history_columns
+         s% data_for_extra_history_columns => null_data_for_extra_history_columns
+         s% how_many_extra_profile_columns => null_how_many_extra_profile_columns
+         s% data_for_extra_profile_columns => null_data_for_extra_profile_columns
+
+         if (dbg) write(*,*) 'call extras_controls'
+         call extras_controls(id, ierr)
+         if (ierr /= 0) return
+
          if (restart_filename /= "restart_photo") then
             temp_fname  = trim(s% photo_directory) // '/' // trim(restart_filename)
             restart_filename  = trim(temp_fname)
@@ -425,20 +443,6 @@
             call show_log_description(id, ierr)
             if (failed('show_log_description',ierr)) return
          end if
-
-         s% extras_startup => null_extras_startup
-         s% extras_check_model => null_extras_check_model
-         s% extras_start_step => null_extras_start_step
-         s% extras_finish_step => null_extras_finish_step
-         s% extras_after_evolve => null_extras_after_evolve
-         s% how_many_extra_history_columns => null_how_many_extra_history_columns
-         s% data_for_extra_history_columns => null_data_for_extra_history_columns
-         s% how_many_extra_profile_columns => null_how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => null_data_for_extra_profile_columns
-
-         if (dbg) write(*,*) 'call extras_controls'
-         call extras_controls(id, ierr)
-         if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call binary_controls'
          call binary_controls(id, binary_id, ierr)
@@ -653,13 +657,13 @@
       end subroutine before_step_loop
 
 
-      subroutine after_step_loop(id, inlist_fname, &
-             dbg, result, ierr)
+      subroutine after_step_loop(id, inlist_fname, dbg, result, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s         
          character (len=*) :: inlist_fname
          logical, intent(in) :: dbg
-         integer, intent(out) :: result, ierr
+         integer, intent(out) :: ierr
+         integer, intent(inout) :: result
          logical :: will_read_pgstar_inlist
 
          real(dp) :: tmp
@@ -711,9 +715,9 @@
          if (result == keep_going) then 
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
-                if (s% pgstar_interval <= 0) then
+                if (s% pg% pgstar_interval <= 0) then
                     will_read_pgstar_inlist = .true.
-                else if(mod(s% model_number, s% pgstar_interval) == 0) then
+                else if(mod(s% model_number, s% pg% pgstar_interval) == 0) then
                     will_read_pgstar_inlist  = .true.
                 end if
                 if(will_read_pgstar_inlist) then
@@ -1558,109 +1562,7 @@
          end do
          write(*,2) 'total mass in cells from 1 to nz', s% nz, s% xmstar
       end subroutine do_report_cell_for_xm
-      
-      
-      subroutine set_which_rates(id, ierr)
-         use rates_def
-         use rates_lib
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: which_rate
-         
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         
-         if (s% job% set_rates_preference) then
-            write(*,*) 'change rates preference to', s% job% new_rates_preference
-            s% which_rates(:) = s% job% new_rates_preference
-         else
-            s% which_rates(:) = rates_NACRE_if_available
-         end if
-         
-         if (len_trim(s% job% set_rate_c12ag) > 0) then
-            if (s% job% set_rate_c12ag == 'NACRE') then
-               which_rate = use_rate_c12ag_NACRE
-            else if (s% job% set_rate_c12ag == 'jina reaclib') then
-               which_rate = use_rate_c12ag_JR
-            else if (s% job% set_rate_c12ag == 'Kunz') then
-               which_rate = use_rate_c12ag_Kunz
-            else if (s% job% set_rate_c12ag == 'CF88') then
-               which_rate = use_rate_c12ag_CF88
-            else if (s% job% set_rate_c12ag == 'Buchmann') then
-               write(*,*) 'Buchmann rate for c12ag is not in the current jina reaclib'
-               write(*,*) 'to use it, switch to the old jina file '
-               write(*,*) 'and use set_rate_c12ag == "jina reaclib"'
-               write(*,*) '.'
-               ierr = -1
-               return
-            else
-               write(*,*) 'invalid string for set_rate_c12ag ' // trim(s% job% set_rate_c12ag)
-               write(*,*) 'options are NACRE, jina reaclib, Kunz, CF88'
-               ierr = -1
-               return
-            end if
-            call set_which_rate_c12ag(s% which_rates, which_rate)
-         end if
-         
-         if (len_trim(s% job% set_rate_n14pg) > 0) then
-            if (s% job% set_rate_n14pg == 'NACRE') then
-               which_rate = use_rate_n14pg_NACRE
-            else if (s% job% set_rate_n14pg == 'jina reaclib') then
-               which_rate = use_rate_n14pg_JR
-            else if (s% job% set_rate_n14pg == 'CF88') then
-               which_rate = use_rate_n14pg_CF88
-            else if (s% job% set_rate_n14pg == 'Imbriani') then
-               write(*,*) 'Imbriani rate for n14pg is not in the current jina reaclib'
-               write(*,*) 'to use it, switch to the old jina file '
-               write(*,*) 'and use set_rate_n14pg == "jina reaclib"'
-               write(*,*) '.'
-               ierr = -1
-               return
-            else
-               write(*,*) 'invalid string for set_rate_n14pg ' // trim(s% job% set_rate_n14pg)
-               write(*,*) 'options are NACRE, jina reaclib, CF88'
-               ierr = -1
-               return
-            end if
-            call set_which_rate_n14pg(s% which_rates, which_rate)
-         end if
-         
-         if (len_trim(s% job% set_rate_3a) > 0) then
-            if (s% job% set_rate_3a == 'NACRE') then
-               which_rate = use_rate_3a_NACRE
-            else if (s% job% set_rate_3a == 'jina reaclib') then
-               which_rate = use_rate_3a_JR
-            else if (s% job% set_rate_3a == 'CF88') then
-               which_rate = use_rate_3a_CF88
-            else if (s% job% set_rate_3a == 'FL87') then
-               which_rate = use_rate_3a_FL87
-            else
-               write(*,*) 'invalid string for set_rate_3a ' // trim(s% job% set_rate_3a)
-               write(*,*) 'options are NACRE, jina reaclib, CF88, FL87'
-               ierr = -1
-               return
-            end if
-            call set_which_rate_3a(s% which_rates, which_rate)
-         end if
-         
-         if (len_trim(s% job% set_rate_1212) > 0) then
-            if (s% job% set_rate_1212 == 'CF88_basic_1212') then
-               which_rate = use_rate_1212_CF88_basic
-            else if (s% job% set_rate_1212 == 'CF88_multi_1212') then
-               which_rate = use_rate_1212_CF88_multi
-            else
-               write(*,*) 'invalid string for set_rate_1212 ' // trim(s% job% set_rate_1212)
-               ierr = -1
-               return
-            end if
-            call set_which_rate_1212(s% which_rates, which_rate)
-         end if
-
-      end subroutine set_which_rates
-      
-      
+            
       subroutine set_rate_factors(id, ierr)
          use net_lib, only: get_net_reaction_table_ptr
          use rates_lib, only: rates_reaction_id
@@ -1722,7 +1624,6 @@
       
          ierr = 0
 
-         s% set_which_rates => set_which_rates ! will be called after net is defined
          s% set_rate_factors => set_rate_factors ! will be called after net is defined
          
          call get_atm_tau_base(s, s% tau_base, ierr)
@@ -1929,10 +1830,6 @@
          if (failed('store_controls',ierr)) return
          call do_star_job_controls_before(id_aux, s_aux, .false., ierr)
          if (ierr /= 0) return
-         s_aux% job% set_rate_c12ag = s% job% set_rate_c12ag
-         s_aux% job% set_rate_n14pg = s% job% set_rate_n14pg
-         s_aux% job% set_rate_3a = s% job% set_rate_3a
-         s_aux% job% set_rate_1212 = s% job% set_rate_1212
          call star_read_model(id_aux, s% job% saved_model_for_merger_2, ierr)
          if (failed('star_read_model',ierr)) return
 
@@ -2094,6 +1991,22 @@
          logical :: change_v, change_u
          include 'formats'
          
+         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
+            call star_change_to_new_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
+            if (failed('star_change_to_new_net',ierr)) return
+         end if
+
+         if (s% job% change_small_net .or. &
+               (s% job% change_initial_small_net .and. .not. restart)) then         
+            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
+            call star_change_to_new_small_net( &
+               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
+            if (failed('star_change_to_new_small_net',ierr)) return
+            write(*,*) 'number of species', s% species
+         end if
+
+
          if (len_trim(s% job% history_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% history_columns_file)
          call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
@@ -2192,22 +2105,7 @@
             write(*,2) 'steps_before_start_timing', &
                s% job% steps_before_start_timing
          end if
-         
-         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
-            call star_change_to_new_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
-            if (failed('star_change_to_new_net',ierr)) return
-         end if
-
-         if (s% job% change_small_net .or. &
-               (s% job% change_initial_small_net .and. .not. restart)) then         
-            write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
-            call star_change_to_new_small_net( &
-               id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
-            if (failed('star_change_to_new_small_net',ierr)) return
-            write(*,*) 'number of species', s% species
-         end if
-         
+                  
          if (abs(s% job% T9_weaklib_full_off - T9_weaklib_full_off) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off', s% job% T9_weaklib_full_off
             T9_weaklib_full_off = s% job% T9_weaklib_full_off
@@ -3838,7 +3736,7 @@
             write(*,*) "          and should be set to 1 during normal MESA use."
             write(*,*) "***"
             write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
-            write(*,*) "and max_model_number by its inverse:"
+            write(*,*) "and max_model_number by its inverse twice:"
             write(*,*) ""
             write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
             s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
@@ -3849,7 +3747,7 @@
             write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
             write(*,*)    "   old max_model_number = ",   s% max_model_number
-            s% max_model_number = s% max_model_number / test_suite_res_factor
+            s% max_model_number = s% max_model_number / test_suite_res_factor / test_suite_res_factor
             write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if

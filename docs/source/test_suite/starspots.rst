@@ -1,0 +1,1 @@
+../../../star/test_suite/starspots/README.rst

@@ -173,9 +173,9 @@
 
 
       subroutine alloc_star_data(id, ierr)
-         use rates_def, only: rates_reaction_id_max, rates_NACRE_if_available
+         use rates_def, only: rates_reaction_id_max
          use chem_def, only: num_categories
-         use net, only: default_set_which_rates, default_set_rate_factors, &
+         use net, only: default_set_rate_factors, &
             default_set_op_mono_factors
 
 
@@ -213,9 +213,6 @@
 
          nullify(s% chem_id)
          nullify(s% xa_removed)
-
-         nullify(s% which_rates)
-         s% set_which_rates => default_set_which_rates
 
          nullify(s% rate_factors)
          s% set_rate_factors => default_set_rate_factors
@@ -503,6 +500,7 @@
          s% species = 0
          s% num_reactions = 0
 
+         s% fix_Pgas = .false.
          s% v_flag = .false.
          s% u_flag = .false.
          s% rotation_flag = .false.
@@ -641,8 +639,6 @@
          s% how_many_extra_binary_history_columns => null_how_many_extra_binary_history_columns
          s% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
          
-         s% Abundance_pgstar_decorator => null_pgstar_decorator
-
          s% generations = 0
 
          s% nz = 0
@@ -747,7 +743,9 @@
 
          s% len_extra_iwork = 0
          s% len_extra_work = 0
-         
+
+         s% phase_sep_mixing_mass = -1
+
          call init_random(s)
 
       end subroutine set_starting_star_data
@@ -869,6 +867,9 @@
 
          initial_mass = s% initial_mass
          initial_z = s% initial_z
+
+         if (s% initial_y < 0) s% initial_y = max(0d0, min(1d0, 0.24d0 + 2*initial_z))
+
          s% dt = 0
          s% termination_code = -1
 

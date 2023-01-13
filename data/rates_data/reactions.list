@@ -116,7 +116,7 @@ r_h2_gn_h1                          1 h2                              =>  1 h1  
 
 r_he3_gp_h2                         1 he3                             =>  1 h1      + 1 h2                                                            1                                      photo                        he3(g,p)h2
 
-r_he4_he4_he4_to_c12                3 he4                             =>  1 c12                                                                       3    he4   he4   he4                   tri_alfa                     triple alpha
+r_he4_he4_he4_to_c12                3 he4                             =>  1 c12                                                                       3    he4   he4   he4                   tri_alpha                     triple alpha
 r_c12_to_he4_he4_he4                1 c12                             =>  3 he4                                                                       1                                      photo                        c12 => 3 he4
 r_c12_ag_o16                        1 c12     + 1 he4                 =>  1 o16                                                                       2    he4   c12                         c_alpha                       c12(a,g)o16
 r1212                               2 c12                             =>  1 he4     + 1 ne20                                                          2    c12   c12                         c12_c12                      c12 + c12 -> ne20 + he4; rate includes -> na23 + h1

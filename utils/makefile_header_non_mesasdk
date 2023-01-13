@@ -92,6 +92,7 @@ MKL_INCLUDE =
 
 # for now, GYRE is only available with the mesasdk 
 USE_GYRE = NO
+USE_ADIPLS = YES
 
 # See http://www.gnu.org/software/make/manual/make.html#Testing-Flags for findstring
 ifneq (,$(findstring ifort,$(FC)))
@@ -390,7 +391,12 @@ LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
 
 LIBS_MESA_BINARY = binary $(LIBS_MESA_STAR)
 LOAD_MESA_BINARY_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_BINARY))
-LOAD_MESA_BINARY_EXT = $(LOAD_MESA_STAR_EXT)
+
+ifeq ($(USE_PGSTAR),YES)
+   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
+else
+   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT)
+endif
 LOAD_MESA_BINARY = $(LOAD_MESA_BINARY_INT) $(LOAD_MESA_BINARY_EXT)
 
 # LOADER creates executables

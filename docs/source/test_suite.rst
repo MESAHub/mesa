@@ -51,6 +51,12 @@ The test_suite examples require a few tweaks in order to be used
 "outside" of the test_suite directory. First, you need to edit
 make/makefile and delete the line
 
+.. note::
+   This is no longer needed and is left only as a reference for previous versions of MESA.
+   All instances of MESA_DIR have been removed from all test cases.
+   You may still need to adjust some inlist paths if they specify relative paths instead of
+   absolute paths.
+
 ::
 
    MESA_DIR = ../../../..
@@ -199,6 +205,14 @@ This test suite example checks the inward propagation of a carbon burning front 
 ^^^^^^^^^^^^^^^
 
 This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+
+
+:ref:`check_pulse_atm`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test checks that the atmosphere structure written to the
+pulsation output closely matches what is expected for the
+:math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
 
 
 :ref:`conserve_angular_momentum`
@@ -432,6 +446,11 @@ to find the instability strip edges, and effective temperatures offset from the 
 
 This test case checks that RSP models can be saved and loaded to produce the same results as test case :ref:`rsp_Cepheid`.
 
+:ref:`starspots`
+^^^^^^^^^^^^^^^^
+
+This test case implements modifications to the surface structure of a 1 solar mass star based on a star spots formalism.
+
 :ref:`semiconvection`
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -663,14 +682,21 @@ An example optimisation run of the ``astero`` module, based on the CoRoT
 target HD 49385.  This is the usual starting point if you want to
 optimise model parameters using the ``astero`` module.
 
+:ref:`fast_from_file`
+^^^^^^^^^^^^^^^^^^^^^
+:ref:`fast_newuoa`
+^^^^^^^^^^^^^^^^^^
+:ref:`fast_scan_grid`
+^^^^^^^^^^^^^^^^^^^^^
 :ref:`fast_simplex`
 ^^^^^^^^^^^^^^^^^^^
 
-Executes a handful of iterations of a very crude simplex optimisation
-to make sure the relevant procedures get tested.
+Each of these test cases runs a handful of iterations of a crude
+optimisation, principally to increase test coverage across the
+``astero`` module.
 
-surface_effects
-^^^^^^^^^^^^^^^
+:ref:`surface_effects`
+^^^^^^^^^^^^^^^^^^^^^^
 
 Tests the implementation of the various surface effect corrections
 available in MESA.

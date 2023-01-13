@@ -329,7 +329,6 @@
          if (ASSOCIATED(s% burn_z_mix_region)) deallocate(s% burn_z_mix_region)
 
          if (ASSOCIATED(s% rate_factors)) deallocate(s% rate_factors)
-         if (ASSOCIATED(s% which_rates)) deallocate(s% which_rates)
 
          if (ASSOCIATED(s% nameofvar)) deallocate(s% nameofvar)
          if (ASSOCIATED(s% nameofequ)) deallocate(s% nameofequ)
@@ -849,6 +848,15 @@
             call do1(s% eps_nuc_neu_total, c% eps_nuc_neu_total)
             if (failed('eps_nuc_neu_total')) exit
 
+            call do2(s% raw_rate, c% raw_rate, num_reactions, null_str)
+            if (failed('raw_rates')) exit
+            call do2(s% screened_rate, c% screened_rate, num_reactions, null_str)
+            if (failed('screened_rates')) exit
+            call do2(s% eps_nuc_rate, c% eps_nuc_rate, num_reactions, null_str)
+            if (failed('eps_nuc_rates')) exit
+            call do2(s% eps_neu_rate, c% eps_neu_rate, num_reactions, null_str)
+            if (failed('eps_neu_rates')) exit
+
             call do2(s% dxdt_nuc, c% dxdt_nuc, species, null_str)
             if (failed('dxdt_nuc')) exit
             call do2(s% d_dxdt_nuc_dRho, c% d_dxdt_nuc_dRho, species, null_str)
@@ -1043,6 +1051,8 @@
             if (failed('mlt_cdc')) exit
             call do1(s% cdc, c% cdc)
             if (failed('cdc')) exit
+            call do1(s% dvc_dt_TDC, c% dvc_dt_TDC)
+            if (failed('dvc_dt_TDC')) exit
 
             call do1(s% D_mix, c% D_mix)
             if (failed('D_mix')) exit

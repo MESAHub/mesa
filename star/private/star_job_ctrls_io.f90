@@ -448,12 +448,6 @@
          co_net, &
          adv_net, &
          adjust_abundances_for_new_isos, &
-         set_rates_preference, &
-         new_rates_preference, &
-         set_rate_c12ag, &
-         set_rate_n14pg, &
-         set_rate_3a, &
-         set_rate_1212, &
          set_uniform_xa_from_file, &
          set_uniform_initial_xa_from_file, &
          file_for_uniform_xa, &
@@ -468,6 +462,7 @@
          T9_weaklib_full_on_hi_Z, &
 
          use_suzuki_weak_rates, &
+         use_3a_fl87, &
 
          use_special_weak_rates, &
          special_weak_states_file, &
@@ -539,6 +534,7 @@
          extras_lpar, &
          num_special_rate_factors, &
          special_rate_factor, &
+         filename_of_special_rate, &
          reaction_for_special_factor,&
          color_num_files,&
          color_file_names,&
@@ -1080,12 +1076,6 @@
          s% job% co_net = co_net
          s% job% adv_net = adv_net
          s% job% adjust_abundances_for_new_isos = adjust_abundances_for_new_isos
-         s% job% set_rates_preference = set_rates_preference
-         s% job% new_rates_preference = new_rates_preference
-         s% job% set_rate_c12ag = set_rate_c12ag
-         s% job% set_rate_n14pg = set_rate_n14pg
-         s% job% set_rate_3a = set_rate_3a
-         s% job% set_rate_1212 = set_rate_1212
          s% job% set_uniform_xa_from_file = set_uniform_xa_from_file
          s% job% set_uniform_initial_xa_from_file = set_uniform_initial_xa_from_file
          s% job% file_for_uniform_xa = file_for_uniform_xa
@@ -1102,6 +1092,7 @@
          s% job% T9_weaklib_full_on_hi_Z = T9_weaklib_full_on_hi_Z
 
          s% job% use_suzuki_weak_rates = use_suzuki_weak_rates
+         s% job% use_3a_fl87 = use_3a_fl87
 
          s% job% use_special_weak_rates = use_special_weak_rates
          s% job% special_weak_states_file = special_weak_states_file
@@ -1175,6 +1166,7 @@
          s% job% extras_lpar = extras_lpar
          s% job% num_special_rate_factors = num_special_rate_factors
          s% job% special_rate_factor = special_rate_factor
+         s% job% filename_of_special_rate = filename_of_special_rate
          s% job% reaction_for_special_factor = reaction_for_special_factor
          s% job% color_num_files = color_num_files
          s% job% color_file_names = color_file_names
@@ -1194,6 +1186,7 @@
          extras_cpar(:) = ''
          extras_lpar(:) = .false.
          special_rate_factor(:) = 1d0
+         filename_of_special_rate(:) = ''
          reaction_for_special_factor(:) = ''
          color_num_colors(:) = 0
          color_file_names(:) = ''
@@ -1639,12 +1632,6 @@
          co_net = s% job% co_net
          adv_net = s% job% adv_net
          adjust_abundances_for_new_isos = s% job% adjust_abundances_for_new_isos
-         set_rates_preference = s% job% set_rates_preference
-         new_rates_preference = s% job% new_rates_preference
-         set_rate_c12ag = s% job% set_rate_c12ag
-         set_rate_n14pg = s% job% set_rate_n14pg
-         set_rate_3a = s% job% set_rate_3a
-         set_rate_1212 = s% job% set_rate_1212
          set_uniform_xa_from_file = s% job% set_uniform_xa_from_file
          set_uniform_initial_xa_from_file = s% job% set_uniform_initial_xa_from_file
          file_for_uniform_xa = s% job% file_for_uniform_xa
@@ -1661,6 +1648,7 @@
          T9_weaklib_full_on_hi_Z = s% job% T9_weaklib_full_on_hi_Z
 
          use_suzuki_weak_rates = s% job% use_suzuki_weak_rates
+         use_3a_fl87 = s% job% use_3a_fl87
 
          use_special_weak_rates = s% job% use_special_weak_rates
          special_weak_states_file = s% job% special_weak_states_file
@@ -1734,6 +1722,8 @@
          extras_lpar = s% job% extras_lpar
          num_special_rate_factors = s% job% num_special_rate_factors
          special_rate_factor = s% job% special_rate_factor
+         filename_of_special_rate = s% job% filename_of_special_rate
+         
          reaction_for_special_factor = s% job% reaction_for_special_factor
          color_num_files = s% job% color_num_files
          color_file_names = s% job% color_file_names
@@ -1779,7 +1769,7 @@
          character(len=*), intent(out) :: val
          integer, intent(out) :: ierr
    
-         character(len(name)) :: upper_name
+         character(len(name)+1) :: upper_name
          character(len=512) :: str
          integer :: iounit,iostat,ind,i
    
@@ -1795,14 +1785,14 @@
          rewind(iounit)
    
          ! Namelists get written in captials
-         upper_name = StrUpCase(name)
+         upper_name = trim(StrUpCase(name))//'='
          val = ''
          ! Search for name inside namelist
          do 
             read(iounit,'(A)',iostat=iostat) str
-            ind = index(str,trim(upper_name))
+            ind = index(trim(str),trim(upper_name))
             if( ind /= 0 ) then
-               val = str(ind+len_trim(upper_name)+1:len_trim(str)-1) ! Remove final comma and starting =
+               val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
                do i=1,len(val)
                   if(val(i:i)=='"') val(i:i) = ' '
                end do

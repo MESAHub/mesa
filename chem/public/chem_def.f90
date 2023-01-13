@@ -2389,7 +2389,7 @@
 
          category_name(ipp) = 'pp'
          category_name(icno) = 'cno'
-         category_name(i3alf) = 'tri_alfa'
+         category_name(i3alf) = 'tri_alpha'
 
          category_name(i_burn_c) = 'c_alpha'
          category_name(i_burn_n) = 'n_alpha'

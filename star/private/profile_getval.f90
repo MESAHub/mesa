@@ -53,7 +53,11 @@
       integer, parameter :: log_concentration_offset = log_g_rad_offset + idel
       integer, parameter :: diffusion_dX_offset = log_concentration_offset + idel
       integer, parameter :: diffusion_D_offset = diffusion_dX_offset + idel
-      integer, parameter :: extra_offset = diffusion_D_offset + idel
+      integer, parameter :: raw_rate_offset = diffusion_D_offset + idel
+      integer, parameter :: screened_rate_offset = raw_rate_offset + idel
+      integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
+      integer, parameter :: extra_offset = eps_neu_rate_offset + idel
 
       integer, parameter :: max_profile_offset = extra_offset + idel
 
@@ -62,12 +66,15 @@
 
 
       integer function do1_profile_spec( &
-            iounit, n, i, string, buffer, report, ierr) result(spec)
+            s, iounit, n, i, string, buffer, report, ierr) result(spec)
 
          use utils_lib
          use utils_def
          use chem_def
          use chem_lib
+         use net_def
+
+         type(star_info), pointer :: s
          integer :: iounit, n, i, num, t
 
          character (len=*) :: string, buffer
@@ -75,9 +82,13 @@
          integer, intent(out) :: ierr
 
          integer :: id
+         type(Net_General_Info), pointer :: g
 
          ierr = 0
          spec = -1
+
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
 
          id = do_get_profile_id(string)
          if (id > 0) then
@@ -122,6 +133,18 @@
 
             case ('log') ! add log of abundance
                call do1_nuclide(log_abundance_offset)
+
+            case ('eps_neu_rate')
+                call do1_rate(eps_neu_rate_offset)
+
+            case ('eps_nuc_rate')
+                call do1_rate(eps_nuc_rate_offset)
+
+            case ('screened_rate')
+                call do1_rate(screened_rate_offset)
+
+            case ('raw_rate')
+                call do1_rate(raw_rate_offset)
 
             case ('extra')
 
@@ -174,6 +197,24 @@
             ierr = -1
          end subroutine do1_nuclide
 
+         subroutine do1_rate(offset) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+            use rates_lib, only: rates_reaction_id
+            integer, intent(in) :: offset
+            integer :: t, id
+            t = token(iounit, n, i, buffer, string)
+            if (t /= name_token) then
+               ierr = -1; return
+            end if
+            id = rates_reaction_id(string)
+            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id            
+            if (id > 0) then
+               spec = offset + id
+               return
+            end if
+            write(*,*) 'bad rate name: ' // trim(string)
+            ierr = -1
+         end subroutine do1_rate
+
 
       end function do1_profile_spec
 
@@ -195,7 +236,7 @@
          if (t /= name_token) then
             spec = -1; return
          end if
-         spec = do1_profile_spec(iounit, n, i, string, buffer, .false., ierr)
+         spec = do1_profile_spec(s, iounit, n, i, string, buffer, .false., ierr)
          if (ierr == 0) return
          ! check to see if it is one of the extra profile columns
          do i=1,s% num_extra_profile_cols
@@ -227,6 +268,7 @@
          use rates_def
          use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
+                  
          type (star_info), pointer :: s
          integer, intent(in) :: c, k
          real(dp), intent(out) :: val
@@ -264,10 +306,23 @@
 
          int_flag = .false.
          rsp_or_w = s% RSP_flag .or. s% RSP2_flag
-
+         
          if (c > extra_offset) then
             i = c - extra_offset
             val = s% profile_extra(k,i)
+         ! TODO: implement eps_neu_rate, eps_nuc_rate, screened_rate
+         else if (c > eps_neu_rate_offset) then
+            i = c - eps_neu_rate_offset
+            val = s% eps_neu_rate(i,k) * s% dm(k)
+         else if (c > eps_nuc_rate_offset) then
+            i = c - eps_nuc_rate_offset
+            val = s% eps_nuc_rate(i,k) * s% dm(k)
+         else if (c > screened_rate_offset) then
+            i = c - screened_rate_offset
+            val = s% screened_rate(i,k) * s% dm(k)
+         else if (c > raw_rate_offset) then
+            i = c - raw_rate_offset
+            val = s% raw_rate(i,k) * s% dm(k)
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
             ii = s% net_iso(i)
@@ -1321,7 +1376,8 @@
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound(k)
-
+            case (p_dvc_dt_TDC_div_g)
+               val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
                val = dble(s% mixing_type(k))
                int_val = s% mixing_type(k)
@@ -2033,7 +2089,7 @@
                if (s% calculate_Brunt_N2) val = sqrt(max(0d0,s% brunt_N2(k)))
             case (p_brunt_frequency) ! cycles per day
                if (s% calculate_Brunt_N2) val = &
-                  (24d0*60d0*60d0/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
+                  (secday/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
             case (p_log_brunt_N)
                if (s% calculate_Brunt_N2) val = safe_log10(sqrt(max(0d0,s% brunt_N2(k))))
             case (p_log_brunt_N2)

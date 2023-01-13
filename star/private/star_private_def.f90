@@ -331,7 +331,6 @@
 
 
       subroutine alloc_star(id, ierr)
-         use rates_def, only: rates_NACRE_if_available
          integer, intent(out) :: id, ierr
          integer :: i
          type (star_info), pointer :: s

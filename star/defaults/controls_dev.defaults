@@ -110,36 +110,6 @@
     RSP2_map_history_filename = 'map_history.data'
 
 
-
-
-    
-
-
-      ! use_superad_reduction
-      ! ~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Implicit alternative to okay_to_reduce_gradT_excess, EXPERIMENTAL
-
-      ! ::
-
-    use_superad_reduction = .false.
-    superad_reduction_Gamma_limit = 0.5d0
-    superad_reduction_Gamma_limit_scale = 5d0
-    superad_reduction_Gamma_inv_scale = 5d0
-    superad_reduction_diff_grads_limit = 1d-3
-    superad_reduction_limit = -1d0
-
-
 ! mass corrections
 ! ================
 
@@ -178,5 +148,57 @@
 
     use_mass_corrections = .false.
 
+
+! WD phase separation
+! ===================
+
+      ! do_phase_separation
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Phase separation upon crystallization in WD cores
+      ! (currently only for C/O white dwarf cores)
+      ! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+
+      ! ::
+
+    do_phase_separation = .false.
+
+      ! do_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, calculate heating term associated with changes in
+      ! internal energy due to any abundance changes from phase
+      ! separation, and include this term in the energy equation.
+
+      ! ::
+
+    do_phase_separation_heating = .true.
+
+      ! phase_separation_mixing_use_brunt
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, the phase separation mixing recalculates relevant
+      ! EOS quantities and evaluates the Ledoux criterion,
+      ! including the brunt B term that depends on the composition
+      ! gradient. This can be somewhat expensive, so this option can
+      ! be set to false to instead just mix outward until there is
+      ! no more negative mu gradient. These will produce similar
+      ! final chemical profiles, but setting this option to true
+      ! is the only way to properly evaluate the physical criterion.
+
+      ! ::
+
+    phase_separation_mixing_use_brunt = .true.
+    
+      ! phase_separation_no_diffusion
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true and element diffusion is on, prevent element diffusion
+      ! from occurring in the layers where phase separation mixing
+      ! is present (experimental)
+
+      ! ::
+
+    phase_separation_no_diffusion = .false.
 
 

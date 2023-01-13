@@ -156,9 +156,11 @@
          real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
             twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
             prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
-            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum
+            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum,&
+            mass_sum
          logical, parameter :: new_only = .false.
          integer, pointer :: net_iso(:)
+         real(dp), pointer :: velocity(:) => null()
 
          include 'formats'
 
@@ -226,7 +228,7 @@
          ! s% time is in seconds
          s% star_age = s% time/secyer
          s% time_years = s% time/secyer
-         s% time_days = s% time/dble(60*60*24)
+         s% time_days = s% time/secday
          if ( s% model_number <= 0 ) then
             s% star_age = 0d0
             s% time_days = 0d0
@@ -236,7 +238,7 @@
          ! s% dt is in seconds
          s% time_step = s% dt/secyer         ! timestep in years
          s% dt_years = s% dt/secyer
-         s% dt_days = s% dt/dble(60*60*24)
+         s% dt_days = s% dt/secday
          
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
@@ -265,37 +267,23 @@
             s% dynamic_timescale = 2*pi*sqrt(radius*radius*radius/(s% cgrav(1)*mstar))
          end if
 
-         if (h1 /= 0) then
-            s% center_h1 = center_avg_x(s,h1)
-            s% surface_h1 = surface_avg_x(s,h1)
-         end if
-         if (he3 /= 0) then
-            s% center_he3 = center_avg_x(s,he3)
-            s% surface_he3 = surface_avg_x(s,he3)
-         end if
-         if (he4 /= 0) then
-            s% center_he4 = center_avg_x(s,he4)
-            s% surface_he4 = surface_avg_x(s,he4)
-         end if
-         if (c12 /= 0) then
-            s% center_c12 = center_avg_x(s,c12)
-            s% surface_c12 = surface_avg_x(s,c12)
-         end if
-         if (n14 /= 0) then
-            s% center_n14 = center_avg_x(s,n14)
-            s% surface_n14 = surface_avg_x(s,n14)
-         end if
-         if (o16 /= 0) then
-            s% center_o16 = center_avg_x(s,o16)
-            s% surface_o16 = surface_avg_x(s,o16)
-         end if
-         if (ne20 /= 0) then
-            s% center_ne20 = center_avg_x(s,ne20)
-            s% surface_ne20 = surface_avg_x(s,ne20)
-         end if
-         if (si28 /= 0) then
-            s% center_si28 = center_avg_x(s,si28)
-         end if
+         ! center_avg_x and surface_avg_x check if the species is not in the net
+         ! and set's the values to 0 if so. So dont check species here. 
+         s% center_h1 = center_avg_x(s,h1)
+         s% surface_h1 = surface_avg_x(s,h1)
+         s% center_he3 = center_avg_x(s,he3)
+         s% surface_he3 = surface_avg_x(s,he3)
+         s% center_he4 = center_avg_x(s,he4)
+         s% surface_he4 = surface_avg_x(s,he4)
+         s% center_c12 = center_avg_x(s,c12)
+         s% surface_c12 = surface_avg_x(s,c12)
+         s% center_n14 = center_avg_x(s,n14)
+         s% surface_n14 = surface_avg_x(s,n14)
+         s% center_o16 = center_avg_x(s,o16)
+         s% surface_o16 = surface_avg_x(s,o16)
+         s% center_ne20 = center_avg_x(s,ne20)
+         s% surface_ne20 = surface_avg_x(s,ne20)
+         s% center_si28 = center_avg_x(s,si28)
 
          ! FYI profile stuff
          do k=1,nz
@@ -395,62 +383,56 @@
          call get_burn_zone_info(s, ierr)
          if (failed('get_burn_zone_info')) return
 
+
          s% fe_core_infall = 0
          s% non_fe_core_infall = 0
          s% non_fe_core_rebound = 0
-         if (s% u_flag) then
-            k_min = minloc(s% u(1:nz),dim=1)
-            if (k_min > 0) then
-               s% max_infall_speed_mass = s% m(k_min)/Msun
+         s% max_infall_speed_mass = 0
+
+         if(s% u_flag .or. s% v_flag) then
+
+            if(s% u_flag) then
+               velocity => s% u
             else
-               s% max_infall_speed_mass = s% m(k_min)/Msun
+               velocity => s% v
             end if
+            k_min = minloc(velocity(1:nz), dim=1)
+
+            s% max_infall_speed_mass = s% m(k_min)/Msun
+
+            mass_sum = 0d0
             if (s% fe_core_mass > 0) then
-               do k = 1, nz
+               do k=1, nz
                   if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if (-s% u(k) > s% fe_core_infall) &
-                     s% fe_core_infall = -s% u(k)
+                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% m(k)
                end do
+
+               if(mass_sum > s% fe_core_infall_mass*msun) then
+                  s% fe_core_infall = -velocity(k_min)
+               end if
             end if
+
             non_fe_core_mass = s% he_core_mass
+            mass_sum = 0d0
+
             if (non_fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*non_fe_core_mass) cycle
-                  if (s% m(k) < Msun*s% fe_core_mass) exit
-                  if (-s% u(k) > s% non_fe_core_infall) &
-                     s% non_fe_core_infall = -s% u(k)
-                  if (s% u(k) > s% non_fe_core_rebound) then
-                     s% non_fe_core_rebound = s% u(k)
-                     !write(*,2) 's% non_fe_core_rebound', k, s% non_fe_core_rebound, s% m(k)/Msun
-                  end if
+               do k=1, nz
+                  if (s% m(k) > Msun * non_fe_core_mass) cycle
+                  if (s% m(k) < Msun * s% fe_core_mass) exit
+                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% m(k)
                end do
+   
+               if(mass_sum > s% non_fe_core_infall_mass*msun) then
+                  s% non_fe_core_infall = -velocity(k_min)
+               end if
+               
+               s% non_fe_core_rebound = maxval(velocity(s%he_core_k:s%fe_core_k),dim=1)
+
             end if
-         else if (s% v_flag) then
-            k_min = minloc(s% v(1:nz),dim=1)
-            if (k_min > 0) then
-               s% max_infall_speed_mass = s% m(k_min)/Msun
-            else
-               s% max_infall_speed_mass = s% m(k_min)/Msun
-            end if
-            if (s% fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if (-s% v(k) > s% fe_core_infall) &
-                     s% fe_core_infall = -s% v(k)
-               end do
-            end if
-            non_fe_core_mass = max(s% he_core_mass, s% co_core_mass)
-            if (non_fe_core_mass > 0) then
-               do k = 1, nz
-                  if (s% m(k) > Msun*non_fe_core_mass) cycle
-                  if (s% m(k) < Msun*s% fe_core_mass) exit
-                  if (-s% v(k) > s% non_fe_core_infall) &
-                     s% non_fe_core_infall = -s% v(k)
-                  if (s% v(k) > s% non_fe_core_rebound) &
-                     s% non_fe_core_rebound = s% v(k)
-               end do
-            end if
+
+            nullify(velocity)
          end if
+
 
          contains
 

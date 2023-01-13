@@ -18,7 +18,7 @@ Indentation/whitespace rules are codified in an `EditorConfig`_ file located in 
 Fortran
 -------
 
-The preferred Fortran version is at least Fortran 90 this enables things like modules and allocatable arrays.
+The preferred Fortran version is at least Fortran 90 as this enables things like modules and allocatable arrays.
 
 Common and equivalence blocks are banned. Just put the variables in a module header if needed to be shared.
 
@@ -69,7 +69,7 @@ for non-critical errors.
 Stop
 ----
 
-When signaling a critical error which can not be recovered from you should use:
+When signalling a critical error which can not be recovered from you should use:
 
 .. code-block:: fortran
 
@@ -77,7 +77,7 @@ When signaling a critical error which can not be recovered from you should use:
 
     call mesa_error(__FILE__,__LINE__)
 
-Which will generate a backtrace where the error occurs, which aids in debugging. The 
+which will generate a backtrace where the error occurs, which aids in debugging. The
 subroutine ``mesa_error`` can also have a optional error message:
 
 
@@ -94,7 +94,10 @@ Do not use:
 
     stop 1
 
-As it can become difficult to distinguish where in the code called ``stop`` if multiple functions use ``stop 1``
+as it can become difficult to distinguish where in the code called ``stop`` if multiple functions use ``stop 1``.
+
+Note that the ``__FILE__`` and ``__LINE__`` macros are not expanded in
+files that are included using Fortran's ``include`` statement.
 
 
 Doubles
@@ -167,6 +170,20 @@ different compilers.
 
 Some helpful formats are provided in ``include/formats``.
 
+Unformatted reads
+-----------------
+
+.. code-block:: fortran
+
+    read(unit,*) x,y,z
+
+
+Should be avoided when the variables that are strings. This is because if the string contains a / (forward-slash) then when doing a unformatted
+read Fortran will stop reading the line.
+
+Either build a full format statement or read the line into one string and split on whitespace. There is also a function ``split_line`` in 
+``utils_lib.f90`` that can be used to split a line up based on whitespace.
+
 
 Constants
 ---------
@@ -177,7 +194,7 @@ used for consistency across the code.  This includes simple fractions
 (e.g. ``one_third``) and simple functions of mathematical constants
 (e.g. ``sqrt2``, ``pi4 = 4*pi``).
 
-Constants should be added to const_def.f90 if they meet any of the following criteria:
+Constants should be added to ``const_def.f90`` if they meet any of the following criteria:
 
 * If it is a well known mathematical or physical constant or derived from other well known constants
 

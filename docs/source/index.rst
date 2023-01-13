@@ -7,7 +7,7 @@ Stellar Astrophysics (MESA), an open-source 1D stellar evolution code.
 
 .. warning::
 
-   These docs are still under active development.  Many sections are incomplete.
+   These docs are always under active development. Some sections are more complete than others.
 
 .. toctree::
    :maxdepth: 1
@@ -26,3 +26,4 @@ Stellar Astrophysics (MESA), an open-source 1D stellar evolution code.
    code_of_conduct
    contributing
    news
+   known_bugs

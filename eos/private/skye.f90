@@ -51,11 +51,12 @@ module skye
          bounds(2,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! Rough ionization density from Jermyn+2021 Equation 53, dividing by 3 so we get closer to Dragons.
-         bounds(3,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         ! Don't let the density get below rho = 200 g/cc so that solar model stays away from blend into Skye.
+         bounds(3,1) = max(2.3d0,log10(abar * pow3(zbar))) + skye_blend_width
          bounds(3,2) = max(7.3d0,log10(1d5 * pow2(zbar))) + skye_blend_width
 
          ! HELM low-T bound
-         bounds(4,1) = max(2d0,log10(abar * pow3(zbar))) + skye_blend_width
+         bounds(4,1) = max(2.3d0,log10(abar * pow3(zbar))) + skye_blend_width
          bounds(4,2) = ht% logtlo
 
          ! Lower-right of (rho,T) plane
@@ -350,7 +351,7 @@ module skye
          ! Ideal ion free energy, only depends on abar
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
 
-         F_ideal_ion = F_ideal_ion + compute_ion_offset(relevant_species, select_xa, chem_id) ! Offset so ion ground state energy is zero.
+         F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
 
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
@@ -372,7 +373,8 @@ module skye
                                      F_coul, latent_ddlnT, latent_ddlnRho, phase)
 
          call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
-                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT)
+                                 phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
+         if(ierr/=0) return
 
       end subroutine skye_eos
 

@@ -48,11 +48,11 @@
       delta_lgRho_limit = 0.1 
       
       delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.001
+      delta_lgT_cntr_limit = 0.0005
       delta_lgT_cntr_hard_limit = 0.01
 
       delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.001     
+      delta_lgT_max_limit = 0.0005    
       delta_lgT_max_hard_limit = 0.01
 
 ! mesh
@@ -76,6 +76,8 @@
       !profile_interval = 1
       !history_interval = 1
       !terminal_interval = 1
+
+      x_integer_ctrl(1) = 5 ! Inlist part
 
 / ! end of controls namelist
 

@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -46,9 +47,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels1_plot(s, id, device_id, &
-            s% History_Panels1_xleft, s% History_Panels1_xright, &
-            s% History_Panels1_ybot, s% History_Panels1_ytop, .false., &
-            s% History_Panels1_title, s% History_Panels1_txt_scale, ierr)
+            s% pg% History_Panels1_xleft, s% pg% History_Panels1_xright, &
+            s% pg% History_Panels1_ybot, s% pg% History_Panels1_ytop, .false., &
+            s% pg% History_Panels1_title, s% pg% History_Panels1_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels1_plot
@@ -65,34 +66,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels1_xaxis_name, &
-            s% History_Panels1_automatic_star_age_units, &
-            s% History_Panels1_xmin, &
-            s% History_Panels1_xmax, &
-            s% History_Panels1_dxmin, &
-            s% History_Panels1_xmargin, &
-            s% History_Panels1_max_width, &
-            s% History_Panels1_num_panels, &
-            s% History_Panels1_other_ymin, &
-            s% History_Panels1_other_ymax, &
-            s% History_Panels1_other_yaxis_reversed, &
-            s% History_Panels1_other_yaxis_log, &
-            s% History_Panels1_same_yaxis_range, &
-            s% History_Panels1_other_dymin, &
-            s% History_Panels1_points_name, &
-            s% History_Panels1_other_ymargin, &
-            s% History_Panels1_other_yaxis_name, &
-            s% History_Panels1_ymin, &
-            s% History_Panels1_ymax, &
-            s% History_Panels1_xaxis_reversed, &
-            s% History_Panels1_yaxis_reversed, &
-            s% History_Panels1_xaxis_log, &
-            s% History_Panels1_yaxis_log, &
-            s% History_Panels1_dymin, &
-            s% History_Panels1_ymargin, &
-            s% History_Panels1_yaxis_name, &
-            s% History_Panels1_use_decorator, &
-            s% History_Panels1_pgstar_decorator, &
+            s% pg% History_Panels1_xaxis_name, &
+            s% pg% History_Panels1_automatic_star_age_units, &
+            s% pg% History_Panels1_xmin, &
+            s% pg% History_Panels1_xmax, &
+            s% pg% History_Panels1_dxmin, &
+            s% pg% History_Panels1_xmargin, &
+            s% pg% History_Panels1_max_width, &
+            s% pg% History_Panels1_num_panels, &
+            s% pg% History_Panels1_other_ymin, &
+            s% pg% History_Panels1_other_ymax, &
+            s% pg% History_Panels1_other_yaxis_reversed, &
+            s% pg% History_Panels1_other_yaxis_log, &
+            s% pg% History_Panels1_same_yaxis_range, &
+            s% pg% History_Panels1_other_dymin, &
+            s% pg% History_Panels1_points_name, &
+            s% pg% History_Panels1_other_ymargin, &
+            s% pg% History_Panels1_other_yaxis_name, &
+            s% pg% History_Panels1_ymin, &
+            s% pg% History_Panels1_ymax, &
+            s% pg% History_Panels1_xaxis_reversed, &
+            s% pg% History_Panels1_yaxis_reversed, &
+            s% pg% History_Panels1_xaxis_log, &
+            s% pg% History_Panels1_yaxis_log, &
+            s% pg% History_Panels1_dymin, &
+            s% pg% History_Panels1_ymargin, &
+            s% pg% History_Panels1_yaxis_name, &
+            s% pg% History_Panels1_use_decorator, &
+            s% pg% History_Panels1_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels1_plot
 
@@ -109,9 +110,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels2_plot(s, id, device_id, &
-            s% History_Panels2_xleft, s% History_Panels2_xright, &
-            s% History_Panels2_ybot, s% History_Panels2_ytop, .false., &
-            s% History_Panels2_title, s% History_Panels2_txt_scale, ierr)
+            s% pg% History_Panels2_xleft, s% pg% History_Panels2_xright, &
+            s% pg% History_Panels2_ybot, s% pg% History_Panels2_ytop, .false., &
+            s% pg% History_Panels2_title, s% pg% History_Panels2_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels2_plot
@@ -128,34 +129,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels2_xaxis_name, &
-            s% History_Panels2_automatic_star_age_units, &
-            s% History_Panels2_xmin, &
-            s% History_Panels2_xmax, &
-            s% History_Panels2_dxmin, &
-            s% History_Panels2_xmargin, &
-            s% History_Panels2_max_width, &
-            s% History_Panels2_num_panels, &
-            s% History_Panels2_other_ymin, &
-            s% History_Panels2_other_ymax, &
-            s% History_Panels2_other_yaxis_reversed, &
-            s% History_Panels2_other_yaxis_log, &
-            s% History_Panels2_same_yaxis_range, &
-            s% History_Panels2_other_dymin, &
-            s% History_Panels2_points_name, &
-            s% History_Panels2_other_ymargin, &
-            s% History_Panels2_other_yaxis_name, &
-            s% History_Panels2_ymin, &
-            s% History_Panels2_ymax, &
-            s% History_Panels2_xaxis_reversed, &
-            s% History_Panels2_yaxis_reversed, &
-            s% History_Panels2_xaxis_log, &
-            s% History_Panels2_yaxis_log, &
-            s% History_Panels2_dymin, &
-            s% History_Panels2_ymargin, &
-            s% History_Panels2_yaxis_name, &
-            s% History_Panels2_use_decorator, &
-            s% History_Panels2_pgstar_decorator, &
+            s% pg% History_Panels2_xaxis_name, &
+            s% pg% History_Panels2_automatic_star_age_units, &
+            s% pg% History_Panels2_xmin, &
+            s% pg% History_Panels2_xmax, &
+            s% pg% History_Panels2_dxmin, &
+            s% pg% History_Panels2_xmargin, &
+            s% pg% History_Panels2_max_width, &
+            s% pg% History_Panels2_num_panels, &
+            s% pg% History_Panels2_other_ymin, &
+            s% pg% History_Panels2_other_ymax, &
+            s% pg% History_Panels2_other_yaxis_reversed, &
+            s% pg% History_Panels2_other_yaxis_log, &
+            s% pg% History_Panels2_same_yaxis_range, &
+            s% pg% History_Panels2_other_dymin, &
+            s% pg% History_Panels2_points_name, &
+            s% pg% History_Panels2_other_ymargin, &
+            s% pg% History_Panels2_other_yaxis_name, &
+            s% pg% History_Panels2_ymin, &
+            s% pg% History_Panels2_ymax, &
+            s% pg% History_Panels2_xaxis_reversed, &
+            s% pg% History_Panels2_yaxis_reversed, &
+            s% pg% History_Panels2_xaxis_log, &
+            s% pg% History_Panels2_yaxis_log, &
+            s% pg% History_Panels2_dymin, &
+            s% pg% History_Panels2_ymargin, &
+            s% pg% History_Panels2_yaxis_name, &
+            s% pg% History_Panels2_use_decorator, &
+            s% pg% History_Panels2_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels2_plot
 
@@ -171,9 +172,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels3_plot(s, id, device_id, &
-            s% History_Panels3_xleft, s% History_Panels3_xright, &
-            s% History_Panels3_ybot, s% History_Panels3_ytop, .false., &
-            s% History_Panels3_title, s% History_Panels3_txt_scale, ierr)
+            s% pg% History_Panels3_xleft, s% pg% History_Panels3_xright, &
+            s% pg% History_Panels3_ybot, s% pg% History_Panels3_ytop, .false., &
+            s% pg% History_Panels3_title, s% pg% History_Panels3_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels3_plot
@@ -190,34 +191,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels3_xaxis_name, &
-            s% History_Panels3_automatic_star_age_units, &
-            s% History_Panels3_xmin, &
-            s% History_Panels3_xmax, &
-            s% History_Panels3_dxmin, &
-            s% History_Panels3_xmargin, &
-            s% History_Panels3_max_width, &
-            s% History_Panels3_num_panels, &
-            s% History_Panels3_other_ymin, &
-            s% History_Panels3_other_ymax, &
-            s% History_Panels3_other_yaxis_reversed, &
-            s% History_Panels3_other_yaxis_log, &
-            s% History_Panels3_same_yaxis_range, &
-            s% History_Panels3_other_dymin, &
-            s% History_Panels3_points_name, &
-            s% History_Panels3_other_ymargin, &
-            s% History_Panels3_other_yaxis_name, &
-            s% History_Panels3_ymin, &
-            s% History_Panels3_ymax, &
-            s% History_Panels3_xaxis_reversed, &
-            s% History_Panels3_yaxis_reversed, &
-            s% History_Panels3_xaxis_log, &
-            s% History_Panels3_yaxis_log, &
-            s% History_Panels3_dymin, &
-            s% History_Panels3_ymargin, &
-            s% History_Panels3_yaxis_name, &
-            s% History_Panels3_use_decorator, &
-            s% History_Panels3_pgstar_decorator, &
+            s% pg% History_Panels3_xaxis_name, &
+            s% pg% History_Panels3_automatic_star_age_units, &
+            s% pg% History_Panels3_xmin, &
+            s% pg% History_Panels3_xmax, &
+            s% pg% History_Panels3_dxmin, &
+            s% pg% History_Panels3_xmargin, &
+            s% pg% History_Panels3_max_width, &
+            s% pg% History_Panels3_num_panels, &
+            s% pg% History_Panels3_other_ymin, &
+            s% pg% History_Panels3_other_ymax, &
+            s% pg% History_Panels3_other_yaxis_reversed, &
+            s% pg% History_Panels3_other_yaxis_log, &
+            s% pg% History_Panels3_same_yaxis_range, &
+            s% pg% History_Panels3_other_dymin, &
+            s% pg% History_Panels3_points_name, &
+            s% pg% History_Panels3_other_ymargin, &
+            s% pg% History_Panels3_other_yaxis_name, &
+            s% pg% History_Panels3_ymin, &
+            s% pg% History_Panels3_ymax, &
+            s% pg% History_Panels3_xaxis_reversed, &
+            s% pg% History_Panels3_yaxis_reversed, &
+            s% pg% History_Panels3_xaxis_log, &
+            s% pg% History_Panels3_yaxis_log, &
+            s% pg% History_Panels3_dymin, &
+            s% pg% History_Panels3_ymargin, &
+            s% pg% History_Panels3_yaxis_name, &
+            s% pg% History_Panels3_use_decorator, &
+            s% pg% History_Panels3_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels3_plot
 
@@ -233,9 +234,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels4_plot(s, id, device_id, &
-            s% History_Panels4_xleft, s% History_Panels4_xright, &
-            s% History_Panels4_ybot, s% History_Panels4_ytop, .false., &
-            s% History_Panels4_title, s% History_Panels4_txt_scale, ierr)
+            s% pg% History_Panels4_xleft, s% pg% History_Panels4_xright, &
+            s% pg% History_Panels4_ybot, s% pg% History_Panels4_ytop, .false., &
+            s% pg% History_Panels4_title, s% pg% History_Panels4_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels4_plot
@@ -252,34 +253,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels4_xaxis_name, &
-            s% History_Panels4_automatic_star_age_units, &
-            s% History_Panels4_xmin, &
-            s% History_Panels4_xmax, &
-            s% History_Panels4_dxmin, &
-            s% History_Panels4_xmargin, &
-            s% History_Panels4_max_width, &
-            s% History_Panels4_num_panels, &
-            s% History_Panels4_other_ymin, &
-            s% History_Panels4_other_ymax, &
-            s% History_Panels4_other_yaxis_reversed, &
-            s% History_Panels4_other_yaxis_log, &
-            s% History_Panels4_same_yaxis_range, &
-            s% History_Panels4_other_dymin, &
-            s% History_Panels4_points_name, &
-            s% History_Panels4_other_ymargin, &
-            s% History_Panels4_other_yaxis_name, &
-            s% History_Panels4_ymin, &
-            s% History_Panels4_ymax, &
-            s% History_Panels4_xaxis_reversed, &
-            s% History_Panels4_yaxis_reversed, &
-            s% History_Panels4_xaxis_log, &
-            s% History_Panels4_yaxis_log, &
-            s% History_Panels4_dymin, &
-            s% History_Panels4_ymargin, &
-            s% History_Panels4_yaxis_name, &
-            s% History_Panels4_use_decorator, &
-            s% History_Panels4_pgstar_decorator, &
+            s% pg% History_Panels4_xaxis_name, &
+            s% pg% History_Panels4_automatic_star_age_units, &
+            s% pg% History_Panels4_xmin, &
+            s% pg% History_Panels4_xmax, &
+            s% pg% History_Panels4_dxmin, &
+            s% pg% History_Panels4_xmargin, &
+            s% pg% History_Panels4_max_width, &
+            s% pg% History_Panels4_num_panels, &
+            s% pg% History_Panels4_other_ymin, &
+            s% pg% History_Panels4_other_ymax, &
+            s% pg% History_Panels4_other_yaxis_reversed, &
+            s% pg% History_Panels4_other_yaxis_log, &
+            s% pg% History_Panels4_same_yaxis_range, &
+            s% pg% History_Panels4_other_dymin, &
+            s% pg% History_Panels4_points_name, &
+            s% pg% History_Panels4_other_ymargin, &
+            s% pg% History_Panels4_other_yaxis_name, &
+            s% pg% History_Panels4_ymin, &
+            s% pg% History_Panels4_ymax, &
+            s% pg% History_Panels4_xaxis_reversed, &
+            s% pg% History_Panels4_yaxis_reversed, &
+            s% pg% History_Panels4_xaxis_log, &
+            s% pg% History_Panels4_yaxis_log, &
+            s% pg% History_Panels4_dymin, &
+            s% pg% History_Panels4_ymargin, &
+            s% pg% History_Panels4_yaxis_name, &
+            s% pg% History_Panels4_use_decorator, &
+            s% pg% History_Panels4_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels4_plot
 
@@ -295,9 +296,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels5_plot(s, id, device_id, &
-            s% History_Panels5_xleft, s% History_Panels5_xright, &
-            s% History_Panels5_ybot, s% History_Panels5_ytop, .false., &
-            s% History_Panels5_title, s% History_Panels5_txt_scale, ierr)
+            s% pg% History_Panels5_xleft, s% pg% History_Panels5_xright, &
+            s% pg% History_Panels5_ybot, s% pg% History_Panels5_ytop, .false., &
+            s% pg% History_Panels5_title, s% pg% History_Panels5_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels5_plot
@@ -314,34 +315,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels5_xaxis_name, &
-            s% History_Panels5_automatic_star_age_units, &
-            s% History_Panels5_xmin, &
-            s% History_Panels5_xmax, &
-            s% History_Panels5_dxmin, &
-            s% History_Panels5_xmargin, &
-            s% History_Panels5_max_width, &
-            s% History_Panels5_num_panels, &
-            s% History_Panels5_other_ymin, &
-            s% History_Panels5_other_ymax, &
-            s% History_Panels5_other_yaxis_reversed, &
-            s% History_Panels5_other_yaxis_log, &
-            s% History_Panels5_same_yaxis_range, &
-            s% History_Panels5_other_dymin, &
-            s% History_Panels5_points_name, &
-            s% History_Panels5_other_ymargin, &
-            s% History_Panels5_other_yaxis_name, &
-            s% History_Panels5_ymin, &
-            s% History_Panels5_ymax, &
-            s% History_Panels5_xaxis_reversed, &
-            s% History_Panels5_yaxis_reversed, &
-            s% History_Panels5_xaxis_log, &
-            s% History_Panels5_yaxis_log, &
-            s% History_Panels5_dymin, &
-            s% History_Panels5_ymargin, &
-            s% History_Panels5_yaxis_name, &
-            s% History_Panels5_use_decorator, &
-            s% History_Panels5_pgstar_decorator, &
+            s% pg% History_Panels5_xaxis_name, &
+            s% pg% History_Panels5_automatic_star_age_units, &
+            s% pg% History_Panels5_xmin, &
+            s% pg% History_Panels5_xmax, &
+            s% pg% History_Panels5_dxmin, &
+            s% pg% History_Panels5_xmargin, &
+            s% pg% History_Panels5_max_width, &
+            s% pg% History_Panels5_num_panels, &
+            s% pg% History_Panels5_other_ymin, &
+            s% pg% History_Panels5_other_ymax, &
+            s% pg% History_Panels5_other_yaxis_reversed, &
+            s% pg% History_Panels5_other_yaxis_log, &
+            s% pg% History_Panels5_same_yaxis_range, &
+            s% pg% History_Panels5_other_dymin, &
+            s% pg% History_Panels5_points_name, &
+            s% pg% History_Panels5_other_ymargin, &
+            s% pg% History_Panels5_other_yaxis_name, &
+            s% pg% History_Panels5_ymin, &
+            s% pg% History_Panels5_ymax, &
+            s% pg% History_Panels5_xaxis_reversed, &
+            s% pg% History_Panels5_yaxis_reversed, &
+            s% pg% History_Panels5_xaxis_log, &
+            s% pg% History_Panels5_yaxis_log, &
+            s% pg% History_Panels5_dymin, &
+            s% pg% History_Panels5_ymargin, &
+            s% pg% History_Panels5_yaxis_name, &
+            s% pg% History_Panels5_use_decorator, &
+            s% pg% History_Panels5_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels5_plot
 
@@ -357,9 +358,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels6_plot(s, id, device_id, &
-            s% History_Panels6_xleft, s% History_Panels6_xright, &
-            s% History_Panels6_ybot, s% History_Panels6_ytop, .false., &
-            s% History_Panels6_title, s% History_Panels6_txt_scale, ierr)
+            s% pg% History_Panels6_xleft, s% pg% History_Panels6_xright, &
+            s% pg% History_Panels6_ybot, s% pg% History_Panels6_ytop, .false., &
+            s% pg% History_Panels6_title, s% pg% History_Panels6_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels6_plot
@@ -376,34 +377,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels6_xaxis_name, &
-            s% History_Panels6_automatic_star_age_units, &
-            s% History_Panels6_xmin, &
-            s% History_Panels6_xmax, &
-            s% History_Panels6_dxmin, &
-            s% History_Panels6_xmargin, &
-            s% History_Panels6_max_width, &
-            s% History_Panels6_num_panels, &
-            s% History_Panels6_other_ymin, &
-            s% History_Panels6_other_ymax, &
-            s% History_Panels6_other_yaxis_reversed, &
-            s% History_Panels6_other_yaxis_log, &
-            s% History_Panels6_same_yaxis_range, &
-            s% History_Panels6_other_dymin, &
-            s% History_Panels6_points_name, &
-            s% History_Panels6_other_ymargin, &
-            s% History_Panels6_other_yaxis_name, &
-            s% History_Panels6_ymin, &
-            s% History_Panels6_ymax, &
-            s% History_Panels6_xaxis_reversed, &
-            s% History_Panels6_yaxis_reversed, &
-            s% History_Panels6_xaxis_log, &
-            s% History_Panels6_yaxis_log, &
-            s% History_Panels6_dymin, &
-            s% History_Panels6_ymargin, &
-            s% History_Panels6_yaxis_name, &
-            s% History_Panels6_use_decorator, &
-            s% History_Panels6_pgstar_decorator, &
+            s% pg% History_Panels6_xaxis_name, &
+            s% pg% History_Panels6_automatic_star_age_units, &
+            s% pg% History_Panels6_xmin, &
+            s% pg% History_Panels6_xmax, &
+            s% pg% History_Panels6_dxmin, &
+            s% pg% History_Panels6_xmargin, &
+            s% pg% History_Panels6_max_width, &
+            s% pg% History_Panels6_num_panels, &
+            s% pg% History_Panels6_other_ymin, &
+            s% pg% History_Panels6_other_ymax, &
+            s% pg% History_Panels6_other_yaxis_reversed, &
+            s% pg% History_Panels6_other_yaxis_log, &
+            s% pg% History_Panels6_same_yaxis_range, &
+            s% pg% History_Panels6_other_dymin, &
+            s% pg% History_Panels6_points_name, &
+            s% pg% History_Panels6_other_ymargin, &
+            s% pg% History_Panels6_other_yaxis_name, &
+            s% pg% History_Panels6_ymin, &
+            s% pg% History_Panels6_ymax, &
+            s% pg% History_Panels6_xaxis_reversed, &
+            s% pg% History_Panels6_yaxis_reversed, &
+            s% pg% History_Panels6_xaxis_log, &
+            s% pg% History_Panels6_yaxis_log, &
+            s% pg% History_Panels6_dymin, &
+            s% pg% History_Panels6_ymargin, &
+            s% pg% History_Panels6_yaxis_name, &
+            s% pg% History_Panels6_use_decorator, &
+            s% pg% History_Panels6_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels6_plot
 
@@ -419,9 +420,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels7_plot(s, id, device_id, &
-            s% History_Panels7_xleft, s% History_Panels7_xright, &
-            s% History_Panels7_ybot, s% History_Panels7_ytop, .false., &
-            s% History_Panels7_title, s% History_Panels7_txt_scale, ierr)
+            s% pg% History_Panels7_xleft, s% pg% History_Panels7_xright, &
+            s% pg% History_Panels7_ybot, s% pg% History_Panels7_ytop, .false., &
+            s% pg% History_Panels7_title, s% pg% History_Panels7_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels7_plot
@@ -438,34 +439,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels7_xaxis_name, &
-            s% History_Panels7_automatic_star_age_units, &
-            s% History_Panels7_xmin, &
-            s% History_Panels7_xmax, &
-            s% History_Panels7_dxmin, &
-            s% History_Panels7_xmargin, &
-            s% History_Panels7_max_width, &
-            s% History_Panels7_num_panels, &
-            s% History_Panels7_other_ymin, &
-            s% History_Panels7_other_ymax, &
-            s% History_Panels7_other_yaxis_reversed, &
-            s% History_Panels7_other_yaxis_log, &
-            s% History_Panels7_same_yaxis_range, &
-            s% History_Panels7_other_dymin, &
-            s% History_Panels7_points_name, &
-            s% History_Panels7_other_ymargin, &
-            s% History_Panels7_other_yaxis_name, &
-            s% History_Panels7_ymin, &
-            s% History_Panels7_ymax, &
-            s% History_Panels7_xaxis_reversed, &
-            s% History_Panels7_yaxis_reversed, &
-            s% History_Panels7_xaxis_log, &
-            s% History_Panels7_yaxis_log, &
-            s% History_Panels7_dymin, &
-            s% History_Panels7_ymargin, &
-            s% History_Panels7_yaxis_name, &
-            s% History_Panels7_use_decorator, &
-            s% History_Panels7_pgstar_decorator, &
+            s% pg% History_Panels7_xaxis_name, &
+            s% pg% History_Panels7_automatic_star_age_units, &
+            s% pg% History_Panels7_xmin, &
+            s% pg% History_Panels7_xmax, &
+            s% pg% History_Panels7_dxmin, &
+            s% pg% History_Panels7_xmargin, &
+            s% pg% History_Panels7_max_width, &
+            s% pg% History_Panels7_num_panels, &
+            s% pg% History_Panels7_other_ymin, &
+            s% pg% History_Panels7_other_ymax, &
+            s% pg% History_Panels7_other_yaxis_reversed, &
+            s% pg% History_Panels7_other_yaxis_log, &
+            s% pg% History_Panels7_same_yaxis_range, &
+            s% pg% History_Panels7_other_dymin, &
+            s% pg% History_Panels7_points_name, &
+            s% pg% History_Panels7_other_ymargin, &
+            s% pg% History_Panels7_other_yaxis_name, &
+            s% pg% History_Panels7_ymin, &
+            s% pg% History_Panels7_ymax, &
+            s% pg% History_Panels7_xaxis_reversed, &
+            s% pg% History_Panels7_yaxis_reversed, &
+            s% pg% History_Panels7_xaxis_log, &
+            s% pg% History_Panels7_yaxis_log, &
+            s% pg% History_Panels7_dymin, &
+            s% pg% History_Panels7_ymargin, &
+            s% pg% History_Panels7_yaxis_name, &
+            s% pg% History_Panels7_use_decorator, &
+            s% pg% History_Panels7_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels7_plot
 
@@ -481,9 +482,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels8_plot(s, id, device_id, &
-            s% History_Panels8_xleft, s% History_Panels8_xright, &
-            s% History_Panels8_ybot, s% History_Panels8_ytop, .false., &
-            s% History_Panels8_title, s% History_Panels8_txt_scale, ierr)
+            s% pg% History_Panels8_xleft, s% pg% History_Panels8_xright, &
+            s% pg% History_Panels8_ybot, s% pg% History_Panels8_ytop, .false., &
+            s% pg% History_Panels8_title, s% pg% History_Panels8_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels8_plot
@@ -500,34 +501,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels8_xaxis_name, &
-            s% History_Panels8_automatic_star_age_units, &
-            s% History_Panels8_xmin, &
-            s% History_Panels8_xmax, &
-            s% History_Panels8_dxmin, &
-            s% History_Panels8_xmargin, &
-            s% History_Panels8_max_width, &
-            s% History_Panels8_num_panels, &
-            s% History_Panels8_other_ymin, &
-            s% History_Panels8_other_ymax, &
-            s% History_Panels8_other_yaxis_reversed, &
-            s% History_Panels8_other_yaxis_log, &
-            s% History_Panels8_same_yaxis_range, &
-            s% History_Panels8_other_dymin, &
-            s% History_Panels8_points_name, &
-            s% History_Panels8_other_ymargin, &
-            s% History_Panels8_other_yaxis_name, &
-            s% History_Panels8_ymin, &
-            s% History_Panels8_ymax, &
-            s% History_Panels8_xaxis_reversed, &
-            s% History_Panels8_yaxis_reversed, &
-            s% History_Panels8_xaxis_log, &
-            s% History_Panels8_yaxis_log, &
-            s% History_Panels8_dymin, &
-            s% History_Panels8_ymargin, &
-            s% History_Panels8_yaxis_name, &
-            s% History_Panels8_use_decorator, &
-            s% History_Panels8_pgstar_decorator, &
+            s% pg% History_Panels8_xaxis_name, &
+            s% pg% History_Panels8_automatic_star_age_units, &
+            s% pg% History_Panels8_xmin, &
+            s% pg% History_Panels8_xmax, &
+            s% pg% History_Panels8_dxmin, &
+            s% pg% History_Panels8_xmargin, &
+            s% pg% History_Panels8_max_width, &
+            s% pg% History_Panels8_num_panels, &
+            s% pg% History_Panels8_other_ymin, &
+            s% pg% History_Panels8_other_ymax, &
+            s% pg% History_Panels8_other_yaxis_reversed, &
+            s% pg% History_Panels8_other_yaxis_log, &
+            s% pg% History_Panels8_same_yaxis_range, &
+            s% pg% History_Panels8_other_dymin, &
+            s% pg% History_Panels8_points_name, &
+            s% pg% History_Panels8_other_ymargin, &
+            s% pg% History_Panels8_other_yaxis_name, &
+            s% pg% History_Panels8_ymin, &
+            s% pg% History_Panels8_ymax, &
+            s% pg% History_Panels8_xaxis_reversed, &
+            s% pg% History_Panels8_yaxis_reversed, &
+            s% pg% History_Panels8_xaxis_log, &
+            s% pg% History_Panels8_yaxis_log, &
+            s% pg% History_Panels8_dymin, &
+            s% pg% History_Panels8_ymargin, &
+            s% pg% History_Panels8_yaxis_name, &
+            s% pg% History_Panels8_use_decorator, &
+            s% pg% History_Panels8_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels8_plot
 
@@ -543,9 +544,9 @@
          call pgbbuf()
          call pgeras()
          call do_History_Panels9_plot(s, id, device_id, &
-            s% History_Panels9_xleft, s% History_Panels9_xright, &
-            s% History_Panels9_ybot, s% History_Panels9_ytop, .false., &
-            s% History_Panels9_title, s% History_Panels9_txt_scale, ierr)
+            s% pg% History_Panels9_xleft, s% pg% History_Panels9_xright, &
+            s% pg% History_Panels9_ybot, s% pg% History_Panels9_ytop, .false., &
+            s% pg% History_Panels9_title, s% pg% History_Panels9_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine History_Panels9_plot
@@ -562,34 +563,34 @@
          call do_history_panels_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% History_Panels9_xaxis_name, &
-            s% History_Panels9_automatic_star_age_units, &
-            s% History_Panels9_xmin, &
-            s% History_Panels9_xmax, &
-            s% History_Panels9_dxmin, &
-            s% History_Panels9_xmargin, &
-            s% History_Panels9_max_width, &
-            s% History_Panels9_num_panels, &
-            s% History_Panels9_other_ymin, &
-            s% History_Panels9_other_ymax, &
-            s% History_Panels9_other_yaxis_reversed, &
-            s% History_Panels9_other_yaxis_log, &
-            s% History_Panels9_same_yaxis_range, &
-            s% History_Panels9_other_dymin, &
-            s% History_Panels9_points_name, &
-            s% History_Panels9_other_ymargin, &
-            s% History_Panels9_other_yaxis_name, &
-            s% History_Panels9_ymin, &
-            s% History_Panels9_ymax, &
-            s% History_Panels9_xaxis_reversed, &
-            s% History_Panels9_yaxis_reversed, &
-            s% History_Panels9_xaxis_log, &
-            s% History_Panels9_yaxis_log, &
-            s% History_Panels9_dymin, &
-            s% History_Panels9_ymargin, &
-            s% History_Panels9_yaxis_name, &
-            s% History_Panels9_use_decorator, &
-            s% History_Panels9_pgstar_decorator, &
+            s% pg% History_Panels9_xaxis_name, &
+            s% pg% History_Panels9_automatic_star_age_units, &
+            s% pg% History_Panels9_xmin, &
+            s% pg% History_Panels9_xmax, &
+            s% pg% History_Panels9_dxmin, &
+            s% pg% History_Panels9_xmargin, &
+            s% pg% History_Panels9_max_width, &
+            s% pg% History_Panels9_num_panels, &
+            s% pg% History_Panels9_other_ymin, &
+            s% pg% History_Panels9_other_ymax, &
+            s% pg% History_Panels9_other_yaxis_reversed, &
+            s% pg% History_Panels9_other_yaxis_log, &
+            s% pg% History_Panels9_same_yaxis_range, &
+            s% pg% History_Panels9_other_dymin, &
+            s% pg% History_Panels9_points_name, &
+            s% pg% History_Panels9_other_ymargin, &
+            s% pg% History_Panels9_other_yaxis_name, &
+            s% pg% History_Panels9_ymin, &
+            s% pg% History_Panels9_ymax, &
+            s% pg% History_Panels9_xaxis_reversed, &
+            s% pg% History_Panels9_yaxis_reversed, &
+            s% pg% History_Panels9_xaxis_log, &
+            s% pg% History_Panels9_yaxis_log, &
+            s% pg% History_Panels9_dymin, &
+            s% pg% History_Panels9_ymargin, &
+            s% pg% History_Panels9_yaxis_name, &
+            s% pg% History_Panels9_use_decorator, &
+            s% pg% History_Panels9_pgstar_decorator, &
             ierr)
       end subroutine do_History_Panels9_plot
 
@@ -674,7 +675,7 @@
          else if (hist_xaxis_name == 'star_age' .and. automatic_star_age_units) then
             if (s% star_age > 1d0) then
                hist_xaxis_name = 'star_age_yr'
-            else if (s% star_age*secyer > 24*60*60) then
+            else if (s% star_age*secyer > secday) then
                hist_xaxis_name = 'star_age_day'
             else if (s% star_age*secyer > 60*60) then
                hist_xaxis_name = 'star_age_hr'
@@ -863,7 +864,7 @@
                else
                   call show_right_yaxis_label_pgstar(s,other_yname)
                end if
-               call pgslw(s% pgstar_lw)
+               call pgslw(s% pg% pgstar_lw)
                if (other_yfile_data_len > 0) then
                   call pgline( &
                      other_yfile_data_len, other_yfile_xdata, other_yfile_ydata)
@@ -902,19 +903,19 @@
                      return
                   end if
                   read(iounit,*) num_pts
-                  ishape = s% History_Panel_points_marker ! 5
+                  ishape = s% pg% History_Panel_points_marker ! 5
                   call pgsave
-                  call pgsci(s% History_Panel_points_ci) !1)
-                  call pgslw(s% History_Panel_points_lw) !2)
-                  call pgsch(s% History_Panel_points_ch) !1.0)
+                  call pgsci(s% pg% History_Panel_points_ci) !1)
+                  call pgslw(s% pg% History_Panel_points_lw) !2)
+                  call pgsch(s% pg% History_Panel_points_ch) !1.0)
                   do k = 1, num_pts
-                     if (s% History_Panel_points_error_bars) then
+                     if (s% pg% History_Panel_points_error_bars) then
                         read(iounit,*) xpt, ypt, errpt
                      else
                         read(iounit,*) xpt, ypt
                      end if
-                     if (mod(k-1,s% History_Panel_points_interval) == 0) then
-                        if (s% History_Panel_points_error_bars) then
+                     if (mod(k-1,s% pg% History_Panel_points_interval) == 0) then
+                        if (s% pg% History_Panel_points_error_bars) then
                            call pgmove(xpt, ypt+errpt)
                            call pgdraw(xpt, ypt-errpt)
                         else
@@ -932,14 +933,14 @@
                else
                   call show_left_yaxis_label_pgstar(s,yname)
                end if               
-               call pgslw(s% pgstar_lw)
+               call pgslw(s% pg% pgstar_lw)
                if (yfile_data_len > 0) then
-                  call pgsls(s% pgstar_history_line_style)
+                  call pgsls(s% pg% pgstar_history_line_style)
                   call pgline(yfile_data_len, yfile_xdata, yfile_ydata)
                   call pgsls(1)
                   deallocate(yfile_xdata, yfile_ydata)
                else
-                  call pgsls(s% pgstar_history_line_style)
+                  call pgsls(s% pg% pgstar_history_line_style)
                   call pgline(n, xvec, yvec)
                   call pgsls(1)
                end if

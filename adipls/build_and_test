@@ -2,7 +2,7 @@
 
 function error {
 	echo
-	more diff.txt
+	cat diff.txt
 	echo
 	pwd
 	echo "TEST FAILED -- compare obs.txt to obs.test.txt"
@@ -34,7 +34,7 @@ fi
 
 if [ ! -f ../skip_test ]
 then
-	if [ ! -f skip_test ]
+	if [ ! -f skip_test ] && [ ! -f test/build_skip_test ]
 	then
   		cd test
   		./ck >& diff.txt

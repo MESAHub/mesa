@@ -35,9 +35,9 @@
         ! j_rot(k) is specific angular momentum at outer edge of cell k; = i_rot*omega
       real(dp), pointer, dimension(:) :: omega ! (nz)
 
-      real(dp), pointer, dimension(:) :: D_ST_start, prev_mesh_D_ST_start ! For time smoothing
-      real(dp), pointer, dimension(:) :: nu_ST_start, prev_mesh_nu_ST_start
-      logical :: have_ST_start_info, prev_mesh_have_ST_start_info
+      real(dp), pointer, dimension(:) :: D_ST_start ! For time smoothing
+      real(dp), pointer, dimension(:) :: nu_ST_start
+      logical :: have_ST_start_info
       
       ! convection
       real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
@@ -150,10 +150,7 @@
          character (len=strlen) :: &
             most_recent_profile_filename, most_recent_controls_filename, &
             most_recent_model_data_filename
-         
-      ! pgstar
-         type (pgstar_hist_node), pointer :: pgstar_hist => null()
-      
+               
       ! random number generator (marsaglia and zaman). period is 2**43 with
          ! 900 million different sequences. the state of the generator (for restarts)
          integer :: rand_i97, rand_j97

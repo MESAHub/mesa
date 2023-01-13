@@ -515,7 +515,7 @@ contains
   ! opacity
 
   subroutine build_T_tau_varying( &
-       tau_surf, L, R, M, cgrav, lnP_surf, tau_outer, &
+       tau_surf, L, R, Teff, M, cgrav, lnP_surf, tau_outer, &
        T_tau_id, eos_proc, kap_proc, errtol, dlogtau, &
        atm_structure_num_pts, atm_structure, &
        ierr)
@@ -527,6 +527,7 @@ contains
     real(dp), intent(in)      :: tau_surf
     real(dp), intent(in)      :: L
     real(dp), intent(in)      :: R
+    real(dp), intent(in)      :: Teff
     real(dp), intent(in)      :: M
     real(dp), intent(in)      :: cgrav
     real(dp), intent(in)      :: lnP_surf
@@ -549,7 +550,6 @@ contains
     integer, parameter :: IOUT = 1
     integer, parameter :: LOUT = 0
 
-    real(dp)          :: Teff
     real(dp)          :: g
     integer           :: liwork
     integer           :: lwork
@@ -583,9 +583,9 @@ contains
        call mesa_error(__FILE__,__LINE__)
     end if
 
-    ! Evaluate the effective temperature & gravity
+    ! Evaluate the gravity
 
-    call eval_Teff_g(L, R, M, cgrav, Teff, g)
+    g = cgrav*M/(R*R)
 
     ! Allocte atm_structure at its initial size
 

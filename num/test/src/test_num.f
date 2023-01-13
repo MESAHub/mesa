@@ -17,6 +17,8 @@
       
       use test_diffusion
       use test_simplex
+
+      use test_integrate
             
       use const_def
       use const_lib
@@ -175,6 +177,9 @@
       do i=1,num_solvers
          call do_test_diffusion(i,decsol,do_numerical_jacobian,show_all,quiet)
       end do
+
+      write(*,*) 'call test_integrate routines'
+      call run_test_integrate()
 
 
       end program

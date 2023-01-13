@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_summary_history_plot(s, id, device_id, &
-            s% Summary_History_xleft, s% Summary_History_xright, &
-            s% Summary_History_ybot, s% Summary_History_ytop, .false., &
-            s% Summary_History_title, s% Summary_History_txt_scale, ierr)
+            s% pg% Summary_History_xleft, s% pg% Summary_History_xright, &
+            s% pg% Summary_History_ybot, s% pg% Summary_History_ytop, .false., &
+            s% pg% Summary_History_title, s% pg% Summary_History_txt_scale, ierr)
 
          call pgebuf()
 
@@ -88,15 +89,15 @@
 
          ierr = 0
 
-         step_min = s% Summary_History_xmin
+         step_min = s% pg% Summary_History_xmin
          if (step_min <= 0) step_min = 1
-         step_max = s% Summary_History_xmax
+         step_max = s% pg% Summary_History_xmax
          if (step_max <= 0) step_max = s% model_number
 
          if (step_min >= s% model_number) step_min = 1
 
-         if (s% Summary_History_max_width > 0) &
-            step_min = max(step_min, step_max - s% Summary_History_max_width)
+         if (s% pg% Summary_History_max_width > 0) &
+            step_min = max(step_min, step_max - s% pg% Summary_History_max_width)
 
          npts = count_hist_points(s, step_min, step_max)
          if (npts <= 1) return
@@ -104,7 +105,7 @@
          xmin = real(max(1,step_min))
          xmax = real(min(s% model_number,step_max))
 
-         num_lines = s% Summary_History_num_lines
+         num_lines = s% pg% Summary_History_num_lines
 
          colors(:) = (/ &
                clr_MediumSlateBlue, clr_Goldenrod, clr_LightSkyBlue, clr_Lilac, &
@@ -157,7 +158,7 @@
             ymax = 1.02
             ymin = 0.0
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsvp(winxmin, winxmax, winymin, winymax)
@@ -177,7 +178,7 @@
             cnt = 0
             do j = 1, num_lines
 
-               yname = s% Summary_History_name(j)
+               yname = s% pg% Summary_History_name(j)
                if (len_trim(yname) == 0) then
                   show(j) = .false.
                   cycle
@@ -189,7 +190,7 @@
                   cycle
                end if
 
-               if (s% Summary_History_scaled_value(j)) then ! scale yvec
+               if (s% pg% Summary_History_scaled_value(j)) then ! scale yvec
 
                   yvec_max = maxval(yvec(1:npts))
                   yvec_min = minval(yvec(1:npts))
@@ -226,18 +227,18 @@
             cnt = 0
             do j=1,num_lines
                if (.not. show(j)) cycle
-               if (len_trim(s% Summary_History_legend(j)) == 0) then
+               if (len_trim(s% pg% Summary_History_legend(j)) == 0) then
                   cnt = summary_history_line_legend( &
-                           cnt,s% Summary_History_name(j))
+                           cnt,s% pg% Summary_History_name(j))
                else
                   cnt = summary_history_line_legend( &
-                           cnt,s% Summary_History_legend(j))
+                           cnt,s% pg% Summary_History_legend(j))
                end if
             end do
             call pgunsa
 
-         call show_pgstar_decorator(s%id, s% summary_history_use_decorator,&
-            s% summary_history_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id, s% pg% summary_history_use_decorator,&
+            s% pg% summary_history_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

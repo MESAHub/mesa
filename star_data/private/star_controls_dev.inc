@@ -35,11 +35,11 @@
             
             
          
-         logical :: use_superad_reduction, use_mass_corrections
-         real(dp) :: &
-            superad_reduction_Gamma_limit, &
-            superad_reduction_Gamma_limit_scale, &
-            superad_reduction_Gamma_inv_scale, &
-            superad_reduction_diff_grads_limit, &
-            superad_reduction_limit
+         logical :: use_mass_corrections
             
+      ! WD phase separation
+         
+            logical :: do_phase_separation
+            logical :: do_phase_separation_heating
+            logical :: phase_separation_mixing_use_brunt
+            logical :: phase_separation_no_diffusion

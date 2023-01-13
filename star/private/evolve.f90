@@ -320,7 +320,6 @@
          s% L_for_BB_outer_BC = -1 ! mark as not set
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
-         s% generations = 1
          s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
          
          if (s% timestep_hold > s% model_number + 10000) then 
@@ -1370,8 +1369,13 @@
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
 
-            s% cumulative_energy_error = s% cumulative_energy_error_old + &
-               s% error_in_energy_conservation
+            if (s% absolute_cumulative_energy_err) then
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    abs(s% error_in_energy_conservation)
+            else
+               s% cumulative_energy_error = s% cumulative_energy_error_old + &
+                    s% error_in_energy_conservation
+            end if
 
             s% total_internal_energy = s% total_internal_energy_end
             s% total_gravitational_energy = s% total_gravitational_energy_end
@@ -1708,7 +1712,7 @@
          else if (s% max_age_in_seconds > 0) then
             end_time = s% max_age_in_seconds
          else if (s% max_age_in_days > 0) then
-            end_time = s% max_age_in_days*(60*60*24)
+            end_time = s% max_age_in_days*secday
          else
             end_time = s% max_age*secyer
          end if
@@ -1842,7 +1846,7 @@
             write(*, *) 's% dt_next', s% dt_next
             prepare_for_new_step = terminate
             if ((s% time >= s% max_age*secyer .and. s% max_age > 0) .or. &
-                (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) .or. &
+                (s% time >= s% max_age_in_days*secday .and. s% max_age_in_days > 0) .or. &
                 (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0)) then
                s% result_reason = result_reason_normal
                s% termination_code = t_max_age
@@ -1918,9 +1922,9 @@
          else if ((s% time + s% dt_next) > s% max_age_in_seconds &
                   .and. s% max_age_in_seconds > 0) then
             s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
-         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
+         else if ((s% time + s% dt_next) > s% max_age_in_days*secday &
                   .and. s% max_age_in_days > 0) then
-            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
+            s% dt_next = max(0d0, s% max_age_in_days*secday - s% time)
          end if
          
          s% dt = s% dt_next
@@ -2092,9 +2096,9 @@
             s% dt_next = -s% time
          else if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
             s% dt_next = max(0d0, s% max_age*secyer - s% time)
-         else if ((s% time + s% dt_next) > s% max_age_in_days*(60*60*24) &
+         else if ((s% time + s% dt_next) > s% max_age_in_days*secday &
                   .and. s% max_age_in_days > 0) then
-            s% dt_next = max(0d0, s% max_age_in_days*(60*60*24) - s% time)
+            s% dt_next = max(0d0, s% max_age_in_days*secday - s% time)
          else if ((s% time + s% dt_next) > s% max_age_in_seconds &
                   .and. s% max_age_in_seconds > 0) then
             s% dt_next = max(0d0, s% max_age_in_seconds - s% time)
@@ -2103,7 +2107,7 @@
             if (s% max_age > 0) then
                remaining_years = s% max_age - s% star_age
             else if (s% max_age_in_days > 0) then
-               remaining_years = (s% max_age_in_days*(60*60*24) - s% time)/secyer
+               remaining_years = (s% max_age_in_days*secday - s% time)/secyer
             else if (s% max_age_in_seconds > 0) then
                remaining_years = (s% max_age_in_seconds - s% time)/secyer
             else

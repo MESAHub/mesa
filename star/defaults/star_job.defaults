@@ -380,23 +380,6 @@
 
     create_pre_main_sequence_model = .false.
 
-
-      ! create_merger_model !!! EXPERIMENTAL
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_for_merger_1
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-      ! saved_model_for_merger_2
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If ``create_merger_model`` is true, then create a star by merging the two models provided.
-
-      ! ::
-
-    create_merger_model = .false.
-    saved_model_for_merger_1 = 'undefined'
-    saved_model_for_merger_2 = 'undefined'
-
-
       ! pre_ms_T_c
       ! ~~~~~~~~~~
 
@@ -2405,91 +2388,9 @@
     adjust_abundances_for_new_isos = .true.
 
 
-      ! set_rates_preference
-      ! ~~~~~~~~~~~~~~~~~~~~
-      ! new_rates_preference
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! + 1 = NACRE rates
-      ! + 2 = jina reaclib rates
-
-      ! ::
-
-    set_rates_preference = .false.
-    new_rates_preference = 2
-
-
-      ! set_rate_c12ag
-      ! ~~~~~~~~~~~~~~
-
-      ! Empty string means ignore this control.
-      ! Can be one of:
-
-      ! + 'NACRE'
-      ! + 'jina reaclib'
-      ! + 'Kunz'
-      ! + 'CF88'
-
-      ! (note: our CF88 is larger than the original by a factor of 1.7)
-
-      ! ::
-
-    set_rate_c12ag = ''
-
-
-      ! set_rate_n14pg
-      ! ~~~~~~~~~~~~~~
-
-      ! Empty string means ignore this control.
-      ! Can be one of
-
-      ! + 'NACRE'
-      ! + 'jina reaclib'
-      ! + 'CF88'
-
-      ! ::
-
-    set_rate_n14pg = ''
-
-
-      ! set_rate_3a
-      ! ~~~~~~~~~~~
-
-      ! Empty string means ignore this control.
-      ! Can be one of
-
-      ! + 'NACRE'
-      ! + 'jina reaclib'
-      ! + 'CF88'
-      ! + 'FL87'
-
-      ! FL87 is Fushiki and Lamb, Apj, 317, 368-388, 1987
-      ! and includes both strong screening and pyconuclear
-
-      ! ::
-
-    set_rate_3a = ''
-
-
-      ! set_rate_1212
-      ! ~~~~~~~~~~~~~
-
-      ! Empty string means ignore this control.
-      ! Can be one of:
-
-      ! + ``'CF88_basic_1212'`` : the single rate approximation from CF88.
-      ! + ``'CF88_multi_1212'`` : combines the rates for the n, p, and a channels.
-      !   c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20 and
-      !   uses neutron branching from dayras, switkowski, and woosley, 1976.
-
-      ! ::
-
-    set_rate_1212 = ''
-
       ! Users can also provide tabulated rates for any of the reactions.
       ! Tabulated rates automatically take priority over any other options for the reaction.
       ! e.g., if you provide a rate table for c12ag, those rates will be used
-      ! if preference to the other options given in ``set_rate_c12ag``.
 
       ! To provide tabulated rates:
       ! create a file of (T8, rate) pairs as in ``data/rates_data/rate_tables``
@@ -2520,6 +2421,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! special_rate_factor
       ! ~~~~~~~~~~~~~~~~~~~
+      ! filename_of_special_rate
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! For using other special rate factors.
       ! ``num_special_rate_factors`` must be <= ``max_num_special_rate_factors``.
@@ -2529,6 +2432,29 @@
     num_special_rate_factors = 0
     reaction_for_special_factor(:) = ''
     special_rate_factor(:) = 1
+
+      ! If set, we read this filename from the local work directory, then try ``data/rates_data/rate_tables``.
+      ! This enables using the MESA provide custom rate tables with out changing the default for everyone.
+      ! Note we still multiple the loaded rate by special_rate_factor so leave that as 1 if you want the rate to be unchanged.
+
+      ! For instance setting:
+      !    num_special_rate_factors = 1
+      !    reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      !    special_rate_factor(1) = 1
+      !    filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+      ! Recovers the old set_rate_c12ag = 'Kunz' option
+
+    filename_of_special_rate(:) = ''
+
+
+      ! use_3a_fl87
+      ! ~~~~~~~~~~~
+
+      ! If true then the triple alpha reaction is taken from Fushiki and Lamb, Apj, 317, 368-388, 1987
+      ! This replaces the old set_rate_3a = 'Fl87' option
+
+      use_3a_fl87 = .false.
 
 
       ! auto_extend_net
@@ -2938,6 +2864,8 @@
       !     Names must be unique across all files loaded and are case sensitive.
       !     For a filter named filter1 history output will be bc_filter1 for bolometric corrections
       !     and abs_mag_filter1 for absolute magnitude
+
+      !     Do not name any column with square brackets ([]) for instance [Fe/H] as this breaks the code 
 
       ! ::
 

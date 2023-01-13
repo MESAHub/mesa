@@ -297,23 +297,7 @@
          write(iounit,2) 'logTcut_lo =', g% logTcut_lo
          write(iounit,2) 'logTcut_lim =', g% logTcut_lim
       end subroutine show_net_params
-      
-      
-      ! before calling net_setup_tables, you can specify options for various rates
-      ! NOTE: these choices are used in building the rates tables, so if you want
-      ! to change your choice, you'll need to rebuild the rate tables.
-      
-      
-      subroutine net_set_which_rates(handle, which_rates, ierr)
-         use net_def, only: do_net_set_which_rates
-         integer, intent(in) :: handle, which_rates(:)
-         integer, intent(out) :: ierr
-         ierr = 0
-         call do_net_set_which_rates(handle, which_rates, ierr)
-         if (ierr /= 0) return
-      end subroutine net_set_which_rates
-      
-      
+            
       subroutine net_set_fe56ec_fake_factor( &
             handle, fe56ec_fake_factor, min_T_for_fe56ec_fake_factor, ierr)
          use net_def, only: do_net_set_fe56ec_fake_factor
@@ -404,22 +388,6 @@
          end if
          net_num_reactions = g% num_reactions
       end function net_num_reactions
-      
-      ! this routine supplies the required size for the work array needed by net_get.
-      integer function net_work_size(handle, ierr)
-         use net_def, only: Net_General_Info, get_net_ptr
-         use net_initialize, only: work_size
-         integer, intent(in) :: handle
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         net_work_size = 0
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_work_size -- did you call alloc_net_handle?'
-            return
-         end if
-         net_work_size = work_size(g)
-      end function net_work_size
       
       subroutine get_chem_id_table(handle, num_isos, chem_id, ierr)
          use net_def, only: Net_General_Info, get_net_ptr
@@ -518,6 +486,7 @@
             ierr = -1
             return
          end if
+
          reaction_id(1:num_reactions) = g% reaction_id(1:num_reactions)
          ierr = 0
       end subroutine get_reaction_id_table
@@ -595,7 +564,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, ierr)
+            ierr)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -607,16 +576,12 @@
       
          integer, intent(in) :: handle
          logical, intent(in) :: just_dxdt
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -655,10 +620,7 @@
          real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
 
          integer, intent(in) :: screening_mode 
-            
-         integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-         real(dp), pointer :: work(:) ! (lwork)
-         
+                     
          integer, intent(out) :: ierr ! 0 means okay
                   
          integer(8) :: time0, time1
@@ -694,7 +656,7 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
-               lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
+               actual_Qs, actual_neuQs, from_weaklib, symbolic, &
                ierr)
          if (g% doing_timing) then
             call system_clock(time1)
@@ -702,35 +664,7 @@
          end if
 
       end subroutine net_get
-      
-      subroutine get_net_rate_ptrs(handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            ierr)
-         use net_def, only: Net_General_Info, get_net_ptr
-         use net_initialize, only: set_rate_ptrs
-         integer, intent(in) :: handle
-         real(dp), pointer, dimension(:) :: &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho
-         integer, intent(in) :: lwork
-         real(dp), pointer :: work(:)
-         integer, intent(out) :: ierr
-         integer :: i
-         type (Net_General_Info), pointer  :: g
-         ierr = 0
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for get_net_rate_ptrs -- did you call alloc_net_handle?'
-            return
-         end if
-         call set_rate_ptrs(g, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-            i, ierr)
-      end subroutine get_net_rate_ptrs
-      
-      
+            
       subroutine net_get_rates_only( &
             handle, n, num_isos, num_reactions,  &
             x, temp, log10temp, rho, log10rho,  &
@@ -738,7 +672,7 @@
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
             screening_mode,  &
-            lwork, work, ierr)
+            ierr)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -748,16 +682,12 @@
          ! same for Rho and logRho
       
          integer, intent(in) :: handle
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -780,10 +710,7 @@
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
          integer, intent(in) :: screening_mode
-            
-         integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-         real(dp), pointer :: work(:) ! (lwork)
-         
+                     
          integer, intent(out) :: ierr ! 0 means okay
                   
          integer(8) :: time0, time1
@@ -836,7 +763,7 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
-               lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
+               actual_Qs, actual_neuQs, from_weaklib, symbolic, &
                ierr)
          if (g% doing_timing) then
             call system_clock(time1)
@@ -859,23 +786,19 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, ierr)
+            ierr)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
          use rates_def, only: num_rvs
       
          integer, intent(in) :: handle
-         type (Net_Info), pointer :: n
+         type (Net_Info)  :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
          real(dp), intent(in)  :: temp, log10temp ! log10 of temp
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: rho, log10rho ! log10 of rho
-            ! provide both if you have them.  else pass one and set the other to = arg_not_provided
-            ! "arg_not_provided" is defined in mesa const_def
          real(dp), intent(in)  :: abar  ! mean number of nucleons per nucleus
          real(dp), intent(in)  :: zbar  ! mean charge per nucleus
          real(dp), intent(in)  :: z2bar ! mean charge squared per nucleus
@@ -916,10 +839,7 @@
          ! rate_raw and rate_screened are described in the declaration of the Net_Info derived type
 
          integer, intent(in) :: screening_mode ! Selects which screening mode to use, see rates_def for definition 
-            
-         integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-         real(dp), pointer :: work(:) ! (lwork)
-         
+                     
          integer, intent(out) :: ierr
             ! ierr = 0 means AOK
             ! ierr = -1 means mass fractions don't add to something very close to 1.0
@@ -957,7 +877,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
+            actual_Qs, actual_neuQs, from_weaklib, symbolic, &
             ierr)
          
       end subroutine net_get_symbolic_d_dxdt_dx
@@ -972,7 +892,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, actual_Qs, actual_neuQs, from_weaklib, &
+            actual_Qs, actual_neuQs, from_weaklib, &
             ierr)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
@@ -980,7 +900,7 @@
          use rates_def, only: num_rvs
          integer, intent(in) :: handle
          logical, intent(in) :: just_dxdt
-         type (Net_Info), pointer:: n
+         type (Net_Info) :: n
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), intent(in)  :: x(:) ! (num_isos)
@@ -1006,8 +926,6 @@
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: eps_neu_total ! ergs/g/s neutrinos from weak reactions
          integer, intent(in) :: screening_mode
-         integer, intent(in) :: lwork ! size of work >= result from calling net_work_size
-         real(dp), pointer :: work(:) ! (lwork)
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null  (num_reactions)
          logical, pointer :: from_weaklib(:) ! ignore if null
          integer, intent(out) :: ierr
@@ -1040,7 +958,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            lwork, work, actual_Qs, actual_neuQs, from_weaklib, symbolic, &
+            actual_Qs, actual_neuQs, from_weaklib, symbolic, &
             ierr)
          if (g% doing_timing) then
             call system_clock(time1)
@@ -1048,22 +966,6 @@
          end if
          
       end subroutine net_get_with_Qs
-
-      integer function net_1_zone_burn_work_size(handle,ierr) result(sz)
-         use net_burn, only: burn_1_zone_work_size
-         use net_def, only: Net_General_Info, get_net_ptr
-         integer, intent(in) :: handle
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         ierr = 0
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_1_zone_burn_work_size -- did you call alloc_net_handle?'
-            sz = 0
-            return
-         end if
-         sz = burn_1_zone_work_size(g)
-      end function net_1_zone_burn_work_size
 
       ! a 1-zone integrator for nets -- for given temperature and density as functions of time
       subroutine net_1_zone_burn( &
@@ -1074,8 +976,6 @@
             screening_mode, &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, &
-            net_lwork, net_work_array, &
             ! results
             ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
@@ -1108,9 +1008,6 @@
          interface
             include 'burner_finish_substep.inc'
          end interface
-         integer, intent(in) :: net_lwork, burn_lwork
-         real(dp), intent(inout), pointer :: burn_work_array(:) ! (burn_lwork)
-         real(dp), intent(inout), pointer :: net_work_array(:) ! (net_lwork)
          real(dp), intent(inout) :: ending_x(:) ! (num_isos)
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: avg_eps_nuc, eps_neu_total
@@ -1128,49 +1025,12 @@
             reaction_Qs, reaction_neuQs, screening_mode, &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, &
-            net_lwork, net_work_array, &
             ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
          
       end subroutine net_1_zone_burn
+
       
-      subroutine get_burn_work_array_pointers(handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            burn_lwork, burn_work_array, ierr)
-         integer, intent(in) :: handle
-         real(dp), pointer :: burn_work_array(:)
-         integer, intent(in) :: burn_lwork
-         real(dp), pointer, dimension(:) :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
-         integer, intent(out) :: ierr
-         call get_net_rate_ptrs(handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
-            ierr)
-      end subroutine get_burn_work_array_pointers
-
-
-
-      integer function net_1_zone_burn_const_density_work_size(handle,ierr) result(sz)
-         use net_burn_const_density, only: burn_const_density_1_zone_work_size
-         use net_def, only: Net_General_Info, get_net_ptr
-         integer, intent(in) :: handle
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         ierr = 0
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_1_zone_burn_const_density_work_size'
-            sz = 0
-            return
-         end if
-         sz = burn_const_density_1_zone_work_size(g)
-      end function net_1_zone_burn_const_density_work_size
-
-
       ! a 1-zone integrator for nets -- for given density
       ! evolve lnT according to dlnT/dt = eps_nuc/(Cv*T)
       subroutine net_1_zone_burn_const_density( &
@@ -1181,7 +1041,6 @@
             screening_mode,  &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, net_lwork, net_work_array, &
             ! results
             ending_x, eps_nuc_categories, ending_log10T, &
             avg_eps_nuc, ending_eps_neu_total, &
@@ -1209,9 +1068,6 @@
          interface
             include 'burner_finish_substep.inc'
          end interface
-         integer, intent(in) :: net_lwork, burn_lwork
-         real(dp), intent(inout), pointer :: burn_work_array(:) ! (burn_lwork)
-         real(dp), intent(inout), pointer :: net_work_array(:) ! (net_lwork)
          real(dp), intent(inout) :: ending_x(:) ! (num_isos)
          real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
          real(dp), intent(out) :: ending_log10T, avg_eps_nuc, ending_eps_neu_total
@@ -1230,29 +1086,10 @@
             screening_mode,  &
             stptry, max_steps, eps, odescal, &
             use_pivoting, trace, dbg, burner_finish_substep, &
-            burn_lwork, burn_work_array, net_lwork, net_work_array, &
             ending_x, eps_nuc_categories, ending_log10T, avg_eps_nuc, ending_eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
          
       end subroutine net_1_zone_burn_const_density
-      
-      subroutine get_burn_const_density_work_array_pointers(handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            burn_lwork, burn_work_array, ierr)
-         integer, intent(in) :: handle
-         real(dp), pointer :: burn_work_array(:)
-         integer, intent(in) :: burn_lwork
-         real(dp), pointer, dimension(:) :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
-         integer, intent(out) :: ierr
-         call get_net_rate_ptrs(handle, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, burn_lwork, burn_work_array, &
-            ierr)
-      end subroutine get_burn_const_density_work_array_pointers
-
       
       ! evolve T according to dT/dt = eps_nuc/Cp while using given P.
       !  then find new Rho and Cp to match P and new T.

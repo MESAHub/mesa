@@ -130,7 +130,8 @@
 
          real(dp) :: min_timestep_limit
          real(dp) :: center_Ye_lower_limit, center_R_lower_limit, &
-            fe_core_infall_limit, non_fe_core_infall_limit, non_fe_core_rebound_limit
+            fe_core_infall_limit, non_fe_core_infall_limit, non_fe_core_rebound_limit, &
+            fe_core_infall_mass, non_fe_core_infall_mass
          real(dp) :: v_div_csound_surf_limit, v_div_csound_max_limit
          real(dp) :: Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit
          real(dp) :: v_surf_div_v_kh_upper_limit, v_surf_div_v_kh_lower_limit
@@ -285,6 +286,17 @@
             gradT_excess_max_log_tau_full_off
 
          real(dp) :: mlt_gradT_fraction, max_logT_for_mlt
+
+    
+            
+         
+         logical :: use_superad_reduction
+         real(dp) :: &
+            superad_reduction_Gamma_limit, &
+            superad_reduction_Gamma_limit_scale, &
+            superad_reduction_Gamma_inv_scale, &
+            superad_reduction_diff_grads_limit, &
+            superad_reduction_limit
 
       ! mixing parameters
 
@@ -710,6 +722,7 @@
          logical :: do_element_diffusion
          logical :: diffusion_use_iben_macdonald
          logical :: diffusion_use_paquette
+         logical :: diffusion_use_caplan
          logical :: diffusion_use_cgs_solver
          logical :: diffusion_use_full_net
          logical :: do_WD_sedimentation_heating
@@ -754,7 +767,7 @@
          real(dp) :: diffusion_max_T_for_radaccel, diffusion_min_T_for_radaccel
          integer :: diffusion_max_Z_for_radaccel, diffusion_min_Z_for_radaccel
          logical :: diffusion_screening_for_radaccel
-         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename
+         character (len=strlen) :: op_mono_data_path, op_mono_data_cache_filename, emesh_data_for_op_mono_path, op_mono_method
 
          integer :: diffusion_num_classes
          character (len=iso_name_length) :: &
@@ -768,13 +781,6 @@
          real(dp) :: diffusion_atol_for_isolve
          integer :: diffusion_maxsteps_for_isolve
          character(len=64) :: diffusion_isolve_solver
-
-      ! WD phase separation
-         
-         logical :: do_phase_separation
-         logical :: do_phase_separation_heating
-         logical :: phase_separation_mixing_use_brunt
-         logical :: phase_separation_no_diffusion
 
       ! opacity controls
 
@@ -1051,7 +1057,7 @@
          
          logical :: fill_arrays_with_NaNs
          logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
-            warn_rates_for_high_temp
+            warn_rates_for_high_temp, absolute_cumulative_energy_err
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
             eps_mdot_leak_frac_factor
@@ -1374,6 +1380,9 @@
          logical :: use_other_timestep_limit
          logical :: use_other_set_pgstar_controls
          logical :: use_other_screening
+         logical :: use_other_rate_get
+         logical :: use_other_net_derivs
+         logical :: use_other_split_burn
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

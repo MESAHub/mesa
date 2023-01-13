@@ -624,8 +624,8 @@
             a=z+chem_isos%n(chem_id(i))
             found =.false.
 
-            ! special case of b8 to he4
-            if (Z == 5 .and. A==8) then ! b8
+            ! special case of be8 to he4
+            if (Z == 4 .and. A==8) then ! be8
                j = 2 ! he4
                abun_out(j) = abun_out(j) + 2*abun_in(i)
                found = .true.

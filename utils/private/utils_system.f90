@@ -104,7 +104,7 @@ module utils_system
    logical function is_dir(folder)
       character(len=*), intent(in) :: folder
 
-      is_dir = f_is_dir(folder) == 1
+      is_dir = f_is_dir(f_c_string(folder)) == 1
 
    end function is_dir
 

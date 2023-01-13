@@ -26,6 +26,7 @@
       module pgstar_astero_plots
       use star_lib
       use star_def
+      use star_pgstar
 
       implicit none
          

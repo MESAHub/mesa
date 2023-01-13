@@ -3,6 +3,7 @@ Linters
 =======
 
 These scripts help check MESA for common problems.
+The linters must be run from ``$MESA_DIR/linters``.
 
 check_photos.py
 ---------------

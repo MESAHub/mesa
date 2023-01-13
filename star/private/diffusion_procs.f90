@@ -32,6 +32,9 @@
 
       implicit none
 
+      integer, parameter :: ngp = 2
+      real(dp), public, save :: fk_gam_old(ngp,17)
+      logical :: initialize_gamma_grid = .true.
 
       contains
 
@@ -1138,14 +1141,29 @@
          kmax_rad_accel = kmax
 
          if (dbg) write(*,*) 'call calc_g_rad'
-         call calc_g_rad( &
-            nz, nzlo, nzhi, nc, m, kmax_rad_accel, X, A, &
+         if (s% op_mono_method == 'mombarg') then
+         call calc_g_rad_mombarg( &
+            s, nz, nzlo, nzhi, nc, m, kmax_rad_accel, X, A, &
             class_chem_id, s% net_iso, s% op_mono_factors, &
             L_face, rho_face, r_face, T_face, alfa_face, &
             min_T_for_radaccel, max_T_for_radaccel, &
             min_Z_for_radaccel, max_Z_for_radaccel, &
             screening, log10_g_rad, g_rad, &
             rad_accel_face, ierr)
+          else if (s% op_mono_method == 'hu') then
+            call calc_g_rad_hu( &
+               nz, nzlo, nzhi, nc, m, kmax_rad_accel, X, A, &
+               class_chem_id, s% net_iso, s% op_mono_factors, &
+               L_face, rho_face, r_face, T_face, alfa_face, &
+               min_T_for_radaccel, max_T_for_radaccel, &
+               min_Z_for_radaccel, max_Z_for_radaccel, &
+               screening, log10_g_rad, g_rad, &
+               rad_accel_face, ierr)
+          else
+            write(*,*) 'Invalid argument for op_mono_method.'
+            stop
+         endif
+
          if (dbg) write(*,*) 'done calc_g_rad'
 
          return
@@ -1195,7 +1213,259 @@
       end subroutine setup_struct_info
 
 
-      subroutine calc_g_rad( &
+      subroutine calc_g_rad_mombarg( &
+            s, nz, nzlo, nzhi, nc, m, kmax_rad_accel, X, A, &
+            class_chem_id, net_iso, op_mono_factors, &
+            L_face, rho_face, r_face, T_face, alfa_face, &
+            min_T_for_radaccel, max_T_for_radaccel, &
+            min_Z_for_radaccel, max_Z_for_radaccel, &
+            screening, log10_g_rad, g_rad, &
+            rad_accel_face, ierr)
+
+         use kap_lib, only: get_op_mono_params, call_load_op_master, call_compute_gamma_grid_mombarg
+         use utils_lib, only: utils_OMP_GET_MAX_THREADS, utils_OMP_GET_THREAD_NUM
+         type (star_info), pointer :: s
+
+         integer, intent(in) :: &
+            nz, nzlo, nzhi, nc, m, kmax_rad_accel, class_chem_id(:), net_iso(:), &
+            min_Z_for_radaccel, max_Z_for_radaccel
+         real(dp), intent(in) :: &
+            min_T_for_radaccel, max_T_for_radaccel
+         real(dp), dimension(:), intent(in) :: &
+            A, L_face, rho_face, r_face, T_face, alfa_face, op_mono_factors
+         real(dp), dimension(:,:), intent(in) :: X
+         logical, intent(in) :: screening
+         real(dp), dimension(:,:), intent(out) :: &
+            log10_g_rad, g_rad, rad_accel_face
+         integer, intent(out) :: ierr
+
+         integer :: iZ(nc), iZ_rad(nc), n, i, j, k, kk, kmax, op_err, sz, offset, &
+            nptot, ipe, nrad, thread_num, k1, k2, dk
+         real(dp) :: alfa, beta, X_face(nc), blend_fac(-15:15)
+
+
+         integer :: np = 28016
+         real(dp) :: fk(17), fk_all(ngp,17), delta, blend
+         character(len=4) :: e_name
+
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         blend_fac =  (/(1._dp - FLOAT(i)/31._dp, i=1,31)/)
+         ierr = 0
+
+         kmax = kmax_rad_accel
+
+         g_rad(1:nc,kmax+1:nzhi) = 0
+         log10_g_rad(1:nc,kmax+1:nzhi) = 1
+
+         g_rad(1:nc,nzlo) = 0
+         log10_g_rad(1:nc,nzlo) = 1
+
+         iZ(1:nc) = chem_isos% Z(class_chem_id(1:nc))
+
+         kk = 0
+         do i = 1, nc
+            if (iZ(i) >= min_Z_for_radaccel .and. &
+                iZ(i) <= max_Z_for_radaccel) then
+               kk = kk+1
+               iZ_rad(kk) = iZ(i)
+            end if
+         end do
+
+        do j = 1, ngp
+        k1 = INT((kmax - (nzlo+1))/ ngp * (j-1) + (nzlo+1))
+        if (j == ngp) THEN
+          k2 = kmax
+        else
+          k2 = INT((kmax - (nzlo+1))/ ngp * j + (nzlo))
+        endif
+        fk = 0
+          do i=1, s% species
+             e_name = chem_isos% name(s% chem_id(i))
+                if (e_name == 'h1')  fk(1)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1)) !s% xa(i,kmax)/ chem_isos% W(s% chem_id(i))
+                if (e_name == 'he4') fk(2)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'c12') fk(3)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'n14') fk(4)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'o16') fk(5)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'ne20')fk(6)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'na23')fk(7)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'mg24')fk(8)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'al27')fk(9)  =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'si28')fk(10) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 's32') fk(11) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'ar40')fk(12) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'ca40')fk(13) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'cr52')fk(14) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'mn55')fk(15) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'fe56')fk(16) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+                if (e_name == 'ni58')fk(17) =  SUM(s% xa(i,k1:k2))/ (chem_isos% W(s% chem_id(i)) * (k2-k1))
+            end do
+          fk = fk / sum(fk)
+          delta = MAXVAL(ABS(fk - fk_gam_old(j,:))/fk_gam_old(j,:))
+          if (initialize_gamma_grid) then
+            call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
+
+            write(*,*) 'Precompute gamma grid initialize.'
+            call call_compute_gamma_grid_mombarg(j, fk, ierr)
+            !write(*,*) 'Done precomputing gamma grid initialize.'
+            fk_gam_old(j,:) = fk
+            if (j == ngp) initialize_gamma_grid = .false.
+          else if (delta > 1d-4) then
+            write(*,*) 'Precompute gamma grid.'
+            call call_compute_gamma_grid_mombarg(j, fk, ierr)
+            !write(*,*) 'Done precomputing gamma grid.'
+            fk_gam_old(j,:) = fk
+          endif
+        enddo
+
+!! PARALLEL DO PRIVATE(i,k,thread_num,op_err,j,alfa,beta,X_face,umesh,ff,ta,rs,sz,offset) SCHEDULE(guided)
+!$OMP PARALLEL DO PRIVATE(i,k,op_err,j,alfa,beta,X_face,blend,dk) SCHEDULE(guided)
+         do k = nzlo+1, kmax
+           !if (k > nzlo .and. k <= kmax) then
+               if (T_face(k) < min_T_for_radaccel) then
+                  do j = 1, nc
+                     rad_accel_face(j,k) = 0d0
+                  end do
+                  rad_accel_face(m,k) = 0d0
+                  cycle
+               end if
+               i = k - nzlo
+               alfa = alfa_face(k)
+               beta = 1d0 - alfa
+               do j = 1, nc
+                  X_face(j) = alfa*X(j,k) + beta*X(j,k-1)
+               end do
+               op_err = 0
+
+               if (dbg) write(*,2) 'call set1_g_rad', k
+               if (dbg) stop
+
+              dk = k - INT((kmax - (nzlo+1))/ ngp + (nzlo+1))
+              if (ABS(dk) .le. 15) then
+                    j = -1
+                    blend = blend_fac(dk)
+              else if (k .lt. INT((kmax - (nzlo+1))/ ngp + (nzlo+1))) then
+                    j = 1
+                    blend = 0d0
+              else
+                   j = 2
+                   blend = 0d0
+               endif
+
+               call set1_g_rad_mombarg( &
+                  s, k, nc, j, blend, iZ, kk, T_face(k), rho_face(k), &
+                  L_face(k), r_face(k), A, X_face, X, &
+                   log10_g_rad(:,k), g_rad(:,k), &
+                  op_err)
+
+
+               if (op_err /= 0) ierr = op_err
+               do j = 1, nc
+                  rad_accel_face(j,k) = g_rad(j,k)
+               end do
+               rad_accel_face(m,k) = 0d0
+
+         end do
+!$OMP END PARALLEL DO
+
+         k = nzlo
+         do j = 1, m
+            rad_accel_face(j,k) = rad_accel_face(j,k+1) ! for plotting
+         end do
+         !write(*,*) 'grad done'
+      end subroutine calc_g_rad_mombarg
+
+
+      subroutine set1_g_rad_mombarg( &
+         s, k, nc, j, blend, iZ, kk, T, rho, L, r, A, X, X_c,&
+         log10_g_rad, g_rad, ierr)
+         use kap_lib, only : call_compute_grad_mombarg
+         use chem_def
+
+         type (star_info), pointer :: s
+
+         integer, intent(in) :: k, nc, kk, j
+         integer, dimension(:), intent(in) :: iZ(:) ! (nc)
+         real(dp), intent(in) :: T, rho, L, r, blend
+         real(dp), dimension(:), intent(in) :: X, A
+         real(dp), dimension(:,:), intent(in) :: X_c
+
+         real(dp), dimension(:), intent(out) :: &
+            log10_g_rad, g_rad
+         real(dp) :: logKappa
+         integer, intent(out) :: ierr
+
+         integer :: i, ii
+         real(dp) :: tot, logT, logRho, flux
+         real(dp), dimension(17) ::lgrad, fk
+         integer :: iZ_rad2(17)
+         character(len=4) :: e_name
+         logical, parameter :: dbg = .false.
+
+         include 'formats'
+
+         ierr = 0
+         iZ_rad2 = (/1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28/)
+
+         if (dbg) write(*,*) 'call op_mono_get_radacc'
+
+
+          fk = 0
+            do i=1, s% species
+               e_name = chem_isos% name(s% chem_id(i))
+                  if (e_name == 'h1')  fk(1)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'he4') fk(2)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'c12') fk(3)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'n14') fk(4)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'o16') fk(5)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'ne20')fk(6)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'na23')fk(7)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'mg24')fk(8)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'al27')fk(9)  =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'si28')fk(10) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 's32') fk(11) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'ar40')fk(12) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'ca40')fk(13) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'cr52')fk(14) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'mn55')fk(15) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'fe56')fk(16) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+                  if (e_name == 'ni58')fk(17) =  s% xa(i,k)/ chem_isos% W(s% chem_id(i))
+            end do
+            fk = fk / sum(fk)
+            call call_compute_grad_mombarg(k, j, blend, fk, T, rho,&
+                        L, r,&
+                        logKappa, lgrad, ierr)
+
+         if (dbg) write(*,*) 'done op_mono_get_radacc'
+
+         do i=1,nc
+            g_rad(i) = 0d0
+            log10_g_rad(i) = 1d0
+         end do
+
+         if (ierr == 101) then ! logRho out of range
+            ierr = 0
+            write(*,2) 'op_mono_get_radacc bad logT logRho', k, logT, logRho
+            return
+         end if
+
+         if (ierr /= 0) stop 'set1_g_rad'  !return
+
+         do ii = 1, 17 !kk
+            do i = 1, nc
+               if (iZ(i) == iZ_rad2(ii)) then
+                  log10_g_rad(i) = lgrad(ii)
+                  g_rad(i) = exp10(lgrad(ii))
+                  exit
+               end if
+            end do
+         end do
+
+      end subroutine set1_g_rad_mombarg
+
+      subroutine calc_g_rad_hu( &
             nz, nzlo, nzhi, nc, m, kmax_rad_accel, X, A, &
             class_chem_id, net_iso, op_mono_factors, &
             L_face, rho_face, r_face, T_face, alfa_face, &
@@ -1299,7 +1569,7 @@
 
             if (dbg) write(*,2) 'call set1_g_rad', k
             if (dbg) stop
-            call set1_g_rad( &
+            call set1_g_rad_hu( &
                k, nc, iZ, kk, iZ_rad, T_face(k), rho_face(k), &
                L_face(k), r_face(k), A, X_face, screening, &
                min_Z_for_radaccel, max_Z_for_radaccel, &
@@ -1322,10 +1592,10 @@
             rad_accel_face(j,k) = rad_accel_face(j,k+1) ! for plotting
          end do
 
-      end subroutine calc_g_rad
+      end subroutine calc_g_rad_hu
 
 
-      subroutine set1_g_rad( &
+      subroutine set1_g_rad_hu( &
          k, nc, iZ, kk, iZ_rad, T, rho, L, r, A, X, screening, &
          min_Z_for_radaccel, max_Z_for_radaccel, &
          class_chem_id, net_iso, op_mono_factors, &
@@ -1416,8 +1686,7 @@
             end do
          end do
 
-      end subroutine set1_g_rad
-
+      end subroutine set1_g_rad_hu
 
       subroutine update_rad_accel_face( &
             nzlo, nzhi, nc, m, A, X_init, X, &
@@ -1433,7 +1702,7 @@
 
          include 'formats'
 
-         do k=nzlo+1,kmax_rad_accel           
+         do k=nzlo+1,kmax_rad_accel
             do i=1,nc
                rad_accel_face(i,k) = pow(10d0, log10_g_rad(i,k))
             end do
@@ -1480,4 +1749,3 @@
 
 
       end module diffusion_procs
-

@@ -274,7 +274,7 @@
              trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
          else if (trim(s% terminal_show_age_units) == 'days') then
-            age = age*secyer/(24*60*60)
+            age = age*dayyer
          end if
             
          time_step = s% time_step ! in years
@@ -282,7 +282,7 @@
              trim(s% terminal_show_timestep_units) == 'secs') then
             time_step = time_step*secyer
          else if (trim(s% terminal_show_timestep_units) == 'days') then
-            time_step = time_step*secyer/(24*60*60)
+            time_step = time_step*dayyer
          end if
         
          if (s% terminal_show_log_age) age = safe_log10(age)
@@ -775,9 +775,9 @@
             call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
                   t_max_age)
                   
-         else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
+         else if (s% time >= s% max_age_in_days*secday .and. s% max_age_in_days > 0) then
             call compare_to_target('time >= max_age_in_days', &
-               s% time/(60*60*24), s% max_age_in_days, t_max_age)
+               s% time/secday, s% max_age_in_days, t_max_age)
                   
          else if (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0) then 
             call compare_to_target('time >= max_age_in_seconds', &

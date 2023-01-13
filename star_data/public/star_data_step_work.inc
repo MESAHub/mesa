@@ -141,6 +141,8 @@
       real(dp), pointer :: gradr_factor(:)
 
       real(dp), pointer :: rmid(:) ! radius at center by mass (cm)
+
+      logical :: fix_Pgas ! Flag to keep Pgas fixed during cell updates
       
       ! rotation variables only calculated if rotatation_flag is true
          ! angular velocity at cell boundary
@@ -216,9 +218,6 @@
       procedure (), pointer, nopass :: set_rate_factors => null()
          ! called whenever the net changes
 
-      integer, pointer :: which_rates(:) ! (rates_reaction_id_max)  controls for rates
-      procedure (), pointer, nopass :: set_which_rates => null()
-
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
          ! (including losses to neutrinos produced in the reactions)
@@ -262,6 +261,9 @@
       real(dp), pointer :: nonnucneu_phot(:)
       real(dp), pointer :: nonnucneu_pair(:) 
       real(dp), pointer :: nonnucneu_reco(:) 
+
+      ! dvc/dt from TDC
+      real(dp), pointer :: dvc_dt_TDC(:) ! cm/sec/sec
 
       ! irradiation heat profile
       real(dp), pointer :: irradiation_heat(:) ! (ergs/gm/sec)      
@@ -325,6 +327,8 @@
          prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
+      real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
+      logical :: prev_mesh_have_ST_start_info
 
       real(dp) :: gradT_excess_alpha ! 1 for full efficiency boost; 0 for no boost
       real(dp) :: gradT_excess_min_beta
@@ -1177,5 +1181,6 @@
          integer :: timing_num_get_eos_calls, timing_num_solve_eos_calls, timing_num_get_kap_calls
          
          
-         
+         real(dp), dimension(:,:),pointer :: raw_rate, screened_rate, eps_neu_rate, eps_nuc_rate !(num_reactions, nz)
+
            

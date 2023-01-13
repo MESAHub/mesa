@@ -207,6 +207,7 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0  
+      if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -235,6 +236,9 @@ contains
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
+      if (k >= 1) then
+         s% dvc_dt_TDC(k) = 0d0
+      end if
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
          if (s% okay_to_set_mlt_vc) then
@@ -253,13 +257,33 @@ contains
 
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
-            mixing_type, scale, L, r, P, T, rho, dV, Cp, opacity, &
+            mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+         s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_TDC'
                return
             end if
+
+         ! Experimental method to lower superadiabaticity. Call TDC again with an artificially reduced
+         ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
+         ! limit, or when a density inversion is expected to happen.
+         ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
+         if (s% use_superad_reduction) then
+            call set_superad_reduction
+            if (Gamma_factor > 1d0) then
+               call set_TDC(&
+                  conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+                  mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+               s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
+               if (ierr /= 0) then
+                  if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
+                  return
+               end if
+            end if
+         end if
 
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
@@ -278,47 +302,8 @@ contains
          ! limit, or when a density inversion is expected to happen.
          ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
          if (s% use_superad_reduction) then
-            Gamma_limit = s% superad_reduction_Gamma_limit
-            scale_value1 = s% superad_reduction_Gamma_limit_scale
-            scale_value2 = s% superad_reduction_Gamma_inv_scale
-            diff_grads_limit = s% superad_reduction_diff_grads_limit
-            reduction_limit = s% superad_reduction_limit
-            Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
-            Gamma_inv_threshold = 4*(1-beta)/chiT
-
-            Gamma_factor = 1d0
-            if (gradT > gradL) then
-               if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
-                  alfa0 = (gradT-gradL)/diff_grads_limit
-                  if (alfa0 < 1d0) then
-                     diff_grads_factor = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
-                  else
-                     diff_grads_factor = 1d0
-                  end if
-
-                  Gamma_term = 0d0
-                  if (Lrad_div_Ledd > Gamma_limit) then
-                     Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
-                  end if
-                  if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
-                     Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
-                  end if
-                  
-                  if (Gamma_term > 0d0) then
-                     Gamma_factor = Gamma_term/beta*diff_grads_factor
-                     Gamma_factor = Gamma_factor + 1d0
-                     if (reduction_limit > 1d0) then
-                        lambda_limit = 2d0/(reduction_limit-1d0)
-                        exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
-                        Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
-                     end if
-                  end if
-               end if
-            end if 
-            s% superad_reduction_factor(k) = Gamma_factor% val
+            call set_superad_reduction
             if (Gamma_factor > 1d0) then
-               grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
-               gradr_scaled = grad_scale*gradr
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                               gradr_scaled, grada, gradL, &
@@ -365,6 +350,71 @@ contains
          D = 0d0
          Gamma = 0d0            
       end if
+
+      contains
+
+      subroutine set_superad_reduction()
+         Gamma_limit = s% superad_reduction_Gamma_limit
+         scale_value1 = s% superad_reduction_Gamma_limit_scale
+         scale_value2 = s% superad_reduction_Gamma_inv_scale
+         diff_grads_limit = s% superad_reduction_diff_grads_limit
+         reduction_limit = s% superad_reduction_limit
+         Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
+         Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
+
+         Gamma_factor = 1d0
+         if (gradT > gradL) then
+            if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
+               alfa0 = (gradT-gradL)/diff_grads_limit
+               if (alfa0 < 1d0) then
+                  diff_grads_factor = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
+               else
+                  diff_grads_factor = 1d0
+               end if
+
+               Gamma_term = 0d0
+               !if (Lrad_div_Ledd > Gamma_limit) then
+               !   Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
+               !end if
+               !if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
+               !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
+               !end if
+               if (Lrad_div_Ledd > Gamma_limit) then
+                  alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
+                  if (alfa0 < 1d0) then
+                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                  else
+                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                  end if
+                  !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
+               end if
+               if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
+                  alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
+                  if (alfa0 < 1d0) then
+                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                  else
+                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                  end if
+                  !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
+               end if
+               
+               if (Gamma_term > 0d0) then
+                  Gamma_factor = Gamma_term/pow(beta,0.5d0)*diff_grads_factor
+                  Gamma_factor = Gamma_factor + 1d0
+                  if (reduction_limit > 1d0) then
+                     lambda_limit = 2d0/(reduction_limit-1d0)
+                     exp_limit = exp(-lambda_limit*(Gamma_factor-1d0))
+                     Gamma_factor = 2d0*(reduction_limit-1d0)*(1d0/(1d0+exp_limit)-0.5d0)+1d0
+                  end if
+               end if
+            end if
+         end if 
+         if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
+         if (Gamma_factor > 1d0) then
+            grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
+            gradr_scaled = grad_scale*gradr
+         end if
+      end
    end subroutine Get_results
 
 

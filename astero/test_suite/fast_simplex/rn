@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# git can't track a truly empty folder for outputs and astero won't
-# create one, so we create it for the tests here
-mkdir -p outputs
-
 # this provides the definition of do_one (run one part of test)
 # do_one [inlist] [output model] [LOGS directory]
-MESA_DIR=../../..
 source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"

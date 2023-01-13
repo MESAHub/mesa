@@ -50,6 +50,7 @@
       integer :: nn_arg
       real(dp) :: data_arg(8)
       
+      logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
       
       contains
@@ -265,7 +266,9 @@
                model_num_digits, model_num_digits
             write(num_string,format_string) s% model_number
 
-            filename = trim(fgong_prefix) // trim(num_string) // trim(fgong_postfix)
+            if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
+
+            filename = trim(astero_results_directory) // '/' // trim(fgong_prefix) // trim(num_string) // trim(fgong_postfix)
 
             call star_write_pulse_data(s%id, 'FGONG', filename, global_data, point_data, ierr)
 

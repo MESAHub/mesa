@@ -53,6 +53,10 @@
          integer, parameter :: max_kind = general_two_two_kind
          
 
+
+
+
+
          
       type Net_General_Info ! things that are constant for the particular net
       ! it is okay to have multiple threads using the same instance of this simultaneously.
@@ -77,9 +81,6 @@
          ! value is between 1 and num_chem_isos         
 
          ! reactions
-
-         integer, allocatable :: which_rates(:) 
-            ! maps reaction id to small integer indicating choice for rate
                   
          integer, pointer :: net_reaction(:) ! maps reaction id to net reaction number
          ! index from 1 to rates_reaction_id_max (in rates_def)   
@@ -133,6 +134,9 @@
                            z158(:), & ! screen z**1.58
                            z52(:) ! columb z**5/2
 
+         real(dp), allocatable, dimension(:) :: mion ! (num_isos) Mass excess in ergs
+
+
          ! info for evaluation of weak rates
          integer :: num_wk_reactions ! number of weak reactions in the current net
          integer, pointer :: &
@@ -166,12 +170,16 @@
          logical :: net_has_been_defined
          logical :: in_use
 
+         logical :: use_3a_fl87 ! Whether triple alpha should use Fushiki and Lamb 1987
+
+         ! Array initialization
+         logical :: fill_arrays_with_nans = .false.
+
       end type Net_General_Info
-               
-      
+
       integer, parameter :: num_weak_info_arrays_in_Net_Info = 9 ! weaklib results
       
-                  
+            
       type Net_Info
          ! this is working storage for the nuclear reaction calculations
          
@@ -180,10 +188,10 @@
          real(dp), pointer :: reaction_Qs(:) ! if null, use standard values         
          real(dp), pointer :: reaction_neuQs(:) ! if null, use standard values
 
-         real(dp), pointer :: eps_nuc_categories(:) ! (num_categories)
+         real(dp), allocatable :: eps_nuc_categories(:) ! (num_categories)
          ! eps_nuc subtotals for each reaction category
          
-         real(dp), pointer, dimension(:) :: &
+         real(dp), allocatable, dimension(:) :: &
             rate_screened, rate_screened_dT, rate_screened_dRho ! (num_rates)
          ! the units here depend on the number of reactants.
          ! in all cases, the rate_screened times as many molar fractions as there are reactants
@@ -196,19 +204,27 @@
          ! similarly, a 3 body reaction will have rate_screened
          ! with units of [gram^2/(mole^2-sec)].
 
-         real(dp), pointer, dimension(:) :: &
+         real(dp), allocatable, dimension(:) :: &
             rate_raw, rate_raw_dT, rate_raw_dRho ! (num_rates)
          ! raw rates are unscreened (but include density factors)
+
+         real(dp), allocatable,dimension(:) :: rate_factors ! (num_rates)
                   
          ! pointers into work array ----------------------------------
 
          ! molar fractions and their rates of change
-         real(dp), pointer :: y(:) ! units [moles/gram]     (num_isos)
-         real(dp), pointer :: d_dydt_dy(:,:) ! units [1/second] (num_isos, num_isos)
-         real(dp), pointer :: d_eps_nuc_dy(:) ! (num_isos)
+         real(dp), allocatable :: y(:) ! units [moles/gram]     (num_isos)
+         real(dp), allocatable :: d_dydt_dy(:,:) ! units [1/second] (num_isos, num_isos)
+         real(dp), allocatable :: d_eps_nuc_dy(:) ! (num_isos)
+         real(dp), allocatable :: x(:) ! mass fraction
+
+         ! approx21 arrays
+         real(dp), allocatable,dimension(:,:) :: dfdy
+         real(dp), allocatable,dimension(:) :: dratdumdy1, dratdumdy2, &
+            d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
          
          ! weaklib results
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:), allocatable :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
@@ -219,10 +235,55 @@
 
          real(dp) :: temp, logT, rho, logRho
 
-         real(dp) :: eps_neu_total
+         real(dp) :: abar, zbar, z2bar, ye, eta, d_eta_dlnt, d_eta_dlnrho
+
+         real(dp) :: fII
+
+         real(dp) :: eps_nuc, eps_total, eps_neu_total
+         real(dp) :: d_eps_nuc_dT, deps_total_dT, deps_neu_dT
+         real(dp) :: d_eps_nuc_dRho, deps_total_dRho, deps_neu_dRho
          real(dp) :: weak_rate_factor
-         
+
+         real(dp),allocatable,dimension(:) :: d_dxdt_dRho, d_dxdt_dT, d_eps_nuc_dx, dxdt
+         real(qp), allocatable,dimension(:,:) :: dydt
+         real(dp), allocatable,dimension(:,:) :: d_dxdt_dx
+
+         ! These contain the rates after being mutlplied by th various density and composition factors 
+         ! but would still need to be mulipled by the zone mass for the absolute value
+         real(dp), allocatable,dimension(:) :: raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate 
+
+
+         ! Passed in by star
+         integer :: star_id = -1, zone = -1
+      
       end type Net_Info
+
+
+      ! Interface for net hooks
+      interface
+         subroutine other_net_derivs_interface( &
+            n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
+            num_reactions, rate_factors, &
+            symbolic, just_dydt, ierr)
+         import dp, qp, Net_Info
+         implicit none
+
+         type(Net_Info) :: n
+         real(qp), intent(inout) :: dydt(:,:)
+         real(qp), intent(out) :: eps_nuc_MeV(:)
+         integer, intent(in) :: num_reactions
+         real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
+            rate_factors(:)
+         logical, intent(in) :: symbolic, just_dydt
+         integer, intent(out) :: ierr
+
+         end subroutine other_net_derivs_interface
+
+      end interface
+
+      ! Other net_derivs handling
+      procedure(other_net_derivs_interface), pointer  :: &
+         net_other_net_derivs => null()
 
       
    ! private to the implementation
@@ -239,14 +300,15 @@
       integer, parameter :: i_burn_caller_id = 1
       integer, parameter :: i_net_handle = 2
       integer, parameter :: i_screening_mode = 3
-      integer, parameter :: i_net_lwork = 4
-      integer, parameter :: i_eos_handle = 5
-      integer, parameter :: i_sparse_format = 6
-      integer, parameter :: i_clip = 7
-      integer, parameter :: i_ntimes = 8
+      integer, parameter :: i_eos_handle = 4
+      integer, parameter :: i_sparse_format = 5
+      integer, parameter :: i_clip = 6
+      integer, parameter :: i_ntimes = 7
       
       integer, parameter :: burn_lipar = i_ntimes
 
+      ! Note: We need  burn_lrpar /= burn_const_P_lrpar so that we can determine whether we are doing a normal burn or 
+      ! one at const_P. This is needed in burn_solout in mod_one_zone_burn. 
       integer, parameter :: r_burn_temp = 1
       integer, parameter :: r_burn_lgT = 2
       integer, parameter :: r_burn_rho = 3
@@ -364,9 +426,6 @@
          type (Net_General_Info), pointer :: g
          if (handle >= 1 .and. handle <= max_net_handles) then
             g => net_handles(handle)
-            if (allocated(g% which_rates)) then
-               deallocate(g% which_rates)
-            end if
             if (associated(g% net_iso)) then
                deallocate(g% net_iso)
                   nullify(g% net_iso)
@@ -384,6 +443,10 @@
             end if
             if (allocated(g% reaction_kind)) then
                deallocate(g% reaction_kind)
+            end if
+
+            if(allocated(g% mion)) then
+               deallocate(g% mion)
             end if
 
             if (associated(g% reaction_reaclib_kind)) then
@@ -479,8 +542,16 @@
       end subroutine get_net_ptr
 
 
-      integer function get_net_timing_total(g)
+      integer function get_net_timing_total(handle, ierr)
+         integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
+         integer, intent(inout) :: ierr 
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_set_logTcut'
+            return
+         end if
          get_net_timing_total = 0
          if (.not. g% doing_timing) return
          get_net_timing_total = &
@@ -492,8 +563,17 @@
       end function get_net_timing_total
 
 
-      subroutine zero_net_timing(g)
+      subroutine zero_net_timing(handle,ierr)
+         integer, intent(in) :: handle
          type (Net_General_Info), pointer :: g
+         integer, intent(inout) :: ierr 
+         ierr = 0
+         call get_net_ptr(handle, g, ierr)
+         if (ierr /= 0) then
+            write(*,*) 'invalid handle for net_set_logTcut'
+            return
+         end if
+
          g% clock_net_eval = 0
          g% clock_net_weak_rates = 0
          g% clock_net_rate_tables = 0 
@@ -505,27 +585,6 @@
          g% clock_derivs_general = 0
          g% clock_net_get = 0
       end subroutine zero_net_timing
-
-      
-      subroutine do_net_set_which_rates(handle, which_rates, ierr)
-         use rates_def, only: rates_reaction_id_max
-         integer, intent(in) :: handle, which_rates(:)
-         integer, intent(out) :: ierr
-         type (Net_General_Info), pointer :: g
-         integer :: j
-         include 'formats'
-         call get_net_ptr(handle, g, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'invalid handle for net_set_which_rates'
-            return
-         end if
-         if (.not. allocated(g% which_rates)) return
-            ! this can happen on coprocessor
-         do j=1,rates_reaction_id_max
-            g% which_rates(j) = which_rates(j)
-         end do
-      end subroutine do_net_set_which_rates
-      
       
       subroutine do_net_set_fe56ec_fake_factor( &
             handle, fe56ec_fake_factor, min_T_for_fe56ec_fake_factor, ierr)

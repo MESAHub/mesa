@@ -40,12 +40,8 @@
          integer :: ierr
          
          qt = quiet
-      
-         n => net_info_target
-         
+               
          call load_libs
-         
-         which_rates_choice = rates_NACRE_if_available
       
          test_logT = 7.833d0
          test_logRho = 2d0

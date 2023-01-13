@@ -107,6 +107,8 @@
             other_neu => null()
          procedure (other_net_get_interface), pointer, nopass :: &
             other_net_get => null()
+         procedure (other_split_burn_interface), pointer, nopass :: &
+            other_split_burn =>null()
             
          procedure (other_adjust_mlt_gradT_fraction_interface), pointer, nopass :: &
             other_adjust_mlt_gradT_fraction => null()
@@ -118,6 +120,10 @@
             other_diffusion => null()
          procedure (other_screening_interface), pointer, nopass :: &
             other_screening => null()
+         procedure (other_rate_get_interface), pointer, nopass :: &
+            other_rate_get => null()
+         procedure (other_net_derivs_interface), pointer, nopass :: &
+            other_net_derivs => null()
 
          procedure (other_surface_PT_interface), pointer, nopass :: &
             other_surface_PT => null()
@@ -190,67 +196,3 @@
          procedure (binary_other_torque_interface), pointer, nopass :: &
             binary_other_torque => null()
 
-         procedure(pgstar_decorator_interface), pointer, nopass :: &
-            Abundance_pgstar_decorator => null(), &
-            Color_Magnitude1_pgstar_decorator => null(), &
-            Color_Magnitude2_pgstar_decorator => null(), &
-            Color_Magnitude3_pgstar_decorator => null(), &
-            Color_Magnitude4_pgstar_decorator => null(), &
-            Color_Magnitude5_pgstar_decorator => null(), &
-            Color_Magnitude6_pgstar_decorator => null(), &
-            Color_Magnitude7_pgstar_decorator => null(), &
-            Color_Magnitude8_pgstar_decorator => null(), &
-            Color_Magnitude9_pgstar_decorator => null(), &
-            dPg_dnu_pgstar_decorator => null(), &
-            Dynamo_pgstar_decorator => null(), &
-            History_Panels1_pgstar_decorator => null(), &
-            History_Panels2_pgstar_decorator => null(), &
-            History_Panels3_pgstar_decorator => null(), &
-            History_Panels4_pgstar_decorator => null(), &
-            History_Panels5_pgstar_decorator => null(), &
-            History_Panels6_pgstar_decorator => null(), &
-            History_Panels7_pgstar_decorator => null(), &
-            History_Panels8_pgstar_decorator => null(), &
-            History_Panels9_pgstar_decorator => null(), &
-            History_Track1_pgstar_decorator => null(), &
-            History_Track2_pgstar_decorator => null(), &
-            History_Track3_pgstar_decorator => null(), &
-            History_Track4_pgstar_decorator => null(), &
-            History_Track5_pgstar_decorator => null(), &
-            History_Track6_pgstar_decorator => null(), &
-            History_Track7_pgstar_decorator => null(), &
-            History_Track8_pgstar_decorator => null(), &
-            History_Track9_pgstar_decorator => null(), &
-            HR_pgstar_decorator => null(), &
-            Kipp_pgstar_decorator => null(), &
-            logg_logt_pgstar_decorator => null(), &
-            logg_teff_pgstar_decorator => null(), &
-            logl_r_pgstar_decorator => null(), &
-            logl_teff_pgstar_decorator => null(), &
-            logl_v_pgstar_decorator => null(), &
-            l_r_pgstar_decorator => null(), &
-            l_teff_pgstar_decorator => null(), &
-            l_v_pgstar_decorator => null(), &
-            mixing_pgstar_decorator => null(), &
-            mode_prop_pgstar_decorator => null(), &
-            network_pgstar_decorator => null(), &
-            power_pgstar_decorator => null(), &
-            production_pgstar_decorator => null(), &
-            Profile_Panels1_pgstar_decorator => null(), &
-            Profile_Panels2_pgstar_decorator => null(), &
-            Profile_Panels3_pgstar_decorator => null(), &
-            Profile_Panels4_pgstar_decorator => null(), &
-            Profile_Panels5_pgstar_decorator => null(), &
-            Profile_Panels6_pgstar_decorator => null(), &
-            Profile_Panels7_pgstar_decorator => null(), &
-            Profile_Panels8_pgstar_decorator => null(), &
-            Profile_Panels9_pgstar_decorator => null(), &
-            R_L_pgstar_decorator => null(), &
-            R_Teff_pgstar_decorator => null(), &
-            rti_pgstar_decorator => null(), &
-            summary_burn_pgstar_decorator => null(), &
-            summary_profile_pgstar_decorator => null(), &
-            summary_history_pgstar_decorator => null(), &
-            trho_pgstar_decorator => null(), &
-            tmaxrho_pgstar_decorator => null(), &
-            trho_profile_pgstar_decorator => null()

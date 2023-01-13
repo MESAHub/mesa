@@ -5,9 +5,16 @@
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
       dump_missing_metals_into_heaviest = .false.
-      
-      set_rates_preference = .true.
-      new_rates_preference = 2   ! 1 = nacre ; 2 = jina reaclib
+
+      num_special_rate_factors = 2
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+
+      reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+      special_rate_factor(2) = 1
+      filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+
 
       change_initial_D_omega_flag = .true.
       new_D_omega_flag = .true.
@@ -87,6 +94,15 @@
 ! mixing
       D_omega_mixing_rate = 1d0
       D_omega_mixing_across_convection_boundary = .false.
+
+
+      overshoot_scheme(1) = 'exponential' ! ``exponential``, ``step``, ``other``
+      overshoot_zone_type(1) = 'burn_Z' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
+      overshoot_zone_loc(1) = 'shell' ! ``core``, ``shell``, ``any``
+      overshoot_bdy_loc(1) = 'bottom' ! ``bottom``, ``top``, ``any``
+
+      overshoot_f(1) = 0.001d0
+      overshoot_f0(1) = 0.0001d0
 
 ! timesteps
       varcontrol_target = 1d-3
@@ -181,6 +197,7 @@
       op_split_burn_eps = 1d-5
       op_split_burn_odescal = 1d-5
 
+      calculate_brunt_N2= .false.
 ! output
       gamma1_limit_max_q = 0.75d0 ! only check below this limit when reporting min gamma1
 

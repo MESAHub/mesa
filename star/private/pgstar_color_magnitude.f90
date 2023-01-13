@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -46,9 +47,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude1_plot(s, id, device_id, &
-            s% Color_Magnitude1_xleft, s% Color_Magnitude1_xright, &
-            s% Color_Magnitude1_ybot, s% Color_Magnitude1_ytop, .false., &
-            s% Color_Magnitude1_title, s% Color_Magnitude1_txt_scale, ierr)
+            s% pg% Color_Magnitude1_xleft, s% pg% Color_Magnitude1_xright, &
+            s% pg% Color_Magnitude1_ybot, s% pg% Color_Magnitude1_ytop, .false., &
+            s% pg% Color_Magnitude1_title, s% pg% Color_Magnitude1_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude1_plot
@@ -65,34 +66,34 @@
          call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude1_xaxis1_name, &
-            s% Color_Magnitude1_xaxis2_name, &
-            s% Color_Magnitude1_xmin, &
-            s% Color_Magnitude1_xmax, &
-            s% Color_Magnitude1_dxmin, &
-            s% Color_Magnitude1_xmargin, &
-            s% Color_Magnitude1_max_width, &
-            s% Color_Magnitude1_num_panels, &
-            s% Color_Magnitude1_other_ymin, &
-            s% Color_Magnitude1_other_ymax, &
-            s% Color_Magnitude1_yaxis_reversed, &
-            s% Color_Magnitude1_other_yaxis_log, &
-            s% Color_Magnitude1_other_dymin, &
-            s% Color_Magnitude1_other_ymargin, &
-            s% Color_Magnitude1_other_yaxis1_name, &
-            s% Color_Magnitude1_other_yaxis2_name, &
-            s% Color_Magnitude1_ymin, &
-            s% Color_Magnitude1_ymax, &
-            s% Color_Magnitude1_xaxis_reversed, &
-            s% Color_Magnitude1_yaxis_reversed, &
-            s% Color_Magnitude1_xaxis_log, &
-            s% Color_Magnitude1_yaxis_log, &
-            s% Color_Magnitude1_dymin, &
-            s% Color_Magnitude1_ymargin, &
-            s% Color_Magnitude1_yaxis1_name, &
-            s% Color_Magnitude1_yaxis2_name, &
-            s% Color_Magnitude1_use_decorator, &
-            s% Color_Magnitude1_pgstar_decorator, &
+            s% pg% Color_Magnitude1_xaxis1_name, &
+            s% pg% Color_Magnitude1_xaxis2_name, &
+            s% pg% Color_Magnitude1_xmin, &
+            s% pg% Color_Magnitude1_xmax, &
+            s% pg% Color_Magnitude1_dxmin, &
+            s% pg% Color_Magnitude1_xmargin, &
+            s% pg% Color_Magnitude1_max_width, &
+            s% pg% Color_Magnitude1_num_panels, &
+            s% pg% Color_Magnitude1_other_ymin, &
+            s% pg% Color_Magnitude1_other_ymax, &
+            s% pg% Color_Magnitude1_yaxis_reversed, &
+            s% pg% Color_Magnitude1_other_yaxis_log, &
+            s% pg% Color_Magnitude1_other_dymin, &
+            s% pg% Color_Magnitude1_other_ymargin, &
+            s% pg% Color_Magnitude1_other_yaxis1_name, &
+            s% pg% Color_Magnitude1_other_yaxis2_name, &
+            s% pg% Color_Magnitude1_ymin, &
+            s% pg% Color_Magnitude1_ymax, &
+            s% pg% Color_Magnitude1_xaxis_reversed, &
+            s% pg% Color_Magnitude1_yaxis_reversed, &
+            s% pg% Color_Magnitude1_xaxis_log, &
+            s% pg% Color_Magnitude1_yaxis_log, &
+            s% pg% Color_Magnitude1_dymin, &
+            s% pg% Color_Magnitude1_ymargin, &
+            s% pg% Color_Magnitude1_yaxis1_name, &
+            s% pg% Color_Magnitude1_yaxis2_name, &
+            s% pg% Color_Magnitude1_use_decorator, &
+            s% pg% Color_Magnitude1_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude1_plot
 
@@ -108,9 +109,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude2_plot(s, id, device_id, &
-            s% Color_Magnitude2_xleft, s% Color_Magnitude2_xright, &
-            s% Color_Magnitude2_ybot, s% Color_Magnitude2_ytop, .false., &
-            s% Color_Magnitude2_title, s% Color_Magnitude2_txt_scale, ierr)
+            s% pg% Color_Magnitude2_xleft, s% pg% Color_Magnitude2_xright, &
+            s% pg% Color_Magnitude2_ybot, s% pg% Color_Magnitude2_ytop, .false., &
+            s% pg% Color_Magnitude2_title, s% pg% Color_Magnitude2_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude2_plot
@@ -127,34 +128,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude2_xaxis1_name, &
-            s% Color_Magnitude2_xaxis2_name, &
-            s% Color_Magnitude2_xmin, &
-            s% Color_Magnitude2_xmax, &
-            s% Color_Magnitude2_dxmin, &
-            s% Color_Magnitude2_xmargin, &
-            s% Color_Magnitude2_max_width, &
-            s% Color_Magnitude2_num_panels, &
-            s% Color_Magnitude2_other_ymin, &
-            s% Color_Magnitude2_other_ymax, &
-            s% Color_Magnitude2_yaxis_reversed, &
-            s% Color_Magnitude2_other_yaxis_log, &
-            s% Color_Magnitude2_other_dymin, &
-            s% Color_Magnitude2_other_ymargin, &
-            s% Color_Magnitude2_other_yaxis1_name, &
-            s% Color_Magnitude2_other_yaxis2_name, &
-            s% Color_Magnitude2_ymin, &
-            s% Color_Magnitude2_ymax, &
-            s% Color_Magnitude2_xaxis_reversed, &
-            s% Color_Magnitude2_yaxis_reversed, &
-            s% Color_Magnitude2_xaxis_log, &
-            s% Color_Magnitude2_yaxis_log, &
-            s% Color_Magnitude2_dymin, &
-            s% Color_Magnitude2_ymargin, &
-            s% Color_Magnitude2_yaxis1_name, &
-            s% Color_Magnitude2_yaxis2_name, &
-            s% Color_Magnitude2_use_decorator, &
-            s% Color_Magnitude2_pgstar_decorator, &
+            s% pg% Color_Magnitude2_xaxis1_name, &
+            s% pg% Color_Magnitude2_xaxis2_name, &
+            s% pg% Color_Magnitude2_xmin, &
+            s% pg% Color_Magnitude2_xmax, &
+            s% pg% Color_Magnitude2_dxmin, &
+            s% pg% Color_Magnitude2_xmargin, &
+            s% pg% Color_Magnitude2_max_width, &
+            s% pg% Color_Magnitude2_num_panels, &
+            s% pg% Color_Magnitude2_other_ymin, &
+            s% pg% Color_Magnitude2_other_ymax, &
+            s% pg% Color_Magnitude2_yaxis_reversed, &
+            s% pg% Color_Magnitude2_other_yaxis_log, &
+            s% pg% Color_Magnitude2_other_dymin, &
+            s% pg% Color_Magnitude2_other_ymargin, &
+            s% pg% Color_Magnitude2_other_yaxis1_name, &
+            s% pg% Color_Magnitude2_other_yaxis2_name, &
+            s% pg% Color_Magnitude2_ymin, &
+            s% pg% Color_Magnitude2_ymax, &
+            s% pg% Color_Magnitude2_xaxis_reversed, &
+            s% pg% Color_Magnitude2_yaxis_reversed, &
+            s% pg% Color_Magnitude2_xaxis_log, &
+            s% pg% Color_Magnitude2_yaxis_log, &
+            s% pg% Color_Magnitude2_dymin, &
+            s% pg% Color_Magnitude2_ymargin, &
+            s% pg% Color_Magnitude2_yaxis1_name, &
+            s% pg% Color_Magnitude2_yaxis2_name, &
+            s% pg% Color_Magnitude2_use_decorator, &
+            s% pg% Color_Magnitude2_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude2_plot
 
@@ -170,9 +171,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude3_plot(s, id, device_id, &
-            s% Color_Magnitude3_xleft, s% Color_Magnitude3_xright, &
-            s% Color_Magnitude3_ybot, s% Color_Magnitude3_ytop, .false., &
-            s% Color_Magnitude3_title, s% Color_Magnitude3_txt_scale, ierr)
+            s% pg% Color_Magnitude3_xleft, s% pg% Color_Magnitude3_xright, &
+            s% pg% Color_Magnitude3_ybot, s% pg% Color_Magnitude3_ytop, .false., &
+            s% pg% Color_Magnitude3_title, s% pg% Color_Magnitude3_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude3_plot
@@ -189,34 +190,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude3_xaxis1_name, &
-            s% Color_Magnitude3_xaxis2_name, &
-            s% Color_Magnitude3_xmin, &
-            s% Color_Magnitude3_xmax, &
-            s% Color_Magnitude3_dxmin, &
-            s% Color_Magnitude3_xmargin, &
-            s% Color_Magnitude3_max_width, &
-            s% Color_Magnitude3_num_panels, &
-            s% Color_Magnitude3_other_ymin, &
-            s% Color_Magnitude3_other_ymax, &
-            s% Color_Magnitude3_yaxis_reversed, &
-            s% Color_Magnitude3_other_yaxis_log, &
-            s% Color_Magnitude3_other_dymin, &
-            s% Color_Magnitude3_other_ymargin, &
-            s% Color_Magnitude3_other_yaxis1_name, &
-            s% Color_Magnitude3_other_yaxis2_name, &
-            s% Color_Magnitude3_ymin, &
-            s% Color_Magnitude3_ymax, &
-            s% Color_Magnitude3_xaxis_reversed, &
-            s% Color_Magnitude3_yaxis_reversed, &
-            s% Color_Magnitude3_xaxis_log, &
-            s% Color_Magnitude3_yaxis_log, &
-            s% Color_Magnitude3_dymin, &
-            s% Color_Magnitude3_ymargin, &
-            s% Color_Magnitude3_yaxis1_name, &
-            s% Color_Magnitude3_yaxis2_name, &
-            s% Color_Magnitude3_use_decorator, &
-            s% Color_Magnitude3_pgstar_decorator, &
+            s% pg% Color_Magnitude3_xaxis1_name, &
+            s% pg% Color_Magnitude3_xaxis2_name, &
+            s% pg% Color_Magnitude3_xmin, &
+            s% pg% Color_Magnitude3_xmax, &
+            s% pg% Color_Magnitude3_dxmin, &
+            s% pg% Color_Magnitude3_xmargin, &
+            s% pg% Color_Magnitude3_max_width, &
+            s% pg% Color_Magnitude3_num_panels, &
+            s% pg% Color_Magnitude3_other_ymin, &
+            s% pg% Color_Magnitude3_other_ymax, &
+            s% pg% Color_Magnitude3_yaxis_reversed, &
+            s% pg% Color_Magnitude3_other_yaxis_log, &
+            s% pg% Color_Magnitude3_other_dymin, &
+            s% pg% Color_Magnitude3_other_ymargin, &
+            s% pg% Color_Magnitude3_other_yaxis1_name, &
+            s% pg% Color_Magnitude3_other_yaxis2_name, &
+            s% pg% Color_Magnitude3_ymin, &
+            s% pg% Color_Magnitude3_ymax, &
+            s% pg% Color_Magnitude3_xaxis_reversed, &
+            s% pg% Color_Magnitude3_yaxis_reversed, &
+            s% pg% Color_Magnitude3_xaxis_log, &
+            s% pg% Color_Magnitude3_yaxis_log, &
+            s% pg% Color_Magnitude3_dymin, &
+            s% pg% Color_Magnitude3_ymargin, &
+            s% pg% Color_Magnitude3_yaxis1_name, &
+            s% pg% Color_Magnitude3_yaxis2_name, &
+            s% pg% Color_Magnitude3_use_decorator, &
+            s% pg% Color_Magnitude3_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude3_plot
 
@@ -232,9 +233,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude4_plot(s, id, device_id, &
-            s% Color_Magnitude4_xleft, s% Color_Magnitude4_xright, &
-            s% Color_Magnitude4_ybot, s% Color_Magnitude4_ytop, .false., &
-            s% Color_Magnitude4_title, s% Color_Magnitude4_txt_scale, ierr)
+            s% pg% Color_Magnitude4_xleft, s% pg% Color_Magnitude4_xright, &
+            s% pg% Color_Magnitude4_ybot, s% pg% Color_Magnitude4_ytop, .false., &
+            s% pg% Color_Magnitude4_title, s% pg% Color_Magnitude4_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude4_plot
@@ -251,34 +252,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude4_xaxis1_name, &
-            s% Color_Magnitude4_xaxis2_name, &
-            s% Color_Magnitude4_xmin, &
-            s% Color_Magnitude4_xmax, &
-            s% Color_Magnitude4_dxmin, &
-            s% Color_Magnitude4_xmargin, &
-            s% Color_Magnitude4_max_width, &
-            s% Color_Magnitude4_num_panels, &
-            s% Color_Magnitude4_other_ymin, &
-            s% Color_Magnitude4_other_ymax, &
-            s% Color_Magnitude4_yaxis_reversed, &
-            s% Color_Magnitude4_other_yaxis_log, &
-            s% Color_Magnitude4_other_dymin, &
-            s% Color_Magnitude4_other_ymargin, &
-            s% Color_Magnitude4_other_yaxis1_name, &
-            s% Color_Magnitude4_other_yaxis2_name, &
-            s% Color_Magnitude4_ymin, &
-            s% Color_Magnitude4_ymax, &
-            s% Color_Magnitude4_xaxis_reversed, &
-            s% Color_Magnitude4_yaxis_reversed, &
-            s% Color_Magnitude4_xaxis_log, &
-            s% Color_Magnitude4_yaxis_log, &
-            s% Color_Magnitude4_dymin, &
-            s% Color_Magnitude4_ymargin, &
-            s% Color_Magnitude4_yaxis1_name, &
-            s% Color_Magnitude4_yaxis2_name, &
-            s% Color_Magnitude4_use_decorator, &
-            s% Color_Magnitude4_pgstar_decorator, &
+            s% pg% Color_Magnitude4_xaxis1_name, &
+            s% pg% Color_Magnitude4_xaxis2_name, &
+            s% pg% Color_Magnitude4_xmin, &
+            s% pg% Color_Magnitude4_xmax, &
+            s% pg% Color_Magnitude4_dxmin, &
+            s% pg% Color_Magnitude4_xmargin, &
+            s% pg% Color_Magnitude4_max_width, &
+            s% pg% Color_Magnitude4_num_panels, &
+            s% pg% Color_Magnitude4_other_ymin, &
+            s% pg% Color_Magnitude4_other_ymax, &
+            s% pg% Color_Magnitude4_yaxis_reversed, &
+            s% pg% Color_Magnitude4_other_yaxis_log, &
+            s% pg% Color_Magnitude4_other_dymin, &
+            s% pg% Color_Magnitude4_other_ymargin, &
+            s% pg% Color_Magnitude4_other_yaxis1_name, &
+            s% pg% Color_Magnitude4_other_yaxis2_name, &
+            s% pg% Color_Magnitude4_ymin, &
+            s% pg% Color_Magnitude4_ymax, &
+            s% pg% Color_Magnitude4_xaxis_reversed, &
+            s% pg% Color_Magnitude4_yaxis_reversed, &
+            s% pg% Color_Magnitude4_xaxis_log, &
+            s% pg% Color_Magnitude4_yaxis_log, &
+            s% pg% Color_Magnitude4_dymin, &
+            s% pg% Color_Magnitude4_ymargin, &
+            s% pg% Color_Magnitude4_yaxis1_name, &
+            s% pg% Color_Magnitude4_yaxis2_name, &
+            s% pg% Color_Magnitude4_use_decorator, &
+            s% pg% Color_Magnitude4_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude4_plot
 
@@ -294,9 +295,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude5_plot(s, id, device_id, &
-            s% Color_Magnitude5_xleft, s% Color_Magnitude5_xright, &
-            s% Color_Magnitude5_ybot, s% Color_Magnitude5_ytop, .false., &
-            s% Color_Magnitude5_title, s% Color_Magnitude5_txt_scale, ierr)
+            s% pg% Color_Magnitude5_xleft, s% pg% Color_Magnitude5_xright, &
+            s% pg% Color_Magnitude5_ybot, s% pg% Color_Magnitude5_ytop, .false., &
+            s% pg% Color_Magnitude5_title, s% pg% Color_Magnitude5_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude5_plot
@@ -313,34 +314,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude5_xaxis1_name, &
-            s% Color_Magnitude5_xaxis2_name, &
-            s% Color_Magnitude5_xmin, &
-            s% Color_Magnitude5_xmax, &
-            s% Color_Magnitude5_dxmin, &
-            s% Color_Magnitude5_xmargin, &
-            s% Color_Magnitude5_max_width, &
-            s% Color_Magnitude5_num_panels, &
-            s% Color_Magnitude5_other_ymin, &
-            s% Color_Magnitude5_other_ymax, &
-            s% Color_Magnitude5_yaxis_reversed, &
-            s% Color_Magnitude5_other_yaxis_log, &
-            s% Color_Magnitude5_other_dymin, &
-            s% Color_Magnitude5_other_ymargin, &
-            s% Color_Magnitude5_other_yaxis1_name, &
-            s% Color_Magnitude5_other_yaxis2_name, &
-            s% Color_Magnitude5_ymin, &
-            s% Color_Magnitude5_ymax, &
-            s% Color_Magnitude5_xaxis_reversed, &
-            s% Color_Magnitude5_yaxis_reversed, &
-            s% Color_Magnitude5_xaxis_log, &
-            s% Color_Magnitude5_yaxis_log, &
-            s% Color_Magnitude5_dymin, &
-            s% Color_Magnitude5_ymargin, &
-            s% Color_Magnitude5_yaxis1_name, &
-            s% Color_Magnitude5_yaxis2_name, &
-            s% Color_Magnitude5_use_decorator, &
-            s% Color_Magnitude5_pgstar_decorator, &
+            s% pg% Color_Magnitude5_xaxis1_name, &
+            s% pg% Color_Magnitude5_xaxis2_name, &
+            s% pg% Color_Magnitude5_xmin, &
+            s% pg% Color_Magnitude5_xmax, &
+            s% pg% Color_Magnitude5_dxmin, &
+            s% pg% Color_Magnitude5_xmargin, &
+            s% pg% Color_Magnitude5_max_width, &
+            s% pg% Color_Magnitude5_num_panels, &
+            s% pg% Color_Magnitude5_other_ymin, &
+            s% pg% Color_Magnitude5_other_ymax, &
+            s% pg% Color_Magnitude5_yaxis_reversed, &
+            s% pg% Color_Magnitude5_other_yaxis_log, &
+            s% pg% Color_Magnitude5_other_dymin, &
+            s% pg% Color_Magnitude5_other_ymargin, &
+            s% pg% Color_Magnitude5_other_yaxis1_name, &
+            s% pg% Color_Magnitude5_other_yaxis2_name, &
+            s% pg% Color_Magnitude5_ymin, &
+            s% pg% Color_Magnitude5_ymax, &
+            s% pg% Color_Magnitude5_xaxis_reversed, &
+            s% pg% Color_Magnitude5_yaxis_reversed, &
+            s% pg% Color_Magnitude5_xaxis_log, &
+            s% pg% Color_Magnitude5_yaxis_log, &
+            s% pg% Color_Magnitude5_dymin, &
+            s% pg% Color_Magnitude5_ymargin, &
+            s% pg% Color_Magnitude5_yaxis1_name, &
+            s% pg% Color_Magnitude5_yaxis2_name, &
+            s% pg% Color_Magnitude5_use_decorator, &
+            s% pg% Color_Magnitude5_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude5_plot
 
@@ -356,9 +357,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude6_plot(s, id, device_id, &
-            s% Color_Magnitude6_xleft, s% Color_Magnitude6_xright, &
-            s% Color_Magnitude6_ybot, s% Color_Magnitude6_ytop, .false., &
-            s% Color_Magnitude6_title, s% Color_Magnitude6_txt_scale, ierr)
+            s% pg% Color_Magnitude6_xleft, s% pg% Color_Magnitude6_xright, &
+            s% pg% Color_Magnitude6_ybot, s% pg% Color_Magnitude6_ytop, .false., &
+            s% pg% Color_Magnitude6_title, s% pg% Color_Magnitude6_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude6_plot
@@ -375,34 +376,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude6_xaxis1_name, &
-            s% Color_Magnitude6_xaxis2_name, &
-            s% Color_Magnitude6_xmin, &
-            s% Color_Magnitude6_xmax, &
-            s% Color_Magnitude6_dxmin, &
-            s% Color_Magnitude6_xmargin, &
-            s% Color_Magnitude6_max_width, &
-            s% Color_Magnitude6_num_panels, &
-            s% Color_Magnitude6_other_ymin, &
-            s% Color_Magnitude6_other_ymax, &
-            s% Color_Magnitude6_yaxis_reversed, &
-            s% Color_Magnitude6_other_yaxis_log, &
-            s% Color_Magnitude6_other_dymin, &
-            s% Color_Magnitude6_other_ymargin, &
-            s% Color_Magnitude6_other_yaxis1_name, &
-            s% Color_Magnitude6_other_yaxis2_name, &
-            s% Color_Magnitude6_ymin, &
-            s% Color_Magnitude6_ymax, &
-            s% Color_Magnitude6_xaxis_reversed, &
-            s% Color_Magnitude6_yaxis_reversed, &
-            s% Color_Magnitude6_xaxis_log, &
-            s% Color_Magnitude6_yaxis_log, &
-            s% Color_Magnitude6_dymin, &
-            s% Color_Magnitude6_ymargin, &
-            s% Color_Magnitude6_yaxis1_name, &
-            s% Color_Magnitude6_yaxis2_name, &
-            s% Color_Magnitude6_use_decorator, &
-            s% Color_Magnitude6_pgstar_decorator, &
+            s% pg% Color_Magnitude6_xaxis1_name, &
+            s% pg% Color_Magnitude6_xaxis2_name, &
+            s% pg% Color_Magnitude6_xmin, &
+            s% pg% Color_Magnitude6_xmax, &
+            s% pg% Color_Magnitude6_dxmin, &
+            s% pg% Color_Magnitude6_xmargin, &
+            s% pg% Color_Magnitude6_max_width, &
+            s% pg% Color_Magnitude6_num_panels, &
+            s% pg% Color_Magnitude6_other_ymin, &
+            s% pg% Color_Magnitude6_other_ymax, &
+            s% pg% Color_Magnitude6_yaxis_reversed, &
+            s% pg% Color_Magnitude6_other_yaxis_log, &
+            s% pg% Color_Magnitude6_other_dymin, &
+            s% pg% Color_Magnitude6_other_ymargin, &
+            s% pg% Color_Magnitude6_other_yaxis1_name, &
+            s% pg% Color_Magnitude6_other_yaxis2_name, &
+            s% pg% Color_Magnitude6_ymin, &
+            s% pg% Color_Magnitude6_ymax, &
+            s% pg% Color_Magnitude6_xaxis_reversed, &
+            s% pg% Color_Magnitude6_yaxis_reversed, &
+            s% pg% Color_Magnitude6_xaxis_log, &
+            s% pg% Color_Magnitude6_yaxis_log, &
+            s% pg% Color_Magnitude6_dymin, &
+            s% pg% Color_Magnitude6_ymargin, &
+            s% pg% Color_Magnitude6_yaxis1_name, &
+            s% pg% Color_Magnitude6_yaxis2_name, &
+            s% pg% Color_Magnitude6_use_decorator, &
+            s% pg% Color_Magnitude6_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude6_plot
 
@@ -418,9 +419,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude7_plot(s, id, device_id, &
-            s% Color_Magnitude7_xleft, s% Color_Magnitude7_xright, &
-            s% Color_Magnitude7_ybot, s% Color_Magnitude7_ytop, .false., &
-            s% Color_Magnitude7_title, s% Color_Magnitude7_txt_scale, ierr)
+            s% pg% Color_Magnitude7_xleft, s% pg% Color_Magnitude7_xright, &
+            s% pg% Color_Magnitude7_ybot, s% pg% Color_Magnitude7_ytop, .false., &
+            s% pg% Color_Magnitude7_title, s% pg% Color_Magnitude7_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude7_plot
@@ -437,34 +438,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude7_xaxis1_name, &
-            s% Color_Magnitude7_xaxis2_name, &
-            s% Color_Magnitude7_xmin, &
-            s% Color_Magnitude7_xmax, &
-            s% Color_Magnitude7_dxmin, &
-            s% Color_Magnitude7_xmargin, &
-            s% Color_Magnitude7_max_width, &
-            s% Color_Magnitude7_num_panels, &
-            s% Color_Magnitude7_other_ymin, &
-            s% Color_Magnitude7_other_ymax, &
-            s% Color_Magnitude7_yaxis_reversed, &
-            s% Color_Magnitude7_other_yaxis_log, &
-            s% Color_Magnitude7_other_dymin, &
-            s% Color_Magnitude7_other_ymargin, &
-            s% Color_Magnitude7_other_yaxis1_name, &
-            s% Color_Magnitude7_other_yaxis2_name, &
-            s% Color_Magnitude7_ymin, &
-            s% Color_Magnitude7_ymax, &
-            s% Color_Magnitude7_xaxis_reversed, &
-            s% Color_Magnitude7_yaxis_reversed, &
-            s% Color_Magnitude7_xaxis_log, &
-            s% Color_Magnitude7_yaxis_log, &
-            s% Color_Magnitude7_dymin, &
-            s% Color_Magnitude7_ymargin, &
-            s% Color_Magnitude7_yaxis1_name, &
-            s% Color_Magnitude7_yaxis2_name, &
-            s% Color_Magnitude7_use_decorator, &
-            s% Color_Magnitude7_pgstar_decorator, &
+            s% pg% Color_Magnitude7_xaxis1_name, &
+            s% pg% Color_Magnitude7_xaxis2_name, &
+            s% pg% Color_Magnitude7_xmin, &
+            s% pg% Color_Magnitude7_xmax, &
+            s% pg% Color_Magnitude7_dxmin, &
+            s% pg% Color_Magnitude7_xmargin, &
+            s% pg% Color_Magnitude7_max_width, &
+            s% pg% Color_Magnitude7_num_panels, &
+            s% pg% Color_Magnitude7_other_ymin, &
+            s% pg% Color_Magnitude7_other_ymax, &
+            s% pg% Color_Magnitude7_yaxis_reversed, &
+            s% pg% Color_Magnitude7_other_yaxis_log, &
+            s% pg% Color_Magnitude7_other_dymin, &
+            s% pg% Color_Magnitude7_other_ymargin, &
+            s% pg% Color_Magnitude7_other_yaxis1_name, &
+            s% pg% Color_Magnitude7_other_yaxis2_name, &
+            s% pg% Color_Magnitude7_ymin, &
+            s% pg% Color_Magnitude7_ymax, &
+            s% pg% Color_Magnitude7_xaxis_reversed, &
+            s% pg% Color_Magnitude7_yaxis_reversed, &
+            s% pg% Color_Magnitude7_xaxis_log, &
+            s% pg% Color_Magnitude7_yaxis_log, &
+            s% pg% Color_Magnitude7_dymin, &
+            s% pg% Color_Magnitude7_ymargin, &
+            s% pg% Color_Magnitude7_yaxis1_name, &
+            s% pg% Color_Magnitude7_yaxis2_name, &
+            s% pg% Color_Magnitude7_use_decorator, &
+            s% pg% Color_Magnitude7_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude7_plot
 
@@ -480,9 +481,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude8_plot(s, id, device_id, &
-            s% Color_Magnitude8_xleft, s% Color_Magnitude8_xright, &
-            s% Color_Magnitude8_ybot, s% Color_Magnitude8_ytop, .false., &
-            s% Color_Magnitude8_title, s% Color_Magnitude8_txt_scale, ierr)
+            s% pg% Color_Magnitude8_xleft, s% pg% Color_Magnitude8_xright, &
+            s% pg% Color_Magnitude8_ybot, s% pg% Color_Magnitude8_ytop, .false., &
+            s% pg% Color_Magnitude8_title, s% pg% Color_Magnitude8_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude8_plot
@@ -499,34 +500,34 @@
            call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude8_xaxis1_name, &
-            s% Color_Magnitude8_xaxis2_name, &
-            s% Color_Magnitude8_xmin, &
-            s% Color_Magnitude8_xmax, &
-            s% Color_Magnitude8_dxmin, &
-            s% Color_Magnitude8_xmargin, &
-            s% Color_Magnitude8_max_width, &
-            s% Color_Magnitude8_num_panels, &
-            s% Color_Magnitude8_other_ymin, &
-            s% Color_Magnitude8_other_ymax, &
-            s% Color_Magnitude8_yaxis_reversed, &
-            s% Color_Magnitude8_other_yaxis_log, &
-            s% Color_Magnitude8_other_dymin, &
-            s% Color_Magnitude8_other_ymargin, &
-            s% Color_Magnitude8_other_yaxis1_name, &
-            s% Color_Magnitude8_other_yaxis2_name, &
-            s% Color_Magnitude8_ymin, &
-            s% Color_Magnitude8_ymax, &
-            s% Color_Magnitude8_xaxis_reversed, &
-            s% Color_Magnitude8_yaxis_reversed, &
-            s% Color_Magnitude8_xaxis_log, &
-            s% Color_Magnitude8_yaxis_log, &
-            s% Color_Magnitude8_dymin, &
-            s% Color_Magnitude8_ymargin, &
-            s% Color_Magnitude8_yaxis1_name, &
-            s% Color_Magnitude8_yaxis2_name, &
-            s% Color_Magnitude8_use_decorator, &
-            s% Color_Magnitude8_pgstar_decorator, &
+            s% pg% Color_Magnitude8_xaxis1_name, &
+            s% pg% Color_Magnitude8_xaxis2_name, &
+            s% pg% Color_Magnitude8_xmin, &
+            s% pg% Color_Magnitude8_xmax, &
+            s% pg% Color_Magnitude8_dxmin, &
+            s% pg% Color_Magnitude8_xmargin, &
+            s% pg% Color_Magnitude8_max_width, &
+            s% pg% Color_Magnitude8_num_panels, &
+            s% pg% Color_Magnitude8_other_ymin, &
+            s% pg% Color_Magnitude8_other_ymax, &
+            s% pg% Color_Magnitude8_yaxis_reversed, &
+            s% pg% Color_Magnitude8_other_yaxis_log, &
+            s% pg% Color_Magnitude8_other_dymin, &
+            s% pg% Color_Magnitude8_other_ymargin, &
+            s% pg% Color_Magnitude8_other_yaxis1_name, &
+            s% pg% Color_Magnitude8_other_yaxis2_name, &
+            s% pg% Color_Magnitude8_ymin, &
+            s% pg% Color_Magnitude8_ymax, &
+            s% pg% Color_Magnitude8_xaxis_reversed, &
+            s% pg% Color_Magnitude8_yaxis_reversed, &
+            s% pg% Color_Magnitude8_xaxis_log, &
+            s% pg% Color_Magnitude8_yaxis_log, &
+            s% pg% Color_Magnitude8_dymin, &
+            s% pg% Color_Magnitude8_ymargin, &
+            s% pg% Color_Magnitude8_yaxis1_name, &
+            s% pg% Color_Magnitude8_yaxis2_name, &
+            s% pg% Color_Magnitude8_use_decorator, &
+            s% pg% Color_Magnitude8_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude8_plot
 
@@ -542,9 +543,9 @@
          call pgbbuf()
          call pgeras()
          call do_Color_Magnitude9_plot(s, id, device_id, &
-            s% Color_Magnitude9_xleft, s% Color_Magnitude9_xright, &
-            s% Color_Magnitude9_ybot, s% Color_Magnitude9_ytop, .false., &
-            s% Color_Magnitude9_title, s% Color_Magnitude9_txt_scale, ierr)
+            s% pg% Color_Magnitude9_xleft, s% pg% Color_Magnitude9_xright, &
+            s% pg% Color_Magnitude9_ybot, s% pg% Color_Magnitude9_ytop, .false., &
+            s% pg% Color_Magnitude9_title, s% pg% Color_Magnitude9_txt_scale, ierr)
          if (ierr /= 0) return
          call pgebuf()
       end subroutine Color_Magnitude9_plot
@@ -561,34 +562,34 @@
         call do_Color_Magnitude_plot( &
             id, s, device_id, &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-            s% Color_Magnitude9_xaxis1_name, &
-            s% Color_Magnitude9_xaxis2_name, &
-            s% Color_Magnitude9_xmin, &
-            s% Color_Magnitude9_xmax, &
-            s% Color_Magnitude9_dxmin, &
-            s% Color_Magnitude9_xmargin, &
-            s% Color_Magnitude9_max_width, &
-            s% Color_Magnitude9_num_panels, &
-            s% Color_Magnitude9_other_ymin, &
-            s% Color_Magnitude9_other_ymax, &
-            s% Color_Magnitude9_yaxis_reversed, &
-            s% Color_Magnitude9_other_yaxis_log, &
-            s% Color_Magnitude9_other_dymin, &
-            s% Color_Magnitude9_other_ymargin, &
-            s% Color_Magnitude9_other_yaxis1_name, &
-            s% Color_Magnitude9_other_yaxis2_name, &
-            s% Color_Magnitude9_ymin, &
-            s% Color_Magnitude9_ymax, &
-            s% Color_Magnitude9_xaxis_reversed, &
-            s% Color_Magnitude9_yaxis_reversed, &
-            s% Color_Magnitude9_xaxis_log, &
-            s% Color_Magnitude9_yaxis_log, &
-            s% Color_Magnitude9_dymin, &
-            s% Color_Magnitude9_ymargin, &
-            s% Color_Magnitude9_yaxis1_name, &
-            s% Color_Magnitude9_yaxis2_name, &
-            s% Color_Magnitude9_use_decorator, &
-            s% Color_Magnitude9_pgstar_decorator, &
+            s% pg% Color_Magnitude9_xaxis1_name, &
+            s% pg% Color_Magnitude9_xaxis2_name, &
+            s% pg% Color_Magnitude9_xmin, &
+            s% pg% Color_Magnitude9_xmax, &
+            s% pg% Color_Magnitude9_dxmin, &
+            s% pg% Color_Magnitude9_xmargin, &
+            s% pg% Color_Magnitude9_max_width, &
+            s% pg% Color_Magnitude9_num_panels, &
+            s% pg% Color_Magnitude9_other_ymin, &
+            s% pg% Color_Magnitude9_other_ymax, &
+            s% pg% Color_Magnitude9_yaxis_reversed, &
+            s% pg% Color_Magnitude9_other_yaxis_log, &
+            s% pg% Color_Magnitude9_other_dymin, &
+            s% pg% Color_Magnitude9_other_ymargin, &
+            s% pg% Color_Magnitude9_other_yaxis1_name, &
+            s% pg% Color_Magnitude9_other_yaxis2_name, &
+            s% pg% Color_Magnitude9_ymin, &
+            s% pg% Color_Magnitude9_ymax, &
+            s% pg% Color_Magnitude9_xaxis_reversed, &
+            s% pg% Color_Magnitude9_yaxis_reversed, &
+            s% pg% Color_Magnitude9_xaxis_log, &
+            s% pg% Color_Magnitude9_yaxis_log, &
+            s% pg% Color_Magnitude9_dymin, &
+            s% pg% Color_Magnitude9_ymargin, &
+            s% pg% Color_Magnitude9_yaxis1_name, &
+            s% pg% Color_Magnitude9_yaxis2_name, &
+            s% pg% Color_Magnitude9_use_decorator, &
+            s% pg% Color_Magnitude9_pgstar_decorator, &
             ierr)
       end subroutine do_Color_Magnitude9_plot
 
@@ -828,7 +829,7 @@
                   call show_right_yaxis_label_pgstar(s,trim(create_label(other_yname1,'')))
                end if
 
-               call pgslw(s% pgstar_lw)
+               call pgslw(s% pg% pgstar_lw)
                call pgline(n, xvec, other_yvec)
                call pgslw(1)
             end if
@@ -860,7 +861,7 @@
                else
                   call show_left_yaxis_label_pgstar(s,trim(create_label(yname1,'')))
                end if
-               call pgslw(s% pgstar_lw)
+               call pgslw(s% pg% pgstar_lw)
                call pgline(n, xvec, yvec)
                call pgslw(1)
             end if

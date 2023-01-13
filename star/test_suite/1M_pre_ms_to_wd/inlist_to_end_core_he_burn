@@ -40,7 +40,7 @@
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 0.0001
 
-      energy_eqn_option = 'dedt'
+      energy_eqn_option = 'eps_grav'
       
       convergence_ignore_equL_residuals = .true.
 

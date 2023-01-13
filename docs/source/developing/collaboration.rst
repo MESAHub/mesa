@@ -26,7 +26,10 @@ software. This is the most important group.
 MESA (e.g., contribute a hook/routine, make a pull request).
 
 *MESA Developers (MD)*: These are individuals committed to improving
-MESA and its infrastructure (e.g., the MESA Test Hub). Responsibilities
+MESA and its infrastructure (e.g., the MESA Test Hub). Instructions on how to become
+a developer are found :doc:`here <developing/new_developers>`.
+
+Responsibilities
 of developers include:
 
 **Stewardship of test_suite cases**

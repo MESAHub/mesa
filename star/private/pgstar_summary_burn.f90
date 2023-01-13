@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -50,9 +51,9 @@
          call pgeras()
 
          call do_summary_burn_plot(s, id, device_id, &
-            s% Summary_Burn_xleft, s% Summary_Burn_xright, &
-            s% Summary_Burn_ybot, s% Summary_Burn_ytop, .false., &
-            s% Summary_Burn_title, s% Summary_Burn_txt_scale, ierr)
+            s% pg% Summary_Burn_xleft, s% pg% Summary_Burn_xright, &
+            s% pg% Summary_Burn_ybot, s% pg% Summary_Burn_ytop, .false., &
+            s% pg% Summary_Burn_title, s% pg% Summary_Burn_txt_scale, ierr)
 
          call pgebuf()
 
@@ -88,10 +89,10 @@
          include 'formats'
 
          ierr = 0
-         xaxis_name = s% Summary_Burn_xaxis_name
-         xaxis_min = s% Summary_Burn_xmin
-         xaxis_max = s% Summary_Burn_xmax
-         xaxis_reversed = s% Summary_Burn_xaxis_reversed
+         xaxis_name = s% pg% Summary_Burn_xaxis_name
+         xaxis_min = s% pg% Summary_Burn_xmin
+         xaxis_max = s% pg% Summary_Burn_xmax
+         xaxis_reversed = s% pg% Summary_Burn_xaxis_reversed
 
          nz = s% nz
          windy = winymax - winymin
@@ -136,7 +137,7 @@
             ymin = 0.0
             ybot = -0.02
 
-            lw = s% pgstar_lw
+            lw = s% pg% pgstar_lw
             call pgqlw(lw_sav)
 
             call pgsvp(winxmin, winxmax, winymin, winymax)
@@ -144,7 +145,7 @@
                call show_model_number_pgstar(s)
                call show_age_pgstar(s)
             end if
-            call show_title_pgstar(s, title, s% Summary_Burn_title_shift)
+            call show_title_pgstar(s, title, s% pg% Summary_Burn_title_shift)
 
             ! logT
             do k=grid_min,grid_max
@@ -272,7 +273,7 @@
                      str = category_name(docat(i))
                      if (str(1:5) == 'burn_') then
                         str = str(6:len_trim(str))
-                     else if (str == 'tri_alfa') then
+                     else if (str == 'tri_alpha') then
                         str = '3a'
                      else if (str == 'c12_c12') then
                         str = 'c+c'
@@ -300,8 +301,8 @@
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
             end if
 
-         call show_pgstar_decorator(s%id, s% summary_burn_use_decorator, &
-            s% summary_burn_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id, s% pg% summary_burn_use_decorator, &
+            s% pg% summary_burn_pgstar_decorator, 0, ierr)
 
 
          end subroutine plot

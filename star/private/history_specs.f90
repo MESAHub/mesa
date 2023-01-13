@@ -56,8 +56,13 @@
       integer, parameter :: abs_mag_offset = bc_offset + idel
       integer, parameter :: lum_band_offset = abs_mag_offset + idel
       integer, parameter :: log_lum_band_offset = lum_band_offset + idel
+      
+      integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
+      integer, parameter :: screened_rate_offset = raw_rate_offset + idel
+      integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
+      integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
 
-      integer, parameter :: start_of_special_cases = log_lum_band_offset + idel
+      integer, parameter :: start_of_special_cases = eps_neu_rate_offset + idel
       ! mixing and burning regions must be given the largest offsets
       ! so they can be distinguished from the other ones
 
@@ -93,7 +98,7 @@
          integer :: iounit, n, i, t, id, j, k, cnt, ii, nxt_spec, spec_err
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
-         logical :: bad_item, special_case
+         logical :: bad_item, special_case, exists
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -107,25 +112,28 @@
          ierr = 0
          spec_err = 0
 
+
          ! first try local directory
          filename = history_columns_file
-         if (len_trim(filename) == 0) filename = 'history_columns.list'
+
+         if(level==1) then ! First pass either the user set the file or we load the defaults
+            if (len_trim(filename) == 0) filename = 'history_columns.list'
+
+            exists=.false.
+            inquire(file=filename,exist=exists)
+
+            if(.not.exists) filename = trim(mesa_dir) // '/star/defaults/history_columns.list'
+         else
+            ! User had include '' in their history_columns.list file, so dont try to load the local one, jump to the defaults
+            if (len_trim(filename) == 0) filename =trim(mesa_dir) // '/star/defaults/history_columns.list'
+         end if
+
+
+
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in star/defaults
-            filename = trim(mesa_dir) // '/star/defaults/' // trim(filename)
-            ierr = 0
-            open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then ! look for log_columns.list
-               filename = 'log_columns.list'
-               ierr = 0
-               open(newunit=iounit, &
-                     file=trim(filename), action='read', status='old', iostat=ierr)
-               if (ierr /= 0) then
-                  write(*,*) 'failed to open ' // trim(history_columns_file)
-                  return
-               end if
-               write(*,*) 'please rename log_columns.list to history_columns.list'
-            end if
+         if (ierr /= 0) then 
+            write(*,*) 'failed to open ' // trim(history_columns_file)
+            return
          end if
 
          if (dbg) then
@@ -271,8 +279,44 @@
                cycle
             end if
 
+            if (string == 'add_raw_rates') then
+               call do_rate(raw_rate_offset,'raw_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_screened_rates') then
+               call do_rate(screened_rate_offset,'screened_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_nuc_rates') then
+               call do_rate(eps_nuc_rate_offset,'eps_nuc_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
+            if (string == 'add_eps_neu_rates') then
+               call do_rate(eps_neu_rate_offset,'eps_neu_rate_', spec_err)
+               if (spec_err /= 0) then
+                  call error; return
+               end if
+               call count_specs
+               cycle
+            end if
+
             nxt_spec = do1_history_spec( &
-               iounit, t, n, i, string, buffer, special_case, report, spec_err)
+               s, iounit, t, n, i, string, buffer, special_case, report, spec_err)
             if (spec_err /= 0) then
                ierr = spec_err
             else
@@ -431,6 +475,25 @@
             end do
          end subroutine do_colors
 
+         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+            use rates_def, only: reaction_name
+            use net_def, only: get_net_ptr
+            integer, intent(in) :: offset
+            character(len=*) :: prefix
+            integer, intent(out) :: ierr
+            integer :: k, ir
+            type(net_general_info), pointer :: g=>null()
+            ierr = 0
+            call get_net_ptr(s% net_handle, g, ierr)
+            if(ierr/=0) return
+            do k=1,s% num_reactions
+               ir = g% reaction_id(k)
+               call insert_spec( &
+                  offset + k,trim(prefix)//trim(reaction_name(ir)), ierr)
+               if (ierr /= 0) return
+            end do
+         end subroutine do_rate
+
 
          subroutine error
             ierr = -1
@@ -442,97 +505,142 @@
 
 
       integer function do1_history_spec( &
-            iounit, t, n, i, string, buffer, special_case, report, ierr) result(spec)
+            s, iounit, t, n, i, string, buffer, special_case, report, ierr) result(spec)
 
          use utils_lib
          use utils_def
          use chem_def
          use chem_lib
+         use net_def
          integer :: iounit, t, n, i
 
+         type(star_info), pointer :: s
          character (len=*) :: string, buffer
          logical, intent(out) :: special_case
          logical, intent(in) :: report
          integer, intent(out) :: ierr
 
          integer :: id
+         type(Net_General_Info), pointer :: g
 
          ierr = 0
          spec = -1
          special_case = .false.
 
-         if (string=='abs_mag') then
-            call do1_color(abs_mag_offset)
+         call get_net_ptr(s% net_handle, g, ierr)
+         if(ierr/=0) return
 
-         else if (string=='bc') then
-            call do1_color(bc_offset)
-            
-         else if (string=='lum_band') then
-            call do1_color(lum_band_offset)
+         ! These must come first otherwise things like center_mu will be caught by the
+         ! center abundaces check
+         id = do_get_history_id(string)
+         if (id > 0) then
+            spec = id
+            if (id == h_mixing_regions .or. &
+                id == h_mix_relr_regions .or. &
+                id == h_burning_regions .or. &
+                id == h_burn_relr_regions) then
+               special_case = .true.
+            end if
+            return
+         end if
+         id = rates_category_id(string)
+         if (id > 0) then
+            spec = category_offset + id
+            return
+         end if
 
-        else if (string=='log_lum_band') then
-            call do1_color(log_lum_band_offset)
+         if (do1(string, 'raw_rate', raw_rate_offset, do1_rate)) then
+            return
 
-         else if (string == 'center') then
-            call do1_nuclide(center_xa_offset)
+         else if (do1(string, 'screened_rate', screened_rate_offset, do1_rate)) then
+               return
 
-         else if (string == 'surface') then
-            call do1_nuclide(surface_xa_offset)
+         else if (do1(string, 'eps_nuc_rate', eps_nuc_rate_offset, do1_rate)) then
+            return
 
-         else if (string == 'average') then
-            call do1_nuclide(average_xa_offset)
+         else if (do1(string, 'eps_neu_rate', eps_neu_rate_offset, do1_rate)) then
+            return
 
-         else if (string == 'total_mass') then
-            call do1_nuclide(total_mass_offset)
+         else if (do1(string, 'abs_mag', abs_mag_offset, do1_color)) then
+            return
 
-         else if (string == 'log_total_mass') then
-            call do1_nuclide(log_total_mass_offset)
+         else if (do1(string, 'bc', bc_offset, do1_color)) then
+            return
 
-         else if (string == 'log_average') then
-            call do1_nuclide(log_average_xa_offset)
+         else if (do1(string, 'lum_band', lum_band_offset, do1_color)) then
+            return
 
-         else if (string == 'log_center') then
-            call do1_nuclide(log_center_xa_offset)
+         else if (do1(string, 'log_lum_band', log_lum_band_offset, do1_color)) then
+            return
 
-         else if (string == 'log_surface') then
-            call do1_nuclide(log_surface_xa_offset)
+         else if (do1(string, 'center', center_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'max_eps_nuc_log_xa') then
-            call do1_nuclide(max_eps_nuc_offset)
+         else if (do1(string, 'surface', surface_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'cz_top_log_xa') then
-            call do1_nuclide(cz_top_max_offset)
+         else if (do1(string, 'average', average_xa_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'cz_log_xa') then
-            call do1_nuclide(cz_max_offset)
+         else if (do1(string, 'total_mass', total_mass_offset, do1_nuclide)) then
+            return
 
-         else if (string == 'c_log_eps_burn') then
-            call do1_rates_category(c_log_eps_burn_offset)
+         else if (do1(string, 'log_total_mass', log_total_mass_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'log_average', log_average_xa_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'log_center', log_center_xa_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'log_surface', log_surface_xa_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'max_eps_nuc_log_xa', max_eps_nuc_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'cz_top_log_xa', cz_top_max_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'cz_log_xa', cz_max_offset, do1_nuclide)) then
+            return
+
+         else if (do1(string, 'c_log_eps_burn', c_log_eps_burn_offset, do1_rates_category)) then
+            return
 
          else
-            id = do_get_history_id(string)
-            if (id > 0) then
-               spec = id
-               if (id == h_mixing_regions .or. &
-                   id == h_mix_relr_regions .or. &
-                   id == h_burning_regions .or. &
-                   id == h_burn_relr_regions) then
-                  special_case = .true.
-               end if
-               return
-            end if
-            id = rates_category_id(string)
-            if (id > 0) then
-               spec = category_offset + id
-               return
-            end if
             if (report) write(*,*) 'bad history list name: ' // trim(string)
             ierr = -1
-
          end if
 
 
          contains
+
+         logical function do1(string, name, offset, func)
+            character(len=*) :: string, name
+            integer :: offset, k
+            external :: func
+
+            if(string == name) then
+               ! We have string value (i.e total_mass c12)
+               call func(offset)
+               do1 = .true.
+            else if(string(1:len_trim(name)+1) == trim(name)//'_') then  
+               ! We have string_value (i.e total_mass_c12) 
+               ! Rewrite string so its in the form string value (i.e total_mass c12)
+               ! By finding the last _ and replacing with a space
+               k = index(string,'_',.true.)
+               string(k:) = ' '
+               buffer(k:k) = ' '
+               i = len_trim(name)
+               call func(offset)
+               do1 = .true.
+            else
+               do1 = .false.
+            end if
+         end function do1
+
 
 
          subroutine do1_nuclide(offset)
@@ -582,6 +690,24 @@
             write(*,*) 'bad filter name: ' // trim(string)
             ierr = -1
          end subroutine do1_color
+
+         subroutine do1_rate(offset)
+            use rates_lib, only: rates_reaction_id
+            integer, intent(in) :: offset
+            t = token(iounit, n, i, buffer, string)
+            if (t /= name_token) then
+               ierr = -1; return
+            end if
+            id = rates_reaction_id(string)
+            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id
+            if (ierr/=0) return
+            if (id > 0) then
+               spec = offset + id
+               return
+            end if
+            write(*,*) 'bad reaction name: ' // trim(string)
+            ierr = -1
+         end subroutine do1_rate
 
 
       end function do1_history_spec

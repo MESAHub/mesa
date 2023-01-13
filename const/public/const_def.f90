@@ -68,7 +68,7 @@
       real(dp), parameter :: two_13 = 1.2599210498948730d0 ! = pow(2d0,1d0/3d0)
       real(dp), parameter :: four_13 = 1.5874010519681994d0 ! = pow(4d0,1d0/3d0)
       real(dp), parameter :: sqrt2 = 1.414213562373095d0 ! = sqrt(2)
-      real(dp), parameter :: sqrt_2_div_3 = 0.8164965809d0 ! = sqrt(2/3)
+      real(dp), parameter :: sqrt_2_div_3 = 0.816496580927726d0 ! = sqrt(2/3)
 
 ! exact physical constants
 
@@ -85,6 +85,7 @@
       real(dp), parameter :: ev2erg = 1.602176634d-12 ! electron volt (erg)
       real(dp), parameter :: mev_to_ergs = 1d6*ev2erg
       real(dp), parameter :: mev_amu = mev_to_ergs/amu
+      real(dp), parameter :: mev2gr = 1d6*ev2erg/(clight*clight) ! MeV to grams
       real(dp), parameter :: Qconv = mev_to_ergs*avo
       real(dp), parameter :: kev = kerg / ev2erg ! converts temp to ev (ev K^-1)
       real(dp), parameter :: boltz_sigma = (pi*pi * boltzm*boltzm*boltzm*boltzm) / (60 * hbar*hbar*hbar * clight*clight) ! Stefan-Boltzmann constant (erg cm^-2 K^-4 s^-1)
@@ -94,7 +95,8 @@
       real(dp), parameter :: au = 1.49597870700D13 ! (cm) - exact value defined by IAU 2009, 2012
       real(dp), parameter :: pc = (3.600D3 * rad2a) * au ! (cm) parsec, by definition
       real(dp), parameter :: dayyer = 365.25d0 ! days per (Julian) year
-      real(dp), parameter :: secyer = 24*60*60*dayyer ! seconds per year
+      real(dp), parameter :: secday = 24*60*60  ! seconds in a day
+      real(dp), parameter :: secyer = secday*dayyer ! seconds per year
       real(dp), parameter :: ly = clight*secyer ! light year (cm)
 
 ! inexact but very well measured physical constants

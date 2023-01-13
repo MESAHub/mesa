@@ -96,12 +96,19 @@ LOAD_PGPLOT = `mesasdk_pgplot_link` -lz
 LOAD_HDF5 = `mesasdk_hdf5_link`
 
 
-# step 7) do you want to use GYRE?
+# step 7a) do you want to use GYRE?
 
 # if you don't plan to use GYRE and want to skip building it, then
 # USE_GYRE = NO
 # if you want to have GYRE built along with the rest of mesa, then
 USE_GYRE = YES
+
+# step 7b) do you want to use ADIPLS?
+
+# if you don't plan to use ADIPLS and want to skip building it, then
+# USE_ADIPLS = NO
+# if you want to have ADIPLS built along with the rest of mesa, then
+USE_ADIPLS = YES
 
 
 # step 8) now do the mesa install
@@ -286,7 +293,12 @@ LOAD_MESA_STAR = $(LOAD_MESA_STAR_INT) $(LOAD_MESA_STAR_EXT)
 
 LIBS_MESA_BINARY = binary $(LIBS_MESA_STAR)
 LOAD_MESA_BINARY_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_BINARY))
-LOAD_MESA_BINARY_EXT = $(LOAD_MESA_STAR_EXT)
+
+ifeq ($(USE_PGSTAR),YES)
+   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT) $(LOAD_PGPLOT)
+else
+   LOAD_MESA_BINARY_EXT = $(LOAD_STAR_MODS_EXT) 
+endif
 LOAD_MESA_BINARY = $(LOAD_MESA_BINARY_INT) $(LOAD_MESA_BINARY_EXT)
 
 # Due to slow compile with -ggdb and -O2 we add -fno-var-tracking which speeds things up alot

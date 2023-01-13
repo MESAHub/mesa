@@ -75,8 +75,8 @@
            idr, dr, &
            deriv_flgs, symbolic, just_dydt)
 
-        type (Net_Info), pointer :: n
-        real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+        type (Net_Info) :: n
+        real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
         integer, intent(in) :: i ! the reaction number
         real(dp), intent(in) :: r_in ! coefficient of rate for the reaction
@@ -110,8 +110,8 @@
 
         ! this function handles reactions with 1-3 inputs going to 1-3 outputs
 
-        type (Net_Info), pointer :: n
-        real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+        type (Net_Info) :: n
+        real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
         integer, intent(in) :: i ! the reaction number
         real(dp), intent(in) :: r_in ! coefficient of rate for the reaction
@@ -150,6 +150,11 @@
         rvs(i_rate) = r * n% rate_screened(i)
         rvs(i_rate_dT) = r * n% rate_screened_dT(i)
         rvs(i_rate_dRho) = r * n% rate_screened_dRho(i)
+
+        n% raw_rate(i) = n% rate_raw(i) * r * avo
+        n% screened_rate(i) = n% rate_screened(i) * r * avo
+        n% eps_nuc_rate(i) = n% rate_screened(i) * r * (Q - Qneu)  * Qconv
+        n% eps_neu_rate(i) = n% rate_screened(i) * r * Qneu  * Qconv
 
         ! evaluate left hand side (inputs)
         lhs = 0
@@ -265,8 +270,8 @@
 
       subroutine do_lhs_iso( &
             n, dydt, i, c, i1, rvs, i2, dr2, i3, dr3, i4, dr4, symbolic, just_dydt)
-         type (Net_Info), pointer :: n
-         real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+         type (Net_Info) :: n
+         real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
          integer, intent(in) :: i, i1, i2, i3, i4
          real(dp), intent(in) :: c, rvs(:), dr2, dr3, dr4
          logical, intent(in) :: symbolic, just_dydt
@@ -354,8 +359,8 @@
 
       subroutine do_rhs_iso( &
             n, dydt, i, c, i1, rvs, i2, dr2, i3, dr3, i4, dr4, symbolic, just_dydt)
-         type (Net_Info), pointer :: n
-         real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+         type (Net_Info) :: n
+         real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
          integer, intent(in) :: i, i1, i2, i3, i4
          real(dp), intent(in) :: c, rvs(:), dr2, dr3, dr4
          logical, intent(in) :: symbolic, just_dydt
@@ -439,8 +444,7 @@
 
 
       subroutine check_balance(n, i, lhs, rhs) ! check conservation of nucleons
-         type (Net_Info), pointer :: n
-         real(qp), pointer :: dydt(:,:) ! (num_rvs, num_isos)
+         type (Net_Info) :: n
          integer, intent(in) :: i
          real(dp), intent(in) :: lhs, rhs
          if (lhs == rhs) return

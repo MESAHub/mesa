@@ -1,5 +1,4 @@
 
-MESA_DIR = ../../../..
 
 STAR= star
 

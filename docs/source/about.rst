@@ -58,7 +58,14 @@ Use of MESA requires:
 
 1. That all publications and presentations (research, educational,
    or outreach) deriving from the use of MESA acknowledge the MESA
-   instrument papers (Paxton et al. 2011, 2013, 2015, 2018, 2019).
+   instrument papers (Paxton et al. 
+   `2011 <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`_, 
+   `2013 <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`_, 
+   `2015 <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`_, 
+   `2018 <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`_, 
+   `2019 <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`_,
+   Jermyn et al.
+   `2022 <https://ui.adsabs.harvard.edu/abs/2022arXiv220803651J/abstract>`_)
 
 2. That users share in a timely fashion all information needed for others to
    recreate their MESA results (e.g., on `MESA Zenodo <https://zenodo.org/communities/mesa>`__).

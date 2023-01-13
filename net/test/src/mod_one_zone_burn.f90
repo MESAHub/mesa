@@ -66,7 +66,6 @@
       logical :: uniform_Xinit
 
       integer :: screening_mode
-      integer, pointer :: which_rates(:)
 
       integer, parameter :: io_out = 35
       real(dp) :: data_output_min_t
@@ -77,7 +76,6 @@
       character (len=32) :: small_mtx_decsol, large_mtx_decsol
 
       logical :: show_net_reactions_info
-      integer :: which_rates_choice
       
       real(dp) :: rattab_logT_lower_bound, rattab_logT_upper_bound
 
@@ -182,9 +180,7 @@
          real(dp) :: logRho, logT, Rho, T, xsum, &
            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT
          real(dp), target :: eps_nuc_categories(num_categories)
-         real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
+
          integer :: i, j, ierr, iounit, decsol_choice, solver_choice, num_times
 
          real(dp), dimension(:), pointer :: times, dxdt_source_term
@@ -200,8 +196,6 @@
          real(dp), pointer :: atol(:) ! absolute error tolerance (species)
          integer :: itol ! switch for rtol and atol
          
-         real(dp), pointer :: burn_work_array(:), net_work_array(:)
-         
          real(dp), pointer :: ending_x(:) ! (species)
          integer :: nfcn    ! number of function evaluations
          integer :: njac    ! number of jacobian evaluations
@@ -210,7 +204,7 @@
          integer :: nrejct  ! number of rejected steps
          integer :: max_order_used
          
-         integer :: iout, caller_id, cid, ir, burn_lwork, net_lwork
+         integer :: iout, caller_id, cid, ir
          integer(8) :: time0, time1, clock_rate
 
          real(dp) :: ending_temp, ending_rho, ending_lnS, initial_rho, initial_lnS, dt
@@ -221,8 +215,7 @@
          integer, parameter :: nwork = pm_work_size
          real(dp), pointer :: pm_work(:)
          
-         type (Net_Info), target :: netinfo_target
-         type (Net_Info), pointer :: netinfo
+         type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          
          include 'formats'
@@ -231,7 +224,6 @@
          told = 0
          
          net_file = net_file_in
-         netinfo => netinfo_target
 
          call test_net_setup(net_file)
 
@@ -527,15 +519,7 @@
          time_doing_eos = -1
             
          if (burn_at_constant_density) then
-            
-            burn_lwork = net_1_zone_burn_const_density_work_size(handle,ierr)
-            if (ierr /= 0) return
-            net_lwork = net_work_size(handle,ierr)
-            if (ierr /= 0) return
-            allocate(net_work_array(net_lwork), burn_work_array(burn_lwork))
-            
-            call set_nan(burn_work_array) ! TESTING
-            
+                        
             starting_log10T = burn_logT
             logT = burn_logT
             logRho = burn_logRho
@@ -549,7 +533,6 @@
                screening_mode,  &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
-               burn_lwork, burn_work_array, net_lwork, net_work_array, &
                ending_x, eps_nuc_categories, ending_log10T, &
                avg_eps_nuc, ending_eps_neu_total, &
                nfcn, njac, nstep, naccpt, nrejct, ierr)
@@ -563,7 +546,6 @@
                write(*,1) 'avg_eps_nuc', avg_eps_nuc
                write(*,1) 'ending_eps_neu_total', ending_eps_neu_total
             end if
-            deallocate(burn_work_array)
 
          else if (burn_at_constant_P) then
             if (num_times_for_burn <= 0) then
@@ -616,14 +598,6 @@
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for etas')
             end if
             
-            burn_lwork = net_1_zone_burn_work_size(handle,ierr)
-            if (ierr /= 0) return
-            net_lwork = net_work_size(handle,ierr)
-            if (ierr /= 0) return
-            allocate(net_work_array(net_lwork), burn_work_array(burn_lwork))
-            
-            call set_nan(burn_work_array) ! TESTING
-            
             call net_1_zone_burn( &
                net_handle, eos_handle, species, num_reactions, 0d0, burn_tend, xin, &
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
@@ -632,14 +606,10 @@
                screening_mode,  & 
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
-               burn_lwork, burn_work_array, & 
-               net_lwork, net_work_array, & 
                ending_x, eps_nuc_categories, &
                avg_eps_nuc, eps_neu_total, &
                nfcn, njac, nstep, naccpt, nrejct, ierr)
-               
-            deallocate(net_work_array, burn_work_array)
-            
+                           
          end if
          call system_clock(time1,clock_rate)
          dt = dble(time1 - time0) / clock_rate
@@ -1041,14 +1011,24 @@
             integer, intent(inout), target :: iwork_y(*)
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            real(dp) :: lgt,lgrho
             integer :: i, cid
             interface
                include 'num_interp_y.dek'
             end interface
             integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+
+            if(size(rpar)==burn_lrpar) then
+               lgt = rpar(r_burn_prev_lgT)
+               lgrho = rpar(r_burn_prev_lgRho)
+            else if (size(rpar)==burn_const_P_lrpar)then
+               lgt = log10(rpar(r_burn_const_P_temperature))
+               lgrho = log10(rpar(r_burn_const_P_rho))
+            end if
+
             
             call burn_solout1( &
-               step, told, time, rpar(r_burn_prev_lgT), rpar(r_burn_prev_lgRho), n, x, irtrn)
+               step, told, time, lgt, lgrho, n, x, irtrn)
          end subroutine burn_solout
 
 
@@ -1066,9 +1046,6 @@
             real(dp) :: logT, logRho, lgPgas, Pgas, Prad, lgP, avg_eps_nuc
             real(dp) :: eps_neu_total, eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, &
               eps_nuc_categories(num_categories)
-            real(dp), dimension(:), pointer :: &
-               rate_raw, rate_raw_dT, rate_raw_dRho, &
-               rate_screened, rate_screened_dT, rate_screened_dRho
 
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
             real(dp) :: dlnRho_dlnT_const_P, d_epsnuc_dlnT_const_P, d_Cv_dlnT
@@ -1083,11 +1060,12 @@
                   dt, energy, entropy, burn_ergs, &
                   xh, xhe, Z, mass_correction
          
-            integer :: i, j, lwork, adjustment_iso, cid, ierr, max_j
+            integer :: i, j, adjustment_iso, cid, ierr, max_j
             real(dp), dimension(species) :: dabar_dx, dzbar_dx, eps_nuc_dx, dmc_dx
-            real(dp), pointer :: work(:), actual_Qs(:), actual_neuQs(:)
+            real(dp), pointer :: actual_Qs(:), actual_neuQs(:)
             logical, pointer :: from_weaklib(:)
             type (Net_General_Info), pointer  :: g
+            type(net_info) :: netinfo
             logical :: skip_jacobian
 
             include 'formats'
@@ -1112,10 +1090,8 @@
             end if
 
             ierr = 0
-            lwork = net_work_size(handle, ierr) 
-            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          
-            allocate(work(lwork), &
+            allocate( &
                   actual_Qs(num_reactions), actual_neuQs(num_reactions), &
                   from_weaklib(num_reactions), &
                   stat=ierr)
@@ -1172,6 +1148,13 @@
             eta = res(i_eta)
             d_eta_dlnT = 0d0
             d_eta_dlnRho = 0d0
+
+            call get_net_ptr(handle, g, ierr)
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+         
+
+            netinfo% g => g
+
          
             call net_get_with_Qs( &
                   handle, skip_jacobian, netinfo, species, num_reactions, &
@@ -1183,7 +1166,7 @@
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
                   screening_mode, &
                   eps_nuc_categories, eps_neu_total, &
-                  lwork, work, actual_Qs, actual_neuQs, from_weaklib, ierr)
+                  actual_Qs, actual_neuQs, from_weaklib, ierr)
             if (ierr /= 0) then
                write(*,'(A)')
                write(*,1) 'logT', logT
@@ -1192,9 +1175,6 @@
                call mesa_error(__FILE__,__LINE__)
             end if
 
-            call get_net_ptr(handle, g, ierr)
-            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
             dt = time - told
 
             ! set burn_ergs according to change from initial abundances
@@ -1225,15 +1205,6 @@
          
             if (time >= data_output_min_t) then
          
-               call get_net_rate_ptrs(g% handle, &
-                  rate_screened, rate_screened_dT, rate_screened_dRho, &
-                  rate_raw, rate_raw_dT, rate_raw_dRho, lwork, work, &
-                  ierr)
-               if (ierr /= 0) then
-                  write(*,*) 'failed in get_net_rate_ptrs'
-                  call mesa_error(__FILE__,__LINE__)
-               end if
-
                write(io_out,'(i7,99(1pe26.16,1x))',advance='no') &
                   step, &
                   sign(1d0,avg_eps_nuc)*log10(max(1d0,abs(avg_eps_nuc))), &
@@ -1283,8 +1254,8 @@
                do i=1,num_reactions_to_track
                   j = index_for_reaction_to_track(i)
                   if (j == 0) cycle
-                  write(io_out,'(1pe26.16,1x)',advance='no') rate_raw(j)
-                  write(io_out,'(1pe26.16,1x)',advance='no') rate_screened(j)
+                  write(io_out,'(1pe26.16,1x)',advance='no') netinfo% rate_raw(j)
+                  write(io_out,'(1pe26.16,1x)',advance='no') netinfo% rate_screened(j)
                end do
                write(io_out,*) 
                do j=1, species
@@ -1315,7 +1286,7 @@
             end if
          
          
-            deallocate(work, actual_Qs, actual_neuQs, from_weaklib)
+            deallocate(actual_Qs, actual_neuQs, from_weaklib)
 
          end subroutine burn_solout1
 
@@ -1367,20 +1338,7 @@
          species = g% num_isos
          num_reactions = g% num_reactions
 
-         allocate(which_rates(rates_reaction_id_max), reaction_id(num_reactions))
-         which_rates(:) = which_rates_choice
-
-         call set_which_rates(ierr)
-         if (ierr /= 0) then
-            write(*,*) 'set_which_rates failed'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         call net_set_which_rates(handle, which_rates, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'net_set_which_rates failed'
-            call mesa_error(__FILE__,__LINE__)
-         end if
+         allocate(reaction_id(num_reactions))
 
          call net_setup_tables(handle, cache_suffix, ierr)
          if (ierr /= 0) then
@@ -1412,61 +1370,6 @@
      
       end subroutine test_net_setup
       
-      
-      subroutine set_which_rates(ierr)
-         use rates_def
-         use rates_lib
-         integer, intent(out) :: ierr
-         integer :: which_rate
-         
-         ierr = 0
-         
-         if (len_trim(set_rate_c12ag) > 0) then
-            if (set_rate_c12ag == 'NACRE') then
-               which_rate = use_rate_c12ag_NACRE
-            else if (set_rate_c12ag == 'Buchmann') then
-               which_rate = use_rate_c12ag_JR
-            else if (set_rate_c12ag == 'Kunz') then
-               which_rate = use_rate_c12ag_Kunz
-            else
-               write(*,*) 'invalid string for set_rate_c12ag ' // trim(set_rate_c12ag)
-               ierr = -1
-               return
-            end if
-            call set_which_rate_c12ag(which_rates, which_rate)
-         end if
-         
-         if (len_trim(set_rate_3a) > 0) then
-            if (set_rate_3a == 'NACRE') then
-               which_rate = use_rate_3a_NACRE
-            else if (set_rate_3a == 'Fynbo') then
-               which_rate = use_rate_3a_JR
-            else if (set_rate_3a == 'CF88') then
-               which_rate = use_rate_3a_CF88
-            else if (set_rate_3a == 'FL87') then
-               which_rate = use_rate_3a_FL87
-            else
-               write(*,*) 'invalid string for set_rate_3a ' // trim(set_rate_3a)
-               ierr = -1
-               return
-            end if
-            call set_which_rate_3a(which_rates, which_rate)
-         end if
-         
-         if (len_trim(set_rate_1212) > 0) then
-            if (set_rate_1212 == 'CF88_1212') then
-               call mesa_error(__FILE__,__LINE__,'fix use_rate_1212_CF88')
-               !which_rate = use_rate_1212_CF88
-            else
-               write(*,*) 'invalid string for set_rate_1212 ' // trim(set_rate_1212)
-               ierr = -1
-               return
-            end if
-            call set_which_rate_1212(which_rates, which_rate)
-         end if
-         
-      end subroutine set_which_rates
-
 
       end module mod_one_zone_support
 
@@ -1500,7 +1403,7 @@
          burn_rtol, burn_atol, burn_xmin, burn_xmax, weak_rate_factor, &
          min_for_show_peak_abundances, max_num_for_show_peak_abundances, &
          data_output_min_t, data_filename, &
-         which_solver, screening_mode, which_rates_choice, &
+         which_solver, screening_mode, &
          data_heading_line, show_net_reactions_info, &
          rattab_logT_lower_bound, rattab_logT_upper_bound, max_steps, max_step_size, &
          decsol_switch, small_mtx_decsol, large_mtx_decsol, &
@@ -1508,7 +1411,6 @@
          starting_temp, pressure, cache_suffix, &
          num_times_for_burn, times_for_burn, log10Ts_for_burn, &
          log10Rhos_for_burn, etas_for_burn, log10Ps_for_burn, &
-         set_rate_c12ag, set_rate_n14pg, set_rate_3a, set_rate_1212, &
          show_Qs, num_reactions_to_track, reaction_to_track,  &
          num_special_rate_factors, reaction_for_special_factor, special_rate_factor
 
@@ -1594,7 +1496,6 @@
          0.95d0, 0.005d0, 0.035d0, 0.010d0 /)
       
       screening_mode = extended_screening
-      which_rates_choice = rates_NACRE_if_available
 
       num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
       reaction_for_special_factor(:) = ''
@@ -1603,21 +1504,6 @@
       num_reactions_to_track = 0
       reaction_to_track(:) = ''
 
-      set_rate_c12ag = '' ! empty string means ignore this control
-         ! one of 'NACRE', 'Buchmann', or 'Kunz'
-      set_rate_n14pg = '' ! empty string means ignore this control
-         ! one of 'NACRE', 'Imbriani', or 'CF88'
-      set_rate_3a = '' ! empty string means ignore this control
-         ! one of 'NACRE', 'Fynbo', 'CF88', or 'FL87'
-            ! FL87 is Fushiki and Lamb, Apj, 317, 368-388, 1987
-            ! and includes both strong screening and pyconuclear
-      set_rate_1212 = '' ! empty string means ignore this control
-         ! one of 'CF88_basic_1212', 'CF88_multi_1212'
-         ! CF88_basic_1212 is the single rate approximation from CF88.
-         ! CF88_multi_1212 combines the rates for the n, p, and a channels.
-            ! c12(c12,n)mg23, c12(c12,p)na23, and c12(c12,a)ne20
-            ! uses neutron branching from dayras, switkowski, and woosley, 1976.
-      
       weak_rate_factor = 1
       
       ! read inlist

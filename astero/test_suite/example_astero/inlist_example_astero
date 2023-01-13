@@ -12,8 +12,10 @@
       change_initial_net = .true. ! switch nuclear reaction network
       new_net_name = 'o18_and_ne22.net'
 
-	   set_rate_c12ag = 'Kunz'
-	   set_rate_n14pg = 'jina reaclib'
+      num_special_rate_factors = 1
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0

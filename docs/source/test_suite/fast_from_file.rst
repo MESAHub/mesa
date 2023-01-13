@@ -1,0 +1,1 @@
+../../../astero/test_suite/fast_from_file/README.rst

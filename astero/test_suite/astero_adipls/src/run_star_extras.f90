@@ -58,43 +58,45 @@
       end subroutine extras_controls
 
       
-      subroutine set_my_vars(id, ierr) ! called from star_astero code
-         !use astero_search_data, only: include_my_var1_in_chi2, my_var1
+      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
          integer, intent(in) :: id
+         character(len=strlen), intent(in) :: name
+         real(dp), intent(out) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         ! my_var's are predefined in the simplex_search_data.
+         ! constraints are predefined in the simplex_search_data.
          ! this routine's job is to assign those variables to current value in the model.
          ! it is called whenever a new value of chi2 is calculated.
-         ! only necessary to set the my_var's you are actually using.
-         ierr = 0
-         !if (include_my_var1_in_chi2) then
-            call star_ptr(id, s, ierr)
-            if (ierr /= 0) return
-            !my_var1 = s% Teff
-         !end if
-      end subroutine set_my_vars
-      
-      
-      subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_astero code
-         !use astero_search_data, only: vary_my_param1
-         integer, intent(in) :: id
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
+         ! only necessary to set the constraints you are actually using.
          ierr = 0
 
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! as example, my_param1 is alpha_mlt
-         ! if (i == 1) then
-         !    call star_ptr(id, s, ierr)
-         !    if (ierr /= 0) return
-         !    s% mixing_length_alpha = new_value
-         ! end if
-      end subroutine will_set_my_param
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         select case (name)
+            ! for custom constraints, create a case with the name of your constraint e.g.
+            ! case ('delta_Pg')
+            !    val = s% delta_Pg
+            ! fall back to history column if user doesn't define name
+            case default
+               val = star_get_history_output(s, name, ierr)
+               if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
+         end select
+
+      end subroutine set_constraint_value
+      
+      
+      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+         !use astero_search_data, only: vary_param1
+         integer, intent(in) :: id
+         character(len=strlen), intent(in) :: name ! which of param's will be set
+         real(dp), intent(in) :: val
+         integer, intent(out) :: ierr
+         type (star_info), pointer :: s
+
+         ierr = 0
+
+      end subroutine set_param
 
 
       subroutine my_other_adipls_mode_info( &
@@ -122,6 +124,7 @@
       
       
       subroutine extras_after_evolve(id, ierr)
+         use astero_lib, only: astero_adipls_is_enabled
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -146,18 +149,21 @@
             order_to_save = 5
             save_mode_filename = 'eigen.data'
          
-            call get_adipls_frequency_info( &
-               s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
-               save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
-            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-            if (okay) then
-               write(*,'(a,2f20.2)') 'got ok match for expected frequency', freq, expected_freq
+            if(astero_adipls_is_enabled) then
+               call get_adipls_frequency_info( &
+                  s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
+                  save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+               if (okay) then
+                  write(*,'(a,2f20.2)') 'got ok match for expected frequency', freq, expected_freq
+               else
+                  write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', freq, expected_freq
+               end if
             else
-               write(*,'(a,2f20.2)') 'ERROR: bad match for expected frequency', freq, expected_freq
+               write(*,*) 'not using adipls: pretend got ok match for expected frequency.'
             end if
          
          end if
-
          call test_suite_after_evolve(s, ierr)
          
       end subroutine extras_after_evolve
@@ -165,6 +171,7 @@
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
+         use astero_lib, only: astero_adipls_is_enabled
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
@@ -178,6 +185,12 @@
          if (ierr /= 0) return
          
          extras_check_model = keep_going
+
+
+         if (.not. astero_adipls_is_enabled) then
+            extras_check_model = terminate
+            return
+         end if
          
          if (s% x_ctrl(1) > 0d0) then
          
@@ -202,22 +215,6 @@
       end function extras_check_model
       
       
-      subroutine set_my_param(s, i, new_value)
-         type (star_info), pointer :: s
-         integer, intent(in) :: i ! which of my_param's will be set
-         real(dp), intent(in) :: new_value
-         include 'formats'
-         ! old value has not yet been changed.
-         ! do whatever is necessary for this new value.
-         ! i.e. change whatever mesa params you need to adjust.
-         ! for example, my_param1 is mass
-         if (i == 1) then
-            s% job% new_mass = new_value
-         end if
-         
-      end subroutine set_my_param
-
-
       subroutine get_adipls_frequency_info( &
             s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
             save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
@@ -346,6 +343,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+
       end function extras_finish_step
       
       

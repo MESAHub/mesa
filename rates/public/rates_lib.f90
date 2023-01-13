@@ -51,7 +51,6 @@
          use load_weak, only: load_weak_data
          use load_ecapture, only: load_ecapture_data
          use rates_initialize, only: init_rates_info
-         use screening_chugunov, only: screen_chugunov_init
          
          character (len=*), intent(in) :: reactionlist_filename, jina_reaclib_filename, rates_table_dir_in
          logical, intent(in) :: use_special_weak_rates, use_suzuki_weak_rates
@@ -97,9 +96,6 @@
          if (dbg) write(*,*) 'call init_rates_info'
          call init_rates_info(reactionlist_filename, ierr)
          if (ierr /= 0) return
-         
-         if (dbg) write(*,*) 'call screen_chugunov_init'
-         call screen_chugunov_init()
         
          have_finished_initialization = .true.
          
@@ -128,13 +124,43 @@
          end if
       end subroutine read_raw_rates_records
 
+
+      subroutine read_rate_from_file(rate_name, filename, ierr)
+         use rates_initialize
+         character(len=*), intent(in) :: rate_name, filename
+         integer, intent(out) :: ierr
+
+         call rate_from_file(rate_name, filename, ierr)
+         if(ierr/=0) then
+            write(*,*) 'read_rate_from_file for',trim(rate_name), trim(filename)
+            return
+         end if
+
+      end subroutine read_rate_from_file
+
+      subroutine read_rates_from_files(rate_names, filenames, ierr)
+         use rates_initialize
+         character(len=*), intent(in) :: rate_names(:), filenames(:)
+         integer, intent(out) :: ierr
+         integer :: i
+
+         ierr = 0
+         do i=1, ubound(rate_names,dim=1)
+            call rate_from_file(rate_names(i), filenames(i), ierr)
+            if(ierr/=0) then
+               write(*,*) 'read_rates_from_files for num=',i,trim(rate_names(i)), trim(filenames(i))
+               return
+            end if
+         end do
+
+      end subroutine read_rates_from_files      
+
       
       subroutine rates_shutdown
 
          use rates_def
          use rates_initialize, only: free_reaction_arrays, free_raw_rates_records
          use reaclib_input, only: reaclib
-         use screening_chugunov, only: free_chugunov
          use utils_lib
 
          call integer_dict_free(skip_warnings_dict)
@@ -146,8 +172,6 @@
          call free_reaction_data(reaclib_rates)
          call free_reaction_arrays()
          call free_raw_rates_records()
-
-         call free_chugunov()
          
       end subroutine rates_shutdown
          
@@ -171,59 +195,20 @@
 
 
       subroutine make_rate_tables( &
-            num_reactions, cache_suffix, net_reaction_id, which_rates,  &
+            num_reactions, cache_suffix, net_reaction_id, &
             rattab, rattab_f1, nT8s, ttab, logttab, ierr)  
          use rates_support, only : do_make_rate_tables
-         integer, intent(in) :: num_reactions, nT8s, net_reaction_id(:), which_rates(:)
+         integer, intent(in) :: num_reactions, nT8s, net_reaction_id(:)
          character (len=*), intent(in) :: cache_suffix
          real(dp) :: rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer :: rattab_f1(:)
          integer, intent(out) :: ierr
          call do_make_rate_tables( &
                num_reactions, cache_suffix, net_reaction_id,  &
-               which_rates, rattab, rattab_f1, nT8s, ttab, logttab, ierr)
+               rattab, rattab_f1, nT8s, ttab, logttab, ierr)
       end subroutine make_rate_tables
       
-      
-      subroutine set_which_rate_c12ag(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_c12_ag_o16) = choice
-         which_rates(ir_o16_ga_c12) = choice
-      end subroutine set_which_rate_c12ag
-      
-      
-      subroutine set_which_rate_n14pg(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_n14_pg_o15) = choice
-         which_rates(irn14pg_aux) = choice
-         which_rates(irn14_to_n15) = choice
-         which_rates(irn14_to_o16) = choice
-         which_rates(irn14_to_c12) = choice
-         which_rates(ir_o15_gp_n14) = choice
-      end subroutine set_which_rate_n14pg
-      
-      
-      subroutine set_which_rate_3a(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir_he4_he4_he4_to_c12) = choice
-         which_rates(ir_c12_to_he4_he4_he4) = choice
-      end subroutine set_which_rate_3a
-      
-      
-      subroutine set_which_rate_1212(which_rates, choice)
-         use rates_def
-         integer, intent(inout) :: which_rates(:)
-         integer, intent(in) :: choice
-         which_rates(ir1212) = choice
-      end subroutine set_which_rate_1212
-      
-      
+           
       subroutine show_reaction_rates_from_cache(cache_filename, ierr) 
          use rates_support, only: do_show_reaction_from_cache
          character (len=*) :: cache_filename
@@ -286,29 +271,28 @@
       end subroutine eval_tfactors
       
 
-      subroutine get_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+      subroutine get_raw_rate(ir, temp, tf, raw_rate, ierr)
          use rates_def, only : T_Factors
          use raw_rates
-         integer, intent(in) :: ir, which_rate
+         integer, intent(in) :: ir
          real(dp), intent(in) :: temp
          type (T_Factors), pointer :: tf
          real(dp), intent(out) :: raw_rate
          integer, intent(out) :: ierr
-         call set_raw_rate(ir, which_rate, temp, tf, raw_rate, ierr)
+         call set_raw_rate(ir,  temp, tf, raw_rate, ierr)
       end subroutine get_raw_rate
 
 
-      subroutine get_raw_rates(n, irs, which_rates, temp, tf, rates, ierr)
+      subroutine get_raw_rates(n, irs, temp, tf, rates, ierr)
          use rates_def, only : T_Factors
          use raw_rates, only: set_raw_rates
          integer, intent(in) :: n
          integer, intent(in) :: irs(:) ! (n) maps 1..n to reaction id
-         integer, intent(in) :: which_rates(:) ! (rates_reaction_id_max)
          real(dp), intent(in) :: temp
          type (T_Factors), pointer :: tf
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
-         call set_raw_rates(n, irs, which_rates, temp, tf, rates, ierr)
+         call set_raw_rates(n, irs, temp, tf, rates, ierr)
       end subroutine get_raw_rates
       
       integer function rates_reaction_id(rname)
@@ -710,7 +694,7 @@
          ! Q is total, so Q-Qneu is the actual thermal energy.
          ! note: lambdas include Ye Rho factors for electron captures.
          ! so treat the rates as if just beta decays
-         real(dp), dimension(:), pointer, intent(inout) :: &
+         real(dp), dimension(:), intent(inout) :: &
                 lambda, dlambda_dlnT, dlambda_dlnRho, &
                 Q, dQ_dlnT, dQ_dlnRho, &
                 Qneu, dQneu_dlnT, dQneu_dlnRho
@@ -756,18 +740,18 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
             ierr)
-           use rates_def, only: Coulomb_Info
+         use rates_def, only: Coulomb_Info
          use eval_weak, only: do_eval_weak_reaction_info
-           use rates_def, only : do_ecapture
+         use rates_def, only : do_ecapture
          integer, intent(in) :: n, ids(:), reaction_ids(:)
-           type(Coulomb_Info), pointer :: cc
+         type(Coulomb_Info), pointer :: cc
          real(dp), intent(in) :: T9, YeRho, eta, d_eta_dlnT, d_eta_dlnRho
          ! lambda = combined rate (capture and decay)
          ! Q and Qneu are for combined rate of beta decay and electron capture.
          ! Q is total, so Q-Qneu is the actual thermal energy.
          ! note: lambdas include Ye Rho factors for electron captures.
          ! so treat the rates as if just beta decays
-         real(dp), dimension(:), pointer :: &
+         real(dp), dimension(:),intent(inout) :: &
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho

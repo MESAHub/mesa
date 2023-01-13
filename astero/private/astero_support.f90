@@ -29,6 +29,7 @@
       use const_def
       use math_lib
       use utils_lib
+      use auto_diff
       
       implicit none
 
@@ -102,6 +103,15 @@
          
          else if (code == 'adipls') then 
 
+            if (.not. adipls_is_enabled) then
+               ierr = -1
+               write(*,'(A)')
+               write(*,'(a)') 'adipls is not currently enabled in your configuration of mesa.'
+               write(*,'(a)') 'check that your utils/makefile_header has USE_ADIPLS = YES'
+               write(*,'(A)')
+               return
+            end if
+
             R = Rsun*s% photosphere_r
             G = standard_cgrav
             M = s% m_grav(1)
@@ -161,21 +171,11 @@
             model_freq_alt_down(0,:) = model_freq(0,:)
             model_inertia_alt_down(0,:) = model_inertia(0,:)
             model_order_alt_down(0,:) = model_order(0,:)
-         else if (l == 1) then
-            call set_to_closest(freq_target(1,:), &
-               model_freq(1,:), model_freq_alt_up(1,:), model_freq_alt_down(1,:), &
-               model_inertia(1,:), model_inertia_alt_up(1,:), model_inertia_alt_down(1,:), &
-               model_order(1,:), model_order_alt_up(1,:), model_order_alt_down(1,:), ierr)
-         else if (l == 2) then
-            call set_to_closest(freq_target(2,:), &
-               model_freq(2,:), model_freq_alt_up(2,:), model_freq_alt_down(2,:), &
-               model_inertia(2,:), model_inertia_alt_up(2,:), model_inertia_alt_down(2,:), &
-               model_order(2,:), model_order_alt_up(2,:), model_order_alt_down(2,:), ierr)
-         else if (l == 3) then
-            call set_to_closest(freq_target(3,:), &
-               model_freq(3,:), model_freq_alt_up(3,:), model_freq_alt_down(3,:), &
-               model_inertia(3,:), model_inertia_alt_up(3,:), model_inertia_alt_down(3,:), &
-               model_order(3,:), model_order_alt_up(3,:), model_order_alt_down(3,:), ierr)
+         else if (0 < l .and. l <= 3) then
+            call set_to_closest(freq_target(l,:), &
+               model_freq(l,:), model_freq_alt_up(l,:), model_freq_alt_down(l,:), &
+               model_inertia(l,:), model_inertia_alt_up(l,:), model_inertia_alt_down(l,:), &
+               model_order(l,:), model_order_alt_up(l,:), model_order_alt_down(l,:), ierr)
          else
             call mesa_error(__FILE__,__LINE__,'bad value for l in get_one_el_info')
          end if
@@ -327,7 +327,7 @@
          integer, intent(in) :: nl0, nl1
          real(dp), intent(in) :: l0(:), l1(:)
          integer, intent(out) :: n, l0_first, l1_first
-         real(dp), intent(inout) :: r01(:), r10(:)
+         real(dp), intent(out) :: r01(:), r10(:)
          
          integer :: l0_seq_n, l0_last, l1_seq_n, l1_last, i, i0, i1
          real(dp) :: d01, d10, sd01, sd10, dnu, sdnu
@@ -337,12 +337,14 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r01)
+         call fill_with_NaNs(r10)
          
          n = 0
          
          if (nl1 <= 0) return
       
-         call get_max_sequence(nl(0), l0, l0_first, l0_seq_n)
+         call get_max_sequence(nl0, l0, l0_first, l0_seq_n)
          l0_last = l0_first + l0_seq_n - 1
          if (dbg) write(*,4) 'l0_first l0_last l0_seq_n', l0_first, l0_last, l0_seq_n
 
@@ -396,7 +398,7 @@
          
          do i = 1, n         
             i0 = i + l0_first
-            i1 = i + l1_first            
+            i1 = i + l1_first
             d01 = (l0(i0-1) - 4*l1(i1-1) + 6*l0(i0) - 4*l1(i1) + l0(i0+1))/8d0
             r01(i) = d01/(l1(i1) - l1(i1-1))
             d10 = -(l1(i1-1) - 4*l0(i0) + 6*l1(i1) - 4*l0(i0+1) + l1(i1+1))/8d0
@@ -426,7 +428,7 @@
          logical, intent(in) :: init
          integer, intent(in) :: nl0, nl1, nl2
          real(dp), intent(in) :: l0(:), l1(:), l2(:)
-         real(dp), intent(inout) :: r02(:)
+         real(dp), intent(out) :: r02(:)
          
          integer :: i, i0, i1, i2, jmin, j
          real(dp) :: d02, sd02, dnu, sdnu, df, f0, f2, fmin, fmax, dfmin
@@ -436,6 +438,7 @@
          include 'formats'
          
          dbg = .false.
+         call fill_with_NaNs(r02)
          
          if (init) then ! set i2_for_r02
             do i = 1, ratios_n         
@@ -1023,25 +1026,18 @@
       end subroutine get_combined_freq_corr_alt_down
       
       
-      real(dp) function power_law(freq, freq_ref, a, b)
+      type(auto_diff_real_2var_order1) function power_law(freq, freq_ref, a, b)
         real(dp), intent(in) :: freq, freq_ref, a, b
+        type(auto_diff_real_2var_order1) :: a_ad, b_ad
+
+        a_ad = a
+        a_ad%d1val1 = 1.0_dp
+
+        b_ad = b
+        b_ad%d1val2 = 1.0_dp
         
-        power_law = a*pow(freq/freq_ref, b)
+        power_law = a_ad*pow(freq/freq_ref, b_ad)
       end function power_law
-
-      
-      real(dp) function dpower_law_da(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-
-        dpower_law_da = pow(freq/freq_ref, b)
-      end function dpower_law_da
-
-
-      real(dp) function dpower_law_db(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dpower_law_db = a*pow(freq/freq_ref, b)*log(freq/freq_ref)
-      end function dpower_law_db
       
       
       subroutine get_power_law_all_freq_corr(a, b, radial_only, freq_ref, &
@@ -1059,6 +1055,7 @@
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
         real(dp) :: Q(0:3,max_nl)
+        type(auto_diff_real_2var_order1) :: power_law_ad
 
         ! Power_Law's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1075,9 +1072,11 @@
            do i = 1, nl(0)
               Q(0,i) = 1
 
-              X(1) = -dpower_law_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              X(2) = -dpower_law_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              y = (obs(0,i) - freq(0,i) - power_law(freq(0,i), freq_ref, a, b))/sigma(0,i)
+              power_law_ad = power_law(freq(0,i), freq_ref, a, b)
+
+              X(1) = -power_law_ad%d1val1/sigma(0,i) ! dpower_law/da
+              X(2) = -power_law_ad%d1val2/sigma(0,i) ! dpower_law/db
+              y = (obs(0,i) - freq(0,i) - power_law_ad%val)/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1091,9 +1090,11 @@
                  do i = 1, nl(l)
                     Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                    X(1) = -dpower_law_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    X(2) = -dpower_law_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - power_law(freq(l,i), freq_ref, a, b))/sigma(l,i)
+                    power_law_ad = power_law(freq(l,i), freq_ref, a, b)
+
+                    X(1) = -power_law_ad%d1val1/sigma(l,i)
+                    X(2) = -power_law_ad%d1val2/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - power_law_ad%val)/sigma(l,i)
                  
                     XtX(1,1) = XtX(1,1) + X(1)*X(1)
                     XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1135,7 +1136,8 @@
 
         do l = 0, 3
            do i = 1, nl(l)
-              freq_corr(l,i) = freq(l,i) + correction_factor*power_law(freq(l,i), freq_ref, a, b)/Q(l,i)
+              power_law_ad = power_law(freq(l,i), freq_ref, a, b)
+              freq_corr(l,i) = freq(l,i) + correction_factor*power_law_ad%val/Q(l,i)
            end do
         end do
 
@@ -1166,25 +1168,18 @@
       end subroutine get_power_law_freq_corr_alt_down
       
       
-      real(dp) function sonoi(freq, freq_ref, a, b)
+      type(auto_diff_real_2var_order1) function sonoi(freq, freq_ref, a, b)
         real(dp), intent(in) :: freq, freq_ref, a, b
+        type(auto_diff_real_2var_order1) :: a_ad, b_ad
+
+        a_ad = a
+        a_ad%d1val1 = 1.0_dp
+
+        b_ad = b
+        b_ad%d1val2 = 1.0_dp
         
-        sonoi = a*freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref,b)))
+        sonoi = a_ad*freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref, b_ad)))
       end function sonoi
-
-
-      real(dp) function dsonoi_da(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dsonoi_da = freq_ref*(1d0 - 1d0/(1d0+pow(freq/freq_ref,b)))
-      end function dsonoi_da
-
-
-      real(dp) function dsonoi_db(freq, freq_ref, a, b)
-        real(dp), intent(in) :: freq, freq_ref, a, b
-        
-        dsonoi_db = a*freq_ref*pow(freq/freq_ref,b)*log(freq/freq_ref)/(1d0+pow(freq/freq_ref,b))**2
-      end function dsonoi_db
 
 
       subroutine get_sonoi_all_freq_corr(a, b, radial_only, freq_ref, &
@@ -1202,6 +1197,7 @@
         real(dp) :: X(2), XtX(2,2), XtXi(2,2), Xty(2), y
         real(dp) :: detXtX, da, db
         real(dp) :: Q(0:3,max_nl)
+        type(auto_diff_real_2var_order1) :: sonoi_ad
 
         ! Sonoi's solar values happen to be the same as MESA's but the
         ! commented expression is there in case it changes
@@ -1217,9 +1213,11 @@
            do i = 1, nl(0)
               Q(0,i) = 1
 
-              X(1) = -dsonoi_da(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              X(2) = -dsonoi_db(freq(0,i), freq_ref, a, b)/sigma(0,i)
-              y = (obs(0,i) - freq(0,i) - sonoi(freq(0,i), freq_ref, a, b))/sigma(0,i)
+              sonoi_ad = sonoi(freq(0,i), freq_ref, a, b)
+
+              X(1) = -sonoi_ad%d1val1/sigma(0,i)
+              X(2) = -sonoi_ad%d1val2/sigma(0,i)
+              y = (obs(0,i) - freq(0,i) - sonoi_ad%val)/sigma(0,i)
               
               XtX(1,1) = XtX(1,1) + X(1)*X(1)
               XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1233,9 +1231,11 @@
                  do i = 1, nl(l)
                     Q(l,i) = inertia(l,i)/interpolate_l0_inertia(freq(l,i))
 
-                    X(1) = -dsonoi_da(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    X(2) = -dsonoi_db(freq(l,i), freq_ref, a, b)/sigma(l,i)
-                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - sonoi(freq(l,i), freq_ref, a, b))/sigma(l,i)
+                    sonoi_ad = sonoi(freq(l,i), freq_ref, a, b)
+
+                    X(1) = -sonoi_ad%d1val1/sigma(l,i)
+                    X(2) = -sonoi_ad%d1val2/sigma(l,i)
+                    y = ((obs(l,i) - freq(l,i))*Q(l,i) - sonoi_ad%val)/sigma(l,i)
                  
                     XtX(1,1) = XtX(1,1) + X(1)*X(1)
                     XtX(1,2) = XtX(1,2) + X(1)*X(2)
@@ -1279,7 +1279,8 @@
 
         do l = 0, 3
            do i = 1, nl(l)
-              freq_corr(l,i) = freq(l,i) + correction_factor*sonoi(freq(l,i), freq_ref, a, b)/Q(l,i)
+              sonoi_ad = sonoi(freq(l,i), freq_ref, a, b)
+              freq_corr(l,i) = freq(l,i) + correction_factor*sonoi_ad%val/Q(l,i)
            end do
         end do
 
@@ -1400,9 +1401,9 @@
          
          ierr = 0
          chi2sum1 = 0
-         chi2N1 = 0     
-         chi2_r_010_ratios = -1    
-         chi2_r_02_ratios = -1   
+         chi2N1 = 0
+         chi2_r_010_ratios = 0
+         chi2_r_02_ratios = 0
          chi2_frequencies = 0
          
          if (chi2_seismo_freq_fraction > 0) then
@@ -1494,7 +1495,7 @@
             
             chi2sum1 = 0
             n = 0
-            do i=2,nl(0)
+            do i=1,nl(0)
                if (sigmas_r02(i) == 0d0) cycle
                model_r02 = interpolate_ratio_r02( &
                   freq_target(0,i + ratios_l0_first), model_freq(0,:), model_ratios_r02)
@@ -1529,48 +1530,6 @@
          chi2sum2 = 0
          chi2N2 = 0
          
-         if (Teff_sigma > 0 .and. include_Teff_in_chi2_spectro) then
-            Teff = s% Teff
-            chi2term = pow2((Teff - Teff_target)/Teff_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Teff', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logL_sigma > 0 .and. include_logL_in_chi2_spectro) then
-            logL = s% log_surface_luminosity
-            chi2term = pow2((logL - logL_target)/logL_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logL', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logg_sigma > 0 .and. include_logg_in_chi2_spectro) then
-            chi2term = pow2((logg - logg_target)/logg_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logg', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (FeH_sigma > 0 .and. include_FeH_in_chi2_spectro) then
-            chi2term = pow2((FeH - FeH_target)/FeH_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term FeH', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (logR_sigma > 0 .and. include_logR_in_chi2_spectro) then
-            chi2term = pow2((logR - logR_target)/logR_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term logR', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
          if (age_sigma > 0 .and. include_age_in_chi2_spectro) then
             chi2term = pow2((s% star_age - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_spectro_info) &
@@ -1578,54 +1537,16 @@
             chi2sum2 = chi2sum2 + chi2term
             chi2N2 = chi2N2 + 1
          end if
-         
-         if (surface_Z_div_X_sigma > 0 .and. include_surface_Z_div_X_in_chi2_spectro) then
-            chi2term = pow2((surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_Z_div_X', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (surface_He_sigma > 0 .and. include_surface_He_in_chi2_spectro) then
-            chi2term = pow2((surface_He - surface_He_target)/surface_He_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term surface_He', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (Rcz_sigma > 0 .and. include_Rcz_in_chi2_spectro) then
-            chi2term = pow2((Rcz - Rcz_target)/Rcz_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term Rcz', s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var1_sigma > 0 .and. include_my_var1_in_chi2_spectro) then
-            chi2term = pow2((my_var1 - my_var1_target)/my_var1_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var1_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var2_sigma > 0 .and. include_my_var2_in_chi2_spectro) then
-            chi2term = pow2((my_var2 - my_var2_target)/my_var2_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var2_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
-         
-         if (my_var3_sigma > 0 .and. include_my_var3_in_chi2_spectro) then
-            chi2term = pow2((my_var3 - my_var3_target)/my_var3_sigma)
-            if (trace_okay .and. trace_chi2_spectro_info) &
-               write(*,2) 'chi2_spectro_term ' // trim(my_var3_name), s% model_number, chi2term
-            chi2sum2 = chi2sum2 + chi2term
-            chi2N2 = chi2N2 + 1
-         end if
+
+         do i = 1, max_constraints
+            if (constraint_sigma(i) > 0 .and. include_constraint_in_chi2_spectro(i)) then
+               chi2term = pow2((constraint_value(i) - constraint_target(i))/constraint_sigma(i))
+               if (trace_okay .and. trace_chi2_spectro_info) &
+                  write(*,2) 'chi2_spectro_term ' // trim(constraint_name(i)), s% model_number, chi2term
+               chi2sum2 = chi2sum2 + chi2term
+               chi2N2 = chi2N2 + 1
+            end if
+         end do
 
          num_chi2_spectro_terms = chi2N2
          if (normalize_chi2_spectro) then

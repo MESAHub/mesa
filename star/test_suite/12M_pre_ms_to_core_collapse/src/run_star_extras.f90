@@ -153,6 +153,21 @@
          if (ierr /= 0) return
          nz = s% nz
          write(*,'(A)')
+         select case (s% x_integer_ctrl(1))
+         case (6)
+            ! put target info in TestHub output
+            testhub_extras_names(1) = 'fe_core_mass'; testhub_extras_vals(1) = s% fe_core_mass
+
+            if(s% fe_core_mass < 1d0) then
+               write(*,1) "Bad fe_core_mass", s%fe_core_mass
+            else
+               if(s% fe_core_infall > s% fe_core_infall_limit) then
+                  write(*,'(a)') 'all values are within tolerance'
+               else
+                  write(*,'(a)') "Bad fe core infall"
+               end if
+            end if
+         end select
          call test_suite_after_evolve(s, ierr)
          if (.not. s% x_logical_ctrl(37)) return
          call gyre_final()

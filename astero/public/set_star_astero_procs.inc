@@ -6,8 +6,8 @@
 ! also need to add 
 ! use astero_def, only: star_astero_procs
 
-   star_astero_procs% set_my_vars => set_my_vars
-   star_astero_procs% will_set_my_param => will_set_my_param
+   star_astero_procs% set_constraint_value => set_constraint_value
+   star_astero_procs% set_param => set_param
    star_astero_procs% extras_startup => extras_startup
    star_astero_procs% extras_controls => extras_controls
    star_astero_procs% extras_check_model => extras_check_model

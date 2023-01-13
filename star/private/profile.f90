@@ -64,6 +64,7 @@
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
 
+         logical :: exists
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -79,17 +80,25 @@
 
          ! first try local directory
          filename = profile_columns_file
-         if (len_trim(filename) == 0) filename = 'profile_columns.list'
-         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in star/defaults
-            filename = trim(mesa_dir) // '/star/defaults/' // trim(filename)
-            ierr = 0
-            open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*,*) 'failed to open ' // trim(filename)
-               return
-            end if
+
+         if(level==1) then ! First pass either the user set the file or we load the defaults
+            if (len_trim(filename) == 0) filename = 'profile_columns.list'
+
+            exists=.false.
+            inquire(file=filename,exist=exists)
+
+            if(.not.exists) filename = trim(mesa_dir) // '/star/defaults/profile_columns.list'
+         else
+            ! User had include '' in their profile_columns.list file, so dont try to load the local one, jump to the defaults
+            if (len_trim(filename) == 0) filename =trim(mesa_dir) // '/star/defaults/profile_columns.list'
          end if
+
+         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
+         if (ierr /= 0) then 
+            write(*,*) 'failed to open ' // trim(profile_columns_file)
+            return
+         end if
+
 
          if (dbg) then
             write(*,'(A)')
@@ -128,6 +137,30 @@
                   ierr = -1; call error; return
                end if
                call count_specs
+               
+            case ('add_eps_neu_rates')
+               call insert_spec(eps_neu_rate_offset, 'add_eps_neu_rate', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_eps_nuc_rates')
+               call insert_spec(eps_nuc_rate_offset, 'add_eps_nuc_rate', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_screened_rates')
+               call insert_spec(screened_rate_offset, 'add_screened_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
+               
+            case ('add_raw_rates')
+               call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
+               if (spec_err /= 0) then
+                  ierr = -1; call error; return
+               end if
 
             case ('add_abundances')
                ! add all of the isos that are in the current net
@@ -153,7 +186,7 @@
 
             case default
                spec_err = 0
-               nxt_spec = do1_profile_spec(iounit, n, i, string, buffer, report, spec_err)
+               nxt_spec = do1_profile_spec(s, iounit, n, i, string, buffer, report, spec_err)
                if (spec_err /= 0) then
                   ierr = spec_err
                else
@@ -280,6 +313,11 @@
             if (s% profile_column_spec(j) == add_abundances .or. &
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
+            else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                     s% profile_column_spec(j) == screened_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. & 
+                     s% profile_column_spec(j) == eps_neu_rate_offset) then
+               numcols = numcols + s% num_reactions
             else
                numcols = numcols + 1
             end if
@@ -350,6 +388,7 @@
          character (len=maxlen_profile_column_name), pointer :: &
             extra_col_names(:), extra_header_item_names(:)
          real(dp), pointer :: extra_col_vals(:,:), extra_header_item_vals(:)
+         type(net_general_info),pointer :: g=>null()
 
          include "formats"
 
@@ -359,6 +398,9 @@
 
          ierr = 0
          nullify(extra_col_names, extra_col_vals)
+
+         call get_net_ptr(s%net_handle, g, ierr)
+         if(ierr/=0) return
 
          nz = s% nz
          species = s% species
@@ -600,9 +642,17 @@
                         col = col+1
                         call do_abundance_col(i, j, jj, kk)
                      end do
+                  else if (s% profile_column_spec(j) == raw_rate_offset .or. &
+                           s% profile_column_spec(j) == screened_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_nuc_rate_offset .or. &
+                           s% profile_column_spec(j) == eps_neu_rate_offset) then
+                     do jj = 1, s% num_reactions
+                        col = col+1
+                        call do_col(i, j, jj, kk)
+                     end do
                   else
                      col = col+1
-                     call do_col(i, j, kk)
+                     call do_col(i, j, 0, kk)
                   end if
                end do
                do j=1,num_extra_cols
@@ -752,17 +802,17 @@
          end subroutine do_extra_col
 
 
-         subroutine do_col(pass, j, k)
+         subroutine do_col(pass, j, jj, k)
             use rates_def
             use profile_getval, only: getval_for_profile
-            integer, intent(in) :: pass, j, k
-            integer :: i, c, ii, int_val
+            integer, intent(in) :: pass, j, jj, k
+            integer :: i, c, int_val, ir
             real(dp) :: val, cno, z, dr, eps, eps_alt
             logical :: int_flag
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
             include 'formats'
-            c = s% profile_column_spec(j)
+            c = s% profile_column_spec(j) + jj
             val = 0; int_val = 0
             if (pass == 1) then
                if (write_flag) write(io, fmt=int_fmt, advance='no') col
@@ -770,6 +820,22 @@
                if (c > extra_offset) then
                   i = c - extra_offset
                   col_name = trim(s% profile_extra_name(i))
+               else if (c > eps_neu_rate_offset) then
+                  i = c - eps_neu_rate_offset
+                  ir = g% reaction_id(i)
+                  col_name = 'eps_neu_rate_' // trim(reaction_name(ir))
+               else if (c > eps_nuc_rate_offset) then
+                  i = c - eps_nuc_rate_offset
+                  ir = g% reaction_id(i)
+                  col_name = 'eps_nuc_rate_' // trim(reaction_name(ir))
+               else if (c > screened_rate_offset) then
+                  i = c - screened_rate_offset
+                  ir = g% reaction_id(i)
+                  col_name = 'screened_rate_' // trim(reaction_name(ir))
+               else if (c > raw_rate_offset) then
+                  i = c - raw_rate_offset
+                  ir = g% reaction_id(i)
+                  col_name = 'raw_rate_' // trim(reaction_name(ir))
                else if (c > diffusion_D_offset) then
                   i = c - diffusion_D_offset
                   col_name = 'diffusion_D_' // trim(chem_isos% name(i))
@@ -844,7 +910,6 @@
 
          subroutine do_abundance_col(pass, j, jj, k)
             integer, intent(in) :: pass, j, jj, k
-            integer :: i, c, ii
             real(dp) :: val
             logical :: int_flag, log_abundance
             character (len=128) :: col_name

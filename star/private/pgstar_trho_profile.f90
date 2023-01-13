@@ -28,6 +28,7 @@
       use star_private_def
       use const_def
       use pgstar_support
+      use star_pgstar
 
       implicit none
 
@@ -49,9 +50,9 @@
          call pgeras()
 
          call do_TRho_Profile_plot(s, id, device_id, &
-            s% TRho_Profile_xleft, s% TRho_Profile_xright, &
-            s% TRho_Profile_ybot, s% TRho_Profile_ytop, .false., &
-            s% TRho_Profile_title, s% TRho_Profile_txt_scale, ierr)
+            s% pg% TRho_Profile_xleft, s% pg% TRho_Profile_xright, &
+            s% pg% TRho_Profile_ybot, s% pg% TRho_Profile_ytop, .false., &
+            s% pg% TRho_Profile_title, s% pg% TRho_Profile_txt_scale, ierr)
 
          call pgebuf()
 
@@ -84,7 +85,7 @@
 
          txt_scale = txt_scale_in
 
-         if (s% TRho_switch_to_Column_Depth) then
+         if (s% pg% TRho_switch_to_Column_Depth) then
             do k=1,nz
                xvec(k) = safe_log10(s% xmstar*sum(s% dq(1:k-1))/(pi4*s% r(k)*s% r(k)))
             end do
@@ -93,13 +94,13 @@
                xvec(k) = s% lnd(k)/ln10
             end do
          end if
-         if (s% TRho_switch_to_mass) then
+         if (s% pg% TRho_switch_to_mass) then
                 do k = 1, nz
                         xvec(k) = safe_log10((s% xmstar - s% m(k))/Msun)
                 end do
          end if
-         xmin = s% TRho_Profile_xmin
-         xmax = s% TRho_Profile_xmax
+         xmin = s% pg% TRho_Profile_xmin
+         xmax = s% pg% TRho_Profile_xmax
          dx = xmax - xmin
 
          call pgsave
@@ -109,8 +110,8 @@
          do k=1,nz
             yvec(k) = s% lnT(k)/ln10
          end do
-         ymin = s% TRho_Profile_ymin
-         ymax = s% TRho_Profile_ymax
+         ymin = s% pg% TRho_Profile_ymin
+         ymax = s% pg% TRho_Profile_ymax
          dy = ymax - ymin
 
          call pgsvp(xleft, xright, ybot, ytop)
@@ -119,8 +120,8 @@
          call pgsci(1)
          call show_box_pgstar(s,'BCNST1','BCMNSTV1')
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         if (s% show_TRho_accretion_mesh_borders) then
-            if(s% TRho_switch_to_mass) then
+         if (s% pg% show_TRho_accretion_mesh_borders) then
+            if(s% pg% TRho_switch_to_mass) then
                 call do_accretion_mesh_borders(safe_log10((s% xmstar&
                                   - s% m(s% k_const_mass))/Msun), &
                                  safe_log10((s% xmstar&
@@ -129,7 +130,7 @@
                                   - s% m( s% k_below_just_added))/Msun),&
                                  ymin, ymax)
             end if
-            if(s% TRho_switch_to_Column_Depth) then
+            if(s% pg% TRho_switch_to_Column_Depth) then
                call do_accretion_mesh_borders(safe_log10(s% xmstar*sum(s% &
                     dq(1:s% k_const_mass-1))/(pi4*s% r(s% k_const_mass)&
                                      *s% r(s% k_const_mass))), &
@@ -142,7 +143,7 @@
                                     ymin, ymax)
             end if
 
-            if( .not. s% TRho_switch_to_Column_Depth .and. .not. s% TRho_switch_to_mass) then
+            if( .not. s% pg% TRho_switch_to_Column_Depth .and. .not. s% pg% TRho_switch_to_mass) then
               call do_accretion_mesh_borders( s% lnd(s% k_const_mass)/ln10,&
                                               s% lnd(s% k_below_const_q)/ln10,&
                                               s% lnd(s% k_below_just_added)/ln10,&
@@ -151,15 +152,15 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
          end if
-         if (s% TRho_switch_to_Column_Depth) then
+         if (s% pg% TRho_switch_to_Column_Depth) then
             call show_xaxis_label_pgstar(s,'log column depth (g cm\u-2\d)')
          end if
-         if(.not. s% TRho_switch_to_Column_Depth .and. .not. s% &
+         if(.not. s% pg% TRho_switch_to_Column_Depth .and. .not. s% pg% &
            TRho_switch_to_mass) then
             call show_xaxis_label_pgstar(s,'log Density (g cm\u-3\d)')
          end if
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         if(s% TRho_switch_to_mass) then
+         if(s% pg% TRho_switch_to_mass) then
             call show_xaxis_label_pgstar(s,'log M - m (Msun)')
          end if
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -171,45 +172,45 @@
          end if
          call show_title_pgstar(s, title)
 
-         if (.not. s% TRho_switch_to_Column_Depth .and. .not. s% TRho_switch_to_mass) then
-            if (s% show_TRho_Profile_kap_regions) call do_kap_regions
-            if (s% show_TRho_Profile_eos_regions) call do_eos_regions
+         if (.not. s% pg% TRho_switch_to_Column_Depth .and. .not. s% pg% TRho_switch_to_mass) then
+            if (s% pg% show_TRho_Profile_kap_regions) call do_kap_regions
+            if (s% pg% show_TRho_Profile_eos_regions) call do_eos_regions
             ! for now, show eos regions will imply showing gamma1 4/3 also
-            if (s% show_TRho_Profile_gamma1_4_3rd .or. s% show_TRho_Profile_eos_regions) call do_gamma1_4_3rd
-            if (s% show_TRho_Profile_degeneracy_line) call do_degeneracy_line
-            if (s% show_TRho_Profile_Pgas_Prad_line) call do_Pgas_Prad_line
-            if (s% show_TRho_Profile_burn_lines) call do_burn_lines
+            if (s% pg% show_TRho_Profile_gamma1_4_3rd .or. s% pg% show_TRho_Profile_eos_regions) call do_gamma1_4_3rd
+            if (s% pg% show_TRho_Profile_degeneracy_line) call do_degeneracy_line
+            if (s% pg% show_TRho_Profile_Pgas_Prad_line) call do_Pgas_Prad_line
+            if (s% pg% show_TRho_Profile_burn_lines) call do_burn_lines
          end if
 
 
-         if (len_trim(s% TRho_Profile_fname) > 0) then
+         if (len_trim(s% pg% TRho_Profile_fname) > 0) then
 
             call mesa_error(__FILE__,__LINE__,'NEED TO ADD ABILITY TO SHOW EXTRA PROFILE FOR COMPARISON')
 
          end if
 
          call show_profile_line(s, xvec, yvec, txt_scale, xmin, xmax, ymin, ymax, &
-               s% show_TRho_Profile_legend, s% TRho_Profile_legend_coord, &
-               s% TRho_Profile_legend_disp1, s% TRho_Profile_legend_del_disp, &
-               s% TRho_Profile_legend_fjust, &
-               s% show_TRho_Profile_mass_locs)
+               s% pg% show_TRho_Profile_legend, s% pg% TRho_Profile_legend_coord, &
+               s% pg% TRho_Profile_legend_disp1, s% pg% TRho_Profile_legend_del_disp, &
+               s% pg% TRho_Profile_legend_fjust, &
+               s% pg% show_TRho_Profile_mass_locs)
 
-         if (s% show_TRho_Profile_text_info) &
+         if (s% pg% show_TRho_Profile_text_info) &
             call do_show_Profile_text_info( &
                s, txt_scale, xmin, xmax, ymin, ymax, &
-               s% TRho_Profile_text_info_xfac, s% TRho_Profile_text_info_dxfac, &
-               s% TRho_Profile_text_info_yfac, s% TRho_Profile_text_info_dyfac, &
+               s% pg% TRho_Profile_text_info_xfac, s% pg% TRho_Profile_text_info_dxfac, &
+               s% pg% TRho_Profile_text_info_yfac, s% pg% TRho_Profile_text_info_dyfac, &
                .false., .false.)
 
          call show_annotations(s, &
-            s% show_TRho_Profile_annotation1, &
-            s% show_TRho_Profile_annotation2, &
-            s% show_TRho_Profile_annotation3)
+            s% pg% show_TRho_Profile_annotation1, &
+            s% pg% show_TRho_Profile_annotation2, &
+            s% pg% show_TRho_Profile_annotation3)
 
          deallocate(xvec, yvec)
          
-         call show_pgstar_decorator(s%id,s% TRho_Profile_use_decorator,&
-            s% TRho_Profile_pgstar_decorator, 0, ierr)
+         call show_pgstar_decorator(s%id,s% pg% TRho_Profile_use_decorator,&
+            s% pg% TRho_Profile_pgstar_decorator, 0, ierr)
 
 
          call pgunsa
@@ -338,8 +339,8 @@
             call pgsci(clr_LightSkyGreen)
             call pgsls(Line_Type_Dash)
 
-            logT1 = s% eos_rq% logT_max_FreeEOS_hi
-            logT2 = s% eos_rq% logT_max_FreeEOS_lo
+            logT1 = s% eos_rq% logT_min_for_all_Skye
+            logT2 = s% eos_rq% logT_min_for_any_Skye
             logT3 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
             logT4 = 0 ! s% eos_rq% logT_min_FreeEOS_lo
 
@@ -454,8 +455,8 @@
          logical function inside(xpos, ypos)
             real, intent(in) :: xpos, ypos
             inside = .false.
-            if (xpos <= s% TRho_Profile_xmin .or. xpos >= s% TRho_Profile_xmax) return
-            if (ypos <= s% TRho_Profile_ymin .or. ypos >= s% TRho_Profile_ymax) return
+            if (xpos <= s% pg% TRho_Profile_xmin .or. xpos >= s% pg% TRho_Profile_xmax) return
+            if (ypos <= s% pg% TRho_Profile_ymin .or. ypos >= s% pg% TRho_Profile_ymax) return
             inside = .true.
          end function inside
 
@@ -468,7 +469,7 @@
             character (len=128) :: str
             sz = size(logRho)
             call pgline(sz, logRho, logT)
-            if (.not. s% show_TRho_Profile_burn_labels) return
+            if (.not. s% pg% show_TRho_Profile_burn_labels) return
             xpos = logRho(sz)
             ypos = logT(sz)
             if (.not. inside(xpos,ypos)) return
@@ -554,7 +555,7 @@
 
          cnt = 0; ypos = ypos + dypos
          age = s% star_age
-         if (s% pgstar_show_age_in_seconds) then
+         if (s% pg% pgstar_show_age_in_seconds) then
             cnt = write_info_line_exp(cnt, ypos, xpos0, dxpos, dxval, &
                   'age sec', age*secyer)
          else

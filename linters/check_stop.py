@@ -41,7 +41,7 @@ def mesa_error(message=None):
     if message is None:
         return "call mesa_error(__FILE__,__LINE__)"
     else:
-        return "call mesa_error(__FILE__,__LINE__," + message + ")"
+        return f"call mesa_error(__FILE__,__LINE__,{message})"
 
 if len(sys.argv) > 1:
     files = sys.argv[1:]
@@ -73,4 +73,4 @@ for file in files:
     if modified:
         with open(file, "w") as f:
             f.writelines(lines)
-        print("Updated ", file)
+        print(f"Updated {file}")

@@ -66,6 +66,8 @@
       !history_interval = 1
       !terminal_interval = 1
 
+       x_integer_ctrl(1) = 4 ! Inlist part
+
 / ! end of controls namelist
 
 
