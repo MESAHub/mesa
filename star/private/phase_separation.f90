@@ -286,14 +286,17 @@
         logical :: mask(s%nz)
 
         mask(:) = .true.
-        
+
         ! Update the model to reflect changes in the abundances across
-        ! cells kc_t:kc_b (the mask part of this call is unused, mask=true for all zones)        
+        ! cells kc_t:kc_b (the mask part of this call is unused, mask=true for all zones).
+        ! Do updates at constant (P,T) rather than constant (rho,T).
+        s%fix_Pgas = .true.
         call set_eos_with_mask(s, kc_t, kc_b, mask, ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: error from call to set_eos_with_mask'
            stop
         end if
+        s%fix_Pgas = .false.
         
         ! Update opacities across cells kc_t:kc_b (this also sets rho_face
         ! and related quantities on faces kc_t:kc_b)        
