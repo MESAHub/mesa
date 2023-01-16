@@ -100,11 +100,8 @@
             ! energy term that Skye sometimes calculates
             save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
             s% eos_rq% Skye_use_ion_offsets = .false.
-            call set_vars(s, dt, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'set_vars failed during phase separation'
-               return
-            end if
+            call update_model_(s,1,s%nz,.false.)
+            ! call set_vars(s, dt, ierr)
             do k=1,s% nz
                s% eps_phase_separation(k) = s% energy(k)
             end do
@@ -126,12 +123,9 @@
                
             end do
 
-            call set_vars(s, dt, ierr)
-            if (ierr /= 0) then
-               write(*,*) 'set_vars failed during phase separation'
-               return
-            end if
-
+            call update_model_(s,1,s%nz,.false.)
+            ! call set_vars(s, dt, ierr)
+            
             ! phase separation heating term for use by energy equation
             do k=1,s% nz
                s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
@@ -191,7 +185,7 @@
         integer, intent(in)      :: kbot
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass, XHe_out, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
+        real(dp) :: mass, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
         integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
         logical :: use_brunt
         
@@ -216,27 +210,9 @@
            ! avg_xa = MAX(MIN(avg_xa, 1._dp), 0._dp)
            ! avg_xa = avg_xa/SUM(avg_xa)
 
-           XHe_out = max(s%xa(net_ihe4,ktop),s%xa(net_ihe4,ktop-1))
-           if(XHe_out < s% eos_rq% mass_fraction_limit_for_Skye) then
-              ! ok to mix all species
-              do l = 1, s%species
-                 s%xa(l,ktop:kbot) = avg_xa(l)
-              end do
-           else
-              ! Mixing He can cause energy problems for eps_phase_separation
-              ! when using Skye, so once we encounter enough He that it is
-              ! included in Skye energy calculation, stop mixing all species.
-              ! Instead, just flatten out the O16 profile, and mix in exchange
-              ! for C12.
-              dXO_top = avg_xa(net_io16) - s%xa(net_io16,ktop)
-              dXO_bot = avg_xa(net_io16) - s%xa(net_io16,kbot)
-              s%xa(net_io16,ktop:kbot) = avg_xa(net_io16)
-              dXC_top = -dXO_top
-              dXC_bot = -dXO_bot
-              s%xa(net_ic12,ktop) = s%xa(net_ic12,ktop) + dXC_top
-              s%xa(net_ic12,ktop+1:kbot) = s%xa(net_ic12,kbot) + dXC_bot
-           end if
-
+           do l = 1, s%species
+              s%xa(l,ktop:kbot) = avg_xa(l)
+           end do
 
            ! updates, eos, opacities, mu, etc now that abundances have changed,
            ! but only in the cells near the boundary where we need to check here.
