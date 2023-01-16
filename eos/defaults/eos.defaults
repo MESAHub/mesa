@@ -180,6 +180,14 @@
 
    mass_fraction_limit_for_Skye = 1d-4
 
+   ! Skye_use_ion_offsets
+   ! ~~~~~~~~~~~~~~~~~~~~
+   ! If true, set neutral ground state as zero point for each ion species energy.
+   ! If false, zero point assumes fully ionized.
+   ! ::
+
+   Skye_use_ion_offsets = .true.
+
    ! Skye Gamma Limits
    ! ~~~~~~~~~~~~~~~~~
    ! The one-component plasma fits in Skye are only valid in certain ranges of the ion interaction parameter Gamma.
