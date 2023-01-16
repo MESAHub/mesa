@@ -43,14 +43,19 @@
       contains
 
 
-      subroutine do_phase_separation(s, ierr)
+      subroutine do_phase_separation(s, dt, ierr)
          use chem_def, only: chem_isos, ic12, io16
          use chem_lib, only: chem_get_iso_id
+         use hydro_vars, only: set_vars
          type (star_info), pointer :: s
+         real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
          real(dp) :: dq_crystal, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16
+         logical :: save_Skye_use_ion_offsets
+
+         s% eps_phase_separation(:) = 0d0
          
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
@@ -90,6 +95,19 @@
                   exit
                end if
             end do
+
+            ! calculate energy associated with phase separation, ignoring the ionization
+            ! energy term that Skye sometimes calculates
+            save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
+            s% eos_rq% Skye_use_ion_offsets = .false.
+            call set_vars(s, dt, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_vars failed during phase separation'
+               return
+            end if
+            do k=1,s% nz
+               s% eps_phase_separation(k) = s% energy(k)
+            end do
             
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
@@ -108,6 +126,17 @@
                
             end do
 
+            call set_vars(s, dt, ierr)
+            if (ierr /= 0) then
+               write(*,*) 'set_vars failed during phase separation'
+               return
+            end if
+
+            ! phase separation heating term for use by energy equation
+            do k=1,s% nz
+               s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+            end do
+            s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
             s% need_to_setvars = .true.
          end if
 
