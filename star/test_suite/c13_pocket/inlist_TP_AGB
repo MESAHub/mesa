@@ -19,11 +19,11 @@
       delta_lgL_He_limit = 0.0125
       lgL_He_burn_min = 2.0
 
-      dH_limit_min_H = 1d-2
-      dH_limit = 0.1
-
-      dH_div_H_limit_min_H = 5d-4
-      dH_div_H_limit = 0.7
+      dX_limit_species(1) = 'h1'
+      dX_limit_min_X(1) = 1d-2
+      dX_limit(1) = 0.1
+      dX_div_X_limit_min_X(1) = 5d-4
+      dX_div_X_limit(1) = 0.7
 
 ! overshooting
 ! first match will be applied
