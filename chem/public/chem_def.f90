@@ -117,7 +117,7 @@
             'californium','einsteinium','fermium','mendelevium', &
             'nobelium','lawrencium','rutherfordium','dubnium', &
             'seaborgium','bohrium','hassium','meitnerium','darmstadtium', &
-            'roentgenium','copernicum' ]
+            'roentgenium','copernicium' ]
 
       ! aluminum isomers
       character(len=iso_name_length), dimension(2:3) :: &
