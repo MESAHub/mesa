@@ -385,6 +385,7 @@
       integer, parameter :: max_num_history_extras = 100
 
       integer, parameter :: num_x_ctrls = 100
+      integer, parameter :: max_dX_limit_ctrls = 100
       
       integer, parameter :: GYRE_MODEL_VERSION = 101
       integer, parameter :: GSM_MODEL_VERSION = 110

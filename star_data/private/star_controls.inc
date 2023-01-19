@@ -1118,17 +1118,18 @@
 
          real(dp) :: dX_mix_dist_limit
 
-         real(dp), dimension(species + 3) :: dX_limit_min_X  ! all species + XYZ
-         real(dp), dimension(species + 3) :: dX_limit
-         real(dp), dimension(species + 3) :: dX_hard_limit
-         logical, dimension(species + 3) :: dX_decreases_only
+         character (len=strlen), dimension(max_dx_limit_ctrls) :: dX_limit_species
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit_min_X  ! all species + XYZ
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_hard_limit
+         logical, dimension(max_dx_limit_ctrls) :: dX_decreases_only
 
-         real(dp), dimension(species + 3) :: dX_div_X_limit_min_X
-         real(dp), dimension(species + 3) :: dX_div_X_limit
-         real(dp), dimension(species + 3) :: dX_div_X_hard_limit
-         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_limit
-         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_hard_limit
-         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_limit_lgT_min
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit_min_X
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit_lgT_min
 
          real(dp) :: dX_nuc_drop_min_X_limit
          real(dp) :: dX_nuc_drop_max_A_limit

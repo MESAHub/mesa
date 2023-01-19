@@ -9483,11 +9483,12 @@
     dX_mix_dist_limit = 1d-4
 
       ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
-      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j.
+      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
       ! special 'species' X (all hydrogen), Y (all helium) and Z (all metals) are
       ! allowed here.
       ! Considers all cells except where have convective mixing.
 
+    dX_limit_species(:) = ''
 
       ! dX_limit_min_X
       ! ~~~~~~~~~~~~~~
