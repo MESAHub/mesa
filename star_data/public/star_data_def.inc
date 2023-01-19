@@ -47,11 +47,7 @@
       integer, parameter :: Tlim_num_burn_steps = Tlim_solver + 1
       integer, parameter :: Tlim_num_diff_solver_steps = Tlim_num_burn_steps + 1
       integer, parameter :: Tlim_dX = Tlim_num_diff_solver_steps + 1
-      integer, parameter :: Tlim_dH = Tlim_dX + 1
-      integer, parameter :: Tlim_dHe = Tlim_dH + 1
-      integer, parameter :: Tlim_dH_div_H = Tlim_dHe + 1
-      integer, parameter :: Tlim_dHe_div_He = Tlim_dH_div_H + 1
-      integer, parameter :: Tlim_dX_div_X = Tlim_dHe_div_He + 1
+      integer, parameter :: Tlim_dX_div_X = Tlim_dX + 1
       integer, parameter :: Tlim_dL_div_L = Tlim_dX_div_X + 1
       integer, parameter :: Tlim_dlgP = Tlim_dL_div_L + 1
       integer, parameter :: Tlim_dlgRho = Tlim_dlgP + 1
@@ -94,9 +90,7 @@
       integer, parameter :: Tlim_bad_Xsum = Tlim_neg_X + 1
       integer, parameter :: Tlim_dlgL_power_photo = Tlim_bad_Xsum + 1
       integer, parameter :: Tlim_delta_HR = Tlim_dlgL_power_photo + 1
-      integer, parameter :: Tlim_dHe3 = Tlim_delta_HR + 1
-      integer, parameter :: Tlim_dHe3_div_He3 = Tlim_dHe3 + 1
-      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_dHe3_div_He3 + 1
+      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_delta_HR + 1
       integer, parameter :: Tlim_num_diff_solver_iters = Tlim_dlog_eps_nuc + 1
       integer, parameter :: Tlim_del_mdot = Tlim_num_diff_solver_iters + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1

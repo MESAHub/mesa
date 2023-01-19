@@ -1118,44 +1118,17 @@
 
          real(dp) :: dX_mix_dist_limit
 
-         real(dp) :: dH_limit_min_H
-         real(dp) :: dH_limit
-         real(dp) :: dH_hard_limit
-         logical :: dH_decreases_only
+         real(dp), dimension(species + 3) :: dX_limit_min_X  ! all species + XYZ
+         real(dp), dimension(species + 3) :: dX_limit
+         real(dp), dimension(species + 3) :: dX_hard_limit
+         logical, dimension(species + 3) :: dX_decreases_only
 
-         real(dp) :: dH_div_H_limit_min_H
-         real(dp) :: dH_div_H_limit
-         real(dp) :: dH_div_H_hard_limit
-
-         real(dp) :: dHe_limit_min_He
-         real(dp) :: dHe_limit
-         real(dp) :: dHe_hard_limit
-         logical :: dHe_decreases_only
-
-         real(dp) :: dHe_div_He_limit_min_He
-         real(dp) :: dHe_div_He_limit
-         real(dp) :: dHe_div_He_hard_limit
-
-         real(dp) :: dHe3_limit_min_He3
-         real(dp) :: dHe3_limit
-         real(dp) :: dHe3_hard_limit
-         logical :: dHe3_decreases_only
-
-         real(dp) :: dHe3_div_He3_limit_min_He3
-         real(dp) :: dHe3_div_He3_limit
-         real(dp) :: dHe3_div_He3_hard_limit
-
-         real(dp) :: dX_limit_min_X
-         real(dp) :: dX_limit
-         real(dp) :: dX_hard_limit
-         logical :: dX_decreases_only
-
-         real(dp) :: dX_div_X_limit_min_X
-         real(dp) :: dX_div_X_limit
-         real(dp) :: dX_div_X_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit
-         real(dp) :: dX_div_X_at_high_T_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit_lgT_min
+         real(dp), dimension(species + 3) :: dX_div_X_limit_min_X
+         real(dp), dimension(species + 3) :: dX_div_X_limit
+         real(dp), dimension(species + 3) :: dX_div_X_hard_limit
+         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_limit
+         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_hard_limit
+         real(dp), dimension(species + 3) :: dX_div_X_at_high_T_limit_lgT_min
 
          real(dp) :: dX_nuc_drop_min_X_limit
          real(dp) :: dX_nuc_drop_max_A_limit
