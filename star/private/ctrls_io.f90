@@ -433,7 +433,7 @@
     dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
-    dX_mix_dist_limit, dX_div_X_at_high_T_limit_lgT_min, &
+    dX_mix_dist_limit, dX_div_X_at_high_T_limit_lgT_min, dX_limit_species, &
     dX_limit_min_X, dX_limit, dX_hard_limit, dX_div_X_limit_min_X, dX_div_X_at_high_T_hard_limit, &
     dX_div_X_limit, dX_div_X_hard_limit, dX_decreases_only, dX_div_X_at_high_T_limit, &
     dX_nuc_drop_min_X_limit, dX_nuc_drop_max_A_limit, dX_nuc_drop_limit, &
@@ -2192,6 +2192,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% dX_mix_dist_limit = dX_mix_dist_limit
 
+ s% dX_limit_species = dX_limit_species
  s% dX_limit_min_X = dX_limit_min_X
  s% dX_limit = dX_limit
  s% dX_hard_limit = dX_hard_limit
@@ -3522,6 +3523,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  opacity_max = s% opacity_max
  opacity_factor = s% opacity_factor
  min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
+ min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
  min_logT_for_opacity_factor_on = s% min_logT_for_opacity_factor_on
  max_logT_for_opacity_factor_on = s% max_logT_for_opacity_factor_on
  max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
@@ -3849,7 +3851,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  check_remnant_only_for_dt_div_min_dr_div_cs_limit = s% check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
  dX_mix_dist_limit = s% dX_mix_dist_limit
-
+ dX_limit_species = s% dX_limit_species
  dX_limit_min_X = s% dX_limit_min_X
  dX_limit = s% dX_limit
  dX_hard_limit = s% dX_hard_limit
