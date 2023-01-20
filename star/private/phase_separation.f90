@@ -46,7 +46,6 @@
       subroutine do_phase_separation(s, dt, ierr)
          use chem_def, only: chem_isos, ic12, io16
          use chem_lib, only: chem_get_iso_id
-         use hydro_vars, only: set_vars
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
@@ -101,7 +100,6 @@
             save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
             s% eos_rq% Skye_use_ion_offsets = .false.
             call update_model_(s,1,s%nz,.false.)
-            ! call set_vars(s, dt, ierr)
             do k=1,s% nz
                s% eps_phase_separation(k) = s% energy(k)
             end do
@@ -124,7 +122,6 @@
             end do
 
             call update_model_(s,1,s%nz,.false.)
-            ! call set_vars(s, dt, ierr)
             
             ! phase separation heating term for use by energy equation
             do k=1,s% nz
