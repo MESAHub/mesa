@@ -54,7 +54,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account (and Rob has access to it).  This is
+<https://readthedocs.org/>`__.  Rich controls the account (and Rob and Evan have access to it).  This is
 currently free for open source software.
 
 
@@ -68,11 +68,10 @@ service.
 Website
 ^^^^^^^
 
-We still use the mesa.sourceforge.net website domian name.  
-The source code for this site lives at https://github.com/MESAHub/mesa-website. 
-It must be manually updated by someone with SourceForge permissions.
+We still use the mesa.sourceforge.net website domian name, but only for a top-level
+redirect to docs.mesastar.org.
 
-This site will be made redundant soon and replaced with a redirect to the ReadTheDocs website.
+The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.
 
 Slack
 -----
@@ -115,6 +114,6 @@ is controlled by Pablo.
 Records
 ^^^^^^^
 
-* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Josiah.
+* The `record for MESA releases <https://zenodo.org/record/4311514>`__ is controlled by Pablo.
 * The `record for OP Mono data <https://zenodo.org/record/4390522>`__ is controlled by Josiah.
 * The records for MESA SDK releases (`macOS <https://zenodo.org/record/4638654>`__, `linux <https://zenodo.org/record/4638535>`__) are controlled by Pablo.

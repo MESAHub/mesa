@@ -82,31 +82,17 @@ is appropriate and documented, and communicating individual developer
 contributions to the astrophysics community so that the careers of
 developers are enhanced by their engagement.
 
+Currently, the MAC is Lars, Rich, and Frank.
+
 **Onboarding and offboarding processes**
 
 These groups are not static and will change as individuals' engagement
 with MESA evolves. If someone is permanently or temporarily unable to
-fulfill their responsibilities, they must inform the MAC of the
-situation. The MAC will reevaluate the membership of these groups on a
-recurring basis. Removal from MD, MTC, and MAC can be for inactivity,
+fulfill their responsibilities, they must inform the MD.
+Removal from MD, MTC, and MAC can be for inactivity,
 harm to the Project, or simply opting out.
 
-Onboarding to MD is done by the MAC in consultation with the MTC and
-the MD.  When a candidate developer is identified, there will be a
-comment period where any MD can privately provide feedback to the MAC
-about the addition to the MESA team.  Nominations and suggestions from
-any MDs are welcome. Currently, the MD are Bill P., Warrick, Evan,
-Earl, Lars, Matteo, Aaron, Rob, Adam, Meridith, Pablo, Radek,
-Anne, Rich, Bill W, and Frank.
-
-As MESA's "first author", Bill is an ex-officio member of both MAC and
-MTC.
-
-Initially, the MTC has members appointed by Bill Paxton. These are
-Rich, Pablo, and Rob.
-
-Currently, the MAC is Lars, Rich, and Frank.
-
+Onboarding to the MD is described :doc:`here <developing/new_developers>`.
 
 Instrument Paper Principles
 ===========================
@@ -118,7 +104,7 @@ Instrument Paper Principles
 How do authorship invitations arise?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-During the completion of the first five MESA Instrument Papers, there have been multiple channels for co-author invitations.
+During the completion of the first six MESA Instrument Papers, there have been multiple channels for co-author invitations.
 
 - Running a non-MESA code in a controlled and engaged manner that enables verification of a NEW MESA capability (e.g., Dessart for shocks).
 
@@ -148,9 +134,4 @@ Prospective co-authors should be prepared to participate by:
 
 The MAC can relax any of these four items when there is value in doing so.
 
-
-How is it decided who the authors are and their order?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Final authorship and order is decided by the MAC only near the completion time of the paper.
 
