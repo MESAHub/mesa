@@ -293,6 +293,7 @@
 
          ! limits for Skye
          logical :: use_Skye
+         logical :: Skye_use_ion_offsets
          real(dp) :: mass_fraction_limit_for_Skye
          real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
          real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).

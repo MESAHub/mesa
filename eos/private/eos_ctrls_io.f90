@@ -106,6 +106,7 @@
 
    ! limits for Skye
    logical :: use_Skye
+   logical :: Skye_use_ion_offsets
    real(dp) :: mass_fraction_limit_for_Skye
    real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
    real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
@@ -231,6 +232,7 @@
 
       ! controls for Skye
       use_Skye, &
+      Skye_use_ion_offsets, &
       mass_fraction_limit_for_Skye, &
       Skye_min_gamma_for_solid, & ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
       Skye_max_gamma_for_liquid, & ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
@@ -486,6 +488,7 @@
       rq% PC_Gamma_full_crystal = PC_Gamma_full_crystal
       ! controls for Skye
       rq% use_Skye = use_Skye
+      rq% Skye_use_ion_offsets = Skye_use_ion_offsets
       rq% mass_fraction_limit_for_Skye = mass_fraction_limit_for_Skye
       rq%Skye_min_gamma_for_solid = Skye_min_gamma_for_solid
       rq%Skye_max_gamma_for_liquid = Skye_max_gamma_for_liquid
@@ -622,6 +625,7 @@
       PC_Gamma_full_crystal = rq% PC_Gamma_full_crystal
       ! controls for Skye
       use_Skye = rq% use_Skye
+      Skye_use_ion_offsets = rq% Skye_use_ion_offsets
       mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
       Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
       Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid  
