@@ -5562,7 +5562,6 @@
     z_fraction_be = 0
     z_fraction_b = 0
     z_fraction_c = 0
-    z_fraction_c = 0
     z_fraction_n = 0
     z_fraction_o = 0
     z_fraction_f = 0
@@ -9487,7 +9486,7 @@
       ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
       ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
       ! allowed here. Eg. 'Z' will trigger the timestep control if any metal isotope
-      ! abundance satisfies the conditions below.
+      ! abundance individually satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
 
     dX_limit_species(:) = ''
