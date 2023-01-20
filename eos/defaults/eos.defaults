@@ -329,9 +329,9 @@
 
 
          ! read_extra_eos_inlist(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
          ! extra_eos_inlist_name(1..5)
-         ! ~~~~~~~~~~~~~~~~~~~~~~
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
          ! If ``read_extra_eos_inlist(i)`` is true, then read &eos from the file ``extra_eos_inlist_name(i)``.
          ! ::
