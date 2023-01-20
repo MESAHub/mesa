@@ -624,16 +624,11 @@
                end if
 
                if(s% do_phase_separation) then
-                  do k=1,s% nz
-                     s% eps_phase_separation(k) = s% energy(k)
-                  end do
-                  call do_phase_separation(s, ierr)
+                  call do_phase_separation(s, dt, ierr)
                   if (failed('do_phase_separation')) return
+                  
                   call set_vars_if_needed(s, dt, 'after phase separation', ierr)
                   if (failed('set_vars_if_needed after phase separation')) return
-                  do k=1,s% nz ! for use by energy equation
-                     s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
-                  end do
                else
                   s% crystal_core_boundary_mass = -1d0
                end if
