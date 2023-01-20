@@ -5562,6 +5562,7 @@
     z_fraction_be = 0
     z_fraction_b = 0
     z_fraction_c = 0
+    z_fraction_c = 0
     z_fraction_n = 0
     z_fraction_o = 0
     z_fraction_f = 0
@@ -9484,8 +9485,9 @@
 
       ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
       ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
-      ! special 'species' X (all hydrogen), Y (all helium) and Z (all metals) are
-      ! allowed here.
+      ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
+      ! allowed here. Eg. 'Z' will trigger the timestep control if any metal isotope
+      ! abundance satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
 
     dX_limit_species(:) = ''
