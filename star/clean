@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd test; ./cleanup
-cd ../test_suite; ./each_test_clean >& /dev/null
+cd make
+make clean
