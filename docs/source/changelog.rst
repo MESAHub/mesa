@@ -40,7 +40,10 @@ style, you can use the following ``sed`` terminal command: ::
     sed -E '/inlist[1-5]/s/([1-5])([_a-z]*) =/\2\(\1\) =/' -i inlist_name
 
 where ``inlist_name`` is the inlist (or inlists) that you'd like to update.
-``sed`` is a standard tool that is included with most Linux distributions.
+This will *replace* the file ``inlist_name``.  Omit the ``-i`` flag if you'd
+like to see the changes without modifying the file.
+
+``sed`` is a standard tool that is included with macOS and most Linux distributions.
 
 
 Changes in r22.11.1
