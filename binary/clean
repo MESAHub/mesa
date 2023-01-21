@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd make
-make clean
+cd make; make clean
+cd ../test/make; make clean
