@@ -150,7 +150,7 @@
             return
          end if
 
-         if (s% phase(k) > 0.9d0 .and. s% mu(k) > 1.7d0) then
+         if (s% phase(k) > 0.5d0 .and. s% mu(k) > 1.7d0) then
             ! mu(k) check is so that we only evaluate this in C/O dominated material or heavier.
             ! Helium can return bad phase info on Skye, so we don't want it to shut off
             ! convection because of wrong phase information.
