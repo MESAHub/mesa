@@ -311,29 +311,6 @@
          nu_upper_factor = 1.2
 
 
-   ! include other inlists
-   
-         read_extra_astero_search_inlist1 = .false.
-         extra_astero_search_inlist1_name = 'undefined'
-            ! if read_extra_astero_search_inlist1 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist2 = .false.
-         extra_astero_search_inlist2_name = 'undefined'
-            ! if read_extra_astero_search_inlist2 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist3 = .false.
-         extra_astero_search_inlist3_name = 'undefined'
-            ! if read_extra_astero_search_inlist3 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist4 = .false.
-         extra_astero_search_inlist4_name = 'undefined'
-            ! if read_extra_astero_search_inlist4 is true, then read this namelist file
-   
-         read_extra_astero_search_inlist5 = .false.
-         extra_astero_search_inlist5_name = 'undefined'
-            ! if read_extra_astero_search_inlist5 is true, then read this namelist file
-
-
 / ! end astero_search_controls
 
 

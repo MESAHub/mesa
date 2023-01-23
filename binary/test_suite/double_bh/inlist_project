@@ -24,8 +24,8 @@
 
    ! initial conditions specified in extra inlist
    ! the initial masses and period are given there
-   read_extra_binary_controls_inlist1 = .true.
-   extra_binary_controls_inlist1_name = "inlist_extra"
+   read_extra_binary_controls_inlist(1) = .true.
+   extra_binary_controls_inlist_name(1) = "inlist_extra"
 
    terminal_interval = 10
 

@@ -13,6 +13,47 @@ Changes in main
 Backwards-incompatible changes
 ------------------------------
 
+Extra inlist controls are now arrays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Almost all MESA inlists have the option of reading other inlists,
+which is a feature canonically used in the main ``inlist`` file.
+e.g. the ``inlist`` in the standard ``star/work`` directory has ::
+
+    read_extra_controls_inlist1 = .true.
+    extra_controls_inlist1_name = 'inlist_project'
+
+where the inlist number could range from 1 to 5.
+
+These and all similar controls have been replaced with arrays like ::
+
+    read_extra_controls_inlist(1) = .true.
+    extra_controls_inlist_name(1) = 'inlist_project'
+
+That is, the number should be moved to the end of the control name
+and placed in round brackets.
+
+This allows a lot of duplicate code to be refactored but will break
+almost all existing MESA inlists.  To update an old inlist to this new
+style, you can use the following ``sed`` terminal command: ::
+
+    sed -E '/inlist[1-5]/s/([1-5])([_a-z]*) =/\2\(\1\) =/' -i inlist_name
+
+where ``inlist_name`` is the inlist (or inlists) that you'd like to update.
+This will *replace* the file ``inlist_name``.  Omit the ``-i`` flag if you'd
+like to see the changes without modifying the file.
+
+``sed`` is a standard tool that is included with macOS and most Linux distributions.
+
+
+Changes in r22.11.1
+===================
+
+.. _Backwards-incompatible changes r22.11.1:
+
+Backwards-incompatible changes
+------------------------------
+
 .. note::
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.

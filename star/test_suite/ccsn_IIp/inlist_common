@@ -1,8 +1,8 @@
 ! inlist_common
 
 &star_job
-   read_extra_star_job_inlist1 = .true.
-   extra_star_job_inlist1_name = 'inlist_mass_Z'
+   read_extra_star_job_inlist(1) = .true.
+   extra_star_job_inlist_name(1) = 'inlist_mass_Z'
  
    show_log_description_at_start = .false.
 
@@ -22,16 +22,16 @@ use_Skye = .false.
 / ! end of eos namelist
 
 &kap
-   read_extra_kap_inlist1 = .true.
-   extra_kap_inlist1_name = 'inlist_mass_Z'
+   read_extra_kap_inlist(1) = .true.
+   extra_kap_inlist_name(1) = 'inlist_mass_Z'
 
    kap_file_prefix = 'gs98'
    use_Type2_opacities = .false.
 / ! end of kap namelist
 
 &controls
-   read_extra_controls_inlist1 = .true.
-   extra_controls_inlist1_name = 'inlist_mass_Z'
+   read_extra_controls_inlist(1) = .true.
+   extra_controls_inlist_name(1)= 'inlist_mass_Z'
 
    ! high center T limit to avoid negative mass fractions
    sig_min_factor_for_high_Tcenter = 0.01
