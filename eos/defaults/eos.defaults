@@ -336,61 +336,13 @@
    ! It works recursively, so the extras can read extras too.
 
 
-         ! read_extra_eos_inlist1
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_eos_inlist1_name
-         ! ~~~~~~~~~~~~~~~~~~~~~~
+         ! read_extra_eos_inlist(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         ! extra_eos_inlist_name(1..5)
+         ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         ! If ``read_extra_eos_inlist1`` is true, then read &eos from the file ``extra_eos_inlist1_name``.
+         ! If ``read_extra_eos_inlist(i)`` is true, then read &eos from the file ``extra_eos_inlist_name(i)``.
          ! ::
 
-      read_extra_eos_inlist1 = .false.
-      extra_eos_inlist1_name = 'undefined'
-
-
-         ! read_extra_eos_inlist2
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_eos_inlist2_name
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-
-         ! If ``read_extra_eos_inlist2`` is true, then read &eos from the file ``extra_eos_inlist2_name``.
-         ! ::
-
-      read_extra_eos_inlist2 = .false.
-      extra_eos_inlist2_name = 'undefined'
-
-
-         ! read_extra_eos_inlist3
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_eos_inlist3_name
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-
-         ! If ``read_extra_eos_inlist3`` is true, then read &eos from the file ``extra_eos_inlist3_name``.
-         ! ::
-
-      read_extra_eos_inlist3 = .false.
-      extra_eos_inlist3_name = 'undefined'
-
-
-         ! read_extra_eos_inlist4
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_eos_inlist4_name
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-
-         ! If ``read_extra_eos_inlist4`` is true, then read &eos from the file ``extra_eos_inlist4_name``.
-         ! ::
-
-      read_extra_eos_inlist4 = .false.
-      extra_eos_inlist4_name = 'undefined'
-
-
-         ! read_extra_eos_inlist5
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-         ! extra_eos_inlist5_name
-         ! ~~~~~~~~~~~~~~~~~~~~~~
-
-         ! If ``read_extra_eos_inlist5`` is true, then read &eos from the file ``extra_eos_inlist5_name``.
-         ! ::
-
-      read_extra_eos_inlist5 = .false.
-      extra_eos_inlist5_name = 'undefined'
+      read_extra_eos_inlist(:) = .false.
+      extra_eos_inlist_name(:) = 'undefined'

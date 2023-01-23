@@ -334,20 +334,8 @@
 
       character (len=strlen) :: rate_tables_dir, rate_cache_suffix
 
-      logical :: read_extra_star_job_inlist1
-      character (len=strlen) :: extra_star_job_inlist1_name
-
-      logical :: read_extra_star_job_inlist2
-      character (len=strlen) :: extra_star_job_inlist2_name
-
-      logical :: read_extra_star_job_inlist3
-      character (len=strlen) :: extra_star_job_inlist3_name
-
-      logical :: read_extra_star_job_inlist4
-      character (len=strlen) :: extra_star_job_inlist4_name
-
-      logical :: read_extra_star_job_inlist5
-      character (len=strlen) :: extra_star_job_inlist5_name
+      logical, dimension(max_extra_inlists) :: read_extra_star_job_inlist
+      character (len=strlen), dimension(max_extra_inlists) :: extra_star_job_inlist_name
 
       integer :: save_pulse_data_for_model_number
       logical :: save_pulse_data_when_terminate
