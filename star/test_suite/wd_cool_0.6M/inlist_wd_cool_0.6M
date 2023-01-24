@@ -8,7 +8,7 @@
 
       load_saved_model = .true.
       load_model_filename = 'co_wd_settled.mod'
-      ! comes from final.mod produced by make_co_wd as of version 14731
+      ! comes from final.mod produced by make_co_wd in r22.11.1
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -18,6 +18,9 @@
 
       set_initial_age = .true.
       initial_age = 0
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
 
       set_initial_dt = .true.
       years_for_initial_dt = 1d2 ! in years
