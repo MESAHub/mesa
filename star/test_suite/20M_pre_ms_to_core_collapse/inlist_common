@@ -133,7 +133,7 @@
       delta_lgT_max_limit = 0.002     
       delta_lgT_max_hard_limit = 0.01
 
-      dHe_div_He_limit = -1
+      dX_div_X_limit(2) = -1 ! for he4
 
       dX_nuc_drop_limit = 2d-2
       dX_nuc_drop_limit_at_high_T = -1  ! default = -1 = same as dX_nuc_drop_limit
