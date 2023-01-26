@@ -45,6 +45,40 @@ like to see the changes without modifying the file.
 
 ``sed`` is a standard tool that is included with macOS and most Linux distributions.
 
+Abundance-based timestep controls are now arrays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The previous controls ::
+
+    dH_limit_min_H = 1d99
+    dH_limit = 1d99
+    dH_hard_limit = 1d99
+    dH_decreases_only = .true.
+    dH_div_H_limit_min_H = 1d-3
+    dH_div_H_limit = 0.9d0
+    dH_div_H_hard_limit = 1d99
+
+and similar controls for ``He`` and ``He3`` have been replaced with
+arrays.  This simplifies the code and allows the controls to be
+applied to any species in the net.  A new control
+``dX_limit_species(...)`` specifies which elements will be checked.
+The previous behaviour for ``H``, for example, has been replaced with
+::
+
+    dX_limit_species(1) = 'h1'
+    dX_limit_min_X(1) = 1d99
+    dX_limit(1) = 1d99
+    dX_hard_limit(1) = 1d99
+    dX_decreases_only(1) = .true.
+    dX_div_X_limit_min_X(1) = 1d-3
+    dX_div_X_limit(1) = 0.9d0
+    dX_div_X_hard_limit(1) = 1d99
+
+The old ``H``, ``He`` and ``He3`` controls correspond to species
+``h1``, ``he4`` and ``he3``, respectively.  You can also set the
+species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
+*individually* to all isotopes of hydrogen, helium or metals,
+respectively.
 
 Changes in r22.11.1
 ===================
