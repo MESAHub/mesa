@@ -3,10 +3,10 @@
       subroutine my_getf2(m, a, lda, ipiv, info)
          integer :: info, lda, m
          integer :: ipiv(:)
-         real(dp) :: a(:,:)
+         real(dp) :: a(:,:),aj(m)
          real(dp), parameter :: one=1, zero=0
          integer :: i, j, jp, ii, jj, n, mm
-         real(dp) :: tmp, da
+         real(dp) :: tmp, da, ajjj
          do j = 1, m
             info = 0
             jp = j - 1 + maxloc(abs(a(j:lda,j)),dim=1)
@@ -31,11 +31,13 @@
                info = j
             end if
             if( j.lt.m ) then
+               aj = a(:,j)
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
+                  ajjj = a(j,jj)
                   !$omp simd
                   do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                     a(ii,jj) = a(ii,jj) - aj(ii)*ajjj
                   end do
                end do
             end if
