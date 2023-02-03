@@ -22,7 +22,7 @@
 
       ! controls for adding core of a certain density (alternatively, could fix radius)
       relax_core = .true.
-      new_core_mass = 3.00120651518e-05 ! 25 Mearth in Msun units
+      new_core_mass = 3.00120651518e-05 ! 10 Mearth in Msun units
       core_avg_rho = 10.d0 ! g/cm^3
       core_avg_eps = 0.d0 ! ergs/g/sec
       dlg_core_mass_per_step = 0.05d0     ! decrease if convergence problems
