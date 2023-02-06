@@ -94,8 +94,8 @@
 
       type(binary_info), pointer :: b
       type (star_info), pointer :: s
-      real(dp) :: v_orb, v_wind, b_BH
-      real(dp) :: alpha  ! Bondi-Hoyle alpha for that star
+      real(dp) :: v_orb, v_wind
+      real(dp) :: alpha, beta  ! Bondi-Hoyle alpha, beta for that star
       real(dp) :: max_xfer  ! Maximum transfer fraction
 
       call binary_ptr(binary_id, b, ierr)
@@ -107,18 +107,20 @@
       if (s_i == 1) then
          s => b% s1
          alpha = b% wind_BH_alpha_1
+         beta = b% wind_BH_beta_1
          max_xfer = b% max_wind_transfer_fraction_1
       else
          s => b% s2
          alpha = b% wind_BH_alpha_2
+         beta = b% wind_BH_beta_2
          max_xfer = b% max_wind_transfer_fraction_2
       end if
       
       ! orbital speed Hurley et al 2002 eq. 8
-      v_orb = sqrt(standard_cgrav * b% m(s_i) / b% separation) !cm/s
+      v_orb = sqrt(standard_cgrav * (b% m(1) + b% m(2)) / b% separation) !cm/s
       
       ! windspeed from Hurley et al 2002 eq. 9
-      v_wind = sqrt( 2d0 / 8d0 *  standard_cgrav * b% m(s_i) / b% r(s_i) )
+      v_wind = sqrt(2d0 * beta *  standard_cgrav * b% m(s_i) / b% r(s_i))
       
       ! Bondi-Hoyle transfer fraction Hurley et al. 2002 eq. 6
       b% wind_xfer_fraction(s_i) = alpha / pow2(b% separation) /&
