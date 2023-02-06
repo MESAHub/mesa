@@ -22,7 +22,8 @@
 
    limit_retention_by_mdot_edd = .true.
    do_wind_mass_transfer_1 = .true.
-   wind_BH_beta_1 = 7d0  ! 7 since donor is O star
+   wind_BH_beta_1 = 1.25d-1 ! wind_BH_beta_1 = 7d0  ! 7 since donor is O star, using this value would make more sense, but we keep the default of 1/8
+                           ! which results in wind accretion below and above the Eddington limit (which we want to test).
    do_jdot_mb = .false.
 
    report_rlo_solver_progress = .true.
