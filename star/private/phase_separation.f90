@@ -54,7 +54,7 @@
          integer :: k, k_bound, kstart, net_ic12, net_io16
          logical :: save_Skye_use_ion_offsets
 
-         s% eps_phase_separation(:) = 0d0
+         s% eps_phase_separation(1:s%nz) = 0d0
          
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
