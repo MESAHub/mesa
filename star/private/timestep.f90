@@ -514,13 +514,12 @@
          dX_div_X_hard_limit = s% dX_div_X_hard_limit*s% time_delta_coeff
 
          do i=1, max_dx_limit_ctrls  ! go over all potential species + XYZ
-            if (  dX_limit_min_X(i) >= 1 .or. &  ! as soon as any of these is >= 1
-                  dX_limit(i) >= 1 .or. &        ! we'd have a problem elsewhere
-                  dX_hard_limit(i) >= 1 .or. &
-                  dX_div_X_limit_min_X(i) >= 1 .or. &
-                  dX_div_X_limit(i) >= 1 .or. &
-                  dX_div_X_hard_limit(i) >= 1 .or. &
-                  s% dX_limit_species(i) == '') then
+            if (  dX_limit_min_X(i) >= 1 .and. &  ! as soon as all of these are >= 1
+                  dX_limit(i) >= 1 .and. &        ! we'd have nothing to do
+                  dX_hard_limit(i) >= 1 .and. &
+                  dX_div_X_limit_min_X(i) >= 1 .and. &
+                  dX_div_X_limit(i) >= 1 .and. &
+                  dX_div_X_hard_limit(i) >= 1) then
                cycle  ! go to next
             end if
    
@@ -579,7 +578,7 @@
    
                   if ((.not. s% dX_decreases_only(j)) .and. delta_X < 0) delta_X = -delta_X
    
-                  if (X >= dX_limit_min_X(i)) then
+                  if (X >= dX_limit_min_X(i)) then  ! any check for dX_limit_* < 1 is useless since X <= 1 anyway
                      if ((.not. skip_hard_limit) .and. delta_X > dX_hard_limit(i)) then
                         check_dX = retry
                         s% why_Tlim = Tlim_dX
