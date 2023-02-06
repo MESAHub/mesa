@@ -1504,7 +1504,7 @@
                end if
 
             case (p_eps_phase_separation)
-               if (s% do_phase_separation_heating) val = s% eps_phase_separation(k)
+               if (s% do_phase_separation .and. s% do_phase_separation_heating) val = s% eps_phase_separation(k)
 
             case (p_eps_WD_sedimentation)
                if (s% do_element_diffusion) val = s% eps_WD_sedimentation(k)
