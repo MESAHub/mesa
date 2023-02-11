@@ -2728,9 +2728,9 @@ contains
             int_val = s% k_below_const_q
             is_int_val = .true.
          case (h_q_below_const_q)
-            val = s% q(s% k_below_const_q)
+            if(s% k_below_const_q>0) val = s% q(s% k_below_const_q)
          case (h_logxq_below_const_q)
-            val = safe_log10(sum(s% dq(1:s% k_below_const_q - 1)))
+            if(s% k_below_const_q>0) val = safe_log10(sum(s% dq(1:s% k_below_const_q - 1)))
 
          case (h_k_const_mass)
             int_val = s% k_const_mass
