@@ -224,6 +224,9 @@
             case(ir_li7_pa_he4) ! li7(p, a)he4
                call do1(rate_li7pa_nacre)
 
+            case(ir_he4_ap_li7) ! li7(p, a)he4
+               call do1_reverse(rate_li7pa_nacre)
+
             case(ir_n13_gp_c12) ! n13(g, p)c12
                call do1_reverse(rate_c12pg_nacre)
 
