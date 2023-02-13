@@ -1197,8 +1197,8 @@
          s% d_dxdt_nuc_dRho(:,k) =  0d0
          s% d_dxdt_nuc_dT(:,k) =  0d0
          s% d_dxdt_nuc_dx(:,:,k) =  0d0
-         s% eps_nuc_neu_total(k) = ending_eps_neu_total ! restore eps_nuc_neu to zones 
-undergoing op_split!
+         ! below, restore eps_nuc_neu to op_split zones.
+         s% eps_nuc_neu_total(k) = ending_eps_neu_total 
          
          do i=1,species ! for use by dX_nuc_drop timestep limiter
             s% dxdt_nuc(i,k) = (s% xa(i,k)-xa_start(i))/dt
