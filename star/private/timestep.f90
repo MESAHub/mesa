@@ -495,10 +495,8 @@
             bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit
          integer :: i, j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
          real(dp) :: D_mix_cutoff
-         real(dp), dimension(max_dX_limit_ctrls) :: dX_limit_min_X, dX_limit, dX_hard_limit, &
-            dX_div_X_limit_min_X, dX_div_X_limit, dX_div_X_hard_limit, &
-            dX_div_X_at_high_T_limit, dX_div_X_at_high_T_hard_limit, &
-            dX_div_X_at_high_T_limit_lgT_min
+         real(dp), dimension(max_dX_limit_ctrls) :: dX_limit, dX_hard_limit, &
+            dX_div_X_limit, dX_div_X_hard_limit
          character (len=strlen) :: sp
 
          include 'formats'
@@ -506,23 +504,29 @@
          check_dX = keep_going
 
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
-         
-         dX_limit = s% dX_limit*s% time_delta_coeff
-         dX_hard_limit = s% dX_hard_limit*s% time_delta_coeff
-
-         dX_div_X_limit = s% dX_div_X_limit*s% time_delta_coeff
-         dX_div_X_hard_limit = s% dX_div_X_hard_limit*s% time_delta_coeff
 
          do i=1, max_dx_limit_ctrls  ! go over all potential species + XYZ
-            if (  dX_limit_min_X(i) >= 1 .and. &  ! as soon as all of these are >= 1
-                  dX_limit(i) >= 1 .and. &        ! we'd have nothing to do
-                  dX_hard_limit(i) >= 1 .and. &
-                  dX_div_X_limit_min_X(i) >= 1 .and. &
-                  dX_div_X_limit(i) >= 1 .and. &
-                  dX_div_X_hard_limit(i) >= 1) then
+            if (s% dX_limit(i) >= 1 .and. &      ! as soon as all of these are >= 1
+                s% dX_hard_limit(i) >= 1 .and. & ! we'd have nothing to do
+                s% dX_div_X_limit(i) >= 1 .and. &
+                s% dX_div_X_hard_limit(i) >= 1) then
                cycle  ! go to next
             end if
-   
+         
+            dX_limit = s% dX_limit(i) * s% time_delta_coeff
+            dX_hard_limit = s% dX_hard_limit(i) * s% time_delta_coeff
+            
+            if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min(i)) then
+               dX_div_X_limit = s% dX_div_X_at_high_T_limit(i)
+               dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit(i)
+            else
+               dX_div_X_limit = s% dX_div_X_limit(i)
+               dX_div_X_hard_limit = s% dX_div_X_hard_limit(i)
+            end if
+            
+            dX_div_X_limit = dX_div_X_limit * s% time_delta_coeff
+            dX_div_X_hard_limit = dX_div_X_hard_limit * s% time_delta_coeff
+            
             max_dX = -1; max_dX_j = -1; max_dX_k = -1
             max_dX_div_X = -1; max_dX_div_X_j = -1; max_dX_div_X_k = -1
             bdy = 0
@@ -578,7 +582,7 @@
    
                   if ((.not. s% dX_decreases_only(j)) .and. delta_X < 0) delta_X = -delta_X
    
-                  if (X >= dX_limit_min_X(i)) then  ! any check for dX_limit_* < 1 is useless since X <= 1 anyway
+                  if (X >= s% dX_limit_min_X(i)) then  ! any check for dX_limit_* < 1 is useless since X <= 1 anyway
                      if ((.not. skip_hard_limit) .and. delta_X > dX_hard_limit(i)) then
                         check_dX = retry
                         s% why_Tlim = Tlim_dX
@@ -601,7 +605,7 @@
                         max_dX_bdy_dist_dm = bdy_dist_dm
                      end if
                   end if
-                  if (X >= dX_div_X_limit_min_X(i)) then
+                  if (X >= s% dX_div_X_limit_min_X(i)) then
                      delta_X_div_X = delta_X/X
                      if ((.not. skip_hard_limit) .and. delta_X_div_X > dX_div_X_hard_limit(i)) then
                         check_dX = retry
@@ -656,8 +660,8 @@
                else
                   s% Tlim_dX_div_X_species = max_dX_div_X_j
                   s% Tlim_dX_div_X_cell = max_dX_div_X_k
-                  write(*, '(a30, i5, 99e20.10)') &
-                     'limit dt because of large dX_div_X ' // &
+                  write(*, '(a35, i5, 99e20.10)') &
+                     ' limit dt because of large dX_div_X ' // &
                         trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
                      ' k, max, lim, m ', &
                      max_dX_div_X_k, max_dX_div_X, dX_div_X_limit(i), &
