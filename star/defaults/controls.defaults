@@ -9534,9 +9534,9 @@
 
     dX_decreases_only(:) = .true.
 
-      ! Limit on magnitude of relative decrease in any cell nonH, nonHe abundance.
+      ! Limit on magnitude of relative decrease in any cell abundance.
       ! ``dX_div_X`` here is abs(xa(j,k) - xa_old(j,k))/xa(j,k)
-      ! for any cell k and any species j other except hydrogen or helium.
+      ! for any cell k and any species j.
       ! Considers all cells except where have convective mixing.
 
 
