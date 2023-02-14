@@ -15,7 +15,8 @@
 *.mod linguist-generated
 *reaclib_results* -linguist-detectable
 *.ph -linguist-detectable
-*.1 -linguist-detectable
+*.[1-9] -linguist-detectable
+*.in -linguist-detectable
 
 # Things to ignore from the release
 star/dev_cases_compare_pulses export-ignore
