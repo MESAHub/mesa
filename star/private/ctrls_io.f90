@@ -3467,10 +3467,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  opacity_max = s% opacity_max
  opacity_factor = s% opacity_factor
  min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
- min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
+ max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
  min_logT_for_opacity_factor_on = s% min_logT_for_opacity_factor_on
  max_logT_for_opacity_factor_on = s% max_logT_for_opacity_factor_on
- max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
 
  non_nuc_neu_factor = s% non_nuc_neu_factor
  use_time_centered_eps_grav = s% use_time_centered_eps_grav
