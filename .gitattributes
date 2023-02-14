@@ -11,8 +11,9 @@
 
 # Try to get github to better understand what our filetypes are
 *.inc linguist-langauge=Fortran
-**inlist* linguist-langauge=Fortran
+*inlist* linguist-langauge=Fortran
 *.mod linguist-generated
+*reaclib_results* -linguist-detectable
 
 # Things to ignore from the release
 star/dev_cases_compare_pulses export-ignore
