@@ -484,17 +484,17 @@
             n_mix_bdy, mix_bdy_loc, mix_bdy_q, &
             dX_dt_limit_ratio, dX_div_X_dt_limit_ratio)
          use num_lib, only: binary_search
-         type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
          integer, intent(in) :: n_mix_bdy, mix_bdy_loc(:)
          real(dp), intent(in) :: dt
          real(dp), intent(in), pointer :: mix_bdy_q(:)
          real(dp), intent(inout) :: dX_dt_limit_ratio, dX_div_X_dt_limit_ratio
 
+         type (star_info), pointer :: s
          real(dp) :: X, X_old, delta_X, delta_X_div_X, max_dX, max_dX_div_X, &
-            bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit
+            bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit, &
+            D_mix_cutoff, ratio_tmp
          integer :: i, j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
-         real(dp) :: D_mix_cutoff
          real(dp), dimension(max_dX_limit_ctrls) :: dX_limit, dX_hard_limit, &
             dX_div_X_limit, dX_div_X_hard_limit
          character (len=strlen) :: sp
@@ -502,6 +502,8 @@
          include 'formats'
 
          check_dX = keep_going
+         dX_dt_limit_ratio = 0d0
+         dX_div_X_dt_limit_ratio = 0d0
 
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
 
@@ -638,34 +640,40 @@
             
             if (dX_limit(i) > 0) then
                dX_dt_limit_ratio = max_dX/dX_limit(i)
-               if (dX_dt_limit_ratio <= 1d0) then
-                  dX_dt_limit_ratio = 0
-               else
-                  s% Tlim_dX_species = max_dX_j
-                  s% Tlim_dX_cell = max_dX_k
-                  write(*, '(a30, i5, 99e20.10)') &
-                     ' limit dt because of large dX '// &
-                        trim(chem_isos% name(s% chem_id(max_dX_j))) // &
-                     ' k, max, lim, m ', &
-                     max_dX_k, max_dX, dX_limit(i), &
-                     max_dX_bdy_dist_dm/Msun
+               if (ratio_tmp > dX_dt_limit_ratio) then
+                  dX_dt_limit_ratio = ratio_tmp
+                  if (dX_dt_limit_ratio <= 1d0) then
+                     dX_dt_limit_ratio = 0
+                  else
+                     s% Tlim_dX_species = max_dX_j
+                     s% Tlim_dX_cell = max_dX_k
+   !                  write(*, '(a30, i5, 99e20.10)') &
+   !                     ' limit dt because of large dX '// &
+   !                        trim(chem_isos% name(s% chem_id(max_dX_j))) // &
+   !                     ' k, max, lim, m ', &
+   !                     max_dX_k, max_dX, dX_limit(i), &
+   !                     max_dX_bdy_dist_dm/Msun
+                  end if
                end if
-   
             end if
    
             if (dX_div_X_limit(i) > 0) then
-               dX_div_X_dt_limit_ratio = max_dX_div_X/dX_div_X_limit(i)
-               if (dX_div_X_dt_limit_ratio <= 1d0) then
-                  dX_div_X_dt_limit_ratio = 0
-               else
-                  s% Tlim_dX_div_X_species = max_dX_div_X_j
-                  s% Tlim_dX_div_X_cell = max_dX_div_X_k
-                  write(*, '(a35, i5, 99e20.10)') &
-                     ' limit dt because of large dX_div_X ' // &
-                        trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
-                     ' k, max, lim, m ', &
-                     max_dX_div_X_k, max_dX_div_X, dX_div_X_limit(i), &
-                     max_dX_div_X_bdy_dist_dm/Msun
+               ratio_tmp = max_dX_div_X/dX_div_X_limit(i)
+               if (ratio_tmp > dX_div_X_dt_limit_ratio) then  ! pick out largest culprit only!
+                  dX_div_X_dt_limit_ratio = ratio_tmp
+                  if (dX_div_X_dt_limit_ratio <= 1d0) then
+                     dX_div_X_dt_limit_ratio = 0
+                  else
+                     s% Tlim_dX_div_X_species = max_dX_div_X_j
+                     s% Tlim_dX_div_X_cell = max_dX_div_X_k
+   !                  write(*, '(a35, i5, 99e20.10)') &  ! shouldn't be written as is isn't guarantueed
+                                                         ! this control will trigger timestep reduction
+   !                     ' limit dt because of large dX_div_X ' // &
+   !                        trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
+   !                     ' k, max, lim, m ', &
+   !                     max_dX_div_X_k, max_dX_div_X, dX_div_X_limit(i), &
+   !                     max_dX_div_X_bdy_dist_dm/Msun
+                  end if
                end if
             end if
          end do
