@@ -116,7 +116,8 @@ module binary_pgbinary
    integer, parameter :: i_Binary_Star1 = i_Binary_Grid9 + 1
    integer, parameter :: i_Binary_Star2 = i_Binary_Star1 + 1
 
-   integer, parameter :: i_Binary_Other = i_Binary_Star2 + 1
+   integer, parameter :: i_Binary_Orbit = i_Binary_Star2
+   integer, parameter :: i_Binary_Other = i_Binary_Orbit + 1
 
    integer, parameter :: num_pgbinary_plots = i_Binary_Other + &
       max_num_Binary_Other_plots

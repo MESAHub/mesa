@@ -194,6 +194,8 @@ contains
          History_Track7_plot, History_Track8_plot, History_Track9_plot
       use pgbinary_star, only : &
          Star1_plot, Star2_plot
+      use pgbinary_orbit, only : &
+         Orbit_plot
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
 
@@ -747,6 +749,20 @@ contains
       p% file_interval = b% pg% Star2_file_interval
       p% file_width = b% pg% Star2_file_width
       p% file_aspect_ratio = b% pg% Star2_file_aspect_ratio
+
+      p => b% pg% pgbinary_win_file_ptr(i_Binary_Orbit)
+      p% plot => Orbit_plot
+      p% id = i_Binary_Orbit
+      p% name = 'Orbit'
+      p% win_flag = b% pg% Orbit_win_flag
+      p% win_width = b% pg% Orbit_win_width
+      p% win_aspect_ratio = b% pg% Orbit_win_aspect_ratio
+      p% file_flag = b% pg% Orbit_file_flag
+      p% file_dir = b% pg% Orbit_file_dir
+      p% file_prefix = b% pg% Orbit_file_prefix
+      p% file_interval = b% pg% Orbit_file_interval
+      p% file_width = b% pg% Orbit_file_width
+      p% file_aspect_ratio = b% pg% Orbit_file_aspect_ratio
 
       do i = 1, max_num_Binary_Other_plots
          p => b% pg% pgbinary_win_file_ptr(i_Binary_Other + i - 1)
