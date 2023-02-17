@@ -948,14 +948,21 @@
          ierr = 0
          vec => vec_ary
 
-         rate_file = trim(rates_table_dir) // '/' // trim(f_name)
-         !write(*,*) 'load table ' // trim(rate_file)
+
+         ! Look for the file based on its name first
+         
+         rate_file = trim(f_name)
          
          open(newunit=iounit,file=trim(rate_file),action='read',status='old',iostat=ierr)
          if (ierr /= 0) then
-            write(*,*) 'ERROR: cannot open rate info file ' // trim(rate_file)
-            !return
-            call mesa_error(__FILE__,__LINE__)
+            ! Look in rates_table_dir
+            rate_file = trim(rates_table_dir) // '/' // trim(f_name)
+            open(newunit=iounit,file=trim(rate_file),action='read',status='old',iostat=ierr)
+            if (ierr /= 0) then
+               write(*,*) 'ERROR: cannot open rate info file ' // trim(rate_file)
+               !return
+               call mesa_error(__FILE__,__LINE__)
+            end if
          end if
 
          do ! read until reach line starting with an integer (nT8s)
