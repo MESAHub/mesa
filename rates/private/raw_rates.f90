@@ -909,7 +909,10 @@
          dlambda_dlnT = 0d0
 
          call do_reaclib_indices_for_reaction(reaction_name(rir), reaclib_rates, lo, hi, ierr)
-         if(ierr/=0) return 
+         if(ierr/=0) then
+            write(*,*) "Error: Could not get reaclib index for rate ",rir, ' ',trim(reaction_name(rir))
+            return 
+         end if
 
          inv_lambda = 0d0
          dinv_lambda_dlnT = 0d0
