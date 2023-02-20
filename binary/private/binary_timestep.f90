@@ -165,39 +165,38 @@
          if (b% fj > 0) then
             rel_change = abs(j_change/b% angular_momentum_j)
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fj_hard > 0d0 .and. rel_change > b% fj_hard) then
+               b% fj_hard > 0d0 .and. rel_change > b% fj_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fj_hard limit,", &
                   "fj_hard:", b% fj_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                b% have_to_reduce_timestep_due_to_j = .true.
                return
             end if
-            dtj = s% time_step/(rel_change/b% fj+1d-99)
+            dtj = s% time_step/(rel_change/(b% fj * b% time_delta_coeff)+1d-99)
          end if
 
          if (b% fm > 0) then
             rel_change = abs(env_change/max(b% env(b% d_i), b% fm_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fm_hard > 0d0 .and. rel_change > b% fm_hard) then
+               b% fm_hard > 0d0 .and. rel_change > b% fm_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fm_hard limit,", &
                   "fm_hard:", b% fm_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dtm = s% time_step/(rel_change/b% fm+1d-99)
+            dtm = s% time_step/(rel_change/(b% fm * b% time_delta_coeff)+1d-99)
          end if
          
          if (b% fr > 0) then
             rel_change = abs(rel_gap_change/max(-b% rl_relative_gap(b% d_i), b% fr_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fr_hard > 0d0 .and. rel_change > b% fr_hard) then
+               b% fr_hard > 0d0 .and. rel_change > b% fr_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fr_hard limit for donor,", &
                   "fr_hard:", b% fr_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dtr = s% time_step/ &
-                (rel_change/b% fr+1d-99)
+            dtr = s% time_step/(rel_change/(b% fr * b% time_delta_coeff)+1d-99)
 
             ! Check for accretor as well
             if (b% rl_relative_gap_old(b% a_i) /= 0) then
@@ -207,61 +206,60 @@
             end if
             rel_change = abs(rel_gap_change/max(-b% rl_relative_gap(b% a_i), b% fr_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fr_hard > 0d0 .and. rel_change > b% fr_hard) then
+               b% fr_hard > 0d0 .and. rel_change > b% fr_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fr_hard limit for accretor,", &
                   "fr_hard:", b% fr_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dtr = min(dtr, s% time_step/ &
-                (rel_change/b% fr+1d-99))
+            dtr = min(dtr, s% time_step/(rel_change/(b% fr * b% time_delta_coeff)+1d-99))
          end if
          if (dtr < b% fr_dt_limit) dtr = b% fr_dt_limit
 
          if (b% fa > 0) then
             rel_change = abs(sep_change/b% separation)
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fa_hard > 0d0 .and. rel_change > b% fa_hard) then
+               b% fa_hard > 0d0 .and. rel_change > b% fa_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fa_hard limit,", &
                   "fa_hard:", b% fa_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dta = s% time_step/(rel_change/b% fa+1d-99)
+            dta = s% time_step/(rel_change/(b% fa * b% time_delta_coeff)+1d-99)
          end if
 
          if (b% fe > 0) then
-            rel_change = abs(e_change/ max( b% eccentricity, b% fe_limit ))
+            rel_change = abs(e_change/ max(b% eccentricity, b% fe_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fe_hard > 0d0 .and. rel_change > b% fe_hard) then
+               b% fe_hard > 0d0 .and. rel_change > b% fe_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fe_hard limit,", &
                   "fe_hard:", b% fe_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dte = s% time_step/(rel_change/b% fe+1d-99)
+            dte = s% time_step/(rel_change/(b% fe * b% time_delta_coeff)+1d-99)
          end if
 
          if (b% fdm > 0d0) then
             rel_change = abs(b% m(b% d_i) - b% m_old(b% d_i))/b% m_old(b% d_i)
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fdm_hard > 0d0 .and. rel_change > b% fdm_hard) then
+               b% fdm_hard > 0d0 .and. rel_change > b% fdm_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fdm_hard limit for donor,", &
                   "fdm_hard:", b% fdm_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dtdm = s% time_step/(rel_change/b% fdm+1d-99)
+            dtdm = s% time_step/(rel_change/(b% fdm * b% time_delta_coeff)+1d-99)
 
             rel_change = abs(b% m(b% a_i) - b% m_old(b% a_i))/b% m_old(b% a_i)
             if (.not. b% ignore_hard_limits_this_step .and. &
-               b% fdm_hard > 0d0 .and. rel_change > b% fdm_hard) then
+               b% fdm_hard > 0d0 .and. rel_change > b% fdm_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fdm_hard limit for accretor,", &
                   "fdm_hard:", b% fdm_hard, "rel_change:", rel_change
                binary_pick_next_timestep = retry
                return
             end if
-            dtdm = min(dtdm, s% time_step/(rel_change/b% fdm+1d-99))
+            dtdm = min(dtdm, s% time_step/(rel_change/(b% fdm * b% time_delta_coeff)+1d-99))
          end if
 
          set_dt = min(dtm, dtr, dtj, dta, dte, dtdm)
