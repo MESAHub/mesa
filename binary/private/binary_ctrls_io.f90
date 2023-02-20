@@ -59,6 +59,7 @@
          extra_binary_terminal_output_file, &
 
          ! timestep controls
+         time_delta_coeff, &
          fm, &
          fm_hard, &
          fa, &
@@ -364,6 +365,7 @@
          b% extra_binary_terminal_output_file = extra_binary_terminal_output_file
 
          ! timestep controls
+         b% time_delta_coeff = time_delta_coeff
          b% fm = fm
          b% fm_hard = fm_hard
          b% fa = fa
@@ -561,6 +563,7 @@
          extra_binary_terminal_output_file = b% extra_binary_terminal_output_file
 
          ! timestep controls
+         time_delta_coeff = b% time_delta_coeff
          fm = b% fm
          fa = b% fa
          fr = b% fr

@@ -193,6 +193,13 @@
 !          'b_deltam'             fdm
 
 
+! time_delta_coeff
+! ~~~~~~~~~~~~~~~~
+! similarly to star/time_delta_coeff, this time_delta_coeff can be scaled to force smaller timestep for binary timestep
+! controls
+
+    time_delta_coeff = 1d0
+
 ! fm
 ! ~~
 ! fm_hard
