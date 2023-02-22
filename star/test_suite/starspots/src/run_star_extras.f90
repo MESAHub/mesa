@@ -165,7 +165,7 @@
          
         !------------------------------
          !if (s% star_age >= 10d0) then
-         if (.not. s% doing_relax) then
+         if (.not. s% doing_relax .and. .not. s% doing_first_model_of_run) then
             xspot_of_r = (P - PB_i)/P 
             gradr_spot = gradr/( fspot*pow4(xspot_of_r) + 1d0 - fspot)
          else
