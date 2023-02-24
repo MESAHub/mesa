@@ -1,6 +1,8 @@
 Quickstart
 ==========
 
+If you haven't already, it's a good idea to sign up for the `mesa-users mailing list <https://lists.mesastar.org/mailman/listinfo/mesa-users>`_. This mailing list is the place to post questions asking the MESA community for help, and you may be able to find the answers to common questions by searching through the `mesa-users list archive <https://lists.mesastar.org/pipermail/mesa-users/>`_. This mailing list is also the place where the MESA team posts important announcements like new MESA releases.
+
 Many questions that appear on the mesa-users list have answers already available somewhere in the MESA world. Navigating through this world is not always straightforward. Here is a little guide on how to do that.
 
 1. Installation
