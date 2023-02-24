@@ -1582,6 +1582,14 @@
          
          s% rate_factors(:) = 1
          if (s% job% num_special_rate_factors <= 0) return
+
+         ! Dont error if we are changing net
+         if ((s% job% change_initial_net .or. s% job% change_net) .and. &
+            trim(s% job% new_net_name)/=trim(s% net_name)) then
+               !write(*,*) "Not changing special rates untill net change"
+               return
+         end if
+
          
          call get_net_reaction_table_ptr(s% net_handle, net_reaction_ptr, ierr)
          if (ierr /= 0) return
@@ -1592,14 +1600,14 @@
             j = 0
             if (ir > 0) j = net_reaction_ptr(ir)
             if (j <= 0) then
-               write(*,2) 'Failed to find reaction_for_special_factor ' // &
+               write(*,*) 'Failed to find reaction_for_special_factor ' // &
                trim(s% job% reaction_for_special_factor(i)), &
                j, s% job% special_rate_factor(i)
                error = .true.
                cycle
             end if
             s% rate_factors(j) = s% job% special_rate_factor(i)
-            write(*,2) 'set special rate factor for ' // &
+            write(*,*) 'set special rate factor for ' // &
                   trim(s% job% reaction_for_special_factor(i)), &
                   j, s% job% special_rate_factor(i)
          end do
