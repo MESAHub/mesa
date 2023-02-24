@@ -362,7 +362,8 @@
          integer, parameter :: ir_h1_h1_he4_to_he3_he3 = ir_he3_he3_to_h1_h1_he4+1
          integer, parameter :: ir_he4_he4_he4_to_c12 = ir_h1_h1_he4_to_he3_he3+1
          integer, parameter :: ir_li7_pa_he4 = ir_he4_he4_he4_to_c12+1
-         integer, parameter :: ir_mg24_ag_si28 = ir_li7_pa_he4+1
+         integer, parameter :: ir_he4_ap_li7 = ir_li7_pa_he4+1
+         integer, parameter :: ir_mg24_ag_si28 = ir_he4_ap_li7+1
          integer, parameter :: ir_mg24_ap_al27 = ir_mg24_ag_si28+1
          integer, parameter :: ir_mg24_ga_ne20 = ir_mg24_ap_al27+1
          integer, parameter :: ir_n13_ap_o16 = ir_mg24_ga_ne20+1
