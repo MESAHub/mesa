@@ -126,10 +126,10 @@ MESA will keep you updated via terminal output that looks like this:
 
 MESA will also display some pgstar plots that look like:
 
-.. figure:: hr_000800.png
+.. figure:: hr_000200.png
    :alt: HR Diagram
 
-.. figure:: trho_profile_000800.png
+.. figure:: trho_profile_000200.png
    :alt: TRho Profile
 
 This should run for 208 steps before stopping with the following
