@@ -76,6 +76,7 @@
          i = 0
          if (s% use_other_mesh_functions) &
             call s% how_many_other_mesh_fcns(s% id, i)
+         if (s% convective_bdy_weight > 0) i=i+1
          if (s% E_function_weight > 0) i=i+1
          if (s% P_function_weight > 0) i=i+1
          if (s% T_function1_weight > 0) i=i+1
@@ -175,6 +176,9 @@
          if (s% omega_function_weight > 0 .and. s% rotation_flag) then
             i = i+1; names(i) = 'omega_function'
          end if
+         if (s% convective_bdy_weight > 0) then
+            i = i+1; names(i) = 'newly_nonconv'
+         end if
          do k=1,num_xa_function
             if (do_mass_function(s, s% xa_function_species(k), s% xa_function_weight(k), j)) then
                i = i+1; names(i) = trim(s% xa_function_species(k))
@@ -263,6 +267,10 @@
                   vals(k,i) = s% omega_function_weight*log10(max(1d-99,abs(s% omega(k))))
                end do
 
+            else if (names(i) == 'newly_nonconv') then
+               !call do_newly_nonconvective(i)
+               call do_mix_type_change(i)
+
             else
                do k=1,num_xa_function
                   call do1_xa_function(k,i)
@@ -273,6 +281,23 @@
          end do
 
          contains
+
+
+         subroutine do_mix_type_change(i)
+            integer, intent(in) :: i
+            integer :: k, j
+            if (s% dt < s% convective_bdy_min_dt_yrs*secyer) return
+            do k=1,nz
+               if (s% dq(k) < s% convective_bdy_dq_limit) cycle
+               if (s% cz_bdy_dq(k) /= 0) vals(k,i) = s% convective_bdy_weight
+            end do
+            do j=1,5
+               do k=2,nz
+                  vals(k,i) = vals(k,i) + vals(k-1,i)
+               end do
+            end do
+
+         end subroutine do_mix_type_change
 
          subroutine do1_xa_function(k,i)
             integer, intent(in) :: k,i

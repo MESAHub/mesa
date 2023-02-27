@@ -233,6 +233,7 @@
     E_function_weight, E_function_param, P_function_weight, &
     mesh_logX_species, &
     mesh_logX_min_for_extra, mesh_dlogX_dlogP_extra, mesh_dlogX_dlogP_full_on, mesh_dlogX_dlogP_full_off, &
+    convective_bdy_min_dt_yrs, convective_bdy_dq_limit, convective_bdy_weight, &
 
     mesh_dlog_eps_min_for_extra, mesh_dlog_eps_dlogP_full_on, mesh_dlog_eps_dlogP_full_off, &
     mesh_dlog_pp_dlogP_extra, mesh_dlog_cno_dlogP_extra, mesh_dlog_3alf_dlogP_extra, &
@@ -1492,6 +1493,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% mesh_dlogX_dlogP_extra = mesh_dlogX_dlogP_extra
  s% mesh_dlogX_dlogP_full_on = mesh_dlogX_dlogP_full_on
  s% mesh_dlogX_dlogP_full_off = mesh_dlogX_dlogP_full_off
+
+ s% convective_bdy_min_dt_yrs = convective_bdy_min_dt_yrs
+ s% convective_bdy_weight = convective_bdy_weight
+ s% convective_bdy_dq_limit = convective_bdy_dq_limit
 
  s% mesh_dlog_eps_min_for_extra = mesh_dlog_eps_min_for_extra
  s% mesh_dlog_eps_dlogP_full_on = mesh_dlog_eps_dlogP_full_on
@@ -3178,6 +3183,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  mesh_dlogX_dlogP_extra = s% mesh_dlogX_dlogP_extra
  mesh_dlogX_dlogP_full_on = s% mesh_dlogX_dlogP_full_on
  mesh_dlogX_dlogP_full_off = s% mesh_dlogX_dlogP_full_off
+
+ convective_bdy_min_dt_yrs = s% convective_bdy_min_dt_yrs
+ convective_bdy_weight = s% convective_bdy_weight
+ convective_bdy_dq_limit = s% convective_bdy_dq_limit
 
  mesh_dlog_eps_min_for_extra = s% mesh_dlog_eps_min_for_extra
  mesh_dlog_eps_dlogP_full_on = s% mesh_dlog_eps_dlogP_full_on
