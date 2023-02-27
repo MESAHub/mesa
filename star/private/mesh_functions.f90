@@ -177,7 +177,7 @@
             i = i+1; names(i) = 'omega_function'
          end if
          if (s% convective_bdy_weight > 0) then
-            i = i+1; names(i) = 'newly_nonconv'
+            i = i+1; names(i) = 'convective_bdy'
          end if
          do k=1,num_xa_function
             if (do_mass_function(s, s% xa_function_species(k), s% xa_function_weight(k), j)) then
@@ -267,9 +267,8 @@
                   vals(k,i) = s% omega_function_weight*log10(max(1d-99,abs(s% omega(k))))
                end do
 
-            else if (names(i) == 'newly_nonconv') then
-               !call do_newly_nonconvective(i)
-               call do_mix_type_change(i)
+            else if (names(i) == 'convective_bdy') then
+               call do_conv_bdy(i)
 
             else
                do k=1,num_xa_function
@@ -283,21 +282,35 @@
          contains
 
 
-         subroutine do_mix_type_change(i)
+         subroutine do_conv_bdy(i)
             integer, intent(in) :: i
             integer :: k, j
+
+            vals(1:nz,i) = 0
+
             if (s% dt < s% convective_bdy_min_dt_yrs*secyer) return
-            do k=1,nz
+
+            !do k=1,nz
+            !   if (s% dq(k) < s% convective_bdy_dq_limit) cycle
+            !   if (s% cz_bdy_dq(k) /= 0) vals(k,i) = s% convective_bdy_weight
+            !end do
+
+            do j = 1, s% num_conv_boundaries
+               k = s% conv_bdy_loc(j)
                if (s% dq(k) < s% convective_bdy_dq_limit) cycle
-               if (s% cz_bdy_dq(k) /= 0) vals(k,i) = s% convective_bdy_weight
-            end do
-            do j=1,5
-               do k=2,nz
-                  vals(k,i) = vals(k,i) + vals(k-1,i)
-               end do
+               vals(k,i) = s% convective_bdy_weight
+               if (k < nz .and. s% top_conv_bdy(i)) then
+                  vals(k+1,i) = s% convective_bdy_weight
+               else if (k > 1 .and. .not. s% top_conv_bdy(i)) then
+                  vals(k-1,i) = s% convective_bdy_weight
+               end if
             end do
 
-         end subroutine do_mix_type_change
+            do k=2,nz
+               vals(k,i) = vals(k,i) + vals(k-1,i)
+            end do
+            
+         end subroutine do_conv_bdy
 
          subroutine do1_xa_function(k,i)
             integer, intent(in) :: k,i
