@@ -6270,10 +6270,9 @@
          !### convective_bdy_min_dt_yrs
 
          ! Mesh function to enhance resolution near convective boundaries
-         ! including regions that are newly nonconvective because of moving boundary.
 
       convective_bdy_weight = 0
-      convective_bdy_dq_limit = 1d-4
+      convective_bdy_dq_limit = 3d-5
       convective_bdy_min_dt_yrs = 1d-3
 
       ! max_rel_delta_IE_for_mesh_total_energy_balance
