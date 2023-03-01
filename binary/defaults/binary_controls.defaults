@@ -313,11 +313,12 @@
 
 ! ::
 
-!     dt_next_max = 10**(dt_softening_factor*log10(dt_next_max) + &
-!         (1-dt_softening_factor)*log10(dt_next_max_old))
+!     dt_next_max = 10**(dt_softening_factor*log10(dt_next_max_old) + &
+!         (1-dt_softening_factor)*log10(dt_next_max))
 
 ! where ``dt_next_max_old`` is the limit used in the previous step. This is meant
-! to avoid large changes in dt. Values must be < 1 and >= 0.
+! to avoid large changes in dt. Values must be < 1 and >= 0, 1 meaning constant dt,
+! 0 meaning no softening
 
 ! ::
 

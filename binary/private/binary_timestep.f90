@@ -282,8 +282,8 @@
 
          if (set_dt < 1d-7) set_dt = 1d-7 ! there's a limit to everything
 
-         b% max_timestep = exp10(b% dt_softening_factor*log10(set_dt*secyer) + &
-             (1-b% dt_softening_factor)*log10(b% max_timestep))
+         b% max_timestep = exp10(b% dt_softening_factor*log10(b% max_timestep) + &
+             (1-b% dt_softening_factor)*log10(set_dt*secyer))
 
          ! use variable varcontrols for different phases of evolution
          if (abs(b% mtransfer_rate)/Msun*secyer > 1d-20) then
