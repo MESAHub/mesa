@@ -706,6 +706,12 @@ contains
             if (will_read_pgbinary_inlist) then
                call read_pgbinary_inlist(b, inlist_fname, ierr)
                if (failed('read_pgbinary_controls', ierr)) return
+               if (b% point_mass_i /= 1) &
+                  call read_pgstar_inlist(b% s1, b% job% inlist_names(1), ierr)
+               if (failed('read_pgstar_controls 1', ierr)) return
+               if (b% point_mass_i /= 2) &
+                  call read_pgstar_inlist(b% s2, b% job% inlist_names(2), ierr)
+               if (failed('read_pgstar_controls 2', ierr)) return
             end if
          end if
          if (result == keep_going .and. b% job% pgbinary_flag) then
