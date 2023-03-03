@@ -24,7 +24,8 @@ module pgbinary
    use chem_def, only : category_name
    use rates_def, only : i_rate
    use pgbinary_support
-   use pgstar, only : pgstar_clear, read_pgstar_data
+   use pgstar, only : pgstar_clear, read_pgstar_data, &
+      update_pgstar_history_file, update_pgstar_data
 
    implicit none
 
@@ -775,8 +776,9 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer(i8) :: time0, time1, clock_rate
-      logical ::do_pause
+      integer :: i
+      integer(8) :: time0, time1, clock_rate
+      logical :: pause, fexists
 
       include 'formats'
 
@@ -786,14 +788,20 @@ contains
 
       call update_pgbinary_data(b, ierr)
       if (failed('update_pgbinary_data')) return
+      ! update pgstar data if stars present
+      if (b% point_mass_i /= 1) call update_pgstar_data(b% s1, ierr)
+      if (b% point_mass_i /= 2) call update_pgstar_data(b% s2, ierr)
       call onScreen_Plots(b, must_write_files, ierr)
       if (failed('onScreen_Plots')) return
       call update_pgbinary_history_file(b, ierr)
       if (failed('save_text_data')) return
-      do_pause = b% pg% pause_flag
-      if ((.not. do_pause) .and. b% pg% pause_interval > 0) &
-      do_pause = (mod(b% model_number, b% pg% pause_interval) == 0)
-      if (do_pause) then
+      ! update pgstar data if stars present
+      if (b% have_star_1) call update_pgstar_history_file(b% s1, ierr)
+      if (b% have_star_2) call update_pgstar_history_file(b% s2, ierr)
+      pause = b% pg% pause
+      if ((.not. pause) .and. b% pg% pause_interval > 0) &
+         pause = (mod(b% model_number, b% pg% pause_interval) == 0)
+      if (pause) then
          write(*, *)
          write(*, *) 'model_number', b% model_number
          write(*, *) 'pgbinary: paused -- hit RETURN to continue'
