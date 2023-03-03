@@ -16,6 +16,8 @@ contains
       type (binary_info), pointer :: b
       type (star_info), pointer :: s
 
+      include 'formats'
+
       call math_init  ! we need this for exp10
 
       write(*, *) 'check time_delta_coeff behavior'
@@ -60,16 +62,16 @@ contains
       ! max(rel_change, fr_limit) / fr = 2d0 = cut factor
       res = binary_pick_next_timestep(b)
 
-      write(*, *) b% max_timestep / secyer  ! should be 5
+      write(*,1) 'b% max_timestep / secyer', b% max_timestep / secyer  ! should be 5
 
       b% max_timestep = 10d0
       b% time_delta_coeff = 0.5d0
       ! now fr is effectively 0.5d-2, so timestep cut in 4 this time
       res = binary_pick_next_timestep(b)
 
-      write(*, *) b% max_timestep / secyer  ! should be 2.5
+      write(*,1) 'b% max_timestep / secyer', b% max_timestep / secyer  ! should be 2.5
 
-      write(*, *) 'done'
+      write(*,'(a)') 'done'
 
    end subroutine do_test
 
