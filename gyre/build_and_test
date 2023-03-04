@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [[ ! -d gyre ]]; then
-    tar xf gyre-6.0.tar.gz
-    mv gyre-6.0 gyre
+    tar xf gyre-7.0.tar.gz
+    mv gyre-7.0 gyre
 fi
 
 ../utils/build_and_test
