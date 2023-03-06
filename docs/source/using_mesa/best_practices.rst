@@ -184,12 +184,12 @@ Second, modify ``inlist_semiconvection_header``
 
   change
 
-      !read_extra_pgstar_inlist1 = .true.
-      !extra_pgstar_inlist1_name = 'inlist_semiconvection'
+      !read_extra_pgstar_inlist(1) = .true.
+      !extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
 
   to
-      read_extra_pgstar_inlist1 = .true.
-      extra_pgstar_inlist1_name = 'inlist_semiconvection'  
+      read_extra_pgstar_inlist(1) = .true.
+      extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
 
    and save the file changes.
 
@@ -455,7 +455,7 @@ that is:
 .. code-block:: latex
 
   Modules for Experiments in Stellar Astrophysics
-  \citep[MESA][]{Paxton2011, Paxton2013, Paxton2015, Paxton2018, Paxton2019, Jermyn2022}.
+  \citep[MESA][]{Paxton2011, Paxton2013, Paxton2015, Paxton2018, Paxton2019, Jermyn2023}.
 
 
 MESA critically rests on the hard work of many researchers who have
