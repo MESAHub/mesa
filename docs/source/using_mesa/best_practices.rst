@@ -184,12 +184,12 @@ Second, modify ``inlist_semiconvection_header``
 
   change
 
-      !read_extra_pgstar_inlist(1) = .true.
-      !extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
+      !read_extra_pgstar_inlist1 = .true.
+      !extra_pgstar_inlist1_name= 'inlist_semiconvection'
 
   to
-      read_extra_pgstar_inlist(1) = .true.
-      extra_pgstar_inlist_name(1)= 'inlist_semiconvection'
+      read_extra_pgstar_inlist1 = .true.
+      extra_pgstar_inlist1_name= 'inlist_semiconvection'
 
    and save the file changes.
 
