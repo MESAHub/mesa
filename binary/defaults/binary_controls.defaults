@@ -656,8 +656,6 @@
 !     else
 !        change_factor = change_factor*(1.0-implicit_lambda) &
 !           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_prev/mass_transfer_rate-1))
-!        change_factor = change_factor*(1.0-implicit_lambda) &
-!           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_rate/mass_transfer_prev-1))
 !     end if
 
 ! Choosing ``implicit_lambda = 0`` will keep the change factor constant.
