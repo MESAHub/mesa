@@ -188,7 +188,7 @@
          end if
          
          if (b% fr > 0) then
-            rel_change = abs(rel_gap_change/max(-b% rl_relative_gap(b% d_i), b% fr_limit))
+            rel_change = abs(rel_gap_change/max(abs(b% rl_relative_gap(b% d_i)), b% fr_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
                b% fr_hard > 0d0 .and. rel_change > b% fr_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fr_hard limit for donor,", &
@@ -204,7 +204,7 @@
             else
                rel_gap_change = 0
             end if
-            rel_change = abs(rel_gap_change/max(-b% rl_relative_gap(b% a_i), b% fr_limit))
+            rel_change = abs(rel_gap_change/max(abs(b% rl_relative_gap(b% a_i)), b% fr_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
                b% fr_hard > 0d0 .and. rel_change > b% fr_hard * b% time_delta_coeff) then
                write(*,*) "retry because of fr_hard limit for accretor,", &
