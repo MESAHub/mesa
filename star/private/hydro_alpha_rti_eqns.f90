@@ -136,8 +136,7 @@
          instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable         
          if (instability2 <= 0d0 .or. &
                s% q(k) > s% alpha_RTI_src_max_q .or. &
-               s% q(k) < s% alpha_RTI_src_min_q .or. &
-               s% rho(k) < 1d99) then
+               s% q(k) < s% alpha_RTI_src_min_q) then
             source_plus = 0d0
             instability2 = 0d0
             instability = 0d0
