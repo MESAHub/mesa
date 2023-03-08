@@ -54,7 +54,7 @@
          call get1_momentum_eqn( &
             s, 1, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
+            if (s% report_ierr) write(*,2) 'ierr /= 0 for do_surf_momentum_eqn'
             return
          end if         
          call store_partials( &
@@ -75,7 +75,7 @@
          call get1_momentum_eqn( &
             s, k, P_surf_ad, nvar, d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
+            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_momentum_eqn', k
             return
          end if         
          call store_partials( &
@@ -112,7 +112,7 @@
 
          include 'formats'
          
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          ierr = 0
@@ -189,7 +189,7 @@
             ! rho represents the inertial (gravitational) mass density.
             ! since dm is baryonic mass, correct dm_face when using mass corrections
             ! this will be used in the calculation of dm_div_A
-            if (s% ctrl% use_mass_corrections) then
+            if (s% use_mass_corrections) then
                if (k > 1) then
                   dm_face = (s% dm(k)*s% mass_correction(k) + s% dm(k-1)*s% mass_correction(k-1))/2d0
                else ! k == 1
@@ -243,10 +243,10 @@
             type(auto_diff_real_star_order1) :: rho_00, rho_m1
             ierr = 0
             ! d_mlt_Pturb = difference in MLT convective pressure across face
-            if (s% ctrl% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
                rho_00 = wrap_d_00(s,k)
                rho_m1 = wrap_d_m1(s,k)
-               d_mlt_Pturb_ad = s% ctrl% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
+               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
             else
                d_mlt_Pturb_ad = 0d0
             end if
@@ -263,10 +263,10 @@
             if (.not. s% RTI_flag) return
             if (k >= s% nz .or. k <= 1) return
             ! diffusion of specific momentum (i.e. v)
-            if (s% ctrl% dudt_RTI_diffusion_factor > 0d0) then ! add diffusion source term to dvdt
+            if (s% dudt_RTI_diffusion_factor > 0d0) then ! add diffusion source term to dvdt
                ! sigmid_RTI(k) is mixing flow at center k in (gm sec^1)
-               sigm1 = s% ctrl% dudt_RTI_diffusion_factor*s% sigmid_RTI(k-1)
-               sig00 = s% ctrl% dudt_RTI_diffusion_factor*s% sigmid_RTI(k)
+               sigm1 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k-1)
+               sig00 = s% dudt_RTI_diffusion_factor*s% sigmid_RTI(k)
                v_p1 = wrap_v_p1(s, k)
                v_00 = wrap_v_00(s, k)
                v_m1 = wrap_v_m1(s, k)
@@ -277,8 +277,8 @@
             end if
             ! kick to adjust densities
             if (s% eta_RTI(k) > 0d0 .and. &
-               s% ctrl% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
-               f = s% ctrl% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/dm_div_A_ad
+               s% dlnddt_RTI_diffusion_factor > 0d0 .and. s% dt > 0d0) then
+               f = s% dlnddt_RTI_diffusion_factor*s% eta_RTI(k)/dm_div_A_ad
                rho_00 = wrap_d_00(s, k)
                rho_m1 = wrap_d_m1(s, k)
                dvdt_kick = f*(rho_00 - rho_m1)/s% dt ! change v according to direction of lower density
@@ -327,10 +327,10 @@
             if (is_bad(dequ)) then
 !$omp critical (hydro_momentum_crit2)
                ierr = -1
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
                   write(*,2) 'get1_momentum_eqn: bad ' // trim(str), k, dequ
                end if
-               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_momentum_eqn')
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_momentum_eqn')
 !$omp end critical (hydro_momentum_crit2)
                return
             end if
@@ -356,13 +356,13 @@
          call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          if (ierr /= 0) return
 
-         if (s% rotation_flag .and. s% ctrl% use_gravity_rotation_correction) then
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
             grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
          else
             grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
          end if
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          if (test_partials) then
@@ -396,7 +396,7 @@
          ierr = 0
          
          extra_ad = 0d0
-         if (s% ctrl% use_other_momentum .or. s% ctrl% use_other_momentum_implicit) then
+         if (s% use_other_momentum .or. s% use_other_momentum_implicit) then
             extra_ad = s% extra_grav(k)
          end if
          
@@ -407,7 +407,7 @@
                local_v_flag = .true.
             else
                local_v_flag = &
-                  (s% xh_old(s% i_lnT,k)/ln10 >= s% ctrl% velocity_logT_lower_bound)
+                  (s% xh_old(s% i_lnT,k)/ln10 >= s% velocity_logT_lower_bound)
             end if
 
             if (local_v_flag) then
@@ -435,7 +435,7 @@
          other_ad = extra_ad - accel_ad + Uq_ad
          other = other_ad%val
          
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          if (test_partials) then
@@ -524,7 +524,7 @@
             d_iPtotavg_dxa00(j) = -iPtotavg*d_Ptotavg_dxa00(j)/Ptotavg
          end do
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -548,14 +548,14 @@
             dr_div_r0_actual, dr_div_r0_expected, dr
          logical :: test_partials, force_zero_v
          include 'formats'
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          ierr = 0         
          if (.not. (s% u_flag .or. s% v_flag)) call mesa_error(__FILE__,__LINE__,'must have either v or u for do1_radius_eqn')
          
-         force_zero_v = (s% q(k) > s% ctrl% velocity_q_upper_bound) .or. &
-            (s% lnT_start(k)/ln10 < s% ctrl% velocity_logT_lower_bound .and. &
-               s% dt < secyer*s% ctrl% max_dt_yrs_for_velocity_logT_lower_bound)                  
+         force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
+            (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &
+               s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
          if (force_zero_v) then
             if (s% u_flag) then
                v00 = wrap_u_00(s,k)

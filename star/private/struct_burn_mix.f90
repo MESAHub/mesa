@@ -68,7 +68,7 @@
             return
          end if        
 
-         if (s% ctrl% use_other_before_struct_burn_mix) then
+         if (s% use_other_before_struct_burn_mix) then
             call s% other_before_struct_burn_mix(s% id, dt, do_struct_burn_mix)
             if (do_struct_burn_mix /= keep_going) return
          end if
@@ -83,12 +83,12 @@
 
          do_struct_burn_mix = retry
          
-         s% do_burn = (s% ctrl% dxdt_nuc_factor > 0d0)
-         s% do_mix = (s% ctrl% mix_factor > 0d0)
+         s% do_burn = (s% dxdt_nuc_factor > 0d0)
+         s% do_mix = (s% mix_factor > 0d0)
          
-         if (s% ctrl% op_split_burn) then
+         if (s% op_split_burn) then
             do k=1,nz
-               if (s% T(k) >= s% ctrl% op_split_burn_min_T) then
+               if (s% T(k) >= s% op_split_burn_min_T) then
                   s% burn_num_iters(k) = 0
                   s% eps_nuc(k) = 0d0
                   s% d_epsnuc_dlnd(k) = 0d0
@@ -104,12 +104,12 @@
             end do
          end if
          
-         if (s% do_burn .and. s% ctrl% op_split_burn) then
+         if (s% do_burn .and. s% op_split_burn) then
             total = 0
             do k=1,s% nz
                total = total - s% energy(k)*s% dm(k)
             end do
-            if (s% ctrl% trace_evolve) write(*,*) 'call do_burn'
+            if (s% trace_evolve) write(*,*) 'call do_burn'
             do_struct_burn_mix = do_burn(s, dt)
             if (do_struct_burn_mix /= keep_going) then
                write(*,2) 'failed in do_burn', s% model_number
@@ -122,7 +122,7 @@
                total = total + s% energy(k)*s% dm(k)
             end do
             s% non_epsnuc_energy_change_from_split_burn = total
-            if (s% ctrl% trace_evolve) write(*,*) 'done do_burn'
+            if (s% trace_evolve) write(*,*) 'done do_burn'
          end if
          
          if (s% doing_first_model_of_run) then
@@ -136,7 +136,7 @@
          if (s% do_mix) then
             call get_convection_sigmas(s, dt, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'get_convection_sigmas failed'
+               if (s% report_ierr) write(*,*) 'get_convection_sigmas failed'
                return
             end if
          else
@@ -169,15 +169,15 @@
 
          call save_start_values(s, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'save_start_values failed'
+            if (s% report_ierr) write(*,*) 'save_start_values failed'
             return
          end if
                      
-         if (s% ctrl% trace_evolve) write(*,*) 'call solver'
+         if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
-         if (s% ctrl% trace_evolve) write(*,*) 'done solver'
+         if (s% trace_evolve) write(*,*) 'done solver'
 
          s% total_num_solver_iterations = &
             s% total_num_solver_iterations + s% num_solver_iterations
@@ -208,7 +208,7 @@
          if (.not. s% j_rot_flag) &
             do_struct_burn_mix = do_mix_omega(s,dt)
 
-         if (s% ctrl% use_other_after_struct_burn_mix) &
+         if (s% use_other_after_struct_burn_mix) &
             call s% other_after_struct_burn_mix(s% id, dt, do_struct_burn_mix)
 
          s% solver_iter = 0 ! to indicate that no longer doing solver iterations
@@ -247,7 +247,7 @@
             ! omega before angular momentum mix
             call set_i_rot(s, .false.)
             call set_omega(s, 'struct_burn_mix')
-            if (s% ctrl% premix_omega) then
+            if (s% premix_omega) then
                do_mix_omega = do_solve_omega_mix(s, 0.5d0*dt)
             else
                do_mix_omega = do_solve_omega_mix(s, dt)
@@ -268,7 +268,7 @@
          ierr = 0
          call rsp_one_step(s,ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'ierr from rsp_one_step'
+            if (s% report_ierr) write(*,*) 'ierr from rsp_one_step'
             do_rsp_step = retry
          end if
       end function do_rsp_step
@@ -398,7 +398,7 @@
          n = nz*nvar
          call work_sizes_for_solver(ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*, *) 'do_solver_converge: work_sizes_for_solver failed'
+            if (s% report_ierr) write(*, *) 'do_solver_converge: work_sizes_for_solver failed'
             do_solver_converge = retry
             s% result_reason = nonzero_ierr
             s% termination_code = t_solve_hydro
@@ -412,7 +412,7 @@
             return
          end if
 
-         report = (s% ctrl% report_solver_progress .or. s% ctrl% report_ierr)
+         report = (s% report_solver_progress .or. s% report_ierr)
          
          s% solver_call_number = s% solver_call_number + 1
 
@@ -473,7 +473,7 @@
          if (s% RSP2_flag) then
             call RSP2_adjust_vars_before_call_solver(s, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'failed in RSP2_adjust_vars_before_call_solver'
+               if (s% report_ierr) write(*,*) 'failed in RSP2_adjust_vars_before_call_solver'
                return
             end if
          end if
@@ -525,15 +525,15 @@
          real(dp), intent(in) :: T_max
          real(dp), intent(out) :: tol_correction_norm, tol_max_correction
          include 'formats'
-         if (T_max >= s% ctrl% tol_correction_extreme_T_limit) then
-            tol_correction_norm = s% ctrl% tol_correction_norm_extreme_T
-            tol_max_correction = s% ctrl% tol_max_correction_extreme_T
-         else if (T_max >= s% ctrl% tol_correction_high_T_limit) then
-            tol_correction_norm = s% ctrl% tol_correction_norm_high_T
-            tol_max_correction = s% ctrl% tol_max_correction_high_T
+         if (T_max >= s% tol_correction_extreme_T_limit) then
+            tol_correction_norm = s% tol_correction_norm_extreme_T
+            tol_max_correction = s% tol_max_correction_extreme_T
+         else if (T_max >= s% tol_correction_high_T_limit) then
+            tol_correction_norm = s% tol_correction_norm_high_T
+            tol_max_correction = s% tol_max_correction_high_T
          else
-            tol_correction_norm = s% ctrl% tol_correction_norm
-            tol_max_correction = s% ctrl% tol_max_correction
+            tol_correction_norm = s% tol_correction_norm
+            tol_max_correction = s% tol_max_correction
          end if
       end subroutine set_tol_correction
 
@@ -573,22 +573,22 @@
          s% using_gold_tolerances = .false.
          gold_tolerances_level = 0
          
-         if ((s% ctrl% use_gold2_tolerances .and. s% ctrl% steps_before_use_gold2_tolerances < 0) .or. &
-             (s% ctrl% steps_before_use_gold2_tolerances >= 0 .and. &
-                s% model_number > s% ctrl% steps_before_use_gold2_tolerances + max(0,s% init_model_number))) then
+         if ((s% use_gold2_tolerances .and. s% steps_before_use_gold2_tolerances < 0) .or. &
+             (s% steps_before_use_gold2_tolerances >= 0 .and. &
+                s% model_number > s% steps_before_use_gold2_tolerances + max(0,s% init_model_number))) then
             s% using_gold_tolerances = .true.
             gold_tolerances_level = 2
-         else if ((s% ctrl% use_gold_tolerances .and. s% ctrl% steps_before_use_gold_tolerances < 0) .or. &
-             (s% ctrl% steps_before_use_gold_tolerances >= 0 .and. &
-                s% model_number > s% ctrl% steps_before_use_gold_tolerances + max(0,s% init_model_number))) then
-            if (s% ctrl% maxT_for_gold_tolerances > 0) then
+         else if ((s% use_gold_tolerances .and. s% steps_before_use_gold_tolerances < 0) .or. &
+             (s% steps_before_use_gold_tolerances >= 0 .and. &
+                s% model_number > s% steps_before_use_gold_tolerances + max(0,s% init_model_number))) then
+            if (s% maxT_for_gold_tolerances > 0) then
                maxT = maxval(s% T(1:nz))
             else
                maxT = -1d0
             end if
-            if (maxT > s% ctrl% maxT_for_gold_tolerances) then 
+            if (maxT > s% maxT_for_gold_tolerances) then 
                !write(*,2) 'exceed maxT_for_gold_tolerances', &
-               !   s% model_number, maxT, s% ctrl% maxT_for_gold_tolerances
+               !   s% model_number, maxT, s% maxT_for_gold_tolerances
             else ! okay for maxT, so check if also ok for eosPC_frac
                s% using_gold_tolerances = .true.
                gold_tolerances_level = 1
@@ -697,10 +697,10 @@
             if (k < nz .and. s% alpha_RTI(k) < 1d-10) cycle
             old_energy = s% energy(k)
             old_IE = old_energy*s% dm(k)
-            if (s% energy(k) < s% ctrl% RTI_energy_floor) then
+            if (s% energy(k) < s% RTI_energy_floor) then
                ! try to take from KE to give to IE
                ! else just bump energy and take hit to energy conservation
-               s% energy(k) = s% ctrl% RTI_energy_floor
+               s% energy(k) = s% RTI_energy_floor
                s% lnE(k) = log(s% energy(k))
                call set_lnT_for_energy(s, k, &
                   s% net_iso(ih1), s% net_iso(ihe3), s% net_iso(ihe4), &
@@ -828,7 +828,7 @@
 
          if (dbg) write(*, *) 'call solver'
          call newt(ierr)
-         if (ierr /= 0 .and. s% ctrl% report_ierr) then
+         if (ierr /= 0 .and. s% report_ierr) then
             write(*,*) 'solver failed for hydro'
          end if
 
@@ -894,14 +894,14 @@
 
          trace = .false.
          
-         min_T_for_const_density_solver = s% ctrl% op_split_burn_min_T_for_variable_T_solver
+         min_T_for_const_density_solver = s% op_split_burn_min_T_for_variable_T_solver
 
          do_burn = keep_going
          ierr = 0
          nz = s% nz
          species = s% species
 
-         if (s% ctrl% eps_nuc_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) then
+         if (s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) then
             do k = 1, nz
                s% eps_nuc(k) = 0d0
                s% burn_num_iters(k) = 0
@@ -947,8 +947,8 @@
          
          screening_mode = get_screening_mode(s,ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) &
-               write(*,*) 'unknown string for screening_mode: ' // trim(s% ctrl% screening_mode)
+            if (s% report_ierr) &
+               write(*,*) 'unknown string for screening_mode: ' // trim(s% screening_mode)
             return
             call mesa_error(__FILE__,__LINE__,'do1_net')
          end if
@@ -957,7 +957,7 @@
 
          kmin = nz+1
          do k=1,nz
-            if (s% T_start(k) < s% ctrl% op_split_burn_min_T) then
+            if (s% T_start(k) < s% op_split_burn_min_T) then
                 ! We get here if we have an off center ignition,
                 ! the arrays wont have been initialised earlier as they stop at the 
                 ! first temperature that exceeds op_split_burn_min_T
@@ -971,15 +971,15 @@
          
          if (kmin > nz) return
 
-         !skip_burn = s% fe_core_infall > s% ctrl% op_split_burn_eps_nuc_infall_limit
-         skip_burn = (minval(s% v_start(1:s% nz)) < -s% ctrl% op_split_burn_eps_nuc_infall_limit)
+         !skip_burn = s% fe_core_infall > s% op_split_burn_eps_nuc_infall_limit
+         skip_burn = (minval(s% v_start(1:s% nz)) < -s% op_split_burn_eps_nuc_infall_limit)
 
          if (s% doing_timing) call start_time(s, time0, total)
 
 !$OMP PARALLEL DO PRIVATE(k,op_err,num_iters,avg_epsnuc) SCHEDULE(dynamic,2)
          do k = kmin, nz
             if (k_bad /= 0) cycle
-            if (s% T_start(k) < s% ctrl% op_split_burn_min_T) then
+            if (s% T_start(k) < s% op_split_burn_min_T) then
                ! We get here if we have an off center ignition,
                ! the arrays wont have been initialised earlier as they stop at the 
                ! first temperature that exceeds op_split_burn_min_T
@@ -1021,13 +1021,13 @@
             call update_time(s, time0, total, s% time_solve_burn)
             
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'do_burn failed', k_bad
+            if (s% report_ierr) write(*,2) 'do_burn failed', k_bad
             return
             call mesa_error(__FILE__,__LINE__,'do_burn')
          
          
             do_burn = retry
-            if (trace .or. s% ctrl% report_ierr) then
+            if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
                !call mesa_error(__FILE__,__LINE__,'do_burn')
             end if
@@ -1114,9 +1114,9 @@
          xa_start => xa_start_ary
 
          stptry = 0d0
-         eps = s% ctrl% op_split_burn_eps
-         odescal = s% ctrl% op_split_burn_odescal         
-         max_steps = s% ctrl% burn_steps_hard_limit         
+         eps = s% op_split_burn_eps
+         odescal = s% op_split_burn_odescal         
+         max_steps = s% burn_steps_hard_limit         
          use_pivoting = .false. ! .true.
          trace = .false.
          burn_dbg = .false.
@@ -1135,7 +1135,7 @@
                s% net_handle, s% eos_handle, species, s% num_reactions, 0d0, dt, &
                xa_start, starting_log10T, s% lnd(k)/ln10, &
                get_eos_info_for_burn_at_const_density, &
-               s% rate_factors, s% ctrl% weak_rate_factor, &
+               s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode, &
                stptry, max_steps, eps, odescal, &
@@ -1145,7 +1145,7 @@
                ending_log10T, avg_epsnuc, ending_eps_neu_total, &
                nfcn, njac, ntry, naccpt, nrejct, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,2) 'net_1_zone_burn_const_density failed', k
+               if (s% report_ierr) write(*,2) 'net_1_zone_burn_const_density failed', k
                return
                call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
@@ -1163,7 +1163,7 @@
             call net_1_zone_burn( &
                s% net_handle, s% eos_handle, species, s% num_reactions, 0d0, dt, xa_start, &
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
-               s% rate_factors, s% ctrl% weak_rate_factor, &
+               s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
                screening_mode,  &
                stptry, max_steps, eps, odescal, &
@@ -1173,7 +1173,7 @@
                avg_epsnuc, ending_eps_neu_total, &
                nfcn, njac, ntry, naccpt, nrejct, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,2) 'net_1_zone_burn failed', k
+               if (s% report_ierr) write(*,2) 'net_1_zone_burn failed', k
                return
                call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
@@ -1185,7 +1185,7 @@
          call do1_net(s, k, s% species, s% num_reactions, &
             net_lwork, .false., ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) &
+            if (s% report_ierr) &
                write(*,2) 'net_1_zone_burn final call to do1_net failed', k
             return
             call mesa_error(__FILE__,__LINE__,'burn1_zone')

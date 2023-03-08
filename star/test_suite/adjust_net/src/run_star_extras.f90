@@ -79,7 +79,7 @@
          if (ierr /= 0) return
          include 'formats'
 
-         select case (s% ctrl% x_integer_ctrl(1)) 
+         select case (s% x_integer_ctrl(1)) 
          case(2) ! inlist_adjust_net
             if (s% species == 62) then
                write(*,'(a,i3)') 'finished with expected number of species', s% species

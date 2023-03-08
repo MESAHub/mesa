@@ -67,7 +67,7 @@ module run_star_extras
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
-            need_to_write_LINA_data = len_trim(s% ctrl% x_character_ctrl(10)) > 0
+            need_to_write_LINA_data = len_trim(s% x_character_ctrl(10)) > 0
          else ! it is a restart
             need_to_write_LINA_data = .false.
          end if
@@ -84,11 +84,11 @@ module run_star_extras
          extras_start_step = keep_going
          if (need_to_write_LINA_data) then
             io = 61
-            open(io,file=trim(s% ctrl% x_character_ctrl(10)),status='unknown')
-            write(io, '(99d16.5)') s% ctrl% RSP_mass, s% ctrl% RSP_L, s% ctrl% RSP_Teff, &
-               (s% rsp_LINA_periods(i), s% rsp_LINA_growth_rates(i), i=1, s% ctrl% RSP_nmodes)
+            open(io,file=trim(s% x_character_ctrl(10)),status='unknown')
+            write(io, '(99d16.5)') s% RSP_mass, s% RSP_L, s% RSP_Teff, &
+               (s% rsp_LINA_periods(i), s% rsp_LINA_growth_rates(i), i=1, s% RSP_nmodes)
             close(io)
-            write(*,*) 'write ' // trim(s% ctrl% x_character_ctrl(10))
+            write(*,*) 'write ' // trim(s% x_character_ctrl(10))
             need_to_write_LINA_data = .false.
          end if
       end function extras_start_step
@@ -104,12 +104,12 @@ module run_star_extras
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% ctrl% x_integer_ctrl(1) <= 0) return
-         if (s% rsp_num_periods < s% ctrl% x_integer_ctrl(1)) return
+         if (s% x_integer_ctrl(1) <= 0) return
+         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
          write(*,'(A)')
          write(*,'(A)')
          write(*,'(A)')
-         target_period = s% ctrl% x_ctrl(1)
+         target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
          if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then

@@ -208,9 +208,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% ctrl% x_ctrl(9) <= 0) return
+         if (s% x_ctrl(9) <= 0) return
          do k = 1, s% nz
-            if (s% v(k) > s% csound(k) .and. s% r(k) > s% ctrl% x_ctrl(9)*Rsun) then
+            if (s% v(k) > s% csound(k) .and. s% r(k) > s% x_ctrl(9)*Rsun) then
                write(*,1) 'shock has reached target location', s% r(k)/Rsun
                extras_finish_step = terminate
                return

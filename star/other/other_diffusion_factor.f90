@@ -47,10 +47,10 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         if(s% ctrl% diffusion_use_full_net) then
+         if(s% diffusion_use_full_net) then
             num_classes = s% species
          else
-            num_classes = s% ctrl% diffusion_num_classes
+            num_classes = s% diffusion_num_classes
          end if
 
          s% extra_diffusion_factor(1:num_classes, 1:s% nz) = 1d0

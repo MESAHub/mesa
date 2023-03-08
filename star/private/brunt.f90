@@ -58,23 +58,23 @@
          ierr = 0
          nz = s% nz
          
-         if (.not. s% ctrl% calculate_Brunt_B) then
+         if (.not. s% calculate_Brunt_B) then
             call set_nan(s% brunt_B(1:nz))
             call set_nan(s% unsmoothed_brunt_B(1:nz))
             return
          end if
 
-         if (s% ctrl% use_other_brunt) then
+         if (s% use_other_brunt) then
             call s% other_brunt(s% id, ierr)
             if (ierr /= 0) then
                 s% retry_message = 'failed in other_brunt'
-                if (s% ctrl% report_ierr) write(*, *) s% retry_message
+                if (s% report_ierr) write(*, *) s% retry_message
             end if
          else
             call do_brunt_B_MHM_form(s,nzlo,nzhi,ierr)
             if (ierr /= 0) then
                 s% retry_message = 'failed in do_brunt_B_MHM_form'
-                if (s% ctrl% report_ierr) write(*, *) s% retry_message
+                if (s% report_ierr) write(*, *) s% retry_message
             end if
          end if
          if (ierr /= 0) return
@@ -90,11 +90,11 @@
 
          allocate(smoothing_array(nz))
          call smooth_brunt_B(smoothing_array)
-         if (s% ctrl% use_other_brunt_smoothing) then
+         if (s% use_other_brunt_smoothing) then
             call s% other_brunt_smoothing(s% id, ierr)
             if (ierr /= 0) then
                s% retry_message = 'failed in other_brunt_smoothing'
-               if (s% ctrl% report_ierr) write(*, *) s% retry_message
+               if (s% report_ierr) write(*, *) s% retry_message
                return
             end if
          end if
@@ -105,10 +105,10 @@
             use star_utils, only: threshold_smoothing
             real(dp) :: work(:)
             logical, parameter :: preserve_sign = .false.
-            if (s% ctrl% num_cells_for_smooth_brunt_B <= 0) return
+            if (s% num_cells_for_smooth_brunt_B <= 0) return
             call threshold_smoothing( &
-               s% brunt_B, s% ctrl% threshold_for_smooth_brunt_B, s% nz, &
-               s% ctrl% num_cells_for_smooth_brunt_B, preserve_sign, work)
+               s% brunt_B, s% threshold_for_smooth_brunt_B, s% nz, &
+               s% num_cells_for_smooth_brunt_B, preserve_sign, work)
          end subroutine smooth_brunt_B
 
       end subroutine do_brunt_B
@@ -133,7 +133,7 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. (s% ctrl% calculate_Brunt_B .and. s% ctrl% calculate_Brunt_N2)) then
+         if (.not. (s% calculate_Brunt_B .and. s% calculate_Brunt_N2)) then
             call set_nan(s% brunt_N2(1:nz))
             call set_nan(s% brunt_N2_composition_term(1:nz))
             return
@@ -144,7 +144,7 @@
          do k=1,nz
             rho_P_chiT_chiRho(k) = (s% rho(k)/s% Peos(k))*(s% chiT(k)/s% chiRho(k))
             ! correct for difference between gravitational mass density and baryonic mass density (rho)
-            if (s% ctrl% use_mass_corrections) then
+            if (s% use_mass_corrections) then
                rho_P_chiT_chiRho(k) = s% mass_correction(k)*rho_P_chiT_chiRho(k)
             end if
          end do
@@ -153,12 +153,12 @@
             s, rho_P_chiT_chiRho, rho_P_chiT_chiRho_face, ierr)
          if (ierr /= 0) then
             s% retry_message = 'failed in get_face_values'
-            if (s% ctrl% report_ierr) write(*, *) s% retry_message
+            if (s% report_ierr) write(*, *) s% retry_message
             return
          end if
 
          do k=1,nz ! clip B and calculate N^2 from B
-            if (abs(s% brunt_B(k)) < s% ctrl% min_magnitude_brunt_B .or. &
+            if (abs(s% brunt_B(k)) < s% min_magnitude_brunt_B .or. &
                   s% gradT(k) == 0 .or. is_bad(s% gradT_sub_grada(k))) then
                s% brunt_B(k) = 0
                s% brunt_N2(k) = 0
@@ -178,11 +178,11 @@
             s% brunt_N2_composition_term(k) = f*s% brunt_B(k)
          end do
 
-         if (s% ctrl% brunt_N2_coefficient /= 1d0) then
+         if (s% brunt_N2_coefficient /= 1d0) then
             do k=1,nz
-               s% brunt_N2(k) = s% ctrl% brunt_N2_coefficient*s% brunt_N2(k)
+               s% brunt_N2(k) = s% brunt_N2_coefficient*s% brunt_N2(k)
                s% brunt_N2_composition_term(k) = &
-                  s% ctrl% brunt_N2_coefficient*s% brunt_N2_composition_term(k)
+                  s% brunt_N2_coefficient*s% brunt_N2_composition_term(k)
             end do
          end if
 
@@ -315,7 +315,7 @@
          s% brunt_B(k) = (lnP1 - lnP2)/delta_lnP/chiT_face
 
          ! add term accounting for the composition-related gradient in gravitational mass
-         if (s% ctrl% use_mass_corrections) then
+         if (s% use_mass_corrections) then
             delta_lnMbar = log(s% mass_correction(k-1)) - log(s% mass_correction(k))
             s% brunt_B(k) = s% brunt_B(k) - chiRho_face*delta_lnMbar/delta_lnP/chiT_face
          end if
@@ -323,7 +323,7 @@
          if (is_bad_num(s% brunt_B(k))) then
             ierr = -1
             s% retry_message = 'bad num for brunt_B'
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
                write(*,2) 'chiT_face', k, chiT_face
                write(*,2) 'delta_lnP', k, delta_lnP
@@ -334,7 +334,7 @@
                write(*,'(A)')
                !call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
                call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if

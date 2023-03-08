@@ -68,12 +68,12 @@
          i_equL = s% i_equL
          if (i_equL == 0) return
 
-         if (.not. s% ctrl% use_dPrad_dm_form_of_T_gradient_eqn) then
+         if (.not. s% use_dPrad_dm_form_of_T_gradient_eqn) then
             ierr = -1
             return
          end if
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          dbg = .false.
@@ -86,7 +86,7 @@
          r_00 = wrap_r_00(s,k)
          area = pi4*pow2(r_00); area2 = pow2(area)
 
-         if (s% lnT(k)/ln10 <= s% ctrl% max_logT_for_mlt &
+         if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
                .and. s% mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
                .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
             Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k) ! C&G 14.109
@@ -97,8 +97,8 @@
          kap_00 = wrap_kap_00(s,k)
          kap_m1 = wrap_kap_m1(s,k)
          kap_face = alfa*kap_00 + beta*kap_m1
-         if (kap_face%val < s% ctrl% min_kap_for_dPrad_dm_eqn) &
-            kap_face = s% ctrl% min_kap_for_dPrad_dm_eqn
+         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
+            kap_face = s% min_kap_for_dPrad_dm_eqn
                   
          ! calculate expected d_P_rad from current L_rad
          d_P_rad_expected_ad = -dm_bar*kap_face*Lrad_ad/(clight*area2)
@@ -120,7 +120,7 @@
          if (is_bad(resid%val)) then
 !$OMP critical (star_alt_dlntdm_bad_num)
             write(*,2) 'resid%val', k, resid%val
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_alt_dlnT_dm_eqn')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_alt_dlnT_dm_eqn')
 !$OMP end critical (star_alt_dlntdm_bad_num)
          end if
 
@@ -157,7 +157,7 @@
          include 'formats'
          ierr = 0
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          i_equL = s% i_equL
@@ -172,8 +172,8 @@
 
          if (is_bad(s% equ(i_equL, k))) then
             ierr = -1
-            if (s% ctrl% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_gradT_eqn')
+            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_gradT_eqn')
             return
             write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
             write(*,2) 'gradT', k, gradT
@@ -234,18 +234,18 @@
          include 'formats'
          ierr = 0
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          i_equL = s% i_equL
          if (i_equL == 0) return
          
-         if (s% ctrl% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
+         if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
             call do1_gradT_eqn(s, k, nvar, ierr)            
             return
          end if
 
-         if (s% ctrl% use_dPrad_dm_form_of_T_gradient_eqn) then
+         if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
             call do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)            
             return
          end if
@@ -275,8 +275,8 @@
 
          if (is_bad(s% equ(i_equL, k))) then
             ierr = -1
-            if (s% ctrl% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'hydro eqns')
+            if (s% report_ierr) write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'hydro eqns')
             return
             write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
             write(*,2) 'lnTdiff', k, lnTdiff
@@ -337,13 +337,13 @@
          if (is_bad(dlnPdm_qhse%val)) then
             ierr = -1
             s% retry_message = 'eval_dlnPdm_qhse: is_bad(dlnPdm_qhse)'
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
 !$OMP critical (hydro_vars_crit1)
                write(*,*) 'eval_dlnPdm_qhse: is_bad(dlnPdm_qhse)'
                stop
 !$OMP end critical (hydro_vars_crit1)
             end if
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'dlnPdm_qhse', k, dlnPdm_qhse
                call mesa_error(__FILE__,__LINE__,'eval_dlnPdm_qhse')
             end if

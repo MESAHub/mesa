@@ -64,14 +64,14 @@
 
          s% eps_grav_ad(k) = eps_grav
 
-         if (s% ctrl% use_other_eps_grav) then
+         if (s% use_other_eps_grav) then
             ! note: call this after 1st doing the standard calculation
             call s% other_eps_grav(s% id, k, s% dt, ierr)
             if (ierr /= 0) return
          end if
 
          ! apply user-specified scaling factor after hook
-         s% eps_grav_ad(k) = s% ctrl% eps_grav_factor * s% eps_grav_ad(k)
+         s% eps_grav_ad(k) = s% eps_grav_factor * s% eps_grav_ad(k)
 
       end subroutine eval_eps_grav_and_partials
 
@@ -91,12 +91,12 @@
 
          using_PC = (s% eos_frac_PC(k) .gt. 0)
 
-         if (using_PC .and. s% gam_start(k) >= s% ctrl% Gamma_lnS_eps_grav_full_on) then
+         if (using_PC .and. s% gam_start(k) >= s% Gamma_lnS_eps_grav_full_on) then
             call do_lnS_eps_grav(s, k, eps_grav, ierr)
-         else if (using_PC .and. s% gam_start(k) > s% ctrl% Gamma_lnS_eps_grav_full_off) then
+         else if (using_PC .and. s% gam_start(k) > s% Gamma_lnS_eps_grav_full_off) then
             Gamma = s% gam_start(k)
-            alfa = (Gamma - s% ctrl% Gamma_lnS_eps_grav_full_off) / &
-               (s% ctrl% Gamma_lnS_eps_grav_full_on - s% ctrl% Gamma_lnS_eps_grav_full_off)
+            alfa = (Gamma - s% Gamma_lnS_eps_grav_full_off) / &
+               (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off)
             call do_lnS_eps_grav(s, k, eps_grav_lnS, ierr)
             if (ierr .ne. 0) return
             call do_std_eps_grav(s, k, eps_grav_std, ierr)
@@ -113,11 +113,11 @@
          if (ierr /= 0 .or. is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'failed in eval_eps_grav_and_partials'
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
                write(*,2) &
                   'failed in eval_eps_grav_and_partials', k, eps_grav% val
             end if
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                call mesa_error(__FILE__,__LINE__,'eval1_eps_grav_and_partials')
             end if
             return
@@ -145,11 +145,11 @@
          include 'formats'
          ierr = 0
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          ! select time-centering
-         if (s% ctrl% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
          else
             theta = 1.0_dp
@@ -177,7 +177,7 @@
 
 
          ! for time centered version
-         if (s% ctrl% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav) then
 
             ! start values are constants during Newton iters
             eps_grav_start = -s% T_start(k)*s% cp_start(k) * ((1d0 - s% grada_start(k)*s% chiT_start(k))*dlnT_dt - s% grada_start(k)*s% chiRho_start(k)*dlnd_dt)
@@ -190,7 +190,7 @@
          end if
 
 
-         if (s% ctrl% include_composition_in_eps_grav) then
+         if (s% include_composition_in_eps_grav) then
             call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
             if (ierr /= 0) return
             eps_grav = eps_grav + eps_grav_composition_term
@@ -199,9 +199,9 @@
          if (is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'do_lnd_eps_grav -- bad value for eps_grav'
-            if (s% ctrl% report_ierr) &
+            if (s% report_ierr) &
                write(*,2) 'do_lnd_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnd_eps_grav')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnd_eps_grav')
             return
          end if
 
@@ -247,7 +247,7 @@
          !
          ! If an such approximation is desired, one could use the following code:
 
-         ! if (s% ctrl% include_composition_in_eps_grav) then
+         ! if (s% include_composition_in_eps_grav) then
          !    call eval_eps_grav_composition(s, k, eps_grav_composition_term, ierr)
          !    if (ierr /= 0) return
          !    eps_grav = eps_grav + eps_grav_composition_term
@@ -256,9 +256,9 @@
          if (is_bad(eps_grav% val)) then
             ierr = -1
             s% retry_message = 'do_lnS_eps_grav -- bad value for eps_grav'
-            if (s% ctrl% report_ierr) &
+            if (s% report_ierr) &
                write(*,2) 'do_lnS_eps_grav -- bad value for eps_grav', k, eps_grav% val
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnS_eps_grav')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_lnS_eps_grav')
             return
          end if
 
@@ -291,7 +291,7 @@
 
          eps_grav_composition_term = 0
 
-         if (s% ctrl% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav) then
             theta = 0.5_dp
          else
             theta = 1.0_dp
@@ -317,7 +317,7 @@
             res, dres_dlnd, dres_dlnT, &
             dres_dxa, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
+            if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
             return
          end if
 
@@ -329,7 +329,7 @@
          d_de_dlnd = (s% dE_dRho_for_partials(k)*s% Rho(k) - d_e_with_xa_start_dlnd)
          d_de_dlnT = (s% Cv_for_partials(k)*s% T(k) - d_e_with_xa_start_dlnT)
 
-         if (s% ctrl% use_time_centered_eps_grav) then
+         if (s% use_time_centered_eps_grav) then
 
             e_start = s% energy_start(k)
 
@@ -339,7 +339,7 @@
                res, dres_dlnd, dres_dlnT, &
                dres_dxa, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
+               if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start', k
                return
             end if
 
@@ -379,7 +379,7 @@
          ! add easy access to this quantity in star
          s% eps_grav_composition_term(k) = eps_grav_composition_term% val
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
          if (test_partials) then
@@ -390,12 +390,12 @@
          end if
 
          if (is_bad(eps_grav_composition_term% val)) then
-          if (s% ctrl% report_ierr) write(*, *) s% retry_message
-            if (s% ctrl% report_ierr) then
+          if (s% report_ierr) write(*, *) s% retry_message
+            if (s% report_ierr) then
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
                !call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val
                call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if

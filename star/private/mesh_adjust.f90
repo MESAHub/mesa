@@ -373,7 +373,7 @@
                max(abs(total_internal_energy1),abs(total_internal_energy2),1d0)
          s% mesh_adjust_IE_conservation = err
 
-         if (s% ctrl% trace_mesh_adjust_error_in_conservation) then
+         if (s% trace_mesh_adjust_error_in_conservation) then
 
             write(*,2) 'mesh adjust error in conservation of IE', &
                s% model_number, err, total_internal_energy2, total_internal_energy1
@@ -1074,7 +1074,7 @@
                Vol_max = maxval(Vol_new(k-1:k+1))
                if (Vol_min == Vol_max .or. is_bad(Vol_min) .or. is_bad(Vol_max)) then
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'Vol_min', k, Vol_min
                      write(*,2) 'Vol_max', k, Vol_max
                      call mesa_error(__FILE__,__LINE__,'mesh_adjust')
@@ -1312,7 +1312,7 @@
 
          if (is_bad(xa_sum)) then
             ierr = -1
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'xa_sum', k, xa_sum
                call mesa_error(__FILE__,__LINE__,'mesh adjust: do_xa')
             end if
@@ -1393,14 +1393,14 @@
 
          if (is_bad(avg_lnT) .or. avg_lnT < 0 .or. avg_lnT > 100) then
             ierr = -1
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'avg_lnT', k, avg_lnT
                call mesa_error(__FILE__,__LINE__,'mesh adjust: do1_lnT')
             end if
             return
          end if
 
-         if (.not. s% ctrl% mesh_adjust_get_T_from_E) then
+         if (.not. s% mesh_adjust_get_T_from_E) then
             call store_lnT_in_xh(s, k, avg_lnT, xh)
             energy_new(k) = energy_old(k_old)
             if (is_bad(energy_old(k_old))) then
@@ -1437,7 +1437,7 @@
             avg_energy = sum_energy/cell_dq
          end if
          
-         if (s% ctrl% max_rel_delta_IE_for_mesh_total_energy_balance == 0d0) then
+         if (s% max_rel_delta_IE_for_mesh_total_energy_balance == 0d0) then
          
             energy_new(k) = avg_energy
          
@@ -1481,7 +1481,7 @@
             end if
             new_KE = cell_specific_KE(s,k,d_dv00,d_dvp1)
 
-            max_delta_energy = avg_energy*s% ctrl% max_rel_delta_IE_for_mesh_total_energy_balance
+            max_delta_energy = avg_energy*s% max_rel_delta_IE_for_mesh_total_energy_balance
             delta_energy = avg_PE + avg_KE - (new_PE + new_KE)
             if (abs(delta_energy) > max_delta_energy) then
                delta_energy = sign(max_delta_energy,delta_energy)
@@ -1686,7 +1686,7 @@
 
          if (ierr /= 0 .or. is_bad_num(lnT)) then
             ierr = -1
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'lnT', k, lnT
                call mesa_error(__FILE__,__LINE__,'mesh adjust: do1_lnT')
             end if
@@ -2110,7 +2110,7 @@
          r00 = get_r_from_xh(s,k)
          s% w_div_w_crit_roche(k) = &
             w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-            s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+            s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          call update1_i_rot_from_xh(s, k)
          s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
 
@@ -2174,7 +2174,7 @@
          if (abs(old_ke_tot - new_ke_tot) > 1d-7*new_ke_tot) then
             ierr = -1
             s% retry_message = 'failed in mesh_adjust do_v'
-            if (s% ctrl% report_ierr) write(*, *) s% retry_message
+            if (s% report_ierr) write(*, *) s% retry_message
             !call mesa_error(__FILE__,__LINE__,'do_v')
             return
          end if
@@ -2182,7 +2182,7 @@
          err = abs(old_ke_tot - new_ke_tot)/max(new_ke_tot,old_ke_tot,1d0)
          s% mesh_adjust_KE_conservation = err
 
-         if (s% ctrl% trace_mesh_adjust_error_in_conservation) then
+         if (s% trace_mesh_adjust_error_in_conservation) then
             write(*,2) 'mesh adjust error in conservation of KE', s% model_number, &
                err, new_ke_tot, old_ke_tot
             if (err > 1d-10) then
@@ -2431,7 +2431,7 @@
          err = abs(old_ke_tot - new_ke_tot)/max(new_ke_tot,old_ke_tot,1d0)
          s% mesh_adjust_KE_conservation = err
 
-         if (s% ctrl% trace_mesh_adjust_error_in_conservation) then
+         if (s% trace_mesh_adjust_error_in_conservation) then
             write(*,2) 'mesh adjust error in conservation of KE', s% model_number, &
                err, new_ke_tot, old_ke_tot
             if (err > 1d-10) then
@@ -2723,7 +2723,7 @@
          err = abs(old_eturb_tot - new_eturb_tot)/max(new_eturb_tot,old_eturb_tot,1d0)
          s% mesh_adjust_Eturb_conservation = err
 
-         if (s% ctrl% trace_mesh_adjust_error_in_conservation) then
+         if (s% trace_mesh_adjust_error_in_conservation) then
             write(*,2) 'mesh adjust error in conservation of turbulent energy', s% model_number, &
                err, new_eturb_tot, old_eturb_tot
             if (err > 1d-10) then

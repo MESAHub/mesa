@@ -36,9 +36,9 @@
 ! here are the x controls used below
 
 !alpha_mlt_routine
-         !alpha_H = s% ctrl% x_ctrl(21)
-         !alpha_other = s% ctrl% x_ctrl(22)
-         !H_limit = s% ctrl% x_ctrl(23)
+         !alpha_H = s% x_ctrl(21)
+         !alpha_other = s% x_ctrl(22)
+         !H_limit = s% x_ctrl(23)
 
 !gyre
       !x_logical_ctrl(37) = .false. ! if true, then run GYRE
@@ -87,9 +87,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         alpha_H = s% ctrl% x_ctrl(21)
-         alpha_other = s% ctrl% x_ctrl(22)
-         H_limit = s% ctrl% x_ctrl(23)
+         alpha_H = s% x_ctrl(21)
+         alpha_other = s% x_ctrl(22)
+         H_limit = s% x_ctrl(23)
          h1 = s% net_iso(ih1)
          !write(*,1) 'alpha_H', alpha_H
          !write(*,1) 'alpha_other', alpha_other
@@ -119,7 +119,7 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
          
-         if (.not. s% ctrl% x_logical_ctrl(37)) return
+         if (.not. s% x_logical_ctrl(37)) return
          
          ! Initialize GYRE
 
@@ -154,7 +154,7 @@
          nz = s% nz
          write(*,'(A)')
          call test_suite_after_evolve(s, ierr)
-         if (.not. s% ctrl% x_logical_ctrl(37)) return
+         if (.not. s% x_logical_ctrl(37)) return
          call gyre_final()
       end subroutine extras_after_evolve
       
@@ -235,7 +235,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (.not. s% ctrl% x_logical_ctrl(37)) return
+         if (.not. s% x_logical_ctrl(37)) return
          extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step

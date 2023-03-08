@@ -53,7 +53,7 @@ module run_star_extras
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          
-         if (s% ctrl% use_other_rsp_build_model) &
+         if (s% use_other_rsp_build_model) &
             s% other_rsp_build_model => rsp_check_2nd_crossing
 
       end subroutine extras_controls
@@ -88,22 +88,22 @@ module run_star_extras
          if (ierr /= 0) return
          write(*,*) 'rsp_check_2nd_crossing'
          
-         delta_Teff = s% ctrl% x_ctrl(1)
+         delta_Teff = s% x_ctrl(1)
          ! approx edges
-         logT1 = s% ctrl% x_ctrl(2)
-         logL1 = s% ctrl% x_ctrl(3)
-         logT2 = s% ctrl% x_ctrl(4)
-         logL2 = s% ctrl% x_ctrl(5)
-         logT3 = s% ctrl% x_ctrl(6)
-         logL3 = s% ctrl% x_ctrl(7)
-         logT4 = s% ctrl% x_ctrl(8)
-         logL4 = s% ctrl% x_ctrl(9)
+         logT1 = s% x_ctrl(2)
+         logL1 = s% x_ctrl(3)
+         logT2 = s% x_ctrl(4)
+         logL2 = s% x_ctrl(5)
+         logT3 = s% x_ctrl(6)
+         logL3 = s% x_ctrl(7)
+         logT4 = s% x_ctrl(8)
+         logL4 = s% x_ctrl(9)
          
-         skip_cols = s% ctrl% x_integer_ctrl(1)
-         col_model_number = s% ctrl% x_integer_ctrl(2)
-         col_star_age = s% ctrl% x_integer_ctrl(3)
-         col_log_Teff = s% ctrl% x_integer_ctrl(4)
-         col_log_L = s% ctrl% x_integer_ctrl(5)
+         skip_cols = s% x_integer_ctrl(1)
+         col_model_number = s% x_integer_ctrl(2)
+         col_star_age = s% x_integer_ctrl(3)
+         col_log_Teff = s% x_integer_ctrl(4)
+         col_log_L = s% x_integer_ctrl(5)
          
          num_cols_to_read = max(col_model_number, col_star_age, col_log_Teff, col_log_L)
          allocate(vals(num_cols_to_read), &
@@ -112,9 +112,9 @@ module run_star_extras
             f1(4*max_cnt), work1(max_cnt*pm_work_size), &
             x_old(max_n), v_old(max_n), x_new(max_n), v_new(max_n))
          
-         open(unit=io_in, file=trim(s% ctrl% x_character_ctrl(1)), status='old', action='read', iostat=ierr)
+         open(unit=io_in, file=trim(s% x_character_ctrl(1)), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
-            write(*,*) 'failed to open history data file ' // trim(s% ctrl% x_character_ctrl(1))
+            write(*,*) 'failed to open history data file ' // trim(s% x_character_ctrl(1))
             return
          end if        
          
@@ -136,29 +136,29 @@ module run_star_extras
          num_models = model_cnt
          close(io_in)
          
-         open(unit=io_out, file=TRIM(s% ctrl% x_character_ctrl(2)), status='REPLACE', iostat=ierr)
+         open(unit=io_out, file=TRIM(s% x_character_ctrl(2)), status='REPLACE', iostat=ierr)
          if (ierr /= 0) then
-            write(*,*) 'failed to open output data file ' // trim(s% ctrl% x_character_ctrl(2))
+            write(*,*) 'failed to open output data file ' // trim(s% x_character_ctrl(2))
             return
          end if
 
-         mass = s% ctrl% RSP_mass
-         X = s% ctrl% RSP_X
-         Z = s% ctrl% RSP_Z
+         mass = s% RSP_mass
+         X = s% RSP_X
+         Z = s% RSP_Z
          
-         write(io_out,1) 'RSP_mass', s% ctrl% RSP_mass
-         write(io_out,1) 'RSP_X', s% ctrl% RSP_X
-         write(io_out,1) 'RSP_Z', s% ctrl% RSP_Z
-         write(io_out,1) 'RSP_alfam', s% ctrl% RSP_alfam
-         write(io_out,1) 'RSP_alfap', s% ctrl% RSP_alfap
-         write(io_out,1) 'RSP_alfat', s% ctrl% RSP_alfat
-         write(io_out,1) 'RSP_gammar', s% ctrl% RSP_gammar
+         write(io_out,1) 'RSP_mass', s% RSP_mass
+         write(io_out,1) 'RSP_X', s% RSP_X
+         write(io_out,1) 'RSP_Z', s% RSP_Z
+         write(io_out,1) 'RSP_alfam', s% RSP_alfam
+         write(io_out,1) 'RSP_alfap', s% RSP_alfap
+         write(io_out,1) 'RSP_alfat', s% RSP_alfat
+         write(io_out,1) 'RSP_gammar', s% RSP_gammar
          write(io_out,*)
          
          write(io_out,'(99a20)') 'model_number', 'period(d)', 'growth', &
             'Teff', 'L', 'star_age'
 
-         s% ctrl% RSP_nmodes = 1 ! just F
+         s% RSP_nmodes = 1 ! just F
          finished_1st_crossing = .false.
          in_2nd_crossing = .false.
          have_first = .false.
@@ -168,34 +168,34 @@ module run_star_extras
          num_beyond_blue_edge = 0
          prev_Teff = 1d99
          search_loop: do model_cnt=1,num_models
-            s% ctrl% RSP_Teff = Ts(model_cnt)
-            s% ctrl% RSP_L = Ls(model_cnt)
-            log_L = log10(s% ctrl% RSP_L)
+            s% RSP_Teff = Ts(model_cnt)
+            s% RSP_L = Ls(model_cnt)
+            log_L = log10(s% RSP_L)
             if (.not. finished_1st_crossing) then
                min_T = exp10(get_red_logT(log_L))
-               finished_1st_crossing = (s% ctrl% RSP_Teff < min_T)
-               prev_Teff = s% ctrl% RSP_Teff
+               finished_1st_crossing = (s% RSP_Teff < min_T)
+               prev_Teff = s% RSP_Teff
                cycle search_loop
             end if
-            if (s% ctrl% RSP_Teff < prev_Teff) then
-               !write(*,2) 'still going to lower T', modnums(model_cnt), s% ctrl% RSP_Teff, prev_Teff
-               prev_Teff = s% ctrl% RSP_Teff
+            if (s% RSP_Teff < prev_Teff) then
+               !write(*,2) 'still going to lower T', modnums(model_cnt), s% RSP_Teff, prev_Teff
+               prev_Teff = s% RSP_Teff
                cycle search_loop ! still going to lower Ts
             end if
             max_T = exp10(get_blue_logT(log_L))            
             min_T = exp10(get_red_logT(log_L))            
-            if (s% ctrl% RSP_Teff < min_T - 4*delta_Teff) then
-               !write(*,2) 'too far from red edge', modnums(model_cnt), s% ctrl% RSP_Teff, min_T
-               prev_Teff = s% ctrl% RSP_Teff
+            if (s% RSP_Teff < min_T - 4*delta_Teff) then
+               !write(*,2) 'too far from red edge', modnums(model_cnt), s% RSP_Teff, min_T
+               prev_Teff = s% RSP_Teff
                cycle search_loop ! too far from red edge
             end if
-            if (have_first .and. s% ctrl% RSP_Teff - delta_Teff < prev_Teff) then
-               !write(*,2) 'too close to prev', modnums(model_cnt), s% ctrl% RSP_Teff - delta_Teff - prev_Teff
+            if (have_first .and. s% RSP_Teff - delta_Teff < prev_Teff) then
+               !write(*,2) 'too close to prev', modnums(model_cnt), s% RSP_Teff - delta_Teff - prev_Teff
                cycle search_loop ! too close to prev
             end if
-            !if (s% ctrl% RSP_Teff < 0.5d0*(min_T + max_T)) cycle search_loop ! too far from blue edge
+            !if (s% RSP_Teff < 0.5d0*(min_T + max_T)) cycle search_loop ! too far from blue edge
             write(*,*) 'call star_do1_rsp_build model Teff L', &
-               modnums(model_cnt), s% ctrl% RSP_Teff, s% ctrl% RSP_L
+               modnums(model_cnt), s% RSP_Teff, s% RSP_L
             call star_do1_rsp_build(s,ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in star_do1_rsp_build'
@@ -209,8 +209,8 @@ module run_star_extras
             n = n+1
             period(n) = s% rsp_LINA_periods(1)
             growth(n) = s% rsp_LINA_growth_rates(1)
-            temp(n) = s% ctrl% RSP_Teff
-            lum(n) = s% ctrl% RSP_L
+            temp(n) = s% RSP_Teff
+            lum(n) = s% RSP_L
             if ((.not. have_first) .and. growth(n) > 0d0) then
                write(*,*) 'failed to find red edge'
                ierr = -1
@@ -223,9 +223,9 @@ module run_star_extras
                num_beyond_blue_edge = num_beyond_blue_edge + 1
             end if
             write(io_out,'(i20,99(1pd20.10))') modnums(model_cnt), &
-               period(n)/86400.d0, growth(n), s% ctrl% RSP_Teff, s% ctrl% RSP_L, ages(model_cnt)
+               period(n)/86400.d0, growth(n), s% RSP_Teff, s% RSP_L, ages(model_cnt)
             if (num_beyond_blue_edge == 2 .or. n == max_n) exit search_loop
-            prev_Teff = s% ctrl% RSP_Teff
+            prev_Teff = s% RSP_Teff
          end do search_loop
          
          if (n == 0 .or. growth(1) >= 0d0 .or. num_beyond_blue_edge < 1) then
@@ -354,7 +354,7 @@ module run_star_extras
          close(io_out)
 
          write(*,*) 'done rsp_check_2nd_crossing'
-         write(*,*) TRIM(s% ctrl% x_character_ctrl(2))
+         write(*,*) TRIM(s% x_character_ctrl(2))
 
          !deallocate(f1, work1, x_new, v_new)
          
@@ -397,12 +397,12 @@ module run_star_extras
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% ctrl% x_integer_ctrl(1) <= 0) return
-         if (s% rsp_num_periods < s% ctrl% x_integer_ctrl(1)) return
+         if (s% x_integer_ctrl(1) <= 0) return
+         if (s% rsp_num_periods < s% x_integer_ctrl(1)) return
          write(*,'(A)')
          write(*,'(A)')
          write(*,'(A)')
-         target_period = s% ctrl% x_ctrl(1)
+         target_period = s% x_ctrl(1)
          rel_run_E_err = s% cumulative_energy_error/s% total_energy
          write(*,*) 'rel_run_E_err', rel_run_E_err
          if (s% total_energy /= 0d0 .and. abs(rel_run_E_err) > 1d-5) then

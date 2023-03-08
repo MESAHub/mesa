@@ -259,10 +259,10 @@
 
             ! additional settings for mass transfer and tides
             if (b% do_j_accretion) then
-               s% ctrl% use_accreted_material_j = .true.
+               s% use_accreted_material_j = .true.
             end if
-            s% ctrl% accrete_given_mass_fractions = .true.
-            s% ctrl% accrete_same_as_surface = .false.
+            s% accrete_given_mass_fractions = .true.
+            s% accrete_same_as_surface = .false.
             s% binary_other_torque => sync_spin_orbit_torque
             
             s% doing_timing = .false.
@@ -642,7 +642,7 @@
                else
                   write_history = .false.
                end if
-               if (s% ctrl% terminal_interval > 0) then
+               if (s% terminal_interval > 0) then
                   write_terminal = (mod(model, b% terminal_interval) == 0)
                else
                   write_terminal = .false.
@@ -833,18 +833,18 @@
 
          s% binary_id = binary_id
          ! binary takes care of writing photos
-         s% ctrl% photo_interval = -1
+         s% photo_interval = -1
          s% job% save_photo_when_terminate = .false.
-         s% ctrl% photo_digits = b% photo_digits
+         s% photo_digits = b% photo_digits
 
          if (b% donor_id == -1) then
             b% donor_id = id
             b% s1 => s
-            s% ctrl% initial_mass = b% m1
+            s% initial_mass = b% m1
          else
             b% accretor_id = id
             b% s2 => s
-            s% ctrl% initial_mass = b% m2
+            s% initial_mass = b% m2
          end if
       end subroutine binary_controls
       

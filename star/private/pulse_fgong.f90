@@ -169,13 +169,13 @@ contains
     global_data(1) = m_outer
     global_data(2) = r_outer
     global_data(3) = s%L(1)
-    global_data(4) = s% ctrl% initial_z
-    global_data(5) = 1d0 - (s% ctrl% initial_y + s% ctrl% initial_z)
-    global_data(6) = s% ctrl% mixing_length_alpha
+    global_data(4) = s%initial_z
+    global_data(5) = 1d0 - (s%initial_y + s%initial_z)
+    global_data(6) = s%mixing_length_alpha
 
     ! global_data(7)-global_data(10) are not used
 
-    if (s% ctrl% interpolate_rho_for_pulse_data) then
+    if (s%interpolate_rho_for_pulse_data) then
        rho_c = eval_center_rho(s, k_b(n_sg))
     else
        rho_c = eval_center(s%rmid, s%rho, k_a(n_sg), k_b(n_sg))
@@ -391,7 +391,7 @@ contains
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
         P = eval_face(s%dq, s%Peos, k, 1, s%nz)
-        if (s% ctrl% interpolate_rho_for_pulse_data) then
+        if (s%interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
            rho = eval_face_rho(s, k, k_a, k_b)
@@ -405,7 +405,7 @@ contains
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
         c_P = eval_face(s%dq, s%cp, k, k_a, k_b)
         rec_mu_e = exp(eval_face(s%dq, s%lnfree_e, k, k_a, k_b))
-        if (r <= s% ctrl% fgong_zero_A_inside_r*Rsun .AND. s%mixing_type(k) /= no_mixing) then
+        if (r <= s%fgong_zero_A_inside_r*Rsun .AND. s%mixing_type(k) /= no_mixing) then
            A_ast = 0d0
         else
            A_ast = eval_face_A_ast(s, k, k_a, k_b)
@@ -559,13 +559,13 @@ contains
 
     ! Set float format from version number (ivers)
 
-    if (s% ctrl% fgong_ivers == 300) then
+    if (s% fgong_ivers == 300) then
        format_for_fgong_data = '(1P5E16.9,x)'
-    else if (s% ctrl% fgong_ivers == 1300) then
+    else if (s% fgong_ivers == 1300) then
        format_for_fgong_data = '(1P,5(X,E26.18E3))'
     else
        write(*,*) ''
-       write(*,'(a,i4)') 'bad fgong_ivers: must be 300 or 1300, not ', s% ctrl% fgong_ivers
+       write(*,'(a,i4)') 'bad fgong_ivers: must be 300 or 1300, not ', s% fgong_ivers
        ierr = 1
        return
     end if
@@ -586,10 +586,10 @@ contains
     nn = SIZE(point_data, 2)
 
     do k = 1, 4
-       write(iounit, *) trim(s% ctrl% fgong_header(k))
+       write(iounit, *) trim(s% fgong_header(k))
     end do
 
-    write(iounit,'(4I10)') nn, ICONST, IVAR, s% ctrl% fgong_ivers
+    write(iounit,'(4I10)') nn, ICONST, IVAR, s% fgong_ivers
 
     write(iounit, format_for_fgong_data) (global_data(i), i=1,n_global)
 

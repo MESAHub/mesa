@@ -180,9 +180,9 @@
          include 'formats'
 
          i_rot = 0d0
-         if (s% ctrl% use_other_eval_i_rot) then
+         if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id,k,r00,w_div_w_crit_roche, i_rot)
-         else if (s% ctrl% simple_i_rot_flag) then
+         else if (s% simple_i_rot_flag) then
             i_rot = (2d0/3d0)*r00*r00
             i_rot% d1Array(i_lnR_00) = 2*i_rot% val
             i_rot% d1Array(i_w_div_wc_00) = 0d0
@@ -224,7 +224,7 @@
             if (.not. skip_w_div_w_crit_roche) then
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(s% r(k),s% m(k),s% j_rot(k),s% cgrav(k), &
-                     s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+                     s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end if
             call eval_i_rot(s, k, s% r(k), s% w_div_w_crit_roche(k), s% i_rot(k))
          end do
@@ -307,7 +307,7 @@
             if (s% j_rot(k) /= 0d0) then
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(get_r_from_xh(s,k),s% m(k),s% j_rot(k),s% cgrav(k), &
-                     s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+                     s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             else
                s% w_div_w_crit_roche(k) = 0d0
             end if
@@ -323,7 +323,7 @@
          do k=1,s% nz
             s% w_div_w_crit_roche(k) = &
                w_div_w_roche_omega(get_r_from_xh(s,k),s% m(k),s% omega(k),s% cgrav(k), &
-                  s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end do
          do k=1,s% nz
             call update1_i_rot_from_xh(s,k)
@@ -350,7 +350,7 @@
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
+            if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
             return
          end if
 
@@ -360,7 +360,7 @@
          ! do it this way so apply limit to sum; sum is used as diffusion coeff for omega
          call get1_am_sig(s, nzlo, nzhi, am_nu, am_sig, dt, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
+            if (s% report_ierr) write(*,1) 'failed in get_rotation_sigmas'
             return
          end if
 
@@ -386,7 +386,7 @@
 
          ierr = 0
          xmstar = s% xmstar
-         sig_term_limit = s% ctrl% am_sig_term_limit
+         sig_term_limit = s% am_sig_term_limit
          nz = s% nz
          ! note: am_sig is cell centered, so combine adjacent am_nu face values.
          am_nu_E00 = 0; am_nu_Ep1 = 0
@@ -486,14 +486,14 @@
          call set_i_rot(s, skip_w_div_w_crit_roche)
          call set_omega(s, 'set_rotation_info')
 
-         if (.not. s% ctrl% use_other_eval_fp_ft) then
+         if (.not. s% use_other_eval_fp_ft) then
             call eval_fp_ft( &
                   s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
-                  s% r_polar, s% r_equatorial, s% ctrl% report_ierr, ierr)
+                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
          else
             call s% other_eval_fp_ft( &
                   s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
-                  s% r_polar, s% r_equatorial, s% ctrl% report_ierr, ierr)
+                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
          end if
          if (ierr /= 0) then
             write(*,*) 'failed in eval_fp_ft'
@@ -550,27 +550,27 @@
             dm = s% dm(k)
             dtau = dm*kap/(pi4*rmid*rmid)
 
-            if (tau + dtau <= s% ctrl% surf_avg_tau_min) then
+            if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
                cycle
             end if
 
             ! check for partial contribution from cell
-            ! the tau < s% ctrl% surf_avg_tau is meant for the case in which the surface tau is set
+            ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
             ! equal or larger to surf_avg_tau. In that case we just use the values of the surface cell.
-            if (tau < s% ctrl% surf_avg_tau) then
-               if (tau < s% ctrl% surf_avg_tau_min) then ! only use part of this cell
-                  dm = dm*(tau + dtau - s% ctrl% surf_avg_tau_min)/dtau
-               else if (tau + dtau > s% ctrl% surf_avg_tau) then ! only use part of this cell
-                  dm = dm*(s% ctrl% surf_avg_tau - tau)/dtau
-                  !write(*,2) 'tau limit', k, (s% ctrl% surf_avg_tau - tau)/dtau
+            if (tau < s% surf_avg_tau) then
+               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+                  dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
+               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+                  dm = dm*(s% surf_avg_tau - tau)/dtau
+                  !write(*,2) 'tau limit', k, (s% surf_avg_tau - tau)/dtau
                end if
             end if
             dmsum = dmsum + dm
             Lrad_div_Ledd = get_Lrad_div_Ledd(s,k)
             Lrad_div_Ledd_sum = Lrad_div_Ledd_sum + dm*Lrad_div_Ledd
             tau = tau + dtau
-            if (tau >= s% ctrl% surf_avg_tau) exit
+            if (tau >= s% surf_avg_tau) exit
          end do
 
          s% Lrad_div_Ledd_avg_surf = Lrad_div_Ledd_sum/dmsum
@@ -598,19 +598,19 @@
             dm = s% dm(k)
             dtau = dm*kap/(pi4*rmid*rmid)
 
-            if (tau + dtau <= s% ctrl% surf_avg_tau_min) then
+            if (tau + dtau <= s% surf_avg_tau_min) then
                tau = tau + dtau
                cycle
             end if
 
             ! check for partial contribution from cell
-            ! the tau < s% ctrl% surf_avg_tau is meant for the case in which the surface tau is set
+            ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
             ! equal or larger to surf_avg_tau. In this case we just use the values of the surface cell.
-            if (tau < s% ctrl% surf_avg_tau) then
-               if (tau < s% ctrl% surf_avg_tau_min) then ! only use part of this cell
-                  dm = dm*(tau + dtau - s% ctrl% surf_avg_tau_min)/dtau
-               else if (tau + dtau > s% ctrl% surf_avg_tau) then ! only use part of this cell
-                  dm = dm*(s% ctrl% surf_avg_tau - tau)/dtau
+            if (tau < s% surf_avg_tau) then
+               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+                  dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
+               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+                  dm = dm*(s% surf_avg_tau - tau)/dtau
                end if
             end if
 
@@ -637,7 +637,7 @@
             logRho_sum = logRho_sum + dm*s% lnd(k)/ln10
             kap_sum = kap_sum + dm*kap
             tau = tau + dtau
-            if (tau >= s% ctrl% surf_avg_tau) exit
+            if (tau >= s% surf_avg_tau) exit
 
          end do
 
@@ -725,7 +725,7 @@
                   fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
                   ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
                end if
-               !if (j == s% ctrl% solver_test_partials_k) then
+               !if (j == s% solver_test_partials_k) then
                !   s% solver_test_partials_val = fp(j)
                !   s% solver_test_partials_var = s% i_w_div_wc
                !   s% solver_test_partials_dval_dx = s% dfp_rot_dw_div_wc(j)
@@ -751,15 +751,15 @@
 
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% ctrl% am_D_mix_factor==0d0) then
+         if (s% am_D_mix_factor==0d0) then
             s% am_nu_omega(:) = 0d0
          end if
 
          s% extra_jdot(:) = 0d0
-         if (s% ctrl% use_other_torque) then
+         if (s% use_other_torque) then
             call s% other_torque(s% id, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr .or. dbg) &
+               if (s% report_ierr .or. dbg) &
                   write(*, *) 'solve_omega_mix: other_torque returned ierr', ierr
                return
             end if
@@ -767,7 +767,7 @@
          if (associated(s% binary_other_torque)) then
             call s% binary_other_torque(s% id, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr .or. dbg) &
+               if (s% report_ierr .or. dbg) &
                   write(*, *) 'solve_omega_mix: binary_other_torque returned ierr', ierr
                return
             end if

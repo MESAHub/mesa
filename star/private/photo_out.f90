@@ -57,7 +57,7 @@
          
          call write_part_number(iounit)
          write(iounit) &
-            s% ctrl% initial_z, & ! need this since read_model can change what is in the inlist
+            s% initial_z, & ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &

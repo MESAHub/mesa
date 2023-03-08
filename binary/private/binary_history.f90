@@ -536,7 +536,7 @@
             case(bh_delta_star_2_mass)
                val = b% m(2) - initial_mass(2)
             case(bh_lg_F_irr)
-               val = safe_log10(b% s_donor% ctrl% irradiation_flux)
+               val = safe_log10(b% s_donor% irradiation_flux)
             case(bh_fixed_xfer_fraction)
                val = b% fixed_xfer_fraction
             case(bh_eff_xfer_fraction)

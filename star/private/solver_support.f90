@@ -63,7 +63,7 @@
                      s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   end if
                else ! abundance variable
-                  s% x_scale(i,k) = max(s% ctrl% xa_scale, s% xa_start(i-nvar_hydro,k))
+                  s% x_scale(i,k) = max(s% xa_scale, s% xa_start(i-nvar_hydro,k))
                end if
             end do
          end do
@@ -73,7 +73,7 @@
          subroutine dump_xscale
             integer :: k, j, k0, k1
             include 'formats'
-            !write(*,1) 's% ctrl% xa_scale', s% ctrl% xa_scale
+            !write(*,1) 's% xa_scale', s% xa_scale
             do k=1,s% nz
                do j=1,nvar
                   write(*,2) 'xscale ' // trim(s% nameofvar(j)), k, s% x_scale(j,k)
@@ -112,7 +112,7 @@
             if (dbg) write(*, *) 'call set_solver_vars'
             call set_solver_vars(s, nvar, dt, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) &
+               if (s% report_ierr) &
                   write(*,2) 'eval_equations: set_solver_vars returned ierr', ierr
                return
             end if
@@ -131,7 +131,7 @@
             if (dbg) write(*, *) 'call eval_equ'
             call eval_equ(s, nvar, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) &
+               if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr
                return
             end if
@@ -139,7 +139,7 @@
 
          if (ierr /= 0) return
          
-         if (.not. s% ctrl% stop_for_bad_nums) return
+         if (.not. s% stop_for_bad_nums) return
 
          cnt = 0
          do i=1,nz
@@ -147,13 +147,13 @@
                if (is_bad_num(s% equ(j, i))) then
                   cnt = cnt + 1
                   s% retry_message = 'eval_equations: equ has a bad num'
-                  if (s% ctrl% report_ierr) then
+                  if (s% report_ierr) then
                      write(*,4) 'eval_equations: equ has a bad num ' // trim(s% nameofequ(j)), &
                         j, i, nvar, s% equ(j, i)
                      write(*,2) 'cell', i
                      write(*,2) 'nz', s% nz
                   end if
-                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equations')
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'eval_equations')
                end if
             end do
          end do
@@ -204,7 +204,7 @@
          k_max = 0
          j_max = 0
          
-         dbg = s% ctrl% solver_check_everything
+         dbg = s% solver_check_everything
 
          nvar_hydro = min(nvar, s% nvar_hydro)
          nvar_chem = s% nvar_chem
@@ -216,8 +216,8 @@
          skip_eqn1 = 0
          skip_eqn2 = 0
          skip_eqn3 = 0
-         if (s% ctrl% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
-         if (s% ctrl% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
+         if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
+         if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
          if (s% do_burn .or. s% do_mix) then
             num_terms = num_terms + nvar*nz
             if (skip_eqn1 > 0) num_terms = num_terms - nz
@@ -258,10 +258,10 @@
                         call mesa_error(__FILE__,__LINE__,'sizeq 1')
                      end if
                      ierr = -1
-                     if (s% ctrl% report_ierr) &
+                     if (s% report_ierr) &
                         write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
                            j, k, s% equ(j,k)*s% residual_weight(j,k)
-                     if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'sizeq 2')
+                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'sizeq 2')
                      return
                   end if
                   if (absq > equ_max) then
@@ -342,7 +342,7 @@
          n = nz
          nvar_hydro = min(nvar, s% nvar_hydro)
 
-         if (s% ctrl% include_L_in_correction_limits) then
+         if (s% include_L_in_correction_limits) then
             skip1 = 0
             do k=1,nz
                s% correction_weight(s% i_lum,k) = 1d0/(frac*s% L_start(1) + abs(s% L(k)))
@@ -351,12 +351,12 @@
             skip1 = s% i_lum
          end if
 
-         if (s% u_flag .and. s% ctrl% include_u_in_correction_limits) then
+         if (s% u_flag .and. s% include_u_in_correction_limits) then
             skip2 = 0
             do k=1,nz
                s% correction_weight(s% i_u,k) = 1d0/(frac*s% csound_start(k) + abs(s% u(k)))
             end do
-         else if (s% v_flag .and. s% ctrl% include_v_in_correction_limits) then
+         else if (s% v_flag .and. s% include_v_in_correction_limits) then
             skip2 = 0
             do k=1,nz
                s% correction_weight(s% i_v,k) = 1d0/(frac*s% csound_start(k) + abs(s% v(k)))
@@ -367,7 +367,7 @@
             skip2 = s% i_v
          end if
 
-         if (s% RSP2_flag .and. s% ctrl% include_w_in_correction_limits) then
+         if (s% RSP2_flag .and. s% include_w_in_correction_limits) then
             skip3 = 0
             do k=1,nz
                if (abs(s% w(k)) < 1d0) then
@@ -391,10 +391,10 @@
          sum_xa_corr = 0
          max_correction = 0
          max_abs_correction = 0
-         x_limit = s% ctrl% correction_xa_limit
+         x_limit = s% correction_xa_limit
          found_NaN = .false.
          found_bad_num = .false.
-         report = s% ctrl% report_ierr
+         report = s% report_ierr
          cell_loop: do k = 1, nz
             max_abs_corr_for_k = 0
             max_abs_xa_corr_for_k = 0
@@ -416,7 +416,7 @@
                      found_bad_num = .true.
                      if (report) write(*,2) 'sizeB: bad num for correction ' // &
                         s% nameofvar(j), k, B(j,k)*s% correction_weight(j,k)
-                     if (s% ctrl% stop_for_bad_nums) then
+                     if (s% stop_for_bad_nums) then
                         found_NaN = .true.
                         write(*,3) s% nameofvar(j) // ' B(j,k)*s% correction_weight(j,k)', &
                            j, k, B(j,k)*s% correction_weight(j,k)
@@ -439,13 +439,13 @@
                   found_bad_num = .true.
                   if (report) write(*,3) 'B(j,k)*s% correction_weight(j,k)', &
                      j, k, B(j,k)*s% correction_weight(j,k)
-                  if (s% ctrl% stop_for_bad_nums) found_NaN = .true.
+                  if (s% stop_for_bad_nums) found_NaN = .true.
                end if
                if (abs_corr > max_abs_corr_for_k &
-                  .and. .not. (j > nvar_hydro .and. s% ctrl% ignore_species_in_max_correction)) &
+                  .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) &
                      max_abs_corr_for_k = abs_corr
                if (abs_corr > max_abs_correction &
-                  .and. .not. (j > nvar_hydro .and. s% ctrl% ignore_species_in_max_correction)) then
+                  .and. .not. (j > nvar_hydro .and. s% ignore_species_in_max_correction)) then
                   max_correction = B(j,k)*s% correction_weight(j,k)
                   max_abs_correction = abs_corr
                   max_zone = k
@@ -473,7 +473,7 @@
                         found_bad_num = .true.
                         if (report) write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', j, k, &
                            B(j,k)*s% correction_weight(j,k)
-                        if (s% ctrl% stop_for_bad_nums) then
+                        if (s% stop_for_bad_nums) then
                            found_NaN = .true.
                            write(*,3) 'chem B(j,k)*s% correction_weight(j,k)', &
                               j, k, B(j,k)*s% correction_weight(j,k)
@@ -487,7 +487,7 @@
                   ! recall that correction dx = B*xscale, so B is a relative correction
                   if (s% xa_start(i,k) >= x_limit) then
                      abs_corr = abs(B(j,k)*s% correction_weight(j,k))
-                     if (.not. s% ctrl% ignore_species_in_max_correction) then
+                     if (.not. s% ignore_species_in_max_correction) then
                         if (abs_corr > max_abs_corr_for_k) max_abs_corr_for_k = abs_corr
                         if (abs_corr > max_abs_correction) then
                            max_abs_correction = abs_corr
@@ -506,7 +506,7 @@
 
          if (found_bad_num) then
             ierr = -1
-            if (found_NaN .and. s% ctrl% stop_for_bad_nums) then
+            if (found_NaN .and. s% stop_for_bad_nums) then
                write(*,*) 'found bad num'
                call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
@@ -515,7 +515,7 @@
 
          if (is_bad_num(sum_corr)) then
             ierr = -1
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                if (report) write(*,*) 'sum_corr', sum_corr
                call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
@@ -534,7 +534,7 @@
             end if
          end if
 
-         if (s% ctrl% solver_show_correction_info) call show_stuff
+         if (s% solver_show_correction_info) call show_stuff
 
          abs_corr = max_abs_correction
 
@@ -546,7 +546,7 @@
 
          if (is_bad_num(max_correction)) then
             ierr = -1
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                if (report) write(*,*) 'max_correction', max_correction
                call mesa_error(__FILE__,__LINE__,'sizeB')
             end if
@@ -558,11 +558,11 @@
          if (s% solver_iter < 3) return
          ! check for flailing
          if ( &
-             abs_corr > s% ctrl% tol_max_correction .and. &
+             abs_corr > s% tol_max_correction .and. &
              abs_corr > s% abs_max_corr1 .and. s% abs_max_corr1 > s% abs_max_corr2 .and. &
              max_zone == s% max_zone1 .and. s% max_zone1 == s% max_zone2 .and. &
              max_var == s% max_var1 .and. s% max_var1 == s% max_var2) then
-            if (s% ctrl% solver_show_correction_info) then
+            if (s% solver_show_correction_info) then
                write(*,*) 'give up because diverging'
             end if
             max_correction = 1d99
@@ -650,14 +650,14 @@
          if (s% RTI_flag) & ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
 
-         if (s% i_lum>=0 .and. s% ctrl% scale_max_correction_for_negative_surf_lum) then
+         if (s% i_lum>=0 .and. s% scale_max_correction_for_negative_surf_lum) then
             !ensure surface luminosity does not become negative
             dlum_surf = B(s% i_lum,1)*s% x_scale(s% i_lum,1)
             old_lum_surf = s% xh_start(s% i_lum,1) + s% solver_dx(s% i_lum,1)
             new_lum_surf = old_lum_surf + dlum_surf
             if (new_lum_surf < 0d0 .and. old_lum_surf > 0d0) then
                correction_factor = min(correction_factor, &
-                  -s% ctrl% max_frac_for_negative_surf_lum*old_lum_surf/dlum_surf)
+                  -s% max_frac_for_negative_surf_lum*old_lum_surf/dlum_surf)
             end if
          end if
 
@@ -674,10 +674,10 @@
          !   end do
          !end if
 
-         if ((.not. s% ctrl% do_solver_damping_for_neg_xa) .or. &
+         if ((.not. s% do_solver_damping_for_neg_xa) .or. &
              (.not. (s% do_mix .or. s% do_burn))) then
             if (min_alpha < 1d0) then
-               min_alpha = max(min_alpha, s% ctrl% corr_coeff_limit)
+               min_alpha = max(min_alpha, s% corr_coeff_limit)
                correction_factor = min_alpha*correction_factor
             end if
             return
@@ -709,9 +709,9 @@
             end do
          end if
 
-         min_alpha = max(min_alpha, s% ctrl% corr_coeff_limit)
+         min_alpha = max(min_alpha, s% corr_coeff_limit)
          correction_factor = min_alpha*correction_factor
-         if (s% ctrl% trace_solver_damping .and. min_alpha < 1d0 .and. bad_j > 0) then
+         if (s% trace_solver_damping .and. min_alpha < 1d0 .and. bad_j > 0) then
             write(*,4) 'solver damping to avoid negative mass fractions: ' // &
                trim(chem_isos% name(s% chem_id(bad_j))), bad_k, &
                s% model_number, s% solver_iter, min_alpha
@@ -793,9 +793,9 @@
          force_another_iteration = 0
 
          if (s% k_below_just_added > 1 .and. &
-               s% num_surf_revisions < s% ctrl% max_num_surf_revisions .and. &
+               s% num_surf_revisions < s% max_num_surf_revisions .and. &
                abs(s% lnS(1) - s% surf_lnS) > &
-                  s% ctrl% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
+                  s% max_abs_rel_change_surf_lnS*max(s% lnS(1),s% surf_lnS)) then
             s% surf_lnS = s% lnS(1)
             s% num_surf_revisions = s% num_surf_revisions + 1
             force_another_iteration = 1
@@ -872,15 +872,15 @@
          xa_start => s% xa_start
          
          report_dx = &
-            s% ctrl% solver_test_partials_dx_0 > 0d0 .and. &
-            s% ctrl% solver_test_partials_k > 0 .and. &
-            s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
-            s% ctrl% solver_test_partials_iter_number == s% solver_iter .and. &
-            len_trim(s% ctrl% solver_test_partials_show_dx_var_name) > 0
+            s% solver_test_partials_dx_0 > 0d0 .and. &
+            s% solver_test_partials_k > 0 .and. &
+            s% solver_call_number == s% solver_test_partials_call_number .and. &
+            s% solver_test_partials_iter_number == s% solver_iter .and. &
+            len_trim(s% solver_test_partials_show_dx_var_name) > 0
             
          if (report_dx) then
-            k = s% ctrl% solver_test_partials_k
-            i_var = lookup_nameofvar(s, s% ctrl% solver_test_partials_show_dx_var_name)            
+            k = s% solver_test_partials_k
+            i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)            
             if (i_var > 0) then
                if (i_var > nvar_hydro) then
                   dx_for_i_var = s% solver_dx(i_var,k)
@@ -890,7 +890,7 @@
                   x_for_i_var = xh_start(i_var,k) + s% solver_dx(i_var,k)
                end if
                write(*,3) 'dx, x for var name ' // &
-                  trim(s% ctrl% solver_test_partials_show_dx_var_name), &
+                  trim(s% solver_test_partials_show_dx_var_name), &
                   k, s% solver_iter, dx_for_i_var, x_for_i_var
             end if
          end if
@@ -942,7 +942,7 @@
                k = loc(2)
                if (s% xa(j,k) >= 1d-3*min_xa_hard_limit) exit ! too good to fix
                if (s% xa(j,k) < min_xa_hard_limit) then
-                  if (s% ctrl% report_ierr) then
+                  if (s% report_ierr) then
                      khi = nz
                      do kk=k+1,nz
                         if (s% xa(j,kk) < min_xa_hard_limit) cycle
@@ -994,7 +994,7 @@
                !write(*,3) 'no extend', k_lo, k_hi
                if (.not. try_again) exit
                dq_sum = sum(s% dq(k_lo:k_hi))
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
                   write(*,5) 'fix xa(j,k_lo:k_hi)', j, k_lo, k, k_hi, s% xa(j,k), &
                      sum(s% xa(j,k_lo:k_hi)*s% dq(k_lo:k_hi))/dq_sum, dq_sum
                   !stop
@@ -1008,9 +1008,9 @@
             end do
          end if
          
-         if (s% ctrl% solver_test_partials_k > 0 .and. &
-             s% ctrl% solver_test_partials_k <= nz) then
-            k = s% ctrl% solver_test_partials_k
+         if (s% solver_test_partials_k > 0 .and. &
+             s% solver_test_partials_k <= nz) then
+            k = s% solver_test_partials_k
          end if
 
          kbad = 0
@@ -1025,7 +1025,7 @@
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
                do k=1,nz ! report the errors sequentially
                   call set1(k,.true.,op_err)
                end do
@@ -1035,20 +1035,20 @@
             return
          end if
          
-         if (s% ctrl% solver_test_partials_k > 0 .and. &
-             s% ctrl% solver_test_partials_k <= nz) then
-            k = s% ctrl% solver_test_partials_k
+         if (s% solver_test_partials_k > 0 .and. &
+             s% solver_test_partials_k <= nz) then
+            k = s% solver_test_partials_k
          end if
 
          if (do_lum) then
             do k=1,nz
                if (is_bad_num(s% L(k))) then
-                  if (s% ctrl% report_ierr) write(*,2) 'set_vars_for_solver L', k, s% L(k), &
+                  if (s% report_ierr) write(*,2) 'set_vars_for_solver L', k, s% L(k), &
                      xh_start(i_lum,k) + s% solver_dx(i_lum,k), &
                      xh_start(i_lum,k), s% solver_dx(i_lum,k)
                   s% retry_message = 'bad num for some L'
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver L', k, s% L(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1059,7 +1059,7 @@
          end if
 
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
 
                do k=1,nz
                   if (abs(1d0 - sum(s% xa(:,k))) > 1d-3) then
@@ -1094,7 +1094,7 @@
          if (do_lnR) then
             call set_rmid(s, 1, nz, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*, *) 'set_rmid returned ierr', ierr
+               if (s% report_ierr) write(*, *) 'set_rmid returned ierr', ierr
                return
             end if
          end if
@@ -1106,7 +1106,7 @@
             skip_grads, skip_rotation, skip_brunt, skip_other_cgrav, &
             skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'set_hydro_vars returned ierr', ierr
+            if (s% report_ierr) write(*,2) 'set_hydro_vars returned ierr', ierr
             return
          end if
 
@@ -1152,8 +1152,8 @@
                s% T(k) = exp(s% lnT(k))
                s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
                if (abs(s% lnT(k) - s% lnT_start(k)) > &
-                       ln10*s% ctrl% hydro_mtx_max_allowed_abs_dlogT .and. &
-                    s% ctrl% min_logT_for_hydro_mtx_max_allowed < &
+                       ln10*s% hydro_mtx_max_allowed_abs_dlogT .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
                      ln10*min(s% lnT(k),s% lnT_start(k))) then
                   if (report) &
                      write(*,4) 'hydro_mtx: change too large, dlogT, logT, logT_start', &
@@ -1164,8 +1164,8 @@
                   ierr = -1
                   return
                end if
-               if (s% lnT(k) > ln10*s% ctrl% hydro_mtx_max_allowed_logT .and. &
-                    s% ctrl% min_logT_for_hydro_mtx_max_allowed < &
+               if (s% lnT(k) > ln10*s% hydro_mtx_max_allowed_logT .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
                      ln10*min(s% lnT(k),s% lnT_start(k))) then
                   if (report) &
                      write(*,4) 'hydro_mtx: logT too large', &
@@ -1175,7 +1175,7 @@
                   ierr = -1
                   return
                end if
-               if (s% lnT(k) < ln10*s% ctrl% hydro_mtx_min_allowed_logT) then
+               if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
                   if (report) &
                      write(*,4) 'hydro_mtx: logT too small', &
                         s% model_number, k, s% solver_iter, &
@@ -1187,7 +1187,7 @@
                s% T(k) = exp(s% lnT(k))
                if (is_bad_num(s% T(k))) then
                   s% retry_message = 'bad num for T'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver T', k, s% T(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1202,7 +1202,7 @@
                if (is_bad_num(s% L(k))) then
                   s% retry_message = 'bad num for L'
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver L', k, s% L(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1215,12 +1215,12 @@
                if (s% w(k) < 0d0) then
                   !write(*,4) 'set_vars_for_solver: fix w < 0', k, &
                   !   s% solver_iter, s% model_number, s% w(k)
-                  s% w(k) = s% ctrl% RSP2_w_fix_if_neg
+                  s% w(k) = s% RSP2_w_fix_if_neg
                end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver w', k, s% w(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1230,7 +1230,7 @@
                if (is_bad_num(s% Hp_face(k))) then
                   s% retry_message = 'bad num for Hp_face'
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver Hp_face', k, s% Hp_face(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1243,7 +1243,7 @@
                s% dxh_v(k) = s% solver_dx(i_v,k)
                if (is_bad_num(s% v(k))) then
                   s% retry_message = 'bad num for v'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver v', k, s% v(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1257,7 +1257,7 @@
                s% dxh_u(k) = s% solver_dx(i_u,k)
                if (is_bad_num(s% u(k))) then
                   s% retry_message = 'bad num for u'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver u', k, s% u(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1271,7 +1271,7 @@
                s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                if (is_bad_num(s% alpha_RTI(k))) then
                   s% retry_message = 'bad num for alpha_RTI'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver alpha_RTI', k, s% alpha_RTI(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1294,7 +1294,7 @@
                end if
                if (is_bad_num(s% w_div_w_crit_roche(k))) then
                   s% retry_message = 'bad num for w_div_w_crit_roche'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1307,7 +1307,7 @@
                s% j_rot(k) = x(i_j_rot)
                if (is_bad_num(s% j_rot(k))) then
                   s% retry_message = 'bad num for j_rot'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver j_rot', k, s% j_rot(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1322,7 +1322,7 @@
                s% dxh_lnR(k) = s% solver_dx(i_lnR,k)
                if (is_bad_num(s% lnR(k))) then
                   s% retry_message = 'bad num for lnR'
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver r lnR solver_dx', &
                         k, s% r(k), s% lnR(k), s% solver_dx(i_lnR,k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
@@ -1337,7 +1337,7 @@
                s% lnd(k) = x(i_lnd)
                s% rho(k) = exp(s% lnd(k))
                s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
-               if (s% lnd(k) < ln10*s% ctrl% hydro_mtx_min_allowed_logRho) then
+               if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
                   if (report) &
                      write(*,4) 'hydro_mtx: logRho too small', &
@@ -1346,11 +1346,11 @@
                   ierr = -1
                   return
                end if
-               if (s% lnd(k) > ln10*s% ctrl% hydro_mtx_max_allowed_logRho .and. &
-                    s% ctrl% min_logT_for_hydro_mtx_max_allowed < &
+               if (s% lnd(k) > ln10*s% hydro_mtx_max_allowed_logRho .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
                      ln10*min(s% lnT(k),s% lnT_start(k))) then
                   write(s% retry_message, *) 'logRho > hydro_mtx_max_allowed_logRho', k
-                  if (s% ctrl% report_ierr .or. report) &
+                  if (s% report_ierr .or. report) &
                      write(*,4) 'hydro_mtx: logRho too large', &
                         s% model_number, k, s% solver_iter, &
                         s% lnd(k)/ln10, s% lnd_start(k)/ln10
@@ -1358,11 +1358,11 @@
                   return
                end if
                if (abs(s% lnd(k) - s% lnd_start(k)) > &
-                     ln10*s% ctrl% hydro_mtx_max_allowed_abs_dlogRho .and. &
-                    s% ctrl% min_logT_for_hydro_mtx_max_allowed < &
+                     ln10*s% hydro_mtx_max_allowed_abs_dlogRho .and. &
+                    s% min_logT_for_hydro_mtx_max_allowed < &
                      ln10*min(s% lnT(k),s% lnT_start(k))) then
                   write(s% retry_message, *) 'abs(dlogRho) > hydro_mtx_max_allowed_abs_dlogRho', k
-                  if (s% ctrl% report_ierr .or. report) &
+                  if (s% report_ierr .or. report) &
                      write(*,4) &
                         'hydro_mtx: dlogRho, logRho, logRho_start', &
                         s% model_number, k, s% solver_iter, &
@@ -1373,7 +1373,7 @@
                end if
                if (is_bad_num(s% rho(k))) then
                   write(s% retry_message, *) 'bad num for rho', k
-                  if (s% ctrl% stop_for_bad_nums) then
+                  if (s% stop_for_bad_nums) then
                      write(*,2) 'set_vars_for_solver rho', k, s% rho(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
@@ -1414,7 +1414,7 @@
             do j=1,species
                if (s% xa(j,k) < min_xa_hard_limit) then
                   s% retry_message = 'some xa < min_xa_hard_limit'
-                  if (report .or. s% ctrl% report_bad_negative_xa) then
+                  if (report .or. s% report_bad_negative_xa) then
                      write(*,3) &
                         'bad negative xa, min_xa_hard_limit, sig, logT ' // &
                         trim(chem_isos% name(s% chem_id(j))), j, k, &
@@ -1438,7 +1438,7 @@
          if (is_bad_num(sum_xa)) then
             ierr = -1
             s% retry_message = 'bad num for mass fractions'
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'set_vars_for_solver sum_xa', k, sum_xa
                call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
             end if
@@ -1479,9 +1479,9 @@
             !end if
          end if
 
-         if (s% ctrl% xa_clip_limit > 0) then
+         if (s% xa_clip_limit > 0) then
             do j=1,species
-               if (s% xa(j,k) < s% ctrl% xa_clip_limit) s% xa(j,k) = 0d0
+               if (s% xa(j,k) < s% xa_clip_limit) s% xa(j,k) = 0d0
             end do
          end if
 

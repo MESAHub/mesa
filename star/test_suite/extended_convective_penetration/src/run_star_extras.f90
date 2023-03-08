@@ -267,12 +267,12 @@
         if (ierr /= 0) return
 
         ! Extract parameters
-        f = s% ctrl% overshoot_f(j)
-        f0 = s% ctrl% overshoot_f0(j)
-        f2 = s% ctrl% x_ctrl(j)
+        f = s%overshoot_f(j)
+        f0 = s%overshoot_f0(j)
+        f2 = s%x_ctrl(j)
 
-        D0 = s% ctrl% overshoot_D0(j)
-        Delta0 = s% ctrl% overshoot_Delta0(j)
+        D0 = s%overshoot_D0(j)
+        Delta0 = s%overshoot_Delta0(j)
 
         if (f < 0.0_dp .OR. f0 <= 0.0_dp .OR. f2 < 0.0_dp) then
             write(*,*) 'ERROR: for extended convective penetration, must set f0 > 0, and f and f2 >= 0'
@@ -282,10 +282,10 @@
         end if
 
         ! Apply mass limits
-        if (s%star_mass < s% ctrl% overshoot_mass_full_on(j)) then
-            if (s%star_mass > s% ctrl% overshoot_mass_full_off(j)) then
-                w = (s%star_mass - s% ctrl% overshoot_mass_full_off(j)) / &
-                  (s% ctrl% overshoot_mass_full_on(j) - s% ctrl% overshoot_mass_full_off(j))
+        if (s%star_mass < s%overshoot_mass_full_on(j)) then
+            if (s%star_mass > s%overshoot_mass_full_off(j)) then
+                w = (s%star_mass - s%overshoot_mass_full_off(j)) / &
+                  (s%overshoot_mass_full_on(j) - s%overshoot_mass_full_off(j))
                 factor = 0.5_dp*(1.0_dp - cospi(w))
                 f = f*factor
                 f0 = f0*factor
@@ -357,7 +357,7 @@
 
             ! Check for early overshoot completion
 
-            if (D(k) < s% ctrl% overshoot_D_min) then
+            if (D(k) < s%overshoot_D_min) then
                 k_b = k
                 exit face_loop
             endif
@@ -401,7 +401,7 @@
         endif
 
         do k= s%nz, 1, -1
-            if (s%D_mix(k) <= s% ctrl% min_D_mix) exit
+            if (s%D_mix(k) <= s% min_D_mix) exit
 
             call calc_Peclet_number(id, k, Peclet_number, ierr)
 
@@ -433,7 +433,7 @@
 
         conductivity = 16.0_dp * boltz_sigma * pow3(s% T(k)) / ( 3.0_dp * s% opacity(k) * pow2(s% rho(k)) * s% cp(k) )
         call evaluate_Hp (s, k, s%r(k), Hp, ierr)
-        Peclet_nr = s% conv_vel(k) * Hp * s% ctrl% mixing_length_alpha / conductivity
+        Peclet_nr = s% conv_vel(k) * Hp * s% mixing_length_alpha / conductivity
     end subroutine calc_Peclet_number
 
     ! Evaluate the pressure scale height at a given location in the star

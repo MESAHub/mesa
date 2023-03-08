@@ -86,7 +86,7 @@
 
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
             ! to account for loss of precision during remeshing.
-            pad = s% ctrl% min_dq * s% m(1) * 0.5d0
+            pad = s% min_dq * s% m(1) * 0.5d0
             do k = s%nz,1,-1
                if(s% m(k) > s% crystal_core_boundary_mass + pad) then
                   kstart = k
@@ -174,7 +174,7 @@
         logical :: use_brunt
         
         update_mode(:) = FIXED_DT_MODE
-        use_brunt = s% ctrl% phase_separation_mixing_use_brunt
+        use_brunt = s% phase_separation_mixing_use_brunt
         net_ihe4 = s% net_iso(ihe4)
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
@@ -313,7 +313,7 @@
         ! This is expensive, so only do it if we really need to.
         if(do_brunt) then
            ! Need to make sure we can set brunt for mix_outward calculation.
-           if(.not. s% ctrl% calculate_Brunt_B) then
+           if(.not. s% calculate_Brunt_B) then
               stop "phase separation requires s% calculate_Brunt_B = .true."
            end if
            call do_brunt_B(s, kc_t, kc_b, ierr) ! for unsmoothed_brunt_B

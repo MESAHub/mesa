@@ -55,14 +55,14 @@
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
          remesh_split_merge = keep_going
-         if (.not. s% ctrl% okay_to_remesh) return
+         if (.not. s% okay_to_remesh) return
 
          if (s% rotation_flag) old_J = total_angular_momentum(s)
 
          call amr(s,ierr)
          if (ierr /= 0) then
             s% retry_message = 'remesh_split_merge failed'
-            if (s% ctrl% report_ierr) write(*, *) s% retry_message
+            if (s% report_ierr) write(*, *) s% retry_message
             s% result_reason = adjust_mesh_failed
             s% termination_code = t_adjust_mesh_failed
             remesh_split_merge = terminate
@@ -102,12 +102,12 @@
          ierr = 0         
          num_split = 0
          num_merge = 0
-         MaxTooSmall = s% ctrl% split_merge_amr_MaxShort
-         MaxTooBig = s% ctrl% split_merge_amr_MaxLong
+         MaxTooSmall = s% split_merge_amr_MaxShort
+         MaxTooBig = s% split_merge_amr_MaxLong
          k = nz_old
          tau_center = s% tau(k) + &
             s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
-         do iter = 1, s% ctrl% split_merge_amr_max_iters
+         do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
             if (mod(iter,2) == 0) then
                if (iTooSmall > 0 .and. TooSmall > MaxTooSmall) then
@@ -131,14 +131,14 @@
          do iter = 1, 100
             call emergency_merge(s, iTooSmall)
             if (iTooSmall == 0) exit
-            if (s% ctrl% split_merge_amr_avoid_repeated_remesh .and. &
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
-            if (s% ctrl% trace_split_merge_amr) &
+            if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_merge', iTooSmall, s% dq(iTooSmall)
             call do_merge(s, iTooSmall, species, new_xa, ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                call report_energies(s,'after emergency_merge')
                !write(*,*)
             end if
@@ -146,14 +146,14 @@
          do iter = 1, 100
             call emergency_split(s, iTooBig)
             if (iTooBig == 0) exit
-            if (s% ctrl% split_merge_amr_avoid_repeated_remesh .and. &
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
-            if (s% ctrl% trace_split_merge_amr) &
+            if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_split', iTooBig, s% dq(iTooBig)
             call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
             if (ierr /= 0) return
             num_split = num_split + 1
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                call report_energies(s,'after emergency_split')
                !write(*,*)
             end if
@@ -162,7 +162,7 @@
          nz = s% nz
          s% q(nz) = s% dq(nz)
          s% m(nz) = s% dm(nz) + s% m_center
-         if (s% ctrl% show_mesh_changes) then
+         if (s% show_mesh_changes) then
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) '                nz_old', nz_old
             write(*,*) '                nz_new', nz
@@ -174,7 +174,7 @@
                r00 = get_r_from_xh(s,k)
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-                  s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+                  s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
                call update1_i_rot_from_xh(s, k)
                s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
             end do
@@ -185,7 +185,7 @@
          
          subroutine split1 ! ratio of desired/actual is too large
             include 'formats'
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                write(*,4) 'do_merge TooSmall', &
                   iTooSmall, s% nz, s% model_number, &
                   TooSmall, MaxTooSmall, s% dq(iTooSmall)
@@ -194,7 +194,7 @@
             call do_merge(s, iTooSmall, species, new_xa, ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                call report_energies(s,'after merge')
                !write(*,*)
             end if
@@ -202,7 +202,7 @@
          
          subroutine merge1  ! ratio of actual/desired is too large
             include 'formats'
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                write(*,4) 'do_split TooBig', iTooBig, &
                   s% nz, s% model_number, TooBig, MaxTooBig, s% dq(iTooBig)
                call report_energies(s,'before split')
@@ -210,7 +210,7 @@
             call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
             if (ierr /= 0) return
             num_split = num_split + 1
-            if (s% ctrl% trace_split_merge_amr) then
+            if (s% trace_split_merge_amr) then
                call report_energies(s,'after split')
                !write(*,*)
             end if
@@ -225,7 +225,7 @@
          integer :: k_min_dq
          include 'formats'
          k_min_dq = minloc(s% dq(1:s% nz),dim=1)
-         if (s% dq(k_min_dq) < s% ctrl% split_merge_amr_dq_min) then
+         if (s% dq(k_min_dq) < s% split_merge_amr_dq_min) then
             iTooSmall = k_min_dq
          else
             iTooSmall = 0
@@ -239,7 +239,7 @@
          integer :: k_max_dq
          include 'formats'
          k_max_dq = maxloc(s% dq(1:s% nz),dim=1)
-         if (s% dq(k_max_dq) > s% ctrl% split_merge_amr_dq_max) then
+         if (s% dq(k_max_dq) > s% split_merge_amr_dq_max) then
             iTooBig = k_max_dq
          else
             iTooBig = 0
@@ -266,26 +266,26 @@
          include 'formats'
          
          nz = s% nz
-         hydrid_zoning = s% ctrl% split_merge_amr_hybrid_zoning
-         flipped_hydrid_zoning = s% ctrl% split_merge_amr_flipped_hybrid_zoning
-         log_zoning = s% ctrl% split_merge_amr_log_zoning
-         logtau_zoning = s% ctrl% split_merge_amr_logtau_zoning
-         nz_baseline = s% ctrl% split_merge_amr_nz_baseline         
-         nz_r_core = s% ctrl% split_merge_amr_nz_r_core
-         if (s% ctrl% split_merge_amr_mesh_delta_coeff /= 1d0) then
-            nz_baseline = int(dble(nz_baseline)/s% ctrl% split_merge_amr_mesh_delta_coeff)
-            nz_r_core = int(dble(nz_r_core)/s% ctrl% split_merge_amr_mesh_delta_coeff)
+         hydrid_zoning = s% split_merge_amr_hybrid_zoning
+         flipped_hydrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
+         log_zoning = s% split_merge_amr_log_zoning
+         logtau_zoning = s% split_merge_amr_logtau_zoning
+         nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_r_core = s% split_merge_amr_nz_r_core
+         if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
+            nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
+            nz_r_core = int(dble(nz_r_core)/s% split_merge_amr_mesh_delta_coeff)
          end if
-         if (s% ctrl% split_merge_amr_r_core_cm > 0d0) then
-            r_core_cm = s% ctrl% split_merge_amr_r_core_cm
-         else if (s% ctrl% split_merge_amr_nz_r_core_fraction > 0d0) then
+         if (s% split_merge_amr_r_core_cm > 0d0) then
+            r_core_cm = s% split_merge_amr_r_core_cm
+         else if (s% split_merge_amr_nz_r_core_fraction > 0d0) then
             r_core_cm = s% R_center + &
-               s% ctrl% split_merge_amr_nz_r_core_fraction*(s% r(1) - s% R_center)
+               s% split_merge_amr_nz_r_core_fraction*(s% r(1) - s% R_center)
          else
             r_core_cm = s% R_center
          end if
-         dq_min = s% ctrl% split_merge_amr_dq_min
-         dq_max = s% ctrl% split_merge_amr_dq_max
+         dq_min = s% split_merge_amr_dq_min
+         dq_max = s% split_merge_amr_dq_max
          inner_outer_q = 0d0
          if (s% u_flag) then
             v => s% u
@@ -376,8 +376,8 @@
                xR = s% r(k)
             end if
             
-            if (s% ctrl% split_merge_amr_avoid_repeated_remesh .and. &
-                  (s% ctrl% split_merge_amr_avoid_repeated_remesh .and. &
+            if (s% split_merge_amr_avoid_repeated_remesh .and. &
+                  (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
@@ -385,8 +385,8 @@
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
-               if (k < nz .or. s% ctrl% split_merge_amr_okay_to_split_nz) then
-                  if (k > 1 .or. s% ctrl% split_merge_amr_okay_to_split_1) then
+               if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
+                  if (k > 1 .or. s% split_merge_amr_okay_to_split_1) then
                      TooBig = oversize_ratio; iTooBig = k
                   end if
                end if
@@ -394,8 +394,8 @@
             
             ! next check for cells that are too small and need to be merged
 
-            if (s% ctrl% merge_amr_ignore_surface_cells .and. &
-                  k<=s% ctrl% merge_amr_k_for_ignore_surface_cells) cycle
+            if (s% merge_amr_ignore_surface_cells .and. &
+                  k<=s% merge_amr_k_for_ignore_surface_cells) cycle
 
             if (abs(dx_actual)>0d0) then
                undersize_ratio = max(dx_baseline/dx_actual, dq_min/s% dq(k))
@@ -403,7 +403,7 @@
                undersize_ratio = dq_min/s% dq(k)
             end if
             
-            if (s% ctrl% merge_amr_max_abs_du_div_cs >= 0d0) then
+            if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
                call check_merge_limits
             else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
                TooSmall = undersize_ratio; iTooSmall = k
@@ -422,7 +422,7 @@
 
             du_div_cs_limit_flag = .false.
 
-            if (.not. s% ctrl% merge_amr_du_div_cs_limit_only_for_compression) then
+            if (.not. s% merge_amr_du_div_cs_limit_only_for_compression) then
                du_div_cs_limit_flag = .true.
             else if (associated(v)) then
                if (k < nz) then
@@ -451,17 +451,17 @@
             end if
          
             if (du_div_cs_limit_flag) then
-               if (s% ctrl% merge_amr_inhibit_at_jumps) then 
+               if (s% merge_amr_inhibit_at_jumps) then 
                   ! reduce undersize_ratio for large jumps
                   ! i.e. large jumps inhibit merges but don't prohibit completely
-                  if (abs_du_div_cs > s% ctrl% merge_amr_max_abs_du_div_cs) &
+                  if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) &
                      undersize_ratio = undersize_ratio * &
-                        s% ctrl% merge_amr_max_abs_du_div_cs/abs_du_div_cs
+                        s% merge_amr_max_abs_du_div_cs/abs_du_div_cs
                   if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then ! switch
                      TooSmall = undersize_ratio; iTooSmall = k
                   end if
                else if (TooSmall < undersize_ratio .and. &
-                        abs_du_div_cs <= s% ctrl% merge_amr_max_abs_du_div_cs .and. &
+                        abs_du_div_cs <= s% merge_amr_max_abs_du_div_cs .and. &
                         s% dq(k) < dq_max/5d0) then
                   TooSmall = undersize_ratio; iTooSmall = k
                end if
@@ -528,7 +528,7 @@
          merge_center = (i == nz)         
          if (merge_center) i = i-1
          ip = i+1
-         if (s% ctrl% split_merge_amr_avoid_repeated_remesh .and. &
+         if (s% split_merge_amr_avoid_repeated_remesh .and. &
                (s% amr_split_merge_has_undergone_remesh(i) .or. &
                   s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.
@@ -950,7 +950,7 @@
          dRght = 0.5d0*(s% r(iR) - s% r(iL))
          dCntr = dLeft + dRght
 
-         if (s% ctrl% equal_split_density_amr) then ! same density in both parts
+         if (s% equal_split_density_amr) then ! same density in both parts
             rho_RR = 0
             grad_rho = 0d0
             use_new_grad_rho = .false.
@@ -1116,7 +1116,7 @@
          
          end if
          
-         min_dm = s% ctrl% split_merge_amr_dq_min*s% xmstar
+         min_dm = s% split_merge_amr_dq_min*s% xmstar
          if (dML < min_dm .or. dMR < min_dm) then
             rho_R = rho
             rho_L = rho

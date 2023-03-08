@@ -184,11 +184,11 @@ For instance the atmosphere model of Jermyn+2021_ could be implemented as::
       !Ledd = (Ledd_rdp / M%val) * M ! Gives Ledd the correct derivatives, because Ledd_rdp scales like M.
       Ledd = 4.0d0*pi*clight*s%cgrav(1)*M/kappa
 
-      if (s% ctrl% x_logical_ctrl(7)) then
+      if (s% x_logical_ctrl(7)) then
          Ledd = Ledd * max(1e-2, (1d0 - pow2(s%job%extras_rpar(i_mu_J) / s%job%extras_rpar(i_J_crit))))
       end if
 
-      if (s% ctrl% x_logical_ctrl(1)) then
+      if (s% x_logical_ctrl(1)) then
          if (L < Ledd) then
             Mdot = Mdot * (1d0 - L/Ledd)**2d0 ! Suggested by Alexander Dittmann
          else
@@ -199,12 +199,12 @@ For instance the atmosphere model of Jermyn+2021_ could be implemented as::
       end if
 
       ! Adjust gain down due to gap opening in the disk
-      if (s% ctrl% x_logical_ctrl(2)) then
+      if (s% x_logical_ctrl(2)) then
          Mdot = Mdot * exp(-pow(M / Msun / cutoff_mass, 2d0/3d0)) ! Form suggested by Doug Lin
       end if
 
 
-      if (s% ctrl% x_logical_ctrl(3)) then
+      if (s% x_logical_ctrl(3)) then
          H_disk = pow(2d0, 0.5d0) * const_csb / Omega_AGN
          erf_arg = -R_bondi / H_disk
          erf_f1 = (-2d0/pow(pi, 0.5d0) )*pow( 1d0 - exp(-erf_arg*erf_arg), 0.5d0)
@@ -212,14 +212,14 @@ For instance the atmosphere model of Jermyn+2021_ could be implemented as::
          Mdot = 0.5d0 * Mdot * pow( pi, 0.5d0 ) * erf_f1 * erf_f2 / erf_arg
       end if
 
-      if (s% ctrl% x_logical_ctrl(4)) then
+      if (s% x_logical_ctrl(4)) then
             R_AGN = pow( standard_cgrav * Mass_AGN * Msun / (Omega_AGN * Omega_AGN) , 1d0/3d0 )
             vortpar = (R_bondi * R_bondi * Omega_AGN)/(2d0 * const_csb * R_AGN) !avg vorticity parameter at R_bondi
             vortpar = (2d0 / (pi * vortpar))*asinh( pow(2d0*vortpar, 1d0/3d0))  !Krumholz, McKee, Klein 2005 eqn. A7
             Mdot = Mdot * pow(1d0 + pow(vortpar, -10d0), -0.1d0) !pick minimum factor
       end if
 
-      if (s% ctrl% x_logical_ctrl(5)) then
+      if (s% x_logical_ctrl(5)) then
             R_Hill = pow(standard_cgrav * s%m(1) / (3d0 * Omega_AGN*Omega_AGN), 1d0/3d0)
             tidepar = pow(R_Hill / R_bondi, 2d0)
             Mdot = Mdot * min(1d0, tidepar) !pick minimum factor
@@ -227,7 +227,7 @@ For instance the atmosphere model of Jermyn+2021_ could be implemented as::
             ! Use min(Bondi, Hill) for accretion rate. Similar to Rosenthal et al. 2020
       end if
 
-      if (s% ctrl% x_logical_ctrl(6)) then
+      if (s% x_logical_ctrl(6)) then
             H_disk = pow(2d0, 0.5d0) * const_csb / Omega_AGN
             R_Hill = pow(standard_cgrav * s%m(1) / (3d0 * Omega_AGN*Omega_AGN), 1d0/3d0)
             R_acc = min(R_Hill, R_Bondi)

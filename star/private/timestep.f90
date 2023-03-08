@@ -52,8 +52,8 @@
          timestep_controller = do_timestep_limits(s, s% dt)
          if (timestep_controller /= keep_going) s% result_reason = timestep_limits
          
-         if (s% ctrl% force_timestep > 0) then
-            s% dt_next = s% ctrl% force_timestep
+         if (s% force_timestep > 0) then
+            s% dt_next = s% force_timestep
             s% why_Tlim = Tlim_force_timestep
             return
          end if
@@ -69,14 +69,14 @@
          if (s% timestep_hold > s% model_number .and. s% dt_next > s% dt) then
             s% dt_next = s% dt
             s% why_Tlim = Tlim_timestep_hold
-            if (s% ctrl% report_dt_hard_limit_retries .and. timestep_controller == keep_going) &
+            if (s% report_dt_hard_limit_retries .and. timestep_controller == keep_going) &
                write(*,3) 'timestep_hold > model_number, so no timestep increase', &
                   s% timestep_hold, s% model_number
          end if
 
          if (is_bad_num(s% dt_next)) then
             write(*, *) 'timestep_controller: dt_next', s% dt_next
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'timestep_controller')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'timestep_controller')
             timestep_controller = terminate
             s% termination_code = t_timestep_controller
             return
@@ -110,11 +110,11 @@
 
          include 'formats'
 
-         if (s% ctrl% never_skip_hard_limits) then
+         if (s% never_skip_hard_limits) then
             skip_hard_limit = .false.
          else
             skip_hard_limit = (s% timestep_hold >= s% model_number) .or. &
-               (s% ctrl% relax_hard_limits_after_retry .and. &
+               (s% relax_hard_limits_after_retry .and. &
                 s% model_number_for_last_retry == s% model_number)
          end if
 
@@ -137,7 +137,7 @@
 
          if (.not. s% doing_first_model_of_run) then
          
-            if (s% ctrl% use_other_timestep_limit) then
+            if (s% use_other_timestep_limit) then
                do_timestep_limits = s% other_timestep_limit( &
                   s% id, skip_hard_limit, dt, dt_limit_ratio(Tlim_other_timestep_limit))
                if (return_now(Tlim_other_timestep_limit)) return
@@ -355,15 +355,15 @@
          order = 1
          call filter_dt_next(s, order, dt_limit_ratio(i_limit)) ! sets s% dt_next
          
-         if (s% log_max_temperature > s% ctrl% min_logT_for_max_timestep_factor_at_high_T) then
-            max_timestep_factor = s% ctrl% max_timestep_factor_at_high_T
+         if (s% log_max_temperature > s% min_logT_for_max_timestep_factor_at_high_T) then
+            max_timestep_factor = s% max_timestep_factor_at_high_T
          else
-            max_timestep_factor = s% ctrl% max_timestep_factor
+            max_timestep_factor = s% max_timestep_factor
          end if
          
          if (max_timestep_factor > 0 .and. s% dt_next > max_timestep_factor*s% dt) then
             s% dt_next = max_timestep_factor*s% dt
-            if (s% ctrl% report_solver_dt_info) then
+            if (s% report_solver_dt_info) then
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'max_timestep_factor', s% model_number, max_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
@@ -372,11 +372,11 @@
             if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
          end if
 
-         if (s% ctrl% min_timestep_factor > 0 .and. s% dt_next < s% ctrl% min_timestep_factor*s% dt) then
-            s% dt_next = s% ctrl% min_timestep_factor*s% dt
-            if (s% ctrl% report_solver_dt_info) then
+         if (s% min_timestep_factor > 0 .and. s% dt_next < s% min_timestep_factor*s% dt) then
+            s% dt_next = s% min_timestep_factor*s% dt
+            if (s% report_solver_dt_info) then
                write(*,2) 's% dt', s% model_number, s% dt
-               write(*,2) 'min_timestep_factor', s% model_number, s% ctrl% min_timestep_factor
+               write(*,2) 'min_timestep_factor', s% model_number, s% min_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
                if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
@@ -415,7 +415,7 @@
          if (value > hard_limit .and. hard_limit > 0 .and. (.not. skip_hard_limit)) then
             check_integer_limit = retry
             s% retry_message = trim(msg) // ' hard limit'
-            if (s% ctrl% report_dt_hard_limit_retries) then
+            if (s% report_dt_hard_limit_retries) then
                write(*,*) trim(msg) // ' hard limit', hard_limit, value
                write(*,3) trim(msg), s% model_number, value
                write(*,3) trim(msg) // ' hard limit', s% model_number, hard_limit
@@ -437,10 +437,10 @@
          real(dp), intent(inout) :: dt_limit_ratio
          integer :: max_steps, i
          check_burn_steps_limit = keep_going
-         if (.not. s% ctrl% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% ctrl% op_split_burn_min_T) return
+         if (.not. s% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% op_split_burn_min_T) return
          max_steps = maxval(s% burn_num_iters(1:s% nz))
          check_burn_steps_limit = check_integer_limit( &
-           s, s% ctrl% burn_steps_limit, s% ctrl% burn_steps_hard_limit, max_steps,  &
+           s, s% burn_steps_limit, s% burn_steps_hard_limit, max_steps,  &
            'num_burn_solver_steps', skip_hard_limit, dt, dt_limit_ratio)
       end function check_burn_steps_limit
 
@@ -454,10 +454,10 @@
          include 'formats'
          check_solver_iters_timestep_limit = keep_going
          iters = s% num_solver_iterations
-         limit = s% ctrl% solver_iters_timestep_limit
+         limit = s% solver_iters_timestep_limit
          hard_limit = -1
          if (s% using_gold_tolerances) then
-            limit = s% ctrl% gold_solver_iters_timestep_limit
+            limit = s% gold_solver_iters_timestep_limit
          end if
          if (s% used_extra_iter_in_solver_for_accretion) iters = iters - 1
          check_solver_iters_timestep_limit = check_integer_limit( &
@@ -472,9 +472,9 @@
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
          check_diffusion_steps_limit = keep_going
-         if (.not. s% ctrl% do_element_diffusion) return
+         if (.not. s% do_element_diffusion) return
          check_diffusion_steps_limit = check_integer_limit( &
-           s, s% ctrl% diffusion_steps_limit, s% ctrl% diffusion_steps_hard_limit, &
+           s, s% diffusion_steps_limit, s% diffusion_steps_hard_limit, &
            s% num_diffusion_solver_steps,  &
            'num_diffusion_solver_steps', skip_hard_limit, dt, dt_limit_ratio)
       end function check_diffusion_steps_limit
@@ -486,9 +486,9 @@
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
          check_diffusion_iters_limit = keep_going
-         if (.not. s% ctrl% do_element_diffusion) return
+         if (.not. s% do_element_diffusion) return
          check_diffusion_iters_limit = check_integer_limit( &
-           s, s% ctrl% diffusion_iters_limit, s% ctrl% diffusion_iters_hard_limit, &
+           s, s% diffusion_iters_limit, s% diffusion_iters_hard_limit, &
            s% num_diffusion_solver_iters,  &
            'num_diffusion_solver_iters', skip_hard_limit, dt, dt_limit_ratio)
       end function check_diffusion_iters_limit
@@ -518,52 +518,52 @@
 
          check_dX = keep_going
 
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
 
          if (which == 0) then ! hydrogen
-            dX_limit_min_X = s% ctrl% dH_limit_min_H
-            dX_limit = s% ctrl% dH_limit
-            dX_hard_limit = s% ctrl% dH_hard_limit
-            dX_div_X_limit_min_X = s% ctrl% dH_div_H_limit_min_H
-            dX_div_X_limit = s% ctrl% dH_div_H_limit
-            dX_div_X_hard_limit = s% ctrl% dH_div_H_hard_limit
-            decreases_only = s% ctrl% dH_decreases_only
+            dX_limit_min_X = s% dH_limit_min_H
+            dX_limit = s% dH_limit
+            dX_hard_limit = s% dH_hard_limit
+            dX_div_X_limit_min_X = s% dH_div_H_limit_min_H
+            dX_div_X_limit = s% dH_div_H_limit
+            dX_div_X_hard_limit = s% dH_div_H_hard_limit
+            decreases_only = s% dH_decreases_only
          else if (which == 1) then ! helium
-            dX_limit_min_X = s% ctrl% dHe_limit_min_He
-            dX_limit = s% ctrl% dHe_limit
-            dX_hard_limit = s% ctrl% dHe_hard_limit
-            dX_div_X_limit_min_X = s% ctrl% dHe_div_He_limit_min_He
-            dX_div_X_limit = s% ctrl% dHe_div_He_limit
-            dX_div_X_hard_limit = s% ctrl% dHe_div_He_hard_limit
-            decreases_only = s% ctrl% dHe_decreases_only
+            dX_limit_min_X = s% dHe_limit_min_He
+            dX_limit = s% dHe_limit
+            dX_hard_limit = s% dHe_hard_limit
+            dX_div_X_limit_min_X = s% dHe_div_He_limit_min_He
+            dX_div_X_limit = s% dHe_div_He_limit
+            dX_div_X_hard_limit = s% dHe_div_He_hard_limit
+            decreases_only = s% dHe_decreases_only
          else if (which == 2) then ! He3
-            dX_limit_min_X = s% ctrl% dHe3_limit_min_He3
-            dX_limit = s% ctrl% dHe3_limit
-            dX_hard_limit = s% ctrl% dHe3_hard_limit
-            dX_div_X_limit_min_X = s% ctrl% dHe3_div_He3_limit_min_He3
-            dX_div_X_limit = s% ctrl% dHe3_div_He3_limit
-            dX_div_X_hard_limit = s% ctrl% dHe3_div_He3_hard_limit
-            decreases_only = s% ctrl% dHe3_decreases_only
+            dX_limit_min_X = s% dHe3_limit_min_He3
+            dX_limit = s% dHe3_limit
+            dX_hard_limit = s% dHe3_hard_limit
+            dX_div_X_limit_min_X = s% dHe3_div_He3_limit_min_He3
+            dX_div_X_limit = s% dHe3_div_He3_limit
+            dX_div_X_hard_limit = s% dHe3_div_He3_hard_limit
+            decreases_only = s% dHe3_decreases_only
          else ! metals
-            dX_limit_min_X = s% ctrl% dX_limit_min_X
-            dX_limit = s% ctrl% dX_limit
-            dX_hard_limit = s% ctrl% dX_hard_limit
-            dX_div_X_limit_min_X = s% ctrl% dX_div_X_limit_min_X
-            if (s% log_max_temperature > s% ctrl% dX_div_X_at_high_T_limit_lgT_min) then
-               dX_div_X_limit = s% ctrl% dX_div_X_at_high_T_limit
-               dX_div_X_hard_limit = s% ctrl% dX_div_X_at_high_T_hard_limit
+            dX_limit_min_X = s% dX_limit_min_X
+            dX_limit = s% dX_limit
+            dX_hard_limit = s% dX_hard_limit
+            dX_div_X_limit_min_X = s% dX_div_X_limit_min_X
+            if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min) then
+               dX_div_X_limit = s% dX_div_X_at_high_T_limit
+               dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit
             else
-               dX_div_X_limit = s% ctrl% dX_div_X_limit
-               dX_div_X_hard_limit = s% ctrl% dX_div_X_hard_limit
+               dX_div_X_limit = s% dX_div_X_limit
+               dX_div_X_hard_limit = s% dX_div_X_hard_limit
             end if
-            decreases_only = s% ctrl% dX_decreases_only
+            decreases_only = s% dX_decreases_only
          end if
          
-         dX_limit = dX_limit*s% ctrl% time_delta_coeff
-         dX_hard_limit = dX_hard_limit*s% ctrl% time_delta_coeff
+         dX_limit = dX_limit*s% time_delta_coeff
+         dX_hard_limit = dX_hard_limit*s% time_delta_coeff
 
-         dX_div_X_limit = dX_div_X_limit*s% ctrl% time_delta_coeff
-         dX_div_X_hard_limit = dX_div_X_hard_limit*s% ctrl% time_delta_coeff
+         dX_div_X_limit = dX_div_X_limit*s% time_delta_coeff
+         dX_div_X_hard_limit = dX_div_X_hard_limit*s% time_delta_coeff
 
          if (  dX_limit_min_X >= 1 .and. &
                dX_limit >= 1 .and. &
@@ -579,10 +579,10 @@
          bdy = 0
          max_dX_bdy_dist_dm = 0
          max_dX_div_X_bdy_dist_dm = 0
-         cz_dist_limit = s% ctrl% dX_mix_dist_limit*Msun
+         cz_dist_limit = s% dX_mix_dist_limit*Msun
 
-         if (s% ctrl% set_min_D_mix .and. s% ye(s% nz) >= s% ctrl% min_center_Ye_for_min_D_mix) then
-            D_mix_cutoff = s% ctrl% min_D_mix
+         if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
+            D_mix_cutoff = s% min_D_mix
          else
             D_mix_cutoff = 0
          end if
@@ -635,7 +635,7 @@
                      s% Tlim_dX_cell = k
                      s% retry_message = 'dX ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
                      s% retry_message_k = k
-                     if (s% ctrl% report_dt_hard_limit_retries) then
+                     if (s% report_dt_hard_limit_retries) then
                         write(*,2) 'old xa', s% model_number, X_old
                         write(*,2) 'new xa', s% model_number, X
                         write(*,2) 'delta xa', s% model_number, delta_dX
@@ -659,7 +659,7 @@
                      s% Tlim_dX_div_X_cell = k            
                      s% retry_message = 'dX_div_X ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
                      s% retry_message_k = k
-                     if (s% ctrl% report_dt_hard_limit_retries) then
+                     if (s% report_dt_hard_limit_retries) then
                         write(*, '(a30, i5, 99(/,a30,e20.10))') &
                            'delta_dX_div_X ' // trim(chem_isos% name(s% chem_id(j))), &
                            k, 'delta_dX_div_X', delta_dX_div_X, &
@@ -731,9 +731,9 @@
 
          check_dL_div_L = keep_going
 
-         dL_div_L_limit_min_L = Lsun*s% ctrl% dL_div_L_limit_min_L
-         dL_div_L_limit = s% ctrl% dL_div_L_limit*s% ctrl% time_delta_coeff
-         dL_div_L_hard_limit = s% ctrl% dL_div_L_hard_limit*s% ctrl% time_delta_coeff
+         dL_div_L_limit_min_L = Lsun*s% dL_div_L_limit_min_L
+         dL_div_L_limit = s% dL_div_L_limit*s% time_delta_coeff
+         dL_div_L_hard_limit = s% dL_div_L_hard_limit*s% time_delta_coeff
 
          if (dL_div_L_limit_min_L <= 0) return
          if (dL_div_L_limit <= 0 .and. dL_div_L_hard_limit <= 0) return
@@ -752,7 +752,7 @@
                   check_dL_div_L= retry
                   s% retry_message = 'dL_div_L hard limit'
                   s% retry_message_k = k
-                  if (s% ctrl% report_dt_hard_limit_retries) then
+                  if (s% report_dt_hard_limit_retries) then
                      write(*,2) 'L', L
                      write(*,2) 'L_start', s% L_start(k)
                      write(*,2) 'abs_dL_div_L', abs_dL_div_L
@@ -792,8 +792,8 @@
          end if
          check_change = keep_going
          abs_change = abs(delta_value)
-         lim = lim_in*s% ctrl% time_delta_coeff
-         hard_lim = hard_lim_in*s% ctrl% time_delta_coeff
+         lim = lim_in*s% time_delta_coeff
+         hard_lim = hard_lim_in*s% time_delta_coeff
          if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
             s% retry_message = trim(msg) // ' hard limit'
             s% retry_message_k = max_k
@@ -802,7 +802,7 @@
          end if
          if (lim <= 0) return
          relative_excess = (abs_change - lim) / lim
-         dt_limit_ratio = abs_change/lim ! 1d0/(s% ctrl% timestep_dt_factor**relative_excess)
+         dt_limit_ratio = abs_change/lim ! 1d0/(s% timestep_dt_factor**relative_excess)
          if (is_bad(dt_limit_ratio)) then
             write(*,1) trim(msg) // ' dt_limit_ratio', dt_limit_ratio, abs_change, lim
             call mesa_error(__FILE__,__LINE__,'check_change')
@@ -819,7 +819,7 @@
          real(dp) :: lim, dlnP
          integer :: k
          include 'formats'
-         lim = ln10*s% ctrl% delta_lgP_limit_min_lgP
+         lim = ln10*s% delta_lgP_limit_min_lgP
          i = 0
          max_dlnP = 0
          do k=1,s% nz
@@ -845,13 +845,13 @@
          call get_dlgP_info(s, i, max_dlnP)
          if (i == 0) return
          check_dlgP_change = check_change(s, max_dlnP/ln10, &
-            s% ctrl% delta_lgP_limit, s% ctrl% delta_lgP_hard_limit, &
+            s% delta_lgP_limit, s% delta_lgP_hard_limit, &
             i, 'delta_lgP', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgP_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgP_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,3) 'lgP', i, s% lnPeos(i)/ln10
             write(*,3) 'lgP_old', i, s% lnPeos_start(i)/ln10
             write(*,3) 'dlgP', i, (s% lnPeos(i) - s% lnPeos_start(i))/ln10
-            write(*,3) 'hard_limit', i, s% ctrl% delta_lgP_hard_limit
+            write(*,3) 'hard_limit', i, s% delta_lgP_hard_limit
          end if
       end function check_dlgP_change
 
@@ -864,7 +864,7 @@
          real(dp) :: lim, dlnRho, max_abs_dlnRho
          integer :: k
          include 'formats'
-         lim = ln10*s% ctrl% delta_lgRho_limit_min_lgRho
+         lim = ln10*s% delta_lgRho_limit_min_lgRho
          i = 0
          max_abs_dlnRho = 0
          do k=1,s% nz
@@ -892,13 +892,13 @@
          call get_dlgRho_info(s, i, max_dlnd)
          if (i == 0) return
          check_dlgRho_change = check_change(s, abs(max_dlnd)/ln10, &
-            s% ctrl% delta_lgRho_limit, s% ctrl% delta_lgRho_hard_limit, &
+            s% delta_lgRho_limit, s% delta_lgRho_hard_limit, &
             i, 'delta_lgRho', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgRho_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgRho_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,3) 'lgRho', i, s% lnd(i)/ln10
             write(*,3) 'lgRho_old', i, s% lnd_start(i)/ln10
             write(*,3) 'dlgRho', i, (s% lnd(i) - s% lnd_start(i))/ln10
-            write(*,3) 'hard_limit', i, s% ctrl% delta_lgRho_hard_limit
+            write(*,3) 'hard_limit', i, s% delta_lgRho_hard_limit
          end if
       end function check_dlgRho_change
 
@@ -911,7 +911,7 @@
          real(dp) :: lim, dlnT, abs_max_dlnT
          integer :: k
          include 'formats'
-         lim = ln10*s% ctrl% delta_lgT_limit_min_lgT
+         lim = ln10*s% delta_lgT_limit_min_lgT
          i = 0
          abs_max_dlnT = 0
          do k=1,s% nz
@@ -939,13 +939,13 @@
          call get_dlgT_info(s, i, max_dlnT)
          if (i == 0) return
          check_dlgT_change = check_change(s, abs(max_dlnT)/ln10, &
-            s% ctrl% delta_lgT_limit, s% ctrl% delta_lgT_hard_limit, &
+            s% delta_lgT_limit, s% delta_lgT_hard_limit, &
             i, 'delta_lgT', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgT_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgT_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,3) 'lgT', i, s% lnT(i)/ln10
             write(*,3) 'lgT_old', i, s% lnT_start(i)/ln10
             write(*,3) 'dlgT', i, (s% lnT(i) - s% lnT_start(i))/ln10
-            write(*,3) 'hard_limit', i, s% ctrl% delta_lgT_hard_limit
+            write(*,3) 'hard_limit', i, s% delta_lgT_hard_limit
          end if
       end function check_dlgT_change
 
@@ -958,7 +958,7 @@
          real(dp) :: lim, dlnE
          integer :: k
          include 'formats'
-         lim = ln10*s% ctrl% delta_lgE_limit_min_lgE
+         lim = ln10*s% delta_lgE_limit_min_lgE
          i = 0
          max_dlnE = 0
          do k=1,s% nz
@@ -985,13 +985,13 @@
          call get_dlgE_info(s, i, max_dlnE)
          if (i == 0) return
          check_dlgE_change = check_change(s, max_dlnE/ln10, &
-            s% ctrl% delta_lgE_limit, s% ctrl% delta_lgE_hard_limit, &
+            s% delta_lgE_limit, s% delta_lgE_hard_limit, &
             i, 'delta_lgE', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgE_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgE_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,3) 'lgE', i, safe_log10(s% energy(i))
             write(*,3) 'lgE_old', i, safe_log10(s% energy_start(i))
             write(*,3) 'dlgE', i, (s% energy(i) - s% energy_start(i))/s% energy(i)/ln10
-            write(*,3) 'hard_limit', i, s% ctrl% delta_lgE_hard_limit
+            write(*,3) 'hard_limit', i, s% delta_lgE_hard_limit
          end if
       end function check_dlgE_change
 
@@ -1004,7 +1004,7 @@
          real(dp) :: lim, dlnR
          integer :: k
          include 'formats'
-         lim = ln10*s% ctrl% delta_lgR_limit_min_lgR
+         lim = ln10*s% delta_lgR_limit_min_lgR
          i = 0
          max_dlnR = 0
          do k=1,s% nz
@@ -1030,13 +1030,13 @@
          call get_dlgR_info(s, i, max_dlnR)
          if (i == 0) return
          check_dlgR_change = check_change(s, max_dlnR/ln10, &
-            s% ctrl% delta_lgR_limit, s% ctrl% delta_lgR_hard_limit, &
+            s% delta_lgR_limit, s% delta_lgR_hard_limit, &
             i, 'delta_lgR', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgR_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgR_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,3) 'lgR', i, s% lnR(i)/ln10
             write(*,3) 'lgR_old', i, s% lnR_start(i)/ln10
             write(*,3) 'dlgR', i, (s% lnR(i) - s% lnR_start(i))/ln10
-            write(*,3) 'hard_limit', i, s% ctrl% delta_lgR_hard_limit
+            write(*,3) 'hard_limit', i, s% delta_lgR_hard_limit
          end if
       end function check_dlgR_change
 
@@ -1061,66 +1061,66 @@
          
          iso = iso_in
          if (iso == iprot) then ! check_lgL_power_photo_change
-            if (s% log_max_temperature < s% ctrl% min_lgT_for_lgL_power_photo_limit) return
+            if (s% log_max_temperature < s% min_lgT_for_lgL_power_photo_limit) return
             new_L = abs(s% power_photo)
             max_other_L = 0d0
             old_L = abs(s% power_photo_old)
-            lim = s% ctrl% delta_lgL_power_photo_limit
-            hard_lim = s% ctrl% delta_lgL_power_photo_hard_limit
-            lgL_min = s% ctrl% lgL_power_photo_burn_min
-            drop_factor = s% ctrl% lgL_power_photo_drop_factor
+            lim = s% delta_lgL_power_photo_limit
+            hard_lim = s% delta_lgL_power_photo_hard_limit
+            lgL_min = s% lgL_power_photo_burn_min
+            drop_factor = s% lgL_power_photo_drop_factor
             relative_limit = 0d0
          else if (iso == ineut) then ! check_lgL_nuc_change
-            if (s% log_max_temperature > s% ctrl% max_lgT_for_lgL_nuc_limit) return
+            if (s% log_max_temperature > s% max_lgT_for_lgL_nuc_limit) return
             new_L = s% power_nuc_burn
             max_other_L = 0d0
             old_L = s% power_nuc_burn_old
             if (s% log_max_temperature > &
-                  s% ctrl% delta_lgL_nuc_at_high_T_limit_lgT_min) then
-               lim = s% ctrl% delta_lgL_nuc_at_high_T_limit
-               hard_lim = s% ctrl% delta_lgL_nuc_at_high_T_hard_limit
+                  s% delta_lgL_nuc_at_high_T_limit_lgT_min) then
+               lim = s% delta_lgL_nuc_at_high_T_limit
+               hard_lim = s% delta_lgL_nuc_at_high_T_hard_limit
             else
-               lim = s% ctrl% delta_lgL_nuc_limit
-               hard_lim = s% ctrl% delta_lgL_nuc_hard_limit
+               lim = s% delta_lgL_nuc_limit
+               hard_lim = s% delta_lgL_nuc_hard_limit
             end if
-            lgL_min = s% ctrl% lgL_nuc_burn_min
-            drop_factor = s% ctrl% lgL_nuc_drop_factor
+            lgL_min = s% lgL_nuc_burn_min
+            drop_factor = s% lgL_nuc_drop_factor
             relative_limit = 0d0
          else if (iso == ih1) then
             new_L = s% power_h_burn
             max_other_L = max(s% power_he_burn, s% power_z_burn)
             old_L = s% power_h_burn_old
-            lim = s% ctrl% delta_lgL_H_limit
-            hard_lim = s% ctrl% delta_lgL_H_hard_limit
-            lgL_min = s% ctrl% lgL_H_burn_min
-            drop_factor = s% ctrl% lgL_H_drop_factor
-            relative_limit = s% ctrl% lgL_H_burn_relative_limit
+            lim = s% delta_lgL_H_limit
+            hard_lim = s% delta_lgL_H_hard_limit
+            lgL_min = s% lgL_H_burn_min
+            drop_factor = s% lgL_H_drop_factor
+            relative_limit = s% lgL_H_burn_relative_limit
          else if (iso == ihe4) then
             new_L = s% power_he_burn
             max_other_L = max(s% power_h_burn, s% power_z_burn)
             old_L = s% power_he_burn_old
-            lim = s% ctrl% delta_lgL_He_limit
-            hard_lim = s% ctrl% delta_lgL_He_hard_limit
-            lgL_min = s% ctrl% lgL_He_burn_min
-            drop_factor = s% ctrl% lgL_He_drop_factor
-            relative_limit = s% ctrl% lgL_He_burn_relative_limit
+            lim = s% delta_lgL_He_limit
+            hard_lim = s% delta_lgL_He_hard_limit
+            lgL_min = s% lgL_He_burn_min
+            drop_factor = s% lgL_He_drop_factor
+            relative_limit = s% lgL_He_burn_relative_limit
          else if (iso == isi28) then
             new_L = s% power_z_burn
             max_other_L = max(s% power_h_burn, s% power_he_burn)
             old_L = s% power_z_burn_old
-            lim = s% ctrl% delta_lgL_z_limit
-            hard_lim = s% ctrl% delta_lgL_z_hard_limit
-            lgL_min = s% ctrl% lgL_z_burn_min
-            drop_factor = s% ctrl% lgL_z_drop_factor
-            relative_limit = s% ctrl% lgL_z_burn_relative_limit
+            lim = s% delta_lgL_z_limit
+            hard_lim = s% delta_lgL_z_hard_limit
+            lgL_min = s% lgL_z_burn_min
+            drop_factor = s% lgL_z_drop_factor
+            relative_limit = s% lgL_z_burn_relative_limit
          else
             call mesa_error(__FILE__,__LINE__,'bad iso arg for check_lgL')
          end if
          
          if (old_L < 0d0) return
          
-         lim = lim*s% ctrl% time_delta_coeff
-         hard_lim = hard_lim*s% ctrl% time_delta_coeff
+         lim = lim*s% time_delta_coeff
+         hard_lim = hard_lim*s% time_delta_coeff
 
          if (new_L < old_L) then
             lim = lim*drop_factor
@@ -1148,7 +1148,7 @@
          if (dbg) write(*,1) 'abs_change', abs_change
          if (dbg) write(*,1) 'hard_lim', hard_lim
          if (hard_lim > 0 .and. abs_change > hard_lim .and. (.not. skip_hard_limit)) then
-            if (s% ctrl% report_dt_hard_limit_retries) then
+            if (s% report_dt_hard_limit_retries) then
                write(*,1) trim(msg) // ' end', lgL
                write(*,1) trim(msg) // ' start', lgL_old
                write(*,1) trim(msg) // ' delta', lgL - lgL_old
@@ -1164,7 +1164,7 @@
 
          relative_excess = (abs_change - lim) / lim
          if (dbg) write(*,1) 'relative_excess', relative_excess
-         dt_limit_ratio = 1d0/pow(s% ctrl% timestep_dt_factor,relative_excess)
+         dt_limit_ratio = 1d0/pow(s% timestep_dt_factor,relative_excess)
          if (dt_limit_ratio <= 1d0) dt_limit_ratio = 0
 
       end function check_lgL
@@ -1239,9 +1239,9 @@
 
          check_lgL_nuc_cat_change = keep_going
 
-         if (s% ctrl% delta_lgL_nuc_cat_limit <= 0 .and. s% ctrl% delta_lgL_nuc_cat_hard_limit <= 0) return
+         if (s% delta_lgL_nuc_cat_limit <= 0 .and. s% delta_lgL_nuc_cat_hard_limit <= 0) return
 
-         cat_burn_min = exp10(s% ctrl% lgL_nuc_cat_burn_min)
+         cat_burn_min = exp10(s% lgL_nuc_cat_burn_min)
          max_diff = 0
          max_j = -1
          max_k = -1
@@ -1253,7 +1253,7 @@
             bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
             ! don't check cells near a mixing boundary
             if (bdy > 0) then
-               if (abs(s% q(k) - mix_bdy_q(bdy)) < s% ctrl% lgL_nuc_mix_dist_limit) cycle
+               if (abs(s% q(k) - mix_bdy_q(bdy)) < s% lgL_nuc_mix_dist_limit) cycle
             end if
 
             call do1_category(ipp,k)
@@ -1286,9 +1286,9 @@
          s% Tlim_dlgL_nuc_cell = max_k
 
          check_lgL_nuc_cat_change = check_change(s, max_lgL_diff, &
-            s% ctrl% delta_lgL_nuc_cat_limit, s% ctrl% delta_lgL_nuc_cat_hard_limit, &
+            s% delta_lgL_nuc_cat_limit, s% delta_lgL_nuc_cat_hard_limit, &
             max_k, 'delta_lgL_nuc_cat', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lgL_nuc_cat_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lgL_nuc_cat_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'max_luminosity ' // trim(category_name(max_j)), max_luminosity
             write(*,1) 'max_luminosity_start ' // trim(category_name(max_j)), max_luminosity_start
          end if
@@ -1324,9 +1324,9 @@
          dt_limit_ratio = 0d0
          if (s% doing_relax .or. s% Teff_old <= 0 .or. s% Teff <= 0) return
          check_dlgTeff_change = check_change(s, safe_log10(s% Teff/s% Teff_old), &
-            s% ctrl% delta_lgTeff_limit, s% ctrl% delta_lgTeff_hard_limit, &
+            s% delta_lgTeff_limit, s% delta_lgTeff_hard_limit, &
             0, 'delta_lgTeff', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgTeff_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgTeff_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lgTeff', safe_log10(s% Teff)
             write(*,1) 'lgTeff_old', safe_log10(s% Teff_old)
          end if
@@ -1347,7 +1347,7 @@
          if (s% doing_relax) return
          i = 0
          max_diff = 0
-         T_limit = s% ctrl% minT_for_highT_Ye_limit
+         T_limit = s% minT_for_highT_Ye_limit
          do k=1, s% nz
             if (s% T(k) < T_limit) cycle
             ye_diff = abs(s% ye(k) - s% ye_start(k))
@@ -1356,9 +1356,9 @@
             i = k
          end do
          check_dYe_highT_change = check_change(s, max_diff, &
-            s% ctrl% delta_Ye_highT_limit, s% ctrl% delta_Ye_highT_hard_limit, &
+            s% delta_Ye_highT_limit, s% delta_Ye_highT_hard_limit, &
             i, 'delta_Ye_highT', .false., dt_limit_ratio, relative_excess)
-         if (check_dYe_highT_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dYe_highT_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,2) 'ye', i, s% ye(i)
             write(*,2) 'ye_start', i, s% ye_start(i)
          end if
@@ -1377,20 +1377,20 @@
          check_dlgT_max_change = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% ctrl% delta_lgT_max_limit_lgT_min < 0d0) return
-         if (s% ctrl% delta_lgT_max_limit_only_after_near_zams) then
+         if (s% delta_lgT_max_limit_lgT_min < 0d0) return
+         if (s% delta_lgT_max_limit_only_after_near_zams) then
             if (s% X(s% nz) > 0.1d0 .and. &
-                s% L_nuc_burn_total/s% L_phot < s% ctrl% Lnuc_div_L_zams_limit ) return
+                s% L_nuc_burn_total/s% L_phot < s% Lnuc_div_L_zams_limit ) return
          end if
          lnTmax_k = maxloc(s% lnT(1:s% nz),dim=1)
          lnTmax = s% lnT(lnTmax_k)
-         if (lnTmax < s% ctrl% delta_lgT_max_limit_lgT_min*ln10) return
+         if (lnTmax < s% delta_lgT_max_limit_lgT_min*ln10) return
          lnTmax_start = maxval(s% lnT_start(1:s% nz))
          change = (lnTmax - lnTmax_start)/ln10
          check_dlgT_max_change = check_change(s, change, &
-            s% ctrl% delta_lgT_max_limit, s% ctrl% delta_lgT_max_hard_limit, &
+            s% delta_lgT_max_limit, s% delta_lgT_max_hard_limit, &
             lnTmax_k, 'delta_lgT_max', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgT_max_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgT_max_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,2) 'lgT_max', lnTmax_k, lnTmax/ln10
             write(*,2) 'lgT_max_old', lnTmax_k, lnTmax_start/ln10
          end if
@@ -1409,16 +1409,16 @@
          check_dlgT_max_at_high_T_change = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% ctrl% delta_lgT_max_at_high_T_limit_lgT_min < 0d0) return
+         if (s% delta_lgT_max_at_high_T_limit_lgT_min < 0d0) return
          lnTmax_k = maxloc(s% lnT(1:s% nz),dim=1)
          lnTmax_at_high_T = s% lnT(lnTmax_k)
-         if (lnTmax_at_high_T < s% ctrl% delta_lgT_max_at_high_T_limit_lgT_min*ln10) return
+         if (lnTmax_at_high_T < s% delta_lgT_max_at_high_T_limit_lgT_min*ln10) return
          lnTmax_at_high_T_start = maxval(s% lnT_start(1:s% nz))
          change = (lnTmax_at_high_T - lnTmax_at_high_T_start)/ln10
          check_dlgT_max_at_high_T_change = check_change(s, change, &
-            s% ctrl% delta_lgT_max_at_high_T_limit, s% ctrl% delta_lgT_max_at_high_T_hard_limit, &
+            s% delta_lgT_max_at_high_T_limit, s% delta_lgT_max_at_high_T_hard_limit, &
             lnTmax_k, 'delta_lgT_max_at_high_T', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgT_max_at_high_T_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgT_max_at_high_T_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,2) 'lgT_max', lnTmax_k, lnTmax_at_high_T/ln10
             write(*,2) 'lgT_max_old', lnTmax_k, lnTmax_at_high_T_start/ln10
          end if
@@ -1436,15 +1436,15 @@
          check_dlgT_cntr_change = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% ctrl% delta_lgT_cntr_limit_only_after_near_zams) then
+         if (s% delta_lgT_cntr_limit_only_after_near_zams) then
             if (s% X(s% nz) > 0.1d0 .and. &
-                s% L_nuc_burn_total/s% L_phot < s% ctrl% Lnuc_div_L_zams_limit) return
+                s% L_nuc_burn_total/s% L_phot < s% Lnuc_div_L_zams_limit) return
          end if
          change = (s% lnT(s% nz) - s% lnT_start(s% nz))/ln10
          check_dlgT_cntr_change = check_change(s, change, &
-            s% ctrl% delta_lgT_cntr_limit, s% ctrl% delta_lgT_cntr_hard_limit, &
+            s% delta_lgT_cntr_limit, s% delta_lgT_cntr_hard_limit, &
             s% nz, 'delta_lgT_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgT_cntr_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgT_cntr_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lgT_cntr', s% lnT(s% nz)/ln10
             write(*,1) 'lgT_cntr_old', s% lnT_start(s% nz)/ln10
          end if
@@ -1464,9 +1464,9 @@
          if (s% doing_relax) return
          change = (s% lnPeos(s% nz) - s% lnPeos_start(s% nz))/ln10
          check_dlgP_cntr_change = check_change(s, change, &
-            s% ctrl% delta_lgP_cntr_limit, s% ctrl% delta_lgP_cntr_hard_limit, &
+            s% delta_lgP_cntr_limit, s% delta_lgP_cntr_hard_limit, &
             s% nz, 'delta_lgP_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgP_cntr_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgP_cntr_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lgP_cntr', s% lnPeos(s% nz)/ln10
             write(*,1) 'lgP_cntr_old', s% lnPeos_start(s% nz)/ln10
          end if
@@ -1488,9 +1488,9 @@
          nz = s% nz
          dlgRho_cntr = (s% lnd(nz) - s% lnd_start(nz))/ln10
          check_dlgRho_cntr_change = check_change(s, dlgRho_cntr, &
-            s% ctrl% delta_lgRho_cntr_limit, s% ctrl% delta_lgRho_cntr_hard_limit, &
+            s% delta_lgRho_cntr_limit, s% delta_lgRho_cntr_hard_limit, &
             nz, 'delta_lgRho_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlgRho_cntr_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlgRho_cntr_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lgRho_cntr', s% lnd(s% nz)/ln10
             write(*,1) 'lgRho_cntr_old', s% lnd_start(s% nz)/ln10
          end if
@@ -1508,7 +1508,7 @@
          include 'formats'
          check_dlog_eps_nuc_change = keep_going
          nz = s% nz
-         limit_ratio = exp10(s% ctrl% delta_log_eps_nuc_limit)
+         limit_ratio = exp10(s% delta_log_eps_nuc_limit)
          max_ratio = limit_ratio
          k_max = 0
          zoneloop: do k=1,nz
@@ -1533,10 +1533,10 @@
             delta = 0
          end if
          check_dlog_eps_nuc_change = check_change(s, delta, &
-            s% ctrl% delta_log_eps_nuc_limit, s% ctrl% delta_log_eps_nuc_hard_limit, &
+            s% delta_log_eps_nuc_limit, s% delta_log_eps_nuc_hard_limit, &
             k_max, 'delta_log_eps_nuc', &
             skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dlog_eps_nuc_change /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dlog_eps_nuc_change /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,2) 'log_eps_nuc', k_max, safe_log10(abs(s% eps_nuc(k_max)))
             write(*,2) 'log_eps_nuc_old', k_max, safe_log10(abs(s% eps_nuc_start(k_max)))
          end if
@@ -1551,16 +1551,16 @@
          integer :: j, nz, j_max
          include 'formats'
          check_dX_div_X_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          nz = s% nz
          max_abs_dX_div_X = -1
          do j=1,s% species
             X = s% xa(j,nz)
-            if (X > s% ctrl% delta_dX_div_X_cntr_max) cycle
-            if (X < s% ctrl% delta_dX_div_X_cntr_min) cycle
+            if (X > s% delta_dX_div_X_cntr_max) cycle
+            if (X < s% delta_dX_div_X_cntr_min) cycle
             if (X <= 0d0) cycle
             dX = X - s% xa_old(j,nz)
-            if (s% ctrl% delta_dX_div_X_drop_only .and. dX > 0) cycle
+            if (s% delta_dX_div_X_drop_only .and. dX > 0) cycle
             abs_dX_div_X = abs(dX/X)
             if (abs_dX_div_X > max_abs_dX_div_X) then
                max_abs_dX_div_X = abs_dX_div_X
@@ -1569,9 +1569,9 @@
          end do
          if (max_abs_dX_div_X <= 0d0) return
          check_dX_div_X_cntr = check_change(s, max_abs_dX_div_X, &
-            s% ctrl% delta_dX_div_X_cntr_limit, s% ctrl% delta_dX_div_X_cntr_hard_limit, &
+            s% delta_dX_div_X_cntr_limit, s% delta_dX_div_X_cntr_hard_limit, &
             0, 'delta_dX_div_X_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dX_div_X_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dX_div_X_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) chem_isos% name(s% chem_id(j_max)) // ' X', s% xa(j_max,nz)
             write(*,1) chem_isos% name(s% chem_id(j_max)) // ' X old', s% xa_old(j_max,nz)
          end if
@@ -1586,20 +1586,20 @@
          integer :: h1, nz
          include 'formats'
          check_lg_XH_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          if (h1 == 0) return
          nz = s% nz
          if (s% xa(h1,nz) < 1d-10) return
          lg_XH_cntr = log10(s% xa(h1,nz))
-         if (lg_XH_cntr > s% ctrl% delta_lg_XH_cntr_max) return
-         if (lg_XH_cntr < s% ctrl% delta_lg_XH_cntr_min) return
+         if (lg_XH_cntr > s% delta_lg_XH_cntr_max) return
+         if (lg_XH_cntr < s% delta_lg_XH_cntr_min) return
          lg_XH_cntr_old = safe_log10(s% xa_old(h1,nz))
-         if (s% ctrl% delta_lg_XH_drop_only .and. lg_XH_cntr >= lg_XH_cntr_old) return
+         if (s% delta_lg_XH_drop_only .and. lg_XH_cntr >= lg_XH_cntr_old) return
          check_lg_XH_cntr = check_change(s, lg_XH_cntr - lg_XH_cntr_old, &
-            s% ctrl% delta_lg_XH_cntr_limit, s% ctrl% delta_lg_XH_cntr_hard_limit, &
+            s% delta_lg_XH_cntr_limit, s% delta_lg_XH_cntr_hard_limit, &
             nz, 'delta_lg_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XH_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XH_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XH_cntr', lg_XH_cntr
             write(*,1) 'lg_XH_cntr_old', lg_XH_cntr_old
             write(*,1) 'delta', lg_XH_cntr - lg_XH_cntr_old
@@ -1616,7 +1616,7 @@
          real(dp) :: xh1, xhe4
          include 'formats'
          check_lg_XHe_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          if (h1 == 0 .or. he4 == 0) return
@@ -1625,14 +1625,14 @@
          xhe4 = s% xa(he4,nz)
          if (xhe4 < max(xh1, 1d-10)) return
          lg_XHe_cntr = log10(xhe4)
-         if (lg_XHe_cntr > s% ctrl% delta_lg_XHe_cntr_max) return
-         if (lg_XHe_cntr < s% ctrl% delta_lg_XHe_cntr_min) return
+         if (lg_XHe_cntr > s% delta_lg_XHe_cntr_max) return
+         if (lg_XHe_cntr < s% delta_lg_XHe_cntr_min) return
          lg_XHe_cntr_old = safe_log10(s% xa_old(he4,nz))
-         if (s% ctrl% delta_lg_XHe_drop_only .and. lg_XHe_cntr >= lg_XHe_cntr_old) return
+         if (s% delta_lg_XHe_drop_only .and. lg_XHe_cntr >= lg_XHe_cntr_old) return
          check_lg_XHe_cntr = check_change(s, lg_XHe_cntr - lg_XHe_cntr_old, &
-            s% ctrl% delta_lg_XHe_cntr_limit, s% ctrl% delta_lg_XHe_cntr_hard_limit, &
+            s% delta_lg_XHe_cntr_limit, s% delta_lg_XHe_cntr_hard_limit, &
             nz, 'delta_lg_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XHe_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XHe_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XHe_cntr', lg_XHe_cntr
             write(*,1) 'lg_XHe_cntr_old', lg_XHe_cntr_old
             write(*,1) 'delta', lg_XHe_cntr - lg_XHe_cntr_old
@@ -1649,7 +1649,7 @@
          real(dp) :: xh1, xhe4, xc12
          include 'formats'
          check_lg_XC_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
@@ -1661,14 +1661,14 @@
          if (xc12 < max(xh1, xhe4, 1d-10)) return
          if (s% xa(c12,nz) < 1d-10) return
          lg_XC_cntr = log10(xc12)
-         if (lg_XC_cntr > s% ctrl% delta_lg_XC_cntr_max) return
-         if (lg_XC_cntr < s% ctrl% delta_lg_XC_cntr_min) return
+         if (lg_XC_cntr > s% delta_lg_XC_cntr_max) return
+         if (lg_XC_cntr < s% delta_lg_XC_cntr_min) return
          lg_XC_cntr_old = safe_log10(s% xa_old(c12,nz))
-         if (s% ctrl% delta_lg_XC_drop_only .and. lg_XC_cntr >= lg_XC_cntr_old) return
+         if (s% delta_lg_XC_drop_only .and. lg_XC_cntr >= lg_XC_cntr_old) return
          check_lg_XC_cntr = check_change(s, lg_XC_cntr - lg_XC_cntr_old, &
-            s% ctrl% delta_lg_XC_cntr_limit, s% ctrl% delta_lg_XC_cntr_hard_limit, &
+            s% delta_lg_XC_cntr_limit, s% delta_lg_XC_cntr_hard_limit, &
             nz, 'delta_lg_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XC_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XC_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XC_cntr', lg_XC_cntr
             write(*,1) 'lg_XC_cntr_old', lg_XC_cntr_old
             write(*,1) 'delta', lg_XC_cntr - lg_XC_cntr_old
@@ -1685,7 +1685,7 @@
          real(dp) :: xh1, xhe4, xc12, XNe16
          include 'formats'
          check_lg_XNe_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
@@ -1698,14 +1698,14 @@
          XNe16 = s% xa(o16,nz)
          if (XNe16 < max(xh1, xhe4, xc12, 1d-10)) return
          lg_XNe_cntr = log10(XNe16)
-         if (lg_XNe_cntr > s% ctrl% delta_lg_XNe_cntr_max) return
-         if (lg_XNe_cntr < s% ctrl% delta_lg_XNe_cntr_min) return
+         if (lg_XNe_cntr > s% delta_lg_XNe_cntr_max) return
+         if (lg_XNe_cntr < s% delta_lg_XNe_cntr_min) return
          lg_XNe_cntr_old = safe_log10(s% xa_old(o16,nz))
-         if (s% ctrl% delta_lg_XNe_drop_only .and. lg_XNe_cntr >= lg_XNe_cntr_old) return
+         if (s% delta_lg_XNe_drop_only .and. lg_XNe_cntr >= lg_XNe_cntr_old) return
          check_lg_XNe_cntr = check_change(s, lg_XNe_cntr - lg_XNe_cntr_old, &
-            s% ctrl% delta_lg_XNe_cntr_limit, s% ctrl% delta_lg_XNe_cntr_hard_limit, &
+            s% delta_lg_XNe_cntr_limit, s% delta_lg_XNe_cntr_hard_limit, &
             nz, 'delta_lg_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XNe_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XNe_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XNe_cntr', lg_XNe_cntr
             write(*,1) 'lg_XNe_cntr_old', lg_XNe_cntr_old
             write(*,1) 'delta', lg_XNe_cntr - lg_XNe_cntr_old
@@ -1722,7 +1722,7 @@
          real(dp) :: xh1, xhe4, xc12, xo16
          include 'formats'
          check_lg_XO_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
@@ -1735,14 +1735,14 @@
          xo16 = s% xa(o16,nz)
          if (xo16 < max(xh1, xhe4, xc12, 1d-10)) return
          lg_XO_cntr = log10(xo16)
-         if (lg_XO_cntr > s% ctrl% delta_lg_XO_cntr_max) return
-         if (lg_XO_cntr < s% ctrl% delta_lg_XO_cntr_min) return
+         if (lg_XO_cntr > s% delta_lg_XO_cntr_max) return
+         if (lg_XO_cntr < s% delta_lg_XO_cntr_min) return
          lg_XO_cntr_old = safe_log10(s% xa_old(o16,nz))
-         if (s% ctrl% delta_lg_XO_drop_only .and. lg_XO_cntr >= lg_XO_cntr_old) return
+         if (s% delta_lg_XO_drop_only .and. lg_XO_cntr >= lg_XO_cntr_old) return
          check_lg_XO_cntr = check_change(s, lg_XO_cntr - lg_XO_cntr_old, &
-            s% ctrl% delta_lg_XO_cntr_limit, s% ctrl% delta_lg_XO_cntr_hard_limit, &
+            s% delta_lg_XO_cntr_limit, s% delta_lg_XO_cntr_hard_limit, &
             nz, 'delta_lg_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XO_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XO_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XO_cntr', lg_XO_cntr
             write(*,1) 'lg_XO_cntr_old', lg_XO_cntr_old
             write(*,1) 'delta', lg_XO_cntr - lg_XO_cntr_old
@@ -1759,7 +1759,7 @@
          real(dp) :: xh1, xhe4, xc12, XSi16
          include 'formats'
          check_lg_XSi_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
          c12 = s% net_iso(ic12)
@@ -1772,14 +1772,14 @@
          XSi16 = s% xa(o16,nz)
          if (XSi16 < max(xh1, xhe4, xc12, 1d-10)) return
          lg_XSi_cntr = log10(XSi16)
-         if (lg_XSi_cntr > s% ctrl% delta_lg_XSi_cntr_max) return
-         if (lg_XSi_cntr < s% ctrl% delta_lg_XSi_cntr_min) return
+         if (lg_XSi_cntr > s% delta_lg_XSi_cntr_max) return
+         if (lg_XSi_cntr < s% delta_lg_XSi_cntr_min) return
          lg_XSi_cntr_old = safe_log10(s% xa_old(o16,nz))
-         if (s% ctrl% delta_lg_XSi_drop_only .and. lg_XSi_cntr >= lg_XSi_cntr_old) return
+         if (s% delta_lg_XSi_drop_only .and. lg_XSi_cntr >= lg_XSi_cntr_old) return
          check_lg_XSi_cntr = check_change(s, lg_XSi_cntr - lg_XSi_cntr_old, &
-            s% ctrl% delta_lg_XSi_cntr_limit, s% ctrl% delta_lg_XSi_cntr_hard_limit, &
+            s% delta_lg_XSi_cntr_limit, s% delta_lg_XSi_cntr_hard_limit, &
             nz, 'delta_lg_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_lg_XSi_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_lg_XSi_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'lg_XSi_cntr', lg_XSi_cntr
             write(*,1) 'lg_XSi_cntr_old', lg_XSi_cntr_old
             write(*,1) 'delta', lg_XSi_cntr - lg_XSi_cntr_old
@@ -1795,17 +1795,17 @@
          integer :: h1, nz
          include 'formats'
          check_XH_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          h1 = s% net_iso(ih1)
          if (h1 == 0) return
          nz = s% nz
          XH_cntr = s% xa(h1,nz)
          XH_cntr_old = s% xa_old(h1,nz)
-         if (s% ctrl% delta_XH_drop_only .and. XH_cntr >= XH_cntr_old) return
+         if (s% delta_XH_drop_only .and. XH_cntr >= XH_cntr_old) return
          check_XH_cntr = check_change(s, XH_cntr - XH_cntr_old, &
-            s% ctrl% delta_XH_cntr_limit, s% ctrl% delta_XH_cntr_hard_limit, &
+            s% delta_XH_cntr_limit, s% delta_XH_cntr_hard_limit, &
             nz, 'delta_XH_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XH_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XH_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XH_cntr', XH_cntr
             write(*,1) 'XH_cntr_old', XH_cntr_old
             write(*,1) 'delta', XH_cntr - XH_cntr_old
@@ -1821,17 +1821,17 @@
          integer :: he4, nz
          include 'formats'
          check_XHe_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          he4 = s% net_iso(ihe4)
          if (he4 == 0) return
          nz = s% nz
          XHe_cntr = s% xa(he4,nz)
          XHe_cntr_old = s% xa_old(he4,nz)
-         if (s% ctrl% delta_XHe_drop_only .and. XHe_cntr >= XHe_cntr_old) return
+         if (s% delta_XHe_drop_only .and. XHe_cntr >= XHe_cntr_old) return
          check_XHe_cntr = check_change(s, XHe_cntr - XHe_cntr_old, &
-            s% ctrl% delta_XHe_cntr_limit, s% ctrl% delta_XHe_cntr_hard_limit, &
+            s% delta_XHe_cntr_limit, s% delta_XHe_cntr_hard_limit, &
             nz, 'delta_XHe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XHe_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XHe_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XHe_cntr', XHe_cntr
             write(*,1) 'XHe_cntr_old', XHe_cntr_old
             write(*,1) 'delta', XHe_cntr - XHe_cntr_old
@@ -1847,17 +1847,17 @@
          integer :: c12, nz
          include 'formats'
          check_XC_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          c12 = s% net_iso(ic12)
          if (c12 == 0) return
          nz = s% nz
          XC_cntr = s% xa(c12,nz)
          XC_cntr_old = s% xa_old(c12,nz)
-         if (s% ctrl% delta_XC_drop_only .and. XC_cntr >= XC_cntr_old) return
+         if (s% delta_XC_drop_only .and. XC_cntr >= XC_cntr_old) return
          check_XC_cntr = check_change(s, XC_cntr - XC_cntr_old, &
-            s% ctrl% delta_XC_cntr_limit, s% ctrl% delta_XC_cntr_hard_limit, &
+            s% delta_XC_cntr_limit, s% delta_XC_cntr_hard_limit, &
             nz, 'delta_XC_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XC_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XC_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XC_cntr', XC_cntr
             write(*,1) 'XC_cntr_old', XC_cntr_old
             write(*,1) 'delta', XC_cntr - XC_cntr_old
@@ -1873,17 +1873,17 @@
          integer :: ne20, nz
          include 'formats'
          check_XNe_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          ne20 = s% net_iso(ine20)
          if (ne20 == 0) return
          nz = s% nz
          XNe_cntr = s% xa(ne20,nz)
          XNe_cntr_old = s% xa_old(ne20,nz)
-         if (s% ctrl% delta_XNe_drop_only .and. XNe_cntr >= XNe_cntr_old) return
+         if (s% delta_XNe_drop_only .and. XNe_cntr >= XNe_cntr_old) return
          check_XNe_cntr = check_change(s, XNe_cntr - XNe_cntr_old, &
-            s% ctrl% delta_XNe_cntr_limit, s% ctrl% delta_XNe_cntr_hard_limit, &
+            s% delta_XNe_cntr_limit, s% delta_XNe_cntr_hard_limit, &
             nz, 'delta_XNe_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XNe_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XNe_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XNe_cntr', XNe_cntr
             write(*,1) 'XNe_cntr_old', XNe_cntr_old
             write(*,1) 'delta', XNe_cntr - XNe_cntr_old
@@ -1899,17 +1899,17 @@
          integer :: o16, nz
          include 'formats'
          check_XO_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          o16 = s% net_iso(io16)
          if (o16 == 0) return
          nz = s% nz
          XO_cntr = s% xa(o16,nz)
          XO_cntr_old = s% xa_old(o16,nz)
-         if (s% ctrl% delta_XO_drop_only .and. XO_cntr >= XO_cntr_old) return
+         if (s% delta_XO_drop_only .and. XO_cntr >= XO_cntr_old) return
          check_XO_cntr = check_change(s, XO_cntr - XO_cntr_old, &
-            s% ctrl% delta_XO_cntr_limit, s% ctrl% delta_XO_cntr_hard_limit, &
+            s% delta_XO_cntr_limit, s% delta_XO_cntr_hard_limit, &
             nz, 'delta_XO_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XO_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XO_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XO_cntr', XO_cntr
             write(*,1) 'XO_cntr_old', XO_cntr_old
             write(*,1) 'delta', XO_cntr - XO_cntr_old
@@ -1925,17 +1925,17 @@
          integer :: si28, nz
          include 'formats'
          check_XSi_cntr = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
          si28 = s% net_iso(isi28)
          if (si28 == 0) return
          nz = s% nz
          XSi_cntr = s% xa(si28,nz)
          XSi_cntr_old = s% xa_old(si28,nz)
-         if (s% ctrl% delta_XSi_drop_only .and. XSi_cntr >= XSi_cntr_old) return
+         if (s% delta_XSi_drop_only .and. XSi_cntr >= XSi_cntr_old) return
          check_XSi_cntr = check_change(s, XSi_cntr - XSi_cntr_old, &
-            s% ctrl% delta_XSi_cntr_limit, s% ctrl% delta_XSi_cntr_hard_limit, &
+            s% delta_XSi_cntr_limit, s% delta_XSi_cntr_hard_limit, &
             nz, 'delta_XSi_cntr', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_XSi_cntr /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_XSi_cntr /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'XSi_cntr', XSi_cntr
             write(*,1) 'XSi_cntr_old', XSi_cntr_old
             write(*,1) 'delta', XSi_cntr - XSi_cntr_old
@@ -1953,14 +1953,14 @@
          mdot = s% mstar_dot
          mdot_old = s% mstar_dot_old
          delta_mdot = abs(mdot - mdot_old)/ &
-            (s% ctrl% delta_mdot_atol*Msun/secyer + &
-               s% ctrl% delta_mdot_rtol*max(abs(mdot),abs(mdot_old)))
+            (s% delta_mdot_atol*Msun/secyer + &
+               s% delta_mdot_rtol*max(abs(mdot),abs(mdot_old)))
          if (delta_mdot == 0) return
-         lim = s% ctrl% delta_mdot_limit*s% ctrl% time_delta_coeff
-         hard_lim = s% ctrl% delta_mdot_hard_limit*s% ctrl% time_delta_coeff
+         lim = s% delta_mdot_limit*s% time_delta_coeff
+         hard_lim = s% delta_mdot_hard_limit*s% time_delta_coeff
          if (hard_lim > 0 .and. (.not. skip_hard_limit)) then
             if (delta_mdot > hard_lim) then
-               if (s% ctrl% report_dt_hard_limit_retries) &
+               if (s% report_dt_hard_limit_retries) &
                   write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_hard_limit', &
                      delta_mdot, hard_lim
                s% retry_message = 'delta_mdot_hard_limit'
@@ -1982,11 +1982,11 @@
          real(dp) :: delta_lg_star_mass, lim, hard_lim
          check_delta_mstar = keep_going
          delta_lg_star_mass = abs(log10(s% mstar/s% mstar_old))
-         lim = s% ctrl% delta_lg_star_mass_limit*s% ctrl% time_delta_coeff
-         hard_lim = s% ctrl% delta_lg_star_mass_hard_limit*s% ctrl% time_delta_coeff
+         lim = s% delta_lg_star_mass_limit*s% time_delta_coeff
+         hard_lim = s% delta_lg_star_mass_hard_limit*s% time_delta_coeff
          if (hard_lim > 0 .and. (.not. skip_hard_limit)) then
             if (delta_lg_star_mass > hard_lim) then
-               if (s% ctrl% report_dt_hard_limit_retries) &
+               if (s% report_dt_hard_limit_retries) &
                   write(*, '(a30, f20.10, 99e20.10)') 'delta_lg_star_mass_hard_limit', &
                      delta_lg_star_mass, hard_lim
                check_delta_mstar = retry
@@ -2009,12 +2009,12 @@
          check_adjust_J_q = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (.not. (s% rotation_flag .and. s% ctrl% do_adjust_J_lost .and. s% mstar_dot < 0d0)) return
+         if (.not. (s% rotation_flag .and. s% do_adjust_J_lost .and. s% mstar_dot < 0d0)) return
          ! we care about s% adjust_J_q remaining above a given limit
          ! so we use 1-S% adjust_J_q
          check_adjust_J_q = check_change(s, 1-s% adjust_J_q, &
-            1-s% ctrl% adjust_J_q_limit, &
-            1-s% ctrl% adjust_J_q_hard_limit, &
+            1-s% adjust_J_q_limit, &
+            1-s% adjust_J_q_hard_limit, &
             0, 'check_adjust_J_q', &
             .false., dt_limit_ratio, relative_excess)
       end function check_adjust_J_q
@@ -2029,7 +2029,7 @@
          check_delta_lgL = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% L_surf < s% ctrl% delta_lgL_limit_L_min .or. s% L_surf_old <= 0d0) then
+         if (s% L_surf < s% delta_lgL_limit_L_min .or. s% L_surf_old <= 0d0) then
             dlgL = 0
          else
             dlgL = log10(s% L_surf/s% L_surf_old)
@@ -2040,9 +2040,9 @@
             call mesa_error(__FILE__,__LINE__,'check_delta_lgL')
          end if
          check_delta_lgL = check_change(s, dlgL, &
-            s% ctrl% delta_lgL_limit, s% ctrl% delta_lgL_hard_limit, &
+            s% delta_lgL_limit, s% delta_lgL_hard_limit, &
             0, 'delta_lgL', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_delta_lgL /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_delta_lgL /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'L_surf', s% L_surf
             write(*,1) 'L_surf_old', s% L_surf_old
          end if
@@ -2060,19 +2060,19 @@
              s% L_phot <= 0 .or. s% Teff <= 0) return
          dlgL = log10(s% L_phot/s% L_phot_old)
          dlgTeff = log10(s% Teff/s% Teff_old)
-         dHR = sqrt(pow2(s% ctrl% delta_HR_ds_L*dlgL) + pow2(s% ctrl% delta_HR_ds_Teff*dlgTeff))
+         dHR = sqrt(pow2(s% delta_HR_ds_L*dlgL) + pow2(s% delta_HR_ds_Teff*dlgTeff))
          if (is_bad(dHR)) then
             write(*,1) 's% L_phot_old', s% L_phot_old
             write(*,1) 's% L_phot', s% L_phot
             write(*,1) 's% Teff_old', s% Teff_old
             write(*,1) 's% Teff', s% Teff
             write(*,1) 'dHR', dHR
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'check_delta_HR')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'check_delta_HR')
          end if
          check_delta_HR = check_change(s, dHR, &
-            s% ctrl% delta_HR_limit, s% ctrl% delta_HR_hard_limit, &
+            s% delta_HR_limit, s% delta_HR_hard_limit, &
             0, 'delta_HR', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_delta_HR /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_delta_HR /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 's% L_phot_old', s% L_phot_old
             write(*,1) 's% L_phot', s% L_phot
             write(*,1) 's% Teff_old', s% Teff_old
@@ -2093,11 +2093,11 @@
          if (s% doing_relax) return
          rel_error = abs(s% error_in_energy_conservation/s% total_energy_end)
          check_rel_error_in_energy = check_change(s, rel_error, &
-            s% ctrl% limit_for_rel_error_in_energy_conservation, &
-            s% ctrl% hard_limit_for_rel_error_in_energy_conservation, &
+            s% limit_for_rel_error_in_energy_conservation, &
+            s% hard_limit_for_rel_error_in_energy_conservation, &
             0, 'hard_limit_for_rel_error_in_energy_conservation', &
             .false., dt_limit_ratio, relative_excess)
-         if (check_rel_error_in_energy /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_rel_error_in_energy /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,1) 'error_in_energy_conservation', s% error_in_energy_conservation
             write(*,1) 'total_energy_end', s% total_energy_end
             write(*,1) 'rel_error', s% error_in_energy_conservation/s% total_energy_end
@@ -2123,9 +2123,9 @@
          ratio = dt/dt_timescale
          !write(*,2) 'dt dt_cell_collapse ratio', min_collapse_k, dt, dt_timescale, ratio
          check_dt_div_dt_cell_collapse = check_change(s, ratio, &
-            s% ctrl% dt_div_dt_cell_collapse_limit, s% ctrl% dt_div_dt_cell_collapse_hard_limit, &
+            s% dt_div_dt_cell_collapse_limit, s% dt_div_dt_cell_collapse_hard_limit, &
             min_collapse_k, 'dt_div_dt_cell_collapse', skip_hard_limit, dt_limit_ratio, relative_excess)
-         if (check_dt_div_dt_cell_collapse /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) then
+         if (check_dt_div_dt_cell_collapse /= keep_going .and. s% report_dt_hard_limit_retries) then
             write(*,2) 'min dt_cell_collapse', min_collapse_k, dt_timescale
          end if
       end function check_dt_div_dt_cell_collapse
@@ -2142,18 +2142,18 @@
          check_dt_div_min_dr_div_cs = keep_going
          dt_limit_ratio = 0d0
          if (s% doing_relax) return
-         if (s% ctrl% dt_div_min_dr_div_cs_limit <= 0d0) return
+         if (s% dt_div_min_dr_div_cs_limit <= 0d0) return
          dt_x = min_dr_div_cs(s, s% Tlim_dt_div_min_dr_div_cs_cell)
          !write(*,2) 'log min_dr_div_cs, q, m', s% Tlim_dt_div_min_dr_div_cs_cell, &
          !   safe_log10(dt_x), s% q(s% Tlim_dt_div_min_dr_div_cs_cell), s% m(s% Tlim_dt_div_min_dr_div_cs_cell)/Msun
          ratio = dt/dt_x
          !write(*,3) 'dt/dx_x log', s% Tlim_dt_div_min_dr_div_cs_cell, s% model_number, ratio, safe_log10(ratio)
          check_dt_div_min_dr_div_cs = check_change(s, ratio, &
-            s% ctrl% dt_div_min_dr_div_cs_limit, s% ctrl% dt_div_min_dr_div_cs_hard_limit, &
+            s% dt_div_min_dr_div_cs_limit, s% dt_div_min_dr_div_cs_hard_limit, &
             s% Tlim_dt_div_min_dr_div_cs_cell, 'dt_div_min_dr_div_cs', &
             skip_hard_limit, dt_limit_ratio, relative_excess)
-         if ((check_dt_div_min_dr_div_cs /= keep_going .and. s% ctrl% report_dt_hard_limit_retries) .or. &
-             (ratio > 1d0 .and. s% ctrl% report_min_dr_div_cs)) then
+         if ((check_dt_div_min_dr_div_cs /= keep_going .and. s% report_dt_hard_limit_retries) .or. &
+             (ratio > 1d0 .and. s% report_min_dr_div_cs)) then
             write(*,2) 'min_dr_div_cs', s% Tlim_dt_div_min_dr_div_cs_cell, dt_x
          end if
       end function check_dt_div_min_dr_div_cs
@@ -2175,10 +2175,10 @@
          include 'formats'
 
          check_dX_nuc_drop = keep_going
-         if (s% ctrl% mix_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) return
+         if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
 
-         X_limit = s% ctrl% dX_nuc_drop_min_X_limit
-         A_limit = s% ctrl% dX_nuc_drop_max_A_limit
+         X_limit = s% dX_nuc_drop_min_X_limit
+         A_limit = s% dX_nuc_drop_max_A_limit
          nz = s% nz
          sig => s% sig
 
@@ -2192,10 +2192,10 @@
          s% Tlim_dXnuc_drop_cell = max_k
          s% Tlim_dXnuc_drop_species = max_j
          
-         hard_limit = s% ctrl% dX_nuc_drop_hard_limit*s% ctrl% time_delta_coeff
+         hard_limit = s% dX_nuc_drop_hard_limit*s% time_delta_coeff
          if (hard_limit > 0 .and. (.not. skip_hard_limit) .and. &
                max_dx_nuc_drop > hard_limit) then
-            if (s% ctrl% report_dt_hard_limit_retries) then
+            if (s% report_dt_hard_limit_retries) then
                write(*,2) trim(chem_isos% name(s% chem_id(max_j))), max_k, s% xa(max_j,max_k)
                write(*,2) trim(chem_isos% name(s% chem_id(max_j))) // ' old', max_k, s% xa_old(max_j,max_k)
                write(*,2) 'drop', max_k, max_dx_nuc_drop
@@ -2206,13 +2206,13 @@
             return
          end if
          
-         limit = s% ctrl% dX_nuc_drop_limit*s% ctrl% time_delta_coeff
-         if (s% log_max_temperature >= 9.45d0 .and. s% ctrl% dX_nuc_drop_limit_at_high_T > 0) &
-            limit = s% ctrl% dX_nuc_drop_limit_at_high_T
+         limit = s% dX_nuc_drop_limit*s% time_delta_coeff
+         if (s% log_max_temperature >= 9.45d0 .and. s% dX_nuc_drop_limit_at_high_T > 0) &
+            limit = s% dX_nuc_drop_limit_at_high_T
          if (limit <= 0 .or. max_dx_nuc_drop <= 0) return
 
-         if (dt < secyer*s% ctrl% dX_nuc_drop_min_yrs_for_dt) return
-         min_dt = secyer*s% ctrl% dX_nuc_drop_min_yrs_for_dt
+         if (dt < secyer*s% dX_nuc_drop_min_yrs_for_dt) return
+         min_dt = secyer*s% dX_nuc_drop_min_yrs_for_dt
          dt_limit_ratio = min( &
             max_dx_nuc_drop/limit, &
             1d0*dt/min_dt)
@@ -2319,30 +2319,30 @@
          if (ierr /= 0) then
             check_varcontrol_limit = retry
             s% retry_message = 'varcontrol hard limit'
-            if (s% ctrl% report_ierr) write(*, *) 'check_varcontrol_limit: eval_varcontrol ierr', ierr
+            if (s% report_ierr) write(*, *) 'check_varcontrol_limit: eval_varcontrol ierr', ierr
             s% result_reason = nonzero_ierr
             return
          end if
          
-         if (s% ctrl% varcontrol_target < s% ctrl% min_allowed_varcontrol_target) then
+         if (s% varcontrol_target < s% min_allowed_varcontrol_target) then
             check_varcontrol_limit = terminate
             write(*, *) 'ERROR: timestep varcontrol_target < min_allowed_varcontrol_target'
             s% result_reason = nonzero_ierr
             return
          end if
 
-         vc_target = max(1d-99,s% ctrl% varcontrol_target)
+         vc_target = max(1d-99,s% varcontrol_target)
          dt_limit_ratio = varcontrol/vc_target
 
-         if (s% ctrl% report_solver_dt_info) then
-            write(*, 1) 's% ctrl% varcontrol_target', s% ctrl% varcontrol_target
+         if (s% report_solver_dt_info) then
+            write(*, 1) 's% varcontrol_target', s% varcontrol_target
             write(*, 1) 'vc_target', vc_target
             write(*, 1) 'varcontrol', varcontrol
             write(*, 1) 'dt_limit_ratio', dt_limit_ratio
             write(*, *)
          end if
 
-         if (dt_limit_ratio > s% ctrl% varcontrol_dt_limit_ratio_hard_max) then
+         if (dt_limit_ratio > s% varcontrol_dt_limit_ratio_hard_max) then
             write(*, '(a50, f20.10, 99e20.10)') 'varcontrol_dt_limit_ratio too large', &
                dt_limit_ratio, varcontrol, vc_target
             check_varcontrol_limit = retry
@@ -2441,7 +2441,7 @@
          s% dt_limit_ratio = dt_limit_ratio
          dt_limit_ratio_target = 1d0
 
-         if (s% ctrl% use_dt_low_pass_controller .and. &
+         if (s% use_dt_low_pass_controller .and. &
                s% dt_limit_ratio_old > 0 .and. s% dt_old > 0) then ! use 2 values to do "low pass" controller
             ratio = limiter(dt_limit_ratio_target/dt_limit_ratio)
             ratio_prev = limiter(dt_limit_ratio_target/s% dt_limit_ratio_old)
@@ -2449,7 +2449,7 @@
                pow(ratio,beta1) * pow(ratio_prev,beta2) * pow(s% dt/s% dt_old,-alpha2))
             s% dt_next = s% dt*limtr
 
-            if (s% ctrl% report_solver_dt_info) then
+            if (s% report_solver_dt_info) then
                write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
                write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
                write(*,2) 's% dt_limit_ratio_old', s% model_number, s% dt_limit_ratio_old
@@ -2463,7 +2463,7 @@
 
          else ! no history available, so fall back to the 1st order controller
             s% dt_next = s% dt*dt_limit_ratio_target/dt_limit_ratio
-            if (s% ctrl% report_solver_dt_info) then
+            if (s% report_solver_dt_info) then
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
                write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio

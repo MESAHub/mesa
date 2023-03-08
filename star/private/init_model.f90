@@ -47,13 +47,13 @@
          real(dp), parameter :: lg_max_abs_mdot = -3.5d0
          real(dp) :: init_mass, init_z
 
-         init_mass = s% ctrl% initial_mass
-         init_z = s% ctrl% initial_z
+         init_mass = s% initial_mass
+         init_z = s% initial_z
 
          call do_read_saved_model(s, fullname, ierr)
          if (ierr /= 0) return
 
-         if (abs(s% ctrl% initial_z - init_z) > 1d-3*init_z) then
+         if (abs(s% initial_z - init_z) > 1d-3*init_z) then
             ierr = -1
             return
          end if
@@ -61,7 +61,7 @@
          call do_relax_mass(s% id, init_mass, lg_max_abs_mdot, ierr)
          if (ierr /= 0) return
 
-         s% ctrl% initial_mass = init_mass
+         s% initial_mass = init_mass
          s% dt_next = min(s% dt_next, 1d2*secyer)
 
       end subroutine get_revised_mass
@@ -85,13 +85,13 @@
          include 'formats'
 
          ierr = 0
-         if (is_bad(s% ctrl% initial_mass)) then
-            write(*,1) 's% ctrl% initial_mass', s% ctrl% initial_mass
+         if (is_bad(s% initial_mass)) then
+            write(*,1) 's% initial_mass', s% initial_mass
             call mesa_error(__FILE__,__LINE__,'get_zams_model')
          end if
 
-         init_mass = s% ctrl% initial_mass
-         s% mstar = s% ctrl% initial_mass*Msun
+         init_mass = s% initial_mass
+         s% mstar = s% initial_mass*Msun
          s% xmstar = s% mstar
          s% M_center = 0
 
@@ -120,14 +120,14 @@
 
          call dealloc
 
-         if (.not. in_range) then ! have revised s% ctrl% initial_mass
-            s% mstar = s% ctrl% initial_mass*Msun
+         if (.not. in_range) then ! have revised s% initial_mass
+            s% mstar = s% initial_mass*Msun
             s% xmstar = s% mstar
             s% M_center = 0
             s% dt_next = 1d2*secyer
             call do_relax_mass(s% id, init_mass, lg_max_abs_mdot, ierr)
             if (ierr /= 0) return
-            s% ctrl% initial_mass = init_mass
+            s% initial_mass = init_mass
             s% dt_next = min(s% dt_next, 1d2*secyer)
          end if
 
@@ -184,7 +184,7 @@
             return
          end if
 
-         initial_mass = s% ctrl% initial_mass
+         initial_mass = s% initial_mass
          nvar_hydro = s% nvar_hydro
 
          call read_zams_header ! sets net_name
@@ -219,7 +219,7 @@
                   m2 = m1
                   nz2 = nz1
                   in_range = .false.
-                  s% ctrl% initial_mass = m2
+                  s% initial_mass = m2
                   initial_mass = m2
                   exit index_loop
                end if
@@ -228,7 +228,7 @@
                      m1 = m2
                      nz1 = nz2
                      in_range = .false.
-                     s% ctrl% initial_mass = m2
+                     s% initial_mass = m2
                      initial_mass = m2
                   end if
                   ! skip to end of index
@@ -307,28 +307,28 @@
                write(*, *)
                return
             end if
-            if (abs(initial_z - s% ctrl% initial_z) > 1d-3*s% ctrl% initial_z) then
+            if (abs(initial_z - s% initial_z) > 1d-3*s% initial_z) then
                ierr = -1
                write(*, *)
                write(*, *)
                write(*, *)
                write(*, *) 'WARNING: requested initial_z does not match zams file initial_z.'
                write(*, 1) 'zams file initial_z', initial_z
-               write(*, 1) 'requested initial_z', s% ctrl% initial_z
+               write(*, 1) 'requested initial_z', s% initial_z
                write(*, *)
                write(*, *)
                write(*, *)
                return
             end if
-            if (s% ctrl% initial_y > 0 .and. &
-                  abs(initial_y - s% ctrl% initial_y) > 1d-3*s% ctrl% initial_y) then
+            if (s% initial_y > 0 .and. &
+                  abs(initial_y - s% initial_y) > 1d-3*s% initial_y) then
                ierr = -1
                write(*, *)
                write(*, *)
                write(*, *)
                write(*, *) 'WARNING: requested initial_y does not match zams file initial_y.'
                write(*, 1) 'zams file initial_y', initial_y
-               write(*, 1) 'requested initial_y', s% ctrl% initial_y
+               write(*, 1) 'requested initial_y', s% initial_y
                write(*, *)
                write(*, *)
                write(*, *)

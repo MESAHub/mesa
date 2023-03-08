@@ -96,11 +96,11 @@ contains
 
        criteria_loop : do j = 1, NUM_PREDICTIVE_PARAM_SETS
 
-          if (.NOT. s% ctrl% predictive_mix(j)) cycle criteria_loop
+          if (.NOT. s%predictive_mix(j)) cycle criteria_loop
 
           ! Check if the criteria match the current boundary
 
-          select case (s% ctrl% predictive_zone_type(j))
+          select case (s%predictive_zone_type(j))
           case ('burn_H')
              match_zone_type = s%burn_h_conv_region(i)
           case ('burn_He')
@@ -115,7 +115,7 @@ contains
           case ('any')
              match_zone_type = .TRUE.
           case default
-             write(*,*) 'Invalid predictive_zone_type: j, s% ctrl% predictive_zone_type(j)=', j, s% ctrl% predictive_zone_type(j)
+             write(*,*) 'Invalid predictive_zone_type: j, s%predictive_zone_type(j)=', j, s%predictive_zone_type(j)
              ierr = -1
              return
           end select
@@ -128,7 +128,7 @@ contains
              is_surf_zone = s%conv_bdy_loc(i+1) == 1
           endif
                 
-          select case (s% ctrl% predictive_zone_loc(j))
+          select case (s%predictive_zone_loc(j))
           case ('core')
              match_zone_loc = is_core_zone
           case ('shell')
@@ -138,12 +138,12 @@ contains
           case ('any')
              match_zone_loc = .TRUE.
           case default
-             write(*,*) 'Invalid predictive_zone_loc: j, s% ctrl% predictive_zone_loc(j)=', j, s% ctrl% predictive_zone_loc(j)
+             write(*,*) 'Invalid predictive_zone_loc: j, s%predictive_zone_loc(j)=', j, s%predictive_zone_loc(j)
              ierr = -1
              return
           end select
 
-          select case (s% ctrl% predictive_bdy_loc(j))
+          select case (s%predictive_bdy_loc(j))
           case ('bottom')
              match_bdy_loc = .NOT. s%top_conv_bdy(i)
           case ('top')
@@ -151,26 +151,26 @@ contains
           case ('any')
              match_bdy_loc = .TRUE.
           case default
-             write(*,*) 'Invalid predictive_bdy_loc: j, s% ctrl% predictive_bdy_loc(j)=', j, s% ctrl% predictive_bdy_loc(j)
+             write(*,*) 'Invalid predictive_bdy_loc: j, s%predictive_bdy_loc(j)=', j, s%predictive_bdy_loc(j)
              ierr = -1
              return
           end select
 
           if (.NOT. (match_zone_type .AND. match_zone_loc .AND. match_bdy_loc)) cycle criteria_loop
 
-          if (s%conv_bdy_q(i) < s% ctrl% predictive_bdy_q_min(j) .OR. &
-              s%conv_bdy_q(i) > s% ctrl% predictive_bdy_q_max(j)) cycle criteria_loop
+          if (s%conv_bdy_q(i) < s%predictive_bdy_q_min(j) .OR. &
+              s%conv_bdy_q(i) > s%predictive_bdy_q_max(j)) cycle criteria_loop
           
           if (DEBUG) then
              write(*,*) 'Predictive mixing at convective boundary: i, j=', i, j
-             write(*,*) '  s% ctrl% predictive_zone_type=', TRIM(s% ctrl% predictive_zone_type(j))
-             write(*,*) '  s% ctrl% predictive_zone_loc=', TRIM(s% ctrl% predictive_zone_loc(j))
-             write(*,*) '  s% ctrl% predictive_bdy_loc=', TRIM(s% ctrl% predictive_bdy_loc(j))
+             write(*,*) '  s%predictive_zone_type=', TRIM(s%predictive_zone_type(j))
+             write(*,*) '  s%predictive_zone_loc=', TRIM(s%predictive_zone_loc(j))
+             write(*,*) '  s%predictive_bdy_loc=', TRIM(s%predictive_bdy_loc(j))
           endif
 
           ! Perform the predictive mixing for this boundary
 
-          if (s% ctrl% do_conv_premix) then
+          if (s%do_conv_premix) then
              call mesa_error(__FILE__,__LINE__,'Predictive mixing and convective premixing cannot be enabled at the same time')
              stop
           end if
@@ -192,7 +192,7 @@ contains
 
        if (is_bad_num(s%D_mix(k))) then
 
-          if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_predictive_mixing')
+          if (s%stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'add_predictive_mixing')
 
        end if
 
@@ -262,10 +262,10 @@ contains
 
     ! Extract parameters
 
-    superad_thresh = MAX(s% ctrl% predictive_superad_thresh(j), 0._dp)
+    superad_thresh = MAX(s%predictive_superad_thresh(j), 0._dp)
 
-    if (s% ctrl% predictive_avoid_reversal(j) /= '') then
-       iso_id = chem_get_iso_id(s% ctrl% predictive_avoid_reversal(j))
+    if (s%predictive_avoid_reversal(j) /= '') then
+       iso_id = chem_get_iso_id(s%predictive_avoid_reversal(j))
        if (iso_id == nuclide_not_found) then
           write(*,*) 'Invalid isotope name in predictive_avoid_reversal'
           ierr = -1
@@ -276,15 +276,15 @@ contains
        iso_r = 0
     endif
 
-    if (s% ctrl% predictive_limit_ingestion(j) /= '') then
-       iso_id = chem_get_iso_id(s% ctrl% predictive_limit_ingestion(j))
+    if (s%predictive_limit_ingestion(j) /= '') then
+       iso_id = chem_get_iso_id(s%predictive_limit_ingestion(j))
        if (iso_id == nuclide_not_found) then
           write(*,*) 'Invalid isotope name in predictive_limit_ingestion'
           ierr = -1
           return
        end if
        iso_i = s%net_iso(iso_id)
-       ingest_factor = s% ctrl% predictive_ingestion_factor(j)
+       ingest_factor = s%predictive_ingestion_factor(j)
     else
        iso_i = 0
     endif
@@ -343,7 +343,7 @@ contains
     ! mix_info. During Ledoux extension, some of the predictive mixing
     ! checks are disabled
 
-    ledoux_extension = s% ctrl% use_ledoux_criterion
+    ledoux_extension = s%use_ledoux_criterion
 
     ! Initialize the extended-zone data
 
@@ -779,7 +779,7 @@ contains
     enddo update_cell_loop_eos
 !$OMP END PARALLEL DO
     if (ierr /= 0) then
-       if (s% ctrl% report_ierr) write(*,*) 'Non-zero return from eval_eos in eval_mixing_coeffs/predictive_mix'
+       if (s% report_ierr) write(*,*) 'Non-zero return from eval_eos in eval_mixing_coeffs/predictive_mix'
        return
     endif
 
@@ -792,7 +792,7 @@ contains
     enddo update_cell_loop_kap
 !$OMP END PARALLEL DO
     if (ierr /= 0) then
-       if (s% ctrl% report_ierr) write(*,*) 'Non-zero return from do_kap_for_cells in eval_mixing_coeffs/predictive_mix'
+       if (s% report_ierr) write(*,*) 'Non-zero return from do_kap_for_cells in eval_mixing_coeffs/predictive_mix'
        print *,'xa:',xa_mx
        return
     endif
@@ -861,7 +861,7 @@ contains
     enddo restore_cell_loop
 !$OMP END PARALLEL DO
     if (ierr /= 0) then
-       if (s% ctrl% report_ierr) write(*,*) 'Non-zero return from do_kap_for_cells in eval_mixing_coeffs/predictive_mix'
+       if (s% report_ierr) write(*,*) 'Non-zero return from do_kap_for_cells in eval_mixing_coeffs/predictive_mix'
        return
     endif
 

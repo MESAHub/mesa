@@ -82,11 +82,11 @@ contains
 
     ! Extract parameters
 
-    f = s% ctrl% overshoot_f(j)
-    f0 = s% ctrl% overshoot_f0(j)
+    f = s%overshoot_f(j)
+    f0 = s%overshoot_f0(j)
 
-    D0 = s% ctrl% overshoot_D0(j)
-    Delta0 = s% ctrl% overshoot_Delta0(j)
+    D0 = s%overshoot_D0(j)
+    Delta0 = s%overshoot_Delta0(j)
 
     if (f <= 0._dp .OR. f0 <= 0._dp) then
        write(*,*) 'ERROR: for step overshooting, must set f and f0 > 0'
@@ -97,10 +97,10 @@ contains
 
     ! Apply mass limits
 
-    if (s%star_mass < s% ctrl% overshoot_mass_full_on(j)) then
-       if (s%star_mass > s% ctrl% overshoot_mass_full_off(j)) then
-          w = (s%star_mass - s% ctrl% overshoot_mass_full_off(j)) / &
-              (s% ctrl% overshoot_mass_full_on(j) - s% ctrl% overshoot_mass_full_off(j))
+    if (s%star_mass < s%overshoot_mass_full_on(j)) then
+       if (s%star_mass > s%overshoot_mass_full_off(j)) then
+          w = (s%star_mass - s%overshoot_mass_full_off(j)) / &
+              (s%overshoot_mass_full_on(j) - s%overshoot_mass_full_off(j))
           factor = 0.5_dp*(1._dp - cospi(w))
           f = f*factor
           f0 = f0*factor
@@ -162,7 +162,7 @@ contains
        end if
        ! Check for early overshoot completion
 
-       if (D(k) < s% ctrl% overshoot_D_min) then
+       if (D(k) < s%overshoot_D_min) then
           k_b = k
           exit face_loop
        endif

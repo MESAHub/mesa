@@ -16,28 +16,6 @@ Backwards-incompatible changes
 
    A large amount of internal clean up has occurred since the last release.  This lists some of the most important changes, but the list is not exhaustive.
 
-run_star_extras.f90 breakage
-----------------------------
-
-.. warning:: 
-
-  This is a a major change that will prevent ``run_star_extras.f90`` from being portable between earlier MESA versions and this version.
-  If you have an edited ``run_star_extras.f90`` (or ``run_binary_extras.f90``) file you MUST update your scripts.
-
-
-As part of a re-organisation of the star_type derived type, all controls (those in your controls inlist) have been moved from 
-``s% XX`` to ``s% ctrl% XX``. 
-
-We provide a script in ``linters/update_ctrls.py`` that can automate the update for you. Run this as:
-
-.. code-block:: shell
-
-  python3 $MESA_DIR/linters/update_ctrls.py file1.f90 file2.f90 ...
-
-This script accepts a list of files to process and depends only on the python stdlib. This only works if you kept the ``star_type`` variable as ``s``. 
-Thus those working on binary models will lkely need to manualy update the variables in their ``run_binary_extras.f90``.
-
-
 
 Module-level changes
 --------------------

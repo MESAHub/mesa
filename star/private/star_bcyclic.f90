@@ -65,7 +65,7 @@
 
          include 'formats'
          
-         if (s% ctrl% use_DGESVX_in_bcyclic .and. s% ctrl% report_min_rcond_from_DGESXV) &
+         if (s% use_DGESVX_in_bcyclic .and. s% report_min_rcond_from_DGESXV) &
             min_rcond_from_DGESVX = 1d99
          
          allocate(factored(nz))
@@ -177,7 +177,7 @@
 
          call dealloc
             
-         if (s% ctrl% use_DGESVX_in_bcyclic .and. s% ctrl% report_min_rcond_from_DGESXV) then
+         if (s% use_DGESVX_in_bcyclic .and. s% report_min_rcond_from_DGESXV) then
             write(*,4) 'DGESVX: k_min, iter, model, min rcond, rpgfac', &
                k_min_rcond_from_DGESVX, iter, s% model_number, min_rcond_from_DGESVX, rpgfac
          end if
@@ -589,7 +589,7 @@
          include 'formats'
          ierr = 0
          
-         if (s% ctrl% use_DGESVX_in_bcyclic) then
+         if (s% use_DGESVX_in_bcyclic) then
             call factor_with_DGESVX
             return
          end if
@@ -620,7 +620,7 @@
                end do
             end do
             
-            if (s% ctrl% use_equilibration_in_DGESVX) then
+            if (s% use_equilibration_in_DGESVX) then
                fact = 'E' ! matrix A will be equilibrated, then copied to AF and factored
             else
                fact = 'N' ! matrix A will be copied to AF and factored
@@ -654,7 +654,7 @@
                ipivot(i) = ipiv(i)
             end do
             
-            if (s% ctrl% report_min_rcond_from_DGESXV .and. rcond < min_rcond_from_DGESVX) then
+            if (s% report_min_rcond_from_DGESXV .and. rcond < min_rcond_from_DGESVX) then
                !$OMP critical (bcyclic_dense_factor_crit)
                min_rcond_from_DGESVX = rcond
                k_min_rcond_from_DGESVX = k
@@ -815,7 +815,7 @@
          real(dp), pointer :: X(:)
          ierr = 0
          
-         if (s% ctrl% use_DGESVX_in_bcyclic) then
+         if (s% use_DGESVX_in_bcyclic) then
             call solve_with_DGESVX
             return
          end if
@@ -890,7 +890,7 @@
          include 'formats'
          ierr = 0
          
-         if (s% ctrl% use_DGESVX_in_bcyclic) then
+         if (s% use_DGESVX_in_bcyclic) then
             call solve1_with_DGESVX
             return
          end if

@@ -110,7 +110,7 @@
          include 'formats'
 
          ierr = 0
-          if (.not. s% ctrl% calculate_Brunt_N2) &
+          if (.not. s% calculate_Brunt_N2) &
              call mesa_error(__FILE__,__LINE__,'pgstar mode_propagation: must have calculate_Brunt_N2 = .true.')
 
          nz = s% nz

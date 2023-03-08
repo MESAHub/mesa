@@ -295,7 +295,7 @@ contains
         m = s%m_grav(k)
         L = s%L(k)
         P = eval_face(s%dq, s%Peos, k, 1, s%nz)
-        if (s% ctrl% interpolate_rho_for_pulse_data) then
+        if (s%interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, k_a, k_b)
         else
            rho = eval_face_rho(s, k, k_a, k_b)
@@ -362,7 +362,7 @@ contains
         m = 0d0
         L = 0d0
         P = eval_center(s%rmid, s%Peos, 1, s%nz)
-        if (s% ctrl% interpolate_rho_for_pulse_data) then
+        if (s%interpolate_rho_for_pulse_data) then
            rho = eval_center(s%rmid, s%rho, k_a, k_b)
         else
            rho = eval_center_rho(s, k_b)

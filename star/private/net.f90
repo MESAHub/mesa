@@ -61,7 +61,7 @@
 
          ierr = 0
 
-         if (s% ctrl% eps_nuc_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) then
+         if (s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) then
             do k = nzlo, nzhi
                s% eps_nuc(k) = 0d0
                s% d_epsnuc_dlnd(k) = 0d0
@@ -73,7 +73,7 @@
                s% d_dxdt_nuc_dT(:,k) =  0d0
                s% d_dxdt_nuc_dx(:,:,k) =  0d0
                s% eps_nuc_neu_total(k) = 0d0
-               if (s% ctrl% op_split_burn) then
+               if (s% op_split_burn) then
                   s% burn_avg_epsnuc(k) = 0d0
                   s% burn_num_iters(k) = 0
                end if
@@ -82,13 +82,13 @@
          end if
 
          rates_other_screening => null()
-         if(s% ctrl% use_other_screening) then
+         if(s% use_other_screening) then
             rates_other_screening => s% other_screening
          end if
 
          net_lwork = net_work_size(s% net_handle, ierr)
          
-         check_op_split_burn = s% ctrl% op_split_burn
+         check_op_split_burn = s% op_split_burn
          
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &
@@ -161,7 +161,7 @@
 
          if (check_op_split_burn .and. &
              s% doing_struct_burn_mix .and. &
-             s% T_start(k) >= s% ctrl% op_split_burn_min_T) then ! leave this to do_burn
+             s% T_start(k) >= s% op_split_burn_min_T) then ! leave this to do_burn
             return
          end if
 
@@ -179,8 +179,8 @@
          s% d_dxdt_nuc_dx(:,:,k) =  0d0
          s% eps_nuc_neu_total(k) = 0d0
 
-         if ((s% ctrl% eps_nuc_factor == 0d0 .and. s% ctrl% dxdt_nuc_factor == 0d0) .or. &
-              s% abar(k) > s% ctrl% max_abar_for_burning) then
+         if ((s% eps_nuc_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) .or. &
+              s% abar(k) > s% max_abar_for_burning) then
             return
          end if
 
@@ -188,38 +188,38 @@
          log10_T = s% lnT(k)/ln10
          T = s% T(k)
          
-         clipped_T = (s% ctrl% max_logT_for_net > 0 .and. log10_T > s% ctrl% max_logT_for_net)
+         clipped_T = (s% max_logT_for_net > 0 .and. log10_T > s% max_logT_for_net)
          if (clipped_T) then
-            log10_T = s% ctrl% max_logT_for_net
+            log10_T = s% max_logT_for_net
             T = exp10(log10_T)
          end if
 
          screening_mode = get_screening_mode(s,ierr)
          if (ierr /= 0) then
-            write(*,*) 'unknown string for screening_mode: ' // trim(s% ctrl% screening_mode)
+            write(*,*) 'unknown string for screening_mode: ' // trim(s% screening_mode)
             call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
 
-         if (s% ctrl% reaction_neuQs_factor /= 1d0) then
+         if (s% reaction_neuQs_factor /= 1d0) then
             sz = size(std_reaction_neuQs,dim=1)
             allocate(reaction_neuQs(sz))
             do j=1,sz
-               reaction_neuQs(j) = std_reaction_neuQs(j)*s% ctrl% reaction_neuQs_factor
+               reaction_neuQs(j) = std_reaction_neuQs(j)*s% reaction_neuQs_factor
             end do
          else
             reaction_neuQs => std_reaction_neuQs
          end if
 
-         if (s% ctrl% solver_test_net_partials) then
-             net_test_partials = (k == s% ctrl% solver_test_partials_k .and. &
-               s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
-               s% solver_iter == s% ctrl% solver_test_partials_iter_number)
+         if (s% solver_test_net_partials) then
+             net_test_partials = (k == s% solver_test_partials_k .and. &
+               s% solver_call_number == s% solver_test_partials_call_number .and. &
+               s% solver_iter == s% solver_test_partials_iter_number)
              ! if the test is for a partial wrt an abundance, do this
              ! in inlist set solver_test_partials_var_name and solver_test_partials_sink_name 
              ! set solver_test_partials_equ_name = ''
-             i_var = lookup_nameofvar(s, s% ctrl% solver_test_partials_var_name)
-             i_var_sink = lookup_nameofvar(s, s% ctrl% solver_test_partials_sink_name)
+             i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
+             i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
              s% solver_test_partials_var = i_var ! index in vars
              if (i_var > s% nvar_hydro) then ! index in xa for sink
                 s% solver_test_partials_dx_sink = i_var_sink - s% nvar_hydro
@@ -230,14 +230,14 @@
              net_test_partials_iother = i_var_sink - s% nvar_hydro ! index in xa for var
          end if
          
-         if (s% ctrl% use_other_net_get) then
+         if (s% use_other_net_get) then
             call s% other_net_get( &
                s% id, k, &
                s% net_handle, .false., netinfo, species, num_reactions, s% xa(1:species,k), &
                T, log10_T, s% rho(k), log10_Rho, &
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &
-               s% rate_factors, s% ctrl% weak_rate_factor, &
+               s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, reaction_neuQs, &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
@@ -249,7 +249,7 @@
                T, log10_T, s% rho(k), log10_Rho, &
                s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k), &
                s% eta(k), s% d_eos_dlnT(i_eta,k), s% d_eos_dlnd(i_eta,k), &
-               s% rate_factors, s% ctrl% weak_rate_factor, &
+               s% rate_factors, s% weak_rate_factor, &
                std_reaction_Qs, reaction_neuQs, &
                s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT, s% d_epsnuc_dx(:,k), &
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
@@ -259,8 +259,8 @@
 
          if (is_bad(s% eps_nuc(k))) then
             ierr = -1
-            if (s% ctrl% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
+            if (s% report_ierr) write(*,*) 'net_get returned bad eps_nuc', ierr
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
 
@@ -284,7 +284,7 @@
             call mesa_error(__FILE__,__LINE__,'after net_get in star')
          end if
          
-         if (s% ctrl% solver_test_net_partials .and. net_test_partials) then
+         if (s% solver_test_net_partials .and. net_test_partials) then
             s% solver_test_partials_val = net_test_partials_val
             s% solver_test_partials_dval_dx = net_test_partials_dval_dx
          end if
@@ -296,18 +296,18 @@
                s% d_dxdt_nuc_dT(1:species,k) = 0
             end if
 
-            if (s% ctrl% nonlocal_NiCo_kap_gamma > 0d0 .and. &
-                  .not. s% ctrl% nonlocal_NiCo_decay_heat) then
+            if (s% nonlocal_NiCo_kap_gamma > 0d0 .and. &
+                  .not. s% nonlocal_NiCo_decay_heat) then
                tau_gamma = 0
                do kk = 1, k
                   tau_gamma = tau_gamma + s% dm(kk)/(pi4*s% rmid(kk)*s% rmid(kk))
                end do
-               tau_gamma = tau_gamma*s% ctrl% nonlocal_NiCo_kap_gamma
+               tau_gamma = tau_gamma*s% nonlocal_NiCo_kap_gamma
                s% eps_nuc(k) = s% eps_nuc(k)*(1d0 - exp(-tau_gamma))
             end if
          
-            if (abs(s% eps_nuc(k)) > s% ctrl% max_abs_eps_nuc) then
-               s% eps_nuc(k) = sign(s% ctrl% max_abs_eps_nuc, s% eps_nuc(k))
+            if (abs(s% eps_nuc(k)) > s% max_abs_eps_nuc) then
+               s% eps_nuc(k) = sign(s% max_abs_eps_nuc, s% eps_nuc(k))
                d_eps_nuc_dRho = 0d0
                d_eps_nuc_dT = 0d0
                s% d_epsnuc_dx(:,k) = 0d0
@@ -330,17 +330,17 @@
 
          end if
 
-         if (s% ctrl% reaction_neuQs_factor /= 1d0) deallocate(reaction_neuQs)
+         if (s% reaction_neuQs_factor /= 1d0) deallocate(reaction_neuQs)
 
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
                write(*,'(A)')
                write(*,*) 'do1_net: net_get failure for cell ', k
                !return
                call show_stuff(s,k,net_lwork,net_work)
             end if
             if (is_bad_num(s% eps_nuc(k))) then
-               if (s% ctrl% stop_for_bad_nums) then
+               if (s% stop_for_bad_nums) then
                   write(*,2) 'eps_nuc', k, s% eps_nuc(k)
                   call mesa_error(__FILE__,__LINE__,'do1_net')
                end if
@@ -349,7 +349,7 @@
          end if
 
          if (is_bad_num(s% eps_nuc(k))) then
-            if (s% ctrl% stop_for_bad_nums) then
+            if (s% stop_for_bad_nums) then
                write(*,2) 'eps_nuc', k, s% eps_nuc(k)
                call mesa_error(__FILE__,__LINE__,'do1_net')
             end if
@@ -360,7 +360,7 @@
          s% d_epsnuc_dlnd(k) = d_eps_nuc_dRho*s% rho(k)
          s% d_epsnuc_dlnT(k) = d_eps_nuc_dT*s% T(k)
 
-         eps_nuc_factor = s% ctrl% eps_nuc_factor
+         eps_nuc_factor = s% eps_nuc_factor
          if (eps_nuc_factor /= 1d0) then
             s% eps_nuc(k) = s% eps_nuc(k)*eps_nuc_factor
             s% d_epsnuc_dlnd(k) = s% d_epsnuc_dlnd(k)*eps_nuc_factor
@@ -369,11 +369,11 @@
             s% eps_nuc_categories(:,k) = s% eps_nuc_categories(:,k)*eps_nuc_factor
          end if
 
-         if (s% ctrl% dxdt_nuc_factor /= 1d0) then
-            s% dxdt_nuc(:,k) = s% dxdt_nuc(:,k)*s% ctrl% dxdt_nuc_factor
-            s% d_dxdt_nuc_dRho(:,k) = s% d_dxdt_nuc_dRho(:,k)*s% ctrl% dxdt_nuc_factor
-            s% d_dxdt_nuc_dT(:,k) = s% d_dxdt_nuc_dT(:,k)*s% ctrl% dxdt_nuc_factor
-            s% d_dxdt_nuc_dx(:,:,k) = s% d_dxdt_nuc_dx(:,:,k)*s% ctrl% dxdt_nuc_factor
+         if (s% dxdt_nuc_factor /= 1d0) then
+            s% dxdt_nuc(:,k) = s% dxdt_nuc(:,k)*s% dxdt_nuc_factor
+            s% d_dxdt_nuc_dRho(:,k) = s% d_dxdt_nuc_dRho(:,k)*s% dxdt_nuc_factor
+            s% d_dxdt_nuc_dT(:,k) = s% d_dxdt_nuc_dT(:,k)*s% dxdt_nuc_factor
+            s% d_dxdt_nuc_dx(:,:,k) = s% d_dxdt_nuc_dx(:,:,k)*s% dxdt_nuc_factor
          end if
 
          if (is_bad_num(s% eps_nuc(k))) then
@@ -383,7 +383,7 @@
             call show_stuff(s,k,net_lwork,net_work)
             write(*,*) '(is_bad_num(s% eps_nuc(k)))'
             write(*,*) 'failed in do1_net'
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
          
@@ -562,7 +562,7 @@
          write(*,1) 'zbar =', s% zbar(k)
          write(*,1) 'z2bar =', s% z2bar(k)
          write(*,1) 'ye =', s% ye(k)
-         write(*,*) 'screening_mode = ' // trim(s% ctrl% screening_mode)
+         write(*,*) 'screening_mode = ' // trim(s% screening_mode)
          write(*,'(A)')
 
       end subroutine show_stuff
@@ -579,7 +579,7 @@
             get_screening_mode = s% screening_mode_value
             return
          end if
-         get_screening_mode = screening_option(s% ctrl% screening_mode, ierr)
+         get_screening_mode = screening_option(s% screening_mode, ierr)
          if (ierr /= 0) return
          s% screening_mode_value = get_screening_mode
       end function get_screening_mode
@@ -709,7 +709,7 @@
 
          call net_start_def(s% net_handle, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_start_def'
+            if (s% report_ierr) write(*,*) 'failed in net_start_def'
             return
          end if
 
@@ -721,13 +721,13 @@
 
          call read_net_file(s% net_name, s% net_handle, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in read_net_file ' // trim(s% net_name)
+            if (s% report_ierr) write(*,*) 'failed in read_net_file ' // trim(s% net_name)
             return
          end if
 
          call net_finish_def(s% net_handle, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_finish_def'
+            if (s% report_ierr) write(*,*) 'failed in net_finish_def'
             return
          end if
 
@@ -736,7 +736,7 @@
 
          call s% set_rate_factors(s% id, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in set_rate_factors'
+            if (s% report_ierr) write(*,*) 'failed in set_rate_factors'
             return
          end if
 
@@ -745,33 +745,33 @@
 
          call s% set_which_rates(s% id, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in set_which_rates'
+            if (s% report_ierr) write(*,*) 'failed in set_which_rates'
             return
          end if
 
          call net_set_which_rates(s% net_handle, s% which_rates, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_set_which_rates'
+            if (s% report_ierr) write(*,*) 'failed in net_set_which_rates'
             return
          end if
 
-         call net_set_logTcut(s% net_handle, s% ctrl% net_logTcut_lo, s% ctrl% net_logTcut_lim, ierr)
+         call net_set_logTcut(s% net_handle, s% net_logTcut_lo, s% net_logTcut_lim, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_set_logTcut'
+            if (s% report_ierr) write(*,*) 'failed in net_set_logTcut'
             return
          end if
 
          call net_set_fe56ec_fake_factor( &
-            s% net_handle, s% ctrl% fe56ec_fake_factor, s% ctrl% min_T_for_fe56ec_fake_factor, ierr)
+            s% net_handle, s% fe56ec_fake_factor, s% min_T_for_fe56ec_fake_factor, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_set_fe56ec_fake_factor'
+            if (s% report_ierr) write(*,*) 'failed in net_set_fe56ec_fake_factor'
             return
          end if
 
          call net_setup_tables( &
             s% net_handle, rates_cache_suffix_for_star, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'failed in net_setup_tables'
+            if (s% report_ierr) write(*,*) 'failed in net_setup_tables'
             return
          end if
 

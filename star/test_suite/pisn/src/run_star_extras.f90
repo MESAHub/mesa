@@ -58,7 +58,7 @@
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
          s% data_for_extra_profile_columns => data_for_extra_profile_columns  
          s% other_remove_surface => remove_ejecta_one_cell_per_step
-         !s% ctrl% use_other_remove_surface = .true.
+         !s% use_other_remove_surface = .true.
 
          s% other_photo_read => extras_photo_read
          s% other_photo_write => extras_photo_write
@@ -110,7 +110,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case(7)
             testhub_extras_names(1) = 'gamma1_cntr_pulse_start'
             testhub_extras_vals(1) = gamma1_cntr_pulse_start
@@ -232,7 +232,7 @@
             s% termination_code = t_xtra1
          end if
 
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case(7)
             if(gamma1_cntr_pulse_start > 1d50 .and. gamma1_integral(s) < 0.0) then
                gamma1_cntr_pulse_start = s% gamma1(s% nz)-4.d0/3.d0
@@ -251,7 +251,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
  
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case(7)
             read(iounit,iostat=ierr) gamma1_cntr_pulse_start
          end select
@@ -267,7 +267,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
  
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case(7)
             write(iounit) gamma1_cntr_pulse_start
          end select

@@ -162,14 +162,14 @@
          SUNR=Rsun
          CL=4d0*(4d0*PI)**2*SIG/3d0
 
-         ALFA = s% ctrl% RSP_alfa
-         ALFAP = s% ctrl% RSP_alfap
-         ALFAM = s% ctrl% RSP_alfam
-         ALFAT = s% ctrl% RSP_alfat
-         ALFAS = s% ctrl% RSP_alfas
-         ALFAC = s% ctrl% RSP_alfac
-         CEDE = s% ctrl% RSP_alfad
-         GAMMAR = s% ctrl% RSP_gammar
+         ALFA = s% RSP_alfa
+         ALFAP = s% RSP_alfap
+         ALFAM = s% RSP_alfam
+         ALFAT = s% RSP_alfat
+         ALFAS = s% RSP_alfas
+         ALFAC = s% RSP_alfac
+         CEDE = s% RSP_alfad
+         GAMMAR = s% RSP_gammar
 
          ALFAP = ALFAP*2.d0/3.d0
          ALFAS = ALFAS*(1.d0/2.d0)*sqrt(2.d0/3.d0)
@@ -179,9 +179,9 @@
          
          call turn_on_time_weighting(s)
 
-         CQ = s% ctrl% RSP_cq
-         ZSH = s% ctrl% RSP_zsh
-         EFL0 = s% ctrl% RSP_efl0
+         CQ = s% RSP_cq
+         ZSH = s% RSP_zsh
+         EFL0 = s% RSP_efl0
          kapE_factor = 1d0 ! s% RSP_kapE_factor
          kapP_factor = 1d0 ! s% RSP_kapP_factor
          
@@ -189,7 +189,7 @@
          
          writing_map = .false.
 
-         if(.not. folder_exists(trim(s% ctrl% log_directory))) call mkdir(trim(s% ctrl% log_directory))
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
             
       end subroutine init_def
       
@@ -219,15 +219,15 @@
       
       subroutine turn_on_time_weighting(s)
          type (star_info), pointer :: s
-         THETA = s% ctrl% RSP_theta
-         THETAT = s% ctrl% RSP_thetat
-         THETAQ = s% ctrl% RSP_thetaq
-         THETAE = s% ctrl% RSP_thetae
-         THETAU = s% ctrl% RSP_thetau
-         WTR = s% ctrl% RSP_wtr
-         WTC = s% ctrl% RSP_wtc
-         WTT = s% ctrl% RSP_wtt
-         GAM = s% ctrl% RSP_gam
+         THETA = s% RSP_theta
+         THETAT = s% RSP_thetat
+         THETAQ = s% RSP_thetaq
+         THETAE = s% RSP_thetae
+         THETAU = s% RSP_thetau
+         WTR = s% RSP_wtr
+         WTC = s% RSP_wtc
+         WTT = s% RSP_wtt
+         GAM = s% RSP_gam
          GAM1=1.d0-GAM
          WTR1=1.d0-WTR
          WTC1=1.d0-WTC
@@ -250,7 +250,7 @@
             write(*,*) 'NZN > MAX_NZN', NZN, MAX_NZN
             call mesa_error(__FILE__,__LINE__,'rsp init_allocate')
          end if
-         IBOTOM = NZN/s% ctrl% RSP_nz_div_IBOTOM
+         IBOTOM = NZN/s% RSP_nz_div_IBOTOM
          n = NZN + 1 ! room for ghost cell
          allocate(xa(s% species), &
             dVol_dr_00(n), dVol_dr_in(n), &
@@ -538,10 +538,10 @@
             write(*,2) 's% nz', s% nz
             call mesa_error(__FILE__,__LINE__,'bad nz')
          end if
-         if (.not. s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, s% nz, s% dq, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def set_star_vars'
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def set_star_vars'
                return
             end if
          end if
@@ -746,10 +746,10 @@
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
          
          ! fix
-         if (.not. s% ctrl% do_normalize_dqs_as_part_of_set_qs) then
+         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, NZN, s% dq, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def cleanup_for_LINA'
+               if (s% report_ierr) write(*,*) 'normalize_dqs failed in rsp_def cleanup_for_LINA'
                return
             end if
          end if

@@ -144,7 +144,7 @@
          call fill_ad_with_zeros(s% eps_grav_ad,1,-1)
          s% ergs_error(1:nz) = 0
          if (.not. restart) s% have_ST_start_info = .false.
-         if (s% ctrl% do_element_diffusion) s% edv(:,1:nz) = 0
+         if (s% do_element_diffusion) s% edv(:,1:nz) = 0
          if (s% u_flag) then
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
@@ -183,13 +183,13 @@
 
          s% doing_finish_load_model = .true.
 
-         if(s% ctrl% calculate_Brunt_B) call do_brunt_B(s, 1, s%nz, ierr)
+         if(s% calculate_Brunt_B) call do_brunt_B(s, 1, s%nz, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in do_brunt_b'
             return
          end if
 
-         if(s% ctrl% calculate_Brunt_N2) call do_brunt_N2(s, 1, s%nz, ierr)
+         if(s% calculate_Brunt_N2) call do_brunt_N2(s, 1, s%nz, ierr)
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in do_brunt_N2'
             return
@@ -274,9 +274,9 @@
          s% xmstar = -1
          
          tau_factor = s% tau_factor
-         Tsurf_factor = s% ctrl% Tsurf_factor
-         mixing_length_alpha = s% ctrl% mixing_length_alpha
-         opacity_factor = s% ctrl% opacity_factor
+         Tsurf_factor = s% Tsurf_factor
+         mixing_length_alpha = s% mixing_length_alpha
+         opacity_factor = s% opacity_factor
 
          call read_properties(iounit, &
             net_name, species, nz, year_month_day_when_created, &
@@ -314,30 +314,30 @@
             s% force_tau_factor = tau_factor
          end if
 
-         if (abs(Tsurf_factor - s% ctrl% Tsurf_factor) > Tsurf_factor*1d-9 .and. &
-               s% ctrl% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
+         if (abs(Tsurf_factor - s% Tsurf_factor) > Tsurf_factor*1d-9 .and. &
+               s% Tsurf_factor /= s% job% set_to_this_Tsurf_factor) then
             ! don't change if just set by inlist
             write(*,'(A)')
             write(*,1) 'WARNING: changing to saved Tsurf_factor =', Tsurf_factor
             write(*,'(A)')
-            s% ctrl% Tsurf_factor = Tsurf_factor
+            s% Tsurf_factor = Tsurf_factor
             s% force_Tsurf_factor = Tsurf_factor
          end if
 
-         if (abs(opacity_factor - s% ctrl% opacity_factor) > opacity_factor*1d-9 .and. &
-               s% ctrl% opacity_factor /= s% job% relax_to_this_opacity_factor) then
+         if (abs(opacity_factor - s% opacity_factor) > opacity_factor*1d-9 .and. &
+               s% opacity_factor /= s% job% relax_to_this_opacity_factor) then
             ! don't change if just set by inlist
             write(*,'(A)')
             write(*,1) 'WARNING: changing to saved opacity_factor =', opacity_factor
             write(*,'(A)')
-            s% ctrl% opacity_factor = opacity_factor
+            s% opacity_factor = opacity_factor
             s% force_opacity_factor = opacity_factor
          end if
 
-         if (abs(mixing_length_alpha - s% ctrl% mixing_length_alpha) > mixing_length_alpha*1d-9) then
+         if (abs(mixing_length_alpha - s% mixing_length_alpha) > mixing_length_alpha*1d-9) then
             write(*,'(A)')
             write(*,1) 'WARNING: model saved with mixing_length_alpha =', mixing_length_alpha
-            write(*,1) 'but current setting for mixing_length_alpha =', s% ctrl% mixing_length_alpha
+            write(*,1) 'but current setting for mixing_length_alpha =', s% mixing_length_alpha
             write(*,'(A)')
          end if
          
@@ -363,7 +363,7 @@
 
          s% net_name = trim(net_name)
          s% species = species
-         s% ctrl% initial_z = initial_z
+         s% initial_z = initial_z
 
          s% mstar = initial_mass*Msun
          if (s% xmstar < 0) then

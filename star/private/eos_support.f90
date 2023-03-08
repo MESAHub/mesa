@@ -93,7 +93,7 @@ contains
 
     if (ierr /= 0) then
        s% retry_message = 'get_eos failed'
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           !$OMP critical (get_eos_critical)
           write(*,*) 'get_eos ierr', ierr
           write(*,2) 'k', k
@@ -102,7 +102,7 @@ contains
           end do
           write(*,1) 'log10Rho', logRho
           write(*,1) 'log10T', logT
-          if (s% ctrl% stop_for_bad_nums .and. &
+          if (s% stop_for_bad_nums .and. &
                is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
           !$OMP end critical (get_eos_critical)
        end if
@@ -365,7 +365,7 @@ contains
        arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
        logRho, res, dres_dlnRho, dres_dlnT, &
        dres_dxa, eos_calls, ierr)
-    if (ierr /= 0 .and. s% ctrl% report_ierr) then
+    if (ierr /= 0 .and. s% report_ierr) then
        write(*,*) 'Call to eosDT_get_Rho failed in solve_eos_given_PgasT'
        write(*,2) 'logPgas', k, logPgas
        write(*,2) 'logT', k, logT

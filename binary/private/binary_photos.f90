@@ -56,12 +56,12 @@
          close(iounit)
 
          if (b% have_star_1) then
-            filename = trim(trim(b% s1% ctrl% photo_directory) // '/1_' // str_photo)
+            filename = trim(trim(b% s1% photo_directory) // '/1_' // str_photo)
             call star_save_for_restart(b% s1% id, filename, ierr)
             report_str = trim(trim(report_str) // ', ' // filename)
          end if
          if (b% have_star_2) then
-            filename = trim(trim(b% s2% ctrl% photo_directory) // '/2_' // str_photo)
+            filename = trim(trim(b% s2% photo_directory) // '/2_' // str_photo)
             call star_save_for_restart(b% s2% id, filename, ierr)
             report_str = trim(trim(report_str) // ', ' // filename)
          end if

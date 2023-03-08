@@ -93,7 +93,7 @@ contains
          r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, &
          gradr_ad, grada_ad, scale_height_ad, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-         s% ctrl% alpha_semiconvection, s% ctrl% thermohaline_coeff, &
+         s% alpha_semiconvection, s% thermohaline_coeff, &
          mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
       gradT = gradT_ad%val
       Y_face = Y_face_ad%val
@@ -139,17 +139,17 @@ contains
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
       
-      if (s% ctrl% use_other_mlt_results) then
+      if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, k, MLT_option, &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            s% ctrl% alpha_semiconvection, s% ctrl% thermohaline_coeff, &
+            s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       else         
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
-            s% ctrl% alpha_semiconvection, s% ctrl% thermohaline_coeff, &
+            s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       end if
 
@@ -194,7 +194,7 @@ contains
       beta = Pg / P
       Lambda = mixing_length_alpha*scale_height
       grav = cgrav*m/pow2(r)   
-      if (s% ctrl% use_Ledoux_criterion) then
+      if (s% use_Ledoux_criterion) then
          gradL = grada + gradL_composition_term ! Ledoux temperature gradient
       else
          gradL = grada
@@ -213,7 +213,7 @@ contains
             opacity%val < 1d-10 .or. P%val < 1d-20 .or. T%val < 1d-10 .or. Rho%val < 1d-20 &
             .or. m < 1d-10 .or. r%val < 1d-10 .or. cgrav < 1d-10) return
 
-      !test_partials = (k == s% ctrl% solver_test_partials_k)
+      !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
       ierr = 0          
       if (k > 0) then
@@ -230,7 +230,7 @@ contains
 
       ! check if this particular k can be done with TDC
       using_TDC = .false.
-      if (s% ctrl% MLT_option == 'TDC') using_TDC = .true.
+      if (s% MLT_option == 'TDC') using_TDC = .true.
       if (.not. s% have_mlt_vc) using_TDC = .false.
       if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
       if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
@@ -252,24 +252,24 @@ contains
          end if
 
          call set_TDC(&
-            conv_vel_start, mixing_length_alpha, s% ctrl% alpha_TDC_DAMP, s% ctrl% alpha_TDC_DAMPR, s% ctrl% alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
+            conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, L, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
 
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'ierr from set_TDC'
+               if (s% report_ierr) write(*,*) 'ierr from set_TDC'
                return
             end if
 
       else if (gradr > gradL) then
          if (report) write(*,3) 'call set_MLT', k, s% solver_iter
-         call set_MLT(MLT_option, mixing_length_alpha, s% ctrl% Henyey_MLT_nu_param, s% ctrl% Henyey_MLT_y_param, &
+         call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
 
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,*) 'ierr from set_MLT'
+            if (s% report_ierr) write(*,*) 'ierr from set_MLT'
             return
          end if
 
@@ -277,12 +277,12 @@ contains
          ! gradr if the resulting gradT would lead to the radiative luminosity approaching the Eddington
          ! limit, or when a density inversion is expected to happen.
          ! This is meant as an implicit alternative to okay_to_reduce_gradT_excess
-         if (s% ctrl% use_superad_reduction) then
-            Gamma_limit = s% ctrl% superad_reduction_Gamma_limit
-            scale_value1 = s% ctrl% superad_reduction_Gamma_limit_scale
-            scale_value2 = s% ctrl% superad_reduction_Gamma_inv_scale
-            diff_grads_limit = s% ctrl% superad_reduction_diff_grads_limit
-            reduction_limit = s% ctrl% superad_reduction_limit
+         if (s% use_superad_reduction) then
+            Gamma_limit = s% superad_reduction_Gamma_limit
+            scale_value1 = s% superad_reduction_Gamma_limit_scale
+            scale_value2 = s% superad_reduction_Gamma_inv_scale
+            diff_grads_limit = s% superad_reduction_diff_grads_limit
+            reduction_limit = s% superad_reduction_limit
             Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
             Gamma_inv_threshold = 4*(1-beta)/chiT
 
@@ -319,12 +319,12 @@ contains
             if (Gamma_factor > 1d0) then
                grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
                gradr_scaled = grad_scale*gradr
-               call set_MLT(MLT_option, mixing_length_alpha, s% ctrl% Henyey_MLT_nu_param, s% ctrl% Henyey_MLT_y_param, &
+               call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                               gradr_scaled, grada, gradL, &
                               Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
                if (ierr /= 0) then
-                  if (s% ctrl% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
+                  if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                   return
                end if
             end if
@@ -335,29 +335,29 @@ contains
       if (mixing_type == no_mixing) then
          if (gradL_composition_term < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s% ctrl% thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'ierr from set_thermohaline'
+               if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
                return
             end if
          else if (gradr > grada) then
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
-                                    s% ctrl% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
+                                    s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
                                     gradL_composition_term, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'ierr from set_semiconvection'
+               if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
          end if         
       end if 
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
-      if (D%val < s% ctrl% remove_small_D_limit .or. is_bad(D%val)) then
-         if (report) write(*,2) 'D < s% ctrl% remove_small_D_limit', k, D%val, s% ctrl% remove_small_D_limit
+      if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
+         if (report) write(*,2) 'D < s% remove_small_D_limit', k, D%val, s% remove_small_D_limit
          mixing_type = no_mixing
          gradT = gradr
          Y_face = gradT - gradL

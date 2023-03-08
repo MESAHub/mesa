@@ -72,19 +72,19 @@
          chem_id => s% chem_id
          species = s% species
          
-         initial_x = max(0d0, min(1d0, s% ctrl% RSP_X))
-         initial_z = max(0d0, min(1d0, s% ctrl% RSP_Z))
+         initial_x = max(0d0, min(1d0, s% RSP_X))
+         initial_z = max(0d0, min(1d0, s% RSP_Z))
          initial_y = max(0d0,1d0 - (initial_x + initial_z))
          initial_h1 = initial_x
          initial_h2 = 0
-         if (s% ctrl% initial_he3 < 0d0) then
+         if (s% initial_he3 < 0d0) then
             xsol_he3 = chem_Xsol('he3')
             xsol_he4 = chem_Xsol('he4')
             initial_he3 = initial_y*xsol_he3/(xsol_he3 + xsol_he4)
             initial_he4 = initial_y*xsol_he4/(xsol_he3 + xsol_he4)
-         else if (s% ctrl% initial_he3 < initial_y) then
-            initial_he3 = s% ctrl% initial_he3
-            initial_he4 = initial_y - s% ctrl% initial_he3
+         else if (s% initial_he3 < initial_y) then
+            initial_he3 = s% initial_he3
+            initial_he4 = initial_y - s% initial_he3
          else
             write(*,*) 'ERROR: initial_he3 is larger than initial_y'
             ierr = -1
@@ -274,7 +274,7 @@
             write(*,2) 'T', k, T
             write(*,2) 'logRho', k, logRho
             write(*,2) 'logT', k, logT
-            if (s% ctrl% stop_for_bad_nums .and. is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+            if (s% stop_for_bad_nums .and. is_bad(logRho+logT)) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
             !$omp end critical (rsp_eval_eos_and_kap_1)
             !return
             call mesa_error(__FILE__,__LINE__,'RSP failed in get_eos')
@@ -453,7 +453,7 @@
             write(*,2) 'logRho', k, logRho
             write(*,2) 'T', k, T
             write(*,2) 'logT', k, logT
-            if (s% ctrl% stop_for_bad_nums .and. egas <= 0d0) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+            if (s% stop_for_bad_nums .and. egas <= 0d0) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
             !$OMP end critical (RSP_eosDEgas)
             return
             call mesa_error(__FILE__,__LINE__,'RSP failed in eval1_mesa_eosDEgas_and_kap')
@@ -627,9 +627,9 @@
          include 'formats'
          ierr = 0
          
-         if (s% ctrl% RSP_kap_density_factor > 0d0) then
-            OP = s% ctrl% RSP_kap_density_factor*V
-            OPV = s% ctrl% RSP_kap_density_factor
+         if (s% RSP_kap_density_factor > 0d0) then
+            OP = s% RSP_kap_density_factor*V
+            OPV = s% RSP_kap_density_factor
             OPT = 0d0
             return
          end if
@@ -642,7 +642,7 @@
          d_eta_dlnRho = d_dlnd(i_eta)
          d_eta_dlnT = d_dlnT(i_eta)
 
-         if (s% ctrl% use_other_kap) then
+         if (s% use_other_kap) then
             call s% other_kap_get( &
                s% id, k, kap_handle, species, chem_id, net_iso, xa, &
                logRho, logT, &
@@ -673,26 +673,26 @@
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         if (k > 0 .and. k <= s% nz .and. s% ctrl% use_other_opacity_factor) then
+         if (k > 0 .and. k <= s% nz .and. s% use_other_opacity_factor) then
             opacity_factor = s% extra_opacity_factor(k)
          else
-            opacity_factor = s% ctrl% opacity_factor
+            opacity_factor = s% opacity_factor
          end if
 
 
          if (opacity_factor /= 1d0) then
-            if (s% ctrl% min_logT_for_opacity_factor_off > 0) then
-               if (logT >= s% ctrl% max_logT_for_opacity_factor_off .or. &
-                   logT <= s% ctrl% min_logT_for_opacity_factor_off) then
+            if (s% min_logT_for_opacity_factor_off > 0) then
+               if (logT >= s% max_logT_for_opacity_factor_off .or. &
+                   logT <= s% min_logT_for_opacity_factor_off) then
                   opacity_factor = 1
-               else if (logT > s% ctrl% max_logT_for_opacity_factor_on) then
+               else if (logT > s% max_logT_for_opacity_factor_on) then
                   opacity_factor = 1 + (opacity_factor-1)* &
-                     (logT - s% ctrl% max_logT_for_opacity_factor_off)/ &
-                     (s% ctrl% max_logT_for_opacity_factor_on - s% ctrl% max_logT_for_opacity_factor_off)
-               else if (logT < s% ctrl% min_logT_for_opacity_factor_on) then
+                     (logT - s% max_logT_for_opacity_factor_off)/ &
+                     (s% max_logT_for_opacity_factor_on - s% max_logT_for_opacity_factor_off)
+               else if (logT < s% min_logT_for_opacity_factor_on) then
                   opacity_factor = 1 + (opacity_factor-1)* &
-                     (logT - s% ctrl% min_logT_for_opacity_factor_off)/ &
-                     (s% ctrl% min_logT_for_opacity_factor_on - s% ctrl% min_logT_for_opacity_factor_off)
+                     (logT - s% min_logT_for_opacity_factor_off)/ &
+                     (s% min_logT_for_opacity_factor_on - s% min_logT_for_opacity_factor_off)
                end if
             end if
          end if

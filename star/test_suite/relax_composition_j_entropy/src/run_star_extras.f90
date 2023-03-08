@@ -69,7 +69,7 @@
          ! to disable the printed warning message,
           s% job% warn_run_star_extras =.false.       
 
-         if (s% ctrl% x_integer_ctrl(1) == 2) then
+         if (s% x_integer_ctrl(1) == 2) then
             !load initial mass and target values
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
@@ -77,7 +77,7 @@
             end if
             open(unit=iounit, file='initial_mass.dat', action='read', iostat=ierr)
             if (ierr == 0) then
-               read(iounit,*) s% ctrl% initial_mass
+               read(iounit,*) s% initial_mass
             else
                return
             end if
@@ -101,7 +101,7 @@
 
             include 'formats'
 
-            write(*,1) "Loading model with mass:", s% ctrl% initial_mass
+            write(*,1) "Loading model with mass:", s% initial_mass
             write(*,1) "Target value for Teff and L:", target_Teff, target_L
          end if
             
@@ -133,7 +133,7 @@
          if (ierr /= 0) return
          extras_check_model = keep_going         
 
-         if (s% ctrl% x_integer_ctrl(1) == 2) then
+         if (s% x_integer_ctrl(1) == 2) then
             s% termination_code = t_xtra1
             if(s% Teff > target_Teff*1.005d0 .or. s% Teff < target_Teff*0.995d0) then
                extras_check_model = terminate
@@ -249,7 +249,7 @@
          ! to update the star log,
             ! s% need_to_update_history_now = .true.
 
-         if (s% ctrl% x_integer_ctrl(1) == 1) then
+         if (s% x_integer_ctrl(1) == 1) then
             if (s% Teff < 8000) then
                write(*,*) "Reached target Teff, generate input files for relax"
                extras_finish_step = terminate

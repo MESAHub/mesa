@@ -69,10 +69,10 @@
 
          ierr = 0
 
-         eps_min_for_delta = exp10(s% ctrl% mesh_dlog_eps_min_for_extra)
+         eps_min_for_delta = exp10(s% mesh_dlog_eps_min_for_extra)
 
-         dlog_eps_dlogP_full_off = s% ctrl% mesh_dlog_eps_dlogP_full_off
-         dlog_eps_dlogP_full_on = s% ctrl% mesh_dlog_eps_dlogP_full_on
+         dlog_eps_dlogP_full_off = s% mesh_dlog_eps_dlogP_full_off
+         dlog_eps_dlogP_full_on = s% mesh_dlog_eps_dlogP_full_on
 
          call set_mesh_function_data( &
             s, num_gvals, gval_names, &
@@ -102,15 +102,15 @@
             ierr = 0
             delta_gval_max(1:nz) = 1d0
 
-            if (s% ctrl% mesh_Pgas_div_P_exponent /= 0) then
-               P_exp = s% ctrl% mesh_Pgas_div_P_exponent
+            if (s% mesh_Pgas_div_P_exponent /= 0) then
+               P_exp = s% mesh_Pgas_div_P_exponent
                do k=1,nz
                   beta = s% Pgas(k)/s% Peos(k)
                   delta_gval_max(k) = delta_gval_max(k)*pow(beta,P_exp)
                end do
             end if
             
-            if (s% ctrl% use_other_mesh_delta_coeff_factor) then
+            if (s% use_other_mesh_delta_coeff_factor) then
                do k=1,nz
                   s% mesh_delta_coeff_factor(k) = delta_gval_max(k)
                end do
@@ -125,43 +125,43 @@
             end if
 
             do j=1,num_mesh_logX
-               if (s% ctrl% mesh_dlogX_dlogP_extra(j) > 0 .and. s% ctrl% mesh_dlogX_dlogP_extra(j) < 1) &
+               if (s% mesh_dlogX_dlogP_extra(j) > 0 .and. s% mesh_dlogX_dlogP_extra(j) < 1) &
                   call do_mesh_dlogX_dlogP_coef(s,j)
             end do
 
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_pp_dlogP_extra, ipp)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_cno_dlogP_extra, icno)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_3alf_dlogP_extra, i3alf)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_pp_dlogP_extra, ipp)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_cno_dlogP_extra, icno)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_3alf_dlogP_extra, i3alf)
 
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_c_dlogP_extra, i_burn_c)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_n_dlogP_extra, i_burn_n)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_o_dlogP_extra, i_burn_o)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_ne_dlogP_extra, i_burn_ne)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_na_dlogP_extra, i_burn_na)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_mg_dlogP_extra, i_burn_mg)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_si_dlogP_extra, i_burn_si)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_s_dlogP_extra, i_burn_s)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_ar_dlogP_extra, i_burn_ar)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_ca_dlogP_extra, i_burn_ca)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_ti_dlogP_extra, i_burn_ti)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_cr_dlogP_extra, i_burn_cr)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_burn_fe_dlogP_extra, i_burn_fe)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_c_dlogP_extra, i_burn_c)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_n_dlogP_extra, i_burn_n)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_o_dlogP_extra, i_burn_o)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_ne_dlogP_extra, i_burn_ne)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_na_dlogP_extra, i_burn_na)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_mg_dlogP_extra, i_burn_mg)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_si_dlogP_extra, i_burn_si)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_s_dlogP_extra, i_burn_s)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_ar_dlogP_extra, i_burn_ar)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_ca_dlogP_extra, i_burn_ca)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_ti_dlogP_extra, i_burn_ti)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_cr_dlogP_extra, i_burn_cr)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_burn_fe_dlogP_extra, i_burn_fe)
 
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_cc_dlogP_extra, icc)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_co_dlogP_extra, ico)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_oo_dlogP_extra, ioo)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_cc_dlogP_extra, icc)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_co_dlogP_extra, ico)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_oo_dlogP_extra, ioo)
 
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_pnhe4_dlogP_extra, ipnhe4)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_photo_dlogP_extra, iphoto)
-            call do1_dlog_eps_dlogP_coef(s% ctrl% mesh_dlog_other_dlogP_extra, iother)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_pnhe4_dlogP_extra, ipnhe4)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_photo_dlogP_extra, iphoto)
+            call do1_dlog_eps_dlogP_coef(s% mesh_dlog_other_dlogP_extra, iother)
 
-            if (s% ctrl% mesh_delta_coeff_factor_smooth_iters > 0) then ! smooth delta_gval_max
+            if (s% mesh_delta_coeff_factor_smooth_iters > 0) then ! smooth delta_gval_max
             
                do k=1,nz
                   src(k) = delta_gval_max(k)
                end do
 
-               do j=1,s% ctrl% mesh_delta_coeff_factor_smooth_iters
+               do j=1,s% mesh_delta_coeff_factor_smooth_iters
                   delta_gval_max(1) = (2*src(1) + src(2))/3
                   do k=2,nz-1
                      delta_gval_max(k) = (src(k-1) + src(k) + src(k+1))/3
@@ -190,15 +190,15 @@
                X_min_for_extra, dlogX, dlogP, dlogX_dlogP, coef
             integer :: k, cid, j
             include 'formats'
-            if (len_trim(s% ctrl% mesh_logX_species(which)) == 0) return
-            cid = chem_get_iso_id(s% ctrl% mesh_logX_species(which))
+            if (len_trim(s% mesh_logX_species(which)) == 0) return
+            cid = chem_get_iso_id(s% mesh_logX_species(which))
             if (cid <= 0) return
             j = s% net_iso(cid)
             if (j == 0) return
-            logX_min_for_extra = s% ctrl% mesh_logX_min_for_extra(which)
-            dlogX_dlogP_extra = s% ctrl% mesh_dlogX_dlogP_extra(which)
-            dlogX_dlogP_full_on = s% ctrl% mesh_dlogX_dlogP_full_on(which)
-            dlogX_dlogP_full_off = s% ctrl% mesh_dlogX_dlogP_full_off(which)
+            logX_min_for_extra = s% mesh_logX_min_for_extra(which)
+            dlogX_dlogP_extra = s% mesh_dlogX_dlogP_extra(which)
+            dlogX_dlogP_full_on = s% mesh_dlogX_dlogP_full_on(which)
+            dlogX_dlogP_full_off = s% mesh_dlogX_dlogP_full_off(which)
             X_min_for_extra = exp10(max(-50d0, logX_min_for_extra))
             do k=2, nz
                if (s% xa(j,k) < X_min_for_extra .or. s% xa(j,k-1) < X_min_for_extra) cycle
@@ -432,7 +432,7 @@
             if (s% xh(s% i_lnR, k) <= s% xh(s% i_lnR, k+1)) then
                ierr = -1
                s% retry_message = 'at start of remesh: negative cell volume for cell'
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
                   write(*, *) 'at start of remesh: negative cell volume for cell', k
                   write(*, *)
                   write(*,2) 's% xh(s% i_lnR, k)', k, s% xh(s% i_lnR, k)
@@ -448,7 +448,7 @@
             if (s% dq(k) <= 0) then
                ierr = -1
                s% retry_message = 'at start of remesh: non-positive cell mass for cell'
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
                   write(*, *) 'at start of remesh: non-positive cell mass for cell', k
                   write(*, *) 's% model_number', s% model_number
                   write(*, *) 's% nz', s% nz

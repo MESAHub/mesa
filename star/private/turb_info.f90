@@ -117,12 +117,12 @@
          if (present(mixing_length_alpha_in)) then
             mixing_length_alpha = mixing_length_alpha_in
          else
-            mixing_length_alpha = s% ctrl% mixing_length_alpha
+            mixing_length_alpha = s% mixing_length_alpha
          end if
 
          if (present(gradL_composition_term_in)) then
             gradL_composition_term = gradL_composition_term_in      
-         else if (s% ctrl% use_Ledoux_criterion) then
+         else if (s% use_Ledoux_criterion) then
             gradL_composition_term = s% gradL_composition_term(k)
          else
             gradL_composition_term = 0d0
@@ -132,7 +132,7 @@
          scale_height_ad = get_scale_height_face(s,k)
          gradr_ad = get_gradr_face(s,k)
 
-         if (s% rotation_flag .and. s% ctrl% mlt_use_rotation_correction) then
+         if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
          else
             gradr_factor = s% gradr_factor(k)
@@ -145,7 +145,7 @@
          
          ! now can call set_no_mixing if necessary
          
-         if (k == 1 .and. s% ctrl% mlt_make_surface_no_mixing) then
+         if (k == 1 .and. s% mlt_make_surface_no_mixing) then
             call set_no_mixing('surface_no_mixing')
             return
          end if
@@ -166,12 +166,12 @@
             return
          end if
          
-         if (s% lnT_start(k)/ln10 > s% ctrl% max_logT_for_mlt) then
+         if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
             call set_no_mixing('max_logT')
             return
          end if
 
-         if (s% ctrl% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
+         if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
             if (s% u_flag) then
                vel => s% u
             else
@@ -194,12 +194,12 @@
                vel => s% v_start
             end if
             abs_du_div_cs = 0d0
-            if (vel(k)/1d5 > s% ctrl% max_v_for_convection) then
+            if (vel(k)/1d5 > s% max_v_for_convection) then
                no_mix = .true.
-            else if (s% q(k) > s% ctrl% max_q_for_convection_with_hydro_on) then
+            else if (s% q(k) > s% max_q_for_convection_with_hydro_on) then
                no_mix = .true.
             else if ((abs(vel(k))) >= &
-                  s% csound_start(k)*s% ctrl% max_v_div_cs_for_convection) then
+                  s% csound_start(k)*s% max_v_div_cs_for_convection) then
                no_mix = .true.              
             else if (s% u_flag) then
                if (k == 1) then
@@ -208,7 +208,7 @@
                   abs_du_div_cs = max(abs(vel(k) - vel(k+1)), &
                       abs(vel(k) - vel(k-1))) / s% csound_start(k)
                end if
-               if (abs_du_div_cs > s% ctrl% max_abs_du_div_cs_for_convection) then
+               if (abs_du_div_cs > s% max_abs_du_div_cs_for_convection) then
                   no_mix = .true.
                end if
             end if
@@ -218,23 +218,23 @@
             end if
          end if
          
-         make_gradr_sticky_in_solver_iters = s% ctrl% make_gradr_sticky_in_solver_iters
+         make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
          if (.not. make_gradr_sticky_in_solver_iters .and. &
-               s% ctrl% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then
+               s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then
             k_T_max = maxloc(s% lnT_start(1:nz),dim=1)
             make_gradr_sticky_in_solver_iters = &
-               (s% lnT_start(k_T_max)/ln10 >= s% ctrl% min_logT_for_make_gradr_sticky_in_solver_iters)
+               (s% lnT_start(k_T_max)/ln10 >= s% min_logT_for_make_gradr_sticky_in_solver_iters)
          end if
          if (make_gradr_sticky_in_solver_iters .and. s% fixed_gradr_for_rest_of_solver_iters(k)) then
             call set_no_mixing('gradr_sticky')
             return
          end if
             
-         call do1_mlt_eval(s, k, s% ctrl% MLT_option, gradL_composition_term, &
+         call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) then
+            if (s% report_ierr) then
                write(*,*) 'ierr in do1_mlt_eval for k', k
             end if
             return
@@ -242,8 +242,8 @@
          
          call store_results
 
-         if (s% ctrl% mlt_gradT_fraction >= 0d0 .and. s% ctrl% mlt_gradT_fraction <= 1d0) then
-            f = s% ctrl% mlt_gradT_fraction
+         if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
+            f = s% mlt_gradT_fraction
          else
             f = s% adjust_mlt_gradT_fraction(k)
          end if
@@ -375,15 +375,15 @@
          s% gradT_excess_effect(k) = 0.0d0         
          gradT_sub_grada = s% gradT(k) - s% grada_face(k)
          if (gradT_excess_alpha <= 0.0  .or. &
-             gradT_sub_grada <= s% ctrl% gradT_excess_f1) return
-         if (s% lnT(k)/ln10 > s% ctrl% gradT_excess_max_logT) return
+             gradT_sub_grada <= s% gradT_excess_f1) return
+         if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) return
          log_tau = log10(s% tau(k))
-         if (log_tau < s% ctrl% gradT_excess_max_log_tau_full_off) return
-         if (log_tau < s% ctrl% gradT_excess_min_log_tau_full_on) &
+         if (log_tau < s% gradT_excess_max_log_tau_full_off) return
+         if (log_tau < s% gradT_excess_min_log_tau_full_on) &
             gradT_excess_alpha = gradT_excess_alpha* &
-               (log_tau - s% ctrl% gradT_excess_max_log_tau_full_off)/ &
-               (s% ctrl% gradT_excess_min_log_tau_full_on - s% ctrl% gradT_excess_max_log_tau_full_off)
-         alfa = s% ctrl% gradT_excess_f2 ! for full boost, use this fraction of gradT
+               (log_tau - s% gradT_excess_max_log_tau_full_off)/ &
+               (s% gradT_excess_min_log_tau_full_on - s% gradT_excess_max_log_tau_full_off)
+         alfa = s% gradT_excess_f2 ! for full boost, use this fraction of gradT
          if (gradT_excess_alpha < 1) & ! only partial boost, so increase alfa
             ! alfa goes to 1 as gradT_excess_alpha goes to 0
             ! alfa unchanged as gradT_excess_alpha goes to 1
@@ -427,21 +427,21 @@
          integer :: k, k_beta, k_lambda, nz, h1, he4
          include 'formats'
          ierr = 0
-         if (.not. s% ctrl% okay_to_reduce_gradT_excess) then
+         if (.not. s% okay_to_reduce_gradT_excess) then
             s% gradT_excess_alpha = 0
             return
          end if
          nz = s% nz
          h1 = s% net_iso(ih1)
          if (h1 /= 0) then
-            if (s% xa(h1,nz) > s% ctrl% gradT_excess_max_center_h1) then
+            if (s% xa(h1,nz) > s% gradT_excess_max_center_h1) then
                s% gradT_excess_alpha = 0
                return
             end if
          end if
          he4 = s% net_iso(ihe4)
          if (he4 /= 0) then
-            if (s% xa(he4,nz) < s% ctrl% gradT_excess_min_center_he4) then
+            if (s% xa(he4,nz) < s% gradT_excess_min_center_he4) then
                s% gradT_excess_alpha = 0
                return
             end if
@@ -467,12 +467,12 @@
          end do
          lambda = min(1d0,lambda)
          s% gradT_excess_max_lambda = lambda
-         lambda1 = s% ctrl% gradT_excess_lambda1
-         beta1 = s% ctrl% gradT_excess_beta1
-         lambda2 = s% ctrl% gradT_excess_lambda2
-         beta2 = s% ctrl% gradT_excess_beta2
-         dlambda = s% ctrl% gradT_excess_dlambda
-         dbeta = s% ctrl% gradT_excess_dbeta
+         lambda1 = s% gradT_excess_lambda1
+         beta1 = s% gradT_excess_beta1
+         lambda2 = s% gradT_excess_lambda2
+         beta2 = s% gradT_excess_beta2
+         dlambda = s% gradT_excess_dlambda
+         dbeta = s% gradT_excess_dbeta
          ! alpha is fraction of full boost to apply
          ! depends on location in (beta,lambda) plane
          if (lambda1 < 0) then
@@ -508,15 +508,15 @@
          end if
          if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
             s% gradT_excess_alpha = &
-               (1d0 - s% ctrl% gradT_excess_age_fraction)*alpha + &
-               s% ctrl% gradT_excess_age_fraction*s% gradT_excess_alpha_old
-            if (s% ctrl% gradT_excess_max_change > 0d0) then
+               (1d0 - s% gradT_excess_age_fraction)*alpha + &
+               s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
+            if (s% gradT_excess_max_change > 0d0) then
                if (s% gradT_excess_alpha > s% gradT_excess_alpha_old) then
                   s% gradT_excess_alpha = min(s% gradT_excess_alpha, s% gradT_excess_alpha_old + &
-                     s% ctrl% gradT_excess_max_change)
+                     s% gradT_excess_max_change)
                else
                   s% gradT_excess_alpha = max(s% gradT_excess_alpha, s% gradT_excess_alpha_old - &
-                     s% ctrl% gradT_excess_max_change)
+                     s% gradT_excess_max_change)
                end if
             end if
          else
@@ -584,7 +584,7 @@
             dr = top_r - bot_r
             Hp = (bot_Hp + top_Hp)/2
             if (dr < s% alpha_mlt(k)*min(top_Hp, bot_Hp) .and. &
-                  s% ctrl% redo_conv_for_dr_lt_mixing_length) then
+                  s% redo_conv_for_dr_lt_mixing_length) then
 !$OMP PARALLEL DO PRIVATE(kk,op_err) SCHEDULE(dynamic,2)
                do kk = k, k_bot
                   op_err = 0

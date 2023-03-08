@@ -75,7 +75,7 @@
          end do
          !$OMP END PARALLEL DO
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 1', s% model_number
+            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 1', s% model_number
             return
          end if
          !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
@@ -91,10 +91,10 @@
          end do
          !$OMP END PARALLEL DO
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 2', s% model_number
+            if (s% report_ierr) write(*,2) 'failed in set_RSP2_vars loop 2', s% model_number
             return
          end if
-         do k = 1, s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent
+         do k = 1, s% RSP2_num_outermost_cells_forced_nonturbulent
             s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
             s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
             s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
@@ -102,7 +102,7 @@
             s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
             s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
          end do
-         do k = s% nz + 1 - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM) , s% nz
+         do k = s% nz + 1 - int(s% nz/s% RSP2_nz_div_IBOTOM) , s% nz
             s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
             s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
             s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
@@ -124,7 +124,7 @@
          logical :: test_partials
          include 'formats'
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.         
          if (.not. s% RSP2_flag) then
             ierr = -1
@@ -171,7 +171,7 @@
          real(dp) :: residual, Hp_start
          logical :: test_partials
          include 'formats'
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          if (.not. s% RSP2_flag) then
@@ -242,7 +242,7 @@
             Hp_face = 1d0 ! not used
             return
          end if
-         if (k > 1 .and. .not. s% ctrl% RSP2_assume_HSE) then
+         if (k > 1 .and. .not. s% RSP2_assume_HSE) then
             call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
             rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
             area = 4d0*pi*pow2(wrap_r_00(s,k))
@@ -268,7 +268,7 @@
                   !   Hp_face%val, pow2(r_00%val)/(s% cgrav(k)*s% m(k)), &
                   !   s% r_start(k), r_00%val
                end if
-               if (s% ctrl% alt_scale_height_flag) then
+               if (s% alt_scale_height_flag) then
                   call mesa_error(__FILE__,__LINE__,'Hp_face_for_rsp2_eqn: cannot use alt_scale_height_flag')
                   ! consider sound speed*hydro time scale as an alternative scale height
                   d_face = alfa*d_00 + beta*d_m1
@@ -299,16 +299,16 @@
          logical :: non_turbulent_cell, test_partials
          real(dp) :: residual, atol, rtol, scal
          include 'formats'
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          ierr = 0
          w_00 = wrap_w_00(s,k)
          
          non_turbulent_cell = &
-            s% ctrl% mixing_length_alpha == 0d0 .or. &
-            k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-            k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)         
+            s% mixing_length_alpha == 0d0 .or. &
+            k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+            k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)         
          if (.not. s% RSP2_flag) then           
             resid_ad = w_00 - s% w_start(k) ! just hold w constant when not using RSP2
          else if (non_turbulent_cell) then
@@ -379,8 +379,8 @@
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
-                     s% ctrl% include_L_in_velocity_time_centering) then
-               L_theta = s% ctrl% L_theta_for_velocity_time_centering
+                     s% include_L_in_velocity_time_centering) then
+               L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
             end if
@@ -419,7 +419,7 @@
          real(dp), intent(out) :: alfa, beta
          ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
          if (k == 1) call mesa_error(__FILE__,__LINE__,'bad k==1 for get_RSP2_alfa_beta_face_weights')
-         if (s% ctrl% RSP2_use_mass_interp_face_values) then
+         if (s% RSP2_use_mass_interp_face_values) then
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1d0 - alfa
          else
@@ -447,7 +447,7 @@
             return
          end if
          
-         if (k == 1 .or. s% ctrl% mixing_length_alpha == 0d0) then
+         if (k == 1 .or. s% mixing_length_alpha == 0d0) then
             Y_face = 0d0
             s% Y_face(k) = 0d0
             s% Y_face_ad(k) = 0d0
@@ -456,7 +456,7 @@
          
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          
-         if (s% ctrl% RSP2_use_RSP_eqn_for_Y_face) then
+         if (s% RSP2_use_RSP_eqn_for_Y_face) then
       
             dm_bar = s% dm_bar(k)
             Hp_face = wrap_Hp_00(s,k)      
@@ -522,7 +522,7 @@
             dlnT_dlnP = dlnT/dlnP
             if (is_bad(dlnT_dlnP%val)) then
                alt_Y_face = 0d0
-            else if (s% ctrl% use_Ledoux_criterion .and. s% ctrl% calculate_Brunt_B) then
+            else if (s% use_Ledoux_criterion .and. s% calculate_Brunt_B) then
                ! gradL = grada + gradL_composition_term
                alt_Y_face = dlnT_dlnP - (grad_ad_face + s% gradL_composition_term(k))
             else
@@ -552,7 +552,7 @@
             PII_face = 0d0
             return
          end if
-         if (k == 1 .or. s% ctrl% mixing_length_alpha == 0d0 .or. &
+         if (k == 1 .or. s% mixing_length_alpha == 0d0 .or. &
                k == s% nz) then ! just skip k == nz to be like RSP
             PII_face = 0d0
             s% PII(k) = 0d0
@@ -565,7 +565,7 @@
          Cp_m1 = wrap_Cp_m1(s, k)
          call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
          Cp_face = alfa*Cp_00 + beta*Cp_m1 ! ergs g^-1 K^-1
-         ALFAS_ALFA = x_ALFAS*s% ctrl% mixing_length_alpha
+         ALFAS_ALFA = x_ALFAS*s% mixing_length_alpha
          PII_face = ALFAS_ALFA*Cp_face*Y_face
          s% PII(k) = PII_face%val
          s% PII_ad(k) = PII_face
@@ -651,7 +651,7 @@
             cgrav_mid = s% cgrav(k)
          end if
          Hp_cell = pow2(rmid)*Peos_00/(d_00*cgrav_mid*mmid)
-         if (s% ctrl% alt_scale_height_flag) then
+         if (s% alt_scale_height_flag) then
             call mesa_error(__FILE__,__LINE__,'Hp_cell_for_Chi: cannot use alt_scale_height_flag')
          end if
       end function Hp_cell_for_Chi
@@ -668,10 +668,10 @@
          real(dp) :: f, ALFAM_ALFA
          include 'formats'
          ierr = 0
-         ALFAM_ALFA = s% ctrl% RSP2_alfam*s% ctrl% mixing_length_alpha
+         ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
-               k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Chi_cell = 0d0
             if (k >= 1 .and. k <= s% nz) then
                s% Chi(k) = 0d0
@@ -708,9 +708,9 @@
          type(auto_diff_real_star_order1) :: d_v_div_r, Chi_cell
          include 'formats'
          ierr = 0
-         if (s% ctrl% mixing_length_alpha == 0d0 .or. &
-             k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Eq_cell = 0d0
             if (k >= 1 .and. k <= s% nz) s% Eq_ad(k) = 0d0
          else
@@ -733,9 +733,9 @@
          type(auto_diff_real_star_order1) :: Chi_00, Chi_m1, r_00
          include 'formats'
          ierr = 0         
-         if (s% ctrl% mixing_length_alpha == 0d0 .or. &
-             k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
@@ -799,7 +799,7 @@
          ! Peos_00*QQ_00/Cp_00 = grad_ad if all perfect.
          !grad_ad_00 = wrap_grad_ad_00(s, k)
          P_QQ_div_Cp = Peos_00*QQ_00/Cp_00 ! use this to be same as RSP
-         Source = (w_00 + s% ctrl% RSP2_source_seed)*PII_div_Hp_cell*T_00*P_QQ_div_Cp
+         Source = (w_00 + s% RSP2_source_seed)*PII_div_Hp_cell*T_00*P_QQ_div_Cp
          
          ! PII units same as Cp = erg g^-1 K^-1
          ! P*QQ/Cp is unitless (see Y_face)
@@ -826,13 +826,13 @@
          type(auto_diff_real_star_order1) :: Hp_cell
          include 'formats'
          ierr = 0
-         if (s% ctrl% mixing_length_alpha == 0d0) then
+         if (s% mixing_length_alpha == 0d0) then
             D = 0d0
          else
             Hp_cell = wrap_Hp_cell(s,k)
             w_00 = wrap_w_00(s,k)
-            dw3 = pow3(w_00) - pow3(s% ctrl% RSP2_w_min_for_damping)
-            D = (s% ctrl% RSP2_alfad*x_CEDE/s% ctrl% mixing_length_alpha)*dw3/Hp_cell
+            dw3 = pow3(w_00) - pow3(s% RSP2_w_min_for_damping)
+            D = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)*dw3/Hp_cell
             ! units cm^3 s^-3 cm^-1 = cm^2 s^-3 = erg g^-1 s^-1
          end if
          if (k==-50) then
@@ -853,8 +853,8 @@
          real(dp) :: gammar, alpha, POM
          include 'formats'
          ierr = 0
-         alpha = s% ctrl% mixing_length_alpha
-         gammar = s% ctrl% RSP2_alfar*x_GAMMAR
+         alpha = s% mixing_length_alpha
+         gammar = s% RSP2_alfar*x_GAMMAR
          if (gammar == 0d0) then
             Dr = 0d0
             s% DAMPR(k) = 0d0
@@ -883,9 +883,9 @@
          type(auto_diff_real_star_order1) :: C
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Source, D, Dr
-         if (s% ctrl% mixing_length_alpha == 0d0 .or. &
-             k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             if (k >= 1 .and. k <= s% nz) then
                s% SOURCE(k) = 0d0
                s% DAMP(k) = 0d0
@@ -972,7 +972,7 @@
             T400 = pow4(T_00)
             if (k == 1) then ! Lr(1) proportional to Erad in cell(1)
                Erad = crad * T400
-               Lr = s% ctrl% RSP2_Lsurf_factor * area * clight * Erad
+               Lr = s% RSP2_Lsurf_factor * area * clight * Erad
                s% Lr(k) = Lr%val
                return
             end if
@@ -984,7 +984,7 @@
             kap_face = alfa*kap_00 + (1d0 - alfa)*kap_m1
             diff_T4_div_kap = (T4m1 - T400)/kap_face
 
-            if (s% ctrl% RSP2_use_Stellingwerf_Lr) then ! RSP style
+            if (s% RSP2_use_Stellingwerf_Lr) then ! RSP style
                BW = log(T4m1/T400)
                if (abs(BW%val) > 1d-20) then
                   BK = log(kap_m1/kap_00)
@@ -1029,9 +1029,9 @@
          real(dp) :: ALFAC, ALFAS, alfa, beta
          include 'formats'
          ierr = 0
-         if (s% ctrl% mixing_length_alpha == 0d0 .or. &
-             k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+         if (s% mixing_length_alpha == 0d0 .or. &
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Lc = 0d0
             Lc_div_w_face = 1
             return
@@ -1081,10 +1081,10 @@
             Lt = 0d0
             return
          end if 
-         alpha_alpha_t = s% ctrl% mixing_length_alpha*s% ctrl% RSP2_alfat
+         alpha_alpha_t = s% mixing_length_alpha*s% RSP2_alfat
          if (alpha_alpha_t == 0d0 .or. &
-             k <= s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-             k > s% nz - int(s% nz/s% ctrl% RSP2_nz_div_IBOTOM)) then
+             k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+             k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Lt = 0d0
             s% Lt(k) = 0d0
             return
@@ -1142,22 +1142,22 @@
          integer :: k, op_err
          include 'formats'         
          ierr = 0
-         if (s% ctrl% mixing_length_alpha == 0d0) return
+         if (s% mixing_length_alpha == 0d0) return
          
          !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,SOURCE,Hp_cell,DAMP,POM,POM2,DAMPR,del,soln) SCHEDULE(dynamic,2)
-         do k=s% ctrl% RSP2_num_outermost_cells_forced_nonturbulent+1, &
-               s% nz - max(1,int(s% nz/s% ctrl% RSP_nz_div_IBOTOM))
+         do k=s% RSP2_num_outermost_cells_forced_nonturbulent+1, &
+               s% nz - max(1,int(s% nz/s% RSP_nz_div_IBOTOM))
                
-            if (s% w(k) > s% ctrl% RSP2_w_min_for_damping) cycle
+            if (s% w(k) > s% RSP2_w_min_for_damping) cycle
             
             PII_div_Hp = 0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
             QQ = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))         
             SOURCE = PII_div_Hp*s% T(k)*s% Peos(k)*QQ/s% Cp(k)
             
             Hp_cell = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
-            DAMP = (s% ctrl% RSP2_alfad*x_CEDE/s% ctrl% mixing_length_alpha)/Hp_cell            
+            DAMP = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)/Hp_cell            
             
-            POM = 4d0*boltz_sigma*pow2(s% ctrl% RSP2_alfar*x_GAMMAR/s% ctrl% mixing_length_alpha)
+            POM = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR/s% mixing_length_alpha)
             POM2 = pow3(s% T(k))/(pow2(s% rho(k))*s% Cp(k)*s% opacity(k)) 
             DAMPR = POM*POM2/pow2(Hp_cell)
             
@@ -1183,7 +1183,7 @@
             if (k==-35) write(*,2) 'soln', k, soln
             if (soln > 0d0) then
                ! i tried soln = sqrt(soln) here. helps solver convergence, but hurts the model results.
-               if (s% ctrl% RSP2_report_adjust_w) &
+               if (s% RSP2_report_adjust_w) &
                   write(*,3) 'RSP2_adjust_vars_before_call_solver w', k, s% model_number, s% w(k), soln
                s% w(k) = soln
             end if

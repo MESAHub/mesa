@@ -114,18 +114,18 @@ contains
        if (.not. skip_kap) then
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
-          if (s% ctrl% use_other_opacity_factor) then
+          if (s% use_other_opacity_factor) then
              call s% other_opacity_factor(s% id, ierr)
              if (ierr /= 0) return
           else
-             s% extra_opacity_factor(1:s% nz) = s% ctrl% opacity_factor
+             s% extra_opacity_factor(1:s% nz) = s% opacity_factor
           end if
        endif
-       if (s% ctrl% use_other_opacity_factor) then
+       if (s% use_other_opacity_factor) then
           call s% other_opacity_factor(s% id, ierr)
           if (ierr /= 0) return
        else
-          s% extra_opacity_factor(1:s% nz) = s% ctrl% opacity_factor
+          s% extra_opacity_factor(1:s% nz) = s% opacity_factor
        end if
 
        if (s% doing_timing) call start_time(s, time0, total)
@@ -138,7 +138,7 @@ contains
        !$OMP END PARALLEL DO
        if (s% doing_timing) call update_time(s, time0, total, s% time_neu_kap)
        if (ierr /= 0) then
-          if (s% ctrl% report_ierr) write(*,*) 'do1_neu_kap returned ierr', ierr
+          if (s% report_ierr) write(*,*) 'do1_neu_kap returned ierr', ierr
           return
        end if
 
@@ -152,7 +152,7 @@ contains
        call do_net(s, nzlo, nzhi, ierr)
        if (dbg) write(*,*) 'micro: done do_net'
        if (ierr /= 0) then
-          if (s% ctrl% report_ierr) write(*,*) 'do_net returned ierr', ierr
+          if (s% report_ierr) write(*,*) 'do_net returned ierr', ierr
           return
        end if
 
@@ -169,7 +169,7 @@ contains
       call do_eos(s,nzlo,nzhi,ierr)
       if (s% doing_timing) call update_time(s, time0, total, s% time_eos)
       if (ierr /= 0) then
-         if (s% ctrl% report_ierr) write(*,*) 'do_eos returned ierr', ierr
+         if (s% report_ierr) write(*,*) 'do_eos returned ierr', ierr
          return
       end if
     end subroutine set_eos
@@ -193,7 +193,7 @@ contains
       type (star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      if (s% T(k) >= Tmin_neu .and. s% ctrl% non_nuc_neu_factor > 0d0) then
+      if (s% T(k) >= Tmin_neu .and. s% non_nuc_neu_factor > 0d0) then
          call do_neu_for_cell(s,k,ierr)
       else
          call do_clear_neu_for_cell(s,k,ierr)
@@ -301,10 +301,10 @@ contains
 
     logRho = s% lnd(k)/ln10
 
-    if (s% ctrl% solver_test_eos_partials) then
-       eos_test_partials = (k == s% ctrl% solver_test_partials_k .and. &
-          s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
-          s% solver_iter == s% ctrl% solver_test_partials_iter_number )
+    if (s% solver_test_eos_partials) then
+       eos_test_partials = (k == s% solver_test_partials_k .and. &
+          s% solver_call_number == s% solver_test_partials_call_number .and. &
+          s% solver_iter == s% solver_test_partials_iter_number )
     end if
 
     call get_eos( &
@@ -313,14 +313,14 @@ contains
          res, s% d_eos_dlnd(:,k), s% d_eos_dlnT(:,k), &
          s% d_eos_dxa(:,:,k), ierr)
     if (ierr /= 0) then
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,*) 'do_eos_for_cell: get_eos ierr', ierr
           !call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
        end if
        return
     end if
     
-    if (s% ctrl% solver_test_eos_partials .and. eos_test_partials) then
+    if (s% solver_test_eos_partials .and. eos_test_partials) then
        s% solver_test_partials_val = eos_test_partials_val
        s% solver_test_partials_dval_dx = eos_test_partials_dval_dx
     end if
@@ -331,10 +331,10 @@ contains
     call store_stuff(ierr)
     if (ierr /= 0) return
 
-    if (s% ctrl% solver_test_partials_write_eos_call_info .and. &
-       k == s% ctrl% solver_test_partials_k .and. &
-       s% solver_call_number == s% ctrl% solver_test_partials_call_number .and. &
-       s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
+    if (s% solver_test_partials_write_eos_call_info .and. &
+       k == s% solver_test_partials_k .and. &
+       s% solver_call_number == s% solver_test_partials_call_number .and. &
+       s% solver_iter == s% solver_test_partials_iter_number) then
        call write_eos_call_info(s,k)
        call mesa_error(__FILE__,__LINE__,'do_eos_for_cell: write_eos_call_info')
     end if
@@ -352,10 +352,10 @@ contains
          s% d_eos_dxa(:,:,k), ierr)
 
       if (ierr /= 0) then
-         if (s% ctrl% report_ierr) then
+         if (s% report_ierr) then
             call write_eos_call_info(s,k)
             write(*,2) 'store_eos_for_cell failed', k
-            if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
+            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
             return
          end if
          return
@@ -390,14 +390,14 @@ contains
     do i = 1, num_eos_basic_results
        if (is_bad(res(i) + d_dlnd(i) + d_dlnT(i))) then
           ierr = -1
-          if (s% ctrl% report_ierr) then
+          if (s% report_ierr) then
              !$OMP critical (micro_crit0)
              write(*,2) trim(eosDT_result_names(i)), k, res(i)
              write(*,2) 'd_dlnd ' // trim(eosDT_result_names(i)), k, d_dlnd(i)
              write(*,2) 'd_dlnT ' // trim(eosDT_result_names(i)), k, d_dlnT(i)
              write(*,'(A)')
              call write_eos_call_info(s,k)
-             if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
+             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
              !$OMP end critical (micro_crit0)
           end if
           return
@@ -408,7 +408,7 @@ contains
     rho = s% rho(k)
     if (T > 1d15 .or. rho > 1d15) then
        ierr = -1
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,4) 'bad T or rho for eos', k, s% solver_iter, s% model_number
           write(*,2) 'T', k, T
           write(*,2) 'rho', k, rho
@@ -474,7 +474,7 @@ contains
     end if
 
     if (ierr /= 0) then
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           !$OMP critical (micro_crit1)
           write(*,2) 's% cp(k)', k, s% cp(k)
           write(*,2) 's% csound(k)', k, s% csound(k)
@@ -547,7 +547,7 @@ contains
     d_eta_dlnRho = s% d_eos_dlnd(i_eta,k)
     d_eta_dlnT = s% d_eos_dlnT(i_eta,k)
 
-    if (s% ctrl% use_starting_composition_for_kap) then
+    if (s% use_starting_composition_for_kap) then
        xa(1:s% species) => s% xa_start(1:s% species,k)
        zbar = s% zbar_start(k)
     else
@@ -568,11 +568,11 @@ contains
     s% kap_frac_Compton(k) = kap_fracs(i_frac_Compton)
 
     if (is_bad_num(s% opacity(k)) .or. ierr /= 0) then
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
           !$omp end critical (star_kap_get)
        end if
        ierr = -1
@@ -580,18 +580,18 @@ contains
     end if
 
     opacity_factor = s% extra_opacity_factor(k)
-    if (s% ctrl% min_logT_for_opacity_factor_off > 0) then
-       if (log10_T >= s% ctrl% max_logT_for_opacity_factor_off .or. &
-            log10_T <= s% ctrl% min_logT_for_opacity_factor_off) then
+    if (s% min_logT_for_opacity_factor_off > 0) then
+       if (log10_T >= s% max_logT_for_opacity_factor_off .or. &
+            log10_T <= s% min_logT_for_opacity_factor_off) then
           opacity_factor = 1
-       else if (log10_T > s% ctrl% max_logT_for_opacity_factor_on) then
+       else if (log10_T > s% max_logT_for_opacity_factor_on) then
           opacity_factor = 1 + (opacity_factor-1)* &
-               (log10_T - s% ctrl% max_logT_for_opacity_factor_off)/ &
-               (s% ctrl% max_logT_for_opacity_factor_on - s% ctrl% max_logT_for_opacity_factor_off)
-       else if (log10_T < s% ctrl% min_logT_for_opacity_factor_on) then
+               (log10_T - s% max_logT_for_opacity_factor_off)/ &
+               (s% max_logT_for_opacity_factor_on - s% max_logT_for_opacity_factor_off)
+       else if (log10_T < s% min_logT_for_opacity_factor_on) then
           opacity_factor = 1 + (opacity_factor-1)* &
-               (log10_T - s% ctrl% min_logT_for_opacity_factor_off)/ &
-               (s% ctrl% min_logT_for_opacity_factor_on - s% ctrl% min_logT_for_opacity_factor_off)
+               (log10_T - s% min_logT_for_opacity_factor_off)/ &
+               (s% min_logT_for_opacity_factor_on - s% min_logT_for_opacity_factor_off)
        end if
     end if
 
@@ -599,14 +599,14 @@ contains
     s% d_opacity_dlnd(k) = s% opacity(k)*dlnkap_dlnd
     s% d_opacity_dlnT(k) = s% opacity(k)*dlnkap_dlnT
 
-    if (s% opacity(k) > s% ctrl% opacity_max .and. s% ctrl% opacity_max > 0) then
-       s% opacity(k) = s% ctrl% opacity_max
+    if (s% opacity(k) > s% opacity_max .and. s% opacity_max > 0) then
+       s% opacity(k) = s% opacity_max
        s% d_opacity_dlnd(k) = 0
        s% d_opacity_dlnT(k) = 0
     end if
 
     if (is_bad_num(s% opacity(k))) then
-       if (s% ctrl% stop_for_bad_nums) then
+       if (s% stop_for_bad_nums) then
           !$omp critical (star_kap_get_bad_num)
           call show_stuff()
           call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
@@ -617,7 +617,7 @@ contains
     end if
 
 
-      !test_partials = (k == s% ctrl% solver_test_partials_k)
+      !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
 
       if (test_partials) then

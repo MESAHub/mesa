@@ -243,8 +243,8 @@
          include 'formats'
 
          if (s% rotation_flag) then
-            full_on = s% ctrl% D_mix_rotation_max_logT_full_on
-            full_off = s% ctrl% D_mix_rotation_min_logT_full_off
+            full_on = s% D_mix_rotation_max_logT_full_on
+            full_off = s% D_mix_rotation_min_logT_full_off
             lgT = s% lnT(k)/ln10
             if (lgT <= full_on) then
                f = 1d0
@@ -253,7 +253,7 @@
             else                   ! lgT > full_on and < full_off
                f = (lgT - full_on) / (full_off - full_on)
             end if
-            am_nu_factor = f*s% ctrl% am_nu_factor
+            am_nu_factor = f*s% am_nu_factor
          else
             am_nu_factor = 1d0
          end if
@@ -271,11 +271,11 @@
          else if (c > diffusion_D_offset) then
             i = c - diffusion_D_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% diffusion_D_self(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% diffusion_D_self(ii,k)
          else if (c > diffusion_dX_offset) then
             i = c - diffusion_dX_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% diffusion_dX(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% diffusion_dX(ii,k)
          else if (c > log_concentration_offset) then
             i = c - log_concentration_offset
             ii = s% net_iso(i)
@@ -283,23 +283,23 @@
          else if (c > log_g_rad_offset) then
             i = c - log_g_rad_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = safe_log10(s% g_rad(ii,k))
+            if (ii > 0 .and. s% do_element_diffusion) val = safe_log10(s% g_rad(ii,k))
          else if (c > v_rad_offset) then
             i = c - v_rad_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% v_rad(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% v_rad(ii,k)
          else if (c > extra_diffusion_factor_offset) then
             i = c - extra_diffusion_factor_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% extra_diffusion_factor(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% extra_diffusion_factor(ii,k)
          else if (c > edv_offset) then
             i = c - edv_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% edv(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% edv(ii,k)
          else if (c > typical_charge_offset) then
             i = c - typical_charge_offset
             ii = s% net_iso(i)
-            if (ii > 0 .and. s% ctrl% do_element_diffusion) val = s% typical_charge(ii,k)
+            if (ii > 0 .and. s% do_element_diffusion) val = s% typical_charge(ii,k)
          else if (c > ionization_offset) then
             i = c - ionization_offset
             ii = s% net_iso(i)
@@ -1030,7 +1030,7 @@
                   abs(s% eps_grav_ad(k)% val)*s% dm(k)/max(1d0,abs(s% L(k))))
 
             case (p_eps_grav_composition_term)
-               if (s% ctrl% include_composition_in_eps_grav) &
+               if (s% include_composition_in_eps_grav) &
                   val = s% eps_grav_composition_term(k)
                   
             case (p_eps_grav_plus_eps_mdot)
@@ -1150,8 +1150,8 @@
                if (abs(s% gradr(k) - s% grada_face(k)) > 1d-20) &
                   val = (s% gradr(k) - s% gradT(k))/(s% gradr(k) - s% grada_face(k))
             case (p_mlt_Pturb)
-               if (s% ctrl% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
-                  val = s% ctrl% mlt_Pturb_factor*pow2(s% mlt_vc(k))*get_rho_face_val(s,k)/3d0
+               if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
+                  val = s% mlt_Pturb_factor*pow2(s% mlt_vc(k))*get_rho_face_val(s,k)/3d0
 
             case (p_grad_density)
                val = s% grad_density(k)
@@ -1294,12 +1294,12 @@
                val = safe_log10(s% sig_raw(k))
 
             case (p_burn_avg_epsnuc)
-               if (s% ctrl% op_split_burn) val = s% burn_avg_epsnuc(k)
+               if (s% op_split_burn) val = s% burn_avg_epsnuc(k)
             case (p_log_burn_avg_epsnuc)
-               if (s% ctrl% op_split_burn) &
+               if (s% op_split_burn) &
                   val = safe_log10(abs(s% burn_avg_epsnuc(k)))
             case (p_burn_num_iters)
-               if (s% ctrl% op_split_burn) then
+               if (s% op_split_burn) then
                   int_val = s% burn_num_iters(k); val = dble(int_val)
                else
                   int_val = 0; val = 0
@@ -1448,31 +1448,31 @@
                end if
 
             case (p_eps_phase_separation)
-               if (s% ctrl% do_phase_separation_heating) val = s% eps_phase_separation(k)
+               if (s% do_phase_separation_heating) val = s% eps_phase_separation(k)
 
             case (p_eps_WD_sedimentation)
-               if (s% ctrl% do_element_diffusion) val = s% eps_WD_sedimentation(k)
+               if (s% do_element_diffusion) val = s% eps_WD_sedimentation(k)
             case (p_log_eps_WD_sedimentation)
-               if (s% ctrl% do_element_diffusion) val = safe_log10(s% eps_WD_sedimentation(k))
+               if (s% do_element_diffusion) val = safe_log10(s% eps_WD_sedimentation(k))
 
             case (p_eps_diffusion)
-               if (s% ctrl% do_element_diffusion) val = s% eps_diffusion(k)
+               if (s% do_element_diffusion) val = s% eps_diffusion(k)
             case (p_log_eps_diffusion)
-               if (s% ctrl% do_element_diffusion) val = safe_log10(s% eps_diffusion(k))
+               if (s% do_element_diffusion) val = safe_log10(s% eps_diffusion(k))
 
             case (p_e_field)
-               if (s% ctrl% do_element_diffusion) val = s% E_field(k)
+               if (s% do_element_diffusion) val = s% E_field(k)
             case (p_log_e_field)
-               if (s% ctrl% do_element_diffusion) val = safe_log10(s% E_field(k))
+               if (s% do_element_diffusion) val = safe_log10(s% E_field(k))
 
             case (p_g_field_element_diffusion)
-               if (s% ctrl% do_element_diffusion) val = s% g_field_element_diffusion(k)
+               if (s% do_element_diffusion) val = s% g_field_element_diffusion(k)
             case (p_log_g_field_element_diffusion)
-               if (s% ctrl% do_element_diffusion) &
+               if (s% do_element_diffusion) &
                   val = safe_log10(s% g_field_element_diffusion(k))
 
             case (p_eE_div_mg_element_diffusion)
-               if (s% ctrl% do_element_diffusion) then
+               if (s% do_element_diffusion) then
                   if ( s% g_field_element_diffusion(k) /= 0d0) then
                      val = qe * s% E_field(k)/(amu * s% g_field_element_diffusion(k))
                   else
@@ -1480,7 +1480,7 @@
                   end if
                end if
             case (p_log_eE_div_mg_element_diffusion)
-               if (s% ctrl% do_element_diffusion) &
+               if (s% do_element_diffusion) &
                   val = safe_log10(qe * s% E_field(k)/(amu * s% g_field_element_diffusion(k)))
 
             case (p_richardson_number)
@@ -1506,60 +1506,60 @@
                val = safe_log10(if_rot(s% am_nu_non_rot,k))
 
             case (p_am_log_D_visc)
-               if (s% ctrl% am_nu_visc_factor >= 0) then
-                  f = s% ctrl% am_nu_visc_factor
+               if (s% am_nu_visc_factor >= 0) then
+                  f = s% am_nu_visc_factor
                else
-                  f = s% ctrl% D_visc_factor
+                  f = s% D_visc_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_visc,k))
             case (p_am_log_D_DSI)
-               if (s% ctrl% am_nu_DSI_factor >= 0) then
-                  f = s% ctrl% am_nu_DSI_factor
+               if (s% am_nu_DSI_factor >= 0) then
+                  f = s% am_nu_DSI_factor
                else
-                  f = s% ctrl% D_DSI_factor
+                  f = s% D_DSI_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_DSI,k))
             case (p_am_log_D_SH)
-               if (s% ctrl% am_nu_SH_factor >= 0) then
-                  f = s% ctrl% am_nu_SH_factor
+               if (s% am_nu_SH_factor >= 0) then
+                  f = s% am_nu_SH_factor
                else
-                  f = s% ctrl% D_SH_factor
+                  f = s% D_SH_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_SH,k))
             case (p_am_log_D_SSI)
-               if (s% ctrl% am_nu_SSI_factor >= 0) then
-                  f = s% ctrl% am_nu_SSI_factor
+               if (s% am_nu_SSI_factor >= 0) then
+                  f = s% am_nu_SSI_factor
                else
-                  f = s% ctrl% D_SSI_factor
+                  f = s% D_SSI_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_SSI,k))
 
             case (p_am_log_D_ES)
-               if (s% ctrl% am_nu_ES_factor >= 0) then
-                  f = s% ctrl% am_nu_ES_factor
+               if (s% am_nu_ES_factor >= 0) then
+                  f = s% am_nu_ES_factor
                else
-                  f = s% ctrl% D_ES_factor
+                  f = s% D_ES_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_ES,k))
             case (p_am_log_D_GSF)
-               if (s% ctrl% am_nu_GSF_factor >= 0) then
-                  f = s% ctrl% am_nu_GSF_factor
+               if (s% am_nu_GSF_factor >= 0) then
+                  f = s% am_nu_GSF_factor
                else
-                  f = s% ctrl% D_GSF_factor
+                  f = s% D_GSF_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_GSF,k))
             case (p_am_log_D_ST)
-               if (s% ctrl% am_nu_ST_factor >= 0) then
-                  f = s% ctrl% am_nu_ST_factor
+               if (s% am_nu_ST_factor >= 0) then
+                  f = s% am_nu_ST_factor
                else
-                  f = s% ctrl% D_ST_factor
+                  f = s% D_ST_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% D_ST,k))
             case (p_am_log_nu_ST)
-               if (s% ctrl% am_nu_ST_factor >= 0) then
-                  f = s% ctrl% am_nu_ST_factor
+               if (s% am_nu_ST_factor >= 0) then
+                  f = s% am_nu_ST_factor
                else
-                  f = s% ctrl% D_ST_factor
+                  f = s% D_ST_factor
                end if
                val = safe_log10(am_nu_factor*f*if_rot(s% nu_ST,k))
 
@@ -1817,7 +1817,7 @@
                   val = safe_log10(s% RSP_Et(k))
                end if
             case(p_Pvsc)
-               if (s% ctrl% use_Pvsc_art_visc .or. s% RSP_flag) val = s% Pvsc(k)
+               if (s% use_Pvsc_art_visc .or. s% RSP_flag) val = s% Pvsc(k)
             case(p_Hp_face)
                if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
@@ -1994,56 +1994,56 @@
                val = (s% lnd(klo) - s% lnd(khi))/(s% rmid(klo) - s% rmid(khi))
 
             case (p_brunt_B)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_B(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_B(k)
             case (p_brunt_nonB)
-               if (s% ctrl% calculate_Brunt_N2) val = -s% gradT_sub_grada(k)
+               if (s% calculate_Brunt_N2) val = -s% gradT_sub_grada(k)
             case (p_log_brunt_B)
                val = log10(max(1d-99,s% brunt_B(k)))
             case (p_log_brunt_nonB)
-               if (s% ctrl% calculate_Brunt_N2) val = log10(max(1d-99,-s% gradT_sub_grada(k)))
+               if (s% calculate_Brunt_N2) val = log10(max(1d-99,-s% gradT_sub_grada(k)))
 
             case (p_brunt_N2)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_N2(k)
             case (p_brunt_N2_composition_term)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2_composition_term(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_N2_composition_term(k)
             case (p_brunt_N2_structure_term)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2(k) - s% brunt_N2_composition_term(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_N2(k) - s% brunt_N2_composition_term(k)
             case (p_log_brunt_N2_composition_term)
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   safe_log10(s% brunt_N2_composition_term(k))
             case (p_log_brunt_N2_structure_term)
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   safe_log10(s% brunt_N2(k) - s% brunt_N2_composition_term(k))
 
             case (p_brunt_A)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2(k)*s% r(k)/s% grav(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_N2(k)*s% r(k)/s% grav(k)
             case (p_brunt_A_div_x2)
                x = s% r(k)/s% r(1)
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2(k)*s% r(k)/s% grav(k)/x/x
+               if (s% calculate_Brunt_N2) val = s% brunt_N2(k)*s% r(k)/s% grav(k)/x/x
             case (p_log_brunt_N2_dimensionless)
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   safe_log10(s% brunt_N2(k)/(3*s% cgrav(1)*s% m_grav(1)/pow3(s% r(1))))
             case (p_brunt_N2_dimensionless)
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   s% brunt_N2(k)/(3*s% cgrav(1)*s% m_grav(1)/pow3(s% r(1)))
             case (p_brunt_N_dimensionless)
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   sqrt(max(0d0,s% brunt_N2(k))/(3*s% cgrav(1)*s% m_grav(1)/pow3(s% r(1))))
             case (p_brunt_N)
-               if (s% ctrl% calculate_Brunt_N2) val = sqrt(max(0d0,s% brunt_N2(k)))
+               if (s% calculate_Brunt_N2) val = sqrt(max(0d0,s% brunt_N2(k)))
             case (p_brunt_frequency) ! cycles per day
-               if (s% ctrl% calculate_Brunt_N2) val = &
+               if (s% calculate_Brunt_N2) val = &
                   (24d0*60d0*60d0/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
             case (p_log_brunt_N)
-               if (s% ctrl% calculate_Brunt_N2) val = safe_log10(sqrt(max(0d0,s% brunt_N2(k))))
+               if (s% calculate_Brunt_N2) val = safe_log10(sqrt(max(0d0,s% brunt_N2(k))))
             case (p_log_brunt_N2)
-               if (s% ctrl% calculate_Brunt_N2) val = safe_log10(s% brunt_N2(k))
+               if (s% calculate_Brunt_N2) val = safe_log10(s% brunt_N2(k))
 
             case (p_brunt_nu) ! micro Hz
-               if (s% ctrl% calculate_Brunt_N2) val = s% brunt_N2(k)
+               if (s% calculate_Brunt_N2) val = s% brunt_N2(k)
                val = (1d6/(2*pi))*sqrt(max(0d0,val))
             case (p_log_brunt_nu) ! micro Hz
-               if (s% ctrl% calculate_Brunt_N2) &
+               if (s% calculate_Brunt_N2) &
                   val = safe_log10((1d6/(2*pi))*sqrt(max(0d0,s% brunt_N2(k))))
 
             case (p_lamb_S)
@@ -2070,15 +2070,15 @@
                val = safe_log10((1d6/(2*pi))*sqrt(110d0)*s% csound_face(k)/s% r(k)) ! microHz
 
             case (p_brunt_N_div_r_integral)
-               if (s% ctrl% calculate_Brunt_N2) val = get_brunt_N_div_r_integral(k)
+               if (s% calculate_Brunt_N2) val = get_brunt_N_div_r_integral(k)
             case (p_sign_brunt_N2)
-               if (s% ctrl% calculate_Brunt_N2) val = sign(1d0,s% brunt_N2(k))
+               if (s% calculate_Brunt_N2) val = sign(1d0,s% brunt_N2(k))
 
             case (p_k_r_integral)
-               if (s% ctrl% calculate_Brunt_N2) val = get_k_r_integral(k,1,1d0)
+               if (s% calculate_Brunt_N2) val = get_k_r_integral(k,1,1d0)
 
             case (p_brunt_N2_sub_omega2)
-               if (s% ctrl% calculate_Brunt_N2) then
+               if (s% calculate_Brunt_N2) then
                   val = s% brunt_N2(k) - pow2(2*pi*s% nu_max/1d6)
                   if (val > 0d0) then
                      val = 1
@@ -2087,7 +2087,7 @@
                   end if
                end if
             case (p_sl2_sub_omega2)
-               if (s% ctrl% calculate_Brunt_N2) then
+               if (s% calculate_Brunt_N2) then
                   val = 2*pow2(s% csound_face(k)/s% r(k)) - pow2(2*pi*s% nu_max/1d6)
                   if (val >= 0d0) then
                      val = 1

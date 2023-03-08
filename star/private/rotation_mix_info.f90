@@ -120,72 +120,72 @@
 
                case (i_DSI)
 
-                  if (s% ctrl% D_DSI_factor > 0 .or. s% ctrl% am_nu_DSI_factor > 0) then
+                  if (s% D_DSI_factor > 0 .or. s% am_nu_DSI_factor > 0) then
                      call set_D_DSI(op_err)
                      if (failed('set_D_DSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_DSI, s% ctrl% smooth_D_DSI, smooth_work(1:nz,which))
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     call smooth_for_rotation(s, s% D_DSI, s% smooth_D_DSI, smooth_work(1:nz,which))
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_DSI)
                      call zero_if_tiny(s,s% D_DSI)
                   end if
 
                case (i_SH)
 
-                  if (s% ctrl% D_SH_factor > 0 .or. s% ctrl% am_nu_SH_factor > 0) then
+                  if (s% D_SH_factor > 0 .or. s% am_nu_SH_factor > 0) then
                      call set_D_SH(op_err)
                      if (failed('set_D_SH', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_SH, s% ctrl% smooth_D_SH, smooth_work(1:nz,which))
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     call smooth_for_rotation(s, s% D_SH, s% smooth_D_SH, smooth_work(1:nz,which))
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SH)
                      call zero_if_tiny(s,s% D_SH)
                   end if
 
                case (i_SSI)
 
-                  if (s% ctrl% D_SSI_factor > 0 .or. s% ctrl% am_nu_SSI_factor > 0) then
+                  if (s% D_SSI_factor > 0 .or. s% am_nu_SSI_factor > 0) then
                      call set_D_SSI(op_err)
                      if (failed('set_D_SSI', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_SSI, s% ctrl% smooth_D_SSI, smooth_work(1:nz,which))
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     call smooth_for_rotation(s, s% D_SSI, s% smooth_D_SSI, smooth_work(1:nz,which))
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_SSI)
                      call zero_if_tiny(s,s% D_SSI)
                   end if
 
                case (i_ES)
 
-                  if (s% ctrl% D_ES_factor > 0 .or. s% ctrl% am_nu_ES_factor > 0) then
+                  if (s% D_ES_factor > 0 .or. s% am_nu_ES_factor > 0) then
                      call set_D_ES(op_err)
                      if (failed('set_D_ES', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_ES, s% ctrl% smooth_D_ES, smooth_work(1:nz,which))
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     call smooth_for_rotation(s, s% D_ES, s% smooth_D_ES, smooth_work(1:nz,which))
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_ES)
                      call zero_if_tiny(s,s% D_ES)
                   end if
 
                case (i_GSF)
 
-                  if (s% ctrl% D_GSF_factor > 0 .or. s% ctrl% am_nu_GSF_factor > 0) then
+                  if (s% D_GSF_factor > 0 .or. s% am_nu_GSF_factor > 0) then
                      call set_D_GSF(op_err)
                      if (failed('set_D_GSF', op_err)) then
                         ierr = -1; cycle
                      end if
-                     call smooth_for_rotation(s, s% D_GSF, s% ctrl% smooth_D_GSF, smooth_work(1:nz,which))
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     call smooth_for_rotation(s, s% D_GSF, s% smooth_D_GSF, smooth_work(1:nz,which))
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_GSF)
                      call zero_if_tiny(s,s% D_GSF)
                   end if
 
                case (i_ST)
 
-                  if (s% ctrl% D_ST_factor > 0 .or. s% ctrl% am_nu_ST_factor > 0) then
+                  if (s% D_ST_factor > 0 .or. s% am_nu_ST_factor > 0) then
 
                      call set_ST(s, &
                         rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
@@ -194,16 +194,16 @@
                         ierr = -1; cycle
                      end if
 
-                     call smooth_for_rotation(s, s% D_ST, s% ctrl% smooth_D_ST, smooth_work(1:nz,which))
-                     call smooth_for_rotation(s, s% nu_ST, s% ctrl% smooth_nu_ST, smooth_work(1:nz,which))
+                     call smooth_for_rotation(s, s% D_ST, s% smooth_D_ST, smooth_work(1:nz,which))
+                     call smooth_for_rotation(s, s% nu_ST, s% smooth_nu_ST, smooth_work(1:nz,which))
 
                      ! time smooth for ST only
                      if (s% prev_mesh_have_ST_start_info .and. .not. s% doing_relax &
-                        .and. .not. s% doing_first_model_of_run .and. s% ctrl% ST_angsmt>0d0) then
+                        .and. .not. s% doing_first_model_of_run .and. s% ST_angsmt>0d0) then
 
                         k0 = 1
-                        angsml = s% ctrl% ST_angsml
-                        angsmt = s% ctrl% ST_angsmt
+                        angsml = s% ST_angsml
+                        angsmt = s% ST_angsmt
                         prev_out_q = 0d0
                         prev_q = 1d0
                         do k=2, nz-1 ! ignore k=1 or nz edge case
@@ -239,13 +239,13 @@
                            pow(pow2(pi4*rho(k)*omega(k)*q*r(k))*abs(omega(k))*s% nu_ST(k),0.25d0)
                      end do
 
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% D_ST)
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% nu_ST)
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% dynamo_B_r)
-                     if (s% ctrl% skip_rotation_in_convection_zones) &
+                     if (s% skip_rotation_in_convection_zones) &
                         call zero_if_convective(nz, s% mixing_type, s% D_mix, s% dynamo_B_phi)
                      call zero_if_tiny(s,s% D_ST)
                      call zero_if_tiny(s,s% nu_ST)
@@ -268,32 +268,32 @@
          else if (s% D_omega_flag) then
                      
             do k=1,nz
-               if (s% q(k) <= s% ctrl% max_q_for_D_omega_zero_in_convection_region .and. &
+               if (s% q(k) <= s% max_q_for_D_omega_zero_in_convection_region .and. &
                    s% mixing_type(k) == convective_mixing) then
                   s% D_omega(k) = 0d0
                   cycle
                end if
                D_omega_source = &
-                  s% ctrl% D_DSI_factor  * s% D_DSI(k)  + &
-                  s% ctrl% D_SH_factor   * s% D_SH(k)   + &
-                  s% ctrl% D_SSI_factor  * s% D_SSI(k)  + &
-                  s% ctrl% D_ES_factor   * s% D_ES(k)   + &
-                  s% ctrl% D_GSF_factor  * s% D_GSF(k)  + &
-                  s% ctrl% D_ST_factor   * s% D_ST(k)
+                  s% D_DSI_factor  * s% D_DSI(k)  + &
+                  s% D_SH_factor   * s% D_SH(k)   + &
+                  s% D_SSI_factor  * s% D_SSI(k)  + &
+                  s% D_ES_factor   * s% D_ES(k)   + &
+                  s% D_GSF_factor  * s% D_GSF(k)  + &
+                  s% D_ST_factor   * s% D_ST(k)
                if (is_bad(D_omega_source)) then
                   write(*,2) 'D_omega_source', k, D_omega_source
-                  write(*,2) 's% ctrl% D_DSI_factor  * s% D_DSI(k)', k, s% ctrl% D_DSI_factor  * s% D_DSI(k), &
-                     s% ctrl% D_DSI_factor, s% D_DSI(k)
-                  write(*,2) 's% ctrl% D_SH_factor   * s% D_SH(k)', k, s% ctrl% D_SH_factor   * s% D_SH(k), &
-                     s% ctrl% D_SH_factor, s% D_SH(k)
-                  write(*,2) 's% ctrl% D_SSI_factor  * s% D_SSI(k)', k, s% ctrl% D_SSI_factor  * s% D_SSI(k), &
-                     s% ctrl% D_SSI_factor, s% D_SSI(k)
-                  write(*,2) 's% ctrl% D_ES_factor   * s% D_ES(k)', k, s% ctrl% D_ES_factor   * s% D_ES(k), &
-                     s% ctrl% D_ES_factor, s% D_ES(k)
-                  write(*,2) 's% ctrl% D_GSF_factor  * s% D_GSF(k)', k, s% ctrl% D_GSF_factor  * s% D_GSF(k), &
-                     s% ctrl% D_GSF_factor, s% D_GSF(k)
-                  write(*,2) 's% ctrl% D_ST_factor   * s% D_ST(k)', k, s% ctrl% D_ST_factor   * s% D_ST(k), &
-                     s% ctrl% D_ST_factor, s% D_ST(k)
+                  write(*,2) 's% D_DSI_factor  * s% D_DSI(k)', k, s% D_DSI_factor  * s% D_DSI(k), &
+                     s% D_DSI_factor, s% D_DSI(k)
+                  write(*,2) 's% D_SH_factor   * s% D_SH(k)', k, s% D_SH_factor   * s% D_SH(k), &
+                     s% D_SH_factor, s% D_SH(k)
+                  write(*,2) 's% D_SSI_factor  * s% D_SSI(k)', k, s% D_SSI_factor  * s% D_SSI(k), &
+                     s% D_SSI_factor, s% D_SSI(k)
+                  write(*,2) 's% D_ES_factor   * s% D_ES(k)', k, s% D_ES_factor   * s% D_ES(k), &
+                     s% D_ES_factor, s% D_ES(k)
+                  write(*,2) 's% D_GSF_factor  * s% D_GSF(k)', k, s% D_GSF_factor  * s% D_GSF(k), &
+                     s% D_GSF_factor, s% D_GSF(k)
+                  write(*,2) 's% D_ST_factor   * s% D_ST(k)', k, s% D_ST_factor   * s% D_ST(k), &
+                     s% D_ST_factor, s% D_ST(k)
                   call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
                s% D_omega(k) = D_omega_source
@@ -304,8 +304,8 @@
                end if
             end do
             
-            if (s% ctrl% smooth_D_omega > 0) then
-               call smooth_for_rotation(s, s% D_omega, s% ctrl% smooth_D_omega, smooth_work(1:nz,1))
+            if (s% smooth_D_omega > 0) then
+               call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, smooth_work(1:nz,1))
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after smooth_for_rotation s% D_omega(k)', k, s% D_omega(k)
@@ -314,7 +314,7 @@
                end do
             end if
             
-            if (s% ctrl% D_omega_mixing_rate > 0d0 .and. s% dt > 0) then
+            if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) then
                call mix_D_omega 
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
@@ -355,11 +355,11 @@
             
             allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
             
-            rate = min(s% ctrl% D_omega_mixing_rate, 1d0/dt)
+            rate = min(s% D_omega_mixing_rate, 1d0/dt)
             do k=2,nz-1
                if (s% D_omega(k) == 0 .or. s% D_omega(k+1) == 0) then
                   sig(k) = 0
-               else if ((.not. s% ctrl% D_omega_mixing_across_convection_boundary) .and. &
+               else if ((.not. s% D_omega_mixing_across_convection_boundary) .and. &
                   s% mixing_type(k) /= convective_mixing .and. &
                       (s% mixing_type(k-1) == convective_mixing .or. &
                        s% mixing_type(k+1) == convective_mixing)) then
@@ -454,7 +454,7 @@
             ierr = 0
             nz = s% nz
 
-            f_mu = s% ctrl% am_gradmu_factor
+            f_mu = s% am_gradmu_factor
 
             ! copy some pointers
             r => s% r
@@ -663,7 +663,7 @@
             end do
 
             ! velocities for ES and GSF
-            if (s% ctrl% D_ES_factor > 0 .or. s% ctrl% D_GSF_factor > 0) then
+            if (s% D_ES_factor > 0 .or. s% D_GSF_factor > 0) then
                do i = 1, nz ! Heger 2000, eqns 35 and 36
                   ! the bracket_term blows up at center since r^2/L and r^2/m can both -> Inf
                   ! so bullet proof by including lower bounds
@@ -676,7 +676,7 @@
                   else
                      denom = (-gradT_sub_grada(i)*delta(i)*pow2(s% cgrav(i)*m(i)))
                      if (abs(denom) < 1d-50 .or. is_bad(denom)) then
-                        if (s% ctrl% stop_for_bad_nums) then
+                        if (s% stop_for_bad_nums) then
                            write(*,2) 'denom', i, denom
                            call mesa_error(__FILE__,__LINE__,'rotation mix info: velocities for ES and GSF')
                         end if
@@ -688,14 +688,14 @@
                               (f_mu*s% smoothed_brunt_B(i))/(gradT_sub_grada(i))
                   end if
                   if (is_bad(ve0(i))) then
-                     if (s% ctrl% stop_for_bad_nums) then
+                     if (s% stop_for_bad_nums) then
                         write(*,2) 've0(i)', i, ve0(i)
                         call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
                      ve0(i) = 1d99
                   end if
                   if (is_bad(ve_mu(i))) then
-                     if (s% ctrl% stop_for_bad_nums) then
+                     if (s% stop_for_bad_nums) then
                         write(*,2) 've_mu(i)', i, ve_mu(i)
                         call mesa_error(__FILE__,__LINE__,'rotation mix info')
                      end if
@@ -718,7 +718,7 @@
                end do
 
                ! conductive opacities for ST
-               if (s% ctrl% D_ST_factor > 0d0 .or. s% ctrl% am_nu_factor > 0d0) then
+               if (s% D_ST_factor > 0d0 .or. s% am_nu_factor > 0d0) then
                   do i = 1, nz
                      call kap_get_elect_cond_opacity( &
                         s% kap_handle, zbar(i), log10(rho(i)), log10(T(i)),  &
@@ -1124,7 +1124,7 @@
                return
             end if
             write(s% retry_message,*) 'set_rotation_mixing_info failed in call to ' // trim(str)
-            if (s% ctrl% report_ierr) write(*, *) s% retry_message
+            if (s% report_ierr) write(*, *) s% retry_message
             failed = .true.
          end function failed
 
@@ -1371,7 +1371,7 @@
          real(dp), dimension(:) :: dc
          integer :: k
          real(dp) :: tiny
-         tiny = s% ctrl% clip_D_limit
+         tiny = s% clip_D_limit
          do k=1,s% nz
             if (dc(k) < tiny) dc(k) = 0
          end do

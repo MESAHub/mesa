@@ -48,7 +48,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         !s% extra_heat(:) = s% ctrl% extra_power_source
+         !s% extra_heat(:) = s% extra_power_source
          ! note that extra_heat is type(auto_diff_real_star_order1) so includes partials.
       end subroutine default_other_energy
 

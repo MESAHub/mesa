@@ -48,9 +48,9 @@
          do k = s% nz, 1, -1
             dq = s% dq(k)
             dx = s% xa(j,k)*dq
-            if (sum_dq+dq >= s% ctrl% center_avg_value_dq) then
-               sum_x = sum_x+ dx*(s% ctrl% center_avg_value_dq - sum_dq)/dq
-               sum_dq = s% ctrl% center_avg_value_dq
+            if (sum_dq+dq >= s% center_avg_value_dq) then
+               sum_x = sum_x+ dx*(s% center_avg_value_dq - sum_dq)/dq
+               sum_dq = s% center_avg_value_dq
                exit
             end if
             sum_x = sum_x + dx
@@ -132,7 +132,7 @@
          extras_check_model = keep_going
 
          ! if not in test, keep going
-         if (s% ctrl% x_integer_ctrl(1) .le. 0) return
+         if (s% x_integer_ctrl(1) .le. 0) return
 
          ! get isotopes
          mg24 = s% net_iso(img24)

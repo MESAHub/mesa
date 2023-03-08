@@ -96,7 +96,7 @@
 
          ierr = 0
 
-         if (s% ctrl% use_other_build_initial_model) then
+         if (s% use_other_build_initial_model) then
             call s% other_build_initial_model(s% id, ierr)
             return
          end if
@@ -126,8 +126,8 @@
             return
          end if
 
-         initial_z = s% ctrl% initial_z
-         initial_y = s% ctrl% initial_y
+         initial_z = s% initial_z
+         initial_y = s% initial_y
          if (initial_y < 0) initial_y = max(0d0, min(1d0, 0.24d0 + 2d0*initial_z))
          initial_h1 = max(0d0, min(1d0, 1d0 - (initial_z + initial_y)))
          initial_h2 = 0d0

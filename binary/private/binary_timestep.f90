@@ -285,30 +285,30 @@
          ! use variable varcontrols for different phases of evolution
          if (abs(b% mtransfer_rate)/Msun*secyer > 1d-20) then
             if (b% s_donor% center_h1 > 1d-12 .and. b% varcontrol_case_a > 0d0) then
-               b% s_donor% ctrl% varcontrol_target = b% varcontrol_case_a
+               b% s_donor% varcontrol_target = b% varcontrol_case_a
                if (b% point_mass_i == 0) &
-                   b% s_accretor% ctrl% varcontrol_target = b% varcontrol_case_a
+                   b% s_accretor% varcontrol_target = b% varcontrol_case_a
             else if (b% s_donor% center_h1 < 1d-12 .and. b% varcontrol_case_b > 0d0) then
-               b% s_donor% ctrl% varcontrol_target = b% varcontrol_case_b
+               b% s_donor% varcontrol_target = b% varcontrol_case_b
                if (b% point_mass_i == 0) &
-                   b% s_accretor% ctrl% varcontrol_target = b% varcontrol_case_b
+                   b% s_accretor% varcontrol_target = b% varcontrol_case_b
             end if
          else
             if (b% s_donor% center_h1 > 1d-12) then
                if (b% varcontrol_ms > 0d0) &
-                   b% s_donor% ctrl% varcontrol_target = b% varcontrol_ms
+                   b% s_donor% varcontrol_target = b% varcontrol_ms
             else
                if (b% varcontrol_post_ms > 0d0) &
-                   b% s_donor% ctrl% varcontrol_target = b% varcontrol_post_ms
+                   b% s_donor% varcontrol_target = b% varcontrol_post_ms
             end if
 
             if (b% point_mass_i == 0) then
                if (b% s_accretor% center_h1 > 1d-12) then
                   if (b% varcontrol_ms > 0d0) &
-                      b% s_accretor% ctrl% varcontrol_target = b% varcontrol_ms
+                      b% s_accretor% varcontrol_target = b% varcontrol_ms
                else
                   if (b% varcontrol_post_ms > 0d0) &
-                      b% s_accretor% ctrl% varcontrol_target = b% varcontrol_post_ms
+                      b% s_accretor% varcontrol_target = b% varcontrol_post_ms
                end if
             end if
          end if

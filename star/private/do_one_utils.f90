@@ -122,16 +122,16 @@
          type (star_info), pointer :: s
          integer :: id, ierr, io
          call output_terminal_header(s,terminal_iounit)
-         if (len_trim(s% ctrl% extra_terminal_output_file) > 0) then
+         if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
-            open(newunit=io, file=trim(s% ctrl% extra_terminal_output_file), &
+            open(newunit=io, file=trim(s% extra_terminal_output_file), &
                action='write', position='append', iostat=ierr)
             if (ierr == 0) then
                call output_terminal_header(s,io)
                close(io)
             else
                write(*,*) 'failed to open extra_terminal_output_file ' // &
-                  trim(s% ctrl% extra_terminal_output_file)
+                  trim(s% extra_terminal_output_file)
             end if
          end if
       end subroutine do_show_terminal_header
@@ -155,32 +155,32 @@
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
             
          ! note that if the age is in days, then the timestep is automatically in seconds.
-         if (trim(s% ctrl% terminal_show_timestep_units) == 'seconds' .or. &
-             trim(s% ctrl% terminal_show_timestep_units) == 'secs') then
-            if (s% ctrl% terminal_show_log_dt) then
+         if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
+             trim(s% terminal_show_timestep_units) == 'secs') then
+            if (s% terminal_show_log_dt) then
                write(io,'(a)',advance='no') '  lg_dt_sec'
             else
                write(io,'(a)',advance='no') '     dt_sec'
             end if
-         else if (trim(s% ctrl% terminal_show_timestep_units) == 'days') then
-            if (s% ctrl% terminal_show_log_dt) then         
+         else if (trim(s% terminal_show_timestep_units) == 'days') then
+            if (s% terminal_show_log_dt) then         
                write(io,'(a)',advance='no') ' lg_dt_days'
             else
                write(io,'(a)',advance='no') '    dt_days'
             end if
-         else if (trim(s% ctrl% terminal_show_timestep_units) == 'years' .or. &
-                  trim(s% ctrl% terminal_show_timestep_units) == 'yrs') then
-            if (s% ctrl% terminal_show_log_dt) then         
+         else if (trim(s% terminal_show_timestep_units) == 'years' .or. &
+                  trim(s% terminal_show_timestep_units) == 'yrs') then
+            if (s% terminal_show_log_dt) then         
                write(io,'(a)',advance='no') '  lg_dt_yrs'
             else
                write(io,'(a)',advance='no') '     dt_yrs'
             end if
          else
-            write(*,*) 'unrecognized option for terminal_show_timestep_units ' // trim(s% ctrl% terminal_show_timestep_units)
+            write(*,*) 'unrecognized option for terminal_show_timestep_units ' // trim(s% terminal_show_timestep_units)
             return
          end if
          
-         if (s% ctrl% initial_z >= 1d-5) then
+         if (s% initial_z >= 1d-5) then
             write(io,'(a)') &
                '    lg_Tcntr    lg_R     lg_L3a     lg_Lneu     lg_Mdot    ' // &
                'He_core    He_cntr    O_cntr     Z_surf   gam_cntr   ' // iters // '  '
@@ -190,28 +190,28 @@
                'He_core    He_cntr    O_cntr     lg_Z_surf gam_cntr  ' // iters // '  '
          end if
 
-         if (trim(s% ctrl% terminal_show_age_units) == 'seconds' .or. &
-             trim(s% ctrl% terminal_show_age_units) == 'secs') then
-            if (s% ctrl% terminal_show_log_age) then
+         if (trim(s% terminal_show_age_units) == 'seconds' .or. &
+             trim(s% terminal_show_age_units) == 'secs') then
+            if (s% terminal_show_log_age) then
                write(io,'(a)',advance='no') 'lg_age_secs'
             else
                write(io,'(a)',advance='no') '   age_secs'
             end if
-         else if (trim(s% ctrl% terminal_show_age_units) == 'days') then
-            if (s% ctrl% terminal_show_log_age) then
+         else if (trim(s% terminal_show_age_units) == 'days') then
+            if (s% terminal_show_log_age) then
                write(io,'(a)',advance='no') 'lg_age_days'
             else
                write(io,'(a)',advance='no') '   age_days'
             end if
-         else if (trim(s% ctrl% terminal_show_age_units) == 'years' .or. &
-                  trim(s% ctrl% terminal_show_age_units) == 'yrs') then
-            if (s% ctrl% terminal_show_log_age) then
+         else if (trim(s% terminal_show_age_units) == 'years' .or. &
+                  trim(s% terminal_show_age_units) == 'yrs') then
+            if (s% terminal_show_log_age) then
                write(io,'(a)',advance='no') ' lg_age_yrs'
             else
                write(io,'(a)',advance='no') '    age_yrs'
             end if
          else
-            write(*,*) 'unrecognized option for terminal_show_age_units ' // trim(s% ctrl% terminal_show_age_units)
+            write(*,*) 'unrecognized option for terminal_show_age_units ' // trim(s% terminal_show_age_units)
             return
          end if
          
@@ -236,16 +236,16 @@
          type (star_info), pointer :: s
          integer :: id, ierr, io
          call output_terminal_summary(s,terminal_iounit)
-         if (len_trim(s% ctrl% extra_terminal_output_file) > 0) then
+         if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
-            open(newunit=io, file=trim(s% ctrl% extra_terminal_output_file), &
+            open(newunit=io, file=trim(s% extra_terminal_output_file), &
                action='write', position='append', iostat=ierr)
             if (ierr == 0) then
                call output_terminal_summary(s,io)
                close(io)
             else
                write(*,*) 'failed to open extra_terminal_output_file ' // &
-                  trim(s% ctrl% extra_terminal_output_file)
+                  trim(s% extra_terminal_output_file)
             end if
          end if
       end subroutine do_terminal_summary
@@ -270,23 +270,23 @@
          include 'formats'
          
          age = s% star_age ! in years            
-         if (trim(s% ctrl% terminal_show_age_units) == 'seconds' .or. &
-             trim(s% ctrl% terminal_show_age_units) == 'secs') then
+         if (trim(s% terminal_show_age_units) == 'seconds' .or. &
+             trim(s% terminal_show_age_units) == 'secs') then
             age = age*secyer
-         else if (trim(s% ctrl% terminal_show_age_units) == 'days') then
+         else if (trim(s% terminal_show_age_units) == 'days') then
             age = age*secyer/(24*60*60)
          end if
             
          time_step = s% time_step ! in years
-         if (trim(s% ctrl% terminal_show_timestep_units) == 'seconds' .or. &
-             trim(s% ctrl% terminal_show_timestep_units) == 'secs') then
+         if (trim(s% terminal_show_timestep_units) == 'seconds' .or. &
+             trim(s% terminal_show_timestep_units) == 'secs') then
             time_step = time_step*secyer
-         else if (trim(s% ctrl% terminal_show_timestep_units) == 'days') then
+         else if (trim(s% terminal_show_timestep_units) == 'days') then
             time_step = time_step*secyer/(24*60*60)
          end if
         
-         if (s% ctrl% terminal_show_log_age) age = safe_log10(age)
-         if (s% ctrl% terminal_show_log_dt) time_step = safe_log10(time_step)
+         if (s% terminal_show_log_age) age = safe_log10(age)
+         if (s% terminal_show_log_dt) time_step = safe_log10(time_step)
 
          model = s% model_number
          nz = s% nz
@@ -357,7 +357,7 @@
             s% num_retries
          
          tmp = max(0d0, min(1d0, 1 - (s% surface_h1 + s% surface_he3 + s% surface_he4)))
-         if (s% ctrl% initial_z >= 1d-5) then
+         if (s% initial_z >= 1d-5) then
             fmt1 = '(1pe11.4, 0p, 9f11.6, '
          else
             tmp = safe_log10(tmp)
@@ -450,7 +450,7 @@
                trim(why)
          end if
          
-         call show_trace_history_values(max(0, s% ctrl% num_trace_history_values))
+         call show_trace_history_values(max(0, s% num_trace_history_values))
          write(io,'(A)')
          
          s% just_wrote_terminal_header = .false.
@@ -473,13 +473,13 @@
             if (num == 0) return
             call do_get_data_for_history_columns(s, ierr)
             if (ierr /= 0) return
-            call get_history_specs(s, num, s% ctrl% trace_history_value_name, specs, .false.)
+            call get_history_specs(s, num, s% trace_history_value_name, specs, .false.)
             call get_history_values( &
                s, num, specs, is_int_value, int_values, values, failed_to_find_value)
             do i = 1, num
                if (failed_to_find_value(i)) then
-                  if (.not. get1_hist_value(s, s% ctrl% trace_history_value_name(i), val)) then
-                     write(*,*) 'failed to find history value ' // trim(s% ctrl% trace_history_value_name(i))
+                  if (.not. get1_hist_value(s, s% trace_history_value_name(i), val)) then
+                     write(*,*) 'failed to find history value ' // trim(s% trace_history_value_name(i))
                      cycle
                   end if
                   values(i) = val
@@ -488,16 +488,16 @@
                   end if
                else if (is_int_value(i)) then
                   write(io,'(a40,i14)') &
-                     trim(s% ctrl% trace_history_value_name(i)), int_values(i)
+                     trim(s% trace_history_value_name(i)), int_values(i)
                   cycle
                end if
                if ((values(i) == 0) .or. &
                         (abs(values(i)) > 1d-4 .and. abs(values(i)) < 1d4)) then
                   write(io,'(a40,99(f26.16))') &
-                     trim(s% ctrl% trace_history_value_name(i)), values(i)
+                     trim(s% trace_history_value_name(i)), values(i)
                else
                   write(io,'(a40,99(1pd26.16))') &
-                     trim(s% ctrl% trace_history_value_name(i)), values(i)
+                     trim(s% trace_history_value_name(i)), values(i)
                   if (is_bad(values(i))) then   
                      call mesa_error(__FILE__,__LINE__,'show_trace_history_values')
                   end if
@@ -516,20 +516,20 @@
          logical :: write_history, write_terminal         
          include 'formats'
          model = s% model_number
-         if (s% ctrl% history_interval > 0) then
-            write_history = (mod(model, s% ctrl% history_interval) == 0) .or. do_write
+         if (s% history_interval > 0) then
+            write_history = (mod(model, s% history_interval) == 0) .or. do_write
          else
             write_history = .false.
          end if
-         if (s% ctrl% terminal_interval > 0) then
-            write_terminal = (mod(model, s% ctrl% terminal_interval) == 0) .or. do_write
+         if (s% terminal_interval > 0) then
+            write_terminal = (mod(model, s% terminal_interval) == 0) .or. do_write
          else
             write_terminal = .false.
          end if
          get_history_info = write_history .or. write_terminal         
          if (.not. get_history_info) return
-         if (s% ctrl% write_header_frequency*s% ctrl% terminal_interval > 0) then
-            if ( mod(model, s% ctrl% write_header_frequency*s% ctrl% terminal_interval) .eq. 0 &
+         if (s% write_header_frequency*s% terminal_interval > 0) then
+            if ( mod(model, s% write_header_frequency*s% terminal_interval) .eq. 0 &
                  .and. .not. s% doing_first_model_of_run) then
                write(*,'(A)')
                call write_terminal_header(s)
@@ -594,7 +594,7 @@
          end if
          
          if (s% RSP_flag) then
-            max_period_number = s% ctrl% RSP_max_num_periods
+            max_period_number = s% RSP_max_num_periods
             period_number = s% RSP_num_periods
             GREKM_avg_abs = s% rsp_GREKM_avg_abs
          else
@@ -606,8 +606,8 @@
          nz = s% nz
          do_check_limits = keep_going
          
-         species_mass_for_min_limit = get_species_mass(s% ctrl% star_species_mass_min_limit_iso)
-         species_mass_for_max_limit = get_species_mass(s% ctrl% star_species_mass_max_limit_iso)
+         species_mass_for_min_limit = get_species_mass(s% star_species_mass_min_limit_iso)
+         species_mass_for_max_limit = get_species_mass(s% star_species_mass_max_limit_iso)
 
          csound_surf = s% csound_face(1)
          if (s% u_flag) then
@@ -662,11 +662,11 @@
          log_Teff = safe_log10(s% Teff)
          if (s% L_phot > 0d0) then
             Lnuc_div_L = s% L_nuc_burn_total / s% L_phot
-            if (.not. s% ctrl% get_delta_nu_from_scaled_solar) then
+            if (.not. s% get_delta_nu_from_scaled_solar) then
                delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
             else
                delta_nu = &
-                  s% ctrl% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% ctrl% Teff_sun) / &
+                  s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
                      pow(s% L_phot,0.75d0)
             end if
          else
@@ -674,16 +674,16 @@
             delta_nu = 0d0
          end if
          
-         if (s% ctrl% dxdt_nuc_factor > 0d0) then
+         if (s% dxdt_nuc_factor > 0d0) then
             k = maxloc(s% eps_nuc(1:nz), dim=1)
             peak_burn_vconv_div_cs = s% conv_vel(k)/s% csound(k)
          else
             peak_burn_vconv_div_cs = 0d0
          end if
          
-         if (s% ctrl% initial_mass > s% he_core_mass) then
+         if (s% initial_mass > s% he_core_mass) then
             envelope_fraction_left = &
-               (s% star_mass - s% he_core_mass)/(s% ctrl% initial_mass - s% he_core_mass)
+               (s% star_mass - s% he_core_mass)/(s% initial_mass - s% he_core_mass)
          else
             envelope_fraction_left = 1
          end if
@@ -700,12 +700,12 @@
          
          min_pgas_div_p = 1d99
          do k = s% nz, 1, -1
-            if (s% q(k) > s% ctrl% Pgas_div_P_limit_max_q) exit
+            if (s% q(k) > s% Pgas_div_P_limit_max_q) exit
             if (s% pgas(k)/s% Peos(k) < min_pgas_div_p) min_pgas_div_p = s% pgas(k)/s% Peos(k)
          end do
          
          max_omega_div_omega_crit = 0; k_omega = 0
-         if (s% rotation_flag .and. s% ctrl% omega_div_omega_crit_limit > 0) then
+         if (s% rotation_flag .and. s% omega_div_omega_crit_limit > 0) then
             do k = 1, s% nz
                omega_div_omega_crit = abs(s% omega(k))/omega_crit(s,k) 
                if (omega_div_omega_crit > max_omega_div_omega_crit) then
@@ -715,12 +715,12 @@
             end do
          end if
          
-         if(s% ctrl% max_abs_rel_run_E_err > 0d0) then
-            if (abs(s% cumulative_energy_error/s% total_energy) > s% ctrl% max_abs_rel_run_E_err &
+         if(s% max_abs_rel_run_E_err > 0d0) then
+            if (abs(s% cumulative_energy_error/s% total_energy) > s% max_abs_rel_run_E_err &
                   .and. .not. s% doing_relax) then
                write(*, '(/,a,/, 2e20.10)') &
                   'stop because abs rel_run_E_err exceeds limit (max_abs_rel_run_E_err) ', &
-                  abs(s% cumulative_energy_error/s% total_energy), s% ctrl% max_abs_rel_run_E_err
+                  abs(s% cumulative_energy_error/s% total_energy), s% max_abs_rel_run_E_err
                do_check_limits = terminate
                s% termination_code = t_max_abs_rel_run_E_err
                s% result_reason = abs_rel_run_E_err
@@ -729,7 +729,7 @@
          end if
          
          if (max_abs_vel > clight) then
-            if (s% ctrl% retry_for_v_above_clight) then 
+            if (s% retry_for_v_above_clight) then 
                write(*, '(/,a,/, I5,1X,2e20.10)') &
                   'retry because maximum velocity exceeds speed of light ',max_abs_vel_loc,max_abs_vel,max_abs_vel/clight
                do_check_limits = retry
@@ -740,69 +740,69 @@
             end if
          end if
 
-         if (peak_burn_vconv_div_cs > 0.75d0*s% ctrl% peak_burn_vconv_div_cs_limit) then
+         if (peak_burn_vconv_div_cs > 0.75d0*s% peak_burn_vconv_div_cs_limit) then
             write(*,1) 'peak_burn_vconv_div_cs: ', &
-               peak_burn_vconv_div_cs / s% ctrl% peak_burn_vconv_div_cs_limit, &
-               peak_burn_vconv_div_cs, s% ctrl% peak_burn_vconv_div_cs_limit
+               peak_burn_vconv_div_cs / s% peak_burn_vconv_div_cs_limit, &
+               peak_burn_vconv_div_cs, s% peak_burn_vconv_div_cs_limit
             k = maxloc(s% eps_nuc(1:nz), dim=1)
             write(*,2) 'maxloc eps_nuc', k, s% conv_vel(k), s% csound(k), s% eps_nuc(k)
             call mesa_error(__FILE__,__LINE__,'test do_one_utils')
          end if
          
-         if (s% fe_core_infall < s% ctrl% fe_core_infall_limit .and. &
-             s% fe_core_infall > 0.99d0*s% ctrl% fe_core_infall_limit) &
+         if (s% fe_core_infall < s% fe_core_infall_limit .and. &
+             s% fe_core_infall > 0.99d0*s% fe_core_infall_limit) &
             write(*,1) 'nearing fe_core_infall limit', &
-               s% fe_core_infall, s% ctrl% fe_core_infall_limit
+               s% fe_core_infall, s% fe_core_infall_limit
          
-         if (s% non_fe_core_infall < s% ctrl% non_fe_core_infall_limit .and. &
-             s% non_fe_core_infall > 0.99d0*s% ctrl% non_fe_core_infall_limit) &
+         if (s% non_fe_core_infall < s% non_fe_core_infall_limit .and. &
+             s% non_fe_core_infall > 0.99d0*s% non_fe_core_infall_limit) &
             write(*,1) 'nearing non_fe_core_infall limit', &
-               s% non_fe_core_infall, s% ctrl% non_fe_core_infall_limit
+               s% non_fe_core_infall, s% non_fe_core_infall_limit
          
-         if (s% non_fe_core_rebound > 0.99d0*s% ctrl% non_fe_core_rebound_limit) &
+         if (s% non_fe_core_rebound > 0.99d0*s% non_fe_core_rebound_limit) &
             write(*,1) 'nearing non_fe_core_rebound limit', &
-               s% non_fe_core_rebound, s% ctrl% non_fe_core_rebound_limit
+               s% non_fe_core_rebound, s% non_fe_core_rebound_limit
          
-         if (max_omega_div_omega_crit > 0.75d0*s% ctrl% omega_div_omega_crit_limit .and. &
-               s% ctrl% omega_div_omega_crit_limit > 0 .and. k_omega > 0) &
+         if (max_omega_div_omega_crit > 0.75d0*s% omega_div_omega_crit_limit .and. &
+               s% omega_div_omega_crit_limit > 0 .and. k_omega > 0) &
             write(*,2) 'omega_div_omega_crit', k_omega, &
-               max_omega_div_omega_crit, s% ctrl% omega_div_omega_crit_limit, &
+               max_omega_div_omega_crit, s% omega_div_omega_crit_limit, &
                s% m(k_omega)/Msun, s% r_equatorial(k_omega)/Rsun, &
                s% omega(k_omega), &
                sqrt(s% cgrav(k_omega)*s% m(k_omega)/ pow3(s% r_equatorial(k_omega)))
          
-         if (s% star_age >= s% ctrl% max_age .and. s% ctrl% max_age > 0) then 
-            call compare_to_target('star_age >= max_age', s% star_age, s% ctrl% max_age, &
+         if (s% star_age >= s% max_age .and. s% max_age > 0) then 
+            call compare_to_target('star_age >= max_age', s% star_age, s% max_age, &
                   t_max_age)
                   
-         else if (s% time >= s% ctrl% max_age_in_days*(60*60*24) .and. s% ctrl% max_age_in_days > 0) then 
+         else if (s% time >= s% max_age_in_days*(60*60*24) .and. s% max_age_in_days > 0) then 
             call compare_to_target('time >= max_age_in_days', &
-               s% time/(60*60*24), s% ctrl% max_age_in_days, t_max_age)
+               s% time/(60*60*24), s% max_age_in_days, t_max_age)
                   
-         else if (s% time >= s% ctrl% max_age_in_seconds .and. s% ctrl% max_age_in_seconds > 0) then 
+         else if (s% time >= s% max_age_in_seconds .and. s% max_age_in_seconds > 0) then 
             call compare_to_target('time >= max_age_in_seconds', &
-               s% time, s% ctrl% max_age_in_seconds, t_max_age)
+               s% time, s% max_age_in_seconds, t_max_age)
             
-         else if (max_omega_div_omega_crit >= s% ctrl% omega_div_omega_crit_limit .and. &
-               s% ctrl% omega_div_omega_crit_limit > 0) then 
+         else if (max_omega_div_omega_crit >= s% omega_div_omega_crit_limit .and. &
+               s% omega_div_omega_crit_limit > 0) then 
             write(*, '(/,a,/, 2e20.10)') &
                'stop max_omega_div_omega_crit >= omega_div_omega_crit_limit', &
-               max_omega_div_omega_crit, s% ctrl% omega_div_omega_crit_limit
+               max_omega_div_omega_crit, s% omega_div_omega_crit_limit
             do_check_limits = terminate
             s% termination_code = t_max_omega_div_omega_crit
             s% result_reason = result_reason_normal
                   
-         else if (peak_burn_vconv_div_cs >= s% ctrl% peak_burn_vconv_div_cs_limit) then 
+         else if (peak_burn_vconv_div_cs >= s% peak_burn_vconv_div_cs_limit) then 
             write(*, '(/,a,/, 2e20.10)') &
                'stop peak_burn_vconv_div_cs >= peak_burn_vconv_div_cs_limit', &
-               peak_burn_vconv_div_cs, s% ctrl% peak_burn_vconv_div_cs_limit
+               peak_burn_vconv_div_cs, s% peak_burn_vconv_div_cs_limit
             do_check_limits = terminate
             s% termination_code = t_peak_burn_vconv_div_cs_limit
             s% result_reason = result_reason_normal
             
-         else if (s% model_number >= s% ctrl% max_model_number .and. s% ctrl% max_model_number >= 0) then 
+         else if (s% model_number >= s% max_model_number .and. s% max_model_number >= 0) then 
             write(*, '(/,a,/, 2i9)') 'stop because model_number >= max_model_number', &
-               s% model_number, s% ctrl% max_model_number
+               s% model_number, s% max_model_number
             do_check_limits = terminate
             s% termination_code = t_max_model_number
             s% result_reason = result_reason_normal
@@ -814,447 +814,447 @@
             s% termination_code = t_max_period_number
             s% result_reason = result_reason_normal
             
-         else if (GREKM_avg_abs < s% ctrl% RSP_GREKM_avg_abs_limit &
-                  .and. s% ctrl% RSP_GREKM_avg_abs_limit >= 0 &
+         else if (GREKM_avg_abs < s% RSP_GREKM_avg_abs_limit &
+                  .and. s% RSP_GREKM_avg_abs_limit >= 0 &
                   .and. period_number >= 10) then 
             write(*, '(/,a,/, 2e20.10)') &
                'stop because GREKM_avg_abs < RSP_GREKM_avg_abs_limit', &
-               GREKM_avg_abs, s% ctrl% RSP_GREKM_avg_abs_limit
+               GREKM_avg_abs, s% RSP_GREKM_avg_abs_limit
             do_check_limits = terminate
             s% termination_code = 0
             s% result_reason = result_reason_normal
            
-         else if (s% center_degeneracy >= s% ctrl% eta_center_limit) then 
+         else if (s% center_degeneracy >= s% eta_center_limit) then 
             call compare_to_target('center_degeneracy >= eta_center_limit', &
-               s% center_degeneracy, s% ctrl% eta_center_limit, t_eta_center_limit)
+               s% center_degeneracy, s% eta_center_limit, t_eta_center_limit)
             
-         else if (s% log_center_temperature >= s% ctrl% log_center_temp_limit) then 
+         else if (s% log_center_temperature >= s% log_center_temp_limit) then 
             call compare_to_target('log_center_temperature >= log_center_temp_limit', &
-               center_value(s, s% lnT)/ln10, s% ctrl% log_center_temp_limit, t_log_center_temp_limit)
+               center_value(s, s% lnT)/ln10, s% log_center_temp_limit, t_log_center_temp_limit)
             
-         else if (s% log_center_temperature <= s% ctrl% log_center_temp_lower_limit) then 
+         else if (s% log_center_temperature <= s% log_center_temp_lower_limit) then 
             call compare_to_target('log_center_temperature <= log_center_temp_lower_limit', &
-               center_value(s, s% lnT)/ln10, s% ctrl% log_center_temp_lower_limit, &
+               center_value(s, s% lnT)/ln10, s% log_center_temp_lower_limit, &
                t_log_center_temp_lower_limit)
             
-         else if (s% max_entropy >= s% ctrl% max_entropy_limit) then 
+         else if (s% max_entropy >= s% max_entropy_limit) then 
             call compare_to_target('max_entropy >= max_entropy_limit', &
-               s% max_entropy, s% ctrl% max_entropy_limit, t_max_entropy_limit)
+               s% max_entropy, s% max_entropy_limit, t_max_entropy_limit)
             
-         else if (s% max_entropy <= s% ctrl% max_entropy_lower_limit) then 
+         else if (s% max_entropy <= s% max_entropy_lower_limit) then 
             call compare_to_target('max_entropy <= max_entropy_lower_limit', &
-               s% max_entropy, s% ctrl% max_entropy_lower_limit, &
+               s% max_entropy, s% max_entropy_lower_limit, &
                t_max_entropy_lower_limit)
             
-         else if (s% center_entropy >= s% ctrl% center_entropy_limit) then 
+         else if (s% center_entropy >= s% center_entropy_limit) then 
             call compare_to_target('center_entropy >= center_entropy_limit', &
-               s% center_entropy, s% ctrl% center_entropy_limit, t_center_entropy_limit)
+               s% center_entropy, s% center_entropy_limit, t_center_entropy_limit)
             
-         else if (s% center_entropy <= s% ctrl% center_entropy_lower_limit) then 
+         else if (s% center_entropy <= s% center_entropy_lower_limit) then 
             call compare_to_target('center_entropy <= center_entropy_lower_limit', &
-               s% center_entropy, s% ctrl% center_entropy_lower_limit, &
+               s% center_entropy, s% center_entropy_lower_limit, &
                t_center_entropy_lower_limit)
             
-         else if (s% log_center_density <= s% ctrl% log_center_density_lower_limit) then 
+         else if (s% log_center_density <= s% log_center_density_lower_limit) then 
             call compare_to_target('log_center_density <= log_center_density_lower_limit', &
-               center_value(s, s% lnd)/ln10, s% ctrl% log_center_density_lower_limit, &
+               center_value(s, s% lnd)/ln10, s% log_center_density_lower_limit, &
                t_log_center_density_lower_limit)
             
-         else if (s% log_center_density >= s% ctrl% log_center_density_limit) then 
+         else if (s% log_center_density >= s% log_center_density_limit) then 
             call compare_to_target('log_center_density >= log_center_density_limit', &
-               center_value(s, s% lnd)/ln10, s% ctrl% log_center_density_limit, t_log_center_density_limit)
+               center_value(s, s% lnd)/ln10, s% log_center_density_limit, t_log_center_density_limit)
             
-         else if (center_gamma > s% ctrl% gamma_center_limit) then 
+         else if (center_gamma > s% gamma_center_limit) then 
             call compare_to_target('center_gamma > gamma_center_limit', &
-               center_gamma, s% ctrl% gamma_center_limit, t_gamma_center_limit)
+               center_gamma, s% gamma_center_limit, t_gamma_center_limit)
             
-         else if (s% log_max_temperature >= s% ctrl% log_max_temp_upper_limit) then 
+         else if (s% log_max_temperature >= s% log_max_temp_upper_limit) then 
             call compare_to_target('log_max_temperature >= log_max_temp_upper_limit', &
-               s% log_max_temperature, s% ctrl% log_max_temp_upper_limit, t_log_max_temp_upper_limit)
+               s% log_max_temperature, s% log_max_temp_upper_limit, t_log_max_temp_upper_limit)
             
-         else if (s% log_max_temperature <= s% ctrl% log_max_temp_lower_limit) then 
+         else if (s% log_max_temperature <= s% log_max_temp_lower_limit) then 
             call compare_to_target('log_max_temperature <= log_max_temp_lower_limit', &
-               s% log_max_temperature, s% ctrl% log_max_temp_lower_limit, t_log_max_temp_lower_limit)
+               s% log_max_temperature, s% log_max_temp_lower_limit, t_log_max_temp_lower_limit)
             
-         else if (s% center_he4 < s% ctrl% HB_limit .and. s% center_h1 < 1d-4) then 
-            call compare_to_target('center he4 < HB_limit', s% center_he4, s% ctrl% HB_limit, t_HB_limit)
+         else if (s% center_he4 < s% HB_limit .and. s% center_h1 < 1d-4) then 
+            call compare_to_target('center he4 < HB_limit', s% center_he4, s% HB_limit, t_HB_limit)
             
-         else if (s% ctrl% star_mass_min_limit > 0 .and. s% star_mass <= s% ctrl% star_mass_min_limit) then 
+         else if (s% star_mass_min_limit > 0 .and. s% star_mass <= s% star_mass_min_limit) then 
             call compare_to_target('star_mass <= star_mass_min_limit', &
-               s% star_mass, s% ctrl% star_mass_min_limit, t_star_mass_min_limit)
+               s% star_mass, s% star_mass_min_limit, t_star_mass_min_limit)
             
-         else if (s% ctrl% star_mass_max_limit > 0 .and. s% star_mass >= s% ctrl% star_mass_max_limit) then 
+         else if (s% star_mass_max_limit > 0 .and. s% star_mass >= s% star_mass_max_limit) then 
             call compare_to_target('star_mass >= star_mass_max_limit', &
-               s% star_mass, s% ctrl% star_mass_max_limit, t_star_mass_max_limit)
+               s% star_mass, s% star_mass_max_limit, t_star_mass_max_limit)
             
-         else if (s% ctrl% remnant_mass_min_limit > 0 .and. remnant_mass <= s% ctrl% remnant_mass_min_limit) then 
+         else if (s% remnant_mass_min_limit > 0 .and. remnant_mass <= s% remnant_mass_min_limit) then 
             call compare_to_target('remnant_mass <= remnant_mass_min_limit', &
-               remnant_mass, s% ctrl% remnant_mass_min_limit, t_remnant_mass_min_limit)
+               remnant_mass, s% remnant_mass_min_limit, t_remnant_mass_min_limit)
             
-         else if (s% ctrl% ejecta_mass_max_limit > 0 .and. ejecta_mass >= s% ctrl% ejecta_mass_max_limit) then 
+         else if (s% ejecta_mass_max_limit > 0 .and. ejecta_mass >= s% ejecta_mass_max_limit) then 
             call compare_to_target('ejecta_mass >= ejecta_mass_max_limit', &
-               ejecta_mass, s% ctrl% ejecta_mass_max_limit, t_ejecta_mass_max_limit)
+               ejecta_mass, s% ejecta_mass_max_limit, t_ejecta_mass_max_limit)
             
          else if (species_mass_for_min_limit >= 0 .and. &
-               species_mass_for_min_limit <= s% ctrl% star_species_mass_min_limit) then 
+               species_mass_for_min_limit <= s% star_species_mass_min_limit) then 
             call compare_to_target( &
-               trim(s% ctrl% star_species_mass_min_limit_iso) // ' total mass <= star_species_mass_min_limit', &
-               species_mass_for_min_limit, s% ctrl% star_species_mass_min_limit, t_star_species_mass_min_limit)
+               trim(s% star_species_mass_min_limit_iso) // ' total mass <= star_species_mass_min_limit', &
+               species_mass_for_min_limit, s% star_species_mass_min_limit, t_star_species_mass_min_limit)
             
-         else if (species_mass_for_max_limit >= s% ctrl% star_species_mass_max_limit) then 
+         else if (species_mass_for_max_limit >= s% star_species_mass_max_limit) then 
             call compare_to_target( &
-               trim(s% ctrl% star_species_mass_max_limit_iso) // ' total mass >= star_species_mass_max_limit', &
-               species_mass_for_max_limit, s% ctrl% star_species_mass_max_limit, t_star_species_mass_max_limit)
+               trim(s% star_species_mass_max_limit_iso) // ' total mass >= star_species_mass_max_limit', &
+               species_mass_for_max_limit, s% star_species_mass_max_limit, t_star_species_mass_max_limit)
                         
-         else if (s% ctrl% xmstar_min_limit > 0 .and. s% xmstar <= s% ctrl% xmstar_min_limit) then 
+         else if (s% xmstar_min_limit > 0 .and. s% xmstar <= s% xmstar_min_limit) then 
             call compare_to_target('xmstar <= xmstar_min_limit', &
-               s% xmstar, s% ctrl% xmstar_min_limit, t_xmstar_min_limit)
+               s% xmstar, s% xmstar_min_limit, t_xmstar_min_limit)
             
-         else if (s% ctrl% xmstar_max_limit > 0 .and. s% xmstar >= s% ctrl% xmstar_max_limit) then 
+         else if (s% xmstar_max_limit > 0 .and. s% xmstar >= s% xmstar_max_limit) then 
             call compare_to_target('xmstar >= xmstar_max_limit', &
-               s% xmstar, s% ctrl% xmstar_max_limit, t_xmstar_max_limit)
+               s% xmstar, s% xmstar_max_limit, t_xmstar_max_limit)
             
-         else if (s% star_mass - s% he_core_mass < s% ctrl% envelope_mass_limit) then 
+         else if (s% star_mass - s% he_core_mass < s% envelope_mass_limit) then 
             call compare_to_target('envelope mass < envelope_mass_limit', &
-               s% star_mass - s% he_core_mass, s% ctrl% envelope_mass_limit, &
+               s% star_mass - s% he_core_mass, s% envelope_mass_limit, &
                t_envelope_mass_limit)
             
-         else if (envelope_fraction_left < s% ctrl% envelope_fraction_left_limit) then 
+         else if (envelope_fraction_left < s% envelope_fraction_left_limit) then 
             call compare_to_target('envelope_fraction_left < limit', &
-               envelope_fraction_left, s% ctrl% envelope_fraction_left_limit, &
+               envelope_fraction_left, s% envelope_fraction_left_limit, &
                t_envelope_fraction_left_limit)
             
-         else if (s% he_core_mass >= s% ctrl% he_core_mass_limit) then 
+         else if (s% he_core_mass >= s% he_core_mass_limit) then 
             call compare_to_target('he_core_mass >= he_core_mass_limit', &
-               s% he_core_mass, s% ctrl% he_core_mass_limit, t_he_core_mass_limit)
+               s% he_core_mass, s% he_core_mass_limit, t_he_core_mass_limit)
             
-         else if (s% co_core_mass >= s% ctrl% co_core_mass_limit) then 
+         else if (s% co_core_mass >= s% co_core_mass_limit) then 
             call compare_to_target('co_core_mass >= co_core_mass_limit', &
-               s% co_core_mass, s% ctrl% co_core_mass_limit, t_co_core_mass_limit)
+               s% co_core_mass, s% co_core_mass_limit, t_co_core_mass_limit)
             
-         else if (s% one_core_mass >= s% ctrl% one_core_mass_limit) then 
+         else if (s% one_core_mass >= s% one_core_mass_limit) then 
             call compare_to_target('one_core_mass >= one_core_mass_limit', &
-               s% one_core_mass, s% ctrl% one_core_mass_limit, t_one_core_mass_limit)
+               s% one_core_mass, s% one_core_mass_limit, t_one_core_mass_limit)
             
-         else if (s% fe_core_mass >= s% ctrl% fe_core_mass_limit) then 
+         else if (s% fe_core_mass >= s% fe_core_mass_limit) then 
             call compare_to_target('fe_core_mass >= fe_core_mass_limit', &
-               s% fe_core_mass, s% ctrl% fe_core_mass_limit, t_fe_core_mass_limit)
+               s% fe_core_mass, s% fe_core_mass_limit, t_fe_core_mass_limit)
             
-         else if (s% neutron_rich_core_mass >= s% ctrl% neutron_rich_core_mass_limit) then 
+         else if (s% neutron_rich_core_mass >= s% neutron_rich_core_mass_limit) then 
             call compare_to_target('neutron_rich_core_mass >= neutron_rich_core_mass_limit', &
-               s% neutron_rich_core_mass, s% ctrl% neutron_rich_core_mass_limit, t_neutron_rich_core_mass_limit)
+               s% neutron_rich_core_mass, s% neutron_rich_core_mass_limit, t_neutron_rich_core_mass_limit)
             
          else if ( &
                s% he_core_mass >= s% co_core_mass .and. &
                s% co_core_mass > 0 .and. &
                s% center_he4 < 1d-4 .and. &
-               s% he_core_mass - s% co_core_mass < s% ctrl% he_layer_mass_lower_limit) then 
+               s% he_core_mass - s% co_core_mass < s% he_layer_mass_lower_limit) then 
             call compare_to_target('he layer mass < he_layer_mass_lower_limit', &
-               s% he_core_mass - s% co_core_mass, s% ctrl% he_layer_mass_lower_limit, &
+               s% he_core_mass - s% co_core_mass, s% he_layer_mass_lower_limit, &
                t_he_layer_mass_lower_limit)
             
          else if (abs(safe_log10(power_h_burn) - s% log_surface_luminosity) <= &
-                  s% ctrl% abs_diff_lg_LH_lg_Ls_limit &
-                  .and. s% ctrl% abs_diff_lg_LH_lg_Ls_limit > 0) then 
+                  s% abs_diff_lg_LH_lg_Ls_limit &
+                  .and. s% abs_diff_lg_LH_lg_Ls_limit > 0) then 
             call compare_to_target('abs(lg_LH - lg_Ls) <= limit', &
                abs(safe_log10(power_h_burn) - s% log_surface_luminosity), &
-                  s% ctrl% abs_diff_lg_LH_lg_Ls_limit, t_abs_diff_lg_LH_lg_Ls_limit)
+                  s% abs_diff_lg_LH_lg_Ls_limit, t_abs_diff_lg_LH_lg_Ls_limit)
 
-         else if (s% Teff <= s% ctrl% Teff_lower_limit) then 
+         else if (s% Teff <= s% Teff_lower_limit) then 
             call compare_to_target('Teff <= Teff_lower_limit', &
-               s% Teff, s% ctrl% Teff_lower_limit, t_Teff_lower_limit)
+               s% Teff, s% Teff_lower_limit, t_Teff_lower_limit)
                
-         else if (s% Teff >= s% ctrl% Teff_upper_limit) then 
+         else if (s% Teff >= s% Teff_upper_limit) then 
             call compare_to_target('Teff >= Teff_upper_limit', &
-               s% Teff, s% ctrl% Teff_upper_limit, t_Teff_upper_limit)
+               s% Teff, s% Teff_upper_limit, t_Teff_upper_limit)
 
-         else if (delta_nu <= s% ctrl% delta_nu_lower_limit .and. s% ctrl% delta_nu_lower_limit > 0) then 
+         else if (delta_nu <= s% delta_nu_lower_limit .and. s% delta_nu_lower_limit > 0) then 
             call compare_to_target('delta_nu <= delta_nu_lower_limit', &
-               delta_nu, s% ctrl% delta_nu_lower_limit, t_delta_nu_lower_limit)
+               delta_nu, s% delta_nu_lower_limit, t_delta_nu_lower_limit)
                
-         else if (delta_nu >= s% ctrl% delta_nu_upper_limit .and. s% ctrl% delta_nu_upper_limit > 0) then 
+         else if (delta_nu >= s% delta_nu_upper_limit .and. s% delta_nu_upper_limit > 0) then 
             call compare_to_target('delta_nu >= delta_nu_upper_limit', &
-               delta_nu, s% ctrl% delta_nu_upper_limit, t_delta_nu_upper_limit)
+               delta_nu, s% delta_nu_upper_limit, t_delta_nu_upper_limit)
 
-         else if (s% delta_Pg <= s% ctrl% delta_Pg_lower_limit .and. s% ctrl% delta_Pg_lower_limit > 0) then 
+         else if (s% delta_Pg <= s% delta_Pg_lower_limit .and. s% delta_Pg_lower_limit > 0) then 
             call compare_to_target('delta_Pg <= delta_Pg_lower_limit', &
-               s% delta_Pg, s% ctrl% delta_Pg_lower_limit, t_delta_Pg_lower_limit)
+               s% delta_Pg, s% delta_Pg_lower_limit, t_delta_Pg_lower_limit)
                
-         else if (s% delta_Pg >= s% ctrl% delta_Pg_upper_limit .and. s% ctrl% delta_Pg_upper_limit > 0) then 
+         else if (s% delta_Pg >= s% delta_Pg_upper_limit .and. s% delta_Pg_upper_limit > 0) then 
             call compare_to_target('delta_Pg >= delta_Pg_upper_limit', &
-               s% delta_Pg, s% ctrl% delta_Pg_upper_limit, t_delta_Pg_upper_limit)
+               s% delta_Pg, s% delta_Pg_upper_limit, t_delta_Pg_upper_limit)
 
-         else if (s% photosphere_m - s% M_center/Msun <= s% ctrl% photosphere_m_sub_M_center_limit) then 
+         else if (s% photosphere_m - s% M_center/Msun <= s% photosphere_m_sub_M_center_limit) then 
             call compare_to_target( &
                'photosphere_m - M_center/Msun <= photosphere_m_sub_M_center_limit', &
                s% photosphere_m - s% M_center/Msun, &
-               s% ctrl% photosphere_m_sub_M_center_limit, &
+               s% photosphere_m_sub_M_center_limit, &
                t_photosphere_m_sub_M_center_limit)
 
-         else if (s% photosphere_m <= s% ctrl% photosphere_m_lower_limit) then 
+         else if (s% photosphere_m <= s% photosphere_m_lower_limit) then 
             call compare_to_target('photosphere_m <= photosphere_m_lower_limit', &
-               s% photosphere_m, s% ctrl% photosphere_m_lower_limit, t_photosphere_m_lower_limit)
+               s% photosphere_m, s% photosphere_m_lower_limit, t_photosphere_m_lower_limit)
                
-         else if (s% photosphere_m >= s% ctrl% photosphere_m_upper_limit) then 
+         else if (s% photosphere_m >= s% photosphere_m_upper_limit) then 
             call compare_to_target('photosphere_m >= photosphere_m_upper_limit', &
-               s% photosphere_m, s% ctrl% photosphere_m_upper_limit, t_photosphere_m_upper_limit)
+               s% photosphere_m, s% photosphere_m_upper_limit, t_photosphere_m_upper_limit)
 
-         else if (s% photosphere_r <= s% ctrl% photosphere_r_lower_limit) then 
+         else if (s% photosphere_r <= s% photosphere_r_lower_limit) then 
             call compare_to_target('photosphere_r <= photosphere_r_lower_limit', &
-               s% photosphere_r, s% ctrl% photosphere_r_lower_limit, t_photosphere_r_lower_limit)
+               s% photosphere_r, s% photosphere_r_lower_limit, t_photosphere_r_lower_limit)
                
-         else if (s% photosphere_r >= s% ctrl% photosphere_r_upper_limit) then 
+         else if (s% photosphere_r >= s% photosphere_r_upper_limit) then 
             call compare_to_target('photosphere_r >= photosphere_r_upper_limit', &
-               s% photosphere_r, s% ctrl% photosphere_r_upper_limit, t_photosphere_r_upper_limit)
+               s% photosphere_r, s% photosphere_r_upper_limit, t_photosphere_r_upper_limit)
 
-         else if (log_Teff <= s% ctrl% log_Teff_lower_limit) then 
+         else if (log_Teff <= s% log_Teff_lower_limit) then 
             call compare_to_target('log_Teff <= log_Teff_lower_limit', &
-               log_Teff, s% ctrl% log_Teff_lower_limit, t_log_Teff_lower_limit)
+               log_Teff, s% log_Teff_lower_limit, t_log_Teff_lower_limit)
                
-         else if (log_Teff >= s% ctrl% log_Teff_upper_limit) then 
+         else if (log_Teff >= s% log_Teff_upper_limit) then 
             call compare_to_target('log_Teff >= log_Teff_upper_limit', &
-               log_Teff, s% ctrl% log_Teff_upper_limit, t_log_Teff_upper_limit)
+               log_Teff, s% log_Teff_upper_limit, t_log_Teff_upper_limit)
 
-         else if (log_surface_temperature <= s% ctrl% log_Tsurf_lower_limit) then 
+         else if (log_surface_temperature <= s% log_Tsurf_lower_limit) then 
             call compare_to_target('log_surface_temperature <= log_Tsurf_lower_limit', &
-               log_surface_temperature, s% ctrl% log_Tsurf_lower_limit, t_log_Tsurf_lower_limit)
+               log_surface_temperature, s% log_Tsurf_lower_limit, t_log_Tsurf_lower_limit)
                
-         else if (log_surface_temperature >= s% ctrl% log_Tsurf_upper_limit) then 
+         else if (log_surface_temperature >= s% log_Tsurf_upper_limit) then 
             call compare_to_target('log_surface_temperature >= log_Tsurf_upper_limit', &
-               log_surface_temperature, s% ctrl% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
+               log_surface_temperature, s% log_Tsurf_upper_limit, t_log_Tsurf_upper_limit)
 
-         else if (s% log_surface_radius <= s% ctrl% log_Rsurf_lower_limit) then 
+         else if (s% log_surface_radius <= s% log_Rsurf_lower_limit) then 
             call compare_to_target('log_surface_radius <= log_Rsurf_lower_limit', &
-               s% log_surface_radius, s% ctrl% log_Rsurf_lower_limit, t_log_Rsurf_lower_limit)
+               s% log_surface_radius, s% log_Rsurf_lower_limit, t_log_Rsurf_lower_limit)
                
-         else if (s% log_surface_radius >= s% ctrl% log_Rsurf_upper_limit) then 
+         else if (s% log_surface_radius >= s% log_Rsurf_upper_limit) then 
             call compare_to_target('log_surface_radius >= log_Rsurf_upper_limit', &
-               s% log_surface_radius, s% ctrl% log_Rsurf_upper_limit, t_log_Rsurf_upper_limit)
+               s% log_surface_radius, s% log_Rsurf_upper_limit, t_log_Rsurf_upper_limit)
 
-         else if (log_surface_pressure <= s% ctrl% log_Psurf_lower_limit) then 
+         else if (log_surface_pressure <= s% log_Psurf_lower_limit) then 
             call compare_to_target('log_surface_pressure <= log_Psurf_lower_limit', &
-               log_surface_pressure, s% ctrl% log_Psurf_lower_limit, t_log_Psurf_lower_limit)
+               log_surface_pressure, s% log_Psurf_lower_limit, t_log_Psurf_lower_limit)
                
-         else if (log_surface_pressure >= s% ctrl% log_Psurf_upper_limit) then 
+         else if (log_surface_pressure >= s% log_Psurf_upper_limit) then 
             call compare_to_target('log_surface_pressure >= log_Psurf_upper_limit', &
-               log_surface_pressure, s% ctrl% log_Psurf_upper_limit, t_log_Psurf_upper_limit)
+               log_surface_pressure, s% log_Psurf_upper_limit, t_log_Psurf_upper_limit)
 
-         else if (log_surface_density <= s% ctrl% log_Dsurf_lower_limit) then 
+         else if (log_surface_density <= s% log_Dsurf_lower_limit) then 
             call compare_to_target('log_surface_density <= log_Dsurf_lower_limit', &
-               log_surface_density, s% ctrl% log_Dsurf_lower_limit, t_log_Dsurf_lower_limit)
+               log_surface_density, s% log_Dsurf_lower_limit, t_log_Dsurf_lower_limit)
                
-         else if (log_surface_density >= s% ctrl% log_Dsurf_upper_limit) then 
+         else if (log_surface_density >= s% log_Dsurf_upper_limit) then 
             call compare_to_target('log_surface_density >= log_Dsurf_upper_limit', &
-               log_surface_density, s% ctrl% log_Dsurf_upper_limit, t_log_Dsurf_upper_limit)
+               log_surface_density, s% log_Dsurf_upper_limit, t_log_Dsurf_upper_limit)
 
-         else if (s% log_surface_luminosity <= s% ctrl% log_L_lower_limit) then 
+         else if (s% log_surface_luminosity <= s% log_L_lower_limit) then 
             call compare_to_target('log_surface_luminosity <= log_L_lower_limit', &
-               s% log_surface_luminosity, s% ctrl% log_L_lower_limit, t_log_L_lower_limit)
+               s% log_surface_luminosity, s% log_L_lower_limit, t_log_L_lower_limit)
                
-         else if (s% log_surface_luminosity >= s% ctrl% log_L_upper_limit) then 
+         else if (s% log_surface_luminosity >= s% log_L_upper_limit) then 
             call compare_to_target('log_surface_luminosity >= log_L_upper_limit', &
-               s% log_surface_luminosity, s% ctrl% log_L_upper_limit, t_log_L_upper_limit)
+               s% log_surface_luminosity, s% log_L_upper_limit, t_log_L_upper_limit)
 
-         else if (log_surface_gravity <= s% ctrl% log_g_lower_limit) then 
+         else if (log_surface_gravity <= s% log_g_lower_limit) then 
             call compare_to_target('log_surface_gravity <= log_g_lower_limit', &
-               log_surface_gravity, s% ctrl% log_g_lower_limit, t_log_g_lower_limit)
+               log_surface_gravity, s% log_g_lower_limit, t_log_g_lower_limit)
             
-         else if (log_surface_gravity >= s% ctrl% log_g_upper_limit) then 
+         else if (log_surface_gravity >= s% log_g_upper_limit) then 
             call compare_to_target('log_surface_gravity >= log_g_upper_limit', &
-               log_surface_gravity, s% ctrl% log_g_upper_limit, t_log_g_upper_limit)
+               log_surface_gravity, s% log_g_upper_limit, t_log_g_upper_limit)
 
-         else if (power_nuc_burn >= s% ctrl% power_nuc_burn_upper_limit) then 
+         else if (power_nuc_burn >= s% power_nuc_burn_upper_limit) then 
             call compare_to_target('power_nuc_burn >= power_nuc_burn_upper_limit', &
-               power_nuc_burn, s% ctrl% power_nuc_burn_upper_limit, t_power_nuc_burn_upper_limit)
+               power_nuc_burn, s% power_nuc_burn_upper_limit, t_power_nuc_burn_upper_limit)
 
-         else if (power_h_burn >= s% ctrl% power_h_burn_upper_limit) then 
+         else if (power_h_burn >= s% power_h_burn_upper_limit) then 
             call compare_to_target('power_h_burn >= power_h_burn_upper_limit', &
-               power_h_burn, s% ctrl% power_h_burn_upper_limit, t_power_h_burn_upper_limit)
+               power_h_burn, s% power_h_burn_upper_limit, t_power_h_burn_upper_limit)
 
-         else if (power_he_burn >= s% ctrl% power_he_burn_upper_limit) then 
+         else if (power_he_burn >= s% power_he_burn_upper_limit) then 
             call compare_to_target('power_he_burn >= power_he_burn_upper_limit', &
-               power_he_burn, s% ctrl% power_he_burn_upper_limit, t_power_he_burn_upper_limit)
+               power_he_burn, s% power_he_burn_upper_limit, t_power_he_burn_upper_limit)
 
-         else if (power_z_burn >= s% ctrl% power_z_burn_upper_limit) then 
+         else if (power_z_burn >= s% power_z_burn_upper_limit) then 
             call compare_to_target('power_z_burn >= power_z_burn_upper_limit', &
-               power_z_burn, s% ctrl% power_z_burn_upper_limit, t_power_z_burn_upper_limit)
+               power_z_burn, s% power_z_burn_upper_limit, t_power_z_burn_upper_limit)
 
-         else if (power_nuc_burn < s% ctrl% power_nuc_burn_lower_limit) then 
+         else if (power_nuc_burn < s% power_nuc_burn_lower_limit) then 
             call compare_to_target('power_nuc_burn < power_nuc_burn_lower_limit', &
-               power_nuc_burn, s% ctrl% power_nuc_burn_lower_limit, t_power_nuc_burn_lower_limit)
+               power_nuc_burn, s% power_nuc_burn_lower_limit, t_power_nuc_burn_lower_limit)
 
-         else if (power_h_burn < s% ctrl% power_h_burn_lower_limit) then 
+         else if (power_h_burn < s% power_h_burn_lower_limit) then 
             call compare_to_target('power_h_burn < power_h_burn_lower_limit', &
-               power_h_burn, s% ctrl% power_h_burn_lower_limit, t_power_h_burn_lower_limit)
+               power_h_burn, s% power_h_burn_lower_limit, t_power_h_burn_lower_limit)
 
-         else if (power_he_burn < s% ctrl% power_he_burn_lower_limit) then 
+         else if (power_he_burn < s% power_he_burn_lower_limit) then 
             call compare_to_target('power_he_burn < power_he_burn_lower_limit', &
-               power_he_burn, s% ctrl% power_he_burn_lower_limit, t_power_he_burn_lower_limit)
+               power_he_burn, s% power_he_burn_lower_limit, t_power_he_burn_lower_limit)
 
-         else if (power_z_burn < s% ctrl% power_z_burn_lower_limit) then 
+         else if (power_z_burn < s% power_z_burn_lower_limit) then 
             call compare_to_target('power_z_burn < power_z_burn_lower_limit', &
-               power_z_burn, s% ctrl% power_z_burn_lower_limit, t_power_z_burn_lower_limit)
+               power_z_burn, s% power_z_burn_lower_limit, t_power_z_burn_lower_limit)
 
-         else if (s% center_Ye < s% ctrl% center_Ye_lower_limit) then 
+         else if (s% center_Ye < s% center_Ye_lower_limit) then 
             call compare_to_target('center_Ye < center_Ye_lower_limit', &
-               s% center_Ye, s% ctrl% center_Ye_lower_limit, t_center_Ye_lower_limit)
+               s% center_Ye, s% center_Ye_lower_limit, t_center_Ye_lower_limit)
 
-         else if (s% R_center < s% ctrl% center_R_lower_limit) then 
+         else if (s% R_center < s% center_R_lower_limit) then 
             call compare_to_target('R_center < center_R_lower_limit', &
-               s% R_center, s% ctrl% center_R_lower_limit, t_center_R_lower_limit)
+               s% R_center, s% center_R_lower_limit, t_center_R_lower_limit)
 
-         else if (s% fe_core_infall > s% ctrl% fe_core_infall_limit) then 
+         else if (s% fe_core_infall > s% fe_core_infall_limit) then 
             if (abs(s% error_in_energy_conservation/s% total_energy_end) < &
-                  s% ctrl% hard_limit_for_rel_error_in_energy_conservation) then
+                  s% hard_limit_for_rel_error_in_energy_conservation) then
                do_check_limits = terminate
                s% result_reason = result_reason_normal
                s% termination_code = t_fe_core_infall_limit
                write(*, '(/,a,/, 99e20.10)') &
                   'stop because fe_core_infall > fe_core_infall_limit', &
-                  s% fe_core_infall, s% ctrl% fe_core_infall_limit
+                  s% fe_core_infall, s% fe_core_infall_limit
             else
                write(*,2) 'rel_E_err too large for fe_core_infall termination', &
                   s% model_number, s% error_in_energy_conservation/abs(s% total_energy_end)
             end if 
 
-         else if (s% non_fe_core_infall > s% ctrl% non_fe_core_infall_limit) then 
+         else if (s% non_fe_core_infall > s% non_fe_core_infall_limit) then 
             call compare_to_target('non_fe_core_infall > non_fe_core_infall_limit', &
-               s% non_fe_core_infall, s% ctrl% non_fe_core_infall_limit, t_non_fe_core_infall_limit)
+               s% non_fe_core_infall, s% non_fe_core_infall_limit, t_non_fe_core_infall_limit)
 
-         else if (s% non_fe_core_rebound > s% ctrl% non_fe_core_rebound_limit) then 
+         else if (s% non_fe_core_rebound > s% non_fe_core_rebound_limit) then 
             call compare_to_target('non_fe_core_rebound > non_fe_core_rebound_limit', &
-               s% non_fe_core_rebound, s% ctrl% non_fe_core_rebound_limit, t_non_fe_core_rebound_limit)
+               s% non_fe_core_rebound, s% non_fe_core_rebound_limit, t_non_fe_core_rebound_limit)
 
-         else if (v_surf/csound_surf > s% ctrl% v_div_csound_surf_limit) then 
+         else if (v_surf/csound_surf > s% v_div_csound_surf_limit) then 
             call compare_to_target('v_surf/csound_surf > v_div_csound_surf_limit', &
-               v_surf/csound_surf, s% ctrl% v_div_csound_surf_limit, t_v_div_csound_surf_limit)
+               v_surf/csound_surf, s% v_div_csound_surf_limit, t_v_div_csound_surf_limit)
 
-         else if (v_div_csound_max > s% ctrl% v_div_csound_max_limit) then 
+         else if (v_div_csound_max > s% v_div_csound_max_limit) then 
             call compare_to_target('v_div_csound_max > v_div_csound_max_limit', &
-               v_div_csound_max, s% ctrl% v_div_csound_max_limit, t_v_div_csound_max_limit)
+               v_div_csound_max, s% v_div_csound_max_limit, t_v_div_csound_max_limit)
 
-         else if (s% min_gamma1 < s% ctrl% gamma1_limit) then 
+         else if (s% min_gamma1 < s% gamma1_limit) then 
             call compare_to_target('min_gamma1 < gamma1_limit', &
-               s% min_gamma1, s% ctrl% gamma1_limit, t_gamma1_limit)            
+               s% min_gamma1, s% gamma1_limit, t_gamma1_limit)            
 
-         else if (min_pgas_div_p < s% ctrl% Pgas_div_P_limit) then 
+         else if (min_pgas_div_p < s% Pgas_div_P_limit) then 
             call compare_to_target('min_pgas_div_p < Pgas_div_P_limit', &
-               min_pgas_div_p, s% ctrl% Pgas_div_P_limit, t_Pgas_div_P_limit)            
+               min_pgas_div_p, s% Pgas_div_P_limit, t_Pgas_div_P_limit)            
 
-         else if (Lnuc_div_L <= s% ctrl% Lnuc_div_L_lower_limit) then 
+         else if (Lnuc_div_L <= s% Lnuc_div_L_lower_limit) then 
             call compare_to_target('Lnuc_div_L <= Lnuc_div_L_lower_limit', &
-               Lnuc_div_L, s% ctrl% Lnuc_div_L_lower_limit, t_Lnuc_div_L_lower_limit)
+               Lnuc_div_L, s% Lnuc_div_L_lower_limit, t_Lnuc_div_L_lower_limit)
                
-         else if (Lnuc_div_L >= s% ctrl% Lnuc_div_L_upper_limit) then 
+         else if (Lnuc_div_L >= s% Lnuc_div_L_upper_limit) then 
             call compare_to_target('Lnuc_div_L >= Lnuc_div_L_upper_limit', &
-               Lnuc_div_L, s% ctrl% Lnuc_div_L_upper_limit, t_Lnuc_div_L_upper_limit)
+               Lnuc_div_L, s% Lnuc_div_L_upper_limit, t_Lnuc_div_L_upper_limit)
 
-         else if (v_surf_div_v_kh <= s% ctrl% v_surf_div_v_kh_lower_limit) then 
+         else if (v_surf_div_v_kh <= s% v_surf_div_v_kh_lower_limit) then 
             call compare_to_target('v_surf_div_v_kh <= v_surf_div_v_kh_lower_limit', &
-               v_surf_div_v_kh, s% ctrl% v_surf_div_v_kh_lower_limit, t_v_surf_div_v_kh_lower_limit)
+               v_surf_div_v_kh, s% v_surf_div_v_kh_lower_limit, t_v_surf_div_v_kh_lower_limit)
                
-         else if (v_surf_div_v_kh >= s% ctrl% v_surf_div_v_kh_upper_limit) then 
+         else if (v_surf_div_v_kh >= s% v_surf_div_v_kh_upper_limit) then 
             call compare_to_target('v_surf_div_v_kh >= v_surf_div_v_kh_upper_limit', &
-               v_surf_div_v_kh, s% ctrl% v_surf_div_v_kh_upper_limit, t_v_surf_div_v_kh_upper_limit)
+               v_surf_div_v_kh, s% v_surf_div_v_kh_upper_limit, t_v_surf_div_v_kh_upper_limit)
                
-         else if (v_surf_div_v_esc >= s% ctrl% v_surf_div_v_esc_limit) then 
+         else if (v_surf_div_v_esc >= s% v_surf_div_v_esc_limit) then 
             call compare_to_target('v_surf_div_v_esc >= v_surf_div_v_esc_limit', &
-               v_surf_div_v_esc, s% ctrl% v_surf_div_v_esc_limit, t_v_surf_div_v_esc_limit)
+               v_surf_div_v_esc, s% v_surf_div_v_esc_limit, t_v_surf_div_v_esc_limit)
                
-         else if (v_surf*1d-5 >= s% ctrl% v_surf_kms_limit) then 
+         else if (v_surf*1d-5 >= s% v_surf_kms_limit) then 
             call compare_to_target('v_surf_kms >= v_surf_kms_limit', &
-               v_surf*1d-5, s% ctrl% v_surf_kms_limit, t_v_surf_kms_limit)
+               v_surf*1d-5, s% v_surf_kms_limit, t_v_surf_kms_limit)
                
          else if (s% cumulative_extra_heating >= &
-                  s% ctrl% stop_when_reach_this_cumulative_extra_heating .and.&
-                  s% ctrl% stop_when_reach_this_cumulative_extra_heating > 0) then 
+                  s% stop_when_reach_this_cumulative_extra_heating .and.&
+                  s% stop_when_reach_this_cumulative_extra_heating > 0) then 
             call compare_to_target( &
                'cumulative_extra_heating >= limit', &
                s% cumulative_extra_heating, &
-               s% ctrl% stop_when_reach_this_cumulative_extra_heating, &
+               s% stop_when_reach_this_cumulative_extra_heating, &
                t_cumulative_extra_heating_limit)
                
-         else if (s% ctrl% stop_near_zams .and. &
-                  Lnuc_div_L >= s% ctrl% Lnuc_div_L_zams_limit) then
+         else if (s% stop_near_zams .and. &
+                  Lnuc_div_L >= s% Lnuc_div_L_zams_limit) then
             do_check_limits = terminate
             s% termination_code = t_Lnuc_div_L_zams_limit
             s% result_reason = result_reason_normal
             write(*, '(/,a,/, 99e20.10)') &
-               'stop because Lnuc_div_L >= Lnuc_div_L_zams_limit', Lnuc_div_L, s% ctrl% Lnuc_div_L_zams_limit
+               'stop because Lnuc_div_L >= Lnuc_div_L_zams_limit', Lnuc_div_L, s% Lnuc_div_L_zams_limit
                
-         else if (s% ctrl% stop_at_phase_PreMS .and. s% phase_of_evolution == phase_PreMS) then
+         else if (s% stop_at_phase_PreMS .and. s% phase_of_evolution == phase_PreMS) then
             do_check_limits = terminate
             s% termination_code = t_phase_PreMS
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_PreMS'
                
-         else if (s% ctrl% stop_at_phase_ZAMS .and. s% phase_of_evolution == phase_ZAMS) then
+         else if (s% stop_at_phase_ZAMS .and. s% phase_of_evolution == phase_ZAMS) then
             do_check_limits = terminate
             s% termination_code = t_phase_ZAMS
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_ZAMS'
                
-         else if (s% ctrl% stop_at_phase_IAMS .and. s% phase_of_evolution == phase_IAMS) then
+         else if (s% stop_at_phase_IAMS .and. s% phase_of_evolution == phase_IAMS) then
             do_check_limits = terminate
             s% termination_code = t_phase_IAMS
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_IAMS'
                
-         else if (s% ctrl% stop_at_phase_TAMS .and. s% phase_of_evolution == phase_TAMS) then
+         else if (s% stop_at_phase_TAMS .and. s% phase_of_evolution == phase_TAMS) then
             do_check_limits = terminate
             s% termination_code = t_phase_TAMS
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TAMS'
                
-         else if (s% ctrl% stop_at_phase_He_Burn .and. s% phase_of_evolution == phase_He_Burn) then
+         else if (s% stop_at_phase_He_Burn .and. s% phase_of_evolution == phase_He_Burn) then
             do_check_limits = terminate
             s% termination_code = t_phase_He_Burn
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_He_Burn'
                
-         else if (s% ctrl% stop_at_phase_ZACHeB .and. s% phase_of_evolution == phase_ZACHeB) then
+         else if (s% stop_at_phase_ZACHeB .and. s% phase_of_evolution == phase_ZACHeB) then
             do_check_limits = terminate
             s% termination_code = t_phase_ZACHeB
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_ZACHeB'
                
-         else if (s% ctrl% stop_at_phase_TACHeB .and. s% phase_of_evolution == phase_TACHeB) then
+         else if (s% stop_at_phase_TACHeB .and. s% phase_of_evolution == phase_TACHeB) then
             do_check_limits = terminate
             s% termination_code = t_phase_TACHeB
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TACHeB'
                
-         else if (s% ctrl% stop_at_phase_TP_AGB .and. s% phase_of_evolution == phase_TP_AGB) then
+         else if (s% stop_at_phase_TP_AGB .and. s% phase_of_evolution == phase_TP_AGB) then
             do_check_limits = terminate
             s% termination_code = t_phase_TP_AGB
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_TP_AGB'
                
-         else if (s% ctrl% stop_at_phase_C_Burn .and. s% phase_of_evolution == phase_C_Burn) then
+         else if (s% stop_at_phase_C_Burn .and. s% phase_of_evolution == phase_C_Burn) then
             do_check_limits = terminate
             s% termination_code = t_phase_C_Burn
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_C_Burn'
                
-         else if (s% ctrl% stop_at_phase_Ne_Burn .and. s% phase_of_evolution == phase_Ne_Burn) then
+         else if (s% stop_at_phase_Ne_Burn .and. s% phase_of_evolution == phase_Ne_Burn) then
             do_check_limits = terminate
             s% termination_code = t_phase_Ne_Burn
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_Ne_Burn'
                
-         else if (s% ctrl% stop_at_phase_O_Burn .and. s% phase_of_evolution == phase_O_Burn) then
+         else if (s% stop_at_phase_O_Burn .and. s% phase_of_evolution == phase_O_Burn) then
             do_check_limits = terminate
             s% termination_code = t_phase_O_Burn
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_O_Burn'
                
-         else if (s% ctrl% stop_at_phase_Si_Burn .and. s% phase_of_evolution == phase_Si_Burn) then
+         else if (s% stop_at_phase_Si_Burn .and. s% phase_of_evolution == phase_Si_Burn) then
             do_check_limits = terminate
             s% termination_code = t_phase_Si_Burn
             s% result_reason = result_reason_normal
             write(*, '(/,a,/)') 'stop because phase_of_evolution == phase_Si_Burn'
                
-         else if (s% ctrl% stop_at_phase_WDCS .and. s% phase_of_evolution == phase_WDCS) then
+         else if (s% stop_at_phase_WDCS .and. s% phase_of_evolution == phase_WDCS) then
             do_check_limits = terminate
             s% termination_code = t_phase_WDCS
             s% result_reason = result_reason_normal
@@ -1263,21 +1263,21 @@
          end if
 
          if (s% u_flag .or. s% v_flag) then ! Things that depend on hydro related quantities
-            if (s% shock_mass >= s% ctrl% shock_mass_upper_limit .and. s% ctrl% shock_mass_upper_limit > 0) then 
+            if (s% shock_mass >= s% shock_mass_upper_limit .and. s% shock_mass_upper_limit > 0) then 
                call compare_to_target('shock_mass >= shock_mass_upper_limit', &
-                  s% shock_mass, s% ctrl% shock_mass_upper_limit, t_shock_mass_upper_limit)
+                  s% shock_mass, s% shock_mass_upper_limit, t_shock_mass_upper_limit)
             end if
          end if
 
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_central_limits
-            if (s% ctrl% xa_central_lower_limit(j) <= 0) cycle
-            if (len_trim(s% ctrl% xa_central_lower_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_central_lower_limit_species(j))
+            if (s% xa_central_lower_limit(j) <= 0) cycle
+            if (len_trim(s% xa_central_lower_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_central_lower_limit_species(j))
             if (cid <= 0) then
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_central_lower_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_central_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_central_lower_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1286,10 +1286,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = center_avg_x(s,i)
-            if (avg_x < s% ctrl% xa_central_lower_limit(j)) then
+            if (avg_x < s% xa_central_lower_limit(j)) then
                call compare_to_target('have dropped below central lower limit for ' // &
-                     trim(s% ctrl% xa_central_lower_limit_species(j)), &
-                     avg_x, s% ctrl% xa_central_lower_limit(j), t_xa_central_lower_limit)
+                     trim(s% xa_central_lower_limit_species(j)), &
+                     avg_x, s% xa_central_lower_limit(j), t_xa_central_lower_limit)
                exit
             end if
          end do
@@ -1297,14 +1297,14 @@
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_central_limits
-            if (s% ctrl% xa_central_upper_limit(j) <= 0) cycle
-            if (s% ctrl% xa_central_upper_limit(j) >= 1) cycle
-            if (len_trim(s% ctrl% xa_central_upper_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_central_upper_limit_species(j))
+            if (s% xa_central_upper_limit(j) <= 0) cycle
+            if (s% xa_central_upper_limit(j) >= 1) cycle
+            if (len_trim(s% xa_central_upper_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_central_upper_limit_species(j))
             if (cid <= 0) then
                !cycle
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_central_upper_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_central_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_central_upper_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1313,10 +1313,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = center_avg_x(s,i)
-            if (avg_x > s% ctrl% xa_central_upper_limit(j)) then
+            if (avg_x > s% xa_central_upper_limit(j)) then
                call compare_to_target('have risen above central upper limit for ' // &
-                     trim(s% ctrl% xa_central_upper_limit_species(j)), &
-                     avg_x, s% ctrl% xa_central_upper_limit(j), t_xa_central_upper_limit)
+                     trim(s% xa_central_upper_limit_species(j)), &
+                     avg_x, s% xa_central_upper_limit(j), t_xa_central_upper_limit)
                exit
             end if
          end do
@@ -1324,12 +1324,12 @@
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_surface_limits
-            if (s% ctrl% xa_surface_lower_limit(j) <= 0) cycle
-            if (len_trim(s% ctrl% xa_surface_lower_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_surface_lower_limit_species(j))
+            if (s% xa_surface_lower_limit(j) <= 0) cycle
+            if (len_trim(s% xa_surface_lower_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_surface_lower_limit_species(j))
             if (cid <= 0) then
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_surface_lower_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_surface_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_surface_lower_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1338,10 +1338,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = surface_avg_x(s,i)
-            if (avg_x < s% ctrl% xa_surface_lower_limit(j)) then
+            if (avg_x < s% xa_surface_lower_limit(j)) then
                call compare_to_target('have dropped below surface lower limit for ' // &
-                     trim(s% ctrl% xa_surface_lower_limit_species(j)), &
-                     avg_x, s% ctrl% xa_surface_lower_limit(j), t_xa_surface_lower_limit)
+                     trim(s% xa_surface_lower_limit_species(j)), &
+                     avg_x, s% xa_surface_lower_limit(j), t_xa_surface_lower_limit)
                exit
             end if
          end do
@@ -1349,14 +1349,14 @@
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_surface_limits
-            if (s% ctrl% xa_surface_upper_limit(j) <= 0) cycle
-            if (s% ctrl% xa_surface_upper_limit(j) >= 1) cycle
-            if (len_trim(s% ctrl% xa_surface_upper_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_surface_upper_limit_species(j))
+            if (s% xa_surface_upper_limit(j) <= 0) cycle
+            if (s% xa_surface_upper_limit(j) >= 1) cycle
+            if (len_trim(s% xa_surface_upper_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_surface_upper_limit_species(j))
             if (cid <= 0) then
                !cycle
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_surface_upper_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_surface_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_surface_upper_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1365,10 +1365,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = surface_avg_x(s,i)
-            if (avg_x > s% ctrl% xa_surface_upper_limit(j)) then
+            if (avg_x > s% xa_surface_upper_limit(j)) then
                call compare_to_target('have risen above surface upper limit for ' // &
-                     trim(s% ctrl% xa_surface_upper_limit_species(j)), &
-                     avg_x, s% ctrl% xa_surface_upper_limit(j), t_xa_surface_upper_limit)
+                     trim(s% xa_surface_upper_limit_species(j)), &
+                     avg_x, s% xa_surface_upper_limit(j), t_xa_surface_upper_limit)
                exit
             end if
          end do
@@ -1376,13 +1376,13 @@
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_average_limits
-            if (s% ctrl% xa_average_lower_limit(j) <= 0) cycle
-            if (len_trim(s% ctrl% xa_average_lower_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_average_lower_limit_species(j))
+            if (s% xa_average_lower_limit(j) <= 0) cycle
+            if (len_trim(s% xa_average_lower_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_average_lower_limit_species(j))
             if (cid <= 0) then
                !cycle
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_average_lower_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_average_lower_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_average_lower_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1391,10 +1391,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = dot_product(s% dq(1:nz), s% xa(i,1:nz))
-            if (avg_x < s% ctrl% xa_average_lower_limit(j)) then
+            if (avg_x < s% xa_average_lower_limit(j)) then
                call compare_to_target('have dropped below average lower limit for ' // &
-                     trim(s% ctrl% xa_average_lower_limit_species(j)), &
-                     avg_x, s% ctrl% xa_average_lower_limit(j), t_xa_average_lower_limit)
+                     trim(s% xa_average_lower_limit_species(j)), &
+                     avg_x, s% xa_average_lower_limit(j), t_xa_average_lower_limit)
                exit
             end if
          end do
@@ -1402,13 +1402,13 @@
          if (do_check_limits /= keep_going) return
          
          do j=1,num_xa_average_limits
-            if (s% ctrl% xa_average_upper_limit(j) <= 0) cycle
-            if (s% ctrl% xa_average_upper_limit(j) >= 1) cycle
-            if (len_trim(s% ctrl% xa_average_upper_limit_species(j)) == 0) cycle
-            cid = chem_get_iso_id(s% ctrl% xa_average_upper_limit_species(j))
+            if (s% xa_average_upper_limit(j) <= 0) cycle
+            if (s% xa_average_upper_limit(j) >= 1) cycle
+            if (len_trim(s% xa_average_upper_limit_species(j)) == 0) cycle
+            cid = chem_get_iso_id(s% xa_average_upper_limit_species(j))
             if (cid <= 0) then
                write(*,'(A)')
-               write(*,2) '<' // trim(s% ctrl% xa_average_upper_limit_species(j)) // '>'
+               write(*,2) '<' // trim(s% xa_average_upper_limit_species(j)) // '>'
                write(*,2) 'is invalid for xa_average_upper_limit_species', j
                write(*,'(A)')
                do_check_limits = terminate
@@ -1417,10 +1417,10 @@
             i = s% net_iso(cid)
             if (i == 0) cycle
             avg_x = dot_product(s% dq(1:nz), s% xa(i,1:nz))
-            if (avg_x > s% ctrl% xa_average_upper_limit(j)) then
+            if (avg_x > s% xa_average_upper_limit(j)) then
                call compare_to_target('have risen above average upper limit for ' // &
-                     trim(s% ctrl% xa_average_upper_limit_species(j)), &
-                     avg_x, s% ctrl% xa_average_upper_limit(j), t_xa_average_upper_limit)
+                     trim(s% xa_average_upper_limit_species(j)), &
+                     avg_x, s% xa_average_upper_limit(j), t_xa_average_upper_limit)
                exit
             end if
          end do
@@ -1436,7 +1436,7 @@
             real(dp) :: err
             include 'formats'
             err = abs(value - target_value)/ &
-               (s% ctrl% when_to_stop_atol + s% ctrl% when_to_stop_rtol*max(abs(value),abs(target_value)))
+               (s% when_to_stop_atol + s% when_to_stop_rtol*max(abs(value),abs(target_value)))
             if (err > 1) then
                do_check_limits = redo
                s% dt = 0.5d0*s% dt
@@ -1526,15 +1526,15 @@
          
          logged = get_history_info(s, must_do_profile)
 
-         if (logged .and. s% ctrl% write_profiles_flag) then
-            if (s% model_number .eq. s% ctrl% profile_model &
-               .or. (s% ctrl% profile_interval > 0 .and. &
+         if (logged .and. s% write_profiles_flag) then
+            if (s% model_number .eq. s% profile_model &
+               .or. (s% profile_interval > 0 .and. &
                      (s% doing_first_model_of_run .or. &
-                     mod(s% model_number,s% ctrl% profile_interval) == 0))) then
-               if (s% ctrl% write_profiles_flag) must_do_profile = .true.
-               if (s% model_number == s% ctrl% profile_model .or. &
+                     mod(s% model_number,s% profile_interval) == 0))) then
+               if (s% write_profiles_flag) must_do_profile = .true.
+               if (s% model_number == s% profile_model .or. &
                    s% doing_first_model_of_run .or. &
-                   (mod(s% model_number, s% ctrl% priority_profile_interval) == 0)) then
+                   (mod(s% model_number, s% priority_profile_interval) == 0)) then
                   profile_priority = phase_priority
                end if
             end if

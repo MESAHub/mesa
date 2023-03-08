@@ -35,12 +35,12 @@
 ! here are the x controls used below
 
 !alpha_mlt_routine
-         !alpha_H = s% ctrl% x_ctrl(21)
-         !alpha_other = s% ctrl% x_ctrl(22)
-         !H_limit = s% ctrl% x_ctrl(23)
+         !alpha_H = s% x_ctrl(21)
+         !alpha_other = s% x_ctrl(22)
+         !H_limit = s% x_ctrl(23)
       
 ! test suite
-      ! s% ctrl% x_integer_ctrl(1)  part number (set to 0 to disable test suite checks)
+      ! s% x_integer_ctrl(1)  part number (set to 0 to disable test suite checks)
 
 
       contains
@@ -78,9 +78,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         alpha_H = s% ctrl% x_ctrl(21)
-         alpha_other = s% ctrl% x_ctrl(22)
-         H_limit = s% ctrl% x_ctrl(23)
+         alpha_H = s% x_ctrl(21)
+         alpha_other = s% x_ctrl(22)
+         H_limit = s% x_ctrl(23)
          h1 = s% net_iso(ih1)
          !write(*,1) 'alpha_H', alpha_H
          !write(*,1) 'alpha_other', alpha_other
@@ -125,7 +125,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         select case (s% ctrl% x_integer_ctrl(1)) 
+         select case (s% x_integer_ctrl(1)) 
 
          case(1) ! inlist_big_net
 

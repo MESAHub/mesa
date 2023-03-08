@@ -48,16 +48,16 @@
 
          if (s% super_eddington_wind_mdot /= 0 .and. s% super_eddington_wind_mdot > -s% mstar_dot) then
             ! NOTE: super_eddington should not be greater than max_wind
-            if (s% ctrl% max_wind > 0 .and. &
-                  s% ctrl% max_wind*Msun/secyer < s% super_eddington_wind_mdot) then
-               s% mstar_dot = -s% ctrl% max_wind*Msun/secyer
+            if (s% max_wind > 0 .and. &
+                  s% max_wind*Msun/secyer < s% super_eddington_wind_mdot) then
+               s% mstar_dot = -s% max_wind*Msun/secyer
             else
                s% mstar_dot = -s% super_eddington_wind_mdot
             end if
          else if (delta_m == 0 &
-            .or. (delta_m < 0 .and. s% star_mass <= s% ctrl% min_star_mass_for_loss) &
-            .or. (delta_m > 0 .and. s% ctrl% max_star_mass_for_gain > 0 &
-                  .and. s% star_mass >= s% ctrl% max_star_mass_for_gain)) then
+            .or. (delta_m < 0 .and. s% star_mass <= s% min_star_mass_for_loss) &
+            .or. (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
+                  .and. s% star_mass >= s% max_star_mass_for_gain)) then
             s% mstar_dot = 0d0
          end if
 
@@ -253,13 +253,13 @@
             call mesa_error(__FILE__,__LINE__,'do_adjust_mass')
          end if
 
-         if (delta_m > 0 .and. s% ctrl% max_star_mass_for_gain > 0 &
-               .and. new_mstar > Msun*s% ctrl% max_star_mass_for_gain) then
-            new_mstar = Msun*s% ctrl% max_star_mass_for_gain
+         if (delta_m > 0 .and. s% max_star_mass_for_gain > 0 &
+               .and. new_mstar > Msun*s% max_star_mass_for_gain) then
+            new_mstar = Msun*s% max_star_mass_for_gain
             delta_m = new_mstar - old_mstar
             s% mstar_dot = delta_m/dt
-         else if (delta_m < 0 .and. new_mstar < Msun*s% ctrl% min_star_mass_for_loss) then
-            new_mstar = Msun*s% ctrl% min_star_mass_for_loss
+         else if (delta_m < 0 .and. new_mstar < Msun*s% min_star_mass_for_loss) then
+            new_mstar = Msun*s% min_star_mass_for_loss
             delta_m = new_mstar - old_mstar
             s% mstar_dot = delta_m/dt
          end if
@@ -327,7 +327,7 @@
             s, nz, old_xmstar, new_xmstar, delta_m, k_const_mass, ierr)
          if (ierr /= 0) then
             s% retry_message = 'revise_q_and_dq failed in adjust mass'
-            if (s% ctrl% report_ierr) write(*,*) s% retry_message
+            if (s% report_ierr) write(*,*) s% retry_message
             call dealloc
             return
          end if
@@ -388,7 +388,7 @@
          if (delta_m < 0) then
             xaccrete(1:species) = 0 ! xaccrete not used when removing mass
          else ! set xaccrete for composition of added material
-            if (s% ctrl% accrete_same_as_surface) then
+            if (s% accrete_same_as_surface) then
                do j=1,species
                   xaccrete(j) = xa_old(j,1)
                end do
@@ -396,7 +396,7 @@
                call get_xa_for_accretion(s, xaccrete, ierr)
                if (ierr /= 0) then
                   s% retry_message = 'get_xa_for_accretion failed in adjust mass'
-                  if (s% ctrl% report_ierr) write(*, *) s% retry_message
+                  if (s% report_ierr) write(*, *) s% retry_message
                   call dealloc
                   return
                end if
@@ -431,7 +431,7 @@
             rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, ierr)
          if (ierr /= 0) then
             s% retry_message = 'set_xa failed in adjust mass'
-            if (s% ctrl% report_ierr) write(*,*) s% retry_message
+            if (s% report_ierr) write(*,*) s% retry_message
             call dealloc
             return
          end if
@@ -446,15 +446,15 @@
                ierr)
             if (ierr /= 0) then
                s% retry_message = 'set_omega_adjust_mass failed in adjust mass'
-               if (s% ctrl% report_ierr) write(*,*) s% retry_message
+               if (s% report_ierr) write(*,*) s% retry_message
                call dealloc
                return
             end if
-            if (s% ctrl% do_adjust_J_lost) then
+            if (s% do_adjust_J_lost) then
                call adjust_J_lost(s, k_below_just_added, starting_j_rot_surf, ierr)
                if (ierr /= 0) then
                   s% retry_message = 'do_adjust_J_lost failed in adjust mass'
-                  if (s% ctrl% report_ierr) write(*,*) s% retry_message
+                  if (s% report_ierr) write(*,*) s% retry_message
                   call dealloc
                   return
                end if
@@ -466,7 +466,7 @@
                   s% D_omega, oldloc, newloc, oldval, newval, work, ierr)
                if (ierr /= 0) then
                   s% retry_message = 'set_D_omega failed in adjust mass'
-                  if (s% ctrl% report_ierr) write(*,*) s% retry_message
+                  if (s% report_ierr) write(*,*) s% retry_message
                   call dealloc
                   return
                end if
@@ -478,7 +478,7 @@
                   s% am_nu_rot, oldloc, newloc, oldval, newval, work, ierr)
                if (ierr /= 0) then
                   s% retry_message = 'set_am_nu_rot failed in adjust mass'
-                  if (s% ctrl% report_ierr) write(*,*) s% retry_message
+                  if (s% report_ierr) write(*,*) s% retry_message
                   call dealloc
                   return
                end if
@@ -486,15 +486,15 @@
          end if
 
          ! soften outer xa    (Pablo -- this should be the very last step)
-         if (s% ctrl% smooth_outer_xa_big > 0.0d0 .and. s% ctrl% smooth_outer_xa_small > 0.0d0) then
+         if (s% smooth_outer_xa_big > 0.0d0 .and. s% smooth_outer_xa_small > 0.0d0) then
             m = 1
             do k = 1, s% nz
-               if (s% m(1) - s% m(k) > s% ctrl% smooth_outer_xa_big * s% m(1)) exit
+               if (s% m(1) - s% m(k) > s% smooth_outer_xa_big * s% m(1)) exit
                region_total_mass = 0
                m = k
                do l = k, s% nz
-                  if (s% m(k) - s% m(l) > s% ctrl% smooth_outer_xa_small * s% m(1) * &
-                     (1-(s% m(1) - s% m(k))/(s% ctrl% smooth_outer_xa_big * s% m(1)))) exit
+                  if (s% m(k) - s% m(l) > s% smooth_outer_xa_small * s% m(1) * &
+                     (1-(s% m(1) - s% m(k))/(s% smooth_outer_xa_big * s% m(1)))) exit
                   m = l
                   region_total_mass = region_total_mass + s% dm(l)
                end do
@@ -658,14 +658,14 @@
 
          okay_to_move_kB_inward = .false.
 
-         lnTlim_A = ln10*s% ctrl% max_logT_for_k_below_const_q
-         lnTlim_B = ln10*s% ctrl% max_logT_for_k_const_mass
+         lnTlim_A = ln10*s% max_logT_for_k_below_const_q
+         lnTlim_B = ln10*s% max_logT_for_k_const_mass
          
          q1 = old_xmstar
          q2 = new_xmstar
          mold_o_mnew_qp = q1/q2
          mold_o_mnew = mold_o_mnew_qp
-         s% ctrl% max_q_for_k_below_const_q = mold_o_mnew
+         s% max_q_for_k_below_const_q = mold_o_mnew
          dqacc = delta_m / new_xmstar
 
          ! might have drifted away from summing to 1 in mesh adjustment, fix up
@@ -696,40 +696,40 @@
          lnTmax = get_lnT_from_xh(s, k)
          lnT_A = min(lnTmax, lnTlim_A)
          
-         if (is_bad(s% ctrl% max_q_for_k_below_const_q)) then
-            write(*,*) 's% ctrl% max_q_for_k_below_const_q', s% ctrl% max_q_for_k_below_const_q
+         if (is_bad(s% max_q_for_k_below_const_q)) then
+            write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
-         if (is_bad(s% ctrl% min_q_for_k_below_const_q)) then
-            write(*,*) 's% ctrl% min_q_for_k_below_const_q', s% ctrl% min_q_for_k_below_const_q
+         if (is_bad(s% min_q_for_k_below_const_q)) then
+            write(*,*) 's% min_q_for_k_below_const_q', s% min_q_for_k_below_const_q
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          
          kA = min_kA
          do k = min_kA, nz-1
             kA = k
-            if ( (1-xq(k)) > s% ctrl% max_q_for_k_below_const_q) cycle
-            if ( 1.0d0-xq(k) <= s% ctrl% min_q_for_k_below_const_q) exit
+            if ( (1-xq(k)) > s% max_q_for_k_below_const_q) cycle
+            if ( 1.0d0-xq(k) <= s% min_q_for_k_below_const_q) exit
             if (get_lnT_from_xh(s, k) >= lnT_A) exit
          end do
          xqA = xq(kA)
 
          lnT_B = min(lnTmax, lnTlim_B)
          
-         if (is_bad(s% ctrl% max_q_for_k_const_mass)) then
-            write(*,*) 's% ctrl% max_q_for_k_const_mass', s% ctrl% max_q_for_k_const_mass
+         if (is_bad(s% max_q_for_k_const_mass)) then
+            write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
-         if (is_bad(s% ctrl% min_q_for_k_const_mass)) then
-            write(*,*) 's% ctrl% min_q_for_k_const_mass', s% ctrl% min_q_for_k_const_mass
+         if (is_bad(s% min_q_for_k_const_mass)) then
+            write(*,*) 's% min_q_for_k_const_mass', s% min_q_for_k_const_mass
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
 
          kB = kA+1
          do k = kB, nz
             kB = k
-            if ( (1-xq(k)) > s% ctrl% max_q_for_k_const_mass) cycle
-            if ( (1-xq(k)) <= s% ctrl% min_q_for_k_const_mass) exit
+            if ( (1-xq(k)) > s% max_q_for_k_const_mass) cycle
+            if ( (1-xq(k)) <= s% min_q_for_k_const_mass) exit
             if (get_lnT_from_xh(s, k) >= lnT_B) exit
          end do
 
@@ -876,7 +876,7 @@
             call set1_xa(s, k, nz, species, xa_old, xaccrete, &
                old_cell_xbdy, new_cell_xbdy, mmax, old_cell_mass, new_cell_mass, op_err)
             if (op_err /= 0) then
-               if (s% ctrl% report_ierr) write(*,2) 'set1_xa error', k
+               if (s% report_ierr) write(*,2) 'set1_xa error', k
                ierr = op_err
             end if
          end do
@@ -1185,16 +1185,16 @@
 
          if (k_below_just_added > 1) then
             ! set omega in cells with newly added material
-            if (s% ctrl% use_accreted_material_j) then
+            if (s% use_accreted_material_j) then
                actual_total_added = 0d0
                do k=1,k_below_just_added-2 ! remaining 2 done below
-                  s% j_rot(k) = s% ctrl% accreted_material_j
+                  s% j_rot(k) = s% accreted_material_j
                   call set1_irot(s, k, k_below_just_added, .true.)
                   s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                   actual_total_added = actual_total_added + s% j_rot(k)*new_dmbar(k)
                end do
                k = k_below_just_added
-               goal_total_added = delta_m*s% ctrl% accreted_material_j
+               goal_total_added = delta_m*s% accreted_material_j
                goal_total = old_j_tot + goal_total_added
                inner_total = dot_product(s% j_rot(k+1:nz),new_dmbar(k+1:nz))
                outer_total = dot_product(s% j_rot(1:k-2),new_dmbar(1:k-2))
@@ -1222,12 +1222,12 @@
          do k=1,nz
             if (is_bad(s% omega(k)) .or. &
               abs(s% omega(k)) > 1d50) then
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
 !$OMP critical (star_adjust_mass_omega)
                   write(*,2) 's% omega(k)', k, s% omega(k)
 !$OMP end critical (star_adjust_mass_omega)
                end if
-               if (s% ctrl% stop_for_bad_nums) then
+               if (s% stop_for_bad_nums) then
                   write(*,2) 's% omega(k)', k, s% omega(k)
                   call mesa_error(__FILE__,__LINE__,'set_omega_adjust_mass')
                end if
@@ -1259,10 +1259,10 @@
          ! omega or j_rot is known.
          if (jrot_known) then
             w_div_wcrit_roche = w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-               s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          else
             w_div_wcrit_roche = w_div_w_roche_omega(r00,s% m(k),s% omega(k),s% cgrav(k), &
-               s% ctrl% w_div_wcrit_max, s% ctrl% w_div_wcrit_max2, s% w_div_wc_flag)
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
          end if
 
          call eval_i_rot(s, k, r00, w_div_wcrit_roche, s% i_rot(k))
@@ -1505,7 +1505,7 @@
          if (mass_lost <= 0) return
 
          ! can use a different j to account for things like wind braking
-         if (s% ctrl% use_other_j_for_adjust_J_lost) then
+         if (s% use_other_j_for_adjust_J_lost) then
             call s% other_j_for_adjust_J_lost(s% id, starting_j_rot_surf, j_for_mass_loss, ierr)
             if (ierr /= 0) then
                write(*,*) "Error in other_j_for_adjust_J_lost"
@@ -1516,8 +1516,8 @@
          end if
 
          actual_J_lost = &
-            s% ctrl% adjust_J_fraction*mass_lost*j_for_mass_loss + &
-            (1d0 - s% ctrl% adjust_J_fraction)*s% angular_momentum_removed
+            s% adjust_J_fraction*mass_lost*j_for_mass_loss + &
+            (1d0 - s% adjust_J_fraction)*s% angular_momentum_removed
          delta_J = actual_J_lost - s% angular_momentum_removed
 
          if (delta_J == 0d0) then
@@ -1534,8 +1534,8 @@
             dm00 = s% dm(k)
             dm = 0.5d0*(dmm1+dm00)
             J = J + dm*s% j_rot(k)
-            if (J < s% ctrl% min_J_div_delta_J*abs(delta_J) &
-               .or. s% q(k) > s% ctrl% min_q_for_adjust_J_lost) cycle
+            if (J < s% min_J_div_delta_J*abs(delta_J) &
+               .or. s% q(k) > s% min_q_for_adjust_J_lost) cycle
             last_k = k
             exit
          end do

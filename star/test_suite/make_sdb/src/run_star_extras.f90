@@ -68,13 +68,13 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
 
-         h_upper_limit = s% ctrl% x_ctrl(1)
+         h_upper_limit = s% x_ctrl(1)
          h_env_mass = s% star_mass - s% he_core_mass
 
          if(h_env_mass < h_upper_limit) then
             ! Turn off winds because already below specified threshold.
-            s% ctrl% Reimers_scaling_factor = 0d0
-            s% ctrl% Blocker_scaling_factor = 0d0
+            s% Reimers_scaling_factor = 0d0
+            s% Blocker_scaling_factor = 0d0
          end if         
       end subroutine extras_startup
       
@@ -101,20 +101,20 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         h_upper_limit = s% ctrl% x_ctrl(1)
-         h_lower_limit = (1d0 - s% ctrl% x_ctrl(2))*h_upper_limit
+         h_upper_limit = s% x_ctrl(1)
+         h_lower_limit = (1d0 - s% x_ctrl(2))*h_upper_limit
          
          h_env_mass = s% star_mass - s% he_core_mass
 
          if(h_env_mass > h_upper_limit) then
             extras_check_model = keep_going
-         else if(h_env_mass < h_lower_limit .and. s% ctrl% Reimers_scaling_factor > 0d0) then
+         else if(h_env_mass < h_lower_limit .and. s% Reimers_scaling_factor > 0d0) then
             write(*,*) "M_env/target =", h_env_mass/h_lower_limit
             write(*,*) "Envelope mass outside tolerance, retrying."
             extras_check_model = retry
          else ! Turn off winds and finish the run
-            s% ctrl% Reimers_scaling_factor = 0d0
-            s% ctrl% Blocker_scaling_factor = 0d0
+            s% Reimers_scaling_factor = 0d0
+            s% Blocker_scaling_factor = 0d0
             extras_check_model = keep_going
          end if
       end function extras_check_model

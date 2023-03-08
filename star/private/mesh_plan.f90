@@ -136,8 +136,8 @@
             end if
          end do
 
-         if (s% ctrl% set_min_D_mix) then
-            D_mix_cutoff = s% ctrl% min_D_mix
+         if (s% set_min_D_mix) then
+            D_mix_cutoff = s% min_D_mix
          else
             D_mix_cutoff = 0
          end if
@@ -507,19 +507,19 @@
                rR = s% r(k_old)
                rL = s% r(k_old+1)
                dr_old = rR - rL
-               min_dr = s% csound(k_old)*s% ctrl% mesh_min_dr_div_cs
+               min_dr = s% csound(k_old)*s% mesh_min_dr_div_cs
                if (dr_old*dq_new/dq_old(k_old) < 2*min_dr) then
                   return ! sound crossing time would be too small
                end if
 
-               min_dr = s% ctrl% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
+               min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
                if (dr_old*dq_new/dq_old(k_old) < 2*min_dr) then
                   return ! new dr would be too small
                end if
 
-               if (s% ctrl% mesh_min_dlnR > 0d0) then
+               if (s% mesh_min_dlnR > 0d0) then
                   dlnR_new = log((rL + dr_old*dq_new/dq_old(k_old))/rL)
-                  if (dlnR_new < 2*s% ctrl% mesh_min_dlnR) then
+                  if (dlnR_new < 2*s% mesh_min_dlnR) then
                      ! the factor of 2 is a safety margin.
                      return
                   end if
@@ -624,7 +624,7 @@
             k_old = 1
             k_new = 1
             xq_new(1) = 0
-            min_dr = s% ctrl% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
+            min_dr = s% mesh_min_dr_div_dRstar*(s% r(1) - s% R_center)
 
             do ! pick next point location
 
@@ -650,13 +650,13 @@
                end if
                
                if (s% gradr(k_old) > s% grada(k_old) .and. &
-                     s% ctrl% min_dq_for_xa_convective > 0d0) then
-                  min_dq_for_xa = s% ctrl% min_dq_for_xa_convective
+                     s% min_dq_for_xa_convective > 0d0) then
+                  min_dq_for_xa = s% min_dq_for_xa_convective
                else
-                  min_dq_for_xa = s% ctrl% min_dq_for_xa
+                  min_dq_for_xa = s% min_dq_for_xa
                end if
                
-               min_dq_for_logT = s% ctrl% min_dq_for_logT
+               min_dq_for_logT = s% min_dq_for_logT
 
                next_dq = pick_next_dq(s, &
                   dbg, next_dq_max, k_old, k_new, nz_old, num_gvals, &
@@ -744,7 +744,7 @@
                            maxval_delta_xa = maxval(abs(s% xa(:,kk)-s% xa(:,kk-1)))
                            j00 = maxloc(s% xa(:,kk),dim=1)
                            jm1 = maxloc(s% xa(:,kk-1),dim=1)
-                           if (maxval_delta_xa > s% ctrl% max_delta_x_for_merge .or. &
+                           if (maxval_delta_xa > s% max_delta_x_for_merge .or. &
                                j00 /= jm1 .or. is_convective_boundary(kk) .or. &
                                is_crystal_boundary(kk)) then
                               ! don't merge across convective or crystal boundary
@@ -782,32 +782,32 @@
 
                      if (dq_old(k_old) < min_dq) then
                         force_merge_with_one_more = .true.
-                     else if (s% ctrl% merge_if_dlnR_too_small) then
+                     else if (s% merge_if_dlnR_too_small) then
                         if (xq_new(k_new) <= xq_old(k_old) .and. &
-                            s% lnR(k_old) - s% lnR(k_old_next) < s% ctrl% mesh_min_dlnR) then
+                            s% lnR(k_old) - s% lnR(k_old_next) < s% mesh_min_dlnR) then
                            force_merge_with_one_more = .true.
                         else if (k_old_next == nz_old .and. s% R_center > 0) then
-                           force_merge_with_one_more = s% lnR(k_old_next) - log(s% R_center) < s% ctrl% mesh_min_dlnR
+                           force_merge_with_one_more = s% lnR(k_old_next) - log(s% R_center) < s% mesh_min_dlnR
                         end if
                      end if
 
-                     if ((.not. force_merge_with_one_more) .and. s% ctrl% merge_if_dr_div_cs_too_small) then
+                     if ((.not. force_merge_with_one_more) .and. s% merge_if_dr_div_cs_too_small) then
                         if (xq_new(k_new) <= xq_old(k_old) .and. &
-                            s% r(k_old) - s% r(k_old_next) < s% ctrl% mesh_min_dr_div_cs*s% csound(k_old)) then
+                            s% r(k_old) - s% r(k_old_next) < s% mesh_min_dr_div_cs*s% csound(k_old)) then
                            force_merge_with_one_more = .true.
                         else if (k_old_next == nz_old) then
                            force_merge_with_one_more = (s% r(k_old_next) - s% R_center) < &
-                                       s% ctrl% mesh_min_dr_div_cs*s% csound(k_old_next)
+                                       s% mesh_min_dr_div_cs*s% csound(k_old_next)
                            if (force_merge_with_one_more .and. dbg) &
                               write(*,3) 'do merge for k_old_next == nz_old', k_old, k_old_next, &
                                  s% r(k_old) - s% R_center, &
-                                 s% ctrl% mesh_min_dr_div_cs*s% csound(k_old_next), &
-                                 s% ctrl% mesh_min_dr_div_cs, s% csound(k_old_next)
+                                 s% mesh_min_dr_div_cs*s% csound(k_old_next), &
+                                 s% mesh_min_dr_div_cs, s% csound(k_old_next)
                         end if
                      end if
 
                      if ((.not. force_merge_with_one_more) .and. &
-                           s% ctrl% merge_if_dr_div_dRstar_too_small) then
+                           s% merge_if_dr_div_dRstar_too_small) then
                         if (xq_new(k_new) <= xq_old(k_old) .and. &
                             s% r(k_old) - s% r(k_old_next) < min_dr) then
                            force_merge_with_one_more = .true.
@@ -915,7 +915,7 @@
 
          logical function is_crystal_boundary(kk)
             integer, intent(in) :: kk
-            if(s% ctrl% do_phase_separation .and. & ! only need this protection when phase separation is on
+            if(s% do_phase_separation .and. & ! only need this protection when phase separation is on
                  s% m(kk) <= s% crystal_core_boundary_mass .and. &
                  s% m(kk-1) >= s% crystal_core_boundary_mass) then
                is_crystal_boundary = .true.
@@ -1097,7 +1097,7 @@
                   write(*,2) 'dq_sum', k, dq_sum
                   write(*,*) 'pick1_dq'
                   ierr = -1
-                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                   return
                end if
                if (dq_sum >= next_dq_max) exit
@@ -1146,7 +1146,7 @@
                write(*,2) 'dq_old(k-1)', k, dq_old(k-1)
                write(*,*) 'pick1_dq'
                ierr = -1
-               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'mesh plan')
                return
             end if
             if (xq_old(k-1) >= xq_new(k_new)) then

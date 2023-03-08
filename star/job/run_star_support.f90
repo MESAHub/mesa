@@ -394,21 +394,21 @@
          if (failed('pgstar_env_check',ierr)) return        
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
-         if (s% ctrl% solver_test_atm_partials .or. s% ctrl% solver_test_eos_partials .or. &
-               s% ctrl% solver_test_kap_partials .or. s% ctrl% solver_test_net_partials) then
-            if (s% ctrl% solver_test_partials_k > 0 .and. s% ctrl% solver_test_partials_dx_0 > 0) then
+         if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. &
+               s% solver_test_kap_partials .or. s% solver_test_net_partials) then
+            if (s% solver_test_partials_k > 0 .and. s% solver_test_partials_dx_0 > 0) then
                write(*,*) 'Forcing single-thread mode for testing of module-level partials'
                call omp_set_num_threads(1)
             end if
          end if
          
-         if (len_trim(s% ctrl% op_mono_data_path) == 0) &
+         if (len_trim(s% op_mono_data_path) == 0) &
             call get_environment_variable( &
-               "MESA_OP_MONO_DATA_PATH", s% ctrl% op_mono_data_path)
+               "MESA_OP_MONO_DATA_PATH", s% op_mono_data_path)
          
-         if (len_trim(s% ctrl% op_mono_data_cache_filename) == 0) &
+         if (len_trim(s% op_mono_data_cache_filename) == 0) &
             call get_environment_variable( &
-               "MESA_OP_MONO_DATA_CACHE_FILENAME", s% ctrl% op_mono_data_cache_filename)         
+               "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
 
          s% extras_startup => null_extras_startup
          s% extras_check_model => null_extras_check_model
@@ -425,7 +425,7 @@
          if (ierr /= 0) return
 
          if (restart_filename /= "restart_photo") then
-            temp_fname  = trim(s% ctrl% photo_directory) // '/' // trim(restart_filename)
+            temp_fname  = trim(s% photo_directory) // '/' // trim(restart_filename)
             restart_filename  = trim(temp_fname)
          end if
 
@@ -576,7 +576,7 @@
             if (failed('extend_net',ierr)) return
          end if
          
-         if (s% ctrl% use_other_remove_surface) then
+         if (s% use_other_remove_surface) then
             call s% other_remove_surface(id, ierr, j)
             if (failed('other_remove_surface',ierr)) return
             if (j > 0) then
@@ -629,7 +629,7 @@
          if (failed('get_model_number',ierr)) return
          
          if (s% star_age < s% job% set_cumulative_energy_error_each_step_if_age_less_than) then
-            if (mod(model_number, s% ctrl% terminal_interval) == 0) &
+            if (mod(model_number, s% terminal_interval) == 0) &
                write(*,1) 'cumulative_energy_error reset to', s% job% new_cumulative_energy_error
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
@@ -693,18 +693,18 @@
 
          if(s% total_energy_end .ne. 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
-                  s% ctrl% warn_when_large_rel_run_E_err) then
+                  s% warn_when_large_rel_run_E_err) then
                write(*,2) 'WARNING: rel_run_E_err', &
                   s% model_number, abs(s% cumulative_energy_error/s% total_energy_end)
             end if
          end if
          
-         if (.not. (s% rotation_flag .or. s% u_flag .or. s% ctrl% use_mass_corrections &
+         if (.not. (s% rotation_flag .or. s% u_flag .or. s% use_mass_corrections &
                .or. s% v_flag .or. s% m_center > 0 .or. s% star_mdot /= 0d0)) then
             tmp = abs(1d0 + s% total_gravitational_energy_end/s% virial_thm_P_avg)
-            if (tmp > s% ctrl% warn_when_large_virial_thm_rel_err) then
+            if (tmp > s% warn_when_large_virial_thm_rel_err) then
                write(*,2) 'WARNING: virial_thm_rel_err', &
-                  s% model_number, tmp, s% ctrl% warn_when_large_virial_thm_rel_err, &
+                  s% model_number, tmp, s% warn_when_large_virial_thm_rel_err, &
                   abs(s% total_gravitational_energy_end), s% virial_thm_P_avg
             end if
          end if
@@ -746,7 +746,7 @@
          
          if (result == keep_going) then 
             call adjust_tau_factor(s)
-            if (s% L_nuc_burn_total/s% L_phot >= s% ctrl% Lnuc_div_L_zams_limit &
+            if (s% L_nuc_burn_total/s% L_phot >= s% Lnuc_div_L_zams_limit &
                   .and. .not. s% rotation_flag) then  
                call do_rotation_near_zams(s,ierr)
                if (ierr /= 0) return
@@ -1091,20 +1091,20 @@
          type (star_info), pointer :: s         
          real(dp) :: next
          include 'formats'
-         write(*,*) 'relax_to_this_Tsurf_factor < s% ctrl% Tsurf_factor', &
-            s% job% relax_to_this_Tsurf_factor < s% ctrl% Tsurf_factor
+         write(*,*) 'relax_to_this_Tsurf_factor < s% Tsurf_factor', &
+            s% job% relax_to_this_Tsurf_factor < s% Tsurf_factor
          write(*,1) 'relax_to_this_Tsurf_factor', s% job% relax_to_this_Tsurf_factor
-         write(*,1) 's% ctrl% Tsurf_factor', s% ctrl% Tsurf_factor
-         if (s% job% relax_to_this_Tsurf_factor < s% ctrl% Tsurf_factor) then
-            next = exp10(safe_log10(s% ctrl% Tsurf_factor) - s% job% dlogTsurf_factor)
+         write(*,1) 's% Tsurf_factor', s% Tsurf_factor
+         if (s% job% relax_to_this_Tsurf_factor < s% Tsurf_factor) then
+            next = exp10(safe_log10(s% Tsurf_factor) - s% job% dlogTsurf_factor)
             if (next < s% job% relax_to_this_Tsurf_factor) &
                next = s% job% relax_to_this_Tsurf_factor
          else
-            next = exp10(safe_log10(s% ctrl% Tsurf_factor) + s% job% dlogTsurf_factor)
+            next = exp10(safe_log10(s% Tsurf_factor) + s% job% dlogTsurf_factor)
             if (next > s% job% relax_to_this_Tsurf_factor) &
                next = s% job% relax_to_this_Tsurf_factor
          end if
-         s% ctrl% Tsurf_factor = next
+         s% Tsurf_factor = next
          write(*,1) 'relax_Tsurf_factor', next, s% job% relax_to_this_Tsurf_factor
       end subroutine relax_Tsurf_factor
 
@@ -1115,13 +1115,13 @@
          character (len=200) :: fname
          integer :: iounit, ierr
          ierr = 0
-         if (s% ctrl% warn_when_large_rel_run_E_err < 1d2) then
+         if (s% warn_when_large_rel_run_E_err < 1d2) then
             fname = trim(mesa_dir) // '/stop_warnings_for_rel_E_err'
             open(newunit=iounit, file=trim(fname), &
                status='old', action='read', iostat=ierr)
             if (ierr == 0) then
                close(iounit)
-               s% ctrl% warn_when_large_rel_run_E_err = 1d99
+               s% warn_when_large_rel_run_E_err = 1d99
                write(*,*) 'turn off warnings for rel_run_E_err'
             end if
          end if
@@ -1279,9 +1279,9 @@
          end if
          
          if (s% model_number == s% job% save_pulse_data_for_model_number) then
-            call star_export_pulse_data(id, s% ctrl% pulse_data_format, s%job%save_pulse_data_filename, &
-                 s% ctrl% add_center_point_to_pulse_data, s% ctrl% keep_surface_point_for_pulse_data, &
-                 s% ctrl% add_atmosphere_to_pulse_data, ierr)
+            call star_export_pulse_data(id, s%pulse_data_format, s%job%save_pulse_data_filename, &
+                 s%add_center_point_to_pulse_data, s%keep_surface_point_for_pulse_data, &
+                 s%add_atmosphere_to_pulse_data, ierr)
             if (failed('star_export_pulse_data',ierr)) return
             write(*, *) 'pulsation data saved to ' // &
                trim(s% job% save_pulse_data_filename)
@@ -1730,7 +1730,7 @@
          if (failed('atm_tau_base',ierr)) return
 
          call rates_warning_init( &
-            s% ctrl% warn_rates_for_high_temp, s% ctrl% max_safe_logT_for_rates)
+            s% warn_rates_for_high_temp, s% max_safe_logT_for_rates)
 
       end subroutine do_star_job_controls_before
 
@@ -2141,7 +2141,7 @@
          if (s% job% set_Tsurf_factor .or. &
                (s% job% set_initial_Tsurf_factor .and. .not. restart)) then
             write(*,1) 'set_Tsurf_factor', s% job% set_to_this_Tsurf_factor
-            s% ctrl% Tsurf_factor = s% job% set_to_this_Tsurf_factor
+            s% Tsurf_factor = s% job% set_to_this_Tsurf_factor
          end if
          
          if (s% job% set_initial_age .and. .not. restart) then
@@ -2173,12 +2173,12 @@
 
          ! enforce max_timestep on first step
 
-         if (s% ctrl% max_years_for_timestep > 0) then
-            max_timestep = secyer*s% ctrl% max_years_for_timestep
-            if (s% ctrl% max_timestep > 0 .and. s% ctrl% max_timestep < max_timestep) &
-                 max_timestep = s% ctrl% max_timestep
+         if (s% max_years_for_timestep > 0) then
+            max_timestep = secyer*s% max_years_for_timestep
+            if (s% max_timestep > 0 .and. s% max_timestep < max_timestep) &
+                 max_timestep = s% max_timestep
          else
-            max_timestep = s% ctrl% max_timestep
+            max_timestep = s% max_timestep
          end if
 
          if (max_timestep > 0 .and. max_timestep < s% dt_next) then
@@ -2198,10 +2198,10 @@
          end if
 
          if (s% job% steps_to_take_before_terminate >= 0) then
-            s% ctrl% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
+            s% max_model_number = s% model_number + s% job% steps_to_take_before_terminate
             write(*,2) 'steps_to_take_before_terminate', &
                s% job% steps_to_take_before_terminate
-            write(*,2) 'max_model_number', s% ctrl% max_model_number
+            write(*,2) 'max_model_number', s% max_model_number
          end if
 
          if (s% job% steps_before_start_timing > 0) then
@@ -2539,8 +2539,8 @@
          if (s% job% set_irradiation .or. &
                (s% job% set_initial_irradiation .and. .not. restart)) then
             write(*,2) 'set_irradiation'
-            s% ctrl% irradiation_flux = s% job% set_to_this_irrad_flux
-            s% ctrl% column_depth_for_irradiation = s% job% irrad_col_depth
+            s% irradiation_flux = s% job% set_to_this_irrad_flux
+            s% column_depth_for_irradiation = s% job% irrad_col_depth
          end if
          
          if (s% job% do_special_test) then
@@ -2567,7 +2567,7 @@
          ! (Warrick Ball pointed out this requirement)
          if (s% job% relax_initial_Z .and. .not. restart) then
             write(*,1) 'relax_initial_Z', s% job% new_Z
-            call star_relax_Z(id, s% job% new_Z, s% ctrl% relax_dlnZ, &
+            call star_relax_Z(id, s% job% new_Z, s% relax_dlnZ, &
                s% job% relax_Z_minq, s% job% relax_Z_maxq, ierr)
             if (failed('star_relax_Z',ierr)) return
             write(*, 1) 'new z', get_current_z(id, ierr)
@@ -2576,7 +2576,7 @@
 
          if (s% job% relax_Z) then
             write(*,1) 'relax_Z', s% job% new_Z
-            call star_relax_Z(id, s% job% new_Z, s% ctrl% relax_dlnZ, &
+            call star_relax_Z(id, s% job% new_Z, s% relax_dlnZ, &
                s% job% relax_Z_minq, s% job% relax_Z_maxq, ierr)
             if (failed('star_relax_Z',ierr)) return
             write(*, 1) 'new z', get_current_z(id, ierr)
@@ -2585,7 +2585,7 @@
 
          if (s% job% relax_initial_Y .and. .not. restart) then
             write(*,1) 'relax_initial_Y', s% job% new_Y
-            call star_relax_Y(id, s% job% new_Y, s% ctrl% relax_dY, &
+            call star_relax_Y(id, s% job% new_Y, s% relax_dY, &
                s% job% relax_Y_minq, s% job% relax_Y_maxq, ierr)
             if (failed('star_relax_Y',ierr)) return
             write(*, 1) 'new y', get_current_y(id, ierr)
@@ -2594,7 +2594,7 @@
 
          if (s% job% relax_Y) then
             write(*,1) 'relax_Y', s% job% new_Y
-            call star_relax_Y(id, s% job% new_Y, s% ctrl% relax_dY, &
+            call star_relax_Y(id, s% job% new_Y, s% relax_dY, &
                s% job% relax_Y_minq, s% job% relax_Y_maxq, ierr)
             if (failed('star_relax_Y',ierr)) return
             write(*, 1) 'new y', get_current_y(id, ierr)
@@ -2844,10 +2844,10 @@
            log_lifetime = 9.921d0 - (3.6648d0 + (1.9697d0 - 0.9369d0*log_m)*log_m)*log_m
            ! Iben & Laughlin (1989) as quoted in H&K (eqn 2.3)
            max_dt = s% job% max_frac_of_lifetime_per_step*secyer*exp10(log_lifetime)
-           if (max_dt < s% ctrl% max_timestep) then
-              s% ctrl% max_timestep = max_dt
+           if (max_dt < s% max_timestep) then
+              s% max_timestep = max_dt
               write(*, *) 'set_max_dt_to_frac_lifetime: lg(maxdt/secyer)', &
-                 log10(s% ctrl% max_timestep/secyer)
+                 log10(s% max_timestep/secyer)
            end if
         end if
          
@@ -2855,8 +2855,8 @@
          
          write(*,*) 'net name ' // trim(s% net_name)
 
-         if (s% ctrl% do_element_diffusion) &
-            write(*,*) 'do_element_diffusion', s% ctrl% do_element_diffusion
+         if (s% do_element_diffusion) &
+            write(*,*) 'do_element_diffusion', s% do_element_diffusion
          
          if (s% RSP_flag) &
             write(*,*) 'RSP_flag', s% RSP_flag
@@ -2876,8 +2876,8 @@
          if (s% j_rot_flag) &
             write(*,*) 'j_rot_flag', s% j_rot_flag
          
-         if (s% ctrl% mix_factor /= 1d0) &
-            write(*,1) 'mix_factor', s% ctrl% mix_factor
+         if (s% mix_factor /= 1d0) &
+            write(*,1) 'mix_factor', s% mix_factor
             
          if (abs(s% tau_base - 2d0/3d0) > 1d-4) &
             write(*,1) 'tau_base', s% tau_base
@@ -2885,20 +2885,20 @@
          if (abs(s% tau_factor - 1) > 1d-4) &
             write(*,1) 'tau_factor', s% tau_factor
             
-         if (s% ctrl% eps_grav_factor /= 1) &
-            write(*,1) 'eps_grav_factor', s% ctrl% eps_grav_factor
+         if (s% eps_grav_factor /= 1) &
+            write(*,1) 'eps_grav_factor', s% eps_grav_factor
             
-         if (s% ctrl% eps_mdot_factor /= 1) &
-            write(*,1) 'eps_mdot_factor', s% ctrl% eps_mdot_factor
+         if (s% eps_mdot_factor /= 1) &
+            write(*,1) 'eps_mdot_factor', s% eps_mdot_factor
 
-         if (s% ctrl% dxdt_nuc_factor /= 1) &
-            write(*,1) 'dxdt_nuc_factor', s% ctrl% dxdt_nuc_factor
+         if (s% dxdt_nuc_factor /= 1) &
+            write(*,1) 'dxdt_nuc_factor', s% dxdt_nuc_factor
             
          if (.NOT. ( &
-              s% ctrl% atm_option == 'T_tau' .AND. &
-              s% ctrl% atm_T_tau_relation == 'Eddington' .AND. &
-              s% ctrl% atm_T_tau_opacity == 'fixed')) &
-            write(*,1) 'atm_option: ' // trim(s% ctrl% atm_option)
+              s% atm_option == 'T_tau' .AND. &
+              s% atm_T_tau_relation == 'Eddington' .AND. &
+              s% atm_T_tau_opacity == 'fixed')) &
+            write(*,1) 'atm_option: ' // trim(s% atm_option)
            
          if (s% M_center /= 0) then
             write(*,1) 'xmstar/mstar', s% xmstar/s% mstar
@@ -2923,8 +2923,8 @@
          if (s% L_center /= 0) &
             write(*,1) 'L_center/Lsun', s% L_center/Lsun
                      
-         if (s% ctrl% opacity_max > 0) &
-            write(*,1) 'opacity_max', s% ctrl% opacity_max
+         if (s% opacity_max > 0) &
+            write(*,1) 'opacity_max', s% opacity_max
          
          if (s% job% show_net_reactions_info) then
             write(*,'(a)') ' net reactions '
@@ -3807,7 +3807,7 @@
 
          if (fpe_check(1:1)=="1") then
             write(*,*) "FPE checking is on"
-            s% ctrl% fill_arrays_with_nans = .true.
+            s% fill_arrays_with_nans = .true.
          end if
 
       end subroutine add_fpe_checks
@@ -3842,17 +3842,17 @@
             write(*,*) "Multiplying mesh_delta_coeff and time_delta_coeff by this factor,"
             write(*,*) "and max_model_number by its inverse twice:"
             write(*,*) ""
-            write(*,*)    "   old mesh_delta_coeff = ",   s% ctrl% mesh_delta_coeff
-            s% ctrl% mesh_delta_coeff = test_suite_res_factor * s% ctrl% mesh_delta_coeff
-            write(*,*)    "   new mesh_delta_coeff = ",   s% ctrl% mesh_delta_coeff
+            write(*,*)    "   old mesh_delta_coeff = ",   s% mesh_delta_coeff
+            s% mesh_delta_coeff = test_suite_res_factor * s% mesh_delta_coeff
+            write(*,*)    "   new mesh_delta_coeff = ",   s% mesh_delta_coeff
             write(*,*)    ""
-            write(*,*)    "   old time_delta_coeff = ",   s% ctrl% time_delta_coeff
-            s% ctrl% time_delta_coeff = test_suite_res_factor * s% ctrl% time_delta_coeff
-            write(*,*)    "   new time_delta_coeff = ",   s% ctrl% time_delta_coeff
+            write(*,*)    "   old time_delta_coeff = ",   s% time_delta_coeff
+            s% time_delta_coeff = test_suite_res_factor * s% time_delta_coeff
+            write(*,*)    "   new time_delta_coeff = ",   s% time_delta_coeff
             write(*,*)    ""
-            write(*,*)    "   old max_model_number = ",   s% ctrl% max_model_number
-            s% ctrl% max_model_number = s% ctrl% max_model_number / test_suite_res_factor / test_suite_res_factor
-            write(*,*)    "   new max_model_number = ",   s% ctrl% max_model_number
+            write(*,*)    "   old max_model_number = ",   s% max_model_number
+            s% max_model_number = s% max_model_number / test_suite_res_factor / test_suite_res_factor
+            write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if
       

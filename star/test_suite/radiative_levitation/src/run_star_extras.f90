@@ -56,9 +56,9 @@
             ierr = -1
             return
          end if
-         s% op_mono_factors(j) = s% ctrl% x_ctrl(1)
-         if (abs(1d0 - s% ctrl% x_ctrl(1)) > 1d-6) write(*,1) &
-            'set_op_mono_factors -- increase fe56 opacity by factor ', s% ctrl% x_ctrl(1)
+         s% op_mono_factors(j) = s% x_ctrl(1)
+         if (abs(1d0 - s% x_ctrl(1)) > 1d-6) write(*,1) &
+            'set_op_mono_factors -- increase fe56 opacity by factor ', s% x_ctrl(1)
       end subroutine set_op_mono_factors
       
       
@@ -72,14 +72,14 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% ctrl% x_ctrl(1) > 0d0) then
-            if (len_trim(s% ctrl% op_mono_data_path) == 0) then
+         if (s% x_ctrl(1) > 0d0) then
+            if (len_trim(s% op_mono_data_path) == 0) then
                ierr = -1
             else
-               fname = trim(s% ctrl% op_mono_data_path) // '/a06.140'
+               fname = trim(s% op_mono_data_path) // '/a06.140'
                inquire(file=trim(fname), exist=dir_exists)
                if (.not. dir_exists) then
-                  write(*,'(a)') ' control op_mono_data_path = "' // trim(s% ctrl% op_mono_data_path) // '"'
+                  write(*,'(a)') ' control op_mono_data_path = "' // trim(s% op_mono_data_path) // '"'
                   write(*,'(a)') ' the file "' // trim(fname) // '" does not exist, so skip this test.'
                   ierr = -1
                end if
@@ -129,9 +129,9 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% ctrl% x_ctrl(1) > 0d0) then
-            if (s% star_age < s% ctrl% max_age) then
-               write(*,1) 'failed to reach max age', s% star_age, s% ctrl% max_age
+         if (s% x_ctrl(1) > 0d0) then
+            if (s% star_age < s% max_age) then
+               write(*,1) 'failed to reach max age', s% star_age, s% max_age
             else
                nz = s% nz
                species = s% species

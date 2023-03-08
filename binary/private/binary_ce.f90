@@ -70,11 +70,11 @@
 
          write(*,*) "TURNING ON CE"
 
-         b% s_donor% ctrl% mix_factor = 0d0
-         b% s_donor% ctrl% dxdt_nuc_factor = 0d0
+         b% s_donor% mix_factor = 0d0
+         b% s_donor% dxdt_nuc_factor = 0d0
          if (b% point_mass_i == 0) then
-            b% s_accretor% ctrl% mix_factor = 0d0
-            b% s_accretor% ctrl% dxdt_nuc_factor = 0d0
+            b% s_accretor% mix_factor = 0d0
+            b% s_accretor% dxdt_nuc_factor = 0d0
          end if
 
          if (b% d_i == 1) then
@@ -360,12 +360,12 @@
          if (terminate_CE) then
             b% CE_flag = .false.
             b% mtransfer_rate = 0d0
-            b% s_donor% ctrl% mix_factor = 1d0
-            b% s_donor% ctrl% dxdt_nuc_factor = 1d0
+            b% s_donor% mix_factor = 1d0
+            b% s_donor% dxdt_nuc_factor = 1d0
             b% s_donor% timestep_hold = b% s_donor% model_number
             if (b% point_mass_i == 0) then
-               b% s_accretor% ctrl% mix_factor = 1d0
-               b% s_accretor% ctrl% dxdt_nuc_factor = 1d0
+               b% s_accretor% mix_factor = 1d0
+               b% s_accretor% dxdt_nuc_factor = 1d0
                b% s_accretor% timestep_hold = b% s_accretor% model_number
             end if
 

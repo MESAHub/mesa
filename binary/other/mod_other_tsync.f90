@@ -99,7 +99,7 @@
       ! e.g., in the &controls inlist, you can set
       !     x_ctrl(1) = my_special_param
       ! then in your routine, you can access that by
-      !     s% ctrl% x_ctrl(1)
+      !     s% x_ctrl(1)
       ! of course before you can use s, you need to get it using the id argument.
       ! here's an example of how to do that -- add these lines at the start of your routine:
       !

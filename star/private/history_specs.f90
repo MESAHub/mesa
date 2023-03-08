@@ -629,7 +629,7 @@
          if (ierr /= 0) return
          if (associated(old_history_column_spec)) then
             ! check that haven't changed the cols specs for an existing log file
-            fname = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% star_history_name)
+            fname = trim(s% log_directory) // '/' // trim(s% star_history_name)
             inquire(file=trim(fname), exist=history_file_exists)
             if (history_file_exists) then
                if (capacity /= size(old_history_column_spec)) then

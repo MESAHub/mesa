@@ -353,9 +353,9 @@
 
          include "formats"
 
-         dbl_fmt = s% ctrl% profile_dbl_format
-         int_fmt = s% ctrl% profile_int_format
-         txt_fmt = s% ctrl% profile_txt_format
+         dbl_fmt = s% profile_dbl_format
+         int_fmt = s% profile_int_format
+         txt_fmt = s% profile_txt_format
 
          ierr = 0
          nullify(extra_col_names, extra_col_vals)
@@ -442,12 +442,12 @@
          end if
 
          if (write_flag) then
-            if(.not. folder_exists(trim(s% ctrl% log_directory))) call mkdir(trim(s% ctrl% log_directory))
+            if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
 
-            if (len_trim(s% ctrl% profile_data_header_suffix) == 0) then
+            if (len_trim(s% profile_data_header_suffix) == 0) then
                fname1 = fname
             else
-               fname1 = trim(fname) // s% ctrl% profile_data_header_suffix
+               fname1 = trim(fname) // s% profile_data_header_suffix
             end if
             open(newunit=io, file=trim(fname1), action='write', status='replace', iostat=ierr)
             if (ierr /= 0) then
@@ -483,8 +483,8 @@
                col = 0
                call do_integer(i, 'model_number', s% model_number)
                call do_integer(i, 'num_zones', s% nz)
-               call do_val(i, 'initial_mass', s% ctrl% initial_mass)
-               call do_val(i, 'initial_z', s% ctrl% initial_z)
+               call do_val(i, 'initial_mass', s% initial_mass)
+               call do_val(i, 'initial_z', s% initial_z)
                call do_val(i, 'star_age', s% star_age)
                call do_val(i, 'time_step', s% time_step)
 
@@ -531,14 +531,14 @@
                call do_val(i, 'power_he_burn', s% power_he_burn)
                call do_val(i, 'power_neu', s% power_neutrinos)
 
-               call do_val(i, 'burn_min1', s% ctrl% burn_min1)
-               call do_val(i, 'burn_min2', s% ctrl% burn_min2)
+               call do_val(i, 'burn_min1', s% burn_min1)
+               call do_val(i, 'burn_min2', s% burn_min2)
 
                call do_val(i, 'time_seconds', s% time)
 
                call do_string(i, 'version_number', version_number)
                
-               if (s% ctrl% profile_header_include_sys_details) then ! make this optional
+               if (s% profile_header_include_sys_details) then ! make this optional
                   call do_string(i, 'compiler', compiler_name)
                   call do_string(i, 'build', compiler_version_name)
                   call do_string(i, 'MESA_SDK_version', mesasdk_version_name)
@@ -568,12 +568,12 @@
          do i = 1, 3
 
             if (i==3) then
-               if (s% ctrl% max_num_profile_zones > 1) then
-                  n = min(nz, s% ctrl% max_num_profile_zones)
+               if (s% max_num_profile_zones > 1) then
+                  n = min(nz, s% max_num_profile_zones)
                else
                   n = nz
                end if
-               if (write_flag .and. len_trim(s% ctrl% profile_data_header_suffix) > 0) then
+               if (write_flag .and. len_trim(s% profile_data_header_suffix) > 0) then
                   close(io)
                   open(newunit=io, file=trim(fname), &
                      action='write', status='replace', iostat=ierr)
@@ -627,11 +627,11 @@
             write(*,'(a)', advance='no') trim(str)
             call write_to_extra_terminal_output_file(s, str, .false.)
 
-            if (s% ctrl% write_pulse_data_with_profile) then
-               fname_out = trim(fname) // '.' // trim(s% ctrl% pulse_data_format)
-               call export_pulse_data(s%id, s% ctrl% pulse_data_format, fname_out, &
-                    s% ctrl% add_center_point_to_pulse_data, s% ctrl% keep_surface_point_for_pulse_data, &
-                    s% ctrl% add_atmosphere_to_pulse_data, ierr)
+            if (s% write_pulse_data_with_profile) then
+               fname_out = trim(fname) // '.' // trim(s% pulse_data_format)
+               call export_pulse_data(s%id, s%pulse_data_format, fname_out, &
+                    s%add_center_point_to_pulse_data, s%keep_surface_point_for_pulse_data, &
+                    s%add_atmosphere_to_pulse_data, ierr)
                if (ierr /= 0) then
                   write(*,*) 'save_pulsation_info failed to open ' // trim(fname_out)
                   ierr = 0
@@ -640,7 +640,7 @@
                end if
             end if
 
-            if (s% ctrl% write_model_with_profile) then
+            if (s% write_model_with_profile) then
                fname_out = s% model_data_filename
                call do_write_model(s% id, fname_out, ierr)
                if (ierr /= 0) then
@@ -651,7 +651,7 @@
                end if
             end if
 
-            if (s% ctrl% write_controls_info_with_profile) then
+            if (s% write_controls_info_with_profile) then
                fname_out = s% model_controls_filename
                call write_controls(s, fname_out, ierr)
                if (ierr /= 0) then
@@ -722,7 +722,7 @@
                v = val
                if (is_bad_num(v)) then
                   write(*,1) 'bad value for ' // trim(col_name), v
-                  if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'profile do_val')
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'profile do_val')
                   v = 0
                end if
                write(io, fmt=dbl_fmt, advance='no') v
@@ -896,12 +896,12 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. s% ctrl% write_profiles_flag) return
+         if (.not. s% write_profiles_flag) return
          if (.not. s% v_flag) s% v(1:nz) = 0
          if (.not. s% u_flag) s% u(1:nz) = 0
          if (.not. s% rotation_flag) s% omega(1:nz) = 0
 
-         max_num_mods = s% ctrl% max_num_profile_models
+         max_num_mods = s% max_num_profile_models
          if (max_num_mods < 0) max_num_mods = s% model_number
          model_priority = s% save_profiles_model_priority
 
@@ -909,7 +909,7 @@
             model_logs(max_num_mods), stat=ierr)
          if (ierr /= 0) return
 
-         write(fname, '(3a)') trim(s% ctrl% log_directory), '/', trim(s% ctrl% profiles_index_name)
+         write(fname, '(3a)') trim(s% log_directory), '/', trim(s% profiles_index_name)
 
          call read_profiles_info( &
             fname, max_num_mods, num_models, model_numbers, model_priorities, model_logs)
@@ -1108,19 +1108,19 @@
             profile_prefix, controls_prefix, model_prefix, num_str, fstring
          integer :: num_digits
 
-         profile_prefix = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% profile_data_prefix)
-         controls_prefix = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% controls_data_prefix)
-         model_prefix = trim(s% ctrl% log_directory) // '/' // trim(s% ctrl% model_data_prefix)
+         profile_prefix = trim(s% log_directory) // '/' // trim(s% profile_data_prefix)
+         controls_prefix = trim(s% log_directory) // '/' // trim(s% controls_data_prefix)
+         model_prefix = trim(s% log_directory) // '/' // trim(s% model_data_prefix)
 
          num_digits = 1 + log10(dble(max(1,model_profile_number)))
          write(fstring,'( "(a,i",i2.2,".",i2.2,",a)" )') num_digits, num_digits
 
          write(s% model_profile_filename, fmt=fstring) &
-            trim(profile_prefix), model_profile_number, trim(s% ctrl% profile_data_suffix)
+            trim(profile_prefix), model_profile_number, trim(s% profile_data_suffix)
          write(s% model_controls_filename, fmt=fstring) &
-            trim(controls_prefix), model_profile_number, trim(s% ctrl% controls_data_suffix)
+            trim(controls_prefix), model_profile_number, trim(s% controls_data_suffix)
          write(s% model_data_filename, fmt=fstring) &
-            trim(model_prefix), model_profile_number, trim(s% ctrl% model_data_suffix)
+            trim(model_prefix), model_profile_number, trim(s% model_data_suffix)
 
       end subroutine get_model_profile_filename
 

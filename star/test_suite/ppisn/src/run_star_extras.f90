@@ -136,33 +136,33 @@
          s% other_kap_get => my_other_kap_get
 
          ! store user provided options from the inlist
-         min_gamma_sub_43_for_hydro = s% ctrl% x_ctrl(1)
-         max_v_for_pulse = s% ctrl% x_ctrl(2)
-         q_for_dyn_ts = s% ctrl% x_ctrl(3)
-         num_dyn_ts_for_relax = s% ctrl% x_ctrl(4)
-         q_for_relax_check = s% ctrl% x_ctrl(5)
-         max_v_for_relax = s% ctrl% x_ctrl(6)
-         max_machn_for_relax = s% ctrl% x_ctrl(7)
-         max_Lneu_for_relax = s% ctrl% x_ctrl(8)
-         max_Lnuc_for_relax = s% ctrl% x_ctrl(9)
-         num_steps_before_relax = s% ctrl% x_integer_ctrl(1)
-         in_inlist_pulses = s% ctrl% x_logical_ctrl(2)
-         max_dt_before_pulse = s% ctrl% x_ctrl(10)
-         max_Lneu_for_mass_loss = s% ctrl% x_ctrl(11)
-         delta_lgLnuc_limit = s% ctrl% x_ctrl(12)
-         max_Lphoto_for_lgLnuc_limit = s% ctrl% x_ctrl(13)
-         max_Lphoto_for_lgLnuc_limit2 = s% ctrl% x_ctrl(14)
-         logT_for_v_flag = s% ctrl% x_ctrl(15)
-         logLneu_for_v_flag = s% ctrl% x_ctrl(16)
-         stop_100d_after_pulse = s% ctrl% x_logical_ctrl(1)
+         min_gamma_sub_43_for_hydro = s% x_ctrl(1)
+         max_v_for_pulse = s% x_ctrl(2)
+         q_for_dyn_ts = s% x_ctrl(3)
+         num_dyn_ts_for_relax = s% x_ctrl(4)
+         q_for_relax_check = s% x_ctrl(5)
+         max_v_for_relax = s% x_ctrl(6)
+         max_machn_for_relax = s% x_ctrl(7)
+         max_Lneu_for_relax = s% x_ctrl(8)
+         max_Lnuc_for_relax = s% x_ctrl(9)
+         num_steps_before_relax = s% x_integer_ctrl(1)
+         in_inlist_pulses = s% x_logical_ctrl(2)
+         max_dt_before_pulse = s% x_ctrl(10)
+         max_Lneu_for_mass_loss = s% x_ctrl(11)
+         delta_lgLnuc_limit = s% x_ctrl(12)
+         max_Lphoto_for_lgLnuc_limit = s% x_ctrl(13)
+         max_Lphoto_for_lgLnuc_limit2 = s% x_ctrl(14)
+         logT_for_v_flag = s% x_ctrl(15)
+         logLneu_for_v_flag = s% x_ctrl(16)
+         stop_100d_after_pulse = s% x_logical_ctrl(1)
 
          ! we store the value given in inlist_ppisn and deactivate it at
          ! high T
-         delta_lgRho_cntr_hard_limit = s% ctrl% delta_lgRho_cntr_hard_limit
+         delta_lgRho_cntr_hard_limit = s% delta_lgRho_cntr_hard_limit
          ! we also store dt_div_min_dr_div_cs_limit, we keep it at a
          ! high value until the onset of a pulse to prevent unnecesarily
          ! small timesteps before a pulsation
-         dt_div_min_dr_div_cs_limit = s% ctrl% dt_div_min_dr_div_cs_limit
+         dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
 
       end subroutine extras_controls
 
@@ -830,7 +830,7 @@
          if (ierr /= 0) return
 
          !this is used to ensure we read the right inlist options
-         s% ctrl% use_other_before_struct_burn_mix = .true.
+         s% use_other_before_struct_burn_mix = .true.
 
          ! be sure power info is stored
          call star_set_power_info(s)
@@ -840,10 +840,10 @@
             if (lburn_div_lsurf > 0d0) then
                if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
-                  s% ctrl% use_other_before_struct_burn_mix = .false.
+                  s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
                                                 s% job% num_steps_to_relax_rotation, 1d0, ierr)
-                  s% ctrl% use_other_before_struct_burn_mix = .true.
+                  s% use_other_before_struct_burn_mix = .true.
                   if (ierr/=0) then
                      write(*,*) "error when relaxing omega at he ZAMS"
                      stop
@@ -859,7 +859,7 @@
          if (.not. s% lxtra(lx_hydro_has_been_on)) then
             s% cumulative_energy_error = 0d0
             s% cumulative_extra_heating = 0d0
-            if(mod(s%model_number, s% ctrl% terminal_interval) == 0) then
+            if(mod(s%model_number, s%terminal_interval) == 0) then
                write(*,*) &
                   "Setting energy conservation error to zero until hydro is turned on for the first time"
             end if
@@ -888,7 +888,7 @@
          s% xtra(x_gamma_int_bound) = -1d0
 
          ! can be adjusted below if nearing breakout
-         s% ctrl% profile_interval = 100
+         s% profile_interval = 100
 
          if (s% u_flag .and. k > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
 
@@ -905,7 +905,7 @@
             ! material below the escape velocity that has a positive net
             ! total specific energy. 
             if (energy_removed_layers > 0d0) then ! possible to eject material
-               if(mod(s%model_number, s% ctrl% terminal_interval) == 0) then
+               if(mod(s%model_number, s%terminal_interval) == 0) then
                   write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
                end if
                do k0 = k+1, s% nz
@@ -921,7 +921,7 @@
                         s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                   end if
                end do 
-               if(mod(s%model_number, s% ctrl% terminal_interval) == 0) then
+               if(mod(s%model_number, s%terminal_interval) == 0) then
                   write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
                end if
             end if
@@ -947,9 +947,9 @@
                   ! to breakout
                   if ((s% u(k1)>5d7 .and. s% u(1)<5d7) &
                      .or. (s% ixtra(ix_num_relaxations) == 0 .and. gamma1_integral < 0d0 .and. s% u(1)<5d7)) then
-                     s% ctrl% profile_interval = 10
+                     s% profile_interval = 10
                   else
-                     s% ctrl% profile_interval = 100
+                     s% profile_interval = 100
                   end if
                   exit
                end if
@@ -963,7 +963,7 @@
                end if
             end do
  
-            if(mod(s%model_number, s% ctrl% terminal_interval) == 0) then
+            if(mod(s%model_number, s%terminal_interval) == 0) then
                write(*,*) 'Layers above q=', s% q(k), 'will be removed'
                write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
                write(*,*) 'check time left', &
@@ -1035,8 +1035,8 @@
 
                write(*,*) "removing cells", k, s% m(k)/Msun
 
-               max_center_cell_dq = s% ctrl% max_center_cell_dq
-               s% ctrl% max_center_cell_dq = s% dq(s% nz)
+               max_center_cell_dq = s% max_center_cell_dq
+               s% max_center_cell_dq = s% dq(s% nz)
                dt = s% dt
                dt_next = s% dt_next
 
@@ -1055,12 +1055,12 @@
                s% pg% Grid2_file_interval = 100000000
                s% job% pgstar_flag = .false.
 
-               max_years_for_timestep = s% ctrl% max_years_for_timestep
-               s% ctrl% max_years_for_timestep = 1d0
+               max_years_for_timestep = s% max_years_for_timestep
+               s% max_years_for_timestep = 1d0
 
-               s% ctrl% delta_lgL_nuc_limit = -1d0
-               s% ctrl% delta_lgL_nuc_hard_limit = -1d0
-               s% ctrl% use_other_before_struct_burn_mix = .false.
+               s% delta_lgL_nuc_limit = -1d0
+               s% delta_lgL_nuc_hard_limit = -1d0
+               s% use_other_before_struct_burn_mix = .false.
                s% timestep_hold = 0
 
                call star_relax_to_star_cut(s% id, k, .true., .true., .true., ierr)
@@ -1069,14 +1069,14 @@
                   stop
                end if
 
-               s% ctrl% max_years_for_timestep = max_years_for_timestep
-               s% ctrl% photo_interval = 100
+               s% max_years_for_timestep = max_years_for_timestep
+               s% photo_interval = 100
                s% dt_next = min(1d2, dt_next)
                s% dt = min(1d2, dt)
 
                s% ixtra(ix_steps_met_relax_cond) = 0
 
-               s% ctrl% max_center_cell_dq = max_center_cell_dq
+               s% max_center_cell_dq = max_center_cell_dq
                if (pgstar_flag) then
                   s% pg% pgstar_interval = pgstar_interval
                   s% pg% Grid2_file_interval = pgstar_file_interval
@@ -1094,7 +1094,7 @@
                if (dbg) write(*,*) "check ierr", ierr
                if (ierr /= 0) return
 
-               s% ctrl% use_other_before_struct_burn_mix = .true.
+               s% use_other_before_struct_burn_mix = .true.
             end if
          end if
 
@@ -1120,7 +1120,7 @@
             if (dbg) write(*,*) "check ierr", ierr
             if (ierr /= 0) return
          end if
-         if(mod(s%model_number, s% ctrl% terminal_interval) == 0) then
+         if(mod(s%model_number, s%terminal_interval) == 0) then
              write(*,*) "check gamma integral", gamma1_integral
          end if
 
@@ -1244,7 +1244,7 @@
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
             if (s% xtra(x_time_start_pulse) > 0d0) then
-               s% ctrl% max_timestep = 1d99
+               s% max_timestep = 1d99
                do k = s% nz, 1, -1
                   v_esc = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
                   if (s% u(k) > 2*v_esc) then
@@ -1252,10 +1252,10 @@
                   end if
                end do
             else
-               s% ctrl% max_timestep = max_dt_before_pulse
+               s% max_timestep = max_dt_before_pulse
             end if
          else
-            s% ctrl% max_timestep = 1d99
+            s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
          end if
 
@@ -1270,25 +1270,25 @@
 
          power_photo = dot_product(s% dm(1:s% nz), s% eps_nuc_categories(iphoto,1:s% nz))/Lsun
          if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit2) then
-            s% ctrl% delta_lgL_nuc_limit = -1d0
-            s% ctrl% delta_lgL_nuc_hard_limit = -1d0
-            s% ctrl% delta_lgL_power_photo_limit = -1d0
-            s% ctrl% delta_lgL_power_photo_hard_limit = -1d0
+            s% delta_lgL_nuc_limit = -1d0
+            s% delta_lgL_nuc_hard_limit = -1d0
+            s% delta_lgL_power_photo_limit = -1d0
+            s% delta_lgL_power_photo_hard_limit = -1d0
          else
             if (s% ixtra(ix_steps_since_relax) == 0 &
                   .or. safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
-               s% ctrl% delta_lgL_nuc_limit = -1d0
-               s% ctrl% delta_lgL_nuc_hard_limit = -1d0
+               s% delta_lgL_nuc_limit = -1d0
+               s% delta_lgL_nuc_hard_limit = -1d0
             else
-               s% ctrl% delta_lgL_nuc_limit = delta_lgLnuc_limit
-               s% ctrl% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
+               s% delta_lgL_nuc_limit = delta_lgLnuc_limit
+               s% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
-               s% ctrl% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% ctrl% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
+               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
             else
-               s% ctrl% delta_lgL_power_photo_limit = -1d0
-               s% ctrl% delta_lgL_power_photo_hard_limit = -1d0
+               s% delta_lgL_power_photo_limit = -1d0
+               s% delta_lgL_power_photo_hard_limit = -1d0
             end if
          end if
 
@@ -1297,20 +1297,20 @@
          if(s% ixtra(ix_steps_since_relax) < 50 &
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
-            s% ctrl% use_other_wind = .false.
+            s% use_other_wind = .false.
             s% was_in_implicit_wind_limit = .false.
          else
-            s% ctrl% use_other_wind = .true.
+            s% use_other_wind = .true.
          end if
 
          if (maxval(s% T(1:s% nz)) > 9.8) then
-            s% ctrl% delta_lgRho_cntr_hard_limit = -1d0
+            s% delta_lgRho_cntr_hard_limit = -1d0
          else
-            s% ctrl% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit
+            s% delta_lgRho_cntr_hard_limit = delta_lgRho_cntr_hard_limit
          end if
 
          ! reading inlists can turn this flag off for some reason
-         s% ctrl% use_other_before_struct_burn_mix = .true.
+         s% use_other_before_struct_burn_mix = .true.
 
          res = keep_going
       end subroutine my_before_struct_burn_mix

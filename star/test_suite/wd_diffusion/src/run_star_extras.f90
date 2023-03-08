@@ -80,7 +80,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          
-         if (s% Teff > s% ctrl% Teff_lower_limit) then
+         if (s% Teff > s% Teff_lower_limit) then
             write(*,*) 'failed to reach target for Teff'
             ierr = -1
             return

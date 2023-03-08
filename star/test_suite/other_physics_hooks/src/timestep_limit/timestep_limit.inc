@@ -169,7 +169,7 @@
          if (delta_mdot == 0) return
          if (delta_mdot_hard_limit > 0 .and. (.not. skip_hard_limit)) then
             if (delta_mdot > delta_mdot_hard_limit) then
-               if (s% ctrl% report_dt_hard_limit_retries) &
+               if (s% report_dt_hard_limit_retries) &
                   write(*, '(a30, f20.10, 99e20.10)') 'delta_mdot_hard_limit', &
                      delta_mdot, delta_mdot_hard_limit
                   check_delta_mdot= retry

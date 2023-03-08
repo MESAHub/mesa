@@ -60,7 +60,7 @@
          include 'formats'         
          ierr = 0
          nz_old = s% nz
-         nz = s% ctrl% RSP2_nz
+         nz = s% RSP2_nz
          if (nz == nz_old) return ! assume have already done remesh for RSP2
          if (nz > nz_old) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 cannot increase nz')
          call setvars(ierr)
@@ -173,9 +173,9 @@
          subroutine find_xm_anchor
             real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
             include 'formats'
-            lnT_anchor = log(s% ctrl% RSP2_T_anchor)
+            lnT_anchor = log(s% RSP2_T_anchor)
             if (lnT_anchor <= s% xh(s% i_lnT,1)) then
-               write(*,1) 'T_anchor < T_surf', s% ctrl% RSP2_T_anchor, exp(s% xh(s% i_lnT,1))
+               write(*,1) 'T_anchor < T_surf', s% RSP2_T_anchor, exp(s% xh(s% i_lnT,1))
                call mesa_error(__FILE__,__LINE__,'find_xm_anchor')
             end if
             xm_anchor = xm_old(nz_old)
@@ -200,8 +200,8 @@
             integer :: nz_outer, n_inner, iter, k, j
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
             include 'formats'
-            nz_outer = s% ctrl% RSP2_nz_outer
-            dq_1_factor = s% ctrl% RSP2_dq_1_factor
+            nz_outer = s% RSP2_nz_outer
+            dq_1_factor = s% RSP2_dq_1_factor
             dxm_outer = xm_anchor/(nz_outer - 1d0 + dq_1_factor)
             !write(*,2) 'dxm_outer', nz_outer, dxm_outer, xm_anchor
             xm(1) = 0d0

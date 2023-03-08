@@ -87,13 +87,13 @@ contains
     ! Evaluate surface temperature and pressure by dispatching to the
     ! appropriate internal routine
 
-    select case (s% ctrl% atm_option)
+    select case (s% atm_option)
 
     case ('T_tau')
 
        call get_T_tau( &
             s, tau_surf, L, R, M, cgrav, &
-            s% ctrl% atm_T_tau_relation, s% ctrl% atm_T_tau_opacity, skip_partials, &
+            s% atm_T_tau_relation, s% atm_T_tau_opacity, skip_partials, &
             Teff, kap, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -111,7 +111,7 @@ contains
     case ('irradiated_grey')
     
        call get_irradiated( &
-            s, s% ctrl% atm_irradiated_opacity, skip_partials, L, R, M, cgrav, &
+            s, s% atm_irradiated_opacity, skip_partials, L, R, M, cgrav, &
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -188,37 +188,37 @@ contains
 
     ! Get the base optical depth
 
-    select case (s% ctrl% atm_option)
+    select case (s% atm_option)
 
     case ('T_tau')
 
-       call get_T_tau_id(s% ctrl% atm_T_tau_relation, T_tau_id, ierr)
+       call get_T_tau_id(s% atm_T_tau_relation, T_tau_id, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to get_T_tau_id failed in get_atm_tau_base'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
 
        call atm_get_T_tau_base(T_tau_id, tau_base, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to atm_get_T_tau_base failed in get_atm_tau_base'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        end if
 
     case ('table')
 
-       call get_table_id(s% ctrl% atm_table, table_id, ierr)
+       call get_table_id(s% atm_table, table_id, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to get_table_id failed in get_atm_tau_base'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
 
        call atm_get_table_base(table_id, tau_base, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to atm_get_table_base failed in get_atm_tau_base'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        end if
 
@@ -282,7 +282,7 @@ contains
 
     if (L < 0._dp) then
        s% retry_message = 'get_T_tau -- L <= 0'
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,2) 'get_T_tau: L <= 0', s% model_number, L
           !call mesa_error(__FILE__,__LINE__)
        end if
@@ -295,7 +295,7 @@ contains
     call get_T_tau_id(T_tau_relation, T_tau_id, ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to get_T_tau_id failed in get_T_tau'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
        return
     end if
 
@@ -308,9 +308,9 @@ contains
        
        ! ok to use s% opacity(1) for fixed
        call atm_eval_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, s% opacity(1), s% ctrl% Pextra_factor, &
+            tau_surf, L, R, M, cgrav, s% opacity(1), s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
-            s% ctrl% atm_T_tau_errtol, 0, skip_partials, &
+            s%atm_T_tau_errtol, 0, skip_partials, &
             Teff, kap, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -321,7 +321,7 @@ contains
        call prepare_kap(s, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to prepare_kap failed in get_T_tau'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
        
@@ -332,9 +332,9 @@ contains
           kap_guess = s% opacity(1)
        end if
        call atm_eval_T_tau_uniform( &
-            tau_surf, L, R, M, cgrav, kap_guess, s% ctrl% Pextra_factor, &
+            tau_surf, L, R, M, cgrav, kap_guess, s% Pextra_factor, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
-            s% ctrl% atm_T_tau_errtol, s% ctrl% atm_T_tau_max_iters, skip_partials, &
+            s%atm_T_tau_errtol, s%atm_T_tau_max_iters, skip_partials, &
             Teff, kap, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -345,14 +345,14 @@ contains
        call prepare_kap(s, ierr)
        if (ierr /= 0) then
          s% retry_message = 'Call to prepare_kap failed in get_T_tau'
-         if (s% ctrl% report_ierr) write(*, *) s% retry_message
+         if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
 
        call atm_eval_T_tau_varying( &
             tau_surf, L, R, M, cgrav, &
             T_tau_id, eos_proc_for_get_T_tau, kap_proc_for_get_T_tau, &
-            s% ctrl% atm_T_tau_errtol, s% ctrl% atm_T_tau_max_steps, skip_partials, &
+            s% atm_T_tau_errtol, s% atm_T_tau_max_steps, skip_partials, &
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -534,7 +534,7 @@ contains
 
     if (L < 0._dp) then
        s% retry_message = 'atm get_table: L < 0'
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,2) 'atm get_table: L < 0', s% model_number, L
           !call mesa_error(__FILE__,__LINE__)
        end if
@@ -544,10 +544,10 @@ contains
 
     ! Get the table id
 
-    call get_table_id(s% ctrl% atm_table, table_id, ierr)
+    call get_table_id(s% atm_table, table_id, ierr)
     if (ierr /= 0) then
        s% retry_message = 'get_table_id failed in get_table'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
        return
     end if
 
@@ -558,16 +558,16 @@ contains
          L, Teff, R, M, cgrav, table_id, alfa, beta, ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to atm_get_table_alfa_beta failed in get_table'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
        return
     endif
     
     ! If completely off the table, may need to reset tau_base to the
     ! T_Tau value to get the expected off-table behavior.
     if(beta == 0._dp) then
-       call get_T_tau_id(s% ctrl% atm_T_tau_relation, T_tau_id, ierr)
+       call get_T_tau_id(s% atm_T_tau_relation, T_tau_id, ierr)
        if (ierr /= 0) then
-          if (s% ctrl% report_ierr) then
+          if (s% report_ierr) then
              write(*,*) 'Call to get_T_tau_id failed in get_table'
           endif
           return
@@ -575,7 +575,7 @@ contains
 
        call atm_get_T_tau_base(T_tau_id, tau_base, ierr)
        if (ierr /= 0) then
-          if (s% ctrl% report_ierr) then
+          if (s% report_ierr) then
              write(*,*) 'Call to atm_get_T_tau_base failed in get_table'
           end if
           return
@@ -589,7 +589,7 @@ contains
     else ! check to see if need to switch back to table value for tau_base
        call atm_get_table_base(table_id, tau_base, ierr)
        if (ierr /= 0) then
-          if (s% ctrl% report_ierr) then
+          if (s% report_ierr) then
              write(*,*) 'Call to atm_get_table_base failed in get_table'
           end if
           return
@@ -614,7 +614,7 @@ contains
             ierr)
        if (ierr /= 0) then
           s% retry_message = 'Call to atm_eval_table failed in get_table'
-          if (s% ctrl% report_ierr) write(*, *) s% retry_message
+          if (s% report_ierr) write(*, *) s% retry_message
           return
        end if
 
@@ -639,20 +639,20 @@ contains
 
     if (alfa /= 0._dp) then
 
-       select case (s% ctrl% atm_off_table_option)
+       select case (s% atm_off_table_option)
 
        case ('T_tau')
 
           call get_T_tau( &
                s, s% tau_base, L, R, M, cgrav, &
-               s% ctrl% atm_T_tau_relation, s% ctrl% atm_T_tau_opacity, skip_partials, &
+               s% atm_T_tau_relation, s% atm_T_tau_opacity, skip_partials, &
                Teff, kap_a, &
                lnT_a, dlnT_dL_a, dlnT_dlnR_a, dlnT_dlnM_a, dlnT_dlnkap_a, &
                lnP_a, dlnP_dL_a, dlnP_dlnR_a, dlnP_dlnM_a, dlnP_dlnkap_a, &
                ierr)
           if (ierr /= 0) then
              s% retry_message = 'Call to get_T_tau failed in get_table'
-             if (s% ctrl% report_ierr) write(*, *) s% retry_message
+             if (s% report_ierr) write(*, *) s% retry_message
              return
           end if
 
@@ -664,7 +664,7 @@ contains
 
        case default
 
-          write(*,*) 'Unknown value for atm_off_table_option: ' // trim(s% ctrl% atm_off_table_option)
+          write(*,*) 'Unknown value for atm_off_table_option: ' // trim(s% atm_off_table_option)
           call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
           
        end select
@@ -818,7 +818,7 @@ contains
 
     if (L < 0._dp) then
        s% retry_message = 'get_irradiated: L <= 0'
-       if (s% ctrl% report_ierr) then
+       if (s% report_ierr) then
           write(*,2) 'get_irradiated: L <= 0', s% model_number, L
           !call mesa_error(__FILE__,__LINE__)
        end if
@@ -834,10 +834,10 @@ contains
     case ('fixed')
 
        call atm_eval_irradiated( &
-            L, R, M, cgrav, s% ctrl% atm_irradiated_T_eq, s% ctrl% atm_irradiated_P_surf, &
-            kap_for_atm, s% ctrl% atm_irradiated_kap_v, s% ctrl% atm_irradiated_kap_v_div_kap_th, &
+            L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
-            s% ctrl% atm_irradiated_errtol, 0, skip_partials, &
+            s% atm_irradiated_errtol, 0, skip_partials, &
             Teff, kap, tau_surf, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             ierr)
@@ -847,15 +847,15 @@ contains
        call prepare_kap(s, ierr)
        if (ierr /= 0) then
           s% retry_message = 'Failed in call to prepare_kap'
-          if (s% ctrl% report_ierr) write(*, *) s% retry_message
+          if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
 
        call atm_eval_irradiated( &
-            L, R, M, cgrav, s% ctrl% atm_irradiated_T_eq, s% ctrl% atm_irradiated_P_surf, &
-            kap_for_atm, s% ctrl% atm_irradiated_kap_v, s% ctrl% atm_irradiated_kap_v_div_kap_th, &
+            L, R, M, cgrav, s% atm_irradiated_T_eq, s% atm_irradiated_P_surf, &
+            kap_for_atm, s% atm_irradiated_kap_v, s% atm_irradiated_kap_v_div_kap_th, &
             eos_proc_for_get_irradiated, kap_proc_for_get_irradiated, &
-            s% ctrl% atm_irradiated_errtol, s% ctrl% atm_irradiated_max_iters, skip_partials, &
+            s% atm_irradiated_errtol, s% atm_irradiated_max_iters, skip_partials, &
             Teff, kap, tau_surf, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             ierr)
@@ -869,7 +869,7 @@ contains
 
     ! Set up remaining values
 
-    lnP_surf = log(s% ctrl% atm_irradiated_P_surf)
+    lnP_surf = log(s% atm_irradiated_P_surf)
 
     dlnP_dL = 0._dp
     dlnP_dlnR = 0._dp
@@ -943,7 +943,7 @@ contains
     ! to guide users toward the newer atmosphere controls; in the long
     ! term, it can be removed
 
-    select case (s% ctrl% atm_option)
+    select case (s% atm_option)
 
     case ('simple_photosphere')
 
@@ -1030,7 +1030,7 @@ contains
 
     case default
  
-      write(*,*) 'Unknown value for atm_option: ' // trim(s% ctrl% atm_option)
+      write(*,*) 'Unknown value for atm_option: ' // trim(s% atm_option)
 
     end select
 
@@ -1057,19 +1057,19 @@ contains
     ! Create the atmosphere structure by dispatching to the
     ! appropriate internal routine
 
-    select case (s% ctrl% atm_option)
+    select case (s% atm_option)
 
     case ('T_tau')
 
        call build_T_tau( &
             s, s% tau_factor*s% tau_base, L, R, Teff, M, cgrav, &
-            s% ctrl% atm_T_tau_relation, s% ctrl% atm_T_tau_opacity, &
+            s% atm_T_tau_relation, s% atm_T_tau_opacity, &
             s% atm_structure_num_pts, s% atm_structure, &
             ierr)
 
     case default
 
-       write(*,*) 'Cannot create atm structure for atm_option: ' // TRIM(s% ctrl% atm_option)
+       write(*,*) 'Cannot create atm structure for atm_option: ' // TRIM(s% atm_option)
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     end select
@@ -1122,7 +1122,7 @@ contains
          ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to get_T_tau failed in build_T_tau'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
        return
     end if
 
@@ -1131,7 +1131,7 @@ contains
     call get_T_tau_id(T_tau_relation, T_tau_id, ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to get_T_tau_id failed in build_T_tau'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
        return
     end if
 
@@ -1143,28 +1143,28 @@ contains
     case ('fixed', 'iterated')
 
        call atm_build_T_tau_uniform( &
-            tau_surf, L, R, Teff, M, cgrav, kap, s% ctrl% Pextra_factor, s% ctrl% atm_build_tau_outer, &
+            tau_surf, L, R, Teff, M, cgrav, kap, s% Pextra_factor, s% atm_build_tau_outer, &
             T_tau_id, eos_proc_for_build_T_tau, kap_proc_for_build_T_tau, &
-            s% ctrl% atm_build_errtol, s% ctrl% atm_build_dlogtau, &
+            s% atm_build_errtol, s% atm_build_dlogtau, &
             atm_structure_num_pts, atm_structure, &
             ierr)
        if (ierr /= 0) then
           s% retry_message = 'Call to atm_build_T_tau_uniform failed in build_T_tau'
-          if (s% ctrl% report_ierr) write(*, *) s% retry_message
+          if (s% report_ierr) write(*, *) s% retry_message
           return
        end if
 
     case ('varying')
 
        call atm_build_T_tau_varying( &
-            tau_surf, L, R, Teff, M, cgrav, lnP_surf, s% ctrl% atm_build_tau_outer, &
+            tau_surf, L, R, Teff, M, cgrav, lnP_surf, s% atm_build_tau_outer, &
             T_tau_id, eos_proc_for_build_T_tau, kap_proc_for_build_T_tau, &
-            s% ctrl% atm_build_errtol, s% ctrl% atm_build_dlogtau, &
+            s% atm_build_errtol, s% atm_build_dlogtau, &
             atm_structure_num_pts, atm_structure, &
             ierr)
        if (ierr /= 0) then
           s% retry_message = 'Call to atm_build_T_tau_varying failed in build_T_tau'
-          if (s% ctrl% report_ierr) write(*, *) s% retry_message
+          if (s% report_ierr) write(*, *) s% retry_message
           return
        end if
 
@@ -1271,7 +1271,7 @@ contains
        s% abar(1), P, T, gamma, rho, energy, ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to eos_gamma_PT_get_rho_energy failed in eos_proc'
-       if (s% ctrl% report_ierr) write(*, *) trim(s% retry_message)
+       if (s% report_ierr) write(*, *) trim(s% retry_message)
     end if
     
     logRho_guess = log10(rho)
@@ -1283,7 +1283,7 @@ contains
          ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to solve_eos_given_PgasT failed in eos_proc'
-       if (s% ctrl% report_ierr) write(*, *) trim(s% retry_message)
+       if (s% report_ierr) write(*, *) trim(s% retry_message)
     end if
 
     lnRho = logRho*ln10
@@ -1329,7 +1329,7 @@ contains
          ierr)
     if (ierr /= 0) then
        s% retry_message = 'Call to get_kap failed in kap_proc'
-       if (s% ctrl% report_ierr) write(*, *) s% retry_message
+       if (s% report_ierr) write(*, *) s% retry_message
     end if
 
     ! Finish

@@ -53,7 +53,7 @@
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
 
-        select case (s% ctrl% x_integer_ctrl(1))
+        select case (s% x_integer_ctrl(1))
         case(1)
            read(iounit,iostat=ierr) ms_t0, cheb_t0, ms_t1, cheb_t1, m_1DUP, mcore_TACHeB
         case(2)
@@ -76,7 +76,7 @@
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
 
-        select case (s% ctrl% x_integer_ctrl(1))
+        select case (s% x_integer_ctrl(1))
         case(1)
            write(iounit) ms_t0, cheb_t0, ms_t1, cheb_t1, m_1DUP, mcore_TACHeB
         case(2)
@@ -137,7 +137,7 @@
          call test_suite_startup(s, restart, ierr)
 
          if (.not. restart) then
-            select case(s% ctrl% x_integer_ctrl(1))
+            select case(s% x_integer_ctrl(1))
             case(1)
                ms_t0 = 0
                ms_t1 = 0
@@ -281,7 +281,7 @@
          ! here is an example for adding an extra history header item
          ! also set how_many_extra_history_header_items
          ! names(1) = 'mixing_length_alpha'
-         ! vals(1) = s% ctrl% mixing_length_alpha
+         ! vals(1) = s% mixing_length_alpha
 
       end subroutine data_for_extra_history_header_items
 
@@ -310,7 +310,7 @@
          ! here is an example for adding an extra profile header item
          ! also set how_many_extra_profile_header_items
          ! names(1) = 'mixing_length_alpha'
-         ! vals(1) = s% ctrl% mixing_length_alpha
+         ! vals(1) = s% mixing_length_alpha
 
       end subroutine data_for_extra_profile_header_items
 
@@ -334,7 +334,7 @@
          ! to update the star log,
             ! s% need_to_update_history_now = .true.
 
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case (1)
 
             ! measure MS lifetime
@@ -451,7 +451,7 @@
          end select
 
          ! Dynamic pgstar axis limits
-         if (s% ctrl% x_integer_ctrl(1) == 4) then
+         if (s% x_integer_ctrl(1) == 4) then
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
             if (s% xa(c13,k_max_c13) .gt. 0.01) then
@@ -484,7 +484,7 @@
          include 'formats'
 
          write(*,'(A)')
-         select case (s% ctrl% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(1))
          case (1)
             write(*,'(A70, F8.3)') '[TestHub] Main-sequence lifetime (Gyr): ', (ms_t1 - ms_t0) / 1d9
             write(*,'(A70, F8.3)') '[TestHub] Deepest penetration of first dredge-up (Msun): ', m_1DUP
@@ -546,10 +546,10 @@
             testhub_extras_names(4) = 'delta_surface_c12'; testhub_extras_vals(4) = delta_surface_c12
 
             ! get targets from inlist
-            max_c13_expected = s% ctrl% x_ctrl(1)
-            mass_max_c13_expected = s% ctrl% x_ctrl(2)
-            pocket_mass_c13_expected = s% ctrl% x_ctrl(3)
-            delta_surface_c12_expected = s% ctrl% x_ctrl(4)
+            max_c13_expected = s% x_ctrl(1)
+            mass_max_c13_expected = s% x_ctrl(2)
+            pocket_mass_c13_expected = s% x_ctrl(3)
+            delta_surface_c12_expected = s% x_ctrl(4)
 
             if (abs(max_c13 - max_c13_expected) > 1d-2) then
                write(*,*) 'bad value for max_c13'

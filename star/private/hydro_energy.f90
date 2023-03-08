@@ -54,7 +54,7 @@
             s, k, do_chem, nvar, &
             d_dm1, d_d00, d_dp1, ierr)
          if (ierr /= 0) then
-            if (s% ctrl% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
+            if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
             return
          end if         
          call store_partials( &
@@ -86,7 +86,7 @@
                     
          include 'formats'
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          
          ierr = 0
@@ -111,7 +111,7 @@
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad + eps_grav_ad
          else if (s% using_velocity_time_centering .and. &
-                s% ctrl% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
             esum_ad = - dL_dm_ad + sources_ad + &
                others_ad - d_turbulent_energy_dt_ad - dwork_dm_ad - de_dt_ad
          else
@@ -134,7 +134,7 @@
             s% solver_test_partials_dval_dx = d_d00(s% solver_test_partials_var)  
             write(*,*) 'get1_energy_eqn', s% solver_test_partials_var
             if (eps_grav_form) write(*,*) 'eps_grav_form', eps_grav_form
-            !if (.false. .and. s% solver_iter == s% ctrl% solver_test_partials_iter_number) then
+            !if (.false. .and. s% solver_iter == s% solver_test_partials_iter_number) then
             if (.true.) then
                write(*,2) 'scal', k, scal
                write(*,2) 'residual', k, residual
@@ -163,8 +163,8 @@
             nz = s% nz
             dt = s% dt
             dm = s% dm(k)
-            doing_op_split_burn = s% ctrl% op_split_burn .and. &
-               s% T_start(k) >= s% ctrl% op_split_burn_min_T
+            doing_op_split_burn = s% op_split_burn .and. &
+               s% T_start(k) >= s% op_split_burn_min_T
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
          end subroutine init
       
@@ -176,7 +176,7 @@
             ierr = 0
             skip_P = eps_grav_form
             if (s% using_velocity_time_centering .and. &
-                s% ctrl% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
                call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr) 
                d_dwork_dxam1 = 0
@@ -196,7 +196,7 @@
                   d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr) 
             end if
             if (ierr /= 0) then
-               if (s% ctrl% report_ierr) write(*,*) 'failed in setup_dwork_dm', k
+               if (s% report_ierr) write(*,*) 'failed in setup_dwork_dm', k
                return
             end if
             dwork_dm_ad = dwork_dm_ad/dm
@@ -209,8 +209,8 @@
             include 'formats'
             ierr = 0         
             if (s% using_velocity_time_centering .and. &
-                     s% ctrl% include_L_in_velocity_time_centering) then
-               L_theta = s% ctrl% L_theta_for_velocity_time_centering
+                     s% include_L_in_velocity_time_centering) then
+               L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
             end if
@@ -228,9 +228,9 @@
             include 'formats'
             ierr = 0
          
-            if (s% ctrl% eps_nuc_factor == 0d0 .or. s% ctrl% nonlocal_NiCo_decay_heat) then
+            if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
                eps_nuc_ad = 0 ! get eps_nuc from extra_heat instead
-            else if (s% ctrl% op_split_burn .and. s% T_start(k) >= s% ctrl% op_split_burn_min_T) then
+            else if (s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T) then
                eps_nuc_ad = 0d0
                eps_nuc_ad%val = s% burn_avg_epsnuc(k)
             else
@@ -252,16 +252,16 @@
             ! other = eps_WD_sedimentation + eps_diffusion + eps_pre_mix + eps_phase_separation
             ! no partials for any of these
             others_ad = 0d0 
-            if (s% ctrl% do_element_diffusion) then
-               if (s% ctrl% do_WD_sedimentation_heating) then
+            if (s% do_element_diffusion) then
+               if (s% do_WD_sedimentation_heating) then
                   others_ad%val = others_ad%val + s% eps_WD_sedimentation(k)
-               else if (s% ctrl% do_diffusion_heating) then
+               else if (s% do_diffusion_heating) then
                   others_ad%val = others_ad%val + s% eps_diffusion(k)
                end if
             end if
-            if (s% ctrl% do_conv_premix .and. s% ctrl% do_premix_heating) &
+            if (s% do_conv_premix .and. s% do_premix_heating) &
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
-            if (s% ctrl% do_phase_separation .and. s% ctrl% do_phase_separation_heating) &
+            if (s% do_phase_separation .and. s% do_phase_separation_heating) &
                others_ad%val = others_ad%val + s% eps_phase_separation(k)
             
             Eq_ad = 0d0
@@ -287,7 +287,7 @@
             type(auto_diff_real_star_order1) :: &
                e_m1, e_00, e_p1, diffusion_eps_in, diffusion_eps_out
             include 'formats'
-            diffusion_factor = s% ctrl% dedt_RTI_diffusion_factor
+            diffusion_factor = s% dedt_RTI_diffusion_factor
             do_diffusion = s% RTI_flag .and. diffusion_factor > 0d0
             if (.not. do_diffusion) then
                diffusion_eps_ad = 0d0
@@ -296,9 +296,9 @@
                   if (s% alpha_RTI(k) > 1d-10 .and. k > 1) then
                      emin_start = min( &
                         s% energy_start(k+1), s% energy_start(k), s% energy_start(k-1))
-                     if (emin_start < 5d0*s% ctrl% RTI_energy_floor) then
+                     if (emin_start < 5d0*s% RTI_energy_floor) then
                         diffusion_factor = diffusion_factor* &
-                           (1d0 + (5d0*s% ctrl% RTI_energy_floor - emin_start)/emin_start)
+                           (1d0 + (5d0*s% RTI_energy_floor - emin_start)/emin_start)
                      end if
                   end if
                   sigp1 = diffusion_factor*s% sig_RTI(k+1)
@@ -344,11 +344,11 @@
                return
             end if
 
-            ! value from checking s% ctrl% energy_eqn_option in hydro_eqns.f90
+            ! value from checking s% energy_eqn_option in hydro_eqns.f90
             eps_grav_form = s% eps_grav_form_for_energy_eqn
          
             if (.not. eps_grav_form) then ! check if want it true
-               if (s% doing_relax .and. s% ctrl% no_dedt_form_during_relax) eps_grav_form = .true.         
+               if (s% doing_relax .and. s% no_dedt_form_during_relax) eps_grav_form = .true.         
             end if
 
             if (eps_grav_form) then
@@ -357,7 +357,7 @@
                end if
                call eval_eps_grav_and_partials(s, k, ierr) ! get eps_grav info
                if (ierr /= 0) then
-                  if (s% ctrl% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k
+                  if (s% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k
                   return
                end if
                eps_grav_ad = s% eps_grav_ad(k)
@@ -392,7 +392,7 @@
                   dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
                   dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)      
                if (ierr /= 0) then
-                  if (s% ctrl% report_ierr) write(*,2) 'failed in get_dke_dt_dpe_dt', k
+                  if (s% report_ierr) write(*,2) 'failed in get_dke_dt_dpe_dt', k
                   return
                end if
                dke_dt_ad = 0d0
@@ -426,8 +426,8 @@
             
             ! do partials wrt composition
             dxam1 = 0d0; dxa00 = 0d0; dxap1 = 0d0
-            if (.not. (s% ctrl% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
-               if (do_chem .and. s% ctrl% dxdt_nuc_factor > 0d0) then
+            if (.not. (s% nonlocal_NiCo_decay_heat .or. doing_op_split_burn)) then
+               if (do_chem .and. s% dxdt_nuc_factor > 0d0) then
                   do j=1,s% species
                      dequ = scal*s% d_epsnuc_dx(j,k)
                      if (checking) call check_dequ(dequ,'d_epsnuc_dx')
@@ -443,7 +443,7 @@
                   dxa00(j) = dxa00(j) + dequ
                end do                           
             else if (do_chem .and. (.not. doing_op_split_burn) .and. &
-                     (s% ctrl% dxdt_nuc_factor > 0d0 .or. s% ctrl% mix_factor > 0d0)) then                     
+                     (s% dxdt_nuc_factor > 0d0 .or. s% mix_factor > 0d0)) then                     
                do j=1,s% species
                   dequ = scal*s% d_eps_grav_dx(j,k)
                   if (checking) call check_dequ(dequ,'d_eps_grav_dx')
@@ -486,10 +486,10 @@
             if (is_bad(dequ)) then
 !$omp critical (hydro_energy_crit2)
                ierr = -1
-               if (s% ctrl% report_ierr) then
+               if (s% report_ierr) then
                   write(*,2) 'get1_energy_eqn: bad ' // trim(str), k, dequ
                end if
-               if (s% ctrl% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_energy_eqn')
+               if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get1_energy_eqn')
 !$omp end critical (hydro_energy_crit2)
                return
             end if
@@ -546,7 +546,7 @@
             d_dwork_dxap1(j) = -d_work_p1_dxap1(j)
          end do         
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k) 
+         !test_partials = (k == s% solver_test_partials_k) 
          test_partials = .false.
             
          if (test_partials) then
@@ -614,8 +614,8 @@
          beta = 1d0 - alfa
          
          if (s% using_velocity_time_centering .and. &
-                  s% ctrl% include_P_in_velocity_time_centering) then
-            P_theta = s% ctrl% P_theta_for_velocity_time_centering
+                  s% include_P_in_velocity_time_centering) then
+            P_theta = s% P_theta_for_velocity_time_centering
          else
             P_theta = 1d0
          end if
@@ -655,21 +655,21 @@
             end if
          
             ! set Pvsc_ad
-            if (.not. s% ctrl% use_Pvsc_art_visc) then
+            if (.not. s% use_Pvsc_art_visc) then
                Pvsc_ad = 0d0
             else
                if (k > 1) then 
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  if (s% ctrl% include_P_in_velocity_time_centering) &
+                  if (s% include_P_in_velocity_time_centering) &
                      PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               if (s% ctrl% include_P_in_velocity_time_centering) &
+               if (s% include_P_in_velocity_time_centering) &
                   PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
@@ -691,7 +691,7 @@
             end if
          
             ! set extra_P
-            if (.not. s% ctrl% use_other_pressure) then
+            if (.not. s% use_other_pressure) then
                extra_P = 0d0
             else if (k > 1) then 
                extra_P = alfa*s% extra_pressure(k) + beta*s% extra_pressure(k-1) 
@@ -701,8 +701,8 @@
          
             ! set mlt_Pturb_ad
             mlt_Pturb_ad = 0d0
-            if (s% ctrl% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
-               mlt_Pturb_ad = s% ctrl% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
          
             P_face_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad + extra_P
          
@@ -719,7 +719,7 @@
             d_work_dxam1(j) = Av_face*d_Pface_dxam1(j)
          end do
 
-         !test_partials = (k == s% ctrl% solver_test_partials_k)
+         !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
             
          if (test_partials) then
@@ -804,7 +804,7 @@
          Av_facep1 = Av_facep1_ad%val
          dV = Av_face00_ad - Av_facep1_ad
 
-         include_mlt_Pturb = s% ctrl% mlt_Pturb_factor > 0d0 &
+         include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
             .and. s% mlt_vc_old(k) > 0d0 .and. k > 1
          
          call calc_Ptot_ad_tw( &

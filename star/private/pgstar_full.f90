@@ -77,8 +77,8 @@
          character (len=strlen) :: fname
          logical :: fexist
          ierr = 0
-         if(.not. folder_exists(trim(s% ctrl% log_directory))) call mkdir(trim(s% ctrl% log_directory))
-         fname = trim(s% ctrl% log_directory) // '/pgstar.dat'
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+         fname = trim(s% log_directory) // '/pgstar.dat'
          inquire(file=trim(fname), exist=fexist)
          if (fexist) then
             open(newunit=iounit, file=trim(fname), status='replace', action='write')
@@ -113,7 +113,7 @@
             write(*,*) 'PGSTAR failed in reading ' // trim(inlist_fname)
             return
          end if
-         if (s% ctrl% use_other_set_pgstar_controls) &
+         if (s% use_other_set_pgstar_controls) &
             call s% other_set_pgstar_controls(s% id)
          call set_win_file_data(s, ierr)
       end subroutine do_read_pgstar_controls
@@ -1278,7 +1278,7 @@
             p% okay_to_call_do_plot_in_grid = .false.
          end do
 
-         if (s% ctrl% use_other_pgstar_plots) &
+         if (s% use_other_pgstar_plots) &
             call s% other_pgstar_plots_info(s% id, ierr)
 
       end subroutine set_win_file_data
@@ -1384,7 +1384,7 @@
                s% L_phot_old > 0 .and. s% Teff_old > 0 .and. .not. must_write_files) then
             dlgL = log10(s% L_phot/s% L_phot_old)
             dlgTeff = log10(s% Teff/s% Teff_old)
-            dHR = sqrt(pow2(s% ctrl% delta_HR_ds_L*dlgL) + pow2(s% ctrl% delta_HR_ds_Teff*dlgTeff))
+            dHR = sqrt(pow2(s% delta_HR_ds_L*dlgL) + pow2(s% delta_HR_ds_Teff*dlgTeff))
             sum_dHR_since_last_file_write = sum_dHR_since_last_file_write + dHR
             must_write_files = &
                (sum_dHR_since_last_file_write >= s% pg% delta_HR_limit_for_file_output)
@@ -1492,8 +1492,8 @@
 
          n = s% number_of_history_columns
 
-         if(.not. folder_exists(trim(s% ctrl% log_directory))) call mkdir(trim(s% ctrl% log_directory))
-         fname = trim(s% ctrl% log_directory) // '/pgstar.dat'
+         if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
+         fname = trim(s% log_directory) // '/pgstar.dat'
 
          if (associated(pg% next)) then
             open(newunit=iounit, file=trim(fname), action='write', &
@@ -1534,7 +1534,7 @@
          include 'formats'
          ierr = 0
 
-         fname = trim(s% ctrl% log_directory) // '/pgstar.dat'
+         fname = trim(s% log_directory) // '/pgstar.dat'
          inquire(file=trim(fname), exist=fexist)
          if (.not.fexist) then
             if (dbg) write(*,*) 'failed to find ' // trim(fname)
