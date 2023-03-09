@@ -98,6 +98,8 @@
    terminal_interval = 50
    write_header_frequency = 50
 
+   use_gold2_tolerances = .true.
+
 / ! end of controls namelist
 
 &pgstar

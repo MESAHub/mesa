@@ -74,6 +74,7 @@
 
 ! solver
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
 
 ! output
       num_trace_history_values = 2

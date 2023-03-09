@@ -14,6 +14,7 @@
       max_number_retries = 80
 
       max_model_number = 70
+      use_gold2_tolerances = .true.
 
       extra_terminal_output_file = 'log2' 
       log_directory = 'LOGS2'

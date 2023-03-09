@@ -41,7 +41,7 @@
 
 &controls
 
-
+    use_gold2_tolerances = .true.
 
     xa_central_lower_limit_species(1) = 'h1'
     xa_central_lower_limit(1) = 0.4 

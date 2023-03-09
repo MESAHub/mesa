@@ -73,6 +73,8 @@
   trace_history_value_name(1) = 'rel_E_err'
   trace_history_value_name(2) = 'log_rel_run_E_err'
 
+  use_gold2_tolerances = .true.
+
   ! for convergence studies
       read_extra_controls_inlist(2) = .false.
       extra_controls_inlist_name(2)= 'inlist_resolution'

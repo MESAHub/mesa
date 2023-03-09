@@ -48,6 +48,7 @@
       include_composition_in_eps_grav = .true.
       limit_for_rel_error_in_energy_conservation = 1d99
       hard_limit_for_rel_error_in_energy_conservation = 1d99
+      use_gold2_tolerances = .true.
 
 
       num_trace_history_values = 2

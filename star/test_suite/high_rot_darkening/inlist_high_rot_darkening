@@ -53,6 +53,7 @@
     history_interval = 1
     terminal_interval = 10
 
+    use_gold2_tolerances = .true.
     gold_solver_iters_timestep_limit = 20
     gold2_solver_iters_timestep_limit = 20
 

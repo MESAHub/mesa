@@ -31,6 +31,7 @@
       
       ! limit max_model_number as part of test_suite
       max_model_number = 75
+      use_gold2_tolerances = .true.
 
       atm_T_tau_opacity = 'varying'
       atm_T_tau_relation = 'Trampedach_solar'

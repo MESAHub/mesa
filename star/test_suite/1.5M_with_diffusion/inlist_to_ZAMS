@@ -69,6 +69,8 @@
 
       mesh_delta_coeff = 0.5
 
+      use_gold2_tolerances = .true.
+
 / ! end of controls namelist
 
 &pgstar

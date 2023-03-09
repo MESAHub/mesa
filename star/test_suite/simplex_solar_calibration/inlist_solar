@@ -69,6 +69,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 1200
+      use_gold2_tolerances = .true.
 
       max_years_for_timestep = 1d7           
       varcontrol_target = 1d-3

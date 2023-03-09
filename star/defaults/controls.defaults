@@ -8957,7 +8957,7 @@
 
       ! ::
 
-    use_gold2_tolerances = .true.
+    use_gold2_tolerances = .false.
     steps_before_use_gold2_tolerances = -1
 
       ! if >= 0, then after this many steps in run, act as if use_gold2_tolerances true

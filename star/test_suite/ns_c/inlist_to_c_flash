@@ -106,6 +106,7 @@
 ! solver    
       energy_eqn_option = 'dedt'
 
+      use_gold2_tolerances = .true.
       steps_before_use_gold2_tolerances = 1
 
       use_other_cgrav = .true. ! for GR factor with gravity

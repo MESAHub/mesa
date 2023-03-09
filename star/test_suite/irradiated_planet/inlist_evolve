@@ -52,6 +52,7 @@
       max_model_number = 650         
       
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
       
       convergence_ignore_equL_residuals = .true.
       
