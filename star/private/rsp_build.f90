@@ -26,7 +26,7 @@
       module rsp_build
       use star_def, only: star_info
       use utils_lib, only: is_bad
-      use const_def, only: dp, crad
+      use const_def, only: dp, crad, one_third, two_thirds
       use eos_lib, only: Radiation_Pressure
       use rsp_def
       use rsp_eval_eos_and_kap, only: X, Y, Z
@@ -202,7 +202,7 @@
       enddo
       II=0; IO=0
       do I=NZN,1,-1
-         if(TA(I).gt.2.d0/3.d0)then
+         if(TA(I).gt.two_thirds)then
             II=I
             IO=I+1
             goto 77
@@ -216,7 +216,7 @@
       end if
       AA=(T(IO)-T(II))/(TA(IO)-TA(II))
       BB=T(IO)-AA*TA(IO)
-      TAUTEFF=AA*2.d0/3.d0+BB
+      TAUTEFF = two_thirds*AA + BB
 
       do I=NZN,1,-1
          if(T(I).gt.TE)then
@@ -380,7 +380,7 @@
             if (s% RSP_trace_RSP_build_model) write(*,*) 'call store_N'
             call store_N
             zone_loop: do
-               R_1=pow(R_1**3-3.d0*V_0*dm_0/P4,1.d0/3.d0)
+               R_1=pow(pow3(R_1)-3.d0*V_0*dm_0/P4, one_third)
                N=N-1  
                if (s% RSP_trace_RSP_build_model) write(*,*) 'zone_loop', N, T_0, TIN
                if (N.eq.0 .or. T_0 >= TIN) then
@@ -393,7 +393,7 @@
                      s% xmstar = s% mstar - s% M_center
                      s% M_center = s% mstar - s% xmstar ! this is how it is set when read file
                      s% L_center = s% RSP_L*SUNL
-                     s% R_center = pow(r(1)**3 - Vol(1)*dm(1)/P43, 1d0/3d0)
+                     s% R_center = pow(pow3(r(1)) - Vol(1)*dm(1)/P43, one_third)
                      s% v_center = 0                     
                      if (s% RSP_trace_RSP_build_model) &
                         write(*,*) '   inner dm growth scale', HH
@@ -464,9 +464,9 @@
          do i=NZN,1,-1
             dtau = dm(i)*K(i)/(4d0*pi*r(i)**2)
             tau = tau + dtau
-            if (tau >= 2d0/3d0) then
+            if (tau >= two_thirds) then
                write(*,2) 'cells from surface tau=0 to tau=2/3', &
-                  NZN+1-i, tau-dtau, 2d0/3d0, tau, T(i), TE
+                  NZN+1-i, tau-dtau, two_thirds, tau, T(i), TE
                return
             end if
          end do
@@ -479,13 +479,13 @@
          include 'formats'
          dm_0=dmN*FSUB
          M_0=MX
-         dm_bar_0=(dm_0/2.d0)
+         dm_bar_0=0.5d0*dm_0
          if(.not.RSP_eddi) then !     EXACT GREY RELATION
-            WE=TE**4
+            WE=pow4(TE)
             T4_0=WE*sqrt(3.d0)/4.d0               !0.4330127018d0 
             T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE !0.811194802d0*TE
          else !     EDDINGTON APPROXIMATION
-            WE=TE**4
+            WE=pow4(TE)
             T4_0=WE*0.5d0 ! T4_0=WE*1.0d0/2.d0
             T_0=pow(0.5d0, 0.25d0)*TE ! T_0= pow(1.0d0/2.d0,0.25d0)*TE
          endif      
@@ -503,12 +503,12 @@
                return
             end if
          else if (s% RSP_use_Prad_for_Psurf) then
-            Psurf = crad*T_0*T_0*T_0*T_0/3d0
+            Psurf = one_third*crad*pow4(T_0)
          else
             Psurf = 0d0
          end if
          Psurf_from_atm = Psurf
-         P_0=Psurf+G*M_0*dm_bar_0/(P4*R_1**4)
+         P_0=Psurf+G*M_0*dm_bar_0/(P4*pow4(R_1))
          call EOP(s,-1,T_0,P_0,V_0, &
                   E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)
          if (ierr /= 0) return
@@ -644,7 +644,7 @@
             dm_0=dm_0*H
          end if         
          dm_bar_0=(dm_0+dmL)/2.d0
-         P_0=P_1+G*M_0*dm_bar_0/(P4*R_1**4)         
+         P_0=P_1+G*M_0*dm_bar_0/(P4*pow4(R_1))         
       end subroutine setup_next_zone
       
       real(dp) function eval_T_residual(ierr)
@@ -653,8 +653,8 @@
             T_0,P_0,V_0,E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)     
          if (ierr /= 0) return 
          call CFLUX(HP_0,IGR_0,Lc_0,w_0,GPF,N)
-         TT=4.d0*SIG*P4**2*R_1**4/(3.d0*dm_bar_0*L)
-         T4_0 = T_0**4
+         TT=4.d0*SIG*pow2(P4)*pow4(R_1)/(3.d0*dm_bar_0*L)
+         T4_0 = pow4(T_0)
          Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
          eval_T_residual = (Lr_0 + Lc_0)/L - 1d0               
@@ -687,7 +687,7 @@
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          include 'formats'
-         Tmax = 0.99d0*(3d0*P_0/crad)**0.25d0 ! Prad must be < P_0
+         Tmax = 0.99d0*pow(3d0*P_0/crad, 0.25d0) ! Prad must be < P_0
          lnT_min = log(T_1)
          lnT_max = log(Tmax)
          resid_T_min = get_T_residual(lnT_min, &
@@ -748,10 +748,10 @@
                return
                call mesa_error(__FILE__,__LINE__,'T_0 <= 0 in Lc_loop1')
             end if
-            T4_0=T_0**4
+            T4_0=pow4(T_0)
          end do Lc_loop1
          
-         TT=4.d0*SIG*P4**2*R_1**4/(3.d0*dm_bar_0*L)
+         TT=4.d0*SIG*pow2(P4)*pow4(R_1)/(3.d0*dm_bar_0*L)
          Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
          F1=(Lr_0+Lc_0)/L-1.d0  
@@ -785,7 +785,7 @@
                   return
                   call mesa_error(__FILE__,__LINE__,'T_0 <= 0 in Lc_loop')
                end if
-               T4_0=T_0**4
+               T4_0=pow4(T_0)
             end do Lc_loop
             Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                   (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
@@ -819,7 +819,7 @@
          V_0  = Vol(N1)
          P_0  = P(N1)
          T_0  = T(N1)
-         T4_0  = T_0**4
+         T4_0  = pow4(T_0)
          M_0  = M(N1)
          dm_0 = dm(N1)
          OP_0 = K(N1)
@@ -875,7 +875,7 @@
          T0= pow(0.5d0, 0.25d0)*TE ! T0= pow(1.0d0/2.d0,0.25d0)*TE 
       endif      
       if (s% RSP_use_Prad_for_Psurf) then
-         Psurf = crad*T0*T0*T0*T0/3d0
+         Psurf = one_third*crad*pow4(T0)
       else
          Psurf = 0d0
       end if
@@ -912,7 +912,7 @@
          kap = alfa*1d-2*(1d0 + X) + (1d0-alfa)*1d-3
       end if
       G_M_dtau_div_R2 = G*M*dtau/R**2
-      Prad = crad*T0*T0*T0*T0/3d0
+      Prad = one_third*crad*pow4(T0)
       Pgas_0 = G_M_dtau_div_R2/kap
       P = Pgas_0 + Prad ! initial guess for P
       call EOP(s,0,T0,P,V,xx,xx,xx,xx,xx,ierr) ! initial V
@@ -963,7 +963,7 @@
       IGR_0=POM*((QQ_0/CP_0+QQ_1/CP_1)/2.d0*(P_1-P_0) &
             -(dlog(T_1)-dlog(T_0)))!hyt!
 
-      POM=sqrt(2.d0/3.d0)*0.5d0
+      POM=sqrt(two_thirds)*0.5d0
       ENT=(E_0+P_0*V_0)/T_0+(E_1+P_1*V_1)/T_1
       FF=POM*ENT
       POM=ALFAS*ALFA
@@ -986,8 +986,8 @@
             AA=CEDE/ALFA
             POM=(GAMMAR**2/ALFA**2)*4.d0*SIG
             BB=(POM/HP_0)* &
-               (T_0**3*V_0**2/CP_0/OP_0 &
-                 +T_1**3*V_1**2/CP_1/OP_1)*0.5d0
+               (pow3(T_0)*pow2(V_0)/CP_0/OP_0 &
+                 +pow3(T_1)*pow2(V_1)/CP_1/OP_1)*0.5d0
             CC=-(T_0*P_0*QQ_0/CP_0 &
                      +T_1*P_1*QQ_1/CP_1)*0.5d0*FF*GPF
             DELTA=BB**2-4.d0*AA*CC
