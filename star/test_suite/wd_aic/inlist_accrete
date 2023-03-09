@@ -27,6 +27,7 @@
 
   ! use eps_grav form
     use_gold_tolerances = .true.
+    use_gold2_tolerances = .true.
 
   ! when to stop
     log_center_density_limit = 9.45

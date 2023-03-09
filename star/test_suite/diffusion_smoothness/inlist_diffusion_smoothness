@@ -43,6 +43,7 @@
 
       energy_eqn_option = 'dedt'
       calculate_Brunt_N2 = .true.
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

@@ -26,6 +26,7 @@
       max_number_retries = 15
 
       max_model_number = 2000
+      use_gold2_tolerances = .true.
 
       extra_terminal_output_file = 'log1' 
       log_directory = 'LOGS1'

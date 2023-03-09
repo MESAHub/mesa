@@ -36,39 +36,40 @@
       max_model_number = 200  
 
       initial_z = 0.02
-      
+
       calculate_Brunt_N2 = .true.
 
-     ! GYRE output controls
+      ! GYRE output controls
 
-     x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-     x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+      x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
 
-     x_integer_ctrl(2) = 2 ! max number of modes to output per call
-     x_logical_ctrl(2) = .false. ! output eigenfunction files
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
 
-     x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-        ! should match gyre.in mode l
-     x_integer_ctrl(4) = 1 ! order
-     x_ctrl(1) = 0.2d-3 ! freq ~ this (Hz)
-     x_ctrl(2) = 1d99 ! growth < this (days)
-     
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+      ! should match gyre.in mode l
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.2d-3 ! freq ~ this (Hz)
+      x_ctrl(2) = 1d99 ! growth < this (days)
 
-  ! starting specifications
-    initial_mass = 1 ! in Msun units
 
-  ! stop when the center mass fraction of h1 drops below this limit
-    xa_central_lower_limit_species(1) = 'h1'
-    xa_central_lower_limit(1) = 1d-3
+      ! starting specifications
+      initial_mass = 1 ! in Msun units
 
-   energy_eqn_option = 'dedt'
-   
-    
-  ! output
+      ! stop when the center mass fraction of h1 drops below this limit
+      xa_central_lower_limit_species(1) = 'h1'
+      xa_central_lower_limit(1) = 1d-3
 
-   num_trace_history_values = 2
-   trace_history_value_name(1) = 'rel_E_err'
-   trace_history_value_name(2) = 'log_rel_run_E_err'
+      energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
+
+
+      ! output
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
 
       photo_interval = 50
       profile_interval = 100

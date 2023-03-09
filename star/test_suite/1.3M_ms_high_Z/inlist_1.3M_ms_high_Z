@@ -43,6 +43,7 @@
 
   ! limit max_model_number as part of test_suite
    max_model_number = 500
+   use_gold2_tolerances = .true.
 
   ! the initial model comes from this thread via Philip Hall
   ! https://lists.mesastar.org/pipermail/mesa-users/2017-June/007738.html

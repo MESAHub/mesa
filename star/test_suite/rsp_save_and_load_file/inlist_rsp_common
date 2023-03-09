@@ -283,6 +283,7 @@
 
 ! general 
       set_rho_to_dm_div_dV = .false.
+      use_gold2_tolerances = .true.
 
       !use_eosDT2 = .true.
       !use_eosELM = .true.

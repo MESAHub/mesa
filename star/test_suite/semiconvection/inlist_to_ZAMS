@@ -55,6 +55,7 @@
 
       !max_years_for_timestep = 1d4
       !max_timestep_factor = 1.2
+      use_gold2_tolerances = .true.
       
 ! output controls
 

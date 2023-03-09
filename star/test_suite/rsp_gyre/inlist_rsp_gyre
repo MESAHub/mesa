@@ -43,6 +43,7 @@
 
    ! limit max_model_number as part of test_suite
    max_model_number = 8000
+   use_gold2_tolerances = .true.
    
    calculate_Brunt_N2 = .true.
 

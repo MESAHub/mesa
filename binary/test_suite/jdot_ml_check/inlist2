@@ -23,6 +23,7 @@
       write_header_frequency = 10
       
       varcontrol_target = 1d-3
+      use_gold2_tolerances = .true.
       
 
 / ! end of controls namelist

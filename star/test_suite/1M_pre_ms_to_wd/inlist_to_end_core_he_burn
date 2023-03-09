@@ -41,6 +41,7 @@
       xa_central_lower_limit(1) = 0.0001
 
       energy_eqn_option = 'eps_grav'
+      use_gold2_tolerances = .true.
       
       convergence_ignore_equL_residuals = .true.
 
