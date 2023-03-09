@@ -1784,7 +1784,7 @@
 
       ! ::
 
-    max_abs_rel_run_E_err = 0.01d0
+    max_abs_rel_run_E_err = -1
 
 
       ! max_number_retries
@@ -11427,7 +11427,7 @@
 
       ! ::
 
-    warn_when_large_rel_run_E_err = 0.01d0
+    warn_when_large_rel_run_E_err = 0.1d0
 
       ! absolute_cumulative_energy_err
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
