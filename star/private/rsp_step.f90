@@ -1636,7 +1636,7 @@
             POM = (16.d0/3.d0)*PI*ALFA*ALFAM/s% dm(k)  
             Vol = s% Vol(k)
             POM1 = s% RSP_w(k)/Vol**2
-            POM2 = 0.5d0*(s% r(k)**6 + s% r(k+1)**6)
+            POM2 = 0.5d0*(pow6(s% r(k)) + pow6(s% r(k+1)))
             POM4 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             POM3 = s% v(k)/s% r(k) - s% v(k+1)/s% r(k+1)
             POMT3 = POM*POM1*POM2*POM4
@@ -1688,12 +1688,12 @@
             dChi_dr_out(I) = POMT4*0.5d0*(dHp_dr_out(I)) ! 
             dChi_dr_00(I) = &
                - 2.d0*s% Chi(k)/Vol*dVol_dr_00(I) & ! 
-               + POMT2*3.d0*s% r(k)**5 &
+               + POMT2*3.d0*pow5(s% r(k)) &
                + POMT3*(2.d0/s% dt/s% r(k) - s% v(k)/s% r(k)**2) &
                + POMT4*0.5d0*(dHp_dr_00(I) + dHp_dr_out(i-1))
             dChi_dr_in(I) = &
                - 2.d0*s% Chi(k)/Vol*dVol_dr_in(I) & ! 
-               + POMT2*3.d0*s% r(k+1)**5 &
+               + POMT2*3.d0*pow5(s% r(k+1)) &
                - POMT3*(2.d0/s% dt/s% r(k+1) - s% v(k+1)/s% r(k+1)**2) &
                + POMT4*0.5d0*(dHp_dr_in(I) + dHp_dr_00(i-1))
             dChi_dr_in2(I) = POMT4*0.5d0*dHp_dr_in(i-1) ! 

@@ -600,7 +600,7 @@
 !           Kuhfuss (1986) tensor EDDY VISCOSITY
             POM=16.d0/3.d0*PI*ALFA*ALFAM*sqrt(Et(I))
             POM1=1.d0/Vol(I)**2/dm(I)
-            POM2=(R(I)**6+R(I-1)**6)*(Hp_face(I)+Hp_face(I-1))*0.25d0
+            POM2=(pow6(R(I))+pow6(R(I-1)))*(Hp_face(I)+Hp_face(I-1))*0.25d0
             EVUU0(I)= POM*POM1*POM2/R(I)
             EVUUM(I)=-POM*POM1*POM2/R(I-1)
          else
