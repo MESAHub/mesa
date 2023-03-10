@@ -75,6 +75,7 @@
    do_conv_premix = .true.
    do_premix_heating = .true.
    use_gold2_tolerances = .true.
+   max_abs_rel_run_E_err = 1d-2
 
    ! Timestep and grid
 
