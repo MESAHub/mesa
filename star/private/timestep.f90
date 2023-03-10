@@ -493,7 +493,7 @@
          type (star_info), pointer :: s
          real(dp) :: X, X_old, delta_X, delta_X_div_X, max_dX, max_dX_div_X, &
             bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit, &
-            D_mix_cutoff, ratio_tmp
+            D_mix_cutoff, ratio_tmp_dX, ratio_tmp_dX_div_X
          integer :: i, j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
          real(dp), dimension(max_dX_limit_ctrls) :: dX_limit, dX_hard_limit, &
             dX_div_X_limit, dX_div_X_hard_limit
@@ -639,9 +639,9 @@
             end do
             
             if (dX_limit(i) > 0) then
-               dX_dt_limit_ratio = max_dX/dX_limit(i)
-               if (ratio_tmp > dX_dt_limit_ratio) then
-                  dX_dt_limit_ratio = ratio_tmp
+               ratio_tmp_dX = max_dX/dX_limit(i)
+               if (ratio_tmp_dX > dX_dt_limit_ratio) then
+                  dX_dt_limit_ratio = ratio_tmp_dX
                   if (dX_dt_limit_ratio <= 1d0) then
                      dX_dt_limit_ratio = 0
                   else
@@ -658,9 +658,9 @@
             end if
    
             if (dX_div_X_limit(i) > 0) then
-               ratio_tmp = max_dX_div_X/dX_div_X_limit(i)
-               if (ratio_tmp > dX_div_X_dt_limit_ratio) then  ! pick out largest culprit only!
-                  dX_div_X_dt_limit_ratio = ratio_tmp
+               ratio_tmp_dX_div_X = max_dX_div_X/dX_div_X_limit(i)
+               if (ratio_tmp_dX_div_X > dX_div_X_dt_limit_ratio) then  ! pick out largest culprit only!
+                  dX_div_X_dt_limit_ratio = ratio_tmp_dX_div_X
                   if (dX_div_X_dt_limit_ratio <= 1d0) then
                      dX_div_X_dt_limit_ratio = 0
                   else
