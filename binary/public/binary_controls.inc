@@ -84,6 +84,7 @@ logical :: do_enhance_wind_1, do_enhance_wind_2
 real(dp) :: tout_B_wind_1, tout_B_wind_2
 logical :: do_wind_mass_transfer_1, do_wind_mass_transfer_2
 real(dp) :: wind_BH_alpha_1, wind_BH_alpha_2
+real(dp) :: wind_BH_beta_1, wind_BH_beta_2
 real(dp) :: max_wind_transfer_fraction_1, max_wind_transfer_fraction_2
 
 ! orbital jdot controls

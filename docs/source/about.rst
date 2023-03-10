@@ -110,6 +110,7 @@ Developers
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
 * Aaron Dotter
+* Matthias Fabry
 * `Robert Farmer <http://rjfarmer.io/>`__
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__

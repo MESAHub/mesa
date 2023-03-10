@@ -1,0 +1,77 @@
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'pre_tzo.mod'
+
+      ! save a model at the end of the run
+      save_model_when_terminate = .true.
+      save_model_filename = 'tzo.mod'      
+
+      relax_initial_core = .true.
+      new_core_mass = 1.4d0
+      dlg_core_mass_per_step = 5d-2
+      relax_core_years_for_dt = 1d0
+      core_avg_rho = 3d9
+      core_avg_eps = 1d5
+
+      set_initial_age = .true.
+      initial_age = 0     
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-8
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0
+
+      relax_Y = .false.
+      relax_Z = .false.
+      relax_mass = .false.
+
+      change_initial_net=.true.
+      new_net_name='approx21.net' 
+
+/ ! end of star_job namelist
+
+&eos
+
+/
+
+&kap
+
+/
+
+
+&controls
+
+   use_gold_tolerances = .false.
+   relax_use_gold_tolerances = .false.
+
+   max_abs_rel_run_E_err = -1d0
+   limit_for_rel_error_in_energy_conservation = 1d99
+   hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+   convergence_ignore_equL_residuals = .true.
+
+   max_model_number = 1
+
+
+   ! Winds
+   hot_wind_scheme = ''
+   cool_wind_RGB_scheme = ''
+   cool_wind_AGB_scheme = ''
+
+   set_min_d_mix=.true.
+   min_d_mix=1d6
+
+   x_integer_ctrl(1) = 2 ! Inlist number
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

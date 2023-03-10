@@ -126,39 +126,46 @@
 
          if (b% max_timestep < 0) b% max_timestep = b% s_donor% dt
 
-
          b% env(b% d_i) = s% star_mass - s% he_core_mass
          if (b% point_mass_i == 0) then
             b% env(b% a_i) = b% s_accretor% star_mass - b% s_accretor% he_core_mass
          end if
 
-         if (b% env_old(b% d_i) /= 0) then
-            env_change = b% env(b% d_i) - b% env_old(b% d_i)
+         if(.not. b% doing_first_model_of_run) then
+            if (b% env_old(b% d_i) /= 0) then
+               env_change = b% env(b% d_i) - b% env_old(b% d_i)
+            else
+               env_change = 0
+            end if
+            
+            if (b% rl_relative_gap_old(b% d_i) /= 0) then
+               rel_gap_change = b% rl_relative_gap_old(b% d_i) - b% rl_relative_gap(b% d_i)
+            else
+               rel_gap_change = 0
+            end if
+            
+            if (b% angular_momentum_j_old /= 0) then
+               j_change = b% angular_momentum_j - b% angular_momentum_j_old
+            else
+               j_change = 0
+            end if
+            
+            if (b% separation_old /= 0) then
+               sep_change = b% separation - b% separation_old
+            else
+               sep_change = 0
+            end if
+            if (b% eccentricity_old /= 0) then
+               e_change = b% eccentricity - b% eccentricity_old
+            else
+               e_change = 0
+            end if
          else
             env_change = 0
-         end if
-         
-         if (b% rl_relative_gap_old(b% d_i) /= 0) then
-            rel_gap_change = b% rl_relative_gap_old(b% d_i) - b% rl_relative_gap(b% d_i)
-         else
             rel_gap_change = 0
-         end if
-         
-         if (b% angular_momentum_j_old /= 0) then
-            j_change = b% angular_momentum_j - b% angular_momentum_j_old
-         else
             j_change = 0
-         end if
-         
-         if (b% separation_old /= 0) then
-            sep_change = b% separation - b% separation_old
-         else
             sep_change = 0
-         end if
-         if (b% eccentricity_old /= 0) then
-             e_change = b% eccentricity - b% eccentricity_old
-         else
-             e_change = 0
+            e_change = 0
          end if
    
          ! get limits for dt based on relative changes

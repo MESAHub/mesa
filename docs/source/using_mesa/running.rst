@@ -115,24 +115,24 @@ MESA will keep you updated via terminal output that looks like this:
 ::
 
          step    lg_Tmax     Teff     lg_LH      lg_Lnuc     Mass       H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry
-     lg_dt_yr    lg_Tcntr    lg_R     lg_L3a     lg_Lneu     lg_Mdot    He_core    He_cntr    O_cntr     Z_surf   gam_cntr   iters  
-       age_yr    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   C_core     C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit
+    lg_dt_yrs    lg_Tcntr    lg_R     lg_L3a     lg_Lneu     lg_Mdot    He_core    He_cntr    O_cntr     Z_surf   gam_cntr   iters
+      age_yrs    lg_Dcntr    lg_L     lg_LZ      lg_Lphoto   lg_Dsurf   CO_core    C_cntr     Ne_cntr    Z_cntr   v_div_cs       dt_limit
   __________________________________________________________________________________________________________________________________________________
-  
-          800   7.455602  2.821E+04   4.211546   4.211546  15.000000  15.000000   0.699864   0.001978   0.280000  -5.912231    873      0
-     2.364495   7.455602   0.837935 -33.599828   3.029214 -99.000000   0.000000   0.279998   0.009380   0.020000   0.014924      3
-   4.5570E+04   0.596891   4.432022 -11.138110 -99.000000  -9.090996   0.000000   0.002618   0.002085   0.020138  0.000E+00    varcontrol
+
+          200   7.468401  2.865E+04   4.240859   4.240859  15.000000  15.000000   0.699697   0.003104   0.280000  -5.917248    864      3
+   3.3257E+00   7.468401   0.795655 -32.911837   3.063854 -99.000000   0.000000   0.280004   0.009379   0.020000   0.014657      5
+   5.0236E+04   0.611187   4.374553 -99.000000 -99.000000  -9.031542   0.000000   0.001654   0.002085   0.020299  0.000E+00  max increase
 
 
 MESA will also display some pgstar plots that look like:
 
-.. figure:: hr_000800.png
+.. figure:: hr_000200.png
    :alt: HR Diagram
 
-.. figure:: trho_profile_000800.png
+.. figure:: trho_profile_000200.png
    :alt: TRho Profile
 
-This should run for about 850 steps before stopping with the following
+This should run for 208 steps before stopping with the following
 message:
 
 ::
@@ -168,7 +168,7 @@ MESA versions):
 indicating that one of these snapshots was automatically saved when the
 run terminated.
 
-Open up inlist_project in your editor. You can see there were two
+Open up ``inlist_project`` in your editor. You can see there were two
 stopping conditions,
 
 ::
@@ -195,11 +195,11 @@ Now we can restart using the photo and our new settings. Try it.
 
 ::
 
-   ./re x849
+   ./re x208
 
-This resumes the run from model 849, but this time the run will stop
+This resumes the run from model 208, but this time the run will stop
 when our other condition is satisfied, when the central hydrogen drops
-below 1e-3. This will happen at about model number 975.
+below 0.001. This will happen at model number 305.
 
 Saving a model
 --------------
@@ -215,7 +215,7 @@ just before the bug happens and send it in an email along with your
 inlist.
 
 Let's save a model file at the end of our run. Go to the following lines
-to the &star_job section of your inlist:
+to the ``&star_job`` section of your inlist:
 
 ::
 
@@ -224,16 +224,16 @@ to the &star_job section of your inlist:
   save_model_filename = '15M_at_TAMS.mod'
 
 Tell MESA that you want to save a model file at the end by editing your
-inlist and changing save_model_when_terminate to true.
+inlist and changing ``save_model_when_terminate`` to ``.true.``.
 
 Save the file and then restart MESA from the same point as before.
 
 ::
 
-   ./re x849
+   ./re x208
 
 This time when the run terminates MESA will save a model named
-15M_at_TAMS.mod. Take a look and see.
+``15M_at_TAMS.mod``. Take a look and see.
 
 Loading a model
 ---------------
@@ -292,8 +292,8 @@ If you want to try this out, save the preceding text as a file named
 ``inlist_load`` in your work directory. Make sure your file ends with 
 a blank new line. Then edit your main inlist
 file so that it will use ``inlist_load`` instead of ``inlist_project``
-everywhere within inlist (i.e., extra_star_job_inlist_name(1) and
-extra_controls_inlist1_name).
+everywhere within inlist (i.e., ``extra_star_job_inlist_name(1)`` and
+``extra_controls_inlist_name(1)``).
 
 Then as usual, do
 
