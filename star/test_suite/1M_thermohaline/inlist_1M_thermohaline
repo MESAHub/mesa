@@ -104,6 +104,7 @@
          
          use_gold2_tolerances = .true.
          use_gold_tolerances = .true.
+         max_abs_rel_run_E_err = 1d-2
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)
