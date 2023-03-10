@@ -636,8 +636,22 @@
          
          logical function two_two()
             two_two = .true.
-            if (in1 == 0 .or. in2 == 0 .or. out1 == 0 .or. out2 == 0 .or. &
-                in1 == in2 .or. out1 == out2) return
+
+            if (in1 == 0 .or. in2 == 0 .or. out1 == 0 .or. out2 == 0) return
+            
+            ! Special case r_li7_pa_he4, this must come first otherwise the out1==out2
+            ! check will label this rate as a _to_ reaction instead of an _ap reaction
+            if (nuclides% Z(in1) == 1 .and. nuclides% N(in1) == 0 .and. &
+               nuclides% Z(out1) == 2 .and. nuclides% N(out1) == 2 .and. &
+               nuclides% Z(out2) == 2 .and.  nuclides% N(out2) == 2 .and. &
+               nuclides% Z(in2) == 3 .and. nuclides% N(in2) == 4) then
+               handle = trim(handle) // '_pa'
+               two_two = .false.
+               return
+            end if
+
+            if(in1==in2 .or. out1==out2) return
+            
             two_two = .false.
             if (nuclides% Z(in1) == 2 .and. nuclides% N(in1) == 2 .and. &
                      nuclides% Z(out1) == 1 .and. nuclides% N(out1) == 0 .and. &
