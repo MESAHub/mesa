@@ -26,7 +26,7 @@
       module rsp_relax_env
       use star_def, only: star_info
       use utils_lib, only: is_bad, mesa_error
-      use const_def, only: dp, crad
+      use const_def, only: dp, crad, one_third
       use eos_lib, only: Radiation_Pressure
       use rsp_def
       use rsp_eval_eos_and_kap, only: X, Y, Z
@@ -511,7 +511,7 @@
       !$OMP PARALLEL DO PRIVATE(I,T1,POM,EDFAC,op_err) SCHEDULE(dynamic,2)
       do 1 I=2,NZN
          T1=P43/dm(I)
-         Vol(I)=T1*(R(I)**3-R(I-1)**3)
+         Vol(I)=T1*(pow3(R(I))-pow3(R(I-1)))
          DVRM(I) = -3.d0*T1*R(I-1)**2
          DVR(I)  =  3.d0*T1*R(I)**2
 
@@ -550,11 +550,11 @@
       if (ierr /= 0) return
 
 !     FIRST ZONE, CALCULATION OF R0 AND EOS
-      P(1)=P(2)+G*M(1)*dm_bar(1)/(P4*R(1)**4)
+      P(1)=P(2)+G*M(1)*dm_bar(1)/(P4*pow4(R(1)))
 !     WITH GIVEN T AND P ITERATE FOR V AND CALCULATE ITS DERIVATIVES
       call EOP(s,0,T(1),P(1),Vol(1),E(1),CPS(1),QQS(1),SVEL,K(1),ierr)
       if (ierr /= 0) return
-      s% R_center=pow(R(1)**3-3.d0*Vol(1)*dm(1)/P4,1.d0/3.d0)
+      s% R_center=pow(pow3(R(1))-3.d0*Vol(1)*dm(1)/P4, one_third)
       T1=P43/dm(1)
       DVRM(1) = -3.d0*T1*s% R_center**2
       DVR(1)  =  3.d0*T1*R(1)**2
@@ -768,7 +768,7 @@
             d_dampR_dw_00(I) = 0.d0
          else
             POM=(GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM2=T(I)**3*Vol(I)**2/(CPS(I)*K(I))
+            POM2=pow3(T(I))*pow2(Vol(I))/(CPS(I)*K(I))
             POM3=Et(I)
             POM4=0.5d0*(Hp_face(I)**2+Hp_face(I-1)**2)
             DAMPR(I)=POM*POM2*POM3/POM4
@@ -788,20 +788,20 @@
 
             TEM1=POM*POM3/POM4
             d_dampR_dr_00(I)=d_dampR_dr_00(I) &
-                     +TEM1*T(I)**3*(2.d0*Vol(I)*DVR(I) &
+                     +TEM1*pow3(T(I))*(2.d0*Vol(I)*DVR(I) &
                     -Vol(I)**2*( 1.d0/CPS(I)*dCp_dr_00(I) &
                                  +1.d0/K(I)*dK_dV_00(I)*DVR(I))) &
                       /(CPS(I)*K(I))              
 
             d_dampR_dr_in(I)=d_dampR_dr_in(I) &
-                    +TEM1*T(I)**3*(2.d0*Vol(I)*DVRM(I) &
+                    +TEM1*pow3(T(I))*(2.d0*Vol(I)*DVRM(I) &
                     -Vol(I)**2*( 1.d0/CPS(I)*dCp_dr_in(I) &
                                  +1.d0/K(I)*dK_dV_00(I)*DVRM(I))) &
                       /(CPS(I)*K(I))
 
             d_dampR_dT_00(I)=d_dampR_dT_00(I) &
                           +TEM1*Vol(I)**2*(3.d0*T(I)**2 &
-                          -T(I)**3*( 1.d0/CPS(I)*dCp_dT_00(I) &
+                          -pow3(T(I))*( 1.d0/CPS(I)*dCp_dT_00(I) &
                                        +1.d0/K(I)*dK_dT_00(I))) &
                          /(CPS(I)*K(I))
 
@@ -892,13 +892,13 @@
                stop
             end if
             DLTX0(I)=4.d0*Lt(I)/R(I) &
-                 +Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I)**3*DVR(I) &
-                                        -1.d0/Vol(I+1)**3*DVRM(I+1))  &
+                 +Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I))*DVR(I) &
+                                        -1.d0/pow3(Vol(I+1))*DVRM(I+1))  &
                  +Lt(I)/Hp_face(I)*dHp_dr_00(I)
 
-            DLTXM(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I)**3*DVRM(I)) &
+            DLTXM(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I))*DVRM(I)) &
                     +Lt(I)/Hp_face(I)*dHp_dr_in(I)
-            DLTXP(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I+1)**3*DVR(I+1)) &
+            DLTXP(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I+1))*DVR(I+1)) &
                     +Lt(I)/Hp_face(I)*dHp_dr_out(I)
             DLTY0(I)=Lt(I)/Hp_face(I)*dHp_dT_00(I)
             DLTYP(I)=Lt(I)/Hp_face(I)*dHp_dT_out(I)
@@ -1022,11 +1022,11 @@
          if(I.eq.NZN) goto 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
-         W_00=T(I)**4
-         W_out=T(I+1)**4
+         W_00=pow4(T(I))
+         W_out=pow4(T(I+1))
          BW=dlog(W_out/W_00)
          BK=dlog(K(I+1)/K(I))
-         T1=-CL*R(I)**4/dm_bar(I)
+         T1=-CL*pow4(R(I))/dm_bar(I)
          T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
          Lr(I)=T1*T2
          T3=T1/(BW-BK)
@@ -1081,13 +1081,13 @@
 
          if(I.eq.NZN) goto 111
          HD(6,IR) = +T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))+ &
-                    4.d0*G*M(I)/(R(I)**3)    !X(i)
+                    4.d0*G*M(I)/pow3(R(I))    !X(i)
          HD(7,IR) = +T1*(dP_dT_00(I+1))           !Y(i+1)
          HD(9,IR) = +T1*(dP_dr_00(I+1)+dPtrb_dr_00(I+1))!X(i+1)
          goto 112
  111     HD(7,IR)=  0.d0
          HD(9,IR)=  0.d0
-         HD(6,IR)= +T1*(-dP_dr_00(I))+4.d0*G*M(I)/(R(I)**3)
+         HD(6,IR)= +T1*(-dP_dr_00(I))+4.d0*G*M(I)/pow3(R(I))
  112     continue
  
 !        CALC CONVECTIVE ENERGY EQUATION

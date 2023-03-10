@@ -26,7 +26,7 @@
       module rsp_step
       use rsp_def
       use star_def, only: star_ptr, star_info
-      use const_def, only: dp, qp, crad
+      use const_def, only: dp, qp, crad, one_third
       use utils_lib, only: is_bad
 
       implicit none
@@ -520,7 +520,7 @@
                return
             end if
          else if (s% RSP_use_Prad_for_Psurf) then
-            P_surf = crad*s% T(1)**4/3d0
+            P_surf = one_third*crad*pow4(s% T(1))
          else if (s% RSP_Psurf >= 0d0) then
             P_surf = s% RSP_Psurf
          else
@@ -764,11 +764,11 @@
             q1 = T1
             q2 = s% r(k)
             q3 = s% r(k+1)
-            q4 = q1*(q2**3 - q3**3)
+            q4 = q1*(pow3(s% r(k)) - pow3(s% r(k+1))) ! pow3 not defined for quad precision, so doesn't work with q2 and q3
             s% Vol(k) = dble(q4)
             dVol_dr_in(I) = - 3.0d0*T1*s% r(k+1)**2
          else
-            s% Vol(k) = T1*(s% r(k)**3 - s% R_center**3)
+            s% Vol(k) = T1*(pow3(s% r(k)) - pow3(s% R_center))
             dVol_dr_in(I) = 0d0
          end if
          if (s% Vol(k) <= 0d0) then
@@ -1542,7 +1542,7 @@
             SOURS = POM*POM2
             DAMPS = (CEDE/ALFA)/((s% Hp_face(k) + s% Hp_face(k+1))*0.5d0)
             POM3 = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM4 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
+            POM4 = pow3(s% T(k))*pow2(s% Vol(k))/(s% Cp(k)*s% opacity(k))       
             DAMPRS = POM3*POM4/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
             DELTA = DAMPRS**2 + 4.d0*DAMPS*SOURS
             if (k==-35) then
@@ -1923,7 +1923,7 @@
                - (s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)*dCp_dr_in(I))
 
             ! DAMP TERM
-            POM = (CEDE/ALFA)*(s% RSP_w(k)**3 - EFL0**3)
+            POM = (CEDE/ALFA)*(pow3(s% RSP_w(k)) - pow3(EFL0))
             POM2 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             s% DAMP(k) = POM/POM2
       
@@ -1963,7 +1963,7 @@
                d_dampR_dw_00 = 0.d0
             else   
                POM = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
-               POM2a = s% T(k)**3*s% Vol(k)**2
+               POM2a = pow3(s% T(k))*s% Vol(k)**2
                POM2b = 1d0/(s% Cp(k)*s% opacity(k))
                POM2 = POM2a*POM2b
                POM3 = s% RSP_w(k)**2
@@ -1972,7 +1972,7 @@
       
                TEM1 = - s% DAMPR(k)/POM4
 
-               d_POM2a_dVol_00 = 2d0*s% T(k)**3*s% Vol(k)
+               d_POM2a_dVol_00 = 2d0*pow3(s% T(k))*s% Vol(k)
                d_POM2b_dVol_00 = &
                   -POM2b*(dCp_dVol(i)/s% Cp(k) + dK_dVol(i)/s% opacity(k))
                d_POM2_dVol_00 = d_POM2a_dVol_00*POM2b + POM2a*d_POM2b_dVol_00
@@ -2007,13 +2007,13 @@
 
                TEM1 = POM*POM3/POM4
                d_dampR_dr_00 = d_dampR_dr_00 &
-                  + TEM1*s% T(k)**3*(2.d0*s% Vol(k)*dVol_dr_00(I) &
+                  + TEM1*pow3(s% T(k))*(2.d0*s% Vol(k)*dVol_dr_00(I) &
                   - s% Vol(k)**2*(1.d0/s% Cp(k)*dCp_dr_00(I) &
                   + 1.d0/s% opacity(k)*dK_dr_00(I))) &
                   /(s% Cp(k)*s% opacity(k))              
 
                d_dampR_dr_in = d_dampR_dr_in &
-                  + TEM1*s% T(k)**3*(&
+                  + TEM1*pow3(s% T(k))*(&
                        2.d0*s% Vol(k)*dVol_dr_in(I) &
                      - s% Vol(k)**2* &
                         (dCp_dr_in(I)/s% Cp(k) + dK_dr_in(I)/s% opacity(k))) &
@@ -2021,7 +2021,7 @@
 
                d_dampR_dT_00 = d_dampR_dT_00 &
                   + TEM1*s% Vol(k)**2*(3.d0*s% T(k)**2 &
-                  - s% T(k)**3*(1.d0/s% Cp(k)*dCp_dT(I) &
+                  - pow3(s% T(k))*(1.d0/s% Cp(k)*dCp_dT(I) &
                   + 1.d0/s% opacity(k)*dK_dT(I))) &
                   /(s% Cp(k)*s% opacity(k))
 
@@ -2168,7 +2168,7 @@
             dLt_dw_00 = 0.d0
             dLt_dw_out = 0.d0
          else
-            POM3 = (s% RSP_w(k-1)**3 - s% RSP_w(k)**3)/s% dm_bar(k)
+            POM3 = (pow3(s% RSP_w(k-1)) - pow3(s% RSP_w(k)))/s% dm_bar(k)
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
@@ -2177,20 +2177,20 @@
             TEM1 = Lt_00/s% Hp_face(k)
             TEM2 = Lt_00/POM2*s% Hp_face(k)
             
-            d_POM2_dVol_00 = dHp_dVol_00(i)*rho2_face - s% Hp_face(k)/s% Vol(k)**3
-            d_POM2_dVol_out = dHp_dVol_out(i)*rho2_face - s% Hp_face(k)/s% Vol(k-1)**3
+            d_POM2_dVol_00 = dHp_dVol_00(i)*rho2_face - s% Hp_face(k)/pow3(s% Vol(k))
+            d_POM2_dVol_out = dHp_dVol_out(i)*rho2_face - s% Hp_face(k)/pow3(s% Vol(k-1))
             dLt_dVol_00 = POM*POM3*d_POM2_dVol_00
             dLt_dVol_out = POM*POM3*d_POM2_dVol_out
             
             dLt_dr_00 = 4.d0*Lt_00/s% r(k) & ! 
-               - TEM2/s% Vol(k)**3*dVol_dr_00(I) &
-               - TEM2/s% Vol(k-1)**3*dVol_dr_in(i+1) &
+               - TEM2/pow3(s% Vol(k))*dVol_dr_00(I) &
+               - TEM2/pow3(s% Vol(k-1))*dVol_dr_in(i+1) &
                + TEM1*dHp_dr_00(I)
             dLt_dr_in = &
-               - TEM2/s% Vol(k)**3*dVol_dr_in(I) & ! 
+               - TEM2/pow3(s% Vol(k))*dVol_dr_in(I) & ! 
                + TEM1*dHp_dr_in(I)
             dLt_dr_out = &
-               - TEM2/s% Vol(k-1)**3*dVol_dr_00(i+1) & ! 
+               - TEM2/pow3(s% Vol(k-1))*dVol_dr_00(i+1) & ! 
                + TEM1*dHp_dr_out(I)
             dLt_dT_00 = TEM1*dHp_dT_00(I) ! 
             dLt_dT_out = TEM1*dHp_dT_out(I) ! 
@@ -2514,7 +2514,7 @@
                XP = P_surf
             else if (s% RSP_use_Prad_for_Psurf) then
                T_surf = s% T_start(1)
-               XP = crad*T_surf**4/3d0
+               XP = one_third*crad*pow4(T_surf)
             else
                XP = 0.0d0
             end if
@@ -3699,15 +3699,15 @@
          
          T = s% T(k)
          V = s% Vol(k)
-         erad_expected = crad*T**4*V ! ergs/gm
+         erad_expected = crad*pow4(T)*V ! ergs/gm
          residual = erad_expected - s% erad(k)
          
          HR(IE) = -residual
          
          HD(i_er_der_00,IE) = -1d0
-         HD(i_er_dT_00,IE) = 4d0*crad*T**3*V
-         HD(i_er_dr_00,IE) = crad*T**4*dVol_dr_00(i)
-         HD(i_er_dr_in,IE) = crad*T**4*dVol_dr_in(i)
+         HD(i_er_dT_00,IE) = 4d0*crad*pow3(T)*V
+         HD(i_er_dr_00,IE) = crad*pow4(T)*dVol_dr_00(i)
+         HD(i_er_dr_in,IE) = crad*pow4(T)*dVol_dr_in(i)
          
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -3749,7 +3749,7 @@
             dFr_dr_in = 0
             dFr_dT_out = 0
          else if (i == NZN) then
-            Fr_00 = 2d0*SIG*s% T(k)**4 !EDDI
+            Fr_00 = 2d0*SIG*pow4(s% T(k)) !EDDI
             dFr_dT_00 = 4.d0*Fr_00/s% T(k)   
             dFr_dK_00 = 0
             dFr_dK_out = 0
@@ -3766,8 +3766,8 @@
             dFr_dr_out = 0d0
             dFr_dr_in = 0d0
             dFr_dT_out = 0d0
-            W = s% T(k)**4
-            WP = s% T(k-1)**4
+            W = pow4(s% T(k))
+            WP = pow4(s% T(k-1))
             BW = 4d0*(s% lnT(k-1) - s% lnT(k)) ! log(WP/W)
             if (abs(BW) < 1d-20) return
             BK = log(s% opacity(k-1)/s% opacity(k))

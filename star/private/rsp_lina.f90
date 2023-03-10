@@ -129,7 +129,7 @@
          write(*,*) 'DM', I, DM(I)
          write(*,*) 'DM_BAR', I, DM_BAR(I)
          write(*,*) 'R', I, R(I)
-         write(*,*) 'R**3', I, R(I)**3
+         write(*,*) 'R**3', I, pow3(R(I))
          write(*,*) 'Vol', I, Vol(I)
          write(*,*) 'T', I, T(I)
          write(*,*) 'Lr', I, Lr(I)
@@ -451,7 +451,7 @@
             d_dampR_dw_00(I) = 0.d0
          else
             POM=(GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM2=T(I)**3*Vol(I)**2/(CPS(I)*K(I))
+            POM2=pow3(T(I))*Vol(I)**2/(CPS(I)*K(I))
             POM3=Et(I)
             POM4=0.5d0*(Hp_face(I)**2+Hp_face(I-1)**2)
             DAMPR(I)=POM*POM2*POM3/POM4
@@ -471,20 +471,20 @@
 
             TEM1=POM*POM3/POM4
             d_dampR_dr_00(I)=d_dampR_dr_00(I) &
-                     +TEM1*T(I)**3*(2.d0*Vol(I)*DVR(I) &
+                     +TEM1*pow3(T(I))*(2.d0*Vol(I)*DVR(I) &
                     -Vol(I)**2*( 1.d0/CPS(I)*dCp_dr_00(I) &
                                  +1.d0/K(I)*dK_dV_00(I)*DVR(I))) &
                       /(CPS(I)*K(I))              
 
             d_dampR_dr_in(I)=d_dampR_dr_in(I) &
-                    +TEM1*T(I)**3*(2.d0*Vol(I)*DVRM(I) &
+                    +TEM1*pow3(T(I))*(2.d0*Vol(I)*DVRM(I) &
                     -Vol(I)**2*( 1.d0/CPS(I)*dCp_dr_in(I) &
                                  +1.d0/K(I)*dK_dV_00(I)*DVRM(I))) &
                       /(CPS(I)*K(I))
 
             d_dampR_dT_00(I)=d_dampR_dT_00(I) &
                           +TEM1*Vol(I)**2*(3.d0*T(I)**2 &
-                          -T(I)**3*( 1.d0/CPS(I)*dCp_dT_00(I) &
+                          -pow3(T(I))*( 1.d0/CPS(I)*dCp_dT_00(I) &
                                        +1.d0/K(I)*dK_dT_00(I))) &
                          /(CPS(I)*K(I))
 
@@ -563,13 +563,13 @@
             POM3=(Et(I+1)**1.5d0-Et(I)**1.5d0)/dm_bar(I)
             Lt(I)=POM*POM2*POM3
             DLTX0(I)=4.d0*Lt(I)/R(I) &
-                 +Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I)**3*DVR(I) &
-                                        -1.d0/Vol(I+1)**3*DVRM(I+1))  &
+                 +Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I))*DVR(I) &
+                                        -1.d0/pow3(Vol(I+1))*DVRM(I+1))  &
                  +Lt(I)/Hp_face(I)*dHp_dr_00(I)
 
-            DLTXM(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I)**3*DVRM(I)) &
+            DLTXM(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I))*DVRM(I)) &
                     +Lt(I)/Hp_face(I)*dHp_dr_in(I)
-            DLTXP(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/Vol(I+1)**3*DVR(I+1)) &
+            DLTXP(I)=Lt(I)/POM2*Hp_face(I)*(-1.d0/pow3(Vol(I+1))*DVR(I+1)) &
                     +Lt(I)/Hp_face(I)*dHp_dr_out(I)
             DLTY0(I)=Lt(I)/Hp_face(I)*dHp_dT_00(I)
             DLTYP(I)=Lt(I)/Hp_face(I)*dHp_dT_out(I)
@@ -607,7 +607,7 @@
 !           Kollath et al. 2002  EDDY VISCOSITY pressure 
             POM=-(16.d0/3.d0)*PI*ALFA*abs(ALFAM)*sqrt(Et(I))
             POM1=1.d0/Vol(I)**2/dm(I)
-            POM2=(R(I)**3+R(I-1)**3)*(Hp_face(I)+Hp_face(I-1))*0.25d0
+            POM2=(pow3(R(I))+pow3(R(I-1)))*(Hp_face(I)+Hp_face(I-1))*0.25d0
             EVUU0(I)= POM*POM1*POM2/R(I)
             EVUUM(I)=-POM*POM1*POM2/R(I-1) 
           endif
@@ -716,11 +716,11 @@
          if(I.eq.NZN) goto 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
-         W_00=T(I)**4
-         W_out=T(I+1)**4
+         W_00=pow4(T(I))
+         W_out=pow4(T(I+1))
          BW=dlog(W_out/W_00)
          BK=dlog(K(I+1)/K(I))
-         T1=-CL*R(I)**4/dm_bar(I)
+         T1=-CL*pow4(R(I))/dm_bar(I)
          T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
          T3=T1/(BW-BK)
          DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
@@ -824,7 +824,7 @@
          MX10(I) = -T1*(-dP_dr_in(I)-dPtrb_dr_in(I))
          MY00(I) = -T1*(-dP_dT_00(I))
          if(I.ne.NZN)then
-            MX00(I) =  4.d0*G*M(I)/R(I)**3 &
+            MX00(I) =  4.d0*G*M(I)/pow3(R(I)) &
                       -T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))
             MX01(I) = -T1*(dP_dr_00(I+1)        +dPtrb_dr_00(I+1))
             MY01(I) = -T1*(dP_dT_00(I+1))
@@ -832,7 +832,7 @@
             MU01(I) =  T4*(EVUU0(I+1))
             MZ01(I) = -T1*(dPtrb_dw_00(I+1))
          else
-            MX00(I) = 4.d0*G*M(I)/R(I)**3 &
+            MX00(I) = 4.d0*G*M(I)/pow3(R(I)) &
                      -T1*(-dP_dr_00(I))
             MX01(I) = 0.d0
             MY01(I) = 0.d0
@@ -1000,7 +1000,7 @@
 !        PERS(J) IS THE PERIOD OF THE MODE J (IN SECONDS)
          OMEG(J)=WIx(IMI+J-1)
          PERS(J)=2.d0*PI/OMEG(J)
-         Q(J)=PERS(J)*SQRT((M(NZN)/SUNM)*(SUNR/R(NZN))**3)/86400.d0
+         Q(J)=PERS(J)*SQRT((M(NZN)/SUNM)*pow3(SUNR/R(NZN)))/86400.d0
 !        ETO(J) IS THE GROWTH RATE OF MODE J
          ETO(J)= P4*WRx(IMI+J-1)/OMEG(J)
          EK(J)=0.d0
@@ -1068,8 +1068,8 @@
             if(ALFAM.lt.0.d0)QWKEV(I,J)=-PI*dm(I)*aimag(conjg(DPEV)*DV_0) 
             QWKPT(I,J)=-PI*dm(I)*aimag(conjg(dP_dT_00URB)*DV_0) 
             if(ALFAM.gt.0.d0)then
-               QWKEV(I,J)=PI*dm(I)*aimag(conjg(DPEV)*(DV_0/R(I)**3- &
-                        3.d0*Vol(I)/R(I)**4*VRR(I,J)*SCALE(J)))
+               QWKEV(I,J)=PI*dm(I)*aimag(conjg(DPEV)*(DV_0/pow3(R(I))- &
+                        3.d0*Vol(I)/pow4(R(I))*VRR(I,J)*SCALE(J)))
             endif
 
             if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J).ge.0.d0) &
@@ -1153,7 +1153,7 @@
 
          SGR(J)=(SGRP-SGRM)/(SGRP+SGRM)
 
-         PSIG=M(NZN)/(P43*R(NZN)**3)
+         PSIG=M(NZN)/(P43*pow3(R(NZN)))
          PSIG=sqrt(P4*G*PSIG)
 
          QCHECK(J)=100.d0*(ETO(J)-(ETOI(J)+ETOIEV(J)+ETOIPT(J))/EK(J)) &

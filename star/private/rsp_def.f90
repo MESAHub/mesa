@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module rsp_def
-      use const_def, only: dp, qp, pi, crad, clight, ln10
+      use const_def, only: dp, qp, pi, crad, clight, ln10, one_third
       use math_lib
       use utils_lib, only: is_bad, mesa_error
       use star_def, only: star_info
@@ -451,7 +451,7 @@
          ! restore bit-for-bit erad = crad*T**4*Vol
          include 'formats'
          do k = 1, NZN
-            s% erad(k) = crad*s% T(k)**4*s% Vol(k)
+            s% erad(k) = crad*pow4(s% T(k))*s% Vol(k)
             s% Prad(k) = s% f_Edd(k)*s% erad(k)/s% Vol(k)
          end do
       end subroutine finish_after_build_model
@@ -508,7 +508,7 @@
             s% RSP_Et(k) = RSP_Et(i)
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = Lr(i)/(4d0*pi*s% r(k)**2)
-            s% erad(k) = crad*s% T(k)**4*s% Vol(k)
+            s% erad(k) = crad*pow4(s% T(k))*s% Vol(k)
             s% L(k) = Lr(i) + Lc(i)
             if (is_bad(s% L(k))) then
                write(*,2) 'L Lr Lc', k, s% L(k), Lr(i), Lc(i)
@@ -558,10 +558,10 @@
          do k=1, NZN
          
             if (k==NZN) then
-               s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
+               s% Vol(k)=P43/s% dm(k)*(pow3(s% r(k)) - pow3(s% R_center))
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
             else
-               s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% r(k+1)**3)
+               s% Vol(k)=P43/s% dm(k)*(pow3(s% r(k)) - pow3(s% r(k+1)))
                s% rmid(k) = 0.5d0*(s% r(k) + s% r(k+1))
             end if
             if (is_bad(s% Vol(k)))then
@@ -604,7 +604,7 @@
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
             if (k == NZN) then ! center
-               s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
+               s% Vol(k)=P43/s% dm(k)*(pow3(s% r(k)) - pow3(s% R_center))
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
                   write(*,2) 'copy from xh to rsp s% Vol(k) r00 r_center dm', k, &
@@ -615,7 +615,7 @@
                q1 = P43/s% dm(k)
                q2 = s% r(k)
                q3 = s% r(k+1)
-               q4 = q1*(q2**3 - q3**3)
+               q4 = q1*(pow3(s% r(k)) - pow3(s% r(k+1))) ! pow3 not defined for quad precision, so doesn't work with q2 and q3
                s% Vol(k) = dble(q4)
                s% rmid(k) = 0.5d0*(s% r(k) + s% r(k+1))
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
@@ -740,7 +740,7 @@
             s% T(k) = T(i)
             s% RSP_w(k) = sqrt(RSP_Et(i))
             s% Peos(k) = Peos(i)
-            s% Prad(k) = crad*s% T(k)**4/3d0
+            s% Prad(k) = one_third*crad*pow4(s% T(k))
             s% Pgas(k) = s% Peos(k) - s% Prad(k)
          end do                    
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
@@ -832,12 +832,12 @@
             k = NZN+1 - i            
             ! revise Vol and rho using revised r
             if (i==1) then
-               s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
+               s% Vol(k)=P43/s% dm(k)*(pow3(s% r(k)) - pow3(s% R_center))
             else
                q1 = P43/s% dm(k)
                q2 = s% r(k)
                q3 = s% r(k+1)
-               q4 = q1*(q2**3 - q3**3)
+               q4 = q1*(pow3(s% r(k)) - pow3(s% r(k+1))) ! pow3 not defined for quad precision, so doesn't work with q2 and q3
                s% Vol(k) = dble(q4)
             end if
             s% rho(k) = 1d0/s% Vol(k)            
@@ -864,7 +864,7 @@
          end do
          
          ! these are necessary to make files consistent with photos.
-         s% R_center = pow(s% r(NZN)**3 - s% Vol(NZN)*s% dm(NZN)/P43, 1d0/3d0)
+         s% R_center = pow(pow3(s% r(NZN)) - s% Vol(NZN)*s% dm(NZN)/P43, one_third)
          s% M_center = s% mstar - s% xmstar
 
       end subroutine copy_results

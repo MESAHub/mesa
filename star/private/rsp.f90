@@ -223,7 +223,7 @@
 
       subroutine rsp_setup_part1(s,restart,ierr)
          ! called by finish_load_model before set_vars
-         use const_def, only: crad
+         use const_def, only: crad, one_third
          use rsp_eval_eos_and_kap, only: &
             restart_rsp_eos_and_kap, get_surf_P_T_kap
          use alloc, only: resize_star_info_arrays
@@ -287,7 +287,7 @@
                      T_surf, Psurf, kap_surf, Teff_atm, ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in get_surf_P_T_kap')
                else if (s% RSP_use_Prad_for_Psurf) then
-                  Psurf = crad*s% T(1)**4/3d0
+                  Psurf = one_third*crad*pow4(s% T(1))
                else
                   Psurf = 0d0
                end if
@@ -435,7 +435,7 @@
             k_max_abs_rel_hse_err = 0
             do k=2,s% nz
                hse_err = &
-                  (s% Peos(k-1) - s% Peos(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*s% r(k)**4)) - 1d0
+                  (s% Peos(k-1) - s% Peos(k))/(-s% cgrav(k)*s% m(k)*s% dm_bar(k)/(4d0*pi*pow4(s% r(k)))) - 1d0
                if (abs(hse_err) >= max_abs_rel_hse_err) then
                   max_abs_rel_hse_err = abs(hse_err)
                   k_max_abs_rel_hse_err = k

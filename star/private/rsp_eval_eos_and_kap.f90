@@ -256,7 +256,7 @@
                res, d_dlnd, d_dlnT, &
                d_dxa, ierr)
             if (ierr == 0) then
-               Prad = crad*T**4/3d0
+               Prad = one_third*crad*pow4(T)
                Pgas = exp(res(i_lnPgas))
                CSND = sqrt(max(0d0, res(i_gamma1)*(Prad+Pgas)/Rho)) 
             end if
@@ -292,7 +292,7 @@
          d_lnfree_e_dlnRho = d_dlnd(i_lnfree_e)
          d_lnfree_e_dlnT = d_dlnT(i_lnfree_e)
          
-         Prad = crad*T**4/3d0  ! erg/cm^2
+         Prad = one_third*crad*pow4(T)  ! erg/cm^2
          d_Pr_dT = 4d0*Prad/T
 
          erad = 3d0*Prad/rho ! 3*Prad*V   erg/gm
@@ -390,7 +390,7 @@
                call store_lnT_in_xh(s, k, logT*ln10)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
                T = s% T(k)
-               new_erad = crad*T**4/rho
+               new_erad = crad*pow4(T)/rho
                new_egas = exp(res(i_lnE)) - new_erad
                if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
                      abs(new_egas - egas) > 1d3*egas_tol) then               
@@ -530,7 +530,7 @@
                call store_lnT_in_xh(s, k, logT*ln10)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
                T = s% T(k)
-               new_erad = crad*T**4/rho
+               new_erad = crad*pow4(T)/rho
                new_egas = exp(res(i_lnE)) - new_erad
                logE = res(i_lnE)/ln10
                if (is_bad(logE) .or. logE <= -20d0) then               
@@ -944,7 +944,7 @@
          call store_lnT_in_xh(s, kk, logT_result*ln10)
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
          
-         new_egas = exp(res(i_lnE)) - crad*s% T(kk)**4/s% rho(kk)
+         new_egas = exp(res(i_lnE)) - crad*pow4(s% T(kk))/s% rho(kk)
          if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
                abs(new_egas - egas_want) > 1d3*egas_tol) then               
             write(*,1) 'logRho', s% lnd(kk)/ln10
