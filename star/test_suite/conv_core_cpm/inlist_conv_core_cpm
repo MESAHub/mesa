@@ -42,6 +42,9 @@
 
 &controls
 
+    ! the following control should break this test:
+    ! conv_premix_fix_pgas = .false.
+
   ! starting specifications
 
   ! when to stop
@@ -51,11 +54,12 @@
 
     ! stop when the center mass fraction of h1 drops below this limit
     xa_central_lower_limit_species(1) = 'h1'
-    xa_central_lower_limit(1) = 0.5 
+    xa_central_lower_limit(1) = 0.5
 
-    !Tolerances for CPM+Ledoux convective core mass 
-    x_ctrl(1) = 0.119 !min core mass at Xc=0.5 
-    x_ctrl(2) = 0.13  !max core mass at Xc=0.5 
+    ! Tolerances for CPM+Ledoux convective core mass,
+    ! expect roughly 0.13
+    x_ctrl(1) = 0.125 ! min core mass at Xc=0.5 
+    x_ctrl(2) = 0.135  ! max core mass at Xc=0.5 
 
   ! mlt
     mixing_length_alpha = 1.8d0 
@@ -82,7 +86,7 @@
      use_gold2_tolerances = .true.
 
   ! output
-   photo_interval = 100 
+   photo_interval = 50 
    profile_interval = 100 
    history_interval = 1
    terminal_interval = 10 
