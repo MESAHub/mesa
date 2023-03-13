@@ -51,7 +51,9 @@
    dX_nuc_drop_limit=5d-2
    dX_nuc_drop_limit_at_high_T=5d-2
    dX_nuc_drop_min_X_limit=5d-2
-   dH_div_H_limit_min_H = 1d-1
+   dX_limit_species(1) = 'h1'
+   dX_limit_species(2) = 'he4'
+   dX_div_X_limit_min_X(1) = 1d-1
 
    photo_interval = 10000
    profile_interval = 1000
