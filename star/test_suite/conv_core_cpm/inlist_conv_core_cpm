@@ -42,9 +42,6 @@
 
 &controls
 
-    ! the following control should break this test:
-    conv_premix_fix_pgas = .false.
-
   ! starting specifications
 
   ! when to stop
