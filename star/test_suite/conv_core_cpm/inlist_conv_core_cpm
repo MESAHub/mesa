@@ -43,7 +43,7 @@
 &controls
 
     ! the following control should break this test:
-    ! conv_premix_fix_pgas = .false.
+    conv_premix_fix_pgas = .false.
 
   ! starting specifications
 
