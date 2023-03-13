@@ -86,7 +86,7 @@
      use_gold2_tolerances = .true.
 
   ! output
-   photo_interval = 50 
+   photo_interval = 20
    profile_interval = 100 
    history_interval = 1
    terminal_interval = 10 
