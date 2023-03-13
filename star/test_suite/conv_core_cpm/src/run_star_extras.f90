@@ -33,7 +33,9 @@
       include 'test_suite_extras_def.inc'
       
       !real(dp) :: example_of_data_to_save_in_photos
-      
+
+      real(dp) :: mass_conv_core_x050  = -1
+
       contains
 
       include 'test_suite_extras.inc'
@@ -88,12 +90,27 @@
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
+         real(dp) :: min_mass_conv_core, max_mass_conv_core
          type (star_info), pointer :: s
-         real(dp) :: dt
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+
+         ! get target range from inlist
+         min_mass_conv_core = s% x_ctrl(1)
+         max_mass_conv_core = s% x_ctrl(2)
+         
+         if ((mass_conv_core_x050 .lt. min_mass_conv_core) .or.(mass_conv_core_x050 .gt. max_mass_conv_core)) then 
+            write(*,*) 'bad value for mass_conv_core_x050' 
+            write(*,*) 'min allowed value', min_mass_conv_core
+            write(*,*) 'mass_conv_core_x050', mass_conv_core_x050
+            write(*,*) 'max allowed value', max_mass_conv_core 
+         else
+            write(*,*) 'Test passed: mass_conv_core within specified range'
+         endif
+ 
          call test_suite_after_evolve(s, ierr)
+
       end subroutine extras_after_evolve
 
 
@@ -179,8 +196,12 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
+
+         if (s% center_h1 .lt. 0.5d0 .and. mass_conv_core_x050 .lt. 0) then 
+            mass_conv_core_x050 = s% mass_conv_core
+         endif 
+
       end function extras_finish_step
-      
       
 
       end module run_star_extras
