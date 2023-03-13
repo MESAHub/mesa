@@ -80,6 +80,18 @@ species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
 *individually* to all isotopes of hydrogen, helium or metals,
 respectively.
 
+Resolution control convective_bdy_weight has been reintroduced
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The option to add extra resolution at convective boundaries
+with the control ``convective_bdy_weight`` was removed after
+version 12115, but has now been reintroduced in a simplified form.
+This control no longer applies to newly nonconvective zones, but
+does add resolution at the location of convective boundaries.
+This was found to be important for smooth convective boundary
+evolution with convective premixing.
+
+
 Changes in r22.11.1
 ===================
 

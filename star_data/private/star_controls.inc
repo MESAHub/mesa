@@ -597,6 +597,9 @@
          real(dp) :: mesh_dlogX_dlogP_full_on(num_mesh_logX)
          real(dp) :: mesh_dlogX_dlogP_full_off(num_mesh_logX)
 
+         real(dp) :: convective_bdy_weight, &
+            convective_bdy_dq_limit, convective_bdy_min_dt_yrs
+
          real(dp) :: mesh_dlog_eps_min_for_extra
          real(dp) :: mesh_dlog_eps_dlogP_full_on
          real(dp) :: mesh_dlog_eps_dlogP_full_off
