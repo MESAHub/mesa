@@ -6265,6 +6265,20 @@
     mesh_dlog_other_dlogP_extra = 0.25d0
     mesh_dlog_photo_dlogP_extra = 1
 
+      ! convective_bdy_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! convective_bdy_dq_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! convective_bdy_min_dt_yrs
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Mesh function to enhance resolution near convective boundaries
+
+      ! ::
+
+      convective_bdy_weight = 0
+      convective_bdy_dq_limit = 3d-5
+      convective_bdy_min_dt_yrs = 1d-3
 
       ! max_rel_delta_IE_for_mesh_total_energy_balance
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
