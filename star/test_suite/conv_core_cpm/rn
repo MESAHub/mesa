@@ -11,10 +11,10 @@ date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 # check if can skip building starting model
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_start.mod start.mod
+   cp standard_1.5_zams.mod 1.5_zams.mod
 else
-   do_one inlist_start start.mod
-   cp start.mod standard_start.mod
+   do_one inlist_to_ZAMS_header 1.5_zams.mod
+   cp 1.5_zams.mod standard_1.5_zams.mod
 fi
 
 do_one inlist_conv_core_cpm_header final.mod

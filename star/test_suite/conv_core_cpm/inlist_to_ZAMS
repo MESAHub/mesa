@@ -1,0 +1,97 @@
+&star_job
+
+      show_log_description_at_start = .false.
+
+      create_pre_main_sequence_model = .true.
+
+      load_saved_model = .false.
+
+      save_model_when_terminate = .true.
+      save_model_filename = '1.5_zams.mod'
+
+      pause_before_terminate = .false.
+
+      !history_columns_file = 'history_columns.list' 
+      !profile_columns_file = 'profile_columns.list' 
+
+      initial_zfracs = 3 ! GS98_zfracs = 3
+      
+/ !end of star_job namelist
+
+
+&eos
+/ ! end of eos namelist
+
+
+&kap
+      use_Type2_opacities = .true.
+      Zbase = 2d-2
+/ ! end of kap namelist
+
+&controls
+
+      initial_mass = 1.5
+      initial_z = 2d-2
+
+! When to stop
+
+    Lnuc_div_L_zams_limit = 0.99d0
+    stop_near_zams = .true.
+      
+! mixing controls
+
+      mixing_length_alpha = 1.8d0
+      MLT_option = 'Henyey'
+
+      
+      use_Ledoux_criterion = .false.
+      !alpha_semiconvection = 0.01 
+      !semiconvection_option = 'Langer_85'
+
+
+      
+! timestep controls
+
+      !max_years_for_timestep = 1d4
+      !max_timestep_factor = 1.2
+      
+! output controls
+
+      log_directory = 'LOGS-ZAMS'
+      photo_interval = 100
+      photo_digits = 5
+      profile_interval = 100
+      history_interval = 10
+      terminal_interval = 50
+      write_header_frequency = 10
+      
+! grid
+
+      mesh_delta_coeff = 0.5
+
+/ ! end of controls namelist
+
+&pgstar
+      
+      Grid2_win_flag = .true.
+      file_digits = 7
+      Grid2_file_dir = 'png'
+      Grid2_file_prefix = 'grid'
+
+      Abundance_xmax = 0.5
+
+      Kipp_win_flag = .true.
+      
+      Kipp_xaxis_name = 'star_age'
+      Kipp_xaxis_in_Myr = .true.
+      Kipp_win_width = 9
+      Kipp_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+      Kipp_show_burn = .false.
+      Kipp_mass_max = 0.16 ! (Msun units) negative means use default
+      Kipp_mass_max = -1 ! (Msun units) negative means use default
+      Kipp_xmin = -1 ! step number.  negative means use default.
+      Kipp_max_width = 0 ! only used if > 0.  causes xmin to move with xmax.
+      Kipp_mix_interval = 1
+
+/ ! end of pgstar namelist
+
