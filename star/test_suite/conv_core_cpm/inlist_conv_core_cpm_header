@@ -1,9 +1,8 @@
 
 &star_job
 
-
-      read_extra_star_job_inlist(2) = .true.
-      extra_star_job_inlist_name(2) = 'inlist_conv_core_cpm'
+      read_extra_star_job_inlist(1) = .true.
+      extra_star_job_inlist_name(1) = 'inlist_conv_core_cpm'
 
 / ! end of star_job namelist
 
@@ -27,7 +26,7 @@
 &controls
 
       read_extra_controls_inlist(1) = .true.
-      extra_controls_inlist_name(1)= 'inlist_conv_core_cpm'
+      extra_controls_inlist_name(1) = 'inlist_conv_core_cpm'
 
 / ! end of controls namelist
 
@@ -35,6 +34,6 @@
 &pgstar
 
       read_extra_pgstar_inlist(1) = .true.
-      extra_pgstar_inlist_name(1)= 'inlist_conv_core_cpm'
+      extra_pgstar_inlist_name(1) = 'inlist_conv_core_cpm'
 
 / ! end of pgstar namelist
