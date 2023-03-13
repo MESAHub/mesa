@@ -421,12 +421,7 @@
     dt_div_min_dr_div_cs_limit, dt_div_min_dr_div_cs_hard_limit, min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit, &
     min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit, min_k_for_dt_div_min_dr_div_cs_limit, &
     min_q_for_dt_div_min_dr_div_cs_limit, max_q_for_dt_div_min_dr_div_cs_limit, check_remnant_only_for_dt_div_min_dr_div_cs_limit, &
-    dX_mix_dist_limit, dH_limit_min_H, dH_limit, dH_hard_limit, dH_div_H_limit_min_H, &
-    dH_div_H_limit, dH_div_H_hard_limit, dH_decreases_only, max_timestep_factor_at_high_T, &
-    dHe_limit_min_He, dHe_limit, dHe_hard_limit, dHe_div_He_limit_min_He, &
-    dHe_div_He_limit, dHe_div_He_hard_limit, dHe_decreases_only, min_logT_for_max_timestep_factor_at_high_T, &
-    dHe3_limit_min_He3, dHe3_limit, dHe3_hard_limit, dHe3_div_He3_limit_min_He3, &
-    dHe3_div_He3_limit, dHe3_div_He3_hard_limit, dHe3_decreases_only, dX_div_X_at_high_T_limit_lgT_min, &
+    dX_mix_dist_limit, dX_div_X_at_high_T_limit_lgT_min, dX_limit_species, &
     dX_limit_min_X, dX_limit, dX_hard_limit, dX_div_X_limit_min_X, dX_div_X_at_high_T_hard_limit, &
     dX_div_X_limit, dX_div_X_hard_limit, dX_decreases_only, dX_div_X_at_high_T_limit, &
     dX_nuc_drop_min_X_limit, dX_nuc_drop_max_A_limit, dX_nuc_drop_limit, &
@@ -2146,30 +2141,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% dX_mix_dist_limit = dX_mix_dist_limit
 
- s% dH_limit_min_H = dH_limit_min_H
- s% dH_limit = dH_limit
- s% dH_hard_limit = dH_hard_limit
- s% dH_div_H_limit_min_H = dH_div_H_limit_min_H
- s% dH_div_H_limit = dH_div_H_limit
- s% dH_div_H_hard_limit = dH_div_H_hard_limit
- s% dH_decreases_only = dH_decreases_only
-
- s% dHe_limit_min_He = dHe_limit_min_He
- s% dHe_limit = dHe_limit
- s% dHe_hard_limit = dHe_hard_limit
- s% dHe_div_He_limit_min_He = dHe_div_He_limit_min_He
- s% dHe_div_He_limit = dHe_div_He_limit
- s% dHe_div_He_hard_limit = dHe_div_He_hard_limit
- s% dHe_decreases_only = dHe_decreases_only
-
- s% dHe3_limit_min_He3 = dHe3_limit_min_He3
- s% dHe3_limit = dHe3_limit
- s% dHe3_hard_limit = dHe3_hard_limit
- s% dHe3_div_He3_limit_min_He3 = dHe3_div_He3_limit_min_He3
- s% dHe3_div_He3_limit = dHe3_div_He3_limit
- s% dHe3_div_He3_hard_limit = dHe3_div_He3_hard_limit
- s% dHe3_decreases_only = dHe3_decreases_only
-
+ s% dX_limit_species = dX_limit_species
  s% dX_limit_min_X = dX_limit_min_X
  s% dX_limit = dX_limit
  s% dX_hard_limit = dX_hard_limit
@@ -3504,9 +3476,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  opacity_max = s% opacity_max
  opacity_factor = s% opacity_factor
  min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off
+ max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
  min_logT_for_opacity_factor_on = s% min_logT_for_opacity_factor_on
  max_logT_for_opacity_factor_on = s% max_logT_for_opacity_factor_on
- max_logT_for_opacity_factor_off = s% max_logT_for_opacity_factor_off
 
  non_nuc_neu_factor = s% non_nuc_neu_factor
  use_time_centered_eps_grav = s% use_time_centered_eps_grav
@@ -3831,31 +3803,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  check_remnant_only_for_dt_div_min_dr_div_cs_limit = s% check_remnant_only_for_dt_div_min_dr_div_cs_limit
 
  dX_mix_dist_limit = s% dX_mix_dist_limit
-
- dH_limit_min_H = s% dH_limit_min_H
- dH_limit = s% dH_limit
- dH_hard_limit = s% dH_hard_limit
- dH_div_H_limit_min_H = s% dH_div_H_limit_min_H
- dH_div_H_limit = s% dH_div_H_limit
- dH_div_H_hard_limit = s% dH_div_H_hard_limit
- dH_decreases_only = s% dH_decreases_only
-
- dHe_limit_min_He = s% dHe_limit_min_He
- dHe_limit = s% dHe_limit
- dHe_hard_limit = s% dHe_hard_limit
- dHe_div_He_limit_min_He = s% dHe_div_He_limit_min_He
- dHe_div_He_limit = s% dHe_div_He_limit
- dHe_div_He_hard_limit = s% dHe_div_He_hard_limit
- dHe_decreases_only = s% dHe_decreases_only
-
- dHe3_limit_min_He3 = s% dHe3_limit_min_He3
- dHe3_limit = s% dHe3_limit
- dHe3_hard_limit = s% dHe3_hard_limit
- dHe3_div_He3_limit_min_He3 = s% dHe3_div_He3_limit_min_He3
- dHe3_div_He3_limit = s% dHe3_div_He3_limit
- dHe3_div_He3_hard_limit = s% dHe3_div_He3_hard_limit
- dHe3_decreases_only = s% dHe3_decreases_only
-
+ dX_limit_species = s% dX_limit_species
  dX_limit_min_X = s% dX_limit_min_X
  dX_limit = s% dX_limit
  dX_hard_limit = s% dX_hard_limit
