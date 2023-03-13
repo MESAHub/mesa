@@ -538,6 +538,12 @@ This test case models a conductively-propagated deflagration wave
 also provides an example for use of the ``other_build_initial_model``
 and ``other_surface_PT`` hooks.
 
+:ref:`conv_core_cpm`
+^^^^^^^^^^^^^^^^^^^^
+
+This test case evolves a 1.5 |Msun| star part of the way through
+the main sequence with CPM enabled and checks that its convective
+core has grown to an appropriate mass coordinate.
 
 :ref:`hb_2M`
 ^^^^^^^^^^^^
