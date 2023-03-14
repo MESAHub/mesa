@@ -186,6 +186,13 @@ This test suite example checks the accretion of material and angular momentum on
 
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
+:ref:`c13_pocket`
+^^^^^^^^^^^^^^^^^
+
+This test evolves a 2.0 |Msun| star through one thermal pulse on the
+asymptotic giant branch (AGB) and illustrates third dredge up and the
+formation of a :math:`^{13}{\rm C}` pocket.
+
 
 :ref:`carbon_kh`
 ^^^^^^^^^^^^^^^^
@@ -214,11 +221,28 @@ This test checks that the atmosphere structure written to the
 pulsation output closely matches what is expected for the
 :math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
 
+   
+:ref:`conductive_flame`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case models a conductively-propagated deflagration wave
+("flame") in a high-density, degenerate carbon-oxygen mixture.  It
+also provides an example for use of the ``other_build_initial_model``
+and ``other_surface_PT`` hooks.
+
 
 :ref:`conserve_angular_momentum`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This test suite example checks angular momentum conservation from the zero age main-sequence to the formation of a helium core in 1.0 Msun, Z=0.02 metallicity, model.
+
+
+:ref:`conv_core_cpm`
+^^^^^^^^^^^^^^^^^^^^
+
+This test case evolves a 1.5 |Msun| star part of the way through
+the main sequence with CPM enabled and checks that its convective
+core has grown to an appropriate mass coordinate.
 
 
 :ref:`custom_colors`
@@ -276,6 +300,12 @@ a slowly pulsating B-type star (SPB) stellar model.
 
 This test case checks the implementation of GYRE in MESA for a cooling 0.85 Msun white dwarf model.
 
+:ref:`hb_2M`
+^^^^^^^^^^^^
+
+This test case shows a 2 |Msun| stellar model evolving
+on the horizontal branch (HB) through core helium burning.
+
 :ref:`high_mass`
 ^^^^^^^^^^^^^^^^
 
@@ -306,10 +336,27 @@ This test case checks the evolution of an ~1 Mjup model after the surface has be
 
 This test case checks the evolutions of a 0.8 Msun, Z=1e-4 metallicity model from the pre-main sequence to core hydrogen depletion.
 
+
+:ref:`magnetic_braking`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This test case involves the calculation of the spin down caused by a
+large-scale magnetic field in a massive star model.
+
+
 :ref:`make_brown_dwarf`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 This test case checks the creation of a 1.05 Mjup, Z=1e-4 metallicity model and its subsequent evolution for 20 billion years.
+
+
+:ref:`make_co_wd`
+^^^^^^^^^^^^^^^^^
+
+This test case produces a 0.6 |Msun| white dwarf with a carbon-oxygen
+dominated core and a stratified atmosphere dominated by hydrogen at
+its surface. The final model produced by this test case also serves as
+the starting model for :ref:`wd_diffusion` and :ref:`wd_cool_0.6M`.
 
 
 :ref:`make_env`
@@ -381,10 +428,29 @@ This test case shows an example of a carbon flash within a neutron star envelope
 This test case exercises several of the ``other_*`` physics hooks simultaneously in a 1 Msun, Z=0.02 metallicity, model.
 It provides an example of how to include your own physics code into a MESA run.
 
+
 :ref:`pisn`
 ^^^^^^^^^^^^^^^^^^^^^^
 
 This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
+
+
+:ref:`ppisn`
+^^^^^^^^^^^^
+
+This test case shows an example of a star undergoing a pulsational
+pair-instability supernova. The model starts from a massive helium
+star, and includes switches from hydrostatic to hydrodynamic models,
+as well as the removal of ejected layers.
+
+
+:ref:`R_CrB_star`
+^^^^^^^^^^^^^^^^^
+
+This test case creates and evolves a simple model of an R Corona
+Borealis star and provides an example of how to use AESOPUS opacity
+tables in MESA.
+
 
 :ref:`radiative_levitation`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -467,7 +533,17 @@ This test case exercises the simplex framework with a check of the chi^2 value f
 
 This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
 
-:ref:`test_memory`
+
+:ref:`T_tau_gradr`
+^^^^^^^^^^^^^^^^^^
+
+This test checks the implementation of the control
+``use_T_tau_gradr_factor``, which modifies the radiative gradient so
+that regions of low optical depth have a temperature that follows the
+:math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
+
+
+      :ref:`test_memory`
 ^^^^^^^^^^^^^^^^^^
 
 This test case program checks MESA's memory management.
@@ -490,6 +566,21 @@ The test vehicle is a pair of 15 Msun, Z=0.02 metallicity, models one with overs
 ^^^^^^^^^^
 
 This test case creates a Thorne-Zytkow object (TZO) and evolves until the NS has accreted a small amount of material.
+
+:ref:`wd_acc_small_dm`
+^^^^^^^^^^^^^^^^^^^^^^
+
+This test case models an accreting CO white dwarf (WD) and checks that
+the composition of the accreted material is being correctly tracked.
+
+:ref:`wd_aic`
+^^^^^^^^^^^^^
+
+This test case shows an accreting ONeMg white dwarf (WD) evolving
+towards accretion induced collapse (AIC).  It also illustrates use of
+the special weak rate implementation described in Section 8 of |MESA
+III|.
+   
 
 :ref:`wd_c_core_ignition`
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -522,87 +613,6 @@ This test case checks the evolution of a nova outburst for one cycle.
 This test case checks the evolution stable hydrogen burning on a white dwarf.
 
 
-:ref:`c13_pocket`
-^^^^^^^^^^^^^^^^^
-
-This test evolves a 2.0 |Msun| star through one thermal pulse on the
-asymptotic giant branch (AGB) and illustrates third dredge up and the
-formation of a :math:`^{13}{\rm C}` pocket.
-
-      
-:ref:`conductive_flame`
-^^^^^^^^^^^^^^^^^^^^^^^
-
-This test case models a conductively-propagated deflagration wave
-("flame") in a high-density, degenerate carbon-oxygen mixture.  It
-also provides an example for use of the ``other_build_initial_model``
-and ``other_surface_PT`` hooks.
-
-:ref:`conv_core_cpm`
-^^^^^^^^^^^^^^^^^^^^
-
-This test case evolves a 1.5 |Msun| star part of the way through
-the main sequence with CPM enabled and checks that its convective
-core has grown to an appropriate mass coordinate.
-
-:ref:`hb_2M`
-^^^^^^^^^^^^
-
-This test case shows a 2 |Msun| stellar model evolving
-on the horizontal branch (HB) through core helium burning.
-
-:ref:`make_co_wd`
-^^^^^^^^^^^^^^^^^
-
-This test case produces a 0.6 |Msun| white dwarf with a carbon-oxygen
-dominated core and a stratified atmosphere dominated by hydrogen at
-its surface. The final model produced by this test case also serves as
-the starting model for :ref:`wd_diffusion` and :ref:`wd_cool_0.6M`.
-
-:ref:`magnetic_braking`
-^^^^^^^^^^^^^^^^^^^^^^^
-
-This test case involves the calculation of the spin down caused by a
-large-scale magnetic field in a massive star model.
-
-
-:ref:`ppisn`
-^^^^^^^^^^^^
-
-This test case shows an example of a star undergoing a pulsational
-pair-instability supernova. The model starts from a massive helium
-star, and includes switches from hydrostatic to hydrodynamic models,
-as well as the removal of ejected layers.
-
-:ref:`R_CrB_star`
-^^^^^^^^^^^^^^^^^
-
-This test case creates and evolves a simple model of an R Corona
-Borealis star and provides an example of how to use AESOPUS opacity
-tables in MESA.
-
-:ref:`T_tau_gradr`
-^^^^^^^^^^^^^^^^^^
-
-This test checks the implementation of the control
-``use_T_tau_gradr_factor``, which modifies the radiative gradient so
-that regions of low optical depth have a temperature that follows the
-:math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
-
-:ref:`wd_acc_small_dm`
-^^^^^^^^^^^^^^^^^^^^^^
-
-This test case models an accreting CO white dwarf (WD) and checks that
-the composition of the accreted material is being correctly tracked.
-
-:ref:`wd_aic`
-^^^^^^^^^^^^^
-
-This test case shows an accreting ONeMg white dwarf (WD) evolving
-towards accretion induced collapse (AIC).  It also illustrates use of
-the special weak rate implementation described in Section 8 of |MESA
-III|.
-   
 
 Binary tests
 ------------
