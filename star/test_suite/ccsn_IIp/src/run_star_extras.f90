@@ -97,6 +97,9 @@
          initial_nico, initial_M_center, initial_he_core_mass, initial_mass, &
          start_m, stop_m
          
+      real(dp), parameter :: h1_limit = 0.1 ! We use this to check that RTI mixing worked
+      real(dp) :: max_mass_h ! Mass cororidnate where h1< h1_limit
+
       contains
 
       include "test_suite_extras.inc"
@@ -423,6 +426,7 @@
             initial_mass = s% star_mass
             initial_time = s% time
             initial_he_core_mass = s% he_core_mass
+            max_mass_h = -1
          
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_EDEP) then
                if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
@@ -434,6 +438,18 @@
                   end if
                end if
                return
+            end if
+
+            if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART4) then
+               ! This is to check that RTI worked
+               ! Find outer most location where H1<h1_limit then later we will check if this has changed
+               do k=1, s%nz
+                  if(s% xa(h1, k) < h1_limit) then
+                     max_mass_h = s% m(k)
+                     exit
+                  end if
+               end do
+               if(max_mass_h < 0) call mesa_error(__FILE__,__LINE__,'Error: Could not find h1 limit')
             end if
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART5 .and. &
@@ -723,11 +739,12 @@
       
       
       subroutine extras_after_evolve(id, ierr)
-         use chem_def, only: ini56, ico56
+         use chem_def, only: ini56, ico56, ih1
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         real(dp) :: dt
+         integer :: k
+         real(dp) :: dt, h1_mass
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -736,7 +753,46 @@
             call write_stella_data(s, ierr)
             if (ierr /= 0) return
          end if
+         
+         ! Check that RTI worked
+         if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART4 .and. s% rti_flag) then
+            ! This is only needed for the test suite and can be removed if doing science
+            call check_rti()
+         end if
+
          call test_suite_after_evolve(s, ierr)
+
+         contains
+
+         subroutine check_rti()
+            logical,parameter :: dbg=.false.
+
+            ! This is to check that RTI worked
+            ! Find outer most location where H1<0.1 then later we will check if this has changed
+            h1_mass = -1
+
+            if(dbg) write(*,*) "max_mass_h", max_mass_h/msun
+
+            do k=1, s%nz-1
+               !write(*,*) k, s% m(k), max_mass_h, s% m(k) .ge. max_mas_h, s% m(k+1).le. max_mass_h,2.3377068540442852E+034 >=  6.6430170767931355E+033
+               if(s% m(k)>= max_mass_h .and. s% m(k+1)<= max_mass_h) then
+                  h1_mass = s% xa(s% net_iso(s% net_iso(ih1)),k)
+                  exit
+               end if
+            end do
+            if(h1_mass < 0) call mesa_error(__FILE__,__LINE__,'Error: Could not find h1 limit')
+
+            if(h1_mass < h1_limit*2) then
+               write(*,*) "h1_limit ",h1_limit
+               write(*,*) "max_mass_h", max_mass_h/msun
+               write(*,*) "h1_mass", h1_mass
+               ierr = -1
+               call mesa_error(__FILE__,__LINE__,'Error: RTI mxiing did not seem to work')
+            end if
+
+         end subroutine check_rti
+
+
       end subroutine extras_after_evolve
       
 
@@ -959,10 +1015,10 @@
          if (ierr /= 0) return
    
          read(iounit,iostat=ierr) initial_nico, initial_M_center, initial_mass, initial_time, initial_he_core_mass
-         read(iounit,iostat=ierr) start_m, stop_m, inlist_part
+         read(iounit,iostat=ierr) start_m, stop_m, inlist_part, max_mass_h
 
          if(inlist_part/= s% x_integer_ctrl(I_INLIST_PART)) then
-            call mesa_error(__FILE__,__LINE__,'Error: Photo was saved for different unlist')
+            call mesa_error(__FILE__,__LINE__,'Error: Photo was saved for different inlist')
             ierr=-1
             return
          end if
@@ -979,7 +1035,7 @@
          if (ierr /= 0) return
    
          write(iounit) initial_nico, initial_M_center, initial_mass, initial_time, initial_he_core_mass
-         write(iounit) start_m, stop_m, s% x_integer_ctrl(I_INLIST_PART)
+         write(iounit) start_m, stop_m, s% x_integer_ctrl(I_INLIST_PART), max_mass_h
    
          end subroutine extras_photo_write
 
