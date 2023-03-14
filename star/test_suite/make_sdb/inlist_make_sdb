@@ -13,6 +13,7 @@
 
       ! simulate common envelope event removing H envelope
       relax_initial_mass_to_remove_H_env = .true.
+      extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
       lg_max_abs_mdot = -1
 
       change_initial_net = .true.      
