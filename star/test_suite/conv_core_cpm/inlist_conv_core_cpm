@@ -231,9 +231,11 @@
          show_History_Track1_target_box = .true.
          History_Track1_n_sigma = 1
          History_Track1_xtarget = 0.5
-         History_Track1_xsigma = 0.05
+         History_Track1_xsigma = 0.03
          History_Track1_ytarget = 0.13 ! The target value between x_ctrl(1) and x_ctrl(2)
          History_Track1_ysigma = 0.005
+
+         History_Track1_fname = 'core_evolution.data'
 
 !---------------------------------------------------------------------------------------------
     ! set up for evolution of convective boundaries

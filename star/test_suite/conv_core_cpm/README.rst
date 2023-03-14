@@ -1,24 +1,21 @@
-.. _test_case_template:
+.. _conv_core_cpm:
 
-******************
-test_case_template
-******************
+*************
+conv_core_cpm
+*************
 
-Test suite cases should have a ``README.rst`` file that contains a
-brief description of the test and its purpose.
+This test case evolves a 1.5 |Msun| star part of the way through
+the main sequence with convective pre-mixing (CPM) enabled and checks that its convective
+core has grown to an appropriate mass coordinate.
 
-If possible, articulate the criteria that indicate a passing test and
-include information that would allow someone else to evaluate the test
-status.  Supplementary material like plots, plotting scripts, etc.,
-should go in a subdirectory ``docs``.
+The model evolves until the core H mass fraction reaches 0.5.
+It then checks that the convective core mass has grown to encompass
+about 0.13 |Msun|. In other words, the top-middle panel in the pgstar
+grid below must show that the red dot falls within the white box.
+The gold curve in that panel shows the expected evolution of the convective
+core if the model continued to evolve beyond its stopping condition.
 
-For tests that are likely to serve as examples of MESA usage, provide
-additional information about key options or important caveats.  This
-assists users who are adapting the test case to their own science.
+.. image:: ../../../star/test_suite/conv_core_cpm/docs/grid_000092.png
 
-The README file should end with a line that describes when the most
-recent significant changes to this test case occurred.  This gives
-both users and developers a sense of how "fresh" the information is.
 
-Last-Updated: 2020-10-01 (mesa r14552) by Josiah Schwab
-
+Last-Updated: 2023-03-14 (MESA d6bbdf4) by Evan Bauer
