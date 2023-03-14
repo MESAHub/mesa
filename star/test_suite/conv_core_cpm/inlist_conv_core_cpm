@@ -93,6 +93,8 @@
 
 &pgstar
 
+  pgstar_interval = 1
+
 !---------------------------------------------------------------------------------------------
 ! grid1 plot of all 5 panels, see below sections setting up each panel
 
@@ -192,7 +194,7 @@
 	!Kipp_title = ''
 
 	! y axis limits
-	Kipp_mass_max = 1.5
+	Kipp_mass_max = 0.2
 	Kipp_mass_min = 0
 	Kipp_show_mass_boundaries = .true.
 
@@ -203,7 +205,10 @@
 
 	Kipp_show_mixing = .true.
 	Kipp_show_burn = .true.
-	Kipp_show_luminosities = .true.
+	Kipp_show_luminosities = .false.
+
+        Kipp_mix_line_weight = 15
+        Kipp_mix_interval = 2
 
 !---------------------------------------------------------------------------------------------
   ! mass of convective core vs. X_c (central H abundance)
@@ -222,6 +227,13 @@
 	  History_Track1_xmax = 0.75 !-101d0
 	  History_Track1_ymin = 0 !-101d0
          History_Track1_ymax = 0.15 !-101d0
+
+         show_History_Track1_target_box = .true.
+         History_Track1_n_sigma = 1
+         History_Track1_xtarget = 0.5
+         History_Track1_xsigma = 0.05
+         History_Track1_ytarget = 0.13 ! The target value between x_ctrl(1) and x_ctrl(2)
+         History_Track1_ysigma = 0.005
 
 !---------------------------------------------------------------------------------------------
     ! set up for evolution of convective boundaries
