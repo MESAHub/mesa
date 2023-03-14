@@ -543,7 +543,7 @@ that regions of low optical depth have a temperature that follows the
 :math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
 
 
-      :ref:`test_memory`
+:ref:`test_memory`
 ^^^^^^^^^^^^^^^^^^
 
 This test case program checks MESA's memory management.
