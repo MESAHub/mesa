@@ -6,8 +6,6 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-rm restart_photo
-
 do_one inlist_infall_header finished_infall.mod LOGS_part_infall
 do_one inlist_end_infall_header ready_for_edep.mod LOGS_part_end_infall
 do_one inlist_edep_header done_with_edep.mod LOGS_part_edep
