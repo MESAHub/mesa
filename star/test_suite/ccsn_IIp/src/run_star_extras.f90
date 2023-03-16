@@ -98,7 +98,7 @@
          start_m, stop_m
          
       real(dp), parameter :: h1_limit = 0.1 ! We use this to check that RTI mixing worked
-      real(dp) :: max_mass_h ! Mass cororidnate where h1< h1_limit
+      real(dp) :: max_mass_h ! Mass co-ordinate where h1< h1_limit
 
       contains
 
@@ -442,7 +442,7 @@
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART4) then
                ! This is to check that RTI worked
-               ! Find outer most location where H1<h1_limit then later we will check if this has changed
+               ! Find outer most location where H1<h1_limit, later we will check if this has changed
                do k=1, s%nz
                   if(s% xa(h1, k) < h1_limit) then
                      max_mass_h = s% m(k)
@@ -774,7 +774,6 @@
             if(dbg) write(*,*) "max_mass_h", max_mass_h/msun
 
             do k=1, s%nz-1
-               !write(*,*) k, s% m(k), max_mass_h, s% m(k) .ge. max_mas_h, s% m(k+1).le. max_mass_h,2.3377068540442852E+034 >=  6.6430170767931355E+033
                if(s% m(k)>= max_mass_h .and. s% m(k+1)<= max_mass_h) then
                   h1_mass = s% xa(s% net_iso(s% net_iso(ih1)),k)
                   exit
