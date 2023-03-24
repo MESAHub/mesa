@@ -31,6 +31,7 @@
          max_number_retries = 8
       ! you probably want to change this
       max_age = 1e10
+      use_gold2_tolerances = .true.
 
       extra_terminal_output_file = 'log1' 
       log_directory = 'LOGS1'

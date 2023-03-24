@@ -20,6 +20,7 @@
   initial_z = 0.02
 
   he_core_mass_limit = 0.3
+  use_gold2_tolerances = .true.
 
 / ! end of controls namelist
 

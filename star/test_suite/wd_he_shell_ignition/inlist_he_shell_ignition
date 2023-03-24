@@ -63,6 +63,7 @@
       ! can't make it through the flash at the end with this true
       ! check again after composition derivatives exist
       include_composition_in_eps_grav = .false.
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

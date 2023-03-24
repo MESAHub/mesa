@@ -42,6 +42,7 @@
       max_years_for_timestep = 1d9
       
       energy_eqn_option = 'eps_grav'
+      use_gold2_tolerances = .true.
 
       limit_for_rel_error_in_energy_conservation = 1d-5
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
