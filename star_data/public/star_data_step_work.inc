@@ -221,6 +221,7 @@
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
          ! (including losses to neutrinos produced in the reactions)
+         ! Thus you should not subtract eps_nuc_neu_total from this
       real(dp), pointer :: eps_nuc_categories(:,:) ! (num_categories, nz)
       real(dp), pointer :: d_epsnuc_dlnd(:) ! partial wrt density
       real(dp), pointer :: d_epsnuc_dlnT(:) ! partial wrt temperature
