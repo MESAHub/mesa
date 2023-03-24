@@ -124,6 +124,8 @@
       history_interval = 10
       terminal_interval = 4000
 
+      use_gold2_tolerances = .true.
+
 / ! end of controls namelist
 
 

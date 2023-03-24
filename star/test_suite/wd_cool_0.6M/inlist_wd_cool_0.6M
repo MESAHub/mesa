@@ -68,6 +68,7 @@
          ! since have energy_eqn_option = 'eps_grav'
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
+      use_gold2_tolerances = .true.
 
       atm_option = 'table'
       atm_table = 'WD_tau_25'

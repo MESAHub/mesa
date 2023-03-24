@@ -54,6 +54,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 1000
+      use_gold2_tolerances = .true.
 
       initial_mass = 1.5
       initial_z = 0.02d0

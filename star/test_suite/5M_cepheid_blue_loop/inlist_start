@@ -84,6 +84,8 @@ steps_before_use_TDC = 10
 
    delta_HR_limit = 0.002
 
+   use_gold2_tolerances = .true.
+
 
 ! output controls
 

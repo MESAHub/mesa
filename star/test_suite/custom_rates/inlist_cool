@@ -18,6 +18,7 @@
 
   max_years_for_timestep = 1d6
   log_center_temp_lower_limit = 7.43136
+  use_gold2_tolerances = .true.
 
 / ! end of controls namelist
 
