@@ -457,7 +457,7 @@ contains
             end do
             fk = fk / sum(fk)
             call call_compute_kappa_mombarg(s% kap_handle, k, &
-                 fk, 10**logT, 10**logRho, logT, logRho, &
+                 fk, logT, logRho, &
                  zbar, lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
          endif

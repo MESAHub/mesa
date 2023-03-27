@@ -773,7 +773,7 @@
       end subroutine call_compute_gamma_grid_mombarg
 
       subroutine call_compute_kappa_mombarg(handle, k,&
-        fk, T_cntr, Rho_cntr, logT_cntr, logRho_cntr,&
+        fk, logT_cntr, logRho_cntr,&
         zbar, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
         kap, dlnkap_dlnT, dlnkap_dlnRho, log_kap_rad_cell, ierr)
         use kap_eval, only: combine_rad_with_conduction
@@ -785,7 +785,7 @@
         integer, intent(in) :: handle ! from alloc_kap_handle
         integer, intent(in) :: k
         real(dp), intent(in) :: fk(:)
-        real(dp), intent(in) :: T_cntr, Rho_cntr, logT_cntr, logRho_cntr
+        real(dp), intent(in) :: logT_cntr, logRho_cntr
         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
         integer, intent(inout) :: ierr
@@ -793,6 +793,7 @@
 
         integer ::  eid(17), ke
         real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2!,fk(17),fk_norm_fac
+        real(dp) :: Rho_cntr, T_cntr
         type (Kap_General_Info), pointer :: rq
 
         ierr = 0
@@ -802,6 +803,9 @@
         endif
         call kap_ptr(handle,rq,ierr)
         if (ierr /= 0) return
+
+        Rho_cntr = 10**logRho_cntr
+        T_cntr = 10**logT_cntr
 
         eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
         img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
