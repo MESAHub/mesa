@@ -141,7 +141,12 @@ contains
 
     type(auto_diff_real_2var_order1) :: frac
 
-    frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
+    if (s% op_mono_method == 'mombarg' .and. k < 2) then
+       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+    else
+       frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
+    end if
+    
     beta = frac% val
 
   end function fraction_of_op_mono
@@ -323,7 +328,12 @@ contains
        return
     end if
 
-    beta = frac_op_mono(s, logRho, logT)
+    if (s% op_mono_method == 'mombarg' .and. k < 2) then
+       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+    else
+       beta = frac_op_mono(s, logRho, logT)
+    end if
+    
     if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = beta % val
 
     if (beta > 0d0) then
@@ -447,8 +457,8 @@ contains
             end do
             fk = fk / sum(fk)
             call call_compute_kappa_mombarg(s% kap_handle, k, &
-                 fk, s% T(k), s% rho(k), logT, logRho, &
-                 s% zbar(k), lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
+                 fk, 10**logT, 10**logRho, logT, logRho, &
+                 zbar, lnfree_e, dlnfree_e_dlnRho, dlnfree_e_dlnT, &
                  kap_op, dlnkap_op_dlnT, dlnkap_op_dlnRho, log_kap_rad, ierr)
          endif
       else
