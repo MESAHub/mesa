@@ -456,18 +456,17 @@ contains
          stop
       end if
 
-       if (ierr /= 0) then
-          s% retry_message = 'error in op_mono kap'
-          if (s% report_ierr) write(*, *) s% retry_message
-          beta = 0
-          if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = 0
-          ierr = 0
-       else if (beta == 1d0) then
-          kap = kap_op
-          dlnkap_dlnT = dlnkap_op_dlnT
-          dlnkap_dlnd = dlnkap_op_dlnRho
-          return
-       end if
+      if (ierr /= 0) then
+         ! Fall back to standard opacities, not OP
+         beta = 0
+         if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = 0
+         ierr = 0
+      else if (beta == 1d0) then
+         kap = kap_op
+         dlnkap_dlnT = dlnkap_op_dlnT
+         dlnkap_dlnd = dlnkap_op_dlnRho
+         return
+      end if
 
        if (is_bad(kap_op)) then
          ierr = 1
