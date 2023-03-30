@@ -411,7 +411,7 @@
          kap_rad = exp10(g1)
 
          call combine_rad_with_conduction( &
-            rq, rho, logRho, T, logT, zbar, &
+            rq, logRho, logT, zbar, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
@@ -793,7 +793,6 @@
 
         integer ::  eid(17), ke
         real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2!,fk(17),fk_norm_fac
-        real(dp) :: Rho_cntr, T_cntr
         type (Kap_General_Info), pointer :: rq
 
         ierr = 0
@@ -804,8 +803,6 @@
         call kap_ptr(handle,rq,ierr)
         if (ierr /= 0) return
 
-        Rho_cntr = 10**logRho_cntr
-        T_cntr = 10**logT_cntr
 
         eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
         img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
@@ -855,7 +852,7 @@
         kap_rad = exp10(log_kap_rad_cell)
 
         call combine_rad_with_conduction( &
-             rq, Rho_cntr, logRho_cntr, T_cntr, logT_cntr, zbar, &
+             rq, logRho_cntr, logT_cntr, zbar, &
              kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
              kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
