@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  The MESA Team
+!   Copyright (C) 2023  The MESA Team & Simon Guichandut
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -28,7 +28,7 @@
       ! consult star/other/README for general usage instructions
       ! control name: use_other_close_gaps = .true.
       ! procedure pointer: s% other_close_gaps => my_routine
-
+      ! This also requires the control remove_mixing_glitches = .true. 
 
       use star_def
 
@@ -37,8 +37,10 @@
       contains
       
       
-      subroutine null_other_close_gaps(id, ierr)
+      subroutine null_other_close_gaps(id, mix_type, min_gap, ierr)
          integer, intent(in) :: id
+         integer, intent(in) :: mix_type
+         real(dp), intent(in) :: min_gap
          integer, intent(out) :: ierr
          ierr = 0
       end subroutine null_other_close_gaps
