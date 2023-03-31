@@ -11341,6 +11341,7 @@
     use_other_eps_grav = .false.
     use_other_mesh_functions = .false.
     use_other_D_mix = .false.
+    use_other_close_gaps = .false.
 
       ! ::
 
