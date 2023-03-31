@@ -1077,21 +1077,33 @@
       subroutine close_convection_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, convective_mixing, s% min_convective_gap, ierr)
+         if (s% use_other_close_gaps) then
+            call s% other_close_gaps(s% id, convective_mixing, s% min_convective_gap, ierr)
+         else
+            call close_gaps(s, convective_mixing, s% min_convective_gap, ierr)
+         end if
       end subroutine close_convection_gaps
 
 
       subroutine close_thermohaline_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, thermohaline_mixing, s% min_thermohaline_gap, ierr)
+         if (s% use_other_close_gaps) then
+            call s% other_close_gaps(s% id, thermohaline_mixing, s% min_thermohaline_gap, ierr)
+         else
+            call close_gaps(s, thermohaline_mixing, s% min_thermohaline_gap, ierr)
+         end if
       end subroutine close_thermohaline_gaps
 
 
       subroutine close_semiconvection_gaps(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         call close_gaps(s, semiconvective_mixing, s% min_semiconvection_gap, ierr)
+         if (s% use_other_close_gaps) then
+            call s% other_close_gaps(s% id, semiconvective_mixing, s% min_semiconvection_gap, ierr)
+         else
+            call close_gaps(s, semiconvective_mixing, s% min_semiconvection_gap, ierr)
+         end if
       end subroutine close_semiconvection_gaps
 
 
