@@ -92,6 +92,12 @@ This was found to be important for smooth convective boundary
 evolution with convective premixing.
 
 
+Hooks
+~~~~~
+
+A new other_close_gaps hook has been added. Provided by Simon Guichandut
+
+
 Changes in r22.11.1
 ===================
 

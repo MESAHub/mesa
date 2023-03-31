@@ -77,6 +77,9 @@
          s% use_other_rate_get = .true.
          s% other_rate_get => my_rate_get
          
+         s% use_other_close_gaps = .true.
+         s% other_close_gaps => my_close_gaps
+
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
@@ -392,6 +395,28 @@
          end if
    
       end subroutine my_rate_get
+
+
+      subroutine my_close_gaps(id, mix_type, min_gap, ierr)
+         integer, intent(in) :: id
+         integer, intent(in) :: mix_type
+         real(dp), intent(in) :: min_gap
+         integer, intent(out) :: ierr
+         integer :: k
+         type (star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+         do k=1, 10
+            if (.false. .and. s% mixing_type(k) == mix_type) then 
+               write(*,*) k, s% D_mix(k), s% mixing_type(k)
+            end if
+         end do
+
+
+      end subroutine my_close_gaps
+
 
 
       end module run_star_extras

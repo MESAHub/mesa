@@ -1360,6 +1360,7 @@
          logical :: use_other_rate_get
          logical :: use_other_net_derivs
          logical :: use_other_split_burn
+         logical :: use_other_close_gaps
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

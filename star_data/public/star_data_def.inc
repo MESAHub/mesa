@@ -835,6 +835,15 @@
          end subroutine other_diffusion_interface
 
 
+         subroutine other_close_gaps_interface(id, mix_type, min_gap, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: id
+            integer, intent(in) :: mix_type
+            real(dp), intent(in) :: min_gap
+            integer, intent(out) :: ierr
+         end subroutine other_close_gaps_interface
+
+
          subroutine other_kap_get_interface( &
                id, k, handle, species, chem_id, net_iso, xa, &
                log10_rho, log10_T, &
