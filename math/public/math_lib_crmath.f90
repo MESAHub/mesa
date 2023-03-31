@@ -155,7 +155,7 @@ contains
 
     if (.NOT. IEEE_IS_FINITE(x)) then
 
-       log_x = 1.E-99_dp
+       log_x = -99._dp
 
     else
 
@@ -174,7 +174,7 @@ contains
 
     if (.NOT. IEEE_IS_FINITE(x)) then
 
-       log10_x = 1.E-99_dp
+       log10_x = -99._dp
 
     else
 
