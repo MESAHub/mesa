@@ -358,6 +358,7 @@
          
          s% model_number = 0
          s% star_age = 0
+         s% crystal_core_boundary_mass = -1d0 
                      
          write(*,2) 'start.mod', nz
          call star_write_model(id, 'start.mod', ierr)
@@ -479,6 +480,7 @@
                s% lnT(k) = logT*ln10
                s% rho(k) = exp10(logRho)
                s% T(k) = T_00
+               s% rho_start(k) = s% rho(k)
                call star_do_eos_for_cell(s% id, k, ierr)
                if (ierr /= 0) then
                   write(*, *) 'Call star_do_eos_for_cell failed', k
@@ -498,6 +500,7 @@
                s% csound_start(k) = s% csound(k)
                s% mlt_gradT_fraction = -1d0
                s% adjust_mlt_gradT_fraction(k) = -1d0
+               s% gradL_composition_term(k) = 0d0
                
                ! skipping use_other_alpha_mlt and other_gradr_factor
                s% alpha_mlt(k) = s% mixing_length_alpha

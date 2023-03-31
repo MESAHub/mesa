@@ -224,6 +224,9 @@
             case(ir_li7_pa_he4) ! li7(p, a)he4
                call do1(rate_li7pa_nacre)
 
+            case(ir_he4_ap_li7) ! li7(p, a)he4
+               call do1_reverse(rate_li7pa_nacre)
+
             case(ir_n13_gp_c12) ! n13(g, p)c12
                call do1_reverse(rate_c12pg_nacre)
 
@@ -906,7 +909,10 @@
          dlambda_dlnT = 0d0
 
          call do_reaclib_indices_for_reaction(reaction_name(rir), reaclib_rates, lo, hi, ierr)
-         if(ierr/=0) return 
+         if(ierr/=0) then
+            write(*,*) "Error: Could not get reaclib index for rate ",rir, ' ',trim(reaction_name(rir))
+            return 
+         end if
 
          inv_lambda = 0d0
          dinv_lambda_dlnT = 0d0
@@ -945,14 +951,21 @@
          ierr = 0
          vec => vec_ary
 
-         rate_file = trim(rates_table_dir) // '/' // trim(f_name)
-         !write(*,*) 'load table ' // trim(rate_file)
+
+         ! Look for the file based on its name first
+         
+         rate_file = trim(f_name)
          
          open(newunit=iounit,file=trim(rate_file),action='read',status='old',iostat=ierr)
          if (ierr /= 0) then
-            write(*,*) 'ERROR: cannot open rate info file ' // trim(rate_file)
-            !return
-            call mesa_error(__FILE__,__LINE__)
+            ! Look in rates_table_dir
+            rate_file = trim(rates_table_dir) // '/' // trim(f_name)
+            open(newunit=iounit,file=trim(rate_file),action='read',status='old',iostat=ierr)
+            if (ierr /= 0) then
+               write(*,*) 'ERROR: cannot open rate info file ' // trim(rate_file)
+               !return
+               call mesa_error(__FILE__,__LINE__)
+            end if
          end if
 
          do ! read until reach line starting with an integer (nT8s)

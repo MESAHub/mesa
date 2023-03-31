@@ -1,0 +1,191 @@
+
+! this is the master inlist that MESA reads when it starts.
+
+! This file tells MESA to go look elsewhere for its configuration
+! info. This makes changing between different inlists easier, by
+! allowing you to easily change the name of the file that gets read.
+
+&star_job
+      load_saved_model = .true.
+      load_model_filename = 'post_tzo.mod'
+
+      ! save a model at the end of the run
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod' 
+      required_termination_code_string = 'PASS: Have reached requested NS mass'
+
+      write_profile_when_terminate = .true.
+      filename_for_profile_when_terminate = 'final.prof'
+      save_pgstar_files_when_terminate=.true.
+
+      change_initial_net=.true.
+      new_net_name='approx21.net' 
+
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-6
+
+      set_initial_age = .true.
+      initial_age = 0     
+
+      set_initial_model_number = .true.
+      initial_model_number = 0
+
+      set_initial_cumulative_energy_error = .true.
+      new_cumulative_energy_error = 0d0 
+
+      relax_Y = .false.
+      relax_Z = .false.
+      relax_mass = .false.
+      relax_initial_core = .false.
+
+/ ! end of star_job namelist
+
+&eos
+      use_skye=.true.
+/
+
+&kap
+      use_Type2_opacities = .true.
+      zbase=1d-4
+/
+
+
+
+&controls
+      x_integer_ctrl(1) = 4 ! Inlist number
+
+      !!!!!!!!!!!!!
+      ! Default choices
+      x_ctrl(1) = 1d0 ! Scale L_center by this times L_edd
+      x_ctrl(2) = 1d0 ! Accretion efficeny for growth of the NS mass
+    
+      mixing_length_alpha = 1.8
+      van_Loon_scaling_factor = 1d0
+      x_logical_ctrl(1) = .true. ! If true turn on v_flag after 100 years
+      ! End defaults
+      !!!!!!!!!!!!!!
+
+      !!!!!!!!!!!!!!
+      ! Stopping criteria for the test suite.
+      x_ctrl(3) = 1.40002 ! Mass of NS to stop at
+      !!!!!!!!!!!!!!
+
+      surface_avg_abundance_dq = 1d-1
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'm_center'
+      trace_history_value_name(2) = 'L_center'
+
+
+      max_age = 1d10
+      v_surf_div_v_esc_limit = 0.1
+
+      min_overshoot_q=0d0
+      max_abs_rel_run_E_err = -1d0
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+      mesh_delta_coeff= 1.5 ! Do not recommend going below 1 for the mesh_delta's, if you need more mesh points increase T_function1_weight
+      mesh_delta_coeff_for_highT = 1.5
+      T_function1_weight = 175
+
+      atm_option = 'T_tau'
+      atm_T_tau_relation = 'Eddington'
+      atm_T_tau_opacity = 'iterated'
+      
+      op_split_burn=.true.
+
+      MLT_option = 'TDC'
+      steps_before_use_TDC = -1
+
+      dX_div_X_limit_min_X(1) = 1d99 ! H
+      dX_div_X_limit_min_X(2) = 1d99 ! He
+      delta_lgL_He_limit = 1d99
+
+      restore_mesh_on_retry = .true.
+      num_steps_to_hold_mesh_after_retry = 1 
+
+      make_gradr_sticky_in_solver_iters = .true.
+      convergence_ignore_equL_residuals = .true.
+
+      varcontrol_target=1d-3
+      time_delta_coeff=1.0
+      max_timestep_factor = 2.0d0
+      !report_solver_dt_info = .true.
+
+      dX_nuc_drop_limit = 5d-2
+      dX_nuc_drop_limit_at_high_T = 5d-2
+      dX_nuc_drop_min_X_limit = 1d-1
+      dX_nuc_drop_max_A_limit = 52
+
+      overshoot_scheme(1) = ''
+      overshoot_zone_type(1) = ''
+      overshoot_zone_loc(1) = ''
+      overshoot_bdy_loc(1) = ''
+      overshoot_f(1) = 0.0d0
+      overshoot_f0(1) = 0.0d0
+
+      min_dq_for_xa_convective = -1
+      
+      max_timestep=2d8 ! This is helpful to limit, you can take larger timesteps but you end up with many more retries
+      
+      ignore_too_large_correction = .true.
+      scale_max_correction = 0.01d0
+      ignore_species_in_max_correction = .true.
+
+      set_min_d_mix=.true.
+      min_d_mix=1d6
+      mass_lower_limit_for_min_D_mix = 0d0 
+      mass_upper_limit_for_min_D_mix = 3.0d0
+      min_center_Ye_for_min_D_mix = 0.0d0
+
+      xa_scale = 1d-5
+      warn_when_large_rel_run_E_err = 1d99
+      min_xa_hard_limit  = -5d-5
+
+! GYRE options
+      write_pulse_data_with_profile = .false.
+      pulse_data_format = 'GYRE'
+      add_double_points_to_pulse_data = .true.
+      add_center_point_to_pulse_data = .false.
+      add_atmosphere_to_pulse_data = .true.
+      !use_superad_reduction = .true.
+
+
+!!!!!!!!!!!!!!
+
+      max_model_number=10000
+      photo_interval = 100
+      profile_interval = 100
+      history_interval=1
+      max_num_profile_models = 50
+
+      center_avg_value_dq = 1d-13
+
+      ! Dont care what happens at s%nz
+      delta_lgT_cntr_limit = 1d99
+      delta_lgP_cntr_limit = 1d99
+      delta_lgRho_cntr_limit = 1d99
+      delta_dX_div_X_cntr_min = 1d99
+      delta_lg_XH_cntr_min = 1d99
+      delta_lg_XHe_cntr_min = 1d99
+      delta_lg_XC_cntr_min = 1d99
+      delta_lg_XO_cntr_min = 1d99
+      delta_XH_cntr_limit = 1d99
+      delta_XH_cntr_hard_limit = 1d99
+      delta_XHe_cntr_limit = 1d99
+      delta_XHe_cntr_hard_limit = 1d99
+      delta_XC_cntr_limit = 1d99
+      delta_XC_cntr_hard_limit = 1d99
+      delta_XO_cntr_limit = 1d99
+      delta_XO_cntr_hard_limit = 1d99
+      delta_XSi_cntr_limit = 1d99
+      delta_XSi_cntr_hard_limit = 1d99
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

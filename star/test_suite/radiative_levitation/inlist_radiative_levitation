@@ -48,6 +48,7 @@
 &controls
 
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
       
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -77,9 +78,9 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10      
-      
-      dH_div_H_limit_min_H = 1d99 ! disable this
-      dHe_div_He_limit_min_He = 1d99 ! disable this
+
+      dX_div_X_limit_min_X(1) = 1d99 ! disable this for H
+      dX_div_X_limit_min_X(2) = 1d99 ! disable this for He
 
       prune_bad_cz_min_Hp_height = 0.1 ! lower limit on radial extent of cz
 

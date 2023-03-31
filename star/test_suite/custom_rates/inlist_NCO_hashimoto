@@ -49,6 +49,7 @@
 &controls
 
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
 
       max_age = 44d7
 

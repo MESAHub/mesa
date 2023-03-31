@@ -1,0 +1,80 @@
+! this is the master inlist that MESA reads when it starts.
+
+! This file tells MESA to go look elsewhere for its configuration
+! info. This makes changing between different inlists easier, by
+! allowing you to easily change the name of the file that gets read.
+
+&star_job
+
+   load_saved_model = .true.
+   load_model_filename = 'tzo.mod'
+
+   ! save a model at the end of the run
+   save_model_when_terminate = .true.
+   save_model_filename = 'post_tzo.mod' 
+
+   set_initial_age = .true.
+   initial_age = 0     
+
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+  ! Change mass here
+   relax_mass_scale = .true.
+   new_mass = 5d0
+   dlgm_per_step = 5d-3
+   change_mass_years_for_dt = 1d2
+
+   relax_Y = .true.
+   relax_initial_Y = .true.
+   new_Y = 0.4
+
+   relax_Z = .true.
+   relax_initial_Z = .true.
+   new_Z = 1d-4
+
+   change_initial_net=.false.
+   new_net_name='approx21.net' 
+
+/ ! end of star_job namelist
+
+&eos
+
+
+/
+
+&kap
+
+/
+
+
+
+&controls
+!      max_age=1d0
+      max_model_number=1
+
+      max_abs_rel_run_E_err = -1d0
+      limit_for_rel_error_in_energy_conservation = 1d99
+      hard_limit_for_rel_error_in_energy_conservation = 1d99
+
+      dxdt_nuc_factor=0d0
+
+      ! Winds
+      hot_wind_scheme = ''
+      cool_wind_RGB_scheme = ''
+      cool_wind_AGB_scheme = ''
+
+      use_gold_tolerances=.false.
+
+      x_integer_ctrl(1) = 3 ! Inlist number
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

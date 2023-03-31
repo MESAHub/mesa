@@ -87,6 +87,7 @@
          reaction_Name(ir_h1_h1_he4_to_he3_he3) = 'r_h1_h1_he4_to_he3_he3'
          reaction_Name(ir_he4_he4_he4_to_c12) = 'r_he4_he4_he4_to_c12'
          reaction_Name(ir_li7_pa_he4) = 'r_li7_pa_he4'
+         reaction_Name(ir_he4_ap_li7) = 'r_he4_ap_li7'
          reaction_Name(ir_mg24_ag_si28) = 'r_mg24_ag_si28'
          reaction_Name(ir_mg24_ap_al27) = 'r_mg24_ap_al27'
          reaction_Name(ir_mg24_ga_ne20) = 'r_mg24_ga_ne20'

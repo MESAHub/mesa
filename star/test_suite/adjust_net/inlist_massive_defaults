@@ -28,7 +28,7 @@
 / ! end of kap namelist
 
 &controls
-         
+         use_gold2_tolerances = .true.
 
          ! high center T limit to avoid negative mass fractions
          sig_min_factor_for_high_Tcenter = 0.01

@@ -61,6 +61,7 @@ star/test_suite/check_redo @fxt44
 star/test_suite/check_pulse_atm @warrickball
 star/test_suite/conductive_flame @fxt44 @rjfarmer
 star/test_suite/conserve_angular_momentum @orlox
+star/test_suite/conv_core_cpm @evbauer
 star/test_suite/custom_colors @rjfarmer
 star/test_suite/custom_rates @evbauer  @fxt44
 star/test_suite/high_rot_darkening @orlox

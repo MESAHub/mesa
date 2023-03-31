@@ -38,6 +38,7 @@
   initial_z = 0.02
   
   calculate_Brunt_N2 = .true.
+  use_gold2_tolerances = .true.
   
   ! GYRE output controls
   

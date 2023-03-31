@@ -813,15 +813,19 @@
 ! wind_BH_alpha_*
 ! ~~~~~~~~~~~~~~~
 
-! Bondi-Hoyle accretion parameter for each star. The default is 3/2 taken
-! from Hurley et al. 2002, MNRAS, 329, 897, in agreement with
-! Boffin & Jorissen 1988, A&A, 205, 155
+! Bondi-Hoyle accretion parameter for each star. The default for alpha is 3/2
+! taken from Hurley et al. 2002, MNRAS, 329, 897, in agreement with
+! Boffin & Jorissen 1988, A&A, 205, 155.
+! The default for beta is 1/8=0.125 in accordance for results of cool
+! supergiants from Kucinskas A., 1999, Ap&SS, 262, 127
 ! "\_1" refers to first star, "\_2" to the second one.
 
 ! ::
 
     wind_BH_alpha_1 = 1.5d0
     wind_BH_alpha_2 = 1.5d0
+    wind_BH_beta_1 = 1.25d-1
+    wind_BH_beta_2 = 1.25d-1
 
 
 ! max_wind_transfer_fraction_*

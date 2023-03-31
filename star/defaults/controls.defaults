@@ -1784,7 +1784,7 @@
 
       ! ::
 
-    max_abs_rel_run_E_err = 0.01d0
+    max_abs_rel_run_E_err = -1
 
 
       ! max_number_retries
@@ -6265,6 +6265,20 @@
     mesh_dlog_other_dlogP_extra = 0.25d0
     mesh_dlog_photo_dlogP_extra = 1
 
+      ! convective_bdy_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! convective_bdy_dq_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! convective_bdy_min_dt_yrs
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Mesh function to enhance resolution near convective boundaries
+
+      ! ::
+
+      convective_bdy_weight = 0
+      convective_bdy_dq_limit = 3d-5
+      convective_bdy_min_dt_yrs = 1d-3
 
       ! max_rel_delta_IE_for_mesh_total_energy_balance
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8957,7 +8971,7 @@
 
       ! ::
 
-    use_gold2_tolerances = .true.
+    use_gold2_tolerances = .false.
     steps_before_use_gold2_tolerances = -1
 
       ! if >= 0, then after this many steps in run, act as if use_gold2_tolerances true
@@ -9085,12 +9099,6 @@
       !          'lgL_power_phot'       delta_lgL_power_photo_limit 
       !          'Lnuc_z'               delta_lgL_z_limit
       !          'bad_X_sum'            (solver found bad mass sum)
-      !          'dH'                   dH_limit
-      !          'dH/H'                 dH_div_H_limit
-      !          'dHe'                  dHe_limit
-      !          'dHe/He'               dHe_div_He_limit
-      !          'dHe3'                 dHe3_limit
-      !          'dHe3/He3'             dHe3_div_He3_limit
       !          'dL/L'                 dL_div_L_limit
       !          'dX'                   dX_limit
       !          'dX/X'                 dX_div_X_limit
@@ -9482,254 +9490,22 @@
 
       ! Option to ignore decreases in abundance in non-mixed cells near mixing boundaries.
       ! Ignore abundance changes if nearest mixing boundary is closer than this in Msun units.
-      ! This applies to ``dH``, ``dH_div_H``, ``dHe``, ``dHe_d_He``, ``dX``, and ``dX_div_X`` limits.
+      ! This applies to ``dX``, and ``dX_div_X`` limits.
 
       ! ::
 
     dX_mix_dist_limit = 1d-4
 
       ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
-      ! dH here is ``abs(xa(h1,k) - xa_old(h1,k))`` for any cell k.
+      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
+      ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
+      ! allowed here. E.g. 'Z' will trigger the timestep control if any metal isotope
+      ! abundance individually satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
 
-
-      ! dH_limit_min_H
-      ! ~~~~~~~~~~~~~~
-
-      ! dH limits only apply where xa(h1,k) >= this limit.
-
-      ! ::
-
-    dH_limit_min_H = 1d99
-
-
-      ! dH_limit
-      ! ~~~~~~~~
-
-      ! If max dH is greater than this, reduce the next timestep by ``dH_limit/max_dH``.
-
-      ! ::
-
-    dH_limit = 1d99
-
-
-      ! dH_hard_limit
-      ! ~~~~~~~~~~~~~
-
-      ! If max dH is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dH_hard_limit = 1d99
-
-
-      ! dH_decreases_only
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! If true, then only consider decreases in abundance.
-
-      ! ::
-
-    dH_decreases_only = .true.
-
-      ! Limit on magnitude of relative decrease in any cell hydrogen abundance.
-      ! ``dH_div_H`` here is ``abs(xa(h1,k) - xa_old(h1,k))/xa(h1,k)``
-      ! considers all cells except where have convective mixing.
-      ! ``dH_decreases_only`` applies to ``dH_div_H`` also.
-
-
-      ! dH_div_H_limit_min_H
-      ! ~~~~~~~~~~~~~~~~~~~~
-
-      ! ``dH_div_H`` limits only apply where xa(h1,k) >= this limit.
-
-      ! ::
-
-    dH_div_H_limit_min_H = 1d-3
-
-
-      ! dH_div_H_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If max ``dH_div_H`` is greater than this, reduce the next timestep by ``dH_div_H_limit/max dH_div_H``.
-
-      ! ::
-
-    dH_div_H_limit = 0.9d0
-
-
-      ! dH_div_H_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! If max ``dH_div_H`` is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dH_div_H_hard_limit = 1d99
-
-      ! Limit on magnitude of decrease in any cell helium abundance during a single timestep.
-      ! dHe here is ``abs(xa(he4,k) - xa_old(he4,k))`` for any cell k.
-      ! Considers all cells except where have convective mixing.
-
-
-      ! dHe_limit_min_He
-      ! ~~~~~~~~~~~~~~~~
-
-      ! dHe limits only apply where xa(he4,k) >= this limit.
-
-      ! ::
-
-    dHe_limit_min_He = 1d99
-
-
-      ! dHe_limit = 1d99
-      ! ~~~~~~~~~~~~~~~~
-
-      ! If max dHe is greater than this, reduce the next timestep by ``dHe_limit/max_dHe``.
-
-      ! ::
-
-    dHe_limit = 1d99
-
-
-      ! dHe_hard_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If max dHe is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dHe_hard_limit = 1d99
-
-
-      ! dHe_decreases_only
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! If true, then only consider decreases in abundance.
-      ! ``dHe_decreases_only`` applies to ``dHe_div_He`` also.
-
-      ! ::
-
-    dHe_decreases_only = .true.
-
-      ! Limit on magnitude of relative decrease in any cell helium abundance.
-      ! ``dHe_div_He`` here is ``abs(xa(he4,k) - xa_old(he4,k))/xa(he4,k)``.
-      ! Considers all cells except where have convective mixing.
-
-
-      ! dHe_div_He_limit_min_He
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``dHe_div_He`` limits only apply where xa(he4,k) >= this limit.
-
-      ! ::
-
-    dHe_div_He_limit_min_He = 1d-3
-
-
-      ! dHe_div_He_limit
-      ! ~~~~~~~~~~~~~~~~
-
-      ! If max ``dHe_div_He`` is greater than this, reduce the next timestep by ``dHe_limit/max_dHe``.
-
-      ! ::
-
-    dHe_div_He_limit = 0.9d0
-
-
-      ! dHe_div_He_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! If max ``dHe_div_He`` is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dHe_div_He_hard_limit = 1d99
-
-      ! Limit on magnitude of decrease in any cell helium abundance during a single timestep.
-      ! dHe3 here is ``abs(xa(he4,k) - xa_old(he3,k))`` for any cell k.
-      ! Considers all cells except where have convective mixing.
-
-
-      ! dHe3_limit_min_He3
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! dHe3 limits only apply where xa(he3,k) >= this limit.
-
-      ! ::
-
-    dHe3_limit_min_He3 = 1d99
-
-
-      ! dHe3_limit
-      ! ~~~~~~~~~~
-
-      ! If max dHe3 is greater than this, reduce the next timestep by ``dHe3_limit/max_dHe3``.
-
-      ! ::
-
-    dHe3_limit = 1d99
-
-
-      ! dHe3_hard_limit
-      ! ~~~~~~~~~~~~~~~
-
-      ! If max dHe3 is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dHe3_hard_limit = 1d99
-
-
-      ! dHe3_decreases_only
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! If true, then only consider decreases in abundance.
-      ! ``dHe3_decreases_only`` applies to ``dHe3_div_He3`` also.
-
-      ! ::
-
-    dHe3_decreases_only = .true.
-
-      ! Limit on magnitude of relative decrease in any cell helium abundance.
-      ! ``dHe3_div_He3`` here is ``abs(xa(he3,k) - xa_old(he3,k))/xa(he3,k)``.
-      ! Considers all cells except where have convective mixing.
-
-
-      ! dHe3_div_He3_limit_min_He3
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ``dHe3_div_He3`` limits only apply where xa(he3,k) >= this limit.
-
-      ! ::
-
-    dHe3_div_He3_limit_min_He3 = 1d99
-
-
-      ! dHe3_div_He3_limit
-      ! ~~~~~~~~~~~~~~~~~~
-
-      ! if max ``dHe3_div_He3`` is greater than this, reduce the next timestep by ``dHe3_limit/max_dHe3``.
-
-      ! ::
-
-    dHe3_div_He3_limit = 1d99
-
-
-      ! dHe3_div_He3_hard_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If max ``dHe3_div_He3`` is greater than this, retry with smaller timestep.
-
-      ! ::
-
-    dHe3_div_He3_hard_limit = 1d99
-
-      ! Limit on magnitude of decrease in any cell nonH, nonHe abundance.
-      ! dX here is ``abs(xa(j,k) - xa_old(j,k))``
-      ! for any cell k and any species j other except hydrogen or helium.
-      ! Considers all cells except where have convective mixing.
-
+    dX_limit_species(1) = 'h1'
+    dX_limit_species(2) = 'he4'
+    dX_limit_species(3:) = ''
 
       ! dX_limit_min_X
       ! ~~~~~~~~~~~~~~
@@ -9738,7 +9514,7 @@
 
       ! ::
 
-    dX_limit_min_X = 1d99
+    dX_limit_min_X(:) = 1d99
 
 
       ! dX_limit
@@ -9749,7 +9525,7 @@
 
       ! ::
 
-    dX_limit = 1d99
+    dX_limit(:) = 1d99
 
 
       ! dX_hard_limit
@@ -9759,7 +9535,7 @@
 
       ! ::
 
-    dX_hard_limit = 1d99
+    dX_hard_limit(:) = 1d99
 
 
       ! dX_decreases_only
@@ -9770,11 +9546,11 @@
 
       ! ::
 
-    dX_decreases_only = .true.
+    dX_decreases_only(:) = .true.
 
-      ! Limit on magnitude of relative decrease in any cell nonH, nonHe abundance.
+      ! Limit on magnitude of relative decrease in any cell abundance.
       ! ``dX_div_X`` here is abs(xa(j,k) - xa_old(j,k))/xa(j,k)
-      ! for any cell k and any species j other except hydrogen or helium.
+      ! for any cell k and any species j.
       ! Considers all cells except where have convective mixing.
 
 
@@ -9785,7 +9561,9 @@
 
       ! ::
 
-    dX_div_X_limit_min_X = 1d99
+    dX_div_X_limit_min_X(1) = 1d-3
+    dX_div_X_limit_min_X(2) = 1d-3
+    dX_div_X_limit_min_X(3:) = 1d99
 
 
       ! dX_div_X_limit
@@ -9796,7 +9574,9 @@
 
       ! ::
 
-    dX_div_X_limit = 1d99
+    dX_div_X_limit(1) = 0.9d0
+    dX_div_X_limit(2) = 0.9d0
+    dX_div_X_limit(3:) = 1d99
 
 
       ! dX_div_X_hard_limit
@@ -9806,7 +9586,7 @@
 
       ! ::
 
-    dX_div_X_hard_limit = 1d99
+    dX_div_X_hard_limit(:) = 1d99
 
 
       ! dX_div_X_at_high_T_limit
@@ -9818,9 +9598,9 @@
 
       ! ::
 
-    dX_div_X_at_high_T_limit = 1d99
-    dX_div_X_at_high_T_hard_limit = 1d99
-    dX_div_X_at_high_T_limit_lgT_min = 1d99
+    dX_div_X_at_high_T_limit(:) = 1d99
+    dX_div_X_at_high_T_hard_limit(:) = 1d99
+    dX_div_X_at_high_T_limit_lgT_min(:) = 1d99
 
       ! Limits on max drop in abundance mass fraction from burning with possible mixing inflow.
       ! This considers both nuclear reactions and offsetting effect of mixing inflow.
@@ -11427,7 +11207,7 @@
 
       ! ::
 
-    warn_when_large_rel_run_E_err = 0.01d0
+    warn_when_large_rel_run_E_err = 0.1d0
 
       ! absolute_cumulative_energy_err
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

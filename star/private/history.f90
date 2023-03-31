@@ -832,9 +832,11 @@ contains
          end if
          val = s% r(k) / s%r(1)
          if (k == 1) return
-         eps1 = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps1 = s% eps_nuc(k) - s% non_nuc_neu(k)
          bv1 = sign(1d0, eps1) * log10(max(1d0, abs(eps1)))
-         eps0 = s% eps_nuc(k - 1) - s% eps_nuc_neu_total(k - 1) - s% non_nuc_neu(k - 1)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps0 = s% eps_nuc(k - 1) - s% non_nuc_neu(k - 1)
          bv0 = sign(1d0, eps0) * log10(max(1d0, abs(eps0)))
          bv = max(bv0, bv1)
          eps = pow(10d0, bv)
@@ -1950,10 +1952,12 @@ contains
             end do
 
          case(h_i_rot_total)
-            val = 0d0
-            do k = 1, s% nz
-               val = val + s% dm_bar(k) * s%i_rot(k)% val
-            end do
+            if(s% rotation_flag) then
+               val = 0d0
+               do k = 1, s% nz
+                  val = val + s% dm_bar(k) * s%i_rot(k)% val
+               end do
+            end if
          case(h_surf_avg_j_rot)
             val = if_rot(s% j_rot_avg_surf)
          case(h_surf_avg_omega)
@@ -2728,9 +2732,9 @@ contains
             int_val = s% k_below_const_q
             is_int_val = .true.
          case (h_q_below_const_q)
-            val = s% q(s% k_below_const_q)
+            if(s% k_below_const_q>0) val = s% q(s% k_below_const_q)
          case (h_logxq_below_const_q)
-            val = safe_log10(sum(s% dq(1:s% k_below_const_q - 1)))
+            if(s% k_below_const_q>0) val = safe_log10(sum(s% dq(1:s% k_below_const_q - 1)))
 
          case (h_k_const_mass)
             int_val = s% k_const_mass

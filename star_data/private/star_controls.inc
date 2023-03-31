@@ -597,6 +597,9 @@
          real(dp) :: mesh_dlogX_dlogP_full_on(num_mesh_logX)
          real(dp) :: mesh_dlogX_dlogP_full_off(num_mesh_logX)
 
+         real(dp) :: convective_bdy_weight, &
+            convective_bdy_dq_limit, convective_bdy_min_dt_yrs
+
          real(dp) :: mesh_dlog_eps_min_for_extra
          real(dp) :: mesh_dlog_eps_dlogP_full_on
          real(dp) :: mesh_dlog_eps_dlogP_full_off
@@ -1118,44 +1121,18 @@
 
          real(dp) :: dX_mix_dist_limit
 
-         real(dp) :: dH_limit_min_H
-         real(dp) :: dH_limit
-         real(dp) :: dH_hard_limit
-         logical :: dH_decreases_only
+         character (len=strlen), dimension(max_dx_limit_ctrls) :: dX_limit_species
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit_min_X  ! all species + XYZ
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_hard_limit
+         logical, dimension(max_dx_limit_ctrls) :: dX_decreases_only
 
-         real(dp) :: dH_div_H_limit_min_H
-         real(dp) :: dH_div_H_limit
-         real(dp) :: dH_div_H_hard_limit
-
-         real(dp) :: dHe_limit_min_He
-         real(dp) :: dHe_limit
-         real(dp) :: dHe_hard_limit
-         logical :: dHe_decreases_only
-
-         real(dp) :: dHe_div_He_limit_min_He
-         real(dp) :: dHe_div_He_limit
-         real(dp) :: dHe_div_He_hard_limit
-
-         real(dp) :: dHe3_limit_min_He3
-         real(dp) :: dHe3_limit
-         real(dp) :: dHe3_hard_limit
-         logical :: dHe3_decreases_only
-
-         real(dp) :: dHe3_div_He3_limit_min_He3
-         real(dp) :: dHe3_div_He3_limit
-         real(dp) :: dHe3_div_He3_hard_limit
-
-         real(dp) :: dX_limit_min_X
-         real(dp) :: dX_limit
-         real(dp) :: dX_hard_limit
-         logical :: dX_decreases_only
-
-         real(dp) :: dX_div_X_limit_min_X
-         real(dp) :: dX_div_X_limit
-         real(dp) :: dX_div_X_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit
-         real(dp) :: dX_div_X_at_high_T_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit_lgT_min
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit_min_X
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit_lgT_min
 
          real(dp) :: dX_nuc_drop_min_X_limit
          real(dp) :: dX_nuc_drop_max_A_limit

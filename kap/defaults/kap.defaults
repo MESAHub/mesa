@@ -446,6 +446,19 @@
 
       use_other_radiative_opacity = .false.
 
+
+! User controls
+! -------------
+! :: 
+
+
+    ! These are arrays of size(10) that can be used to pass in custom information to kap
+    kap_ctrl(:) = 0d0
+    kap_integer_ctrl(:) = 0
+    kap_logical_ctrl(:) = .false.
+    kap_character_ctrl(:) = ''
+
+
 ! Extra inlist controls
 ! ---------------------
 

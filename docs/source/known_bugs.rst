@@ -11,6 +11,23 @@ a newer version of MESA. Note this list is NOT comprehensive, users should check
 issue but it may not be complete.
 
 
+r22.11.1
+========
+
+Rates
+=====
+
+There is a bug in the rate selection code that certain endothermic weak reactions are not added to the nuclear network. These are 
+r_be10_wk-minus_b10, r_ni66_wk-minus_cu66, and r_h3_wk-minus_he3. Other weak reactions with heavier parents may also be affected.
+
+A separate issue also meant we are missing the rate r_he4_ap_li7 as the reverse rate of r_li7_pa_he4.
+
+Both issues will effect previous versions of MESA as well.
+
+Both issues have been fixed in the git main branch.
+
+
+
 r22.05.1
 ========
 

@@ -104,6 +104,9 @@
 
     do_element_diffusion = .false.
     report_solver_progress = .false.
+
+    ! Solver
+    use_gold2_tolerances = .true.
     
     ! Timestep and grid
     mesh_delta_coeff = 0.8

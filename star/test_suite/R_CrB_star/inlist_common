@@ -39,6 +39,7 @@
 
       energy_eqn_option = 'dedt'
       varcontrol_target = 1d-3
+      use_gold2_tolerances = .true.
 
       photo_interval = 100
       profile_interval = 100

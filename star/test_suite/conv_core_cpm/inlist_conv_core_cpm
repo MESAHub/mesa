@@ -1,0 +1,295 @@
+
+&star_job
+   show_log_description_at_start = .false.
+
+   load_saved_model = .true. 
+   load_model_filename = '1.5_zams.mod' 
+
+    set_initial_age = .true. 
+    initial_age = 0 
+    set_initial_model_number = .true. 
+    initial_model_number = 0
+
+    save_model_when_terminate = .true.
+    required_termination_code_string = 'xa_central_lower_limit'
+    save_model_filename = 'final.mod'
+
+    ! display on-screen plots
+    pgstar_flag = .true.
+    save_pgstar_files_when_terminate = .true.
+
+/ ! end of star_job namelist
+
+
+&eos
+  ! eos options
+  ! see eos/defaults/eos.defaults
+
+/ ! end of eos namelist
+
+
+&kap
+  ! kap options
+  ! see kap/defaults/kap.defaults
+  use_Type2_opacities = .true.
+  Zbase = 0.02
+  kap_file_prefix = 'a09' 
+  kap_lowT_prefix = 'lowT_fa05_a09p' 
+  kap_CO_prefix = 'a09_co'
+  
+/ ! end of kap namelist
+
+
+&controls
+
+  ! starting specifications
+
+  ! when to stop
+
+    ! limit max_model_number as part of test_suite
+    max_model_number = 200
+
+    ! stop when the center mass fraction of h1 drops below this limit
+    xa_central_lower_limit_species(1) = 'h1'
+    xa_central_lower_limit(1) = 0.5
+
+    ! Tolerances for CPM+Ledoux convective core mass,
+    ! expect roughly 0.13
+    x_ctrl(1) = 0.125 ! min core mass at Xc=0.5 
+    x_ctrl(2) = 0.135  ! max core mass at Xc=0.5 
+
+  ! mlt
+    mixing_length_alpha = 1.8d0 
+    MLT_option = 'TDC'
+    use_Ledoux_criterion = .true.
+    do_conv_premix = .true. 
+
+  ! mixing
+
+  ! timesteps
+    max_years_for_timestep = 1d7
+
+  ! mesh
+
+     convective_bdy_weight = 2
+     num_cells_for_smooth_gradL_composition_term = 10 
+     threshold_for_smooth_gradL_composition_term = 0.02 
+     num_cells_for_smooth_brunt_B = 10 
+     threshold_for_smooth_brunt_B = 0.1 
+
+  ! solver
+     energy_eqn_option = 'dedt'
+     use_gold_tolerances = .true.
+     use_gold2_tolerances = .true.
+
+  ! output
+   photo_interval = 20
+   profile_interval = 100 
+   history_interval = 1
+   terminal_interval = 10 
+   write_header_frequency = 10 
+
+/ ! end of controls namelist
+
+&pgstar
+
+  pgstar_interval = 1
+
+!---------------------------------------------------------------------------------------------
+! grid1 plot of all 5 panels, see below sections setting up each panel
+
+! file output
+   Grid1_file_flag = .true.
+   Grid1_file_dir = 'png'
+   Grid1_file_prefix = 'grid_'
+   Grid1_file_interval = 100000 ! we're just saving the last png for the test suite
+   Grid1_file_width = 16
+   Grid1_file_aspect_ratio = -1
+
+! window setup
+   Grid1_win_width = 14
+   Grid1_win_aspect_ratio = 0.55
+   ! Grid1_win_flag = .true.
+   Grid1_xleft = 0.03
+   Grid1_xright = 0.95
+   Grid1_ybot = 0.05
+   Grid1_ytop = 0.97
+   Grid1_num_plots = 5
+   Grid1_num_cols = 3
+   Grid1_num_rows = 2
+   Grid1_title=''
+! panel 1: abundances
+   Grid1_plot_name(1) = 'Abundance'
+   Grid1_plot_row(1)=1
+   Grid1_plot_col(1)=1
+   Grid1_plot_colspan(1) = 1
+   Grid1_plot_rowspan(1) = 1
+   Grid1_plot_pad_left(1) = 0.04    ! fraction of full window width for padding on left
+   Grid1_plot_pad_right(1) = 0.02   ! fraction of full window width for padding on right
+   Grid1_plot_pad_top(1) = 0.06     ! fraction of full window height for padding at top
+   Grid1_plot_pad_bot(1) = 0.06     ! fraction of full window height for padding at bottom
+   Grid1_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
+! panel 2: Evolution of Conv core (History_Track1 pgplot name)
+   Grid1_plot_name(2) = 'History_Track1'
+   Grid1_plot_row(2)=1
+   Grid1_plot_col(2)=2
+   Grid1_plot_colspan(2) = 1
+   Grid1_plot_rowspan(2) = 1
+   Grid1_plot_pad_left(2) = 0.08    ! fraction of full window width for padding on left
+   Grid1_plot_pad_right(2) = 0.02   ! fraction of full window width for padding on right
+   Grid1_plot_pad_top(2) = 0.06     ! fraction of full window height for padding at top
+   Grid1_plot_pad_bot(2) = 0.03     ! fraction of full window height for padding at bottom
+   Grid1_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
+! panel 3: profile plot of grada, gradL, gradr, X (Summary_Profile pgplot name)
+   Grid1_plot_name(3) = 'Summary_Profile'
+   Grid1_plot_row(3)=1
+   Grid1_plot_col(3)=3
+   Grid1_plot_colspan(3) = 1
+   Grid1_plot_rowspan(3) = 1
+   Grid1_plot_pad_left(3) = 0.03    ! fraction of full window width for padding on left
+   Grid1_plot_pad_right(3) = 0.04   ! fraction of full window width for padding on right
+   Grid1_plot_pad_top(3) = 0.06     ! fraction of full window height for padding at top
+   Grid1_plot_pad_bot(3) = 0.06     ! fraction of full window height for padding at bottom
+   Grid1_txt_scale_factor(3) = 1.0 ! multiply txt_scale for subplot by this
+
+! panel 4: kippenhaun diagram
+   Grid1_plot_name(4) = 'Kipp'
+   Grid1_plot_row(4)=2
+   Grid1_plot_col(4)=1
+   Grid1_plot_colspan(4) = 2
+   Grid1_plot_rowspan(4) = 1
+   Grid1_txt_scale_factor(4) = 0.75
+   Grid1_plot_pad_left(4) = 0.04    ! fraction of full window width for padding on left
+   Grid1_plot_pad_right(4) = 0.06   ! fraction of full window width for padding on right
+   Grid1_plot_pad_top(4) = 0.05     ! fraction of full window height for padding at top
+   Grid1_plot_pad_bot(4) = 0.05     ! fraction of full window height for padding at bottom
+!panel 5: HR
+   Grid1_plot_name(5) = 'HR'
+   Grid1_plot_row(5)=2
+   Grid1_plot_col(5)=3
+   Grid1_plot_colspan(5) = 1
+   Grid1_plot_rowspan(5) = 1
+   Grid1_plot_pad_left(5) = 0.068    ! fraction of full window width for padding on left
+   Grid1_plot_pad_right(5) = -0.035   ! fraction of full window width for padding on right
+   Grid1_plot_pad_top(5) = 0.08     ! fraction of full window height for padding at top
+   Grid1_plot_pad_bot(5) = 0.01     ! fraction of full window height for padding at bottom
+   Grid1_txt_scale_factor(5) = 0.65 ! multiply txt_scale for subplot by this
+
+!---------------------------------------------------------------------------------------------
+
+    HR_logT_min = 3.6
+    HR_logT_max = 4.0
+    HR_logL_min = 0.5
+    HR_logL_max = 1.3
+
+!---------------------------------------------------------------------------------------------
+	! Kippenhahn diagram history plot
+
+	Kipp_win_flag = .false.
+
+	! window properties
+	!Kipp_win_width = 10
+	!Kipp_win_aspect_ratio = 0.75
+	!Kipp_txt_scale = 0.9
+	!Kipp_title = ''
+
+	! y axis limits
+	Kipp_mass_max = 0.2
+	Kipp_mass_min = 0
+	Kipp_show_mass_boundaries = .true.
+
+	! x axis limits
+	Kipp_xmax = -101              ! maximum step number.  negative means use default.
+	Kipp_xmin = 0         ! minimum step number.  negative means use default.
+	Kipp_max_width = -1         ! only used if > 0.  causes xmin to move with xmax.
+
+	Kipp_show_mixing = .true.
+	Kipp_show_burn = .true.
+	Kipp_show_luminosities = .false.
+
+        Kipp_mix_line_weight = 15
+        Kipp_mix_interval = 2
+
+!---------------------------------------------------------------------------------------------
+  ! mass of convective core vs. X_c (central H abundance)
+      ! set parameters and labels for the mass of convective core
+          History_Track1_title = 'Evolution of Conv Core Mass'
+	  History_Track1_xname = 'center_h1'
+	  History_Track1_yname = 'mass_conv_core'
+	  History_Track1_xaxis_label = 'X\dc\u'
+	  History_Track1_yaxis_label = 'Mass of Convective Core'
+      ! set up limits of the plot
+	  History_Track1_reverse_xaxis = .true.
+	  History_Track1_reverse_yaxis = .false.
+	  History_Track1_log_xaxis = .false.
+	  History_Track1_log_yaxis = .false.
+	  History_Track1_xmin = 0.0 !-101d0
+	  History_Track1_xmax = 0.75 !-101d0
+	  History_Track1_ymin = 0 !-101d0
+         History_Track1_ymax = 0.15 !-101d0
+
+         show_History_Track1_target_box = .true.
+         History_Track1_n_sigma = 1
+         History_Track1_xtarget = 0.5
+         History_Track1_xsigma = 0.03
+         History_Track1_ytarget = 0.13 ! The target value between x_ctrl(1) and x_ctrl(2)
+         History_Track1_ysigma = 0.005
+
+         History_Track1_fname = 'core_evolution.data'
+
+!---------------------------------------------------------------------------------------------
+    ! set up for evolution of convective boundaries
+    ! grad_rad, grad_ad, grad_L, X, vs mass
+    Summary_Profile_win_width = 5
+    Summary_Profile_win_flag = .false.
+    Summary_Profile_num_lines = 4
+    !Summary_Profile_scaled_value(:)=.false.
+    Summary_Profile_title='\(0583)\d Profiles'
+
+    Summary_Profile_name(1) = 'mixing_type'
+    Summary_Profile_legend(1) = 'convection'
+    !Summary_Profile_txt_scale = 1.0
+    Summary_Profile_scaled_value(1) = .false. !.true.
+
+    Summary_Profile_name(2) = 'grada'
+    Summary_Profile_legend(2) = '\(0583)\dad'
+    Summary_Profile_txt_scale = 1.0
+    Summary_Profile_scaled_value(2) = .false. !.true.
+
+    Summary_Profile_name(3) = 'gradr'
+    Summary_Profile_legend(3) = '\(0583)\drad'
+    Summary_Profile_xmax=0.2
+    Summary_Profile_scaled_value(3) = .false. !.true.
+
+    Summary_Profile_name(4) = 'x' !'center_h1'
+    Summary_Profile_legend(4) = 'X'
+    Summary_Profile_scaled_value(4) = .false.
+
+!---------------------------------------------------------------------------------------------
+  ! Abundance profile plot
+    Abundance_num_isos_to_show = 4
+    Abundance_which_isos_to_show(1)  = 'h1'
+    Abundance_which_isos_to_show(2)  = 'he4'
+    Abundance_which_isos_to_show(3)  = 'c12'
+    Abundance_which_isos_to_show(4)  = 'o16'
+    Abundance_title = 'Abundance'
+    ! number and size of isotope labels along curves
+	num_abundance_line_labels = 4
+	Abundance_line_txt_scale_factor = 0.8
+	! number and size of isotopes on legend
+	!Abundance_legend_max_cnt = 0
+	!Abundance_legend_txt_scale_factor = 0.6
+
+	! xaxis name and orientation
+	Abundance_xaxis_name = 'mass'
+	Abundance_xaxis_reversed = .false.
+
+	! xaxis limits
+	Abundance_xmin = 0.0
+	Abundance_xmax = 1.5 ! -101d0
+
+	! yaxis limits
+	Abundance_log_mass_frac_min = -3.0
+	Abundance_log_mass_frac_max =  0.3
+
+/ ! end of pgstar namelist

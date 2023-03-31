@@ -39,6 +39,7 @@
 
       max_number_retries = 20
       max_model_number = 2000
+      use_gold2_tolerances = .true.
       
       mesh_delta_coeff = 0.6
       

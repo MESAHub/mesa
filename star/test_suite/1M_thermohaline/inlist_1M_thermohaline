@@ -77,8 +77,9 @@
          varcontrol_target = 1d-4
 
          ! Tighten the following controls to reduce the number of retries.
-         dX_div_X_limit_min_X = 3d-4
-         dX_div_X_limit = 3d-2
+         dX_limit_species(1) = 'Z'
+         dX_div_X_limit_min_X(1) = 3d-4
+         dX_div_X_limit(1) = 3d-2
 
          MLT_option = 'Cox'
         
@@ -104,6 +105,7 @@
          
          use_gold2_tolerances = .true.
          use_gold_tolerances = .true.
+         max_abs_rel_run_E_err = 1d-2
 
          mass_change_full_on_dt = 1d7 ! (seconds)
          mass_change_full_off_dt = 1d6 ! (seconds)

@@ -89,6 +89,7 @@
 
 ! timesteps
       max_years_for_timestep = 1d9
+      use_gold2_tolerances = .true.
       
       varcontrol_target = 1d-3
       dX_nuc_drop_limit = 3d-2
