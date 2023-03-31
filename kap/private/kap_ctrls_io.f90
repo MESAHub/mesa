@@ -88,7 +88,12 @@
 
    logical, dimension(max_extra_inlists) :: read_extra_kap_inlist
    character (len=strlen), dimension(max_extra_inlists) :: extra_kap_inlist_name
-
+   
+   ! User supplied inputs
+   real(dp) :: kap_ctrl(10)
+   integer :: kap_integer_ctrl(10)
+   logical :: kap_logical_ctrl(10)
+   character(len=strlen) :: kap_character_ctrl(10)
 
    namelist /kap/ &
 
@@ -121,6 +126,12 @@
       use_other_elect_cond_opacity, &
       use_other_compton_opacity, &
       use_other_radiative_opacity, &
+
+   ! User supplied inputs
+      kap_ctrl, &
+      kap_integer_ctrl, &
+      kap_logical_ctrl, &
+      kap_character_ctrl,&
 
       read_extra_kap_inlist, extra_kap_inlist_name
 
@@ -380,6 +391,12 @@
       rq% use_other_compton_opacity = use_other_compton_opacity
       rq% use_other_radiative_opacity = use_other_radiative_opacity
 
+      ! user inputs
+      rq% kap_ctrl = kap_ctrl
+      rq% kap_integer_ctrl = kap_integer_ctrl
+      rq% kap_logical_ctrl = kap_logical_ctrl
+      rq% kap_character_ctrl = kap_character_ctrl
+
    end subroutine store_controls
 
 
@@ -433,6 +450,12 @@
       use_other_elect_cond_opacity = rq% use_other_elect_cond_opacity
       use_other_compton_opacity = rq% use_other_compton_opacity
       use_other_radiative_opacity = rq% use_other_radiative_opacity
+
+      ! user inputs
+      kap_ctrl = rq% kap_ctrl
+      kap_integer_ctrl = rq% kap_integer_ctrl
+      kap_logical_ctrl = rq% kap_logical_ctrl
+      kap_character_ctrl = rq% kap_character_ctrl
 
 
    end subroutine set_controls_for_writing
