@@ -315,6 +315,18 @@
    use_other_eos_results = .false.
 
 
+! User controls
+! -------------
+! :: 
+
+
+    ! These are arrays of size(10) that can be used to pass in custom information to the eos
+    eos_ctrl(:) = 0d0
+    eos_integer_ctrl(:) = 0
+    eos_logical_ctrl(:) = .false.
+    eos_character_ctrl(:) = ''
+
+
 ! Debugging controls
 ! ------------------
 ! ::

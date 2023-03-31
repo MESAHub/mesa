@@ -137,6 +137,12 @@
    logical, dimension(max_extra_inlists) :: read_extra_eos_inlist
    character (len=strlen), dimension(max_extra_inlists) :: extra_eos_inlist_name
 
+   ! User supplied inputs
+   real(dp) :: eos_ctrl(10)
+   integer :: eos_integer_ctrl(10)
+   logical :: eos_logical_ctrl(10)
+   character(len=strlen) :: eos_character_ctrl(10)
+
 
    namelist /eos/ &
       use_FreeEOS, &
@@ -252,7 +258,13 @@
       X_lo, X_hi, &
       Z_lo, Z_hi, &
       
-      read_extra_eos_inlist, extra_eos_inlist_name
+      read_extra_eos_inlist, extra_eos_inlist_name,&
+
+   ! User supplied inputs
+      eos_ctrl, &
+      eos_integer_ctrl, &
+      eos_logical_ctrl, &
+      eos_character_ctrl
 
 
    contains
@@ -459,6 +471,12 @@
       rq% use_other_eos_component = use_other_eos_component
       rq% use_other_eos_results = use_other_eos_results
 
+      ! user inputs
+      rq% eos_ctrl = eos_ctrl
+      rq% eos_integer_ctrl = eos_integer_ctrl
+      rq% eos_logical_ctrl = eos_logical_ctrl
+      rq% eos_character_ctrl = eos_character_ctrl
+
       ! debugging
       rq% dbg = dbg
       rq% logT_lo = logT_lo
@@ -595,6 +613,12 @@
       ! other eos
       use_other_eos_component = rq% use_other_eos_component
       use_other_eos_results = rq% use_other_eos_results
+
+      ! user inputs
+      eos_ctrl = rq% eos_ctrl
+      eos_integer_ctrl = rq% eos_integer_ctrl
+      eos_logical_ctrl = rq% eos_logical_ctrl
+      eos_character_ctrl = rq% eos_character_ctrl
 
       ! debugging
       dbg = rq% dbg
