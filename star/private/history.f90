@@ -832,9 +832,11 @@ contains
          end if
          val = s% r(k) / s%r(1)
          if (k == 1) return
-         eps1 = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps1 = s% eps_nuc(k) - s% non_nuc_neu(k)
          bv1 = sign(1d0, eps1) * log10(max(1d0, abs(eps1)))
-         eps0 = s% eps_nuc(k - 1) - s% eps_nuc_neu_total(k - 1) - s% non_nuc_neu(k - 1)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps0 = s% eps_nuc(k - 1) - s% non_nuc_neu(k - 1)
          bv0 = sign(1d0, eps0) * log10(max(1d0, abs(eps0)))
          bv = max(bv0, bv1)
          eps = pow(10d0, bv)
