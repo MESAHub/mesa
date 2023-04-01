@@ -955,35 +955,30 @@
 
       ! when_to_stop_rtol
       ! ~~~~~~~~~~~~~~~~~
+      ! when_to_stop_atol
+      ! ~~~~~~~~~~~~~~~~~
 
-      ! Relative error criteria when hitting stop target time.
-      ! The system will automatically redo with a smaller timestep to hit a stopping target.
-      ! It calculates the following "error" term and retries if it is > 1.
-
-      ! ::
+      ! Relative (``rtol``) and absolute (``atol``) error criteria for
+      ! target stopping values.  To compare how accurately the last
+      ! step satisfied a stopping condition, MESA evaluates ::
 
       !     error = abs(value - target_value)/ &
-      !             (when_to_stop_atol + when_to_stop_rtol*max(abs(value),abs(target_value)))
+      !             (when_to_stop_atol + when_to_stop_rtol*max(abs(value), abs(target_value)))
+
+      ! and will redo with a smaller timestep if ``error`` is greater
+      ! than 1.  The default values ``1d99`` for both guarantee that
+      ! ``error`` is tiny, so the run terminates as soon as a stopping
+      ! condition is reached.
+
+      ! If you wish to use either ``rtol`` or ``atol``, you should
+      ! change the other to 0 (or your desired value).  To see why,
+      ! suppose we only set ``when_to_stop_rtol = 1d-3``.  Because
+      ! ``when_to_stop_atol`` is still ``1d99``, ``error`` will still
+      ! be very small and MESA won't redo the last step.
 
       ! ::
 
     when_to_stop_rtol = 1d99
-
-
-      ! when_to_stop_atol
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! Abolute error criteria when hitting stop target time.
-      ! The system will automatically redo with a smaller timestep to hit a stopping target.
-      ! It calculates the following "error" term and retries if it is > 1.
-
-      ! ::
-
-      !     error = abs(value - target_value)/ &
-      !             (when_to_stop_atol + when_to_stop_rtol*max(abs(value),abs(target_value)))
-
-      ! ::
-
     when_to_stop_atol = 1d99
 
 
@@ -994,8 +989,8 @@
       ! max_age_in_seconds
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! Stop when the age of the star exceeds this value (in years).
-      ! only applies when > 0.
+      ! Stop when the age of the star exceeds this value in years, days, or seconds.
+      ! Only applies when > 0.
 
       ! ::
 
