@@ -86,11 +86,12 @@ contains
     call hi%write_dset('kap_kap_T', point_data(13,:))
     call hi%write_dset('kap_kap_rho', point_data(14,:))
 
-    call hi%write_dset('eps', point_data(15,:))
-    call hi%write_dset('eps_eps_T', point_data(16,:))
-    call hi%write_dset('eps_eps_rho', point_data(17,:))
+    call hi%write_dset('eps_nuc', point_data(15,:))
+    call hi%write_dset('eps_grav', point_data(16,:))
+    call hi%write_dset('eps_eps_T', point_data(17,:))
+    call hi%write_dset('eps_eps_rho', point_data(18,:))
 
-    call hi%write_dset('Omega_rot', point_data(18,:))
+    call hi%write_dset('Omega_rot', point_data(19,:))
 
     ! Close the file
 
