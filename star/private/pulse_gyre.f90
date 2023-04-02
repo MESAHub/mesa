@@ -32,6 +32,7 @@ module pulse_gyre
   use utils_lib
   use atm_def
   use atm_support
+  use eps_grav
 
   use pulse_utils
 
@@ -41,7 +42,7 @@ module pulse_gyre
 
   ! Parameters
 
-  integer, parameter :: NCOL = 18
+  integer, parameter :: NCOL = 19
 
   ! Access specifiers
 
@@ -85,6 +86,16 @@ contains
        write(*,*) 'bad star id for get_gyre_data'
        return
     end if
+
+    ! Update the eps_grav data
+
+    do k = 1, s%nz
+       call eval_eps_grav_and_partials(s, k, ierr)
+       if (ierr /= 0) then
+          write(*,*) 'failed in call to eval_eps_grav_and_partials'
+          return
+       end if
+    end do
 
     ! Set up segment indices
 
@@ -220,10 +231,11 @@ contains
            kap => point_data(12,j), &
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
-           eps => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           omega => point_data(18,j))
+           eps_nuc => point_data(15,j), &
+           eps_grav => point_data(16,j), &
+           eps_T => point_data(17,j), &
+           eps_rho => point_data(18,j), &
+           omega => point_data(19,j))
 
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
         m = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
@@ -240,11 +252,12 @@ contains
         N2 = grav*grav*(rho/P)*delta*(nabla_ad - nabla)
 
         kap = s%atm_structure(atm_kap,k)
-        kap_rho = kap*s%atm_structure(atm_dlnkap_dlnd,k)*kap
         kap_T = kap*s%atm_structure(atm_dlnkap_dlnT,k)*kap
-        eps = 0d0
-        eps_rho = 0d0
+        kap_rho = kap*s%atm_structure(atm_dlnkap_dlnd,k)*kap
+        eps_nuc = 0d0
+        eps_grav = 0d0
         eps_T = 0d0
+        eps_rho = 0d0
         if (s%rotation_flag) then
            omega = s%omega(1)
         else
@@ -286,10 +299,11 @@ contains
            kap => point_data(12,j), &
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
-           eps => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           omega => point_data(18,j))
+           eps_nuc => point_data(15,j), &
+           eps_grav => point_data(16,j), &
+           eps_T => point_data(17,j), &
+           eps_rho => point_data(18,j), &
+           omega => point_data(19,j))
 
         r = s%r(k)
         m = s%m_grav(k)
@@ -307,11 +321,12 @@ contains
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
         nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
-        kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
-        eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
-        eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
+        kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)
+        eps_nuc = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
+        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
+        eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
         if (s%rotation_flag) then
            omega = s%omega(k) ! Not quite right; omega can be discontinuous
         else
@@ -353,10 +368,11 @@ contains
            kap => point_data(12,j), &
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
-           eps => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           omega => point_data(18,j))
+           eps_nuc => point_data(15,j), &
+           eps_grav => point_data(16,j), &
+           eps_T => point_data(17,j), &
+           eps_rho => point_data(18,j), &
+           omega => point_data(19,j))
 
         r = 0d0
         m = 0d0
@@ -378,11 +394,12 @@ contains
         delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
         nabla = eval_center(s%r, s%gradT, k_a, k_b)
         kap = eval_center(s%rmid, s%opacity, k_a, k_b)
-        kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)
         kap_T = eval_center(s%rmid, s%d_opacity_dlnT, k_a, k_b)
-        eps = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
-        eps_rho = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
+        kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)
+        eps_nuc = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
+        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         eps_T = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
+        eps_rho = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
         if (s%rotation_flag) then
            omega = eval_center(s%r, s%omega, k_a, k_b)
         else
