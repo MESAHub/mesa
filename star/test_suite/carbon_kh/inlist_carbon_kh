@@ -55,7 +55,7 @@
   use_simple_es_for_kap = .true.
 
   ! when to stop
-  log_center_density_limit = 8.5
+  log_center_density_upper_limit = 8.5
   when_to_stop_atol = 1d-3
   when_to_stop_rtol = 0
 

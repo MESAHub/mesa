@@ -1056,14 +1056,14 @@
     eta_center_limit = 1d99
 
 
-      ! log_center_density_limit
+      ! log_center_density_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop when log10 of the center density exceeds this limit.
 
       ! ::
 
-    log_center_density_limit = 12d0
+    log_center_density_upper_limit = 12d0
 
 
       ! log_center_density_lower_limit
@@ -1076,14 +1076,14 @@
     log_center_density_lower_limit = -1d99
 
 
-      ! log_center_temp_limit
+      ! log_center_temp_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop when log10 of the center temperature exceeds this limit.
 
       ! ::
 
-    log_center_temp_limit = 11d0
+    log_center_temp_upper_limit = 11d0
 
 
       ! log_center_temp_lower_limit
@@ -1130,7 +1130,7 @@
     log_max_temp_lower_limit = -99
 
 
-      ! center_entropy_limit
+      ! center_entropy_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the center entropy exceeds this limit.
@@ -1138,7 +1138,7 @@
 
       ! ::
 
-    center_entropy_limit = 1d99
+    center_entropy_upper_limit = 1d99
 
 
       ! center_entropy_lower_limit
@@ -1152,7 +1152,7 @@
     center_entropy_lower_limit = -1d99
 
 
-      ! max_entropy_limit
+      ! max_entropy_upper_limit
       ! ~~~~~~~~~~~~~~~~~
 
       ! stop when the max entropy exceeds this limit.
@@ -1160,7 +1160,7 @@
 
       ! ::
 
-    max_entropy_limit = 1d99
+    max_entropy_upper_limit = 1d99
 
 
       ! max_entropy_lower_limit

@@ -114,11 +114,11 @@
       integer, parameter :: t_peak_burn_vconv_div_cs_limit = t_max_omega_div_omega_crit + 1
       integer, parameter :: t_max_model_number = t_peak_burn_vconv_div_cs_limit + 1 
       integer, parameter :: t_eta_center_limit = t_max_model_number + 1 
-      integer, parameter :: t_log_center_temp_limit = t_eta_center_limit + 1 
-      integer, parameter :: t_log_center_temp_lower_limit = t_log_center_temp_limit + 1 
+      integer, parameter :: t_log_center_temp_upper_limit = t_eta_center_limit + 1 
+      integer, parameter :: t_log_center_temp_lower_limit = t_log_center_temp_upper_limit + 1 
       integer, parameter :: t_log_center_density_lower_limit = t_log_center_temp_lower_limit + 1 
-      integer, parameter :: t_log_center_density_limit = t_log_center_density_lower_limit + 1 
-      integer, parameter :: t_gamma_center_limit = t_log_center_density_limit + 1 
+      integer, parameter :: t_log_center_density_upper_limit = t_log_center_density_lower_limit + 1 
+      integer, parameter :: t_gamma_center_limit = t_log_center_density_upper_limit + 1 
       integer, parameter :: t_log_max_temp_upper_limit = t_gamma_center_limit + 1 
       integer, parameter :: t_log_max_temp_lower_limit = t_log_max_temp_upper_limit + 1 
       integer, parameter :: t_HB_limit = t_log_max_temp_lower_limit + 1 
@@ -225,10 +225,10 @@
       integer, parameter :: t_cumulative_extra_heating_limit = t_relax_finished_okay + 1
       integer, parameter :: t_delta_total_energy = t_cumulative_extra_heating_limit + 1
       integer, parameter :: t_max_explicit_hydro_nsteps = t_delta_total_energy + 1
-      integer, parameter :: t_center_entropy_limit = t_max_explicit_hydro_nsteps + 1
-      integer, parameter :: t_center_entropy_lower_limit = t_center_entropy_limit + 1
-      integer, parameter :: t_max_entropy_limit = t_center_entropy_lower_limit + 1
-      integer, parameter :: t_max_entropy_lower_limit = t_max_entropy_limit + 1
+      integer, parameter :: t_center_entropy_upper_limit = t_max_explicit_hydro_nsteps + 1
+      integer, parameter :: t_center_entropy_lower_limit = t_center_entropy_upper_limit + 1
+      integer, parameter :: t_max_entropy_upper_limit = t_center_entropy_lower_limit + 1
+      integer, parameter :: t_max_entropy_lower_limit = t_max_entropy_upper_limit + 1
       integer, parameter :: t_max_period_number = t_max_entropy_lower_limit + 1
       integer, parameter :: t_max_abs_rel_run_E_err = t_max_period_number + 1
 
