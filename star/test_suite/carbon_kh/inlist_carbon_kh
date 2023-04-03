@@ -76,10 +76,10 @@
   use_gold2_tolerances = .true.
 
   ! for convergence studies
-      read_extra_controls_inlist(2) = .false.
+      read_extra_controls_inlist(2) = .true.
       extra_controls_inlist_name(2)= 'inlist_resolution'
 
-      read_extra_controls_inlist(3) = .false.
+      read_extra_controls_inlist(3) = .true.
       extra_controls_inlist_name(3)= 'inlist_equations'
 
 / ! end of controls namelist
