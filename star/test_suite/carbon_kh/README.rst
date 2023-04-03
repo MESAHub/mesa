@@ -25,7 +25,7 @@ degeneracy and the dominant energy loss mechanism transitions from
 radiative diffusion to optically-thin neutrino cooling.
 
 This case is discussed extensively in section 5.2 of
-`MESA Instrument Paper VI <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/>`__.
+`MESA Instrument Paper VI <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`__.
 You can run the full resolution study described in that section by
 using the ``rnall`` bash script, which links to different energy equation
 and resolution options to run through the model 12 times. This will produce
