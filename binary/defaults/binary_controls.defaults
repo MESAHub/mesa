@@ -1045,7 +1045,12 @@
 ! "\_1" refers to first star, "\_2" to the second one.
 ! Options are:
 
-! + "Uniform" : Each layer is synced independently given the sync timescale.
+! + "Uniform" : Each layer is synced independently but uniformly,
+                given the sync timescale.
+! + "tdyn_div_tkh" : Each layer is synced independently using the local ratio of
+                    the dynamical and the thermal timescale to iteratively
+                    calculate the synchronization efficiency, given the sync
+                    timescale.
 
 ! ::
 
