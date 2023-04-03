@@ -2,10 +2,6 @@
 #   export MESA_FPE_CHECKS_ON=1
 #   setenv MESA_FPE_CHECKS_ON 1
 
-do_one carbon_kh "stop because log_center_density >= log_center_density_limit" "final.mod" auto
-
-return 
-
 # Slow cases
 do_one ppisn "Successful test: evolved 100 days past first relax" "final.mod" x150
 do_one 1M_pre_ms_to_wd "stop because log_surface_luminosity <= log_L_lower_limit" "final.mod" auto
@@ -30,6 +26,7 @@ do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" 
 do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
+do_one carbon_kh "stop because log_center_density >= log_center_density_limit" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
 do_one check_pulse_atm "all values are within tolerance" "final.mod" skip
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
