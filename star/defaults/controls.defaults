@@ -1058,41 +1058,27 @@
 
       ! log_center_density_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! log_center_density_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Stop when log10 of the center density exceeds this limit.
+      ! Stop when log10 of the center density is above/below the upper/lower limit.
 
       ! ::
 
     log_center_density_upper_limit = 12d0
-
-
-      ! log_center_density_lower_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Stop when log10 of the center density is below this limit.
-
-      ! ::
-
     log_center_density_lower_limit = -1d99
 
 
       ! log_center_temp_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~
+      ! log_center_temp_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Stop when log10 of the center temperature exceeds this limit.
+      ! Stop when log10 of the center temperature is above/below the upper/lower limit.
 
       ! ::
 
     log_center_temp_upper_limit = 11d0
-
-
-      ! log_center_temp_lower_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Stop when log10 of the center temperature is below this limit.
-
-      ! ::
-
     log_center_temp_lower_limit = -1d99
 
 
@@ -1112,65 +1098,42 @@
 
       ! log_max_temp_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! log_max_temp_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when log10 of the maximum temperature rises above this limit.
+      ! stop when log10 of the maximum temperature is above/below the upper/lower limit.
 
       ! ::
 
     log_max_temp_upper_limit = 99
-
-
-      ! log_max_temp_lower_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! stop when log10 of the maximum temperature drops below this limit.
-
-      ! ::
-
     log_max_temp_lower_limit = -99
 
 
       ! center_entropy_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~
+      ! center_entropy_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when the center entropy exceeds this limit.
+      ! stop when the center entropy is above/below the upper/lower limit.
       ! in kerg per baryon
 
       ! ::
 
     center_entropy_upper_limit = 1d99
-
-
-      ! center_entropy_lower_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! stop when the center entropy is below this limit.
-      ! in kerg per baryon
-
-      ! ::
-
     center_entropy_lower_limit = -1d99
 
 
       ! max_entropy_upper_limit
       ! ~~~~~~~~~~~~~~~~~
+      ! max_entropy_lower_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop when the max entropy exceeds this limit.
+      ! stop when the max entropy is above/below the upper/lower limit.
       ! in kerg per baryon
 
       ! ::
 
     max_entropy_upper_limit = 1d99
-
-
-      ! max_entropy_lower_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! stop when the max entropy is below this limit.
-      ! in kerg per baryon
-
-      ! ::
-
     max_entropy_lower_limit = -1d99
 
 
