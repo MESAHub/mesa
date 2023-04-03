@@ -69,9 +69,9 @@
 
   history_interval = 1
   write_profiles_flag = .true.
-  profile_interval = 1000000000
-  photo_interval = 1000000000
-  terminal_interval = 10 
+  profile_interval = 10000
+  photo_interval = 100
+  terminal_interval = 10
 
   num_trace_history_values = 2
   trace_history_value_name(1) = 'rel_E_err'
