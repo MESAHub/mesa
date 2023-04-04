@@ -828,27 +828,27 @@
             call compare_to_target('center_degeneracy >= eta_center_limit', &
                s% center_degeneracy, s% eta_center_limit, t_eta_center_limit)
             
-         else if (s% log_center_temperature >= s% log_center_temp_limit) then 
-            call compare_to_target('log_center_temperature >= log_center_temp_limit', &
-               center_value(s, s% lnT)/ln10, s% log_center_temp_limit, t_log_center_temp_limit)
+         else if (s% log_center_temperature >= s% log_center_temp_upper_limit) then 
+            call compare_to_target('log_center_temperature >= log_center_temp_upper_limit', &
+               center_value(s, s% lnT)/ln10, s% log_center_temp_upper_limit, t_log_center_temp_upper_limit)
             
          else if (s% log_center_temperature <= s% log_center_temp_lower_limit) then 
             call compare_to_target('log_center_temperature <= log_center_temp_lower_limit', &
                center_value(s, s% lnT)/ln10, s% log_center_temp_lower_limit, &
                t_log_center_temp_lower_limit)
             
-         else if (s% max_entropy >= s% max_entropy_limit) then 
-            call compare_to_target('max_entropy >= max_entropy_limit', &
-               s% max_entropy, s% max_entropy_limit, t_max_entropy_limit)
+         else if (s% max_entropy >= s% max_entropy_upper_limit) then 
+            call compare_to_target('max_entropy >= max_entropy_upper_limit', &
+               s% max_entropy, s% max_entropy_upper_limit, t_max_entropy_upper_limit)
             
          else if (s% max_entropy <= s% max_entropy_lower_limit) then 
             call compare_to_target('max_entropy <= max_entropy_lower_limit', &
                s% max_entropy, s% max_entropy_lower_limit, &
                t_max_entropy_lower_limit)
             
-         else if (s% center_entropy >= s% center_entropy_limit) then 
-            call compare_to_target('center_entropy >= center_entropy_limit', &
-               s% center_entropy, s% center_entropy_limit, t_center_entropy_limit)
+         else if (s% center_entropy >= s% center_entropy_upper_limit) then 
+            call compare_to_target('center_entropy >= center_entropy_upper_limit', &
+               s% center_entropy, s% center_entropy_upper_limit, t_center_entropy_upper_limit)
             
          else if (s% center_entropy <= s% center_entropy_lower_limit) then 
             call compare_to_target('center_entropy <= center_entropy_lower_limit', &
@@ -860,9 +860,9 @@
                center_value(s, s% lnd)/ln10, s% log_center_density_lower_limit, &
                t_log_center_density_lower_limit)
             
-         else if (s% log_center_density >= s% log_center_density_limit) then 
-            call compare_to_target('log_center_density >= log_center_density_limit', &
-               center_value(s, s% lnd)/ln10, s% log_center_density_limit, t_log_center_density_limit)
+         else if (s% log_center_density >= s% log_center_density_upper_limit) then 
+            call compare_to_target('log_center_density >= log_center_density_upper_limit', &
+               center_value(s, s% lnd)/ln10, s% log_center_density_upper_limit, t_log_center_density_upper_limit)
             
          else if (center_gamma > s% gamma_center_limit) then 
             call compare_to_target('center_gamma > gamma_center_limit', &

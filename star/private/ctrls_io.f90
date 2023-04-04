@@ -51,10 +51,10 @@
     max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, max_age_in_days, &
     num_adjusted_dt_steps_before_max_age, dt_years_for_steps_before_max_age, max_abs_rel_run_E_err, &
     reduction_factor_for_max_timestep, when_to_stop_rtol, when_to_stop_atol, &
-    gamma_center_limit, eta_center_limit, log_center_temp_limit, log_max_temp_upper_limit, &
-    log_max_temp_lower_limit , log_center_temp_lower_limit, log_center_density_limit, &
-    log_center_density_lower_limit, center_entropy_limit, center_entropy_lower_limit, &
-    max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
+    gamma_center_limit, eta_center_limit, log_center_temp_upper_limit, log_max_temp_upper_limit, &
+    log_max_temp_lower_limit , log_center_temp_lower_limit, log_center_density_upper_limit, &
+    log_center_density_lower_limit, center_entropy_upper_limit, center_entropy_lower_limit, &
+    max_entropy_upper_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
     fe_core_infall_mass, non_fe_core_infall_mass, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
@@ -780,17 +780,17 @@
  s% when_to_stop_atol = when_to_stop_atol
  s% gamma_center_limit = gamma_center_limit
  s% eta_center_limit = eta_center_limit
- s% log_center_temp_limit = log_center_temp_limit
+ s% log_center_temp_upper_limit = log_center_temp_upper_limit
  s% log_max_temp_upper_limit = log_max_temp_upper_limit
  s% log_max_temp_lower_limit = log_max_temp_lower_limit
  s% log_center_temp_lower_limit = log_center_temp_lower_limit
- s% log_center_density_limit = log_center_density_limit
+ s% log_center_density_upper_limit = log_center_density_upper_limit
  s% log_center_density_lower_limit = log_center_density_lower_limit
  s% min_timestep_limit = min_timestep_limit
 
- s% center_entropy_limit = center_entropy_limit
+ s% center_entropy_upper_limit = center_entropy_upper_limit
  s% center_entropy_lower_limit = center_entropy_lower_limit
- s% max_entropy_limit = max_entropy_limit
+ s% max_entropy_upper_limit = max_entropy_upper_limit
  s% max_entropy_lower_limit = max_entropy_lower_limit
 
  s% fe_core_infall_limit = fe_core_infall_limit
@@ -2455,17 +2455,17 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  when_to_stop_atol = s% when_to_stop_atol
  gamma_center_limit = s% gamma_center_limit
  eta_center_limit = s% eta_center_limit
- log_center_temp_limit = s% log_center_temp_limit
+ log_center_temp_upper_limit = s% log_center_temp_upper_limit
  log_max_temp_upper_limit = s% log_max_temp_upper_limit
  log_max_temp_lower_limit = s% log_max_temp_lower_limit
  log_center_temp_lower_limit = s% log_center_temp_lower_limit
- log_center_density_limit = s% log_center_density_limit
+ log_center_density_upper_limit = s% log_center_density_upper_limit
  log_center_density_lower_limit = s% log_center_density_lower_limit
  min_timestep_limit = s% min_timestep_limit
 
- center_entropy_limit = s% center_entropy_limit
+ center_entropy_upper_limit = s% center_entropy_upper_limit
  center_entropy_lower_limit = s% center_entropy_lower_limit
- max_entropy_limit = s% max_entropy_limit
+ max_entropy_upper_limit = s% max_entropy_upper_limit
  max_entropy_lower_limit = s% max_entropy_lower_limit
 
  fe_core_infall_limit = s% fe_core_infall_limit

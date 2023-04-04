@@ -54,7 +54,7 @@
       max_age = 44d7
 
       ! Should not reach this until next inlist
-      log_center_temp_limit = 7.8
+      log_center_temp_upper_limit = 7.8
 
       ! Accretion Controls
       accrete_same_as_surface = .false.
