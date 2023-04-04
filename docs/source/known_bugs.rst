@@ -26,6 +26,17 @@ Both issues will effect previous versions of MESA as well.
 
 Both issues have been fixed in the git main branch.
 
+See `gh-491 <https://github.com/MESAHub/mesa/issues/491>`_ and `gh-497 <https://github.com/MESAHub/mesa/issues/497>`_
+
+RTI
+===
+
+A bug has existed since shortly after r15140 where RTI mixing will be effectively zero in a model even with the RTI_flag=.true.
+
+This has now been fixed in the git main.
+
+See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
+
 
 
 r22.05.1
