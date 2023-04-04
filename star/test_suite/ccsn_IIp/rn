@@ -32,18 +32,4 @@ do_one inlist_shock_part5_header shock_part5.mod LOGS_part5
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-if [ -r LOGS_for_ccsn_run ]
-then
-  rm -rf LOGS_for_ccsn_run_old
-  mv LOGS_for_ccsn_run LOGS_for_ccsn_run_old
-fi
-mkdir LOGS_for_ccsn_run
-mv LOGS_part* LOGS_for_ccsn_run
-rm -rf inlists
-mkdir inlists
-cp inlist_* inlists
-mv inlists LOGS_for_ccsn_run
-cp shock_part*.mod LOGS_for_ccsn_run
-echo 'created LOGS_for_ccsn_run'
-echo
 
