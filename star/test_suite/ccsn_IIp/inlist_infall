@@ -118,6 +118,8 @@
   trace_history_value_name(2) = 'log_rel_run_E_err'
   trace_history_value_name(3) = 'r_center'
 
+  x_integer_ctrl(1) = -1 ! part number
+
 / ! end of controls namelist
 
 &pgstar
