@@ -13,6 +13,32 @@ Changes in main
 Backwards-incompatible changes
 ------------------------------
 
+Renamed controls for upper limits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following controls in ``&controls`` for upper limits on
+`when to stop <reference/controls.html#when-to-stop>`_ have
+been renamed:
+
++------------------------------+------------------------------------+
++ Old                          + New                                +
++==============================+====================================+
++                              +                                    +
++ ``log_center_density_limit`` + ``log_center_density_upper_limit`` +
++                              +                                    +
++ ``log_center_temp_limit``    + ``log_center_temp_upper_limit``    +
++                              +                                    +
++ ``center_entropy_limit``     + ``center_entropy_upper_limit``     +
++                              +                                    +
++ ``max_entropy_limit``        + ``max_entropy_upper_limit``        +
++                              +                                    +
++------------------------------+------------------------------------+
+
+You can substitute the new names for the old ones using the command
+line tool ``sed`` with, e.g. ::
+
+    $ sed 's/log_center_density_limit/log_center_density_upper_limit' -i <inlist_filename>
+
 Extra inlist controls are now arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

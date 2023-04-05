@@ -26,6 +26,7 @@ do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" 
 do_one 20M_z2m2_high_rotation "stop because have dropped below central lower limit for he4" "final.mod" auto
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
+do_one carbon_kh "stop because log_center_density >= log_center_density_upper_limit" "final.mod" auto
 do_one cburn_inward "Terminate as flame reached half way" "final.mod" auto
 do_one check_pulse_atm "all values are within tolerance" "final.mod" skip
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
@@ -33,7 +34,7 @@ do_one conductive_flame "all values are within tolerance" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
 do_one conv_core_cpm "Test passed: mass_conv_core within specified range" "final.mod" auto
 do_one custom_colors "stop because have dropped below central lower limit for h1" "custom_colors_end.mod" skip
-do_one custom_rates "stop because log_center_temperature >= log_center_temp_limit" "final.mod" auto
+do_one custom_rates "stop because log_center_temperature >= log_center_temp_upper_limit" "final.mod" auto
 do_one diffusion_smoothness "brunt_N2_composition_term is smooth enough" "final.mod" skip
 do_one extended_convective_penetration "All values are within tolerances" "final.mod" auto
 

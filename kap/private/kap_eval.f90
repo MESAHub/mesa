@@ -28,13 +28,13 @@
       use kap_def
       use const_def, only: dp, ln10, sige
       use math_lib
-      
+
       implicit none
-      
-            
+
+
       contains
-      
-      
+
+
       subroutine Get_kap_Results( &
            rq, zbar, X, Z, XC, XN, XO, XNe, logRho, logT, &
            lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
@@ -67,7 +67,7 @@
          type(auto_diff_real_2var_order1) :: blend_logT, blend_logR, blend
 
          real(dp) :: frac_Type2, frac_highT, frac_lowT
-         
+
          logical :: dbg
 
          include 'formats'
@@ -221,13 +221,13 @@
          dlnkap_rad_dlnT = logkap_rad% d1val2
 
          call combine_rad_with_conduction( &
-            rq, Rho, logRho, T, logT, zbar, &
+            rq, logRho, logT, zbar, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-         
+
       end subroutine Get_kap_Results
-      
-      
+
+
       subroutine Get_kap_Results_blend_T( &
            rq, X, Z, XC, XN, XO, XNe, logRho_in, logT_in, &
            frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -237,7 +237,7 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition    
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
         real(dp), intent(in) :: logRho_in ! density
         real(dp), intent(in) :: logT_in ! temperature
 
@@ -255,7 +255,7 @@
         real(dp) :: lowT_logT_max, logT_min
 
         logical :: clipped_Rho
-        
+
         logical :: dbg
 
         real(dp) :: alfa, beta, &
@@ -313,7 +313,7 @@
         case (kap_lowT_AESOPUS)
            lowT_logT_max = kA % max_logT
         case default
-           lowT_logT_max = kap_lowT_z_tables(rq% kap_lowT_option)% ar(1)% x_tables(1)% logT_max           
+           lowT_logT_max = kap_lowT_z_tables(rq% kap_lowT_option)% ar(1)% x_tables(1)% logT_max
         end select
 
 
@@ -347,7 +347,7 @@
         alfa0 = (logT - lower_bdy) / (upper_bdy - lower_bdy)
         d_alfa0_dlnT = 1d0/(upper_bdy - lower_bdy)/ln10
 
-        ! must smooth the transitions near alfa = 0.0 and 1.0  
+        ! must smooth the transitions near alfa = 0.0 and 1.0
         ! Rich Townsend's smoothing function for this
         alfa = -alfa0*alfa0*alfa0*(-10d0 + alfa0*(15d0 - 6d0*alfa0))
         d_alfa_dlnT = 30d0*(alfa0 - 1d0)*(alfa0 - 1d0)*alfa0*alfa0*d_alfa0_dlnT
@@ -398,7 +398,7 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition    
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
         real(dp), intent(in) :: logRho_in ! density
         real(dp), intent(in) :: logT_in ! temperature
         ! free_e := total combined number per nucleon of free electrons and positrons
@@ -455,7 +455,7 @@
            call AESOPUS_get(Zbase, X, XC, XN, XO, logRho, logT, &
                 kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
-           
+
         case default
            if (rq% kap_lowT_option == kap_lowT_test) then
               if (dbg) write(*,*) 'Calling test for lowT'
@@ -489,7 +489,7 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC_in, XN_in, XO_in, XNe_in ! composition    
+        real(dp), intent(in) :: X, Z, XC_in, XN_in, XO_in, XNe_in ! composition
         real(dp), intent(in) :: logRho_in ! density
         real(dp), intent(in) :: logT_in ! temperature
 
@@ -700,24 +700,24 @@
 
 
       subroutine combine_rad_with_conduction( &
-            rq, Rho, logRho, T, logT, zbar, &
+            rq, logRho, logT, zbar, &
             kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
 
          use condint, only: do_electron_conduction
          type (Kap_General_Info), pointer :: rq
-         real(dp), intent(in) :: Rho, logRho, T, logT, zbar
+         real(dp), intent(in) :: logRho, logT, zbar
          real(dp), intent(inout) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
-      
+
          real(dp) :: kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          if (.not. rq% include_electron_conduction) then
             kap = kap_rad
             dlnkap_dlnRho = dlnkap_rad_dlnRho
@@ -744,12 +744,12 @@
          if (dbg) write(*,1) 'dlnkap_ec_dlnRho', dlnkap_ec_dlnRho
          if (dbg) write(*,1) 'dlnkap_ec_dlnT', dlnkap_ec_dlnT
          if (dbg) write(*,*)
-         
+
          kap = 1d0 / (1d0/kap_rad + 1d0/kap_ec)
          if (dbg) write(*,1) 'kap_rad', kap_rad
          if (dbg) write(*,1) 'kap', kap
          if (dbg) write(*,1) 'log10(kap)', log10(kap)
-         
+
          if (is_bad(kap)) then
             ierr = -1; return
             write(*,1) 'kap', kap
@@ -769,9 +769,9 @@
             write(*,1) 'kap_ec', kap_ec
             call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
          end if
-         
+
          dlnkap_dlnT = (kap/kap_rad) * dlnkap_rad_dlnT + (kap/kap_ec) * dlnkap_ec_dlnT
-         
+
          if (is_bad(dlnkap_dlnT)) then
             ierr = -1; return
             write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
@@ -787,8 +787,8 @@
          if (dbg) write(*,1) 'dlnkap_dlnRho', dlnkap_dlnRho
          if (dbg) write(*,1) 'dlnkap_dlnT', dlnkap_dlnT
          if (dbg) call mesa_error(__FILE__,__LINE__,'combine_rad_with_conduction')
-      
-      
+
+
       end subroutine combine_rad_with_conduction
 
 
@@ -810,7 +810,7 @@
          real(dp), intent(in) :: eta_in, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
-         
+
          type(auto_diff_real_2var_order1) :: T, rho, free_e, eta, kap_auto
          type(auto_diff_real_2var_order1) :: zeta, f1, f2, f3, alpha, tbr, theta, tkev, mfp
 
@@ -828,15 +828,15 @@
             c22    = -0.0067d0, &
             c31    = -0.037d0, &
             c32    =  0.0031d0
-         
+
          include 'formats'
-         
+
          ierr = 0
 
          ! set up auto diff
          ! var1: Rho
          ! var2: T
-         
+
          Rho = Rho_in
          Rho% d1val1 = 1d0
          Rho% d1val2 = 0d0
@@ -871,9 +871,8 @@
          kap = kap_auto% val
          dlnkap_dlnRho = Rho% val * kap_auto% d1val1 / kap
          dlnkap_dlnT = T% val * kap_auto% d1val2 / kap
-         
+
       end subroutine Compton_Opacity
 
 
       end module kap_eval
-      

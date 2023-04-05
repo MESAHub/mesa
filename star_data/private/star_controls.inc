@@ -28,13 +28,13 @@
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
          real(dp) :: eta_center_limit
-         real(dp) :: log_center_temp_limit
+         real(dp) :: log_center_temp_upper_limit
          real(dp) :: log_center_temp_lower_limit
-         real(dp) :: log_center_density_limit, log_center_density_lower_limit
+         real(dp) :: log_center_density_upper_limit, log_center_density_lower_limit
          real(dp) :: log_max_temp_upper_limit, log_max_temp_lower_limit
          real(dp) :: surface_accel_div_grav_limit
-         real(dp) :: center_entropy_limit, center_entropy_lower_limit
-         real(dp) :: max_entropy_limit, max_entropy_lower_limit
+         real(dp) :: center_entropy_upper_limit, center_entropy_lower_limit
+         real(dp) :: max_entropy_upper_limit, max_entropy_lower_limit
 
          character (len=iso_name_length) :: &
             xa_central_lower_limit_species(num_xa_central_limits)

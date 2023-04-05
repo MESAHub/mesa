@@ -98,8 +98,6 @@ use_Skye = .false.
    x_ctrl(22) = 1.5 ! alpha_other
    x_ctrl(23) = 0.5 ! H_limit 
       ! use alpha_H if cell X >= H_limit; else use alpha_other
-   x_ctrl(24) = 9d0 ! mass limit (Msun)
-      ! use other_alpfa_mlt only if star_mass >= this limit.
 
    min_overshoot_q = 0d0
 
