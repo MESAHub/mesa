@@ -4,6 +4,10 @@
   load_saved_model = .true.
   load_model_filename = 'pure_carbon_at_rhoc_10gcc.mod'
 
+  save_model_when_terminate = .true.
+  save_model_filename = 'final.mod'
+  required_termination_code_string = 'log_center_density_upper_limit'
+
   set_initial_age = .true.
   initial_age = 0
 
@@ -55,7 +59,7 @@
   use_simple_es_for_kap = .true.
 
   ! when to stop
-  log_center_density_limit = 8.5
+  log_center_density_upper_limit = 8.5
   when_to_stop_atol = 1d-3
   when_to_stop_rtol = 0
 
@@ -65,9 +69,9 @@
 
   history_interval = 1
   write_profiles_flag = .true.
-  profile_interval = 1000000000
-  photo_interval = 1000000000
-  terminal_interval = 10 
+  profile_interval = 10000
+  photo_interval = 100
+  terminal_interval = 10
 
   num_trace_history_values = 2
   trace_history_value_name(1) = 'rel_E_err'
@@ -76,10 +80,10 @@
   use_gold2_tolerances = .true.
 
   ! for convergence studies
-      read_extra_controls_inlist(2) = .false.
+      read_extra_controls_inlist(2) = .true.
       extra_controls_inlist_name(2)= 'inlist_resolution'
 
-      read_extra_controls_inlist(3) = .false.
+      read_extra_controls_inlist(3) = .true.
       extra_controls_inlist_name(3)= 'inlist_equations'
 
 / ! end of controls namelist
