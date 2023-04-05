@@ -6,7 +6,7 @@
 
   save_model_when_terminate = .true.
   save_model_filename = 'final.mod'
-  required_termination_code_string = 'log_center_density_limit'
+  required_termination_code_string = 'log_center_density_upper_limit'
 
   set_initial_age = .true.
   initial_age = 0

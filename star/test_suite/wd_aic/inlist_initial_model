@@ -6,7 +6,7 @@
   ! save a model at the end of the run
     save_model_when_terminate = .true.
     save_model_filename = '1.325M_Y1.mod'
-    required_termination_code_string = 'log_center_density_limit'
+    required_termination_code_string = 'log_center_density_upper_limit'
 
   ! change net
     change_net = .true.
@@ -37,7 +37,7 @@
     varcontrol_target = 1e-3
 
   ! when to stop
-    log_center_density_limit = 3
+    log_center_density_upper_limit = 3
 
   ! turn off nuclear reactions
     eps_nuc_factor = 0
