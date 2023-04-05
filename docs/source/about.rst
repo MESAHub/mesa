@@ -115,6 +115,7 @@ Developers
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
+* `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
 * `Frank Timmes <http://cococubed.asu.edu/>`__
