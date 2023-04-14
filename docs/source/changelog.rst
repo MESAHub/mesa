@@ -18,7 +18,8 @@ White Dwarf C/O Phase Separation
 
 An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
 using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
-More documentation and associated controls can be found at :ref:`reference/controls:WD_phase_separation`.
+The MESA implementation is described in `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
+More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
 This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
 
 Hooks
