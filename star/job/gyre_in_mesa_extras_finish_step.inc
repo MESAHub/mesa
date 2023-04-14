@@ -162,7 +162,7 @@
 
          gr = md%grid()
 
-         do k = 1, md%n_k
+         do k = 1, md%n
             write(unit, 140) gr%pt(k)%x, md%xi_r(k), md%xi_h(k), md%dW_dx(k)
 140         format(6(1X,E24.16))
          end do
