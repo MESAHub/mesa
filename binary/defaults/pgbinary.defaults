@@ -2823,22 +2823,42 @@ Grid9_file_interval = 5
 Grid9_file_width = -1
 Grid9_file_aspect_ratio = -1
 
+
+! Star 1
+! ~~~~~~
+
+! Plot a ``&pgstar`` window of the first star in the binary object (``b% s1``)
+
+! ::
+
 Star1_win_flag = .false.
-Star1_file_flag = .false.
-Star1_file_interval = 5
-Star1_file_dir = 'png'
-Star1_file_prefix = 'star1_'
+
+! ::
+
 Star1_win_width = 7
 Star1_win_aspect_ratio = 0.8
+
+! ::
+
 Star1_xleft = 0.10
 Star1_xright = 0.90
 Star1_ybot = 0.10
 Star1_ytop = 0.90
-Star1_file_width = -1
-Star1_file_aspect_ratio = -1
-Star1_txt_scale_factor = 0.7
 Star1_title = 'Star 1'
+
+! Choose your ``&pgstar`` window here
+
+! ::
+
 Star1_plot_name = ''
+
+! ::
+
+Star1_txt_scale_factor = 0.7
+
+! box around the pgstar object
+
+! ::
 
 do_star1_box = .false.
 star1_box_pad_left = -0.01
@@ -2846,22 +2866,54 @@ star1_box_pad_right = 0.01
 star1_box_pad_bot = -0.01
 star1_box_pad_top = 0.01
 
+
+! file output
+
+! ::
+
+Star1_file_flag = .false.
+Star1_file_interval = 5
+Star1_file_dir = 'png'
+Star1_file_prefix = 'star1_'
+Star1_file_width = -1
+Star1_file_aspect_ratio = -1
+
+
+! Star 2
+! ~~~~~~
+
+! Plot a ``&pgstar`` window of the second star in the binary object (``b% s2``)
+
+! ::
+
 Star2_win_flag = .false.
-Star2_file_flag = .false.
-Star2_file_interval = 5
-Star2_file_dir = 'png'
-Star2_file_prefix = 'star2_'
+
+! ::
+
 Star2_win_width = 7
 Star2_win_aspect_ratio = 0.8
+
+! ::
+
 Star2_xleft = 0.10
 Star2_xright = 0.90
 Star2_ybot = 0.10
 Star2_ytop = 0.90
-Star2_file_width = -1
-Star2_file_aspect_ratio = -1
-Star2_txt_scale_factor = 0.7
 Star2_title = 'Star 2'
+
+! ::
+
+Star2_txt_scale_factor = 0.7
+
+! Choose your ``&pgstar`` window here
+
+! ::
+
 Star2_plot_name = ''
+
+! box around ``pgstar`` window
+
+! ::
 
 do_star2_box = .false.
 star2_box_pad_left = -0.01
@@ -2869,24 +2921,65 @@ star2_box_pad_right = 0.01
 star2_box_pad_bot = -0.01
 star2_box_pad_top = 0.01
 
+! file output
+
+! ::
+
+Star2_file_flag = .false.
+Star2_file_interval = 5
+Star2_file_dir = 'png'
+Star2_file_prefix = 'star2_'
+Star2_file_width = -1
+Star2_file_aspect_ratio = -1
+
+! show 'detached', 'donor', or 'accretor' after star names (control for both stars)
+
+! ::
+
 show_mtrans_status = .true.
 
+! Orbit
+! ~~~~~
+
+! Show a visual representation of the binary system, with stellar sizes
+! to scale with the separation.
+
+! ::
+
 Orbit_win_flag = .false.
-Orbit_file_flag = .false.
-Orbit_file_interval = 1
-Orbit_file_dir = 'png'
-Orbit_file_prefix = 'orbit_'
-Orbit_title = 'Orbit'
+
+! ::
+
 Orbit_win_width = 7
 Orbit_win_aspect_ratio = 0.9
+
+! ::
+
 Orbit_xleft = 0.1
 Orbit_xright = 0.9
 Orbit_ybot = 0.1
 Orbit_ytop = 0.9
+Orbit_title = 'Orbit'
+Orbit_txt_scale_factor = 1.0
+
+! show the roche lobe sizes
+
+! ::
+
+Orbit_show_RL = .true.
+
+! file output
+
+! ::
+
+Orbit_file_flag = .false.
+Orbit_file_interval = 1
+Orbit_file_dir = 'png'
+Orbit_file_prefix = 'orbit_'
 Orbit_file_width = -1
 Orbit_file_aspect_ratio = -1
-Orbit_txt_scale = 1.0
-Orbit_show_RL = .true.
+
+
 
 ! "annotation" strings -- provide args for PGMTXT
 
@@ -2963,7 +3056,7 @@ annotation3_text = ''
 ! pgbinary_extras
 ! =============
 
-! the PGbinary extras work the same as for the binary controls
+! the pgbinary extras work the same as for the binary controls
 
 ! ::
 
