@@ -8,18 +8,29 @@ Changes in main
 
 .. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
-.. _Backwards-incompatible changes main:
+.. _New Features main:
 
-Backwards-incompatible changes
-------------------------------
+New Features
+------------
 
 White Dwarf C/O Phase Separation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
 using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
-More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
+More documentation and associated controls can be found at :ref:`reference/controls:WD_phase_separation`.
 This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
+
+Hooks
+~~~~~
+
+A new other_close_gaps hook has been added. Provided by Simon Guichandut
+
+
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
 
 Renamed controls for upper limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,11 +136,6 @@ does add resolution at the location of convective boundaries.
 This was found to be important for smooth convective boundary
 evolution with convective premixing.
 
-
-Hooks
-~~~~~
-
-A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
 
 Changes in r22.11.1
