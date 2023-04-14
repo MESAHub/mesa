@@ -7252,9 +7252,9 @@
       ! do_phase_separation
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Phase separation upon crystallization in WD cores
-      ! (currently only for C/O white dwarf cores)
-      ! using the phase diagram of `Blouin et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+      ! Phase separation upon crystallization in WD cores (currently only for C/O white dwarf cores)
+      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_
+      ! with the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
 
       ! ::
 
