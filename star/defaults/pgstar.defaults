@@ -6252,8 +6252,8 @@
 ! ============
 
 
-      ! Text_Summary 1
-      ! --------------
+      ! Text_Summary1
+      ! -------------
 
       ! ::
 
@@ -7691,41 +7691,40 @@
     Grid9_file_width = -1
     Grid9_file_aspect_ratio = -1
 
+! Annotation
+! ==========
+
       ! "annotation" strings -- provide args for PGMTXT
 
-      ! ::
+      ! Write text at a position specified relative to the viewport (outside
+      ! or inside).  The text is written using the current values of
+      ! attributes color-index, line-width, character-height, and
+      ! character-font.
 
-      !          Write text at a position specified relative to the viewport (outside
-      !          or inside).  The text is written using the current values of
-      !          attributes color-index, line-width, character-height, and
-      !          character-font.
-
-      ! ::
-
-      !           SIDE            : must include one of the characters 'B', 'L', 'T',
-      !                             or 'R' signifying the Bottom, Left, Top, or Right
-      !                             margin of the viewport. If it includes 'LV' or
-      !                             'RV', the string is written perpendicular to the
-      !                             frame rather than parallel to it.
-      !           DISP            : the displacement of the character string from the
-      !                             specified edge of the viewport, measured outwards
-      !                             from the viewport in units of the character
-      !                             height. Use a negative value to write inside the
-      !                             viewport, a positive value to write outside.
-      !           COORD           : the location of the character string along the
-      !                             specified edge of the viewport, as a fraction of
-      !                             the length of the edge.
-      !           FJUST           : controls justification of the string parallel to
-      !                             the specified edge of the viewport. If
-      !                             FJUST = 0.0, the left-hand end of the string will
-      !                             be placed at COORD; if JUST = 0.5, the center of
-      !                             the string will be placed at COORD; if JUST = 1.0,
-      !                             the right-hand end of the string will be placed at
-      !                             at COORD. Other values between 0 and 1 give inter-
-      !                             mediate placing, but they are not very useful.
-      !           TEXT           :  the text string to be plotted. Trailing spaces are
-      !                             ignored when justifying the string, but leading
-      !                             spaces are significant.
+      ! + SIDE :
+      !   must include one of the characters 'B', 'L', 'T',
+      !   or 'R' signifying the Bottom, Left, Top, or Right
+      !   margin of the viewport. If it includes 'LV' or
+      !   'RV', the string is written perpendicular to the
+      !   frame rather than parallel to it.
+      ! + DISP :
+      !   the displacement of the character string from the
+      !   specified edge of the viewport, measured outwards
+      !   from the viewport in units of the character
+      !   height. Use a negative value to write inside the
+      !   viewport, a positive value to write outside.
+      ! + COORD :
+      !   the location of the character string along the
+      !   specified edge of the viewport, as a fraction of
+      !   the length of the edge.
+      ! + FJUST :
+      !   controls justification of the string parallel to
+      !   the specified edge of the viewport. If
+      !   FJUST = 0.0, the left-hand end of the string will
+      !   be placed at COORD; if JUST = 0.5, the center of
+      !   the string will be placed at COORD; if JUST = 1.0,
+      !   the right-hand end of the string will be placed at
+      !   at COORD.
 
       ! ::
 
