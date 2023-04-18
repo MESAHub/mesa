@@ -706,6 +706,8 @@
             case(A09_Prz_zfracs)
                zsolar = A09_Prz_zsol
                ysolar = A09_Prz_ysol 
+            case(Custom_zfracs)
+               call mesa_error(__FILE__,__LINE__,"[M/H] not supported with custom zfracs.")
             case default
                call mesa_error(__FILE__,__LINE__,"Bad zfrac_choice")
          end select
