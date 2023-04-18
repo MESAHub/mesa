@@ -138,6 +138,18 @@ This was found to be important for smooth convective boundary
 evolution with convective premixing.
 
 
+RTI
+~~~
+
+A bug has existed since shortly after r15140 where RTI
+mixing will be effectively zero in a model even with the
+``RTI_flag=.true.`` set.
+
+This has now been fixed. Users of RTI mixing are recommended to upgrade to the
+newest MESA version.
+
+See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
+
 
 Changes in r22.11.1
 ===================
