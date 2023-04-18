@@ -297,6 +297,7 @@
       
       
       ! identifiers for different Z fractions.
+      integer, parameter :: Custom_zfracs = 0
       integer, parameter :: AG89_zfracs = 1
       integer, parameter :: GN93_zfracs = 2
       integer, parameter :: GS98_zfracs = 3
