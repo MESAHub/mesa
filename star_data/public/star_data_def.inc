@@ -387,8 +387,8 @@
       integer, parameter :: num_x_ctrls = 100
       integer, parameter :: max_dX_limit_ctrls = 100
       
-      integer, parameter :: GYRE_MODEL_VERSION = 101
-      integer, parameter :: GSM_MODEL_VERSION = 110
+      integer, parameter :: GYRE_MODEL_VERSION = 120
+      integer, parameter :: GSM_MODEL_VERSION = 120
 
       ! interfaces for procedure pointers
       abstract interface
