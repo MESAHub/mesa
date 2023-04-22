@@ -232,9 +232,9 @@ contains
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
            eps_nuc => point_data(15,j), &
-           eps_grav => point_data(16,j), &
-           eps_T => point_data(17,j), &
-           eps_rho => point_data(18,j), &
+           eps_T => point_data(16,j), &
+           eps_rho => point_data(17,j), &
+           eps_grav => point_data(18,j), &
            omega => point_data(19,j))
 
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
@@ -255,9 +255,9 @@ contains
         kap_T = kap*s%atm_structure(atm_dlnkap_dlnT,k)*kap
         kap_rho = kap*s%atm_structure(atm_dlnkap_dlnd,k)*kap
         eps_nuc = 0d0
-        eps_grav = 0d0
         eps_T = 0d0
         eps_rho = 0d0
+        eps_grav = 0d0
         if (s%rotation_flag) then
            omega = s%omega(1)
         else
@@ -300,9 +300,9 @@ contains
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
            eps_nuc => point_data(15,j), &
-           eps_grav => point_data(16,j), &
-           eps_T => point_data(17,j), &
-           eps_rho => point_data(18,j), &
+           eps_T => point_data(16,j), &
+           eps_rho => point_data(17,j), &
+           eps_grav => point_data(18,j), &
            omega => point_data(19,j))
 
         r = s%r(k)
@@ -324,9 +324,9 @@ contains
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)
         eps_nuc = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
-        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
         eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
+        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
         if (s%rotation_flag) then
            omega = s%omega(k) ! Not quite right; omega can be discontinuous
         else
@@ -369,9 +369,9 @@ contains
            kap_T => point_data(13,j), &
            kap_rho => point_data(14,j), &
            eps_nuc => point_data(15,j), &
-           eps_grav => point_data(16,j), &
-           eps_T => point_data(17,j), &
-           eps_rho => point_data(18,j), &
+           eps_T => point_data(16,j), &
+           eps_rho => point_data(17,j), &
+           eps_grav => point_data(18,j), &
            omega => point_data(19,j))
 
         r = 0d0
@@ -397,9 +397,9 @@ contains
         kap_T = eval_center(s%rmid, s%d_opacity_dlnT, k_a, k_b)
         kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)
         eps_nuc = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
-        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         eps_T = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
         eps_rho = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
+        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
         if (s%rotation_flag) then
            omega = eval_center(s%r, s%omega, k_a, k_b)
         else
