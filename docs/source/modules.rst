@@ -62,6 +62,7 @@ automatic calculation of analytic derivatives using the chain rule.
 
    auto_diff/overview
    auto_diff/example
+   auto_diff/more_detail
 
 
 .. _chem:
