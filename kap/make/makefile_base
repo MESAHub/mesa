@@ -17,7 +17,7 @@ SRCS = \
    kap_def.f90 \
    op_def.f90 \
    op_load.f \
-   op_load_master.f \
+   op_load_master.f90 \
    op_common.f \
    op_ev.f \
    op_osc.f \
@@ -100,7 +100,7 @@ else
 	$(COMPILE_NO_CHECKS) $(FCfree) $<
 endif
 
-op_load.o op_common.o op_ev.o op_osc.o op_radacc.o op_load_master.o : %.o : %.f
+op_load.o op_common.o op_ev.o op_osc.o op_radacc.o  : %.o : %.f
 ifneq ($(QUIET),)
 	@echo COMPILE_LEGACY_NOCHECKS $<
 	@$(COMPILE_LEGACY_NOCHECKS) $(FCfixed) $<
