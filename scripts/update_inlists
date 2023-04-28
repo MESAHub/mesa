@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir backup_inlists
+cp inlist* backup_inlists
 sed 's/log_center_density_limit/log_center_density_upper_limit/' -i inlist*
 sed 's/log_center_temp_limit/log_center_temp_upper_limit/' -i inlist*
 sed 's/center_entropy_limit/center_entropy_upper_limit/' -i inlist*

@@ -50,6 +50,9 @@ to update all inlist files (``inlist*``), which you can run in any work director
 where you want to update every inlist by invoking ::
   $MESA_DIR/scripts/update_inlists
 
+This script will save the previous versions of your inlists to a directory named
+``backup_inlists``.
+  
 Renamed controls for upper limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
