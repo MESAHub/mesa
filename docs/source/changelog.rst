@@ -8,59 +8,10 @@ Changes in main
 
 .. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
-.. _New Features main:
-
-New Features
-------------
-
-White Dwarf C/O Phase Separation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
-using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
-The MESA implementation is described in `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
-More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
-This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
-
-Hooks
-~~~~~
-
-A new other_close_gaps hook has been added. Provided by Simon Guichandut
-
-
 .. _Backwards-incompatible changes main:
 
 Backwards-incompatible changes
 ------------------------------
-
-Module enhancement: ``pgbinary``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When running ``./binary`` models it is useful to have graphical
-output to 'see' what's going on.
-Previously, this was only possible on the ``pgstar`` level, meaning you would
-need to setup two ``pgstar`` windows if you are evolving two stars in the
-binary.
-
-Here we introduce ``pgbinary``, which acts much like ``pgstar``. You enable it
-with the ``&binary_job`` inlist with ``pgbinary_flag = .true.``. Then you
-select windows and/or files to be plotted in the ``&pgbinary`` inlist.
-Currently the following plot types can be created:
-
-* History_Track[1-9],
-* Summary_History,
-* History_Panels[1-9],
-* Text_Summary[1-9],
-* Grid[1-9],
-
-analogous to their ``pgstar`` equivalents, and two ``pgbinary``-only plots:
-
-* Star[1-2], to plot a star window through ``&pgstar`` controls, within ``pgbinary``.
-* Orbit, a visual representation of the stars' sizes to their separation
-
-Main use case is to have a single window containing both stars' ``pgstar`` info,
-through using ``Grid`` at the ``pgbinary`` level, populating it with ``Star1``
-and ``Star2``, and have each plot profile info, Kipp diagrams etc...
 
 Renamed controls for upper limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,6 +106,49 @@ species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
 *individually* to all isotopes of hydrogen, helium or metals,
 respectively.
 
+.. _New Features main:
+
+New Features
+------------
+
+White Dwarf C/O Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
+using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+The MESA implementation is described in `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
+More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
+This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
+
+Module enhancement: ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When running ``./binary`` models it is useful to have graphical
+output to 'see' what's going on.
+Previously, this was only possible on the ``pgstar`` level, meaning you would
+need to setup two ``pgstar`` windows if you are evolving two stars in the
+binary.
+
+Here we introduce ``pgbinary``, which acts much like ``pgstar``. You enable it
+with the ``&binary_job`` inlist with ``pgbinary_flag = .true.``. Then you
+select windows and/or files to be plotted in the ``&pgbinary`` inlist.
+Currently the following plot types can be created:
+
+* History_Track[1-9],
+* Summary_History,
+* History_Panels[1-9],
+* Text_Summary[1-9],
+* Grid[1-9],
+
+analogous to their ``pgstar`` equivalents, and two ``pgbinary``-only plots:
+
+* Star[1-2], to plot a star window through ``&pgstar`` controls, within ``pgbinary``.
+* Orbit, a visual representation of the stars' sizes to their separation
+
+Main use case is to have a single window containing both stars' ``pgstar`` info,
+through using ``Grid`` at the ``pgbinary`` level, populating it with ``Star1``
+and ``Star2``, and have each plot profile info, Kipp diagrams etc...
+
 Resolution control convective_bdy_weight has been reintroduced
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -178,6 +172,11 @@ This has now been fixed. Users of RTI mixing are recommended to upgrade to the
 newest MESA version.
 
 See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
+
+Hooks
+~~~~~
+
+A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
 
 Changes in r22.11.1
