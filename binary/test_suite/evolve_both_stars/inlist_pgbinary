@@ -9,9 +9,14 @@ pgbinary_model_fjust = 1.4
 pgbinary_grid_title_disp = 0.2
 pgbinary_title_disp = 0.2
 
+
+Orbit_win_flag = .true.
+Orbit_win_width = 8
+
+
 Grid1_win_flag = .true.
 
-Grid1_win_width = 19.5
+Grid1_win_width = 19
 Grid1_win_aspect_ratio = 0.58
 
 Grid1_xleft = 0.0
