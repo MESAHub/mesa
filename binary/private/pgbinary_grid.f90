@@ -534,7 +534,7 @@ contains
          case ('orbit')
             call do_orbit_plot(&
                b, id, device_id, xleft, xright, ybot, ytop, grid_subplot, b% pg% Orbit_title, &
-               Grid_txt_scale_factor(i) * b% pg% Orbit_txt_scale, ierr)
+               Grid_txt_scale_factor(i) * b% pg% Orbit_txt_scale_factor, ierr)
          case default
             ! check for "other" plot
             found_it = .false.
@@ -557,9 +557,9 @@ contains
                write(*, '(a)') &
                   'here are the valid names:', &
                   'Summary_History', &
-                  'Text_Summary1,..,9', &
-                  'History_Panels1,..,9', &
-                  'History_Tracks1,..,9', &
+                  'Text_Summary1..9', &
+                  'History_Panels1..9', &
+                  'History_Tracks1..9', &
                   'Star1,2'
                write(*, *)
 

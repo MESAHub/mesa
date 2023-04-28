@@ -33,6 +33,35 @@ A new other_close_gaps hook has been added. Provided by Simon Guichandut
 Backwards-incompatible changes
 ------------------------------
 
+Module enhancement: ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When running ``./binary`` models it is useful to have graphical
+output to 'see' what's going on.
+Previously, this was only possible on the ``pgstar`` level, meaning you would
+need to setup two ``pgstar`` windows if you are evolving two stars in the
+binary.
+
+Here we introduce ``pgbinary``, which acts much like ``pgstar``. You enable it
+with the ``&binary_job`` inlist with ``pgbinary_flag = .true.``. Then you
+select windows and/or files to be plotted in the ``&pgbinary`` inlist.
+Currently the following plot types can be created:
+
+* History_Track[1-9],
+* Summary_History,
+* History_Panels[1-9],
+* Text_Summary[1-9],
+* Grid[1-9],
+
+analogous to their ``pgstar`` equivalents, and two ``pgbinary``-only plots:
+
+* Star[1-2], to plot a star window through ``&pgstar`` controls, within ``pgbinary``.
+* Orbit, a visual representation of the stars' sizes to their separation
+
+Main use case is to have a single window containing both stars' ``pgstar`` info,
+through using ``Grid`` at the ``pgbinary`` level, populating it with ``Star1``
+and ``Star2``, and have each plot profile info, Kipp diagrams etc...
+
 Renamed controls for upper limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
