@@ -13,32 +13,6 @@ Changes in main
 Backwards-incompatible changes
 ------------------------------
 
-Renamed controls for upper limits
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following controls in ``&controls`` for upper limits on
-`when to stop <reference/controls.html#when-to-stop>`_ have
-been renamed:
-
-+------------------------------+------------------------------------+
-+ Old                          + New                                +
-+==============================+====================================+
-+                              +                                    +
-+ ``log_center_density_limit`` + ``log_center_density_upper_limit`` +
-+                              +                                    +
-+ ``log_center_temp_limit``    + ``log_center_temp_upper_limit``    +
-+                              +                                    +
-+ ``center_entropy_limit``     + ``center_entropy_upper_limit``     +
-+                              +                                    +
-+ ``max_entropy_limit``        + ``max_entropy_upper_limit``        +
-+                              +                                    +
-+------------------------------+------------------------------------+
-
-You can substitute the new names for the old ones using the command
-line tool ``sed`` with, e.g. ::
-
-    $ sed 's/log_center_density_limit/log_center_density_upper_limit' -i <inlist_filename>
-
 Extra inlist controls are now arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,6 +44,37 @@ This will *replace* the file ``inlist_name``.  Omit the ``-i`` flag if you'd
 like to see the changes without modifying the file.
 
 ``sed`` is a standard tool that is included with macOS and most Linux distributions.
+For convenience, we have also included a bash script that will call a version of
+this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
+to update all inlist files (``inlist*``), which you can run in any work directory
+where you want to update every inlist by invoking ::
+  $MESA_DIR/scripts/update_inlists
+
+Renamed controls for upper limits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following controls in ``&controls`` for upper limits on
+`when to stop <reference/controls.html#when-to-stop>`_ have
+been renamed:
+
++------------------------------+------------------------------------+
++ Old                          + New                                +
++==============================+====================================+
++                              +                                    +
++ ``log_center_density_limit`` + ``log_center_density_upper_limit`` +
++                              +                                    +
++ ``log_center_temp_limit``    + ``log_center_temp_upper_limit``    +
++                              +                                    +
++ ``center_entropy_limit``     + ``center_entropy_upper_limit``     +
++                              +                                    +
++ ``max_entropy_limit``        + ``max_entropy_upper_limit``        +
++                              +                                    +
++------------------------------+------------------------------------+
+
+You can substitute the new names for the old ones using the command
+line tool ``sed`` with, e.g. ::
+
+    $ sed 's/log_center_density_limit/log_center_density_upper_limit/' -i <inlist_filename>
 
 Abundance-based timestep controls are now arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
