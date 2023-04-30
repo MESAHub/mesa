@@ -22,7 +22,7 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
 c FORTRAN 90 module for calculation of radiative accelerations,
 c based on the Opacity Project (OP) code "OPserver".
 c See CHANGES_HU for changes made to the original code.
@@ -33,7 +33,7 @@ c
       use math_lib
       use op_def
       logical :: have_loaded_op = .false.
-      
+
 
       contains
 C******************************************************************
@@ -41,10 +41,10 @@ C******************************************************************
         implicit none
       character (len=*), intent(in) :: path, cache_filename
       integer, intent(out) :: ierr
-      
-      
-      
-      
+
+
+
+
       integer,parameter :: ipz=28
       real :: am,amm,delp,dpack
       integer :: ios,it,ite11,ite22,ite33,itt,itte1,itte2,itte3,izz,jne,ite
@@ -56,7 +56,7 @@ C******************************************************************
       real :: dv,dv1
 
       integer :: cache_version
-      
+
        common /mesh/ ntotv,dv,dv1,umesh,semesh
 !    common /atomdata/
 !       common/atomdata/ ite1,ite2,ite3,jn1(91),jn2(91),jne3,umin,umax,ntot,
@@ -64,8 +64,8 @@ C******************************************************************
 !      +  ne2(17,91,25),fion(-1:28,28,91,25),np(17,91,25),kp1(17,91,25),
 !      +  kp2(17,91,25),kp3(17,91,25),npp(17,91,25),mx(33417000),
 !      +  yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
-!      
-     
+!
+
       integer,dimension(ipe) :: ifl,iflp
       character num(0:9)*1,zlab(ipe)*3,tlab*6,zlabp(ipe)*3
       DATA NUM/'0','1','2','3','4','5','6','7','8','9'/
@@ -78,7 +78,7 @@ c
       real :: y_temp(nptot)
       integer :: nx_index, left_n, right_n, n_index
       real :: left_val, right_val, cross_section, slope
-      
+
       if(allocated(yy2) .eqv. .false.) then
          ! yy2 actually needs 29,563 x 10,000 length
          ALLOCATE(yy2(30000*10000),nx(19305000),yx(19305000),stat=ierr)
@@ -88,16 +88,16 @@ c
          yx=0.0
    !     write(*,*) "ierr",ierr
       end if
-      
-      
+
+
       ierr=0
       if (have_loaded_op) return
-          
+
 !$omp critical (critial_do_op_dload)
-      
+
       if (have_loaded_op) goto 1001
 
- 
+
       !path = '../OP4STARS_1.3'
       !call getenv("oppath", path)
       !if (len(trim(path)) == 0) then
@@ -142,7 +142,7 @@ c
         zlab(n)='m'//num(kz(n)/10)//num(kz(n)-10*(kz(n)/10))
         iflp(n)=70+n
         zlabp(n)='a'//num(kz(n)/10)//num(kz(n)-10*(kz(n)/10))
-      enddo
+      end do
 
       write(*,*) 'loading OP mono data...'
 
@@ -171,7 +171,7 @@ c     print*,' Opening '//'./'//zlab(1)//'.index'
       NTOTP=NF
       IF(NTOTP.GT.nptot)then
          write(6,6002)ntotp,nptot
-         ierr=2         
+         ierr=2
          goto 1001
       endif
       INT(1)=1
@@ -183,7 +183,7 @@ c     print*,' Opening '//'./'//zlab(1)//'.index'
 c      ITE1=MAX(ITE1,ITTE1)
 c      ITE2=MIN(ITE2,ITTE2)
 C
-c  READ MESH FILES                 
+c  READ MESH FILES
       OPEN(1,FILE=trim(path)//'/'//ZLAB(1)//'.mesh',status='old',
      + form='unformatted',iostat=ios)
       if (ios /= 0) then
@@ -191,13 +191,13 @@ c  READ MESH FILES
          ierr = -1
          goto 1001
       end if
-      READ(1)DV,NTOTV,(UMESH(N),N=1,NTOTV)   
+      READ(1)DV,NTOTV,(UMESH(N),N=1,NTOTV)
       umin=umesh(1)
       umax=umesh(ntotv)
       DV1=DV
-      CLOSE(1)               
-C      
-C  GET MESH FOR SCREEN   
+      CLOSE(1)
+C
+C  GET MESH FOR SCREEN
       CALL IMESH(UMESH,NTOTV)
 C
 C     SUBSEQUENT FILES
@@ -285,7 +285,7 @@ c            IF(SKIP(N))GOTO 70
                goto 1001
             end if
             endif
-         enddo
+         end do
 C        READ HEADINGS
          NN=1
          READ(IFL(1))IZZ,ITE,AM,UM,UX,NCCC,NFFF,DelP,JNE1,JNE2,JNE3
@@ -301,7 +301,7 @@ c            IF(SKIP(N))GOTO 80
             endif
             JNE1=MAX(JNE1,JNE11)
             JNE2=MIN(JNE2,JNE22)
-         enddo
+         end do
          itt=(it-ite1)/2+1
          jn1(itt)=jne1
          jn2(itt)=jne2
@@ -328,14 +328,14 @@ C
                    left_n = nx_temp(nx_index-1)
                    right_n = nx_temp(nx_index)
                    slope = (right_val - left_val)/float(right_n - left_n)
-                   
+
                    do n_index = left_n, right_n
                       cross_section = left_val + (n_index-left_n)*slope
                       yy2(ncount2 + n_index) = cross_section
-                   enddo
+                   end do
                    yy2(ncount2 + left_n) = left_val
                    yy2(ncount2 + right_n) = right_val
-                enddo
+                end do
                 kp2(n, itt, jnn) = ncount2
                 ncount2 = ncount2 + ntotp
              else
@@ -351,9 +351,9 @@ C
                    ncount3=ncount3+npp(n,itt,jnn)
                  endif
                endif
-            enddo
-          enddo
-c          
+            end do
+          end do
+c
 c     write(6,610)it
 c     write(6,*)'ncount1 = ',ncount1
 c     write(6,*)'ncount2 = ',ncount2
@@ -366,25 +366,25 @@ c
             close(iflp(n))
   150    CONTINUE
 c
-      enddo   
-      
+      end do
+
       write(*,*) 'done loading OP mono data'
       have_loaded_op = .true.
-         
+
       !write(*,*)'ncount1 = ',ncount1
       !write(6,*)'ncount2 = ',ncount2
       !write(6,*)'ncount3 = ',ncount3
       ios = 0
-      open(1, file=trim(cache_filename), iostat=ios, 
+      open(1, file=trim(cache_filename), iostat=ios,
      >         action='write', form='unformatted')
       if (ios == 0) then
          write(*,*) 'write ' // trim(cache_filename)
          write(1) op_cache_version, ntotv,dv,dv1,umesh,
      >      ite1,ite2,ite3,jn1,jn2,jne3,umin,umax,ntotp,nc,nf,int,epatom,oplnck, ne1p, 
-     >      ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx    
+     >      ne2p,fionp,np,kp1,kp2,kp3,npp,yy2,nx,yx
          close(1)
       end if
-     
+
 1001  continue
 
 C     pre-calculate semesh
@@ -428,20 +428,20 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 
 c***********************************************************************
         SUBROUTINE IMESH(UMESH,NTOT)
-C      
+C
       DIMENSION UMESH(nptot)
       COMMON/CIMESH/U(100),AA(nptot),BB(nptot),IN(nptot),ITOT,NN
       save /cimesh/
-      
+
       UMIN=UMESH(1)
       UMAX=UMESH(NTOT)
-c      
+c
       II=100
       A=(II*UMIN-UMAX)/REAL(II-1)
       B=(UMAX-UMIN)/REAL(II-1)
       DO I=1,II
         U(I)=A+B*I
-      ENDDO  
+      ENDDO
 c
       ib=2
       ub=u(ib)
@@ -458,21 +458,21 @@ c
             nn=n-1
             ibb=ib-1
             goto 1
-          endif 
-        endif  
+          endif
+        endif
         in(n)=ib
         aa(n)=(ub-umesh(n))/d
         bb(n)=(umesh(n)-ua)/d
-      enddo
+      end do
 c
     1      ib=ibb
       do n=nn+1,ntot
         ib=ib+1
         in(n)=ib
         u(ib)=umesh(n)
-      enddo  
+      end do
       itot=ib
-c      
+c
         return
       end SUBROUTINE IMESH
 
@@ -484,8 +484,8 @@ c
       real, intent(out) :: umesh(:), semesh(:) ! (nptot)
       integer :: i, k, ntotv
       real :: dvp, dv1, umin, umax, umeshp(nptot), semeshp(nptot)
-      common /mesh/ ntotv, dvp, dv1, umeshp, semeshp    
-      save /mesh/    
+      common /mesh/ ntotv, dvp, dv1, umeshp, semeshp
+      save /mesh/
 c
       ntot = ntotv
       dv = dvp
@@ -502,13 +502,13 @@ c
       dscat = (umax - umin)*0.01
       do i = 0, 100
          uf(i) = umin + i*dscat
-      enddo  
+      end do
 c
       return
 c
       end subroutine msh
 
-      
+
       subroutine solve(u,v,z,uz,ierr)
       integer, intent(inout) :: ierr
       dimension u(4)
@@ -516,13 +516,13 @@ c
 c  If  P(R) =   u(1)  u(2)  u(3)  u(4)
 c  for   R  =    -3    -1    1     3
 c  then a cubic fit is:
-      P(R)=( 
+      P(R)=(
      +  27*(u(3)+u(2))-3*(u(1)+u(4)) +R*(
      +  27*(u(3)-u(2))-(u(4)-u(1))   +R*(
      +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +R*(
      +  -3*(u(3)-u(2))+(u(4)-u(1)) ))))/48.
 c  First derivative is:
-      PP(R)=( 
+      PP(R)=(
      +  27*(u(3)-u(2))-(u(4)-u(1))+ 2*R*(
      +  -3*(u(2)+u(3))+3*(u(4)+u(1)) +3*R*(
      +  -3*(u(3)-u(2))+(u(4)-u(1)) )))/48.
@@ -537,19 +537,19 @@ c  Newton-Raphson iterations
          d=(v-p(z))/uz
          z=z+d
          if(abs(d).lt.1.e-4)return
-      enddo
-c      
+      end do
+c
 !      print*,' Not converged after 10 iterations in SOLVE'
 !      print*,' v=',v
 !      DO N=1,4
 !         PRINT*,' N, U(N)=',N,U(N)
-!      ENDDO  
+!      ENDDO
       ierr = 10
       return
 !      stop
-c      
+c
       end subroutine solve
-c***********************************************************************      
+c***********************************************************************
 
       SUBROUTINE BRCKR(T,FNE,RION,NION,U,NFREQ,SF, ierr)
       integer, intent(inout) :: ierr
@@ -674,7 +674,7 @@ C
 C
       integer n,k
 c
-!      ierr = 0 
+!      ierr = 0
       a=x*0.88622693
 c
       IF(X.LT.1)THEN
@@ -694,7 +694,7 @@ c
    11    ETA=LOG(dble(U))
 c
       ELSE
-         if(a.lt.2)then      
+         if(a.lt.2)then
             E=LOG(dble(X))
          else
             e=pow(1.5d0*a,2d0/3d0)
@@ -760,20 +760,20 @@ C
       data twopi/6.283185/
       COMMON/CIMESH/U(100),AA(nptot),BB(nptot),IN(nptot),ITOT,NN
       save /cimesh/
-c      
+c
       rydt=ft/157894.
       aune=1.48185e-25*fne
-c      
-c       get alp2=1/(Debye)**2      
+c
+c       get alp2=1/(Debye)**2
       b=0
       do i=1,ipz
         b=b+rion(i)*i**2
-      enddo
+      end do
         alp2=(5.8804e-19)*fne*b/(epa*ft)
       if(alp2/ft.lt.5e-8)return !!!!!!!!!!!
-c      
+c
       c=1.7337*aune/sqrt(rydt)
-c      
+c
       do i=1,itot
         w=u(i)*rydt
         f(i)=0.
@@ -790,22 +790,22 @@ c
             q=(1./x2-1./x1+LOG(dble(x1/x2)))*
      +        (fkp*(1.-exp(dble(-twopi*k/fkp))))/(fk*(1.-exp(dble(-twopi*k/fk))))
               ff=ff+wt(j)*q
-          enddo
+          end do
           f(i)=f(i)+crz*ff
     1     continue
-        enddo
+        end do
 c
       p(1)=f(1)
       do n=2,nn
         w=umesh(n)*rydt
         p(n)=p(n)+(aa(n)*f(in(n)-1)+bb(n)*f(in(n)))/(w*w*w)
-      enddo
+      end do
       do n=nn+1,ntot
         w=umesh(n)*rydt
         p(n)=p(n)+f(in(n))/(w*w*w)
-      enddo  
+      end do
 c
       return
-      end subroutine screen2        
+      end subroutine screen2
 
       end module op_load
