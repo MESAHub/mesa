@@ -17,7 +17,7 @@ do_one pisn "termination code: Star is unbound" "final.mod" skip
 do_one 15M_dynamo "all values are within tolerances" "final.mod" auto
 
 do_one 1.3M_ms_high_Z "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
-do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" skip skip
+do_one 1.4M_ms_op_mono "successfully used OP_mono opacities" "final.mod" auto
 do_one 1.5M_with_diffusion "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one 5M_cepheid_blue_loop "crossed blue edge to start 3rd crossing" "final.mod" auto
 do_one 7M_prems_to_AGB "stop because log_surface_luminosity >= log_L_upper_limit" "final.mod" auto
@@ -69,7 +69,7 @@ do_one ns_h "stop because time >= max_age_in_seconds" "final.mod" auto
 do_one ns_he "stop because power_nuc_burn >= power_nuc_burn_upper_limit" "final.mod" auto   
 do_one other_physics_hooks "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one R_CrB_star "stop because Teff <= Teff_lower_limit" "final.mod" auto
-do_one radiative_levitation "found expected effects of radiative levitation" skip skip              
+do_one radiative_levitation "found expected effects of radiative levitation" "final.mod" auto
 do_one relax_composition_j_entropy "termination code: xa_central_lower_limit" "final.mod" auto
 
 do_one rsp_BEP "good match for period" "final.mod" skip   
