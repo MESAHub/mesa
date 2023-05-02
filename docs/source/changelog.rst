@@ -184,8 +184,7 @@ See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
 Rates
 ~~~~~
 
-There has been a bug present in the rate `r_c12_to_he4_he4_he4` since r21.12.1 up to 
-r22.11.1. 
+There has been a bug present in the rate `r_c12_to_he4_he4_he4` in r22.05.1 and r22.11.1. 
 This causes an excessive amount of C12 to be burnt during core helium burning. 
 Users are highly recommend to update to the latest MESA.
 
