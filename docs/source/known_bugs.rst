@@ -17,6 +17,12 @@ r22.11.1
 Rates
 =====
 
+There has been a bug present in the rate `r_c12_to_he4_he4_he4` in r22.05.1 and r22.11.1. 
+This causes an excessive amount of C12 to be burnt during core helium burning. 
+Users are highly recommend to update to the latest MESA.
+
+See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_`
+
 There is a bug in the rate selection code that certain endothermic weak reactions are not added to the nuclear network. These are 
 r_be10_wk-minus_b10, r_ni66_wk-minus_cu66, and r_h3_wk-minus_he3. Other weak reactions with heavier parents may also be affected.
 
