@@ -168,6 +168,23 @@ does add resolution at the location of convective boundaries.
 This was found to be important for smooth convective boundary
 evolution with convective premixing.
 
+Hooks
+~~~~~
+
+A new other_close_gaps hook has been added. Provided by Simon Guichandut
+
+
+Bug Fixes
+---------
+
+Rates
+~~~~~
+
+There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
+This causes an excessive amount of C12 to be burnt during core helium burning. 
+We strongly recommend that users update to the latest MESA.
+
+See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
 
 RTI
 ~~~
@@ -180,21 +197,6 @@ This has now been fixed. Users of RTI mixing are recommended to upgrade to the
 newest MESA version.
 
 See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
-
-Rates
-~~~~~
-
-There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
-This causes an excessive amount of C12 to be burnt during core helium burning. 
-We strongly recommend that users update to the latest MESA.
-
-See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
-
-
-Hooks
-~~~~~
-
-A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
 
 Changes in r22.11.1
