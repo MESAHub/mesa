@@ -277,7 +277,7 @@
       luminosity ! luminosity in Lsun units
       log_L ! log10 luminosity in Lsun units
       log_R ! log10 radius in Rsun units
-      !radius ! Rsun
+      radius ! Rsun
       !radius_cm
       !log_R_cm
       
