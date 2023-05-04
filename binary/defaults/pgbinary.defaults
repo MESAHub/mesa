@@ -2978,6 +2978,7 @@
 
       ! ::
 
+   Orbit show_RL = .true.
    Orbit_show_stars = .true.
 
       ! file output

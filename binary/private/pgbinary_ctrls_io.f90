@@ -1324,7 +1324,8 @@ module pgbinary_ctrls_io
       Orbit_ytop, &
       Orbit_file_width, &
       Orbit_file_aspect_ratio, &
-      Orbit_txt_scale_factor, &
+      Orbit_txt_scale, &
+      Orbit_show_RL, &
       Orbit_show_stars, &
 
       annotation1_ci, &
@@ -2796,7 +2797,8 @@ contains
       pg% Orbit_ytop = Orbit_ytop
       pg% Orbit_file_width = Orbit_file_width
       pg% Orbit_file_aspect_ratio = Orbit_file_aspect_ratio
-      pg% Orbit_txt_scale_factor = Orbit_txt_scale_factor
+      pg% Orbit_txt_scale = Orbit_txt_scale
+      pg% Orbit_show_RL = Orbit_show_RL
       pg% Orbit_show_stars = Orbit_show_stars
 
       pg% annotation1_ci = annotation1_ci
