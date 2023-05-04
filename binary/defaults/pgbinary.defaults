@@ -2887,6 +2887,7 @@ Orbit_file_width = -1
 Orbit_file_aspect_ratio = -1
 Orbit_txt_scale = 1.0
 Orbit_show_RL = .true.
+Orbit_show_stars = .true.
 
 ! "annotation" strings -- provide args for PGMTXT
 

@@ -89,7 +89,7 @@ contains
       integer, pointer :: ipar(:) ! (lipar)
       real(dp), pointer :: rpar(:) ! (lrpar)
       real(dp), dimension(num_points) :: cosp
-      real(dp) :: q, this_psi, xl1, psi_RL
+      real(dp) :: q, q_in, this_psi, xl1, psi_RL
       
       include 'formats'
       
@@ -124,16 +124,19 @@ contains
       xmax = max(x1max, x2max)
       
       q = b% m(2) / b% m(1)
+      q_in = 1d0 / q  ! flip q for other star
+      allocate(rpar(3))
+
       if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
-         allocate(rpar(2))
          psi_RL = Psi_fit(b% rl(1) / b% separation, q)
          xl1 = xl1_fit(q)
          rpar(1) = psi_RL
+         rpar(3) = q
          do i = 1, num_points
             rpar(2) = cosp(i)
             rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
                1d-3, 1d0 - 1d-3, & ! left, right bracket
-               roche(1d-3, cosp(i)) - psi_RL, roche(1d0 - 1d-3, cosp(i)) - psi_RL, & ! f(left, right bracket)
+               roche(1d-3, cosp(i), q) - psi_RL, roche(1d0 - 1d-3, cosp(i), q) - psi_RL, & ! f(left, right bracket)
                25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
                0, rpar, 0, ipar, & ! func_params
                ierr)
@@ -146,14 +149,41 @@ contains
          x1s_RL(2 * num_points + 1) = x1s_RL(1)  ! close contour
          y1s_RL(2 * num_points + 1) = y1s_RL(1)
 
+         psi_RL = Psi_fit(b% rl(2) / b% separation, q_in)
+         xl1 = xl1_fit(q_in)
+         rpar(1) = psi_RL
+         rpar(3) = q_in
+         do i = 1, num_points
+            rpar(2) = cosp(i)
+            rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
+               1d-3, 1d0 - 1d-3, & ! left, right bracket
+               roche(1d-3, cosp(i), q) - psi_RL, roche(1d0 - 1d-3, cosp(i), q) - psi_RL, & ! f(left, right bracket)
+               25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
+               0, rpar, 0, ipar, & ! func_params
+               ierr)
+            x2s_RL(i) = rs(i) * cosp(i)
+            y2s_RL(i) = rs(i) * sin(thetas(i))
+            x2s_RL(i) = -(x2s_RL(i) - a2 * (1 - e))  ! displace xs
+            x2s_RL(2 * num_points - i + 1) = x2s_RL(i)  ! fill out lower lobe
+            y2s_RL(2 * num_points - i + 1) = -y2s_RL(i) ! flip y for lower lobe
+         end do
+
+         x2s_RL(2 * num_points + 1) = x2s_RL(1)  ! close contour
+         y2s_RL(2 * num_points + 1) = y2s_RL(1)
+      else if (b% pg% Orbit_show_RL .and. abs(log10(q)) > 2) then
+         write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
+      end if
+
+      if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          if (b% point_mass_i /= 1) then
             this_psi = Psi_fit(b% r(1) / b% separation, q)
             rpar(1) = this_psi
+            rpar(3) = q
             do i=1, num_points
                rpar(2) = cosp(i)
                rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
                   1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp(i)) - this_psi, roche(1d0 - 1d-3, cosp(i)) - this_psi, & ! f(left, right bracket)
+                  roche(1d-3, cosp(i), q) - this_psi, roche(1d0 - 1d-3, cosp(i), q) - this_psi, & ! f(left, right bracket)
                   25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
@@ -189,36 +219,15 @@ contains
          x1max = maxval(abs(x1s_RL))
          xmax = max(x1max, xmax)
 
-         q = 1d0 / q  ! flip q for other star
-         psi_RL = Psi_fit(b% rl(2) / b% separation, q)
-         xl1 = xl1_fit(q)
-         rpar(1) = psi_RL
-         do i = 1, num_points
-            rpar(2) = cosp(i)
-            rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
-               1d-3, 1d0 - 1d-3, & ! left, right bracket
-               roche(1d-3, cosp(i)) - psi_RL, roche(1d0 - 1d-3, cosp(i)) - psi_RL, & ! f(left, right bracket)
-               25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
-               0, rpar, 0, ipar, & ! func_params
-               ierr)
-            x2s_RL(i) = rs(i) * cosp(i)
-            y2s_RL(i) = rs(i) * sin(thetas(i))
-            x2s_RL(i) = -(x2s_RL(i) - a2 * (1 - e))  ! displace xs
-            x2s_RL(2 * num_points - i + 1) = x2s_RL(i)  ! fill out lower lobe
-            y2s_RL(2 * num_points - i + 1) = -y2s_RL(i) ! flip y for lower lobe
-         end do
-
-         x2s_RL(2 * num_points + 1) = x2s_RL(1)  ! close contour
-         y2s_RL(2 * num_points + 1) = y2s_RL(1)
-
          if (b% point_mass_i /= 2) then
             this_psi = Psi_fit(b% r(2) / b% separation, q)
             rpar(1) = this_psi
+            rpar(3) = q_in
             do i = 1, num_points
                rpar(2) = cosp(i)
                rs(i) = safe_root_with_guess(f_roche, 1d-1, 1d-3, &  ! function, guess, dx for bracket
                   1d-3, 1d0 - 1d-3, & ! left, right bracket
-                  roche(1d-3, cosp(i)) - this_psi, roche(1d0 - 1d-3, cosp(i)) - this_psi, & ! f(left, right bracket)
+                  roche(1d-3, cosp(i), q) - this_psi, roche(1d0 - 1d-3, cosp(i), q) - this_psi, & ! f(left, right bracket)
                   25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
@@ -245,17 +254,17 @@ contains
             x2s_star(2 * num_points + 1) = x2s_star(1)  ! close contour
             y2s_star(2 * num_points + 1) = y2s_star(1)
          else
-            x1s_star(:) = 0d0
-            y1s_star(:) = 0d0
+            x2s_star(:) = 0d0
+            y2s_star(:) = 0d0
          end if
          x2max = maxval(abs(x2s_star))
          xmax = max(x2max, xmax)
          x2max = maxval(abs(x2s_RL))
          xmax = max(x2max, xmax)
-         deallocate(rpar)
-      else if (b% pg% Orbit_show_RL .and. abs(log10(q)) > 2) then
-         write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
+      else if (b% pg% Orbit_show_stars .and. abs(log10(q)) > 2) then
+         write(*, 1) "pgbinary: Not plotting stars, q too extreme: abs(log(q)) = ", abs(log10(q))
       end if
+      deallocate(rpar)
 
       call pgsave  ! plot titles, axes and stuff
       call pgsch(txt_scale)
@@ -284,19 +293,30 @@ contains
       call pgline(2 * num_points + 1, x2s, y2s)
       call pgunsa
 
-      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
+      if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          call pgsave  ! plot stars
          call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
          call pgsfs(3)  ! select hatched
          call pgshs(45.0, 0.33, 0.0)  ! define hatching
          call pgsci(clr_Goldenrod)
-         call pgline(2 * num_points + 1, x1s_star, y1s_star)
-         call pgpoly(2 * num_points + 1, x1s_star, y1s_star)
+         if (b% point_mass_i /= 1) then
+            call pgline(2 * num_points + 1, x1s_star, y1s_star)
+            call pgpoly(2 * num_points + 1, x1s_star, y1s_star)
+         else
+            call pgslw(int(2.0 * b% pg% pgbinary_lw))
+            call pgpt1(- a1 * (1 - e), 0.0, 1)
+         end if
          call pgsci(clr_LightSkyBlue)
-         call pgline(2 * num_points + 1, x2s_star, y2s_star)
-         call pgpoly(2 * num_points + 1, x2s_star, y2s_star)
+         if (b% point_mass_i /= 2) then
+            call pgline(2 * num_points + 1, x2s_star, y2s_star)
+            call pgpoly(2 * num_points + 1, x2s_star, y2s_star)
+         else
+            call pgslw(int(2.0 * b% pg% pgbinary_lw))
+            call pgpt1(a2 * (1 - e), 0.0, 1)
+         end if
          call pgunsa
-         ! plot RLs
+      end if
+      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
          call pgsave
          call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
          call pgline(2 * num_points + 1, x1s_RL, y1s_RL)
@@ -309,11 +329,11 @@ contains
    
    contains
 
-      real function xl1_fit(q)
-         real(dp), intent(in) :: q
+      real function xl1_fit(qq)
+         real(dp), intent(in) :: qq
          real(dp) :: logq
          
-         logq = log10(q)
+         logq = log10(qq)
          if (q > 1) logq = -logq
          xl1_fit = - 1.72452947 / pi * atan(logq * 0.21625699) + 0.5 &
             + 0.01559149 * logq &
@@ -322,22 +342,22 @@ contains
       
       end function xl1_fit
       
-      real(dp) function Psi_fit(req, q)
+      real(dp) function Psi_fit(req, qq)
          ! aprroximation of Roche potential versus q = m_other / m_this and r_eq, the &
          ! dimensionless volume equivalent radius (== r / separation of the model)
-         real(dp), intent(in) :: req, q
-         Psi_fit = -1d0 / req - q &
-            - 0.5533 * (1 + q) * req ** 2 &
+         real(dp), intent(in) :: req, qq
+         Psi_fit = -1d0 / req - qq &
+            - 0.5533 * (1 + qq) * req ** 2 &
             - 0.3642 * req ** 2 * (req ** 2 - 1) &
             - 1.8693 * req * (req - 0.1) * (req - 0.3) * (req - 0.7) * (req - 1.0414)
       end function Psi_fit
       
-      real(dp) function roche(r, ccosp)
-         real(dp), intent(in) :: r, ccosp
+      real(dp) function roche(r, ccosp, qq)
+         real(dp), intent(in) :: r, ccosp, qq
          
          roche = -1d0 / r &
-            - q * (pow(1 - 2 * r * ccosp + r**2, -0.5d0) - r * ccosp) &
-            - (1 + q) / 2 * r**2
+            - qq * (pow(1 - 2 * r * ccosp + r**2, -0.5d0) - r * ccosp) &
+            - (1 + qq) / 2 * r**2
       end function roche
       
       real(dp) function f_roche(r, dfdx, lrpar, rpar, lipar, ipar, ierr)
@@ -348,10 +368,10 @@ contains
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          
-         f_roche = roche(r, rpar(2)) - rpar(1)
+         f_roche = roche(r, rpar(2), rpar(3)) - rpar(1)
          dfdx = 1d0 / r**2 &
-            + q * (pow(1 - 2 * r * rpar(2) + r**2, -1.5d0) * (r - rpar(2)) + rpar(2)) &
-            - (1 + q) * r
+            + rpar(3) * (pow(1 - 2 * r * rpar(2) + r**2, -1.5d0) * (r - rpar(2)) + rpar(2)) &
+            - (1 + rpar(3)) * r
          ierr = 0
       end function f_roche
    

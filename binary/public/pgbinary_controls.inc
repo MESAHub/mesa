@@ -924,7 +924,7 @@ character (len = strlen) :: Star2_title, Star2_plot_name
 logical :: show_mtrans_status
 
 logical :: Orbit_win_flag, Orbit_file_flag, do_Orbit_win, do_Orbit_file
-logical :: Orbit_show_RL
+logical :: Orbit_show_RL, Orbit_show_stars
 integer :: Orbit_file_interval, id_Orbit_win, id_Orbit_file
 character (len = strlen) :: Orbit_file_dir, Orbit_file_prefix, Orbit_title
 real :: Orbit_win_width, Orbit_win_aspect_ratio, &
