@@ -979,14 +979,6 @@
    !rsp_deltamag
    !rsp_deltar
    !rsp_grekm
-   !rsp_grekm_avg_abs
-   !rsp_grpdv
-   !rsp_lina_growth_rate_f
-   !rsp_lina_growth_rate_o1
-   !rsp_lina_growth_rate_o2
-   !rsp_lina_period_f_days
-   !rsp_lina_period_o1_days
-   !rsp_lina_period_o2_days
    !rsp_num_periods
    !rsp_period_in_days
    !rsp_phase

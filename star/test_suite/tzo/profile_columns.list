@@ -489,7 +489,6 @@
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc
-   !dconv_vel_dt
 
    !log_Lconv
    !log_Lconv_div_L
@@ -685,14 +684,9 @@
    !rsp_Lr_div_L
    !rsp_Lt
    !rsp_Lt_div_L
-   !rsp_PII_face
    !rsp_Pt
    !rsp_Pvsc
    !rsp_Uq
-   !rsp_WORK
-   !rsp_WORKC
-   !rsp_WORKQ
-   !rsp_WORKT
    !rsp_Y_face
    !rsp_damp
    !rsp_dampR
