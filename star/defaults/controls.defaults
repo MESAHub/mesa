@@ -1057,7 +1057,7 @@
 
 
       ! log_center_density_upper_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! log_center_density_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1070,7 +1070,7 @@
 
 
       ! log_center_temp_upper_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! log_center_temp_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1110,7 +1110,7 @@
 
 
       ! center_entropy_upper_limit
-      ! ~~~~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! center_entropy_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1124,7 +1124,7 @@
 
 
       ! max_entropy_upper_limit
-      ! ~~~~~~~~~~~~~~~~~
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
       ! max_entropy_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
