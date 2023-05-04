@@ -282,9 +282,19 @@
       !pnhe4
       !other    
 
-      !add_eps_nuc_rates
-      !add_eps_neu_rates
-   !add_raw_rates
+   ! adds columns for all of the reactions that are in the current net 
+   ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
+   !add_raw_rates      ! raw reaction rates,       reactions/second
+   !add_screened_rates ! screened reaction rates reactions/second
+   !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+   !add_eps_neu_rates  ! Neutrino losses             erg/s
+
+   ! individual reactions (as many as desired)
+   ! use list_net_reactions = .true. in star_job to list all reactions in the current net    
+   ! reactions/second
+      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_wk_h2
+
    burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
    !log_burn_avg_epsnuc
@@ -307,6 +317,12 @@
 
    add_abundances ! this adds all of the isos that are in the current net
    ! NOTE: you can list specific isotopes by giving their names (from chem_def)
+   !h1
+   !he3
+   !he4
+   !c12
+   !n14
+   !o16
 
    !add_log_abundances ! this adds log10 of all of the isos that are in the current net
    ! NOTE: you can list specific isotopes by giving their names (from chem_def)
@@ -486,6 +502,7 @@
    !mlt_log_abs_Y
    !mlt_vc
    !log_mlt_vc
+   !dvc_dt_TDC_div_g 
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc
@@ -626,7 +643,8 @@
    !log_g_rad he4   ! log10 acceleration from radiative levitation
    !log_g_rad ne20   ! log10 acceleration from radiative levitation
 
-
+!# Phase Separation
+   !eps_phase_separation
 
 !# Oscillations
    brunt_N2 ! brunt-vaisala frequency squared
@@ -674,32 +692,32 @@
 
 !# RSP
 
-   !rsp_Chi
-   !rsp_Eq
-   !rsp_Et
-   !rsp_Hp_face
-   !rsp_Lc
-   !rsp_Lc_div_L
-   !rsp_Lr
-   !rsp_Lr_div_L
-   !rsp_Lt
-   !rsp_Lt_div_L
-   !rsp_Pt
-   !rsp_Pvsc
-   !rsp_Uq
-   !rsp_Y_face
-   !rsp_damp
-   !rsp_dampR
-   !rsp_erad
-   !rsp_gradT
-   !rsp_heat_exchange_timescale
-   !rsp_logEt
-   !rsp_log_dt_div_heat_exchange_timescale
-   !rsp_log_erad
-   !rsp_log_heat_exchange_timescale
-   !rsp_sink
-   !rsp_src
-   !rsp_src_snk
+   !rsp_Chi        ! dlnP_dlnRho 
+   !rsp_Et         ! Specific turbulent energy
+   !rsp_logEt      ! Log specific turbulent energy
+   !rsp_erad       ! Specific internal (radiative) energy
+   !rsp_log_erad   ! Log specific internal (radiative) energy
+   !rsp_Hp_face    ! Pressure scale height at cell face
+   !rsp_Lc         ! Convective luminosity
+   !rsp_Lc_div_L   ! Convective luminosity div total luminosity 
+   !rsp_Lr         ! Radiative luminosity
+   !rsp_Lr_div_L   ! Radiative luminosity div total luminosity
+   !rsp_Lt         ! Turbulent luminosity 
+   !rsp_Lt_div_L   ! Turbulent luminosity div total luminosity
+   !rsp_Pt         ! Turbulent pressure, p_t, see Table 1 in MESA5
+   !rsp_Uq         ! Viscous momentum transfer rate, U_q, see Table 1 in MESA5
+   !rsp_Eq         ! Viscous energy transfer rate, epsilon_q, see Table 1 in MESA5
+   !rsp_Pvsc       ! Artificial viscosity, p_av, see Table 1 in MESA5
+   !rsp_gradT      ! Temperature gradient
+   !rsp_Y_face     ! Superadiabatic gradient at cell face, Y_sag, see Table 1 in MESA5
+   !rsp_damp       ! Turbulent dissipation, D, see Table 1 in MESA5
+   !rsp_dampR      ! Radiative cooling, D_r, see Table 1 in MESA5
+   !rsp_sink       ! Sum of turbulent dissipation and radiative cooling terms
+   !rsp_src        ! Source function, S, see Table 1 in MESA5
+   !rsp_src_snk    ! Convective coupling, C, see Table 1 in MESA5
+   !rsp_heat_exchange_timescale      !  1d0/(clight * opacity * density)
+   !rsp_log_heat_exchange_timescale 
+   !rsp_log_dt_div_heat_exchange_timescale   ! Ratio of time step to heat exchange timescale
    !w
    !log_w
 

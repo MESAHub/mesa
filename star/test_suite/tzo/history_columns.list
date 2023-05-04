@@ -106,6 +106,7 @@
       !max_gradT_sub_grada
       !min_log_mlt_Gamma
 
+
    !## mixing regions
 
       mass_conv_core ! (Msun) mass coord of top of convective core.  0 if core is not convective
@@ -117,14 +118,14 @@
       !  mx1_top and mx1_bot are the extent of all kinds of mixing, convective and other.
 
       ! values are m/Mstar
-      !conv_mx1_top
-      !conv_mx1_bot
-      !conv_mx2_top
-      !conv_mx2_bot
-      !mx1_top
-      !mx1_bot
-      !mx2_top
-      !mx2_bot
+      conv_mx1_top
+      conv_mx1_bot
+      conv_mx2_top
+      conv_mx2_bot
+      mx1_top
+      mx1_bot
+      mx2_top
+      mx2_bot
 
       ! radius -- values are radii in Rsun units
       !conv_mx1_top_r
@@ -282,9 +283,23 @@
       photo
       pnhe4
       other
+   
+   !## information about individual reactions
+   
+          ! adds columns for all of the reactions that are in the current net 
+      ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
+      !add_raw_rates      ! raw reaction rates,       reactions/second
+      !add_screened_rates ! screened reaction rates reactions/second
+      !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+      !add_eps_neu_rates  ! Neutrino losses             erg/s
+   
+          ! individual reactions (as many as desired)
+          ! use list_net_reactions = .true. in star_job to list all reactions in the current net 
+          ! reactions/second
+      !raw_rate r_h1_h1_ec_h2 
+      !raw_rate r_h1_h1_wk_h2
 
-      !add_eps_nuc_rates
-      !add_eps_neu_rates
+
 
    !## nuclear reactions at center
 
@@ -313,15 +328,15 @@
       ! end1 is mass of outer edge where first zone ends (i.e. eps_nuc < burn_min1)
       ! similar for the second zone
 
-     ! epsnuc_M_1 ! start1 for 1st zone
-     ! epsnuc_M_2 ! start2
-     ! epsnuc_M_3 ! end2
-     ! epsnuc_M_4 ! end1
+      epsnuc_M_1 ! start1 for 1st zone
+      epsnuc_M_2 ! start2
+      epsnuc_M_3 ! end2
+      epsnuc_M_4 ! end1
 
-     ! epsnuc_M_5 ! start1 for 2nd zone
-     ! epsnuc_M_6 ! start2
-     ! epsnuc_M_7 ! end2
-     ! epsnuc_M_8 ! end1
+      epsnuc_M_5 ! start1 for 2nd zone
+      epsnuc_M_6 ! start2
+      epsnuc_M_7 ! end2
+      epsnuc_M_8 ! end1
 
 
       ! you might want to get a more complete list of burning regions by using the following
@@ -364,7 +379,7 @@
 
    !## CO core
       co_core_mass
-      !co_core
+      !CO_core
       !co_core_radius
       !co_core_lgT
       !co_core_lgRho
@@ -449,7 +464,7 @@
 
    !## conditions at the photosphere
       !effective_T
-      !teff
+      !Teff
       log_Teff ! log10 effective temperature
          ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
          ! where L and R are evaluated at the photosphere (tau_factor < 1)
@@ -478,7 +493,7 @@
       !photosphere_cell_free_e
       !photosphere_cell_log_free_e
       !photosphere_logg
-      !photosphere_t
+      !photosphere_T
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
@@ -566,9 +581,9 @@
       log_center_P ! pressure
 
       ! shorter names for above
-      !log_cntr_P
-      !log_cntr_Rho
-      !log_cntr_T
+      log_cntr_P
+      log_cntr_Rho
+      log_cntr_T
 
       !center_T ! temperature
       !center_Rho ! density
@@ -599,7 +614,9 @@
       compactness_parameter ! (m/Msun)/(R(m)/1000km) for m = 2.5 Msun
       !compactness
       m4 ! Mass co-ordinate where entropy=4
+      ! mu4 is sensitive to the choice of how much dm/dr you average over, thus we average dm and dr over M(entropy=4) and M(entropy=4)+0.3Msun
       mu4 ! dM(Msun)/dr(1000km) where entropy=4
+
 
       !center_omega
       !center_omega_div_omega_crit
@@ -616,6 +633,12 @@
       !add_center_abundances
       !add_log_center_abundances
 
+      ! individual central mass fractions (as many as desired)
+      center h1
+      center he4
+      center c12
+      center o16
+
       ! individual log10 central mass fractions (as many as desired)
       !log_center h1
       !log_center he4
@@ -631,7 +654,8 @@
       ! individual surface mass fractions (as many as desired)
       !surface h1
       !surface he4
-
+      surface c12
+      surface o16
       ! etc.
 
       ! individual log10 surface mass fractions (as many as desired)
@@ -664,7 +688,8 @@
       !add_log_total_mass
 
       ! individual mass totals for entire star (as many as desired)
-
+      total_mass h1
+      total_mass he4
       ! etc.
 
       ! individial log10  mass totals for entire star (in Msun units)
@@ -703,7 +728,7 @@
       !shock_entropy
       !shock_tau
       !shock_k
-      !shock_pre_lgrho
+      !shock_pre_lgRho
 
 !----------------------------------------------------------------------------------------------
 
@@ -775,8 +800,8 @@
       !total_turbulent_energy
       !log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
-      !tot_et
-      !log_tot_et
+      !tot_Et
+      !log_tot_Et
 
       !total_energy_foe
 
@@ -805,7 +830,7 @@
 
       !error_in_energy_conservation ! for this step
          ! = total_energy - (total_energy_start + total_energy_sources_and_sinks)
-      !cumulative_energy_error ! = sum over all steps of error_in_energy_conservation
+      !cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
       !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
       !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
@@ -813,7 +838,7 @@
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
       !log_rel_error_in_energy_conservation
 
-      !virial_thm_p_avg
+      !virial_thm_P_avg
       !virial_thm_rel_err
       !work_inward_at_center
       !work_outward_at_surface
@@ -976,12 +1001,12 @@
 
 !# RSP
 
-   !rsp_deltamag
-   !rsp_deltar
-   !rsp_grekm
-   !rsp_num_periods
-   !rsp_period_in_days
-   !rsp_phase
+   !rsp_DeltaMag ! absolute magnitude difference between minimum and maximum light (mag)
+   !rsp_DeltaR ! R_max - R_min difference in the max and min radius (Rsun)
+   !rsp_GREKM ! fractional growth of the kinetic energy per pulsation period ("nonlinear growth rate") - see equation 5 in MESA5
+   !rsp_num_periods ! Count of the number of pulsation cycles completed
+   !rsp_period_in_days ! Running period, ie., period between two consecutive values of R_max (days) 
+   !rsp_phase ! Running pulsation phase for a cycle
 
 !----------------------------------------------------------------------------------------------
 !# debugging
