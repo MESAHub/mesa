@@ -84,9 +84,9 @@
    ! ---------------------
 
    ! read_extra_astero_pgstar_inlist
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! extra_astero_pgstar_inlist_name
-   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    ! If ``read_extra_astero_pgstar_inlist(i)`` is ``.true.``, then read the namelist
    ! in file ``extra_astero_pgstar_inlist_name(i)``.  ::
 
