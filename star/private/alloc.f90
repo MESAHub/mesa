@@ -985,6 +985,9 @@
                   action == do_copy_pointers_and_resize) &
                s% alpha_mlt(1:nz) = s% mixing_length_alpha
 
+            call do1(s% dvdt_drag, c% dvdt_drag)
+            if (failed('dvdt_drag')) exit
+
             call do1(s% vc, c% vc)
             if (failed('vc')) exit
 
