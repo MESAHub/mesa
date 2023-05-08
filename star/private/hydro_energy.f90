@@ -225,7 +225,7 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
-               drag_force, drag_energy
+               v_00, v_p1, drag_force, drag_energy
             include 'formats'
             ierr = 0
          

@@ -829,6 +829,10 @@
          integer :: steps_before_use_velocity_time_centering
 
          real(dp) :: &
+            drag_coefficient, &
+            min_q_for_drag
+
+         real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
             RTI_C_X0_frac, RTI_C_X_factor, RTI_energy_floor, RTI_D_mix_floor, &
             RTI_max_alpha, RTI_min_dm_behind_shock_for_full_on, &
