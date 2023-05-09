@@ -273,6 +273,7 @@
             
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
+            drag_energy = 0d0
             if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
                v_00 = wrap_v_00(s,k)
                drag_force = s% drag_coefficient*v_00/s% dt

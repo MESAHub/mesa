@@ -402,6 +402,7 @@
          end if
          
          accel_ad = 0d0
+         drag = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
