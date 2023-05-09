@@ -224,7 +224,8 @@
             !use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
+               v_00, v_p1, drag_force, drag_energy
             include 'formats'
             ierr = 0
          
@@ -272,7 +273,20 @@
             
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
-            sources_ad = eps_nuc_ad - non_nuc_neu_ad + extra_heat_ad + Eq_ad + RTI_diffusion_ad
+            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+               v_00 = wrap_v_00(s,k)
+               drag_force = s% drag_coefficient*v_00/s% dt
+               drag_energy = 0.5d0*v_00*drag_force
+            ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
+            end if
+            if (s% q(k+1) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+               v_p1 = wrap_v_p1(s,k)
+               drag_force = s% drag_coefficient*v_p1/s% dt
+               drag_energy = drag_energy + 0.5d0*v_p1*drag_force
+            ! drag energy for inner half-cell.   the 0.5d0 is for dm/2
+            end if
+
+            sources_ad = eps_nuc_ad - non_nuc_neu_ad + extra_heat_ad + Eq_ad + RTI_diffusion_ad + drag_energy
 
             sources_ad%val = sources_ad%val + s% irradiation_heat(k)
             
