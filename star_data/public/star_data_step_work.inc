@@ -297,6 +297,7 @@
    
       ! drag
       real(dp), pointer :: dvdt_drag(:)
+      real(dp), pointer :: FdotV_drag_energy(:)
    
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
