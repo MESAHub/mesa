@@ -842,7 +842,7 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_entropy avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if (s% star_age >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
+         if ((s% star_age - s% initial_star_age) >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
             relax_entropy_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -1095,7 +1095,7 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_angular_momentum avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if (s% star_age >= &
+         if ((s% star_age - s% initial_star_age) >= &
             s% job% timescale_for_relax_angular_momentum*&
                s% job% num_timescales_for_relax_angular_momentum) then
             relax_angular_momentum_check_model = terminate
@@ -4007,10 +4007,13 @@
             s% num_retries = 0
             s% time = 0
             s% star_age = 0
+            s% initial_star_age = 0
             s% model_number_for_last_retry = 0
             s% photo_interval = 0
             s% profile_interval = 0
             s% priority_profile_interval = 0
+         else
+            s% initial_star_age = s% star_age
          end if
 
          if( s% job% pgstar_flag) then
