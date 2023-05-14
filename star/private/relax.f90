@@ -708,13 +708,18 @@
 
          ipar(1) = num_pts
          ipar(2) = s% max_model_number
-         lrpar = 5*num_pts
+         lrpar = 5*num_pts + 1
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
 
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
+         if s% doing_first_model_of_run then
+            rpar(lrpar) = 0
+         else
+            rpar(lrpar) = s% star_age
+    
 
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
@@ -835,14 +840,14 @@
 
          ierr = 0
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          call adjust_entropy(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_entropy_check_model = terminate
 
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_entropy avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if ((s% star_age - s% initial_star_age) >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
+         if ((s% star_age - rpar(lrpar)) >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
             relax_entropy_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -958,14 +963,17 @@
 
          ipar(1) = num_pts
          ipar(2) = s% max_model_number
-         lrpar = 5*num_pts
+         lrpar = 5*num_pts+1
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
 
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-
+         if s% doing_first_model_of_run then
+            rpar(lrpar) = 0
+         else
+            rpar(lrpar) = s% star_age
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
          
@@ -1088,14 +1096,14 @@
 
          ierr = 0
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          call adjust_angular_momentum(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_angular_momentum_check_model = terminate
 
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_angular_momentum avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if ((s% star_age - s% initial_star_age) >= &
+         if ((s% star_age - rpar(lrpar)) >= &
             s% job% timescale_for_relax_angular_momentum*&
                s% job% num_timescales_for_relax_angular_momentum) then
             relax_angular_momentum_check_model = terminate
@@ -4007,13 +4015,10 @@
             s% num_retries = 0
             s% time = 0
             s% star_age = 0
-            s% initial_star_age = 0
             s% model_number_for_last_retry = 0
             s% photo_interval = 0
             s% profile_interval = 0
             s% priority_profile_interval = 0
-         else
-            s% initial_star_age = s% star_age
          end if
 
          if( s% job% pgstar_flag) then
