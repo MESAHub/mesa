@@ -715,10 +715,11 @@
          x(1:num_pts) => rpar(1:num_pts)
          f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-         if s% doing_first_model_of_run then
+         if (s% doing_first_model_of_run) then
             rpar(lrpar) = 0
          else
             rpar(lrpar) = s% star_age
+         end if
     
 
          call store_rpar(num_pts, ierr)
@@ -970,10 +971,11 @@
          x(1:num_pts) => rpar(1:num_pts)
          f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-         if s% doing_first_model_of_run then
+         if (s% doing_first_model_of_run) then
             rpar(lrpar) = 0
          else
             rpar(lrpar) = s% star_age
+         end if
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
          
