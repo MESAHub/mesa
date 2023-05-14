@@ -785,7 +785,7 @@
          ! nuclear timescale (years) -- proportional to mass divided by luminosity
 
       ! times in other units (just for convenience)
-      real(dp) :: star_age, initial_star_age, time_days, time_years ! time is in seconds
+      real(dp) :: star_age, time_days, time_years ! time is in seconds
       real(dp) :: time_step, dt_days, dt_years ! dt is in seconds
       
       real(dp) :: dt_start ! dt during first try for step
