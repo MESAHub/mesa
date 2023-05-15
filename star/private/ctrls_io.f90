@@ -314,6 +314,7 @@
 
     ! WD phase separation
     do_phase_separation, &
+    phase_separation_option, &
     do_phase_separation_heating, &
     phase_separation_mixing_use_brunt, &
     phase_separation_no_diffusion, &
@@ -1774,6 +1775,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  ! WD phase separation
  s% do_phase_separation = do_phase_separation
+ s% phase_separation_option = phase_separation_option
  s% do_phase_separation_heating = do_phase_separation_heating
  s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
  s% phase_separation_no_diffusion = phase_separation_no_diffusion
@@ -3384,6 +3386,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_dt_limit = s% diffusion_dt_limit
 
  do_phase_separation = s% do_phase_separation
+ phase_separation_option = s% phase_separation_option
  do_phase_separation_heating = s% do_phase_separation_heating
  phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
  phase_separation_no_diffusion = s% phase_separation_no_diffusion
