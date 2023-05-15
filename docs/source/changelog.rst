@@ -3,12 +3,10 @@ Changelog
 *********
 
 
-Changes in main
-===============
+Changes in r23.05.1-rc2
+=======================
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r23.05.1-rc2:
 
 Backwards-incompatible changes
 ------------------------------
@@ -114,7 +112,7 @@ species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
 *individually* to all isotopes of hydrogen, helium or metals,
 respectively.
 
-.. _New Features main:
+.. _New Features r23.05.1-rc2:
 
 New Features
 ------------
@@ -173,6 +171,8 @@ Hooks
 
 A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
+
+.. _Bug Fixes r23.05.1-rc2:
 
 Bug Fixes
 ---------
