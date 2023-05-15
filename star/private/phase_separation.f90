@@ -42,12 +42,34 @@
       
       contains
 
-
       subroutine do_phase_separation(s, dt, ierr)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: dt
+         integer, intent(out) :: ierr
+
+         if(s% phase_separation_option == 'CO') then
+            call do_2component_phase_separation(s, dt, 'CO', ierr)
+         else if(s% phase_separation_option == 'ONe') then
+            ! TODO: update do2component_phase_separation and move_one_zone
+            ! to generalize for when components == 'ONe',
+            ! implement a blouin_delta_o_ne function for this
+            call do_2component_phase_separation(s, dt, 'ONe', ierr)
+         else if(s% phase_separation_option == 'distillation') then
+            ! TODO: implement distillation
+            ! call do_distillation(s, dt, ierr)
+            return
+         else
+            write(*,*) 'invalid phase_separation_option'
+            stop
+         end if
+      end subroutine do_phase_separation
+      
+      subroutine do_2component_phase_separation(s, dt, components, ierr)
          use chem_def, only: chem_isos, ic12, io16
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
+         character (len=*), intent(in) :: components
          integer, intent(out) :: ierr
          
          real(dp) :: dq_crystal, XO, XC, pad
@@ -132,7 +154,7 @@
          end if
 
          ierr = 0
-      end subroutine do_phase_separation
+      end subroutine do_2component_phase_separation
 
       subroutine move_one_zone(s,k,dq_crystal)
         use chem_def, only: chem_isos, ic12, io16
@@ -176,20 +198,15 @@
       
       ! mix composition outward until reaching stable composition profile
       subroutine mix_outward(s,kbot)
-        use chem_def, only: chem_isos, ihe4, ic12, io16
-
         type(star_info), pointer :: s
         integer, intent(in)      :: kbot
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
-        integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
+        real(dp) :: mass, B_term, grada, gradr
+        integer :: k, l, ktop
         logical :: use_brunt
         
         use_brunt = s% phase_separation_mixing_use_brunt
-        net_ihe4 = s% net_iso(ihe4)
-        net_ic12 = s% net_iso(ic12)
-        net_io16 = s% net_iso(io16)
 
         do k=kbot,1,-1
            ktop = k
