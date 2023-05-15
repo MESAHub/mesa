@@ -32,7 +32,7 @@
       implicit none
 
       private
-      public :: do_phase_separation
+      public :: do_distillation
 
       logical, parameter :: dbg = .false.
 
@@ -43,23 +43,23 @@
       contains
 
 
-      subroutine do_phase_separation(s, dt, ierr)
-         use chem_def, only: chem_isos, ic12, io16
-         use chem_lib, only: chem_get_iso_id
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: dt
-         integer, intent(out) :: ierr
-         
-         real(dp) :: dq_crystal, XO, XC, pad
-         integer :: k, k_bound, kstart, net_ic12, net_io16
-         logical :: save_Skye_use_ion_offsets
-
-         s% eps_phase_separation(1:s%nz) = 0d0
-         
-         if(s% phase(s% nz) < eos_phase_boundary) then
-            s% crystal_core_boundary_mass = 0d0
-            return
-         end if
+        subroutine do_distillation(s, dt, ierr)
+          use chem_def, only: chem_isos, ic12, io16
+          use chem_lib, only: chem_get_iso_id
+          type (star_info), pointer :: s
+          real(dp), intent(in) :: dt
+          integer, intent(out) :: ierr
+          
+          real(dp) :: dq_crystal, XO, XC, pad
+          integer :: k, k_bound, kstart, net_ic12, net_io16
+          logical :: save_Skye_use_ion_offsets
+          
+          s% eps_phase_separation(1:s%nz) = 0d0
+          
+          if(s% phase(s% nz) < eos_phase_boundary) then
+             s% crystal_core_boundary_mass = 0d0
+             return
+          end if
 
          ! Set phase separation mixing mass negative at beginning of phase separation
          s% phase_sep_mixing_mass = -1d0
@@ -132,7 +132,7 @@
          end if
 
          ierr = 0
-      end subroutine do_phase_separation
+       end subroutine do_distillation
 
       subroutine move_one_zone(s,k,dq_crystal)
         use chem_def, only: chem_isos, ic12, io16
