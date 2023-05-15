@@ -1067,7 +1067,13 @@
             
          logical :: stop_for_bad_nums
          integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
+
+      ! WD phase separation
          
+         logical :: do_phase_separation
+         logical :: do_phase_separation_heating
+         logical :: phase_separation_mixing_use_brunt
+
       ! timestep parameters
       
          real(dp) :: time_delta_coeff ! like mesh_delta_coeff
