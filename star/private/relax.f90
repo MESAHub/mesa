@@ -684,7 +684,7 @@
          integer, parameter ::  lipar=2
          integer :: lrpar, max_model_number
          real(dp), pointer :: rpar(:)
-         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_years_for_timestep
+         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_years_for_timestep, time
          logical :: do_element_diffusion, use_other_energy
          type (star_info), pointer :: s
          real(dp), pointer :: x(:), f1(:), f(:,:)
@@ -708,20 +708,14 @@
 
          ipar(1) = num_pts
          ipar(2) = s% max_model_number
-         lrpar = 5*num_pts + 1
+         lrpar = 5*num_pts
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
 
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-         if (s% doing_first_model_of_run) then
-            rpar(lrpar) = 0
-         else
-            rpar(lrpar) = s% star_age
-         end if
     
-
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
          
@@ -744,6 +738,8 @@
          s% use_other_energy = .true.
          other_energy => s% other_energy
          s% other_energy => entropy_relax_other_energy
+         time = s% time
+         s% time = 0d0
 
          call do_internal_evolve( &
                id, before_evolve_relax_entropy, &
@@ -758,6 +754,7 @@
          s% max_years_for_timestep = max_years_for_timestep
          s% use_other_energy = use_other_energy
          s% other_energy => other_energy
+         s% time = time
 
          call error_check('relax entropy',ierr)
 
@@ -848,7 +845,8 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_entropy avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if ((s% star_age - rpar(lrpar)) >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
+
+         if (s% star_age >= s% job% timescale_for_relax_entropy*s% job% num_timescales_for_relax_entropy) then
             relax_entropy_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
@@ -940,7 +938,7 @@
          integer :: lrpar, max_model_number
          real(dp), pointer :: rpar(:)
          real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_timestep, &
-            am_D_mix_factor
+            am_D_mix_factor, time
          logical :: do_element_diffusion, use_other_torque
          type (star_info), pointer :: s
          real(dp), pointer :: x(:), f1(:), f(:,:)
@@ -964,18 +962,13 @@
 
          ipar(1) = num_pts
          ipar(2) = s% max_model_number
-         lrpar = 5*num_pts+1
+         lrpar = 5*num_pts
          allocate(rpar(lrpar), stat=ierr)
          if (ierr /= 0) return
 
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-         if (s% doing_first_model_of_run) then
-            rpar(lrpar) = 0
-         else
-            rpar(lrpar) = s% star_age
-         end if
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
          
@@ -1000,6 +993,8 @@
          s% use_other_torque = .true.
          other_torque => s% other_torque
          s% other_torque => angular_momentum_relax_other_torque
+         time = s% time
+         s% time = 0d0
 
          call do_internal_evolve( &
                id, before_evolve_relax_angular_momentum, &
@@ -1015,6 +1010,7 @@
          s% max_timestep = max_timestep
          s% use_other_torque = use_other_torque
          s% other_torque => other_torque
+         s% time = time
 
          call error_check('relax angular momentum',ierr)
 
@@ -1105,7 +1101,7 @@
          if (mod(s% model_number, s% terminal_interval) == 0) &
             write(*,*) 'relax_angular_momentum avg rel err, dt, model', avg_err, s% dt/secyer, s% model_number
 
-         if ((s% star_age - rpar(lrpar)) >= &
+         if (s% star_age  >= &
             s% job% timescale_for_relax_angular_momentum*&
                s% job% num_timescales_for_relax_angular_momentum) then
             relax_angular_momentum_check_model = terminate
