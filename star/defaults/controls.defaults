@@ -7263,12 +7263,13 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Choice of appropriate option for the WD core mixture:
+      
       ! + ``'CO'`` : carbon-oxygen phase separation using the two-component
-      !   phase diagram of `Blouin et al. (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
-      !   phase diagram of `Blouin & Daligault (2021) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
+      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
       ! + ``'distillation'`` : approximation of the effects of three-component C-O-Ne phase separation
-      !   described in `Blouin et al. (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...911L...5B>`_.
+      !   described in `Blouin, Daligault, & Saumon (2021) <https://ui.adsabs.harvard.edu/abs/2021ApJ...911L...5B/abstract>`_.
       
       ! ::
 
