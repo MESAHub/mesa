@@ -50,8 +50,6 @@
          if(s% phase_separation_option == 'CO') then
             call do_2component_phase_separation(s, dt, 'CO', ierr)
          else if(s% phase_separation_option == 'ONe') then
-            ! TODO: update do2component_phase_separation
-            ! to generalize for when components == 'ONe'
             call do_2component_phase_separation(s, dt, 'ONe', ierr)
          else if(s% phase_separation_option == 'distillation') then
             ! TODO: implement distillation
@@ -64,15 +62,15 @@
       end subroutine do_phase_separation
       
       subroutine do_2component_phase_separation(s, dt, components, ierr)
-         use chem_def, only: chem_isos, ic12, io16
+         use chem_def, only: chem_isos, ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
          integer, intent(out) :: ierr
          
-         real(dp) :: dq_crystal, XO, XC, pad
-         integer :: k, k_bound, kstart, net_ic12, net_io16
+         real(dp) :: dq_crystal, XNe, XO, XC, pad
+         integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
          logical :: save_Skye_use_ion_offsets
 
          s% eps_phase_separation(1:s%nz) = 0d0
@@ -87,6 +85,7 @@
 
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
+         net_ine20 = s% net_iso(ine20)
          
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
@@ -96,11 +95,14 @@
                exit
             end if
          end do
-
-         ! Check that we're still in C/O dominated material, otherwise skip phase separation
-         XO = s% xa(net_io16,k_bound)
+         
          XC = s% xa(net_ic12,k_bound)
-         if (XO + XC < 0.9d0) return
+         XO = s% xa(net_io16,k_bound)
+         XNe = s% xa(net_ine20,k_bound)
+         ! Check that we're still in C/O or O/Ne dominated material as appropriate,
+         ! otherwise skip phase separation
+         if(components == 'CO'.and. XO + XC < 0.9d0) return
+         if(components == 'ONe'.and. XNe + XO < 0.9d0) return
          
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
