@@ -57,6 +57,9 @@
       thermohaline_coeff = 100
       MLT_option = 'Cox'
 
+      okay_to_reduce_gradT_excess = .true.
+      gradT_excess_lambda1 = -1
+
 ! mixing
        overshoot_scheme(1) = 'exponential'
        overshoot_zone_type(1) = 'burn_Z'
@@ -73,8 +76,8 @@
       mesh_delta_coeff = 1.5     
 
 ! solver
-      energy_eqn_option = 'dedt'
-      use_gold2_tolerances = .true.
+      energy_eqn_option = 'eps_grav'
+      use_gold2_tolerances = .false.
 
 ! output
       num_trace_history_values = 2

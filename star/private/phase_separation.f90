@@ -102,7 +102,7 @@
          ! Check that we're still in C/O or O/Ne dominated material as appropriate,
          ! otherwise skip phase separation
          if(components == 'CO'.and. XO + XC < 0.9d0) return
-         if(components == 'ONe'.and. XNe + XO < 0.9d0) return
+         if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
          
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
