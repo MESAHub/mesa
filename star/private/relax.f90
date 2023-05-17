@@ -838,7 +838,7 @@
 
          ierr = 0
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
          call adjust_entropy(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_entropy_check_model = terminate
 
@@ -1094,7 +1094,7 @@
 
          ierr = 0
          x(1:num_pts) => rpar(1:num_pts)
-         f1(1:4*num_pts) => rpar(num_pts+1:lrpar-1)
+         f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
          call adjust_angular_momentum(num_pts, avg_err, ierr)
          if (ierr /= 0) relax_angular_momentum_check_model = terminate
 
