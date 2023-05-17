@@ -246,7 +246,8 @@
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O),
                ! as long as there is enough Ne in the next zone out to proceed
-               do while((XNe < distill_critical_XNe .or. XO > 0d0) .and. XNe_out > 1d-5)
+               ! TODO: make check on XNe_out more physical
+               do while(XNe < distill_critical_XNe .and. XNe_out > 0.01d0)
                   call distill_at_boundary(s,k,distill_critical_XNe)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1)
@@ -276,8 +277,11 @@
         integer, intent(in) :: k
         real(dp), intent(in) :: distill_critical_XNe
         
-        real(dp) :: XC, XO, XNe, XC_out, XNe_out, dXC, dXO, dXNe20, dXNe22, Xfac
+        real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum, Xfac
+        real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio
         integer :: net_ic12, net_io16, net_ine20, net_ine22
+
+        dq_ratio = s% dq(k) / s% dq(k-1)
         
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
@@ -289,7 +293,11 @@
         XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
         
         XC_out = s% xa(net_ic12,k-1)
+        XO_out = s% xa(net_io16,k-1)
         XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+
+        print *, "distill at boundary; k, XC, XO, XNe, XC_out, XO_out, XNe_out", &
+             k, XC, XO, XNe, XC_out, XO_out, XNe_out
         
         ! Need to rescale temporarily because phase diagram assumes XC + XO + XNe = 1?
         Xfac = XO + XC + XNe
@@ -298,85 +306,69 @@
         !XO = XO/Xfac
         !XNe = XNe/Xfac
 
-        ! TODO: refine this to avoid overshooting, with more options for exchanging
-        ! only as much Ne as needed once getting close to critical value. Otherwise
-        ! we'll probably get a somewhat noisy looking composition profile in the crystal.
-        ! Probably break this up into lots of smaller helper subroutines so that logic
-        ! is easier to follow.
-        if(XNe < distill_critical_XNe) then
-           if (XO > XNe_out) then
-              ! pull all Ne from zone k-1 into zone k, exchange for oxygen
-              dXNe20 = s% xa(net_ine20,k-1)
-              dXNe22 = s% xa(net_ine22,k-1)
-              dXO = dXNe20 + dXNe22
+        ! Net effect of distillation is that crystals enriched in oxygen float upward.
+        ! Need to limit toward xNe = 0.2, xC = 0.8. Start by pushing O outward in exchange
+        ! for C/Ne mixture until O is depleted. Then exchange C/Ne until reaching critical
+        ! Ne value.
 
-              s% xa(net_ine20,k) = s% xa(net_ine20,k) + dXNe20
-              s% xa(net_ine22,k) = s% xa(net_ine22,k) + dXNe22
-              s% xa(net_io16,k) = s% xa(net_io16,k) - dXO
-
-              s% xa(net_ine20,k-1) = 0d0 ! s% xa(net_ine20,k-1) - dXNe20
-              s% xa(net_ine22,k-1) = 0d0 ! s% xa(net_ine22,k-1) - dXNe22
-              s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO
-           else if(XO > 0d0) then
-              ! exchange all of the oxygen that is left for neon
+        if(XO > 0d0 .and. XNe < distill_critical_XNe) then
+           ! exchange O for a mixture of C and Ne
+           Xout_sum = XC_out + XNe_out
+           if(XO <= Xout_sum) then
+              ! Can exchange all O in zone k for C and Ne
               dXO = s% xa(net_io16,k)
-              ! make relative fractions of exchanged Ne20 and Ne22 proportional to fractions in zone k-1,
-              ! with dXNe20 + dXNe22 = dXO
-              dXNe20 = dXO*s% xa(net_ine20,k-1)/(s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1))
-              dXNe22 = dXO*s% xa(net_ine22,k-1)/(s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1))
-
-              s% xa(net_ine20,k) = s% xa(net_ine20,k) + dXNe20
-              s% xa(net_ine22,k) = s% xa(net_ine22,k) + dXNe22
-              s% xa(net_io16,k) = 0d0 ! s% xa(net_io16,k) - dXO
-
-              s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - dXNe20
-              s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22
-              s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO
            else
-              ! no oxygen left, but still need more neon, so exhcange for carbon
+              ! can only exchange as much O as we have C and Ne in external zone,
+              ! but next iteration should get rid of the rest of the O
+              dXO = Xout_sum
+           end if
+           ! make relative fractions of exchanged C12, Ne20, and Ne22 proportional to fractions in zone k-1,
+           ! with dXC + dXNe20 + dXNe22 = dXO
+           dXC    = dXO*s% xa(net_ic12,k-1) /Xout_sum
+           dXNe20 = dXO*s% xa(net_ine20,k-1)/Xout_sum
+           dXNe22 = dXO*s% xa(net_ine22,k-1)/Xout_sum
+           
+           s% xa(net_ic12,k) = s% xa(net_ic12,k) + dXC
+           s% xa(net_io16,k) = s% xa(net_io16,k) - dXO
+           s% xa(net_ine20,k) = s% xa(net_ine20,k) + dXNe20
+           s% xa(net_ine22,k) = s% xa(net_ine22,k) + dXNe22
+
+           ! use dq_ratio to conserve total mass of each element,
+           ! accounting for the fact that zone k-1 has different mass than zone k.
+           s% xa(net_ic12,k-1) = s% xa(net_ic12,k-1) - dXC*dq_ratio
+           s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO*dq_ratio
+           s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - dXNe20*dq_ratio
+           s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22*dq_ratio
+        else if(XNe < distill_critical_XNe) then
+           ! continue increasing XNe until reaching critical value
+           if(XNe_out <= (distill_critical_XNe - XNe)) then
+              ! pull all Ne from zone k-1 into zone k, exchange for C
               dXNe20 = s% xa(net_ine20,k-1)
               dXNe22 = s% xa(net_ine22,k-1)
               dXC = dXNe20 + dXNe22
-
-              ! for debugging
-              if(dXC > s% xa(net_ic12,k)) then
-                 print *, 'Not enough carbon to continue distillation. This is likely a bug.'
-                 print *, 'need dXC < XC, but dXC = ', dXC
-                 print *, 'XC, XO, XNe', XC, XO, XNe
-                 stop
-              end if
-
-              s% xa(net_ine20,k) = s% xa(net_ine20,k) + dXNe20
-              s% xa(net_ine22,k) = s% xa(net_ine22,k) + dXNe22
-              s% xa(net_ic12,k) = s% xa(net_ic12,k) - dXC
-
-              s% xa(net_ine20,k-1) = 0d0 ! s% xa(net_ine20,k-1) - dXNe20
-              s% xa(net_ine22,k-1) = 0d0 ! s% xa(net_ine22,k-1) - dXNe22
-              s% xa(net_ic12,k-1) = s% xa(net_ic12,k-1) + dXC
-           end if
-        else if(XO > 0d0) then
-           ! swap any residual oxygen for carbon
-           if(XO <= XC_out) then
-              ! Can exchange all O in zone k for C
-              dXO = s% xa(net_io16,k)
-              s% xa(net_ic12,k) = s% xa(net_ic12,k) + dXO
-              s% xa(net_io16,k) = 0d0 ! s% xa(net_io16,k) - dXO
-              s% xa(net_ic12,k-1) = s% xa(net_ic12,k-1) - dXO
-              s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO
            else
-              ! can only exchange as much O as we have carbon in external zone
-              ! but next iteration should get rid of the rest of the O
-              dXO = s% xa(net_ic12,k-1)
-              s% xa(net_ic12,k) = s% xa(net_ic12,k) + dXO
-              s% xa(net_io16,k) = s% xa(net_io16,k) - dXO
-              s% xa(net_ic12,k-1) = 0d0 ! s% xa(net_ic12,k-1) - dXO
-              s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO
+              ! Only exchange as much as needed to reach critical Ne
+              dXNe_tot = distill_critical_XNe - XNe
+              dXNe20 = dXNe_tot*s% xa(net_ine20,k-1)/XNe_out
+              dXNe22 = dXNe_tot*s% xa(net_ine22,k-1)/XNe_out
+              dXC = dXNe_tot
            end if
+           
+           s% xa(net_ine20,k) = s% xa(net_ine20,k) + dXNe20
+           s% xa(net_ine22,k) = s% xa(net_ine22,k) + dXNe22
+           s% xa(net_ic12,k) = s% xa(net_ic12,k) - dXC
+           
+           ! use dq_ratio to conserve total mass of each element,
+           ! accounting for the fact that zone k-1 has different mass than zone k.
+           s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - dXNe20*dq_ratio
+           s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22*dq_ratio
+           s% xa(net_ic12,k-1) = s% xa(net_ic12,k-1) + dXC*dq_ratio
         else ! for debugging
            write(*,*) 'should not have ended up here...'
            write(*,*) 'XC, XO, XNe', XC, XO, XNe
+           stop
         end if
-        
+
         call update_model_(s,k-1,s%nz,.true.)
         
       end subroutine distill_at_boundary
