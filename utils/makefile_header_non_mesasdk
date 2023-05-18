@@ -330,7 +330,7 @@ COMPILE_DEVEL     = $(COMPILE_NO_OPT)
 # some definitions used in the test makefiles and client makefiles
 
 WORK_COMPILE = \
-   $(FC) $(FCbasic) $(FCopenmp) -O0 $(FCchecks) $(FCdebug) $(FCfree) $(FCstandard) \
+   $(FC) $(FCbasic) $(FCopenmp) -O0 $(FCchecks) $(FCdebug) $(FCfree) \
    $(FC_free_preprocess) -I$(MESA_INCLUDE_DIR) $(INCLUDE_HDF5) -c
  
 ifeq ($(USE_PGPLOT),YES)
