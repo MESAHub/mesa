@@ -48,9 +48,11 @@
          integer, intent(out) :: ierr
 
          if(s% phase_separation_option == 'CO') then
-            call do_2component_phase_separation(s, dt, 'CO', ierr)
+            call do_2component_phase_separation(s, dt, 'CO', -1, ierr)
+            ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'ONe') then
-            call do_2component_phase_separation(s, dt, 'ONe', ierr)
+            call do_2component_phase_separation(s, dt, 'ONe', -1, ierr)
+            ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'distillation') then
             call do_distillation(s, dt, ierr)
          else
@@ -59,27 +61,35 @@
          end if
       end subroutine do_phase_separation
       
-      subroutine do_2component_phase_separation(s, dt, components, ierr)
+      subroutine do_2component_phase_separation(s, dt, components, k_in, ierr)
          use chem_def, only: chem_isos, ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
+         integer, intent(in) :: k_in ! option to separate only one zone if specified k_in > 0
          integer, intent(out) :: ierr
          
          real(dp) :: dq_crystal, XNe, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
-         logical :: save_Skye_use_ion_offsets
+         logical :: save_Skye_use_ion_offsets, set_mixing_and_energy
 
-         s% eps_phase_separation(1:s%nz) = 0d0
+         if(k_in > 0) then
+            set_mixing_and_energy = .false.
+         else
+            set_mixing_and_energy = .true.
+         end if
+
+         if(set_mixing_and_energy) then
+            ! Set phase separation mixing mass negative at beginning of phase separation
+            s% phase_sep_mixing_mass = -1d0
+            s% eps_phase_separation(1:s%nz) = 0d0
+         end if
          
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
-
-         ! Set phase separation mixing mass negative at beginning of phase separation
-         s% phase_sep_mixing_mass = -1d0
 
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
@@ -99,36 +109,42 @@
          XNe = s% xa(net_ine20,k_bound)
          ! Check that we're still in C/O or O/Ne dominated material as appropriate,
          ! otherwise skip phase separation
-         if(components == 'CO'.and. XO + XC < 0.9d0) return
-         if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
+         if(components == 'CO'.and. XO + XC < 0.9d0 .and. k_in < 1) return
+         if(components == 'ONe'.and. XNe + XO < 0.8d0 .and. k_in < 1) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
          
          ! If there is a phase transition, reset the composition at the boundary
-         if(k_bound > 0) then
+         if(k_bound > 0 .or. k_in > 0) then
             dq_crystal = 0d0
 
-            ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
-            ! to account for loss of precision during remeshing.
-            pad = s% min_dq * s% m(1) * 0.5d0
-            do k = s%nz,1,-1
-               if(s% m(k) > s% crystal_core_boundary_mass + pad) then
-                  kstart = k
-                  exit
-               end if
-            end do
+            if(k_in > 0) then
+               kstart = k_in
+            else
+               ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
+               ! to account for loss of precision during remeshing.
+               pad = s% min_dq * s% m(1) * 0.5d0
+               do k = s%nz,1,-1
+                  if(s% m(k) > s% crystal_core_boundary_mass + pad) then
+                     kstart = k
+                     exit
+                  end if
+               end do
+            end if
 
-            ! calculate energy associated with phase separation, ignoring the ionization
-            ! energy term that Skye sometimes calculates
-            save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
-            s% eos_rq% Skye_use_ion_offsets = .false.
-            call update_model_(s,1,s%nz,.false.)
-            do k=1,s% nz
-               s% eps_phase_separation(k) = s% energy(k)
-            end do
+            if(set_mixing_and_energy) then
+               ! calculate energy associated with phase separation, ignoring the ionization
+               ! energy term that Skye sometimes calculates
+               save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
+               s% eos_rq% Skye_use_ion_offsets = .false.
+               call update_model_(s,1,s%nz,.false.)
+               do k=1,s% nz
+                  s% eps_phase_separation(k) = s% energy(k)
+               end do
+            end if
             
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
-               if(s% phase(k) <= eos_phase_boundary) then
+               if(s% phase(k) <= eos_phase_boundary .or. k < k_in) then
                   s% crystal_core_boundary_mass = s% m(k+1)
                   exit
                end if
@@ -143,12 +159,14 @@
             end do
 
             call update_model_(s,1,s%nz,.false.)
-            
-            ! phase separation heating term for use by energy equation
-            do k=1,s% nz
-               s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
-            end do
-            s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
+
+            if(set_mixing_and_energy) then
+               ! phase separation heating term for use by energy equation
+               do k=1,s% nz
+                  s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+               end do
+               s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
+            end if
             s% need_to_setvars = .true.
          end if
 
@@ -162,22 +180,13 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: XNe, XNe_out, XO, XC, pad, distill_critical_XNe
-         integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20, net_ine22
+         real(dp) :: GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit
+         integer :: k, net_ic12, net_io16, net_ine20, net_ine22
          logical :: save_Skye_use_ion_offsets
 
-         distill_critical_XNe = 0.3143d0
+         distill_final_XNe = 0.3143d0
          
          s% eps_phase_separation(1:s%nz) = 0d0
-
-         ! TODO: this phase check needs to be replaced with something checking GammaC
-         if(s% phase(s% nz) < eos_phase_boundary) then
-            s% crystal_core_boundary_mass = 0d0
-            return
-         end if
-
-         ! Set phase separation mixing mass negative at beginning of phase separation
-         s% phase_sep_mixing_mass = -1d0
 
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
@@ -188,96 +197,82 @@
             write(*,*) 'distillation requires ne22 be included in net'
             stop
          end if
+
+         ! Set phase separation mixing mass negative at beginning of distillation
+         s% phase_sep_mixing_mass = -1d0
          
-         ! Find zone of phase transition from liquid to solid
-         k_bound = -1
-         do k = s%nz,1,-1
-            if(s% phase(k-1) <= eos_phase_boundary .and. s% phase(k) > eos_phase_boundary) then
-               k_bound = k
-               exit
-            end if
+         ! calculate energy associated with phase separation, ignoring the ionization
+         ! energy term that Skye sometimes calculates
+         save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
+         s% eos_rq% Skye_use_ion_offsets = .false.
+         call update_model_(s,1,s%nz,.false.)
+         do k=1,s% nz
+            s% eps_phase_separation(k) = s% energy(k)
          end do
-         
-         XC = s% xa(net_ic12,k_bound)
-         XO = s% xa(net_io16,k_bound)
-         XNe = s% xa(net_ine20,k_bound) + s% xa(net_ine22,k_bound)
-         
-         if(XC + XO + XNe < 0.9d0) return
 
-         ! check if there's enough Ne for distillation,
-         ! or if we should just do 2component C/O phase separation
-         if(XNe < 0.015d0) then ! TODO: make this composition check depend on GammaC
-            call do_2component_phase_separation(s, dt, 'CO', ierr)
-            return
-         end if
-         
-         ! If there is a phase transition, reset the composition at the boundary
-         if(k_bound > 0) then
-
-            ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
-            ! to account for loss of precision during remeshing.
-            pad = s% min_dq * s% m(1) * 0.5d0
-            ! TODO: this might also need to be reimagined
-            do k = s%nz,1,-1
-               if(s% m(k) > s% crystal_core_boundary_mass + pad) then
-                  kstart = k
-                  exit
-               end if
-            end do
-
-            ! calculate energy associated with phase separation, ignoring the ionization
-            ! energy term that Skye sometimes calculates
-            save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
-            s% eos_rq% Skye_use_ion_offsets = .false.
-            call update_model_(s,1,s%nz,.false.)
-            do k=1,s% nz
-               s% eps_phase_separation(k) = s% energy(k)
-            end do
+         do k = s%nz, 1, -1
+            XC = s% xa(net_ic12,k)
+            XO = s% xa(net_io16,k)
+            XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+            XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+            if(XC + XO + XNe < 0.9d0) exit
             
-            ! loop runs outward starting at previous crystallization boundary
-            do k = kstart,1,-1
-               ! Start by checking if this material should be crystallizing
-               if(s% phase(k) <= eos_phase_boundary) then
-                  s% crystal_core_boundary_mass = s% m(k+1)
-                  exit
-               end if
+            ! Check whether we are in a regime where distillation should occur
+            GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
+            XNe_crit = blouin_XNe_crit(GammaC)
+            print *, "Gamma, GammaC", s% gam(k), GammaC
 
-               XC = s% xa(net_ic12,k)
-               XO = s% xa(net_io16,k)
-               XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
-               XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+            pad = s% min_dq * s% m(1) * 0.5d0
+            if(s% m(k) < s% crystal_core_boundary_mass + pad) then
+               ! This material has frozen, so leave it alone
+               cycle
+            else if(XNe > XNe_crit) then
+               ! should be distilling in this zone
+               
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O),
                ! as long as there is enough Ne in the next zone out to proceed
-               ! TODO: make check on XNe_out more physical
-               do while(XNe < distill_critical_XNe .and. XNe_out > 0.01d0)
-                  call distill_at_boundary(s,k,distill_critical_XNe)
+               ! TODO: might need some padding on XNe_crit here, remember XNe_crit can be negative too
+               do while(XNe < distill_final_XNe .and. XNe_out > XNe_crit)
+                  call distill_at_boundary(s,k,distill_final_XNe)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1)
-                  XO = s% xa(net_io16,k)
                   XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                   XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
                end do
-            end do
-
-            call update_model_(s,1,s%nz,.false.)
-            
-            ! phase separation heating term for use by energy equation
-            do k=1,s% nz
-               s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
-            end do
-            s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
-            s% need_to_setvars = .true.
-         end if
-
+               s% crystal_core_boundary_mass = s% m(k)
+               ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
+            else
+               ! not distilling, but may phase separate,
+               ! so fall back to 2component phase separation
+               if(s% phase(k) < eos_phase_boundary) then
+                  ! once we reach a point where not distilling or freezing,
+                  ! break out of do loop
+                  exit
+               else
+                  ! limit this call to one zone at a time
+                  call do_2component_phase_separation(s, dt, 'CO', k, ierr)
+               end if
+            end if
+         end do
+         
+         call update_model_(s,1,s%nz,.false.)
+         
+         ! phase separation heating term for use by energy equation
+         do k=1,s% nz
+            s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+         end do
+         s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
+         s% need_to_setvars = .true.
+         
          ierr = 0
       end subroutine do_distillation
 
-      subroutine distill_at_boundary(s,k,distill_critical_XNe)
+      subroutine distill_at_boundary(s,k,distill_final_XNe)
         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
-        real(dp), intent(in) :: distill_critical_XNe
+        real(dp), intent(in) :: distill_final_XNe
         
         real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum, Xfac
         real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio
@@ -313,7 +308,7 @@
         ! for C/Ne mixture until O is depleted. Then exchange C/Ne until reaching critical
         ! Ne value.
 
-        if(XO > 0d0 .and. XNe < distill_critical_XNe) then
+        if(XO > 0d0 .and. XNe < distill_final_XNe) then
            ! exchange O for a mixture of C and Ne
            Xout_sum = XC_out + XNe_out
            if(XO <= Xout_sum/dq_ratio) then
@@ -341,16 +336,16 @@
            s% xa(net_io16,k-1) = s% xa(net_io16,k-1) + dXO*dq_ratio
            s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - dXNe20*dq_ratio
            s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22*dq_ratio
-        else if(XNe < distill_critical_XNe) then
+        else if(XNe < distill_final_XNe) then
            ! continue increasing XNe until reaching critical value
-           if(XNe_out/dq_ratio <= (distill_critical_XNe - XNe)) then
+           if(XNe_out/dq_ratio <= (distill_final_XNe - XNe)) then
               ! pull all Ne from zone k-1 into zone k, exchange for C
               dXNe20 = s% xa(net_ine20,k-1)/dq_ratio
               dXNe22 = s% xa(net_ine22,k-1)/dq_ratio
               dXC = dXNe20 + dXNe22
            else
               ! Only exchange as much as needed to reach critical Ne
-              dXNe_tot = distill_critical_XNe - XNe
+              dXNe_tot = distill_final_XNe - XNe
               dXNe20 = dXNe_tot*s% xa(net_ine20,k-1)/XNe_out
               dXNe22 = dXNe_tot*s% xa(net_ine22,k-1)/XNe_out
               dXC = dXNe_tot
@@ -580,6 +575,24 @@
         
         blouin_delta_xne = Xnew - Xin
       end function blouin_delta_xne
+
+      real(dp) function blouin_XNe_crit(GammaC)
+        real(dp), intent(in) :: GammaC ! Carbon coupling
+        real(dp) :: XNe1, XNe2, GammaC1, GammaC2, XNe_crit
+
+        ! 2 points from the fit line defining the boundary
+        ! (figure 3; Blouin, Daligault, & Saumon 2021 ApJL 911:L5)
+        ! using right y-axis for mass fractions rather than number fractions
+        XNe1 = 0.042d0
+        XNe2 = 0.005d0
+        GammaC1 = 130d0
+        GammaC2 = 180d0
+
+        XNe_crit = XNe1 + (GammaC - GammaC1)*(XNe2 - XNe1)/(GammaC2-GammaC1)
+        print *, "Blouin XNe crit: GammaC, XNe_crit", GammaC, XNe_crit
+        
+        blouin_XNe_crit = XNe_crit
+      end function blouin_XNe_crit
       
       subroutine update_model_ (s, kc_t, kc_b, do_brunt)
 
