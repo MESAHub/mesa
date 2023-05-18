@@ -169,7 +169,8 @@
          distill_critical_XNe = 0.3143d0
          
          s% eps_phase_separation(1:s%nz) = 0d0
-         
+
+         ! TODO: this phase check needs to be replaced with something checking GammaC
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
@@ -216,6 +217,7 @@
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
             ! to account for loss of precision during remeshing.
             pad = s% min_dq * s% m(1) * 0.5d0
+            ! TODO: this might also need to be reimagined
             do k = s%nz,1,-1
                if(s% m(k) > s% crystal_core_boundary_mass + pad) then
                   kstart = k
@@ -296,7 +298,7 @@
         XO_out = s% xa(net_io16,k-1)
         XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
 
-        print *, "distill at boundary; k, XC, XO, XNe, XC_out, XO_out, XNe_out", &
+        print *, "before distill at boundary; k, XC, XO, XNe, XC_out, XO_out, XNe_out", &
              k, XC, XO, XNe, XC_out, XO_out, XNe_out
         
         ! Need to rescale temporarily because phase diagram assumes XC + XO + XNe = 1?
@@ -314,13 +316,13 @@
         if(XO > 0d0 .and. XNe < distill_critical_XNe) then
            ! exchange O for a mixture of C and Ne
            Xout_sum = XC_out + XNe_out
-           if(XO <= Xout_sum) then
+           if(XO <= Xout_sum/dq_ratio) then
               ! Can exchange all O in zone k for C and Ne
               dXO = s% xa(net_io16,k)
            else
               ! can only exchange as much O as we have C and Ne in external zone,
               ! but next iteration should get rid of the rest of the O
-              dXO = Xout_sum
+              dXO = Xout_sum/dq_ratio
            end if
            ! make relative fractions of exchanged C12, Ne20, and Ne22 proportional to fractions in zone k-1,
            ! with dXC + dXNe20 + dXNe22 = dXO
@@ -341,10 +343,10 @@
            s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22*dq_ratio
         else if(XNe < distill_critical_XNe) then
            ! continue increasing XNe until reaching critical value
-           if(XNe_out <= (distill_critical_XNe - XNe)) then
+           if(XNe_out/dq_ratio <= (distill_critical_XNe - XNe)) then
               ! pull all Ne from zone k-1 into zone k, exchange for C
-              dXNe20 = s% xa(net_ine20,k-1)
-              dXNe22 = s% xa(net_ine22,k-1)
+              dXNe20 = s% xa(net_ine20,k-1)/dq_ratio
+              dXNe22 = s% xa(net_ine22,k-1)/dq_ratio
               dXC = dXNe20 + dXNe22
            else
               ! Only exchange as much as needed to reach critical Ne
@@ -369,6 +371,21 @@
            stop
         end if
 
+        ! for debugging
+        ! TODO: get rid of this block when development is more stable
+        if(.true.) then 
+           XC = s% xa(net_ic12,k)
+           XO = s% xa(net_io16,k)
+           XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+           
+           XC_out = s% xa(net_ic12,k-1)
+           XO_out = s% xa(net_io16,k-1)
+           XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+           print *, "after distill at boundary;  k, XC, XO, XNe, XC_out, XO_out, XNe_out", &
+                k, XC, XO, XNe, XC_out, XO_out, XNe_out
+           print *, "dq_ratio:", dq_ratio
+        end if
+        
         call update_model_(s,k-1,s%nz,.true.)
         
       end subroutine distill_at_boundary
