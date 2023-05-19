@@ -235,8 +235,9 @@
                end if
                XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-               if(XNe >= distill_final_XNe) then
-                  ! done distilling this zone, mark crystallized
+               if(XNe >= distill_final_XNe .and. &
+                    s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
+                  ! done distilling this zone and everything inward from it, mark crystallized
                   s% crystal_core_boundary_mass = s% m(k)
                   print *, "setting crystal_core_boundary_mass after distilling zone", k
                   ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
