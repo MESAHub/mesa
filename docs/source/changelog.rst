@@ -114,6 +114,13 @@ species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
 *individually* to all isotopes of hydrogen, helium or metals,
 respectively.
 
+Colors
+~~~~~~
+
+The colors module now returns `-1d99` when asking for a value that is
+off table
+
+
 .. _New Features main:
 
 New Features
