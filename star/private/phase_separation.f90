@@ -48,10 +48,10 @@
          integer, intent(out) :: ierr
 
          if(s% phase_separation_option == 'CO') then
-            call do_2component_phase_separation(s, dt, 'CO', -1, ierr)
+            call do_2component_phase_separation(s, dt, 'CO', .true., ierr)
             ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'ONe') then
-            call do_2component_phase_separation(s, dt, 'ONe', -1, ierr)
+            call do_2component_phase_separation(s, dt, 'ONe', .true., ierr)
             ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'distillation') then
             call do_distillation(s, dt, ierr)
@@ -61,36 +61,31 @@
          end if
       end subroutine do_phase_separation
       
-      subroutine do_2component_phase_separation(s, dt, components, k_in, ierr)
+      subroutine do_2component_phase_separation(s, dt, components, set_mixing_and_energy, ierr)
          use chem_def, only: chem_isos, ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
-         integer, intent(in) :: k_in ! option to separate only one zone if specified k_in > 0
+         logical, intent(in) :: set_mixing_and_energy
          integer, intent(out) :: ierr
          
          real(dp) :: dq_crystal, XNe, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
-         logical :: save_Skye_use_ion_offsets, set_mixing_and_energy
-
-         if(k_in > 0) then
-            set_mixing_and_energy = .false.
-         else
-            set_mixing_and_energy = .true.
-         end if
+         logical :: save_Skye_use_ion_offsets
 
          if(set_mixing_and_energy) then
             ! Set phase separation mixing mass negative at beginning of phase separation
             s% phase_sep_mixing_mass = -1d0
             s% eps_phase_separation(1:s%nz) = 0d0
          end if
-         
+
+         ! TODO: check if this makes sense for calls from distillation
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
-
+            
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
          net_ine20 = s% net_iso(ine20)
@@ -109,26 +104,22 @@
          XNe = s% xa(net_ine20,k_bound)
          ! Check that we're still in C/O or O/Ne dominated material as appropriate,
          ! otherwise skip phase separation
-         if(components == 'CO'.and. XO + XC < 0.9d0 .and. k_in < 1) return
-         if(components == 'ONe'.and. XNe + XO < 0.8d0 .and. k_in < 1) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
+         if(components == 'CO'.and. XO + XC < 0.9d0) return
+         if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
          
          ! If there is a phase transition, reset the composition at the boundary
-         if(k_bound > 0 .or. k_in > 0) then
+         if(k_bound > 0) then
             dq_crystal = 0d0
 
-            if(k_in > 0) then
-               kstart = k_in
-            else
-               ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
-               ! to account for loss of precision during remeshing.
-               pad = s% min_dq * s% m(1) * 0.5d0
-               do k = s%nz,1,-1
-                  if(s% m(k) > s% crystal_core_boundary_mass + pad) then
-                     kstart = k
-                     exit
-                  end if
-               end do
-            end if
+            ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
+            ! to account for loss of precision during remeshing.
+            pad = s% min_dq * s% m(1) * 0.5d0
+            do k = s%nz,1,-1
+               if(s% m(k) > s% crystal_core_boundary_mass + pad) then
+                  kstart = k
+                  exit
+               end if
+            end do
 
             if(set_mixing_and_energy) then
                ! calculate energy associated with phase separation, ignoring the ionization
@@ -144,7 +135,7 @@
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
-               if(s% phase(k) <= eos_phase_boundary .or. k < k_in) then
+               if(s% phase(k) <= eos_phase_boundary) then
                   s% crystal_core_boundary_mass = s% m(k+1)
                   exit
                end if
@@ -153,7 +144,7 @@
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
                if(dq_crystal > 0d0) then
-                  call mix_outward(s, k-1)
+                  call mix_outward(s, k-1, 0)
                end if
                
             end do
@@ -181,8 +172,8 @@
          integer, intent(out) :: ierr
          
          real(dp) :: GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit
-         integer :: k, net_ic12, net_io16, net_ine20, net_ine22
-         logical :: save_Skye_use_ion_offsets
+         integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
+         logical :: save_Skye_use_ion_offsets, distilling
 
          distill_final_XNe = 0.3143d0
          
@@ -210,7 +201,16 @@
             s% eps_phase_separation(k) = s% energy(k)
          end do
 
-         do k = s%nz, 1, -1
+         pad = s% min_dq * s% m(1) * 0.5d0
+         do k = s%nz,1,-1
+            if(s% m(k) > s% crystal_core_boundary_mass + pad) then
+               kstart = k
+               exit
+            end if
+         end do
+
+         distilling = .false.
+         do k = kstart, 1, -1
             XC = s% xa(net_ic12,k)
             XO = s% xa(net_io16,k)
             XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -220,40 +220,42 @@
             ! Check whether we are in a regime where distillation should occur
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
             XNe_crit = blouin_XNe_crit(GammaC)
-            print *, "Gamma, GammaC", s% gam(k), GammaC
-
-            pad = s% min_dq * s% m(1) * 0.5d0
-            if(s% m(k) < s% crystal_core_boundary_mass + pad) then
-               ! This material has frozen, so leave it alone
-               cycle
-            else if(XNe > XNe_crit) then
+            
+            if(XNe > XNe_crit) then
                ! should be distilling in this zone
+               distilling = .true. ! so we know not to do 2 component separation later
                
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O),
                ! as long as there is enough Ne in the next zone out to proceed
                ! TODO: might need some padding on XNe_crit here, remember XNe_crit can be negative too
-               do while(XNe < distill_final_XNe .and. XNe_out > XNe_crit)
+               if(XNe < distill_final_XNe .and. XNe_out > XNe_crit) then
                   call distill_at_boundary(s,k,distill_final_XNe)
                   ! mix from zone k-1 outward
-                  call mix_outward(s, k-1)
-                  XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
-                  XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-               end do
-               s% crystal_core_boundary_mass = s% m(k)
-               ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
-            else
-               ! not distilling, but may phase separate,
-               ! so fall back to 2component phase separation
-               if(s% phase(k) < eos_phase_boundary) then
-                  ! once we reach a point where not distilling or freezing,
-                  ! break out of do loop
-                  exit
-               else
-                  ! limit this call to one zone at a time
-                  call do_2component_phase_separation(s, dt, 'CO', k, ierr)
+                  call mix_outward(s, k-1, 2)
                end if
+               XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+               XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+               if(XNe >= distill_final_XNe) then
+                  ! done distilling this zone, mark crystallized
+                  s% crystal_core_boundary_mass = s% m(k)
+                  print *, "setting crystal_core_boundary_mass after distilling zone", k
+                  ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
+               end if
+            else
+               ! break out of loop once reaching a point where XNe < XNe_crit
+               exit
             end if
          end do
+
+         if(.not. distilling) then
+            ! fall back to 2component phase separation
+            ! TODO: since eos_phase_boundary is not 0.5, crystallization is delayed,
+            ! and that might lead to some distillation where phase separation should happen instead
+            ! limit this call to one zone at a time
+            ! Could maybe use this loop just to mark which regions of the star
+            ! should distill at phi=0.5, then have a separate loop actually do the distillation/separation
+            call do_2component_phase_separation(s, dt, 'CO', .false., ierr)
+         end if
          
          call update_model_(s,1,s%nz,.false.)
          
@@ -308,7 +310,7 @@
         ! for C/Ne mixture until O is depleted. Then exchange C/Ne until reaching critical
         ! Ne value.
 
-        if(XO > 0d0 .and. XNe < distill_final_XNe) then
+        if(XO > 1d-15 .and. XNe < distill_final_XNe) then
            ! exchange O for a mixture of C and Ne
            Xout_sum = XC_out + XNe_out
            if(XO <= Xout_sum/dq_ratio) then
@@ -454,9 +456,9 @@
       end subroutine move_one_zone
       
       ! mix composition outward until reaching stable composition profile
-      subroutine mix_outward(s,kbot)
+      subroutine mix_outward(s,kbot,min_mix_zones)
         type(star_info), pointer :: s
-        integer, intent(in)      :: kbot
+        integer, intent(in)      :: kbot, min_mix_zones
         
         real(dp) :: avg_xa(s%species)
         real(dp) :: mass, B_term, grada, gradr
@@ -465,7 +467,7 @@
         
         use_brunt = s% phase_separation_mixing_use_brunt
 
-        do k=kbot,1,-1
+        do k=kbot-min_mix_zones,1,-1
            ktop = k
 
            if (s% m(ktop) > s% phase_sep_mixing_mass) then
