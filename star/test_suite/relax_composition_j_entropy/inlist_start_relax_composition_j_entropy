@@ -27,13 +27,22 @@
 
     relax_initial_angular_momentum = .true.
     relax_angular_momentum_filename = "angular_momentum.dat"
+    timescale_for_relax_angular_momentum = 1d-10
+    max_dt_for_relax_angular_momentum = 1d-9
+    num_timescales_for_relax_angular_momentum = 100
 
     relax_initial_entropy = .true.
     relax_entropy_filename = "entropy.dat"
+    timescale_for_relax_entropy = 1d-10
+    max_dt_for_relax_entropy = 1d-9
+    num_timescales_for_relax_entropy = 100
       
     save_model_when_terminate = .true.
     save_model_filename = 'relaxed.mod'
     required_termination_code_string = 'Values for Teff and L are within tolerance'
+
+    set_initial_age = .true.
+    initial_age = 1d8
 
 / ! end of star_job namelist
 
