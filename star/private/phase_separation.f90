@@ -78,12 +78,12 @@
             ! Set phase separation mixing mass negative at beginning of phase separation
             s% phase_sep_mixing_mass = -1d0
             s% eps_phase_separation(1:s%nz) = 0d0
-         end if
 
-         ! TODO: check if this makes sense for calls from distillation
-         if(s% phase(s% nz) < eos_phase_boundary) then
-            s% crystal_core_boundary_mass = 0d0
-            return
+            ! TODO: check if this makes sense for calls from distillation
+            if(s% phase(s% nz) < eos_phase_boundary) then
+               s% crystal_core_boundary_mass = 0d0
+               return
+            end if
          end if
             
          net_ic12 = s% net_iso(ic12)
@@ -171,10 +171,11 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit
-         integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
+         real(dp) :: GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, max_distill_q
+         integer :: k, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones
          logical :: save_Skye_use_ion_offsets, distilling
 
+         max_distill_q = 0.2
          distill_final_XNe = 0.3143d0
          
          s% eps_phase_separation(1:s%nz) = 0d0
@@ -209,8 +210,15 @@
             end if
          end do
 
+         do k = s%nz,1,-1
+            if(s% q(k) - s% q(kstart) > max_distill_q ) then
+               kend = k
+               exit
+            end if
+         end do
+
          distilling = .false.
-         do k = kstart, 1, -1
+         do k = kstart, kend, -1
             XC = s% xa(net_ic12,k)
             XO = s% xa(net_io16,k)
             XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -221,7 +229,7 @@
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
             XNe_crit = blouin_XNe_crit(GammaC)
             
-            if(XNe > XNe_crit) then
+            if(XNe > max(XNe_crit,3d-4)) then
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
                
@@ -231,19 +239,20 @@
                if(XNe < distill_final_XNe .and. XNe_out > XNe_crit) then
                   call distill_at_boundary(s,k,distill_final_XNe)
                   ! mix from zone k-1 outward
-                  call mix_outward(s, k-1, 2)
+                  call mix_outward(s, k-1, 3)
                end if
                XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-               if(XNe >= distill_final_XNe .and. &
-                    s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
-                  ! done distilling this zone and everything inward from it, mark crystallized
-                  s% crystal_core_boundary_mass = s% m(k)
-                  print *, "setting crystal_core_boundary_mass after distilling zone", k
-                  ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
+               if(XNe >= distill_final_XNe .or. XNe_out < 3d-4) then
+                  if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
+                     ! done distilling this zone and everything inward from it, mark crystallized
+                     s% crystal_core_boundary_mass = s% m(k)
+                     print *, "setting crystal_core_boundary_mass after distilling zone", k
+                     ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
+                  end if
                end if
             else
-               ! break out of loop once reaching a point where XNe < XNe_crit
+               ! break out of loop once reaching a point where XNe < XNe_crit or 3d-4
                exit
             end if
          end do
@@ -314,6 +323,7 @@
         ! C and Ne need to increase, so check how much is available in next zone out
         max_Delta_XC = min(Delta_XC,XC_out/dq_ratio)
         max_Delta_XNe = min(Delta_XNe,XNe_out/dq_ratio)
+        max_Delta_XNe = min(max_Delta_XNe,0.03d0) ! avoid having overly dramatic changes in XNe for energy purposes
 
         ! O needs to go to zero by getting pushed into next zone out,
         ! so check how much next zone out can accept
