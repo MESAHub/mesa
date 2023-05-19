@@ -281,7 +281,9 @@
         real(dp) :: Delta_XC, Delta_XO, Delta_XNe, max_Delta_XC, max_Delta_XO, max_Delta_XNe
         real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio, scale
         integer :: net_ic12, net_io16, net_ine20, net_ine22
+        logical :: debug
 
+        debug = .false.
         dq_ratio = s% dq(k) / s% dq(k-1)
         
         net_ic12 = s% net_iso(ic12)
@@ -296,10 +298,6 @@
         XC_out = s% xa(net_ic12,k-1)
         XO_out = s% xa(net_io16,k-1)
         XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-
-        print *, "k, nz, dq_ratio", k, s%nz, dq_ratio
-        print *, "before distill at boundary; XC, XO, XNe, XC_out, XO_out, XNe_out", &
-             XC, XO, XNe, XC_out, XO_out, XNe_out
 
         ! Net effect of distillation is that crystals enriched in oxygen float upward.
         ! Need to limit toward xNe = 0.2, xC = 0.8. Start by pushing O outward in exchange
@@ -331,8 +329,16 @@
         dXNe20 = dXNe_tot*s% xa(net_ine20,k-1)/XNe_out ! proportional to composition of outer zone because that's what distills inward
         dXNe22 = dXNe_tot*s% xa(net_ine22,k-1)/XNe_out
 
-        print *, "max_Delta_XC, max_Delta_XO, max_Delta_XNe, dXC, dXO, dXNe", &
-             max_Delta_XC, max_Delta_XO, max_Delta_XNe, dXC, dXO, dXNe_tot
+        ! for debugging
+        ! TODO: get rid of this block when development is more stable
+        if(debug) then
+           print *, "k, nz, dq_ratio", k, s%nz, dq_ratio
+           print *, "before distill at boundary; XC, XO, XNe, XC_out, XO_out, XNe_out", &
+                XC, XO, XNe, XC_out, XO_out, XNe_out
+           
+           print *, "max_Delta_XC, max_Delta_XO, max_Delta_XNe, dXC, dXO, dXNe", &
+                max_Delta_XC, max_Delta_XO, max_Delta_XNe, dXC, dXO, dXNe_tot
+        end if
         
         s% xa(net_ic12,k) = s% xa(net_ic12,k) + dXC
         s% xa(net_io16,k) = s% xa(net_io16,k) + dXO ! dXO should be negative, so we're pushing O out of this zone
@@ -348,7 +354,7 @@
         
         ! for debugging
         ! TODO: get rid of this block when development is more stable
-        if(.true.) then 
+        if(debug) then
            XC = s% xa(net_ic12,k)
            XO = s% xa(net_io16,k)
            XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -568,7 +574,6 @@
         GammaC2 = 180d0
 
         XNe_crit = XNe1 + (GammaC - GammaC1)*(XNe2 - XNe1)/(GammaC2-GammaC1)
-        print *, "Blouin XNe crit: GammaC, XNe_crit", GammaC, XNe_crit
         
         blouin_XNe_crit = XNe_crit
       end function blouin_XNe_crit
