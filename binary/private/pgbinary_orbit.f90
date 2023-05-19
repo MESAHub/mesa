@@ -342,14 +342,20 @@ contains
       
       end function xl1_fit
       
-      real(dp) function Psi_fit(req, qq)
+      real(dp) function Psi_fit(r_eq, qq)
          ! aprroximation of Roche potential versus q = m_other / m_this and r_eq, the &
-         ! dimensionless volume equivalent radius (== r / separation of the model)
-         real(dp), intent(in) :: req, qq
-         Psi_fit = -1d0 / req - qq &
-            - 0.5533 * (1 + qq) * req ** 2 &
-            - 0.3642 * req ** 2 * (req ** 2 - 1) &
-            - 1.8693 * req * (req - 0.1) * (req - 0.3) * (req - 0.7) * (req - 1.0414)
+         ! dimensionless volume equivalent radius (== r / separation of the model), with limit at 5%
+         real(dp), intent(in) :: r_eq, qq
+         real(dp) :: r_here
+         if (req <= 0.05) then
+            r_here = 0.05
+         else
+            r_here = r_eq
+         end if
+         Psi_fit = -1d0 / r_here - qq &
+            - 0.5533 * (1 + qq) * r_here ** 2 &
+            - 0.3642 * r_here ** 2 * (r_here ** 2 - 1) &
+            - 1.8693 * r_here * (r_here - 0.1) * (r_here - 0.3) * (r_here - 0.7) * (r_here - 1.0414)
       end function Psi_fit
       
       real(dp) function roche(r, ccosp, qq)
