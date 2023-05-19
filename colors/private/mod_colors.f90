@@ -550,12 +550,12 @@
          end if
                   
          ierr = 0
+
+        ! write(*,*) log_Teff,log_g, M_div_h_in
          
-         if (lgt >= thead% lgt) then ! use the largest lgt
-            call get_glist_results( &
-               thead% glist, lgg, lgz, results1, thead%n_colors, ierr)
-            if (ierr /= 0) return
-            results = results1
+         if (lgt >= thead% lgt) then ! Error out
+            results = -1d99
+            return
          else
             
             tlist => thead
@@ -573,6 +573,10 @@
                   if (ierr /= 0) return
                   call get_glist_results(tnxt% glist, lgg, lgz, results2, n_colors, ierr)
                   if (ierr /= 0) return
+                  if(any(results1<-1d50) .or.any(results2<-1d50) ) then
+                     results = -1d99
+                     return
+                  end if
                   alfa = (lgt - tnxt% lgt) / (tlist% lgt - tnxt% lgt)
                   beta = 1.d0 - alfa
                   results(1:n_colors) = alfa * results1(1:n_colors) + beta * results2(1:n_colors)
@@ -580,19 +584,12 @@
                end if
                tlist => tnxt
             end do
-      
-            if (.not. (associated(tlist% nxt))) then
-               ! use the smallest lgt
-               call get_glist_results( &
-                  tlist% glist, lgg, lgz, results1, n_colors,ierr)
-               if (ierr /= 0) return
-               results = results1
-            end if
-         
          end if
+      
+         ! Below all available log t's
+         results = -1d99
+
          
-         !results(bol) = colors_bol
-                  
       end subroutine Eval_Colors
       
       
@@ -606,10 +603,9 @@
          type (lgg_list), pointer :: glist => null(), gnxt => null()
          real(dp),dimension(max_num_bcs_per_file) :: results1, results2
          real(dp) :: alfa, beta
-               
-         
+                        
          glist => gptr
-         ierr = -1
+         ierr = 0
          if (.not. associated(glist)) then
             write(*,*) 'bad glist for get_glist_results'
             ierr = -1
@@ -617,10 +613,7 @@
          end if
          
          if (lgg >= glist% lgg) then ! use the largest lgg
-            call get_zlist_results( &
-               glist% zlist, lgz, results1, n_colors, ierr)
-            if (ierr /= 0) return
-            results = results1
+            results = -1d99
             return
          end if
 
@@ -636,7 +629,12 @@
                call get_zlist_results(glist% zlist, lgz, results1, n_colors, ierr)
                if (ierr /= 0) return
                call get_zlist_results(gnxt% zlist, lgz, results2, n_colors, ierr)
-               if (ierr /= 0) return               
+               if (ierr /= 0) return      
+         
+               if(any(results1<-1d50) .or.any(results2<-1d50) ) then
+                  results = -1d99
+                  return
+               end if
                alfa = (lgg - gnxt% lgg) / (glist% lgg - gnxt% lgg)
                beta = 1.d0 - alfa
                results(1:n_colors) = alfa * results1(1:n_colors) + beta * results2(1:n_colors)
@@ -645,10 +643,8 @@
             glist => gnxt
          end do
       
-         ! use the smallest lgg
-         call get_zlist_results(glist% zlist, lgz, results1, n_colors, ierr)
-         if (ierr /= 0) return
-         results = results1
+         ! below all available log g's
+         results = -1d99
                
       end subroutine get_glist_results
       
@@ -673,7 +669,7 @@
          end if
          
          if (lgz >= zlist% lgz) then ! use the largest lgz
-            results = zlist% colors
+            results = -1d99
             return
          end if
 
@@ -692,8 +688,8 @@
             zlist => znxt
          end do
       
-         ! use the smallest lgz
-         results = zlist% colors
+         ! below all available log z's
+         results = -1d99
       
       end subroutine get_zlist_results
 
