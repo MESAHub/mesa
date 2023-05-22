@@ -105,6 +105,9 @@ contains
          return
       end if
 
+      b% pg% star_1_color = clr_Goldenrod
+      b% pg% star_2_color = clr_LightSkyBlue
+
       have_initialized_pgbinary = .true.
    end subroutine init_pgbinary
 

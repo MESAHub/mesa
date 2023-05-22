@@ -282,12 +282,12 @@ contains
       call show_xaxis_label_pgbinary(b, 'separation')
       call show_left_yaxis_label_pgbinary(b, 'separation')
 
-      call pgsci(clr_Goldenrod)
+      call pgsci(b% pg% star_1_color)
       call pgmtxt('T', -2.0, 0.05, 0.0, 'Star 1')
       call pgslw(b% pg% pgbinary_lw / 2)
       call pgline(2 * num_points + 1, x1s, y1s)
 
-      call pgsci(clr_LightSkyBlue)
+      call pgsci(b% pg% star_2_color)
       call pgmtxt('T', -2.0 - 1.3, 0.05, 0.0, 'Star 2')
       call pgslw(b% pg% pgbinary_lw / 2)
       call pgline(2 * num_points + 1, x2s, y2s)

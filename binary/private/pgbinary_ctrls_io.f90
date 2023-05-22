@@ -619,6 +619,412 @@ module pgbinary_ctrls_io
       History_Track9_title, &
       History_Track9_use_decorator, &
 
+      Star_History_track1_win_flag, &
+      Star_History_track1_file_flag, &
+      Star_History_track1_file_interval, &
+      Star_History_track1_step_min, &
+      Star_History_track1_step_max, &
+      show_Star_History_track1_target_box, &
+      Star_History_track1_n_sigma, &
+      Star_History_track1_xtarget, &
+      Star_History_track1_xsigma, &
+      Star_History_track1_ytarget, &
+      Star_History_track1_ysigma, &
+      Star_History_track1_xname, &
+      Star_History_track1_xaxis_label, &
+      Star_History_track1_yname, &
+      Star_History_track1_yaxis_label, &
+      Star_History_track1_file_dir, &
+      Star_History_track1_file_prefix, &
+      show_Star_History_track1_annotation1, &
+      show_Star_History_track1_annotation2, &
+      show_Star_History_track1_annotation3, &
+      Star_History_track1_fname, &
+      Star_History_track1_reverse_xaxis, &
+      Star_History_track1_reverse_yaxis, &
+      Star_History_track1_log_xaxis, &
+      Star_History_track1_log_yaxis, &
+      Star_History_track1_xmin, &
+      Star_History_track1_xmax, &
+      Star_History_track1_ymin, &
+      Star_History_track1_ymax, &
+      Star_History_track1_xmargin, &
+      Star_History_track1_ymargin, &
+      Star_History_track1_dxmin, &
+      Star_History_track1_dymin, &
+      Star_History_track1_win_width, &
+      Star_History_track1_win_aspect_ratio, &
+      Star_History_track1_file_width, &
+      Star_History_track1_file_aspect_ratio, &
+      Star_History_track1_xleft, &
+      Star_History_track1_xright, &
+      Star_History_track1_ybot, &
+      Star_History_track1_ytop, &
+      Star_History_track1_txt_scale, &
+      Star_History_track1_title, &
+      Star_History_track1_use_decorator, &
+
+      Star_History_track2_win_flag, &
+      Star_History_track2_file_flag, &
+      Star_History_track2_file_interval, &
+      Star_History_track2_step_min, &
+      Star_History_track2_step_max, &
+      show_Star_History_track2_target_box, &
+      Star_History_track2_n_sigma, &
+      Star_History_track2_xtarget, &
+      Star_History_track2_xsigma, &
+      Star_History_track2_ytarget, &
+      Star_History_track2_ysigma, &
+      Star_History_track2_xname, &
+      Star_History_track2_xaxis_label, &
+      Star_History_track2_yname, &
+      Star_History_track2_yaxis_label, &
+      Star_History_track2_file_dir, &
+      Star_History_track2_file_prefix, &
+      show_Star_History_track2_annotation1, &
+      show_Star_History_track2_annotation2, &
+      show_Star_History_track2_annotation3, &
+      Star_History_track2_fname, &
+      Star_History_track2_reverse_xaxis, &
+      Star_History_track2_reverse_yaxis, &
+      Star_History_track2_log_xaxis, &
+      Star_History_track2_log_yaxis, &
+      Star_History_track2_xmin, &
+      Star_History_track2_xmax, &
+      Star_History_track2_ymin, &
+      Star_History_track2_ymax, &
+      Star_History_track2_xmargin, &
+      Star_History_track2_ymargin, &
+      Star_History_track2_dxmin, &
+      Star_History_track2_dymin, &
+      Star_History_track2_win_width, &
+      Star_History_track2_win_aspect_ratio, &
+      Star_History_track2_file_width, &
+      Star_History_track2_file_aspect_ratio, &
+      Star_History_track2_xleft, &
+      Star_History_track2_xright, &
+      Star_History_track2_ybot, &
+      Star_History_track2_ytop, &
+      Star_History_track2_txt_scale, &
+      Star_History_track2_title, &
+      Star_History_track2_use_decorator, &
+
+      Star_History_track3_win_flag, &
+      Star_History_track3_file_flag, &
+      Star_History_track3_file_interval, &
+      Star_History_track3_step_min, &
+      Star_History_track3_step_max, &
+      show_Star_History_track3_target_box, &
+      Star_History_track3_n_sigma, &
+      Star_History_track3_xtarget, &
+      Star_History_track3_xsigma, &
+      Star_History_track3_ytarget, &
+      Star_History_track3_ysigma, &
+      Star_History_track3_xname, &
+      Star_History_track3_xaxis_label, &
+      Star_History_track3_yname, &
+      Star_History_track3_yaxis_label, &
+      Star_History_track3_file_dir, &
+      Star_History_track3_file_prefix, &
+      show_Star_History_track3_annotation1, &
+      show_Star_History_track3_annotation2, &
+      show_Star_History_track3_annotation3, &
+      Star_History_track3_fname, &
+      Star_History_track3_reverse_xaxis, &
+      Star_History_track3_reverse_yaxis, &
+      Star_History_track3_log_xaxis, &
+      Star_History_track3_log_yaxis, &
+      Star_History_track3_xmin, &
+      Star_History_track3_xmax, &
+      Star_History_track3_ymin, &
+      Star_History_track3_ymax, &
+      Star_History_track3_xmargin, &
+      Star_History_track3_ymargin, &
+      Star_History_track3_dxmin, &
+      Star_History_track3_dymin, &
+      Star_History_track3_win_width, &
+      Star_History_track3_win_aspect_ratio, &
+      Star_History_track3_file_width, &
+      Star_History_track3_file_aspect_ratio, &
+      Star_History_track3_xleft, &
+      Star_History_track3_xright, &
+      Star_History_track3_ybot, &
+      Star_History_track3_ytop, &
+      Star_History_track3_txt_scale, &
+      Star_History_track3_title, &
+      Star_History_track3_use_decorator, &
+
+      Star_History_track4_win_flag, &
+      Star_History_track4_file_flag, &
+      Star_History_track4_file_interval, &
+      Star_History_track4_step_min, &
+      Star_History_track4_step_max, &
+      show_Star_History_track4_target_box, &
+      Star_History_track4_n_sigma, &
+      Star_History_track4_xtarget, &
+      Star_History_track4_xsigma, &
+      Star_History_track4_ytarget, &
+      Star_History_track4_ysigma, &
+      Star_History_track4_xname, &
+      Star_History_track4_xaxis_label, &
+      Star_History_track4_yname, &
+      Star_History_track4_yaxis_label, &
+      Star_History_track4_file_dir, &
+      Star_History_track4_file_prefix, &
+      show_Star_History_track4_annotation1, &
+      show_Star_History_track4_annotation2, &
+      show_Star_History_track4_annotation3, &
+      Star_History_track4_fname, &
+      Star_History_track4_reverse_xaxis, &
+      Star_History_track4_reverse_yaxis, &
+      Star_History_track4_log_xaxis, &
+      Star_History_track4_log_yaxis, &
+      Star_History_track4_xmin, &
+      Star_History_track4_xmax, &
+      Star_History_track4_ymin, &
+      Star_History_track4_ymax, &
+      Star_History_track4_xmargin, &
+      Star_History_track4_ymargin, &
+      Star_History_track4_dxmin, &
+      Star_History_track4_dymin, &
+      Star_History_track4_win_width, &
+      Star_History_track4_win_aspect_ratio, &
+      Star_History_track4_file_width, &
+      Star_History_track4_file_aspect_ratio, &
+      Star_History_track4_xleft, &
+      Star_History_track4_xright, &
+      Star_History_track4_ybot, &
+      Star_History_track4_ytop, &
+      Star_History_track4_txt_scale, &
+      Star_History_track4_title, &
+      Star_History_track4_use_decorator, &
+
+      Star_History_track5_win_flag, &
+      Star_History_track5_file_flag, &
+      Star_History_track5_file_interval, &
+      Star_History_track5_step_min, &
+      Star_History_track5_step_max, &
+      show_Star_History_track5_target_box, &
+      Star_History_track5_n_sigma, &
+      Star_History_track5_xtarget, &
+      Star_History_track5_xsigma, &
+      Star_History_track5_ytarget, &
+      Star_History_track5_ysigma, &
+      Star_History_track5_xname, &
+      Star_History_track5_xaxis_label, &
+      Star_History_track5_yname, &
+      Star_History_track5_yaxis_label, &
+      Star_History_track5_file_dir, &
+      Star_History_track5_file_prefix, &
+      show_Star_History_track5_annotation1, &
+      show_Star_History_track5_annotation2, &
+      show_Star_History_track5_annotation3, &
+      Star_History_track5_fname, &
+      Star_History_track5_reverse_xaxis, &
+      Star_History_track5_reverse_yaxis, &
+      Star_History_track5_log_xaxis, &
+      Star_History_track5_log_yaxis, &
+      Star_History_track5_xmin, &
+      Star_History_track5_xmax, &
+      Star_History_track5_ymin, &
+      Star_History_track5_ymax, &
+      Star_History_track5_xmargin, &
+      Star_History_track5_ymargin, &
+      Star_History_track5_dxmin, &
+      Star_History_track5_dymin, &
+      Star_History_track5_win_width, &
+      Star_History_track5_win_aspect_ratio, &
+      Star_History_track5_file_width, &
+      Star_History_track5_file_aspect_ratio, &
+      Star_History_track5_xleft, &
+      Star_History_track5_xright, &
+      Star_History_track5_ybot, &
+      Star_History_track5_ytop, &
+      Star_History_track5_txt_scale, &
+      Star_History_track5_title, &
+      Star_History_track5_use_decorator, &
+
+      Star_History_track6_win_flag, &
+      Star_History_track6_file_flag, &
+      Star_History_track6_file_interval, &
+      Star_History_track6_step_min, &
+      Star_History_track6_step_max, &
+      show_Star_History_track6_target_box, &
+      Star_History_track6_n_sigma, &
+      Star_History_track6_xtarget, &
+      Star_History_track6_xsigma, &
+      Star_History_track6_ytarget, &
+      Star_History_track6_ysigma, &
+      Star_History_track6_xname, &
+      Star_History_track6_xaxis_label, &
+      Star_History_track6_yname, &
+      Star_History_track6_yaxis_label, &
+      Star_History_track6_file_dir, &
+      Star_History_track6_file_prefix, &
+      show_Star_History_track6_annotation1, &
+      show_Star_History_track6_annotation2, &
+      show_Star_History_track6_annotation3, &
+      Star_History_track6_fname, &
+      Star_History_track6_reverse_xaxis, &
+      Star_History_track6_reverse_yaxis, &
+      Star_History_track6_log_xaxis, &
+      Star_History_track6_log_yaxis, &
+      Star_History_track6_xmin, &
+      Star_History_track6_xmax, &
+      Star_History_track6_ymin, &
+      Star_History_track6_ymax, &
+      Star_History_track6_xmargin, &
+      Star_History_track6_ymargin, &
+      Star_History_track6_dxmin, &
+      Star_History_track6_dymin, &
+      Star_History_track6_win_width, &
+      Star_History_track6_win_aspect_ratio, &
+      Star_History_track6_file_width, &
+      Star_History_track6_file_aspect_ratio, &
+      Star_History_track6_xleft, &
+      Star_History_track6_xright, &
+      Star_History_track6_ybot, &
+      Star_History_track6_ytop, &
+      Star_History_track6_txt_scale, &
+      Star_History_track6_title, &
+      Star_History_track6_use_decorator, &
+
+      Star_History_track7_win_flag, &
+      Star_History_track7_file_flag, &
+      Star_History_track7_file_interval, &
+      Star_History_track7_step_min, &
+      Star_History_track7_step_max, &
+      show_Star_History_track7_target_box, &
+      Star_History_track7_n_sigma, &
+      Star_History_track7_xtarget, &
+      Star_History_track7_xsigma, &
+      Star_History_track7_ytarget, &
+      Star_History_track7_ysigma, &
+      Star_History_track7_xname, &
+      Star_History_track7_xaxis_label, &
+      Star_History_track7_yname, &
+      Star_History_track7_yaxis_label, &
+      Star_History_track7_file_dir, &
+      Star_History_track7_file_prefix, &
+      show_Star_History_track7_annotation1, &
+      show_Star_History_track7_annotation2, &
+      show_Star_History_track7_annotation3, &
+      Star_History_track7_fname, &
+      Star_History_track7_reverse_xaxis, &
+      Star_History_track7_reverse_yaxis, &
+      Star_History_track7_log_xaxis, &
+      Star_History_track7_log_yaxis, &
+      Star_History_track7_xmin, &
+      Star_History_track7_xmax, &
+      Star_History_track7_ymin, &
+      Star_History_track7_ymax, &
+      Star_History_track7_xmargin, &
+      Star_History_track7_ymargin, &
+      Star_History_track7_dxmin, &
+      Star_History_track7_dymin, &
+      Star_History_track7_win_width, &
+      Star_History_track7_win_aspect_ratio, &
+      Star_History_track7_file_width, &
+      Star_History_track7_file_aspect_ratio, &
+      Star_History_track7_xleft, &
+      Star_History_track7_xright, &
+      Star_History_track7_ybot, &
+      Star_History_track7_ytop, &
+      Star_History_track7_txt_scale, &
+      Star_History_track7_title, &
+      Star_History_track7_use_decorator, &
+
+      Star_History_track8_win_flag, &
+      Star_History_track8_file_flag, &
+      Star_History_track8_file_interval, &
+      Star_History_track8_step_min, &
+      Star_History_track8_step_max, &
+      show_Star_History_track8_target_box, &
+      Star_History_track8_n_sigma, &
+      Star_History_track8_xtarget, &
+      Star_History_track8_xsigma, &
+      Star_History_track8_ytarget, &
+      Star_History_track8_ysigma, &
+      Star_History_track8_xname, &
+      Star_History_track8_xaxis_label, &
+      Star_History_track8_yname, &
+      Star_History_track8_yaxis_label, &
+      Star_History_track8_file_dir, &
+      Star_History_track8_file_prefix, &
+      show_Star_History_track8_annotation1, &
+      show_Star_History_track8_annotation2, &
+      show_Star_History_track8_annotation3, &
+      Star_History_track8_fname, &
+      Star_History_track8_reverse_xaxis, &
+      Star_History_track8_reverse_yaxis, &
+      Star_History_track8_log_xaxis, &
+      Star_History_track8_log_yaxis, &
+      Star_History_track8_xmin, &
+      Star_History_track8_xmax, &
+      Star_History_track8_ymin, &
+      Star_History_track8_ymax, &
+      Star_History_track8_xmargin, &
+      Star_History_track8_ymargin, &
+      Star_History_track8_dxmin, &
+      Star_History_track8_dymin, &
+      Star_History_track8_win_width, &
+      Star_History_track8_win_aspect_ratio, &
+      Star_History_track8_file_width, &
+      Star_History_track8_file_aspect_ratio, &
+      Star_History_track8_xleft, &
+      Star_History_track8_xright, &
+      Star_History_track8_ybot, &
+      Star_History_track8_ytop, &
+      Star_History_track8_txt_scale, &
+      Star_History_track8_title, &
+      Star_History_track8_use_decorator, &
+
+      Star_History_track9_win_flag, &
+      Star_History_track9_file_flag, &
+      Star_History_track9_file_interval, &
+      Star_History_track9_step_min, &
+      Star_History_track9_step_max, &
+      show_Star_History_track9_target_box, &
+      Star_History_track9_n_sigma, &
+      Star_History_track9_xtarget, &
+      Star_History_track9_xsigma, &
+      Star_History_track9_ytarget, &
+      Star_History_track9_ysigma, &
+      Star_History_track9_xname, &
+      Star_History_track9_xaxis_label, &
+      Star_History_track9_yname, &
+      Star_History_track9_yaxis_label, &
+      Star_History_track9_file_dir, &
+      Star_History_track9_file_prefix, &
+      show_Star_History_track9_annotation1, &
+      show_Star_History_track9_annotation2, &
+      show_Star_History_track9_annotation3, &
+      Star_History_track9_fname, &
+      Star_History_track9_reverse_xaxis, &
+      Star_History_track9_reverse_yaxis, &
+      Star_History_track9_log_xaxis, &
+      Star_History_track9_log_yaxis, &
+      Star_History_track9_xmin, &
+      Star_History_track9_xmax, &
+      Star_History_track9_ymin, &
+      Star_History_track9_ymax, &
+      Star_History_track9_xmargin, &
+      Star_History_track9_ymargin, &
+      Star_History_track9_dxmin, &
+      Star_History_track9_dymin, &
+      Star_History_track9_win_width, &
+      Star_History_track9_win_aspect_ratio, &
+      Star_History_track9_file_width, &
+      Star_History_track9_file_aspect_ratio, &
+      Star_History_track9_xleft, &
+      Star_History_track9_xright, &
+      Star_History_track9_ybot, &
+      Star_History_track9_ytop, &
+      Star_History_track9_txt_scale, &
+      Star_History_track9_title, &
+      Star_History_track9_use_decorator, &
+
+
       History_Panels1_win_flag, &
       History_Panels1_win_width, &
       History_Panels1_win_aspect_ratio, &
@@ -2092,6 +2498,412 @@ contains
       pg% History_Track9_txt_scale = History_Track9_txt_scale
       pg% History_Track9_title = History_Track9_title
       pg% History_Track9_use_decorator = History_Track9_use_decorator
+
+      pg% Star_History_track1_win_flag = Star_History_track1_win_flag
+      pg% Star_History_track1_file_flag = Star_History_track1_file_flag
+      pg% Star_History_track1_file_interval = Star_History_track1_file_interval
+      pg% Star_History_track1_step_min = Star_History_track1_step_min
+      pg% Star_History_track1_step_max = Star_History_track1_step_max
+      pg% show_Star_History_track1_target_box = show_Star_History_track1_target_box
+      pg% Star_History_track1_n_sigma = Star_History_track1_n_sigma
+      pg% Star_History_track1_xtarget = Star_History_track1_xtarget
+      pg% Star_History_track1_xsigma = Star_History_track1_xsigma
+      pg% Star_History_track1_ytarget = Star_History_track1_ytarget
+      pg% Star_History_track1_ysigma = Star_History_track1_ysigma
+      pg% Star_History_track1_file_dir = Star_History_track1_file_dir
+      pg% Star_History_track1_file_prefix = Star_History_track1_file_prefix
+      pg% show_Star_History_track1_annotation1 = show_Star_History_track1_annotation1
+      pg% show_Star_History_track1_annotation2 = show_Star_History_track1_annotation2
+      pg% show_Star_History_track1_annotation3 = show_Star_History_track1_annotation3
+      pg% Star_History_track1_fname = Star_History_track1_fname
+      pg% Star_History_track1_xname = Star_History_track1_xname
+      pg% Star_History_track1_xaxis_label = Star_History_track1_xaxis_label
+      pg% Star_History_track1_yname = Star_History_track1_yname
+      pg% Star_History_track1_yaxis_label = Star_History_track1_yaxis_label
+      pg% Star_History_track1_reverse_xaxis = Star_History_track1_reverse_xaxis
+      pg% Star_History_track1_reverse_yaxis = Star_History_track1_reverse_yaxis
+      pg% Star_History_track1_log_xaxis = Star_History_track1_log_xaxis
+      pg% Star_History_track1_log_yaxis = Star_History_track1_log_yaxis
+      pg% Star_History_track1_xmin = Star_History_track1_xmin
+      pg% Star_History_track1_xmax = Star_History_track1_xmax
+      pg% Star_History_track1_ymin = Star_History_track1_ymin
+      pg% Star_History_track1_ymax = Star_History_track1_ymax
+      pg% Star_History_track1_xmargin = Star_History_track1_xmargin
+      pg% Star_History_track1_ymargin = Star_History_track1_ymargin
+      pg% Star_History_track1_dxmin = Star_History_track1_dxmin
+      pg% Star_History_track1_dymin = Star_History_track1_dymin
+      pg% Star_History_track1_win_width = Star_History_track1_win_width
+      pg% Star_History_track1_win_aspect_ratio = Star_History_track1_win_aspect_ratio
+      pg% Star_History_track1_file_width = Star_History_track1_file_width
+      pg% Star_History_track1_file_aspect_ratio = Star_History_track1_file_aspect_ratio
+      pg% Star_History_track1_xleft = Star_History_track1_xleft
+      pg% Star_History_track1_xright = Star_History_track1_xright
+      pg% Star_History_track1_ybot = Star_History_track1_ybot
+      pg% Star_History_track1_ytop = Star_History_track1_ytop
+      pg% Star_History_track1_txt_scale = Star_History_track1_txt_scale
+      pg% Star_History_track1_title = Star_History_track1_title
+      pg% Star_History_track1_use_decorator = Star_History_track1_use_decorator
+
+      pg% Star_History_track2_win_flag = Star_History_track2_win_flag
+      pg% Star_History_track2_file_flag = Star_History_track2_file_flag
+      pg% Star_History_track2_file_interval = Star_History_track2_file_interval
+      pg% Star_History_track2_step_min = Star_History_track2_step_min
+      pg% Star_History_track2_step_max = Star_History_track2_step_max
+      pg% show_Star_History_track2_target_box = show_Star_History_track2_target_box
+      pg% Star_History_track2_n_sigma = Star_History_track2_n_sigma
+      pg% Star_History_track2_xtarget = Star_History_track2_xtarget
+      pg% Star_History_track2_xsigma = Star_History_track2_xsigma
+      pg% Star_History_track2_ytarget = Star_History_track2_ytarget
+      pg% Star_History_track2_ysigma = Star_History_track2_ysigma
+      pg% Star_History_track2_xname = Star_History_track2_xname
+      pg% Star_History_track2_xaxis_label = Star_History_track2_xaxis_label
+      pg% Star_History_track2_yname = Star_History_track2_yname
+      pg% Star_History_track2_yaxis_label = Star_History_track2_yaxis_label
+      pg% Star_History_track2_file_dir = Star_History_track2_file_dir
+      pg% Star_History_track2_file_prefix = Star_History_track2_file_prefix
+      pg% show_Star_History_track2_annotation1 = show_Star_History_track2_annotation1
+      pg% show_Star_History_track2_annotation2 = show_Star_History_track2_annotation2
+      pg% show_Star_History_track2_annotation3 = show_Star_History_track2_annotation3
+      pg% Star_History_track2_fname = Star_History_track2_fname
+      pg% Star_History_track2_reverse_xaxis = Star_History_track2_reverse_xaxis
+      pg% Star_History_track2_reverse_yaxis = Star_History_track2_reverse_yaxis
+      pg% Star_History_track2_log_xaxis = Star_History_track2_log_xaxis
+      pg% Star_History_track2_log_yaxis = Star_History_track2_log_yaxis
+      pg% Star_History_track2_xmin = Star_History_track2_xmin
+      pg% Star_History_track2_xmax = Star_History_track2_xmax
+      pg% Star_History_track2_ymin = Star_History_track2_ymin
+      pg% Star_History_track2_ymax = Star_History_track2_ymax
+      pg% Star_History_track2_xmargin = Star_History_track2_xmargin
+      pg% Star_History_track2_ymargin = Star_History_track2_ymargin
+      pg% Star_History_track2_dxmin = Star_History_track2_dxmin
+      pg% Star_History_track2_dymin = Star_History_track2_dymin
+      pg% Star_History_track2_win_width = Star_History_track2_win_width
+      pg% Star_History_track2_win_aspect_ratio = Star_History_track2_win_aspect_ratio
+      pg% Star_History_track2_file_width = Star_History_track2_file_width
+      pg% Star_History_track2_file_aspect_ratio = Star_History_track2_file_aspect_ratio
+      pg% Star_History_track2_xleft = Star_History_track2_xleft
+      pg% Star_History_track2_xright = Star_History_track2_xright
+      pg% Star_History_track2_ybot = Star_History_track2_ybot
+      pg% Star_History_track2_ytop = Star_History_track2_ytop
+      pg% Star_History_track2_txt_scale = Star_History_track2_txt_scale
+      pg% Star_History_track2_title = Star_History_track2_title
+      pg% Star_History_track2_use_decorator = Star_History_track2_use_decorator
+
+      pg% Star_History_track3_win_flag = Star_History_track3_win_flag
+      pg% Star_History_track3_file_flag = Star_History_track3_file_flag
+      pg% Star_History_track3_file_interval = Star_History_track3_file_interval
+      pg% Star_History_track3_step_min = Star_History_track3_step_min
+      pg% Star_History_track3_step_max = Star_History_track3_step_max
+      pg% show_Star_History_track3_target_box = show_Star_History_track3_target_box
+      pg% Star_History_track3_n_sigma = Star_History_track3_n_sigma
+      pg% Star_History_track3_xtarget = Star_History_track3_xtarget
+      pg% Star_History_track3_xsigma = Star_History_track3_xsigma
+      pg% Star_History_track3_ytarget = Star_History_track3_ytarget
+      pg% Star_History_track3_ysigma = Star_History_track3_ysigma
+      pg% Star_History_track3_xname = Star_History_track3_xname
+      pg% Star_History_track3_xaxis_label = Star_History_track3_xaxis_label
+      pg% Star_History_track3_yname = Star_History_track3_yname
+      pg% Star_History_track3_yaxis_label = Star_History_track3_yaxis_label
+      pg% Star_History_track3_file_dir = Star_History_track3_file_dir
+      pg% Star_History_track3_file_prefix = Star_History_track3_file_prefix
+      pg% show_Star_History_track3_annotation1 = show_Star_History_track3_annotation1
+      pg% show_Star_History_track3_annotation2 = show_Star_History_track3_annotation2
+      pg% show_Star_History_track3_annotation3 = show_Star_History_track3_annotation3
+      pg% Star_History_track3_fname = Star_History_track3_fname
+      pg% Star_History_track3_reverse_xaxis = Star_History_track3_reverse_xaxis
+      pg% Star_History_track3_reverse_yaxis = Star_History_track3_reverse_yaxis
+      pg% Star_History_track3_log_xaxis = Star_History_track3_log_xaxis
+      pg% Star_History_track3_log_yaxis = Star_History_track3_log_yaxis
+      pg% Star_History_track3_xmin = Star_History_track3_xmin
+      pg% Star_History_track3_xmax = Star_History_track3_xmax
+      pg% Star_History_track3_ymin = Star_History_track3_ymin
+      pg% Star_History_track3_ymax = Star_History_track3_ymax
+      pg% Star_History_track3_xmargin = Star_History_track3_xmargin
+      pg% Star_History_track3_ymargin = Star_History_track3_ymargin
+      pg% Star_History_track3_dxmin = Star_History_track3_dxmin
+      pg% Star_History_track3_dymin = Star_History_track3_dymin
+      pg% Star_History_track3_win_width = Star_History_track3_win_width
+      pg% Star_History_track3_win_aspect_ratio = Star_History_track3_win_aspect_ratio
+      pg% Star_History_track3_file_width = Star_History_track3_file_width
+      pg% Star_History_track3_file_aspect_ratio = Star_History_track3_file_aspect_ratio
+      pg% Star_History_track3_xleft = Star_History_track3_xleft
+      pg% Star_History_track3_xright = Star_History_track3_xright
+      pg% Star_History_track3_ybot = Star_History_track3_ybot
+      pg% Star_History_track3_ytop = Star_History_track3_ytop
+      pg% Star_History_track3_txt_scale = Star_History_track3_txt_scale
+      pg% Star_History_track3_title = Star_History_track3_title
+      pg% Star_History_track3_use_decorator = Star_History_track3_use_decorator
+
+      pg% Star_History_track4_win_flag = Star_History_track4_win_flag
+      pg% Star_History_track4_file_flag = Star_History_track4_file_flag
+      pg% Star_History_track4_file_interval = Star_History_track4_file_interval
+      pg% Star_History_track4_step_min = Star_History_track4_step_min
+      pg% Star_History_track4_step_max = Star_History_track4_step_max
+      pg% show_Star_History_track4_target_box = show_Star_History_track4_target_box
+      pg% Star_History_track4_n_sigma = Star_History_track4_n_sigma
+      pg% Star_History_track4_xtarget = Star_History_track4_xtarget
+      pg% Star_History_track4_xsigma = Star_History_track4_xsigma
+      pg% Star_History_track4_ytarget = Star_History_track4_ytarget
+      pg% Star_History_track4_ysigma = Star_History_track4_ysigma
+      pg% Star_History_track4_xname = Star_History_track4_xname
+      pg% Star_History_track4_xaxis_label = Star_History_track4_xaxis_label
+      pg% Star_History_track4_yname = Star_History_track4_yname
+      pg% Star_History_track4_yaxis_label = Star_History_track4_yaxis_label
+      pg% Star_History_track4_file_dir = Star_History_track4_file_dir
+      pg% Star_History_track4_file_prefix = Star_History_track4_file_prefix
+      pg% show_Star_History_track4_annotation1 = show_Star_History_track4_annotation1
+      pg% show_Star_History_track4_annotation2 = show_Star_History_track4_annotation2
+      pg% show_Star_History_track4_annotation3 = show_Star_History_track4_annotation3
+      pg% Star_History_track4_fname = Star_History_track4_fname
+      pg% Star_History_track4_reverse_xaxis = Star_History_track4_reverse_xaxis
+      pg% Star_History_track4_reverse_yaxis = Star_History_track4_reverse_yaxis
+      pg% Star_History_track4_log_xaxis = Star_History_track4_log_xaxis
+      pg% Star_History_track4_log_yaxis = Star_History_track4_log_yaxis
+      pg% Star_History_track4_xmin = Star_History_track4_xmin
+      pg% Star_History_track4_xmax = Star_History_track4_xmax
+      pg% Star_History_track4_ymin = Star_History_track4_ymin
+      pg% Star_History_track4_ymax = Star_History_track4_ymax
+      pg% Star_History_track4_xmargin = Star_History_track4_xmargin
+      pg% Star_History_track4_ymargin = Star_History_track4_ymargin
+      pg% Star_History_track4_dxmin = Star_History_track4_dxmin
+      pg% Star_History_track4_dymin = Star_History_track4_dymin
+      pg% Star_History_track4_win_width = Star_History_track4_win_width
+      pg% Star_History_track4_win_aspect_ratio = Star_History_track4_win_aspect_ratio
+      pg% Star_History_track4_file_width = Star_History_track4_file_width
+      pg% Star_History_track4_file_aspect_ratio = Star_History_track4_file_aspect_ratio
+      pg% Star_History_track4_xleft = Star_History_track4_xleft
+      pg% Star_History_track4_xright = Star_History_track4_xright
+      pg% Star_History_track4_ybot = Star_History_track4_ybot
+      pg% Star_History_track4_ytop = Star_History_track4_ytop
+      pg% Star_History_track4_txt_scale = Star_History_track4_txt_scale
+      pg% Star_History_track4_title = Star_History_track4_title
+      pg% Star_History_track4_use_decorator = Star_History_track4_use_decorator
+
+      pg% Star_History_track5_win_flag = Star_History_track5_win_flag
+      pg% Star_History_track5_file_flag = Star_History_track5_file_flag
+      pg% Star_History_track5_file_interval = Star_History_track5_file_interval
+      pg% Star_History_track5_step_min = Star_History_track5_step_min
+      pg% Star_History_track5_step_max = Star_History_track5_step_max
+      pg% show_Star_History_track5_target_box = show_Star_History_track5_target_box
+      pg% Star_History_track5_n_sigma = Star_History_track5_n_sigma
+      pg% Star_History_track5_xtarget = Star_History_track5_xtarget
+      pg% Star_History_track5_xsigma = Star_History_track5_xsigma
+      pg% Star_History_track5_ytarget = Star_History_track5_ytarget
+      pg% Star_History_track5_ysigma = Star_History_track5_ysigma
+      pg% Star_History_track5_xname = Star_History_track5_xname
+      pg% Star_History_track5_xaxis_label = Star_History_track5_xaxis_label
+      pg% Star_History_track5_yname = Star_History_track5_yname
+      pg% Star_History_track5_yaxis_label = Star_History_track5_yaxis_label
+      pg% Star_History_track5_file_dir = Star_History_track5_file_dir
+      pg% Star_History_track5_file_prefix = Star_History_track5_file_prefix
+      pg% show_Star_History_track5_annotation1 = show_Star_History_track5_annotation1
+      pg% show_Star_History_track5_annotation2 = show_Star_History_track5_annotation2
+      pg% show_Star_History_track5_annotation3 = show_Star_History_track5_annotation3
+      pg% Star_History_track5_fname = Star_History_track5_fname
+      pg% Star_History_track5_reverse_xaxis = Star_History_track5_reverse_xaxis
+      pg% Star_History_track5_reverse_yaxis = Star_History_track5_reverse_yaxis
+      pg% Star_History_track5_log_xaxis = Star_History_track5_log_xaxis
+      pg% Star_History_track5_log_yaxis = Star_History_track5_log_yaxis
+      pg% Star_History_track5_xmin = Star_History_track5_xmin
+      pg% Star_History_track5_xmax = Star_History_track5_xmax
+      pg% Star_History_track5_ymin = Star_History_track5_ymin
+      pg% Star_History_track5_ymax = Star_History_track5_ymax
+      pg% Star_History_track5_xmargin = Star_History_track5_xmargin
+      pg% Star_History_track5_ymargin = Star_History_track5_ymargin
+      pg% Star_History_track5_dxmin = Star_History_track5_dxmin
+      pg% Star_History_track5_dymin = Star_History_track5_dymin
+      pg% Star_History_track5_win_width = Star_History_track5_win_width
+      pg% Star_History_track5_win_aspect_ratio = Star_History_track5_win_aspect_ratio
+      pg% Star_History_track5_file_width = Star_History_track5_file_width
+      pg% Star_History_track5_file_aspect_ratio = Star_History_track5_file_aspect_ratio
+      pg% Star_History_track5_xleft = Star_History_track5_xleft
+      pg% Star_History_track5_xright = Star_History_track5_xright
+      pg% Star_History_track5_ybot = Star_History_track5_ybot
+      pg% Star_History_track5_ytop = Star_History_track5_ytop
+      pg% Star_History_track5_txt_scale = Star_History_track5_txt_scale
+      pg% Star_History_track5_title = Star_History_track5_title
+      pg% Star_History_track5_use_decorator = Star_History_track5_use_decorator
+
+      pg% Star_History_track6_win_flag = Star_History_track6_win_flag
+      pg% Star_History_track6_file_flag = Star_History_track6_file_flag
+      pg% Star_History_track6_file_interval = Star_History_track6_file_interval
+      pg% Star_History_track6_step_min = Star_History_track6_step_min
+      pg% Star_History_track6_step_max = Star_History_track6_step_max
+      pg% show_Star_History_track6_target_box = show_Star_History_track6_target_box
+      pg% Star_History_track6_n_sigma = Star_History_track6_n_sigma
+      pg% Star_History_track6_xtarget = Star_History_track6_xtarget
+      pg% Star_History_track6_xsigma = Star_History_track6_xsigma
+      pg% Star_History_track6_ytarget = Star_History_track6_ytarget
+      pg% Star_History_track6_ysigma = Star_History_track6_ysigma
+      pg% Star_History_track6_xname = Star_History_track6_xname
+      pg% Star_History_track6_xaxis_label = Star_History_track6_xaxis_label
+      pg% Star_History_track6_yname = Star_History_track6_yname
+      pg% Star_History_track6_yaxis_label = Star_History_track6_yaxis_label
+      pg% Star_History_track6_file_dir = Star_History_track6_file_dir
+      pg% Star_History_track6_file_prefix = Star_History_track6_file_prefix
+      pg% show_Star_History_track6_annotation1 = show_Star_History_track6_annotation1
+      pg% show_Star_History_track6_annotation2 = show_Star_History_track6_annotation2
+      pg% show_Star_History_track6_annotation3 = show_Star_History_track6_annotation3
+      pg% Star_History_track6_fname = Star_History_track6_fname
+      pg% Star_History_track6_reverse_xaxis = Star_History_track6_reverse_xaxis
+      pg% Star_History_track6_reverse_yaxis = Star_History_track6_reverse_yaxis
+      pg% Star_History_track6_log_xaxis = Star_History_track6_log_xaxis
+      pg% Star_History_track6_log_yaxis = Star_History_track6_log_yaxis
+      pg% Star_History_track6_xmin = Star_History_track6_xmin
+      pg% Star_History_track6_xmax = Star_History_track6_xmax
+      pg% Star_History_track6_ymin = Star_History_track6_ymin
+      pg% Star_History_track6_ymax = Star_History_track6_ymax
+      pg% Star_History_track6_xmargin = Star_History_track6_xmargin
+      pg% Star_History_track6_ymargin = Star_History_track6_ymargin
+      pg% Star_History_track6_dxmin = Star_History_track6_dxmin
+      pg% Star_History_track6_dymin = Star_History_track6_dymin
+      pg% Star_History_track6_win_width = Star_History_track6_win_width
+      pg% Star_History_track6_win_aspect_ratio = Star_History_track6_win_aspect_ratio
+      pg% Star_History_track6_file_width = Star_History_track6_file_width
+      pg% Star_History_track6_file_aspect_ratio = Star_History_track6_file_aspect_ratio
+      pg% Star_History_track6_xleft = Star_History_track6_xleft
+      pg% Star_History_track6_xright = Star_History_track6_xright
+      pg% Star_History_track6_ybot = Star_History_track6_ybot
+      pg% Star_History_track6_ytop = Star_History_track6_ytop
+      pg% Star_History_track6_txt_scale = Star_History_track6_txt_scale
+      pg% Star_History_track6_title = Star_History_track6_title
+      pg% Star_History_track6_use_decorator = Star_History_track6_use_decorator
+
+      pg% Star_History_track7_win_flag = Star_History_track7_win_flag
+      pg% Star_History_track7_file_flag = Star_History_track7_file_flag
+      pg% Star_History_track7_file_interval = Star_History_track7_file_interval
+      pg% Star_History_track7_step_min = Star_History_track7_step_min
+      pg% Star_History_track7_step_max = Star_History_track7_step_max
+      pg% show_Star_History_track7_target_box = show_Star_History_track7_target_box
+      pg% Star_History_track7_n_sigma = Star_History_track7_n_sigma
+      pg% Star_History_track7_xtarget = Star_History_track7_xtarget
+      pg% Star_History_track7_xsigma = Star_History_track7_xsigma
+      pg% Star_History_track7_ytarget = Star_History_track7_ytarget
+      pg% Star_History_track7_ysigma = Star_History_track7_ysigma
+      pg% Star_History_track7_xname = Star_History_track7_xname
+      pg% Star_History_track7_xaxis_label = Star_History_track7_xaxis_label
+      pg% Star_History_track7_yname = Star_History_track7_yname
+      pg% Star_History_track7_yaxis_label = Star_History_track7_yaxis_label
+      pg% Star_History_track7_file_dir = Star_History_track7_file_dir
+      pg% Star_History_track7_file_prefix = Star_History_track7_file_prefix
+      pg% show_Star_History_track7_annotation1 = show_Star_History_track7_annotation1
+      pg% show_Star_History_track7_annotation2 = show_Star_History_track7_annotation2
+      pg% show_Star_History_track7_annotation3 = show_Star_History_track7_annotation3
+      pg% Star_History_track7_fname = Star_History_track7_fname
+      pg% Star_History_track7_reverse_xaxis = Star_History_track7_reverse_xaxis
+      pg% Star_History_track7_reverse_yaxis = Star_History_track7_reverse_yaxis
+      pg% Star_History_track7_log_xaxis = Star_History_track7_log_xaxis
+      pg% Star_History_track7_log_yaxis = Star_History_track7_log_yaxis
+      pg% Star_History_track7_xmin = Star_History_track7_xmin
+      pg% Star_History_track7_xmax = Star_History_track7_xmax
+      pg% Star_History_track7_ymin = Star_History_track7_ymin
+      pg% Star_History_track7_ymax = Star_History_track7_ymax
+      pg% Star_History_track7_xmargin = Star_History_track7_xmargin
+      pg% Star_History_track7_ymargin = Star_History_track7_ymargin
+      pg% Star_History_track7_dxmin = Star_History_track7_dxmin
+      pg% Star_History_track7_dymin = Star_History_track7_dymin
+      pg% Star_History_track7_win_width = Star_History_track7_win_width
+      pg% Star_History_track7_win_aspect_ratio = Star_History_track7_win_aspect_ratio
+      pg% Star_History_track7_file_width = Star_History_track7_file_width
+      pg% Star_History_track7_file_aspect_ratio = Star_History_track7_file_aspect_ratio
+      pg% Star_History_track7_xleft = Star_History_track7_xleft
+      pg% Star_History_track7_xright = Star_History_track7_xright
+      pg% Star_History_track7_ybot = Star_History_track7_ybot
+      pg% Star_History_track7_ytop = Star_History_track7_ytop
+      pg% Star_History_track7_txt_scale = Star_History_track7_txt_scale
+      pg% Star_History_track7_title = Star_History_track7_title
+      pg% Star_History_track7_use_decorator = Star_History_track7_use_decorator
+
+      pg% Star_History_track8_win_flag = Star_History_track8_win_flag
+      pg% Star_History_track8_file_flag = Star_History_track8_file_flag
+      pg% Star_History_track8_file_interval = Star_History_track8_file_interval
+      pg% Star_History_track8_step_min = Star_History_track8_step_min
+      pg% Star_History_track8_step_max = Star_History_track8_step_max
+      pg% show_Star_History_track8_target_box = show_Star_History_track8_target_box
+      pg% Star_History_track8_n_sigma = Star_History_track8_n_sigma
+      pg% Star_History_track8_xtarget = Star_History_track8_xtarget
+      pg% Star_History_track8_xsigma = Star_History_track8_xsigma
+      pg% Star_History_track8_ytarget = Star_History_track8_ytarget
+      pg% Star_History_track8_ysigma = Star_History_track8_ysigma
+      pg% Star_History_track8_xname = Star_History_track8_xname
+      pg% Star_History_track8_xaxis_label = Star_History_track8_xaxis_label
+      pg% Star_History_track8_yname = Star_History_track8_yname
+      pg% Star_History_track8_yaxis_label = Star_History_track8_yaxis_label
+      pg% Star_History_track8_file_dir = Star_History_track8_file_dir
+      pg% Star_History_track8_file_prefix = Star_History_track8_file_prefix
+      pg% show_Star_History_track8_annotation1 = show_Star_History_track8_annotation1
+      pg% show_Star_History_track8_annotation2 = show_Star_History_track8_annotation2
+      pg% show_Star_History_track8_annotation3 = show_Star_History_track8_annotation3
+      pg% Star_History_track8_fname = Star_History_track8_fname
+      pg% Star_History_track8_reverse_xaxis = Star_History_track8_reverse_xaxis
+      pg% Star_History_track8_reverse_yaxis = Star_History_track8_reverse_yaxis
+      pg% Star_History_track8_log_xaxis = Star_History_track8_log_xaxis
+      pg% Star_History_track8_log_yaxis = Star_History_track8_log_yaxis
+      pg% Star_History_track8_xmin = Star_History_track8_xmin
+      pg% Star_History_track8_xmax = Star_History_track8_xmax
+      pg% Star_History_track8_ymin = Star_History_track8_ymin
+      pg% Star_History_track8_ymax = Star_History_track8_ymax
+      pg% Star_History_track8_xmargin = Star_History_track8_xmargin
+      pg% Star_History_track8_ymargin = Star_History_track8_ymargin
+      pg% Star_History_track8_dxmin = Star_History_track8_dxmin
+      pg% Star_History_track8_dymin = Star_History_track8_dymin
+      pg% Star_History_track8_win_width = Star_History_track8_win_width
+      pg% Star_History_track8_win_aspect_ratio = Star_History_track8_win_aspect_ratio
+      pg% Star_History_track8_file_width = Star_History_track8_file_width
+      pg% Star_History_track8_file_aspect_ratio = Star_History_track8_file_aspect_ratio
+      pg% Star_History_track8_xleft = Star_History_track8_xleft
+      pg% Star_History_track8_xright = Star_History_track8_xright
+      pg% Star_History_track8_ybot = Star_History_track8_ybot
+      pg% Star_History_track8_ytop = Star_History_track8_ytop
+      pg% Star_History_track8_txt_scale = Star_History_track8_txt_scale
+      pg% Star_History_track8_title = Star_History_track8_title
+      pg% Star_History_track8_use_decorator = Star_History_track8_use_decorator
+
+      pg% Star_History_track9_win_flag = Star_History_track9_win_flag
+      pg% Star_History_track9_file_flag = Star_History_track9_file_flag
+      pg% Star_History_track9_file_interval = Star_History_track9_file_interval
+      pg% Star_History_track9_step_min = Star_History_track9_step_min
+      pg% Star_History_track9_step_max = Star_History_track9_step_max
+      pg% show_Star_History_track9_target_box = show_Star_History_track9_target_box
+      pg% Star_History_track9_n_sigma = Star_History_track9_n_sigma
+      pg% Star_History_track9_xtarget = Star_History_track9_xtarget
+      pg% Star_History_track9_xsigma = Star_History_track9_xsigma
+      pg% Star_History_track9_ytarget = Star_History_track9_ytarget
+      pg% Star_History_track9_ysigma = Star_History_track9_ysigma
+      pg% Star_History_track9_xname = Star_History_track9_xname
+      pg% Star_History_track9_xaxis_label = Star_History_track9_xaxis_label
+      pg% Star_History_track9_yname = Star_History_track9_yname
+      pg% Star_History_track9_yaxis_label = Star_History_track9_yaxis_label
+      pg% Star_History_track9_file_dir = Star_History_track9_file_dir
+      pg% Star_History_track9_file_prefix = Star_History_track9_file_prefix
+      pg% show_Star_History_track9_annotation1 = show_Star_History_track9_annotation1
+      pg% show_Star_History_track9_annotation2 = show_Star_History_track9_annotation2
+      pg% show_Star_History_track9_annotation3 = show_Star_History_track9_annotation3
+      pg% Star_History_track9_fname = Star_History_track9_fname
+      pg% Star_History_track9_reverse_xaxis = Star_History_track9_reverse_xaxis
+      pg% Star_History_track9_reverse_yaxis = Star_History_track9_reverse_yaxis
+      pg% Star_History_track9_log_xaxis = Star_History_track9_log_xaxis
+      pg% Star_History_track9_log_yaxis = Star_History_track9_log_yaxis
+      pg% Star_History_track9_xmin = Star_History_track9_xmin
+      pg% Star_History_track9_xmax = Star_History_track9_xmax
+      pg% Star_History_track9_ymin = Star_History_track9_ymin
+      pg% Star_History_track9_ymax = Star_History_track9_ymax
+      pg% Star_History_track9_xmargin = Star_History_track9_xmargin
+      pg% Star_History_track9_ymargin = Star_History_track9_ymargin
+      pg% Star_History_track9_dxmin = Star_History_track9_dxmin
+      pg% Star_History_track9_dymin = Star_History_track9_dymin
+      pg% Star_History_track9_win_width = Star_History_track9_win_width
+      pg% Star_History_track9_win_aspect_ratio = Star_History_track9_win_aspect_ratio
+      pg% Star_History_track9_file_width = Star_History_track9_file_width
+      pg% Star_History_track9_file_aspect_ratio = Star_History_track9_file_aspect_ratio
+      pg% Star_History_track9_xleft = Star_History_track9_xleft
+      pg% Star_History_track9_xright = Star_History_track9_xright
+      pg% Star_History_track9_ybot = Star_History_track9_ybot
+      pg% Star_History_track9_ytop = Star_History_track9_ytop
+      pg% Star_History_track9_txt_scale = Star_History_track9_txt_scale
+      pg% Star_History_track9_title = Star_History_track9_title
+      pg% Star_History_track9_use_decorator = Star_History_track9_use_decorator
+
 
       pg% History_Panels1_win_flag = History_Panels1_win_flag
       pg% History_Panels1_win_width = History_Panels1_win_width
