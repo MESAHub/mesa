@@ -32,7 +32,7 @@ module pgbinary_support
    use pgstar_support, only : Set_Colours, do1_pgmtxt, &
       clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
-      clr_anonymous, colormap_offset, colormap_last, colormap_size, &
+      clr_anonymous, clr_Goldenrod, clr_LightSkyBlue, colormap_offset, colormap_last, colormap_size, &
       colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
       Line_Type_Dot ! inherit colors/linetypes + some routines from pgstar
    use star_pgstar
@@ -104,9 +104,6 @@ contains
          write(*, *) 'failed to init pgstar, required for pgbinary'
          return
       end if
-
-      b% pg% star_1_color = clr_Goldenrod
-      b% pg% star_2_color = clr_LightSkyBlue
 
       have_initialized_pgbinary = .true.
    end subroutine init_pgbinary
@@ -243,10 +240,12 @@ contains
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
       call Set_Colours(white_on_black_flag, ierr)
+      b% pg% star_1_color = clr_Goldenrod
+      b% pg% star_2_color = clr_LightSkyBlue
    end subroutine open_device
 
 
-   integer function count_hist_points(b, step_min, step_max) result(numpts)
+   integer function count_binary_hist_points(b, step_min, step_max) result(numpts)
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max
       type (pgbinary_hist_node), pointer :: pg
@@ -259,7 +258,7 @@ contains
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
          pg => pg% next
       end do
-   end function count_hist_points
+   end function count_binary_hist_points
 
 
    logical function get1_hist_yvec(b, step_min, step_max, n, name, vec)
@@ -324,7 +323,7 @@ contains
    end subroutine set_hist_points_steps
 
 
-   integer function get_hist_index(b, spec) result(index)
+   integer function get_binary_hist_index(b, spec) result(index)
       type (binary_info), pointer :: b
       integer, intent(in) :: spec
       integer :: i, num
@@ -337,10 +336,10 @@ contains
          end if
       end do
       index = -1
-   end function get_hist_index
+   end function get_binary_hist_index
 
 
-   subroutine get_hist_points(&
+   subroutine get_binary_hist_points(&
       b, step_min, step_max, numpts, index, vec)
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max, numpts, index
@@ -367,7 +366,7 @@ contains
          end if
          pg => pg% next
       end do
-   end subroutine get_hist_points
+   end subroutine get_binary_hist_points
 
 
    subroutine show_annotations(b, show_annotation1, show_annotation2, show_annotation3)

@@ -98,7 +98,7 @@ contains
       if (b% pg% Summary_History_max_width > 0) &
          step_min = max(step_min, step_max - b% pg% Summary_History_max_width)
 
-      npts = count_hist_points(b, step_min, step_max)
+      npts = count_binary_hist_points(b, step_min, step_max)
       if (npts <= 1) return
 
       xmin = real(max(1, step_min))

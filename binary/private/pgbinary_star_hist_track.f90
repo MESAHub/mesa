@@ -35,7 +35,7 @@ module pgbinary_star_hist_track
 contains
 
 
-   subroutine Star_history_track1_plot(id, device_id, ierr)
+   subroutine Star_History_Track1_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -45,16 +45,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track1_plot(b, id, device_id, &
-         b% pg% Star_history_track1_xleft, b% pg% Star_history_track1_xright, &
-         b% pg% Star_history_track1_ybot, b% pg% Star_history_track1_ytop, .false., &
-         b% pg% Star_history_track1_title, b% pg% Star_history_track1_txt_scale, ierr)
+      call do_Star_History_Track1_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(1), b% pg% Star_History_Track_xright(1), &
+         b% pg% Star_History_Track_ybot(1), b% pg% Star_History_Track_ytop(1), .false., &
+         b% pg% Star_History_Track_title(1), b% pg% Star_History_Track_txt_scale(1), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track1_plot
+   end subroutine Star_History_Track1_plot
 
 
-   subroutine do_Star_history_track1_plot(b, id, device_id, &
+   subroutine do_Star_History_Track1_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -62,37 +62,27 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track1_xname, &
-         b% pg% Star_history_track1_yname, &
-         b% pg% Star_history_track1_xaxis_label, &
-         b% pg% Star_history_track1_yaxis_label, &
-         b% pg% Star_history_track1_xmin, &
-         b% pg% Star_history_track1_xmax, &
-         b% pg% Star_history_track1_xmargin, &
-         b% pg% Star_history_track1_dxmin, &
-         b% pg% Star_history_track1_ymin, &
-         b% pg% Star_history_track1_ymax, &
-         b% pg% Star_history_track1_ymargin, &
-         b% pg% Star_history_track1_dymin, &
-         b% pg% Star_history_track1_step_min, &
-         b% pg% Star_history_track1_step_max, &
-         b% pg% Star_history_track1_reverse_xaxis, &
-         b% pg% Star_history_track1_reverse_yaxis, &
-         b% pg% Star_history_track1_log_xaxis, &
-         b% pg% Star_history_track1_log_yaxis, &
-         b% pg% show_Star_history_track1_annotation1, &
-         b% pg% show_Star_history_track1_annotation2, &
-         b% pg% show_Star_history_track1_annotation3, &
-         b% pg% Star_history_track1_fname, &
-         b% pg% Star_history_track1_use_decorator, &
-         b% pg% Star_history_track1_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(1), b% pg% Star_History_Track_yname(1), &
+         b% pg% Star_History_Track_xaxis_label(1), b% pg% Star_History_Track_yaxis_label(1), &
+         b% pg% Star_History_Track_xmin(1), b% pg% Star_History_Track_xmax(1), &
+         b% pg% Star_History_Track_xmargin(1), b% pg% Star_History_Track_dxmin(1), &
+         b% pg% Star_History_Track_ymin(1), b% pg% Star_History_Track_ymax(1), &
+         b% pg% Star_History_Track_ymargin(1), b% pg% Star_History_Track_dymin(1), &
+         b% pg% Star_History_Track_step_min(1), b% pg% Star_History_Track_step_max(1), &
+         b% pg% Star_History_Track_reverse_xaxis(1), b% pg% Star_History_Track_reverse_yaxis(1), &
+         b% pg% Star_History_Track_log_xaxis(1), b% pg% Star_History_Track_log_yaxis(1), &
+         b% pg% show_Star_History_Track_annotation1(1), &
+         b% pg% show_Star_History_Track_annotation2(1), &
+         b% pg% show_Star_History_Track_annotation3(1), &
+         b% pg% Star_History_Track_fname(1), &
+         b% pg% Star_History_Track_use_decorator(1), b% pg% Star_History_Track1_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track1_plot
+   end subroutine do_Star_History_Track1_plot
 
 
-   subroutine Star_history_track2_plot(id, device_id, ierr)
+   subroutine Star_History_Track2_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -102,16 +92,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track2_plot(b, id, device_id, &
-         b% pg% Star_history_track2_xleft, b% pg% Star_history_track2_xright, &
-         b% pg% Star_history_track2_ybot, b% pg% Star_history_track2_ytop, .false., &
-         b% pg% Star_history_track2_title, b% pg% Star_history_track2_txt_scale, ierr)
+      call do_Star_History_Track2_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(2), b% pg% Star_History_Track_xright(2), &
+         b% pg% Star_History_Track_ybot(2), b% pg% Star_History_Track_ytop(2), .false., &
+         b% pg% Star_History_Track_title(2), b% pg% Star_History_Track_txt_scale(2), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track2_plot
+   end subroutine Star_History_Track2_plot
 
 
-   subroutine do_Star_history_track2_plot(b, id, device_id, &
+   subroutine do_Star_History_Track2_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -119,37 +109,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track2_xname, &
-         b% pg% Star_history_track2_yname, &
-         b% pg% Star_history_track2_xaxis_label, &
-         b% pg% Star_history_track2_yaxis_label, &
-         b% pg% Star_history_track2_xmin, &
-         b% pg% Star_history_track2_xmax, &
-         b% pg% Star_history_track2_xmargin, &
-         b% pg% Star_history_track2_dxmin, &
-         b% pg% Star_history_track2_ymin, &
-         b% pg% Star_history_track2_ymax, &
-         b% pg% Star_history_track2_ymargin, &
-         b% pg% Star_history_track2_dymin, &
-         b% pg% Star_history_track2_step_min, &
-         b% pg% Star_history_track2_step_max, &
-         b% pg% Star_history_track2_reverse_xaxis, &
-         b% pg% Star_history_track2_reverse_yaxis, &
-         b% pg% Star_history_track2_log_xaxis, &
-         b% pg% Star_history_track2_log_yaxis, &
-         b% pg% show_Star_history_track2_annotation1, &
-         b% pg% show_Star_history_track2_annotation2, &
-         b% pg% show_Star_history_track2_annotation3, &
-         b% pg% Star_history_track2_fname, &
-         b% pg% Star_history_track2_use_decorator, &
-         b% pg% Star_history_track2_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(2), b% pg% Star_History_Track_yname(2), &
+         b% pg% Star_History_Track_xaxis_label(2), b% pg% Star_History_Track_yaxis_label(2), &
+         b% pg% Star_History_Track_xmin(2), b% pg% Star_History_Track_xmax(2), &
+         b% pg% Star_History_Track_xmargin(2), b% pg% Star_History_Track_dxmin(2), &
+         b% pg% Star_History_Track_ymin(2), b% pg% Star_History_Track_ymax(2), &
+         b% pg% Star_History_Track_ymargin(2), b% pg% Star_History_Track_dymin(2), &
+         b% pg% Star_History_Track_step_min(2), b% pg% Star_History_Track_step_max(2), &
+         b% pg% Star_History_Track_reverse_xaxis(2), b% pg% Star_History_Track_reverse_yaxis(2), &
+         b% pg% Star_History_Track_log_xaxis(2), b% pg% Star_History_Track_log_yaxis(2), &
+         b% pg% show_Star_History_Track_annotation1(2), &
+         b% pg% show_Star_History_Track_annotation2(2), &
+         b% pg% show_Star_History_Track_annotation3(2), &
+         b% pg% Star_History_Track_fname(2), &
+         b% pg% Star_History_Track_use_decorator(2), b% pg% Star_History_Track2_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track2_plot
+   end subroutine do_Star_History_Track2_plot
 
-
-   subroutine Star_history_track3_plot(id, device_id, ierr)
+   subroutine Star_History_Track3_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -159,16 +138,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track3_plot(b, id, device_id, &
-         b% pg% Star_history_track3_xleft, b% pg% Star_history_track3_xright, &
-         b% pg% Star_history_track3_ybot, b% pg% Star_history_track3_ytop, .false., &
-         b% pg% Star_history_track3_title, b% pg% Star_history_track3_txt_scale, ierr)
+      call do_Star_History_Track3_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(3), b% pg% Star_History_Track_xright(3), &
+         b% pg% Star_History_Track_ybot(3), b% pg% Star_History_Track_ytop(3), .false., &
+         b% pg% Star_History_Track_title(3), b% pg% Star_History_Track_txt_scale(3), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track3_plot
+   end subroutine Star_History_Track3_plot
 
 
-   subroutine do_Star_history_track3_plot(b, id, device_id, &
+   subroutine do_Star_History_Track3_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -176,37 +155,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track3_xname, &
-         b% pg% Star_history_track3_yname, &
-         b% pg% Star_history_track3_xaxis_label, &
-         b% pg% Star_history_track3_yaxis_label, &
-         b% pg% Star_history_track3_xmin, &
-         b% pg% Star_history_track3_xmax, &
-         b% pg% Star_history_track3_xmargin, &
-         b% pg% Star_history_track3_dxmin, &
-         b% pg% Star_history_track3_ymin, &
-         b% pg% Star_history_track3_ymax, &
-         b% pg% Star_history_track3_ymargin, &
-         b% pg% Star_history_track3_dymin, &
-         b% pg% Star_history_track3_step_min, &
-         b% pg% Star_history_track3_step_max, &
-         b% pg% Star_history_track3_reverse_xaxis, &
-         b% pg% Star_history_track3_reverse_yaxis, &
-         b% pg% Star_history_track3_log_xaxis, &
-         b% pg% Star_history_track3_log_yaxis, &
-         b% pg% show_Star_history_track3_annotation1, &
-         b% pg% show_Star_history_track3_annotation2, &
-         b% pg% show_Star_history_track3_annotation3, &
-         b% pg% Star_history_track3_fname, &
-         b% pg% Star_history_track3_use_decorator, &
-         b% pg% Star_history_track3_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(3), b% pg% Star_History_Track_yname(3), &
+         b% pg% Star_History_Track_xaxis_label(3), b% pg% Star_History_Track_yaxis_label(3), &
+         b% pg% Star_History_Track_xmin(3), b% pg% Star_History_Track_xmax(3), &
+         b% pg% Star_History_Track_xmargin(3), b% pg% Star_History_Track_dxmin(3), &
+         b% pg% Star_History_Track_ymin(3), b% pg% Star_History_Track_ymax(3), &
+         b% pg% Star_History_Track_ymargin(3), b% pg% Star_History_Track_dymin(3), &
+         b% pg% Star_History_Track_step_min(3), b% pg% Star_History_Track_step_max(3), &
+         b% pg% Star_History_Track_reverse_xaxis(3), b% pg% Star_History_Track_reverse_yaxis(3), &
+         b% pg% Star_History_Track_log_xaxis(3), b% pg% Star_History_Track_log_yaxis(3), &
+         b% pg% show_Star_History_Track_annotation1(3), &
+         b% pg% show_Star_History_Track_annotation2(3), &
+         b% pg% show_Star_History_Track_annotation3(3), &
+         b% pg% Star_History_Track_fname(3), &
+         b% pg% Star_History_Track_use_decorator(3), b% pg% Star_History_Track3_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track3_plot
+   end subroutine do_Star_History_Track3_plot
 
-
-   subroutine Star_history_track4_plot(id, device_id, ierr)
+   subroutine Star_History_Track4_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -216,16 +184,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track4_plot(b, id, device_id, &
-         b% pg% Star_history_track4_xleft, b% pg% Star_history_track4_xright, &
-         b% pg% Star_history_track4_ybot, b% pg% Star_history_track4_ytop, .false., &
-         b% pg% Star_history_track4_title, b% pg% Star_history_track4_txt_scale, ierr)
+      call do_Star_History_Track4_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(4), b% pg% Star_History_Track_xright(4), &
+         b% pg% Star_History_Track_ybot(4), b% pg% Star_History_Track_ytop(4), .false., &
+         b% pg% Star_History_Track_title(4), b% pg% Star_History_Track_txt_scale(4), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track4_plot
+   end subroutine Star_History_Track4_plot
 
 
-   subroutine do_Star_history_track4_plot(b, id, device_id, &
+   subroutine do_Star_History_Track4_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -233,37 +201,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track4_xname, &
-         b% pg% Star_history_track4_yname, &
-         b% pg% Star_history_track4_xaxis_label, &
-         b% pg% Star_history_track4_yaxis_label, &
-         b% pg% Star_history_track4_xmin, &
-         b% pg% Star_history_track4_xmax, &
-         b% pg% Star_history_track4_xmargin, &
-         b% pg% Star_history_track4_dxmin, &
-         b% pg% Star_history_track4_ymin, &
-         b% pg% Star_history_track4_ymax, &
-         b% pg% Star_history_track4_ymargin, &
-         b% pg% Star_history_track4_dymin, &
-         b% pg% Star_history_track4_step_min, &
-         b% pg% Star_history_track4_step_max, &
-         b% pg% Star_history_track4_reverse_xaxis, &
-         b% pg% Star_history_track4_reverse_yaxis, &
-         b% pg% Star_history_track4_log_xaxis, &
-         b% pg% Star_history_track4_log_yaxis, &
-         b% pg% show_Star_history_track4_annotation1, &
-         b% pg% show_Star_history_track4_annotation2, &
-         b% pg% show_Star_history_track4_annotation3, &
-         b% pg% Star_history_track4_fname, &
-         b% pg% Star_history_track4_use_decorator, &
-         b% pg% Star_history_track4_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(4), b% pg% Star_History_Track_yname(4), &
+         b% pg% Star_History_Track_xaxis_label(4), b% pg% Star_History_Track_yaxis_label(4), &
+         b% pg% Star_History_Track_xmin(4), b% pg% Star_History_Track_xmax(4), &
+         b% pg% Star_History_Track_xmargin(4), b% pg% Star_History_Track_dxmin(4), &
+         b% pg% Star_History_Track_ymin(4), b% pg% Star_History_Track_ymax(4), &
+         b% pg% Star_History_Track_ymargin(4), b% pg% Star_History_Track_dymin(4), &
+         b% pg% Star_History_Track_step_min(4), b% pg% Star_History_Track_step_max(4), &
+         b% pg% Star_History_Track_reverse_xaxis(4), b% pg% Star_History_Track_reverse_yaxis(4), &
+         b% pg% Star_History_Track_log_xaxis(4), b% pg% Star_History_Track_log_yaxis(4), &
+         b% pg% show_Star_History_Track_annotation1(4), &
+         b% pg% show_Star_History_Track_annotation2(4), &
+         b% pg% show_Star_History_Track_annotation3(4), &
+         b% pg% Star_History_Track_fname(4), &
+         b% pg% Star_History_Track_use_decorator(4), b% pg% Star_History_Track4_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track4_plot
+   end subroutine do_Star_History_Track4_plot
 
-
-   subroutine Star_history_track5_plot(id, device_id, ierr)
+   subroutine Star_History_Track5_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -273,16 +230,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track5_plot(b, id, device_id, &
-         b% pg% Star_history_track5_xleft, b% pg% Star_history_track5_xright, &
-         b% pg% Star_history_track5_ybot, b% pg% Star_history_track5_ytop, .false., &
-         b% pg% Star_history_track5_title, b% pg% Star_history_track5_txt_scale, ierr)
+      call do_Star_History_Track5_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(5), b% pg% Star_History_Track_xright(5), &
+         b% pg% Star_History_Track_ybot(5), b% pg% Star_History_Track_ytop(5), .false., &
+         b% pg% Star_History_Track_title(5), b% pg% Star_History_Track_txt_scale(5), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track5_plot
+   end subroutine Star_History_Track5_plot
 
 
-   subroutine do_Star_history_track5_plot(b, id, device_id, &
+   subroutine do_Star_History_Track5_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -290,37 +247,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track5_xname, &
-         b% pg% Star_history_track5_yname, &
-         b% pg% Star_history_track5_xaxis_label, &
-         b% pg% Star_history_track5_yaxis_label, &
-         b% pg% Star_history_track5_xmin, &
-         b% pg% Star_history_track5_xmax, &
-         b% pg% Star_history_track5_xmargin, &
-         b% pg% Star_history_track5_dxmin, &
-         b% pg% Star_history_track5_ymin, &
-         b% pg% Star_history_track5_ymax, &
-         b% pg% Star_history_track5_ymargin, &
-         b% pg% Star_history_track5_dymin, &
-         b% pg% Star_history_track5_step_min, &
-         b% pg% Star_history_track5_step_max, &
-         b% pg% Star_history_track5_reverse_xaxis, &
-         b% pg% Star_history_track5_reverse_yaxis, &
-         b% pg% Star_history_track5_log_xaxis, &
-         b% pg% Star_history_track5_log_yaxis, &
-         b% pg% show_Star_history_track5_annotation1, &
-         b% pg% show_Star_history_track5_annotation2, &
-         b% pg% show_Star_history_track5_annotation3, &
-         b% pg% Star_history_track5_fname, &
-         b% pg% Star_history_track5_use_decorator, &
-         b% pg% Star_history_track5_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(5), b% pg% Star_History_Track_yname(5), &
+         b% pg% Star_History_Track_xaxis_label(5), b% pg% Star_History_Track_yaxis_label(5), &
+         b% pg% Star_History_Track_xmin(5), b% pg% Star_History_Track_xmax(5), &
+         b% pg% Star_History_Track_xmargin(5), b% pg% Star_History_Track_dxmin(5), &
+         b% pg% Star_History_Track_ymin(5), b% pg% Star_History_Track_ymax(5), &
+         b% pg% Star_History_Track_ymargin(5), b% pg% Star_History_Track_dymin(5), &
+         b% pg% Star_History_Track_step_min(5), b% pg% Star_History_Track_step_max(5), &
+         b% pg% Star_History_Track_reverse_xaxis(5), b% pg% Star_History_Track_reverse_yaxis(5), &
+         b% pg% Star_History_Track_log_xaxis(5), b% pg% Star_History_Track_log_yaxis(5), &
+         b% pg% show_Star_History_Track_annotation1(5), &
+         b% pg% show_Star_History_Track_annotation2(5), &
+         b% pg% show_Star_History_Track_annotation3(5), &
+         b% pg% Star_History_Track_fname(5), &
+         b% pg% Star_History_Track_use_decorator(5), b% pg% Star_History_Track5_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track5_plot
+   end subroutine do_Star_History_Track5_plot
 
-
-   subroutine Star_history_track6_plot(id, device_id, ierr)
+   subroutine Star_History_Track6_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -330,16 +276,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track6_plot(b, id, device_id, &
-         b% pg% Star_history_track6_xleft, b% pg% Star_history_track6_xright, &
-         b% pg% Star_history_track6_ybot, b% pg% Star_history_track6_ytop, .false., &
-         b% pg% Star_history_track6_title, b% pg% Star_history_track6_txt_scale, ierr)
+      call do_Star_History_Track6_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(6), b% pg% Star_History_Track_xright(6), &
+         b% pg% Star_History_Track_ybot(6), b% pg% Star_History_Track_ytop(6), .false., &
+         b% pg% Star_History_Track_title(6), b% pg% Star_History_Track_txt_scale(6), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track6_plot
+   end subroutine Star_History_Track6_plot
 
 
-   subroutine do_Star_history_track6_plot(b, id, device_id, &
+   subroutine do_Star_History_Track6_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -347,37 +293,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track6_xname, &
-         b% pg% Star_history_track6_yname, &
-         b% pg% Star_history_track6_xaxis_label, &
-         b% pg% Star_history_track6_yaxis_label, &
-         b% pg% Star_history_track6_xmin, &
-         b% pg% Star_history_track6_xmax, &
-         b% pg% Star_history_track6_xmargin, &
-         b% pg% Star_history_track6_dxmin, &
-         b% pg% Star_history_track6_ymin, &
-         b% pg% Star_history_track6_ymax, &
-         b% pg% Star_history_track6_ymargin, &
-         b% pg% Star_history_track6_dymin, &
-         b% pg% Star_history_track6_step_min, &
-         b% pg% Star_history_track6_step_max, &
-         b% pg% Star_history_track6_reverse_xaxis, &
-         b% pg% Star_history_track6_reverse_yaxis, &
-         b% pg% Star_history_track6_log_xaxis, &
-         b% pg% Star_history_track6_log_yaxis, &
-         b% pg% show_Star_history_track6_annotation1, &
-         b% pg% show_Star_history_track6_annotation2, &
-         b% pg% show_Star_history_track6_annotation3, &
-         b% pg% Star_history_track6_fname, &
-         b% pg% Star_history_track6_use_decorator, &
-         b% pg% Star_history_track6_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(6), b% pg% Star_History_Track_yname(6), &
+         b% pg% Star_History_Track_xaxis_label(6), b% pg% Star_History_Track_yaxis_label(6), &
+         b% pg% Star_History_Track_xmin(6), b% pg% Star_History_Track_xmax(6), &
+         b% pg% Star_History_Track_xmargin(6), b% pg% Star_History_Track_dxmin(6), &
+         b% pg% Star_History_Track_ymin(6), b% pg% Star_History_Track_ymax(6), &
+         b% pg% Star_History_Track_ymargin(6), b% pg% Star_History_Track_dymin(6), &
+         b% pg% Star_History_Track_step_min(6), b% pg% Star_History_Track_step_max(6), &
+         b% pg% Star_History_Track_reverse_xaxis(6), b% pg% Star_History_Track_reverse_yaxis(6), &
+         b% pg% Star_History_Track_log_xaxis(6), b% pg% Star_History_Track_log_yaxis(6), &
+         b% pg% show_Star_History_Track_annotation1(6), &
+         b% pg% show_Star_History_Track_annotation2(6), &
+         b% pg% show_Star_History_Track_annotation3(6), &
+         b% pg% Star_History_Track_fname(6), &
+         b% pg% Star_History_Track_use_decorator(6), b% pg% Star_History_Track6_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track6_plot
+   end subroutine do_Star_History_Track6_plot
 
-
-   subroutine Star_history_track7_plot(id, device_id, ierr)
+   subroutine Star_History_Track7_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -387,16 +322,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track7_plot(b, id, device_id, &
-         b% pg% Star_history_track7_xleft, b% pg% Star_history_track7_xright, &
-         b% pg% Star_history_track7_ybot, b% pg% Star_history_track7_ytop, .false., &
-         b% pg% Star_history_track7_title, b% pg% Star_history_track7_txt_scale, ierr)
+      call do_Star_History_Track7_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(7), b% pg% Star_History_Track_xright(7), &
+         b% pg% Star_History_Track_ybot(7), b% pg% Star_History_Track_ytop(7), .false., &
+         b% pg% Star_History_Track_title(7), b% pg% Star_History_Track_txt_scale(7), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track7_plot
+   end subroutine Star_History_Track7_plot
 
 
-   subroutine do_Star_history_track7_plot(b, id, device_id, &
+   subroutine do_Star_History_Track7_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -404,37 +339,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track7_xname, &
-         b% pg% Star_history_track7_yname, &
-         b% pg% Star_history_track7_xaxis_label, &
-         b% pg% Star_history_track7_yaxis_label, &
-         b% pg% Star_history_track7_xmin, &
-         b% pg% Star_history_track7_xmax, &
-         b% pg% Star_history_track7_xmargin, &
-         b% pg% Star_history_track7_dxmin, &
-         b% pg% Star_history_track7_ymin, &
-         b% pg% Star_history_track7_ymax, &
-         b% pg% Star_history_track7_ymargin, &
-         b% pg% Star_history_track7_dymin, &
-         b% pg% Star_history_track7_step_min, &
-         b% pg% Star_history_track7_step_max, &
-         b% pg% Star_history_track7_reverse_xaxis, &
-         b% pg% Star_history_track7_reverse_yaxis, &
-         b% pg% Star_history_track7_log_xaxis, &
-         b% pg% Star_history_track7_log_yaxis, &
-         b% pg% show_Star_history_track7_annotation1, &
-         b% pg% show_Star_history_track7_annotation2, &
-         b% pg% show_Star_history_track7_annotation3, &
-         b% pg% Star_history_track7_fname, &
-         b% pg% Star_history_track7_use_decorator, &
-         b% pg% Star_history_track7_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(7), b% pg% Star_History_Track_yname(7), &
+         b% pg% Star_History_Track_xaxis_label(7), b% pg% Star_History_Track_yaxis_label(7), &
+         b% pg% Star_History_Track_xmin(7), b% pg% Star_History_Track_xmax(7), &
+         b% pg% Star_History_Track_xmargin(7), b% pg% Star_History_Track_dxmin(7), &
+         b% pg% Star_History_Track_ymin(7), b% pg% Star_History_Track_ymax(7), &
+         b% pg% Star_History_Track_ymargin(7), b% pg% Star_History_Track_dymin(7), &
+         b% pg% Star_History_Track_step_min(7), b% pg% Star_History_Track_step_max(7), &
+         b% pg% Star_History_Track_reverse_xaxis(7), b% pg% Star_History_Track_reverse_yaxis(7), &
+         b% pg% Star_History_Track_log_xaxis(7), b% pg% Star_History_Track_log_yaxis(7), &
+         b% pg% show_Star_History_Track_annotation1(7), &
+         b% pg% show_Star_History_Track_annotation2(7), &
+         b% pg% show_Star_History_Track_annotation3(7), &
+         b% pg% Star_History_Track_fname(7), &
+         b% pg% Star_History_Track_use_decorator(7), b% pg% Star_History_Track7_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track7_plot
+   end subroutine do_Star_History_Track7_plot
 
-
-   subroutine Star_history_track8_plot(id, device_id, ierr)
+   subroutine Star_History_Track8_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -444,16 +368,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track8_plot(b, id, device_id, &
-         b% pg% Star_history_track8_xleft, b% pg% Star_history_track8_xright, &
-         b% pg% Star_history_track8_ybot, b% pg% Star_history_track8_ytop, .false., &
-         b% pg% Star_history_track8_title, b% pg% Star_history_track8_txt_scale, ierr)
+      call do_Star_History_Track8_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(8), b% pg% Star_History_Track_xright(8), &
+         b% pg% Star_History_Track_ybot(8), b% pg% Star_History_Track_ytop(8), .false., &
+         b% pg% Star_History_Track_title(8), b% pg% Star_History_Track_txt_scale(8), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track8_plot
+   end subroutine Star_History_Track8_plot
 
 
-   subroutine do_Star_history_track8_plot(b, id, device_id, &
+   subroutine do_Star_History_Track8_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -461,37 +385,26 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track8_xname, &
-         b% pg% Star_history_track8_yname, &
-         b% pg% Star_history_track8_xaxis_label, &
-         b% pg% Star_history_track8_yaxis_label, &
-         b% pg% Star_history_track8_xmin, &
-         b% pg% Star_history_track8_xmax, &
-         b% pg% Star_history_track8_xmargin, &
-         b% pg% Star_history_track8_dxmin, &
-         b% pg% Star_history_track8_ymin, &
-         b% pg% Star_history_track8_ymax, &
-         b% pg% Star_history_track8_ymargin, &
-         b% pg% Star_history_track8_dymin, &
-         b% pg% Star_history_track8_step_min, &
-         b% pg% Star_history_track8_step_max, &
-         b% pg% Star_history_track8_reverse_xaxis, &
-         b% pg% Star_history_track8_reverse_yaxis, &
-         b% pg% Star_history_track8_log_xaxis, &
-         b% pg% Star_history_track8_log_yaxis, &
-         b% pg% show_Star_history_track8_annotation1, &
-         b% pg% show_Star_history_track8_annotation2, &
-         b% pg% show_Star_history_track8_annotation3, &
-         b% pg% Star_history_track8_fname, &
-         b% pg% Star_history_track8_use_decorator, &
-         b% pg% Star_history_track8_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(8), b% pg% Star_History_Track_yname(8), &
+         b% pg% Star_History_Track_xaxis_label(8), b% pg% Star_History_Track_yaxis_label(8), &
+         b% pg% Star_History_Track_xmin(8), b% pg% Star_History_Track_xmax(8), &
+         b% pg% Star_History_Track_xmargin(8), b% pg% Star_History_Track_dxmin(8), &
+         b% pg% Star_History_Track_ymin(8), b% pg% Star_History_Track_ymax(8), &
+         b% pg% Star_History_Track_ymargin(8), b% pg% Star_History_Track_dymin(8), &
+         b% pg% Star_History_Track_step_min(8), b% pg% Star_History_Track_step_max(8), &
+         b% pg% Star_History_Track_reverse_xaxis(8), b% pg% Star_History_Track_reverse_yaxis(8), &
+         b% pg% Star_History_Track_log_xaxis(8), b% pg% Star_History_Track_log_yaxis(8), &
+         b% pg% show_Star_History_Track_annotation1(8), &
+         b% pg% show_Star_History_Track_annotation2(8), &
+         b% pg% show_Star_History_Track_annotation3(8), &
+         b% pg% Star_History_Track_fname(8), &
+         b% pg% Star_History_Track_use_decorator(8), b% pg% Star_History_Track8_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track8_plot
+   end subroutine do_Star_History_Track8_plot
 
-
-   subroutine Star_history_track9_plot(id, device_id, ierr)
+   subroutine Star_History_Track9_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
@@ -501,16 +414,16 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Star_history_track9_plot(b, id, device_id, &
-         b% pg% Star_history_track9_xleft, b% pg% Star_history_track9_xright, &
-         b% pg% Star_history_track9_ybot, b% pg% Star_history_track9_ytop, .false., &
-         b% pg% Star_history_track9_title, b% pg% Star_history_track9_txt_scale, ierr)
+      call do_Star_History_Track9_plot(b, id, device_id, &
+         b% pg% Star_History_Track_xleft(9), b% pg% Star_History_Track_xright(9), &
+         b% pg% Star_History_Track_ybot(9), b% pg% Star_History_Track_ytop(9), .false., &
+         b% pg% Star_History_Track_title(9), b% pg% Star_History_Track_txt_scale(9), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine Star_history_track9_plot
+   end subroutine Star_History_Track9_plot
 
 
-   subroutine do_Star_history_track9_plot(b, id, device_id, &
+   subroutine do_Star_History_Track9_plot(b, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
       integer, intent(in) :: id, device_id
@@ -518,34 +431,24 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Star_hist_track(b, id, device_id, &
+      call do_Star_Hist_Track(b, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% Star_history_track9_xname, &
-         b% pg% Star_history_track9_yname, &
-         b% pg% Star_history_track9_xaxis_label, &
-         b% pg% Star_history_track9_yaxis_label, &
-         b% pg% Star_history_track9_xmin, &
-         b% pg% Star_history_track9_xmax, &
-         b% pg% Star_history_track9_xmargin, &
-         b% pg% Star_history_track9_dxmin, &
-         b% pg% Star_history_track9_ymin, &
-         b% pg% Star_history_track9_ymax, &
-         b% pg% Star_history_track9_ymargin, &
-         b% pg% Star_history_track9_dymin, &
-         b% pg% Star_history_track9_step_min, &
-         b% pg% Star_history_track9_step_max, &
-         b% pg% Star_history_track9_reverse_xaxis, &
-         b% pg% Star_history_track9_reverse_yaxis, &
-         b% pg% Star_history_track9_log_xaxis, &
-         b% pg% Star_history_track9_log_yaxis, &
-         b% pg% show_Star_history_track9_annotation1, &
-         b% pg% show_Star_history_track9_annotation2, &
-         b% pg% show_Star_history_track9_annotation3, &
-         b% pg% Star_history_track9_fname, &
-         b% pg% Star_history_track9_use_decorator, &
-         b% pg% Star_history_track9_pgbinary_decorator, &
+         b% pg% Star_History_Track_xname(9), b% pg% Star_History_Track_yname(9), &
+         b% pg% Star_History_Track_xaxis_label(9), b% pg% Star_History_Track_yaxis_label(9), &
+         b% pg% Star_History_Track_xmin(9), b% pg% Star_History_Track_xmax(9), &
+         b% pg% Star_History_Track_xmargin(9), b% pg% Star_History_Track_dxmin(9), &
+         b% pg% Star_History_Track_ymin(9), b% pg% Star_History_Track_ymax(9), &
+         b% pg% Star_History_Track_ymargin(9), b% pg% Star_History_Track_dymin(9), &
+         b% pg% Star_History_Track_step_min(9), b% pg% Star_History_Track_step_max(9), &
+         b% pg% Star_History_Track_reverse_xaxis(9), b% pg% Star_History_Track_reverse_yaxis(9), &
+         b% pg% Star_History_Track_log_xaxis(9), b% pg% Star_History_Track_log_yaxis(9), &
+         b% pg% show_Star_History_Track_annotation1(9), &
+         b% pg% show_Star_History_Track_annotation2(9), &
+         b% pg% show_Star_History_Track_annotation3(9), &
+         b% pg% Star_History_Track_fname(9), &
+         b% pg% Star_History_Track_use_decorator(9), b% pg% Star_History_Track9_pgbinary_decorator, &
          null_decorate, ierr)
-   end subroutine do_Star_history_track9_plot
+   end subroutine do_Star_History_Track9_plot
 
 
    subroutine null_decorate(id, ierr)
@@ -569,20 +472,19 @@ contains
       decorate, ierr)
 
       use utils_lib
-      use pgstar_support, only: set_xleft_xright, set_ytop_ybot
+      use pgstar_support, only: set_xleft_xright, set_ytop_ybot, count_hist_points, get_hist_points
 
       type (binary_info), pointer :: b
       integer, intent(in) :: &
-         id, device_id, step_min, step_max, n_sigma
+         id, device_id, step_min, step_max
       real, intent(in) :: &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
-         xtarget, ytarget, xsigma, ysigma, &
          given_xmin, given_xmax, xmargin, dxmin, &
          given_ymin, given_ymax, ymargin, dymin
       character (len = *), intent(in) :: &
          title, xname, yname, xaxis_label, yaxis_label, fname
       logical, intent(in) :: subplot, &
-         reverse_xaxis, reverse_yaxis, log_xaxis, log_yaxis, show_target_box, &
+         reverse_xaxis, reverse_yaxis, log_xaxis, log_yaxis, &
          show_annotation1, show_annotation2, show_annotation3, use_decorator
       interface
          subroutine decorate(id, ierr)
@@ -681,8 +583,8 @@ contains
             return
          end if
 
-         call get_hist_points(s, step_min, step_max, n, ix, xvec)
-         call get_hist_points(s, step_min, step_max, n, iy, yvec)
+         call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
+         call get_hist_points(s, step_min, step_max, n, iy, yvec, ierr)
 
          if (log_xaxis) then
             do k = 1, n
@@ -704,39 +606,7 @@ contains
             n, yvec, given_ymin, given_ymax, -101.0, ymargin, &
             reverse_yaxis, dymin, ybot, ytop)
 
-         if (show_target_box) then
-            call pgsci(clr_Silver)
-            if (n_sigma >= 0) then
-               j_min = n_sigma
-               j_max = n_sigma
-            else
-               j_min = 1
-               j_max = -n_sigma
-            end if
-            do j = j_min, j_max
-               dx = xsigma * j
-               xplus = xtarget + dx
-               xminus = xtarget - dx
-               if (log_xaxis) then
-                  xplus = log10(max(tiny(xplus), xplus))
-                  xminus = log10(max(tiny(xminus), xminus))
-               end if
-               dy = ysigma * j
-               yplus = ytarget + dy
-               yminus = ytarget - dy
-               if (log_yaxis) then
-                  yplus = log10(max(tiny(yplus), yplus))
-                  yminus = log10(max(tiny(yminus), yminus))
-               end if
-               call pgmove(xminus, yminus)
-               call pgdraw(xplus, yminus)
-               call pgdraw(xplus, yplus)
-               call pgdraw(xminus, yplus)
-               call pgdraw(xminus, yminus)
-            end do
-         end if
-
-         if (star == 1)
+         if (star == 1) then
             call pgsci(b% pg% star_1_color)
          else
             call pgsci(b% pg% star_2_color)
@@ -769,7 +639,7 @@ contains
          if (.not. read_values_from_file(fname, &
             file_data_xvec, file_data_yvec, file_data_len)) then
             write(*, *) &
-               'bad filename for History tracks plot ' // trim(fname)
+               'bad filename for Star_History tracks plot ' // trim(fname)
             return
          end if
          if (log_xaxis) then

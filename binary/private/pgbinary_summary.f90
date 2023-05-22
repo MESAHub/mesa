@@ -45,10 +45,10 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_Text_Summary1_plot(b, id, device_id, &
-         b% pg% Text_Summary1_xleft, b% pg% Text_Summary1_xright, &
-         b% pg% Text_Summary1_ybot, b% pg% Text_Summary1_ytop, .false., &
-         b% pg% Text_Summary1_title, b% pg% Text_Summary1_txt_scale, ierr)
+      call do_Text_Summary_plot(b, id, device_id, &
+         b% pg% Text_Summary_xleft(1), b% pg% Text_Summary_xright(1), &
+         b% pg% Text_Summary_ybot(1), b% pg% Text_Summary_ytop(1), .false., &
+         b% pg% Text_Summary_title(1), b% pg% Text_Summary_txt_scale(1), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary1_plot
@@ -64,8 +64,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary1_num_rows, b% pg% Text_Summary1_num_cols, &
-         b% pg% Text_Summary1_name, ierr)
+         b% pg% Text_Summary_num_rows(1), b% pg% Text_Summary_num_cols(1), &
+         b% pg% Text_Summary_name(1, :, :), ierr)
    end subroutine do_Text_Summary1_plot
 
 
@@ -80,9 +80,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary2_plot(b, id, device_id, &
-         b% pg% Text_Summary2_xleft, b% pg% Text_Summary2_xright, &
-         b% pg% Text_Summary2_ybot, b% pg% Text_Summary2_ytop, .false., &
-         b% pg% Text_Summary2_title, b% pg% Text_Summary2_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(2), b% pg% Text_Summary_xright(2), &
+         b% pg% Text_Summary_ybot(2), b% pg% Text_Summary_ytop(2), .false., &
+         b% pg% Text_Summary_title(2), b% pg% Text_Summary_txt_scale(2), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary2_plot
@@ -98,8 +98,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary2_num_rows, b% pg% Text_Summary2_num_cols, &
-         b% pg% Text_Summary2_name, ierr)
+         b% pg% Text_Summary_num_rows(2), b% pg% Text_Summary_num_cols(2), &
+         b% pg% Text_Summary_name(2, :, :), ierr)
    end subroutine do_Text_Summary2_plot
 
 
@@ -114,9 +114,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary3_plot(b, id, device_id, &
-         b% pg% Text_Summary3_xleft, b% pg% Text_Summary3_xright, &
-         b% pg% Text_Summary3_ybot, b% pg% Text_Summary3_ytop, .false., &
-         b% pg% Text_Summary3_title, b% pg% Text_Summary3_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(3), b% pg% Text_Summary_xright(3), &
+         b% pg% Text_Summary_ybot(3), b% pg% Text_Summary_ytop(3), .false., &
+         b% pg% Text_Summary_title(3), b% pg% Text_Summary_txt_scale(3), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary3_plot
@@ -132,8 +132,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary3_num_rows, b% pg% Text_Summary3_num_cols, &
-         b% pg% Text_Summary3_name, ierr)
+         b% pg% Text_Summary_num_rows(3), b% pg% Text_Summary_num_cols(3), &
+         b% pg% Text_Summary_name(3, :, :), ierr)
    end subroutine do_Text_Summary3_plot
 
 
@@ -148,9 +148,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary4_plot(b, id, device_id, &
-         b% pg% Text_Summary4_xleft, b% pg% Text_Summary4_xright, &
-         b% pg% Text_Summary4_ybot, b% pg% Text_Summary4_ytop, .false., &
-         b% pg% Text_Summary4_title, b% pg% Text_Summary4_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(4), b% pg% Text_Summary_xright(4), &
+         b% pg% Text_Summary_ybot(4), b% pg% Text_Summary_ytop(4), .false., &
+         b% pg% Text_Summary_title(4), b% pg% Text_Summary_txt_scale(4), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary4_plot
@@ -166,8 +166,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary4_num_rows, b% pg% Text_Summary4_num_cols, &
-         b% pg% Text_Summary4_name, ierr)
+         b% pg% Text_Summary_num_rows(4), b% pg% Text_Summary_num_cols(4), &
+         b% pg% Text_Summary_name(4, :, :), ierr)
    end subroutine do_Text_Summary4_plot
 
 
@@ -182,9 +182,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary5_plot(b, id, device_id, &
-         b% pg% Text_Summary5_xleft, b% pg% Text_Summary5_xright, &
-         b% pg% Text_Summary5_ybot, b% pg% Text_Summary5_ytop, .false., &
-         b% pg% Text_Summary5_title, b% pg% Text_Summary5_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(5), b% pg% Text_Summary_xright(5), &
+         b% pg% Text_Summary_ybot(5), b% pg% Text_Summary_ytop(5), .false., &
+         b% pg% Text_Summary_title(5), b% pg% Text_Summary_txt_scale(5), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary5_plot
@@ -200,8 +200,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary5_num_rows, b% pg% Text_Summary5_num_cols, &
-         b% pg% Text_Summary5_name, ierr)
+         b% pg% Text_Summary_num_rows(5), b% pg% Text_Summary_num_cols(5), &
+         b% pg% Text_Summary_name(5, :, :), ierr)
    end subroutine do_Text_Summary5_plot
 
 
@@ -216,9 +216,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary6_plot(b, id, device_id, &
-         b% pg% Text_Summary6_xleft, b% pg% Text_Summary6_xright, &
-         b% pg% Text_Summary6_ybot, b% pg% Text_Summary6_ytop, .false., &
-         b% pg% Text_Summary6_title, b% pg% Text_Summary6_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(6), b% pg% Text_Summary_xright(6), &
+         b% pg% Text_Summary_ybot(6), b% pg% Text_Summary_ytop(6), .false., &
+         b% pg% Text_Summary_title(6), b% pg% Text_Summary_txt_scale(6), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary6_plot
@@ -234,8 +234,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary6_num_rows, b% pg% Text_Summary6_num_cols, &
-         b% pg% Text_Summary6_name, ierr)
+         b% pg% Text_Summary_num_rows(6), b% pg% Text_Summary_num_cols(6), &
+         b% pg% Text_Summary_name(6, :, :), ierr)
    end subroutine do_Text_Summary6_plot
 
 
@@ -250,9 +250,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary7_plot(b, id, device_id, &
-         b% pg% Text_Summary7_xleft, b% pg% Text_Summary7_xright, &
-         b% pg% Text_Summary7_ybot, b% pg% Text_Summary7_ytop, .false., &
-         b% pg% Text_Summary7_title, b% pg% Text_Summary7_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(7), b% pg% Text_Summary_xright(7), &
+         b% pg% Text_Summary_ybot(7), b% pg% Text_Summary_ytop(7), .false., &
+         b% pg% Text_Summary_title(7), b% pg% Text_Summary_txt_scale(7), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary7_plot
@@ -268,8 +268,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary7_num_rows, b% pg% Text_Summary7_num_cols, &
-         b% pg% Text_Summary7_name, ierr)
+         b% pg% Text_Summary_num_rows(7), b% pg% Text_Summary_num_cols(7), &
+         b% pg% Text_Summary_name(7, :, :), ierr)
    end subroutine do_Text_Summary7_plot
 
 
@@ -284,9 +284,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary8_plot(b, id, device_id, &
-         b% pg% Text_Summary8_xleft, b% pg% Text_Summary8_xright, &
-         b% pg% Text_Summary8_ybot, b% pg% Text_Summary8_ytop, .false., &
-         b% pg% Text_Summary8_title, b% pg% Text_Summary8_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(8), b% pg% Text_Summary_xright(8), &
+         b% pg% Text_Summary_ybot(8), b% pg% Text_Summary_ytop(8), .false., &
+         b% pg% Text_Summary_title(8), b% pg% Text_Summary_txt_scale(8), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary8_plot
@@ -302,8 +302,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary8_num_rows, b% pg% Text_Summary8_num_cols, &
-         b% pg% Text_Summary8_name, ierr)
+         b% pg% Text_Summary_num_rows(8), b% pg% Text_Summary_num_cols(8), &
+         b% pg% Text_Summary_name(8, :, :), ierr)
    end subroutine do_Text_Summary8_plot
 
 
@@ -318,9 +318,9 @@ contains
       call pgbbuf()
       call pgeras()
       call do_Text_Summary9_plot(b, id, device_id, &
-         b% pg% Text_Summary9_xleft, b% pg% Text_Summary9_xright, &
-         b% pg% Text_Summary9_ybot, b% pg% Text_Summary9_ytop, .false., &
-         b% pg% Text_Summary9_title, b% pg% Text_Summary9_txt_scale, ierr)
+         b% pg% Text_Summary_xleft(9), b% pg% Text_Summary_xright(9), &
+         b% pg% Text_Summary_ybot(9), b% pg% Text_Summary_ytop(9), .false., &
+         b% pg% Text_Summary_title(9), b% pg% Text_Summary_txt_scale(9), ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Text_Summary9_plot
@@ -336,8 +336,8 @@ contains
       integer, intent(out) :: ierr
       call Summary_plot(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
-         b% pg% Text_Summary9_num_rows, b% pg% Text_Summary9_num_cols, &
-         b% pg% Text_Summary9_name, ierr)
+         b% pg% Text_Summary_num_rows(9), b% pg% Text_Summary_num_cols(9), &
+         b% pg% Text_Summary_name(9, :, :), ierr)
    end subroutine do_Text_Summary9_plot
 
 

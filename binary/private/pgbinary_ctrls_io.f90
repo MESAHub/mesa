@@ -96,1303 +96,143 @@ module pgbinary_ctrls_io
       pgbinary_model_lw, &
       pgbinary_box_lw, &
 
+      Text_Summary_win_flag, &
+      Text_Summary_file_flag, &
+      Text_Summary_file_interval, &
+      Text_Summary_file_dir, &
+      Text_Summary_file_prefix, &
+      Text_Summary_num_cols, Text_Summary_num_rows, Text_Summary_name, &
+      Text_Summary_win_width, &
+      Text_Summary_win_aspect_ratio, &
+      Text_Summary_file_width, &
+      Text_Summary_file_aspect_ratio, &
+      Text_Summary_title, Text_Summary_xleft, Text_Summary_xright, &
+      Text_Summary_ybot, Text_Summary_ytop, Text_Summary_txt_scale, &
 
-      Text_Summary1_win_flag, &
-      Text_Summary1_file_flag, &
-      Text_Summary1_file_interval, &
-      Text_Summary1_file_dir, &
-      Text_Summary1_file_prefix, &
-      Text_Summary1_num_cols, Text_Summary1_num_rows, Text_Summary1_name, &
-      Text_Summary1_win_width, &
-      Text_Summary1_win_aspect_ratio, &
-      Text_Summary1_file_width, &
-      Text_Summary1_file_aspect_ratio, &
-      Text_Summary1_title, Text_Summary1_xleft, Text_Summary1_xright, &
-      Text_Summary1_ybot, Text_Summary1_ytop, Text_Summary1_txt_scale, &
+      History_Track_win_flag, &
+      History_Track_file_flag, &
+      History_Track_file_interval, &
+      History_Track_step_min, &
+      History_Track_step_max, &
+      show_History_Track_target_box, &
+      History_Track_n_sigma, &
+      History_Track_xtarget, &
+      History_Track_xsigma, &
+      History_Track_ytarget, &
+      History_Track_ysigma, &
+      History_Track_xname, &
+      History_Track_xaxis_label, &
+      History_Track_yname, &
+      History_Track_yaxis_label, &
+      History_Track_file_dir, &
+      History_Track_file_prefix, &
+      show_History_Track_annotation1, &
+      show_History_Track_annotation2, &
+      show_History_Track_annotation3, &
+      History_Track_fname, &
+      History_Track_reverse_xaxis, &
+      History_Track_reverse_yaxis, &
+      History_Track_log_xaxis, &
+      History_Track_log_yaxis, &
+      History_Track_xmin, &
+      History_Track_xmax, &
+      History_Track_ymin, &
+      History_Track_ymax, &
+      History_Track_xmargin, &
+      History_Track_ymargin, &
+      History_Track_dxmin, &
+      History_Track_dymin, &
+      History_Track_win_width, &
+      History_Track_win_aspect_ratio, &
+      History_Track_file_width, &
+      History_Track_file_aspect_ratio, &
+      History_Track_xleft, &
+      History_Track_xright, &
+      History_Track_ybot, &
+      History_Track_ytop, &
+      History_Track_txt_scale, &
+      History_Track_title, &
+      History_Track_use_decorator, &
 
-      Text_Summary2_win_flag, &
-      Text_Summary2_file_flag, &
-      Text_Summary2_file_interval, &
-      Text_Summary2_file_dir, &
-      Text_Summary2_file_prefix, &
-      Text_Summary2_num_cols, Text_Summary2_num_rows, Text_Summary2_name, &
-      Text_Summary2_win_width, &
-      Text_Summary2_win_aspect_ratio, &
-      Text_Summary2_file_width, &
-      Text_Summary2_file_aspect_ratio, &
-      Text_Summary2_title, Text_Summary2_xleft, Text_Summary2_xright, &
-      Text_Summary2_ybot, Text_Summary2_ytop, Text_Summary2_txt_scale, &
-
-      Text_Summary3_win_flag, &
-      Text_Summary3_file_flag, &
-      Text_Summary3_file_interval, &
-      Text_Summary3_file_dir, &
-      Text_Summary3_file_prefix, &
-      Text_Summary3_num_cols, Text_Summary3_num_rows, Text_Summary3_name, &
-      Text_Summary3_win_width, &
-      Text_Summary3_win_aspect_ratio, &
-      Text_Summary3_file_width, &
-      Text_Summary3_file_aspect_ratio, &
-      Text_Summary3_title, Text_Summary3_xleft, Text_Summary3_xright, &
-      Text_Summary3_ybot, Text_Summary3_ytop, Text_Summary3_txt_scale, &
-
-      Text_Summary4_win_flag, &
-      Text_Summary4_file_flag, &
-      Text_Summary4_file_interval, &
-      Text_Summary4_file_dir, &
-      Text_Summary4_file_prefix, &
-      Text_Summary4_num_cols, Text_Summary4_num_rows, Text_Summary4_name, &
-      Text_Summary4_win_width, &
-      Text_Summary4_win_aspect_ratio, &
-      Text_Summary4_file_width, &
-      Text_Summary4_file_aspect_ratio, &
-      Text_Summary4_title, Text_Summary4_xleft, Text_Summary4_xright, &
-      Text_Summary4_ybot, Text_Summary4_ytop, Text_Summary4_txt_scale, &
-
-      Text_Summary5_win_flag, &
-      Text_Summary5_file_flag, &
-      Text_Summary5_file_interval, &
-      Text_Summary5_file_dir, &
-      Text_Summary5_file_prefix, &
-      Text_Summary5_num_cols, Text_Summary5_num_rows, Text_Summary5_name, &
-      Text_Summary5_win_width, &
-      Text_Summary5_win_aspect_ratio, &
-      Text_Summary5_file_width, &
-      Text_Summary5_file_aspect_ratio, &
-      Text_Summary5_title, Text_Summary5_xleft, Text_Summary5_xright, &
-      Text_Summary5_ybot, Text_Summary5_ytop, Text_Summary5_txt_scale, &
-
-      Text_Summary6_win_flag, &
-      Text_Summary6_file_flag, &
-      Text_Summary6_file_interval, &
-      Text_Summary6_file_dir, &
-      Text_Summary6_file_prefix, &
-      Text_Summary6_num_cols, Text_Summary6_num_rows, Text_Summary6_name, &
-      Text_Summary6_win_width, &
-      Text_Summary6_win_aspect_ratio, &
-      Text_Summary6_file_width, &
-      Text_Summary6_file_aspect_ratio, &
-      Text_Summary6_title, Text_Summary6_xleft, Text_Summary6_xright, &
-      Text_Summary6_ybot, Text_Summary6_ytop, Text_Summary6_txt_scale, &
-
-      Text_Summary7_win_flag, &
-      Text_Summary7_file_flag, &
-      Text_Summary7_file_interval, &
-      Text_Summary7_file_dir, &
-      Text_Summary7_file_prefix, &
-      Text_Summary7_num_cols, Text_Summary7_num_rows, Text_Summary7_name, &
-      Text_Summary7_win_width, &
-      Text_Summary7_win_aspect_ratio, &
-      Text_Summary7_file_width, &
-      Text_Summary7_file_aspect_ratio, &
-      Text_Summary7_title, Text_Summary7_xleft, Text_Summary7_xright, &
-      Text_Summary7_ybot, Text_Summary7_ytop, Text_Summary7_txt_scale, &
-
-      Text_Summary8_win_flag, &
-      Text_Summary8_file_flag, &
-      Text_Summary8_file_interval, &
-      Text_Summary8_file_dir, &
-      Text_Summary8_file_prefix, &
-      Text_Summary8_num_cols, Text_Summary8_num_rows, Text_Summary8_name, &
-      Text_Summary8_win_width, &
-      Text_Summary8_win_aspect_ratio, &
-      Text_Summary8_file_width, &
-      Text_Summary8_file_aspect_ratio, &
-      Text_Summary8_title, Text_Summary8_xleft, Text_Summary8_xright, &
-      Text_Summary8_ybot, Text_Summary8_ytop, Text_Summary8_txt_scale, &
-
-      Text_Summary9_win_flag, &
-      Text_Summary9_file_flag, &
-      Text_Summary9_file_interval, &
-      Text_Summary9_file_dir, &
-      Text_Summary9_file_prefix, &
-      Text_Summary9_num_cols, Text_Summary9_num_rows, Text_Summary9_name, &
-      Text_Summary9_win_width, &
-      Text_Summary9_win_aspect_ratio, &
-      Text_Summary9_file_width, &
-      Text_Summary9_file_aspect_ratio, &
-      Text_Summary9_title, Text_Summary9_xleft, Text_Summary9_xright, &
-      Text_Summary9_ybot, Text_Summary9_ytop, Text_Summary9_txt_scale, &
-
-      History_Track1_win_flag, &
-      History_Track1_file_flag, &
-      History_Track1_file_interval, &
-      History_Track1_step_min, &
-      History_Track1_step_max, &
-      show_History_Track1_target_box, &
-      History_Track1_n_sigma, &
-      History_Track1_xtarget, &
-      History_Track1_xsigma, &
-      History_Track1_ytarget, &
-      History_Track1_ysigma, &
-      History_Track1_xname, &
-      History_Track1_xaxis_label, &
-      History_Track1_yname, &
-      History_Track1_yaxis_label, &
-      History_Track1_file_dir, &
-      History_Track1_file_prefix, &
-      show_History_Track1_annotation1, &
-      show_History_Track1_annotation2, &
-      show_History_Track1_annotation3, &
-      History_Track1_fname, &
-      History_Track1_reverse_xaxis, &
-      History_Track1_reverse_yaxis, &
-      History_Track1_log_xaxis, &
-      History_Track1_log_yaxis, &
-      History_Track1_xmin, &
-      History_Track1_xmax, &
-      History_Track1_ymin, &
-      History_Track1_ymax, &
-      History_Track1_xmargin, &
-      History_Track1_ymargin, &
-      History_Track1_dxmin, &
-      History_Track1_dymin, &
-      History_Track1_win_width, &
-      History_Track1_win_aspect_ratio, &
-      History_Track1_file_width, &
-      History_Track1_file_aspect_ratio, &
-      History_Track1_xleft, &
-      History_Track1_xright, &
-      History_Track1_ybot, &
-      History_Track1_ytop, &
-      History_Track1_txt_scale, &
-      History_Track1_title, &
-      History_Track1_use_decorator, &
-
-      History_Track2_win_flag, &
-      History_Track2_file_flag, &
-      History_Track2_file_interval, &
-      History_Track2_step_min, &
-      History_Track2_step_max, &
-      show_History_Track2_target_box, &
-      History_Track2_n_sigma, &
-      History_Track2_xtarget, &
-      History_Track2_xsigma, &
-      History_Track2_ytarget, &
-      History_Track2_ysigma, &
-      History_Track2_xname, &
-      History_Track2_xaxis_label, &
-      History_Track2_yname, &
-      History_Track2_yaxis_label, &
-      History_Track2_file_dir, &
-      History_Track2_file_prefix, &
-      show_History_Track2_annotation1, &
-      show_History_Track2_annotation2, &
-      show_History_Track2_annotation3, &
-      History_Track2_fname, &
-      History_Track2_reverse_xaxis, &
-      History_Track2_reverse_yaxis, &
-      History_Track2_log_xaxis, &
-      History_Track2_log_yaxis, &
-      History_Track2_xmin, &
-      History_Track2_xmax, &
-      History_Track2_ymin, &
-      History_Track2_ymax, &
-      History_Track2_xmargin, &
-      History_Track2_ymargin, &
-      History_Track2_dxmin, &
-      History_Track2_dymin, &
-      History_Track2_win_width, &
-      History_Track2_win_aspect_ratio, &
-      History_Track2_file_width, &
-      History_Track2_file_aspect_ratio, &
-      History_Track2_xleft, &
-      History_Track2_xright, &
-      History_Track2_ybot, &
-      History_Track2_ytop, &
-      History_Track2_txt_scale, &
-      History_Track2_title, &
-      History_Track2_use_decorator, &
-
-      History_Track3_win_flag, &
-      History_Track3_file_flag, &
-      History_Track3_file_interval, &
-      History_Track3_step_min, &
-      History_Track3_step_max, &
-      show_History_Track3_target_box, &
-      History_Track3_n_sigma, &
-      History_Track3_xtarget, &
-      History_Track3_xsigma, &
-      History_Track3_ytarget, &
-      History_Track3_ysigma, &
-      History_Track3_xname, &
-      History_Track3_xaxis_label, &
-      History_Track3_yname, &
-      History_Track3_yaxis_label, &
-      History_Track3_file_dir, &
-      History_Track3_file_prefix, &
-      show_History_Track3_annotation1, &
-      show_History_Track3_annotation2, &
-      show_History_Track3_annotation3, &
-      History_Track3_fname, &
-      History_Track3_reverse_xaxis, &
-      History_Track3_reverse_yaxis, &
-      History_Track3_log_xaxis, &
-      History_Track3_log_yaxis, &
-      History_Track3_xmin, &
-      History_Track3_xmax, &
-      History_Track3_ymin, &
-      History_Track3_ymax, &
-      History_Track3_xmargin, &
-      History_Track3_ymargin, &
-      History_Track3_dxmin, &
-      History_Track3_dymin, &
-      History_Track3_win_width, &
-      History_Track3_win_aspect_ratio, &
-      History_Track3_file_width, &
-      History_Track3_file_aspect_ratio, &
-      History_Track3_xleft, &
-      History_Track3_xright, &
-      History_Track3_ybot, &
-      History_Track3_ytop, &
-      History_Track3_txt_scale, &
-      History_Track3_title, &
-      History_Track3_use_decorator, &
-
-      History_Track4_win_flag, &
-      History_Track4_file_flag, &
-      History_Track4_file_interval, &
-      History_Track4_step_min, &
-      History_Track4_step_max, &
-      show_History_Track4_target_box, &
-      History_Track4_n_sigma, &
-      History_Track4_xtarget, &
-      History_Track4_xsigma, &
-      History_Track4_ytarget, &
-      History_Track4_ysigma, &
-      History_Track4_xname, &
-      History_Track4_xaxis_label, &
-      History_Track4_yname, &
-      History_Track4_yaxis_label, &
-      History_Track4_file_dir, &
-      History_Track4_file_prefix, &
-      show_History_Track4_annotation1, &
-      show_History_Track4_annotation2, &
-      show_History_Track4_annotation3, &
-      History_Track4_fname, &
-      History_Track4_reverse_xaxis, &
-      History_Track4_reverse_yaxis, &
-      History_Track4_log_xaxis, &
-      History_Track4_log_yaxis, &
-      History_Track4_xmin, &
-      History_Track4_xmax, &
-      History_Track4_ymin, &
-      History_Track4_ymax, &
-      History_Track4_xmargin, &
-      History_Track4_ymargin, &
-      History_Track4_dxmin, &
-      History_Track4_dymin, &
-      History_Track4_win_width, &
-      History_Track4_win_aspect_ratio, &
-      History_Track4_file_width, &
-      History_Track4_file_aspect_ratio, &
-      History_Track4_xleft, &
-      History_Track4_xright, &
-      History_Track4_ybot, &
-      History_Track4_ytop, &
-      History_Track4_txt_scale, &
-      History_Track4_title, &
-      History_Track4_use_decorator, &
-
-      History_Track5_win_flag, &
-      History_Track5_file_flag, &
-      History_Track5_file_interval, &
-      History_Track5_step_min, &
-      History_Track5_step_max, &
-      show_History_Track5_target_box, &
-      History_Track5_n_sigma, &
-      History_Track5_xtarget, &
-      History_Track5_xsigma, &
-      History_Track5_ytarget, &
-      History_Track5_ysigma, &
-      History_Track5_xname, &
-      History_Track5_xaxis_label, &
-      History_Track5_yname, &
-      History_Track5_yaxis_label, &
-      History_Track5_file_dir, &
-      History_Track5_file_prefix, &
-      show_History_Track5_annotation1, &
-      show_History_Track5_annotation2, &
-      show_History_Track5_annotation3, &
-      History_Track5_fname, &
-      History_Track5_reverse_xaxis, &
-      History_Track5_reverse_yaxis, &
-      History_Track5_log_xaxis, &
-      History_Track5_log_yaxis, &
-      History_Track5_xmin, &
-      History_Track5_xmax, &
-      History_Track5_ymin, &
-      History_Track5_ymax, &
-      History_Track5_xmargin, &
-      History_Track5_ymargin, &
-      History_Track5_dxmin, &
-      History_Track5_dymin, &
-      History_Track5_win_width, &
-      History_Track5_win_aspect_ratio, &
-      History_Track5_file_width, &
-      History_Track5_file_aspect_ratio, &
-      History_Track5_xleft, &
-      History_Track5_xright, &
-      History_Track5_ybot, &
-      History_Track5_ytop, &
-      History_Track5_txt_scale, &
-      History_Track5_title, &
-      History_Track5_use_decorator, &
-
-      History_Track6_win_flag, &
-      History_Track6_file_flag, &
-      History_Track6_file_interval, &
-      History_Track6_step_min, &
-      History_Track6_step_max, &
-      show_History_Track6_target_box, &
-      History_Track6_n_sigma, &
-      History_Track6_xtarget, &
-      History_Track6_xsigma, &
-      History_Track6_ytarget, &
-      History_Track6_ysigma, &
-      History_Track6_xname, &
-      History_Track6_xaxis_label, &
-      History_Track6_yname, &
-      History_Track6_yaxis_label, &
-      History_Track6_file_dir, &
-      History_Track6_file_prefix, &
-      show_History_Track6_annotation1, &
-      show_History_Track6_annotation2, &
-      show_History_Track6_annotation3, &
-      History_Track6_fname, &
-      History_Track6_reverse_xaxis, &
-      History_Track6_reverse_yaxis, &
-      History_Track6_log_xaxis, &
-      History_Track6_log_yaxis, &
-      History_Track6_xmin, &
-      History_Track6_xmax, &
-      History_Track6_ymin, &
-      History_Track6_ymax, &
-      History_Track6_xmargin, &
-      History_Track6_ymargin, &
-      History_Track6_dxmin, &
-      History_Track6_dymin, &
-      History_Track6_win_width, &
-      History_Track6_win_aspect_ratio, &
-      History_Track6_file_width, &
-      History_Track6_file_aspect_ratio, &
-      History_Track6_xleft, &
-      History_Track6_xright, &
-      History_Track6_ybot, &
-      History_Track6_ytop, &
-      History_Track6_txt_scale, &
-      History_Track6_title, &
-      History_Track6_use_decorator, &
-
-      History_Track7_win_flag, &
-      History_Track7_file_flag, &
-      History_Track7_file_interval, &
-      History_Track7_step_min, &
-      History_Track7_step_max, &
-      show_History_Track7_target_box, &
-      History_Track7_n_sigma, &
-      History_Track7_xtarget, &
-      History_Track7_xsigma, &
-      History_Track7_ytarget, &
-      History_Track7_ysigma, &
-      History_Track7_xname, &
-      History_Track7_xaxis_label, &
-      History_Track7_yname, &
-      History_Track7_yaxis_label, &
-      History_Track7_file_dir, &
-      History_Track7_file_prefix, &
-      show_History_Track7_annotation1, &
-      show_History_Track7_annotation2, &
-      show_History_Track7_annotation3, &
-      History_Track7_fname, &
-      History_Track7_reverse_xaxis, &
-      History_Track7_reverse_yaxis, &
-      History_Track7_log_xaxis, &
-      History_Track7_log_yaxis, &
-      History_Track7_xmin, &
-      History_Track7_xmax, &
-      History_Track7_ymin, &
-      History_Track7_ymax, &
-      History_Track7_xmargin, &
-      History_Track7_ymargin, &
-      History_Track7_dxmin, &
-      History_Track7_dymin, &
-      History_Track7_win_width, &
-      History_Track7_win_aspect_ratio, &
-      History_Track7_file_width, &
-      History_Track7_file_aspect_ratio, &
-      History_Track7_xleft, &
-      History_Track7_xright, &
-      History_Track7_ybot, &
-      History_Track7_ytop, &
-      History_Track7_txt_scale, &
-      History_Track7_title, &
-      History_Track7_use_decorator, &
-
-      History_Track8_win_flag, &
-      History_Track8_file_flag, &
-      History_Track8_file_interval, &
-      History_Track8_step_min, &
-      History_Track8_step_max, &
-      show_History_Track8_target_box, &
-      History_Track8_n_sigma, &
-      History_Track8_xtarget, &
-      History_Track8_xsigma, &
-      History_Track8_ytarget, &
-      History_Track8_ysigma, &
-      History_Track8_xname, &
-      History_Track8_xaxis_label, &
-      History_Track8_yname, &
-      History_Track8_yaxis_label, &
-      History_Track8_file_dir, &
-      History_Track8_file_prefix, &
-      show_History_Track8_annotation1, &
-      show_History_Track8_annotation2, &
-      show_History_Track8_annotation3, &
-      History_Track8_fname, &
-      History_Track8_reverse_xaxis, &
-      History_Track8_reverse_yaxis, &
-      History_Track8_log_xaxis, &
-      History_Track8_log_yaxis, &
-      History_Track8_xmin, &
-      History_Track8_xmax, &
-      History_Track8_ymin, &
-      History_Track8_ymax, &
-      History_Track8_xmargin, &
-      History_Track8_ymargin, &
-      History_Track8_dxmin, &
-      History_Track8_dymin, &
-      History_Track8_win_width, &
-      History_Track8_win_aspect_ratio, &
-      History_Track8_file_width, &
-      History_Track8_file_aspect_ratio, &
-      History_Track8_xleft, &
-      History_Track8_xright, &
-      History_Track8_ybot, &
-      History_Track8_ytop, &
-      History_Track8_txt_scale, &
-      History_Track8_title, &
-      History_Track8_use_decorator, &
-
-      History_Track9_win_flag, &
-      History_Track9_file_flag, &
-      History_Track9_file_interval, &
-      History_Track9_step_min, &
-      History_Track9_step_max, &
-      show_History_Track9_target_box, &
-      History_Track9_n_sigma, &
-      History_Track9_xtarget, &
-      History_Track9_xsigma, &
-      History_Track9_ytarget, &
-      History_Track9_ysigma, &
-      History_Track9_xname, &
-      History_Track9_xaxis_label, &
-      History_Track9_yname, &
-      History_Track9_yaxis_label, &
-      History_Track9_file_dir, &
-      History_Track9_file_prefix, &
-      show_History_Track9_annotation1, &
-      show_History_Track9_annotation2, &
-      show_History_Track9_annotation3, &
-      History_Track9_fname, &
-      History_Track9_reverse_xaxis, &
-      History_Track9_reverse_yaxis, &
-      History_Track9_log_xaxis, &
-      History_Track9_log_yaxis, &
-      History_Track9_xmin, &
-      History_Track9_xmax, &
-      History_Track9_ymin, &
-      History_Track9_ymax, &
-      History_Track9_xmargin, &
-      History_Track9_ymargin, &
-      History_Track9_dxmin, &
-      History_Track9_dymin, &
-      History_Track9_win_width, &
-      History_Track9_win_aspect_ratio, &
-      History_Track9_file_width, &
-      History_Track9_file_aspect_ratio, &
-      History_Track9_xleft, &
-      History_Track9_xright, &
-      History_Track9_ybot, &
-      History_Track9_ytop, &
-      History_Track9_txt_scale, &
-      History_Track9_title, &
-      History_Track9_use_decorator, &
-
-      Star_History_track1_win_flag, &
-      Star_History_track1_file_flag, &
-      Star_History_track1_file_interval, &
-      Star_History_track1_step_min, &
-      Star_History_track1_step_max, &
-      show_Star_History_track1_target_box, &
-      Star_History_track1_n_sigma, &
-      Star_History_track1_xtarget, &
-      Star_History_track1_xsigma, &
-      Star_History_track1_ytarget, &
-      Star_History_track1_ysigma, &
-      Star_History_track1_xname, &
-      Star_History_track1_xaxis_label, &
-      Star_History_track1_yname, &
-      Star_History_track1_yaxis_label, &
-      Star_History_track1_file_dir, &
-      Star_History_track1_file_prefix, &
-      show_Star_History_track1_annotation1, &
-      show_Star_History_track1_annotation2, &
-      show_Star_History_track1_annotation3, &
-      Star_History_track1_fname, &
-      Star_History_track1_reverse_xaxis, &
-      Star_History_track1_reverse_yaxis, &
-      Star_History_track1_log_xaxis, &
-      Star_History_track1_log_yaxis, &
-      Star_History_track1_xmin, &
-      Star_History_track1_xmax, &
-      Star_History_track1_ymin, &
-      Star_History_track1_ymax, &
-      Star_History_track1_xmargin, &
-      Star_History_track1_ymargin, &
-      Star_History_track1_dxmin, &
-      Star_History_track1_dymin, &
-      Star_History_track1_win_width, &
-      Star_History_track1_win_aspect_ratio, &
-      Star_History_track1_file_width, &
-      Star_History_track1_file_aspect_ratio, &
-      Star_History_track1_xleft, &
-      Star_History_track1_xright, &
-      Star_History_track1_ybot, &
-      Star_History_track1_ytop, &
-      Star_History_track1_txt_scale, &
-      Star_History_track1_title, &
-      Star_History_track1_use_decorator, &
-
-      Star_History_track2_win_flag, &
-      Star_History_track2_file_flag, &
-      Star_History_track2_file_interval, &
-      Star_History_track2_step_min, &
-      Star_History_track2_step_max, &
-      show_Star_History_track2_target_box, &
-      Star_History_track2_n_sigma, &
-      Star_History_track2_xtarget, &
-      Star_History_track2_xsigma, &
-      Star_History_track2_ytarget, &
-      Star_History_track2_ysigma, &
-      Star_History_track2_xname, &
-      Star_History_track2_xaxis_label, &
-      Star_History_track2_yname, &
-      Star_History_track2_yaxis_label, &
-      Star_History_track2_file_dir, &
-      Star_History_track2_file_prefix, &
-      show_Star_History_track2_annotation1, &
-      show_Star_History_track2_annotation2, &
-      show_Star_History_track2_annotation3, &
-      Star_History_track2_fname, &
-      Star_History_track2_reverse_xaxis, &
-      Star_History_track2_reverse_yaxis, &
-      Star_History_track2_log_xaxis, &
-      Star_History_track2_log_yaxis, &
-      Star_History_track2_xmin, &
-      Star_History_track2_xmax, &
-      Star_History_track2_ymin, &
-      Star_History_track2_ymax, &
-      Star_History_track2_xmargin, &
-      Star_History_track2_ymargin, &
-      Star_History_track2_dxmin, &
-      Star_History_track2_dymin, &
-      Star_History_track2_win_width, &
-      Star_History_track2_win_aspect_ratio, &
-      Star_History_track2_file_width, &
-      Star_History_track2_file_aspect_ratio, &
-      Star_History_track2_xleft, &
-      Star_History_track2_xright, &
-      Star_History_track2_ybot, &
-      Star_History_track2_ytop, &
-      Star_History_track2_txt_scale, &
-      Star_History_track2_title, &
-      Star_History_track2_use_decorator, &
-
-      Star_History_track3_win_flag, &
-      Star_History_track3_file_flag, &
-      Star_History_track3_file_interval, &
-      Star_History_track3_step_min, &
-      Star_History_track3_step_max, &
-      show_Star_History_track3_target_box, &
-      Star_History_track3_n_sigma, &
-      Star_History_track3_xtarget, &
-      Star_History_track3_xsigma, &
-      Star_History_track3_ytarget, &
-      Star_History_track3_ysigma, &
-      Star_History_track3_xname, &
-      Star_History_track3_xaxis_label, &
-      Star_History_track3_yname, &
-      Star_History_track3_yaxis_label, &
-      Star_History_track3_file_dir, &
-      Star_History_track3_file_prefix, &
-      show_Star_History_track3_annotation1, &
-      show_Star_History_track3_annotation2, &
-      show_Star_History_track3_annotation3, &
-      Star_History_track3_fname, &
-      Star_History_track3_reverse_xaxis, &
-      Star_History_track3_reverse_yaxis, &
-      Star_History_track3_log_xaxis, &
-      Star_History_track3_log_yaxis, &
-      Star_History_track3_xmin, &
-      Star_History_track3_xmax, &
-      Star_History_track3_ymin, &
-      Star_History_track3_ymax, &
-      Star_History_track3_xmargin, &
-      Star_History_track3_ymargin, &
-      Star_History_track3_dxmin, &
-      Star_History_track3_dymin, &
-      Star_History_track3_win_width, &
-      Star_History_track3_win_aspect_ratio, &
-      Star_History_track3_file_width, &
-      Star_History_track3_file_aspect_ratio, &
-      Star_History_track3_xleft, &
-      Star_History_track3_xright, &
-      Star_History_track3_ybot, &
-      Star_History_track3_ytop, &
-      Star_History_track3_txt_scale, &
-      Star_History_track3_title, &
-      Star_History_track3_use_decorator, &
-
-      Star_History_track4_win_flag, &
-      Star_History_track4_file_flag, &
-      Star_History_track4_file_interval, &
-      Star_History_track4_step_min, &
-      Star_History_track4_step_max, &
-      show_Star_History_track4_target_box, &
-      Star_History_track4_n_sigma, &
-      Star_History_track4_xtarget, &
-      Star_History_track4_xsigma, &
-      Star_History_track4_ytarget, &
-      Star_History_track4_ysigma, &
-      Star_History_track4_xname, &
-      Star_History_track4_xaxis_label, &
-      Star_History_track4_yname, &
-      Star_History_track4_yaxis_label, &
-      Star_History_track4_file_dir, &
-      Star_History_track4_file_prefix, &
-      show_Star_History_track4_annotation1, &
-      show_Star_History_track4_annotation2, &
-      show_Star_History_track4_annotation3, &
-      Star_History_track4_fname, &
-      Star_History_track4_reverse_xaxis, &
-      Star_History_track4_reverse_yaxis, &
-      Star_History_track4_log_xaxis, &
-      Star_History_track4_log_yaxis, &
-      Star_History_track4_xmin, &
-      Star_History_track4_xmax, &
-      Star_History_track4_ymin, &
-      Star_History_track4_ymax, &
-      Star_History_track4_xmargin, &
-      Star_History_track4_ymargin, &
-      Star_History_track4_dxmin, &
-      Star_History_track4_dymin, &
-      Star_History_track4_win_width, &
-      Star_History_track4_win_aspect_ratio, &
-      Star_History_track4_file_width, &
-      Star_History_track4_file_aspect_ratio, &
-      Star_History_track4_xleft, &
-      Star_History_track4_xright, &
-      Star_History_track4_ybot, &
-      Star_History_track4_ytop, &
-      Star_History_track4_txt_scale, &
-      Star_History_track4_title, &
-      Star_History_track4_use_decorator, &
-
-      Star_History_track5_win_flag, &
-      Star_History_track5_file_flag, &
-      Star_History_track5_file_interval, &
-      Star_History_track5_step_min, &
-      Star_History_track5_step_max, &
-      show_Star_History_track5_target_box, &
-      Star_History_track5_n_sigma, &
-      Star_History_track5_xtarget, &
-      Star_History_track5_xsigma, &
-      Star_History_track5_ytarget, &
-      Star_History_track5_ysigma, &
-      Star_History_track5_xname, &
-      Star_History_track5_xaxis_label, &
-      Star_History_track5_yname, &
-      Star_History_track5_yaxis_label, &
-      Star_History_track5_file_dir, &
-      Star_History_track5_file_prefix, &
-      show_Star_History_track5_annotation1, &
-      show_Star_History_track5_annotation2, &
-      show_Star_History_track5_annotation3, &
-      Star_History_track5_fname, &
-      Star_History_track5_reverse_xaxis, &
-      Star_History_track5_reverse_yaxis, &
-      Star_History_track5_log_xaxis, &
-      Star_History_track5_log_yaxis, &
-      Star_History_track5_xmin, &
-      Star_History_track5_xmax, &
-      Star_History_track5_ymin, &
-      Star_History_track5_ymax, &
-      Star_History_track5_xmargin, &
-      Star_History_track5_ymargin, &
-      Star_History_track5_dxmin, &
-      Star_History_track5_dymin, &
-      Star_History_track5_win_width, &
-      Star_History_track5_win_aspect_ratio, &
-      Star_History_track5_file_width, &
-      Star_History_track5_file_aspect_ratio, &
-      Star_History_track5_xleft, &
-      Star_History_track5_xright, &
-      Star_History_track5_ybot, &
-      Star_History_track5_ytop, &
-      Star_History_track5_txt_scale, &
-      Star_History_track5_title, &
-      Star_History_track5_use_decorator, &
-
-      Star_History_track6_win_flag, &
-      Star_History_track6_file_flag, &
-      Star_History_track6_file_interval, &
-      Star_History_track6_step_min, &
-      Star_History_track6_step_max, &
-      show_Star_History_track6_target_box, &
-      Star_History_track6_n_sigma, &
-      Star_History_track6_xtarget, &
-      Star_History_track6_xsigma, &
-      Star_History_track6_ytarget, &
-      Star_History_track6_ysigma, &
-      Star_History_track6_xname, &
-      Star_History_track6_xaxis_label, &
-      Star_History_track6_yname, &
-      Star_History_track6_yaxis_label, &
-      Star_History_track6_file_dir, &
-      Star_History_track6_file_prefix, &
-      show_Star_History_track6_annotation1, &
-      show_Star_History_track6_annotation2, &
-      show_Star_History_track6_annotation3, &
-      Star_History_track6_fname, &
-      Star_History_track6_reverse_xaxis, &
-      Star_History_track6_reverse_yaxis, &
-      Star_History_track6_log_xaxis, &
-      Star_History_track6_log_yaxis, &
-      Star_History_track6_xmin, &
-      Star_History_track6_xmax, &
-      Star_History_track6_ymin, &
-      Star_History_track6_ymax, &
-      Star_History_track6_xmargin, &
-      Star_History_track6_ymargin, &
-      Star_History_track6_dxmin, &
-      Star_History_track6_dymin, &
-      Star_History_track6_win_width, &
-      Star_History_track6_win_aspect_ratio, &
-      Star_History_track6_file_width, &
-      Star_History_track6_file_aspect_ratio, &
-      Star_History_track6_xleft, &
-      Star_History_track6_xright, &
-      Star_History_track6_ybot, &
-      Star_History_track6_ytop, &
-      Star_History_track6_txt_scale, &
-      Star_History_track6_title, &
-      Star_History_track6_use_decorator, &
-
-      Star_History_track7_win_flag, &
-      Star_History_track7_file_flag, &
-      Star_History_track7_file_interval, &
-      Star_History_track7_step_min, &
-      Star_History_track7_step_max, &
-      show_Star_History_track7_target_box, &
-      Star_History_track7_n_sigma, &
-      Star_History_track7_xtarget, &
-      Star_History_track7_xsigma, &
-      Star_History_track7_ytarget, &
-      Star_History_track7_ysigma, &
-      Star_History_track7_xname, &
-      Star_History_track7_xaxis_label, &
-      Star_History_track7_yname, &
-      Star_History_track7_yaxis_label, &
-      Star_History_track7_file_dir, &
-      Star_History_track7_file_prefix, &
-      show_Star_History_track7_annotation1, &
-      show_Star_History_track7_annotation2, &
-      show_Star_History_track7_annotation3, &
-      Star_History_track7_fname, &
-      Star_History_track7_reverse_xaxis, &
-      Star_History_track7_reverse_yaxis, &
-      Star_History_track7_log_xaxis, &
-      Star_History_track7_log_yaxis, &
-      Star_History_track7_xmin, &
-      Star_History_track7_xmax, &
-      Star_History_track7_ymin, &
-      Star_History_track7_ymax, &
-      Star_History_track7_xmargin, &
-      Star_History_track7_ymargin, &
-      Star_History_track7_dxmin, &
-      Star_History_track7_dymin, &
-      Star_History_track7_win_width, &
-      Star_History_track7_win_aspect_ratio, &
-      Star_History_track7_file_width, &
-      Star_History_track7_file_aspect_ratio, &
-      Star_History_track7_xleft, &
-      Star_History_track7_xright, &
-      Star_History_track7_ybot, &
-      Star_History_track7_ytop, &
-      Star_History_track7_txt_scale, &
-      Star_History_track7_title, &
-      Star_History_track7_use_decorator, &
-
-      Star_History_track8_win_flag, &
-      Star_History_track8_file_flag, &
-      Star_History_track8_file_interval, &
-      Star_History_track8_step_min, &
-      Star_History_track8_step_max, &
-      show_Star_History_track8_target_box, &
-      Star_History_track8_n_sigma, &
-      Star_History_track8_xtarget, &
-      Star_History_track8_xsigma, &
-      Star_History_track8_ytarget, &
-      Star_History_track8_ysigma, &
-      Star_History_track8_xname, &
-      Star_History_track8_xaxis_label, &
-      Star_History_track8_yname, &
-      Star_History_track8_yaxis_label, &
-      Star_History_track8_file_dir, &
-      Star_History_track8_file_prefix, &
-      show_Star_History_track8_annotation1, &
-      show_Star_History_track8_annotation2, &
-      show_Star_History_track8_annotation3, &
-      Star_History_track8_fname, &
-      Star_History_track8_reverse_xaxis, &
-      Star_History_track8_reverse_yaxis, &
-      Star_History_track8_log_xaxis, &
-      Star_History_track8_log_yaxis, &
-      Star_History_track8_xmin, &
-      Star_History_track8_xmax, &
-      Star_History_track8_ymin, &
-      Star_History_track8_ymax, &
-      Star_History_track8_xmargin, &
-      Star_History_track8_ymargin, &
-      Star_History_track8_dxmin, &
-      Star_History_track8_dymin, &
-      Star_History_track8_win_width, &
-      Star_History_track8_win_aspect_ratio, &
-      Star_History_track8_file_width, &
-      Star_History_track8_file_aspect_ratio, &
-      Star_History_track8_xleft, &
-      Star_History_track8_xright, &
-      Star_History_track8_ybot, &
-      Star_History_track8_ytop, &
-      Star_History_track8_txt_scale, &
-      Star_History_track8_title, &
-      Star_History_track8_use_decorator, &
-
-      Star_History_track9_win_flag, &
-      Star_History_track9_file_flag, &
-      Star_History_track9_file_interval, &
-      Star_History_track9_step_min, &
-      Star_History_track9_step_max, &
-      show_Star_History_track9_target_box, &
-      Star_History_track9_n_sigma, &
-      Star_History_track9_xtarget, &
-      Star_History_track9_xsigma, &
-      Star_History_track9_ytarget, &
-      Star_History_track9_ysigma, &
-      Star_History_track9_xname, &
-      Star_History_track9_xaxis_label, &
-      Star_History_track9_yname, &
-      Star_History_track9_yaxis_label, &
-      Star_History_track9_file_dir, &
-      Star_History_track9_file_prefix, &
-      show_Star_History_track9_annotation1, &
-      show_Star_History_track9_annotation2, &
-      show_Star_History_track9_annotation3, &
-      Star_History_track9_fname, &
-      Star_History_track9_reverse_xaxis, &
-      Star_History_track9_reverse_yaxis, &
-      Star_History_track9_log_xaxis, &
-      Star_History_track9_log_yaxis, &
-      Star_History_track9_xmin, &
-      Star_History_track9_xmax, &
-      Star_History_track9_ymin, &
-      Star_History_track9_ymax, &
-      Star_History_track9_xmargin, &
-      Star_History_track9_ymargin, &
-      Star_History_track9_dxmin, &
-      Star_History_track9_dymin, &
-      Star_History_track9_win_width, &
-      Star_History_track9_win_aspect_ratio, &
-      Star_History_track9_file_width, &
-      Star_History_track9_file_aspect_ratio, &
-      Star_History_track9_xleft, &
-      Star_History_track9_xright, &
-      Star_History_track9_ybot, &
-      Star_History_track9_ytop, &
-      Star_History_track9_txt_scale, &
-      Star_History_track9_title, &
-      Star_History_track9_use_decorator, &
-
-
-      History_Panels1_win_flag, &
-      History_Panels1_win_width, &
-      History_Panels1_win_aspect_ratio, &
-      History_Panels1_xleft, &
-      History_Panels1_xright, &
-      History_Panels1_ybot, &
-      History_Panels1_ytop, &
-      History_Panels1_txt_scale, &
-      History_Panels1_title, &
-      History_Panels1_xmax, &
-      History_Panels1_xmin, &
-      History_Panels1_dxmin, &
-      History_Panels1_max_width, &
-      History_Panels1_num_panels, &
-      History_Panels1_xaxis_name, &
-      History_Panels1_yaxis_name, &
-      History_Panels1_xaxis_reversed, &
-      History_Panels1_yaxis_reversed, &
-      History_Panels1_yaxis_log, &
-      History_Panels1_ymin, &
-      History_Panels1_ymax, &
-      History_Panels1_dymin, &
-      History_Panels1_other_yaxis_name, &
-      History_Panels1_other_yaxis_reversed, &
-      History_Panels1_xaxis_log, &
-      History_Panels1_other_yaxis_log, &
-      History_Panels1_other_ymin, &
-      History_Panels1_other_ymax, &
-      History_Panels1_other_dymin, &
-      History_Panels1_points_name, &
-      History_Panels1_file_flag, &
-      History_Panels1_file_dir, &
-      History_Panels1_file_prefix, &
-      History_Panels1_file_interval, &
-      History_Panels1_file_width, &
-      History_Panels1_file_aspect_ratio, &
-      History_Panels1_xmargin, &
-      History_Panels1_ymargin, &
-      History_Panels1_other_ymargin, &
-      History_Panels1_use_decorator, &
-
-      History_Panels2_win_flag, &
-      History_Panels2_win_width, &
-      History_Panels2_win_aspect_ratio, &
-      History_Panels2_xleft, &
-      History_Panels2_xright, &
-      History_Panels2_ybot, &
-      History_Panels2_ytop, &
-      History_Panels2_txt_scale, &
-      History_Panels2_title, &
-      History_Panels2_xmax, &
-      History_Panels2_xmin, &
-      History_Panels2_dxmin, &
-      History_Panels2_max_width, &
-      History_Panels2_num_panels, &
-      History_Panels2_xaxis_name, &
-      History_Panels2_yaxis_name, &
-      History_Panels2_xaxis_reversed, &
-      History_Panels2_yaxis_reversed, &
-      History_Panels2_yaxis_log, &
-      History_Panels2_ymin, &
-      History_Panels2_ymax, &
-      History_Panels2_dymin, &
-      History_Panels2_other_yaxis_name, &
-      History_Panels2_other_yaxis_reversed, &
-      History_Panels2_xaxis_log, &
-      History_Panels2_other_yaxis_log, &
-      History_Panels2_other_ymin, &
-      History_Panels2_other_ymax, &
-      History_Panels2_other_dymin, &
-      History_Panels2_points_name, &
-      History_Panels2_file_flag, &
-      History_Panels2_file_dir, &
-      History_Panels2_file_prefix, &
-      History_Panels2_file_interval, &
-      History_Panels2_file_width, &
-      History_Panels2_file_aspect_ratio, &
-      History_Panels2_xmargin, &
-      History_Panels2_ymargin, &
-      History_Panels2_other_ymargin, &
-      History_Panels2_use_decorator, &
-
-      History_Panels3_win_flag, &
-      History_Panels3_win_width, &
-      History_Panels3_win_aspect_ratio, &
-      History_Panels3_xleft, &
-      History_Panels3_xright, &
-      History_Panels3_ybot, &
-      History_Panels3_ytop, &
-      History_Panels3_txt_scale, &
-      History_Panels3_title, &
-      History_Panels3_xmax, &
-      History_Panels3_xmin, &
-      History_Panels3_dxmin, &
-      History_Panels3_max_width, &
-      History_Panels3_num_panels, &
-      History_Panels3_xaxis_name, &
-      History_Panels3_yaxis_name, &
-      History_Panels3_xaxis_reversed, &
-      History_Panels3_yaxis_reversed, &
-      History_Panels3_yaxis_log, &
-      History_Panels3_ymin, &
-      History_Panels3_ymax, &
-      History_Panels3_dymin, &
-      History_Panels3_other_yaxis_name, &
-      History_Panels3_other_yaxis_reversed, &
-      History_Panels3_xaxis_log, &
-      History_Panels3_other_yaxis_log, &
-      History_Panels3_other_ymin, &
-      History_Panels3_other_ymax, &
-      History_Panels3_other_dymin, &
-      History_Panels3_points_name, &
-      History_Panels3_file_flag, &
-      History_Panels3_file_dir, &
-      History_Panels3_file_prefix, &
-      History_Panels3_file_interval, &
-      History_Panels3_file_width, &
-      History_Panels3_file_aspect_ratio, &
-      History_Panels3_xmargin, &
-      History_Panels3_ymargin, &
-      History_Panels3_other_ymargin, &
-      History_Panels3_use_decorator, &
-
-      History_Panels4_win_flag, &
-      History_Panels4_win_width, &
-      History_Panels4_win_aspect_ratio, &
-      History_Panels4_xleft, &
-      History_Panels4_xright, &
-      History_Panels4_ybot, &
-      History_Panels4_ytop, &
-      History_Panels4_txt_scale, &
-      History_Panels4_title, &
-      History_Panels4_xmax, &
-      History_Panels4_xmin, &
-      History_Panels4_dxmin, &
-      History_Panels4_max_width, &
-      History_Panels4_num_panels, &
-      History_Panels4_xaxis_name, &
-      History_Panels4_yaxis_name, &
-      History_Panels4_xaxis_reversed, &
-      History_Panels4_yaxis_reversed, &
-      History_Panels4_yaxis_log, &
-      History_Panels4_ymin, &
-      History_Panels4_ymax, &
-      History_Panels4_dymin, &
-      History_Panels4_other_yaxis_name, &
-      History_Panels4_other_yaxis_reversed, &
-      History_Panels4_xaxis_log, &
-      History_Panels4_other_yaxis_log, &
-      History_Panels4_other_ymin, &
-      History_Panels4_other_ymax, &
-      History_Panels4_other_dymin, &
-      History_Panels4_points_name, &
-      History_Panels4_file_flag, &
-      History_Panels4_file_dir, &
-      History_Panels4_file_prefix, &
-      History_Panels4_file_interval, &
-      History_Panels4_file_width, &
-      History_Panels4_file_aspect_ratio, &
-      History_Panels4_xmargin, &
-      History_Panels4_ymargin, &
-      History_Panels4_other_ymargin, &
-      History_Panels4_use_decorator, &
-
-      History_Panels5_win_flag, &
-      History_Panels5_win_width, &
-      History_Panels5_win_aspect_ratio, &
-      History_Panels5_xleft, &
-      History_Panels5_xright, &
-      History_Panels5_ybot, &
-      History_Panels5_ytop, &
-      History_Panels5_txt_scale, &
-      History_Panels5_title, &
-      History_Panels5_xmax, &
-      History_Panels5_xmin, &
-      History_Panels5_dxmin, &
-      History_Panels5_max_width, &
-      History_Panels5_num_panels, &
-      History_Panels5_xaxis_name, &
-      History_Panels5_yaxis_name, &
-      History_Panels5_xaxis_reversed, &
-      History_Panels5_yaxis_reversed, &
-      History_Panels5_yaxis_log, &
-      History_Panels5_ymin, &
-      History_Panels5_ymax, &
-      History_Panels5_dymin, &
-      History_Panels5_other_yaxis_name, &
-      History_Panels5_other_yaxis_reversed, &
-      History_Panels5_xaxis_log, &
-      History_Panels5_other_yaxis_log, &
-      History_Panels5_other_ymin, &
-      History_Panels5_other_ymax, &
-      History_Panels5_other_dymin, &
-      History_Panels5_points_name, &
-      History_Panels5_file_flag, &
-      History_Panels5_file_dir, &
-      History_Panels5_file_prefix, &
-      History_Panels5_file_interval, &
-      History_Panels5_file_width, &
-      History_Panels5_file_aspect_ratio, &
-      History_Panels5_xmargin, &
-      History_Panels5_ymargin, &
-      History_Panels5_other_ymargin, &
-      History_Panels5_use_decorator, &
-
-      History_Panels6_win_flag, &
-      History_Panels6_win_width, &
-      History_Panels6_win_aspect_ratio, &
-      History_Panels6_xleft, &
-      History_Panels6_xright, &
-      History_Panels6_ybot, &
-      History_Panels6_ytop, &
-      History_Panels6_txt_scale, &
-      History_Panels6_title, &
-      History_Panels6_xmax, &
-      History_Panels6_xmin, &
-      History_Panels6_dxmin, &
-      History_Panels6_max_width, &
-      History_Panels6_num_panels, &
-      History_Panels6_xaxis_name, &
-      History_Panels6_yaxis_name, &
-      History_Panels6_xaxis_reversed, &
-      History_Panels6_yaxis_reversed, &
-      History_Panels6_yaxis_log, &
-      History_Panels6_ymin, &
-      History_Panels6_ymax, &
-      History_Panels6_dymin, &
-      History_Panels6_other_yaxis_name, &
-      History_Panels6_other_yaxis_reversed, &
-      History_Panels6_xaxis_log, &
-      History_Panels6_other_yaxis_log, &
-      History_Panels6_other_ymin, &
-      History_Panels6_other_ymax, &
-      History_Panels6_other_dymin, &
-      History_Panels6_points_name, &
-      History_Panels6_file_flag, &
-      History_Panels6_file_dir, &
-      History_Panels6_file_prefix, &
-      History_Panels6_file_interval, &
-      History_Panels6_file_width, &
-      History_Panels6_file_aspect_ratio, &
-      History_Panels6_xmargin, &
-      History_Panels6_ymargin, &
-      History_Panels6_other_ymargin, &
-      History_Panels6_use_decorator, &
-
-      History_Panels7_win_flag, &
-      History_Panels7_win_width, &
-      History_Panels7_win_aspect_ratio, &
-      History_Panels7_xleft, &
-      History_Panels7_xright, &
-      History_Panels7_ybot, &
-      History_Panels7_ytop, &
-      History_Panels7_txt_scale, &
-      History_Panels7_title, &
-      History_Panels7_xmax, &
-      History_Panels7_xmin, &
-      History_Panels7_dxmin, &
-      History_Panels7_max_width, &
-      History_Panels7_num_panels, &
-      History_Panels7_xaxis_name, &
-      History_Panels7_yaxis_name, &
-      History_Panels7_xaxis_reversed, &
-      History_Panels7_yaxis_reversed, &
-      History_Panels7_yaxis_log, &
-      History_Panels7_ymin, &
-      History_Panels7_ymax, &
-      History_Panels7_dymin, &
-      History_Panels7_other_yaxis_name, &
-      History_Panels7_other_yaxis_reversed, &
-      History_Panels7_xaxis_log, &
-      History_Panels7_other_yaxis_log, &
-      History_Panels7_other_ymin, &
-      History_Panels7_other_ymax, &
-      History_Panels7_other_dymin, &
-      History_Panels7_points_name, &
-      History_Panels7_file_flag, &
-      History_Panels7_file_dir, &
-      History_Panels7_file_prefix, &
-      History_Panels7_file_interval, &
-      History_Panels7_file_width, &
-      History_Panels7_file_aspect_ratio, &
-      History_Panels7_xmargin, &
-      History_Panels7_ymargin, &
-      History_Panels7_other_ymargin, &
-      History_Panels7_use_decorator, &
-
-      History_Panels8_win_flag, &
-      History_Panels8_win_width, &
-      History_Panels8_win_aspect_ratio, &
-      History_Panels8_xleft, &
-      History_Panels8_xright, &
-      History_Panels8_ybot, &
-      History_Panels8_ytop, &
-      History_Panels8_txt_scale, &
-      History_Panels8_title, &
-      History_Panels8_xmax, &
-      History_Panels8_xmin, &
-      History_Panels8_dxmin, &
-      History_Panels8_max_width, &
-      History_Panels8_num_panels, &
-      History_Panels8_xaxis_name, &
-      History_Panels8_yaxis_name, &
-      History_Panels8_xaxis_reversed, &
-      History_Panels8_yaxis_reversed, &
-      History_Panels8_yaxis_log, &
-      History_Panels8_ymin, &
-      History_Panels8_ymax, &
-      History_Panels8_dymin, &
-      History_Panels8_other_yaxis_name, &
-      History_Panels8_other_yaxis_reversed, &
-      History_Panels8_xaxis_log, &
-      History_Panels8_other_yaxis_log, &
-      History_Panels8_other_ymin, &
-      History_Panels8_other_ymax, &
-      History_Panels8_other_dymin, &
-      History_Panels8_points_name, &
-      History_Panels8_file_flag, &
-      History_Panels8_file_dir, &
-      History_Panels8_file_prefix, &
-      History_Panels8_file_interval, &
-      History_Panels8_file_width, &
-      History_Panels8_file_aspect_ratio, &
-      History_Panels8_xmargin, &
-      History_Panels8_ymargin, &
-      History_Panels8_other_ymargin, &
-      History_Panels8_use_decorator, &
-
-      History_Panels9_win_flag, &
-      History_Panels9_win_width, &
-      History_Panels9_win_aspect_ratio, &
-      History_Panels9_xleft, &
-      History_Panels9_xright, &
-      History_Panels9_ybot, &
-      History_Panels9_ytop, &
-      History_Panels9_txt_scale, &
-      History_Panels9_title, &
-      History_Panels9_xmax, &
-      History_Panels9_xmin, &
-      History_Panels9_dxmin, &
-      History_Panels9_max_width, &
-      History_Panels9_num_panels, &
-      History_Panels9_xaxis_name, &
-      History_Panels9_yaxis_name, &
-      History_Panels9_xaxis_reversed, &
-      History_Panels9_yaxis_reversed, &
-      History_Panels9_yaxis_log, &
-      History_Panels9_ymin, &
-      History_Panels9_ymax, &
-      History_Panels9_dymin, &
-      History_Panels9_other_yaxis_name, &
-      History_Panels9_other_yaxis_reversed, &
-      History_Panels9_xaxis_log, &
-      History_Panels9_other_yaxis_log, &
-      History_Panels9_other_ymin, &
-      History_Panels9_other_ymax, &
-      History_Panels9_other_dymin, &
-      History_Panels9_points_name, &
-      History_Panels9_file_flag, &
-      History_Panels9_file_dir, &
-      History_Panels9_file_prefix, &
-      History_Panels9_file_interval, &
-      History_Panels9_file_width, &
-      History_Panels9_file_aspect_ratio, &
-      History_Panels9_xmargin, &
-      History_Panels9_ymargin, &
-      History_Panels9_other_ymargin, &
-      History_Panels9_use_decorator, &
+      Star_History_track_win_flag, &
+      Star_History_track_file_flag, &
+      Star_History_track_file_interval, &
+      Star_History_track_step_min, &
+      Star_History_track_step_max, &
+      Star_History_track_xname, &
+      Star_History_track_xaxis_label, &
+      Star_History_track_yname, &
+      Star_History_track_yaxis_label, &
+      Star_History_track_file_dir, &
+      Star_History_track_file_prefix, &
+      show_Star_History_track_annotation1, &
+      show_Star_History_track_annotation2, &
+      show_Star_History_track_annotation3, &
+      Star_History_track_fname, &
+      Star_History_track_reverse_xaxis, &
+      Star_History_track_reverse_yaxis, &
+      Star_History_track_log_xaxis, &
+      Star_History_track_log_yaxis, &
+      Star_History_track_xmin, &
+      Star_History_track_xmax, &
+      Star_History_track_ymin, &
+      Star_History_track_ymax, &
+      Star_History_track_xmargin, &
+      Star_History_track_ymargin, &
+      Star_History_track_dxmin, &
+      Star_History_track_dymin, &
+      Star_History_track_win_width, &
+      Star_History_track_win_aspect_ratio, &
+      Star_History_track_file_width, &
+      Star_History_track_file_aspect_ratio, &
+      Star_History_track_xleft, &
+      Star_History_track_xright, &
+      Star_History_track_ybot, &
+      Star_History_track_ytop, &
+      Star_History_track_txt_scale, &
+      Star_History_track_title, &
+      Star_History_track_use_decorator, &
+      
+      History_Panels_win_flag, &
+      History_Panels_win_width, &
+      History_Panels_win_aspect_ratio, &
+      History_Panels_xleft, &
+      History_Panels_xright, &
+      History_Panels_ybot, &
+      History_Panels_ytop, &
+      History_Panels_txt_scale, &
+      History_Panels_title, &
+      History_Panels_xmax, &
+      History_Panels_xmin, &
+      History_Panels_dxmin, &
+      History_Panels_max_width, &
+      History_Panels_num_panels, &
+      History_Panels_xaxis_name, &
+      History_Panels_yaxis_name, &
+      History_Panels_xaxis_reversed, &
+      History_Panels_yaxis_reversed, &
+      History_Panels_yaxis_log, &
+      History_Panels_ymin, &
+      History_Panels_ymax, &
+      History_Panels_dymin, &
+      History_Panels_other_yaxis_name, &
+      History_Panels_other_yaxis_reversed, &
+      History_Panels_xaxis_log, &
+      History_Panels_other_yaxis_log, &
+      History_Panels_other_ymin, &
+      History_Panels_other_ymax, &
+      History_Panels_other_dymin, &
+      History_Panels_points_name, &
+      History_Panels_file_flag, &
+      History_Panels_file_dir, &
+      History_Panels_file_prefix, &
+      History_Panels_file_interval, &
+      History_Panels_file_width, &
+      History_Panels_file_aspect_ratio, &
+      History_Panels_xmargin, &
+      History_Panels_ymargin, &
+      History_Panels_other_ymargin, &
+      History_Panels_use_decorator, &
 
       History_Panel_points_error_bars, &
       History_Panel_points_interval, &
@@ -1425,257 +265,33 @@ module pgbinary_ctrls_io
       Summary_History_num_lines, &
       Summary_History_use_decorator, &
 
-      Grid1_win_flag, &
-      Grid1_win_width, &
-      Grid1_win_aspect_ratio, &
-      Grid1_xleft, &
-      Grid1_xright, &
-      Grid1_ybot, &
-      Grid1_ytop, &
-      Grid1_title, &
-      Grid1_txt_scale_factor, &
-      Grid1_num_cols, &
-      Grid1_num_rows, &
-      Grid1_num_plots, &
-      Grid1_plot_name, &
-      Grid1_plot_row, &
-      Grid1_plot_rowspan, &
-      Grid1_plot_col, &
-      Grid1_plot_colspan, &
-      Grid1_plot_pad_left, &
-      Grid1_plot_pad_right, &
-      Grid1_plot_pad_top, &
-      Grid1_plot_pad_bot, &
-      Grid1_file_flag, &
-      Grid1_file_dir, &
-      Grid1_file_prefix, &
-      Grid1_file_interval, &
-      Grid1_file_width, &
-      Grid1_file_aspect_ratio, &
-
-      Grid2_win_flag, &
-      Grid2_win_width, &
-      Grid2_win_aspect_ratio, &
-      Grid2_xleft, &
-      Grid2_xright, &
-      Grid2_ybot, &
-      Grid2_ytop, &
-      Grid2_title, &
-      Grid2_txt_scale_factor, &
-      Grid2_num_cols, &
-      Grid2_num_rows, &
-      Grid2_num_plots, &
-      Grid2_plot_name, &
-      Grid2_plot_row, &
-      Grid2_plot_rowspan, &
-      Grid2_plot_col, &
-      Grid2_plot_colspan, &
-      Grid2_plot_pad_left, &
-      Grid2_plot_pad_right, &
-      Grid2_plot_pad_top, &
-      Grid2_plot_pad_bot, &
-      Grid2_file_flag, &
-      Grid2_file_dir, &
-      Grid2_file_prefix, &
-      Grid2_file_interval, &
-      Grid2_file_width, &
-      Grid2_file_aspect_ratio, &
-
-      Grid3_win_flag, &
-      Grid3_win_width, &
-      Grid3_win_aspect_ratio, &
-      Grid3_xleft, &
-      Grid3_xright, &
-      Grid3_ybot, &
-      Grid3_ytop, &
-      Grid3_title, &
-      Grid3_txt_scale_factor, &
-      Grid3_num_cols, &
-      Grid3_num_rows, &
-      Grid3_num_plots, &
-      Grid3_plot_name, &
-      Grid3_plot_row, &
-      Grid3_plot_rowspan, &
-      Grid3_plot_col, &
-      Grid3_plot_colspan, &
-      Grid3_plot_pad_left, &
-      Grid3_plot_pad_right, &
-      Grid3_plot_pad_top, &
-      Grid3_plot_pad_bot, &
-      Grid3_file_flag, &
-      Grid3_file_dir, &
-      Grid3_file_prefix, &
-      Grid3_file_interval, &
-      Grid3_file_width, &
-      Grid3_file_aspect_ratio, &
-
-      Grid4_win_flag, &
-      Grid4_win_width, &
-      Grid4_win_aspect_ratio, &
-      Grid4_xleft, &
-      Grid4_xright, &
-      Grid4_ybot, &
-      Grid4_ytop, &
-      Grid4_title, &
-      Grid4_txt_scale_factor, &
-      Grid4_num_cols, &
-      Grid4_num_rows, &
-      Grid4_num_plots, &
-      Grid4_plot_name, &
-      Grid4_plot_row, &
-      Grid4_plot_rowspan, &
-      Grid4_plot_col, &
-      Grid4_plot_colspan, &
-      Grid4_plot_pad_left, &
-      Grid4_plot_pad_right, &
-      Grid4_plot_pad_top, &
-      Grid4_plot_pad_bot, &
-      Grid4_file_flag, &
-      Grid4_file_dir, &
-      Grid4_file_prefix, &
-      Grid4_file_interval, &
-      Grid4_file_width, &
-      Grid4_file_aspect_ratio, &
-
-      Grid5_win_flag, &
-      Grid5_win_width, &
-      Grid5_win_aspect_ratio, &
-      Grid5_xleft, &
-      Grid5_xright, &
-      Grid5_ybot, &
-      Grid5_ytop, &
-      Grid5_title, &
-      Grid5_txt_scale_factor, &
-      Grid5_num_cols, &
-      Grid5_num_rows, &
-      Grid5_num_plots, &
-      Grid5_plot_name, &
-      Grid5_plot_row, &
-      Grid5_plot_rowspan, &
-      Grid5_plot_col, &
-      Grid5_plot_colspan, &
-      Grid5_plot_pad_left, &
-      Grid5_plot_pad_right, &
-      Grid5_plot_pad_top, &
-      Grid5_plot_pad_bot, &
-      Grid5_file_flag, &
-      Grid5_file_dir, &
-      Grid5_file_prefix, &
-      Grid5_file_interval, &
-      Grid5_file_width, &
-      Grid5_file_aspect_ratio, &
-
-      Grid6_win_flag, &
-      Grid6_win_width, &
-      Grid6_win_aspect_ratio, &
-      Grid6_xleft, &
-      Grid6_xright, &
-      Grid6_ybot, &
-      Grid6_ytop, &
-      Grid6_title, &
-      Grid6_txt_scale_factor, &
-      Grid6_num_cols, &
-      Grid6_num_rows, &
-      Grid6_num_plots, &
-      Grid6_plot_name, &
-      Grid6_plot_row, &
-      Grid6_plot_rowspan, &
-      Grid6_plot_col, &
-      Grid6_plot_colspan, &
-      Grid6_plot_pad_left, &
-      Grid6_plot_pad_right, &
-      Grid6_plot_pad_top, &
-      Grid6_plot_pad_bot, &
-      Grid6_file_flag, &
-      Grid6_file_dir, &
-      Grid6_file_prefix, &
-      Grid6_file_interval, &
-      Grid6_file_width, &
-      Grid6_file_aspect_ratio, &
-
-      Grid7_win_flag, &
-      Grid7_win_width, &
-      Grid7_win_aspect_ratio, &
-      Grid7_xleft, &
-      Grid7_xright, &
-      Grid7_ybot, &
-      Grid7_ytop, &
-      Grid7_title, &
-      Grid7_txt_scale_factor, &
-      Grid7_num_cols, &
-      Grid7_num_rows, &
-      Grid7_num_plots, &
-      Grid7_plot_name, &
-      Grid7_plot_row, &
-      Grid7_plot_rowspan, &
-      Grid7_plot_col, &
-      Grid7_plot_colspan, &
-      Grid7_plot_pad_left, &
-      Grid7_plot_pad_right, &
-      Grid7_plot_pad_top, &
-      Grid7_plot_pad_bot, &
-      Grid7_file_flag, &
-      Grid7_file_dir, &
-      Grid7_file_prefix, &
-      Grid7_file_interval, &
-      Grid7_file_width, &
-      Grid7_file_aspect_ratio, &
-
-      Grid8_win_flag, &
-      Grid8_win_width, &
-      Grid8_win_aspect_ratio, &
-      Grid8_xleft, &
-      Grid8_xright, &
-      Grid8_ybot, &
-      Grid8_ytop, &
-      Grid8_title, &
-      Grid8_txt_scale_factor, &
-      Grid8_num_cols, &
-      Grid8_num_rows, &
-      Grid8_num_plots, &
-      Grid8_plot_name, &
-      Grid8_plot_row, &
-      Grid8_plot_rowspan, &
-      Grid8_plot_col, &
-      Grid8_plot_colspan, &
-      Grid8_plot_pad_left, &
-      Grid8_plot_pad_right, &
-      Grid8_plot_pad_top, &
-      Grid8_plot_pad_bot, &
-      Grid8_file_flag, &
-      Grid8_file_dir, &
-      Grid8_file_prefix, &
-      Grid8_file_interval, &
-      Grid8_file_width, &
-      Grid8_file_aspect_ratio, &
-
-      Grid9_win_flag, &
-      Grid9_win_width, &
-      Grid9_win_aspect_ratio, &
-      Grid9_xleft, &
-      Grid9_xright, &
-      Grid9_ybot, &
-      Grid9_ytop, &
-      Grid9_title, &
-      Grid9_txt_scale_factor, &
-      Grid9_num_cols, &
-      Grid9_num_rows, &
-      Grid9_num_plots, &
-      Grid9_plot_name, &
-      Grid9_plot_row, &
-      Grid9_plot_rowspan, &
-      Grid9_plot_col, &
-      Grid9_plot_colspan, &
-      Grid9_plot_pad_left, &
-      Grid9_plot_pad_right, &
-      Grid9_plot_pad_top, &
-      Grid9_plot_pad_bot, &
-      Grid9_file_flag, &
-      Grid9_file_dir, &
-      Grid9_file_prefix, &
-      Grid9_file_interval, &
-      Grid9_file_width, &
-      Grid9_file_aspect_ratio, &
+      Grid_win_flag, &
+      Grid_win_width, &
+      Grid_win_aspect_ratio, &
+      Grid_xleft, &
+      Grid_xright, &
+      Grid_ybot, &
+      Grid_ytop, &
+      Grid_title, &
+      Grid_txt_scale_factor, &
+      Grid_num_cols, &
+      Grid_num_rows, &
+      Grid_num_plots, &
+      Grid_plot_name, &
+      Grid_plot_row, &
+      Grid_plot_rowspan, &
+      Grid_plot_col, &
+      Grid_plot_colspan, &
+      Grid_plot_pad_left, &
+      Grid_plot_pad_right, &
+      Grid_plot_pad_top, &
+      Grid_plot_pad_bot, &
+      Grid_file_flag, &
+      Grid_file_dir, &
+      Grid_file_prefix, &
+      Grid_file_interval, &
+      Grid_file_width, &
+      Grid_file_aspect_ratio, &
 
       Star1_win_flag, &
       Star1_file_flag, &
@@ -1923,1357 +539,148 @@ contains
       pg% pgbinary_model_lw = pgbinary_model_lw
       pg% pgbinary_box_lw = pgbinary_box_lw
 
-      pg% Text_Summary1_win_flag = Text_Summary1_win_flag
-      pg% Text_Summary1_file_flag = Text_Summary1_file_flag
-      pg% Text_Summary1_file_interval = Text_Summary1_file_interval
-      pg% Text_Summary1_file_dir = Text_Summary1_file_dir
-      pg% Text_Summary1_file_prefix = Text_Summary1_file_prefix
-      pg% Text_Summary1_num_cols = Text_Summary1_num_cols
-      pg% Text_Summary1_num_rows = Text_Summary1_num_rows
-      pg% Text_Summary1_name = Text_Summary1_name
-      pg% Text_Summary1_win_width = Text_Summary1_win_width
-      pg% Text_Summary1_win_aspect_ratio = Text_Summary1_win_aspect_ratio
-      pg% Text_Summary1_file_width = Text_Summary1_file_width
-      pg% Text_Summary1_file_aspect_ratio = Text_Summary1_file_aspect_ratio
-      pg% Text_Summary1_title = Text_Summary1_title
-      pg% Text_Summary1_xleft = Text_Summary1_xleft
-      pg% Text_Summary1_xright = Text_Summary1_xright
-      pg% Text_Summary1_ybot = Text_Summary1_ybot
-      pg% Text_Summary1_ytop = Text_Summary1_ytop
-      pg% Text_Summary1_txt_scale = Text_Summary1_txt_scale
+      pg% Text_Summary_win_flag = Text_Summary_win_flag
+      pg% Text_Summary_file_flag = Text_Summary_file_flag
+      pg% Text_Summary_file_interval = Text_Summary_file_interval
+      pg% Text_Summary_file_dir = Text_Summary_file_dir
+      pg% Text_Summary_file_prefix = Text_Summary_file_prefix
+      pg% Text_Summary_num_cols = Text_Summary_num_cols
+      pg% Text_Summary_num_rows = Text_Summary_num_rows
+      pg% Text_Summary_name = Text_Summary_name
+      pg% Text_Summary_win_width = Text_Summary_win_width
+      pg% Text_Summary_win_aspect_ratio = Text_Summary_win_aspect_ratio
+      pg% Text_Summary_file_width = Text_Summary_file_width
+      pg% Text_Summary_file_aspect_ratio = Text_Summary_file_aspect_ratio
+      pg% Text_Summary_title = Text_Summary_title
+      pg% Text_Summary_xleft = Text_Summary_xleft
+      pg% Text_Summary_xright = Text_Summary_xright
+      pg% Text_Summary_ybot = Text_Summary_ybot
+      pg% Text_Summary_ytop = Text_Summary_ytop
+      pg% Text_Summary_txt_scale = Text_Summary_txt_scale
 
-      pg% Text_Summary2_win_flag = Text_Summary2_win_flag
-      pg% Text_Summary2_file_flag = Text_Summary2_file_flag
-      pg% Text_Summary2_file_interval = Text_Summary2_file_interval
-      pg% Text_Summary2_file_dir = Text_Summary2_file_dir
-      pg% Text_Summary2_file_prefix = Text_Summary2_file_prefix
-      pg% Text_Summary2_num_cols = Text_Summary2_num_cols
-      pg% Text_Summary2_num_rows = Text_Summary2_num_rows
-      pg% Text_Summary2_name = Text_Summary2_name
-      pg% Text_Summary2_win_width = Text_Summary2_win_width
-      pg% Text_Summary2_win_aspect_ratio = Text_Summary2_win_aspect_ratio
-      pg% Text_Summary2_file_width = Text_Summary2_file_width
-      pg% Text_Summary2_file_aspect_ratio = Text_Summary2_file_aspect_ratio
-      pg% Text_Summary2_title = Text_Summary2_title
-      pg% Text_Summary2_xleft = Text_Summary2_xleft
-      pg% Text_Summary2_xright = Text_Summary2_xright
-      pg% Text_Summary2_ybot = Text_Summary2_ybot
-      pg% Text_Summary2_ytop = Text_Summary2_ytop
-      pg% Text_Summary2_txt_scale = Text_Summary2_txt_scale
+      pg% History_track_win_flag = History_track_win_flag
+      pg% History_track_file_flag = History_track_file_flag
+      pg% History_track_file_interval = History_track_file_interval
+      pg% History_track_step_min = History_track_step_min
+      pg% History_track_step_max = History_track_step_max
+      pg% show_History_track_target_box = show_History_track_target_box
+      pg% History_track_n_sigma = History_track_n_sigma
+      pg% History_track_xtarget = History_track_xtarget
+      pg% History_track_xsigma = History_track_xsigma
+      pg% History_track_ytarget = History_track_ytarget
+      pg% History_track_ysigma = History_track_ysigma
+      pg% History_track_file_dir = History_track_file_dir
+      pg% History_track_file_prefix = History_track_file_prefix
+      pg% show_History_track_annotation1 = show_History_track_annotation1
+      pg% show_History_track_annotation2 = show_History_track_annotation2
+      pg% show_History_track_annotation3 = show_History_track_annotation3
+      pg% History_track_fname = History_track_fname
+      pg% History_track_xname = History_track_xname
+      pg% History_track_xaxis_label = History_track_xaxis_label
+      pg% History_track_yname = History_track_yname
+      pg% History_track_yaxis_label = History_track_yaxis_label
+      pg% History_track_reverse_xaxis = History_track_reverse_xaxis
+      pg% History_track_reverse_yaxis = History_track_reverse_yaxis
+      pg% History_track_log_xaxis = History_track_log_xaxis
+      pg% History_track_log_yaxis = History_track_log_yaxis
+      pg% History_track_xmin = History_track_xmin
+      pg% History_track_xmax = History_track_xmax
+      pg% History_track_ymin = History_track_ymin
+      pg% History_track_ymax = History_track_ymax
+      pg% History_track_xmargin = History_track_xmargin
+      pg% History_track_ymargin = History_track_ymargin
+      pg% History_track_dxmin = History_track_dxmin
+      pg% History_track_dymin = History_track_dymin
+      pg% History_track_win_width = History_track_win_width
+      pg% History_track_win_aspect_ratio = History_track_win_aspect_ratio
+      pg% History_track_file_width = History_track_file_width
+      pg% History_track_file_aspect_ratio = History_track_file_aspect_ratio
+      pg% History_track_xleft = History_track_xleft
+      pg% History_track_xright = History_track_xright
+      pg% History_track_ybot = History_track_ybot
+      pg% History_track_ytop = History_track_ytop
+      pg% History_track_txt_scale = History_track_txt_scale
+      pg% History_track_title = History_track_title
+      pg% History_track_use_decorator = History_track_use_decorator
+      pg% Star_History_track_win_flag = Star_History_track_win_flag
+      pg% Star_History_track_file_flag = Star_History_track_file_flag
+      pg% Star_History_track_file_interval = Star_History_track_file_interval
+      pg% Star_History_track_step_min = Star_History_track_step_min
+      pg% Star_History_track_step_max = Star_History_track_step_max
+      pg% Star_History_track_file_dir = Star_History_track_file_dir
+      pg% Star_History_track_file_prefix = Star_History_track_file_prefix
+      pg% show_Star_History_track_annotation1 = show_Star_History_track_annotation1
+      pg% show_Star_History_track_annotation2 = show_Star_History_track_annotation2
+      pg% show_Star_History_track_annotation3 = show_Star_History_track_annotation3
+      pg% Star_History_track_fname = Star_History_track_fname
+      pg% Star_History_track_xname = Star_History_track_xname
+      pg% Star_History_track_xaxis_label = Star_History_track_xaxis_label
+      pg% Star_History_track_yname = Star_History_track_yname
+      pg% Star_History_track_yaxis_label = Star_History_track_yaxis_label
+      pg% Star_History_track_reverse_xaxis = Star_History_track_reverse_xaxis
+      pg% Star_History_track_reverse_yaxis = Star_History_track_reverse_yaxis
+      pg% Star_History_track_log_xaxis = Star_History_track_log_xaxis
+      pg% Star_History_track_log_yaxis = Star_History_track_log_yaxis
+      pg% Star_History_track_xmin = Star_History_track_xmin
+      pg% Star_History_track_xmax = Star_History_track_xmax
+      pg% Star_History_track_ymin = Star_History_track_ymin
+      pg% Star_History_track_ymax = Star_History_track_ymax
+      pg% Star_History_track_xmargin = Star_History_track_xmargin
+      pg% Star_History_track_ymargin = Star_History_track_ymargin
+      pg% Star_History_track_dxmin = Star_History_track_dxmin
+      pg% Star_History_track_dymin = Star_History_track_dymin
+      pg% Star_History_track_win_width = Star_History_track_win_width
+      pg% Star_History_track_win_aspect_ratio = Star_History_track_win_aspect_ratio
+      pg% Star_History_track_file_width = Star_History_track_file_width
+      pg% Star_History_track_file_aspect_ratio = Star_History_track_file_aspect_ratio
+      pg% Star_History_track_xleft = Star_History_track_xleft
+      pg% Star_History_track_xright = Star_History_track_xright
+      pg% Star_History_track_ybot = Star_History_track_ybot
+      pg% Star_History_track_ytop = Star_History_track_ytop
+      pg% Star_History_track_txt_scale = Star_History_track_txt_scale
+      pg% Star_History_track_title = Star_History_track_title
+      pg% Star_History_track_use_decorator = Star_History_track_use_decorator
 
-      pg% Text_Summary3_win_flag = Text_Summary3_win_flag
-      pg% Text_Summary3_file_flag = Text_Summary3_file_flag
-      pg% Text_Summary3_file_interval = Text_Summary3_file_interval
-      pg% Text_Summary3_file_dir = Text_Summary3_file_dir
-      pg% Text_Summary3_file_prefix = Text_Summary3_file_prefix
-      pg% Text_Summary3_num_cols = Text_Summary3_num_cols
-      pg% Text_Summary3_num_rows = Text_Summary3_num_rows
-      pg% Text_Summary3_name = Text_Summary3_name
-      pg% Text_Summary3_win_width = Text_Summary3_win_width
-      pg% Text_Summary3_win_aspect_ratio = Text_Summary3_win_aspect_ratio
-      pg% Text_Summary3_file_width = Text_Summary3_file_width
-      pg% Text_Summary3_file_aspect_ratio = Text_Summary3_file_aspect_ratio
-      pg% Text_Summary3_title = Text_Summary3_title
-      pg% Text_Summary3_xleft = Text_Summary3_xleft
-      pg% Text_Summary3_xright = Text_Summary3_xright
-      pg% Text_Summary3_ybot = Text_Summary3_ybot
-      pg% Text_Summary3_ytop = Text_Summary3_ytop
-      pg% Text_Summary3_txt_scale = Text_Summary3_txt_scale
-
-      pg% Text_Summary4_win_flag = Text_Summary4_win_flag
-      pg% Text_Summary4_file_flag = Text_Summary4_file_flag
-      pg% Text_Summary4_file_interval = Text_Summary4_file_interval
-      pg% Text_Summary4_file_dir = Text_Summary4_file_dir
-      pg% Text_Summary4_file_prefix = Text_Summary4_file_prefix
-      pg% Text_Summary4_num_cols = Text_Summary4_num_cols
-      pg% Text_Summary4_num_rows = Text_Summary4_num_rows
-      pg% Text_Summary4_name = Text_Summary4_name
-      pg% Text_Summary4_win_width = Text_Summary4_win_width
-      pg% Text_Summary4_win_aspect_ratio = Text_Summary4_win_aspect_ratio
-      pg% Text_Summary4_file_width = Text_Summary4_file_width
-      pg% Text_Summary4_file_aspect_ratio = Text_Summary4_file_aspect_ratio
-      pg% Text_Summary4_title = Text_Summary4_title
-      pg% Text_Summary4_xleft = Text_Summary4_xleft
-      pg% Text_Summary4_xright = Text_Summary4_xright
-      pg% Text_Summary4_ybot = Text_Summary4_ybot
-      pg% Text_Summary4_ytop = Text_Summary4_ytop
-      pg% Text_Summary4_txt_scale = Text_Summary4_txt_scale
-
-      pg% Text_Summary5_win_flag = Text_Summary5_win_flag
-      pg% Text_Summary5_file_flag = Text_Summary5_file_flag
-      pg% Text_Summary5_file_interval = Text_Summary5_file_interval
-      pg% Text_Summary5_file_dir = Text_Summary5_file_dir
-      pg% Text_Summary5_file_prefix = Text_Summary5_file_prefix
-      pg% Text_Summary5_num_cols = Text_Summary5_num_cols
-      pg% Text_Summary5_num_rows = Text_Summary5_num_rows
-      pg% Text_Summary5_name = Text_Summary5_name
-      pg% Text_Summary5_win_width = Text_Summary5_win_width
-      pg% Text_Summary5_win_aspect_ratio = Text_Summary5_win_aspect_ratio
-      pg% Text_Summary5_file_width = Text_Summary5_file_width
-      pg% Text_Summary5_file_aspect_ratio = Text_Summary5_file_aspect_ratio
-      pg% Text_Summary5_title = Text_Summary5_title
-      pg% Text_Summary5_xleft = Text_Summary5_xleft
-      pg% Text_Summary5_xright = Text_Summary5_xright
-      pg% Text_Summary5_ybot = Text_Summary5_ybot
-      pg% Text_Summary5_ytop = Text_Summary5_ytop
-      pg% Text_Summary5_txt_scale = Text_Summary5_txt_scale
-
-      pg% Text_Summary6_win_flag = Text_Summary6_win_flag
-      pg% Text_Summary6_file_flag = Text_Summary6_file_flag
-      pg% Text_Summary6_file_interval = Text_Summary6_file_interval
-      pg% Text_Summary6_file_dir = Text_Summary6_file_dir
-      pg% Text_Summary6_file_prefix = Text_Summary6_file_prefix
-      pg% Text_Summary6_num_cols = Text_Summary6_num_cols
-      pg% Text_Summary6_num_rows = Text_Summary6_num_rows
-      pg% Text_Summary6_name = Text_Summary6_name
-      pg% Text_Summary6_win_width = Text_Summary6_win_width
-      pg% Text_Summary6_win_aspect_ratio = Text_Summary6_win_aspect_ratio
-      pg% Text_Summary6_file_width = Text_Summary6_file_width
-      pg% Text_Summary6_file_aspect_ratio = Text_Summary6_file_aspect_ratio
-      pg% Text_Summary6_title = Text_Summary6_title
-      pg% Text_Summary6_xleft = Text_Summary6_xleft
-      pg% Text_Summary6_xright = Text_Summary6_xright
-      pg% Text_Summary6_ybot = Text_Summary6_ybot
-      pg% Text_Summary6_ytop = Text_Summary6_ytop
-      pg% Text_Summary6_txt_scale = Text_Summary6_txt_scale
-
-      pg% Text_Summary7_win_flag = Text_Summary7_win_flag
-      pg% Text_Summary7_file_flag = Text_Summary7_file_flag
-      pg% Text_Summary7_file_interval = Text_Summary7_file_interval
-      pg% Text_Summary7_file_dir = Text_Summary7_file_dir
-      pg% Text_Summary7_file_prefix = Text_Summary7_file_prefix
-      pg% Text_Summary7_num_cols = Text_Summary7_num_cols
-      pg% Text_Summary7_num_rows = Text_Summary7_num_rows
-      pg% Text_Summary7_name = Text_Summary7_name
-      pg% Text_Summary7_win_width = Text_Summary7_win_width
-      pg% Text_Summary7_win_aspect_ratio = Text_Summary7_win_aspect_ratio
-      pg% Text_Summary7_file_width = Text_Summary7_file_width
-      pg% Text_Summary7_file_aspect_ratio = Text_Summary7_file_aspect_ratio
-      pg% Text_Summary7_title = Text_Summary7_title
-      pg% Text_Summary7_xleft = Text_Summary7_xleft
-      pg% Text_Summary7_xright = Text_Summary7_xright
-      pg% Text_Summary7_ybot = Text_Summary7_ybot
-      pg% Text_Summary7_ytop = Text_Summary7_ytop
-      pg% Text_Summary7_txt_scale = Text_Summary7_txt_scale
-
-      pg% Text_Summary8_win_flag = Text_Summary8_win_flag
-      pg% Text_Summary8_file_flag = Text_Summary8_file_flag
-      pg% Text_Summary8_file_interval = Text_Summary8_file_interval
-      pg% Text_Summary8_file_dir = Text_Summary8_file_dir
-      pg% Text_Summary8_file_prefix = Text_Summary8_file_prefix
-      pg% Text_Summary8_num_cols = Text_Summary8_num_cols
-      pg% Text_Summary8_num_rows = Text_Summary8_num_rows
-      pg% Text_Summary8_name = Text_Summary8_name
-      pg% Text_Summary8_win_width = Text_Summary8_win_width
-      pg% Text_Summary8_win_aspect_ratio = Text_Summary8_win_aspect_ratio
-      pg% Text_Summary8_file_width = Text_Summary8_file_width
-      pg% Text_Summary8_file_aspect_ratio = Text_Summary8_file_aspect_ratio
-      pg% Text_Summary8_title = Text_Summary8_title
-      pg% Text_Summary8_xleft = Text_Summary8_xleft
-      pg% Text_Summary8_xright = Text_Summary8_xright
-      pg% Text_Summary8_ybot = Text_Summary8_ybot
-      pg% Text_Summary8_ytop = Text_Summary8_ytop
-      pg% Text_Summary8_txt_scale = Text_Summary8_txt_scale
-
-      pg% Text_Summary9_win_flag = Text_Summary9_win_flag
-      pg% Text_Summary9_file_flag = Text_Summary9_file_flag
-      pg% Text_Summary9_file_interval = Text_Summary9_file_interval
-      pg% Text_Summary9_file_dir = Text_Summary9_file_dir
-      pg% Text_Summary9_file_prefix = Text_Summary9_file_prefix
-      pg% Text_Summary9_num_cols = Text_Summary9_num_cols
-      pg% Text_Summary9_num_rows = Text_Summary9_num_rows
-      pg% Text_Summary9_name = Text_Summary9_name
-      pg% Text_Summary9_win_width = Text_Summary9_win_width
-      pg% Text_Summary9_win_aspect_ratio = Text_Summary9_win_aspect_ratio
-      pg% Text_Summary9_file_width = Text_Summary9_file_width
-      pg% Text_Summary9_file_aspect_ratio = Text_Summary9_file_aspect_ratio
-      pg% Text_Summary9_title = Text_Summary9_title
-      pg% Text_Summary9_xleft = Text_Summary9_xleft
-      pg% Text_Summary9_xright = Text_Summary9_xright
-      pg% Text_Summary9_ybot = Text_Summary9_ybot
-      pg% Text_Summary9_ytop = Text_Summary9_ytop
-      pg% Text_Summary9_txt_scale = Text_Summary9_txt_scale
-
-      pg% History_Track1_win_flag = History_Track1_win_flag
-      pg% History_Track1_file_flag = History_Track1_file_flag
-      pg% History_Track1_file_interval = History_Track1_file_interval
-      pg% History_Track1_step_min = History_Track1_step_min
-      pg% History_Track1_step_max = History_Track1_step_max
-      pg% show_History_Track1_target_box = show_History_Track1_target_box
-      pg% History_Track1_n_sigma = History_Track1_n_sigma
-      pg% History_Track1_xtarget = History_Track1_xtarget
-      pg% History_Track1_xsigma = History_Track1_xsigma
-      pg% History_Track1_ytarget = History_Track1_ytarget
-      pg% History_Track1_ysigma = History_Track1_ysigma
-      pg% History_Track1_file_dir = History_Track1_file_dir
-      pg% History_Track1_file_prefix = History_Track1_file_prefix
-      pg% show_History_Track1_annotation1 = show_History_Track1_annotation1
-      pg% show_History_Track1_annotation2 = show_History_Track1_annotation2
-      pg% show_History_Track1_annotation3 = show_History_Track1_annotation3
-      pg% History_Track1_fname = History_Track1_fname
-      pg% History_Track1_xname = History_Track1_xname
-      pg% History_Track1_xaxis_label = History_Track1_xaxis_label
-      pg% History_Track1_yname = History_Track1_yname
-      pg% History_Track1_yaxis_label = History_Track1_yaxis_label
-      pg% History_Track1_reverse_xaxis = History_Track1_reverse_xaxis
-      pg% History_Track1_reverse_yaxis = History_Track1_reverse_yaxis
-      pg% History_Track1_log_xaxis = History_Track1_log_xaxis
-      pg% History_Track1_log_yaxis = History_Track1_log_yaxis
-      pg% History_Track1_xmin = History_Track1_xmin
-      pg% History_Track1_xmax = History_Track1_xmax
-      pg% History_Track1_ymin = History_Track1_ymin
-      pg% History_Track1_ymax = History_Track1_ymax
-      pg% History_Track1_xmargin = History_Track1_xmargin
-      pg% History_Track1_ymargin = History_Track1_ymargin
-      pg% History_Track1_dxmin = History_Track1_dxmin
-      pg% History_Track1_dymin = History_Track1_dymin
-      pg% History_Track1_win_width = History_Track1_win_width
-      pg% History_Track1_win_aspect_ratio = History_Track1_win_aspect_ratio
-      pg% History_Track1_file_width = History_Track1_file_width
-      pg% History_Track1_file_aspect_ratio = History_Track1_file_aspect_ratio
-      pg% History_Track1_xleft = History_Track1_xleft
-      pg% History_Track1_xright = History_Track1_xright
-      pg% History_Track1_ybot = History_Track1_ybot
-      pg% History_Track1_ytop = History_Track1_ytop
-      pg% History_Track1_txt_scale = History_Track1_txt_scale
-      pg% History_Track1_title = History_Track1_title
-      pg% History_Track1_use_decorator = History_Track1_use_decorator
-
-      pg% History_Track2_win_flag = History_Track2_win_flag
-      pg% History_Track2_file_flag = History_Track2_file_flag
-      pg% History_Track2_file_interval = History_Track2_file_interval
-      pg% History_Track2_step_min = History_Track2_step_min
-      pg% History_Track2_step_max = History_Track2_step_max
-      pg% show_History_Track2_target_box = show_History_Track2_target_box
-      pg% History_Track2_n_sigma = History_Track2_n_sigma
-      pg% History_Track2_xtarget = History_Track2_xtarget
-      pg% History_Track2_xsigma = History_Track2_xsigma
-      pg% History_Track2_ytarget = History_Track2_ytarget
-      pg% History_Track2_ysigma = History_Track2_ysigma
-      pg% History_Track2_xname = History_Track2_xname
-      pg% History_Track2_xaxis_label = History_Track2_xaxis_label
-      pg% History_Track2_yname = History_Track2_yname
-      pg% History_Track2_yaxis_label = History_Track2_yaxis_label
-      pg% History_Track2_file_dir = History_Track2_file_dir
-      pg% History_Track2_file_prefix = History_Track2_file_prefix
-      pg% show_History_Track2_annotation1 = show_History_Track2_annotation1
-      pg% show_History_Track2_annotation2 = show_History_Track2_annotation2
-      pg% show_History_Track2_annotation3 = show_History_Track2_annotation3
-      pg% History_Track2_fname = History_Track2_fname
-      pg% History_Track2_reverse_xaxis = History_Track2_reverse_xaxis
-      pg% History_Track2_reverse_yaxis = History_Track2_reverse_yaxis
-      pg% History_Track2_log_xaxis = History_Track2_log_xaxis
-      pg% History_Track2_log_yaxis = History_Track2_log_yaxis
-      pg% History_Track2_xmin = History_Track2_xmin
-      pg% History_Track2_xmax = History_Track2_xmax
-      pg% History_Track2_ymin = History_Track2_ymin
-      pg% History_Track2_ymax = History_Track2_ymax
-      pg% History_Track2_xmargin = History_Track2_xmargin
-      pg% History_Track2_ymargin = History_Track2_ymargin
-      pg% History_Track2_dxmin = History_Track2_dxmin
-      pg% History_Track2_dymin = History_Track2_dymin
-      pg% History_Track2_win_width = History_Track2_win_width
-      pg% History_Track2_win_aspect_ratio = History_Track2_win_aspect_ratio
-      pg% History_Track2_file_width = History_Track2_file_width
-      pg% History_Track2_file_aspect_ratio = History_Track2_file_aspect_ratio
-      pg% History_Track2_xleft = History_Track2_xleft
-      pg% History_Track2_xright = History_Track2_xright
-      pg% History_Track2_ybot = History_Track2_ybot
-      pg% History_Track2_ytop = History_Track2_ytop
-      pg% History_Track2_txt_scale = History_Track2_txt_scale
-      pg% History_Track2_title = History_Track2_title
-      pg% History_Track2_use_decorator = History_Track2_use_decorator
-
-      pg% History_Track3_win_flag = History_Track3_win_flag
-      pg% History_Track3_file_flag = History_Track3_file_flag
-      pg% History_Track3_file_interval = History_Track3_file_interval
-      pg% History_Track3_step_min = History_Track3_step_min
-      pg% History_Track3_step_max = History_Track3_step_max
-      pg% show_History_Track3_target_box = show_History_Track3_target_box
-      pg% History_Track3_n_sigma = History_Track3_n_sigma
-      pg% History_Track3_xtarget = History_Track3_xtarget
-      pg% History_Track3_xsigma = History_Track3_xsigma
-      pg% History_Track3_ytarget = History_Track3_ytarget
-      pg% History_Track3_ysigma = History_Track3_ysigma
-      pg% History_Track3_xname = History_Track3_xname
-      pg% History_Track3_xaxis_label = History_Track3_xaxis_label
-      pg% History_Track3_yname = History_Track3_yname
-      pg% History_Track3_yaxis_label = History_Track3_yaxis_label
-      pg% History_Track3_file_dir = History_Track3_file_dir
-      pg% History_Track3_file_prefix = History_Track3_file_prefix
-      pg% show_History_Track3_annotation1 = show_History_Track3_annotation1
-      pg% show_History_Track3_annotation2 = show_History_Track3_annotation2
-      pg% show_History_Track3_annotation3 = show_History_Track3_annotation3
-      pg% History_Track3_fname = History_Track3_fname
-      pg% History_Track3_reverse_xaxis = History_Track3_reverse_xaxis
-      pg% History_Track3_reverse_yaxis = History_Track3_reverse_yaxis
-      pg% History_Track3_log_xaxis = History_Track3_log_xaxis
-      pg% History_Track3_log_yaxis = History_Track3_log_yaxis
-      pg% History_Track3_xmin = History_Track3_xmin
-      pg% History_Track3_xmax = History_Track3_xmax
-      pg% History_Track3_ymin = History_Track3_ymin
-      pg% History_Track3_ymax = History_Track3_ymax
-      pg% History_Track3_xmargin = History_Track3_xmargin
-      pg% History_Track3_ymargin = History_Track3_ymargin
-      pg% History_Track3_dxmin = History_Track3_dxmin
-      pg% History_Track3_dymin = History_Track3_dymin
-      pg% History_Track3_win_width = History_Track3_win_width
-      pg% History_Track3_win_aspect_ratio = History_Track3_win_aspect_ratio
-      pg% History_Track3_file_width = History_Track3_file_width
-      pg% History_Track3_file_aspect_ratio = History_Track3_file_aspect_ratio
-      pg% History_Track3_xleft = History_Track3_xleft
-      pg% History_Track3_xright = History_Track3_xright
-      pg% History_Track3_ybot = History_Track3_ybot
-      pg% History_Track3_ytop = History_Track3_ytop
-      pg% History_Track3_txt_scale = History_Track3_txt_scale
-      pg% History_Track3_title = History_Track3_title
-      pg% History_Track3_use_decorator = History_Track3_use_decorator
-
-      pg% History_Track4_win_flag = History_Track4_win_flag
-      pg% History_Track4_file_flag = History_Track4_file_flag
-      pg% History_Track4_file_interval = History_Track4_file_interval
-      pg% History_Track4_step_min = History_Track4_step_min
-      pg% History_Track4_step_max = History_Track4_step_max
-      pg% show_History_Track4_target_box = show_History_Track4_target_box
-      pg% History_Track4_n_sigma = History_Track4_n_sigma
-      pg% History_Track4_xtarget = History_Track4_xtarget
-      pg% History_Track4_xsigma = History_Track4_xsigma
-      pg% History_Track4_ytarget = History_Track4_ytarget
-      pg% History_Track4_ysigma = History_Track4_ysigma
-      pg% History_Track4_xname = History_Track4_xname
-      pg% History_Track4_xaxis_label = History_Track4_xaxis_label
-      pg% History_Track4_yname = History_Track4_yname
-      pg% History_Track4_yaxis_label = History_Track4_yaxis_label
-      pg% History_Track4_file_dir = History_Track4_file_dir
-      pg% History_Track4_file_prefix = History_Track4_file_prefix
-      pg% show_History_Track4_annotation1 = show_History_Track4_annotation1
-      pg% show_History_Track4_annotation2 = show_History_Track4_annotation2
-      pg% show_History_Track4_annotation3 = show_History_Track4_annotation3
-      pg% History_Track4_fname = History_Track4_fname
-      pg% History_Track4_reverse_xaxis = History_Track4_reverse_xaxis
-      pg% History_Track4_reverse_yaxis = History_Track4_reverse_yaxis
-      pg% History_Track4_log_xaxis = History_Track4_log_xaxis
-      pg% History_Track4_log_yaxis = History_Track4_log_yaxis
-      pg% History_Track4_xmin = History_Track4_xmin
-      pg% History_Track4_xmax = History_Track4_xmax
-      pg% History_Track4_ymin = History_Track4_ymin
-      pg% History_Track4_ymax = History_Track4_ymax
-      pg% History_Track4_xmargin = History_Track4_xmargin
-      pg% History_Track4_ymargin = History_Track4_ymargin
-      pg% History_Track4_dxmin = History_Track4_dxmin
-      pg% History_Track4_dymin = History_Track4_dymin
-      pg% History_Track4_win_width = History_Track4_win_width
-      pg% History_Track4_win_aspect_ratio = History_Track4_win_aspect_ratio
-      pg% History_Track4_file_width = History_Track4_file_width
-      pg% History_Track4_file_aspect_ratio = History_Track4_file_aspect_ratio
-      pg% History_Track4_xleft = History_Track4_xleft
-      pg% History_Track4_xright = History_Track4_xright
-      pg% History_Track4_ybot = History_Track4_ybot
-      pg% History_Track4_ytop = History_Track4_ytop
-      pg% History_Track4_txt_scale = History_Track4_txt_scale
-      pg% History_Track4_title = History_Track4_title
-      pg% History_Track4_use_decorator = History_Track4_use_decorator
-
-      pg% History_Track5_win_flag = History_Track5_win_flag
-      pg% History_Track5_file_flag = History_Track5_file_flag
-      pg% History_Track5_file_interval = History_Track5_file_interval
-      pg% History_Track5_step_min = History_Track5_step_min
-      pg% History_Track5_step_max = History_Track5_step_max
-      pg% show_History_Track5_target_box = show_History_Track5_target_box
-      pg% History_Track5_n_sigma = History_Track5_n_sigma
-      pg% History_Track5_xtarget = History_Track5_xtarget
-      pg% History_Track5_xsigma = History_Track5_xsigma
-      pg% History_Track5_ytarget = History_Track5_ytarget
-      pg% History_Track5_ysigma = History_Track5_ysigma
-      pg% History_Track5_xname = History_Track5_xname
-      pg% History_Track5_xaxis_label = History_Track5_xaxis_label
-      pg% History_Track5_yname = History_Track5_yname
-      pg% History_Track5_yaxis_label = History_Track5_yaxis_label
-      pg% History_Track5_file_dir = History_Track5_file_dir
-      pg% History_Track5_file_prefix = History_Track5_file_prefix
-      pg% show_History_Track5_annotation1 = show_History_Track5_annotation1
-      pg% show_History_Track5_annotation2 = show_History_Track5_annotation2
-      pg% show_History_Track5_annotation3 = show_History_Track5_annotation3
-      pg% History_Track5_fname = History_Track5_fname
-      pg% History_Track5_reverse_xaxis = History_Track5_reverse_xaxis
-      pg% History_Track5_reverse_yaxis = History_Track5_reverse_yaxis
-      pg% History_Track5_log_xaxis = History_Track5_log_xaxis
-      pg% History_Track5_log_yaxis = History_Track5_log_yaxis
-      pg% History_Track5_xmin = History_Track5_xmin
-      pg% History_Track5_xmax = History_Track5_xmax
-      pg% History_Track5_ymin = History_Track5_ymin
-      pg% History_Track5_ymax = History_Track5_ymax
-      pg% History_Track5_xmargin = History_Track5_xmargin
-      pg% History_Track5_ymargin = History_Track5_ymargin
-      pg% History_Track5_dxmin = History_Track5_dxmin
-      pg% History_Track5_dymin = History_Track5_dymin
-      pg% History_Track5_win_width = History_Track5_win_width
-      pg% History_Track5_win_aspect_ratio = History_Track5_win_aspect_ratio
-      pg% History_Track5_file_width = History_Track5_file_width
-      pg% History_Track5_file_aspect_ratio = History_Track5_file_aspect_ratio
-      pg% History_Track5_xleft = History_Track5_xleft
-      pg% History_Track5_xright = History_Track5_xright
-      pg% History_Track5_ybot = History_Track5_ybot
-      pg% History_Track5_ytop = History_Track5_ytop
-      pg% History_Track5_txt_scale = History_Track5_txt_scale
-      pg% History_Track5_title = History_Track5_title
-      pg% History_Track5_use_decorator = History_Track5_use_decorator
-
-      pg% History_Track6_win_flag = History_Track6_win_flag
-      pg% History_Track6_file_flag = History_Track6_file_flag
-      pg% History_Track6_file_interval = History_Track6_file_interval
-      pg% History_Track6_step_min = History_Track6_step_min
-      pg% History_Track6_step_max = History_Track6_step_max
-      pg% show_History_Track6_target_box = show_History_Track6_target_box
-      pg% History_Track6_n_sigma = History_Track6_n_sigma
-      pg% History_Track6_xtarget = History_Track6_xtarget
-      pg% History_Track6_xsigma = History_Track6_xsigma
-      pg% History_Track6_ytarget = History_Track6_ytarget
-      pg% History_Track6_ysigma = History_Track6_ysigma
-      pg% History_Track6_xname = History_Track6_xname
-      pg% History_Track6_xaxis_label = History_Track6_xaxis_label
-      pg% History_Track6_yname = History_Track6_yname
-      pg% History_Track6_yaxis_label = History_Track6_yaxis_label
-      pg% History_Track6_file_dir = History_Track6_file_dir
-      pg% History_Track6_file_prefix = History_Track6_file_prefix
-      pg% show_History_Track6_annotation1 = show_History_Track6_annotation1
-      pg% show_History_Track6_annotation2 = show_History_Track6_annotation2
-      pg% show_History_Track6_annotation3 = show_History_Track6_annotation3
-      pg% History_Track6_fname = History_Track6_fname
-      pg% History_Track6_reverse_xaxis = History_Track6_reverse_xaxis
-      pg% History_Track6_reverse_yaxis = History_Track6_reverse_yaxis
-      pg% History_Track6_log_xaxis = History_Track6_log_xaxis
-      pg% History_Track6_log_yaxis = History_Track6_log_yaxis
-      pg% History_Track6_xmin = History_Track6_xmin
-      pg% History_Track6_xmax = History_Track6_xmax
-      pg% History_Track6_ymin = History_Track6_ymin
-      pg% History_Track6_ymax = History_Track6_ymax
-      pg% History_Track6_xmargin = History_Track6_xmargin
-      pg% History_Track6_ymargin = History_Track6_ymargin
-      pg% History_Track6_dxmin = History_Track6_dxmin
-      pg% History_Track6_dymin = History_Track6_dymin
-      pg% History_Track6_win_width = History_Track6_win_width
-      pg% History_Track6_win_aspect_ratio = History_Track6_win_aspect_ratio
-      pg% History_Track6_file_width = History_Track6_file_width
-      pg% History_Track6_file_aspect_ratio = History_Track6_file_aspect_ratio
-      pg% History_Track6_xleft = History_Track6_xleft
-      pg% History_Track6_xright = History_Track6_xright
-      pg% History_Track6_ybot = History_Track6_ybot
-      pg% History_Track6_ytop = History_Track6_ytop
-      pg% History_Track6_txt_scale = History_Track6_txt_scale
-      pg% History_Track6_title = History_Track6_title
-      pg% History_Track6_use_decorator = History_Track6_use_decorator
-
-      pg% History_Track7_win_flag = History_Track7_win_flag
-      pg% History_Track7_file_flag = History_Track7_file_flag
-      pg% History_Track7_file_interval = History_Track7_file_interval
-      pg% History_Track7_step_min = History_Track7_step_min
-      pg% History_Track7_step_max = History_Track7_step_max
-      pg% show_History_Track7_target_box = show_History_Track7_target_box
-      pg% History_Track7_n_sigma = History_Track7_n_sigma
-      pg% History_Track7_xtarget = History_Track7_xtarget
-      pg% History_Track7_xsigma = History_Track7_xsigma
-      pg% History_Track7_ytarget = History_Track7_ytarget
-      pg% History_Track7_ysigma = History_Track7_ysigma
-      pg% History_Track7_xname = History_Track7_xname
-      pg% History_Track7_xaxis_label = History_Track7_xaxis_label
-      pg% History_Track7_yname = History_Track7_yname
-      pg% History_Track7_yaxis_label = History_Track7_yaxis_label
-      pg% History_Track7_file_dir = History_Track7_file_dir
-      pg% History_Track7_file_prefix = History_Track7_file_prefix
-      pg% show_History_Track7_annotation1 = show_History_Track7_annotation1
-      pg% show_History_Track7_annotation2 = show_History_Track7_annotation2
-      pg% show_History_Track7_annotation3 = show_History_Track7_annotation3
-      pg% History_Track7_fname = History_Track7_fname
-      pg% History_Track7_reverse_xaxis = History_Track7_reverse_xaxis
-      pg% History_Track7_reverse_yaxis = History_Track7_reverse_yaxis
-      pg% History_Track7_log_xaxis = History_Track7_log_xaxis
-      pg% History_Track7_log_yaxis = History_Track7_log_yaxis
-      pg% History_Track7_xmin = History_Track7_xmin
-      pg% History_Track7_xmax = History_Track7_xmax
-      pg% History_Track7_ymin = History_Track7_ymin
-      pg% History_Track7_ymax = History_Track7_ymax
-      pg% History_Track7_xmargin = History_Track7_xmargin
-      pg% History_Track7_ymargin = History_Track7_ymargin
-      pg% History_Track7_dxmin = History_Track7_dxmin
-      pg% History_Track7_dymin = History_Track7_dymin
-      pg% History_Track7_win_width = History_Track7_win_width
-      pg% History_Track7_win_aspect_ratio = History_Track7_win_aspect_ratio
-      pg% History_Track7_file_width = History_Track7_file_width
-      pg% History_Track7_file_aspect_ratio = History_Track7_file_aspect_ratio
-      pg% History_Track7_xleft = History_Track7_xleft
-      pg% History_Track7_xright = History_Track7_xright
-      pg% History_Track7_ybot = History_Track7_ybot
-      pg% History_Track7_ytop = History_Track7_ytop
-      pg% History_Track7_txt_scale = History_Track7_txt_scale
-      pg% History_Track7_title = History_Track7_title
-      pg% History_Track7_use_decorator = History_Track7_use_decorator
-
-      pg% History_Track8_win_flag = History_Track8_win_flag
-      pg% History_Track8_file_flag = History_Track8_file_flag
-      pg% History_Track8_file_interval = History_Track8_file_interval
-      pg% History_Track8_step_min = History_Track8_step_min
-      pg% History_Track8_step_max = History_Track8_step_max
-      pg% show_History_Track8_target_box = show_History_Track8_target_box
-      pg% History_Track8_n_sigma = History_Track8_n_sigma
-      pg% History_Track8_xtarget = History_Track8_xtarget
-      pg% History_Track8_xsigma = History_Track8_xsigma
-      pg% History_Track8_ytarget = History_Track8_ytarget
-      pg% History_Track8_ysigma = History_Track8_ysigma
-      pg% History_Track8_xname = History_Track8_xname
-      pg% History_Track8_xaxis_label = History_Track8_xaxis_label
-      pg% History_Track8_yname = History_Track8_yname
-      pg% History_Track8_yaxis_label = History_Track8_yaxis_label
-      pg% History_Track8_file_dir = History_Track8_file_dir
-      pg% History_Track8_file_prefix = History_Track8_file_prefix
-      pg% show_History_Track8_annotation1 = show_History_Track8_annotation1
-      pg% show_History_Track8_annotation2 = show_History_Track8_annotation2
-      pg% show_History_Track8_annotation3 = show_History_Track8_annotation3
-      pg% History_Track8_fname = History_Track8_fname
-      pg% History_Track8_reverse_xaxis = History_Track8_reverse_xaxis
-      pg% History_Track8_reverse_yaxis = History_Track8_reverse_yaxis
-      pg% History_Track8_log_xaxis = History_Track8_log_xaxis
-      pg% History_Track8_log_yaxis = History_Track8_log_yaxis
-      pg% History_Track8_xmin = History_Track8_xmin
-      pg% History_Track8_xmax = History_Track8_xmax
-      pg% History_Track8_ymin = History_Track8_ymin
-      pg% History_Track8_ymax = History_Track8_ymax
-      pg% History_Track8_xmargin = History_Track8_xmargin
-      pg% History_Track8_ymargin = History_Track8_ymargin
-      pg% History_Track8_dxmin = History_Track8_dxmin
-      pg% History_Track8_dymin = History_Track8_dymin
-      pg% History_Track8_win_width = History_Track8_win_width
-      pg% History_Track8_win_aspect_ratio = History_Track8_win_aspect_ratio
-      pg% History_Track8_file_width = History_Track8_file_width
-      pg% History_Track8_file_aspect_ratio = History_Track8_file_aspect_ratio
-      pg% History_Track8_xleft = History_Track8_xleft
-      pg% History_Track8_xright = History_Track8_xright
-      pg% History_Track8_ybot = History_Track8_ybot
-      pg% History_Track8_ytop = History_Track8_ytop
-      pg% History_Track8_txt_scale = History_Track8_txt_scale
-      pg% History_Track8_title = History_Track8_title
-      pg% History_Track8_use_decorator = History_Track8_use_decorator
-
-      pg% History_Track9_win_flag = History_Track9_win_flag
-      pg% History_Track9_file_flag = History_Track9_file_flag
-      pg% History_Track9_file_interval = History_Track9_file_interval
-      pg% History_Track9_step_min = History_Track9_step_min
-      pg% History_Track9_step_max = History_Track9_step_max
-      pg% show_History_Track9_target_box = show_History_Track9_target_box
-      pg% History_Track9_n_sigma = History_Track9_n_sigma
-      pg% History_Track9_xtarget = History_Track9_xtarget
-      pg% History_Track9_xsigma = History_Track9_xsigma
-      pg% History_Track9_ytarget = History_Track9_ytarget
-      pg% History_Track9_ysigma = History_Track9_ysigma
-      pg% History_Track9_xname = History_Track9_xname
-      pg% History_Track9_xaxis_label = History_Track9_xaxis_label
-      pg% History_Track9_yname = History_Track9_yname
-      pg% History_Track9_yaxis_label = History_Track9_yaxis_label
-      pg% History_Track9_file_dir = History_Track9_file_dir
-      pg% History_Track9_file_prefix = History_Track9_file_prefix
-      pg% show_History_Track9_annotation1 = show_History_Track9_annotation1
-      pg% show_History_Track9_annotation2 = show_History_Track9_annotation2
-      pg% show_History_Track9_annotation3 = show_History_Track9_annotation3
-      pg% History_Track9_fname = History_Track9_fname
-      pg% History_Track9_reverse_xaxis = History_Track9_reverse_xaxis
-      pg% History_Track9_reverse_yaxis = History_Track9_reverse_yaxis
-      pg% History_Track9_log_xaxis = History_Track9_log_xaxis
-      pg% History_Track9_log_yaxis = History_Track9_log_yaxis
-      pg% History_Track9_xmin = History_Track9_xmin
-      pg% History_Track9_xmax = History_Track9_xmax
-      pg% History_Track9_ymin = History_Track9_ymin
-      pg% History_Track9_ymax = History_Track9_ymax
-      pg% History_Track9_xmargin = History_Track9_xmargin
-      pg% History_Track9_ymargin = History_Track9_ymargin
-      pg% History_Track9_dxmin = History_Track9_dxmin
-      pg% History_Track9_dymin = History_Track9_dymin
-      pg% History_Track9_win_width = History_Track9_win_width
-      pg% History_Track9_win_aspect_ratio = History_Track9_win_aspect_ratio
-      pg% History_Track9_file_width = History_Track9_file_width
-      pg% History_Track9_file_aspect_ratio = History_Track9_file_aspect_ratio
-      pg% History_Track9_xleft = History_Track9_xleft
-      pg% History_Track9_xright = History_Track9_xright
-      pg% History_Track9_ybot = History_Track9_ybot
-      pg% History_Track9_ytop = History_Track9_ytop
-      pg% History_Track9_txt_scale = History_Track9_txt_scale
-      pg% History_Track9_title = History_Track9_title
-      pg% History_Track9_use_decorator = History_Track9_use_decorator
-
-      pg% Star_History_track1_win_flag = Star_History_track1_win_flag
-      pg% Star_History_track1_file_flag = Star_History_track1_file_flag
-      pg% Star_History_track1_file_interval = Star_History_track1_file_interval
-      pg% Star_History_track1_step_min = Star_History_track1_step_min
-      pg% Star_History_track1_step_max = Star_History_track1_step_max
-      pg% show_Star_History_track1_target_box = show_Star_History_track1_target_box
-      pg% Star_History_track1_n_sigma = Star_History_track1_n_sigma
-      pg% Star_History_track1_xtarget = Star_History_track1_xtarget
-      pg% Star_History_track1_xsigma = Star_History_track1_xsigma
-      pg% Star_History_track1_ytarget = Star_History_track1_ytarget
-      pg% Star_History_track1_ysigma = Star_History_track1_ysigma
-      pg% Star_History_track1_file_dir = Star_History_track1_file_dir
-      pg% Star_History_track1_file_prefix = Star_History_track1_file_prefix
-      pg% show_Star_History_track1_annotation1 = show_Star_History_track1_annotation1
-      pg% show_Star_History_track1_annotation2 = show_Star_History_track1_annotation2
-      pg% show_Star_History_track1_annotation3 = show_Star_History_track1_annotation3
-      pg% Star_History_track1_fname = Star_History_track1_fname
-      pg% Star_History_track1_xname = Star_History_track1_xname
-      pg% Star_History_track1_xaxis_label = Star_History_track1_xaxis_label
-      pg% Star_History_track1_yname = Star_History_track1_yname
-      pg% Star_History_track1_yaxis_label = Star_History_track1_yaxis_label
-      pg% Star_History_track1_reverse_xaxis = Star_History_track1_reverse_xaxis
-      pg% Star_History_track1_reverse_yaxis = Star_History_track1_reverse_yaxis
-      pg% Star_History_track1_log_xaxis = Star_History_track1_log_xaxis
-      pg% Star_History_track1_log_yaxis = Star_History_track1_log_yaxis
-      pg% Star_History_track1_xmin = Star_History_track1_xmin
-      pg% Star_History_track1_xmax = Star_History_track1_xmax
-      pg% Star_History_track1_ymin = Star_History_track1_ymin
-      pg% Star_History_track1_ymax = Star_History_track1_ymax
-      pg% Star_History_track1_xmargin = Star_History_track1_xmargin
-      pg% Star_History_track1_ymargin = Star_History_track1_ymargin
-      pg% Star_History_track1_dxmin = Star_History_track1_dxmin
-      pg% Star_History_track1_dymin = Star_History_track1_dymin
-      pg% Star_History_track1_win_width = Star_History_track1_win_width
-      pg% Star_History_track1_win_aspect_ratio = Star_History_track1_win_aspect_ratio
-      pg% Star_History_track1_file_width = Star_History_track1_file_width
-      pg% Star_History_track1_file_aspect_ratio = Star_History_track1_file_aspect_ratio
-      pg% Star_History_track1_xleft = Star_History_track1_xleft
-      pg% Star_History_track1_xright = Star_History_track1_xright
-      pg% Star_History_track1_ybot = Star_History_track1_ybot
-      pg% Star_History_track1_ytop = Star_History_track1_ytop
-      pg% Star_History_track1_txt_scale = Star_History_track1_txt_scale
-      pg% Star_History_track1_title = Star_History_track1_title
-      pg% Star_History_track1_use_decorator = Star_History_track1_use_decorator
-
-      pg% Star_History_track2_win_flag = Star_History_track2_win_flag
-      pg% Star_History_track2_file_flag = Star_History_track2_file_flag
-      pg% Star_History_track2_file_interval = Star_History_track2_file_interval
-      pg% Star_History_track2_step_min = Star_History_track2_step_min
-      pg% Star_History_track2_step_max = Star_History_track2_step_max
-      pg% show_Star_History_track2_target_box = show_Star_History_track2_target_box
-      pg% Star_History_track2_n_sigma = Star_History_track2_n_sigma
-      pg% Star_History_track2_xtarget = Star_History_track2_xtarget
-      pg% Star_History_track2_xsigma = Star_History_track2_xsigma
-      pg% Star_History_track2_ytarget = Star_History_track2_ytarget
-      pg% Star_History_track2_ysigma = Star_History_track2_ysigma
-      pg% Star_History_track2_xname = Star_History_track2_xname
-      pg% Star_History_track2_xaxis_label = Star_History_track2_xaxis_label
-      pg% Star_History_track2_yname = Star_History_track2_yname
-      pg% Star_History_track2_yaxis_label = Star_History_track2_yaxis_label
-      pg% Star_History_track2_file_dir = Star_History_track2_file_dir
-      pg% Star_History_track2_file_prefix = Star_History_track2_file_prefix
-      pg% show_Star_History_track2_annotation1 = show_Star_History_track2_annotation1
-      pg% show_Star_History_track2_annotation2 = show_Star_History_track2_annotation2
-      pg% show_Star_History_track2_annotation3 = show_Star_History_track2_annotation3
-      pg% Star_History_track2_fname = Star_History_track2_fname
-      pg% Star_History_track2_reverse_xaxis = Star_History_track2_reverse_xaxis
-      pg% Star_History_track2_reverse_yaxis = Star_History_track2_reverse_yaxis
-      pg% Star_History_track2_log_xaxis = Star_History_track2_log_xaxis
-      pg% Star_History_track2_log_yaxis = Star_History_track2_log_yaxis
-      pg% Star_History_track2_xmin = Star_History_track2_xmin
-      pg% Star_History_track2_xmax = Star_History_track2_xmax
-      pg% Star_History_track2_ymin = Star_History_track2_ymin
-      pg% Star_History_track2_ymax = Star_History_track2_ymax
-      pg% Star_History_track2_xmargin = Star_History_track2_xmargin
-      pg% Star_History_track2_ymargin = Star_History_track2_ymargin
-      pg% Star_History_track2_dxmin = Star_History_track2_dxmin
-      pg% Star_History_track2_dymin = Star_History_track2_dymin
-      pg% Star_History_track2_win_width = Star_History_track2_win_width
-      pg% Star_History_track2_win_aspect_ratio = Star_History_track2_win_aspect_ratio
-      pg% Star_History_track2_file_width = Star_History_track2_file_width
-      pg% Star_History_track2_file_aspect_ratio = Star_History_track2_file_aspect_ratio
-      pg% Star_History_track2_xleft = Star_History_track2_xleft
-      pg% Star_History_track2_xright = Star_History_track2_xright
-      pg% Star_History_track2_ybot = Star_History_track2_ybot
-      pg% Star_History_track2_ytop = Star_History_track2_ytop
-      pg% Star_History_track2_txt_scale = Star_History_track2_txt_scale
-      pg% Star_History_track2_title = Star_History_track2_title
-      pg% Star_History_track2_use_decorator = Star_History_track2_use_decorator
-
-      pg% Star_History_track3_win_flag = Star_History_track3_win_flag
-      pg% Star_History_track3_file_flag = Star_History_track3_file_flag
-      pg% Star_History_track3_file_interval = Star_History_track3_file_interval
-      pg% Star_History_track3_step_min = Star_History_track3_step_min
-      pg% Star_History_track3_step_max = Star_History_track3_step_max
-      pg% show_Star_History_track3_target_box = show_Star_History_track3_target_box
-      pg% Star_History_track3_n_sigma = Star_History_track3_n_sigma
-      pg% Star_History_track3_xtarget = Star_History_track3_xtarget
-      pg% Star_History_track3_xsigma = Star_History_track3_xsigma
-      pg% Star_History_track3_ytarget = Star_History_track3_ytarget
-      pg% Star_History_track3_ysigma = Star_History_track3_ysigma
-      pg% Star_History_track3_xname = Star_History_track3_xname
-      pg% Star_History_track3_xaxis_label = Star_History_track3_xaxis_label
-      pg% Star_History_track3_yname = Star_History_track3_yname
-      pg% Star_History_track3_yaxis_label = Star_History_track3_yaxis_label
-      pg% Star_History_track3_file_dir = Star_History_track3_file_dir
-      pg% Star_History_track3_file_prefix = Star_History_track3_file_prefix
-      pg% show_Star_History_track3_annotation1 = show_Star_History_track3_annotation1
-      pg% show_Star_History_track3_annotation2 = show_Star_History_track3_annotation2
-      pg% show_Star_History_track3_annotation3 = show_Star_History_track3_annotation3
-      pg% Star_History_track3_fname = Star_History_track3_fname
-      pg% Star_History_track3_reverse_xaxis = Star_History_track3_reverse_xaxis
-      pg% Star_History_track3_reverse_yaxis = Star_History_track3_reverse_yaxis
-      pg% Star_History_track3_log_xaxis = Star_History_track3_log_xaxis
-      pg% Star_History_track3_log_yaxis = Star_History_track3_log_yaxis
-      pg% Star_History_track3_xmin = Star_History_track3_xmin
-      pg% Star_History_track3_xmax = Star_History_track3_xmax
-      pg% Star_History_track3_ymin = Star_History_track3_ymin
-      pg% Star_History_track3_ymax = Star_History_track3_ymax
-      pg% Star_History_track3_xmargin = Star_History_track3_xmargin
-      pg% Star_History_track3_ymargin = Star_History_track3_ymargin
-      pg% Star_History_track3_dxmin = Star_History_track3_dxmin
-      pg% Star_History_track3_dymin = Star_History_track3_dymin
-      pg% Star_History_track3_win_width = Star_History_track3_win_width
-      pg% Star_History_track3_win_aspect_ratio = Star_History_track3_win_aspect_ratio
-      pg% Star_History_track3_file_width = Star_History_track3_file_width
-      pg% Star_History_track3_file_aspect_ratio = Star_History_track3_file_aspect_ratio
-      pg% Star_History_track3_xleft = Star_History_track3_xleft
-      pg% Star_History_track3_xright = Star_History_track3_xright
-      pg% Star_History_track3_ybot = Star_History_track3_ybot
-      pg% Star_History_track3_ytop = Star_History_track3_ytop
-      pg% Star_History_track3_txt_scale = Star_History_track3_txt_scale
-      pg% Star_History_track3_title = Star_History_track3_title
-      pg% Star_History_track3_use_decorator = Star_History_track3_use_decorator
-
-      pg% Star_History_track4_win_flag = Star_History_track4_win_flag
-      pg% Star_History_track4_file_flag = Star_History_track4_file_flag
-      pg% Star_History_track4_file_interval = Star_History_track4_file_interval
-      pg% Star_History_track4_step_min = Star_History_track4_step_min
-      pg% Star_History_track4_step_max = Star_History_track4_step_max
-      pg% show_Star_History_track4_target_box = show_Star_History_track4_target_box
-      pg% Star_History_track4_n_sigma = Star_History_track4_n_sigma
-      pg% Star_History_track4_xtarget = Star_History_track4_xtarget
-      pg% Star_History_track4_xsigma = Star_History_track4_xsigma
-      pg% Star_History_track4_ytarget = Star_History_track4_ytarget
-      pg% Star_History_track4_ysigma = Star_History_track4_ysigma
-      pg% Star_History_track4_xname = Star_History_track4_xname
-      pg% Star_History_track4_xaxis_label = Star_History_track4_xaxis_label
-      pg% Star_History_track4_yname = Star_History_track4_yname
-      pg% Star_History_track4_yaxis_label = Star_History_track4_yaxis_label
-      pg% Star_History_track4_file_dir = Star_History_track4_file_dir
-      pg% Star_History_track4_file_prefix = Star_History_track4_file_prefix
-      pg% show_Star_History_track4_annotation1 = show_Star_History_track4_annotation1
-      pg% show_Star_History_track4_annotation2 = show_Star_History_track4_annotation2
-      pg% show_Star_History_track4_annotation3 = show_Star_History_track4_annotation3
-      pg% Star_History_track4_fname = Star_History_track4_fname
-      pg% Star_History_track4_reverse_xaxis = Star_History_track4_reverse_xaxis
-      pg% Star_History_track4_reverse_yaxis = Star_History_track4_reverse_yaxis
-      pg% Star_History_track4_log_xaxis = Star_History_track4_log_xaxis
-      pg% Star_History_track4_log_yaxis = Star_History_track4_log_yaxis
-      pg% Star_History_track4_xmin = Star_History_track4_xmin
-      pg% Star_History_track4_xmax = Star_History_track4_xmax
-      pg% Star_History_track4_ymin = Star_History_track4_ymin
-      pg% Star_History_track4_ymax = Star_History_track4_ymax
-      pg% Star_History_track4_xmargin = Star_History_track4_xmargin
-      pg% Star_History_track4_ymargin = Star_History_track4_ymargin
-      pg% Star_History_track4_dxmin = Star_History_track4_dxmin
-      pg% Star_History_track4_dymin = Star_History_track4_dymin
-      pg% Star_History_track4_win_width = Star_History_track4_win_width
-      pg% Star_History_track4_win_aspect_ratio = Star_History_track4_win_aspect_ratio
-      pg% Star_History_track4_file_width = Star_History_track4_file_width
-      pg% Star_History_track4_file_aspect_ratio = Star_History_track4_file_aspect_ratio
-      pg% Star_History_track4_xleft = Star_History_track4_xleft
-      pg% Star_History_track4_xright = Star_History_track4_xright
-      pg% Star_History_track4_ybot = Star_History_track4_ybot
-      pg% Star_History_track4_ytop = Star_History_track4_ytop
-      pg% Star_History_track4_txt_scale = Star_History_track4_txt_scale
-      pg% Star_History_track4_title = Star_History_track4_title
-      pg% Star_History_track4_use_decorator = Star_History_track4_use_decorator
-
-      pg% Star_History_track5_win_flag = Star_History_track5_win_flag
-      pg% Star_History_track5_file_flag = Star_History_track5_file_flag
-      pg% Star_History_track5_file_interval = Star_History_track5_file_interval
-      pg% Star_History_track5_step_min = Star_History_track5_step_min
-      pg% Star_History_track5_step_max = Star_History_track5_step_max
-      pg% show_Star_History_track5_target_box = show_Star_History_track5_target_box
-      pg% Star_History_track5_n_sigma = Star_History_track5_n_sigma
-      pg% Star_History_track5_xtarget = Star_History_track5_xtarget
-      pg% Star_History_track5_xsigma = Star_History_track5_xsigma
-      pg% Star_History_track5_ytarget = Star_History_track5_ytarget
-      pg% Star_History_track5_ysigma = Star_History_track5_ysigma
-      pg% Star_History_track5_xname = Star_History_track5_xname
-      pg% Star_History_track5_xaxis_label = Star_History_track5_xaxis_label
-      pg% Star_History_track5_yname = Star_History_track5_yname
-      pg% Star_History_track5_yaxis_label = Star_History_track5_yaxis_label
-      pg% Star_History_track5_file_dir = Star_History_track5_file_dir
-      pg% Star_History_track5_file_prefix = Star_History_track5_file_prefix
-      pg% show_Star_History_track5_annotation1 = show_Star_History_track5_annotation1
-      pg% show_Star_History_track5_annotation2 = show_Star_History_track5_annotation2
-      pg% show_Star_History_track5_annotation3 = show_Star_History_track5_annotation3
-      pg% Star_History_track5_fname = Star_History_track5_fname
-      pg% Star_History_track5_reverse_xaxis = Star_History_track5_reverse_xaxis
-      pg% Star_History_track5_reverse_yaxis = Star_History_track5_reverse_yaxis
-      pg% Star_History_track5_log_xaxis = Star_History_track5_log_xaxis
-      pg% Star_History_track5_log_yaxis = Star_History_track5_log_yaxis
-      pg% Star_History_track5_xmin = Star_History_track5_xmin
-      pg% Star_History_track5_xmax = Star_History_track5_xmax
-      pg% Star_History_track5_ymin = Star_History_track5_ymin
-      pg% Star_History_track5_ymax = Star_History_track5_ymax
-      pg% Star_History_track5_xmargin = Star_History_track5_xmargin
-      pg% Star_History_track5_ymargin = Star_History_track5_ymargin
-      pg% Star_History_track5_dxmin = Star_History_track5_dxmin
-      pg% Star_History_track5_dymin = Star_History_track5_dymin
-      pg% Star_History_track5_win_width = Star_History_track5_win_width
-      pg% Star_History_track5_win_aspect_ratio = Star_History_track5_win_aspect_ratio
-      pg% Star_History_track5_file_width = Star_History_track5_file_width
-      pg% Star_History_track5_file_aspect_ratio = Star_History_track5_file_aspect_ratio
-      pg% Star_History_track5_xleft = Star_History_track5_xleft
-      pg% Star_History_track5_xright = Star_History_track5_xright
-      pg% Star_History_track5_ybot = Star_History_track5_ybot
-      pg% Star_History_track5_ytop = Star_History_track5_ytop
-      pg% Star_History_track5_txt_scale = Star_History_track5_txt_scale
-      pg% Star_History_track5_title = Star_History_track5_title
-      pg% Star_History_track5_use_decorator = Star_History_track5_use_decorator
-
-      pg% Star_History_track6_win_flag = Star_History_track6_win_flag
-      pg% Star_History_track6_file_flag = Star_History_track6_file_flag
-      pg% Star_History_track6_file_interval = Star_History_track6_file_interval
-      pg% Star_History_track6_step_min = Star_History_track6_step_min
-      pg% Star_History_track6_step_max = Star_History_track6_step_max
-      pg% show_Star_History_track6_target_box = show_Star_History_track6_target_box
-      pg% Star_History_track6_n_sigma = Star_History_track6_n_sigma
-      pg% Star_History_track6_xtarget = Star_History_track6_xtarget
-      pg% Star_History_track6_xsigma = Star_History_track6_xsigma
-      pg% Star_History_track6_ytarget = Star_History_track6_ytarget
-      pg% Star_History_track6_ysigma = Star_History_track6_ysigma
-      pg% Star_History_track6_xname = Star_History_track6_xname
-      pg% Star_History_track6_xaxis_label = Star_History_track6_xaxis_label
-      pg% Star_History_track6_yname = Star_History_track6_yname
-      pg% Star_History_track6_yaxis_label = Star_History_track6_yaxis_label
-      pg% Star_History_track6_file_dir = Star_History_track6_file_dir
-      pg% Star_History_track6_file_prefix = Star_History_track6_file_prefix
-      pg% show_Star_History_track6_annotation1 = show_Star_History_track6_annotation1
-      pg% show_Star_History_track6_annotation2 = show_Star_History_track6_annotation2
-      pg% show_Star_History_track6_annotation3 = show_Star_History_track6_annotation3
-      pg% Star_History_track6_fname = Star_History_track6_fname
-      pg% Star_History_track6_reverse_xaxis = Star_History_track6_reverse_xaxis
-      pg% Star_History_track6_reverse_yaxis = Star_History_track6_reverse_yaxis
-      pg% Star_History_track6_log_xaxis = Star_History_track6_log_xaxis
-      pg% Star_History_track6_log_yaxis = Star_History_track6_log_yaxis
-      pg% Star_History_track6_xmin = Star_History_track6_xmin
-      pg% Star_History_track6_xmax = Star_History_track6_xmax
-      pg% Star_History_track6_ymin = Star_History_track6_ymin
-      pg% Star_History_track6_ymax = Star_History_track6_ymax
-      pg% Star_History_track6_xmargin = Star_History_track6_xmargin
-      pg% Star_History_track6_ymargin = Star_History_track6_ymargin
-      pg% Star_History_track6_dxmin = Star_History_track6_dxmin
-      pg% Star_History_track6_dymin = Star_History_track6_dymin
-      pg% Star_History_track6_win_width = Star_History_track6_win_width
-      pg% Star_History_track6_win_aspect_ratio = Star_History_track6_win_aspect_ratio
-      pg% Star_History_track6_file_width = Star_History_track6_file_width
-      pg% Star_History_track6_file_aspect_ratio = Star_History_track6_file_aspect_ratio
-      pg% Star_History_track6_xleft = Star_History_track6_xleft
-      pg% Star_History_track6_xright = Star_History_track6_xright
-      pg% Star_History_track6_ybot = Star_History_track6_ybot
-      pg% Star_History_track6_ytop = Star_History_track6_ytop
-      pg% Star_History_track6_txt_scale = Star_History_track6_txt_scale
-      pg% Star_History_track6_title = Star_History_track6_title
-      pg% Star_History_track6_use_decorator = Star_History_track6_use_decorator
-
-      pg% Star_History_track7_win_flag = Star_History_track7_win_flag
-      pg% Star_History_track7_file_flag = Star_History_track7_file_flag
-      pg% Star_History_track7_file_interval = Star_History_track7_file_interval
-      pg% Star_History_track7_step_min = Star_History_track7_step_min
-      pg% Star_History_track7_step_max = Star_History_track7_step_max
-      pg% show_Star_History_track7_target_box = show_Star_History_track7_target_box
-      pg% Star_History_track7_n_sigma = Star_History_track7_n_sigma
-      pg% Star_History_track7_xtarget = Star_History_track7_xtarget
-      pg% Star_History_track7_xsigma = Star_History_track7_xsigma
-      pg% Star_History_track7_ytarget = Star_History_track7_ytarget
-      pg% Star_History_track7_ysigma = Star_History_track7_ysigma
-      pg% Star_History_track7_xname = Star_History_track7_xname
-      pg% Star_History_track7_xaxis_label = Star_History_track7_xaxis_label
-      pg% Star_History_track7_yname = Star_History_track7_yname
-      pg% Star_History_track7_yaxis_label = Star_History_track7_yaxis_label
-      pg% Star_History_track7_file_dir = Star_History_track7_file_dir
-      pg% Star_History_track7_file_prefix = Star_History_track7_file_prefix
-      pg% show_Star_History_track7_annotation1 = show_Star_History_track7_annotation1
-      pg% show_Star_History_track7_annotation2 = show_Star_History_track7_annotation2
-      pg% show_Star_History_track7_annotation3 = show_Star_History_track7_annotation3
-      pg% Star_History_track7_fname = Star_History_track7_fname
-      pg% Star_History_track7_reverse_xaxis = Star_History_track7_reverse_xaxis
-      pg% Star_History_track7_reverse_yaxis = Star_History_track7_reverse_yaxis
-      pg% Star_History_track7_log_xaxis = Star_History_track7_log_xaxis
-      pg% Star_History_track7_log_yaxis = Star_History_track7_log_yaxis
-      pg% Star_History_track7_xmin = Star_History_track7_xmin
-      pg% Star_History_track7_xmax = Star_History_track7_xmax
-      pg% Star_History_track7_ymin = Star_History_track7_ymin
-      pg% Star_History_track7_ymax = Star_History_track7_ymax
-      pg% Star_History_track7_xmargin = Star_History_track7_xmargin
-      pg% Star_History_track7_ymargin = Star_History_track7_ymargin
-      pg% Star_History_track7_dxmin = Star_History_track7_dxmin
-      pg% Star_History_track7_dymin = Star_History_track7_dymin
-      pg% Star_History_track7_win_width = Star_History_track7_win_width
-      pg% Star_History_track7_win_aspect_ratio = Star_History_track7_win_aspect_ratio
-      pg% Star_History_track7_file_width = Star_History_track7_file_width
-      pg% Star_History_track7_file_aspect_ratio = Star_History_track7_file_aspect_ratio
-      pg% Star_History_track7_xleft = Star_History_track7_xleft
-      pg% Star_History_track7_xright = Star_History_track7_xright
-      pg% Star_History_track7_ybot = Star_History_track7_ybot
-      pg% Star_History_track7_ytop = Star_History_track7_ytop
-      pg% Star_History_track7_txt_scale = Star_History_track7_txt_scale
-      pg% Star_History_track7_title = Star_History_track7_title
-      pg% Star_History_track7_use_decorator = Star_History_track7_use_decorator
-
-      pg% Star_History_track8_win_flag = Star_History_track8_win_flag
-      pg% Star_History_track8_file_flag = Star_History_track8_file_flag
-      pg% Star_History_track8_file_interval = Star_History_track8_file_interval
-      pg% Star_History_track8_step_min = Star_History_track8_step_min
-      pg% Star_History_track8_step_max = Star_History_track8_step_max
-      pg% show_Star_History_track8_target_box = show_Star_History_track8_target_box
-      pg% Star_History_track8_n_sigma = Star_History_track8_n_sigma
-      pg% Star_History_track8_xtarget = Star_History_track8_xtarget
-      pg% Star_History_track8_xsigma = Star_History_track8_xsigma
-      pg% Star_History_track8_ytarget = Star_History_track8_ytarget
-      pg% Star_History_track8_ysigma = Star_History_track8_ysigma
-      pg% Star_History_track8_xname = Star_History_track8_xname
-      pg% Star_History_track8_xaxis_label = Star_History_track8_xaxis_label
-      pg% Star_History_track8_yname = Star_History_track8_yname
-      pg% Star_History_track8_yaxis_label = Star_History_track8_yaxis_label
-      pg% Star_History_track8_file_dir = Star_History_track8_file_dir
-      pg% Star_History_track8_file_prefix = Star_History_track8_file_prefix
-      pg% show_Star_History_track8_annotation1 = show_Star_History_track8_annotation1
-      pg% show_Star_History_track8_annotation2 = show_Star_History_track8_annotation2
-      pg% show_Star_History_track8_annotation3 = show_Star_History_track8_annotation3
-      pg% Star_History_track8_fname = Star_History_track8_fname
-      pg% Star_History_track8_reverse_xaxis = Star_History_track8_reverse_xaxis
-      pg% Star_History_track8_reverse_yaxis = Star_History_track8_reverse_yaxis
-      pg% Star_History_track8_log_xaxis = Star_History_track8_log_xaxis
-      pg% Star_History_track8_log_yaxis = Star_History_track8_log_yaxis
-      pg% Star_History_track8_xmin = Star_History_track8_xmin
-      pg% Star_History_track8_xmax = Star_History_track8_xmax
-      pg% Star_History_track8_ymin = Star_History_track8_ymin
-      pg% Star_History_track8_ymax = Star_History_track8_ymax
-      pg% Star_History_track8_xmargin = Star_History_track8_xmargin
-      pg% Star_History_track8_ymargin = Star_History_track8_ymargin
-      pg% Star_History_track8_dxmin = Star_History_track8_dxmin
-      pg% Star_History_track8_dymin = Star_History_track8_dymin
-      pg% Star_History_track8_win_width = Star_History_track8_win_width
-      pg% Star_History_track8_win_aspect_ratio = Star_History_track8_win_aspect_ratio
-      pg% Star_History_track8_file_width = Star_History_track8_file_width
-      pg% Star_History_track8_file_aspect_ratio = Star_History_track8_file_aspect_ratio
-      pg% Star_History_track8_xleft = Star_History_track8_xleft
-      pg% Star_History_track8_xright = Star_History_track8_xright
-      pg% Star_History_track8_ybot = Star_History_track8_ybot
-      pg% Star_History_track8_ytop = Star_History_track8_ytop
-      pg% Star_History_track8_txt_scale = Star_History_track8_txt_scale
-      pg% Star_History_track8_title = Star_History_track8_title
-      pg% Star_History_track8_use_decorator = Star_History_track8_use_decorator
-
-      pg% Star_History_track9_win_flag = Star_History_track9_win_flag
-      pg% Star_History_track9_file_flag = Star_History_track9_file_flag
-      pg% Star_History_track9_file_interval = Star_History_track9_file_interval
-      pg% Star_History_track9_step_min = Star_History_track9_step_min
-      pg% Star_History_track9_step_max = Star_History_track9_step_max
-      pg% show_Star_History_track9_target_box = show_Star_History_track9_target_box
-      pg% Star_History_track9_n_sigma = Star_History_track9_n_sigma
-      pg% Star_History_track9_xtarget = Star_History_track9_xtarget
-      pg% Star_History_track9_xsigma = Star_History_track9_xsigma
-      pg% Star_History_track9_ytarget = Star_History_track9_ytarget
-      pg% Star_History_track9_ysigma = Star_History_track9_ysigma
-      pg% Star_History_track9_xname = Star_History_track9_xname
-      pg% Star_History_track9_xaxis_label = Star_History_track9_xaxis_label
-      pg% Star_History_track9_yname = Star_History_track9_yname
-      pg% Star_History_track9_yaxis_label = Star_History_track9_yaxis_label
-      pg% Star_History_track9_file_dir = Star_History_track9_file_dir
-      pg% Star_History_track9_file_prefix = Star_History_track9_file_prefix
-      pg% show_Star_History_track9_annotation1 = show_Star_History_track9_annotation1
-      pg% show_Star_History_track9_annotation2 = show_Star_History_track9_annotation2
-      pg% show_Star_History_track9_annotation3 = show_Star_History_track9_annotation3
-      pg% Star_History_track9_fname = Star_History_track9_fname
-      pg% Star_History_track9_reverse_xaxis = Star_History_track9_reverse_xaxis
-      pg% Star_History_track9_reverse_yaxis = Star_History_track9_reverse_yaxis
-      pg% Star_History_track9_log_xaxis = Star_History_track9_log_xaxis
-      pg% Star_History_track9_log_yaxis = Star_History_track9_log_yaxis
-      pg% Star_History_track9_xmin = Star_History_track9_xmin
-      pg% Star_History_track9_xmax = Star_History_track9_xmax
-      pg% Star_History_track9_ymin = Star_History_track9_ymin
-      pg% Star_History_track9_ymax = Star_History_track9_ymax
-      pg% Star_History_track9_xmargin = Star_History_track9_xmargin
-      pg% Star_History_track9_ymargin = Star_History_track9_ymargin
-      pg% Star_History_track9_dxmin = Star_History_track9_dxmin
-      pg% Star_History_track9_dymin = Star_History_track9_dymin
-      pg% Star_History_track9_win_width = Star_History_track9_win_width
-      pg% Star_History_track9_win_aspect_ratio = Star_History_track9_win_aspect_ratio
-      pg% Star_History_track9_file_width = Star_History_track9_file_width
-      pg% Star_History_track9_file_aspect_ratio = Star_History_track9_file_aspect_ratio
-      pg% Star_History_track9_xleft = Star_History_track9_xleft
-      pg% Star_History_track9_xright = Star_History_track9_xright
-      pg% Star_History_track9_ybot = Star_History_track9_ybot
-      pg% Star_History_track9_ytop = Star_History_track9_ytop
-      pg% Star_History_track9_txt_scale = Star_History_track9_txt_scale
-      pg% Star_History_track9_title = Star_History_track9_title
-      pg% Star_History_track9_use_decorator = Star_History_track9_use_decorator
-
-
-      pg% History_Panels1_win_flag = History_Panels1_win_flag
-      pg% History_Panels1_win_width = History_Panels1_win_width
-      pg% History_Panels1_win_aspect_ratio = History_Panels1_win_aspect_ratio
-      pg% History_Panels1_xleft = History_Panels1_xleft
-      pg% History_Panels1_xright = History_Panels1_xright
-      pg% History_Panels1_ybot = History_Panels1_ybot
-      pg% History_Panels1_ytop = History_Panels1_ytop
-      pg% History_Panels1_txt_scale = History_Panels1_txt_scale
-      pg% History_Panels1_title = History_Panels1_title
-      pg% History_Panels1_xmax = History_Panels1_xmax
-      pg% History_Panels1_xmin = History_Panels1_xmin
-      pg% History_Panels1_dxmin = History_Panels1_dxmin
-      pg% History_Panels1_max_width = History_Panels1_max_width
-      pg% History_Panels1_num_panels = History_Panels1_num_panels
-      pg% History_Panels1_xaxis_name = History_Panels1_xaxis_name
-      pg% History_Panels1_yaxis_name = History_Panels1_yaxis_name
-      pg% History_Panels1_xaxis_reversed = History_Panels1_xaxis_reversed
-      pg% History_Panels1_yaxis_reversed = History_Panels1_yaxis_reversed
-      pg% History_Panels1_xaxis_log = History_Panels1_xaxis_log
-      pg% History_Panels1_yaxis_log = History_Panels1_yaxis_log
-      pg% History_Panels1_ymin = History_Panels1_ymin
-      pg% History_Panels1_ymax = History_Panels1_ymax
-      pg% History_Panels1_dymin = History_Panels1_dymin
-      pg% History_Panels1_other_yaxis_name = History_Panels1_other_yaxis_name
-      pg% History_Panels1_other_yaxis_reversed = History_Panels1_other_yaxis_reversed
-      pg% History_Panels1_other_yaxis_log = History_Panels1_other_yaxis_log
-      pg% History_Panels1_other_ymin = History_Panels1_other_ymin
-      pg% History_Panels1_other_ymax = History_Panels1_other_ymax
-      pg% History_Panels1_other_dymin = History_Panels1_other_dymin
-      pg% History_Panels1_file_flag = History_Panels1_file_flag
-      pg% History_Panels1_points_name = History_Panels1_points_name
-      pg% History_Panels1_file_dir = History_Panels1_file_dir
-      pg% History_Panels1_file_prefix = History_Panels1_file_prefix
-      pg% History_Panels1_file_interval = History_Panels1_file_interval
-      pg% History_Panels1_file_width = History_Panels1_file_width
-      pg% History_Panels1_file_aspect_ratio = History_Panels1_file_aspect_ratio
-      pg% History_Panels1_xmargin = History_Panels1_xmargin
-      pg% History_Panels1_ymargin = History_Panels1_ymargin
-      pg% History_Panels1_other_ymargin = History_Panels1_other_ymargin
-      pg% History_Panels1_use_decorator = History_Panels1_use_decorator
-
-      pg% History_Panels2_win_flag = History_Panels2_win_flag
-      pg% History_Panels2_win_width = History_Panels2_win_width
-      pg% History_Panels2_win_aspect_ratio = History_Panels2_win_aspect_ratio
-      pg% History_Panels2_xleft = History_Panels2_xleft
-      pg% History_Panels2_xright = History_Panels2_xright
-      pg% History_Panels2_ybot = History_Panels2_ybot
-      pg% History_Panels2_ytop = History_Panels2_ytop
-      pg% History_Panels2_txt_scale = History_Panels2_txt_scale
-      pg% History_Panels2_title = History_Panels2_title
-      pg% History_Panels2_xmax = History_Panels2_xmax
-      pg% History_Panels2_xmin = History_Panels2_xmin
-      pg% History_Panels2_dxmin = History_Panels2_dxmin
-      pg% History_Panels2_max_width = History_Panels2_max_width
-      pg% History_Panels2_num_panels = History_Panels2_num_panels
-      pg% History_Panels2_xaxis_name = History_Panels2_xaxis_name
-      pg% History_Panels2_yaxis_name = History_Panels2_yaxis_name
-      pg% History_Panels2_xaxis_reversed = History_Panels2_xaxis_reversed
-      pg% History_Panels2_yaxis_reversed = History_Panels2_yaxis_reversed
-      pg% History_Panels2_xaxis_log = History_Panels2_xaxis_log
-      pg% History_Panels2_yaxis_log = History_Panels2_yaxis_log
-      pg% History_Panels2_ymin = History_Panels2_ymin
-      pg% History_Panels2_ymax = History_Panels2_ymax
-      pg% History_Panels2_dymin = History_Panels2_dymin
-      pg% History_Panels2_other_yaxis_name = History_Panels2_other_yaxis_name
-      pg% History_Panels2_other_yaxis_reversed = History_Panels2_other_yaxis_reversed
-      pg% History_Panels2_other_yaxis_log = History_Panels2_other_yaxis_log
-      pg% History_Panels2_other_ymin = History_Panels2_other_ymin
-      pg% History_Panels2_other_ymax = History_Panels2_other_ymax
-      pg% History_Panels2_other_dymin = History_Panels2_other_dymin
-      pg% History_Panels2_file_flag = History_Panels2_file_flag
-      pg% History_Panels2_points_name = History_Panels2_points_name
-      pg% History_Panels2_file_dir = History_Panels2_file_dir
-      pg% History_Panels2_file_prefix = History_Panels2_file_prefix
-      pg% History_Panels2_file_interval = History_Panels2_file_interval
-      pg% History_Panels2_file_width = History_Panels2_file_width
-      pg% History_Panels2_file_aspect_ratio = History_Panels2_file_aspect_ratio
-      pg% History_Panels2_xmargin = History_Panels2_xmargin
-      pg% History_Panels2_ymargin = History_Panels2_ymargin
-      pg% History_Panels2_other_ymargin = History_Panels2_other_ymargin
-      pg% History_Panels2_use_decorator = History_Panels2_use_decorator
-
-      pg% History_Panels3_win_flag = History_Panels3_win_flag
-      pg% History_Panels3_win_width = History_Panels3_win_width
-      pg% History_Panels3_win_aspect_ratio = History_Panels3_win_aspect_ratio
-      pg% History_Panels3_xleft = History_Panels3_xleft
-      pg% History_Panels3_xright = History_Panels3_xright
-      pg% History_Panels3_ybot = History_Panels3_ybot
-      pg% History_Panels3_ytop = History_Panels3_ytop
-      pg% History_Panels3_txt_scale = History_Panels3_txt_scale
-      pg% History_Panels3_title = History_Panels3_title
-      pg% History_Panels3_xmax = History_Panels3_xmax
-      pg% History_Panels3_xmin = History_Panels3_xmin
-      pg% History_Panels3_dxmin = History_Panels3_dxmin
-      pg% History_Panels3_max_width = History_Panels3_max_width
-      pg% History_Panels3_num_panels = History_Panels3_num_panels
-      pg% History_Panels3_xaxis_name = History_Panels3_xaxis_name
-      pg% History_Panels3_yaxis_name = History_Panels3_yaxis_name
-      pg% History_Panels3_xaxis_reversed = History_Panels3_xaxis_reversed
-      pg% History_Panels3_yaxis_reversed = History_Panels3_yaxis_reversed
-      pg% History_Panels3_xaxis_log = History_Panels3_xaxis_log
-      pg% History_Panels3_yaxis_log = History_Panels3_yaxis_log
-      pg% History_Panels3_ymin = History_Panels3_ymin
-      pg% History_Panels3_ymax = History_Panels3_ymax
-      pg% History_Panels3_dymin = History_Panels3_dymin
-      pg% History_Panels3_other_yaxis_name = History_Panels3_other_yaxis_name
-      pg% History_Panels3_other_yaxis_reversed = History_Panels3_other_yaxis_reversed
-      pg% History_Panels3_other_yaxis_log = History_Panels3_other_yaxis_log
-      pg% History_Panels3_other_ymin = History_Panels3_other_ymin
-      pg% History_Panels3_other_ymax = History_Panels3_other_ymax
-      pg% History_Panels3_other_dymin = History_Panels3_other_dymin
-      pg% History_Panels3_file_flag = History_Panels3_file_flag
-      pg% History_Panels3_points_name = History_Panels3_points_name
-      pg% History_Panels3_file_dir = History_Panels3_file_dir
-      pg% History_Panels3_file_prefix = History_Panels3_file_prefix
-      pg% History_Panels3_file_interval = History_Panels3_file_interval
-      pg% History_Panels3_file_width = History_Panels3_file_width
-      pg% History_Panels3_file_aspect_ratio = History_Panels3_file_aspect_ratio
-      pg% History_Panels3_xmargin = History_Panels3_xmargin
-      pg% History_Panels3_ymargin = History_Panels3_ymargin
-      pg% History_Panels3_other_ymargin = History_Panels3_other_ymargin
-      pg% History_Panels3_use_decorator = History_Panels3_use_decorator
-
-      pg% History_Panels4_win_flag = History_Panels4_win_flag
-      pg% History_Panels4_win_width = History_Panels4_win_width
-      pg% History_Panels4_win_aspect_ratio = History_Panels4_win_aspect_ratio
-      pg% History_Panels4_xleft = History_Panels4_xleft
-      pg% History_Panels4_xright = History_Panels4_xright
-      pg% History_Panels4_ybot = History_Panels4_ybot
-      pg% History_Panels4_ytop = History_Panels4_ytop
-      pg% History_Panels4_txt_scale = History_Panels4_txt_scale
-      pg% History_Panels4_title = History_Panels4_title
-      pg% History_Panels4_xmax = History_Panels4_xmax
-      pg% History_Panels4_xmin = History_Panels4_xmin
-      pg% History_Panels4_dxmin = History_Panels4_dxmin
-      pg% History_Panels4_max_width = History_Panels4_max_width
-      pg% History_Panels4_num_panels = History_Panels4_num_panels
-      pg% History_Panels4_xaxis_name = History_Panels4_xaxis_name
-      pg% History_Panels4_yaxis_name = History_Panels4_yaxis_name
-      pg% History_Panels4_xaxis_reversed = History_Panels4_xaxis_reversed
-      pg% History_Panels4_yaxis_reversed = History_Panels4_yaxis_reversed
-      pg% History_Panels4_xaxis_log = History_Panels4_xaxis_log
-      pg% History_Panels4_yaxis_log = History_Panels4_yaxis_log
-      pg% History_Panels4_ymin = History_Panels4_ymin
-      pg% History_Panels4_ymax = History_Panels4_ymax
-      pg% History_Panels4_dymin = History_Panels4_dymin
-      pg% History_Panels4_other_yaxis_name = History_Panels4_other_yaxis_name
-      pg% History_Panels4_other_yaxis_reversed = History_Panels4_other_yaxis_reversed
-      pg% History_Panels4_other_yaxis_log = History_Panels4_other_yaxis_log
-      pg% History_Panels4_other_ymin = History_Panels4_other_ymin
-      pg% History_Panels4_other_ymax = History_Panels4_other_ymax
-      pg% History_Panels4_other_dymin = History_Panels4_other_dymin
-      pg% History_Panels4_file_flag = History_Panels4_file_flag
-      pg% History_Panels4_points_name = History_Panels4_points_name
-      pg% History_Panels4_file_dir = History_Panels4_file_dir
-      pg% History_Panels4_file_prefix = History_Panels4_file_prefix
-      pg% History_Panels4_file_interval = History_Panels4_file_interval
-      pg% History_Panels4_file_width = History_Panels4_file_width
-      pg% History_Panels4_file_aspect_ratio = History_Panels4_file_aspect_ratio
-      pg% History_Panels4_xmargin = History_Panels4_xmargin
-      pg% History_Panels4_ymargin = History_Panels4_ymargin
-      pg% History_Panels4_other_ymargin = History_Panels4_other_ymargin
-      pg% History_Panels4_use_decorator = History_Panels4_use_decorator
-
-      pg% History_Panels5_win_flag = History_Panels5_win_flag
-      pg% History_Panels5_win_width = History_Panels5_win_width
-      pg% History_Panels5_win_aspect_ratio = History_Panels5_win_aspect_ratio
-      pg% History_Panels5_xleft = History_Panels5_xleft
-      pg% History_Panels5_xright = History_Panels5_xright
-      pg% History_Panels5_ybot = History_Panels5_ybot
-      pg% History_Panels5_ytop = History_Panels5_ytop
-      pg% History_Panels5_txt_scale = History_Panels5_txt_scale
-      pg% History_Panels5_title = History_Panels5_title
-      pg% History_Panels5_xmax = History_Panels5_xmax
-      pg% History_Panels5_xmin = History_Panels5_xmin
-      pg% History_Panels5_dxmin = History_Panels5_dxmin
-      pg% History_Panels5_max_width = History_Panels5_max_width
-      pg% History_Panels5_num_panels = History_Panels5_num_panels
-      pg% History_Panels5_xaxis_name = History_Panels5_xaxis_name
-      pg% History_Panels5_yaxis_name = History_Panels5_yaxis_name
-      pg% History_Panels5_xaxis_reversed = History_Panels5_xaxis_reversed
-      pg% History_Panels5_yaxis_reversed = History_Panels5_yaxis_reversed
-      pg% History_Panels5_xaxis_log = History_Panels5_xaxis_log
-      pg% History_Panels5_yaxis_log = History_Panels5_yaxis_log
-      pg% History_Panels5_ymin = History_Panels5_ymin
-      pg% History_Panels5_ymax = History_Panels5_ymax
-      pg% History_Panels5_dymin = History_Panels5_dymin
-      pg% History_Panels5_other_yaxis_name = History_Panels5_other_yaxis_name
-      pg% History_Panels5_other_yaxis_reversed = History_Panels5_other_yaxis_reversed
-      pg% History_Panels5_other_yaxis_log = History_Panels5_other_yaxis_log
-      pg% History_Panels5_other_ymin = History_Panels5_other_ymin
-      pg% History_Panels5_other_ymax = History_Panels5_other_ymax
-      pg% History_Panels5_other_dymin = History_Panels5_other_dymin
-      pg% History_Panels5_file_flag = History_Panels5_file_flag
-      pg% History_Panels5_points_name = History_Panels5_points_name
-      pg% History_Panels5_file_dir = History_Panels5_file_dir
-      pg% History_Panels5_file_prefix = History_Panels5_file_prefix
-      pg% History_Panels5_file_interval = History_Panels5_file_interval
-      pg% History_Panels5_file_width = History_Panels5_file_width
-      pg% History_Panels5_file_aspect_ratio = History_Panels5_file_aspect_ratio
-      pg% History_Panels5_xmargin = History_Panels5_xmargin
-      pg% History_Panels5_ymargin = History_Panels5_ymargin
-      pg% History_Panels5_other_ymargin = History_Panels5_other_ymargin
-      pg% History_Panels5_use_decorator = History_Panels5_use_decorator
-
-      pg% History_Panels6_win_flag = History_Panels6_win_flag
-      pg% History_Panels6_win_width = History_Panels6_win_width
-      pg% History_Panels6_win_aspect_ratio = History_Panels6_win_aspect_ratio
-      pg% History_Panels6_xleft = History_Panels6_xleft
-      pg% History_Panels6_xright = History_Panels6_xright
-      pg% History_Panels6_ybot = History_Panels6_ybot
-      pg% History_Panels6_ytop = History_Panels6_ytop
-      pg% History_Panels6_txt_scale = History_Panels6_txt_scale
-      pg% History_Panels6_title = History_Panels6_title
-      pg% History_Panels6_xmax = History_Panels6_xmax
-      pg% History_Panels6_xmin = History_Panels6_xmin
-      pg% History_Panels6_dxmin = History_Panels6_dxmin
-      pg% History_Panels6_max_width = History_Panels6_max_width
-      pg% History_Panels6_num_panels = History_Panels6_num_panels
-      pg% History_Panels6_xaxis_name = History_Panels6_xaxis_name
-      pg% History_Panels6_yaxis_name = History_Panels6_yaxis_name
-      pg% History_Panels6_xaxis_reversed = History_Panels6_xaxis_reversed
-      pg% History_Panels6_yaxis_reversed = History_Panels6_yaxis_reversed
-      pg% History_Panels6_xaxis_log = History_Panels6_xaxis_log
-      pg% History_Panels6_yaxis_log = History_Panels6_yaxis_log
-      pg% History_Panels6_ymin = History_Panels6_ymin
-      pg% History_Panels6_ymax = History_Panels6_ymax
-      pg% History_Panels6_dymin = History_Panels6_dymin
-      pg% History_Panels6_other_yaxis_name = History_Panels6_other_yaxis_name
-      pg% History_Panels6_other_yaxis_reversed = History_Panels6_other_yaxis_reversed
-      pg% History_Panels6_other_yaxis_log = History_Panels6_other_yaxis_log
-      pg% History_Panels6_other_ymin = History_Panels6_other_ymin
-      pg% History_Panels6_other_ymax = History_Panels6_other_ymax
-      pg% History_Panels6_other_dymin = History_Panels6_other_dymin
-      pg% History_Panels6_file_flag = History_Panels6_file_flag
-      pg% History_Panels6_points_name = History_Panels6_points_name
-      pg% History_Panels6_file_dir = History_Panels6_file_dir
-      pg% History_Panels6_file_prefix = History_Panels6_file_prefix
-      pg% History_Panels6_file_interval = History_Panels6_file_interval
-      pg% History_Panels6_file_width = History_Panels6_file_width
-      pg% History_Panels6_file_aspect_ratio = History_Panels6_file_aspect_ratio
-      pg% History_Panels6_xmargin = History_Panels6_xmargin
-      pg% History_Panels6_ymargin = History_Panels6_ymargin
-      pg% History_Panels6_other_ymargin = History_Panels6_other_ymargin
-      pg% History_Panels6_use_decorator = History_Panels6_use_decorator
-
-      pg% History_Panels7_win_flag = History_Panels7_win_flag
-      pg% History_Panels7_win_width = History_Panels7_win_width
-      pg% History_Panels7_win_aspect_ratio = History_Panels7_win_aspect_ratio
-      pg% History_Panels7_xleft = History_Panels7_xleft
-      pg% History_Panels7_xright = History_Panels7_xright
-      pg% History_Panels7_ybot = History_Panels7_ybot
-      pg% History_Panels7_ytop = History_Panels7_ytop
-      pg% History_Panels7_txt_scale = History_Panels7_txt_scale
-      pg% History_Panels7_title = History_Panels7_title
-      pg% History_Panels7_xmax = History_Panels7_xmax
-      pg% History_Panels7_xmin = History_Panels7_xmin
-      pg% History_Panels7_dxmin = History_Panels7_dxmin
-      pg% History_Panels7_max_width = History_Panels7_max_width
-      pg% History_Panels7_num_panels = History_Panels7_num_panels
-      pg% History_Panels7_xaxis_name = History_Panels7_xaxis_name
-      pg% History_Panels7_yaxis_name = History_Panels7_yaxis_name
-      pg% History_Panels7_xaxis_reversed = History_Panels7_xaxis_reversed
-      pg% History_Panels7_yaxis_reversed = History_Panels7_yaxis_reversed
-      pg% History_Panels7_xaxis_log = History_Panels7_xaxis_log
-      pg% History_Panels7_yaxis_log = History_Panels7_yaxis_log
-      pg% History_Panels7_ymin = History_Panels7_ymin
-      pg% History_Panels7_ymax = History_Panels7_ymax
-      pg% History_Panels7_dymin = History_Panels7_dymin
-      pg% History_Panels7_other_yaxis_name = History_Panels7_other_yaxis_name
-      pg% History_Panels7_other_yaxis_reversed = History_Panels7_other_yaxis_reversed
-      pg% History_Panels7_other_yaxis_log = History_Panels7_other_yaxis_log
-      pg% History_Panels7_other_ymin = History_Panels7_other_ymin
-      pg% History_Panels7_other_ymax = History_Panels7_other_ymax
-      pg% History_Panels7_other_dymin = History_Panels7_other_dymin
-      pg% History_Panels7_file_flag = History_Panels7_file_flag
-      pg% History_Panels7_points_name = History_Panels7_points_name
-      pg% History_Panels7_file_dir = History_Panels7_file_dir
-      pg% History_Panels7_file_prefix = History_Panels7_file_prefix
-      pg% History_Panels7_file_interval = History_Panels7_file_interval
-      pg% History_Panels7_file_width = History_Panels7_file_width
-      pg% History_Panels7_file_aspect_ratio = History_Panels7_file_aspect_ratio
-      pg% History_Panels7_xmargin = History_Panels7_xmargin
-      pg% History_Panels7_ymargin = History_Panels7_ymargin
-      pg% History_Panels7_other_ymargin = History_Panels7_other_ymargin
-      pg% History_Panels7_use_decorator = History_Panels7_use_decorator
-
-      pg% History_Panels8_win_flag = History_Panels8_win_flag
-      pg% History_Panels8_win_width = History_Panels8_win_width
-      pg% History_Panels8_win_aspect_ratio = History_Panels8_win_aspect_ratio
-      pg% History_Panels8_xleft = History_Panels8_xleft
-      pg% History_Panels8_xright = History_Panels8_xright
-      pg% History_Panels8_ybot = History_Panels8_ybot
-      pg% History_Panels8_ytop = History_Panels8_ytop
-      pg% History_Panels8_txt_scale = History_Panels8_txt_scale
-      pg% History_Panels8_title = History_Panels8_title
-      pg% History_Panels8_xmax = History_Panels8_xmax
-      pg% History_Panels8_xmin = History_Panels8_xmin
-      pg% History_Panels8_dxmin = History_Panels8_dxmin
-      pg% History_Panels8_max_width = History_Panels8_max_width
-      pg% History_Panels8_num_panels = History_Panels8_num_panels
-      pg% History_Panels8_xaxis_name = History_Panels8_xaxis_name
-      pg% History_Panels8_yaxis_name = History_Panels8_yaxis_name
-      pg% History_Panels8_xaxis_reversed = History_Panels8_xaxis_reversed
-      pg% History_Panels8_yaxis_reversed = History_Panels8_yaxis_reversed
-      pg% History_Panels8_xaxis_log = History_Panels8_xaxis_log
-      pg% History_Panels8_yaxis_log = History_Panels8_yaxis_log
-      pg% History_Panels8_ymin = History_Panels8_ymin
-      pg% History_Panels8_ymax = History_Panels8_ymax
-      pg% History_Panels8_dymin = History_Panels8_dymin
-      pg% History_Panels8_other_yaxis_name = History_Panels8_other_yaxis_name
-      pg% History_Panels8_other_yaxis_reversed = History_Panels8_other_yaxis_reversed
-      pg% History_Panels8_other_yaxis_log = History_Panels8_other_yaxis_log
-      pg% History_Panels8_other_ymin = History_Panels8_other_ymin
-      pg% History_Panels8_other_ymax = History_Panels8_other_ymax
-      pg% History_Panels8_other_dymin = History_Panels8_other_dymin
-      pg% History_Panels8_file_flag = History_Panels8_file_flag
-      pg% History_Panels8_points_name = History_Panels8_points_name
-      pg% History_Panels8_file_dir = History_Panels8_file_dir
-      pg% History_Panels8_file_prefix = History_Panels8_file_prefix
-      pg% History_Panels8_file_interval = History_Panels8_file_interval
-      pg% History_Panels8_file_width = History_Panels8_file_width
-      pg% History_Panels8_file_aspect_ratio = History_Panels8_file_aspect_ratio
-      pg% History_Panels8_xmargin = History_Panels8_xmargin
-      pg% History_Panels8_ymargin = History_Panels8_ymargin
-      pg% History_Panels8_other_ymargin = History_Panels8_other_ymargin
-      pg% History_Panels8_use_decorator = History_Panels8_use_decorator
-
-      pg% History_Panels9_win_flag = History_Panels9_win_flag
-      pg% History_Panels9_win_width = History_Panels9_win_width
-      pg% History_Panels9_win_aspect_ratio = History_Panels9_win_aspect_ratio
-      pg% History_Panels9_xleft = History_Panels9_xleft
-      pg% History_Panels9_xright = History_Panels9_xright
-      pg% History_Panels9_ybot = History_Panels9_ybot
-      pg% History_Panels9_ytop = History_Panels9_ytop
-      pg% History_Panels9_txt_scale = History_Panels9_txt_scale
-      pg% History_Panels9_title = History_Panels9_title
-      pg% History_Panels9_xmax = History_Panels9_xmax
-      pg% History_Panels9_xmin = History_Panels9_xmin
-      pg% History_Panels9_dxmin = History_Panels9_dxmin
-      pg% History_Panels9_max_width = History_Panels9_max_width
-      pg% History_Panels9_num_panels = History_Panels9_num_panels
-      pg% History_Panels9_xaxis_name = History_Panels9_xaxis_name
-      pg% History_Panels9_yaxis_name = History_Panels9_yaxis_name
-      pg% History_Panels9_xaxis_reversed = History_Panels9_xaxis_reversed
-      pg% History_Panels9_yaxis_reversed = History_Panels9_yaxis_reversed
-      pg% History_Panels9_xaxis_log = History_Panels9_xaxis_log
-      pg% History_Panels9_yaxis_log = History_Panels9_yaxis_log
-      pg% History_Panels9_ymin = History_Panels9_ymin
-      pg% History_Panels9_ymax = History_Panels9_ymax
-      pg% History_Panels9_dymin = History_Panels9_dymin
-      pg% History_Panels9_other_yaxis_name = History_Panels9_other_yaxis_name
-      pg% History_Panels9_other_yaxis_reversed = History_Panels9_other_yaxis_reversed
-      pg% History_Panels9_other_yaxis_log = History_Panels9_other_yaxis_log
-      pg% History_Panels9_other_ymin = History_Panels9_other_ymin
-      pg% History_Panels9_other_ymax = History_Panels9_other_ymax
-      pg% History_Panels9_other_dymin = History_Panels9_other_dymin
-      pg% History_Panels9_file_flag = History_Panels9_file_flag
-      pg% History_Panels9_points_name = History_Panels9_points_name
-      pg% History_Panels9_file_flag = History_Panels9_file_flag
-      pg% History_Panels9_file_dir = History_Panels9_file_dir
-      pg% History_Panels9_file_prefix = History_Panels9_file_prefix
-      pg% History_Panels9_file_interval = History_Panels9_file_interval
-      pg% History_Panels9_file_width = History_Panels9_file_width
-      pg% History_Panels9_file_aspect_ratio = History_Panels9_file_aspect_ratio
-      pg% History_Panels9_xmargin = History_Panels9_xmargin
-      pg% History_Panels9_ymargin = History_Panels9_ymargin
-      pg% History_Panels9_other_ymargin = History_Panels9_other_ymargin
-      pg% History_Panels9_use_decorator = History_Panels9_use_decorator
+      pg% History_Panels_win_flag = History_Panels_win_flag
+      pg% History_Panels_win_width = History_Panels_win_width
+      pg% History_Panels_win_aspect_ratio = History_Panels_win_aspect_ratio
+      pg% History_Panels_xleft = History_Panels_xleft
+      pg% History_Panels_xright = History_Panels_xright
+      pg% History_Panels_ybot = History_Panels_ybot
+      pg% History_Panels_ytop = History_Panels_ytop
+      pg% History_Panels_txt_scale = History_Panels_txt_scale
+      pg% History_Panels_title = History_Panels_title
+      pg% History_Panels_xmax = History_Panels_xmax
+      pg% History_Panels_xmin = History_Panels_xmin
+      pg% History_Panels_dxmin = History_Panels_dxmin
+      pg% History_Panels_max_width = History_Panels_max_width
+      pg% History_Panels_num_panels = History_Panels_num_panels
+      pg% History_Panels_xaxis_name = History_Panels_xaxis_name
+      pg% History_Panels_yaxis_name = History_Panels_yaxis_name
+      pg% History_Panels_xaxis_reversed = History_Panels_xaxis_reversed
+      pg% History_Panels_yaxis_reversed = History_Panels_yaxis_reversed
+      pg% History_Panels_xaxis_log = History_Panels_xaxis_log
+      pg% History_Panels_yaxis_log = History_Panels_yaxis_log
+      pg% History_Panels_ymin = History_Panels_ymin
+      pg% History_Panels_ymax = History_Panels_ymax
+      pg% History_Panels_dymin = History_Panels_dymin
+      pg% History_Panels_other_yaxis_name = History_Panels_other_yaxis_name
+      pg% History_Panels_other_yaxis_reversed = History_Panels_other_yaxis_reversed
+      pg% History_Panels_other_yaxis_log = History_Panels_other_yaxis_log
+      pg% History_Panels_other_ymin = History_Panels_other_ymin
+      pg% History_Panels_other_ymax = History_Panels_other_ymax
+      pg% History_Panels_other_dymin = History_Panels_other_dymin
+      pg% History_Panels_file_flag = History_Panels_file_flag
+      pg% History_Panels_points_name = History_Panels_points_name
+      pg% History_Panels_file_dir = History_Panels_file_dir
+      pg% History_Panels_file_prefix = History_Panels_file_prefix
+      pg% History_Panels_file_interval = History_Panels_file_interval
+      pg% History_Panels_file_width = History_Panels_file_width
+      pg% History_Panels_file_aspect_ratio = History_Panels_file_aspect_ratio
+      pg% History_Panels_xmargin = History_Panels_xmargin
+      pg% History_Panels_ymargin = History_Panels_ymargin
+      pg% History_Panels_other_ymargin = History_Panels_other_ymargin
+      pg% History_Panels_use_decorator = History_Panels_use_decorator
 
       pg% History_Panel_points_error_bars = History_Panel_points_error_bars
       pg% History_Panel_points_interval = History_Panel_points_interval
@@ -3306,257 +713,33 @@ contains
       pg% Summary_History_num_lines = Summary_History_num_lines
       pg% Summary_History_use_decorator = Summary_History_use_decorator
 
-      pg% Grid1_win_flag = Grid1_win_flag
-      pg% Grid1_win_width = Grid1_win_width
-      pg% Grid1_win_aspect_ratio = Grid1_win_aspect_ratio
-      pg% Grid1_xleft = Grid1_xleft
-      pg% Grid1_xright = Grid1_xright
-      pg% Grid1_ybot = Grid1_ybot
-      pg% Grid1_ytop = Grid1_ytop
-      pg% Grid1_title = Grid1_title
-      pg% Grid1_txt_scale_factor = Grid1_txt_scale_factor
-      pg% Grid1_num_cols = Grid1_num_cols
-      pg% Grid1_num_rows = Grid1_num_rows
-      pg% Grid1_num_plots = Grid1_num_plots
-      pg% Grid1_plot_name = Grid1_plot_name
-      pg% Grid1_plot_row = Grid1_plot_row
-      pg% Grid1_plot_rowspan = Grid1_plot_rowspan
-      pg% Grid1_plot_col = Grid1_plot_col
-      pg% Grid1_plot_colspan = Grid1_plot_colspan
-      pg% Grid1_plot_pad_left = Grid1_plot_pad_left
-      pg% Grid1_plot_pad_right = Grid1_plot_pad_right
-      pg% Grid1_plot_pad_top = Grid1_plot_pad_top
-      pg% Grid1_plot_pad_bot = Grid1_plot_pad_bot
-      pg% Grid1_file_flag = Grid1_file_flag
-      pg% Grid1_file_dir = Grid1_file_dir
-      pg% Grid1_file_prefix = Grid1_file_prefix
-      pg% Grid1_file_interval = Grid1_file_interval
-      pg% Grid1_file_width = Grid1_file_width
-      pg% Grid1_file_aspect_ratio = Grid1_file_aspect_ratio
-
-      pg% Grid2_win_flag = Grid2_win_flag
-      pg% Grid2_win_width = Grid2_win_width
-      pg% Grid2_win_aspect_ratio = Grid2_win_aspect_ratio
-      pg% Grid2_xleft = Grid2_xleft
-      pg% Grid2_xright = Grid2_xright
-      pg% Grid2_ybot = Grid2_ybot
-      pg% Grid2_ytop = Grid2_ytop
-      pg% Grid2_title = Grid2_title
-      pg% Grid2_txt_scale_factor = Grid2_txt_scale_factor
-      pg% Grid2_num_cols = Grid2_num_cols
-      pg% Grid2_num_rows = Grid2_num_rows
-      pg% Grid2_num_plots = Grid2_num_plots
-      pg% Grid2_plot_name = Grid2_plot_name
-      pg% Grid2_plot_row = Grid2_plot_row
-      pg% Grid2_plot_rowspan = Grid2_plot_rowspan
-      pg% Grid2_plot_col = Grid2_plot_col
-      pg% Grid2_plot_colspan = Grid2_plot_colspan
-      pg% Grid2_plot_pad_left = Grid2_plot_pad_left
-      pg% Grid2_plot_pad_right = Grid2_plot_pad_right
-      pg% Grid2_plot_pad_top = Grid2_plot_pad_top
-      pg% Grid2_plot_pad_bot = Grid2_plot_pad_bot
-      pg% Grid2_file_flag = Grid2_file_flag
-      pg% Grid2_file_dir = Grid2_file_dir
-      pg% Grid2_file_prefix = Grid2_file_prefix
-      pg% Grid2_file_interval = Grid2_file_interval
-      pg% Grid2_file_width = Grid2_file_width
-      pg% Grid2_file_aspect_ratio = Grid2_file_aspect_ratio
-
-      pg% Grid3_win_flag = Grid3_win_flag
-      pg% Grid3_win_width = Grid3_win_width
-      pg% Grid3_win_aspect_ratio = Grid3_win_aspect_ratio
-      pg% Grid3_xleft = Grid3_xleft
-      pg% Grid3_xright = Grid3_xright
-      pg% Grid3_ybot = Grid3_ybot
-      pg% Grid3_ytop = Grid3_ytop
-      pg% Grid3_title = Grid3_title
-      pg% Grid3_txt_scale_factor = Grid3_txt_scale_factor
-      pg% Grid3_num_cols = Grid3_num_cols
-      pg% Grid3_num_rows = Grid3_num_rows
-      pg% Grid3_num_plots = Grid3_num_plots
-      pg% Grid3_plot_name = Grid3_plot_name
-      pg% Grid3_plot_row = Grid3_plot_row
-      pg% Grid3_plot_rowspan = Grid3_plot_rowspan
-      pg% Grid3_plot_col = Grid3_plot_col
-      pg% Grid3_plot_colspan = Grid3_plot_colspan
-      pg% Grid3_plot_pad_left = Grid3_plot_pad_left
-      pg% Grid3_plot_pad_right = Grid3_plot_pad_right
-      pg% Grid3_plot_pad_top = Grid3_plot_pad_top
-      pg% Grid3_plot_pad_bot = Grid3_plot_pad_bot
-      pg% Grid3_file_flag = Grid3_file_flag
-      pg% Grid3_file_dir = Grid3_file_dir
-      pg% Grid3_file_prefix = Grid3_file_prefix
-      pg% Grid3_file_interval = Grid3_file_interval
-      pg% Grid3_file_width = Grid3_file_width
-      pg% Grid3_file_aspect_ratio = Grid3_file_aspect_ratio
-
-      pg% Grid4_win_flag = Grid4_win_flag
-      pg% Grid4_win_width = Grid4_win_width
-      pg% Grid4_win_aspect_ratio = Grid4_win_aspect_ratio
-      pg% Grid4_xleft = Grid4_xleft
-      pg% Grid4_xright = Grid4_xright
-      pg% Grid4_ybot = Grid4_ybot
-      pg% Grid4_ytop = Grid4_ytop
-      pg% Grid4_title = Grid4_title
-      pg% Grid4_txt_scale_factor = Grid4_txt_scale_factor
-      pg% Grid4_num_cols = Grid4_num_cols
-      pg% Grid4_num_rows = Grid4_num_rows
-      pg% Grid4_num_plots = Grid4_num_plots
-      pg% Grid4_plot_name = Grid4_plot_name
-      pg% Grid4_plot_row = Grid4_plot_row
-      pg% Grid4_plot_rowspan = Grid4_plot_rowspan
-      pg% Grid4_plot_col = Grid4_plot_col
-      pg% Grid4_plot_colspan = Grid4_plot_colspan
-      pg% Grid4_plot_pad_left = Grid4_plot_pad_left
-      pg% Grid4_plot_pad_right = Grid4_plot_pad_right
-      pg% Grid4_plot_pad_top = Grid4_plot_pad_top
-      pg% Grid4_plot_pad_bot = Grid4_plot_pad_bot
-      pg% Grid4_file_flag = Grid4_file_flag
-      pg% Grid4_file_dir = Grid4_file_dir
-      pg% Grid4_file_prefix = Grid4_file_prefix
-      pg% Grid4_file_interval = Grid4_file_interval
-      pg% Grid4_file_width = Grid4_file_width
-      pg% Grid4_file_aspect_ratio = Grid4_file_aspect_ratio
-
-      pg% Grid5_win_flag = Grid5_win_flag
-      pg% Grid5_win_width = Grid5_win_width
-      pg% Grid5_win_aspect_ratio = Grid5_win_aspect_ratio
-      pg% Grid5_xleft = Grid5_xleft
-      pg% Grid5_xright = Grid5_xright
-      pg% Grid5_ybot = Grid5_ybot
-      pg% Grid5_ytop = Grid5_ytop
-      pg% Grid5_title = Grid5_title
-      pg% Grid5_txt_scale_factor = Grid5_txt_scale_factor
-      pg% Grid5_num_cols = Grid5_num_cols
-      pg% Grid5_num_rows = Grid5_num_rows
-      pg% Grid5_num_plots = Grid5_num_plots
-      pg% Grid5_plot_name = Grid5_plot_name
-      pg% Grid5_plot_row = Grid5_plot_row
-      pg% Grid5_plot_rowspan = Grid5_plot_rowspan
-      pg% Grid5_plot_col = Grid5_plot_col
-      pg% Grid5_plot_colspan = Grid5_plot_colspan
-      pg% Grid5_plot_pad_left = Grid5_plot_pad_left
-      pg% Grid5_plot_pad_right = Grid5_plot_pad_right
-      pg% Grid5_plot_pad_top = Grid5_plot_pad_top
-      pg% Grid5_plot_pad_bot = Grid5_plot_pad_bot
-      pg% Grid5_file_flag = Grid5_file_flag
-      pg% Grid5_file_dir = Grid5_file_dir
-      pg% Grid5_file_prefix = Grid5_file_prefix
-      pg% Grid5_file_interval = Grid5_file_interval
-      pg% Grid5_file_width = Grid5_file_width
-      pg% Grid5_file_aspect_ratio = Grid5_file_aspect_ratio
-
-      pg% Grid6_win_flag = Grid6_win_flag
-      pg% Grid6_win_width = Grid6_win_width
-      pg% Grid6_win_aspect_ratio = Grid6_win_aspect_ratio
-      pg% Grid6_xleft = Grid6_xleft
-      pg% Grid6_xright = Grid6_xright
-      pg% Grid6_ybot = Grid6_ybot
-      pg% Grid6_ytop = Grid6_ytop
-      pg% Grid6_title = Grid6_title
-      pg% Grid6_txt_scale_factor = Grid6_txt_scale_factor
-      pg% Grid6_num_cols = Grid6_num_cols
-      pg% Grid6_num_rows = Grid6_num_rows
-      pg% Grid6_num_plots = Grid6_num_plots
-      pg% Grid6_plot_name = Grid6_plot_name
-      pg% Grid6_plot_row = Grid6_plot_row
-      pg% Grid6_plot_rowspan = Grid6_plot_rowspan
-      pg% Grid6_plot_col = Grid6_plot_col
-      pg% Grid6_plot_colspan = Grid6_plot_colspan
-      pg% Grid6_plot_pad_left = Grid6_plot_pad_left
-      pg% Grid6_plot_pad_right = Grid6_plot_pad_right
-      pg% Grid6_plot_pad_top = Grid6_plot_pad_top
-      pg% Grid6_plot_pad_bot = Grid6_plot_pad_bot
-      pg% Grid6_file_flag = Grid6_file_flag
-      pg% Grid6_file_dir = Grid6_file_dir
-      pg% Grid6_file_prefix = Grid6_file_prefix
-      pg% Grid6_file_interval = Grid6_file_interval
-      pg% Grid6_file_width = Grid6_file_width
-      pg% Grid6_file_aspect_ratio = Grid6_file_aspect_ratio
-
-      pg% Grid7_win_flag = Grid7_win_flag
-      pg% Grid7_win_width = Grid7_win_width
-      pg% Grid7_win_aspect_ratio = Grid7_win_aspect_ratio
-      pg% Grid7_xleft = Grid7_xleft
-      pg% Grid7_xright = Grid7_xright
-      pg% Grid7_ybot = Grid7_ybot
-      pg% Grid7_ytop = Grid7_ytop
-      pg% Grid7_title = Grid7_title
-      pg% Grid7_txt_scale_factor = Grid7_txt_scale_factor
-      pg% Grid7_num_cols = Grid7_num_cols
-      pg% Grid7_num_rows = Grid7_num_rows
-      pg% Grid7_num_plots = Grid7_num_plots
-      pg% Grid7_plot_name = Grid7_plot_name
-      pg% Grid7_plot_row = Grid7_plot_row
-      pg% Grid7_plot_rowspan = Grid7_plot_rowspan
-      pg% Grid7_plot_col = Grid7_plot_col
-      pg% Grid7_plot_colspan = Grid7_plot_colspan
-      pg% Grid7_plot_pad_left = Grid7_plot_pad_left
-      pg% Grid7_plot_pad_right = Grid7_plot_pad_right
-      pg% Grid7_plot_pad_top = Grid7_plot_pad_top
-      pg% Grid7_plot_pad_bot = Grid7_plot_pad_bot
-      pg% Grid7_file_flag = Grid7_file_flag
-      pg% Grid7_file_dir = Grid7_file_dir
-      pg% Grid7_file_prefix = Grid7_file_prefix
-      pg% Grid7_file_interval = Grid7_file_interval
-      pg% Grid7_file_width = Grid7_file_width
-      pg% Grid7_file_aspect_ratio = Grid7_file_aspect_ratio
-
-      pg% Grid8_win_flag = Grid8_win_flag
-      pg% Grid8_win_width = Grid8_win_width
-      pg% Grid8_win_aspect_ratio = Grid8_win_aspect_ratio
-      pg% Grid8_xleft = Grid8_xleft
-      pg% Grid8_xright = Grid8_xright
-      pg% Grid8_ybot = Grid8_ybot
-      pg% Grid8_ytop = Grid8_ytop
-      pg% Grid8_title = Grid8_title
-      pg% Grid8_txt_scale_factor = Grid8_txt_scale_factor
-      pg% Grid8_num_cols = Grid8_num_cols
-      pg% Grid8_num_rows = Grid8_num_rows
-      pg% Grid8_num_plots = Grid8_num_plots
-      pg% Grid8_plot_name = Grid8_plot_name
-      pg% Grid8_plot_row = Grid8_plot_row
-      pg% Grid8_plot_rowspan = Grid8_plot_rowspan
-      pg% Grid8_plot_col = Grid8_plot_col
-      pg% Grid8_plot_colspan = Grid8_plot_colspan
-      pg% Grid8_plot_pad_left = Grid8_plot_pad_left
-      pg% Grid8_plot_pad_right = Grid8_plot_pad_right
-      pg% Grid8_plot_pad_top = Grid8_plot_pad_top
-      pg% Grid8_plot_pad_bot = Grid8_plot_pad_bot
-      pg% Grid8_file_flag = Grid8_file_flag
-      pg% Grid8_file_dir = Grid8_file_dir
-      pg% Grid8_file_prefix = Grid8_file_prefix
-      pg% Grid8_file_interval = Grid8_file_interval
-      pg% Grid8_file_width = Grid8_file_width
-      pg% Grid8_file_aspect_ratio = Grid8_file_aspect_ratio
-
-      pg% Grid9_win_flag = Grid9_win_flag
-      pg% Grid9_win_width = Grid9_win_width
-      pg% Grid9_win_aspect_ratio = Grid9_win_aspect_ratio
-      pg% Grid9_xleft = Grid9_xleft
-      pg% Grid9_xright = Grid9_xright
-      pg% Grid9_ybot = Grid9_ybot
-      pg% Grid9_ytop = Grid9_ytop
-      pg% Grid9_title = Grid9_title
-      pg% Grid9_txt_scale_factor = Grid9_txt_scale_factor
-      pg% Grid9_num_cols = Grid9_num_cols
-      pg% Grid9_num_rows = Grid9_num_rows
-      pg% Grid9_num_plots = Grid9_num_plots
-      pg% Grid9_plot_name = Grid9_plot_name
-      pg% Grid9_plot_row = Grid9_plot_row
-      pg% Grid9_plot_rowspan = Grid9_plot_rowspan
-      pg% Grid9_plot_col = Grid9_plot_col
-      pg% Grid9_plot_colspan = Grid9_plot_colspan
-      pg% Grid9_plot_pad_left = Grid9_plot_pad_left
-      pg% Grid9_plot_pad_right = Grid9_plot_pad_right
-      pg% Grid9_plot_pad_top = Grid9_plot_pad_top
-      pg% Grid9_plot_pad_bot = Grid9_plot_pad_bot
-      pg% Grid9_file_flag = Grid9_file_flag
-      pg% Grid9_file_dir = Grid9_file_dir
-      pg% Grid9_file_prefix = Grid9_file_prefix
-      pg% Grid9_file_interval = Grid9_file_interval
-      pg% Grid9_file_width = Grid9_file_width
-      pg% Grid9_file_aspect_ratio = Grid9_file_aspect_ratio
+      pg% Grid_win_flag = Grid_win_flag
+      pg% Grid_win_width = Grid_win_width
+      pg% Grid_win_aspect_ratio = Grid_win_aspect_ratio
+      pg% Grid_xleft = Grid_xleft
+      pg% Grid_xright = Grid_xright
+      pg% Grid_ybot = Grid_ybot
+      pg% Grid_ytop = Grid_ytop
+      pg% Grid_title = Grid_title
+      pg% Grid_txt_scale_factor = Grid_txt_scale_factor
+      pg% Grid_num_cols = Grid_num_cols
+      pg% Grid_num_rows = Grid_num_rows
+      pg% Grid_num_plots = Grid_num_plots
+      pg% Grid_plot_name = Grid_plot_name
+      pg% Grid_plot_row = Grid_plot_row
+      pg% Grid_plot_rowspan = Grid_plot_rowspan
+      pg% Grid_plot_col = Grid_plot_col
+      pg% Grid_plot_colspan = Grid_plot_colspan
+      pg% Grid_plot_pad_left = Grid_plot_pad_left
+      pg% Grid_plot_pad_right = Grid_plot_pad_right
+      pg% Grid_plot_pad_top = Grid_plot_pad_top
+      pg% Grid_plot_pad_bot = Grid_plot_pad_bot
+      pg% Grid_file_flag = Grid_file_flag
+      pg% Grid_file_dir = Grid_file_dir
+      pg% Grid_file_prefix = Grid_file_prefix
+      pg% Grid_file_interval = Grid_file_interval
+      pg% Grid_file_width = Grid_file_width
+      pg% Grid_file_aspect_ratio = Grid_file_aspect_ratio
 
       pg% Star1_win_flag = Star1_win_flag
       pg% Star1_file_flag = Star1_file_flag

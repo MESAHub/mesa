@@ -20,6 +20,7 @@ ifeq ($(USE_PGSTAR),YES)
    pgbinary_summary.f90 \
    pgbinary_summary_history.f90 \
    pgbinary_hist_track.f90 \
+   pgbinary_star_hist_track.f90 \
    pgbinary_history_panels.f90 \
    pgbinary_orbit.f90 \
    pgbinary_star.f90 \

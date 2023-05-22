@@ -347,7 +347,7 @@ contains
          ! dimensionless volume equivalent radius (== r / separation of the model), with limit at 5%
          real(dp), intent(in) :: r_eq, qq
          real(dp) :: r_here
-         if (req <= 0.05) then
+         if (r_eq <= 0.05) then
             r_here = 0.05
          else
             r_here = r_eq

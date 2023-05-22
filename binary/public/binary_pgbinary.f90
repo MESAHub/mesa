@@ -93,7 +93,17 @@ module binary_pgbinary
    integer, parameter :: i_Binary_Hist_Track8 = i_Binary_Hist_Track7 + 1
    integer, parameter :: i_Binary_Hist_Track9 = i_Binary_Hist_Track8 + 1
 
-   integer, parameter :: i_Binary_Hist_Panels1 = i_Binary_Hist_Track9 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track1 = i_Binary_Hist_Track9 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track2 = i_Binary_Star_Hist_Track1 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track3 = i_Binary_Star_Hist_Track2 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track4 = i_Binary_Star_Hist_Track3 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track5 = i_Binary_Star_Hist_Track4 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track6 = i_Binary_Star_Hist_Track5 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track7 = i_Binary_Star_Hist_Track6 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track8 = i_Binary_Star_Hist_Track7 + 1
+   integer, parameter :: i_Binary_Star_Hist_Track9 = i_Binary_Star_Hist_Track8 + 1
+
+   integer, parameter :: i_Binary_Hist_Panels1 = i_Binary_Star_Hist_Track9 + 1
    integer, parameter :: i_Binary_Hist_Panels2 = i_Binary_Hist_Panels1 + 1
    integer, parameter :: i_Binary_Hist_Panels3 = i_Binary_Hist_Panels2 + 1
    integer, parameter :: i_Binary_Hist_Panels4 = i_Binary_Hist_Panels3 + 1
@@ -125,6 +135,8 @@ module binary_pgbinary
    integer, parameter :: max_num_pgbinary_Grid_plots = 10
 
    integer, parameter :: max_num_pgbinary_trace_Binary_History_values = 20
+
+   integer, parameter :: pgbinary_array_length = 9
 
    type pgbinary_hist_node
       real(dp) :: age
