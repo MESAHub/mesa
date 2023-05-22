@@ -138,6 +138,8 @@ module binary_pgbinary
    type pgbinary_controls
       include "pgbinary_controls.inc"
 
+      integer :: star_1_color, star_2_color
+
       type (pgbinary_hist_node), pointer :: pgbinary_hist => null()
 
       procedure(pgbinary_decorator_interface), pointer, nopass :: &
@@ -159,6 +161,15 @@ module binary_pgbinary
             History_Track7_pgbinary_decorator => null(), &
             History_Track8_pgbinary_decorator => null(), &
             History_Track9_pgbinary_decorator => null(), &
+            Star_History_Track1_pgbinary_decorator => null(), &
+            Star_History_Track2_pgbinary_decorator => null(), &
+            Star_History_Track3_pgbinary_decorator => null(), &
+            Star_History_Track4_pgbinary_decorator => null(), &
+            Star_History_Track5_pgbinary_decorator => null(), &
+            Star_History_Track6_pgbinary_decorator => null(), &
+            Star_History_Track7_pgbinary_decorator => null(), &
+            Star_History_Track8_pgbinary_decorator => null(), &
+            Star_History_Track9_pgbinary_decorator => null(), &
             summary_history_pgbinary_decorator => null()
 
    end type pgbinary_controls
