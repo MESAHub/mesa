@@ -171,7 +171,7 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, max_distill_q
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, max_distill_q
          integer :: k, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones
          logical :: save_Skye_use_ion_offsets, distilling
 
@@ -226,17 +226,22 @@
             if(XC + XO + XNe < 0.9d0) exit
             
             ! Check whether we are in a regime where distillation should occur
+            Gamma_melt = blouin_Gamma_melt_CO(XO)
+            GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
-            XNe_crit = blouin_XNe_crit(GammaC)
+            XNe_crit = blouin_XNe_crit(GammaC_melt)
             
-            if(XNe > max(XNe_crit,3d-4)) then
+            if(XNe > max(XNe_crit,3d-4) .and. GammaC > GammaC_melt) then
+               ! 3d-4 just to ignore distillation once it starts becoming insignificant
+               ! TODO: tune this, check that 3d-4 isn't too large to miss anything important
+
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
                
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O),
                ! as long as there is enough Ne in the next zone out to proceed
-               ! TODO: might need some padding on XNe_crit here, remember XNe_crit can be negative too
-               if(XNe < distill_final_XNe .and. XNe_out > XNe_crit) then
+               ! TODO: XNe_out might need to be checked against value of XNe_crit for zone k-1?
+               if(XNe < distill_final_XNe) then !  .and. XNe_out > XNe_crit) then
                   call distill_at_boundary(s,k,distill_final_XNe)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1, 3)
@@ -248,22 +253,17 @@
                      ! done distilling this zone and everything inward from it, mark crystallized
                      s% crystal_core_boundary_mass = s% m(k)
                      print *, "setting crystal_core_boundary_mass after distilling zone", k
-                     ! TODO: may need to be more carefuly about setting crystal_core_boundary_mass here
+                     ! TODO: may need to be more careful about setting crystal_core_boundary_mass here
                   end if
                end if
             else
-               ! break out of loop once reaching a point where XNe < XNe_crit or 3d-4
+               ! break out of loop once reaching a point where XNe < XNe_crit or 3d-4, or not crystallizing yet
                exit
             end if
          end do
 
          if(.not. distilling) then
             ! fall back to 2component phase separation
-            ! TODO: since eos_phase_boundary is not 0.5, crystallization is delayed,
-            ! and that might lead to some distillation where phase separation should happen instead
-            ! limit this call to one zone at a time
-            ! Could maybe use this loop just to mark which regions of the star
-            ! should distill at phi=0.5, then have a separate loop actually do the distillation/separation
             call do_2component_phase_separation(s, dt, 'CO', .false., ierr)
          end if
          
@@ -539,6 +539,32 @@
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
 
+      real(dp) function blouin_Gamma_melt_CO(Xin)
+        real(dp), intent(in) :: Xin ! mass fraction
+        real(dp) :: xo ! number fraction
+        real(dp) :: a0, a1, a2, a3, a4, a5, Gamma
+
+        ! Convert input mass fraction to number fraction, assuming C/O mixture
+        xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)
+        
+        a0 = 178d0
+        a1 = 167.178104d0
+        a2 = -3.973461d0
+        a3 = -741.863826d0
+        a4 = 876.516929d0
+        a5 = -297.857813d0
+        
+        Gamma = &
+             a0 + &
+             a1*xo + &
+             a2*xo*xo + &
+             a3*xo*xo*xo + &
+             a4*xo*xo*xo*xo + &
+             a5*xo*xo*xo*xo*xo
+
+        blouin_Gamma_melt_CO = Gamma
+      end function blouin_Gamma_melt_CO
+      
       real(dp) function blouin_delta_xne(Xin)
         real(dp), intent(in) :: Xin ! mass fraction
         real(dp) :: Xnew ! mass fraction
