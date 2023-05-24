@@ -28,8 +28,10 @@ This test case has five parts.
 
 * Part 4 (``inlist_after_remove``) replaces the remaining hydrogen in the envelope with helium.
 
-* Part 5 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall).
+* Part 5 (``inlist_to_pre_si_burn``) evolves the model until log_center_T = 9.45d0, just before Si-core burning.
+
+* Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall).
 
 
-Last-Updated: 12May2023 by EbF
+Last-Updated: 24May2023 by EbF
 

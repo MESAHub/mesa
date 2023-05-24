@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2023  The MESA team & Ebhraheem Farag
+!   Copyright (C) 2023  The MESA team & Ebraheem Farag
 !
 !   this file is part of mesa.
 !

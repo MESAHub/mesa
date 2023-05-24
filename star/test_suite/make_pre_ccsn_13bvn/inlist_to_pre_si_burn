@@ -2,10 +2,10 @@
 &star_job
 
       load_saved_model = .true.
-      load_model_filename = 'before_si_burn.mod'
+      load_model_filename = 'ready.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
+      save_model_filename = 'before_si_burn.mod'
 
       change_initial_net = .true.      
       new_net_name = 'approx21_cr60_plus_co56.net'
@@ -17,12 +17,13 @@
 
 &controls
 
-! 300 km/s core infall stopping condition
-     fe_core_infall_limit = 3d7
-     non_fe_core_infall_limit = 3d7
+! stopping condition: stop when lg_centerT >= 9.45 
+! just before Si ignites in the core
 
-      when_to_stop_rtol = 1d-3
-      when_to_stop_atol = 1d-3
+     log_center_temp_upper_limit = 9.45d0
+
+     when_to_stop_rtol = 1d-2
+     when_to_stop_atol = 1d-2
 
 
 ! adjust overshoot, to prevent He shell convection from propagating inward in test case.
@@ -78,8 +79,8 @@
       !history_interval = 1
       terminal_interval = 1
 
-      x_integer_ctrl(1) = 6 ! inlist_part
-
+      x_integer_ctrl(1) = 5 ! inlist_part
+      
 
 / ! end of controls namelist
 
@@ -87,7 +88,7 @@
 
 &pgstar
 
-Grid1_title = 'inlist_to_cc'
+Grid1_title = 'inlist_to_pre_si_burn'
 
 TRho_logRho_min = 3.0 ! only used if /= -101d0
 TRho_logT_min = 8.5 ! only used if /= -101d0
