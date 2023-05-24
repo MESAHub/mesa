@@ -10,9 +10,6 @@
 
       write_profile_when_terminate = .false.
 
-      pgstar_flag = .true.
-
-
 / ! end of star_job namelist
 
 
@@ -28,7 +25,8 @@
       trace_history_value_name(2) = 'total_mass h1'
       trace_history_value_name(3) = 'total_mass he4'
       
-      
+      x_integer_ctrl(1) = 2 ! inlist_part
+
 
 ! FOR DEBUGGING
 

@@ -25,14 +25,18 @@
       use star_lib
       use star_def
       use const_def
+      use math_lib
       
       implicit none
 
       include "test_suite_extras_def.inc"
       
-      integer :: time0, time1, clock_rate
+      integer, parameter :: I_INLIST_PART = 1 ! inlist part number
+
 
       contains
+
+      include "test_suite_extras.inc"
       
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -97,13 +101,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         !extras_startup = 0
-         call system_clock(time0,clock_rate)
-         if (.not. restart) then
-            call alloc_extra_info(s)
-         else ! it is a restart
-            call unpack_extra_info(s)
-         end if
+         call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
       
       
@@ -115,11 +113,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call system_clock(time1,clock_rate)
-         dt = dble(time1 - time0) / clock_rate / 60
-         !write(*,'(/,a50,f12.2,99i10/)') 'runtime (minutes), retries, backups, steps', &
-         !   dt, s% num_retries, s% num_backups, s% model_number
-         ierr = 0
+         call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
       
 
@@ -204,6 +198,20 @@
          end do
       end subroutine data_for_extra_profile_columns
       
+ ! returns either keep_going or terminate.
+      integer function extras_start_step(id)
+         integer, intent(in) :: id
+         integer :: ierr
+         type (star_info), pointer :: s
+
+         include 'formats'
+         extras_start_step = keep_going
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
+      end function extras_start_step
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -215,7 +223,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         call store_extra_info(s)
          ! custom mass_change for inlist_remove written by -EbF
          env_mass_check = s% star_mass - s% he_core_mass
          if (s% x_logical_ctrl(1)) then
@@ -229,105 +236,38 @@
          end if
       end function extras_finish_step
 
-      ! routines for saving and restoring extra data so can do restarts
-         
-         ! put these defs at the top and delete from the following routines
-         !integer, parameter :: extra_info_alloc = 1
-         !integer, parameter :: extra_info_get = 2
-         !integer, parameter :: extra_info_put = 3
-      
-      
-      subroutine alloc_extra_info(s)
-         integer, parameter :: extra_info_alloc = 1
+      subroutine extras_photo_read(id, iounit, ierr)
+         integer, intent(in) :: id, iounit
+         integer, intent(out) :: ierr
+         integer :: inlist_part
          type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_alloc)
-      end subroutine alloc_extra_info
-      
-      
-      subroutine unpack_extra_info(s)
-         integer, parameter :: extra_info_get = 2
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_get)
-      end subroutine unpack_extra_info
-      
-      
-      subroutine store_extra_info(s)
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         call move_extra_info(s,extra_info_put)
-      end subroutine store_extra_info
-      
-      
-      subroutine move_extra_info(s,op)
-         integer, parameter :: extra_info_alloc = 1
-         integer, parameter :: extra_info_get = 2
-         integer, parameter :: extra_info_put = 3
-         type (star_info), pointer :: s
-         integer, intent(in) :: op
-         
-         integer :: i, j, num_ints, num_dbls, ierr
-         
-         i = 0
-         ! call move_int or move_flg    
-         num_ints = i
-         
-         i = 0
-         ! call move_dbl       
-         
-         num_dbls = i
-         
-         if (op /= extra_info_alloc) return
-         if (num_ints == 0 .and. num_dbls == 0) return
-         
          ierr = 0
-         call star_alloc_extras(s% id, num_ints, num_dbls, ierr)
-         if (ierr /= 0) then
-            write(*,*) 'failed in star_alloc_extras'
-            write(*,*) 'alloc_extras num_ints', num_ints
-            write(*,*) 'alloc_extras num_dbls', num_dbls
-            stop 1
+   
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+   
+         read(iounit,iostat=ierr)  inlist_part
+
+         if(inlist_part/= s% x_integer_ctrl(I_INLIST_PART)) then
+            call mesa_error(__FILE__,__LINE__,'Error: Photo was saved for different inlist')
+            ierr=-1
+            return
          end if
-         
-         contains
-         
-         subroutine move_dbl(dbl)
-            real(dp) :: dbl
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               dbl = s% extra_work(i)
-            case (extra_info_put)
-               s% extra_work(i) = dbl
-            end select
-         end subroutine move_dbl
-         
-         subroutine move_int(int)
-            integer :: int
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               int = s% extra_iwork(i)
-            case (extra_info_put)
-               s% extra_iwork(i) = int
-            end select
-         end subroutine move_int
-         
-         subroutine move_flg(flg)
-            logical :: flg
-            i = i+1
-            select case (op)
-            case (extra_info_get)
-               flg = (s% extra_iwork(i) /= 0)
-            case (extra_info_put)
-               if (flg) then
-                  s% extra_iwork(i) = 1
-               else
-                  s% extra_iwork(i) = 0
-               end if
-            end select
-         end subroutine move_flg
-      
-      end subroutine move_extra_info
+
+         end subroutine extras_photo_read
+   
+         subroutine extras_photo_write(id, iounit)
+         integer, intent(in) :: id, iounit
+         integer :: ierr
+         type (star_info), pointer :: s
+         ierr = 0
+   
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+   
+         write(iounit) s% x_integer_ctrl(I_INLIST_PART)
+   
+         end subroutine extras_photo_write
 
       end module run_star_extras
       

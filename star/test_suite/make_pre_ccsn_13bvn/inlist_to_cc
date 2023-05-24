@@ -5,12 +5,12 @@
       load_model_filename = 'ready.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'cc.mod'
+      save_model_filename = 'final.mod'
 
       change_initial_net = .true.      
       new_net_name = 'approx21_cr60_plus_co56.net'
 
-      pgstar_flag = .true.
+      
       
 / ! end of star_job namelist
 
@@ -77,6 +77,9 @@
       !profile_interval = 1
       !history_interval = 1
       terminal_interval = 1
+
+      x_integer_ctrl(1) = 5 ! inlist_part
+
 
 ! FOR DEBUGGING
 

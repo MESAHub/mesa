@@ -9,8 +9,6 @@
 
       write_profile_when_terminate = .false.
 
-      pgstar_flag = .true.
-
       set_initial_model_number = .true.
       initial_model_number = 0
 
@@ -39,6 +37,8 @@
 
       num_trace_history_values = 1
       trace_history_value_name(1) = 'radius'
+
+      x_integer_ctrl(1) = 1 ! inlist_part
       
 ! FOR DEBUGGING
 

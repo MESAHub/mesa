@@ -21,15 +21,15 @@
       replace_element_nzlo = -1
       replace_element_nzhi = -1
 
-      pgstar_flag = .false.
-
-
 / ! end of star_job namelist
 
 
 &controls
       
       terminal_interval = 1
+
+      x_integer_ctrl(1) = 4 ! inlist_part
+
 
       
 

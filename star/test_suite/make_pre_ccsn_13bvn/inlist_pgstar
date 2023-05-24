@@ -795,7 +795,7 @@ Grid1_txt_scale_factor(8) = 1.0 ! multiply txt_scale for subplot by this
 Grid1_file_flag = .true.
 Grid1_file_dir = 'grid_png'
 Grid1_file_prefix = 'grid_'
-Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
+Grid1_file_interval = 1000     ! output when mod(model_number,Grid1_file_interval)==0
 !Grid1_file_width = -1        ! (inches) negative means use same value as for window
 Grid1_file_width = 24       ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
