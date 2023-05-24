@@ -215,11 +215,11 @@
          do k = 1, nz
             vals(k,1) = s% eos_frac_HELM(k)
             vals(k,2) = s% eos_frac_FreeEOS(k)
-            vals(k,3) = ((s% energy(k) - s% energy_start(k)) + &
-               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) + &
+            vals(k,3) = ((s% energy(k) - s% energy_start(k)) &
+               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) &
                -0.5d0 * (s% Rho_start(k)*s% dE_dRho_start(k) + s% Rho(k)*s% dE_dRho(k)) * s% dxh_lnd(k)) * s% dt
             vals(k,4) = (&
-               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) + &
+               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) &
                -0.5d0 * (s% Rho_start(k)*s% dE_dRho_start(k) + s% Rho(k)*s% dE_dRho(k)) * s% dxh_lnd(k)) * s% dt
          end do
 
@@ -247,8 +247,8 @@
          e_eos_err_step_blend = 0
          do k = 1, nz
             e_eos_err_cell = s% dm(k) * &
-               ((s% energy(k) - s% energy_start(k)) + &
-               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) + &
+               ((s% energy(k) - s% energy_start(k)) &
+               -0.5d0 * (s% T_start(k)*s% cv_start(k) + s% T(k)*s% cv(k)) * s% dxh_lnT(k) &
                -0.5d0 * (s% Rho_start(k)*s% dE_dRho_start(k) + s% Rho(k)*s% dE_dRho(k)) * s% dxh_lnd(k))
             e_eos_err_step = e_eos_err_step + e_eos_err_cell
             if (in_eos_blend(s,k)) e_eos_err_step_blend = e_eos_err_step_blend + e_eos_err_cell
