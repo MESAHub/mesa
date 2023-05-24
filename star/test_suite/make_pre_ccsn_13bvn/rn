@@ -15,7 +15,7 @@ do_one inlist_remove_header removed.mod
 
 do_one inlist_after_remove_header ready.mod
 
-do_one inlist_to_cc_header cc.mod
+do_one inlist_to_cc_header final.mod
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 

@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010  Bill Paxton
+!   Copyright (C) 2023  The MESA team & Ebhraheem Farag
 !
 !   this file is part of mesa.
 !
