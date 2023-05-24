@@ -7,13 +7,13 @@ source "${MESA_DIR}/star/test_suite/test_suite_helpers"
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
-#do_one inlist_to_zams_header near_zams.mod
+do_one inlist_to_zams_header near_zams.mod
 
-#do_one inlist_before_remove_header ready_to_remove.mod
+do_one inlist_before_remove_header ready_to_remove.mod
 
-#do_one inlist_remove_header removed.mod
+do_one inlist_remove_header removed.mod
 
-#do_one inlist_after_remove_header ready.mod
+do_one inlist_after_remove_header ready.mod
 
 do_one inlist_to_pre_si_burn_header before_si_burn.mod
 
