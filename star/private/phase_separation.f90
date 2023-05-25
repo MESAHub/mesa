@@ -71,7 +71,7 @@
          logical, intent(in) :: set_mixing_and_energy
          integer, intent(out) :: ierr
          
-         real(dp) :: dq_crystal, XNe, XO, XC, pad
+         real(dp) :: XNe, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
          logical :: save_Skye_use_ion_offsets
 
@@ -110,7 +110,6 @@
          
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
-            dq_crystal = 0d0
 
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
             ! to account for loss of precision during remeshing.
@@ -141,12 +140,10 @@
                   exit
                end if
 
-               call move_one_zone(s,k,components,dq_crystal)
+               call move_one_zone(s,k,components)
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
-               if(dq_crystal > 0d0) then
-                  call mix_outward(s, k-1, 0)
-               end if
+               call mix_outward(s, k-1, 0)
                
             end do
 
@@ -172,9 +169,11 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: Gamma_melt, GammaC_melt, GammaC, XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, max_distill_q
-         integer :: k, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones
-         logical :: save_Skye_use_ion_offsets, distilling
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC, &
+              XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, &
+              max_distill_q, eps_tmp, L_distill, L_max
+         integer :: k, kk, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones, iter
+         logical :: save_Skye_use_ion_offsets, distilling, distilled, done_crystallizing
 
          max_distill_q = 0.2
          distill_final_XNe = 0.3143d0
@@ -219,12 +218,24 @@
          end do
 
          distilling = .false.
+         done_crystallizing = .false.
+         L_distill = 0d0
+         L_max = 0.98d0 * s% L_phot * Lsun
+         iter = 0
+         
+         do while(L_distill < L_max .and. (.not. done_crystallizing) .and. iter < 30)
+            iter = iter+1
+            ! TODO: indent below
+            distilled = .false.
          do k = kstart, kend, -1
             XC = s% xa(net_ic12,k)
             XO = s% xa(net_io16,k)
             XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
             XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-            if(XC + XO + XNe < 0.9d0) exit
+            if(XC + XO + XNe < 0.9d0 .and. k == kstart) then
+               done_crystallizing = .true.
+               exit
+            end if
             
             ! Check whether we are in a regime where distillation should occur
             Gamma_melt = blouin_Gamma_melt_CO(XO)
@@ -232,23 +243,26 @@
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
             XNe_crit = blouin_XNe_crit(GammaC_melt)
             
-            if(XNe > max(XNe_crit,3d-4) .and. GammaC > GammaC_melt) then
-               ! 3d-4 just to ignore distillation once it starts becoming insignificant
-               ! TODO: tune this, check that 3d-4 isn't too large to miss anything important
-
+            if(XNe > max(XNe_crit,1d-4) .and. &
+                 XNe < distill_final_XNe .and. &
+                 GammaC > GammaC_melt .and. & 
+                 XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
+               distilled = .true.
                
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
                ! Once distillation starts in a zone, it stays liquid and continues
                ! distilling until reaching xNe = 0.2.
-               if(XNe < distill_final_XNe .and. XNe_out > 1d-4) then ! 1d-4 just to break out if further distillation is impossible
-                  call distill_at_boundary(s,k,distill_final_XNe)
+               ! if (XNe < distill_final_XNe .and. & ! redundant?
+               !     L_distill < L_max .and. & ! redundant?
+               !     XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
+                  call distill_at_boundary(s,k,distill_final_XNe,L_distill)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1, 3)
-               end if
-               XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
-               XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+                  XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+                  XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+               ! end if
                if(XNe >= distill_final_XNe .or. XNe_out < 1d-4) then
                   if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                      ! done distilling this zone and everything inward from it, mark crystallized
@@ -257,16 +271,39 @@
                      ! TODO: may need to be more careful about setting crystal_core_boundary_mass here
                   end if
                end if
-            else
-               ! break out of loop once reaching a point where XNe < XNe_crit or 3d-4, or not crystallizing yet
+            else if (GammaC > GammaC_melt .and. (.not. distilling)) then
+               ! also check that we're done with everything inward from this point
+               if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
+                  ! zone won't distill, but is ready to phase separate C/O
+                  call move_one_zone(s,k,'CO')
+                  ! crystallized out to k now, liquid starts at k-1.
+                  ! now mix the liquid material outward until stably stratified
+                  call mix_outward(s, k-1, 2)
+                  print *, "doing C/O phase sep and setting crystal_core_boundary_mass in zone", k
+                  s% crystal_core_boundary_mass = s% m(k)
+                  done_crystallizing = .true.
+               end if
+            end if
+
+            ! checking if we've reached a luminosity comparable to the star
+            L_distill = 0d0
+            do kk = 1, s% nz
+               eps_tmp = (s% eps_phase_separation(kk) - s% energy(kk)) / dt
+               L_distill = L_distill + eps_tmp*s% dm(kk)
+            end do
+            if(L_distill >= L_max) then
+               ! enough phase separation / distillation luminosity for this step, leave loop
+               print *, "reached lumionsity of the star in distillation loop"
+               print *, "L_distill, L_WD, ratio = ", L_distill/Lsun, s% L_phot, L_distill/(s% L_phot*Lsun)
                exit
             end if
-         end do
 
-         if(.not. distilling) then
-            ! fall back to 2component phase separation
-            call do_2component_phase_separation(s, dt, 'CO', .false., ierr)
+         end do
+         if (.not. distilled) then
+            ! went through whole inner loop without doing any distillation, so break out of do while
+            done_crystallizing = .true.
          end if
+         end do
          
          call update_model_(s,1,s%nz,.false.)
          
@@ -280,16 +317,17 @@
          ierr = 0
       end subroutine do_distillation
 
-      subroutine distill_at_boundary(s,k,distill_final_XNe)
+      subroutine distill_at_boundary(s,k,distill_final_XNe,L_distill)
         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
-        real(dp), intent(in) :: distill_final_XNe
+        real(dp), intent(in) :: distill_final_XNe, L_distill
         
         real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum
         real(dp) :: Delta_XC, Delta_XO, Delta_XNe, max_Delta_XC, max_Delta_XO, max_Delta_XNe
         real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio, scale
+        real(dp) :: delta_binding_energy, Lmax
         integer :: net_ic12, net_io16, net_ine20, net_ine22
         logical :: debug
 
@@ -309,6 +347,17 @@
         XO_out = s% xa(net_io16,k-1)
         XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
 
+        ! First calculate how much XNe can change due to energy considerations,
+        ! want rough energy for change in the zone not to exceed luminosity of the star.
+        ! Rough luminosity is given by change in gravitational binding energy of moving
+        ! the neutron excess from distilling element into zone k,
+        ! with 2 as neutron excess of 22Ne, and 22 its atomic mass.
+        Lmax = max(s%L_phot*Lsun - L_distill, Lsun*1d-5)
+        delta_binding_energy = abs(s%grav(k) * s% r(k) - s% grav(1) * s% r(1)) ! specific binding energy change to move from surface into zone k
+        ! L_distill tracks luminosity already provided in previous loop iterations for this step
+        max_Delta_XNe = Lmax * s%dt / ((2d0/22d0) * delta_binding_energy * s%dm(k))
+        print *, "Max Delta XNe for luminosity", max_Delta_XNe
+        
         ! Net effect of distillation is that crystals enriched in oxygen float upward.
         ! Need to limit toward xNe = 0.2, xC = 0.8. Start by pushing O outward in exchange
         ! for C/Ne mixture until O is depleted. Then exchange C/Ne until reaching critical
@@ -323,8 +372,8 @@
         ! Which element will limit the size of composition step.
         ! C and Ne need to increase, so check how much is available in next zone out
         max_Delta_XC = min(Delta_XC,XC_out/dq_ratio)
-        max_Delta_XNe = min(Delta_XNe,XNe_out/dq_ratio)
-        max_Delta_XNe = min(max_Delta_XNe,0.03d0) ! avoid having overly dramatic changes in XNe for energy purposes
+        max_Delta_XNe = min(max_Delta_XNe,Delta_XNe,XNe_out/dq_ratio)
+        ! max_Delta_XNe = min(3d-3,Delta_XNe,XNe_out/dq_ratio)
 
         ! O needs to go to zero by getting pushed into next zone out,
         ! so check how much next zone out can accept
@@ -381,18 +430,15 @@
         
       end subroutine distill_at_boundary
 
-      subroutine move_one_zone(s,k,components,dq_crystal)
+      subroutine move_one_zone(s,k,components)
         use chem_def, only: chem_isos, ic12, io16, ine20
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
         character (len=*), intent(in) :: components
-        real(dp), intent(inout) :: dq_crystal
         
         real(dp) :: XC, XO, XNe, XC1, XO1, XNe1, dXO, dXNe, Xfac
         integer :: net_ic12, net_io16, net_ine20
-        
-        dq_crystal = dq_crystal + s% dq(k)
         
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
@@ -504,7 +550,7 @@
         end do
 
         ! Call a final update over all mixed cells now.
-        call update_model_(s, ktop, kbot, .true.)
+        call update_model_(s, ktop, kbot+1, .true.)
        
       end subroutine mix_outward
 
