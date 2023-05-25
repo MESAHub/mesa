@@ -55,6 +55,7 @@
             ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'distillation') then
             call do_distillation(s, dt, ierr)
+            call smooth_eps_phase_sep(s,dt,ierr)
          else
             write(*,*) 'invalid phase_separation_option'
             stop
@@ -238,17 +239,17 @@
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
                
-               ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O),
-               ! as long as there is enough Ne in the next zone out to proceed
-               ! TODO: XNe_out might need to be checked against value of XNe_crit for zone k-1?
-               if(XNe < distill_final_XNe) then !  .and. XNe_out > XNe_crit) then
+               ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
+               ! Once distillation starts in a zone, it stays liquid and continues
+               ! distilling until reaching xNe = 0.2.
+               if(XNe < distill_final_XNe .and. XNe_out > 1d-4) then ! 1d-4 just to break out if further distillation is impossible
                   call distill_at_boundary(s,k,distill_final_XNe)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1, 3)
                end if
                XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-               if(XNe >= distill_final_XNe .or. XNe_out < 3d-4) then
+               if(XNe >= distill_final_XNe .or. XNe_out < 1d-4) then
                   if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                      ! done distilling this zone and everything inward from it, mark crystallized
                      s% crystal_core_boundary_mass = s% m(k)
@@ -682,7 +683,29 @@
         return
         
       end subroutine update_model_
-      
+
+      subroutine smooth_eps_phase_sep(s,dt,ierr)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: dt
+         integer, intent(out) :: ierr
+
+         real(dp) :: integrated_luminosity
+         integer :: k, kmid
+
+         integrated_luminosity = dot_product(s% dm(1:s%nz), s% eps_phase_separation(1:s%nz))
+
+         ! redistribute evenly through the inner half of the star
+         do k = 1,s%nz
+            if(s% q(k) < 0.5d0) then
+               kmid = k
+               exit
+            end if
+         end do
+
+         s% eps_phase_separation(:) = 0d0
+         s% eps_phase_separation(kmid:s%nz) = integrated_luminosity/s% m(kmid)
+
+      end subroutine smooth_eps_phase_sep
       
       end module phase_separation
 
