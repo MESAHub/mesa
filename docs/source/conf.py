@@ -20,8 +20,8 @@ sys.path.insert(0, os.path.abspath('./_ext/'))
 project = 'MESA'
 copyright = '2022, The MESA Team'
 author = 'The MESA Team'
-release = 'main'
-version = 'main'
+release = 'r23.05.1'
+version = 'r23.05.1'
 
 
 # -- General configuration ---------------------------------------------------
