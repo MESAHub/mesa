@@ -10,6 +10,11 @@ Changes in main
 
 .. _Backwards-incompatible changes main:
 
+Changes in r23.05.1
+===================
+
+.. _Backwards-incompatible changes r23.05.1:
+
 Backwards-incompatible changes
 ------------------------------
 
@@ -117,11 +122,11 @@ respectively.
 Colors
 ~~~~~~
 
-The colors module now returns `-1d99` when asking for a value that is
-off table
+The colors module now returns ``-1d99`` when asking for a value that is
+off table.
 
 
-.. _New Features main:
+.. _New Features r23.05.1:
 
 New Features
 ------------
@@ -180,6 +185,7 @@ Hooks
 
 A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
+.. _Bug Fixes r23.05.1:
 
 Bug Fixes
 ---------
@@ -557,7 +563,7 @@ Then this means you are missing the ``use auto_diff`` statement.
 An example of using ``autodiff`` in a hook can be found at :ref:`autodiff example`
 
 
-.. _Module-level changes main:
+.. _Module-level changes r21.12.1:
 
 Module-level changes
 --------------------
@@ -802,7 +808,7 @@ ability to provide these unneeded and unused quantities has been
 removed.
 
 
-.. _Other changes main:
+.. _Other changes r21.12.1:
 
 Other changes
 -------------
