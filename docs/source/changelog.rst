@@ -8,6 +8,11 @@ Changes in r23.05.1
 
 .. _Backwards-incompatible changes r23.05.1:
 
+Changes in r23.05.1
+===================
+
+.. _Backwards-incompatible changes r23.05.1:
+
 Backwards-incompatible changes
 ------------------------------
 
@@ -1883,9 +1888,7 @@ Changes to atmospheres
 There has been a major overhaul of the atmosphere controls and related
 code.  This improves consistency between the atmosphere and interior
 calculations and offers more flexibility to users.  To learn more,
-please consult the user guide available at
-
-    http://mesa.sourceforge.net/assets/atm-user-guide.txt
+please consult the user guide available :download:`here <assets/atm-user-guide.txt>`.
 
 Changes to ``s% xtra`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
