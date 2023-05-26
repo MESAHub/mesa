@@ -3,12 +3,10 @@ Changelog
 *********
 
 
-Changes in main
-===============
+Changes in r23.05.1
+===================
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r23.05.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -117,11 +115,11 @@ respectively.
 Colors
 ~~~~~~
 
-The colors module now returns `-1d99` when asking for a value that is
-off table
+The colors module now returns ``-1d99`` when asking for a value that is
+off table.
 
 
-.. _New Features main:
+.. _New Features r23.05.1:
 
 New Features
 ------------
@@ -180,6 +178,7 @@ Hooks
 
 A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
+.. _Bug Fixes r23.05.1:
 
 Bug Fixes
 ---------
