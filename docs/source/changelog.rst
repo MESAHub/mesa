@@ -8,11 +8,6 @@ Changes in r23.05.1
 
 .. _Backwards-incompatible changes r23.05.1:
 
-Changes in r23.05.1
-===================
-
-.. _Backwards-incompatible changes r23.05.1:
-
 Backwards-incompatible changes
 ------------------------------
 
