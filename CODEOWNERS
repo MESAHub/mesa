@@ -5,20 +5,20 @@
 
 adipls/ @rhdtownsend @warrickball
 astero/ @warrickball
-atm/ @rhdtownsend @warrickball @aarondotter
+atm/ @rhdtownsend @warrickball
 autodiff/ 
 binary/ @orlox
-chem/ @rjfarmer @fxt44 @aarondotter
+chem/ @rjfarmer @fxt44
 colors/ @rjfarmer
-const/ @rjfarmer @fxt44 @aarondotter
+const/ @rjfarmer @fxt44
 data/ @rjfarmer
 docs/ @rhdtownsend
-eos/ @fxt44 @aarondotter  @evbauer
+eos/ @fxt44 @evbauer
 gyre/ @rhdtownsend @warrickball
 hdfio5 @rhdtownsend
 interp_1d/ @rhdtownsend 
 interp_2d/ @rhdtownsend 
-kap/ @fxt44 @aarondotter
+kap/ @fxt44
 linters/ @rjfarmer
 turb/ 
 math/ @rhdtownsend

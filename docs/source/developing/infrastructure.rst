@@ -40,7 +40,7 @@ mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
 Frank who pays the hosting fees (through grants at ASU).
 This costs about $100/year.
 
-New account signups are handled by Frank, Aaron, and Rob.
+New account signups are handled by Frank, Evan, and Rob.
 
 Marketplace
 ^^^^^^^^^^^

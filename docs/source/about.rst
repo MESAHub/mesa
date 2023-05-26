@@ -109,7 +109,6 @@ Developers
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
-* Aaron Dotter
 * Matthias Fabry
 * `Robert Farmer <http://rjfarmer.io/>`__
 * Eoin Farrell
@@ -126,9 +125,10 @@ Past Developers
 ---------------
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
+* `Aaron Dotter <https://aarondotter.github.io/>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
-* `Josiah Schwab <https://yoshiyahu.org/>`__ (2013-2021)
+* `Josiah Schwab <https://yoshiyahu.org/>`__
 
 
 Acknowledgments
