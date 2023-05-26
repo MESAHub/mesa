@@ -1,0 +1,337 @@
+STELLAR ATMOSPHERES IN MESA
+===========================
+
+Rich Townsend (townsend@astro.wisc.edu)
+v1.3, September 9, 2019
+
+Overview
+--------
+
+MESA uses the atmosphere (atm) module to obtain a surface temperature
+(T_surf) and surface pressure (P_surf), representing the conditions at
+the base of the stellar atmosphere. These values are applied as
+boundary conditions when evolving the interior model. (Aside: MESA
+treats the atmosphere separately, via these boundary conditions,
+because the physics governing the atmosphere is often quite different
+from that in the interior).
+
+Historically, MESA decided how T_surf and P_surf are calculated using
+the 'which_atm_option' control. To improve consistency between the
+atmosphere and interior calculations, and to offer more flexibility to
+users, this control has been replaced by a new set of controls.
+
+
+
+Choosing 'atm_option'
+---------------------
+
+The top-level control for determining how T_surf and P_surf are
+calculated is 'atm_option'. Possible choices (and accompanying
+controls) are as follows:
+
+*) atm_option == 'T_tau'
+
+  - MESA defines the temperature structure of the atmosphere using a
+    T(tau) relation. The choice of relation is set by the
+    'atm_T_tau_relation' control:
+
+    *) atm_T_tau_relation == 'Eddington'
+
+       -- use the Eddington grey relation.
+
+    *) atm_T_tau_relation == 'solar_Hopf'
+
+       -- use an approximate Hopf function calibrated against the Sun
+          (see section A.5 of Paxton et al. 2013, MESA II). This is
+          equivalent to the fit given by Sonoi et al. (2019, A&A, 621,
+          84) to the Vernazza et al. (1981) VAL-C model.
+
+    *) atm_T_tau_relation == 'Krishna_Swamy'
+
+       -- use the approximate Hopf function given by Krishna-Swamy
+          (1966, ApJ, 145, 174).
+    
+  - The pressure structure of the atmosphere is obtained by
+    integrating the equation of hydrostatic equilibrium:
+
+    dP/dtau = g/kappa
+
+    ...for constant gravity g. There are three choices for how the
+    opacity kappa is evaluated, set by the 'atm_T_tau_opacity'
+    control:
+
+    *) atm_T_tau_opacity == 'varying'
+
+       -- at each optical depth, evaluate the opacity consistent with
+          the local thermodynamic state (typically, density and
+          temperature). This is done via calls to MESA's
+          equation-of-state and opacity modules.
+
+    *) atm_T_tau_opacity == 'fixed'
+
+       -- assume the same opacity at each optical depth (i.e. uniform
+          opacity), equal to the the opacity in the outermost cell of
+          the interior model.
+
+    *) atm_T_tau_opacity == 'iterated'
+    
+       -- assume the same opacity at each optical depth (again,
+          uniform opacity), but use iteration to find an opacity
+          consistent with the thermodynamic state at the base of the
+          atmosphere.
+
+  - For the 'varying' option above, the equation of hydrostatic
+    equilibrium is integrated numerically. Controls that affect this
+    integration include 'atm_T_tau_errtol' (sets the error tolerance)
+    and 'atm_T_tau_max_steps' (sets the maximum number of steps).
+
+  - For the 'iterated' option above, the equation of hydrostatic
+    equilibrium is integrated analytically. Controls that affect the
+    opacity iteration include 'atm_T_tau_errtol' (sets the error
+    tolerance) and 'atm_T_tau_max_iters' (sets the maximum number of
+    iterations).
+
+  - For the 'fixed' option above, the equation of hydrostatic
+    equilibrium is also be integrated analytically. No other controls
+    are needed.
+
+  - Once the temperature and pressure structure of the atmosphere is
+    known, MESA evaluates T(tau) and P(tau) at tau=tau_surf, providing
+    the necessary T_surf and P_surf values for the boundary
+    conditions. The nominal surface optical depth tau_surf is
+    calculated via
+
+    tau_surf = tau_base * tau_factor
+
+    Here, tau_base is the optical depth where T(tau) = Teff (the
+    stellar effective temperature) for the chosen T(tau) relation,
+    while tau_factor is a parameter determined from various controls
+    in the &star_job namelist (e.g., 'set_tau_factor').
+
+*) atm_option == 'table'
+
+  - MESA uses pre-computed tables, from separate model atmosphere
+    calculations, to interpolate T_surf and P_surf values for the
+    boundary conditions. The interpolations are peformed using the
+    effective temperature Teff and log10-surface gravity logg as
+    independent variables. The choice of table is set by the
+    'atm_table' control:
+
+    *) atm_table == 'photosphere'
+
+       - model atmosphere tables computed for a range of metallicites,
+         using a combination of PHOENIX ((Hauschildt et al. 1999a,b)
+         and Castelli & Kurucz (2003) treatments. Surface optical
+         depth is defined so that T(tau_surf) = Teff.
+
+    *) atm_table == 'tau_100'
+       atm_table == 'tau_10'
+       atm_table == 'tau_1'
+       atm_table == 'tau_1m1'
+
+       - model atmospheres computed for solar metallicites, using a
+         combination of COND (Allard et al. 2001) and Castelli &
+         Kurucz (2003) treatments. Surface optical depths are tau_surf
+         = 100, 10, 1, 0.1, respectively.
+
+    *) atm_table = 'WD_tau_25'
+
+       - model atmospheres for cool white dwarfs, using Rohrmann et
+         al. (2011, MNRAS, 411, 781) treatment. Surface optical depth
+         is tau_surf = 25.12.
+
+    *) atm_table = 'DB_tau_25'
+
+       - model atmospheres for hot(ter) white dwarrfs, provided by Odette
+         Toloza based on Detlev Koester’s atmosphere code. Surface
+         optical depth is tau_surf = 25.12.
+
+  - When any of these 'table' choices is used, it's possible that
+    requested Teff and logg lies outside the table range. When this
+    happens, MESA can optionally switch to an alternative approach for
+    evaluating T_surf and P_surf. The alternative approach is
+    determined by the 'atm_off_table_option' control, which can
+    take the following values:
+
+    *) atm_off_table_option == 'T_tau'
+
+       - use the same T(tau) approach as described above for
+         atm_option == 'T_tau'. The 'atm_T_tau_relation' and
+         'atm_T_tau_opacity' controls (and others) are used in this
+         case for the off-table evaluation.
+
+    If 'atm_off_table_option' is left blank, an attempt to
+    interpolate off the table will cause MESA to halt execution.
+
+*) atm_option == 'irradiated_grey'
+
+  - MESA defines the temperature structure of the atmosphere using a
+    T(tau) relation based on the irradiated grey-atmosphere model of
+    Guillot & Havel (2011, A&A 527, A20). The evaluation of this model
+    depends on the 'atm_irradiated_T_eq' (equilibrium irradiation
+    temperature), 'atm_irradiated_kap_v' and
+    'atm_irradiated_kap_v_div_kap_th' (the latter two affecting how
+    the irradiation opacity kap_v is set).
+
+  - The pressure structure of the atmosphere is obtained by
+    integrating the equation of hydrostatic equilibrium:
+
+    dP/dtau = g/kappa
+
+    ...for constant gravity g. There are two choices for how the
+    opacity kappa is evaluated, set by the 'atm_irradiated_opacity'
+    control:
+
+    *) atm_irradiated_opacity == 'fixed'
+
+       -- assume the same opacity at each optical depth (i.e. uniform
+          opacity), equal to the the opacity in the outermost cell of
+          the interior model.
+
+    *) atm_irradiated_opacity == 'iterated'
+    
+       -- assume the same opacity at each optical depth (again,
+          uniform opacity), but use iteration to find an opacity
+          consistent with the thermodynamic state at the base of the
+          atmosphere. NOTE: currently, MESA can run into convergence
+          problems when this option is used.
+
+  - For the 'iterated' option above, the equation of hydrostatic
+    equilibrium is integrated analytically. Controls that affect the
+    opacity iteration include 'atm_irradiated_errtol' (sets the error
+    tolerance) and 'atm_irradiated_max_iters' (sets the maximum number
+    of iterations).
+
+  - For the 'fixed' option above, the equation of hydrostatic
+    equilibrium is also integrated analytically. No other controls are
+    needed.
+
+  - Once the temperature and pressure structure of the atmosphere is
+    known, MESA evaluates T(tau) at tau=tau_surf, providing the
+    necessary T_surf value for the boundary conditions. The nominal
+    surface optical depth tau_surf is not set directly, but instead
+    calculated from the 'atm_irradiated_P_surf' control:
+
+    P(tau_surf) = atm_irradiated_P_surf
+
+    (this also sets the value of P_surf for the boundary conditions).
+
+*) atm_option == 'Paczynski_grey'
+
+  - MESA creates an atmosphere using an approach inspired by Paczynski
+    (1969, Acta Astr., vol. 19, 1). This is similar to using an
+    Eddington-grey T(tau) relation, but includes corrections for
+    geometric dilution at optical depth tau < 2/3, and also takes
+    convection via MLT into account. Controls that affect the
+    atmosphere calculation include 'Paczynski_atm_R_surf_errtol'.
+
+*) atm_option == 'fixed_Teff'
+
+  - MESA sets T_surf using the Eddington T(tau) relation, at an
+    optical depth tau_surf (see the 'T_tau' section above for a
+    discussion of how tau_surf is calculated). The effective
+    temperature Teff is set by the 'atm_fixed_Teff' control.
+
+  - MESA sets P_surf from the radiation pressure associated with
+    T_surf.
+
+*) atm_option == 'fixed_Tsurf'
+
+  - MESA sets T_surf from the 'atm_fixed_Tsurf' control. The effective
+    temperature is set using the Eddington T(tau) relation, at an
+    optical depth tau_surf (see the 'T_tau' section above for a
+    discussion of how tau_surf is calculated).
+
+  - MESA sets P_surf from the radiation pressure associated with T_surf
+
+*) atm_option == 'fixed_Psurf'
+
+  - MESA sets P_surf from the 'atm_fixed_Psurf' control
+
+  - MESA sets T_surf from the Eddington T(tau) relation, at an optical
+    depth tau_surf (see the 'T_tau' section above for a discussion of
+    how tau_surf is calculated). The effective temperature Teff is set
+    by the stellar radius and luminosity.
+
+*) atm_option == 'fixed_Psurf_and_Tsurf'
+
+  - MESA sets P_surf and T_surf from the 'atm_fixed_Psurf' and
+    'atm_fixed_Tsurf' controls, respectively.
+
+
+
+Mapping from Old to New
+-----------------------
+
+For those wanting to convert existing inlists to use the new approach
+described above, the following mappings may be useful:
+
+Old: which_atm_option == 'simple_photosphere'
+New: atm_option == 'T_tau'
+     atm_T_tau_relation == 'Eddington'
+     atm_T_tau_opacity = 'fixed'
+
+Old: which_atm_option == 'grey_and_kap'
+New: atm_option == 'T_tau'
+     atm_T_tau_relation == 'Eddington'
+     atm_T_tau_opacity = 'iterated'
+
+Old: which_atm_option == 'Eddington_grey'
+New: atm_option == 'T_tau'
+     atm_T_tau_relation == 'Eddington'
+     atm_T_tau_opacity = 'varying'
+
+Old: which_atm_option == 'XXXXXX_tables' (various choices for XXXXXX)
+New: atm_option == 'table'
+     atm_table = 'XXXXXX'
+
+Old: which_atm_option == 'grey_irradiated'
+New: atm_option == 'irradiated_grey'
+     atm_irradiated_opacity == 'fixed' (if atm_grey_irradiated_simple_kap_th = .true.)
+     atm_irradiated_opacity == 'varying' (if atm_grey_irradiated_simple_kap_th = .false.)
+
+If MESA is run using one of the old options, it will print out the
+appropriate mapping and halt execution.
+
+
+
+Atmosphere Structure Building
+-----------------------------
+
+MESA's atmosphere evaluation, described above, is primarily used to
+get the T_surf and P_surf values for the boundary conditions. However,
+when writing output files for pulsation codes (using the
+'save_pulse_data...' controls), it is sometimes desirable to append
+the (spatial) atmosphere structure data to the interior structure
+data; that way, the extension of modes into the stellar atmosphere can
+naturally be modeled by the pulsation code.
+
+To append atmosphere structure data in this way, set the
+'add_atmosphere_to_pulse_data' control to .true. . A couple of caveats
+apply:
+
+*) This capability is only available when atm_option == 'T_tau'
+ or atm_option == 'Paczynski_grey'. For other choices of
+ 'atm_option' (e.g., 'table'), there are insufficient data to
+ determine what the spatial structure of the atmosphere should be.
+
+*) It's important to realize that calculation of atmosphere structure
+ data has NO effect on the evolution of the star, OR on MESA's
+ standard profile, history and photo outputs. Only the pulsation
+ output files are affected.
+
+When building atmosphere structure data, the following controls
+influence how the calculation is performed:
+
+*) 'atm_build_errtol' -- error tolerance for integrating the r(tau)
+ [and possibly also T(tau)] equations
+
+*) 'atm_build_dlogtau' -- maximum spacing in log10(tau) for
+ atmosphere structure data
+
+*) 'atm_build_tau_outer' -- outermost tau for atmosphere structure
+ data (the data will extend from tau_surf to tau_outer)
+
+The resulting structure data will contain approximately
+[log10(tau_surf) - log10(tau_outer)]/dlogtau points.
+
