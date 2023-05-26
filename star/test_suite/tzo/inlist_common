@@ -59,7 +59,7 @@
    profile_interval = 1000
    max_num_profile_models = 10
    history_interval = 1
-   terminal_interval = 1
+   terminal_interval = 10 
    write_header_frequency = 100
 
    overshoot_scheme(1) = 'exponential'
