@@ -130,6 +130,14 @@ Past Developers
 * `Adam Jermyn <http://adamjermyn.com/>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__
 
+Other Code Contributors
+-----------------------
+
+* Kent Budge
+* Lorne Nelson
+* Joris Vos
+* Jonathan Tomshine
+* Michael Zhang
 
 Acknowledgments
 ===============
