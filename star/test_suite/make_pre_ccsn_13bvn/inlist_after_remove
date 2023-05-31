@@ -1,0 +1,47 @@
+
+
+&star_job
+   
+      load_saved_model = .true.
+      load_model_filename = 'removed.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'ready.mod'      
+
+      write_profile_when_terminate = .false.
+
+      steps_to_take_before_terminate = 5 ! if nothing to do after remove
+      
+      ! for Ib
+      replace_element = .true.
+      !replace_initial_element = .false.  
+      chem_name1 = 'h1'
+      chem_name2 = 'he4'
+      ! replaces chem1 by chem2
+      replace_element_nzlo = -1
+      replace_element_nzhi = -1
+
+/ ! end of star_job namelist
+
+
+&controls
+      
+      terminal_interval = 1
+
+      x_integer_ctrl(1) = 4 ! inlist_part
+
+
+      
+
+! FOR DEBUGGING
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+Grid1_title = 'inlist_after_remove'
+
+
+/ ! end of pgstar namelist

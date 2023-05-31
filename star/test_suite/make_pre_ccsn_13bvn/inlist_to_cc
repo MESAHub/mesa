@@ -1,0 +1,96 @@
+
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'before_si_burn.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'final.mod'
+
+      change_initial_net = .true.      
+      new_net_name = 'approx21_cr60_plus_co56.net'
+
+      
+      
+/ ! end of star_job namelist
+
+
+&controls
+
+! 300 km/s core infall stopping condition
+     fe_core_infall_limit = 3d7
+     non_fe_core_infall_limit = 3d7
+
+      when_to_stop_rtol = 1d-3
+      when_to_stop_atol = 1d-3
+
+
+! adjust overshoot, to prevent He shell convection from propagating inward in test case.
+     overshoot_scheme(1) = 'none' 
+     overshoot_zone_type(1) = 'burn_He' 
+     overshoot_zone_loc(1) = 'shell' 
+     overshoot_bdy_loc(1) = 'bottom'
+
+
+     overshoot_scheme(2) = 'exponential' 
+     overshoot_zone_type(2) = 'any' 
+     overshoot_zone_loc(2) = 'any' 
+     overshoot_bdy_loc(2) = 'any'
+     overshoot_f(2) = 0.01
+     overshoot_f0(2) = 0.004
+
+     min_overshoot_q = 0d0
+
+
+! prevent development of radial pulses during advanced burning
+      drag_coefficient = 1d0
+      min_q_for_drag = 0.8d0
+
+
+! relax tolerance on central he burning
+      delta_XHe_cntr_limit = 0.2d0
+      delta_XHe_cntr_hard_limit = 0.5d0
+
+
+! convergence testing tighter time_steps for advanced burning
+      !mesh_delta_coeff = 0.5d0
+      delta_lgRho_cntr_limit = 0.005      
+      delta_lgT_cntr_limit = 0.005  
+      delta_lgT_max_limit = 0.005     
+
+
+! Extra values to print to terminal
+      num_trace_history_values = 9
+      trace_history_value_name(1) = 'radius'
+      trace_history_value_name(2) = 'total_mass he4'
+      trace_history_value_name(3) = 'total_mass o16'
+      trace_history_value_name(4) = 'total_mass ni56'
+      trace_history_value_name(5) = 'total_mass fe56'
+      trace_history_value_name(6) = 'fe_core_infall'
+      trace_history_value_name(7) = 'non_fe_core_infall'
+      trace_history_value_name(8) = 'rel_E_err'
+      trace_history_value_name(9) = 'log_rel_run_E_err'
+
+! FOR DEBUGGING
+
+      !photo_interval = 10
+      !profile_interval = 1
+      !history_interval = 1
+      terminal_interval = 1
+
+      x_integer_ctrl(1) = 6 ! inlist_part
+
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+
+Grid1_title = 'inlist_to_cc'
+
+TRho_logRho_min = 3.0 ! only used if /= -101d0
+TRho_logT_min = 8.5 ! only used if /= -101d0
+
+
+/ ! end of pgstar namelist

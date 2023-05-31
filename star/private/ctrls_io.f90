@@ -350,6 +350,7 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
+    drag_coefficient, min_q_for_drag, &
     retry_for_v_above_clight, &
 
     ! hydro solver
@@ -1855,6 +1856,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_log_max_boost = RTI_log_max_boost 
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
+
+ s% drag_coefficient = drag_coefficient
+ s% min_q_for_drag = min_q_for_drag
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -3519,6 +3523,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_log_max_boost = s% RTI_log_max_boost 
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
+
+
+ drag_coefficient = s% drag_coefficient
+ min_q_for_drag = s% min_q_for_drag
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
