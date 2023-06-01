@@ -10,6 +10,11 @@ Changes in main
 
 .. _Backwards-incompatible changes main:
 
+Changes in r23.05.1
+===================
+
+.. _Backwards-incompatible changes r23.05.1:
+
 Backwards-incompatible changes
 ------------------------------
 
@@ -114,7 +119,14 @@ species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
 *individually* to all isotopes of hydrogen, helium or metals,
 respectively.
 
-.. _New Features main:
+Colors
+~~~~~~
+
+The colors module now returns ``-1d99`` when asking for a value that is
+off table.
+
+
+.. _New Features r23.05.1:
 
 New Features
 ------------
@@ -173,6 +185,7 @@ Hooks
 
 A new other_close_gaps hook has been added. Provided by Simon Guichandut
 
+.. _Bug Fixes r23.05.1:
 
 Bug Fixes
 ---------
@@ -550,7 +563,7 @@ Then this means you are missing the ``use auto_diff`` statement.
 An example of using ``autodiff`` in a hook can be found at :ref:`autodiff example`
 
 
-.. _Module-level changes main:
+.. _Module-level changes r21.12.1:
 
 Module-level changes
 --------------------
@@ -795,7 +808,7 @@ ability to provide these unneeded and unused quantities has been
 removed.
 
 
-.. _Other changes main:
+.. _Other changes r21.12.1:
 
 Other changes
 -------------
@@ -1877,9 +1890,7 @@ Changes to atmospheres
 There has been a major overhaul of the atmosphere controls and related
 code.  This improves consistency between the atmosphere and interior
 calculations and offers more flexibility to users.  To learn more,
-please consult the user guide available at
-
-    http://mesa.sourceforge.net/assets/atm-user-guide.txt
+please consult the user guide available :download:`here <assets/atm-user-guide.txt>`.
 
 Changes to ``s% xtra`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

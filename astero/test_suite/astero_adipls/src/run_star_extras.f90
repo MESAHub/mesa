@@ -103,8 +103,8 @@
             l, order, freq, inertia, x, y, aa, data, nn, iy, iaa, ispcpr, ierr)
          integer, intent(in) :: l, order
          real(dp), intent(in) :: freq, inertia
-         real(dp), intent(in) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
          integer, intent(in) :: nn, iy, iaa, ispcpr
+         real(dp), intent(in) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
          integer, intent(out) :: ierr
          ierr = 0
          write(*,*) 'astero called my_other_adipls_mode_info'
