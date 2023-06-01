@@ -36,6 +36,9 @@
       when_to_stop_rtol = 1d-5
       when_to_stop_atol = 1d-4
 
+! prevent development of radial pulses during advanced burning
+      drag_coefficient = 1d0
+      min_q_for_drag = 0.8d0
 
 
       ! Extra output for to terminal

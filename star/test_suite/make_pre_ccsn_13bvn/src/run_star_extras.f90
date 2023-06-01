@@ -152,14 +152,19 @@
          if (ierr /= 0) return
          names(1) = 'log_total_drag_energy'
          vals(1) = 0
-         do k=1,s% nz
-            if (s% q(k) >= s% min_q_for_drag) then
-               vals(1) = s% FdotV_drag_energy(k) * s% dm(k) + vals(1)
-            else
-               vals(1) = vals(1)
-            end if
-         end do
-         vals(1) = log10(max(1d-40,abs(vals(1))))
+         if (s% v_flag) then
+            do k=1,s% nz
+               if (s% q(k) >= s% min_q_for_drag) then
+                  vals(1) = s% FdotV_drag_energy(k) * s% dm(k) + vals(1)
+               else
+                  vals(1) = vals(1)
+               end if
+            end do
+            vals(1) = log10(max(1d-40,abs(vals(1))))
+         else
+            vals(1) = 0d0
+         end if
+
       end subroutine data_for_extra_history_columns
 
       
@@ -191,11 +196,20 @@
          names(2) = 'dvdt_drag'
          names(3) = 'FdotV_drag_energy'
 
-         do k=1,s% nz
-            vals(k,1) = s% zbar(k)/s% abar(k)
-            vals(k,2) = s% dvdt_drag(k)
-            vals(k,3) = s% FdotV_drag_energy(k)
-         end do
+         if(s% v_flag) then
+            do k=1,s% nz
+               vals(k,1) = s% zbar(k)/s% abar(k)
+               vals(k,2) = s% dvdt_drag(k)
+               vals(k,3) = s% FdotV_drag_energy(k)
+            end do
+         else
+            do k=1,s% nz
+               vals(k,1) = s% zbar(k)/s% abar(k)
+               vals(k,2) = 0d0
+               vals(k,3) = 0d0
+            end do
+         end if
+
       end subroutine data_for_extra_profile_columns
       
  ! returns either keep_going or terminate.
@@ -254,9 +268,9 @@
             return
          end if
 
-         end subroutine extras_photo_read
+      end subroutine extras_photo_read
    
-         subroutine extras_photo_write(id, iounit)
+      subroutine extras_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
          integer :: ierr
          type (star_info), pointer :: s
@@ -267,7 +281,7 @@
    
          write(iounit) s% x_integer_ctrl(I_INLIST_PART)
    
-         end subroutine extras_photo_write
+      end subroutine extras_photo_write
 
-      end module run_star_extras
+   end module run_star_extras
       

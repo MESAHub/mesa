@@ -403,6 +403,7 @@
          
          accel_ad = 0d0
          drag = 0d0
+         s% dvdt_drag(1:s%nz) = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
@@ -426,7 +427,6 @@
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv
 
-            s% dvdt_drag(k) = 0
             if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
                v_00 = wrap_v_00(s,k)
                drag = -s% drag_coefficient*v_00/s% dt
