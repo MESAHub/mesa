@@ -167,7 +167,7 @@
          
       ! on composition changes
       dX_nuc_drop_limit = 5d-2 
-      dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
+      dX_nuc_drop_limit_at_high_T = 5d-2 ! for center logT > 9.45
       dX_nuc_drop_max_A_limit = 52
       dX_nuc_drop_min_X_limit = 1d-4
       dX_nuc_drop_hard_limit = 1d99
