@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.0.0
+        uses: actions/checkout@v3.0.0
         with:
           lfs: true
       - name: Checkout LFS objects
@@ -26,28 +26,28 @@ jobs:
           sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
         shell: bash
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         id: cache
         with:
           path: |
             mesasdk-x86_64-linux-${{matrix.sdk}}.tar.gz
-          key: ${{ runner.os }}-${{ hashFiles('mesasdk-x86_64-linux-${{matrix.sdk}}.tar.gz') }}
+          key: ${{ runner.os }}-${{matrix.sdk}}
 
 
-      - name: Get SDK ${{ runner.os }} ${{matrix.sdk}}
-        if: steps.cache.outputs.cache-hit != 'true' and ${{matrix.sdk}} == '20.12.1'
+      - name: Get SDK ${{ runner.os }} '20.12.1'
+        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '20.12.1'
         run: |
             wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
         shell: bash
 
-      - name: Get SDK ${{ runner.os }} ${{matrix.sdk}}
-        if: steps.cache.outputs.cache-hit != 'true' and ${{matrix.sdk}} == '21.4.1'
+      - name: Get SDK ${{ runner.os }} '21.4.1'
+        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '21.4.1'
         run: |
             wget -q https://zenodo.org/record/5802444/files/mesasdk-x86_64-linux-21.4.1.tar.gz
         shell: bash
 
-      - name: Get SDK ${{ runner.os }} ${{matrix.sdk}}
-        if: steps.cache.outputs.cache-hit != 'true' and ${{matrix.sdk}} == '22.6.1'
+      - name: Get SDK ${{ runner.os }} '22.6.1'
+        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '22.6.1'
         run: |
             wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
         shell: bash
