@@ -36,9 +36,6 @@
          ! s% how_many_other_mesh_fcns => how_many_my_other_mesh_fcns
          ! s% other_mesh_fcn_data => my_other_mesh_fcn_data
 
-      use star_def
-      use math_lib
-
       implicit none
       
             
@@ -75,6 +72,8 @@
       
       subroutine other_mesh_fcn_data( &
             id, nfcns, names, gval_is_xa_function, vals1, ierr)
+         use star_def
+         use math_lib
          integer, intent(in) :: id
          integer, intent(in) :: nfcns
          character (len=*) :: names(:)

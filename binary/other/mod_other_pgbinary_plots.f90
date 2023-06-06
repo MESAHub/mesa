@@ -32,8 +32,6 @@ module mod_other_pgbinary_plots
 
    ! see star/other/sample_pgbinary_plot.f90
 
-   use binary_def
-
    implicit none
 
 
@@ -42,6 +40,7 @@ contains
 
    ! default does nothing
    subroutine null_other_pgbinary_plots_info(id, ierr)
+      use binary_def
       integer, intent(in) :: id
       integer, intent(out) :: ierr
       ierr = 0
