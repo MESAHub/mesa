@@ -35,19 +35,19 @@ jobs:
 
 
       - name: Get SDK ${{ runner.os }} '20.12.1'
-        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '20.12.1'
+        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk  == '20.12.1') }}
         run: |
             wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
         shell: bash
 
       - name: Get SDK ${{ runner.os }} '21.4.1'
-        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '21.4.1'
+        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '21.4.1') }}
         run: |
             wget -q https://zenodo.org/record/5802444/files/mesasdk-x86_64-linux-21.4.1.tar.gz
         shell: bash
 
       - name: Get SDK ${{ runner.os }} '22.6.1'
-        if: steps.cache.outputs.cache-hit != 'true' && ${{matrix.sdk}} == '22.6.1'
+        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk ==  '22.6.1') }}
         run: |
             wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
         shell: bash
