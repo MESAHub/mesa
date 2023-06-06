@@ -51,6 +51,7 @@
       
       subroutine null_other_mesh_fcn_data( &
             id, nfcns, names, gval_is_xa_function, vals1, ierr)
+         use const_def
          integer, intent(in) :: id
          integer, intent(in) :: nfcns
          character (len=*) :: names(:)
@@ -74,6 +75,7 @@
             id, nfcns, names, gval_is_xa_function, vals1, ierr)
          use star_def
          use math_lib
+         use const_def
          integer, intent(in) :: id
          integer, intent(in) :: nfcns
          character (len=*) :: names(:)
