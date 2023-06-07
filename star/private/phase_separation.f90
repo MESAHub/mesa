@@ -163,28 +163,21 @@
       end subroutine do_2component_phase_separation
 
       subroutine do_distillation(s, dt, ierr)
-         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
+         use chem_def, only: chem_isos, ine22
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: Gamma_melt, GammaC_melt, GammaC, &
-              XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num, &
-              max_distill_q, eps_tmp, L_distill, L_max
-         integer :: k, kk, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones, iter
-         logical :: save_Skye_use_ion_offsets, distilling, distilled, done_crystallizing
+         real(dp) :: eps_tmp, L_distill, L_max, save_boundary_mass, &
+              retry_scale_factor, scale_factor_low, scale_factor_high
+         real(dp) :: xa_save(s%species,s%nz)
+         integer :: k, iter, net_ine22
+         logical :: save_Skye_use_ion_offsets
 
-         max_distill_q = 0.2
-         distill_final_XNe = 0.3143d0
-         
          s% eps_phase_separation(1:s%nz) = 0d0
 
-         net_ic12 = s% net_iso(ic12)
-         net_io16 = s% net_iso(io16)
-         net_ine20 = s% net_iso(ine20)
          net_ine22 = s% net_iso(ine22)
-
          if(net_ine22 < 0) then
             write(*,*) 'distillation requires ne22 be included in net'
             stop
@@ -200,8 +193,89 @@
          call update_model_(s,1,s%nz,.false.)
          do k=1,s% nz
             s% eps_phase_separation(k) = s% energy(k)
+            xa_save(:,k) = s% xa(:,k)
+         end do
+         save_boundary_mass = s% crystal_core_boundary_mass
+
+         call distill_loop(s,1d0)
+         
+         ! checking luminosity
+         L_max = s% L_phot * Lsun
+         L_distill = 0d0
+         do k = 1, s% nz
+            eps_tmp = (s% eps_phase_separation(k) - s% energy(k)) / dt
+            L_distill = L_distill + eps_tmp*s% dm(k)
          end do
 
+         ! TODO: get rid of this
+         print *, "distill iter, scale_factor, Lum_ratio", 0, 1d0, L_distill/L_max
+         
+         if(L_distill > L_max) then
+            ! reset model and try again with scale_factor for changes
+            retry_scale_factor = L_max/L_distill
+            scale_factor_high = 1d0
+            
+            iter = 0
+            do while((L_distill < 0.9d0*L_max .or. L_distill > L_max) .and. iter < 20)
+               iter = iter + 1
+               
+               ! reset model
+               s% crystal_core_boundary_mass = save_boundary_mass
+               s% xa(:,:) = xa_save(:,:)
+               call update_model_(s,1,s%nz,.true.)
+
+               call distill_loop(s,retry_scale_factor)
+
+               L_distill = 0d0
+               do k = 1, s% nz
+                  eps_tmp = (s% eps_phase_separation(k) - s% energy(k)) / dt
+                  L_distill = L_distill + eps_tmp*s% dm(k)
+               end do
+               print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
+
+               ! first try simple bisection for now
+               if(L_distill < 0.9d0*L_max) then
+                  ! need to try a larger scale factor
+                  scale_factor_low = retry_scale_factor
+                  retry_scale_factor = 0.5d0*(retry_scale_factor + scale_factor_high)
+               else
+                  scale_factor_high = retry_scale_factor
+                  retry_scale_factor = 0.5d0*(retry_scale_factor + scale_factor_low)
+               end if
+            end do
+            print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
+         end if
+         
+         call update_model_(s,1,s%nz,.false.)
+         
+         ! phase separation heating term for use by energy equation
+         do k=1,s% nz
+            s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+         end do
+         s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
+         s% need_to_setvars = .true.
+         
+         ierr = 0
+      end subroutine do_distillation
+
+      subroutine distill_loop(s,scale_factor)
+         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
+         use chem_lib, only: chem_get_iso_id
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: scale_factor
+         
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC, &
+              XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num
+         integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
+         logical :: distilling
+
+         distill_final_XNe = 0.3143d0
+         
+         net_ic12 = s% net_iso(ic12)
+         net_io16 = s% net_iso(io16)
+         net_ine20 = s% net_iso(ine20)
+         net_ine22 = s% net_iso(ine22)
+         
          pad = s% min_dq * s% m(1) * 0.5d0
          do k = s%nz,1,-1
             if(s% m(k) > s% crystal_core_boundary_mass + pad) then
@@ -210,32 +284,13 @@
             end if
          end do
 
-         do k = s%nz,1,-1
-            if(s% q(k) - s% q(kstart) > max_distill_q ) then
-               kend = k
-               exit
-            end if
-         end do
-
          distilling = .false.
-         done_crystallizing = .false.
-         L_distill = 0d0
-         L_max = 0.98d0 * s% L_phot * Lsun
-         iter = 0
-         
-         do while(L_distill < L_max .and. (.not. done_crystallizing) .and. iter < 30)
-            ! TODO: might not need this do while, iter construction now that distillation
-            ! is more gradual function of temperature.
-            iter = iter+1
-            ! TODO: indent below
-            distilled = .false.
-         do k = kstart, kend, -1
+         do k = kstart, 1, -1
             XC = s% xa(net_ic12,k)
             XO = s% xa(net_io16,k)
             XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
             XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-            if(XC + XO + XNe < 0.9d0 .and. k == kstart) then
-               done_crystallizing = .true.
+            if(XC + XO + XNe < 0.9d0) then
                exit
             end if
 
@@ -264,7 +319,6 @@
                  XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
-               distilled = .true.
                
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
                ! Once distillation starts in a zone, it stays liquid and continues
@@ -272,7 +326,7 @@
                ! if (XNe < distill_final_XNe .and. & ! redundant?
                !     L_distill < L_max .and. & ! redundant?
                !     XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
-                  call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,L_distill)
+                  call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1, 3)
                   XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -296,48 +350,20 @@
                   call mix_outward(s, k-1, 2)
                   print *, "doing C/O phase sep and setting crystal_core_boundary_mass in zone", k
                   s% crystal_core_boundary_mass = s% m(k)
-                  done_crystallizing = .true.
                end if
-            end if
-
-            ! checking if we've reached a luminosity comparable to the star
-            L_distill = 0d0
-            do kk = 1, s% nz
-               eps_tmp = (s% eps_phase_separation(kk) - s% energy(kk)) / dt
-               L_distill = L_distill + eps_tmp*s% dm(kk)
-            end do
-            if(L_distill >= L_max) then
-               ! enough phase separation / distillation luminosity for this step, leave loop
-               print *, "reached lumionsity of the star in distillation loop"
-               print *, "L_distill, L_WD, ratio = ", L_distill/Lsun, s% L_phot, L_distill/(s% L_phot*Lsun)
+            else if (GammaC < GammaC_melt) then
+               ! print *, "exiting distill loop at q =", s% q(k), k
                exit
             end if
-
          end do
-         if (.not. distilled) then
-            ! went through whole inner loop without doing any distillation, so break out of do while
-            done_crystallizing = .true.
-         end if
-         end do
-         
-         call update_model_(s,1,s%nz,.false.)
-         
-         ! phase separation heating term for use by energy equation
-         do k=1,s% nz
-            s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
-         end do
-         s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
-         s% need_to_setvars = .true.
-         
-         ierr = 0
-      end subroutine do_distillation
-
-      subroutine distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,L_distill)
+      end subroutine distill_loop
+      
+      subroutine distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
-        real(dp), intent(in) :: XNe_crit, distill_final_XNe, GammaC, GammaC_melt, L_distill
+        real(dp), intent(in) :: XNe_crit, distill_final_XNe, GammaC, GammaC_melt, scale_factor
         
         real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum, target_XNe
         real(dp) :: Delta_XC, Delta_XO, Delta_XNe, max_Delta_XC, max_Delta_XO, max_Delta_XNe
@@ -371,17 +397,6 @@
            return
         end if
 
-        ! First calculate how much XNe can change due to energy considerations,
-        ! want rough energy for change in the zone not to exceed luminosity of the star.
-        ! Rough luminosity is given by change in gravitational binding energy of moving
-        ! the neutron excess from distilling element into zone k,
-        ! with 2 as neutron excess of 22Ne, and 22 its atomic mass.
-        Lmax = max(s%L_phot*Lsun - L_distill, Lsun*1d-5)
-        delta_binding_energy = abs(s%grav(k) * s% r(k) - s% grav(1) * s% r(1)) ! specific binding energy change to move from surface into zone k
-        ! L_distill tracks luminosity already provided in previous loop iterations for this step
-        max_Delta_XNe = Lmax * s%dt / ((2d0/22d0) * delta_binding_energy * s%dm(k))
-        ! print *, "Max Delta XNe for luminosity", max_Delta_XNe
-        
         ! Net effect of distillation is that crystals enriched in oxygen float upward.
         ! Need to limit toward xNe = 0.2, xC = 0.8. Start by pushing O outward in exchange
         ! for C/Ne mixture until O is depleted. Then exchange C/Ne until reaching critical
@@ -396,15 +411,14 @@
         ! Which element will limit the size of composition step.
         ! C and Ne need to increase, so check how much is available in next zone out
         max_Delta_XC = min(Delta_XC,XC_out/dq_ratio)
-        max_Delta_XNe = min(max_Delta_XNe,Delta_XNe,XNe_out/dq_ratio,target_XNe-XNe)
-        ! max_Delta_XNe = min(Delta_XNe,XNe_out/dq_ratio,target_XNe-XNe)
+        max_Delta_XNe = min(Delta_XNe,XNe_out/dq_ratio,target_XNe-XNe)
 
         ! O needs to go to zero by getting pushed into next zone out,
         ! so check how much next zone out can accept
         max_Delta_XO = min(XO,(1d0-XO_out)/dq_ratio)
 
-        ! check which gives the smallest scale factor
-        scale = min(max_Delta_XC/Delta_XC, max_Delta_XO/XO, max_Delta_XNe/Delta_XNe)
+        ! check which gives the smallest scale factor, and possibly scale downward further by input scale_factor
+        scale = scale_factor*min(max_Delta_XC/Delta_XC, max_Delta_XO/XO, max_Delta_XNe/Delta_XNe)
 
         ! Now rescale all changes to the same scale factor
         dXC = scale*Delta_XC
