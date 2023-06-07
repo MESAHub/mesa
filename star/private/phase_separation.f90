@@ -213,6 +213,7 @@
          if(L_distill > L_max) then
             ! reset model and try again with scale_factor for changes
             retry_scale_factor = L_max/L_distill
+            scale_factor_low = 0d0
             scale_factor_high = 1d0
             
             iter = 0
@@ -221,6 +222,7 @@
                
                ! reset model
                s% crystal_core_boundary_mass = save_boundary_mass
+               s% phase_sep_mixing_mass = -1d0
                s% xa(:,:) = xa_save(:,:)
                call update_model_(s,1,s%nz,.true.)
 
@@ -233,7 +235,7 @@
                end do
                print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
 
-               ! first try simple bisection for now
+               ! simple bisection seems to work
                if(L_distill < 0.9d0*L_max) then
                   ! need to try a larger scale factor
                   scale_factor_low = retry_scale_factor
@@ -344,6 +346,8 @@
                ! also check that we're done with everything inward from this point
                if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                   ! zone won't distill, but is ready to phase separate C/O
+                  ! TODO: not currently responsive to scale_factor on this branch, so need to update
+                  ! to avoid lots of useless iterations
                   call move_one_zone_for_distill(s,k)
                   ! crystallized out to k now, liquid starts at k-1.
                   ! now mix the liquid material outward until stably stratified
