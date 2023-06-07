@@ -170,7 +170,7 @@
          integer, intent(out) :: ierr
          
          real(dp) :: Gamma_melt, GammaC_melt, GammaC, &
-              XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, &
+              XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num, &
               max_distill_q, eps_tmp, L_distill, L_max
          integer :: k, kk, kstart, kend, net_ic12, net_io16, net_ine20, net_ine22, max_distill_zones, iter
          logical :: save_Skye_use_ion_offsets, distilling, distilled, done_crystallizing
@@ -236,10 +236,23 @@
                done_crystallizing = .true.
                exit
             end if
+
+            ! some number fractions for expressions from Simon
+            xne_num = XNe*s% abar(k)/22d0 ! assumes 22Ne is dominant isotope for this conversion
+            xo_num = XO*s% abar(k)/16d0
             
             ! Check whether we are in a regime where distillation should occur
             Gamma_melt = blouin_Gamma_melt_CO(XO)
             GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
+
+            ! Can't use this corrected freezing temperature until make the logic
+            ! more sophisticated and incoporate trajectory toward final freezing point
+            ! for zones once they start distilling.
+            ! This is only limit in the limit of xne << xco to test where distillation STARTS
+            !GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
+            !     + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
+            !     - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
+            !     + 2408.44d0*xne_num*xo_num*xo_num*xo_num
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
             XNe_crit = blouin_XNe_crit(GammaC_melt)
             
@@ -275,7 +288,7 @@
                ! also check that we're done with everything inward from this point
                if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                   ! zone won't distill, but is ready to phase separate C/O
-                  call move_one_zone(s,k,'CO')
+                  call move_one_zone_for_distill(s,k)
                   ! crystallized out to k now, liquid starts at k-1.
                   ! now mix the liquid material outward until stably stratified
                   call mix_outward(s, k-1, 2)
@@ -494,6 +507,76 @@
         call update_model_(s,k-1,s%nz,.true.)
         
       end subroutine move_one_zone
+
+      subroutine move_one_zone_for_distill(s,k)
+        use chem_def, only: chem_isos, ic12, io16, ine20, ine22
+        use chem_lib, only: chem_get_iso_id
+        type(star_info), pointer :: s
+        integer, intent(in) :: k
+        
+        real(dp) :: XC, XO, XNe, dXC, dXO, dXNe, dXNe20, dXNe22, Xfac, Xnew
+        real(dp) :: xo_num, xne_num, dxo_num, dxne_num, abar_new
+        integer :: net_ic12, net_io16, net_ine20, net_ine22
+        
+        net_ic12 = s% net_iso(ic12)
+        net_io16 = s% net_iso(io16)
+        net_ine20 = s% net_iso(ine20)
+        net_ine22 = s% net_iso(ine22)
+        
+        XC = s% xa(net_ic12,k)
+        XO = s% xa(net_io16,k)
+        XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+
+        ! rescale to C + O + Ne = 1
+        Xfac = XO + XC + XNe
+        XC = XC/Xfac
+        XO = XO/Xfac
+        XNe = XNe/Xfac
+           
+        xo_num = XO*s% abar(k)/16d0
+        xne_num = XNe*s% abar(k)/22d0 ! assumes 22Ne is dominant isotope for this conversion
+
+        ! change in number fractions
+        dxo_num = blouin_delta_xo_3component(xo_num,xne_num)
+        dxne_num = blouin_delta_xne_3component(xo_num,xne_num) ! this is <=0 by construction
+
+        ! convert changes to mass fractions
+        abar_new = &
+             16d0*(xo_num + dxo_num) + &
+             22d0*(xne_num + dxne_num) + &
+             12d0*(1d0 - xo_num - dxo_num - xne_num - dxne_num)
+        Xnew = 16d0*(xo_num + dxo_num)/abar_new ! placeholder for oxygen
+        dXO = Xnew - XO
+        Xnew = 22d0*(xne_num + dxne_num)/abar_new ! placeholder for neon
+        dXNe = XNew - XNe
+        dXC = -dXO -dXNe
+
+        ! allot change in isotopes proportionally
+        dXNe20 = dXNe*s% xa(net_ine20,k)/(XNe*Xfac)
+        dXNe22 = dXNe*s% xa(net_ine22,k)/(XNe*Xfac)
+
+        ! adjust mass fractions in the MESA model
+        s% xa(net_ic12,k) = Xfac*(XC + dXC)
+        s% xa(net_io16,k) = Xfac*(XO + dXO)
+        s% xa(net_ine20,k) = Xfac*(s% xa(net_ine20,k) + dXNe20)
+        s% xa(net_ine22,k) = Xfac*(s% xa(net_ine22,k) + dXNe22)
+        
+        ! Redistribute change in C,O,Ne into zone k-1, conserving total mass of C,O,Ne
+        s% xa(net_ic12,k-1) = s% xa(net_ic12,k-1) - Xfac*dXC * s% dq(k) / s% dq(k-1)
+        s% xa(net_io16,k-1) = s% xa(net_io16,k-1) - Xfac*dXO * s% dq(k) / s% dq(k-1)
+        s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - Xfac*dXNe20 * s% dq(k) / s% dq(k-1)
+        s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - Xfac*dXNe22 * s% dq(k) / s% dq(k-1)
+
+        print *, "move one zone for distill"
+        print *, "abundances in zone", k, s% xa(net_ic12,k), s% xa(net_io16,k), s% xa(net_ine20,k), s% xa(net_ine22,k)
+        print *, "abundances in zone", k-1, s% xa(net_ic12,k-1), s% xa(net_io16,k-1), s% xa(net_ine20,k-1), s% xa(net_ine22,k-1)
+        print *, "dXC, dXO, dXNe", dXC, dXO, dXNe
+        print *, "dq ratio (k-1/k)", s%dq(k-1)/s%dq(k)
+        
+        call update_model_(s,k-1,s%nz,.true.)
+        
+      end subroutine move_one_zone_for_distill
+
       
       ! mix composition outward until reaching stable composition profile
       subroutine mix_outward(s,kbot,min_mix_zones)
@@ -644,6 +727,32 @@
         blouin_delta_xne = Xnew - Xin
       end function blouin_delta_xne
 
+      real(dp) function blouin_delta_xo_3component(xo,xne)
+        real(dp), intent(in) :: xo, xne ! number fractions
+        real(dp) :: a0, a1, a2, a3, a4, a5
+
+        a0 = 0d0
+        a1 = -0.311540d0
+        a2 = 2.114743d0
+        a3 = -1.661095d0
+        a4 = -1.406005d0
+        a5 = 1.263897d0
+
+        blouin_delta_xo_3component = &
+             (a0 + 0.640125d0*xne) + &
+             (a1 + 2.218484d0*xne)*xo + &
+             (a2 - 4.599227d0*xne)*xo*xo + &
+             a3*xo*xo*xo + &
+             a4*xo*xo*xo*xo + &
+             a5*xo*xo*xo*xo*xo
+        
+      end function blouin_delta_xo_3component
+
+      real(dp) function blouin_delta_xne_3component(xo,xne)
+        real(dp), intent(in) :: xo, xne ! number fractions
+        blouin_delta_xne_3component = min(0d0,-0.611587d0*xne + 0.782489d0*xne*xo)
+      end function blouin_delta_xne_3component
+      
       real(dp) function blouin_XNe_crit(GammaC)
         real(dp), intent(in) :: GammaC ! Carbon coupling
         real(dp) :: XNe1, XNe2, GammaC1, GammaC2, XNe_crit
