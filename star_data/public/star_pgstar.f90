@@ -189,6 +189,8 @@ module star_pgstar
    integer, parameter :: max_num_cols_Text_Summary = 20
    integer, parameter :: max_num_profile_mass_points = 10
 
+   integer, parameter :: pgstar_array_length = 9
+
 
    ! some Tioga colors for pgstar
    integer :: clr_Black
