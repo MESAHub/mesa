@@ -224,6 +224,8 @@
          iter = 0
          
          do while(L_distill < L_max .and. (.not. done_crystallizing) .and. iter < 30)
+            ! TODO: might not need this do while, iter construction now that distillation
+            ! is more gradual function of temperature.
             iter = iter+1
             ! TODO: indent below
             distilled = .false.
@@ -270,7 +272,7 @@
                ! if (XNe < distill_final_XNe .and. & ! redundant?
                !     L_distill < L_max .and. & ! redundant?
                !     XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
-                  call distill_at_boundary(s,k,distill_final_XNe,L_distill)
+                  call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,L_distill)
                   ! mix from zone k-1 outward
                   call mix_outward(s, k-1, 3)
                   XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -330,14 +332,14 @@
          ierr = 0
       end subroutine do_distillation
 
-      subroutine distill_at_boundary(s,k,distill_final_XNe,L_distill)
+      subroutine distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,L_distill)
         use chem_def, only: chem_isos, ic12, io16, ine20, ine22
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
-        real(dp), intent(in) :: distill_final_XNe, L_distill
+        real(dp), intent(in) :: XNe_crit, distill_final_XNe, GammaC, GammaC_melt, L_distill
         
-        real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum
+        real(dp) :: XC, XO, XNe, XC_out, XO_out, XNe_out, Xout_sum, target_XNe
         real(dp) :: Delta_XC, Delta_XO, Delta_XNe, max_Delta_XC, max_Delta_XO, max_Delta_XNe
         real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio, scale
         real(dp) :: delta_binding_energy, Lmax
@@ -360,6 +362,15 @@
         XO_out = s% xa(net_io16,k-1)
         XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
 
+        ! distillation not complete until GammaC = 208,
+        ! so draw a line between start of distillation and GammaC = 208, XNe = distill_final_XNe,
+        ! only go as far along that line as current GammaC allows.
+        target_XNe = XNe_crit + (distill_final_XNe - XNe_crit + 1d-5)*(GammaC - GammaC_melt)/(208d0 - GammaC_melt)
+        if(XNe >= target_XNe) then
+           ! not cool enough to continue distillation yet
+           return
+        end if
+
         ! First calculate how much XNe can change due to energy considerations,
         ! want rough energy for change in the zone not to exceed luminosity of the star.
         ! Rough luminosity is given by change in gravitational binding energy of moving
@@ -369,7 +380,7 @@
         delta_binding_energy = abs(s%grav(k) * s% r(k) - s% grav(1) * s% r(1)) ! specific binding energy change to move from surface into zone k
         ! L_distill tracks luminosity already provided in previous loop iterations for this step
         max_Delta_XNe = Lmax * s%dt / ((2d0/22d0) * delta_binding_energy * s%dm(k))
-        print *, "Max Delta XNe for luminosity", max_Delta_XNe
+        ! print *, "Max Delta XNe for luminosity", max_Delta_XNe
         
         ! Net effect of distillation is that crystals enriched in oxygen float upward.
         ! Need to limit toward xNe = 0.2, xC = 0.8. Start by pushing O outward in exchange
@@ -379,14 +390,14 @@
         ! start by calculating difference between zone composition (XC,XO,XNe)
         ! and target compostion ~(1-distill_final_XNe,0,distill_final_XNe) (not accounting for trace impurities)
         Delta_XO = -XO ! get rid of all O
-        Delta_XNe = distill_final_XNe - XNe ! reach target Ne fraction
+        Delta_XNe = distill_final_XNe - XNe + 1d-5 ! reach target Ne fraction (with some pad to alleviate roundoff error)
         Delta_XC = XO - Delta_XNe ! All O that doesn't become Ne must become C
         
         ! Which element will limit the size of composition step.
         ! C and Ne need to increase, so check how much is available in next zone out
         max_Delta_XC = min(Delta_XC,XC_out/dq_ratio)
-        max_Delta_XNe = min(max_Delta_XNe,Delta_XNe,XNe_out/dq_ratio)
-        ! max_Delta_XNe = min(3d-3,Delta_XNe,XNe_out/dq_ratio)
+        max_Delta_XNe = min(max_Delta_XNe,Delta_XNe,XNe_out/dq_ratio,target_XNe-XNe)
+        ! max_Delta_XNe = min(Delta_XNe,XNe_out/dq_ratio,target_XNe-XNe)
 
         ! O needs to go to zero by getting pushed into next zone out,
         ! so check how much next zone out can accept
