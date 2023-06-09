@@ -144,9 +144,7 @@ contains
       use pgstar_summary_burn, only : summary_burn_plot
       use pgstar_summary_profile, only : summary_profile_plot
       use pgstar_summary_history, only : summary_history_plot
-      use pgstar_grid, only : &
-         grid1_plot, grid2_plot, grid3_plot, grid4_plot, &
-         grid5_plot, grid6_plot, grid7_plot, grid8_plot, grid9_plot
+      use pgstar_grid, only : grid_plot
       use pgstar_summary, only : &
          Text_Summary1_Plot, Text_Summary2_Plot, Text_Summary3_Plot, &
          Text_Summary4_Plot, Text_Summary5_Plot, Text_Summary6_Plot, &

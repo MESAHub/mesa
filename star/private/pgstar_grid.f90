@@ -35,8 +35,8 @@ module pgstar_grid
 contains
 
 
-   subroutine grid1_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
+   subroutine grid_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
       ierr = 0
@@ -47,469 +47,49 @@ contains
       call pgbbuf()
       call pgeras()
 
-      call do_grid1_plot(s, id, device_id, &
-         s% pg% Grid1_xleft, s% pg% Grid1_xright, &
-         s% pg% Grid1_ybot, s% pg% Grid1_ytop, .false., s% pg% Grid1_title, &
-         s% pg% Grid1_txt_scale_factor, ierr)
+      call do_grid_plot(s, id, device_id, array_ix, &
+         s% pg% Grid_xleft(array_ix), s% pg% Grid_xright(array_ix), &
+         s% pg% Grid_ybot(array_ix), s% pg% Grid_ytop(array_ix), .false., &
+         s% pg% Grid_title(array_ix), s% pg% Grid_txt_scale_factor(array_ix), &
+         ierr)
 
       call pgebuf()
-   end subroutine grid1_plot
+   end subroutine grid_plot
 
-   subroutine do_grid1_plot(s, id, device_id, &
+   subroutine do_grid_plot(s, id, device_id, array_ix, &
       winxmin, winxmax, winymin, winymax, subplot, title, &
       txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
+      integer, intent(in) :: id, device_id, array_ix
       real, intent(in) :: winxmin, winxmax, winymin, winymax
       real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
+
       ierr = 0
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
+      call do_one_Grid_plot(s, id, device_id, array_ix, &
          winxmin, winxmax, winymin, winymax, subplot, title, &
          txt_scale_factor, &
-         s% pg% Grid1_num_cols, &
-         s% pg% Grid1_num_rows, &
-         s% pg% Grid1_num_plots, &
-         s% pg% Grid1_plot_name, &
-         s% pg% Grid1_plot_row, &
-         s% pg% Grid1_plot_rowspan, &
-         s% pg% Grid1_plot_col, &
-         s% pg% Grid1_plot_colspan, &
-         s% pg% Grid1_plot_pad_left, &
-         s% pg% Grid1_plot_pad_right, &
-         s% pg% Grid1_plot_pad_top, &
-         s% pg% Grid1_plot_pad_bot, &
+         s% pg% Grid_num_cols(array_ix), &
+         s% pg% Grid_num_rows(array_ix), &
+         s% pg% Grid_num_plots(array_ix), &
+         s% pg% Grid_plot_name(array_ix), &
+         s% pg% Grid_plot_row(array_ix), &
+         s% pg% Grid_plot_rowspan(array_ix), &
+         s% pg% Grid_plot_col(array_ix), &
+         s% pg% Grid_plot_colspan(array_ix), &
+         s% pg% Grid_plot_pad_left(array_ix), &
+         s% pg% Grid_plot_pad_right(array_ix), &
+         s% pg% Grid_plot_pad_top(array_ix), &
+         s% pg% Grid_plot_pad_bot(array_ix), &
          ierr)
-   end subroutine do_grid1_plot
-
-   subroutine grid2_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid2_plot(s, id, device_id, &
-         s% pg% Grid2_xleft, s% pg% Grid2_xright, &
-         s% pg% Grid2_ybot, s% pg% Grid2_ytop, .false., s% pg% Grid2_title, &
-         s% pg% Grid2_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid2_plot
+   end subroutine do_grid_plot
 
 
-   subroutine do_grid2_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid2_num_cols, &
-         s% pg% Grid2_num_rows, &
-         s% pg% Grid2_num_plots, &
-         s% pg% Grid2_plot_name, &
-         s% pg% Grid2_plot_row, &
-         s% pg% Grid2_plot_rowspan, &
-         s% pg% Grid2_plot_col, &
-         s% pg% Grid2_plot_colspan, &
-         s% pg% Grid2_plot_pad_left, &
-         s% pg% Grid2_plot_pad_right, &
-         s% pg% Grid2_plot_pad_top, &
-         s% pg% Grid2_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid2_plot
-
-
-   subroutine grid3_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid3_plot(s, id, device_id, &
-         s% pg% Grid3_xleft, s% pg% Grid3_xright, &
-         s% pg% Grid3_ybot, s% pg% Grid3_ytop, .false., s% pg% Grid3_title, &
-         s% pg% Grid3_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid3_plot
-
-
-   subroutine do_grid3_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid3_num_cols, &
-         s% pg% Grid3_num_rows, &
-         s% pg% Grid3_num_plots, &
-         s% pg% Grid3_plot_name, &
-         s% pg% Grid3_plot_row, &
-         s% pg% Grid3_plot_rowspan, &
-         s% pg% Grid3_plot_col, &
-         s% pg% Grid3_plot_colspan, &
-         s% pg% Grid3_plot_pad_left, &
-         s% pg% Grid3_plot_pad_right, &
-         s% pg% Grid3_plot_pad_top, &
-         s% pg% Grid3_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid3_plot
-
-
-   subroutine grid4_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid4_plot(s, id, device_id, &
-         s% pg% Grid4_xleft, s% pg% Grid4_xright, &
-         s% pg% Grid4_ybot, s% pg% Grid4_ytop, .false., s% pg% Grid4_title, &
-         s% pg% Grid4_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid4_plot
-
-
-   subroutine do_grid4_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid4_num_cols, &
-         s% pg% Grid4_num_rows, &
-         s% pg% Grid4_num_plots, &
-         s% pg% Grid4_plot_name, &
-         s% pg% Grid4_plot_row, &
-         s% pg% Grid4_plot_rowspan, &
-         s% pg% Grid4_plot_col, &
-         s% pg% Grid4_plot_colspan, &
-         s% pg% Grid4_plot_pad_left, &
-         s% pg% Grid4_plot_pad_right, &
-         s% pg% Grid4_plot_pad_top, &
-         s% pg% Grid4_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid4_plot
-
-
-   subroutine grid5_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid5_plot(s, id, device_id, &
-         s% pg% Grid5_xleft, s% pg% Grid5_xright, &
-         s% pg% Grid5_ybot, s% pg% Grid5_ytop, .false., s% pg% Grid5_title, &
-         s% pg% Grid5_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid5_plot
-
-
-   subroutine do_grid5_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid5_num_cols, &
-         s% pg% Grid5_num_rows, &
-         s% pg% Grid5_num_plots, &
-         s% pg% Grid5_plot_name, &
-         s% pg% Grid5_plot_row, &
-         s% pg% Grid5_plot_rowspan, &
-         s% pg% Grid5_plot_col, &
-         s% pg% Grid5_plot_colspan, &
-         s% pg% Grid5_plot_pad_left, &
-         s% pg% Grid5_plot_pad_right, &
-         s% pg% Grid5_plot_pad_top, &
-         s% pg% Grid5_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid5_plot
-
-
-   subroutine grid6_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid6_plot(s, id, device_id, &
-         s% pg% Grid6_xleft, s% pg% Grid6_xright, &
-         s% pg% Grid6_ybot, s% pg% Grid6_ytop, .false., s% pg% Grid6_title, &
-         s% pg% Grid6_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid6_plot
-
-
-   subroutine do_grid6_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid6_num_cols, &
-         s% pg% Grid6_num_rows, &
-         s% pg% Grid6_num_plots, &
-         s% pg% Grid6_plot_name, &
-         s% pg% Grid6_plot_row, &
-         s% pg% Grid6_plot_rowspan, &
-         s% pg% Grid6_plot_col, &
-         s% pg% Grid6_plot_colspan, &
-         s% pg% Grid6_plot_pad_left, &
-         s% pg% Grid6_plot_pad_right, &
-         s% pg% Grid6_plot_pad_top, &
-         s% pg% Grid6_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid6_plot
-
-
-   subroutine grid7_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid7_plot(s, id, device_id, &
-         s% pg% Grid7_xleft, s% pg% Grid7_xright, &
-         s% pg% Grid7_ybot, s% pg% Grid7_ytop, .false., s% pg% Grid7_title, &
-         s% pg% Grid7_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid7_plot
-
-
-   subroutine do_grid7_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid7_num_cols, &
-         s% pg% Grid7_num_rows, &
-         s% pg% Grid7_num_plots, &
-         s% pg% Grid7_plot_name, &
-         s% pg% Grid7_plot_row, &
-         s% pg% Grid7_plot_rowspan, &
-         s% pg% Grid7_plot_col, &
-         s% pg% Grid7_plot_colspan, &
-         s% pg% Grid7_plot_pad_left, &
-         s% pg% Grid7_plot_pad_right, &
-         s% pg% Grid7_plot_pad_top, &
-         s% pg% Grid7_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid7_plot
-
-
-   subroutine grid8_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid8_plot(s, id, device_id, &
-         s% pg% Grid8_xleft, s% pg% Grid8_xright, &
-         s% pg% Grid8_ybot, s% pg% Grid8_ytop, .false., s% pg% Grid8_title, &
-         s% pg% Grid8_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid8_plot
-
-
-   subroutine do_grid8_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid8_num_cols, &
-         s% pg% Grid8_num_rows, &
-         s% pg% Grid8_num_plots, &
-         s% pg% Grid8_plot_name, &
-         s% pg% Grid8_plot_row, &
-         s% pg% Grid8_plot_rowspan, &
-         s% pg% Grid8_plot_col, &
-         s% pg% Grid8_plot_colspan, &
-         s% pg% Grid8_plot_pad_left, &
-         s% pg% Grid8_plot_pad_right, &
-         s% pg% Grid8_plot_pad_top, &
-         s% pg% Grid8_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid8_plot
-
-   subroutine grid9_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-
-      call do_grid9_plot(s, id, device_id, &
-         s% pg% Grid9_xleft, s% pg% Grid9_xright, &
-         s% pg% Grid9_ybot, s% pg% Grid9_ytop, .false., s% pg% Grid9_title, &
-         s% pg% Grid9_txt_scale_factor, ierr)
-
-      call pgebuf()
-   end subroutine grid9_plot
-
-
-   subroutine do_grid9_plot(s, id, device_id, &
-      winxmin, winxmax, winymin, winymax, subplot, title, &
-      txt_scale_factor, ierr)
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: winxmin, winxmax, winymin, winymax
-      real, intent(in), dimension(max_num_pgstar_grid_plots) :: txt_scale_factor
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      type (star_info), pointer :: s
-      ierr = 0
-      call get_star_ptr(id, s, ierr)
-      if (ierr /= 0) return
-      call Grid_plot(s, id, device_id, &
-         winxmin, winxmax, winymin, winymax, subplot, title, &
-         txt_scale_factor, &
-         s% pg% Grid9_num_cols, &
-         s% pg% Grid9_num_rows, &
-         s% pg% Grid9_num_plots, &
-         s% pg% Grid9_plot_name, &
-         s% pg% Grid9_plot_row, &
-         s% pg% Grid9_plot_rowspan, &
-         s% pg% Grid9_plot_col, &
-         s% pg% Grid9_plot_colspan, &
-         s% pg% Grid9_plot_pad_left, &
-         s% pg% Grid9_plot_pad_right, &
-         s% pg% Grid9_plot_pad_top, &
-         s% pg% Grid9_plot_pad_bot, &
-         ierr)
-   end subroutine do_grid9_plot
-
-
-   subroutine Grid_plot(s, id, device_id, &
+   subroutine do_one_Grid_plot(s, id, device_id, array_ix, &
       Grid_xleft, Grid_xright, &
       Grid_ybot, Grid_ytop, subplot, Grid_title, &
       Grid_txt_scale_factor, &
@@ -1021,8 +601,7 @@ contains
 
       end do
 
-   end subroutine Grid_plot
+   end subroutine do_one_Grid_plot
 
 
 end module pgstar_grid
-
