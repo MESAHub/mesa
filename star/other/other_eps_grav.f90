@@ -29,9 +29,6 @@
       ! control name: use_other_eps_grav = .true.
       ! procedure pointer: s% other_eps_grav => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -39,6 +36,7 @@
       
       
       subroutine null_other_eps_grav(id, k, dt, ierr)
+         use star_def
          integer, intent(in) :: id, k
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr

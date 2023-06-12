@@ -32,8 +32,6 @@
 
       ! see star/other/sample_pgstar_plot.f90
         
-      use star_def
-
       implicit none
 
                   
@@ -42,6 +40,7 @@
       
       ! default does nothing
       subroutine null_other_pgstar_plots_info(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0

@@ -29,10 +29,6 @@
       ! control name: use_other_energy = .true.
       ! procedure pointer: s% other_energy => my_routine
 
-
-      use star_def
-      use auto_diff
-
       implicit none
       
             
@@ -40,6 +36,8 @@
       
       
       subroutine default_other_energy(id, ierr)
+         use star_def
+         use auto_diff
          use const_def, only: Rsun
          integer, intent(in) :: id
          integer, intent(out) :: ierr

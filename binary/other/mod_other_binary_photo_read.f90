@@ -25,8 +25,6 @@
 
       module mod_other_binary_photo_read
 
-      use binary_def
-
       implicit none
 
       ! note: there is no flag "use_other_binary_photo_read".
@@ -37,6 +35,7 @@
 
 
       subroutine default_other_binary_photo_read(binary_id, iounit, ierr)
+         use binary_def
          integer, intent(in) :: binary_id, iounit
          integer, intent(out) :: ierr
          ierr = 0

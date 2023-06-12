@@ -24,7 +24,6 @@
 ! ***********************************************************************
  
       module mod_other_binary_jdot
-          use binary_def, only : binary_info, binary_ptr
 
       ! NOTE: remember to set one of:
       ! use_other_jdot_mb = .true.
@@ -107,6 +106,7 @@
       contains
       
       subroutine null_other_jdot_mb(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -120,6 +120,7 @@
       end subroutine null_other_jdot_mb
 
       subroutine null_other_jdot_gr(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -133,6 +134,7 @@
       end subroutine null_other_jdot_gr
 
       subroutine null_other_jdot_ml(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -146,6 +148,7 @@
       end subroutine null_other_jdot_ml
 
       subroutine null_other_extra_jdot(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -159,6 +162,7 @@
       end subroutine null_other_extra_jdot
 
       subroutine null_other_jdot_ls(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -172,6 +176,7 @@
       end subroutine null_other_jdot_ls
 
       subroutine null_other_jdot_missing_wind(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
