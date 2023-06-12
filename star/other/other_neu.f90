@@ -29,9 +29,6 @@
       ! control name: use_other_neu = .true.
       ! procedure pointer: s% other_neu => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -41,6 +38,7 @@
       subroutine null_other_neu(  &
             id, k, T, log10_T, Rho, log10_Rho, abar, zbar, log10_Tlim, flags, &
             loss, sources, ierr)
+         use star_def
          use neu_lib, only: neu_get
          use neu_def
          integer, intent(in) :: id ! id for star         

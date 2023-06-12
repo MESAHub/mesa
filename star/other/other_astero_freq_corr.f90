@@ -29,9 +29,6 @@
       ! control name: use_other_astero_freq_corr = .true.
       ! procedure pointer: s% other_astero_freq_corr => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -39,6 +36,7 @@
       
       
       subroutine default_other_astero_freq_corr(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

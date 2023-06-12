@@ -29,9 +29,6 @@
       ! control name: use_other_eval_fp_ft = .true.
       ! procedure pointer: s% other_eval_fp_ft => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -42,6 +39,7 @@
          use num_lib
          use star_utils
          use auto_diff_support
+         use star_def
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
