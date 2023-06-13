@@ -10,6 +10,19 @@ Changes in main
 
 .. _Backwards-incompatible changes main:
 
+Backwards-incompatible changes
+------------------------------
+
+Hooks
+-----
+
+The ``other_pressure`` hook has been converted to use ``auto_diff``
+thus the variable ``s% extra_pressure`` is now an ``auto_diff``
+and allows for the setting of the partial derivatives the
+pressure with respect to other variables.
+
+
+
 Changes in r23.05.1
 ===================
 
