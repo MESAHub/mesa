@@ -403,7 +403,7 @@
          
          accel_ad = 0d0
          drag = 0d0
-         s% dvdt_drag(1:s%nz) = 0d0
+         s% dvdt_drag(k) = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
