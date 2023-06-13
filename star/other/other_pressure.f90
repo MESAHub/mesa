@@ -38,6 +38,7 @@
       
       subroutine default_other_pressure(id, ierr)
          use star_def
+         use auto_diff
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
