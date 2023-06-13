@@ -1,11 +1,9 @@
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
       ! PGStar state
 
       type (pgstar_win_file_data) :: pgstar_win_file_ptr(num_pgstar_plots)
 
       type (pgstar_hist_node), pointer :: pgstar_hist => null()
-
 
       ! PGstar controls
       integer :: pgstar_interval
@@ -84,7 +82,6 @@
          Text_Summary_file_width, Text_Summary_file_aspect_ratio, &
          prev_Text_Summary_file_width, prev_Text_Summary_file_ratio
 
-
       logical :: dPg_dnu_win_flag, dPg_dnu_file_flag
       logical :: show_dPg_dnu_annotation1, &
          show_dPg_dnu_annotation2, &
@@ -104,7 +101,6 @@
          prev_dPg_dnu_win_width, prev_dPg_dnu_win_ratio, &
          dPg_dnu_file_width, dPg_dnu_file_aspect_ratio, &
          prev_dPg_dnu_file_width, prev_dPg_dnu_file_ratio
-
 
       logical, dimension(pgstar_array_length) :: History_Track_win_flag, History_Track_file_flag
       logical, dimension(pgstar_array_length):: show_History_Track_annotation1, &
@@ -132,7 +128,6 @@
          History_Track_file_width, History_Track_file_aspect_ratio, &
          prev_History_Track_file_width, prev_History_Track_file_ratio
 
-
       logical :: HR_win_flag, HR_file_flag
       logical :: show_HR_annotation1, show_HR_annotation2, show_HR_annotation3
       logical :: show_HR_target_box, show_HR_classical_instability_strip, &
@@ -152,7 +147,6 @@
          HR_file_width, HR_file_aspect_ratio, &
          prev_HR_file_width, prev_HR_file_ratio
 
-
       logical :: TRho_win_flag, TRho_file_flag
       logical :: show_TRho_annotation1, show_TRho_annotation2, show_TRho_annotation3, &
          show_TRho_degeneracy_line
@@ -170,7 +164,6 @@
          TRho_file_width, TRho_file_aspect_ratio, &
          prev_TRho_file_width, prev_TRho_file_ratio
 
-
       logical :: TmaxRho_win_flag, TmaxRho_file_flag
       logical :: show_TmaxRho_annotation1, show_TmaxRho_annotation2, show_TmaxRho_annotation3, &
          show_TmaxRho_degeneracy_line
@@ -187,7 +180,6 @@
          prev_TmaxRho_win_width, prev_TmaxRho_win_ratio, &
          TmaxRho_file_width, TmaxRho_file_aspect_ratio, &
          prev_TmaxRho_file_width, prev_TmaxRho_file_ratio
-
 
       logical :: logL_R_win_flag, logL_R_file_flag
       logical :: show_logL_R_target_box, show_logL_photosphere_r
@@ -209,7 +201,6 @@
          logL_R_target_logL, logL_R_target_logL_sigma, &
          logL_R_target_R, logL_R_target_R_sigma
 
-
       logical :: logL_Teff_win_flag, logL_Teff_file_flag
       logical :: show_logL_Teff_target_box
       logical :: show_logL_Teff_annotation1, show_logL_Teff_annotation2, show_logL_Teff_annotation3
@@ -229,7 +220,6 @@
          prev_logL_Teff_file_width, prev_logL_Teff_file_ratio, &
          logL_Teff_target_logL, logL_Teff_target_logL_sigma, &
          logL_Teff_target_Teff, logL_Teff_target_Teff_sigma
-
 
       logical :: logL_v_win_flag, logL_v_file_flag
       logical :: show_logL_v_target_box, show_logL_photosphere_v
@@ -251,7 +241,6 @@
          logL_v_target_logL, logL_v_target_logL_sigma, &
          logL_v_target_v, logL_v_target_v_sigma
 
-
       logical :: L_Teff_win_flag, L_Teff_file_flag
       logical :: show_L_Teff_target_box
       logical :: show_L_Teff_annotation1, show_L_Teff_annotation2, show_L_Teff_annotation3
@@ -271,7 +260,6 @@
          prev_L_Teff_file_width, prev_L_Teff_file_ratio, &
          L_Teff_target_L, L_Teff_target_L_sigma, &
          L_Teff_target_Teff, L_Teff_target_Teff_sigma
-
 
       logical :: L_v_win_flag, L_v_file_flag
       logical :: show_L_v_target_box
@@ -293,7 +281,6 @@
          L_v_target_L, L_v_target_L_sigma, &
          L_v_target_v, L_v_target_v_sigma
 
-
       logical :: L_R_win_flag, L_R_file_flag
       logical :: show_L_R_target_box
       logical :: show_L_R_annotation1, show_L_R_annotation2, show_L_R_annotation3
@@ -313,7 +300,6 @@
          prev_L_R_file_width, prev_L_R_file_ratio, &
          L_R_target_L, L_R_target_L_sigma, &
          L_R_target_R, L_R_target_R_sigma
-
 
       logical :: R_Teff_win_flag, R_Teff_file_flag
       logical :: show_R_Teff_target_box
@@ -335,7 +321,6 @@
          R_Teff_target_R, R_Teff_target_R_sigma, &
          R_Teff_target_Teff, R_Teff_target_Teff_sigma
 
-
       logical :: R_L_win_flag, R_L_file_flag
       logical :: show_R_L_target_box
       logical :: show_R_L_annotation1, show_R_L_annotation2, show_R_L_annotation3
@@ -356,7 +341,6 @@
          R_L_target_R, R_L_target_R_sigma, &
          R_L_target_L, R_L_target_L_sigma
 
-
       logical :: logg_Teff_win_flag, logg_Teff_file_flag
       logical :: show_logg_Teff_target_box
       logical :: show_logg_Teff_annotation1, show_logg_Teff_annotation2, show_logg_Teff_annotation3
@@ -376,7 +360,6 @@
          prev_logg_Teff_file_width, prev_logg_Teff_file_ratio, &
          logg_Teff_target_logg, logg_Teff_target_logg_sigma, &
          logg_Teff_target_Teff, logg_Teff_target_Teff_sigma
-
 
       logical :: logg_logT_win_flag, logg_logT_file_flag
       logical :: do_logg_logT_win, do_logg_logT_file
@@ -399,7 +382,6 @@
          logg_logT_target_logg, logg_logT_target_logg_sigma, &
          logg_logT_target_logT, logg_logT_target_logT_sigma
 
-
       logical :: rti_win_flag, rti_file_flag
       logical :: rti_xaxis_log, rti_xaxis_reversed, &
          rti_xaxis_in_Myr, rti_xaxis_in_seconds, rti_xaxis_time_from_present
@@ -417,7 +399,6 @@
          rti_file_width, rti_file_aspect_ratio, &
          prev_rti_file_width, prev_rti_file_ratio, &
          rti_xmax, rti_xmin, rti_xmargin
-
 
       logical :: Kipp_win_flag, Kipp_file_flag
       logical :: Kipp_xaxis_log, Kipp_xaxis_reversed, &
@@ -444,7 +425,6 @@
          Kipp_xmax, Kipp_xmin,Kipp_xmargin, &
          Kipp_burn_type_cutoff
 
-
       logical :: TRho_Profile_win_flag, TRho_Profile_file_flag, TRho_switch_to_Column_Depth
       logical :: TRho_switch_to_mass
       integer :: id_TRho_Profile_win, id_TRho_Profile_file, TRho_Profile_file_interval
@@ -469,7 +449,6 @@
          TRho_Profile_ybot, TRho_Profile_ytop, TRho_Profile_txt_scale, &
          prev_TRho_Profile_file_width, prev_TRho_Profile_file_ratio
       logical :: show_TRho_accretion_mesh_borders
-
 
       integer :: num_profile_mass_points
       real :: profile_mass_point_q(max_num_profile_mass_points)
@@ -515,7 +494,6 @@
          Profile_Panels_dymin, Profile_Panels_other_dymin
       logical, dimension(pgstar_array_length) :: Profile_Panels_show_grid
 
-
       logical :: Dynamo_win_flag, Dynamo_file_flag
       integer :: id_Dynamo_win, id_Dynamo_file, Dynamo_file_interval
       character (len=strlen) :: Dynamo_file_dir, Dynamo_file_prefix
@@ -533,7 +511,6 @@
          Dynamo_file_width, Dynamo_file_aspect_ratio, &
          prev_Dynamo_file_width, prev_Dynamo_file_ratio
 
-
       logical :: Mixing_win_flag, Mixing_file_flag
       logical :: Mixing_xaxis_reversed, Mixing_show_rotation_details
       integer :: id_Mixing_win, id_Mixing_file, Mixing_file_interval
@@ -549,7 +526,6 @@
          prev_Mixing_win_width, prev_Mixing_win_ratio, &
          Mixing_file_width, Mixing_file_aspect_ratio, &
          prev_Mixing_file_width, prev_Mixing_file_ratio
-
 
       logical, dimension(pgstar_array_length) :: History_Panels_win_flag, History_Panels_file_flag
       integer, dimension(pgstar_array_length) :: id_History_Panels_win, id_History_Panels_file, History_Panels_file_interval
@@ -583,17 +559,15 @@
          History_Panel_points_ci, History_Panel_points_lw
       real :: History_Panel_points_ch
 
-
       logical, dimension(pgstar_array_length) :: Color_Magnitude_win_flag, Color_Magnitude_file_flag
       integer, dimension(pgstar_array_length) :: id_Color_Magnitude_win, id_Color_Magnitude_file, Color_Magnitude_file_interval
       character (len=strlen), dimension(pgstar_array_length) :: Color_Magnitude_file_dir, Color_Magnitude_file_prefix
-      logical, dimension(pgstar_array_length) :: Color_Magnitude_xaxis_reversed,Color_Magnitude_xaxis_log
-      character (len=strlen), dimension(pgstar_array_length) :: Color_Magnitude_xaxis1_name,Color_Magnitude_xaxis2_name,&
+      logical, dimension(pgstar_array_length) :: Color_Magnitude_xaxis_reversed, Color_Magnitude_xaxis_log
+      character (len=strlen), dimension(pgstar_array_length) :: Color_Magnitude_xaxis1_name, Color_Magnitude_xaxis2_name, &
          Color_Magnitude_title
       real, dimension(pgstar_array_length) :: &
-         Color_Magnitude_xmin, Color_Magnitude_xmax, Color_Magnitude_dxmin,&
-         Color_Magnitude_max_width,Color_Magnitude_xmargin, &
-         Color_Magnitude_win_width, Color_Magnitude_win_aspect_ratio, &
+         Color_Magnitude_xmin, Color_Magnitude_xmax, Color_Magnitude_dxmin, Color_Magnitude_xmargin, &
+         Color_Magnitude_max_width, Color_Magnitude_win_width, Color_Magnitude_win_aspect_ratio, &
          Color_Magnitude_xleft, Color_Magnitude_xright, &
          Color_Magnitude_ybot, Color_Magnitude_ytop, Color_Magnitude_txt_scale, &
          prev_Color_Magnitude_win_width, prev_Color_Magnitude_win_ratio, &
@@ -601,7 +575,7 @@
          prev_Color_Magnitude_file_width, prev_Color_Magnitude_file_ratio
       integer, dimension(pgstar_array_length) :: Color_Magnitude_num_panels
       character (len=strlen), dimension(pgstar_array_length, max_num_Color_Magnitude) :: &
-         Color_Magnitude_yaxis1_name, Color_Magnitude_other_yaxis1_name,&
+         Color_Magnitude_yaxis1_name, Color_Magnitude_other_yaxis1_name, &
          Color_Magnitude_yaxis2_name, Color_Magnitude_other_yaxis2_name
       logical, dimension(pgstar_array_length, max_num_Color_Magnitude) :: &
          Color_Magnitude_yaxis_reversed, Color_Magnitude_other_yaxis_reversed, &
@@ -611,7 +585,6 @@
          Color_Magnitude_ymax, Color_Magnitude_other_ymax, &
          Color_Magnitude_ymargin, Color_Magnitude_other_ymargin, &
          Color_Magnitude_dymin, Color_Magnitude_other_dymin
-
 
       logical :: Mode_Prop_win_flag, Mode_Prop_file_flag
       logical :: Mode_Prop_xaxis_reversed
@@ -627,7 +600,6 @@
          Mode_Prop_file_width, Mode_Prop_file_aspect_ratio, &
          prev_Mode_Prop_file_width, prev_Mode_Prop_file_ratio
 
-
       logical :: Summary_Burn_win_flag, Summary_Burn_file_flag
       logical :: Summary_Burn_xaxis_reversed
       integer :: id_Summary_Burn_win, id_Summary_Burn_file, &
@@ -642,7 +614,6 @@
          prev_Summary_Burn_win_width, prev_Summary_Burn_win_ratio, &
          Summary_Burn_file_width, Summary_Burn_file_aspect_ratio, &
          prev_Summary_Burn_file_width, prev_Summary_Burn_file_ratio
-
 
       logical :: Summary_Profile_win_flag, Summary_Profile_file_flag
       logical :: Summary_Profile_xaxis_reversed, &
@@ -662,7 +633,6 @@
          Summary_Profile_file_width, Summary_Profile_file_aspect_ratio, &
          prev_Summary_Profile_file_width, prev_Summary_Profile_file_ratio
 
-
       logical :: Summary_History_win_flag, Summary_History_file_flag
       logical :: Summary_History_scaled_value(max_num_Summary_History_Lines)
       integer :: id_Summary_History_win, id_Summary_History_file, &
@@ -680,7 +650,6 @@
          Summary_History_file_width, Summary_History_file_aspect_ratio, &
          prev_Summary_History_file_width, prev_Summary_History_file_ratio
 
-
       logical :: Power_win_flag, Power_file_flag
       logical :: Power_xaxis_reversed
       integer :: id_Power_win, id_Power_file, Power_file_interval, &
@@ -695,7 +664,6 @@
          prev_Power_win_width, prev_Power_win_ratio, &
          Power_file_width, Power_file_aspect_ratio, &
          prev_Power_file_width, prev_Power_file_ratio
-
 
       logical :: Abundance_win_flag, Abundance_file_flag
       logical :: Abundance_xaxis_reversed, Abundance_show_photosphere_location
@@ -717,7 +685,6 @@
          Abundance_file_width, Abundance_file_aspect_ratio, &
          prev_Abundance_file_width, prev_Abundance_file_ratio
 
-
       logical :: Network_win_flag, Network_file_flag
       logical :: Network_show_colorbar, Network_show_element_names, &
             Network_show_mass_fraction
@@ -734,7 +701,6 @@
          prev_Network_win_width, prev_Network_win_ratio, &
          Network_file_width, Network_file_aspect_ratio, &
          prev_Network_file_width, prev_Network_file_ratio
-
 
       logical :: Production_win_flag, Production_file_flag
       logical :: Production_show_element_names
@@ -753,30 +719,28 @@
          Production_file_width, Production_file_aspect_ratio, &
          prev_Production_file_width, prev_Production_file_ratio
 
-
-      logical, dimension(pgtar_array_length) :: Grid_win_flag, Grid_file_flag
-      integer, dimension(pgtar_array_length) :: Grid_file_interval, Grid_step_max
-      integer, dimension(pgtar_array_length) :: id_Grid_win, id_Grid_file
-      character (len=strlen), dimension(pgtar_array_length) :: Grid_file_dir, Grid_file_prefix
-      real, dimension(pgtar_array_length) :: &
+      logical, dimension(pgstar_array_length) :: Grid_win_flag, Grid_file_flag
+      integer, dimension(pgstar_array_length) :: Grid_file_interval, Grid_step_max
+      integer, dimension(pgstar_array_length) :: id_Grid_win, id_Grid_file
+      character (len=strlen), dimension(pgstar_array_length) :: Grid_file_dir, Grid_file_prefix, Grid_title
+      real, dimension(pgstar_array_length) :: &
          Grid_win_width, Grid_win_aspect_ratio, &
          Grid_xleft, Grid_xright, &
          Grid_ybot, Grid_ytop, &
          prev_Grid_win_width, prev_Grid_win_ratio, &
          Grid_file_width, Grid_file_aspect_ratio, &
          prev_Grid_file_width, prev_Grid_file_ratio
-      character (len=strlen), dimension(pgtar_array_length) :: Grid_title, &
-         Grid_plot_name(max_num_pgstar_grid_plots)
+      character (len=strlen), dimension(pgstar_array_length, max_num_pgstar_grid_plots) :: &
+         Grid_plot_name
       real, dimension(pgstar_array_length, max_num_pgstar_grid_plots) :: &
          Grid_txt_scale_factor, &
          Grid_plot_pad_left, Grid_plot_pad_right, &
          Grid_plot_pad_top, Grid_plot_pad_bot
-      integer, dimension(pgtar_array_length) :: &
+      integer, dimension(pgstar_array_length) :: &
          Grid_num_cols, Grid_num_rows, Grid_num_plots
       integer, dimension(pgstar_array_length, max_num_pgstar_grid_plots) :: &
          Grid_plot_row, Grid_plot_rowspan, &
          Grid_plot_col, Grid_plot_colspan
-
 
       integer :: annotation1_ci, annotation1_lw, annotation1_cf
       real :: annotation1_ch

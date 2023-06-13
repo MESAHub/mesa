@@ -35,8 +35,9 @@ module star_pgstar
 
    abstract interface
       
-      subroutine pgstar_plot_interface(id, device_id, ierr)
+      subroutine pgstar_plot_interface(id, device_id, ierr, array_ix)
          integer, intent(in) :: id, device_id
+         integer, intent(in), optional :: array_ix
          integer, intent(out) :: ierr
       end subroutine pgstar_plot_interface
 
