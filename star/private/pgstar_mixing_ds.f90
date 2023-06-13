@@ -37,9 +37,9 @@
       contains
 
 
-      subroutine Mixing_plot(id, device_id, ierr)
-         implicit none
+      subroutine Mixing_plot(id, device_id, ierr, array_ix)
          integer, intent(in) :: id, device_id
+         integer, intent(in), optional :: array_ix
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -93,9 +93,9 @@
          logical, intent(in) :: subplot, &
             xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
+
          call MixDs_plot(s, device_id, &
             s% pg% Mixing_win_flag, s% pg% Mixing_file_flag, &
-            s% pg% do_Mixing_win, s% pg% do_Mixing_file, &
             s% pg% id_Mixing_win, s% pg% id_Mixing_file, s% pg% Mixing_file_interval, &
             s% pg% Mixing_file_dir, s% pg% Mixing_file_prefix, &
             s% pg% show_Mixing_annotation1, s% pg% show_Mixing_annotation2, &
@@ -111,10 +111,8 @@
       end subroutine do_Mixing_panel
 
 
-
       subroutine MixDs_plot(s, device_id, &
             MixDs_win_flag, MixDs_file_flag, &
-            do_MixDs_win, do_MixDs_file, &
             id_MixDs_win, id_MixDs_file, MixDs_file_interval, &
             MixDs_file_dir, MixDs_file_prefix, &
             show_MixDs_annotation1, show_MixDs_annotation2, show_MixDs_annotation3, &
@@ -133,7 +131,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: device_id
          logical, intent(in) :: MixDs_win_flag, MixDs_file_flag
-         logical, intent(in) :: do_MixDs_win, do_MixDs_file
          integer, intent(in) :: id_MixDs_win, id_MixDs_file, MixDs_file_interval
          character (len=strlen), intent(in) :: MixDs_file_dir, MixDs_file_prefix
          logical, intent(in) :: show_MixDs_annotation1, show_MixDs_annotation2, show_MixDs_annotation3

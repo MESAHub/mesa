@@ -2079,13 +2079,13 @@ contains
       integer, intent(inout) :: ierr
       procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
-      if(use_flag)then
-         if(associated(pgstar_decorator))then
+      if (use_flag) then
+         if (associated(pgstar_decorator)) then
             call pgsave
             call PGQWIN(xmin, xmax, ymin, ymax)
             call pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
             call pgunsa
-            if(ierr/=0)then
+            if (ierr/=0) then
                write(*, *) "Error in pgstar_decorator"
             end if
          end if

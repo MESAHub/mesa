@@ -174,8 +174,9 @@
       end subroutine read_my_pgstar_namelist
 
 
-      subroutine my_plot(id, device_id, ierr)
+      subroutine my_plot(id, device_id, ierr, array_ix)
          integer, intent(in) :: id, device_id
+         integer, intent(in), optional :: array_ix
          integer, intent(out) :: ierr
          
          real :: winxmin, winxmax, winymin, winymax, label_scale

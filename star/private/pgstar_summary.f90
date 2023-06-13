@@ -36,10 +36,16 @@
       contains
 
 
-      subroutine Text_Summary_plot(id, device_id, array_ix, ierr)
-         integer, intent(in) :: id, device_id, array_ix
+      subroutine Text_Summary_plot(id, device_id, ierr, array_ix)
+         integer, intent(in) :: id, device_id
+         integer, intent(in), optional :: array_ix
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+
+         if (.not. present(array_ix)) then
+            ierr = -1
+            return
+         end if
 
          ierr = 0
          call get_star_ptr(id, s, ierr)
@@ -64,14 +70,15 @@
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
+
          call Summary_plot(s, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             s% pg% Text_Summary_num_rows(array_ix), s% pg% Text_Summary_num_cols(array_ix), &
-            s% pg% Text_Summary_name(array_ix), ierr)
+            s% pg% Text_Summary_name(array_ix, :, :), ierr)
       end subroutine do_Text_Summary_plot
 
 
-      subroutine Summary_plot(s, device_id, array_ix, &
+      subroutine Summary_plot(s, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
             Text_Summary_num_rows, Text_Summary_num_cols, &
             Text_Summary_name, ierr)
@@ -81,12 +88,12 @@
          use net_def
 
          type (star_info), pointer :: s
-         integer, intent(in) :: device_id, array_ix
+         integer, intent(in) :: device_id
          real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(in) :: Text_Summary_num_rows, Text_Summary_num_cols
-         character (len=*), intent(in) :: Text_Summary_name(:,:)
+         character (len=*), intent(in) :: Text_Summary_name(:, :)
          integer, intent(out) :: ierr
 
          integer :: col, num_cols, num_rows

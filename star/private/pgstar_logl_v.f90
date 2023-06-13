@@ -36,8 +36,9 @@
       contains
 
 
-      subroutine logL_v_Plot(id, device_id, ierr)
+      subroutine logL_v_Plot(id, device_id, ierr, array_ix)
          integer, intent(in) :: id, device_id
+         integer, intent(in), optional :: array_ix
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
