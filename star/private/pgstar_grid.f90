@@ -41,12 +41,6 @@ contains
       type (star_info), pointer :: s
 
       ierr = 0
-
-      if (.not. present(array_ix)) then
-         ierr = -1
-         return
-      end if
-
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
 

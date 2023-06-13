@@ -41,11 +41,6 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
 
-         if (.not. present(array_ix)) then
-            ierr = -1
-            return
-         end if
-
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
