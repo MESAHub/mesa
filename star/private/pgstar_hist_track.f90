@@ -36,10 +36,17 @@ module pgstar_hist_track
 contains
 
 
-   subroutine History_Track_plot(id, device_id, array_ix, ierr)
-      integer, intent(in) :: id, device_id, array_ix
+   subroutine History_Track_plot(id, device_id, ierr, array_ix)
+      integer, intent(in) :: id, device_id
+      integer, intent(in), optional :: array_ix
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
+
+      if (.not. present(array_ix)) then
+         ierr = -1
+         return
+      end if
+
       ierr = 0
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -63,7 +70,33 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_Hist_Track(s, id, device_id, array_ix, &
+      procedure(pgstar_decorator_interface), pointer :: decorator
+
+      select case (array_ix)  ! decorator interfaces cannot be arrayified
+      case(1)
+         decorator => s% pg% History_Track1_pgstar_decorator
+      case(2)
+         decorator => s% pg% History_Track2_pgstar_decorator
+      case(3)
+         decorator => s% pg% History_Track3_pgstar_decorator
+      case(4)
+         decorator => s% pg% History_Track4_pgstar_decorator
+      case(5)
+         decorator => s% pg% History_Track5_pgstar_decorator
+      case(6)
+         decorator => s% pg% History_Track6_pgstar_decorator
+      case(7)
+         decorator => s% pg% History_Track7_pgstar_decorator
+      case(8)
+         decorator => s% pg% History_Track8_pgstar_decorator
+      case(9)
+         decorator => s% pg% History_Track9_pgstar_decorator
+      case default
+         write(*, *) "select appropriate history track window (1..9)"
+         return
+      end select
+
+      call do_Hist_Track(s, id, device_id, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
          s% pg% History_Track_xname(array_ix), &
          s% pg% History_Track_yname(array_ix), &
@@ -94,8 +127,8 @@ contains
          s% pg% show_History_Track_annotation3(array_ix), &
          s% pg% History_Track_fname(array_ix), &
          s% pg% History_Track_use_decorator(array_ix), &
-         s% pg% History_Track_pgstar_decorator(array_ix), &
-         null_decorate, ierr)
+         decorator, null_decorate, &
+         ierr)
    end subroutine do_History_Track_plot
 
 
@@ -106,7 +139,7 @@ contains
    end subroutine null_decorate
 
 
-   subroutine do_Hist_Track(s, id, device_id, array_ix, &
+   subroutine do_Hist_Track(s, id, device_id, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
       xname, yname, xaxis_label, yaxis_label, &
       given_xmin, given_xmax, xmargin, dxmin, &
@@ -118,13 +151,12 @@ contains
       xtarget, ytarget, xsigma, ysigma, &
       show_annotation1, show_annotation2, show_annotation3, &
       fname, &
-      use_decorator, pgstar_decorator, &
-      decorate, ierr)
+      use_decorator, pgstar_decorator, decorate, ierr)
       use utils_lib
 
       type (star_info), pointer :: s
       integer, intent(in) :: &
-         id, device_id, step_min_in, step_max_in, n_sigma, array_ix
+         id, device_id, step_min_in, step_max_in, n_sigma
       real, intent(in) :: &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
          xtarget, ytarget, xsigma, ysigma, &
@@ -299,11 +331,11 @@ contains
          show_annotation2, &
          show_annotation3)
 
-      call decorate(s% id, ierr)
+      call decorate(s% id, ierr)  ! hard coded decorator for other plots
 
       call pgunsa
 
-      call show_pgstar_decorator(s%id, use_decorator, pgstar_decorator, 0, ierr)
+      call show_pgstar_decorator(s%id, use_decorator, pgstar_decorator, 0, ierr)  ! user decorator
 
       deallocate(xvec, yvec)
 

@@ -37,10 +37,17 @@ module pgstar_profile_panels
 contains
 
 
-   subroutine Profile_Panels_plot(id, device_id, array_ix, ierr)
-      integer, intent(in) :: id, device_id, array_ix
+   subroutine Profile_Panels_plot(id, device_id, ierr, array_ix)
+      integer, intent(in) :: id, device_id
+      integer, intent(in), optional :: array_ix
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
+
+      if (.not. present(array_ix)) then
+         ierr = -1
+         return
+      end if
+
       ierr = 0
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -64,53 +71,82 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
+      procedure(pgstar_decorator_interface), pointer :: decorator
+
+      select case (array_ix)  ! decorator interfaces cannot be arrayified
+      case(1)
+         decorator => s% pg% Profile_Panels1_pgstar_decorator
+      case(2)
+         decorator => s% pg% Profile_Panels2_pgstar_decorator
+      case(3)
+         decorator => s% pg% Profile_Panels3_pgstar_decorator
+      case(4)
+         decorator => s% pg% Profile_Panels4_pgstar_decorator
+      case(5)
+         decorator => s% pg% Profile_Panels5_pgstar_decorator
+      case(6)
+         decorator => s% pg% Profile_Panels6_pgstar_decorator
+      case(7)
+         decorator => s% pg% Profile_Panels7_pgstar_decorator
+      case(8)
+         decorator => s% pg% Profile_Panels8_pgstar_decorator
+      case(9)
+         decorator => s% pg% Profile_Panels9_pgstar_decorator
+      case default
+         write(*, *) "select appropriate profile panels window (1..9)"
+         return
+      end select
+
       call Pro_panels_plot(s, device_id, array_ix, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         s% pg% Profile_Panels_xaxis_reversed(array_ix), &
-         s% pg% Profile_Panels_yaxis_reversed(array_ix), &
-         s% pg% Profile_Panels_other_yaxis_reversed(array_ix), &
-         s% pg% Profile_Panels_yaxis_log(array_ix), &
-         s% pg% Profile_Panels_other_yaxis_log(array_ix), &
-         s% pg% Profile_Panels_same_yaxis_range(array_ix), &
-         s% pg% Profile_Panels_xaxis_name(array_ix), &
-         s% pg% Profile_Panels_yaxis_name(array_ix), &
-         s% pg% Profile_Panels_other_yaxis_name(array_ix), &
-         s% pg% Profile_Panels_xmin(array_ix), s% pg% Profile_Panels_xmax(array_ix), &
-         s% pg% Profile_Panels_xmargin(array_ix), s% pg% Profile_Panels_show_mix_regions_on_xaxis(array_ix), &
-         s% pg% Profile_Panels_ymin(array_ix), s% pg% Profile_Panels_other_ymin(array_ix), &
-         s% pg% Profile_Panels_ymax(array_ix), s% pg% Profile_Panels_other_ymax(array_ix), &
-         s% pg% Profile_Panels_ycenter(array_ix), s% pg% Profile_Panels_other_ycenter(array_ix), &
-         s% pg% Profile_Panels_ymargin(array_ix), s% pg% Profile_Panels_other_ymargin(array_ix), &
-         s% pg% Profile_Panels_dymin(array_ix), s% pg% Profile_Panels_other_dymin(array_ix), &
-         s% pg% Profile_Panels_show_grid(array_ix), &
          s% pg% Profile_Panels_num_panels(array_ix), &
-         s% pg% Profile_Panels_use_decorator(array_ix), &
-         s% pg% Profile_Panels_pgstar_decorator(array_ix), &
-         1, &
+
+         s% pg% Profile_Panels_xaxis_name(array_ix), &
+         s% pg% Profile_Panels_xmin(array_ix), s% pg% Profile_Panels_xmax(array_ix), &
+         s% pg% Profile_Panels_xmargin(array_ix), &
+         s% pg% Profile_Panels_xaxis_reversed(array_ix), &
+
+         s% pg% Profile_Panels_yaxis_name(array_ix, :), s% pg% Profile_Panels_ycenter(array_ix, :), &
+         s% pg% Profile_Panels_ymin(array_ix, :), s% pg% Profile_Panels_ymax(array_ix, :), &
+         s% pg% Profile_Panels_dymin(array_ix, :), s% pg% Profile_Panels_ymargin(array_ix, :), &
+         s% pg% Profile_Panels_yaxis_reversed(array_ix, :), s% pg% Profile_Panels_yaxis_log(array_ix, :), &
+
+         s% pg% Profile_Panels_other_yaxis_name(array_ix, :), s% pg% Profile_Panels_other_ycenter(array_ix, :), &
+         s% pg% Profile_Panels_other_ymin(array_ix, :), s% pg% Profile_Panels_other_ymax(array_ix, :), &
+         s% pg% Profile_Panels_other_dymin(array_ix, :), s% pg% Profile_Panels_other_ymargin(array_ix, :), &
+         s% pg% Profile_Panels_other_yaxis_reversed(array_ix, :), s% pg% Profile_Panels_other_yaxis_log(array_ix, :), &
+
+         s% pg% Profile_Panels_same_yaxis_range(array_ix, :), &
+         s% pg% Profile_Panels_show_mix_regions_on_xaxis(array_ix), &
+         s% pg% Profile_Panels_show_grid(array_ix), &
+
+         s% pg% Profile_Panels_use_decorator(array_ix), decorator, &
          ierr)
    end subroutine do_profile_panels_plot
 
 
    subroutine Pro_panels_plot(s, device_id, array_ix, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-      panels_xaxis_reversed, &
-      panels_yaxis_reversed, &
-      panels_other_yaxis_reversed, &
-      panels_yaxis_log, &
-      panels_other_yaxis_log, &
-      panels_same_yaxis_range, &
-      panels_xaxis_name, &
-      panels_yaxis_name, &
-      panels_other_yaxis_name, &
-      panels_xmin_in, panels_xmax_in, &
-      panels_xmargin_in, show_mix_regions, &
-      panels_ymin, panels_other_ymin, &
-      panels_ymax, panels_other_ymax, &
-      panels_ycenter, panels_other_ycenter, &
-      panels_ymargin, panels_other_ymargin, &
-      panels_dymin, panels_other_dymin, &
-      panels_show_grid, &
       panels_num_panels, &
+      panels_xaxis_name, &
+      panels_xmin_in, panels_xmax_in, &
+      panels_xmargin_in, &
+      panels_xaxis_reversed, &
+
+      panels_yaxis_name, panels_ycenter, &
+      panels_ymin, panels_ymax, &
+      panels_dymin, panels_ymargin, &
+      panels_yaxis_reversed, panels_yaxis_log, &
+
+      panels_other_yaxis_name, panels_other_ycenter, &
+      panels_other_ymin, panels_other_ymax, &
+      panels_other_dymin, panels_other_ymargin, &
+      panels_other_yaxis_reversed, panels_other_yaxis_log, &
+
+      panels_same_yaxis_range, &
+      show_mix_regions, &
+      panels_show_grid, &
+
       use_decorator, pgstar_decorator, &
       ierr)
 
@@ -125,7 +161,7 @@ contains
 
       type (star_info), pointer :: s
       integer, intent(in) :: &
-         device_id, panels_num_panels, array_ix,
+         device_id, panels_num_panels, array_ix
       real, intent(in) :: &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
          panels_xmin_in, panels_xmax_in, panels_xmargin_in

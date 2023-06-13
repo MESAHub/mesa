@@ -36,10 +36,17 @@ module pgstar_history_panels
 contains
 
 
-   subroutine History_Panels_plot(id, device_id, array_ix, ierr)
-      integer, intent(in) :: id, device_id, array_ix
+   subroutine History_Panels_plot(id, device_id, ierr, array_ix)
+      integer, intent(in) :: id, device_id
+      integer, intent(in), optional :: array_ix
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
+
+      if (.not. present(array_ix)) then
+         ierr = -1
+         return
+      end if
+
       ierr = 0
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -63,55 +70,82 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
+      procedure(pgstar_decorator_interface), pointer :: decorator
+
+      select case (array_ix)  ! decorator interfaces cannot be arrayified
+      case(1)
+         decorator => s% pg% History_Panels1_pgstar_decorator
+      case(2)
+         decorator => s% pg% History_Panels2_pgstar_decorator
+      case(3)
+         decorator => s% pg% History_Panels3_pgstar_decorator
+      case(4)
+         decorator => s% pg% History_Panels4_pgstar_decorator
+      case(5)
+         decorator => s% pg% History_Panels5_pgstar_decorator
+      case(6)
+         decorator => s% pg% History_Panels6_pgstar_decorator
+      case(7)
+         decorator => s% pg% History_Panels7_pgstar_decorator
+      case(8)
+         decorator => s% pg% History_Panels8_pgstar_decorator
+      case(9)
+         decorator => s% pg% History_Panels9_pgstar_decorator
+      case default
+         write(*, *) "select appropriate history panels window (1..9)"
+         return
+      end select
+
       call do_one_panels_plot(&
          id, s, device_id, array_ix, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
+         s% pg% History_Panels_max_width(array_ix), s% pg% History_Panels_num_panels(array_ix), &
+
          s% pg% History_Panels_xaxis_name(array_ix), &
+         s% pg% History_Panels_xmin(array_ix), s% pg% History_Panels_xmax(array_ix), &
+         s% pg% History_Panels_dxmin(array_ix), s% pg% History_Panels_xmargin(array_ix), &
+         s% pg% History_Panels_xaxis_reversed(array_ix), s% pg% History_Panels_xaxis_log(array_ix), &
+
+         s% pg% History_Panels_yaxis_name(array_ix, :), &
+         s% pg% History_Panels_ymin(array_ix, :), s% pg% History_Panels_ymax(array_ix, :), &
+         s% pg% History_Panels_dymin(array_ix, :), s% pg% History_Panels_ymargin(array_ix, :), &
+         s% pg% History_Panels_yaxis_reversed(array_ix, :), s% pg% History_Panels_yaxis_log(array_ix, :), &
+
+         s% pg% History_Panels_other_yaxis_name(array_ix, :), &
+         s% pg% History_Panels_other_ymin(array_ix, :), s% pg% History_Panels_other_ymax(array_ix, :), &
+         s% pg% History_Panels_other_dymin(array_ix, :), s% pg% History_Panels_other_ymargin(array_ix, :), &
+         s% pg% History_Panels_other_yaxis_reversed(array_ix, :), s% pg% History_Panels_other_yaxis_log(array_ix, :), &
+
+         s% pg% History_Panels_same_yaxis_range(array_ix, :), &
+         s% pg% History_Panels_points_name(array_ix, :), &
          s% pg% History_Panels_automatic_star_age_units(array_ix), &
-         s% pg% History_Panels_xmin(array_ix), &
-         s% pg% History_Panels_xmax(array_ix), &
-         s% pg% History_Panels_dxmin(array_ix), &
-         s% pg% History_Panels_xmargin(array_ix), &
-         s% pg% History_Panels_max_width(array_ix), &
-         s% pg% History_Panels_num_panels(array_ix), &
-         s% pg% History_Panels_other_ymin(array_ix), &
-         s% pg% History_Panels_other_ymax(array_ix), &
-         s% pg% History_Panels_other_yaxis_reversed(array_ix), &
-         s% pg% History_Panels_other_yaxis_log(array_ix), &
-         s% pg% History_Panels_same_yaxis_range(array_ix), &
-         s% pg% History_Panels_other_dymin(array_ix), &
-         s% pg% History_Panels_points_name(array_ix), &
-         s% pg% History_Panels_other_ymargin(array_ix), &
-         s% pg% History_Panels_other_yaxis_name(array_ix), &
-         s% pg% History_Panels_ymin(array_ix), &
-         s% pg% History_Panels_ymax(array_ix), &
-         s% pg% History_Panels_xaxis_reversed(array_ix), &
-         s% pg% History_Panels_yaxis_reversed(array_ix), &
-         s% pg% History_Panels_xaxis_log(array_ix), &
-         s% pg% History_Panels_yaxis_log(array_ix), &
-         s% pg% History_Panels_dymin(array_ix), &
-         s% pg% History_Panels_ymargin(array_ix), &
-         s% pg% History_Panels_yaxis_name(array_ix), &
-         s% pg% History_Panels_use_decorator(array_ix), &
-         s% pg% History_Panels_pgstar_decorator(array_ix), &
+
+         s% pg% History_Panels_use_decorator(array_ix), decorator, &
          ierr)
    end subroutine do_History_Panels_plot
 
 
-   subroutine do_one_panels_plot(&
+   subroutine do_one_panels_plot( &
       id, s, device_id, array_ix, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-      hist_xaxis_name_in, automatic_star_age_units, hist_xmin_in, hist_xmax, dxmin, hist_xmargin, &
       hist_max_width, hist_num_panels, &
-      hist_other_ymin, hist_other_ymax, &
-      hist_other_yaxis_reversed, hist_other_yaxis_log, &
-      hist_same_yaxis_range, &
-      hist_other_dymin, hist_points_name, &
-      hist_other_ymargin, hist_other_yaxis_name, &
+      hist_xaxis_name_in, &
+      hist_xmin_in, hist_xmax,&
+      dxmin, hist_xmargin, &
+      hist_xaxis_reversed, hist_xaxis_log, &
+      hist_yaxis_name, &
       hist_ymin, hist_ymax, &
-      hist_xaxis_reversed, hist_yaxis_reversed, &
-      hist_xaxis_log, hist_yaxis_log, &
-      hist_dymin, hist_ymargin, hist_yaxis_name, &
+      hist_dymin, hist_ymargin,  &
+      hist_yaxis_reversed, hist_yaxis_log, &
+      hist_other_yaxis_name, &
+      hist_other_ymin, hist_other_ymax, &
+      hist_other_dymin, hist_other_ymargin, &
+      hist_other_yaxis_reversed, hist_other_yaxis_log, &
+
+      hist_same_yaxis_range, &
+      hist_points_name, &
+      automatic_star_age_units, &
+
       use_decorator, pgstar_decorator, &
       ierr)
       use utils_lib

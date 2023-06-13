@@ -36,11 +36,18 @@ module pgstar_Color_Magnitude
 contains
 
 
-   subroutine Color_Magnitude_plot(id, device_id, array_ix, ierr)
-      integer, intent(in) :: id, device_id, array_ix
+   subroutine Color_Magnitude_plot(id, device_id, ierr, array_ix)
+      integer, intent(in) :: id, device_id
+      integer, intent(in), optional :: array_ix
       integer, intent(out) :: ierr
       type (star_info), pointer :: s
       ierr = 0
+
+      if (.not. present(array_ix)) then
+         ierr = -1
+         return
+      end if
+
       call get_star_ptr(id, s, ierr)
       if (ierr /= 0) return
       call pgslct(device_id)
@@ -63,37 +70,53 @@ contains
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
+      procedure(pgstar_decorator_interface), pointer :: decorator
+
+      select case (array_ix)  ! decorator interfaces cannot be arrayified
+      case(1)
+         decorator => s% pg% Color_Magnitude1_pgstar_decorator
+      case(2)
+         decorator => s% pg% Color_Magnitude2_pgstar_decorator
+      case(3)
+         decorator => s% pg% Color_Magnitude3_pgstar_decorator
+      case(4)
+         decorator => s% pg% Color_Magnitude4_pgstar_decorator
+      case(5)
+         decorator => s% pg% Color_Magnitude5_pgstar_decorator
+      case(6)
+         decorator => s% pg% Color_Magnitude6_pgstar_decorator
+      case(7)
+         decorator => s% pg% Color_Magnitude7_pgstar_decorator
+      case(8)
+         decorator => s% pg% Color_Magnitude8_pgstar_decorator
+      case(9)
+         decorator => s% pg% Color_Magnitude9_pgstar_decorator
+      case default
+         write(*, *) "select appropriate color magnitude window (1..9)"
+         return
+      end select
+
       call do_one_cm_plot(&
          id, s, device_id, array_ix, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         s% pg% Color_Magnitude_xaxis1_name(array_ix), &
-         s% pg% Color_Magnitude_xaxis2_name(array_ix), &
-         s% pg% Color_Magnitude_xmin(array_ix), &
-         s% pg% Color_Magnitude_xmax(array_ix), &
-         s% pg% Color_Magnitude_dxmin(array_ix), &
-         s% pg% Color_Magnitude_xmargin(array_ix), &
-         s% pg% Color_Magnitude_max_width(array_ix), &
-         s% pg% Color_Magnitude_num_panels(array_ix), &
-         s% pg% Color_Magnitude_other_ymin(array_ix), &
-         s% pg% Color_Magnitude_other_ymax(array_ix), &
-         s% pg% Color_Magnitude_yaxis_reversed(array_ix), &
-         s% pg% Color_Magnitude_other_yaxis_log(array_ix), &
-         s% pg% Color_Magnitude_other_dymin(array_ix), &
-         s% pg% Color_Magnitude_other_ymargin(array_ix), &
-         s% pg% Color_Magnitude_other_yaxis1_name(array_ix), &
-         s% pg% Color_Magnitude_other_yaxis2_name(array_ix), &
-         s% pg% Color_Magnitude_ymin(array_ix), &
-         s% pg% Color_Magnitude_ymax(array_ix), &
-         s% pg% Color_Magnitude_xaxis_reversed(array_ix), &
-         s% pg% Color_Magnitude_yaxis_reversed(array_ix), &
-         s% pg% Color_Magnitude_xaxis_log(array_ix), &
-         s% pg% Color_Magnitude_yaxis_log(array_ix), &
-         s% pg% Color_Magnitude_dymin(array_ix), &
-         s% pg% Color_Magnitude_ymargin(array_ix), &
-         s% pg% Color_Magnitude_yaxis1_name(array_ix), &
-         s% pg% Color_Magnitude_yaxis2_name(array_ix), &
-         s% pg% Color_Magnitude_use_decorator(array_ix), &
-         s% pg% Color_Magnitude_pgstar_decorator(array_ix), &
+         s% pg% Color_Magnitude_max_width(array_ix), s% pg% Color_Magnitude_num_panels(array_ix), &
+
+         s% pg% Color_Magnitude_xaxis1_name(array_ix), s% pg% Color_Magnitude_xaxis2_name(array_ix), &
+         s% pg% Color_Magnitude_xmin(array_ix), s% pg% Color_Magnitude_xmax(array_ix), &
+         s% pg% Color_Magnitude_dxmin(array_ix),  s% pg% Color_Magnitude_xmargin(array_ix), &
+         s% pg% Color_Magnitude_xaxis_reversed(array_ix), s% pg% Color_Magnitude_xaxis_log(array_ix), &
+
+         s% pg% Color_Magnitude_yaxis1_name(array_ix, :), s% pg% Color_Magnitude_yaxis2_name(array_ix, :), &
+         s% pg% Color_Magnitude_ymin(array_ix, :), s% pg% Color_Magnitude_ymax(array_ix, :), &
+         s% pg% Color_Magnitude_dymin(array_ix, :), s% pg% Color_Magnitude_ymargin(array_ix, :), &
+         s% pg% Color_Magnitude_yaxis_reversed(array_ix, :), s% pg% Color_Magnitude_yaxis_log(array_ix, :), &
+
+         s% pg% Color_Magnitude_other_yaxis1_name(array_ix, :), s% pg% Color_Magnitude_other_yaxis2_name(array_ix, :), &
+         s% pg% Color_Magnitude_other_ymin(array_ix, :), s% pg% Color_Magnitude_other_ymax(array_ix, :), &
+         s% pg% Color_Magnitude_other_dymin(array_ix, :), s% pg% Color_Magnitude_other_ymargin(array_ix, :), &
+         s% pg% Color_Magnitude_other_yaxis_reversed(array_ix, :), s% pg% Color_Magnitude_other_yaxis_log(array_ix, :), &
+
+         s% pg% Color_Magnitude_use_decorator(array_ix), decorator, &
          ierr)
    end subroutine do_Color_Magnitude_plot
 
@@ -101,18 +124,23 @@ contains
    subroutine do_one_cm_plot(&
       id, s, device_id, array_ix, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-      color_xaxis1_name, color_xaxis2_name, &
-      color_xmin_in, color_xmax, dxmin, color_xmargin, &
       color_max_width, color_num_panels, &
-      color_other_ymin, color_other_ymax, &
-      color_other_yaxis_reversed, color_other_yaxis_log, &
-      color_other_dymin, color_other_ymargin, &
-      color_other_yaxis1_name, color_other_yaxis2_name, &
-      color_ymin, color_ymax, &
-      color_xaxis_reversed, color_yaxis_reversed, &
-      color_xaxis_log, color_yaxis_log, &
-      color_dymin, color_ymargin, &
+
+      color_xaxis1_name, color_xaxis2_name, &
+      color_xmin_in, color_xmax, &
+      color_dxmin, color_xmargin, &
+      color_xaxis_reversed, color_xaxis_log, &
+
       color_yaxis1_name, color_yaxis2_name, &
+      color_ymin, color_ymax, &
+      color_dymin, color_ymargin, &
+      color_yaxis_reversed, color_yaxis_log, &
+
+      color_other_yaxis1_name, color_other_yaxis2_name, &
+      color_other_ymin, color_other_ymax, &
+      color_other_dymin, color_other_ymargin, &
+      color_other_yaxis_reversed, color_other_yaxis_log, &
+
       color_use_decorator, color_pgstar_decorator, &
       ierr)
       use utils_lib
@@ -124,7 +152,7 @@ contains
       character (len = *), intent(in) :: title, color_xaxis1_name, color_xaxis2_name
       real, intent(in) :: &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
-         color_xmin_in, color_xmax, color_max_width, color_xmargin, dxmin
+         color_xmin_in, color_xmax, color_max_width, color_xmargin, color_dxmin
       real, intent(in), dimension(:) :: &
          color_other_ymin, color_other_ymax, &
          color_other_dymin, color_other_ymargin, &
@@ -229,7 +257,7 @@ contains
 
       call set_xleft_xright(&
          n, xvec, color_xmin, color_xmax, color_xmargin, &
-         color_xaxis_reversed, dxmin, xleft, xright)
+         color_xaxis_reversed, color_dxmin, xleft, xright)
 
       call pgsave
       call pgsch(txt_scale)
@@ -270,13 +298,13 @@ contains
             have_other_yaxis2 = get1_yvec(other_yname2, other_yvec2)
          end if
 
-         if(have_yaxis1)then
+         if (have_yaxis1) then
             have_yaxis = .True.
          else
             have_yaxis = .false.
          end if
 
-         if(have_other_yaxis1) then
+         if (have_other_yaxis1) then
             have_other_yaxis = .True.
          else
             have_other_yaxis = .false.
@@ -294,7 +322,7 @@ contains
          end do
 
          other_yvec = other_yvec1
-         if(have_other_yaxis2) other_yvec = other_yvec - other_yvec2
+         if (have_other_yaxis2) other_yvec = other_yvec - other_yvec2
 
          ! Make sure limits are sensible for plotting
          do i = lbound(other_yvec, dim = 1), ubound(other_yvec, dim = 1)
@@ -359,7 +387,7 @@ contains
                end if
             end if
             call pgsci(y_color)
-            if(have_yaxis2)then
+            if (have_yaxis2) then
                call show_left_yaxis_label_pgstar(s, trim(create_label(yname1, yname2)))
             else
                call show_left_yaxis_label_pgstar(s, trim(create_label(yname1, '')))
@@ -371,7 +399,7 @@ contains
 
          call pgsci(1)
 
-         call show_pgstar_decorator(s%id, color_use_decorator, color_pgstar_decorator, j, ierr)
+         call show_pgstar_decorator(s% id, color_use_decorator, color_pgstar_decorator, j, ierr)
 
       end do
 
