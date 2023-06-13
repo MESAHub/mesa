@@ -3526,7 +3526,7 @@
 
       ! ::
 
-    Grid_plot_name(1, 4) = 'Text_Summary1'
+    Grid_plot_name(1, 4) = 'Text_Summary(1)'
     Grid_plot_row(1, 4) = 7
     Grid_plot_rowspan(1, 4) = 2
     Grid_plot_col(1, 4) = 1
@@ -3592,7 +3592,7 @@
 
       ! ::
 
-    Grid_plot_name(2, 4) = 'Text_Summary1'
+    Grid_plot_name(2, 4) = 'Text_Summary(1)'
     Grid_plot_row(2, 4) = 7
     Grid_plot_rowspan(2, 4) = 2
     Grid_plot_col(2, 4) = 1
