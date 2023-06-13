@@ -35,9 +35,8 @@
 
       contains
 
-      subroutine network_plot(id, device_id, ierr, array_ix)
-         integer, intent(in) :: id, device_id
-         integer, intent(in), optional :: array_ix
+      subroutine network_plot(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s

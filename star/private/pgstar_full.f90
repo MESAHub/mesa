@@ -163,6 +163,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary1)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary1
+      p% array_ix = 1
       p% name = 'Text_Summary(1)'
       p% win_flag = s% pg% Text_Summary_win_flag(1)
       p% win_width = s% pg% Text_Summary_win_width(1)
@@ -177,6 +178,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary2)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary2
+      p% array_ix = 2
       p% name = 'Text_Summary(2)'
       p% win_flag = s% pg% Text_Summary_win_flag(2)
       p% win_width = s% pg% Text_Summary_win_width(2)
@@ -191,6 +193,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary3)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary3
+      p% array_ix = 3
       p% name = 'Text_Summary(3)'
       p% win_flag = s% pg% Text_Summary_win_flag(3)
       p% win_width = s% pg% Text_Summary_win_width(3)
@@ -205,6 +208,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary4)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary4
+      p% array_ix = 4
       p% name = 'Text_Summary(4)'
       p% win_flag = s% pg% Text_Summary_win_flag(4)
       p% win_width = s% pg% Text_Summary_win_width(4)
@@ -219,6 +223,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary5)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary5
+      p% array_ix = 5
       p% name = 'Text_Summary(5)'
       p% win_flag = s% pg% Text_Summary_win_flag(5)
       p% win_width = s% pg% Text_Summary_win_width(5)
@@ -233,6 +238,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary6)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary6
+      p% array_ix = 6
       p% name = 'Text_Summary(6)'
       p% win_flag = s% pg% Text_Summary_win_flag(6)
       p% win_width = s% pg% Text_Summary_win_width(6)
@@ -247,6 +253,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary7)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary7
+      p% array_ix = 7
       p% name = 'Text_Summary(7)'
       p% win_flag = s% pg% Text_Summary_win_flag(7)
       p% win_width = s% pg% Text_Summary_win_width(7)
@@ -261,6 +268,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary8)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary8
+      p% array_ix = 8
       p% name = 'Text_Summary(8)'
       p% win_flag = s% pg% Text_Summary_win_flag(8)
       p% win_width = s% pg% Text_Summary_win_width(8)
@@ -275,6 +283,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Text_Summary9)
       p% plot => Text_Summary_Plot
       p% id = i_Text_Summary9
+      p% array_ix = 9
       p% name = 'Text_Summary(9)'
       p% win_flag = s% pg% Text_Summary_win_flag(9)
       p% win_width = s% pg% Text_Summary_win_width(9)
@@ -289,6 +298,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_TRho_Profile)
       p% plot => TRho_Profile_plot
       p% id = i_TRho_Profile
+      p% array_ix = 0
       p% name = 'TRho_Profile'
       p% win_flag = s% pg% TRho_Profile_win_flag
       p% win_width = s% pg% TRho_Profile_win_width
@@ -303,6 +313,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels1)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels1
+      p% array_ix = 1
       p% name = 'Profile_Panels(1)'
       p% win_flag = s% pg% Profile_Panels_win_flag(1)
       p% win_width = s% pg% Profile_Panels_win_width(1)
@@ -317,6 +328,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels2)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels2
+      p% array_ix = 2
       p% name = 'Profile_Panels(2)'
       p% win_flag = s% pg% Profile_Panels_win_flag(2)
       p% win_width = s% pg% Profile_Panels_win_width(2)
@@ -331,6 +343,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels3)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels3
+      p% array_ix = 3
       p% name = 'Profile_Panels(3)'
       p% win_flag = s% pg% Profile_Panels_win_flag(3)
       p% win_width = s% pg% Profile_Panels_win_width(3)
@@ -345,6 +358,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels4)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels4
+      p% array_ix = 4
       p% name = 'Profile_Panels(4)'
       p% win_flag = s% pg% Profile_Panels_win_flag(4)
       p% win_width = s% pg% Profile_Panels_win_width(4)
@@ -359,6 +373,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels5)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels5
+      p% array_ix = 5
       p% name = 'Profile_Panels(5)'
       p% win_flag = s% pg% Profile_Panels_win_flag(5)
       p% win_width = s% pg% Profile_Panels_win_width(5)
@@ -373,6 +388,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels6)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels6
+      p% array_ix = 6
       p% name = 'Profile_Panels(6)'
       p% win_flag = s% pg% Profile_Panels_win_flag(6)
       p% win_width = s% pg% Profile_Panels_win_width(6)
@@ -387,6 +403,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels7)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels7
+      p% array_ix = 7
       p% name = 'Profile_Panels(7)'
       p% win_flag = s% pg% Profile_Panels_win_flag(7)
       p% win_width = s% pg% Profile_Panels_win_width(7)
@@ -401,6 +418,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels8)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels8
+      p% array_ix = 8
       p% name = 'Profile_Panels(8)'
       p% win_flag = s% pg% Profile_Panels_win_flag(8)
       p% win_width = s% pg% Profile_Panels_win_width(8)
@@ -415,6 +433,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Profile_Panels9)
       p% plot => Profile_Panels_plot
       p% id = i_Profile_Panels9
+      p% array_ix = 9
       p% name = 'Profile_Panels(9)'
       p% win_flag = s% pg% Profile_Panels_win_flag(9)
       p% win_width = s% pg% Profile_Panels_win_width(9)
@@ -429,6 +448,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_logg_Teff)
       p% plot => logg_Teff_Plot
       p% id = i_logg_Teff
+      p% array_ix = 0
       p% name = 'logg_Teff'
       p% win_flag = s% pg% logg_Teff_win_flag
       p% win_width = s% pg% logg_Teff_win_width
@@ -443,6 +463,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_logL_Teff)
       p% plot => logL_Teff_Plot
       p% id = i_logL_Teff
+      p% array_ix = 0
       p% name = 'logL_Teff'
       p% win_flag = s% pg% logL_Teff_win_flag
       p% win_width = s% pg% logL_Teff_win_width
@@ -457,6 +478,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_L_Teff)
       p% plot => L_Teff_Plot
       p% id = i_L_Teff
+      p% array_ix = 0
       p% name = 'L_Teff'
       p% win_flag = s% pg% L_Teff_win_flag
       p% win_width = s% pg% L_Teff_win_width
@@ -471,6 +493,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_L_v)
       p% plot => L_v_Plot
       p% id = i_L_v
+      p% array_ix = 0
       p% name = 'L_v'
       p% win_flag = s% pg% L_v_win_flag
       p% win_width = s% pg% L_v_win_width
@@ -485,6 +508,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_L_R)
       p% plot => L_R_Plot
       p% id = i_L_R
+      p% array_ix = 0
       p% name = 'L_R'
       p% win_flag = s% pg% L_R_win_flag
       p% win_width = s% pg% L_R_win_width
@@ -499,6 +523,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_R_Teff)
       p% plot => R_Teff_Plot
       p% id = i_R_Teff
+      p% array_ix = 0
       p% name = 'R_Teff'
       p% win_flag = s% pg% R_Teff_win_flag
       p% win_width = s% pg% R_Teff_win_width
@@ -513,6 +538,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_R_L)
       p% plot => R_L_Plot
       p% id = i_R_L
+      p% array_ix = 0
       p% name = 'R_L'
       p% win_flag = s% pg% R_L_win_flag
       p% win_width = s% pg% R_L_win_width
@@ -527,6 +553,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_logg_logT)
       p% plot => logg_logT_Plot
       p% id = i_logg_logT
+      p% array_ix = 0
       p% name = 'logg_logT'
       p% win_flag = s% pg% logg_logT_win_flag
       p% win_width = s% pg% logg_logT_win_width
@@ -541,6 +568,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_dPg_dnu)
       p% plot => dPg_dnu_Plot
       p% id = i_dPg_dnu
+      p% array_ix = 0
       p% name = 'dPg_dnu'
       p% win_flag = s% pg% dPg_dnu_win_flag
       p% win_width = s% pg% dPg_dnu_win_width
@@ -555,6 +583,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_HR)
       p% plot => HR_Plot
       p% id = i_HR
+      p% array_ix = 0
       p% name = 'HR'
       p% win_flag = s% pg% HR_win_flag
       p% win_width = s% pg% HR_win_width
@@ -569,6 +598,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_TRho)
       p% plot => TRho_Plot
       p% id = i_TRho
+      p% array_ix = 0
       p% name = 'TRho'
       p% win_flag = s% pg% TRho_win_flag
       p% win_width = s% pg% TRho_win_width
@@ -583,6 +613,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_TmaxRho)
       p% plot => TmaxRho_Plot
       p% id = i_TmaxRho
+      p% array_ix = 0
       p% name = 'TmaxRho'
       p% win_flag = s% pg% TmaxRho_win_flag
       p% win_width = s% pg% TmaxRho_win_width
@@ -597,6 +628,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Dynamo)
       p% plot => Dynamo_plot
       p% id = i_Dynamo
+      p% array_ix = 0
       p% name = 'Dynamo'
       p% win_flag = s% pg% Dynamo_win_flag
       p% win_width = s% pg% Dynamo_win_width
@@ -611,6 +643,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Mixing)
       p% plot => Mixing_plot
       p% id = i_Mixing
+      p% array_ix = 0
       p% name = 'Mixing'
       p% win_flag = s% pg% Mixing_win_flag
       p% win_width = s% pg% Mixing_win_width
@@ -625,6 +658,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Kipp)
       p% plot => Kipp_Plot
       p% id = i_Kipp
+      p% array_ix = 0
       p% name = 'Kipp'
       p% win_flag = s% pg% Kipp_win_flag
       p% win_width = s% pg% Kipp_win_width
@@ -639,6 +673,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Network)
       p% plot => Network_Plot
       p% id = i_Network
+      p% array_ix = 0
       p% name = 'Network'
       p% win_flag = s% pg% Network_win_flag
       p% win_width = s% pg% Network_win_width
@@ -653,6 +688,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Production)
       p% plot => Production_Plot
       p% id = i_Production
+      p% array_ix = 0
       p% name = 'Production'
       p% win_flag = s% pg% Production_win_flag
       p% win_width = s% pg% Production_win_width
@@ -667,6 +703,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels1)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels1
+      p% array_ix = 1
       p% name = 'History_Panels(1)'
       p% win_flag = s% pg% History_Panels_win_flag(1)
       p% win_width = s% pg% History_Panels_win_width(1)
@@ -681,6 +718,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels2)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels2
+      p% array_ix = 2
       p% name = 'History_Panels(2)'
       p% win_flag = s% pg% History_Panels_win_flag(2)
       p% win_width = s% pg% History_Panels_win_width(2)
@@ -695,6 +733,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels3)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels3
+      p% array_ix = 3
       p% name = 'History_Panels(3)'
       p% win_flag = s% pg% History_Panels_win_flag(3)
       p% win_width = s% pg% History_Panels_win_width(3)
@@ -709,6 +748,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels4)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels4
+      p% array_ix = 4
       p% name = 'History_Panels(4)'
       p% win_flag = s% pg% History_Panels_win_flag(4)
       p% win_width = s% pg% History_Panels_win_width(4)
@@ -723,6 +763,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels5)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels5
+      p% array_ix = 5
       p% name = 'History_Panels(5)'
       p% win_flag = s% pg% History_Panels_win_flag(5)
       p% win_width = s% pg% History_Panels_win_width(5)
@@ -737,6 +778,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels6)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels6
+      p% array_ix = 6
       p% name = 'History_Panels(6)'
       p% win_flag = s% pg% History_Panels_win_flag(6)
       p% win_width = s% pg% History_Panels_win_width(6)
@@ -751,6 +793,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels7)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels7
+      p% array_ix = 7
       p% name = 'History_Panels(7)'
       p% win_flag = s% pg% History_Panels_win_flag(7)
       p% win_width = s% pg% History_Panels_win_width(7)
@@ -765,6 +808,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels8)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels8
+      p% array_ix = 8
       p% name = 'History_Panels(8)'
       p% win_flag = s% pg% History_Panels_win_flag(8)
       p% win_width = s% pg% History_Panels_win_width(8)
@@ -779,6 +823,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Panels9)
       p% plot => History_Panels_plot
       p% id = i_Hist_Panels9
+      p% array_ix = 9
       p% name = 'History_Panels(9)'
       p% win_flag = s% pg% History_Panels_win_flag(9)
       p% win_width = s% pg% History_Panels_win_width(9)
@@ -793,6 +838,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track1)
       p% plot => History_Track_plot
       p% id = i_Hist_Track1
+      p% array_ix = 1
       p% name = 'History_Track(1)'
       p% win_flag = s% pg% History_Track_win_flag(1)
       p% win_width = s% pg% History_Track_win_width(1)
@@ -807,6 +853,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track2)
       p% plot => History_Track_plot
       p% id = i_Hist_Track2
+      p% array_ix = 2
       p% name = 'History_Track(2)'
       p% win_flag = s% pg% History_Track_win_flag(2)
       p% win_width = s% pg% History_Track_win_width(2)
@@ -821,6 +868,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track3)
       p% plot => History_Track_plot
       p% id = i_Hist_Track3
+      p% array_ix = 3
       p% name = 'History_Track(3)'
       p% win_flag = s% pg% History_Track_win_flag(3)
       p% win_width = s% pg% History_Track_win_width(3)
@@ -835,6 +883,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track4)
       p% plot => History_Track_plot
       p% id = i_Hist_Track4
+      p% array_ix = 4
       p% name = 'History_Track(4)'
       p% win_flag = s% pg% History_Track_win_flag(4)
       p% win_width = s% pg% History_Track_win_width(4)
@@ -849,6 +898,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track5)
       p% plot => History_Track_plot
       p% id = i_Hist_Track5
+      p% array_ix = 5
       p% name = 'History_Track(5)'
       p% win_flag = s% pg% History_Track_win_flag(5)
       p% win_width = s% pg% History_Track_win_width(5)
@@ -863,6 +913,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track6)
       p% plot => History_Track_plot
       p% id = i_Hist_Track6
+      p% array_ix = 6
       p% name = 'History_Track(6)'
       p% win_flag = s% pg% History_Track_win_flag(6)
       p% win_width = s% pg% History_Track_win_width(6)
@@ -877,6 +928,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track7)
       p% plot => History_Track_plot
       p% id = i_Hist_Track7
+      p% array_ix = 7
       p% name = 'History_Track(7)'
       p% win_flag = s% pg% History_Track_win_flag(7)
       p% win_width = s% pg% History_Track_win_width(7)
@@ -891,6 +943,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track8)
       p% plot => History_Track_plot
       p% id = i_Hist_Track8
+      p% array_ix = 8
       p% name = 'History_Track(8)'
       p% win_flag = s% pg% History_Track_win_flag(8)
       p% win_width = s% pg% History_Track_win_width(8)
@@ -905,6 +958,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Hist_Track9)
       p% plot => History_Track_plot
       p% id = i_Hist_Track9
+      p% array_ix = 9
       p% name = 'History_Track(9)'
       p% win_flag = s% pg% History_Track_win_flag(9)
       p% win_width = s% pg% History_Track_win_width(9)
@@ -919,6 +973,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Mode_Prop)
       p% plot => mode_propagation_plot
       p% id = i_Mode_Prop
+      p% array_ix = 0
       p% name = 'Mode_Propagation'
       p% win_flag = s% pg% Mode_Prop_win_flag
       p% win_width = s% pg% Mode_Prop_win_width
@@ -933,6 +988,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Power)
       p% plot => power_plot
       p% id = i_Power
+      p% array_ix = 0
       p% name = 'Power'
       p% win_flag = s% pg% Power_win_flag
       p% win_width = s% pg% Power_win_width
@@ -947,6 +1003,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Abundance)
       p% plot => abundance_plot
       p% id = i_Abundance
+      p% array_ix = 0
       p% name = 'Abundance'
       p% win_flag = s% pg% Abundance_win_flag
       p% win_width = s% pg% Abundance_win_width
@@ -961,6 +1018,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Summary_Burn)
       p% plot => summary_burn_plot
       p% id = i_Summary_Burn
+      p% array_ix = 0
       p% name = 'Summary_Burn'
       p% win_flag = s% pg% Summary_Burn_win_flag
       p% win_width = s% pg% Summary_Burn_win_width
@@ -975,6 +1033,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Summary_Profile)
       p% plot => summary_profile_plot
       p% id = i_Summary_Profile
+      p% array_ix = 0
       p% name = 'Summary_Profile'
       p% win_flag = s% pg% Summary_Profile_win_flag
       p% win_width = s% pg% Summary_Profile_win_width
@@ -989,6 +1048,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Summary_History)
       p% plot => summary_history_plot
       p% id = i_Summary_History
+      p% array_ix = 0
       p% name = 'Summary_History'
       p% win_flag = s% pg% Summary_History_win_flag
       p% win_width = s% pg% Summary_History_win_width
@@ -1003,6 +1063,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag1)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag1
+      p% array_ix = 1
       p% name = 'Color_Magnitude(1)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(1)
       p% win_width = s% pg% Color_Magnitude_win_width(1)
@@ -1017,6 +1078,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag2)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag2
+      p% array_ix = 2
       p% name = 'Color_Magnitude(2)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(2)
       p% win_width = s% pg% Color_Magnitude_win_width(2)
@@ -1031,6 +1093,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag3)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag3
+      p% array_ix = 3
       p% name = 'Color_Magnitude(3)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(3)
       p% win_width = s% pg% Color_Magnitude_win_width(3)
@@ -1045,6 +1108,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag4)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag4
+      p% array_ix = 4
       p% name = 'Color_Magnitude(4)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(4)
       p% win_width = s% pg% Color_Magnitude_win_width(4)
@@ -1059,6 +1123,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag5)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag5
+      p% array_ix = 5
       p% name = 'Color_Magnitude(5)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(5)
       p% win_width = s% pg% Color_Magnitude_win_width(5)
@@ -1073,6 +1138,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag6)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag6
+      p% array_ix = 6
       p% name = 'Color_Magnitude(6)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(6)
       p% win_width = s% pg% Color_Magnitude_win_width(6)
@@ -1087,6 +1153,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag7)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag7
+      p% array_ix = 7
       p% name = 'Color_Magnitude(7)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(7)
       p% win_width = s% pg% Color_Magnitude_win_width(7)
@@ -1101,6 +1168,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag8)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag8
+      p% array_ix = 8
       p% name = 'Color_Magnitude(8)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(8)
       p% win_width = s% pg% Color_Magnitude_win_width(8)
@@ -1115,6 +1183,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Col_Mag9)
       p% plot => Color_Magnitude_plot
       p% id = i_Col_Mag9
+      p% array_ix = 9
       p% name = 'Color_Magnitude(9)'
       p% win_flag = s% pg% Color_Magnitude_win_flag(9)
       p% win_width = s% pg% Color_Magnitude_win_width(9)
@@ -1129,6 +1198,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid1)
       p% plot => grid_plot
       p% id = i_Grid1
+      p% array_ix = 1
       p% name = 'Grid(1)'
       p% win_flag = s% pg% Grid_win_flag(1)
       p% win_width = s% pg% Grid_win_width(1)
@@ -1143,6 +1213,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid2)
       p% plot => grid_plot
       p% id = i_Grid2
+      p% array_ix = 2
       p% name = 'Grid(2)'
       p% win_flag = s% pg% Grid_win_flag(2)
       p% win_width = s% pg% Grid_win_width(2)
@@ -1157,6 +1228,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid3)
       p% plot => grid_plot
       p% id = i_Grid3
+      p% array_ix = 3
       p% name = 'Grid(3)'
       p% win_flag = s% pg% Grid_win_flag(3)
       p% win_width = s% pg% Grid_win_width(3)
@@ -1171,6 +1243,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid4)
       p% plot => grid_plot
       p% id = i_Grid4
+      p% array_ix = 4
       p% name = 'Grid(4)'
       p% win_flag = s% pg% Grid_win_flag(4)
       p% win_width = s% pg% Grid_win_width(4)
@@ -1185,6 +1258,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid5)
       p% plot => grid_plot
       p% id = i_Grid5
+      p% array_ix = 5
       p% name = 'Grid(5)'
       p% win_flag = s% pg% Grid_win_flag(5)
       p% win_width = s% pg% Grid_win_width(5)
@@ -1199,6 +1273,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid6)
       p% plot => grid_plot
       p% id = i_Grid6
+      p% array_ix = 6
       p% name = 'Grid(6)'
       p% win_flag = s% pg% Grid_win_flag(6)
       p% win_width = s% pg% Grid_win_width(6)
@@ -1213,6 +1288,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid7)
       p% plot => grid_plot
       p% id = i_Grid7
+      p% array_ix = 7
       p% name = 'Grid(7)'
       p% win_flag = s% pg% Grid_win_flag(7)
       p% win_width = s% pg% Grid_win_width(7)
@@ -1227,6 +1303,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid8)
       p% plot => grid_plot
       p% id = i_Grid8
+      p% array_ix = 8
       p% name = 'Grid(8)'
       p% win_flag = s% pg% Grid_win_flag(8)
       p% win_width = s% pg% Grid_win_width(8)
@@ -1241,6 +1318,7 @@ contains
       p => s% pg% pgstar_win_file_ptr(i_Grid9)
       p% plot => grid_plot
       p% id = i_Grid9
+      p% array_ix = 9
       p% name = 'Grid(9)'
       p% win_flag = s% pg% Grid_win_flag(9)
       p% win_width = s% pg% Grid_win_width(9)
@@ -1405,14 +1483,14 @@ contains
       do i = 1, num_pgstar_plots
          p => s% pg% pgstar_win_file_ptr(i)
 
-         if(show_plot_now) then
+         if (show_plot_now) then
             ! call to check_window opens device
             call check_window(s, p, ierr)
             if (failed('check_window')) return
 
             ! make the plot (window)
             if (p% do_win) then
-               call p% plot(s% id, p% id_win, ierr)
+               call p% plot(s% id, p% id_win, p% array_ix, ierr)
                if (failed(p% name)) return
             end if
          end if
@@ -1424,13 +1502,13 @@ contains
             end if
          end if
 
-         if(save_plot_now)then
+         if (save_plot_now) then
             ! call to check_file opens device and does mkdir
             call check_file(s, p, ierr)
 
             ! make the plot (file)
             if (p% do_file) then
-               call p% plot(s% id, p% id_file, ierr)
+               call p% plot(s% id, p% id_file, p% array_ix, ierr)
                if (failed(p% name)) return
                call pgclos
                if (s% pg% pgstar_report_writing_files) &

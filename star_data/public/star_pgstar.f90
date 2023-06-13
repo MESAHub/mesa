@@ -35,9 +35,8 @@ module star_pgstar
 
    abstract interface
       
-      subroutine pgstar_plot_interface(id, device_id, ierr, array_ix)
-         integer, intent(in) :: id, device_id
-         integer, intent(in), optional :: array_ix
+      subroutine pgstar_plot_interface(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
       end subroutine pgstar_plot_interface
 
@@ -59,7 +58,7 @@ module star_pgstar
    end interface
 
    type pgstar_win_file_data
-      integer :: id
+      integer :: id, array_ix
       character (len=64) :: name
       logical :: win_flag, file_flag, do_win, do_file
       integer :: id_win, id_file, file_interval
