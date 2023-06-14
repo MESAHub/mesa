@@ -143,6 +143,12 @@ An experimental RSP solver feature was turned on by default, leading to converge
 r15140
 ======
 
+Free Electron Density on FreeEOS
+--------------------------------
+
+The free electron density (``lnfree_e``) reported by FreeEOS was off by a factor of ``ln(10)`` due to tabulations needing to list the log base 10 value of this quantity rather than natural log. For historical reasons related to OPAL tables, the EOS tables report the log base 10 value, which is later converted to natural log before being reported as ``lnfree_e`` in MESA.
+
+See `gh-189 <https://github.com/MESAHub/mesa/issues/189>`_
 
 r12778
 ======
