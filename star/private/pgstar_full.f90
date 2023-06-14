@@ -27,8 +27,8 @@ module pgstar
 
    use star_private_def
    use const_def
-   use chem_def, only : category_name
-   use rates_def, only : i_rate
+   use chem_def, only: category_name
+   use rates_def, only: i_rate
    use pgstar_support
    use star_pgstar
 
@@ -39,7 +39,7 @@ contains
 
 
    subroutine do_create_file_name(s, dir, prefix, name)
-      use pgstar_support, only : create_file_name
+      use pgstar_support, only: create_file_name
       type (star_info), pointer :: s
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
@@ -48,8 +48,8 @@ contains
 
 
    subroutine do_write_plot_to_file(s, p, filename, ierr)
-      use star_def, only : star_info
-      use pgstar_support, only : write_plot_to_file
+      use star_def, only: star_info
+      use pgstar_support, only: write_plot_to_file
       type (star_info), pointer :: s
       type (pgstar_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
@@ -60,7 +60,7 @@ contains
 
    subroutine do_show_pgstar_annotations(&
       s, show_annotation1, show_annotation2, show_annotation3)
-      use pgstar_support, only : show_annotations
+      use pgstar_support, only: show_annotations
       type (star_info), pointer :: s
       logical, intent(in) :: &
          show_annotation1, show_annotation2, show_annotation3
@@ -103,7 +103,7 @@ contains
 
 
    subroutine do_read_pgstar_controls(s, inlist_fname, ierr)
-      use pgstar_ctrls_io, only : read_pgstar
+      use pgstar_ctrls_io, only: read_pgstar
       type (star_info), pointer :: s
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
@@ -120,180 +120,64 @@ contains
 
 
    subroutine set_win_file_data(s, ierr)
-      use pgstar_kipp, only : Kipp_Plot
-      use pgstar_L_R, only : L_R_Plot
-      use pgstar_L_v, only : L_v_Plot
-      use pgstar_L_Teff, only : L_Teff_Plot
-      use pgstar_logL_R, only : logL_R_Plot
-      use pgstar_logL_v, only : logL_v_Plot
-      use pgstar_logL_Teff, only : logL_Teff_Plot
-      use pgstar_r_L, only : R_L_Plot
-      use pgstar_r_Teff, only : R_Teff_Plot
-      use pgstar_logg_Teff, only : logg_Teff_Plot
-      use pgstar_logg_logT, only : logg_logT_Plot
-      use pgstar_dPg_dnu, only : dPg_dnu_Plot
-      use pgstar_hr, only : HR_Plot
-      use pgstar_trho, only : TRho_Plot
-      use pgstar_tmaxrho, only : TmaxRho_Plot
-      use pgstar_dynamo, only : Dynamo_plot
-      use pgstar_mixing_Ds, only : Mixing_plot
-      use pgstar_trho_profile, only : TRho_Profile_plot
-      use pgstar_power, only : power_plot
-      use pgstar_mode_prop, only : mode_propagation_plot
-      use pgstar_abundance, only : abundance_plot
-      use pgstar_summary_burn, only : summary_burn_plot
-      use pgstar_summary_profile, only : summary_profile_plot
-      use pgstar_summary_history, only : summary_history_plot
-      use pgstar_grid, only : grid_plot
-      use pgstar_summary, only : Text_Summary_Plot
-      use pgstar_profile_panels, only : Profile_Panels_plot
-      use pgstar_history_panels, only : History_Panels_plot
-      use pgstar_hist_track, only : History_Track_plot
-      use pgstar_network, only : Network_plot
-      use pgstar_production, only : Production_plot
-      use pgstar_Color_Magnitude, only : Color_Magnitude_plot
+      use pgstar_kipp, only: Kipp_Plot
+      use pgstar_L_R, only: L_R_Plot
+      use pgstar_L_v, only: L_v_Plot
+      use pgstar_L_Teff, only: L_Teff_Plot
+      use pgstar_logL_R, only: logL_R_Plot
+      use pgstar_logL_v, only: logL_v_Plot
+      use pgstar_logL_Teff, only: logL_Teff_Plot
+      use pgstar_r_L, only: R_L_Plot
+      use pgstar_r_Teff, only: R_Teff_Plot
+      use pgstar_logg_Teff, only: logg_Teff_Plot
+      use pgstar_logg_logT, only: logg_logT_Plot
+      use pgstar_dPg_dnu, only: dPg_dnu_Plot
+      use pgstar_hr, only: HR_Plot
+      use pgstar_trho, only: TRho_Plot
+      use pgstar_tmaxrho, only: TmaxRho_Plot
+      use pgstar_dynamo, only: Dynamo_plot
+      use pgstar_mixing_Ds, only: Mixing_plot
+      use pgstar_trho_profile, only: TRho_Profile_plot
+      use pgstar_power, only: power_plot
+      use pgstar_mode_prop, only: mode_propagation_plot
+      use pgstar_abundance, only: abundance_plot
+      use pgstar_summary_burn, only: summary_burn_plot
+      use pgstar_summary_profile, only: summary_profile_plot
+      use pgstar_summary_history, only: summary_history_plot
+      use pgstar_grid, only: grid_plot
+      use pgstar_summary, only: Text_Summary_Plot
+      use pgstar_profile_panels, only: Profile_Panels_plot
+      use pgstar_history_panels, only: History_Panels_plot
+      use pgstar_hist_track, only: History_Track_plot
+      use pgstar_network, only: Network_plot
+      use pgstar_production, only: Production_plot
+      use pgstar_Color_Magnitude, only: Color_Magnitude_plot
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
       type (pgstar_win_file_data), pointer :: p
       integer :: i
+      character (len = strlen) :: nm
 
       ! store win and file info in records
 
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary1)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary1
-      p% array_ix = 1
-      p% name = 'Text_Summary(1)'
-      p% win_flag = s% pg% Text_Summary_win_flag(1)
-      p% win_width = s% pg% Text_Summary_win_width(1)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(1)
-      p% file_flag = s% pg% Text_Summary_file_flag(1)
-      p% file_dir = s% pg% Text_Summary_file_dir(1)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(1)
-      p% file_interval = s% pg% Text_Summary_file_interval(1)
-      p% file_width = s% pg% Text_Summary_file_width(1)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(1)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary2)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary2
-      p% array_ix = 2
-      p% name = 'Text_Summary(2)'
-      p% win_flag = s% pg% Text_Summary_win_flag(2)
-      p% win_width = s% pg% Text_Summary_win_width(2)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(2)
-      p% file_flag = s% pg% Text_Summary_file_flag(2)
-      p% file_dir = s% pg% Text_Summary_file_dir(2)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(2)
-      p% file_interval = s% pg% Text_Summary_file_interval(2)
-      p% file_width = s% pg% Text_Summary_file_width(2)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary3)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary3
-      p% array_ix = 3
-      p% name = 'Text_Summary(3)'
-      p% win_flag = s% pg% Text_Summary_win_flag(3)
-      p% win_width = s% pg% Text_Summary_win_width(3)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(3)
-      p% file_flag = s% pg% Text_Summary_file_flag(3)
-      p% file_dir = s% pg% Text_Summary_file_dir(3)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(3)
-      p% file_interval = s% pg% Text_Summary_file_interval(3)
-      p% file_width = s% pg% Text_Summary_file_width(3)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary4)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary4
-      p% array_ix = 4
-      p% name = 'Text_Summary(4)'
-      p% win_flag = s% pg% Text_Summary_win_flag(4)
-      p% win_width = s% pg% Text_Summary_win_width(4)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(4)
-      p% file_flag = s% pg% Text_Summary_file_flag(4)
-      p% file_dir = s% pg% Text_Summary_file_dir(4)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(4)
-      p% file_interval = s% pg% Text_Summary_file_interval(4)
-      p% file_width = s% pg% Text_Summary_file_width(4)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary5)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary5
-      p% array_ix = 5
-      p% name = 'Text_Summary(5)'
-      p% win_flag = s% pg% Text_Summary_win_flag(5)
-      p% win_width = s% pg% Text_Summary_win_width(5)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(5)
-      p% file_flag = s% pg% Text_Summary_file_flag(5)
-      p% file_dir = s% pg% Text_Summary_file_dir(5)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(5)
-      p% file_interval = s% pg% Text_Summary_file_interval(5)
-      p% file_width = s% pg% Text_Summary_file_width(5)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary6)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary6
-      p% array_ix = 6
-      p% name = 'Text_Summary(6)'
-      p% win_flag = s% pg% Text_Summary_win_flag(6)
-      p% win_width = s% pg% Text_Summary_win_width(6)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(6)
-      p% file_flag = s% pg% Text_Summary_file_flag(6)
-      p% file_dir = s% pg% Text_Summary_file_dir(6)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(6)
-      p% file_interval = s% pg% Text_Summary_file_interval(6)
-      p% file_width = s% pg% Text_Summary_file_width(6)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary7)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary7
-      p% array_ix = 7
-      p% name = 'Text_Summary(7)'
-      p% win_flag = s% pg% Text_Summary_win_flag(7)
-      p% win_width = s% pg% Text_Summary_win_width(7)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(7)
-      p% file_flag = s% pg% Text_Summary_file_flag(7)
-      p% file_dir = s% pg% Text_Summary_file_dir(7)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(7)
-      p% file_interval = s% pg% Text_Summary_file_interval(7)
-      p% file_width = s% pg% Text_Summary_file_width(7)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary8)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary8
-      p% array_ix = 8
-      p% name = 'Text_Summary(8)'
-      p% win_flag = s% pg% Text_Summary_win_flag(8)
-      p% win_width = s% pg% Text_Summary_win_width(8)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(8)
-      p% file_flag = s% pg% Text_Summary_file_flag(8)
-      p% file_dir = s% pg% Text_Summary_file_dir(8)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(8)
-      p% file_interval = s% pg% Text_Summary_file_interval(8)
-      p% file_width = s% pg% Text_Summary_file_width(8)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Text_Summary9)
-      p% plot => Text_Summary_Plot
-      p% id = i_Text_Summary9
-      p% array_ix = 9
-      p% name = 'Text_Summary(9)'
-      p% win_flag = s% pg% Text_Summary_win_flag(9)
-      p% win_width = s% pg% Text_Summary_win_width(9)
-      p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(9)
-      p% file_flag = s% pg% Text_Summary_file_flag(9)
-      p% file_dir = s% pg% Text_Summary_file_dir(9)
-      p% file_prefix = s% pg% Text_Summary_file_prefix(9)
-      p% file_interval = s% pg% Text_Summary_file_interval(9)
-      p% file_width = s% pg% Text_Summary_file_width(9)
-      p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(9)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Text_Summary + i - 1)
+         p% plot => Text_Summary_Plot
+         p% id = i_Text_Summary + i - 1
+         p% array_ix = i
+         write(nm, '(I2)') i
+         p% name = 'Text_Summary' // trim(nm)
+         p% win_flag = s% pg% Text_Summary_win_flag(i)
+         p% win_width = s% pg% Text_Summary_win_width(i)
+         p% win_aspect_ratio = s% pg% Text_Summary_win_aspect_ratio(i)
+         p% file_flag = s% pg% Text_Summary_file_flag(i)
+         p% file_dir = s% pg% Text_Summary_file_dir(i)
+         p% file_prefix = s% pg% Text_Summary_file_prefix(i)
+         p% file_interval = s% pg% Text_Summary_file_interval(i)
+         p% file_width = s% pg% Text_Summary_file_width(i)
+         p% file_aspect_ratio = s% pg% Text_Summary_file_aspect_ratio(i)
+      end do
 
       p => s% pg% pgstar_win_file_ptr(i_TRho_Profile)
       p% plot => TRho_Profile_plot
@@ -310,140 +194,23 @@ contains
       p% file_width = s% pg% TRho_Profile_file_width
       p% file_aspect_ratio = s% pg% TRho_Profile_file_aspect_ratio
 
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels1)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels1
-      p% array_ix = 1
-      p% name = 'Profile_Panels(1)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(1)
-      p% win_width = s% pg% Profile_Panels_win_width(1)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(1)
-      p% file_flag = s% pg% Profile_Panels_file_flag(1)
-      p% file_dir = s% pg% Profile_Panels_file_dir(1)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(1)
-      p% file_interval = s% pg% Profile_Panels_file_interval(1)
-      p% file_width = s% pg% Profile_Panels_file_width(1)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(1)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels2)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels2
-      p% array_ix = 2
-      p% name = 'Profile_Panels(2)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(2)
-      p% win_width = s% pg% Profile_Panels_win_width(2)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(2)
-      p% file_flag = s% pg% Profile_Panels_file_flag(2)
-      p% file_dir = s% pg% Profile_Panels_file_dir(2)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(2)
-      p% file_interval = s% pg% Profile_Panels_file_interval(2)
-      p% file_width = s% pg% Profile_Panels_file_width(2)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels3)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels3
-      p% array_ix = 3
-      p% name = 'Profile_Panels(3)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(3)
-      p% win_width = s% pg% Profile_Panels_win_width(3)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(3)
-      p% file_flag = s% pg% Profile_Panels_file_flag(3)
-      p% file_dir = s% pg% Profile_Panels_file_dir(3)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(3)
-      p% file_interval = s% pg% Profile_Panels_file_interval(3)
-      p% file_width = s% pg% Profile_Panels_file_width(3)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels4)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels4
-      p% array_ix = 4
-      p% name = 'Profile_Panels(4)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(4)
-      p% win_width = s% pg% Profile_Panels_win_width(4)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(4)
-      p% file_flag = s% pg% Profile_Panels_file_flag(4)
-      p% file_dir = s% pg% Profile_Panels_file_dir(4)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(4)
-      p% file_interval = s% pg% Profile_Panels_file_interval(4)
-      p% file_width = s% pg% Profile_Panels_file_width(4)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels5)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels5
-      p% array_ix = 5
-      p% name = 'Profile_Panels(5)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(5)
-      p% win_width = s% pg% Profile_Panels_win_width(5)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(5)
-      p% file_flag = s% pg% Profile_Panels_file_flag(5)
-      p% file_dir = s% pg% Profile_Panels_file_dir(5)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(5)
-      p% file_interval = s% pg% Profile_Panels_file_interval(5)
-      p% file_width = s% pg% Profile_Panels_file_width(5)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels6)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels6
-      p% array_ix = 6
-      p% name = 'Profile_Panels(6)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(6)
-      p% win_width = s% pg% Profile_Panels_win_width(6)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(6)
-      p% file_flag = s% pg% Profile_Panels_file_flag(6)
-      p% file_dir = s% pg% Profile_Panels_file_dir(6)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(6)
-      p% file_interval = s% pg% Profile_Panels_file_interval(6)
-      p% file_width = s% pg% Profile_Panels_file_width(6)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels7)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels7
-      p% array_ix = 7
-      p% name = 'Profile_Panels(7)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(7)
-      p% win_width = s% pg% Profile_Panels_win_width(7)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(7)
-      p% file_flag = s% pg% Profile_Panels_file_flag(7)
-      p% file_dir = s% pg% Profile_Panels_file_dir(7)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(7)
-      p% file_interval = s% pg% Profile_Panels_file_interval(7)
-      p% file_width = s% pg% Profile_Panels_file_width(7)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels8)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels8
-      p% array_ix = 8
-      p% name = 'Profile_Panels(8)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(8)
-      p% win_width = s% pg% Profile_Panels_win_width(8)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(8)
-      p% file_flag = s% pg% Profile_Panels_file_flag(8)
-      p% file_dir = s% pg% Profile_Panels_file_dir(8)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(8)
-      p% file_interval = s% pg% Profile_Panels_file_interval(8)
-      p% file_width = s% pg% Profile_Panels_file_width(8)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Profile_Panels9)
-      p% plot => Profile_Panels_plot
-      p% id = i_Profile_Panels9
-      p% array_ix = 9
-      p% name = 'Profile_Panels(9)'
-      p% win_flag = s% pg% Profile_Panels_win_flag(9)
-      p% win_width = s% pg% Profile_Panels_win_width(9)
-      p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(9)
-      p% file_flag = s% pg% Profile_Panels_file_flag(9)
-      p% file_dir = s% pg% Profile_Panels_file_dir(9)
-      p% file_prefix = s% pg% Profile_Panels_file_prefix(9)
-      p% file_interval = s% pg% Profile_Panels_file_interval(9)
-      p% file_width = s% pg% Profile_Panels_file_width(9)
-      p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(9)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Profile_Panels + i - 1)
+         p% plot => Profile_Panels_plot
+         p% id = i_Profile_Panels + i - 1
+         p% array_ix = i
+         write(nm, '(I1)') i
+         p% name = 'Profile_Panels' // trim(nm)
+         p% win_flag = s% pg% Profile_Panels_win_flag(i)
+         p% win_width = s% pg% Profile_Panels_win_width(i)
+         p% win_aspect_ratio = s% pg% Profile_Panels_win_aspect_ratio(i)
+         p% file_flag = s% pg% Profile_Panels_file_flag(i)
+         p% file_dir = s% pg% Profile_Panels_file_dir(i)
+         p% file_prefix = s% pg% Profile_Panels_file_prefix(i)
+         p% file_interval = s% pg% Profile_Panels_file_interval(i)
+         p% file_width = s% pg% Profile_Panels_file_width(i)
+         p% file_aspect_ratio = s% pg% Profile_Panels_file_aspect_ratio(i)
+      end do
 
       p => s% pg% pgstar_win_file_ptr(i_logg_Teff)
       p% plot => logg_Teff_Plot
@@ -700,275 +467,41 @@ contains
       p% file_width = s% pg% Production_file_width
       p% file_aspect_ratio = s% pg% Production_file_aspect_ratio
 
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels1)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels1
-      p% array_ix = 1
-      p% name = 'History_Panels(1)'
-      p% win_flag = s% pg% History_Panels_win_flag(1)
-      p% win_width = s% pg% History_Panels_win_width(1)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(1)
-      p% file_flag = s% pg% History_Panels_file_flag(1)
-      p% file_dir = s% pg% History_Panels_file_dir(1)
-      p% file_prefix = s% pg% History_Panels_file_prefix(1)
-      p% file_interval = s% pg% History_Panels_file_interval(1)
-      p% file_width = s% pg% History_Panels_file_width(1)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(1)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Hist_Panels + i - 1)
+         p% plot => History_Panels_plot
+         p% id = i_Hist_Panels + i - 1
+         p% array_ix = i
+         write(nm, '( I1 )') i
+         p% name = 'History_Panels' // nm
+         p% win_flag = s% pg% History_Panels_win_flag(i)
+         p% win_width = s% pg% History_Panels_win_width(i)
+         p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(i)
+         p% file_flag = s% pg% History_Panels_file_flag(i)
+         p% file_dir = s% pg% History_Panels_file_dir(i)
+         p% file_prefix = s% pg% History_Panels_file_prefix(i)
+         p% file_interval = s% pg% History_Panels_file_interval(i)
+         p% file_width = s% pg% History_Panels_file_width(i)
+         p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(i)
+      end do
 
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels2)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels2
-      p% array_ix = 2
-      p% name = 'History_Panels(2)'
-      p% win_flag = s% pg% History_Panels_win_flag(2)
-      p% win_width = s% pg% History_Panels_win_width(2)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(2)
-      p% file_flag = s% pg% History_Panels_file_flag(2)
-      p% file_dir = s% pg% History_Panels_file_dir(2)
-      p% file_prefix = s% pg% History_Panels_file_prefix(2)
-      p% file_interval = s% pg% History_Panels_file_interval(2)
-      p% file_width = s% pg% History_Panels_file_width(2)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels3)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels3
-      p% array_ix = 3
-      p% name = 'History_Panels(3)'
-      p% win_flag = s% pg% History_Panels_win_flag(3)
-      p% win_width = s% pg% History_Panels_win_width(3)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(3)
-      p% file_flag = s% pg% History_Panels_file_flag(3)
-      p% file_dir = s% pg% History_Panels_file_dir(3)
-      p% file_prefix = s% pg% History_Panels_file_prefix(3)
-      p% file_interval = s% pg% History_Panels_file_interval(3)
-      p% file_width = s% pg% History_Panels_file_width(3)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels4)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels4
-      p% array_ix = 4
-      p% name = 'History_Panels(4)'
-      p% win_flag = s% pg% History_Panels_win_flag(4)
-      p% win_width = s% pg% History_Panels_win_width(4)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(4)
-      p% file_flag = s% pg% History_Panels_file_flag(4)
-      p% file_dir = s% pg% History_Panels_file_dir(4)
-      p% file_prefix = s% pg% History_Panels_file_prefix(4)
-      p% file_interval = s% pg% History_Panels_file_interval(4)
-      p% file_width = s% pg% History_Panels_file_width(4)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels5)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels5
-      p% array_ix = 5
-      p% name = 'History_Panels(5)'
-      p% win_flag = s% pg% History_Panels_win_flag(5)
-      p% win_width = s% pg% History_Panels_win_width(5)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(5)
-      p% file_flag = s% pg% History_Panels_file_flag(5)
-      p% file_dir = s% pg% History_Panels_file_dir(5)
-      p% file_prefix = s% pg% History_Panels_file_prefix(5)
-      p% file_interval = s% pg% History_Panels_file_interval(5)
-      p% file_width = s% pg% History_Panels_file_width(5)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels6)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels6
-      p% array_ix = 6
-      p% name = 'History_Panels(6)'
-      p% win_flag = s% pg% History_Panels_win_flag(6)
-      p% win_width = s% pg% History_Panels_win_width(6)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(6)
-      p% file_flag = s% pg% History_Panels_file_flag(6)
-      p% file_dir = s% pg% History_Panels_file_dir(6)
-      p% file_prefix = s% pg% History_Panels_file_prefix(6)
-      p% file_interval = s% pg% History_Panels_file_interval(6)
-      p% file_width = s% pg% History_Panels_file_width(6)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels7)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels7
-      p% array_ix = 7
-      p% name = 'History_Panels(7)'
-      p% win_flag = s% pg% History_Panels_win_flag(7)
-      p% win_width = s% pg% History_Panels_win_width(7)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(7)
-      p% file_flag = s% pg% History_Panels_file_flag(7)
-      p% file_dir = s% pg% History_Panels_file_dir(7)
-      p% file_prefix = s% pg% History_Panels_file_prefix(7)
-      p% file_interval = s% pg% History_Panels_file_interval(7)
-      p% file_width = s% pg% History_Panels_file_width(7)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels8)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels8
-      p% array_ix = 8
-      p% name = 'History_Panels(8)'
-      p% win_flag = s% pg% History_Panels_win_flag(8)
-      p% win_width = s% pg% History_Panels_win_width(8)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(8)
-      p% file_flag = s% pg% History_Panels_file_flag(8)
-      p% file_dir = s% pg% History_Panels_file_dir(8)
-      p% file_prefix = s% pg% History_Panels_file_prefix(8)
-      p% file_interval = s% pg% History_Panels_file_interval(8)
-      p% file_width = s% pg% History_Panels_file_width(8)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Panels9)
-      p% plot => History_Panels_plot
-      p% id = i_Hist_Panels9
-      p% array_ix = 9
-      p% name = 'History_Panels(9)'
-      p% win_flag = s% pg% History_Panels_win_flag(9)
-      p% win_width = s% pg% History_Panels_win_width(9)
-      p% win_aspect_ratio = s% pg% History_Panels_win_aspect_ratio(9)
-      p% file_flag = s% pg% History_Panels_file_flag(9)
-      p% file_dir = s% pg% History_Panels_file_dir(9)
-      p% file_prefix = s% pg% History_Panels_file_prefix(9)
-      p% file_interval = s% pg% History_Panels_file_interval(9)
-      p% file_width = s% pg% History_Panels_file_width(9)
-      p% file_aspect_ratio = s% pg% History_Panels_file_aspect_ratio(9)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track1)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track1
-      p% array_ix = 1
-      p% name = 'History_Track(1)'
-      p% win_flag = s% pg% History_Track_win_flag(1)
-      p% win_width = s% pg% History_Track_win_width(1)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(1)
-      p% file_flag = s% pg% History_Track_file_flag(1)
-      p% file_dir = s% pg% History_Track_file_dir(1)
-      p% file_prefix = s% pg% History_Track_file_prefix(1)
-      p% file_interval = s% pg% History_Track_file_interval(1)
-      p% file_width = s% pg% History_Track_file_width(1)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(1)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track2)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track2
-      p% array_ix = 2
-      p% name = 'History_Track(2)'
-      p% win_flag = s% pg% History_Track_win_flag(2)
-      p% win_width = s% pg% History_Track_win_width(2)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(2)
-      p% file_flag = s% pg% History_Track_file_flag(2)
-      p% file_dir = s% pg% History_Track_file_dir(2)
-      p% file_prefix = s% pg% History_Track_file_prefix(2)
-      p% file_interval = s% pg% History_Track_file_interval(2)
-      p% file_width = s% pg% History_Track_file_width(2)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track3)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track3
-      p% array_ix = 3
-      p% name = 'History_Track(3)'
-      p% win_flag = s% pg% History_Track_win_flag(3)
-      p% win_width = s% pg% History_Track_win_width(3)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(3)
-      p% file_flag = s% pg% History_Track_file_flag(3)
-      p% file_dir = s% pg% History_Track_file_dir(3)
-      p% file_prefix = s% pg% History_Track_file_prefix(3)
-      p% file_interval = s% pg% History_Track_file_interval(3)
-      p% file_width = s% pg% History_Track_file_width(3)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track4)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track4
-      p% array_ix = 4
-      p% name = 'History_Track(4)'
-      p% win_flag = s% pg% History_Track_win_flag(4)
-      p% win_width = s% pg% History_Track_win_width(4)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(4)
-      p% file_flag = s% pg% History_Track_file_flag(4)
-      p% file_dir = s% pg% History_Track_file_dir(4)
-      p% file_prefix = s% pg% History_Track_file_prefix(4)
-      p% file_interval = s% pg% History_Track_file_interval(4)
-      p% file_width = s% pg% History_Track_file_width(4)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track5)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track5
-      p% array_ix = 5
-      p% name = 'History_Track(5)'
-      p% win_flag = s% pg% History_Track_win_flag(5)
-      p% win_width = s% pg% History_Track_win_width(5)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(5)
-      p% file_flag = s% pg% History_Track_file_flag(5)
-      p% file_dir = s% pg% History_Track_file_dir(5)
-      p% file_prefix = s% pg% History_Track_file_prefix(5)
-      p% file_interval = s% pg% History_Track_file_interval(5)
-      p% file_width = s% pg% History_Track_file_width(5)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track6)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track6
-      p% array_ix = 6
-      p% name = 'History_Track(6)'
-      p% win_flag = s% pg% History_Track_win_flag(6)
-      p% win_width = s% pg% History_Track_win_width(6)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(6)
-      p% file_flag = s% pg% History_Track_file_flag(6)
-      p% file_dir = s% pg% History_Track_file_dir(6)
-      p% file_prefix = s% pg% History_Track_file_prefix(6)
-      p% file_interval = s% pg% History_Track_file_interval(6)
-      p% file_width = s% pg% History_Track_file_width(6)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track7)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track7
-      p% array_ix = 7
-      p% name = 'History_Track(7)'
-      p% win_flag = s% pg% History_Track_win_flag(7)
-      p% win_width = s% pg% History_Track_win_width(7)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(7)
-      p% file_flag = s% pg% History_Track_file_flag(7)
-      p% file_dir = s% pg% History_Track_file_dir(7)
-      p% file_prefix = s% pg% History_Track_file_prefix(7)
-      p% file_interval = s% pg% History_Track_file_interval(7)
-      p% file_width = s% pg% History_Track_file_width(7)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track8)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track8
-      p% array_ix = 8
-      p% name = 'History_Track(8)'
-      p% win_flag = s% pg% History_Track_win_flag(8)
-      p% win_width = s% pg% History_Track_win_width(8)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(8)
-      p% file_flag = s% pg% History_Track_file_flag(8)
-      p% file_dir = s% pg% History_Track_file_dir(8)
-      p% file_prefix = s% pg% History_Track_file_prefix(8)
-      p% file_interval = s% pg% History_Track_file_interval(8)
-      p% file_width = s% pg% History_Track_file_width(8)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Hist_Track9)
-      p% plot => History_Track_plot
-      p% id = i_Hist_Track9
-      p% array_ix = 9
-      p% name = 'History_Track(9)'
-      p% win_flag = s% pg% History_Track_win_flag(9)
-      p% win_width = s% pg% History_Track_win_width(9)
-      p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(9)
-      p% file_flag = s% pg% History_Track_file_flag(9)
-      p% file_dir = s% pg% History_Track_file_dir(9)
-      p% file_prefix = s% pg% History_Track_file_prefix(9)
-      p% file_interval = s% pg% History_Track_file_interval(9)
-      p% file_width = s% pg% History_Track_file_width(9)
-      p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(9)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Hist_Track + i - 1)
+         p% plot => History_Track_plot
+         p% id = i_Hist_Track + i - 1
+         p% array_ix = i
+         write(nm, '(I1)') i
+         p% name = 'History_Track' // trim(nm)
+         p% win_flag = s% pg% History_Track_win_flag(i)
+         p% win_width = s% pg% History_Track_win_width(i)
+         p% win_aspect_ratio = s% pg% History_Track_win_aspect_ratio(i)
+         p% file_flag = s% pg% History_Track_file_flag(i)
+         p% file_dir = s% pg% History_Track_file_dir(i)
+         p% file_prefix = s% pg% History_Track_file_prefix(i)
+         p% file_interval = s% pg% History_Track_file_interval(i)
+         p% file_width = s% pg% History_Track_file_width(i)
+         p% file_aspect_ratio = s% pg% History_Track_file_aspect_ratio(i)
+      end do
 
       p => s% pg% pgstar_win_file_ptr(i_Mode_Prop)
       p% plot => mode_propagation_plot
@@ -1060,275 +593,41 @@ contains
       p% file_width = s% pg% Summary_History_file_width
       p% file_aspect_ratio = s% pg% Summary_History_file_aspect_ratio
 
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag1)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag1
-      p% array_ix = 1
-      p% name = 'Color_Magnitude(1)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(1)
-      p% win_width = s% pg% Color_Magnitude_win_width(1)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(1)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(1)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(1)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(1)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(1)
-      p% file_width = s% pg% Color_Magnitude_file_width(1)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(1)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Col_Mag + i - 1)
+         p% plot => Color_Magnitude_plot
+         p% id = i_Col_Mag + i - 1
+         p% array_ix = i
+         write(nm, '(I1)') i
+         p% name = 'Color_Magnitude' // trim(nm)
+         p% win_flag = s% pg% Color_Magnitude_win_flag(i)
+         p% win_width = s% pg% Color_Magnitude_win_width(i)
+         p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(i)
+         p% file_flag = s% pg% Color_Magnitude_file_flag(i)
+         p% file_dir = s% pg% Color_Magnitude_file_dir(i)
+         p% file_prefix = s% pg% Color_Magnitude_file_prefix(i)
+         p% file_interval = s% pg% Color_Magnitude_file_interval(i)
+         p% file_width = s% pg% Color_Magnitude_file_width(i)
+         p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(i)
+      end do
 
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag2)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag2
-      p% array_ix = 2
-      p% name = 'Color_Magnitude(2)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(2)
-      p% win_width = s% pg% Color_Magnitude_win_width(2)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(2)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(2)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(2)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(2)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(2)
-      p% file_width = s% pg% Color_Magnitude_file_width(2)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag3)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag3
-      p% array_ix = 3
-      p% name = 'Color_Magnitude(3)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(3)
-      p% win_width = s% pg% Color_Magnitude_win_width(3)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(3)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(3)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(3)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(3)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(3)
-      p% file_width = s% pg% Color_Magnitude_file_width(3)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag4)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag4
-      p% array_ix = 4
-      p% name = 'Color_Magnitude(4)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(4)
-      p% win_width = s% pg% Color_Magnitude_win_width(4)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(4)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(4)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(4)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(4)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(4)
-      p% file_width = s% pg% Color_Magnitude_file_width(4)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag5)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag5
-      p% array_ix = 5
-      p% name = 'Color_Magnitude(5)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(5)
-      p% win_width = s% pg% Color_Magnitude_win_width(5)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(5)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(5)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(5)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(5)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(5)
-      p% file_width = s% pg% Color_Magnitude_file_width(5)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag6)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag6
-      p% array_ix = 6
-      p% name = 'Color_Magnitude(6)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(6)
-      p% win_width = s% pg% Color_Magnitude_win_width(6)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(6)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(6)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(6)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(6)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(6)
-      p% file_width = s% pg% Color_Magnitude_file_width(6)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag7)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag7
-      p% array_ix = 7
-      p% name = 'Color_Magnitude(7)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(7)
-      p% win_width = s% pg% Color_Magnitude_win_width(7)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(7)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(7)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(7)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(7)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(7)
-      p% file_width = s% pg% Color_Magnitude_file_width(7)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag8)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag8
-      p% array_ix = 8
-      p% name = 'Color_Magnitude(8)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(8)
-      p% win_width = s% pg% Color_Magnitude_win_width(8)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(8)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(8)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(8)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(8)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(8)
-      p% file_width = s% pg% Color_Magnitude_file_width(8)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Col_Mag9)
-      p% plot => Color_Magnitude_plot
-      p% id = i_Col_Mag9
-      p% array_ix = 9
-      p% name = 'Color_Magnitude(9)'
-      p% win_flag = s% pg% Color_Magnitude_win_flag(9)
-      p% win_width = s% pg% Color_Magnitude_win_width(9)
-      p% win_aspect_ratio = s% pg% Color_Magnitude_win_aspect_ratio(9)
-      p% file_flag = s% pg% Color_Magnitude_file_flag(9)
-      p% file_dir = s% pg% Color_Magnitude_file_dir(9)
-      p% file_prefix = s% pg% Color_Magnitude_file_prefix(9)
-      p% file_interval = s% pg% Color_Magnitude_file_interval(9)
-      p% file_width = s% pg% Color_Magnitude_file_width(9)
-      p% file_aspect_ratio = s% pg% Color_Magnitude_file_aspect_ratio(9)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid1)
-      p% plot => grid_plot
-      p% id = i_Grid1
-      p% array_ix = 1
-      p% name = 'Grid(1)'
-      p% win_flag = s% pg% Grid_win_flag(1)
-      p% win_width = s% pg% Grid_win_width(1)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(1)
-      p% file_flag = s% pg% Grid_file_flag(1)
-      p% file_dir = s% pg% Grid_file_dir(1)
-      p% file_prefix = s% pg% Grid_file_prefix(1)
-      p% file_interval = s% pg% Grid_file_interval(1)
-      p% file_width = s% pg% Grid_file_width(1)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(1)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid2)
-      p% plot => grid_plot
-      p% id = i_Grid2
-      p% array_ix = 2
-      p% name = 'Grid(2)'
-      p% win_flag = s% pg% Grid_win_flag(2)
-      p% win_width = s% pg% Grid_win_width(2)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(2)
-      p% file_flag = s% pg% Grid_file_flag(2)
-      p% file_dir = s% pg% Grid_file_dir(2)
-      p% file_prefix = s% pg% Grid_file_prefix(2)
-      p% file_interval = s% pg% Grid_file_interval(2)
-      p% file_width = s% pg% Grid_file_width(2)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(2)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid3)
-      p% plot => grid_plot
-      p% id = i_Grid3
-      p% array_ix = 3
-      p% name = 'Grid(3)'
-      p% win_flag = s% pg% Grid_win_flag(3)
-      p% win_width = s% pg% Grid_win_width(3)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(3)
-      p% file_flag = s% pg% Grid_file_flag(3)
-      p% file_dir = s% pg% Grid_file_dir(3)
-      p% file_prefix = s% pg% Grid_file_prefix(3)
-      p% file_interval = s% pg% Grid_file_interval(3)
-      p% file_width = s% pg% Grid_file_width(3)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(3)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid4)
-      p% plot => grid_plot
-      p% id = i_Grid4
-      p% array_ix = 4
-      p% name = 'Grid(4)'
-      p% win_flag = s% pg% Grid_win_flag(4)
-      p% win_width = s% pg% Grid_win_width(4)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(4)
-      p% file_flag = s% pg% Grid_file_flag(4)
-      p% file_dir = s% pg% Grid_file_dir(4)
-      p% file_prefix = s% pg% Grid_file_prefix(4)
-      p% file_interval = s% pg% Grid_file_interval(4)
-      p% file_width = s% pg% Grid_file_width(4)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(4)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid5)
-      p% plot => grid_plot
-      p% id = i_Grid5
-      p% array_ix = 5
-      p% name = 'Grid(5)'
-      p% win_flag = s% pg% Grid_win_flag(5)
-      p% win_width = s% pg% Grid_win_width(5)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(5)
-      p% file_flag = s% pg% Grid_file_flag(5)
-      p% file_dir = s% pg% Grid_file_dir(5)
-      p% file_prefix = s% pg% Grid_file_prefix(5)
-      p% file_interval = s% pg% Grid_file_interval(5)
-      p% file_width = s% pg% Grid_file_width(5)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(5)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid6)
-      p% plot => grid_plot
-      p% id = i_Grid6
-      p% array_ix = 6
-      p% name = 'Grid(6)'
-      p% win_flag = s% pg% Grid_win_flag(6)
-      p% win_width = s% pg% Grid_win_width(6)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(6)
-      p% file_flag = s% pg% Grid_file_flag(6)
-      p% file_dir = s% pg% Grid_file_dir(6)
-      p% file_prefix = s% pg% Grid_file_prefix(6)
-      p% file_interval = s% pg% Grid_file_interval(6)
-      p% file_width = s% pg% Grid_file_width(6)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(6)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid7)
-      p% plot => grid_plot
-      p% id = i_Grid7
-      p% array_ix = 7
-      p% name = 'Grid(7)'
-      p% win_flag = s% pg% Grid_win_flag(7)
-      p% win_width = s% pg% Grid_win_width(7)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(7)
-      p% file_flag = s% pg% Grid_file_flag(7)
-      p% file_dir = s% pg% Grid_file_dir(7)
-      p% file_prefix = s% pg% Grid_file_prefix(7)
-      p% file_interval = s% pg% Grid_file_interval(7)
-      p% file_width = s% pg% Grid_file_width(7)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(7)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid8)
-      p% plot => grid_plot
-      p% id = i_Grid8
-      p% array_ix = 8
-      p% name = 'Grid(8)'
-      p% win_flag = s% pg% Grid_win_flag(8)
-      p% win_width = s% pg% Grid_win_width(8)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(8)
-      p% file_flag = s% pg% Grid_file_flag(8)
-      p% file_dir = s% pg% Grid_file_dir(8)
-      p% file_prefix = s% pg% Grid_file_prefix(8)
-      p% file_interval = s% pg% Grid_file_interval(8)
-      p% file_width = s% pg% Grid_file_width(8)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(8)
-
-      p => s% pg% pgstar_win_file_ptr(i_Grid9)
-      p% plot => grid_plot
-      p% id = i_Grid9
-      p% array_ix = 9
-      p% name = 'Grid(9)'
-      p% win_flag = s% pg% Grid_win_flag(9)
-      p% win_width = s% pg% Grid_win_width(9)
-      p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(9)
-      p% file_flag = s% pg% Grid_file_flag(9)
-      p% file_dir = s% pg% Grid_file_dir(9)
-      p% file_prefix = s% pg% Grid_file_prefix(9)
-      p% file_interval = s% pg% Grid_file_interval(9)
-      p% file_width = s% pg% Grid_file_width(9)
-      p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(9)
+      do i = 1, pgstar_array_length
+         p => s% pg% pgstar_win_file_ptr(i_Grid + i - 1)
+         p% plot => grid_plot
+         p% id = i_Grid + i - 1
+         p% array_ix = 1
+         write(nm, '(I1)') i
+         p% name = 'Grid' // trim(nm)
+         p% win_flag = s% pg% Grid_win_flag(i)
+         p% win_width = s% pg% Grid_win_width(i)
+         p% win_aspect_ratio = s% pg% Grid_win_aspect_ratio(i)
+         p% file_flag = s% pg% Grid_file_flag(i)
+         p% file_dir = s% pg% Grid_file_dir(i)
+         p% file_prefix = s% pg% Grid_file_prefix(i)
+         p% file_interval = s% pg% Grid_file_interval(i)
+         p% file_width = s% pg% Grid_file_width(i)
+         p% file_aspect_ratio = s% pg% Grid_file_aspect_ratio(i)
+      end do
 
       do i = 1, max_num_Other_plots
          p => s% pg% pgstar_win_file_ptr(i_Other + i - 1)
@@ -1413,9 +712,9 @@ contains
       use utils_lib
       use chem_def
       use net_def
-      use net_lib, only : get_net_reaction_table
-      use rates_def, only : rates_reaction_id_max
-      use const_def, only : Msun, Rsun
+      use net_lib, only: get_net_reaction_table
+      use rates_def, only: rates_reaction_id_max
+      use const_def, only: Msun, Rsun
 
       type (star_info), pointer :: s
       logical :: must_write_files_in
@@ -1639,7 +938,7 @@ contains
 
 
    subroutine update_pgstar_data(s, ierr)
-      use star_utils, only : eval_csound
+      use star_utils, only: eval_csound
 
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -1666,7 +965,7 @@ contains
    contains
 
       subroutine get_hist_values(num, ierr)
-         use history, only : do_get_data_for_history_columns
+         use history, only: do_get_data_for_history_columns
          integer, intent(in) :: num
          integer, intent(out) :: ierr
          integer :: i
