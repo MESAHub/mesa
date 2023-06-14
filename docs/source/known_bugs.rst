@@ -15,7 +15,7 @@ r22.11.1
 ========
 
 Rates
-=====
+-----
 
 There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
 This causes an excessive amount of C12 to be burnt during core helium burning. 
@@ -35,7 +35,7 @@ Both issues have been fixed in the git main branch.
 See `gh-491 <https://github.com/MESAHub/mesa/issues/491>`_ and `gh-497 <https://github.com/MESAHub/mesa/issues/497>`_
 
 RTI
-===
+---
 
 A bug has existed since shortly after r15140 where RTI mixing will be effectively zero in a model even with the ``RTI_flag=.true.``
 
