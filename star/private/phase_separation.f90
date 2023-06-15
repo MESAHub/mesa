@@ -170,10 +170,10 @@
          integer, intent(out) :: ierr
          
          real(dp) :: eps_tmp, L_distill, L_max, save_boundary_mass, &
-              retry_scale_factor, scale_factor_low, scale_factor_high
+              retry_scale_factor, scale_factor_low, scale_factor_high, tol_low, tol_high
          real(dp) :: xa_save(s%species,s%nz)
          integer :: k, iter, net_ine22
-         logical :: save_Skye_use_ion_offsets
+         logical :: save_Skye_use_ion_offsets, distilled
 
          s% eps_phase_separation(1:s%nz) = 0d0
 
@@ -197,7 +197,7 @@
          end do
          save_boundary_mass = s% crystal_core_boundary_mass
 
-         call distill_loop(s,1d0)
+         call distill_loop(s,1d0,distilled)
          
          ! checking luminosity
          L_max = s% L_phot * Lsun
@@ -209,15 +209,19 @@
 
          ! TODO: get rid of this
          print *, "distill iter, scale_factor, Lum_ratio", 0, 1d0, L_distill/L_max
-         
-         if(L_distill > L_max) then
+
+         ! try to converge amount of distillation toward not producing too much luminosity
+         if(L_distill > L_max .and. distilled) then
             ! reset model and try again with scale_factor for changes
             retry_scale_factor = L_max/L_distill
             scale_factor_low = 0d0
             scale_factor_high = 1d0
+
+            tol_low = 0.9d0
+            tol_high = 1.0d0 ! initially try for something that strictly does not exceed WD luminosity
             
             iter = 0
-            do while((L_distill < 0.9d0*L_max .or. L_distill > L_max) .and. iter < 20)
+            do while((L_distill < tol_low*L_max .or. L_distill > tol_high*L_max) .and. iter < 15)
                iter = iter + 1
                
                ! reset model
@@ -226,7 +230,7 @@
                s% xa(:,:) = xa_save(:,:)
                call update_model_(s,1,s%nz,.true.)
 
-               call distill_loop(s,retry_scale_factor)
+               call distill_loop(s,retry_scale_factor,distilled)
 
                L_distill = 0d0
                do k = 1, s% nz
@@ -236,13 +240,23 @@
                print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
 
                ! simple bisection seems to work
-               if(L_distill < 0.9d0*L_max) then
+               if(L_distill < tol_low*L_max) then
                   ! need to try a larger scale factor
                   scale_factor_low = retry_scale_factor
                   retry_scale_factor = 0.5d0*(retry_scale_factor + scale_factor_high)
                else
                   scale_factor_high = retry_scale_factor
                   retry_scale_factor = 0.5d0*(retry_scale_factor + scale_factor_low)
+               end if
+
+               ! relax tolerances after 5 and 10 iters
+               if(iter > 5) then
+                  tol_low = 0.8d0
+                  tol_high = 1.2d0
+               end if
+               if(iter > 10) then
+                  tol_low = 0.5d0
+                  tol_high = 2d0
                end if
             end do
             print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
@@ -260,16 +274,16 @@
          ierr = 0
       end subroutine do_distillation
 
-      subroutine distill_loop(s,scale_factor)
+      subroutine distill_loop(s,scale_factor,distilling)
          use chem_def, only: chem_isos, ic12, io16, ine20, ine22
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: scale_factor
+         logical, intent(out) :: distilling
          
-         real(dp) :: Gamma_melt, GammaC_melt, GammaC, &
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC, L_distill, eps_tmp, &
               XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num
-         integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
-         logical :: distilling
+         integer :: k, kk, kstart, net_ic12, net_io16, net_ine20, net_ine22
 
          distill_final_XNe = 0.3143d0
          
@@ -354,6 +368,16 @@
                   call mix_outward(s, k-1, 2)
                   print *, "doing C/O phase sep and setting crystal_core_boundary_mass in zone", k
                   s% crystal_core_boundary_mass = s% m(k)
+
+                  ! break out of loop once phase sep luminosity approaches that of the star
+                  L_distill = 0d0
+                  do kk = 1, s% nz
+                     eps_tmp = (s% eps_phase_separation(kk) - s% energy(kk)) / s% dt
+                     L_distill = L_distill + eps_tmp*s% dm(kk)
+                  end do
+                  if(L_distill >  0.9d0 * s% L_phot * Lsun) then
+                     exit
+                  end if
                end if
             else if (GammaC < GammaC_melt) then
                ! print *, "exiting distill loop at q =", s% q(k), k
