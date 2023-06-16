@@ -14,11 +14,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3.0.0
-        with:
-          lfs: true
-      - name: Checkout LFS objects
+
+      - name: Create LFS file list
         run: |
-          git lfs checkout
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v3
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-${{ hashFiles('.lfs-assets-id') }}-v1
+
+      - name: Git LFS Pull
+        run: git lfs pull
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+  
+      - name: Git LFS Checkout
+        run: git lfs checkout
+        if: steps.lfs-cache.outputs.cache-hit == 'true'
 
       - name: Install dependencies Linux
         run: |
