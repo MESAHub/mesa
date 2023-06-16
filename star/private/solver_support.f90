@@ -829,7 +829,7 @@
             skip_grads = .true., &
             skip_rotation = .true., &
             skip_m_grav_and_grav = .true., &
-            skip_brunt = .false., & ! .true., & ! EXPERIMENTAL: tesing not skipping brunt updates during solver iterations
+            skip_brunt = .true., &
             skip_mixing_info = .true., &
             skip_set_cz_bdy_mass = .true., &
             skip_other_cgrav = .true.
