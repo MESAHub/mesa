@@ -606,7 +606,7 @@
 
          end if
 
-         if (.not. skip_brunt) then
+         if (.not. skip_brunt) then ! skip_brunt during solver iterations
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
