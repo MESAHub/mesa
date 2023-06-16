@@ -8150,6 +8150,11 @@
       ! useful for preventing the development radial pulsations during advanced
       ! burning in massive stars and AGB stars.
 
+      ! Under certain circumstances we will not have drag in the surface k=1 zone
+      ! To force the drag term to be on in the outer zone you must enable one of the 
+      ! following surface boundary conditions:
+      ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
+
       ! ::
 
     drag_coefficient = 0d0

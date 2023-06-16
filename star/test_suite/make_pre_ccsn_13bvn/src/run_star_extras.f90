@@ -152,7 +152,7 @@
          if (ierr /= 0) return
          names(1) = 'log_total_drag_energy'
          vals(1) = 0
-         if (s% v_flag) then
+         if (s% v_flag .and. s% drag_coefficient > 0) then
             do k=1,s% nz
                if (s% q(k) >= s% min_q_for_drag) then
                   vals(1) = s% FdotV_drag_energy(k) * s% dm(k) + vals(1)
@@ -196,7 +196,7 @@
          names(2) = 'dvdt_drag'
          names(3) = 'FdotV_drag_energy'
 
-         if(s% v_flag) then
+         if(s% v_flag .and. s% drag_coefficient > 0) then
             do k=1,s% nz
                vals(k,1) = s% zbar(k)/s% abar(k)
                vals(k,2) = s% dvdt_drag(k)
