@@ -1,0 +1,41 @@
+
+
+&star_job
+
+      load_saved_model = .true.
+      load_model_filename = 'near_zams.mod'
+
+      save_model_when_terminate = .true.
+      save_model_filename = 'ready_to_remove.mod'
+
+      write_profile_when_terminate = .false.
+
+/ ! end of star_job namelist
+
+
+&controls
+
+      ! Stopping condiiton
+      xa_central_lower_limit_species(1) = 'he4'
+      xa_central_lower_limit(1) = 1d-6
+
+      ! Extra output to print to terminal
+      num_trace_history_values = 3
+      trace_history_value_name(1) = 'surf_avg_v_rot'
+      trace_history_value_name(2) = 'total_mass h1'
+      trace_history_value_name(3) = 'total_mass he4'
+      
+      x_integer_ctrl(1) = 2 ! inlist_part
+
+
+! FOR DEBUGGING
+
+/ ! end of controls namelist
+
+
+
+&pgstar
+Grid1_title = 'inlist_before_remove'
+
+
+/ ! end of pgstar namelist

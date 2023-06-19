@@ -8136,10 +8136,29 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
     
     
-    
+      ! drag_coefficient
+      ! ~~~~~~~~~~~~~~~~
+      ! min_q_for_drag
+      ! ~~~~~~~~~~~~~~
+
+      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only for v(k) when q(k) > min_q_for_drag.
+      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
+      ! useful for preventing the development radial pulsations during advanced
+      ! burning in massive stars and AGB stars.
+
+      ! Under certain circumstances we will not have drag in the surface k=1 zone
+      ! To force the drag term to be on in the outer zone you must enable one of the 
+      ! following surface boundary conditions:
+      ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
+
+      ! ::
+
+    drag_coefficient = 0d0
+    min_q_for_drag = 0d0
     
 
       ! for hydro comparison tests (e.g., Sedov)
