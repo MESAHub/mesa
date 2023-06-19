@@ -276,7 +276,7 @@
       real(dp), pointer, dimension(:) :: extra_opacity_factor
       
       ! extra pressure profile (can be set by user)
-      real(dp), pointer :: extra_pressure(:) ! (ergs/gm/sec)
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_pressure(:) ! (ergs/gm/sec)
       
       ! extra heat profile (can be set by user)
       type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_heat
