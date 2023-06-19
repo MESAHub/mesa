@@ -3284,7 +3284,7 @@
          
          Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad
          
-         if (s% use_other_pressure) Ptot_ad%val = Ptot_ad%val + s% extra_pressure(k)
+         if (s% use_other_pressure) Ptot_ad = Ptot_ad + s% extra_pressure(k)
 
       end subroutine calc_Ptot_ad_tw
       
