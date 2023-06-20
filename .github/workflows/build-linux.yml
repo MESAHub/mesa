@@ -1,6 +1,6 @@
 name: Build on Linux with SDK
 
-on: [push, pull_request, release]
+on: [pull_request, release]
 
 jobs:
   build:
