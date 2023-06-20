@@ -131,12 +131,12 @@
          
       end function null_how_many_extra_binary_history_columns
       
-      subroutine null_data_for_extra_binary_history_columns(binary_id, n, names, vals, ierr)
+      subroutine null_data_for_extra_binary_history_columns(binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
          use const_def
          integer, intent(in) :: binary_id
          integer, intent(in) :: n
-         character (len=maxlen_binary_history_column_name) :: names(n)
+         character (len=maxlen_binary_history_column_name) :: extra_names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -157,12 +157,12 @@
       end function null_how_many_extra_binary_history_header_items
 
       subroutine null_data_for_extra_binary_history_header_items( &
-           binary_id, n, names, vals, ierr)
+           binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
          use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id, n
-         character (len=maxlen_binary_history_column_name) :: names(n)
+         character (len=maxlen_binary_history_column_name) :: extra_names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
          ierr = 0
