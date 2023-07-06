@@ -18,6 +18,7 @@ gyre/ @rhdtownsend @warrickball
 hdfio5 @rhdtownsend
 interp_1d/ @rhdtownsend 
 interp_2d/ @rhdtownsend 
+ionization/ 
 kap/ @fxt44
 linters/ @rjfarmer
 turb/ 

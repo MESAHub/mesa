@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-      module ionization_potentials
+      module mod_tables
       
       use const_def, only: dp
       use utils_lib, only: mesa_error
@@ -598,5 +598,5 @@
       end subroutine set_ionization_potentials
 
 
-      end module ionization_potentials
+      end module mod_tables
 

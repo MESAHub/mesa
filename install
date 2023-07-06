@@ -354,6 +354,12 @@ do_one_parallel net
 do_one star_data
 do_one turb
 
+if [ ! -r data/ionization_data ]
+then
+	do_input_data ionization
+fi
+do_one_parallel ionization
+
 if [ ! -r data/atm_data ]
 then
 	do_input_data atm
