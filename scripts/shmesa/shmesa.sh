@@ -1,19 +1,15 @@
 #!/bin/bash
 
 #### MESA SHMESA 
-#### Author: Earl Patrick Bellinger
-#### Max Planck Institute for Astrophysics
-#### bellinger@phys.au.dk
-
 #### Command line utilies for MESA 
-# provides commands such as `mesa change` and `mesa grep` 
-# for usage, source this file (`source shmesa.sh`) and call: mesa help 
+# provides commands such as `shmesa change` and `shmesa grep` 
+# for usage, source this file (`source shmesa.sh`) and call: shmesa help 
 # hot tip: add `source $MESA_DIR/scripts/shmesa.sh` to your ~/.bashrc 
 
 export MESA_SHMESA_DEBUG=0 # set to 1 for commentary 
 export MESA_SHMESA_BACKUP=1 # back up modified files before modification (e.g. to inlist.bak) 
 
-mesa () {
+shmesa () {
     ( # start a subshell so that the `set` commands are not persistent)
     set -Eeo pipefail # exit if any commands fail 
     #if [[ $MESA_SHMESA_DEBUG -eq 1 ]]; then # print each command before it is executed
@@ -31,7 +27,7 @@ mesa () {
     fi
     
     ### Define main utilities; parse command line tokens at the end 
-    mesa_help () {
+    shmesa_help () {
          cat << "EOF"
       _     __  __ _____ ____    _    
   ___| |__ |  \/  | ____/ ___|  / \   
@@ -40,7 +36,7 @@ mesa () {
  |___/_| |_|_|  |_|_____|____/_/   \_\
                                       
 EOF
-        echo "Usage: mesa [work|change|defaults|cp|grep|zip|version|update|help] [arguments]"
+        echo "Usage: shmesa [work|change|defaults|cp|grep|zip|help] [arguments]"
         echo
         echo "Subcommands:"
         echo "  work      copy the work directory to the current location"
@@ -49,8 +45,6 @@ EOF
         echo "  cp        copy a MESA directory without copying LOGS, photos, etc."
         echo "  grep      search the MESA source code for a given string"
         echo "  zip       prepare a MESA directory for sharing"
-        #echo "  version   check the version of MESA (and check for updates)//TODO"
-        #echo "  update    update MESA to the latest version //TODO"
         echo "  help      display this helpful message"
         echo "  -h        flag for getting additional details about any of the above"
         echo
@@ -58,9 +52,9 @@ EOF
     
     ### Now define all the subcommands in the above help message 
 
-    mesa_work () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa work [optional: target_name]"
+    shmesa_work () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa work [optional: target_name]"
             echo "Copies the MESA star/work directory to the specified location."
             echo "If no target_name is provided, it will copy the directory to the current location."
             return 0
@@ -80,18 +74,18 @@ EOF
     }
 
 
-    mesa_change () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa change inlist parameter value [parameter value [parameter value]]"
+    shmesa_change () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa change inlist parameter value [parameter value [parameter value]]"
             echo "Modifies one or more parameters in the supplied inlist."
             echo "Uncomments the parameter if it's commented out."
             echo "Creates a backup of the inlist in the corresponding .bak file."
             echo ""
             echo "Examples:"
-            echo "  mesa change inlist_project initial_mass 1.3"
-            echo "  mesa change inlist_project log_directory 'LOGS_MS'"
-            echo "  mesa change inlist_project do_element_diffusion .true."
-            echo "  mesa change inlist_project initial_mass 1.3 do_element_diffusion .true."
+            echo "  shmesa change inlist_project initial_mass 1.3"
+            echo "  shmesa change inlist_project log_directory 'LOGS_MS'"
+            echo "  shmesa change inlist_project do_element_diffusion .true."
+            echo "  shmesa change inlist_project initial_mass 1.3 do_element_diffusion .true."
             return 0
         fi
 
@@ -135,14 +129,14 @@ EOF
     }
 
 
-    mesa_defaults () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa defaults [parameter [parameter]]"
+    shmesa_defaults () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa defaults [parameter [parameter]]"
             echo "Copies profile_columns.list and history_columns.list to the current location."
             echo "Also uncomments any specified parameters."
             echo "If the files are already in the present directory, just uncomment the specified parameters."
             echo ""
-            echo "Example: mesa defaults nu_max delta_nu"
+            echo "Example: shmesa defaults nu_max delta_nu"
             return 0
         fi
 
@@ -180,9 +174,9 @@ EOF
     }
 
 
-    mesa_cp () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa cp source_dir target_dir"
+    shmesa_cp () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa cp source_dir target_dir"
             echo "Copies a MESA working directory but without copying"
             echo "LOGS, photos, or .mesa_temp_cache"
             return 0
@@ -190,7 +184,7 @@ EOF
 
         if [[ -z $1 || -z $2 ]]; then
             echo "Error: Missing arguments."
-            echo "Usage: mesa cp source_dir target_dir"
+            echo "Usage: shmesa cp source_dir target_dir"
             return 1
         fi
 
@@ -205,15 +199,15 @@ EOF
     }
     
 
-    mesa_grep () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa grep term [optional: directory or filename]"
+    shmesa_grep () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa grep term [optional: directory or filename]"
             return 0
         fi
 
         if [[ -z $1 ]]; then
             echo "Error: Missing search term."
-            echo "Usage: mesa grep term [optional: directory or filename]"
+            echo "Usage: shmesa grep term [optional: directory or filename]"
             return 1
         fi
 
@@ -228,14 +222,12 @@ EOF
     }
 
 
-    mesa_zip () {
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa zip [directory]"
+    shmesa_zip () {
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa zip [directory]"
             echo "zips the inlists and models of the specified directory for sharing"
             return 0
         fi
-
-        UNTESTED
 
         local dir_to_zip='.'
         local zip_name="mesa.zip"
@@ -254,10 +246,10 @@ EOF
 
 
     ### DEVELOPMENT USE 
-    mesa_template () {
+    shmesa_template () {
         ### TEMPLATE FOR NEW SHMESA FUNCTIONS 
-        if mesa_check_h_flag "$@"; then
-            echo "Usage: mesa funcname arg [optional arg]"
+        if shmesa_check_h_flag "$@"; then
+            echo "Usage: shmesa funcname arg [optional arg]"
             echo "put discription here"
             return 0
         fi
@@ -275,14 +267,14 @@ EOF
         #shift # and then copy this block to parse the next one, for example 
 
         # afterwards, update:
-        # 1. mesa_test 
-        # 2. mesa_help 
+        # 1. shmesa_test 
+        # 2. shmesa_help 
         # 3. parser at the end of this file 
     }
 
 
     ## Test shmesa with different subcommands and arguments
-    mesa_test () {
+    shmesa_test () {
         echo
         echo 
         echo 
@@ -299,44 +291,38 @@ EOF
             MESA_SHMESA_DEBUG=1
         fi 
         
-        # mesa [work|change|defaults|cp|grep|zip|version|update|help]
+        # shmesa [work|change|defaults|cp|grep|zip|help]
         local SHMESA_TEST_DIR="shmesa_test_work"
 
         # mesa work
-        run_mesa_test "work" \
-            "mesa work $SHMESA_TEST_DIR && \
-            cd $SHMESA_TEST_DIR && \
-            ./mk"
+        run_shmesa_test "work" \
+            "shmesa work $SHMESA_TEST_DIR && \
+             cd $SHMESA_TEST_DIR && \
+             ./mk"
 
         # mesa change 
-        run_mesa_test "change" \
-            "mesa change inlist_project \
-                         pgstar_flag .false. && \
-             mesa change inlist_project \
-                         initial_mass 1.2 \
-                         Z 0.01 \
-                         Zbase 0.01"
+        run_shmesa_test "change" \
+            "shmesa change inlist_project \
+                           pgstar_flag .false. && \
+             shmesa change inlist_project \
+                           initial_mass 1.2 \
+                           Z 0.01 \
+                           Zbase 0.01"
         
         # mesa defaults
-        run_mesa_test "defaults" \
-            "mesa defaults nu_max delta_nu && \
-             mesa defaults logM"
+        run_shmesa_test "defaults" \
+            "shmesa defaults nu_max delta_nu && \
+             shmesa defaults logM"
 
         # mesa cp
-        run_mesa_test "cp" \
+        run_shmesa_test "cp" \
             "cd .. &&\
-             mesa cp '$SHMESA_TEST_DIR' '$SHMESA_TEST_DIR'2"
+             shmesa cp '$SHMESA_TEST_DIR' '$SHMESA_TEST_DIR'2"
 
         # mesa grep
         # TODO
 
         # mesa zip
-        # TODO
-
-        # mesa version
-        # TODO
-
-        # mesa update
         # TODO
 
         MESA_SHMESA_DEBUG=$temp_value
@@ -370,7 +356,7 @@ EOF
         fi
     }
 
-    mesa_check_h_flag () {
+    shmesa_check_h_flag () {
         for arg in "$@"; do
             if [[ $arg == "-h" ]]; then
                 return 0
@@ -379,13 +365,13 @@ EOF
         return 1
     }
 
-    run_mesa_test() {
+    run_shmesa_test() {
         local submodule_name=$1
         local test_command=$2
 
         echo
         echo
-        echo ">>> test: mesa $submodule_name"
+        echo ">>> test: shmesa $submodule_name"
         echo
         eval "$test_command"
         echo
@@ -404,7 +390,7 @@ EOF
     ### Parse command line tokens
     ###
     if [[ -z $1 ]]; then
-        mesa_help
+        shmesa_help
         return 1
     fi
 
@@ -415,37 +401,37 @@ EOF
 
     case "$subcommand" in
         work)
-            mesa_work "$@"
+            shmesa_work "$@"
             ;;
         change)
-            mesa_change "$@"
+            shmesa_change "$@"
             ;;
         defaults)
-            mesa_defaults "$@"
+            shmesa_defaults "$@"
             ;;
         cp)
-            mesa_cp "$@"
+            shmesa_cp "$@"
             ;;
         grep)
-            mesa_grep "$@"
+            shmesa_grep "$@"
             ;;
         zip)
-            mesa_zip "$@"
+            shmesa_zip "$@"
             ;;
         test)
-            mesa_test "$@"
+            shmesa_test "$@"
             ;;
         help)
-            mesa_help
+            shmesa_help
             ;;
         "" | *[[:space:]]*)
-            mesa_help
+            shmesa_help
             ;;
         *)
             
             echo "Invalid subcommand: $subcommand"
             # TODO: "The most similar command is: ..."
-            mesa_help
+            shmesa_help
             return 1
         ;;
     esac
