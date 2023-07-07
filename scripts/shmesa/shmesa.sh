@@ -398,7 +398,7 @@ UNTESTED () {
 ###
 if [[ -z $1 ]]; then
     shmesa_help
-    return 1
+    exit
 fi
 
 local subcommand=$1
@@ -430,13 +430,14 @@ case "$subcommand" in
         ;;
     help | "" | "-h" | *[[:space:]]*)
         shmesa_help
+        exit
         ;;
     *)
         
         echo "Invalid subcommand: $subcommand"
         # TODO: "The most similar command is: ..."
         shmesa_help
-        return 1
+        exit
     ;;
 esac
 ) # close subshell
