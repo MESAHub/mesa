@@ -1,10 +1,14 @@
 #!/bin/bash
 
 #### MESA SHMESA 
+#### Author: Earl Patrick Bellinger
+#### Max Planck Institute for Astrophysics
+#### bellinger@phys.au.dk
+
 #### Command line utilies for MESA 
 # provides commands such as `mesa change` and `mesa grep` 
 # for usage, source this file (`source shmesa.sh`) and call: mesa help 
-# hot tip: add `source $MESA_DIR/scripts/shmesa/shmesa.sh` to your ~/.bashrc 
+# hot tip: add `source $MESA_DIR/scripts/shmesa.sh` to your ~/.bashrc 
 
 export MESA_SHMESA_DEBUG=0 # set to 1 for commentary 
 export MESA_SHMESA_BACKUP=1 # back up modified files before modification (e.g. to inlist.bak) 
@@ -67,7 +71,7 @@ EOF
             target_dir=$1
         fi
 
-        if [[ -d $target_dir ]]; then
+        if [[ -d $target_dir ]] && [[ $target_dir != "." ]]; then
             echo "Error: Target directory '$target_dir' already exists."
             return 1
         fi
