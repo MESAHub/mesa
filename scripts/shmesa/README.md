@@ -1,6 +1,6 @@
 **shmesa**: a set of bash utilities providing convenience functions for MESA 
 
-To install, simply add `PATH=$PATH:$MESA_DIR/scripts/shmesa.sh` to your `~/.bashrc` and start a new terminal.
+To install, simply add `PATH=$PATH:$MESA_DIR/scripts/shmesa` to your `~/.bashrc` and start a new terminal.
 
 To use, simply call: `shmesa`
 
