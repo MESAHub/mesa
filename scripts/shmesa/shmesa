@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### MESA SHMESA 
 #### Command line utilies for MESA 
@@ -401,7 +401,7 @@ if [[ -z $1 ]]; then
     exit
 fi
 
-local subcommand=$1
+subcommand=$1
 shift
 
 debug_print "Calling $subcommand with arguments: $@"
