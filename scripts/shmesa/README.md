@@ -1,8 +1,8 @@
 **shmesa**: a set of bash utilities providing convenience functions for MESA 
 
-To install, simply add `source $MESA_DIR/scripts/shmesa.sh` to your `~/.bashrc` and start a new terminal.
+To install, simply add `PATH=$PATH:$MESA_DIR/scripts/shmesa.sh` to your `~/.bashrc` and start a new terminal.
 
-To use, simply call: `shmesa `
+To use, simply call: `shmesa`
 
 ```bash
 > shmesa
@@ -83,8 +83,7 @@ SHMESA> DEBUG: SHMESA> BACKING UP: inlist_project inlist_project.bak
 ...
 
 >>> test: shmesa defaults
-SHMESA> DEBUG: Calling defaults with arguments: nu_max Delta_nu
-Warning: Parameter 'Delta_nu' not found in either profile_columns.list or history_columns.list.
+SHMESA> DEBUG: Calling defaults with arguments: nu_max delta_nu
 SHMESA> DEBUG: Calling defaults with arguments: logM
 SHMESA> DEBUG: SHMESA> BACKING UP: profile_columns.list
 SHMESA> DEBUG: SHMESA> BACKING UP: history_columns.list
