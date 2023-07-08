@@ -17,7 +17,7 @@ if [ -z "${MESA_SHMESA_BACKUP}" ]; then
     export MESA_SHMESA_BACKUP=1 # back up modified files before modification (e.g. to inlist.bak) 
 fi
 if [ -z "${MESA_SHMESA_TEST}" ]; then
-    export MESA_SHMESA_TEST="shmesa_test_work"
+    export MESA_SHMESA_TEST="test_work_shmesa"
 fi
 
 #if [[ $MESA_SHMESA_DEBUG -eq 1 ]]; then # print each command before it is executed
@@ -204,7 +204,8 @@ shmesa_cp () {
     rsync -av --progress $SOURCE/ $TARGET \
         --exclude LOGS \
         --exclude photos \
-        --exclude .mesa_temp_cache
+        --exclude .mesa_temp_cache \
+        --exclude *.bak
 }
 
 
@@ -306,18 +307,13 @@ shmesa_test () {
     
     # shmesa [work|change|defaults|cp|grep|zip|help]
     rm -rf $MESA_SHMESA_TEST
-    
-    echo $(pwd) 
+    rm -rf '$MESA_SHMESA_TEST'_cp
     
     # shmesa work
     run_shmesa_test "work" \
-        "(shmesa work $MESA_SHMESA_TEST)"
-    
-    # shmesa defaults
-    run_shmesa_test "defaults" \
-        "(cd $MESA_SHMESA_TEST && \
-          shmesa defaults nu_max delta_nu && \
-          shmesa defaults logM)"
+        "(shmesa work $MESA_SHMESA_TEST && \
+          cd $MESA_SHMESA_TEST && \
+          ./mk)"
     
     # shmesa change 
     run_shmesa_test "change" \
@@ -328,17 +324,24 @@ shmesa_test () {
                         initial_mass 1.2 \
                         Z 0.01 \
                         Zbase 0.01)"
+    
+    # shmesa defaults
+    run_shmesa_test "defaults" \
+        "(cd $MESA_SHMESA_TEST && \
+          shmesa defaults nu_max delta_nu && \
+          shmesa defaults logM)"
+    
+    # shmesa cp
+    run_shmesa_test "cp" \
+        "(shmesa cp '$MESA_SHMESA_TEST' '$MESA_SHMESA_TEST'_cp)"
+    
     # shmesa zip
     run_shmesa_test "zip" \
         "(cd $MESA_SHMESA_TEST && shmesa zip)"
     
-    # shmesa cp
-    run_shmesa_test "cp" \
-        "(shmesa cp '$MESA_SHMESA_TEST' '$MESA_SHMESA_TEST'2)"
-    
     # shmesa grep
     run_shmesa_test "grep" \
-        "(shmesa grep do_element_diffusion)"
+        "(shmesa grep diffusion_class_representative)"
     
     MESA_SHMESA_DEBUG=$temp_value
     echo "all done!"
@@ -389,7 +392,6 @@ run_shmesa_test() {
     echo ">>> test: shmesa $submodule_name"
     echo
     eval "$test_command"
-    echo "adsfs"
     echo
     echo "<<< success"
     echo
