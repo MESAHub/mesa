@@ -485,10 +485,10 @@
 
          subroutine eval_Bjorklund_wind(w)
             real(dp), intent(inout) :: w
-            real(dp), parameter :: Zbjork = 0.013
+            real(dp), parameter :: Zbjork = 0.013d0
             real(dp) :: logw
             ! eq 20 from Björklund et al, 2021, A&A 648, A36
-            logw = -5.55 + 0.79 * log10(Z/Zbjork) + (2.16 + 0.32 * log10(Z/Zbjork)) * log10(L1/(1d6*Lsun))
+            logw = -5.55d0 + 0.79d0 * log10(Z/Zbjork) + (2.16d0 + 0.32d0 * log10(Z/Zbjork)) * log10(L1/(1d6*Lsun))
             w = exp10(logw)
 
          end subroutine eval_Bjorklund_wind
