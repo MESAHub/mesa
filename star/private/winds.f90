@@ -171,7 +171,7 @@
                if (dbg) &
                   write(*,*) 'using cool_wind_RGB_scheme: "' // trim(scheme) // '"'
             end if
-            call eval_wind_for_scheme(scheme,cool_wind)
+            call eval_wind_for_scheme(scheme, cool_wind)
          else
             cool_wind = 0d0
          endif
@@ -401,6 +401,10 @@
                    call eval_Nieuwenhuijzen_wind(wind)
                    wind = s% Nieuwenhuijzen_scaling_factor * wind
                    if (dbg) write(*,1) 'Nieuwenhuijzen_wind', wind
+                else if (scheme == 'Bjorklund') then
+                   call eval_Bjorklund_wind(wind)
+                   wind = s% Bjorklund_scaling_factor * wind
+                   if (dbg) write(*,1) 'Bjorklund_wind', wind
                 else
                    ierr = -1
                    write(*,*) 'unknown name for wind scheme : ' // trim(scheme)
@@ -478,6 +482,16 @@
 
          end subroutine rotation_enhancement
 
+
+         subroutine eval_Bjorklund_wind(w)
+            real(dp), intent(inout) :: w
+            real(dp), parameter :: Zbjork = 0.013
+            real(dp) :: logw
+            ! eq 20 from Björklund et al, 2021, A&A 648, A36
+            logw = -5.55 + 0.79 * log10(Z/Zbjork) + (2.16 + 0.32 * log10(Z/Zbjork)) * log10(L1/(1d6*Lsun))
+            w = exp10(logw)
+
+         end subroutine eval_Bjorklund_wind
 
          subroutine eval_Vink_wind(w)
             real(dp), intent(inout) :: w
