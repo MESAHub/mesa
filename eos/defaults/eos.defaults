@@ -101,8 +101,8 @@
 
    logT_min_FreeEOS_hi = 3.1d0
    logT_min_FreeEOS_lo = 3.0d0
-   logT_max_FreeEOS_hi = 7.7d0 ! for cburn_inward
-   logT_max_FreeEOS_lo = 7.6d0
+   logT_max_FreeEOS_hi = 8.2d0 ! FreeEOS tabulations go up to here
+   logT_max_FreeEOS_lo = 8.1d0
 
    logQ_cut_FreeEOS_lo_Z_max = 0.3d0
    logQ_cut_lo_Z_FreeEOS_hi = 0.5d0
