@@ -7470,12 +7470,14 @@
       ! low_logT_op_mono_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! you can select a range of log10T for using ``op_mono`` opacities
-      ! outside that range, the code will use standard opacity tables.
-      ! for example, you might only use high T limits so that ``op_mono``
+      ! Blending controls for turning ``op_mono`` opacities off above (high_logT)
+      ! and below (low_logT) specified temperature ranges.
+      ! When not using ``op_mono``, the code will use standard opacity tables.
+      ! For example, you might only use high T limits so that ``op_mono``
       ! is only used in the envelope, or you might set both low and
       ! high T limits so that ``op_mono`` is used around the Fe peak logT
       ! but not for other locations in the star.
+      ! These controls should satisfy the following inequalities:
 
       ! ::
 
@@ -7483,21 +7485,14 @@
       !     high_logT_op_mono_full_on >= low_logT_op_mono_full_on
       !     low_logT_op_mono_full_on >= low_logT_op_mono_full_off
 
-      ! ::
+      ! op_mono opacities fully on if
+      !     ``log10T`` <= ``high_logT_op_mono_full_on`` and
+      !     ``log10T`` >= ``low_logT_op_mono_full_on``
 
-      !     op_mono opacities full on if
-      !     log10T <= high_logT_op_mono_full_on
-      !     and
-      !     log10T >= low_logT_op_mono_full_on
+      ! op_mono opacities full off if
+      !     ``log10T`` >= ``high_logT_op_mono_full_off`` or
+      !     ``log10T`` <= ``low_logT_op_mono_full_off``
 
-      ! ::
-
-      !     op_mono opacities full off if
-      !     log10T >= high_logT_op_mono_full_off
-      !     or
-      !     log10T <= low_logT_op_mono_full_off
-
-      ! partially on for other cases
       ! Note: OP mono ignored if either high_logT control < 0
 
       ! ::
