@@ -237,23 +237,24 @@ shmesa_grep () {
 shmesa_zip () {
     if shmesa_check_h_flag "$@"; then
         echo "Usage: shmesa zip [directory]"
-        echo "zips the inlists and models of the specified directory for sharing"
+        echo "zips the appropriate files of the specified directory for sharing"
         return 0
     fi
-
+    
     local dir_to_zip='.'
     local zip_name="mesa.zip"
     if [[ ! -z $1 ]]; then
         dir_to_zip=$1
         zip_name="${dir_to_zip}_mesa.zip"
     fi
-
-    if [[ ! $(find "$dir_to_zip" -type f -iname "*inlist*" -o -iname "*.mod") ]]; then
-        echo "Warning: No files with 'inlist' in their names or files ending in '.mod' found in the directory '$dir_to_zip'."
+    
+    if [[ ! $(find "$dir_to_zip" -type f -iname "*inlist*") ]]; then
+        echo "Warning: No inlist files found in the directory '$dir_to_zip'."
     fi
-
-    # Create a zip file containing only inlists and models
-    zip -r "$zip_name" "$dir_to_zip" -i '*inlist*' '*.mod'
+    
+    local include_pattern="*inlist* *.mod *.list *.net */src/*"
+    local exclude_pattern="*/make/*.mod *.bak"
+    zip -r "$zip_name" "$dir_to_zip" -i "$include_pattern" -x "$exclude_pattern"
 }
 
 
@@ -337,7 +338,7 @@ shmesa_test () {
     
     # shmesa zip
     run_shmesa_test "zip" \
-        "(cd $MESA_SHMESA_TEST && shmesa zip)"
+        "(shmesa zip '$MESA_SHMESA_TEST')"
     
     # shmesa grep
     run_shmesa_test "grep" \
