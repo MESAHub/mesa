@@ -379,7 +379,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          evolve_to_zams_check_model = bare_bones_check_model(id) 
          if (evolve_to_zams_check_model /= keep_going) return
-         if (s% L_nuc_burn_total >= s% L(1)/Lsun) then
+         if (s% L_nuc_burn_total >= 0.999d0 * s% L(1)/Lsun) then
             evolve_to_zams_check_model = terminate
             s% termination_code = t_extras_check_model
          end if
