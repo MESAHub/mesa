@@ -31,8 +31,9 @@ For current MESA releases impacted by this bug, the following steps provide a wo
 - Use the following setting in the ``&controls`` section of your inlists for models where
   you want to use the patched ZAMS file:
 
-  ::
-     zams_filename = 'zams_z2m2_y28_patched.data'
+::
+
+   zams_filename = 'zams_z2m2_y28_patched.data'
 
 r22.11.1
 ========
