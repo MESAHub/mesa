@@ -15,6 +15,27 @@ r7             'r7.txt'
 r8             'r8.txt'
 r9             'r9.txt'
 
+! c12ag rates from debeor et al. 2017 improved with high resolution (mehta et al. 2022) 
+
+! 0 sigma (median c12ag rate)
+r_c12_ag_o16   'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
+
+! positive sigmas (high c12ag)
+!r_c12_ag_o16   'c12ag_deboer_sigma_0p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_1p0_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_1p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_2p0_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_2p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_3p0_2000_Tgrid.dat'
+
+! negative sigmas  (lo c12ag)
+!r_c12_ag_o16   'c12ag_deboer_sigma_m0p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_m1p0_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_m1p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_m2p0_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_m2p5_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_m3p0_2000_Tgrid.dat'
+
 ! al26 isomers
 r_al26-1_to_al26-2 'r_al26-1_to_al26-2.dat'
 r_al26-2_to_al26-1 'r_al26-2_to_al26-1.dat'
