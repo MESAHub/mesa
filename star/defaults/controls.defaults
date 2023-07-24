@@ -4384,7 +4384,6 @@
       !   Mon. Not. R. Astron. Soc. 411, 781–791 (2011)
       
       ! + ``'DB_WD_tau_25'``:
-      !   EXPERIMENTAL
       !   helium dominated (log(H/He)=-5.0) atmosphere tables for DB
       !   white dwarfs, provided by Odette Toloza and Detlev Koester.
       !   5000K < Teff < 40000K
