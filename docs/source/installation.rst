@@ -26,11 +26,11 @@ Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 
 Before you install MESA, you need to get the prerequisites. The `MESA
-SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
+SDK <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
 simplifies this process by providing a prebuilt set of compilers and
 run-time libraries that should make your MESA install go
 smoothly. Visit the `MESA SDK website
-<http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
+<http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
 the details of setting it up.
 
 If you would prefer to use ifort (the MESA SDK uses gfortran), that is
