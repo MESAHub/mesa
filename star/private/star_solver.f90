@@ -129,8 +129,6 @@
          integer, dimension(:), pointer :: ipiv_blk1=>null()
          character (len=s%nz) :: equed1
 
-         real(dp), dimension(:,:), pointer :: A=>null(), Acopy=>null()
-         real(dp), dimension(:), pointer :: A1=>null(), Acopy1=>null()
          real(dp), dimension(:), pointer :: lblk1=>null(), dblk1=>null(), ublk1=>null()
          real(dp), dimension(:), pointer :: lblkF1=>null(), dblkF1=>null(), ublkF1=>null()
 
@@ -338,7 +336,7 @@
                      tol_residual_norm, tol_max_residual
                end if
                
-               call solver_test_partials(nvar, xder, size(A,dim=1), A1, ierr)
+               call solver_test_partials(nvar, xder, ierr)
                if (ierr /= 0) then
                   call write_msg('solver_test_partials returned ierr /= 0')
                   convergence_failure = .true.
@@ -628,12 +626,10 @@
          end subroutine do_solver_work
          
          
-         subroutine solver_test_partials(nvar, xder, ldA, A1, ierr)
+         subroutine solver_test_partials(nvar, xder, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
-            integer, intent(in) :: ldA ! leading dimension of A
-            real(dp), pointer, dimension(:) :: A1
             integer, intent(out) :: ierr
             
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
@@ -724,7 +720,7 @@
          
          subroutine do_equations(ierr)
             integer, intent(out) :: ierr
-            call prepare_solver_matrix(nvar, xder, size(A,dim=1), A1, ierr)
+            call prepare_solver_matrix(nvar, xder, ierr)
             if (ierr /= 0) return
             call eval_equations(s, nvar, ierr)
             if (ierr /= 0) return
@@ -732,28 +728,18 @@
          end subroutine do_equations
 
 
-         subroutine prepare_solver_matrix(nvar, xder, ldA, A1, ierr)
+         subroutine prepare_solver_matrix(nvar, xder, ierr)
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
-            integer, intent(in) :: ldA ! leading dimension of A
-            real(dp), pointer, dimension(:) :: A1
             integer, intent(out) :: ierr
-            real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
             integer :: i, j, nz, neqns
             include 'formats'
             ierr = 0
             nz = s% nz
             neqns = nvar*nz
-            A(1:ldA,1:neqns) => A1(1:ldA*neqns)         
-            i = nvar*nvar*nz
-            if (size(A1,dim=1) < 3*i) then
-               write(*,*) 'prepare_solver_matrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
-               ierr = -1
-               return
-            end if
-            s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
-            s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
-            s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
+            s% ublk(1:nvar,1:nvar,1:nz) => ublk1
+            s% dblk(1:nvar,1:nvar,1:nz) => dblk1
+            s% lblk(1:nvar,1:nvar,1:nz) => lblk1
          end subroutine prepare_solver_matrix
 
 
@@ -1821,7 +1807,6 @@
             ierr = 0
 
             i = 1
-            allocate(A1(1:3*nvar*neq))
 
             if(allocated(s% equ1)) then
                if(size(s% equ1,dim=1) /= neq) then
@@ -1875,31 +1860,31 @@
 
             ipiv_blk1(1:neq) => ipiv1(1:neq)
 
-            A(1:3*nvar,1:neq) => A1(1:3*nvar*neq)
-            Acopy1 => A1
-            Acopy => A
-
-            ublk1(1:nvar*neq) => A1(1:nvar*neq)
-            dblk1(1:nvar*neq) => A1(1+nvar*neq:2*nvar*neq)
-            lblk1(1:nvar*neq) => A1(1+2*nvar*neq:3*nvar*neq)
+            allocate(ublk1(1:nvar*neq),dblk1(1:nvar*neq),lblk1(1:nvar*neq))
 
             lblk(1:nvar,1:nvar,1:nz) => lblk1(1:nvar*neq)
             dblk(1:nvar,1:nvar,1:nz) => dblk1(1:nvar*neq)
             ublk(1:nvar,1:nvar,1:nz) => ublk1(1:nvar*neq)
 
-            ublkF1(1:nvar*neq) => AF1(1:nvar*neq)
-            dblkF1(1:nvar*neq) => AF1(1+nvar*neq:2*nvar*neq)
-            lblkF1(1:nvar*neq) => AF1(1+2*nvar*neq:3*nvar*neq)
+            allocate(ublkF1(1:nvar*neq),dblkF1(1:nvar*neq),lblkF1(1:nvar*neq))
 
             lblkF(1:nvar,1:nvar,1:nz) => lblkF1(1:nvar*neq)
             dblkF(1:nvar,1:nvar,1:nz) => dblkF1(1:nvar*neq)
             ublkF(1:nvar,1:nvar,1:nz) => ublkF1(1:nvar*neq)
 
+            if (s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs(lblk1)
+               call fill_with_NaNs(dblk1)
+               call fill_with_NaNs(ublk1)
+               call fill_with_NaNs(lblkF1)
+               call fill_with_NaNs(dblkF1)
+               call fill_with_NaNs(ublkF1)
+            end if
+
          end subroutine pointers
 
          subroutine cleanup()
 
-            if(associated(A1)) deallocate(A1)
             if(associated(dxsave1)) deallocate(dxsave1)
             if(associated(ddxsave)) deallocate(ddxsave)
             if(associated(ddxsave)) deallocate(ddxsave)
@@ -1916,10 +1901,18 @@
             if(associated(save_lblk1)) deallocate(save_lblk1)
             if(associated(ipiv1)) deallocate(ipiv1)
 
-            nullify(A1, equ, equ1, dxsave1,dxsave, ddxsave, B1, &
+            if(associated(ublk1)) deallocate(ublk1)
+            if(associated(dblk1)) deallocate(dblk1)
+            if(associated(lblk1)) deallocate(lblk1)
+            if(associated(ublkF1)) deallocate(ublkF1)
+            if(associated(dblkF1)) deallocate(dblkF1)
+            if(associated(lblkF1)) deallocate(lblkF1)
+
+
+            nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
                      soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1,&
-                     B, soln, grad_f,ipiv1) 
+                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1) 
 
          end subroutine cleanup
 
