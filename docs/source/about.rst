@@ -104,7 +104,7 @@ The missions of the MESA Team are:
 Developers
 ----------
 
-* `Warrick Ball <https://warrickball.github.io/>`__
+* `Warrick Ball <https://warrickball.gitlab.io/>`__
 * `Evan Bauer <https://evbauer.github.io/>`__
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
