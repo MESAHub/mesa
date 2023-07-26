@@ -28,7 +28,7 @@ Previously we had logic to determine if a extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
-new features
+New features
 ------------
 
 The Björklund et al. (2021) wind scheme has been implemented for use in all wind
