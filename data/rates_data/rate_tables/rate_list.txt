@@ -16,9 +16,8 @@ r8             'r8.txt'
 r9             'r9.txt'
 
 ! c12ag rates from debeor et al. 2017 improved with high resolution (mehta et al. 2022) 
-
 ! 0 sigma (median c12ag rate)
-r_c12_ag_o16   'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
+!r_c12_ag_o16   'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
 ! positive sigmas (high c12ag)
 !r_c12_ag_o16   'c12ag_deboer_sigma_0p5_2000_Tgrid.dat'
