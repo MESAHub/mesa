@@ -29,7 +29,6 @@ as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
 
-
 Changes in r23.05.1
 ===================
 
@@ -73,6 +72,7 @@ For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
+
   $MESA_DIR/scripts/update_inlists
 
 This script will save the previous versions of your inlists to a directory named
@@ -1945,8 +1945,8 @@ Changes to WD ``atm`` tables
 There are now 2 options for white dwarf atmosphere tables:
 
 * ``WD_tau_25``: the original WD atmosphere table option for DA (H atmosphere)
-WDs; also found and fixed a bug in the header of this file that was
-causing it to use only a small portion of the actual table
+  WDs; also found and fixed a bug in the header of this file that was
+  causing it to use only a small portion of the actual table
 
 * ``DB_WD_tau_25``: new table for DB (He atmosphere) WDs
 

@@ -8,7 +8,8 @@ This test suite case evolves a 1 solar mass, solar metallicity (Z=0.02) model to
 
 The impedence of the surface flux due to magnetic pressure from starspots is parameterized in the style of an atmospheric boundary modification.
 As first described by Somers et al. (2015; ApJ), the degree of "spottiness" on the stellar surface is characterized using two parameters:
- * SPOTF (hereafter fspot): a coverage fraction, or "spot filling factor" (in the notation of the YREC documentation); and
+
+* SPOTF (hereafter fspot): a coverage fraction, or "spot filling factor" (in the notation of the YREC documentation); and
 
 * SPOTX (hereafter xspot): the temperature contrast between the spotted and unspotted regions: xspot = T_spot/T_photosphere.
 
