@@ -31,12 +31,13 @@ prone, so now we save extra history values as floats.
 Rates
 -----
 
-In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16 rates spanning the uncertainty range of -3 to +3 sigma from 
-`Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_. with updated numerical resolution from `Mehta et al. 2022
-<https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
+In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16
+rates spanning the uncertainty range of -3 to +3 sigma from `Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_
+with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
 
-These rates can be accessed through the rate selection mechanism. These can be loaded, either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the option 
-``filename_of_special_rate``.
+These rates can be accessed through the rate selection mechanism. 
+These can be loaded, either by the normal mechanism of adding the filename
+to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
 
 
 Changes in r23.05.1
