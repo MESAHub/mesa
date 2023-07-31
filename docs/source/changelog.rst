@@ -36,7 +36,7 @@ In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16 ra
 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
 
 These rates can be accessed through the rate selection mechanism. These can be loaded, either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the option 
-``filename_of_special_rate``. This option sets the filename to load the rate from for the rate specified by ``reaction_for_special_factor``.
+``filename_of_special_rate``.
 
 
 Changes in r23.05.1
