@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Delete unused packages
         run: |
-	  # commands lifted from https://github.com/jlumbroso/free-disk-space
+          # commands lifted from https://github.com/jlumbroso/free-disk-space
           sudo rm -rf /usr/local/lib/android
           sudo apt-get remove -y '^dotnet-.*' # 990 MB
           sudo apt-get remove -y '^llvm-.*' # 1052 MB
