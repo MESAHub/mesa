@@ -30,12 +30,6 @@
       
       !pgstar_flag = .true.
 
-      num_special_rate_factors = 1
-      reaction_for_special_factor(1) = 'r_c12_ag_o16'
-      special_rate_factor(1) = 1
-      filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
-      
-
 / ! end of star_job namelist
 
 
