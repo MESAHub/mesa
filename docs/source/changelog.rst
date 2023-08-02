@@ -24,7 +24,7 @@ pressure with respect to other variables.
 run_star_extras
 ---------------
 
-Previously we had logic to determine if a extra history value should be saved 
+Previously we had logic to determine if a extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
@@ -38,6 +38,19 @@ with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.har
 These rates can be accessed through the rate selection mechanism. 
 These can be loaded, either by the normal mechanism of adding the filename
 to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
+
+
+Maximum net size
+----------------
+
+Previous MESA versions where limited to ~300 isotopes in the nuclear network,
+this has now been (slightly) relaxed.
+In principle the maximum network size is sqrt(2^31/nz). Thus for nz=1000 zones
+this is about ~1400 isotopes, at 5000
+zones this is ~650 isotopes. Note this will require a huge amount of RAM,
+``mesa_495.net`` requires at least ~80GB of RAM, and it is estimated
+that for 1400 isotopes you will need ~650GB of RAM.
+
 
 Changes in r23.05.1
 ===================
