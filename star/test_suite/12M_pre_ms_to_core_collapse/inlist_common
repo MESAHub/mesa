@@ -191,7 +191,7 @@
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
 
       op_split_burn = .true.
-      op_split_burn_min_T = 1d9
+      op_split_burn_min_T = 4d9
       burn_steps_limit = 150
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
