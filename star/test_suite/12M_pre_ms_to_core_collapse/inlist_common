@@ -190,6 +190,8 @@
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
 
+      ! Can be helpful to decrease op_split_burn_min_T
+      ! to 3d9 or even 1d9 for large networks to avoid crashes
       op_split_burn = .true.
       op_split_burn_min_T = 4d9
       burn_steps_limit = 150
