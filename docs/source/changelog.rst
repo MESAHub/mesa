@@ -44,6 +44,8 @@ with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.har
 These rates can be accessed through the rate selection mechanism. 
 These can be loaded, either by the normal mechanism of adding the filename
 to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
+Several examples in the test suite now make use of these rates, such as
+massive stars and models for building white dwarfs.
 
 
 Maximum net size
