@@ -124,7 +124,6 @@
     max_logT_for_k_const_mass = 100
     max_q_for_k_const_mass = 0.99
     min_q_for_k_const_mass = 0.99
-    fix_eps_grav_transition_to_grid = .true.
     
     !overshoot
 
