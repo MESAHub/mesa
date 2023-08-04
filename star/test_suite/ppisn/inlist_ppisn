@@ -239,7 +239,6 @@
     max_logT_for_k_const_mass = 100
     max_q_for_k_const_mass = 0.98
     min_q_for_k_const_mass = 0.98
-    fix_eps_grav_transition_to_grid = .true.
 
    history_interval = 1
    max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000

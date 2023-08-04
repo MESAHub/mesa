@@ -133,7 +133,7 @@
    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
-    fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
+    make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
@@ -190,7 +190,7 @@
     hot_wind_scheme, cool_wind_RGB_scheme, cool_wind_AGB_scheme, RGB_to_AGB_wind_switch, &
     Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, van_Loon_scaling_factor, &
     Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
-    Dutch_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
+    Dutch_scaling_factor, Bjorklund_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
     wind_H_envelope_limit, wind_H_He_envelope_limit, hot_wind_full_on_T, cool_wind_full_on_T, &
     
     ! composition of added mass
@@ -1025,7 +1025,6 @@
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
  s% threshold_for_smooth_gradL_composition_term = threshold_for_smooth_gradL_composition_term
  s% clip_D_limit = clip_D_limit
- s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
 s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
 s% gradT_excess_f1 = gradT_excess_f1
@@ -1360,6 +1359,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
  s% Vink_scaling_factor = Vink_scaling_factor
  s% Dutch_scaling_factor = Dutch_scaling_factor
+ s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
  s% Dutch_wind_lowT_scheme = Dutch_wind_lowT_scheme
 
  s% wind_H_envelope_limit = wind_H_envelope_limit
@@ -2705,7 +2705,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term
  threshold_for_smooth_gradL_composition_term = s% threshold_for_smooth_gradL_composition_term
  clip_D_limit = s% clip_D_limit
- fix_eps_grav_transition_to_grid = s% fix_eps_grav_transition_to_grid
 
  okay_to_reduce_gradT_excess = s% okay_to_reduce_gradT_excess
  gradT_excess_f1 = s% gradT_excess_f1
@@ -3033,6 +3032,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
  Vink_scaling_factor = s% Vink_scaling_factor
  Dutch_scaling_factor = s% Dutch_scaling_factor
+ Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
  Dutch_wind_lowT_scheme = s% Dutch_wind_lowT_scheme
 
  wind_H_envelope_limit = s% wind_H_envelope_limit
