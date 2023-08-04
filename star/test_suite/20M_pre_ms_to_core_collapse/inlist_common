@@ -16,9 +16,19 @@
       change_initial_v_flag = .true.
       new_v_flag = .true.
 
-      relax_to_this_tau_factor = 1.5d6
-      dlogtau_factor = 0.1d0
-      relax_initial_tau_factor = .true.
+      ! Can be adopted to avoid issues with surface for high Z or during advanced burning
+      !relax_to_this_tau_factor = 1.5d6
+      !dlogtau_factor = 0.1d0
+      !relax_initial_tau_factor = .true.
+
+      num_special_rate_factors = 2
+      reaction_for_special_factor(1) = 'r_c12_ag_o16'
+      special_rate_factor(1) = 1
+      filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
+
+      reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+      special_rate_factor(2) = 1
+      filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
 
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
@@ -195,9 +205,11 @@
       sig_min_factor_for_high_Tcenter = 0.01
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-
+     
+      ! Can be helpful to decrease op_split_burn_min_T 
+      ! to 3d9 or even 1d9 for large networks to avoid crashes
       op_split_burn = .true.
-      op_split_burn_min_T = 1d9
+      op_split_burn_min_T = 4d9 
       burn_steps_limit = 150
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
