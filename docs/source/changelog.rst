@@ -28,6 +28,10 @@ Previously we had logic to determine if a extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
+
+New features
+------------
+
 Rates
 -----
 
@@ -51,6 +55,11 @@ zones this is ~650 isotopes. Note this will require a huge amount of RAM,
 ``mesa_495.net`` requires at least ~80GB of RAM, and it is estimated
 that for 1400 isotopes you will need ~650GB of RAM.
 
+Björklund Wind
+~~~~~~~~~~~~~~
+
+The Björklund et al. (2021) wind scheme has been implemented for use in all wind
+schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
 
 Changes in r23.05.1
 ===================

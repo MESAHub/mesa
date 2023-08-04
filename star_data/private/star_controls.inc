@@ -470,6 +470,7 @@
          real(dp) :: Nieuwenhuijzen_scaling_factor
          real(dp) :: Vink_scaling_factor
          real(dp) :: Dutch_scaling_factor
+         real(dp) :: Bjorklund_scaling_factor
          character (len=strlen) :: Dutch_wind_lowT_scheme
 
          real(dp) :: wind_H_envelope_limit, wind_H_He_envelope_limit, wind_He_layer_limit

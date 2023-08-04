@@ -190,7 +190,7 @@
     hot_wind_scheme, cool_wind_RGB_scheme, cool_wind_AGB_scheme, RGB_to_AGB_wind_switch, &
     Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, van_Loon_scaling_factor, &
     Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
-    Dutch_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
+    Dutch_scaling_factor, Bjorklund_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
     wind_H_envelope_limit, wind_H_He_envelope_limit, hot_wind_full_on_T, cool_wind_full_on_T, &
     
     ! composition of added mass
@@ -1359,6 +1359,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
  s% Vink_scaling_factor = Vink_scaling_factor
  s% Dutch_scaling_factor = Dutch_scaling_factor
+ s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
  s% Dutch_wind_lowT_scheme = Dutch_wind_lowT_scheme
 
  s% wind_H_envelope_limit = wind_H_envelope_limit
@@ -3031,6 +3032,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
  Vink_scaling_factor = s% Vink_scaling_factor
  Dutch_scaling_factor = s% Dutch_scaling_factor
+ Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
  Dutch_wind_lowT_scheme = s% Dutch_wind_lowT_scheme
 
  wind_H_envelope_limit = s% wind_H_envelope_limit
