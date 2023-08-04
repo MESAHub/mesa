@@ -24,12 +24,39 @@ pressure with respect to other variables.
 run_star_extras
 ---------------
 
-Previously we had logic to determine if a extra history value should be saved 
+Previously we had logic to determine if a extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
+
 New features
 ------------
+
+Rates
+-----
+
+In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16
+rates spanning the uncertainty range of -3 to +3 sigma from `Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_
+with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
+
+These rates can be accessed through the rate selection mechanism. 
+These can be loaded, either by the normal mechanism of adding the filename
+to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
+
+
+Maximum net size
+----------------
+
+Previous MESA versions where limited to ~300 isotopes in the nuclear network,
+this has now been (slightly) relaxed.
+In principle the maximum network size is sqrt(2^31/nz). Thus for nz=1000 zones
+this is about ~1400 isotopes, at 5000
+zones this is ~650 isotopes. Note this will require a huge amount of RAM,
+``mesa_495.net`` requires at least ~80GB of RAM, and it is estimated
+that for 1400 isotopes you will need ~650GB of RAM.
+
+Björklund Wind
+~~~~~~~~~~~~~~
 
 The Björklund et al. (2021) wind scheme has been implemented for use in all wind
 schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
@@ -77,6 +104,7 @@ For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
+
   $MESA_DIR/scripts/update_inlists
 
 This script will save the previous versions of your inlists to a directory named
@@ -1949,8 +1977,8 @@ Changes to WD ``atm`` tables
 There are now 2 options for white dwarf atmosphere tables:
 
 * ``WD_tau_25``: the original WD atmosphere table option for DA (H atmosphere)
-WDs; also found and fixed a bug in the header of this file that was
-causing it to use only a small portion of the actual table
+  WDs; also found and fixed a bug in the header of this file that was
+  causing it to use only a small portion of the actual table
 
 * ``DB_WD_tau_25``: new table for DB (He atmosphere) WDs
 

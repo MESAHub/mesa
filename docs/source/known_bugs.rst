@@ -10,6 +10,30 @@ we will also list work arounds, but for some bugs the only option will be to upd
 a newer version of MESA. Note this list is NOT comprehensive, users should check this first if they have an 
 issue but it may not be complete.
 
+r23.05.1
+========
+
+ZAMS Model Central Composition
+------------------------------
+
+When ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``, we fall back
+to loading a ZAMS model based on interpolating from a grid of pre-computed ZAMS models found in
+``data/star_data/zams_models``. The default file included in that directory is meant to start from
+a composition of X = 0.70 and Z = 0.02, but one of the models in the grid (1.26 Msun) has partially
+proceeded through hydrogen burning already so that its central H abundance is X = 0.58. Interpolation
+in this grid of models will impact the central H abundance for initial masses between 1.0 and 1.58 Msun.
+
+This bug affects versions r15140 through r23.05.1, and will be fixed in the next release.
+For current MESA releases impacted by this bug, the following steps provide a workaround with a patched ZAMS file:
+
+- Download this updated ZAMS model file: :download:`zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`
+- Copy the file into ``$MESA_DIR/data/star_data/zams_models``
+- Use the following setting in the ``&controls`` section of your inlists for models where
+  you want to use the patched ZAMS file:
+
+::
+
+   zams_filename = 'zams_z2m2_y28_patched.data'
 
 r22.11.1
 ========
