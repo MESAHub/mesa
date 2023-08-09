@@ -201,6 +201,7 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         integer :: gyre_data_schema
          character (len=strlen) :: fgong_header(4)
          integer :: fgong_ivers
 
