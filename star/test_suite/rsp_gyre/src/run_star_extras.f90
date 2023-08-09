@@ -123,7 +123,7 @@ module run_star_extras
             'GYRE', 'gyre.data', global_data, point_data, ierr)
          if (ierr /= 0) return
 
-         call gyre_set_model(global_data, point_data, 101)
+         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
 
          write(*, 100) 'order', 'freq (Hz)', 'P (sec)', &
            'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'
@@ -238,8 +238,8 @@ module run_star_extras
             gr = md%grid()
 
             period(md%n_pg) = 1d0/freq
-            npts(md%n_pg) = md%n_k
-            do k = 1, md%n_k
+            npts(md%n_pg) = md%n
+            do k = 1, md%n
                r(md%n_pg,k) = gr%pt(k)%x
                v(md%n_pg,k) = md%xi_r(k)            
             end do
@@ -253,7 +253,7 @@ module run_star_extras
                open(NEWUNIT=unit, FILE=filename, STATUS='REPLACE')
                write(unit, 130) 'x=r/R', 'Real(xi_r/R)', 'Imag(xi_r/R)', 'Real(xi_h/R)', 'Imag(xi_h/R)', 'dW/dx'
 130               format(6(1X,A24))
-               do k = 1, md%n_k
+               do k = 1, md%n
                   write(unit, 140) gr%pt(k)%x, md%xi_r(k), md%xi_h(k), md%dW_dx(k)
 140               format(6(1X,E24.16))
                end do

@@ -104,7 +104,7 @@
     write_pulse_data_with_profile, pulse_data_format, add_atmosphere_to_pulse_data, &
     add_center_point_to_pulse_data, keep_surface_point_for_pulse_data, add_double_points_to_pulse_data, &
     interpolate_rho_for_pulse_data, threshold_grad_mu_for_double_point, max_number_of_double_points,&
-    fgong_header, fgong_ivers, &
+    gyre_data_schema, fgong_header, fgong_ivers, &
     max_num_gyre_points, format_for_OSC_data, &
     fgong_zero_A_inside_r, use_other_export_pulse_data, use_other_get_pulse_data, use_other_edit_pulse_data, &
     write_model_with_profile, model_data_prefix, model_data_suffix, &
@@ -966,6 +966,8 @@
  s% interpolate_rho_for_pulse_data = interpolate_rho_for_pulse_data
  s% threshold_grad_mu_for_double_point = threshold_grad_mu_for_double_point
  s% max_number_of_double_points = max_number_of_double_points
+
+ s% gyre_data_schema = gyre_data_schema
 
  s% fgong_header = fgong_header
  s% fgong_ivers = fgong_ivers
@@ -2642,6 +2644,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  interpolate_rho_for_pulse_data = s% interpolate_rho_for_pulse_data
  threshold_grad_mu_for_double_point = s% threshold_grad_mu_for_double_point
  max_number_of_double_points = s% max_number_of_double_points
+
+ gyre_data_schema = s% gyre_data_schema
 
  fgong_header = s% fgong_header
  fgong_ivers = s% fgong_ivers
