@@ -40,10 +40,6 @@ module pulse_gyre
 
   implicit none
 
-  ! Parameters
-
-  integer, parameter :: NCOL = 19
-
   ! Access specifiers
 
   private
@@ -56,13 +52,13 @@ contains
   subroutine get_gyre_data (id, &
        add_center_point, keep_surface_point, add_atmosphere, global_data, point_data, ierr)
 
-    integer, intent(in)                :: id
-    logical, intent(in)                :: add_center_point
-    logical, intent(in)                :: keep_surface_point
-    logical, intent(in)                :: add_atmosphere
-    real(dp), allocatable, intent(out) :: global_data(:)
-    real(dp), allocatable, intent(out) :: point_data(:,:)
-    integer, intent(out)               :: ierr
+    integer, intent(in)                        :: id
+    logical, intent(in)                        :: add_center_point
+    logical, intent(in)                        :: keep_surface_point
+    logical, intent(in)                        :: add_atmosphere
+    real(dp), allocatable, intent(out)         :: global_data(:)
+    real(dp), allocatable, target, intent(out) :: point_data(:,:)
+    integer, intent(out)                       :: ierr
 
     type(star_info), pointer :: s
     integer, allocatable     :: k_a(:)
@@ -73,6 +69,25 @@ contains
     integer                  :: n_env
     integer                  :: nn_env
     integer                  :: nn
+    real(dp), pointer        :: r(:) => NULL()
+    real(dp), pointer        :: m(:) => NULL()
+    real(dp), pointer        :: L(:) => NULL()
+    real(dp), pointer        :: P(:) => NULL()
+    real(dp), pointer        :: T(:) => NULL()
+    real(dp), pointer        :: rho(:) => NULL()
+    real(dp), pointer        :: nabla(:) => NULL()
+    real(dp), pointer        :: N2(:) => NULL()
+    real(dp), pointer        :: Gamma_1(:) => NULL()
+    real(dp), pointer        :: nabla_ad(:) => NULL()
+    real(dp), pointer        :: delta(:) => NULL()
+    real(dp), pointer        :: kap(:) => NULL()
+    real(dp), pointer        :: kap_kap_T(:) => NULL()
+    real(dp), pointer        :: kap_kap_rho(:) => NULL()
+    real(dp), pointer        :: eps_nuc(:) => NULL()
+    real(dp), pointer        :: eps_eps_T(:) => NULL()
+    real(dp), pointer        :: eps_eps_rho(:) => NULL()
+    real(dp), pointer        :: eps_grav(:) => NULL()
+    real(dp), pointer        :: Omega_rot(:) => NULL()
     real(dp)                 :: r_outer
     real(dp)                 :: m_outer
     integer                  :: j
@@ -87,23 +102,13 @@ contains
        return
     end if
 
-    ! Update the eps_grav data
-
-    do k = 1, s%nz
-       call eval_eps_grav_and_partials(s, k, ierr)
-       if (ierr /= 0) then
-          write(*,*) 'failed in call to eval_eps_grav_and_partials'
-          return
-       end if
-    end do
-
     ! Set up segment indices
 
     call set_segment_indices(s, k_a, k_b, add_center_point)
 
     n_sg = SIZE(k_a)
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
@@ -132,9 +137,84 @@ contains
        nn = nn_env + nn_atm
     endif
 
-    ! Store global data
+    ! Allocate arrays & set up data pointers
 
     allocate(global_data(3))
+
+    ! Set up data pointers
+
+    select case(s%gyre_data_schema)
+
+    case(101,110)
+
+       allocate(point_data(18,nn))
+
+       r => point_data(1,:)
+       m => point_data(2,:)
+       L => point_data(3,:)
+       P => point_data(4,:)
+       T => point_data(5,:)
+       rho => point_data(6,:)
+       nabla => point_data(7,:)
+       N2 => point_data(8,:)
+       Gamma_1 => point_data(9,:)
+       nabla_ad => point_data(10,:)
+       delta => point_data(11,:)
+       kap => point_data(12,:)
+       kap_kap_T => point_data(13,:)
+       kap_kap_rho => point_data(14,:)
+       eps_nuc => point_data(15,:)
+       eps_eps_T => point_data(16,:)
+       eps_eps_rho => point_data(17,:)
+       Omega_rot => point_data(18,:)
+
+    case(120)
+
+       allocate(point_data(19,nn))
+
+       r => point_data(1,:)
+       m => point_data(2,:)
+       L => point_data(3,:)
+       P => point_data(4,:)
+       T => point_data(5,:)
+       rho => point_data(6,:)
+       nabla => point_data(7,:)
+       N2 => point_data(8,:)
+       Gamma_1 => point_data(9,:)
+       nabla_ad => point_data(10,:)
+       delta => point_data(11,:)
+       kap => point_data(12,:)
+       kap_kap_T => point_data(13,:)
+       kap_kap_rho => point_data(14,:)
+       eps_nuc => point_data(15,:)
+       eps_eps_T => point_data(16,:)
+       eps_eps_rho => point_data(17,:)
+       eps_grav => point_data(18,:)
+       Omega_rot => point_data(19,:)
+
+    case default
+
+       write(*,*) 'invalid gyre_data_schema'
+       ierr = -1
+       return
+
+    end select
+
+    ! If necessary, update the eps_grav data in the model
+
+    if (ASSOCIATED(eps_grav)) then
+
+       do k = 1, s%nz
+          call eval_eps_grav_and_partials(s, k, ierr)
+          if (ierr /= 0) then
+             write(*,*) 'failed in call to eval_eps_grav_and_partials'
+             return
+          end if
+       end do
+
+    end if
+
+    ! Store global data
 
     r_outer = Rsun*s%photosphere_r
     m_outer = s%m_grav(1)
@@ -144,8 +224,6 @@ contains
     global_data(3) = s%L(1)
 
     ! Store point data
-
-    allocate(point_data(NCOL,nn))
 
     j = 1
 
@@ -216,55 +294,36 @@ contains
       ! Store data associated with atmosphere point k into the
       ! point_data array at position j
 
-      associate ( &
-           r => point_data(1,j), &
-           m => point_data(2,j), &
-           L => point_data(3,j), &
-           P => point_data(4,j), &
-           T => point_data(5,j), &
-           rho => point_data(6,j), &
-           nabla => point_data(7,j), &
-           N2 => point_data(8,j), &
-           Gamma_1 => point_data(9,j), &
-           nabla_ad => point_data(10,j), &
-           delta => point_data(11,j), &
-           kap => point_data(12,j), &
-           kap_T => point_data(13,j), &
-           kap_rho => point_data(14,j), &
-           eps_nuc => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           eps_grav => point_data(18,j), &
-           omega => point_data(19,j))
+      r(j) = s%r(1) + s%atm_structure(atm_delta_r,k)
+      m(j) = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
+      L(j) = s%L(1)
 
-        r = s%r(1) + s%atm_structure(atm_delta_r,k)
-        m = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
-        L = s%L(1)
-        P = exp(s%atm_structure(atm_lnP,k))
-        rho = exp(s%atm_structure(atm_lnd,k))
-        T = exp(s%atm_structure(atm_lnT,k))
-        Gamma_1 = s%atm_structure(atm_gamma1,k)
-        nabla_ad = s%atm_structure(atm_grada,k)
-        delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
-        nabla = s%atm_structure(atm_gradT,k)
+      P(j) = exp(s%atm_structure(atm_lnP,k))
+      rho(j) = exp(s%atm_structure(atm_lnd,k))
+      T(j) = exp(s%atm_structure(atm_lnT,k))
 
-        grav = s%cgrav(1)*m/(r*r)
-        N2 = grav*grav*(rho/P)*delta*(nabla_ad - nabla)
+      Gamma_1(j) = s%atm_structure(atm_gamma1,k)
+      nabla_ad(j) = s%atm_structure(atm_grada,k)
+      delta(j) = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
+      nabla(j) = s%atm_structure(atm_gradT,k)
 
-        kap = s%atm_structure(atm_kap,k)
-        kap_T = kap*s%atm_structure(atm_dlnkap_dlnT,k)*kap
-        kap_rho = kap*s%atm_structure(atm_dlnkap_dlnd,k)*kap
-        eps_nuc = 0d0
-        eps_T = 0d0
-        eps_rho = 0d0
-        eps_grav = 0d0
-        if (s%rotation_flag) then
-           omega = s%omega(1)
-        else
-           omega = 0d0
-        end if
+      grav = s%cgrav(1)*m(j)/(r(j)*r(j))
+      N2(j) = grav*grav*(rho(j)/P(j))*delta(j)*(nabla_ad(j) - nabla(j))
 
-      end associate
+      kap(j) = s%atm_structure(atm_kap,k)
+      kap_kap_T(j) = kap(j)*s%atm_structure(atm_dlnkap_dlnT,k)
+      kap_kap_rho(j) = kap(j)*s%atm_structure(atm_dlnkap_dlnd,k)
+
+      eps_nuc(j) = 0d0
+      eps_eps_T(j) = 0d0
+      eps_eps_rho(j) = 0d0
+      if (ASSOCIATED(eps_grav)) eps_grav(j) = 0d0
+
+      if (s%rotation_flag) then
+         Omega_rot(j) = s%omega(1)
+      else
+         Omega_rot(j) = 0d0
+      end if
 
       ! Finish
 
@@ -284,56 +343,38 @@ contains
       ! Store data associated with envelope face k into the point_data
       ! array at position j
 
-      associate ( &
-           r => point_data(1,j), &
-           m => point_data(2,j), &
-           L => point_data(3,j), &
-           P => point_data(4,j), &
-           T => point_data(5,j), &
-           rho => point_data(6,j), &
-           nabla => point_data(7,j), &
-           N2 => point_data(8,j), &
-           Gamma_1 => point_data(9,j), &
-           nabla_ad => point_data(10,j), &
-           delta => point_data(11,j), &
-           kap => point_data(12,j), &
-           kap_T => point_data(13,j), &
-           kap_rho => point_data(14,j), &
-           eps_nuc => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           eps_grav => point_data(18,j), &
-           omega => point_data(19,j))
+      r(j) = s%r(k)
+      m(j) = s%m_grav(k)
+      L(j) = s%L(k)
 
-        r = s%r(k)
-        m = s%m_grav(k)
-        L = s%L(k)
-        P = eval_face(s%dq, s%Peos, k, 1, s%nz)
-        if (s%interpolate_rho_for_pulse_data) then
-           rho = eval_face(s%dq, s%rho, k, k_a, k_b)
-        else
-           rho = eval_face_rho(s, k, k_a, k_b)
-        end if
-        T = eval_face(s%dq, s%T, k, 1, s%nz)
-        N2 = eval_face_A_ast(s, k, k_a, k_b)*s%grav(k)/s%r(k)
-        Gamma_1 = eval_face(s%dq, s%gamma1, k, k_a, k_b)
-        nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
-        delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
-        kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
-        kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
-        kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)
-        eps_nuc = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
-        eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
-        eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
-        eps_grav = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
-        if (s%rotation_flag) then
-           omega = s%omega(k) ! Not quite right; omega can be discontinuous
-        else
-           omega = 0d0
-        end if
+      P(j) = eval_face(s%dq, s%Peos, k, 1, s%nz)
+      if (s%interpolate_rho_for_pulse_data) then
+         rho(j) = eval_face(s%dq, s%rho, k, k_a, k_b)
+      else
+         rho(j) = eval_face_rho(s, k, k_a, k_b)
+      end if
+      T(j) = eval_face(s%dq, s%T, k, 1, s%nz)
 
-      end associate
+      N2(j) = eval_face_A_ast(s, k, k_a, k_b)*s%grav(k)/s%r(k)
+      Gamma_1(j) = eval_face(s%dq, s%gamma1, k, k_a, k_b)
+      nabla_ad(j) = eval_face(s%dq, s%grada, k, k_a, k_b)
+      delta(j) = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
+      nabla(j) = s%gradT(k) ! Not quite right; gradT can be discontinuous
+
+      kap(j) = eval_face(s%dq, s%opacity, k, k_a, k_b)
+      kap_kap_T(j) = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
+      kap_kap_rho(j) = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)
+
+      eps_nuc(j) = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
+      eps_eps_T(j) = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
+      eps_eps_rho(j) = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
+      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
+
+      if (s%rotation_flag) then
+         Omega_rot(j) = s%omega(k) ! Not quite right; omega can be discontinuous
+      else
+         Omega_rot = 0d0
+      end if
 
       ! Finish
 
@@ -353,60 +394,42 @@ contains
 
       ! Store data for the center into the point_data array at position j
 
-      associate ( &
-           r => point_data(1,j), &
-           m => point_data(2,j), &
-           L => point_data(3,j), &
-           P => point_data(4,j), &
-           T => point_data(5,j), &
-           rho => point_data(6,j), &
-           nabla => point_data(7,j), &
-           N2 => point_data(8,j), &
-           Gamma_1 => point_data(9,j), &
-           nabla_ad => point_data(10,j), &
-           delta => point_data(11,j), &
-           kap => point_data(12,j), &
-           kap_T => point_data(13,j), &
-           kap_rho => point_data(14,j), &
-           eps_nuc => point_data(15,j), &
-           eps_T => point_data(16,j), &
-           eps_rho => point_data(17,j), &
-           eps_grav => point_data(18,j), &
-           omega => point_data(19,j))
+      r(j) = 0d0
+      m(j) = 0d0
+      L(j) = 0d0
 
-        r = 0d0
-        m = 0d0
-        L = 0d0
-        P = eval_center(s%rmid, s%Peos, 1, s%nz)
-        if (s%interpolate_rho_for_pulse_data) then
-           rho = eval_center(s%rmid, s%rho, k_a, k_b)
-        else
-           rho = eval_center_rho(s, k_b)
-        end if
+      P(j) = eval_center(s%rmid, s%Peos, 1, s%nz)
+      if (s%interpolate_rho_for_pulse_data) then
+         rho(j) = eval_center(s%rmid, s%rho, k_a, k_b)
+      else
+         rho(j) = eval_center_rho(s, k_b)
+      end if
+      ! at the centre d²P/dr² = -4πGρ²/3
+      d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho(j)**2
+      P(j) = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+      T(j) = eval_center(s%rmid, s%T, 1, s%nz)
 
-        ! at the centre d²P/dr² = -4πGρ²/3
-        d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho**2
-        P = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
-        T = eval_center(s%rmid, s%T, 1, s%nz)
-        N2 = 0d0
-        Gamma_1 = eval_center(s%rmid, s%gamma1, k_a, k_b)
-        nabla_ad = eval_center(s%rmid, s%grada, k_a, k_b)
-        delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
-        nabla = eval_center(s%r, s%gradT, k_a, k_b)
-        kap = eval_center(s%rmid, s%opacity, k_a, k_b)
-        kap_T = eval_center(s%rmid, s%d_opacity_dlnT, k_a, k_b)
-        kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)
-        eps_nuc = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
-        eps_T = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
-        eps_rho = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
-        eps_grav = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
-        if (s%rotation_flag) then
-           omega = eval_center(s%r, s%omega, k_a, k_b)
-        else
-           omega = 0d0
-        end if
+      N2(j) = 0d0
+      Gamma_1(j) = eval_center(s%rmid, s%gamma1, k_a, k_b)
+      nabla_ad(j) = eval_center(s%rmid, s%grada, k_a, k_b)
+      delta(j) = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
+      nabla(j) = eval_center(s%r, s%gradT, k_a, k_b)
 
-      end associate
+      kap(j) = eval_center(s%rmid, s%opacity, k_a, k_b)
+      kap_kap_T(j) = eval_center(s%rmid, s%d_opacity_dlnT, k_a, k_b)
+      kap_kap_rho(j) = eval_center(s%rmid, s%d_opacity_dlnd, k_a, k_b)
+
+      eps_nuc(j) = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
+      eps_eps_T(j) = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
+      eps_eps_rho(j) = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
+      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
+
+      if (s%rotation_flag) then
+         Omega_rot(j) = eval_center(s%r, s%omega, k_a, k_b)
+      else
+         Omega_rot(j) = 0d0
+      end if
+
 
       ! Finish
 
@@ -439,6 +462,14 @@ contains
        return
     end if
 
+    select case(s%gyre_data_schema)
+    case(101,120)
+    case default
+       write(*,*) 'invalid gyre_data_schema'
+       ierr = -1
+       return
+    end select
+
     ! Open the file
 
     open(newunit=iounit, file=TRIM(filename), status='REPLACE', iostat=ierr)
@@ -451,7 +482,7 @@ contains
 
     nn = SIZE(point_data, 2)
 
-    write(iounit, 100) nn, global_data, GYRE_MODEL_VERSION
+    write(iounit, 100) nn, global_data, s%gyre_data_schema
 100 format(I6, 3(1X,1PE26.16), 1X, I6)
 
     do j = 1, nn
