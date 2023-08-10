@@ -484,17 +484,7 @@ contains
          else if (pass == 2) then
             call do_name(j + col_offset, extra_col_names(j))
          else if (pass == 3) then
-            if (abs(extra_col_vals(j)) < huge(int_val))then
-               int_val = int(extra_col_vals(j))
-               if (abs(extra_col_vals(j) - dble(int_val)) < &
-                  1d-10 * max(1d-10, abs(extra_col_vals(j)))) then
-                  call do_int_val(j + col_offset, int_val)
-               else
-                  call do_val(j + col_offset, extra_col_vals(j))
-               end if
-            else
-               call do_val(j + col_offset, extra_col_vals(j))
-            end if
+            call do_val(j + col_offset, extra_col_vals(j))
          end if
       end subroutine do_extra_col
 
@@ -832,9 +822,11 @@ contains
          end if
          val = s% r(k) / s%r(1)
          if (k == 1) return
-         eps1 = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps1 = s% eps_nuc(k) - s% non_nuc_neu(k)
          bv1 = sign(1d0, eps1) * log10(max(1d0, abs(eps1)))
-         eps0 = s% eps_nuc(k - 1) - s% eps_nuc_neu_total(k - 1) - s% non_nuc_neu(k - 1)
+         ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+         eps0 = s% eps_nuc(k - 1) - s% non_nuc_neu(k - 1)
          bv0 = sign(1d0, eps0) * log10(max(1d0, abs(eps0)))
          bv = max(bv0, bv1)
          eps = pow(10d0, bv)

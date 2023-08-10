@@ -934,7 +934,7 @@
             call do1(s% extra_opacity_factor, c% extra_opacity_factor)
             if (failed('extra_opacity_factor')) exit
 
-            call do1(s% extra_pressure, c% extra_pressure)
+            call do1_ad(s% extra_pressure, c% extra_pressure)
             if (failed('extra_pressure')) exit
             call do1(s% eps_heat, c% eps_heat)
             if (failed('eps_heat')) exit
@@ -984,6 +984,12 @@
             if (action == do_allocate .or. &
                   action == do_copy_pointers_and_resize) &
                s% alpha_mlt(1:nz) = s% mixing_length_alpha
+
+            call do1(s% dvdt_drag, c% dvdt_drag)
+            if (failed('dvdt_drag')) exit
+
+            call do1(s% FdotV_drag_energy, c% FdotV_drag_energy)
+            if (failed('FdotV_drag_energy')) exit
 
             call do1(s% vc, c% vc)
             if (failed('vc')) exit

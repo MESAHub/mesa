@@ -32,8 +32,6 @@
       ! note that other_cgrav only changes G in the stellar structure
       ! the binary module is unaffected by changes in cgrav
 
-      use star_def
-
       implicit none
 
       
@@ -41,6 +39,7 @@
       
       
       subroutine default_other_cgrav(id, ierr)
+         use star_def
          use const_def, only: standard_cgrav
          integer, intent(in) :: id
          integer, intent(out) :: ierr

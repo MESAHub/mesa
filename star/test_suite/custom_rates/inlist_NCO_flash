@@ -8,7 +8,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
-      required_termination_code_string = 'log_center_temp_limit'
+      required_termination_code_string = 'log_center_temp_upper_limit'
 
       ! Nuclear Reactions
 
@@ -62,7 +62,7 @@
       ! limit max_model_number as part of test_suite
       max_model_number = 600
 
-      log_center_temp_limit = 7.8
+      log_center_temp_upper_limit = 7.8
 
       ! Accretion Controls
       accrete_same_as_surface = .false.

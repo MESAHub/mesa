@@ -26,8 +26,6 @@
       module other_photo_read
 
 
-      use star_def
-
       implicit none
 
       ! note: there is no flag "use_other_photo_read".  
@@ -38,6 +36,7 @@
       
 
       subroutine default_other_photo_read(id, iounit, ierr)
+         use star_def
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          ierr = 0

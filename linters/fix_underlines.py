@@ -15,6 +15,7 @@ DEFAULTS_FILES = (
     "star/defaults/pgstar.defaults",
     "binary/defaults/binary_job.defaults",
     "binary/defaults/binary_controls.defaults",
+    "binary/defaults/pgbinary.defaults",
     "eos/defaults/eos.defaults",
     "kap/defaults/kap.defaults",
 )

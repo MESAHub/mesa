@@ -51,10 +51,10 @@
     max_model_number, relax_max_number_retries, max_number_retries, max_age, max_age_in_seconds, max_age_in_days, &
     num_adjusted_dt_steps_before_max_age, dt_years_for_steps_before_max_age, max_abs_rel_run_E_err, &
     reduction_factor_for_max_timestep, when_to_stop_rtol, when_to_stop_atol, &
-    gamma_center_limit, eta_center_limit, log_center_temp_limit, log_max_temp_upper_limit, &
-    log_max_temp_lower_limit , log_center_temp_lower_limit, log_center_density_limit, &
-    log_center_density_lower_limit, center_entropy_limit, center_entropy_lower_limit, &
-    max_entropy_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
+    gamma_center_limit, eta_center_limit, log_center_temp_upper_limit, log_max_temp_upper_limit, &
+    log_max_temp_lower_limit , log_center_temp_lower_limit, log_center_density_upper_limit, &
+    log_center_density_lower_limit, center_entropy_upper_limit, center_entropy_lower_limit, &
+    max_entropy_upper_limit, max_entropy_lower_limit, min_timestep_limit, non_fe_core_rebound_limit, &
     fe_core_infall_limit, center_Ye_lower_limit, center_R_lower_limit, non_fe_core_infall_limit, &
     fe_core_infall_mass, non_fe_core_infall_mass, &
     v_div_csound_surf_limit, v_div_csound_max_limit, Lnuc_div_L_upper_limit, Lnuc_div_L_lower_limit,&
@@ -133,7 +133,7 @@
    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
-    fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
+    make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
@@ -190,7 +190,7 @@
     hot_wind_scheme, cool_wind_RGB_scheme, cool_wind_AGB_scheme, RGB_to_AGB_wind_switch, &
     Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, van_Loon_scaling_factor, &
     Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
-    Dutch_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
+    Dutch_scaling_factor, Bjorklund_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
     wind_H_envelope_limit, wind_H_He_envelope_limit, hot_wind_full_on_T, cool_wind_full_on_T, &
     
     ! composition of added mass
@@ -350,6 +350,7 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
+    drag_coefficient, min_q_for_drag, &
     retry_for_v_above_clight, &
 
     ! hydro solver
@@ -520,7 +521,7 @@
     use_other_diffusion_coefficients, use_other_pgstar_plots, use_other_eval_fp_ft, use_other_eval_i_rot, use_other_torque, &
     use_other_torque_implicit, use_other_wind, use_other_accreting_state, use_other_after_struct_burn_mix, use_other_mesh_delta_coeff_factor, &
     use_other_before_struct_burn_mix, use_other_astero_freq_corr, use_other_timestep_limit, use_other_set_pgstar_controls, &
-    use_other_screening, use_other_rate_get, use_other_net_derivs, use_other_split_burn, &
+    use_other_screening, use_other_rate_get, use_other_net_derivs, use_other_split_burn, use_other_close_gaps, &
     x_ctrl, x_integer_ctrl, x_logical_ctrl, x_character_ctrl, &
     
     ! extra files
@@ -780,17 +781,17 @@
  s% when_to_stop_atol = when_to_stop_atol
  s% gamma_center_limit = gamma_center_limit
  s% eta_center_limit = eta_center_limit
- s% log_center_temp_limit = log_center_temp_limit
+ s% log_center_temp_upper_limit = log_center_temp_upper_limit
  s% log_max_temp_upper_limit = log_max_temp_upper_limit
  s% log_max_temp_lower_limit = log_max_temp_lower_limit
  s% log_center_temp_lower_limit = log_center_temp_lower_limit
- s% log_center_density_limit = log_center_density_limit
+ s% log_center_density_upper_limit = log_center_density_upper_limit
  s% log_center_density_lower_limit = log_center_density_lower_limit
  s% min_timestep_limit = min_timestep_limit
 
- s% center_entropy_limit = center_entropy_limit
+ s% center_entropy_upper_limit = center_entropy_upper_limit
  s% center_entropy_lower_limit = center_entropy_lower_limit
- s% max_entropy_limit = max_entropy_limit
+ s% max_entropy_upper_limit = max_entropy_upper_limit
  s% max_entropy_lower_limit = max_entropy_lower_limit
 
  s% fe_core_infall_limit = fe_core_infall_limit
@@ -1026,7 +1027,6 @@
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
  s% threshold_for_smooth_gradL_composition_term = threshold_for_smooth_gradL_composition_term
  s% clip_D_limit = clip_D_limit
- s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
 s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
 s% gradT_excess_f1 = gradT_excess_f1
@@ -1361,6 +1361,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
  s% Vink_scaling_factor = Vink_scaling_factor
  s% Dutch_scaling_factor = Dutch_scaling_factor
+ s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
  s% Dutch_wind_lowT_scheme = Dutch_wind_lowT_scheme
 
  s% wind_H_envelope_limit = wind_H_envelope_limit
@@ -1857,6 +1858,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_log_max_boost = RTI_log_max_boost 
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
+
+ s% drag_coefficient = drag_coefficient
+ s% min_q_for_drag = min_q_for_drag
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -2399,6 +2403,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_other_rate_get = use_other_rate_get
  s% use_other_net_derivs = use_other_net_derivs
  s% use_other_split_burn = use_other_split_burn
+ s% use_other_close_gaps = use_other_close_gaps
 
  s% x_ctrl = x_ctrl
  s% x_integer_ctrl = x_integer_ctrl
@@ -2456,17 +2461,17 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  when_to_stop_atol = s% when_to_stop_atol
  gamma_center_limit = s% gamma_center_limit
  eta_center_limit = s% eta_center_limit
- log_center_temp_limit = s% log_center_temp_limit
+ log_center_temp_upper_limit = s% log_center_temp_upper_limit
  log_max_temp_upper_limit = s% log_max_temp_upper_limit
  log_max_temp_lower_limit = s% log_max_temp_lower_limit
  log_center_temp_lower_limit = s% log_center_temp_lower_limit
- log_center_density_limit = s% log_center_density_limit
+ log_center_density_upper_limit = s% log_center_density_upper_limit
  log_center_density_lower_limit = s% log_center_density_lower_limit
  min_timestep_limit = s% min_timestep_limit
 
- center_entropy_limit = s% center_entropy_limit
+ center_entropy_upper_limit = s% center_entropy_upper_limit
  center_entropy_lower_limit = s% center_entropy_lower_limit
- max_entropy_limit = s% max_entropy_limit
+ max_entropy_upper_limit = s% max_entropy_upper_limit
  max_entropy_lower_limit = s% max_entropy_lower_limit
 
  fe_core_infall_limit = s% fe_core_infall_limit
@@ -2704,7 +2709,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term
  threshold_for_smooth_gradL_composition_term = s% threshold_for_smooth_gradL_composition_term
  clip_D_limit = s% clip_D_limit
- fix_eps_grav_transition_to_grid = s% fix_eps_grav_transition_to_grid
 
  okay_to_reduce_gradT_excess = s% okay_to_reduce_gradT_excess
  gradT_excess_f1 = s% gradT_excess_f1
@@ -3032,6 +3036,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
  Vink_scaling_factor = s% Vink_scaling_factor
  Dutch_scaling_factor = s% Dutch_scaling_factor
+ Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
  Dutch_wind_lowT_scheme = s% Dutch_wind_lowT_scheme
 
  wind_H_envelope_limit = s% wind_H_envelope_limit
@@ -3522,6 +3527,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_log_max_boost = s% RTI_log_max_boost 
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
+
+
+ drag_coefficient = s% drag_coefficient
+ min_q_for_drag = s% min_q_for_drag
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
@@ -4063,6 +4072,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  use_other_rate_get = s% use_other_rate_get
  use_other_net_derivs = s% use_other_net_derivs
  use_other_split_burn = s% use_other_split_burn
+ use_other_close_gaps = s% use_other_close_gaps
 
  x_ctrl = s% x_ctrl
  x_integer_ctrl = s% x_integer_ctrl

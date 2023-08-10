@@ -233,7 +233,7 @@ COMPILE_DEVEL     = $(COMPILE_NO_OPT)
 # some definitions used in the test makefiles and client makefiles
 
 WORK_COMPILE = \
-   $(FC) $(FCbasic) $(FCopenmp) $(FCchecks) $(FCdebug) $(FCfree) \
+   $(FC) $(FCbasic) $(FCopenmp) $(FCchecks) $(FCdebug) $(FCfree) $(FCstandard) \
    -I$(MESA_INCLUDE_DIR) -I$(WORK_SRC_DIR) -c
 
 ifeq ($(USE_PGPLOT),YES)

@@ -5,36 +5,35 @@
 
 adipls/ @rhdtownsend @warrickball
 astero/ @warrickball
-atm/ @rhdtownsend @warrickball @aarondotter
+atm/ @rhdtownsend @warrickball
 autodiff/ 
 binary/ @orlox
-chem/ @rjfarmer @fxt44 @aarondotter
-colors/ @rjfarmer
-const/ @rjfarmer @fxt44 @aarondotter
-data/ @rjfarmer
+chem/ @fxt44
+colors/ 
+const/ @fxt44
+data/ 
 docs/ @rhdtownsend
-eos/ @fxt44 @aarondotter  @evbauer
+eos/ @fxt44 @evbauer
 gyre/ @rhdtownsend @warrickball
 hdfio5 @rhdtownsend
 interp_1d/ @rhdtownsend 
 interp_2d/ @rhdtownsend 
-kap/ @fxt44 @aarondotter
-linters/ @rjfarmer
+kap/ @fxt44
+linters/ 
 turb/ 
 math/ @rhdtownsend
-mtx/  @rjfarmer @mjoyceGR
-net/ @rjfarmer @fxt44
-neu/ @rjfarmer @fxt44
+mtx/  @mjoyceGR
+net/ @fxt44
+neu/ @fxt44
 num/ 
-rates/ @rjfarmer @fxt44
+rates/ @fxt44
 #star/
 #star_data/
 #stella/ 
-utils/ @rhdtownsend @warrickball @rjfarmer
+utils/ @rhdtownsend @warrickball 
 
 ### Star ###
 
-star/private/pgstar_*.f90 @rjfarmer
 star/private/rsp_*.f90 @rsmolec
 star/private/phase_separation.f90 @evbauer
 
@@ -52,20 +51,20 @@ star/test_suite/20M_z2m2_high_rotation
 star/test_suite/5M_cepheid_blue_loop @annethoul @rsmolec
 star/test_suite/7M_prems_to_AGB @annethoul
 star/test_suite/accreted_material_j @orlox
-star/test_suite/adjust_net @rjfarmer
+star/test_suite/adjust_net 
 star/test_suite/c13_pocket @fxt44
 star/test_suite/carbon_kh @evbauer
-star/test_suite/cburn_inward @rjfarmer
-star/test_suite/ccsn_IIp @rjfarmer @fxt44
+star/test_suite/cburn_inward 
+star/test_suite/ccsn_IIp @fxt44
 star/test_suite/check_redo @fxt44
 star/test_suite/check_pulse_atm @warrickball
-star/test_suite/conductive_flame @fxt44 @rjfarmer
+star/test_suite/conductive_flame @fxt44 
 star/test_suite/conserve_angular_momentum @orlox
 star/test_suite/conv_core_cpm @evbauer
-star/test_suite/custom_colors @rjfarmer
+star/test_suite/custom_colors 
 star/test_suite/custom_rates @evbauer  @fxt44
 star/test_suite/high_rot_darkening @orlox
-star/test_suite/dev_ppisn @rjfarmer
+star/test_suite/dev_ppisn 
 star/test_suite/diffusion_smoothness @fxt44
 star/test_suite/extended_convective_penetration @fxt44
 star/test_suite/gyre_in_mesa_bcep @rhdtownsend @annethoul
@@ -75,7 +74,7 @@ star/test_suite/gyre_in_mesa_rsg @rhdtownsend @annethoul
 star/test_suite/gyre_in_mesa_spb @rhdtownsend @annethoul
 star/test_suite/gyre_in_mesa_wd @rhdtownsend @annethoul
 star/test_suite/hb_2M @annethoul
-star/test_suite/high_mass @fxt44 @rjfarmer
+star/test_suite/high_mass @fxt44 
 star/test_suite/high_z @fxt44
 star/test_suite/hot_cool_wind @fxt44
 star/test_suite/hse_riemann @fxt44
@@ -84,7 +83,7 @@ star/test_suite/low_z @aarondotter
 star/test_suite/magnetic_braking 
 star/test_suite/make_brown_dwarf @fxt44
 star/test_suite/make_co_wd @wmwolf @evbauer @fxt44
-star/test_suite/make_env @rjfarmer
+star/test_suite/make_env 
 star/test_suite/make_he_wd @evbauer @fxt44
 star/test_suite/make_metals @fxt44
 star/test_suite/make_o_ne_wd @fxt44 @evbauer
@@ -92,12 +91,12 @@ star/test_suite/make_planets @fxt44
 star/test_suite/make_sdb @evbauer
 star/test_suite/make_zams @fxt44
 star/test_suite/make_zams_low_mass @fxt44
-star/test_suite/make_zams_ultra_high_mass @fxt44 @rjfarmer
-star/test_suite/ns_c @rjfarmer @fxt44
-star/test_suite/ns_h @rjfarmer @fxt44
-star/test_suite/ns_he @rjfarmer @fxt44
+star/test_suite/make_zams_ultra_high_mass @fxt44 
+star/test_suite/ns_c @fxt44
+star/test_suite/ns_h @fxt44
+star/test_suite/ns_he @fxt44
 star/test_suite/other_physics_hooks @fxt44
-star/test_suite/pisn @rjfarmer
+star/test_suite/pisn 
 star/test_suite/radiative_levitation @evbauer
 star/test_suite/R_CrB_star @fxt44
 star/test_suite/relax_composition_j_entropy @warrickball
@@ -114,8 +113,8 @@ star/test_suite/rsp_Type_II_Cepheid @rsmolec
 star/test_suite/semiconvection  @annethoul
 star/test_suite/simplex_solar_calibration @mjoyceGR
 star/test_suite/test_case_template @fxt44
-star/test_suite/test_memory @rjfarmer
-star/test_suite/timing @rjfarmer
+star/test_suite/test_memory 
+star/test_suite/timing 
 star/test_suite/T_tau_gradr @warrickball
 star/test_suite/twin_studies @fxt44
 star/test_suite/wd_acc_small_dm @wmwolf
@@ -127,21 +126,21 @@ star/test_suite/wd_he_shell_ignition @wmwolf
 star/test_suite/wd_nova_burst @wmwolf
 star/test_suite/wd_stable_h_burn @wmwolf
 
-star/test_suite/12M_pre_ms_to_core_collapse @rjfarmer
-star/test_suite/20M_pre_ms_to_core_collapse @rjfarmer
-star/test_suite/split_burn_big_net @rjfarmer
-star/test_suite/zams_to_cc_80 @rjfarmer
-star/test_suite/20M_z2m2_high_rotation @rjfarmer
+star/test_suite/12M_pre_ms_to_core_collapse 
+star/test_suite/20M_pre_ms_to_core_collapse 
+star/test_suite/split_burn_big_net 
+star/test_suite/zams_to_cc_80 
+star/test_suite/20M_z2m2_high_rotation 
 
 
-binary/test_suite/double_bh @orlox @rjfarmer
+binary/test_suite/double_bh @orlox 
 binary/test_suite/evolve_both_stars @orlox @mjoyceGR
 binary/test_suite/jdot_gr_check @orlox
 binary/test_suite/jdot_ls_check @orlox
 binary/test_suite/jdot_ml_check @orlox
-binary/test_suite/star_plus_point_mass @orlox @rjfarmer
+binary/test_suite/star_plus_point_mass @orlox 
 binary/test_suite/star_plus_point_mass_explicit_mdot @orlox
-binary/test_suite/wind_fed_bhhmxb @orlox @rjfarmer
+binary/test_suite/wind_fed_bhhmxb @orlox 
 
 astero/test_suite/astero_adipls @warrickball
 astero/test_suite/astero_gyre @warrickball

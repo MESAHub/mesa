@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
 module kap_def
-  use const_def, only: dp
+  use const_def, only: dp, strlen
 
   implicit none
 
@@ -253,6 +253,12 @@ module kap_def
       ! bookkeeping
       integer :: handle
       logical :: in_use
+
+      ! User supplied inputs
+      real(dp) :: kap_ctrl(10)
+      integer :: kap_integer_ctrl(10)
+      logical :: kap_logical_ctrl(10)
+      character(len=strlen) :: kap_character_ctrl(10)
 
       ! other hooks
 

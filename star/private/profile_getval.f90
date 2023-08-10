@@ -467,9 +467,11 @@
                val = s% eps_grav_ad(k)% val
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_net_nuclear_energy)
-               val = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+               ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+               val = s% eps_nuc(k) - s% non_nuc_neu(k)
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_eps_nuc_plus_nuc_neu)
+               !  eps_nuc  subtracts eps_nuc_neu so this is just the total eenrgy from nuclear burning without neutrinos
                val = s% eps_nuc(k) + s% eps_nuc_neu_total(k)
             case (p_eps_nuc_minus_non_nuc_neu)
                val = s% eps_nuc(k) - s% non_nuc_neu(k)

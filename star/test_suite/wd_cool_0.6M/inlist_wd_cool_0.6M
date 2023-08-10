@@ -8,7 +8,7 @@
 
       load_saved_model = .true.
       load_model_filename = 'co_wd_settled.mod'
-      ! comes from final.mod produced by make_co_wd in r22.11.1
+      ! comes from final.mod produced by make_co_wd
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
@@ -74,8 +74,8 @@
       atm_table = 'WD_tau_25'
 
       ! C/O phase separation
-      ! do_phase_separation = .true.
-      ! do_phase_separation_heating = .true.
+      do_phase_separation = .true.
+      do_phase_separation_heating = .true.
 
       ! Diffusion controls
       do_element_diffusion = .true.

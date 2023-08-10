@@ -29,9 +29,6 @@
       ! control name: use_other_brunt_smoothing = .true.
       ! procedure pointer: s% other_brunt_smoothing => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -39,6 +36,7 @@
       
       
       subroutine null_other_brunt_smoothing(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

@@ -51,14 +51,14 @@
   delta_lgL_limit = 0.01
 
   x_ctrl(16) = 0.05 ! stop when shock reaches this mass below surface
-  x_ctrl(45) = 0
-  x_ctrl(46) = 90
-  x_ctrl(47) = 0.8
-  x_ctrl(12) = 1d-15
-  x_ctrl(35) = -1d+99
-  x_ctrl(36) = -1d+99
-  x_integer_ctrl(1) = 5
-  x_integer_ctrl(3) = 3
+  x_ctrl(45) = 0 ! boxcar start smooth at this + m_center
+  x_ctrl(46) = 90 ! boxcar smooth this + he_core_mass
+  x_ctrl(47) = 0.8 ! width of boxcar smooth
+  x_ctrl(12) = 1d-15 ! amount of ni56 to add
+  x_ctrl(35) = -1d+99 ! put ni56 this + m_center
+  x_ctrl(36) = -1d+99 ! end ni56 at this + he_core_mass
+  x_integer_ctrl(1) = 5 ! inlist part number
+  x_integer_ctrl(3) = 3  ! first pass of boxcar smooth num iters
 
   photo_interval = 25
 

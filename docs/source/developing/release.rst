@@ -10,6 +10,11 @@ General steps
 - Pick a release date 
 - Pick a RC1 (release candidate) date which should be ~1 month before the release
 
+Prior to generating a release
+-----------------------------
+
+- Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to an hour or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
+  
 Making a release
 ----------------
 

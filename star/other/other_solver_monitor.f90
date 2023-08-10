@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_solver_monitor => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -42,6 +40,7 @@
             id, iter, passed_tol_tests, &
             correction_norm, max_correction, &
             residual_norm, max_residual, ierr)
+         use star_def
          integer, intent(in) :: id, iter 
             ! iter is the number of the iteration we have just finished
          logical, intent(in) :: passed_tol_tests
