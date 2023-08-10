@@ -31,13 +31,12 @@
       ! so there is no use_other_overshooting_scheme flag.
 
 
-      use star_def
-
       implicit none
       
       contains
             
       subroutine null_other_overshooting_scheme(id, i, j, k_a, k_b, D, vc, ierr)
+         use star_def
          integer, intent(in) :: id, i, j
          integer, intent(out) :: k_a, k_b
          real(dp), intent(out), dimension(:) :: D, vc

@@ -1013,7 +1013,7 @@
                zfrac(:) = L09_element_zfrac(:)
             case (A09_Prz_zfracs)
                zfrac(:) = A09_Prz_zfrac(:)
-            case (0) ! use non-standard values given in controls
+            case (Custom_zfracs) ! use non-standard values given in controls
                zfrac(:) = 0
                zfrac(e_li) = s% z_fraction_li
                zfrac(e_be) = s% z_fraction_be

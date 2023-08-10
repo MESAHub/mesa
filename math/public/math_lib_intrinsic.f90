@@ -171,9 +171,9 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: log_x
 
-    if (.NOT. IEEE_IS_NORMAL(x)) then
+    if (.NOT. IEEE_IS_FINITE(x)) then
 
-       log_x = 1.E-99_dp
+       log_x = -99._dp
 
     else
 
@@ -190,9 +190,9 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: log10_x
 
-    if (.NOT. IEEE_IS_NORMAL(x)) then
+    if (.NOT. IEEE_IS_FINITE(x)) then
 
-       log10_x = 1.E-99_dp
+       log10_x = -99._dp
 
     else
 

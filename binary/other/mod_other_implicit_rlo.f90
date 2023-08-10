@@ -24,7 +24,6 @@
 ! ***********************************************************************
  
       module mod_other_implicit_rlo
-          use binary_def, only : binary_info, binary_ptr
 
       ! NOTE: remember to set one of these to true:
       ! use_other_check_implicit_rlo_mdot = .true.
@@ -117,6 +116,7 @@
       contains
       
       integer function null_other_check_implicit_rlo(binary_id, new_mdot)
+         use binary_def, only : binary_info, binary_ptr
          use const_def, only: dp
          use star_def
          integer, intent(in) :: binary_id
@@ -136,6 +136,7 @@
       
       subroutine null_other_implicit_function_to_solve(binary_id, &
          function_to_solve, use_sum, detached, ierr)
+         use binary_def, only : binary_info, binary_ptr
          use const_def, only: dp
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: function_to_solve

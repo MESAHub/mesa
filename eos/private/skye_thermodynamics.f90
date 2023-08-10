@@ -131,7 +131,7 @@ module skye_thermodynamics
       e = erad + egas
       s = srad + sgas
 
-      if(s<0 .or. e<0 .or. pgas <0 ) then
+      if(s<0 .or. e<0 .or. pgas<0) then
          ierr = -1
          return
       end if

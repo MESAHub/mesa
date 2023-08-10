@@ -29,9 +29,6 @@
       ! Note: there is no flag use_other_mlt_gradT_fraction
       ! procedure pointer: s% other_adjust_mlt_gradT_fraction => my_routine
 
-
-      use star_def
-
       implicit none
       
       
@@ -40,6 +37,7 @@
       
       
       subroutine default_other_adjust_mlt_gradT_fraction(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

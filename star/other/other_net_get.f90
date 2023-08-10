@@ -29,9 +29,6 @@
       ! control name: use_other_net_get = .true.
       ! procedure pointer: s% other_net_get => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -49,6 +46,7 @@
             screening_mode, &
             eps_nuc_categories, eps_neu_total, &
             ierr)      
+         use star_def
          use net_lib, only: net_get
          use net_def, only: Net_Info
          integer, intent(in) :: id ! id for star         

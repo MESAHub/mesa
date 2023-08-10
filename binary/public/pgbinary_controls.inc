@@ -932,7 +932,7 @@ real :: Orbit_win_width, Orbit_win_aspect_ratio, &
       Orbit_ybot, Orbit_ytop, &
       prev_Orbit_win_width, prev_Orbit_win_ratio, &
       Orbit_file_width, Orbit_file_aspect_ratio, &
-      prev_Orbit_file_width, prev_Orbit_file_ratio, Orbit_txt_scale
+      prev_Orbit_file_width, prev_Orbit_file_ratio, Orbit_txt_scale_factor
 
 integer :: annotation1_ci, annotation1_lw, annotation1_cf
 real :: annotation1_ch

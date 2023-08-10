@@ -4,7 +4,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 
 .. image:: https://img.shields.io/github/license/MESAHub/mesa
     :alt: GitHub
-    :target: https://github.com/MESAHub/mesa/blob/master/COPYING
+    :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
 .. image:: https://img.shields.io/github/v/release/MESAHub/mesa
     :alt: GitHub release (latest by date)
     :target: https://github.com/MESAHub/mesa/releases/latest

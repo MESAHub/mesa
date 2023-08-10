@@ -8,7 +8,7 @@
       num_special_rate_factors = 2
       reaction_for_special_factor(1) = 'r_c12_ag_o16'
       special_rate_factor(1) = 1
-      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+      filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
       reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
       special_rate_factor(2) = 1
@@ -57,6 +57,9 @@
       thermohaline_coeff = 100
       MLT_option = 'Cox'
 
+      okay_to_reduce_gradT_excess = .true.
+      gradT_excess_lambda1 = -1
+
 ! mixing
        overshoot_scheme(1) = 'exponential'
        overshoot_zone_type(1) = 'burn_Z'
@@ -73,8 +76,8 @@
       mesh_delta_coeff = 1.5     
 
 ! solver
-      energy_eqn_option = 'dedt'
-      use_gold2_tolerances = .true.
+      energy_eqn_option = 'eps_grav'
+      use_gold2_tolerances = .false.
 
 ! output
       num_trace_history_values = 2

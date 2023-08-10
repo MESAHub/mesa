@@ -24,8 +24,6 @@
 ! ***********************************************************************
  
       module mod_other_tsync
-          use binary_def, only : binary_info, binary_ptr
-          use star_def, only : star_info, star_ptr
 
       ! NOTE: remember to set true:
       ! use_other_tsync = .true.
@@ -129,6 +127,8 @@
       
       subroutine null_other_tsync(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
          use const_def, only: dp, strlen
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : star_info, star_ptr
          integer, intent(in) :: id
          character (len=strlen), intent(in) :: sync_type ! synchronization timescale
          real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ). 

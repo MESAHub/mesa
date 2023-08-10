@@ -143,6 +143,7 @@
   write_header_frequency = 10
 
   report_solver_progress = .false.
+  x_integer_ctrl(1) = -2 ! part number
 
 / ! end of controls namelist
 

@@ -119,7 +119,7 @@
          real(dp), parameter :: x24_limit = 0.01d0
          real(dp), parameter :: x20_limit = 0.02d0
          real(dp), parameter :: log_center_density_mg = 9.7d0
-         real(dp), parameter :: log_center_density_limit = 10.0d0
+         real(dp), parameter :: log_center_density_upper_limit = 10.0d0
          real(dp), parameter :: log_center_temperature_limit = 8.8d0
 
          ! for debugging
@@ -167,7 +167,7 @@
             return
          endif
 
-         if (s% log_center_density >= log_center_density_limit) then
+         if (s% log_center_density >= log_center_density_upper_limit) then
             extras_check_model = terminate
             termination_code_str(t_xtra4) = 'FAIL: electron captures should have occurred by now'
             s% termination_code = t_xtra4

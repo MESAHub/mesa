@@ -15,6 +15,7 @@ build.log
 /lib/
 /include/
 *.pyc
+*/other/*.mod
 
 ## Debugging/Profiling
 gmon.out

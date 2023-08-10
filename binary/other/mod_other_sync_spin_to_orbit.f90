@@ -24,8 +24,6 @@
 ! ***********************************************************************
  
       module mod_other_sync_spin_to_orbit
-          use binary_def, only : binary_info, binary_ptr
-          use star_def, only : star_info, star_ptr
 
       ! NOTE: remember to set true:
       ! use_other_sync_spin_to_orbit = .true.
@@ -128,6 +126,8 @@
 
       subroutine null_other_sync_spin_to_orbit(id, nz, osep, qratio, rl, dt_next, Ftid, sync_type, sync_mode, ierr)
          use const_def, only: dp, strlen
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : star_info, star_ptr
          integer, intent(in) :: id
          integer, intent(in) :: nz
          real(dp), intent(in) :: osep ! orbital separation (cm)

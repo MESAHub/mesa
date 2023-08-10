@@ -337,3 +337,37 @@ For a weak rate, add 1/2 life and Qneu to weak_info.list in weaklib_data.
 If possible, get 1/2 life = log(2)/exp(c1) with c1 from reaclib.
 
 To get the reaction added automatically add it to init_special_case_reaction_info in net_initialize.
+
+
+Inspect the temperature dependence of used rates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+During a run, MESA will cache the data for individual reaction rates
+in ``$MESA_DIR/data/rates_data/cache``. Whenever a nuclear reaction
+whose rate has not yet been cached is used for the first time,
+the terminal output will show a line similar to the following:
+
+::
+
+   write $MESA_DIR/data/rates_data/cache/r34_pp2_1.bin
+
+
+Each of the files in ``$MESA_DIR/data/rates_data/cache`` contains
+10000 lines listing temperature and corresponding rate for the
+specific reaction. However, these are in binary format. Inside
+``$MESA_DIR/rates/test`` you can find an executable called
+``show_rates`` which can be used to to print the rates in a human
+readable format. To do so, run it passing the path to a cache file as
+argument. You can pipe the output of this executable to a file to
+obtain a file that you can easily plot.
+Example:
+
+::
+
+  cd $MESA_DIR/rates/test/
+  ./show_rates $MESA_DIR/data/rates_data/cache/r34_pp2_1.bin > rate_r34_pp2_1.txt
+
+The file `rate_r34_pp2_1.txt` can now be opened with your text editor.
+
+**N.B.**: you will need to explicitly give the full path name for
+``$MESA_DIR`` in the second line.

@@ -24,6 +24,7 @@ Binary defaults
 
    reference/binary_job
    reference/binary_controls
+   reference/pgbinary
 
 Astero defaults
 ===============

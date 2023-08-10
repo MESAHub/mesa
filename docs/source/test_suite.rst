@@ -512,11 +512,6 @@ to find the instability strip edges, and effective temperatures offset from the 
 
 This test case checks that RSP models can be saved and loaded to produce the same results as test case :ref:`rsp_Cepheid`.
 
-:ref:`starspots`
-^^^^^^^^^^^^^^^^
-
-This test case implements modifications to the surface structure of a 1 solar mass star based on a star spots formalism.
-
 :ref:`semiconvection`
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -533,6 +528,10 @@ This test case exercises the simplex framework with a check of the chi^2 value f
 
 This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
 
+:ref:`starspots`
+^^^^^^^^^^^^^^^^
+
+This test case implements modifications to the surface structure of a 1 solar mass star based on a star spots formalism.
 
 :ref:`T_tau_gradr`
 ^^^^^^^^^^^^^^^^^^

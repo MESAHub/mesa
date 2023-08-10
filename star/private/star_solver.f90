@@ -36,7 +36,7 @@
       implicit none
 
       private
-      public :: solver, get_solver_work_sizes
+      public :: solver
 
 
       contains
@@ -45,7 +45,6 @@
       subroutine solver( &
             s, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
          use alloc, only: non_crit_get_quad_array, non_crit_return_quad_array
          use utils_lib, only: realloc_if_needed_1, quad_realloc_if_needed_1, fill_with_NaNs
@@ -54,14 +53,6 @@
          ! the primary variables
          integer, intent(in) :: nvar ! number of variables per zone
          logical, intent(in) :: skip_global_corr_coeff_limit
-
-         ! work arrays. required sizes provided by the routine solver_work_sizes.
-         ! for standard use, set work and iwork to 0 before calling.
-         ! NOTE: these arrays contain some optional parameter settings and outputs.
-         ! see num_def for details.
-         integer, intent(in) :: lwork, liwork
-         real(dp), intent(inout), target :: work(:) ! (lwork)
-         integer, intent(inout), target :: iwork(:) ! (liwork)
 
          ! convergence criteria
          integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
@@ -100,7 +91,6 @@
          call do_solver( &
             s, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
       end subroutine solver
@@ -109,7 +99,6 @@
       subroutine do_solver( &
             s, nvar, AF1, ldAF, neq, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            work, lwork, iwork, liwork, &
             convergence_failure, ierr)
 
          type (star_info), pointer :: s
@@ -123,32 +112,25 @@
          integer, intent(in) :: gold_tolerances_level
          real(dp), intent(in) :: tol_max_correction, tol_correction_norm
 
-         ! work arrays
-         integer, intent(in) :: lwork, liwork
-         real(dp), intent(inout), target :: work(:) ! (lwork)
-         integer, intent(inout), target :: iwork(:) ! (liwork)
-
          ! output
          logical, intent(out) :: convergence_failure
          integer, intent(out) :: ierr
 
          ! info saved in work arrays
 
-         real(dp), dimension(:,:), pointer :: dxsave, ddxsave, B, grad_f, soln
-         real(dp), dimension(:), pointer :: dxsave1, ddxsave1, B1, grad_f1, &
-            row_scale_factors1, col_scale_factors1, soln1, save_ublk1, save_dblk1, save_lblk1
-         real(dp), dimension(:,:), pointer ::  rhs
-         integer, dimension(:), pointer :: ipiv1
+         real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
+         real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
+            row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null()
+         real(dp), dimension(:,:), pointer ::  rhs=>null()
+         integer, dimension(:), pointer :: ipiv1=>null()
          real(dp), dimension(:,:), pointer :: &
-            ddx, xgg, ddxd, ddxdd, xder, equsave
+            ddx=>null(), xgg=>null(), ddxd=>null(), ddxdd=>null(), xder=>null(), equsave=>null()
 
-         integer, dimension(:), pointer :: ipiv_blk1
+         integer, dimension(:), pointer :: ipiv_blk1=>null()
          character (len=s%nz) :: equed1
 
-         real(dp), dimension(:,:), pointer :: A, Acopy
-         real(dp), dimension(:), pointer :: A1, Acopy1
-         real(dp), dimension(:), pointer :: lblk1, dblk1, ublk1
-         real(dp), dimension(:), pointer :: lblkF1, dblkF1, ublkF1
+         real(dp), dimension(:), pointer :: lblk1=>null(), dblk1=>null(), ublk1=>null()
+         real(dp), dimension(:), pointer :: lblkF1=>null(), dblkF1=>null(), ublkF1=>null()
 
          ! locals
          real(dp)  ::  &
@@ -173,474 +155,481 @@
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
 
-         real(dp), pointer, dimension(:) :: equ1
-         real(dp), pointer, dimension(:,:) :: equ ! (nvar,nz)
-         real(dp), pointer, dimension(:,:) :: AF ! (ldAF,neq)
-         real(dp), pointer, dimension(:,:,:) :: ublk, dblk, lblk ! (nvar,nvar,nz)
-         real(dp), dimension(:,:,:), pointer :: lblkF, dblkF, ublkF ! (nvar,nvar,nz)
+         real(dp), pointer, dimension(:) :: equ1=>null()
+         real(dp), pointer, dimension(:,:) :: equ=>null() ! (nvar,nz)
+         real(dp), pointer, dimension(:,:) :: AF=>null() ! (ldAF,neq)
+         real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null() ! (nvar,nvar,nz)
+         real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null() ! (nvar,nvar,nz)
 
-         include 'formats'
-
-         err_msg = ''
-         
-         nz = s% nz
-
-         AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
-
-         tol_msg(1) = 'avg corr'
-         tol_msg(2) = 'max corr '
-         tol_msg(3) = 'avg+max corr'
-         tol_msg(4) = 'avg resid'
-         tol_msg(5) = 'avg corr+resid'
-         tol_msg(6) = 'max corr, avg resid'
-         tol_msg(7) = 'avg+max corr, avg resid'
-         tol_msg(8) = 'max resid'
-         tol_msg(9) = 'avg corr, max resid'
-         tol_msg(10) = 'max corr+resid'
-         tol_msg(11) = 'avg+max corr, max resid'
-         tol_msg(12) = 'avg+max resid'
-         tol_msg(13) = 'avg corr, avg+max resid'
-         tol_msg(14) = 'max corr, avg+max resid'
-         tol_msg(15) = 'avg+max corr+resid'
-
-         ierr = 0
-         iter = 0
-         s% solver_iter = iter
-
-         call set_param_defaults
-         dbg_msg = s% report_solver_progress
-         
-         if (gold_tolerances_level == 2) then
-            tol_residual_norm = s% gold2_tol_residual_norm1
-            tol_max_residual = s% gold2_tol_max_residual1
-            tol_residual_norm2 = s% gold2_tol_residual_norm2
-            tol_max_residual2 = s% gold2_tol_max_residual2
-            tol_residual_norm3 = s% gold2_tol_residual_norm3
-            tol_max_residual3 = s% gold2_tol_max_residual3
-         else if (gold_tolerances_level == 1) then
-            tol_residual_norm = s% gold_tol_residual_norm1
-            tol_max_residual = s% gold_tol_max_residual1
-            tol_residual_norm2 = s% gold_tol_residual_norm2
-            tol_max_residual2 = s% gold_tol_max_residual2
-            tol_residual_norm3 = s% gold_tol_residual_norm3
-            tol_max_residual3 = s% gold_tol_max_residual3
-         else
-            tol_residual_norm = s% tol_residual_norm1
-            tol_max_residual = s% tol_max_residual1
-            tol_residual_norm2 = s% tol_residual_norm2
-            tol_max_residual2 = s% tol_max_residual2
-            tol_residual_norm3 = s% tol_residual_norm3
-            tol_max_residual3 = s% tol_max_residual3
-         end if
-
-         tol_abs_slope_min = -1 ! unused
-         tol_corr_resid_product = -1 ! unused
-         if (skip_global_corr_coeff_limit) then
-            min_corr_coeff = 1
-         else
-            min_corr_coeff = s% corr_coeff_limit
-         end if
-         
-         if (gold_tolerances_level == 2) then
-            iter_for_resid_tol2 = s% gold2_iter_for_resid_tol2
-            iter_for_resid_tol3 = s% gold2_iter_for_resid_tol3
-         else if (gold_tolerances_level == 1) then
-            iter_for_resid_tol2 = s% gold_iter_for_resid_tol2
-            iter_for_resid_tol3 = s% gold_iter_for_resid_tol3
-         else
-            iter_for_resid_tol2 = s% iter_for_resid_tol2
-            iter_for_resid_tol3 = s% iter_for_resid_tol3
-         end if
-
-         call pointers(ierr)
-         if (ierr /= 0) return
-
-         doing_extra = .false.
-         passed_tol_tests = .false. ! goes true when pass the tests
-         convergence_failure = .false. ! goes true when time to give up
-         coeff = 1.d0
-
-         residual_norm=0
-         max_residual=0
-         corr_norm_min=1d99
-         max_corr_min=1d99
-         max_resid_min=1d99
-         resid_norm_min=1d99
-         correction_factor=0
-         f=0d0
-         slope=0d0
-
-         call set_xscale_info(s, nvar, ierr)
-         if (ierr /= 0) then
-            if (dbg_msg) &
-               write(*, *) 'solver failure: set_xscale_info returned ierr', ierr
-            convergence_failure = .true.
-            return
-         end if
-         
-         call do_equations(ierr)                 
-         if (ierr /= 0) then
-            if (dbg_msg) &
-               write(*, *) 'solver failure: eval_equations returned ierr', ierr
-            convergence_failure = .true.
-            return
-         end if
-         
-         call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
-         if (ierr /= 0) then
-            if (dbg_msg) &
-               write(*, *) 'solver failure: sizequ returned ierr', ierr
-            convergence_failure = .true.
-            return
-         end if
-
-         first_try = .true.
-         iter = 1
-         s% solver_iter = iter
-         if (s% doing_first_model_of_run) then
-            max_tries = s% max_tries1
-         else if (s% retry_cnt > 20) then
-            max_tries = s% max_tries_after_20_retries
-         else if (s% retry_cnt > 10) then
-            max_tries = s% max_tries_after_10_retries
-         else if (s% retry_cnt > 5) then
-            max_tries = s% max_tries_after_5_retries
-         else if (s% retry_cnt > 0) then
-            max_tries = s% max_tries_for_retry
-         else
-            max_tries = s% solver_max_tries_before_reject
-         end if
-         tiny_corr_cnt = 0
-
-         s% num_solver_iterations = 0
-         
-      iter_loop: do while (.not. passed_tol_tests)
-
-            if (dbg_msg .and. first_try) write(*, *)
-            
-            max_resid_j = -1
-            max_corr_j = -1
-
-            if (iter >= iter_for_resid_tol2) then
-               if (iter < iter_for_resid_tol3) then
-                  tol_residual_norm = tol_residual_norm2
-                  tol_max_residual = tol_max_residual2
-                  if (dbg_msg .and. iter == iter_for_resid_tol2) &
-                     write(*,1) 'tol2 residual tolerances: norm, max', &
-                        tol_residual_norm, tol_max_residual
-               else
-                  tol_residual_norm = tol_residual_norm3
-                  tol_max_residual = tol_max_residual3
-                  if (dbg_msg .and. iter == iter_for_resid_tol3) &
-                     write(*,1) 'tol3 residual tolerances: norm, max', &
-                        tol_residual_norm, tol_max_residual
-               end if
-            else if (dbg_msg .and. iter == 1) then
-               write(*,2) 'solver_call_number', s% solver_call_number
-               write(*,2) 'gold tolerances level', gold_tolerances_level
-               write(*,1) 'correction tolerances: norm, max', &
-                  tol_correction_norm, tol_max_correction
-               write(*,1) 'tol1 residual tolerances: norm, max', &
-                  tol_residual_norm, tol_max_residual
-            end if
-            
-            call solver_test_partials(nvar, xder, size(A,dim=1), A1, ierr)
-            if (ierr /= 0) then
-               call write_msg('solver_test_partials returned ierr /= 0')
-               convergence_failure = .true.
-               exit iter_loop
-            end if
-            
-            s% num_solver_iterations = s% num_solver_iterations + 1
-            if (s% model_number == 1 .and. &
-                s% num_solver_iterations > 60 .and. &
-                mod(s% num_solver_iterations,10) == 0) &
-                  write(*,*) 'first model is slow to converge: num tries', &
-                     s% num_solver_iterations
-         
-            if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
-               write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
-               call oops(err_msg)
-               exit iter_loop
-            end if
-
-            call inspectB(s, nvar, soln, ierr)
-            if (ierr /= 0) then
-               call oops('inspectB returned ierr')
-               exit iter_loop
-            end if
-
-            ! compute size of scaled correction B
-            call sizeB(s, nvar, soln, &
-                  max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
-            if (ierr /= 0) then
-               call oops('correction rejected by sizeB')
-               exit iter_loop
-            end if
-
-            correction_norm = abs(correction_norm)
-            max_abs_correction = abs(max_correction)
-            corr_norm_min = min(correction_norm, corr_norm_min)
-            max_corr_min = min(max_abs_correction, max_corr_min)
-
-            if (is_bad_num(correction_norm) .or. is_bad_num(max_abs_correction)) then
-               ! bad news -- bogus correction
-               call oops('bad result from sizeB -- correction info either NaN or Inf')
-               if (s% stop_for_bad_nums) then
-                  write(*,1) 'correction_norm', correction_norm
-                  write(*,1) 'max_correction', max_correction
-                  call mesa_error(__FILE__,__LINE__,'solver')
-               end if
-               exit iter_loop
-            end if
-
-            if (.not. s% ignore_too_large_correction) then
-               if ((correction_norm > s% corr_param_factor*s% scale_correction_norm) .and. &
-                     .not. s% doing_first_model_of_run) then
-                  call oops('avg corr too large')
-                  exit iter_loop
-               endif
-            end if
-
-            ! shrink the correction if it is too large
-            correction_factor = 1d0
-            temp_correction_factor = 1d0
-
-            if (correction_norm*correction_factor > s% scale_correction_norm) then
-               correction_factor = min(correction_factor,s% scale_correction_norm/correction_norm)
-            end if
-            
-            if (max_abs_correction*correction_factor > s% scale_max_correction) then
-               temp_correction_factor = s% scale_max_correction/max_abs_correction
-            end if
-
-            if (iter > s% solver_itermin_until_reduce_min_corr_coeff) then
-               if (min_corr_coeff == 1d0 .and. &
-                  s% solver_reduced_min_corr_coeff < 1d0) then
-                     min_corr_coeff = s% solver_reduced_min_corr_coeff
-               end if
-            end if
-
-            correction_factor = max(min_corr_coeff, correction_factor)
-            if (.not. s% ignore_min_corr_coeff_for_scale_max_correction) then
-               temp_correction_factor = max(min_corr_coeff, temp_correction_factor)
-            end if
-            correction_factor = min(correction_factor, temp_correction_factor)
-
-            ! fix B if out of definition domain
-            call Bdomain(s, nvar, soln, correction_factor, ierr)
-            if (ierr /= 0) then ! correction cannot be fixed
-               call oops('correction rejected by Bdomain')
-               exit iter_loop
-            end if
-
-            if (min_corr_coeff < 1d0) then
-               ! compute gradient of f = equ<dot>jacobian
-               ! NOTE: NOT jacobian<dot>equ
-               call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
-
-               slope = eval_slope(nvar, nz, grad_f, soln)
-               if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
-                  if (is_bad_num(slope) .and. s% stop_for_bad_nums) then
-                     write(*,1) 'slope', slope
-                     call mesa_error(__FILE__,__LINE__,'solver')
-                  end if
-                  slope = 0d0
-                  min_corr_coeff = 1d0
-               end if
-
-            else
-
-               slope = 0d0
-
-            end if
-            
-            f = 0d0
-            call adjust_correction( &
-               min_corr_coeff, correction_factor, grad_f1, f, slope, coeff, err_msg, ierr)
-            if (ierr /= 0) then
-               call oops(err_msg)
-               exit iter_loop
-            end if
-            s% solver_adjust_iter = 0
-
-            ! coeff is factor by which adjust_correction rescaled the correction vector
-            if (coeff > s% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
-               tiny_corr_cnt = 0
-            else
-               tiny_corr_cnt = tiny_corr_cnt + 1
-            end if
-
-            ! check the residuals for the equations
-
-            call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
-            if (ierr /= 0) then
-               call oops('sizequ returned ierr')
-               exit iter_loop
-            end if
-
-            if (is_bad_num(residual_norm)) then
-               call oops('residual_norm is a a bad number (NaN or Infinity)')
-               if (s% stop_for_bad_nums) then
-                  write(*,1) 'residual_norm', residual_norm
-                  call mesa_error(__FILE__,__LINE__,'solver')
-               end if
-               exit iter_loop
-            end if
-            
-            if (is_bad_num(max_residual)) then
-               call oops('max_residual is a a bad number (NaN or Infinity)')
-               if (s% stop_for_bad_nums) then
-                  write(*,1) 'max_residual', max_residual
-                  call mesa_error(__FILE__,__LINE__,'solver')
-               end if
-               exit iter_loop
-            end if
-
-            residual_norm = abs(residual_norm)
-            max_residual = abs(max_residual)
-            s% residual_norm = residual_norm
-            s% max_residual = max_residual
-            resid_norm_min = min(residual_norm, resid_norm_min)
-            max_resid_min = min(max_residual, max_resid_min)
-            
-            disabled_resid_tests = &
-               tol_max_residual > 1d2 .and. tol_residual_norm > 1d2
-            pass_resid_tests = &
-               .not. disabled_resid_tests .and. &
-               max_residual <= tol_max_residual .and. &
-               residual_norm <= tol_residual_norm
-            pass_corr_tests_without_coeff = &
-               max_abs_correction <= tol_max_correction .and. &
-               correction_norm <= tol_correction_norm
-            pass_corr_tests_with_coeff = &
-               max_abs_correction <= tol_max_correction*coeff .and. &
-               correction_norm <= tol_correction_norm*coeff
-
-            passed_tol_tests = &
-               (pass_resid_tests .and. pass_corr_tests_with_coeff) .or. &
-               (disabled_resid_tests .and. pass_corr_tests_without_coeff)
-            
-            if (.not. passed_tol_tests) then
-
-               if (iter >= max_tries) then
-                  call get_message
-                  message = trim(message) // ' -- give up'
-                  if (len_trim(s% retry_message) == 0) &
-                     s% retry_message = trim(message) // ' in solver'
-                  if (dbg_msg) call write_msg(message)
-                  if (.not. pass_resid_tests .and. .not. disabled_resid_tests) then
-                     if (residual_norm > tol_residual_norm) &
-                        write(*,2) 'residual_norm > tol_residual_norm', &
-                           s% model_number, residual_norm, tol_residual_norm
-                     if (max_residual > tol_max_residual) &
-                        write(*,2) 'max_residual > tol_max_residual', &
-                           s% model_number, max_residual, tol_max_residual
-                  end if
-                  if (disabled_resid_tests) then ! no coeff for corrections
-                     if (correction_norm > tol_correction_norm) &
-                        write(*,2) 'correction_norm > tol_correction_norm', &
-                           s% model_number, correction_norm, tol_correction_norm, coeff
-                     if (max_abs_correction > tol_max_correction) &
-                        write(*,2) 'max_abs_correction > tol_max_correction', &
-                           s% model_number, max_abs_correction, tol_max_correction, coeff
-                  else ! include coeff for corrections
-                     if (correction_norm > tol_correction_norm*coeff) &
-                        write(*,2) 'correction_norm > tol_correction_norm*coeff', &
-                           s% model_number, correction_norm, tol_correction_norm*coeff, coeff
-                     if (max_abs_correction > tol_max_correction*coeff) &
-                        write(*,2) 'max_abs_correction > tol_max_correction*coeff', &
-                           s% model_number, max_abs_correction, tol_max_correction*coeff, coeff
-                  end if
-                  convergence_failure = .true.
-                  exit iter_loop
-               else if (.not. first_try .and. .not. s% doing_first_model_of_run) then
-                  if (correction_norm > s% corr_norm_jump_limit*corr_norm_min) then
-                     call oops('avg correction jumped')
-                     exit iter_loop
-                  else if (residual_norm > s% resid_norm_jump_limit*resid_norm_min) then
-                     call oops('avg residual jumped')
-                     exit iter_loop
-                  else if (max_abs_correction > s% max_corr_jump_limit*max_corr_min) then
-                     call oops('max correction jumped')
-                     exit iter_loop
-                  else if (max_residual > s% max_resid_jump_limit*max_resid_min) then
-                     call oops('max residual jumped')
-                     exit iter_loop
-                  else if (tiny_corr_cnt >= s% tiny_corr_coeff_limit &
-                        .and. min_corr_coeff < 1) then
-                     call oops('tiny corrections')
-                     exit iter_loop
-                  end if
-               else if (.not. s% doing_first_model_of_run) then
-                  if (coeff < min(min_corr_coeff,correction_factor)) then
-                     call oops('coeff too small')
-                     exit iter_loop
-                  end if
-               end if
-            end if
-
-            if (dbg_msg) then
-               if (.not. passed_tol_tests) then
-                  call get_message
-               end if
-               if (.not. passed_tol_tests) then
-                  call write_msg(message)
-               else if (iter < s% solver_itermin) then
-                  call write_msg('iter < itermin')
-               else
-                  call write_msg('okay!')
-               end if
-            end if
-
-            if (passed_tol_tests .and. (iter+1 < max_tries)) then
-               ! about to declare victory... but may want to do another iteration
-               force_iter_value = force_another_iteration(s, iter, s% solver_itermin)
-               if (force_iter_value > 0) then
-                  passed_tol_tests = .false. ! force another
-                  tiny_corr_cnt = 0 ! reset the counter
-                  corr_norm_min = 1d99
-                  resid_norm_min = 1d99
-                  max_corr_min = 1d99
-                  max_resid_min = 1d99
-               else if (force_iter_value < 0) then ! failure
-                  call oops('force iter')
-                  exit iter_loop
-               end if
-            end if
-
-            if (s% use_other_solver_monitor .and. &
-                  associated(s% other_solver_monitor)) then
-               call s% other_solver_monitor( &
-                  s% id, iter, passed_tol_tests, &
-                  correction_norm, max_correction, &
-                  residual_norm, max_residual, ierr)
-               if (ierr /= 0) then
-                  call oops('other_solver_monitor')
-                  exit iter_loop
-               end if
-            end if
-
-            iter=iter+1
-            s% solver_iter = iter
-            first_try = .false.
-
-         end do iter_loop
-            
-         if (max_residual > s% warning_limit_for_max_residual .and. .not. convergence_failure) &
-            write(*,2) 'WARNING: max_residual > warning_limit_for_max_residual', &
-               s% model_number, max_residual, s% warning_limit_for_max_residual
-
+         call do_solver_work()
+         ! Split it this way so we can guarantee cleanup() gets called once do_solver_work finishes
+         ! Otherwise all the pointers will leak memory.
+         call cleanup()
 
          contains
+
+         subroutine do_solver_work
+            include 'formats'
+
+            err_msg = ''
+            
+            nz = s% nz
+
+            AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
+
+            tol_msg(1) = 'avg corr'
+            tol_msg(2) = 'max corr '
+            tol_msg(3) = 'avg+max corr'
+            tol_msg(4) = 'avg resid'
+            tol_msg(5) = 'avg corr+resid'
+            tol_msg(6) = 'max corr, avg resid'
+            tol_msg(7) = 'avg+max corr, avg resid'
+            tol_msg(8) = 'max resid'
+            tol_msg(9) = 'avg corr, max resid'
+            tol_msg(10) = 'max corr+resid'
+            tol_msg(11) = 'avg+max corr, max resid'
+            tol_msg(12) = 'avg+max resid'
+            tol_msg(13) = 'avg corr, avg+max resid'
+            tol_msg(14) = 'max corr, avg+max resid'
+            tol_msg(15) = 'avg+max corr+resid'
+
+            ierr = 0
+            iter = 0
+            s% solver_iter = iter
+
+            call set_param_defaults
+            dbg_msg = s% report_solver_progress
+            
+            if (gold_tolerances_level == 2) then
+               tol_residual_norm = s% gold2_tol_residual_norm1
+               tol_max_residual = s% gold2_tol_max_residual1
+               tol_residual_norm2 = s% gold2_tol_residual_norm2
+               tol_max_residual2 = s% gold2_tol_max_residual2
+               tol_residual_norm3 = s% gold2_tol_residual_norm3
+               tol_max_residual3 = s% gold2_tol_max_residual3
+            else if (gold_tolerances_level == 1) then
+               tol_residual_norm = s% gold_tol_residual_norm1
+               tol_max_residual = s% gold_tol_max_residual1
+               tol_residual_norm2 = s% gold_tol_residual_norm2
+               tol_max_residual2 = s% gold_tol_max_residual2
+               tol_residual_norm3 = s% gold_tol_residual_norm3
+               tol_max_residual3 = s% gold_tol_max_residual3
+            else
+               tol_residual_norm = s% tol_residual_norm1
+               tol_max_residual = s% tol_max_residual1
+               tol_residual_norm2 = s% tol_residual_norm2
+               tol_max_residual2 = s% tol_max_residual2
+               tol_residual_norm3 = s% tol_residual_norm3
+               tol_max_residual3 = s% tol_max_residual3
+            end if
+
+            tol_abs_slope_min = -1 ! unused
+            tol_corr_resid_product = -1 ! unused
+            if (skip_global_corr_coeff_limit) then
+               min_corr_coeff = 1
+            else
+               min_corr_coeff = s% corr_coeff_limit
+            end if
+            
+            if (gold_tolerances_level == 2) then
+               iter_for_resid_tol2 = s% gold2_iter_for_resid_tol2
+               iter_for_resid_tol3 = s% gold2_iter_for_resid_tol3
+            else if (gold_tolerances_level == 1) then
+               iter_for_resid_tol2 = s% gold_iter_for_resid_tol2
+               iter_for_resid_tol3 = s% gold_iter_for_resid_tol3
+            else
+               iter_for_resid_tol2 = s% iter_for_resid_tol2
+               iter_for_resid_tol3 = s% iter_for_resid_tol3
+            end if
+
+            call pointers(ierr)
+            if (ierr /= 0) then
+               return
+            end if
+
+            doing_extra = .false.
+            passed_tol_tests = .false. ! goes true when pass the tests
+            convergence_failure = .false. ! goes true when time to give up
+            coeff = 1.d0
+
+            residual_norm=0
+            max_residual=0
+            corr_norm_min=1d99
+            max_corr_min=1d99
+            max_resid_min=1d99
+            resid_norm_min=1d99
+            correction_factor=0
+            f=0d0
+            slope=0d0
+
+            call set_xscale_info(s, nvar, ierr)
+            if (ierr /= 0) then
+               if (dbg_msg) &
+                  write(*, *) 'solver failure: set_xscale_info returned ierr', ierr
+               convergence_failure = .true.
+               return
+            end if
+            
+            call do_equations(ierr)                 
+            if (ierr /= 0) then
+               if (dbg_msg) &
+                  write(*, *) 'solver failure: eval_equations returned ierr', ierr
+               convergence_failure = .true.
+               return
+            end if
+            
+            call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
+            if (ierr /= 0) then
+               if (dbg_msg) &
+                  write(*, *) 'solver failure: sizequ returned ierr', ierr
+               convergence_failure = .true.
+               return
+            end if
+
+            first_try = .true.
+            iter = 1
+            s% solver_iter = iter
+            if (s% doing_first_model_of_run) then
+               max_tries = s% max_tries1
+            else if (s% retry_cnt > 20) then
+               max_tries = s% max_tries_after_20_retries
+            else if (s% retry_cnt > 10) then
+               max_tries = s% max_tries_after_10_retries
+            else if (s% retry_cnt > 5) then
+               max_tries = s% max_tries_after_5_retries
+            else if (s% retry_cnt > 0) then
+               max_tries = s% max_tries_for_retry
+            else
+               max_tries = s% solver_max_tries_before_reject
+            end if
+            tiny_corr_cnt = 0
+
+            s% num_solver_iterations = 0
+            
+         iter_loop: do while (.not. passed_tol_tests)
+
+               if (dbg_msg .and. first_try) write(*, *)
+               
+               max_resid_j = -1
+               max_corr_j = -1
+
+               if (iter >= iter_for_resid_tol2) then
+                  if (iter < iter_for_resid_tol3) then
+                     tol_residual_norm = tol_residual_norm2
+                     tol_max_residual = tol_max_residual2
+                     if (dbg_msg .and. iter == iter_for_resid_tol2) &
+                        write(*,1) 'tol2 residual tolerances: norm, max', &
+                           tol_residual_norm, tol_max_residual
+                  else
+                     tol_residual_norm = tol_residual_norm3
+                     tol_max_residual = tol_max_residual3
+                     if (dbg_msg .and. iter == iter_for_resid_tol3) &
+                        write(*,1) 'tol3 residual tolerances: norm, max', &
+                           tol_residual_norm, tol_max_residual
+                  end if
+               else if (dbg_msg .and. iter == 1) then
+                  write(*,2) 'solver_call_number', s% solver_call_number
+                  write(*,2) 'gold tolerances level', gold_tolerances_level
+                  write(*,1) 'correction tolerances: norm, max', &
+                     tol_correction_norm, tol_max_correction
+                  write(*,1) 'tol1 residual tolerances: norm, max', &
+                     tol_residual_norm, tol_max_residual
+               end if
+               
+               call solver_test_partials(nvar, xder, ierr)
+               if (ierr /= 0) then
+                  call write_msg('solver_test_partials returned ierr /= 0')
+                  convergence_failure = .true.
+                  exit iter_loop
+               end if
+               
+               s% num_solver_iterations = s% num_solver_iterations + 1
+               if (s% model_number == 1 .and. &
+                  s% num_solver_iterations > 60 .and. &
+                  mod(s% num_solver_iterations,10) == 0) &
+                     write(*,*) 'first model is slow to converge: num tries', &
+                        s% num_solver_iterations
+            
+               if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
+                  write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
+                  call oops(err_msg)
+                  exit iter_loop
+               end if
+
+               call inspectB(s, nvar, soln, ierr)
+               if (ierr /= 0) then
+                  call oops('inspectB returned ierr')
+                  exit iter_loop
+               end if
+
+               ! compute size of scaled correction B
+               call sizeB(s, nvar, soln, &
+                     max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
+               if (ierr /= 0) then
+                  call oops('correction rejected by sizeB')
+                  exit iter_loop
+               end if
+
+               correction_norm = abs(correction_norm)
+               max_abs_correction = abs(max_correction)
+               corr_norm_min = min(correction_norm, corr_norm_min)
+               max_corr_min = min(max_abs_correction, max_corr_min)
+
+               if (is_bad_num(correction_norm) .or. is_bad_num(max_abs_correction)) then
+                  ! bad news -- bogus correction
+                  call oops('bad result from sizeB -- correction info either NaN or Inf')
+                  if (s% stop_for_bad_nums) then
+                     write(*,1) 'correction_norm', correction_norm
+                     write(*,1) 'max_correction', max_correction
+                     call mesa_error(__FILE__,__LINE__,'solver')
+                  end if
+                  exit iter_loop
+               end if
+
+               if (.not. s% ignore_too_large_correction) then
+                  if ((correction_norm > s% corr_param_factor*s% scale_correction_norm) .and. &
+                        .not. s% doing_first_model_of_run) then
+                     call oops('avg corr too large')
+                     exit iter_loop
+                  endif
+               end if
+
+               ! shrink the correction if it is too large
+               correction_factor = 1d0
+               temp_correction_factor = 1d0
+
+               if (correction_norm*correction_factor > s% scale_correction_norm) then
+                  correction_factor = min(correction_factor,s% scale_correction_norm/correction_norm)
+               end if
+               
+               if (max_abs_correction*correction_factor > s% scale_max_correction) then
+                  temp_correction_factor = s% scale_max_correction/max_abs_correction
+               end if
+
+               if (iter > s% solver_itermin_until_reduce_min_corr_coeff) then
+                  if (min_corr_coeff == 1d0 .and. &
+                     s% solver_reduced_min_corr_coeff < 1d0) then
+                        min_corr_coeff = s% solver_reduced_min_corr_coeff
+                  end if
+               end if
+
+               correction_factor = max(min_corr_coeff, correction_factor)
+               if (.not. s% ignore_min_corr_coeff_for_scale_max_correction) then
+                  temp_correction_factor = max(min_corr_coeff, temp_correction_factor)
+               end if
+               correction_factor = min(correction_factor, temp_correction_factor)
+
+               ! fix B if out of definition domain
+               call Bdomain(s, nvar, soln, correction_factor, ierr)
+               if (ierr /= 0) then ! correction cannot be fixed
+                  call oops('correction rejected by Bdomain')
+                  exit iter_loop
+               end if
+
+               if (min_corr_coeff < 1d0) then
+                  ! compute gradient of f = equ<dot>jacobian
+                  ! NOTE: NOT jacobian<dot>equ
+                  call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+
+                  slope = eval_slope(nvar, nz, grad_f, soln)
+                  if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
+                     if (is_bad_num(slope) .and. s% stop_for_bad_nums) then
+                        write(*,1) 'slope', slope
+                        call mesa_error(__FILE__,__LINE__,'solver')
+                     end if
+                     slope = 0d0
+                     min_corr_coeff = 1d0
+                  end if
+
+               else
+
+                  slope = 0d0
+
+               end if
+               
+               f = 0d0
+               call adjust_correction( &
+                  min_corr_coeff, correction_factor, grad_f1, f, slope, coeff, err_msg, ierr)
+               if (ierr /= 0) then
+                  call oops(err_msg)
+                  exit iter_loop
+               end if
+               s% solver_adjust_iter = 0
+
+               ! coeff is factor by which adjust_correction rescaled the correction vector
+               if (coeff > s% tiny_corr_factor*min_corr_coeff .or. min_corr_coeff >= 1d0) then
+                  tiny_corr_cnt = 0
+               else
+                  tiny_corr_cnt = tiny_corr_cnt + 1
+               end if
+
+               ! check the residuals for the equations
+
+               call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
+               if (ierr /= 0) then
+                  call oops('sizequ returned ierr')
+                  exit iter_loop
+               end if
+
+               if (is_bad_num(residual_norm)) then
+                  call oops('residual_norm is a a bad number (NaN or Infinity)')
+                  if (s% stop_for_bad_nums) then
+                     write(*,1) 'residual_norm', residual_norm
+                     call mesa_error(__FILE__,__LINE__,'solver')
+                  end if
+                  exit iter_loop
+               end if
+               
+               if (is_bad_num(max_residual)) then
+                  call oops('max_residual is a a bad number (NaN or Infinity)')
+                  if (s% stop_for_bad_nums) then
+                     write(*,1) 'max_residual', max_residual
+                     call mesa_error(__FILE__,__LINE__,'solver')
+                  end if
+                  exit iter_loop
+               end if
+
+               residual_norm = abs(residual_norm)
+               max_residual = abs(max_residual)
+               s% residual_norm = residual_norm
+               s% max_residual = max_residual
+               resid_norm_min = min(residual_norm, resid_norm_min)
+               max_resid_min = min(max_residual, max_resid_min)
+               
+               disabled_resid_tests = &
+                  tol_max_residual > 1d2 .and. tol_residual_norm > 1d2
+               pass_resid_tests = &
+                  .not. disabled_resid_tests .and. &
+                  max_residual <= tol_max_residual .and. &
+                  residual_norm <= tol_residual_norm
+               pass_corr_tests_without_coeff = &
+                  max_abs_correction <= tol_max_correction .and. &
+                  correction_norm <= tol_correction_norm
+               pass_corr_tests_with_coeff = &
+                  max_abs_correction <= tol_max_correction*coeff .and. &
+                  correction_norm <= tol_correction_norm*coeff
+
+               passed_tol_tests = &
+                  (pass_resid_tests .and. pass_corr_tests_with_coeff) .or. &
+                  (disabled_resid_tests .and. pass_corr_tests_without_coeff)
+               
+               if (.not. passed_tol_tests) then
+
+                  if (iter >= max_tries) then
+                     call get_message
+                     message = trim(message) // ' -- give up'
+                     if (len_trim(s% retry_message) == 0) &
+                        s% retry_message = trim(message) // ' in solver'
+                     if (dbg_msg) call write_msg(message)
+                     if (.not. pass_resid_tests .and. .not. disabled_resid_tests) then
+                        if (residual_norm > tol_residual_norm) &
+                           write(*,2) 'residual_norm > tol_residual_norm', &
+                              s% model_number, residual_norm, tol_residual_norm
+                        if (max_residual > tol_max_residual) &
+                           write(*,2) 'max_residual > tol_max_residual', &
+                              s% model_number, max_residual, tol_max_residual
+                     end if
+                     if (disabled_resid_tests) then ! no coeff for corrections
+                        if (correction_norm > tol_correction_norm) &
+                           write(*,2) 'correction_norm > tol_correction_norm', &
+                              s% model_number, correction_norm, tol_correction_norm, coeff
+                        if (max_abs_correction > tol_max_correction) &
+                           write(*,2) 'max_abs_correction > tol_max_correction', &
+                              s% model_number, max_abs_correction, tol_max_correction, coeff
+                     else ! include coeff for corrections
+                        if (correction_norm > tol_correction_norm*coeff) &
+                           write(*,2) 'correction_norm > tol_correction_norm*coeff', &
+                              s% model_number, correction_norm, tol_correction_norm*coeff, coeff
+                        if (max_abs_correction > tol_max_correction*coeff) &
+                           write(*,2) 'max_abs_correction > tol_max_correction*coeff', &
+                              s% model_number, max_abs_correction, tol_max_correction*coeff, coeff
+                     end if
+                     convergence_failure = .true.
+                     exit iter_loop
+                  else if (.not. first_try .and. .not. s% doing_first_model_of_run) then
+                     if (correction_norm > s% corr_norm_jump_limit*corr_norm_min) then
+                        call oops('avg correction jumped')
+                        exit iter_loop
+                     else if (residual_norm > s% resid_norm_jump_limit*resid_norm_min) then
+                        call oops('avg residual jumped')
+                        exit iter_loop
+                     else if (max_abs_correction > s% max_corr_jump_limit*max_corr_min) then
+                        call oops('max correction jumped')
+                        exit iter_loop
+                     else if (max_residual > s% max_resid_jump_limit*max_resid_min) then
+                        call oops('max residual jumped')
+                        exit iter_loop
+                     else if (tiny_corr_cnt >= s% tiny_corr_coeff_limit &
+                           .and. min_corr_coeff < 1) then
+                        call oops('tiny corrections')
+                        exit iter_loop
+                     end if
+                  else if (.not. s% doing_first_model_of_run) then
+                     if (coeff < min(min_corr_coeff,correction_factor)) then
+                        call oops('coeff too small')
+                        exit iter_loop
+                     end if
+                  end if
+               end if
+
+               if (dbg_msg) then
+                  if (.not. passed_tol_tests) then
+                     call get_message
+                  end if
+                  if (.not. passed_tol_tests) then
+                     call write_msg(message)
+                  else if (iter < s% solver_itermin) then
+                     call write_msg('iter < itermin')
+                  else
+                     call write_msg('okay!')
+                  end if
+               end if
+
+               if (passed_tol_tests .and. (iter+1 < max_tries)) then
+                  ! about to declare victory... but may want to do another iteration
+                  force_iter_value = force_another_iteration(s, iter, s% solver_itermin)
+                  if (force_iter_value > 0) then
+                     passed_tol_tests = .false. ! force another
+                     tiny_corr_cnt = 0 ! reset the counter
+                     corr_norm_min = 1d99
+                     resid_norm_min = 1d99
+                     max_corr_min = 1d99
+                     max_resid_min = 1d99
+                  else if (force_iter_value < 0) then ! failure
+                     call oops('force iter')
+                     exit iter_loop
+                  end if
+               end if
+
+               if (s% use_other_solver_monitor .and. &
+                     associated(s% other_solver_monitor)) then
+                  call s% other_solver_monitor( &
+                     s% id, iter, passed_tol_tests, &
+                     correction_norm, max_correction, &
+                     residual_norm, max_residual, ierr)
+                  if (ierr /= 0) then
+                     call oops('other_solver_monitor')
+                     exit iter_loop
+                  end if
+               end if
+
+               iter=iter+1
+               s% solver_iter = iter
+               first_try = .false.
+
+            end do iter_loop
+               
+            if (max_residual > s% warning_limit_for_max_residual .and. .not. convergence_failure) &
+               write(*,2) 'WARNING: max_residual > warning_limit_for_max_residual', &
+                  s% model_number, max_residual, s% warning_limit_for_max_residual
+
+         end subroutine do_solver_work
          
          
-         subroutine solver_test_partials(nvar, xder, ldA, A1, ierr)
+         subroutine solver_test_partials(nvar, xder, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
-            integer, intent(in) :: ldA ! leading dimension of A
-            real(dp), pointer, dimension(:) :: A1
             integer, intent(out) :: ierr
             
             integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
@@ -731,7 +720,7 @@
          
          subroutine do_equations(ierr)
             integer, intent(out) :: ierr
-            call prepare_solver_matrix(nvar, xder, size(A,dim=1), A1, ierr)
+            call prepare_solver_matrix(nvar, xder, ierr)
             if (ierr /= 0) return
             call eval_equations(s, nvar, ierr)
             if (ierr /= 0) return
@@ -739,28 +728,18 @@
          end subroutine do_equations
 
 
-         subroutine prepare_solver_matrix(nvar, xder, ldA, A1, ierr)
+         subroutine prepare_solver_matrix(nvar, xder, ierr)
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
-            integer, intent(in) :: ldA ! leading dimension of A
-            real(dp), pointer, dimension(:) :: A1
             integer, intent(out) :: ierr
-            real(dp), pointer, dimension(:,:) :: A ! (ldA, neqns)
             integer :: i, j, nz, neqns
             include 'formats'
             ierr = 0
             nz = s% nz
             neqns = nvar*nz
-            A(1:ldA,1:neqns) => A1(1:ldA*neqns)         
-            i = nvar*nvar*nz
-            if (size(A1,dim=1) < 3*i) then
-               write(*,*) 'prepare_solver_matrix: size(A1,dim=1) < 3*i', size(A1,dim=1), 3*i
-               ierr = -1
-               return
-            end if
-            s% ublk(1:nvar,1:nvar,1:nz) => A1(1:i)
-            s% dblk(1:nvar,1:nvar,1:nz) => A1(i+1:2*i)
-            s% lblk(1:nvar,1:nvar,1:nz) => A1(2*i+1:3*i)
+            s% ublk(1:nvar,1:nvar,1:nz) => ublk1
+            s% dblk(1:nvar,1:nvar,1:nz) => dblk1
+            s% lblk(1:nvar,1:nvar,1:nz) => lblk1
          end subroutine prepare_solver_matrix
 
 
@@ -1818,6 +1797,8 @@
 
 
          subroutine pointers(ierr)
+            use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
+
             integer, intent(out) :: ierr
 
             integer :: i, j
@@ -1826,72 +1807,114 @@
             ierr = 0
 
             i = 1
-            A1(1:3*nvar*neq) => work(i:i+3*nvar*neq-1); i = i+3*nvar*neq
-            s% equ1(1:neq) => work(i:i+neq-1); i = i+neq
+
+            if(allocated(s% equ1)) then
+               if(size(s% equ1,dim=1) /= neq) then
+                  deallocate(s% equ1)
+                  allocate(s% equ1(1:neq))
+               end if
+            else
+               allocate(s% equ1(1:neq))
+            end if
+
             s% equ(1:nvar,1:nz) => s% equ1(1:neq)
             equ1 => s% equ1
             equ => s% equ
-            dxsave1(1:neq) => work(i:i+neq-1); i = i+neq
+
+            allocate(dxsave1(1:neq))
+            allocate(ddxsave1(1:neq))
+            allocate(B1(1:neq))
+            allocate(soln1(1:neq))
+            allocate(grad_f1(1:neq))
+            allocate(rhs(1:nvar,1:nz))
+            allocate(xder(1:nvar,1:nz))
+            allocate(ddx(1:nvar,1:nz))
+            allocate(row_scale_factors1(1:neq))
+            allocate(col_scale_factors1(1:neq))
+            allocate(save_ublk1(1:nvar*neq))
+            allocate(save_dblk1(1:nvar*neq))
+            allocate(save_lblk1(1:nvar*neq))
+
+            if (s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs(dxsave1)
+               call fill_with_NaNs(ddxsave1)
+               call fill_with_NaNs(B1)
+               call fill_with_NaNs(soln1)
+               call fill_with_NaNs_2D(rhs)
+               call fill_with_NaNs_2D(xder)
+               call fill_with_NaNs_2D(ddx)
+               call fill_with_NaNs(row_scale_factors1)
+               call fill_with_NaNs(col_scale_factors1)
+               call fill_with_NaNs(save_ublk1)
+               call fill_with_NaNs(save_dblk1)
+               call fill_with_NaNs(save_lblk1)
+            end if
+
             dxsave(1:nvar,1:nz) => dxsave1(1:neq)
-            ddxsave1(1:neq) => work(i:i+neq-1); i = i+neq
             ddxsave(1:nvar,1:nz) => ddxsave1(1:neq)
-            B1 => work(i:i+neq-1); i = i+neq
             B(1:nvar,1:nz) => B1(1:neq)
-            soln1 => work(i:i+neq-1); i = i+neq
             soln(1:nvar,1:nz) => soln1(1:neq)
-            grad_f1(1:neq) => work(i:i+neq-1); i = i+neq
             grad_f(1:nvar,1:nz) => grad_f1(1:neq)
-            rhs(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-            xder(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-            ddx(1:nvar,1:nz) => work(i:i+neq-1); i = i+neq
-            row_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
-            col_scale_factors1(1:neq) => work(i:i+neq-1); i = i+neq
-            save_ublk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
-            save_dblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
-            save_lblk1(1:nvar*neq) => work(i:i+nvar*neq-1); i = i+nvar*neq
 
-            if (i-1 > lwork) then
-               ierr = -1
-               write(*,*) 'use_DGESVX_in_bcyclic', s% use_DGESVX_in_bcyclic
-               write(*,  &
-                  '(a, i12, a, i12, e26.6)') 'solver: lwork is too small.  must be at least', i-1, &
-                  '   but is only ', lwork, dble(i-1 - lwork)/(neq*nvar)
-               return
-            end if
-
-            i = 1
-            ipiv1(1:neq) => iwork(i:i+neq-1); i = i+neq
-            if (i-1 > liwork) then
-               ierr = -1
-               write(*, '(a, i6, a, i6)')  &
-                        'solver: liwork is too small.  must be at least', i,  &
-                        '   but is only ', liwork
-               return
-            end if
+            allocate(ipiv1(1:neq))
 
             ipiv_blk1(1:neq) => ipiv1(1:neq)
 
-            A(1:3*nvar,1:neq) => A1(1:3*nvar*neq)
-            Acopy1 => A1
-            Acopy => A
-
-            ublk1(1:nvar*neq) => A1(1:nvar*neq)
-            dblk1(1:nvar*neq) => A1(1+nvar*neq:2*nvar*neq)
-            lblk1(1:nvar*neq) => A1(1+2*nvar*neq:3*nvar*neq)
+            allocate(ublk1(1:nvar*neq),dblk1(1:nvar*neq),lblk1(1:nvar*neq))
 
             lblk(1:nvar,1:nvar,1:nz) => lblk1(1:nvar*neq)
             dblk(1:nvar,1:nvar,1:nz) => dblk1(1:nvar*neq)
             ublk(1:nvar,1:nvar,1:nz) => ublk1(1:nvar*neq)
 
-            ublkF1(1:nvar*neq) => AF1(1:nvar*neq)
-            dblkF1(1:nvar*neq) => AF1(1+nvar*neq:2*nvar*neq)
-            lblkF1(1:nvar*neq) => AF1(1+2*nvar*neq:3*nvar*neq)
+            allocate(ublkF1(1:nvar*neq),dblkF1(1:nvar*neq),lblkF1(1:nvar*neq))
 
             lblkF(1:nvar,1:nvar,1:nz) => lblkF1(1:nvar*neq)
             dblkF(1:nvar,1:nvar,1:nz) => dblkF1(1:nvar*neq)
             ublkF(1:nvar,1:nvar,1:nz) => ublkF1(1:nvar*neq)
 
+            if (s% fill_arrays_with_NaNs) then
+               call fill_with_NaNs(lblk1)
+               call fill_with_NaNs(dblk1)
+               call fill_with_NaNs(ublk1)
+               call fill_with_NaNs(lblkF1)
+               call fill_with_NaNs(dblkF1)
+               call fill_with_NaNs(ublkF1)
+            end if
+
          end subroutine pointers
+
+         subroutine cleanup()
+
+            if(associated(dxsave1)) deallocate(dxsave1)
+            if(associated(ddxsave)) deallocate(ddxsave)
+            if(associated(ddxsave)) deallocate(ddxsave)
+            if(associated(B1)) deallocate(B1)
+            if(associated(soln1)) deallocate(soln1)
+            if(associated(grad_f1)) deallocate(grad_f1)
+            if(associated(rhs)) deallocate(rhs)
+            if(associated(xder)) deallocate(xder)
+            if(associated(ddx)) deallocate(ddx)
+            if(associated(row_scale_factors1)) deallocate(row_scale_factors1)
+            if(associated(col_scale_factors1)) deallocate(col_scale_factors1)
+            if(associated(save_ublk1)) deallocate(save_ublk1)
+            if(associated(save_dblk1)) deallocate(save_dblk1)
+            if(associated(save_lblk1)) deallocate(save_lblk1)
+            if(associated(ipiv1)) deallocate(ipiv1)
+
+            if(associated(ublk1)) deallocate(ublk1)
+            if(associated(dblk1)) deallocate(dblk1)
+            if(associated(lblk1)) deallocate(lblk1)
+            if(associated(ublkF1)) deallocate(ublkF1)
+            if(associated(dblkF1)) deallocate(dblkF1)
+            if(associated(lblkF1)) deallocate(lblkF1)
+
+
+            nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
+                     soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
+                     col_scale_factors1, save_ublk1, save_dblk1, save_lblk1,&
+                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1) 
+
+         end subroutine cleanup
 
 
          real(dp) function eval_slope(nvar, nz, grad_f, B)
@@ -1922,18 +1945,5 @@
          end function eval_f
 
       end subroutine do_solver
-
-
-      subroutine get_solver_work_sizes(s, nvar, nz, lwork, liwork, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: nvar, nz
-         integer, intent(out) :: lwork, liwork, ierr
-         integer :: neq
-         ierr = 0
-         neq = nvar*nz
-         liwork = neq
-         lwork = neq*(7*nvar + 10)
-      end subroutine get_solver_work_sizes
-
 
       end module star_solver

@@ -29,15 +29,13 @@
       ! control name: use_other_torque = .true.
       ! procedure pointer: s% other_torque => my_routine
 
-
-      use star_def
-
       implicit none
       
             
       contains
       
       subroutine default_other_torque(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

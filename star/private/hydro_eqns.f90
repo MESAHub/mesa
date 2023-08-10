@@ -745,6 +745,14 @@
             i_P_eqn = s% i_dv_dt
          end if
 
+
+         if(s% drag_coefficient > 0) then
+            ! We dont call expected_non_HSE_term with k==1 unless we call set_momentum_BC
+            ! so lets initilize this to zero, then if we dont call set_momentum_BC we have a 
+            ! sensible value here.
+            s% dvdt_drag(1) = 0 
+         end if
+         
          need_P_surf = .false.
          if (s% use_compression_outer_BC) then
             call set_compression_BC(ierr)

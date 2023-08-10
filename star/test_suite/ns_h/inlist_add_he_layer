@@ -30,11 +30,18 @@
       set_initial_age = .true.
       initial_age = 0
 
-!      pgstar_flag = .true.
+      ! pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
+   use_simple_Skye_blends = .true.
+   logT_min_for_any_Skye = 7.2
+   logT_min_for_all_Skye = 7.4
+   ! move the density corner far away so that blend is over logT
+   logRho_min_for_any_Skye = 4.9
+   logRho_min_for_all_Skye = 5.0
+
 / ! end of eos namelist
 
 &kap

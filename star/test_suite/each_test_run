@@ -92,6 +92,11 @@ function check_restart {
         fi
 
         # check that final model matches
+        if [[ ! -f ./ck ]]; then
+            failure_msg "$1 restart failed: No ck script"
+            return 1
+        fi
+
 
         if ! ./ck
         then
