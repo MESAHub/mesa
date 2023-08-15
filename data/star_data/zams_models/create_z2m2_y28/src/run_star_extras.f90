@@ -379,9 +379,9 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          evolve_to_zams_check_model = bare_bones_check_model(id) 
          if (evolve_to_zams_check_model /= keep_going) return
-         if (s% X(s% nz) < 0.697d0) then
+         if (s% X(s% nz) < s% x_ctrl(1)) then
             ! stop when star has depleted a small amount of hydrogen
-            if ( s% X(s% nz) < 0.69699d0 ) then
+            if ( s% X(s% nz) < (s% x_ctrl(1) - 1d-5) ) then
                evolve_to_zams_check_model = retry
                write(*, *) 'star has depleted a small amount of hydrogen; taking a smaller timestep to hit target'
             else
