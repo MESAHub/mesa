@@ -65,6 +65,19 @@ Björklund Wind
 The Björklund et al. (2021) wind scheme has been implemented for use in all wind
 schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
 
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+The ZAMS model data used to generate the initial model for simulations with
+``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
+had an issue where stars between 1.0 and 1.58 Msun would have a starting 
+central hydrogen mass fraction markedly lower than other masses. The grid of 
+starting models has been recalculated with a more stringent stopping condition, 
+and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
+near 0.697.
+
 Changes in r23.05.1
 ===================
 
