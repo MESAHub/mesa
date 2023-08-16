@@ -30,6 +30,8 @@ plt.xscale('log')
 plt.xlabel(r'Mass [$M_\odot$]')
 plt.ylabel(r'Center $X$')
 
+plt.ylim(0.6965,0.6975)
+
 plt.savefig('CenterXfrac.png',dpi=200)
 
 plt.clf()
