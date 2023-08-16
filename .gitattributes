@@ -19,6 +19,7 @@ docs/source/assets/zams_z2m2_y28_patched.data filter=lfs diff=lfs merge=lfs -tex
 *.ph -linguist-detectable
 *.[1-9] -linguist-detectable
 *.in -linguist-detectable
+
 # Things to ignore from the release
 star/dev_cases_compare_pulses export-ignore
 star/dev_cases_star_to_RSP2 export-ignore
