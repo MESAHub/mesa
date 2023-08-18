@@ -16,6 +16,7 @@ jobs:
         run: |
           # commands lifted from https://github.com/jlumbroso/free-disk-space
           sudo rm -rf /usr/local/lib/android
+          sudo apt-get remove -y '^aspnetcore-.*'
           sudo apt-get remove -y '^dotnet-.*' # 990 MB
           sudo apt-get remove -y '^llvm-.*' # 1052 MB
           # sudo apt-get remove -y 'php.*' # 56.6 MB
