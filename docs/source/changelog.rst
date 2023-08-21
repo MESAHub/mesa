@@ -65,6 +65,18 @@ Björklund Wind
 The Björklund et al. (2021) wind scheme has been implemented for use in all wind
 schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
 
+GYRE Update
+~~~~~~~~~~~
+
+The bundled GYRE oscillation code has been updated to `release 7.1
+<https://gyre.readthedocs.io/en/v7.1/>`. The GYRE and GSM pulsation
+output formats have been also been updated to take advantage of new
+features in GYRE. The version of an output file can be set by the new
+``gyre_data_schema`` parameter in ``&controls``; the default value is 101 (version 1.01)
+produced GYRE-format files that are backward-compatible with older
+GYRE releases. (If using GSM-format files, set to 110 instead for
+backward compatibility).
+
 
 .. _Bug Fixes main:
 
