@@ -54,7 +54,7 @@
           return
        end if
 
-       call gyre_set_model(global_data, point_data, 101)
+       call gyre_set_model(global_data, point_data, s%gyre_data_schema)
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &

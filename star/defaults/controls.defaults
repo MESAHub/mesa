@@ -679,6 +679,16 @@
 
     format_for_OSC_data = '(1P5E19.12,x)'
 
+      ! gyre_data_schema
+      ! ~~~~~~~~~~~~~~~~
+
+      ! data schema to use when passing model internally to GYRE, and/or
+      ! writing files in GYRE/GSM format. For instance, to write v1.20 GYRE files
+      ! use the value 120
+
+      ! ::
+
+    gyre_data_schema = 101
 
       ! max_num_gyre_points
       ! ~~~~~~~~~~~~~~~~~~~
