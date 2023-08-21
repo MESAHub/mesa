@@ -69,7 +69,7 @@ GYRE Update
 ~~~~~~~~~~~
 
 The bundled GYRE oscillation code has been updated to `release 7.1
-<https://gyre.readthedocs.io/en/v7.1/>`. The GYRE and GSM pulsation
+<https://gyre.readthedocs.io/en/v7.1/>`_. The GYRE and GSM pulsation
 output formats have been also been updated to take advantage of new
 features in GYRE. The version of an output file can be set by the new
 ``gyre_data_schema`` parameter in ``&controls``; the default value is 101 (version 1.01)
