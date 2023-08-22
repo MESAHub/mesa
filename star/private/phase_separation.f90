@@ -31,15 +31,21 @@
 
       implicit none
 
-      private
-      public :: do_phase_separation
-
       logical, parameter :: dbg = .false.
 
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
       
+      ! The saved_data type saves composition and crystallization data from star_info
+      type saved_data
+         real(dp), allocatable :: xa(:,:)
+         real(dp) :: crystal_core_boundary_mass
+      end type saved_data
+
+      private
+      public :: do_phase_separation
+
       contains
 
       subroutine do_phase_separation(s, dt, ierr)
@@ -169,12 +175,13 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
          
-         real(dp) :: eps_tmp, L_distill, L_max, save_boundary_mass, &
+         type(saved_data) :: sd
+         real(dp) :: eps_tmp, L_distill, L_max, &
               retry_scale_factor, scale_factor_low, scale_factor_high, tol_low, tol_high
-         real(dp) :: xa_save(s%species,s%nz)
          integer :: k, iter, net_ine22
          logical :: save_Skye_use_ion_offsets, distilled
 
+         call alloc_saved_data_(s, sd)
          s% eps_phase_separation(1:s%nz) = 0d0
 
          net_ine22 = s% net_iso(ine22)
@@ -191,11 +198,10 @@
          save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
          s% eos_rq% Skye_use_ion_offsets = .false.
          call update_model_(s,1,s%nz,.false.)
+         call save_model_(s,sd) ! sets saved data sd to starting composition and crystal core location
          do k=1,s% nz
             s% eps_phase_separation(k) = s% energy(k)
-            xa_save(:,k) = s% xa(:,k)
          end do
-         save_boundary_mass = s% crystal_core_boundary_mass
 
          call distill_loop(s,1d0,distilled)
          
@@ -225,9 +231,8 @@
                iter = iter + 1
                
                ! reset model
-               s% crystal_core_boundary_mass = save_boundary_mass
                s% phase_sep_mixing_mass = -1d0
-               s% xa(:,:) = xa_save(:,:)
+               call restore_model_(s,sd)
                call update_model_(s,1,s%nz,.true.)
 
                call distill_loop(s,retry_scale_factor,distilled)
@@ -891,6 +896,30 @@
         return
         
       end subroutine update_model_
+
+      subroutine save_model_ (s, sd)
+        type(star_info), pointer        :: s
+        type(saved_data), intent(inout) :: sd
+
+        sd% crystal_core_boundary_mass = s% crystal_core_boundary_mass
+        sd% xa(:,1:s%nz) = s% xa(:,1:s%nz)
+      end subroutine save_model_
+
+      subroutine restore_model_ (s, sd)
+        type(star_info), pointer     :: s
+        type(saved_data), intent(in) :: sd
+
+        s% crystal_core_boundary_mass = sd% crystal_core_boundary_mass
+        s% xa(:,1:s%nz) = sd% xa(:,1:s%nz)
+      end subroutine restore_model_
+
+      subroutine alloc_saved_data_ (s, sd)
+        type(star_info), pointer :: s
+        type(saved_data)         :: sd
+
+        ! Allocate cell data arrays
+        allocate(sd%xa(s%species,s%nz))
+      end subroutine alloc_saved_data_
 
       subroutine smooth_eps_phase_sep(s,dt,ierr)
          type (star_info), pointer :: s
