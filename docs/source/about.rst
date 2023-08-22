@@ -110,6 +110,7 @@ Developers
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
 * Matthias Fabry
+* Ebraheem Farag
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
