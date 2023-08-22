@@ -34,6 +34,8 @@
       x_integer_ctrl(1) = 1 ! part number
       
       stop_at_phase_TP_AGB = .true.
+      num_cells_for_smooth_gradL_composition_term = 10
+      ! helps avoid internal convection that spuriously triggers TP_AGB condition too early
 
       ! Run will fail if these are triggered before TP_AGB
       stop_at_phase_C_Burn = .true.

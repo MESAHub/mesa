@@ -679,6 +679,16 @@
 
     format_for_OSC_data = '(1P5E19.12,x)'
 
+      ! gyre_data_schema
+      ! ~~~~~~~~~~~~~~~~
+
+      ! data schema to use when passing model internally to GYRE, and/or
+      ! writing files in GYRE/GSM format. For instance, to write v1.20 GYRE files
+      ! use the value 120
+
+      ! ::
+
+    gyre_data_schema = 101
 
       ! max_num_gyre_points
       ! ~~~~~~~~~~~~~~~~~~~
@@ -4384,7 +4394,6 @@
       !   Mon. Not. R. Astron. Soc. 411, 781–791 (2011)
       
       ! + ``'DB_WD_tau_25'``:
-      !   EXPERIMENTAL
       !   helium dominated (log(H/He)=-5.0) atmosphere tables for DB
       !   white dwarfs, provided by Odette Toloza and Detlev Koester.
       !   5000K < Teff < 40000K
@@ -4723,8 +4732,6 @@
 
       ! hot_wind_scheme
       ! ~~~~~~~~~~~~~~~
-      ! hot_wind_Wolf_Rayet_scheme
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! cool_wind_RGB_scheme
       ! ~~~~~~~~~~~~~~~~~~~~
       ! cool_wind_AGB_scheme
@@ -4770,6 +4777,7 @@
       ! Suggested hot wind option:
 
       !   + 'Vink'
+      !   + 'Bjorklund'
 
       ! Suggested cool wind options:
 
@@ -4822,6 +4830,9 @@
     RGB_to_AGB_wind_switch = 1d-4
 
       ! The code will automatically choose between an RGB wind and an AGB wind.
+
+      ! ::
+
       ! The following names for the different schemes are recognized:
 
       ! + 'Reimers'
@@ -4831,6 +4842,7 @@
       ! + 'Nieuwenhuijzen'
       ! + 'Vink'
       ! + 'Dutch'
+      ! + 'Bjorklund'
       ! + 'other'  --- for wind options implemented using other_wind hook
 
 
@@ -4915,6 +4927,17 @@
 
     Vink_scaling_factor = 0d0
 
+      ! Bjorklund_scaling_factor
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Björklund, R., Sundqvist, J.O., Puls, J., & Najarro, F., 2021, A&A, 648, A36.
+      ! "New predictions for radiation-driven, steady-state mass-loss and
+      ! wind-momentum from hot, massive stars II.
+      ! A grid of O-type stars in the Galaxy and the Magellanic Clouds"
+
+      ! This wind scheme does not feature a bistability jump.
+
+   Bjorklund_scaling_factor = 0d0
 
       ! Dutch_scaling_factor
       ! ~~~~~~~~~~~~~~~~~~~~
@@ -7485,12 +7508,14 @@
       ! low_logT_op_mono_full_on
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! you can select a range of log10T for using ``op_mono`` opacities
-      ! outside that range, the code will use standard opacity tables.
-      ! for example, you might only use high T limits so that ``op_mono``
+      ! Blending controls for turning ``op_mono`` opacities off above (high_logT)
+      ! and below (low_logT) specified temperature ranges.
+      ! When not using ``op_mono``, the code will use standard opacity tables.
+      ! For example, you might only use high T limits so that ``op_mono``
       ! is only used in the envelope, or you might set both low and
       ! high T limits so that ``op_mono`` is used around the Fe peak logT
       ! but not for other locations in the star.
+      ! These controls should satisfy the following inequalities:
 
       ! ::
 
@@ -7498,21 +7523,14 @@
       !     high_logT_op_mono_full_on >= low_logT_op_mono_full_on
       !     low_logT_op_mono_full_on >= low_logT_op_mono_full_off
 
-      ! ::
+      ! op_mono opacities fully on if
+      !     ``log10T`` <= ``high_logT_op_mono_full_on`` and
+      !     ``log10T`` >= ``low_logT_op_mono_full_on``
 
-      !     op_mono opacities full on if
-      !     log10T <= high_logT_op_mono_full_on
-      !     and
-      !     log10T >= low_logT_op_mono_full_on
+      ! op_mono opacities full off if
+      !     ``log10T`` >= ``high_logT_op_mono_full_off`` or
+      !     ``log10T`` <= ``low_logT_op_mono_full_off``
 
-      ! ::
-
-      !     op_mono opacities full off if
-      !     log10T >= high_logT_op_mono_full_off
-      !     or
-      !     log10T <= low_logT_op_mono_full_off
-
-      ! partially on for other cases
       ! Note: OP mono ignored if either high_logT control < 0
 
       ! ::
@@ -7832,12 +7850,6 @@
 
     eps_grav_factor = 1d0
 
-      ! fix_eps_grav_transition_to_grid 
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    fix_eps_grav_transition_to_grid = .false.
-
-
       ! velocity_q_upper_bound
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8151,10 +8163,29 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
     
     
-    
+      ! drag_coefficient
+      ! ~~~~~~~~~~~~~~~~
+      ! min_q_for_drag
+      ! ~~~~~~~~~~~~~~
+
+      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only for v(k) when q(k) > min_q_for_drag.
+      ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
+      ! useful for preventing the development radial pulsations during advanced
+      ! burning in massive stars and AGB stars.
+
+      ! Under certain circumstances we will not have drag in the surface k=1 zone
+      ! To force the drag term to be on in the outer zone you must enable one of the 
+      ! following surface boundary conditions:
+      ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
+
+      ! ::
+
+    drag_coefficient = 0d0
+    min_q_for_drag = 0d0
     
 
       ! for hydro comparison tests (e.g., Sedov)

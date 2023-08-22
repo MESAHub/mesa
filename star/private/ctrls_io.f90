@@ -104,7 +104,7 @@
     write_pulse_data_with_profile, pulse_data_format, add_atmosphere_to_pulse_data, &
     add_center_point_to_pulse_data, keep_surface_point_for_pulse_data, add_double_points_to_pulse_data, &
     interpolate_rho_for_pulse_data, threshold_grad_mu_for_double_point, max_number_of_double_points,&
-    fgong_header, fgong_ivers, &
+    gyre_data_schema, fgong_header, fgong_ivers, &
     max_num_gyre_points, format_for_OSC_data, &
     fgong_zero_A_inside_r, use_other_export_pulse_data, use_other_get_pulse_data, use_other_edit_pulse_data, &
     write_model_with_profile, model_data_prefix, model_data_suffix, &
@@ -133,7 +133,7 @@
    gradT_excess_min_center_he4, gradT_excess_max_logT, gradT_excess_min_log_tau_full_on, gradT_excess_max_log_tau_full_off, &
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
-    fix_eps_grav_transition_to_grid, make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
+    make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
@@ -190,7 +190,7 @@
     hot_wind_scheme, cool_wind_RGB_scheme, cool_wind_AGB_scheme, RGB_to_AGB_wind_switch, &
     Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, van_Loon_scaling_factor, &
     Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
-    Dutch_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
+    Dutch_scaling_factor, Bjorklund_scaling_factor, Dutch_wind_lowT_scheme, wind_He_layer_limit, &
     wind_H_envelope_limit, wind_H_He_envelope_limit, hot_wind_full_on_T, cool_wind_full_on_T, &
     
     ! composition of added mass
@@ -351,6 +351,7 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
+    drag_coefficient, min_q_for_drag, &
     retry_for_v_above_clight, &
 
     ! hydro solver
@@ -968,6 +969,8 @@
  s% threshold_grad_mu_for_double_point = threshold_grad_mu_for_double_point
  s% max_number_of_double_points = max_number_of_double_points
 
+ s% gyre_data_schema = gyre_data_schema
+
  s% fgong_header = fgong_header
  s% fgong_ivers = fgong_ivers
 
@@ -1025,7 +1028,6 @@
  s% num_cells_for_smooth_gradL_composition_term = num_cells_for_smooth_gradL_composition_term
  s% threshold_for_smooth_gradL_composition_term = threshold_for_smooth_gradL_composition_term
  s% clip_D_limit = clip_D_limit
- s% fix_eps_grav_transition_to_grid = fix_eps_grav_transition_to_grid
 
 s% okay_to_reduce_gradT_excess = okay_to_reduce_gradT_excess
 s% gradT_excess_f1 = gradT_excess_f1
@@ -1360,6 +1362,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
  s% Vink_scaling_factor = Vink_scaling_factor
  s% Dutch_scaling_factor = Dutch_scaling_factor
+ s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
  s% Dutch_wind_lowT_scheme = Dutch_wind_lowT_scheme
 
  s% wind_H_envelope_limit = wind_H_envelope_limit
@@ -1857,6 +1860,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_log_max_boost = RTI_log_max_boost 
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
+
+ s% drag_coefficient = drag_coefficient
+ s% min_q_for_drag = min_q_for_drag
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -2646,6 +2652,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  threshold_grad_mu_for_double_point = s% threshold_grad_mu_for_double_point
  max_number_of_double_points = s% max_number_of_double_points
 
+ gyre_data_schema = s% gyre_data_schema
+
  fgong_header = s% fgong_header
  fgong_ivers = s% fgong_ivers
  
@@ -2703,7 +2711,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  num_cells_for_smooth_gradL_composition_term = s% num_cells_for_smooth_gradL_composition_term
  threshold_for_smooth_gradL_composition_term = s% threshold_for_smooth_gradL_composition_term
  clip_D_limit = s% clip_D_limit
- fix_eps_grav_transition_to_grid = s% fix_eps_grav_transition_to_grid
 
  okay_to_reduce_gradT_excess = s% okay_to_reduce_gradT_excess
  gradT_excess_f1 = s% gradT_excess_f1
@@ -3031,6 +3038,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
  Vink_scaling_factor = s% Vink_scaling_factor
  Dutch_scaling_factor = s% Dutch_scaling_factor
+ Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
  Dutch_wind_lowT_scheme = s% Dutch_wind_lowT_scheme
 
  wind_H_envelope_limit = s% wind_H_envelope_limit
@@ -3522,6 +3530,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_log_max_boost = s% RTI_log_max_boost 
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
+
+
+ drag_coefficient = s% drag_coefficient
+ min_q_for_drag = s% min_q_for_drag
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound

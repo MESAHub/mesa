@@ -44,7 +44,7 @@ the boundary conditions. The interpolations are peformed using
        al. (2011, MNRAS, 411, 781) treatment. Surface optical depth
        is :math:`\tau_{\rm surf} = 25.12`.
 
-   * - ``'DB_tau_25'``
+   * - ``'DB_WD_tau_25'``
      - Use model atmospheres for hot(ter) white dwarrfs, provided by Odette
        Toloza based on Detlev Koester’s atmosphere code. Surface
        optical depth is :math:`\tau_{\rm surf} = 25.12`.

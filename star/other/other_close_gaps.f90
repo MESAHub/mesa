@@ -30,14 +30,13 @@
       ! procedure pointer: s% other_close_gaps => my_routine
       ! This also requires the control remove_mixing_glitches = .true. 
 
-      use star_def
-
       implicit none
       
       contains
       
       
       subroutine null_other_close_gaps(id, mix_type, min_gap, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(in) :: mix_type
          real(dp), intent(in) :: min_gap

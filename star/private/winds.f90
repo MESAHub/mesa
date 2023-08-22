@@ -171,7 +171,7 @@
                if (dbg) &
                   write(*,*) 'using cool_wind_RGB_scheme: "' // trim(scheme) // '"'
             end if
-            call eval_wind_for_scheme(scheme,cool_wind)
+            call eval_wind_for_scheme(scheme, cool_wind)
          else
             cool_wind = 0d0
          endif
@@ -401,6 +401,10 @@
                    call eval_Nieuwenhuijzen_wind(wind)
                    wind = s% Nieuwenhuijzen_scaling_factor * wind
                    if (dbg) write(*,1) 'Nieuwenhuijzen_wind', wind
+                else if (scheme == 'Bjorklund') then
+                   call eval_Bjorklund_wind(wind)
+                   wind = s% Bjorklund_scaling_factor * wind
+                   if (dbg) write(*,1) 'Bjorklund_wind', wind
                 else
                    ierr = -1
                    write(*,*) 'unknown name for wind scheme : ' // trim(scheme)
@@ -478,6 +482,24 @@
 
          end subroutine rotation_enhancement
 
+
+         subroutine eval_Bjorklund_wind(w)
+            real(dp), intent(inout) :: w
+            real(dp), parameter :: Zbjork = 0.014d0
+            real(dp) :: logw, Meff
+
+            ! electron opacity is constant 0.34 in their models (Eq. 6)
+            Meff = M1*(1d0 - 0.34d0*L1/(pi4*clight*s% cgrav(1)*M1))  ! effective mass
+
+            ! eq 7 from Björklund et al, 2022, arXiv:2203.08218, accepted to A&A
+            logw = - 5.52d0 &
+                   + 2.39d0 * log10(L1/(1d6*Lsun)) &
+                   - 1.48d0 * log10(Meff/(4.5d1*Msun)) &
+                   + 2.12d0 * log10(T1/4.5d4) &
+                   + (0.75d0 - 1.87d0 * log10(T1/4.5d4)) * log10(Z/Zbjork)
+            w = exp10(logw)
+
+         end subroutine eval_Bjorklund_wind
 
          subroutine eval_Vink_wind(w)
             real(dp), intent(inout) :: w

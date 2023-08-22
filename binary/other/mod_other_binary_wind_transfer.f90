@@ -24,7 +24,6 @@
 ! ***********************************************************************
  
       module mod_other_binary_wind_transfer
-          use binary_def, only : binary_info, binary_ptr
 
       ! NOTE: remember to set true:
       ! use_other_binary_wind_transfer = .true.
@@ -147,6 +146,7 @@
       contains
       
       subroutine null_other_binary_wind_transfer(binary_id, s_i, ierr)
+         use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id, s_i
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b

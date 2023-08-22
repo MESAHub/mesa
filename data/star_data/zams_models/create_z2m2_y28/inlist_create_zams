@@ -27,6 +27,12 @@
    mixing_length_alpha = 2d0
    alpha_semiconvection = 1d0
 
+   ! stopping criteria: central x drops below x_ctrl(1)
+   ! Note: cannot use typical xa_central_lower_limit* controls
+   ! because the run MUST be stopped in extras_check_model.
+   ! See src/run_star_extras.f90 for details.
+   x_ctrl(1) = 0.697d0
+
    overshoot_scheme(1) = 'exponential'
    overshoot_zone_type(1) = 'any'
    overshoot_zone_loc(1) = 'any'
