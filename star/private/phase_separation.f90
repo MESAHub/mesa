@@ -56,10 +56,10 @@
          integer, intent(out) :: ierr
 
          if(s% phase_separation_option == 'CO') then
-            call do_2component_phase_separation(s, dt, 'CO', .true., ierr)
+            call do_2component_phase_separation(s, dt, 'CO', ierr)
             ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'ONe') then
-            call do_2component_phase_separation(s, dt, 'ONe', .true., ierr)
+            call do_2component_phase_separation(s, dt, 'ONe', ierr)
             ! -1 argument means iterate through all freezing material
          else if(s% phase_separation_option == 'distillation') then
             call do_distillation(s, dt, ierr)
@@ -70,30 +70,25 @@
          end if
       end subroutine do_phase_separation
 
-      ! TODO: maybe get rid of set_mixing_and_energy now that distillation doesn't fall back to calling this
-      subroutine do_2component_phase_separation(s, dt, components, set_mixing_and_energy, ierr)
+      subroutine do_2component_phase_separation(s, dt, components, ierr)
          use chem_def, only: chem_isos, ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
-         logical, intent(in) :: set_mixing_and_energy
          integer, intent(out) :: ierr
          
          real(dp) :: XNe, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
          logical :: save_Skye_use_ion_offsets
 
-         if(set_mixing_and_energy) then
-            ! Set phase separation mixing mass negative at beginning of phase separation
-            s% phase_sep_mixing_mass = -1d0
-            s% eps_phase_separation(1:s%nz) = 0d0
-
-            ! TODO: check if this makes sense for calls from distillation
-            if(s% phase(s% nz) < eos_phase_boundary) then
-               s% crystal_core_boundary_mass = 0d0
-               return
-            end if
+         ! Set phase separation mixing mass negative at beginning of phase separation
+         s% phase_sep_mixing_mass = -1d0
+         s% eps_phase_separation(1:s%nz) = 0d0
+         
+         if(s% phase(s% nz) < eos_phase_boundary) then
+            s% crystal_core_boundary_mass = 0d0
+            return
          end if
             
          net_ic12 = s% net_iso(ic12)
@@ -130,16 +125,14 @@
                end if
             end do
 
-            if(set_mixing_and_energy) then
-               ! calculate energy associated with phase separation, ignoring the ionization
-               ! energy term that Skye sometimes calculates
-               save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
-               s% eos_rq% Skye_use_ion_offsets = .false.
-               call update_model_(s,1,s%nz,.false.)
-               do k=1,s% nz
-                  s% eps_phase_separation(k) = s% energy(k)
-               end do
-            end if
+            ! calculate energy associated with phase separation, ignoring the ionization
+            ! energy term that Skye sometimes calculates
+            save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
+            s% eos_rq% Skye_use_ion_offsets = .false.
+            call update_model_(s,1,s%nz,.false.)
+            do k=1,s% nz
+               s% eps_phase_separation(k) = s% energy(k)
+            end do
             
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
@@ -158,13 +151,11 @@
 
             call update_model_(s,1,s%nz,.false.)
 
-            if(set_mixing_and_energy) then
-               ! phase separation heating term for use by energy equation
-               do k=1,s% nz
-                  s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
-               end do
-               s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
-            end if
+            ! phase separation heating term for use by energy equation
+            do k=1,s% nz
+               s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+            end do
+            s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
             s% need_to_setvars = .true.
          end if
 
@@ -247,13 +238,12 @@
                end if
 
                ! relax tolerances after 5 and 10 iters
-               if(iter > 5) then
-                  tol_low = 0.8d0
-                  tol_high = 1.2d0
-               end if
                if(iter > 10) then
                   tol_low = 0.5d0
                   tol_high = 2d0
+               else if(iter > 5) then
+                  tol_low = 0.8d0
+                  tol_high = 1.2d0
                end if
             end do
             print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
@@ -356,8 +346,6 @@
                ! also check that we're done with everything inward from this point
                if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                   ! zone won't distill, but is ready to phase separate C/O
-                  ! TODO: not currently responsive to scale_factor on this branch, so need to update
-                  ! to avoid lots of useless iterations
                   call move_one_zone_for_distill(s,k)
                   ! crystallized out to k now, liquid starts at k-1.
                   ! now mix the liquid material outward until stably stratified
