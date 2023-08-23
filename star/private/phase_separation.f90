@@ -37,9 +37,11 @@
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
       
-      ! The saved_data type saves composition and crystallization data from star_info
+      ! The saved_data type saves composition, energy,
+      ! and crystallization data from star_info
       type saved_data
          real(dp), allocatable :: xa(:,:)
+         real(dp), allocatable :: energy(:)
          real(dp) :: crystal_core_boundary_mass
       end type saved_data
 
@@ -176,7 +178,7 @@
          integer, intent(out) :: ierr
          
          type(saved_data) :: sd
-         real(dp) :: eps_tmp, L_distill, L_max, &
+         real(dp) :: L_distill, L_max, &
               retry_scale_factor, scale_factor_low, scale_factor_high, tol_low, tol_high
          integer :: k, iter, net_ine22
          logical :: save_Skye_use_ion_offsets, distilled
@@ -198,20 +200,13 @@
          save_Skye_use_ion_offsets = s% eos_rq% Skye_use_ion_offsets
          s% eos_rq% Skye_use_ion_offsets = .false.
          call update_model_(s,1,s%nz,.false.)
-         call save_model_(s,sd) ! sets saved data sd to starting composition and crystal core location
-         do k=1,s% nz
-            s% eps_phase_separation(k) = s% energy(k)
-         end do
+         call save_model_(s,sd) ! sets saved data sd to starting composition, energy, and crystal core location
 
-         call distill_loop(s,1d0,distilled)
+         call distill_loop(s,sd,1d0,distilled)
          
          ! checking luminosity
          L_max = s% L_phot * Lsun
-         L_distill = 0d0
-         do k = 1, s% nz
-            eps_tmp = (s% eps_phase_separation(k) - s% energy(k)) / dt
-            L_distill = L_distill + eps_tmp*s% dm(k)
-         end do
+         call calc_L_distill(s,sd,L_distill)
 
          ! TODO: get rid of this
          print *, "distill iter, scale_factor, Lum_ratio", 0, 1d0, L_distill/L_max
@@ -232,16 +227,12 @@
                
                ! reset model
                s% phase_sep_mixing_mass = -1d0
-               call restore_model_(s,sd)
+               call restore_composition_(s,sd)
                call update_model_(s,1,s%nz,.true.)
 
-               call distill_loop(s,retry_scale_factor,distilled)
+               call distill_loop(s,sd,retry_scale_factor,distilled)
 
-               L_distill = 0d0
-               do k = 1, s% nz
-                  eps_tmp = (s% eps_phase_separation(k) - s% energy(k)) / dt
-                  L_distill = L_distill + eps_tmp*s% dm(k)
-               end do
+               call calc_L_distill(s,sd,L_distill)
                print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
 
                ! simple bisection seems to work
@@ -271,7 +262,7 @@
          
          ! phase separation heating term for use by energy equation
          do k=1,s% nz
-            s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
+            s% eps_phase_separation(k) = (sd% energy(k) - s% energy(k)) / dt
          end do
          s% eos_rq% Skye_use_ion_offsets = save_Skye_use_ion_offsets
          s% need_to_setvars = .true.
@@ -279,16 +270,18 @@
          ierr = 0
       end subroutine do_distillation
 
-      subroutine distill_loop(s,scale_factor,distilling)
+      subroutine distill_loop(s,sd,scale_factor,distilling)
          use chem_def, only: chem_isos, ic12, io16, ine20, ine22
          use chem_lib, only: chem_get_iso_id
-         type (star_info), pointer :: s
-         real(dp), intent(in) :: scale_factor
-         logical, intent(out) :: distilling
          
-         real(dp) :: Gamma_melt, GammaC_melt, GammaC, L_distill, eps_tmp, &
+         type (star_info), pointer    :: s
+         type(saved_data), intent(in) :: sd
+         real(dp), intent(in)         :: scale_factor
+         logical, intent(out)         :: distilling
+         
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC, L_distill, &
               XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num
-         integer :: k, kk, kstart, net_ic12, net_io16, net_ine20, net_ine22
+         integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
 
          distill_final_XNe = 0.3143d0
          
@@ -375,14 +368,8 @@
                   s% crystal_core_boundary_mass = s% m(k)
 
                   ! break out of loop once phase sep luminosity approaches that of the star
-                  L_distill = 0d0
-                  do kk = 1, s% nz
-                     eps_tmp = (s% eps_phase_separation(kk) - s% energy(kk)) / s% dt
-                     L_distill = L_distill + eps_tmp*s% dm(kk)
-                  end do
-                  if(L_distill >  0.9d0 * s% L_phot * Lsun) then
-                     exit
-                  end if
+                  call calc_L_distill(s,sd,L_distill)
+                  if(L_distill >  0.9d0 * s% L_phot * Lsun) exit
                end if
             else if (GammaC < GammaC_melt) then
                ! print *, "exiting distill loop at q =", s% q(k), k
@@ -827,6 +814,21 @@
         
         blouin_XNe_crit = XNe_crit
       end function blouin_XNe_crit
+
+      subroutine calc_L_distill(s,sd,L_distill)
+        type(star_info), pointer     :: s
+        type(saved_data), intent(in) :: sd
+        real(dp), intent(out)        :: L_distill
+        
+        real(dp) :: eps_tmp
+        integer  :: k
+        
+        L_distill = 0d0
+        do k = 1, s% nz
+           eps_tmp = (sd% energy(k) - s% energy(k)) / s% dt
+           L_distill = L_distill + eps_tmp*s% dm(k)
+        end do
+      end subroutine calc_L_distill
       
       subroutine update_model_ (s, kc_t, kc_b, do_brunt)
 
@@ -903,15 +905,16 @@
 
         sd% crystal_core_boundary_mass = s% crystal_core_boundary_mass
         sd% xa(:,1:s%nz) = s% xa(:,1:s%nz)
+        sd% energy(1:s%nz) = s% energy(1:s%nz)
       end subroutine save_model_
 
-      subroutine restore_model_ (s, sd)
+      subroutine restore_composition_ (s, sd)
         type(star_info), pointer     :: s
         type(saved_data), intent(in) :: sd
 
         s% crystal_core_boundary_mass = sd% crystal_core_boundary_mass
         s% xa(:,1:s%nz) = sd% xa(:,1:s%nz)
-      end subroutine restore_model_
+      end subroutine restore_composition_
 
       subroutine alloc_saved_data_ (s, sd)
         type(star_info), pointer :: s
@@ -919,6 +922,7 @@
 
         ! Allocate cell data arrays
         allocate(sd%xa(s%species,s%nz))
+        allocate(sd%energy(s%nz))
       end subroutine alloc_saved_data_
 
       subroutine smooth_eps_phase_sep(s,dt,ierr)
