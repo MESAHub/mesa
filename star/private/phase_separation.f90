@@ -69,7 +69,8 @@
             stop
          end if
       end subroutine do_phase_separation
-      
+
+      ! TODO: maybe get rid of set_mixing_and_energy now that distillation doesn't fall back to calling this
       subroutine do_2component_phase_separation(s, dt, components, set_mixing_and_energy, ierr)
          use chem_def, only: chem_isos, ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
@@ -316,6 +317,7 @@
             Gamma_melt = blouin_Gamma_melt_CO(XO)
             GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
 
+            ! TODO: check whether the rest of the code is ready to try this.
             ! Can't use this corrected freezing temperature until make the logic
             ! more sophisticated and incoporate trajectory toward final freezing point
             ! for zones once they start distilling.
@@ -327,31 +329,27 @@
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
             XNe_crit = blouin_XNe_crit(GammaC_melt)
             
-            if(XNe > max(XNe_crit,1d-4) .and. &
+            if(XNe > max(XNe_crit,1d-7) .and. &
                  XNe < distill_final_XNe .and. &
-                 GammaC > GammaC_melt .and. & 
-                 XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
+                 GammaC > GammaC_melt) then
+            
                ! should be distilling in this zone
                distilling = .true. ! so we know not to do 2 component separation later
                
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
                ! Once distillation starts in a zone, it stays liquid and continues
                ! distilling until reaching xNe = 0.2.
-               ! if (XNe < distill_final_XNe .and. & ! redundant?
-               !     L_distill < L_max .and. & ! redundant?
-               !     XNe_out > 1d-4) then! 1d-4 just to break out if further distillation is impossible
-                  call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
-                  ! mix from zone k-1 outward
-                  call mix_outward(s, k-1, 3)
-                  XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
-                  XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
-               ! end if
-               if(XNe >= distill_final_XNe .or. XNe_out < 1d-4) then
+               call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
+
+               ! mix from zone k-1 outward
+               call mix_outward(s, k-1, 3) ! TODO: maybe add inlist option for how many cells to include in last argument
+               XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
+               XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
+               
+               if(XNe >= distill_final_XNe .or. XNe_out < 1d-7) then
                   if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
                      ! done distilling this zone and everything inward from it, mark crystallized
                      s% crystal_core_boundary_mass = s% m(k)
-                     print *, "setting crystal_core_boundary_mass after distilling zone", k
-                     ! TODO: may need to be more careful about setting crystal_core_boundary_mass here
                   end if
                end if
             else if (GammaC > GammaC_melt .and. (.not. distilling)) then
@@ -364,7 +362,6 @@
                   ! crystallized out to k now, liquid starts at k-1.
                   ! now mix the liquid material outward until stably stratified
                   call mix_outward(s, k-1, 2)
-                  print *, "doing C/O phase sep and setting crystal_core_boundary_mass in zone", k
                   s% crystal_core_boundary_mass = s% m(k)
 
                   ! break out of loop once phase sep luminosity approaches that of the star
@@ -372,8 +369,7 @@
                   if(L_distill >  0.9d0 * s% L_phot * Lsun) exit
                end if
             else if (GammaC < GammaC_melt) then
-               ! print *, "exiting distill loop at q =", s% q(k), k
-               exit
+               exit ! zones outward from here are not cool enough to freeze yet
             end if
          end do
       end subroutine distill_loop
@@ -390,9 +386,7 @@
         real(dp) :: dXC, dXO, dXNe_tot, dXNe20, dXNe22, dq_ratio, scale
         real(dp) :: delta_binding_energy, Lmax
         integer :: net_ic12, net_io16, net_ine20, net_ine22
-        logical :: debug
 
-        debug = .false.
         dq_ratio = s% dq(k) / s% dq(k-1)
         
         net_ic12 = s% net_iso(ic12)
@@ -425,7 +419,7 @@
         ! start by calculating difference between zone composition (XC,XO,XNe)
         ! and target compostion ~(1-distill_final_XNe,0,distill_final_XNe) (not accounting for trace impurities)
         Delta_XO = -XO ! get rid of all O
-        Delta_XNe = distill_final_XNe - XNe + 1d-5 ! reach target Ne fraction (with some pad to alleviate roundoff error)
+        Delta_XNe = distill_final_XNe - XNe + 1d-7 ! reach target Ne fraction (with some pad to alleviate roundoff error)
         Delta_XC = XO - Delta_XNe ! All O that doesn't become Ne must become C
         
         ! Which element will limit the size of composition step.
@@ -449,7 +443,7 @@
 
         ! for debugging
         ! TODO: get rid of this block when development is more stable
-        if(debug) then
+        if(dbg) then
            print *, "k, nz, dq_ratio", k, s%nz, dq_ratio
            print *, "before distill at boundary; XC, XO, XNe, XC_out, XO_out, XNe_out", &
                 XC, XO, XNe, XC_out, XO_out, XNe_out
@@ -472,7 +466,7 @@
         
         ! for debugging
         ! TODO: get rid of this block when development is more stable
-        if(debug) then
+        if(dbg) then
            XC = s% xa(net_ic12,k)
            XO = s% xa(net_io16,k)
            XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
@@ -612,11 +606,13 @@
         s% xa(net_ine20,k-1) = s% xa(net_ine20,k-1) - Xfac*dXNe20 * s% dq(k) / s% dq(k-1)
         s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - Xfac*dXNe22 * s% dq(k) / s% dq(k-1)
 
-        print *, "move one zone for distill"
-        print *, "abundances in zone", k, s% xa(net_ic12,k), s% xa(net_io16,k), s% xa(net_ine20,k), s% xa(net_ine22,k)
-        print *, "abundances in zone", k-1, s% xa(net_ic12,k-1), s% xa(net_io16,k-1), s% xa(net_ine20,k-1), s% xa(net_ine22,k-1)
-        print *, "dXC, dXO, dXNe", dXC, dXO, dXNe
-        print *, "dq ratio (k-1/k)", s%dq(k-1)/s%dq(k)
+        if(dbg) then
+           print *, "move one zone for distill"
+           print *, "abundances in zone", k, s% xa(net_ic12,k), s% xa(net_io16,k), s% xa(net_ine20,k), s% xa(net_ine22,k)
+           print *, "abundances in zone", k-1, s% xa(net_ic12,k-1), s% xa(net_io16,k-1), s% xa(net_ine20,k-1), s% xa(net_ine22,k-1)
+           print *, "dXC, dXO, dXNe", dXC, dXO, dXNe
+           print *, "dq ratio (k-1/k)", s%dq(k-1)/s%dq(k)
+        end if
         
         call update_model_(s,k-1,s%nz,.true.)
         
