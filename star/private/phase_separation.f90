@@ -200,8 +200,7 @@
          L_max = s% L_phot * Lsun
          call calc_L_distill(s,sd,L_distill)
 
-         ! TODO: get rid of this
-         print *, "distill iter, scale_factor, Lum_ratio", 0, 1d0, L_distill/L_max
+         if(dbg) print *, "distill iter, scale_factor, Lum_ratio", 0, 1d0, L_distill/L_max
 
          ! try to converge amount of distillation toward not producing too much luminosity
          if(L_distill > L_max .and. distilled) then
@@ -225,7 +224,7 @@
                call distill_loop(s,sd,retry_scale_factor,distilled)
 
                call calc_L_distill(s,sd,L_distill)
-               print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
+               if(dbg) print *, "retry iter, scale_factor, Lum_ratio", iter, retry_scale_factor, L_distill/L_max
 
                ! simple bisection seems to work
                if(L_distill < tol_low*L_max) then
@@ -246,7 +245,7 @@
                   tol_high = 1.02d0
                end if
             end do
-            print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
+            if(dbg) print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
          end if
          
          call update_model_(s,1,s%nz,.false.)
@@ -304,13 +303,14 @@
             xo_num = XO*s% abar(k)/16d0
             
             ! Check whether we are in a regime where distillation should occur
-            Gamma_melt = blouin_Gamma_melt_CO(XO)
-
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
+
+            Gamma_melt = blouin_Gamma_melt_CO(XO)
             GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
                  + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
                  - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
                  + 2408.44d0*xne_num*xo_num*xo_num*xo_num
+
             XNe_crit = blouin_XNe_crit(GammaC_melt)
             
             if(XNe > max(XNe_crit,1d-7) .and. &
@@ -326,7 +326,7 @@
                call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
 
                ! mix from zone k-1 outward
-               call mix_outward(s, k-1, 3) ! TODO: maybe add inlist option for how many cells to include in last argument
+               call mix_outward(s, k-1, 3) ! TODO: add inlist option for how many cells to include in last argument
                XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
                
@@ -387,7 +387,7 @@
         ! distillation not complete until GammaC = 208,
         ! so draw a line between start of distillation and GammaC = 208, XNe = distill_final_XNe,
         ! only go as far along that line as current GammaC allows.
-        target_XNe = XNe_crit + (distill_final_XNe - XNe_crit + 1d-7)*(GammaC - GammaC_melt)/(208d0 - GammaC_melt)
+        target_XNe = XNe_crit + (distill_final_XNe - XNe_crit + 1d-5)*(GammaC - GammaC_melt)/(208d0 - GammaC_melt)
         if(XNe >= target_XNe) then
            ! not cool enough to continue distillation yet
            return
@@ -401,7 +401,7 @@
         ! start by calculating difference between zone composition (XC,XO,XNe)
         ! and target compostion ~(1-distill_final_XNe,0,distill_final_XNe) (not accounting for trace impurities)
         Delta_XO = -XO ! get rid of all O
-        Delta_XNe = distill_final_XNe - XNe + 1d-7 ! reach target Ne fraction (with some pad to alleviate roundoff error)
+        Delta_XNe = distill_final_XNe - XNe + 1d-5 ! reach target Ne fraction (with some pad to alleviate roundoff error)
         Delta_XC = XO - Delta_XNe ! All O that doesn't become Ne must become C
         
         ! Which element will limit the size of composition step.
@@ -424,7 +424,6 @@
         dXNe22 = dXNe_tot*s% xa(net_ine22,k-1)/XNe_out
 
         ! for debugging
-        ! TODO: get rid of this block when development is more stable
         if(dbg) then
            print *, "k, nz, dq_ratio", k, s%nz, dq_ratio
            print *, "before distill at boundary; XC, XO, XNe, XC_out, XO_out, XNe_out", &
@@ -447,7 +446,6 @@
         s% xa(net_ine22,k-1) = s% xa(net_ine22,k-1) - dXNe22*dq_ratio
         
         ! for debugging
-        ! TODO: get rid of this block when development is more stable
         if(dbg) then
            XC = s% xa(net_ic12,k)
            XO = s% xa(net_io16,k)
