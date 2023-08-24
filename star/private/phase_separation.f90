@@ -214,7 +214,7 @@
             tol_high = 1.0d0 ! initially try for something that strictly does not exceed WD luminosity
             
             iter = 0
-            do while((L_distill < tol_low*L_max .or. L_distill > tol_high*L_max) .and. iter < 15)
+            do while((L_distill < tol_low*L_max .or. L_distill > tol_high*L_max) .and. iter < 12)
                iter = iter + 1
                
                ! reset model
@@ -237,13 +237,13 @@
                   retry_scale_factor = 0.5d0*(retry_scale_factor + scale_factor_low)
                end if
 
-               ! relax tolerances after 5 and 10 iters
-               if(iter > 10) then
-                  tol_low = 0.5d0
-                  tol_high = 2d0
-               else if(iter > 5) then
-                  tol_low = 0.8d0
-                  tol_high = 1.2d0
+               ! relax tolerances after 4 and 8 iters, prefer L_distill < L
+               if(iter > 8) then
+                  tol_low = 0.3d0
+                  tol_high = 1.1d0
+               else if(iter > 4) then
+                  tol_low = 0.7d0
+                  tol_high = 1.02d0
                end if
             end do
             print *, "converged after iter, L_dist, L_max, ratio", iter, L_distill/Lsun, L_max/Lsun, L_distill/L_max
@@ -305,18 +305,12 @@
             
             ! Check whether we are in a regime where distillation should occur
             Gamma_melt = blouin_Gamma_melt_CO(XO)
-            GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
 
-            ! TODO: check whether the rest of the code is ready to try this.
-            ! Can't use this corrected freezing temperature until make the logic
-            ! more sophisticated and incoporate trajectory toward final freezing point
-            ! for zones once they start distilling.
-            ! This is only limit in the limit of xne << xco to test where distillation STARTS
-            !GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
-            !     + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
-            !     - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
-            !     + 2408.44d0*xne_num*xo_num*xo_num*xo_num
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
+            GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
+                 + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
+                 - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
+                 + 2408.44d0*xne_num*xo_num*xo_num*xo_num
             XNe_crit = blouin_XNe_crit(GammaC_melt)
             
             if(XNe > max(XNe_crit,1d-7) .and. &
@@ -393,7 +387,7 @@
         ! distillation not complete until GammaC = 208,
         ! so draw a line between start of distillation and GammaC = 208, XNe = distill_final_XNe,
         ! only go as far along that line as current GammaC allows.
-        target_XNe = XNe_crit + (distill_final_XNe - XNe_crit + 1d-5)*(GammaC - GammaC_melt)/(208d0 - GammaC_melt)
+        target_XNe = XNe_crit + (distill_final_XNe - XNe_crit + 1d-7)*(GammaC - GammaC_melt)/(208d0 - GammaC_melt)
         if(XNe >= target_XNe) then
            ! not cool enough to continue distillation yet
            return
@@ -795,8 +789,9 @@
         GammaC2 = 180d0
 
         XNe_crit = XNe1 + (GammaC - GammaC1)*(XNe2 - XNe1)/(GammaC2-GammaC1)
-        
-        blouin_XNe_crit = XNe_crit
+
+        ! set a floor of zero to avoid returning negative values for large GammaC
+        blouin_XNe_crit = max(XNe_crit,0d0)
       end function blouin_XNe_crit
 
       subroutine calc_L_distill(s,sd,L_distill)
