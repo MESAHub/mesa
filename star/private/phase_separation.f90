@@ -269,7 +269,7 @@
          real(dp), intent(in)         :: scale_factor
          logical, intent(out)         :: distilling
          
-         real(dp) :: Gamma_melt, GammaC_melt, GammaC, L_distill, &
+         real(dp) :: Gamma_melt, GammaC_melt, GammaC_melt_CO, GammaC, L_distill, &
               XNe, XNe_out, XO, XC, pad, distill_final_XNe, XNe_crit, xne_num, xo_num
          integer :: k, kstart, net_ic12, net_io16, net_ine20, net_ine22
 
@@ -304,9 +304,16 @@
             
             ! Check whether we are in a regime where distillation should occur
             GammaC = s% gam(k) * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma> * 6^(5/3) / <Z^(5/3)>
+            Gamma_melt = blouin_Gamma_melt_CO(xo_num)
 
-            Gamma_melt = blouin_Gamma_melt_CO(XO)
-            GammaC_melt = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
+            ! no correction for presence of Ne yet
+            ! conversion assumes binary C/O mixture, so xc = 1 - xo
+            GammaC_melt_CO = Gamma_melt * pow(6d0,5d0/3d0) / ((1-xo_num)*pow(6d0,5d0/3d0) + xo_num*pow(8d0,5d0/3d0))
+            ! this way is incorrect:
+            ! GammaC_melt_CO = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
+
+            ! now include correction for Ne
+            GammaC_melt = GammaC_melt_CO & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)> (assuming pure C/O)
                  + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
                  - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
                  + 2408.44d0*xne_num*xo_num*xo_num*xo_num
@@ -323,10 +330,10 @@
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
                ! Once distillation starts in a zone, it stays liquid and continues
                ! distilling until reaching xNe = 0.2.
-               call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
+               call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt_CO,scale_factor)
 
                ! mix from zone k-1 outward
-               call mix_outward(s, k-1, 3) ! TODO: add inlist option for how many cells to include in last argument
+               call mix_outward(s, k-1, 0) ! TODO: add inlist option for how many cells to include in last argument
                XNe = s% xa(net_ine20,k) + s% xa(net_ine22,k)
                XNe_out = s% xa(net_ine20,k-1) + s% xa(net_ine22,k-1)
                
@@ -336,6 +343,10 @@
                      s% crystal_core_boundary_mass = s% m(k)
                   end if
                end if
+               
+               ! break out of loop once phase sep luminosity approaches that of the star
+               call calc_L_distill(s,sd,L_distill)
+               if(L_distill >  0.9d0 * s% L_phot * Lsun .and. scale_factor < 1d0) exit
             else if (GammaC > GammaC_melt .and. (.not. distilling)) then
                ! also check that we're done with everything inward from this point
                if( k == s% nz .or. s% crystal_core_boundary_mass + pad > s% m(min(k+1,s%nz)) ) then
@@ -343,7 +354,7 @@
                   call move_one_zone_for_distill(s,k)
                   ! crystallized out to k now, liquid starts at k-1.
                   ! now mix the liquid material outward until stably stratified
-                  call mix_outward(s, k-1, 2)
+                  call mix_outward(s, k-1, 0)
                   s% crystal_core_boundary_mass = s% m(k)
 
                   ! break out of loop once phase sep luminosity approaches that of the star
@@ -458,7 +469,7 @@
                 XC, XO, XNe, XC_out, XO_out, XNe_out
         end if
         
-        call update_model_(s,k-1,s%nz,.true.)
+        call update_model_(s,k-1,k,.false.)
         
       end subroutine distill_at_boundary
 
@@ -690,14 +701,10 @@
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
 
-      real(dp) function blouin_Gamma_melt_CO(Xin)
-        real(dp), intent(in) :: Xin ! mass fraction
-        real(dp) :: xo ! number fraction
+      real(dp) function blouin_Gamma_melt_CO(xo)
+        real(dp), intent(in) :: xo ! number fraction of oxygen
         real(dp) :: a0, a1, a2, a3, a4, a5, Gamma
 
-        ! Convert input mass fraction to number fraction, assuming C/O mixture
-        xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)
-        
         a0 = 178d0
         a1 = 167.178104d0
         a2 = -3.973461d0
