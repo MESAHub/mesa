@@ -312,7 +312,8 @@
             ! this way is incorrect:
             ! GammaC_melt_CO = Gamma_melt * pow(6d0,5d0/3d0) / s% z53bar(k) ! <Gamma>_m * 6^(5/3) / <Z^(5/3)>
 
-            ! now include correction for Ne
+            ! now include correction for Ne, but stay in the regime of low Ne abundance where fits are valid
+            xne_num = min(xne_num,0.04d0)
             GammaC_melt = GammaC_melt_CO & ! <Gamma>_m * 6^(5/3) / <Z^(5/3)> (assuming pure C/O)
                  + 1096.69d0*xne_num*xo_num & ! corrections to phase diagram accounting for presence of Ne
                  - 3410.33d0*xne_num*xo_num*xo_num & ! fits from Simon Blouin (priv comm)
@@ -330,7 +331,7 @@
                ! must distill to xNe = 0.2 (XNe = 0.3143) and xC = 0.8 (no O).
                ! Once distillation starts in a zone, it stays liquid and continues
                ! distilling until reaching xNe = 0.2.
-               call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt_CO,scale_factor)
+               call distill_at_boundary(s,k,XNe_crit,distill_final_XNe,GammaC,GammaC_melt,scale_factor)
 
                ! mix from zone k-1 outward
                call mix_outward(s, k-1, 0) ! TODO: add inlist option for how many cells to include in last argument
