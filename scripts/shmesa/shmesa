@@ -44,7 +44,7 @@ shmesa_help () {
  |___/_| |_|_|  |_|_____|____/_/   \_\
                                       
 EOF
-    echo "Usage: shmesa [work|change|defaults|cp|grep|zip|help] [arguments]"
+    echo "Usage: shmesa [work|change|defaults|cp|grep|extras|zip|help] [arguments]"
     echo
     echo "Subcommands:"
     echo "  work      copy the work directory to the current location"
@@ -52,6 +52,7 @@ EOF
     echo "  defaults  copy the history/profile defaults to the current location"
     echo "  cp        copy a MESA directory without copying LOGS, photos, etc."
     echo "  grep      search the MESA source code for a given string"
+    echo "  extras    fill in the full run_star_extras.f90 template"
     echo "  zip       prepare a MESA directory for sharing"
     echo "  help      display this helpful message"
     echo "  -h        flag for getting additional details about any of the above"
@@ -258,12 +259,36 @@ shmesa_zip () {
 }
 
 
+shmesa_extras () {
+    if shmesa_check_h_flag "$@"; then
+        echo "Usage: shmesa extras [src/run_star_extras.f90]"
+        echo "replaces run_star_extras.f90 with the full template"
+        return 0
+    fi
+
+    local rse='src/run_star_extras.f90'
+    if [[ ! -z $1 ]]; then
+        rse=$1
+    fi
+
+    local contents=$(cat "$MESA_DIR/include/standard_run_star_extras.inc")
+    if [[ -z $contents ]]; then
+        echo "Cannot find $MESA_DIR/include/standard_run_star_extras.inc"
+        return 1
+    fi
+    contents=$(sed 's:|:\\|:g' "$MESA_DIR/include/standard_run_star_extras.inc" | sed -z 's:\n:\\n:g')
+
+    backup_copy "$rse" "$rse".bak
+    sed -i "s|      include 'standard_run_star_extras.inc'|$contents|" $rse
+}
+
+
 ### DEVELOPMENT USE 
 shmesa_template () {
     ### TEMPLATE FOR NEW SHMESA FUNCTIONS 
     if shmesa_check_h_flag "$@"; then
         echo "Usage: shmesa funcname arg [optional arg]"
-        echo "put discription here"
+        echo "put description here"
         return 0
     fi
 
@@ -335,6 +360,10 @@ shmesa_test () {
     # shmesa cp
     run_shmesa_test "cp" \
         "(shmesa cp '$MESA_SHMESA_TEST' '$MESA_SHMESA_TEST'_cp)"
+
+    # shmesa extras
+    run_shmesa_test "extras" \
+        "(cd $MESA_SHMESA_TEST && shmesa extras)"
     
     # shmesa zip
     run_shmesa_test "zip" \
@@ -434,6 +463,9 @@ case "$subcommand" in
         ;;
     grep)
         shmesa_grep "$@"
+        ;;
+    extras)
+        shmesa_extras "$@"
         ;;
     zip)
         shmesa_zip "$@"
