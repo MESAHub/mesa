@@ -12,7 +12,7 @@ To use, simply call: `shmesa`
  \__ \ | | | |  | | |___ ___) / ___ \
  |___/_| |_|_|  |_|_____|____/_/   \_\
 
-Usage: shmesa [work|change|defaults|cp|grep|zip|help] [arguments]
+Usage: shmesa [work|change|defaults|cp|grep|extras|zip|help] [arguments]
 
 Subcommands:
   work      copy the work directory to the current location
@@ -20,6 +20,7 @@ Subcommands:
   defaults  copy the history/profile defaults to the current location
   cp        copy a MESA directory without copying LOGS, photos, etc.
   grep      search the MESA source code for a given string
+  extras    fill in the full run_star_extras.f90 template
   zip       prepare a MESA directory for sharing
   help      display this helpful message
   -h        get additional details about any of the above
@@ -122,4 +123,3 @@ There's instructions inside the code for adding a new bash subprogram to this dr
         # 3. parser at the end of this file 
     }
 ```
-
