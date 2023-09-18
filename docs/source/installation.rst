@@ -188,7 +188,7 @@ Confirm that you installed the MESA SDK correctly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Please check that you followed the MESA SDK `installation
-instructions <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+instructions <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
 Pay particular attention to the prerequisites for your system.
 
 Consult the FAQ
@@ -199,7 +199,7 @@ Check to see if there is any information about your problem in the
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
-FAQ <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Frequently_Asked_Questions_.01FAQ.01>`__.
+FAQ <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Frequently_Asked_Questions_.01FAQ.01>`__.
 
 Search the mesa-users mailing list archive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
