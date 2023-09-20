@@ -205,13 +205,6 @@
     pgstar_age_coord = -0.04
     pgstar_age_fjust = 0.0
 
-      ! ### axes line weight
-
-      ! ::
-
-    pgstar_box_lw = 3
-
-
       ! titles
       ! ~~~~~~
 
@@ -272,6 +265,13 @@
 
     pgstar_num_scale = 1.2
 
+
+      ! line width for axes
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! ::
+
+    pgstar_box_lw = 3
 
       ! line width for data
       ! ~~~~~~~~~~~~~~~~~~~
