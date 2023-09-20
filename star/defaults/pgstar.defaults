@@ -298,19 +298,19 @@
 ! TRho Profile window
 ! ===================
 
-      ! current model in T-Rho plane
+      ! Display current model in T-Rho plane
 
       ! ::
 
     TRho_Profile_win_flag = .false.
 
+      ! Window Sizing
+      ! -------------
+
       ! ::
 
     TRho_Profile_win_width = 6
     TRho_Profile_win_aspect_ratio = 0.75
-
-      ! ::
-
     TRho_Profile_xleft = 0.15
     TRho_Profile_xright = 0.85
     TRho_Profile_ybot = 0.15
@@ -318,17 +318,27 @@
     TRho_Profile_txt_scale = 1.0
     TRho_Profile_title = 'TRho_Profile'
 
+      ! Axis limits
+      ! -----------
+
+      ! ::
+
+    TRho_Profile_xmin = -11.1
+    TRho_Profile_xmax = 10.2
+    TRho_Profile_ymin = 2.6
+    TRho_Profile_ymax = 10.2
+
+
+      ! If ``TRho_switch_to_Column_Depth = .true.``, replace logRho for xaxis by log column depth (g/cm^2). 
+      ! If ``TRho_switch_to_mass = .true.``, replace logRho for xaxis by log mass coordinate M-m(k) |Msun|.
+
       ! ::
 
     TRho_switch_to_Column_Depth = .false.
-
-      ! if true, replace logRho for xaxis by log column depth (g/cm^2)
-
-      ! ::
-
     TRho_switch_to_mass = .false.
 
-      ! if true, replaces logRho for xaxis by log mass coordinate M-m(k) (Msun)
+      ! Legend 
+      ! ------
 
       ! ::
 
@@ -347,25 +357,30 @@
     TRho_Profile_text_info_yfac = 0.6
     TRho_Profile_text_info_dyfac = -0.04
 
+      ! Decorators
+      ! ----------
+
+      ! If ``show_TRho_accretion_mesh_borders = .true.``, plots the borders of the mesh and newly accreted material in the appropriate xcoord
+
       ! ::
 
-    show_TRho_Profile_mass_locs = .false.
     show_TRho_accretion_mesh_borders = .false.
 
-      ! If true, plots the borders of the mesh and newly accreted material in the appropriate xcoord
+      ! The regions shown by ``show_TRho_Profile_kap_regions`` and ``show_TRho_Profile_eos_regions`` may **not** correspond exactly to those used in the model as 
+      ! they are **not** updated to reflect changes made in a inlist that change the boundaries between eos or kap regions. 
 
       ! ::
 
     show_TRho_Profile_kap_regions = .false.
     show_TRho_Profile_eos_regions = .false.
+
+      ! ::
+
     show_TRho_Profile_gamma1_4_3rd = .false.
     show_TRho_Profile_degeneracy_line = .true.
     show_TRho_Profile_Pgas_Prad_line = .true.
     show_TRho_Profile_burn_lines = .true.
     show_TRho_Profile_burn_labels = .true.
-
-      ! The regions shown may not correspond exactly to those used in the model as 
-      ! they are not updated to reflect changes made in a inlist that change the boundaries between eos or kap regions. 
 
       ! ::
 
@@ -377,23 +392,16 @@
 
     TRho_Profile_fname = ''
 
-      ! Enables calling a subroutine to add extra information to a plot
+      ! ``TRho_Profile_use_decorator`` enables calling a subroutine to add extra information to a plot
       ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
 
       ! ::
 
     TRho_Profile_use_decorator = .false.
 
-      ! axis limits
 
-      ! ::
-
-    TRho_Profile_xmin = -11.1
-    TRho_Profile_xmax = 10.2
-    TRho_Profile_ymin = 2.6
-    TRho_Profile_ymax = 10.2
-
-      ! file output
+      ! TRho Profile file output
+      ! ------------------------
 
       ! ::
 
@@ -404,32 +412,43 @@
     TRho_Profile_file_width = -1
     TRho_Profile_file_aspect_ratio = -1
 
-      ! mass location markers
+      ! Mass location markers
+      ! ---------------------
 
-      !|     profile_mass_point_color_index
-      !|     1 = foreground color
-      !|     2 = red
-      !|     3 = green
-      !|     4 = blue
-      !|     etc. the full range is defined in Set_Colours in pgstar_support.f
-      !|     profile_mass_point_symbol
-      !|     code number of the symbol to be drawn:
-      !|           -1, -2  : a single dot (diameter = current
-      !|                     line width).
-      !|           -3..-31 : a regular polygon with ABS(SYMBOL)
-      !|                     edges (style set by current fill style).
-      !|           0..31   : standard marker symbols.
-      !|           32..127 : ASCII characters (in current font).
-      !|                     e.g. to use letter F as a marker, let
-      !|                     SYMBOL = ICHAR('F').
-      !|           > 127  :  a Hershey symbol number.
-      !|     for info about codes, http://www.astro.caltech.edu/~tjp/pgplot/hershey.html
-      !|     profile_mass_point_str
-      !|     text to show with the marker
-      !|     profile_mass_point_str_clr
-      !|     color index for the string
+      ! if ``show_TRho_Profile_mass_locs = .true.``, display mass location markers on TRho profile plot
+      ! ::
 
-      ! set all the entries
+    show_TRho_Profile_mass_locs = .false.
+
+      ! Setting Colors 
+      ! ~~~~~~~~~~~~~~
+
+      ! ``profile_mass_point_color_index`` and ``profile_mass_point_str_clr`` 
+      ! set the color of the mass location's symbol and corresponding string, respectively, 
+      ! with 1 = foreground color, 2 = Red, 3 = Green, 4 = Blue, etc.
+      ! The full range of available indicies is defined in Set_Colours in pgstar.support.f.
+      
+      ! Setting Symbols and Text
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``profile_mass_point_symbol`` sets the symbol to be drawn for a given marker.
+      ! A selection of code numbers used to define the mass point symbol can be found in the table below.
+      ! For more information about code numbers, http://www.astro.caltech.edu/~tjp/pgplot/hershey.html
+
+      ! =========   ==============================================================================================
+      ! -1, -2      A single dot (diameter = current line width).
+      ! -3 .. -31   A regular polygon with ABS(SYMBOL) edges (style set by current fill style).
+      ! 0 .. 31     Standard marker symbols
+      ! 32 .. 127   ASCII characters (in current font). e.g. to use letter F as a marker, let SYMBOL = ICHAR('F').
+      ! > 127       A Hershey symbol number
+      ! =========   ==============================================================================================
+
+      !``profile_mass_point_str`` sets the text displayed with the marker. 
+
+      ! Syntax
+      ! ~~~~~~
+
+      ! To set defaults for all entries: 
 
       ! ::
 
@@ -441,7 +460,7 @@
     profile_mass_point_str_clr = 1
     profile_mass_point_str_scale = 1.0
 
-      ! set defaults
+      ! To then set individual qualities of any given ``profile_mass_point_q(N)``:
 
       ! ::
 
