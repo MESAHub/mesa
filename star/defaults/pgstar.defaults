@@ -304,8 +304,7 @@
 
     TRho_Profile_win_flag = .false.
 
-      ! Window Sizing
-      ! -------------
+      ! **Window Sizing**
 
       ! ::
 
@@ -318,8 +317,7 @@
     TRho_Profile_txt_scale = 1.0
     TRho_Profile_title = 'TRho_Profile'
 
-      ! Axis limits
-      ! -----------
+      ! **Axis limits**
 
       ! ::
 
@@ -337,8 +335,7 @@
     TRho_switch_to_Column_Depth = .false.
     TRho_switch_to_mass = .false.
 
-      ! Legend 
-      ! ------
+      ! **Legend**
 
       ! ::
 
@@ -357,8 +354,7 @@
     TRho_Profile_text_info_yfac = 0.6
     TRho_Profile_text_info_dyfac = -0.04
 
-      ! Decorators
-      ! ----------
+      ! **Decorators**
 
       ! If ``show_TRho_accretion_mesh_borders = .true.``, plots the borders of the mesh and newly accreted material in the appropriate xcoord
 
@@ -400,8 +396,7 @@
     TRho_Profile_use_decorator = .false.
 
 
-      ! TRho Profile file output
-      ! ------------------------
+      ! **file output**
 
       ! ::
 
@@ -420,16 +415,14 @@
 
     show_TRho_Profile_mass_locs = .false.
 
-      ! Setting Colors 
-      ! ~~~~~~~~~~~~~~
+      ! **Setting Colors**
 
       ! ``profile_mass_point_color_index`` and ``profile_mass_point_str_clr`` 
       ! set the color of the mass location's symbol and corresponding string, respectively, 
       ! with 1 = foreground color, 2 = Red, 3 = Green, 4 = Blue, etc.
       ! The full range of available indicies is defined in Set_Colours in pgstar.support.f.
       
-      ! Setting Symbols and Text
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! **Setting Symbols and Text**
 
       ! ``profile_mass_point_symbol`` sets the symbol to be drawn for a given marker.
       ! A selection of code numbers used to define the mass point symbol can be found in the table below.
@@ -445,8 +438,7 @@
 
       !``profile_mass_point_str`` sets the text displayed with the marker. 
 
-      ! Syntax
-      ! ~~~~~~
+      ! **Syntax**
 
       ! To set defaults for all entries: 
 
@@ -493,25 +485,47 @@
 ! Abundance window
 ! ================
 
-      ! current model abundance profiles
+      ! Display current model abundance profiles
 
       ! ::
 
     Abundance_win_flag = .false.
 
+      ! **Window sizing**
+
       ! ::
 
     Abundance_win_width = 6
     Abundance_win_aspect_ratio = 0.75
-
-      ! ::
-
     Abundance_xleft = 0.15
     Abundance_xright = 0.85
     Abundance_ybot = 0.15
     Abundance_ytop = 0.85
     Abundance_txt_scale = 1.0
     Abundance_title = 'Abundance'
+
+      ! **Axis Limits and labels**
+
+      ! X-axis limits are set by ``Abundance_xmin`` and ``Abundance_xmax``. 
+      ! Y-axis limits are set by ``Abundance_log_mass_frac_min`` and ``Abundance_log_mass_frac_max``
+
+      ! ::
+
+    Abundance_xmin = -101d0
+    Abundance_xmax = -101d0
+    Abundance_log_mass_frac_min = 101
+    Abundance_log_mass_frac_max = 0.3
+    Abundance_xaxis_reversed = .false.
+    Abundance_xaxis_name = 'mass'
+
+      ! **Legend**
+      
+      ! ::
+
+    Abundance_legend_max_cnt = 16
+    Abundance_legend_txt_scale_factor = 0.8
+
+      ! **Isotope Selecton**
 
       ! ::
 
@@ -528,42 +542,21 @@
     num_abundance_line_labels = 5
     Abundance_line_txt_scale_factor = 0.8
 
-      ! ::
 
-    Abundance_legend_max_cnt = 16
-    Abundance_legend_txt_scale_factor = 0.8
-
-      ! ::
-
-    Abundance_xaxis_name = 'mass'
-    Abundance_xaxis_reversed = .false.
-
-      ! abundance xaxis limits -- to override system default selections
-
-      ! ::
-
-    Abundance_xmin = -101d0
-    Abundance_xmax = -101d0
-
-      ! abundance yaxis limits -- to override system default selections
-
-      ! ::
-
-    Abundance_log_mass_frac_min = 101
-    Abundance_log_mass_frac_max = 0.3
+      ! **Decorators**
 
       ! ::
 
     Abundance_show_photosphere_location = .false.
 
-      ! Enables calling a subroutine to add extra information to a plot
+      ! ''Abundance_use_decorator`` enables calling a subroutine to add extra information to a plot
       ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
 
       ! ::
 
     Abundance_use_decorator = .false.
 
-      ! file output
+      ! **file output**
 
       ! ::
 
@@ -577,7 +570,7 @@
 ! Power window
 ! ============
 
-      ! current model nuclear power profiles
+      ! Display current model nuclear power profiles
 
       ! ::
 
