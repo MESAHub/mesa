@@ -127,6 +127,11 @@ module skye_thermodynamics
       ! Compute base thermodynamic quantities
       call thermodynamics_from_free_energy(F_gas, temp, dens, sgas, egas, pgas)
       call thermodynamics_from_free_energy(F_rad, temp, dens, srad, erad, prad)
+      
+      ! Simplify (overwrite) prad to avoid having rho^2/rho^2 term that auto_diff gives.
+      ! This avoids some subtractions for quantities that should be 0 like chid.
+      prad = crad * pow4(temp) / 3d0
+      
       p = prad + pgas
       e = erad + egas
       s = srad + sgas
