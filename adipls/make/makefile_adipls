@@ -30,16 +30,15 @@ LIB_SRCS = \
     nrk.d.f vinta.d.f lir.d.f rnmean.d.f \
     vintk.new.d.f store.d.f notwin.d.f notwni.f \
     skpcom.f zero.d.f eiginh.d.f intgpt.d.f \
-    spline.d.f length.f strcompr.f lirt.d.f blstio.f \
+    spline.d.f length.f strcompr.f lirt.d.f \
     srdist.c.d.f rseta4.c.d.f
 
 PROG_SRCS = main.c.d.f user_adi.c.d.f
 
-# On Windows, the blstio common block isn't linked in properly
+# The blstio block data doesn't get linked properly on some platforms;
+# so, add it explictly to PROG_SRCS
 
-ifeq ($(BUILD_ON_WINDOWS),YES)
-   PROG_SRC = $(PROG_SRC) blstio.f
-endif
+PROG_SRCS := $(PROG_SRCS) blstio.f
 
 #################################################################
 #
