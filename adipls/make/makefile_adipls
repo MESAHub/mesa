@@ -35,11 +35,6 @@ LIB_SRCS = \
 
 PROG_SRCS = main.c.d.f user_adi.c.d.f
 
-# The blstio block data doesn't get linked properly on some platforms;
-# so, add it explictly to PROG_SRCS
-
-PROG_SRCS := $(PROG_SRCS) blstio.f
-
 #################################################################
 #
 # TARGETS
@@ -93,6 +88,17 @@ else
 	$(COMPILE_CMD) -w -c $<
 endif
 
+# This is a workaround for some linkers that ignore the BLOCK DATA in
+# blstio
+
+ofiles.c.o : ofiles.c.f blstio.f
+ifneq ($(QUIET),)
+	@echo COMPILE_CMD $<
+	@cat $^ | $(COMPILE_CMD) -x f77 -w -o $@ -c -
+else
+	cat $^ | $(COMPILE_CMD) -x f77 -w -o $@ -c -
+endif
+
 ifeq ($(USE_SHARED), YES)
      COMPILE_CMD += -fPIC
 endif
@@ -104,5 +110,4 @@ endif
 SRC_PATH = ../adipack.c/adipls:../adipack.c/gensr:../adipack.c/adiajobs/sr
 
 vpath %.f $(SRC_PATH)
-
 
