@@ -21,7 +21,7 @@ jobs:
           sudo apt-get remove -y '^llvm-.*' # 1052 MB
           # sudo apt-get remove -y 'php.*' # 56.6 MB
           # sudo apt-get remove -y '^mysql-.*' # 209 MB
-          sudo apt-get remove -y azure-cli google-cloud-sdk google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
+          sudo apt-get remove -y azure-cli google-cloud-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
           sudo apt-get autoremove -y # 771 MB
           sudo apt-get clean
 
