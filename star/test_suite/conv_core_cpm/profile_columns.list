@@ -283,7 +283,11 @@
       !other    
 
    ! adds columns for all of the reactions that are in the current net 
+   ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
    !add_raw_rates      ! raw reaction rates,       reactions/second
+   !add_screened_rates ! screened reaction rates reactions/second
+   !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
+   !add_eps_neu_rates  ! Neutrino losses             erg/s
 
    ! individual reactions (as many as desired)
    ! use list_net_reactions = .true. in star_job to list all reactions in the current net    
@@ -498,6 +502,7 @@
    !mlt_log_abs_Y
    !mlt_vc
    !log_mlt_vc
+   !dvc_dt_TDC_div_g 
 
    !superad_reduction_factor
    !conv_vel_div_mlt_vc
@@ -536,7 +541,7 @@
    !tau ! optical depth
    !log_column_depth ! log10 column depth, exterior mass / area (g cm^-2)
    !log_radial_depth ! log10 radial distance to surface (cm)
-   !logtau ! log10(optical depth) at center of zone
+   !logtau ! log10(optical depth) at cell face
    !tau_eff ! tau that gives the local P == P_atm if this location at surface
       ! tau_eff = kap*(P/g - Pextra_factor*(L/M)/(6*pi*clight*cgrav))
    !tau_eff_div_tau

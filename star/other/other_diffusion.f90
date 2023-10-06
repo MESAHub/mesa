@@ -29,10 +29,6 @@
       ! control name: use_other_diffusion = .true.
       ! procedure pointer: s% other_diffusion => my_routine
 
-
-
-      use star_def
-
       implicit none
       
             

@@ -10,12 +10,42 @@ we will also list work arounds, but for some bugs the only option will be to upd
 a newer version of MESA. Note this list is NOT comprehensive, users should check this first if they have an 
 issue but it may not be complete.
 
+r23.05.1
+========
+
+ZAMS Model Central Composition
+------------------------------
+
+When ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``, we fall back
+to loading a ZAMS model based on interpolating from a grid of pre-computed ZAMS models found in
+``data/star_data/zams_models``. The default file included in that directory is meant to start from
+a composition of X = 0.70 and Z = 0.02, but one of the models in the grid (1.26 Msun) has partially
+proceeded through hydrogen burning already so that its central H abundance is X = 0.58. Interpolation
+in this grid of models will impact the central H abundance for initial masses between 1.0 and 1.58 Msun.
+
+This bug affects versions r15140 through r23.05.1, and will be fixed in the next release.
+For current MESA releases impacted by this bug, the following steps provide a workaround with a patched ZAMS file:
+
+- Download this updated ZAMS model file: :download:`zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`
+- Copy the file into ``$MESA_DIR/data/star_data/zams_models``
+- Use the following setting in the ``&controls`` section of your inlists for models where
+  you want to use the patched ZAMS file:
+
+::
+
+   zams_filename = 'zams_z2m2_y28_patched.data'
 
 r22.11.1
 ========
 
 Rates
-=====
+-----
+
+There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
+This causes an excessive amount of C12 to be burnt during core helium burning. 
+We strongly recommend that users update to the latest MESA.
+
+See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
 
 There is a bug in the rate selection code that certain endothermic weak reactions are not added to the nuclear network. These are 
 r_be10_wk-minus_b10, r_ni66_wk-minus_cu66, and r_h3_wk-minus_he3. Other weak reactions with heavier parents may also be affected.
@@ -29,7 +59,7 @@ Both issues have been fixed in the git main branch.
 See `gh-491 <https://github.com/MESAHub/mesa/issues/491>`_ and `gh-497 <https://github.com/MESAHub/mesa/issues/497>`_
 
 RTI
-===
+---
 
 A bug has existed since shortly after r15140 where RTI mixing will be effectively zero in a model even with the ``RTI_flag=.true.``
 
@@ -137,6 +167,12 @@ An experimental RSP solver feature was turned on by default, leading to converge
 r15140
 ======
 
+Free Electron Density on FreeEOS
+--------------------------------
+
+The free electron density (``lnfree_e``) reported by FreeEOS was off by a factor of ``ln(10)`` due to tabulations needing to list the log base 10 value of this quantity rather than natural log. For historical reasons related to OPAL tables, the EOS tables report the log base 10 value, which is later converted to natural log before being reported as ``lnfree_e`` in MESA.
+
+See `gh-189 <https://github.com/MESAHub/mesa/issues/189>`_
 
 r12778
 ======

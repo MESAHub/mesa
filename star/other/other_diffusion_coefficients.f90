@@ -29,9 +29,6 @@
       ! control name: use_other_diffusion_coefficients = .true.
       ! procedure pointer: s% other_diffusion_coefficients => my_routine
 
-
-      use star_def
-
       implicit none
       
             
@@ -62,6 +59,7 @@
       subroutine null_other_diffusion_coefficients( &
             id, k, nc, m, rho, T, A, X, Z, C, charge, na, &
             Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
+         use star_def
          use const_def, only: dp
          integer, intent(in) :: id, k, nc, m  
          real(dp), intent(in) :: rho, T, charge(m), na(m)

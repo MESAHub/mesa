@@ -29,8 +29,6 @@
       ! control name: use_other_gradr_factor = .true.
       ! procedure pointer: s% other_gradr_factor => my_routine
       
-      use star_def
-
       implicit none
       
             
@@ -38,6 +36,7 @@
       
       
       subroutine null_other_gradr_factor(id, ierr)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

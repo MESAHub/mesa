@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_mlt_results => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -45,6 +43,7 @@
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
          use const_def, only: dp
          use auto_diff
+         use star_def
          integer, intent(in) :: id
          integer, intent(in) :: k
          character (len=*), intent(in) :: MLT_option

@@ -24,8 +24,6 @@
 ! ***********************************************************************
  
    module mod_other_binary_extras
-      use binary_def
-      use const_def
       
    
       implicit none
@@ -36,6 +34,9 @@
       contains
       
       integer function null_extras_binary_startup(binary_id,restart,ierr)
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : keep_going
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -50,6 +51,9 @@
       end function  null_extras_binary_startup
       
       integer function null_extras_binary_start_step(binary_id,ierr)
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : keep_going
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -64,6 +68,9 @@
       
       !Return either keep_going, retry or terminate
       integer function null_extras_binary_check_model(binary_id)
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : keep_going
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
@@ -79,6 +86,9 @@
       ! returns either keep_going or terminate.
       ! note: cannot request retry; extras_binary_check_model can do that.
       integer function null_extras_binary_finish_step(binary_id)
+         use binary_def, only : binary_info, binary_ptr
+         use star_def, only : keep_going
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer :: ierr
@@ -93,6 +103,8 @@
       
       
       subroutine null_extras_binary_after_evolve(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
@@ -104,6 +116,8 @@
       end subroutine null_extras_binary_after_evolve
       
       integer function null_how_many_extra_binary_history_columns(binary_id)
+         use binary_def, only : binary_info, binary_ptr
+         use const_def
          integer, intent(in) :: binary_id
          type (binary_info), pointer :: b
          integer :: ierr
@@ -117,10 +131,12 @@
          
       end function null_how_many_extra_binary_history_columns
       
-      subroutine null_data_for_extra_binary_history_columns(binary_id, n, names, vals, ierr)
+      subroutine null_data_for_extra_binary_history_columns(binary_id, n, extra_names, vals, ierr)
+         use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
+         use const_def
          integer, intent(in) :: binary_id
          integer, intent(in) :: n
-         character (len=maxlen_binary_history_column_name) :: names(n)
+         character (len=maxlen_binary_history_column_name) :: extra_names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
@@ -135,16 +151,18 @@
       
       
       integer function null_how_many_extra_binary_history_header_items(binary_id)
-         use binary_def, only: binary_info
+         use const_def
          integer, intent(in) :: binary_id
          null_how_many_extra_binary_history_header_items = 0
       end function null_how_many_extra_binary_history_header_items
 
       subroutine null_data_for_extra_binary_history_header_items( &
-           binary_id, n, names, vals, ierr)
+           binary_id, n, extra_names, vals, ierr)
+         use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
+         use const_def
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id, n
-         character (len=maxlen_binary_history_column_name) :: names(n)
+         character (len=maxlen_binary_history_column_name) :: extra_names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
          ierr = 0
