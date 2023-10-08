@@ -26,7 +26,7 @@ LIB_SRCS = \
     delta1.d.f delta2.d.f delta3.d.f \
     sph.d.f uhx.d.f \
     aramax.d.f derive.d.f derivk.new.d.f leq.d.f \
-    lininh.new.d.f lininh4.d.f ofiles.c.f \
+    lininh.new.d.f lininh4.d.f \
     nrk.d.f vinta.d.f lir.d.f rnmean.d.f \
     vintk.new.d.f store.d.f notwin.d.f notwni.f \
     skpcom.f zero.d.f eiginh.d.f intgpt.d.f \
@@ -42,7 +42,7 @@ PROG_SRCS = main.c.d.f user_adi.c.d.f
 LIB = libadipls.$(LIB_SUFFIX_STATIC)
 PROG = ../adipack.c/adipls/adipls.c.d.x
 
-LIB_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(LIB_SRCS)))
+LIB_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(LIB_SRCS))) ofiles_blstio.o
 PROG_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(PROG_SRCS)))
 
 all : $(LIB) $(PROG)
@@ -65,7 +65,7 @@ else
 endif	
 
 clean:
-	-@rm -f *.o $(LIB) $(PROG)
+	-@rm -f *.o ofiles_blstio.f $(LIB) $(PROG)
 
 install:
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
@@ -91,12 +91,12 @@ endif
 # This is a workaround for some linkers that ignore the BLOCK DATA in
 # blstio
 
-ofiles.c.o : ofiles.c.f blstio.f
+ofiles_blstio.f : ofiles.c.f blstio.f
 ifneq ($(QUIET),)
-	@echo COMPILE_CMD $<
-	@cat $^ | $(COMPILE_CMD) -x f77 -w -o $@ -c -
+	@echo COMBINE $^
+	@cat $^ > $@
 else
-	cat $^ | $(COMPILE_CMD) -x f77 -w -o $@ -c -
+	cat $^ > $@
 endif
 
 ifeq ($(USE_SHARED), YES)
