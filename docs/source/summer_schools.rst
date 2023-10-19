@@ -11,10 +11,18 @@ The MESA Summer Schools have traditionally been held in Santa Barbara, Californi
 How to run a MESA Summer School
 =================
 
+Preparing a good program takes about a year. Historically, the program has taken place in the middle of August. Assuming this timing, preparations for next year's program should begin in September.
 
 
-1 year + out
+1 year + out (September/October)
 --------------------
 
 - Book a venue
 - Choose your organizational team
+
+
+9 months out (November)
+--------------------
+
+- Contact lecturers. Try to invite people with a diverse set of research areas and consider focusing on topics that have not been covered in past programs (see previous summer school pages and agendas for this information)
+- Contact TAs. 
