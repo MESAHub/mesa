@@ -35,8 +35,8 @@ module star_pgstar
 
    abstract interface
       
-      subroutine pgstar_plot_interface(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
+      subroutine pgstar_plot_interface(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
       end subroutine pgstar_plot_interface
 
@@ -58,7 +58,7 @@ module star_pgstar
    end interface
 
    type pgstar_win_file_data
-      integer :: id
+      integer :: id, array_ix
       character (len=64) :: name
       logical :: win_flag, file_flag, do_win, do_file
       integer :: id_win, id_file, file_interval
@@ -93,6 +93,8 @@ module star_pgstar
    integer, parameter :: max_num_Summary_History_Lines = 16
    integer, parameter :: max_num_Other_plots = 16
 
+   integer, parameter :: pgstar_array_length = 9
+
    integer, parameter :: i_TRho_Profile = 1
    integer, parameter :: i_logg_logT = i_TRho_Profile + 1
    integer, parameter :: i_logg_Teff = i_logg_logT + 1
@@ -121,66 +123,13 @@ module star_pgstar
    integer, parameter :: i_Summary_Burn = i_Summary_History + 1
    integer, parameter :: i_Summary_Profile = i_Summary_Burn + 1
 
-   integer, parameter :: i_Text_Summary1 = i_Summary_Profile + 1
-   integer, parameter :: i_Text_Summary2 = i_Text_Summary1 + 1
-   integer, parameter :: i_Text_Summary3 = i_Text_Summary2 + 1
-   integer, parameter :: i_Text_Summary4 = i_Text_Summary3 + 1
-   integer, parameter :: i_Text_Summary5 = i_Text_Summary4 + 1
-   integer, parameter :: i_Text_Summary6 = i_Text_Summary5 + 1
-   integer, parameter :: i_Text_Summary7 = i_Text_Summary6 + 1
-   integer, parameter :: i_Text_Summary8 = i_Text_Summary7 + 1
-   integer, parameter :: i_Text_Summary9 = i_Text_Summary8 + 1
-
-   integer, parameter :: i_Profile_Panels1 = i_Text_Summary9 + 1
-   integer, parameter :: i_Profile_Panels2 = i_Profile_Panels1 + 1
-   integer, parameter :: i_Profile_Panels3 = i_Profile_Panels2 + 1
-   integer, parameter :: i_Profile_Panels4 = i_Profile_Panels3 + 1
-   integer, parameter :: i_Profile_Panels5 = i_Profile_Panels4 + 1
-   integer, parameter :: i_Profile_Panels6 = i_Profile_Panels5 + 1
-   integer, parameter :: i_Profile_Panels7 = i_Profile_Panels6 + 1
-   integer, parameter :: i_Profile_Panels8 = i_Profile_Panels7 + 1
-   integer, parameter :: i_Profile_Panels9 = i_Profile_Panels8 + 1
-
-   integer, parameter :: i_Hist_Track1 = i_Profile_Panels9 + 1
-   integer, parameter :: i_Hist_Track2 = i_Hist_Track1 + 1
-   integer, parameter :: i_Hist_Track3 = i_Hist_Track2 + 1
-   integer, parameter :: i_Hist_Track4 = i_Hist_Track3 + 1
-   integer, parameter :: i_Hist_Track5 = i_Hist_Track4 + 1
-   integer, parameter :: i_Hist_Track6 = i_Hist_Track5 + 1
-   integer, parameter :: i_Hist_Track7 = i_Hist_Track6 + 1
-   integer, parameter :: i_Hist_Track8 = i_Hist_Track7 + 1
-   integer, parameter :: i_Hist_Track9 = i_Hist_Track8 + 1
-
-   integer, parameter :: i_Hist_Panels1 = i_Hist_Track9 + 1
-   integer, parameter :: i_Hist_Panels2 = i_Hist_Panels1 + 1
-   integer, parameter :: i_Hist_Panels3 = i_Hist_Panels2 + 1
-   integer, parameter :: i_Hist_Panels4 = i_Hist_Panels3 + 1
-   integer, parameter :: i_Hist_Panels5 = i_Hist_Panels4 + 1
-   integer, parameter :: i_Hist_Panels6 = i_Hist_Panels5 + 1
-   integer, parameter :: i_Hist_Panels7 = i_Hist_Panels6 + 1
-   integer, parameter :: i_Hist_Panels8 = i_Hist_Panels7 + 1
-   integer, parameter :: i_Hist_Panels9 = i_Hist_Panels8 + 1
-
-   integer, parameter :: i_Col_Mag1 = i_Hist_Panels9 + 1
-   integer, parameter :: i_Col_Mag2 = i_Col_Mag1 + 1
-   integer, parameter :: i_Col_Mag3 = i_Col_Mag2 + 1
-   integer, parameter :: i_Col_Mag4 = i_Col_Mag3 + 1
-   integer, parameter :: i_Col_Mag5 = i_Col_Mag4 + 1
-   integer, parameter :: i_Col_Mag6 = i_Col_Mag5 + 1
-   integer, parameter :: i_Col_Mag7 = i_Col_Mag6 + 1
-   integer, parameter :: i_Col_Mag8 = i_Col_Mag7 + 1
-   integer, parameter :: i_Col_Mag9 = i_Col_Mag8 + 1
-
-   integer, parameter :: i_Grid1 = i_Col_Mag9 + 1
-   integer, parameter :: i_Grid2 = i_Grid1 + 1
-   integer, parameter :: i_Grid3 = i_Grid2 + 1
-   integer, parameter :: i_Grid4 = i_Grid3 + 1
-   integer, parameter :: i_Grid5 = i_Grid4 + 1
-   integer, parameter :: i_Grid6 = i_Grid5 + 1
-   integer, parameter :: i_Grid7 = i_Grid6 + 1
-   integer, parameter :: i_Grid8 = i_Grid7 + 1
-   integer, parameter :: i_Grid9 = i_Grid8 + 1
-   integer, parameter :: i_Other = i_Grid9 + 1
+   integer, parameter :: i_Text_Summary = i_Summary_Profile + 1
+   integer, parameter :: i_Profile_Panels = i_Text_Summary + pgstar_array_length
+   integer, parameter :: i_Hist_Track = i_Profile_Panels + pgstar_array_length
+   integer, parameter :: i_Hist_Panels = i_Hist_Track + pgstar_array_length
+   integer, parameter :: i_Col_Mag = i_Hist_Panels + pgstar_array_length
+   integer, parameter :: i_Grid = i_Col_Mag + pgstar_array_length
+   integer, parameter :: i_Other = i_Grid + pgstar_array_length
 
    integer, parameter :: num_pgstar_plots = i_Other + max_num_Other_plots
 
@@ -188,6 +137,7 @@ module star_pgstar
    integer, parameter :: max_num_rows_Text_Summary = 20
    integer, parameter :: max_num_cols_Text_Summary = 20
    integer, parameter :: max_num_profile_mass_points = 10
+
 
 
    ! some Tioga colors for pgstar
