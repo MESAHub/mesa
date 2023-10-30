@@ -36,6 +36,8 @@
    terminal_interval = 10
    write_header_frequency = 10
 
+   use_gold2_tolerances = .true.
+
 / ! end of controls namelist
 
 

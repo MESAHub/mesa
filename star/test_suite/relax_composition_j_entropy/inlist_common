@@ -12,6 +12,7 @@
 
   ! limit max_model_number as part of test_suite
     max_model_number = 1000
+    use_gold2_tolerances = .true.
 
     use_ledoux_criterion = .true.
     mixing_length_alpha = 1.5
@@ -52,7 +53,7 @@
   ! stop when the center mass fraction of h1 drops below this limit
     xa_central_lower_limit_species(1) = 'he4'
     xa_central_lower_limit(1) = 1d-3
-MLT_option='Cox'
+    MLT_option='Cox'
 / ! end of controls namelist
 
 

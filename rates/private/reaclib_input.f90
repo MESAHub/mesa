@@ -248,7 +248,7 @@
          integer :: i,j,l,count,loc_count,nt,indx,cat, &
             weaklib_count,chapter,num_in,num_out,num_skip_for_weaklib,num_from_reaclib, &
             max_lhs_Z, min_Z, i1, i2, cid_in, cid_out
-         logical :: include_this_rate, already_included_from_weaklib, found_it
+         logical :: include_this_rate, already_included_from_weaklib, found_it, is_weak
          integer, dimension(max_species_per_reaction) :: pspecies
          character(len=max_id_length) :: handle
          character(len=iso_name_length) :: name_i, name_j, name1, name2, label
@@ -329,12 +329,16 @@
 
             end do loop_over_nuclides
 
+            is_weak = (use_weaklib .and. num_in == 1 .and. num_out == 1) 
+
             ! only include forward rates
             ! Define the reverse rate as being the endothermic reaction, always
             ! Some photo disintegrations can be exothermic, so dont trust what REACLIB calls a reverse rate
-            if(include_this_rate) then
+            if(include_this_rate .and. .not. is_weak) then
                if(sum(nuclides% binding_energy(pspecies(1:num_in))) - &
-                  sum(nuclides% binding_energy(pspecies(num_in+1:Nt)))  > 0 ) cycle loop_over_rates
+                  sum(nuclides% binding_energy(pspecies(num_in+1:Nt)))  > 0 ) then
+                     cycle loop_over_rates
+                  end if
             end if
             if (include_this_rate) then
                if (use_weaklib .and. num_in == 1 .and. num_out == 1) then

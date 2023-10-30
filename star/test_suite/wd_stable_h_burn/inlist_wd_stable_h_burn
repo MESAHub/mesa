@@ -68,6 +68,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
+      use_gold2_tolerances = .true.
 
       use_Ledoux_criterion = .false.
       
@@ -96,7 +97,7 @@
 		xa_function_weight(2) = 20
 		xa_function_param(2) = 1d-2
 
-      !dH_div_H_limit = 0.8d0   ! 10.7 101 3 2137
+      ! dX_div_X_limit(1) = 0.8d0   ! 10.7 101 3 2137
 
       delta_lgL_H_limit = 0.1 ! limit for magnitude of change in lgL_H
       delta_lgL_H_hard_limit = 0.5

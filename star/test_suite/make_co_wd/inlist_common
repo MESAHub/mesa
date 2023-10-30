@@ -14,7 +14,7 @@
       num_special_rate_factors = 2
       reaction_for_special_factor(1) = 'r_c12_ag_o16'
       special_rate_factor(1) = 1
-      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+      filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
       reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
       special_rate_factor(2) = 1
@@ -89,6 +89,7 @@
 
 ! timesteps
       max_years_for_timestep = 1d9
+      use_gold2_tolerances = .true.
       
       varcontrol_target = 1d-3
       dX_nuc_drop_limit = 3d-2

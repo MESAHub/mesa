@@ -27,14 +27,11 @@
 
       ! NOTE: remember to set X_use_decorator = .true. to enable this, 
       ! where X is the name of the pgstar plot
-      ! and set s% X_pgstar_decorator => your_function in your
+      ! and set s% pg% X_pgstar_decorator => your_function in your
       ! run_star_extras.f
       
       ! List of pgplot routines: http://www.astro.caltech.edu/~tjp/pgplot/annlist.html
  
-      use star_def
-      use const_def
-
       implicit none
 
                   
@@ -45,6 +42,8 @@
       ! xmin, xmax, ymin, ymax: current plot boundary
       ! plot_num: If a plot has multiple sub-panels, then this tells you which panel is being called
       subroutine null_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+         use star_def
+         use const_def
          integer, intent(in) :: id
          !Not doubles
          real,intent(in) :: xmin, xmax, ymin, ymax 
@@ -55,6 +54,8 @@
 
 ! Example function to add squares and some text to the abundance plot
 !      subroutine Abundance_pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+!         use star_def
+!         use const_def
 !         integer, intent(in) :: id
 !         !Not dp
 !         real,intent(in) :: xmin, xmax, ymin, ymax 

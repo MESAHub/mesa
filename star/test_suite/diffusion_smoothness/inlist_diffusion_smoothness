@@ -43,6 +43,7 @@
 
       energy_eqn_option = 'dedt'
       calculate_Brunt_N2 = .true.
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -64,6 +65,8 @@
       limit_for_rel_error_in_energy_conservation = 1d-6 ! this makes d2N2 too large.  takes 63 steps. log_rel_run_E_err  -3.5859393528096946
       limit_for_rel_error_in_energy_conservation = 1d-5 ! this is smooth enough.  takes 58 steps. log_rel_run_E_err  -3.4820705862368895
       hard_limit_for_rel_error_in_energy_conservation = 1d-4
+
+      convective_bdy_weight = 1
       
       cool_wind_RGB_scheme = 'Reimers'
       cool_wind_AGB_scheme = 'Blocker'

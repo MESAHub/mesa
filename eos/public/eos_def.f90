@@ -26,7 +26,7 @@
 
       module eos_def
       
-      use const_def, only: dp, use_mesa_temp_cache
+      use const_def, only: dp, use_mesa_temp_cache, strlen
       use chem_def, only: max_el_z
       
       implicit none
@@ -332,6 +332,13 @@
          ! bookkeeping
          integer :: handle
          logical :: in_use
+
+
+         ! User supplied inputs
+         real(dp) :: eos_ctrl(10)
+         integer :: eos_integer_ctrl(10)
+         logical :: eos_logical_ctrl(10)
+         character(len=strlen) :: eos_character_ctrl(10)
 
       end type EoS_General_Info
 

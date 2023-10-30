@@ -96,6 +96,8 @@
       report_solver_progress = .false. ! set true to see info about solver iterations
       report_ierr = .false. ! if true, produce terminal output when have some internal error
 
+      use_gold2_tolerances = .true.
+
       !trace_evolve = .true.
 
       photo_interval = 50

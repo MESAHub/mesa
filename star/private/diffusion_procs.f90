@@ -147,8 +147,6 @@
             return
          end if
 
-         if (dbg) call mesa_error(__FILE__,__LINE__,'fixup')
-
       end subroutine fixup
 
 
@@ -361,6 +359,11 @@
                ierr = -1
                return
             end if
+
+            ! don't try to apply rescaling corrections to anything that
+            ! ended up completely set to zero by fix_negative_masses
+            if (frac <= 0d0) cycle
+
             do k=nzlo,nzhi
                mass(j,k) = mass(j,k)/frac
             end do

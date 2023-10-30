@@ -38,6 +38,7 @@
       warn_when_large_virial_thm_rel_err = 5d-2
 
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

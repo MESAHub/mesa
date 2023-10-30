@@ -23,6 +23,7 @@
       ! you can/should delete this for use outside of test_suite
          retry_limit = 100
          max_number_retries = 80
+         use_gold2_tolerances = .true.
 
       extra_terminal_output_file = 'log2' 
       log_directory = 'LOGS2'

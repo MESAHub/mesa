@@ -581,7 +581,7 @@ You can do so with the commands:
 
 If the error persists, please email mesa-users@lists.mesastar.org.
 Follow `the instructions for posting a question to
-mesa-users <prereqs.html#post-a-question-to-mesa-users>`__ and also
+mesa-users <installation.html#post-a-question-to-mesa-users>`__ and also
 attach the file ``$MESA_DIR/crlibm/crlibm/config.log``.
 
 Why do I get the error "Cannot utime: Function not implemented"?

@@ -57,6 +57,7 @@
    initial_Z = 0.008d0
    
    energy_eqn_option = 'dedt'
+   use_gold2_tolerances = .true.
 
    mixing_length_alpha = 1.8d0
    MLT_option = 'TDC'

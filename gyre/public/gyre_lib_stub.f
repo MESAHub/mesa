@@ -20,6 +20,7 @@ module gyre_lib ! stub
 
   type :: wave_t
     type(grid_t), allocatable :: gr
+    integer :: n
   contains
     procedure, public :: freq
     procedure, public :: grid
@@ -32,7 +33,6 @@ module gyre_lib ! stub
     integer :: n_pg
     integer :: n_p
     integer :: n_g
-    integer :: n_k
   end type mode_t
 
   interface gyre_set_constant

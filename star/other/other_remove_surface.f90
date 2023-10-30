@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_remove_surface => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -39,6 +37,7 @@
       
       
       subroutine default_other_remove_surface(id, ierr, k)
+         use star_def
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          integer, intent(out) :: k

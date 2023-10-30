@@ -42,7 +42,7 @@
     use_simple_es_for_kap = .true.
 
   ! when to stop
-    log_center_density_limit = -1.5
+    log_center_density_upper_limit = -1.5
 
   ! turn off nuclear reactions
     eps_nuc_factor = 0

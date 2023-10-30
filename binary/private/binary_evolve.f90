@@ -188,6 +188,7 @@
             b% CE_lambda2 = 0d0
             b% CE_Ebind1 = 0d0
             b% CE_Ebind2 = 0d0
+            b% mtransfer_rate = 0
 
             b% num_tries = 0
 
@@ -337,6 +338,11 @@
             b% eccentricity = b% eccentricity + get_edot(b) *b% time_step*secyer
             if (b% eccentricity < b% min_eccentricity) b% eccentricity = b% min_eccentricity
             if (b% eccentricity > b% max_eccentricity) b% eccentricity = b% max_eccentricity
+         else
+            b% edot_tidal = 0d0
+            b% edot_enhance = 0d0
+            b% extra_edot = 0d0
+            b% edot = 0d0
          end if
          
          !use new eccentricity to calculate new time coordinate
@@ -504,17 +510,19 @@
 
          binary_finish_step = keep_going
          ! update change factor in case mtransfer_rate has changed
-         if(b% mtransfer_rate_old /= b% mtransfer_rate .and. &
-             b% mtransfer_rate /= 0 .and. b% mtransfer_rate_old /= 0) then
-            if(b% mtransfer_rate < b% mtransfer_rate_old) then
-               b% change_factor = b% change_factor*(1d0-b% implicit_lambda) + b% implicit_lambda* &
-                  (1+b% change_factor_fraction*(b% mtransfer_rate/b% mtransfer_rate_old-1))
-            else
-               b% change_factor = b% change_factor*(1d0-b% implicit_lambda) + b% implicit_lambda* &
-                   (1+b% change_factor_fraction*(b% mtransfer_rate_old/b% mtransfer_rate-1))
+         if(.not. b% doing_first_model_of_run) then
+            if(b% mtransfer_rate_old /= b% mtransfer_rate .and. &
+               b% mtransfer_rate /= 0 .and. b% mtransfer_rate_old /= 0) then
+               if(b% mtransfer_rate < b% mtransfer_rate_old) then
+                  b% change_factor = b% change_factor*(1d0-b% implicit_lambda) + b% implicit_lambda* &
+                     (1+b% change_factor_fraction*(b% mtransfer_rate/b% mtransfer_rate_old-1))
+               else
+                  b% change_factor = b% change_factor*(1d0-b% implicit_lambda) + b% implicit_lambda* &
+                     (1+b% change_factor_fraction*(b% mtransfer_rate_old/b% mtransfer_rate-1))
+               end if
+               if(b% change_factor > b% max_change_factor) b% change_factor = b% max_change_factor
+               if(b% change_factor < b% min_change_factor) b% change_factor = b% min_change_factor
             end if
-            if(b% change_factor > b% max_change_factor) b% change_factor = b% max_change_factor
-            if(b% change_factor < b% min_change_factor) b% change_factor = b% min_change_factor
          end if
 
          ! store all variables into "old"

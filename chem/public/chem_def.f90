@@ -117,7 +117,7 @@
             'californium','einsteinium','fermium','mendelevium', &
             'nobelium','lawrencium','rutherfordium','dubnium', &
             'seaborgium','bohrium','hassium','meitnerium','darmstadtium', &
-            'roentgenium','copernicum' ]
+            'roentgenium','copernicium' ]
 
       ! aluminum isomers
       character(len=iso_name_length), dimension(2:3) :: &
@@ -297,6 +297,7 @@
       
       
       ! identifiers for different Z fractions.
+      integer, parameter :: Custom_zfracs = 0
       integer, parameter :: AG89_zfracs = 1
       integer, parameter :: GN93_zfracs = 2
       integer, parameter :: GS98_zfracs = 3

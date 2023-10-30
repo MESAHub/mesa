@@ -74,6 +74,7 @@ use_Skye = .false.
    RSP_kick_vsurf_km_per_sec = 0.5d0
    
 ! solver
+   use_gold2_tolerances = .true.
 
 ! output controls
    

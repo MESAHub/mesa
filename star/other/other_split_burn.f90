@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_split_burn => my_routine
       ! This also require op_split_burn = .true. as well as setting the other op_split_burn options
 
-      use star_def
-
       implicit none
       
             
@@ -49,6 +47,7 @@
          ! results
          ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
          nfcn, njac, nstep, naccpt, nrejct, ierr)
+         use star_def
          use net_def
          use chem_def, only: num_categories
          

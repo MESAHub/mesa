@@ -28,6 +28,7 @@
       
       ! limit max_model_number as part of test_suite
       max_model_number = 10000
+      use_gold2_tolerances = .true.
       
       max_age = 1d3
 

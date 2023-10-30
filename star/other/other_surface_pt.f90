@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_surface_PT => my_routine
 
 
-      use star_def
-
       implicit none
       
       contains
@@ -44,6 +42,7 @@
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, ierr)
          use const_def, only: dp
+         use star_def
          !use star_lib, only: star_get_surf_PT
          integer, intent(in) :: id
          logical, intent(in) :: skip_partials

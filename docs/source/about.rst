@@ -104,16 +104,17 @@ The missions of the MESA Team are:
 Developers
 ----------
 
-* `Warrick Ball <https://warrickball.github.io/>`__
+* `Warrick Ball <https://warrickball.gitlab.io/>`__
 * `Evan Bauer <https://evbauer.github.io/>`__
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
-* Aaron Dotter
-* `Robert Farmer <http://rjfarmer.io/>`__
+* Matthias Fabry
+* Ebraheem Farag
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
+* `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
 * `Frank Timmes <http://cococubed.asu.edu/>`__
@@ -124,10 +125,20 @@ Past Developers
 ---------------
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
+* `Aaron Dotter <https://aarondotter.github.io/>`__
+* `Robert Farmer <http://rjfarmer.io/>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
-* `Josiah Schwab <https://yoshiyahu.org/>`__ (2013-2021)
+* `Josiah Schwab <https://yoshiyahu.org/>`__
 
+Other Code Contributors
+-----------------------
+
+* Kent Budge
+* Lorne Nelson
+* Joris Vos
+* Jonathan Tomshine
+* Michael Zhang
 
 Acknowledgments
 ===============

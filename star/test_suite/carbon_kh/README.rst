@@ -24,6 +24,19 @@ non-degenerate conditions to conditions of relativistic electron
 degeneracy and the dominant energy loss mechanism transitions from
 radiative diffusion to optically-thin neutrino cooling.
 
+This case is discussed extensively in section 5.2 of
+`MESA Instrument Paper VI <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`__.
+You can run the full resolution study described in that section by
+using the ``rnall`` bash script, which links to different energy equation
+and resolution options to run through the model 12 times. This will produce
+the output necessary for reproducing plots like the ones below and seen in
+figures 9 and 10 of the instrument paper.
+
+By default, the test suite ``rn`` script runs just one of these instances:
+the high resolution run using the ``eps_grav`` energy equation option,
+which should run in a few minutes, appears reasonably converged based on the plots
+below, and exhibits a small cumulative energy error.
+
 The included Jupyter notebook (``docs/carbon_kh.ipynb``) provides
 information about reproducing the following convergence study.
 
@@ -34,5 +47,5 @@ information about reproducing the following convergence study.
 .. image:: ../../../star/test_suite/carbon_kh/docs/carbon_kh_total_energy_history_with_rel_cum_E_err.png
 
 
-Last-Updated: 2021-08-26 (mesa e9d467610) by Josiah Schwab
+Last-Updated: 2023-04-03 (mesa 81ad921) by Evan Bauer
 

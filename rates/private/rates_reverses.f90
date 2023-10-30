@@ -168,6 +168,9 @@
          reverse_reaction_id(irfe52neut_to_fe54) = irfe54g_to_fe52
          reverse_reaction_id(irfe54g_to_fe52) = irfe52neut_to_fe54
 
+         reverse_reaction_id(ir_li7_pa_he4) = ir_he4_ap_li7
+         reverse_reaction_id(ir_he4_ap_li7) = ir_li7_pa_he4
+
       end subroutine set_reaction_reverses
 
          

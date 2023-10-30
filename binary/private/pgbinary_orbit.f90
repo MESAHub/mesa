@@ -47,7 +47,7 @@ contains
       call do_Orbit_plot(b, id, device_id, &
          b% pg% Orbit_xleft, b% pg% Orbit_xright, &
          b% pg% Orbit_ybot, b% pg% Orbit_ytop, .false., &
-         b% pg% Orbit_title, b% pg% Orbit_txt_scale, ierr)
+         b% pg% Orbit_title, b% pg% Orbit_txt_scale_factor, ierr)
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Orbit_plot

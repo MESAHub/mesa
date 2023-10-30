@@ -1,0 +1,46 @@
+! this is the master inlist that MESA reads when it starts.
+
+! This file tells MESA to go look elsewhere for its configuration
+! info. This makes changing between different inlists easier, by
+! allowing you to easily change the name of the file that gets read.
+
+&star_job
+
+   ! begin with a pre-main sequence model
+   create_pre_main_sequence_model = .true.
+   pre_ms_relax_num_steps = 50
+
+   ! save a model at the end of the run
+   save_model_when_terminate = .true.
+   save_model_filename = 'pre_tzo.mod'
+
+   change_initial_net=.true.
+   new_net_name='approx21.net' 
+
+/ ! end of star_job namelist
+
+&eos
+
+/
+
+&kap
+
+/
+
+
+&controls
+
+   xa_central_lower_limit_species(1) = 'h1'
+   xa_central_lower_limit(1) = 0.5d0
+
+   x_integer_ctrl(1) = 1 ! Inlist number
+
+   use_other_cgrav=.false.
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+
+/ ! end of pgstar namelist

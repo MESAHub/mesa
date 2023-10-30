@@ -47,6 +47,7 @@
       energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
       include_composition_in_eps_grav = .true.
+      use_gold2_tolerances = .true.
 
       warn_when_large_rel_run_E_err = 1d99
       max_abs_rel_run_E_err = 1d99

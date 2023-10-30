@@ -66,6 +66,7 @@
     
       use_ledoux_criterion = .true.
       make_gradr_sticky_in_solver_iters = .false.
+      use_gold2_tolerances = .true.
 
       ! We need to only use 'top' overshooting because 'bottom'
       ! overshooting generates unphysical dilution of C12 below

@@ -117,6 +117,7 @@
 &pgstar
          
 !pause = .true.
+Grid2_win_flag = .true.
 
 Profile_Panels1_xmin = -101 ! 1.9
 Profile_Panels2_xmin = -101 ! 1.9

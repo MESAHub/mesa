@@ -128,6 +128,9 @@
          procedure (other_surface_PT_interface), pointer, nopass :: &
             other_surface_PT => null()
 
+         procedure (other_close_gaps_interface), pointer, nopass :: &
+            other_close_gaps => null()
+
          procedure (other_kap_get_interface), pointer, nopass :: &
             other_kap_get => null()
          procedure (other_kap_get_op_mono_interface), pointer, nopass :: &

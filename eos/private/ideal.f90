@@ -169,7 +169,11 @@ module ideal
 
       ! Ideal ion free energy, only depends on abar
       F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
-      F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
+
+      ! The compute_ion_offset correction should only be applied to ionized matter.
+      ! Right now, ideal always assumes neutral, so leave this off unless/until we consider
+      ! adding assumption of full ionizatino for high T regions on ideal gas.
+      !F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
 
       ! Radiation free energy, independent of composition
       F_rad = compute_F_rad(temp, den)

@@ -13,6 +13,7 @@
 
       ! simulate common envelope event removing H envelope
       relax_initial_mass_to_remove_H_env = .true.
+      extra_mass_retained_by_remove_H_env = 5d-3 ! (Msun)
       lg_max_abs_mdot = -1
 
       change_initial_net = .true.      
@@ -55,6 +56,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4200
+      use_gold2_tolerances = .true.
       
       xa_central_upper_limit_species(1) = 'c12'
       xa_central_upper_limit(1) = 0.05d0

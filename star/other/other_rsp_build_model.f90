@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_rsp_build_model => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -50,6 +48,7 @@
          ! don't need to set xh or xa
 
       subroutine null_other_rsp_build_model(id, ierr)
+         use star_def
          integer, intent(in) :: id ! star id if available; 0 otherwise
          integer, intent(out) :: ierr ! 0 means AOK.         
          write(*,*) 'no implementation for other_rsp_build_model'

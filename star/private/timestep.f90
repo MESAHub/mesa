@@ -159,22 +159,7 @@
                s, skip_hard_limit, dt, dt_limit_ratio(Tlim_num_diff_solver_iters))
             if (return_now(Tlim_num_diff_solver_iters)) return
 
-            do_timestep_limits = check_dX(s, 0, skip_hard_limit, dt, &
-               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
-               dt_limit_ratio(Tlim_dH), dt_limit_ratio(Tlim_dH_div_H))
-            if (return_now(Tlim_dH_div_H)) return
-
-            do_timestep_limits = check_dX(s, 1, skip_hard_limit, dt, &
-               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
-               dt_limit_ratio(Tlim_dHe), dt_limit_ratio(Tlim_dHe_div_He))
-            if (return_now(Tlim_dHe_div_He)) return
-
-            do_timestep_limits = check_dX(s, 2, skip_hard_limit, dt, &
-               num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
-               dt_limit_ratio(Tlim_dHe3), dt_limit_ratio(Tlim_dHe3_div_He3))
-            if (return_now(Tlim_dHe3_div_He3)) return
-
-            do_timestep_limits = check_dX(s, -1, skip_hard_limit, dt, &
+            do_timestep_limits = check_dX(s, skip_hard_limit, dt, &
                num_mix_boundaries, mix_bdy_loc, mix_bdy_q, &
                dt_limit_ratio(Tlim_dX), dt_limit_ratio(Tlim_dX_div_X))
             if (return_now(Tlim_dX_div_X)) return
@@ -495,226 +480,203 @@
       end function check_diffusion_iters_limit
 
 
-      integer function check_dX(s, which, skip_hard_limit, dt, &
+      integer function check_dX(s, skip_hard_limit, dt, &
             n_mix_bdy, mix_bdy_loc, mix_bdy_q, &
             dX_dt_limit_ratio, dX_div_X_dt_limit_ratio)
          use num_lib, only: binary_search
-         type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
-         integer, intent(in) :: which, n_mix_bdy, mix_bdy_loc(:)
+         integer, intent(in) :: n_mix_bdy, mix_bdy_loc(:)
          real(dp), intent(in) :: dt
          real(dp), intent(in), pointer :: mix_bdy_q(:)
          real(dp), intent(inout) :: dX_dt_limit_ratio, dX_div_X_dt_limit_ratio
 
-         real(dp) :: X, X_old, delta_dX, delta_dX_div_X, max_dX, max_dX_div_X, &
-            bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit
-         integer :: j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
-         real(dp) :: D_mix_cutoff, dX_limit_min_X, dX_limit, dX_hard_limit
-         real(dp) :: dX_div_X_limit_min_X, dX_div_X_limit, dX_div_X_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit, dX_div_X_at_high_T_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit_lgT_min
-         logical :: decreases_only
+         type (star_info), pointer :: s
+         real(dp) :: X, X_old, delta_X, delta_X_div_X, max_dX, max_dX_div_X, &
+            bdy_dist_dm, max_dX_bdy_dist_dm, max_dX_div_X_bdy_dist_dm, cz_dist_limit, &
+            D_mix_cutoff, ratio_tmp_dX, ratio_tmp_dX_div_X
+         integer :: i, j, k, cid, bdy, max_dX_j, max_dX_k, max_dX_div_X_j, max_dX_div_X_k
+         real(dp), dimension(max_dX_limit_ctrls) :: dX_limit, dX_hard_limit, &
+            dX_div_X_limit, dX_div_X_hard_limit
+         character (len=strlen) :: sp
 
          include 'formats'
 
          check_dX = keep_going
+         dX_dt_limit_ratio = 0d0
+         dX_div_X_dt_limit_ratio = 0d0
 
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
 
-         if (which == 0) then ! hydrogen
-            dX_limit_min_X = s% dH_limit_min_H
-            dX_limit = s% dH_limit
-            dX_hard_limit = s% dH_hard_limit
-            dX_div_X_limit_min_X = s% dH_div_H_limit_min_H
-            dX_div_X_limit = s% dH_div_H_limit
-            dX_div_X_hard_limit = s% dH_div_H_hard_limit
-            decreases_only = s% dH_decreases_only
-         else if (which == 1) then ! helium
-            dX_limit_min_X = s% dHe_limit_min_He
-            dX_limit = s% dHe_limit
-            dX_hard_limit = s% dHe_hard_limit
-            dX_div_X_limit_min_X = s% dHe_div_He_limit_min_He
-            dX_div_X_limit = s% dHe_div_He_limit
-            dX_div_X_hard_limit = s% dHe_div_He_hard_limit
-            decreases_only = s% dHe_decreases_only
-         else if (which == 2) then ! He3
-            dX_limit_min_X = s% dHe3_limit_min_He3
-            dX_limit = s% dHe3_limit
-            dX_hard_limit = s% dHe3_hard_limit
-            dX_div_X_limit_min_X = s% dHe3_div_He3_limit_min_He3
-            dX_div_X_limit = s% dHe3_div_He3_limit
-            dX_div_X_hard_limit = s% dHe3_div_He3_hard_limit
-            decreases_only = s% dHe3_decreases_only
-         else ! metals
-            dX_limit_min_X = s% dX_limit_min_X
-            dX_limit = s% dX_limit
-            dX_hard_limit = s% dX_hard_limit
-            dX_div_X_limit_min_X = s% dX_div_X_limit_min_X
-            if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min) then
-               dX_div_X_limit = s% dX_div_X_at_high_T_limit
-               dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit
-            else
-               dX_div_X_limit = s% dX_div_X_limit
-               dX_div_X_hard_limit = s% dX_div_X_hard_limit
+         do i=1, max_dx_limit_ctrls  ! go over all potential species + XYZ
+            if (s% dX_limit(i) >= 1 .and. &      ! as soon as all of these are >= 1
+                s% dX_hard_limit(i) >= 1 .and. & ! we'd have nothing to do
+                s% dX_div_X_limit(i) >= 1 .and. &
+                s% dX_div_X_hard_limit(i) >= 1) then
+               cycle  ! go to next
             end if
-            decreases_only = s% dX_decreases_only
-         end if
          
-         dX_limit = dX_limit*s% time_delta_coeff
-         dX_hard_limit = dX_hard_limit*s% time_delta_coeff
-
-         dX_div_X_limit = dX_div_X_limit*s% time_delta_coeff
-         dX_div_X_hard_limit = dX_div_X_hard_limit*s% time_delta_coeff
-
-         if (  dX_limit_min_X >= 1 .and. &
-               dX_limit >= 1 .and. &
-               dX_hard_limit >= 1 .and. &
-               dX_div_X_limit_min_X >= 1 .and. &
-               dX_div_X_limit >= 1 .and. &
-               dX_div_X_hard_limit >= 1) then
-            return
-         end if
-
-         max_dX = -1; max_dX_j = -1; max_dX_k = -1
-         max_dX_div_X = -1; max_dX_div_X_j = -1; max_dX_div_X_k = -1
-         bdy = 0
-         max_dX_bdy_dist_dm = 0
-         max_dX_div_X_bdy_dist_dm = 0
-         cz_dist_limit = s% dX_mix_dist_limit*Msun
-
-         if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
-            D_mix_cutoff = s% min_D_mix
-         else
-            D_mix_cutoff = 0
-         end if
-
-         do k = 1, s% nz
-
-            if (s% D_mix(k) > D_mix_cutoff) then
-               cycle
+            dX_limit = s% dX_limit(i) * s% time_delta_coeff
+            dX_hard_limit = s% dX_hard_limit(i) * s% time_delta_coeff
+            
+            if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min(i)) then
+               dX_div_X_limit = s% dX_div_X_at_high_T_limit(i)
+               dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit(i)
+            else
+               dX_div_X_limit = s% dX_div_X_limit(i)
+               dX_div_X_hard_limit = s% dX_div_X_hard_limit(i)
             end if
-            if (k < s% nz) then
-               if (s% D_mix(k+1) > D_mix_cutoff) then
+            
+            dX_div_X_limit = dX_div_X_limit * s% time_delta_coeff
+            dX_div_X_hard_limit = dX_div_X_hard_limit * s% time_delta_coeff
+            
+            max_dX = -1; max_dX_j = -1; max_dX_k = -1
+            max_dX_div_X = -1; max_dX_div_X_j = -1; max_dX_div_X_k = -1
+            bdy = 0
+            max_dX_bdy_dist_dm = 0
+            max_dX_div_X_bdy_dist_dm = 0
+            cz_dist_limit = s% dX_mix_dist_limit*Msun
+   
+            if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
+               D_mix_cutoff = s% min_D_mix
+            else
+               D_mix_cutoff = 0
+            end if
+            
+            sp = s% dX_limit_species(i)
+            
+            do k = 1, s% nz
+   
+               if (s% D_mix(k) > D_mix_cutoff) then
                   cycle
                end if
-            end if
-
-            ! find the nearest mixing boundary
-            bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
-            ! don't check cells near a mixing boundary
-            if (bdy > 0 .and. bdy < n_mix_bdy) then
-               bdy_dist_dm = s% xmstar*abs(s% q(k) - mix_bdy_q(bdy))
-               if (bdy_dist_dm < cz_dist_limit) cycle
-            else
-               bdy_dist_dm = 0
-            end if
-
-            do j = 1, s% species
-
-               cid = s% chem_id(j)
-               if (which == 0) then ! hydrogen
-                  if (cid /= ih1) cycle
-               else if (which == 1) then ! helium
-                  if (cid /= ihe4) cycle
-               else if (which == 2) then ! he3
-                  if (cid /= ihe3) cycle
-               else ! other
-                  if (chem_isos% Z(cid) <= 2) cycle
+               if (k < s% nz) then
+                  if (s% D_mix(k+1) > D_mix_cutoff) then
+                     cycle
+                  end if
                end if
-
-               X = s% xa(j,k)
-               X_old = s% xa_old(j,k)
-               delta_dX = X_old - X ! decrease in abundance
-
-               if ((.not. decreases_only) .and. delta_dX < 0) delta_dX = -delta_dX
-
-               if (X >= dX_limit_min_X) then
-                  if ((.not. skip_hard_limit) .and. delta_dX > dX_hard_limit) then
-                     check_dX = retry
-                     s% why_Tlim = Tlim_dX
-                     s% Tlim_dX_species = j
-                     s% Tlim_dX_cell = k
-                     s% retry_message = 'dX ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
-                     s% retry_message_k = k
-                     if (s% report_dt_hard_limit_retries) then
-                        write(*,2) 'old xa', s% model_number, X_old
-                        write(*,2) 'new xa', s% model_number, X
-                        write(*,2) 'delta xa', s% model_number, delta_dX
-                        write(*,2) 'hard limit delta xa', s% model_number, dX_hard_limit
+   
+               ! find the nearest mixing boundary
+               bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
+               ! don't check cells near a mixing boundary
+               if (bdy > 0 .and. bdy < n_mix_bdy) then
+                  bdy_dist_dm = s% xmstar*abs(s% q(k) - mix_bdy_q(bdy))
+                  if (bdy_dist_dm < cz_dist_limit) cycle
+               else
+                  bdy_dist_dm = 0
+               end if
+               
+               do j = 1, s% species
+   
+                  cid = s% chem_id(j)
+                  if (sp == 'X') then  ! any hydrogen
+                     if (cid /= ih1 .or. cid /= ih2 .or. cid /= ih3) cycle
+                  else if (sp == 'Y') then  ! any helium
+                     if (cid /= ihe4 .or. cid /= ihe3) cycle
+                  else if (sp == 'Z') then  ! any metal
+                     if (chem_isos% Z(cid) <= 2) cycle
+                  else  ! single isotope
+                     if (trim(chem_isos% name(s% chem_id(j))) /= trim(sp)) cycle
+                  end if
+   
+                  X = s% xa(j,k)
+                  X_old = s% xa_old(j,k)
+                  delta_X = X_old - X ! decrease in abundance
+   
+                  if ((.not. s% dX_decreases_only(j)) .and. delta_X < 0) delta_X = -delta_X
+   
+                  if (X >= s% dX_limit_min_X(i)) then  ! any check for dX_limit_* < 1 is useless since X <= 1 anyway
+                     if ((.not. skip_hard_limit) .and. delta_X > dX_hard_limit(i)) then
+                        check_dX = retry
+                        s% why_Tlim = Tlim_dX
+                        s% Tlim_dX_species = j
+                        s% Tlim_dX_cell = k
+                        s% retry_message = 'dX ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
+                        s% retry_message_k = k
+                        if (s% report_dt_hard_limit_retries) then
+                           write(*,2) 'old xa', s% model_number, X_old
+                           write(*,2) 'new xa', s% model_number, X
+                           write(*,2) 'delta xa', s% model_number, delta_X
+                           write(*,2) 'hard limit delta xa', s% model_number, dX_hard_limit
+                        end if
+                        return
                      end if
-                     return
-                  end if
-                  if (delta_dX > max_dX) then
-                     max_dX = delta_dX
-                     max_dX_j = j
-                     max_dX_k = k
-                     max_dX_bdy_dist_dm = bdy_dist_dm
-                  end if
-               end if
-               if (X >= dX_div_X_limit_min_X) then
-                  delta_dX_div_X = delta_dX/X
-                  if ((.not. skip_hard_limit) .and. delta_dX_div_X > dX_div_X_hard_limit) then
-                     check_dX = retry
-                     s% why_Tlim = Tlim_dX_div_X
-                     s% Tlim_dX_div_X_species = j
-                     s% Tlim_dX_div_X_cell = k            
-                     s% retry_message = 'dX_div_X ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
-                     s% retry_message_k = k
-                     if (s% report_dt_hard_limit_retries) then
-                        write(*, '(a30, i5, 99(/,a30,e20.10))') &
-                           'delta_dX_div_X ' // trim(chem_isos% name(s% chem_id(j))), &
-                           k, 'delta_dX_div_X', delta_dX_div_X, &
-                           'dX_div_X_hard_limit', dX_div_X_hard_limit
-                        write(*,2) 'old xa', s% model_number, X_old
-                        write(*,2) 'new xa', s% model_number, X
-                        write(*,2) 'delta_dX_div_X', s% model_number, delta_dX_div_X
-                        write(*,2) 'dX_div_X_hard_limit', s% model_number, dX_div_X_hard_limit
+                     if (delta_X > max_dX) then
+                        max_dX = delta_X
+                        max_dX_j = j
+                        max_dX_k = k
+                        max_dX_bdy_dist_dm = bdy_dist_dm
                      end if
-                     return
                   end if
-                  if (delta_dX_div_X > max_dX_div_X) then
-                     max_dX_div_X = delta_dX_div_X
-                     max_dX_div_X_j = j
-                     max_dX_div_X_k = k
-                     max_dX_div_X_bdy_dist_dm = bdy_dist_dm
+                  if (X >= s% dX_div_X_limit_min_X(i)) then
+                     delta_X_div_X = delta_X/X
+                     if ((.not. skip_hard_limit) .and. delta_X_div_X > dX_div_X_hard_limit(i)) then
+                        check_dX = retry
+                        s% why_Tlim = Tlim_dX_div_X
+                        s% Tlim_dX_div_X_species = j
+                        s% Tlim_dX_div_X_cell = k
+                        s% retry_message = 'dX_div_X ' // trim(chem_isos% name(s% chem_id(j))) // ' hard limit'
+                        s% retry_message_k = k
+                        if (s% report_dt_hard_limit_retries) then
+                           write(*, '(a30, i5, 99(/,a30,e20.10))') &
+                              'delta_X_div_X ' // trim(chem_isos% name(s% chem_id(j))), &
+                              k, 'delta_X_div_X', delta_X_div_X, &
+                              'dX_div_X_hard_limit', dX_div_X_hard_limit
+                           write(*,2) 'old xa', s% model_number, X_old
+                           write(*,2) 'new xa', s% model_number, X
+                           write(*,2) 'delta_X_div_X', s% model_number, delta_X_div_X
+                           write(*,2) 'dX_div_X_hard_limit', s% model_number, dX_div_X_hard_limit
+                        end if
+                        return
+                     end if
+                     if (delta_X_div_X > max_dX_div_X) then
+                        max_dX_div_X = delta_X_div_X
+                        max_dX_div_X_j = j
+                        max_dX_div_X_k = k
+                        max_dX_div_X_bdy_dist_dm = bdy_dist_dm
+                     end if
                   end if
-               end if
+               end do
             end do
+            
+            if (dX_limit(i) > 0) then
+               ratio_tmp_dX = max_dX/dX_limit(i)
+               if (ratio_tmp_dX > dX_dt_limit_ratio) then
+                  dX_dt_limit_ratio = ratio_tmp_dX
+                  if (dX_dt_limit_ratio <= 1d0) then
+                     dX_dt_limit_ratio = 0
+                  else
+                     s% Tlim_dX_species = max_dX_j
+                     s% Tlim_dX_cell = max_dX_k
+   !                  write(*, '(a30, i5, 99e20.10)') &
+   !                     ' limit dt because of large dX '// &
+   !                        trim(chem_isos% name(s% chem_id(max_dX_j))) // &
+   !                     ' k, max, lim, m ', &
+   !                     max_dX_k, max_dX, dX_limit(i), &
+   !                     max_dX_bdy_dist_dm/Msun
+                  end if
+               end if
+            end if
+   
+            if (dX_div_X_limit(i) > 0) then
+               ratio_tmp_dX_div_X = max_dX_div_X/dX_div_X_limit(i)
+               if (ratio_tmp_dX_div_X > dX_div_X_dt_limit_ratio) then  ! pick out largest culprit only!
+                  dX_div_X_dt_limit_ratio = ratio_tmp_dX_div_X
+                  if (dX_div_X_dt_limit_ratio <= 1d0) then
+                     dX_div_X_dt_limit_ratio = 0
+                  else
+                     s% Tlim_dX_div_X_species = max_dX_div_X_j
+                     s% Tlim_dX_div_X_cell = max_dX_div_X_k
+   !                  write(*, '(a35, i5, 99e20.10)') &  ! shouldn't be written as is isn't guarantueed
+                                                         ! this control will trigger timestep reduction
+   !                     ' limit dt because of large dX_div_X ' // &
+   !                        trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
+   !                     ' k, max, lim, m ', &
+   !                     max_dX_div_X_k, max_dX_div_X, dX_div_X_limit(i), &
+   !                     max_dX_div_X_bdy_dist_dm/Msun
+                  end if
+               end if
+            end if
          end do
-
-         if (dX_limit > 0) then
-            dX_dt_limit_ratio = max_dX/dX_limit
-            if (dX_dt_limit_ratio <= 1d0) then
-               dX_dt_limit_ratio = 0
-            else
-               j = max_dX_j
-               k = max_dX_k
-               s% Tlim_dX_species = j
-               s% Tlim_dX_cell = k
-               write(*, '(a30, i5, 99e20.10)') &
-                  'dX ' // trim(chem_isos% name(s% chem_id(j))), &
-                  k, max_dX, dX_limit, (s% M_center + s% xmstar*(s% q(k) - s% dq(k)/2))/Msun, &
-                  max_dX_bdy_dist_dm/Msun
-            end if
-
-         end if
-
-         if (dX_div_X_limit > 0) then
-            dX_div_X_dt_limit_ratio = max_dX_div_X/dX_div_X_limit
-            if (dX_div_X_dt_limit_ratio <= 1d0) then
-               dX_div_X_dt_limit_ratio = 0
-            else
-               s% Tlim_dX_div_X_species = max_dX_div_X_j
-               s% Tlim_dX_div_X_cell = max_dX_div_X_k
-               if (which > 2) write(*, '(a30, i5, 99e20.10)') &
-                  'limit dt because of large dX_div_X ' // &
-                     trim(chem_isos% name(s% chem_id(max_dX_div_X_j))) // &
-                     ' k, max, lim, m ', &
-                  max_dX_div_X_k, max_dX_div_X, dX_div_X_limit, &
-                  max_dX_div_X_bdy_dist_dm/Msun
-            end if
-         end if
-
       end function check_dX
 
 

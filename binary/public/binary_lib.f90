@@ -229,5 +229,30 @@
 
       end subroutine binary_set_star_job_namelist
 
+      real(dp) function binary_compute_k_div_T(binary_id, is_donor, has_convective_envelope, ierr)
+         use binary_def, only: binary_info, binary_ptr
+         use binary_tides, only: k_div_T
+         use star_def, only: star_info
+         integer, intent(in) :: binary_id
+         logical, intent(in) :: is_donor
+         type(star_info), pointer :: s
+         logical, intent(in) :: has_convective_envelope
+         integer, intent(out) :: ierr
+         type (binary_info), pointer :: b
+
+         ierr = 0
+         call binary_ptr(binary_id, b, ierr)
+         if(ierr/=0) return
+
+         if(is_donor) then
+            s => b% s_donor
+         else
+            s => b% s_accretor
+         end if
+
+         binary_compute_k_div_T = k_div_T(b, s, has_convective_envelope, ierr)
+
+      end function binary_compute_k_div_T
+
       end module binary_lib
 

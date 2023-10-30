@@ -34,6 +34,7 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 25000
+      use_gold2_tolerances = .true.
 
       energy_eqn_option = 'dedt'
       convergence_ignore_equL_residuals = .true. ! needed during flash
