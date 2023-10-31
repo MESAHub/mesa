@@ -21,6 +21,7 @@ integer :: write_header_frequency
 character (len = strlen) :: extra_binary_terminal_output_file
 
 ! timestep controls
+real(dp) :: time_delta_coeff
 real(dp) :: fm
 real(dp) :: fm_hard
 real(dp) :: fa
