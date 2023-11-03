@@ -4673,7 +4673,6 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Don't increase prev mdot by more that this.
-      ! NOTE: use ``vcrit_max_years_for_timestep`` with this.
 
       ! ::
 
