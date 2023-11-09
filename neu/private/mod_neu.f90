@@ -1033,19 +1033,19 @@
          sin1 = sin(u)
 
          ! double, triple, etc. angle formulas
-         ! sin/cos (2 fac1 tau)
+         ! sin/cos (2 u)
          sin2 = 2.0d0 * sin1 * cos1
          cos2 = 2.0d0 * cos1 * cos1 - 1.0d0
 
-         ! sin/cos (3 fac1 tau)
+         ! sin/cos (3 u)
          sin3 = sin1 * (3.0d0 - 4.0d0 * sin1 * sin1)
          cos3 = cos1 * (4.0d0 * cos1 * cos1 - 3.0d0)
 
-         ! sin/cos (4 fac1 tau) -- use double angle on sin2/cos2
+         ! sin/cos (4 u) -- use double angle on sin2/cos2
          sin4 = 2.0d0 * sin2 * cos2
          cos4 = 2.0d0 * cos2 * cos2 - 1.0d0
 
-         ! sin/cos (5 fac1 tau)
+         ! sin/cos (5 u)
          sin5 = sin1 * (5.0d0 - sin1 * sin1 * (20.0d0 - 16.0d0 * sin1 * sin1))
          cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0);
 
