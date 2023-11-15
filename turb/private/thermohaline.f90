@@ -64,7 +64,8 @@ contains
       integer, intent(in) :: iso      
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
-      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th            
+      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
+      real(dp) :: l2hat, lhat, lamhat, w, HB
       include 'formats'     
       dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable               
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
@@ -72,7 +73,8 @@ contains
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
          D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
       else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
-               thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+               thermohaline_option == 'Brown_Garaud_Stellmach_13' .or. &
+               thermohaline_option == 'Harrington_Garaud_19') then
          call get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
          R0 = (gradr - grada)/gradL_composition_term
          Pr = nu/K_T
@@ -87,8 +89,18 @@ contains
             ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
-         else ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-            D_thrm = K_mu*(nuC_brown(R0,pr,tau) - 1d0)
+         else if (thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+            call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
+         else if (thermohaline_option == 'Harrington_Garaud_19') then
+            call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            HB = 0d0 ! todo: promote this to optional input specified by magnetic field from MESA model
+
+            ! solve for w based on Harrington & Garaud model
+            call solve_hg19_eqn32(pr,tau,R0,HB,w,ierr)
+
+            ! KB = 1.24
+            D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 1.24d0) - 1d0)
          endif
       else
          D_thrm = 0
@@ -155,19 +167,9 @@ contains
 
    end subroutine get_diff_coeffs
 
-   real(dp) function nuC_brown(R0,prandtl,tau)
-      !Function calculates Nu_C from input parameters, following Brown et al. 2013.
-      !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
-
-      real(dp), intent(in) :: R0,prandtl,tau
-      real(dp) :: l2hat,lhat,lamhat ! maxl2,maxl,lambdamax
-      real(dp) :: r_th
-
-      r_th = (R0 - 1d0)/(1d0/tau - 1d0)
-
-      ! Use inputs to calculate l2hat, lhat, and lamhat
-      call calc_mode_properties(R0,prandtl,tau,l2hat,lhat,lamhat)
-
+   real(dp) function nuC_brown(tau, l2hat, lamhat)
+      real(dp), intent(in) :: tau, l2hat, lamhat
+      
       ! Nu_C reduces to this simpler form for the Brown model,
       ! Formula (33) from Brown et al, with C = 7.
       nuC_brown = 1.d0 + 49.d0*lamhat*lamhat/(tau*l2hat*(lamhat+tau*l2hat))
