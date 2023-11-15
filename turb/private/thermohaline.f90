@@ -398,9 +398,9 @@ contains
       integer, intent(out)           :: ierr
       real(dp), intent(in), optional :: CH
 
-      integer, parameter  :: NEWT_IMAX = 10
-      integer, parameter  :: IMAX = 50
-      real(dp), parameter :: EPSX = 1e-5_dp
+      integer, parameter  :: NEWT_IMAX = 100
+      integer, parameter  :: IMAX = 0
+      real(dp), parameter :: EPSX = 2e-12_dp
       real(dp), parameter :: EPSY = 0._dp
 
       real(dp)          :: CH_
