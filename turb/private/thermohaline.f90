@@ -44,6 +44,7 @@ contains
    !! @param thermohaline_option A string specifying which thermohaline prescription to use.
    !! @param grada Adiabatic gradient dlnT/dlnP
    !! @param gradr Radiative temperature gradient dlnT/dlnP, equals the actual gradient because there's no convection
+   !! @param N2_T Structure part of brunt squared (excludes composition term)
    !! @param T Temperature
    !! @param opacity opacity
    !! @param rho Density
@@ -55,19 +56,19 @@ contains
    !! @param D_thrm Output, diffusivity.
    !! @param ierr Output, error index.
    subroutine get_D_thermohaline(thermohaline_option, &
-         grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+         grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
          iso, XH1, thermohaline_coeff, D_thrm, ierr)
       character(len=*) :: thermohaline_option
       real(dp), intent(in) :: &
-         grada, gradr, T, opacity, rho, Cp, gradL_composition_term, XH1, &
+         grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, XH1, &
          thermohaline_coeff
       integer, intent(in) :: iso      
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
-      real(dp) :: l2hat, lhat, lamhat, w, HB
+      real(dp) :: l2hat, lhat, lamhat, w, d2, HB, B0
       include 'formats'     
-      dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable               
+      dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
       if (thermohaline_option == 'Kippenhahn') then
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
@@ -94,7 +95,10 @@ contains
             D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
          else if (thermohaline_option == 'Harrington_Garaud_19') then
             call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
-            HB = 0d0 ! todo: promote this to optional input specified by magnetic field from MESA model
+
+            B0 = 100d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
+            HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
             ! solve for w based on Harrington & Garaud model
             call solve_hg19_eqn32(pr,tau,R0,HB,w,ierr)

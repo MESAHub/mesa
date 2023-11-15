@@ -175,7 +175,7 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, N2_T
       real(dp) :: conv_vel_start, scale
 
       ! these are used by use_superad_reduction
@@ -208,6 +208,9 @@ contains
       D = 0d0
       Gamma = 0d0  
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
+
+      ! Brunt structure term for use as input to thermohaline
+      N2_T = (rho*pow2(grav)/P)*(chiT/chiRho)*(grada-gradT)
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -320,7 +323,7 @@ contains
       if (mixing_type == no_mixing) then
          if (gradL_composition_term < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then
