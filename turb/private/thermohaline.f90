@@ -379,4 +379,57 @@ contains
       return
    end subroutine NR
 
+   ! RHS function for HG19's eqn. 32 (function and derivatives, suitable for use
+   ! with safe_root_with_guess)
+
+   real(dp) function hg19_eqn32_func(x, df_dx, lrpar, rpar, lipar, ipar, ierr) result(f)
+
+      use const_def, only: dp
+
+      real(dp), intent(in)             :: x
+      real(dp), intent(out)            :: df_dx
+      integer, intent(in)              :: lrpar
+      real(dp), intent(inout), pointer :: rpar
+      integer, intent(in)              :: lipar
+      integer, intent(inout), pointer  :: ipar
+      integer, intent(out)             :: ierr
+
+      real(dp) :: l2hat
+      real(dp) :: lhat
+      real(dp) :: lamhat
+      real(dp) :: LHS
+      real(dp) :: RHS1
+      real(dp) :: RHS2
+
+      Evaluate eqn. 32 of HG19
+
+      if (lrpar /= 5 .OR. lipar /= 0) then
+         ierr = -1
+         return
+      end if
+
+      associate( &
+           Pr => rpar(1), &
+           tau => rpar(2), &
+           R0 => rpar(3), &
+           HB => rpar(4), &
+           CH => rpar(5))
+
+        call calc_brown_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
+
+        LHS = 0.5_dp * x**2.0_dp - HB
+        RHS1 = (CH*lamhat/(0.42_dp*lhat))**1.5_dp
+        RHS2 = sqrt(x)
+
+        f = LHS - (RHS1*RHS2)
+        df_dx = x - 0.5_dp * (CH*lamhat/(0.42_dp*lhat))**1.5_dp / sqrt(x)         
+
+      end associate
+
+      ierr = 0
+
+      return
+
+   end function hg19_eqn32_func
+
 end module thermohaline
