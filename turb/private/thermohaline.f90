@@ -394,9 +394,9 @@ contains
       real(dp), intent(in)             :: x
       real(dp), intent(out)            :: df_dx
       integer, intent(in)              :: lrpar
-      real(dp), intent(inout), pointer :: rpar
+      real(dp), intent(inout), pointer :: rpar(:)
       integer, intent(in)              :: lipar
-      integer, intent(inout), pointer  :: ipar
+      integer, intent(inout), pointer  :: ipar(:)
       integer, intent(out)             :: ierr
 
       real(dp) :: l2hat
