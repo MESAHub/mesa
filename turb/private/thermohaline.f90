@@ -88,7 +88,7 @@ contains
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
          else ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-            D_thrm = K_mu*(Numu(R0,r_th,pr,tau) - 1d0)
+            D_thrm = K_mu*(Numu(R0,pr,tau) - 1d0)
          endif
       else
          D_thrm = 0
@@ -155,51 +155,56 @@ contains
 
    end subroutine get_diff_coeffs
 
-   real(dp) function numu(R0,r_th,prandtl,diffratio)
+   real(dp) function numu(R0,prandtl,tau)
       !Function calculates Nu_mu from input parameters, following Brown et al. 2013.
       !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
 
-      real(dp), intent(in) :: R0,r_th,prandtl,diffratio
+      real(dp), intent(in) :: R0,prandtl,tau
       real(dp) :: maxl2,maxl,lambdamax
+      real(dp) :: r_th
+
+      r_th = (R0 - 1d0)/(1d0/tau - 1d0)
 
       ! Use inputs to calculate maxl2, maxl, and lambdamax
-      call calc_brown_mode_properties(R0,r_th,prandtl,diffratio,maxl2,maxl,lambdamax)
+      call calc_brown_mode_properties(R0,prandtl,tau,maxl2,maxl,lambdamax)
 
       !Calculate Nu_mu using Formula (33) from Brown et al, with C = 7.
-      numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax+diffratio*maxl2))
+      numu = 1.d0 + 49.d0*lambdamax*lambdamax/(tau*maxl2*(lambdamax+tau*maxl2))
 
       return
    end function numu 
 
-   subroutine calc_brown_mode_properties(R0,r_th,prandtl,diffratio,maxl2,maxl,lambdamax)
-      real(dp), intent(in) :: R0,r_th,prandtl,diffratio
+   subroutine calc_brown_mode_properties(R0,prandtl,tau,maxl2,maxl,lambdamax)
+      real(dp), intent(in) :: R0,prandtl,tau
       real(dp), intent(out) :: maxl2,maxl,lambdamax
-      real(dp) :: myvars(2)
+      real(dp) :: myvars(2), r_th
       integer :: ierr, iter, max_iters
 
+      r_th = (R0 - 1d0)/(1d0/tau - 1d0)
+
       ! Initialize guess using estimates from Brown et al. 2013
-      call analytical_estimate_th(maxl,lambdamax,r_th,prandtl,diffratio)
+      call analytical_estimate_th(maxl,lambdamax,r_th,prandtl,tau)
             
       myvars(1) = maxl
       myvars(2) = lambdamax
 
       !Call Newton relaxation algorithm
-      call NR(myvars,prandtl,diffratio,R0,ierr)
+      call NR(myvars,prandtl,tau,R0,ierr)
       
       !If the growth rate is negative, then try another set of parameters as first guess.  
       !Repeat as many times as necessary until convergence is obtained.
       iter = 1
       max_iters = 200
       do while(iter<=max_iters .and. ((myvars(2)<0).or.(ierr /= 0))) 
-         !write(*,*) 'Alternative', r_th,prandtl,diffratio,iter
+         !write(*,*) 'Alternative', r_th,prandtl,tau,iter
          !Reset guess values
          myvars(1) = maxl
          myvars(2) = lambdamax
          !Call relaxation for slightly different Pr, tau, R0.
-         call NR(myvars,prandtl*(1d0+iter*1.d-2),diffratio,R0/(1d0+iter*1.d-2),ierr)
+         call NR(myvars,prandtl*(1d0+iter*1.d-2),tau,R0/(1d0+iter*1.d-2),ierr)
          !If it converged this time, call NR for the real parameters.
-         if(ierr.eq.0) call NR(myvars,prandtl,diffratio,R0,ierr)
-         !write(*,*) prandtl,diffratio,R0,myvars(1),myvars(2),ierr
+         if(ierr.eq.0) call NR(myvars,prandtl,tau,R0,ierr)
+         !write(*,*) prandtl,tau,R0,myvars(1),myvars(2),ierr
          !Otherwise, increase counter and try again.
          iter = iter + 1            
       enddo
@@ -211,7 +216,7 @@ contains
          !Plug solution into "l^2" and lambda.
          maxl2 = myvars(1)*myvars(1)
          lambdamax = myvars(2)
-         !write(*,*) prandtl,diffratio,r_th,maxl2,lambdamax
+         !write(*,*) prandtl,tau,r_th,maxl2,lambdamax
       end if
       
    end subroutine calc_brown_mode_properties
@@ -401,7 +406,7 @@ contains
       real(dp) :: RHS1
       real(dp) :: RHS2
 
-      Evaluate eqn. 32 of HG19
+      ! Evaluate eqn. 32 of HG19
 
       if (lrpar /= 5 .OR. lipar /= 0) then
          ierr = -1
