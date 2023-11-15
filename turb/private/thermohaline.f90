@@ -384,6 +384,63 @@ contains
       return
    end subroutine NR
 
+   !****
+
+   ! Solver for HG19's eqn. 32
+
+   subroutine solve_hg19_eqn32(Pr, tau, R0, HB, w, ierr, CH)
+
+      real(dp), intent(in)           :: Pr
+      real(dp), intent(in)           :: tau
+      real(dp), intent(in)           :: R0
+      real(dp), intent(in)           :: HB
+      real(dp), intent(out)          :: w
+      integer, intent(out)           :: ierr
+      real(dp), intent(in), optional :: CH
+
+      integer, parameter  :: NEWT_IMAX = 10
+      integer, parameter  :: IMAX = 50
+      real(dp), parameter :: EPSX = 1e-5_dp
+      real(dp), parameter :: EPSY = 0._dp
+
+      real(dp)          :: CH_
+      real(dp)          :: l2hat
+      real(dp)          :: lhat
+      real(dp)          :: lamhat
+      real(dp)          :: w0
+      real(dp), target  :: rpar(5)
+      integer,  target  :: ipar(0)
+      real(dp), pointer :: rpar_(:)
+      integer, pointer  :: ipar_(:)
+
+      if (PRESENT(CH)) then
+         CH_ = CH
+      else
+         CH_ = 1.66_dp
+      end if
+
+      call calc_brown_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
+
+      w0 = MAX(sqrt(2.0_dp*HB), 2.0_dp * PI * lamhat/lhat)
+
+      rpar = [Pr, tau, R0, HB, CH_]
+
+      rpar_ => rpar
+      ipar_ => ipar
+
+      w = safe_root_with_guess(hg19_eqn32_func, w0, 0.5*w0, &
+           arg_not_provided, arg_not_provided, &
+           arg_not_provided, arg_not_provided, &
+           NEWT_IMAX, IMAX, EPSX, EPSY, &
+           SIZE(rpar_), rpar_, SIZE(ipar_), ipar_, &
+           ierr)
+
+      return
+
+   end subroutine solve_hg19_eqn32
+
+   !****
+
    ! RHS function for HG19's eqn. 32 (function and derivatives, suitable for use
    ! with safe_root_with_guess)
 
@@ -414,6 +471,7 @@ contains
       end if
 
       associate( &
+           w => x, &
            Pr => rpar(1), &
            tau => rpar(2), &
            R0 => rpar(3), &
@@ -422,12 +480,12 @@ contains
 
         call calc_brown_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
 
-        LHS = 0.5_dp * x**2.0_dp - HB
+        LHS = 0.5_dp * w**2.0_dp - HB
         RHS1 = (CH*lamhat/(0.42_dp*lhat))**1.5_dp
-        RHS2 = sqrt(x)
+        RHS2 = sqrt(w)
 
         f = LHS - (RHS1*RHS2)
-        df_dx = x - 0.5_dp * (CH*lamhat/(0.42_dp*lhat))**1.5_dp / sqrt(x)         
+        df_dx = w - 0.5_dp * (CH*lamhat/(0.42_dp*lhat))**1.5_dp / sqrt(w)         
 
       end associate
 
