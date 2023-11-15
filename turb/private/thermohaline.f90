@@ -88,7 +88,7 @@ contains
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
          else ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-            D_thrm = K_mu*(numu_brown(R0,pr,tau) - 1d0)
+            D_thrm = K_mu*(nuC_brown(R0,pr,tau) - 1d0)
          endif
       else
          D_thrm = 0
@@ -155,8 +155,8 @@ contains
 
    end subroutine get_diff_coeffs
 
-   real(dp) function numu_brown(R0,prandtl,tau)
-      !Function calculates Nu_mu from input parameters, following Brown et al. 2013.
+   real(dp) function nuC_brown(R0,prandtl,tau)
+      !Function calculates Nu_C from input parameters, following Brown et al. 2013.
       !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
 
       real(dp), intent(in) :: R0,prandtl,tau
@@ -166,16 +166,11 @@ contains
       r_th = (R0 - 1d0)/(1d0/tau - 1d0)
 
       ! Use inputs to calculate l2hat, lhat, and lamhat
-      call calc_brown_mode_properties(R0,prandtl,tau,l2hat,lhat,lamhat)
+      call calc_mode_properties(R0,prandtl,tau,l2hat,lhat,lamhat)
 
-      numu_brown = nuC_brown(tau,lamhat,l2hat)
-      return
-   end function numu_brown
-
-   ! Nu_C reduces to this simpler form for the Brown model
-   real(dp) function nuC_brown(tau,lambdamax,maxl2)
-      real(dp), intent(in) :: tau,lambdamax,maxl2
-      nuC_brown = 1.d0 + 49.d0*lambdamax*lambdamax/(tau*maxl2*(lambdamax+tau*maxl2))
+      ! Nu_C reduces to this simpler form for the Brown model,
+      ! Formula (33) from Brown et al, with C = 7.
+      nuC_brown = 1.d0 + 49.d0*lamhat*lamhat/(tau*l2hat*(lamhat+tau*l2hat))
       return
    end function nuC_brown
 
@@ -186,7 +181,7 @@ contains
       return
    end function nuC
    
-   subroutine calc_brown_mode_properties(R0,prandtl,tau,maxl2,maxl,lambdamax)
+   subroutine calc_mode_properties(R0,prandtl,tau,maxl2,maxl,lambdamax)
       real(dp), intent(in) :: R0,prandtl,tau
       real(dp), intent(out) :: maxl2,maxl,lambdamax
       real(dp) :: myvars(2), r_th
@@ -231,7 +226,7 @@ contains
          !write(*,*) prandtl,tau,r_th,maxl2,lambdamax
       end if
       
-   end subroutine calc_brown_mode_properties
+   end subroutine calc_mode_properties
 
    subroutine thermohaline_rhs(myx,myf,myj,prandtl,diffratio,R0)
       ! This routine is needed for the NR solver.
@@ -431,7 +426,7 @@ contains
          CH_ = 1.66_dp
       end if
 
-      call calc_brown_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
+      call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
 
       w0 = MAX(sqrt(2.0_dp*HB), 2.0_dp * PI * lamhat/lhat)
 
@@ -490,7 +485,7 @@ contains
            HB => rpar(4), &
            CH => rpar(5))
 
-        call calc_brown_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
+        call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
 
         LHS = 0.5_dp * w**2.0_dp - HB
         RHS1 = (CH*lamhat/(0.42_dp*lhat))**1.5_dp
