@@ -233,6 +233,7 @@ module fingering_modes
       
       
         ! Minimal interface to scalar minimization
+        
         subroutine minimize(func, x, xmin, xmax, var1, var2, var3)
           external :: func
           real(dp), intent(inout) :: x
@@ -243,6 +244,196 @@ module fingering_modes
       
         end subroutine minimize
       
+
+        subroutine minimize_scalar(func, x, xmin, xmax, ierr, var1, var2, var3)
+
+            external func
+            real(dp), intent(inout) :: x
+            real(dp), intent(in) :: xmin, xmax
+            integer, intent(out) :: ierr
+            real(dp), intent(in), optional :: var1, var2, var3
+          
+            ! Parameters 
+            integer, parameter :: ITMAX = 100
+            real(dp), parameter :: EPS = 1.0e-5_dp
+          
+            ! Local variables
+            integer :: iter
+            real(dp) :: a,b,v,fv,w,fw
+            logical :: bracketed
+            external :: func
+          
+            a = xmin
+            b = xmax  
+            v = x  
+            w = v
+            fv = func(v, var1, var2, var3)  
+            fw = fv
+          
+            do iter = 1, ITMAX
+               call mnbrak(func, a, v, b, var1, var2, var3, bracketed)
+               call brent(func, a, v, b, var1, var2, var3, w, fw)
+               if (abs(x-w) < EPS*(abs(x)+abs(w))) exit
+            end do
+          
+            x = w
+            ierr = iter
+          
+            contains
+          
+              ! Local version of brent and mnbrak
+              subroutine brent(func,ax,bx,cx,var1,var2,var3,xmin,fmin)
+                real(dp), external :: func
+                real(dp), intent(in) :: ax,bx,cx
+                real(dp), intent(out) :: xmin,fmin 
+                real(dp), intent(in), optional :: var1,var2,var3
+                real(dp) :: a,b,d,etemp,fu,fv,fw,fx,p,q,r,tol,t2,u,v,w,x,xm
+                parameter (tol=3.0e-8_dp)
+                a=min(ax,cx)
+                b=max(ax,cx)
+                v=bx
+                w=v
+                x=v
+                e=0.0_dp
+                fx=func(x,var1,var2,var3)
+                fv=fx
+                fw=fx
+                do
+                  xm=0.5_dp*(a+b)
+                  tol1=tol*abs(x)+1.0e-5_dp
+                  tol2=2.0_dp*tol1
+                  if(abs(x-xm).le.(tol2-0.5_dp*(b-a))) then
+                    xmin=x
+                    fmin=fx
+                    return
+                  end if
+                  if(abs(e).gt.tol1) then
+                    r=(x-w)*(fx-fv)
+                    q=(x-v)*(fx-fw)
+                    p=(x-v)*q-(x-w)*r
+                    q=2.0_dp*(q-r)
+                    if(q.gt.0.0_dp) p=-p
+                    q=abs(q)
+                    etemp=e
+                    e=d
+                    if(abs(p).ge.abs(0.5_dp*q*etemp).or.p.le.q*(a-x).or.p.ge.q*(b-x))then
+                      e=merge(a-x,b-x, x-a.lt.x-b)
+                      d=CG*e  
+                    else
+                      d=p/q
+                      u=x+d
+                      if((u-a).lt.tol2).or.(b-u).lt.tol2) then
+                        d=sign(tol1,xm-x)
+                      end if
+                    end if
+                  else
+                    e=merge(a-x,b-x, x-a.lt.x-b)
+                    d=CG*e
+                  end if
+                  if(abs(d).ge.tol1) then
+                    u=x+d
+                  else
+                    u=x+sign(tol1,d)
+                  end if
+                  fu=func(u,var1,var2,var3)
+                  if(fu.le.fx) then
+                    if(u.ge.x) then
+                      a=x
+                    else
+                      b=x
+                    end if
+                    v=w
+                    fv=fw
+                    w=x
+                    fw=fx
+                    x=u
+                    fx=fu
+                  else
+                    if(u.lt.x) then
+                      a=u
+                    else
+                      b=u
+                    end if
+                    if(fu.le.fw .or. w.eq.x) then
+                      v=w 
+                      fv=fw
+                      w=u
+                      fw=fu
+                    else if(fu.le.fv .or. v.eq.x .or. v.eq.w) then
+                      v=u
+                      fv=fu
+                    end if
+                  end if
+                end do
+              end subroutine brent
+                
+              subroutine mnbrak(func,ax,bx,cx,var1,var2,var3,bracketed)
+                real(dp), external :: func
+                real(dp), intent(in) :: ax  
+                real(dp), intent(inout) :: bx 
+                real(dp), intent(out) :: cx
+                logical, intent(out) :: bracketed
+                real(dp), intent(in), optional :: var1, var2, var3
+                real(dp) :: ulim,u,r,q,fu,dum    
+                parameter (CGOLD=0.3819660_dp,GLIMIT=100.0_dp,TINY=1.0e-20_dp)
+                fu=func(ax,var1,var2,var3)
+                fb=func(bx,var1,var2,var3)
+                if (fb.gt.fu) then
+                  dum=ax
+                  ax=bx
+                  bx=dum
+                  dum=fb
+                  fb=fu
+                  fu=dum
+                end if
+                cx=bx+CGOLD*(bx-ax)
+                fc=func(cx,var1,var2,var3)
+                bracketed = .true.
+                if (fb.ge.fc) then
+                  r=(bx-ax)*(fb-fc)
+                  q=(bx-cx)*(fb-fa)
+                  u=bx-((bx-cx)*q-(bx-ax)*r)/(2.0_dp*sign(max(abs(q-r),TINY),q-r))
+                  ulim=bx+GLIMIT*(cx-bx)
+                  if ((bx-u)*(u-cx).gt.0.0_dp) then
+                    fu=func(u,var1,var2,var3)
+                    if (fu.lt.fc) then
+                      ax=bx
+                      bx=u
+                      return
+                    else if(fu.gt.fb) then
+                      cx=u
+                      return
+                    end if
+                    u=cx+GOLD*(cx-bx)
+                    fu=func(u,var1,var2,var3)
+                  else if((cx-u)*(u-ulim).gt.0.0_dp) then
+                    fu=func(u,var1,var2,var3)
+                    if(fu.lt.fc) then
+                      bx=cx
+                      cx=u
+                      u=cx+GOLD*(cx-bx)
+                      fb=fc
+                      fc=fu
+                      fu=func(u,var1,var2,var3)
+                    end if
+                  else if((u-ulim)*(ulim-cx).ge.0.0_dp) then
+                    u=ulim
+                    fu=func(u,var1,var2,var3)
+                  else            
+                    u=cx+GOLD*(cx-bx)
+                    fu=func(u,var1,var2,var3)
+                  end if
+                  ax=bx
+                  bx=cx
+                  cx=u
+                  fa=fb
+                  fb=fc
+                  fc=fu
+                  return
+                end if
+              end subroutine mnbrak
+          
+          end subroutine minimize_scalar
 
   
   end module fingering_modes
