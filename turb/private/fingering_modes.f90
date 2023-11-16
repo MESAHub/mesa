@@ -189,5 +189,60 @@ module fingering_modes
       end subroutine hybrd1
   
     end function gaml2max
+
+    ! This is an attempt to implement Rich's improved gaml2max_new
+      
+        function gaml2max_new(pr, tau, r0) result(out)
+          real(dp), intent(in) :: pr, tau, r0
+          real(dp) :: out(2)
+      
+          real(dp) :: lam_til_min, lam_til_max
+          real(dp) :: lam_til, l2, lam
+      
+          lam_til_min = 0.0_dp
+          lam_til_max = (1.0_dp - r0*tau)/(r0 - tau)
+      
+          call minimize(fun, lam_til, lam_til_min, lam_til_max, pr, tau, r0)
+      
+          l2 = eval_l2(lam_til, pr, tau, r0)
+          lam = l2*lam_til
+      
+          out = [lam, l2]
+      
+        end function gaml2max_new
+      
+        function fun(lam_til, pr, tau, r0) result(f)
+          real(dp), intent(in) :: lam_til, pr, tau, r0
+          real(dp) :: f
+      
+          real(dp) :: l2
+      
+          l2 = eval_l2(lam_til, pr, tau, r0)
+          f = -l2*lam_til
+      
+        end function fun
+      
+        function eval_l2(lam_til, pr, tau, r0) result(l2)
+          real(dp), intent(in) :: lam_til, pr, tau, r0
+          real(dp) :: l2
+      
+          l2 = sqrt(pr*(1.0_dp + lam_til - r0*lam_til - r0*tau)/(r0*(1.0_dp + lam_til)*&
+               (pr + lam_til)*(lam_til + tau)))
+      
+        end function eval_l2
+      
+      
+        ! Minimal interface to scalar minimization
+        subroutine minimize(func, x, xmin, xmax, var1, var2, var3)
+          external :: func
+          real(dp), intent(inout) :: x
+          real(dp), intent(in) :: xmin, xmax, var1, var2, var3
+          integer :: ierr
+      
+          call minimize_scalar(func, x, xmin, xmax, ierr, var1, var2, var3)
+      
+        end subroutine minimize
+      
+
   
   end module fingering_modes
