@@ -96,12 +96,12 @@ contains
          else if (thermohaline_option == 'Harrington_Garaud_19') then
             call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
 
-            B0 = 100d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
             ! solve for w based on Harrington & Garaud model
-            call solve_hg19_eqn32(pr,tau,R0,HB,w,ierr)
+            call solve_hg19_eqn32(HB,l2hat,lhat,lamhat,w,ierr)
 
             ! KB = 1.24
             D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 1.24d0) - 1d0)
@@ -180,7 +180,7 @@ contains
       return
    end function nuC_brown
 
-   ! More general expression for Nu_C in terms of w, for Harrington model
+   ! More general expression for Nu_C in terms of w, for Harrington and Fraser models
    real(dp) function nuC(tau, w, lamhat, l2hat, KB)
       real(dp), intent(in) :: tau, w, lamhat, l2hat, KB
       nuC =  1d0 + KB * pow2(w) / (tau * (lamhat + tau * l2hat))
@@ -401,12 +401,12 @@ contains
 
    ! Solver for HG19's eqn. 32
 
-   subroutine solve_hg19_eqn32(Pr, tau, R0, HB, w, ierr, CH)
+   subroutine solve_hg19_eqn32(HB, l2hat, lhat, lamhat, w, ierr, CH)
 
-      real(dp), intent(in)           :: Pr
-      real(dp), intent(in)           :: tau
-      real(dp), intent(in)           :: R0
       real(dp), intent(in)           :: HB
+      real(dp), intent(in)           :: l2hat
+      real(dp), intent(in)           :: lhat
+      real(dp), intent(in)           :: lamhat
       real(dp), intent(out)          :: w
       integer, intent(out)           :: ierr
       real(dp), intent(in), optional :: CH
@@ -417,9 +417,6 @@ contains
       real(dp), parameter :: EPSY = 0._dp
 
       real(dp)          :: CH_
-      real(dp)          :: l2hat
-      real(dp)          :: lhat
-      real(dp)          :: lamhat
       real(dp)          :: w0
       real(dp), target  :: rpar(5)
       integer,  target  :: ipar(0)
@@ -432,11 +429,9 @@ contains
          CH_ = 1.66_dp
       end if
 
-      call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
-
       w0 = MAX(sqrt(2.0_dp*HB), 2.0_dp * PI * lamhat/lhat)
 
-      rpar = [Pr, tau, R0, HB, CH_]
+      rpar = [l2hat, lhat, lamhat, HB, CH_]
 
       rpar_ => rpar
       ipar_ => ipar
@@ -469,9 +464,6 @@ contains
       integer, intent(inout), pointer  :: ipar(:)
       integer, intent(out)             :: ierr
 
-      real(dp) :: l2hat
-      real(dp) :: lhat
-      real(dp) :: lamhat
       real(dp) :: LHS
       real(dp) :: RHS1
       real(dp) :: RHS2
@@ -485,13 +477,11 @@ contains
 
       associate( &
            w => x, &
-           Pr => rpar(1), &
-           tau => rpar(2), &
-           R0 => rpar(3), &
+           l2hat => rpar(1), &
+           lhat => rpar(2), &
+           lamhat => rpar(3), &
            HB => rpar(4), &
            CH => rpar(5))
-
-        call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
 
         LHS = 0.5_dp * w**2.0_dp - HB
         RHS1 = (CH*lamhat/(0.42_dp*lhat))**1.5_dp
