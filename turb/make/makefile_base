@@ -12,7 +12,17 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCE FILES
 
-SRCS = mlt.f90 tdc_support.f90 tdc.f90 thermohaline.f90 semiconvection.f90 turb.f90
+SRCS = \
+     mlt.f90 \
+     tdc_support.f90 \
+     tdc.f90 \
+     magnetic_diffusion.f90 \
+     fingering_modes.f90 \
+     kh_instability.f90 \
+     parasite_model.f90 \
+     thermohaline.f90 \
+     semiconvection.f90 \
+     turb.f90
 
 #################################################################
 #
