@@ -233,7 +233,6 @@ module fingering_modes
       
       
         ! Minimal interface to scalar minimization
-        
         subroutine minimize(func, x, xmin, xmax, var1, var2, var3)
           external :: func
           real(dp), intent(inout) :: x
