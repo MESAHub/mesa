@@ -13,13 +13,14 @@ module fingering_modes
   
 contains
 
-   subroutine gaml2max(pr, tau, r0, lam, beta, method)
+   subroutine gaml2max(pr, tau, r0, lam, beta, ierr, method)
 
       real(dp), intent(in)               :: pr
       real(dp), intent(in)               :: tau
       real(dp), intent(in)               :: r0
       real(dp), intent(out)              :: lam
       real(dp), intent(out)              :: beta
+      integer, intent(out)               :: ierr
       character(*), intent(in), optional :: method
 
       ! Find the growth rate lam and wavenumber-squared beta of the
@@ -52,18 +53,20 @@ contains
 
    !****
 
-   subroutine gaml2max_opt_(Pr, tau, R0, lam, beta)
+   subroutine gaml2max_opt_(Pr, tau, R0, lam, beta, ierr)
 
       real(dp), intent(in)  :: Pr
       real(dp), intent(in)  :: tau
       real(dp), intent(in)  :: R0
       real(dp), intent(out) :: lam
       real(dp), intent(out) :: beta
+      integer, intent(out)  :: ierr
 
       integer, parameter  :: MAX_TRIES = 25
-      reap(dp), parameter :: EPS = 10*sqrt(EPSILON(0._dp))
+      real(dp), parameter :: EPS = 10*sqrt(EPSILON(0._dp))
 
       real(dp) :: tlam_max
+      real(dp) :: tlam
       real(dp) :: lam2
       
       ! This version uses a 1-D optimization search
@@ -93,8 +96,8 @@ contains
 
       function lam2_(tlam)
 
-         real(dp) :: tlam
-         real(dp) :: lam2_
+         real(dp), intent(in) :: tlam
+         real(dp)             :: lam2_
 
          ! Evaluate lam2 = lam^2 given tlam
 
@@ -110,13 +113,14 @@ contains
 
    !****
 
-   subroutine gaml2max_cubic_(Pr, tau, R0, lam, beta)
+   subroutine gaml2max_cubic_(Pr, tau, R0, lam, beta, ierr)
 
       real(dp), intent(in)  :: Pr
       real(dp), intent(in)  :: tau
       real(dp), intent(in)  :: R0
       real(dp), intent(out) :: lam
       real(dp), intent(out) :: beta
+      integer, intent(out)  :: ierr
 
       real(dp) :: al
       real(dp) :: a2
@@ -155,7 +159,7 @@ contains
 
       if (q < 0._dp) then
          snq = sqrt(-q)
-         tlam = 2*snqq*cos(acos(r/snq**3)/3) - a2/3
+         tlam = 2*snq*cos(acos(r/snq**3)/3) - a2/3
       else
          tlam = -a2/3
       endif
