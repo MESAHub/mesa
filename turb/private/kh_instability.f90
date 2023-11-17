@@ -1,6 +1,7 @@
 module kh_instability
 
     use fingering_modes, only: gaml2max
+    use f95_lapack ! Might need to link properly from SDK
   
     
     implicit none
@@ -22,7 +23,7 @@ module kh_instability
   
   contains
   
-    subroutine khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
+    subroutine khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm) ! db = \eta / k_T with \eta the magnetic diffusivity hb_star is the alfven mach number
       real(dp), intent(in) :: w, lhat, hb, pr, db 
       real(dp), intent(out) :: hb_star, re, rm
   
@@ -153,7 +154,7 @@ module kh_instability
       complex(dp), allocatable :: v(:,:)
       integer :: i
   
-      call eigensystem(l, w, v)
+      call ge(l, w, v)
   
 !!$      if (present(withmode)) then
 !!$         i = maxloc(aimag(w),1)
@@ -174,7 +175,7 @@ module kh_instability
       complex(dp), allocatable :: v(:,:)
       integer :: i
   
-      call eigensystem(l, w, v)
+      call ge(l, w, v)
   
       omg = w(maxloc(aimag(w)))
   
