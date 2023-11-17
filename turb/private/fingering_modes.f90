@@ -1,4 +1,5 @@
 module fingering_modes
+module num   
 
     implicit none
   
@@ -270,8 +271,10 @@ module fingering_modes
             fw = fv
           
             do iter = 1, ITMAX
-               call mnbrak(func, a, v, b, var1, var2, var3, bracketed)
-               call brent(func, a, v, b, var1, var2, var3, w, fw)
+               ! call mnbrak(func, a, v, b, var1, var2, var3, bracketed)
+
+               ! call brent(func, a, v, b, var1, var2, var3, w, fw) ! We can use MESA num safe_root_with_brackets
+              call  safe_root_with_brackets() ! Need to adapt 
                if (abs(x-w) < EPS*(abs(x)+abs(w))) exit
             end do
           
@@ -281,6 +284,7 @@ module fingering_modes
             contains
           
               ! Local version of brent and mnbrak
+              ! We might not need these 
               subroutine brent(func,ax,bx,cx,var1,var2,var3,xmin,fmin)
                 real(dp), external :: func
                 real(dp), intent(in) :: ax,bx,cx
@@ -433,5 +437,42 @@ module fingering_modes
               end subroutine mnbrak
           
           end subroutine minimize_scalar
+
+
+          ! Matteo Started working on this. Not ready yet. 
+
+            subroutine calculate_max_velocity(radius, blob_mu, mean_mu, &  
+                 grad_T, grad_mu, pressure, density, acceleration, v_max)
+
+              ! Calculate max (drag-limited) velocity for RT unstable blob    
+          
+              real(dp), intent(in) :: radius
+              real(dp), intent(in) :: blob_mu, mean_mu 
+              real(dp), intent(in) :: grad_T, grad_mu
+              real(dp), intent(in) :: pressure, density
+              real(dp), intent(out) :: acceleration
+              real(dp), intent(out) :: v_max
+          
+              real(dp) :: scale_height
+              real(dp) :: delta_rho
+              real(dp) :: buoyancy_force, drag_force
+          
+              scale_height = pressure / (density * grad_T)
+          
+              delta_rho = density * (mean_mu - blob_mu) * grad_mu / &
+                   (blob_mu * grad_T)
+          
+              buoyancy_force = gravity * delta_rho * (4.0/3.0) * pi * radius**3
+              drag_force = 0.5_dp * density * drag_coefficient * v_max**2 * &
+                   (4.0_dp*pi*radius**2)
+          
+              acceleration = buoyancy_force / (density * (4.0/3.0) * pi * radius**3)
+          
+              v_max = sqrt(2.0_dp * acceleration * scale_height)
+          
+            end subroutine calculate_max_velocity
+            
+          end module blob_velocity
+
 
   end module fingering_modes
