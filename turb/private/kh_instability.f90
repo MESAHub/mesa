@@ -1,7 +1,8 @@
 module kh_instability
 
+    use const_def, only: dp
     use fingering_modes, only: gaml2max
-    use f95_lapack ! Might need to link properly from SDK
+    ! use f95_lapack ! Might need to link properly from SDK
   
     
     implicit none
@@ -11,13 +12,10 @@ module kh_instability
     public :: deln
     public :: lmat
     public :: gamfromL
-    public :: omegafromL
     public :: gamma_over_k
-    public :: omega_over_k
     public :: gammax_kscan
     public :: gammax_minus_lambda
   
-    integer, parameter :: dp = kind(1.d0)
     real(dp), parameter :: CH = 1.66_dp
 
   
@@ -166,21 +164,7 @@ module kh_instability
 !!$      end if
   
     end function gamfromL
-  
-    function omegafromL(l) result(omg)
-      complex(dp), intent(in) :: l(:,:)
-      complex(dp) :: omg
-  
-      complex(dp) :: w(size(l,1)) 
-      complex(dp), allocatable :: v(:,:)
-      integer :: i
-  
-      call ge(l, w, v)
-  
-      omg = w(maxloc(aimag(w)))
-  
-    end function omegafromL
-  
+    
     function gamma_over_k(delta, m2, re, rm, ks, n, ideal) result(gamk)
       real(dp), intent(in) :: delta, m2, re, rm
       real(dp), intent(in) :: ks(:)
@@ -198,23 +182,6 @@ module kh_instability
       end do
   
     end function gamma_over_k
-  
-    function omega_over_k(delta, m2, re, rm, ks, n, ideal) result(omgk)
-      real(dp), intent(in) :: delta, m2, re, rm 
-      real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n
-      logical, intent(in) :: ideal
-  
-      complex(dp) :: l_result(2*n,2*n)
-      complex(dp) :: omgk(size(ks))
-      integer :: i
-  
-      do i = 1, size(ks)
-         call lmat(delta, m2, re, rm, ks(i), n, ideal, l_result)
-         omgk(i) = omegafromL(l_result)
-      end do
-  
-    end function omega_over_k
   
     function gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except) result(gammax)
       real(dp), intent(in) :: delta, m2, re, rm

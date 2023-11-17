@@ -122,10 +122,7 @@ contains
       real(dp), intent(out) :: beta
       integer, intent(out)  :: ierr
 
-      real(dp) :: al
-      real(dp) :: a2
-      real(dp) :: a1
-      real(dp) :: a0
+      real(dp) :: a0, a1, a2, a3
       real(dp) :: q
       real(dp) :: r
       real(dp) :: snq
@@ -143,7 +140,7 @@ contains
 
       ! Determine q and r
 
-      q = a1/(3*a_3) - (a2/(3*a3)**2
+      q = a1/(3*a3) - (a2/(3*a3))**2
       r = a1*a2/(6*a3**2) - a0/(2*a3) - (a2/(3*a3))**3
 
       ! Sanity check (ensures that the cubic has three real roots)
