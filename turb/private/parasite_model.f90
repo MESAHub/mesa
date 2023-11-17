@@ -35,7 +35,7 @@ module parasite_model
   
       real(dp), intent(in) :: pr, tau, r0, hb, db 
       real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n, ideal
+      integer, intent(in) :: n, ideal ! n MUST be odd
       real(dp), intent(in) :: delta  
       logical, intent(in) ::  badks_exception, get_kmax
       real(dp), intent(in), optional :: lamhat, l2hat
@@ -52,7 +52,11 @@ module parasite_model
       integer, pointer  :: ipar(:)
       integer :: lrpar, lipar
       integer :: ierr
-  
+
+      if(mod(n,2) == 0) then
+         stop "thermohaline parasite wf: n must be odd"
+      end if
+      
       if (present(lamhat)) then
          lamhat_ = lamhat
          l2hat_ = l2hat
