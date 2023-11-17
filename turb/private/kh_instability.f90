@@ -15,17 +15,12 @@ module kh_instability
     public :: omega_over_k
     public :: gammax_kscan
     public :: gammax_minus_lambda
-    public :: krangeerror
   
     integer, parameter :: dp = kind(1.d0)
     real(dp), parameter :: CH = 1.66_dp
 
   
   contains
-  
-    type krangeerror
-      character(len=*) :: msg
-    end type krangeerror
   
     subroutine khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
       real(dp), intent(in) :: w, lhat, hb, pr, db 
@@ -37,19 +32,13 @@ module kh_instability
   
     end subroutine khparams_from_fingering
   
-    function deln(k, n, delta, finger_norm, k0)
+    function deln(k, n, delta)
       real(dp), intent(in) :: k  
       integer, intent(in) :: n  
       real(dp), intent(in) :: delta
-      logical, intent(in) :: finger_norm
-      real(dp), intent(in), optional :: k0
       real(dp) :: deln
   
-      if (finger_norm) then
-         deln = k**2 + k0**2 * (n + delta)**2
-      else
-         deln = k**2 + (n + delta)**2
-      end if
+      deln = k**2 + (n + delta)**2
   
     end function deln
   
@@ -60,10 +49,15 @@ module kh_instability
       complex(dp), intent(out) :: l(2*n,2*n)
   
       real(dp) :: diss
-      integer :: i, m, ns(n), ms(2*n)
+      integer :: i, j, m, ns(n), ms(2*n)
       real(dp) :: delns(n), delns_m(2*n)
-  
-      diss = 1.0_dp - ideal
+      real(dp) :: deltan, deltanm1, deltanp1
+
+      if(ideal) then
+         diss = 0d0
+      else
+         diss = 1d0
+      end if
   
       do i = -n/2, n/2
          ns(i+n/2+1) = i
@@ -94,22 +88,37 @@ module kh_instability
       do i = 1, 2*n-1
          if (i > 1 .and. i < 2*n-1) then
             deltan = delns_m(i)
-            deltanp1 = delns_m(i+2)
-            deltanm1 = delns_m(i-2)
             if (mod(ms(i),2) == 0) then
-               n = ms(i)/2
                l(i,i) = (0.0_dp, 1.0_dp) * (diss/re) * deltan
-               l(i,i+1) = m2 * k  
-               l(i,i+2) = -k * (1 - deltanp1) / (2.0_dp*deltan)
-               l(i,i-2) = k * (1 - deltanm1) / (2.0_dp*deltan)
             else
                l(i,i) = (0.0_dp, 1.0_dp) * diss/rm * deltan
-               l(i,i-1) = k
-               l(i,i+2) = k/2.0_dp 
-               l(i,i-2) = -k/2.0_dp
             end if
          end if
       end do
+
+      ! pm 1 entries
+      do i = 2, 2*n-2
+         if (mod(ms(i),2) == 0) then
+            l(i,i+1) = m2 * k
+         else
+            l(i,i-1) = k
+         end if
+      end do
+      
+      ! pm 2 entries
+      do i = 3, 2*n-3
+         deltan = delns_m(i)
+         deltanp1 = delns_m(i+2)
+         deltanm1 = delns_m(i-2)
+         if (mod(ms(i),2) == 0) then
+            l(i,i+2) = -k * (1 - deltanp1) / (2.0_dp*deltan)
+            l(i,i-2) = k * (1 - deltanm1) / (2.0_dp*deltan)
+         else
+            l(i,i+2) = k/2.0_dp 
+            l(i,i-2) = -k/2.0_dp
+         end if
+      end do
+
   
       ! Boundary conditions
       i = 1
@@ -138,7 +147,7 @@ module kh_instability
       complex(dp), intent(in) :: l(:,:)
       logical, intent(in), optional :: withmode
       real(dp) :: gam 
-      complex(dp), allocatable, optional :: mode(:)
+      !complex(dp), allocatable, optional :: mode(:)
   
       complex(dp) :: w(size(l,1))
       complex(dp), allocatable :: v(:,:)
@@ -146,14 +155,14 @@ module kh_instability
   
       call eigensystem(l, w, v)
   
-      if (present(withmode)) then
-         i = maxloc(aimag(w),1)
-         gam = -aimag(w(i))
-         allocate(mode(size(w)))
-         mode = v(:,i)
-      else
+!!$      if (present(withmode)) then
+!!$         i = maxloc(aimag(w),1)
+!!$         gam = -aimag(w(i))
+!!$         allocate(mode(size(w)))
+!!$         mode = v(:,i)
+!!$      else
          gam = maxval(-aimag(w))
-      end if
+!!$      end if
   
     end function gamfromL
   
@@ -177,11 +186,14 @@ module kh_instability
       integer, intent(in) :: n
       logical, intent(in) :: ideal
   
+      complex(dp) :: l_result(2*n,2*n)
       real(dp) :: gamk(size(ks))
       integer :: i
-      
+
+
       do i = 1, size(ks)
-         gamk(i) = gamfromL(lmat(delta, m2, re, rm, ks(i), n, ideal))
+         call lmat(delta, m2, re, rm, ks(i), n, ideal, l_result)
+         gamk(i) = gamfromL(l_result)
       end do
   
     end function gamma_over_k
@@ -192,11 +204,13 @@ module kh_instability
       integer, intent(in) :: n
       logical, intent(in) :: ideal
   
+      complex(dp) :: l_result(2*n,2*n)
       complex(dp) :: omgk(size(ks))
       integer :: i
   
       do i = 1, size(ks)
-         omgk(i) = omegafromL(lmat(delta, m2, re, rm, ks(i), n, ideal)) 
+         call lmat(delta, m2, re, rm, ks(i), n, ideal, l_result)
+         omgk(i) = omegafromL(l_result)
       end do
   
     end function omega_over_k
@@ -217,117 +231,117 @@ module kh_instability
   
       if (badks_except .and. gammax > 0.0_dp) then
          if (i == 1 .or. i == size(ks)) then
-            write(msg,*) 'Most unstable growth at edge of k range'
-            error stop krangeerror(msg)
+            write(*,*) 'WARNING: most unstable growth at edge of k range'
+            stop ! may need to get rid of this stop statement
          end if
       end if
   
     end function gammax_kscan
 
       
-        function sigma_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_star, n, withmode) result(sigma)
-          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0, k_star 
-          integer, intent(in) :: n
-          logical, intent(in), optional :: withmode
-          real(dp) :: sigma
-          complex(dp), allocatable, optional :: mode(:)
+!!$        function sigma_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_star, n, withmode) result(sigma)
+!!$          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0, k_star 
+!!$          integer, intent(in) :: n
+!!$          logical, intent(in), optional :: withmode
+!!$          real(dp) :: sigma
+!!$          complex(dp), allocatable, optional :: mode(:)
+!!$      
+!!$          real(dp) :: lamhat, lhat, l2hat, m2, re, rm
+!!$          complex(dp) :: l(2*n,2*n)
+!!$      
+!!$          call gaml2max(pr, tau, r0, lamhat, l2hat)
+!!$          lhat = sqrt(l2hat)
+!!$      
+!!$          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
+!!$      
+!!$          call lmat(delta, m2, re, rm, k_star, n, l)
+!!$          
+!!$          if (present(withmode)) then
+!!$             sigma = gamfromL(l, .true., mode) 
+!!$          else
+!!$             sigma = gamfromL(l)
+!!$          end if
+!!$      
+!!$        end function sigma_from_fingering_params
+!!$      
+!!$        function omega_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_star, n) result(omg)
+!!$          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0, k_star
+!!$          integer, intent(in) :: n
+!!$          complex(dp) :: omg
+!!$      
+!!$          real(dp) :: lamhat, lhat, l2hat, m2, re, rm 
+!!$          complex(dp) :: l(2*n,2*n)
+!!$      
+!!$          call gaml2max(pr, tau, r0, lamhat, l2hat)  
+!!$          lhat = sqrt(l2hat)
+!!$      
+!!$          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
+!!$      
+!!$          call lmat(delta, m2, re, rm, k_star, n, l)
+!!$          omg = omegafromL(l)
+!!$      
+!!$        end function omega_from_fingering_params
+!!$      
+!!$        function sigma_over_k_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars, n) result(sigk)
+!!$          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0 
+!!$          real(dp), intent(in) :: k_stars(:)
+!!$          integer, intent(in) :: n
+!!$          real(dp) :: sigk(size(k_stars))
+!!$      
+!!$          integer :: i
+!!$      
+!!$          do i = 1, size(k_stars)
+!!$             sigk(i) = sigma_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars(i), n)
+!!$          end do
+!!$      
+!!$        end function sigma_over_k_fingering_params
       
-          real(dp) :: lamhat, lhat, l2hat, m2, re, rm
-          complex(dp) :: l(2*n,2*n)
+!!$        function gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except, get_kmax) result(gammax)
+!!$          ! Add get_kmax option
+!!$      
+!!$          real(dp), intent(in) :: delta, m2, re, rm 
+!!$          real(dp), intent(in) :: ks(:)
+!!$          integer, intent(in) :: n
+!!$          logical, intent(in) :: ideal, badks_except, get_kmax
+!!$          real(dp) :: gammax
+!!$          real(dp), optional :: kmax
+!!$      
+!!$          ! Same as before but now optionally return kmax
+!!$          
+!!$          if (get_kmax) then
+!!$             gammax = gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except, kmax) 
+!!$          else
+!!$             gammax = gammax_kscan1(delta, m2, re, rm, ks, n, ideal, badks_except)
+!!$          end if
+!!$      
+!!$        end function gammax_kscan
       
-          call gaml2max(pr, tau, r0, lamhat, l2hat)
-          lhat = sqrt(l2hat)
-      
-          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
-      
-          call lmat(delta, m2, re, rm, k_star, n, l)
-          
-          if (present(withmode)) then
-             sigma = gamfromL(l, .true., mode) 
-          else
-             sigma = gamfromL(l)
-          end if
-      
-        end function sigma_from_fingering_params
-      
-        function omega_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_star, n) result(omg)
-          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0, k_star
-          integer, intent(in) :: n
-          complex(dp) :: omg
-      
-          real(dp) :: lamhat, lhat, l2hat, m2, re, rm 
-          complex(dp) :: l(2*n,2*n)
-      
-          call gaml2max(pr, tau, r0, lamhat, l2hat)  
-          lhat = sqrt(l2hat)
-      
-          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
-      
-          call lmat(delta, m2, re, rm, k_star, n, l)
-          omg = omegafromL(l)
-      
-        end function omega_from_fingering_params
-      
-        function sigma_over_k_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars, n) result(sigk)
-          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0 
-          real(dp), intent(in) :: k_stars(:)
-          integer, intent(in) :: n
-          real(dp) :: sigk(size(k_stars))
-      
-          integer :: i
-      
-          do i = 1, size(k_stars)
-             sigk(i) = sigma_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars(i), n)
-          end do
-      
-        end function sigma_over_k_fingering_params
-      
-        function gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except, get_kmax) result(gammax)
-          ! Add get_kmax option
-      
-          real(dp), intent(in) :: delta, m2, re, rm 
-          real(dp), intent(in) :: ks(:)
-          integer, intent(in) :: n
-          logical, intent(in) :: ideal, badks_except, get_kmax
-          real(dp) :: gammax
-          real(dp), optional :: kmax
-      
-          ! Same as before but now optionally return kmax
-          
-          if (get_kmax) then
-             gammax = gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except, kmax) 
-          else
-             gammax = gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except)
-          end if
-      
-        end function gammax_kscan
-      
-        function sigma_max_kscan_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars, n, &
-             badks_except, get_kmax) result(sigmax)
-      
-          ! Add get_kmax option
-      
-          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0
-          real(dp), intent(in) :: k_stars(:)
-          integer, intent(in) :: n
-          logical, intent(in) :: badks_except, get_kmax  
-          real(dp) :: sigmax
-          real(dp), optional :: kmax
-      
-          real(dp) :: lamhat, lhat, l2hat, m2, re, rm
-      
-          call gaml2max(pr, tau, r0, lamhat, l2hat)
-          lhat = sqrt(l2hat)
-      
-          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
-      
-          if (get_kmax) then
-             sigmax = gammax_kscan(delta, m2, re, rm, k_stars, n, .false., badks_except, kmax)
-          else 
-             sigmax = gammax_kscan(delta, m2, re, rm, k_stars, n, .false., badks_except)
-          end if
-      
-        end function sigma_max_kscan_fingering_params
+!!$        function sigma_max_kscan_fingering_params(delta, w, hb, db, pr, tau, r0, k_stars, n, &
+!!$             badks_except, get_kmax) result(sigmax)
+!!$      
+!!$          ! Add get_kmax option
+!!$      
+!!$          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0
+!!$          real(dp), intent(in) :: k_stars(:)
+!!$          integer, intent(in) :: n
+!!$          logical, intent(in) :: badks_except, get_kmax  
+!!$          real(dp) :: sigmax
+!!$          real(dp), optional :: kmax
+!!$      
+!!$          real(dp) :: lamhat, lhat, l2hat, m2, re, rm
+!!$      
+!!$          call gaml2max(pr, tau, r0, lamhat, l2hat)
+!!$          lhat = sqrt(l2hat)
+!!$      
+!!$          call khparams_from_fingering(w, lhat, hb, pr, db, m2, re, rm)
+!!$      
+!!$          if (get_kmax) then
+!!$             sigmax = gammax_kscan(delta, m2, re, rm, k_stars, n, .false., badks_except, kmax)
+!!$          else 
+!!$             sigmax = gammax_kscan(delta, m2, re, rm, k_stars, n, .false., badks_except)
+!!$          end if
+!!$      
+!!$        end function sigma_max_kscan_fingering_params
       
         function gammax_minus_lambda(w, lamhat, lhat, hb, pr, db, delta, ks, n, ideal, badks_exception) result(f)
       
