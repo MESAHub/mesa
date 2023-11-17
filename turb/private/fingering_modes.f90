@@ -136,20 +136,19 @@ contains
 
       ! Set up cubic coefficients
 
-      al = Pr - R0 - Pr*R0 + tau
-
-      a2 = -2*(R0-1)*(Pr + tau + pr*tau) / al
-      a1 = (pr + tau - 4*Pr*(R0-1)*tau - (1+Pr)*R0*tau**2)/al
-      a0 = -2*Pr*tau*(r0*tau - 1)/al
+      a3 = Pr - R0 - Pr*R0 + tau
+      a2 = -2*(R0-1)*(Pr + tau + pr*tau)
+      a1 = pr + tau - 4*Pr*(R0-1)*tau - (1+Pr)*R0*tau**2
+      a0 = -2*Pr*tau*(r0*tau - 1)
 
       ! Determine q and r
 
-      q = a1/3 - a2**2/9
-      r = (a1*a2 - 3*a0)/6 - a2**3/27
+      q = a1/(3*a_3) - (a2/(3*a3)**2
+      r = a1*a2/(6*a3**2) - a0/(2*a3) - (a2/(3*a3))**3
 
-      ! Sanity check
+      ! Sanity check (ensures that the cubic has three real roots)
 
-      if (r**q + q**3 > 0._dp) then
+      if (r**2 + q**3 > 0._dp) then
          write(*, *) 'invalid cubic in gaml2max_cubic_'
          ierr = -1
          return
