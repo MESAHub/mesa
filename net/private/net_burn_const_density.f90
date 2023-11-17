@@ -237,7 +237,8 @@
          stpmax = max_steps
 
          n% screening_mode = screening_mode
-                  
+         n% g => g
+          
          if (dbg) write(*,2) 'call setup_net_info', iwork
          call setup_net_info(n) 
          if (dbg) write(*,*) 'done setup_net_info'
