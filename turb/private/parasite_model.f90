@@ -21,6 +21,13 @@ module parasite_model
   
   contains
   
+   ! Adrian said we can get rid of ideal, badks_exception, delta. 
+   ! delta = Floquet wavenumber. delta = 0 means we are doing the analyisis for just one finger (n=1). For n > 1, delta = 1/n (e.g. 1/2 for 2 fingers). 
+   ! Adrian says for most (all) cases delta = 0 is enough. We're keeping it there in case this turns out to be false in some edge case. 
+   ! For now ideal = 1 or 0. Ideal = 1 means ideal gas. Be sure it is an integer, not logical 
+   ! badks_exception true should throw a warning telling the kz search domain does not contain sigma_max, so the search didn't complete. Changed that in kh_instability.
+   ! Note we will need to decide what MESA should use as input for ks (the grid of kz values over which we do the search). Need to be robust
+
     function wf(pr, tau, r0, hb, db, ks, n, delta, ideal, badks_exception, get_kmax, &
          lamhat, l2hat) result(w)
   
@@ -28,9 +35,9 @@ module parasite_model
   
       real(dp), intent(in) :: pr, tau, r0, hb, db 
       real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n
+      integer, intent(in) :: n, ideal
       real(dp), intent(in) :: delta  
-      logical, intent(in) :: ideal, badks_exception, get_kmax
+      logical, intent(in) ::  badks_exception, get_kmax
       real(dp), intent(in), optional :: lamhat, l2hat
       real(dp) :: w
       real(dp), optional :: kmax
@@ -44,7 +51,7 @@ module parasite_model
          lamhat_ = lamhat
          l2hat_ = l2hat
       else
-         call gaml2max(pr, tau, r0, lamhat_, l2hat_) 
+         call gaml2max_new(pr, tau, r0, lamhat_, l2hat_) 
       end if
   
       lhat = sqrt(l2hat_)
