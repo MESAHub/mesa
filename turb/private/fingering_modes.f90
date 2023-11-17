@@ -435,5 +435,4 @@ module fingering_modes
           
           end subroutine minimize_scalar
 
-  
   end module fingering_modes
