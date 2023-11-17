@@ -1,126 +1,144 @@
 ! ***********************************************************************
-!   magnetic_diffusion module
-!   Part of MESA software suite
 !
-!   This module calculates various properties related to magnetic diffusion.
+!   Copyright (C) 2010-2021  The MESA Team
 !
-!   Contains:
-!   - calc_eta: Computes magnetic diffusivity from electrical conductivity.
-!   - calc_sige: Computes electrical conductivity for different regimes.
-!   - sige1, sige2, sige3: Helper functions for electrical conductivity calculations.
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
 !
-!   References:
-!   - S.-C. Yoon Oct. 10, 2003
-!   - Spitzer 1962
-!   - Wendell et al. 1987, ApJ 313:284
-!   - Nandkumar & Pethick (1984)
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
 !
-!   This code is distributed under the terms of the MESA MANIFESTO and the GNU General Library Public License.
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
 ! ***********************************************************************
 
-module magnetic_diffusion
 
-    use const_def
-    use num_lib
-    use math_lib
-    use utils_lib
-    implicit none
+      module magnetic_diffusion
 
-    private
-    public :: calc_eta, calc_sige, sige1, sige2, sige3
+      use const_def
+      use num_lib
+      use math_lib
+      use utils_lib
 
-contains
+      implicit none
 
+      private
+      public :: calc_sige, calc_eta
 
-!### Example of how to use this: 
+      contains
 
-! call kap_get_elect_cond_opacity( &
-! s% kap_handle, s% zbar(k), log10(s% rho(k)),& 
-! log10(s% T(k)), kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
-! if (ierr /= 0) return
-! kap_cond(k) = kap
+      !> Compute the magnetic diffusivity from the electric conductivity.
+      !! @param sig The electrical conductivity (1/s).
+      !! @param eta The magnetic diffusivity (output, cm^2/s).
+      real(dp) function calc_eta(sig) result(eta)
+         real(dp), intent(in) :: sig
 
-! !## Then calculate the conductivity 
+         eta = (clight * clight / (4d0 * pi)) /sig
+      end function calc_eta
 
-! sig = calc_sige(s% abar(k), s% zbar(k),s% rho(k), & 
-! s% T(k),s% Cp(k), kap_cond(k),s% opacity(k))
-! cond(k) = sig
+      !> Computes the electrical conductivity following
+      !! S.-C. YOON Oct. 10, 2003.
+      !!
+      !! @param abar The mean atomic mass number.
+      !! @param zbar The mean atomic charge.
+      !! @param rho The density (g/cm^3).
+      !! @param T The temperature (K).
+      !! @param Cp The specific heat at constant pressure (erg/g/K).
+      !! @param kap_cond The electronic thermal opacity (cm^2/g).
+      !! @param opacity The opacity (cm^2/g).
+      !! @param sig The electrical conductivity (output, 1/s).
+      real(dp) function calc_sige(abar, zbar, rho, T, Cp, kap_cond, opacity) result(sig)
+         real(dp), intent(in) :: abar, zbar, rho, T, Cp, kap_cond, opacity
+         real(dp) :: gamma, xlg, alpha, ffff, xxx, xsig1, xsig2, xsig3
 
-! !## and the magnetic diffusivity
+         gamma = 0.2275d0*pow2(zbar) * pow(rho * 1.d-6 / abar, one_third)*1.d8/T
+         xlg = log10(gamma)
 
-! eta(k) = clight * clight / (4d0 * pi * sig)
+         alpha = 16d0 * boltz_sigma * pow3(T) / (3d0 * opacity * pow2(rho) * Cp)
 
+         if (xlg < -1.5d0) then
+            sig = sige1(zbar,T,gamma)
+         else if (xlg >= -1.5d0 .and. xlg <= 0d0) then
+            xxx = (xlg + 0.75d0)*4d0/3d0
+            ffff = 0.25d0*(2d0-3d0*xxx + pow3(xxx))
+            xsig1 = sige1(zbar,T,gamma)
+            xsig2 = sige2(T,rho,kap_cond)
+            sig = (1d0-ffff)*xsig2 + ffff*xsig1
+         else if (xlg > 0d0 .and. xlg < 0.5d0) then
+            xsig2 = sige2(T,rho,kap_cond)
+            sig = xsig2
+         else if (xlg >= 0.5d0 .and. xlg < 1d0) then
+            xxx = (xlg-0.75d0)*4d0
+            ffff = 0.25d0*(2d0-3d0*xxx + pow3(xxx))
+            xsig2 = sige2(T,rho,kap_cond)
+            xsig3 = sige3(zbar,T,gamma)
+            sig = (1d0-ffff)*xsig3 + ffff*xsig2
+         else
+            sig = sige3(zbar,T,gamma)
+         endif
 
+      end function calc_sige
 
-
-    !> Compute magnetic diffusivity from electrical conductivity.
-    real(dp) function calc_eta(sig)
-        real(dp), intent(in) :: sig
-        calc_eta = (clight * clight / (4d0 * pi)) / sig
-    end function calc_eta
-
-    !> Compute electrical conductivity for various regimes.
-    real(dp) function calc_sige(abar, zbar, rho, T, Cp, kap_cond, opacity)
-        real(dp), intent(in) :: abar, zbar, rho, T, Cp, kap_cond, opacity
-        real(dp) :: gamma, xlg, alpha, ffff, xxx, xsig1, xsig2, xsig3
-
-        gamma = 0.2275d0 * pow2(zbar) * pow(rho * 1.d-6 / abar, one_third) * 1.d8 / T
-        xlg = log10(gamma)
-        alpha = 16d0 * boltz_sigma * pow3(T) / (3d0 * opacity * pow2(rho) * Cp)
-
-        select case (true)
-            case (xlg < -1.5d0)
-                calc_sige = sige1(zbar, T, gamma)
-            case (xlg >= -1.5d0 .and. xlg <= 0d0)
-                xxx = (xlg + 0.75d0) * 4d0 / 3d0
-                ffff = 0.25d0 * (2d0 - 3d0 * xxx + pow3(xxx))
-                xsig1 = sige1(zbar, T, gamma)
-                xsig2 = sige2(T, rho, kap_cond)
-                calc_sige = (1d0 - ffff) * xsig2 + ffff * xsig1
-            case (xlg > 0d0 .and. xlg < 0.5d0)
-                xsig2 = sige2(T, rho, kap_cond)
-                calc_sige = xsig2
-            case (xlg >= 0.5d0 .and. xlg < 1d0)
-                xxx = (xlg - 0.75d0) * 4d0
-                ffff = 0.25d0 * (2d0 - 3d0 * xxx + pow3(xxx))
-                xsig2 = sige2(T, rho, kap_cond)
-                xsig3 = sige3(zbar, T, gamma)
-                calc_sige = (1d0 - ffff) * xsig3 + ffff * xsig2
-            case (xlg >= 1d0)
-                calc_sige = sige3(zbar, T, gamma)
-        end select
-    end function calc_sige
-
-    !> Computes one regime of the electrical conductivity.
-    real(dp) function sige1(z, t, xgamma)
-        real(dp), intent(in) :: z, t, xgamma
-        real(dp) :: etan, xlambda, f
-        if (t >= 4.2d5) then
-            f = sqrt(4.2d5 / t)
-        else
+      !> Computes one regime of the electrical conductivity.
+      !! Written by S.-C. Yoon, Oct. 10, 2003
+      !! See also Spitzer 1962 and Wendell et al. 1987, ApJ 313:284
+      !! @param Z species charge
+      !! @param T Temperature (K)
+      !! @param xgamma The ion coupling strength (dimensionless).
+      !! @param sige1 The electrical conductivity (1/s).
+      real(dp) function sige1(z,t,xgamma)
+         real(dp), intent(in) :: z, t, xgamma
+         real(dp) :: etan, xlambda,f
+         if (t >= 4.2d5) then
+            f = sqrt(4.2d5/t)
+         else
             f = 1.d0
-        end if
-        xlambda = sqrt(3d0 * z * z * z) * pow(xgamma, -1.5d0) * f + 1d0
-        etan = 3.d11 * z * log(xlambda) * pow(t, -1.5d0)
-        etan = etan / (1.d0 - 1.20487d0 * exp(-1.0576d0 * pow(z, 0.347044d0)))
-        sige1 = clight * clight / (pi4 * etan)
-    end function sige1
+         end if
+         xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
+         etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
+         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
+         sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
+      end function sige1
 
-    !> Computes electrical conductivity using conductive opacity.
-    real(dp) function sige2(t, rho, kap_cond)
-        real(dp), intent(in) :: t, rho, kap_cond
-        sige2 = 1.11d9 * t * t / (rho * kap_cond)
-    end function sige2
+      !> Computes one regime of the electrical conductivity using the conductive opacity.
+      !! Written by S.-C. Yoon, Oct. 10, 2003
+      !! See Wendell et al. 1987, ApJ 313:284
+      !! @param T Temperature (K)
+      !! @param rho Temperature (g/cm^3)
+      !! @param kap_cond The electronic thermal opacity (cm^2/g).
+      !! @param sige2 The electrical conductivity (1/s).
+      real(dp) function sige2(T,rho,kap_cond)
+         real(dp), intent(in) :: t,rho,kap_cond
+         sige2 = 1.11d9*T*T/(rho*kap_cond)
+      end function sige2
 
-    !> Computes electrical conductivity in degenerate matter.
-    real(dp) function sige3(z, t, xgamma)
-        real(dp), intent(in) :: z, t, xgamma
-        real(dp) :: rme, rm23, ctmp, xi
-        rme = 8.5646d-23 * t * t * t * xgamma * xgamma * xgamma / pow5(z)
-        rm23 = pow(rme, 2d0 / 3d0)
-        ctmp = 1d0 + 1.018d0 * rm23
-        xi = sqrt(3.14159d0 / 3.) * log(z) / 3.d0 + 2.d0 * log(1.32d0 + 2.33d0 / sqrt(xgamma)) / 3.d0 - 0.484d0 * rm23 / ctmp
-        sige3 = 8.630d21 * rme / (z * ctmp * xi)
-    end function sige3
+      !> Computes the electrical conductivity in degenerate matter.
+      !! Written by S.-C. Yoon, Oct. 10, 2003
+      !! See Nandkumar & Pethick (1984)
+      !! @param Z species charge
+      !! @param T Temperature (K)
+      !! @param xgamma The ion coupling strength (dimensionless).
+      !! @param sige3 The electrical conductivity (1/s).
+      real(dp) function sige3(z,t,xgamma)
+         real(dp), intent(in) :: z, t, xgamma
+         real(dp) :: rme, rm23, ctmp, xi
+         rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
+         rm23 = pow(rme,2d0/3d0)
+         ctmp = 1d0 + 1.018d0*rm23
+         xi= sqrt(3.14159d0/3.)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
+         sige3 = 8.630d21*rme/(z*ctmp*xi)
+      end function sige3
 
-end module magnetic_diffusion
+
+      end module magnetic_diffusion
