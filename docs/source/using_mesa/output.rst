@@ -10,7 +10,7 @@ Output files
 By default, MESA stores its data in the `LOGS` directory. The data files
 are text-based and can fed into your favorite plotting program. You
 should visit the
-`Add-ons <http://cococubed.asu.edu/mesa_market/add-ons.html>`__ section
+`Add-ons <http://cococubed.com/mesa_market/add-ons.html>`__ section
 of the MESA forum and see if someone has contributed code in your
 language of choice. (There are reasonably mature routines for python,
 IDL, ruby and Mathematica.) An example of python plotting is shown
@@ -103,7 +103,7 @@ the `numpy <http://www.numpy.org>`__ and
 
 While you may want to write your own tools to read and analyze the
 output of your MESA calculations, `many already
-exist <http://cococubed.asu.edu/mesa_market/add-ons.html>`__. In that
+exist <http://cococubed.com/mesa_market/add-ons.html>`__. In that
 vein, we introduce a simple module for use in python scripts and
 interactive sessions called ``mesa_reader``, which only requires
 `numpy <http://www.numpy.org>`__.

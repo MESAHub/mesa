@@ -117,7 +117,7 @@ Developers
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
-* `Frank Timmes <http://cococubed.asu.edu/>`__
+* `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
 
