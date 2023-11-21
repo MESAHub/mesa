@@ -161,3 +161,16 @@
     phase_separation_no_diffusion = .false.
 
 
+! split burn
+! ================
+
+
+      ! op_split_burn_min_T_for_variable_T_solver
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! use variable T, constant density solver for op_split_burn in cells with T >= this limit at start of step.
+      ! only adopted in cells with T >= op_split_burn_min_T at start of step.
+
+      ! ::  
+
+    op_split_burn_min_T_for_variable_T_solver = 1d99
