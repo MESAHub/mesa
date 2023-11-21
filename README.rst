@@ -45,8 +45,6 @@ the focus of MESA.
 Documentation
 =============
 
-Please visit http://mesa.sourceforge.net/ for up-to-date information about installing and running MESA.
+Please visit https://docs.mesastar.org/ for up-to-date information about installing and running MESA.
 
-Full documentation for MESA can be found at https://docs.mesastar.org/
-
-The `MESA Marketplace <http://cococubed.asu.edu/mesa_market/>`__ provides resources for published papers using MESA. 
+The `MESA Marketplace <http://cococubed.com/mesa_market/>`__ provides resources for published papers using MESA. 
