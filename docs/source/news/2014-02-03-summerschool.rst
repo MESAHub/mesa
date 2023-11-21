@@ -10,7 +10,7 @@ astrophysics, and more importantly, hands-on labs and tutorials on using
 MESA.
 
 `MESA Summer School
-2014 <http://cococubed.asu.edu/mesa_summer_school_2014>`__
+2014 <http://cococubed.com/mesa_summer_school_2014>`__
 
 Enrollment will be limited to 44 participants. Applications close April
 1, 2014. Please spread the word to your colleagues, students and
