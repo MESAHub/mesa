@@ -46,7 +46,7 @@ Marketplace
 ^^^^^^^^^^^
 
 The address mesastar.org redirects to the `MESA marketplace
-<http://cococubed.asu.edu/mesa_market/>`__, which is controlled and
+<http://cococubed.com/mesa_market/>`__, which is controlled and
 hosted by Frank at ASU.
 
 
