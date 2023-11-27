@@ -180,9 +180,9 @@ contains
 
       if (q < 0._dp) then
          snq = sqrt(-q)
-         tlam = 2*snq*cos(acos(r/snq**3)/3) - a2/3
+         tlam = 2*snq*cos(acos(r/snq**3)/3) - a2/(3*a3)
       else
-         tlam = -a2/3
+         tlam = -a2/(3*a3)
       endif
 
       ! Evaluate outputs
