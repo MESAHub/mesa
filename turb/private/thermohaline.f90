@@ -30,6 +30,7 @@ use const_def
 use num_lib
 use utils_lib
 use auto_diff
+use fingering_modes
 
 implicit none
 
@@ -66,7 +67,7 @@ contains
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
-      real(dp) :: l2hat, lhat, lamhat, w, d2, HB, B0
+      real(dp) :: l2hat, lhat, lamhat, w, d2, HB, B0, l2hat_test, lamhat_test, reldiff
       include 'formats'     
       dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
@@ -91,12 +92,24 @@ contains
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
          else if (thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-            call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            !! Options for calculating mode properties (gaml2max with 'CUBIC' should be optimal):
+            !call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            !call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='OPT')
+            call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='CUBIC')
             D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
          else if (thermohaline_option == 'Harrington_Garaud_19') then
             call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
 
-            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            !call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='OPT')
+            call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='CUBIC')
+
+            reldiff = (lamhat - lamhat_test)/lamhat
+            if (abs(reldiff) > 1d-12) then
+               print *, "WARNING: growth rate relative difference", reldiff
+               print *, "wavenumber squared relative difference", (l2hat -l2hat_test)/l2hat
+            end if
+
+            B0 = 100d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
