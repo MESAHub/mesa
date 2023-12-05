@@ -711,7 +711,7 @@
 
          ! sin/cos (5 fac1 tau)
          sin5 = sin1 * (5.0d0 - sin1 * sin1 * (20.0d0 - 16.0d0 * sin1 * sin1))
-         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0);
+         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0)
 
          last = cos(fac2*tau)
          xast = sin(fac2*tau)
@@ -1047,7 +1047,7 @@
 
          ! sin/cos (5 u)
          sin5 = sin1 * (5.0d0 - sin1 * sin1 * (20.0d0 - 16.0d0 * sin1 * sin1))
-         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0);
+         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0)
 
 
    !..equation 5.21
