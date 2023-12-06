@@ -1,0 +1,15 @@
+
+&plotter
+
+  !### Ignore ierr so large ranges can be plotted (need to implement)
+  ! ignore_ierr = .true.
+
+  ! Parameters for thermohaline calculations  
+  tau = 1d-7
+  Pr = 1d-6
+  Pm = 0.1d0
+
+  ! calculate over nR0 points in the range 1 < R0 < 1/tau  
+  nR0 = 85
+  
+/
