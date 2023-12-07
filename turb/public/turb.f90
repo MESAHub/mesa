@@ -7,7 +7,8 @@ module turb
    implicit none
 
    private
-   public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection
+   public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection, &
+        thermohaline_mode_properties, calc_hg19_w, thermohaline_nusseltC
 
    contains
 
@@ -54,6 +55,65 @@ module turb
       mixing_type = thermohaline_mixing 
    end subroutine set_thermohaline
 
+   !! Helper functions used in turb/plotter for plotting mixing in terms of dimensionless parameters
+   subroutine thermohaline_mode_properties(Pr, tau, R0, lamhat, l2hat, ierr, method)
+     use fingering_modes
+
+     real(dp), intent(in)               :: Pr
+     real(dp), intent(in)               :: tau
+     real(dp), intent(in)               :: R0
+     real(dp), intent(out)              :: lamhat
+     real(dp), intent(out)              :: l2hat
+     integer, intent(out)               :: ierr
+     character(*), intent(in), optional :: method
+
+     real(dp) :: lhat
+     
+     if (PRESENT(method)) then
+        
+        select case(method)
+        case('OPT')
+           call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr, 'OPT')
+        case('CUBIC')
+           call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr, 'CUBIC')
+        case('2D_ROOT')
+           call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
+        case default
+           write(*, *) 'invalid method in call to gaml2max'
+           ierr = -1
+           return
+        end select
+
+      else
+
+         call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr)
+
+      end if
+
+      return
+   end subroutine thermohaline_mode_properties
+
+   real(dp) function thermohaline_nusseltC(tau, w, lamhat, l2hat)
+     use thermohaline, only: nuC
+     real(dp), intent(in) :: tau, w, lamhat, l2hat
+     thermohaline_nusseltC = nuC(tau, w, lamhat, l2hat, 1.24d0)
+     return 
+   end function thermohaline_nusseltC
+
+   subroutine calc_hg19_w(HB, l2hat, lhat, lamhat, w, ierr)
+     use thermohaline, only: solve_hg19_eqn32
+
+     real(dp), intent(in)           :: HB
+     real(dp), intent(in)           :: l2hat
+     real(dp), intent(in)           :: lhat
+     real(dp), intent(in)           :: lamhat
+     real(dp), intent(out)          :: w
+     integer, intent(out)           :: ierr
+
+     call solve_hg19_eqn32(HB, l2hat, lhat, lamhat, w, ierr)
+     
+   end subroutine calc_hg19_w
+   
    !> Computes the outputs of time-dependent convection theory following the model specified in
    !! Radek Smolec's thesis [https://users.camk.edu.pl/smolec/phd_smolec.pdf], which in turn
    !! follows the model of Kuhfuss 1986.

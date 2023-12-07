@@ -34,7 +34,7 @@ module fingering_modes
 
    private
 
-   public :: gaml2max
+   public :: gaml2max, calc_mode_properties
   
 contains
 

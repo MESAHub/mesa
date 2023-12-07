@@ -3,25 +3,27 @@ program turb_plotter
   use utils_lib
   use const_lib
   use math_lib
+  use turb
   
   implicit none
 
   integer :: ierr
   character (len=32) :: my_mesa_dir
 
-  integer :: nR0, j
-  real(dp) :: tau, Pr, Pm, R0, res
+  integer :: nR0, i, j, jmax
+  real(dp) :: tau, Pr, Pm, HB1, HB2, R0
+  real(dp) :: l2hat, lhat, lamhat, w
+  real(dp) :: HB(3), res(3)
   integer :: iounit
 
   real(dp), parameter :: UNSET = -999
   
   namelist /plotter/ &
-       tau, Pr, Pm, nR0
+       tau, Pr, Pm, HB1, HB2, nR0
 
   include 'formats'
 
   ierr = 0
-  res = 0d0
   
   my_mesa_dir = '../..'
   call const_init(my_mesa_dir,ierr)
@@ -35,24 +37,58 @@ program turb_plotter
   tau = UNSET
   Pr = UNSET
   Pm = UNSET
+  HB1 = UNSET
+  HB2 = UNSET
   nR0 = UNSET
   
   ! get info from namelist
   open(newunit=iounit, file='inlist_plotter')
   read(iounit, nml=plotter)
   close(iounit)
+
+  HB = [0d0, HB1, HB2]
   
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')
 
+  ! loop stays interior to interval 1 < R0 < 1/tau,
+  ! so need two extra points to define the endpoints.
+  jmax = nR0 + 2
+  
   ! loop for making calls to calculate things
-  do j = 1,nR0
-     R0 = 1 + (1/tau)*(j-1)/(nR0 -1)
+  do j = 2,jmax-1
+     R0 = 1d0 + (1d0/tau - 1d0)*(j - 1)/(jmax - 1)
 
-     ! caclulate res as function of tau, Pr, Pm, R0 here
-     res = 37d0
+     ! calculate lamhat and l2hat
+     call thermohaline_mode_properties(Pr, tau, R0, lamhat, l2hat, ierr)
+     if (ierr /= 0) then
+        write(*,*) 'thermohaline_mode_properties failed'
+        call mesa_error(__FILE__,__LINE__)
+     end if
+
+     lhat = sqrt(l2hat)
+
+     ! Calculate results for 3 different magnetic field strengths (0,HB1,HB2)
+     do i = 1,3
+        ! use mode properties to calculate velocity w (Harrington model for now)
+        call calc_hg19_w(HB(i), l2hat, lhat, lamhat, w, ierr)
+        if (ierr /= 0) then
+           write(*,*) 'calc_hg19_w failed'
+           write(*,*) 'R0', R0
+           write(*,*) '1/tau', 1/tau
+           write(*,*) 'HB', HB(i)
+           write(*,*) 'l2hat', l2hat
+           write(*,*) 'lhat', lhat
+           write(*,*) 'lamhat', lamhat
+           write(*,*) 'w', w
+           call mesa_error(__FILE__,__LINE__)
+        end if
+        
+        ! caclulate resulting D/kappa_T as function of tau, Pr, Pm, R0
+        res(i) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+     end do
      
-     write(iounit,*) j, R0, res
+     write(iounit,*) j-1, R0, res
   end do
   
 end program turb_plotter
