@@ -13,14 +13,14 @@ D0 = data[:,2]
 D1 = data[:,3]
 D2 = data[:,4]
 
+plt.plot(R0,D2,label=r'$H_B = H_{B2}$ from inlist')
+plt.plot(R0,D1,label=r'$H_B = H_{B1}$ from inlist')
 plt.plot(R0,D0,label=r'$H_B = 0$')
-plt.plot(R0,D1,label=r'$H_B = H_B^1$')
-plt.plot(R0,D2,label=r'$H_B = H_B^2$')
 
 plt.yscale('log')
 plt.ylim(bottom=3e-3)
 
-plt.legend()
+plt.legend(frameon=True)
 
 plt.xlabel(r'$R_0$')
 plt.ylabel(r'$D_C/\kappa_C$')
