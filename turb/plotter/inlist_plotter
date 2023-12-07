@@ -9,7 +9,11 @@
   Pr = 1d-6
   Pm = 0.1d0
 
+  ! Magnetic field parameters (see HG19)
+  HB1 = 1d-7 ! ~100 Gauss
+  HB2 = 1d-5 ! ~1000 Gauss  
+  
   ! calculate over nR0 points in the range 1 < R0 < 1/tau  
-  nR0 = 85
+  nR0 = 10000
   
 /
