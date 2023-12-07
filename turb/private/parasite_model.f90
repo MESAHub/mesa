@@ -9,9 +9,6 @@ module parasite_model
   
     private
     public :: wf
-    public :: hg19_eq32
-    public :: deq32dw
-    public :: wf_hg19
     public :: nuc
     public :: nut
     public :: gamma_tot
@@ -138,61 +135,6 @@ module parasite_model
       return
       
     end function gx_m_lam
-  
-    function hg19_eq32(w, pr, tau, r0, hb, CH) result(f)
-  
-      ! Evaluates Eq. 32 in HG19
-  
-      real(dp), intent(in) :: w, pr, tau, r0, hb, CH  
-      real(dp) :: f
-  
-      real(dp) :: lamhat, lhat, l2hat
-      integer :: ierr
-  
-      call gaml2max(pr, tau, r0, lamhat, l2hat, ierr)
-      lhat = sqrt(l2hat)
-  
-      f = 0.5_dp*w**2 - hb - (CH*lamhat/(0.42_dp*lhat))**1.5 * sqrt(w)
-  
-    end function hg19_eq32
-  
-    function deq32dw(w, pr, tau, r0, hb, CH) result(dfdw)
-  
-      ! Derivative wrt w of hg19_eq32
-  
-      real(dp), intent(in) :: w, pr, tau, r0, hb, CH
-      real(dp) :: dfdw
-  
-      real(dp) :: lamhat, lhat, l2hat
-      integer :: ierr
-  
-      call gaml2max(pr, tau, r0, lamhat, l2hat, ierr)
-      lhat = sqrt(l2hat)
-  
-      dfdw = w - 0.5_dp*(CH*lamhat/(0.42_dp*lhat))**1.5/sqrt(w)
-  
-    end function deq32dw
-  
-    function wf_hg19(pr, tau, r0, hb, CH) result(w)
-  
-      ! Newton solver for Eq. 32 in HG19
-  
-      real(dp), intent(in) :: pr, tau, r0, hb, CH
-      real(dp) :: w
-  
-      real(dp) :: lamhat, lhat, l2hat
-      real(dp) :: w0
-      integer :: ierr
-  
-      ! Initial guess
-      call gaml2max(pr, tau, r0, lamhat, l2hat, ierr)
-      lhat = sqrt(l2hat)
-      w0 = max(sqrt(2.0_dp*hb), 2.0_dp*pi*lamhat/lhat)
-  
-      ! Call Newton solver
-      call newt(hg19_eq32, deq32dw, w, w0, pr, tau, r0, hb, CH, ierr) 
-  
-    end function wf_hg19
   
     function nuc(tau, w, lamhat, l2hat, kb) result(nu)
   
