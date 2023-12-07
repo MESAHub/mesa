@@ -95,31 +95,13 @@ contains
             !! Options for calculating mode properties (gaml2max with 'CUBIC' should be optimal):
             !call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
             !call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='OPT')
-            
-            call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
 
-            !call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='OPT')
-            call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='CUBIC')
-
-            reldiff = (lamhat - lamhat_test)/lamhat
-            reldiff2 = (l2hat - l2hat_test)/l2hat
-            if (abs(reldiff) > 1d-15 .or. abs(reldiff2) > 1d-12) then
-               print *, "WARNING: growth rate relative difference", reldiff
-               print *, "wavenumber squared relative difference", (l2hat -l2hat_test)/l2hat
-            end if
-            
             D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
          else if (thermohaline_option == 'Harrington_Garaud_19') then
-            call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
-
-            !call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='OPT')
-            call gaml2max(pr, tau, R0, lamhat_test, l2hat_test, ierr, method='CUBIC')
-
-            reldiff = (lamhat - lamhat_test)/lamhat
-            if (abs(reldiff) > 1d-12) then
-               print *, "WARNING: growth rate relative difference", reldiff
-               print *, "wavenumber squared relative difference", (l2hat -l2hat_test)/l2hat
-            end if
+            !call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
+            !call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='OPT')
+            call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
 
             B0 = 100d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
