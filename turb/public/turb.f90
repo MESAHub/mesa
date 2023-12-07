@@ -8,7 +8,7 @@ module turb
 
    private
    public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection, &
-        thermohaline_mode_properties, calc_hg19_w, thermohaline_nusseltC
+        thermohaline_mode_properties, calc_hg19_w, calc_frg24_w, thermohaline_nusseltC
 
    contains
 
@@ -113,6 +113,29 @@ module turb
      call solve_hg19_eqn32(HB, l2hat, lhat, lamhat, w, ierr)
      
    end subroutine calc_hg19_w
+
+   subroutine calc_frg24_w(pr, tau, r0, hb, db, ks, n, w, ierr, lamhat, l2hat)
+     use parasite_model
+
+     real(dp), intent(in) :: pr, tau, r0, hb, db 
+     real(dp), intent(in) :: ks(:)
+     integer, intent(in) :: n ! n MUST be odd
+     real(dp), intent(out) :: w
+     integer, intent(out) :: ierr
+     real(dp), intent(in), optional :: lamhat, l2hat
+
+     ierr = 0
+
+     ! these calls to wf ignore delta, ideal, badks_exception, get_kmax (0,0,false,false)
+     if (present(lamhat)) then
+        ! lamhat and l2hat already calculated, so can pass as arguments
+        w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false., lamhat, l2hat)
+     else
+        ! lamhat and l2hat need to be calculated inside the wf routine
+        w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false.)
+     end if
+  
+   end subroutine calc_frg24_w
    
    !> Computes the outputs of time-dependent convection theory following the model specified in
    !! Radek Smolec's thesis [https://users.camk.edu.pl/smolec/phd_smolec.pdf], which in turn

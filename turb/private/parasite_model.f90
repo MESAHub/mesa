@@ -49,7 +49,7 @@ module parasite_model
       integer, pointer  :: ipar(:)
       integer :: lrpar, lipar
       integer :: ierr
-
+      
       if(mod(n,2) == 0) then
          stop "thermohaline parasite wf: n must be odd"
       end if
@@ -79,7 +79,7 @@ module parasite_model
       
       y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
       y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
-  
+
       ! Call bracketed root finder
       w = safe_root_with_brackets( &
            gx_m_lam, w1, w2, y1, y2, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
@@ -108,9 +108,10 @@ module parasite_model
 
       dfdx = 0d0 ! unused for bracket search
       
-      if (lrpar /= 8 .OR. lipar /= 2) then
+      if (lipar /= 1) then
          ierr = -1
-         return
+         write(*,*) "lrpar, lipar", lrpar, lipar
+         stop "wrong number of parameters for bracketed root solve"
       end if
       
       associate( &

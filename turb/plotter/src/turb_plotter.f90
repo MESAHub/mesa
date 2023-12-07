@@ -10,11 +10,12 @@ program turb_plotter
   integer :: ierr
   character (len=32) :: my_mesa_dir
 
-  integer :: nR0, i, j, jmax
-  real(dp) :: tau, Pr, Pm, HB1, HB2, R0
+  integer  :: nR0, i, j, jmax, spectral_resolution
+  real(dp) :: ks(100)
+  real(dp) :: tau, Pr, Pm, HB1, HB2, DB, R0
   real(dp) :: l2hat, lhat, lamhat, w
-  real(dp) :: HB(3), res(3)
-  integer :: iounit
+  real(dp) :: HB(3), res(6)
+  integer  :: iounit
 
   real(dp), parameter :: UNSET = -999
   
@@ -24,6 +25,16 @@ program turb_plotter
   include 'formats'
 
   ierr = 0
+
+  spectral_resolution = 17 ! must be odd. Should promote to inlist option eventually
+
+  do i = 1,50
+     ! first 50 entries are log space from 1e-6 to 0.1 (don't include endpoint)
+     ks(i) = pow(-6d0 + (i-1)*(-1d0 + 6d0)/50d0,10)
+
+     ! last 50 entries are linear space from 0.1 to 2
+     ks(i+50) = 0.1d0 + (i-1)*(2d0 - 0.1d0)/49d0
+  end do
   
   my_mesa_dir = '../..'
   call const_init(my_mesa_dir,ierr)
@@ -47,6 +58,7 @@ program turb_plotter
   close(iounit)
 
   HB = [0d0, HB1, HB2]
+  res(:) = 0d0
   
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')
@@ -84,8 +96,25 @@ program turb_plotter
            call mesa_error(__FILE__,__LINE__)
         end if
         
-        ! caclulate resulting D/kappa_T as function of tau, Pr, Pm, R0
+        ! caclulate resulting D/kappa_T as function of tau, Pr, R0
         res(i) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+
+        ! Now calculate again for full FRG24 model (adds in Pm dependence)
+        DB = Pr/Pm
+        call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
+        if (ierr /= 0) then
+           write(*,*) 'calc_frg24_w failed'
+           write(*,*) 'R0', R0
+           write(*,*) '1/tau', 1/tau
+           write(*,*) 'HB', HB(i)
+           write(*,*) 'l2hat', l2hat
+           write(*,*) 'lhat', lhat
+           write(*,*) 'lamhat', lamhat
+           write(*,*) 'w', w
+           call mesa_error(__FILE__,__LINE__)
+        end if
+        res(i+3) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+
      end do
      
      write(iounit,*) j-1, R0, res
