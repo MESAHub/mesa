@@ -142,18 +142,39 @@ module kh_instability
   
     end subroutine lmat
   
-    function gamfromL(l, withmode) result(gam)
-      complex(dp), intent(in) :: l(:,:)
+    function gamfromL(L, N, withmode) result(gam)
+      complex(dp), intent(in) :: L(:,:)
+      integer, intent(in) :: N ! size of NxN matrix L
       logical, intent(in), optional :: withmode
       real(dp) :: gam 
       !complex(dp), allocatable, optional :: mode(:)
   
-      complex(dp) :: w(size(l,1))
-      complex(dp), allocatable :: v(:,:)
-      integer :: i
-  
-      call ge(l, w, v)
-  
+      complex(dp) :: w(N) ! eigenvalues
+      complex(dp) :: VL(N,N), VR(N,N) ! left and right eigenvectors (not used, dummies for ZGEEV interface)
+      complex(dp), allocatable :: work(:) ! workspace
+      real(dp) :: rwork(2*N) ! workspace
+      integer :: info, lwork
+
+      ! Query ZGEEV for optimal workspace size
+      lwork = -1 
+      allocate(work(1))
+      call ZGEEV('N','N',N,L,N,w,VL,N,VR,N,work,lwork,rwork,info)
+      
+      ! Allocate optimal workspace
+      lwork = INT(work(1)) 
+      deallocate(work)
+      allocate(work(lwork))
+      
+      ! lapack get eigenvalues
+      ! first two arguments specify not to compute ('N') either left or right eigenvectors
+      call ZGEEV('N','N',N,L,N,w,VL,N,VR,N,work,lwork,rwork,info)
+      
+      deallocate(work)
+      
+      if (info /= 0) then
+         write(*,*) 'ZGEEV failed in gamfromL' 
+      end if
+
 !!$      if (present(withmode)) then
 !!$         i = maxloc(aimag(w),1)
 !!$         gam = -aimag(w(i))
@@ -162,7 +183,7 @@ module kh_instability
 !!$      else
          gam = maxval(-aimag(w))
 !!$      end if
-  
+
     end function gamfromL
     
     function gamma_over_k(delta, m2, re, rm, ks, n, ideal) result(gamk)
@@ -178,7 +199,7 @@ module kh_instability
 
       do i = 1, size(ks)
          call lmat(delta, m2, re, rm, ks(i), n, ideal, l_result)
-         gamk(i) = gamfromL(l_result)
+         gamk(i) = gamfromL(l_result,2*n)
       end do
   
     end function gamma_over_k
@@ -225,9 +246,9 @@ module kh_instability
 !!$          call lmat(delta, m2, re, rm, k_star, n, l)
 !!$          
 !!$          if (present(withmode)) then
-!!$             sigma = gamfromL(l, .true., mode) 
+!!$             sigma = gamfromL(l, 2*n, .true., mode) 
 !!$          else
-!!$             sigma = gamfromL(l)
+!!$             sigma = gamfromL(l, 2*n)
 !!$          end if
 !!$      
 !!$        end function sigma_from_fingering_params
