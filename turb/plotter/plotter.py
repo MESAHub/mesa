@@ -13,9 +13,15 @@ D0 = data[:,2]
 D1 = data[:,3]
 D2 = data[:,4]
 
+D1_frg = data[:,5]
+D2_frg = data[:,6]
+
 plt.plot(R0,D2,label=r'$H_B = H_{B2}$ from inlist')
 plt.plot(R0,D1,label=r'$H_B = H_{B1}$ from inlist')
 plt.plot(R0,D0,label=r'$H_B = 0$')
+
+plt.scatter(R0,D2_frg,s=10)
+plt.scatter(R0,D1_frg,s=7)
 
 plt.yscale('log')
 plt.ylim(bottom=3e-3)

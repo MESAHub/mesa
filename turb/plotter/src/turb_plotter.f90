@@ -14,7 +14,7 @@ program turb_plotter
   real(dp) :: ks(100)
   real(dp) :: tau, Pr, Pm, HB1, HB2, DB, R0
   real(dp) :: l2hat, lhat, lamhat, w
-  real(dp) :: HB(3), res(6)
+  real(dp) :: HB(3), res(5)
   integer  :: iounit
 
   real(dp), parameter :: UNSET = -999
@@ -99,8 +99,12 @@ program turb_plotter
         ! caclulate resulting D/kappa_T as function of tau, Pr, R0
         res(i) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
 
-        ! Now calculate again for full FRG24 model (adds in Pm dependence)
-        DB = Pr/Pm
+     end do
+
+     ! Now calculate again for full FRG24 model (adds in Pm dependence)
+     DB = Pr/Pm
+     do i = 2,3
+        print *, "calc_frg24_w, R0, HB", R0, HB(i)
         call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
         if (ierr /= 0) then
            write(*,*) 'calc_frg24_w failed'
@@ -113,8 +117,7 @@ program turb_plotter
            write(*,*) 'w', w
            call mesa_error(__FILE__,__LINE__)
         end if
-        res(i+3) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
-
+        res(i+2) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
      end do
      
      write(iounit,*) j-1, R0, res
