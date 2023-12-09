@@ -30,7 +30,7 @@ program turb_plotter
 
   do i = 1,50
      ! first 50 entries are log space from 1e-6 to 0.1 (don't include endpoint)
-     ks(i) = pow(-6d0 + (i-1)*(-1d0 + 6d0)/50d0,10)
+     ks(i) = pow(10d0,-6d0 + (i-1)*(-1d0 + 6d0)/50d0)
 
      ! last 50 entries are linear space from 0.1 to 2
      ks(i+50) = 0.1d0 + (i-1)*(2d0 - 0.1d0)/49d0
@@ -104,7 +104,6 @@ program turb_plotter
      ! Now calculate again for full FRG24 model (adds in Pm dependence)
      DB = Pr/Pm
      do i = 2,3
-        print *, "calc_frg24_w, R0, HB", R0, HB(i)
         call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
         if (ierr /= 0) then
            write(*,*) 'calc_frg24_w failed'
@@ -117,6 +116,7 @@ program turb_plotter
            write(*,*) 'w', w
            call mesa_error(__FILE__,__LINE__)
         end if
+        print *, "calc_frg24_w, R0, HB, w", R0, HB(i), w
         res(i+2) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
      end do
      
