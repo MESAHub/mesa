@@ -14,7 +14,7 @@ program turb_plotter
   real(dp) :: ks(100)
   real(dp) :: tau, Pr, Pm, HB1, HB2, DB, R0
   real(dp) :: l2hat, lhat, lamhat, w
-  real(dp) :: HB(3), res(5)
+  real(dp) :: HB(3), res(6)
   integer  :: iounit
 
   real(dp), parameter :: UNSET = -999
@@ -62,6 +62,8 @@ program turb_plotter
   
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')
+  ! header for use by numpy genfromtxt in plotter.py
+  write(iounit,*) "# index R0 Dth_HG19_HB0 Dth_HG19_HB1 Dth_HG19_HB2 Dth_FRG24_HB0 Dth_FRG24_HB1 Dth_FRG24_HB2"
 
   ! loop stays interior to interval 1 < R0 < 1/tau,
   ! so need two extra points to define the endpoints.
@@ -103,7 +105,7 @@ program turb_plotter
 
      ! Now calculate again for full FRG24 model (adds in Pm dependence)
      DB = Pr/Pm
-     do i = 2,3
+     do i = 1,3
         call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
         if (ierr /= 0) then
            write(*,*) 'calc_frg24_w failed'
@@ -117,7 +119,7 @@ program turb_plotter
            call mesa_error(__FILE__,__LINE__)
         end if
         print *, "calc_frg24_w, R0, HB, w", R0, HB(i), w
-        res(i+2) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+        res(i+3) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
      end do
      
      write(iounit,*) j-1, R0, res
