@@ -40,7 +40,7 @@ module parasite_model
       ! real(dp), optional :: kmax
   
       integer, parameter  :: IMAX = 50
-      real(dp), parameter :: EPSX = 2e-12_dp
+      real(dp), parameter :: EPSX = 2e-12_dp ! may want to put more thought into optimal x and y tolerances
       real(dp), parameter :: EPSY = 0._dp
 
       real(dp) :: lamhat_, l2hat_
@@ -66,7 +66,8 @@ module parasite_model
       ! Set bracketing interval
       w1 = 2.0_dp*pi*lamhat_/lhat
       w2 = w1 + sqrt(2.0_dp*hb)
-      
+      !! Do we need to iterate here to check that gx_m_lam(w2) > 0 so that our bracketing interval is valid?
+
       lrpar = 7 + size(ks)
       lipar = 1
       allocate(rpar(lrpar))

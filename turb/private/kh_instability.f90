@@ -51,6 +51,7 @@ module kh_instability
       integer :: i, j, m, ns(n), ms(2*n)
       real(dp) :: delns(n), delns_m(2*n)
       real(dp) :: deltan, deltanm1, deltanp1
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
 
       if(ideal) then
          diss = 0d0
@@ -88,9 +89,9 @@ module kh_instability
          if (i > 1 .and. i < 2*n-1) then
             deltan = delns_m(i)
             if (mod(ms(i),2) == 0) then
-               l(i,i) = (0.0_dp, 1.0_dp) * (diss/re) * deltan
+               l(i,i) = j_imag * (diss/re) * deltan
             else
-               l(i,i) = (0.0_dp, 1.0_dp) * diss/rm * deltan
+               l(i,i) = j_imag * diss/rm * deltan
             end if
          end if
       end do
@@ -105,40 +106,40 @@ module kh_instability
       end do
       
       ! pm 2 entries
-      do i = 3, 2*n-3
+      do i = 3, 2*n-2
          deltan = delns_m(i)
          deltanp1 = delns_m(i+2)
          deltanm1 = delns_m(i-2)
          if (mod(ms(i),2) == 0) then
-            l(i,i+2) = -k * (1 - deltanp1) / (2.0_dp*deltan)
-            l(i,i-2) = k * (1 - deltanm1) / (2.0_dp*deltan)
+            l(i,i+2) = -k * (1 - deltanp1) / (2.0_dp*j_imag*deltan)
+            l(i,i-2) = k * (1 - deltanm1) / (2.0_dp*j_imag*deltan)
          else
-            l(i,i+2) = k/2.0_dp 
-            l(i,i-2) = -k/2.0_dp
+            l(i,i+2) = k/(2.0_dp*j_imag)
+            l(i,i-2) = -k/(2.0_dp*j_imag)
          end if
       end do
 
   
       ! Boundary conditions
       i = 1
-      l(i,i) = (0.0_dp,1.0_dp) * delns_m(i) * diss / re
+      l(i,i) = j_imag * delns_m(i) * diss / re
       l(i,i+1) = m2 * k
-      l(i,i+2) = -k * (1 - delns_m(i+2)) / (2.0_dp*delns_m(i))
+      l(i,i+2) = -k * (1 - delns_m(i+2)) / (2.0_dp*j_imag*delns_m(i))
   
       i = 2
-      l(i,i) = (0.0_dp,1.0_dp) * delns_m(i) * diss / rm  
+      l(i,i) = j_imag * delns_m(i) * diss / rm
       l(i,i-1) = k
-      l(i,i+2) = k/2.0_dp
+      l(i,i+2) = k/(2.0_dp*j_imag)
   
       i = 2*n-1
-      l(i,i) = (0.0_dp,1.0_dp) * delns_m(i) * diss / re
-      l(i,i-1) = m2*k
-      l(i,i-2) = k * (1 - delns_m(i-2)) / (2.0_dp*delns_m(i))
+      l(i,i) = j_imag * delns_m(i) * diss / re
+      l(i,i+1) = m2*k
+      l(i,i-2) = k * (1 - delns_m(i-2)) / (2.0_dp*j_imag*delns_m(i))
   
       i = 2*n
-      l(i,i) = (0.0_dp,1.0_dp) * delns_m(i) * diss / rm
-      l(i,i-2) = k
-      l(i,i-3) = -k/2.0_dp
+      l(i,i) = j_imag * delns_m(i) * diss / rm
+      l(i,i-1) = k
+      l(i,i-2) = -k/(2.0_dp*j_imag)
   
     end subroutine lmat
   
@@ -149,7 +150,7 @@ module kh_instability
       real(dp) :: gam 
       !complex(dp), allocatable, optional :: mode(:)
   
-      complex(dp) :: w(N) ! eigenvalues
+      complex(dp) :: omega(N) ! eigenvalues
       complex(dp) :: VL(N,N), VR(N,N) ! left and right eigenvectors (not used, dummies for ZGEEV interface)
       complex(dp), allocatable :: work(:) ! workspace
       real(dp) :: rwork(2*N) ! workspace
@@ -158,16 +159,16 @@ module kh_instability
       ! Query ZGEEV for optimal workspace size
       lwork = -1 
       allocate(work(1))
-      call ZGEEV('N','N',N,L,N,w,VL,N,VR,N,work,lwork,rwork,info)
+      call ZGEEV('N','N',N,L,N,omega,VL,N,VR,N,work,lwork,rwork,info)
       
       ! Allocate optimal workspace
       lwork = INT(work(1)) 
       deallocate(work)
       allocate(work(lwork))
       
-      ! lapack get eigenvalues
+      ! lapack get eigenvalues (ZGEEV is for general complex double precision matrices)
       ! first two arguments specify not to compute ('N') either left or right eigenvectors
-      call ZGEEV('N','N',N,L,N,w,VL,N,VR,N,work,lwork,rwork,info)
+      call ZGEEV('N','N',N,L,N,omega,VL,N,VR,N,work,lwork,rwork,info)
       
       deallocate(work)
       
@@ -176,12 +177,12 @@ module kh_instability
       end if
 
 !!$      if (present(withmode)) then
-!!$         i = maxloc(aimag(w),1)
-!!$         gam = -aimag(w(i))
-!!$         allocate(mode(size(w)))
+!!$         i = maxloc(aimag(omega),1)
+!!$         gam = -aimag(omega(i))
+!!$         allocate(mode(size(omega)))
 !!$         mode = v(:,i)
 !!$      else
-         gam = maxval(-aimag(w))
+         gam = maxval(-aimag(omega))
 !!$      end if
 
     end function gamfromL
@@ -195,7 +196,6 @@ module kh_instability
       complex(dp) :: l_result(2*n,2*n)
       real(dp) :: gamk(size(ks))
       integer :: i
-
 
       do i = 1, size(ks)
          call lmat(delta, m2, re, rm, ks(i), n, ideal, l_result)
@@ -348,9 +348,9 @@ module kh_instability
           m2 = hb / w**2
           re = w / (pr * lhat) 
           rm = w / (db * lhat)
-      
+
           sigma = gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_exception)
-      
+
           f = sigma*w*lhat - CH*lamhat
       
         end function gammax_minus_lambda
