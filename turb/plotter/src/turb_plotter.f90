@@ -10,30 +10,22 @@ program turb_plotter
   integer :: ierr
   character (len=32) :: my_mesa_dir
 
-  integer  :: nR0, i, j, jmax, spectral_resolution
-  real(dp) :: ks(100)
-  real(dp) :: tau, Pr, Pm, HB1, HB2, DB, R0
-  real(dp) :: l2hat, lhat, lamhat, w
-  real(dp) :: HB(3), res(6)
-  integer  :: iounit
+  integer               :: nR0, nks, i, j, jmax, spectral_resolution
+  real(dp), allocatable :: ks(:)
+  real(dp)              :: tau, Pr, Pm, HB1, HB2, DB, R0
+  real(dp)              :: l2hat, lhat, lamhat, w
+  real(dp)              :: HB(3), res(6)
+  integer               :: iounit
 
   real(dp), parameter :: UNSET = -999
   
   namelist /plotter/ &
-       tau, Pr, Pm, HB1, HB2, nR0, spectral_resolution
+       tau, Pr, Pm, HB1, HB2, nR0, nks, spectral_resolution
 
   include 'formats'
 
   ierr = 0
 
-  do i = 1,50
-     ! first 50 entries are log space from 1e-6 to 0.1 (don't include endpoint)
-     ks(i) = pow(10d0,-6d0 + (i-1)*(-1d0 + 6d0)/50d0)
-
-     ! last 50 entries are linear space from 0.1 to 2
-     ks(i+50) = 0.1d0 + (i-1)*(2d0 - 0.1d0)/49d0
-  end do
-  
   my_mesa_dir = '../..'
   call const_init(my_mesa_dir,ierr)
   if (ierr /= 0) then
@@ -49,6 +41,8 @@ program turb_plotter
   HB1 = UNSET
   HB2 = UNSET
   nR0 = UNSET
+  nks = UNSET
+  spectral_resolution = UNSET
   
   ! get info from namelist
   open(newunit=iounit, file='inlist_plotter')
@@ -60,6 +54,15 @@ program turb_plotter
   
   ! spectral_resolution must be odd integer, so promote to next odd number if even
   spectral_resolution = (spectral_resolution/2)*2 + 1
+
+  allocate(ks(nks*2))
+  do i = 1,nks
+     ! first nks entries are log space from 1e-6 to 0.1 (don't include endpoint)
+     ks(i) = pow(10d0,-6d0 + (i-1)*(-1d0 + 6d0)/nks)
+
+     ! last nks entries are linear space from 0.1 to 2
+     ks(i+nks) = 0.1d0 + (i-1)*(2d0 - 0.1d0)/(nks - 1)
+  end do
   
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')
@@ -125,5 +128,7 @@ program turb_plotter
      
      write(iounit,*) j-1, R0, res
   end do
+
+  deallocate(ks)
   
 end program turb_plotter
