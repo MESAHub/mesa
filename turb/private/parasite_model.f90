@@ -48,7 +48,7 @@ module parasite_model
       real(dp), pointer :: rpar(:)
       integer, pointer  :: ipar(:)
       integer :: lrpar, lipar
-      integer :: ierr
+      integer :: i, ierr
       
       if(mod(n,2) == 0) then
          stop "thermohaline parasite wf: n must be odd"
@@ -66,7 +66,6 @@ module parasite_model
       ! Set bracketing interval
       w1 = 2.0_dp*pi*lamhat_/lhat
       w2 = w1 + sqrt(2.0_dp*hb)
-      !! Do we need to iterate here to check that gx_m_lam(w2) > 0 so that our bracketing interval is valid?
 
       lrpar = 7 + size(ks)
       lipar = 1
@@ -80,6 +79,31 @@ module parasite_model
       
       y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
       y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+
+      if(y1 > 0d0) then
+         write(*,*) "invalid lower bracket for FRG w search"
+         call mesa_error(__FILE__,__LINE__)
+      end if
+      
+      i = 0
+      ! check whether y2 > 0, and if necessary adjust until w2 is valid upper bound
+      do while (y2 < 0d0)
+         ! write(*,*) "y2 < 0, resetting brackets", w2, " -->", 10*w2
+
+         if(i > 20) then ! we tried increasing w2 by 20 orders of magnitude, so need to break
+            write(*,*) "Can't find valid upper bracket for FRG w search"
+            call mesa_error(__FILE__,__LINE__)
+         end if
+         
+         i = i+1
+         
+         ! set new lower bound
+         w1 = w2
+         y1 = y2
+         
+         w2 = w2*pow(10d0,i)
+         y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      end do
 
       ! Call bracketed root finder
       w = safe_root_with_brackets( &
