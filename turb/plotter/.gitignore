@@ -1,4 +1,4 @@
-turb_plotter.dat
-turb_plotter.png
-turb_plotter.pdf
+*.dat
+*.png
+*.pdf
 plotter

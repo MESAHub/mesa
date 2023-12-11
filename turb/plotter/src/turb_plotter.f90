@@ -20,13 +20,11 @@ program turb_plotter
   real(dp), parameter :: UNSET = -999
   
   namelist /plotter/ &
-       tau, Pr, Pm, HB1, HB2, nR0
+       tau, Pr, Pm, HB1, HB2, nR0, spectral_resolution
 
   include 'formats'
 
   ierr = 0
-
-  spectral_resolution = 17 ! must be odd. Should promote to inlist option eventually
 
   do i = 1,50
      ! first 50 entries are log space from 1e-6 to 0.1 (don't include endpoint)
@@ -59,6 +57,9 @@ program turb_plotter
 
   HB = [0d0, HB1, HB2]
   res(:) = 0d0
+  
+  ! spectral_resolution must be odd integer, so promote to next odd number if even
+  spectral_resolution = (spectral_resolution/2)*2 + 1
   
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')

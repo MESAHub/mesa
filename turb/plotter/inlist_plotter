@@ -4,16 +4,29 @@
   !### Ignore ierr so large ranges can be plotted (need to implement)
   ! ignore_ierr = .true.
 
-  ! Parameters for thermohaline calculations  
+  ! calculate over nR0 points in the range 1 < R0 < 1/tau
+  nR0 = 50
+
+  ! resolution used by FRG calculations
+  spectral_resolution = 17
+
+
+  !! Parameters for thermohaline calculations
+  
+  !! For RGB Stars
   tau = 1d-7
   Pr = 1d-6
   Pm = 0.1d0
-
   ! Magnetic field parameters (see HG19)
   HB1 = 1d-7 ! ~100 Gauss
   HB2 = 1d-5 ! ~1000 Gauss  
   
-  ! calculate over nR0 points in the range 1 < R0 < 1/tau  
-  nR0 = 50
+  !! For WDs
+  ! tau = 1d-3
+  ! Pr = 1d-3
+  ! Pm = 1d0
+  ! ! Magnetic field parameters (see HG19)
+  ! HB1 = 1d-3 ! ~100 Gauss
+  ! HB2 = 1d-1 ! ~1000 Gauss
   
 /
