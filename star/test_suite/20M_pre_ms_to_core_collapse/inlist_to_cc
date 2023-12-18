@@ -20,12 +20,29 @@
 / ! end of kap namelist
 
 &controls
+      !delta_lgRho_cntr_limit = 5d-3
+      !dX_nuc_drop_limit_at_high_T = 5d-3  ! default = -1 = same as dX_nuc_drop_limit
+      !use_gold2_tolerances = .false. 
+
+! prevent development of radial pulses during advanced burning
+      drag_coefficient = 1d0
+      min_q_for_drag = 0.8d0
+
+   set_min_D_mix = .true.
+   min_D_mix = 1d-2 
 
       fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
       !max_number_retries = 37
+
+ignore_too_large_correction = .true. ! for conv_vel's
+
+      delta_lg_XH_cntr_min   = 0.5d0
+      delta_lg_XO_cntr_min   = 0.5d0
+      delta_lg_XC_cntr_min   = 0.5d0
+      delta_lg_XHe_cntr_min   = 0.5d0
 
 ! wind
 
@@ -34,21 +51,23 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
+!      alpha_semiconvection = 0
+!      thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+      limit_for_rel_error_in_energy_conservation = 1d-3
+      hard_limit_for_rel_error_in_energy_conservation = 1d-2
 
-      delta_XSi_cntr_limit = 0.008
-      delta_XSi_cntr_hard_limit = 0.025
+      delta_XSi_cntr_limit = 0.0025
+
 
 ! mesh
 
 ! solver
+
+
       calculate_Brunt_B = .true.     ! needed for tau_conv
       max_q_for_conv_timescale = 0.2d0
       max_X_for_conv_timescale = 1d-6   ! must be > 0
@@ -99,10 +118,6 @@ Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax =  5 ! 
 Profile_Panels3_xaxis_reversed = .false.
 
-Profile_Panels3_xaxis_name = 'zone'
-Profile_Panels3_xmin = -101d0
-Profile_Panels3_xmax = -101d0
-Profile_Panels3_xaxis_reversed = .true.
 
 Profile_Panels3_yaxis_name(4) = 'gamma1'
 Profile_Panels3_dymin(4) = 0.14
@@ -114,8 +129,10 @@ TRho_Profile_xmax = 10
 TRho_Profile_ymin = 8.5
 TRho_Profile_ymax = 10.1
 
-TRho_logT_max = 10d0
+TRho_logT_min = 9.2d0
+TRho_logRho_min = 6d0
 TRho_logRho_max = 10d0
+TRho_logT_max = 10d0
 
 Text_Summary1_name(1,2) = 'time_step_sec'
 Text_Summary1_name(2,2) = 'star_age_sec'
