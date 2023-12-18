@@ -8,7 +8,7 @@ This test suite evolves a 1/10 solar metalicity 20 |MSun| model from the pre-ms 
 For bit for bit convergence, we recomended to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.
 
-This test_suite has been tested up to 60 solar masses at solar metallicity with mass loss, and produces reasonable HR-tracks. 
+This test_suite has been tested up to 80 solar masses, up to solar metallicity, with mass loss, and produces reasonable HR-tracks. 
 For production science we recommend adopting tighter mesh and timestep controls as the comments in inlist_common indicate.
 
 Physical checks

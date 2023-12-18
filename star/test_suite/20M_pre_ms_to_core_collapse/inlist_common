@@ -41,7 +41,7 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .true.
+      pgstar_flag = .false.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
@@ -77,6 +77,7 @@
       Pextra_factor = 4 ! easy to lower with mass loss!ideally 1.5 is most physical
       ! if you run into issues, you can increase Pextra 
       ! extra pressure helps stabilize the atmosphere during core He burning +
+     
 
       atm_option = 'T_tau'
       atm_T_tau_relation = 'Eddington'
