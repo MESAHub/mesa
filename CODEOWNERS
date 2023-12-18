@@ -18,7 +18,7 @@ gyre/ @rhdtownsend @warrickball
 hdfio5 @rhdtownsend
 interp_1d/ @rhdtownsend 
 interp_2d/ @rhdtownsend 
-kap/ @fxt44
+kap/ @fxt44 @Debraheem
 linters/ 
 turb/ 
 math/ @rhdtownsend
@@ -88,6 +88,7 @@ star/test_suite/make_he_wd @evbauer @fxt44
 star/test_suite/make_metals @fxt44
 star/test_suite/make_o_ne_wd @fxt44 @evbauer
 star/test_suite/make_planets @fxt44
+star/test_suite/make_pre_ccsn_13bvn @Debraheem
 star/test_suite/make_sdb @evbauer
 star/test_suite/make_zams @fxt44
 star/test_suite/make_zams_low_mass @fxt44
@@ -126,11 +127,11 @@ star/test_suite/wd_he_shell_ignition @wmwolf
 star/test_suite/wd_nova_burst @wmwolf
 star/test_suite/wd_stable_h_burn @wmwolf
 
-star/test_suite/12M_pre_ms_to_core_collapse 
-star/test_suite/20M_pre_ms_to_core_collapse 
-star/test_suite/split_burn_big_net 
-star/test_suite/zams_to_cc_80 
-star/test_suite/20M_z2m2_high_rotation 
+star/test_suite/12M_pre_ms_to_core_collapse @Debraheem
+star/test_suite/20M_pre_ms_to_core_collapse @Debraheem
+star/test_suite/split_burn_big_net
+star/test_suite/zams_to_cc_80 @Debraheem
+star/test_suite/20M_z2m2_high_rotation
 
 
 binary/test_suite/double_bh @orlox 
