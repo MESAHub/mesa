@@ -31,7 +31,7 @@
 &controls
 
       xa_central_lower_limit_species(1) = 'he4'
-      xa_central_lower_limit(1) = 0.05d0
+      xa_central_lower_limit(1) = 1d-6
 
       ! limit max_model_number as part of test_suite
       max_model_number = 3000
@@ -44,17 +44,16 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
+
 
 ! mixing
 
 ! timesteps
-      delta_XHe_cntr_hard_limit = 0.02d0
-      delta_XC_cntr_hard_limit = 0.02d0
-      delta_XNe_cntr_hard_limit = 0.02d0
-      delta_XO_cntr_hard_limit = 0.02d0
-      delta_XSi_cntr_hard_limit = 0.02d0
+      !delta_XHe_cntr_hard_limit = 0.02d0
+      !delta_XC_cntr_hard_limit = 0.02d0
+      !delta_XNe_cntr_hard_limit = 0.02d0
+      !delta_XO_cntr_hard_limit = 0.02d0
+      !delta_XSi_cntr_hard_limit = 0.02d0
 
 ! mesh
 
