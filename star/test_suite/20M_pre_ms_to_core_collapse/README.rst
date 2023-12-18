@@ -21,7 +21,7 @@ Inlists
 
 This test case has seven parts.
 
-* Part 1 (``inlist_make_late_pre_zams``) creates a 20 |Msun|, Z=1.42*10^-1 metallicity, pre-main sequence model and evolves it for 100 years.
+* Part 1 (``inlist_make_late_pre_zams``) creates a 20 |Msun|, Z=1.42*10^-3 metallicity, pre-main sequence model and evolves it for 100 years.
 
 * Part 2 (``inlist_to_zams``) evolves the model to the zero age main sequence.
 
