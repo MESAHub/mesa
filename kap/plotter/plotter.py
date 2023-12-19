@@ -32,14 +32,14 @@ ax.set_xlim(Xran.min(), Xran.max())
 ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
-cmap = copy.copy(mpl.cm.get_cmap("viridis"))
-cmap.set_over('white')
+cmap = copy.copy(mpl.cm.get_cmap("coolwarm"))
+cmap.set_over('red')
 cmap.set_under('black')
 
 # set color bar limits
 # None will auto-set limits
-cbar_min = None # -15
-cbar_max = None # 1
+cbar_min = -15
+cbar_max = 1
 
 pcol = ax.pcolormesh(Xran, Yran, kapDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)
 pcol.set_edgecolor('face')
