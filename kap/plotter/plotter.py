@@ -38,8 +38,8 @@ cmap.set_under('black')
 
 # set color bar limits
 # None will auto-set limits
-cbar_min = None
-cbar_max = None
+cbar_min = None # -15
+cbar_max = None # 1
 
 pcol = ax.pcolormesh(Xran, Yran, kapDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)
 pcol.set_edgecolor('face')
@@ -47,6 +47,6 @@ cax = fig.colorbar(pcol, extend='both')
 cax.set_label('')
 
 # save figure
-fig.savefig('kap_plotter.png', dpi=150)
+fig.savefig('kap_plotter.png', dpi=300)
 
 plt.show()
