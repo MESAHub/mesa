@@ -9,14 +9,9 @@
       save_model_when_terminate = .true.
       save_model_filename = 'zams.mod'
       required_termination_code_string = 'xa_central_lower_limit'
-
-      set_initial_age = .true.
-      initial_age = 0
-
+      
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-
-      change_initial_Z = .true.
 
       new_rotation_flag = .true.
       near_zams_relax_omega_div_omega_crit = .true.
@@ -55,24 +50,21 @@
 
 ! mlt
       alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
+!      thermohaline_coeff = 2
 
 ! mixing
 
 ! timesteps
-      delta_XHe_cntr_hard_limit = 0.02d0
-      delta_XC_cntr_hard_limit = 0.02d0
-      delta_XNe_cntr_hard_limit = 0.02d0
-      delta_XO_cntr_hard_limit = 0.02d0
-      delta_XSi_cntr_hard_limit = 0.02d0
+!      delta_XHe_cntr_hard_limit = 0.02d0
+!      delta_XC_cntr_hard_limit = 0.02d0
+!      delta_XNe_cntr_hard_limit = 0.02d0
+!      delta_XO_cntr_hard_limit = 0.02d0
+!      delta_XSi_cntr_hard_limit = 0.02d0
 
 ! mesh
 
 ! solver
       solver_iters_timestep_limit = 20
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
 
 ! output
       num_trace_history_values = 2
@@ -84,7 +76,7 @@
       !history_interval = 1
       !terminal_interval = 1
 
-      x_integer_ctrl(1) = 2 ! Inlist part
+      x_integer_ctrl(5) = 2 ! Inlist part number
 
 / ! end of controls namelist
 

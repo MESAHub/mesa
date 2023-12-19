@@ -20,16 +20,17 @@
 / ! end of kap namelist
 
 &controls
-      !delta_lgRho_cntr_limit = 5d-3
-      !dX_nuc_drop_limit_at_high_T = 5d-3  ! default = -1 = same as dX_nuc_drop_limit
-      !use_gold2_tolerances = .false. 
+
+! to avoid a host of retries we relax our limits on split_burn
+! for speed/stability in test_suite, at reduced time resolution.
+op_split_burn_min_T = 1d9
 
 ! prevent development of radial pulses during advanced burning
-      drag_coefficient = 1d0
-      min_q_for_drag = 0.8d0
+      !drag_coefficient = 1d0
+      !min_q_for_drag = 0.8d0
 
-   set_min_D_mix = .true.
-   min_D_mix = 1d-2 
+      set_min_D_mix = .true.
+      min_D_mix = 1d-2 
 
       fe_core_infall_limit = 1d7
 
@@ -102,7 +103,7 @@ ignore_too_large_correction = .true. ! for conv_vel's
       !history_interval = 1
       terminal_interval = 10 
 
-      x_integer_ctrl(1) =  7 ! Inlist part number
+      x_integer_ctrl(5) =  7 ! Inlist part number
 
 / ! end of controls namelist
 
@@ -124,9 +125,9 @@ Profile_Panels3_dymin(4) = 0.14
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 Profile_Panels3_dymin(4) = 0.14
 
-TRho_Profile_xmin = 3.0
+TRho_Profile_xmin = -15 !3.0
 TRho_Profile_xmax = 10
-TRho_Profile_ymin = 8.5
+TRho_Profile_ymin = 3.35 !8.5
 TRho_Profile_ymax = 10.1
 
 TRho_logT_min = 9.2d0
