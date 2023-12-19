@@ -74,7 +74,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4 ! easy to lower with mass loss!ideally 1.5 is most physical
+      Pextra_factor = 2 ! easy to lower with mass loss!ideally 1.5 is most physical
       ! if you run into issues, you can increase Pextra 
       ! extra pressure helps stabilize the atmosphere during core He burning +
      
@@ -94,12 +94,20 @@
       D_ST_factor = 1
 
 ! mlt
-      mixing_length_alpha = 3 ! 1.5
+      mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
       ! We will be bold and try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
       alpha_TDC_DAMPR = 1d0 ! 0d0 is default for mlt limit
+
+
+      use_other_alpha_mlt = .true. ! implemented in run_star_extras
+      x_ctrl(21) = 3.0 ! alpha_H
+      x_ctrl(22) = 1.5 ! alpha_other
+      x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
+      x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
+
 
       use_Ledoux_criterion = .true.
       semiconvection_option = 'Langer_85 mixing; gradT = gradr'
@@ -124,7 +132,7 @@
 
 
       ! MLT ++, explicit, well tested
-      okay_to_reduce_gradT_excess = .true.
+      okay_to_reduce_gradT_excess = .false.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
       gradT_excess_lambda1 = -1d0 ! full on
@@ -355,6 +363,29 @@
 
       !report_solver_progress = .true. ! set true to see info about solver iterations
       !report_ierr = .true. ! if true, produce terminal output when have some internal error
+
+
+
+
+
+! GYRE output controls
+      !write_pulse_data_with_profile = .true.
+      pulse_data_format = 'GYRE'
+      
+      x_logical_ctrl(37) = .false. ! if true, then run GYRE
+
+      x_integer_ctrl(1) = 1 ! output GYRE info at this step interval
+      x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
+
+      x_integer_ctrl(2) = 2 ! max number of modes to output per call
+      x_logical_ctrl(2) = .false. ! output eigenfunction files
+
+      x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         ! should match gyre.in mode l
+      x_integer_ctrl(4) = 1 ! order
+      x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
+      x_ctrl(2) = 0.33d+03 ! growth < this (days)
+
 
 /
 &pgstar

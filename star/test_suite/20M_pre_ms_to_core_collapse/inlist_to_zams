@@ -76,7 +76,7 @@
       !history_interval = 1
       !terminal_interval = 1
 
-      x_integer_ctrl(1) = 2 ! Inlist part number
+      x_integer_ctrl(5) = 2 ! Inlist part number
 
 / ! end of controls namelist
 

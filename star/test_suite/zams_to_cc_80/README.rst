@@ -1,10 +1,10 @@
-.. _20M_pre_ms_to_core_collapse:
+.. _ZAMS_to_core_collapse_80:
 
 ***************************
-20M_pre_ms_to_core_collapse
+ZAMS_to_core_collapse_80
 ***************************
 
-This test suite evolves a solar metalicity 20 |MSun| model from the pre-ms to core collapse. 
+This test suite evolves a 1/10 solar metalicity 80 |MSun| model from the pre-ms to core collapse. 
 For bit for bit convergence, we recomended to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.
 
@@ -24,7 +24,7 @@ Inlists
 
 This test case has seven parts.
 
-* Part 1 (``inlist_make_late_pre_zams``) creates a 20 |Msun|, Z=1.42*10^-2 metallicity, pre-main sequence model and evolves it for 100 years.
+* Part 1 (``inlist_make_late_pre_zams``) creates a 80 |Msun|, Z=1.42*10^-3 metallicity, pre-main sequence model and evolves it for 100 years.
 
 * Part 2 (``inlist_to_zams``) evolves the model to the zero age main sequence.
 

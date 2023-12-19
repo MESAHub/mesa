@@ -153,7 +153,7 @@
          if (ierr /= 0) return
          nz = s% nz
          write(*,'(A)')
-         select case (s% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(5))
          case (6)
             ! put target info in TestHub output
             testhub_extras_names(1) = 'fe_core_mass'; testhub_extras_vals(1) = s% fe_core_mass

@@ -10,11 +10,6 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
 
-      set_initial_dt = .true.
-      years_for_initial_dt = 1d-6
-
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
 
 / ! end of star_job namelist
 
@@ -26,11 +21,29 @@
 
 &controls
 
+! to avoid a host of retries we relax our limits on split_burn
+! for speed/stability in test_suite, at reduced time resolution.
+op_split_burn_min_T = 1d9
+
+! prevent development of radial pulses during advanced burning
+      !drag_coefficient = 1d0
+      !min_q_for_drag = 0.8d0
+
+      set_min_D_mix = .true.
+      min_D_mix = 1d-2 
+
       fe_core_infall_limit = 1d7
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 8000
+      max_model_number = 6000
       !max_number_retries = 37
+
+ignore_too_large_correction = .true. ! for conv_vel's
+
+      delta_lg_XH_cntr_min   = 0.5d0
+      delta_lg_XO_cntr_min   = 0.5d0
+      delta_lg_XC_cntr_min   = 0.5d0
+      delta_lg_XHe_cntr_min   = 0.5d0
 
 ! wind
 
@@ -39,35 +52,27 @@
 ! rotation
 
 ! mlt
+!      alpha_semiconvection = 0
+!      thermohaline_coeff = 0
 
 ! mixing
 
 ! timesteps
-      limit_for_rel_error_in_energy_conservation = 1d-4
-      hard_limit_for_rel_error_in_energy_conservation = 1d-3
+      limit_for_rel_error_in_energy_conservation = 1d-3
+      hard_limit_for_rel_error_in_energy_conservation = 1d-2
 
-      delta_lgRho_cntr_limit = 0.01
-      delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
-      
-      delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.003
-      delta_lgT_cntr_hard_limit = 0.1
+      delta_XSi_cntr_limit = 0.0025
 
-      delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.003     
-      delta_lgT_max_hard_limit = 0.1
-
-      delta_XSi_cntr_limit = 0.0003d0
-      delta_XSi_cntr_hard_limit = 0.03d0
 
 ! mesh
 
 ! solver
+
+
       calculate_Brunt_B = .true.     ! needed for tau_conv
       max_q_for_conv_timescale = 0.2d0
       max_X_for_conv_timescale = 1d-6   ! must be > 0
-      
+
 ! GYRE output controls
       !write_pulse_data_with_profile = .true.
       !x_logical_ctrl(37) = .true. ! if true, then run GYRE
@@ -98,7 +103,7 @@
       !history_interval = 1
       terminal_interval = 10 
 
-      x_integer_ctrl(1) = 6 ! Inlist part
+      x_integer_ctrl(5) =  6 ! Inlist part number
 
 / ! end of controls namelist
 
@@ -114,27 +119,23 @@ Profile_Panels3_xmin = 0 ! -101d0
 Profile_Panels3_xmax =  5 ! 
 Profile_Panels3_xaxis_reversed = .false.
 
-Profile_Panels3_xaxis_name = 'zone'
-Profile_Panels3_xmin = -101d0
-Profile_Panels3_xmax = -101d0
-Profile_Panels3_xaxis_reversed = .true.
-
-
 
 Profile_Panels3_yaxis_name(4) = 'gamma1'
+Profile_Panels3_dymin(4) = 0.14
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
+Profile_Panels3_dymin(4) = 0.14
 
-TRho_Profile_xmin = 3.0
+TRho_Profile_xmin = -15 !3.0
 TRho_Profile_xmax = 10
-TRho_Profile_ymin = 8.5
+TRho_Profile_ymin = 3.35 !8.5
 TRho_Profile_ymax = 10.1
 
-TRho_logT_max = 10d0
+TRho_logT_min = 9.2d0
+TRho_logRho_min = 6d0
 TRho_logRho_max = 10d0
+TRho_logT_max = 10d0
 
 Text_Summary1_name(1,2) = 'time_step_sec'
 Text_Summary1_name(2,2) = 'star_age_sec'
 
-
-kipp_mass_max=2.5
 / ! end of pgstar namelist
