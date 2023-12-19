@@ -176,7 +176,7 @@
             logK, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use interp_1d_def, only: pm_work_size, mp_work_size
-         use interp_1d_lib, only: interpolate_vector, interp_pm, interp_m3a
+         use interp_1d_lib, only: interpolate_vector, interp_pm
 
          type (Kap_Z_Table), dimension(:), pointer :: z_tables
          type (Kap_General_Info), pointer :: rq
@@ -465,7 +465,7 @@
             logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          use kap_def
          use interp_1d_def, only: pm_work_size
-         use interp_1d_lib, only: interpolate_vector, interp_pm, interp_pm_autodiff
+         use interp_1d_lib, only: interpolate_vector, interpolate_vector_autodiff, interp_pm, interp_pm_autodiff
          use auto_diff
 
          type (Kap_Z_Table), dimension(:), pointer :: z_tables
@@ -493,7 +493,6 @@
          
          ierr = 0
          work => work_ary
-         deriv_work => deriv_work_ary
          
          if (ix+2 > num_Xs) then
             i1 = num_Xs-2
@@ -583,19 +582,6 @@
                   'Get_Kap_for_X_cubic', ierr)
             new = v_new(1)
          end subroutine interp1
-
-         subroutine interp1_mp(old, new, ierr)
-            real(dp), intent(in) :: old(n_old)
-            real(dp), intent(out) :: new
-            integer, intent(out) :: ierr
-            real(dp) :: v_old(n_old), v_new(n_new)
-            v_old(:) = dble(old(:))
-
-            call interpolate_vector( &
-                  n_old, x_old, n_new, x_new, v_old, v_new, interp_m3a, mp_work_size, deriv_work, &
-                  'Get_Kap_for_X_cubic', ierr)
-            new = real(v_new(1),kind=dp)
-         end subroutine interp1_mp
           
       end subroutine Get_Kap_for_X_cubic
       

@@ -19,7 +19,8 @@ def parse(fname):
     data = np.swapaxes(data, 0, 1)
     return data, Yran, Xran, nX, nY
 
-files = ['linear.dat','cubic.dat']
+files = ['cubic.dat','cubic_autodiff.dat']
+labels = ['interpolated derivative','autodiff derivative']
 
 with open(files[0]) as f:
     title = f.readline().strip()
@@ -33,14 +34,14 @@ ax.set_title(r'$\log_{10} T = 6.5$, $\log_{10} \rho = -5$, $Z=0$')
 ax.set_xlabel(xlabel)
 ax.set_ylabel(title)
     
-for infile in files:
+for j,infile in enumerate(files):
     kapDT, Yran, Xran, nX, nY = parse(infile)
     
     logkap_logTmid = kapDT[int(nY/2),:,2]
     logkap_logTmid_m1 = kapDT[int(nY/2)-1,:,2]
     logkap_logTmid_p1 = kapDT[int(nY/2)+1,:,2]
 
-    ax.plot(Xran,logkap_logTmid,label='interpolated derivative')
+    ax.plot(Xran,logkap_logTmid,label=labels[j])
     #ax.plot(Xran,logkap_logTmid_p1,ls='--')
     ax.set_xlim(Xran.min(), Xran.max())
 
