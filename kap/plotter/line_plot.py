@@ -29,6 +29,7 @@ with open(files[0]) as f:
 
 # set up plot and labels
 fig, ax = plt.subplots()
+ax.set_title(r'$\log_{10} T = 6.5$, $\log_{10} \rho = -5$, $Z=0$')
 ax.set_xlabel(xlabel)
 ax.set_ylabel(title)
     
@@ -39,7 +40,7 @@ for infile in files:
     logkap_logTmid_m1 = kapDT[int(nY/2)-1,:,2]
     logkap_logTmid_p1 = kapDT[int(nY/2)+1,:,2]
 
-    ax.plot(Xran,logkap_logTmid)
+    ax.plot(Xran,logkap_logTmid,label='interpolated derivative')
     #ax.plot(Xran,logkap_logTmid_p1,ls='--')
     ax.set_xlim(Xran.min(), Xran.max())
 
@@ -73,9 +74,10 @@ for infile in files:
 
     #ax.plot(Xran,nderiv_m1,ls=':',c='k')
     #ax.plot(Xran,nderiv_p1,ls='--',c='k')
-    ax.plot(Xran,(nderiv_p1+nderiv_m1)/2,ls='--',c='k')
+    ax.plot(Xran,(nderiv_p1+nderiv_m1)/2,ls='--',c='k',label='numeric derivative')
+
+ax.legend()
     
 # save figure
 fig.savefig('line_kap.png', dpi=300)
 
-plt.show()
