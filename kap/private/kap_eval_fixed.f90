@@ -464,8 +464,9 @@
             z_tables, rq, iz, ix, num_Xs, x_tables, X, logRho, logT, &
             logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          use kap_def
-         use interp_1d_def, only: pm_work_size, mp_work_size
-         use interp_1d_lib, only: interpolate_vector, interp_pm, interp_m3a
+         use interp_1d_def, only: pm_work_size
+         use interp_1d_lib, only: interpolate_vector, interp_pm, interp_pm_autodiff
+         use auto_diff
 
          type (Kap_Z_Table), dimension(:), pointer :: z_tables
          type (Kap_General_Info), pointer :: rq
@@ -478,10 +479,13 @@
          
          integer, parameter :: n_old = 4, n_new = 1
          real(dp), dimension(n_old) :: logKs, dlogKs_dlogRho, dlogKs_dlogT
-         real(dp) :: x_old(n_old), x_new(n_new)
-         real(dp), target :: work_ary(n_old*pm_work_size), deriv_work_ary(n_old*mp_work_size)
-         real(dp), pointer :: work(:), deriv_work(:)
+         type(auto_diff_real_2var_order1), dimension(n_old) :: logKs_ad
+         type(auto_diff_real_2var_order1) :: x_old(n_old), x_new(n_new)
+         type(auto_diff_real_2var_order1), target :: work_ary(n_old*pm_work_size)
+         type(auto_diff_real_2var_order1), pointer :: work(:)
          integer :: i, i1, ixx
+
+         type(auto_diff_real_2var_order1) :: logK_ad
          
          logical, parameter :: dbg = .false.
          
@@ -504,7 +508,9 @@
          do i=1,n_old
             ixx = i1-2+i
             if (dbg) write(*,*) 'ixx', ixx
-            x_old(i) = x_tables(ixx)% X
+            x_old(i) % val = x_tables(ixx)% X
+            x_old(i) % d1val1 = 0d0
+            x_old(i) % d1val2 = 0d0
             call Get_Kap_for_logRho_logT( &
                      z_tables, rq, iz, x_tables, ixx, &
                      logRho, logT, logKs(i), dlogKs_dlogRho(i), dlogKs_dlogT(i), ierr)
@@ -513,27 +519,25 @@
                if (dbg) write(*,11) 'logT', logT
                return
             end if
+            ! now pack into auto_diff form
+            logKs_ad(i) % val = logKs(i)
+            logKs_ad(i) % d1val1 = dlogKs_dlogT(i)
+            logKs_ad(i) % d1val2 = dlogKs_dlogRho(i)
          end do
-         x_new(1) = X
-         
-         !call interp1_mp(logKs, logK, ierr)
-         call interp1(logKs, logK, ierr)
+         x_new(1) % val = X
+         x_new(1) % d1val1 = 0d0
+         x_new(1) % d1val2 = 0d0
+                  
+         call interp1(logKs_ad, logK_ad, ierr)
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
-         
-         call interp1_mp(dlogKs_dlogRho, dlogK_dlogRho, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
-            return
-         end if
-                  
-         call interp1_mp(dlogKs_dlogT, dlogK_dlogT, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
-            return
-         end if
+
+         ! unpack auto_diff pack into output reals
+         logK = logK_ad % val
+         dlogK_dlogT = logK_ad % d1val1
+         dlogK_dlogRho = logK_ad % d1val2
          
          if (dbg) then
          
@@ -566,15 +570,18 @@
          contains
          
          subroutine interp1(old, new, ierr)
-            real(dp), intent(in) :: old(n_old)
-            real(dp), intent(out) :: new
+            type(auto_diff_real_2var_order1), intent(in) :: old(n_old)
+            type(auto_diff_real_2var_order1), intent(out) :: new
             integer, intent(out) :: ierr
-            real(dp) :: v_old(n_old), v_new(n_new)
-            v_old(:) = dble(old(:))
-            call interpolate_vector( &
-                  n_old, x_old, n_new, x_new, v_old, v_new, interp_pm, pm_work_size, work, &
+            type(auto_diff_real_2var_order1) :: v_old(n_old), v_new(n_new)
+            integer :: i
+            do i = 1, n_old
+               v_old(i) = old(i)
+            end do
+            call interpolate_vector_autodiff( &
+                  n_old, x_old, n_new, x_new, v_old, v_new, interp_pm_autodiff, pm_work_size, work, &
                   'Get_Kap_for_X_cubic', ierr)
-            new = real(v_new(1),kind=dp)
+            new = v_new(1)
          end subroutine interp1
 
          subroutine interp1_mp(old, new, ierr)
