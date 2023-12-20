@@ -288,7 +288,7 @@ module kap_def
      kap_options_max = 7
 
 
-  integer, parameter :: kap_max_dim = 20 !change this to make even larger grids in X and/or Z
+  integer, parameter :: kap_max_dim = 50 !change this to make even larger grids in X and/or Z
 
   integer, dimension(kap_options_max) :: num_kap_Xs = 0
   real(dp), dimension(kap_max_dim, kap_options_max) :: kap_Xs = -1d0
