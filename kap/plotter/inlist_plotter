@@ -12,7 +12,7 @@
   !### put kap options here
   ! see kap/defaults/kap.defaults
   cubic_interpolation_in_X = .true.
-  cubic_interpolation_in_Z = .false.
+  cubic_interpolation_in_Z = .true.
 
   use_Type2_opacities = .false.
   Zbase = 0
@@ -28,14 +28,14 @@
   ! if doing_d_dlnd, partials wrt lnd, else wrt lnT
 
   doing_partial = .true.
-  doing_dfridr = .false.
+  doing_dfridr = .true.
   doing_d_dlnd = .false.
 
 
   !### pick which quantities to plot against
   ! valid options are Rho, T, X, Z
 
-  xname = 'X'
+  xname = 'Rho'
   yname = 'T'
 
   ! xname = 'X'
@@ -44,8 +44,8 @@
   !### pick number of points
   ! values for non-xname,yname variables are ignored
 
-  nT = 51
-  nRho = 300
+  nT = 301
+  nRho = 301
   nX = 500
   nZ = 150
 
@@ -54,8 +54,8 @@
   ! center/delta takes precedence over min/max
   ! center is used when var is not xname/yname
 
-  ! X_center = 0.625
-  Z_center = 0.00
+  X_center = 0.625d0 ! 0.7d0
+  Z_center = 5d-4 ! closest grid points are at Z = 3d-4 and 1d-3
 
   ! delta_X = 0.1
   delta_Z = 0.0
@@ -66,11 +66,11 @@
   ! Z_min = 0
   ! Z_max = 0.1
 
-  logT_center = 6.5
-  logRho_center = -5
+  logT_center = 7d0
+  logRho_center = -2d0
 
-  delta_logT = 0.0001d0
-  delta_logRho = 8d0
+  delta_logT = 6d0
+  delta_logRho = 24d0
 
   ! logT_min = 3.8
   ! logT_max = 4.2
