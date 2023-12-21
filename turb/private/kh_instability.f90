@@ -26,7 +26,7 @@ module kh_instability
       real(dp), intent(in) :: w, lhat, hb, pr, db 
       real(dp), intent(out) :: hb_star, re, rm
   
-      hb_star = hb / w**2
+      hb_star = hb / pow2(w)
       re = w / (pr * lhat)
       rm = w / (db * lhat)
   
@@ -38,7 +38,7 @@ module kh_instability
       real(dp), intent(in) :: delta
       real(dp) :: deln
   
-      deln = k**2 + (n + delta)**2
+      deln = pow2(k) + pow2(n + delta)
   
     end function deln
   
@@ -212,7 +212,7 @@ module kh_instability
          CC = -tau * pow2(k_mode)
 
          ! A field
-         ! \lambda A +    i k_m^2 k_x k_z E_{\psi}\left(  A_{m+1} +  A_{m-1} \right) = -D_B k_m^2 A_m + k_z i \psi_m
+         ! \lambda A +    i k_x k_z E_{\psi}\left(  A_{m+1} +  A_{m-1} \right) = -D_B A_m + k_z i \psi_m
 
          AA_P = -j_imag * k * k_z * A_Psi
          AA_N = -j_imag * k * k_z * A_Psi
@@ -471,7 +471,7 @@ module kh_instability
           real(dp) :: m2, re, rm
           real(dp) :: sigma
           
-          m2 = hb / w**2
+          m2 = hb / pow2(w)
           re = w / (pr * lhat) 
           rm = w / (db * lhat)
 
