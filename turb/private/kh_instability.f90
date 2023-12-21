@@ -1,6 +1,7 @@
 module kh_instability
 
     use const_def, only: dp
+    use math_lib
     use fingering_modes, only: gaml2max
     ! use f95_lapack ! Might need to link properly from SDK
   
@@ -16,7 +17,7 @@ module kh_instability
     public :: gammax_kscan
     public :: gammax_minus_lambda
   
-    real(dp), parameter :: CH = 1.66_dp
+    real(dp), parameter :: CH = 1.66_dp ! 3.03_dp
 
   
   contains
@@ -142,7 +143,132 @@ module kh_instability
       l(i,i-2) = -k/(2.0_dp*j_imag)
   
     end subroutine lmat
+
+    subroutine sams_lmat(n, f, k, m, A_Psi, A_T, A_C, Pr, tau, R0, Pm, HB, l)
+      integer, intent(in)      :: n
+      real(dp), intent(in)     :: f, k, m, A_psi, A_T, A_C, Pr, tau, R0, Pm, HB
+      complex(dp), intent(out) :: l((2*n+1)*4,(2*n+1)*4)
   
+      integer  :: i, j, dim, index, stride
+      real(dp) :: D_b, k_mode, k_x, k_z, P_k_mode, N_k_mode
+      complex(dp) :: PsiPsi_P, PsiPsi_N, PsiPsi, PsiT, PsiC, PsiA, &
+                     TT_P, TT_N, TPsi_P, TPsi_N, TPsi, TT, &
+                     CC_P, CC_N, CPsi_P, CPsi_N, CPsi, CC, &
+                     AA_P, AA_N, AA, APsi
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
+
+      dim = (2*n+1)*4
+      D_b = Pr/Pm
+
+      do i = -n, n
+         k_mode = sqrt(pow2(i*k + f) + pow2(m)) ! $k_m$ in latex
+         k_x = i*k + f ! $(f + (m+1)k_x)$ in latex
+         k_z = m ! $k_z$ in latex
+        
+         P_k_mode = sqrt(pow2((i + 1)*k + f) + pow2(m))  ! $k_{m+1}$ in latex
+         N_k_mode = sqrt(pow2((i - 1)*k + f) + pow2(m))  ! $k_{m-1}$ in latex
+
+         ! \psi field         
+         ! -\lambda k_m^2 \psi_m -
+         ! 	  i k_x  k_z   E_{\psi} \left( k_{m+1}^2 \psi_{m+1} +  k_{m-1}^2 \psi_{m-1} \right)  +
+         !  i k_x^3 k_z E_{\psi}\left( \psi_{m+1} + \psi_{m-1}\right)
+         !  \end{equation}
+         !  $$ =  \text{Pr} k_m^4 + i\text{Pr}(f + (m+1)k_x)(T_m -C_m) -
+         ! 	i H_b  k_z k_m^2 A_m  $$
+         
+         ! (terms are in order that they appear in latex doc)
+         
+         PsiPsi_P = j_imag * (-pow2(P_k_mode) * A_Psi * k_z * k + A_Psi * pow3(k) * k_z) / pow2(k_mode)
+         PsiPsi_N = j_imag * (-pow2(N_k_mode) * A_Psi * k_z * k + A_Psi * pow3(k) * k_z) / pow2(k_mode)
+
+         PsiPsi = - Pr * pow2(k_mode)
+         PsiT = -j_imag * Pr * k_x / pow2(k_mode)
+         PsiC = j_imag * Pr * k_x / pow2(k_mode)
+
+         PsiA = j_imag * k_z * HB
+
+         ! T field
+         ! \lambda T_m  +  i k_x  k_z E_{\psi}(T_{m+1} + T_{m-1})  + k_x k_z E_{T} (-\psi_{m+1} + \psi_{m-1}) + i(f + m k_x) \psi_m = -k_m^2 T_m
+
+         TT_P = j_imag * (-k * A_Psi * k_z)
+         TT_N = j_imag * (-k * A_Psi * k_z)
+
+         TPsi_P = (k * A_T * k_z)
+         TPsi_N = (-k * A_T * k_z)
+
+         TPsi = -(j_imag * k_x)
+         TT = -pow2(k_mode)
+
+         ! C field
+         ! \lambda C_m  +  i k_x  k_z E_{\psi} (C_{m+1} + C_{m-1})  + k_x k_z E_{C} (-\psi_{m+1} + \psi_{m-1})  + i(f + m k_x) \frac{1}{R_0}\psi_m = -\tau k_m^2 C_m
+         
+         CC_P = j_imag * (-k * A_Psi * k_z)
+         CC_N = j_imag * (-k * A_Psi * k_z)
+         
+         CPsi_P = (k * A_C * k_z)
+         CPsi_N = (-k * A_C * k_z)
+
+         CPsi = -(j_imag * k_x / R0)
+         CC = -tau * pow2(k_mode)
+
+         ! A field
+         ! \lambda A +    i k_m^2 k_x k_z E_{\psi}\left(  A_{m+1} +  A_{m-1} \right) = -D_B k_m^2 A_m + k_z i \psi_m
+
+         AA_P = -j_imag * k * k_z * A_Psi
+         AA_N = -j_imag * k * k_z * A_Psi
+
+         AA = -D_b * pow2(k_mode)
+
+         APsi = j_imag * k_z
+
+         !  interactions
+
+         stride = 4
+         index = (n + i) * stride + 1
+
+         !  same mode interactions
+
+         l(index, index) = PsiPsi
+         l(index, index + 1) = PsiT
+         l(index, index + 2) = PsiC
+
+         l(index + 1, index) = TPsi
+         l(index + 1, index + 1) = TT
+
+         l(index + 2, index) = CPsi
+         l(index + 2, index + 2) = CC
+
+         l(index + 3, index) = APsi
+         l(index + 3, index + 3) = AA
+         l(index, index + 3) = PsiA
+
+         ! neighboring interactions
+
+         if (index > stride) then
+            l(index, index - stride) = PsiPsi_N
+            l(index + 1, index - stride) = TPsi_N
+            l(index + 2, index - stride) = CPsi_N
+            l(index + 1, index - stride + 1) = TT_N
+            l(index + 2, index - stride + 2) = CC_N
+
+            l(index + 3, index - stride + 3) = AA_N
+         end if
+
+         if (index + stride + 3 < dim) then
+            l(index, index + stride) = PsiPsi_P
+            l(index + 1, index + stride) = TPsi_P
+            l(index + 2, index + stride) = CPsi_P
+            l(index + 1, index + stride + 1) = TT_P
+            l(index + 2, index + stride + 2) = CC_P
+
+            l(index + 3, index + stride + 3) = AA_P
+         end if
+         
+      end do
+      
+    end subroutine sams_lmat
+    
+    
     function gamfromL(L, N, withmode) result(gam)
       complex(dp), intent(in) :: L(:,:)
       integer, intent(in) :: N ! size of NxN matrix L
