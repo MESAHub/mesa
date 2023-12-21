@@ -58,7 +58,7 @@ install:
 #
 # COMPILATION RULES
 
-MY_FC_FLAGS = $(FCfree)
+MY_FC_FLAGS = $(FCopenmp) $(FCfree)
 
 %.o: %.f90
 ifneq ($(QUIET),)

@@ -7,14 +7,13 @@ program turb_plotter
   
   implicit none
 
-  integer :: ierr
+  integer :: ierr, op_err
   character (len=32) :: my_mesa_dir
 
-  integer               :: nR0, nks, i, j, jmax, spectral_resolution
-  real(dp), allocatable :: ks(:)
+  integer               :: nR0, nks, j, jmax, spectral_resolution
+  real(dp), allocatable :: ks(:), res(:,:)
   real(dp)              :: tau, Pr, Pm, HB1, HB2, DB, R0
-  real(dp)              :: l2hat, lhat, lamhat, w
-  real(dp)              :: HB(3), res(6)
+  real(dp)              :: HB(3)
   integer               :: iounit
 
   real(dp), parameter :: UNSET = -999
@@ -50,33 +49,58 @@ program turb_plotter
   close(iounit)
 
   HB = [0d0, HB1, HB2]
-  res(:) = 0d0
+  DB = Pr/Pm
   
   ! spectral_resolution must be odd integer, so promote to next odd number if even
   spectral_resolution = (spectral_resolution/2)*2 + 1
 
   allocate(ks(nks*2))
-  do i = 1,nks
+  allocate(res(nR0,7))
+  res(:,:) = 0d0
+  
+  do j = 1,nks
      ! first nks entries are log space from 1e-6 to 0.1 (don't include endpoint)
-     ks(i) = pow(10d0,-6d0 + (i-1)*(-1d0 + 6d0)/nks)
+     ks(j) = pow(10d0,-6d0 + (j-1)*(-1d0 + 6d0)/nks)
 
      ! last nks entries are linear space from 0.1 to 2
-     ks(i+nks) = 0.1d0 + (i-1)*(2d0 - 0.1d0)/(nks - 1)
+     ks(j+nks) = 0.1d0 + (j-1)*(2d0 - 0.1d0)/(nks - 1)
   end do
   
+  ! loop stays interior to interval 1 < R0 < 1/tau,
+  ! so need two extra points to define the endpoints.
+  jmax = nR0 + 2
+  
+!$OMP PARALLEL DO PRIVATE(j, R0, op_err) SCHEDULE(dynamic,2)
+  do j = 2,jmax-1
+     R0 = 1d0 + (1d0/tau - 1d0)*(j - 1)/(jmax - 1)
+     call set_res_for(j-1, R0, op_err)
+     if(op_err /= 0) ierr = op_err
+  end do
+!$OMP END PARALLEL DO
+
   ! file for output
   open(newunit=iounit, file='turb_plotter.dat')
   ! header for use by numpy genfromtxt in plotter.py
   write(iounit,*) "# index R0 Dth_HG19_HB0 Dth_HG19_HB1 Dth_HG19_HB2 Dth_FRG24_HB0 Dth_FRG24_HB1 Dth_FRG24_HB2"
 
-  ! loop stays interior to interval 1 < R0 < 1/tau,
-  ! so need two extra points to define the endpoints.
-  jmax = nR0 + 2
+  ! write out results
+  do j = 1,nR0
+     write(iounit,*) j, res(j,:)
+  end do
   
-  ! loop for making calls to calculate things
-  do j = 2,jmax-1
-     R0 = 1d0 + (1d0/tau - 1d0)*(j - 1)/(jmax - 1)
+  deallocate(ks)
+  deallocate(res)
+  
+contains
 
+  subroutine set_res_for(j, R0, ierr)
+     integer, intent(in)  :: j
+     real(dp), intent(in) :: R0
+     integer, intent(out) :: ierr
+
+     real(dp) :: l2hat, lhat, lamhat, w
+     integer  :: i
+  
      ! calculate lamhat and l2hat
      call thermohaline_mode_properties(Pr, tau, R0, lamhat, l2hat, ierr)
      if (ierr /= 0) then
@@ -85,6 +109,8 @@ program turb_plotter
      end if
 
      lhat = sqrt(l2hat)
+
+     res(j,1) = R0
 
      ! Calculate results for 3 different magnetic field strengths (0,HB1,HB2)
      do i = 1,3
@@ -103,12 +129,11 @@ program turb_plotter
         end if
         
         ! caclulate resulting D/kappa_T as function of tau, Pr, R0
-        res(i) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+        res(j,i+1) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
 
      end do
 
      ! Now calculate again for full FRG24 model (adds in Pm dependence)
-     DB = Pr/Pm
      do i = 1,3
         call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
         if (ierr /= 0) then
@@ -116,19 +141,18 @@ program turb_plotter
            write(*,*) 'R0', R0
            write(*,*) '1/tau', 1/tau
            write(*,*) 'HB', HB(i)
+           write(*,*) 'DB', DB
            write(*,*) 'l2hat', l2hat
            write(*,*) 'lhat', lhat
            write(*,*) 'lamhat', lamhat
            write(*,*) 'w', w
+           write(*,*) 'ierr', ierr
            call mesa_error(__FILE__,__LINE__)
         end if
-        print *, "calc_frg24_w, R0, HB, w", R0, HB(i), w
-        res(i+3) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+        write(*,*) "calc_frg24_w, R0, HB, w", R0, HB(i), w
+        res(j,i+4) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
      end do
      
-     write(iounit,*) j-1, R0, res
-  end do
+   end subroutine set_res_for
 
-  deallocate(ks)
-  
 end program turb_plotter

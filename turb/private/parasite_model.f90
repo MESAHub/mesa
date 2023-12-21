@@ -101,7 +101,7 @@ module parasite_model
          w1 = w2
          y1 = y2
          
-         w2 = w2*pow(10d0,i)
+         w2 = w2*10d0
          y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
       end do
 
