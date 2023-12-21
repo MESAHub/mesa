@@ -36,6 +36,20 @@ function do_one_CO {
 	echo
 }
 
+function do_one_oplib {
+	echo "using" $1
+	echo
+	check_okay
+	python spline_OPLIB_tables.py $1
+	check_okay
+	cp -r $1_spline/* data/kap_data/.
+	check_okay
+	rm -rf $1_spline
+	check_okay
+	echo 'done' $1
+	echo
+}
+
 mkdir -p data/kap_data
 
 rm -f data/kap_data/*.data
@@ -81,6 +95,10 @@ do_one_CO inlist_gs98_aFe_p4_CO
 do_one inlist_gs98_aFe_p6 
 do_one inlist_gs98_aFe_p8 
 
+do_one_oplib kap_input_data/oplib/OPLIB_GS98_LOG_1194_25E
+do_one_oplib kap_input_data/oplib/OPLIB_AGSS09_LOG_1194_25E
+do_one_oplib kap_input_data/oplib/OPLIB_AAG21_LOG_1194_25E
+do_one_oplib kap_input_data/oplib/OPLIB_MB22_LOG_1194_25E
 
 
 echo "**************"
