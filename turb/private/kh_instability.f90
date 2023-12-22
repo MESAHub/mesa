@@ -21,7 +21,7 @@ module kh_instability
     public :: gammax_minus_lambda_withTC
   
     real(dp), parameter :: CH = 1.66_dp
-    real(dp), parameter :: C2 = 1._dp/CH ! or 0.33?
+    real(dp), parameter :: C2 = 0.33d0 ! 1._dp/CH ! or 0.33?
   
   contains
   

@@ -17,7 +17,7 @@ module parasite_model
   
     real(dp), parameter :: kb = 1.24_dp
     real(dp), parameter :: CH = 1.66_dp
-    real(dp), parameter :: C2 = 1d0/CH
+    real(dp), parameter :: C2 = 0.33d0 ! 1d0/CH
   
   contains
   
