@@ -114,13 +114,14 @@ module turb
      
    end subroutine calc_hg19_w
 
-   subroutine calc_frg24_w(pr, tau, r0, hb, db, ks, n, w, ierr, lamhat, l2hat)
+   subroutine calc_frg24_w(pr, tau, r0, hb, db, ks, n, w, withTC, ierr, lamhat, l2hat)
      use parasite_model
 
      real(dp), intent(in) :: pr, tau, r0, hb, db 
      real(dp), intent(in) :: ks(:)
      integer, intent(in) :: n ! n MUST be odd
      real(dp), intent(out) :: w
+     logical, intent(in) :: withTC
      integer, intent(out) :: ierr
      real(dp), intent(in), optional :: lamhat, l2hat
 
@@ -129,10 +130,18 @@ module turb
      ! these calls to wf ignore delta, ideal, badks_exception, get_kmax (0,0,false,false)
      if (present(lamhat)) then
         ! lamhat and l2hat already calculated, so can pass as arguments
-        w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false., lamhat, l2hat)
+        if(withTC) then
+           w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., lamhat, l2hat)
+        else
+           w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false., lamhat, l2hat)
+        end if
      else
         ! lamhat and l2hat need to be calculated inside the wf routine
-        w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false.)
+        if(withTC) then
+           w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false.)
+        else
+           w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false.)
+        end if
      end if
   
    end subroutine calc_frg24_w

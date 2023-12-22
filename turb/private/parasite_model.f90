@@ -10,6 +10,7 @@ module parasite_model
   
     private
     public :: wf
+    public :: wf_withTC
     public :: nuc
     public :: nut
     public :: gamma_tot
@@ -123,7 +124,7 @@ module parasite_model
     end function wf
 
     function wf_withTC(pr, tau, r0, hb, db, ks, n, get_kmax, lamhat, l2hat) result(w)
-  
+
       ! Root finding for wf
   
       real(dp), intent(in) :: pr, tau, r0, hb, db 

@@ -8,10 +8,13 @@
   nR0 = 50
 
   ! resolution used by FRG calculations
-  spectral_resolution = 17
+  spectral_resolution = 17 ! 9
 
   ! For FRG, we use 2*nks points in k space to scan for fastest growing mode
-  nks = 50
+  nks = 50 ! 20
+
+  ! whether or not to include TC terms in matrix solve of FRG24 model
+  FRG_withTC = .false.
 
   !! Parameters for thermohaline calculations
   

@@ -14,12 +14,13 @@ program turb_plotter
   real(dp), allocatable :: ks(:), res(:,:)
   real(dp)              :: tau, Pr, Pm, HB1, HB2, DB, R0
   real(dp)              :: HB(3)
+  logical               :: FRG_withTC
   integer               :: iounit
 
   real(dp), parameter :: UNSET = -999
   
   namelist /plotter/ &
-       tau, Pr, Pm, HB1, HB2, nR0, nks, spectral_resolution
+       tau, Pr, Pm, HB1, HB2, nR0, nks, spectral_resolution, FRG_withTC
 
   include 'formats'
 
@@ -135,7 +136,7 @@ contains
 
      ! Now calculate again for full FRG24 model (adds in Pm dependence)
      do i = 1,3
-        call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, ierr, lamhat, l2hat)
+        call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, FRG_withTC, ierr, lamhat, l2hat)
         if (ierr /= 0) then
            write(*,*) 'calc_frg24_w failed'
            write(*,*) 'R0', R0
