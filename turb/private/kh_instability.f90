@@ -2,6 +2,7 @@ module kh_instability
 
     use const_def, only: dp
     use math_lib
+    use utils_lib
     use fingering_modes, only: gaml2max
     ! use f95_lapack ! Might need to link properly from SDK
   
@@ -15,10 +16,12 @@ module kh_instability
     public :: gamfromL
     public :: gamma_over_k
     public :: gammax_kscan
+    public :: gammax_kscan_withTC
     public :: gammax_minus_lambda
+    public :: gammax_minus_lambda_withTC
   
-    real(dp), parameter :: CH = 1.66_dp ! 3.03_dp
-
+    real(dp), parameter :: CH = 1.66_dp
+    real(dp), parameter :: C2 = 1._dp/CH ! or 0.33?
   
   contains
   
@@ -329,6 +332,36 @@ module kh_instability
       end do
   
     end function gamma_over_k
+
+    function gamma_over_k_withTC(w, hb, db, pr, tau, R0, ks, n) result(gamk)
+      real(dp), intent(in) :: w, hb, db, pr, tau, R0
+      real(dp), intent(in) :: ks(:)
+      integer, intent(in) :: n
+  
+      complex(dp) :: l_result(4*n,4*n)
+      real(dp) :: gamk(size(ks))
+      real(dp) :: kz, lamhat, l2hat, lhat, A_psi, A_T, A_C
+      integer :: i, n_Sam, ierr
+
+      ! TODO: should pass lamhat, l2hat, lhat in as arguments,
+      ! since they've already been calculated elsehwere
+      call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
+      lhat = sqrt(l2hat)
+      
+      A_psi = w / (2*lhat)
+      A_T = -lhat * A_psi / (lamhat + l2hat)
+      A_C = -lhat * A_psi / (R0 * (lamhat + tau * l2hat))
+      n_Sam = (n-1)/2  ! Sam's definition of n is different than Adrian's
+
+      do i = 1, size(ks)
+         kz = ks(i)*lhat
+         ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
+         call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
+         gamk(i) = gamfromL(l_result,4*n)
+      end do
+  
+    end function gamma_over_k_withTC
+
   
     function gammax_kscan(delta, m2, re, rm, ks, n, ideal, badks_except) result(gammax)
       real(dp), intent(in) :: delta, m2, re, rm
@@ -353,6 +386,30 @@ module kh_instability
   
     end function gammax_kscan
 
+   function gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception) result(gammax)
+      real(dp), intent(in) :: w, hb, db, pr, tau, R0
+      real(dp), intent(in) :: ks(:)
+      integer, intent(in) :: n
+      logical, intent(in) :: badks_exception
+  
+      real(dp) :: gammax
+      real(dp) :: gamk(size(ks))
+      integer :: i
+  
+      gamk = gamma_over_k_withTC(w, hb, db, pr, tau, R0, ks, n)
+      i = maxloc(gamk,1)
+      gammax = gamk(i)
+  
+      if (badks_exception .and. gammax > 0.0_dp) then
+         if (i == 1 .or. i == size(ks)) then
+            write(*,*) 'WARNING: most unstable growth at edge of k range'
+            write(*,*) 'have not fully implemented logic for badks_exception'
+            call mesa_error(__FILE__,__LINE__)
+         end if
+      end if
+  
+    end function gammax_kscan_withTC
+    
       
 !!$        function sigma_from_fingering_params(delta, w, hb, db, pr, tau, r0, k_star, n, withmode) result(sigma)
 !!$          real(dp), intent(in) :: delta, w, hb, db, pr, tau, r0, k_star 
@@ -480,5 +537,19 @@ module kh_instability
           f = sigma*w*lhat - CH*lamhat
       
         end function gammax_minus_lambda
+
+        function gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, R0, db, ks, n, badks_exception) result(f)
       
+          ! Root finding helper function
+      
+          real(dp), intent(in) :: w, lamhat, lhat, hb, pr, tau, R0, db
+          real(dp), intent(in) :: ks(:)
+          integer, intent(in) :: n
+          logical, intent(in) :: badks_exception
+          real(dp) :: f
+      
+          f = C2*gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception) - lamhat
+
+        end function gammax_minus_lambda_withTC
+        
       end module kh_instability
