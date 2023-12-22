@@ -13,8 +13,8 @@
   ! For FRG, we use 2*nks points in k space to scan for fastest growing mode
   nks = 50 ! 20
 
-  ! whether or not to include TC terms in matrix solve of FRG24 model
-  FRG_withTC = .false.
+  ! whether or not to include T&C terms for extended matrix of FRG24 model
+  FRG_withTC = .true.
 
   !! Parameters for thermohaline calculations
   

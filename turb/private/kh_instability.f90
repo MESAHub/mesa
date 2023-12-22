@@ -274,10 +274,10 @@ module kh_instability
     end subroutine sams_lmat
     
     
-    function gamfromL(L, N, withmode) result(gam)
+    function gamfromL(L, N, return_maxreal, withmode) result(gam)
       complex(dp), intent(in) :: L(:,:)
       integer, intent(in) :: N ! size of NxN matrix L
-      logical, intent(in), optional :: withmode
+      logical, intent(in), optional :: return_maxreal, withmode
       real(dp) :: gam 
       !complex(dp), allocatable, optional :: mode(:)
   
@@ -313,7 +313,13 @@ module kh_instability
 !!$         allocate(mode(size(omega)))
 !!$         mode = v(:,i)
 !!$      else
+
+      if(present(return_maxreal)) then
+         gam = maxval(realpart(omega))
+      else
          gam = maxval(-aimag(omega))
+      end if
+
 !!$      end if
 
     end function gamfromL
@@ -359,7 +365,7 @@ module kh_instability
          kz = ks(i)*lhat
          ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
          call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
-         gamk(i) = gamfromL(l_result,4*n)
+         gamk(i) = gamfromL(l_result,4*n,.true.)
       end do
   
     end function gamma_over_k_withTC
@@ -548,9 +554,10 @@ module kh_instability
           real(dp), intent(in) :: ks(:)
           integer, intent(in) :: n
           logical, intent(in) :: badks_exception
-          real(dp) :: f
-      
-          f = C2*gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception) - lamhat
+          real(dp) :: gammax, f
+
+          gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception)
+          f = gammax*C2 - lamhat
 
         end function gammax_minus_lambda_withTC
         

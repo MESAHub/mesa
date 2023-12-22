@@ -178,6 +178,10 @@ module parasite_model
 
       if(y1 > 0d0) then
          write(*,*) "invalid lower bracket for FRG w search"
+         write(*,*) "w1", w1
+         write(*,*) "y1", y1
+         write(*,*) "w2", w2
+         write(*,*) "y2", y2
          call mesa_error(__FILE__,__LINE__)
       end if
       
