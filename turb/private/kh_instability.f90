@@ -163,6 +163,8 @@ module kh_instability
       dim = (2*n+1)*4
       D_b = Pr/Pm
 
+      l(:,:) = (0.0_dp, 0.0_dp)
+
       do i = -n, n
          k_mode = sqrt(pow2(i*k + f) + pow2(m)) ! $k_m$ in latex
          k_x = i*k + f ! $(f + (m+1)k_x)$ in latex
@@ -257,7 +259,7 @@ module kh_instability
             l(index + 3, index - stride + 3) = AA_N
          end if
 
-         if (index + stride + 3 < dim) then
+         if (index + stride + 3 <= dim) then
             l(index, index + stride) = PsiPsi_P
             l(index + 1, index + stride) = TPsi_P
             l(index + 2, index + stride) = CPsi_P
