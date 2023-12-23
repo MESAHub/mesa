@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/wichita/mb22'		
+         lowT_flag = .true.
+         logT_file = 'logT_points_lowT_2.7'
+         logR_min = -8.00d0
+         logR_max = 2.00d0
+         logR_points = 51
+         type1_table = 'magg21'
+         output_dir = 'data/kap_data'
+         table_prefix = 'lowT_fa05_mb22'
+         header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with MB22 photospheric metals'
+         table_version= 38
+
+/
