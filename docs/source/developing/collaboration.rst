@@ -27,7 +27,7 @@ MESA (e.g., contribute a hook/routine, make a pull request).
 
 *MESA Developers (MD)*: These are individuals committed to improving
 MESA and its infrastructure (e.g., the MESA Test Hub). Instructions on how to become
-a developer are found :doc:`here <developing/new_developers>`.
+a developer are found :doc:`here <new_developers>`.
 
 Responsibilities
 of developers include:
@@ -92,7 +92,7 @@ fulfill their responsibilities, they must inform the MD.
 Removal from MD, MTC, and MAC can be for inactivity,
 harm to the Project, or simply opting out.
 
-Onboarding to the MD is described :doc:`here <developing/new_developers>`.
+Onboarding to the MD is described :doc:`here <new_developers>`.
 
 Instrument Paper Principles
 ===========================
