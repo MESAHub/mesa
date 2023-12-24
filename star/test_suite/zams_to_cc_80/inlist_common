@@ -41,7 +41,7 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .false.
+      pgstar_flag = .true.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
@@ -74,7 +74,7 @@
       max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
-      Pextra_factor = 4 !2 ! easy to lower with mass loss!ideally 1.5 is most physical
+      Pextra_factor = 2 ! easy to lower with mass loss!ideally 1.5 is most physical
       ! if you run into issues, you can increase Pextra 
       ! extra pressure helps stabilize the atmosphere during core He burning +
      
@@ -133,7 +133,7 @@
 
 
       ! MLT ++, explicit, well tested
-      okay_to_reduce_gradT_excess = .false.
+      okay_to_reduce_gradT_excess = .true.
       gradT_excess_f1 = 1d-4
       gradT_excess_f2 = 1d-2
       !gradT_excess_lambda1 = -1d0 ! full on

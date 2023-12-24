@@ -20,8 +20,8 @@
 
 &controls
 ! prevent development of radial pulses during advanced burning
-      !drag_coefficient = 1d0
-      !min_q_for_drag = 0.8d0
+      drag_coefficient = 0.9d0
+      min_q_for_drag = 0.8d0
 
    set_min_D_mix = .true.
    min_D_mix = 1d-2 

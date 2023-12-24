@@ -25,13 +25,13 @@
 op_split_burn_min_T = 1d9
 
 ! prevent development of radial pulses during advanced burning
-      !drag_coefficient = 1d0
-      !min_q_for_drag = 0.8d0
+      drag_coefficient = 0.9d0
+      min_q_for_drag = 0.8d0
 
-   set_min_D_mix = .true.
-   min_D_mix = 1d-2 
+      set_min_D_mix = .true.
+      min_D_mix = 1d-2 
 
-      fe_core_infall_limit = 1d7
+      fe_core_infall_limit = 3d7
 
       ! limit max_model_number as part of test_suite
       max_model_number = 6000
@@ -115,7 +115,7 @@ ignore_too_large_correction = .true. ! for conv_vel's
 
 Profile_Panels3_xaxis_name = 'mass'
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax =  10 ! 
+Profile_Panels3_xmax =  -101d0 ! 
 Profile_Panels3_xaxis_reversed = .false.
 
 

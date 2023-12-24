@@ -49,17 +49,25 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0.01
-!      thermohaline_coeff = 2
+      ! superadiabatic reduction, implicit, new
+      use_superad_reduction = .false.
+      superad_reduction_Gamma_limit = 0.5d0 !default is 0.5d0
+      superad_reduction_Gamma_limit_scale = 5d0
+      superad_reduction_Gamma_inv_scale = 5d0
+      superad_reduction_diff_grads_limit = 1d-2 ! default is 1d-3
+      superad_reduction_limit = -1d0
+
+
+      ! MLT ++, explicit, well tested
+      okay_to_reduce_gradT_excess = .false.
+      gradT_excess_f1 = 1d-4
+      gradT_excess_f2 = 1d-2
+      !gradT_excess_lambda1 = -1d0 ! full on
 
 ! mixing
 
 ! timesteps
-!      delta_XHe_cntr_hard_limit = 0.02d0
-!      delta_XC_cntr_hard_limit = 0.02d0
-!      delta_XNe_cntr_hard_limit = 0.02d0
-!      delta_XO_cntr_hard_limit = 0.02d0
-!      delta_XSi_cntr_hard_limit = 0.02d0
+
 
 ! mesh
 

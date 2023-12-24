@@ -10,7 +10,7 @@ see https://github.com/MESAHub/mesa/issues/610.
 
 This test_suite has been tested up to 80 solar masses, up to solar metallicity, with mass loss, and produces reasonable HR-tracks.
 Note that for higher masses at solar metallicity, some combination of Pextra_factor, mass-loss, and/or superadiabatic convection reduction (e.g. mlt++)
-might be necessary to stabalize the surface and avoid retries resulting from inneficient convection, respectively.
+might be necessary to stabilize the surface and avoid numerical issues. See the 80Msun_zams_to_cc test_suite as an example.
 
 For production science we recommend adopting tighter mesh and timestep controls, such as those suggested in the comments of inlist_common.
 
