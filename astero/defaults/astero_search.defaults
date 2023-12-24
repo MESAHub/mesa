@@ -49,7 +49,7 @@
    ! + ``Rcz``
 
    ! where ``M_H``, ``surface_Z_div_X``, ``surface_He`` and ``Rcz``
-   ! are now implemented in the standard ``run_star_extras.f90`.
+   ! are now implemented in the standard ``run_star_extras.f90``.
    ! The other options fall back to the history columns.
 
    ! To implement your own constraints, create the appropriate case
@@ -621,7 +621,7 @@
    ! ~~~~
    ! Legacy controls from the old interface, which is available with
    ! the default ``run_star_extras.f90`` by using the parameter names
-   ! ``initial_Y`` and ``initial_FeH`.
+   ! ``initial_Y`` and ``initial_FeH``.
 
    ! If ``Y_depends_on_Z = .false.``, ``Y`` is a parameter like any other and you should set
    ! ``vary_Y``, ``first_Y``, ``min_Y`` and ``max_Y`` (and ``delta_Y`` for a grid).
