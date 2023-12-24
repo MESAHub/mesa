@@ -20,8 +20,8 @@
 
 &controls
 ! prevent development of radial pulses during advanced burning
-      !drag_coefficient = 1d0
-      !min_q_for_drag = 0.8d0
+      drag_coefficient = 0.9
+      min_q_for_drag = 0.8d0
 
    set_min_D_mix = .true.
    min_D_mix = 1d-2 
@@ -89,7 +89,7 @@ TRho_logT_max = 10d0
 
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 15 ! 
+Profile_Panels3_xmax =-101d0 ! 
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
 TRho_Profile_xmin = -12d0

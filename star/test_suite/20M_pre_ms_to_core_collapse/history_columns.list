@@ -501,7 +501,7 @@
       !luminosity_ergs_s ! luminosity in cgs units
       log_L ! log10 luminosity in Lsun units
       !log_L_ergs_s ! log10 luminosity in cgs units
-      !radius ! Rsun
+      radius ! Rsun
       log_R ! log10 radius in Rsun units
       !radius_cm
       !log_R_cm
