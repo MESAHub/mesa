@@ -17,10 +17,10 @@
 
 &controls
 
-! stopping condition: stop when lg_centerT >= 9.45 
+! stopping condition: stop when lg_centerT >= 9.60 
 ! just before Si ignites in the core
 
-     log_center_temp_upper_limit = 9.55d0
+     log_center_temp_upper_limit = 9.60d0
 
      when_to_stop_rtol = 1d-2
      when_to_stop_atol = 1d-2

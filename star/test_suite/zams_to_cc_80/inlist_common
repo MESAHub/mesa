@@ -41,7 +41,7 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .true.
+      pgstar_flag = .false.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
