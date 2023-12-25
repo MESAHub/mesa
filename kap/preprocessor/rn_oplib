@@ -11,7 +11,7 @@ function do_one_oplib {
         check_okay   
         echo $1_spline
         check_okay
-    cp -r $1_spline/* ../../data/kap_data/.
+        cp -r $1_spline/* ../../data/kap_data/.
         check_okay
         rm -rf $1_spline
         check_okay
