@@ -4198,6 +4198,25 @@
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !
+      ! + ``'fixed_Teff'`` : 
+      ! set Tsurf from Eddington T(tau) relation
+      !     for current surface tau and Teff = ``atm_fixed_Teff``.
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !
+      ! + ``'fixed_Tsurf'`` :
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !      
+      ! + ``'fixed_Psurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
+      ! set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
+      !
+      ! + ``'fixed_Psurf_and_Tsurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
 
       ! ::
 
