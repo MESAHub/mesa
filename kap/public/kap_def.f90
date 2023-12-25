@@ -283,9 +283,13 @@ module kap_def
      kap_a09 = 3, & 
      kap_OP_gs98 = 4, & 
      kap_OP_a09 = 5, &
-     kap_user = 6, &
-     kap_test = 7, &
-     kap_options_max = 7
+     kap_oplib_gs98 = 6, &
+     kap_oplib_agss09 = 7, &
+     kap_oplib_aag21 = 8, &
+     kap_oplib_mb22 = 9, &
+     kap_user = 10, &
+     kap_test = 11, &
+     kap_options_max = 11
 
 
   integer, parameter :: kap_max_dim = 50 !change this to make even larger grids in X and/or Z
@@ -320,17 +324,19 @@ module kap_def
   
   ! kap_lowT_options
   integer, parameter :: &
-     kap_lowT_Freedman11 = 1, & 
-     kap_lowT_fa05_gs98 = 2, & 
-     kap_lowT_fa05_gn93 = 3, & 
-     kap_lowT_fa05_a09p = 4, & 
-     kap_lowT_af94_gn93 = 5, &
-     kap_lowT_rt14_ag89 = 6, &
-     kap_lowT_kapCN = 7, & 
-     kap_lowT_AESOPUS = 8, &
-     kap_lowT_user = 9, &
-     kap_lowT_test = 10, &
-     kap_lowT_options_max = 10
+     kap_lowT_fa05_mb22= 1, &
+     kap_lowT_fa05_aag21 = 2, &
+     kap_lowT_Freedman11 = 3, & 
+     kap_lowT_fa05_gs98 = 4, & 
+     kap_lowT_fa05_gn93 = 5, & 
+     kap_lowT_fa05_a09p = 6, & 
+     kap_lowT_af94_gn93 = 7, &
+     kap_lowT_rt14_ag89 = 8, &
+     kap_lowT_kapCN = 9, & 
+     kap_lowT_AESOPUS = 10, &
+     kap_lowT_user = 11, &
+     kap_lowT_test = 12, &
+     kap_lowT_options_max = 12
 
   
   integer, dimension(kap_lowT_options_max) :: num_kap_lowT_Xs = 0
@@ -539,6 +545,10 @@ contains
     kap_option_str(kap_a09) = 'a09'
     kap_option_str(kap_OP_gs98) = 'OP_gs98'
     kap_option_str(kap_OP_a09) = 'OP_a09_nans_removed_by_hand'
+    kap_option_str(kap_oplib_gs98) = 'oplib_gs98'
+    kap_option_str(kap_oplib_agss09) = 'oplib_agss09'
+    kap_option_str(kap_oplib_aag21) = 'oplib_aag21'
+    kap_option_str(kap_oplib_mb22) = 'oplib_mb22'
     kap_option_str(kap_test) = 'test'
     
     kap_CO_option_str(kap_CO_gn93) = 'gn93_co'
@@ -546,6 +556,8 @@ contains
     kap_CO_option_str(kap_CO_a09) = 'a09_co'
     kap_CO_option_str(kap_CO_test) = 'test_co'
     
+    kap_lowT_option_str(kap_lowT_fa05_mb22) = 'lowT_fa05_mb22'
+    kap_lowT_option_str(kap_lowT_fa05_aag21) = 'lowT_fa05_aag21'
     kap_lowT_option_str(kap_lowT_Freedman11) = 'lowT_Freedman11'
     kap_lowT_option_str(kap_lowT_fa05_gs98) = 'lowT_fa05_gs98'
     kap_lowT_option_str(kap_lowT_fa05_gn93) = 'lowT_fa05_gn93'
@@ -568,6 +580,27 @@ contains
 
     do i=1, kap_options_max
        select case (i)
+       case (6:9)
+         num_kap_Xs(i) = 30
+         kap_Xs(1:num_kap_Xs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.000d0, 0.001d0, 0.01d0, &
+             0.05d0, 0.1d0, 0.15d0, 0.2d0, 0.25d0, 0.3d0, 0.35d0, 0.4d0, 0.45d0, 0.5d0, 0.55d0, &
+             0.6d0, 0.65d0, 0.7d0, 0.75d0, 0.8d0, 0.85d0, 0.9d0, 0.91d0, 0.92d0, 0.93d0, 0.94d0, &
+             0.95d0,1.0d0]
+         num_kap_Zs(i) = 41
+         kap_Zs(1:num_kap_Zs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.00003d0, 0.00007d0, 0.0001d0, &
+         0.0003d0 ,0.0007d0, 0.001d0, 0.002d0, 0.003d0, 0.004d0, 0.006d0, 0.008d0, 0.01d0, 0.012d0, &
+         0.014d0, 0.015d0, 0.016d0, 0.017d0, 0.018d0, 0.019d0, 0.02d0, 0.021d0, 0.022d0, 0.023d0, &
+         0.024d0, 0.025d0, 0.026d0, 0.028d0, 0.03d0, 0.035d0, 0.04d0, 0.05d0, 0.06d0, 0.07d0, 0.08d0, &
+         0.09d0, 0.1d0, 0.15d0, 0.2d0]
+         num_kap_Xs_for_this_Z(1:num_kap_Zs(i), i) = [ num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i)-1, num_kap_Xs(i)-2, num_kap_Xs(i)-3, num_kap_Xs(i)-4, &
+            num_kap_Xs(i)-5, num_kap_Xs(i)-6, num_kap_Xs(i)-7, num_kap_Xs(i)-8]
        case DEFAULT
           num_kap_Xs(i) = 10
           kap_Xs(1:num_kap_Xs(i), i) = [0.00d0, 0.10d0, 0.20d0, &
