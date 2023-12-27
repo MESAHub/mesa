@@ -832,7 +832,11 @@
 
          real(dp) :: &
             drag_coefficient, &
-            min_q_for_drag
+            min_q_for_drag, &
+            v_drag_factor, &
+            v_drag, &
+            q_for_v_drag_full_off, &
+            q_for_v_drag_full_on
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
