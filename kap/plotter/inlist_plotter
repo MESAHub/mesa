@@ -57,7 +57,7 @@
   X_center = 0.625d0 ! 0.7d0
   Z_center = 5d-4 ! closest grid points are at Z = 3d-4 and 1d-3
 
-  ! delta_X = 0.1
+  delta_X = 0.0
   delta_Z = 0.0
 
   X_min = 0
