@@ -77,6 +77,15 @@ produced GYRE-format files that are backward-compatible with older
 GYRE releases. (If using GSM-format files, set to 110 instead for
 backward compatibility).
 
+White Dwarf O/Ne Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Phase separation for crystallizing white dwarfs now supports options
+for either C/O or O/Ne phase diagrams. You can select the appropriate
+option with the ``phase_separation_option`` in the ``&controls`` inlist
+section (see documentation at :ref:`reference/controls:phase_separation_option`).
+The phase diagram for O/Ne separation comes from
+`Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
 
 .. _Bug Fixes main:
 
