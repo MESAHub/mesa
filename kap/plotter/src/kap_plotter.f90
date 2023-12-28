@@ -302,12 +302,17 @@ program kap_plotter
             write(*,1) 'lnfree_e', res(i_lnfree_e)
             write(*,1) 'd_dlnd(lnfree_e)', d_dlnd(i_lnfree_e)
             write(*,1) 'd_dlnT(lnfree_e)', d_dlnT(i_lnfree_e)
-            write(*,1) 'eta = ', res(i_eta)
+            write(*,1) 'eta', res(i_eta)
             write(*,1) 'd_dlnd(eta)', d_dlnd(i_eta)
             write(*,1) 'd_dlnT(eta)', d_dlnT(i_eta)
             call mesa_error(__FILE__,__LINE__)
          end if
 
+         call set_nan(kap)
+         call set_nan(dlnkap_dlnRho)
+         call set_nan(dlnkap_dlnT)
+         call set_nan(dlnkap_dxa)
+         
          call kap_get( &
               kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
               res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
@@ -338,7 +343,7 @@ program kap_plotter
             err = 0d0
             dvardx = dfridr(dx_0,dfridr_func,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
-            res1 = safe_log10(abs(xdum))
+            res1 = log10(abs(xdum))
          end if
 
 
