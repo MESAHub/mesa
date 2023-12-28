@@ -36,10 +36,10 @@ else
 fi
 
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-   cp standard_before_si_burn.mod before_si_burn.mod
+   cp standard_after_si_burn.mod after_si_burn.mod
 else
-   do_one inlist_to_pre_si_burn_header before_si_burn.mod
-   cp before_si_burn.mod standard_before_si_burn.mod
+   do_one inlist_to_post_si_burn_header after_si_burn.mod
+   cp after_si_burn.mod standard_after_si_burn.mod
 fi
 
 do_one inlist_to_cc_header final.mod
