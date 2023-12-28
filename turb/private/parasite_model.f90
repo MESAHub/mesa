@@ -212,7 +212,7 @@ module parasite_model
       ! needs more work on gammax_kscan
       if (get_kmax) then
          call khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
-         gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, .false.)
+         gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, .false.)
       end if
 
       deallocate(rpar)

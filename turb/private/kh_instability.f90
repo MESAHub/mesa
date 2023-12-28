@@ -3,7 +3,6 @@ module kh_instability
     use const_def, only: dp
     use math_lib
     use utils_lib
-    use fingering_modes, only: gaml2max
     ! use f95_lapack ! Might need to link properly from SDK
   
     
@@ -341,20 +340,17 @@ module kh_instability
   
     end function gamma_over_k
 
-    function gamma_over_k_withTC(w, hb, db, pr, tau, R0, ks, n) result(gamk)
-      real(dp), intent(in) :: w, hb, db, pr, tau, R0
+    function gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n) result(gamk)
+      real(dp), intent(in) :: w, hb, db, pr, tau, R0, lamhat, lhat
       real(dp), intent(in) :: ks(:)
       integer, intent(in) :: n
   
       complex(dp) :: l_result(4*n,4*n)
       real(dp) :: gamk(size(ks))
-      real(dp) :: kz, lamhat, l2hat, lhat, A_psi, A_T, A_C
+      real(dp) :: kz, l2hat, A_psi, A_T, A_C
       integer :: i, n_Sam, ierr
 
-      ! TODO: should pass lamhat, l2hat, lhat in as arguments,
-      ! since they've already been calculated elsehwere
-      call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
-      lhat = sqrt(l2hat)
+      l2hat = pow2(lhat)
       
       A_psi = w / (2*lhat)
       A_T = -lhat * A_psi / (lamhat + l2hat)
@@ -394,8 +390,8 @@ module kh_instability
   
     end function gammax_kscan
 
-   function gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception) result(gammax)
-      real(dp), intent(in) :: w, hb, db, pr, tau, R0
+   function gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception) result(gammax)
+      real(dp), intent(in) :: w, hb, db, pr, tau, R0, lamhat, lhat
       real(dp), intent(in) :: ks(:)
       integer, intent(in) :: n
       logical, intent(in) :: badks_exception
@@ -404,7 +400,7 @@ module kh_instability
       real(dp) :: gamk(size(ks))
       integer :: i
   
-      gamk = gamma_over_k_withTC(w, hb, db, pr, tau, R0, ks, n)
+      gamk = gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n)
       i = maxloc(gamk,1)
       gammax = gamk(i)
   
@@ -556,7 +552,7 @@ module kh_instability
           logical, intent(in) :: badks_exception
           real(dp) :: gammax, f
 
-          gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, ks, n, badks_exception)
+          gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception)
           f = gammax*C2 - lamhat
 
         end function gammax_minus_lambda_withTC
