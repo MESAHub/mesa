@@ -17,7 +17,7 @@ module parasite_model
   
     real(dp), parameter :: kb = 1.24_dp
     real(dp), parameter :: CH = 1.66_dp
-    real(dp), parameter :: C2 = 0.33d0 ! 1d0/CH
+    real(dp), parameter :: C2 = 0.33d0
   
   contains
   
@@ -83,10 +83,25 @@ module parasite_model
       y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
       y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
 
-      if(y1 > 0d0) then
-         write(*,*) "invalid lower bracket for FRG w search"
-         call mesa_error(__FILE__,__LINE__)
-      end if
+      i = 0
+      ! check whether y1 < 0, and if necessary adjust until w2 is valid lower bound
+      do while (y1 > 0d0)
+         ! write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
+
+         if(i > 20) then ! we tried decresasing w1 by 20 orders of magnitude, so need to break
+            write(*,*) "Can't find valid lower bracket for FRG w search"
+            call mesa_error(__FILE__,__LINE__)
+         end if
+         
+         i = i+1
+         
+         ! set new lower bound
+         w2 = w1
+         y2 = y1
+         
+         w1 = w1/10d0
+         y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      end do
       
       i = 0
       ! check whether y2 > 0, and if necessary adjust until w2 is valid upper bound
@@ -176,14 +191,25 @@ module parasite_model
       y1 = gx_m_lam_withTC(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
       y2 = gx_m_lam_withTC(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
 
-      if(y1 > 0d0) then
-         write(*,*) "invalid lower bracket for FRG w search"
-         write(*,*) "w1", w1
-         write(*,*) "y1", y1
-         write(*,*) "w2", w2
-         write(*,*) "y2", y2
-         call mesa_error(__FILE__,__LINE__)
-      end if
+      i = 0
+      ! check whether y1 < 0, and if necessary adjust until w2 is valid lower bound
+      do while (y1 > 0d0)
+         write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
+
+         if(i > 20) then ! we tried decreasing w1 by 20 orders of magnitude, so need to break
+            write(*,*) "Can't find valid lower bracket for FRG w search"
+            call mesa_error(__FILE__,__LINE__)
+         end if
+         
+         i = i+1
+         
+         ! set new lower bound
+         w2 = w1
+         y2 = y1
+         
+         w1 = w1/10d0
+         y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      end do
       
       i = 0
       ! check whether y2 > 0, and if necessary adjust until w2 is valid upper bound
