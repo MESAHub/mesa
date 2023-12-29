@@ -84,7 +84,7 @@ module parasite_model
       y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
 
       i = 0
-      ! check whether y1 < 0, and if necessary adjust until w2 is valid lower bound
+      ! check whether y1 < 0, and if necessary adjust until w1 is valid lower bound
       do while (y1 > 0d0)
          ! write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
 
@@ -192,7 +192,7 @@ module parasite_model
       y2 = gx_m_lam_withTC(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
 
       i = 0
-      ! check whether y1 < 0, and if necessary adjust until w2 is valid lower bound
+      ! check whether y1 < 0, and if necessary adjust until w1 is valid lower bound
       do while (y1 > 0d0)
          write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
 
