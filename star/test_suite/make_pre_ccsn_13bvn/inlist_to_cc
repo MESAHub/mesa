@@ -18,7 +18,7 @@
 &controls
 
 ! reduce op_split_burn_min_T to help with test_suite speed.
-     op_split_burn_min_T = 1d9
+     !op_split_burn_min_T = 1d9 ! results in photo check sum issues if toggled now.
 
 ! 300 km/s core infall stopping condition
      fe_core_infall_limit = 3d7
