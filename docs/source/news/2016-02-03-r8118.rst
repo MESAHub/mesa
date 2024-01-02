@@ -12,7 +12,7 @@ post <https://lists.mesastar.org/pipermail/mesa-users/2016-February/006205.html>
 to learn more.
 
 -  Almost all extras routines in run_star_extras and run_binary_extras
-   are now implemented as hooks, in a similar way to all other_\*
+   are now implemented as hooks, in a similar way to all ``other_\*``
    routines. If you use a custom run_star_extras, you need to slightly
    modify it for it to be compatible with this and future versions.
 
