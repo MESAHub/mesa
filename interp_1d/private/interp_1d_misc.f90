@@ -645,10 +645,10 @@
          call minmod(z, n, z, f3)
          call minmod(z, n, z, f4)
       end subroutine minmod4
-      
-      
+
+
       subroutine median(z, n, f1, f2, f3)
-         real(dp), intent(inout) :: z(:)     
+         real(dp), intent(inout) :: z(:)
          integer, intent(in) :: n       ! length of vectors
          real(dp), intent(in) :: f1(:), f2(:), f3(:)
          real(dp), target :: tmp1_ary(n), tmp2_ary(n)
@@ -660,6 +660,63 @@
          call minmod(z(1:n), n, tmp1(1:n), tmp2(1:n))
          z(1:n) = z(1:n) + f1(1:n)
       end subroutine median
+
+
+      type(auto_diff_real_2var_order1) function minmod1_autodiff(f1, f2)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(in) :: f1, f2
+         minmod1_autodiff = 0.5d0 * (sign(f1) + sign(f2)) * min(abs(f1), abs(f2))
+      end function minmod1_autodiff
+
+
+      type(auto_diff_real_2var_order1) function median1_autodiff(f1, f2, f3)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(in) :: f1, f2, f3
+         median1_autodiff = f1 + minmod1_autodiff(f2 - f1, f3 - f1)
+      end function median1_autodiff
+
+
+      subroutine minmod_autodiff(z, n, f1, f2)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         integer :: k
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:)
+         do k =1, n
+         z(k) = 0.5d0 * (sign(f1(k)) + sign(f2(k))) * min(abs(f1(k)), abs(f2(k)))
+         end do
+      end subroutine minmod_autodiff
+
+      subroutine minmod4_autodiff(z, n, f1, f2, f3, f4)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:), f3(:), f4(:)
+         call minmod_autodiff(z, n, f1, f2)
+         call minmod_autodiff(z, n, z, f3)
+         call minmod_autodiff(z, n, z, f4)
+      end subroutine minmod4_autodiff
+
+
+      subroutine median_autodiff(z, n, f1, f2, f3)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         integer :: k
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:), f3(:)
+         type(auto_diff_real_2var_order1), target :: tmp1_ary(n), tmp2_ary(n)
+         type(auto_diff_real_2var_order1), pointer :: tmp1(:), tmp2(:)
+         tmp1 => tmp1_ary
+         tmp2 => tmp2_ary
+         do k =1,n
+         tmp1(k) = f2(k) - f1(k)
+         tmp2(k) = f3(k) - f1(k)
+         end do
+         call minmod_autodiff(z, n, tmp1, tmp2)
+         do k =1,n
+         z(k) = z(k) + f1(k)
+         end do
+      end subroutine median_autodiff
 
 
       end module interp_1d_misc
