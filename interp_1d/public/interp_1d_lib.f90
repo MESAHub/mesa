@@ -721,6 +721,128 @@
          call m3_on_uniform_grid(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)        
       end subroutine interp_m3q_on_uniform_grid
 
+      
+      subroutine interp_m3_autodiff(x, nx, f1, which, nwork, work1, str, ierr) 
+         ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         integer, intent(in) :: nx       ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which ! average, quartic, or super_bee
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3(x, nx, f1, which, .false., nwork, work1, str, ierr)      
+      end subroutine interp_m3_autodiff
+
+
+      subroutine interp_m3a_autodiff(x, nx, f1, nwork, work1, str, ierr) 
+         ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         integer, intent(in) :: nx       ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3(x, nx, f1, average, .false., nwork, work1, str, ierr)      
+      end subroutine interp_m3a_autodiff
+
+
+      subroutine interp_m3q_autodiff(x, nx, f1, nwork, work1, str, ierr) 
+         ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         integer, intent(in) :: nx       ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3(x, nx, f1, quartic, .false., nwork, work1, str, ierr)      
+      end subroutine interp_m3q_autodiff
+
+
+      subroutine interp_m3b_autodiff(x, nx, f1, nwork, work1, str, ierr) 
+         ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         integer, intent(in) :: nx       ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)     
+      end subroutine interp_m3b_autodiff
+            
+      
+      subroutine interp_m3_on_uniform_grid_autodiff(dx, nx, f1, which, nwork, work1, str, ierr)
+         ! make monotonicity preserving cubic interpolant on uniformly spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
+         integer, intent(in) :: nx ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: which ! average, quartic, or super_bee
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3_on_uniform_grid(dx, nx, f1, which, .false., nwork, work1, str, ierr)         
+      end subroutine interp_m3_on_uniform_grid_autodiff
+            
+      
+      subroutine interp_m3a_on_uniform_grid_autodiff(dx, nx, f1, nwork, work1, str, ierr)
+         ! make monotonicity preserving cubic interpolant on uniformly spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
+         integer, intent(in) :: nx ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3_on_uniform_grid(dx, nx, f1, average, .false., nwork, work1, str, ierr)         
+      end subroutine interp_m3a_on_uniform_grid_autodiff
+            
+      
+      subroutine interp_m3b_on_uniform_grid_autodiff(dx, nx, f1, nwork, work1, str, ierr)
+         ! make monotonicity preserving cubic interpolant on uniformly spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
+         integer, intent(in) :: nx ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3_on_uniform_grid(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)         
+      end subroutine interp_m3b_on_uniform_grid_autodiff
+            
+      
+      subroutine interp_m3q_on_uniform_grid_autodiff(dx, nx, f1, nwork, work1, str, ierr)
+         ! make monotonicity preserving cubic interpolant on uniformly spaced grid
+         use interp_1d_def
+         use interp_1d_mp_autodiff
+         type(auto_diff_real_2var_order1), intent(in) :: dx ! the grid spacing
+         integer, intent(in) :: nx ! length of x vector (>= 4)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nwork ! nwork must be >= mp_work_size (see interp_1d_def)
+         type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         character (len=*) :: str ! for debugging
+         integer, intent(out) :: ierr
+         call m3_on_uniform_grid(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)        
+      end subroutine interp_m3q_on_uniform_grid_autodiff
+
 
 
       ! simple Lagrange polynomial weights

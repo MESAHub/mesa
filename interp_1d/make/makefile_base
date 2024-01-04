@@ -17,6 +17,7 @@ SRCS = \
    interp_1d_pm.f90 \
    interp_1d_pm_autodiff.f90 \
    interp_1d_mp.f90 \
+   interp_1d_mp_autodiff.f90\
    interp_1d_misc_sg.f90 \
    interp_1d_pm_sg.f90 \
    interp_1d_mp_sg.f90 \
