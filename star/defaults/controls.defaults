@@ -7390,7 +7390,7 @@
       ! as modified by Haili Hu.  Since the tar.gz file is large (656 MB),
       ! it is not included in the standard mesa download.
 
-      ! You can get ``OP4STARS_1.3.tar.xz`` from http://sourceforge.net/projects/mesa/files
+      ! You can get ``OP4STARS_1.3.tar.xz`` from https://zenodo.org/records/4390522
 
       ! Put it any place you want on your disk.
 
