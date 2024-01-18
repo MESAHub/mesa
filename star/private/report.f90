@@ -356,7 +356,7 @@
             s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
          else
             s% delta_nu = &
-               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
          
@@ -364,7 +364,7 @@
          if (failed('get_mass_info')) return
          
          s% nu_max = s% nu_max_sun*s% star_mass/ &
-            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
+            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% astero_Teff_sun))
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max

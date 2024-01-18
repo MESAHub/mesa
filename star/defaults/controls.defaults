@@ -7548,7 +7548,7 @@
       ! Otherwise, ``delta_nu`` is calculated from the asteroseismic
       ! scaling relations (see `Ulrich 1986`_, `Brown et al. 1991`_
       ! and `Kjeldsen & Bedding 1995`_) using solar reference values
-      ! ``nu_max_sun``, ``delta_nu_sun`` and ``Teff_sun``.
+      ! ``nu_max_sun``, ``delta_nu_sun`` and ``astero_Teff_sun``.
 
       ! ``nu_max`` is always computed from the scaling relation.
 
@@ -7564,21 +7564,25 @@
       ! ~~~~~~~~~~
       ! delta_nu_sun
       ! ~~~~~~~~~~~~
-      ! Teff_sun
-      ! ~~~~~~~~
+      ! astero_Teff_sun
+      ! ~~~~~~~~~~~~~~~
 
       ! Solar reference values used in the asteroseismic scaling relations
       ! for ``delta_nu`` (if ``get_delta_nu_from_scaled_solar`` is ``.false.``)
       ! and ``nu_max`` (always).
 
-      ! ``nu_max_sun`` is the Sun-as-as-star value reported by `Lund
+      ! The default ``nu_max_sun`` is the Sun-as-as-star value reported by `Lund
       ! et al. (2017)`_, which is consistent with but conceptually
       ! different from the result of 3073.59 ± 0.18 μHz by `Kiefer et
       ! al. (2018)`_.
 
-      ! ``delta_nu_sun`` is also taken from `Lund et al. (2017)`_.
+      ! The default ``delta_nu_sun`` is also taken from `Lund et al. (2017)`_.
 
-      ! ``Teff_sun`` is the value adopted in IAU 2015 Resolution B3.
+      ! The default ``astero_Teff_sun`` is the value adopted in IAU 2015 Resolution B3.
+      ! This should not be confused with the constant ``Teffsun``, which is always
+      ! equal to the IAU value and not controlled by a parameter.  The "asteroseismic"
+      ! value can be changed in case one needs to reproduce previous calculations
+      ! using the scaling relations.
 
       ! .. _Lund et al. (2017): https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L
       ! .. _Kiefer et al. (2018): https://ui.adsabs.harvard.edu/abs/2018SoPh..293..151K
@@ -7587,7 +7591,7 @@
 
     nu_max_sun = 3078d0 ! μHz
     delta_nu_sun = 134.91d0 ! μHz
-    Teff_sun = 5772d0 ! kelvin
+    astero_Teff_sun = 5772d0 ! kelvin
 
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
