@@ -90,6 +90,10 @@ starting models has been recalculated with a more stringent stopping condition,
 and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
 near 0.697.
 
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options have been reimplemented, although we caution users that their
+implementation might conflict with mlt_option = ``TDC``.
+
 Changes in r23.05.1
 ===================
 
