@@ -29,7 +29,8 @@ controlled from the inlist.
 
 The inner boundary is at r = 0.  The outer boundary has a fixed
 temperature and a fixed pressure equal to the initial pressure of the
-material.  This is achieved via the ``use_other_surface_PT`` hook.
+material.  This is achieved via the ``use_other_surface_PT`` hook, but
+can also be done using the ``fixed_Psurf_and_Tsurf`` atmosphere option.
 
 After an initial transient, the entire flame structure, approximately
 isobaric, propagates into the upstream fuel with a unique speed and
@@ -55,5 +56,5 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 .. |Schwab2020| replace:: `Schwab et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...891....5S/abstract>`__
 
 
-Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab
+Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab, + documentation 2024-01-22 EbF
 
