@@ -4173,7 +4173,8 @@
       ! ~~~~~~~~~~
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
-      ! setting up outer boundary conditions
+      ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
+      ! options might conflict with mlt_option = ``TDC``.
 
       ! + ``'T_tau'``: 
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
@@ -4217,6 +4218,8 @@
       ! + ``'fixed_Psurf_and_Tsurf'`` :
       ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
       ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! see the ``conductive_flame`` test_suite for an example of 
+      ! this boundary condition implemented via the ``other_surface_PT`` hook.
 
       ! ::
 
