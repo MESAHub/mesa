@@ -74,7 +74,7 @@
          end if
 
          !write(*,*) 'call gyre_set_model'
-         call gyre_set_model(global_data, point_data, 101)
+         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
 
           write(*, 100) 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)', 'growth', 'cycles to double'

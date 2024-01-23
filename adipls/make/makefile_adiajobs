@@ -14,107 +14,106 @@ include $(MESA_DIR)/utils/makefile_header
 
 ASYMP_SCALE_SRCS = \
     asymp-scale.d.o lir.d.o getcas.o rdamdl.n.d.o skpcom.o \
-    cpycom.o length.o ofiles.o blstio.o
+    cpycom.o length.o ofiles.o
 
 COMPAMOD_SRCS = \
     compamod.n.d.o ofiles.o lir.d.o vinta.d.o \
-    length.o blstio.o
+    length.o
 
 DIFF_FGONG_SRCS = \
-    diff-fgong.d.o lir.d.o blstio.o
+    diff-fgong.d.o lir.d.o
 
 DIFF_SUM_SRCS = \
-    diff-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o \
-    blstio.o
+    diff-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o
 
 FDIF_SIN_SRCS = \
     fdif.sin.d.o ofiles.o zero.d.o lir.d.o \
-    skpcom.o length.o blstio.o
+    skpcom.o length.o
 
 FGONG_AMDL_SRCS = \
-    fgong-amdl.d.o blstio.o
+    fgong-amdl.d.o
 
 FILT_GSM_SRCS = \
-    filt-gsm.d.o blstio.o
+    filt-gsm.d.o
 
 FIT_DNL_SRCS = \
-    fit-dnl.o lstsqr.o skpcom.o length.o blstio.o
+    fit-dnl.o lstsqr.o skpcom.o length.o
 
 FORM_AGSM_SRCS = \
-    form-agsm.d.o blstio.o
+    form-agsm.d.o
 
 FORM_AMDL_SRCS = \
-    form-amdl.d.o blstio.o
+    form-amdl.d.o
 
 FREQDIF_SRCS = \
     freqdif.d.o ofiles.o zero.d.o izero.o lir.d.o \
-    rdfreq.d.o rdfrqe.d.o skpcom.o length.o blstio.o
+    rdfreq.d.o rdfrqe.d.o skpcom.o length.o
 
 LSQFREQ_SRCS = \
     lsqfreq.d.o rdfrqm.d.o ofiles.o lsqpol.d.o \
-    leq.d.o skpcom.o craysub.d.o length.o blstio.o
+    leq.d.o skpcom.o craysub.d.o length.o
 
 MER_AMDE_SRCS = \
-    mer-amde.d.o blstio.o
+    mer-amde.d.o
 
 MER_SUM_SRCS = \
-    mer-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o blstio.o
+    mer-sum.d.o rdfreq.d.o wrfreq.d.o skpcom.o
 
 PRT_AMDL_SRCS = \
-    prt-amdl.d.o blstio.o
+    prt-amdl.d.o
 
 REDISTRB_SRCS = \
     redistrb.d.o ofiles.o length.o lir.d.o vinta.d.o \
-    rnmean.d.o spline.d.o blstio.o
+    rnmean.d.o spline.d.o
 
 REDISTRB_C_SRCS = \
     redistrb.c.d.o srdist.c.d.o rseta4.c.d.o ofiles.c.o \
     length.o lir.d.o lirt.d.o vinta.d.o derive.d.o \
-    rnmean.d.o blstio.o
+    rnmean.d.o
 
 RES_AMDE_SRCS = \
-    res-amde.d.o blstio.o
+    res-amde.d.o
 
 SCAN_AGSM_SRCS = \
-    scan-agsm.d.o blstio.o
+    scan-agsm.d.o
 
 SCAN_AMDE_SRCS = \
-    scan-amde.d.o blstio.o
+    scan-amde.d.o
 
 SCAN_AMDL_SRCS = \
-    scan-amdl.d.o blstio.o
+    scan-amdl.d.o
 
 SCAN_SSM_SRCS = \
-    scan-ssm.d.o blstio.o
+    scan-ssm.d.o
 
 SEL_AMDL_SRCS = \
-    sel-amdl.d.o blstio.o
+    sel-amdl.d.o
 
 SELAMDE_SRCS = \
     selamde.d.o ofiles.o length.o inrnge.o \
-    rdfreq.d.o setssm.d.o skpcom.o blstio.o
+    rdfreq.d.o setssm.d.o skpcom.o
 
 SELSUM_SRCS = \
     selsum.d.o ofiles.o length.o inrnge.o \
-    rdfreq.d.o setssm.d.o skpcom.o blstio.o
+    rdfreq.d.o setssm.d.o skpcom.o
 
 SET_ASSCAL_SRCS = \
     set-asscal.d.o rdamdl.n.d.o ofiles.o length.o \
-    squint.d.o vinta.d.o lir.d.o blstio.o
+    squint.d.o vinta.d.o lir.d.o
 
 SET_DNL_SRCS = \
-    set-dnl.d.o rdfreq.d.o skpcom.o blstio.o
+    set-dnl.d.o rdfreq.d.o skpcom.o
 
 SET_OBS_SRCS = \
-    set-obs.d.o rdfreq.d.o skpcom.o blstio.o
+    set-obs.d.o rdfreq.d.o skpcom.o
 
 SETEXEC_SRCS = \
     setexec.d.o rdfreq.d.o ofiles.o length.o \
-    skpcom.o blstio.o
+    skpcom.o
 
 SORTSUM_SRCS = \
     sortsum.d.o rdfreq.d.o rdilst.o iprsgn.d.o \
-    sort.d.o skpcom.o ofiles.o length.o blstio.o
+    sort.d.o skpcom.o ofiles.o length.o
 
 #################################################################
 #

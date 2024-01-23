@@ -126,6 +126,8 @@ c  Find flrmin and flrmax
 c      
 c  Check range of flrho
       if(flrho .lt. flrmin .or. flrho .gt. flrmax)then
+         write(*,*) "findne failed because density is out of range for logT, logRho", flt, flrho
+         write(*,*) "Allowed range for logRho is",flrmin," to ",flrmax
          ierr = 101
          return
       endif

@@ -201,6 +201,7 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         integer :: gyre_data_schema
          character (len=strlen) :: fgong_header(4)
          integer :: fgong_ivers
 
@@ -259,7 +260,7 @@
          real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
-         logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
+         logical :: alt_scale_height_flag
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
@@ -470,6 +471,7 @@
          real(dp) :: Nieuwenhuijzen_scaling_factor
          real(dp) :: Vink_scaling_factor
          real(dp) :: Dutch_scaling_factor
+         real(dp) :: Bjorklund_scaling_factor
          character (len=strlen) :: Dutch_wind_lowT_scheme
 
          real(dp) :: wind_H_envelope_limit, wind_H_He_envelope_limit, wind_He_layer_limit
@@ -1077,6 +1079,7 @@
          logical :: do_phase_separation
          logical :: do_phase_separation_heating
          logical :: phase_separation_mixing_use_brunt
+         character (len=32) :: phase_separation_option
 
       ! timestep parameters
       

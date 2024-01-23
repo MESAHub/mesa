@@ -5,34 +5,32 @@ properties([
 
 def labels = 'linux && docker && mesa'
 /* use HOME=MESA_DIR=customWorkspace=dir for build */
-def dir = "${env.JENKINS_HOME}/mesa/${env.BRANCH_NAME}"
+def dir
 def image
 def vars = [
     /* 4*4=16 isn't quite right as we're limited to 4, but in practice it seems work out */
     "OMP_NUM_THREADS=4",
-    "NPROCS=4",
-    "HOME=${dir}",
-    "MESA_DIR=${dir}",
+    "NPROCS=4"
   ]
 def ntests = 0
 
 node(labels) {
   stage('build') {
     timeout(time: 1, unit: 'HOURS') {
-      withEnv(vars) {
-	ws(env.HOME) {
+      dir = env.WORKSPACE
+      withEnv(vars + ["HOME=${dir}", "MESA_DIR=${dir}"]) {
           checkout scm
           withCredentials([
               usernamePassword(credentialsId: 'mesa_test', passwordVariable: 'MESA_TEST_PSW', usernameVariable: 'MESA_TEST_USR'),
               string(credentialsId: 'mesa_test_logs_token', variable: 'MESA_LOGS_TOKEN')]) {
-            writeYaml(file: "${env.HOME}/.mesa_test/config.yml", overwrite: true, data: [
+            writeYaml(file: "${dir}/.mesa_test/config.yml", overwrite: true, data: [
               'computer_name': 'Jenkins',
               'email': env.MESA_TEST_USR,
               'password': env.MESA_TEST_PSW,
               'logs_token': env.MESA_LOGS_TOKEN,
               'github_protocol': ':ssh',
-              'mesa_mirror': "${env.HOME}/mirror", /* not used */
-              'mesa_work': env.MESA_DIR,
+              'mesa_mirror': "${dir}/mirror", /* not used */
+              'mesa_work': dir,
               'platform': 'Linux',
               'platform_version': 'Ubuntu'
             ])
@@ -55,7 +53,6 @@ node(labels) {
 	    '''
 	    ntests = nt.toInteger()
           }
-        }
       }
     }
   }
@@ -69,9 +66,9 @@ for (int i = 1; i <= ntests; i++) {
     node(labels) {
       stage(name) {
 	timeout(time: 24, unit: 'HOURS') {
-	  withEnv(vars) {
+	  withEnv(vars + ["HOME=${dir}", "MESA_DIR=${dir}"]) {
 	    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-	      image.inside("-v ${dir}:${dir}:rw") {
+	      image.inside(env.WORKSPACE == dir ? "" : "-v ${dir}:${dir}:rw") {
 		sh """#!/bin/bash -e
 		  source \$MESASDK_ROOT/bin/mesasdk_init.sh
 

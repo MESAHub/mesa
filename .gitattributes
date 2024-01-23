@@ -8,6 +8,10 @@
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.mod filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+data/star_data/zams_models/zams_z2m2_y28.data filter=lfs diff=lfs merge=lfs -text
+docs/source/assets/zams_z2m2_y28_patched.data filter=lfs diff=lfs merge=lfs -text
+neu/test/test_output filter=lfs diff=lfs merge=lfs -text
+
 # Try to get github to better understand what our filetypes are
 *.inc linguist-language=Fortran
 *inlist* linguist-language=Fortran
@@ -16,10 +20,10 @@
 *.ph -linguist-detectable
 *.[1-9] -linguist-detectable
 *.in -linguist-detectable
+
 # Things to ignore from the release
 star/dev_cases_compare_pulses export-ignore
 star/dev_cases_star_to_RSP2 export-ignore
 star/dev_cases_test_RSP2 export-ignore
 star/dev_cases_test_TDC export-ignore
 star/rsp2_utils export-ignore
-docs/source/assets/zams_z2m2_y28_patched.data filter=lfs diff=lfs merge=lfs -text
