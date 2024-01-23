@@ -77,6 +77,15 @@ produced GYRE-format files that are backward-compatible with older
 GYRE releases. (If using GSM-format files, set to 110 instead for
 backward compatibility).
 
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+ 'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+ 
 
 .. _Bug Fixes main:
 

@@ -97,9 +97,9 @@
       mixing_length_alpha = 1.5
       MLT_option = 'TDC'
 
-      ! We will be bold and try radiative damping, although it
+      ! If you would like to be bold, try radiative damping, although it
       ! is a departure from the mlt limit of 'TDC'
-      alpha_TDC_DAMPR = 1d0 ! 0d0 is default for mlt limit
+      alpha_TDC_DAMPR = 0d0 ! 0d0 is default for mlt limit
 
 
       use_other_alpha_mlt = .true. ! implemented in run_star_extras
