@@ -4173,7 +4173,8 @@
       ! ~~~~~~~~~~
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
-      ! setting up outer boundary conditions
+      ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
+      ! options might conflict with mlt_option = ``TDC``.
 
       ! + ``'T_tau'``: 
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
@@ -4198,6 +4199,27 @@
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !
+      ! + ``'fixed_Teff'`` : 
+      ! set Tsurf from Eddington T(tau) relation
+      !     for current surface tau and Teff = ``atm_fixed_Teff``.
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !
+      ! + ``'fixed_Tsurf'`` :
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !      
+      ! + ``'fixed_Psurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
+      ! set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
+      !
+      ! + ``'fixed_Psurf_and_Tsurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! see the ``conductive_flame`` test_suite for an example of 
+      ! this boundary condition implemented via the ``other_surface_PT`` hook.
 
       ! ::
 
@@ -4829,9 +4851,6 @@
     RGB_to_AGB_wind_switch = 1d-4
 
       ! The code will automatically choose between an RGB wind and an AGB wind.
-
-      ! ::
-
       ! The following names for the different schemes are recognized:
 
       ! + 'Reimers'
@@ -7274,13 +7293,26 @@
       ! do_phase_separation
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Phase separation upon crystallization in WD cores (currently only for C/O white dwarf cores)
-      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_
-      ! with the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+      ! Phase separation upon crystallization in WD cores
+      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
 
       ! ::
 
     do_phase_separation = .false.
+
+      ! phase_separation_option
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Choice of appropriate option for the WD core mixture:
+      
+      ! + ``'CO'`` : carbon-oxygen phase separation using the two-component
+      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+      ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
+      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+      
+      ! ::
+
+    phase_separation_option = 'CO'
 
       ! do_phase_separation_heating
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9523,12 +9555,19 @@
 
     dX_mix_dist_limit = 1d-4
 
-      ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
-      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
-      ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
-      ! allowed here. E.g. 'Z' will trigger the timestep control if any metal isotope
+      ! dX_limit_species
+      ! ~~~~~~~~~~~~~~~~
+
+      ! Specify which species the ``dX_limit``, ``dX_div_X_limit``, etc array entries apply to.
+      ! These are limits on magnitude of decrease in any cell abundance during a single timestep.
+      ! dX here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg ``'h1'``, ``'he4'``, etc.
+      ! Special 'species' ``'X'`` (any hydrogen), ``'Y'`` (any helium) and ``'Z'`` (any metals) are
+      ! allowed here. E.g. ``'Z'`` will trigger the timestep control if any metal isotope
       ! abundance individually satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
+
+
+      ! ::
 
     dX_limit_species(1) = 'h1'
     dX_limit_species(2) = 'he4'
