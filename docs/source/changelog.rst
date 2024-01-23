@@ -77,6 +77,16 @@ produced GYRE-format files that are backward-compatible with older
 GYRE releases. (If using GSM-format files, set to 110 instead for
 backward compatibility).
 
+White Dwarf O/Ne Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Phase separation for crystallizing white dwarfs now supports options
+for either C/O or O/Ne phase diagrams. You can select the appropriate
+option with the ``phase_separation_option`` in the ``&controls`` inlist
+section (see documentation at :ref:`reference/controls:phase_separation_option`).
+The phase diagram for O/Ne separation comes from
+`Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+
 Massive Star test_suite Updates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
@@ -98,6 +108,10 @@ central hydrogen mass fraction markedly lower than other masses. The grid of
 starting models has been recalculated with a more stringent stopping condition, 
 and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
 near 0.697.
+
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options have been reimplemented, although we caution users that their
+implementation might conflict with mlt_option = ``TDC``.
 
 Changes in r23.05.1
 ===================
