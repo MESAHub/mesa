@@ -28,7 +28,15 @@ Previously we had logic to determine if a extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
+Asteroseismic scaling relations
+-------------------------------
 
+The default values of the parameters ``delta_nu_sun`` and ``nu_max_sun`` used in the asteroseismic scaling relations
+have been updated to the values reported by `Lund et al. (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L/abstract>`_
+(:math:`\Delta\nu_\odot = \mathrm{134.91}\,\mu\mathrm{Hz}` and :math:`\nu_{\mathrm{max},\odot} = \mathrm{3078}\,\mu\mathrm{Hz}`).
+The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusion
+with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
+default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
 
 Changes in r23.05.1
 ===================
