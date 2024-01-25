@@ -303,7 +303,7 @@
        ignore_species_in_max_correction = .true.
 
       ! might help to turn off gold2 in 8-10 Msun degenerate cores
-      ! for O-Ne flames, turned off in inlist_to_cc for numerical speed.
+      ! for O-Ne flames.
       use_gold2_tolerances = .true. 
       gold2_tol_max_residual2 = 5d-7
       gold2_tol_max_residual3 = 5d-4

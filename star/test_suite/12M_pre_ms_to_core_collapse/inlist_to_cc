@@ -52,8 +52,6 @@ ignore_too_large_correction = .true. ! for conv_vel's
 ! rotation
 
 ! mlt
-!      alpha_semiconvection = 0
-!      thermohaline_coeff = 0
 
 ! mixing
 
