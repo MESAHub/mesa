@@ -5,7 +5,7 @@
       load_model_filename = 'ready.mod'
 
       save_model_when_terminate = .true.
-      save_model_filename = 'before_si_burn.mod'
+      save_model_filename = 'after_si_burn.mod'
 
       change_initial_net = .true.      
       new_net_name = 'approx21_cr60_plus_co56.net'
@@ -17,10 +17,10 @@
 
 &controls
 
-! stopping condition: stop when lg_centerT >= 9.45 
+! stopping condition: stop when lg_centerT >= 9.60 
 ! just before Si ignites in the core
 
-     log_center_temp_upper_limit = 9.55d0
+     log_center_temp_upper_limit = 9.60d0
 
      when_to_stop_rtol = 1d-2
      when_to_stop_atol = 1d-2
@@ -88,7 +88,7 @@
 
 &pgstar
 
-Grid1_title = 'inlist_to_pre_si_burn'
+Grid1_title = 'inlist_to_post_si_burn'
 
 TRho_logRho_min = 3.0 ! only used if /= -101d0
 TRho_logT_min = 8.5 ! only used if /= -101d0

@@ -249,9 +249,9 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
-      !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
-      !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
+      log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
       !mass_loc_of_max_eps_nuc ! (in Msun units)
       !mass_ext_to_max_eps_nuc ! (in Msun units)
