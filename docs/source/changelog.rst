@@ -95,10 +95,22 @@ section (see documentation at :ref:`reference/controls:phase_separation_option`)
 The phase diagram for O/Ne separation comes from
 `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
 
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+ 
+
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
 The ZAMS model data used to generate the initial model for simulations with
 ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
 had an issue where stars between 1.0 and 1.58 Msun would have a starting 
@@ -108,8 +120,8 @@ and now all pre-computed ZAMS models have a central hydrogen mass fraction very
 near 0.697.
 
 The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
-atmosphere options have been reimplemented, although we caution users that their
-implementation might conflict with mlt_option = ``TDC``.
+atmosphere options were removed in r15140. We have reimplemented them although we
+caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
 
 Changes in r23.05.1
 ===================
