@@ -807,7 +807,7 @@
       ! asteroseismology controls
 
          logical :: get_delta_nu_from_scaled_solar
-         real(dp) :: nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq
+         real(dp) :: nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq
 
 
       ! hydro parameters

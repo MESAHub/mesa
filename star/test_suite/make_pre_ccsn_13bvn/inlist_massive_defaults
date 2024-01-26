@@ -103,8 +103,8 @@
      ! To get the star to cc.
      op_split_burn = .true.
      op_split_burn_min_T = 4.2d9
-     op_split_burn_eps = 1d-7 
-     op_split_burn_odescal = 1d-8
+     op_split_burn_eps = 1d-5 !1d-7 
+     op_split_burn_odescal = 1d-5 !1d-8
 
      ! high center T limit to avoid negative mass fractions
      sig_min_factor_for_high_Tcenter = 0.01
@@ -148,7 +148,7 @@
       mlt_make_surface_no_mixing = .true. 
       energy_eqn_option = 'dedt'
       include_composition_in_eps_grav = .true.  
-      min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes 
+      !min_dq_for_xa = 1d-4    ! avoid over-resolving composition changes 
 
 
 ! mesh resolution section 
