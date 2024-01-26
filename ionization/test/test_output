@@ -1,15 +1,4 @@
 
- do_test_ionization
-                                              log10_T =    5.5098142662145326D+00
-                                            log10_rho =   -4.0420635246937922D+00
-                                   h1 typical charge =     1.0000000000000000D+00
-                                  he4 typical charge =     2.0000000000000000D+00
-                                  o16 typical charge =     6.0000000000000000D+00
-                                 fe52 typical charge =     1.0000000000000000D+01
-
- done
-
-
  test_fe56_in_he4
                        z for Fe56 in He4      25.8953869      30.5000000       7.9000000
                        z for Fe56 in He4      19.0993247      26.0000000       7.0000000

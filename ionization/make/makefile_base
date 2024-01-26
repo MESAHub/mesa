@@ -17,7 +17,6 @@ SRCS = \
    ion_tables_load.f90 \
    ion_tables_eval.f90 \
    ion_table_plot.f90 \
-   mod_tables.f90 \
    mod_ionization.f90 \
    ionization_lib.f90
 

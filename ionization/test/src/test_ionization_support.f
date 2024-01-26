@@ -62,7 +62,6 @@
          !call create_table_plot_files; stop
          !call Build_Plots; stop
       
-         call do_test_Paquette_ionization(quietly)
          call test_fe56_in_he4(quietly)
          call do_test_eval_ionization(quietly)
          
@@ -143,131 +142,7 @@
          
       end subroutine do_test_eval_ionization
 
-      subroutine do_test_Paquette_ionization(quietly)
-         logical, intent(in) :: quietly
-         real(dp) :: abar, free_e, T, log10_T, rho, log10_rho, &
-            typical_charge, actual
-         integer :: cid, ierr
-         
-         include 'formats'
 
-         abar = 1.4641872501488922D+00
-         free_e = 7.7809739936525557D-01
-         T = 3.2345529591587989D+05
-         log10_T = log10(T)
-         rho = 9.0768775206067858D-05
-         log10_rho = log10(rho)
-         
-         if (.not. quietly) then
-            write(*,*)
-            write(*,*) 'do_test_ionization'
-            write(*,1) 'log10_T =', log10_T
-            write(*,1) 'log10_rho =', log10_rho
-         end if
-
-
-
-         if (.false.) then
-            cid = ini58
-            typical_charge = 1.0000000000000000D+01
-            actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-            if (.not. quietly) write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-            if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-            stop 'test ionization'
-         end if
-
-
-
-         cid = ih1
-         typical_charge = 1.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         if (.not. quietly) write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = ihe4
-         typical_charge = 2.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         if (.not. quietly) write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = io16
-         typical_charge = 6.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         if (.not. quietly) write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = ife52
-         typical_charge = 1.0000000000000000D+01
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         if (.not. quietly) write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-         
-         if (quietly) return
-         
-         write(*,*)
-         write(*,*) 'done'
-         write(*,*)
-         
-      end subroutine do_test_Paquette_ionization 
-
-
-      subroutine do_other_test
-         real(dp) :: abar, free_e, T, log10_T, rho, log10_rho, &
-            typical_charge, actual
-         integer :: cid, ierr
-         
-         1 format(a40,1pe26.16)
-         
-         call chem_init('isotopes.data_approx', ierr)
-         if (ierr /= 0) then
-            write(*,*) 'FATAL ERROR: failed in chem_init'
-            call mesa_error(__FILE__,__LINE__)
-         end if
-
-         abar = 1.4641872501488922D+00
-         free_e = 7.7809739936525557D-01
-         T = 3.2345529591587989D+05
-         log10_T = 5.5098142662145326D+00
-         rho = 9.0768775206067858D-05
-         log10_rho =   -4.0420635246937922D+00
-         
-         write(*,*)
-         write(*,1) 'log10_T =', log10_T
-         write(*,1) 'log10_rho =', log10_rho
-
-
-         cid = ih1
-         typical_charge = 1.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = ihe4
-         typical_charge = 2.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = io16
-         typical_charge = 6.0000000000000000D+00
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-
-         cid = ife52
-         typical_charge = 1.0000000000000000D+01
-         actual = eval_typical_charge(cid, abar, free_e, T, log10_T, rho, log10_rho)
-         write(*,1) trim(chem_isos% name(cid)) // ' typical charge = ', actual
-         if (abs(actual - typical_charge) > 1d-6) call mesa_error(__FILE__,__LINE__)
-         
-         write(*,*)
-         write(*,*) 'done'
-         write(*,*)
-
-         
-      end subroutine do_other_test
-      
-      
       subroutine Build_Plots
          use const_lib
          use utils_lib, only: mkdir
