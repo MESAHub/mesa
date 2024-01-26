@@ -267,7 +267,7 @@
          use chem_def
          use rates_def
          use ionization_def
-         use ionization_lib, only: eval_typical_charge
+         use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
                   
          type (star_info), pointer :: s
