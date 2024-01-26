@@ -24,7 +24,7 @@ pressure with respect to other variables.
 run_star_extras
 ~~~~~~~~~~~~~~~
 
-Previously we had logic to determine if a extra history value should be saved
+Previously we had logic to determine if an extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
@@ -96,7 +96,7 @@ The phase diagram for O/Ne separation comes from
 `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
 
 Massive Star test_suite Updates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
 test_suites have each been updated and now fully evolve models at solar metallicities to core
@@ -122,6 +122,12 @@ near 0.697.
 The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
 atmosphere options were removed in r15140. We have reimplemented them although we
 caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
+The EOS coverage regions have been updated to fall back to ideal gas in a region
+previously covered by HELM where it returned unphysical floor values of ``1e-20``
+for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
+be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
+
 
 Changes in r23.05.1
 ===================
