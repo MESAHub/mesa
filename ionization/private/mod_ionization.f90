@@ -238,35 +238,6 @@
             min(c1*z2, c2*(pow(z2/z1,two_thirds) + 0.6d0))
       end function chi_effective
       
-      real(dp) function get_typical_charge(cid, a1, z1, T, log_T, rho, log_rho)
-         use mod_tables
-         use chem_def
-         integer, intent(in) :: cid
-         real(dp), intent(in) :: a1, z1, T, log_T, rho, log_rho      
-         real(dp) :: chi, c0, c1, c2, z2, chi_eff
-         integer :: i, izmax
-         include 'formats'
-         if (.not. ionization_tables_okay) then
-            call set_ionization_potentials
-            ionization_tables_okay = .true.
-         end if
-         izmax = int(chem_isos% Z(cid))
-         get_typical_charge = dble(izmax)
-         if (izmax > 30) return
-         call chi_info(a1, z1, T, log_T, rho, log_rho, chi, c0, c1, c2)
-         do i=1, izmax-1
-            z2 = dble(i)
-            chi_eff = chi_effective(chi, c0, c1, c2, z1, z2+1)
-            if (chi_eff < ip(izmax,i+1)) then
-               get_typical_charge = z2
-               return
-            end if
-         end do
-      end function get_typical_charge
-      
-      
-
-
 
       end module mod_ionization
 
