@@ -204,7 +204,7 @@ contains
          
     if (dbg) write(*,2) 'call gyre_set_model', s%model_number
 
-    call gyre_set_model(global_data, point_data, GYRE_MODEL_VERSION)
+    call gyre_set_model(global_data, point_data, s%gyre_data_schema)
 
     if (dbg) write(*,2) 'done gyre_set_model', s%model_number
 

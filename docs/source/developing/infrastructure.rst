@@ -65,7 +65,7 @@ Marketplace
 ^^^^^^^^^^^
 
 The address mesastar.org redirects to the `MESA marketplace
-<http://cococubed.asu.edu/mesa_market/>`__, which is controlled and
+<http://cococubed.com/mesa_market/>`__, which is controlled and
 hosted by Frank at ASU.
 
 
@@ -73,7 +73,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account (and Rob and Evan have access to it).  This is
+<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Evan, and Joey have access to it).  This is
 currently free for open source software.
 
 

@@ -123,7 +123,7 @@ module run_star_extras
             'GYRE', 'gyre.data', global_data, point_data, ierr)
          if (ierr /= 0) return
 
-         call gyre_set_model(global_data, point_data, 101)
+         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
 
          write(*, 100) 'order', 'freq (Hz)', 'P (sec)', &
            'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'

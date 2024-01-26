@@ -14,7 +14,7 @@ routines.
 
 Someone may have already written something similar to what you want.
 Check the list of `user-submitted
-routines <http://cococubed.asu.edu/mesa_market/add-ons.html>`__ to see.
+routines <http://cococubed.com/mesa_market/add-ons.html>`__ to see.
 If you develop something new and useful, consider sharing it with the
 community.
 

@@ -30,13 +30,18 @@
       set_initial_age = .true.
       initial_age = 0
 
-      !pgstar_flag = .true.
+      ! pgstar_flag = .true.
 
 / ! end of star_job namelist
 
 &eos
-   logRho1_PC_limit = 3.1d0 ! 2.999d0 ! keep < logRho2_OPAL_SCVH_limit (3.48)
-   logRho2_PC_limit = 2.8d0 ! must be > 2.8 or so to avoid NaN's from PC
+   use_simple_Skye_blends = .true.
+   logT_min_for_any_Skye = 7.2
+   logT_min_for_all_Skye = 7.4
+   ! move the density corner far away so that blend is over logT
+   logRho_min_for_any_Skye = 4.9
+   logRho_min_for_all_Skye = 5.0
+   
 / ! end of eos namelist
 
 &kap
