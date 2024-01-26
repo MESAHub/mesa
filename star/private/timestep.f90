@@ -1118,7 +1118,7 @@
                write(*,1) trim(msg) // ' hard_lim', hard_lim
             end if
             check_lgL = retry
-            s% retry_message = 'lgL hard limit'
+            s% retry_message = trim(msg) // ' hard limit'
             return
          end if
 
