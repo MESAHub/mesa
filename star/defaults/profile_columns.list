@@ -539,7 +539,7 @@
    !tau ! optical depth
    !log_column_depth ! log10 column depth, exterior mass / area (g cm^-2)
    !log_radial_depth ! log10 radial distance to surface (cm)
-   !logtau ! log10(optical depth) at center of zone
+   !logtau ! log10(optical depth) at cell face
    !tau_eff ! tau that gives the local P == P_atm if this location at surface
       ! tau_eff = kap*(P/g - Pextra_factor*(L/M)/(6*pi*clight*cgrav))
    !tau_eff_div_tau

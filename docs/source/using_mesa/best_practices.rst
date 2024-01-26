@@ -562,17 +562,14 @@ share the input files, but also your simulation data products.
     first. The "sandbox" allows you to see how a final entry would look
     before submitting the real thing to the main service.
 
-We have a created a `Zenodo
+We have created a `Zenodo
 community <https://zenodo.org/communities/mesa/>`__ with which you can
-associate your Zenodo uploads. The `MESA
-Marketplace <http://mesastar.org>`__ will remain in use as an aggregator
+associate your Zenodo uploads. You can find guidelines for what to include
+with your Zenodo upload under the MESA Community
+`curation policy <https://zenodo.org/communities/mesa/curation-policy>`__.
+The `MESA Marketplace <http://mesastar.org>`__ will remain in use as an aggregator
 portal, and we request users to inform us of new uploads so that they
 are highlighted there as well.
-
-.. note::
-
- For the 2021 MESA Summer School, each participant should upload their table's abstract and 
- their latest ``star_history_name`` file to a MESA Zenodo sandbox.
 
 
 

@@ -4,7 +4,7 @@
 TZO
 ***
 
-This test case builds and evolves a Thorne-Zytkow object (TZO) (Farmer et al in prep)
+This test case builds and evolves a Thorne-Zytkow object (TZO) (Farmer et al 2023)
 
 The model stats by building a 20 |Msun| star mid way through the main sequence (inlist_initial). The precise physics do not matter here,
 but having a large convective burning core is necessary for the the TZO formation to proceed smoothly.

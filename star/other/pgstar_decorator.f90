@@ -27,7 +27,7 @@
 
       ! NOTE: remember to set X_use_decorator = .true. to enable this, 
       ! where X is the name of the pgstar plot
-      ! and set s% X_pgstar_decorator => your_function in your
+      ! and set s% pg% X_pgstar_decorator => your_function in your
       ! run_star_extras.f
       
       ! List of pgplot routines: http://www.astro.caltech.edu/~tjp/pgplot/annlist.html

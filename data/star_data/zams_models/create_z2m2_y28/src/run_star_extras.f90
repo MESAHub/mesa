@@ -379,10 +379,21 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          evolve_to_zams_check_model = bare_bones_check_model(id) 
          if (evolve_to_zams_check_model /= keep_going) return
-         if (s% L_nuc_burn_total >= s% L(1)/Lsun) then
-            evolve_to_zams_check_model = terminate
-            s% termination_code = t_extras_check_model
+         if (s% X(s% nz) < s% x_ctrl(1)) then
+            ! stop when star has depleted a small amount of hydrogen
+            if ( s% X(s% nz) < (s% x_ctrl(1) - 1d-5) ) then
+               evolve_to_zams_check_model = retry
+               write(*, *) 'star has depleted a small amount of hydrogen; taking a smaller timestep to hit target'
+            else
+               evolve_to_zams_check_model = terminate
+               s% termination_code = t_extras_check_model
+            end if
          end if
+         ! Simpler stopping condition used previously
+         ! if (s% L_nuc_burn_total >= 0.99d0 * s% L(1)/Lsun) then
+         !    evolve_to_zams_check_model = terminate
+         !    s% termination_code = t_extras_check_model
+         ! end if
       end function evolve_to_zams_check_model
       
       

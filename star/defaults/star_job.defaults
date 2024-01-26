@@ -952,6 +952,8 @@
       ! ``relax_Z = .true.`` gradually changes average Z, reconverging at each step.
       ! ``change_Z = .true.`` simply changes abundances; doesn't reconverge the model.
       ! note: ``relax_dlnZ`` in the controls inlist determines the rate of change
+      ! note: ``initial_zfracs`` are not adjusted when using these controls, 
+      ! except if ``set_uniform_initial_composition = .true.``, and manually setting abundances.
 
       ! ::
 
