@@ -2,13 +2,10 @@
 Changelog
 *********
 
+Changes in r24.02.1-rc1
+=======================
 
-Changes in main
-===============
-
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r24.02.1-rc1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -24,7 +21,7 @@ pressure with respect to other variables.
 run_star_extras
 ~~~~~~~~~~~~~~~
 
-Previously we had logic to determine if a extra history value should be saved
+Previously we had logic to determine if an extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
@@ -38,10 +35,22 @@ The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusi
 with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
 default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
 
-.. _New Features main:
+.. _New Features r24.02.1-rc1:
 
 New Features
 ------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
 
 Rates
 ~~~~~
@@ -106,7 +115,7 @@ has been tested to function with large reaction networks containing > 200 isotop
 as seen in section 6.9 of MESA IV.
  
 
-.. _Bug Fixes main:
+.. _Bug Fixes r24.02.1-rc1:
 
 Bug Fixes
 ---------
@@ -122,6 +131,7 @@ near 0.697.
 The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
 atmosphere options were removed in r15140. We have reimplemented them although we
 caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
 
 Changes in r23.05.1
 ===================
