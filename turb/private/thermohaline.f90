@@ -110,7 +110,7 @@ contains
             ! solve for w based on Harrington & Garaud model
             call solve_hg19_eqn32(HB,l2hat,lhat,lamhat,w,ierr)
 
-            ! KB = 1.24
+            ! KB = 1.24 for Harrington model.
             D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 1.24d0) - 1d0)
          endif
       else
@@ -188,6 +188,7 @@ contains
    end function nuC_brown
 
    ! More general expression for Nu_C in terms of w, for Harrington and Fraser models
+   ! KB = 1.24 for Harrington, 0.62 for Fraser
    real(dp) function nuC(tau, w, lamhat, l2hat, KB)
       real(dp), intent(in) :: tau, w, lamhat, l2hat, KB
       nuC =  1d0 + KB * pow2(w) / (tau * (lamhat + tau * l2hat))

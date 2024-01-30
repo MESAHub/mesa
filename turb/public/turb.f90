@@ -93,10 +93,10 @@ module turb
       return
    end subroutine thermohaline_mode_properties
 
-   real(dp) function thermohaline_nusseltC(tau, w, lamhat, l2hat)
+   real(dp) function thermohaline_nusseltC(tau, w, lamhat, l2hat, KB)
      use thermohaline, only: nuC
-     real(dp), intent(in) :: tau, w, lamhat, l2hat
-     thermohaline_nusseltC = nuC(tau, w, lamhat, l2hat, 1.24d0)
+     real(dp), intent(in) :: tau, w, lamhat, l2hat, KB
+     thermohaline_nusseltC = nuC(tau, w, lamhat, l2hat, KB)
      return 
    end function thermohaline_nusseltC
 

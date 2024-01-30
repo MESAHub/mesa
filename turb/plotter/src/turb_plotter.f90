@@ -130,7 +130,8 @@ contains
         end if
         
         ! caclulate resulting D/kappa_T as function of tau, Pr, R0
-        res(j,i+1) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+        ! KB = 1.24 for Harrington model
+        res(j,i+1) = thermohaline_nusseltC(tau, w, lamhat, l2hat, 1.24d0) - 1d0
 
      end do
 
@@ -151,7 +152,8 @@ contains
            call mesa_error(__FILE__,__LINE__)
         end if
         write(*,*) "calc_frg24_w, R0, HB, w", R0, HB(i), w
-        res(j,i+4) = thermohaline_nusseltC(tau, w, lamhat, l2hat) - 1d0
+        ! KB = 0.62 for Fraser model
+        res(j,i+4) = thermohaline_nusseltC(tau, w, lamhat, l2hat, 0.62d0) - 1d0
      end do
      
    end subroutine set_res_for

@@ -11,11 +11,7 @@ module parasite_model
     private
     public :: wf
     public :: wf_withTC
-    public :: nuc
-    public :: nut
-    public :: gamma_tot
   
-    real(dp), parameter :: kb = 1.24_dp
     real(dp), parameter :: CH = 1.66_dp
     real(dp), parameter :: C2 = 0.33d0
   
@@ -328,43 +324,5 @@ module parasite_model
       return
       
     end function gx_m_lam_withTC
-    
-    function nuc(tau, w, lamhat, l2hat, kb) result(nu)
-  
-      ! Nusselt number for composition
-  
-      real(dp), intent(in) :: tau, w, lamhat, l2hat, kb
-      real(dp) :: nu
-  
-      nu = 1.0_dp + kb*w**2/(tau*(lamhat + tau*l2hat))
-  
-    end function nuc
-  
-    function nut(w, lamhat, l2hat, kb) result(nu)
-  
-      ! Nusselt number for temperature
-  
-      real(dp), intent(in) :: w, lamhat, l2hat, kb  
-      real(dp) :: nu
-  
-      nu = 1.0_dp + kb*w**2/(lamhat + l2hat)
-  
-    end function nut
-  
-    function gamma_tot(tau, r0, w, lamhat, l2hat, kb) result(gamma)
-  
-      ! Total growth rate
-  
-      real(dp), intent(in) :: tau, r0, w, lamhat, l2hat, kb
-      real(dp) :: gamma
-  
-      real(dp) :: nut_, nuc_
-  
-      nut_ = nut(w, lamhat, l2hat, kb)
-      nuc_ = nuc(tau, w, lamhat, l2hat, kb)
-  
-      gamma = r0*nut_/(tau*nuc_)
-  
-    end function gamma_tot
     
   end module parasite_model
