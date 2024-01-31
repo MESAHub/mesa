@@ -2016,7 +2016,7 @@
                r = s% r(k)
                s% eta_RTI(k) = C*alpha_face*cs*r
                
-               if (is_bad(s% eta_RTI(k))) then
+               if (is_bad(s% eta_RTI(k)) .and. s% q(k) <= s% alpha_RTI_src_max_q) then
                   ierr = -1
                   return
                   if (s% stop_for_bad_nums) then
