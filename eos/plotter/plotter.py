@@ -43,7 +43,6 @@ cbar_min = None
 cbar_max = None
 
 pcol = ax.pcolormesh(Xran, Yran, eosDT[...,2], shading='nearest', cmap=cmap, vmin=cbar_min, vmax=cbar_max)
-pcol.set_edgecolor('face')
 cax = fig.colorbar(pcol, extend='both')
 cax.set_label('')
 

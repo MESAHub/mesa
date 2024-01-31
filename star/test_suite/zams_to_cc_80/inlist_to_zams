@@ -9,17 +9,9 @@
       save_model_when_terminate = .true.
       save_model_filename = 'zams.mod'
       required_termination_code_string = 'xa_central_lower_limit'
-
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_model_number = .true.
-      initial_model_number = 0
       
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
-
-      change_initial_Z = .true.
 
       new_rotation_flag = .true.
       near_zams_relax_omega_div_omega_crit = .true.
@@ -46,7 +38,8 @@
       max_model_number = 6000
       !max_number_retries = 58
       
-      Lnuc_div_L_zams_limit = 0.4 ! for very high mass
+      !stop_near_zams = .false.
+      !Lnuc_div_L_zams_limit = 0.4 ! if stop_near_zams
       
 ! wind
       ! delay wind until reach zams
@@ -57,17 +50,28 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0.01
-      thermohaline_coeff = 2
+
+      ! turn off mlt++ on the pre-zams.
+
+      ! superadiabatic reduction, implicit, new
+      use_superad_reduction = .false.
+      superad_reduction_Gamma_limit = 0.5d0 !default is 0.5d0
+      superad_reduction_Gamma_limit_scale = 5d0
+      superad_reduction_Gamma_inv_scale = 5d0
+      superad_reduction_diff_grads_limit = 1d-2 ! default is 1d-3
+      superad_reduction_limit = -1d0
+
+
+      ! MLT ++, explicit, well tested
+      okay_to_reduce_gradT_excess = .false.
+      gradT_excess_f1 = 1d-4
+      gradT_excess_f2 = 1d-2
+      !gradT_excess_lambda1 = -1d0 ! full on
 
 ! mixing
 
 ! timesteps
-      delta_XHe_cntr_hard_limit = 0.02d0
-      delta_XC_cntr_hard_limit = 0.02d0
-      delta_XNe_cntr_hard_limit = 0.02d0
-      delta_XO_cntr_hard_limit = 0.02d0
-      delta_XSi_cntr_hard_limit = 0.02d0
+
 
 ! mesh
 
@@ -78,13 +82,8 @@
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
-      
-      !photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
 
-      x_integer_ctrl(2) = 2 ! Part number
+      x_integer_ctrl(5) = 2 ! Inlist part number
 
 / ! end of controls namelist
 

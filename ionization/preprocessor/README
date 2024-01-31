@@ -1,0 +1,88 @@
+########################################
+#
+#  Thomas-Fermi Debye-Huckel code
+#  written by Francois Hebert, 2009-2010
+#
+#  this code calculates the charge state
+#   of a ‘heavy’ nucleus in a dense plasma
+#   of lighter, fully-ionized, atoms.
+#  ex: iron in a degenerate helium plasma
+#
+########################################
+
+
+to compile:
+
+from the tfdh directory, run
+$mk
+
+this will cd into the tfdh/src directory, and run make
+
+to do this by hand, cd to tfdh/src and run:
+$make all
+
+
+########################################
+
+
+to test compatibility of compiler, linker, and code in general:
+
+in tfdh directory, run
+$testscript
+
+this will:
+-compile a test program
+-run this program (might take a few minutes)
+-use diff to compare output to the included reference: tfdh/testdir/reference_file
+output of diff is sent to diff_file.
+
+
+current (dec 2010) source files have been checked to compile and link on:
+
+macbook2,1 running macos 10.6.5
+apple gcc install:
+> gcc version 4.2.1 (Apple Inc. build 5664)
+gfortran install:
+> gcc version 4.5.0 20090604 (experimental) [trunk revision 148180] (GCC)
+
+
+########################################
+
+
+to run:
+
+i have not implemented inlist input for this code, so input is hard-coded 
+in the main.f file which must be recompiled for each run.
+(just re-run the mk script. it’s quick)
+
+the tfdh code prints the output to files as it runs. in order to keep things 
+clean, i have set it up to take an output directory as command-line argument.
+
+
+you can run the executable using the provided script:
+$rn <dir>
+
+this assumes:
+-the executable stays in tfdh/src
+-you want your output to go into tfdh/data/<dir>
+this script makes the directory <dir> for you and then calls the tfdh code.
+
+
+to do your own thing, just run the executable as follows:
+$tfdh <dir>
+
+
+########################################
+
+
+some issues:
+
+- the code becomes excruciatingly slow at high temperature, low density.
+for the case of Fe in a He OCP, this region of pain lies roughly in the phase
+space of T ~ 1e8 K and ne ~< 1e27 cm^-3
+
+- for very high Ztrace cases, the central divergence is stronger and the code 
+will tend to behave strangely, giving Znet = 0. this is best dealt with by 
+increasing the initial radius "eps" of the tfdh and fast_tfdh integrators 
+to start further from the singularity. for runs with Ztrace ~ 100, i found 
+that increasing eps from 1e-13_dp to 1e-12_dp fixed this issue.
