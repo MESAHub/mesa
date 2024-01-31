@@ -10,9 +10,6 @@
       save_model_filename = 'lgTmax.mod'
       required_termination_code_string = 'log_max_temp_upper_limit'
 
-      set_initial_model_number = .false.
-      set_initial_number_retries = .false.
-
 / ! end of star_job namelist
 
 &eos
@@ -22,13 +19,21 @@
 / ! end of kap namelist
 
 &controls
+! prevent development of radial pulses during advanced burning
+      !drag_coefficient = 1d0
+      !min_q_for_drag = 0.8d0
 
-      log_max_temp_upper_limit = 9.550d0
+      set_min_D_mix = .true.
+      min_D_mix = 1d-2 
+
+      log_max_temp_upper_limit = 9.600d0
 
       ! limit max_model_number as part of test_suite
       max_model_number = 4000
       !max_number_retries = 37
 
+      limit_for_rel_error_in_energy_conservation = 1d-3
+      hard_limit_for_rel_error_in_energy_conservation = 1d-2
 ! wind
 
 ! atmosphere
@@ -36,31 +41,15 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
+
 
 ! mixing
 
 ! timesteps
-      dX_nuc_drop_limit = -1
-      delta_lgRho_cntr_limit = 0.01
-      delta_lgRho_cntr_hard_limit = 0.1
-      delta_lgRho_limit = 0.1 
-      
-      delta_lgT_cntr_limit_only_after_near_zams = .true.
-      delta_lgT_cntr_limit = 0.0005
-      delta_lgT_cntr_hard_limit = 0.01
-
-      delta_lgT_max_limit_only_after_near_zams = .true.
-      delta_lgT_max_limit = 0.0005    
-      delta_lgT_max_hard_limit = 0.01
 
 ! mesh
 
 ! solver
-      
-! GYRE output controls
-      !write_pulse_data_with_profile = .true.
 
 ! output
       terminal_show_age_units = 'days'
@@ -72,12 +61,7 @@
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      !photo_interval = 10
-      !profile_interval = 1
-      !history_interval = 1
-      !terminal_interval = 1
-
-      x_integer_ctrl(1) = 5 ! Inlist part
+      x_integer_ctrl(1) =  5 ! Inlist part number
 
 / ! end of controls namelist
 
@@ -85,17 +69,18 @@
 
 &pgstar
 
+TRho_logT_min = 8.6d0
+TRho_logRho_min = 5d0
+TRho_logRho_max = 10d0
+TRho_logT_max = 10d0
+
+
 !pause = .true.
 Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.0 ! -101d0
+Profile_Panels3_xmax = 5 ! 
 Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
 
-TRho_Profile_xmin = -2.0
-TRho_Profile_ymin = 7.5
-
-TRho_Profile_xmin = 3.0
-TRho_Profile_xmax = 9.0
-TRho_Profile_ymin = 8.3
-TRho_Profile_ymax = 9.6
+TRho_Profile_xmin = -12d0
+TRho_Profile_ymin = 3.0d0
 
 / ! end of pgstar namelist

@@ -108,6 +108,9 @@ uses export to set variables):
     export MESASDK_ROOT=/Applications/mesasdk
     source $MESASDK_ROOT/bin/mesasdk_init.sh
 
+    # add shmesa (the MESA command line tool) to your PATH 
+    export PATH=$PATH:$MESA_DIR/scripts/shmesa
+
 
 If your machine uses csh as its shell, use ``setenv`` instead of ``export``.
     

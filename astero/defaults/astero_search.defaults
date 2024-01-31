@@ -85,6 +85,8 @@
    ! constraint_sigma(:)
    ! ~~~~~~~~~~~~~~~~~~~
 
+   ! ::
+
       constraint_name(:) = '' ! change this to whatever you want
       constraint_target(:) = 0
       constraint_sigma(:) = 0
@@ -102,7 +104,7 @@
    ! Z_div_X_solar
    ! ~~~~~~~~~~~~~
    ! Convenience parameter leftover from the old interface that
-   ! can be used when calculating things relative to solar metallicity.
+   ! can be used when calculating things relative to solar metallicity. ::
 
       Z_div_X_solar = 0.02293d0
 
@@ -130,7 +132,7 @@
 
    ! dt_for_smaller_steps_before_age_target
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   ! This should be much smaller than ``age_sigma``.
+   ! This should be much smaller than ``age_sigma``. ::
 
       dt_for_smaller_steps_before_age_target = 0.0065d8 ! 1/10 age_sigma
 
@@ -570,6 +572,7 @@
    ! parameters in the ``set_param`` subroutine in
    ! ``run_star_extras.f90``, or rely on the default
    ! implementation, which provides the legacy options
+
    ! * ``initial_mass``
    ! * ``initial_Y``
    ! * ``initial_FeH``
@@ -587,7 +590,7 @@
    ! ~~~~~~~~~~
    ! If ``.true.``, that parameter will be varied by the search.
    ! If ``.false.``, that parameter will be fixed at the first value
-   ! (see ``first_param``).
+   ! (see ``first_param``). ::
 
       vary_param(:) = .false.
 
@@ -941,7 +944,7 @@
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
    ! Formats for writing floats (reals), integers and characters
-   ! (strings) to the results file.
+   ! (strings) to the results file. ::
 
       astero_results_dbl_format = '(1pes26.16)'
       astero_results_int_format = '(i26)'
@@ -1166,16 +1169,16 @@
    ! The GYRE controls are read from the ``gyre_input_file``.
    ! Rich offers the following comments on setting them:
 
-   ! > I suggest setting freq_min to 0.9*MINVAL(l0_obs),
-   ! > and freq_max to 1.1*MAXVAL(l0_obs)
-   ! > (similarly for the other l values).
+   !  I suggest setting freq_min to 0.9*MINVAL(l0_obs),
+   !  and freq_max to 1.1*MAXVAL(l0_obs)
+   !  (similarly for the other l values).
 
-   ! > freq_units should be 'UHZ',
-   ! > and set grid_type to 'LINEAR'.
+   !  freq_units should be 'UHZ',
+   !  and set grid_type to 'LINEAR'.
 
-   ! > For n_freq, I suggest either setting it to 10*(freq_max - freq_min)/dfreq,
-   ! > where dfreq is the estimated frequency spacing; or, set it to 10*nl0.
-   ! > The factor 10 is arbitrary, but seems to be a good safety factor.
+   !  For n_freq, I suggest either setting it to 10*(freq_max - freq_min)/dfreq,
+   !  where dfreq is the estimated frequency spacing; or, set it to 10*nl0.
+   !  The factor 10 is arbitrary, but seems to be a good safety factor.
 
    ! gyre_input_file
    ! ~~~~~~~~~~~~~~~
