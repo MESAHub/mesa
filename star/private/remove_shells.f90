@@ -1138,7 +1138,7 @@
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interp_pm, interp_values, interp_value
          use adjust_xyz, only: change_net
-         use set_flags, only: set_v_flag, set_u_flag, set_rotation_flag
+         use set_flags, only: set_v_flag, set_u_flag, set_RTI_flag, set_rotation_flag
          use rotation_mix_info, only: set_rotation_mixing_info
          use hydro_rotation, only: set_i_rot, set_rotation_info
          use relax, only: do_relax_composition, do_relax_angular_momentum, do_relax_entropy
@@ -1150,7 +1150,7 @@
             ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
-         logical :: v_flag, u_flag, rotation_flag
+         logical :: v_flag, u_flag, RTI_flag, rotation_flag
          type (star_info), pointer :: s
          character (len=net_name_len) :: net_name
          integer :: model_number, num_trace_history_values, photo_interval
@@ -1240,11 +1240,19 @@
             if (dbg) write(*,*) "set_v_flag ierr", ierr
             v_flag = .true.
          end if
+
          u_flag = .false.
          if (s% u_flag) then
             call set_u_flag(id, .false., ierr)
             if (dbg) write(*,*) "set_u_flag ierr", ierr
             u_flag = .true.
+         end if
+
+         RTI_flag = .false.
+         if (s% RTI_flag) then
+            call set_RTI_flag(id, .false., ierr)
+            if (dbg) write(*,*) "set_RTI_flag ierr", ierr
+            RTI_flag = .true.
          end if
 
          if (s% rotation_flag) then

@@ -2983,7 +2983,7 @@
     conv_premix_dump_snapshots = .false.
 
 
-   ! Rayleigh Taylor Instability
+   ! Rayleigh-Taylor Instability
    ! ____________________________
 
       ! derived from Paul Duffell's code RT1D.
@@ -8196,8 +8196,11 @@
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
-    
-    
+  
+  
+      ! Hydrodynamic drag
+      ! =================
+      
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
@@ -8219,12 +8222,32 @@
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
     
+ 
+      ! v_drag_factor
+      ! ~~~~~~~~~~~~~
+      ! v_drag
+      ! ~~~~~~
+      ! q_for_v_drag_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! q_for_v_drag_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! for hydro comparison tests (e.g., Sedov)
+      ! Implemented only for u_flag right now. Adds a pseudo drag term of the form
+      ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
+      ! of a star. Effect is full on for q>q_for_v_drag_full_on and full off for
+      ! q < q_for_v_drag_full_off.
+
+      ! ::
+
+    v_drag_factor = 0d0
+    v_drag = 0d0
+    q_for_v_drag_full_off = 0.95d0
+    q_for_v_drag_full_on = 0.96d0
 
 
       ! Rayleigh-Taylor Instability
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! for hydro comparison tests (e.g., Sedov)
       ! RTI_A
       ! ~~~~~
       ! RTI_B
