@@ -2,13 +2,10 @@
 Changelog
 *********
 
+Changes in r24.02.1-rc1
+=======================
 
-Changes in main
-===============
-
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r24.02.1-rc1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -38,10 +35,28 @@ The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusi
 with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
 default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
 
-.. _New Features main:
+stash.py
+~~~~~~~~
+The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+
+
+.. _New Features r24.02.1-rc1:
 
 New Features
 ------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
 
 Rates
 ~~~~~
@@ -106,7 +121,7 @@ has been tested to function with large reaction networks containing > 200 isotop
 as seen in section 6.9 of MESA IV.
  
 
-.. _Bug Fixes main:
+.. _Bug Fixes r24.02.1-rc1:
 
 Bug Fixes
 ---------
