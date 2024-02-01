@@ -35,6 +35,12 @@ The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusi
 with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
 default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
 
+stash.py
+~~~~~~~~
+The script `stash.py` for storing MESA runs has been moved out of `$MESA_DIR/star/work`
+and into the `$MESA_DIR/scripts`. Consider adding this directory to your path. 
+
+
 .. _New Features r24.02.1-rc1:
 
 New Features
