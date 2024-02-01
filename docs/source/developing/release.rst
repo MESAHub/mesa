@@ -106,7 +106,7 @@ Release steps
 
 To make an actual release (once testing is complete), first push the git tag made by the release script:
 
-- git push origin release/r12345
+- ``git push origin r12345``
 
 This is the key bit, as the Github release will be anchored to this tag.
 
