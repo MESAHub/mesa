@@ -79,7 +79,7 @@
       photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10 
 
       x_integer_ctrl(1) = 6 ! inlist_part
 
