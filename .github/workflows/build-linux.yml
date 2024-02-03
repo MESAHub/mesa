@@ -42,7 +42,7 @@ jobs:
       - name: Git LFS Pull
         run: git lfs pull
         if: steps.lfs-cache.outputs.cache-hit != 'true'
-  
+
       - name: Git LFS Checkout
         run: git lfs checkout
         if: steps.lfs-cache.outputs.cache-hit == 'true'
@@ -87,10 +87,10 @@ jobs:
       - name: Compile
         shell: bash
         run: |
-          # Linux runners have 2 cores
-          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
-          export OMP_NUM_THREADS=2
-          export NPROCS=2
+          # Linux runners have 4 cores
+          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+          export OMP_NUM_THREADS=4
+          export NPROCS=4
           export "MESASDK_ROOT=$(readlink -f mesasdk)"
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           export "MESA_DIR=$(readlink -f ./)"
