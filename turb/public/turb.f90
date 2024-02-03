@@ -100,17 +100,16 @@ module turb
      return 
    end function thermohaline_nusseltC
 
-   subroutine calc_hg19_w(HB, l2hat, lhat, lamhat, w, ierr)
+   subroutine calc_hg19_w(HB, l2hat, lamhat, w, ierr)
      use thermohaline, only: solve_hg19_eqn32
 
      real(dp), intent(in)           :: HB
      real(dp), intent(in)           :: l2hat
-     real(dp), intent(in)           :: lhat
      real(dp), intent(in)           :: lamhat
      real(dp), intent(out)          :: w
      integer, intent(out)           :: ierr
 
-     call solve_hg19_eqn32(HB, l2hat, lhat, lamhat, w, ierr)
+     call solve_hg19_eqn32(HB, l2hat, lamhat, w, ierr)
      
    end subroutine calc_hg19_w
 

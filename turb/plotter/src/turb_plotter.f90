@@ -99,7 +99,7 @@ contains
      real(dp), intent(in) :: R0
      integer, intent(out) :: ierr
 
-     real(dp) :: l2hat, lhat, lamhat, w
+     real(dp) :: l2hat, lamhat, w
      integer  :: i
   
      ! calculate lamhat and l2hat
@@ -109,21 +109,18 @@ contains
         call mesa_error(__FILE__,__LINE__)
      end if
 
-     lhat = sqrt(l2hat)
-
      res(j,1) = R0
 
      ! Calculate results for 3 different magnetic field strengths (0,HB1,HB2)
      do i = 1,3
         ! use mode properties to calculate velocity w (Harrington model for now)
-        call calc_hg19_w(HB(i), l2hat, lhat, lamhat, w, ierr)
+        call calc_hg19_w(HB(i), l2hat, lamhat, w, ierr)
         if (ierr /= 0) then
            write(*,*) 'calc_hg19_w failed'
            write(*,*) 'R0', R0
            write(*,*) '1/tau', 1/tau
            write(*,*) 'HB', HB(i)
            write(*,*) 'l2hat', l2hat
-           write(*,*) 'lhat', lhat
            write(*,*) 'lamhat', lamhat
            write(*,*) 'w', w
            call mesa_error(__FILE__,__LINE__)
@@ -145,7 +142,6 @@ contains
            write(*,*) 'HB', HB(i)
            write(*,*) 'DB', DB
            write(*,*) 'l2hat', l2hat
-           write(*,*) 'lhat', lhat
            write(*,*) 'lamhat', lamhat
            write(*,*) 'w', w
            write(*,*) 'ierr', ierr

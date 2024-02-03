@@ -31,6 +31,7 @@ use num_lib
 use utils_lib
 use auto_diff
 use fingering_modes
+use parasite_model
 
 implicit none
 
@@ -66,8 +67,13 @@ contains
       integer, intent(in) :: iso      
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
-      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
-      real(dp) :: l2hat, lhat, lamhat, w, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
+      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th, Pm, DB
+      real(dp) :: l2hat, lamhat, w, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
+      real(dp), allocatable :: ks(:)
+      integer :: j, nks, spectral_resolution ! for FRG model
+      logical :: withTC
+      logical, parameter :: dbg = .true.
+      
       include 'formats'     
       dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
@@ -76,7 +82,8 @@ contains
          D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
       else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11' .or. &
                thermohaline_option == 'Brown_Garaud_Stellmach_13' .or. &
-               thermohaline_option == 'Harrington_Garaud_19') then
+               thermohaline_option == 'Harrington_Garaud_19' .or. &
+               thermohaline_option == 'Fraser_Reifenstein_Garaud_24') then
          call get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, K_T, K_mu, nu)
          R0 = (gradr - grada)/gradL_composition_term
          Pr = nu/K_T
@@ -92,26 +99,63 @@ contains
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
          else if (thermohaline_option == 'Brown_Garaud_Stellmach_13') then
-            !! Options for calculating mode properties (gaml2max with 'CUBIC' should be optimal):
-            !call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
-            !call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='OPT')
             call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
-
             D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
          else if (thermohaline_option == 'Harrington_Garaud_19') then
-            !call calc_mode_properties(R0,pr,tau,l2hat,lhat,lamhat)
-            !call gaml2max(pr, tau, R0, lamhat, l2hat, ierr, method='OPT')
             call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
 
-            B0 = 100d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
             ! solve for w based on Harrington & Garaud model
-            call solve_hg19_eqn32(HB,l2hat,lhat,lamhat,w,ierr)
+            call solve_hg19_eqn32(HB,l2hat,lamhat,w,ierr)
+            if(ierr /= 0 .and. dbg) then
+               write(*,*) "failed in solve_hg19_eqn32"
+               write(*,*) "HB", HB
+               write(*,*) "l2hat", l2hat
+               write(*,*) "lamhat", lamhat
+               write(*,*) "w", w
+            end if
 
             ! KB = 1.24 for Harrington model.
             D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 1.24d0) - 1d0)
+
+         else if (thermohaline_option == 'Fraser_Reifenstein_Garaud_24') then
+            call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
+
+            ! TODO: promote these to inlist options
+            nks = 50
+            spectral_resolution = 17
+            withTC = .true.
+            
+            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
+            HB = B0*B0*d2/(pi4*rho*K_T*K_T)
+
+            Pm = 0.1d0 ! Magnetic Prandtl number. TODO: calculate self-consistently from plasma conditions
+            DB = Pr/Pm
+
+            ! This may evolve. Rich is working on optimization
+            allocate(ks(nks*2))
+            do j = 1,nks
+               ! first nks entries are log space from 1e-6 to 0.1 (don't include endpoint)
+               ks(j) = pow(10d0,-6d0 + (j-1)*(-1d0 + 6d0)/nks)
+               ! last nks entries are linear space from 0.1 to 2
+               ks(j+nks) = 0.1d0 + (j-1)*(2d0 - 0.1d0)/(nks - 1)
+            end do
+            
+            ! solve for w based on Fraser model
+            if(withTC) then
+               w = wf_withTC(pr, tau, R0, HB, DB, ks, spectral_resolution, .false., lamhat, l2hat)
+            else
+               w = wf(pr, tau, R0, HB, DB, ks, spectral_resolution, 0d0, 0, .false., .false., lamhat, l2hat)
+            end if
+
+            ! KB = 0.62 for Fraser model.
+            D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 0.62d0) - 1d0)
+
+            deallocate(ks)
          endif
       else
          D_thrm = 0
@@ -199,11 +243,10 @@ contains
 
    ! Solver for HG19's eqn. 32
 
-   subroutine solve_hg19_eqn32(HB, l2hat, lhat, lamhat, w, ierr, CH)
+   subroutine solve_hg19_eqn32(HB, l2hat, lamhat, w, ierr, CH)
 
       real(dp), intent(in)           :: HB
       real(dp), intent(in)           :: l2hat
-      real(dp), intent(in)           :: lhat
       real(dp), intent(in)           :: lamhat
       real(dp), intent(out)          :: w
       integer, intent(out)           :: ierr
@@ -216,6 +259,7 @@ contains
 
       real(dp)          :: CH_
       real(dp)          :: w0
+      real(dp)          :: lhat
       real(dp), target  :: rpar(5)
       integer,  target  :: ipar(0)
       real(dp), pointer :: rpar_(:)
@@ -226,6 +270,8 @@ contains
       else
          CH_ = 1.66_dp
       end if
+
+      lhat = sqrt(l2hat)
 
       w0 = MAX(sqrt(2.0_dp*HB), 2.0_dp * PI * lamhat/lhat)
 
