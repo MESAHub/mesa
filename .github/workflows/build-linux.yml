@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["20.12.1", "21.4.1", "22.6.1"]
+        sdk: ["21.4.1", "22.6.1", "23.7.3"]
 
     runs-on: ubuntu-latest
 
@@ -64,12 +64,6 @@ jobs:
           key: ${{ runner.os }}-${{matrix.sdk}}
 
 
-      - name: Get SDK ${{ runner.os }} '20.12.1'
-        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk  == '20.12.1') }}
-        run: |
-            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
-        shell: bash
-
       - name: Get SDK ${{ runner.os }} '21.4.1'
         if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '21.4.1') }}
         run: |
@@ -80,6 +74,12 @@ jobs:
         if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk ==  '22.6.1') }}
         run: |
             wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
+        shell: bash
+
+      - name: Get SDK ${{ runner.os }} '23.7.3'
+        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '23.7.3') }}
+        run: |
+            wget -q https://zenodo.org/record/10624843/files/mesasdk-x86_64-linux-23.7.3.tar.gz
         shell: bash
 
       - name: Unpack SDK ${{ runner.os }} ${{matrix.sdk}}
