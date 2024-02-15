@@ -46,6 +46,8 @@
       history_interval = 10
       terminal_interval = 10
       write_header_frequency = 10
+
+      use_gold2_tolerances = .true.
       
       !photo_interval = 1
       !profile_interval = 1

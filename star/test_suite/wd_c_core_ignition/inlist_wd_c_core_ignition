@@ -52,6 +52,7 @@
       ! energy equation options
       energy_eqn_option = 'eps_grav'
       use_time_centered_eps_grav = .true.
+      use_gold2_tolerances = .true.
 
       limit_for_rel_error_in_energy_conservation = 1d99
       hard_limit_for_rel_error_in_energy_conservation = 1d99

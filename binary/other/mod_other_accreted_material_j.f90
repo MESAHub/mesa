@@ -24,8 +24,7 @@
 ! ***********************************************************************
  
       module mod_other_accreted_material_j
-          use binary_def, only : binary_info, binary_ptr
-
+          
       ! NOTE: remember to set true:
       ! use_other_accreted_material_j = .true.
       
@@ -114,6 +113,7 @@
       contains
       
       subroutine null_other_accreted_material_j(binary_id, ierr)
+         use binary_def, only : binary_info, binary_ptr
          use const_def, only: dp
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr

@@ -15,7 +15,7 @@ more.
 Apply for admission at:
 
 `MESA Summer School
-2016 <http://cococubed.asu.edu/mesa_summer_school_2016/>`__
+2016 <http://cococubed.com/mesa_summer_school_2016/>`__
 
 Enrollment is limited and closes March 1, 2016.
 

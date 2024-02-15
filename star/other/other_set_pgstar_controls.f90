@@ -30,8 +30,6 @@
       ! procedure pointer: s% other_set_pgstar_controls => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -39,6 +37,7 @@
       
       
       subroutine default_other_set_pgstar_controls(id)
+         use star_def
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer :: ierr

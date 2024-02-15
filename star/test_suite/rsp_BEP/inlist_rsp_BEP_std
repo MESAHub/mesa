@@ -67,6 +67,7 @@
    RSP_max_num_periods = 3000
    
 ! solver
+   use_gold2_tolerances = .true.
    
 ! output controls
    

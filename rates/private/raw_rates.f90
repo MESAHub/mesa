@@ -131,7 +131,7 @@
                call do1(rate_tripalf_jina)
       
             case(ir_c12_to_he4_he4_he4) ! c12 to 3 alpha
-               call do1(rate_tripalf_jina)
+               call do1_reverse(rate_tripalf_jina)
 
             case(ir_c12_ag_o16)
                call do1(rate_c12ag_jina)

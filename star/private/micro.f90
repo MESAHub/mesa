@@ -149,7 +149,7 @@ contains
           end do
           fk = fk / sum(fk)
           delta = MAXVAL(ABS(fk - fk_pcg_old)/fk_pcg_old)
-          
+
           if (initiaze_kap_grid) then
              call call_load_op_master(s% emesh_data_for_op_mono_path, ierr)
              write(*,*) 'Computing kappa grid for initial mixture.'
@@ -165,7 +165,7 @@ contains
              fk_pcg_old = fk
           endif
        endif
-       
+
        if (s% use_other_opacity_factor) then
           call s% other_opacity_factor(s% id, ierr)
           if (ierr /= 0) return

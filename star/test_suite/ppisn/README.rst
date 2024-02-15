@@ -13,7 +13,7 @@ Initialization of the model
 ===========================
 The initial mass of the helium star is set in ``inlist_extra``
 
-.. literalinclude:: ../../../star/test_suite/dev_ppisn/inlist_extra
+.. literalinclude:: ../../../star/test_suite/ppisn/inlist_extra
 
 In this case we use a :math:`72 M_\odot`
 

@@ -31,8 +31,6 @@
       ! (if using OP MONO)  s% other_kap_get_op_mono => my_routine
 
 
-      use star_def
-
       implicit none
       
             
@@ -45,7 +43,7 @@
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap_fracs, kap, dln_kap_dlnRho, dln_kap_dlnT, dln_kap_dxa, ierr)
-
+         use star_def
          use kap_def, only: num_kap_fracs
 
          ! INPUT
@@ -91,6 +89,7 @@
             nel, izzp, fap, fac, screening, umesh, semesh, ff, rs, &
             ! output
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
+         use star_def
          integer, intent(in) :: handle ! from alloc_kap_handle
          real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
          real(dp), intent(in) :: log10_rho ! the density

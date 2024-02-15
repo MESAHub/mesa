@@ -6,7 +6,7 @@ class DefaultsParser < Parslet::Parser
   # the format being parsed is described in 
   # $MESA_DIR/star/defaults/FORMAT
 
-  # simple rules that we'll reuse throught
+  # simple rules that we'll reuse throughout
 
   rule(:equals)     { space? >> str('=') >> space? }
 

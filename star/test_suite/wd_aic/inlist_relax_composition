@@ -7,7 +7,7 @@
   ! save a model at the end of the run
     save_model_when_terminate = .true.
     save_model_filename = '1.325M_ONeMg.mod'
-    required_termination_code_string = 'log_center_density_limit'
+    required_termination_code_string = 'log_center_density_upper_limit'
 
   ! relax composition
     num_steps_to_relax_composition = 10
@@ -44,7 +44,7 @@
     varcontrol_target = 1e-3
 
   ! when to stop
-    log_center_density_limit = 7
+    log_center_density_upper_limit = 7
 
   ! turn off nuclear reactions
     eps_nuc_factor = 0

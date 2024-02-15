@@ -26,6 +26,7 @@
       write_header_frequency = 10
       
       max_age = 1.4d10
+      use_gold2_tolerances = .true.
 
 / ! end of controls namelist
 

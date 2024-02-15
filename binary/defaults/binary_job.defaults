@@ -1,7 +1,9 @@
 ! ==========
 ! binary_job
 ! ==========
-pgbinary_flag = .false.
+! ::
+
+    pgbinary_flag = .false.
 
 ! output/input files
 ! ==================
@@ -14,7 +16,7 @@ pgbinary_flag = .false.
 
 ! ::
 
-show_binary_log_description_at_start = .true.
+    show_binary_log_description_at_start = .true.
 
 
 ! binary_history_columns_file
@@ -24,7 +26,7 @@ show_binary_log_description_at_start = .true.
 
 ! ::
 
-binary_history_columns_file = ''
+    binary_history_columns_file = ''
 
 
 ! warn_binary_extra
@@ -37,7 +39,7 @@ binary_history_columns_file = ''
 
 ! ::
 
-warn_binary_extra = .true.
+    warn_binary_extra = .true.
 
 
 ! inlist_names(:)
@@ -48,8 +50,8 @@ warn_binary_extra = .true.
 
 ! ::
 
-inlist_names(1) = 'inlist1'
-inlist_names(2) = 'inlist2'
+    inlist_names(1) = 'inlist1'
+    inlist_names(2) = 'inlist2'
 
 
 ! read_extra_binary_job_inlist(1..5)
@@ -66,8 +68,8 @@ inlist_names(2) = 'inlist2'
 
 ! ::
 
-read_extra_binary_job_inlist(:) = .false.
-extra_binary_job_inlist_name(:) = 'undefined'
+    read_extra_binary_job_inlist(:) = .false.
+    extra_binary_job_inlist_name(:) = 'undefined'
 
 ! starting model
 ! ==============
@@ -84,7 +86,7 @@ extra_binary_job_inlist_name(:) = 'undefined'
 
 ! ::
 
-evolve_both_stars = .false.
+    evolve_both_stars = .false.
 
 
 ! relax_primary_to_th_eq
@@ -129,13 +131,13 @@ evolve_both_stars = .false.
 
 ! ::
 
-relax_primary_to_th_eq = .false.
-log_Lnuc_div_L_for_relax_primary_to_th_eq = 0.005d0
-min_age_for_relax_primary_to_th_eq = 1d2
-max_steps_for_relax_primary_to_th_eq = 1000
-no_history_during_relax_primary_to_th_eq = .true.
-reset_age_for_relax_primary_to_th_eq = .true.
-tsync_for_relax_primary_to_th_eq = 1
+    relax_primary_to_th_eq = .false.
+    log_Lnuc_div_L_for_relax_primary_to_th_eq = 0.005d0
+    min_age_for_relax_primary_to_th_eq = 1d2
+    max_steps_for_relax_primary_to_th_eq = 1000
+    no_history_during_relax_primary_to_th_eq = .true.
+    reset_age_for_relax_primary_to_th_eq = .true.
+    tsync_for_relax_primary_to_th_eq = 1
 
 ! modifications to model
 ! ======================
@@ -153,9 +155,9 @@ tsync_for_relax_primary_to_th_eq = 1
 
 ! ::
 
-change_ignore_rlof_flag = .false.
-change_initial_ignore_rlof_flag = .false.
-new_ignore_rlof_flag = .false.
+    change_ignore_rlof_flag = .false.
+    change_initial_ignore_rlof_flag = .false.
+    new_ignore_rlof_flag = .false.
 
 
 ! change_model_twins_flag
@@ -172,9 +174,9 @@ new_ignore_rlof_flag = .false.
 
 ! ::
 
-change_model_twins_flag = .false.
-change_initial_model_twins_flag = .false.
-new_model_twins_flag = .false.
+    change_model_twins_flag = .false.
+    change_initial_model_twins_flag = .false.
+    new_model_twins_flag = .false.
 
 
 ! change_point_mass_i
@@ -190,9 +192,9 @@ new_model_twins_flag = .false.
 
 ! ::
 
-change_point_mass_i = .false.
-change_initial_point_mass_i = .false.
-new_point_mass_i = 0
+    change_point_mass_i = .false.
+    change_initial_point_mass_i = .false.
+    new_point_mass_i = 0
 
 
 ! change_m1
@@ -210,9 +212,9 @@ new_point_mass_i = 0
 
 ! ::
 
-change_m1 = .false.
-change_initial_m1 = .false.
-new_m1 = 0d0
+    change_m1 = .false.
+    change_initial_m1 = .false.
+    new_m1 = 0d0
 
 
 ! change_m2
@@ -230,9 +232,9 @@ new_m1 = 0d0
 
 ! ::
 
-change_m2 = .false.
-change_initial_m2 = .false.
-new_m2 = 0d0
+    change_m2 = .false.
+    change_initial_m2 = .false.
+    new_m2 = 0d0
 
 
 ! change_separation_eccentricity
@@ -255,13 +257,13 @@ new_m2 = 0d0
 
 ! ::
 
-change_separation_eccentricity = .false.
-change_initial_separation_eccentricity = .false.
-change_period_eccentricity = .false.
-change_initial_period_eccentricity = .false.
+    change_separation_eccentricity = .false.
+    change_initial_separation_eccentricity = .false.
+    change_period_eccentricity = .false.
+    change_initial_period_eccentricity = .false.
 
 ! ::
 
-new_separation = 0d0
-new_period = 0d0
-new_eccentricity = 0d0
+    new_separation = 0d0
+    new_period = 0d0
+    new_eccentricity = 0d0

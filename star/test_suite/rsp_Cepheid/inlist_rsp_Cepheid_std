@@ -68,6 +68,7 @@
       
    
 ! solver
+   use_gold2_tolerances = .true.
 
 ! output controls
    

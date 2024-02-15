@@ -47,11 +47,7 @@
       integer, parameter :: Tlim_num_burn_steps = Tlim_solver + 1
       integer, parameter :: Tlim_num_diff_solver_steps = Tlim_num_burn_steps + 1
       integer, parameter :: Tlim_dX = Tlim_num_diff_solver_steps + 1
-      integer, parameter :: Tlim_dH = Tlim_dX + 1
-      integer, parameter :: Tlim_dHe = Tlim_dH + 1
-      integer, parameter :: Tlim_dH_div_H = Tlim_dHe + 1
-      integer, parameter :: Tlim_dHe_div_He = Tlim_dH_div_H + 1
-      integer, parameter :: Tlim_dX_div_X = Tlim_dHe_div_He + 1
+      integer, parameter :: Tlim_dX_div_X = Tlim_dX + 1
       integer, parameter :: Tlim_dL_div_L = Tlim_dX_div_X + 1
       integer, parameter :: Tlim_dlgP = Tlim_dL_div_L + 1
       integer, parameter :: Tlim_dlgRho = Tlim_dlgP + 1
@@ -94,9 +90,7 @@
       integer, parameter :: Tlim_bad_Xsum = Tlim_neg_X + 1
       integer, parameter :: Tlim_dlgL_power_photo = Tlim_bad_Xsum + 1
       integer, parameter :: Tlim_delta_HR = Tlim_dlgL_power_photo + 1
-      integer, parameter :: Tlim_dHe3 = Tlim_delta_HR + 1
-      integer, parameter :: Tlim_dHe3_div_He3 = Tlim_dHe3 + 1
-      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_dHe3_div_He3 + 1
+      integer, parameter :: Tlim_dlog_eps_nuc = Tlim_delta_HR + 1
       integer, parameter :: Tlim_num_diff_solver_iters = Tlim_dlog_eps_nuc + 1
       integer, parameter :: Tlim_del_mdot = Tlim_num_diff_solver_iters + 1
       integer, parameter :: Tlim_adjust_J_q = Tlim_del_mdot + 1
@@ -120,11 +114,11 @@
       integer, parameter :: t_peak_burn_vconv_div_cs_limit = t_max_omega_div_omega_crit + 1
       integer, parameter :: t_max_model_number = t_peak_burn_vconv_div_cs_limit + 1 
       integer, parameter :: t_eta_center_limit = t_max_model_number + 1 
-      integer, parameter :: t_log_center_temp_limit = t_eta_center_limit + 1 
-      integer, parameter :: t_log_center_temp_lower_limit = t_log_center_temp_limit + 1 
+      integer, parameter :: t_log_center_temp_upper_limit = t_eta_center_limit + 1 
+      integer, parameter :: t_log_center_temp_lower_limit = t_log_center_temp_upper_limit + 1 
       integer, parameter :: t_log_center_density_lower_limit = t_log_center_temp_lower_limit + 1 
-      integer, parameter :: t_log_center_density_limit = t_log_center_density_lower_limit + 1 
-      integer, parameter :: t_gamma_center_limit = t_log_center_density_limit + 1 
+      integer, parameter :: t_log_center_density_upper_limit = t_log_center_density_lower_limit + 1 
+      integer, parameter :: t_gamma_center_limit = t_log_center_density_upper_limit + 1 
       integer, parameter :: t_log_max_temp_upper_limit = t_gamma_center_limit + 1 
       integer, parameter :: t_log_max_temp_lower_limit = t_log_max_temp_upper_limit + 1 
       integer, parameter :: t_HB_limit = t_log_max_temp_lower_limit + 1 
@@ -231,10 +225,10 @@
       integer, parameter :: t_cumulative_extra_heating_limit = t_relax_finished_okay + 1
       integer, parameter :: t_delta_total_energy = t_cumulative_extra_heating_limit + 1
       integer, parameter :: t_max_explicit_hydro_nsteps = t_delta_total_energy + 1
-      integer, parameter :: t_center_entropy_limit = t_max_explicit_hydro_nsteps + 1
-      integer, parameter :: t_center_entropy_lower_limit = t_center_entropy_limit + 1
-      integer, parameter :: t_max_entropy_limit = t_center_entropy_lower_limit + 1
-      integer, parameter :: t_max_entropy_lower_limit = t_max_entropy_limit + 1
+      integer, parameter :: t_center_entropy_upper_limit = t_max_explicit_hydro_nsteps + 1
+      integer, parameter :: t_center_entropy_lower_limit = t_center_entropy_upper_limit + 1
+      integer, parameter :: t_max_entropy_upper_limit = t_center_entropy_lower_limit + 1
+      integer, parameter :: t_max_entropy_lower_limit = t_max_entropy_upper_limit + 1
       integer, parameter :: t_max_period_number = t_max_entropy_lower_limit + 1
       integer, parameter :: t_max_abs_rel_run_E_err = t_max_period_number + 1
 
@@ -391,10 +385,8 @@
       integer, parameter :: max_num_history_extras = 100
 
       integer, parameter :: num_x_ctrls = 100
+      integer, parameter :: max_dX_limit_ctrls = 100
       
-      integer, parameter :: GYRE_MODEL_VERSION = 101
-      integer, parameter :: GSM_MODEL_VERSION = 110
-
       ! interfaces for procedure pointers
       abstract interface
       
@@ -838,6 +830,15 @@
             real(dp), intent(in) :: dt 
             integer, intent(out) :: ierr
          end subroutine other_diffusion_interface
+
+
+         subroutine other_close_gaps_interface(id, mix_type, min_gap, ierr)
+            use const_def, only: dp
+            integer, intent(in) :: id
+            integer, intent(in) :: mix_type
+            real(dp), intent(in) :: min_gap
+            integer, intent(out) :: ierr
+         end subroutine other_close_gaps_interface
 
 
          subroutine other_kap_get_interface( &

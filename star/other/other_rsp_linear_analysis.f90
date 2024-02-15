@@ -39,6 +39,7 @@
 
 
       subroutine null_other_rsp_linear_analysis(id, restart, ierr)
+         use star_def
          integer, intent(in) :: id ! star id if available; 0 otherwise
          logical, intent(in) :: restart
          integer, intent(out) :: ierr ! 0 means AOK.

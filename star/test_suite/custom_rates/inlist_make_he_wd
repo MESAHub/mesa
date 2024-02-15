@@ -27,6 +27,7 @@
 
   mass_change = -1d-8
   max_age = 1d5
+  use_gold2_tolerances = .true.
 
 / ! end of controls namelist
 

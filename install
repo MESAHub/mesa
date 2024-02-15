@@ -86,16 +86,16 @@ then
     echo
     echo "****************************************************************"
     echo "*                                                              *"
-    echo "*        MESA should not be installed with root privaleges     *"
-    echo "*        Using sudo is a bad idea and unlikely to fix the      *"
+    echo "*      MESA should not be installed with root privileges.      *"
+    echo "*       Using sudo is a bad idea and unlikely to fix the       *"
     echo "*                   problem you think you have.                *"
     echo "*                                                              *"
-    echo "*                 If you have permission issues,               *"
-    echo "*              contact the mesa-users mailing list             *"
+    echo "*                If you have permission issues,                *"
+    echo "*             contact the mesa-users mailing list.             *"
     echo "*                                                              *"
-    echo "*         If you wish to install mesa in a root location       *"
+    echo "*        If you wish to install MESA in a root location        *"
     echo "*                then we assume you can edit the               *"
-    echo "*             ./install file to remove this check              *"
+    echo "*             ./install file to remove this check.             *"
     echo "*                                                              *"
     echo "****************************************************************"
     echo
@@ -353,6 +353,12 @@ do_one_parallel net
 
 do_one star_data
 do_one turb
+
+if [ ! -r data/ionization_data ]
+then
+	do_input_data ionization
+fi
+do_one_parallel ionization
 
 if [ ! -r data/atm_data ]
 then

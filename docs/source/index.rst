@@ -17,13 +17,15 @@ Stellar Astrophysics (MESA), an open-source 1D stellar evolution code.
    installation
    using_mesa
    modules
-   reference
-   test_suite
-   faq
-   developing
-   changelog
    about
+   changelog
    code_of_conduct
    contributing
-   news
+   developing
+   faq
    known_bugs
+   news
+   reference
+   summer_schools
+   test_suite
+   

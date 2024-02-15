@@ -38,6 +38,7 @@
       xa_central_lower_limit(1) = 0.0001
 
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

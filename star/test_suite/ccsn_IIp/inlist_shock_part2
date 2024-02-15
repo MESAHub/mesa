@@ -26,13 +26,7 @@
          
       x_integer_ctrl(1) = 2 ! part number
       x_ctrl(7) = 0.5 !  setting stop_m in part2, fraction of He layer
-      
-      !x_ctrl(11) = 0 ! mass Co56
-      !x_ctrl(12) = 0.05d0 ! mass Ni56 - exact amount set later.  this just traces mixing.
-      !x_ctrl(35) = 0 ! relative to M_center
-      !x_ctrl(36) = -1.5 ! relative to He_core_mass
-      ! set uniform Ni abundance between these mass bounds
-      
+            
 ! RTI      
 
 ! equation controls

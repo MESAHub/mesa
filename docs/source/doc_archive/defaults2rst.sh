@@ -17,6 +17,8 @@ defaults2rst ../kap/defaults/kap.defaults source/kap/defaults.rst
 # binary
 defaults2rst ../binary/defaults/binary_job.defaults source/reference/binary_job.rst
 defaults2rst ../binary/defaults/binary_controls.defaults source/reference/binary_controls.rst
+defaults2rst ../binary/defaults/pgbinary.defaults source/reference/pgbinary.rst
+
 
 # star
 defaults2rst ../star/defaults/star_job.defaults source/reference/star_job.rst

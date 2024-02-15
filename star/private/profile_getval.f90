@@ -266,6 +266,7 @@
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
          use rates_def
+         use ionization_def
          use mod_typical_charge, only: eval_typical_charge
          use rsp_def, only: rsp_WORK, rsp_WORKQ, rsp_WORKT, rsp_WORKC
                   
@@ -280,6 +281,7 @@
             r00_start, rp1_start, dr3, dr3_start, d_drL, d_drR, flxR, mmid, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, kk, ierr
+         real(dp) :: ionization_res(num_ion_vals)
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor, Lconv, conv_vel
          logical :: rsp_or_w
          include 'formats'
@@ -467,9 +469,11 @@
                val = s% eps_grav_ad(k)% val
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_net_nuclear_energy)
-               val = s% eps_nuc(k) - s% eps_nuc_neu_total(k) - s% non_nuc_neu(k)
+               ! Do not subtract s% eps_nuc_neu_total(k)  eps_nuc already contains it
+               val = s% eps_nuc(k) - s% non_nuc_neu(k)
                val = sign(1d0,val)*log10(max(1d0,abs(val)))
             case (p_eps_nuc_plus_nuc_neu)
+               !  eps_nuc  subtracts eps_nuc_neu so this is just the total eenrgy from nuclear burning without neutrinos
                val = s% eps_nuc(k) + s% eps_nuc_neu_total(k)
             case (p_eps_nuc_minus_non_nuc_neu)
                val = s% eps_nuc(k) - s% non_nuc_neu(k)

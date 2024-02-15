@@ -91,6 +91,8 @@
       T_function1_weight = 50
       limit_for_rel_error_in_energy_conservation = 1d-4
       hard_limit_for_rel_error_in_energy_conservation = 1d-3
+
+      use_gold2_tolerances = .true.
       
     ! allow for minuscule timesteps
       min_timestep_limit = 1d-20

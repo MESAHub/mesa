@@ -221,6 +221,7 @@
       real(dp), pointer :: eps_nuc(:) ! sum of reaction_eps_nuc for all reactions in net
          ! thermal ergs per gram per second from nuclear reactions
          ! (including losses to neutrinos produced in the reactions)
+         ! Thus you should not subtract eps_nuc_neu_total from this
       real(dp), pointer :: eps_nuc_categories(:,:) ! (num_categories, nz)
       real(dp), pointer :: d_epsnuc_dlnd(:) ! partial wrt density
       real(dp), pointer :: d_epsnuc_dlnT(:) ! partial wrt temperature
@@ -275,7 +276,7 @@
       real(dp), pointer, dimension(:) :: extra_opacity_factor
       
       ! extra pressure profile (can be set by user)
-      real(dp), pointer :: extra_pressure(:) ! (ergs/gm/sec)
+      type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_pressure(:) ! (ergs/gm/sec)
       
       ! extra heat profile (can be set by user)
       type(auto_diff_real_star_order1), pointer, dimension(:) :: extra_heat
@@ -293,6 +294,10 @@
       ! velocity time centering
       real(dp), pointer, dimension(:) :: vc
       real(dp) :: d_vc_dv
+   
+      ! drag
+      real(dp), pointer :: dvdt_drag(:)
+      real(dp), pointer :: FdotV_drag_energy(:)
    
       ! gravitational constant (can be set by user and can be vary within model)
       real(dp), pointer :: cgrav(:)      
@@ -497,8 +502,7 @@
       real(dp) :: delta_Pg ! g-mode period spacing for l=1 (seconds)
          ! sqrt(2)*pi^2/(integral of brunt_N/r dr)
       real(dp) :: nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
-         ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/astero_Teff_sun)^0.5)
       real(dp) :: acoustic_cutoff ! 1e6*0.5*g*sqrt(gamma1*rho/P) at surface (micro Hz)
       ! asteroseismology
       real(dp) :: delta_nu ! in micro Hz.  = 10^6/(2*photosphere_acoustic_r)
@@ -964,24 +968,24 @@
       ! equation residuals, etc
       
          ! equ(i,k) is residual for equation i of cell k            
-         real(dp), dimension(:,:), pointer :: equ ! (nvar,nz);  equ => equ1
-         real(dp), dimension(:), pointer :: equ1 ! (nvar*nz); data for equ
-         real(dp), dimension(:,:,:), pointer :: ublk, dblk, lblk ! (nvar,nvar,nz) 
+         real(dp), dimension(:,:), pointer :: equ=>null() ! (nvar,nz);  equ => equ1
+         real(dp), dimension(:), allocatable :: equ1 ! (nvar*nz); data for equ
+         real(dp), dimension(:,:,:), pointer :: ublk=>null(), dblk=>null(), lblk=>null() ! (nvar,nvar,nz) 
          ! dblk(i,j,k) = dequ(i,k)/dx(j,k)
          ! lblk(i,j,k) = dequ(i,k)/dx(j,k-1)
          ! ublk(i,j,k) = dequ(i,k)/dx(j,k+1)
          
-         real(dp), pointer, dimension(:) :: AF1 ! for factored jacobian
+         real(dp), pointer, dimension(:) :: AF1=>null() ! for factored jacobian
 
-         real(dp), pointer :: solver_dx(:,:), solver_dx1(:)
+         real(dp), pointer :: solver_dx(:,:)=>null(), solver_dx1(:)=>null()
          integer :: solver_iter, solver_adjust_iter
-         real(dp), pointer :: x_scale(:,:), x_scale1(:)
+         real(dp), pointer :: x_scale(:,:)=>null(), x_scale1(:)=>null()
 
          ! residual_weight and correction_weight are used by the solver in deciding if have a good enough solution.
          ! these are = 1d0 in most case, but are sometimes reduced to tell the solver "don't worry, be happy."
          ! weight = 0d0 means just ignore this item in making decisions.
-         real(dp), dimension(:,:), pointer :: residual_weight, correction_weight ! (nvar,nz)
-         real(dp), dimension(:), pointer :: residual_weight1, correction_weight1 ! (nvar,nz)
+         real(dp), dimension(:,:), pointer :: residual_weight=>null(), correction_weight=>null() ! (nvar,nz)
+         real(dp), dimension(:), pointer :: residual_weight1=>null(), correction_weight1=>null() ! (nvar,nz)
 
          
       ! sizeB info

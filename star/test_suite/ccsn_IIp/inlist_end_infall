@@ -143,12 +143,13 @@
   write_header_frequency = 10
 
   report_solver_progress = .false.
+  x_integer_ctrl(1) = -2 ! part number
 
 / ! end of controls namelist
 
 &pgstar
          
-pause = .true.
+!pause = .true.
 
 Grid2_win_flag = .true.
 pgstar_interval = 1

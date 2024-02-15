@@ -2,13 +2,152 @@
 Changelog
 *********
 
+Changes in r24.02.1-rc1
+=======================
 
-Changes in main
-===============
+.. _Backwards-incompatible changes r24.02.1-rc1:
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+Backwards-incompatible changes
+------------------------------
 
-.. _Backwards-incompatible changes main:
+Hooks
+~~~~~
+
+The ``other_pressure`` hook has been converted to use ``auto_diff``
+thus the variable ``s% extra_pressure`` is now an ``auto_diff``
+and allows for the setting of the partial derivatives the
+pressure with respect to other variables.
+
+run_star_extras
+~~~~~~~~~~~~~~~
+
+Previously we had logic to determine if an extra history value should be saved
+as an int or a float (users can only provide data as a float). This was error
+prone, so now we save extra history values as floats.
+
+Asteroseismic scaling relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default values of the parameters ``delta_nu_sun`` and ``nu_max_sun`` used in the asteroseismic scaling relations
+have been updated to the values reported by `Lund et al. (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L/abstract>`_
+(:math:`\Delta\nu_\odot = \mathrm{134.91}\,\mu\mathrm{Hz}` and :math:`\nu_{\mathrm{max},\odot} = \mathrm{3078}\,\mu\mathrm{Hz}`).
+The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusion
+with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
+default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
+
+stash.py
+~~~~~~~~
+The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+
+
+.. _New Features r24.02.1-rc1:
+
+New Features
+------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
+
+Rates
+~~~~~
+
+In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16
+rates spanning the uncertainty range of -3 to +3 sigma from `Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_
+with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
+
+These rates can be accessed through the rate selection mechanism. 
+These can be loaded, either by the normal mechanism of adding the filename
+to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
+Several examples in the test suite now make use of these rates, such as
+massive stars and models for building white dwarfs.
+
+Maximum net size
+~~~~~~~~~~~~~~~~
+
+Previous MESA versions where limited to ~300 isotopes in the nuclear network,
+this has now been (slightly) relaxed.
+In principle the maximum network size is sqrt(2^31/nz). Thus for nz=1000 zones
+this is about ~1400 isotopes, at 5000
+zones this is ~650 isotopes. Note this will require a huge amount of RAM,
+``mesa_495.net`` requires at least ~80GB of RAM, and it is estimated
+that for 1400 isotopes you will need ~650GB of RAM.
+
+Björklund Wind
+~~~~~~~~~~~~~~
+
+The Björklund et al. (2021) wind scheme has been implemented for use in all wind
+schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
+
+GYRE Update
+~~~~~~~~~~~
+
+The bundled GYRE oscillation code has been updated to `release 7.1
+<https://gyre.readthedocs.io/en/v7.1/>`_. The GYRE and GSM pulsation
+output formats have been also been updated to take advantage of new
+features in GYRE. The version of an output file can be set by the new
+``gyre_data_schema`` parameter in ``&controls``; the default value is 101 (version 1.01)
+produced GYRE-format files that are backward-compatible with older
+GYRE releases. (If using GSM-format files, set to 110 instead for
+backward compatibility).
+
+White Dwarf O/Ne Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Phase separation for crystallizing white dwarfs now supports options
+for either C/O or O/Ne phase diagrams. You can select the appropriate
+option with the ``phase_separation_option`` in the ``&controls`` inlist
+section (see documentation at :ref:`reference/controls:phase_separation_option`).
+The phase diagram for O/Ne separation comes from
+`Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+ 
+
+.. _Bug Fixes r24.02.1-rc1:
+
+Bug Fixes
+---------
+
+The ZAMS model data used to generate the initial model for simulations with
+``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
+had an issue where stars between 1.0 and 1.58 Msun would have a starting 
+central hydrogen mass fraction markedly lower than other masses. The grid of 
+starting models has been recalculated with a more stringent stopping condition, 
+and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
+near 0.697.
+
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options were removed in r15140. We have reimplemented them although we
+caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
+The EOS coverage regions have been updated to fall back to ideal gas in a region
+previously covered by HELM where it returned unphysical floor values of ``1e-20``
+for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
+be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
+
+
+Changes in r23.05.1
+===================
+
+.. _Backwards-incompatible changes r23.05.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -44,6 +183,168 @@ This will *replace* the file ``inlist_name``.  Omit the ``-i`` flag if you'd
 like to see the changes without modifying the file.
 
 ``sed`` is a standard tool that is included with macOS and most Linux distributions.
+For convenience, we have also included a bash script that will call a version of
+this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
+to update all inlist files (``inlist*``), which you can run in any work directory
+where you want to update every inlist by invoking ::
+
+  $MESA_DIR/scripts/update_inlists
+
+This script will save the previous versions of your inlists to a directory named
+``backup_inlists``.
+  
+Renamed controls for upper limits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following controls in ``&controls`` for upper limits on
+`when to stop <reference/controls.html#when-to-stop>`_ have
+been renamed:
+
++------------------------------+------------------------------------+
++ Old                          + New                                +
++==============================+====================================+
++                              +                                    +
++ ``log_center_density_limit`` + ``log_center_density_upper_limit`` +
++                              +                                    +
++ ``log_center_temp_limit``    + ``log_center_temp_upper_limit``    +
++                              +                                    +
++ ``center_entropy_limit``     + ``center_entropy_upper_limit``     +
++                              +                                    +
++ ``max_entropy_limit``        + ``max_entropy_upper_limit``        +
++                              +                                    +
++------------------------------+------------------------------------+
+
+You can substitute the new names for the old ones using the command
+line tool ``sed`` with, e.g. ::
+
+    $ sed 's/log_center_density_limit/log_center_density_upper_limit/' -i <inlist_filename>
+
+Abundance-based timestep controls are now arrays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The previous controls ::
+
+    dH_limit_min_H = 1d99
+    dH_limit = 1d99
+    dH_hard_limit = 1d99
+    dH_decreases_only = .true.
+    dH_div_H_limit_min_H = 1d-3
+    dH_div_H_limit = 0.9d0
+    dH_div_H_hard_limit = 1d99
+
+and similar controls for ``He`` and ``He3`` have been replaced with
+arrays.  This simplifies the code and allows the controls to be
+applied to any species in the net.  A new control
+``dX_limit_species(...)`` specifies which elements will be checked.
+The previous behaviour for ``H``, for example, has been replaced with
+::
+
+    dX_limit_species(1) = 'h1'
+    dX_limit_min_X(1) = 1d99
+    dX_limit(1) = 1d99
+    dX_hard_limit(1) = 1d99
+    dX_decreases_only(1) = .true.
+    dX_div_X_limit_min_X(1) = 1d-3
+    dX_div_X_limit(1) = 0.9d0
+    dX_div_X_hard_limit(1) = 1d99
+
+The old ``H``, ``He`` and ``He3`` controls correspond to species
+``h1``, ``he4`` and ``he3``, respectively.  You can also set the
+species to ``X``, ``Y`` or ``Z``, in which case the checks are applied
+*individually* to all isotopes of hydrogen, helium or metals,
+respectively.
+
+Colors
+~~~~~~
+
+The colors module now returns ``-1d99`` when asking for a value that is
+off table.
+
+
+.. _New Features r23.05.1:
+
+New Features
+------------
+
+White Dwarf C/O Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An option to include carbon-oxygen phase separation for crystallizing C/O white dwarfs is now available,
+using the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+The MESA implementation is described in `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
+More documentation and associated controls can be found at :ref:`reference/controls:do_phase_separation`.
+This option is off by default, but it is on in the ``wd_cool_0.6M`` test case.
+
+Module enhancement: ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When running ``./binary`` models it is useful to have graphical
+output to 'see' what's going on.
+Previously, this was only possible on the ``pgstar`` level, meaning you would
+need to setup two ``pgstar`` windows if you are evolving two stars in the
+binary.
+
+Here we introduce ``pgbinary``, which acts much like ``pgstar``. You enable it
+with the ``&binary_job`` inlist with ``pgbinary_flag = .true.``. Then you
+select windows and/or files to be plotted in the ``&pgbinary`` inlist.
+Currently the following plot types can be created:
+
+* History_Track[1-9],
+* Summary_History,
+* History_Panels[1-9],
+* Text_Summary[1-9],
+* Grid[1-9],
+
+analogous to their ``pgstar`` equivalents, and two ``pgbinary``-only plots:
+
+* Star[1-2], to plot a star window through ``&pgstar`` controls, within ``pgbinary``.
+* Orbit, a visual representation of the stars' sizes to their separation
+
+Main use case is to have a single window containing both stars' ``pgstar`` info,
+through using ``Grid`` at the ``pgbinary`` level, populating it with ``Star1``
+and ``Star2``, and have each plot profile info, Kipp diagrams etc...
+
+Resolution control convective_bdy_weight has been reintroduced
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The option to add extra resolution at convective boundaries
+with the control ``convective_bdy_weight`` was removed after
+version 12115, but has now been reintroduced in a simplified form.
+This control no longer applies to newly nonconvective zones, but
+does add resolution at the location of convective boundaries.
+This was found to be important for smooth convective boundary
+evolution with convective premixing.
+
+Hooks
+~~~~~
+
+A new other_close_gaps hook has been added. Provided by Simon Guichandut
+
+.. _Bug Fixes r23.05.1:
+
+Bug Fixes
+---------
+
+Rates
+~~~~~
+
+There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
+This causes an excessive amount of C12 to be burnt during core helium burning. 
+We strongly recommend that users update to the latest MESA.
+
+See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
+
+RTI
+~~~
+
+A bug has existed since shortly after r15140 where RTI
+mixing will be effectively zero in a model even with the
+``RTI_flag=.true.`` set.
+
+This has now been fixed. Users of RTI mixing are recommended to upgrade to the
+newest MESA version.
+
+See `gh-503 <https://github.com/MESAHub/mesa/issues/503>`_
 
 
 Changes in r22.11.1
@@ -397,7 +698,7 @@ Then this means you are missing the ``use auto_diff`` statement.
 An example of using ``autodiff`` in a hook can be found at :ref:`autodiff example`
 
 
-.. _Module-level changes main:
+.. _Module-level changes r21.12.1:
 
 Module-level changes
 --------------------
@@ -642,7 +943,7 @@ ability to provide these unneeded and unused quantities has been
 removed.
 
 
-.. _Other changes main:
+.. _Other changes r21.12.1:
 
 Other changes
 -------------
@@ -1724,9 +2025,7 @@ Changes to atmospheres
 There has been a major overhaul of the atmosphere controls and related
 code.  This improves consistency between the atmosphere and interior
 calculations and offers more flexibility to users.  To learn more,
-please consult the user guide available at
-
-    http://mesa.sourceforge.net/assets/atm-user-guide.txt
+please consult the user guide available :download:`here <assets/atm-user-guide.txt>`.
 
 Changes to ``s% xtra`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1761,8 +2060,8 @@ Changes to WD ``atm`` tables
 There are now 2 options for white dwarf atmosphere tables:
 
 * ``WD_tau_25``: the original WD atmosphere table option for DA (H atmosphere)
-WDs; also found and fixed a bug in the header of this file that was
-causing it to use only a small portion of the actual table
+  WDs; also found and fixed a bug in the header of this file that was
+  causing it to use only a small portion of the actual table
 
 * ``DB_WD_tau_25``: new table for DB (He atmosphere) WDs
 

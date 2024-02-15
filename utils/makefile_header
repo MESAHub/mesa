@@ -233,7 +233,7 @@ COMPILE_DEVEL     = $(COMPILE_NO_OPT)
 # some definitions used in the test makefiles and client makefiles
 
 WORK_COMPILE = \
-   $(FC) $(FCbasic) $(FCopenmp) $(FCchecks) $(FCdebug) $(FCfree) \
+   $(FC) $(FCbasic) $(FCopenmp) $(FCchecks) $(FCdebug) $(FCfree) $(FCstandard) \
    -I$(MESA_INCLUDE_DIR) -I$(WORK_SRC_DIR) -c
 
 ifeq ($(USE_PGPLOT),YES)
@@ -267,7 +267,7 @@ LOAD_MESA_MICRO_INT = $(addprefix -l,$(LIBS_MESA_MICRO))
 LOAD_MESA_MICRO_EXT = $(LOAD_MESA_NUMERICS_EXT)
 LOAD_MESA_MICRO = $(LOAD_MESA_MICRO_INT) $(LOAD_MESA_MICRO_EXT)
 
-LIBS_MESA_MACRO = atm colors turb $(LIBS_MESA_MICRO)
+LIBS_MESA_MACRO = ionization atm colors turb $(LIBS_MESA_MICRO)
 LOAD_MESA_MACRO_INT = $(addprefix -l,$(LIBS_MESA_MACRO))
 LOAD_MESA_MACRO_EXT = $(LOAD_MESA_MICRO_EXT)
 LOAD_MESA_MACRO = $(LOAD_MESA_MACRO_INT) $(LOAD_MESA_MACRO_EXT)

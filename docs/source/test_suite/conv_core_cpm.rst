@@ -1,0 +1,1 @@
+../../../star/test_suite/conv_core_cpm/README.rst

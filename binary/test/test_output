@@ -1,1 +1,4 @@
- done
+ check time_delta_coeff behavior
+                               b% max_timestep / secyer    5.0000000000000044D+00
+                               b% max_timestep / secyer    2.5000000000000067D+00
+done

@@ -65,7 +65,7 @@ Use of MESA requires:
    `2018 <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`_, 
    `2019 <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`_,
    Jermyn et al.
-   `2022 <https://ui.adsabs.harvard.edu/abs/2022arXiv220803651J/abstract>`_)
+   `2023 <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`_)
 
 2. That users share in a timely fashion all information needed for others to
    recreate their MESA results (e.g., on `MESA Zenodo <https://zenodo.org/communities/mesa>`__).
@@ -104,20 +104,20 @@ The missions of the MESA Team are:
 Developers
 ----------
 
-* `Warrick Ball <https://warrickball.github.io/>`__
+* `Warrick Ball <https://warrickball.gitlab.io/>`__
 * `Evan Bauer <https://evbauer.github.io/>`__
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
-* Aaron Dotter
 * Matthias Fabry
-* `Robert Farmer <http://rjfarmer.io/>`__
+* Ebraheem Farag
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
+* `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
-* `Frank Timmes <http://cococubed.asu.edu/>`__
+* `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
 
@@ -125,10 +125,20 @@ Past Developers
 ---------------
 
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
+* `Aaron Dotter <https://aarondotter.github.io/>`__
+* `Robert Farmer <http://rjfarmer.io/>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
-* `Josiah Schwab <https://yoshiyahu.org/>`__ (2013-2021)
+* `Josiah Schwab <https://yoshiyahu.org/>`__
 
+Other Code Contributors
+-----------------------
+
+* Kent Budge
+* Lorne Nelson
+* Joris Vos
+* Jonathan Tomshine
+* Michael Zhang
 
 Acknowledgments
 ===============

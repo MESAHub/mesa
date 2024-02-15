@@ -58,6 +58,7 @@
    !   Y = 0.267d0
       
 ! solver
+   use_gold2_tolerances = .true.
 
 ! output controls
    

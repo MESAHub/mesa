@@ -1,6 +1,7 @@
 &controls
 
       energy_eqn_option = 'eps_grav'
+      use_time_centered_eps_grav = .true.
 
 ! turn off energy error related things
       limit_for_rel_error_in_energy_conservation = 1d99

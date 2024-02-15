@@ -29,6 +29,7 @@
    
 ! solver
    energy_eqn_option = 'dedt'
+   use_gold2_tolerances = .true.
 
 / ! end of controls namelist
 

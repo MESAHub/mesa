@@ -11,6 +11,7 @@ DEFAULTS_FILES = (
     'kap/defaults',
     'reference/binary_job',
     'reference/binary_controls',
+    'reference/pgbinary',
     'reference/star_job',
     'reference/controls',
     'reference/pgstar',

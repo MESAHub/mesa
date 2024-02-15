@@ -15,6 +15,7 @@ build.log
 /lib/
 /include/
 *.pyc
+*/other/*.mod
 
 ## Debugging/Profiling
 gmon.out
@@ -98,3 +99,4 @@ testhub.yml
 .mesa_temp_cache/
 TAGS
 .vscode
+.idea

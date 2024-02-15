@@ -56,7 +56,7 @@
          real(dp) :: M_div_h ! [M/h], or as an approximation, log10[z/zsun]
          real(dp) :: boloMag
          real(dp), dimension(num_results) :: results
-         real(dp) ::log_g
+         real(dp) ::log_g, x
          integer :: info, i,total_num_colors
          character (len=8) :: vname
          character(len=strlen),dimension(num_results):: colors_name
@@ -137,6 +137,21 @@
             write(*,'(A)')
             
          end if         
+
+
+         !Check some extreme values
+         x = get_bc_by_name('V',10.d0,log_g, M_div_h, info)
+         write(*,'(A,1pes40.16e3)') 'high logT',x
+         x = get_bc_by_name('V',0.d0,log_g, M_div_h, info)
+         write(*,'(A,1pes40.16e3)') 'low logT', x
+         x = get_bc_by_name('V',log_teff,-10.d0, M_div_h, info)
+         write(*,'(A,1pes40.16e3)') 'low logg',x
+         x = get_bc_by_name('V',log_teff,10.d0, M_div_h, info)
+         write(*,'(A,1pes40.16e3)') 'high logg',x
+         x = get_bc_by_name('V',log_teff,-10.d0,1.0d0, info)
+         write(*,'(A,1pes40.16e3)') 'high m/h',x
+
+
          
       end subroutine do_one_colors
 

@@ -15,7 +15,7 @@
       num_special_rate_factors = 1
       reaction_for_special_factor(1) = 'r_c12_ag_o16'
       special_rate_factor(1) = 1
-      filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+      filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
@@ -45,6 +45,7 @@
 &controls
 
       energy_eqn_option = 'dedt'
+      use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'

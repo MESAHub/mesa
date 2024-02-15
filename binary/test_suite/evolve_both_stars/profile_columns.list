@@ -49,7 +49,7 @@
    radius ! radius at outer boundary of zone (in Rsun units)
    temperature ! temperature at center of zone
    tau ! optical depth
-   logtau ! log10(optical depth) at center of zone
+   logtau ! log10(optical depth) at cell face
    pressure ! total pressure at center of zone (pgas + prad)
    !pgas ! gas pressure at center of zone (electrons and ions)
    pgas_div_ptotal ! pgas/pressure

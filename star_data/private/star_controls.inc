@@ -28,13 +28,13 @@
          integer :: num_adjusted_dt_steps_before_max_age
          real(dp) :: gamma_center_limit
          real(dp) :: eta_center_limit
-         real(dp) :: log_center_temp_limit
+         real(dp) :: log_center_temp_upper_limit
          real(dp) :: log_center_temp_lower_limit
-         real(dp) :: log_center_density_limit, log_center_density_lower_limit
+         real(dp) :: log_center_density_upper_limit, log_center_density_lower_limit
          real(dp) :: log_max_temp_upper_limit, log_max_temp_lower_limit
          real(dp) :: surface_accel_div_grav_limit
-         real(dp) :: center_entropy_limit, center_entropy_lower_limit
-         real(dp) :: max_entropy_limit, max_entropy_lower_limit
+         real(dp) :: center_entropy_upper_limit, center_entropy_lower_limit
+         real(dp) :: max_entropy_upper_limit, max_entropy_lower_limit
 
          character (len=iso_name_length) :: &
             xa_central_lower_limit_species(num_xa_central_limits)
@@ -201,6 +201,7 @@
             interpolate_rho_for_pulse_data
          real(dp) :: threshold_grad_mu_for_double_point
          integer :: max_number_of_double_points
+         integer :: gyre_data_schema
          character (len=strlen) :: fgong_header(4)
          integer :: fgong_ivers
 
@@ -259,7 +260,7 @@
          real(dp) :: alpha_TDC_PtdVdt  ! RSP2_alfap
          real(dp) :: threshold_for_smooth_gradL_composition_term
          real(dp) :: clip_D_limit
-         logical :: alt_scale_height_flag, fix_eps_grav_transition_to_grid
+         logical :: alt_scale_height_flag
          real(dp) :: Henyey_MLT_y_param, Henyey_MLT_nu_param, mlt_Pturb_factor, &
             min_logT_for_make_gradr_sticky_in_solver_iters
          logical :: mlt_use_rotation_correction, make_gradr_sticky_in_solver_iters, &
@@ -470,6 +471,7 @@
          real(dp) :: Nieuwenhuijzen_scaling_factor
          real(dp) :: Vink_scaling_factor
          real(dp) :: Dutch_scaling_factor
+         real(dp) :: Bjorklund_scaling_factor
          character (len=strlen) :: Dutch_wind_lowT_scheme
 
          real(dp) :: wind_H_envelope_limit, wind_H_He_envelope_limit, wind_He_layer_limit
@@ -596,6 +598,9 @@
          real(dp) :: mesh_dlogX_dlogP_extra(num_mesh_logX)
          real(dp) :: mesh_dlogX_dlogP_full_on(num_mesh_logX)
          real(dp) :: mesh_dlogX_dlogP_full_off(num_mesh_logX)
+
+         real(dp) :: convective_bdy_weight, &
+            convective_bdy_dq_limit, convective_bdy_min_dt_yrs
 
          real(dp) :: mesh_dlog_eps_min_for_extra
          real(dp) :: mesh_dlog_eps_dlogP_full_on
@@ -802,7 +807,7 @@
       ! asteroseismology controls
 
          logical :: get_delta_nu_from_scaled_solar
-         real(dp) :: nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq
+         real(dp) :: nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq
 
 
       ! hydro parameters
@@ -824,6 +829,10 @@
          real(dp) :: P_theta_for_velocity_time_centering, &
             L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
+
+         real(dp) :: &
+            drag_coefficient, &
+            min_q_for_drag
 
          real(dp) :: &
             RTI_A, RTI_B, RTI_C, RTI_D, &
@@ -1064,7 +1073,14 @@
             
          logical :: stop_for_bad_nums
          integer :: diffusion_dump_call_number, energy_conservation_dump_model_number
+
+      ! WD phase separation
          
+         logical :: do_phase_separation
+         logical :: do_phase_separation_heating
+         logical :: phase_separation_mixing_use_brunt
+         character (len=32) :: phase_separation_option
+
       ! timestep parameters
       
          real(dp) :: time_delta_coeff ! like mesh_delta_coeff
@@ -1118,44 +1134,18 @@
 
          real(dp) :: dX_mix_dist_limit
 
-         real(dp) :: dH_limit_min_H
-         real(dp) :: dH_limit
-         real(dp) :: dH_hard_limit
-         logical :: dH_decreases_only
+         character (len=strlen), dimension(max_dx_limit_ctrls) :: dX_limit_species
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit_min_X  ! all species + XYZ
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_hard_limit
+         logical, dimension(max_dx_limit_ctrls) :: dX_decreases_only
 
-         real(dp) :: dH_div_H_limit_min_H
-         real(dp) :: dH_div_H_limit
-         real(dp) :: dH_div_H_hard_limit
-
-         real(dp) :: dHe_limit_min_He
-         real(dp) :: dHe_limit
-         real(dp) :: dHe_hard_limit
-         logical :: dHe_decreases_only
-
-         real(dp) :: dHe_div_He_limit_min_He
-         real(dp) :: dHe_div_He_limit
-         real(dp) :: dHe_div_He_hard_limit
-
-         real(dp) :: dHe3_limit_min_He3
-         real(dp) :: dHe3_limit
-         real(dp) :: dHe3_hard_limit
-         logical :: dHe3_decreases_only
-
-         real(dp) :: dHe3_div_He3_limit_min_He3
-         real(dp) :: dHe3_div_He3_limit
-         real(dp) :: dHe3_div_He3_hard_limit
-
-         real(dp) :: dX_limit_min_X
-         real(dp) :: dX_limit
-         real(dp) :: dX_hard_limit
-         logical :: dX_decreases_only
-
-         real(dp) :: dX_div_X_limit_min_X
-         real(dp) :: dX_div_X_limit
-         real(dp) :: dX_div_X_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit
-         real(dp) :: dX_div_X_at_high_T_hard_limit
-         real(dp) :: dX_div_X_at_high_T_limit_lgT_min
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit_min_X
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_hard_limit
+         real(dp), dimension(max_dx_limit_ctrls) :: dX_div_X_at_high_T_limit_lgT_min
 
          real(dp) :: dX_nuc_drop_min_X_limit
          real(dp) :: dX_nuc_drop_max_A_limit
@@ -1383,6 +1373,7 @@
          logical :: use_other_rate_get
          logical :: use_other_net_derivs
          logical :: use_other_split_burn
+         logical :: use_other_close_gaps
 
          real(dp) :: x_ctrl(num_x_ctrls)
          integer :: x_integer_ctrl(num_x_ctrls)

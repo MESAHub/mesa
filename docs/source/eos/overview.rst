@@ -159,11 +159,6 @@ thermodynamic consistency.  The composition is accounted for via
 :math:`\overline{{\rm A}}` (the mass-averaged atomic weight), and
 :math:`\overline{\rm Z}` (the mass-averaged atomic charge).
 
-.. note::
-
-  HELM serves as a "backstop" EOS for MESA.  When applied at low
-  temperatures, it falls back into an ideal gas mode.
-
 
 PC
 --
@@ -190,6 +185,17 @@ defining feature of this equation of state is that it uses analytic
 free energy terms and provides thermodynamic quantities using
 automatic differentiation machinery.
 
+ideal
+-----
+
+.. warning::
+
+   This EOS is used as a very simple backstop.
+   It currently assumes fully neutral matter, even at high temperatures.
+
+This EOS is a backstop derived from the ideal ion portion of Skye.
+It assumes no free electrons, so the only EOS contributions are from
+ideal ions and radiation.
 
 CMS
 ---

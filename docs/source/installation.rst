@@ -26,11 +26,11 @@ Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 
 Before you install MESA, you need to get the prerequisites. The `MESA
-SDK <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
+SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__
 simplifies this process by providing a prebuilt set of compilers and
 run-time libraries that should make your MESA install go
 smoothly. Visit the `MESA SDK website
-<http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
+<http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ for
 the details of setting it up.
 
 If you would prefer to use ifort (the MESA SDK uses gfortran), that is
@@ -107,6 +107,9 @@ uses export to set variables):
     # The directory shown is only an example and must be modified for your particular system.
     export MESASDK_ROOT=/Applications/mesasdk
     source $MESASDK_ROOT/bin/mesasdk_init.sh
+
+    # add shmesa (the MESA command line tool) to your PATH 
+    export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
 
 If your machine uses csh as its shell, use ``setenv`` instead of ``export``.
@@ -188,7 +191,7 @@ Confirm that you installed the MESA SDK correctly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Please check that you followed the MESA SDK `installation
-instructions <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
+instructions <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__.
 Pay particular attention to the prerequisites for your system.
 
 Consult the FAQ
@@ -199,7 +202,7 @@ Check to see if there is any information about your problem in the
 
 If you are using the MESA SDK and are having a problem with
 installation, you should also consult the `MESA SDK
-FAQ <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Frequently_Asked_Questions_.01FAQ.01>`__.
+FAQ <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Frequently_Asked_Questions_.01FAQ.01>`__.
 
 Search the mesa-users mailing list archive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

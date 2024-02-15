@@ -67,6 +67,7 @@
 ! equation controls
       energy_eqn_option = 'dedt'
       use_dPrad_dm_form_of_T_gradient_eqn = .true.
+      use_gold2_tolerances = .true.
 
       ! turn off energy from nuclear reactions and neutrinos
       eps_nuc_factor = 0d0
