@@ -110,7 +110,7 @@
     write_model_with_profile, model_data_prefix, model_data_suffix, &
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
-    mass_depth_for_L_surf, conv_core_gap_dq_limit, &
+    conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
@@ -991,7 +991,6 @@
  s% min_q_for_inner_mach1_location = min_q_for_inner_mach1_location
  s% max_q_for_outer_mach1_location = max_q_for_outer_mach1_location
  
- s% mass_depth_for_L_surf = mass_depth_for_L_surf
  s% conv_core_gap_dq_limit = conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
@@ -2674,7 +2673,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_q_for_inner_mach1_location = s% min_q_for_inner_mach1_location
  max_q_for_outer_mach1_location = s% max_q_for_outer_mach1_location
  
- mass_depth_for_L_surf = s% mass_depth_for_L_surf
  conv_core_gap_dq_limit = s% conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
