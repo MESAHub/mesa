@@ -857,16 +857,6 @@
     surface_avg_abundance_dq = 1d-8
 
 
-      ! mass_depth_for_L_surf
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! only if ``use_flux_limiting_with_dPrad_dm_form``
-
-      ! ::
-
-    mass_depth_for_L_surf = 0d0
-
-
       ! conv_core_gap_dq_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~
 

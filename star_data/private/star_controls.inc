@@ -210,7 +210,7 @@
          real(dp) :: fgong_zero_A_inside_r
          real(dp) :: trace_mass_location, &
             min_tau_for_max_abs_v_location, min_q_for_inner_mach1_location, &
-            max_q_for_outer_mach1_location, mass_depth_for_L_surf, &
+            max_q_for_outer_mach1_location, &
             conv_core_gap_dq_limit
          real(dp) :: mixing_D_limit_for_log
 
