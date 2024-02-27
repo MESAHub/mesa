@@ -1494,3 +1494,16 @@
     use_other_CE_binary_evolve_step = .false.
     use_other_CE_binary_finish_step = .false.
     use_other_e2 = .false.
+
+
+! extra params as a convenience for developing new features
+! note: the parameter ``num_x_ctrls`` is defined in ``binary_def.f90``
+
+! ::
+
+    x_ctrl(1:binary_num_x_ctrls) = 0d0
+    x_integer_ctrl(1:binary_num_x_ctrls) = 0
+    x_logical_ctrl(1:binary_num_x_ctrls) = .false.
+    x_character_ctrl(1:binary_num_x_ctrls) = ''
+
+
