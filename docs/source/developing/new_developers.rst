@@ -49,6 +49,17 @@ Assuming the new developer has been accepted, the nominator:
 * Makes sure the new developer gets access to the infrastructure (github, slack, mesa-dev, testhub).
 * Acts as a mentor to the new developer, helping them to get used to the system and the way things are done. This includes making commits, merging PR's, and general development tasks.
 
+Infrastructure Access for Collaborators
+---------------------------------------
+
+Membership in the MESA Developers entails (but is not necessarily limited to) access to several key pieces of infrastructure: the MESA Developers Slack, regular zoom meetings, and commit access to the GitHub repository. When members of the developer team are collaborating with researchers outside of the team on projects that involve significant MESA development, it may be useful to grant some degree of access to this infrastructure without necessarily going through the full process of nomination for membership in the MESA Developers. Examples include students, postdocs, or other researchers hired by or collaborating with members of the developer team. In such cases, we adopt the following policies for access to the infrastructure:
+
+* Developers may grant commit access to the GitHub repository by adding somebody to the MESAHub GitHub organization in the `Outside Collaborator <https://docs.github.com/en/organizations/managing-user-access-to-your-organizations-repositories/managing-outside-collaborators/adding-outside-collaborators-to-repositories-in-your-organization>`__ role. This access does not require a nomination and vote, but the developer granting access should notify the developer team by posting on Slack or on the mesa-developers mailing list.
+* Developers may also add collaborators to the MESA Developers Slack, without the need for a nomination or vote. We will reserve a few private channels for developer team members only, and the #meetings channel will only be accessible to those approved to join the zoom meetings.
+* Developers may nominate outside collaborators to participate in the regular developer zoom calls and have access to the #meetings channel on Slack, including recordings of previous meetings. The procedure for approving this nomination will be the same as described above for approving developer team member nominations, but in this case the scope is on the narrow question of zoom meeting participation. The timeline for this approval will therefore be at least 2 weeks and must span 2 meetings.
+
+This delegated access may be followed by nomination for membership in due course, and these policies are intended to facilitate smooth communication and collaboration prior to that step. If necessary, the above categories of access can also be revoked following the process described in the :ref:`developing/new_developers:Removing a Developer` section of this documentation.
+
 Removing a Developer
 --------------------
 
