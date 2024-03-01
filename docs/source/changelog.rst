@@ -119,7 +119,15 @@ collapse while keeping their surface boundaries at tau = 1. The models offer a f
 has been tested to function with large reaction networks containing > 200 isotopes thanks to
 'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
 as seen in section 6.9 of MESA IV.
- 
+
+Reintroduction of Velocity Drag for v_flag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The option to apply a drag term to the velocities in the outer envelope
+with the control ``drag_coefficient`` and ``min_q_for_drag`` was removed after
+version 15140, but has now been reintroduced. The logical control ``use_drag_energy``
+has been introduced as well, so users can decided whether the drag energy is included
+in the energy equation. We also provide an additional option to turn off the 
+velocities above a desired optical depth with the control ``velocity_tau_lower_bound``.
 
 .. _Bug Fixes r24.02.1-rc1:
 
@@ -143,6 +151,11 @@ previously covered by HELM where it returned unphysical floor values of ``1e-20`
 for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
 be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
 
+A bug in the implementation of the ``fe_core_infall_limit`` sometimes resulted 
+in the premature termination of a model due to large negative velocities outside
+the fe core.
+
+ See `gh-626 <https://github.com/MESAHub/mesa/issues/626#issue-2157840823>`_
 
 Changes in r23.05.1
 ===================
