@@ -845,8 +845,8 @@
          logical :: retry_for_v_above_clight
 
          logical :: include_composition_in_eps_grav
-         real(dp) :: velocity_logT_lower_bound, &
-            max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, &  velocity_q_upper_bound
+         real(dp) :: velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, &
+            velocity_tau_lower_bound, velocity_q_upper_bound
          real(dp) :: Gamma_lnS_eps_grav_full_on, Gamma_lnS_eps_grav_full_off
          integer :: max_num_surf_revisions
          real(dp) :: max_abs_rel_change_surf_lnS
