@@ -2,10 +2,10 @@
 Changelog
 *********
 
-Changes in r24.02.1-rc1
-=======================
+Changes in r24.03.1
+===================
 
-.. _Backwards-incompatible changes r24.02.1-rc1:
+.. _Backwards-incompatible changes r24.03.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -41,7 +41,7 @@ The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/
 and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
 
 
-.. _New Features r24.02.1-rc1:
+.. _New Features r24.03.1:
 
 New Features
 ------------
@@ -125,11 +125,11 @@ Reintroduction of Velocity Drag for v_flag
 The option to apply a drag term to the velocities in the outer envelope
 with the control ``drag_coefficient`` and ``min_q_for_drag`` was removed after
 version 15140, but has now been reintroduced. The logical control ``use_drag_energy``
-has been introduced as well, so users can decided whether the drag energy is included
+has been introduced as well, so users can decide whether the drag energy is included
 in the energy equation. We also provide an additional option to turn off the 
 velocities above a desired optical depth with the control ``velocity_tau_lower_bound``.
 
-.. _Bug Fixes r24.02.1-rc1:
+.. _Bug Fixes r24.03.1:
 
 Bug Fixes
 ---------
