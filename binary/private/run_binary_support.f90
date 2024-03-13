@@ -643,13 +643,13 @@ contains
 
          end do step_loop
 
+         partial_result = b% extras_binary_finish_step(b% binary_id)
+         result = worst_result(result, partial_result)
+
          if(result == keep_going) result = binary_finish_step(b)
          if (b% CE_flag .and. b% CE_init .and. result == keep_going) then
             result = worst_result(result, CE_binary_finish_step(b))
          end if
-
-         partial_result = b% extras_binary_finish_step(b% binary_id)
-         result = worst_result(result, partial_result)
 
          if (result == keep_going) then
             ! write terminal info

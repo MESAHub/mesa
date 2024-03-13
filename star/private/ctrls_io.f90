@@ -110,7 +110,7 @@
     write_model_with_profile, model_data_prefix, model_data_suffix, &
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
-    mass_depth_for_L_surf, conv_core_gap_dq_limit, &
+    conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
@@ -350,8 +350,8 @@
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
-    drag_coefficient, min_q_for_drag, &
+    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
+    use_drag_energy, drag_coefficient, min_q_for_drag, &
     v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     retry_for_v_above_clight, &
 
@@ -992,7 +992,6 @@
  s% min_q_for_inner_mach1_location = min_q_for_inner_mach1_location
  s% max_q_for_outer_mach1_location = max_q_for_outer_mach1_location
  
- s% mass_depth_for_L_surf = mass_depth_for_L_surf
  s% conv_core_gap_dq_limit = conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
@@ -1862,6 +1861,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
 
+ s% use_drag_energy = use_drag_energy
  s% drag_coefficient = drag_coefficient
  s% min_q_for_drag = min_q_for_drag
  s% v_drag_factor = v_drag_factor
@@ -1872,6 +1872,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
+ s% velocity_tau_lower_bound = velocity_tau_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
 
  s% retry_for_v_above_clight = retry_for_v_above_clight
@@ -2680,7 +2681,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_q_for_inner_mach1_location = s% min_q_for_inner_mach1_location
  max_q_for_outer_mach1_location = s% max_q_for_outer_mach1_location
  
- mass_depth_for_L_surf = s% mass_depth_for_L_surf
  conv_core_gap_dq_limit = s% conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
@@ -3537,7 +3537,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
 
-
+ use_drag_energy = s% use_drag_energy
  drag_coefficient = s% drag_coefficient
  min_q_for_drag = s% min_q_for_drag
  v_drag_factor = s% v_drag_factor
@@ -3547,6 +3547,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
+ velocity_tau_lower_bound = s% velocity_tau_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
 
  retry_for_v_above_clight = s% retry_for_v_above_clight

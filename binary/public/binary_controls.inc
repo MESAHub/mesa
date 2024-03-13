@@ -177,4 +177,9 @@ logical :: use_other_CE_binary_finish_step
 logical :: use_other_e2
 logical :: use_other_pgbinary_plots
 
+real(dp) :: x_ctrl(binary_num_x_ctrls)
+integer :: x_integer_ctrl(binary_num_x_ctrls)
+logical :: x_logical_ctrl(binary_num_x_ctrls)
+character (len=strlen) :: x_character_ctrl(binary_num_x_ctrls)
+
 ! end of controls

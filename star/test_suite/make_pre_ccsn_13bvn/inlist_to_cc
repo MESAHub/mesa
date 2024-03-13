@@ -22,7 +22,7 @@
 
 ! 300 km/s core infall stopping condition
      fe_core_infall_limit = 3d7
-     non_fe_core_infall_limit = 3d7
+     non_fe_core_infall_limit = 1d99!3d7
 
       when_to_stop_rtol = 1d-3
       when_to_stop_atol = 1d-3
@@ -79,7 +79,7 @@
       photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 1
+      terminal_interval = 10 
 
       x_integer_ctrl(1) = 6 ! inlist_part
 
