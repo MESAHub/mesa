@@ -408,6 +408,8 @@ The message (with brackets) may appear anywhere in the commit message.
 
 Compile ``MESA`` but do not run the test suite. Useful when changes only touch documentation or the changes can not affect the final result.
 
+Note that this string will also `prevent any GitHub actions from running <https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs>`_.
+
 [ci split]
 ^^^^^^^^^^
 

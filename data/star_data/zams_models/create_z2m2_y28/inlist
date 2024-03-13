@@ -7,7 +7,7 @@
 
 &star_job
 
-      mesa_dir = '../../../..'
+      !mesa_dir = '../../../..'
 
       read_extra_star_job_inlist(2) = .true.
       extra_star_job_inlist_name(2) = 'inlist_create_zams'
