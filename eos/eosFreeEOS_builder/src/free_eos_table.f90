@@ -576,7 +576,6 @@ contains
       eos_result(i_dsp) = 0._dp
       eos_result(i_dse) = 0._dp
 
-      eos_result(i_lnfree_e) = res(i_lnfree_e)/ln10
    end subroutine mesa_eos_eval
 
 end program make_free_eos_table
