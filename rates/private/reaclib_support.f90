@@ -217,25 +217,27 @@
 
             ! log(prefactor of reverse_ratio)
             tmp = product(mass(1:Ni))/product(mass(Ni+1:Nt))
-            rates% inverse_coefficients(1,i) = pow(tmp,1.5d0)*(product(g(1:Ni))/product(g(Ni+1:Nt)))
+            rates% inverse_coefficients(1,i) = pow(tmp,1.5d0*(Ni-No))*(product(g(1:Ni))/product(g(Ni+1:Nt)))
 
             ! -Q/(kB*10**9)
             sum1 = sum(winvn% binding_energy(ps(1:Ni)))
             sum2 = sum(winvn% binding_energy(ps(Ni+1:Nt)))
             rates% inverse_coefficients(2,i) = (sum1-sum2)*conv/kB/1d9
 
+            ! see equation 21 in Reichert et al. 2023 (https://doi.org/10.3847/1538-4365/acf033)
+            ! delta_reactants/delta_products is handled in net.
             ! This should be 0 for non-photo-disintegration reverse rates and 1 for photos's in the reverse channel
-            if (No==1) then
+            if (Ni-No .ne. 0) then
                rates% inverse_exp(i) = 1
                if(rates% inverse_coefficients(2,i)<0) then
                   ! negative values denote endothermic photodisintegrations
                   ! We want rate_photo/rate_forward
-                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * fac
+                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
                else
                   ! positive values denote exothermic photodisintegrations
                   ! We divide by fac and invert the T^3/2 as we want to compute
                   ! rate_reverse/rate_photo
-                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) / fac
+                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
                   rates% inverse_exp(i) = -1 ! We us this term in a log() expression
                end if
             else
