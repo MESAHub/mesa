@@ -257,6 +257,13 @@
          return
        end if
 
+       ! error out for very low pgas,egas,sgas (previously just set hard floor at this value)
+       if(pgas < 1d-20 .or. egas < 1d-20 .or. sgas < 1d-20) then
+          ierr = 1
+          if (dbg) write(*,*) 'failed in helm, sums too small'
+          return
+       end if
+
 !..compute the derivative quantities (cv, gamma1 ...etc)
        include 'helm_gammas.dek'
        if (ierr /= 0) then

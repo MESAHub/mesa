@@ -26,7 +26,6 @@ with open('eos_plotter.dat') as f:
 # overwrite with fancier labels
 xlabel = r'$\log(\rho/{\rm g\,cm^{-3}})$'
 ylabel = r'$\log(T/{\rm K})$'
-title = r'MESA EOS Regions ($X=0.7$, $Z=0.02$)'
 
 eosDT, Yran, Xran = parse('eos_plotter.dat')
 
@@ -34,6 +33,15 @@ apjcolwidth=3.38
 # set up plot and labels
 #fig, ax = plt.subplots(figsize=(apjcolwidth,apjcolwidth*4./5.)) # for paper figures
 fig, ax = plt.subplots(figsize=(5,4)) # for website pngs
+
+## for solar composition plot
+title = r'MESA EOS Regions ($X=0.7$, $Z=0.02$)'
+ax.text(4.0,2.3,'no coverage',fontsize='small')
+
+## for Z = 1 plot
+#title = r'MESA EOS Regions ($X=0.0$, $Z=1.0$)'
+#ax.text(4.8,2.3,'no coverage',fontsize='small')
+
 ax.set_title(title)
 ax.set_xlabel(xlabel)
 ax.set_ylabel(ylabel)
@@ -48,9 +56,9 @@ my_colors[5] = tmp
 cmap = colors.ListedColormap(my_colors)
 bounds = [-0.5, 0.5, 1.5, 2.5, 3.5, 5.5, 7.5]
 norm = colors.BoundaryNorm(bounds, cmap.N)
+cmap.set_under('white')
 
 pcol = ax.pcolormesh(Xran, Yran, eosDT[...,2], shading='nearest', cmap=cmap, norm=norm, rasterized=True)
-pcol.set_edgecolor('face')
 cax = fig.colorbar(pcol, ticks=[0, 1, 2, 3, 4.5, 6.5])
 cax.set_label('')
 cax.ax.tick_params(labelsize='x-small')

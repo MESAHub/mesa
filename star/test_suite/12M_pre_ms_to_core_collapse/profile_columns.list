@@ -295,7 +295,7 @@
       !raw_rate r_h1_h1_ec_h2 
       !raw_rate r_h1_h1_wk_h2
 
-   !burn_num_iters ! Number of split_burn iterations taken
+   burn_num_iters ! Number of split_burn iterations taken
    !burn_avg_epsnuc
    !log_burn_avg_epsnuc
 
@@ -408,7 +408,7 @@
    !Lt_div_L
 
 !# Energetics
-   !total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
+   total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
    !cell_specific_IE
    !cell_specific_KE
    !cell_IE_div_IE_plus_KE

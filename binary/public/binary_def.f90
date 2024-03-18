@@ -37,6 +37,7 @@
 
       integer, parameter :: maxlen_binary_history_column_name = 80
       integer, parameter :: binary_num_xtra_vals = 30
+      integer, parameter :: binary_num_x_ctrls = 100
       
       ! time_step limit identifiers
       integer, parameter :: b_Tlim_comp = 1
