@@ -7,21 +7,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["20.12.1", "21.4.1", "22.6.1"]
+        sdk: ["21.4.1", "22.6.1", "23.7.3"]
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Delete unused packages
         run: |
-          # commands lifted from https://github.com/jlumbroso/free-disk-space
+          # runners have 150GB of disk space and the Ubuntu image is big so we sometimes found it ran out of space for MESA
+          # others have encountered this too so we took commands from this action
+          # https://github.com/jlumbroso/free-disk-space
+          # currently commented because we don't need it and these commands can need changing when the Ubuntu image changes
           sudo rm -rf /usr/local/lib/android
-          sudo apt-get remove -y '^aspnetcore-.*'
-          sudo apt-get remove -y '^dotnet-.*' # 990 MB
-          sudo apt-get remove -y '^llvm-.*' # 1052 MB
+          # sudo apt-get remove -y '^aspnetcore-.*'
+          # sudo apt-get remove -y '^dotnet-.*' # 990 MB
+          # sudo apt-get remove -y '^llvm-.*' # 1052 MB
           # sudo apt-get remove -y 'php.*' # 56.6 MB
           # sudo apt-get remove -y '^mysql-.*' # 209 MB
-          sudo apt-get remove -y azure-cli google-cloud-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
+          # sudo apt-get remove -y azure-cli google-cloud-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
           sudo apt-get autoremove -y # 771 MB
           sudo apt-get clean
 
@@ -42,7 +45,7 @@ jobs:
       - name: Git LFS Pull
         run: git lfs pull
         if: steps.lfs-cache.outputs.cache-hit != 'true'
-  
+
       - name: Git LFS Checkout
         run: git lfs checkout
         if: steps.lfs-cache.outputs.cache-hit == 'true'
@@ -61,12 +64,6 @@ jobs:
           key: ${{ runner.os }}-${{matrix.sdk}}
 
 
-      - name: Get SDK ${{ runner.os }} '20.12.1'
-        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk  == '20.12.1') }}
-        run: |
-            wget -q https://zenodo.org/record/4587206/files/mesasdk-x86_64-linux-20.12.1.tar.gz
-        shell: bash
-
       - name: Get SDK ${{ runner.os }} '21.4.1'
         if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '21.4.1') }}
         run: |
@@ -79,6 +76,12 @@ jobs:
             wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
         shell: bash
 
+      - name: Get SDK ${{ runner.os }} '23.7.3'
+        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '23.7.3') }}
+        run: |
+            wget -q https://zenodo.org/record/10624843/files/mesasdk-x86_64-linux-23.7.3.tar.gz
+        shell: bash
+
       - name: Unpack SDK ${{ runner.os }} ${{matrix.sdk}}
         run: |
             tar xvf mesasdk-x86_64-linux-${{matrix.sdk}}.tar.gz
@@ -87,10 +90,10 @@ jobs:
       - name: Compile
         shell: bash
         run: |
-          # Linux runners have 2 cores
-          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
-          export OMP_NUM_THREADS=2
-          export NPROCS=2
+          # Linux runners have 4 cores
+          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+          export OMP_NUM_THREADS=4
+          export NPROCS=4
           export "MESASDK_ROOT=$(readlink -f mesasdk)"
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           export "MESA_DIR=$(readlink -f ./)"

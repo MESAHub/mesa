@@ -2,13 +2,10 @@
 Changelog
 *********
 
+Changes in r24.02.1-rc1
+=======================
 
-Changes in main
-===============
-
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
+.. _Backwards-incompatible changes r24.02.1-rc1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -24,15 +21,42 @@ pressure with respect to other variables.
 run_star_extras
 ~~~~~~~~~~~~~~~
 
-Previously we had logic to determine if a extra history value should be saved
+Previously we had logic to determine if an extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
+Asteroseismic scaling relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _New Features main:
+The default values of the parameters ``delta_nu_sun`` and ``nu_max_sun`` used in the asteroseismic scaling relations
+have been updated to the values reported by `Lund et al. (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L/abstract>`_
+(:math:`\Delta\nu_\odot = \mathrm{134.91}\,\mu\mathrm{Hz}` and :math:`\nu_{\mathrm{max},\odot} = \mathrm{3078}\,\mu\mathrm{Hz}`).
+The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusion
+with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
+default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
+
+stash.py
+~~~~~~~~
+The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+
+
+.. _New Features r24.02.1-rc1:
 
 New Features
 ------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
 
 Rates
 ~~~~~
@@ -46,7 +70,6 @@ These can be loaded, either by the normal mechanism of adding the filename
 to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
 Several examples in the test suite now make use of these rates, such as
 massive stars and models for building white dwarfs.
-
 
 Maximum net size
 ~~~~~~~~~~~~~~~~
@@ -87,10 +110,22 @@ section (see documentation at :ref:`reference/controls:phase_separation_option`)
 The phase diagram for O/Ne separation comes from
 `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
 
-.. _Bug Fixes main:
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+ 
+
+.. _Bug Fixes r24.02.1-rc1:
 
 Bug Fixes
 ---------
+
 The ZAMS model data used to generate the initial model for simulations with
 ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
 had an issue where stars between 1.0 and 1.58 Msun would have a starting 
@@ -98,6 +133,16 @@ central hydrogen mass fraction markedly lower than other masses. The grid of
 starting models has been recalculated with a more stringent stopping condition, 
 and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
 near 0.697.
+
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options were removed in r15140. We have reimplemented them although we
+caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
+The EOS coverage regions have been updated to fall back to ideal gas in a region
+previously covered by HELM where it returned unphysical floor values of ``1e-20``
+for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
+be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
+
 
 Changes in r23.05.1
 ===================

@@ -249,9 +249,9 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
-      !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
-      !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
+      log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
       !mass_loc_of_max_eps_nuc ! (in Msun units)
       !mass_ext_to_max_eps_nuc ! (in Msun units)
@@ -740,8 +740,7 @@
          ! sqrt(2) pi^2/(integral of brunt_N/r dr)
       !log_delta_Pg
       !nu_max ! estimate from scaling relation (microHz)
-         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/Teff_sun)^0.5)
-         ! with nu_max_sun = 3100 microHz, Teff_sun = 5777
+         ! nu_max = nu_max_sun * M/Msun / ((R/Rsun)^2 (Teff/astero_Teff_sun)^0.5)
       !nu_max_3_4th_div_delta_nu ! nu_max^0.75/delta_nu
       !acoustic_cutoff ! 0.5*g*sqrt(gamma1*rho/P) at surface
       !acoustic_radius ! integral of dr/csound (seconds)

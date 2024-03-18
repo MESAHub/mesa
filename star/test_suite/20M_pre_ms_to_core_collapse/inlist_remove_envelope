@@ -39,8 +39,6 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
@@ -60,7 +58,7 @@
       !history_interval = 1
       !terminal_interval = 1
 
-      x_integer_ctrl(1) =  4 ! Inlist part number
+      x_integer_ctrl(5) =  4 ! Inlist part number
 
 / ! end of controls namelist
 
