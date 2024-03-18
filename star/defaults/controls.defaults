@@ -7883,7 +7883,18 @@
       ! ::
 
     velocity_q_upper_bound = 1d99
+    
+      ! velocity_tau_lower_bound
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
+      ! Local override for global ``v_flag``.
+      ! If local tau < this bound, local ``v_flag`` is set false,
+      ! else local ``v_flag`` is set to global ``v_flag``.
+      ! this lets you force v = 0 in outer envelope.
+
+      ! ::
+
+    velocity_tau_lower_bound = -1d99
 
       ! velocity_logT_lower_bound
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8204,8 +8215,18 @@
       ! following surface boundary conditions:
       ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
 
+      ! If use_drag_energy = .true. adds the work done by the drag force
+      ! to the energy balance. Since the drag force is proportional to
+      ! the velocity which is subject to numerical spikes and
+      ! oscillations, you may not want to use the work done by it in the
+      ! model If set to .false. but drag_coefficient is nonzero, the
+      ! drag force will be applied in the momentum equation (as a
+      ! numerical trick to damp spurious velocities) but not in the
+      ! energy equation.
+
       ! ::
 
+    use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
     
