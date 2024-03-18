@@ -167,7 +167,8 @@
                logK, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use interp_1d_def, only: pm_work_size
-         use interp_1d_lib, only: interpolate_vector, interp_pm
+         use interp_1d_lib, only: interpolate_vector_autodiff, interp_pm_autodiff
+         use auto_diff
 
          type (Kap_General_Info), pointer :: rq
          integer, intent(in) :: iz
@@ -178,9 +179,11 @@
          
          integer, parameter :: n_old = 4, n_new = 1
          real(dp), dimension(n_old) :: logKs, dlogKs_dlogRho, dlogKs_dlogT
-         real(dp) :: z_old(n_old), z_new(n_new)
-         real(dp), target :: work_ary(n_old*pm_work_size)
-         real(dp), pointer :: work(:)
+         type(auto_diff_real_2var_order1), dimension(n_old) :: logKs_ad
+         type(auto_diff_real_2var_order1) :: logK_ad
+         type(auto_diff_real_2var_order1) :: z_old(n_old), z_new(n_new)
+         type(auto_diff_real_2var_order1), target :: work_ary(n_old*pm_work_size)
+         type(auto_diff_real_2var_order1), pointer :: work(:)
          integer :: i, i1, izz, num_Zs, CO_option
          
          logical, parameter :: dbg = .false.
@@ -210,7 +213,9 @@
          
          do i=1,n_old
             izz = i1-2+i
-            z_old(i) = kap_co_z_tables(CO_option)% ar(izz)% Zbase
+            z_old(i) %val= kap_co_z_tables(CO_option)% ar(izz)% Zbase
+            z_old(i) % d1val1 = 0d0
+            z_old(i) % d1val2 = 0d0
             if (dbg) then
                write(*,*) 'izz', izz
                write(*,*) 'z_old', i, z_old(i)
@@ -222,27 +227,26 @@
             if (ierr /= 0) then
                return
             end if
+            ! now pack into auto_diff form
+            logKs_ad(i) % val = logKs(i)
+            logKs_ad(i) % d1val1 = dlogKs_dlogT(i)
+            logKs_ad(i) % d1val2 = dlogKs_dlogRho(i)
          end do
-         z_new(1) = Z
-         
-         call interp1(logKs, logK, ierr)
+         z_new(1) % val = Z
+         z_new(1) % d1val1 = 0d0
+         z_new(1) % d1val2 = 0d0
+
+         call interp1(logKs_ad, logK_ad, ierr)
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
-         
-         call interp1(dlogKs_dlogRho, dlnkap_dlnRho, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
-            return
-         end if
-                  
-         call interp1(dlogKs_dlogT, dlnkap_dlnT, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
-            return
-         end if
-         
+
+         ! unpack auto_diff pack into output reals
+         logK = logK_ad % val
+         dlnkap_dlnT = logK_ad % d1val1
+         dlnkap_dlnRho = logK_ad % d1val2
+
          if (dbg) then
          
             do i=1,n_old
@@ -278,13 +282,16 @@
          contains
          
          subroutine interp1(old, new, ierr)
-            real(dp), intent(in) :: old(n_old)
-            real(dp), intent(out) :: new
+            type(auto_diff_real_2var_order1), intent(in) :: old(n_old)
+            type(auto_diff_real_2var_order1), intent(out) :: new
             integer, intent(out) :: ierr
-            real(dp) :: v_old(n_old), v_new(n_new)
-            v_old(:) = dble(old(:))
-            call interpolate_vector( &
-               n_old, z_old, n_new, z_new, v_old, v_new, interp_pm, pm_work_size, work, &
+            type(auto_diff_real_2var_order1) :: v_old(n_old), v_new(n_new)
+            integer :: i
+            do i = 1, n_old
+               v_old(i) = old(i)
+            end do
+            call interpolate_vector_autodiff( &
+               n_old, z_old, n_new, z_new, v_old, v_new, interp_pm_autodiff, pm_work_size, work, &
                'Get_Kap_for_CO_Z_cubic', ierr)
             new = v_new(1)
          end subroutine interp1
@@ -440,7 +447,8 @@
             logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          use kap_def
          use interp_1d_def, only: pm_work_size
-         use interp_1d_lib, only: interpolate_vector, interp_pm
+         use interp_1d_lib, only: interpolate_vector_autodiff, interp_pm_autodiff
+         use auto_diff
 
          ! return opacity from Z table number iz for the given X, XC, XO
          type (Kap_General_Info), pointer :: rq
@@ -453,9 +461,11 @@
          
          integer, parameter :: n_old = 4, n_new = 1
          real(dp), dimension(n_old) :: logKs, dlogKs_dlogRho, dlogKs_dlogT
-         real(dp) :: x_old(n_old), x_new(n_new)
-         real(dp), target :: work_ary(n_old*pm_work_size)
-         real(dp), pointer :: work(:)
+         type(auto_diff_real_2var_order1), dimension(n_old) :: logKs_ad
+         type(auto_diff_real_2var_order1) :: logK_ad
+         type(auto_diff_real_2var_order1) :: x_old(n_old), x_new(n_new)
+         type(auto_diff_real_2var_order1), target :: work_ary(n_old*pm_work_size)
+         type(auto_diff_real_2var_order1), pointer :: work(:)
          integer :: i, i1, ixx, num_Xs
          
          logical, parameter :: dbg = .false.
@@ -480,8 +490,9 @@
          do i=1,n_old
             ixx = i1-2+i
             if (dbg) write(*,*) 'ixx', ixx
-            x_old(i) = x_tables(ixx)% X
-
+            x_old(i) % val = x_tables(ixx)% X
+            x_old(i) % d1val1 = 0d0
+            x_old(i) % d1val2 = 0d0
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ixx, &
                   logRho, logT, logKs(i), dlogKs_dlogRho(i), dlogKs_dlogT(i), ierr)
@@ -490,27 +501,26 @@
                if (dbg) write(*,11) 'logT', logT
                return
             end if
+            ! now pack into auto_diff form
+            logKs_ad(i) % val = logKs(i)
+            logKs_ad(i) % d1val1 = dlogKs_dlogT(i)
+            logKs_ad(i) % d1val2 = dlogKs_dlogRho(i)
          end do
-         x_new(1) = X
-         
-         call interp1(logKs, logK, ierr)
+         x_new(1) % val = X
+         x_new(1) % d1val1 = 0d0
+         x_new(1) % d1val2 = 0d0
+
+         call interp1(logKs_ad, logK_ad, ierr)
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
-         
-         call interp1(dlogKs_dlogRho, dlogK_dlogRho, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogRho')
-            return
-         end if
-                  
-         call interp1(dlogKs_dlogT, dlogK_dlogT, ierr)
-         if (ierr /= 0) then
-            call mesa_error(__FILE__,__LINE__,'failed in interp1 for dlogK_dlogT')
-            return
-         end if
-         
+                 
+        ! unpack auto_diff pack into output reals
+        logK = logK_ad % val
+        dlogK_dlogT = logK_ad % d1val1
+        dlogK_dlogRho = logK_ad % d1val2
+
          if (dbg) then
          
             do i=1,n_old
@@ -542,15 +552,18 @@
          contains
          
          subroutine interp1(old, new, ierr)
-            real(dp), intent(in) :: old(n_old)
-            real(dp), intent(out) :: new
+            type(auto_diff_real_2var_order1), intent(in) :: old(n_old)
+            type(auto_diff_real_2var_order1), intent(out) :: new
             integer, intent(out) :: ierr
-            real(dp) :: v_old(n_old), v_new(n_new)
-            v_old(:) = dble(old(:))
-            call interpolate_vector( &
-                  n_old, x_old, n_new, x_new, v_old, v_new, interp_pm, pm_work_size, work, &
+            type(auto_diff_real_2var_order1) :: v_old(n_old), v_new(n_new)
+            integer :: i
+            do i = 1, n_old
+               v_old(i) = old(i)
+            end do
+            call interpolate_vector_autodiff( &
+                  n_old, x_old, n_new, x_new, v_old, v_new, interp_pm_autodiff, pm_work_size, work, &
                   'Get_Kap_for_CO_X_cubic', ierr)
-            new = real(v_new(1),kind=dp)
+            new = v_new(1)
          end subroutine interp1
       
       end subroutine Get_Kap_for_CO_X_cubic
