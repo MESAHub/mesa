@@ -271,6 +271,106 @@ module kh_instability
       end do
       
     end subroutine sams_lmat
+
+    subroutine richs_lmat(n, k_z, R0, Pr, tau, l_f, E_Psi, E_T, E_C, HB, DB, l)
+      integer, intent(in)      :: n
+      real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_T, E_C, HB, DB
+      complex(dp), intent(out) :: l((2*n+1)*4,(2*n+1)*4)
+  
+      integer  :: m, j, dim, i_p, i_p_p, i_p_m, i_t, i_t_p, &
+                  i_t_m, i_c, i_c_p, i_c_m, i_a, i_a_p, i_a_m
+      real(dp) :: k2_m, k2_m_p, k2_m_m
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
+
+      dim = (2*n+1)*4
+
+      l(:,:) = (0.0_dp, 0.0_dp)
+
+      do m = -n, n
+         ! Set up block indices
+         i_p = 4*(m + n)
+         i_p_p = i_p + 4
+         i_p_m = i_p - 4
+
+         i_t = i_p + 1
+         i_t_p = i_t + 4
+         i_t_m = i_t - 4
+
+         i_c = i_t + 1
+         i_c_p = i_c + 4
+         i_c_m = i_c - 4
+
+         i_a = i_c + 1
+         i_a_p = i_a + 4
+         i_a_m = i_a - 4
+
+         ! Evaluate wavenumbers
+         k2_m = pow2(m*l_f) + pow2(k_z)
+         k2_m_p = pow2((m + 1)*l_f) + pow2(k_z)
+         k2_m_m = pow2((m - 1)*l_f) + pow2(k_z)
+         
+         ! Set matrix elements
+         
+         ! Start with psi_m row
+         ! psi_m column
+         l(i_p, i_p) = -Pr * k2_m
+         ! T_m column
+         l(i_p, i_t) = -j_imag * Pr * m * l_f / k2_m
+         ! C_m column
+         l(i_p, i_c) = j_imag * Pr * m * l_f / k2_m
+         ! A_m column
+         l(i_p, i_a) = j_imag * HB * k_z
+
+         if (m > -n) then
+            ! psi_{m-1} column
+            l(i_p, i_p_m) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_m / k2_m
+         end if
+
+         if (m < n) then
+            ! psi_{m+1} column
+            l(i_p, i_p_p) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_p / k2_m
+         end if
+
+         ! T_m row
+         l(i_t, i_p) = -j_imag * m * l_f
+         l(i_t, i_t) = -k2_m
+
+         if (m > -n) then
+            l(i_t, i_p_m) = -l_f * k_z * E_T
+            l(i_t, i_t_m) = -j_imag * l_f * k_z * E_psi
+         end if
+         if (m < n) then
+            l(i_t, i_p_p) = l_f * k_z * E_T
+            l(i_t, i_t_p) = -j_imag * l_f * k_z * E_psi
+         end if
+
+         ! C_m row
+         l(i_c, i_p) = -j_imag * m * l_f / R0
+         l(i_c, i_c) = -tau * k2_m
+
+         if (m > -n) then
+            l(i_c, i_p_m) = -l_f * k_z * E_C
+            l(i_c, i_c_m) = -j_imag * l_f * k_z * E_psi
+         end if
+         if (m < n) then
+            l(i_c, i_p_p) = l_f * k_z * E_C
+            l(i_c, i_c_p) = -j_imag * l_f * k_z * E_psi
+         end if
+
+         ! A_m row
+         l(i_a, i_p) = j_imag * k_z
+         l(i_a, i_a) = -DB * k2_m
+
+         if (m > -n) then
+            l(i_a, i_a_m) = -j_imag * l_f * k_z * E_psi
+         end if
+         if (m < n) then
+            l(i_a, i_a_p) = -j_imag * l_f * k_z * E_psi
+         end if
+      
+      end do
+      
+    end subroutine richs_lmat
     
     
     function gamfromL(L, N, return_maxreal, withmode) result(gam)
@@ -360,7 +460,8 @@ module kh_instability
       do i = 1, size(ks)
          kz = ks(i)*lhat
          ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
-         call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
+         ! call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
+         call richs_lmat(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
          gamk(i) = gamfromL(l_result,4*n,.true.)
       end do
   
