@@ -288,7 +288,7 @@ module kh_instability
 
       do m = -n, n
          ! Set up block indices
-         i_p = 4*(m + n)
+         i_p = 4*(m + n) + 1
          i_p_p = i_p + 4
          i_p_m = i_p - 4
 
