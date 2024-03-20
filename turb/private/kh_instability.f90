@@ -854,7 +854,7 @@ module kh_instability
       ! first, set up the 0th row, corresponding to C_0
       l(1, 1) = -tau * pow2(k_z)
       l(1, 2) = l_f * k_z * E_C
-      l(1, 4) = -j_imag * l_f * k_z * E_psi
+      l(1, 3) = -j_imag * l_f * k_z * E_psi
 
       ! next, the psi_1- row
       k2_1 = pow2(l_f) + pow2(k_z)
