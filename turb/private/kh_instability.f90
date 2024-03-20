@@ -702,7 +702,7 @@ module kh_instability
       ! to remove the T equation
       integer, intent(in)      :: n
       real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_C, HB, DB
-      complex(dp), intent(out) :: l(3*n + 2,3*n + 2)
+      complex(dp), intent(out) :: l(3*n + 2, 3*n + 2)
   
       integer  :: m, j, dim, i_p, i_p_p, i_p_m, &
                   i_c, i_c_p, i_c_m, i_a, i_a_p, i_a_m
@@ -771,7 +771,7 @@ module kh_instability
       if (n > 1) then
          do m = 2, n
             ! Set up block indices
-            i_p = 3*m - 1
+            i_p = 3*m
             i_p_p = i_p + 3
             i_p_m = i_p - 3
 
@@ -835,7 +835,7 @@ module kh_instability
       ! to remove the T equation
       integer, intent(in)      :: n
       real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_C, HB, DB
-      complex(dp), intent(out) :: l(3*n + 1,3*n + 1)
+      complex(dp), intent(out) :: l(3*n + 1, 3*n + 1)
   
       integer  :: m, j, dim, i_p, i_p_p, i_p_m, &
                   i_c, i_c_p, i_c_m, i_a, i_a_p, i_a_m
