@@ -695,6 +695,266 @@ module kh_instability
       end if
       
     end subroutine lmat_block_b
+
+
+    subroutine lmat_block_a_LPN(n, k_z, R0, Pr, tau, l_f, E_Psi, E_C, HB, DB, l)
+      ! same as lmat_block_a above, but implements the low peclet number limit
+      ! to remove the T equation
+      integer, intent(in)      :: n
+      real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_C, HB, DB
+      complex(dp), intent(out) :: l(3*n + 2,3*n + 2)
+  
+      integer  :: m, j, dim, i_p, i_p_p, i_p_m, &
+                  i_c, i_c_p, i_c_m, i_a, i_a_p, i_a_m
+      real(dp) :: k2_m, k2_m_p, k2_m_m, k2_1, k2_2
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
+
+      dim = 3*n + 2
+
+      l(:,:) = (0.0_dp, 0.0_dp)
+
+      ! The basis ordering is: psi_0, A_0, psi_1+, C_1-, A_1+, psi_2+, C_2-, ...
+
+      ! The m=0 and 1 cases are a little funny. While they can be implemented in 
+      ! the loop over m, I find it easier to set them up here first, separately.
+      
+      ! first, set up the 0th row, corresponding to psi_0
+      k2_1 = pow2(l_f) + pow2(k_z)
+      l(1, 1) = -Pr * pow2(k_z)
+      l(1, 2) = j_imag * HB * k_z
+      l(1, 3) = j_imag * (l_f/k_z) * E_psi * (pow2(l_f) - k2_1)
+      ! next, the 1st row, corresponding to A_0
+      l(2, 1) = j_imag * k_z
+      l(2, 2) = -DB * pow2(k_z)
+      l(2, 5) = -j_imag * l_f * k_z * E_psi
+
+      ! next, the psi_1+ row
+      k2_2 = 4 * pow2(l_f) + pow2(k_z)
+      ! psi_1+ equation:
+      l(3, 1) = 2*j_imag * (l_f * k_z / k2_1) * E_psi * (pow2(l_f) - pow2(k_z))
+      l(3, 3) = -Pr * (k2_1 + pow2(l_f / k2_1))
+      if (n > 1) then
+         ! coupling to psi_2+
+         l(3, 6) = j_imag * (l_f * k_z / k2_1) * E_psi * (pow2(l_f) - k2_2)
+      end if
+      ! coupling to C_1-
+      l(3, 4) = j_imag * Pr * (l_f / k2_1)
+      ! coupling to A_1+
+      l(3, 5) = j_imag * HB * k_z
+
+      ! C_1- equation:
+      ! coupling to psi_0
+      l(4, 1) = -2 * l_f * k_z * E_C
+      ! coupling to psi_1+
+      l(4, 3) = -j_imag * l_f / R0
+      ! coupling to C_1-:
+      l(4, 4) = -tau * k2_1
+      if (n > 1) then
+         ! coupling to psi_2+:
+         l(4, 6) = l_f * k_z * E_C
+         ! coupling to C_2-:
+         l(4, 7) = -j_imag * l_f * k_z * E_psi
+      end if
+
+      ! A_1+ equation:
+      ! A_0
+      l(5, 2) = -2 * j_imag * l_f * k_z * E_psi
+      ! psi_1+
+      l(5, 3) = j_imag * k_z
+      ! A_1+:
+      l(5, 5) = -DB * k2_1
+      if (n > 1) then
+         ! A_2+:
+         l(5, 8) = -j_imag * l_f * k_z * E_psi
+      end if
+      
+      if (n > 1) then
+         do m = 2, n
+            ! Set up block indices
+            i_p = 3*m - 1
+            i_p_p = i_p + 3
+            i_p_m = i_p - 3
+
+            i_c = i_p + 1
+            i_c_p = i_c + 3
+            i_c_m = i_c - 3
+
+            i_a = i_c + 1
+            i_a_p = i_a + 3
+            i_a_m = i_a - 3
+
+            ! Evaluate wavenumbers
+            k2_m = pow2(m*l_f) + pow2(k_z)
+            k2_m_p = pow2((m + 1)*l_f) + pow2(k_z)
+            k2_m_m = pow2((m - 1)*l_f) + pow2(k_z)
+            
+            ! Set matrix elements
+            
+            ! Start with psi_m row
+            ! psi_m column
+            l(i_p, i_p) = -Pr * (k2_m + pow2(m * l_f / k2_m))
+            ! C_m column
+            l(i_p, i_c) = j_imag * Pr * m * l_f / k2_m
+            ! A_m column
+            l(i_p, i_a) = j_imag * HB * k_z
+            ! psi_{m-1} column
+            ! l(i_p, i_p_m) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_m / k2_m
+            l(i_p, i_p_m) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_m)
+            if (m < n) then
+               ! psi_{m+1} column
+               ! l(i_p, i_p_p) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_p / k2_m
+               l(i_p, i_p_p) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_p)
+            end if
+
+            ! C_m row
+            l(i_c, i_p) = -j_imag * m * l_f / R0
+            l(i_c, i_c) = -tau * k2_m
+            l(i_c, i_p_m) = -l_f * k_z * E_C
+            l(i_c, i_c_m) = -j_imag * l_f * k_z * E_psi
+            if (m < n) then
+               l(i_c, i_p_p) = l_f * k_z * E_C
+               l(i_c, i_c_p) = -j_imag * l_f * k_z * E_psi
+            end if
+
+            ! A_m row
+            l(i_a, i_p) = j_imag * k_z
+            l(i_a, i_a) = -DB * k2_m
+            l(i_a, i_a_m) = -j_imag * l_f * k_z * E_psi
+            if (m < n) then
+               l(i_a, i_a_p) = -j_imag * l_f * k_z * E_psi
+            end if
+         
+         end do
+      end if
+      
+    end subroutine lmat_block_a_LPN
+
+
+    subroutine lmat_block_b_LPN(n, k_z, R0, Pr, tau, l_f, E_Psi, E_C, HB, DB, l)
+      ! same as lmat_block_b above, but implements the low peclet number limit
+      ! to remove the T equation
+      integer, intent(in)      :: n
+      real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_C, HB, DB
+      complex(dp), intent(out) :: l(3*n + 1,3*n + 1)
+  
+      integer  :: m, j, dim, i_p, i_p_p, i_p_m, &
+                  i_c, i_c_p, i_c_m, i_a, i_a_p, i_a_m
+      real(dp) :: k2_m, k2_m_p, k2_m_m, k2_1, k2_2
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
+
+      dim = 3*n + 1
+
+      l(:,:) = (0.0_dp, 0.0_dp)
+
+      ! The basis ordering is: C_0, psi_1-, C_1+, A_1-, psi_2-, C_2+, ...
+
+      ! The m=0 and 1 cases are a little funny. While they can be implemented in 
+      ! the loop over m, I find it easier to set them up here first, separately.
+      
+      ! first, set up the 0th row, corresponding to C_0
+      l(1, 1) = -tau * pow2(k_z)
+      l(1, 2) = l_f * k_z * E_C
+      l(1, 4) = -j_imag * l_f * k_z * E_psi
+
+      ! next, the psi_1- row
+      k2_1 = pow2(l_f) + pow2(k_z)
+      k2_2 = 4 * pow2(l_f) + pow2(k_z)
+      ! psi_1- equation:
+      l(2, 2) = -Pr * (k2_1 + pow2(l_f / k2_1))
+      if (n > 1) then
+         ! coupling to psi_2-
+         l(2, 5) = j_imag * (l_f * k_z / k2_1) * E_psi * (pow2(l_f) - k2_2)
+      end if
+      ! coupling to C_1+
+      l(2, 3) = j_imag * Pr * (l_f / k2_1)
+      ! coupling to A_1-
+      l(2, 4) = j_imag * HB * k_z
+
+      ! C_1+ equation:
+      ! coupling to C_0
+      l(3, 1) = -2 * j_imag * l_f * k_z * E_psi
+      ! coupling to psi_1-
+      l(3, 2) = -j_imag * l_f / R0
+      ! coupling to C_1+:
+      l(3, 3) = -tau * k2_1
+      if (n > 1) then
+         ! coupling to psi_2-:
+         l(3, 5) = l_f * k_z * E_C
+         ! coupling to C_2+:
+         l(3, 6) = -j_imag * l_f * k_z * E_psi
+      end if
+
+      ! A_1- equation:
+      ! psi_1-
+      l(4, 2) = j_imag * k_z
+      ! A_1-:
+      l(4, 4) = -DB * k2_1
+      if (n > 1) then
+         ! A_2-:
+         l(4, 7) = -j_imag * l_f * k_z * E_psi
+      end if
+      
+      ! the rest of the matrix is identical to the other sub-block
+      if (n > 1) then
+         do m = 2, n
+            ! Set up block indices
+            i_p = 3*m - 1
+            i_p_p = i_p + 3
+            i_p_m = i_p - 3
+
+            i_c = i_p + 1
+            i_c_p = i_c + 3
+            i_c_m = i_c - 3
+
+            i_a = i_c + 1
+            i_a_p = i_a + 3
+            i_a_m = i_a - 3
+
+            ! Evaluate wavenumbers
+            k2_m = pow2(m*l_f) + pow2(k_z)
+            k2_m_p = pow2((m + 1)*l_f) + pow2(k_z)
+            k2_m_m = pow2((m - 1)*l_f) + pow2(k_z)
+            
+            ! Set matrix elements
+            
+            ! Start with psi_m row
+            ! psi_m column
+            l(i_p, i_p) = -Pr * (k2_m + pow2(m * l_f / k2_m))
+            ! C_m column
+            l(i_p, i_c) = j_imag * Pr * m * l_f / k2_m
+            ! A_m column
+            l(i_p, i_a) = j_imag * HB * k_z
+            ! psi_{m-1} column
+            ! l(i_p, i_p_m) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_m / k2_m
+            l(i_p, i_p_m) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_m)
+            if (m < n) then
+               ! psi_{m+1} column
+               ! l(i_p, i_p_p) = j_imag * pow3(l_f) * k_z * E_psi / k2_m - j_imag * l_f * k_z * E_psi * k2_m_p / k2_m
+               l(i_p, i_p_p) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_p)
+            end if
+
+            ! C_m row
+            l(i_c, i_p) = -j_imag * m * l_f / R0
+            l(i_c, i_c) = -tau * k2_m
+            l(i_c, i_p_m) = -l_f * k_z * E_C
+            l(i_c, i_c_m) = -j_imag * l_f * k_z * E_psi
+            if (m < n) then
+               l(i_c, i_p_p) = l_f * k_z * E_C
+               l(i_c, i_c_p) = -j_imag * l_f * k_z * E_psi
+            end if
+
+            ! A_m row
+            l(i_a, i_p) = j_imag * k_z
+            l(i_a, i_a) = -DB * k2_m
+            l(i_a, i_a_m) = -j_imag * l_f * k_z * E_psi
+            if (m < n) then
+               l(i_a, i_a_p) = -j_imag * l_f * k_z * E_psi
+            end if
+         
+         end do
+      end if
+      
+    end subroutine lmat_block_b_LPN
     
     
     function gamfromL(L, N, return_maxreal, withmode) result(gam)
@@ -771,10 +1031,14 @@ module kh_instability
       integer, intent(in) :: n
   
       ! complex(dp) :: l_result(4*n,4*n)
-      complex(dp) :: l_result(2*n,2*n)  ! each block is half the size of the original matrix
+      ! complex(dp) :: l_result(2*n,2*n)  ! each block is half the size of the original matrix
       real(dp) :: gamk(size(ks))
       real(dp) :: kz, l2hat, A_psi, A_T, A_C, gam_a, gam_b
       integer :: i, n_Sam, ierr
+      ! Now the two blocks have two different sizes; if this is ugly, could just be ok with one
+      ! matrix having an extra row and column of zeroes
+      ! complex(dp) :: l_result_a(3*n_Sam+2, 3*n_Sam+2), l_result_b(3*n_Sam+1, 3*n_Sam+1)
+      complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(3*((n-1)/2)+1, 3*((n-1)/2)+1)
 
       l2hat = pow2(lhat)
       
@@ -789,10 +1053,14 @@ module kh_instability
          ! call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
          ! call richs_lmat(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
          ! gamk(i) = gamfromL(l_result,4*n,.true.)
-         call lmat_block_a(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
-         gam_a = gamfromL(l_result, 2*n, .true.)
-         call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
-         gam_b = gamfromL(l_result, 2*n, .true.)
+         ! call lmat_block_a(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
+         ! gam_a = gamfromL(l_result, 2*n, .true.)
+         ! call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
+         ! gam_b = gamfromL(l_result, 2*n, .true.)
+         call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
+         gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
+         call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+         gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
          gamk(i) = MAX(gam_a, gam_b)
          
       end do
