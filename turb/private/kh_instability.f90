@@ -955,6 +955,105 @@ module kh_instability
       end if
       
     end subroutine lmat_block_b_LPN
+
+
+    subroutine lmat_block_b_LPN_QS(n, k_z, R0, Pr, tau, l_f, E_Psi, E_C, HB, DB, l)
+      ! same as lmat_block_b_LPN above, but implements the low magnetic Reynolds number
+      ! limit (AKA the quasistatic approximation/limit) to remove the A equation
+      integer, intent(in)      :: n
+      real(dp), intent(in)     :: k_z, R0, Pr, tau, l_f, E_psi, E_C, HB, DB
+      complex(dp), intent(out) :: l(2*n + 1, 2*n + 1)
+  
+      integer  :: m, j, dim, i_p, i_p_p, i_p_m, &
+                  i_c, i_c_p, i_c_m
+      real(dp) :: k2_m, k2_m_p, k2_m_m, k2_1, k2_2
+      complex(dp), parameter :: j_imag = (0d0,1d0) ! shorthand for imaginary unit
+
+      dim = 2*n + 1
+
+      l(:,:) = (0.0_dp, 0.0_dp)
+
+      ! The basis ordering is: C_0, psi_1-, C_1+, psi_2-, C_2+, ...
+
+      ! The m=0 and 1 cases are a little funny. While they can be implemented in 
+      ! the loop over m, I find it easier to set them up here first, separately.
+      
+      ! first, set up the 0th row, corresponding to C_0
+      l(1, 1) = -tau * pow2(k_z)
+      l(1, 2) = l_f * k_z * E_C
+      l(1, 3) = -j_imag * l_f * k_z * E_psi
+
+      ! next, the psi_1- row
+      k2_1 = pow2(l_f) + pow2(k_z)
+      k2_2 = 4 * pow2(l_f) + pow2(k_z)
+      ! psi_1- equation:
+      l(2, 2) = -Pr * (k2_1 + pow2(l_f / k2_1)) - (HB / DB) * pow2(k_z) / k2_1
+      if (n > 1) then
+         ! coupling to psi_2-
+         l(2, 4) = j_imag * (l_f * k_z / k2_1) * E_psi * (pow2(l_f) - k2_2)
+      end if
+      ! coupling to C_1+
+      l(2, 3) = j_imag * Pr * (l_f / k2_1)
+
+      ! C_1+ equation:
+      ! coupling to C_0
+      l(3, 1) = -2 * j_imag * l_f * k_z * E_psi
+      ! coupling to psi_1-
+      l(3, 2) = -j_imag * l_f / R0
+      ! coupling to C_1+:
+      l(3, 3) = -tau * k2_1
+      if (n > 1) then
+         ! coupling to psi_2-:
+         l(3, 4) = l_f * k_z * E_C
+         ! coupling to C_2+:
+         l(3, 5) = -j_imag * l_f * k_z * E_psi
+      end if
+      
+      ! the rest of the matrix
+      if (n > 1) then
+         do m = 2, n
+            ! Set up block indices
+            i_p = 2*m
+            i_p_p = i_p + 2
+            i_p_m = i_p - 2
+
+            i_c = i_p + 1
+            i_c_p = i_c + 2
+            i_c_m = i_c - 2
+
+            ! Evaluate wavenumbers
+            k2_m = pow2(m*l_f) + pow2(k_z)
+            k2_m_p = pow2((m + 1)*l_f) + pow2(k_z)
+            k2_m_m = pow2((m - 1)*l_f) + pow2(k_z)
+            
+            ! Set matrix elements
+            
+            ! Start with psi_m row
+            ! psi_m column
+            l(i_p, i_p) = -Pr * (k2_m + pow2(m * l_f / k2_m)) - (HB / DB) * pow2(k_z) / k2_m
+            ! C_m column
+            l(i_p, i_c) = j_imag * Pr * m * l_f / k2_m
+            ! psi_{m-1} column
+            l(i_p, i_p_m) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_m)
+            if (m < n) then
+               ! psi_{m+1} column
+               l(i_p, i_p_p) = j_imag * l_f * k_z * (E_psi / k2_m) * (pow2(l_f) - k2_m_p)
+            end if
+
+            ! C_m row
+            l(i_c, i_p) = -j_imag * m * l_f / R0
+            l(i_c, i_c) = -tau * k2_m
+            l(i_c, i_p_m) = -l_f * k_z * E_C
+            l(i_c, i_c_m) = -j_imag * l_f * k_z * E_psi
+            if (m < n) then
+               l(i_c, i_p_p) = l_f * k_z * E_C
+               l(i_c, i_c_p) = -j_imag * l_f * k_z * E_psi
+            end if
+         
+         end do
+      end if
+      
+    end subroutine lmat_block_b_LPN_QS
     
     
     function gamfromL(L, N, return_maxreal, withmode) result(gam)
@@ -1038,7 +1137,8 @@ module kh_instability
       ! Now the two blocks have two different sizes; if this is ugly, could just be ok with one
       ! matrix having an extra row and column of zeroes
       ! complex(dp) :: l_result_a(3*n_Sam+2, 3*n_Sam+2), l_result_b(3*n_Sam+1, 3*n_Sam+1)
-      complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(3*((n-1)/2)+1, 3*((n-1)/2)+1)
+      ! complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(3*((n-1)/2)+1, 3*((n-1)/2)+1)
+      complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(n, n)
 
       l2hat = pow2(lhat)
       
@@ -1059,8 +1159,10 @@ module kh_instability
          ! gam_b = gamfromL(l_result, 2*n, .true.)
          call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
          gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
-         call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
-         gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
+         ! call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+         ! gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
+         call lmat_block_b_LPN_QS(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+         gam_b = gamfromL(l_result_b, 2*n_Sam+1, .true.)
          gamk(i) = MAX(gam_a, gam_b)
          
       end do
