@@ -115,6 +115,7 @@ module turb
 
    subroutine calc_frg24_w(pr, tau, r0, hb, db, ks, n, w, withTC, safety, ierr, lamhat, l2hat)
      use parasite_model
+     use thermohaline, only: solve_hg19_eqn32
 
      real(dp), intent(in) :: pr, tau, r0, hb, db 
      real(dp), intent(in) :: ks(:)
@@ -130,13 +131,22 @@ module turb
      if (present(lamhat)) then
         ! lamhat and l2hat already calculated, so can pass as arguments
         if(withTC) then
-           w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety, lamhat, l2hat)
+           if (safety == 0) then
+             ! TODO: is it bad for this minimization to be occurring here AND in thermohaline.f90?
+             call solve_hg19_eqn32(hb, l2hat, lamhat, w, ierr)
+             w = MIN(w, wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety, lamhat, l2hat))
+           else
+             w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety, lamhat, l2hat)
+           end if
         else
            w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false., lamhat, l2hat)
         end if
      else
         ! lamhat and l2hat need to be calculated inside the wf routine
         if(withTC) then
+           if (safety == 0) then
+            stop "In turb.f90 calc_frg24_w, have not yet implemented safety=0 for case where lamhat, l2hat not already calculated"
+           end if
            w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety)
         else
            w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false.)
