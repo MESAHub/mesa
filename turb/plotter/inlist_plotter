@@ -15,6 +15,7 @@
 
   ! whether or not to include T&C terms for extended matrix of FRG24 model
   FRG_withTC = .true.
+  safety = 3  ! balance between accuracy and speed for FRG24 model, safety=0 is less accurate but faster, safety=3 (max) is accurate but slow
 
   !! Parameters for thermohaline calculations
   
