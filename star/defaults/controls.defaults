@@ -4048,57 +4048,20 @@
 
       ! ::
 
-    w_div_wcrit_max = 0.90d0
+    w_div_wcrit_max = 0.89d0
 
 
       ! w_div_wcrit_max2
       ! ~~~~~~~~~~~~~~~~
 
       ! When w_div_wc_flag is true, rather than a hard limit on w_div_wcrit
-      ! we use w_div_wcrit_max2<w_div_wcrit_max to provide a smooth transition.
+      ! we use w_div_wcrit_max<w_div_wcrit_max2 to provide a smooth transition.
       ! In the limit of j_rot->infinity, the resulting w_div_wc will match 
-      ! w_div_wcrit_max, while nothing is done when w_div_wcrit_max<w_div_wcrit_max2
+      ! w_div_wcrit_max2, while nothing is done when w_div_wcrit_max<w_div_wcrit_max
 
       ! ::
 
-    w_div_wcrit_max2 = 0.89d0
-
-
-      ! FP_min
-      ! ~~~~~~
-      ! FT_min
-      ! ~~~~~~
-
-      ! Lower limits for rotational distortion corrections factors FP and FT.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false., otherwise the
-      ! limits are set using w_div_wcrit_max
-
-      ! ::
-
-    FP_min = 0.75d0
-    FT_min = 0.95d0
-
-
-      ! FP_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an fp < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FP_error_limit = 0d0
-
-
-      ! FT_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an ft < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FT_error_limit = 0d0
+    w_div_wcrit_max2 = 0.90d0
 
 
       ! D_mix_rotation_max_logT_full_on
