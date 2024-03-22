@@ -1124,10 +1124,10 @@ module kh_instability
   
     end function gamma_over_k
 
-    function gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n) result(gamk)
+    function gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, safety) result(gamk)
       real(dp), intent(in) :: w, hb, db, pr, tau, R0, lamhat, lhat
       real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n
+      integer, intent(in) :: n, safety
   
       ! complex(dp) :: l_result(4*n,4*n)
       ! complex(dp) :: l_result(2*n,2*n)  ! each block is half the size of the original matrix
@@ -1138,34 +1138,85 @@ module kh_instability
       ! matrix having an extra row and column of zeroes
       ! complex(dp) :: l_result_a(3*n_Sam+2, 3*n_Sam+2), l_result_b(3*n_Sam+1, 3*n_Sam+1)
       ! complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(3*((n-1)/2)+1, 3*((n-1)/2)+1)
-      complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(n, n)
+      ! complex(dp) :: l_result_a(3*((n-1)/2)+2, 3*((n-1)/2)+2), l_result_b(n, n)
+      
+      ! TODO: Evan, can you tell me what the reasonable thing to do here is? l_result's size depends on 
+      ! the value of safety, so we could either make it a dynamic array as I've done here, or make it
+      ! so each choice of "safety" calls a different equivalent of "gamma_over_k_withTC", where the
+      ! appropriate size of l_result is declared
+      complex(dp), allocatable :: l_result_a(:, :), l_result_b(:, :)
+
+      n_Sam = (n-1)/2  ! Sam's definition of n is different than Adrian's
+
+      if (safety == 0) then
+         allocate(l_result_b(n, n))
+         ! and no need to allocate l_result_a
+      elseif (safety == 1) then
+         allocate(l_result_a(3*n_Sam+2, 3*n_Sam+2))
+         allocate(l_result_b(n, n))
+      elseif (safety == 2) then
+         allocate(l_result_a(3*n_Sam+2, 3*n_Sam+2))
+         allocate(l_result_b(3*n_Sam+1, 3*n_Sam+1))
+      elseif (safety == 3) then
+         allocate(l_result_a(2*n, 2*n))
+         ! and no need to allocate l_result_b: we can just reuse this array
+      end if  ! TODO: there should be an "ELSE" statement here raising an error if safety isn't one of these values
+
 
       l2hat = pow2(lhat)
       
       A_psi = w / (2*lhat)
       A_T = -lhat * A_psi / (lamhat + l2hat)
       A_C = -lhat * A_psi / (R0 * (lamhat + tau * l2hat))
-      n_Sam = (n-1)/2  ! Sam's definition of n is different than Adrian's
 
       do i = 1, size(ks)
          kz = ks(i)*lhat
-         ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
-         ! call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
-         ! call richs_lmat(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
-         ! gamk(i) = gamfromL(l_result,4*n,.true.)
-         ! call lmat_block_a(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
-         ! gam_a = gamfromL(l_result, 2*n, .true.)
-         ! call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
-         ! gam_b = gamfromL(l_result, 2*n, .true.)
-         call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
-         gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
-         ! call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
-         ! gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
-         call lmat_block_b_LPN_QS(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
-         gam_b = gamfromL(l_result_b, 2*n_Sam+1, .true.)
-         gamk(i) = MAX(gam_a, gam_b)
+         if (safety == 0) then
+            call lmat_block_b_LPN_QS(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+            gamk(i) = gamfromL(l_result_b, n, .true.)
+         elseif (safety == 1) then
+            call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
+            gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
+            call lmat_block_b_LPN_QS(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+            gam_b = gamfromL(l_result_b, n, .true.)
+            gamk(i) = MAX(gam_a, gam_b)
+         elseif (safety == 2) then
+            call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
+            gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
+            call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+            gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
+            gamk(i) = MAX(gam_a, gam_b)
+         elseif (safety == 3) then
+            call lmat_block_a(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result_a)
+            gam_a = gamfromL(l_result_a, 2*n, .true.)
+            call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result_a)
+            gam_b = gamfromL(l_result_a, 2*n, .true.)
+            gamk(i) = MAX(gam_a, gam_b)
+         end if
+         ! ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
+         ! ! call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
+         ! ! call richs_lmat(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
+         ! ! gamk(i) = gamfromL(l_result,4*n,.true.)
+         ! ! call lmat_block_a(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
+         ! ! gam_a = gamfromL(l_result, 2*n, .true.)
+         ! ! call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result)
+         ! ! gam_b = gamfromL(l_result, 2*n, .true.)
+         ! call lmat_block_a_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_a)
+         ! gam_a = gamfromL(l_result_a, 3*n_Sam+2, .true.)
+         ! ! call lmat_block_b_LPN(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+         ! ! gam_b = gamfromL(l_result_b, 3*n_Sam+1, .true.)
+         ! call lmat_block_b_LPN_QS(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_C, hb, db, l_result_b)
+         ! gam_b = gamfromL(l_result_b, 2*n_Sam+1, .true.)
+         ! gamk(i) = MAX(gam_a, gam_b)
          
       end do
+
+      if (safety > 0) then
+         deallocate(l_result_a)
+      end if
+      if (safety < 3) then
+         deallocate(l_result_b)
+      end if
   
     end function gamma_over_k_withTC
 
@@ -1193,17 +1244,17 @@ module kh_instability
   
     end function gammax_kscan
 
-   function gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception) result(gammax)
+   function gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception, safety) result(gammax)
       real(dp), intent(in) :: w, hb, db, pr, tau, R0, lamhat, lhat
       real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n
+      integer, intent(in) :: n, safety
       logical, intent(in) :: badks_exception
   
       real(dp) :: gammax
       real(dp) :: gamk(size(ks))
       integer :: i
   
-      gamk = gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n)
+      gamk = gamma_over_k_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, safety)
       i = maxloc(gamk,1)
       gammax = gamk(i)
   
@@ -1345,17 +1396,17 @@ module kh_instability
       
         end function gammax_minus_lambda
 
-        function gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, R0, db, ks, n, badks_exception) result(f)
+        function gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, R0, db, ks, n, badks_exception, safety) result(f)
       
           ! Root finding helper function
       
           real(dp), intent(in) :: w, lamhat, lhat, hb, pr, tau, R0, db
           real(dp), intent(in) :: ks(:)
-          integer, intent(in) :: n
+          integer, intent(in) :: n, safety
           logical, intent(in) :: badks_exception
           real(dp) :: gammax, f
 
-          gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception)
+          gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, badks_exception, safety)
           f = gammax*C2 - lamhat
 
         end function gammax_minus_lambda_withTC
