@@ -143,6 +143,7 @@ module parasite_model
       !  would require knowing a priori what constitutes "large R0")
       ! safety = 2: low-tau limit
       ! safety = 3 (max): use full model (I don't think this option will ever be needed since tau is always tiny)
+      ! safety = 4 (actual max for now while debugging): use the original implementation; gives same answers as safety=3 but needlessly slower
   
       real(dp), intent(in) :: pr, tau, r0, hb, db 
       real(dp), intent(in) :: ks(:)

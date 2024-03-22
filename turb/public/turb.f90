@@ -144,7 +144,7 @@ module turb
      else
         ! lamhat and l2hat need to be calculated inside the wf routine
         if(withTC) then
-           if (safety == 0) then
+           if (safety == 0) then  ! TODO: fix this
             stop "In turb.f90 calc_frg24_w, have not yet implemented safety=0 for case where lamhat, l2hat not already calculated"
            end if
            w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety)

@@ -1160,6 +1160,8 @@ module kh_instability
       elseif (safety == 3) then
          allocate(l_result_a(2*n, 2*n))
          ! and no need to allocate l_result_b: we can just reuse this array
+      elseif (safety == 4) then
+         allocate(l_result_a(4*n, 4*n))
       end if  ! TODO: there should be an "ELSE" statement here raising an error if safety isn't one of these values
 
 
@@ -1192,6 +1194,9 @@ module kh_instability
             call lmat_block_b(n_Sam, kz, R0, pr, tau, lhat, A_Psi, A_T, A_C, hb, db, l_result_a)
             gam_b = gamfromL(l_result_a, 2*n, .true.)
             gamk(i) = MAX(gam_a, gam_b)
+         elseif (safety == 4) then
+            call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result_a)
+            gamk(i) = gamfromL(l_result_a,4*n,.true.)
          end if
          ! ! sams_lmat has dimension (2*n_sam+1)*4 = 4*n
          ! ! call sams_lmat(n_Sam, 0d0, lhat, kz, A_Psi, A_T, A_C, pr, tau, R0, pr/db, hb, l_result)
