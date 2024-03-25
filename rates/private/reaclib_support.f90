@@ -226,22 +226,31 @@
 
             ! see equation 21 in Reichert et al. 2023 (https://doi.org/10.3847/1538-4365/acf033)
             ! delta_reactants/delta_products is handled in net.
-            ! This should be 0 for non-photo-disintegration reverse rates and 1 for photos's in the reverse channel
+            ! fac == (mu * kb * T / (2 * pi * hbar^2))^3/2 term with out a T^3/2.
+            ! fac shows up as fac^(Ni-No) in rates% inverse_coefficients(1,i)
+            ! so rates% inverse_coefficients(1,i) before being the log is contains the
+            ! terms for fac^(n) == fac^(Ni-No), where n = Ni - No.
+ 
+            ! the T makes its way back in the subroutine compute_some_inverse_lambdas, inside reaclib_eval.
+            ! It appears in log form as 1.5d0*rates% inverse_exp(i)*lnT9, where,
+            ! rates% inverse_exp(i) = Ni-No, so,
+            ! 1.5d0*rates% inverse_exp(i)*lnT9 == ln(T^(3n/2)), where n = Ni-No.
+            rates% inverse_exp(i) = Ni - No ! We us this term in a log() expression in reaclib_eval
+
+            ! Ni-No should be 0 for non-photo-disintegration reverse rates and >=1 for photos's in the reverse channel
             if (Ni-No .ne. 0) then
-               rates% inverse_exp(i) = 1
-               if(rates% inverse_coefficients(2,i)<0) then
-                  ! negative values denote endothermic photodisintegrations
-                  ! We want rate_photo/rate_forward
-                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
-               else
-                  ! positive values denote exothermic photodisintegrations
-                  ! We divide by fac and invert the T^3/2 as we want to compute
-                  ! rate_reverse/rate_photo
-                  rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
-                  rates% inverse_exp(i) = -1 ! We us this term in a log() expression
-               end if
-            else
-               rates% inverse_exp(i) = 0
+               ! whether endothermic or exothermic, Ni-No handles the sign of Q from rates% inverse_coefficients(2,i)
+               rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
+               ! negative values of Q denote endothermic photodisintegrations
+               ! We multiply by fac^|Ni-No| as we want to compute
+               ! rate_photo/rate_forward
+
+               ! positive values of Q denote exothermic photodisintegrations
+               ! We DIVIDE by fac^|Ni-No| as we want to compute
+               ! rate_reverse/rate_photo
+            else ! Ni - No = 0
+               rates% inverse_exp(i) = 0 ! ensure this is 0.
+               rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) ! no point calling pow(fac,0)
             end if
             rates% inverse_coefficients(1,i) = log(rates% inverse_coefficients(1,i))
 

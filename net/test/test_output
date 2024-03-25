@@ -105,12 +105,12 @@
                                 log temp         9.600000000
                                  log rho         6.000000000
 
-                            log(eps_nuc)        24.177999299
+                            log(eps_nuc)        24.177999295
 
-                                 eps_nuc     0.150660463E+25
+                                 eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.253423821
-                          d_lneps_dlnRho         1.008418059
+                            d_lneps_dlnT        -0.253424018
+                          d_lneps_dlnRho         1.008418067
 
 
  energy generation by category
@@ -118,7 +118,7 @@
                                 category   log rate (erg/g/sec)
 
                                 fe_co_ni        24.177953   0.150644E+25
-                                   photo        20.161503   0.145045E+21
+                                   photo        20.161465   0.145032E+21
                                  s_alpha        18.844132   0.698444E+19
                                 si_alpha        18.653887   0.450699E+19
                                 ar_alpha        18.392651   0.246974E+19
@@ -147,12 +147,12 @@
                                 log temp         9.600000000
                                  log rho         6.000000000
 
-                            log(eps_nuc)        24.177999299
+                            log(eps_nuc)        24.177999295
 
-                                 eps_nuc     0.150660463E+25
+                                 eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.253423821
-                          d_lneps_dlnRho         1.008418059
+                            d_lneps_dlnT        -0.253424018
+                          d_lneps_dlnRho         1.008418067
 
 
  energy generation by category
@@ -160,7 +160,7 @@
                                 category   log rate (erg/g/sec)
 
                                 fe_co_ni        24.177953   0.150644E+25
-                                   photo        20.161503   0.145045E+21
+                                   photo        20.161465   0.145032E+21
                                  s_alpha        18.844132   0.698444E+19
                                 si_alpha        18.653887   0.450699E+19
                                 ar_alpha        18.392651   0.246974E+19
@@ -203,11 +203,11 @@
  test_one_zone_burn_const_P
                                       number of species          21
                                  large final abundances    1.0000000000000000D-02
-                                                    o16           1    7.1912341184973860D-01
-                                                   si28           2    1.6156653202056090D-01
-                                                    s32           3    5.9901160297285490D-02
-                                                   ar36           4    2.9148489383661574D-02
-                                                   ca40           5    1.6055974886422349D-02
+                                                    o16           1    7.1798810044269901D-01
+                                                   si28           2    1.6142410416068431D-01
+                                                    s32           3    6.0439378324441878D-02
+                                                   ar36           4    2.9692711889885499D-02
+                                                   ca40           5    1.6560528697491497D-02
 
                                                    xsum    1.0000000000000000D+00
 
