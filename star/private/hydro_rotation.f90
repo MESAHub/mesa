@@ -642,7 +642,7 @@
          do j=1, s% nz
             ! Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
             ! by this point in the code, w_div_w_crit_roche is set
-            w = s% w_div_w_crit_roche(j)
+            w = abs(s% w_div_w_crit_roche(j))
             w% d1val1 = 1d0
 
             w2 = pow2(w)
@@ -701,7 +701,7 @@
             i_rot% d1Array(i_lnR_00) = 2d0 * i_rot% val
             i_rot% d1Array(i_w_div_wc_00) = 0d0
          else
-            w = w_div_w_crit_roche
+            w = abs(w_div_w_crit_roche)
             w% d1val1 = 1d0
 
             r = r00
