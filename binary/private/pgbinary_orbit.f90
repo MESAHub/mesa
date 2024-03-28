@@ -203,6 +203,9 @@ contains
             y2s_RL(2 * num_points + 1) = y2s_RL(1)
             x2max = maxval(abs(x2s_RL))
             xmax = max(x2max, xmax)
+         else
+            x2s_RL = 0d0
+            y2s_RL = 0d0
          end if
       else if (b% pg% Orbit_show_RL .and. abs(log10(q)) > 2) then
          write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
