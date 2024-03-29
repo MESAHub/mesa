@@ -96,7 +96,7 @@ contains
 
        criteria_loop : do j = 1, NUM_PREDICTIVE_PARAM_SETS
 
-          if (.NOT. s%predictive_mix(j)) cycle criteria_loop
+          if (.NOT. s% predictive_mix(j)) cycle criteria_loop
 
           ! Check if the criteria match the current boundary
 
@@ -170,8 +170,13 @@ contains
 
           ! Perform the predictive mixing for this boundary
 
-          if (s%do_conv_premix) then
+          if (s% do_conv_premix) then
              call mesa_error(__FILE__,__LINE__,'Predictive mixing and convective premixing cannot be enabled at the same time')
+             stop
+          end if
+
+          if (s% MLT_option == 'TDC') then
+             call mesa_error(__FILE__,__LINE__,'Predictive mixing and TDC cannot be enabled at the same time')
              stop
           end if
 
