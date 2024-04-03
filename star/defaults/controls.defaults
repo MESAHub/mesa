@@ -5597,6 +5597,7 @@
       ! ~~~~~~~~~~~~~~
 
       ! Maximum number of grid points allowed.
+      ! Only used if > 0.
 
       ! ::
 
