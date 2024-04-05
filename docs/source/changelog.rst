@@ -24,7 +24,8 @@ New Features
 Bug Fixes
 ---------
 
-
+MESA no longer produces a segmentation fault if it tries to increase
+the number of cells beyond ``max_allowed_nz``.
 
 
 Changes in r24.03.1
