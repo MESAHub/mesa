@@ -5597,6 +5597,7 @@
       ! ~~~~~~~~~~~~~~
 
       ! Maximum number of grid points allowed.
+      ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
 
       ! ::
 
