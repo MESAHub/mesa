@@ -411,7 +411,7 @@
                if (ierr /= 0) return
             end if
             nz_new = nz_new + 1
-            if (max_allowed_nz > 0 .and. nz_new > max_allowed_nz) then
+            if (nz_new > max_allowed_nz) then
                write(*,*) 'tried to increase number of mesh points beyond max allowed nz', max_allowed_nz
                ierr = -1
                return
@@ -868,7 +868,7 @@
                dq_sum = sum(dq_new(1:k_new))
 
                k_new = k_new + 1
-               if (max_allowed_nz > 0 .and. k_new > max_allowed_nz) then
+               if (k_new > max_allowed_nz) then
                   write(*,*) 'tried to increase number of mesh points beyond max allowed nz', max_allowed_nz
                   ierr = -1
                   return
