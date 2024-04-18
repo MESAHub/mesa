@@ -18,6 +18,8 @@ Backwards-incompatible changes
 New Features
 ------------
 
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
 
 .. _Bug Fixes main:
 
