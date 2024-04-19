@@ -3885,6 +3885,7 @@
          s% Nieuwenhuijzen_scaling_factor = 0d0
          s% Vink_scaling_factor = 0d0
          s% Dutch_scaling_factor = 0d0
+         s% Bjorklund_scaling_factor = 0d0
          s% use_other_wind = .false.
       end subroutine turn_off_winds
 
@@ -3944,7 +3945,7 @@
             steps_before_use_gold_tolerances, steps_before_use_gold2_tolerances
          real(dp) :: star_age, time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
             Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, Dutch_scaling_factor, &
-            van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
+            van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, Bjorklund_scaling_factor,&
             dxdt_nuc_factor, tol_correction_norm, tol_max_correction, warning_limit_for_max_residual, &
             tol_residual_norm1, tol_max_residual1, &
             tol_residual_norm2, tol_max_residual2, &
@@ -4164,6 +4165,7 @@
             Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
             Vink_scaling_factor = s% Vink_scaling_factor
             Dutch_scaling_factor = s% Dutch_scaling_factor
+            Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
             use_other_wind = s% use_other_wind
 
             num_retries = s% num_retries
@@ -4221,6 +4223,7 @@
             s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
             s% Vink_scaling_factor = Vink_scaling_factor
             s% Dutch_scaling_factor = Dutch_scaling_factor
+            s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
             s% use_other_wind = use_other_wind
             s% num_retries = num_retries
             s% star_age = star_age
