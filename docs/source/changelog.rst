@@ -18,13 +18,16 @@ Backwards-incompatible changes
 New Features
 ------------
 
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
 
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
 
-
+MESA no longer produces a segmentation fault if it tries to increase
+the number of cells beyond ``max_allowed_nz``.
 
 
 Changes in r24.03.1
