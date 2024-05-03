@@ -2971,11 +2971,11 @@
    Orbit_title = 'Orbit'
    Orbit_txt_scale_factor = 1.0
 
-      ! show the roche lobe sizes
+      ! show the star sizes
 
       ! ::
 
-   Orbit_show_RL = .true.
+   Orbit_show_stars = .true.
 
       ! file output
 
