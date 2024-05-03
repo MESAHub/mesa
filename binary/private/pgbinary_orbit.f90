@@ -131,9 +131,7 @@ contains
       xmax = max(x1max, x2max)
       
       q = b% m(2) / b% m(1)
-      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
-         call pgsci(clr_Goldenrod)
-         call pgpt1(x1s(1), y1s(1), -1)
+      if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          if (b% point_mass_i /= 1) then
             this_psi = Psi_fit(b% r(1) / b% separation, q)
             xl1 = xl1_fit(q)
@@ -167,6 +165,9 @@ contains
             y1s_RL(2 * num_points + 1) = y1s_RL(1)
             x1max = maxval(abs(x1s_RL))
             xmax = max(x1max, xmax)
+         else
+            x1s_RL = 0d0
+            y1s_RL = 0d0
          end if
          
          if (b% point_mass_i /= 2) then
@@ -207,7 +208,7 @@ contains
             x2s_RL = 0d0
             y2s_RL = 0d0
          end if
-      else if (b% pg% Orbit_show_RL .and. abs(log10(q)) > 2) then
+      else if (b% pg% Orbit_show_stars .and. abs(log10(q)) > 2) then
          write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
       end if
       
@@ -229,7 +230,7 @@ contains
       call pgslw(b% pg% pgbinary_lw / 2)
       call pgline(2 * num_points + 1, x2s, y2s)
       
-      if (b% pg% Orbit_show_RL .and. abs(log10(q)) <= 2) then
+      if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
          call pgsfs(3)
          call pgshs(45.0, 0.33, 0.0)
