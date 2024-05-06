@@ -24,7 +24,18 @@ New Features
 Bug Fixes
 ---------
 
+Rates
+~~~~~
 
+There has been a bug present in the rates module due to the incorrect
+phase space factors for reverse reaction rates involving greater than 2 reactants or 
+products. This bug resulted in inconsistent equillibrium compositions when the network
+evolves into nuclear statistical equillibrium (NSE), at temperatures exceeding 4 GK. 
+This bug effects users who evolve models into NSE using large reaction networks. This
+includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
+networks are less affected. We strongly recommend that users update to the latest MESA release.
+
+See `gh-575 <https://github.com/MESAHub/mesa/issues/575>`_
 
 
 Changes in r24.03.1

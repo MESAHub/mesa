@@ -236,7 +236,7 @@
             ! It appears in log form as 1.5d0*rates% inverse_exp(i)*lnT9, where,
             ! rates% inverse_exp(i) = Ni-No, so,
             ! 1.5d0*rates% inverse_exp(i)*lnT9 == ln(T^(3n/2)), where n = Ni-No.
-            rates% inverse_exp(i) = Ni - No ! We us this term in a log() expression in reaclib_eval
+            rates% inverse_exp(i) = Ni - No ! We use this term in a log() expression in reaclib_eval
 
             ! Ni-No should be 0 for non-photo-disintegration reverse rates
             ! and >=1 for photos's in the reverse channel
