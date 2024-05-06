@@ -18,6 +18,8 @@ Backwards-incompatible changes
 New Features
 ------------
 
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
 
 .. _Bug Fixes main:
 
@@ -36,6 +38,12 @@ includes evolving massive stars to core-collapse. Smaller networks such as the `
 networks are less affected. We strongly recommend that users update to the latest MESA release.
 
 See `gh-575 <https://github.com/MESAHub/mesa/issues/575>`_
+
+``max_allowed_nz``
+~~~~~~~~~~~~~~~~~~
+
+MESA no longer produces a segmentation fault if it tries to increase
+the number of cells beyond ``max_allowed_nz``.
 
 
 Changes in r24.03.1
