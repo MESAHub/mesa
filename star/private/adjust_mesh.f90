@@ -141,18 +141,6 @@
 
          s% mesh_call_number = s% mesh_call_number + 1
 
-         if (.not. associated(s% other_star_info)) then
-            allocate(s% other_star_info)
-            prv => s% other_star_info
-            c => null()
-         else
-            prv => s% other_star_info
-            c => copy_info
-            c = prv
-         end if
-
-         prv = s ! this makes copies of pointers and scalars
-
          sum_L_other = 0
          sum_L_other_limit = Lsun
          do j=1,num_categories
@@ -319,10 +307,22 @@
             call dealloc
             return
          end if
-         
+
          nz = nz_new
          s% nz = nz
          nvar = s% nvar_total
+
+         if (.not. associated(s% other_star_info)) then
+            allocate(s% other_star_info)
+            prv => s% other_star_info
+            c => null()
+         else
+            prv => s% other_star_info
+            c => copy_info
+            c = prv
+         end if
+
+         prv = s ! this makes copies of pointers and scalars
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)

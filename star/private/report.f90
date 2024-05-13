@@ -356,7 +356,7 @@
             s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
          else
             s% delta_nu = &
-               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
          
@@ -364,7 +364,7 @@
          if (failed('get_mass_info')) return
          
          s% nu_max = s% nu_max_sun*s% star_mass/ &
-            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
+            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% astero_Teff_sun))
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
@@ -404,10 +404,11 @@
             if (s% fe_core_mass > 0) then
                do k=1, nz
                   if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% m(k)
+                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
 
-               if(mass_sum > s% fe_core_infall_mass*msun) then
+               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
+                   (s%m(k_min) <= s%fe_core_mass*msun)) then
                   s% fe_core_infall = -velocity(k_min)
                end if
             end if
@@ -419,10 +420,11 @@
                do k=1, nz
                   if (s% m(k) > Msun * non_fe_core_mass) cycle
                   if (s% m(k) < Msun * s% fe_core_mass) exit
-                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% m(k)
+                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
    
-               if(mass_sum > s% non_fe_core_infall_mass*msun) then
+               if ((mass_sum > s% non_fe_core_infall_mass*msun) .and. &
+                   (s%m(k_min) <= s% he_core_mass * msun)) then
                   s% non_fe_core_infall = -velocity(k_min)
                end if
                
