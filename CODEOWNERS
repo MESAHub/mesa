@@ -24,10 +24,10 @@ linters/
 turb/ 
 math/ @rhdtownsend
 mtx/  @mjoyceGR
-net/ @fxt44
-neu/ @fxt44
+net/ @fxt44 @Debraheem
+neu/ @fxt44 @Debraheem
 num/ 
-rates/ @fxt44
+rates/ @fxt44 @Debraheem
 #star/
 #star_data/
 #stella/ 
