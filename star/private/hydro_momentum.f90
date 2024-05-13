@@ -563,6 +563,7 @@
          if (.not. (s% u_flag .or. s% v_flag)) call mesa_error(__FILE__,__LINE__,'must have either v or u for do1_radius_eqn')
          
          force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
+            (s% tau(k) < s% velocity_tau_lower_bound) .or. &
             (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &
                s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
          if (force_zero_v) then

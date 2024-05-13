@@ -11,7 +11,7 @@
       save_model_filename = 'late_pre_zams.mod'
       required_termination_code_string = 'max_age'
 
-      pgstar_flag = .false.
+      !pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -38,12 +38,20 @@
       trace_history_value_name(3) = 'rel_E_err'
       trace_history_value_name(4) = 'log_rel_run_E_err'
 
-      photo_interval = 50
-      profile_interval = 50
-      history_interval = 5
-      terminal_interval = 10
+       photo_interval         = 200!1000
+       photo_digits           = 8
+       profile_interval       = 100 
+       max_num_profile_models = 400000
+       history_interval       = 1
+       write_header_frequency = 10
+       terminal_interval      = 10
 
-      x_integer_ctrl(1) = 1 ! Inlist part
+      x_integer_ctrl(5) = 1 ! Inlist part number
 
 / ! end of controls namelist
+
+&pgstar
+
+
+/ ! end of pgstar namelist
 

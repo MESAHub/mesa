@@ -183,7 +183,7 @@ module ideal
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
       if(ierr/=0) return
       
-      res(i_mu) = 1d0 ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
+      res(i_mu) = abar ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
 
    end subroutine ideal_eos
 

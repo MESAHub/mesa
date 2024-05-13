@@ -32,6 +32,8 @@ plt.ylabel(r'Center $X$')
 
 plt.ylim(0.6965,0.6975)
 
+plt.tight_layout()
+
 plt.savefig('CenterXfrac.png',dpi=200)
 
 plt.clf()
@@ -43,5 +45,7 @@ plt.gca().invert_xaxis()
 
 plt.xlabel(r'$T_{\rm eff}$ [K]')
 plt.ylabel(r'$L$ [$L_\odot$]')
+
+plt.tight_layout()
 
 plt.savefig('HR.png',dpi=200)

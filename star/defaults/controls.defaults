@@ -857,16 +857,6 @@
     surface_avg_abundance_dq = 1d-8
 
 
-      ! mass_depth_for_L_surf
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! only if ``use_flux_limiting_with_dPrad_dm_form``
-
-      ! ::
-
-    mass_depth_for_L_surf = 0d0
-
-
       ! conv_core_gap_dq_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4173,7 +4163,8 @@
       ! ~~~~~~~~~~
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
-      ! setting up outer boundary conditions
+      ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
+      ! options might conflict with mlt_option = ``TDC``.
 
       ! + ``'T_tau'``: 
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
@@ -4198,6 +4189,27 @@
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !
+      ! + ``'fixed_Teff'`` : 
+      ! set Tsurf from Eddington T(tau) relation
+      !     for current surface tau and Teff = ``atm_fixed_Teff``.
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !
+      ! + ``'fixed_Tsurf'`` :
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
+      ! set Psurf = Radiation_Pressure(Tsurf)
+      !      
+      ! + ``'fixed_Psurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
+      ! set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
+      !
+      ! + ``'fixed_Psurf_and_Tsurf'`` :
+      ! get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      ! get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      ! see the ``conductive_flame`` test_suite for an example of 
+      ! this boundary condition implemented via the ``other_surface_PT`` hook.
 
       ! ::
 
@@ -4829,9 +4841,6 @@
     RGB_to_AGB_wind_switch = 1d-4
 
       ! The code will automatically choose between an RGB wind and an AGB wind.
-
-      ! ::
-
       ! The following names for the different schemes are recognized:
 
       ! + 'Reimers'
@@ -5588,6 +5597,7 @@
       ! ~~~~~~~~~~~~~~
 
       ! Maximum number of grid points allowed.
+      ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
 
       ! ::
 
@@ -7575,43 +7585,59 @@
 
       ! get_delta_nu_from_scaled_solar
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If ``get_delta_nu_from_scaled_solar`` is ``.false.``, the
+      ! large separation ``delta_nu`` is the inverse of the sound
+      ! crossing time from one side of the star to the other, through
+      ! the center.  This is sometimes called the "asymptotic" large
+      ! separation.
 
-      ! use scaled solar values
+      ! Otherwise, ``delta_nu`` is calculated from the asteroseismic
+      ! scaling relations (see `Ulrich 1986`_, `Brown et al. 1991`_
+      ! and `Kjeldsen & Bedding 1995`_) using solar reference values
+      ! ``nu_max_sun``, ``delta_nu_sun`` and ``astero_Teff_sun``.
+
+      ! ``nu_max`` is always computed from the scaling relation.
+
+      ! .. _Ulrich 1986: https://ui.adsabs.harvard.edu/abs/1986ApJ...306L..37U
+      ! .. _Brown et al. 1991:  https://ui.adsabs.harvard.edu/abs/1991ApJ...368..599B
+      ! .. _Kjeldsen & Bedding 1995: https://ui.adsabs.harvard.edu/abs/1995A%26A...293...87K
 
       ! ::
 
     get_delta_nu_from_scaled_solar = .false.
 
-
       ! nu_max_sun
       ! ~~~~~~~~~~
-
-      ! solar value of ``nu_max``
-
-      ! ::
-
-    nu_max_sun = 3100d0
-
-
       ! delta_nu_sun
       ! ~~~~~~~~~~~~
+      ! astero_Teff_sun
+      ! ~~~~~~~~~~~~~~~
 
-      ! solar value of ``delta_nu``
+      ! Solar reference values used in the asteroseismic scaling relations
+      ! for ``delta_nu`` (if ``get_delta_nu_from_scaled_solar`` is ``.false.``)
+      ! and ``nu_max`` (always).
+
+      ! The default ``nu_max_sun`` is the Sun-as-as-star value reported by `Lund
+      ! et al. (2017)`_, which is consistent with but conceptually
+      ! different from the result of 3073.59 ± 0.18 μHz by `Kiefer et
+      ! al. (2018)`_.
+
+      ! The default ``delta_nu_sun`` is also taken from `Lund et al. (2017)`_.
+
+      ! The default ``astero_Teff_sun`` is the value adopted in IAU 2015 Resolution B3.
+      ! This should not be confused with the constant ``Teffsun``, which is always
+      ! equal to the IAU value and not controlled by a parameter.  The "asteroseismic"
+      ! value can be changed in case one needs to reproduce previous calculations
+      ! using the scaling relations.
+
+      ! .. _Lund et al. (2017): https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L
+      ! .. _Kiefer et al. (2018): https://ui.adsabs.harvard.edu/abs/2018SoPh..293..151K
 
       ! ::
 
-    delta_nu_sun = 135d0
-
-
-      ! Teff_sun
-      ! ~~~~~~~~
-
-      ! solar value of Teff
-
-      ! ::
-
-    Teff_sun = 5777d0
-
+    nu_max_sun = 3078d0 ! μHz
+    delta_nu_sun = 134.91d0 ! μHz
+    astero_Teff_sun = 5772d0 ! kelvin
 
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
@@ -7858,7 +7884,18 @@
       ! ::
 
     velocity_q_upper_bound = 1d99
+    
+      ! velocity_tau_lower_bound
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
+      ! Local override for global ``v_flag``.
+      ! If local tau < this bound, local ``v_flag`` is set false,
+      ! else local ``v_flag`` is set to global ``v_flag``.
+      ! this lets you force v = 0 in outer envelope.
+
+      ! ::
+
+    velocity_tau_lower_bound = -1d99
 
       ! velocity_logT_lower_bound
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8179,8 +8216,18 @@
       ! following surface boundary conditions:
       ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
 
+      ! If use_drag_energy = .true. adds the work done by the drag force
+      ! to the energy balance. Since the drag force is proportional to
+      ! the velocity which is subject to numerical spikes and
+      ! oscillations, you may not want to use the work done by it in the
+      ! model If set to .false. but drag_coefficient is nonzero, the
+      ! drag force will be applied in the momentum equation (as a
+      ! numerical trick to damp spurious velocities) but not in the
+      ! energy equation.
+
       ! ::
 
+    use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
     
@@ -9536,12 +9583,19 @@
 
     dX_mix_dist_limit = 1d-4
 
-      ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
-      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
-      ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
-      ! allowed here. E.g. 'Z' will trigger the timestep control if any metal isotope
+      ! dX_limit_species
+      ! ~~~~~~~~~~~~~~~~
+
+      ! Specify which species the ``dX_limit``, ``dX_div_X_limit``, etc array entries apply to.
+      ! These are limits on magnitude of decrease in any cell abundance during a single timestep.
+      ! dX here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg ``'h1'``, ``'he4'``, etc.
+      ! Special 'species' ``'X'`` (any hydrogen), ``'Y'`` (any helium) and ``'Z'`` (any metals) are
+      ! allowed here. E.g. ``'Z'`` will trigger the timestep control if any metal isotope
       ! abundance individually satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
+
+
+      ! ::
 
     dX_limit_species(1) = 'h1'
     dX_limit_species(2) = 'he4'
