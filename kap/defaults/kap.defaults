@@ -38,7 +38,7 @@
    ! + X:  0.0, 0.1, 0.2, 0.35, 0.5, 0.7, 0.8, 0.9, 0.95, 1-Z
    ! + Z: 0.0, 1e-4, 3e-4, 1e-3, 2e-3, 4e-3, 1e-2, 2e-2, 3e-2, 4e-2, 6e-2, 8e-1, 1e-1
 
-   The OPLIB Type1 tables offer additional table density, for 1194 (X,Z) pairs from the following sets:
+   !The OPLIB Type1 tables offer additional table density, for 1194 (X,Z) pairs from the following sets:
    !
    ! + X:  0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.05, 0.1,
    ! + 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 
