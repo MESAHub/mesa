@@ -11,8 +11,9 @@
 
   !### put kap options here
   ! see kap/defaults/kap.defaults
-  cubic_interpolation_in_X = .true.
-  cubic_interpolation_in_Z = .true.
+
+  ! cubic_interpolation_in_X = .true.
+  ! cubic_interpolation_in_Z = .true.
 
   use_Type2_opacities = .false.
   Zbase = 0
@@ -27,9 +28,9 @@
   ! if doing_dfridr is true, do dfridr and show the error
   ! if doing_d_dlnd, partials wrt lnd, else wrt lnT
 
-  doing_partial = .true.
-  doing_dfridr = .true.
-  doing_d_dlnd = .false.
+  doing_partial = .false.
+  doing_dfridr = .false.
+  doing_d_dlnd = .true.
 
 
   !### pick which quantities to plot against
@@ -66,17 +67,17 @@
   ! Z_min = 0
   ! Z_max = 0.1
 
-  logT_center = 7d0
+  logT_center = 6d0
   logRho_center = -2d0
 
-  delta_logT = 6d0
+  delta_logT = 8d0
   delta_logRho = 24d0
 
   ! logT_min = 3.8
   ! logT_max = 4.2
   
   ! logRho_min = -10
-  ! logRho_max = 0
+  ! logRho_max = -6
 
 
 /
