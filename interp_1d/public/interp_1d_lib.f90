@@ -734,7 +734,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3(x, nx, f1, which, .false., nwork, work1, str, ierr)      
+         call m3_autodiff(x, nx, f1, which, .false., nwork, work1, str, ierr)      
       end subroutine interp_m3_autodiff
 
 
@@ -749,7 +749,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3(x, nx, f1, average, .false., nwork, work1, str, ierr)      
+         call m3_autodiff(x, nx, f1, average, .false., nwork, work1, str, ierr)      
       end subroutine interp_m3a_autodiff
 
 
@@ -764,7 +764,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3(x, nx, f1, quartic, .false., nwork, work1, str, ierr)      
+         call m3_autodiff(x, nx, f1, quartic, .false., nwork, work1, str, ierr)      
       end subroutine interp_m3q_autodiff
 
 
@@ -779,7 +779,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)     
+         call m3_autodiff(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)     
       end subroutine interp_m3b_autodiff
             
       
@@ -795,7 +795,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid(dx, nx, f1, which, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_autodiff(dx, nx, f1, which, .false., nwork, work1, str, ierr)         
       end subroutine interp_m3_on_uniform_grid_autodiff
             
       
@@ -810,7 +810,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid(dx, nx, f1, average, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_autodiff(dx, nx, f1, average, .false., nwork, work1, str, ierr)         
       end subroutine interp_m3a_on_uniform_grid_autodiff
             
       
@@ -825,7 +825,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_autodiff(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)         
       end subroutine interp_m3b_on_uniform_grid_autodiff
             
       
@@ -840,7 +840,7 @@
          type(auto_diff_real_2var_order1), intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)        
+         call m3_on_uniform_grid_autodiff(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)        
       end subroutine interp_m3q_on_uniform_grid_autodiff
 
 

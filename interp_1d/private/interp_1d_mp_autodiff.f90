@@ -30,12 +30,12 @@
 
       implicit none
       private
-      public :: m3, m3_on_uniform_grid
+      public :: m3_autodiff, m3_on_uniform_grid_autodiff
       
       contains
       
       
-      subroutine m3(x, nx, f1, which, slope_only, nwork, work1, str, ierr)  
+      subroutine m3_autodiff(x, nx, f1, which, slope_only, nwork, work1, str, ierr)  
          use interp_1d_def
          use auto_diff
          use interp_1d_misc
@@ -217,10 +217,10 @@
          f(3,nx) = (3*f(1, nx-1) - 3*f(1, nx) + (f(2, nx-1) + 2*f(2, nx)) * h(nx-1)) / (h(nx-1)*h(nx-1))
          f(4,nx) = (-2*f(1, nx-1) + 2*f(1, nx) - (f(2, nx-1) + f(2, nx))*h(nx-1)) / (h(nx-1)*h(nx-1)*h(nx-1))
       
-      end subroutine m3
+      end subroutine m3_autodiff
 
       
-      subroutine m3_on_uniform_grid(dx, nx, f1, which, slope_only, nwork, work1, str, ierr)  
+      subroutine m3_on_uniform_grid_autodiff(dx, nx, f1, which, slope_only, nwork, work1, str, ierr)  
          use interp_1d_def
          use auto_diff
          use interp_1d_misc
@@ -392,7 +392,7 @@
          f(3, nx) = (3*f(1, nx-1) - 3*f(1, nx) + (f(2, nx-1) + 2*f(2, nx)) * dx) / (dx*dx)
          f(4, nx) = (-2*f(1, nx-1) + 2*f(1, nx) - (f(2, nx-1) + f(2, nx))*dx) / (dx*dx*dx)
       
-      end subroutine m3_on_uniform_grid
+      end subroutine m3_on_uniform_grid_autodiff
 
 
       end module interp_1d_mp_autodiff
