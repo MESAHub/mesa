@@ -1,7 +1,0 @@
-cubic_autodiff.dat filter=lfs diff=lfs merge=lfs -text
-cubic.dat filter=lfs diff=lfs merge=lfs -text
-linear.dat filter=lfs diff=lfs merge=lfs -text
-opacity_cubic_bigrange.dat filter=lfs diff=lfs merge=lfs -text
-opacity_cubic.dat filter=lfs diff=lfs merge=lfs -text
-opacity_linear_bigrange.dat filter=lfs diff=lfs merge=lfs -text
-opacity_linear.dat filter=lfs diff=lfs merge=lfs -text
