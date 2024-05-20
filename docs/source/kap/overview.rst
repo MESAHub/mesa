@@ -70,7 +70,7 @@ taken from Figure 1 in Farag et al. 2024. Further comparisons
 between OP/OPAL/OPLIB can be found in Farag et al. 2024.
 
 
-.. figure:: type1_format.pdf
+.. figure:: type1_format.png
    :alt: kap blends in solar-like compositions
 
    Location of each Type-1 opacity table in the :math:`X–Z` plane (left panel) and the
