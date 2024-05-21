@@ -2309,6 +2309,10 @@
                   write(*,1) 'metals L09'
                case (A09_Prz_zfracs)
                   write(*,1) 'metals A09_Prz'
+               case (MB22_photospheric_zfracs)
+                  write(*,1) 'metals MB22_photospheric'
+               case (AAG21_photospheric_zfracs)
+                  write(*,1) 'metals AAG21_photospheric'
                case default
                   write(*,2) 'unknown value for initial_zfracs', s% job% initial_zfracs
             end select

@@ -1,0 +1,15 @@
+&kappa
+
+         data_dir = 'kap_input_data/wichita/aag21'		
+         lowT_flag = .true.
+         logT_file = 'logT_points_lowT_2.7'
+         logR_min = -8.00d0
+         logR_max = 2.00d0
+         logR_points = 51
+         type1_table = 'aag21'
+         output_dir = 'data/kap_data'
+         table_prefix = 'lowT_fa05_aag21'
+         header_info = 'low temperature opacities from Ferguson, Alexander, et al (2005) with AAG21 photospheric metals'
+         table_version= 38
+
+/
