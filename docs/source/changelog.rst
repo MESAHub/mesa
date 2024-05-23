@@ -27,17 +27,17 @@ Kap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Type 1 Rosseland-mean opacity tables from The Los Alamos
-OPLIB database (`OPLIB (Colgan et al. 2016) <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
 These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
 :math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
 opacity tables contains 1194 individual tables, a
 dramatic increase in table density (in the X--Z plane) over the standard
 126 individual tables provided in previous opacity releases. These tables
 are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
-`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_,
-`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_,  
-`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_,
-and `MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_. Users can
+(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
 adopt this new set of tables by selecting one of the following
 options for :ref:`kap/defaults:kap_file_prefix`:
 
@@ -48,9 +48,7 @@ options for :ref:`kap/defaults:kap_file_prefix`:
  
 See :ref:`kap/overview:Overview of kap module` and
 :ref:`kap/defaults:kap_file_prefix` for more details on the
-implementation of these tables. 
-
-For further details on these new OPLIB opacity tables, a direct comparison with 
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
 the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
 in Farag et al. 2024.
 
