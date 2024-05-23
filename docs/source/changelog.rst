@@ -23,8 +23,8 @@ New Features
 Kap
 ~~~~~
 
-``High Temperature Opacity Tables``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`High Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Type 1 Rosseland-mean opacity tables from The Los Alamos
 OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
@@ -39,7 +39,7 @@ are available for four solar-scaled abundance mixtures constructed from photosph
 (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
 and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
 adopt this new set of tables by selecting one of the following
-options for :ref:`kap/defaults:kap_file_prefix`:
+options for `kap_file_prefix`:
 
 + ``'oplib_gs98``'
 + ``'oplib_agss09``'
@@ -52,8 +52,8 @@ implementation of these tables. For further details on these new OPLIB opacity t
 the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
 in Farag et al. 2024.
 
-``Low Temperature Opacity Tables``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`Low Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
 and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
@@ -67,8 +67,8 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 
 Chem
 ~~~~~
-New initial metal mass fractions `initial_zfracs` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
-are now available. See :ref:`references/star_job:initial_zfracs` for more details.
+New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
+are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
 
 .. _Bug Fixes main:
 
