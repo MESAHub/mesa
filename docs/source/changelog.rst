@@ -39,12 +39,12 @@ are available for four solar-scaled abundance mixtures constructed from photosph
 (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
 and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
 adopt this new set of tables by selecting one of the following
-options for `kap_file_prefix`:
+options for ``kap_file_prefix``:
 
-+ ``'oplib_gs98``'
-+ ``'oplib_agss09``'
-+ ``'oplib_aag21``'
-+ ``'oplib_mb22``'
++ ``'oplib_gs98'``
++ ``'oplib_agss09'``
++ ``'oplib_aag21'``
++ ``'oplib_mb22'``
  
 See :ref:`kap/overview:Overview of kap module` and
 :ref:`kap/defaults:kap_file_prefix` for more details on the
