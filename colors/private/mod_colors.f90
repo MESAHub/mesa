@@ -573,7 +573,7 @@
                   if (ierr /= 0) return
                   call get_glist_results(tnxt% glist, lgg, lgz, results2, n_colors, ierr)
                   if (ierr /= 0) return
-                  if(any(results1<-1d50) .or.any(results2<-1d50) ) then
+                  if(any(results1(1:n_colors)<-1d50) .or.any(results2(1:n_colors)<-1d50) ) then
                      results = -1d99
                      return
                   end if
@@ -631,7 +631,7 @@
                call get_zlist_results(gnxt% zlist, lgz, results2, n_colors, ierr)
                if (ierr /= 0) return      
          
-               if(any(results1<-1d50) .or.any(results2<-1d50) ) then
+               if(any(results1(1:n_colors)<-1d50) .or.any(results2(1:n_colors)<-1d50) ) then
                   results = -1d99
                   return
                end if

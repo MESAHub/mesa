@@ -34,21 +34,21 @@
       
       
       ! args for adipls
-      integer :: i_paramset, ierr_param, i_inout, nn
-      real(dp), pointer :: x(:) ! (nn)
-      real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)
-      real(dp) :: data(8)
+      integer, save :: i_paramset, ierr_param, i_inout, nn
+      real(dp), save, pointer :: x(:) => null() ! (nn)
+      real(dp), save, pointer :: aa(:,:) => null() ! (iaa_arg,nn)
+      real(dp), save :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
 
-      integer :: iounit_dev_null = -1
+      integer, save :: iounit_dev_null = -1
 
-      integer :: nn_redist ! set from redistrb.c input file
+      integer, save :: nn_redist ! set from redistrb.c input file
       
       
-      real(dp), pointer :: x_arg(:), aa_arg(:,:)
-      integer :: nn_arg
-      real(dp) :: data_arg(8)
+      real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
+      integer, save :: nn_arg
+      real(dp), save :: data_arg(8)
       
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
@@ -236,9 +236,9 @@
          real(dp) :: cgrav
 
          integer :: i, iriche, iturpr
-         integer :: iconst, ivar, ivers
+         integer :: iconst, ivar, ivers, nn_in
          real(dp), allocatable :: global_data(:) ! (iconst)
-         real(dp), allocatable :: point_data(:,:) ! (ivar,nn)
+         real(dp), allocatable :: point_data(:,:) ! (ivar,nn_in)
          character (len=2000) :: format_string, num_string, filename
          
          ierr = 0
@@ -283,12 +283,12 @@
 
          iconst = SIZE(global_data)
          ivar = SIZE(point_data, 1)
-         nn = SIZE(point_data, 2)
+         nn_in = SIZE(point_data, 2)
 
          ivers = 0 ! It's not clear what this does in fgong_amdl
 
          call fgong_amdl( &
-            cgrav, nn, iconst, ivar, ivers, global_data, point_data, data, aa, nn, ierr)
+            cgrav, nn_in, iconst, ivar, ivers, global_data, point_data, data, aa, nn, ierr)
          deallocate(global_data, point_data)
 
          if (ierr /= 0) then
@@ -668,16 +668,16 @@
          integer, intent(inout) :: iriche, iturpr
          real(dp), intent(in) :: cgrav
          character (len=64) :: fname
-         integer :: nn, iconst, ivar, ivers, ierr
+         integer :: nn, nn_in, iconst, ivar, ivers, ierr
          real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
+         real(dp), pointer :: var(:,:) ! (ivar,nn_in)   will be allocated
          real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
          real(dp), pointer :: x(:) ! (nn)   will be allocated
          real(dp) :: data(8)
          
          ierr = 0
          fname = 'test.fgong'
-         call read_fgong_file(fname, nn, iconst, ivar, ivers, glob, var, ierr)
+         call read_fgong_file(fname, nn_in, iconst, ivar, ivers, glob, var, ierr)
          if (ierr /= 0) then
             write(*,*) 'read_and_store failed in read_fgong_file'
             call mesa_error(__FILE__,__LINE__)
@@ -716,7 +716,7 @@
          
          ierr = 0
          nn = nn_in
-         
+
          allocate(aa1(iaa_arg,nn))
          do i=1,nn
             do j=1,ivarmd
@@ -833,7 +833,7 @@
       
          ierr = 0
          nn = nn_in
-      
+
          if (var(1,1).gt.var(1,nn)) then 
             nn1=nn+1
             do i=1,ivar

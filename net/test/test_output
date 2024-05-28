@@ -105,27 +105,27 @@
                                 log temp         9.600000000
                                  log rho         6.000000000
 
-                            log(eps_nuc)        24.178055700
+                            log(eps_nuc)        24.177999295
 
-                                 eps_nuc     0.150680031E+25
+                                 eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.251306070
-                          d_lneps_dlnRho         1.008425906
+                            d_lneps_dlnT        -0.253424018
+                          d_lneps_dlnRho         1.008418067
 
 
  energy generation by category
 
                                 category   log rate (erg/g/sec)
 
-                                fe_co_ni        24.178013   0.150665E+25
-                                   photo        20.161509   0.145047E+21
-                                si_alpha        18.180628   0.151575E+19
-                                 s_alpha        18.053619   0.113141E+19
-                                ar_alpha        17.551212   0.355805E+18
-                                mg_alpha        17.035498   0.108517E+18
-                                ti_alpha        16.444832   0.278504E+17
-                                ca_alpha        16.021612   0.105102E+17
-                                cr_alpha        15.767744   0.585792E+16
+                                fe_co_ni        24.177953   0.150644E+25
+                                   photo        20.161465   0.145032E+21
+                                 s_alpha        18.844132   0.698444E+19
+                                si_alpha        18.653887   0.450699E+19
+                                ar_alpha        18.392651   0.246974E+19
+                                mg_alpha        17.802202   0.634164E+18
+                                ti_alpha        17.300311   0.199669E+18
+                                ca_alpha        16.259105   0.181596E+17
+                                cr_alpha        15.768197   0.586404E+16
                                  o_alpha        15.265751   0.184396E+16
                                 ne_alpha        14.736951   0.545696E+15
                                  c_alpha        14.073434   0.118422E+15
@@ -147,27 +147,27 @@
                                 log temp         9.600000000
                                  log rho         6.000000000
 
-                            log(eps_nuc)        24.178055700
+                            log(eps_nuc)        24.177999295
 
-                                 eps_nuc     0.150680031E+25
+                                 eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.251306070
-                          d_lneps_dlnRho         1.008425906
+                            d_lneps_dlnT        -0.253424018
+                          d_lneps_dlnRho         1.008418067
 
 
  energy generation by category
 
                                 category   log rate (erg/g/sec)
 
-                                fe_co_ni        24.178013   0.150665E+25
-                                   photo        20.161509   0.145047E+21
-                                si_alpha        18.180628   0.151575E+19
-                                 s_alpha        18.053619   0.113141E+19
-                                ar_alpha        17.551212   0.355805E+18
-                                mg_alpha        17.035498   0.108517E+18
-                                ti_alpha        16.444832   0.278504E+17
-                                ca_alpha        16.021612   0.105102E+17
-                                cr_alpha        15.767744   0.585792E+16
+                                fe_co_ni        24.177953   0.150644E+25
+                                   photo        20.161465   0.145032E+21
+                                 s_alpha        18.844132   0.698444E+19
+                                si_alpha        18.653887   0.450699E+19
+                                ar_alpha        18.392651   0.246974E+19
+                                mg_alpha        17.802202   0.634164E+18
+                                ti_alpha        17.300311   0.199669E+18
+                                ca_alpha        16.259105   0.181596E+17
+                                cr_alpha        15.768197   0.586404E+16
                                  o_alpha        15.265751   0.184396E+16
                                 ne_alpha        14.736951   0.545696E+15
                                  c_alpha        14.073434   0.118422E+15
@@ -203,12 +203,13 @@
  test_one_zone_burn_const_P
                                       number of species          21
                                  large final abundances    1.0000000000000000D-02
-                                                    o16           1    6.9572247281581800D-01
-                                                   si28           2    2.0457753929379163D-01
-                                                    s32           3    4.4284801800238464D-02
-                                                   mg24           4    3.7924075365992252D-02
+                                                    o16           1    7.1798810044269901D-01
+                                                   si28           2    1.6142410416068431D-01
+                                                    s32           3    6.0439378324441878D-02
+                                                   ar36           4    2.9692711889885499D-02
+                                                   ca40           5    1.6560528697491497D-02
 
-                                                   xsum    1.0000000000000002D+00
+                                                   xsum    1.0000000000000000D+00
 
 
 

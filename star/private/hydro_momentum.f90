@@ -387,7 +387,8 @@
             other_ad, accel_ad,Uq_ad
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: extra_ad, v_00
+         type(auto_diff_real_star_order1) :: extra_ad, v_00, &
+            drag
          real(dp) :: accel, d_accel_dv, fraction_on
          logical :: test_partials, local_v_flag
 
@@ -401,6 +402,8 @@
          end if
          
          accel_ad = 0d0
+         drag = 0d0
+         s% dvdt_drag(k) = 0d0
          if (s% v_flag) then
             
             if (s% i_lnT == 0) then
@@ -423,6 +426,12 @@
             end if
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv
+
+            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+               v_00 = wrap_v_00(s,k)
+               drag = -s% drag_coefficient*v_00/s% dt
+               s% dvdt_drag(k) = drag%val
+            end if
          
          end if ! v_flag
 
@@ -432,7 +441,7 @@
             if (ierr /= 0) return
          end if
          
-         other_ad = extra_ad - accel_ad + Uq_ad
+         other_ad = extra_ad - accel_ad + drag + Uq_ad
          other = other_ad%val
          
          !test_partials = (k == s% solver_test_partials_k)
@@ -554,6 +563,7 @@
          if (.not. (s% u_flag .or. s% v_flag)) call mesa_error(__FILE__,__LINE__,'must have either v or u for do1_radius_eqn')
          
          force_zero_v = (s% q(k) > s% velocity_q_upper_bound) .or. &
+            (s% tau(k) < s% velocity_tau_lower_bound) .or. &
             (s% lnT_start(k)/ln10 < s% velocity_logT_lower_bound .and. &
                s% dt < secyer*s% max_dt_yrs_for_velocity_logT_lower_bound)                  
          if (force_zero_v) then

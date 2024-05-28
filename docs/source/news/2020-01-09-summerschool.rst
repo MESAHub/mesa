@@ -12,4 +12,4 @@ Götberg, and Radek Smolec.
 Due date for applications is March 1, 2020:
 
 `MESA Summer School
-2020 <http://cococubed.asu.edu/mesa_summer_school_2020/application.html>`__
+2020 <http://cococubed.com/mesa_summer_school_2020/application.html>`__

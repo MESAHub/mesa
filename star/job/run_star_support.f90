@@ -2309,6 +2309,10 @@
                   write(*,1) 'metals L09'
                case (A09_Prz_zfracs)
                   write(*,1) 'metals A09_Prz'
+               case (MB22_photospheric_zfracs)
+                  write(*,1) 'metals MB22_photospheric'
+               case (AAG21_photospheric_zfracs)
+                  write(*,1) 'metals AAG21_photospheric'
                case default
                   write(*,2) 'unknown value for initial_zfracs', s% job% initial_zfracs
             end select
@@ -3059,7 +3063,7 @@
                   else
                      T_guess_gas = 2*var2*s% abar(k)*mp/(3*kerg*(1+s% zbar(k))) ! ideal gas (var2=energy)
                      T_guess_rad = pow(var2/crad,0.25d0)
-                     logT_guess = log10(max(T_guess_gas,T_guess_rad))
+                     logT_guess = log10(min(T_guess_gas,T_guess_rad))
                      call eosDT_get_T( &
                         s% eos_handle, &
                         s% species, s% chem_id, s% net_iso, s% xa(:,k), &

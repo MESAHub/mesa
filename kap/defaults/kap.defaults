@@ -33,10 +33,25 @@
    ! These tables use the value of ``Zbase`` for Z, unless ``use_Zbase_for_Type1 = .false.``.
 
    ! The Type1 tables cover a wider range of X and have a higher resolution in
-   ! Z for each X than Type2.  The Type1 tables are for (X,Z) pairs from the following sets:
+   ! Z for each X than Type2.  The OPAL/OP Type1 tables are for 126 (X,Z) pairs from the following sets:
    !
    ! + X:  0.0, 0.1, 0.2, 0.35, 0.5, 0.7, 0.8, 0.9, 0.95, 1-Z
    ! + Z: 0.0, 1e-4, 3e-4, 1e-3, 2e-3, 4e-3, 1e-2, 2e-2, 3e-2, 4e-2, 6e-2, 8e-1, 1e-1
+
+   !The OPLIB Type1 tables offer additional table density, for 1194 (X,Z) pairs from the following sets:
+   !
+   ! + X:  0.0, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.05, 0.1,
+   ! + 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 
+   ! + 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 
+   ! + 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
+   ! + 0.98, 0.99, 1-Z
+   ! +
+   ! + Z: 0.0, 0.000001, 0.00001, 0.00003, 0.00007, 0.0001,
+   ! + 0.0003, 0.0007, 0.001, 0.002, 0.003, 0.004,0.006,
+   ! + 0.008, 0.01, 0.012, 0.014, 0.015, 0.016, 0.017, 0.018,
+   ! + 0.019, 0.02, 0.021, 0.022, 0.023, 0.024, 0.025, 0.026,
+   ! + 0.028, 0.03, 0.035, 0.04, 0.05, 0.06, 0.07, 0.08,
+   ! + 0.09, 0.1, 0.15, 0.2
 
 
    ! Available options:
@@ -46,6 +61,10 @@
    ! + ``'a09'``
    ! + ``'OP_gs98'``
    ! + ``'OP_a09_nans_removed_by_hand'``
+   ! + ``'oplib_gs98``'
+   ! + ``'oplib_agss09``'
+   ! + ``'oplib_aag21``'
+   ! + ``'oplib_mb22``'
    !
    ! ::
 
@@ -88,6 +107,8 @@
 
    ! Available options:
 
+   ! + ``'lowT_fa05_mb22'``
+   ! + ``'lowT_fa05_aag21'``
    ! + ``'lowT_Freedman11'``
    ! + ``'lowT_fa05_gs98'``
    ! + ``'lowT_fa05_gn93'``
@@ -449,10 +470,9 @@
 
 ! User controls
 ! -------------
-! :: 
 
+    ! These are arrays of size(10) that can be used to pass in custom information to kap ::
 
-    ! These are arrays of size(10) that can be used to pass in custom information to kap
     kap_ctrl(:) = 0d0
     kap_integer_ctrl(:) = 0
     kap_logical_ctrl(:) = .false.
@@ -471,7 +491,7 @@
          ! extra_kap_inlist_name(1..5)
          ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-         ! If ``read_extra_kap_inlist(i)`` is true, then read &eos from the file ``extra_kap_inlist_name(i)``.
+         ! If ``read_extra_kap_inlist(i)`` is true, then read ``&eos`` from the file ``extra_kap_inlist_name(i)``.
          ! ::
 
       read_extra_kap_inlist(:) = .false.

@@ -21,6 +21,7 @@ integer :: write_header_frequency
 character (len = strlen) :: extra_binary_terminal_output_file
 
 ! timestep controls
+real(dp) :: time_delta_coeff
 real(dp) :: fm
 real(dp) :: fm_hard
 real(dp) :: fa
@@ -175,5 +176,10 @@ logical :: use_other_CE_binary_evolve_step
 logical :: use_other_CE_binary_finish_step
 logical :: use_other_e2
 logical :: use_other_pgbinary_plots
+
+real(dp) :: x_ctrl(binary_num_x_ctrls)
+integer :: x_integer_ctrl(binary_num_x_ctrls)
+logical :: x_logical_ctrl(binary_num_x_ctrls)
+character (len=strlen) :: x_character_ctrl(binary_num_x_ctrls)
 
 ! end of controls

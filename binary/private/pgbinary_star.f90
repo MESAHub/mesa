@@ -186,7 +186,7 @@ contains
             call plot_case(b% s1, b% star_ids(1))
             call update_pgstar_history_file(b% s1, ierr)
          else
-            write(mass, '(f3.2)') b% m(1) / Msun
+            write(mass, '(f0.2)') b% m(1) / Msun
             call pgmtxt('T', -2.0, 0.5, 0.5, 'Star 1 not simulated')
             call pgmtxt('T', -3.0, 0.5, 0.5, 'point mass of ' // trim(adjustl(mass)) // ' M\d\(2281)')
          end if
@@ -199,13 +199,12 @@ contains
             call pgsvp(xleft, xright, ybot, ytop)
          end if
          if (b% point_mass_i /= 2) then
-
             call read_pgstar_inlist(b% s2, b% job% inlist_names(2), ierr)
             call update_pgstar_data(b% s2, ierr)
             call plot_case(b% s2, b% star_ids(2))
             call update_pgstar_history_file(b% s2, ierr)
          else
-            write(mass, '(f3.2)') b% m(2) / Msun
+            write(mass, '(f0.2)') b% m(2) / Msun
             call pgmtxt('T', -2.0, 0.5, 0.5, 'Star 2 not simulated')
             call pgmtxt('T', -3.0, 0.5, 0.5, 'point mass of ' // trim(adjustl(mass)) // ' M\d\(2281)')
          end if

@@ -28,16 +28,14 @@
       ! consult star/other/README for general usage instructions
       ! control name: use_other_eval_i_rot = .true.
       ! procedure pointer: s% other_eval_i_rot => my_routine
-
-
-      use star_def
-
+         
       implicit none
       
             
       contains
 
       subroutine null_other_eval_i_rot(id,k,r00,w_div_w_crit_roche, i_rot)
+         use star_def
          use auto_diff_support
          integer, intent(in) :: id, k
          real(dp), intent(in) :: r00,w_div_w_crit_roche

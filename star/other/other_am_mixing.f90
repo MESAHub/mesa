@@ -29,10 +29,6 @@
       ! control name: use_other_am_mixing = .true.
       ! procedure pointer: s% other_am_mixing => my_routine
 
-
-      use star_def
-      use const_def
-
       implicit none
       
       contains
@@ -41,6 +37,8 @@
       ! you can revise vectors s% am_nu_omega(:) and s% am_nu_j(:)
       
       subroutine null_other_am_mixing(id, ierr)
+         use star_def
+         use const_def   
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0

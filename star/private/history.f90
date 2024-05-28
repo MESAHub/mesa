@@ -484,17 +484,7 @@ contains
          else if (pass == 2) then
             call do_name(j + col_offset, extra_col_names(j))
          else if (pass == 3) then
-            if (abs(extra_col_vals(j)) < huge(int_val))then
-               int_val = int(extra_col_vals(j))
-               if (abs(extra_col_vals(j) - dble(int_val)) < &
-                  1d-10 * max(1d-10, abs(extra_col_vals(j)))) then
-                  call do_int_val(j + col_offset, int_val)
-               else
-                  call do_val(j + col_offset, extra_col_vals(j))
-               end if
-            else
-               call do_val(j + col_offset, extra_col_vals(j))
-            end if
+            call do_val(j + col_offset, extra_col_vals(j))
          end if
       end subroutine do_extra_col
 
@@ -2684,7 +2674,7 @@ contains
                val = 1d6 / (2 * s% photosphere_acoustic_r) ! microHz
             else
                val = &
-                  s% delta_nu_sun * sqrt(s% star_mass) * pow3(s% Teff / s% Teff_sun) / &
+                  s% delta_nu_sun * sqrt(s% star_mass) * pow3(s% Teff / s% astero_Teff_sun) / &
                      pow(s% L_phot, 0.75d0)
             end if
          case(h_delta_Pg)

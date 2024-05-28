@@ -32,9 +32,6 @@ module pgbinary_decorator
 
    ! List of pgplot routines: http://www.astro.caltech.edu/~tjp/pgplot/annlist.html
 
-   use binary_def
-   use const_def
-
    implicit none
 
 
@@ -45,6 +42,8 @@ contains
    ! xmin, xmax, ymin, ymax: current plot boundary
    ! plot_num: If a plot has multiple sub-panels, then this tells you which panel is being called
    subroutine null_pgbinary_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+      use binary_def
+      use const_def
       integer, intent(in) :: id
       !Not doubles
       real, intent(in) :: xmin, xmax, ymin, ymax

@@ -47,13 +47,13 @@
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_extra'
 
-   pgstar_flag = .false.
+   pgstar_flag = .true.
    save_pgstar_files_when_terminate = .true.
 
    num_special_rate_factors = 2
    reaction_for_special_factor(1) = 'r_c12_ag_o16'
    special_rate_factor(1) = 1
-   filename_of_special_rate(1) = 'r_c12_ag_o16_kunz.txt'
+   filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
    reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
    special_rate_factor(2) = 1
@@ -188,6 +188,7 @@
    okay_to_remesh = .true.
    max_dq = 1d-3 ! RECOMMENDED 1d-3
    mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+
    !! this one is turned on in run_star_extras
    !use_split_merge_amr = .true.
    split_merge_amr_log_zoning = .true.
@@ -196,7 +197,11 @@
    split_merge_amr_MaxShort = 2.5d0
    split_merge_amr_max_iters = 50
    split_merge_amr_okay_to_split_nz = .false.
-   merge_amr_ignore_surface_cells = .false.
+
+   !prevent surface from going crazy during remesh and when hydro turns on
+   merge_amr_ignore_surface_cells = .true.
+   merge_amr_k_for_ignore_surface_cells = 2
+
    merge_amr_max_abs_du_div_cs = 0.05d0
    merge_amr_du_div_cs_limit_only_for_compression = .true.
    split_merge_amr_avoid_repeated_remesh = .true.
@@ -239,7 +244,6 @@
     max_logT_for_k_const_mass = 100
     max_q_for_k_const_mass = 0.98
     min_q_for_k_const_mass = 0.98
-    fix_eps_grav_transition_to_grid = .true.
 
    history_interval = 1
    max_num_profile_models = 10000 ! 100 ! RECOMMENDED 10000

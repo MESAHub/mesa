@@ -2,13 +2,260 @@
 Changelog
 *********
 
-
 Changes in main
 ===============
 
 .. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
 .. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+
+.. _New Features main:
+
+New Features
+------------
+
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
+Kap
+~~~~~
+
+`High Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Type 1 Rosseland-mean opacity tables from The Los Alamos
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
+These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
+:math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
+opacity tables contains 1194 individual tables, a
+dramatic increase in table density (in the X--Z plane) over the standard
+126 individual tables provided in previous opacity releases. These tables
+are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
+(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
+adopt this new set of tables by selecting one of the following
+options for ``kap_file_prefix``:
+
++ ``'oplib_gs98'``
++ ``'oplib_agss09'``
++ ``'oplib_aag21'``
++ ``'oplib_mb22'``
+ 
+See :ref:`kap/overview:Overview of kap module` and
+:ref:`kap/defaults:kap_file_prefix` for more details on the
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
+the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
+in Farag et al. 2024.
+
+`Low Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
+solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
+computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
+adopt this new set of tables by selecting one of the following
+options for :ref:`kap/defaults:kap_lowT_prefix`:
+
++ ``'lowT_fa05_mb22'``
++ ``'lowT_fa05_aag21'``
+
+Chem
+~~~~~
+New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
+are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+Rates
+~~~~~
+
+There has been a bug present in the rates module due to the incorrect
+phase space factors for reverse reaction rates involving greater than 2 reactants or 
+products. This bug resulted in inconsistent equillibrium compositions when the network
+evolves into nuclear statistical equillibrium (NSE), at temperatures exceeding 4 GK. 
+This bug effects users who evolve models into NSE using large reaction networks. This
+includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
+networks are less affected. We strongly recommend that users update to the latest MESA release.
+
+See `gh-575 <https://github.com/MESAHub/mesa/issues/575>`_
+
+``max_allowed_nz``
+~~~~~~~~~~~~~~~~~~
+
+MESA no longer produces a segmentation fault if it tries to increase
+the number of cells beyond ``max_allowed_nz``.
+
+``pgbinary``
+~~~~~~~~~~~~
+A bug in the `pgbinary` axes definitions resulted in models crashing when running in single star mode and has been corrected.
+Another bug inhibited the mass of the not modeled star from being displayed in the `pgbinary` panel and has also been corrected.
+
+See `gh-634 <https://github.com/MESAHub/mesa/issues/634>`_ 
+
+
+Changes in r24.03.1
+===================
+
+.. _Backwards-incompatible changes r24.03.1:
+
+Backwards-incompatible changes
+------------------------------
+
+Hooks
+~~~~~
+
+The ``other_pressure`` hook has been converted to use ``auto_diff``
+thus the variable ``s% extra_pressure`` is now an ``auto_diff``
+and allows for the setting of the partial derivatives the
+pressure with respect to other variables.
+
+run_star_extras
+~~~~~~~~~~~~~~~
+
+Previously we had logic to determine if an extra history value should be saved
+as an int or a float (users can only provide data as a float). This was error
+prone, so now we save extra history values as floats.
+
+Asteroseismic scaling relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default values of the parameters ``delta_nu_sun`` and ``nu_max_sun`` used in the asteroseismic scaling relations
+have been updated to the values reported by `Lund et al. (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L/abstract>`_
+(:math:`\Delta\nu_\odot = \mathrm{134.91}\,\mu\mathrm{Hz}` and :math:`\nu_{\mathrm{max},\odot} = \mathrm{3078}\,\mu\mathrm{Hz}`).
+The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusion
+with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
+default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
+
+stash.py
+~~~~~~~~
+The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+
+
+.. _New Features r24.03.1:
+
+New Features
+------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
+
+Rates
+~~~~~
+
+In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16
+rates spanning the uncertainty range of -3 to +3 sigma from `Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_
+with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
+
+These rates can be accessed through the rate selection mechanism. 
+These can be loaded, either by the normal mechanism of adding the filename
+to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
+Several examples in the test suite now make use of these rates, such as
+massive stars and models for building white dwarfs.
+
+Maximum net size
+~~~~~~~~~~~~~~~~
+
+Previous MESA versions where limited to ~300 isotopes in the nuclear network,
+this has now been (slightly) relaxed.
+In principle the maximum network size is sqrt(2^31/nz). Thus for nz=1000 zones
+this is about ~1400 isotopes, at 5000
+zones this is ~650 isotopes. Note this will require a huge amount of RAM,
+``mesa_495.net`` requires at least ~80GB of RAM, and it is estimated
+that for 1400 isotopes you will need ~650GB of RAM.
+
+Björklund Wind
+~~~~~~~~~~~~~~
+
+The Björklund et al. (2021) wind scheme has been implemented for use in all wind
+schemes. E.g. ``hot_wind_scheme = 'Bjorklund'`` in ``&controls``.
+
+GYRE Update
+~~~~~~~~~~~
+
+The bundled GYRE oscillation code has been updated to `release 7.1
+<https://gyre.readthedocs.io/en/v7.1/>`_. The GYRE and GSM pulsation
+output formats have been also been updated to take advantage of new
+features in GYRE. The version of an output file can be set by the new
+``gyre_data_schema`` parameter in ``&controls``; the default value is 101 (version 1.01)
+produced GYRE-format files that are backward-compatible with older
+GYRE releases. (If using GSM-format files, set to 110 instead for
+backward compatibility).
+
+White Dwarf O/Ne Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Phase separation for crystallizing white dwarfs now supports options
+for either C/O or O/Ne phase diagrams. You can select the appropriate
+option with the ``phase_separation_option`` in the ``&controls`` inlist
+section (see documentation at :ref:`reference/controls:phase_separation_option`).
+The phase diagram for O/Ne separation comes from
+`Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+
+Reintroduction of Velocity Drag for v_flag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The option to apply a drag term to the velocities in the outer envelope
+with the control ``drag_coefficient`` and ``min_q_for_drag`` was removed after
+version 15140, but has now been reintroduced. The logical control ``use_drag_energy``
+has been introduced as well, so users can decide whether the drag energy is included
+in the energy equation. We also provide an additional option to turn off the 
+velocities above a desired optical depth with the control ``velocity_tau_lower_bound``.
+
+.. _Bug Fixes r24.03.1:
+
+Bug Fixes
+---------
+
+The ZAMS model data used to generate the initial model for simulations with
+``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
+had an issue where stars between 1.0 and 1.58 Msun would have a starting 
+central hydrogen mass fraction markedly lower than other masses. The grid of 
+starting models has been recalculated with a more stringent stopping condition, 
+and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
+near 0.697.
+
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options were removed in r15140. We have reimplemented them although we
+caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
+The EOS coverage regions have been updated to fall back to ideal gas in a region
+previously covered by HELM where it returned unphysical floor values of ``1e-20``
+for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
+be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
+
+A bug in the implementation of the ``fe_core_infall_limit`` sometimes resulted 
+in the premature termination of a model due to large negative velocities outside
+the fe core.
+
+ See `gh-626 <https://github.com/MESAHub/mesa/issues/626#issue-2157840823>`_
 
 Changes in r23.05.1
 ===================
@@ -53,6 +300,7 @@ For convenience, we have also included a bash script that will call a version of
 this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
+
   $MESA_DIR/scripts/update_inlists
 
 This script will save the previous versions of your inlists to a directory named
@@ -1925,8 +2173,8 @@ Changes to WD ``atm`` tables
 There are now 2 options for white dwarf atmosphere tables:
 
 * ``WD_tau_25``: the original WD atmosphere table option for DA (H atmosphere)
-WDs; also found and fixed a bug in the header of this file that was
-causing it to use only a small portion of the actual table
+  WDs; also found and fixed a bug in the header of this file that was
+  causing it to use only a small portion of the actual table
 
 * ``DB_WD_tau_25``: new table for DB (He atmosphere) WDs
 

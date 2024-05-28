@@ -380,7 +380,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
-         integer :: ierr, nz, k, n, solver_lwork, solver_liwork
+         integer :: ierr, nz, k, n
          logical :: report
 
          include 'formats'
@@ -396,59 +396,14 @@
 
          nz = s% nz
          n = nz*nvar
-         call work_sizes_for_solver(ierr)
-         if (ierr /= 0) then
-            if (s% report_ierr) write(*, *) 'do_solver_converge: work_sizes_for_solver failed'
-            do_solver_converge = retry
-            s% result_reason = nonzero_ierr
-            s% termination_code = t_solve_hydro
-            return
-         end if
-
-         call alloc_for_solver(ierr)
-         if (ierr /= 0) then
-            s% termination_code = t_solve_hydro
-            s% result_reason = nonzero_ierr
-            return
-         end if
-
-         report = (s% report_solver_progress .or. s% report_ierr)
          
          s% solver_call_number = s% solver_call_number + 1
 
          do_solver_converge = do_solver( &
             s, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction, &
-            report, nz, nvar, s% solver_work, solver_lwork, &
-            s% solver_iwork, solver_liwork)
+            report, nz, nvar)
 
-
-         contains
-
-
-         subroutine alloc_for_solver(ierr)
-            integer, intent(out) :: ierr
-            include 'formats'
-            ierr = 0
-            if (.not. associated(s% solver_iwork)) then
-               allocate(s% solver_iwork(solver_liwork))
-            else if (size(s% solver_iwork, dim=1) < solver_liwork) then
-               deallocate(s% solver_iwork)
-               allocate(s% solver_iwork(int(1.3d0*solver_liwork)+100))
-            end if
-            if (.not. associated(s% solver_work)) then
-               allocate(s% solver_work(solver_lwork))
-            else if (size(s% solver_work, dim=1) < solver_lwork) then
-               deallocate(s% solver_work)
-               allocate(s% solver_work(int(1.3d0*solver_lwork)+100))
-            end if
-         end subroutine alloc_for_solver
-
-         subroutine work_sizes_for_solver(ierr)
-            use star_solver, only: get_solver_work_sizes
-            integer, intent(out) :: ierr
-            call get_solver_work_sizes(s, nvar, nz, solver_lwork, solver_liwork, ierr)
-         end subroutine work_sizes_for_solver
 
       end function do_solver_converge
 
@@ -541,8 +496,7 @@
       integer function do_solver( &
             s, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction, &
-            report, nz, nvar, solver_work, solver_lwork, &
-            solver_iwork, solver_liwork)
+            report, nz, nvar)
          ! return keep_going, retry, or terminate
 
          ! when using solver for hydro step,
@@ -559,9 +513,6 @@
          logical, intent(in) :: skip_global_corr_coeff_limit, report
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
-         integer, intent(in) :: solver_lwork, solver_liwork
-         real(dp), pointer :: solver_work(:) ! (solver_lwork)
-         integer, pointer :: solver_iwork(:) ! (solver_liwork)
          logical :: converged
          integer :: i, k, species, ierr, alph, j1, j2, gold_tolerances_level
          real(dp) :: varscale, r003, rp13, dV, frac, maxT
@@ -632,8 +583,6 @@
          call hydro_solver_step( &
             s, nz, s% nvar_hydro, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            solver_work, solver_lwork, &
-            solver_iwork, solver_liwork, &
             converged, ierr)
          if (ierr /= 0) then
             if (report) then
@@ -785,8 +734,6 @@
       subroutine hydro_solver_step( &
             s, nz, nvar_hydro, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-            solver_work, solver_lwork, &
-            solver_iwork, solver_liwork, &
             converged, ierr)
          use num_def
          use chem_def
@@ -799,9 +746,6 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), intent(in) :: tol_max_correction, tol_correction_norm
          integer, intent(in) :: gold_tolerances_level
-         integer, intent(in) :: solver_lwork, solver_liwork
-         real(dp), intent(inout), pointer :: solver_work(:) ! (solver_lwork)
-         integer, intent(inout), pointer :: solver_iwork(:) ! (solver_liwork)
          logical, intent(out) :: converged
          integer, intent(out) :: ierr
 
@@ -859,8 +803,6 @@
             call solver( &
                s, nvar, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
-               solver_work, solver_lwork, &
-               solver_iwork, solver_liwork, &
                failure, ierr)
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag

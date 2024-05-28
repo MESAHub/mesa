@@ -49,7 +49,7 @@
       x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
          ! should match gyre.in mode l
       x_integer_ctrl(4) = 1 ! order
-      x_ctrl(1) = 0.2323E-07 ! freq ~ this (Hz)
+      x_ctrl(1) = 0.2238E-07 ! freq ~ this (Hz)
       x_ctrl(2) = 15d+03 ! growth < this (days)
 
       energy_eqn_option = 'dedt'

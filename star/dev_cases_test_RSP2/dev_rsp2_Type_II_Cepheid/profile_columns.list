@@ -128,7 +128,7 @@
    
 
    tau ! optical depth
-   logtau ! log10(optical depth) at center of zone
+   logtau ! log10(optical depth) at cell face
    pressure ! total pressure at center of zone (pgas + prad)
    !xtau
    !xlogtau

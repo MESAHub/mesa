@@ -59,6 +59,7 @@
          extra_binary_terminal_output_file, &
 
          ! timestep controls
+         time_delta_coeff, &
          fm, &
          fm_hard, &
          fa, &
@@ -223,6 +224,10 @@
          use_other_CE_rlo_mdot, &
          use_other_CE_binary_evolve_step, &
          use_other_CE_binary_finish_step, &
+         x_ctrl, &
+         x_integer_ctrl, &
+         x_logical_ctrl, &
+         x_character_ctrl, &
 
          ! extra files
          read_extra_binary_controls_inlist, extra_binary_controls_inlist_name
@@ -364,6 +369,7 @@
          b% extra_binary_terminal_output_file = extra_binary_terminal_output_file
 
          ! timestep controls
+         b% time_delta_coeff = time_delta_coeff
          b% fm = fm
          b% fm_hard = fm_hard
          b% fa = fa
@@ -528,6 +534,11 @@
          b% use_other_CE_rlo_mdot = use_other_CE_rlo_mdot
          b% use_other_CE_binary_evolve_step = use_other_CE_binary_evolve_step
          b% use_other_CE_binary_finish_step = use_other_CE_binary_finish_step
+
+         b% x_ctrl = x_ctrl
+         b% x_integer_ctrl = x_integer_ctrl
+         b% x_logical_ctrl = x_logical_ctrl
+         b% x_character_ctrl = x_character_ctrl
          
       end subroutine store_binary_controls
 
@@ -561,6 +572,7 @@
          extra_binary_terminal_output_file = b% extra_binary_terminal_output_file
 
          ! timestep controls
+         time_delta_coeff = b% time_delta_coeff
          fm = b% fm
          fa = b% fa
          fr = b% fr
@@ -717,6 +729,11 @@
          use_other_CE_binary_evolve_step = b% use_other_CE_binary_evolve_step
          use_other_CE_binary_finish_step = b% use_other_CE_binary_finish_step
          
+         x_ctrl = b% x_ctrl
+         x_integer_ctrl = b% x_integer_ctrl
+         x_logical_ctrl = b% x_logical_ctrl
+         x_character_ctrl = b% x_character_ctrl
+
       end subroutine set_binary_controls_for_writing
       
       subroutine write_binary_controls(io,ierr)

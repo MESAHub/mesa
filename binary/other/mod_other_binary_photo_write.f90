@@ -25,7 +25,6 @@
 
       module mod_other_binary_photo_write
 
-      use binary_def
 
       implicit none
 
@@ -37,6 +36,7 @@
 
 
       subroutine default_other_binary_photo_write(binary_id, iounit)
+         use binary_def
          integer, intent(in) :: binary_id, iounit
          !write(iounit) stuff
       end subroutine default_other_binary_photo_write

@@ -193,6 +193,13 @@
 !          'b_deltam'             fdm
 
 
+! time_delta_coeff
+! ~~~~~~~~~~~~~~~~
+! similarly to star/time_delta_coeff, this time_delta_coeff can be scaled to force smaller timestep for binary timestep
+! controls
+
+    time_delta_coeff = 1d0
+
 ! fm
 ! ~~
 ! fm_hard
@@ -310,7 +317,8 @@
 !         (1-dt_softening_factor)*log10(dt_next_max))
 
 ! where ``dt_next_max_old`` is the limit used in the previous step. This is meant
-! to avoid large changes in dt. Values must be < 1 and >= 0.
+! to avoid large changes in dt. Values must be < 1 and >= 0, 1 meaning constant dt,
+! 0 meaning no softening
 
 ! ::
 
@@ -656,8 +664,6 @@
 !     else
 !        change_factor = change_factor*(1.0-implicit_lambda) &
 !           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_prev/mass_transfer_rate-1))
-!        change_factor = change_factor*(1.0-implicit_lambda) &
-!           + implicit_lambda*(1+change_factor_fraction*(mass_transfer_rate/mass_transfer_prev-1))
 !     end if
 
 ! Choosing ``implicit_lambda = 0`` will keep the change factor constant.
@@ -1486,3 +1492,16 @@
     use_other_CE_binary_evolve_step = .false.
     use_other_CE_binary_finish_step = .false.
     use_other_e2 = .false.
+
+
+! extra params as a convenience for developing new features
+! note: the parameter ``num_x_ctrls`` is defined in ``binary_def.f90``
+
+! ::
+
+    x_ctrl(1:binary_num_x_ctrls) = 0d0
+    x_integer_ctrl(1:binary_num_x_ctrls) = 0
+    x_logical_ctrl(1:binary_num_x_ctrls) = .false.
+    x_character_ctrl(1:binary_num_x_ctrls) = ''
+
+
