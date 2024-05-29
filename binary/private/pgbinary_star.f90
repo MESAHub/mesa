@@ -34,8 +34,8 @@ module pgbinary_star
 contains
 
 
-   subroutine Star1_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
+   subroutine Star1_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
       ierr = 0
@@ -65,8 +65,8 @@ contains
          plot_name, 1, ierr)
    end subroutine do_Star1_plot
 
-   subroutine Star2_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
+   subroutine Star2_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
       ierr = 0
@@ -118,6 +118,7 @@ contains
       use pgstar_dPg_dnu, only : do_dPg_dnu_Plot
       use pgstar_hr, only : do_HR_Plot
       use pgstar_trho, only : do_TRho_Plot
+      use pgstar_tmaxrho, only : do_TmaxRho_Plot
       use pgstar_dynamo, only : do_Dynamo_plot
       use pgstar_mixing_Ds, only : do_Mixing_plot
       use pgstar_trho_profile, only : do_TRho_Profile_plot
@@ -264,6 +265,10 @@ contains
             call do_TRho_Profile_plot(&
                s, id, device_id, xleft, xright, ybot, ytop, star_subplot, s% pg% TRho_Profile_title, &
                Star_txt_scale_factor * s% pg% TRho_Profile_txt_scale, ierr)
+         case ('tmax_rho')
+            call do_TmaxRho_Plot(&
+               s, id, device_id, xleft, xright, ybot, ytop, star_subplot, s% pg% TmaxRho_title, &
+               Star_txt_scale_factor * s% pg% TmaxRho_txt_scale, ierr)
          case ('profile_panels(1)')
             call do_Profile_Panels_plot(&
                s, id, device_id, 1, xleft, xright, ybot, ytop, star_subplot, s% pg% Profile_Panels_title(1), &
@@ -579,6 +584,7 @@ contains
                   'logg_logT', &
                   'dPg_dnu', &
                   'TRho_Profile', &
+                  'TmaxRho', &
                   'Summary_Burn', &
                   'Summary_Profile', &
                   'Summary_History', &
