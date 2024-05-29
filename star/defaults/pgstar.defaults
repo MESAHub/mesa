@@ -3653,7 +3653,7 @@
     Grid_plot_pad_bot(1, 4) = -0.05
     Grid_txt_scale_factor(1, 4) = 0.2
 
-    Grid_file_prefix(1) = 'grid1'
+    Grid_file_prefix(1) = 'grid1_'
 
       ! Grid(2)
       ! -------
@@ -3732,7 +3732,7 @@
     Grid_plot_pad_bot(2, 5) = 0.0
     Grid_txt_scale_factor(2, 5) = 0.65
 
-    Grid_file_prefix(2) = 'Grid2'
+    Grid_file_prefix(2) = 'Grid2_'
 
 
       ! Grid(3)
