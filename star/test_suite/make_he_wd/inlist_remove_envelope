@@ -87,6 +87,6 @@
          !pause = .true. 
             ! if true, the code waits for user to enter a RETURN on the command line
 
-!Grid3_win_flag = .true.
+!Grid_win_flag(3) = .true.
       
 / ! end of pgstar namelist

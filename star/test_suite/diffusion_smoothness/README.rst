@@ -31,28 +31,28 @@ pgstar commands used for the plot:
     pgstar_interval = 1
 
  ! Brunt B profile
-    Profile_Panels1_win_flag = .true.
-    Profile_Panels1_win_width = 14
-    Profile_Panels1_show_grid = .false
-    Profile_Panels1_title = 'diffusion_smoothness'
+    Profile_Panels_win_flag(1) = .true.
+    Profile_Panels_win_width(1) = 14
+    Profile_Panels_show_grid(1) = .false
+    Profile_Panels_title(1) = 'diffusion_smoothness'
 
-    Profile_Panels1_xaxis_name = 'zone'
-    Profile_Panels1_xmin = -101d0
-    Profile_Panels1_xmax = -101d0
-    Profile_Panels1_xaxis_reversed = .true.
-    Profile_Panels1_show_mix_regions_on_xaxis = .true.
+    Profile_Panels_xaxis_name(1) = 'zone'
+    Profile_Panels_xmin(1) = -101d0
+    Profile_Panels_xmax(1) = -101d0
+    Profile_Panels_xaxis_reversed(1) = .true.
+    Profile_Panels_show_mix_regions_on_xaxis(1) = .true.
 
-    Profile_Panels1_num_panels = 1
-    Profile_Panels1_yaxis_name(1) = 'brunt_B'
+    Profile_Panels_num_panels(1) = 1
+    Profile_Panels_yaxis_name(1, 1) = 'brunt_B'
     Profile_Panels1_ymin(:) = -101d0
     Profile_Panels1_ymax(:) = -101d0
-    Profile_Panels1_other_yaxis_name(1) = ''
+    Profile_Panels_other_yaxis_name(1, 1) = ''
 
-    Profile_Panels1_file_flag = .true.
-    Profile_Panels1_file_dir = 'png'
-    Profile_Panels1_file_prefix = 'brunt_'
-    Profile_Panels1_file_interval = 10000
-    Profile_Panels1_file_width = 14      
+    Profile_Panels_file_flag(1) = .true.
+    Profile_Panels_file_dir(1) = 'png'
+    Profile_Panels_file_prefix(1) = 'brunt_'
+    Profile_Panels_file_interval(1) = 10000
+    Profile_Panels_file_width(1) = 14
 
  / ! end of pgstar namelist
 

@@ -136,95 +136,95 @@
   pgstar_interval = 5
   pause = .false.
 
-  Grid1_win_flag = .true.
+  Grid_win_flag(1) = .true.
 
-  Grid1_win_width = 12
-  Grid1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+  Grid_win_width(1) = 12
+  Grid_win_aspect_ratio(1) = 0.75 ! aspect_ratio = height/width
 
-  Grid1_xleft = 0.12 ! fraction of full window width for margin on left
-  Grid1_xright = 0.95 ! fraction of full window width for margin on right
-  Grid1_ybot = 0.08 ! fraction of full window width for margin on bottom
-  Grid1_ytop = 0.92 ! fraction of full window width for margin on top
+  Grid_xleft(1) = 0.12 ! fraction of full window width for margin on left
+  Grid_xright(1) = 0.95 ! fraction of full window width for margin on right
+  Grid_ybot(1) = 0.08 ! fraction of full window width for margin on bottom
+  Grid_ytop(1) = 0.92 ! fraction of full window width for margin on top
 
-  Grid1_plot_name(:) = ''
-  Grid1_plot_row(:) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(:) = 1 ! plot spans this number of rows
-  Grid1_plot_col(:) =  1 ! number from 1 at left
-  Grid1_plot_colspan(:) = 1 ! plot spans this number of columns
-  Grid1_plot_pad_left(:) = 0.0 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(:) = 0.0 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(:) = 0.0 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(:) = 0.0 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, :) = ''
+  Grid_plot_row(1, :) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, :) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, :) =  1 ! number from 1 at left
+  Grid_plot_colspan(1, :) = 1 ! plot spans this number of columns
+  Grid_plot_pad_left(1, :) = 0.0 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, :) = 0.0 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, :) = 0.0 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, :) = 0.0 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
 
   ! set default
-  Grid1_num_cols = 2 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 3 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 2 ! <= 10
+  Grid_num_cols(1) = 2 ! divide plotting region into this many equal width cols
+  Grid_num_rows(1) = 3 ! divide plotting region into this many equal height rows
+  Grid_num_plots(1) = 2 ! <= 10
 
-  Grid1_plot_name(:) = ''
-  Grid1_plot_row(:) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(:) = 1 ! plot spans this number of rows
-  Grid1_plot_col(:) =  1 ! number from 1 at left
-  Grid1_plot_colspan(:) = 1 ! plot spans this number of columns
-  Grid1_plot_pad_left(:) = 0.03 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(:) = 0.03 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(:) = 0.03 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(:) = 0.03 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, :) = ''
+  Grid_plot_row(1, :) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, :) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, :) =  1 ! number from 1 at left
+  Grid_plot_colspan(1, :) = 1 ! plot spans this number of columns
+  Grid_plot_pad_left(1, :) = 0.03 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, :) = 0.03 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, :) = 0.03 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, :) = 0.03 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
 
 
-  Grid1_plot_name(1) = 'Profile_Panels1'
-  Grid1_plot_row(1) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(1) = 3 ! plot spans this number of rows
-  Grid1_plot_col(1) =  1 ! number from 1 at left
-  Grid1_plot_colspan(1) = 1 ! plot spans this number of columns
-  Grid1_plot_pad_left(1) = -0.025 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.1 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = 0.0 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 0.6 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 1) = 'Profile_Panels1'
+  Grid_plot_row(1, 1) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 1) = 3 ! plot spans this number of rows
+  Grid_plot_col(1, 1) =  1 ! number from 1 at left
+  Grid_plot_colspan(1, 1) = 1 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 1) = -0.025 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 1) = 0.1 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 1) = 0.0 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 1) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 1) = 0.6 ! multiply txt_scale for subplot by this
 
-  Grid1_plot_name(2) = 'History_Panels1'
-  Grid1_plot_row(2) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(2) = 3 ! plot spans this number of rows
-  Grid1_plot_col(2) =  2 ! number from 1 at left
-  Grid1_plot_colspan(2) = 1 ! plot spans this number of columns
-  Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.025 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = 0.0 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 0.65 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 2) = 'History_Panels1'
+  Grid_plot_row(1, 2) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 2) = 3 ! plot spans this number of rows
+  Grid_plot_col(1, 2) =  2 ! number from 1 at left
+  Grid_plot_colspan(1, 2) = 1 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 2) = 0.05 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 2) = 0.025 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 2) = 0.0 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 2) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 2) = 0.65 ! multiply txt_scale for subplot by this
 
 
   ! file output
-  Grid1_file_flag = .false.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1'
-  Grid1_file_interval = 5 ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = 9 ! negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Grid_file_flag(1) = .false.
+  Grid_file_dir(1) = 'png'
+  Grid_file_prefix(1) = 'grid1'
+  Grid_file_interval(1) = 5 ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_width(1) = 9 ! negative means use same value as for window
+  Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
 
-  Profile_Panels1_win_flag = .false.
+  Profile_Panels_win_flag(1) = .false.
 
-  Profile_Panels1_win_width = 6
-  Profile_Panels1_win_aspect_ratio = 1.5 ! aspect_ratio = height/width
+  Profile_Panels_win_width(1) = 6
+  Profile_Panels_win_aspect_ratio = 1.5 ! aspect_ratio(1) = height/width
 
-  Profile_Panels1_xleft = 0.15
-  Profile_Panels1_xright = 0.85
-  Profile_Panels1_ybot = 0.15
-  Profile_Panels1_ytop = 0.85
-  Profile_Panels1_txt_scale = 1.0
-  Profile_Panels1_title = 'Profile Panels1'
+  Profile_Panels_xleft(1) = 0.15
+  Profile_Panels_xright(1) = 0.85
+  Profile_Panels_ybot(1) = 0.15
+  Profile_Panels_ytop(1) = 0.85
+  Profile_Panels_txt_scale(1) = 1.0
+  Profile_Panels_title(1) = 'Profile Panels1'
 
-  Profile_Panels1_xaxis_name = 'radius_cm'
-  Profile_Panels1_xaxis_reversed = .false.
-  Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
-  Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
-  Profile_Panels1_xmargin = 0d0
-  Profile_Panels1_show_mix_regions_on_xaxis = .false.
+  Profile_Panels_xaxis_name(1) = 'radius_cm'
+  Profile_Panels_xaxis_reversed(1) = .false.
+  Profile_Panels_xmin(1) = -101d0 ! only used if /= -101d0
+  Profile_Panels_xmax(1) = -101d0 ! only used if /= -101d0
+  Profile_Panels_xmargin(1) = 0d0
+  Profile_Panels_show_mix_regions_on_xaxis(1) = .false.
 
   Profile_Panels1_yaxis_name(:) = ''
   Profile_Panels1_yaxis_reversed(:) = .false.
@@ -244,82 +244,82 @@
   Profile_Panels1_other_ymargin(:) = 0.1
   Profile_Panels1_other_dymin(:) = -1
 
-  Profile_Panels1_show_grid = .false.
+  Profile_Panels_show_grid(1) = .false.
 
   ! setup default plot
-  Profile_Panels1_num_panels = 4
+  Profile_Panels_num_panels(1) = 4
 
-  Profile_Panels1_yaxis_name(1) = 'density'
-  Profile_Panels1_other_yaxis_name(1) = ''
+  Profile_Panels_yaxis_name(1, 1) = 'density'
+  Profile_Panels_other_yaxis_name(1, 1) = ''
 
-  Profile_Panels1_ymin(1) = -101d0
-  Profile_Panels1_ymax(1) = -101d0
+  Profile_Panels_ymin(1, 1) = -101d0
+  Profile_Panels_ymax(1, 1) = -101d0
 
-  Profile_Panels1_other_ymin(1) = -101d0
-  Profile_Panels1_other_ymax(1) = -101d0
+  Profile_Panels_other_ymin(1, 1) = -101d0
+  Profile_Panels_other_ymax(1, 1) = -101d0
 
-  Profile_Panels1_yaxis_name(2) = 'velocity'
-  Profile_Panels1_other_yaxis_name(2) = ''
+  Profile_Panels_yaxis_name(1, 2) = 'velocity'
+  Profile_Panels_other_yaxis_name(1, 2) = ''
 
-  Profile_Panels1_ymin(2) = -101d0
-  Profile_Panels1_ymax(2) = -101d0
+  Profile_Panels_ymin(1, 2) = -101d0
+  Profile_Panels_ymax(1, 2) = -101d0
 
-  Profile_Panels1_other_ymin(2) = -101d0
-  Profile_Panels1_other_ymax(2) = -101d0
+  Profile_Panels_other_ymin(1, 2) = -101d0
+  Profile_Panels_other_ymax(1, 2) = -101d0
 
-  Profile_Panels1_yaxis_name(3) = 'pressure'
-  Profile_Panels1_other_yaxis_name(3) = ''
+  Profile_Panels_yaxis_name(1, 3) = 'pressure'
+  Profile_Panels_other_yaxis_name(1, 3) = ''
 
-  Profile_Panels1_ymin(3) = -101d0
-  Profile_Panels1_ymax(3) = -101d0
+  Profile_Panels_ymin(1, 3) = -101d0
+  Profile_Panels_ymax(1, 3) = -101d0
 
-  Profile_Panels1_other_ymin(3) = -101d0
-  Profile_Panels1_other_ymax(3) = -101d0
+  Profile_Panels_other_ymin(1, 3) = -101d0
+  Profile_Panels_other_ymax(1, 3) = -101d0
 
-  Profile_Panels1_yaxis_name(4) = 'entropy_difference'
-  Profile_Panels1_other_yaxis_name(4) = ''
+  Profile_Panels_yaxis_name(1, 4) = 'entropy_difference'
+  Profile_Panels_other_yaxis_name(1, 4) = ''
 
-  Profile_Panels1_ymin(4) = -11
-  Profile_Panels1_ymax(4) = -101d0
+  Profile_Panels_ymin(1, 4) = -11
+  Profile_Panels_ymax(1, 4) = -101d0
   Profile_Panels1_yaxis_log(4) = .true. ! show log10 of abs value
 
-  Profile_Panels1_other_ymin(4) = -101d0
-  Profile_Panels1_other_ymax(4) = -101d0
+  Profile_Panels_other_ymin(1, 4) = -101d0
+  Profile_Panels_other_ymax(1, 4) = -101d0
 
 
   ! Enables calling a subroutine to add extra information to a plot
   ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
-  Profile_Panels1_use_decorator = .false.
+  Profile_Panels_use_decorator(1) = .false.
 
   ! file output
-  Profile_Panels1_file_flag = .false.
-  Profile_Panels1_file_dir = 'png'
-  Profile_Panels1_file_prefix = 'profile_panels1_'
-  Profile_Panels1_file_interval = 5 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
-  Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
-  Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Profile_Panels_file_flag(1) = .false.
+  Profile_Panels_file_dir(1) = 'png'
+  Profile_Panels_file_prefix(1) = 'profile_panels1_'
+  Profile_Panels_file_interval(1) = 5 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
+  Profile_Panels_file_width(1) = -1 ! (inches) negative means use same value as for window
+  Profile_Panels_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
 
-  History_Panels1_win_flag = .false.
+  History_Panels_win_flag(1) = .false.
 
-  History_Panels1_win_width = 6
-  History_Panels1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+  History_Panels_win_width(1) = 6
+  History_Panels_win_aspect_ratio = 0.75 ! aspect_ratio(1) = height/width
 
-  History_Panels1_xleft = 0.15
-  History_Panels1_xright = 0.85
-  History_Panels1_ybot = 0.15
-  History_Panels1_ytop = 0.85
-  History_Panels1_txt_scale = 1.0
-  History_Panels1_title = 'History_Panels1'
+  History_Panels_xleft(1) = 0.15
+  History_Panels_xright(1) = 0.85
+  History_Panels_ybot(1) = 0.15
+  History_Panels_ytop(1) = 0.85
+  History_Panels_txt_scale(1) = 1.0
+  History_Panels_title(1) = 'History_Panels1'
 
-  History_Panels1_xaxis_name = 'star_age'
-  History_Panels1_xmin = -101d0
-  History_Panels1_xmax = -101d0
-  History_Panels1_max_width = 100 ! only used if > 0.  causes xmin to move with xmax.
-  History_Panels1_dxmin = -1
-  History_Panels1_xaxis_reversed = .false.
-  History_Panels1_xaxis_log = .false. ! show log10 of abs value
+  History_Panels_xaxis_name(1) = 'star_age'
+  History_Panels_xmin(1) = -101d0
+  History_Panels_xmax(1) = -101d0
+  History_Panels_max_width(1) = 100 ! only used if > 0.  causes xmin to move with xmax.
+  History_Panels_dxmin(1) = -1
+  History_Panels_xaxis_reversed(1) = .false.
+  History_Panels_xaxis_log(1) = .false. ! show log10 of abs value
 
   History_Panels1_yaxis_name(:) = ''
   History_Panels1_yaxis_reversed(:) = .false.
@@ -340,45 +340,45 @@
   History_Panels1_points_name(:) = ''
 
   ! setup default
-  History_Panels1_num_panels = 2
+  History_Panels_num_panels(1) = 2
 
-  History_Panels1_yaxis_name(1) = 'Ew'
+  History_Panels_yaxis_name(1, 1) = 'Ew'
   History_Panels1_yaxis_log(1) = .true. ! show log10 of abs value
-  History_Panels1_yaxis_reversed(1) = .false.
-  History_Panels1_ymin(1) = -101d0 ! only used if /= -101d0
-  History_Panels1_ymax(1) = -101d0 ! only used if /= -101d0
-  History_Panels1_dymin(1) = -1
+  History_Panels_yaxis_reversed(1, 1) = .false.
+  History_Panels_ymin(1, 1) = -101d0 ! only used if /= -101d0
+  History_Panels_ymax(1, 1) = -101d0 ! only used if /= -101d0
+  History_Panels_dymin(1, 1) = -1
 
-  History_Panels1_other_yaxis_name(1) = ''
-  History_Panels1_other_yaxis_reversed(1) = .false.
+  History_Panels_other_yaxis_name(1, 1) = ''
+  History_Panels_other_yaxis_reversed(1, 1) = .false.
   History_Panels1_other_yaxis_log(1) = .true. ! show log10 of abs value
-  History_Panels1_other_ymin(1) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
+  History_Panels_other_ymin(1, 1) = -101d0 ! only used if /= -101d0
+  History_Panels_other_ymax(1, 1) = -101d0 ! only used if /= -101d0
   History_Panels1_other_dymin(1) = -1
 
-  History_Panels1_yaxis_name(2) = 'frac_total_entropy_change'
-  History_Panels1_yaxis_reversed(2) = .false.
-  History_Panels1_ymin(2) = 0 ! only used if /= -101d0
-  History_Panels1_ymax(2) = -101d0 ! only used if /= -101d0
-  History_Panels1_dymin(2) = -1
+  History_Panels_yaxis_name(1, 2) = 'frac_total_entropy_change'
+  History_Panels_yaxis_reversed(1, 2) = .false.
+  History_Panels_ymin(1, 2) = 0 ! only used if /= -101d0
+  History_Panels_ymax(1, 2) = -101d0 ! only used if /= -101d0
+  History_Panels_dymin(1, 2) = -1
 
-  History_Panels1_other_yaxis_name(2) = ''
-  History_Panels1_other_yaxis_reversed(2) = .false.
-  History_Panels1_other_ymin(2) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_ymax(2) = -101d0 ! only used if /= -101d0
+  History_Panels_other_yaxis_name(1, 2) = ''
+  History_Panels_other_yaxis_reversed(1, 2) = .false.
+  History_Panels_other_ymin(1, 2) = -101d0 ! only used if /= -101d0
+  History_Panels_other_ymax(1, 2) = -101d0 ! only used if /= -101d0
   History_Panels1_other_dymin(2) = -1
 
   ! Enables calling a subroutine to add extra information to a plot
   ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
-  History_Panels1_use_decorator = .false.
+  History_Panels_use_decorator(1) = .false.
 
   ! file output
-  History_Panels1_file_flag = .false.
-  History_Panels1_file_dir = 'png'
-  History_Panels1_file_prefix = 'History_Panels1_'
-  History_Panels1_file_interval = 5 ! output when `mod(model_number,History_Panels1_file_interval)==0`
-  History_Panels1_file_width = -1 ! (inches) negative means use same value as for window
-  History_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+  History_Panels_file_flag(1) = .false.
+  History_Panels_file_dir(1) = 'png'
+  History_Panels_file_prefix(1) = 'History_Panels1_'
+  History_Panels_file_interval(1) = 5 ! output when `mod(model_number,History_Panels1_file_interval)==0`
+  History_Panels_file_width(1) = -1 ! (inches) negative means use same value as for window
+  History_Panels_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
 / ! end of pgstar namelist

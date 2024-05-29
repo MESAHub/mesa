@@ -36,150 +36,150 @@ pgstar commands used for the plots above:
   
   !------------------------------------------------------------------------------------
 
-  Grid1_win_flag = .true.
-  Grid1_win_width = 15
-  Grid1_win_aspect_ratio = 0.666
+  Grid_win_flag(1) = .true.
+  Grid_win_width(1) = 15
+  Grid_win_aspect_ratio(1) = 0.666
   
   ! file output
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1_'
-  Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = 15        ! (inches) negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Grid_file_flag(1) = .true.
+  Grid_file_dir(1) = 'png'
+  Grid_file_prefix(1) = 'grid1_'
+  Grid_file_interval(1) = 10     ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_width(1) = 15        ! (inches) negative means use same value as for window
+  Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
   
   ! reset the defaults
   
-  Grid1_plot_name(:) = ''
-  Grid1_plot_row(:) = 1           ! number from 1 at top
-  Grid1_plot_rowspan(:) = 1       ! plot spans this number of rows
-  Grid1_plot_col(:) =  1          ! number from 1 at left
-  Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
-  Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, :) = ''
+  Grid_plot_row(1, :) = 1           ! number from 1 at top
+  Grid_plot_rowspan(1, :) = 1       ! plot spans this number of rows
+  Grid_plot_col(1, :) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, :) = 1       ! plot spans this number of columns
+  Grid_plot_pad_left(1, :) = 0.0    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, :) = 0.0   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, :) = 0.0     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, :) = 0.0     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
   
   
-  Grid1_title = ''
+  Grid_title(1) = ''
   
-  Grid1_num_cols = 3 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 5 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 6 ! <= 10
-  
-  
-  Grid1_plot_name(1) = 'Text_Summary1'
-  Grid1_plot_row(1) = 1           ! number from 1 at top
-  Grid1_plot_rowspan(1) = 1       ! plot spans this number of rows
-  Grid1_plot_col(1) =  1          ! number from 1 at left
-  Grid1_plot_colspan(1) = 3       ! plot spans this number of columns
-  
-  Grid1_plot_pad_left(1) = -0.03   ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.0   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = -0.06     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.07     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 1 ! 0.8 ! multiply txt_scale for subplot by this
+  Grid_num_cols(1) = 3 ! divide plotting region into this many equal width cols
+  Grid_num_rows(1) = 5 ! divide plotting region into this many equal height rows
+  Grid_num_plots(1) = 6 ! <= 10
   
   
-  Grid1_plot_name(2) = 'TRho_Profile'
-  Grid1_plot_row(2) = 2          ! number from 1 at top
-  Grid1_plot_rowspan(2) = 2       ! plot spans this number of rows
-  Grid1_plot_col(2) =  2          ! number from 1 at left
-  Grid1_plot_colspan(2) = 1       ! plot spans this number of columns
+  Grid_plot_name(1, 1) = 'Text_Summary1'
+  Grid_plot_row(1, 1) = 1           ! number from 1 at top
+  Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
+  Grid_plot_col(1, 1) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, 1) = 3       ! plot spans this number of columns
   
-  Grid1_plot_pad_left(2) = -0.01    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.06   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = -0.04     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.01    ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 0.8 ! multiply txt_scale for subplot by this
-  
-  
-  Grid1_plot_name(4) = 'Kipp'
-  Grid1_plot_row(4) = 4           ! number from 1 at top
-  Grid1_plot_rowspan(4) = 2       ! plot spans this number of rows
-  Grid1_plot_col(4) =  2          ! number from 1 at left
-  Grid1_plot_colspan(4) = 1       ! plot spans this number of columns
-  
-  Grid1_plot_pad_left(4) = -0.01    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(4) = 0.06   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(4) = 0.05     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(4) = 0.0     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(4) = 0.6 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_left(1, 1) = -0.03   ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 1) = 0.0   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 1) = -0.06     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 1) = 0.07     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 1) = 1 ! 0.8 ! multiply txt_scale for subplot by this
   
   
-  Grid1_plot_name(3) = 'HR'
-  Grid1_plot_row(3) = 2           ! number from 1 at top
-  Grid1_plot_rowspan(3) = 2       ! plot spans this number of rows
-  Grid1_plot_col(3) =  1          ! number from 1 at left
-  Grid1_plot_colspan(3) = 1       ! plot spans this number of columns
+  Grid_plot_name(1, 2) = 'TRho_Profile'
+  Grid_plot_row(1, 2) = 2          ! number from 1 at top
+  Grid_plot_rowspan(1, 2) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 2) =  2          ! number from 1 at left
+  Grid_plot_colspan(1, 2) = 1       ! plot spans this number of columns
   
-  Grid1_plot_pad_left(3) = 0.00    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(3) = 0.08   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(3) = -0.04     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(3) = 0.03     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(3) = 1.0 ! multiply txt_scale for subplot by this
-  
-  
-  Grid1_plot_name(5) = 'TRho'
-  Grid1_plot_row(5) = 4           ! number from 1 at top
-  Grid1_plot_rowspan(5) = 2       ! plot spans this number of rows
-  Grid1_plot_col(5) = 1          ! number from 1 at left
-  Grid1_plot_colspan(5) = 1       ! plot spans this number of columns
-  
-  Grid1_plot_pad_left(5) = 0.00    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(5) = 0.08   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(5) = 0.05     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(5) = 0     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(5) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_left(1, 2) = -0.01    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 2) = 0.06   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 2) = -0.04     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 2) = 0.01    ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 2) = 0.8 ! multiply txt_scale for subplot by this
   
   
-  Grid1_plot_name(6) = 'Profile_Panels3'
-  Grid1_plot_row(6) = 2          ! number from 1 at top
-  Grid1_plot_rowspan(6) = 4       ! plot spans this number of rows
-  Grid1_plot_col(6) =  3          ! Number from 1 at left
-  Grid1_plot_colspan(6) = 1       ! plot spans this number of columns
+  Grid_plot_name(1, 4) = 'Kipp'
+  Grid_plot_row(1, 4) = 4           ! number from 1 at top
+  Grid_plot_rowspan(1, 4) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 4) =  2          ! number from 1 at left
+  Grid_plot_colspan(1, 4) = 1       ! plot spans this number of columns
   
-  Grid1_plot_pad_left(6) = 0.04    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(6) = 0.06   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(6) = -0.04    ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(6) = 0     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(6) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_left(1, 4) = -0.01    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 4) = 0.06   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 4) = 0.05     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 4) = 0.0     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 4) = 0.6 ! multiply txt_scale for subplot by this
+  
+  
+  Grid_plot_name(1, 3) = 'HR'
+  Grid_plot_row(1, 3) = 2           ! number from 1 at top
+  Grid_plot_rowspan(1, 3) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 3) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, 3) = 1       ! plot spans this number of columns
+  
+  Grid_plot_pad_left(1, 3) = 0.00    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 3) = 0.08   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 3) = -0.04     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 3) = 0.03     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 3) = 1.0 ! multiply txt_scale for subplot by this
+  
+  
+  Grid_plot_name(1, 5) = 'TRho'
+  Grid_plot_row(1, 5) = 4           ! number from 1 at top
+  Grid_plot_rowspan(1, 5) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 5) = 1          ! number from 1 at left
+  Grid_plot_colspan(1, 5) = 1       ! plot spans this number of columns
+  
+  Grid_plot_pad_left(1, 5) = 0.00    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 5) = 0.08   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 5) = 0.05     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 5) = 0     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 5) = 0.7 ! multiply txt_scale for subplot by this
+  
+  
+  Grid_plot_name(1, 6) = 'Profile_Panels3'
+  Grid_plot_row(1, 6) = 2          ! number from 1 at top
+  Grid_plot_rowspan(1, 6) = 4       ! plot spans this number of rows
+  Grid_plot_col(1, 6) =  3          ! Number from 1 at left
+  Grid_plot_colspan(1, 6) = 1       ! plot spans this number of columns
+  
+  Grid_plot_pad_left(1, 6) = 0.04    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 6) = 0.06   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 6) = -0.04    ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 6) = 0     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 6) = 0.7 ! multiply txt_scale for subplot by this
   
   
   !------------------------------------------------------------------------------------
   
-  Profile_Panels3_win_flag = .false.
+  Profile_Panels_win_flag(3) = .false.
   
-  Profile_Panels3_title = ''
+  Profile_Panels_title(3) = ''
   
-  Profile_Panels3_num_panels = 3
+  Profile_Panels_num_panels(3) = 3
   
-  Profile_Panels3_yaxis_name(1) = 'Abundance'
+  Profile_Panels_yaxis_name(3, 1) = 'Abundance'
   
-  Profile_Panels3_yaxis_name(2) = 'Power'
+  Profile_Panels_yaxis_name(3, 2) = 'Power'
   
-  Profile_Panels3_yaxis_name(3) = 'Mixing'
+  Profile_Panels_yaxis_name(3, 3) = 'Mixing'
   Mixing_legend_txt_scale_factor = 0.9
   
-  !Profile_Panels3_yaxis_name(4) = '' ! 'logT'
-  !Profile_Panels3_other_yaxis_name(4) = '' ! 'zone'
-  !Profile_Panels3_other_ymin(4) = -101d0
-  !Profile_Panels3_other_ymax(4) = -101d0
+  !Profile_Panels_yaxis_name(3, 4) = '' ! 'logT'
+  !Profile_Panels_other_yaxis_name(3, 4) = '' ! 'zone'
+  !Profile_Panels_other_ymin(3, 4) = -101d0
+  !Profile_Panels_other_ymax(3, 4) = -101d0
   
-  !Profile_Panels3_yaxis_name(5) = ''
-  !Profile_Panels3_other_yaxis_name(5) = ''
-  !Profile_Panels3_other_ymin(5) = -101d0
-  !Profile_Panels3_other_ymax(5) = -101d0
+  !Profile_Panels_yaxis_name(3, 5) = ''
+  !Profile_Panels_other_yaxis_name(3, 5) = ''
+  !Profile_Panels_other_ymin(3, 5) = -101d0
+  !Profile_Panels_other_ymax(3, 5) = -101d0
   
   ! x-axis limits and properties
-  Profile_Panels3_xaxis_name = 'mass'
-  Profile_Panels3_xmin = 0.0
-  Profile_Panels3_xmax = 10.0
-  Profile_Panels3_xaxis_reversed = .false.
+  Profile_Panels_xaxis_name(3) = 'mass'
+  Profile_Panels_xmin(3) = 0.0
+  Profile_Panels_xmax(3) = 10.0
+  Profile_Panels_xaxis_reversed(3) = .false.
   
-  Profile_Panels3_show_grid = .true.
-  Profile_Panels3_show_mix_regions_on_xaxis = .true.
+  Profile_Panels_show_grid(3) = .true.
+  Profile_Panels_show_mix_regions_on_xaxis(3) = .true.
   
   !------------------------------------------------------------------------------------
   
@@ -271,56 +271,56 @@ pgstar commands used for the plots above:
   
   ! Text_Summary windows
   
-  Text_Summary1_win_flag = .false.
-  Text_Summary1_win_width = 10
-  Text_Summary1_win_aspect_ratio = 0.15
+  Text_Summary_win_flag(1) = .false.
+  Text_Summary_win_width(1) = 10
+  Text_Summary_win_aspect_ratio(1) = 0.15
   
-  Text_Summary1_xleft = 0.01
-  Text_Summary1_xright = 0.99
-  Text_Summary1_ybot = 0.0
-  Text_Summary1_ytop = 1.0
-  Text_Summary1_txt_scale = 0.95
-  Text_Summary1_title = ''
+  Text_Summary_xleft(1) = 0.01
+  Text_Summary_xright(1) = 0.99
+  Text_Summary_ybot(1) = 0.0
+  Text_Summary_ytop(1) = 1.0
+  Text_Summary_txt_scale(1) = 0.95
+  Text_Summary_title(1) = ''
   
-  Text_Summary1_num_rows = 6 ! <= 20
-  Text_Summary1_num_cols = 5 ! <= 20
-  Text_Summary1_name(:,:) = ''
+  Text_Summary_num_rows(1) = 6 ! <= 20
+  Text_Summary_num_cols(1) = 5 ! <= 20
+  Text_Summary_name(1, :, :) = ''
   
-  Text_Summary1_name(1,1) = 'model_number'
-  Text_Summary1_name(1,2) = 'Teff'
-  Text_Summary1_name(1,3) = 'Mass'
-  Text_Summary1_name(1,4) = 'H_cntr'
-  Text_Summary1_name(1,5) = 'H_rich'
+  Text_Summary_name(1, 1, 1) = 'model_number'
+  Text_Summary_name(1, 1, 2) = 'Teff'
+  Text_Summary_name(1, 1, 3) = 'Mass'
+  Text_Summary_name(1, 1, 4) = 'H_cntr'
+  Text_Summary_name(1, 1, 5) = 'H_rich'
   
-  Text_Summary1_name(2,1) = 'log_dt'  
-  Text_Summary1_name(2,2) = 'log_R'
-  Text_Summary1_name(2,3) = 'lg_Mdot'
-  Text_Summary1_name(2,4) = 'He_cntr'
-  Text_Summary1_name(2,5) = 'He_core'
+  Text_Summary_name(1, 2, 1) = 'log_dt'
+  Text_Summary_name(1, 2, 2) = 'log_R'
+  Text_Summary_name(1, 2, 3) = 'lg_Mdot'
+  Text_Summary_name(1, 2, 4) = 'He_cntr'
+  Text_Summary_name(1, 2, 5) = 'He_core'
   
-  Text_Summary1_name(3,1) = 'star_age'
-  Text_Summary1_name(3,2) = 'log_L'
-  Text_Summary1_name(3,3) = 'eta_cntr'
-  Text_Summary1_name(3,4) = 'C_cntr'
-  Text_Summary1_name(3,5) = 'CO_core'
+  Text_Summary_name(1, 3, 1) = 'star_age'
+  Text_Summary_name(1, 3, 2) = 'log_L'
+  Text_Summary_name(1, 3, 3) = 'eta_cntr'
+  Text_Summary_name(1, 3, 4) = 'C_cntr'
+  Text_Summary_name(1, 3, 5) = 'CO_core'
   
-  Text_Summary1_name(4,1) = 'log_max_T'
-  Text_Summary1_name(4,2) = 'log_LH'
-  Text_Summary1_name(4,3) = 'lg_Lnuc'
-  Text_Summary1_name(4,4) = 'O_cntr'
-  Text_Summary1_name(4,5) = 'Fe_core'
+  Text_Summary_name(1, 4, 1) = 'log_max_T'
+  Text_Summary_name(1, 4, 2) = 'log_LH'
+  Text_Summary_name(1, 4, 3) = 'lg_Lnuc'
+  Text_Summary_name(1, 4, 4) = 'O_cntr'
+  Text_Summary_name(1, 4, 5) = 'Fe_core'
   
-  Text_Summary1_name(5,1) = 'log_cntr_T'
-  Text_Summary1_name(5,2) = 'log_LHe'
-  Text_Summary1_name(5,3) = 'lg_Lneu'
-  Text_Summary1_name(5,4) = 'Ne_cntr'
-  Text_Summary1_name(5,5) = 'zones'
+  Text_Summary_name(1, 5, 1) = 'log_cntr_T'
+  Text_Summary_name(1, 5, 2) = 'log_LHe'
+  Text_Summary_name(1, 5, 3) = 'lg_Lneu'
+  Text_Summary_name(1, 5, 4) = 'Ne_cntr'
+  Text_Summary_name(1, 5, 5) = 'zones'
   
-  Text_Summary1_name(6,1) = 'log_cntr_Rho'
-  Text_Summary1_name(6,2) = 'log_LZ'
-  Text_Summary1_name(6,3) = 'lg_Lphoto'
-  Text_Summary1_name(6,4) = 'Si_cntr'
-  Text_Summary1_name(6,5) = 'retries'
+  Text_Summary_name(1, 6, 1) = 'log_cntr_Rho'
+  Text_Summary_name(1, 6, 2) = 'log_LZ'
+  Text_Summary_name(1, 6, 3) = 'lg_Lphoto'
+  Text_Summary_name(1, 6, 4) = 'Si_cntr'
+  Text_Summary_name(1, 6, 5) = 'retries'
   
   
   !------------------------------------------------------------------------------------

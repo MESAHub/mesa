@@ -120,40 +120,36 @@
 
 
 &pgstar
+   Grid_win_flag(6) = .true.
+   Grid_win_width(6) = 11
 
-         
+   !Grid_file_flag(6) = .true.
+   Grid_file_dir(6) = 'png'
+   Grid_file_prefix(6) = 'grid6_'
+   Grid_file_interval(6) = 5 ! output when mod(model_number,Grid6_file_interval)==0
+   Grid_file_width(6) = -1 ! (inches) negative means use same value as for window
+   Grid_file_aspect_ratio(6) = -1 ! negative means use same value as for window
 
-         
-      Grid6_win_flag = .true.
-      Grid6_win_width = 11
-         
-      !Grid6_file_flag = .true.
-      Grid6_file_dir = 'png'
-      Grid6_file_prefix = 'grid6_'
-      Grid6_file_interval = 5 ! output when mod(model_number,Grid6_file_interval)==0
-      Grid6_file_width = -1 ! (inches) negative means use same value as for window
-      Grid6_file_aspect_ratio = -1 ! negative means use same value as for window
+   Summary_Burn_xaxis_name = 'mass'
+   Summary_Burn_xaxis_reversed = .false.
+   Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+   Summary_Burn_xmax = 2.1  ! only used if /= -101d0
 
-      Summary_Burn_xaxis_name = 'mass' 
-      Summary_Burn_xaxis_reversed = .false.
-      Summary_Burn_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Summary_Burn_xmax = 2.1  ! only used if /= -101d0
-      
-      Abundance_xaxis_name = 'mass' 
-      Abundance_xaxis_reversed = .false.
-      ! power xaxis limits -- to override system default selections
-      Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
-      Abundance_xmax = -101d0 ! only used if /= -101d0
-      Abundance_log_mass_frac_min = -6 ! only used if < 0
+   Abundance_xaxis_name = 'mass'
+   Abundance_xaxis_reversed = .false.
+   ! power xaxis limits -- to override system default selections
+   Abundance_xmin = 0.00 ! -101d0 ! only used if /= -101d0
+   Abundance_xmax = -101d0 ! only used if /= -101d0
+   Abundance_log_mass_frac_min = -6 ! only used if < 0
 
-      !Profile_Panels4_win_flag = .true.
-      !Profile_Panels4_win_width = 6
-         
-      ! Abundance window -- current model abundance profiles
-      
-         !Abundance_win_flag = .true.
-      
-         Abundance_win_width = 9
-         Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-   
+   !Profile_Panels_win_flag(4) = .true.
+   !Profile_Panels_win_width(4) = 6
+
+   ! Abundance window -- current model abundance profiles
+
+   !Abundance_win_flag = .true.
+
+   Abundance_win_width = 9
+   Abundance_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+
 / ! end of pgstar namelist

@@ -34,25 +34,25 @@ pgstar commands used for the plot above:
 
   pgstar_interval = 10
 
-         Profile_Panels3_win_flag = .true. 
-         Profile_Panels3_win_width = 10
-         Profile_Panels3_title = 'radiative_levitation'
+         Profile_Panels_win_flag(3) = .true.
+         Profile_Panels_win_width(3) = 10
+         Profile_Panels_title(3) = 'radiative_levitation'
 
-         Profile_Panels3_xaxis_name = 'logxm'
-         Profile_Panels3_xaxis_reversed = .true.
-         Profile_Panels3_xmin = -14 ! only used if /= -101d0
-         Profile_Panels3_xmax = -1 ! only used if /= -101d0
+         Profile_Panels_xaxis_name(3) = 'logxm'
+         Profile_Panels_xaxis_reversed(3) = .true.
+         Profile_Panels_xmin(3) = -14 ! only used if /= -101d0
+         Profile_Panels_xmax(3) = -1 ! only used if /= -101d0
 
-         Profile_Panels3_num_panels = 3
-         Profile_Panels3_yaxis_name(2) = 'opacity'
-         Profile_Panels3_other_yaxis_name(2) = 'gradr'
+         Profile_Panels_num_panels(3) = 3
+         Profile_Panels_yaxis_name(3, 2) = 'opacity'
+         Profile_Panels_other_yaxis_name(3, 2) = 'gradr'
 
-         Profile_Panels3_file_flag = .true. 
-         Profile_Panels3_file_dir = 'pgstar_out'
-         Profile_Panels3_file_prefix = 'profile_'
-         Profile_Panels3_file_interval = 10000
-         Profile_Panels3_file_width = 10
-         Profile_Panels3_file_aspect_ratio = -1 
+         Profile_Panels_file_flag(3) = .true.
+         Profile_Panels_file_dir(3) = 'pgstar_out'
+         Profile_Panels_file_prefix(3) = 'profile_'
+         Profile_Panels_file_interval(3) = 10000
+         Profile_Panels_file_width(3) = 10
+         Profile_Panels_file_aspect_ratio(3) = -1
 
 
  / ! end of pgstar namelist

@@ -110,64 +110,64 @@ pgstar commands used for the plots above:
    History_Track3_file_width = -1
    History_Track3_file_aspect_ratio = -1
 
-   Grid1_win_flag = .true.
-   Grid1_win_width = 10
-   Grid1_win_aspect_ratio = 1.2
+   Grid_win_flag(1) = .true.
+   Grid_win_width(1) = 10
+   Grid_win_aspect_ratio(1) = 1.2
 
-   Grid1_plot_name(:) = ''
-   Grid1_txt_scale_factor(:) = 1.0 ! multiply txt_scale for subplot by this
+   Grid_plot_name(1, :) = ''
+   Grid_txt_scale_factor(1, :) = 1.0 ! multiply txt_scale for subplot by this
 
-   Grid1_title = 'wd_stable_h_burn'
+   Grid_title(1) = 'wd_stable_h_burn'
 
-   Grid1_num_cols = 1 ! divide plotting region into this many equal width cols
-   Grid1_num_rows = 3 ! divide plotting region into this many equal height rows
-   Grid1_num_plots = 3 ! <= 10
+   Grid_num_cols(1) = 1 ! divide plotting region into this many equal width cols
+   Grid_num_rows(1) = 3 ! divide plotting region into this many equal height rows
+   Grid_num_plots(1) = 3 ! <= 10
 
-   Grid1_plot_name(1) = 'History_Track1'
-   Grid1_plot_row(1) = 1           ! number from 1 at top
-   Grid1_plot_rowspan(1) = 1       ! plot spans this number of rows
-   Grid1_plot_col(1) =  1          ! number from 1 at left
-   Grid1_plot_colspan(1) = 1       ! plot spans this number of columns
+   Grid_plot_name(1, 1) = 'History_Track1'
+   Grid_plot_row(1, 1) = 1           ! number from 1 at top
+   Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
+   Grid_plot_col(1, 1) =  1          ! number from 1 at left
+   Grid_plot_colspan(1, 1) = 1       ! plot spans this number of columns
 
-   Grid1_plot_pad_left(1) = 0.00    ! fraction of full window width for padding on left
-   Grid1_plot_pad_right(1) = -0.02   ! fraction of full window width for padding on right
-   Grid1_plot_pad_top(1) = -0.02     ! fraction of full window height for padding at top
-   Grid1_plot_pad_bot(1) = 0.05     ! fraction of full window height for padding at bottom
-   Grid1_txt_scale_factor(1) = 0.8 ! multiply txt_scale for subplot by this
-
-
-   Grid1_plot_name(2) = 'History_Track2'
-   Grid1_plot_row(2) = 2           ! number from 1 at top
-   Grid1_plot_rowspan(2) = 1       ! plot spans this number of rows
-   Grid1_plot_col(2) =  1          ! number from 1 at left
-   Grid1_plot_colspan(2) = 1       ! plot spans this number of columns
-
-   Grid1_plot_pad_left(2) = 0.0    ! fraction of full window width for padding on left
-   Grid1_plot_pad_right(2) = -0.02   ! fraction of full window width for padding on right
-   Grid1_plot_pad_top(2) = 0.0     ! fraction of full window height for padding at top
-   Grid1_plot_pad_bot(2) = 0.00     ! fraction of full window height for padding at bottom
-   Grid1_txt_scale_factor(2) = 0.8 ! multiply txt_scale for subplot by this
+   Grid_plot_pad_left(1, 1) = 0.00    ! fraction of full window width for padding on left
+   Grid_plot_pad_right(1, 1) = -0.02   ! fraction of full window width for padding on right
+   Grid_plot_pad_top(1, 1) = -0.02     ! fraction of full window height for padding at top
+   Grid_plot_pad_bot(1, 1) = 0.05     ! fraction of full window height for padding at bottom
+   Grid_txt_scale_factor(1, 1) = 0.8 ! multiply txt_scale for subplot by this
 
 
-   Grid1_plot_name(3) = 'History_Track3'
-   Grid1_plot_row(3) = 3           ! number from 1 at top
-   Grid1_plot_rowspan(3) = 1       ! plot spans this number of rows
-   Grid1_plot_col(3) =  1          ! number from 1 at left
-   Grid1_plot_colspan(3) = 1       ! plot spans this number of columns
+   Grid_plot_name(1, 2) = 'History_Track2'
+   Grid_plot_row(1, 2) = 2           ! number from 1 at top
+   Grid_plot_rowspan(1, 2) = 1       ! plot spans this number of rows
+   Grid_plot_col(1, 2) =  1          ! number from 1 at left
+   Grid_plot_colspan(1, 2) = 1       ! plot spans this number of columns
 
-   Grid1_plot_pad_left(3) = 0.0    ! fraction of full window width for padding on left
-   Grid1_plot_pad_right(3) = -0.02   ! fraction of full window width for padding on right
-   Grid1_plot_pad_top(3) = 0.05     ! fraction of full window height for padding at top
-   Grid1_plot_pad_bot(3) = -0.03     ! fraction of full window height for padding at bottom
-   Grid1_txt_scale_factor(3) = 0.8 ! multiply txt_scale for subplot by this
+   Grid_plot_pad_left(1, 2) = 0.0    ! fraction of full window width for padding on left
+   Grid_plot_pad_right(1, 2) = -0.02   ! fraction of full window width for padding on right
+   Grid_plot_pad_top(1, 2) = 0.0     ! fraction of full window height for padding at top
+   Grid_plot_pad_bot(1, 2) = 0.00     ! fraction of full window height for padding at bottom
+   Grid_txt_scale_factor(1, 2) = 0.8 ! multiply txt_scale for subplot by this
 
 
-   Grid1_file_flag = .true.
-   Grid1_file_dir = 'pgstar_out'
-   Grid1_file_prefix = 'grid_'
-   Grid1_file_interval = 10000
-   Grid1_file_width = -1        
-   Grid1_file_aspect_ratio = -1 
+   Grid_plot_name(1, 3) = 'History_Track3'
+   Grid_plot_row(1, 3) = 3           ! number from 1 at top
+   Grid_plot_rowspan(1, 3) = 1       ! plot spans this number of rows
+   Grid_plot_col(1, 3) =  1          ! number from 1 at left
+   Grid_plot_colspan(1, 3) = 1       ! plot spans this number of columns
+
+   Grid_plot_pad_left(1, 3) = 0.0    ! fraction of full window width for padding on left
+   Grid_plot_pad_right(1, 3) = -0.02   ! fraction of full window width for padding on right
+   Grid_plot_pad_top(1, 3) = 0.05     ! fraction of full window height for padding at top
+   Grid_plot_pad_bot(1, 3) = -0.03     ! fraction of full window height for padding at bottom
+   Grid_txt_scale_factor(1, 3) = 0.8 ! multiply txt_scale for subplot by this
+
+
+   Grid_file_flag(1) = .true.
+   Grid_file_dir(1) = 'pgstar_out'
+   Grid_file_prefix(1) = 'grid_'
+   Grid_file_interval(1) = 10000
+   Grid_file_width(1) = -1
+   Grid_file_aspect_ratio(1) = -1
 
  / ! end of pgstar namelist
 

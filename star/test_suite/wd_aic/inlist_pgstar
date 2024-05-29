@@ -1,31 +1,31 @@
 &pgstar
 
-  Grid1_title = 'wd_aic'
-  Grid1_win_flag = .false.
+  Grid_title(1) = 'wd_aic'
+  Grid_win_flag(1) = .false.
 
-  Grid1_win_width = 12
-  Grid1_win_aspect_ratio = 0.4 ! aspect_ratio = height/width
+  Grid_win_width(1) = 12
+  Grid_win_aspect_ratio(1) = 0.4 ! aspect_ratio = height/width
 
-  Grid1_xleft = 0.05 ! fraction of full window width for margin on left
-  Grid1_xright = 0.95 ! fraction of full window width for margin on right
-  Grid1_ybot = 0.08 ! fraction of full window width for margin on bottom
-  Grid1_ytop = 0.92 ! fraction of full window width for margin on top
+  Grid_xleft(1) = 0.05 ! fraction of full window width for margin on left
+  Grid_xright(1) = 0.95 ! fraction of full window width for margin on right
+  Grid_ybot(1) = 0.08 ! fraction of full window width for margin on bottom
+  Grid_ytop(1) = 0.92 ! fraction of full window width for margin on top
 
-  Grid1_num_cols = 5 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 1 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 2 ! <= 10
+  Grid_num_cols(1) = 5 ! divide plotting region into this many equal width cols
+  Grid_num_rows(1) = 1 ! divide plotting region into this many equal height rows
+  Grid_num_plots(1) = 2 ! <= 10
 
 
-  Grid1_plot_name(1) = 'TRho'
-  Grid1_plot_row(1) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(1) = 1 ! plot spans this number of rows
-  Grid1_plot_col(1) =  1 ! number from 1 at left
-  Grid1_plot_colspan(1) = 2 ! plot spans this number of columns
-  Grid1_plot_pad_left(1) = 0.025 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.05 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 1.0 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 1) = 'TRho'
+  Grid_plot_row(1, 1) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 1) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, 1) =  1 ! number from 1 at left
+  Grid_plot_colspan(1, 1) = 2 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 1) = 0.025 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 1) = 0.05 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 1) = 0.05 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 1) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 1) = 1.0 ! multiply txt_scale for subplot by this
 
   ! set range for TRho window
   TRho_logT_min = 8.3
@@ -34,16 +34,16 @@
   TRho_logRho_max = 10.0
 
 
-  Grid1_plot_name(2) = 'Abundance'
-  Grid1_plot_row(2) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(2) = 1 ! plot spans this number of rows
-  Grid1_plot_col(2) = 3 ! number from 1 at left
-  Grid1_plot_colspan(2) = 3 ! plot spans this number of columns
-  Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.025 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 1.0 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 2) = 'Abundance'
+  Grid_plot_row(1, 2) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 2) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, 2) = 3 ! number from 1 at left
+  Grid_plot_colspan(1, 2) = 3 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 2) = 0.05 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 2) = 0.025 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 2) = 0.05 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 2) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 2) = 1.0 ! multiply txt_scale for subplot by this
 
   ! set abundance plot limits
   Abundance_xmin = 0
@@ -64,11 +64,11 @@
 
 
   ! file output
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1'
-  Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = -1 ! negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Grid_file_flag(1) = .true.
+  Grid_file_dir(1) = 'png'
+  Grid_file_prefix(1) = 'grid1'
+  Grid_file_interval(1) = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_width(1) = -1 ! negative means use same value as for window
+  Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 / ! end of pgstar namelist

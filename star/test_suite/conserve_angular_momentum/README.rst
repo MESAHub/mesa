@@ -66,85 +66,85 @@ pgstar commands used for the first 7 plots:
  Abundance_file_width = -1        ! (inches) negative means use same value as for window
  Abundance_file_aspect_ratio = -1 ! negative means use same value as for window
 
- Profile_Panels2_win_flag = .false.
- Profile_Panels2_num_panels = 1
- Profile_Panels2_show_grid = .true.
- Profile_Panels2_show_mix_regions_on_xaxis = .true.
+ Profile_Panels_win_flag(2) = .false.
+ Profile_Panels_num_panels(2) = 1
+ Profile_Panels_show_grid(2) = .true.
+ Profile_Panels_show_mix_regions_on_xaxis(2) = .true.
 
- Profile_Panels2_win_width = 15
- Profile_Panels2_win_aspect_ratio = 1.0
- Profile_Panels2_txt_scale = 1.0
- Profile_Panels2_title = ''      
+ Profile_Panels_win_width(2) = 15
+ Profile_Panels_win_aspect_ratio(2) = 1.0
+ Profile_Panels_txt_scale(2) = 1.0
+ Profile_Panels_title(2) = ''
 
- Profile_Panels2_xaxis_name = 'mass'
- Profile_Panels2_xmin = 0.0 
- Profile_Panels2_xmax = 1.0
- Profile_Panels2_xaxis_reversed = .false.
+ Profile_Panels_xaxis_name(2) = 'mass'
+ Profile_Panels_xmin(2) = 0.0
+ Profile_Panels_xmax(2) = 1.0
+ Profile_Panels_xaxis_reversed(2) = .false.
 
- Profile_Panels2_yaxis_name(1) = 'omega'   
- Profile_Panels2_ymin(1) = 0.0
- Profile_Panels2_ymax(1) = 8.0e-4 ! only used if /= -101d0
+ Profile_Panels_yaxis_name(2, 1) = 'omega'
+ Profile_Panels_ymin(2, 1) = 0.0
+ Profile_Panels_ymax(2, 1) = 8.0e-4 ! only used if /= -101d0
 
- Profile_Panels2_other_yaxis_name(1) = 'log_j_rot'   
- Profile_Panels2_other_ymin(1) = 10.0 ! only used if /= -101d0
- Profile_Panels2_other_ymax(1) = 17.0 ! only used if /= -101d0
+ Profile_Panels_other_yaxis_name(2, 1) = 'log_j_rot'
+ Profile_Panels_other_ymin(2, 1) = 10.0 ! only used if /= -101d0
+ Profile_Panels_other_ymax(2, 1) = 17.0 ! only used if /= -101d0
 
- Profile_Panels2_file_flag = .false.
- Profile_Panels2_file_dir = 'png'
- Profile_Panels2_file_prefix = 'j_omega_'
- Profile_Panels2_file_interval = 10     ! output when mod(model_number,file_interval)==0
- Profile_Panels2_file_width = -1        ! (inches) negative means use same value as for window
- Profile_Panels2_file_aspect_ratio = -1 ! negative means use same value as for window
-
-
-
- Text_Summary1_win_flag = .false.
- Text_Summary1_win_width = 10
- Text_Summary1_win_aspect_ratio = 0.15
-
- Text_Summary1_xleft = 0.01
- Text_Summary1_xright = 0.99
- Text_Summary1_ybot = 0.0
- Text_Summary1_ytop = 1.0
- Text_Summary1_txt_scale = 1.0
-
- Text_Summary1_num_rows = 1 ! <= 20
- Text_Summary1_num_cols = 3 ! <= 20
- Text_Summary1_name(:,:) = ''
-
- Text_Summary1_name(1,1) = 'num_zones'
- Text_Summary1_name(1,2) = 'total_angular_momentum'
- Text_Summary1_name(1,3) = 'surf_avg_v_rot'
-
- Text_Summary1_file_flag = .false.
- Text_Summary1_file_dir = 'png'
- Text_Summary1_file_prefix = 'text_'
- Text_Summary1_file_interval = 10     ! output when mod(model_number,file_interval)==0
- Text_Summary1_file_width = -1        ! (inches) negative means use same value as for window
- Text_Summary1_file_aspect_ratio = -1 ! negative means use same value as for window
+ Profile_Panels_file_flag(2) = .false.
+ Profile_Panels_file_dir(2) = 'png'
+ Profile_Panels_file_prefix(2) = 'j_omega_'
+ Profile_Panels_file_interval(2) = 10     ! output when mod(model_number,file_interval)==0
+ Profile_Panels_file_width(2) = -1        ! (inches) negative means use same value as for window
+ Profile_Panels_file_aspect_ratio(2) = -1 ! negative means use same value as for window
 
 
- Grid1_win_flag = .true.
- Grid1_win_width = 15
- Grid1_win_aspect_ratio = 0.6
 
- Grid1_plot_name(:) = ''
- Grid1_plot_row(:) = 1           ! number from 1 at top
- Grid1_plot_rowspan(:) = 1       ! plot spans this number of rows
- Grid1_plot_col(:) =  1          ! number from 1 at left
- Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
- Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
- Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
- Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
- Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
- Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+ Text_Summary_win_flag(1) = .false.
+ Text_Summary_win_width(1) = 10
+ Text_Summary_win_aspect_ratio(1) = 0.15
+
+ Text_Summary_xleft(1) = 0.01
+ Text_Summary_xright(1) = 0.99
+ Text_Summary_ybot(1) = 0.0
+ Text_Summary_ytop(1) = 1.0
+ Text_Summary_txt_scale(1) = 1.0
+
+ Text_Summary_num_rows(1) = 1 ! <= 20
+ Text_Summary_num_cols(1) = 3 ! <= 20
+ Text_Summary_name(1, :, :) = ''
+
+ Text_Summary_name(1, 1, 1) = 'num_zones'
+ Text_Summary_name(1, 1, 2) = 'total_angular_momentum'
+ Text_Summary_name(1, 1, 3) = 'surf_avg_v_rot'
+
+ Text_Summary_file_flag(1) = .false.
+ Text_Summary_file_dir(1) = 'png'
+ Text_Summary_file_prefix(1) = 'text_'
+ Text_Summary_file_interval(1) = 10     ! output when mod(model_number,file_interval)==0
+ Text_Summary_file_width(1) = -1        ! (inches) negative means use same value as for window
+ Text_Summary_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
- Grid1_num_cols = 6 ! divide plotting region into this many equal width cols
- Grid1_num_rows = 2 ! divide plotting region into this many equal height rows
- Grid1_num_plots = 10 ! <= 10
+ Grid_win_flag(1) = .true.
+ Grid_win_width(1) = 15
+ Grid_win_aspect_ratio(1) = 0.6
 
- Grid1_title = 'inlist_conserve_J'
+ Grid_plot_name(1, :) = ''
+ Grid_plot_row(1, :) = 1           ! number from 1 at top
+ Grid_plot_rowspan(1, :) = 1       ! plot spans this number of rows
+ Grid_plot_col(1, :) =  1          ! number from 1 at left
+ Grid_plot_colspan(1, :) = 1       ! plot spans this number of columns
+ Grid_plot_pad_left(1, :) = 0.0    ! fraction of full window width for padding on left
+ Grid_plot_pad_right(1, :) = 0.0   ! fraction of full window width for padding on right
+ Grid_plot_pad_top(1, :) = 0.0     ! fraction of full window height for padding at top
+ Grid_plot_pad_bot(1, :) = 0.0     ! fraction of full window height for padding at bottom
+ Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
+
+
+ Grid_num_cols(1) = 6 ! divide plotting region into this many equal width cols
+ Grid_num_rows(1) = 2 ! divide plotting region into this many equal height rows
+ Grid_num_plots(1) = 10 ! <= 10
+
+ Grid_title(1) = 'inlist_conserve_J'
 
     pgstar_show_model_number = .true.
     pgstar_model_scale = 1.0
@@ -162,51 +162,51 @@ pgstar commands used for the first 7 plots:
 
 
 
- Grid1_plot_name(1) = 'Text_Summary1'
- Grid1_plot_row(1) = 1           ! number from 1 at top
- Grid1_plot_rowspan(1) = 1       ! plot spans this number of rows
- Grid1_plot_col(1) =  1          ! number from 1 at left
- Grid1_plot_colspan(1) = 6       ! plot spans this number of columns
+ Grid_plot_name(1, 1) = 'Text_Summary1'
+ Grid_plot_row(1, 1) = 1           ! number from 1 at top
+ Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
+ Grid_plot_col(1, 1) =  1          ! number from 1 at left
+ Grid_plot_colspan(1, 1) = 6       ! plot spans this number of columns
 
- Grid1_plot_pad_left(1) = -0.06    ! fraction of full window width for padding on left
- Grid1_plot_pad_right(1) = 0.05   ! fraction of full window width for padding on right
- Grid1_plot_pad_top(1) = -0.02     ! fraction of full window height for padding at top
- Grid1_plot_pad_bot(1) = 0.39     ! fraction of full window height for padding at bottom
- Grid1_txt_scale_factor(1) = 1.2 ! multiply txt_scale for subplot by this
-
-
- Grid1_plot_name(2) = 'Abundance'
- Grid1_plot_row(2) = 1           ! number from 1 at top
- Grid1_plot_rowspan(2) = 2       ! plot spans this number of rows
- Grid1_plot_col(2) =  1          ! number from 1 at left
- Grid1_plot_colspan(2) = 3       ! plot spans this number of columns
-
- Grid1_plot_pad_left(2) = -0.05    ! fraction of full window width for padding on left
- Grid1_plot_pad_right(2) = 0.10   ! fraction of full window width for padding on right
- Grid1_plot_pad_top(2) = 0.03     ! fraction of full window height for padding at top
- Grid1_plot_pad_bot(2) = 0.03     ! fraction of full window height for padding at bottom
- Grid1_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
+ Grid_plot_pad_left(1, 1) = -0.06    ! fraction of full window width for padding on left
+ Grid_plot_pad_right(1, 1) = 0.05   ! fraction of full window width for padding on right
+ Grid_plot_pad_top(1, 1) = -0.02     ! fraction of full window height for padding at top
+ Grid_plot_pad_bot(1, 1) = 0.39     ! fraction of full window height for padding at bottom
+ Grid_txt_scale_factor(1, 1) = 1.2 ! multiply txt_scale for subplot by this
 
 
- Grid1_plot_name(3) = 'Profile_Panels2'
- Grid1_plot_row(3) = 1          ! number from 1 at top
- Grid1_plot_rowspan(3) = 2       ! plot spans this number of rows
- Grid1_plot_col(3) =  5          ! Number from 1 at left
- Grid1_plot_colspan(3) = 3       ! plot spans this number of columns
+ Grid_plot_name(1, 2) = 'Abundance'
+ Grid_plot_row(1, 2) = 1           ! number from 1 at top
+ Grid_plot_rowspan(1, 2) = 2       ! plot spans this number of rows
+ Grid_plot_col(1, 2) =  1          ! number from 1 at left
+ Grid_plot_colspan(1, 2) = 3       ! plot spans this number of columns
 
- Grid1_plot_pad_left(3) = -0.15    ! fraction of full window width for padding on left
- Grid1_plot_pad_right(3) = 0.20   ! fraction of full window width for padding on right
- Grid1_plot_pad_top(3) = 0.03     ! fraction of full window height for padding at top
- Grid1_plot_pad_bot(3) = 0.03     ! fraction of full window height for padding at bottom
- Grid1_txt_scale_factor(3) = 0.7 ! multiply txt_scale for subplot by this
+ Grid_plot_pad_left(1, 2) = -0.05    ! fraction of full window width for padding on left
+ Grid_plot_pad_right(1, 2) = 0.10   ! fraction of full window width for padding on right
+ Grid_plot_pad_top(1, 2) = 0.03     ! fraction of full window height for padding at top
+ Grid_plot_pad_bot(1, 2) = 0.03     ! fraction of full window height for padding at bottom
+ Grid_txt_scale_factor(1, 2) = 0.7 ! multiply txt_scale for subplot by this
 
 
- Grid1_file_flag = .true.
- Grid1_file_dir = 'png'
- Grid1_file_prefix = 'grid_'
- Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
- Grid1_file_width = -1       ! (inches) negative means use same value as for window
- Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+ Grid_plot_name(1, 3) = 'Profile_Panels2'
+ Grid_plot_row(1, 3) = 1          ! number from 1 at top
+ Grid_plot_rowspan(1, 3) = 2       ! plot spans this number of rows
+ Grid_plot_col(1, 3) =  5          ! Number from 1 at left
+ Grid_plot_colspan(1, 3) = 3       ! plot spans this number of columns
+
+ Grid_plot_pad_left(1, 3) = -0.15    ! fraction of full window width for padding on left
+ Grid_plot_pad_right(1, 3) = 0.20   ! fraction of full window width for padding on right
+ Grid_plot_pad_top(1, 3) = 0.03     ! fraction of full window height for padding at top
+ Grid_plot_pad_bot(1, 3) = 0.03     ! fraction of full window height for padding at bottom
+ Grid_txt_scale_factor(1, 3) = 0.7 ! multiply txt_scale for subplot by this
+
+
+ Grid_file_flag(1) = .true.
+ Grid_file_dir(1) = 'png'
+ Grid_file_prefix(1) = 'grid_'
+ Grid_file_interval(1) = 10     ! output when mod(model_number,Grid1_file_interval)==0
+ Grid_file_width(1) = -1       ! (inches) negative means use same value as for window
+ Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
 

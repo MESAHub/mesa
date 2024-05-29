@@ -44,50 +44,50 @@ pgstar commands used for the plots above:
    !file_extension = 'ps'           
 
  ! build grid
-  Grid1_title = '1.3M_ms_high_Z'
-  Grid1_win_flag = .true.
+  Grid_title(1) = '1.3M_ms_high_Z'
+  Grid_win_flag(1) = .true.
 
-  Grid1_win_width = 15
-  Grid1_win_aspect_ratio = 0.4 ! aspect_ratio = height/width
+  Grid_win_width(1) = 15
+  Grid_win_aspect_ratio(1) = 0.4 ! aspect_ratio = height/width
 
-  Grid1_xleft = 0.05 ! fraction of full window width for margin on left
-  Grid1_xright = 0.95 ! fraction of full window width for margin on right
-  Grid1_ybot = 0.08 ! fraction of full window width for margin on bottom
-  Grid1_ytop = 0.92 ! fraction of full window width for margin on top
+  Grid_xleft(1) = 0.05 ! fraction of full window width for margin on left
+  Grid_xright(1) = 0.95 ! fraction of full window width for margin on right
+  Grid_ybot(1) = 0.08 ! fraction of full window width for margin on bottom
+  Grid_ytop(1) = 0.92 ! fraction of full window width for margin on top
 
-  Grid1_num_cols = 5 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 1 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 2 ! <= 10
+  Grid_num_cols(1) = 5 ! divide plotting region into this many equal width cols
+  Grid_num_rows(1) = 1 ! divide plotting region into this many equal height rows
+  Grid_num_plots(1) = 2 ! <= 10
 
-  Grid1_plot_name(1) = 'HR'
-  Grid1_plot_row(1) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(1) = 1 ! plot spans this number of rows
-  Grid1_plot_col(1) =  1 ! number from 1 at left
-  Grid1_plot_colspan(1) = 2 ! plot spans this number of columns
-  Grid1_plot_pad_left(1) = 0.025 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.05 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 1.0 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 1) = 'HR'
+  Grid_plot_row(1, 1) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 1) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, 1) =  1 ! number from 1 at left
+  Grid_plot_colspan(1, 1) = 2 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 1) = 0.025 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 1) = 0.05 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 1) = 0.05 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 1) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 1) = 1.0 ! multiply txt_scale for subplot by this
 
-  Grid1_plot_name(2) = 'Profile_Panels1'
-  Grid1_plot_row(2) = 1 ! number from 1 at top
-  Grid1_plot_rowspan(2) = 1 ! plot spans this number of rows
-  Grid1_plot_col(2) = 3 ! number from 1 at left
-  Grid1_plot_colspan(2) = 3 ! plot spans this number of columns
-  Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.025 ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = 0.05 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.05 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 1.0 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, 2) = 'Profile_Panels1'
+  Grid_plot_row(1, 2) = 1 ! number from 1 at top
+  Grid_plot_rowspan(1, 2) = 1 ! plot spans this number of rows
+  Grid_plot_col(1, 2) = 3 ! number from 1 at left
+  Grid_plot_colspan(1, 2) = 3 ! plot spans this number of columns
+  Grid_plot_pad_left(1, 2) = 0.05 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 2) = 0.025 ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 2) = 0.05 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 2) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 2) = 1.0 ! multiply txt_scale for subplot by this
 
   ! file output
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1'
-  Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = 15 ! negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Grid_file_flag(1) = .true.
+  Grid_file_dir(1) = 'png'
+  Grid_file_prefix(1) = 'grid1'
+  Grid_file_interval(1) = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_width(1) = 15 ! negative means use same value as for window
+  Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
    pgstar_model_scale = 1.4
    pgstar_model_disp = 1.5
@@ -114,19 +114,19 @@ pgstar commands used for the plots above:
 
 
  ! profile 
-  Profile_Panels1_win_flag = .false.
+  Profile_Panels_win_flag(1) = .false.
 
-  Profile_Panels1_num_panels = 1
+  Profile_Panels_num_panels(1) = 1
 
-  Profile_Panels1_xaxis_name = 'mass'
-  Profile_Panels1_xmin = -101d0 ! only used if /= -101d0
-  Profile_Panels1_xmax = -101d0 ! only used if /= -101d0
+  Profile_Panels_xaxis_name(1) = 'mass'
+  Profile_Panels_xmin(1) = -101d0 ! only used if /= -101d0
+  Profile_Panels_xmax(1) = -101d0 ! only used if /= -101d0
 
-  Profile_Panels1_yaxis_name(1) = 'z_mass_fraction_metals'
-  Profile_Panels1_ymin(1) = 0.038 ! only used if /= -101d0
-  Profile_Panels1_ymax(1) = 0.042 ! only used if /= -101d0
+  Profile_Panels_yaxis_name(1, 1) = 'z_mass_fraction_metals'
+  Profile_Panels_ymin(1, 1) = 0.038 ! only used if /= -101d0
+  Profile_Panels_ymax(1, 1) = 0.042 ! only used if /= -101d0
 
-  Profile_Panels1_other_yaxis_name(:) = ''
+  Profile_Panels_other_yaxis_name(1, :) = ''
 
  / ! end of pgstar namelist
 

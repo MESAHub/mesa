@@ -44,32 +44,32 @@ pgstar commands used for the plots above:
   file_extension = 'ps'
 
 
-    Profile_Panels2_win_flag = .true.
-    Profile_Panels2_win_width = 10
-    Profile_Panels2_title = 'wd_he_shell_ignition'
+    Profile_Panels_win_flag(2) = .true.
+    Profile_Panels_win_width(2) = 10
+    Profile_Panels_title(2) = 'wd_he_shell_ignition'
 
-    Profile_Panels2_xaxis_name = 'mass'
-    Profile_Panels2_xaxis_reversed = .false.
-    Profile_Panels2_xmin = 0.90
-    Profile_Panels2_xmax = 1.2
-    Profile_Panels2_show_mix_regions_on_xaxis = .false.
+    Profile_Panels_xaxis_name(2) = 'mass'
+    Profile_Panels_xaxis_reversed(2) = .false.
+    Profile_Panels_xmin(2) = 0.90
+    Profile_Panels_xmax(2) = 1.2
+    Profile_Panels_show_mix_regions_on_xaxis(2) = .false.
 
-    Profile_Panels2_xright = 0.92
-    Profile_Panels2_ytop = 0.92
+    Profile_Panels_xright(2) = 0.92
+    Profile_Panels_ytop(2) = 0.92
 
     num_abundance_line_labels = 5
     Abundance_legend_max_cnt = 0
 
-    Profile_Panels2_yaxis_name(2) = 'Power'
-    Profile_Panels2_ymin(2) = 5.0
-    Profile_Panels2_ymax(2) = 15.0
+    Profile_Panels_yaxis_name(2, 2) = 'Power'
+    Profile_Panels_ymin(2, 2) = 5.0
+    Profile_Panels_ymax(2, 2) = 15.0
 
-    Profile_Panels2_file_flag = .true.
-    Profile_Panels2_file_dir = 'pgstar_out'
-    Profile_Panels2_file_prefix = 'profile_'
-    Profile_Panels2_file_interval = 100000     
-    Profile_Panels2_file_width = -1
-    Profile_Panels2_file_aspect_ratio = -1
+    Profile_Panels_file_flag(2) = .true.
+    Profile_Panels_file_dir(2) = 'pgstar_out'
+    Profile_Panels_file_prefix(2) = 'profile_'
+    Profile_Panels_file_interval(2) = 100000
+    Profile_Panels_file_width(2) = -1
+    Profile_Panels_file_aspect_ratio(2) = -1
 
 
     History_Track1_win_flag = .true.

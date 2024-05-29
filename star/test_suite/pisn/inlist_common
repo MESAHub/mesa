@@ -217,9 +217,9 @@
 !pgstar_interval = 1
 
 ! x-axis limits and properties
-Profile_Panels3_xaxis_name = 'mass'
-Profile_Panels3_xmin = 0.0
-Profile_Panels3_xmax = 1.6
-Profile_Panels3_xaxis_reversed = .false.
+Profile_Panels_xaxis_name(3) = 'mass'
+Profile_Panels_xmin(3) = 0.0
+Profile_Panels_xmax(3) = 1.6
+Profile_Panels_xaxis_reversed(3) = .false.
 
 / ! end of pgstar namelist

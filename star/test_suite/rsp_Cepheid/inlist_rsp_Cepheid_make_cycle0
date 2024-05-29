@@ -103,25 +103,25 @@
 
       !pgstar_interval = 20
          
-      Grid2_win_flag = .true.
+      Grid_win_flag(2) = .true.
 
-      Grid2_title = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
+      Grid_title(2) = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
       
       History_Panels1_xaxis_name='star_age_day'
-      History_Panels1_max_width = 365 ! only used if > 0.  causes xmin to move with xmax.
+      History_Panels_max_width(1) = 365 ! only used if > 0.  causes xmin to move with xmax.
 
-      ! Grid2_file_flag = .true.
+      ! Grid_file_flag(2) = .true.
       file_digits = 7
-      Grid2_file_dir = 'png'
-      Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 5 ! output when mod(model_number,Grid2_file_interval)==0
+      Grid_file_dir(2) = 'png'
+      Grid_file_prefix(2) = 'grid'
+      Grid_file_interval(2) = 5 ! output when mod(model_number,Grid2_file_interval)==0
       
-      !Profile_Panels1_show_grid = .true.
+      !Profile_Panels_show_grid(1) = .true.
 
-      Profile_Panels1_xaxis_name = 'logtau'
-      Profile_Panels1_xaxis_reversed = .true.
-      Profile_Panels1_xmin = -101D0
-      Profile_Panels1_xmax = -101D0
+      Profile_Panels_xaxis_name(1) = 'logtau'
+      Profile_Panels_xaxis_reversed(1) = .true.
+      Profile_Panels_xmin(1) = -101D0
+      Profile_Panels_xmax(1) = -101D0
 
       Profile_Panels1_dymin(4) = 0.02
 

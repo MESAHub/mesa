@@ -31,6 +31,6 @@ This test case has 5 parts. Click to see a larger version of a plot.
    :width: 100%
 
 
-The plots above were made with the provided ``inist_pgstar`` by setting ``Grid1_win_flag = .true.`` and ``Grid1_file_flag = .true.``.
+The plots above were made with the provided ``inist_pgstar`` by setting ``Grid_win_flag(1) = .true.`` and ``Grid_file_flag(1) = .true.``.
 
 Last-Updated: 29Jun2021 (MESA 7f132f41) by adamjermyn.

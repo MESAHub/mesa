@@ -144,54 +144,54 @@
 
       !pause = .true.
 
-      Grid1_file_flag = .true.
-      Grid1_file_dir = 'png'
-      Grid1_file_prefix = 'cc_'
-      Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
+      Grid_file_flag(1) = .true.
+      Grid_file_dir(1) = 'png'
+      Grid_file_prefix(1) = 'cc_'
+      Grid_file_interval(1) = 10     ! output when mod(model_number,Grid1_file_interval)==0
 
-      !History_Panels2_xaxis_name = 'star_age'
-      History_Panels2_automatic_star_age_units = .true.
+      !History_Panels_xaxis_name(2) = 'star_age'
+      History_Panels_automatic_star_age_units(2) = .true.
 
-      History_Panels2_yaxis_name(1) = 'total_energy_foe'
+      History_Panels_yaxis_name(2, 1) = 'total_energy_foe'
 
-      Profile_Panels3_xaxis_name = 'mass'
-      Profile_Panels3_xmin = 15 ! 0.0
-      Profile_Panels3_xmax = -101d0
-      Profile_Panels3_xaxis_reversed = .false.
+      Profile_Panels_xaxis_name(3) = 'mass'
+      Profile_Panels_xmin(3) = 15 ! 0.0
+      Profile_Panels_xmax(3) = -101d0
+      Profile_Panels_xaxis_reversed(3) = .false.
 
-      Profile_Panels3_xaxis_name = 'zone' ! 'logxq' !  
-      Profile_Panels3_xmin = -101d0
-      Profile_Panels3_xmax = -101d0
-      Profile_Panels3_xaxis_reversed = .true.
+      Profile_Panels_xaxis_name(3) = 'zone' ! 'logxq' !
+      Profile_Panels_xmin(3) = -101d0
+      Profile_Panels_xmax(3) = -101d0
+      Profile_Panels_xaxis_reversed(3) = .true.
 
-      !Profile_Panels3_show_grid = .true.
+      !Profile_Panels_show_grid(3) = .true.
 
-      !Profile_Panels3_xaxis_name = 'logxq'
-      !Profile_Panels3_xmin = -6d0
-      !Profile_Panels3_xmax = 0d0
+      !Profile_Panels_xaxis_name(3) = 'logxq'
+      !Profile_Panels_xmin(3) = -6d0
+      !Profile_Panels_xmax(3) = 0d0
 
-      Profile_Panels3_num_panels = 5
+      Profile_Panels_num_panels(3) = 5
 
-      Profile_Panels3_yaxis_name(3) = 'gamma1' 
-      Profile_Panels3_ymin(3) = 1.26d0
-      Profile_Panels3_ymax(3) = -101d0
-      Profile_Panels3_other_yaxis_name(3) =  'v_div_cs'
-      Profile_Panels3_other_dymin(3) = 0.15
+      Profile_Panels_yaxis_name(3, 3) = 'gamma1'
+      Profile_Panels_ymin(3, 3) = 1.26d0
+      Profile_Panels_ymax(3, 3) = -101d0
+      Profile_Panels_other_yaxis_name(3, 3) =  'v_div_cs'
+      Profile_Panels_other_dymin(3, 3) = 0.15
 
-      Profile_Panels3_yaxis_name(4) = 'logRho'
-      Profile_Panels3_other_yaxis_name(4) = 'vel_km_per_s'
-      Profile_Panels3_other_dymin(4) = 12
+      Profile_Panels_yaxis_name(3, 4) = 'logRho'
+      Profile_Panels_other_yaxis_name(3, 4) = 'vel_km_per_s'
+      Profile_Panels_other_dymin(3, 4) = 12
 
-      Profile_Panels3_yaxis_name(5) = 'logT'
-      Profile_Panels3_ymin(5) = -101 
-      Profile_Panels3_other_yaxis_name(5) = 'v_div_v_escape'
-      Profile_Panels3_other_dymin(5) = 0.15
-      Profile_Panels3_other_ymin(5) = -0.1
-      Profile_Panels3_other_ymax(5) = 1.3d0
+      Profile_Panels_yaxis_name(3, 5) = 'logT'
+      Profile_Panels_ymin(3, 5) = -101
+      Profile_Panels_other_yaxis_name(3, 5) = 'v_div_v_escape'
+      Profile_Panels_other_dymin(3, 5) = 0.15
+      Profile_Panels_other_ymin(3, 5) = -0.1
+      Profile_Panels_other_ymax(3, 5) = 1.3d0
 
-      Text_Summary1_name(2,4) = 'log_R'
-      Text_Summary1_name(3,3) = 'remnant_M'
-      Text_Summary1_name(2,3) = 'ejecta_M'
+      Text_Summary_name(1, 2, 4) = 'log_R'
+      Text_Summary_name(1, 3, 3) = 'remnant_M'
+      Text_Summary_name(1, 2, 3) = 'ejecta_M'
 
 
       TRho_Profile_xmin = 2.0
