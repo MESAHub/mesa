@@ -8,6 +8,8 @@
    change_initial_ignore_rlof_flag = .true.
    new_ignore_rlof_flag = .true.
 
+!   pgbinary_flag = .true.
+
 / ! end of binary_job namelist
 
 &binary_controls
