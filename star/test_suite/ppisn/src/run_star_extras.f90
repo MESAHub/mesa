@@ -126,7 +126,7 @@
          ! we turn pgstar on and off at some points, so we store the original setting
          pgstar_flag = s% job% pgstar_flag
          pgstar_interval = s% pg% pgstar_interval
-         pgstar_file_interval = s% pg% Grid2_file_interval
+         pgstar_file_interval = s% pg% Grid_file_interval(2)
 
          ! this is optional
          s% other_wind => brott_wind

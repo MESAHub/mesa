@@ -66,8 +66,8 @@
 
    Profile_Panels_xaxis_name(3) = 'logxq'
    Profile_Panels_xaxis_reversed(3) = .true.
-   !Profile_Panels3_xmin = 20.2d0 ! only used if /= -101d0
-   !Profile_Panels3_xmax = 20.6d0 ! 10 ! only used if /= -101d0
+   !Profile_Panels_xmin(3) = 20.2d0 ! only used if /= -101d0
+   !Profile_Panels_xmax(3) = 20.6d0 ! 10 ! only used if /= -101d0
 
    Abundance_line_txt_scale_factor = 1.1 ! relative to other text
    Abundance_legend_txt_scale_factor = 1.1 ! relative to other text

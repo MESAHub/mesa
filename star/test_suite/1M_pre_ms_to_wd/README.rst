@@ -58,7 +58,7 @@ pgstar commands used for the plots above:
       Grid_file_flag(6) = .true.
       Grid_file_dir(6) = 'png'
       Grid_file_prefix(6) = 'grid6_'
-      Grid_file_interval(6) = 1000 ! output when mod(model_number,Grid6_file_interval)==0
+      Grid_file_interval(6) = 1000 ! output when mod(model_number,Grid_file_interval(6))==0
       Grid_file_width(6) = 15 ! (inches) negative means use same value as for window
 
       Abundance_log_mass_frac_min = -4.0 

@@ -33,28 +33,28 @@ pgstar commands used for the plots above:
     pgstar_interval = 10
 
 
-    History_Track1_win_flag = .true.
-    History_Track1_win_width = 12
-    History_Track1_title = 'accreted_material_j'                                                                                                                                                                                   
-    History_Track1_xname = 'star_mass'
-    History_Track1_yname = 'log_total_angular_momentum'
-    History_Track1_yaxis_label = 'log J'
-    History_Track1_xaxis_label = 'M\d\(2281)'
-    History_Track1_reverse_xaxis = .false.
-    History_Track1_reverse_yaxis = .false.
+    History_Track_win_flag(1) = .true.
+    History_Track_win_width(1) = 12
+    History_Track_title(1) = 'accreted_material_j'
+    History_Track_xname(1) = 'star_mass'
+    History_Track_yname(1) = 'log_total_angular_momentum'
+    History_Track_yaxis_label(1) = 'log J'
+    History_Track_xaxis_label(1) = 'M\d\(2281)'
+    History_Track_reverse_xaxis(1) = .false.
+    History_Track_reverse_yaxis(1) = .false.
 
-    History_Track1_xmin = 20.0
-    History_Track1_xmax = 25.0
-    History_Track1_ymin = 51.9
-    History_Track1_ymax = 52.7
+    History_Track_xmin(1) = 20.0
+    History_Track_xmax(1) = 25.0
+    History_Track_ymin(1) = 51.9
+    History_Track_ymax(1) = 52.7
 
  ! file output
-    History_Track1_file_flag = .true.
-    History_Track1_file_dir = 'png'
-    History_Track1_file_prefix = 'track1_'
-    History_Track1_file_interval = 10
-    History_Track1_file_width =12
-    History_Track1_file_aspect_ratio = -1
+    History_Track_file_flag(1) = .true.
+    History_Track_file_dir(1) = 'png'
+    History_Track_file_prefix(1) = 'track1_'
+    History_Track_file_interval(1) = 10
+    History_Track_file_width(1) =12
+    History_Track_file_aspect_ratio(1) = -1
 
  / ! end of pgstar namelist
 

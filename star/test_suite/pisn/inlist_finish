@@ -147,7 +147,7 @@
       Grid_file_flag(1) = .true.
       Grid_file_dir(1) = 'png'
       Grid_file_prefix(1) = 'cc_'
-      Grid_file_interval(1) = 10     ! output when mod(model_number,Grid1_file_interval)==0
+      Grid_file_interval(1) = 10     ! output when mod(model_number,Grid_file_interval(1))==0
 
       !History_Panels_xaxis_name(2) = 'star_age'
       History_Panels_automatic_star_age_units(2) = .true.

@@ -44,8 +44,8 @@ pgstar commands used for the plot:
 
     Profile_Panels_num_panels(1) = 1
     Profile_Panels_yaxis_name(1, 1) = 'brunt_B'
-    Profile_Panels1_ymin(:) = -101d0
-    Profile_Panels1_ymax(:) = -101d0
+    Profile_Panels_ymin(1, :) = -101d0
+    Profile_Panels_ymax(1, :) = -101d0
     Profile_Panels_other_yaxis_name(1, 1) = ''
 
     Profile_Panels_file_flag(1) = .true.

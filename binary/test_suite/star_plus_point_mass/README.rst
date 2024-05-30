@@ -50,56 +50,56 @@ pgstar commands used for the plots above:
 
   pgstar_left_yaxis_label_disp = 4.0
 
-  History_Track1_win_flag = .true.
-  History_Track1_win_width = 12
-  History_Track1_win_aspect_ratio = 0.75
-  History_Track1_txt_scale = 0.8
-  History_Track1_title = ' '
+  History_Track_win_flag(1) = .true.
+  History_Track_win_width(1) = 12
+  History_Track_win_aspect_ratio(1) = 0.75
+  History_Track_txt_scale(1) = 0.8
+  History_Track_title(1) = ' '
 
-  History_Track1_xname = 'model_number'
-  History_Track1_yname = 'period_days'
-  History_Track1_xaxis_label = 'Model Number'
-  History_Track1_yaxis_label = 'Binary Period (day)'
-  History_Track1_reverse_xaxis = .false.
-  History_Track1_reverse_yaxis = .false.
+  History_Track_xname(1) = 'model_number'
+  History_Track_yname(1) = 'period_days'
+  History_Track_xaxis_label(1) = 'Model Number'
+  History_Track_yaxis_label(1) = 'Binary Period (day)'
+  History_Track_reverse_xaxis(1) = .false.
+  History_Track_reverse_yaxis(1) = .false.
 
-  History_Track1_xmin = 0.0
-  History_Track1_xmax = 350
-  History_Track1_ymin = 0.0
-  History_Track1_ymax = 7.0
+  History_Track_xmin(1) = 0.0
+  History_Track_xmax(1) = 350
+  History_Track_ymin(1) = 0.0
+  History_Track_ymax(1) = 7.0
 
-  History_Track1_file_flag = .true.
-  History_Track1_file_dir = 'pgstar_out'
-  History_Track1_file_prefix = 'track1_'
-  History_Track1_file_interval = 100
-  History_Track1_file_width = -1
-  History_Track1_file_aspect_ratio = -1
+  History_Track_file_flag(1) = .true.
+  History_Track_file_dir(1) = 'pgstar_out'
+  History_Track_file_prefix(1) = 'track1_'
+  History_Track_file_interval(1) = 100
+  History_Track_file_width(1) = -1
+  History_Track_file_aspect_ratio(1) = -1
 
 
-  History_Track2_win_flag = .true.
-  History_Track2_win_width = 12
-  History_Track2_win_aspect_ratio = 0.75
-  History_Track2_txt_scale = 0.8
-  History_Track2_title = ' '
+  History_Track_win_flag(2) = .true.
+  History_Track_win_width(2) = 12
+  History_Track_win_aspect_ratio(2) = 0.75
+  History_Track_txt_scale(2) = 0.8
+  History_Track_title(2) = ' '
 
-  History_Track2_xname = 'model_number'
-  History_Track2_yname = 'binary_separation'
-  History_Track2_xaxis_label = 'Model Number'
-  History_Track2_yaxis_label = 'Binary Seperation (R\d\(2281)\u)'
-  History_Track2_reverse_xaxis = .false.
-  History_Track2_reverse_yaxis = .false.
+  History_Track_xname(2) = 'model_number'
+  History_Track_yname(2) = 'binary_separation'
+  History_Track_xaxis_label(2) = 'Model Number'
+  History_Track_yaxis_label(2) = 'Binary Seperation (R\d\(2281)\u)'
+  History_Track_reverse_xaxis(2) = .false.
+  History_Track_reverse_yaxis(2) = .false.
 
-  History_Track2_xmin = 0.0
-  History_Track2_xmax = 350
-  History_Track2_ymin = 0.0
-  History_Track2_ymax = 40.0
+  History_Track_xmin(2) = 0.0
+  History_Track_xmax(2) = 350
+  History_Track_ymin(2) = 0.0
+  History_Track_ymax(2) = 40.0
 
-  History_Track2_file_flag = .true.
-  History_Track2_file_dir = 'pgstar_out'
-  History_Track2_file_prefix = 'track2_'
-  History_Track2_file_interval = 100
-  History_Track2_file_width = -1
-  History_Track2_file_aspect_ratio = -1
+  History_Track_file_flag(2) = .true.
+  History_Track_file_dir(2) = 'pgstar_out'
+  History_Track_file_prefix(2) = 'track2_'
+  History_Track_file_interval(2) = 100
+  History_Track_file_width(2) = -1
+  History_Track_file_aspect_ratio(2) = -1
          
 
   Kipp_win_flag = .true.

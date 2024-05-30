@@ -58,7 +58,7 @@
       
 #ifdef USE_PGPLOT
          !Add custom decorator to pgplots
-         s% color_magnitude1_pgstar_decorator => col_mag1_decorator
+         s% Color_Magnitude_pgstar_decorator(1) => col_mag1_decorator
 #endif
          
       end subroutine extras_controls

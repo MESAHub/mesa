@@ -201,7 +201,7 @@
   Grid_file_flag(1) = .false.
   Grid_file_dir(1) = 'png'
   Grid_file_prefix(1) = 'grid1'
-  Grid_file_interval(1) = 5 ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_interval(1) = 5 ! output when mod(model_number,Grid_file_interval(1))==0
   Grid_file_width(1) = 9 ! negative means use same value as for window
   Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
@@ -226,23 +226,23 @@
   Profile_Panels_xmargin(1) = 0d0
   Profile_Panels_show_mix_regions_on_xaxis(1) = .false.
 
-  Profile_Panels1_yaxis_name(:) = ''
-  Profile_Panels1_yaxis_reversed(:) = .false.
-  Profile_Panels1_yaxis_log(:) = .false. ! show log10 of abs value
-  Profile_Panels1_ymin(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_ymax(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_ycenter(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_ymargin(:) = 0.1
-  Profile_Panels1_dymin(:) = -1
+  Profile_Panels_yaxis_name(1, :) = ''
+  Profile_Panels_yaxis_reversed(1, :) = .false.
+  Profile_Panels_yaxis_log(1, :) = .false. ! show log10 of abs value
+  Profile_Panels_ymin(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_ymax(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_ycenter(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_ymargin(1, :) = 0.1
+  Profile_Panels_dymin(1, :) = -1
 
-  Profile_Panels1_other_yaxis_name(:) = ''
-  Profile_Panels1_other_yaxis_reversed(:) = .false.
-  Profile_Panels1_other_yaxis_log(:) = .false. ! show log10 of abs value
-  Profile_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_other_ycenter(:) = -101d0 ! only used if /= -101d0
-  Profile_Panels1_other_ymargin(:) = 0.1
-  Profile_Panels1_other_dymin(:) = -1
+  Profile_Panels_other_yaxis_name(1, :) = ''
+  Profile_Panels_other_yaxis_reversed(1, :) = .false.
+  Profile_Panels_other_yaxis_log(1, :) = .false. ! show log10 of abs value
+  Profile_Panels_other_ymin(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_other_ymax(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_other_ycenter(1, :) = -101d0 ! only used if /= -101d0
+  Profile_Panels_other_ymargin(1, :) = 0.1
+  Profile_Panels_other_dymin(1, :) = -1
 
   Profile_Panels_show_grid(1) = .false.
 
@@ -281,7 +281,7 @@
 
   Profile_Panels_ymin(1, 4) = -11
   Profile_Panels_ymax(1, 4) = -101d0
-  Profile_Panels1_yaxis_log(4) = .true. ! show log10 of abs value
+  Profile_Panels_yaxis_log(1, 4) = .true. ! show log10 of abs value
 
   Profile_Panels_other_ymin(1, 4) = -101d0
   Profile_Panels_other_ymax(1, 4) = -101d0
@@ -295,7 +295,7 @@
   Profile_Panels_file_flag(1) = .false.
   Profile_Panels_file_dir(1) = 'png'
   Profile_Panels_file_prefix(1) = 'profile_panels1_'
-  Profile_Panels_file_interval(1) = 5 ! output when `mod(model_number,Profile_Panels1_file_interval)==0`
+  Profile_Panels_file_interval(1) = 5 ! output when `mod(model_number,Profile_Panels_file_interval(1))==0`
   Profile_Panels_file_width(1) = -1 ! (inches) negative means use same value as for window
   Profile_Panels_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
@@ -321,29 +321,29 @@
   History_Panels_xaxis_reversed(1) = .false.
   History_Panels_xaxis_log(1) = .false. ! show log10 of abs value
 
-  History_Panels1_yaxis_name(:) = ''
-  History_Panels1_yaxis_reversed(:) = .false.
-  History_Panels1_yaxis_log(:) = .false. ! show log10 of abs value
-  History_Panels1_ymin(:) = -101d0 ! only used if /= -101d0
-  History_Panels1_ymax(:) = -101d0 ! only used if /= -101d0
-  History_Panels1_ymargin(:) = 0.1
-  History_Panels1_dymin(:) = -1
+  History_Panels_yaxis_name(1, :) = ''
+  History_Panels_yaxis_reversed(1, :) = .false.
+  History_Panels_yaxis_log(1, :) = .false. ! show log10 of abs value
+  History_Panels_ymin(1, :) = -101d0 ! only used if /= -101d0
+  History_Panels_ymax(1, :) = -101d0 ! only used if /= -101d0
+  History_Panels_ymargin(1, :) = 0.1
+  History_Panels_dymin(1, :) = -1
 
-  History_Panels1_other_yaxis_name(:) = ''
-  History_Panels1_other_yaxis_reversed(:) = .false.
-  History_Panels1_other_yaxis_log(:) = .false. ! show log10 of abs value
-  History_Panels1_other_ymin(:) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_ymax(:) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_ymargin(:) = 0.1
-  History_Panels1_other_dymin(:) = -1
+  History_Panels_other_yaxis_name(1, :) = ''
+  History_Panels_other_yaxis_reversed(1, :) = .false.
+  History_Panels_other_yaxis_log(1, :) = .false. ! show log10 of abs value
+  History_Panels_other_ymin(1, :) = -101d0 ! only used if /= -101d0
+  History_Panels_other_ymax(1, :) = -101d0 ! only used if /= -101d0
+  History_Panels_other_ymargin(1, :) = 0.1
+  History_Panels_other_dymin(1, :) = -1
 
-  History_Panels1_points_name(:) = ''
+  History_Panels_points_name(1, :) = ''
 
   ! setup default
   History_Panels_num_panels(1) = 2
 
   History_Panels_yaxis_name(1, 1) = 'Ew'
-  History_Panels1_yaxis_log(1) = .true. ! show log10 of abs value
+  History_Panels_yaxis_log(1, 1) = .true. ! show log10 of abs value
   History_Panels_yaxis_reversed(1, 1) = .false.
   History_Panels_ymin(1, 1) = -101d0 ! only used if /= -101d0
   History_Panels_ymax(1, 1) = -101d0 ! only used if /= -101d0
@@ -351,10 +351,10 @@
 
   History_Panels_other_yaxis_name(1, 1) = ''
   History_Panels_other_yaxis_reversed(1, 1) = .false.
-  History_Panels1_other_yaxis_log(1) = .true. ! show log10 of abs value
+  History_Panels_other_yaxis_log(1, 1) = .true. ! show log10 of abs value
   History_Panels_other_ymin(1, 1) = -101d0 ! only used if /= -101d0
   History_Panels_other_ymax(1, 1) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_dymin(1) = -1
+  History_Panels_other_dymin(1, 1) = -1
 
   History_Panels_yaxis_name(1, 2) = 'frac_total_entropy_change'
   History_Panels_yaxis_reversed(1, 2) = .false.
@@ -366,7 +366,7 @@
   History_Panels_other_yaxis_reversed(1, 2) = .false.
   History_Panels_other_ymin(1, 2) = -101d0 ! only used if /= -101d0
   History_Panels_other_ymax(1, 2) = -101d0 ! only used if /= -101d0
-  History_Panels1_other_dymin(2) = -1
+  History_Panels_other_dymin(1, 2) = -1
 
   ! Enables calling a subroutine to add extra information to a plot
   ! see `$MESA_DIR/star/other/pgstar_decorator.f90`

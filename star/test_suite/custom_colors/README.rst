@@ -41,118 +41,118 @@ pgstar commands used for the first 7 plots:
 
       !### Color_magnitude1
 
-         Color_magnitude1_win_flag = .true.
+         Color_Magnitude_win_flag(1) = .true.
 
-         Color_magnitude1_win_width = 15
-         Color_magnitude1_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+         Color_Magnitude_win_width(1) = 15
+         Color_Magnitude_win_aspect_ratio(1) = 0.75 ! aspect_ratio = height/width
 
-         Color_magnitude1_xleft = 0.15
-         Color_magnitude1_xright = 0.85
-         Color_magnitude1_ybot = 0.15
-         Color_magnitude1_ytop = 0.85
-         Color_magnitude1_txt_scale = 1.0
-         Color_magnitude1_title = 'Color_magnitude1'
+         Color_Magnitude_xleft(1) = 0.15
+         Color_Magnitude_xright(1) = 0.85
+         Color_Magnitude_ybot(1) = 0.15
+         Color_Magnitude_ytop(1) = 0.85
+         Color_Magnitude_txt_scale(1) = 1.0
+         Color_Magnitude_title(1) = 'Color_magnitude1'
 
          ! setup default
-         Color_magnitude1_num_panels = 2
+         Color_Magnitude_num_panels(1) = 2
 
          ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude1_xaxis1_name = 'model_number'
-         Color_magnitude1_xaxis2_name = ''
+         Color_Magnitude_xaxis1_name(1) = 'model_number'
+         Color_Magnitude_xaxis2_name(1) = ''
 
 
          ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude1_yaxis1_name(1) = 'bc_B'
-         Color_magnitude1_yaxis2_name(1) = 'bc_U'
-         Color_magnitude1_yaxis_reversed(1) = .false.
+         Color_Magnitude_yaxis1_name(1)(1) = 'bc_B'
+         Color_Magnitude_yaxis2_name(1)(1) = 'bc_U'
+         Color_Magnitude_yaxis_reversed(1)(1) = .false.
          
          ! Plots `other_yaxis1-other_yaxis2` leave `other_yaxis2` blank if you only want to plot `other_yaxis1`.
-         Color_magnitude1_other_yaxis1_name(1) = 'abs_mag_V'
-         Color_magnitude1_other_yaxis2_name(1) = ''
-         Color_magnitude1_other_yaxis_reversed(1) = .true.
+         Color_Magnitude_other_yaxis1_name(1)(1) = 'abs_mag_V'
+         Color_Magnitude_other_yaxis2_name(1)(1) = ''
+         Color_Magnitude_other_yaxis_reversed(1)(1) = .true.
 
 
-         Color_magnitude1_yaxis1_name(2) = 'bc_B'
-         Color_magnitude1_other_yaxis1_name(2) = 'bc_U'
+         Color_Magnitude_yaxis1_name(2)(1) = 'bc_B'
+         Color_Magnitude_other_yaxis1_name(2)(1) = 'bc_U'
          
          ! Enables calling a subroutine to add extra information to a plot
          ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
-         Color_magnitude1_use_decorator = .true.
+         Color_Magnitude_use_decorator(1) = .true.
 
          ! file output
-         Color_magnitude1_file_flag = .true.
-         Color_magnitude1_file_dir = 'png'
-         Color_magnitude1_file_prefix = 'Color_magnitude1_'
-         Color_magnitude1_file_interval = 5 ! output when `mod(model_number,Color_magnitude1_file_interval)==0`
-         Color_magnitude1_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude1_file_aspect_ratio = -1 ! negative means use same value as for window
+         Color_Magnitude_file_flag(1) = .true.
+         Color_Magnitude_file_dir(1) = 'png'
+         Color_Magnitude_file_prefix(1) = 'Color_magnitude1_'
+         Color_Magnitude_file_interval(1) = 5 ! output when `mod(model_number,Color_magnitude1_file_interval)==0`
+         Color_Magnitude_file_width(1) = -1 ! (inches) negative means use same value as for window
+         Color_Magnitude_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
       !### Color_magnitude2
 
-         Color_magnitude2_win_flag = .true.
+         Color_Magnitude_win_flag(2) = .true.
 
-         Color_magnitude2_win_width = 15
-         Color_magnitude2_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+         Color_Magnitude_win_width(2) = 15
+         Color_Magnitude_win_aspect_ratio(2) = 0.75 ! aspect_ratio = height/width
 
-         Color_magnitude2_xleft = 0.15
-         Color_magnitude2_xright = 0.85
-         Color_magnitude2_ybot = 0.15
-         Color_magnitude2_ytop = 0.85
-         Color_magnitude2_txt_scale = 1.0
-         Color_magnitude2_title = 'Color_magnitude2'
+         Color_Magnitude_xleft(2) = 0.15
+         Color_Magnitude_xright(2) = 0.85
+         Color_Magnitude_ybot(2) = 0.15
+         Color_Magnitude_ytop(2) = 0.85
+         Color_Magnitude_txt_scale(2) = 1.0
+         Color_Magnitude_title(2) = 'Color_magnitude2'
 
          ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude2_xaxis1_name = 'abs_mag_B'
-         Color_magnitude2_xaxis2_name = 'abs_mag_U'
+         Color_Magnitude_xaxis1_name(2) = 'abs_mag_B'
+         Color_Magnitude_xaxis2_name(2) = 'abs_mag_U'
 
          ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude2_yaxis1_name(1) = 'abs_mag_R'
-         Color_magnitude2_yaxis2_name(1) = 'abs_mag_J'
+         Color_Magnitude_yaxis1_name(1)(2) = 'abs_mag_R'
+         Color_Magnitude_yaxis2_name(1)(2) = 'abs_mag_J'
 
          ! setup default
-         Color_magnitude2_num_panels = 1
+         Color_Magnitude_num_panels(2) = 1
          ! file output
-         Color_magnitude2_file_flag = .true.
-         Color_magnitude2_file_dir = 'png'
-         Color_magnitude2_file_prefix = 'Color_magnitude2_'
-         Color_magnitude2_file_interval = 5 ! output when `mod(model_number,Color_magnitude2_file_interval)==0`
-         Color_magnitude2_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude2_file_aspect_ratio = -1 ! negative means use same value as for window
+         Color_Magnitude_file_flag(2) = .true.
+         Color_Magnitude_file_dir(2) = 'png'
+         Color_Magnitude_file_prefix(2) = 'Color_magnitude2_'
+         Color_Magnitude_file_interval(2) = 5 ! output when `mod(model_number,Color_magnitude2_file_interval)==0`
+         Color_Magnitude_file_width(2) = -1 ! (inches) negative means use same value as for window
+         Color_Magnitude_file_aspect_ratio(2) = -1 ! negative means use same value as for window
 
 
       !### Color_magnitude3
 
-         Color_magnitude3_win_flag = .true.
+         Color_Magnitude_win_flag(3) = .true.
 
-         Color_magnitude3_win_width = 15
-         Color_magnitude3_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
+         Color_Magnitude_win_width(3) = 15
+         Color_Magnitude_win_aspect_ratio(3) = 0.75 ! aspect_ratio = height/width
 
-         Color_magnitude3_xleft = 0.15
-         Color_magnitude3_xright = 0.85
-         Color_magnitude3_ybot = 0.15
-         Color_magnitude3_ytop = 0.85
-         Color_magnitude3_txt_scale = 1.0
-         Color_magnitude3_title = 'Color_magnitude3'
+         Color_Magnitude_xleft(3) = 0.15
+         Color_Magnitude_xright(3) = 0.85
+         Color_Magnitude_ybot(3) = 0.15
+         Color_Magnitude_ytop(3) = 0.85
+         Color_Magnitude_txt_scale(3) = 1.0
+         Color_Magnitude_title(3) = 'Color_magnitude3'
 
          ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
-         Color_magnitude3_xaxis1_name = 'model_number'
-         Color_magnitude3_xaxis2_name = ''
+         Color_Magnitude_xaxis1_name(3) = 'model_number'
+         Color_Magnitude_xaxis2_name(3) = ''
 
          ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
-         Color_magnitude3_yaxis1_name(1) = 'bc_v_bb'
+         Color_Magnitude_yaxis1_name(1)(3) = 'bc_v_bb'
          
-         Color_magnitude3_other_yaxis1_name(1) = 'av_v'
+         Color_Magnitude_other_yaxis1_name(1)(3) = 'av_v'
          
          ! setup default
-         Color_magnitude3_num_panels = 1
+         Color_Magnitude_num_panels(3) = 1
          ! file output
-         Color_magnitude3_file_flag = .true.
-         Color_magnitude3_file_dir = 'png'
-         Color_magnitude3_file_prefix = 'Color_magnitude3_'
-         Color_magnitude3_file_interval = 5 ! output when `mod(model_number,Color_magnitude3_file_interval)==0`
-         Color_magnitude3_file_width = -1 ! (inches) negative means use same value as for window
-         Color_magnitude3_file_aspect_ratio = -1 ! negative means use same value as for window
+         Color_Magnitude_file_flag(3) = .true.
+         Color_Magnitude_file_dir(3) = 'png'
+         Color_Magnitude_file_prefix(3) = 'Color_magnitude3_'
+         Color_Magnitude_file_interval(3) = 5 ! output when `mod(model_number,Color_magnitude3_file_interval)==0`
+         Color_Magnitude_file_width(3) = -1 ! (inches) negative means use same value as for window
+         Color_Magnitude_file_aspect_ratio(3) = -1 ! negative means use same value as for window
 
 
  / ! end of pgstar namelist

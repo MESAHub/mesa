@@ -88,7 +88,7 @@ pgstar commands used for the plots above:
          Grid_file_flag(2) = .true.
          Grid_file_dir(2) = 'png'
          Grid_file_prefix(2) = 'grid_'
-         Grid_file_interval(2) = 10 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
+         Grid_file_interval(2) = 10 ! 1 ! output when mod(model_number,Grid_file_interval(2))==0
          Grid_file_width(2) = -1 ! negative means use same value as for window
          Grid_file_aspect_ratio(2) = -1 ! negative means use same value as for window
       

@@ -425,14 +425,14 @@ Profile_Panels_ymin(1, 1) = 0 ! only used if /= -101d0
 Profile_Panels_ymax(1, 1) = -101d0 ! only used if /= -101d0
 
 Profile_Panels_other_yaxis_name(1, 1) = 'dvdt_drag'
-Profile_Panels1_other_yaxis_log(1) = .true.
+Profile_Panels_other_yaxis_log(1, 1) = .true.
 Profile_Panels_other_ymin(1, 1) = -10d0 ! only used if /= -101d0
 Profile_Panels_other_ymax(1, 1) = -101d0 ! only used if /= -101d0
 
 
 ! contents of panel 2
 Profile_Panels_yaxis_name(1, 2) = 'FdotV_drag_energy'
-Profile_Panels1_yaxis_log(2) = .true.
+Profile_Panels_yaxis_log(1, 2) = .true.
 Profile_Panels_ymin(1, 2) = -10 ! only used if /= -101d0
 Profile_Panels_ymax(1, 2) = 10d0 ! only used if /= -101d0
 
@@ -499,7 +499,7 @@ Profile_Panels_other_ymax(3, 1) = -101d0
 
 ! file output
 Profile_Panels_file_flag(3) = .false.
-Profile_Panels_file_interval(3) = 10     ! output when mod(model_number,Grid1_file_interval)==0
+Profile_Panels_file_interval(3) = 10     ! output when mod(model_number,Grid_file_interval(1))==0
 Profile_Panels_file_dir(3) = 'infall_png'
 Profile_Panels_file_prefix(3) = 'infall_'
 Profile_Panels_file_interval(3) = 10     ! output when mod(model_number,file_interval)==0
@@ -795,7 +795,7 @@ Grid_txt_scale_factor(1, 8) = 1.0 ! multiply txt_scale for subplot by this
 Grid_file_flag(1) = .true.
 Grid_file_dir(1) = 'grid_png'
 Grid_file_prefix(1) = 'grid_'
-Grid_file_interval(1) = 1000     ! output when mod(model_number,Grid1_file_interval)==0
+Grid_file_interval(1) = 1000     ! output when mod(model_number,Grid_file_interval(1))==0
 !Grid_file_width(1) = -1        ! (inches) negative means use same value as for window
 Grid_file_width(1) = 24       ! (inches) negative means use same value as for window
 Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
@@ -864,7 +864,7 @@ Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
       ! ::
 
 
-    History_Panels1_points_name(:) = ''
+    History_Panels_points_name(1, :) = ''
 
       ! setup default
 
@@ -886,7 +886,7 @@ Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
     History_Panels_other_yaxis_reversed(1, 1) = .false.
     History_Panels_other_ymin(1, 1) = -101d0
     History_Panels_other_ymax(1, 1) = -101d0
-    History_Panels1_other_dymin(1) = -1
+    History_Panels_other_dymin(1, 1) = -1
 
       ! ::
 
@@ -900,10 +900,10 @@ Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
     History_Panels_other_yaxis_name(1, 2) = 'log_total_drag_energy'
     History_Panels_other_yaxis_reversed(1, 2) = .false.
-    History_Panels1_other_yaxis_log(2) = .false.
+    History_Panels_other_yaxis_log(1, 2) = .false.
     !History_Panels_other_ymin(1, 2) = -101d0
     !History_Panels_other_ymax(1, 2) = 40d0
-    History_Panels1_other_dymin(2) = -1
+    History_Panels_other_dymin(1, 2) = -1
 
       ! ::
 
@@ -919,7 +919,7 @@ Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
     History_Panels_other_yaxis_reversed(1, 3) = .false.
     History_Panels_other_ymin(1, 3) = -101d0
     History_Panels_other_ymax(1, 3) = -101d0
-    History_Panels1_other_dymin(3) = -1
+    History_Panels_other_dymin(1, 3) = -1
 
       ! Enables calling a subroutine to add extra information to a plot
       ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``

@@ -71,14 +71,14 @@
 
       Grid_title(2) = '4.165 M\d\(2281)\u  Z=0.007  Classical Cepheid'
       
-      History_Panels1_xaxis_name='star_age_day'
+      History_Panels_xaxis_name(1) ='star_age_day'
       History_Panels_max_width(1) = 365 ! only used if > 0.  causes xmin to move with xmax.
 
       Grid_file_flag(2) = .true.
       file_digits = 7
       Grid_file_dir(2) = 'png'
       Grid_file_prefix(2) = 'grid'
-      Grid_file_interval(2) = 10 ! output when mod(model_number,Grid2_file_interval)==0
+      Grid_file_interval(2) = 10 ! output when mod(model_number,Grid_file_interval(2))==0
       
       !Profile_Panels_show_grid(1) = .true.
 
@@ -87,7 +87,7 @@
       Profile_Panels_xmin(1) = -101D0
       Profile_Panels_xmax(1) = -101D0
 
-      Profile_Panels1_dymin(4) = 0.02
+      Profile_Panels_dymin(1, 4) = 0.02
       !Profile_Panels_yaxis_name(1, 2) = 'avg_charge_He'
 
 / ! end of pgstar namelist

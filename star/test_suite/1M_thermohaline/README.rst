@@ -165,7 +165,7 @@ pgstar commands used for the plots above:
          Grid_file_flag(3) = .true.
          Grid_file_dir(3) = 'grid3_png'
          Grid_file_prefix(3) = 'Mixing_'
-         Grid_file_interval(3) = 100 ! output when mod(model_number,Grid3_file_interval)==0
+         Grid_file_interval(3) = 100 ! output when mod(model_number,Grid_file_interval(3))==0
          Grid_file_width(3) = 14        ! (inches) negative means use same value as for window
 
 
@@ -182,8 +182,8 @@ pgstar commands used for the plots above:
 
      Profile_Panels_num_panels(1) = 1
      Profile_Panels_yaxis_name(1, 1) = 'brunt_B'
-     Profile_Panels1_ymin(:) = -0.00006 ! 0.633
-     Profile_Panels1_ymax(:) = 0.000001 ! 0.634
+     Profile_Panels_ymin(1, :) = -0.00006 ! 0.633
+     Profile_Panels_ymax(1, :) = 0.000001 ! 0.634
      Profile_Panels_other_yaxis_name(1, 1) = ''
 
      Profile_Panels_file_flag(1) = .true.

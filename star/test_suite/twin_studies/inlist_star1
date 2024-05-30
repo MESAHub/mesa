@@ -35,6 +35,6 @@
    !Grid_file_flag(1) = .true.
    Grid_file_dir(1) = 'png1'
    Grid_file_prefix(1) = 'star1'
-   Grid_file_interval(1) = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   Grid_file_interval(1) = 10 ! output when mod(model_number,Grid_file_interval(1))==0
 
 / ! end of pgstar namelist

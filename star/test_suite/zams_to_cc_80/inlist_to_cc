@@ -118,9 +118,9 @@ Profile_Panels_xaxis_reversed(3) = .false.
 
 
 Profile_Panels_yaxis_name(3, 4) = 'gamma1'
-Profile_Panels3_dymin(4) = 0.14
+Profile_Panels_dymin(3, 4) = 0.14
 Profile_Panels_other_yaxis_name(3, 4) = 'vel_km_per_s'
-Profile_Panels3_dymin(4) = 0.14
+Profile_Panels_dymin(3, 4) = 0.14
 
 TRho_Profile_xmin = -12.0
 TRho_Profile_xmax = 10

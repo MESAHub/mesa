@@ -43,7 +43,7 @@
   Grid_file_flag(1) = .true.
   Grid_file_dir(1) = 'png'
   Grid_file_prefix(1) = 'grid1'
-  Grid_file_interval(1) = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
+  Grid_file_interval(1) = 1000000 ! output when mod(model_number,Grid_file_interval(1))==0
   Grid_file_width(1) = -1 ! negative means use same value as for window
   Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
   ! MESA uses PGPLOT for live plotting and gives the user a tremendous
@@ -93,7 +93,7 @@
   Profile_Panels_file_flag(1) = .false.
   Profile_Panels_file_dir(1) = 'png'
   Profile_Panels_file_prefix(1) = 'profile_panels1_'
-  Profile_Panels_file_interval(1) = 5 ! output when mod(model_number,Profile_Panels1_file_interval)==0
+  Profile_Panels_file_interval(1) = 5 ! output when mod(model_number,Profile_Panels_file_interval(1))==0
   Profile_Panels_file_width(1) = -1 ! (inches) negative means use same value as for window
   Profile_Panels_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
