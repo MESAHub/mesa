@@ -41,8 +41,8 @@ via richardson extrapolation, We see strong disagreement in the figure below.
 .. figure:: ../change_log_plots/cubic_dfridr_dkapdT.png
    :alt: relative kap derivative error
 
-  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
-  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
+  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
   and compton scattering opacity are labeled and presented with their associated blending regions.
 
@@ -51,8 +51,8 @@ via richardson extrapolation, We see strong disagreement in the figure below.
 .. figure:: ../change_log_plots/linear_dfridr_dkapdT.png
    :alt: relative kap derivative error
 
-  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
-  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
+  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
   and compton scattering opacity are labeled and presented with their associated blending regions.
 
@@ -68,8 +68,8 @@ has resulted in an unprecidented increase in the numerical accuracy of opacity d
 .. figure:: ../change_log_plots/cubic_dfridr_dkapdT_ad.png
    :alt: relative kap derivative error
 
-  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
-  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
+  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
   and compton scattering opacity are labeled and presented with their associated blending regions.
 
