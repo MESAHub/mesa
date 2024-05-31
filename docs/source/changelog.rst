@@ -63,9 +63,9 @@ halt the progress of the solver and ultimately crash a calculation.
 In hopes of improving the robustness of MESA's cubic opacity interpolation routines, and their overall numerical stability, we have implemented
 automatic differentiation into the opacity interpolating functions. Now, when using cubic interpolation, the opacity derivatives of an arbitrary mixture
 in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
-has resulted in an unprecidented increase in the numerical accuracy of opacity derivatives computed with cubic interpolation.
+has resulted in an unprecidented increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
 
-.. figure:: ../change_log_plots/cubic_dfridr_dkapdT.png
+.. figure:: ../change_log_plots/cubic_dfridr_dkapdT_ad.png
    :alt: relative kap derivative error
 
   This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
@@ -73,12 +73,13 @@ has resulted in an unprecidented increase in the numerical accuracy of opacity d
   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
   and compton scattering opacity are labeled and presented with their associated blending regions.
 
-
-Although linear interpolation remains the MESA default, we implore users to try out cubic interpolation, which has been shown to consistently increase the overall 
+Some areas in the figure still seems to disagree with the numerical derivatives achieved via richardson extrapolation, however there is ongoing development to
+discearn whether these remaining differences are a product of the interpolation method, or rather the implementation of richardson extrapolation in MESA. The entire
+MESA test_suite has been tested with these improvements to the opacity derivatives without error, so we are relatively confident in their interpolation at the moment. 
+For this MESA release, linear interpolation will remain the default interpolation opacity method. Although, we implore users to experiment with cubic interpolation, as it has been shown to consistently increase the overall 
 opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024.
 
-While linear interpolation will remain the default in this MESA release, we anticipate making cubic interpolation the default in a future MESA release version. We 
-encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
+We anticipate making cubic interpolation the default in a future MESA release version. We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
 
 
