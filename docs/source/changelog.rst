@@ -20,6 +20,115 @@ New Features
 
 ``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
 
+Kap
+~~~~~
+
+`Opacity interpolation`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two 1D splines.
+Previous versions of MESA have offered the users the ability to choose linear or cubic interpolation for these splines, 
+while leaving the default as linear interpolation.
+
++ ``cubic_interpolation_in_X = .true.``
++ ``cubic_interpolation_in_Z = .true.``
+
+We have refrained from adopting cubic interpolation as the default, as the interpolated opacity derivatives with respect to
+density and temperature where not very robust. Their derivatives often disagreed with the numerical derivatives produced via nearest neighbor
+richardson extrapolation. By directly comparing these derivatives to the numerical derivatives generated 
+via richardson extrapolation, We see strong disagreement in the figure below.
+
+.. figure:: ../change_log_plots/cubic_dfridr_dkapdT.png
+   :alt: relative kap derivative error
+
+  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
+  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+  and compton scattering opacity are labeled and presented with their associated blending regions.
+
+  This figure is in stark contrast to the relative numerical derivative error one gets when using linear interpolation only, see the figure below. 
+
+.. figure:: ../change_log_plots/linear_dfridr_dkapdT.png
+   :alt: relative kap derivative error
+
+  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
+  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+  and compton scattering opacity are labeled and presented with their associated blending regions.
+
+While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the jacobian matrix
+MESA solves. The opacity derivatives help direct the implicit calculation to a converged solution. Hence, numerically unstable opacity derivatives can
+halt the progress of the solver and ultimately crash a calculation. 
+
+In hopes of improving the robustness of MESA's cubic opacity interpolation routines, and their overall numerical stability, we have implemented
+automatic differentiation into the opacity interpolating functions. Now, when using cubic interpolation, the opacity derivatives of an arbitrary mixture
+in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
+has resulted in an unprecidented increase in the numerical accuracy of opacity derivatives computed with cubic interpolation.
+
+.. figure:: ../change_log_plots/cubic_dfridr_dkapdT.png
+   :alt: relative kap derivative error
+
+  This figure shows the relative derivative error, :math:'\partial \kappa / \partial T' (:math:'X' = 0.625, :math:'Z' = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
+  The OPLIB log(:math:'R') = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:'R') = 1.0 boundary is shown with a dashed line. 
+  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+  and compton scattering opacity are labeled and presented with their associated blending regions.
+
+
+Although linear interpolation remains the MESA default, we implore users to try out cubic interpolation, which has been shown to consistently increase the overall 
+opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024.
+
+While linear interpolation will remain the default in this MESA release, we anticipate making cubic interpolation the default in a future MESA release version. We 
+encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
+
+
+
+
+`High Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Type 1 Rosseland-mean opacity tables from The Los Alamos
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
+These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
+:math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
+opacity tables contains 1194 individual tables, a
+dramatic increase in table density (in the X--Z plane) over the standard
+126 individual tables provided in previous opacity releases. These tables
+are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
+(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
+adopt this new set of tables by selecting one of the following
+options for ``kap_file_prefix``:
+
++ ``'oplib_gs98'``
++ ``'oplib_agss09'``
++ ``'oplib_aag21'``
++ ``'oplib_mb22'``
+ 
+See :ref:`kap/overview:Overview of kap module` and
+:ref:`kap/defaults:kap_file_prefix` for more details on the
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
+the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
+in Farag et al. 2024.
+
+`Low Temperature Opacity Tables`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
+solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
+computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
+adopt this new set of tables by selecting one of the following
+options for :ref:`kap/defaults:kap_lowT_prefix`:
+
++ ``'lowT_fa05_mb22'``
++ ``'lowT_fa05_aag21'``
+
+Chem
+~~~~~
+New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
+are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
 
 .. _Bug Fixes main:
 
@@ -44,6 +153,13 @@ See `gh-575 <https://github.com/MESAHub/mesa/issues/575>`_
 
 MESA no longer produces a segmentation fault if it tries to increase
 the number of cells beyond ``max_allowed_nz``.
+
+``pgbinary``
+~~~~~~~~~~~~
+A bug in the `pgbinary` axes definitions resulted in models crashing when running in single star mode and has been corrected.
+Another bug inhibited the mass of the not modeled star from being displayed in the `pgbinary` panel and has also been corrected.
+
+See `gh-634 <https://github.com/MESAHub/mesa/issues/634>`_ 
 
 
 Changes in r24.03.1
