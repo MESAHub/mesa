@@ -38,23 +38,27 @@ density and temperature were not very robust. Their derivatives often disagreed 
 richardson extrapolation. By directly comparing these derivatives to the numerical derivatives generated 
 via richardson extrapolation, shown in the figure below.
 
-.. figure:: ../change_log_plots/cubic_dfridr_dkapdT.png
+.. figure:: changelog_plots/cubic_dfridr_dkapdT.png
+   :alt: old cubic relative kap derivative error
+
+   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
+   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
+   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+   and compton scattering opacity are labeled and presented with their associated blending regions.
+
+
+This is in stark contrast to the relative derivative error achieved with linear interpolation only, see the figure below. 
+
+.. figure:: changelog_plots/linear_dfridr_dkapdT.png
    :alt: relative kap derivative error
 
-  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
-  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
-  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
-  and compton scattering opacity are labeled and presented with their associated blending regions.
+   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
+   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
+   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+   and compton scattering opacity are labeled and presented with their associated blending regions.
 
-  This is in stark contrast to the relative derivative error achieved with linear interpolation only, see the figure below. 
-
-.. figure:: ../change_log_plots/linear_dfridr_dkapdT.png
-   :alt: relative kap derivative error
-
-  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
-  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
-  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
-  and compton scattering opacity are labeled and presented with their associated blending regions.
 
 While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the jacobian matrix
 MESA solves. The opacity derivatives are used to implicitly solve the stellar structure equations and reach a converged solution. Numerically unstable opacity derivatives can
@@ -65,13 +69,15 @@ automatic differentiation into the opacity interpolating functions. Now, when us
 in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
 has resulted in a significant reduction in the relative derivative error and results in an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
 
-.. figure:: ../change_log_plots/cubic_dfridr_dkapdT_ad.png
+.. figure:: changelog_plots/cubic_dfridr_dkapdT_ad.png
    :alt: relative kap derivative error
 
-  This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015), for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
-  The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
-  The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
-  and compton scattering opacity are labeled and presented with their associated blending regions.
+   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
+   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
+   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
+   and compton scattering opacity are labeled and presented with their associated blending regions.
+
 
 Some areas in the figure still seems to disagree with the numerical derivatives achieved via richardson extrapolation, however there is ongoing development to
 discearn whether these remaining differences are a product of the interpolation method, or rather the implementation of richardson extrapolation in MESA. The entire
