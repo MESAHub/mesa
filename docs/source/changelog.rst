@@ -67,7 +67,7 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 **Opacity interpolation**
 
 MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consequtive 1D splines.
-Previous versions of MESA have offered the users the ability to choose linear or cubic interpolation for these splines, 
+Previous versions of MESA have offered users the ability to choose linear or cubic interpolation for these splines, 
 while leaving the default as linear interpolation::
 
   cubic_interpolation_in_X = .false.
@@ -81,21 +81,20 @@ derivatives and blue indicates high quality derivatives.
 .. figure:: changelog_plots/cubic_dfridr_dkapdT.png
    :alt: old cubic relative kap derivative error
 
-   This figure shows the relative error in the derivative :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   This figure shows the logarithmic relative error in the derivative :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
    for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
    The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
    The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
    and compton scattering opacity are labeled and presented with their associated blending regions.
 
 
-While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the Jacobian matrix for the MESA implicit solver.
-The opacity derivatives are used to implicitly solve the stellar structure equations and reach a converged solution. Numerically unstable opacity derivatives can
-halt the progress of the solver and ultimately crash a calculation. 
+While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the Jacobian matrix for MESA's implicit solver.
+Numerically unstable opacity derivatives can halt the progress of the solver and ultimately crash a calculation. 
 
 To improve the numerical stability of MESA's cubic opacity interpolation routines, we have implemented
 automatic differentiation into the opacity interpolating functions. Now, when using cubic interpolation, the opacity derivatives for an arbitrary mixture
 in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
-has resulted in a significant reduction in the relative derivative error and results in an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
+has lead to a significant reduction in the relative derivative error and an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
 
 .. figure:: changelog_plots/cubic_dfridr_dkapdT_ad.png
    :alt: new cubic relative kap derivative error
@@ -114,7 +113,7 @@ option (shown below), while also providing more accurate opacity physics between
 
 For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
 while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
-However, we recommend users experiment with cubic interpolation, as it has been shown to consistently increase the overall 
+However, adopting cubic interpolation has been shown to consistently increase the overall 
 opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024.
 We anticipate making cubic interpolation the default in a future MESA release version. 
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
