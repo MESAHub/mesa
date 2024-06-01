@@ -68,40 +68,28 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 
 MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consequtive 1D splines.
 Previous versions of MESA have offered the users the ability to choose linear or cubic interpolation for these splines, 
-while leaving the default as linear interpolation.
+while leaving the default as linear interpolation::
 
-+ ``cubic_interpolation_in_X = .false.``
-+ ``cubic_interpolation_in_Z = .false.``
+  cubic_interpolation_in_X = .false.
+  cubic_interpolation_in_Z = .false.
 
-We have refrained from adopting cubic interpolation as the default, as the interpolated opacity derivatives with respect to
-density and temperature were not very robust. Their derivatives often disagreed with the numerical derivatives produced via nearest neighbor
-richardson extrapolation. By directly comparing these derivatives to the numerical derivatives generated 
-via richardson extrapolation, shown in the figure below.
+We have refrained from adopting cubic interpolation as the default due to poor quality interpolated opacity derivatives with respect to
+density and temperature, which often disagreed with the numerical derivatives produced via nearest neighbor
+Richardson extrapolation. The figure below shows this comparison on a logarithmic scale, where in general red indicates poor quality
+derivatives and blue indicates high quality derivatives.
 
 .. figure:: changelog_plots/cubic_dfridr_dkapdT.png
    :alt: old cubic relative kap derivative error
 
-   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   This figure shows the relative error in the derivative :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
    for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using cubic interpolation.
    The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
    The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
    and compton scattering opacity are labeled and presented with their associated blending regions.
 
 
-This is in stark contrast to the relative derivative error achieved with linear interpolation only, see the figure below. 
-
-.. figure:: changelog_plots/linear_dfridr_dkapdT.png
-   :alt: relative kap derivative error
-
-   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
-   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using linear interpolation.
-   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
-   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
-   and compton scattering opacity are labeled and presented with their associated blending regions.
-
-
-While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the jacobian matrix
-MESA solves. The opacity derivatives are used to implicitly solve the stellar structure equations and reach a converged solution. Numerically unstable opacity derivatives can
+While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the Jacobian matrix for the MESA implicit solver.
+The opacity derivatives are used to implicitly solve the stellar structure equations and reach a converged solution. Numerically unstable opacity derivatives can
 halt the progress of the solver and ultimately crash a calculation. 
 
 To improve the numerical stability of MESA's cubic opacity interpolation routines, we have implemented
@@ -110,21 +98,25 @@ in the :math:`X–Z` plane are computed by taking the derivative of the interpol
 has resulted in a significant reduction in the relative derivative error and results in an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
 
 .. figure:: changelog_plots/cubic_dfridr_dkapdT_ad.png
-   :alt: relative kap derivative error
+   :alt: new cubic relative kap derivative error
 
-   This figure shows the relative derivative error, :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
-   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module using cubic interpolation with automatic differentation.
-   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line. 
-   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve. Regions for Atomic, molecular,
-   and compton scattering opacity are labeled and presented with their associated blending regions.
+   Same as previous figure, but for new cubic interpolation scheme taking advantage of automatic differentiation.
 
 
-Some areas in the figure still seems to disagree with the numerical derivatives achieved via richardson extrapolation, however there is ongoing development to
-discearn whether these remaining differences are a product of the interpolation method, or rather the implementation of richardson extrapolation in MESA. The entire
-MESA test_suite has been tested with these improvements to the opacity derivatives without error. 
+This new implementation of cubic interpolation in composition for opacity tables comes close to achieving the derivative quality of the linear interpolation
+option (shown below), while also providing more accurate opacity physics between opacity table grid points.
 
-For this MESA release, linear interpolation will remain the default interpolation opacity method. Although, we implore users to experiment with cubic interpolation, as it has been shown to consistently increase the overall 
-opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024. We anticipate making cubic interpolation the default in a future MESA release version. 
+.. figure:: changelog_plots/linear_dfridr_dkapdT.png
+   :alt: linear relative kap derivative error
+
+   Same as previous figure, but for linear interpolation instead of cubic.
+
+
+For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
+while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
+However, we recommend users experiment with cubic interpolation, as it has been shown to consistently increase the overall 
+opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024.
+We anticipate making cubic interpolation the default in a future MESA release version. 
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
 
