@@ -21,10 +21,50 @@ New Features
 ``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
 
 Kap
-~~~~~
+~~~
 
-`Opacity interpolation`
-~~~~~~~~~~~~~~~~~~~~~~~
+**High Temperature Opacity Tables**
+
+Type 1 Rosseland-mean opacity tables from The Los Alamos
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
+These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
+:math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
+opacity tables contains 1194 individual tables, a
+dramatic increase in table density (in the X--Z plane) over the standard
+126 individual tables provided in previous opacity releases. These tables
+are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
+(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
+adopt this new set of tables by selecting one of the following
+options for ``kap_file_prefix``:
+
++ ``'oplib_gs98'``
++ ``'oplib_agss09'``
++ ``'oplib_aag21'``
++ ``'oplib_mb22'``
+ 
+See :ref:`kap/overview:Overview of kap module` and
+:ref:`kap/defaults:kap_file_prefix` for more details on the
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
+the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
+in Farag et al. 2024.
+
+
+**Low Temperature Opacity Tables**
+
+Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
+solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
+computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
+adopt this new set of tables by selecting one of the following
+options for :ref:`kap/defaults:kap_lowT_prefix`:
+
++ ``'lowT_fa05_mb22'``
++ ``'lowT_fa05_aag21'``
+
+**Opacity interpolation**
 
 MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consequtive 1D splines.
 Previous versions of MESA have offered the users the ability to choose linear or cubic interpolation for these splines, 
@@ -87,50 +127,6 @@ For this MESA release, linear interpolation will remain the default interpolatio
 opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024. We anticipate making cubic interpolation the default in a future MESA release version. 
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
-
-
-
-`High Temperature Opacity Tables`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Type 1 Rosseland-mean opacity tables from The Los Alamos
-OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
-These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
-:math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
-opacity tables contains 1194 individual tables, a
-dramatic increase in table density (in the X--Z plane) over the standard
-126 individual tables provided in previous opacity releases. These tables
-are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
-(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
-(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
-(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
-and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
-adopt this new set of tables by selecting one of the following
-options for ``kap_file_prefix``:
-
-+ ``'oplib_gs98'``
-+ ``'oplib_agss09'``
-+ ``'oplib_aag21'``
-+ ``'oplib_mb22'``
- 
-See :ref:`kap/overview:Overview of kap module` and
-:ref:`kap/defaults:kap_file_prefix` for more details on the
-implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
-the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
-in Farag et al. 2024.
-
-`Low Temperature Opacity Tables`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
-and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
-solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
-computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
-adopt this new set of tables by selecting one of the following
-options for :ref:`kap/defaults:kap_lowT_prefix`:
-
-+ ``'lowT_fa05_mb22'``
-+ ``'lowT_fa05_aag21'``
 
 Chem
 ~~~~~
