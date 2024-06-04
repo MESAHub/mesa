@@ -22,7 +22,10 @@ endif
 #
 # LIBRARIES
 
-LIBS_LOCAL = gyre
+LOCAL_LIB_DIR = ../../gyre/lib
+LOCAL_INC_DIR = ../../gyre/include
+
+LIBS_LOCAL = gyre_mesa gyre forum
 DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
 LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
 
@@ -58,9 +61,9 @@ nodeps : $(.DEFAULT_GOAL)
 %.o: %.f
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
-	@$(TEST_COMPILE) $(FCfree) $<
+	@$(TEST_COMPILE) $(FCfree) -I$(LOCAL_INC_DIR) $<
 else
-	$(TEST_COMPILE) $(FCfree) $<
+	$(TEST_COMPILE) $(FCfree) -I$(LOCAL_INC_DIR) $<
 endif
 
 #################################################################
@@ -71,7 +74,7 @@ SRC_PATH = ../src
 
 vpath %.f $(SRC_PATH)
 
-vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
+vpath %.mod $(LOCAL_INC_DIR):$(MESA_DIR)/include
 
 NODEPS = $(or $(filter nodeps,$(MAKECMDGOALS)),$(filter clean,$(MAKECMDGOALS)))
 
