@@ -10,12 +10,14 @@ include $(MESA_DIR)/utils/makefile_header
 
 #################################################################
 #
-# HAND-OFF
+# Hand off to GYRE build system
 
 MESA_LIB_DIR = $(MESA_DIR)/lib
 MESA_INC_DIR = $(MESA_DIR)/include
 
 export GYRE_DIR = ../gyre
+export TOOLS = no
+
 ifeq ($(USE_SHARED), YES)
    export SHARED = yes
 else
