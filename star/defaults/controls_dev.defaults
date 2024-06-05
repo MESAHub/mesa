@@ -174,3 +174,21 @@
       ! ::  
 
     op_split_burn_min_T_for_variable_T_solver = 1d99
+
+
+! TDC
+! ================
+
+      ! include_alfam
+      ! ~~~~~~~~~~~~~
+      ! alpha_TDC_DampM
+      ! ~~~~~~~~~~~~~~~
+
+      ! If include_alfam = .true., then include the eddy viscous damping parameter in TDC alpha_TDC_DampM
+
+      ! ::  
+
+    include_alfam = .false.
+    alpha_TDC_DampM = 0.25
+
+

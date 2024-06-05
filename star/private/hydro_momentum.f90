@@ -440,6 +440,11 @@
             Uq_ad = compute_Uq_face(s, k, ierr)
             if (ierr /= 0) return
          end if
+
+         if (s% include_alfam) then ! Uq(k) is turbulent viscosity drag at face k
+            Uq_ad = compute_Uq_face(s, k, ierr)
+            if (ierr /= 0) return
+         end if
          
          other_ad = extra_ad - accel_ad + drag + Uq_ad
          other = other_ad%val

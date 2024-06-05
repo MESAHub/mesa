@@ -65,7 +65,7 @@ public :: set_Y, Q_bisection_search, dQdZ_bisection_search, Af_bisection_search,
       logical :: report
       real(dp) :: mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt
       type(auto_diff_real_tdc) :: A0, c0, L, L0, gradL, grada
-      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma
+      type(auto_diff_real_star_order1) :: T, rho, dV, Cp, kap, Hp, Gamma, Eq_div_w
    end type tdc_info
 
 contains
@@ -522,7 +522,7 @@ contains
       real(dp), parameter :: x_GAMMAR = 2.d0*sqrt(3.d0)
 
       S0 = convert(x_ALFAS*info%mixing_length_alpha*info%Cp*info%T/info%Hp)*info%grada
-      S0 = S0*Y
+      S0 = S0*Y + convert(info%Eq_div_w)
       D0 = convert(info%alpha_TDC_DAMP*x_CEDE/(info%mixing_length_alpha*info%Hp))
       gammar_div_alfa = info%alpha_TDC_DAMPR*x_GAMMAR/(info%mixing_length_alpha*info%Hp)
       DR0 = convert(4d0*boltz_sigma*pow2(gammar_div_alfa)*pow3(info%T)/(pow2(info%rho)*info%Cp*info%kap))

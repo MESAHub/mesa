@@ -162,6 +162,7 @@ contains
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
+      use hydro_rsp2, only: compute_Eq_cell
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
@@ -181,14 +182,21 @@ contains
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
+         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq
 
       character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
 
-      ! Pre-calculate some things. 
+      ! Pre-calculate some things.
+      if (s% mlt_vc_old(k) > 0d0) then
+        check_Eq = compute_Eq_cell(s, k, ierr)
+        Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3) ! maybe should be using conv_vel???
+      else
+        Eq_div_w = 0
+      end if
+      !write(*,*) "k, Eq_div_w, compute_Eq_cell(s,k), s% mlt_vc_old(k)", k, Eq_div_w % val, check_Eq %val, s% mlt_vc_old(k)
       Pr = crad*pow4(T)/3d0
       Pg = P - Pr
       beta = Pg / P
@@ -258,7 +266,7 @@ contains
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k),Eq_div_w, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -276,7 +284,7 @@ contains
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k),Eq_div_w, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
