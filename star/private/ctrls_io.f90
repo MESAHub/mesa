@@ -111,7 +111,7 @@
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
     conv_core_gap_dq_limit, &
-    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
+    alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, alpha_TDC_DAMPM, include_alfam, &
     
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
@@ -2055,6 +2055,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% alpha_TDC_DAMP = alpha_TDC_DAMP
  s% alpha_TDC_DAMPR = alpha_TDC_DAMPR
  s% alpha_TDC_PtdVdt = alpha_TDC_PtdVdt
+ s% alpha_TDC_DAMPM = alpha_TDC_DAMPM
+ s% include_alfam = include_alfam
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
 
  s% RSP2_alfap = RSP2_alfap
@@ -3731,6 +3733,8 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  alpha_TDC_DAMP = s% alpha_TDC_DAMP
  alpha_TDC_DAMPR = s% alpha_TDC_DAMPR
  alpha_TDC_PtdVdt = s% alpha_TDC_PtdVdt
+ alpha_TDC_DAMPM = s% alpha_TDC_DAMPM
+ include_alfam = s% include_alfam
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
 
  RSP2_alfap= s% RSP2_alfap

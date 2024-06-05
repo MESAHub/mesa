@@ -40,7 +40,8 @@
          do1_rsp2_L_eqn, do1_turbulent_energy_eqn, do1_rsp2_Hp_eqn, &
          compute_Eq_cell, compute_Uq_face, set_RSP2_vars, &
          Hp_face_for_rsp2_val, Hp_face_for_rsp2_eqn, set_etrb_start_vars, &
-         RSP2_adjust_vars_before_call_solver, get_RSP2_alfa_beta_face_weights
+         RSP2_adjust_vars_before_call_solver, get_RSP2_alfa_beta_face_weights, &
+         set_viscosity_vars_TDC
       
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, & ! Ptrb
@@ -111,6 +112,68 @@
             s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
          end do
       end subroutine set_RSP2_vars
+
+
+
+        subroutine set_viscosity_vars_TDC(s,ierr)
+           type (star_info), pointer :: s
+           integer, intent(out) :: ierr
+           type(auto_diff_real_star_order1) :: x
+           integer :: k, op_err
+           include 'formats'
+           ierr = 0
+           op_err = 0
+
+            !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+            do k=1,s%nz
+               ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
+               if (s% Hp_face(k) <= 0) then
+                   ! this scale height for face is already calculated in TDC
+                   s% Hp_face(k) = s% scale_height(k) !get_scale_height_face_val(s,k)
+!                   write(*,*) 'k, hp_face, hp_cell', k, s% Hp_face(k), s% scale_height(k)
+!                  s% xh(s% i_Hp,k) = s% Hp_face(k)
+               end if
+            end do
+            !$OMP END PARALLEL DO
+           if (ierr /= 0) then
+              if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 1', s% model_number
+              return
+           end if
+           !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+           do k=1,s% nz
+              x = compute_Chi_cell(s, k, op_err)
+              if (op_err /= 0) ierr = op_err
+              x = compute_Eq_cell(s, k, op_err)
+              if (op_err /= 0) ierr = op_err
+             ! x = compute_Uq_face(s, k, op_err)
+              !if (op_err /= 0) ierr = op_err
+!              x = compute_C(s, k, op_err) ! COUPL
+!              if (op_err /= 0) ierr = op_err
+!              x = compute_L_face(s, k, op_err) ! Lr, Lt, Lc
+!              if (op_err /= 0) ierr = op_err
+           end do
+           !$OMP END PARALLEL DO
+           if (ierr /= 0) then
+              if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 2', s% model_number
+              return
+           end if
+           do k = 1, s% RSP2_num_outermost_cells_forced_nonturbulent
+              s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
+              s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
+           !   s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
+              !s% Ptrb(k) = 0d0;
+          !    s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
+          !    s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
+           end do
+           do k = s% nz + 1 - int(s% nz/s% RSP2_nz_div_IBOTOM) , s% nz
+              s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
+              s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
+         !     s% COUPL(k) = 0d0; s% COUPL_ad(k) = 0d0
+              !s% Ptrb(k) = 0d0;
+        !      s% Lc(k) = 0d0; s% Lc_ad(k) = 0d0
+        !      s% Lt(k) = 0d0; s% Lt_ad(k) = 0d0
+           end do
+        end subroutine set_viscosity_vars_TDC
 
 
       subroutine do1_rsp2_L_eqn(s, k, nvar, ierr)
@@ -585,7 +648,7 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: d_v_div_r
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
+         type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1, term1, term2
          include 'formats'
          ierr = 0
          v_00 = wrap_v_00(s,k)
@@ -594,6 +657,14 @@
          r_p1 = wrap_r_p1(s,k)
          if (r_p1%val == 0d0) r_p1 = 1d0
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
+
+        ! Debugging output to trace values
+!        if (k == 63) then
+!            write(*,*) 'test d_v_div_r, k:', k
+!            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
+!            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
+!            write(*,*) 'd_v_div_r:', d_v_div_r %val
+!        end if
       end function compute_d_v_div_r
       
       
@@ -678,9 +749,15 @@
             if (ierr /= 0) return
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
-            w_00 = wrap_w_00(s,k)
+            
+            ! use mlt_vc_old instead of wrap w if using TDC.
+            if (s% include_alfam) then
+                w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC ! maybe should be using mlt_vc?
+            else ! normal RSP2
+                w_00 = wrap_w_00(s,k)
+            end if
             d_00 = wrap_d_00(s,k)
-            f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)  
+            f = (16d0/3d0)*pi*ALFAM_ALFA/s% dm(k)
             rho2 = pow2(d_00)
             r_00 = wrap_r_00(s,k)
             r_p1 = wrap_r_p1(s,k)
@@ -688,11 +765,22 @@
             Chi_cell = f*rho2*r6_cell*d_v_div_r*Hp_cell*w_00
             ! units = g^-1 cm s^-1 g^2 cm^-6 cm^6 s^-1 cm
             !       = g cm^2 s^-2
-            !       = erg            
+            !       = erg
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
-
+!        if (k==100) then
+!                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
+!                write(*,*) 'Hp_cell', Hp_cell %val
+!                write(*,*) 'd_v_div_r', d_v_div_r %val
+!                write(*,*) ' f',  f
+!                write(*,*) 'w_00',w_00 %val
+!                write(*,*) 'd_00 ', d_00 %val
+!                write(*,*) 'rho2 ', rho2 %val
+!                write(*,*) 'r_00',  r_00 %val
+!                write(*,*) 'r_p1 ',  r_p1 %val
+!                write(*,*) 'r6_cell',  r6_cell %val
+!        end if
       end function compute_Chi_cell
 
       
@@ -711,9 +799,13 @@
             if (k >= 1 .and. k <= s% nz) s% Eq_ad(k) = 0d0
          else
             Chi_cell = s% Chi_ad(k) ! compute_Chi_cell(s,k,ierr)
+            !Chi_cell = compute_Chi_cell(s,k,ierr)
             if (ierr /= 0) return
             d_v_div_r = compute_d_v_div_r_opt_time_center(s, k, ierr)
             if (ierr /= 0) return
+          !  write(*,*) 'd_v_div_r', d_v_div_r
+           ! write(*,*) 'Chi_cell', Chi_cell
+           ! write(*,*) 's% Chi_ad(k)', s% Chi_ad(k) %val
             Eq_cell = 4d0*pi*Chi_cell*d_v_div_r/s% dm(k) ! erg s^-1 g^-1
          end if
          s% Eq(k) = Eq_cell%val
@@ -736,6 +828,7 @@
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
             Chi_00 = s% Chi_ad(k) ! compute_Chi_cell(s,k,ierr)
+            !Chi_00 = compute_Chi_cell(s,k,ierr)
             if (k > 1) then
                !Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
                Chi_m1 = shift_m1(s% Chi_ad(k-1))
@@ -744,11 +837,11 @@
                Chi_m1 = 0d0
             end if
             Uq_face = 4d0*pi*(Chi_m1 - Chi_00)/(r_00*s% dm_bar(k))
-            
-            if (k==-56) then
-               write(*,3) 'RSP2 Uq chi_m1 chi_00 r', k, s% solver_iter, &
-                  Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
-            end if
+            Uq_face %val = Uq_face %val
+!            if (k==63) then
+!               write(*,3) 'k Uq chi_m1 chi_00 r', k, s% solver_iter, &
+!                  Uq_face%val, Chi_m1%val, Chi_00%val, r_00%val
+!            end if
             
          end if
          ! erg g^-1 cm^-1 = g cm^2 s^-2 g^-1 cm^-1 = cm s^-2, acceleration

@@ -1,6 +1,8 @@
          
          logical :: compare_TDC_to_MLT
  
+         logical :: include_alfam
+         real(dp) :: alpha_TDC_DampM
          real(dp) :: RSP2_Lsurf_factor
          real(dp) :: RSP2_alfap
          real(dp) :: RSP2_alfat
