@@ -2,18 +2,10 @@
 Changelog
 *********
 
-Changes in main
-===============
+Changes in r24.06.1-rc1
+=======================
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
-.. _Backwards-incompatible changes main:
-
-Backwards-incompatible changes
-------------------------------
-
-
-.. _New Features main:
+.. _New Features r24.06.1-rc1:
 
 New Features
 ------------
@@ -124,11 +116,11 @@ We encourage users to experiment with these different opacity interpolation rout
 
 
 Chem
-~~~~~
+~~~~
 New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
 are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
 
-.. _Bug Fixes main:
+.. _Bug Fixes r24.06.1-rc1:
 
 Bug Fixes
 ---------
