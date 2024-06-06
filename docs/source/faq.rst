@@ -756,7 +756,7 @@ a simple script, images_to_movie.sh, which uses ffmpeg to create movies
 from PNG files produced by MESA.
 
 To make use of this capability, consult `Rich's
-instructions <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Making_Movies>`__.
+instructions <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Making_Movies>`__.
 
 Programming
 ===========
