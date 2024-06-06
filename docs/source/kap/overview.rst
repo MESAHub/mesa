@@ -66,8 +66,8 @@ selected by the option :ref:`kap/defaults:kap_file_prefix`.
 
 A direct comparison between the Type 1 format of OPAL/OP tables and 
 the OPLIB tables are shown in the figure below
-taken from Figure 1 in Farag et al. 2024. Further comparisons
-between OP/OPAL/OPLIB can be found in Farag et al. 2024.
+taken from Figure 1 in `Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_. Further comparisons
+between OP/OPAL/OPLIB can be found in `Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_.
 
 
 .. figure:: type1_format.png
@@ -76,7 +76,7 @@ between OP/OPAL/OPLIB can be found in Farag et al. 2024.
    Location of each Type-1 opacity table in the :math:`X–Z` plane (left panel) and the
    log:math:`T`–log:math:`R` plane (right panel). Orange circles mark the location of
    the 126 OPAL Type-1 tables (Rogers & Iglesias 1992). Blue circles
-   mark the location of the new 1194 Type-1 opacity tables (Farag et al. 2024).
+   mark the location of the new 1194 Type-1 opacity tables (`Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_).
 
 Additionally, there is support for the OPAL Type 2 tables that allow
 for varying amounts of C and O beyond that accounted for by :math:`Z`;
