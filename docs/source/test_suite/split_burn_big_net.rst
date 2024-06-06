@@ -1,1 +1,1 @@
-../..//../star/test_suite/split_burn_big_net/README.rst
+../../../star/test_suite/split_burn_big_net/README.rst
