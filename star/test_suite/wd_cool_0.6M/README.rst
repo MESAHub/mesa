@@ -34,17 +34,17 @@ pgstar commands used for the plots above:
   file_device = 'vcps'          ! postscript
   file_extension = 'ps'
 
-         Grid2_win_flag = .true.
-         Grid2_win_width = 16
-         Grid2_title = 'inlist_wd_cool_0.6M'
-         Grid2_xleft = 0.08
-         Grid2_xright = 0.99
-         Grid2_ybot = 0.04
-         Grid2_ytop = 0.92
+         Grid_win_flag(2) = .true.
+         Grid_win_width(2) = 16
+         Grid_title(2) = 'inlist_wd_cool_0.6M'
+         Grid_xleft(2) = 0.08
+         Grid_xright(2) = 0.99
+         Grid_ybot(2) = 0.04
+         Grid_ytop(2) = 0.92
 
-         Grid2_file_flag = .true.
-         Grid2_file_width = 16
-         Grid2_file_interval = 10000
+         Grid_file_flag(2) = .true.
+         Grid_file_width(2) = 16
+         Grid_file_interval(2) = 10000
 
          TRho_Profile_xmin = -6.0
          TRho_Profile_xmax = 7.0

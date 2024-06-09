@@ -34,30 +34,30 @@ pgstar commands used for the plots above:
   file_device = 'vcps'          ! postscript
   file_extension = 'ps'
 
-        Profile_Panels2_win_flag = .true.
-        Profile_Panels2_win_width = 12
-        Profile_Panels2_title = 'wd_diffusion'
+        Profile_Panels_win_flag(2) = .true.
+        Profile_Panels_win_width(2) = 12
+        Profile_Panels_title(2) = 'wd_diffusion'
 
-        Profile_Panels2_yaxis_name(2) = 'eE_div_mg_element_diffusion'
+        Profile_Panels_yaxis_name(2, 2) = 'eE_div_mg_element_diffusion'
 
-        Profile_Panels2_xaxis_name = 'logxm'
-        Profile_Panels2_xaxis_reversed = .true.
-        Profile_Panels2_xmin = -8
-        Profile_Panels2_xmax = 0
-        Profile_Panels2_show_mix_regions_on_xaxis = .true.
+        Profile_Panels_xaxis_name(2) = 'logxm'
+        Profile_Panels_xaxis_reversed(2) = .true.
+        Profile_Panels_xmin(2) = -8
+        Profile_Panels_xmax(2) = 0
+        Profile_Panels_show_mix_regions_on_xaxis(2) = .true.
 
-        Profile_Panels2_xright = 0.92
-        Profile_Panels2_ytop = 0.92
+        Profile_Panels_xright(2) = 0.92
+        Profile_Panels_ytop(2) = 0.92
 
         num_abundance_line_labels = 5
         Abundance_legend_max_cnt = 0
 
-        Profile_Panels2_file_flag = .true.
-        Profile_Panels2_file_dir = 'pgstar_out'
-        Profile_Panels2_file_prefix = 'profile_'
-        Profile_Panels2_file_interval = 100000     
-        Profile_Panels2_file_width = -1
-        Profile_Panels2_file_aspect_ratio = -1
+        Profile_Panels_file_flag(2) = .true.
+        Profile_Panels_file_dir(2) = 'pgstar_out'
+        Profile_Panels_file_prefix(2) = 'profile_'
+        Profile_Panels_file_interval(2) = 100000
+        Profile_Panels_file_width(2) = -1
+        Profile_Panels_file_aspect_ratio(2) = -1
 
  / ! end of pgstar namelist
 

@@ -98,29 +98,29 @@ pgstar commands used for the Part 2 plots above:
      TRho_file_aspect_ratio = -1 
 
 
-     History_Track1_win_flag = .true.
-     History_Track1_win_width = 12
-     History_Track1_win_aspect_ratio = 0.75
-     History_Track1_title = 'wd_c_core_ignition'
+     History_Track_win_flag(1) = .true.
+     History_Track_win_width(1) = 12
+     History_Track_win_aspect_ratio(1) = 0.75
+     History_Track_title(1) = 'wd_c_core_ignition'
 
-     History_Track1_xname = 'log_center_T'
-     History_Track1_yname = 'log_Lnuc'
-     History_Track1_xaxis_label = 'log T\dcenter'
-     History_Track1_yaxis_label = 'log Lnuc/L\d\(2281)'
-     History_Track1_reverse_xaxis = .false.
-     History_Track1_reverse_yaxis = .false.
+     History_Track_xname(1) = 'log_center_T'
+     History_Track_yname(1) = 'log_Lnuc'
+     History_Track_xaxis_label(1) = 'log T\dcenter'
+     History_Track_yaxis_label(1) = 'log Lnuc/L\d\(2281)'
+     History_Track_reverse_xaxis(1) = .false.
+     History_Track_reverse_yaxis(1) = .false.
 
-     History_Track1_xmin = 7.7
-     History_Track1_xmax = 8.7
-     History_Track1_ymin = -5.0
-     History_Track1_ymax = 9.0
+     History_Track_xmin(1) = 7.7
+     History_Track_xmax(1) = 8.7
+     History_Track_ymin(1) = -5.0
+     History_Track_ymax(1) = 9.0
 
-     History_Track1_file_flag = .true.
-     History_Track1_file_dir = 'pgstar_out'
-     History_Track1_file_prefix = 'track1_'
-     History_Track1_file_interval = 10000
-     History_Track1_file_width = -1
-     History_Track1_file_aspect_ratio = -1
+     History_Track_file_flag(1) = .true.
+     History_Track_file_dir(1) = 'pgstar_out'
+     History_Track_file_prefix(1) = 'track1_'
+     History_Track_file_interval(1) = 10000
+     History_Track_file_width(1) = -1
+     History_Track_file_aspect_ratio(1) = -1
 
      Kipp_win_flag = .true.
      Kipp_win_width = 12

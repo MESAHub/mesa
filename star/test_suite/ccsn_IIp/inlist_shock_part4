@@ -117,19 +117,19 @@
 &pgstar
          
 !pause = .true.
-Grid2_win_flag = .true.
+Grid_win_flag(2) = .true.
 
-Profile_Panels1_xmin = -101 ! 1.9
-Profile_Panels2_xmin = -101 ! 1.9
+Profile_Panels_xmin(1) = -101 ! 1.9
+Profile_Panels_xmin(2) = -101 ! 1.9
 Abundance_xmin = -101 ! 1.9
 Mixing_xmin = -101 ! 1.9
 
-!Profile_Panels1_yaxis_name(2) = 'alpha_RTI'
-!Profile_Panels1_ymax(2) = 0.99
-!Profile_Panels1_ymin(2) = 0
-!Profile_Panels1_other_yaxis_name(2) = 'log_source_RTI'
-!Profile_Panels1_other_ymax(2) = -0.1
-!Profile_Panels1_other_ymin(2) = -10
+!Profile_Panels_yaxis_name(1, 2) = 'alpha_RTI'
+!Profile_Panels_ymax(1, 2) = 0.99
+!Profile_Panels_ymin(1, 2) = 0
+!Profile_Panels_other_yaxis_name(1, 2) = 'log_source_RTI'
+!Profile_Panels_other_ymax(1, 2) = -0.1
+!Profile_Panels_other_ymin(1, 2) = -10
 
 
 / ! end of pgstar namelist

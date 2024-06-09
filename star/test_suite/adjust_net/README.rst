@@ -71,29 +71,29 @@ pgstar commands used for the plots above:
     Network_file_aspect_ratio = -1
 
 
-    History_Track1_win_flag = .true.
-    History_Track1_win_width = 12
-    History_Track1_title = 'adjust_net'                                                                                                                                                                                   
-    History_Track1_xname = 'model_number'
-    History_Track1_xaxis_label = 'model number'
+    History_Track_win_flag(1) = .true.
+    History_Track_win_width(1) = 12
+    History_Track_title(1) = 'adjust_net'
+    History_Track_xname(1) = 'model_number'
+    History_Track_xaxis_label(1) = 'model number'
 
-    History_Track1_yname = 'species'
-    History_Track1_yaxis_label = 'species in network'
+    History_Track_yname(1) = 'species'
+    History_Track_yaxis_label(1) = 'species in network'
 
-    History_Track1_reverse_xaxis = .false.
-    History_Track1_reverse_yaxis = .false.
+    History_Track_reverse_xaxis(1) = .false.
+    History_Track_reverse_yaxis(1) = .false.
 
-    History_Track1_xmin = 180.0
-    History_Track1_xmax = 240.0
-    History_Track1_ymin = 0.0
-    History_Track1_ymax = 70.0
+    History_Track_xmin(1) = 180.0
+    History_Track_xmax(1) = 240.0
+    History_Track_ymin(1) = 0.0
+    History_Track_ymax(1) = 70.0
 
-    History_Track1_file_flag = .true.
-    History_Track1_file_dir = 'png'
-    History_Track1_file_prefix = 'track1_'
-    History_Track1_file_interval = 10
-    History_Track1_file_width =12
-    History_Track1_file_aspect_ratio = -1
+    History_Track_file_flag(1) = .true.
+    History_Track_file_dir(1) = 'png'
+    History_Track_file_prefix(1) = 'track1_'
+    History_Track_file_interval(1) = 10
+    History_Track_file_width(1) =12
+    History_Track_file_aspect_ratio(1) = -1
 
  / ! end of pgstar namelist
 

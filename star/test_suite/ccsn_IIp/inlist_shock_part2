@@ -47,7 +47,7 @@
          
 !pause = .true.
 
-Grid2_win_flag = .true.
+Grid_win_flag(2) = .true.
 pgstar_interval = 5
 
 / ! end of pgstar namelist

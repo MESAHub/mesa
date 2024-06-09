@@ -196,7 +196,7 @@ make_gradr_sticky_in_solver_iters = .true.
 
 &pgstar
    
-   Grid2_win_flag = .true.
+   Grid_win_flag(2) = .true.
 
    ! HR window -- lg_L vs. lg_Teff
 

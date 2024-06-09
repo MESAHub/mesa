@@ -34,8 +34,8 @@ module pgbinary_orbit
 contains
    
    
-   subroutine Orbit_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
+   subroutine Orbit_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
       ierr = 0

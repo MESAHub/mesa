@@ -36,11 +36,11 @@
    !pause_interval = 10
    pgstar_interval = 1
 
-   Grid1_title = 'star2 - without overshooting'
+   Grid_title(1) = 'star2 - without overshooting'
    
-   !Grid1_file_flag = .true.
-   Grid1_file_dir = 'png2'
-   Grid1_file_prefix = 'star2'
-   Grid1_file_interval = 10 ! output when mod(model_number,Grid1_file_interval)==0
+   !Grid_file_flag(1) = .true.
+   Grid_file_dir(1) = 'png2'
+   Grid_file_prefix(1) = 'star2'
+   Grid_file_interval(1) = 10 ! output when mod(model_number,Grid_file_interval(1))==0
 
 / ! end of pgstar namelist

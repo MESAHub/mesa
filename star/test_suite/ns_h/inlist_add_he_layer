@@ -135,7 +135,7 @@ report_solver_progress = .false.
          
 !pause = .true.
 
-Grid2_win_flag = .true.
+Grid_win_flag(2) = .true.
 pgstar_interval = 1
 
 / ! end of pgstar namelist

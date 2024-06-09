@@ -70,7 +70,7 @@
 
 &pgstar
          
-         Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
-         Profile_Panels3_xmax = 1.5 ! -101d0 ! only used if /= -101d0
+         Profile_Panels_xmin(3) = -101d0 ! only used if /= -101d0
+         Profile_Panels_xmax(3) = 1.5 ! -101d0 ! only used if /= -101d0
 
 / ! end of pgstar namelist

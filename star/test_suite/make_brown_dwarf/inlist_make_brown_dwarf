@@ -59,7 +59,7 @@
 
 &pgstar
 
-      Grid1_win_flag = .true.
+      Grid_win_flag(1) = .true.
       
       TRho_Profile_xmin = -8
       TRho_Profile_xmax = 4

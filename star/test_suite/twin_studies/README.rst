@@ -35,7 +35,7 @@ for star 1:
 
    pgstar_interval = 1
 
-   Grid1_title = 'star1 - with overshooting'
+   Grid_title(1) = 'star1 - with overshooting'
   
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    !file_device = 'png'            ! png
@@ -44,10 +44,10 @@ for star 1:
    file_device = 'vcps'          ! postscript
    file_extension = 'ps'
 
-   Grid1_file_flag = .true.
-   Grid1_file_dir = 'png1'
-   Grid1_file_prefix = 'star1'
-   Grid1_file_interval = 10
+   Grid_file_flag(1) = .true.
+   Grid_file_dir(1) = 'png1'
+   Grid_file_prefix(1) = 'star1'
+   Grid_file_interval(1) = 10
 
  / ! end of pgstar namelist
 
@@ -67,12 +67,12 @@ and for star 2:
    file_device = 'vcps'          ! postscript
    file_extension = 'ps'
 
-   Grid1_title = 'star2 - without overshooting'
+   Grid_title(1) = 'star2 - without overshooting'
    
-   Grid1_file_flag = .true.
-   Grid1_file_dir = 'png2'
-   Grid1_file_prefix = 'star2'
-   Grid1_file_interval = 10
+   Grid_file_flag(1) = .true.
+   Grid_file_dir(1) = 'png2'
+   Grid_file_prefix(1) = 'star2'
+   Grid_file_interval(1) = 10
 
  / ! end of pgstar namelist
 

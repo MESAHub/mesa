@@ -102,16 +102,16 @@
 
    Dynamo_legend_txt_scale_factor = 0.7
    Mixing_legend_txt_scale_factor = 0.55
-   Profile_Panels4_txt_scale = 0.8
+   Profile_Panels_txt_scale(4) = 0.8
 
-   Profile_Panels4_win_flag = .true.
-   Profile_Panels4_win_width = 7
-   Profile_Panels4_title = '15M Dynamo'
+   Profile_Panels_win_flag(4) = .true.
+   Profile_Panels_win_width(4) = 7
+   Profile_Panels_title(4) = '15M Dynamo'
 
-   Profile_Panels4_file_flag = .true.
-   Profile_Panels4_file_dir = 'png'
-   Profile_Panels4_file_prefix = 'profile_Panels4_'
-   Profile_Panels4_file_interval = 50
-   Profile_Panels4_file_width = 10
+   Profile_Panels_file_flag(4) = .true.
+   Profile_Panels_file_dir(4) = 'png'
+   Profile_Panels_file_prefix(4) = 'profile_Panels4_'
+   Profile_Panels_file_interval(4) = 50
+   Profile_Panels_file_width(4) = 10
 
 / ! end of pgstar namelist

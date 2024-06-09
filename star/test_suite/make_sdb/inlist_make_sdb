@@ -90,14 +90,14 @@
 &pgstar
          
          !pause = .true.
-         !Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing_Ds, and Dynamo    
-         Profile_Panels4_num_panels = 3
-         Profile_Panels4_title = 'Abundance-Power-Mixing'
-         !History_Panels1_win_flag = .true. ! logT, logRho, log_L, log_Teff
-         Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
+         !Profile_Panels_win_flag(4) = .true. ! Abundance, Power, Mixing_Ds, and Dynamo
+         Profile_Panels_num_panels(4) = 3
+         Profile_Panels_title(4) = 'Abundance-Power-Mixing'
+         !History_Panels_win_flag(1) = .true. ! logT, logRho, log_L, log_Teff
+         Grid_win_flag(8) = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
          
-         Profile_Panels4_xaxis_name = 'mass'
-         Profile_Panels4_xaxis_reversed = .false.
+         Profile_Panels_xaxis_name(4) = 'mass'
+         Profile_Panels_xaxis_reversed(4) = .false.
 
 
 / ! end of pgstar namelist

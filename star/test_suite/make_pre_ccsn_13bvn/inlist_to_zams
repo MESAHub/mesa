@@ -47,7 +47,7 @@
 
 
 &pgstar
-Grid1_title = 'inlist_to_zams'
+Grid_title(1) = 'inlist_to_zams'
 
 
 / ! end of pgstar namelist

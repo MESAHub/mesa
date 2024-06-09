@@ -85,11 +85,11 @@
 
 
 &pgstar
-    Grid4_win_flag = .true.
+    Grid_win_flag(4) = .true.
     Kipp_mass_max = 5 ! (Msun units)
 
-    Grid4_file_flag = .false.
-    Grid4_file_interval = 20
+    Grid_file_flag(4) = .false.
+    Grid_file_interval(4) = 20
 
     Mixing_win_flag = .true.
     Mixing_win_width = 9

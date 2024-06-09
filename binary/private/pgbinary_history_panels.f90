@@ -28,6 +28,7 @@ module pgbinary_history_panels
    use binary_private_def
    use const_def
    use pgbinary_support
+   use binary_pgbinary
 
    implicit none
 
@@ -35,8 +36,8 @@ module pgbinary_history_panels
 contains
 
 
-   subroutine History_Panels1_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
+   subroutine History_Panels_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
       ierr = 0
@@ -45,549 +46,93 @@ contains
       call pgslct(device_id)
       call pgbbuf()
       call pgeras()
-      call do_History_Panels1_plot(b, id, device_id, &
-         b% pg% History_Panels1_xleft, b% pg% History_Panels1_xright, &
-         b% pg% History_Panels1_ybot, b% pg% History_Panels1_ytop, .false., &
-         b% pg% History_Panels1_title, b% pg% History_Panels1_txt_scale, ierr)
+      call do_History_Panels_plot(b, id, device_id, array_ix, &
+         b% pg% History_Panels_xleft(array_ix), b% pg% History_Panels_xright(array_ix), &
+         b% pg% History_Panels_ybot(array_ix), b% pg% History_Panels_ytop(array_ix), .false., &
+         b% pg% History_Panels_title(array_ix), b% pg% History_Panels_txt_scale(array_ix), ierr)
       if (ierr /= 0) return
       call pgebuf()
-   end subroutine History_Panels1_plot
+   end subroutine History_Panels_plot
 
 
-   subroutine do_History_Panels1_plot(b, id, device_id, &
+   subroutine do_History_Panels_plot(b, id, device_id, array_ix, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
+      integer, intent(in) :: id, device_id, array_ix
       real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
       logical, intent(in) :: subplot
       character (len = *), intent(in) :: title
       integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
+
+      procedure(pgbinary_decorator_interface), pointer :: decorator
+
+      select case (array_ix)  ! decorator interfaces cannot be arrayified
+      case(1)
+         decorator => b% pg% History_Panels1_pgbinary_decorator
+      case(2)
+         decorator => b% pg% History_Panels2_pgbinary_decorator
+      case(3)
+         decorator => b% pg% History_Panels3_pgbinary_decorator
+      case(4)
+         decorator => b% pg% History_Panels4_pgbinary_decorator
+      case(5)
+         decorator => b% pg% History_Panels5_pgbinary_decorator
+      case(6)
+         decorator => b% pg% History_Panels6_pgbinary_decorator
+      case(7)
+         decorator => b% pg% History_Panels7_pgbinary_decorator
+      case(8)
+         decorator => b% pg% History_Panels8_pgbinary_decorator
+      case(9)
+         decorator => b% pg% History_Panels9_pgbinary_decorator
+      case default
+         write(*, *) "select appropriate history panels window (1..9)"
+         return
+      end select
+
+      call do_one_panels_plot(&
+         id, b, device_id, array_ix, &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels1_xaxis_name, &
-         b% pg% History_Panels1_xmin, &
-         b% pg% History_Panels1_xmax, &
-         b% pg% History_Panels1_dxmin, &
-         b% pg% History_Panels1_xmargin, &
-         b% pg% History_Panels1_max_width, &
-         b% pg% History_Panels1_num_panels, &
-         b% pg% History_Panels1_other_ymin, &
-         b% pg% History_Panels1_other_ymax, &
-         b% pg% History_Panels1_yaxis_reversed, &
-         b% pg% History_Panels1_other_yaxis_log, &
-         b% pg% History_Panels1_other_dymin, &
-         b% pg% History_Panels1_points_name, &
-         b% pg% History_Panels1_other_ymargin, &
-         b% pg% History_Panels1_other_yaxis_name, &
-         b% pg% History_Panels1_ymin, &
-         b% pg% History_Panels1_ymax, &
-         b% pg% History_Panels1_xaxis_reversed, &
-         b% pg% History_Panels1_yaxis_reversed, &
-         b% pg% History_Panels1_xaxis_log, &
-         b% pg% History_Panels1_yaxis_log, &
-         b% pg% History_Panels1_dymin, &
-         b% pg% History_Panels1_ymargin, &
-         b% pg% History_Panels1_yaxis_name, &
-         b% pg% History_Panels1_use_decorator, &
-         b% pg% History_Panels1_pgbinary_decorator, &
+         b% pg% History_Panels_max_width(array_ix), b% pg% History_Panels_num_panels(array_ix), &
+
+         b% pg% History_Panels_xaxis_name(array_ix), &
+         b% pg% History_Panels_xmin(array_ix), b% pg% History_Panels_xmax(array_ix), &
+         b% pg% History_Panels_dxmin(array_ix), b% pg% History_Panels_xmargin(array_ix), &
+         b% pg% History_Panels_xaxis_reversed(array_ix), b% pg% History_Panels_xaxis_log(array_ix), &
+
+         b% pg% History_Panels_yaxis_name(array_ix, :), &
+         b% pg% History_Panels_ymin(array_ix, :), b% pg% History_Panels_ymax(array_ix, :), &
+         b% pg% History_Panels_dymin(array_ix, :), b% pg% History_Panels_ymargin(array_ix, :), &
+         b% pg% History_Panels_yaxis_reversed(array_ix, :), b% pg% History_Panels_yaxis_log(array_ix, :), &
+
+         b% pg% History_Panels_other_yaxis_name(array_ix, :), &
+         b% pg% History_Panels_other_ymin(array_ix, :), b% pg% History_Panels_other_ymax(array_ix, :), &
+         b% pg% History_Panels_other_dymin(array_ix, :), b% pg% History_Panels_other_ymargin(array_ix, :), &
+         b% pg% History_Panels_other_yaxis_reversed(array_ix, :), b% pg% History_Panels_other_yaxis_log(array_ix, :), &
+
+         b% pg% History_Panels_points_name(array_ix, :), &
+         b% pg% History_Panels_use_decorator(array_ix), decorator, &
          ierr)
-   end subroutine do_History_Panels1_plot
+   end subroutine do_History_Panels_plot
 
 
-   subroutine History_Panels2_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels2_plot(b, id, device_id, &
-         b% pg% History_Panels2_xleft, b% pg% History_Panels2_xright, &
-         b% pg% History_Panels2_ybot, b% pg% History_Panels2_ytop, .false., &
-         b% pg% History_Panels2_title, b% pg% History_Panels2_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels2_plot
-
-
-   subroutine do_History_Panels2_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels2_xaxis_name, &
-         b% pg% History_Panels2_xmin, &
-         b% pg% History_Panels2_xmax, &
-         b% pg% History_Panels2_dxmin, &
-         b% pg% History_Panels2_xmargin, &
-         b% pg% History_Panels2_max_width, &
-         b% pg% History_Panels2_num_panels, &
-         b% pg% History_Panels2_other_ymin, &
-         b% pg% History_Panels2_other_ymax, &
-         b% pg% History_Panels2_yaxis_reversed, &
-         b% pg% History_Panels2_other_yaxis_log, &
-         b% pg% History_Panels2_other_dymin, &
-         b% pg% History_Panels2_points_name, &
-         b% pg% History_Panels2_other_ymargin, &
-         b% pg% History_Panels2_other_yaxis_name, &
-         b% pg% History_Panels2_ymin, &
-         b% pg% History_Panels2_ymax, &
-         b% pg% History_Panels2_xaxis_reversed, &
-         b% pg% History_Panels2_yaxis_reversed, &
-         b% pg% History_Panels2_xaxis_log, &
-         b% pg% History_Panels2_yaxis_log, &
-         b% pg% History_Panels2_dymin, &
-         b% pg% History_Panels2_ymargin, &
-         b% pg% History_Panels2_yaxis_name, &
-         b% pg% History_Panels2_use_decorator, &
-         b% pg% History_Panels2_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels2_plot
-
-
-   subroutine History_Panels3_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels3_plot(b, id, device_id, &
-         b% pg% History_Panels3_xleft, b% pg% History_Panels3_xright, &
-         b% pg% History_Panels3_ybot, b% pg% History_Panels3_ytop, .false., &
-         b% pg% History_Panels3_title, b% pg% History_Panels3_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels3_plot
-
-
-   subroutine do_History_Panels3_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels3_xaxis_name, &
-         b% pg% History_Panels3_xmin, &
-         b% pg% History_Panels3_xmax, &
-         b% pg% History_Panels3_dxmin, &
-         b% pg% History_Panels3_xmargin, &
-         b% pg% History_Panels3_max_width, &
-         b% pg% History_Panels3_num_panels, &
-         b% pg% History_Panels3_other_ymin, &
-         b% pg% History_Panels3_other_ymax, &
-         b% pg% History_Panels3_yaxis_reversed, &
-         b% pg% History_Panels3_other_yaxis_log, &
-         b% pg% History_Panels3_other_dymin, &
-         b% pg% History_Panels3_points_name, &
-         b% pg% History_Panels3_other_ymargin, &
-         b% pg% History_Panels3_other_yaxis_name, &
-         b% pg% History_Panels3_ymin, &
-         b% pg% History_Panels3_ymax, &
-         b% pg% History_Panels3_xaxis_reversed, &
-         b% pg% History_Panels3_yaxis_reversed, &
-         b% pg% History_Panels3_xaxis_log, &
-         b% pg% History_Panels3_yaxis_log, &
-         b% pg% History_Panels3_dymin, &
-         b% pg% History_Panels3_ymargin, &
-         b% pg% History_Panels3_yaxis_name, &
-         b% pg% History_Panels3_use_decorator, &
-         b% pg% History_Panels3_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels3_plot
-
-
-   subroutine History_Panels4_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels4_plot(b, id, device_id, &
-         b% pg% History_Panels4_xleft, b% pg% History_Panels4_xright, &
-         b% pg% History_Panels4_ybot, b% pg% History_Panels4_ytop, .false., &
-         b% pg% History_Panels4_title, b% pg% History_Panels4_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels4_plot
-
-
-   subroutine do_History_Panels4_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels4_xaxis_name, &
-         b% pg% History_Panels4_xmin, &
-         b% pg% History_Panels4_xmax, &
-         b% pg% History_Panels4_dxmin, &
-         b% pg% History_Panels4_xmargin, &
-         b% pg% History_Panels4_max_width, &
-         b% pg% History_Panels4_num_panels, &
-         b% pg% History_Panels4_other_ymin, &
-         b% pg% History_Panels4_other_ymax, &
-         b% pg% History_Panels4_yaxis_reversed, &
-         b% pg% History_Panels4_other_yaxis_log, &
-         b% pg% History_Panels4_other_dymin, &
-         b% pg% History_Panels4_points_name, &
-         b% pg% History_Panels4_other_ymargin, &
-         b% pg% History_Panels4_other_yaxis_name, &
-         b% pg% History_Panels4_ymin, &
-         b% pg% History_Panels4_ymax, &
-         b% pg% History_Panels4_xaxis_reversed, &
-         b% pg% History_Panels4_yaxis_reversed, &
-         b% pg% History_Panels4_xaxis_log, &
-         b% pg% History_Panels4_yaxis_log, &
-         b% pg% History_Panels4_dymin, &
-         b% pg% History_Panels4_ymargin, &
-         b% pg% History_Panels4_yaxis_name, &
-         b% pg% History_Panels4_use_decorator, &
-         b% pg% History_Panels4_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels4_plot
-
-
-   subroutine History_Panels5_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels5_plot(b, id, device_id, &
-         b% pg% History_Panels5_xleft, b% pg% History_Panels5_xright, &
-         b% pg% History_Panels5_ybot, b% pg% History_Panels5_ytop, .false., &
-         b% pg% History_Panels5_title, b% pg% History_Panels5_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels5_plot
-
-
-   subroutine do_History_Panels5_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels5_xaxis_name, &
-         b% pg% History_Panels5_xmin, &
-         b% pg% History_Panels5_xmax, &
-         b% pg% History_Panels5_dxmin, &
-         b% pg% History_Panels5_xmargin, &
-         b% pg% History_Panels5_max_width, &
-         b% pg% History_Panels5_num_panels, &
-         b% pg% History_Panels5_other_ymin, &
-         b% pg% History_Panels5_other_ymax, &
-         b% pg% History_Panels5_yaxis_reversed, &
-         b% pg% History_Panels5_other_yaxis_log, &
-         b% pg% History_Panels5_other_dymin, &
-         b% pg% History_Panels5_points_name, &
-         b% pg% History_Panels5_other_ymargin, &
-         b% pg% History_Panels5_other_yaxis_name, &
-         b% pg% History_Panels5_ymin, &
-         b% pg% History_Panels5_ymax, &
-         b% pg% History_Panels5_xaxis_reversed, &
-         b% pg% History_Panels5_yaxis_reversed, &
-         b% pg% History_Panels5_xaxis_log, &
-         b% pg% History_Panels5_yaxis_log, &
-         b% pg% History_Panels5_dymin, &
-         b% pg% History_Panels5_ymargin, &
-         b% pg% History_Panels5_yaxis_name, &
-         b% pg% History_Panels5_use_decorator, &
-         b% pg% History_Panels5_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels5_plot
-
-
-   subroutine History_Panels6_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels6_plot(b, id, device_id, &
-         b% pg% History_Panels6_xleft, b% pg% History_Panels6_xright, &
-         b% pg% History_Panels6_ybot, b% pg% History_Panels6_ytop, .false., &
-         b% pg% History_Panels6_title, b% pg% History_Panels6_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels6_plot
-
-
-   subroutine do_History_Panels6_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels6_xaxis_name, &
-         b% pg% History_Panels6_xmin, &
-         b% pg% History_Panels6_xmax, &
-         b% pg% History_Panels6_dxmin, &
-         b% pg% History_Panels6_xmargin, &
-         b% pg% History_Panels6_max_width, &
-         b% pg% History_Panels6_num_panels, &
-         b% pg% History_Panels6_other_ymin, &
-         b% pg% History_Panels6_other_ymax, &
-         b% pg% History_Panels6_yaxis_reversed, &
-         b% pg% History_Panels6_other_yaxis_log, &
-         b% pg% History_Panels6_other_dymin, &
-         b% pg% History_Panels6_points_name, &
-         b% pg% History_Panels6_other_ymargin, &
-         b% pg% History_Panels6_other_yaxis_name, &
-         b% pg% History_Panels6_ymin, &
-         b% pg% History_Panels6_ymax, &
-         b% pg% History_Panels6_xaxis_reversed, &
-         b% pg% History_Panels6_yaxis_reversed, &
-         b% pg% History_Panels6_xaxis_log, &
-         b% pg% History_Panels6_yaxis_log, &
-         b% pg% History_Panels6_dymin, &
-         b% pg% History_Panels6_ymargin, &
-         b% pg% History_Panels6_yaxis_name, &
-         b% pg% History_Panels6_use_decorator, &
-         b% pg% History_Panels6_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels6_plot
-
-
-   subroutine History_Panels7_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels7_plot(b, id, device_id, &
-         b% pg% History_Panels7_xleft, b% pg% History_Panels7_xright, &
-         b% pg% History_Panels7_ybot, b% pg% History_Panels7_ytop, .false., &
-         b% pg% History_Panels7_title, b% pg% History_Panels7_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels7_plot
-
-
-   subroutine do_History_Panels7_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels7_xaxis_name, &
-         b% pg% History_Panels7_xmin, &
-         b% pg% History_Panels7_xmax, &
-         b% pg% History_Panels7_dxmin, &
-         b% pg% History_Panels7_xmargin, &
-         b% pg% History_Panels7_max_width, &
-         b% pg% History_Panels7_num_panels, &
-         b% pg% History_Panels7_other_ymin, &
-         b% pg% History_Panels7_other_ymax, &
-         b% pg% History_Panels7_yaxis_reversed, &
-         b% pg% History_Panels7_other_yaxis_log, &
-         b% pg% History_Panels7_other_dymin, &
-         b% pg% History_Panels7_points_name, &
-         b% pg% History_Panels7_other_ymargin, &
-         b% pg% History_Panels7_other_yaxis_name, &
-         b% pg% History_Panels7_ymin, &
-         b% pg% History_Panels7_ymax, &
-         b% pg% History_Panels7_xaxis_reversed, &
-         b% pg% History_Panels7_yaxis_reversed, &
-         b% pg% History_Panels7_xaxis_log, &
-         b% pg% History_Panels7_yaxis_log, &
-         b% pg% History_Panels7_dymin, &
-         b% pg% History_Panels7_ymargin, &
-         b% pg% History_Panels7_yaxis_name, &
-         b% pg% History_Panels7_use_decorator, &
-         b% pg% History_Panels7_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels7_plot
-
-
-   subroutine History_Panels8_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels8_plot(b, id, device_id, &
-         b% pg% History_Panels8_xleft, b% pg% History_Panels8_xright, &
-         b% pg% History_Panels8_ybot, b% pg% History_Panels8_ytop, .false., &
-         b% pg% History_Panels8_title, b% pg% History_Panels8_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels8_plot
-
-
-   subroutine do_History_Panels8_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels8_xaxis_name, &
-         b% pg% History_Panels8_xmin, &
-         b% pg% History_Panels8_xmax, &
-         b% pg% History_Panels8_dxmin, &
-         b% pg% History_Panels8_xmargin, &
-         b% pg% History_Panels8_max_width, &
-         b% pg% History_Panels8_num_panels, &
-         b% pg% History_Panels8_other_ymin, &
-         b% pg% History_Panels8_other_ymax, &
-         b% pg% History_Panels8_yaxis_reversed, &
-         b% pg% History_Panels8_other_yaxis_log, &
-         b% pg% History_Panels8_other_dymin, &
-         b% pg% History_Panels8_points_name, &
-         b% pg% History_Panels8_other_ymargin, &
-         b% pg% History_Panels8_other_yaxis_name, &
-         b% pg% History_Panels8_ymin, &
-         b% pg% History_Panels8_ymax, &
-         b% pg% History_Panels8_xaxis_reversed, &
-         b% pg% History_Panels8_yaxis_reversed, &
-         b% pg% History_Panels8_xaxis_log, &
-         b% pg% History_Panels8_yaxis_log, &
-         b% pg% History_Panels8_dymin, &
-         b% pg% History_Panels8_ymargin, &
-         b% pg% History_Panels8_yaxis_name, &
-         b% pg% History_Panels8_use_decorator, &
-         b% pg% History_Panels8_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels8_plot
-
-
-   subroutine History_Panels9_plot(id, device_id, ierr)
-      integer, intent(in) :: id, device_id
-      integer, intent(out) :: ierr
-      type (binary_info), pointer :: b
-      ierr = 0
-      call get_binary_ptr(id, b, ierr)
-      if (ierr /= 0) return
-      call pgslct(device_id)
-      call pgbbuf()
-      call pgeras()
-      call do_History_Panels9_plot(b, id, device_id, &
-         b% pg% History_Panels9_xleft, b% pg% History_Panels9_xright, &
-         b% pg% History_Panels9_ybot, b% pg% History_Panels9_ytop, .false., &
-         b% pg% History_Panels9_title, b% pg% History_Panels9_txt_scale, ierr)
-      if (ierr /= 0) return
-      call pgebuf()
-   end subroutine History_Panels9_plot
-
-
-   subroutine do_History_Panels9_plot(b, id, device_id, &
-      vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, ierr)
-      type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id
-      real, intent(in) :: vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale
-      logical, intent(in) :: subplot
-      character (len = *), intent(in) :: title
-      integer, intent(out) :: ierr
-      call do_history_panels_plot(&
-         id, b, device_id, &
-         vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-         b% pg% History_Panels9_xaxis_name, &
-         b% pg% History_Panels9_xmin, &
-         b% pg% History_Panels9_xmax, &
-         b% pg% History_Panels9_dxmin, &
-         b% pg% History_Panels9_xmargin, &
-         b% pg% History_Panels9_max_width, &
-         b% pg% History_Panels9_num_panels, &
-         b% pg% History_Panels9_other_ymin, &
-         b% pg% History_Panels9_other_ymax, &
-         b% pg% History_Panels9_other_yaxis_reversed, &
-         b% pg% History_Panels9_other_yaxis_log, &
-         b% pg% History_Panels9_other_dymin, &
-         b% pg% History_Panels9_points_name, &
-         b% pg% History_Panels9_other_ymargin, &
-         b% pg% History_Panels9_other_yaxis_name, &
-         b% pg% History_Panels9_ymin, &
-         b% pg% History_Panels9_ymax, &
-         b% pg% History_Panels9_xaxis_reversed, &
-         b% pg% History_Panels9_yaxis_reversed, &
-         b% pg% History_Panels9_xaxis_log, &
-         b% pg% History_Panels9_yaxis_log, &
-         b% pg% History_Panels9_dymin, &
-         b% pg% History_Panels9_ymargin, &
-         b% pg% History_Panels9_yaxis_name, &
-         b% pg% History_Panels9_use_decorator, &
-         b% pg% History_Panels9_pgbinary_decorator, &
-         ierr)
-   end subroutine do_History_Panels9_plot
-
-
-   subroutine do_history_panels_plot(&
-      id, b, device_id, &
+   subroutine do_one_panels_plot(&
+      id, b, device_id, array_ix, &
       vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
-      hist_xaxis_name, hist_xmin_in, hist_xmax, dxmin, hist_xmargin, &
       hist_max_width, hist_num_panels, &
-      hist_other_ymin, hist_other_ymax, &
-      hist_other_yaxis_reversed, hist_other_yaxis_log, &
-      hist_other_dymin, hist_points_name, &
-      hist_other_ymargin, hist_other_yaxis_name, &
+      hist_xaxis_name_in, &
+      hist_xmin_in, hist_xmax,&
+      dxmin, hist_xmargin, &
+      hist_xaxis_reversed, hist_xaxis_log, &
+      hist_yaxis_name, &
       hist_ymin, hist_ymax, &
-      hist_xaxis_reversed, hist_yaxis_reversed, &
-      hist_xaxis_log, hist_yaxis_log, &
-      hist_dymin, hist_ymargin, hist_yaxis_name, &
+      hist_dymin, hist_ymargin,  &
+      hist_yaxis_reversed, hist_yaxis_log, &
+      hist_other_yaxis_name, &
+      hist_other_ymin, hist_other_ymax, &
+      hist_other_dymin, hist_other_ymargin, &
+      hist_other_yaxis_reversed, hist_other_yaxis_log, &
+      hist_points_name, &
       use_decorator, pgbinary_decorator, &
       ierr)
 
@@ -595,9 +140,9 @@ contains
       use pgstar_support, only : set_xleft_xright, set_ytop_ybot
 
       type (binary_info), pointer :: b
-      integer, intent(in) :: id, device_id, hist_num_panels
+      integer, intent(in) :: id, device_id, hist_num_panels, array_ix
       logical, intent(in) :: subplot, hist_xaxis_reversed, hist_xaxis_log
-      character (len = *), intent(in) :: title, hist_xaxis_name
+      character (len = *), intent(in) :: title, hist_xaxis_name_in
       real, intent(in) :: &
          vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
          hist_xmin_in, hist_xmax, hist_max_width, hist_xmargin, dxmin
@@ -614,7 +159,7 @@ contains
       integer, intent(out) :: ierr
       procedure(pgbinary_decorator_interface), pointer :: pgbinary_decorator
 
-      character (len = strlen) :: yname, other_yname
+      character (len = strlen) :: yname, other_yname, hist_xaxis_name
       real, pointer, dimension(:) :: xvec, yvec, other_yvec
       real, pointer, dimension(:) :: yfile_xdata, other_yfile_xdata
       real, pointer, dimension(:) :: yfile_ydata, other_yfile_ydata
@@ -633,18 +178,11 @@ contains
       include 'formats'
 
       ierr = 0
-
-      call integer_dict_lookup(b% binary_history_names_dict, hist_xaxis_name, ix, ierr)
-      if (ierr /= 0) ix = -1
-      if (ix <= 0) then
-         write(*, *)
-         write(*, *) 'ERROR: failed to find ' // &
-            trim(hist_xaxis_name) // ' in history data'
-         write(*, *)
-         ierr = -1
-      end if
-
+      hist_xaxis_name = hist_xaxis_name_in
       hist_xmin = hist_xmin_in
+
+      step_min = 1
+      step_max = b% model_number
 
       if (hist_xaxis_name == 'model_number') then
          max_width = int(hist_max_width)
@@ -654,9 +192,16 @@ contains
          if (step_max <= 0) step_max = b% model_number
          if (step_min >= b% model_number) step_min = 1
          if (max_width > 0) step_min = max(step_min, step_max - max_width)
-      else
-         step_min = 1
-         step_max = b% model_number
+      end if
+
+      call integer_dict_lookup(b% binary_history_names_dict, hist_xaxis_name, ix, ierr)
+      if (ierr /= 0) ix = -1
+      if (ix <= 0) then
+         write(*, *)
+         write(*, *) 'ERROR: failed to find ' // &
+            trim(hist_xaxis_name) // ' in history data'
+         write(*, *)
+         ierr = -1
       end if
 
       n = count_hist_points(b, step_min, step_max)
@@ -914,7 +459,7 @@ contains
       end function get1_yvec
 
 
-   end subroutine do_history_panels_plot
+   end subroutine do_one_panels_plot
 
 
 end module pgbinary_history_panels

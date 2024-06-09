@@ -88,7 +88,7 @@
 
 &pgstar
 
-Grid1_title = 'inlist_to_post_si_burn'
+Grid_title(1) = 'inlist_to_post_si_burn'
 
 TRho_logRho_min = 3.0 ! only used if /= -101d0
 TRho_logT_min = 8.5 ! only used if /= -101d0

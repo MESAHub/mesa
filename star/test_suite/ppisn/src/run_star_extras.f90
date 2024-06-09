@@ -126,7 +126,7 @@
          ! we turn pgstar on and off at some points, so we store the original setting
          pgstar_flag = s% job% pgstar_flag
          pgstar_interval = s% pg% pgstar_interval
-         pgstar_file_interval = s% pg% Grid2_file_interval
+         pgstar_file_interval = s% pg% Grid_file_interval(2)
 
          ! this is optional
          s% other_wind => brott_wind
@@ -519,7 +519,7 @@
             s% xtra(x_star_age_at_relax) = -1d0
             ! to avoid showing pgstar stuff during initial model creation
             s% pg% pgstar_interval = 100000000
-            s% pg% Grid2_file_interval = 100000000
+            s% pg% Grid_file_interval(2) = 100000000
          else ! it is a restart
             if (s% lxtra(lx_hydro_on)) then
                call star_read_controls(id, 'inlist_hydro_on', ierr)
@@ -867,7 +867,7 @@
 
          if (pgstar_flag) then
             s% pg% pgstar_interval = pgstar_interval
-            s% pg% Grid2_file_interval = pgstar_file_interval
+            s% pg% Grid_file_interval(2) = pgstar_file_interval
          end if
          just_did_relax = .false.
          if (s% u_flag) then ! get point where v<vesc
@@ -1052,7 +1052,7 @@
 
                ! to avoid showing pgstar stuff during relax
                s% pg% pgstar_interval = 100000000
-               s% pg% Grid2_file_interval = 100000000
+               s% pg% Grid_file_interval(2) = 100000000
                s% job% pgstar_flag = .false.
 
                max_years_for_timestep = s% max_years_for_timestep
@@ -1079,7 +1079,7 @@
                s% max_center_cell_dq = max_center_cell_dq
                if (pgstar_flag) then
                   s% pg% pgstar_interval = pgstar_interval
-                  s% pg% Grid2_file_interval = pgstar_file_interval
+                  s% pg% Grid_file_interval(2) = pgstar_file_interval
                   s% job% pgstar_flag = .true.
                end if
                just_did_relax = .true.

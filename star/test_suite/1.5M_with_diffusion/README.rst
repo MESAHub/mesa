@@ -39,14 +39,14 @@ pgstar commands used for the plots above:
    file_extension = 'ps'           
 
 
-      Grid2_win_width = 15
-      Grid2_win_flag = .true.
-      Grid2_file_flag = .true.
+      Grid_win_width(2) = 15
+      Grid_win_flag(2) = .true.
+      Grid_file_flag(2) = .true.
       file_digits = 7
-      Grid2_file_dir = 'png2'
-      Grid2_file_prefix = 'grid'
-      Grid2_file_interval = 5
-      Grid2_file_width = 15
+      Grid_file_dir(2) = 'png2'
+      Grid_file_prefix(2) = 'grid'
+      Grid_file_interval(2) = 5
+      Grid_file_width(2) = 15
 
  / ! end of pgstar namelist
 

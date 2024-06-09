@@ -103,7 +103,7 @@
 
 &pgstar
 
-!      Grid4_win_flag = .true.
+!      Grid_win_flag(4) = .true.
       Kipp_mass_max = 0.2 ! (Msun units) negative means use default
-!      Grid4_file_flag = .true.
+!      Grid_file_flag(4) = .true.
 / ! end of pgstar namelist

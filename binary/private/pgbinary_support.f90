@@ -196,7 +196,7 @@ contains
          write(*, *) 'failed in open_device'
          return
       end if
-      call p% plot(b% binary_id, p% id_file, ierr)
+      call p% plot(b% binary_id, p% id_file, p% array_ix, ierr)
       call pgclos
       p% id_file = 0
       p% do_file = .false.

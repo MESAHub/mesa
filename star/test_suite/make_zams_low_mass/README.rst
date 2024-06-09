@@ -66,43 +66,43 @@ pgstar commands used for the plot above:
   HR_logL_min = -4.0
   HR_logL_max = 0.0
 
-  Text_Summary1_win_flag = .false.
-  Text_Summary1_win_width = 10
-  Text_Summary1_win_aspect_ratio = 0.15
+  Text_Summary_win_flag(1) = .false.
+  Text_Summary_win_width(1) = 10
+  Text_Summary_win_aspect_ratio(1) = 0.15
 
-  Text_Summary1_xleft = 0.01
-  Text_Summary1_xright = 0.99
-  Text_Summary1_ybot = 0.0
-  Text_Summary1_ytop = 1.0
-  Text_Summary1_txt_scale = 1.0
+  Text_Summary_xleft(1) = 0.01
+  Text_Summary_xright(1) = 0.99
+  Text_Summary_ybot(1) = 0.0
+  Text_Summary_ytop(1) = 1.0
+  Text_Summary_txt_scale(1) = 1.0
 
-  Text_Summary1_num_rows = 1 ! <= 20
-  Text_Summary1_num_cols = 3 ! <= 20
-  Text_Summary1_name(:,:) = ''
+  Text_Summary_num_rows(1) = 1 ! <= 20
+  Text_Summary_num_cols(1) = 3 ! <= 20
+  Text_Summary_name(1, :, :) = ''
 
-  Text_Summary1_name(1,1) = 'star_mass'
-  Text_Summary1_name(1,2) = 'log_LH'
-  Text_Summary1_name(1,3) = 'num_zones'
+  Text_Summary_name(1, 1, 1) = 'star_mass'
+  Text_Summary_name(1, 1, 2) = 'log_LH'
+  Text_Summary_name(1, 1, 3) = 'num_zones'
 
-  Grid1_title = 'make_zams_low_mass'
-  Grid1_win_flag = .true.
-  Grid1_win_width = 15
-  Grid1_win_aspect_ratio = 0.6
+  Grid_title(1) = 'make_zams_low_mass'
+  Grid_win_flag(1) = .true.
+  Grid_win_width(1) = 15
+  Grid_win_aspect_ratio(1) = 0.6
 
-  Grid1_plot_name(:) = ''
-  Grid1_plot_row(:) = 1           ! number from 1 at top
-  Grid1_plot_rowspan(:) = 1       ! plot spans this number of rows
-  Grid1_plot_col(:) =  1          ! number from 1 at left
-  Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
-  Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_name(1, :) = ''
+  Grid_plot_row(1, :) = 1           ! number from 1 at top
+  Grid_plot_rowspan(1, :) = 1       ! plot spans this number of rows
+  Grid_plot_col(1, :) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, :) = 1       ! plot spans this number of columns
+  Grid_plot_pad_left(1, :) = 0.0    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, :) = 0.0   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, :) = 0.0     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, :) = 0.0     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
 
-  Grid1_num_cols = 6 ! divide plotting region into this many equal width cols
-  Grid1_num_rows = 2 ! divide plotting region into this many equal height rows
-  Grid1_num_plots = 10 ! <= 10
+  Grid_num_cols(1) = 6 ! divide plotting region into this many equal width cols
+  Grid_num_rows(1) = 2 ! divide plotting region into this many equal height rows
+  Grid_num_plots(1) = 10 ! <= 10
 
    pgstar_show_model_number = .true.
    pgstar_model_scale = 1.0
@@ -118,50 +118,50 @@ pgstar commands used for the plot above:
    pgstar_age_coord = -0.10
    pgstar_age_fjust = 0.0
 
-  Grid1_plot_name(1) = 'Text_Summary1'
-  Grid1_plot_row(1) = 1           ! number from 1 at top
-  Grid1_plot_rowspan(1) = 1       ! plot spans this number of rows
-  Grid1_plot_col(1) =  1          ! number from 1 at left
-  Grid1_plot_colspan(1) = 6       ! plot spans this number of columns
+  Grid_plot_name(1, 1) = 'Text_Summary1'
+  Grid_plot_row(1, 1) = 1           ! number from 1 at top
+  Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
+  Grid_plot_col(1, 1) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, 1) = 6       ! plot spans this number of columns
 
-  Grid1_plot_pad_left(1) = -0.06    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.05   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(1) = -0.02     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(1) = 0.39     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 1.2 ! multiply txt_scale for subplot by this
-
-
-  Grid1_plot_name(2) = 'Abundance'
-  Grid1_plot_row(2) = 1           ! number from 1 at top
-  Grid1_plot_rowspan(2) = 2       ! plot spans this number of rows
-  Grid1_plot_col(2) =  1          ! number from 1 at left
-  Grid1_plot_colspan(2) = 3       ! plot spans this number of columns
-
-  Grid1_plot_pad_left(2) = -0.05    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.10   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(2) = 0.03     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.03     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_left(1, 1) = -0.06    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 1) = 0.05   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 1) = -0.02     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 1) = 0.39     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 1) = 1.2 ! multiply txt_scale for subplot by this
 
 
-  Grid1_plot_name(3) = 'HR'
-  Grid1_plot_row(3) = 1          ! number from 1 at top
-  Grid1_plot_rowspan(3) = 2       ! plot spans this number of rows
-  Grid1_plot_col(3) =  5          ! Number from 1 at left
-  Grid1_plot_colspan(3) = 3       ! plot spans this number of columns
+  Grid_plot_name(1, 2) = 'Abundance'
+  Grid_plot_row(1, 2) = 1           ! number from 1 at top
+  Grid_plot_rowspan(1, 2) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 2) =  1          ! number from 1 at left
+  Grid_plot_colspan(1, 2) = 3       ! plot spans this number of columns
 
-  Grid1_plot_pad_left(3) = -0.15    ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(3) = 0.20   ! fraction of full window width for padding on right
-  Grid1_plot_pad_top(3) = 0.03     ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(3) = 0.03     ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(3) = 0.7 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_left(1, 2) = -0.05    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 2) = 0.10   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 2) = 0.03     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 2) = 0.03     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 2) = 0.7 ! multiply txt_scale for subplot by this
 
 
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'pgstar_out'
-  Grid1_file_prefix = 'grid_'
-  Grid1_file_interval = 10000
-  Grid1_file_width = -1       ! (inches) negative means use same value as for window
+  Grid_plot_name(1, 3) = 'HR'
+  Grid_plot_row(1, 3) = 1          ! number from 1 at top
+  Grid_plot_rowspan(1, 3) = 2       ! plot spans this number of rows
+  Grid_plot_col(1, 3) =  5          ! Number from 1 at left
+  Grid_plot_colspan(1, 3) = 3       ! plot spans this number of columns
+
+  Grid_plot_pad_left(1, 3) = -0.15    ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1, 3) = 0.20   ! fraction of full window width for padding on right
+  Grid_plot_pad_top(1, 3) = 0.03     ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1, 3) = 0.03     ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1, 3) = 0.7 ! multiply txt_scale for subplot by this
+
+
+  Grid_file_flag(1) = .true.
+  Grid_file_dir(1) = 'pgstar_out'
+  Grid_file_prefix(1) = 'grid_'
+  Grid_file_interval(1) = 10000
+  Grid_file_width(1) = -1       ! (inches) negative means use same value as for window
 
  / ! end of pgstar namelist
 

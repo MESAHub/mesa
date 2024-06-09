@@ -43,7 +43,7 @@
 
 
 &pgstar
-Grid1_title = 'inlist_after_remove'
+Grid_title(1) = 'inlist_after_remove'
 
 
 / ! end of pgstar namelist

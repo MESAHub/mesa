@@ -36,9 +36,8 @@
       contains
 
 
-      subroutine power_plot(id, device_id, ierr)
-         implicit none
-         integer, intent(in) :: id, device_id
+      subroutine power_plot(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s

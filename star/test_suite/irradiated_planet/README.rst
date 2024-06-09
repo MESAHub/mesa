@@ -37,58 +37,58 @@ pgstar commands used for the plots above:
 
    pgstar_interval = 10
 
-    History_Track1_win_flag = .true.
-    History_Track1_win_width = 12
-    History_Track1_win_aspect_ratio = 0.75
-    History_Track1_title = 'irradiated_planet'
+    History_Track_win_flag(1) = .true.
+    History_Track_win_width(1) = 12
+    History_Track_win_aspect_ratio(1) = 0.75
+    History_Track_title(1) = 'irradiated_planet'
 
-    History_Track1_xname = 'log_star_age'
-    History_Track1_yname = 'log_surf_cell_pressure'
-    History_Track1_xaxis_label = 'log10 (Time/year) '
-    History_Track1_yaxis_label = 'log10 (Surface Pressure/(erg/cm\u3\u))'
-    History_Track1_reverse_xaxis = .false.
-    History_Track1_reverse_yaxis = .false.
-    History_Track1_log_xaxis = .false.
-    History_Track1_log_yaxis = .false.
+    History_Track_xname(1) = 'log_star_age'
+    History_Track_yname(1) = 'log_surf_cell_pressure'
+    History_Track_xaxis_label(1) = 'log10 (Time/year) '
+    History_Track_yaxis_label(1) = 'log10 (Surface Pressure/(erg/cm\u3\u))'
+    History_Track_reverse_xaxis(1) = .false.
+    History_Track_reverse_yaxis(1) = .false.
+    History_Track_log_xaxis(1) = .false.
+    History_Track_log_yaxis(1) = .false.
 
-    History_Track1_xmin = 3.0
-    History_Track1_xmax = 6.0
-    History_Track1_ymin = 5.7
-    History_Track1_ymax = 6.1
+    History_Track_xmin(1) = 3.0
+    History_Track_xmax(1) = 6.0
+    History_Track_ymin(1) = 5.7
+    History_Track_ymax(1) = 6.1
 
-    History_Track1_file_flag = .true.
-    History_Track1_file_dir = 'png'
-    History_Track1_file_prefix = 'pres_'
-    History_Track1_file_interval = 10000
-    History_Track1_file_width = -1
-    History_Track1_file_aspect_ratio = -1
+    History_Track_file_flag(1) = .true.
+    History_Track_file_dir(1) = 'png'
+    History_Track_file_prefix(1) = 'pres_'
+    History_Track_file_interval(1) = 10000
+    History_Track_file_width(1) = -1
+    History_Track_file_aspect_ratio(1) = -1
 
 
-    History_Track2_win_flag = .true.
-    History_Track2_win_width = 12
-    History_Track2_win_aspect_ratio = 0.75
-    History_Track2_title = 'irradiated_planet'
+    History_Track_win_flag(2) = .true.
+    History_Track_win_width(2) = 12
+    History_Track_win_aspect_ratio(2) = 0.75
+    History_Track_title(2) = 'irradiated_planet'
 
-    History_Track2_xname = 'log_star_age'
-    History_Track2_yname = 'radius_cm'
-    History_Track2_xaxis_label = 'Time (log years)'
-    History_Track2_yaxis_label = 'Radius (cm)'
-    History_Track2_reverse_xaxis = .false.
-    History_Track2_reverse_yaxis = .false.
-    History_Track2_log_xaxis = .false.
-    History_Track2_log_yaxis = .false.
+    History_Track_xname(2) = 'log_star_age'
+    History_Track_yname(2) = 'radius_cm'
+    History_Track_xaxis_label(2) = 'Time (log years)'
+    History_Track_yaxis_label(2) = 'Radius (cm)'
+    History_Track_reverse_xaxis(2) = .false.
+    History_Track_reverse_yaxis(2) = .false.
+    History_Track_log_xaxis(2) = .false.
+    History_Track_log_yaxis(2) = .false.
 
-    History_Track2_xmin = 5.0
-    History_Track2_xmax = 10.3
-    History_Track2_ymin = 0.7e10
-    History_Track2_ymax = 1.2e10
+    History_Track_xmin(2) = 5.0
+    History_Track_xmax(2) = 10.3
+    History_Track_ymin(2) = 0.7e10
+    History_Track_ymax(2) = 1.2e10
 
-    History_Track2_file_flag = .true.
-    History_Track2_file_dir = 'png'
-    History_Track2_file_prefix = 'track1_'
-    History_Track2_file_interval = 1000
-    History_Track2_file_width = -1
-    History_Track2_file_aspect_ratio = -1
+    History_Track_file_flag(2) = .true.
+    History_Track_file_dir(2) = 'png'
+    History_Track_file_prefix(2) = 'track1_'
+    History_Track_file_interval(2) = 1000
+    History_Track_file_width(2) = -1
+    History_Track_file_aspect_ratio(2) = -1
 
  / ! end of pgstar namelist
 
