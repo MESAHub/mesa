@@ -18,7 +18,7 @@ Kap
 **High Temperature Opacity Tables**
 
 Type 1 Rosseland-mean opacity tables from The Los Alamos
-OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (`Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_).
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (`Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_).
 These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
 :math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
 opacity tables contains 1194 individual tables, a
@@ -41,7 +41,7 @@ See :ref:`kap/overview:Overview of kap module` and
 :ref:`kap/defaults:kap_file_prefix` for more details on the
 implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
 the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
-in `Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_.
+in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 
 
 **Low Temperature Opacity Tables**
@@ -110,7 +110,7 @@ option (shown below), while also providing more accurate opacity physics between
 For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
 while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
 However, adopting cubic interpolation has been shown to consistently increase the overall 
-opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in `Farag et al. 2024 <https://arxiv.org/abs/2406.02845>`_.
+opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 We anticipate making cubic interpolation the default in a future MESA release version. 
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
