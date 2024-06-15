@@ -549,6 +549,26 @@
          end if   
                
       end function
+
+! returns mass excess in MeV
+function get_mass_excess_each_component(nuclides,chem_id) result (mass_excess)
+   use chem_def
+   type(nuclide_data), intent(in) :: nuclides
+   integer, intent(in) :: chem_id
+   real(dp) :: mass_excess
+   logical :: use_nuclides_mass_excess=.false.
+   
+   ! These should be identical but can have slight ~ulp difference
+   ! due to floating point maths
+   if(use_nuclides_mass_excess)then
+      mass_excess = nuclides% mass_excess(chem_id)
+   else
+      mass_excess = nuclides% Z(chem_id)*del_Mp + nuclides% N(chem_id)*del_Mn -&
+                  nuclides% binding_energy(chem_id)
+   end if
+         
+end function
+
       
       function get_Q(nuclides,chem_id) result (q)
          use chem_def

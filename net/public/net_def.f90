@@ -26,7 +26,8 @@
       module net_def
       
       use const_def, only: dp, qp
-      
+      use auto_diff
+
       implicit none
 
 
@@ -220,8 +221,12 @@
 
          ! approx21 arrays
          real(dp), allocatable,dimension(:,:) :: dfdy
-         real(dp), allocatable,dimension(:) :: dratdumdy1, dratdumdy2, &
-            d_epsnuc_dy, d_epsneu_dy, dydt1, dfdT, dfdRho
+         real(dp), allocatable,dimension(:) :: d_epsnuc_dy, d_epsneu_dy
+         type(auto_diff_real_2var_order1), allocatable,dimension(:) :: &
+                dratdumdy1, dratdumdy2, dydt1 !, dfdT, dfdRho
+         type(auto_diff_real_2var_order1), allocatable, dimension(:) :: &
+                rate_screened_ad ! autodiff 1 is T, 2 is Rho
+         type(auto_diff_real_2var_order1) :: eps_total_ad, eps_neu_total_ad
          
          ! weaklib results
          real(dp), dimension(:), allocatable :: &
