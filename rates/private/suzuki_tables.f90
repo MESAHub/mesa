@@ -351,7 +351,7 @@ contains
   subroutine private_load_suzuki_tables(ierr)
 
      use utils_lib
-     use hdf5io_lib
+     use forum_m, only: hdf5io_t, OPEN_FILE_RO
      use chem_lib, only: chem_get_iso_id
      use chem_def, only: iso_name_length
 
