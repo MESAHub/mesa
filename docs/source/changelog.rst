@@ -58,10 +58,9 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 
 **Opacity interpolation**
 
-We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation
-in composition.
+We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation in composition.
 
-MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consequtive 1D splines.
+MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consecutive 1D splines.
 MESA offers users the ability to choose linear or cubic interpolation for these splines, 
 while leaving the default as linear interpolation::
 
@@ -130,8 +129,8 @@ Rates
 
 There has been a bug present in the rates module due to the incorrect
 phase space factors for reverse reaction rates involving greater than 2 reactants or 
-products. This bug resulted in inconsistent equillibrium compositions when the network
-evolves into nuclear statistical equillibrium (NSE), at temperatures exceeding 4 GK. 
+products. This bug resulted in inconsistent equilibrium compositions when the network
+evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK. 
 This bug effects users who evolve models into NSE using large reaction networks. This
 includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
 networks are less affected. We strongly recommend that users update to the latest MESA release.
