@@ -590,7 +590,7 @@
 
         subroutine read_hd5_file
 
-          use hdf5io_lib
+          use forum_m, only: hdf5io_t, OPEN_FILE_RO
 
           character (len=256)                 :: filename
           type(hdf5io_t)                      :: hi
