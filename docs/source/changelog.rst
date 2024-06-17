@@ -2,6 +2,22 @@
 Changelog
 *********
 
+Changes in main
+===============
+
+.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+
+.. _New Features main:
+
+  New Features
+------------
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+
 Changes in r24.06.1-rc1
 =======================
 
