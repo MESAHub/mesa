@@ -8,6 +8,7 @@ program kap_plotter
    use chem_lib
    use const_lib
    use math_lib
+   use utils_lib
    use num_lib, only : dfridr
 
    implicit none
@@ -285,12 +286,32 @@ program kap_plotter
             eos_handle, species, chem_id, net_iso, xa, &
             Rho, log10Rho, T, log10T, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
-         if (ierr /= 0) then
+         ! ierr /= 0 is okay as long as the following inputs to kap are fine
+         if(is_bad(res(i_lnfree_e)) .or. is_bad(d_dlnd(i_lnfree_e)) .or. is_bad(d_dlnT(i_lnfree_e)) .or. &
+              is_bad(res(i_eta)) .or. is_bad(d_dlnd(i_eta)) .or. is_bad(d_dlnT(i_eta))) then
             write(*,*) 'failed in eosDT_get'
             write(*,1) 'log10Rho', log10Rho
             write(*,1) 'log10T', log10T
+            write(*,'(A)')
+            write(*,1) 'eos_frac_FreeEOS', res(i_frac_FreeEOS)
+            write(*,1) 'eos_frac_OPAL_SCVH', res(i_frac_OPAL_SCVH)
+            write(*,1) 'eos_frac_Skye',    res(i_frac_Skye)
+            write(*,1) 'eos_frac_HELM',    res(i_frac_HELM)
+            write(*,1) 'eos_frac_ideal',   res(i_frac_ideal)
+            write(*,'(A)')
+            write(*,1) 'lnfree_e', res(i_lnfree_e)
+            write(*,1) 'd_dlnd(lnfree_e)', d_dlnd(i_lnfree_e)
+            write(*,1) 'd_dlnT(lnfree_e)', d_dlnT(i_lnfree_e)
+            write(*,1) 'eta', res(i_eta)
+            write(*,1) 'd_dlnd(eta)', d_dlnd(i_eta)
+            write(*,1) 'd_dlnT(eta)', d_dlnT(i_eta)
             call mesa_error(__FILE__,__LINE__)
          end if
+
+         call set_nan(kap)
+         call set_nan(dlnkap_dlnRho)
+         call set_nan(dlnkap_dlnT)
+         call set_nan(dlnkap_dxa)
          
          call kap_get( &
               kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
@@ -322,7 +343,7 @@ program kap_plotter
             err = 0d0
             dvardx = dfridr(dx_0,dfridr_func,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),min_derivative_error)
-            res1 = safe_log10(abs(xdum))
+            res1 = log10(abs(xdum))
          end if
 
 

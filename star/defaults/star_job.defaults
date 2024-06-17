@@ -709,10 +709,11 @@
       ! + ``GS98_zfracs = 3``
       ! + ``L03_zfracs = 4``
       ! + ``AGS05_zfracs = 5``
-      ! + ``AGSS09_zfracs = 6``
+      ! + ``AGSS09_photospheric_zfracs = 6``
       ! + ``L09_zfracs = 7``
       ! + ``A09_Prz_zfracs = 8``
-
+      ! + ``MB22_photospheric_zfracs = 9``
+      ! + ``AAG21_photospheric_zfracs = 10``
       ! for example, ``initial_zfracs = 3`` for ``GS98_zfracs``
       ! or set ``initial_zfracs = 0`` to use the special list of z fractions specified in controls
       ! (i.e., ``z_fraction_li``, ``z_fraction_be``, ``z_fraction_b``, etc.)

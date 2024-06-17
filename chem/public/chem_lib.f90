@@ -705,7 +705,13 @@
                ysolar = L09_ysol
             case(A09_Prz_zfracs)
                zsolar = A09_Prz_zsol
-               ysolar = A09_Prz_ysol 
+               ysolar = A09_Prz_ysol
+            case(MB22_photospheric_zfracs)
+               zsolar = MB22_photospheric_zsol
+               ysolar = MB22_photospheric_ysol
+            case(AAG21_photospheric_zfracs)
+               zsolar = AAG21_photospheric_zsol
+               ysolar = AAG21_photospheric_ysol
             case(Custom_zfracs)
                call mesa_error(__FILE__,__LINE__,"[M/H] not supported with custom zfracs.")
             case default

@@ -253,7 +253,7 @@ shmesa_zip () {
         echo "Warning: No inlist files found in the directory '$dir_to_zip'."
     fi
 
-    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "*star" "*binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
+    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "star" "binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
 }
 
 

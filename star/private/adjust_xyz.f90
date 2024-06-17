@@ -1013,6 +1013,10 @@
                zfrac(:) = L09_element_zfrac(:)
             case (A09_Prz_zfracs)
                zfrac(:) = A09_Prz_zfrac(:)
+            case (MB22_photospheric_zfracs)
+               zfrac(:) = MB22_photospheric_element_zfrac(:)
+            case (AAG21_photospheric_zfracs)
+               zfrac(:) = AAG21_photospheric_element_zfrac(:)
             case (Custom_zfracs) ! use non-standard values given in controls
                zfrac(:) = 0
                zfrac(e_li) = s% z_fraction_li
