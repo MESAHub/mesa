@@ -25,7 +25,7 @@
 
 module kap_aesopus
 
-  use hdf5io_lib
+  use forum_m, only: hdf5io_t, OPEN_FILE_RO
   use math_lib
   use kap_def
 

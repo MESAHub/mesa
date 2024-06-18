@@ -7,13 +7,21 @@ Changes in main
 
 .. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
 
-.. _Backwards-incompatible changes main:
-
-Backwards-incompatible changes
-------------------------------
-
-
 .. _New Features main:
+
+  New Features
+------------
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+
+Changes in r24.06.1-rc1
+=======================
+
+.. _New Features r24.06.1-rc1:
 
 New Features
 ------------
@@ -26,7 +34,7 @@ Kap
 **High Temperature Opacity Tables**
 
 Type 1 Rosseland-mean opacity tables from The Los Alamos
-OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (Farag et al. 2024).
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (`Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_).
 These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
 :math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
 opacity tables contains 1194 individual tables, a
@@ -49,7 +57,7 @@ See :ref:`kap/overview:Overview of kap module` and
 :ref:`kap/defaults:kap_file_prefix` for more details on the
 implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
 the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
-in Farag et al. 2024.
+in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 
 
 **Low Temperature Opacity Tables**
@@ -66,10 +74,9 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 
 **Opacity interpolation**
 
-We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation
-in composition.
+We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation in composition.
 
-MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consequtive 1D splines.
+MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consecutive 1D splines.
 MESA offers users the ability to choose linear or cubic interpolation for these splines, 
 while leaving the default as linear interpolation::
 
@@ -118,17 +125,17 @@ option (shown below), while also providing more accurate opacity physics between
 For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
 while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
 However, adopting cubic interpolation has been shown to consistently increase the overall 
-opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in Farag et al. 2024.
+opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 We anticipate making cubic interpolation the default in a future MESA release version. 
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
 
 Chem
-~~~~~
+~~~~
 New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
 are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
 
-.. _Bug Fixes main:
+.. _Bug Fixes r24.06.1-rc1:
 
 Bug Fixes
 ---------
@@ -138,8 +145,8 @@ Rates
 
 There has been a bug present in the rates module due to the incorrect
 phase space factors for reverse reaction rates involving greater than 2 reactants or 
-products. This bug resulted in inconsistent equillibrium compositions when the network
-evolves into nuclear statistical equillibrium (NSE), at temperatures exceeding 4 GK. 
+products. This bug resulted in inconsistent equilibrium compositions when the network
+evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK. 
 This bug effects users who evolve models into NSE using large reaction networks. This
 includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
 networks are less affected. We strongly recommend that users update to the latest MESA release.
