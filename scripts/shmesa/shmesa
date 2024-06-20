@@ -113,28 +113,26 @@ shmesa_change () {
     
     # Create a backup of the inlist before making any changes
     backup_copy "$filename" "${filename}.bak"
-    
-    local ESCAPE="s#[^^]#[&]#g; s#\^#\\^#g" # sed escape string
-    # iterate through parameter,value pairs in the supplied input 
+
     while [[ -n $1 && -n $2 ]]; do
         local param=$1
         local newval=$2
         shift 2
         
-        local escapedParam=$(sed "$ESCAPE" <<< "$param")
-        local search="^\s*\!*\s*$escapedParam\s*=.+$" 
+        local search="^\s*\!*\s*\b${param}\b\s*=.*$"
         local replace="    $param = $newval"
         
         # Check if the parameter is present in the inlist
-        if ! grep -q "$param" "$filename"; then
+        if ! grep -qw "$param" "$filename"; then
             echo "Error: Parameter '$param' not found in the inlist '$filename'."
             backup_restore "$filename"
             return 1
         fi
         
         # Update its value
-        sed -r -i -e "s#$search#$replace#g" "$filename"
+        perl -i -pe "s/$search/$replace/" "$filename"
     done
+
 }
 
 
@@ -162,20 +160,17 @@ shmesa_defaults () {
         cp "$MESA_DIR/star/defaults/history_columns.list" .
     fi
     
-    local ESCAPE="s#[^^]#[&]#g; s#\^#\\^#g" # sed escape string
-    # Uncomment the specified parameters
     while [[ -n $1 ]]; do
         local param=$1
         shift
         
-        local escapedParam=$(sed "$ESCAPE" <<< "$param")
-        local search="^\s*\!*\s*$escapedParam\s*.+$"
-        local replace="    $param"
+        local search="^\s*\!${param}\b(\s*.*)?$"
+        local replace="      $param\$1"
         
-        if grep -q "$param" profile_columns.list || \
-           grep -q "$param" history_columns.list; then
-            sed -r -i -e "s#$search#$replace#g" profile_columns.list
-            sed -r -i -e "s#$search#$replace#g" history_columns.list
+        if grep -q -w "$param" profile_columns.list; then
+            perl -i -pe "s/$search/$replace/g" profile_columns.list
+        elif grep -q -w "$param" history_columns.list; then
+            perl -i -pe "s/$search/$replace/g" history_columns.list
         else
             echo "Warning: Parameter '$param' not found in either profile_columns.list or history_columns.list."
         fi
@@ -253,7 +248,7 @@ shmesa_zip () {
         echo "Warning: No inlist files found in the directory '$dir_to_zip'."
     fi
 
-    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "star" "binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
+    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "*star" "*binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
 }
 
 
@@ -274,10 +269,10 @@ shmesa_extras () {
         echo "Cannot find $MESA_DIR/include/standard_run_star_extras.inc"
         return 1
     fi
-    contents=$(sed 's:|:\\|:g' "$MESA_DIR/include/standard_run_star_extras.inc" | sed -z 's:\n:\\n:g')
+    contents=$(perl -pe 's/:/\\:/g; s/\n/\\n/g' "$MESA_DIR/include/standard_run_star_extras.inc")
 
     backup_copy "$rse" "$rse".bak
-    sed -i "s|      include 'standard_run_star_extras.inc'|$contents|" $rse
+    perl -i -pe "s|      include 'standard_run_star_extras.inc'|$contents|g" "$rse"
 }
 
 
