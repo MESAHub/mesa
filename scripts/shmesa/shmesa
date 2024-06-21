@@ -341,7 +341,7 @@ shmesa_test () {
                         pgstar_flag .false. && \
           shmesa change inlist_project \
                         initial_mass 1.2 \
-                        Z 0.01 \
+                        initial_z 0.01 \
                         Zbase 0.01)"
     
     # shmesa defaults
