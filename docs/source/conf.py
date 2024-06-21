@@ -23,11 +23,6 @@ author = 'The MESA Team'
 release = 'main'
 version = 'main'
 
-current_version = 'r24.03.1'
-
-# Check if the current version matches the version of this documentation
-is_old_version = version != current_version
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -90,41 +85,21 @@ html_css_files = [
 
 
 # standard substitutions
-if is_old_version:
-    rst_prolog = r"""
-    ..  warning::
+rst_prolog = r"""
+.. |MESA I| replace:: `MESA I <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
+.. |MESA II| replace:: `MESA II <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`__
+.. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
+.. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
+.. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
+.. |Msun| replace:: :math:`{\rm M}_\odot`
+.. |Lsun| replace:: :math:`{\rm L}_\odot`
+.. |Rsun| replace:: :math:`{\rm R}_\odot`
+.. |Teff| replace:: :math:`T_{\rm eff}`
+.. |logRho| replace:: :math:`\log(\rho/\rm g\,cm^{-3})`
+.. |logT| replace:: :math:`\log(T/\rm K)`
+.. |chi^2| replace:: :math:`\chi^2`
+.. |gpercm3| replace:: :math:`\rm g\,cm^{-3}`
+"""
 
-        This is an older verion.
-
-    .. |MESA I| replace:: `MESA I <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
-    .. |MESA II| replace:: `MESA II <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`__
-    .. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
-    .. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
-    .. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
-    .. |Msun| replace:: :math:`{\rm M}_\odot`
-    .. |Lsun| replace:: :math:`{\rm L}_\odot`
-    .. |Rsun| replace:: :math:`{\rm R}_\odot`
-    .. |Teff| replace:: :math:`T_{\rm eff}`
-    .. |logRho| replace:: :math:`\log(\rho/\rm g\,cm^{-3})`
-    .. |logT| replace:: :math:`\log(T/\rm K)`
-    .. |chi^2| replace:: :math:`\chi^2`
-    .. |gpercm3| replace:: :math:`\rm g\,cm^{-3}`
-    """
-else:
-    rst_prolog = r"""
-    .. |MESA I| replace:: `MESA I <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
-    .. |MESA II| replace:: `MESA II <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`__
-    .. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
-    .. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
-    .. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
-    .. |Msun| replace:: :math:`{\rm M}_\odot`
-    .. |Lsun| replace:: :math:`{\rm L}_\odot`
-    .. |Rsun| replace:: :math:`{\rm R}_\odot`
-    .. |Teff| replace:: :math:`T_{\rm eff}`
-    .. |logRho| replace:: :math:`\log(\rho/\rm g\,cm^{-3})`
-    .. |logT| replace:: :math:`\log(T/\rm K)`
-    .. |chi^2| replace:: :math:`\chi^2`
-    .. |gpercm3| replace:: :math:`\rm g\,cm^{-3}`
-    """
 # set default highlighting language
 highlight_language = 'fortran'
