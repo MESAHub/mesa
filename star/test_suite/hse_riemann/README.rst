@@ -8,7 +8,7 @@ This test case checks Riemann HLLC solver can hold an envelope model in hydrosta
 
 This test case has 1 parts. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_finish``) loads a model containing the envelope from a 12 msun model with its core excised. The model is then evolved for 1e5 s, and the ``run_star_extras.f90`` then checks that the peak mach number is less than 0.1. This is an example of a null test; if the Riemann HLLC solver is working, then the profiles should remain static and the peak mach number should be small:
+* Part 1 (``inlist_finish``) loads a model containing the envelope from a 12 Msun model with its core excised. The model is then evolved for 1e5 s, and the ``run_star_extras.f90`` then checks that the peak mach number is less than 0.1. This is an example of a null test; if the Riemann HLLC solver is working, then the profiles should remain static and the peak mach number should be small:
 
 .. raw:: html
 

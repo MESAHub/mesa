@@ -37,7 +37,7 @@ that ensure the thermal pulse cycle and the pocket are well resolved.
 This also adds the large exponential overshooting at the base of the
 convective envelope that mixes the protons into the intershell.
 
-At the end of this test, MESA has succesfully evolved through a
+At the end of this test, MESA has successfully evolved through a
 thermal pulse and the :math:`^{13}{\rm C}` pocket is apparent.
 
 .. image:: ../../../star/test_suite/c13_pocket/docs/grid1001915.png

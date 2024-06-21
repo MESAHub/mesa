@@ -4,7 +4,7 @@
 ccsn_IIp
 ********
 
-This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click to see a larger view of a plot.
 
@@ -24,22 +24,22 @@ This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click t
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/edep.svg
    :scale: 100%
 
-* Part 4 (``inlist_shock_part1``) contnues the evolution until the outward bound shock reaches 1.83 Msun:
+* Part 4 (``inlist_shock_part1``) continues the evolution until the outward bound shock reaches 1.83 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part1.svg
    :scale: 100%
 
-* Part 5 (``inlist_shock_part2``) contnues the evolution until the outward bound shock reaches 2.68 Msun:
+* Part 5 (``inlist_shock_part2``) continues the evolution until the outward bound shock reaches 2.68 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part2.svg
    :scale: 100%
 
-* Part 6 (``inlist_shock_part3``) contnues the evolution until the outward bound shock reaches 3.88 Msun:
+* Part 6 (``inlist_shock_part3``) continues the evolution until the outward bound shock reaches 3.88 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part3.svg
    :scale: 100%
 
-* Part 7 (``inlist_shock_part4``) contnues the evolution until the outward bound shock reaches 11.64 Msun:
+* Part 7 (``inlist_shock_part4``) continues the evolution until the outward bound shock reaches 11.64 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part4.svg
    :scale: 100%
