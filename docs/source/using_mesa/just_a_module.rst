@@ -129,7 +129,7 @@ Now take some time to explore the makefile, and use it to build the executable
 
      make
 
-Run the executable, named sample_kap, whoech reads a mesa model file and writes out the opacity and its derivatives at each cell
+Run the executable, named sample_kap, which reads a mesa model file and writes out the opacity and its derivatives at each cell
 
 .. code-block:: console
 

@@ -4,7 +4,7 @@
 pisn
 ****
 
-This test case evolves an initialy 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN)
+This test case evolves an initially 200 |Msun| star from ZAMS until it undergoes a pair instability supernovae (PISN)
 
 
 Physical checks
@@ -27,7 +27,7 @@ This test case has seven parts.
 
 * Part 3 (``inlist_to_end_core_he_burn``) This takes the model up to the end of core helium burning
 
-* Part 4 (``inlist_remove_envelope_header``) This removes whats left of the hydrogren envelope
+* Part 4 (``inlist_remove_envelope_header``) This removes whats left of the hydrogen envelope
 
 * Part 5 (``inlist_to_end_core_c_burn``) This takes the model up to the end of carbon burning
 

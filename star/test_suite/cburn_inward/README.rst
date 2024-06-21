@@ -9,7 +9,7 @@ This test suite example checks the inward propagation of a carbon burning front 
 Physical checks
 ===============
 
-This test case tracks the mass co-orindate when carbon ignites, the density at that point, and 
+This test case tracks the mass coordinate when carbon ignites, the density at that point, and 
 the C/O core mass at that instance.
 
 This mass should be about half the C/O core mass (0.5 |Msun|). If its not then the initial model needs updating.
@@ -18,7 +18,7 @@ during core helium burning. If the ignition mass is higher then increase the ini
 increase overshoot during core helium burning.
 
 The ignition density should be about |logRho| ~ 6.2 (`Farmer et al (2015) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..184F/abstract>`__).
-If its signficantly different (0.1 dex) then we have a microphysics problem (or more likely an issue tracking the flame location).
+If its significantly different (0.1 dex) then we have a microphysics problem (or more likely an issue tracking the flame location).
 
 The C/O core mass should be between 1.0 and 1.4 |Msun|, if different then tune the initial mass/overshot, otherwise
 we may not get a carbon flame.
