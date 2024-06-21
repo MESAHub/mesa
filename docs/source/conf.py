@@ -15,18 +15,15 @@ import sys
 sys.path.insert(0, os.path.abspath('./_ext/'))
 
 
-# -- Set Current Version here ------------------------------------------------
-current_version = 'r24.03.1'
-
-
 # -- Project information -----------------------------------------------------
 
 project = 'MESA'
 copyright = '2024, The MESA Team'
 author = 'The MESA Team'
-release = 'This is the release string' 
-version = 'r24.03.1' #'main'
+release = 'main'
+version = 'main'
 
+current_version = 'r24.03.1'
 
 # Check if the current version matches the version of this documentation
 is_old_version = version != current_version
