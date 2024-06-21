@@ -25,7 +25,7 @@ project = 'MESA'
 copyright = '2024, The MESA Team'
 author = 'The MESA Team'
 release = 'This is the release string' 
-version = 'r22.05.1' #'main'
+version = 'r24.03.1' #'main'
 
 
 # Check if the current version matches the version of this documentation
