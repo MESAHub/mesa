@@ -12,6 +12,7 @@ RUN apt-get update && \
       tcsh \
       git \
       git-lfs \
+      python3 \
       ruby \
       && \
     apt-get autoremove --purge -y && \
