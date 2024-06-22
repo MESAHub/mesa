@@ -3,7 +3,7 @@
 ! ==============================
 
    ! This document defines a format for MESA defaults files.
-   ! Because these files are compiled, documenation must be in commments.
+   ! Because these files are compiled, documentation must be in comments.
    ! After leading spaces and ! are stripped, this file should be valid
    ! reStructuredText (reST) so that it can rendered in the Sphinx docs.
    ! This file is written in the format it describes.

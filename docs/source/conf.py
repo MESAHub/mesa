@@ -31,7 +31,9 @@ version = 'main'
 # ones.
 extensions = [
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.extlinks',
     'defaults2rst',
+    'sphinx_copybutton',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -83,7 +85,6 @@ html_css_files = [
     'theme_overrides.css',  # overrides for wide tables in RTD theme
 ]
 
-
 # standard substitutions
 rst_prolog = r"""
 .. |MESA I| replace:: `MESA I <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`__
@@ -103,3 +104,9 @@ rst_prolog = r"""
 
 # set default highlighting language
 highlight_language = 'fortran'
+
+# sphinx.extlinks configuration
+extlinks = {
+    'wiki': ('https://en.wikipedia.org/wiki/%s', None),
+    'git': ('https://github.com/%s', None)
+}

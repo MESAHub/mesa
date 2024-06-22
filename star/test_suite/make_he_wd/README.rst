@@ -13,7 +13,7 @@ This test case has 3 parts. Click to see a larger version of a plot.
 .. image:: ../../../star/test_suite/make_he_wd/docs/abund_000515.svg
    :scale: 100%
 
-* Part 2 (``inlist_remove_envelope``) relaxes the model to a new mass of 0.15 Msun, sheddind the outer 1.35 Msun with a wind whose maximum mass loss rate is 1e-5 Msun/yr, and then evolving the hot He white dwarf for 100 million years:
+* Part 2 (``inlist_remove_envelope``) relaxes the model to a new mass of 0.15 Msun, shedding the outer 1.35 Msun with a wind whose maximum mass loss rate is 1e-5 Msun/yr, and then evolving the hot He white dwarf for 100 million years:
 
 .. image:: ../../../star/test_suite/make_he_wd/docs/abund_000119.svg
    :scale: 100%

@@ -4,7 +4,7 @@
 split_burn_big_net
 ******************
 
-This test suite example checks the use of MESA's split burn capabilites in a 25 |Msun| star, during silicon burning
+This test suite example checks the use of MESA's split burn capabilities in a 25 |Msun| star, during silicon burning
 
 Physical checks
 ===============
