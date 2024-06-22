@@ -22,7 +22,7 @@ endif
 #
 # LIBRARIES
 
-ifeq ($USE_GYRE),YES)
+ifeq ($(USE_GYRE),YES)
     LOCAL_LIB_DIR = ../../gyre/lib
     LOCAL_INC_DIR = ../../gyre/include
     LIBS_LOCAL = gyre gyre_mesa
