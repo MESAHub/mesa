@@ -10,7 +10,7 @@
       subroutine gyre_in_mesa_extras_set_velocities(s,restart,ierr)
          use const_def
          use math_lib
-         use gyre_lib
+         use gyre_mesa_m
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interpolate_vector_pm
          type (star_info), pointer :: s

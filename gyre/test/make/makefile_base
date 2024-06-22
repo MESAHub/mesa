@@ -12,26 +12,31 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-ifeq ($(USE_GYRE),NO)
-    SRCS = test_gyre_stub.f
-else
+ifeq ($(USE_GYRE),YES)
     SRCS = test_gyre.f
+else
+    SRCS = test_gyre_stub.f
 endif
 
 #################################################################
 #
 # LIBRARIES
 
-LOCAL_LIB_DIR = ../../gyre/lib
-LOCAL_INC_DIR = ../../gyre/include
+ifeq ($USE_GYRE),YES)
+    LOCAL_LIB_DIR = ../../gyre/lib
+    LOCAL_INC_DIR = ../../gyre/include
+    LIBS_LOCAL = gyre gyre_mesa
+else
+    LOCAL_LIB_DIR = ../../make
+    LOCAL_INC_DIR = ../../make
+endif
 
-LIBS_LOCAL = gyre_mesa gyre forum
 DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
 LOAD_LOCAL = -L$(LOCAL_LIB_DIR) $(addprefix -l,$(LIBS_LOCAL))
 
-LIBS_OTHER = $(LIBS_MATRIX)
+LIBS_OTHER = $(LIBS_MATRIX) $(LIBS_MESA_NUMERICS)
 DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX) $(LOAD_HDF5)
+LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX) $(LOAD_MESA_NUMERICS)
 
 #################################################################
 #
