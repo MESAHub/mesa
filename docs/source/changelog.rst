@@ -9,8 +9,27 @@ Changes in main
 
 .. _New Features main:
 
-  New Features
+New Features
 ------------
+
+**Replacement of HDF5io by ForUM**
+
+The HDF5io module (in the :file:`hdf5io` subdirectory) has been
+replaced by the ForUM module (in the :file:`forum`
+subdirectory). HDF5io provided a high-level wrapper around the `HDF5
+input/output library <https://www.hdfgroup.org/solutions/hdf5/>`__; it
+was based on source files copied from an alpha version of
+ForUM. :git:`ForUM <rhdtownsend/forum>` (short for Fortran Utility
+Modules) is a small library providing input/output, operating system,
+memory management and utility routines for Fortran.
+
+Now that ForUM has officially been released, and also that recent GYRE
+releases also require ForUM, it made sense to include the official
+distribution of ForUM within MESA. One important consequence of this
+decision is that ForUM uses :git:`fypp <aradi/fypp>` for
+pre-processing and templating, and fypp in turn requires a Python
+interpreter. As a consequence, building MESA now requires Python (3.5
+or newer) be installed.
 
 .. _Bug Fixes main:
 
