@@ -295,7 +295,7 @@ LIBS_MESA_BINARY = binary $(LIBS_MESA_STAR)
 LOAD_MESA_BINARY_INT = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_MESA_BINARY))
 
 ifeq ($(USE_GYRE),YES)
-   LIBS_GYRE = gyre gyre_mesa
+   LIBS_GYRE = gyre_mesa gyre
 else
    LIBS_GYRE = gyre_mesa
 endif

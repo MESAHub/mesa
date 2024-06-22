@@ -25,10 +25,11 @@ endif
 ifeq ($(USE_GYRE),YES)
     LOCAL_LIB_DIR = ../../gyre/lib
     LOCAL_INC_DIR = ../../gyre/include
-    LIBS_LOCAL = gyre gyre_mesa
+    LIBS_LOCAL = gyre_mesa gyre
 else
     LOCAL_LIB_DIR = ../../make
     LOCAL_INC_DIR = ../../make
+    LIBS_LOCAL = gyre_mesa
 endif
 
 DEPS_LOCAL = $(patsubst %,$(LOCAL_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_LOCAL))
