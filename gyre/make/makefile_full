@@ -17,6 +17,7 @@ MESA_INC_DIR = $(MESA_DIR)/include
 
 GYRE_DIR = ../gyre
 
+export FRONTENDS = no
 export TOOLS = no
 export FORUM = no
 export IFACES = yes
