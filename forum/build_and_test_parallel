@@ -1,9 +1,8 @@
 #!/bin/bash
 
-if [[ ! -d forum ]]; then
-    tar xf forum-HEAD.tar.gz
-    mv forum-HEAD forum
-fi
+rm -rf forum
+tar xf forum-HEAD.tar.gz
+mv forum-HEAD forum
 
 ../utils/build_and_test_parallel
 
