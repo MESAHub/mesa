@@ -2,6 +2,8 @@
 Changelog
 *********
 
+.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) be installed.
+
 Changes in main
 ===============
 
