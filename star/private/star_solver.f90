@@ -1016,30 +1016,33 @@
                call start_time(s, time0, total_time)
             end if
             
-            !$omp simd
+            !$OMP PARALLEL DO SIMD
             do i=1,neq
                b1(i) = -equ1(i)
             end do
+            !$OMP END PARALLEL DO SIMD
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   save_ublk1(i) = ublk1(i)
                   save_dblk1(i) = dblk1(i)
                   save_lblk1(i) = lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
             
             call factor_mtx(ierr)
             if (ierr == 0) call solve_mtx(ierr)
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   ublk1(i) = save_ublk1(i)
                   dblk1(i) = save_dblk1(i)
                   lblk1(i) = save_lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
 
             if (s% doing_timing) then
