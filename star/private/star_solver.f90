@@ -1016,11 +1016,11 @@
                call start_time(s, time0, total_time)
             end if
             
-            !$OMP PARALLEL DO SIMD
+            !$OMP SIMD
             do i=1,neq
                b1(i) = -equ1(i)
             end do
-            !$OMP END PARALLEL DO SIMD
+            !$OMP END SIMD
             
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD
