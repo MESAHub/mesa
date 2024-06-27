@@ -33,6 +33,21 @@ pre-processing and templating, and fypp in turn requires a Python
 interpreter. As a consequence, building MESA now requires Python (3.5
 or newer) be installed.
 
+**Update to GYRE 7.2.1**
+
+The GYRE distribution bundled with MESA has been updated to release
+7.2.1. Full details about this release can be found on the `GYRE
+documentation page <https://gyre.readthedocs.io/en/v7.2.1/>`__. From
+the perspective of MESA users, the significant change arising from
+this update is that the MESA-to-GYRE interface is now provided via the
+library file :file:`libgyre_mesa.a` and the module file
+:file:`gyre_mesa_m.mod` (previously, these were :file:`libgyre.a` and
+:file:`gyre_lib.mod`, respectively). A new variable, `LOAD_GYRE`, has
+been added to :file:`utils/makefile_header` to simplify linking
+against :file:`libgyre_mea.a`. These changes will likely only affect
+those users that make calls to GYRE from inside
+:file:`run_star_extras.f90`.
+
 .. _Bug Fixes main:
 
 Bug Fixes
