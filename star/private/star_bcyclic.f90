@@ -75,12 +75,13 @@
 
          ierr = 0
          neq = nvar*nz
-         !$omp simd
+         !$OMP PARALLEL DO SIMD
          do i = 1,nvar*neq
             lblkF1(i) = lblk1(i)
             dblkF1(i) = dblk1(i)
             ublkF1(i) = ublk1(i)
          end do
+         !$OMP END PARALLEL DO SIMD
 
          if (dbg) write(*,*) 'start bcyclic_factor'
 
