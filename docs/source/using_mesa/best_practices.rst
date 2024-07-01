@@ -46,9 +46,9 @@ Begin in the directory where you do your MESA work.
 
   cp -r $MESA_DIR/star/test_suite/semiconvection .
 
-In old MESA revisions, there were hard-coded references in the test_suite to set the variable MESA_DIR = ../../../..  . 
+In old MESA revisions, there were hard-coded references in the test_suite to set the variable ``MESA_DIR = ../../../..``  . 
 This practice has been removed in current revisions. If you are running this tutorial with an old revision of MESA, comment out or delete that line in the 
-makefile script, the rn script, the ck script, and in inlist_semiconvection_header. If you are running with any MESA revision after r23.05.1, ignore this comment and read on.
+makefile, the ``rn`` script, the ``ck`` script, and in ``inlist_semiconvection_header``. If you are running with any MESA revision after r23.05.1, ignore this comment and read on.
 
 Now clean the directory, 
 
