@@ -219,7 +219,7 @@ contains
 
     work => work_ary
 
-    do i= 1, E2_NPAIRS
+    do i = 1, E2_NPAIRS
        E2_x(i) = E2_pairs(2*i-1)
        E2_f(1,i) = E2_pairs(2*i)
     end do
