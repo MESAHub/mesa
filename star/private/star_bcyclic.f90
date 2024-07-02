@@ -321,6 +321,7 @@
             end if
 
             do j=1,nvar
+               !$omp simd
                do i=1,nvar
                   lmat(i,j) = -lmat(i,j)
                end do
@@ -336,6 +337,7 @@
             end if
 
             do j=1,nvar
+               !$omp simd
                do i=1,nvar
                   umat(i,j) = -umat(i,j)
                end do
@@ -352,7 +354,7 @@
          nmin = 1
 !$OMP PARALLEL DO SCHEDULE(static,3) &
 !$OMP PRIVATE(i,ns,shift2,dmat,umat,lmat,lnext,unext,lprev,uprev,kcount,shift,umat0,lmat0,k)
-         do i= 1, 3*(1+(nblk-nmin)/2)
+         do i = 1, 3*(1+(nblk-nmin)/2)
 
             ns = 2*((i-1)/3) + nmin
             k = ncycle*(ns-1) + 1
@@ -437,7 +439,6 @@
          real(dp), pointer, dimension(:) :: X, Xprev, Xnext
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
          character (len=1) :: equed
-         logical :: okay
 
          include 'formats'
 
@@ -447,7 +448,7 @@
          nmin = 2
          op_err = 0
 !$OMP PARALLEL DO SCHEDULE(static,3) &
-!$OMP PRIVATE(ns,shift1,ipivot,shift2,k,dmat,dmatF,X,row_scale_factors,col_scale_factors,equed,i,okay,op_err)
+!$OMP PRIVATE(ns,shift1,ipivot,shift2,k,dmat,dmatF,X,row_scale_factors,col_scale_factors,equed,i,op_err)
          do ns = nmin, nblk, 2
             k = ncycle*(ns-1) + 1
             shift1 = nvar*(k-1)
@@ -686,7 +687,6 @@
          real(dp), pointer, dimension(:,:) :: dmat, dmatF
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
          character (len=1) :: equed
-         logical :: okay
 
          include 'formats'
 
@@ -694,9 +694,11 @@
          if (dbg) write(*,*) 'start bcyclic_solve'
          
          ! copy B to soln
+         !$OMP PARALLEL DO SIMD
          do i=1,nvar*nz
             soln1(i) = B1(i)
          end do
+         !$OMP END PARALLEL DO SIMD
 
          ierr = 0
 
@@ -842,6 +844,7 @@
             nrhs = nvar
 
             do i=1,nvar
+               !$omp simd
                do j=1,nvar
                   a(i,j) = mtx(i,j)
                   af(i,j) = mtxF(i,j)
@@ -868,6 +871,7 @@
             end if
             
             do i=1,nvar
+               !$omp simd
                do j=1,nvar
                   X_mtx(i,j) = x(i,j)
                end do
@@ -918,6 +922,7 @@
             include 'formats'
 
             do i=1,nvar
+               !$omp simd
                do j=1,nvar
                   a(i,j) = mtx(i,j)
                   af(i,j) = mtxF(i,j)

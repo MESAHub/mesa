@@ -194,7 +194,7 @@
             ip = ipiv( ix )
             if( ip.ne.i ) then
                !$omp simd private(temp)
-               do k = 1, n
+               do k = 1,n
                   temp = a( i, k )
                   a( i, k ) = a( ip, k )
                   a( ip, k ) = temp
@@ -214,7 +214,7 @@
          integer :: i,k
          info = 0
          !$omp simd private(temp)
-         do i = 1, n
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
@@ -248,7 +248,8 @@
          real(dp) :: temp
          integer :: i,k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
@@ -282,7 +283,8 @@
          real(dp) :: temp
          integer :: i,k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp

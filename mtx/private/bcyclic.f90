@@ -396,7 +396,7 @@
          nmin = 1
 !$omp parallel do schedule(static,3) &
 !$omp private(i,ns,shift2,dmat,umat,lmat,lnext,unext,lprev,uprev,kcount,shift,umat0,lmat0,k)
-         do i= 1, 3*(1+(nblk-nmin)/2)
+         do i = 1, 3*(1+(nblk-nmin)/2)
          
             ns = 2*((i-1)/3) + nmin
             k = ncycle*(ns-1) + 1
