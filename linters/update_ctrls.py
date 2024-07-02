@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 # This file is designed to handle moving controls from s% xx to s% ctrl %xx
-# While this replicates alot of check_defaults.py we want this to be standalone
+# While this replicates a lot of check_defaults.py we want this to be standalone
 # and only depend on the python stdlib. This way users can easily use it to port their
 # run_star_extras.f90 files without needing to worry about python packaging.
 
 # Usage: python update_ctrls.up file1.f90 file2.f90 ....
 
-# Note this only works for s% (or s %) it does not work if you renamed the star_type varaible
+# Note this only works for s% (or s %) it does not work if you renamed the star_type variable
 # to something other than s, for instance in the binary module.
 
 import os
@@ -115,7 +115,8 @@ def get_inc(filename):
     lines = [i.replace("&", "").strip() for i in lines if i]
 
     # Remove type defintion (i.e real(dp) :: x) leaves just x
-    # as well as anything that starstwith a comment or has a comment embeded in it
+    # as well as anything that stars with a comment 
+    # or has a comment embedded in it
     for idl, line in enumerate(lines):
         if "::" in line:
             lines[idl] = line.split("::")[1].strip()
