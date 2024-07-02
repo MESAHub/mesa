@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import sys
-import os
 import re
 
 
@@ -13,11 +12,11 @@ def search(filename, checks, summary=False):
                 # Skip comment lines
                 continue
             for c in checks:
-                if "!" in line and not "!$" in line:
-                    l = line[: line.index("!")]
+                if "!" in line and "!$" not in line:
+                    lcheck = line[: line.index("!")]
                 else:
-                    l = line
-                lcheck = l.lower()
+                    lcheck = line
+                lcheck = lcheck.lower()
                 x = c(lcheck)
                 if x is not None:
                     count += 1
@@ -37,14 +36,14 @@ def check_float(line):
 
 def check_pow(line):
     # Look for 3**5
-    if re.search("[a-zA-Z0-9\)]\*\*[a-zA-Z0-9]", line):
+    if re.search(r"[a-zA-Z0-9\)]\*\*[a-zA-Z0-9]", line):
         return "Found ** use, use powX() instead"
     return None
 
 
 def check_real_op(line):
     # Lots of code has 1.+2.
-    checks = ["[0-9]\.\*", "[0-9]\.\+", "[0-9]\.\-", "[0-9]\.\/"]
+    checks = [r"[0-9]\.\*", r"[0-9]\.\+", r"[0-9]\.\-", r"[0-9]\.\/"]
     found = []
     for c in checks:
         if re.search(c, line):
@@ -57,7 +56,7 @@ def check_real_op(line):
 def check_real_exp(line):
     # Look for 1e+1, 1e-1, 1e1
     if (
-        re.search("[0-9][eE][+]?[-]?[0-9]", line)
+        re.search(r"[0-9][eE][+]?[-]?[0-9]", line)
         and "write" not in line
         and "format(" not in line
     ):
@@ -69,10 +68,10 @@ def check_real_d(line):
     # Look for 1.5 but not 1.5d0
     if "write" not in line and "format(" not in line:
         for i in re.split(
-            " |\+|\-|\=|\*|\/", line
+            r" |\+|\-|\=|\*|\/", line
         ):  # Split up string into things approximately like a number
             if len(i) and re.search(
-                "\d+[.](?!.*[_Dd]).*", i
+                r"\d+[.](?!.*[_Dd]).*", i
             ):  # test if missing double precision qualifier
                 return "Missing D on float"
     return None
@@ -84,11 +83,11 @@ def check_real(line):
         return "Declared real use real(dp) instead"
     return None
 
+
 def check_dp(line):
     if "double precision" in line:
         return "Found double precision use real(dp) instead"
     return None
-
 
 
 allchecks = [
@@ -99,6 +98,7 @@ allchecks = [
     check_real_d,
     check_dp,
 ]
+
 
 if __name__ == "__main__":
     files = sys.argv[1:]
