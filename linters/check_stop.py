@@ -14,8 +14,8 @@ MESA_DIR = os.environ["MESA_DIR"]
 # Files or folders to skip
 skip_folders = [
     "utils/",
-    'eos/eosCMS_builder',
-    'eos/eosFreeEOS_builder',
+    "eos/eosCMS_builder",
+    "eos/eosFreeEOS_builder",
 ]
 
 skip_files = [
@@ -43,6 +43,7 @@ def mesa_error(message=None):
     else:
         return f"call mesa_error(__FILE__,__LINE__,{message})"
 
+
 if len(sys.argv) > 1:
     files = sys.argv[1:]
 else:
@@ -65,7 +66,7 @@ for file in files:
             elif str_stop.search(line):
                 # String type, preserve error message
                 match = str_stop.search(line).group()
-                match = match[len("stop ") :]
+                match = match[len("stop "):]
                 line = re.sub(str_stop, mesa_error(match), line)
             lines[ldx] = line
             modified = True
