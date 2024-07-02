@@ -1945,7 +1945,11 @@
       ! stop_at_phase_WDCS
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! if true, when phase of evolution reaches this point.
+      ! if true, terminate model when phase of evolution reaches this point.
+      ! Definitions for stop_at_phase_* can be found in
+      ! $MESA_DIR/star/private/star_utils.f90 inside the
+      ! subroutine ``set_phase_of_evolution``
+      ! ::
 
       ! ::
     
