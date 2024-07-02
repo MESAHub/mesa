@@ -376,7 +376,7 @@ condition can be expressed as "stop when quantity X rises above or falls
 below some limit", there's a good chance that you can choose to stop
 simply by setting a few existing flags. Take a look at the "when to
 stop" section of star/defaults/controls.defaults, which starts around
-line 230.
+line 940.
 
 If your condition isn't there or is a more complicated logical
 combination of conditions, then you will probably need to implement it
