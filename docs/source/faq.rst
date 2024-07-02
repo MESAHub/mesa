@@ -524,7 +524,7 @@ previous version of OS X.
     open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
 
 -  Install the latest version of the `MESA
-   SDK <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__
+   SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__
    appropriate for your version of OS X.
 
 Why do I get the error "stdlib.h: No such file or directory"?
@@ -532,7 +532,7 @@ Why do I get the error "stdlib.h: No such file or directory"?
 
 If yore using macOS 10.14 (Mojave), then this error indicates that you
 did not install the system headers (see previous FAQ or `the SDK
-website <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__).
+website <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Mac_OS_X>`__).
 
 Why do I get the error "C compiler cannot create executables"?
 --------------------------------------------------------------
@@ -641,7 +641,7 @@ the MESA SDK. There are a few possible solutions:
 
 (1) Use the contemporary version of the SDK. There is a `list of old
     MESA
-    SDKs <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
+    SDKs <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk-old>`__
     that indicates which version of MESA was current when each was
     released.
 
@@ -756,7 +756,7 @@ a simple script, images_to_movie.sh, which uses ffmpeg to create movies
 from PNG files produced by MESA.
 
 To make use of this capability, consult `Rich's
-instructions <http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Making_Movies>`__.
+instructions <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk#Making_Movies>`__.
 
 Programming
 ===========
