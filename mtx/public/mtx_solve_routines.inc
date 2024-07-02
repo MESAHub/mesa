@@ -244,24 +244,25 @@
          integer :: ipiv(:)
          real(dp) :: a(:,:), b(:)
          real(dp), parameter :: one=1, zero=0
-         integer, parameter :: n = 4
+         ! integer, parameter :: n = 4
          real(dp) :: temp
          integer :: i,k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,4
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
          end do         
-         do k = 1,n
+         do k = 1,4
             if (b(k).ne.zero) then
                !$omp simd
-               do i = k + 1,n
+               do i = k + 1,4
                   b(i) = b(i) - b(k)*a(i,k)
                end do
             end if
          end do
-         do k = n,1,-1
+         do k = 4,1,-1
             if (b(k).ne.zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd
@@ -278,24 +279,25 @@
          integer :: ipiv(:)
          real(dp) :: a(:,:), b(:)
          real(dp), parameter :: one=1, zero=0
-         integer, parameter :: n = 5
+         ! integer, parameter :: n = 5
          real(dp) :: temp
          integer :: i,k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,5
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
          end do         
-         do k = 1,n
+         do k = 1,5
             if (b(k).ne.zero) then
                !$omp simd
-               do i = k + 1,n
+               do i = k + 1,5
                   b(i) = b(i) - b(k)*a(i,k)
                end do
             end if
          end do
-         do k = n,1,-1
+         do k = 5,1,-1
             if (b(k).ne.zero) then
                b(k) = b(k)/a(k,k)
                !$omp simd

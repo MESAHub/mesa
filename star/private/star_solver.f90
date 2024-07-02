@@ -26,6 +26,7 @@
 
       module star_solver
 
+      use caliper_mod
       use star_private_def
       use const_def, only: dp
       use num_def
@@ -88,10 +89,12 @@
 
          if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% AF1)
 
+         call cali_begin_phase('do_solver')
          call do_solver( &
             s, nvar, s% AF1, ldAF, neqns, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             convergence_failure, ierr)
+         call cali_end_phase('do_solver')
 
       end subroutine solver
 
@@ -161,10 +164,14 @@
          real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null() ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null() ! (nvar,nvar,nz)
 
+         call cali_begin_phase('do_solver_work')
          call do_solver_work()
+         call cali_end_phase('do_solver_work')
          ! Split it this way so we can guarantee cleanup() gets called once do_solver_work finishes
          ! Otherwise all the pointers will leak memory.
+         call cali_begin_phase('cleanup')
          call cleanup()
+         call cali_end_phase('cleanup')
 
          contains
 
@@ -648,8 +655,12 @@
                s% solver_test_partials_iter_number == iter
             if (.not. testing_partial) return
 
+            call cali_begin_phase('solver_test_partials')
             call do_equations(ierr)
+            call cali_end_phase('solver_test_partials')
             if (ierr /= 0) return
+
+            call cali_begin_phase('solver_test_partials.extras')
 
             allocate(save_dx(nvar,nz), save_equ(nvar,nz))
 
@@ -680,6 +691,8 @@
             end if
             deallocate(save_dx, save_equ)
             call mesa_error(__FILE__,__LINE__,'done solver_test_partials')
+
+            call cali_end_phase('solver_test_partials.extras')
 
          end subroutine solver_test_partials
 
@@ -722,7 +735,9 @@
             integer, intent(out) :: ierr
             call prepare_solver_matrix(nvar, xder, ierr)
             if (ierr /= 0) return
+            call cali_begin_phase('eval_equations')
             call eval_equations(s, nvar, ierr)
+            call cali_end_phase('eval_equations')
             if (ierr /= 0) return
             call s% other_after_solver_setmatrix(s% id, ierr)
          end subroutine do_equations
@@ -968,7 +983,6 @@
             logical, intent(in) :: just_use_dx
             integer :: i, k
             include 'formats'
-
             if (just_use_dx) then
                if (coeff == 1d0) then
                   do k=1,nz
@@ -1009,6 +1023,9 @@
             real(dp) :: ferr, berr, total_time
 
             include 'formats'
+
+            call cali_begin_phase('solve_equ')
+
             ierr = 0
             solve_equ = .true.
 
@@ -1016,30 +1033,33 @@
                call start_time(s, time0, total_time)
             end if
             
-            !$omp simd
+            !$OMP PARALLEL DO SIMD
             do i=1,neq
                b1(i) = -equ1(i)
             end do
+            !$OMP END PARALLEL DO SIMD
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   save_ublk1(i) = ublk1(i)
                   save_dblk1(i) = dblk1(i)
                   save_lblk1(i) = lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
             
             call factor_mtx(ierr)
             if (ierr == 0) call solve_mtx(ierr)
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   ublk1(i) = save_ublk1(i)
                   dblk1(i) = save_dblk1(i)
                   lblk1(i) = save_lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
 
             if (s% doing_timing) then
@@ -1050,26 +1070,31 @@
                b(1:nvar,1:nz) = 0d0
             end if
 
+            call cali_end_phase('solve_equ')
          end function solve_equ
 
 
          subroutine factor_mtx(ierr)
             use star_bcyclic, only: bcyclic_factor
             integer, intent(out) :: ierr
+            call cali_begin_phase('factor_mtx')
             call bcyclic_factor( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, row_scale_factors1, col_scale_factors1, &
                equed1, iter, ierr)
+            call cali_end_phase('factor_mtx')
          end subroutine factor_mtx
 
 
          subroutine solve_mtx(ierr)
             use star_bcyclic, only: bcyclic_solve
             integer, intent(out) :: ierr
+            call cali_begin_phase('solve_mtx')
             call bcyclic_solve( &
                s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipiv_blk1, &
                B1, soln1, row_scale_factors1, col_scale_factors1, equed1, &
                iter, ierr)
+            call cali_end_phase('solve_mtx')
          end subroutine solve_mtx
 
 

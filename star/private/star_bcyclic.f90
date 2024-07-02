@@ -22,6 +22,7 @@
 
       module star_bcyclic
 
+      use caliper_mod
       use star_private_def
       use const_def, only: dp, ln10
       use utils_lib, only: set_nan
@@ -64,23 +65,30 @@
          integer, allocatable :: factored(:)
 
          include 'formats'
+
+         call cali_begin_phase('start')
          
          if (s% use_DGESVX_in_bcyclic .and. s% report_min_rcond_from_DGESXV) &
             min_rcond_from_DGESVX = 1d99
          
+         call cali_begin_phase('start1')
          allocate(factored(nz))
          do k=1,nz
             factored(k) = 0
          end do
+         call cali_end_phase('start1')
 
+         call cali_begin_phase('start2')
          ierr = 0
          neq = nvar*nz
-         !$omp simd
+         !$OMP PARALLEL DO SIMD
          do i = 1,nvar*neq
             lblkF1(i) = lblk1(i)
             dblkF1(i) = dblk1(i)
             ublkF1(i) = ublk1(i)
          end do
+         !$OMP END PARALLEL DO SIMD
+         call cali_end_phase('start2')
 
          if (dbg) write(*,*) 'start bcyclic_factor'
 
@@ -92,6 +100,8 @@
             maxlevels = maxlevels+1
          end do
          maxlevels = max(1, maxlevels)
+
+         call cali_end_phase('start')
 
          have_odd_storage = associated(s% bcyclic_odd_storage)
          if (have_odd_storage) then
@@ -121,6 +131,7 @@
 
          if (dbg) write(*,*) 'start factor_cycle'
 
+         call cali_begin_phase('factor_cycle')
          factor_cycle: do ! perform cyclic-reduction factorization
 
             nslevel(nlevel) = nstemp
@@ -147,6 +158,7 @@
             if (nlevel > maxlevels) exit
 
          end do factor_cycle
+         call cali_end_phase('factor_cycle')
 
          if (dbg) write(*,*) 'done factor_cycle'
 
@@ -157,10 +169,12 @@
          row_scale_factors(1:nvar) => row_scale_factors1(1:nvar)
          col_scale_factors(1:nvar) => col_scale_factors1(1:nvar)
          factored(1) = factored(1) + 1
+         call cali_begin_phase('dense_factor')
          call dense_factor(s, 1, nvar, dmat, dmatF, ipivot, &
             row_scale_factors, col_scale_factors, equed, &
             min_rcond_from_DGESVX, k_min_rcond_from_DGESVX, rpgfac, &
             ierr)
+         call cali_end_phase('dense_factor')
          equed1(1:1) = equed(1:1)
          if (ierr /= 0) then
             write(*,*) 'dense_factor failed'
@@ -242,8 +256,8 @@
                return
             end if
          end if
-
-!$OMP PARALLEL DO private(ns,kcount,shift,shift2,i) SCHEDULE(static,3)
+call cali_begin_phase('co.loop1')
+!$OMP PARALLEL DO private(ns,kcount,shift,shift2,i) ! XXX SCHEDULE(static,3)
          do ns = nmin, nblk, 2  ! copy umat and lmat
             kcount = (ns-nmin)/2 + 1
             shift = nvar2*(kcount-1)
@@ -254,6 +268,7 @@
             end do
          end do
 !$OMP END PARALLEL DO
+call cali_end_phase('co.loop1')
 
          if (nvar2*kcount > s% bcyclic_odd_storage(nlevel)% ul_size) then
             write(*,*) 'nvar2*kcount > ul_size in cycle_onestep'
@@ -264,7 +279,8 @@
          if (dbg) write(*,*) 'start lu factorization'
          ! compute lu factorization of even diagonal blocks
          nmin = 2
-!$OMP PARALLEL DO SCHEDULE(static,3) &
+call cali_begin_phase('co.loop2')
+!$OMP PARALLEL DO & ! XXX SCHEDULE(static,3) &
 !$OMP PRIVATE(ipivot,dmat,dmatF,ns,op_err,shift1,shift2,i,j,k,row_scale_factors,col_scale_factors,equed)
          do ns = nmin, nblk, 2
 
@@ -289,6 +305,7 @@
 
          end do
 !$OMP END PARALLEL DO
+call cali_end_phase('co.loop2')
          if (ierr /= 0) then
             !write(*,*) 'factorization failed in bcyclic'
             return
@@ -296,7 +313,8 @@
 
          if (dbg) write(*,*) 'done lu factorization; start solve'
 
-!$OMP PARALLEL DO SCHEDULE(static,3) &
+call cali_begin_phase('co.loop3')  ! XXX 3
+!$OMP PARALLEL DO & ! XXX SCHEDULE(static,3) &
 !$OMP PRIVATE(ns,k,shift1,shift2,ipivot,dmat,dmatF,umat,lmat,mat1,i,j,row_scale_factors,col_scale_factors,equed,op_err)
          do ns = nmin, nblk, 2
             ! compute new l=-d[-1]l, u=-d[-1]u for even blocks
@@ -320,6 +338,8 @@
             end if
 
             do j=1,nvar
+               ! XXX
+               !$omp simd
                do i=1,nvar
                   lmat(i,j) = -lmat(i,j)
                end do
@@ -335,6 +355,8 @@
             end if
 
             do j=1,nvar
+               ! XXX
+               !$omp simd
                do i=1,nvar
                   umat(i,j) = -umat(i,j)
                end do
@@ -342,6 +364,7 @@
 
          end do
 !$OMP END PARALLEL DO
+call cali_end_phase('co.loop3')
          if (dbg) write(*,*) 'done solve'
 
          if (ierr /= 0) return
@@ -349,9 +372,10 @@
          ! compute new odd blocks in terms of even block factors
          ! compute odd hatted matrix elements except at boundaries
          nmin = 1
-!$OMP PARALLEL DO SCHEDULE(static,3) &
+call cali_begin_phase('co.loop4')
+!$OMP PARALLEL DO & ! XXX SCHEDULE(static,3) &
 !$OMP PRIVATE(i,ns,shift2,dmat,umat,lmat,lnext,unext,lprev,uprev,kcount,shift,umat0,lmat0,k)
-         do i= 1, 3*(1+(nblk-nmin)/2)
+         do i = 1, 3*(1+(nblk-nmin)/2)
 
             ns = 2*((i-1)/3) + nmin
             k = ncycle*(ns-1) + 1
@@ -411,6 +435,7 @@
 
          end do
 !$OMP END PARALLEL DO
+call cali_end_phase('co.loop4')
          if (dbg) write(*,*) 'done cycle_onestep'
 
       end subroutine cycle_onestep
@@ -436,7 +461,6 @@
          real(dp), pointer, dimension(:) :: X, Xprev, Xnext
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
          character (len=1) :: equed
-         logical :: okay
 
          include 'formats'
 
@@ -445,8 +469,9 @@
          ! compute dblk[-1]*brhs for even indices and store in brhs(even)
          nmin = 2
          op_err = 0
+call cali_begin_phase('loop1')  ! XXX 3
 !$OMP PARALLEL DO SCHEDULE(static,3) &
-!$OMP PRIVATE(ns,shift1,ipivot,shift2,k,dmat,dmatF,X,row_scale_factors,col_scale_factors,equed,i,okay,op_err)
+!$OMP PRIVATE(ns,shift1,ipivot,shift2,k,dmat,dmatF,X,row_scale_factors,col_scale_factors,equed,i,op_err)
          do ns = nmin, nblk, 2
             k = ncycle*(ns-1) + 1
             shift1 = nvar*(k-1)
@@ -467,43 +492,60 @@
 
          end do
 !$OMP END PARALLEL DO
+call cali_end_phase('loop1')
 
         if (ierr /= 0) return
 
         ! compute odd (hatted) sources (b-hats) for interior rows
          nmin = 1
          kcount = 0
+call cali_begin_phase('loop2')  ! XXX 3
 !$OMP PARALLEL DO SCHEDULE(static,3) &
-!$OMP PRIVATE(ns,shift1,X,kcount,shift,umat,lmat,Xnext,Xprev)
-         do ns = nmin, nblk, 2
+!$OMP PRIVATE(ns,shift1,X,umat,lmat,Xnext,Xprev)
+         do ns = 1, nblk, 2
             shift1 = nvar*ncycle*(ns-1)
             X(1:nvar) => soln1(shift1+1:shift1+nvar)
-            kcount = 1+(ns-nmin)/2
-            shift = nvar2*(kcount-1)
-            umat(1:nvar,1:nvar) => &
-               s% bcyclic_odd_storage(nlevel)% umat1(shift+1:shift+nvar2)
-            lmat(1:nvar,1:nvar) => &
-               s% bcyclic_odd_storage(nlevel)% lmat1(shift+1:shift+nvar2)
+            !kcount = 1+(ns-nmin)/2
+            !shift = nvar2*(kcount-1)
+            !shift = nvar2*(ns-1)/2
+            shift1 = nvar2*(ns-1)/2
+            umat(1:nvar,1:nvar) => s% bcyclic_odd_storage(nlevel)% umat1(shift1+1:shift1+nvar2)
+            lmat(1:nvar,1:nvar) => s% bcyclic_odd_storage(nlevel)% lmat1(shift1+1:shift1+nvar2)
             if (ns > 1) then
                shift1 = nvar*ncycle*(ns-2)
-               Xprev => soln1(shift1+1:shift1+nvar)
+               Xprev(1:nvar) => soln1(shift1+1:shift1+nvar)
+               call dgemv('N', nvar, nvar, -1.0d0, lmat, nvar, Xprev, 1, 1.0d0, X, 1)
             end if
             if (ns < nblk) then
                shift1 = nvar*ncycle*ns
-               Xnext => soln1(shift1+1:shift1+nvar)
-               if (ns > 1) then
-                  ! bptr = bptr - matmul(umat,bnext) - matmul(lmat,bprev)
-                  call my_gemv_mv(nvar,nvar,umat,Xnext,lmat,Xprev,X)
-               else
-                  ! bptr = bptr - matmul(umat,bnext)
-                  call my_gemv(nvar,nvar,umat,nvar,Xnext,X)
-               end if
-            else if (ns > 1) then
-               ! bptr = bptr - matmul(lmat,bprev)
-               call my_gemv(nvar,nvar,lmat,nvar,Xprev,X)
-            end if
+               Xnext(1:nvar) => soln1(shift1+1:shift1+nvar)
+               call dgemv('N', nvar, nvar, -1.0d0, umat, nvar, Xnext, 1, 1.0d0, X, 1)
+            end if   
+            !if (ns > 1) then
+            !   shift1 = nvar*ncycle*(ns-2)
+            !   Xprev(1:nvar) => soln1(shift1+1:shift1+nvar)
+            !end if
+            !if (ns < nblk) then
+            !   shift1 = nvar*ncycle*ns
+            !   Xnext(1:nvar) => soln1(shift1+1:shift1+nvar)
+            !   if (ns > 1) then
+            !      ! bptr = bptr - matmul(umat,bnext) - matmul(lmat,bprev)
+            !      ! call my_gemv_mv(nvar,nvar,umat,Xnext,lmat,Xprev,X)
+            !      call dgemv('N', nvar, nvar, -1.0d0, umat, nvar, Xnext, 1, 1.0d0, X, 1) ! XXX
+            !      call dgemv('N', nvar, nvar, -1.0d0, lmat, nvar, Xprev, 1, 1.0d0, X, 1) ! XXX
+            !   else
+            !      ! bptr = bptr - matmul(umat,bnext)
+            !      ! call my_gemv(nvar,nvar,umat,nvar,Xnext,X)
+            !      call dgemv('N', nvar, nvar, -1.0d0, umat, nvar, Xnext, 1, 1.0d0, X, 1) ! XXX
+            !   end if
+            !else if (ns > 1) then
+            !   ! bptr = bptr - matmul(lmat,bprev)
+            !   ! call my_gemv(nvar,nvar,lmat,nvar,Xprev,X)
+            !   call dgemv('N', nvar, nvar, -1.0d0, lmat, nvar, Xprev, 1, 1.0d0, X, 1) ! XXX
+            !end if
          end do
 !$OMP END PARALLEL DO
+         call cali_end_phase('loop2')
 
          if (nvar2*kcount > s% bcyclic_odd_storage(nlevel)% ul_size) then
             write(*,*) 'nvar2*kcount > ul_size in cycle_rhs'
@@ -685,17 +727,17 @@
          real(dp), pointer, dimension(:,:) :: dmat, dmatF
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
          character (len=1) :: equed
-         logical :: okay
 
          include 'formats'
-
 
          if (dbg) write(*,*) 'start bcyclic_solve'
          
          ! copy B to soln
+         !$OMP PARALLEL DO SIMD ! XXX
          do i=1,nvar*nz
             soln1(i) = B1(i)
          end do
+         !$OMP END PARALLEL DO SIMD
 
          ierr = 0
 
@@ -717,14 +759,17 @@
 
          if (dbg) write(*,*) 'start forward_cycle'
 
+         call cali_begin_phase('forward_cycle')
          forward_cycle: do
 
             nslevel(nlevel) = nstemp
             if (dbg) write(*,2) 'call cycle_rhs', nstemp
+            call cali_begin_phase('cycle_rhs')
             call cycle_rhs( &
                s, nz, nstemp, nvar, ncycle, nlevel, &
                dblk1, dblkF1, soln1, ipivot1, &
                row_scale_factors1, col_scale_factors1, equed1, ierr)
+               call cali_end_phase('cycle_rhs')
             if (ierr /= 0) then
                call dealloc
                return
@@ -739,6 +784,7 @@
             if (nlevel > maxlevels) exit
 
          end do forward_cycle
+         call cali_end_phase('forward_cycle')
 
          if (dbg) write(*,*) 'done forward_cycle'
 
@@ -748,8 +794,10 @@
          row_scale_factors(1:nvar) => row_scale_factors1(1:nvar)
          col_scale_factors(1:nvar) => col_scale_factors1(1:nvar)
          equed(1:1) = equed1(1:1)
+         call cali_begin_phase('dense_solve1')
          call dense_solve1(s, 1, nvar, soln1, dmat, dmatF, ipivot, .false., &
             row_scale_factors, col_scale_factors, equed, ierr)
+         call cali_end_phase('dense_solve1')
          if (ierr /= 0) then
             write(*,*) 'failed in my_getrs1'
             call dealloc
@@ -757,6 +805,7 @@
          end if
 
          ! back solve for even x's
+         call cali_begin_phase('back_cycle')
          back_cycle: do while (ncycle > 1)
             ncycle = ncycle/2
             nlevel = nlevel-1
@@ -769,6 +818,7 @@
                s, nvar, nz, ncycle, nstemp, nlevel, &
                lblk1, ublk1, lblkF1, ublkF1, soln1)
          end do back_cycle
+         call cali_end_phase('back_cycle')
 
          call dealloc
 
@@ -841,6 +891,8 @@
             nrhs = nvar
 
             do i=1,nvar
+               ! XXX
+               !$omp simd
                do j=1,nvar
                   a(i,j) = mtx(i,j)
                   af(i,j) = mtxF(i,j)
@@ -867,6 +919,8 @@
             end if
             
             do i=1,nvar
+               ! XXX
+               !$omp simd
                do j=1,nvar
                   X_mtx(i,j) = x(i,j)
                end do
@@ -889,12 +943,13 @@
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         
+
          if (s% use_DGESVX_in_bcyclic) then
-            call solve1_with_DGESVX
+            call solve1_with_DGESVX(mtxF, ipivot, X_vec, ierr)
             return
          end if
-         
+
+         call cali_begin_phase('my_getrs1')
          if (nvar == 4) then
             call my_getrs1_n4(mtxF, ipivot, X_vec, ierr)
          else if (nvar == 5) then
@@ -902,10 +957,15 @@
          else
             call my_getrs1(nvar, mtxF, nvar, ipivot, X_vec, nvar, ierr)
          end if
+         call cali_end_phase('my_getrs1')
          
          contains
          
-         subroutine solve1_with_DGESVX
+         subroutine solve1_with_DGESVX(mtxF, ipivot, X_vec, ierr)
+            integer :: ierr
+            integer :: ipivot(:)
+            real(dp) :: mtxF(:,:), X_vec(:)
+
             character (len=1) :: fact, trans
             real(dp) :: rcond
             integer, parameter :: nrhs = 1
@@ -916,7 +976,11 @@
 
             include 'formats'
 
+            call cali_begin_phase('solve1_with_DGESVX')
+
             do i=1,nvar
+               ! XXX
+               !$omp simd
                do j=1,nvar
                   a(i,j) = mtx(i,j)
                   af(i,j) = mtxF(i,j)
@@ -942,6 +1006,8 @@
             do i=1,nvar
                X_vec(i) = x(i,1)
             end do
+
+            call cali_end_phase('solve1_with_DGESVX')
 
          end subroutine solve1_with_DGESVX
 

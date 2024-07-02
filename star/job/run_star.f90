@@ -1,6 +1,7 @@
  
       module run_star
-      implicit none
+         use caliper_mod
+         implicit none
       
       contains
       
@@ -16,6 +17,10 @@
             restart_okay = .true.
          integer :: id, ierr
          logical :: restart
+
+         ! A scope annotation. Start region 'main'
+         call cali_begin_region('do_run_star')
+
          call run1_star( &
             do_alloc_star, &
             do_free_star, &
@@ -25,6 +30,8 @@
             ierr, &
             inlist_fname_arg)
          call starlib_shutdown
+
+         call cali_end_region('do_run_star')
       end subroutine do_run_star
 
       end module run_star

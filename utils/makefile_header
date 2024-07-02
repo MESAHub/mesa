@@ -58,7 +58,7 @@ endif
 # NOTE: recent versions of mesa have required reduced optimization 
 # in order to work with ifort; we suggest using gfortran instead of ifort if possible.
 
-FC = gfortran
+FC = gfortran -I/usr/local/include/caliper/fortran -L/usr/local/lib -lcaliper
 CC = gcc
 
 

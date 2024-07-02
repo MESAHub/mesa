@@ -26,6 +26,7 @@
 
       module star_lib ! this is the procedure interface to mesa/star.
 
+      use caliper_mod
       use const_def, only: dp
       use star_def, only: star_ptr, star_info, maxlen_profile_column_name
       use utils_lib, only: mesa_error
@@ -583,7 +584,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         call cali_begin_phase('star_evolve_step_part1')
          star_evolve_step_part1 = do_evolve_step_part1(id, first_try)
+         call cali_end_phase('star_evolve_step_part1')
       end function star_evolve_step_part1
 
       integer function star_evolve_step_part2(id, first_try)
@@ -597,7 +600,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         call cali_begin_phase('star_evolve_step_part2')
          star_evolve_step_part2 = do_evolve_step_part2(id, first_try)
+         call cali_end_phase('star_evolve_step_part2')
       end function star_evolve_step_part2
       
       

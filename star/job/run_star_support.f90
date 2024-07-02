@@ -25,6 +25,7 @@
  
       module run_star_support
 
+      use caliper_mod
       use star_lib
       use star_def
       use chem_def
@@ -100,18 +101,21 @@
 
          11 format(a35, f20.10)
 
+         call cali_begin_phase('do_before_evolve_loop')
          restart_filename = 'restart_photo'
          call start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
             id, restart, restart_filename, pgstar_ok, dbg, &
             extras_controls, ierr, inlist_fname_arg)
          if (failed('do_before_evolve_loop',ierr)) return
+         call cali_end_phase('do_before_evolve_loop')
 
          call star_ptr(id, s, ierr)
          if (failed('star_ptr',ierr)) return
 
          continue_evolve_loop = .true.
 
+         call cali_begin_phase('evolve_loop')
          if (dbg) write(*,*) 'start evolve_loop'
          evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
          
@@ -119,8 +123,11 @@
             if (failed('do_evolve_one_step',ierr)) return
 
          end do evolve_loop
+         call cali_end_phase('evolve_loop')
 
+         call cali_begin_phase('after_evolve_loop')
          call after_evolve_loop(s% id, do_free_star, ierr)
+         call cali_end_phase('after_evolve_loop')
          if (failed('after_evolve_loop',ierr)) return
 
       end subroutine run1_star  
@@ -203,6 +210,7 @@
 
          first_try = .true.
       
+         call cali_begin_phase('step_loop')
          step_loop: do ! may need to repeat this loop
          
             if (stop_is_requested(s)) then
@@ -211,7 +219,9 @@
                exit
             end if
          
+            call cali_begin_phase('star_evolve_step')
             result = star_evolve_step(id, first_try)
+            call cali_end_phase('star_evolve_step')
             if (result == keep_going) result = star_check_model(id)
             if (result == keep_going) result = s% extras_check_model(id)
             if (result == keep_going) result = star_pick_next_timestep(id)            
@@ -238,13 +248,15 @@
             first_try = .false.
             
          end do step_loop
+         call cali_end_phase('step_loop')
          
          ! once we get here, the only options are keep_going or terminate.
          ! redo or retry must be done inside the step_loop
-         
+         call cali_begin_phase('after_step_loop')
          call after_step_loop(s% id, s% inlist_fname, &
              dbg, result, ierr)
          if (failed('after_step_loop',ierr)) return
+         call cali_end_phase('after_step_loop')
             
          if (result /= keep_going) then
             if (result /= terminate) then
@@ -377,7 +389,9 @@
          if (failed('set_star_kap_and_eos_handles',ierr)) return
          
          if (dbg) write(*,*) 'call star_setup'
+         call cali_begin_phase('star_setup')
          call star_setup(id, inlist_fname, ierr)
+         call cali_end_phase('star_setup')
          if (failed('star_setup',ierr)) return
          
          if(dbg) write(*,*) 'call add_fpe_checks'
@@ -711,7 +725,8 @@
                   abs(s% total_gravitational_energy_end), s% virial_thm_P_avg
             end if
          end if
-                     
+                   
+         call cali_begin_phase('asl.read_pgstar_inlist')
          if (result == keep_going) then 
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
@@ -726,6 +741,7 @@
                end if
             end if
          end if
+         call cali_end_phase('asl.read_pgstar_inlist')
       
          if (result == keep_going) then
             result = s% extras_finish_step(id)      
@@ -893,7 +909,7 @@
             if (failed('write_terminal_summary',ierr)) return
          
          end if
-         
+
          if (len_trim(s% job% echo_at_end) > 0) then
             write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_end)

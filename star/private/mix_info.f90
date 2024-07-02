@@ -2300,6 +2300,8 @@
          integer :: j, k
          include 'formats'
 
+         ! XXX
+         !$OMP PARALLEL DO
          do k = 1, s% nz
 
             dm = s% dm(k)
@@ -2352,6 +2354,7 @@
             end do
 
          end do
+         !$OMP END PARALLEL DO
 
       end subroutine set_dxdt_mix
 

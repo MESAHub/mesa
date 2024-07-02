@@ -25,6 +25,7 @@
 
       module solver_support
 
+      use caliper_mod
       use star_private_def
       use utils_lib, only: is_bad
       use const_def
@@ -110,7 +111,9 @@
             if (dbg) write(*, *) 'skip set_solver_vars on call before 1st iter'
          else
             if (dbg) write(*, *) 'call set_solver_vars'
+            call cali_begin_phase('set_solver_vars')
             call set_solver_vars(s, nvar, dt, ierr)
+            call cali_end_phase('set_solver_vars')
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*,2) 'eval_equations: set_solver_vars returned ierr', ierr
@@ -118,7 +121,9 @@
             end if
          end if
 
+         call cali_begin_phase('set_dxdt_mix')
          call set_dxdt_mix(s)
+         call cali_end_phase('set_dxdt_mix')
 
          if (ierr == 0) then
             do k=1,nz
@@ -129,7 +134,9 @@
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
+            call cali_begin_phase('eval_equ')
             call eval_equ(s, nvar, ierr)
+            call cali_end_phase('eval_equ')
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr

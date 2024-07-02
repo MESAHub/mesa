@@ -25,6 +25,7 @@
 
       module struct_burn_mix
 
+      use caliper_mod
       use star_private_def
       use const_def
       use utils_lib, only: is_bad
@@ -53,6 +54,7 @@
 
          include 'formats'
 
+         !call cali_begin_phase('do_struct_burn_mix')
          ierr = 0
          s% non_epsnuc_energy_change_from_split_burn = 0d0
          dt = s% dt
@@ -172,12 +174,14 @@
             if (s% report_ierr) write(*,*) 'save_start_values failed'
             return
          end if
-                     
+                 
+         call cali_begin_phase('do_solver_converge')
          if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
             tol_correction_norm, tol_max_correction)
          if (s% trace_evolve) write(*,*) 'done solver'
+         call cali_end_phase('do_solver_converge')
 
          s% total_num_solver_iterations = &
             s% total_num_solver_iterations + s% num_solver_iterations
@@ -214,7 +218,9 @@
          s% solver_iter = 0 ! to indicate that no longer doing solver iterations
          s% doing_struct_burn_mix = .false.
          if (s% doing_timing) call update_time(s, time0, total, s% time_struct_burn_mix)
-         
+       
+         !call cali_end_phase('do_struct_burn_mix')   
+
          contains
          
          subroutine test(str)
@@ -519,6 +525,8 @@
 
          include 'formats'
 
+         !call cali_begin_phase('do_solver')
+
          species = s% species
          do_solver = keep_going
          s% using_gold_tolerances = .false.
@@ -579,11 +587,13 @@
             end do
          end if
 
+         call cali_begin_phase('hydro_solver_step')
          converged = .false.
          call hydro_solver_step( &
             s, nz, s% nvar_hydro, nvar, skip_global_corr_coeff_limit, &
             gold_tolerances_level, tol_max_correction, tol_correction_norm, &
             converged, ierr)
+         call cali_end_phase('hydro_solver_step')
          if (ierr /= 0) then
             if (report) then
                write(*, *) 'hydro_solver_step returned ierr', ierr
@@ -599,11 +609,13 @@
             return
          end if
 
+         call cali_begin_phase('check_after_converge')
          if (converged) then ! sanity checks before accept it
             converged = check_after_converge(s, report, ierr)
             if (converged .and. s% RTI_flag) & ! special checks
                converged = RTI_check_after_converge(s, report, ierr)
          end if
+         call cali_end_phase('check_after_converge')
 
          if (.not. converged) then
             do_solver = retry
@@ -623,6 +635,7 @@
             return
          end if
 
+      !call cali_end_phase('do_solver')
       end function do_solver
 
 
@@ -770,11 +783,13 @@
             return
          end if
 
+         call cali_begin_phase('newt')
          if (dbg) write(*, *) 'call solver'
          call newt(ierr)
          if (ierr /= 0 .and. s% report_ierr) then
             write(*,*) 'solver failed for hydro'
          end if
+         call cali_end_phase('newt')
 
          converged = (ierr == 0) .and. (.not. failure)
          if (converged) then

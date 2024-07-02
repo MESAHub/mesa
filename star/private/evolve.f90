@@ -25,6 +25,7 @@
 
       module evolve
 
+      use caliper_mod
       use star_private_def
       use const_def
       use star_utils
@@ -304,7 +305,6 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
-
          do_step_part1 = terminate
          ierr = 0
          call get_star_ptr(id, s, ierr)
@@ -467,7 +467,6 @@
             if (s% report_ierr) write(*, *) 'do_step_part1 ' // trim(str)
             s% result_reason = nonzero_ierr
          end function failed
-
       end function do_step_part1
 
 
@@ -546,7 +545,6 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -679,7 +677,9 @@
                 s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
 
             s% doing_struct_burn_mix = .true.
+            call cali_begin_phase('do_struct_burn_mix')
             do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
+            call cali_end_phase('do_struct_burn_mix')
             s% doing_struct_burn_mix = .false.
             if (do_step_part2 /= keep_going) return
             ! when reach here, have taken the step successfully
@@ -730,7 +730,6 @@
          s% current_system_clock_time = time0
          s% total_elapsed_time = &
             dble(time0 - s% starting_system_clock_time)/dble(clock_rate)
-         
          
          contains
 
@@ -1603,7 +1602,6 @@
             okay_energy_conservation = .true.
 
          end function okay_energy_conservation
-
       end function do_step_part2
 
 
