@@ -23,21 +23,20 @@
 
    ! See ``use_Zbase_for_Type1``. By default, Zbase does not typically affect the
    ! outer regions of a stellar model when the surface metallicity remains 
-   ! below the initial metallicity (Z < Zbase).  Zbase is typically 
-   ! only used for Type2 opacities which operate (deeper in the stellar interior). 
+   ! below the initial metallicity (Z < Zbase). Zbase is typically 
+   ! only used for Type2 opacities which operate deeper in the stellar interior. 
    ! ::
 
    ! Specific scenarios such as high Z accretion onto a metal poor model
-   ! can produce a situation where (Z > Zbase). Durin this scenario
-   ! the surface metallicity can be enhanced substantialy beyond the initial metallicity. 
+   ! can produce a situation where (Z > Zbase). During this scenario
+   ! the surface metallicity can be enhanced beyond the initial metallicity. 
    ! Users can opt to exlusively adopt Type1 opacities in this scenario with
    ! the ``use_Zbase_for_Type1`` flag.
    ! ::
 
-   ! NOTE: for wind schemes that scale with metallicitity, we use Zbase rather than Z (as long as Zbase > 0).
+   ! NOTE: For wind schemes that scale with metallicitity, we use Zbase rather than Z (as long as Zbase > 0).
       ! This is because wind mass loss rate is primarily determined by iron opacity,
       ! which is unlikely to change during the evolution. 
-      ! This will result in an underprediction of the wind in high Z accretion models (where Z > Zbase).
 
    ! Zbase must be set if using kapCN, AESOPUS, or Type2
    ! opacities or else MESA well draw an error. 
