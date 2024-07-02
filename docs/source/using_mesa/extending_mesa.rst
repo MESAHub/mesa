@@ -176,7 +176,7 @@ Let's indicate that we want to add two columns to our history file.
 
 Now let's calculate the information we want to output. This subroutine
 has access to the star_info pointer, so you can make use of any of the
-quantities defined in star/public/star_data.inc to compute additional
+quantities defined in star/public/star_data_*.inc to compute additional
 information about the star. Here's a subroutine that calculates what we
 want to know. There are a few “best practices” shown in this routine
 that are worth remembering, so read through the code and pay attention
@@ -548,7 +548,7 @@ the other_neu at the routine you want to be executed.
      if (ierr /= 0) return
   
      ! this is the place to set any procedure pointers you want to change
-     ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
+     ! e.g., other_wind, other_mixing, other_energy  (see star_data_procedures.inc)
      s% other_neu => tutorial_other_neu
   
   end subroutine extras_controls
