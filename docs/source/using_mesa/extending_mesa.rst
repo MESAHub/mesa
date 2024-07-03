@@ -176,7 +176,7 @@ Let's indicate that we want to add two columns to our history file.
 
 Now let's calculate the information we want to output. This subroutine
 has access to the star_info pointer, so you can make use of any of the
-quantities defined in star/public/star_data.inc to compute additional
+quantities defined in star/public/star_data_*.inc to compute additional
 information about the star. Here's a subroutine that calculates what we
 want to know. There are a few “best practices” shown in this routine
 that are worth remembering, so read through the code and pay attention
@@ -215,19 +215,19 @@ to the comments.
         edot_partial = edot_partial + s% dm(i) * s% eps_nuc(i)
         if (edot_partial .ge. (frac * edot)) exit
      end do
-  
+
      ! note: do NOT add these names to history_columns.list
      ! the history_columns.list is only for the built-in log column options.
      ! it must not include the new column names you are adding here.
-  
+
      ! column 1
      names(1) = "m90"
      vals(1) = s% q(i) * s% star_mass  ! in solar masses
-  
+
      ! column 2
      names(2) = "log_R90"
-     vals(2) = safe_log10_cr(s% R(i) / rsol) ! in solar radii
-  
+     vals(2) = log10(s% R(i) / rsun) ! in solar radii
+
      ierr = 0
   end subroutine data_for_extra_history_columns
 
@@ -266,18 +266,18 @@ Here I've just uncommented the stock example.
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-  
+
      ! note: do NOT add the extra names to profile_columns.list
      ! the profile_columns.list is only for the built-in profile column options.
      ! it must not include the new column names you are adding here.
-  
+
      ! here is an example for adding a profile column
      if (n /= 1) stop 'data_for_extra_profile_columns'
      names(1) = 'beta'
      do k = 1, nz
-        vals(k,1) = s% Pgas(k)/s% P(k)
+        vals(k,1) = s% Pgas(k)/s% Peos(k)
      end do
-  
+
   end subroutine data_for_extra_profile_columns
 
 Choosing when to output history or profiles
@@ -376,7 +376,7 @@ condition can be expressed as "stop when quantity X rises above or falls
 below some limit", there's a good chance that you can choose to stop
 simply by setting a few existing flags. Take a look at the "when to
 stop" section of star/defaults/controls.defaults, which starts around
-line 230.
+line 940.
 
 If your condition isn't there or is a more complicated logical
 combination of conditions, then you will probably need to implement it
@@ -548,7 +548,7 @@ the other_neu at the routine you want to be executed.
      if (ierr /= 0) return
   
      ! this is the place to set any procedure pointers you want to change
-     ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
+     ! e.g., other_wind, other_mixing, other_energy  (see star_data_procedures.inc)
      s% other_neu => tutorial_other_neu
   
   end subroutine extras_controls
