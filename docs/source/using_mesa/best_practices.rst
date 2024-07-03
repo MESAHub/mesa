@@ -46,68 +46,17 @@ Begin in the directory where you do your MESA work.
 
   cp -r $MESA_DIR/star/test_suite/semiconvection .
 
-There are four files to edit. First, modify ``make/makefile``:
+In old MESA revisions, there were hard-coded references in the test_suite to set the variable ``MESA_DIR = ../../../..``  . 
+This practice has been removed in current revisions. If you are running this tutorial with an old revision of MESA, comment out or delete that line in the 
+makefile, the ``rn`` script, the ``ck`` script, and in ``inlist_semiconvection_header``. If you are running with any MESA revision after r23.05.1, ignore this comment and read on.
+
+Now clean the directory, 
 
 .. code-block:: console
 
-   cd semiconvection
-   cd make
+   ./clean
 
-   Edit makefile, changing
-
-       MESA_DIR = ../../../..
-
-   to 
-
-       # MESA_DIR = ../../../..
-  
-   Save the file change in your editor, and
-
-   cd ../
-
-Second, modify the ``rn`` script:
-
-.. code-block:: console
-
-   Edit rn, changing
-
-       MESA_DIR=../../.. 
-
-   to
-
-       # MESA_DIR=../../.. 
-
-   and save the file change.
-
-Third, modify the ``ck`` script:
-
-.. code-block:: console
-
-   Edit ck, changing
-
-       MESA_DIR=../../..
-
-   to
-
-       # MESA_DIR=../../..
-
-   and save the file change.
-
-Fourth, modify ``inlist_semiconvection_header``:
-
-.. code-block:: console
-
-   Edit inlist_semiconvection_header, changing
-
-       mesa_dir = '../../..'
-
-   to 
-
-      !mesa_dir = '../../..'
-
-   and save the file change.
-
-Now build the executable 
+build the executable, 
 
 .. code-block:: console
 

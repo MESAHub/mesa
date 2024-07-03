@@ -12,10 +12,34 @@
    ! Zbase
    ! ~~~~~
 
-   ! The base metallicity for the opacity tables.  This provides the
+   ! The base metallicity for the opacity tables. This provides the
    ! reference metallicity necessary to calculate element variations.
    ! Physically, this usually corresponds to the initial metallicity
-   ! of the star.
+   ! of the model and remains static during the entirety of a 
+   ! calculation. Variations in metallicity from nuclear burning and
+   ! mixing should not alter Zbase as its purpose is to serve as a
+   ! reference metallicity for C and O enhancement during Helium burning. 
+   ! ::
+
+   ! See ``use_Zbase_for_Type1``. By default, Zbase does not typically affect the
+   ! outer regions of a stellar model when the surface metallicity remains 
+   ! below the initial metallicity (Z < Zbase). Zbase is typically 
+   ! only used for Type2 opacities which operate deeper in the stellar interior. 
+   ! ::
+
+   ! Specific scenarios such as high Z accretion onto a metal poor model
+   ! can produce a situation where (Z > Zbase). During this scenario
+   ! the surface metallicity can be enhanced beyond the initial metallicity. 
+   ! Users can opt to exlusively adopt Type1 opacities in this scenario with
+   ! the ``use_Zbase_for_Type1`` flag.
+   ! ::
+
+   ! NOTE: For wind schemes that scale with metallicitity, we use Zbase rather than Z (as long as Zbase > 0).
+      ! This is because wind mass loss rate is primarily determined by iron opacity,
+      ! which is unlikely to change during the evolution. 
+
+   ! Zbase must be set if using kapCN, AESOPUS, or Type2
+   ! opacities or else MESA well draw an error. 
    ! ::
 
       Zbase = -1
@@ -45,7 +69,7 @@
    ! + 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 
    ! + 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
    ! + 0.98, 0.99, 1-Z
-   ! +
+
    ! + Z: 0.0, 0.000001, 0.00001, 0.00003, 0.00007, 0.0001,
    ! + 0.0003, 0.0007, 0.001, 0.002, 0.003, 0.004,0.006,
    ! + 0.008, 0.01, 0.012, 0.014, 0.015, 0.016, 0.017, 0.018,
