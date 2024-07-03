@@ -2,7 +2,6 @@ module chem_support
    use const_def
    use const_lib
    use math_lib
-   use math_lib
    use utils_lib, only: mesa_error
 
    real(dp), parameter :: no_mass_table_entry = -999.d0
