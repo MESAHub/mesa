@@ -118,6 +118,7 @@ module chem_support
       do i = 1, nlines
          read(mass_unit,'(A)',iostat = ios) buf
          call parse_line_mass_unit(buf, Z, A, eval, mass, error,ierr)
+         if (ierr /= 0) cycle
          N = A-Z
          ! store mass and convert from keV to MeV
          mass_table(Z,N) = mass*keV_to_MeV
