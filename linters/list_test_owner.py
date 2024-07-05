@@ -1,5 +1,3 @@
-import os
-import glob
 from collections import defaultdict
 
 import check_test_suite_owners as cc

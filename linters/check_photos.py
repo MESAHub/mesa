@@ -6,6 +6,7 @@ from collections.abc import MutableSet
 
 MESA_DIR = "../"
 
+
 class CaseInsensitiveSet(MutableSet):
     def __init__(self, iterable):
         self._values = {}
@@ -53,9 +54,9 @@ known_false_positives = {
     "net_iso",
     "model_profile_filename",
     "include_binary_history_in_log_file",
-    "i_dj_rot_dt", # Shadows s% i_j_rot
-    "i_equ_w_div_wc", # Shadows s% i_w_div_wc
-    "have_j_rot", # Set from s% rotation_flag
+    "i_dj_rot_dt",  # Shadows s% i_j_rot
+    "i_equ_w_div_wc",  # Shadows s% i_w_div_wc
+    "have_j_rot",  # Set from s% rotation_flag
     "nz_old",
 }
 
