@@ -183,9 +183,7 @@
          character (len=*), intent(in) :: mesa_dir_init
          integer, intent(out) :: ierr
 
-         integer :: i, iounit
-         character (len=40) :: version_number
-         character (len=strlen) :: filename, temp_caches_disable
+         character (len=strlen) :: temp_caches_disable
 
          ierr = 0
 
