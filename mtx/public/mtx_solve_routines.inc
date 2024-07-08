@@ -1,11 +1,13 @@
 
       
       subroutine my_getf2(m, a, lda, ipiv, info)
-         integer :: info, lda, m
-         integer :: ipiv(:)
-         real(dp) :: a(:,:),aj(m)
-         real(dp), parameter :: one=1, zero=0
-         integer :: i, j, jp, ii, jj, n
+         integer, intent(in) :: m, lda
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(:)
+         real(dp), intent(inout) :: a(:,:)
+         real(dp) :: aj(m)
+         real(dp), parameter :: one=1.0_dp, zero=0.0_dp
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da, ajjj
          do j = 1, m
             info = 0
@@ -36,8 +38,8 @@
                do jj = j+1, m
                   ajjj = a(j,jj)
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - aj(ii)*ajjj
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - aj(i)*ajjj
                   end do
                end do
             end if
@@ -51,7 +53,7 @@
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=4, lda=4
-         integer :: i, j, jp, ii, jj, n
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -80,8 +82,8 @@
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
@@ -95,7 +97,7 @@
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=5, lda=5
-         integer :: i, j, jp, ii, jj, n
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -124,8 +126,8 @@
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
@@ -169,8 +171,8 @@
       end subroutine my_getrs
       
       
-      subroutine my_laswp( n,   a, lda,  k1, k2, ipiv,  incx )
-         integer :: incx, k1, k2, lda, n
+      subroutine my_laswp( n, a, lda,  k1, k2, ipiv, incx )
+         integer :: incx, k1, k2, lda
          integer :: ipiv(:)
          real(dp) :: a(:,:) ! a( lda, * )
          integer :: i, i1, i2, inc, ip, ix, ix0, j, k, n32
@@ -524,8 +526,8 @@
          integer :: info, lda, m
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
-         integer :: i, j, ii, jj, n
-         real(dp) :: tmp, da
+         integer :: i, j, jj
+         real(dp) :: da
          do j = 1, m
             info = 0
             if( a( j, j ).ne.zero ) then
@@ -542,8 +544,8 @@
             if( j.lt.m ) then
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
