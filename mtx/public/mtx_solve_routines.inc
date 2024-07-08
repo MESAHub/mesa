@@ -172,7 +172,7 @@
       
       
       subroutine my_laswp( n, a, lda,  k1, k2, ipiv, incx )
-         integer :: incx, k1, k2, lda
+         integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
          real(dp) :: a(:,:) ! a( lda, * )
          integer :: i, i1, i2, inc, ip, ix, ix0, j, k, n32
