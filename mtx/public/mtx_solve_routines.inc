@@ -5,7 +5,7 @@
          integer :: ipiv(:)
          real(dp) :: a(:,:),aj(m)
          real(dp), parameter :: one=1, zero=0
-         integer :: i, j, jp, ii, jj, n, mm
+         integer :: i, j, jp, ii, jj, n
          real(dp) :: tmp, da, ajjj
          do j = 1, m
             info = 0
@@ -51,7 +51,7 @@
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=4, lda=4
-         integer :: i, j, jp, ii, jj, n, mm
+         integer :: i, j, jp, ii, jj, n
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -95,7 +95,7 @@
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=5, lda=5
-         integer :: i, j, jp, ii, jj, n, mm
+         integer :: i, j, jp, ii, jj, n
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -524,7 +524,7 @@
          integer :: info, lda, m
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
-         integer :: i, j, ii, jj, n, mm
+         integer :: i, j, ii, jj, n
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
