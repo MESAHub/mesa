@@ -248,18 +248,18 @@
          end if
 
 !call cali_begin_phase('co.loop1')
-!$OMP PARALLEL DO SIMD PRIVATE(ns, i) COLLAPSE(2)
+!$OMP PARALLEL DO PRIVATE(ns, shift, shift2, i) COLLAPSE(2)
          do ns = nmin, nblk, 2  ! copy umat and lmat
             do i = 1, nvar2
                ! kcount = (ns-nmin)/2 + 1
                ! shift = nvar2*(kcount-1)
-               !shift = nvar2*(ns-nmin)/2
-               !shift2 = nvar2*ncycle*(ns-1)
-               s% bcyclic_odd_storage(nlevel)% umat1(nvar2*(ns-nmin)/2+i) = ublkF1(nvar2*ncycle*(ns-1)+i)
-               s% bcyclic_odd_storage(nlevel)% lmat1(nvar2*(ns-nmin)/2+i) = lblkF1(nvar2*ncycle*(ns-1)+i)
+               shift = nvar2*(ns-nmin)/2
+               shift2 = nvar2*ncycle*(ns-1)
+               s% bcyclic_odd_storage(nlevel)% umat1(shift+i) = ublkF1(shift2+i)
+               s% bcyclic_odd_storage(nlevel)% lmat1(shift+i) = lblkF1(shift2+i)
             end do
          end do
-!$OMP END PARALLEL DO SIMD
+!$OMP END PARALLEL DO
 !call cali_end_phase('co.loop1')
 
          if (nvar2*kcount > s% bcyclic_odd_storage(nlevel)% ul_size) then
