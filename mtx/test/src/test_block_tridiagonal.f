@@ -280,7 +280,7 @@
          
          subroutine read_testfile(fname)
             character (len=*), intent(in) :: fname
-            integer :: iounit, ierr, i, j, k, line
+            integer :: iounit, ierr, j, k, line
             !write(*,*) 'reading ' // trim(fname)
             iounit = 33; ierr = 0
             open(unit=iounit, file=trim(fname), status='old', action='read', iostat=ierr)
@@ -333,8 +333,8 @@
          
          
          subroutine check_x
-            real(fltp) :: max_err, err, atol, rtol, avg_err
-            integer :: i_max, j_max,i, j, rep        
+            real(fltp) :: max_err, atol, rtol, avg_err
+            integer :: i_max, j_max,i, j        
             include 'formats'
             atol = 1d-4
             rtol = 1d-4   

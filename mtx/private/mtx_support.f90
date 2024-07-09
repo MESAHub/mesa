@@ -827,7 +827,7 @@
          real(dp), pointer, intent(in) :: A1(:) ! =(n, n)
          real(dp), pointer, intent(in) :: x(:) ! (n)
          real(dp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(dp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -842,7 +842,7 @@
          real(qp), pointer, intent(in) :: A1(:) ! =(n, n)
          real(qp), pointer, intent(in) :: x(:) ! (n)
          real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(qp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -858,7 +858,7 @@
          real(dp), pointer, intent(in) :: x(:) ! (n)
          real(dp), pointer, intent(in) :: c(:) ! (n)
          real(dp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(dp), pointer :: A(:,:) ! (n,n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -874,7 +874,7 @@
          real(qp), pointer, intent(in) :: x(:) ! (n)
          real(qp), pointer, intent(in) :: c(:) ! (n)
          real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(qp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n

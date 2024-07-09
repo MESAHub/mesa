@@ -28,7 +28,7 @@
          integer, intent(in) :: matrix_size, n_upper_bands, n_lower_bands
 
          ! Intermediates
-         integer counter, i, j, k, k1, k2
+         integer i, j
          character(len=1) :: FACT, TRANS, EQUED
          integer :: NRHS, LDAB, LDAFB, LDB, LDX
          integer :: IWORK(matrix_size),  IPIV(matrix_size)

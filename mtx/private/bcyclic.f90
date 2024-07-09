@@ -59,8 +59,8 @@
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
       
-         integer, pointer :: iptr(:,:), nslevel(:), ipivot(:)
-         integer :: ncycle, nstemp, maxlevels, nlevel, i, j, k
+         integer, pointer :: nslevel(:), ipivot(:)
+         integer :: ncycle, nstemp, maxlevels, nlevel
          logical :: have_odd_storage
          real(dp), pointer, dimension(:,:) :: dmat
          real(dp) :: dlamch, sfmin
@@ -183,7 +183,7 @@
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
       
-         integer, pointer :: iptr(:,:), nslevel(:), ipivot(:)
+         integer, pointer :: nslevel(:), ipivot(:)
          integer :: ncycle, nstemp, maxlevels, nlevel, nvar2
          real(dp), pointer, dimension(:,:) :: dmat, bptr2
 
@@ -300,8 +300,8 @@
          real(dp), pointer, dimension(:,:) :: dmat, umat, lmat, umat0, lmat0
          real(dp), pointer, dimension(:,:) :: lnext, unext, lprev, uprev
          real(dp), pointer :: mat1(:)
-         integer :: i, j, shift, min_sz, new_sz, shift1, shift2, nvar2, &
-            ns, ierr_loc, nmin, kcount, k, ii, jj, kk
+         integer :: i, shift, min_sz, new_sz, shift1, shift2, nvar2, &
+            ns, ierr_loc, nmin, kcount, k
          real(dp) :: dlamch, sfmin
       
          include 'formats'
@@ -464,7 +464,7 @@
          integer, pointer, intent(in) :: ipivot1(:)
          integer, intent(out) :: ierr
       
-         integer :: k, ns, ierr_loc, nmin, kcount, shift, i, shift1, shift2, nvar2
+         integer :: k, ns, ierr_loc, nmin, kcount, shift, shift1, shift2, nvar2
          integer, pointer :: ipivot(:)
          real(dp), pointer, dimension(:,:) :: dmat, umat, lmat, bptr2
          real(dp), pointer, dimension(:) :: bprev, bnext, bptr
@@ -548,8 +548,7 @@
          real(dp), pointer, intent(inout) :: brhs1(:)
 
          real(dp), pointer :: umat(:,:), lmat(:,:), bprev(:), bnext(:), bptr(:)
-         real(dp), pointer, dimension(:) :: bprevr, bnextr
-         integer :: shift1, shift2, nvar2, ns, ierr, nmin
+         integer :: shift1, shift2, nvar2, ns, nmin
 
          nvar2 = nvar*nvar
          nmin = 2
