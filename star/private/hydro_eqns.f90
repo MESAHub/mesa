@@ -828,8 +828,7 @@
                P_surf, T_surf, dlnP_bc_dlnPsurf, P_rad, &
                dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
                dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-               dlnT_bc_dlnE_const_Rho, dlnT_dlnE_const_Rho, dlnP_dlnE_c_Rho, &
-               dlnP_bc_dlnE_c_Rho, dlnT_bc_dlnd_c_E, dlnP_bc_dlnd_c_E, &
+               dlnP_dlnE_c_Rho, &
                d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
                dlnR00, dlnT00, dlnd00
             logical, parameter :: skip_partials = .false.
@@ -1083,7 +1082,7 @@
          subroutine set_compression_BC(ierr)
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               rho1, rho2, lnd1, lnd2, dlnd1, dlnd2, drho1, drho2
+               rho1, rho2, dlnd1, dlnd2
             include 'formats'
             ! gradient of compression vanishes fixes density for cell 1
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
@@ -1144,7 +1143,6 @@
          integer, intent(out) :: ierr
          integer :: i, k
          type (star_info), pointer :: s
-         real(dp), dimension(:, :), pointer :: equ
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)

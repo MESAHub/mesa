@@ -16,7 +16,6 @@
          real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ier
-         integer :: j
          include 'formats'
          ier = 0
          if (iop == 0) then ! factor
