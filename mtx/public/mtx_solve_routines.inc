@@ -48,9 +48,9 @@
 
       
       subroutine my_getf2_n4(a, ipiv, info)
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:)
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(4)
+         real(dp), intent(inout) :: a(4,4)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=4, lda=4
          integer :: i, j, jp, jj
@@ -92,9 +92,9 @@
 
       
       subroutine my_getf2_n5(a, ipiv, info)
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:)
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(5)
+         real(dp), intent(inout) :: a(5,5)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=5, lda=5
          integer :: i, j, jp, jj
@@ -208,12 +208,13 @@
             
       
       subroutine my_getrs1( n, a, lda, ipiv, b, ldb, info )
-         integer :: info, lda, ldb, n
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(:), lda, ldb, n
+         real(dp), intent(in) :: a(:,:)
+         real(dp), intent(inout) :: b(:)
          real(dp), parameter :: one=1, zero=0
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
          !$omp simd private(temp)
          do i = 1,n
@@ -242,13 +243,14 @@
             
       
       subroutine my_getrs1_n4( a, ipiv, b, info )
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(4)
+         real(dp), intent(in) :: a(4,4)
+         real(dp), intent(inout) :: b(4)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: n = 4
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
          !$omp simd private(temp)
          do i = 1,n
@@ -277,13 +279,14 @@
             
       
       subroutine my_getrs1_n5( a, ipiv, b, info )
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(5)
+         real(dp), intent(in) :: a(5,5)
+         real(dp), intent(inout) :: b(5)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: n = 5
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
          !$omp simd private(temp)
          do i = 1,n
