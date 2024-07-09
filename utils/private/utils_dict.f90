@@ -458,7 +458,7 @@
          integer, intent(in) :: hash_size
          integer, intent(inout) :: collisions
          type (integer_dict), pointer :: node, next
-         integer :: hashkey, size, i
+         integer :: hashkey, i
          logical :: okay
          if (.not. associated(dict)) return
          node => dict

@@ -42,7 +42,7 @@
          
          real(dp) :: a(ndim,n),a2(ndim,n),values(nzmax)
          integer,parameter :: ml = 1,mu = 2, ldbb = 2*ml+mu+1
-         real(dp) :: b(ndim,n),b2(ndim,n),bb(ldbb,n),bb2(ldbb,n)
+         real(dp) :: b(ndim,n),bb(ldbb,n),bb2(ldbb,n)
          integer :: ierr,nz,iptr(n+1),jind(nzmax),i,j,k,kk,hint
          
          write(*,*) 'test_format_conversion'

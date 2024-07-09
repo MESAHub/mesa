@@ -74,7 +74,7 @@ contains
     integer, intent(out) :: ierr
 
     character(len=256) :: filename
-    integer :: n, io
+    integer :: n
     integer :: iX, iCO, iC, iN
 
     type(hdf5io_t) :: hi, hi_ts
@@ -336,7 +336,7 @@ contains
     real(dp), intent(in) :: Zref, X, XC, XN, XO, logR, logT
     real(dp), intent(out) :: res(3)
     integer, intent(out) :: ierr
-    real(dp), pointer :: Z_ary(:), work1(:)
+    real(dp), pointer :: work1(:)
     integer, parameter :: nZ = 3
     integer :: i,iZ
     real(dp) :: my_Z, raw_res(3, nZ), x_new(1), v_new(1)
@@ -524,8 +524,6 @@ contains
       integer,  intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
       real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
       logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
-
-      integer :: i
 
       weights = 0
 

@@ -620,7 +620,6 @@ contains
     integer, intent(inout) :: i ! number of characters already read from buffer
     character (len=*), intent(inout) :: buffer ! line of text from input file
     character (len=*), intent(inout) :: string ! holds string or name for string or name token
-    character (len=1) :: tab_str
 
     integer :: info, j, j1, j2, l, str_len
 
