@@ -37,7 +37,7 @@
       implicit none
       
       character (len=32) :: my_mesa_dir
-      integer :: ierr, i
+      integer :: ierr
 
       my_mesa_dir = '../..'         
       call const_init(my_mesa_dir,ierr)     

@@ -52,8 +52,6 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_star_order1()
       type(auto_diff_real_star_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
 
       call header('Testing assignment')
       x = 3d0
@@ -123,9 +121,6 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_1var_order1()
       type(auto_diff_real_1var_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
-
 
       call header('Testing assignment and comparison')
 
@@ -543,9 +538,6 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_2var_order1()
       type(auto_diff_real_2var_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
-
 
       call header('Testing assignment and comparison')
 
