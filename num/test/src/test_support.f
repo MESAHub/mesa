@@ -96,7 +96,7 @@
       
       subroutine test_root_with_brackets
          integer, parameter :: lrpar=0, lipar=0
-         real(dp) :: x, dfdx, y
+         real(dp) :: x, dfdx
          real(dp) :: x1, x3 ! bounds for x
             ! values of f at x1 and x3 must have opposite sign
             ! return value for safe_root will be bracketed by x1 and x3
@@ -105,7 +105,7 @@
          real(dp) :: epsx, epsy 
          ! stop seaching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
-         integer :: i, ierr
+         integer :: ierr
          real(dp) :: expected_root = 0.74800611d0
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
@@ -296,13 +296,11 @@
          real(dp) :: atol(1) ! absolute error tolerance(s)
          real(dp) :: x ! starting value for the interval of integration
          real(dp) :: xend ! ending value for the interval of integration
-         real(dp) :: expect(nv), yprime(nv)
-         character (len=64) :: str
-         character (len=256) :: dir, fname
+         real(dp) :: expect(nv)
          integer, parameter :: lrpar = 2, lipar = 1, nrdens = nv
          integer, parameter :: liwork = nrdens+100, lwork = 11*nv+8*nrdens+100
-         real(dp) :: max_abs_yp2, h, max_step_size
-         integer :: io_unit, i, lout, iout, idid, itol, j
+         real(dp) :: h, max_step_size
+         integer :: lout, iout, idid, itol, j
          integer :: check_liwork, check_lwork, max_steps, ierr
          real(dp), target :: y_ary(nv)
          real(dp), pointer :: y(:)

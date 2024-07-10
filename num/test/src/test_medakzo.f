@@ -228,7 +228,6 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          real(dp) :: yprime(n)
          integer, intent(out) :: ierr
-         integer :: nz, i, j
          include 'formats'
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
@@ -282,7 +281,7 @@
          logical :: consis
          integer, parameter :: ndisc = 1, n_soln=11
          real(dp) :: result(n_soln), soln(n_soln), h0, t(0:ndisc+1), atol(1), rtol(1)
-         integer :: i, j, k, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
+         integer :: j, k, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
          real(dp), target :: rpar_ary(lrpar) 
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
@@ -404,7 +403,6 @@
             end function interp_y
          end interface
          integer, intent(out) :: irtrn
-         real(dp) :: xout, y1, y2
          integer :: ierr
          include 'formats'
          !if (mod(nr,10) == 0) write(*,2) 'step', nr, x, y(1:2)

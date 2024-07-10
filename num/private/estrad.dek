@@ -34,7 +34,7 @@
       double precision :: hee1, hee2, hee3, sum, sum1
       integer :: i, mm, j, k, im1
       real(dp), pointer :: e1(:,:)
-      real(dp), pointer, dimension(:) :: p1, p2, p3
+      real(dp), pointer, dimension(:) :: p1
       
       e1(1:lde1,1:nm1) => e1_1D(1:lde1*nm1)
       p1(1:n) => cont(m1+1:m1+n)

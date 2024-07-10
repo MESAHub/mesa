@@ -33,7 +33,6 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          real(dp) :: yprime(n)
          integer, intent(out) :: ierr
-         integer :: nz, i, j
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
          call beam_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar)

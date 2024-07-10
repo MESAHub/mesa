@@ -33,7 +33,7 @@
       logical, parameter :: show_all = .false.  ! false for releases
 
 
-      integer :: i, j, k, solver, decsol, omp_get_thread_num, ierr
+      integer :: i, decsol, ierr
       logical :: do_numerical_jacobian, m_band, j_band, quiet
       character (len=32) :: my_mesa_dir
 
