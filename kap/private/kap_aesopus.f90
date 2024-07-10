@@ -41,7 +41,6 @@ module kap_aesopus
 contains
 
   subroutine kap_aesopus_init(rq, ierr)
-    use const_def, only: mesa_data_dir
     use kap_def, only: kap_aesopus_is_initialized
     type (Kap_General_Info), pointer :: rq
     integer, intent(out) :: ierr

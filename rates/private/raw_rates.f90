@@ -815,7 +815,6 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
          integer, intent(out) :: ierr
-         real(dp) :: fr1, rr1, alfa, beta
          include 'formats'
          ierr = 0
 
@@ -897,7 +896,7 @@
          integer, intent(out) :: ierr
          real(dp), dimension(1):: ln_lambda, lambda, dlambda_dlnT, &
                                     inv_lambda, dinv_lambda_dlnT
-         integer :: lo, hi, num_lambdas
+         integer :: lo, hi
          real(dp) :: fr_table
          include 'formats'
          ierr = 0
@@ -940,7 +939,6 @@
          integer, intent(out) :: ierr
          
          integer :: iounit, j, nvec
-         real(dp) :: tmp
          real(dp), pointer :: work(:)=> null()
          real(dp), pointer :: T8s(:)=> null()
          real(dp), pointer :: f1(:)=> null(), f(:,:)=> null()
