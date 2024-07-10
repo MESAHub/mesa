@@ -68,9 +68,9 @@
          integer, intent(out) :: ierr                      ! error code =0 ==> no error
 
          integer, parameter :: nwork = pm_work_size
-         real(dp) :: x0,x1,dx,y0,y1,dy,alfa,beta,ddx,f1,f2
+         real(dp) :: x0,x1,dx,y0,y1,dy,alfa,beta
          real(dp) :: ys(4), ynew(1), val(1)
-         integer :: j, jlo, jhi, i, ix, jy, ii
+         integer :: j, jlo, i, ix, jy, ii
          real(dp), target :: work_ary(4*nwork), ff_ary(4*4)
          real(dp), pointer :: work(:), fin(:,:,:), ff(:,:), ff1(:)
          work => work_ary
