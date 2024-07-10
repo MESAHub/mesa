@@ -7,6 +7,7 @@
       SUBROUTINE do_BOBYQA (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,
      1  MAXFUN,W,CALFUN,max_valid_value)
       IMPLICIT REAL(dp) (A-H,O-Z)
+      integer :: N, NPT, IPRINT, MAXFUN
       DIMENSION X(:),XL(:),XU(:),W(*)
       interface
 #include "num_bobyqa_proc.dek"
@@ -144,6 +145,7 @@
      1  MAXFUN,XBASE,XPT,FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,
      2  SL,SU,XNEW,XALT,D,VLAG,W,CALFUN,max_valid_value)
       IMPLICIT REAL*8 (A-H,O-Z)
+      integer :: N, NPT, IPRINT, MAXFUN, NDIM
       DIMENSION X(:),XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),
      1  XOPT(*),GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),
      2  SL(*),SU(*),XNEW(*),XALT(*),D(*),VLAG(*),W(*)
@@ -832,6 +834,7 @@
       SUBROUTINE ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
      1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,GLAG,HCOL,W)
       IMPLICIT REAL*8 (A-H,O-Z)
+      integer :: N, NPT, NDIM, KOPT, KNEW
       DIMENSION XPT(NPT,*),XOPT(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),
      1  SU(*),XNEW(*),XALT(*),GLAG(*),HCOL(*),W(*)
 !

@@ -52,6 +52,7 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_star_order1()
       type(auto_diff_real_star_order1) :: x, y, z
+      integer :: i
 
       call header('Testing assignment')
       x = 3d0
