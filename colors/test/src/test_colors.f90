@@ -16,7 +16,7 @@
          use const_lib
 
          character (len=256) :: my_mesa_dir
-         integer :: info,ierr
+         integer :: info
          
          logical, parameter :: do_one = .true.
          integer, parameter :: n_colors=11
@@ -57,14 +57,13 @@
          real(dp) :: boloMag
          real(dp), dimension(num_results) :: results
          real(dp) ::log_g, x
-         integer :: info, i,total_num_colors
+         integer :: info, i
          character (len=8) :: vname
          character(len=strlen),dimension(num_results):: colors_name
          logical, parameter :: doing_solar = .true.
          real(dp), dimension(num_results) :: solar_expected_results = (/ &
          4.75d0, -0.11510d0, -0.14211d0, -0.61768d0, -0.36199d0, -0.68894d0, -1.46926d0, -0.32695d0, -0.78032d0, -0.39024d0, &
          0.05223d0, -0.10512d0,  -0.33801d0, -0.44312d0, -0.44123d0, -0.43080d0 /) 
-         character(len=256),dimension(20) :: names
 
          
          ! solar values

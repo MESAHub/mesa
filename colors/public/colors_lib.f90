@@ -193,7 +193,7 @@
          ! input
          character(len=*), intent(in) :: name
          integer, intent(inout) :: ierr
-         integer :: i,j,k,n_colors
+         integer :: i,j,k
          
          get_bc_id_by_name=-1
          ierr=0
@@ -222,7 +222,7 @@
          ! input
          integer, intent(in) :: id
          integer, intent(inout) :: ierr
-         integer :: i,j,k,n_colors
+         integer :: i,j,k
          
          get_bc_name_by_id=''
          ierr=0
