@@ -536,7 +536,6 @@
          use math_lib
          integer, intent(in) :: handle
          type (EoS_General_Info), pointer :: rq
-         integer :: iz
          rq => eos_handles(handle)
          rq% in_use = .true.
          rq% handle = handle
@@ -574,7 +573,7 @@
       subroutine eos_def_shutdown
          type (eosPC_Support_Info), pointer :: fq
          type (FITION_Info), pointer :: fi
-         integer :: ix, iz
+         integer :: iz
 
          ! DT tables
          call free_EosDT_XZ_Info( &

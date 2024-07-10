@@ -110,8 +110,7 @@
       
 !..for the interpolations
       integer          iat, jat
-      real(dp) dth, dt2, dti, dt2i, dt3i, dd, dd2, ddi, dd2i, dd3i, &
-                       xt, xd, mxt, mxd, fi(36), &
+      real(dp) xt, xd, mxt, mxd, fi(36), &
                        din, dindd, dinda, dindz, dindda, dinddz, dindaa, &
                        dindaz, dindzz, dinddaa, dinddaz, &
                        w0t, w1t, w2t, w0mt, w1mt, w2mt, &
