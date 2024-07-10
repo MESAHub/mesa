@@ -233,7 +233,6 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
-         integer :: nz, i, j
          ierr = 0
          dfdy(1, 1) = 0d0
          dfdy(1, 2) = 1d0

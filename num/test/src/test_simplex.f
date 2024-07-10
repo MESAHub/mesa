@@ -47,7 +47,7 @@
          real(dp), pointer :: rpar(:) ! (lrpar)
          integer :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr
-         integer :: seed, i, j, k
+         integer :: seed
          real(dp) :: alpha, beta, gamma, delta
          
          include 'formats'

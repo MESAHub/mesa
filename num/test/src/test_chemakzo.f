@@ -33,7 +33,6 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          real(dp) :: yprime(n)
          integer, intent(out) :: ierr
-         integer :: nz, i, j
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
          call chemakzo_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar)
@@ -160,7 +159,7 @@
          logical :: consis
          integer, parameter :: ndisc = 0
          real(dp) :: h0, t(0:ndisc+1), atol(1), rtol(1)
-         integer :: i, mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
+         integer :: mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
          real(dp), target :: rpar_ary(lrpar) 
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)

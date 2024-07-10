@@ -107,7 +107,6 @@
       subroutine do_1step_diffuse( &
             do_numerical_jacobian, which_decsol, &
             dt, kappa, nz, nvar, concentration, fluxes, delx, ierr)
-         integer i
          logical, intent(in) :: do_numerical_jacobian
          integer, intent(in) :: which_decsol
          integer, intent(in) :: nz, nvar
@@ -455,7 +454,6 @@
          real(dp), intent(inout) :: rpar(:) ! (lrpar)
          integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
-         integer :: i, j
          if (dbg) write(*, '(a, /)') 'exit_setmatrix'
          ierr = 0
       end subroutine exit_setmatrix

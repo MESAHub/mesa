@@ -75,7 +75,6 @@
          integer, parameter :: ld_dfdy = 2 ! for vdpol
          real(dp), target :: dfdy1(ld_dfdy*n)
          real(dp), pointer :: dfdy(:,:)
-         integer :: i, k 
          include 'formats'
          ierr = 0
          dfdy(1:ld_dfdy,1:n) => dfdy1(1:ld_dfdy*n)
@@ -101,7 +100,6 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          real(dp) :: yprime(n)
          integer, intent(out) :: ierr
-         integer :: nz, i, j
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
          call vdpol_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar)
@@ -224,7 +222,7 @@
          logical :: consis
          integer, parameter :: ndisc = 0
          real(dp) :: h0, t(0:ndisc+1), atol(1), rtol(1)
-         integer :: i, mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, iout, nstep
+         integer :: mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, iout, nstep
          real(dp), target :: rpar_ary(lrpar) 
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)

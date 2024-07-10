@@ -535,7 +535,7 @@ c
       integer, intent(inout), target :: iwork(*)
       integer, intent(out) :: ierr
       
-      real(dp) :: xold, h, s, s1
+      real(dp) :: xold, h
       integer :: nd, i, j
       real(dp), pointer :: con(:)
       integer, pointer :: icomp(:)
