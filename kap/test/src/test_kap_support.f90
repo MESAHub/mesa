@@ -72,10 +72,10 @@
          logical, intent(in) :: quietly
          character (len=*), intent(in) :: test_str
          real(dp) :: &
-            zbar, Z, xh, XC, XN, XO, XNe, frac, abar, kap1, &
-            fC, fN, fO, fNe, dXC, dXO, xmass(ionmax), &
+            zbar, Z, xh, XC, XN, XO, XNe, kap1, &
+            xmass(ionmax), &
             frac_Type2, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            logT, logRho, logR, kap, log10kap, dlnkap_dlnRho, dlnkap_dlnT
+            logT, logRho, kap, log10kap, dlnkap_dlnRho, dlnkap_dlnT
             
          logical :: CO_enhanced
          logical, parameter :: dbg = .false.
@@ -182,8 +182,8 @@
          
             real, pointer :: &
                umesh(:), semesh(:), ff(:,:,:,:), ta(:,:,:,:), rs(:,:,:)
-            integer :: kk, nel, nptot, ipe, nrad, i, iz(ionmax), iZ_rad(ionmax)
-            real(dp), dimension(ionmax) :: fap, fac, gp1, &
+            integer :: kk, nel, nptot, ipe, nrad, iz(ionmax), iZ_rad(ionmax)
+            real(dp), dimension(ionmax) :: fap, fac, &
                lgrad
             real(dp) :: flux, L, r
             logical, parameter :: screening = .true.
@@ -308,7 +308,7 @@
             fC, fN, fO, fNe, dXC, dXO, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
-            logT, logRho, logR, kap, log10kap, dlnkap_dlnRho, dlnkap_dlnT
+            logT, logRho, kap, log10kap, dlnkap_dlnRho, dlnkap_dlnT
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(species)
 
          ! eos results
@@ -486,7 +486,6 @@
          use const_lib
          logical, intent(in) :: quietly
          
-         character (len=256) :: kap_dir, opal_dir, cbeg_ferg
          integer :: ierr
          logical, parameter :: use_cache = .true.
          
