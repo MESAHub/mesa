@@ -186,7 +186,7 @@
          integer side
          real(qp), dimension(:), allocatable :: remainders1, remainders2
          type(accurate_real) diff, dBottom, dTop, dBottomTop, dTopBottom
-         integer i, j, k, counter
+         integer :: i, j, k, counter
 
          allocate(remainders1(nz), remainders2(nz))
 
@@ -340,7 +340,7 @@
          integer, dimension(0:nz) :: i_min, i_max
 
          ! Intermediates
-         integer i, j, counter
+         integer :: i, j, counter
 
          ! Ensures that anything is less than initial i_min
          ! and anything is morre than initial i_max.
@@ -379,7 +379,7 @@
          type(non_rect_array), dimension(0:nz) :: pf
 
          ! Intermediates
-         integer i, j, l, counter, start, end, direction
+         integer :: i, j, l, counter, start, end, direction
          logical work_backwards
          real(qp), dimension(:), allocatable :: test
 
@@ -432,7 +432,7 @@
       ! inside cell i.
       real(qp) function compute_pass_fraction(i, j, i_min, i_max, pf)
          ! Inputs
-         integer i, j
+         integer :: i, j
          integer, dimension(0:) :: i_min, i_max
          type(non_rect_array), dimension(0:) :: pf
 
@@ -457,7 +457,7 @@
          real(qp), dimension(:) :: mass_flux
 
          ! Intermediates
-         integer i, j, counter
+         integer :: i, j, counter
 
          ! Ensures that anything is less than initial i_min
          ! and anything is morre than initial i_max.
@@ -538,7 +538,7 @@
          real(qp), intent(in), dimension(:) :: dm_new, dm_old
 
          ! Intermediates
-         integer i, j, k, l
+         integer :: i, j, k, l
          real(qp) :: mesh_intersects(2*nz)
          integer :: ranges(2*nz,2)
 

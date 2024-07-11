@@ -725,8 +725,8 @@
 !  ier -- completion code:  0 means OK
 !-------------------
 
-      integer i,j
-      integer ii(1), jj(1) 
+      integer :: i,j
+      integer :: ii(1), jj(1) 
       real xparam(1),yparam(1),hx(1),hxi(1),hy(1),hyi(1)
       call herm2xy(xget,yget,x,nx,y,ny,ilinx,iliny,i,j,
      >         xparam(1),yparam(1),hx(1),hxi(1),hy(1),hyi(1),ier)
