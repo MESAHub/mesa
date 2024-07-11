@@ -144,7 +144,7 @@ FCstandard = -std=f2008 -Wno-error=tabs
 
 FCimpno = -fimplicit-none  
 FCchecks = -fbounds-check -Wuninitialized -Warray-bounds
-FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination
+FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination -Waliasing
 #FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
 FCtrapNANs = -ffpe-trap=invalid,overflow,zero 
 # -Wno-unused-parameter
