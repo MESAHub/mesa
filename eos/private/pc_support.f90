@@ -58,7 +58,7 @@
       integer, parameter :: iPDTii = 5
       integer, parameter :: iPDRii = 6 
       real(dp) :: lnGAMI_min, lnGAMI_max, dlnGAMI, lnGAMI
-      integer :: nlnGAMI, i, j, k_old
+      integer :: nlnGAMI, k_old
       real(dp) :: xk_old, xkp1_old, xk_new, delta
       real(dp), pointer, dimension(:,:) :: f_1, f_2, f_3, f_4, f_5, f_6
       
@@ -226,7 +226,7 @@
       logical, intent(out) :: skip
       integer, intent(out) :: ierr
       
-      integer :: iRS, jGAME, i
+      integer :: iRS, jGAME
       real(dp) :: lnRS, lnRS0, lnRS1, lnGAME, lnGAME0, lnGAME1
       real(dp), dimension(nvals_FSCRliq8) :: fval, df_dlnRS, df_dlnGAME
       type (eosPC_Support_Info), pointer :: fq
@@ -309,7 +309,7 @@
       logical, intent(out) :: skip
       integer, intent(out) :: ierr
       
-      integer :: iRS, jGAME, i
+      integer :: iRS, jGAME
       real(dp) :: lnRS, lnRS0, lnRS1, lnGAME, lnGAME0, lnGAME1
       real(dp), dimension(nvals_EXCOR7) :: fval, df_dlnRS, df_dlnGAME
       type (eosPC_Support_Info), pointer :: fq
@@ -570,7 +570,7 @@
       integer, intent(in) :: iZion ! 0 means EXCOR7
       integer, intent(out) :: ierr
       
-      integer :: io_unit, n, j, i, k, iQ, nparams, nvals
+      integer :: io_unit, n, j, i, iQ, nparams, nvals
       character (len=256) :: filename, fname, cache_fname, temp_cache_fname
       character (len=1000) :: message
       real(dp), pointer :: tbl2_1(:), tbl2(:,:,:)
@@ -812,22 +812,19 @@
 
       real(dp), allocatable, target :: f1_ary(:) ! data & spline coefficients
       real(dp), pointer :: f1(:), f(:,:,:), tbl2(:,:,:)
-      integer :: ibcxmin                   ! bc flag for x=xmin
+      integer :: ibcxmin                 ! bc flag for x=xmin
       real(dp) :: bcxmin(fq% nlnGAME)    ! bc data vs. y at x=xmin
-      integer :: ibcxmax                   ! bc flag for x=xmax
-      real(dp) :: bcxmax(fq% nlnGAME)     ! bc data vs. y at x=xmax
-      integer :: ibcymin                   ! bc flag for y=ymin
-      real(dp) :: bcymin(fq% nlnRS)   ! bc data vs. x at y=ymin
-      integer :: ibcymax                   ! bc flag for y=ymax
-      real(dp) :: bcymax(fq% nlnRS)   ! bc data vs. x at y=ymax
-      integer :: ili_lnRSs    ! =1: logRho grid is "nearly" equally spaced
+      integer :: ibcxmax                 ! bc flag for x=xmax
+      real(dp) :: bcxmax(fq% nlnGAME)    ! bc data vs. y at x=xmax
+      integer :: ibcymin                 ! bc flag for y=ymin
+      real(dp) :: bcymin(fq% nlnRS)      ! bc data vs. x at y=ymin
+      integer :: ibcymax                 ! bc flag for y=ymax
+      real(dp) :: bcymax(fq% nlnRS)      ! bc data vs. x at y=ymax
+      integer :: ili_lnRSs        ! =1: logRho grid is "nearly" equally spaced
       integer :: ili_lnGAMEs      ! =1: lnGAME grid is "nearly" equally spaced
-      integer :: ier            ! =0 on exit if there is no error.
-      integer :: iQ, jtemp, ilnGAME, ilnRS
-      real(dp) :: fval(nvals), df_dx(nvals), df_dy(nvals)
+      integer :: ier              ! =0 on exit if there is no error.
             
-      integer :: v, vlist(3), var, i, j, ii, jj
-      character (len=256) :: message
+      integer :: v, i, j
       
       include 'formats'
 
@@ -893,7 +890,7 @@
 
       real(dp) :: lnGAME_min_in, lnGAME_max_in, dlnGAME_in,  &
             lnRS_min_in, lnRS_max_in, dlnRS_in
-      integer :: Zion_in, nlnRS_in, nlnGAME_in, io_unit, i, j
+      integer :: Zion_in, nlnRS_in, nlnGAME_in, io_unit
       real(dp), parameter :: tiny = 1d-10
       
       include 'formats'

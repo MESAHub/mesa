@@ -418,7 +418,7 @@
             integer, intent(out) :: ierr
 
             real(qp) :: m
-            integer i
+            integer :: i
 
             ierr = 0
 

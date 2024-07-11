@@ -851,7 +851,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,c00,c01,c02,c03,c04, &
+         real(dp) :: a0,c00,c01,c02,c03,c04, &
          dd00,dd01,dd02,&
          f0,z, &
          dum,dumdt,dumdd,dumda,dumdz
@@ -1001,7 +1001,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,c00,c01,c02,c03, &
+         real(dp) :: a0,a1,c00,c01,c02,c03, &
          z, &
          dum,dumdt,dumdd,dumda,dumdz
 
@@ -1171,7 +1171,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,tfermi
+         real(dp) ::a2,tfermi
 
          ! brem
 
@@ -1427,7 +1427,7 @@
          real(dp), intent(out) :: splas,splasdt,splasdd,splasda,splasdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,a3,b1,b2,c00,c01,c02,c03,c04,xlnt,cc, &
+         real(dp) :: a1,a2,a3,b1,b2,c00,c01,c02,c03,c04,xlnt,cc, &
                      c,d,f1,&
                      dumdt,dumdd,dumda,dumdz, gum
 
@@ -1614,7 +1614,7 @@
          real(dp), intent(out) :: spair,spairdt,spairdd,spairda,spairdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,a3,b1,b2,c,d, gl,gldt
+         real(dp) :: a1,a2,a3,b1,b2,c,d, gl,gldt
          
          real(dp) :: xnum,xnumdt,xnumdd,xnumda,xnumdz, &
          xden,xdendt,xdendd,xdenda,xdendz

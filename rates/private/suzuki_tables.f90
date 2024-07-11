@@ -232,7 +232,7 @@ contains
   contains
 
     subroutine find_location ! set ix, jy; x is logT; y is lYeRho
-      integer i, j
+      integer :: i, j
       include 'formats'
       ! x0 <= logT <= x1
       ix = table % num_T-1 ! since weak_num_logT is small, just do a linear search

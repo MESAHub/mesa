@@ -1073,7 +1073,7 @@
       REAL(dp), pointer ::        VALUES (:)
       integer, intent(out) :: ierr
       
-      integer i
+      integer :: i
       ierr = 0
       READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
                            TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
@@ -1119,7 +1119,7 @@
       REAL(qp), pointer ::        VALUES (:)
       integer, intent(out) :: ierr
       
-      integer i
+      integer :: i
       ierr = 0
       READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
                            TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
@@ -1164,7 +1164,7 @@
 
       REAL(dp)         VALUES (*)
       
-      integer i
+      integer :: i
       
       ierr = 0
 
