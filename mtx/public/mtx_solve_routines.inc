@@ -140,8 +140,7 @@
          integer :: ipiv(:)
          real(dp) :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i, j, k
          info = 0
          call my_laswp(nrhs, b, ldb, 1, n, ipiv, 1 )
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )
@@ -175,7 +174,7 @@
          integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
          real(dp) :: a(:,:) ! a( lda, * )
-         integer :: i, i1, i2, inc, ip, ix, ix0, j, k, n32
+         integer :: i, i1, i2, inc, ip, ix, ix0, k
          real(dp) :: temp
          ! interchange row i with row ipiv(i) for each of rows k1 through k2.
          if( incx.gt.0 ) then
@@ -317,7 +316,6 @@
       subroutine my_gemm0_p1(m,n,k,a,lda,b,ldb,c,ldc) ! c := -a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(dp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
-         integer :: j, i
          real(dp), parameter :: zero=0
          include 'formats'
          ! transa = 'n'
@@ -414,7 +412,7 @@
 
 
       subroutine my_gemv_mv(m,n,a,x,b,z,y) ! y = y - a*x - b*z
-         integer lda,m,n
+         integer m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -470,7 +468,7 @@
 
 
       subroutine my_gemv_p_mv(m,n,a,x,b,z,y) ! y = y + a*x + b*z
-         integer lda,m,n
+         integer m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -560,8 +558,7 @@
          integer :: info, lda, ldb, n, nrhs
          real(dp) :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i,j,k
          info = 0
          do j = 1,nrhs
             do k = 1,n
@@ -591,7 +588,6 @@
          integer :: info, lda, ldb, n
          real(dp) :: a(:,:), b(:)
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
          integer :: i,k
          info = 0
          do k = 1,n

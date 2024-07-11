@@ -1171,7 +1171,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) ::a2,tfermi
+         real(dp) ::tfermi
 
          ! brem
 

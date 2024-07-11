@@ -379,9 +379,7 @@
          type(non_rect_array), dimension(0:nz) :: pf
 
          ! Intermediates
-         integer :: i, j, l, counter, start, end, direction
-         logical work_backwards
-         real(qp), dimension(:), allocatable :: test
+         integer :: i, j, l, counter
 
          ! Outputs
          call find_i_ranges(nz, ranges, i_min, i_max)
