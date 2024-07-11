@@ -496,7 +496,7 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
-         integer :: num_steps_to_use, starting_model_number, ierr
+         integer :: num_steps_to_use, starting_model_number
 
          include 'formats'
 
@@ -539,7 +539,7 @@
          real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor
          logical :: do_element_diffusion
          type (star_info), pointer :: s
-         real(dp), pointer :: xa(:), f1(:), f(:,:,:)
+         real(dp), pointer :: xa(:)
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
          ipar => ipar_ary
@@ -813,7 +813,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: num_pts, ierr, max_model_number
-         real(dp) :: lambda, avg_err
+         real(dp) :: avg_err
          real(dp), pointer :: x(:) ! =(num_pts)
          real(dp), pointer :: f1(:) ! =(4, num_pts)
 
@@ -901,7 +901,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k, nz, num_pts, op_err
+         integer :: k, nz, num_pts
          real(dp), pointer :: vals(:), xq(:), x(:), f(:)
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -1069,7 +1069,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: num_pts, ierr, max_model_number
-         real(dp) :: lambda, avg_err
+         real(dp) :: avg_err
          real(dp), pointer :: x(:) ! =(num_pts)
          real(dp), pointer :: f1(:) ! =(4, num_pts)
 
@@ -1859,14 +1859,13 @@
          integer, intent(out) :: ierr
 
          integer, parameter ::  lipar=2, lrpar=2
-         integer :: max_model_number, i
+         integer :: max_model_number
          real(dp) :: max_years_for_timestep
          type (star_info), pointer :: s
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
          real(dp), target :: rpar_ary(lrpar)
          real(dp), pointer :: rpar(:)
-         logical :: adding_mass
 
          rpar => rpar_ary
          ipar => ipar_ary
@@ -1936,7 +1935,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: adjust_model, max_num_steps, num_steps
-         real(dp) :: init_mass_change, final_mass_change, mass_change, frac
+         real(dp) :: init_mass_change, final_mass_change, frac
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -2694,7 +2693,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_v_center, dv_per_step, relax_v_center_dt, next
          logical, parameter :: dbg = .false.
 
@@ -2946,7 +2944,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_value, per_step_multiplier
          logical, parameter :: dbg = .false.
 
@@ -3051,7 +3048,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_value, per_step_multiplier
          logical, parameter :: dbg = .false.
 
@@ -3386,9 +3382,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr, klo, khi
-         real(dp) :: lnbc_target, new_pre_ms, new_lnbc, dlnbc, lnbc, &
-            current_pre_ms, next_pre_ms
 
          logical, parameter :: dbg = .false.
 

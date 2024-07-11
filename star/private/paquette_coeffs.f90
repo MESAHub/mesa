@@ -61,7 +61,7 @@
 ! Local variables
       real(dp) :: PSI_ST, EPS_ST, GAMMA_ST2, A, E_PSI_ST
       real(dp) :: AA, BB, CC, EE, Ps, Pt, Pst, Qs, Qt, Qst, Ss, &
-           St, Ms, Mt, Xs, Xt, Xe, Me, Pe, Se, DELTA
+           St, Ms, Mt, Xs, Xt, DELTA
       real(dp) :: DPSI_N1, DPSI_N
       integer :: i, J, N, K, NREF
       real(dp) :: NZZ, NE

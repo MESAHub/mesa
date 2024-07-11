@@ -54,7 +54,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer :: nslevel(:), ipivot(:)
-         integer :: neq, ncycle, nstemp, maxlevels, nlevel, i, j, k
+         integer :: neq, ncycle, nstemp, maxlevels, nlevel, i, k
          logical :: have_odd_storage
          real(dp), pointer, dimension(:,:) :: dmat, dmatF
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
@@ -221,7 +221,7 @@
          real(dp), pointer, dimension(:,:) :: lnext, unext, lprev, uprev
          real(dp), pointer, dimension(:) :: mat1
          integer :: i, j, shift, min_sz, new_sz, shift1, shift2, nvar2, &
-            ns, op_err, nmin, kcount, k, ii, jj, kk
+            ns, op_err, nmin, kcount, k
          real(dp), pointer, dimension(:) :: row_scale_factors, col_scale_factors
          character (len=1) :: equed
 
@@ -435,7 +435,7 @@
             s, nz, nblk, nvar, ncycle, nlevel, &
             dblk1, dblkF1, soln1, ipivot1, &
             row_scale_factors1, col_scale_factors1, equed1, ierr)
-         use chem_def, only: chem_isos
+         !use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nblk, nvar, ncycle, nlevel
          real(dp), pointer, intent(in), dimension(:) :: &
@@ -445,7 +445,7 @@
          character (len=nz) :: equed1
          integer, intent(out) :: ierr
 
-         integer :: i, k, ns, op_err, nmin, kcount, shift, shift1, shift2, nvar2
+         integer :: k, ns, op_err, nmin, kcount, shift, shift1, shift2, nvar2
          integer, pointer :: ipivot(:)
          real(dp), pointer, dimension(:,:) :: dmatF, dmat, umat, lmat
          real(dp), pointer, dimension(:) :: X, Xprev, Xnext
@@ -547,7 +547,7 @@
          real(dp), pointer, intent(inout) :: soln1(:)
 
          real(dp), pointer :: umat(:,:), lmat(:,:), bprev(:), bnext(:), bptr(:)
-         integer :: shift1, shift2, nvar2, ns, ierr, nmin, i, j
+         integer :: shift1, shift2, nvar2, ns, nmin
 
          include 'formats'
 
@@ -600,10 +600,6 @@
          real(dp) :: min_rcond_from_DGESVX, rpgfac
          integer :: k_min_rcond_from_DGESVX
          integer, intent(out) :: ierr
-         integer :: i, j
-         real(dp), pointer :: work(:)
-         integer, pointer :: iwork(:)
-         real(dp) :: rcond
          include 'formats'
          ierr = 0
          
