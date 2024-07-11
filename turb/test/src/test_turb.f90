@@ -84,7 +84,6 @@ program test_turb
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
       logical :: report
-      integer :: j
 
       include 'formats'
 
@@ -155,7 +154,7 @@ program test_turb
       real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D
       integer :: mixing_type, ierr, tdc_num_iters
       logical :: report
       integer :: j
