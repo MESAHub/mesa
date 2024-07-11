@@ -370,6 +370,7 @@
       ! i.e., A + B -> C exothermic
       subroutine rates_two_to_one_reverse_factor( &
             Q, T9, T932, iso_A, iso_B, iso_C, rev, d_rev_dT, ierr) ! A + B <-> C
+         use chem_def, only: chem_isos
          use math_lib
          real(dp), intent(in) :: Q, T9, T932
          integer, intent(in) :: iso_A, iso_B, iso_C
@@ -416,6 +417,7 @@
       ! i.e., A + B -> C + D exothermic
       subroutine rates_two_to_two_reverse_factor( &
             Q, T9, iso_A, iso_B, iso_C, iso_D, rev, d_rev_dT, ierr) ! A + B <-> C + D
+         use chem_def, only: chem_isos
          use math_lib
          real(dp), intent(in) :: Q, T9
          integer, intent(in) :: iso_A, iso_B, iso_C, iso_D
