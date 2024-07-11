@@ -60,7 +60,7 @@
               frac, dfrac_dlogRho, dfrac_dlogT, ierr)
 
          ! INPUT
-         !use chem_def, only: num_chem_isos
+         use chem_def, only: num_chem_isos
 
          integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
@@ -101,7 +101,7 @@
               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
 
          ! INPUT
-         !use chem_def, only: num_chem_isos
+         use chem_def, only: num_chem_isos
 
          integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
@@ -149,7 +149,7 @@
               res, d_dlnRho_const_T, d_dlnT_const_Rho, d_dxa_const_TRho, ierr)
 
          ! INPUT
-         !use chem_def, only: num_chem_isos
+         use chem_def, only: num_chem_isos
 
          integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
