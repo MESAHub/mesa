@@ -427,14 +427,14 @@
 
             if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
                i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
-               if (i_var .gt. s% nvar_hydro) then
+               if (i_var > s% nvar_hydro) then
                   i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
                end if
             end if
 
             ! if we're on an EOS where there aren't composition partials,
             ! approximate derivatives with finite differences
-            if (frac_without_dxa .gt. 0) then
+            if (frac_without_dxa > 0) then
 
                do j=1, s% species
                   dxa = s% xa(j,k) - s% xa_start(j,k)
@@ -443,7 +443,7 @@
                         s% solver_iter == s% solver_test_partials_iter_number) &
                      write(*,2) 'dxa', j, dxa
 
-                  if (abs(dxa) .ge. dxa_threshold) then
+                  if (abs(dxa) >= dxa_threshold) then
 
                      ! first, get eos with xa_start
 
@@ -513,11 +513,11 @@
                      if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
-                              if (j .eq. i_var - s% nvar_hydro) then
+                              if (j == i_var - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               endif
-                              if (j .eq. i_var_sink - s% nvar_hydro) then
+                              if (j == i_var_sink - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if

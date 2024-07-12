@@ -477,7 +477,7 @@
                ! if the abundance switches back and forth between 0 and 1d-99,
                ! then small negative abundances ~ -1d-115 can be generated
                do k = 1, nz
-                  if (vals(j,k) .lt. 0d0) vals(j,k) = 0d0
+                  if (vals(j,k) < 0d0) vals(j,k) = 0d0
                end do
                if (op_err /= 0) ierr = op_err
                s% xa(j,1:nz) = (1d0-lambda)*s% xa(j,1:nz) + lambda*vals(j,1:nz)

@@ -275,7 +275,7 @@
 
             drag_energy = 0d0
             s% FdotV_drag_energy(k) = 0
-            if (k .ne. s% nz) then
+            if (k /= s% nz) then
                if ((s% q(k) > s% min_q_for_drag) .and. &
                     (s% drag_coefficient > 0) .and. &
                     s% use_drag_energy) then

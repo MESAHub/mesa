@@ -1316,7 +1316,7 @@
             !..... From Kippenhahn&Weigert, Eqs. (7.6) and (7.7), the convective
             !..... velocity can be computed.  Now assume \nu=1/3 l_mix v and assume
             !..... that l_mix = H_p.
-            if ((xmagnt .LE. 0.D0) .AND. (xmagnmu .GT. 0.D0) .AND. (xmagn .GT. 0.D0)) &
+            if ((xmagnt <= 0.D0) .AND. (xmagnmu > 0.D0) .AND. (xmagn > 0.D0)) &
                xmagnu = &
                   sqrt(xmagnu*scale_height(k)*(one_third)* &
                   pow(grav(k)*delta(k)*scale_height(k)*MAX(0.D0,L(k))/ &

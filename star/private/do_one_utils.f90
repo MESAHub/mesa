@@ -48,7 +48,7 @@
       logical function model_is_okay(s)
          type (star_info), pointer :: s
          ! for now, just check for valid number in the final dynamic timescale
-         model_is_okay = ((s% dynamic_timescale - s% dynamic_timescale) .eq. 0d0) &
+         model_is_okay = ((s% dynamic_timescale - s% dynamic_timescale) == 0d0) &
                         .and. ((s% dynamic_timescale + 1d0) > 1d0)
       end function model_is_okay
 
@@ -529,7 +529,7 @@
          get_history_info = write_history .or. write_terminal         
          if (.not. get_history_info) return
          if (s% write_header_frequency*s% terminal_interval > 0) then
-            if ( mod(model, s% write_header_frequency*s% terminal_interval) .eq. 0 &
+            if ( mod(model, s% write_header_frequency*s% terminal_interval) == 0 &
                  .and. .not. s% doing_first_model_of_run) then
                write(*,'(A)')
                call write_terminal_header(s)
@@ -1527,7 +1527,7 @@
          logged = get_history_info(s, must_do_profile)
 
          if (logged .and. s% write_profiles_flag) then
-            if (s% model_number .eq. s% profile_model &
+            if (s% model_number == s% profile_model &
                .or. (s% profile_interval > 0 .and. &
                      (s% doing_first_model_of_run .or. &
                      mod(s% model_number,s% profile_interval) == 0))) then
