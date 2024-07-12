@@ -154,10 +154,8 @@
          real(dp), pointer :: AF_copy(:) ! =(ldAF, neq)
          
          ! for sparse
-         integer :: n, nzmax, need_lrd, need_lid, lfil, maxits, iout
-         real(dp) :: eps, droptol
+         integer :: n, nzmax, need_lrd, need_lid
                
-         real(dp) :: sparse_nzmax_factor
          integer(8) :: test_time0, test_time1, clock_rate
          logical :: do_test_timing
          
@@ -351,21 +349,19 @@
          real(dp)  :: 
      >      coeff, f, slope, residual_norm, max_residual, corr_norm_min, resid_norm_min, correction_factor,
      >      residual_norm_save, corr_norm_min_save, resid_norm_min_save, correction_factor_save,
-     >      correction_norm, corr_norm_initial, max_correction, slope_extra,
+     >      correction_norm, max_correction,
      >      tol_max_correction, tol_residual_norm, tol_abs_slope_min, tol_corr_resid_product,
      >      min_corr_coeff, tol_max_residual, max_corr_min, max_resid_min
-         integer :: iiter, max_tries, ndiag, zone, idiag, tiny_corr_cnt, ldA, i, j, k, info,
+         integer :: iiter, max_tries, ndiag, zone, idiag, tiny_corr_cnt, ldA, i, k, info,
      >      last_jac_iter, max_iterations_for_jacobian, force_iter_value,
      >      max_iter_for_enforce_resid_tol, max_iter_for_resid_tol2, max_iter_for_resid_tol3,
      >      caller_id
-         integer(8) :: test_time0, test_time1, time0, time1, clock_rate
+         integer(8) :: time0, time1, clock_rate
          character (len=256) :: err_msg
-         logical :: first_try, dbg_msg, passed_tol_tests, 
-     >      overlay_AF, do_mtx_timing, do_test_timing, doing_extra
+         logical :: first_try, dbg_msg, passed_tol_tests, overlay_AF, do_mtx_timing, doing_extra
          integer, parameter :: num_tol_msgs = 15
          character (len=32) :: tol_msg(num_tol_msgs)
          character (len=64) :: message
-         real(dp), pointer, dimension(:) :: p1_1, p1_2
 
          ! set pointers to 1D data
          real(dp), pointer, dimension(:,:) :: x, xold, equ, xscale ! (nvar,nz)       
@@ -869,12 +865,11 @@
             integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
       
-            integer :: i, j, k, iter, k_max_corr, i_max_corr
-            character (len=256) :: message
+            integer :: i, k, iter
             logical :: first_time
-            real(dp) :: a1, alam, alam2, alamin, a2, disc, f2, tmp1,
-     >         rhs1, rhs2, temp, test, tmplam, max_corr, fold, min_corr_coeff
-            real(dp) :: frac, f_target
+            real(dp) :: a1, alam, alam2, a2, disc, f2, tmp1,
+     >         rhs1, rhs2, tmplam, fold, min_corr_coeff
+            real(dp) :: f_target
             logical :: skip_eval_f
      
             real(dp), parameter :: alf = 1d-2 ! ensures sufficient decrease in f
@@ -1056,8 +1051,7 @@
 
 
          logical function solve_equ()    
-            integer ::  nrhs, ldafb, ldb, ldx, lda, i, j, n, sprs_nz
-            real(dp) :: ferr, berr
+            integer ::  nrhs, ldafb, ldb, ldx, lda, i, n, sprs_nz
             
             include 'formats'
 
@@ -1137,7 +1131,7 @@
          subroutine solve_mtx(n, ldafb, sprs_nz)
             integer, intent(in) :: n, ldafb, sprs_nz
             character(1) :: trans
-            integer :: info_solve, info_dealloc, i, j
+            integer :: info_solve, info_dealloc
             info = 0; info_solve=0; info_dealloc=0
             trans = 'N'
             if (matrix_type == block_tridiag_dble_matrix_type) then
@@ -1177,7 +1171,6 @@
             integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
             logical :: need_solver_to_eval_jacobian
-            integer :: i, j, k
             include 'formats'
             need_solver_to_eval_jacobian = .true.
             call enter_setmatrix(iiter, 
@@ -1197,9 +1190,9 @@
             integer, intent(inout) :: ipar(:) ! (lipar)
             integer, intent(out) :: ierr
 
-            integer :: i, j, ii, jj, k, kk, ij, ik, ivar, jvar, iz, jz, jzz, ideb, ifin
+            integer :: i, j, ii, k, kk, ij, ik, ivar, ideb, ifin
             integer, dimension(nvar) :: nskip, gskip, dskip
-            real(dp) :: dscale, partial
+            real(dp) :: partial
             logical :: need_solver_to_eval_jacobian
             
             include 'formats'
@@ -1425,7 +1418,7 @@
             ! increment vector from previous vector of primaries.
             real(dp), dimension(:,:) :: xold 
             ! xold = x-dx.  xold is kept constant; x and dx change.
-            integer :: i, j, k
+            integer :: j, k
          
     1       format(a20, i16) ! integers
     2       format(a20, 1pe26.16) ! reals
@@ -1481,7 +1474,6 @@
             integer, intent(out) :: ierr
       
             integer :: i, j
-            character (len=256) :: err_msg
 
             ierr = 0         
             i = num_work_params+1
@@ -1582,7 +1574,7 @@
          real(dp) function eval_slope(nvar, nz, grad_f, B)
             integer, intent(in) :: nvar, nz
             real(dp), intent(in), dimension(:,:) :: grad_f, B
-            integer :: k, i
+            integer :: i
             eval_slope = 0
             do i=1,nvar
                eval_slope = eval_slope + dot_product(grad_f(i,1:nz),B(i,1:nz))
@@ -1618,7 +1610,7 @@
          integer, intent(out) :: lwork, liwork
          integer, intent(out) :: ierr
          
-         integer :: i, ndiag, ldAF, neq
+         integer :: ndiag, ldAF, neq
          
          include 'formats'
 

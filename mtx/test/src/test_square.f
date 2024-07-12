@@ -44,8 +44,8 @@
       
       
          integer,parameter :: n=3, nrhs=1
-         integer :: i,info,ipiv(n),icommon(n)
-         double precision :: A1(n,n),B1(n),A2(n,n),B2(n),work(4*n),rcond
+         integer :: info,ipiv(n)
+         double precision :: A1(n,n),B1(n),A2(n,n),B2(n)
          double precision :: A1_init(n,n),A2_init(n,n),X(n),prod(n)
          
          include 'formats'
@@ -106,8 +106,8 @@
       subroutine test_square2
       
          integer,parameter :: n=3,nrhs=1
-         integer :: i,info,ipiv(n),icommon(n)
-         double precision :: A1(n,n),B1(n,nrhs),A2(n,n),B2(n,nrhs),work(4*n),rcond
+         integer :: info,ipiv(n)
+         double precision :: A1(n,n),B1(n,nrhs),A2(n,n),B2(n,nrhs)
          
          include 'formats'
          
@@ -152,8 +152,8 @@
       subroutine test_square1
       
          integer,parameter :: n=4,nrhs=1
-         integer :: i,info,ipiv(n),iwork(n)
-         double precision :: A(n,n),B(n,nrhs),A2(n,n),work(4*n),rcond
+         integer :: info,ipiv(n)
+         double precision :: A(n,n),B(n,nrhs),A2(n,n)
          
          include 'formats'
       

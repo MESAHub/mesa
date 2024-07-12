@@ -566,7 +566,7 @@ contains
       real(dp), intent(in) :: dt    
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, lk 
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root 
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 

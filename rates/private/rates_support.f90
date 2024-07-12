@@ -49,7 +49,7 @@
          real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
          
-         integer :: imax, iat0, iat, ir, i, j, irho
+         integer :: imax, iat0, iat, ir, i, irho
          integer, parameter :: mp = 4
          real(dp), allocatable :: dtab(:), ddtab(:)
          real(dp), pointer :: rattab_f(:,:,:) 
@@ -151,9 +151,8 @@
             use const_def, only: ln10
             integer, intent(in) :: r1, r2
             
-            integer :: i, k, cnt
-            real(dp) :: denom, am1, a00, ap1, ap2, cm1, c00, cp1, cp2,  &
-                  rate, dr_dT, dx, dt, old_rate, old_dr_dT
+            integer :: i, k
+            real(dp) :: dt
             
             include 'formats'
                
@@ -201,7 +200,7 @@
          real(dp), pointer :: rattab_f1(:)
          integer, intent(out) :: ierr
          
-         integer :: i, j, operr, ir, num_to_add_to_cache,thread_num
+         integer :: i, j, operr, num_to_add_to_cache,thread_num
          real(dp) :: logT, btemp
          real(dp), pointer ::  work1(:)=>null(), f1(:)=>null(), rattab_f(:,:,:)=>null()
          integer, pointer :: reaction_id(:) =>null()
@@ -530,7 +529,7 @@
          
          integer :: version, nrattab, which
          real(dp) :: rattab_thi, rattab_tlo, rattab_tstp, rate, T8, logT
-         integer :: ios, ir, i, j, io_unit
+         integer :: ios, j, io_unit
          real(dp), parameter :: tiny = 1d-6
          character (len=maxlen_reaction_Name) :: name
 

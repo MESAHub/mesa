@@ -46,10 +46,9 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
 
-         integer ::  i, k, nsteps, lout, iout, idid, ijac, max_cols_exptrap, &
-            max_steps, xnstp, nfcn, njac, naccept, nreject, ndec, nsol, nrdens, &
-            nzmax, lrd, lid, nrow, ncol, ndns, ndim, lfil, maxits, isparse, liwork, lwork
-         real(dp) :: h, droptol, eps, max_step_size, y_min, y_max
+         integer ::  i, lout, iout, idid, ijac, max_cols_exptrap, max_steps, nrdens, &
+            nzmax, lrd, lid, isparse, liwork, lwork
+         real(dp) :: h, eps, max_step_size, y_min, y_max
 
          integer, pointer :: iwork(:) !(liwork)
          real(dp), pointer :: work(:) !(lwork)

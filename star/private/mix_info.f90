@@ -584,7 +584,7 @@
             if (in_convective_region) then
                if (s% mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
-               else if(s% conv_vel(k) .ne. 0d0) then
+               else if(s% conv_vel(k) /= 0d0) then
                   turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
                end if
             else ! in non-convective region

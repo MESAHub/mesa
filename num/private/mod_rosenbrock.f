@@ -351,6 +351,10 @@
       real(dp), intent(in) :: y_min, y_max
       real(dp), pointer, dimension(:) :: p1, p2, p3, p4, p5
       integer, pointer, dimension(:) :: ip1
+      integer :: i, iedy, iedy1, iecon, ieak
+      integer :: ieia, iefx, iee, iemas, iejac, ieja, ieip, ieynew, iesj, iesa, ierr
+      integer :: ijob, lde, ldjac, ldmas, ldmas2, m1, m2, meth
+      integer :: nm1, njac, nfcn, nerror, ndec, naccpt, nsol, nstep, nmax, nrejct
       mljac = mljac_in; mujac = mujac_in
 ! *** *** *** *** *** *** ***
 !        setting the parameters 
@@ -638,6 +642,8 @@
 !         declarations 
 ! ---------------------------------------------------------- 
       implicit real(dp) (a-h,o-z)
+      integer :: n, itol, ijac, isparse, mljac, mujac, idfx, mlmas, mumas, iout, idid, nmax, meth, ijob,
+     &           ldjac, lde, ldmas, m1, m2, nm1, nerror, nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, lout
        interface
          real(dp) function contro(i,x,rwork,iwork,ierr)
             use const_def, only: dp
@@ -694,7 +700,7 @@
       
       dimension fx(n),fjac(ldjac,n),fmas(ldmas,nm1),atol(*),rtol(*)
      
-      integer iwork(2)
+      integer :: iwork(2)
       real(dp), target :: rwork(2+5*n)
       real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
@@ -708,8 +714,12 @@
       logical reject,autnms,implct,banded,last,pred,not_stage1,no_aux_in_error,need_free
       real(dp), pointer :: cont(:), dy2(:)
       real(dp) :: hprev, rd32
-      integer :: i, j
-      
+      integer :: i, j, k, l, j1, is
+      integer :: lrc, lbeg, lend, irtrn
+      integer :: mbb, mbdiag, mbjac, md, mdiag, mdiff, mle, mm, mue, mujacj, mujacp
+      integer :: nsing, nn, nn2, nn3, nn4
+      integer :: ierr, ier
+  
       real(dp), pointer :: ak(:,:), e(:,:), p1(:)
       ak(1:n,1:ns) => ak1(1:n*ns)
       e(1:lde,1:nm1) => e1(1:lde*nm1)

@@ -1006,7 +1006,7 @@
             use star_utils, only: start_time, update_time
             use rsp_def, only: NV, MAX_NZN
             integer ::  i, k, ierr
-            real(dp) :: ferr, berr, total_time
+            real(dp) :: ferr, total_time
 
             include 'formats'
             ierr = 0
@@ -1151,7 +1151,6 @@
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
             real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
-            real(dp) :: dvardx_0
             integer :: i, j_var_xa_index, j_var_sink_xa_index
             include 'formats'
             if (i_equ /= 0) then
@@ -1618,7 +1617,7 @@
             !  an estimate of the error in the first derivative is returned in err.
             integer, parameter :: ntab = 20
             integer :: i,j
-            real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum,f1,f2
+            real(dp) :: errt,fac,hh,a(ntab,ntab),f1,f2
             real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
             include 'formats'
             dfridr = 0d0
@@ -1804,8 +1803,7 @@
 
             integer, intent(out) :: ierr
 
-            integer :: i, j
-            character (len=strlen) :: err_msg
+            integer :: i
 
             ierr = 0
 
@@ -1923,7 +1921,7 @@
          real(dp) function eval_slope(nvar, nz, grad_f, B)
             integer, intent(in) :: nvar, nz
             real(dp), intent(in), dimension(:,:) :: grad_f, B
-            integer :: k, i
+            integer :: i
             eval_slope = 0
             do i=1,nvar
                eval_slope = eval_slope + dot_product(grad_f(i,1:nz),B(i,1:nz))

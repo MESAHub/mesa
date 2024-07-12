@@ -100,10 +100,9 @@
       
       subroutine test_net_setup(net_file_in)
          character (len=*), intent(in) :: net_file_in
-         integer, pointer :: r_id(:)
          type(Net_General_Info), pointer :: g
 
-         integer :: info, i, ierr
+         integer :: info, ierr
          
          include 'formats'
          
@@ -195,7 +194,6 @@
 
       subroutine Do_One_Net(symbolic)
          logical, intent(in) :: symbolic
-         integer :: i, id
          call do1_net(net_handle, symbolic)
       end subroutine Do_One_Net
 
@@ -787,21 +785,20 @@
          character (len=*), intent(in) :: net_file
          logical, intent(in) :: do_timing, show_Qs
          
-         real(dp) :: logRho, logT, Rho, T, xsum, Q1, Q2, &
+         real(dp) :: logRho, logT, Rho, T, xsum, Q1, &
            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, weak_rate_factor, &
             dvardx, dvardx_0, dx_0, err, var_0, xdum, &
            eps_nuc_categories(num_categories), xh, xhe, mass_correction !approx_abar, approx_zbar
-         integer :: i, j, k, info, ierr
+         integer :: i, j, info, ierr
          integer :: j_dx, j_dx_sink
-         integer :: adjustment_iso, ir_c12_c12_to_he4_ne20, ir_he4_ne20_to_c12_c12
          real(dp), dimension(:), pointer :: d_eps_nuc_dx, dabar_dx, dzbar_dx, dmc_dx
          real(dp), pointer :: rate_factors(:), &
             actual_Qs(:), actual_neuQs(:)       
          logical, pointer :: from_weaklib(:)
          logical :: skip_jacobian, doing_d_dlnd, doing_dx
          real(dp), dimension(:), pointer :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
+            rate_raw, rate_raw_dT, &
+            rate_screened
          type(net_info) :: n
          
          include 'formats'
@@ -1713,7 +1710,7 @@
          real(dp) function dfridr_func(delta_x) result(val)
             real(dp), intent(in) :: delta_x
             integer :: ierr
-            real(dp) :: pgas, prad, energy, entropy, var, log_var
+            real(dp) :: var, log_var
             include 'formats'
             ierr = 0
             
@@ -1793,7 +1790,7 @@
             !  an estimate of the error in the first derivative is returned in err.
             integer, parameter :: ntab = 20
             integer :: i,j
-            real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum
+            real(dp) :: errt,fac,hh,a(ntab,ntab)
             real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
             include 'formats'
             dfridr = 0d0

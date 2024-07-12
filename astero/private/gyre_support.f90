@@ -100,7 +100,6 @@ contains
 
     integer  :: ipar(1)
     real(dp) :: rpar(1)
-    integer  :: i
     integer(8) :: time0, time1, clock_rate
     real(dp) :: time
          
@@ -306,8 +305,7 @@ contains
     real(dp), intent(inout)  :: rpar(:)
     integer, intent(out)     :: ierr
 
-    integer :: iounit, i, j, skip, nn
-    real(dp) :: y_r, y_h
+    integer :: iounit
 
     include 'formats'
          

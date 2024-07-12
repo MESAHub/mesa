@@ -16,7 +16,6 @@
          real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ier
-         integer :: i, j, iounit
          include 'formats'
          ier = 0
          if (iop == 0) then ! factor
@@ -118,7 +117,6 @@
          
          complex(dp), pointer :: a(:,:)
          integer :: i, j
-         character (len=100) :: message
          
          i=1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -159,7 +157,6 @@
          
          complex(dp), pointer :: a(:,:)
          integer :: i, j
-         character (len=100) :: message
          
          i=1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -199,7 +196,6 @@
          
          complex(dp), pointer :: a(:,:), b(:)
          integer :: i, j
-         character (len=100) :: message
          
          i = 1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -241,7 +237,6 @@
          
          complex(dp), pointer :: a(:,:), b(:)
          integer :: i, j
-         character (len=100) :: message
          
          i = 1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)

@@ -131,7 +131,7 @@ SKIP_NAN_TRAPS = YES
 #SKIP_NAN_TRAPS = NO
 # if not SKIP_NAN_TRAPS, then also add $(FCtrapNANs) to FCbasic2
 
-FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 $(SPECIAL_FC_FLAGS) $(FCbasic2)
+FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 -fdiagnostics-color $(SPECIAL_FC_FLAGS) $(FCbasic2)
 FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 
 # Set the fortran standard to compile against, files that can't be compiled to the standard and are 
@@ -144,7 +144,7 @@ FCstandard = -std=f2008 -Wno-error=tabs
 
 FCimpno = -fimplicit-none  
 FCchecks = -fbounds-check -Wuninitialized -Warray-bounds
-FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination
+FCwarn = -Wunused-value -W -Wno-compare-reals -Wno-unused-parameter -Wno-function-elimination -Waliasing
 #FCwarn = -Wunused-value -Werror -W -Wno-compare-reals -Wno-unused-parameter
 FCtrapNANs = -ffpe-trap=invalid,overflow,zero 
 # -Wno-unused-parameter

@@ -52,7 +52,6 @@
         real ( kind = 8 ) m
         real ( kind = 8 ) machep
         real ( kind = 8 ) t
-        real ( kind = 8 ) z
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_GLOMIN_ALL'
@@ -217,9 +216,7 @@
         real ( kind = 8 ) a
         real ( kind = 8 ) b
         real ( kind = 8 ) eps
-        real ( kind = 8 ) r8_epsilon
         real ( kind = 8 ) t
-        real ( kind = 8 ) z
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_LOCAL_MIN_ALL'
@@ -440,9 +437,7 @@
         real ( kind = 8 ) a
         real ( kind = 8 ) b
         real ( kind = 8 ) machep
-        real ( kind = 8 ) r8_epsilon
         real ( kind = 8 ) t
-        real ( kind = 8 ) z
 
         machep = epsilon ( machep )
         t = machep

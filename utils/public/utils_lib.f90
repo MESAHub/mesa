@@ -73,6 +73,7 @@ contains
     character(len=*) :: compiler_name, compiler_version_name
     integer :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
     character(len=3) :: gcc_major_string, gcc_minor_string, gcc_patch_string
+    if (.false.) intel_compiler_build_date = 0
 #ifdef __INTEL_COMPILER
     compiler_name = "ifort"
     intel_compiler_build_date = __INTEL_COMPILER_BUILD_DATE
@@ -620,7 +621,6 @@ contains
     integer, intent(inout) :: i ! number of characters already read from buffer
     character (len=*), intent(inout) :: buffer ! line of text from input file
     character (len=*), intent(inout) :: string ! holds string or name for string or name token
-    character (len=1) :: tab_str
 
     integer :: info, j, j1, j2, l, str_len
 

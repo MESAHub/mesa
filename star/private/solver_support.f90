@@ -28,7 +28,6 @@
       use star_private_def
       use utils_lib, only: is_bad
       use const_def
-
       use num_def
 
       implicit none
@@ -853,7 +852,7 @@
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
          integer :: op_err, kbad, &
             cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
-         real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
+         real(dp) :: r2, xavg, u00, um1, dx_for_i_var, x_for_i_var, &
             dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
          logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
             do_u, do_v, do_alpha_RTI, do_w_div_wc, do_j_rot
@@ -1122,7 +1121,7 @@
 
 
          subroutine set1(k,report,ierr)
-            use chem_def, only: chem_isos
+            !use chem_def, only: chem_isos
             integer, intent(in) :: k
             logical, intent(in) :: report
             integer, intent(out) :: ierr
@@ -1131,9 +1130,8 @@
             ! setting x = xh_start + dx is necessary because of numerical issues.
             ! we want to ensure that we've calculated the variables using exactly the
             ! same values for x as will be returned as the final result.
-            real(dp) :: r2, sum_xa
-            integer :: j, i, k_below_just_added
-            real(dp) :: del_t, starting_value, alfa, beta, v, theta
+            integer :: j, k_below_just_added
+            real(dp) :: v
 
             include 'formats'
             ierr = 0
@@ -1401,8 +1399,8 @@
          logical, intent(in) :: report
          integer, intent(out) :: ierr
 
-         integer :: j, species, jmax
-         real(dp) :: sum_xa, xsum
+         integer :: j, species
+         real(dp) :: sum_xa
          logical :: okay
 
          include 'formats'
@@ -1490,7 +1488,7 @@
 
       subroutine dump_struct(s)
          type (star_info), pointer :: s
-         integer :: k, j, i
+         integer :: k, j
 
          include 'formats'
 
@@ -1548,7 +1546,7 @@
       subroutine edit_dlnR_dt_above_k_below_just_added(s, xh_start)
          type (star_info), pointer :: s
          real(dp), dimension(:, :) :: xh_start
-         integer :: k, k_below_just_added
+         integer :: k_below_just_added
          real(dp) :: lnR_start
          k_below_just_added = s% k_below_just_added
          if (k_below_just_added == 1) return
