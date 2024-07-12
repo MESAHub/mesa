@@ -1570,7 +1570,7 @@
               else if( g_plasma(i,j) < 1d0) then ! Use eqn C23 for weakly coupled
                  do no=1,2
                     do mo=1,3 ! Implementing the (m-1)! term with a simple if statement.
-                       if(mo .eq. 3) then
+                       if(mo == 3) then
                           facmo = 2 ! (3-1)!
                        else
                           facmo = 1 ! (1-1)! and (2-1)!

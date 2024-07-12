@@ -541,7 +541,7 @@
          include 'formats'
          ! check_for_redo_MLT assumes that nzlo = 1, nzhi = nz
          ! that is presently true; make sure that assumption doesn't change
-         if (.not. ((nzlo.eq.1).and.(nzhi.eq.s%nz))) then
+         if (.not. ((nzlo==1).and.(nzhi==s%nz))) then
             write(*,*) 'nzlo != 1 or nzhi != nz'
             call mesa_error(__FILE__,__LINE__)
          endif

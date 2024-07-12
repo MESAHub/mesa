@@ -200,7 +200,7 @@
 
                abun=safe_log10(dble(abun))
 
-               if(z.lt.ymin .or. z.gt.ymax .or. n.lt.xleft .or.n.gt.xright)CYCLE
+               if(z<ymin .or. z>ymax .or. n<xleft .or.n>xright)CYCLE
 
                if (s% pg% Network_show_element_names) THEN
                   call pgsci(1)
