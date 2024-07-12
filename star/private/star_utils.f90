@@ -3342,7 +3342,7 @@
                j = k
                k = m
                l = mod(53*l + 1, 169)
-               if (mod(l*m,64) .ge. 32) x = x + t
+               if (mod(l*m,64) >= 32) x = x + t
                t = 0.5d0 * t
             enddo
             s% rand_u(ii) = x
@@ -3359,16 +3359,16 @@
          type (star_info), pointer :: s      
          real(dp) :: uni
          uni = s% rand_u(s% rand_i97) - s% rand_u(s% rand_j97)
-         if (uni .lt. 0.0d0) uni = uni + 1.0d0
+         if (uni < 0.0d0) uni = uni + 1.0d0
          s% rand_u(s% rand_i97) = uni
          s% rand_i97 = s% rand_i97 - 1
-         if (s% rand_i97 .eq. 0) s% rand_i97 = 97
+         if (s% rand_i97 == 0) s% rand_i97 = 97
          s% rand_j97 = s% rand_j97 - 1
-         if (s% rand_j97 .eq. 0) s% rand_j97 = 97
+         if (s% rand_j97 == 0) s% rand_j97 = 97
          s% rand_c = s% rand_c - s% rand_cd
-         if (s% rand_c .lt. 0.0d0) s% rand_c = s% rand_c + s% rand_cm
+         if (s% rand_c < 0.0d0) s% rand_c = s% rand_c + s% rand_cm
          uni = uni - s% rand_c
-         if (uni .lt. 0.0d0) uni = uni + 1.0d0
+         if (uni < 0.0d0) uni = uni + 1.0d0
          rand = uni
       end function rand
 

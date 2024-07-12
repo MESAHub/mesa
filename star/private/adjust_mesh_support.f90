@@ -290,7 +290,7 @@
            ! 0.5 < alfa < 1 : linear (coeff_start -> 1)
 
            beta = 2d0 * (alfa - 0.5d0)
-           if (beta .lt. 0d0) then
+           if (beta < 0d0) then
               coef = coef_start
            else
               coef = coef_start*(1d0 - beta) + beta

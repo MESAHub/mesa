@@ -89,7 +89,7 @@
          include 'formats'
          ierr = 0
 
-         using_PC = (s% eos_frac_PC(k) .gt. 0)
+         using_PC = (s% eos_frac_PC(k) > 0)
 
          if (using_PC .and. s% gam_start(k) >= s% Gamma_lnS_eps_grav_full_on) then
             call do_lnS_eps_grav(s, k, eps_grav, ierr)
@@ -98,9 +98,9 @@
             alfa = (Gamma - s% Gamma_lnS_eps_grav_full_off) / &
                (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off)
             call do_lnS_eps_grav(s, k, eps_grav_lnS, ierr)
-            if (ierr .ne. 0) return
+            if (ierr /= 0) return
             call do_std_eps_grav(s, k, eps_grav_std, ierr)
-            if (ierr .ne. 0) return
+            if (ierr /= 0) return
             ! the derivative of the blending function is missing
             ! but historically we've been able to get away with that
             ! because the two forms should match in the blend region

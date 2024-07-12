@@ -767,7 +767,7 @@
          ierr = 0
          bzm_1 = null_zone; bzm_2 = null_zone; bzm_3 = null_zone; bzm_4 = null_zone
          burn_zone = 0 ! haven't entered the zone yet
-         if (i_start .ne. s% nz) then
+         if (i_start /= s% nz) then
             i = i_start+1
             prev_m = s% m(i)
             prev_x = s% eps_nuc(i)
@@ -780,16 +780,16 @@
             cur_x = s% eps_nuc(i)
             select case (burn_zone)
                case (0)
-                  if ( cur_x .gt. burn_min2 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  if ( cur_x > burn_min2 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_2 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      end if
                      bzm_1 = bzm_2
                      burn_zone = 2
-                  elseif ( cur_x .gt. burn_min1 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  elseif ( cur_x > burn_min1 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_1 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_1 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
@@ -797,27 +797,27 @@
                      burn_zone = 1
                   end if
                case (1) ! in the initial eps > burn_min1 region
-                  if ( cur_x .gt. burn_min2 ) then
+                  if ( cur_x > burn_min2 ) then
                      bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 2
-                  else if ( cur_x .lt. burn_min1 ) then
+                  else if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return
                   end if
                case (2) ! in the initial eps > burn_min2 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      bzm_3 = bzm_4
                      i_start = i
                      return
                   end if
-                  if ( cur_x .lt. burn_min2 ) then
+                  if ( cur_x < burn_min2 ) then
                      bzm_3 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 3
                   end if
                case (3) ! in the final eps > burn_min1 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return

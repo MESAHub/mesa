@@ -57,7 +57,6 @@ module support_functions
 
    pure real(dp) function int_int_pow(x, y) result(z)
       integer, intent(in) :: x, y
-      real(dp) :: x_real, y_real
 
       z = x**y
    end function int_int_pow

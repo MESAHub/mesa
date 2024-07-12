@@ -185,8 +185,8 @@
          integer, intent(in) :: ict(6)                    ! code specifying output desired
          real(dp), intent(inout) :: fval(6)         ! output data
          integer, intent(out) :: ier                      ! error code =0 ==> no error
-         integer i,j
-         integer ii(1), jj(1) 
+         integer :: i,j
+         integer :: ii(1), jj(1) 
          real(dp) xparam(1),yparam(1),hx(1),hxi(1),hy(1),hyi(1)
  1       format(a40,1pe26.16)
          call herm2xy_db(xget,yget,x,nx,y,ny,ilinx,iliny,i,j,

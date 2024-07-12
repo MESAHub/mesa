@@ -173,14 +173,14 @@
             max_zone=s%nz
 
             do i=1,s%nz
-               if(s%m(i).le.max_mass) then
+               if(s%m(i)<=max_mass) then
                   min_zone=i-1
                   exit
                end if
             end do
 
             do i=min_zone,s%nz
-               if(s%m(i).le.min_mass) then
+               if(s%m(i)<=min_mass) then
                   max_zone=i-1
                   exit
                end if
@@ -231,7 +231,7 @@
                lac=safe_log10(scaled_abun_init(i))
    
                !Remove low abundance isotopes, low in star and low in solar can lead to large production factor
-               if(la .lt.s% pg%production_min_mass_frac .or. lac .lt.s% pg%production_min_mass_frac) then
+               if(la <s% pg%production_min_mass_frac .or. lac <s% pg%production_min_mass_frac) then
                   scaled_abun(i)=-HUGE(ymin)
                else
                   scaled_abun(i)=real(la-lac)
@@ -290,17 +290,17 @@
             alternate=-1
             i=1
             outer: do 
-               if(i.gt.solsiz) exit outer
+               if(i>solsiz) exit outer
       
                ! Z is greater than zmax
-               if(izsol(i).gt.zmax) exit outer
+               if(izsol(i)>zmax) exit outer
 
                !Sets color
                call set_line_style(izsol(i))
 
                !Shows element name, alternates between two levels to spread them out
                if (s% pg% Production_show_element_names &
-                  .and.(iasol(i).le.xright).and.(iasol(i).ge.xleft)) THEN
+                  .and.(iasol(i)<=xright).and.(iasol(i)>=xleft)) THEN
                      yloc=(ymax*1.0)+abs(0.75+(alternate)/2.0)
                      call pgtext(iasol(i)*1.0,yloc,el_name(izsol(i)))
                      alternate=alternate*(-1.0)
@@ -313,9 +313,9 @@
 
                inner: do j=i,solsiz
                
-                  if(izsol(j).eq.izsol(i))then
-                     if((scaled_abun(j).ge. ymin) .and. (scaled_abun(j) .le. ymax)&
-                        .and.(iasol(j).le.xright).and.(iasol(j).ge.xleft)) then
+                  if(izsol(j)==izsol(i))then
+                     if((scaled_abun(j)>= ymin) .and. (scaled_abun(j) <= ymax)&
+                        .and.(iasol(j)<=xright).and.(iasol(j)>=xleft)) then
                         a=iasol(j)
 
                         !Draw point at values

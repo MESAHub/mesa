@@ -52,7 +52,6 @@
 
          real(dp), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          logical, parameter :: dbg = .true.
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
@@ -166,7 +165,6 @@
 
          real(dp), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          
@@ -254,7 +252,6 @@
 
          real(dp), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          
@@ -339,7 +336,6 @@
          integer, intent(out) :: ierr
 
          real(dp) :: h, s
-         character (len=256) :: message
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          

@@ -88,9 +88,9 @@
       real(dp), parameter  :: tiny=1.0d-15
 
       
-      real(dp) y0(nvar),a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
-      integer i,kmax,kopt,nseq(stifbs_imax),nvold
-      logical first
+      real(dp) :: y0(nvar),a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
+      integer :: i,kmax,kopt,nseq(stifbs_imax),nvold
+      logical :: first
 
       include 'formats'
 

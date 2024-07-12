@@ -520,7 +520,7 @@
             NPCH2 = s% RSP_map_last_period
             IP = s% RSP_num_periods
             io = 77
-            if (IP+1.ge.NPCH1.and.IP+1.le.NPCH2) then
+            if (IP+1>=NPCH1.and.IP+1<=NPCH2) then
                if(.not. writing_map) then
                   call read_map_specs(s,ierr)
                   if (ierr /= 0) then
@@ -552,7 +552,7 @@
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
                do k=1,NZN,s% RSP_map_zone_interval ! gnuplot pm3d map
                   I = NZN+1 - k
-                  if(I.gt.IBOTOM.and.I.lt.NZN) then
+                  if(I>IBOTOM.and.I<NZN) then
                      write(io,'(d18.10,1x,i4)',advance='no') FASE, k
                      do n=1,num_map_cols
                         write(io,'(1x,d18.10)',advance='no') &
@@ -569,7 +569,7 @@
                enddo
                !write(io,*)
             end if
-            if(IP.eq.NPCH2 .and. .not. done_writing_map) then
+            if(IP==NPCH2 .and. .not. done_writing_map) then
                close(io)
                fname = trim(s% log_directory) // '/' // trim(s% RSP_map_filename)
                write(*,*) '  close ' // trim(fname)
@@ -782,8 +782,8 @@
          logical :: cycle_complete
          integer :: i, k
          include 'formats'
-         if(s% L(1)/SUNL.gt.LMAX) LMAX=s% L(1)/SUNL
-         if(s% L(1)/SUNL.lt.LMIN) LMIN=s% L(1)/SUNL      
+         if(s% L(1)/SUNL>LMAX) LMAX=s% L(1)/SUNL
+         if(s% L(1)/SUNL<LMIN) LMIN=s% L(1)/SUNL      
          INSIDE=0      
          call check_cycle_completed(s,cycle_complete)
          ULL=UN
@@ -845,7 +845,7 @@
          INSIDE = 1 ! for initial call
          !s% mstar = M(1)
          call set_star_vars(s,ierr)
-         if(s% rsp_num_periods.eq.1)s% rsp_GREKM=0.d0
+         if(s% rsp_num_periods==1)s% rsp_GREKM=0.d0
          EKDEL  = EKMAX-EKMIN
          EKMAXL = EKMAX
          EKMAX  =-10.d50
@@ -878,7 +878,7 @@
          character (len=256) :: fname
          dt = s% dt
          ! LAST STEP OF PdV
-         if(INSIDE.eq.1.and.IWORK.eq.1) then  
+         if(INSIDE==1.and.IWORK==1) then  
             IWORK=0
             do I=1,NZN
                k = NZN+1-i
@@ -921,8 +921,8 @@
          endif
 
          ! INITIAL STEP OF PdV:
-         if((INSIDE.eq.1.and.IWORK.eq.0).or. &
-            (s% rsp_num_periods.eq.0.and.IWORK.eq.0))then
+         if((INSIDE==1.and.IWORK==0).or. &
+            (s% rsp_num_periods==0.and.IWORK==0))then
             IWORK=1 
             do I=1,NZN
                k = NZN+1-i
@@ -935,7 +935,7 @@
          endif
 
          ! FIRST AND NEXT STEPS of PdV:
-         if(IWORK.eq.1)then
+         if(IWORK==1)then
             do I=1,NZN
                k = NZN+1-i
                dm = s% dm(k)
@@ -986,22 +986,22 @@
          TET = s% time
          cycle_complete = .false.
          UN=s% v(1)
-         if(UN.gt.0.d0.and.ULL.le.0.d0) then
+         if(UN>0.d0.and.ULL<=0.d0) then
             RMIN=s% r(1)/SUNR
          end if
-         if (s% model_number.eq.1) return
+         if (s% model_number==1) return
          if (.not. s% RSP_have_set_velocities) return
          if (s% r(1)/SUNR < s% RSP_min_max_R_for_periods) return
          if (UN/s% csound(1) > VMAX) then
             VMAX = UN/s% csound(1)
          end if
-         if(UN*ULL.gt.0.0d0.or.UN.gt.0.d0) return
+         if(UN*ULL>0.0d0.or.UN>0.d0) return
          T0=TET
          min_PERIOD = PERIODLIN*s% RSP_min_PERIOD_div_PERIODLIN
-         if (abs(UN-ULL).gt.1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
+         if (abs(UN-ULL)>1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
          if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
-         if(FIRST.eq.1)then   
+         if(FIRST==1)then   
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
             s% rsp_period=T0-TT1

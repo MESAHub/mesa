@@ -180,7 +180,7 @@
 !        (DERIVATIVES ~1/sqrt(E_T) AND WITH w=0, LAPACK
 !         PROBLEM ARISES; NO SUCH PROBLEM WHEN E_T^2 IS USED
 !         AND LINE BELOW IS NOT NECESSARY THEN)
-         if(w(I).le.EFL02) w(I)=EFL02
+         if(w(I)<=EFL02) w(I)=EFL02
          !write(*,*) NZN-I+1, sqrt(w(i))
       enddo
       
@@ -202,7 +202,7 @@
       enddo
       II=0; IO=0
       do I=NZN,1,-1
-         if(TA(I).gt.2.d0/3.d0)then
+         if(TA(I)>2.d0/3.d0)then
             II=I
             IO=I+1
             goto 77
@@ -219,7 +219,7 @@
       TAUTEFF=AA*2.d0/3.d0+BB
 
       do I=NZN,1,-1
-         if(T(I).gt.TE)then
+         if(T(I)>TE)then
             II=I
             IO=I+1
             goto 78
@@ -237,7 +237,7 @@
       GEFF=G*Mass/R(NZN)**2
       MBOL=-2.5d0*dlog10(ELR)+4.79d0    
       
-      if(NMODES.eq.0) goto 11 ! jesli masz liczyc tylko static envelope
+      if(NMODES==0) goto 11 ! jesli masz liczyc tylko static envelope
       
       if (.not. (s% use_RSP_new_start_scheme .or. s% use_other_RSP_linear_analysis)) then          
          if (s% RSP_trace_RSP_build_model) write(*,*) '*** linear analysis ***'
@@ -294,7 +294,7 @@
          s% v(kk)=0d0
       end do
       s% L_center=L
-      if(ALFA.eq.0.d0) EFL0=0.d0          
+      if(ALFA==0.d0) EFL0=0.d0          
       s% rsp_period=s% RSP_default_PERIODLIN
       if (is_bad(s% rsp_period)) then
          write(*,1) 'rsp_period', s% rsp_period
@@ -302,7 +302,7 @@
       end if
       amix1 = s% RSP_fraction_1st_overtone
       amix2 = s% RSP_fraction_2nd_overtone
-      if((AMIX1+AMIX2).gt.1.d0) write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
+      if((AMIX1+AMIX2)>1.d0) write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
       if (.not. s% use_RSP_new_start_scheme) then      
          PERIODLIN=PERS(s% RSP_mode_for_setting_PERIODLIN+1)         
          s% rsp_period=PERIODLIN            
@@ -383,10 +383,10 @@
                R_1=pow(R_1**3-3.d0*V_0*dm_0/P4,1.d0/3.d0)
                N=N-1  
                if (s% RSP_trace_RSP_build_model) write(*,*) 'zone_loop', N, T_0, TIN
-               if (N.eq.0 .or. T_0 >= TIN) then
+               if (N==0 .or. T_0 >= TIN) then
                   if (s% RSP_trace_RSP_build_model) write(*,*) 'call next_H'
                   call next_H ! sets HH
-                  if (N.eq.0 .and. abs(T(1)-TIN).lt.TIN*TIN_tol) then
+                  if (N==0 .and. abs(T(1)-TIN)<TIN*TIN_tol) then
                      s% M_center = M_0 - dm_0
                      s% star_mass = s% RSP_mass
                      s% mstar = s% star_mass*SUNM
@@ -425,7 +425,7 @@
                if (s% RSP_trace_RSP_build_model) write(*,*) 'call get_V'
                call get_V(ierr)
                if (ierr /= 0) return
-               if((NZN-N+1.eq.NZT .or. T_0 >= TH0) &
+               if((NZN-N+1==NZT .or. T_0 >= TH0) &
                      .and. adjusting_dmN) then
                   if (s% RSP_trace_RSP_build_model) &
                      write(*,*) 'call next_dmN', dmN_cnt, NZN-N+1, T_0, TH0, abs(T_0-TH0), TH0_tol*TH0
@@ -437,7 +437,7 @@
                      !call mesa_error(__FILE__,__LINE__)
                   end if
                   call next_dmN
-                  if(NZN-N+1.eq.NZT.and.abs(T_0-TH0).lt.TH0_tol*TH0) then
+                  if(NZN-N+1==NZT.and.abs(T_0-TH0)<TH0_tol*TH0) then
                      adjusting_dmN = .false.
                      if (s% RSP_trace_RSP_build_model) &
                         write(*,*) '           outer dm/Msun', dmN/SUNM
@@ -452,7 +452,7 @@
          end do start_from_top_loop
          
          s% R_center=R_1; H0=H; dmN0=dmN     
-         if(N.ne.0) call change_NZN
+         if(N/=0) call change_NZN
       
       contains
       
@@ -525,9 +525,9 @@
          call EOP(s,N,T_0,P_0,V_0, &
                   E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)
          if (ierr /= 0) return
-         if(N.ne.NZN)then
+         if(N/=NZN)then
             call CFLUX(HP_0,IGR_0,Lc_0,w_0,GPF,N)
-            if(Lc_0.ge.L) then 
+            if(Lc_0>=L) then 
                write(*,*) 'trouble!',I
                stop
             endif
@@ -634,7 +634,7 @@
          T_1 = sqrt(sqrt(T4_1))
          E_1 = E_0
          !     RESET dm FOR THE INNNER ZONES
-         if(N.eq.NZN-1) then
+         if(N==NZN-1) then
             dm_0=dmN
          else if (T_1 > TH0) then
             if (in_outer_env) then
@@ -741,7 +741,7 @@
                T_0,P_0,V_0,E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)  
             if (ierr /= 0) return    
             call CFLUX(HP_0,IGR_0,Lc_0,w_0,GPF,N)
-            if(Lc_0.lt.L) exit Lc_loop1
+            if(Lc_0<L) exit Lc_loop1
             T_0=T_0-10.d0*(Lc_0/L) 
             if (T_0 <= 0) then
                ierr = -1
@@ -760,7 +760,7 @@
          I=0
          T1_loop: do ! adjust T to make Lr + Lc = L
             I=I+1
-            if(I.gt.10000) then
+            if(I>10000) then
                get_T = .false.
                if (s% RSP_testing) then
                   write(*,*) 'failed get_T', N, T_0
@@ -768,7 +768,7 @@
                end if
                return
             end if
-            do while (abs(D/T4_0).gt.0.5d0) 
+            do while (abs(D/T4_0)>0.5d0) 
                D=(T4_0/2.d0)*(D/abs(D))
             end do
             T4_0 = T4_0-D
@@ -778,7 +778,7 @@
                    T_0,P_0,V_0,E_0,CP_0,QQ_0,SVEL_0,OP_0,ierr)
                if (ierr /= 0) return
                call CFLUX(HP_0,IGR_0,Lc_0,w_0,GPF,N)
-               if (Lc_0.lt.L) exit Lc_loop
+               if (Lc_0<L) exit Lc_loop
                T_0=T_0-10.d0*(Lc_0/L)
                if (T_0 <= 0) then
                   ierr = -1
@@ -790,7 +790,7 @@
             Lr_0=TT*(T4_0/OP_0-T4_1/OP_1)/ &
                   (1.d0-dlog(OP_0/OP_1)/dlog(T4_0/T4_1))*L
             F2=(Lr_0+Lc_0)/L-1.d0  
-            if(ABS(F2).lt.PREC .or. F2.eq.F1) exit T1_loop
+            if(ABS(F2)<PREC .or. F2==F1) exit T1_loop
             D=F2*(T4_0-T4_0)/(F2-F1)
             F1=F2
             T4_0=T4_0
@@ -802,7 +802,7 @@
       
       subroutine failed
          write(*,*) 'NO CONVERGENCE IN STA INNER LOOP',I
-         if((.not.adjusting_dmN) .OR. dmN_cnt.gt.1 .or. IG > 54) then
+         if((.not.adjusting_dmN) .OR. dmN_cnt>1 .or. IG > 54) then
             write(*,*) 'zone ',N,'IGR= ',IGR_0 
             stop
          end if
@@ -949,7 +949,7 @@
       real(dp) :: AA,BB,CC,DELTA
       integer :: N
 !-
-      if(ALFA.eq.0.d0) then
+      if(ALFA==0.d0) then
          OMEGA_0=0.d0
          Lc_0=0.d0
          return
@@ -973,13 +973,13 @@
    
 
 !     BOTTOM BOUNDARY CONDITION FOR CONVECTION
-      if(N.le.IBOTOM)then 
+      if(N<=IBOTOM)then 
          Lc_0=0.d0
          OMEGA_0=0.d0
          return
       endif
-      if(IGR_0.gt.0.d0)then
-         if(.true. .or. GAMMAR.eq.0.d0)then   ! gammar breaks Cep 11.5M model  BP
+      if(IGR_0>0.d0)then
+         if(.true. .or. GAMMAR==0.d0)then   ! gammar breaks Cep 11.5M model  BP
            OMEGA_0=sqrt(ALFA/CEDE*FF*GPF* &
              (T_0*P_0*QQ_0/CP_0+T_1*P_1*QQ_1/CP_1)*0.5d0)
          else
@@ -991,7 +991,7 @@
             CC=-(T_0*P_0*QQ_0/CP_0 &
                      +T_1*P_1*QQ_1/CP_1)*0.5d0*FF*GPF
             DELTA=BB**2-4.d0*AA*CC
-            if(DELTA.le.0.d0) then
+            if(DELTA<=0.d0) then
                write(*,*) 'CFLUX: Error! : Y>0, but no solution found'
                stop
             endif

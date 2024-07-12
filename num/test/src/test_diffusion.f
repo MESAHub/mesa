@@ -30,7 +30,7 @@
          integer, intent(out) :: ierr
          
          real(dp) :: sig1, sig2
-         integer :: i, j
+         integer :: i
          ierr = 0
 
          f = 0; dfdy=0
@@ -89,7 +89,6 @@
          real(dp), intent(inout) :: f(:), dfdy(:,:)
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         real(dp) :: yprime(n)
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
@@ -182,7 +181,7 @@
          real(dp), target :: y_ary(n)
          real(dp), pointer :: y(:)
          real(dp) :: result(n_soln), soln(n_soln), h0, atol(1), rtol(1), t(0:ndisc+1)
-         integer :: i, j, k, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol
+         integer :: i, k, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol
          real(dp), target :: rpar_ary(lrpar) 
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)

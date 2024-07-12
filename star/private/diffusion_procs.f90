@@ -1346,10 +1346,10 @@
                if (dbg) stop
 
               dk = k - INT((kmax - (nzlo+1))/ ngp + (nzlo+1))
-              if (ABS(dk) .le. 15) then
+              if (ABS(dk) <= 15) then
                     j = -1
                     blend = blend_fac(dk)
-              else if (k .lt. INT((kmax - (nzlo+1))/ ngp + (nzlo+1))) then
+              else if (k < INT((kmax - (nzlo+1))/ ngp + (nzlo+1))) then
                     j = 1
                     blend = 0d0
               else

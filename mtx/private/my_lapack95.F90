@@ -66,7 +66,7 @@
 
 
       subroutine my_gemv_mv(m,n,a,x,b,z,y) ! y = y - a*x - b*z
-         integer lda,m,n
+         integer m, n
          real(fltp) :: a(:,:), b(:,:)
          real(fltp) :: x(:), z(:), y(:)
          real(fltp) :: tmp_x, tmp_z
@@ -118,7 +118,7 @@
 
 
       subroutine my_gemv_p_mv(m,n,a,x,b,z,y) ! y = y + a*x + b*z
-         integer lda,m,n
+         integer m, n
          real(fltp) :: a(:,:), b(:,:)
          real(fltp) :: x(:), z(:), y(:)
          real(fltp) :: tmp_x, tmp_z
@@ -723,7 +723,7 @@
                
       subroutine my_laswp_4_by_1( a, lda, ipiv )
          ! n == 1, k1 == 1, k2 == 4, incx == 1
-         integer :: incx, k1, lda
+         integer :: lda
          integer :: ipiv(:)
          real(fltp) :: a(:,:) ! a( lda, * )
          integer :: ip
@@ -758,7 +758,7 @@
                
       subroutine my_laswp_5_by_1( a, lda, ipiv )
          ! n == 1, k1 == 1, k2 == 5, incx == 1
-         integer :: incx, k1, lda
+         integer :: lda
          integer :: ipiv(:)
          real(fltp) :: a(:,:) ! a( lda, * )
          integer :: ip
@@ -972,8 +972,7 @@
          integer, pointer :: ipiv(:)
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: one=1, zero=0
-         real(fltp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i, j, k
          info = 0
          
          if (nrhs == 1) then
@@ -1025,7 +1024,6 @@
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: zero=0
          
-         integer :: j
          info = 0
       
          !call my_laswp(5, b, ldb, 1, 5, ipiv, 1 )
@@ -1332,8 +1330,7 @@
          integer, pointer :: ipiv(:)
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: one=1, zero=0
-         real(fltp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i, j, k
          info = 0
          call my_laswp_dbg(nrhs, b, ldb, 1, n, ipiv, 1 )
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )

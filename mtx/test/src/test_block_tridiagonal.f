@@ -84,11 +84,7 @@
           
          real(dp), pointer :: rpar_decsol(:) ! (lrd)
          integer, pointer :: ipar_decsol(:) ! (lid)
-         real(fltp) :: time_factor, time_solve, time_refine, time_dealloc, sum_times
-         real(fltp) :: sum_factor, setup, factor_As, &
-            factor_As_thm_fac_avg, factor_As_thm_slv_avg, &
-            factor_As_thm_fac_max, factor_As_thm_slv_max, &
-            setup_coupling, factor_coupling
+         real(fltp) :: time_factor, time_solve, time_refine, time_dealloc
 
          integer :: i, j, k, ierr, lid, lrd, nvar, nz, rep
          logical :: use_given_weights
@@ -221,8 +217,7 @@
             end interface
             
             integer :: iop, rep
-            real(fltp) :: avg_err, max_err, err, atol, rtol
-            integer :: i_max, j_max, i, j, k
+            integer :: j, k
          
             include 'formats'
                      
@@ -280,7 +275,7 @@
          
          subroutine read_testfile(fname)
             character (len=*), intent(in) :: fname
-            integer :: iounit, ierr, i, j, k, line
+            integer :: iounit, ierr
             !write(*,*) 'reading ' // trim(fname)
             iounit = 33; ierr = 0
             open(unit=iounit, file=trim(fname), status='old', action='read', iostat=ierr)
@@ -333,8 +328,8 @@
          
          
          subroutine check_x
-            real(fltp) :: max_err, err, atol, rtol, avg_err
-            integer :: i_max, j_max,i, j, rep        
+            real(fltp) :: max_err, atol, rtol, avg_err
+            integer :: i_max, j_max,i, j        
             include 'formats'
             atol = 1d-4
             rtol = 1d-4   

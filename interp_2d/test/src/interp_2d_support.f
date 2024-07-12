@@ -171,7 +171,7 @@
          
          integer :: ict(6) ! code specifying output desired
          real(dp) :: fval(6) ! results
-         integer :: nf2, ix, jy
+         integer :: nf2
          integer :: ier ! error code =0 ==> no error
          
          nf2 = num_xpts
@@ -212,7 +212,7 @@
          
          integer :: ict(6) ! code specifying output desired
          real :: fval(6) ! results
-         integer :: nf2, ix, jy
+         integer :: nf2
          integer :: ier ! error code =0 ==> no error
          
 

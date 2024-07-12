@@ -275,7 +275,7 @@ contains
   contains
 
     subroutine find_location ! set ix, jy; x is T9; y is lYeRho
-      integer i, j
+      integer :: i, j
       real(dp) :: del
       include 'formats'
       ! x0 <= T9 <= x1
@@ -302,7 +302,7 @@ contains
     end subroutine find_location
 
     subroutine setup_for_bicubic_interpolations
-      integer i, j
+      integer :: i, j
       real(dp) :: del
 
       include 'formats'

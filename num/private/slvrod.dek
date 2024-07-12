@@ -32,9 +32,9 @@ c
       real(dp), pointer :: e_1D(:) ! =(lde,nm1)
       
       ! LOCALS
-      integer :: i, j, mm, k, jkm, im1
+      integer :: i, j
       real(dp) :: sum
-      real(dp), pointer :: ptr(:), r1(:)
+      real(dp), pointer :: r1(:)
       real(dp), target, dimension(nvar*nz) :: x0_ary, b_ary, r_ary, Ax0_ary
       real(dp), pointer, dimension(:,:) :: ak2, x0, b, r, Ax0
       real(dp), pointer, dimension(:,:,:) :: uf_lblk, uf_dblk, uf_ublk

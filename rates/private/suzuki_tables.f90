@@ -98,14 +98,13 @@ contains
     real(dp), intent(out) :: Qneu, dQneu_dlnT, dQneu_dlnRho
     integer, intent(out) :: ierr
 
-    integer :: ix, jy          ! target cell in the spline data
-    real(dp) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(ix), x1 = xs(ix+1)
-    real(dp) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(jy), y1 = ys(jy+1)
+    integer :: ix, jy       ! target cell in the spline data
+    real(dp) :: x0, x1      ! x0 <= xget <= x1;  x0 = xs(ix), x1 = xs(ix+1)
+    real(dp) :: y0, y1      ! y0 <= yget <= y1;  y0 = ys(jy), y1 = ys(jy+1)
 
     real(dp) :: logT
 
     real(dp) :: delta_logT, dlogT, dlYeRho, delta_lYeRho, y_alfa, y_beta, x_alfa, x_beta
-    integer :: ilogT, ilYeRho
 
     real(dp) :: ldecay, d_ldecay_dlogT, d_ldecay_dlYeRho, &
          lcapture, d_lcapture_dlogT, d_lcapture_dlYeRho, &
@@ -233,8 +232,7 @@ contains
   contains
 
     subroutine find_location ! set ix, jy; x is logT; y is lYeRho
-      integer i, j
-      real(dp) :: del
+      integer :: i, j
       include 'formats'
       ! x0 <= logT <= x1
       ix = table % num_T-1 ! since weak_num_logT is small, just do a linear search
@@ -364,8 +362,6 @@ contains
      character(:), allocatable :: group_names(:)
      integer                   :: num_suzuki_reactions
      integer                   :: i
-
-     character(len=2*iso_name_length+1) :: key
 
      logical, parameter :: dbg = .false.
 

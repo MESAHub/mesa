@@ -52,7 +52,6 @@
                spL, spR, t, tmax, tmp, tmp1, tmp2
          real(dp), parameter :: tiny = 1d-20
          integer :: i
-         character (len=256) :: message
          real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 

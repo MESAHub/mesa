@@ -219,6 +219,7 @@ c ----------------------------------------------------------
 c         declarations 
 c ---------------------------------------------------------- 
       implicit real(dp) (a-h,o-z)
+      integer :: n, itol, lout, iout, idid, nmax, meth
 
       real(dp) k1(n),k2(n),k3(n),k4(n),k5(n),k6(n)
       dimension y(n),y1(n),ysti(n),atol(*),rtol(*)
@@ -535,7 +536,7 @@ c
       integer, intent(inout), target :: iwork(*)
       integer, intent(out) :: ierr
       
-      real(dp) :: xold, h, s, s1
+      real(dp) :: xold, h
       integer :: nd, i, j
       real(dp), pointer :: con(:)
       integer, pointer :: icomp(:)
