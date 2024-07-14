@@ -190,7 +190,7 @@
       limit_for_rel_error_in_energy_conservation = 1d-7
       hard_limit_for_rel_error_in_energy_conservation = 1d-6      
       
-      never_skip_hard_limits = .true
+      never_skip_hard_limits = .true.
       min_xa_hard_limit = -1d-5
       min_xa_hard_limit_for_highT = -3d-5
 
