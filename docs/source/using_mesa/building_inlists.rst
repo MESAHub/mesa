@@ -58,7 +58,7 @@ You can also use pre-defined chemical compositions based on published data. Thes
 By default, the initial composition in MESA is ``initial_zfracs = 3`` which corresponds to the `GS98 <https://link.springer.com/article/10.1023%2FA%3A1005161325181>`__ metal fraction. There are 8 possible predefined choices for this control in MESA.
 
 If you want for example to use the more recent available solar composition given in `AGSS09 <https://www.annualreviews.org/doi/pdf/10.1146/annurev.astro.46.060407.145222>`__ , you need to set ``initial_zfracs = 6``.
-Since it is very important to use the opacity tables which are built using the solar composition used, we also have to set the ``kappa_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
+Since it is very important to use the opacity tables which are built using the solar composition used, we also have to set the ``kap_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
 
 .. literalinclude:: inlist_example
    :start-after: ! Modifications to model
