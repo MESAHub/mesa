@@ -432,7 +432,7 @@ It provides an example of how to include your own physics code into a MESA run.
 :ref:`pisn`
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This test case evolves an initially 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
+This test case evolves an initially 200 |Msun| star from ZAMS until it undergoes a pair instability supernovae (PISN).
 
 
 :ref:`ppisn`
