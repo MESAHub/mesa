@@ -54,7 +54,7 @@
 
   ! file output
   Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
+  Grid1_file_dir = 'pgstar_out'
   Grid1_file_prefix = 'grid1'
   Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
   Grid1_file_width = -1 ! negative means use same value as for window
@@ -127,7 +127,7 @@
 
   ! file output
   Profile_Panels1_file_flag = .false.
-  Profile_Panels1_file_dir = 'png'
+  Profile_Panels1_file_dir = 'pgstar_out'
   Profile_Panels1_file_prefix = 'profile_panels1_'
   Profile_Panels1_file_interval = 5 ! output when mod(model_number,Profile_Panels1_file_interval)==0
   Profile_Panels1_file_width = -1 ! (inches) negative means use same value as for window
