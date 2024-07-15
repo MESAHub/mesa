@@ -29,14 +29,12 @@ function update_docs {
             filename=$(basename -- "$img")
             extension="${filename##*.}"
             filename="${filename%.*}"
-            echo "$filename"
-            echo "$extension"
         done
         for img in $(grep ".. image::" README.rst | cut -d' ' -f3); do
             filename=$(basename -- "$img")
             extension="${filename##*.}"
             filename="${filename%.*}"
-            image_to_copy="$extension/$filename.$extension"
+            image_to_copy="pgstar_out/$filename.$extension"
             if [ -e "$image_to_copy" ]; then
                 cp "$image_to_copy" docs/
                 echo "Updated image $filename.$extension in the docs"
