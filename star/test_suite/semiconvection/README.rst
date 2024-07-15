@@ -25,7 +25,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    all values are within tolerances
 
 
-Note that the choice made for the inital mixture (a09 in this test
+Note that the choice made for the initial mixture (a09 in this test
 case) and for the nuclear reaction network (here:
 pp_and_cno_extras.net) influence the growth of the convective
 core. The values used in this test case for the

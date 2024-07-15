@@ -18,7 +18,7 @@ This test case has two parts.
 The final model, click on the image for a larger version, shows
 
 .. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/grid1000219.png
-  :scale: 100%
+  :width: 100 %
 
 The left plot shows the HR diagram. The yellow curve is a precalculated 
 HR track loaded  from ``HR_OPAL.dat``, while the green curve is the model calculated.
@@ -28,7 +28,7 @@ as core hydrogen depletes.
 
 pgstar commands used for the plots above:
 
-.. literalinclude:: inlist_pgstar
+.. literalinclude:: ../../../star/test_suite/1.3M_ms_high_Z/inlist_pgstar
   :language: console
 
 Last-Updated: 15Jul2024 (MESA 42806c93) by pmocz
