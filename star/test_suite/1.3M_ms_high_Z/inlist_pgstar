@@ -1,9 +1,22 @@
 &pgstar
 
+  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
+  ! amount of control of the presentation of the information.
+
+  ! device
+  file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
+  file_device = 'png'          ! png
+  file_extension = 'png'       
+
+  !file_device = 'vcps'        ! postscript
+  !file_extension = 'ps'     
+
+  pgstar_interval = 10      
+
   Grid1_title = '1.3M_ms_high_Z'
   Grid1_win_flag = .false.
 
-  Grid1_win_width = 12
+  Grid1_win_width = 15
   Grid1_win_aspect_ratio = 0.4 ! aspect_ratio = height/width
 
   Grid1_xleft = 0.05 ! fraction of full window width for margin on left
@@ -46,8 +59,6 @@
   Grid1_file_interval = 1000000 ! output when mod(model_number,Grid1_file_interval)==0
   Grid1_file_width = -1 ! negative means use same value as for window
   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
-  ! MESA uses PGPLOT for live plotting and gives the user a tremendous
-  ! amount of control of the presentation of the information.
 
   ! show HR diagram
   ! this plots the history of L,Teff over many timesteps
