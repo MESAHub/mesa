@@ -17,7 +17,7 @@ This test case has two parts.
 
 The final model, click on the image for a larger version, shows
 
-.. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/grid1000219.png
+.. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/grid1000219.svg
   :width: 100%
 
 The left plot shows the HR diagram. The yellow curve is a precalculated 
@@ -26,9 +26,11 @@ The right plot shows a profile of the metal mass fraction. The curve rises above
 background metallicity as hydrogen burns to helium and goes below the background metallicity
 as core hydrogen depletes.
 
+
 pgstar commands used for the plots above:
 
 .. literalinclude:: ../../../star/test_suite/1.3M_ms_high_Z/inlist_pgstar
   :language: console
 
-Last-Updated: 15Jul2024 (MESA 6796e09f) by pmocz
+
+Last-Updated: 16Jul2024 (MESA 2b020681) by pmocz on C916PXT6XW

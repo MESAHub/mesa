@@ -35,11 +35,24 @@ function update_docs {
             extension="${filename##*.}"
             filename="${filename%.*}"
             image_to_copy="pgstar_out/$filename.$extension"
+            # if requested extension is .svg, it needs to be converted from .ps:
+            if [ "$extension" == "svg" ]; then
+                if [ ! -e "$image_to_copy" ]; then
+                    echo "Converting $filename.ps to $filename.svg"
+                    epstool --copy --bbox  pgstar_out/$filename.ps pgstar_out/_TMP_$filename.ps
+                    ps2pdf -dEPSCrop pgstar_out/_TMP_$filename.ps pgstar_out/_TMP_$filename.pdf
+                    inkscape --export-page=1 --export-type="svg" --export-extension=org.inkscape.output.scour_inkscape --export-filename=pgstar_out/$filename.svg pgstar_out/_TMP_$filename.pdf
+                    rm pgstar_out/_TMP_$filename.ps pgstar_out/_TMP_$filename.pdf
+                fi
+            fi
             if [ -e "$image_to_copy" ]; then
                 cp "$image_to_copy" docs/
                 echo "Updated image $filename.$extension in the docs"
                 # replace the line "Last-Updated: ..." in README.rst
-                sed -i "" "s/Last-Updated: .*/Last-Updated: $(date '+%d%b%Y') (MESA $(git rev-parse --short HEAD)) by $USER/" README.rst
+                LAST_UPDATED="Last-Updated: $(date '+%d%b%Y') (MESA $(git rev-parse --short HEAD)) by $USER on $(hostname)"
+                # print name of 
+                sed -i "" "/Last-Updated: .*/d" README.rst
+                echo $LAST_UPDATED >> README.rst
             else
                 echo "Error: $image_to_copy not found. Test may no longer be producing this file or may now be producing a different final snapshot number! Update test and README.rst accordingly."
             fi
