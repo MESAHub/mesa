@@ -2,6 +2,7 @@
   :align: center
   :width: 200
   :alt: MESA
+  :target: https://docs.mesastar.org/en/latest/
 
 ######################################################
 Modules for Experiments in Stellar Astrophysics (MESA)
