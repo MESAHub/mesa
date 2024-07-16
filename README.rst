@@ -2,24 +2,37 @@
 Modules for Experiments in Stellar Astrophysics (MESA)
 ######################################################
 
-.. image:: https://img.shields.io/github/license/MESAHub/mesa
-    :alt: GitHub
-    :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
+.. image:: https://img.shields.io/badge/repo_status-Active-brightgreen
+    :alt: RepoStatus
+    :target: https://www.repostatus.org/#active
+.. image:: https://img.shields.io/readthedocs/mesa-doc
+    :alt: ReadTheDocs
+    :target: https://docs.mesastar.org/en/latest/
 .. image:: https://img.shields.io/github/v/release/MESAHub/mesa
     :alt: GitHub release (latest by date)
     :target: https://github.com/MESAHub/mesa/releases/latest
-.. image:: https://img.shields.io/github/issues/MESAHub/mesa
-    :alt: GitHub issues
-    :target: https://github.com/MESAHub/mesa/issues
+.. image:: https://img.shields.io/badge/zenodo-community-blue
+    :alt: Zenodo
+    :target: https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10
+.. image:: https://img.shields.io/github/license/MESAHub/mesa
+    :alt: GitHub
+    :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
+.. image:: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml/badge.svg
+    :alt: BuildLinux
+    :target: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml
 
-**WARNING**: The default ``main`` branch is the development version of
-MESA and is not guaranteed to function correctly.  If you are using
-MESA, you should use an official release version.
+|
+
+   **WARNING**: ⚠️ The default ``main`` branch is the development version of
+   MESA and is not guaranteed to function correctly.  If you are using
+   MESA, you should use an official release version.
+
 
 Overview
 ========
 
-MESA is built to allow users to run experiments in stellar evolution. 
+MESA is a powerful and versatile open-source software suite built to 
+allow users to run experiments in stellar evolution.
 Stellar evolution calculations (i.e., stellar evolution tracks and
 detailed information about the evolution of internal and global
 properties) are a basic tool that enable a broad range of research in
@@ -39,7 +52,6 @@ of research frontiers with evolving understanding and insights, quite
 often profound. However, much remains to be gained scientifically (and
 pedagogically) by accurate one-dimensional calculations, and this is
 the focus of MESA.
-
 
 
 Documentation
