@@ -4,6 +4,8 @@
 high_mass
 *********
 
+.. tags:: star, high-mass
+
 This test case checks the evolution of a 300 |Msun|, Z = 1e-4 metallicity, model through core hydrogen depletion.
 
 This test case has 1 part. Click to see a larger version of a plot.

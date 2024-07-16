@@ -13,7 +13,7 @@ This test case has 2 part2. Click to see a larger view of a plot.
 * Part 2 (``inlist_diffusion_smoothness``) activates element diffusion and continues the evolution for 3e9 years. The ``run-star_extras.f90`` then checks that the Brunt profile is sufficiently smooth in the central portion of the model.
 
 .. image:: ../../../star/test_suite/diffusion_smoothness/docs/brunt_000036.svg
-   :scale: 100%
+   :width: 100%
 
 pgstar commands used for the plot:
 

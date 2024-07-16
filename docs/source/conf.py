@@ -34,6 +34,8 @@ extensions = [
     'sphinx.ext.extlinks',
     'defaults2rst',
     'sphinx_copybutton',
+    'sphinx_design',
+    'sphinx_tags',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,6 +53,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+#html_theme = 'sphinx_book_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,6 +75,34 @@ html_theme_options = {
     'includehidden': True,
     'titles_only': False,
     'logo_only': True
+}
+
+# sphinx_book_theme options
+#html_theme_options = {
+#    'collapse_navigation': True,
+#    'navigation_depth': 4,
+#    'repository_url': "https://github.com/MESAHub/mesa",
+#    'use_repository_button': True,
+#    'icon_links': [
+#        {
+#            "name": "GitHub",
+#            "url": "https://github.com/MESAHub/mesa",
+#            "icon": "fa-brands fa-github",
+#        },
+#    ],
+#}
+
+# sphinx_tags options
+tags_create_tags = True
+tags_overview_title = "Test Problem tags"
+tags_page_title = "Tags"
+tags_page_header = "Test problems with this tag"
+tags_create_badges = True
+tags_badge_colors = {
+    "star": "primary",
+    "binary": "primary",
+    "high-mass": "secondary",
+    "low-mass": "secondary",
 }
 
 # Set master doc
