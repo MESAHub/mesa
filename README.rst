@@ -1,3 +1,8 @@
+.. image:: docs/source/mesa-logo-200.png
+  :align: center
+  :width: 200
+  :alt: MESA
+
 ######################################################
 Modules for Experiments in Stellar Astrophysics (MESA)
 ######################################################
