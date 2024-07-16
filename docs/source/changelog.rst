@@ -251,7 +251,7 @@ shmesa
 ~~~~~~
 
 We have introduced a new set of command line utilities for interacting with MESA. 
-See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__. 
 
 These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
 ``run_star_extras.f90`` template (``shmesa extras``). 
@@ -2576,7 +2576,7 @@ ionization routine. This was due to a typo in the original paper that
 presented the ionization scheme. Restored the missing factor of
 rho^1/3 thanks to a later presentation of this same scheme (Dupuis et
 al. 1992) and a note `here
-<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`_.
+<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`__.
 
 Added a user control (``D_mix_ignore_diffusion``) for when to ignore
 element diffusion in surface or core mixing regions. Previously,
@@ -2590,7 +2590,7 @@ turn it off, but weaker mixing won't.
 Gravity Darkening (Aaron)
 -------------------------
 
-Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`_ for more info.
+Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`__ for more info.
 
 ::
 
