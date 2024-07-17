@@ -33,7 +33,7 @@
    trace_history_value_name(2) = 'log_rel_run_E_err'
 
    ! limit max_model_number as part of test_suite
-   max_model_number = 1550  
+   max_model_number = 1550
    use_gold2_tolerances = .true.
 
    initial_mass = 300
@@ -67,4 +67,3 @@
    write_header_frequency = 100
 
 / ! end of controls namelist
-
