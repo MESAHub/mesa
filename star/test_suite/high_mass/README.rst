@@ -25,4 +25,4 @@ pgstar commands used for the plots above:
   :language: console
 
 
-Last-Updated: 17Jul2024 (MESA 0cc374fa) by pmocz on C916PXT6XW in 67 seconds using 8 threads.
+Last-Updated: 17Jul2024 (MESA beef2c3b) by pmocz on C916PXT6XW in 67 seconds using 8 threads.

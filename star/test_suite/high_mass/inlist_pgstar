@@ -1,16 +1,20 @@
 &pgstar
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-  !file_device = 'png'            ! png
+  !file_device = 'png'          ! png
   !file_extension = 'png'
   file_device = 'vcps'          ! postscript
   file_extension = 'ps'
 
   pgstar_interval = 10
 
-  HR_win_flag = .false.
+  HR_win_flag = .false.  ! set to .true. for on-the-fly plotting
+  HR_file_flag = .true.
+  HR_file_dir = 'pgstar_out'
+  HR_file_prefix = 'hr'
+
   HR_win_width = 12
-  HR_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
+  HR_win_aspect_ratio = 1.0d0 ! aspect_ratio = height/width
   HR_title = 'inlist_high_mass'
 
   HR_logT_min = 4.5
@@ -18,16 +22,17 @@
   HR_logL_min = 6.6
   HR_logL_max = 7.2
 
-  HR_file_flag = .true.
-  HR_file_dir = 'pgstar_out'
-  HR_file_prefix = 'hr'
   HR_file_interval = 100 ! output when mod(model_number,HR_file_interval)==0
-  HR_file_width = 15 ! negative means use same value as for window
+  HR_file_width = -1 ! negative means use same value as for window
   HR_file_aspect_ratio = -1 ! negative means use same value as for window
 
-  Abundance_win_flag = .false.
+  Abundance_win_flag = .false. ! set to .true. for on-the-fly plotting
+  Abundance_file_flag = .true.
+  Abundance_file_dir = 'pgstar_out'
+  Abundance_file_prefix = 'abund_'
+
   Abundance_win_width = 12
-  Abundance_win_aspect_ratio = 1.2
+  Abundance_win_aspect_ratio = 1.0d0
   Abundance_title = 'inlist_high_mass'
 
   Abundance_num_isos_to_show = 7
@@ -52,9 +57,6 @@
   Abundance_log_mass_frac_min = -6.0
   Abundance_log_mass_frac_max =  0.3
 
-  Abundance_file_flag = .true.
-  Abundance_file_dir = 'pgstar_out'
-  Abundance_file_prefix = 'abund_'
   Abundance_file_interval = 100 ! output when mod(model_number,HR_file_interval)==0
   Abundance_file_width = -1        ! (inches) negative means use same value as for window
   Abundance_file_aspect_ratio = -1 ! negative means use same value as for window

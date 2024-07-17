@@ -10,4 +10,4 @@ Test Problem tags
     :maxdepth: 1
 
     high-mass (1) <high-mass.rst>
-    star (2) <star.rst>
+    star (3) <star.rst>
