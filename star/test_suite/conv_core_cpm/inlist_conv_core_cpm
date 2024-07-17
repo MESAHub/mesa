@@ -99,8 +99,11 @@
 ! grid1 plot of all 5 panels, see below sections setting up each panel
 
 ! file output
+   file_white_on_black_flag = .true.
+   file_device = 'vcps'
+   file_extension = 'ps'
    Grid1_file_flag = .true.
-   Grid1_file_dir = 'png'
+   Grid1_file_dir = 'pgstar_out'
    Grid1_file_prefix = 'grid_'
    Grid1_file_interval = 100000 ! we're just saving the last png for the test suite
    Grid1_file_width = 16

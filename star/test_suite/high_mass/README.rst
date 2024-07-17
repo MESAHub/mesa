@@ -22,7 +22,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 pgstar commands used for the plots above:
 
 .. literalinclude:: ../../../star/test_suite/high_mass/inlist_pgstar
-  :language: console
+   :language: console
 
 
 Last-Updated: 17Jul2024 (MESA beef2c3b) by pmocz on C916PXT6XW in 67 seconds using 8 threads.
