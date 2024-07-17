@@ -35,15 +35,44 @@ function update_docs {
             filename=$(basename -- "$img")
             extension="${filename##*.}"
             filename="${filename%.*}"
-            image_to_copy="pgstar_out/$filename.$extension"
+            img_dir="pgstar_out"
+            # find the right img directory out of "pgstar_out", "pgstar_out1", "pgstar_out2", "pgstar_out3", "png", "png1", "png2", "png3"
+            if [ \( -e "pgstar_out/$filename.$extension" \) -o \( -e "pgstar_out/$filename.ps" \) ]; then
+                img_dir="pgstar_out"
+            elif [ \( -e "pgstar_out1/$filename.$extension" \) -o \( -e "pgstar_out1/$filename.ps" \) ]; then
+                img_dir="pgstar_out1"
+            elif [ \( -e "pgstar_out2/$filename.$extension" \) -o \( -e "pgstar_out2/$filename.ps" \) ]; then
+                img_dir="pgstar_out2"
+            elif [ \( -e "pgstar_out3/$filename.$extension" \) -o \( -e "pgstar_out3/$filename.ps" \) ]; then
+                img_dir="pgstar_out3"
+            elif [ -e "png/$filename.$extension" ]; then
+                img_dir="png"
+            elif [ -e "png1/$filename.$extension" ]; then
+                img_dir="png1"
+            elif [ -e "png2/$filename.$extension" ]; then
+                img_dir="png2"
+            elif [ -e "png3/$filename.$extension" ]; then
+                img_dir="png3"
+            fi
+            image_to_copy="$img_dir/$filename.$extension"
             # if requested extension is .svg, it needs to be converted from .ps:
             if [ "$extension" == "svg" ]; then
-                if [ ! -e "$image_to_copy" ]; then
+                if [ -e $img_dir/$filename.ps ]; then
                     echo "Converting $filename.ps to $filename.svg"
-                    epstool --copy --bbox  pgstar_out/$filename.ps pgstar_out/_TMP_$filename.ps
-                    ps2pdf -dEPSCrop pgstar_out/_TMP_$filename.ps pgstar_out/_TMP_$filename.pdf
-                    inkscape --export-page=1 --export-type="svg" --export-extension=org.inkscape.output.scour_inkscape --export-filename=pgstar_out/$filename.svg pgstar_out/_TMP_$filename.pdf
-                    rm pgstar_out/_TMP_$filename.ps pgstar_out/_TMP_$filename.pdf
+                    if [ ! command -v epstool &> /dev/null]; then
+                        echo "Error: 'epstool' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                    elif [ ! command -v ps2pdf &> /dev/null]; then
+                        echo "Error: 'ps2pdf' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                    elif [ ! command -v inkscape &> /dev/null]; then
+                        echo "Error: 'inkscape' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                    elif [ ! command -v svgo &> /dev/null]; then
+                        echo "Error: 'svgo' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                    fi
+                    epstool --copy --bbox  $img_dir/$filename.ps $img_dir/_TMP_$filename.ps
+                    ps2pdf -dEPSCrop $img_dir/_TMP_$filename.ps $img_dir/_TMP_$filename.pdf
+                    inkscape --export-page=1 --export-type="svg" --export-extension=org.inkscape.output.scour_inkscape --export-filename=$img_dir/_TMP_$filename.svg $img_dir/_TMP_$filename.pdf
+                    svgo $img_dir/_TMP_$filename.svg -o $img_dir/$filename.svg
+                    rm $img_dir/_TMP_$filename.ps $img_dir/_TMP_$filename.pdf $img_dir/_TMP_$filename.svg
                 fi
             fi
             if [ -e "$image_to_copy" ]; then
