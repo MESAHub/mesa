@@ -29,13 +29,13 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 
 |
 
-   **WARNING**: ⚠️ The default ``main`` branch is the development version of
+   **WARNING**: The default ``main`` branch is the development version of
    MESA and is not guaranteed to function correctly.  If you are using
    MESA, you should use an official release version.
 
 
-⭐ Overview
-==========
+Overview
+========
 
 MESA is a powerful and versatile open-source software suite built to 
 allow users to run experiments in stellar evolution.
@@ -60,8 +60,8 @@ pedagogically) by accurate one-dimensional calculations, and this is
 the focus of MESA.
 
 
-🔗 Links
-=======
+Links
+=====
 
 * `Code repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
