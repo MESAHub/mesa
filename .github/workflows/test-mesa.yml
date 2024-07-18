@@ -27,26 +27,23 @@ jobs:
       - name: Install mesa_test
         run: |
           cd $GITHUB_WORKSPACE/mesa_test
-          ls -la
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
           pwd
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          echo "MESA_DIR=$MESA_DIR"
-          ls -la
+          ls -la ..
         shell: bash
 
       - name: Create config file
         run: |
-          MESA_TEST_YML=$MESA_DIR/.mesa_test/config.yml
+          MESA_TEST_YML=$GITHUB_WORKSPACE/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
           echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
           echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
           echo "password: ${{ secrets.MESA_TEST_PASSWORD }}" >> $MESA_TEST_YML
           echo "logs_token: ${{ secrets.MESA_TEST_LOGS_TOKEN }}" >> $MESA_TEST_YML
           echo "github_protocol: :ssh" >> $MESA_TEST_YML
-          echo "mesa_mirror: $MESA_DIR/mirror" >> $MESA_TEST_YML
-          echo "mesa_work: $MESA_DIR" >> $MESA_TEST_YML
+          echo "mesa_mirror: $GITHUB_WORKSPACE/mirror" >> $MESA_TEST_YML
+          echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
           mesa_test install --no-checkout
