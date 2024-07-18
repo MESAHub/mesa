@@ -17,6 +17,7 @@ jobs:
         uses: ./.github/actions/install-mesa
         with:
           sdk: "23.7.3"
+          do_install: "false" # Skip install
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
@@ -26,6 +27,7 @@ jobs:
 
       - name: Install mesa_test and create config file
         run: |
+          # Setup mesa_test
           cd $GITHUB_WORKSPACE/mesa_test
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
@@ -50,15 +52,16 @@ jobs:
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
           echo "XXX"
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           mesa_test install --no-checkout
           echo "XXXXX"
           mesa_test submit --empty
         shell: bash
 
-      #- name: Test Problem 13
-      #  run: |
-      #    mesa_test test 13
-      #  shell: bash
+      - name: Test Problem 13
+        run: |
+          mesa_test test 13
+        shell: bash
 
       #- name: Test Problem 15
       #  run: |

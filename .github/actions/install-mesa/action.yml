@@ -7,6 +7,10 @@ inputs:
     description: 'The version of the MESA SDK to install'
     required: false
     default: '23.7.3'
+  do_install:
+    description: 'Perform the final MESA installation after setting up SDK and environment'
+    required: false
+    default: 'true'
 
 runs:
 
@@ -106,8 +110,10 @@ runs:
         # Turn off caching during build to save more space
         sed -i 's/use_cache_for_eos = .true./use_cache_for_eos = .false./g' $MESA_DIR/eos/public/eos_def.f90
         sed -i 's/use_cache = .true./use_cache = .false./g' $MESA_DIR/star/private/star_private_def.f90
-        # ./install
-        # if [ ! -f lib/libbinary.a ]; then
-        #   exit 1
-        # fi
+        if [${{inputs.do_install}} = "true"]; then
+          ./install
+          if [ ! -f lib/libbinary.a ]; then
+            exit 1
+          fi
+        fi
       shell: bash
