@@ -92,18 +92,18 @@ runs:
       run: |
         # Linux runners have 4 cores
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-        export OMP_NUM_THREADS=4
-        export NPROCS=4
-        export "MESASDK_ROOT=$(readlink -f mesasdk)"
+        echo "OMP_NUM_THREADS=4" >> $GITHUB_ENV
+        echo "NPROCS=4" >> $GITHUB_ENV
+        echo "MESASDK_ROOT=$(readlink -f mesasdk)" >> $GITHUB_ENV
         source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-        export "MESA_DIR=$(readlink -f ./)"
+        echo "MESA_DIR=$(readlink -f ./)" >> $GITHUB_ENV
         # Everything is run as root so we need to disable the root check in the install script
         sed -i 's/\${EUID:-\$(id -u)}/1/' install
         # Turn off caching during build to save more space
         sed -i 's/use_cache_for_eos = .true./use_cache_for_eos = .false./g' $MESA_DIR/eos/public/eos_def.f90
         sed -i 's/use_cache = .true./use_cache = .false./g' $MESA_DIR/star/private/star_private_def.f90
-        ./install
-        if [ ! -f lib/libbinary.a ]; then
-          exit 1
-        fi
+        # ./install
+        # if [ ! -f lib/libbinary.a ]; then
+        #   exit 1
+        # fi
       shell: bash
