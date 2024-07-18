@@ -29,8 +29,10 @@ jobs:
           cd $GITHUB_WORKSPACE/mesa_test
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
-          mkdir .mesa_test
+          echo $GITHUB_WORKSPACE
           pwd
+          echo "XXX"
+          ls -la ../ii
           echo "XXX"
           ls -la ..
           echo "XXX"
@@ -42,7 +44,7 @@ jobs:
 
       - name: Create config file
         run: |
-          MESA_TEST_YML=$GITHUB_WORKSPACE/.mesa_test/config.yml
+          MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
           echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
           echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
