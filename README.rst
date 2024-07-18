@@ -67,6 +67,7 @@ Links
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
 * `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA. 
 * `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
+* `MESA Users Mailing List <https://lists.mesastar.org/mailman/listinfo/mesa-users>`__ for info about new releases, news items, and requests for help/bug reports.
 * `MESA Test Hub <https://testhub.mesastar.org/>`__ to view results of regression testing (for Developers).
 * `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub (for Developers).
 
