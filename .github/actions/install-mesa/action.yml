@@ -1,6 +1,6 @@
 name : 'install-mesa'
 
-description: 'Download and install the MESA SDK and MESA'
+description: 'Download and install the MESA SDK and install MESA'
 
 inputs:
   sdk:
@@ -29,15 +29,12 @@ runs:
         sudo apt-get autoremove -y # 771 MB
         sudo apt-get clean
 
-    - name: Checkout
-      uses: actions/checkout@v3.0.0
-
     - name: Create LFS file list
       run: |
         git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
     - name: Restore LFS cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: lfs-cache
       with:
         path: .git/lfs
@@ -57,7 +54,7 @@ runs:
         sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
       shell: bash
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: cache
       with:
         path: |
@@ -84,7 +81,7 @@ runs:
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
       run: |
-          tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
+        tar xvf mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
       shell: bash
 
     - name: Compile
