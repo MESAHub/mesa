@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install MESA on ${{ runner.os }} with SDK ${{matrix.sdk}}
         uses: ./.github/actions/install-mesa
         with:
