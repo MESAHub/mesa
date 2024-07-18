@@ -28,4 +28,40 @@ jobs:
         run: |
           gem install mesa_test
         shell: bash
+
+      - name: Create config file
+        run: |
+          MESA_TEST_YML=$MESA_DIR/.mesa_test/config.yml
+          echo "---" > $MESA_TEST_YML
+          echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
+          echo "email: XXX" >> $MESA_TEST_YML
+          echo "password: XXX" >> $MESA_TEST_YML
+          echo "logs_token: XXX" >> $MESA_TEST_YML
+          echo "github_protocol: :ssh" >> $MESA_TEST_YML
+          echo "mesa_mirror: $MESA_DIR/mirror" >> $MESA_TEST_YML
+          echo "mesa_work: $MESA_DIR" >> $MESA_TEST_YML
+          echo "platform: Linux" >> $MESA_TEST_YML
+          echo "platform_version: Ubuntu" >> $MESA_TEST_YML
+          mesa_test install --no-checkout
+          mesa_test submit --empty
+        shell: bash
+
+      - name: Test Problem 13
+        run: |
+          mesa_test test 13
+        shell: bash
+
+      - name: Test Problem 15
+        run: |
+          mesa_test test 15
+        shell: bash
         
+      - name: Test Problem 29
+        run: |
+          mesa_test test 29
+        shell: bash
+
+      - name: Test Problem 41
+        run: |
+          mesa_test test 41
+        shell: bash
