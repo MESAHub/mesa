@@ -101,6 +101,7 @@ runs:
         export "MESASDK_ROOT=$(readlink -f mesasdk)"
         source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
         export "MESA_DIR=$(readlink -f ./)"
+        # Save environment variables to Github environment
         echo "OMP_NUM_THREADS=${OMP_NUM_THREADS}" >> $GITHUB_ENV
         echo "NPROCS=${NPROCS}" >> $GITHUB_ENV
         echo "MESASDK_ROOT=${MESASDK_ROOT}" >> $GITHUB_ENV
