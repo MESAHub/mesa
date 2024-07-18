@@ -29,8 +29,15 @@ jobs:
           cd $GITHUB_WORKSPACE/mesa_test
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
+          mkdir .mesa_test
           pwd
+          echo "XXX"
           ls -la ..
+          echo "XXX"
+          ls -la
+          echo "XXX"
+          ls -la mesa_test
+          echo "XXX"
         shell: bash
 
       - name: Create config file
