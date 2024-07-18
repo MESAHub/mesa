@@ -28,10 +28,12 @@ runs:
         # sudo apt-get remove -y azure-cli google-cloud-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
         sudo apt-get autoremove -y # 771 MB
         sudo apt-get clean
+      shell: bash
 
     - name: Create LFS file list
       run: |
         git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      shell: bash
 
     - name: Restore LFS cache
       uses: actions/cache@v4
@@ -42,10 +44,12 @@ runs:
 
     - name: Git LFS Pull
       run: git lfs pull
+      shell: bash
       if: steps.lfs-cache.outputs.cache-hit != 'true'
 
     - name: Git LFS Checkout
       run: git lfs checkout
+      shell: bash
       if: steps.lfs-cache.outputs.cache-hit == 'true'
 
     - name: Install dependencies Linux
@@ -85,7 +89,6 @@ runs:
       shell: bash
 
     - name: Compile
-      shell: bash
       run: |
         # Linux runners have 4 cores
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
@@ -103,3 +106,4 @@ runs:
         if [ ! -f lib/libbinary.a ]; then
           exit 1
         fi
+      shell: bash
