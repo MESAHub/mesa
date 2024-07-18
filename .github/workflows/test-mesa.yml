@@ -19,14 +19,15 @@ jobs:
           sdk: "23.7.3"
 
       - name: Checkout mesa_test
-        uses: actions/checkout@v4
-        with:
-          repository: 'MESAHub/mesa_test'
-          ref: 'main'
+        run: |
+          git clone git@github.com:MESAHub/mesa_test.git
+        shell: bash
 
       - name: Install mesa_test
         run: |
+          cd mesa_test/
           gem install mesa_test
+          cd ../
         shell: bash
 
       - name: Create config file
