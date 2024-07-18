@@ -33,6 +33,10 @@ jobs:
 
       - name: Create config file
         run: |
+          export OMP_NUM_THREADS=${{env.OMP_NUM_THREADS}}
+          export NPROCS=${{env.NPROCS}}
+          export MESASDK_ROOT=${{env.MESASDK_ROOT}}
+          export MESA_DIR=${{env.MESA_DIR}}
           mkdir /home/runner/.mesa_test
           MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
@@ -45,7 +49,9 @@ jobs:
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
+          echo "XXX"
           mesa_test install --no-checkout
+          echo "XXXXX"
           mesa_test submit --empty
         shell: bash
 
