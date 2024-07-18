@@ -27,7 +27,8 @@ jobs:
       - name: Install mesa_test
         run: |
           cd $GITHUB_WORKSPACE/mesa_test
-          gem install mesa_test
+          ls -la
+          sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
           pwd
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
