@@ -1,0 +1,31 @@
+name: Test Mesa
+
+on: [pull_request, release]
+
+jobs:
+  test_mesa:
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
+        uses: ./.github/actions/install-mesa
+        with:
+          sdk: "23.7.3"
+
+      - name: Checkout mesa_test
+        uses: actions/checkout@v4
+        with:
+          repository: 'mesa/mesa_test'
+          ref: 'main'
+
+      - name: Install mesa_test
+        run: |
+          gem install mesa_test
+        shell: bash
+        
