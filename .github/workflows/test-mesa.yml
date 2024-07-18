@@ -32,7 +32,7 @@ jobs:
           echo $GITHUB_WORKSPACE
           pwd
           echo "XXX"
-          ls -la ../ii
+          ls -la ../..
           echo "XXX"
           ls -la ..
           echo "XXX"
