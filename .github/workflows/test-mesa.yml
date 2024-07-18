@@ -33,9 +33,8 @@ jobs:
 
       - name: Create config file
         run: |
-          echo ${{ runner.home }}
-          mkdir ${{ runner.home }}/.mesa_test
-          MESA_TEST_YML={{ runner.home }}/.mesa_test/config.yml
+          mkdir /home/runner/.mesa_test
+          MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
           echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
           echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
