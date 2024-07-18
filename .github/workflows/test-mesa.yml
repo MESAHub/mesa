@@ -30,7 +30,9 @@ jobs:
           gem install mesa_test
           cd $GITHUB_WORKSPACE
           pwd
-          ls -l
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "MESA_DIR=$MESA_DIR"
+          ls -la
         shell: bash
 
       - name: Create config file
@@ -46,8 +48,8 @@ jobs:
           echo "mesa_work: $MESA_DIR" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
-          # mesa_test install --no-checkout
-          # mesa_test submit --empty
+          mesa_test install --no-checkout
+          mesa_test submit --empty
         shell: bash
 
       #- name: Test Problem 13
