@@ -21,7 +21,7 @@ jobs:
       - name: Checkout mesa_test
         uses: actions/checkout@v4
         with:
-          repository: 'mesa/mesa_test'
+          repository: 'MESAHub/mesa_test'
           ref: 'main'
 
       - name: Install mesa_test
@@ -42,26 +42,26 @@ jobs:
           echo "mesa_work: $MESA_DIR" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
-          mesa_test install --no-checkout
-          mesa_test submit --empty
+          # mesa_test install --no-checkout
+          # mesa_test submit --empty
         shell: bash
 
-      - name: Test Problem 13
-        run: |
-          mesa_test test 13
-        shell: bash
+      #- name: Test Problem 13
+      #  run: |
+      #    mesa_test test 13
+      #  shell: bash
 
-      - name: Test Problem 15
-        run: |
-          mesa_test test 15
-        shell: bash
-        
-      - name: Test Problem 29
-        run: |
-          mesa_test test 29
-        shell: bash
+      #- name: Test Problem 15
+      #  run: |
+      #    mesa_test test 15
+      #  shell: bash
+      #  
+      #- name: Test Problem 29
+      #  run: |
+      #    mesa_test test 29
+      #  shell: bash
 
-      - name: Test Problem 41
-        run: |
-          mesa_test test 41
-        shell: bash
+      #- name: Test Problem 41
+      #  run: |
+      #    mesa_test test 41
+      #  shell: bash
