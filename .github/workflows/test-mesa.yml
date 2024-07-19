@@ -18,7 +18,7 @@ jobs:
         uses: ./.github/actions/install-mesa
         with:
           sdk: "23.7.3"
-      # XXX    do_install: "false" # Skip install because mesa_test will do this
+          do_install: "false" # Skip install because mesa_test will do this XXX remove
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
@@ -35,14 +35,6 @@ jobs:
         shell: bash
 
       - name: Create mesa_test config file
-        env:
-          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
-          NPROCS: ${{env.NPROCS}}
-          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
-          MESA_DIR: ${{env.MESA_DIR}}
-          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
-          MESA_TEST_PASSWORD: ${{ secrets.MESA_TEST_PASSWORD }}
-          MESA_TEST_LOGS_TOKEN: ${{ secrets.MESA_TEST_LOGS_TOKEN }}
         run: |
           MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
@@ -55,13 +47,13 @@ jobs:
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
-          echo "XXX"
-          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          echo $MESA_TEST_EMAIL | sed 's/./& /g'
-          echo ${{ secrets.MESA_TEST_EMAIL }} | sed 's/./& /g'
-          # XXXmesa_test install --no-checkout
           mesa_test submit --empty
-          mesa_test test 29
+          echo "XXX"
+          # source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          # echo $MESA_TEST_EMAIL | sed 's/./& /g'
+          # echo ${{ secrets.MESA_TEST_EMAIL }} | sed 's/./& /g'
+          # XXXmesa_test install --no-checkout
+          #mesa_test test 29
         shell: bash
 
       - name: Test Problem 13
