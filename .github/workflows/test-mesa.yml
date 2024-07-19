@@ -26,41 +26,52 @@ jobs:
           repository: MESAHub/mesa_test
           path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
 
-      - name: Install mesa_test and create config file
-        env:
-          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
-          MESA_TEST_PASSWORD: ${{ secrets.MESA_TEST_PASSWORD }}
-          MESA_TEST_LOGS_TOKEN: ${{ secrets.MESA_TEST_LOGS_TOKEN }}
-        run: |
+      - name: Install mesa_test
           # Setup mesa_test
           cd $GITHUB_WORKSPACE/mesa_test
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
-          export OMP_NUM_THREADS=${{env.OMP_NUM_THREADS}}
-          export NPROCS=${{env.NPROCS}}
-          export MESASDK_ROOT=${{env.MESASDK_ROOT}}
-          export MESA_DIR=${{env.MESA_DIR}}
           mkdir /home/runner/.mesa_test
+        shell: bash
+
+      - name: Create mesa_test config file
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
+          MESA_TEST_PASSWORD: ${{ secrets.MESA_TEST_PASSWORD }}
+          MESA_TEST_LOGS_TOKEN: ${{ secrets.MESA_TEST_LOGS_TOKEN }}
+        run: |
           MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
           echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
-          echo "email: $MESA_TEST_EMAIL" >> $MESA_TEST_YML
-          echo "password: $MESA_TEST_PASSWORD" >> $MESA_TEST_YML
-          echo "logs_token: $MESA_TEST_LOGS_TOKEN" >> $MESA_TEST_YML
+          echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
+          echo "password: ${{ secrets.MESA_TEST_PASSWORD }}" >> $MESA_TEST_YML
+          echo "logs_token: ${{ secrets.MESA_TEST_LOGS_TOKEN }}" >> $MESA_TEST_YML
           echo "github_protocol: :ssh" >> $MESA_TEST_YML
           echo "mesa_mirror: $GITHUB_WORKSPACE/mirror" >> $MESA_TEST_YML
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
+          echo "XXX"
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           echo $MESA_TEST_EMAIL | sed 's/./& /g'
+          echo ${{ secrets.MESA_TEST_EMAIL }} | sed 's/./& /g'
           # XXXmesa_test install --no-checkout
           mesa_test submit --empty
-          mesa_test test 15
+          mesa_test test 29
         shell: bash
 
       - name: Test Problem 13
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
         run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           mesa_test test 13
         shell: bash
 
