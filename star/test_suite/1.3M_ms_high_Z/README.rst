@@ -4,8 +4,6 @@
 1.3M_ms_high_Z
 **************
 
-.. tags:: star
-
 The test checks the evolution of metal-rich low-mass stars by evolving 
 a 1.3 |Msun|, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 

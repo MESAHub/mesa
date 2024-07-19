@@ -4,8 +4,6 @@
 1.5M_with_diffusion
 *******************
 
-.. tags:: star
-
 The test checks the functionality of element diffusion. 
 The test vehicle is a 1.5 |Msun| solar metallicity model.
 
