@@ -27,7 +27,7 @@ jobs:
           path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
 
       - name: Install mesa_test
-          # Setup mesa_test
+        run: |
           cd $GITHUB_WORKSPACE/mesa_test
           sudo gem install mesa_test
           cd $GITHUB_WORKSPACE
