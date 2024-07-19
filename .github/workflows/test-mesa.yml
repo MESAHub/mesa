@@ -18,14 +18,10 @@ jobs:
 
       - name: Print git hash
         run: |
-          pwd
           cd $GITHUB_WORKSPACE
           pwd
-          echo $GITHUB_SHA
-          git status
           git branch
           git log --pretty=format:'%h' -n 1
-          ls -la
         shell: bash
 
       - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
@@ -33,23 +29,11 @@ jobs:
         with:
           sdk: "23.7.3"
 
-      - name: Print git hash
-        run: |
-          cd $GITHUB_WORKSPACE
-          git log --pretty=format:'%h' -n 1
-        shell: bash
-
       - name: Checkout mesa_test
         uses: actions/checkout@v4
         with:
           repository: MESAHub/mesa_test
           path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
-
-      - name: Print git hash
-        run: |
-          cd $GITHUB_WORKSPACE
-          git log --pretty=format:'%h' -n 1
-        shell: bash
 
       - name: Install mesa_test
         run: |
@@ -77,17 +61,6 @@ jobs:
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
-          echo "XXX"
-          source $MESASDK_ROOT/bin/mesasdk_init.sh
-          mesa_test submit --empty
-          echo "XXX"
-          mesa_test test 15
-          echo "XXX"
-          # source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          # echo $MESA_TEST_EMAIL | sed 's/./& /g'
-          # echo ${{ secrets.MESA_TEST_EMAIL }} | sed 's/./& /g'
-          # XXXmesa_test install --no-checkout
-          #mesa_test test 29
         shell: bash
 
       - name: Test Problem 13
@@ -101,17 +74,35 @@ jobs:
           mesa_test test 13
         shell: bash
 
-      #- name: Test Problem 15
-      #  run: |
-      #    mesa_test test 15
-      #  shell: bash
-      #  
-      #- name: Test Problem 29
-      #  run: |
-      #    mesa_test test 29
-      #  shell: bash
+      - name: Test Problem 15
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 15
+        shell: bash
 
-      #- name: Test Problem 41
-      #  run: |
-      #    mesa_test test 41
-      #  shell: bash
+      - name: Test Problem 29
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 29
+        shell: bash
+
+      - name: Test Problem 41
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test test 41
+        shell: bash
