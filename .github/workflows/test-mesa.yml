@@ -18,7 +18,6 @@ jobs:
         uses: ./.github/actions/install-mesa
         with:
           sdk: "23.7.3"
-          do_install: "false" # Skip install because mesa_test will do this XXX remove
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
@@ -47,6 +46,7 @@ jobs:
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
+          echo "XXX"
           mesa_test submit --empty
           echo "XXX"
           # source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
