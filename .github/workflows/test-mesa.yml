@@ -48,7 +48,8 @@ jobs:
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          echo "${{secrets.MESA_TEST_EMAIL}}" | sed 's/./& /g'
+          echo "XXX"
+          echo ${{secrets.MESA_TEST_EMAIL}} | sed 's/./& /g'
           # XXXmesa_test install --no-checkout
           mesa_test submit --empty
         shell: bash
