@@ -16,8 +16,13 @@ jobs:
 
       - name: Print git hash
         run: |
+          pwd
           cd $GITHUB_WORKSPACE
+          pwd
+          git status
+          git branch
           git log --pretty=format:'%h' -n 1
+          ls -la
         shell: bash
 
       - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
