@@ -14,16 +14,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Print git hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          git log --pretty=format:'%h' -n 1
+        shell: bash
+
       - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
         uses: ./.github/actions/install-mesa
         with:
           sdk: "23.7.3"
+
+      - name: Print git hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          git log --pretty=format:'%h' -n 1
+        shell: bash
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
         with:
           repository: MESAHub/mesa_test
           path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
+
+      - name: Print git hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          git log --pretty=format:'%h' -n 1
+        shell: bash
 
       - name: Install mesa_test
         run: |
