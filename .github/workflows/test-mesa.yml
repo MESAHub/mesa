@@ -34,6 +34,15 @@ jobs:
           mkdir /home/runner/.mesa_test
         shell: bash
 
+      - name: Set env as secret
+        env:
+          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
+        run: |
+          import os
+          for q in (os.getenv("MESA_TEST_EMAIL")):
+            print(q)
+        shell: python
+
       - name: Create mesa_test config file
         env:
           MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
