@@ -47,7 +47,7 @@ jobs:
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
-          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          # XXXsource "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           echo "XXX"
           echo ${{secrets.MESA_TEST_EMAIL}} | sed 's/./& /g'
           # XXXmesa_test install --no-checkout
