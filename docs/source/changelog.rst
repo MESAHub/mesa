@@ -251,7 +251,7 @@ shmesa
 ~~~~~~
 
 We have introduced a new set of command line utilities for interacting with MESA. 
-See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`_. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__. 
 
 These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
 ``run_star_extras.f90`` template (``shmesa extras``). 
@@ -402,6 +402,8 @@ this ``sed`` command (along with ``sed`` commands for the next changlog entry as
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
 
+.. code-block:: console
+
   $MESA_DIR/scripts/update_inlists
 
 This script will save the previous versions of your inlists to a directory named
@@ -430,6 +432,8 @@ been renamed:
 
 You can substitute the new names for the old ones using the command
 line tool ``sed`` with, e.g. ::
+
+.. code-block:: console
 
     $ sed 's/log_center_density_limit/log_center_density_upper_limit/' -i <inlist_filename>
 
@@ -2444,7 +2448,7 @@ terms that contributed to that component.
 The format of the OP_MONO opacity table cache has changed.  If you have
 used these files in a previous version of MESA then you should do:
 
-::
+.. code-block:: console
 
    rm $MESA_OP_MONO_DATA_CACHE_FILENAME
 
@@ -2572,7 +2576,7 @@ ionization routine. This was due to a typo in the original paper that
 presented the ionization scheme. Restored the missing factor of
 rho^1/3 thanks to a later presentation of this same scheme (Dupuis et
 al. 1992) and a note `here
-<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`_.
+<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`__.
 
 Added a user control (``D_mix_ignore_diffusion``) for when to ignore
 element diffusion in surface or core mixing regions. Previously,
@@ -2586,7 +2590,7 @@ turn it off, but weaker mixing won't.
 Gravity Darkening (Aaron)
 -------------------------
 
-Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`_ for more info.
+Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`__ for more info.
 
 ::
 
