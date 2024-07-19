@@ -72,10 +72,10 @@ we have a radiative temperature gradient (:math:`\nabla_T = \nabla_{rad}`).
 
 
 .. image:: ../../../star/test_suite/extended_convective_penetration/docs/grads_000047.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/extended_convective_penetration/docs/mixing_000047.svg
-   :scale: 100%
+   :width: 100%
 
 pgstar commands used for the plot:
 

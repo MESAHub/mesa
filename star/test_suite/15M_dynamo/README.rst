@@ -51,7 +51,7 @@ The radial and azimuthal components of the magnetic field
 are only being generated in the radiative region between convection zone (bottom panel).
 
 .. image:: ../../../star/test_suite/15M_dynamo/docs/profile_Panels4_00000521.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the plots above:
