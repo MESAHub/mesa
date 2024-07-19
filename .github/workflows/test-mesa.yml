@@ -36,11 +36,13 @@ jobs:
 
       - name: Set env as secret
         env:
-          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
+          XXX: ${{ secrets.MESA_TEST_EMAIL }}
         run: |
           import os
-          for q in (os.getenv("MESA_TEST_EMAIL")):
+          print('XXX')
+          for q in (os.getenv("XXX")):
             print(q)
+          print('DONE')
         shell: python
 
       - name: Create mesa_test config file
