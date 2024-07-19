@@ -34,6 +34,11 @@ jobs:
         shell: bash
 
       - name: Create mesa_test config file
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
         run: |
           MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
@@ -47,7 +52,10 @@ jobs:
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
           echo "XXX"
+          source $MESASDK_ROOT/bin/mesasdk_init.sh
           mesa_test submit --empty
+          echo "XXX"
+          mesa_test test 15
           echo "XXX"
           # source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           # echo $MESA_TEST_EMAIL | sed 's/./& /g'
