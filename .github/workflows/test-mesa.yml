@@ -43,7 +43,7 @@ jobs:
           import os
           lines = ['---', 'computer_name: GitHub_Runner', 'email: '+os.getenv("MESA_TEST_EMAIL"), 'password: '+os.getenv("MESA_TEST_PASSWORD"), 'logs_token: '+os.getenv("MESA_TEST_LOGS_TOKEN"), 'github_protocol: :ssh', 'mesa_mirror: '+os.getenv("GITHUB_WORKSPACE")+'/mirror', 'mesa_work: '+os.getenv("GITHUB_WORKSPACE"), 'platform: Linux', 'platform_version: Ubuntu']
           with open('/home/runner/.mesa_test/config.yml', 'a') as f:
-            f.writelines(lines)
+            f.writelines([string + '\n' for string in lines])
         shell: python
 
       - name: Test Problem 13
