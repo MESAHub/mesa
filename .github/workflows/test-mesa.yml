@@ -26,6 +26,10 @@ jobs:
           path: mesa_test # Store in $GITHUB_WORKSPACE/mesa_test
 
       - name: Install mesa_test and create config file
+        env:
+          MESA_TEST_EMAIL: ${{ secrets.MESA_TEST_EMAIL }}
+          MESA_TEST_PASSWORD: ${{ secrets.MESA_TEST_PASSWORD }}
+          MESA_TEST_LOGS_TOKEN: ${{ secrets.MESA_TEST_LOGS_TOKEN }}
         run: |
           # Setup mesa_test
           cd $GITHUB_WORKSPACE/mesa_test
@@ -39,9 +43,9 @@ jobs:
           MESA_TEST_YML=/home/runner/.mesa_test/config.yml
           echo "---" > $MESA_TEST_YML
           echo "computer_name: GitHub_Runner" >> $MESA_TEST_YML
-          echo "email: ${{ secrets.MESA_TEST_EMAIL }}" >> $MESA_TEST_YML
-          echo "password: ${{ secrets.MESA_TEST_PASSWORD }}" >> $MESA_TEST_YML
-          echo "logs_token: ${{ secrets.MESA_TEST_LOGS_TOKEN }}" >> $MESA_TEST_YML
+          echo "email: $MESA_TEST_EMAIL" >> $MESA_TEST_YML
+          echo "password: $MESA_TEST_PASSWORD" >> $MESA_TEST_YML
+          echo "logs_token: $MESA_TEST_LOGS_TOKEN" >> $MESA_TEST_YML
           echo "github_protocol: :ssh" >> $MESA_TEST_YML
           echo "mesa_mirror: $GITHUB_WORKSPACE/mirror" >> $MESA_TEST_YML
           echo "mesa_work: $GITHUB_WORKSPACE" >> $MESA_TEST_YML
@@ -50,7 +54,7 @@ jobs:
           # XXXsource "${MESASDK_ROOT}/bin/mesasdk_init.sh"
           echo "XXX"
           more $MESA_TEST_YML
-          echo ${{secrets.MESA_TEST_EMAIL}} | sed 's/./& /g'
+          echo $MESA_TEST_EMAIL | sed 's/./& /g'
           # XXXmesa_test install --no-checkout
           mesa_test submit --empty
         shell: bash
