@@ -13,10 +13,10 @@ This test case has 2 parts. Click to see a larger version of a plot.
 * Part 2 (``inlist_low_z``) continues the evolution until the mass fraction of hydrogen is less than 1e-6. A novelty of this inlist is exercising the custom opacity table controls desscribed at :ref:`kap/defaults:kap module controls`.
 
 .. image:: ../../../star/test_suite/low_z/docs/kip000335.svg
-   :width: 100%
+   :scale: 100%
 
 .. image:: ../../../star/test_suite/low_z/docs/hr000335.svg
-   :width: 100%
+   :scale: 100%
 
 
 

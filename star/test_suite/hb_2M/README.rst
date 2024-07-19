@@ -203,7 +203,7 @@ We specify the output. Here we use the default LOG directory, so we do not speci
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_hb_2M
    :start-after: output controls
-   :end-before: num_trace_history_values = 2
+   :end-before: !num_trace_history_values = 2
 
 
 

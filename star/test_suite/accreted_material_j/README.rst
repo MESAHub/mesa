@@ -14,7 +14,7 @@ This test case has two parts. Click to see a larger view of a plot.
 * Part 2 (``inlist_accreted_material_j``) continues the evolution by first applying uniform rotation Omega/Omega_crit = 0.1, and then accreting material with the same composition as the outermost cell at a rate of 0.001 Msun/year with an angular momentum of 0.1 Keplerian. The model terminates when the mass reaches 25 Msun:
 
 .. image:: ../../../star/test_suite/accreted_material_j/docs/track1_000452.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plots above:

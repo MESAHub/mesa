@@ -11,10 +11,10 @@ This test case has 1 parts. Click to see a larger version of a plot.
 * Part 1 (``inlist_hot_cool_wind``) loads  a 7 Msun, Z=0.02 metallicity, main sequence model. A Reimers_scaling_factor = 1 cool wind above Teff = 8000 K and a Vink_scaling_factor = 1 hot wind above 12,000 K is enabled and the model evolves until the central helium mass fraction drops below 1e-6. At this point the mass is 6.75 Msun:
 
 .. image:: ../../../star/test_suite/hot_cool_wind/docs/kipp000527.svg
-   :width: 100%
+   :scale: 100%
 
 .. image:: ../../../star/test_suite/hot_cool_wind/docs/hr000527.svg
-   :width: 100%
+   :scale: 100%
 
 
 

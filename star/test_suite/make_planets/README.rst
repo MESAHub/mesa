@@ -11,19 +11,19 @@ This test case has 3 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_create``) creates a 0.9685 Mjup, 2.0 Rjup, Z=0.02 metallicity, Y=0.24 helium mass fraction initial model which is evolved for 50 years.
 
 .. image:: ../../../star/test_suite/make_planets/docs/trho_000026.svg
-   :width: 100%
+   :scale: 100%
 
 * Part 2 (``inlist_core``) adds a 10 Mearth core with a density of 10 g cm\ :sup:`-3` and then further evolves the model for 2000 years.
 
 .. image:: ../../../star/test_suite/make_planets/docs/trho_000076.svg
-   :width: 100%
+   :scale: 100%
 
 * Part 3 (``inlist_evolve``) continuously deposits a flux of 5.5e8 erg cm\ :sup:`-2` s\ :sup:`-1` at a column depth of 300 cmcm\ :sup:`2` g cm\ :sup:`-3` and evolves the model for 10 billion years:
 
 555501654.562d0 ! 1.d9 erg/cm^2/s
 
 .. image:: ../../../star/test_suite/make_planets/docs/trho_000118.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plots above:

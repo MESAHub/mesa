@@ -76,7 +76,7 @@ between OP/OPAL/OPLIB can be found in `Farag et al. 2024 <https://doi.org/10.384
    Location of each Type-1 opacity table in the :math:`X–Z` plane (left panel) and the
    log:math:`T`–log:math:`R` plane (right panel). Orange circles mark the location of
    the 126 OPAL Type-1 tables (Rogers & Iglesias 1992). Blue circles
-   mark the location of the new 1194 Type-1 opacity tables (Farag et al. 2024).
+   mark the location of the new 1194 Type-1 opacity tables (`Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_).
 
 Additionally, there is support for the OPAL Type 2 tables that allow
 for varying amounts of C and O beyond that accounted for by :math:`Z`;

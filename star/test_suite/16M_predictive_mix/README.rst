@@ -19,7 +19,7 @@ A Kippenhahn diagram shows the evolution of a retreating convective core on the 
 This can be compared to Figure 3 in the MESA IV instrument paper, and the convective pre-mixing Kippenhahn diagram in :ref:`16M_conv_premix`.
 
 .. image:: ../../../star/test_suite/16M_predictive_mix/docs/kipp_00000385.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plots above:

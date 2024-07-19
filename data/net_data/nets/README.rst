@@ -347,7 +347,7 @@ in ``$MESA_DIR/data/rates_data/cache``. Whenever a nuclear reaction
 whose rate has not yet been cached is used for the first time,
 the terminal output will show a line similar to the following:
 
-.. code-block:: console
+::
 
    write $MESA_DIR/data/rates_data/cache/r34_pp2_1.bin
 
@@ -362,7 +362,7 @@ argument. You can pipe the output of this executable to a file to
 obtain a file that you can easily plot.
 Example:
 
-.. code-block:: console
+::
 
   cd $MESA_DIR/rates/test/
   ./show_rates $MESA_DIR/data/rates_data/cache/r34_pp2_1.bin > rate_r34_pp2_1.txt

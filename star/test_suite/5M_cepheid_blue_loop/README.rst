@@ -14,7 +14,7 @@ This test case has two parts. Click to see a larger view of a plot.
 * Part 2 (``inlist_cepheid_blue_loop``) continues the evolution as core helium burning proceeds. The model executes a blue loop, with the red edge and blue edge of the classical Cepheid instability strip boundaries shown in the HR diagram:
 
 .. image:: ../../../star/test_suite/5M_cepheid_blue_loop/docs/hr002086.svg
-   :width: 100%
+   :scale: 100%
 
 pgstar commands used:
 

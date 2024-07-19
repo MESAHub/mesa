@@ -152,14 +152,10 @@ Acknowledging support
 
 Getting all authors who committed code (this includes merged pull requests) ::
 
-.. code-block:: console
-
     git log --format='%aN' r21.12.1..HEAD | sort -u
 
 
 Listing all commits that acknowledge help from someone ::
-
-.. code-block:: console
 
     git log --all --grep="-by" r21.12.1..HEAD
 

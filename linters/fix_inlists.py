@@ -41,14 +41,6 @@ def fix_line(line):
     # Limit output
     if "profile_interval" in line:
         line = set_min_value(line)
-
-    # Fix indent spaces (if line starts with spaces, replace it with 3 spaces)
-    if line.startswith(" "):
-        line = "   " + line.lstrip()
-
-    # Remove spaces trailing the line
-    line = line.rstrip() + "\n"
-
     return line
 
 

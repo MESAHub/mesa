@@ -19,19 +19,22 @@
    ! calculation. Variations in metallicity from nuclear burning and
    ! mixing should not alter Zbase as its purpose is to serve as a
    ! reference metallicity for C and O enhancement during Helium burning. 
+   ! ::
 
    ! See ``use_Zbase_for_Type1``. By default, Zbase does not typically affect the
    ! outer regions of a stellar model when the surface metallicity remains 
    ! below the initial metallicity (Z < Zbase). Zbase is typically 
    ! only used for Type2 opacities which operate deeper in the stellar interior. 
+   ! ::
 
    ! Specific scenarios such as high Z accretion onto a metal poor model
    ! can produce a situation where (Z > Zbase). During this scenario
    ! the surface metallicity can be enhanced beyond the initial metallicity. 
-   ! Users can opt to exclusively adopt Type1 opacities in this scenario with
+   ! Users can opt to exlusively adopt Type1 opacities in this scenario with
    ! the ``use_Zbase_for_Type1`` flag.
+   ! ::
 
-   ! NOTE: For wind schemes that scale with metallicity, we use Zbase rather than Z (as long as Zbase > 0).
+   ! NOTE: For wind schemes that scale with metallicitity, we use Zbase rather than Z (as long as Zbase > 0).
       ! This is because wind mass loss rate is primarily determined by iron opacity,
       ! which is unlikely to change during the evolution. 
 

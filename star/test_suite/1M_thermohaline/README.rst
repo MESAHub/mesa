@@ -41,7 +41,7 @@ thermohaline region. Within the thermohaline region, nuclear burning
 is starting to transform the hydrogen-rich envelope to the helium-rich core.
 
 .. image:: ../../../star/test_suite/1M_thermohaline/docs/abund_00004245.svg
-   :width: 100%
+   :scale: 100%
 
 The brunt B profile in the vicinity of the thermohaline region is
 shown the following plot.  The mixing type is again indicated on the
@@ -51,7 +51,7 @@ thermohaline mixing. Note the thermohaline region begins and ends
 where brunt B becomes negative.
 
 .. image:: ../../../star/test_suite/1M_thermohaline/docs/profile_panels1_00004245.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plots above:

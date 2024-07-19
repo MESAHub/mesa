@@ -51,7 +51,7 @@ skip to part 3.  Options shared between all parts are contained in
 Click to see a larger plot:
 
 .. image:: ../../../star/test_suite/R_CrB_star/docs/grid1-000709.svg
-   :width: 100%
+   :scale: 100%
 
 .. |Weiss1987| replace:: `Weiss (1987) <https://ui.adsabs.harvard.edu/abs/1987A%26A...185..165W/abstract>`__           
 .. |Schwab2019| replace:: `Schwab (2019) <https://ui.adsabs.harvard.edu/abs/2019ApJ...885...27S/abstract>`__

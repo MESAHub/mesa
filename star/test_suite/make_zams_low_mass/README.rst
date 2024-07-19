@@ -11,7 +11,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_zams``) creates a 0.085 Msun, Z = 0.014 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
 
 .. image:: ../../../star/test_suite/make_zams_low_mass/docs/grid_000196.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plot above:

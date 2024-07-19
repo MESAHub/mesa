@@ -5,11 +5,11 @@ semiconvection
 **************
 
 This test case checks placement of the convective and semiconvective boundaries when using the Ledoux criterion and predictive mixing,
-see |MESA V|. The test vehicle is with a 1.5 |Msun|, Z=0.02 metallicity, model.
+see |MESA V|. The test vehicle is with a 1.5 Msun, Z=0.02 metallicity, model.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_semiconvection``) loads a pre-built 1.5 |Msun|, Z=0.02 metallicity, model from test case :ref:`make_zams_high_mass`. New initial model generation should use the supplied ``inlist_to_ZAMS``. The model is then evolved until the central hydrogen mass fraction drops below 0.4. At this time the convective core has almost reached its maximum mass extension, and there is a semiconvective layer above the convective core. The ``run_star_extars.f90`` then checks the mixing types at three points (0.12, 0.135, and 0.15 |Msun|), where the convective types  should be convection, semiconvection, and no mixing. In addition, the ``run_star_extars.f90`` checks the average temperature and density between two points in the star : 
+* Part 1 (``inlist_semiconvection``) loads a pre-built 1.5 Msun, Z=0.02 metallicity, model from test case :ref:`make_zams_high_mass`. New initial model generation should use the supplied ``inlist_to_ZAMS``. The model is then evolved until the central hydrogen mass fraction drops below 0.4. At this time the convective core has almost reached its maximum mass extension, and there is a semiconvective layer above the convective core. The ``run_star_extars.f90`` then checks the mixing types at three points (0.12, 0.135, and 0.15 Msun), where the convective types  should be convection, semiconvection, and no mixing. In addition, the ``run_star_extars.f90`` checks the average temperature and density between two points in the star : 
 
 .. code-block:: console
 
@@ -25,7 +25,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    all values are within tolerances
 
 
-Note that the choice made for the initial mixture (a09 in this test
+Note that the choice made for the inital mixture (a09 in this test
 case) and for the nuclear reaction network (here:
 pp_and_cno_extras.net) influence the growth of the convective
 core. The values used in this test case for the

@@ -66,7 +66,7 @@ for file in files:
             elif str_stop.search(line):
                 # String type, preserve error message
                 match = str_stop.search(line).group()
-                match = match[len("stop ") :]
+                match = match[len("stop "):]
                 line = re.sub(str_stop, mesa_error(match), line)
             lines[ldx] = line
             modified = True

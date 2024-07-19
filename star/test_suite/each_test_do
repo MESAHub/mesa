@@ -1,33 +1,35 @@
 #!/bin/bash
 
 function check_okay {
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    fi
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
 }
 
+
+
 function error {
-    echo
-    more diff.txt
-    echo
-    echo "******* failed ******** diff final_check.mod" "$1"
-    echo
+	echo
+	more diff.txt
+	echo
+	echo "******* failed ******** diff final_check.mod" "$1"
+	echo
 }
 
 function do_onex {
 cd $1
 if [ -z profile_columns.list ]
 then
-    pwd
-    cp ../../defaults/profile_columns.list profile_columns.list
-    svn add profile_columns.list
+  pwd
+  cp ../../defaults/profile_columns.list profile_columns.list
+  svn add profile_columns.list
 fi
 if [ -z history_columns.list ]
 then
-    pwd
-    cp ../../defaults/history_columns.list history_columns.list
-    svn add history_columns.list
+  pwd
+  cp ../../defaults/history_columns.list history_columns.list
+  svn add history_columns.list
 fi
 cd ..
 }
@@ -36,13 +38,13 @@ function do_onexx {
 cd $1
 if [ -z $3 ]
 then
-    echo
+  echo
 elif [ "$3" == skip ]
 then
-    echo
+  echo
 else
-    pwd
-    cp "$3" /Users/bpaxton/mesa/star/test_suite/$1/final_check.mod
+  pwd
+  cp "$3" /Users/bpaxton/mesa/star/test_suite/$1/final_check.mod
 fi
 cd ..
 }
@@ -51,19 +53,19 @@ function do_onex {
 cd $1
 if [ ! -r final_check.mod ]
 then
-    if [ ! -z $3 ]
-    then
-        pwd
-        echo cp $3 final_check.mod
-      cp $3 final_check.mod
-      #svn add final_check.mod
-    elif [ -r final.mod ]
-    then
-        pwd
-        echo cp final.mod final_check.mod
-        cp final.mod final_check.mod
-        #svn add final_check.mod
-    fi
+  if [ ! -z $3 ]
+  then
+    pwd
+    echo cp $3 final_check.mod
+    cp $3 final_check.mod
+    #svn add final_check.mod
+  elif [ -r final.mod ]
+  then
+    pwd
+    echo cp final.mod final_check.mod
+    cp final.mod final_check.mod
+    #svn add final_check.mod
+  fi
 fi
 cd ..
 }
@@ -77,12 +79,13 @@ function do_onex {
 }
 
 
+
 function do_one {
-    echo $1
-    cd $1
-    cat history_columns.list >> ../history_columns.combined.list
-    rm history_columns.combined.list
-    cd ..
+  echo $1
+  cd $1
+  cat history_columns.list >> ../history_columns.combined.list
+  rm history_columns.combined.list
+  cd ..
 }
 
 

@@ -13,7 +13,7 @@ This test case has 4 parts.
 * Part 2 (``inlist_to_near_pulses``) continues the evolution until effective temperature goes below log10(Teff/K) = 3.55.
 
 .. image:: ../../../star/test_suite/gyre_in_mesa_rsg/docs/hr000496.svg
-   :width: 100%
+   :scale: 100%
 
 * Part 3 (``inlist_to_pulse``) continues the evolution until luminosity exceeds log10(Lsun/L) = 5.04.
 

@@ -11,17 +11,17 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_make_metals``) creates a metal-free 3 Msun pre-main sequence model, and evolves the initial pure hydrogen + helium model until the central helium mass fraction drops below 1e-4 :
 
 .. image:: ../../../star/test_suite/make_metals/docs/abund_000516.svg
-   :width: 100%
+   :scale: 100%
 
 The core gets hot enough to make its own carbon from the triple-alpha reaction:
 
 .. image:: ../../../star/test_suite/make_metals/docs/trhoc_000516.svg
-   :width: 100%
+   :scale: 100%
 
 Which makes for an interesting journey in the HR diagram:
 
 .. image:: ../../../star/test_suite/make_metals/docs/hr_000516.svg
-   :width: 100%
+   :scale: 100%
 
 
 pgstar commands used for the plots above:
