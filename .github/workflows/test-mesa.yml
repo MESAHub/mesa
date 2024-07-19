@@ -13,11 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
-        uses: ./.github/actions/install-mesa
-        with:
-          sdk: "23.7.3"
-          do_install: "false" # Skip install because mesa_test will do this
+      #- name: Install MESA on ${{ runner.os }} with SDK 23.7.3
+      #  uses: ./.github/actions/install-mesa
+      #  with:
+      #    sdk: "23.7.3"
+      # XXX    do_install: "false" # Skip install because mesa_test will do this
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
