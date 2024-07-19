@@ -4,8 +4,6 @@
 conv_core_cpm
 *************
 
-.. tags:: star
-
 This test case evolves a 1.5 |Msun| star part of the way through
 the main sequence with convective pre-mixing (CPM) enabled and checks that its convective
 core has grown to an appropriate mass coordinate.
