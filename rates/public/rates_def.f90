@@ -1154,7 +1154,7 @@
          ierr = 0
          call set_rattab_range(5.30102999566398d0, 10.301029995664d0)
          
-         reaclib_min_T9 = 1d-2 
+         reaclib_min_T9 = 1d-4 
             ! need <= 2d-3 for pre-ms li7 burning
             ! pre-ms deuterium burning needs much lower (4d-4)
             ! but that seems to cause problems during advanced burning.
