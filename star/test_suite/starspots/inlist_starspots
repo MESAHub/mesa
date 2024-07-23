@@ -15,7 +15,6 @@
    create_pre_main_sequence_model = .true.
    pre_ms_relax_to_start_radiative_core = .false. !.true. ! by default, but it should not be!!!
 
-
    ! save a model at the end of the run
    save_model_when_terminate = .true.
    save_model_filename = 'final.mod'
@@ -26,14 +25,12 @@
    pre_ms_check_radiative_core_min_mass = 0.3d0 ! default is 0.3d0
    pre_ms_check_radiative_core_Lnuc_div_L_limit = 1d-6
 
-
    set_uniform_initial_composition = .true.
 
    initial_h1 = 0.7349
    initial_h2 = 2.75d-5  ! Lodders 2009
    initial_he3 = 8.5d-5  ! Lodders 2009
    initial_he4 = 0.24
-
 
    initial_zfracs = 6 !! scaling of the rest of the elements according to someone's solar abundance
 
@@ -74,11 +71,9 @@
    atm_option = 'table'
    atm_table = 'photosphere'
 
-
    warn_when_large_rel_run_E_err = 99d0 !0.02d0
    log_directory = 'LOGS'
    write_profiles_flag = .false.
-
 
    max_num_profile_models = -1
    history_interval = 1
@@ -91,7 +86,6 @@
    initial_mass = 1.0 ! in Msun units
    min_timestep_limit=0
    max_model_number = -1 !1500
-
 
    cool_wind_RGB_scheme = 'Reimers'
    cool_wind_AGB_scheme = 'Blocker'
@@ -137,7 +131,6 @@
 
    ! Convergence checking
    use_gold_tolerances = .true.
-
 
    max_number_retries = -1 !1000 !100!100
    max_model_number = 10000 !-1
