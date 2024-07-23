@@ -58,7 +58,7 @@ nodeps : $(.DEFAULT_GOAL)
 
 #################################################################
 #
-# COMPULATION RULES
+# COMPILATION RULES
 
 COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_DEPLOY))
 
