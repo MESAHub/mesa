@@ -2,29 +2,29 @@
      *,scatop,eden)
       usekinds,only:dp
       userad_photo_cross_section,only:photoCross
-      implicitreal*8(a-h,o-z)
+      implicitreal(dp)(a-h,o-z)
       integer,parameter::p_Nelements=99
-      real*8,parameter::p_x_i_flo=1d-17
+      real(dp),parameter::p_x_i_flo=1d-17
       integer,parameter::p_jmax=6
       integernfreqOpac
       character*(*)linedatafile,longlist,xsecdatadir
       logicalrdlndump,mkshortlist
-      real*8rho,temp,abund(p_Nelements),freq(nfreqOpac+1),freqmn(nfreqOpac),taumin
-      real*8opac(nfreqOpac),scatop(nfreqOpac)
-      real*8iondenz(p_jmax,p_Nelements),iondenz_part(p_jmax,p_Nelements)
-      real*8iondenzHminus
+      real(dp)rho,temp,abund(p_Nelements),freq(nfreqOpac+1),freqmn(nfreqOpac),taumin
+      real(dp)opac(nfreqOpac),scatop(nfreqOpac)
+      real(dp)iondenz(p_jmax,p_Nelements),iondenz_part(p_jmax,p_Nelements)
+      real(dp)iondenzHminus
       integerionstg1(p_Nelements)
-      real*8frac(0:31),part(0:31),nucden
+      real(dp)frac(0:31),part(0:31),nucden
       realtm1,tm2
-      real*8expnu(nfreqOpac)
-      real*8plnkfnc(nfreqOpac)
+      real(dp)expnu(nfreqOpac)
+      real(dp)plnkfnc(nfreqOpac)
       real(kind=dp),dimension(nfreqOpac)::sigma
       parameter(maxfreqdim=5000)
-      real*8wave(maxfreqdim+1)
-      real*8hfreq3c2(maxfreqdim)
-      real*8dlnfreq(maxfreqdim)
-      real*8freqm3(maxfreqdim)
-      real*8gff(nfreqOpac*30)
+      real(dp)wave(maxfreqdim+1)
+      real(dp)hfreq3c2(maxfreqdim)
+      real(dp)dlnfreq(maxfreqdim)
+      real(dp)freqm3(maxfreqdim)
+      real(dp)gff(nfreqOpac*30)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)

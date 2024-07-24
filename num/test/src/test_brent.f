@@ -355,10 +355,10 @@
 
       real*8 function f_01 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real(dp), intent(in) :: x
-         real(dp), intent(out) :: dfdx
+         real*8, intent(in) :: x
+         real*8, intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_01 = sin ( x ) - 0.5D+00 * x
          ierr = 0
@@ -367,10 +367,10 @@
       
       real*8 function f_02 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real(dp), intent(in) :: x
-         real(dp), intent(out) :: dfdx
+         real*8, intent(in) :: x
+         real*8, intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_02 = 2.0D+00 * x - exp( - x )
          ierr = 0
@@ -379,10 +379,10 @@
       
       real*8 function f_03 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real(dp), intent(in) :: x
-         real(dp), intent(out) :: dfdx
+         real*8, intent(in) :: x
+         real*8, intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_03 = x * exp( - x )
          ierr = 0
@@ -391,10 +391,10 @@
       
       real*8 function f_04 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real(dp), intent(in) :: x
-         real(dp), intent(out) :: dfdx
+         real*8, intent(in) :: x
+         real*8, intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_04 = exp( x ) - 1.0D+00 / 100.0D+00 / x / x
          ierr = 0
@@ -403,10 +403,10 @@
       
       real*8 function f_05 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real(dp), intent(in) :: x
-         real(dp), intent(out) :: dfdx
+         real*8, intent(in) :: x
+         real*8, intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_05 = ( x + 3.0D+00 ) * ( x - 1.0D+00 ) * ( x - 1.0D+00 )
          ierr = 0
@@ -530,9 +530,9 @@
         
         integer, parameter :: lrpar = 0, lipar = 0
         integer :: ierr
-        real(dp), target :: rpar_ary(lrpar) 
+        real*8, target :: rpar_ary(lrpar) 
         integer, target :: ipar_ary(lipar)
-        real(dp), pointer :: rpar(:)
+        real*8, pointer :: rpar(:)
         integer, pointer :: ipar(:)
         
         include 'formats'
@@ -561,10 +561,6 @@
 
         return
       end subroutine test_zero_one
-
-
-
-
-
+      
 
       end module test_brent

@@ -1,6 +1,6 @@
   Subroutine VOLEN(KMarg);
   -- outputs ENG in Ueng=1e12 erg/g/s
-  Implicit real*8 (a-h,o-z);
+  Implicit real(dp) (a-h,o-z);
   _Include snrad;
   _Include nico;
 --  Parameter(Positr=4.d-2); -- energy fraction dep. loc. by e^+ from 56Co

@@ -14,11 +14,11 @@ SUBROUTINE BEGIN;
 -- _TRACE "write(*,'(2(a,i5),a,1p,g12.4,a)')' Nzon=',Nzon,' Mzon=',Mzon,' AMNi=',AMNi,"
 -- _TRACE "@wterm' Ncnd=',Ncnd,' Krad=',Krad,"
 -- _TRACE "@wterm' Natom=',Natom,' Zn(Natom)=',Zn(Natom),"
-IMPLICIT REAL*8(A-H,O-Z);
+IMPLICIT real(dp)(A-H,O-Z);
    _INCLUDE  snrad;
    _Include opacity;
    _INCLUDE abo;
- -- real*8 hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
+ -- real(dp) hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
    --       hptrbsc(Nfreq,@Ntab,@Ntab,Mzon/@skip);
   <*B: vars, PARAMETERS, data *>;
   <*R: READ INPUT DATA FOR BURST *>;
@@ -745,7 +745,7 @@ _until kio^=0;
     --PRINT *,' N DIFF. EQS=',N,'   N RAD. EQS=',2*KRAD;
 %S:O
 SUBROUTINE @SAVE_MODEL;
-    IMPLICIT REAL*8 (A-H,O-Z);
+    IMPLICIT real(dp) (A-H,O-Z);
     INTEGER LUNIT;
     Character*80 NFILE*80;
     _INCLUDEN snrad;
@@ -771,7 +771,7 @@ SUBROUTINE @SAVE_MODEL;
  RETURN;END;
 %I:O
     BLOCK DATA STDATA;
-    IMPLICIT REAL*8(A-H,O-Z);
+    IMPLICIT real(dp)(A-H,O-Z);
      _include zone;
     COMMON/QNRGYE/QNUC,RGASA,YELECT;
     COMMON/HNUSED/HUSED,NQUSED,NFUN,NJAC,NITER,NFAIL;

@@ -16,7 +16,7 @@
 --  _TRACE " @wterm' Tp = ',Tp,' Pl = ',Pl,"
   _Define @GWl GWgL ;
   SUBROUTINE URSOS;
-  IMPlICIT REAL*8 (A-H,O-Z);
+  IMPlICIT real(dp) (A-H,O-Z);
 
 /* 
   _include nstep;

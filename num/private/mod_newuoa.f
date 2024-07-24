@@ -9,12 +9,12 @@
 
       SUBROUTINE do_newuoa (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,
      >         CALFUN,max_valid_value)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(*),W(*)
       interface
 #include "num_newuoa_proc.dek"
       end interface
-      real*8, intent(in) :: max_valid_value
+      real(dp), intent(in) :: max_valid_value
 !
 !     This subroutine seeks the least value of a function of many variables,
 !     by a trust region method that forms quadratic models by interpolation.
@@ -86,11 +86,11 @@
       SUBROUTINE NEWUOB (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,XBASE,
      1  XOPT,XNEW,XPT,FVAL,GQ,HQ,PQ,BMAT,ZMAT,NDIM,D,VLAG,W,
      1  CALFUN,max_valid_value)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       interface
 #include "num_newuoa_proc.dek"
       end interface
-      real*8, intent(in) :: max_valid_value
+      real(dp), intent(in) :: max_valid_value
       logical :: do_replace
       DIMENSION X(*),XBASE(*),XOPT(*),XNEW(*),XPT(NPT,*),FVAL(*),
      1  GQ(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),VLAG(*),W(*)
@@ -660,7 +660,7 @@
 
       SUBROUTINE BIGDEN (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,
      1  KNEW,D,W,VLAG,BETA,S,WVEC,PROD)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
      1  W(*),VLAG(*),S(*),WVEC(NDIM,*),PROD(NDIM,*)
       DIMENSION DEN(9),DENEX(9),PAR(9)
@@ -883,10 +883,10 @@
       DENMAX=SUM
       ISAVE=0
       IU=49
-      TEMP=TWOPI/DFLOAT(IU+1)
+      TEMP=TWOPI/DBLE(IU+1)
       PAR(1)=ONE
       DO 250 I=1,IU
-      ANGLE=DFLOAT(I)*TEMP
+      ANGLE=DBLE(I)*TEMP
       PAR(2)=cos(ANGLE)
       PAR(3)=sin(ANGLE)
       DO 230 J=4,8,2
@@ -912,7 +912,7 @@
           TEMPB=TEMPB-DENMAX
           STEP=HALF*(TEMPA-TEMPB)/(TEMPA+TEMPB)
       END IF
-      ANGLE=TEMP*(DFLOAT(ISAVE)+STEP)
+      ANGLE=TEMP*(DBLE(ISAVE)+STEP)
 !
 !     Calculate the new parameters of the denominator, the new VLAG vector
 !     and the new D. Then test for convergence.
@@ -980,7 +980,7 @@
       
       SUBROUTINE BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,
      1  DELTA,D,ALPHA,HCOL,GC,GD,S,W)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
      1  HCOL(*),GC(*),GD(*),S(*),W(*)
 !
@@ -1115,9 +1115,9 @@
       TAUOLD=TAUBEG
       ISAVE=0
       IU=49
-      TEMP=TWOPI/DFLOAT(IU+1)
+      TEMP=TWOPI/DBLE(IU+1)
       DO 140 I=1,IU
-      ANGLE=DFLOAT(I)*TEMP
+      ANGLE=DBLE(I)*TEMP
       CTH=cos(ANGLE)
       STH=sin(ANGLE)
       TAU=CF1+(CF2+CF4*CTH)*CTH+(CF3+CF5*CTH)*STH
@@ -1137,7 +1137,7 @@
           TEMPB=TEMPB-TAUMAX
           STEP=HALF*(TEMPA-TEMPB)/(TEMPA+TEMPB)
       END IF
-      ANGLE=TEMP*(DFLOAT(ISAVE)+STEP)
+      ANGLE=TEMP*(DBLE(ISAVE)+STEP)
 !
 !     Calculate the new D and GD. Then test for convergence.
 !
@@ -1155,7 +1155,7 @@
       
       SUBROUTINE TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,STEP,
      1  D,G,HD,HS,CRVMIN)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),GQ(*),HQ(*),PQ(*),STEP(*),
      1  D(*),G(*),HD(*),HS(*)
 !
@@ -1295,9 +1295,9 @@
       QMIN=QBEG
       ISAVE=0
       IU=49
-      TEMP=TWOPI/DFLOAT(IU+1)
+      TEMP=TWOPI/DBLE(IU+1)
       DO 140 I=1,IU
-      ANGLE=DFLOAT(I)*TEMP
+      ANGLE=DBLE(I)*TEMP
       CTH=cos(ANGLE)
       STH=sin(ANGLE)
       QNEW=(SG+CF*CTH)*CTH+(DG+DHS*CTH)*STH
@@ -1317,7 +1317,7 @@
           TEMPB=TEMPB-QMIN
           ANGLE=HALF*(TEMPA-TEMPB)/(TEMPA+TEMPB)
       END IF
-      ANGLE=TEMP*(DFLOAT(ISAVE)+ANGLE)
+      ANGLE=TEMP*(DBLE(ISAVE)+ANGLE)
 !
 !     Calculate the new STEP and HS. Then test for convergence.
 !
@@ -1360,7 +1360,7 @@
       END SUBROUTINE TRSAPP
 
       SUBROUTINE UPDATE (N,NPT,BMAT,ZMAT,IDZ,NDIM,VLAG,BETA,KNEW,W)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION BMAT(NDIM,*),ZMAT(NPT,*),VLAG(*),W(*)
 !
 !     The arrays BMAT and ZMAT with IDZ are updated, in order to shift the

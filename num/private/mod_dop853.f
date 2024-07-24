@@ -32,9 +32,9 @@
      &         n,fcn,x,y,xend,h,max_step_size,max_steps,
      &         rtol,atol,itol,solout,iout,work,lwork,iwork,liwork,
      &         lrpar,rpar,lipar,ipar,lout,idid)
-c *** *** *** *** *** *** *** *** *** *** *** *** ***
-c          declarations 
-c *** *** *** *** *** *** *** *** *** *** *** *** ***
+! *** *** *** *** *** *** *** *** *** *** *** *** ***
+!          declarations 
+! *** *** *** *** *** *** *** *** *** *** *** *** ***
       implicit real(dp) (a-h,o-z)
       integer, intent(in) :: n ! the dimension of the system
       interface
@@ -56,15 +56,15 @@ c *** *** *** *** *** *** *** *** *** *** *** *** ***
       integer, intent(out)  :: idid
 
       logical arret
-c *** *** *** *** *** *** ***
-c        setting the parameters 
-c *** *** *** *** *** *** ***
+! *** *** *** *** *** *** ***
+!        setting the parameters 
+! *** *** *** *** *** *** ***
       nfcn=0
       nstep=0
       naccpt=0
       nrejct=0
       arret=.false.
-c -------- nmax , the maximal number of steps ----- 
+! -------- nmax , the maximal number of steps ----- 
       if(max_steps.eq.0)then
          nmax=100000
       else
@@ -75,7 +75,7 @@ c -------- nmax , the maximal number of steps -----
             arret=.true.
          end if
       end if
-c -------- meth   coefficients of the method
+! -------- meth   coefficients of the method
       if(iwork(2).eq.0)then
          meth=1
       else
@@ -86,11 +86,11 @@ c -------- meth   coefficients of the method
             arret=.true.
          end if
       end if  
-c -------- nstiff   parameter for stiffness detection  
+! -------- nstiff   parameter for stiffness detection  
       nstiff=iwork(4) 
       if (nstiff.eq.0) nstiff=1000
       if (nstiff.lt.0) nstiff=nmax+10
-c -------- nrdens   number of dense output components
+! -------- nrdens   number of dense output components
       nrdens=iwork(5)
       if(nrdens.lt.0.or.nrdens.gt.n)then
          if (lout.gt.0) write(lout,*)
@@ -107,7 +107,7 @@ c -------- nrdens   number of dense output components
             end do
          end if
       end if       
-c -------- uround   smallest number satisfying 1.d0+uround>1.d0  
+! -------- uround   smallest number satisfying 1.d0+uround>1.d0  
       if(work(1).eq.0.d0)then
          uround=2.3d-16
       else
@@ -118,7 +118,7 @@ c -------- uround   smallest number satisfying 1.d0+uround>1.d0
             arret=.true.
          end if
       end if
-c -------  safety factor -------------
+! -------  safety factor -------------
       if(work(2).eq.0.d0)then
          safe=0.9d0
       else
@@ -129,7 +129,7 @@ c -------  safety factor -------------
             arret=.true.
          end if
       end if
-c -------  fac1,fac2     parameters for step size selection
+! -------  fac1,fac2     parameters for step size selection
       if(work(3).eq.0.d0)then
          fac1=0.333d0
       else
@@ -140,7 +140,7 @@ c -------  fac1,fac2     parameters for step size selection
       else
          fac2=work(4)
       end if
-c --------- beta for step control stabilization -----------
+! --------- beta for step control stabilization -----------
       if(work(5).eq.0.d0)then
          beta=0.0d0
       else
@@ -155,13 +155,13 @@ c --------- beta for step control stabilization -----------
          end if
          end if
       end if
-c -------- maximal step size
+! -------- maximal step size
       if(max_step_size.eq.0.d0)then
          hmax=xend-x
       else
          hmax=max_step_size
       end if
-c ------- prepare the entry-points for the arrays in work -----
+! ------- prepare the entry-points for the arrays in work -----
       iek1=21
       iek2=iek1+n
       iek3=iek2+n
@@ -174,7 +174,7 @@ c ------- prepare the entry-points for the arrays in work -----
       iek10=iek9+n
       iey1=iek10+n
       ieco=iey1+n
-c ------ total storage requirement -----------
+! ------ total storage requirement -----------
       istore=ieco+(3+8*nrdens)-1
       if(istore.gt.lwork)then
         if (lout.gt.0) write(lout,*)
@@ -188,12 +188,12 @@ c ------ total storage requirement -----------
      &   ' insufficient storage for iwork, min. liwork=',istore
         arret=.true.
       end if
-c -------- when a fail has occured, we return with idid=-1
+! -------- when a fail has occured, we return with idid=-1
       if (arret) then
          idid=-1
          return
       end if
-c -------- call to core integrator ------------
+! -------- call to core integrator ------------
       call dp86co(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,
      &   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,
      &   work(iek1),work(iek2),work(iek3),work(iek4),work(iek5),
@@ -205,24 +205,24 @@ c -------- call to core integrator ------------
       iwork(18)=nstep
       iwork(19)=naccpt
       iwork(20)=nrejct
-c ----------- return -----------
+! ----------- return -----------
       return
       end subroutine do_dop853
+!
 c
-c
-c
-c  ----- ... and here is the core integrator  ----------
-c
+!
+!    ----- ... and here is the core integrator  ----------
+!
       subroutine dp86co(n,fcn,x,y,xend,hmax,h,rtol,atol,itol,lout,
      &   solout,iout,idid,nmax,uround,meth,nstiff,safe,beta,fac1,fac2,
      &   k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,y1,rwork,icomp,nrd,lrpar,rpar,lipar,ipar,
      &   nfcn,nstep,naccpt,nrejct)
-c ----------------------------------------------------------
-c     core integrator for dop853
-c     parameters same as in dop853 with workspace added 
-c ---------------------------------------------------------- 
-c         declarations 
-c ---------------------------------------------------------- 
+! ----------------------------------------------------------
+!    core integrator for dop853
+!    parameters same as in dop853 with workspace added 
+! ---------------------------------------------------------- 
+!        declarations 
+! ---------------------------------------------------------- 
       implicit real(dp) (a-h,o-z)
       integer :: n, itol, lout, iout, idid, nmax, meth
       parameter (
@@ -409,15 +409,15 @@ c ----------------------------------------------------------
       real(dp), pointer :: cont(:)
       cont => rwork(3:3+8*nrd)
          
-c *** *** *** *** *** *** ***
-c  initialisations
-c *** *** *** *** *** *** *** 
+! *** *** *** *** *** *** ***
+!    initialisations
+! *** *** *** *** *** *** *** 
       facold=1.d-4  
       expo1=1.d0/8.d0-beta*0.2d0
       facc1=1.d0/fac1
       facc2=1.d0/fac2
       posneg=sign(1.d0,xend-x) 
-c --- initial preparations   
+! --- initial preparations   
       atoli=atol(1)
       rtoli=rtol(1)    
       last=.false. 
@@ -458,7 +458,7 @@ c --- initial preparations
           call solout(naccpt+1,xold,x,n,y,rwork,iwork,contd8,lrpar,rpar,lipar,ipar,irtrn)
           if (irtrn.lt.0) goto 79
       end if
-c --- basic integration step  
+! --- basic integration step  
    1  continue
       if (nstep.gt.nmax) goto 78
       if (0.1d0*abs(h).le.abs(x)*uround)goto 77
@@ -467,7 +467,7 @@ c --- basic integration step
          last=.true.
       end if
       nstep=nstep+1
-c --- the twelve stages
+! --- the twelve stages
       if (irtrn.ge.2) then
          call fcn(n,x,h,y,k1,lrpar,rpar,lipar,ipar,ierr)
          if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
@@ -526,7 +526,7 @@ c --- the twelve stages
       k4(i)=b1*k1(i)+b6*k6(i)+b7*k7(i)+b8*k8(i)+b9*k9(i)
      &   +b10*k10(i)+b11*k2(i)+b12*k3(i)
   35  k5(i)=y(i)+h*k4(i)
-c --- error estimation  
+! --- error estimation  
       err=0.d0
       err2=0.d0
       if (itol.eq.0) then   
@@ -549,21 +549,21 @@ c --- error estimation
       deno=err+0.01d0*err2
       if (deno.le.0.d0) deno=1.d0
       err=abs(h)*err*sqrt(1.d0/(n*deno))
-c --- computation of hnew
+! --- computation of hnew
       fac11=pow(err,expo1)
-c --- lund-stabilization
+! --- lund-stabilization
       fac=fac11/pow(facold,beta)
-c --- we require  fac1 <= hnew/h <= fac2
+! --- we require  fac1 <= hnew/h <= fac2
       fac=max(facc2,min(facc1,fac/safe))
-      hnew=h/fac  
+      hnew=h/fac
       if(err.le.1.d0)then
-c --- step is accepted  
+! --- step is accepted  
          facold=max(err,1.0d-4)
          naccpt=naccpt+1
          call fcn(n,xph,h,k5,k4,lrpar,rpar,lipar,ipar,ierr)
          if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
          nfcn=nfcn+1
-c ------- stiffness detection
+! ------- stiffness detection
          if (mod(naccpt,nstiff).eq.0.or.iasti.gt.0) then
             stnum=0.d0
             stden=0.d0
@@ -585,9 +585,9 @@ c ------- stiffness detection
                if (nonsti.eq.6) iasti=0
             end if
          end if 
-c ------- final preparation for dense output
+! ------- final preparation for dense output
          if (iout.ge.2) then
-c ----    save the first function evaluations   
+! ----    save the first function evaluations   
             do 62 j=1,nrd
                i=icomp(j)
                cont(j)=y(i)
@@ -605,7 +605,7 @@ c ----    save the first function evaluations
                cont(j+nrd*7)=d71*k1(i)+d76*k6(i)+d77*k7(i)+d78*k8(i)
      &                  +d79*k9(i)+d710*k10(i)+d711*k2(i)+d712*k3(i)
    62       continue 
-c ---     the next three function evaluations
+! ---     the next three function evaluations
             do 51 i=1,n 
   51           y1(i)=y(i)+h*(a141*k1(i)+a147*k7(i)+a148*k8(i)
      &            +a149*k9(i)+a1410*k10(i)+a1411*k2(i)+a1412*k3(i)
@@ -625,7 +625,7 @@ c ---     the next three function evaluations
             call fcn(n,x+c16*h,h,y1,k3,lrpar,rpar,lipar,ipar,ierr)
             if (ierr /= 0) then; hnew=h/facc1; h=hnew; goto 1; end if
             nfcn=nfcn+3 
-c ---     final preparation
+! ---     final preparation
             do 63 j=1,nrd
                i=icomp(j)
                cont(j+nrd*4)=h*(cont(j+nrd*4)+d413*k4(i)+d414*k10(i)
@@ -652,7 +652,7 @@ c ---     final preparation
             call solout(naccpt+1,xold,x,n,y,rwork,iwork,contd8,lrpar,rpar,lipar,ipar,irtrn)
             if (irtrn.lt.0) goto 79
          end if 
-c ------- normal exit
+! ------- normal exit
          if (last) then
             h=hnew
             idid=1
@@ -662,7 +662,7 @@ c ------- normal exit
          if(reject)hnew=posneg*min(abs(hnew),abs(h))
          reject=.false. 
       else  
-c --- step is rejected   
+! --- step is rejected   
          hnew=h/min(facc1,fac11/safe)
          reject=.true.  
          if(naccpt.ge.1)nrejct=nrejct+1   
@@ -670,7 +670,7 @@ c --- step is rejected
       end if
       h=hnew
       goto 1
-c --- fail exit
+! --- fail exit
   76  continue
       idid=-4
       return
@@ -691,12 +691,12 @@ c --- fail exit
       idid=2
       return
       end subroutine dp86co
-c
+!
       function hinit(n,fcn,x,y,xend,posneg,f0,f1,y1,iord,
      &                       hmax,atol,rtol,itol,lrpar,rpar,lipar,ipar,ierr)
-c ----------------------------------------------------------
-c ----  computation of an initial step size guess
-c ----------------------------------------------------------
+! ----------------------------------------------------------
+! ----  computation of an initial step size guess
+! ----------------------------------------------------------
       implicit real(dp) (a-h,o-z)
       
       real(dp), intent(inout) :: x 
@@ -716,10 +716,10 @@ c ----------------------------------------------------------
 #include "num_fcn.dek"
       end interface
 
-c ---- compute a first guess for explicit euler as
-c ----   h = 0.01 * norm (y0) / norm (f0)
-c ---- the increment for explicit euler is small
-c ---- compared to the solution
+! ---- compute a first guess for explicit euler as
+! ----   h = 0.01 * norm (y0) / norm (f0)
+! ---- the increment for explicit euler is small
+! ---- compared to the solution
       dnf=0.0d0
       dny=0.0d0 
       atoli=atol(1)
@@ -742,12 +742,12 @@ c ---- compared to the solution
       end if
       h=min(h,hmax)
       h=sign(h,posneg) 
-c ---- perform an explicit euler step
+! ---- perform an explicit euler step
       do 12 i=1,n
   12  y1(i)=y(i)+h*f0(i)
       call fcn(n,x+h,h,y1,f1,lrpar,rpar,lipar,ipar,ierr)
       if (ierr /= 0) then; idid=-5; return; end if
-c ---- estimate the second derivative of the solution
+! ---- estimate the second derivative of the solution
       der2=0.0d0
       if (itol.eq.0) then   
         do 15 i=1,n 
@@ -759,8 +759,8 @@ c ---- estimate the second derivative of the solution
   16    der2=der2+((f1(i)-f0(i))/sk)**2   
       end if
       der2=sqrt(der2)/h
-c ---- step size is computed such that
-c ----  h**iord * max ( norm (f0), norm (der2)) = 0.01
+! ---- step size is computed such that
+! ----  h**iord * max ( norm (f0), norm (der2)) = 0.01
       der12=max(abs(der2),sqrt(dnf))
       if (der12.le.1.d-15) then
          h1=max(1.0d-6,abs(h)*1.0d-3)
@@ -771,7 +771,7 @@ c ----  h**iord * max ( norm (f0), norm (der2)) = 0.01
       hinit=sign(h,posneg)  
       return
       end function hinit
-c
+!
 
 
 

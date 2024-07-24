@@ -470,7 +470,7 @@
          use const_def
          integer, parameter :: n = 100
          integer :: ord(n), i
-         real*8 :: a(n)
+         real(dp) :: a(n)
          include 'formats'
          write(*,*)
          write(*,*) 'qsort into increasing order'
@@ -485,14 +485,14 @@
       end subroutine test_qsort
       
       
-      real*8 function g(x) result(y)
-         real*8, intent(in) :: x
+      real(dp) function g(x) result(y)
+         real(dp), intent(in) :: x
          y = (x-3)*(x-8)
       end function g
       
       
       subroutine test_find0_quadratic
-         real*8 :: xx1, yy1, xx2, yy2, xx3, yy3, x, y
+         real(dp) :: xx1, yy1, xx2, yy2, xx3, yy3, x, y
          integer :: ierr
          include 'formats'
          write(*,*) 'test_find0_quadratic'
@@ -528,7 +528,7 @@
       
       
       subroutine test_find_max_quadratic
-         real*8 :: x1, y1, x2, y2, x3, y3, dx1, dx2, xmax, ymax
+         real(dp) :: x1, y1, x2, y2, x3, y3, dx1, dx2, xmax, ymax
          integer :: ierr
          include 'formats'
          write(*,*) 'test_find_max_quadratic'

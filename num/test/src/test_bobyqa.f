@@ -8,9 +8,9 @@
       contains
       
       subroutine do_test_bobyqa      
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(100),XL(100),XU(100),W(10000)
-      real*8, parameter :: max_valid_value = 1d99
+      real(dp), parameter :: max_valid_value = 1d99
       include 'formats'
       BDL=-1.0D0
       BDU=1.0D0
@@ -23,7 +23,7 @@
       DO 10 I=1,N
       XL(I)=BDL
       XU(I)=BDU
-   10 X(I)=DFLOAT(I)/DFLOAT(N+1)
+   10 X(I)=DBLE(I)/DBLE(N+1)
       RHOBEG=0.2D0*X(1)
       PRINT 20, N,NPT
    20 FORMAT (4X,'test BOBYQA with N =',I2,' and NPT =',I3)
@@ -57,8 +57,8 @@
       SUM=0.0D0
       DO 30 J=1,N
    30 SUM=SUM+Y(I,J)
-      SUM=SUM/DFLOAT(N)
-      IF (IW .GT. 0) SUM=SUM+1.0D0/DFLOAT(I*I-2*I)
+      SUM=SUM/DBLE(N)
+      IF (IW .GT. 0) SUM=SUM+1.0D0/DBLE(I*I-2*I)
       IW=-IW
    40 F=F+SUM*SUM
       RETURN

@@ -29,7 +29,7 @@ _Define @TAUPH   0.64D0
 %B:O
     _label @endparm,@endrun,@next,@eomod;
    PROGRAM EVE;
-    IMPLICIT REAL*8(A-H,O-Z);
+    IMPLICIT real(dp)(A-H,O-Z);
     _INCLUDEN snrad;
     _INCLUDEN opacity;
     _INCLUDEN abo;
@@ -809,13 +809,13 @@ _define @ap "'" ;
    WRITE(10,'(''#'',65x,16f13.5)')totmass(Natom+1),(totmass(j),j=1,Natom);
 %I:O
     BLOCK DATA EVEDAT;
-    IMPLICIT REAL*8(A-H,O-Z);
-    REAL*8 M;
+    IMPLICIT real(dp)(A-H,O-Z);
+    real(dp) M;
     _INCLUDE zone; -- Mzon
     COMMON/AMM/DM(Mzon+2),M(Mzon+2);
     COMMON /DAN1/ BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON;
     COMMON /DAN2/ EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2;
-      REAL*8 MIDDLE,DMID;
+      real(dp) MIDDLE,DMID;
     COMMON /DAN3/ DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt;
     COMMON /DANN/ AN;
     COMMON/BTIME/TIME,DTN,DT0,DTK1,DTK2,DTOLD,DTMAX,TOO;
@@ -838,7 +838,7 @@ _define @ap "'" ;
 %B_varmodel:o
 _include formod;
 %BC:
-    REAL*8 UC(Mzon),YAINV(Mzon);
+    real(dp) UC(Mzon),YAINV(Mzon);
     EQUIVALENCE ( Y(3*Mzon+1,1),UC(1)),(Y(4*Mzon+1,1),YAINV(1));
 %BG:O
     Parameter(NDIST=Mzon/3);     -- NUMBER OF REDEFINED OUTER ZONES
@@ -848,7 +848,7 @@ _include formod;
        EPSE1(Mzon+2),PRES1(Mzon+2),TAUZON(Mzon+2),ENERGY(Mzon+2);
     COMMON/DAN1/BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON;
     COMMON/DAN2/EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2;
-    REAL*8 MIDDLE,DMID;
+    real(dp) MIDDLE,DMID;
     COMMON /DAN3/ DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt;
     COMMON/TINT/TC,TS,AMISO,GAMT;
     COMMON/DJI/JT,J1,JK;
@@ -860,7 +860,7 @@ _include formod;
     Logical Prompt;
     Character*3 STATUS;
     Logical Lexist;
-    Real*8 PARMS(5),FACTDM;      -- factor of zone redefining
-    real*8 myrhom(@zone);
-    real*8 totmass(Natom+1); -- Ni in Natom+1
+    real(dp) PARMS(5),FACTDM;      -- factor of zone redefining
+    real(dp) myrhom(@zone);
+    real(dp) totmass(Natom+1); -- Ni in Natom+1
 

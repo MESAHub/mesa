@@ -2,9 +2,9 @@ C---------------------------------------------------------------------------
 C               S U B R O U T I N E   P F S A H A
 C---------------------------------------------------------------------------
       SUBROUTINE PFSAHA(IZ, NION, MODE, T, P, XNE, ANSWER)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
 C
-      REAL*8 XNE, P, ANSWER(6)
+      real(dp) XNE, P, ANSWER(6)
 C This is a slightly modified version of a routine written by Robert Kurucz.
 C I use it to calculate ionization fraction, though as indicated below it
 C will also return partition function. The routine contains data for all
@@ -27,7 +27,7 @@ C  P must contain the total gas pressure.
       intent(out) ANSWER
       DIMENSION F(6),IP(6),PART(6),POTLO(6),LOCZ(29)
       DIMENSION FSAVE(6)
-      REAL*8 IP
+      real(dp) IP
       DIMENSION SCALE(4)
       DIMENSION EHYD(6),EHE1(29),EHE2(6),EC1(14),EMG1(11),EAL1(9),
      1ESI1(11),EC2(6),EMG2(6),ESI2(6),ECA1(8),ECA2(5),ENA1(8),

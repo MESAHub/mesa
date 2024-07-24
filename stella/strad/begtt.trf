@@ -14,11 +14,11 @@ SUBROUTINE BEGINTT;
 -- _TRACE "@wterm' Nzon=',Nzon,' Mzon=',Mzon,"
 -- _TRACE "@wterm' Ncnd=',Ncnd,' Krad=',Krad,"
 -- _TRACE "@wterm' Natom=',Natom,' Zn(Natom)=',Zn(Natom),"
-IMPLICIT REAL*8(A-H,O-Z);
+IMPLICIT real(dp)(A-H,O-Z);
    _INCLUDE  snrad;
    _Include opacity;
    _INCLUDE abo;
- -- real*8 hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
+ -- real(dp) hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
    --       hptrbsc(Nfreq,@Ntab,@Ntab,Mzon/@skip);
   <*B: vars, PARAMETERS, data *>;
   <*R: READ INPUT DATA FOR BURST *>;

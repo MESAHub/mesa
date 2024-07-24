@@ -9,7 +9,7 @@
         use kinds,         only: dp;
         use rad_photo_cross_section,       only: photoCross;
 
-       implicit real*8 (a-h, o-z);
+       implicit real(dp) (a-h, o-z);
 --  _include opacity.inc; -- contains dumfreq etc - conflict with freq etc in arguments
  -- Calling parameters:
  -- <input>
@@ -36,44 +36,44 @@
  --     eden = computed electron density.
 
        integer, parameter   :: p_Nelements = 99;
-       real*8, parameter    :: p_x_i_flo = 1d-17;
+       real(dp), parameter    :: p_x_i_flo = 1d-17;
        integer, parameter   :: p_jmax = 6;
 
        integer nfreqOpac;
        character*(*) linedatafile, longlist, xsecdatadir;
        logical rdlndump, mkshortlist;
-       real*8 rho, temp, abund(p_Nelements), freq(nfreqOpac+1), freqmn(nfreqOpac), taumin;
-       real*8 opac(nfreqOpac), scatop(nfreqOpac);
-       real*8 iondenz(p_jmax,p_Nelements), iondenz_part(p_jmax,p_Nelements);
-       real*8 iondenzHminus;
+       real(dp) rho, temp, abund(p_Nelements), freq(nfreqOpac+1), freqmn(nfreqOpac), taumin;
+       real(dp) opac(nfreqOpac), scatop(nfreqOpac);
+       real(dp) iondenz(p_jmax,p_Nelements), iondenz_part(p_jmax,p_Nelements);
+       real(dp) iondenzHminus;
        integer ionstg1(p_Nelements);
-       real*8 frac(0:31), part(0:31), nucden;
+       real(dp) frac(0:31), part(0:31), nucden;
        real tm1,tm2;
 
        --  pointer (ptrexpnu, expnu);
-       real*8 expnu(nfreqOpac);
+       real(dp) expnu(nfreqOpac);
        --  pointer (ptrplnkfnc, plnkfnc);
-       real*8 plnkfnc(nfreqOpac);
+       real(dp) plnkfnc(nfreqOpac);
        --  pointer (ptrwave, wave);
---       real*8 wave(nfreqOpac+1);
+--       real(dp) wave(nfreqOpac+1);
        --  pointer (ptrhfreq3c2, hfreq3c2);
---       real*8 hfreq3c2(nfreqOpac);
+--       real(dp) hfreq3c2(nfreqOpac);
        --  pointer (ptrdlnfreq, dlnfreq);
---       real*8 dlnfreq(nfreqOpac);
+--       real(dp) dlnfreq(nfreqOpac);
        --  pointer (ptrfreqm3, freqm3);
---       real*8 freqm3(nfreqOpac);
+--       real(dp) freqm3(nfreqOpac);
        --  pointer (ptrsigma, sigma);
        real(kind=dp), dimension(nfreqOpac) ::  sigma;
 
        parameter(maxfreqdim=5000);
-       real*8 wave(maxfreqdim+1);
-       real*8 hfreq3c2(maxfreqdim);
-       real*8 dlnfreq(maxfreqdim);
-       real*8 freqm3(maxfreqdim);
+       real(dp) wave(maxfreqdim+1);
+       real(dp) hfreq3c2(maxfreqdim);
+       real(dp) dlnfreq(maxfreqdim);
+       real(dp) freqm3(maxfreqdim);
 
 
        --  pointer (ptrgff, gff);
-       real*8 gff(nfreqOpac*30);
+       real(dp) gff(nfreqOpac*30);
        _include zone; -- for Az,Zn definitions in fundrad;
        _include fundrad;
 

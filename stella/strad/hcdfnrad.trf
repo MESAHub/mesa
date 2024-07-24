@@ -27,7 +27,7 @@
     --         '  fsave(229)=',fsave(229),"
 --
  SUBROUTINE DIFMAT;
- IMPLICIT REAL*8 (A-H,O-Z);
+ IMPLICIT real(dp) (A-H,O-Z);
     _Include snrad ;
     _include nstep;
     _Include difjac;
@@ -54,12 +54,12 @@
    Parameter(RADC3=RADC/3.D0);
 --  Common/Lim/Klim(Mzon);
    COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH;
-   REAL*8 Ry(Mzon), Uy(Mzon),Ty(Mzon);
+   real(dp) Ry(Mzon), Uy(Mzon),Ty(Mzon);
    <*C* CONVECTIVE VARIABLES *>;
 %CC:O
    COMMON/CONV/ELMX(Mzon),FLCON(Mzon);
    EQUIVALENCE (FSAVE(NYDIM+1+3*Mzon),DUC),(FSAVE(Mzon*3+1),UC);
-   REAL*8 UC(Mzon),DUC(Mzon);
+   real(dp) UC(Mzon),DUC(Mzon);
 %_Varvec:O
 %_THICK:O
     Tprad4=0.D0; TRD4=0.D0; -- TBDD=0.D0;

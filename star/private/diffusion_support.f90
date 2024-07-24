@@ -208,12 +208,12 @@
          
          !write(*,1) 'GT_factor SIG_factor', GT_factor, SIG_factor
 
-         do k = nzlo+1, nzhi         
+         do k = nzlo+1, nzhi
             call get1_flow_coeffs( &
                k, nc, m, v_advection_face(:,k), v_advection_max, &
                SIG_factor, GT_factor, sigma_lnC(:,:,k), &
                four_pi_r2_rho_face(k), dm_bar(k), &
-               C_div_X_face(:,k), GT_face(:,k), D_self_face(:,k), SIG_face(:,:,k))            
+               C_div_X_face(:,k), GT_face(:,k), D_self_face(:,k), SIG_face(:,:,k))
             if (sum_dm >= AD_dm_full_off) then
                AD_face(k) = 0d0
             else
@@ -228,7 +228,7 @@
                         (AD_dm_full_on - AD_dm_full_off)
                !write(*,2) 'boost factor AD_face', k, AD_face(k)/sigmax, AD_face(k)
             end if
-            sum_dm = sum_dm + cell_dm(k)              
+            sum_dm = sum_dm + cell_dm(k)
          end do
          
          do j=1,nc ! not used, but copy just for sake of plotting
@@ -322,7 +322,7 @@
             k, nz, nc, m, nzlo, nzhi, C, X, Z, A, alfa_face, tiny_C, &
             d_dr_factor, dlnRho_dr_face, C_face, X_face, Z_face, C_div_X_face, &
             dC_dr_face, dlnne_dr_face)
-         integer, intent(in) :: k, nc, m, nz, nzlo, nzhi         
+         integer, intent(in) :: k, nc, m, nz, nzlo, nzhi
          real(dp), dimension(:,:), intent(in) :: C, X, Z ! (m,nz)
          real(dp), intent(in) :: A(:) ! (m) atomic number
          real(dp), intent(in) :: alfa_face(:), d_dr_factor, dlnRho_dr_face
@@ -399,8 +399,8 @@
             ! Get number densities (per cm^3)
             do i = 1, nc
                na(i) = rho*X(i)/(A(i)*amu)   
-            end do         
-            na(m) = 0.d0      
+            end do
+            na(m) = 0.d0
             do i = 1, nc
                na(m) = na(m) + charge(i)*na(i)
             end do
@@ -553,7 +553,7 @@
                     e_ap1,e_at1,e_ar1,e_ax1,ierr)
 
                if (ierr /= 0) then
-                  !return      
+                  !return
                   write(*,2) 'solve_burgers_cgs_no_thermal failed', k
                   do i=1,m-1
                      write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -595,7 +595,7 @@
             g_ax(1:m) = 0d0
             
             if (ierr /= 0) then
-               !return      
+               !return
                write(*,2) 'solve_burgers_cgs failed', k
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -612,7 +612,7 @@
                ierr)
 
             if (ierr /= 0) then
-               !return      
+               !return
                write(*,2) 'do1_solve_thoul_hu failed', k
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -779,7 +779,7 @@
             GT_face(i) = GT_factor*four_pi_r2_rho_face*v_advection_face(i)
             D_self_face(i) = sigma_lnC_face(i,i)  
             do j = 1, nc
-               SIG_face(i,j) = c*sigma_lnC_face(i,j)/C_div_X_face(j)               
+               SIG_face(i,j) = c*sigma_lnC_face(i,j)/C_div_X_face(j)
             end do
          end do
          
@@ -878,7 +878,7 @@
 
          ierr = 0
          ko = 2d0  
-         indx(1:n) = 0    
+         indx(1:n) = 0
 
          ! calculate cc and ac:
       
@@ -1354,7 +1354,7 @@
                  delta(i+downshift,j+rightshift) = Kdiff(i,j)* &
                       ( 3d0 + zdiff1(i,j) - 0.8d0*zdiff2(i,j) )* &
                       A(i)*A(j)/pow2(A(i)+A(j))
-              end if              
+              end if
            end do
            
            ! Term multiplying the electric field. (doesn't appear in energy equations)

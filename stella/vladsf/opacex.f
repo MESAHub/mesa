@@ -4,7 +4,7 @@ c and scattering opacity.
       subroutine opacity(rho, temp, abund, nfreq, freq,
      .     dvdr, linedatafile, rdlndump, mkshortlist, longlist,
      .     taumin, xsecdatadir, opac, scatop, eden)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
 c Calling parameters:
 c <input>
@@ -32,39 +32,39 @@ c     eden = computed electron density.
       integer nfreq
       character*(*) linedatafile, longlist, xsecdatadir
       logical rdlndump, mkshortlist
-      real*8 rho, temp, abund(99), freq(nfreq), taumin
-      real*8 opac(nfreq), scatop(nfreq)
+      real(dp) rho, temp, abund(99), freq(nfreq), taumin
+      real(dp) opac(nfreq), scatop(nfreq)
 
-      real*8 iondenz(6,99), iondenz_part(6,99)
+      real(dp) iondenz(6,99), iondenz_part(6,99)
       integer ionstg1(99)
-      real*8 frac(31), part(31), nucden
+      real(dp) frac(31), part(31), nucden
 
 
 C      pointer (ptrexpnu, expnu)
       parameter(iptrexpnu=9999)
-      real*8 expnu(iptrexpnu)
+      real(dp) expnu(iptrexpnu)
 C      pointer (ptrplnkfnc, plnkfnc)
       parameter(iptrplnkfnc=9999)
-      real*8 plnkfnc(iptrplnkfnc)
+      real(dp) plnkfnc(iptrplnkfnc)
 C      pointer (ptrwave, wave)
       parameter(iptrwave=9999)
-      real*8 wave(iptrwave)
+      real(dp) wave(iptrwave)
 C      pointer (ptrhfreq3c2, hfreq3c2)
       parameter(iptrhfreq3c2=9999)
-      real*8 hfreq3c2(iptrhfreq3c2)
+      real(dp) hfreq3c2(iptrhfreq3c2)
 C      pointer (ptrdlnfreq, dlnfreq)
       parameter(iptrdlnfreq=9999)
-      real*8 dlnfreq(iptrdlnfreq)
+      real(dp) dlnfreq(iptrdlnfreq)
 C      pointer (ptrfreqm3, freqm3)
       parameter(iptrfreqm3=9999)
-      real*8 freqm3(iptrfreqm3)
+      real(dp) freqm3(iptrfreqm3)
 C      pointer (ptrsigma, sigma)
       parameter(iptrsigma=9999)
-      real*8 sigma(iptrsigma)
+      real(dp) sigma(iptrsigma)
 
 C      pointer (ptrgff, gff)
       parameter(iptrgff=9999*30)
-      real*8 gff(iptrgff)
+      real(dp) gff(iptrgff)
 
       common/Uex/SUex
 

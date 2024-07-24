@@ -5,14 +5,14 @@
 -- km == the number of mass zone must be defined prior to 
 -- every call of Happa
 Subroutine Happa;
-Implicit real*8 (A-H,O-Z);
+Implicit real(dp) (A-H,O-Z);
 _INCLUDE snrad;
  _Include abo; -- needed for print nstep
 _Include opacity;
 --Parameter(DUSTK=1.d1,TpDust=0.032d0,Cneutr=0.020D0);
 Parameter(DUSTK=1.d-03,TpDust=0.012d0,Cneutr=0.020D0);
 Integer i,j;
-Real*8 xx,yy,Fix1,Fix2,Tab00,Tab01,Tab10,Tab11;
+real(dp) xx,yy,Fix1,Fix2,Tab00,Tab01,Tab10,Tab11;
 Dimension Fixtab(2), Fixtsc(2);
 
 ----------------------------------------------------------
