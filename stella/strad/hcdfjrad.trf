@@ -7,7 +7,7 @@
 --  _TRACE "If(KM>Nzon-2)WRITE(0,'(A,I3,A,1P,E10.2)')
   --                           ' Nzon=',Nzon,'     B01=',B01,"
   Subroutine DIFJAC;
-  IMPLICIT real(dp) (A-H,O-Z);
+  IMPLICIT REAL*8 (A-H,O-Z);
     _include snrad;
     _include difjac;
     _include nstep;

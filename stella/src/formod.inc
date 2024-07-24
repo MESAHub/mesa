@@ -1,4 +1,4 @@
- real(dp)  WMOD(@zone,@Nitem),AZinv(Mzon);
+ Real*8  WMOD(@zone,@Nitem),AZinv(Mzon);
  Integer NZONE, Nitind,IndAbun(Natom);
  Double precision Rhomod(@zone),Tpmod(@zone),Pmod(@zone),ammod(@zone);
  Double precision Xnimod(@zone,2); -- 1st col. Xni, 

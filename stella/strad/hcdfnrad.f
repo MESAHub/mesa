@@ -1,5 +1,5 @@
       SUBROUTINEDIFMAT
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)
@@ -101,7 +101,7 @@
       Common/Burno/YDOT1,YDOT2,CCPL1,CCPL2,CCTP1,CCTP2,AS1,AS2,YCARB1,YCARB2
       Parameter(RADC3=RADC/3.D0)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
-      real(dp)Ry(Mzon),Uy(Mzon),Ty(Mzon)
+      REAL*8Ry(Mzon),Uy(Mzon),Ty(Mzon)
       BLACK(Lbl,Tpbl)=(exp(-(FREQMN(Lbl)/Tpbl)))/(1.d0-(exp(-(FREQMN(Lbl)/Tpbl))))
       BLACKD(Lbl,Tpbl)=(FREQMN(Lbl)/Tpbl)*(exp(-(FREQMN(Lbl)/Tpbl)))/(1.d0-(exp(-(FREQMN(Lbl)/Tpbl))))**2
       Theta(Z)=0.5D0*(SIGN(1.D0,Z)+1.D0)

@@ -3748,12 +3748,12 @@ contains
 
    subroutine ics_full(nz,ne,npts,fr,sigma)
      integer, intent(in)  ::  nz,ne, npts
-      real(dp), dimension(npts), intent(in)  ::  fr
+      real*8, dimension(npts), intent(in)  ::  fr
       real (kind=dp), dimension(npts), intent(out)  :: sigma
       character(len=*), parameter ::  subrtn_name = 'ics_full'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
       integer k, is, nint, nout
-      real(dp) a,b,e,einn,p1,q,s,x,y,z
+      real*8 a,b,e,einn,p1,q,s,x,y,z
 !       common/l/l(7)
 !       common/ninn/ninn(30)
 !       common/ntot/ntot(30)
@@ -3762,7 +3762,7 @@ contains
 
 ! *** Hertz to electron-Volt transition coefficient
 
-      real(dp), parameter :: hztoev=4.13566727333d-15
+      real*8, parameter :: hztoev=4.13566727333d-15
 
 
 ! *** creating null-filled sigma-array      
@@ -3902,7 +3902,7 @@ contains
   subroutine   photoCrossVerner( nz,ne, e, s)
 ! subroutine   photoCrossVerner( nz,ne, e, s)
       integer, intent(in)  ::  nz,ne
-      real(dp), intent(in)  ::  e
+      real*8, intent(in)  ::  e
       real (kind=dp), intent(out)  :: s
       character(len=*), parameter ::  subrtn_name = 'photoCrossVerner'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
@@ -3989,7 +3989,7 @@ end subroutine photoCrossVerner
 !!***************************************************************************
  subroutine   phfit2(nz,ne,is,e,s)
       integer, intent(in)  ::  nz,ne, is
-      real(dp), intent(in)  ::  e
+      real*8, intent(in)  ::  e
       real (kind=dp), intent(out)  :: s
       character(len=*), parameter ::  subrtn_name = 'phfit2'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name

@@ -28,7 +28,7 @@ c  must possess in order to be included in the shortened list of lines.
      .     nradii, nrdim, eden, temp, dvdravg, iondenz, ionstg1, 
      .     nr1, nr2) 
  
-      implicit real(dp) (a-h,o-z) 
+      implicit real*8 (a-h,o-z) 
  
  
 
@@ -65,19 +65,19 @@ c  grid.
 c (integer) MXWAVE is the first (frequency grid) dimension of SCATOP, 
 c OPACITY and EMIS. 
  
-c (real(dp)) HFREQ3C2(NWAVE) = h * freq**3 / c**2 on the frequency grid. 
+c (real*8) HFREQ3C2(NWAVE) = h * freq**3 / c**2 on the frequency grid. 
  
-c (real(dp)) DLNFREQ(NWAVE) = 2 (freq(k+1)-freq(k))/(freq(k)+freq(k+1)). 
+c (real*8) DLNFREQ(NWAVE) = 2 (freq(k+1)-freq(k))/(freq(k)+freq(k+1)). 
  
-c (real(dp)) WLGRD(NWAVE) contains the wavelength grid, in angstroms, with 
+c (real*8) WLGRD(NWAVE) contains the wavelength grid, in angstroms, with 
 c  WLGRD(K+1)<WLGRD(K). 
  
-c (real(dp)) SCATOP(MXWAVE,NRADII), OPACITY(MXWAVE,NRADII) and  
+c (real*8) SCATOP(MXWAVE,NRADII), OPACITY(MXWAVE,NRADII) and  
 c  EMIS(MXWAVE,NRADII) contain the scattering opacity, absorptive opacity, 
 c  and emissivity, respectively, tabulated as a function of frequency and 
 c  radius. 
  
-c (real(dp)) PLNKFNC(MXWAVE,NRADII) must contain the Planck function, B-NU. 
+c (real*8) PLNKFNC(MXWAVE,NRADII) must contain the Planck function, B-NU. 
  
 c (integer) INIT should be set to zero the first time LINEEXPOP is called. 
 c  This causes the line list to be read and sorted, and various other 
@@ -90,7 +90,7 @@ c  the line list contained in the ascii file, LONGLIST, and write out to
 c  the file LINELIST all lines which have TAUSOB > TAUMIN, based on the  
 c  current model. 
  
-c (real(dp)) TAUMIN is the minimum Sobolev optical depth a line should have, 
+c (real*8) TAUMIN is the minimum Sobolev optical depth a line should have, 
 c  somewhere in the star, in order to be included in the file LINELIST (used 
 c  when MKSHTLST is true. 
  
@@ -101,16 +101,16 @@ c (integer) NRADII is the number of radial grid points.
  
 c (integer) NRDIM is the first dimension of IONDENZ and IONSTG1. 
  
-c (real(dp)) EDEN(NRADII) should contain the electron density on the 
+c (real*8) EDEN(NRADII) should contain the electron density on the 
 c  radial grid. 
  
-c (real(dp)) TEMP(NRADII) should contain the temperature on the radial 
+c (real*8) TEMP(NRADII) should contain the temperature on the radial 
 c  grid. 
  
-c (real(dp)) DVDRAVG(NRADII) should contain the angle averaged velocity  
+c (real*8) DVDRAVG(NRADII) should contain the angle averaged velocity  
 c  gradient on the radial grid. 
  
-c (real(dp)) IONDENZ(NRDIM,6,99) should contain the ion density divided by 
+c (real*8) IONDENZ(NRDIM,6,99) should contain the ion density divided by 
 c  the partition function of the six most populated successive ionization 
 c  stages of every element up to Z=99. 
  
@@ -133,13 +133,13 @@ c  to compute the opacity.
  
       integer nwave, mxwave, nradii, nrdim, init, nr1, nr2 
  
-      real(dp) wlgrd(mxwave), taumin 
-      real(dp) dlnfreq(mxwave), hfreq3c2(mxwave) 
-      real(dp) scatop(mxwave,nradii), opacity(mxwave,nradii) 
-      real(dp) emis(mxwave,nradii) 
-      real(dp) plnkfnc(mxwave,nradii) 
-      real(dp) eden(nradii), temp(nradii), dvdravg(nradii) 
-      real(dp) iondenz(nrdim,6,99) 
+      real*8 wlgrd(mxwave), taumin 
+      real*8 dlnfreq(mxwave), hfreq3c2(mxwave) 
+      real*8 scatop(mxwave,nradii), opacity(mxwave,nradii) 
+      real*8 emis(mxwave,nradii) 
+      real*8 plnkfnc(mxwave,nradii) 
+      real*8 eden(nradii), temp(nradii), dvdravg(nradii) 
+      real*8 iondenz(nrdim,6,99) 
  
 c Local variables 
       pointer (pdvdrlog, dvdrlog) 
@@ -159,7 +159,7 @@ c Local variables
       pointer (ptrhckt, hckt) 
       pointer (ptrlabund, labund) 
       pointer (ptrexpvc, expvecx) 
-      real(dp) expvecx(75 *200 ) 
+      real*8 expvecx(75 *200 ) 
 
  
       pointer (ptrlscat, lscat) 
@@ -168,10 +168,10 @@ c Local variables
 
       pointer (ptrlemis, lemis) 
 
-      real(dp) lscat(100000000), lopac(100000000) 
-      real(dp) lemis(100000000) 
+      real*8 lscat(100000000), lopac(100000000) 
+      real*8 lemis(100000000) 
       pointer (ptridenz, idenz) 
-      real(dp) idenz(31*99 *75 ) 
+      real*8 idenz(31*99 *75 ) 
 
  
 
@@ -181,7 +181,7 @@ c Local variables
       pointer (ptrlcountw, linecountw) 
       integer linecountw(4950) 
  
-      real(dp) enrvec(200 ) 
+      real*8 enrvec(200 ) 
  
 
  
@@ -189,7 +189,7 @@ c Local variables
       real*4 elower(112219 ), eupper(112219 ) 
       real*4 enrwt(112219 ) 
       real*4 dumvec(112219 ), element(112219 ) 
-      real(dp) dvdrlog(75 ), hckt(75 ) 
+      real*8 dvdrlog(75 ), hckt(75 ) 
       logical labund(99 ) 
  
       integer idumvec(112219 ), levindex(112219 ) 
@@ -212,7 +212,7 @@ c Local variables
      .     ptgf, ptelow, ptenrndx, ptionstg, ptwlindx, 
      .     ptrlvndx, nlines
  
-      real(dp) quench_fac(2) 
+      real*8 quench_fac(2) 
       integer discard1, discard2, type1, type2, type3, type4 
  
       save ptrinit 

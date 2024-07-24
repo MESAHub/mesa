@@ -9,7 +9,7 @@ _Define
   Subroutine NTH(INCND);
     -- NTM: finds in Nthick(L) the zone numbers of
     -- optically thick zones for all NFRUS frequency groups
-    Implicit real(dp) (a-h,o-z);
+    Implicit real*8 (a-h,o-z);
     _Includen snrad;
     _Includen abo;
     Logical Newth;
@@ -117,7 +117,7 @@ _Define
      _od;
 %_SMOold:O
   Subroutine SMOOTH;
-    Implicit real(dp) (a-h,o-z);
+    Implicit real*8 (a-h,o-z);
     _Includen snrad;
     Logical PEEK,FOUNDP;
     Parameter(DSMTH=1.3D0);
@@ -157,7 +157,7 @@ _Define
   end;
 %_SMOOTH:
   Subroutine SMOOTH;
-    Implicit real(dp) (a-h,o-z);
+    Implicit real*8 (a-h,o-z);
     _Includen snrad;
     Parameter(DSMTH=1.3D0,Fsmth=1.2);
     ISM=0;

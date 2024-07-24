@@ -17,7 +17,7 @@
    @ffloor     1.d-50   -- f (occ.n) floor - machine dependent     
 --
 SUBROUTINE Gdepos;
- IMPLICIT real(dp) (A-H,O-Z);
+ IMPLICIT REAL*8 (A-H,O-Z);
  _Includen snrad;
 -- Parameter(NP=@Npe+@Npc-1);   -- Total number of tangent rays now in abo.inc
  Parameter(tret=1.d0/3.d0);

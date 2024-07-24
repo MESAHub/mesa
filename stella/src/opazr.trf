@@ -1,7 +1,7 @@
 -- Rosseland Opacity in Zeldovich-Raizer approximation
 -- Subroutine opat;
 Subroutine Opacit;
-Implicit real(dp) (a-h,o-z);
+Implicit real*8 (a-h,o-z);
 _include zone;
 _include fundrad;
 -- Parameter(DUSTK=10.d0,CAPMIN=1.D-4,TpDust=0.02d0,Depres=6.d+1,

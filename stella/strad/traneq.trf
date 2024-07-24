@@ -1,5 +1,5 @@
 Subroutine TranEq;
-  IMPLICIT real(dp) (A-H,O-Z);
+  IMPLICIT REAL*8 (A-H,O-Z);
     _Include snrad;
     _Include nstep;
     _Include difjac.inc;

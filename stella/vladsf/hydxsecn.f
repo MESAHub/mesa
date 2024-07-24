@@ -4,9 +4,9 @@ c -----------------------------------------------------------------------
 c Compute hydrogenic crossection for hydrogenic state of charge Z and
 c radial quantum number N.
       function hydxsecn(phot, z, n)
-      implicit real(dp) (a-h, o-z)
+      implicit real*8 (a-h, o-z)
 
-      real(dp) phot, z
+      real*8 phot, z
       integer n
 
 c PHOT is the photon energy in units of the ionization threshold energy.

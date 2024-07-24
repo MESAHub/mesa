@@ -21,7 +21,7 @@ C          OUTPUT:
 C
 C         ANL(IL,IF) = ARRAY OF CROSS SECTIONS, IL=LMIN+1,LMAX+1 AND IF=1,NFREQ
 C   
-      IMPLICIT real(dp)(A-H,O-Z)
+      IMPLICIT REAL*8(A-H,O-Z)
       SAVE
       DIMENSION G2(100,2),G3(100,2),MM(100),AB(100),ALO(1500),FAL(1500),
      ~
@@ -229,7 +229,7 @@ C
       RETURN
       END
       DOUBLE PRECISION FUNCTION EXP1(X)
-      IMPLICIT real(dp)(A-H,O-Z)
+      IMPLICIT REAL*8(A-H,O-Z)
       DX=DABS(X)
       IF(DX.LT.1.0D-9) GOTO1
       IF(DX.LT.1.0D-5) GOTO2

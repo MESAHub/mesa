@@ -1,5 +1,5 @@
  Block Data azdat;
- Implicit real(dp) (a-h,o-z);
+ Implicit real*8 (a-h,o-z);
 _Include zone; 
 _include azzn;
  COMMON /SAMPLE/sampleZ(Natom);

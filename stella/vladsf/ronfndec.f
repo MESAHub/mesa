@@ -1,5 +1,5 @@
       Programronfict
-      implicitreal(dp)(a-h,o-z)
+      implicitreal*8(a-h,o-z)
       character*132tablestr
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
@@ -103,9 +103,9 @@
       datadaybegl/0.d0/,dayendl/2.d0/
       PARAMETER(MAXIONM1=(6-1))
       PARAMETER(NSBINTVL=3*10)
-      real(dp)scatop(Nfreq),opac(Nfreq)
-      real(dp)eden,temp,nucden
-      real(dp)abund(99)
+      real*8scatop(Nfreq),opac(Nfreq)
+      real*8eden,temp,nucden
+      real*8abund(99)
       character*80linelist,longlist,xsecdatadir
       logicalrdlndump
       logicaltstwritten

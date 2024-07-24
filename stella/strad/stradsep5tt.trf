@@ -96,17 +96,17 @@ _DEFINE
 
 -- DEBUG SUBCHK,UNIT(6);ENDDEBUG;
 PROGRAM STELLA;    -- CALCULATE STELLAR MODEL
- IMPLICIT real(dp)(A-H,O-Z);
+ IMPLICIT REAL*8(A-H,O-Z);
  REAL    LTIM,MTIM;              -- TIMER
  REAL    @BEG_TIME,TIMEND;       -- TIMER  IBM, F90 & Ndp
- --real(dp)      @BEG_TIME,TIMEND; -- TIMER  RISC_IBM
+ --REAL*8      @BEG_TIME,TIMEND; -- TIMER  RISC_IBM
  --CHARACTER*8 @DATE, @TIME*8;   -- TIMER  IBM
  CHARACTER*10 @DATE;
  CHARACTER*8  @TIME;            -- TIMER  F90
     _INCLUDE snrad;
     _INCLUDE opacity;
     _INCLUDE abo;
---  real(dp) hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
+--  real*8 hptrbab(Nfreq,@Ntab,@Ntab,Mzon/@skip),
 --          hptrbsc(Nfreq,@Ntab,@Ntab,Mzon/@skip);
 --  Parameter(Taukli=0.1d0); -- tau for flux limiter
 --  Parameter(Taujmp=0.5d0); -- tau jump for flux limiter

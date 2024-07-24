@@ -3,14 +3,14 @@ c               s u b r o u t i n e   s e t n u c m s
 c ---------------------------------------------------------------------------
 c Assign nuclear mass values to array `nucmass'.
       subroutine setnucms(nucmass)
-      implicit real(dp) (a-h,o-z)
+      implicit real*8 (a-h,o-z)
 
       PARAMETER(MAXIONM1=(6  - 1))
       PARAMETER(NSBINTVL=3*10 )
 
-      real(dp) nucmass(99 )
+      real*8 nucmass(99 )
 
-      real(dp) xnucmass(99), nucmass1(79), nucmass2(20)
+      real*8 xnucmass(99), nucmass1(79), nucmass2(20)
 
       equivalence(xnucmass(1), nucmass1(1))
       equivalence(xnucmass(80),nucmass2(1))

@@ -35,10 +35,10 @@ _DEFINE    @H_MINUS_BF_SIGMA    4;
 
 subroutine hMinusAbsorp( T, wLength, pTypeAbsrb, K_res);
      implicit none;
-     real(dp) T, wLength, K_res;
+     Real*8 T, wLength, K_res;
      integer pTypeAbsrb;
 -- var bf
-     real(dp) calc_K_bf_wl,calc_K_ff_wl;
+     Real*8 calc_K_bf_wl,calc_K_ff_wl;
 -- var ff
   
      K_res = 333.33;
@@ -63,8 +63,8 @@ end subroutine;
 /*----------------  FUNCTIONS -------------------------------*/ 
  function calc_K_ff_wl( l_T, l_wLength ) result(K_ff_wl);
 -- var 
-    real(dp) l_T, T5040, l_wLength;
-    real(dp) K_ff_wl, ff_func_sum;
+    Real*8 l_T, T5040, l_wLength;
+    Real*8 K_ff_wl, ff_func_sum;
     Dimension ff_An_g(6), ff_Bn_g(6), ff_Cn_g(6), ff_Dn_g(6), ff_En_g(6), ff_Fn_g(6); -- parameters coeff in table  3a
     Dimension ff_An_s(6), ff_Bn_s(6), ff_Cn_s(6), ff_Dn_s(6), ff_En_s(6), ff_Fn_s(6); -- parameters coeff in table  3b
 /*
@@ -127,9 +127,9 @@ end subroutine;
 
  function calc_K_bf_wl( l_T, l_wLength, typeReturn ) result(K_bf_wl);
 -- var 
-    real(dp)::l_T, l_wLength;
+    Real*8::l_T, l_wLength;
     Integer::typeReturn; 
-    real(dp)       K_bf_wl, bf_sigma_lambda, bf_func_sum;
+    Real*8       K_bf_wl, bf_sigma_lambda, bf_func_sum;
     Parameter(bf_alpha=1.439d4); 
     Parameter(bf_lambda0=1.6419d0); -- the photo-detach. threshold 
     Dimension bf_Cn(6); -- parameters Cn in table 2

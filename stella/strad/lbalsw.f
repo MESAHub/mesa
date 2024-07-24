@@ -6,7 +6,7 @@ C- _TRACE "@wterm' Lb Hedd(63)=',Hedd(63),"
 C- _TRACE "@wterm' Tp, Pl: =',Tp,Pl,"
 C: LOSSEN - LOSSES AND GAINS OF ENERGY *
       SUBROUTINELOSSEN
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
 C- INPUT  RHO,Ty,NREG,Ry,DM,CK1,2,- ARGUMENTS IN COMMONS
 C- OUTPUT  ELTOT,ELVOL,ELSURF,TPSURF IN COM/BAL/
 C-      @wterm  "print*,";
@@ -180,7 +180,7 @@ C- IOUT      LINE PRINT INTERVAL
 C- NOUT      PRINT STEP
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
@@ -188,7 +188,7 @@ C- NOUT      PRINT STEP
       REAL*4WORK(Mzon+2,NFREQ)
 CNFUNC IF NFREQ < NFUNC*
      *,WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
 C       1 - LG(T), 2 - LG(PL), 3 - LG(P), 4 - LG(S)      *
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
@@ -199,7 +199,7 @@ C- Dimension of the Tcurv array
       RealTcurv
       IntegerNFRUSED
 C- an integer array which store exact number of used freqs
-      real(dp)Flsave
+      REAL*8Flsave
 C- remove this to read old flx files!
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
@@ -211,7 +211,7 @@ C- dummy var for constructing of Opafile
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
 C-No. of steps & Time in days
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -259,7 +259,7 @@ C-  DEBUG SUBCHK,UNIT(6);ENDDEBUG;
       SUBROUTINEPRIBAL(IPOUT
 Cline print interval*
      *)
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
 C-      @wterm  "print*,";
 C-NVARS - number of independent variables
       PARAMETER(NVARS=3)
@@ -431,7 +431,7 @@ C- IOUT      LINE PRINT INTERVAL
 C- NOUT      PRINT STEP
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
@@ -439,7 +439,7 @@ C- NOUT      PRINT STEP
       REAL*4WORK(Mzon+2,NFREQ)
 CNFUNC IF NFREQ < NFUNC*
      *,WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
 C       1 - LG(T), 2 - LG(PL), 3 - LG(P), 4 - LG(S)      *
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
@@ -450,7 +450,7 @@ C- Dimension of the Tcurv array
       RealTcurv
       IntegerNFRUSED
 C- an integer array which store exact number of used freqs
-      real(dp)Flsave
+      REAL*8Flsave
 C- remove this to read old flx files!
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
@@ -462,7 +462,7 @@ C- dummy var for constructing of Opafile
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
 C-No. of steps & Time in days
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -473,8 +473,8 @@ C-    Dimension tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon);
       Dimensiontauzon(Nfreq)
       LogicalLOW,HIGH
       COMMON/NIT/Xelow,Xion(0:Nstage,Natom),Nit,LOW,HIGH
-      real(dp)BL(NFREQ),FJ(NFREQ),FH(NFREQ)
-      real(dp)FJL(NFREQ)
+      REAL*8BL(NFREQ),FJ(NFREQ),FH(NFREQ)
+      REAL*8FJL(NFREQ)
 C-Dimension workm(Mzon),Xlow(2),Xup(2);
       COMMON/CONV/ELMX(Mzon),FLCON(Mzon)
 C-    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
@@ -1287,7 +1287,7 @@ C- ' NREG   ENGNUC    XCARB     ENG       LUM      CAPPA    ZON');
       END
 C: PRIMAG - PRINT MAGNITUDES *
       SUBROUTINEPRIMAG
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
       Parameter(MAXIT=15)
       Parameter(EPSTPH=1.D-3)
 C-      @wterm  "print*,";
@@ -1461,7 +1461,7 @@ C- IOUT      LINE PRINT INTERVAL
 C- NOUT      PRINT STEP
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
@@ -1469,7 +1469,7 @@ C- NOUT      PRINT STEP
       REAL*4WORK(Mzon+2,NFREQ)
 CNFUNC IF NFREQ < NFUNC*
      *,WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
 C       1 - LG(T), 2 - LG(PL), 3 - LG(P), 4 - LG(S)      *
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
@@ -1480,7 +1480,7 @@ C- Dimension of the Tcurv array
       RealTcurv
       IntegerNFRUSED
 C- an integer array which store exact number of used freqs
-      real(dp)Flsave
+      REAL*8Flsave
 C- remove this to read old flx files!
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
@@ -1492,7 +1492,7 @@ C- dummy var for constructing of Opafile
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
 C-No. of steps & Time in days
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -1502,8 +1502,8 @@ C-_TRACE "@wterm' depos(1), depos(20)',depos(1),depos(20),"
 C:  PARAMETERS & COMMONS *
 C-    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
       common/phofit/Tphfit,Rphfit
-C-  real(dp) BL(NFREQ),FJ(NFREQ),FH(NFREQ); -- FOR %MG:
-      real(dp)Ryp(Mzon),Uyp(Mzon),Typ(Mzon),Rhop(Mzon)
+C-  REAL*8 BL(NFREQ),FJ(NFREQ),FH(NFREQ); -- FOR %MG:
+      REAL*8Ryp(Mzon),Uyp(Mzon),Typ(Mzon),Rhop(Mzon)
 C- for primag
       Character*80Opafile
 C- Common/opabs100/opacabs100(Nfreq); -- bad if here; now in argument for subr. 'opacity"
