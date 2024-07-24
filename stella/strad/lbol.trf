@@ -1,6 +1,6 @@
  subroutine Lbol(runname);
     -- read and shift lum from runname.ph
-    IMPLICIT REAL*8(A-H,O-Z);
+    IMPLICIT real(dp)(A-H,O-Z);
     _include snrad;
     _include abo;
     _define @ap "'" ;
@@ -17,7 +17,7 @@
     dimension algfreq(Nfreq),freq(Nfreq+1),freqmn(Nfreq),ttt(Nfreq);
     DIMENSION WAVEL(NFREQ);-- WAVELENGTHS IN ANGSTREMS
 --  in Stella  WAVEL in Opacity.inc
-    Real*8 lwplam1,lwplam2;
+    real(dp) lwplam1,lwplam2;
     DATA WLMAX/5.0D+04/,WLMIN/1.D+0/;
     -- wavelength range in Angstrems for SN1987A (Peter Lundqvist)
  */

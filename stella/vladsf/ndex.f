@@ -1,12 +1,12 @@
       integer function ndex(x0, x, n)
       integer n, ndexd
-      real*8 x0, x(n)
+      real(dp) x0, x(n)
       ndex = ndexd(x0, x, n)
       return
       end
 
       function ndexd(x0, x, n)
-      implicit real*8(a - h,o - z)
+      implicit real(dp)(a - h,o - z)
       dimension x(n)
 
 c This function finds the value of ndexd such that x(ndexd) <=

@@ -12,7 +12,7 @@
       interface
 #include "num_bobyqa_proc.dek"
       end interface
-      real*8, intent(in) :: max_valid_value
+      real(dp), intent(in) :: max_valid_value
 
 !     This subroutine seeks the least value of a function of many variables,
 !     by applying a trust region method that forms quadratic models by
@@ -144,7 +144,7 @@
       SUBROUTINE BOBYQB (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,
      1  MAXFUN,XBASE,XPT,FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,
      2  SL,SU,XNEW,XALT,D,VLAG,W,CALFUN,max_valid_value)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       integer :: N, NPT, IPRINT, MAXFUN, NDIM
       DIMENSION X(:),XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),
      1  XOPT(*),GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),
@@ -152,7 +152,7 @@
       interface
 #include "num_bobyqa_proc.dek"
       end interface
-      real*8, intent(in) :: max_valid_value
+      real(dp), intent(in) :: max_valid_value
       
       logical :: do_replace
 !
@@ -833,7 +833,7 @@
 
       SUBROUTINE ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
      1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,GLAG,HCOL,W)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       integer :: N, NPT, NDIM, KOPT, KNEW
       DIMENSION XPT(NPT,*),XOPT(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),
      1  SU(*),XNEW(*),XALT(*),GLAG(*),HCOL(*),W(*)
@@ -1115,7 +1115,7 @@
 
       SUBROUTINE PRELIM (N,NPT,X,XL,XU,RHOBEG,IPRINT,MAXFUN,XBASE,
      1  XPT,FVAL,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,KOPT,CALFUN)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(:),XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),GOPT(*),
      1  HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*)
       interface
@@ -1276,7 +1276,7 @@
       SUBROUTINE RESCUE (N,NPT,XL,XU,IPRINT,MAXFUN,XBASE,XPT,
      1  FVAL,XOPT,GOPT,HQ,PQ,BMAT,ZMAT,NDIM,SL,SU,NF,DELTA,
      2  KOPT,VLAG,PTSAUX,PTSID,W,CALFUN)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XL(:),XU(:),XBASE(*),XPT(NPT,*),FVAL(*),XOPT(*),
      1  GOPT(*),HQ(*),PQ(*),BMAT(NDIM,*),ZMAT(NPT,*),SL(*),SU(*),
      2  VLAG(*),PTSAUX(2,*),PTSID(*),W(*)
@@ -1325,7 +1325,7 @@
       ONE=1.0D0
       ZERO=0.0D0
       NP=N+1
-      SFRAC=HALF/DFLOAT(NP)
+      SFRAC=HALF/DBLE(NP)
       NPTM=NPT-NP
 !
 !     Shift the interpolation points so that XOPT becomes the origin, and set
@@ -1390,9 +1390,9 @@
       DO 60 J=1,N
       JP=J+1
       JPN=JP+N
-      PTSID(JP)=DFLOAT(J)+SFRAC
+      PTSID(JP)=DBLE(J)+SFRAC
       IF (JPN .LE. NPT) THEN
-          PTSID(JPN)=DFLOAT(J)/DFLOAT(NP)+SFRAC
+          PTSID(JPN)=DBLE(J)/DBLE(NP)+SFRAC
           TEMP=ONE/(PTSAUX(1,J)-PTSAUX(2,J))
           BMAT(JP,J)=-TEMP+ONE/PTSAUX(1,J)
           BMAT(JPN,J)=TEMP+ONE/PTSAUX(2,J)
@@ -1411,11 +1411,11 @@
 !
       IF (NPT .GE. N+NP) THEN
           DO 70 K=2*NP,NPT
-          IW=(DFLOAT(K-NP)-HALF)/DFLOAT(N)
+          IW=(DBLE(K-NP)-HALF)/DBLE(N)
           IP=K-NP-IW*N
           IQ=IP+IW
           IF (IQ .GT. N) IQ=IQ-N
-          PTSID(K)=DFLOAT(IP)+DFLOAT(IQ)/DFLOAT(NP)+SFRAC
+          PTSID(K)=DBLE(IP)+DBLE(IQ)/DBLE(NP)+SFRAC
           TEMP=ONE/(PTSAUX(1,IP)*PTSAUX(1,IQ))
           ZMAT(1,K-NP)=TEMP
           ZMAT(IP+1,K-NP)=-TEMP
@@ -1486,7 +1486,7 @@
       ELSE
           IP=PTSID(K)
           IF (IP .GT. 0) SUM=W(NPT+IP)*PTSAUX(1,IP)
-          IQ=DFLOAT(NP)*PTSID(K)-DFLOAT(IP*NP)
+          IQ=DBLE(NP)*PTSID(K)-DBLE(IP*NP)
           IF (IQ .GT. 0) THEN
               IW=1
               IF (IP .EQ. 0) IW=2
@@ -1576,7 +1576,7 @@
   270 HQ(IH)=HQ(IH)+TEMP*W(I)
       PQ(KPT)=ZERO
       IP=PTSID(KPT)
-      IQ=DFLOAT(NP)*PTSID(KPT)-DFLOAT(IP*NP)
+      IQ=DBLE(NP)*PTSID(KPT)-DBLE(IP*NP)
       IF (IP .GT. 0) THEN
           XP=PTSAUX(1,IP)
           XPT(KPT,IP)=XP
@@ -1642,7 +1642,7 @@
           PQ(K)=PQ(K)+TEMP
       ELSE
           IP=PTSID(K)
-          IQ=DFLOAT(NP)*PTSID(K)-DFLOAT(IP*NP)
+          IQ=DBLE(NP)*PTSID(K)-DBLE(IP*NP)
           IHQ=(IQ*IQ+IQ)/2
           IF (IP .EQ. 0) THEN
               HQ(IHQ)=HQ(IHQ)+TEMP*PTSAUX(2,IQ)**2
@@ -1665,7 +1665,7 @@
 
       SUBROUTINE TRSBOX (N,NPT,XPT,XOPT,GOPT,HQ,PQ,SL,SU,DELTA,
      1  XNEW,D,GNEW,XBDI,S,HS,HRED,DSQ,CRVMIN)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XPT(NPT,*),XOPT(*),GOPT(*),HQ(*),PQ(*),SL(*),SU(*),
      1  XNEW(*),D(*),GNEW(*),XBDI(*),S(*),HS(*),HRED(*)
 !
@@ -1955,7 +1955,7 @@
       REDSAV=ZERO
       IU=17.0D0*ANGBD+3.1D0
       DO 170 I=1,IU
-      ANGT=ANGBD*DFLOAT(I)/DFLOAT(IU)
+      ANGT=ANGBD*DBLE(I)/DBLE(IU)
       STH=(ANGT+ANGT)/(ONE+ANGT*ANGT)
       TEMP=SHS+ANGT*(ANGT*DHD-DHS-DHS)
       REDNEW=STH*(ANGT*DREDG-SREDG-HALF*STH*TEMP)
@@ -1974,7 +1974,7 @@
       IF (ISAV .EQ. 0) GOTO 190
       IF (ISAV .LT. IU) THEN
           TEMP=(RDNEXT-RDPREV)/(REDMAX+REDMAX-RDPREV-RDNEXT)
-          ANGT=ANGBD*(DFLOAT(ISAV)+HALF*TEMP)/DFLOAT(IU)
+          ANGT=ANGBD*(DBLE(ISAV)+HALF*TEMP)/DBLE(IU)
       END IF
       CTH=(ONE-ANGT*ANGT)/(ONE+ANGT*ANGT)
       STH=(ANGT+ANGT)/(ONE+ANGT*ANGT)
@@ -2048,7 +2048,7 @@
 
       SUBROUTINE UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,
      1  KNEW,W)
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION BMAT(NDIM,*),ZMAT(NPT,*),VLAG(*),W(*)
 !
 !     The arrays BMAT and ZMAT are updated, as required by the new position

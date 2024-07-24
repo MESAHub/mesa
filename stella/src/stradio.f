@@ -1,5 +1,5 @@
       SubroutineStradIO(mode,Lunit,NFILE)
-      IMPLICITREAL*8(A-H,O-Z)
+      IMPLICITreal(dp)(A-H,O-Z)
       character*80NFILE,mode*2,Status*3
       integerLunit,IOST
       LOGICALLEXIST,DUMMY
@@ -90,13 +90,13 @@
       common/NSTEP/NSTEP,NDebug,MAXER,IOUT,NOUT
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      REAL*8TPMAX(MAXDER+1),TQ(4)
+      real(dp)TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
       PARAMETER(NFUNC=6)
       REAL*4WORK(Mzon+2,NFREQ),WRK(Mzon,4)
-      REAL*8WRKX(Mzon),WORKX(Mzon+2)
+      real(dp)WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
       Common/RUTP/Ry(Mzon),Uy(Mzon),Ty(Mzon),Press(Mzon),Rho(Mzon)
@@ -104,7 +104,7 @@
       Parameter(Lcurdm=1000)
       RealTcurv
       IntegerNFRUSED
-      REAL*8Flsave
+      real(dp)Flsave
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
       Common/BEGR/BEGRUN
@@ -113,7 +113,7 @@
       CHARACTER*1app
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
-      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
+      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM

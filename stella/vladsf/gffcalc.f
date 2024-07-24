@@ -6,7 +6,7 @@ c calculations of Karzas and Latter (1961), by E. Gronenschild and
 c R. Mewe 1978, A&A Suppl, 32, 283-305.
 
       subroutine gffcalc(gauntff, t, freq, nfreq, freqdim, iondim)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
 
       PARAMETER(MAXIONM1=(6  - 1))

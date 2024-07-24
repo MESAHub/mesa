@@ -13,9 +13,9 @@
 !     The Chebyquad test problem (Fletcher, 1965) for N = 2,4,6 and 8,
 !     with NPT = 2N+1.
 !
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(10),W(10000)
-      real*8, parameter :: max_valid_value = 1d99
+      real(dp), parameter :: max_valid_value = 1d99
       include 'formats'
       IPRINT=0
       MAXFUN=5000
@@ -24,7 +24,7 @@
       nfcn = 0
       NPT=2*N+1
       DO 10 I=1,N
-   10 X(I)=DFLOAT(I)/DFLOAT(N+1)
+   10 X(I)=DBLE(I)/DBLE(N+1)
       RHOBEG=0.2D0*X(1)
       PRINT 20, N,NPT
    20 FORMAT (4X,'test NEWUOA with N =',I2,' and NPT =',I3)
@@ -58,8 +58,8 @@
       SUM=0.0D0
       DO 30 J=1,N
    30 SUM=SUM+Y(I,J)
-      SUM=SUM/DFLOAT(N)
-      IF (IW .GT. 0) SUM=SUM+1.0D0/DFLOAT(I*I-2*I)
+      SUM=SUM/DBLE(N)
+      IF (IW .GT. 0) SUM=SUM+1.0D0/DBLE(I*I-2*I)
       IW=-IW
    40 F=F+SUM*SUM
       RETURN

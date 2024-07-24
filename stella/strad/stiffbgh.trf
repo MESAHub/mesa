@@ -29,7 +29,7 @@ _Define
     --          Y(2*Nzon+ncnd+2,1),Y(2*Nzon+ncnd+3,1),Y(2*Nzon+ncnd+4,1) ,"
 
 SUBROUTINE VTSTIF;
-   IMPLICIT REAL*8(A-H,O-Z);
+   IMPLICIT real(dp)(A-H,O-Z);
 /* VTSTIF performs one step of the integration of an initial
    value problem for a system of ordinary differential equations.
    Communication with VTSTIF is done with the following variables:
@@ -157,15 +157,15 @@ _include nstep;
 _include stsave;
 -- COMMON/STSAVE/RMAX,TREND,OLDL0,RC,HOLD,EDN,E,EUP,BND,EPSOLD,TOLD,
    --           MEO,NOLD,NQ,LNQ,IDOUB;
-REAL*8 ERROR(NYDIM),EL(13),TQ(4);
-REAL*8 XMOD,ERREST,ERROLD;
+real(dp) ERROR(NYDIM),EL(13),TQ(4);
+real(dp) XMOD,ERREST,ERROLD;
     PARAMETER (NCHANL=6,
                ETA=1.D-04); -- PIVOT THRESHOLD IN M28BYS
     PARAMETER (DeltaDeb=1.d-10);           -- FOR DEBUGGER
     CHARACTER @STRING*20,@LINE*130;       -- FOR DEBUGGER
     CHARACTER*20 CharVarName(5);          -- FOR DEBUGGER
     Logical FOUNDI;                       -- FOR DEBUGGER
-    REAL*8 @DNAMEDVAR(NYDIM),DSAVE(NYDIM);-- FOR DEBUGGER
+    real(dp) @DNAMEDVAR(NYDIM),DSAVE(NYDIM);-- FOR DEBUGGER
     Integer RETCOD/0/,Ifail/0/; -- RETURN CODE
     Real Tm1,Tm2; -- Timer for CMS -- CRAY REAL
     LOGICAL CORRCO; -- CORRECTOR ITERATIONS HAVE CONVERGED

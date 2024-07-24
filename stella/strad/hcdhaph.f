@@ -1,5 +1,5 @@
       SubroutineDHAPH
-      Implicitreal*8(a-h,o-z)
+      Implicitreal(dp)(a-h,o-z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)

@@ -31,7 +31,7 @@ _define
 <*M: PRIMAG - PRINT MAGNITUDES *>;
 %L:o
 SUBROUTINE LOSSEN;
-IMPLICIT REAL*8(A-H,O-Z);
+IMPLICIT real(dp)(A-H,O-Z);
 -- INPUT  RHO,Ty,NREG,Ry,DM,CK1,2,- ARGUMENTS IN COMMONS
 -- OUTPUT  ELTOT,ELVOL,ELSURF,TPSURF IN COM/BAL/
     _INCLUDEN snrad;
@@ -75,7 +75,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 %P:o
 --  DEBUG SUBCHK,UNIT(6);ENDDEBUG;
     SUBROUTINE PRIBAL(IPOUT /*line print interval*/ );
-    IMPLICIT REAL*8(A-H,O-Z);
+    IMPLICIT real(dp)(A-H,O-Z);
     _INCLUDE snrad;
     _INCLUDE abo; --NVARS-THE NUMBER OF INDEPENDENT VARIABLES
     <*C:  PARAMETERS & COMMONS *>;
@@ -101,8 +101,8 @@ IMPLICIT REAL*8(A-H,O-Z);
     Dimension tauzon(Nfreq);
     Logical LOW,HIGH;
     COMMON/NIT/Xelow,Xion(0:Nstage,Natom),Nit,LOW,HIGH;
-    REAL*8 BL(NFREQ),FJ(NFREQ),FH(NFREQ);
-    REAL*8 FJL(NFREQ);
+    real(dp) BL(NFREQ),FJ(NFREQ),FH(NFREQ);
+    real(dp) FJL(NFREQ);
     --Dimension workm(Mzon),Xlow(2),Xup(2);
     COMMON/CONV/ELMX(Mzon),FLCON(Mzon);
 --    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
@@ -995,7 +995,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 --  CALL PRIMAG;
 %M:o
     SUBROUTINE PRIMAG;
-     IMPLICIT REAL*8(A-H,O-Z);
+     IMPLICIT real(dp)(A-H,O-Z);
      Parameter(MAXIT=15);
      Parameter(EPSTPH=1.D-3);
     _INCLUDEN snrad;
@@ -1004,7 +1004,7 @@ IMPLICIT REAL*8(A-H,O-Z);
   --_TRACE "@wterm' Jph=',Jph,' SumH=',SumH,' Teff=',Teff,"
 --_TRACE "@wterm' depos(1), depos(20)',depos(1),depos(20),"
     <*C:  PARAMETERS & COMMONS *>;
-      REAL*8   Ryp(Mzon),Uyp(Mzon),Typ(Mzon),Rhop(Mzon); -- for primag
+      real(dp)   Ryp(Mzon),Uyp(Mzon),Typ(Mzon),Rhop(Mzon); -- for primag
     _includen opacity;
     _includen black;
     _Do K=1,Nzon;
@@ -1117,7 +1117,7 @@ IMPLICIT REAL*8(A-H,O-Z);
 %MC:O
 --    Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
     common/phofit/Tphfit,Rphfit;
---  REAL*8 BL(NFREQ),FJ(NFREQ),FH(NFREQ); -- FOR %MG:
+--  real(dp) BL(NFREQ),FJ(NFREQ),FH(NFREQ); -- FOR %MG:
 %MA:
    I=NZON; tau(I)=0.D0; tauTp=0.D0;
    IRph=0; kmrep=0;

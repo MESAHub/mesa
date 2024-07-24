@@ -36,7 +36,7 @@
 -- _TRACE "@wterm' Kpl=',Kpl,'  Lfr=', Lfr,' fmin=',fmin,'  fmax=',fmax,"
 --
  SUBROUTINE Feau(incnd,Kntold); -- new and old ncnd
- IMPLICIT REAL*8 (A-H,O-Z);
+ IMPLICIT real(dp) (A-H,O-Z);
  _Includen snrad;
 -- Parameter(NP=@Npe+@Npc-1);   -- Total number of tangent rays
  Parameter(tret=1.d0/3.d0);

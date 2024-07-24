@@ -6,7 +6,7 @@
 -- in COMMON/ARG/ in STATEQ INCLUDE
 --_TRACE "WRITE(5,*)' ZMEAN=',ZMEAN,'   HIGH=',HIGH,"
   SUBROUTINE URSOSZ;
-  IMPlICIT REAL*8 (A-H,O-Z);
+  IMPlICIT real(dp) (A-H,O-Z);
   _INCLUDE zone;
   _INCLUDE fundrad;
   _INCLUDE stateq;

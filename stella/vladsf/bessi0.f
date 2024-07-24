@@ -1,6 +1,6 @@
       FUNCTION BESSI0(X)
-      IMPLICIT REAL*8 (A-H,O-Z)
-      REAL*8 Y,P1,P2,P3,P4,P5,P6,P7,
+      IMPLICIT real(dp) (A-H,O-Z)
+      real(dp) Y,P1,P2,P3,P4,P5,P6,P7,
      *         Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9
       DATA 
      *   P1,P2,P3,P4,P5,P6,P7/1.0D0,3.5156229D0,3.0899424D0,1.2067492D0,

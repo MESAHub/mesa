@@ -8,7 +8,7 @@ c Ron Eastman, UCSC, 10 Nov 1993.
 
       subroutine gshfdxsec(z, ne, n_princ, l_ang, npts, datadir, mode,
      .     x, e_thresh, sigma)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
 c Calling parameters:
 c [input]
@@ -32,7 +32,7 @@ c     (r*8) e_thresh is the threshold energy in eV.
 c     (r*8) sigma(npts) is the photoionization crossection in cm^2.
 
       integer z, ne, n_princ, l_ang, npts, mode
-      real*8 x(npts), sigma(npts)
+      real(dp) x(npts), sigma(npts)
       character*(*) datadir
 
       integer init
@@ -48,32 +48,32 @@ c Arrays to hold first order fitting parameters.
       parameter (n4s=18)
 
       integer z_1s(n1s), ne_1s(n1s)
-      real*8 eth_1s(n1s), e0_1s(n1s), sig0_1s(n1s)
-      real*8 ya_1s(n1s), p_1s(n1s), yw_1s(n1s)
+      real(dp) eth_1s(n1s), e0_1s(n1s), sig0_1s(n1s)
+      real(dp) ya_1s(n1s), p_1s(n1s), yw_1s(n1s)
 
       integer z_2s(n2s), ne_2s(n2s)
-      real*8 eth_2s(n2s), e0_2s(n2s), sig0_2s(n2s)
-      real*8 ya_2s(n2s), p_2s(n2s), yw_2s(n2s)
+      real(dp) eth_2s(n2s), e0_2s(n2s), sig0_2s(n2s)
+      real(dp) ya_2s(n2s), p_2s(n2s), yw_2s(n2s)
 
       integer z_2p(n2p), ne_2p(n2p)
-      real*8 eth_2p(n2p), e0_2p(n2p), sig0_2p(n2p)
-      real*8 ya_2p(n2p), p_2p(n2p), yw_2p(n2p)
+      real(dp) eth_2p(n2p), e0_2p(n2p), sig0_2p(n2p)
+      real(dp) ya_2p(n2p), p_2p(n2p), yw_2p(n2p)
 
       integer z_3s(n3s), ne_3s(n3s)
-      real*8 eth_3s(n3s), e0_3s(n3s), sig0_3s(n3s)
-      real*8 ya_3s(n3s), p_3s(n3s), yw_3s(n3s)
+      real(dp) eth_3s(n3s), e0_3s(n3s), sig0_3s(n3s)
+      real(dp) ya_3s(n3s), p_3s(n3s), yw_3s(n3s)
 
       integer z_3p(n3p), ne_3p(n3p)
-      real*8 eth_3p(n3p), e0_3p(n3p), sig0_3p(n3p)
-      real*8 ya_3p(n3p), p_3p(n3p), yw_3p(n3p)
+      real(dp) eth_3p(n3p), e0_3p(n3p), sig0_3p(n3p)
+      real(dp) ya_3p(n3p), p_3p(n3p), yw_3p(n3p)
 
       integer z_3d(n3d), ne_3d(n3d)
-      real*8 eth_3d(n3d), e0_3d(n3d), sig0_3d(n3d)
-      real*8 ya_3d(n3d), p_3d(n3d), yw_3d(n3d)
+      real(dp) eth_3d(n3d), e0_3d(n3d), sig0_3d(n3d)
+      real(dp) ya_3d(n3d), p_3d(n3d), yw_3d(n3d)
 
       integer z_4s(n4s), ne_4s(n4s)
-      real*8 eth_4s(n4s), e0_4s(n4s), sig0_4s(n4s)
-      real*8 ya_4s(n4s), p_4s(n4s), yw_4s(n4s)
+      real(dp) eth_4s(n4s), e0_4s(n4s), sig0_4s(n4s)
+      real(dp) ya_4s(n4s), p_4s(n4s), yw_4s(n4s)
 
 c Save all these quantities!
 
@@ -101,10 +101,10 @@ c Save all these quantities!
 
 c Arrays to hold second order fitting parameters.
       parameter (ngroups=20)
-      real*8 p_g(ngroups), yw_g(ngroups)
+      real(dp) p_g(ngroups), yw_g(ngroups)
       integer ya_g(ngroups), zc_g(ngroups), alpha_g(ngroups)
       integer z0_g(ngroups), i0_g(ngroups)
-      real*8 a_g(6,ngroups), b_g(6,ngroups), c_g(6,ngroups)
+      real(dp) a_g(6,ngroups), b_g(6,ngroups), c_g(6,ngroups)
       character*4 group_name(ngroups)
 
       common /vybtso/p_g, yw_g, a_g, b_g, c_g, ya_g, zc_g,
@@ -341,12 +341,12 @@ c ---------------------------------------------------------------
 c This subroutine reads in the first order fitting parameters.
       subroutine read_vybt_fo_fits(datadir, fitfile, n, z, ne, eth,
      .     e0, sig0, ya, p, yw)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
       character*(*) datadir, fitfile
       integer z(n), ne(n)
-      real*8 eth(n), e0(n), sig0(n)
-      real*8 ya(n), p(n), yw(n)
+      real(dp) eth(n), e0(n), sig0(n)
+      real(dp) ya(n), p(n), yw(n)
 
 
       character*160  path
@@ -402,15 +402,15 @@ c - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 c ----------------------------------------------------------
 c This subroutine reads in the second order fitting parameters.
       subroutine read_vybt_so_fits(datadir)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
       character*(*) datadir
 c Arrays to hold second order fitting parameters.
       parameter (ngroups=20)
-      real*8 p_g(ngroups), yw_g(ngroups)
+      real(dp) p_g(ngroups), yw_g(ngroups)
       integer ya_g(ngroups), zc_g(ngroups), alpha_g(ngroups)
       integer z0_g(ngroups), i0_g(ngroups)
-      real*8 a_g(6,ngroups), b_g(6,ngroups), c_g(6,ngroups)
+      real(dp) a_g(6,ngroups), b_g(6,ngroups), c_g(6,ngroups)
       character*4 group_name(ngroups)
 
       common /vybtso/p_g, yw_g, a_g, b_g, c_g, ya_g, zc_g,
@@ -486,14 +486,14 @@ c threshold energy is returned. Otherwise, zero is returned.
 
       logical function fo_search(z, ne, l_ang, nfit, zf, nef, eth,
      .     p, e0, sig0, yw, ya, mode, npts, x, sigma, e_thresh)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
       integer z, ne, l_ang, nfit, npts, mode
       integer zf(nfit), nef(nfit)
-      real*8 e_thresh, eth(nfit), e0(nfit), sig0(nfit)
-      real*8 yw(nfit), ya(nfit), p(nfit)
+      real(dp) e_thresh, eth(nfit), e0(nfit), sig0(nfit)
+      real(dp) yw(nfit), ya(nfit), p(nfit)
 
-      real*8 x(npts), sigma(npts)
+      real(dp) x(npts), sigma(npts)
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       fo_search = .false.
 
@@ -518,12 +518,12 @@ c crossection.
 
       subroutine gshfd_sigma_calc(l_ang, eth, p, e0, sig0, yw, ya,
      .        npts, x, sigma, mode)
-      implicit real*8 (a-h, o-z)
+      implicit real(dp) (a-h, o-z)
 
       integer l_ang, npts, mode
-      real*8 eth, e0, sig0, yw, ya, p
+      real(dp) eth, e0, sig0, yw, ya, p
 
-      real*8 x(npts), sigma(npts)
+      real(dp) x(npts), sigma(npts)
 
       data hev/4.1357d-15/, c18/2.997925d+18/
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

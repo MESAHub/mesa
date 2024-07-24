@@ -1,8 +1,8 @@
      SUBROUTINE UBV;
-      IMPLICIT REAL*8 (A-H,O-Z);
+      IMPLICIT real(dp) (A-H,O-Z);
       _INCLUDE snrad;
-      REAL*8 FIU(5),FIB(6),FIV(8),WLU(5),WLB(6),WLV(8);
-      REAL*8 MBOL,MU,MB,MV,MBOL1;
+      real(dp) FIU(5),FIB(6),FIV(8),WLU(5),WLB(6),WLV(8);
+      real(dp) MBOL,MU,MB,MV,MBOL1;
       COMMON/COLOR/MBOL,MU,MB,MV,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,Lyman;
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH;
       DATA FIU/
@@ -52,7 +52,7 @@
       RETURN;
       END;
       FUNCTION FP(X);
-      IMPLICIT REAL*8 (A-H,O-Z);
+      IMPLICIT real(dp) (A-H,O-Z);
       PARAMETER (C1=0.11095214D0,C2=14.3877D0);
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH;
       FP=0.D0;

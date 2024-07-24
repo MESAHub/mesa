@@ -1586,7 +1586,7 @@
             integer, intent(in) :: nvar, nz
             real(dp), intent(in), dimension(:,:) :: equ
             integer :: k, i
-            real*8 :: q
+            real(dp) :: q
             include 'formats'
             eval_f = 0
             do k = 1, nz

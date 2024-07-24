@@ -1,13 +1,13 @@
       subroutineedensol(rho,T,abundx,eden,maxiter,acc,numelems)
-      implicitreal*8(a-h,o-z)
+      implicitreal(dp)(a-h,o-z)
       PARAMETER(MAXIONM1=(6-1))
       PARAMETER(NSBINTVL=3*10)
       parameter(inucmas=99)
-      real*8nucmass(inucmas)
-      real*8abundx(99),rho,eden,T
+      real(dp)nucmass(inucmas)
+      real(dp)abundx(99),rho,eden,T
       integerindexv(99)
       integernumelems
-      real*8frac(0:6),partition(0:6)
+      real(dp)frac(0:6),partition(0:6)
       saveptrnucmass,init
       datainit/1/
       datapi/3.141592653589793d+00/,fourpi/12.5637061d+00/

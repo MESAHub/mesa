@@ -510,7 +510,7 @@
 
 
 
-   real*8 function eval_brent_safe_zero ( a, b, machep, t, epsy, f, fa_in, fb_in, lrpar, rpar, lipar, ipar, ierr )
+   real(dp) function eval_brent_safe_zero ( a, b, machep, t, epsy, f, fa_in, fb_in, lrpar, rpar, lipar, ipar, ierr )
 
    !*****************************************************************************80
    !

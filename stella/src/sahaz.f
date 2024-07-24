@@ -1,5 +1,5 @@
       SUBROUTINEURSOSZ
-      IMPlICITREAL*8(A-H,O-Z)
+      IMPlICITreal(dp)(A-H,O-Z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)

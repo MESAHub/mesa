@@ -1,5 +1,5 @@
    Subroutine DHAPH;
-   Implicit real*8 (a-h,o-z);
+   Implicit real(dp) (a-h,o-z);
    _INCLUDEN snrad;
     _Include difjac;
    Dimension HapHM(Nfreq);

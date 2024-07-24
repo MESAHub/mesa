@@ -1,5 +1,5 @@
       PROGRAMEVE
-      IMPLICITREAL*8(A-H,O-Z)
+      IMPLICITreal(dp)(A-H,O-Z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)
@@ -99,13 +99,13 @@
       common/NSTEP/NSTEP,NDebug,MAXER,IOUT,NOUT
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      REAL*8TPMAX(MAXDER+1),TQ(4)
+      real(dp)TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
       PARAMETER(NFUNC=6)
       REAL*4WORK(Mzon+2,NFREQ),WRK(Mzon,4)
-      REAL*8WRKX(Mzon),WORKX(Mzon+2)
+      real(dp)WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
       Common/RUTP/Ry(Mzon),Uy(Mzon),Ty(Mzon),Press(Mzon),Rho(Mzon)
@@ -113,7 +113,7 @@
       Parameter(Lcurdm=1000)
       RealTcurv
       IntegerNFRUSED
-      REAL*8Flsave
+      real(dp)Flsave
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
       Common/BEGR/BEGRUN
@@ -122,7 +122,7 @@
       CHARACTER*1app
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
-      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
+      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -313,7 +313,7 @@
      *472D-01,-6.931472D-01,1.791759D+00,9.162907D-01,2.876821D-01,-2.876821D-01,-9.162907D-01,-1.791759D+00,6.931472D-01,-6.931472D
      *-01,6.931472D-01,-6.931472D-01/
       DataChames/'H ','He','C ','N ','O ','Ne','Na','Mg','Al','Si','S ','Ar','Ca','Fe','Ni'/
-      Real*8WMOD(1800,22),AZinv(Mzon)
+      real(dp)WMOD(1800,22),AZinv(Mzon)
       IntegerNZONE,Nitind,IndAbun(Natom)
       DoubleprecisionRhomod(1800),Tpmod(1800),Pmod(1800),ammod(1800)
       DoubleprecisionXnimod(1800,2)
@@ -328,7 +328,7 @@
       COMMON/AM1/TMPR(Mzon+2),RHOEVE(Mzon+2),Radius(Mzon+2),VELOC(Mzon+2),EPSE1(Mzon+2),PRES1(Mzon+2),TAUZON(Mzon+2),ENERGY(Mzon+2)
       COMMON/DAN1/BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON
       COMMON/DAN2/EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2
-      REAL*8MIDDLE,DMID
+      real(dp)MIDDLE,DMID
       COMMON/DAN3/DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt
       COMMON/TINT/TC,TS,AMISO,GAMT
       COMMON/DJI/JT,J1,JK
@@ -340,9 +340,9 @@
       LogicalPrompt
       Character*3STATUS
       LogicalLexist
-      Real*8PARMS(5),FACTDM
-      real*8myrhom(1800)
-      real*8totmass(Natom+1)
+      real(dp)PARMS(5),FACTDM
+      real(dp)myrhom(1800)
+      real(dp)totmass(Natom+1)
       DATAIndAbun/1,1,1,1,1,1,1,1,1,1,1,1,1,1,1/
       Open(unit=1,file='eve.1',status='old')
       READ(1,'(A)')
@@ -873,8 +873,8 @@
       Close(10)
       END
       BLOCKDATAEVEDAT
-      IMPLICITREAL*8(A-H,O-Z)
-      REAL*8M
+      IMPLICITreal(dp)(A-H,O-Z)
+      real(dp)M
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)
@@ -887,7 +887,7 @@
       COMMON/AMM/DM(Mzon+2),M(Mzon+2)
       COMMON/DAN1/BM1,Rcen,BMK,RKON,PK,DENSCE,ANTROP,VSTRE,IPRINT,JZON
       COMMON/DAN2/EPS1,EPSD,EPSA,DELTD,DELTB,ITER1,ITER2
-      REAL*8MIDDLE,DMID
+      real(dp)MIDDLE,DMID
       COMMON/DAN3/DM1,DM2,PLATO,CENTR,MIDDLE,DMID,Kadapt
       COMMON/DANN/AN
       COMMON/BTIME/TIME,DTN,DT0,DTK1,DTK2,DTOLD,DTMAX,TOO
