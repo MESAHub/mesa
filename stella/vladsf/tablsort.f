@@ -3,7 +3,7 @@ C                  S U B R O U T I N E   T A B L S O R T
 C --------------------------------------------------------------------------
       SUBROUTINE TABLSORT(N,ARRIN,INDX,IORDER)
       ENTRY DTBLSORT(N,ARRIN,INDX,IORDER)
-      IMPLICIT real(dp) (A-H, O-Z)
+      IMPLICIT REAL*8 (A-H, O-Z)
       INTEGER N, IORDER
 C This subroutine is a essentially unmodified version of a routine published
 C in 'Numerical Recipes' by Press et. al., which they called INDEXX.F.
@@ -331,7 +331,7 @@ C --------------------------------------------------------------------------
 C                  S U B R O U T I N E   I T A B L S R T
 C --------------------------------------------------------------------------
       SUBROUTINE ITABLSRT(N,ARRIN,INDX,IORDER)
-      IMPLICIT real(dp) (A-H, O-Z)
+      IMPLICIT REAL*8 (A-H, O-Z)
       INTEGER N, IORDER
 C This subroutine is a slightly modified version of a routine published
 C in 'Numerical Recipes' by Press et. al., which they called INDEXX.F.

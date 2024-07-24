@@ -22,9 +22,9 @@
 *** If a species in the ground state has no electrons on the given shell,
 *** the subroutine returns s=0.
 ******************************************************************************
-      implicit real(dp) (a-h, o-z)
+      implicit real*8 (a-h, o-z)
       integer nz,ne,is
-      real(dp) e,s
+      real*8 e,s
       common/l/l(7)
       common/ninn/ninn(30)
       common/ntot/ntot(30)
@@ -74,7 +74,7 @@ c     &              ph1(6,nz,ne,is),y
       return
       end
       BLOCK DATA BDATA
-      implicit real(dp) (a-h, o-z)
+      implicit real*8 (a-h, o-z)
       COMMON/L/L(7)
       COMMON/NINN/NINN(30)
       COMMON/NTOT/NTOT(30)

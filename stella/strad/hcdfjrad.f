@@ -1,5 +1,5 @@
       SubroutineDIFJAC
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)

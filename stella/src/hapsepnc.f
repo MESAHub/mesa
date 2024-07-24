@@ -1,5 +1,5 @@
       SubroutineHappa
-      Implicitreal(dp)(A-H,O-Z)
+      Implicitreal*8(A-H,O-Z)
       PARAMETER(NVARS=3)
       include '../obj/nfreq_and_mzone.inc'
       PARAMETER(NYDIM=(NVARS+2*NFREQ)*Mzon,MAXDER=4)
@@ -87,13 +87,13 @@
       common/NSTEP/NSTEP,NDebug,MAXER,IOUT,NOUT
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
       PARAMETER(NFUNC=6)
       REAL*4WORK(Mzon+2,NFREQ),WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
       Common/RUTP/Ry(Mzon),Uy(Mzon),Ty(Mzon),Press(Mzon),Rho(Mzon)
@@ -101,7 +101,7 @@
       Parameter(Lcurdm=1000)
       RealTcurv
       IntegerNFRUSED
-      real(dp)Flsave
+      REAL*8Flsave
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
       Common/BEGR/BEGRUN
@@ -110,7 +110,7 @@
       CHARACTER*1app
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -128,7 +128,7 @@
       Common/dumfreq/dumFreq(Nfreq+1),dumFreqmn(Nfreq),dumwavel(Nfreq)
       Parameter(DUSTK=1.d-03,TpDust=0.012d0,Cneutr=0.020D0)
       Integeri,j
-      real(dp)xx,yy,Fix1,Fix2,Tab00,Tab01,Tab10,Tab11
+      Real*8xx,yy,Fix1,Fix2,Tab00,Tab01,Tab10,Tab11
       DimensionFixtab(2),Fixtsc(2)
       Fun(z,tabz1,tabz2,fun1,fun2)=fun1-(fun1-fun2)*((z-tabz1)/(tabz2-tabz1))
       xx=Log(Pl*Urho)

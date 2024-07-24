@@ -1,7 +1,7 @@
 C- GEAR integrator for ODE with sparse Jacobian and option METH=3
 C- for BRAYTON, GUSTAVSON & HACHTEL method
       SUBROUTINEVTSTIF
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
 C VTSTIF performs one step of the integration of an initial
 C   value problem for a system of ordinary differential equations.
 C   Communication with VTSTIF is done with the following variables:
@@ -275,8 +275,8 @@ C- COMMON/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD;
       COMMON/STSAVE/RMAX,TREND,OLDL0,RC,HOLD,EDN,E,EUP,BND,EPSOLD,TOLD,MEO,NOLD,NQ,LNQ,IDOUB
 C- COMMON/STSAVE/RMAX,TREND,OLDL0,RC,HOLD,EDN,E,EUP,BND,EPSOLD,TOLD,
 C-           MEO,NOLD,NQ,LNQ,IDOUB;
-      real(dp)ERROR(NYDIM),EL(13),TQ(4)
-      real(dp)XMOD,ERREST,ERROLD
+      REAL*8ERROR(NYDIM),EL(13),TQ(4)
+      REAL*8XMOD,ERREST,ERROLD
       PARAMETER(NCHANL=6,ETA=1.D-04)
 C- PIVOT THRESHOLD IN M28BYS
       PARAMETER(DeltaDeb=1.d-10)
@@ -287,7 +287,7 @@ C- FOR DEBUGGER
 C- FOR DEBUGGER
       LogicalFOUNDI
 C- FOR DEBUGGER
-      real(dp)DNDVAR(NYDIM),DSAVE(NYDIM)
+      REAL*8DNDVAR(NYDIM),DSAVE(NYDIM)
 C- FOR DEBUGGER
       IntegerRETCOD/0/,Ifail/0/
 C- RETURN CODE

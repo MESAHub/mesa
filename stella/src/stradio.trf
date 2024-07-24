@@ -40,7 +40,7 @@ _DEFINE
 -- _TRACE "WRITE(*,'(A,1P,E15.3,A)')' EKO=',EKO,";
 
 Subroutine StradIO(mode,Lunit,NFILE);
- IMPLICIT real(dp)(A-H,O-Z);
+ IMPLICIT REAL*8(A-H,O-Z);
 --character*(*) NFILE,mode*2,Status*3;
  character*80 NFILE,mode*2,Status*3;
  integer Lunit,IOST;

@@ -7,7 +7,7 @@
 -- separate absorption made in 1997
 -- bug with it corrected May 23 1998 in Saltsjoebaden
 -- time-dependent Ni-Co-Fe done by Elena Sorokina
-   implicit real(dp) (a-h, o-z);
+   implicit real*8 (a-h, o-z);
    character*132 tablestr;
      _INCLUDE snrad;
      _include nico;
@@ -263,9 +263,9 @@
       PARAMETER(MAXIONM1=(6  - 1));
       PARAMETER(NSBINTVL=3*10 );
 
-      real(dp) scatop(Nfreq), opac(Nfreq);
-      real(dp) eden, temp, nucden;
-      real(dp) abund(99);
+      real*8 scatop(Nfreq), opac(Nfreq);
+      real*8 eden, temp, nucden;
+      real*8 abund(99);
       character*80  linelist, longlist, xsecdatadir;
       logical rdlndump;
       logical tstwritten;

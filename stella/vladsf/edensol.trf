@@ -39,7 +39,7 @@
 
   
       subroutine edensol(rho, T, abundx, eden, maxiter, acc, numelems);
-      implicit real(dp) (a-h,o-z);
+      implicit real*8 (a-h,o-z);
       PARAMETER(MAXIONM1=(6  - 1));
       PARAMETER(NSBINTVL=3*10 );
  --
@@ -47,13 +47,13 @@
   
  --      pointer(ptrnucmass, nucmass)
       parameter(inucmas=99);
-      real(dp) nucmass(inucmas);
+      real*8 nucmass(inucmas);
   
-      real(dp) abundx(99 ), rho, eden, T;
+      real*8 abundx(99 ), rho, eden, T;
       integer indexv(99 );
       integer numelems;
   
-      real(dp) frac(0:6), partition(0:6);
+      real*8 frac(0:6), partition(0:6);
       save ptrnucmass, init;
       data init/1/;
   

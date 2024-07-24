@@ -8,7 +8,7 @@ C-  _TRACE "write(*,*)'  ttfit ii jstep =',ii,jstep,"
 C-  _TRACE "write(*,*)'  ttfit xc05(1) NNAG=',xc05(1),"
 C-  _TRACE "write(*,*)'  Flsave(1,Jsave)=',Flsave(1,Jsave),"
       subroutinett4strad(runname)
-      Implicitreal(dp)(a-h,o-z)
+      Implicitreal*8(a-h,o-z)
 C: *
       Parameter(FJnois=1.d-30)
       Parameter(MAXIT=15)
@@ -200,7 +200,7 @@ C- IOUT      LINE PRINT INTERVAL
 C- NOUT      PRINT STEP
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
@@ -208,7 +208,7 @@ C- NOUT      PRINT STEP
       REAL*4WORK(Mzon+2,NFREQ)
 CNFUNC IF NFREQ < NFUNC*
      *,WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
 C       1 - LG(T), 2 - LG(PL), 3 - LG(P), 4 - LG(S)      *
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
@@ -219,7 +219,7 @@ C- Dimension of the Tcurv array
       RealTcurv
       IntegerNFRUSED
 C- an integer array which store exact number of used freqs
-      real(dp)Flsave
+      REAL*8Flsave
 C- remove this to read old flx files!
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
@@ -231,7 +231,7 @@ C- dummy var for constructing of Opafile
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
 C-No. of steps & Time in days
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -262,7 +262,7 @@ C- parameter (Tbba=2000.d0,epsbb=1.d-3);
       parameter(Tbba=1.d04,epsbb=1.d-3)
 C-Parameter(Mfreq=@Mfreq);
 C- think about max Nfreq !
-      real(dp)alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),wbb(Mfreq)
+      real*8alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),wbb(Mfreq)
       common/frq/alumnu,Blc,Ab,nu,numn,R14,frbba
 C-_includen sahaz;
       Parameter(CPSI=3.0176176020D-04,CPRESS=1.0035958999D-04,CRGAS=8.3144721451D-01,CAvD=6.0221419900D+17,CSaha=1.5271823083D+23,DL
@@ -460,7 +460,7 @@ C: vars. Sasha *
 C-   Dimension freqob(Mfreq);
       Parameter(Ldel=Mfreq/10)
       integerian,j,i,n,Nrec,nfrus
-      real(dp)Ast,hplanck1,b1,b2,Tbb,ybb,LB,BB,LBa,BBa,bBlack,frbb,dx,dAb,F01,F02,FAb1,FAb2,Ft1,Ft2,Av,Fa,Fb1,Fx,D,F1,F2,Fi,a11,a12,a2
+      real*8Ast,hplanck1,b1,b2,Tbb,ybb,LB,BB,LBa,BBa,bBlack,frbb,dx,dAb,F01,F02,FAb1,FAb2,Ft1,Ft2,Av,Fa,Fb1,Fx,D,F1,F2,Fi,a11,a12,a2
      *1,a22,c1,c2,dummy,frbba
 C- NAG SEARCHMIN VARIABLES
       INTEGERNNAG,IA,iwbb,MAXCAL,IPRINT,IFAIL,INAG
@@ -494,16 +494,16 @@ C-
       PARAMETER(NPTSI=23)
       PARAMETER(NPTSMAX=25)
 C- maximum number of points
-      real(dp)Lbolavg,Mbolavg
-      real(dp)U0,B0,V0,UF0,BF0,VF0,RF0,IF0
-      real(dp)WLU(NPTSU),TU(NPTSU),WLB(NPTSB),TB(NPTSB),WLV(NPTSV),TV(NPTSV),WLR(NPTSR),TR(NPTSR),WLI(NPTSI),TI(NPTSI)
-      real(dp)FHX,FLXAVG,AMAGX,SCALE
+      real*8Lbolavg,Mbolavg
+      real*8U0,B0,V0,UF0,BF0,VF0,RF0,IF0
+      real*8WLU(NPTSU),TU(NPTSU),WLB(NPTSB),TB(NPTSB),WLV(NPTSV),TV(NPTSV),WLR(NPTSR),TR(NPTSR),WLI(NPTSI),TI(NPTSI)
+      real*8FHX,FLXAVG,AMAGX,SCALE
       logicalfreqfind
       integerindfreq
       common/ubvwrk/indfreq(NPTSMAX,5),freqfind
 C-      Common/observer/wH(Nfreq),cH(Nfreq),zerfr;
       parameter(NrecMax=10000)
-      real(dp)sumlum(Mfreq,0:NrecMax),avglum(Mfreq),timeph(0:NrecMax),rphsav(0:NrecMax)
+      real*8sumlum(Mfreq,0:NrecMax),avglum(Mfreq),timeph(0:NrecMax),rphsav(0:NrecMax)
       integerinit
       saveinit
       datainit/0/
@@ -548,7 +548,7 @@ C-
       dataTI/0.000,0.024,0.232,0.555,0.785,0.910,0.965,0.985,0.990,0.995,1.000,1.000,0.990,0.980,0.950,0.910,0.860,0.750,0.560,0.330
      *,0.150,0.030,0.000/
 C-real*4 ttt(MFREQ);
-      real(dp)ttt(MFREQ)
+      real*8ttt(MFREQ)
       Common/Volanm/Ryzer,Kmcor
 C- emulate Ni for analyt.model
       BLACK(Lbl,Tpbl)=(exp(-(FREQMN(Lbl)/Tpbl)))/(1.d0-(exp(-(FREQMN(Lbl)/Tpbl))))
@@ -1417,7 +1417,7 @@ C: subroutine *
 C: Double Precision version  *
 C: Subroutine RESID - RESIDUALS OF test EQUATIONS *
       SUBROUTINERESID(NNAG,XC05,RC,IFLAG)
-      IMPLICITreal(dp)(A-H,O-Z)
+      IMPLICITREAL*8(A-H,O-Z)
 C-      @wterm  "print*,";
 C-NVARS - number of independent variables
       PARAMETER(NVARS=3)
@@ -1589,7 +1589,7 @@ C- IOUT      LINE PRINT INTERVAL
 C- NOUT      PRINT STEP
       common/CREAD/TAUOLD,NSTMAX,MBATCH,MAXORD
       common/debug/LfrDebug,Nperturb,Kbad
-      real(dp)TPMAX(MAXDER+1),TQ(4)
+      REAL*8TPMAX(MAXDER+1),TQ(4)
       COMMON/TAU/TAU(Mzon+1),FLUX(Mzon)
       common/tauubvri/tauU(Mzon),tauB(Mzon),tauV(Mzon),tauR(Mzon),tauI(Mzon)
       COMMON/PHOT/XJPH,DMPH,RPH,TPH,PLPH,VPH,CHEMPH,GRVPH,HP,JPH
@@ -1597,7 +1597,7 @@ C- NOUT      PRINT STEP
       REAL*4WORK(Mzon+2,NFREQ)
 CNFUNC IF NFREQ < NFUNC*
      *,WRK(Mzon,4)
-      real(dp)WRKX(Mzon),WORKX(Mzon+2)
+      REAL*8WRKX(Mzon),WORKX(Mzon+2)
       COMMON/STEPD/WRKX,WORKX,TPHOT,TEFF,WORK,WRK,NPHOT,NZM
 C       1 - LG(T), 2 - LG(PL), 3 - LG(P), 4 - LG(S)      *
       PARAMETER(TMCRIT=1.D-6,TPNSE=5.D0,EPGROW=0.02D0)
@@ -1608,7 +1608,7 @@ C- Dimension of the Tcurv array
       RealTcurv
       IntegerNFRUSED
 C- an integer array which store exact number of used freqs
-      real(dp)Flsave
+      REAL*8Flsave
 C- remove this to read old flx files!
       Common/Curve/tcurv(8,Lcurdm),Depos(Lcurdm),Flsave(MFREQ+1,Lcurdm),NFRUSED(Lcurdm),Lsaved
       LOGICALBEGRUN
@@ -1620,7 +1620,7 @@ C- dummy var for constructing of Opafile
       LogicalGivdtl
       Common/ABGrap/NSTA,NSTB,TcurA,TcurB,Givdtl
 C-No. of steps & Time in days
-      real(dp)MBOL,MU,MB,MV,MR,MI,MBOL1
+      REAL*8MBOL,MU,MB,MV,MR,MI,MBOL1
       COMMON/COLOR/MBOL,MU,MB,MV,MR,MI,UMB,BMV,MBOL1,LubvU,LubvB,LubvV,LubvR,LubvI,Lyman
       COMMON/DETAIL/QRTarr(Mzon),UUarr(Mzon),ArrLum(Mzon),Acc(Mzon)
       Common/XYZ/XA,YA,URM
@@ -1630,14 +1630,14 @@ C- parameter (Tbba=2000.d0,epsbb=1.d-3);
       parameter(Tbba=1.d04,epsbb=1.d-3)
 C-Parameter(Mfreq=@Mfreq);
 C- think about max Nfreq !
-      real(dp)alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),wbb(Mfreq)
+      real*8alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),wbb(Mfreq)
       common/frq/alumnu,Blc,Ab,nu,numn,R14,frbba
 C-     CALLED BY C05NAF
 C-     CALCULATES VALUES OF RESIDUALS RC AT XC05,.
 C-     WHERE XC05(1)=LN(YP), XC05(2)=LN(YN)
       INTEGERNNAG
       DimensionXC05(NNAG),RC(NNAG)
-      real(dp)LBa,frbba
+      Real*8LBa,frbba
       hplanck1=2.d0*pi*hplanc
       ITRES=ITRES+1
       IFLAG=0

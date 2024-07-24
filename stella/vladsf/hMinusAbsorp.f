@@ -1,8 +1,8 @@
       subroutinehMinusAbsorp(T,wLength,pTypeAbsrb,K_res)
       implicitnone
-      real(dp)T,wLength,K_res
+      Real*8T,wLength,K_res
       integerpTypeAbsrb
-      real(dp)calc_K_bf_wl,calc_K_ff_wl
+      Real*8calc_K_bf_wl,calc_K_ff_wl
       K_res=333.33
       if(pTypeAbsrb.eq.1)then
       K_res=calc_K_bf_wl(T,wLength,pTypeAbsrb)+calc_K_ff_wl(T,wLength)
@@ -16,8 +16,8 @@
       RETURN
       endsubroutine
       functioncalc_K_ff_wl(l_T,l_wLength)result(K_ff_wl)
-      real(dp)l_T,T5040,l_wLength
-      real(dp)K_ff_wl,ff_func_sum
+      Real*8l_T,T5040,l_wLength
+      Real*8K_ff_wl,ff_func_sum
       Dimensionff_An_g(6),ff_Bn_g(6),ff_Cn_g(6),ff_Dn_g(6),ff_En_g(6),ff_Fn_g(6)
       Dimensionff_An_s(6),ff_Bn_s(6),ff_Cn_s(6),ff_Dn_s(6),ff_En_s(6),ff_Fn_s(6)
       Dataff_An_s/518.1021,473.2636,-482.2089,115.5291,0.0,0.0/
@@ -57,9 +57,9 @@
       return
       endfunction
       functioncalc_K_bf_wl(l_T,l_wLength,typeReturn)result(K_bf_wl)
-      real(dp)::l_T,l_wLength
+      Real*8::l_T,l_wLength
       Integer::typeReturn
-      real(dp)K_bf_wl,bf_sigma_lambda,bf_func_sum
+      Real*8K_bf_wl,bf_sigma_lambda,bf_func_sum
       Parameter(bf_alpha=1.439d4)
       Parameter(bf_lambda0=1.6419d0)
       Dimensionbf_Cn(6)

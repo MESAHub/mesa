@@ -1,6 +1,6 @@
       subroutinelineexpop(linelist,readdump,nwave,mxwave,hfreq3c2,dlnfreq,wlgrd,scatop,opacity,emis,plnkfnc,init,mkshtlst,taumin,lon
      *glist,nradii,nrdim,eden,temp,dvdravg,iondenz,ionstg1,nr1,nr2)
-      implicitreal(dp)(a-h,o-z)
+      implicitreal*8(a-h,o-z)
       PARAMETER(MAXIONM1=(6-1))
       PARAMETER(NSBINTVL=3*10)
       PARAMETER(lindim=300000)
@@ -16,20 +16,20 @@
       integerionstg1(nrdim,99)
       logicalwrtdump,fexist
       integernwave,mxwave,nradii,nrdim,init,nr1,nr2
-      real(dp)wlgrd(mxwave+1),taumin
-      real(dp)dlnfreq(mxwave),hfreq3c2(mxwave)
-      real(dp)scatop(mxwave,nradii),opacity(mxwave,nradii)
-      real(dp)emis(mxwave,nradii)
-      real(dp)plnkfnc(mxwave,nradii)
-      real(dp)eden(nradii),temp(nradii),dvdravg(nradii)
-      real(dp)iondenz(nrdim,6,99)
-      real(dp)expvecx(75*200)
-      real(dp)lscat(10000),lopac(10000)
-      real(dp)lemis(10000)
-      real(dp)idenz(0:31*99*75)
+      real*8wlgrd(mxwave+1),taumin
+      real*8dlnfreq(mxwave),hfreq3c2(mxwave)
+      real*8scatop(mxwave,nradii),opacity(mxwave,nradii)
+      real*8emis(mxwave,nradii)
+      real*8plnkfnc(mxwave,nradii)
+      real*8eden(nradii),temp(nradii),dvdravg(nradii)
+      real*8iondenz(nrdim,6,99)
+      real*8expvecx(75*200)
+      real*8lscat(10000),lopac(10000)
+      real*8lemis(10000)
+      real*8idenz(0:31*99*75)
       integerlinecountr(4950)
       integerlinecountw(4950)
-      real(dp)enrvec(200)
+      real*8enrvec(200)
       real*4wavelen0(lindim),gf0(lindim)
       real*4elower0(lindim),eupper0(lindim)
       real*4element0(lindim)
@@ -38,7 +38,7 @@
       real*4elower(lindim),eupper(lindim)
       real*4enrwt(lindim)
       real*4dumvec(lindim),element(lindim)
-      real(dp)dvdrlog(75),hckt(75)
+      real*8dvdrlog(75),hckt(75)
       logicallabund(99)
       integeridumvec(lindim),levindex(lindim)
       integerznucline(lindim),ionstage(lindim)
@@ -50,7 +50,7 @@
       integerptrinit
       common/ltelnz/ptrwavln,pelement,pidmvec,pdumvec,ptznucln,ptenrwt,ptenrvec,ptgf,ptelow,ptenrndx,ptionstg,ptwlindx,ptrlvndx,nlin
      *es
-      real(dp)quench_fac(2)
+      real*8quench_fac(2)
       integerdiscard1,discard2,type1,type2,type3,type4
       saveptrinit
       realtm1,tm2

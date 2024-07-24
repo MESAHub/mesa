@@ -2,8 +2,8 @@ c This function is the routine bessk0 from `Numerical Recipes', modified
 c so that it returns the expression exp(x) * K0(x). - R. Eastman 11/15/93
 
       function bessk0ex(x)
-      implicit real(dp) (a-h,o-z)
-      real(dp) y,p1,p2,p3,p4,p5,p6,p7,
+      implicit real*8 (a-h,o-z)
+      real*8 y,p1,p2,p3,p4,p5,p6,p7,
      .     q1,q2,q3,q4,q5,q6,q7
       data p1,p2,p3,p4,p5,p6,p7/-0.57721566d0,0.42278420d0,0.23069756d0,
      ~

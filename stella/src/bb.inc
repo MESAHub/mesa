@@ -4,6 +4,6 @@
 parameter (Tbba=1.d04,epsbb=1.d-3);
 --Parameter(Mfreq=@Mfreq);
      -- think about max Nfreq !
-real(dp) alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),
+real*8 alumnu(Mfreq),Blc(Mfreq),Ab(Mfreq),nu(Mfreq),numn(Mfreq),Xpl(Mfreq),
        wbb(Mfreq);
 common/frq/ alumnu,Blc,Ab,nu,numn,R14,frbba;

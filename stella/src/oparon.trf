@@ -15,7 +15,7 @@ _Define
              ";
 
 Subroutine Opacit;
-Implicit real(dp) (a-h,o-z);
+Implicit real*8 (a-h,o-z);
 -- "Dust" added already in HAPPA!!!
 -- Parameter(DUSTK=1.d2,
 --          TpDust=0.032d0); 
