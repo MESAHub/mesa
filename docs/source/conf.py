@@ -22,6 +22,7 @@ copyright = '2024, The MESA Team'
 author = 'The MESA Team'
 release = 'main'
 version = 'main'
+language = 'en'
 
 
 # -- General configuration ---------------------------------------------------
@@ -36,6 +37,7 @@ extensions = [
     'sphinx_copybutton',
     'sphinx_design',
     'sphinx_tags',
+    'sphinxemoji.sphinxemoji',
     'versionwarning.extension',
 ]
 
