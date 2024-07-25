@@ -99,7 +99,7 @@
          include 'formats'
          species = s% species
          nz_old = s% nz
-         ierr = 0         
+         ierr = 0
          num_split = 0
          num_merge = 0
          MaxTooSmall = s% split_merge_amr_MaxShort
@@ -270,7 +270,7 @@
          flipped_hydrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
-         nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_baseline = s% split_merge_amr_nz_baseline
          nz_r_core = s% split_merge_amr_nz_r_core
          if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
             nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
@@ -501,7 +501,7 @@
          include 'formats'
 
          ierr = 0
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
@@ -525,7 +525,7 @@
             end if
          end if
 
-         merge_center = (i == nz)         
+         merge_center = (i == nz)
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
@@ -838,7 +838,7 @@
 
          ierr = 0
          star_PE0 = get_star_PE(s)
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          nz = s% nz
          s% num_hydro_splits = s% num_hydro_splits + 1
          done = .false.
@@ -891,7 +891,7 @@
             write(*,2) 'tauR', i, tauR
             write(*,2) 'nz', nz
             call mesa_error(__FILE__,__LINE__,'do_split')
-            !$omp end critical (adjust_mesh_split_merge_crit1)         
+            !$omp end critical (adjust_mesh_split_merge_crit1)
          end if
                  
          dr = rR - rL
@@ -980,7 +980,7 @@
             v_R = s% u(iR)
             v2_R = v_R*v_R
             v_C = s% u(iC)
-            v2_C = v_C*v_C         
+            v2_C = v_C*v_C
             v_L = s% u(iL)
             v2_L = v_L*v_L
             if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
@@ -1111,7 +1111,7 @@
                write(*,2) 'rho_L', iC, rho_L
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'failed in do_split extrapolation of density from above')
-   !$omp end critical  (adjust_mesh_split_merge_crit2)        
+   !$omp end critical  (adjust_mesh_split_merge_crit2)
             end if
          
          end if

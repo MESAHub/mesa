@@ -64,7 +64,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfixed)
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
 
 COMPILE_CMD = $(COMPILE)
 
@@ -92,10 +92,10 @@ endif
 
 %.o : %.f
 ifneq ($(QUIET),)
-	@echo COMPILE_CMD $<
-	@$(COMPILE_CMD) $<
+	@echo COMPILE_FIXED $<
+	@$(COMPILE_FIXED) $<
 else
-	$(COMPILE_CMD) $<
+	$(COMPILE_FIXED) $<
 endif
 
 %.o : %.f90

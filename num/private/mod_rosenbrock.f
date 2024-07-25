@@ -1097,7 +1097,7 @@
 ! --- step is accepted  
          naccpt=naccpt+1
          if (pred) then
-c       --- predictive controller of gustafsson
+!      --- predictive controller of gustafsson
             if (naccpt.gt.1) then
                facgus=(hacc/h)*pow(err**2/erracc,eloi)/safe
                facgus=max(fac2,min(fac1,facgus))
