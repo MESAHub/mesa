@@ -418,9 +418,9 @@
          porb = b% period
 
          if (has_convective_envelope) then
-            m_env = 0d0
-            r_env = 0d0
-            do k=1, s% nz
+            m_env = s% m(1) / Msun  ! assume fully convective
+            r_env = s% r(1) / Rsun
+            do k=1, s% nz  ! search if _not_ fully convective
                if (s% mixing_type(k) /= convective_mixing .and. &
                    s% rho(k) > 1d5*s% rho(1)) then
                   r_env = (r_phot - s% r(k))/Rsun
