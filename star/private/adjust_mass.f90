@@ -149,7 +149,7 @@
 
          ! Intermediates
          integer j, nz
-         real(dp) r_new, vol00, volp1, cell_vol         
+         real(dp) r_new, vol00, volp1, cell_vol
 
          nz = s%nz
 
@@ -608,7 +608,7 @@
             call work_array(s, alloc_flag, crit, &
                 work, nz*pm_work_size, nz_alloc_extra, 'adjust_mass work', ierr)
             if (ierr /= 0) return
-         end subroutine do_work_arrays            
+         end subroutine do_work_arrays
 
       end subroutine do_adjust_mass
 

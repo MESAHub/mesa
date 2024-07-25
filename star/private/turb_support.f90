@@ -216,7 +216,7 @@ contains
 
       !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
-      ierr = 0          
+      ierr = 0
       if (k > 0) then
          s% tdc_num_iters(k) = 0
       end if
@@ -337,7 +337,7 @@ contains
                if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
-         end if         
+         end if
       end if 
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
@@ -348,7 +348,7 @@ contains
          Y_face = gradT - gradL
          conv_vel = 0d0
          D = 0d0
-         Gamma = 0d0            
+         Gamma = 0d0
       end if
 
       contains

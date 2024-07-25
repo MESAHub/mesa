@@ -33,7 +33,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
       subroutine beam_feval(nvar,t,th,df,ierr,rpar,ipar)
       use math_lib
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT real*8 (A-H,O-Z)
       integer ierr,ipar(*)
       integer, parameter :: N=40, NN=2*N, NCOM=N, NSQ=N*N, NQUATR=NSQ*NSQ, NNCOM=NN
       double precision rpar(*), an, deltas
