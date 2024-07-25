@@ -34,9 +34,10 @@ extensions = [
     'sphinx.ext.extlinks',
     'defaults2rst',
     'sphinx_copybutton',
+    'sphinx_design',
+    'sphinx_tags',
+    'versionwarning.extension',
 ]
-#    'sphinx_design',
-#    'sphinx_tags',
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -93,17 +94,17 @@ html_theme_options = {
 #}
 
 # sphinx_tags options
-#tags_create_tags = True
-#tags_overview_title = "Test Problem tags"
-#tags_page_title = "Tags"
-#tags_page_header = "Test problems with this tag"
-#tags_create_badges = True
-#tags_badge_colors = {
-#    "star": "primary",
-#    "binary": "primary",
-#    "high-mass": "secondary",
-#    "low-mass": "secondary",
-#}
+tags_create_tags = True
+tags_overview_title = "Test Problem tags"
+tags_page_title = "Tags"
+tags_page_header = "Test problems with this tag"
+tags_create_badges = True
+tags_badge_colors = {
+    "star": "primary",
+    "binary": "primary",
+    "high-mass": "secondary",
+    "low-mass": "secondary",
+}
 
 # Set master doc
 master_doc = 'index'
