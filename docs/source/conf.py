@@ -38,7 +38,6 @@ extensions = [
     'sphinx_design',
     'sphinx_tags',
     'sphinxemoji.sphinxemoji',
-    'versionwarning.extension',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
