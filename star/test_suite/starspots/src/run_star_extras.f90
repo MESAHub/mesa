@@ -97,7 +97,7 @@
       integer function extras_start_step(id)
          integer, intent(in) :: id
          integer :: ierr
-         real(dp) :: mu_ideal_gas, R2 !! pi can be deleted
+         real(dp) :: mu_ideal_gas, R2
          type (star_info), pointer :: s
          real(dp) :: power_he_burn, power_c_burn, power_neutrinos, &
          center_h1, center_he4, ocz_top_mass, ocz_bot_mass, &
@@ -186,7 +186,6 @@
 
             use const_def, only: dp
 
-         
             integer, intent(in) :: id
             logical, intent(in) :: skip_partials
 
@@ -198,7 +197,7 @@
             integer, intent(out) :: ierr
 
             ! For my tweaks
-            real(dp) ::  alp !, fspot, xspot
+            real(dp) ::  alp
 
             ! Call the stock get_surf_PT
             type (star_info), pointer :: s
@@ -222,7 +221,7 @@
             s% L(1) = s% L(1) / alp
 
             ! Now, set the Teff. Used in atm table lookup to set boundary conditions
-            s% Teff = pow(s% L(1)/(pi4*s% r(1)*s% r(1)*boltz_sigma), 0.25_dp)
+            s% Teff = pow(s% L(1)/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
 
             ! Set everything with Lamb.
             call star_get_surf_PT(id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
@@ -230,7 +229,7 @@
                   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                   ierr)
 
-            s% Teff = pow(L_init/(pi4*s% r(1)*s% r(1)*boltz_sigma), 0.25_dp)
+            s% Teff = pow(L_init/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
             s% L(1) = L_init
 
       end subroutine starspot_tweak_PT
@@ -250,7 +249,6 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going     
-
 
          if (.false. .and. s% star_mass_h1 < 0.35d0) then
             ! stop when star hydrogen mass drops to specified level
@@ -289,7 +287,6 @@
          ! note: do NOT add the extras names to history_columns.list
          ! the history_columns.list is only for the built-in history column options.
          ! it must not include the new column names you are adding here.
-         
 
       end subroutine data_for_extra_history_columns
 
@@ -397,4 +394,3 @@
       end subroutine extras_after_evolve
 
       end module run_star_extras
-      
