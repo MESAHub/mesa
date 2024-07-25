@@ -20,9 +20,9 @@ sys.path.insert(0, os.path.abspath('./_ext/'))
 project = 'MESA'
 copyright = '2024, The MESA Team'
 author = 'The MESA Team'
-release = 'main'
-version = 'main'
 language = 'en'
+version = 'main'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -112,6 +112,7 @@ master_doc = 'index'
 
 # Set logo
 html_logo = 'mesa-logo-200.png'
+html_favicon = 'mesa-favicon.png'
 
 # Override theme stylesheet
 html_css_files = [
