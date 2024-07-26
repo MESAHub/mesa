@@ -19,19 +19,24 @@ history = mr.MesaData("LOGS/history.data")
 load_dir = mr.MesaLogDir("./LOGS")
 profile = load_dir.profile_data()
 
+# load HR_OPAL.dat reference data
+hr_opal = np.genfromtxt("HR_OPAL.dat", delimiter="   ", skip_header=1)
+
 # Plot HR diagram
 HR_logT_min = 3.55
 HR_logT_max = 3.85
 HR_logL_min = 0.1
 HR_logL_max = 1.0
 plt.figure()
-plt.plot(history.log_Teff, history.log_L)
+plt.plot(hr_opal[:,0], hr_opal[:,1], label="OPAL.dat", color="tab:orange")
+plt.plot(history.log_Teff, history.log_L, label="MESA", color="tab:blue")
 plt.plot(history.log_Teff[-1], history.log_L[-1], "ro")
 plt.xlabel(r"$\log_{10}(T_{\rm eff})$")
 plt.ylabel(r"$\log_{10}(L/L_{\odot})$")
 plt.title("HR Diagram")
 plt.xlim(HR_logT_min, HR_logT_max)
 plt.ylim(HR_logL_min, HR_logL_max)
+plt.legend()
 plt.gca().set_box_aspect(1)
 plt.gca().invert_xaxis()
 plt.savefig("plt_out/HR_diagram.svg", bbox_inches="tight", pad_inches=0)
