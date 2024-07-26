@@ -5,7 +5,7 @@ import mesa_reader as mr
 
 # pip install git+https://github.com/wmwolf/py_mesa_reader.git
 
-# if the directory plt_out/ does not exitst, make it
+# if the directory plt_out/ does not exits, make it
 if not os.path.exists("plt_out"):
     os.makedirs("plt_out")
 
