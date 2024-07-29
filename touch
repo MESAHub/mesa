@@ -26,7 +26,6 @@ do_one auto_diff
 do_one binary
 do_one chem
 do_one colors
-do_one const
 do_one eos
 do_one gyre
 do_one forum
