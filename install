@@ -1,19 +1,14 @@
 #!/bin/bash
 
-set -o pipefail
-
-# Get version number from git
-if [ -d ".git" ] || [ -f ".git" ]; then
-    # Limits hashes to 7 characters
-    version=$(git rev-parse HEAD)
-    printf "%s" "${version:0:7}" > data/version_number
-fi
+set -eo pipefail
 
 # Create file for TestHub
 # This file will be populated during math/test
 echo "# If this file contains only this line, install failed before math/test" > testhub.yml
 
 export BUILD_LOG="build.log"
+
+make data/version_number
 
 # Get system info
 ./help > $BUILD_LOG  2>&1
@@ -174,7 +169,7 @@ then
 	fi
 fi
 
-if [[ "$MESA_DIR" == *" "* ]]; 
+if [[ "$MESA_DIR" == *" "* ]];
 then
 	echo
 	echo "****************************************************************"
@@ -262,6 +257,19 @@ then
 	exit 1
 fi
 
+# Check mesasdk version
+if [ ! -z "$MESASDK_ROOT" ]; then
+    if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
+	MINIMUM_VERSION=20.3.1
+	VERSION_CHECK=$(echo $($MESA_DIR/utils/check_sdk_version $MINIMUM_VERSION))
+	echo MESASDK version check $VERSION_CHECK
+	if [ $VERSION_CHECK != "passed" ]; then
+	    echo Your MESASDK is too old please update to version $MINIMUM_VERSION or newer
+	    exit 1
+        fi
+    fi
+fi
+
 
 if [ ! -r lib ]
 then
@@ -272,6 +280,31 @@ if [ ! -r include ]
 then
   mkdir include
 fi
+
+function enum_procs {
+    if [ -n "$NPROCS" ]; then
+	echo $NPROCS
+    else
+	case `uname -s` in
+	    Linux)
+		if [ -r /proc/cpuinfo ]; then
+		    grep -c processor /proc/cpuinfo
+		else
+		    echo 1
+		fi
+		;;
+	    Darwin)
+		sysctl hw.ncpu | awk '{print $2}'
+		;;
+	    *)
+	    echo 1
+	    ;;
+	esac
+    fi
+}
+
+make -Oline -j$(enum_procs)
+check_okay
 
 do_one_parallel const
 do_one utils
@@ -360,7 +393,7 @@ do_one_parallel ionization
 if [ ! -r data/atm_data ]
 then
 	do_input_data atm
-fi 
+fi
 do_one atm
 do_one turb
 
@@ -396,4 +429,4 @@ echo
 echo
 
 # end scope and redirect output
-} 2>&1 | tee -a $BUILD_LOG
+} 2>&1 | tee -a $BUILD_LOG | grep -Ev "(Leaving|Entering) directory"
