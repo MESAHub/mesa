@@ -7,7 +7,7 @@ inputs:
   sdk:
     description: 'The version of the MESA SDK to install'
     required: false
-    default: '23.7.3'
+    default: '25.12.1'
 
 runs:
 
@@ -66,28 +66,10 @@ runs:
           mesasdk-x86_64-linux-${{inputs.sdk}}.tar.gz
         key: ${{ runner.os }}-${{inputs.sdk}}
 
-    - name: Get SDK ${{ runner.os }} '21.4.1'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '21.4.1') }}
+    - name: Get SDK ${{ runner.os }} '25.12.1'
+      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '25.12.1') }}
       run: |
-        wget -q https://zenodo.org/record/5802444/files/mesasdk-x86_64-linux-21.4.1.tar.gz
-      shell: bash
-
-    - name: Get SDK ${{ runner.os }} '22.6.1'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk ==  '22.6.1') }}
-      run: |
-        wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
-      shell: bash
-
-    - name: Get SDK ${{ runner.os }} '23.7.3'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '23.7.3') }}
-      run: |
-        wget -q https://zenodo.org/record/10624843/files/mesasdk-x86_64-linux-23.7.3.tar.gz
-      shell: bash
-
-    - name: Get SDK ${{ runner.os }} '24.7.1'
-      if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '24.7.1') }}
-      run: |
-        wget -q https://zenodo.org/records/13768913/files/mesasdk-x86_64-linux-24.7.1.tar.gz
+        wget --user-agent="" -q http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-25.12.1.tar.gz
       shell: bash
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
