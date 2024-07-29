@@ -30,16 +30,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <libgen.h>
-#include <sys/types.h>
 #include <stdbool.h>
 #include <dirent.h>
 #include "utils_c_system.h"
 
+#define PATHLEN 4096
 static const int SUCCESS=0;
-static const int PATHLEN=4096;
-static const char TEMPLATE[]="/.temp-XXXXXX";
-static const int LEN_TEMP=strlen(TEMPLATE);
+static const char TEMPLATE[]=".temp-XXXXXX";
 
 /* Makes a single directory at path (mkdir path) */
 int c_mkdir(const char * restrict path) {
@@ -66,7 +63,11 @@ int c_mkdir_p(const char * restrict path) {
     if(is_dir(path)==1) 
         return SUCCESS;
 
-    strncpy(_path, path,PATHLEN);
+    if (strlen(path) >= PATHLEN) {
+        return -1;
+    }
+
+    strcpy(_path, path);
     
     /* Iterate the string */
     for (p = _path + 1; *p; p++) {
@@ -108,127 +109,58 @@ int is_dir(const char * restrict path) {
  */
 
 int c_mv(const char * restrict src, const char * restrict dest) {
-    char realSrc[PATHLEN], realDest[PATHLEN];
-    char *tmp;
-    char destDir[PATHLEN], srcFile[PATHLEN], temp[PATHLEN], copy[PATHLEN];
-    struct stat srcStat, destStat, destDirStat;
-    int remove_dest, fTemp, index;
-    bool dbg = false;
-    
-    remove_dest = 0;
-    /* Get real paths for files */
-    realpath(src, realSrc);
-        
-    /* Cant use realpath as file might not exist yet */
-    strncpy(realDest,dest,PATHLEN);
-        
-    if (stat(realDest,&destStat) == 0)
-        if (!S_ISREG(destStat.st_mode))
-            strncat(realDest,"/",PATHLEN - strlen(realDest) - 1);
-        
-    if(dbg){
-        printf("mv %s to %s\n",src, dest);
-        printf("mv %s to %s\n",realSrc, realDest);
+    char dest_temp[PATHLEN];
+
+    if (rename(src, dest) == SUCCESS) {
+        return SUCCESS;
     }
-    
-    /* Get folder where output will go */
-    strncpy(copy, realDest, PATHLEN);
-    tmp = dirname(copy);   
-    strncpy(destDir, tmp, PATHLEN-1);
-    
-    /* If destination folder does not end in a / add one */
-    index = strlen(destDir);
-    if(index > PATHLEN-2)
-        return -2;
-    
-    if(strcmp(&destDir[index],"/") != 0){
-        destDir[index+1]  = '/';
-        destDir[index+2] = '\0';
-    }
-    
-    /* Get basename of input file */
-    strncpy(copy, realSrc, PATHLEN);
-    tmp = basename(copy);
-    strncpy(srcFile, tmp, PATHLEN-1);
-    
-    if(dbg)
-        printf("+ %s %s %s %s\n",srcFile, realSrc, destDir, realDest);
-    
-    /* Does input file exist? */ 
-    if (stat(realSrc,&srcStat) < 0)
+
+    if (errno != EXDEV) {
         return -1;
-    
-    /* Does output exist? */
-    if (stat(realDest,&destStat) == 0){
-        if(dbg)
-            printf("** %s %s\n", realDest, srcFile);
-            
-        /* Check if folder*/
-        if (S_ISREG(destStat.st_mode)){
-            /* If a file allready, mark for removal*/
-            remove_dest = 1;
-        } else {
-            /* is folder, append src filename to foldername */
-            strcat(realDest, srcFile);
-        }
-    } 
-    if(dbg)
-        printf("*** %s %s\n",destDir, realDest);
-        
-    /* Get stat for output folder */
-    if(stat(destDir, &destDirStat))
-        return -2;
-    
-    /* is src and dest on the same file system? */
-    if (srcStat.st_dev == destDirStat.st_dev){
-        /* Delete output file if it exists */
-        if(remove_dest)
-            remove(realDest);
-            
-        if(dbg)
-            printf("%s %s\n", realSrc, realDest);
-        /* Move src to dest */
-        if(rename(realSrc, realDest) != SUCCESS)
-            return -3; 
-            
-    } else{
-        /* Copy src to a temp file on dest then move to final location */
-        
-        /* Build temporay filename */
-        strncpy(temp, destDir, PATHLEN - LEN_TEMP);
-        strncat(temp, TEMPLATE, PATHLEN - strlen(temp) - 1);
-        
-        /* Make temp file */
-        fTemp = mkstemp(temp);
-        if (fTemp < 0)
-            goto error;
-        /* Just need the file made dont need the file descriptor */
-        close(fTemp);
-            
-        /* Copy data to temp file */
-        if (c_cp(realSrc, temp) != SUCCESS)
-            goto error; 
-            
-        /* Delete output file if it exists */
-        if(remove_dest)
-            remove(realDest);
-                        
-        /* Move from temp to final dest */
-        if(rename(temp, realDest) != SUCCESS)
-            goto error;
-        
-        /* Remove orignal */
-        remove(realSrc);
     }
-    
+
+    if (strlen(dest) >= PATHLEN) {
+        return -1;
+    }
+
+    strcpy(dest_temp, dest);
+
+    size_t i = strlen(dest);
+    while (i) {
+        if (dest_temp[i - 1] == '/') {
+            break;
+        }
+
+        i--;
+    }
+
+    if (strlen(TEMPLATE) >= PATHLEN - i) {
+        return -1;
+    }
+
+    strcpy(dest_temp + i, TEMPLATE);
+
+    int fd = mkstemp(dest_temp);
+
+    if (fd == -1) {
+        return -1;
+    }
+
+    close(fd);
+
+    if (c_cp(src, dest_temp) != SUCCESS) {
+        remove(dest_temp);
+        return -1;
+    }
+
+    if (rename(dest_temp, dest) != SUCCESS) {
+        remove(dest_temp);
+        return -1;
+    }
+
+    remove(src);
+
     return SUCCESS;
-    
-    error:
-        remove(temp);
-        if(fTemp >= 0)
-            close(fTemp);
-        return -8;
-    
 }
 
 
