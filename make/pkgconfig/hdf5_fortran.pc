@@ -1,5 +1,5 @@
-Name: hdf5-fortran
+Name: hdf5_fortran
 Description: HDF5 (Hierarchical Data Format 5) Software Library
 Version: 1.14.2
 Cflags: -I${MESASDK_ROOT}/include
-Libs: -L${MESASDK_ROOT}/lib -lhdf5_fortram
+Libs: -L${MESASDK_ROOT}/lib -lhdf5_fortran

@@ -1,0 +1,4 @@
+Name: lapack
+Version: 3.0
+Description: LAPACK
+Libs: -L${MESASDK_ROOT}/math-slots/${MATH_SLOT}/lib/ -llapack -lblas
