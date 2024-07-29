@@ -1,1 +1,1 @@
-SUBDIRS := const
+SUBDIRS := const utils
