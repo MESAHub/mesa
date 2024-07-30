@@ -2,6 +2,7 @@
       
       use num_def
       use num_lib
+      use const_def, only: dp
       
       integer :: nfcn
 
@@ -16,6 +17,7 @@
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(10),W(10000)
       real(dp), parameter :: max_valid_value = 1d99
+      integer :: IPRINT,I,N,NPT,MAXFUN
       include 'formats'
       IPRINT=0
       MAXFUN=5000
@@ -43,7 +45,8 @@
       real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
 
-      real(dp) :: Y(10,10)
+      integer :: I,J,IW,MAXFUN,NP
+      real(dp) :: Y(10,10), sum
       nfcn = nfcn + 1
       DO 10 J=1,N
       Y(1,J)=1.0D0

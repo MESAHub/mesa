@@ -18,8 +18,9 @@ c     $Id: beam.F,v 1.2 2006/10/02 10:29:13 testset Exp $
 c
 c-----------------------------------------------------------------------
       subroutine beam_init(neqn,y,yprime,consis)
+      use const_def, only: dp
       integer neqn
-      double precision y(neqn),yprime(neqn)
+      real(dp) y(neqn),yprime(neqn)
       logical consis
 
       integer i
@@ -32,11 +33,12 @@ c-----------------------------------------------------------------------
       end
 c-----------------------------------------------------------------------
       subroutine beam_feval(nvar,t,th,df,ierr,rpar,ipar)
+      use const_def, only: dp
       use math_lib
-      IMPLICIT real*8 (A-H,O-Z)
+      IMPLICIT real(dp) (A-H,O-Z)
       integer ierr,ipar(*)
       integer, parameter :: N=40, NN=2*N, NCOM=N, NSQ=N*N, NQUATR=NSQ*NSQ, NNCOM=NN
-      double precision rpar(*), an, deltas
+      real(dp) rpar(*), an, deltas
         DIMENSION DF(NN),TH(150),U(150),V(150),W(150)
         DIMENSION ALPHA(150),BETA(150),STH(150),CTH(150)
 C --- SET DEFAULT VALUES
@@ -115,8 +117,9 @@ C -------- PUT  DERIVATIVES IN RIGHT PLACE -------------
         END
 c-----------------------------------------------------------------------
       subroutine beam_jeval(ldim,neqn,t,y,yprime,dfdy,ierr,rpar,ipar)
+      use const_def, only: dp
       integer ldim,neqn,ierr,ipar(*)
-      double precision t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
+      real(dp) t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
 c
 c     dummy subroutine
 c
@@ -124,11 +127,12 @@ c
       end
 c-----------------------------------------------------------------------
       subroutine beam_solut(neqn,t,y)
+      use const_def, only: dp
       integer neqn
-      double precision t,y(neqn)
+      real(dp) t,y(neqn)
 c
 c
-c computed using double precision RADAU on an 
+c computed using real(dp) RADAU on an 
 c     Alphaserver DS20E, with a 667 MHz EV67 processor.
 c          
 c          uround = 1.01d-19
