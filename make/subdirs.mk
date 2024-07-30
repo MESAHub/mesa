@@ -1,1 +1,1 @@
-SUBDIRS := const utils math
+SUBDIRS := const utils math mtx
