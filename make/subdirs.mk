@@ -1,1 +1,1 @@
-SUBDIRS := const utils math mtx
+SUBDIRS := const utils math mtx auto_diff
