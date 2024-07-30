@@ -33,7 +33,6 @@ do_one interp_1d
 do_one interp_2d
 do_one ionization
 do_one kap
-do_one mtx
 do_one net
 do_one neu
 do_one num
