@@ -34,7 +34,6 @@ do_one ionization
 do_one kap
 do_one net
 do_one neu
-do_one num
 do_one rates
 do_one sample
 do_one star
