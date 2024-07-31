@@ -77,23 +77,20 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-COMPILE_NC = $(FC) $(FCbasic) $(FCopenmp) $(FCstatic) $(FCopt) $(FCfixed) $(TEST_INCLUDES) -c
-
-bari_vdpol.o bari_vdpol3.o bari_vdpol_x.o bari_vdpol3_x.o bari_medakzo.o bari_hires.o \
-  bari_pollu.o bari_rober.o bari_beam.o bari_chemakzo.o : %.o : %.f
+%.o : %.f
 ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY_NC $<
-	@$(COMPILE_NC) $<
+	@echo TEST_COMPILE fixed $<
+	@$(TEST_COMPILE) $(FCfixed) -fimplicit-none $<
 else
-	$(COMPILE_NC) $<
+	$(TEST_COMPILE) $(FCfixed)-fimplicit-none $<
 endif
 
 %.o: %.f90
 ifneq ($(QUIET),)
-	@echo TEST_COMPILE_LEGACY $<
-	@$(TEST_COMPILE) $(FCfree) $<
+	@echo TEST_COMPILE free $<
+	@$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
 else
-	$(TEST_COMPILE) $(FCfree) $<
+	$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
 endif
 
 #################################################################
