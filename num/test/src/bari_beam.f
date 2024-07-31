@@ -36,7 +36,7 @@ c-----------------------------------------------------------------------
       use const_def, only: dp
       use math_lib
       IMPLICIT real(dp) (A-H,O-Z)
-      integer ierr,ipar(*)
+      integer ierr,nvar,i,ipar(*)
       integer, parameter :: N=40, NN=2*N, NCOM=N, NSQ=N*N, NQUATR=NSQ*NSQ, NNCOM=NN
       real(dp) rpar(*), an, deltas
         DIMENSION DF(NN),TH(150),U(150),V(150),W(150)

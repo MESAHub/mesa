@@ -11,6 +11,10 @@
 #include "mtx_decsol.dek"
 #include "mtx_decsols.dek"
       end interface
+      integer, pointer :: ip1(:) ! (nm1)
+      integer :: n, iphes(n), nerror, ldjac, mljac, mujac, ldmas, mlmas, mumas
+      integer :: nfcn, ijob, m1, m2, nm1, lde1, lrpar, lipar, ier, mle, mue
+      integer :: mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
       integer :: ia(:) ! (n+1)
       integer :: ja(:) ! (nzmax)
       double precision :: sa(nzmax)
@@ -19,10 +23,6 @@
       integer, intent(inout), pointer :: ipar(:) ! (lipar)
       real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
       
-      integer, pointer :: ip1(:) ! (nm1)
-      integer :: iphes(n), n, nerror, ldjac, mljac, mujac, ldmas, mlmas, mumas
-      integer :: nfcn, ijob, m1, m2, nm1, lde1, lrpar, lipar, ier, mle, mue
-      integer :: mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lrd, lid
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
       double precision, pointer :: e1_1D(:)
       double precision :: x, scal(n), y0(n), y(n)

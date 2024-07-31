@@ -11,6 +11,7 @@
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(100),XL(100),XU(100),W(10000)
       real(dp), parameter :: max_valid_value = 1d99
+      integer I,IPRINT,n,MAXFUN,NPT
       include 'formats'
       BDL=-1.0D0
       BDU=1.0D0
@@ -41,6 +42,8 @@
       integer, intent(in) :: n
       real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
+      integer :: i,j,iw,np
+      real(dp) :: sum
 
       real(dp) :: Y(10,10)
       nfcn = nfcn + 1
