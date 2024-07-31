@@ -308,8 +308,6 @@ check_okay
 
 do_one_parallel forum
 
-do_one_parallel interp_2d
-
 if [ ! -r data ]
 then
 	echo
