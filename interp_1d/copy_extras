@@ -1,4 +1,0 @@
-mkdir new/test/plot_data
-mkdir new/test/plot_out
-cp -r test/test_data new/test/test_data
-cp test/*.rb new/test
