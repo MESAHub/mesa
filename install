@@ -343,18 +343,6 @@ then
 fi
 do_one_parallel colors
 
-# get rid of obsolete eos_data directory
-rm -rf data/eos_data
-
-# check that the eos data directories exist
-if [ ! -r data/eosDT_data ]
-then
-	do_input_data eos
-fi
-
-# now have installed eos data, so can install the eos module
-do_one_parallel eos
-
 if [ ! -r data/kap_data ]
 then
 	do_input_data kap
