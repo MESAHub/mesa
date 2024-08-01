@@ -24,7 +24,6 @@ do_one astero
 do_one atm
 do_one binary
 do_one colors
-do_one eos
 do_one gyre
 do_one forum
 do_one ionization
