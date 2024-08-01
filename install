@@ -337,16 +337,6 @@ function do_input_data {
 	cd ..
 }
 
-
-
-
-
-if [ ! -r data/chem_data ]
-then
-	do_input_data chem
-fi
-do_one_parallel chem
-
 if [ ! -r data/colors_data ]
 then
 	do_input_data colors
