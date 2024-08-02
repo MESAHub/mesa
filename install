@@ -306,8 +306,6 @@ function enum_procs {
 make -Oline -j$(enum_procs)
 check_okay
 
-do_one_parallel forum
-
 if [ ! -r data ]
 then
 	echo
