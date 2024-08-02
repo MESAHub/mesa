@@ -313,8 +313,6 @@ else
 fi
 check_okay
 
-do_one_parallel forum
-
 if [ ! -r data ]
 then
 	echo
