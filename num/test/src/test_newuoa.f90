@@ -15,8 +15,10 @@ contains
 !     The Chebyquad test problem (Fletcher, 1965) for N = 2,4,6 and 8,
 !     with NPT = 2N+1.
 !
-      dimension X(10), W(10000)
+      real(dp), dimension(10) :: X
+      real(dp), dimension(10000) :: W
       real(dp), parameter :: max_valid_value = 1d99
+      real(dp) :: f, RHOBEG, RHOend
       integer :: IPRINT, I, N, NPT, MAXFUN
       include 'formats'
       IPRINT = 0
