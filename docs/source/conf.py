@@ -14,6 +14,13 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('./_ext/'))
 
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context["READTHEDOCS"] = True
+
 
 # -- Project information -----------------------------------------------------
 
@@ -103,6 +110,7 @@ tags_create_badges = True
 tags_badge_colors = {
     "star": "primary",
     "binary": "primary",
+    "astero": "primary",
     "high-mass": "secondary",
     "low-mass": "secondary",
 }
