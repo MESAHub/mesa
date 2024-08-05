@@ -14,13 +14,6 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('./_ext/'))
 
-# Set canonical URL from the Read the Docs Domain
-html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
-
-# Tell Jinja2 templates the build is running on Read the Docs
-if os.environ.get("READTHEDOCS", "") == "True":
-    html_context["READTHEDOCS"] = True
-
 
 # -- Project information -----------------------------------------------------
 
@@ -121,6 +114,16 @@ master_doc = 'index'
 # Set logo
 html_logo = 'mesa-logo-200.png'
 html_favicon = 'mesa-favicon.png'
+
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+html_context = {}
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context["READTHEDOCS"] = True
+
 
 # Override theme stylesheet
 html_css_files = [
