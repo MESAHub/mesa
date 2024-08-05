@@ -1,19 +1,24 @@
-      module test_bobyqa
+      module test_newuoa
       
       use num_def
       use num_lib
+      use const_def, only: dp
       
       integer :: nfcn
 
       contains
       
-      subroutine do_test_bobyqa      
+      subroutine do_test_newuoa      
+
+!
+!     The Chebyquad test problem (Fletcher, 1965) for N = 2,4,6 and 8,
+!     with NPT = 2N+1.
+!
       IMPLICIT real(dp) (A-H,O-Z)
-      DIMENSION X(100),XL(100),XU(100),W(10000)
+      DIMENSION X(10),W(10000)
       real(dp), parameter :: max_valid_value = 1d99
+      integer :: IPRINT,I,N,NPT,MAXFUN
       include 'formats'
-      BDL=-1.0D0
-      BDU=1.0D0
       IPRINT=0
       MAXFUN=5000
       RHOEND=1.0D-6
@@ -21,18 +26,16 @@
       nfcn = 0
       NPT=2*N+1
       DO 10 I=1,N
-      XL(I)=BDL
-      XU(I)=BDU
    10 X(I)=DBLE(I)/DBLE(N+1)
       RHOBEG=0.2D0*X(1)
       PRINT 20, N,NPT
-   20 FORMAT (4X,'test BOBYQA with N =',I2,' and NPT =',I3)
-      CALL BOBYQA (N,NPT,X,XL,XU,RHOBEG,RHOEND,IPRINT,MAXFUN,W,CALFUN,max_valid_value)
+   20 FORMAT (4X,'test NEWUOA with N =',I2,' and NPT =',I3)
+      CALL NEWUOA (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,CALFUN,max_valid_value)
       call calfun(n,x,f)
       !write(*,2) 'f', nfcn, f
-      if (abs(f) > 1d-10) write(*,*) 'failed in test of BOBYQA: min f', f
+      if (abs(f) > 1d-10) write(*,*) 'failed in test of newuoa: min f', f
    30 CONTINUE
-      END subroutine do_test_bobyqa
+      END subroutine do_test_newuoa
 
 
 
@@ -42,7 +45,8 @@
       real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
 
-      real(dp) :: Y(10,10)
+      integer :: I,J,IW,MAXFUN,NP
+      real(dp) :: Y(10,10), sum
       nfcn = nfcn + 1
       DO 10 J=1,N
       Y(1,J)=1.0D0
@@ -63,23 +67,5 @@
    40 F=F+SUM*SUM
       RETURN
       END SUBROUTINE CALFUN      
-
-
-      SUBROUTINE xCALFUN (N,X,F)
-      implicit none
-      integer, intent(in) :: n
-      real(dp), intent(in) :: x(*)
-      real(dp), intent(out) :: f
-      integer :: i, j
-      real(dp) :: temp
-      F=0.0D0
-      DO 10 I=4,N,2
-      DO 10 J=2,I-2,2
-      TEMP=(X(I-1)-X(J-1))**2+(X(I)-X(J))**2
-      TEMP=DMAX1(TEMP,1.0D-6)
-   10 F=F+1.0D0/DSQRT(TEMP)
-      RETURN
-      END SUBROUTINE xCALFUN
       
-      
-      end module test_bobyqa
+      end module test_newuoa
