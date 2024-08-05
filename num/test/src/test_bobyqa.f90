@@ -3,18 +3,21 @@ module test_bobyqa
    use num_def
    use num_lib
 
+   implicit none
+
    integer :: nfcn
 
 contains
 
    subroutine do_test_bobyqa
-      implicit real(dp) (A - H, O - Z)
-      dimension X(100), XL(100), XU(100), W(10000)
+      real(dp), dimension(100) :: X, XL, XU
+      real(dp), dimension(10000) :: W
       real(dp), parameter :: max_valid_value = 1d99
-      integer I, IPRINT, n, MAXFUN, NPT
+      real(dp), parameter :: BDL = -1.0d0
+      real(dp), parameter :: BDU = 1.0d0
+      real(dp) :: f, RHOBEG, RHOend
+      integer :: I, IPRINT, N, MAXFUN, NPT
       include 'formats'
-      BDL = -1.0D0
-      BDU = 1.0D0
       IPRINT = 0
       MAXFUN = 5000
       RHOend = 1.0D-6
@@ -71,7 +74,6 @@ contains
    end subroutine CALFUN
 
    subroutine xCALFUN(N, X, F)
-      implicit none
       integer, intent(in) :: n
       real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f

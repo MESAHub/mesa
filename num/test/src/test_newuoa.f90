@@ -4,6 +4,8 @@ module test_newuoa
    use num_lib
    use const_def, only: dp
 
+   implicit none
+
    integer :: nfcn
 
 contains
@@ -13,7 +15,6 @@ contains
 !     The Chebyquad test problem (Fletcher, 1965) for N = 2,4,6 and 8,
 !     with NPT = 2N+1.
 !
-      implicit real(dp) (A - H, O - Z)
       dimension X(10), W(10000)
       real(dp), parameter :: max_valid_value = 1d99
       integer :: IPRINT, I, N, NPT, MAXFUN
