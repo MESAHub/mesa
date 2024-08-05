@@ -23,20 +23,25 @@ function testhub_log {
 # otherwise it generates an error message
 function update_docs {
     start_time=$1
-    # check for images in README.rst
+    # run python plotting script plot.py if it exists
+    if [ -e plot.py ]; then
+        echo "Running plot.py"
+        if ! python plot.py; then
+            echo "Error: plot.py failed to run"
+        fi
+    fi
+    # check for image filenames in README.rst
     if grep -q ".. image::" README.rst; then
-        # copy images to docs if it exists
+        # copy images to docs/ if they exist
         for img in $(grep ".. image::" README.rst | cut -d' ' -f3); do
             filename=$(basename -- "$img")
             extension="${filename##*.}"
             filename="${filename%.*}"
-        done
-        for img in $(grep ".. image::" README.rst | cut -d' ' -f3); do
-            filename=$(basename -- "$img")
-            extension="${filename##*.}"
-            filename="${filename%.*}"
+            # find the right img directory out of:
+            #   "pgstar_out", "pgstar_out1", "pgstar_out2", "pgstar_out3", 
+            #   "png", "png1", "png2", "png3", 
+            #   "plt_out", "plt_out1", "plt_out2", "plt_out3"
             img_dir="pgstar_out"
-            # find the right img directory out of "pgstar_out", "pgstar_out1", "pgstar_out2", "pgstar_out3", "png", "png1", "png2", "png3"
             if [ \( -e "pgstar_out/$filename.$extension" \) -o \( -e "pgstar_out/$filename.ps" \) ]; then
                 img_dir="pgstar_out"
             elif [ \( -e "pgstar_out1/$filename.$extension" \) -o \( -e "pgstar_out1/$filename.ps" \) ]; then
@@ -53,9 +58,17 @@ function update_docs {
                 img_dir="png2"
             elif [ -e "png3/$filename.$extension" ]; then
                 img_dir="png3"
+            elif [ -e "plt_out/$filename.$extension" ]; then
+                img_dir="plt_out"
+            elif [ -e "plt_out1/$filename.$extension" ]; then
+                img_dir="plt_out1"
+            elif [ -e "plt_out2/$filename.$extension" ]; then
+                img_dir="plt_out2"
+            elif [ -e "plt_out3/$filename.$extension" ]; then
+                img_dir="plt_out3"
             fi
             image_to_copy="$img_dir/$filename.$extension"
-            # if requested extension is .svg, it needs to be converted from .ps:
+            # if requested extension is .svg, it may need to be converted from .ps (since pgstar outputs .ps):
             if [ "$extension" == "svg" ]; then
                 if [ -e $img_dir/$filename.ps ]; then
                     echo "Converting $filename.ps to $filename.svg"
@@ -75,6 +88,7 @@ function update_docs {
                     rm $img_dir/_TMP_$filename.ps $img_dir/_TMP_$filename.pdf $img_dir/_TMP_$filename.svg
                 fi
             fi
+            # perform copy if image exists, and update README.rst
             if [ -e "$image_to_copy" ]; then
                 cp "$image_to_copy" docs/
                 echo "Updated image $filename.$extension in the docs"

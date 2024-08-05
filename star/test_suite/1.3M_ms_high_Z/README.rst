@@ -26,11 +26,23 @@ The right plot shows a profile of the metal mass fraction. The curve rises above
 background metallicity as hydrogen burns to helium and goes below the background metallicity
 as core hydrogen depletes.
 
-
 pgstar commands used for the plots above:
 
 .. literalinclude:: ../../../star/test_suite/1.3M_ms_high_Z/inlist_pgstar
   :language: console
 
+The figures can also be created in Python with ``matplotlib`` and reading in data with the ``mesa_reader`` package:
 
-Last-Updated: 17Jul2024 (MESA 0cc374fa) by pmocz on C916PXT6XW in 155 seconds using 8 threads.
+.. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/HR_diagram.svg
+  :width: 100%
+
+.. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/z_mass_fraction_metals.svg
+  :width: 100%
+
+The Python script used to create the figures above:
+
+.. literalinclude:: ../../../star/test_suite/1.3M_ms_high_Z/plot.py
+  :language: python
+
+
+Last-Updated: 26Jul2024 (MESA afd04d7d) by pmocz on C916PXT6XW in 159 seconds using 8 threads.

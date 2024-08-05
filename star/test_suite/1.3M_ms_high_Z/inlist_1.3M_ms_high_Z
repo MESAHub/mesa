@@ -60,7 +60,7 @@
 
    photo_interval = 50
    profile_interval = 100
-   history_interval = 10
+   history_interval = 1
    terminal_interval = 10
 
 / ! end of controls namelist
