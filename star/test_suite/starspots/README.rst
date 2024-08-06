@@ -33,5 +33,7 @@ A plot of the HR diagram for the problem is included below:
 .. image:: ../../../star/test_suite/starspots/docs/hr_starspots_001496.svg
    :width: 100%
 
+
 Last updated by Meridith Joyce on 08/06/2024
-Last-Updated: 23Jul2024 (MESA 6d0b0f29) by pmocz on C916PXT6XW in 207 seconds using 8 threads.
+
+Last-Run: 06Aug2024 (MESA 7890d305) by pmocz on C916PXT6XW in 629 seconds using 8 threads.
