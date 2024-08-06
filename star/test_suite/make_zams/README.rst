@@ -17,7 +17,9 @@ This test case has 1 part. Click to see a larger version of a plot.
 pgstar commands used for the plot above:
 
 .. literalinclude:: ../../../star/test_suite/make_zams/inlist_zams
-:language: console
+  :language: console
+  :start-at: &pgstar
+  :end-at: ! end of pgstar namelist
 
 
 Last-Updated: 20Jun2021 (MESA e2acbc2) by fxt.
