@@ -8,6 +8,8 @@ This test suite case evolves a 0.9 |Msun|, solar metallicity (Z=0.02) model
 to an age of 24.63 Gyr using MESA's implementation of the 
 YREC (Yale Rotating Evolution Code) SPOTS formalism introduced by 
 `Somers et al. (2020; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__
+Compare to Figure 15 in Section 7 of MESA Instrument Paper VI.
+
 
 The impedence of the surface flux due to magnetic pressure from starspots is parameterized 
 in the style of an atmospheric boundary modification. As first described by 
