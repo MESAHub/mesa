@@ -60,7 +60,7 @@
 &controls
    star_history_name = 'history.data'
 
-   max_age = 12d9 !0.8d9
+   max_age = 24.63d9 !26d9 !0.8d9
 
    use_other_mlt_results = .true. !.true.
    use_other_surface_PT = .true. !.True.
@@ -83,7 +83,7 @@
    photo_interval = 100
 
    ! starting specifications
-   initial_mass = 1.0 ! in Msun units
+   initial_mass = 0.9 !1.0 ! in Msun units
    min_timestep_limit=0
    max_model_number = -1 !1500
 
@@ -159,9 +159,9 @@
    HR_title = 'HR'
 
    ! set static plot bounds
-   HR_logT_min = 3.0
-   HR_logT_max = 6.5
-   HR_logL_min = -2.0
+   HR_logT_min = 3.55
+   HR_logT_max = 3.78
+   HR_logL_min = -0.7
    HR_logL_max = 2.0
 
 / ! end of pgstar namelist
