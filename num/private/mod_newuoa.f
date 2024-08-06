@@ -1135,24 +1135,28 @@
 !     Calculate the coefficients of the objective function on the circle,
 !     beginning with the multiplication of S by the second derivative matrix.
 !
-      DO 120 K=1,NPT
-      SUM=ZERO
-      DO 110 J=1,N
-  110 SUM=SUM+XPT(K,J)*S(J)
-      SUM=HCOL(K)*SUM
-      DO 120 I=1,N
-  120 W(I)=W(I)+SUM*XPT(K,I)
+      DO K=1,NPT
+        SUM=ZERO
+        DO J=1,N
+            SUM=SUM+XPT(K,J)*S(J)
+        END DO
+        SUM=HCOL(K)*SUM
+        DO I=1,N
+            W(I)=W(I)+SUM*XPT(K,I)
+        END DO
+      END DO
       CF1=ZERO
       CF2=ZERO
       CF3=ZERO
       CF4=ZERO
       CF5=ZERO
-      DO 130 I=1,N
-      CF1=CF1+S(I)*W(I)
-      CF2=CF2+D(I)*GC(I)
-      CF3=CF3+S(I)*GC(I)
-      CF4=CF4+D(I)*GD(I)
-  130 CF5=CF5+S(I)*GD(I)
+      DO I=1,N
+        CF1=CF1+S(I)*W(I)
+        CF2=CF2+D(I)*GC(I)
+        CF3=CF3+S(I)*GC(I)
+        CF4=CF4+D(I)*GD(I)
+        CF5=CF5+S(I)*GD(I)
+      END DO
       CF1=HALF*CF1
       CF4=HALF*CF4-CF1
 !
@@ -1164,19 +1168,20 @@
       ISAVE=0
       IU=49
       TEMP=TWOPI/DBLE(IU+1)
-      DO 140 I=1,IU
-      ANGLE=DBLE(I)*TEMP
-      CTH=cos(ANGLE)
-      STH=sin(ANGLE)
-      TAU=CF1+(CF2+CF4*CTH)*CTH+(CF3+CF5*CTH)*STH
-      IF (DABS(TAU) > DABS(TAUMAX)) THEN
-          TAUMAX=TAU
-          ISAVE=I
-          TEMPA=TAUOLD
-      ELSE IF (I == ISAVE+1) THEN
-          TEMPB=TAU
-      END IF
-  140 TAUOLD=TAU
+      DO I=1,IU
+        ANGLE=DBLE(I)*TEMP
+        CTH=cos(ANGLE)
+        STH=sin(ANGLE)
+        TAU=CF1+(CF2+CF4*CTH)*CTH+(CF3+CF5*CTH)*STH
+        IF (DABS(TAU) > DABS(TAUMAX)) THEN
+            TAUMAX=TAU
+            ISAVE=I
+            TEMPA=TAUOLD
+        ELSE IF (I == ISAVE+1) THEN
+            TEMPB=TAU
+        END IF
+        TAUOLD=TAU
+      END DO
       IF (ISAVE == 0) TEMPA=TAU
       IF (ISAVE == IU) TEMPB=TAUBEG
       STEP=ZERO
@@ -1192,10 +1197,11 @@
       CTH=cos(ANGLE)
       STH=sin(ANGLE)
       TAU=CF1+(CF2+CF4*CTH)*CTH+(CF3+CF5*CTH)*STH
-      DO 150 I=1,N
-      D(I)=CTH*D(I)+STH*S(I)
-      GD(I)=CTH*GD(I)+STH*W(I)
-  150 S(I)=GC(I)+GD(I)
+      DO I=1,N
+        D(I)=CTH*D(I)+STH*S(I)
+        GD(I)=CTH*GD(I)+STH*W(I)
+        S(I)=GC(I)+GD(I)
+      END DO
       IF (DABS(TAU) <= 1.1D0*DABS(TAUBEG)) GOTO 160
       IF (ITERC < N) GOTO 80
   160 RETURN
@@ -1232,20 +1238,22 @@
       ITERC=0
       ITERMAX=N
       ITERSW=ITERMAX
-      DO 10 I=1,N
-   10 D(I)=XOPT(I)
+      DO I=1,N
+         D(I)=XOPT(I)
+      END DO
       GOTO 170
 !
 !     Prepare for the first line search.
 !
    20 QRED=ZERO
       DD=ZERO
-      DO 30 I=1,N
-      STEP(I)=ZERO
-      HS(I)=ZERO
-      G(I)=GQ(I)+HD(I)
-      D(I)=-G(I)
-   30 DD=DD+D(I)**2
+      DO I=1,N
+        STEP(I)=ZERO
+        HS(I)=ZERO
+        G(I)=GQ(I)+HD(I)
+        D(I)=-G(I)
+        DD=DD+D(I)**2
+      END DO
       CRVMIN=ZERO
       IF (DD == ZERO) GOTO 160
       DS=ZERO
@@ -1260,8 +1268,9 @@
       BSTEP=TEMP/(DS+DSQRT(DS*DS+DD*TEMP))
       GOTO 170
    50 DHD=ZERO
-      DO 60 J=1,N
-   60 DHD=DHD+D(J)*HD(J)
+      DO J=1,N
+         DHD=DHD+D(J)*HD(J)
+      END DO
 !
 !     Update CRVMIN and set the step-length ALPHA.
 !
@@ -1279,10 +1288,11 @@
 !
       GGSAV=GG
       GG=ZERO
-      DO 70 I=1,N
-      STEP(I)=STEP(I)+ALPHA*D(I)
-      HS(I)=HS(I)+ALPHA*HD(I)
-   70 GG=GG+(G(I)+HS(I))**2
+      DO I=1,N
+        STEP(I)=STEP(I)+ALPHA*D(I)
+        HS(I)=HS(I)+ALPHA*HD(I)
+        GG=GG+(G(I)+HS(I))**2
+      END DO
 !
 !     Begin another conjugate direction iteration if required.
 !
@@ -1294,11 +1304,12 @@
           DD=ZERO
           DS=ZERO
           SS=ZERO
-          DO 80 I=1,N
-          D(I)=TEMP*D(I)-G(I)-HS(I)
-          DD=DD+D(I)**2
-          DS=DS+D(I)*STEP(I)
-   80     SS=SS+STEP(I)**2
+          DO I=1,N
+            D(I)=TEMP*D(I)-G(I)-HS(I)
+            DD=DD+D(I)**2
+            DS=DS+D(I)*STEP(I)
+            SS=SS+STEP(I)**2
+          END DO
           IF (DS <= ZERO) GOTO 160
           IF (SS < DELSQ) GOTO 40
       END IF
@@ -1310,9 +1321,10 @@
    90 IF (GG <= 1.0D-4*GGBEG) GOTO 160
       SG=ZERO
       SHS=ZERO
-      DO 100 I=1,N
-      SG=SG+STEP(I)*G(I)
-  100 SHS=SHS+STEP(I)*HS(I)
+      DO I=1,N
+         SG=SG+STEP(I)*G(I)
+         SHS=SHS+STEP(I)*HS(I)
+      END DO
       SGK=SG+SHS
       ANGTEST=SGK/DSQRT(GG*DELSQ)
       IF (ANGTEST <= -0.99D0) GOTO 160
@@ -1324,16 +1336,18 @@
       TEMP=DSQRT(DELSQ*GG-SGK*SGK)
       TEMPA=DELSQ/TEMP
       TEMPB=SGK/TEMP
-      DO 110 I=1,N
-  110 D(I)=TEMPA*(G(I)+HS(I))-TEMPB*STEP(I)
+      DO I=1,N
+         D(I)=TEMPA*(G(I)+HS(I))-TEMPB*STEP(I)
+      END DO
       GOTO 170
   120 DG=ZERO
       DHD=ZERO
       DHS=ZERO
-      DO 130 I=1,N
-      DG=DG+D(I)*G(I)
-      DHD=DHD+HD(I)*D(I)
-  130 DHS=DHS+HD(I)*STEP(I)
+      DO I=1,N
+        DG=DG+D(I)*G(I)
+        DHD=DHD+HD(I)*D(I)
+        DHS=DHS+HD(I)*STEP(I)
+      END DO
 !
 !     Seek the value of the angle that minimizes Q.
 !
@@ -1344,19 +1358,20 @@
       ISAVE=0
       IU=49
       TEMP=TWOPI/DBLE(IU+1)
-      DO 140 I=1,IU
-      ANGLE=DBLE(I)*TEMP
-      CTH=cos(ANGLE)
-      STH=sin(ANGLE)
-      QNEW=(SG+CF*CTH)*CTH+(DG+DHS*CTH)*STH
-      IF (QNEW < QMIN) THEN
-          QMIN=QNEW
-          ISAVE=I
-          TEMPA=QSAV
-      ELSE IF (I == ISAVE+1) THEN
-          TEMPB=QNEW
-      END IF
-  140 QSAV=QNEW
+      DO I=1,IU
+        ANGLE=DBLE(I)*TEMP
+        CTH=cos(ANGLE)
+        STH=sin(ANGLE)
+        QNEW=(SG+CF*CTH)*CTH+(DG+DHS*CTH)*STH
+        IF (QNEW < QMIN) THEN
+            QMIN=QNEW
+            ISAVE=I
+            TEMPA=QSAV
+        ELSE IF (I == ISAVE+1) THEN
+            TEMPB=QNEW
+        END IF
+        QSAV=QNEW
+      END DO
       IF (ISAVE == ZERO) TEMPA=QNEW
       IF (ISAVE == IU) TEMPB=QBEG
       ANGLE=ZERO
@@ -1373,10 +1388,11 @@
       STH=sin(ANGLE)
       REDUC=QBEG-(SG+CF*CTH)*CTH-(DG+DHS*CTH)*STH
       GG=ZERO
-      DO 150 I=1,N
-      STEP(I)=CTH*STEP(I)+STH*D(I)
-      HS(I)=CTH*HS(I)+STH*HD(I)
-  150 GG=GG+(G(I)+HS(I))**2
+      DO I=1,N
+        STEP(I)=CTH*STEP(I)+STH*D(I)
+        HS(I)=CTH*HS(I)+STH*HD(I)
+        GG=GG+(G(I)+HS(I))**2
+      END DO
       QRED=QRED+REDUC
       RATIO=REDUC/QRED
       IF (ITERC < ITERMAX .AND. RATIO > 0.01D0) GOTO 90
