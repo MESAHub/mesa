@@ -1,6 +1,6 @@
 &star_job
 
-      show_log_description_at_start = .false. 
+      show_log_description_at_start = .false.
 
       load_saved_model = .true.
       load_model_filename = 'zams.mod'
@@ -31,6 +31,9 @@
       !required_termination_code_string = 'xa_central_lower_limit'
       required_termination_code_string = 'star_mass_max_limit'
 
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
 / !end of star_job
 
 &eos
@@ -55,9 +58,9 @@
 
       ! limit max_model_number as part of test_suite
       max_model_number = 1000
-            
+
       premix_omega = .true.
-      
+
       am_nu_visc_factor = 0
       am_D_mix_factor = 0.0333333333333333d00
       D_DSI_factor = 1
@@ -69,7 +72,7 @@
 
       !set_min_D_mix = .true.
       !min_D_mix = 1d10
-      
+
   ! starting specifications
       initial_mass = 20 ! in Msun units
       initial_Z = 0.02
@@ -96,23 +99,23 @@
       !varcontrol_target = 5d-4
       delta_lg_star_mass_limit = 2d-4
       delta_lg_star_mass_hard_limit = 4d-4
-   
+
    ! output to files and terminal
       photo_interval = 50
       profile_interval = 100
       max_num_profile_models = 3000
       history_interval = 10
       terminal_interval = 10
-      
+
       write_header_frequency = 10
-      
+
       !report_solver_progress = .true.
 
 /
 
 
 &pgstar
-         
+
 
 
 / ! end of pgstar namelist
