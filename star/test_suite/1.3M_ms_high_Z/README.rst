@@ -45,4 +45,6 @@ The Python script used to create the figures above:
   :language: python
 
 
-Last-Updated: 26Jul2024 (MESA afd04d7d) by pmocz on C916PXT6XW in 159 seconds using 8 threads.
+Last-Updated: 27May2021 (MESA ebecc10) by fxt
+
+Last-Run: 26Jul2024 (MESA afd04d7d) by pmocz on C916PXT6XW in 159 seconds using 8 threads.
