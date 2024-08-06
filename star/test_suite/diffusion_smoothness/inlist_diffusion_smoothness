@@ -1,33 +1,33 @@
 
 &star_job
 
-      show_log_description_at_start = .false.
-      
-      !show_net_species_info = .true.
-      !show_net_reactions_info = .true.
+   show_log_description_at_start = .false.
 
-      load_saved_model = .true.
-      load_model_filename = 'zams.mod'
-      
-      save_model_when_terminate = .true.
-      save_model_filename = 'final.mod'
-      required_termination_code_string = 'max_age'
+   !show_net_species_info = .true.
+   !show_net_reactions_info = .true.
+
+   load_saved_model = .true.
+   load_model_filename = 'zams.mod'
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   required_termination_code_string = 'max_age'
 
 
-      change_initial_net = .true.      
-      new_net_name = 'o18_and_ne22.net'
-   
-      set_initial_age = .true.
-      initial_age = 0
+   change_initial_net = .true.
+   new_net_name = 'o18_and_ne22.net'
 
-      set_initial_model_number = .true.
-      initial_model_number = 0
+   set_initial_age = .true.
+   initial_age = 0
 
-      set_initial_cumulative_energy_error = .true.
-      new_cumulative_energy_error = 0d0
+   set_initial_model_number = .true.
+   initial_model_number = 0
 
-      pgstar_flag = .true.
-      save_pgstar_files_when_terminate = .true.
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+
+   pgstar_flag = .true.
+   save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
 
@@ -35,117 +35,117 @@
 / ! end of eos namelist
 
 &kap
-      Zbase = 0.02d0
-      kap_file_prefix = 'gs98'
+   Zbase = 0.02d0
+   kap_file_prefix = 'gs98'
 / ! end of kap namelist
 
 &controls
 
-      energy_eqn_option = 'dedt'
-      calculate_Brunt_N2 = .true.
-      use_gold2_tolerances = .true.
+   energy_eqn_option = 'dedt'
+   calculate_Brunt_N2 = .true.
+   use_gold2_tolerances = .true.
 
-      num_trace_history_values = 2
-      trace_history_value_name(1) = 'rel_E_err'
-      trace_history_value_name(2) = 'log_rel_run_E_err'
-         
-      ! limit max_model_number as part of test_suite
-      max_model_number = 100
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'rel_E_err'
+   trace_history_value_name(2) = 'log_rel_run_E_err'
 
-      x_integer_ctrl(1) = 1 ! part number
+   ! limit max_model_number as part of test_suite
+   max_model_number = 100
 
-      max_age = 3d9
+   x_integer_ctrl(1) = 1 ! part number
 
-      initial_mass = 1.0
-      initial_z = 0.02d0
-      
-      varcontrol_target = 1d-3
-      mesh_delta_coeff = 0.7
-      
-      limit_for_rel_error_in_energy_conservation = 1d-6 ! this makes d2N2 too large.  takes 63 steps. log_rel_run_E_err  -3.5859393528096946
-      limit_for_rel_error_in_energy_conservation = 1d-5 ! this is smooth enough.  takes 58 steps. log_rel_run_E_err  -3.4820705862368895
-      hard_limit_for_rel_error_in_energy_conservation = 1d-4
+   max_age = 3d9
 
-      convective_bdy_weight = 1
-      
-      cool_wind_RGB_scheme = 'Reimers'
-      cool_wind_AGB_scheme = 'Blocker'
-      RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.7d0  
-      Blocker_scaling_factor = 0.7d0  
+   initial_mass = 1.0
+   initial_z = 0.02d0
+
+   varcontrol_target = 1d-3
+   mesh_delta_coeff = 0.7
+
+   limit_for_rel_error_in_energy_conservation = 1d-6 ! this makes d2N2 too large.  takes 63 steps. log_rel_run_E_err  -3.5859393528096946
+   limit_for_rel_error_in_energy_conservation = 1d-5 ! this is smooth enough.  takes 58 steps. log_rel_run_E_err  -3.4820705862368895
+   hard_limit_for_rel_error_in_energy_conservation = 1d-4
+
+   convective_bdy_weight = 1
+
+   cool_wind_RGB_scheme = 'Reimers'
+   cool_wind_AGB_scheme = 'Blocker'
+   RGB_to_AGB_wind_switch = 1d-4
+   Reimers_scaling_factor = 0.7d0
+   Blocker_scaling_factor = 0.7d0
 
 !      set_min_D_mix = .true.
-      min_D_mix = 1d2 ! D_mix will be at least this large
-      min_center_Ye_for_min_D_mix = 0.47 ! min_D_mix is only used when center Ye >= this
-         ! i.e., when center Ye drops below this, min_D_mix is 0
-      
-      
-      num_cells_for_smooth_brunt_B = 0
-      
-      !show_diffusion_info = .true. ! terminal output for diffusion
-         !show_diffusion_substep_info = .true.         
-         !show_diffusion_timing = .true.
+   min_D_mix = 1d2 ! D_mix will be at least this large
+   min_center_Ye_for_min_D_mix = 0.47 ! min_D_mix is only used when center Ye >= this
+   ! i.e., when center Ye drops below this, min_D_mix is 0
 
-      do_element_diffusion = .true. ! determines whether or not we do diffusion
-      
-      diffusion_calculates_ionization = .true.
 
-      diffusion_num_classes = 4 ! number of classes of species for diffusion calculations
-      diffusion_class_representative(1) = 'h1'
-      diffusion_class_representative(2) = 'he4'
-      diffusion_class_representative(3) = 'o16'
-      diffusion_class_representative(4) = 'fe56'
+   num_cells_for_smooth_brunt_B = 0
 
-      ! in ascending order.  species goes into 1st class with A_max >= species A
-      diffusion_class_A_max(1) = 2
-      diffusion_class_A_max(2) = 4
-      diffusion_class_A_max(3) = 16
-      diffusion_class_A_max(4) = 10000
-         
-      diffusion_use_isolve = .true.
-      diffusion_rtol_for_isolve = 1d-4
-      diffusion_atol_for_isolve = 1d-5
-      diffusion_maxsteps_for_isolve = 1000
-      diffusion_isolve_solver = 'ros2_solver'
+   !show_diffusion_info = .true. ! terminal output for diffusion
+   !show_diffusion_substep_info = .true.
+   !show_diffusion_timing = .true.
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 10
-      terminal_interval = 10
+   do_element_diffusion = .true. ! determines whether or not we do diffusion
+
+   diffusion_calculates_ionization = .true.
+
+   diffusion_num_classes = 4 ! number of classes of species for diffusion calculations
+   diffusion_class_representative(1) = 'h1'
+   diffusion_class_representative(2) = 'he4'
+   diffusion_class_representative(3) = 'o16'
+   diffusion_class_representative(4) = 'fe56'
+
+   ! in ascending order.  species goes into 1st class with A_max >= species A
+   diffusion_class_A_max(1) = 2
+   diffusion_class_A_max(2) = 4
+   diffusion_class_A_max(3) = 16
+   diffusion_class_A_max(4) = 10000
+
+   diffusion_use_isolve = .true.
+   diffusion_rtol_for_isolve = 1d-4
+   diffusion_atol_for_isolve = 1d-5
+   diffusion_maxsteps_for_isolve = 1000
+   diffusion_isolve_solver = 'ros2_solver'
+
+   photo_interval = 50
+   profile_interval = 100
+   history_interval = 10
+   terminal_interval = 10
 
 / ! end of controls namelist
 
 
 &pgstar
 
-      file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-      file_device = 'vcps'   ! postscript
-      file_extension = 'ps'
+   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
+   file_device = 'vcps'   ! postscript
+   file_extension = 'ps'
 
-      pgstar_interval = 1
+   pgstar_interval = 1
 
-      ! Brunt B profile
-      Profile_Panels1_win_flag = .true.
-      Profile_Panels1_win_width = 14
-      Profile_Panels1_show_grid = .false
-      Profile_Panels1_title = 'diffusion_smoothness'
+   ! Brunt B profile
+   Profile_Panels1_win_flag = .true.
+   Profile_Panels1_win_width = 14
+   Profile_Panels1_show_grid = .false
+   Profile_Panels1_title = 'diffusion_smoothness'
 
-      Profile_Panels1_xaxis_name = 'zone'
-      Profile_Panels1_xmin = -101d0
-      Profile_Panels1_xmax = -101d0
-      Profile_Panels1_xaxis_reversed = .true.
-      Profile_Panels1_show_mix_regions_on_xaxis = .true.
+   Profile_Panels1_xaxis_name = 'zone'
+   Profile_Panels1_xmin = -101d0
+   Profile_Panels1_xmax = -101d0
+   Profile_Panels1_xaxis_reversed = .true.
+   Profile_Panels1_show_mix_regions_on_xaxis = .true.
 
-      Profile_Panels1_num_panels = 1
-      Profile_Panels1_yaxis_name(1) = 'brunt_B'
-      Profile_Panels1_ymin(:) = -101d0
-      Profile_Panels1_ymax(:) = -101d0
-      Profile_Panels1_other_yaxis_name(1) = ''
+   Profile_Panels1_num_panels = 1
+   Profile_Panels1_yaxis_name(1) = 'brunt_B'
+   Profile_Panels1_ymin(:) = -101d0
+   Profile_Panels1_ymax(:) = -101d0
+   Profile_Panels1_other_yaxis_name(1) = ''
 
-      Profile_Panels1_file_flag = .true.
-      Profile_Panels1_file_dir = 'pgstar_out'
-      Profile_Panels1_file_prefix = 'brunt_'
-      Profile_Panels1_file_interval = 10000
-      Profile_Panels1_file_width = 14      
+   Profile_Panels1_file_flag = .true.
+   Profile_Panels1_file_dir = 'pgstar_out'
+   Profile_Panels1_file_prefix = 'brunt_'
+   Profile_Panels1_file_interval = 10000
+   Profile_Panels1_file_width = 14
 
 / ! end of pgstar namelist
