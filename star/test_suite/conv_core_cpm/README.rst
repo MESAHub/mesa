@@ -18,5 +18,6 @@ core if the model continued to evolve beyond its stopping condition.
 .. image:: ../../../star/test_suite/conv_core_cpm/docs/grid_000092.svg
    :width: 100%
 
+Last-Updated: 2023-03-14 (MESA d6bbdf4) by Evan Bauer
 
-Last-Updated: 17Jul2024 (MESA 5ef2ffac) by pmocz on C916PXT6XW in 125 seconds using 8 threads.
+Last-Run: 17Jul2024 (MESA 5ef2ffac) by pmocz on C916PXT6XW in 125 seconds using 8 threads.
