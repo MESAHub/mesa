@@ -380,31 +380,37 @@
       W(K)=SUMA*(HALF*SUMA+SUMB)
   230 VLAG(K)=SUM
       BETA=ZERO
-      DO 250 K=1,NPTM
-      SUM=ZERO
-      DO 240 I=1,NPT
-  240 SUM=SUM+ZMAT(I,K)*W(I)
-      IF (K < IDZ) THEN
-          BETA=BETA+SUM*SUM
-          SUM=-SUM
-      ELSE
-          BETA=BETA-SUM*SUM
-      END IF
-      DO 250 I=1,NPT
-  250 VLAG(I)=VLAG(I)+SUM*ZMAT(I,K)
+      DO K=1,NPTM
+        SUM=ZERO
+        DO I=1,NPT
+           SUM=SUM+ZMAT(I,K)*W(I)
+        END DO
+        IF (K < IDZ) THEN
+            BETA=BETA+SUM*SUM
+            SUM=-SUM
+        ELSE
+            BETA=BETA-SUM*SUM
+        END IF
+        DO I=1,NPT
+            VLAG(I)=VLAG(I)+SUM*ZMAT(I,K)
+        END DO
+      END DO
       BSUM=ZERO
       DX=ZERO
-      DO 280 J=1,N
-      SUM=ZERO
-      DO 260 I=1,NPT
-  260 SUM=SUM+W(I)*BMAT(I,J)
-      BSUM=BSUM+SUM*D(J)
-      JP=NPT+J
-      DO 270 K=1,N
-  270 SUM=SUM+BMAT(JP,K)*D(K)
-      VLAG(JP)=SUM
-      BSUM=BSUM+SUM*D(J)
-  280 DX=DX+D(J)*XOPT(J)
+      DO J=1,N
+        SUM=ZERO
+        DO I=1,NPT
+            SUM=SUM+W(I)*BMAT(I,J)
+        END DO
+        BSUM=BSUM+SUM*D(J)
+        JP=NPT+J
+        DO K=1,N
+            SUM=SUM+BMAT(JP,K)*D(K)
+        END DO
+        VLAG(JP)=SUM
+        BSUM=BSUM+SUM*D(J)
+        DX=DX+D(J)*XOPT(J)
+      END DO
       BETA=DX*DX+DSQ*(XOPTSQ+DX+DX+HALF*DSQ)+BETA-BSUM
       VLAG(KOPT)=VLAG(KOPT)+ONE
 !
@@ -422,9 +428,10 @@
 !
 !     Calculate the next value of the objective function.
 !
-  290 DO 300 I=1,N
-      XNEW(I)=XOPT(I)+D(I)
-  300 X(I)=XBASE(I)+XNEW(I)
+  290 DO I=1,N
+         XNEW(I)=XOPT(I)+D(I)
+         X(I)=XBASE(I)+XNEW(I)
+      END DO
       NF=NF+1
   310 IF (NF > NFTEST) THEN
           NF=NF-1
@@ -447,15 +454,18 @@
 !
       VQUAD=ZERO
       IH=0
-      DO 340 J=1,N
-      VQUAD=VQUAD+D(J)*GQ(J)
-      DO 340 I=1,J
-      IH=IH+1
-      TEMP=D(I)*XNEW(J)+D(J)*XOPT(I)
-      IF (I == J) TEMP=HALF*TEMP
-  340 VQUAD=VQUAD+TEMP*HQ(IH)
-      DO 350 K=1,NPT
-  350 VQUAD=VQUAD+PQ(K)*W(K)
+      DO J=1,N
+        VQUAD=VQUAD+D(J)*GQ(J)
+        DO I=1,J
+           IH=IH+1
+           TEMP=D(I)*XNEW(J)+D(J)*XOPT(I)
+           IF (I == J) TEMP=HALF*TEMP
+           VQUAD=VQUAD+TEMP*HQ(IH)
+        END DO
+      END DO
+      DO K=1,NPT
+         VQUAD=VQUAD+PQ(K)*W(K)
+      END DO
       DIFF=F-FOPT-VQUAD
       DIFFC=DIFFB
       DIFFB=DIFFA
@@ -468,11 +478,12 @@
 !
       FSAVE=FOPT
       IF (F < FOPT) THEN
-          FOPT=F
-          XOPTSQ=ZERO
-          DO 360 I=1,N
-          XOPT(I)=XNEW(I)
-  360     XOPTSQ=XOPTSQ+XOPT(I)**2
+         FOPT=F
+         XOPTSQ=ZERO
+         DO I=1,N
+            XOPT(I)=XNEW(I)
+            XOPTSQ=XOPTSQ+XOPT(I)**2
+         END DO
       END IF
       KSAVE=KNEW
       IF (KNEW > 0) GOTO 410
@@ -504,22 +515,23 @@
           KTEMP=KOPT
           DETRAT=ONE
       END IF
-      DO 400 K=1,NPT
-      HDIAG=ZERO
-      DO 380 J=1,NPTM
-      TEMP=ONE
-      IF (J < IDZ) TEMP=-ONE
-  380 HDIAG=HDIAG+TEMP*ZMAT(K,J)**2
-      TEMP=DABS(BETA*HDIAG+VLAG(K)**2)
-      DISTSQ=ZERO
-      DO 390 J=1,N
-  390 DISTSQ=DISTSQ+(XPT(K,J)-XOPT(J))**2
-      IF (DISTSQ > RHOSQ) TEMP=TEMP*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)
-      IF (TEMP > DETRAT .AND. K /= KTEMP) THEN
-          DETRAT=TEMP
-          KNEW=K
-      END IF
-  400 CONTINUE
+      DO K=1,NPT
+        HDIAG=ZERO
+        DO 380 J=1,NPTM
+        TEMP=ONE
+        IF (J < IDZ) TEMP=-ONE
+  380   HDIAG=HDIAG+TEMP*ZMAT(K,J)**2
+        TEMP=DABS(BETA*HDIAG+VLAG(K)**2)
+        DISTSQ=ZERO
+        DO J=1,N
+            DISTSQ=DISTSQ+(XPT(K,J)-XOPT(J))**2
+        END DO
+        IF (DISTSQ > RHOSQ) TEMP=TEMP*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)*(DISTSQ/RHOSQ)
+        IF (TEMP > DETRAT .AND. K /= KTEMP) THEN
+            DETRAT=TEMP
+            KNEW=K
+        END IF
+      END DO
       IF (KNEW == 0) GOTO 460
 !
 !     Update BMAT, ZMAT and IDZ, so that the KNEW-th interpolation point
@@ -539,16 +551,19 @@
 !     Update the other second derivative parameters, and then the gradient
 !     vector of the model. Also include the new interpolation point.
 !
-      DO 440 J=1,NPTM
-      TEMP=DIFF*ZMAT(KNEW,J)
-      IF (J < IDZ) TEMP=-TEMP
-      DO 440 K=1,NPT
-  440 PQ(K)=PQ(K)+TEMP*ZMAT(K,J)
+      DO J=1,NPTM
+        TEMP=DIFF*ZMAT(KNEW,J)
+        IF (J < IDZ) TEMP=-TEMP
+        DO K=1,NPT
+            PQ(K)=PQ(K)+TEMP*ZMAT(K,J)
+        END DO
+      END DO
       GQSQ=ZERO
-      DO 450 I=1,N
-      GQ(I)=GQ(I)+DIFF*BMAT(KNEW,I)
-      GQSQ=GQSQ+GQ(I)**2
-  450 XPT(KNEW,I)=XNEW(I)
+      DO I=1,N
+        GQ(I)=GQ(I)+DIFF*BMAT(KNEW,I)
+        GQSQ=GQSQ+GQ(I)**2
+        XPT(KNEW,I)=XNEW(I)
+      END DO
 !
 !     If a trust region step makes a small change to the objective function,
 !     then calculate the gradient of the least Frobenius norm interpolant at
@@ -558,15 +573,18 @@
           IF (DABS(RATIO) > 1.0D-2) THEN
               ITEST=0
           ELSE
-              DO 700 K=1,NPT
-  700         VLAG(K)=FVAL(K)-FVAL(KOPT)
+              DO K=1,NPT
+                 VLAG(K)=FVAL(K)-FVAL(KOPT)
+              END DO
               GISQ=ZERO
-              DO 720 I=1,N
-              SUM=ZERO
-              DO 710 K=1,NPT
-  710         SUM=SUM+BMAT(K,I)*VLAG(K)
-              GISQ=GISQ+SUM*SUM
-  720         W(I)=SUM
+              DO I=1,N
+                SUM=ZERO
+                DO K=1,NPT
+                   SUM=SUM+BMAT(K,I)*VLAG(K)
+                END DO
+                GISQ=GISQ+SUM*SUM
+                W(I)=SUM
+              END DO
 !
 !     Test whether to replace the new quadratic model by the least Frobenius
 !     norm interpolant, making the replacement if the test is satisfied.
@@ -584,19 +602,25 @@
                 end do
               end if 
               IF (do_replace) THEN    
-                  DO 730 I=1,N
-  730             GQ(I)=W(I)
-                  DO 740 IH=1,NH
-  740             HQ(IH)=ZERO
-                  DO 760 J=1,NPTM
-                  W(J)=ZERO
-                  DO 750 K=1,NPT
-  750             W(J)=W(J)+VLAG(K)*ZMAT(K,J)
-  760             IF (J < IDZ) W(J)=-W(J)
-                  DO 770 K=1,NPT
-                  PQ(K)=ZERO
-                  DO 770 J=1,NPTM
-  770             PQ(K)=PQ(K)+ZMAT(K,J)*W(J)
+                  DO I=1,N
+                     GQ(I)=W(I)
+                  END DO
+                  DO IH=1,NH
+                     HQ(IH)=ZERO
+                  END DO
+                  DO J=1,NPTM
+                    W(J)=ZERO
+                    DO K=1,NPT
+                        W(J)=W(J)+VLAG(K)*ZMAT(K,J)
+                    END DO
+                  IF (J < IDZ) W(J)=-W(J)
+                  END DO
+                  DO K=1,NPT
+                    PQ(K)=ZERO
+                    DO J=1,NPTM
+                        PQ(K)=PQ(K)+ZMAT(K,J)*W(J)
+                    END DO
+                  END DO
                   ITEST=0
               END IF
           END IF
