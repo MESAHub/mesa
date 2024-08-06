@@ -14,6 +14,10 @@
       set_initial_cumulative_energy_error = .true.
       new_cumulative_energy_error = 0d0
 
+      pgstar_flag = .true.
+      save_pgstar_files_when_terminate = .true.
+
+
 / ! end of star_job namelist
 
 &eos
@@ -28,7 +32,7 @@
 / !end of kap namelist
 
 &controls
-      
+
       energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
       max_abs_rel_run_E_err = 1d-2
@@ -42,7 +46,7 @@
 
       initial_mass = 7.00
       initial_z = 0.001
-      
+
       mixing_length_alpha = 1.73
 
       log_L_upper_limit = 4.3
@@ -58,14 +62,14 @@
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'fixed'
 
-! mass loss       
+! mass loss
       cool_wind_full_on_T = 9.99d9
       hot_wind_full_on_T = 1d10
       cool_wind_RGB_scheme = 'Reimers'
       cool_wind_AGB_scheme = 'Blocker'
       RGB_to_AGB_wind_switch = 1d-4
-      Reimers_scaling_factor = 0.5d0  
-      Blocker_scaling_factor = 0.0003d0  
+      Reimers_scaling_factor = 0.5d0
+      Blocker_scaling_factor = 0.0003d0
 
 
       photo_interval = 50
@@ -76,4 +80,3 @@
 
 
 / ! end of controls namelist
-
