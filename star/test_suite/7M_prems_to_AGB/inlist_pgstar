@@ -2,10 +2,10 @@
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
 
-  file_device = 'png'          ! postscript
-  file_extension = 'png'
+  file_device = 'vcps'   ! postscript
+  file_extension = 'ps'
 
-   pgstar_interval = 10
+  pgstar_interval = 10
 
   HR_win_flag = .true.
   HR_win_width = 12
