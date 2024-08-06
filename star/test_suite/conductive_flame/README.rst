@@ -51,6 +51,7 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
    :width: 100%
 
 pgstar commands used for the plots above:
+
 .. literalinclude:: ../../../star/test_suite/conductive_flame/inlist_pgstar
   :language: console
 
