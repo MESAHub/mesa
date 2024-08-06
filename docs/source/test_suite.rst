@@ -309,7 +309,7 @@ on the horizontal branch (HB) through core helium burning.
 :ref:`high_mass`
 ^^^^^^^^^^^^^^^^
 
-This test case checks the evolution of a 300 |Msun|, Z = 1e-4 metallicity, model through core hydrogen depletion.
+This test case checks the evolution of a 300 |Msun|, Z = 1e-5 metallicity, model through core hydrogen depletion.
 
 :ref:`high_z`
 ^^^^^^^^^^^^^
@@ -713,7 +713,7 @@ optimise model parameters using the ``astero`` module.
 ^^^^^^^^^^^^^^^^^^^
 
 Each of these test cases runs a handful of iterations of a crude
-optimisation, principally to increase test coverage across the
+optimization, principally to increase test coverage across the
 ``astero`` module.
 
 :ref:`surface_effects`
