@@ -114,6 +114,16 @@ master_doc = 'index'
 html_logo = 'mesa-logo-200.png'
 html_favicon = 'mesa-favicon.png'
 
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+html_context = {}
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    html_context["READTHEDOCS"] = True
+
+
 # Override theme stylesheet
 html_css_files = [
     'theme_overrides.css',  # overrides for wide tables in RTD theme
