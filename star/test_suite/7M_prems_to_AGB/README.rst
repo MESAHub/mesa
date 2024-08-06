@@ -23,5 +23,6 @@ pgstar commands used:
   :end-at: ! end of pgstar namelist
 
 
+Last-Updated: 29May2021 (MESA e37f76f) by fxt
 
-Last-Updated: 06Aug2024 (MESA f50b3763) by pmocz on C916PXT6XW in 410 seconds using 8 threads.
+Last-Run: 06Aug2024 (MESA f50b3763) by pmocz on C916PXT6XW in 410 seconds using 8 threads.

@@ -22,5 +22,6 @@ pgstar commands used for the plot:
   :start-at: &pgstar
   :end-at: ! end of pgstar namelist
 
+Last-Updated: 06Jun2021 (MESA 5be9e57) by fxt
 
-Last-Updated: 06Aug2024 (MESA 8b152605) by pmocz on C916PXT6XW in 82 seconds using 8 threads.
+Last-Run: 06Aug2024 (MESA 8b152605) by pmocz on C916PXT6XW in 82 seconds using 8 threads.
