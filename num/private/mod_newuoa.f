@@ -263,8 +263,9 @@
       CALL TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,D,W,W(NP),
      1  W(NP+N),W(NP+2*N),CRVMIN)
       DSQ=ZERO
-      DO 110 I=1,N
-  110 DSQ=DSQ+D(I)**2
+      DO I=1,N
+         DSQ=DSQ+D(I)**2
+      END DO
       DNORM=DMIN1(DELTA,DSQRT(DSQ))
       IF (DNORM < HALF*RHO) THEN
           KNEW=-1
@@ -282,62 +283,77 @@
 !
   120 IF (DSQ <= 1.0D-3*XOPTSQ) THEN
           TEMPQ=0.25D0*XOPTSQ
-          DO 140 K=1,NPT
-          SUM=ZERO
-          DO 130 I=1,N
-  130     SUM=SUM+XPT(K,I)*XOPT(I)
-          TEMP=PQ(K)*SUM
-          SUM=SUM-HALF*XOPTSQ
-          W(NPT+K)=SUM
-          DO 140 I=1,N
-          GQ(I)=GQ(I)+TEMP*XPT(K,I)
-          XPT(K,I)=XPT(K,I)-HALF*XOPT(I)
-          VLAG(I)=BMAT(K,I)
-          W(I)=SUM*XPT(K,I)+TEMPQ*XOPT(I)
-          IP=NPT+I
-          DO 140 J=1,I
-  140     BMAT(IP,J)=BMAT(IP,J)+VLAG(I)*W(J)+W(I)*VLAG(J)
+          DO K=1,NPT
+            SUM=ZERO
+            DO I=1,N
+               SUM=SUM+XPT(K,I)*XOPT(I)
+            END DO
+            TEMP=PQ(K)*SUM
+            SUM=SUM-HALF*XOPTSQ
+            W(NPT+K)=SUM
+            DO I=1,N
+               GQ(I)=GQ(I)+TEMP*XPT(K,I)
+               XPT(K,I)=XPT(K,I)-HALF*XOPT(I)
+               VLAG(I)=BMAT(K,I)
+               W(I)=SUM*XPT(K,I)+TEMPQ*XOPT(I)
+               IP=NPT+I
+               DO J=1,I
+                  BMAT(IP,J)=BMAT(IP,J)+VLAG(I)*W(J)+W(I)*VLAG(J)
+               END DO
+            END DO
+          END DO
 !
 !     Then the revisions of BMAT that depend on ZMAT are calculated.
 !
-          DO 180 K=1,NPTM
-          SUMZ=ZERO
-          DO 150 I=1,NPT
-          SUMZ=SUMZ+ZMAT(I,K)
-  150     W(I)=W(NPT+I)*ZMAT(I,K)
-          DO 170 J=1,N
-          SUM=TEMPQ*SUMZ*XOPT(J)
-          DO 160 I=1,NPT
-  160     SUM=SUM+W(I)*XPT(I,J)
-          VLAG(J)=SUM
-          IF (K < IDZ) SUM=-SUM
-          DO 170 I=1,NPT
-  170     BMAT(I,J)=BMAT(I,J)+SUM*ZMAT(I,K)
-          DO 180 I=1,N
-          IP=I+NPT
-          TEMP=VLAG(I)
-          IF (K < IDZ) TEMP=-TEMP
-          DO 180 J=1,I
-  180     BMAT(IP,J)=BMAT(IP,J)+TEMP*VLAG(J)
+          DO K=1,NPTM
+            SUMZ=ZERO
+            DO I=1,NPT
+                SUMZ=SUMZ+ZMAT(I,K)
+                W(I)=W(NPT+I)*ZMAT(I,K)
+            END DO
+            DO J=1,N
+                SUM=TEMPQ*SUMZ*XOPT(J)
+                DO I=1,NPT
+                SUM=SUM+W(I)*XPT(I,J)
+                END DO
+                VLAG(J)=SUM
+                IF (K < IDZ) SUM=-SUM
+                DO I=1,NPT
+                   BMAT(I,J)=BMAT(I,J)+SUM*ZMAT(I,K)
+                END DO
+            END DO
+            DO I=1,N
+                IP=I+NPT
+                TEMP=VLAG(I)
+                IF (K < IDZ) TEMP=-TEMP
+                DO J=1,I
+                    BMAT(IP,J)=BMAT(IP,J)+TEMP*VLAG(J)
+                END DO
+            END DO
+          END DO
 !
 !     The following instructions complete the shift of XBASE, including
 !     the changes to the parameters of the quadratic model.
 !
           IH=0
-          DO 200 J=1,N
-          W(J)=ZERO
-          DO 190 K=1,NPT
-          W(J)=W(J)+PQ(K)*XPT(K,J)
-  190     XPT(K,J)=XPT(K,J)-HALF*XOPT(J)
-          DO 200 I=1,J
-          IH=IH+1
-          IF (I < J) GQ(J)=GQ(J)+HQ(IH)*XOPT(I)
-          GQ(I)=GQ(I)+HQ(IH)*XOPT(J)
-          HQ(IH)=HQ(IH)+W(I)*XOPT(J)+XOPT(I)*W(J)
-  200     BMAT(NPT+I,J)=BMAT(NPT+J,I)
-          DO 210 J=1,N
-          XBASE(J)=XBASE(J)+XOPT(J)
-  210     XOPT(J)=ZERO
+          DO J=1,N
+            W(J)=ZERO
+            DO K=1,NPT
+                W(J)=W(J)+PQ(K)*XPT(K,J)
+                XPT(K,J)=XPT(K,J)-HALF*XOPT(J)
+            END DO
+            DO I=1,J
+                IH=IH+1
+                IF (I < J) GQ(J)=GQ(J)+HQ(IH)*XOPT(I)
+                GQ(I)=GQ(I)+HQ(IH)*XOPT(J)
+                HQ(IH)=HQ(IH)+W(I)*XOPT(J)+XOPT(I)*W(J)
+                BMAT(NPT+I,J)=BMAT(NPT+J,I)
+            END DO
+          END DO
+          DO J=1,N
+             XBASE(J)=XBASE(J)+XOPT(J)
+             XOPT(J)=ZERO
+          END DO
           XOPTSQ=ZERO
       END IF
 !
@@ -599,15 +615,16 @@
 !
       KNEW=0
   460 DISTSQ=4.0D0*DELTA*DELTA
-      DO 480 K=1,NPT
-      SUM=ZERO
-      DO 470 J=1,N
-  470 SUM=SUM+(XPT(K,J)-XOPT(J))**2
-      IF (SUM > DISTSQ) THEN
-          KNEW=K
-          DISTSQ=SUM
-      END IF
-  480 CONTINUE
+      DO K=1,NPT
+        SUM=ZERO
+        DO J=1,N
+           SUM=SUM+(XPT(K,J)-XOPT(J))**2
+        END DO
+        IF (SUM > DISTSQ) THEN
+           KNEW=K
+           DISTSQ=SUM
+        END IF
+      END DO
 !
 !     If KNEW is positive, then set DSTEP, and branch back for the next
 !     iteration, which will generate a "model step".
@@ -1346,21 +1363,27 @@
 !     They are called from three different places, which are distinguished
 !     by the value of ITERC.
 !
-  170 DO 180 I=1,N
-  180 HD(I)=ZERO
-      DO 200 K=1,NPT
-      TEMP=ZERO
-      DO 190 J=1,N
-  190 TEMP=TEMP+XPT(K,J)*D(J)
-      TEMP=TEMP*PQ(K)
-      DO 200 I=1,N
-  200 HD(I)=HD(I)+TEMP*XPT(K,I)
+  170 DO I=1,N
+         HD(I)=ZERO
+      END DO
+      DO K=1,NPT
+        TEMP=ZERO
+        DO J=1,N
+           TEMP=TEMP+XPT(K,J)*D(J)
+        END DO
+        TEMP=TEMP*PQ(K)
+        DO I=1,N
+           HD(I)=HD(I)+TEMP*XPT(K,I)
+        END DO
+      END DO
       IH=0
-      DO 210 J=1,N
-      DO 210 I=1,J
-      IH=IH+1
-      IF (I < J) HD(J)=HD(J)+HQ(IH)*D(I)
-  210 HD(I)=HD(I)+HQ(IH)*D(J)
+      DO J=1,N
+        DO I=1,J
+        IH=IH+1
+        IF (I < J) HD(J)=HD(J)+HQ(IH)*D(I)
+           HD(I)=HD(I)+HQ(IH)*D(J)
+        END DO
+      END DO
       IF (ITERC == 0) GOTO 20
       IF (ITERC <= ITERSW) GOTO 50
       GOTO 120
@@ -1385,20 +1408,21 @@
 !     Apply the rotations that put zeros in the KNEW-th row of ZMAT.
 !
       JL=1
-      DO 20 J=2,NPTM
-      IF (J == IDZ) THEN
-          JL=IDZ
-      ELSE IF (ZMAT(KNEW,J) /= ZERO) THEN
-          TEMP=DSQRT(ZMAT(KNEW,JL)**2+ZMAT(KNEW,J)**2)
-          TEMPA=ZMAT(KNEW,JL)/TEMP
-          TEMPB=ZMAT(KNEW,J)/TEMP
-          DO 10 I=1,NPT
-          TEMP=TEMPA*ZMAT(I,JL)+TEMPB*ZMAT(I,J)
-          ZMAT(I,J)=TEMPA*ZMAT(I,J)-TEMPB*ZMAT(I,JL)
-   10     ZMAT(I,JL)=TEMP
-          ZMAT(KNEW,J)=ZERO
-      END IF
-   20 CONTINUE
+      DO J=2,NPTM
+        IF (J == IDZ) THEN
+            JL=IDZ
+        ELSE IF (ZMAT(KNEW,J) /= ZERO) THEN
+            TEMP=DSQRT(ZMAT(KNEW,JL)**2+ZMAT(KNEW,J)**2)
+            TEMPA=ZMAT(KNEW,JL)/TEMP
+            TEMPB=ZMAT(KNEW,J)/TEMP
+            DO I=1,NPT
+               TEMP=TEMPA*ZMAT(I,JL)+TEMPB*ZMAT(I,J)
+               ZMAT(I,J)=TEMPA*ZMAT(I,J)-TEMPB*ZMAT(I,JL)
+               ZMAT(I,JL)=TEMP
+            END DO
+            ZMAT(KNEW,J)=ZERO
+        END IF
+      END DO
 !
 !     Put the first NPT components of the KNEW-th column of HLAG into W,
 !     and calculate the parameters of the updating formula.
@@ -1406,10 +1430,10 @@
       TEMPA=ZMAT(KNEW,1)
       IF (IDZ >= 2) TEMPA=-TEMPA
       IF (JL > 1) TEMPB=ZMAT(KNEW,JL)
-      DO 30 I=1,NPT
-      W(I)=TEMPA*ZMAT(I,1)
-      IF (JL > 1) W(I)=W(I)+TEMPB*ZMAT(I,JL)
-   30 CONTINUE
+      DO I=1,NPT
+        W(I)=TEMPA*ZMAT(I,1)
+        IF (JL > 1) W(I)=W(I)+TEMPB*ZMAT(I,JL)
+      END DO
       ALPHA=W(KNEW)
       TAU=VLAG(KNEW)
       TAUSQ=TAU*TAU
@@ -1425,8 +1449,9 @@
           TEMP=DSQRT(DABS(DENOM))
           TEMPB=TEMPA/TEMP
           TEMPA=TAU/TEMP
-          DO 40 I=1,NPT
-   40     ZMAT(I,1)=TEMPA*ZMAT(I,1)-TEMPB*VLAG(I)
+          DO I=1,NPT
+             ZMAT(I,1)=TEMPA*ZMAT(I,1)-TEMPB*VLAG(I)
+          END DO
           IF (IDZ == 1 .AND. TEMP < ZERO) IDZ=2
           IF (IDZ >= 2 .AND. TEMP >= ZERO) IFLAG=1
       ELSE
@@ -1442,9 +1467,10 @@
           TEMP=ZMAT(KNEW,JA)
           SCALA=ONE/DSQRT(DABS(BETA)*TEMP*TEMP+TAUSQ)
           SCALB=SCALA*DSQRT(DABS(DENOM))
-          DO 50 I=1,NPT
-          ZMAT(I,JA)=SCALA*(TAU*ZMAT(I,JA)-TEMP*VLAG(I))
-   50     ZMAT(I,JB)=SCALB*(ZMAT(I,JB)-TEMPA*W(I)-TEMPB*VLAG(I))
+          DO I=1,NPT
+             ZMAT(I,JA)=SCALA*(TAU*ZMAT(I,JA)-TEMP*VLAG(I))
+             ZMAT(I,JB)=SCALB*(ZMAT(I,JB)-TEMPA*W(I)-TEMPB*VLAG(I))
+          END DO
           IF (DENOM <= ZERO) THEN
               IF (BETA < ZERO) IDZ=IDZ+1
               IF (BETA >= ZERO) IFLAG=1
