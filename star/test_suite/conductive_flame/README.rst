@@ -47,7 +47,13 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 
 
 
-.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000427.png
+.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000597.png
+   :width: 100%
+
+pgstar commands used for the plots above:
+.. literalinclude:: ../../../star/test_suite/conductive_flame/inlist_pgstar
+  :language: console
+
 
 .. |Timmes1992| replace:: `Timmes & Woosley (1992) <https://ui.adsabs.harvard.edu/abs/1992ApJ...396..649T/abstract>`__
 
@@ -58,3 +64,4 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 
 Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab, + documentation 2024-01-22 EbF
 
+Last-Updated: 06Aug2024 (MESA 7a3e4ee4) by EbF in 497 seconds using 10 threads.
