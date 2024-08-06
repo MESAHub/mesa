@@ -4,7 +4,7 @@
 starspots
 ******************
 
-This test suite case evolves a 1.0 |Msun|, solar metallicity (Z=0.02) model 
+This test suite case evolves a 0.9 |Msun|, solar metallicity (Z=0.02) model 
 to an age of 0.8 Gyr using MESA's implementation of the 
 YREC (Yale Rotating Evolution Code) SPOTS formalism introduced by 
 `Somers et al. (2020; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__
