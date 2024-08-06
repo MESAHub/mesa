@@ -16,7 +16,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 pgstar commands used for the plot above:
 
-.. literalinclude:: ../../../star/test_suite/high_mass/inlist_pgstar
+.. literalinclude:: ../../../star/test_suite/make_zams/inlist_zams
 :language: console
 
 
