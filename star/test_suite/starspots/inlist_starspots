@@ -154,6 +154,7 @@
    HR_file_flag = .true.
    HR_file_dir = 'pgstar_out'
    HR_file_prefix = 'hr_starspots_'
+   HR_file_interval = 50
    HR_win_width = 9
    HR_win_aspect_ratio = 1.0
    HR_title = 'HR'
