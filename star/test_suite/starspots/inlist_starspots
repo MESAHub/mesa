@@ -60,7 +60,7 @@
 &controls
    star_history_name = 'history.data'
 
-   max_age = 0.8d9
+   max_age = 12d9 !0.8d9
 
    use_other_mlt_results = .true. !.true.
    use_other_surface_PT = .true. !.True.
@@ -150,7 +150,7 @@
    file_device = 'vcps' ! postscript
    file_extension = 'ps'
 
-   HR_win_flag = .false. ! switch to .true. to visualize in real-time
+   HR_win_flag = .true. ! switch to .true. to visualize in real-time
    HR_file_flag = .true.
    HR_file_dir = 'pgstar_out'
    HR_file_prefix = 'hr_starspots_'
