@@ -237,19 +237,24 @@
 !
    20 IF (KOPT  /=  KBASE) THEN
           IH=0
-          DO 30 J=1,N
-          DO 30 I=1,J
-          IH=IH+1
-          IF (I  <  J) GOPT(J)=GOPT(J)+HQ(IH)*XOPT(I)
-   30     GOPT(I)=GOPT(I)+HQ(IH)*XOPT(J)
+          DO J=1,N
+            DO I=1,J
+                IH=IH+1
+                IF (I  <  J) GOPT(J)=GOPT(J)+HQ(IH)*XOPT(I)
+                GOPT(I)=GOPT(I)+HQ(IH)*XOPT(J)
+            END DO
+          END DO
           IF (NF  >  NPT) THEN
-              DO 50 K=1,NPT
-              TEMP=ZERO
-              DO 40 J=1,N
-   40         TEMP=TEMP+XPT(K,J)*XOPT(J)
-              TEMP=PQ(K)*TEMP
-              DO 50 I=1,N
-   50         GOPT(I)=GOPT(I)+TEMP*XPT(K,I)
+              DO K=1,NPT
+                TEMP=ZERO
+                DO J=1,N
+                    TEMP=TEMP+XPT(K,J)*XOPT(J)
+                END DO
+                TEMP=PQ(K)*TEMP
+                DO I=1,N
+                    GOPT(I)=GOPT(I)+TEMP*XPT(K,I)
+                END DO
+              END DO
           END IF
       END IF
 !
@@ -279,18 +284,19 @@
           IF (CRVMIN  >  ZERO .AND. ERRBIG  >  FRHOSQ*CRVMIN)
      1       GOTO 650
           BDTOL=ERRBIG/RHO
-          DO 80 J=1,N
-          BDTEST=BDTOL
-          IF (XNEW(J)  ==  SL(J)) BDTEST=W(J)
-          IF (XNEW(J)  ==  SU(J)) BDTEST=-W(J)
-          IF (BDTEST  <  BDTOL) THEN
-              CURV=HQ((J+J*J)/2)
-              DO 70 K=1,NPT
-   70         CURV=CURV+PQ(K)*XPT(K,J)**2
-              BDTEST=BDTEST+HALF*CURV*RHO
-              IF (BDTEST  <  BDTOL) GOTO 650
-          END IF
-   80     CONTINUE
+          DO J=1,N
+            BDTEST=BDTOL
+            IF (XNEW(J)  ==  SL(J)) BDTEST=W(J)
+            IF (XNEW(J)  ==  SU(J)) BDTEST=-W(J)
+            IF (BDTEST  <  BDTOL) THEN
+                CURV=HQ((J+J*J)/2)
+                DO K=1,NPT
+                    CURV=CURV+PQ(K)*XPT(K,J)**2
+                END DO
+                BDTEST=BDTEST+HALF*CURV*RHO
+                IF (BDTEST  <  BDTOL) GOTO 650
+            END IF
+          END DO
           GOTO 680
       END IF
       NTRITS=NTRITS+1
@@ -304,61 +310,76 @@
    90 IF (DSQ  <=  1.0D-3*XOPTSQ) THEN
           FRACSQ=0.25D0*XOPTSQ
           SUMPQ=ZERO
-          DO 110 K=1,NPT
-          SUMPQ=SUMPQ+PQ(K)
-          SUM=-HALF*XOPTSQ
-          DO 100 I=1,N
-  100     SUM=SUM+XPT(K,I)*XOPT(I)
-          W(NPT+K)=SUM
-          TEMP=FRACSQ-HALF*SUM
-          DO 110 I=1,N
-          W(I)=BMAT(K,I)
-          VLAG(I)=SUM*XPT(K,I)+TEMP*XOPT(I)
-          IP=NPT+I
-          DO 110 J=1,I
-  110     BMAT(IP,J)=BMAT(IP,J)+W(I)*VLAG(J)+VLAG(I)*W(J)
+          DO K=1,NPT
+            SUMPQ=SUMPQ+PQ(K)
+            SUM=-HALF*XOPTSQ
+            DO I=1,N
+                SUM=SUM+XPT(K,I)*XOPT(I)
+            END DO
+            W(NPT+K)=SUM
+            TEMP=FRACSQ-HALF*SUM
+              DO I=1,N
+                 W(I)=BMAT(K,I)
+                 VLAG(I)=SUM*XPT(K,I)+TEMP*XOPT(I)
+                 IP=NPT+I
+              DO J=1,I
+                 BMAT(IP,J)=BMAT(IP,J)+W(I)*VLAG(J)+VLAG(I)*W(J)
+              END DO
+            END DO
+          END DO
 !
 !     Then the revisions of BMAT that depend on ZMAT are calculated.
 !
-          DO 150 JJ=1,NPTM
-          SUMZ=ZERO
-          SUMW=ZERO
-          DO 120 K=1,NPT
-          SUMZ=SUMZ+ZMAT(K,JJ)
-          VLAG(K)=W(NPT+K)*ZMAT(K,JJ)
-  120     SUMW=SUMW+VLAG(K)
-          DO 140 J=1,N
-          SUM=(FRACSQ*SUMZ-HALF*SUMW)*XOPT(J)
-          DO 130 K=1,NPT
-  130     SUM=SUM+VLAG(K)*XPT(K,J)
-          W(J)=SUM
-          DO 140 K=1,NPT
-  140     BMAT(K,J)=BMAT(K,J)+SUM*ZMAT(K,JJ)
-          DO 150 I=1,N
-          IP=I+NPT
-          TEMP=W(I)
-          DO 150 J=1,I
-  150     BMAT(IP,J)=BMAT(IP,J)+TEMP*W(J)
+          DO JJ=1,NPTM
+            SUMZ=ZERO
+            SUMW=ZERO
+            DO K=1,NPT
+                SUMZ=SUMZ+ZMAT(K,JJ)
+                VLAG(K)=W(NPT+K)*ZMAT(K,JJ)
+                SUMW=SUMW+VLAG(K)
+            END DO
+            DO J=1,N
+                SUM=(FRACSQ*SUMZ-HALF*SUMW)*XOPT(J)
+                DO K=1,NPT
+                    SUM=SUM+VLAG(K)*XPT(K,J)
+                END DO
+                W(J)=SUM
+                DO K=1,NPT
+                    BMAT(K,J)=BMAT(K,J)+SUM*ZMAT(K,JJ)
+                END DO
+            END DO
+            DO I=1,N
+                IP=I+NPT
+                TEMP=W(I)
+                DO J=1,I
+                    BMAT(IP,J)=BMAT(IP,J)+TEMP*W(J)
+                END DO
+            END DO
+        END DO
 !
 !     The following instructions complete the shift, including the changes
 !     to the second derivative parameters of the quadratic model.
 !
           IH=0
-          DO 170 J=1,N
+          DO J=1,N
           W(J)=-HALF*SUMPQ*XOPT(J)
-          DO 160 K=1,NPT
-          W(J)=W(J)+PQ(K)*XPT(K,J)
-  160     XPT(K,J)=XPT(K,J)-XOPT(J)
-          DO 170 I=1,J
-          IH=IH+1
-          HQ(IH)=HQ(IH)+W(I)*XOPT(J)+XOPT(I)*W(J)
-  170     BMAT(NPT+I,J)=BMAT(NPT+J,I)
-          DO 180 I=1,N
-          XBASE(I)=XBASE(I)+XOPT(I)
-          XNEW(I)=XNEW(I)-XOPT(I)
-          SL(I)=SL(I)-XOPT(I)
-          SU(I)=SU(I)-XOPT(I)
-  180     XOPT(I)=ZERO
+          DO K=1,NPT
+             W(J)=W(J)+PQ(K)*XPT(K,J)
+             XPT(K,J)=XPT(K,J)-XOPT(J)
+          END DO
+            DO I=1,J
+            IH=IH+1
+            HQ(IH)=HQ(IH)+W(I)*XOPT(J)+XOPT(I)*W(J)
+            BMAT(NPT+I,J)=BMAT(NPT+J,I)
+            END DO
+          END DO
+          DO I=1,N
+            XBASE(I)=XBASE(I)+XOPT(I)
+            XNEW(I)=XNEW(I)-XOPT(I)
+            SL(I)=SL(I)-XOPT(I)
+            SU(I)=SU(I)-XOPT(I)
+            XOPT(I)=ZERO
+          END DO
           XOPTSQ=ZERO
       END IF
       IF (NTRITS  ==  0) GOTO 210
