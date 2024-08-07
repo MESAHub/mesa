@@ -853,30 +853,39 @@
 !
 !     Put the coefficents of THETA*Wcheck in PROD.
 !
-      DO 190 JC=1,5
-      NW=NPT
-      IF (JC == 2 .OR. JC == 3) NW=NDIM
-      DO 130 K=1,NPT
-  130 PROD(K,JC)=ZERO
-      DO 150 J=1,NPTM
-      SUM=ZERO
-      DO 140 K=1,NPT
-  140 SUM=SUM+ZMAT(K,J)*WVEC(K,JC)
-      IF (J < IDZ) SUM=-SUM
-      DO 150 K=1,NPT
-  150 PROD(K,JC)=PROD(K,JC)+SUM*ZMAT(K,J)
-      IF (NW == NDIM) THEN
-          DO 170 K=1,NPT
-          SUM=ZERO
-          DO 160 J=1,N
-  160     SUM=SUM+BMAT(K,J)*WVEC(NPT+J,JC)
-  170     PROD(K,JC)=PROD(K,JC)+SUM
-      END IF
-      DO 190 J=1,N
-      SUM=ZERO
-      DO 180 I=1,NW
-  180 SUM=SUM+BMAT(I,J)*WVEC(I,JC)
-  190 PROD(NPT+J,JC)=SUM
+      DO JC=1,5
+        NW=NPT
+        IF (JC == 2 .OR. JC == 3) NW=NDIM
+        DO K=1,NPT
+            PROD(K,JC)=ZERO
+        END DO
+        DO J=1,NPTM
+            SUM=ZERO
+            DO K=1,NPT
+                SUM=SUM+ZMAT(K,J)*WVEC(K,JC)
+            END DO
+            IF (J < IDZ) SUM=-SUM
+            DO K=1,NPT
+            PROD(K,JC)=PROD(K,JC)+SUM*ZMAT(K,J)
+            END DO
+        END DO
+        IF (NW == NDIM) THEN
+            DO K=1,NPT
+            SUM=ZERO
+            DO J=1,N
+                SUM=SUM+BMAT(K,J)*WVEC(NPT+J,JC)
+            END DO
+            PROD(K,JC)=PROD(K,JC)+SUM
+            END DO
+        END IF
+        DO J=1,N
+            SUM=ZERO
+            DO I=1,NW
+                SUM=SUM+BMAT(I,J)*WVEC(I,JC)
+            END DO
+            PROD(NPT+J,JC)=SUM
+        END DO
+      END DO
 !
 !     Include in DEN the part of BETA that depends on THETA.
 !
@@ -941,25 +950,27 @@
       IU=49
       TEMP=TWOPI/DBLE(IU+1)
       PAR(1)=ONE
-      DO 250 I=1,IU
-      ANGLE=DBLE(I)*TEMP
-      PAR(2)=cos(ANGLE)
-      PAR(3)=sin(ANGLE)
-      DO 230 J=4,8,2
-      PAR(J)=PAR(2)*PAR(J-2)-PAR(3)*PAR(J-1)
-  230 PAR(J+1)=PAR(2)*PAR(J-1)+PAR(3)*PAR(J-2)
-      SUMOLD=SUM
-      SUM=ZERO
-      DO 240 J=1,9
-  240 SUM=SUM+DENEX(J)*PAR(J)
-      IF (DABS(SUM) > DABS(DENMAX)) THEN
-          DENMAX=SUM
-          ISAVE=I
-          TEMPA=SUMOLD
-      ELSE IF (I == ISAVE+1) THEN
-          TEMPB=SUM
-      END IF
-  250 CONTINUE
+      DO I=1,IU
+        ANGLE=DBLE(I)*TEMP
+        PAR(2)=cos(ANGLE)
+        PAR(3)=sin(ANGLE)
+        DO J=4,8,2
+            PAR(J)=PAR(2)*PAR(J-2)-PAR(3)*PAR(J-1)
+            PAR(J+1)=PAR(2)*PAR(J-1)+PAR(3)*PAR(J-2)
+        END DO
+        SUMOLD=SUM
+        SUM=ZERO
+        DO J=1,9
+           SUM=SUM+DENEX(J)*PAR(J)
+        END DO
+        IF (DABS(SUM) > DABS(DENMAX)) THEN
+            DENMAX=SUM
+            ISAVE=I
+            TEMPA=SUMOLD
+        ELSE IF (I == ISAVE+1) THEN
+            TEMPB=SUM
+        END IF
+      END DO
       IF (ISAVE == 0) TEMPA=SUM
       IF (ISAVE == IU) TEMPB=DENOLD
       STEP=ZERO
@@ -975,28 +986,33 @@
 !
       PAR(2)=cos(ANGLE)
       PAR(3)=sin(ANGLE)
-      DO 260 J=4,8,2
-      PAR(J)=PAR(2)*PAR(J-2)-PAR(3)*PAR(J-1)
-  260 PAR(J+1)=PAR(2)*PAR(J-1)+PAR(3)*PAR(J-2)
+      DO J=4,8,2
+        PAR(J)=PAR(2)*PAR(J-2)-PAR(3)*PAR(J-1)
+        PAR(J+1)=PAR(2)*PAR(J-1)+PAR(3)*PAR(J-2)
+      END DO
       BETA=ZERO
       DENMAX=ZERO
-      DO 270 J=1,9
-      BETA=BETA+DEN(J)*PAR(J)
-  270 DENMAX=DENMAX+DENEX(J)*PAR(J)
-      DO 280 K=1,NDIM
-      VLAG(K)=ZERO
-      DO 280 J=1,5
-  280 VLAG(K)=VLAG(K)+PROD(K,J)*PAR(J)
+      DO J=1,9
+        BETA=BETA+DEN(J)*PAR(J)
+        DENMAX=DENMAX+DENEX(J)*PAR(J)
+      END DO
+      DO K=1,NDIM
+        VLAG(K)=ZERO
+        DO J=1,5
+            VLAG(K)=VLAG(K)+PROD(K,J)*PAR(J)
+        END DO
+      END DO
       TAU=VLAG(KNEW)
       DD=ZERO
       TEMPA=ZERO
       TEMPB=ZERO
-      DO 290 I=1,N
-      D(I)=PAR(2)*D(I)+PAR(3)*S(I)
-      W(I)=XOPT(I)+D(I)
-      DD=DD+D(I)**2
-      TEMPA=TEMPA+D(I)*W(I)
-  290 TEMPB=TEMPB+W(I)*W(I)
+      DO I=1,N
+        D(I)=PAR(2)*D(I)+PAR(3)*S(I)
+        W(I)=XOPT(I)+D(I)
+        DD=DD+D(I)**2
+        TEMPA=TEMPA+D(I)*W(I)
+        TEMPB=TEMPB+W(I)*W(I)
+      END DO
       IF (ITERC >= N) GOTO 340
       IF (ITERC > 1) DENSAV=DMAX1(DENSAV,DENOLD)
       IF (DABS(DENMAX) <= 1.1D0*DABS(DENSAV)) GOTO 340
@@ -1152,9 +1168,10 @@
       TEMP=DD*SS-SP*SP
       IF (TEMP <= 1.0D-8*DD*SS) GOTO 160
       DENOM=DSQRT(TEMP)
-      DO 100 I=1,N
-      S(I)=(DD*S(I)-SP*D(I))/DENOM
-  100 W(I)=ZERO
+      DO I=1,N
+         S(I)=(DD*S(I)-SP*D(I))/DENOM
+         W(I)=ZERO
+      END DO
 !
 !     Calculate the coefficients of the objective function on the circle,
 !     beginning with the multiplication of S by the second derivative matrix.
