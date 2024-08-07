@@ -71,7 +71,7 @@
                   
          real(dp) :: nu_obs, dist_j, nu, dist, min_dist, min_freq, &
             R, G, M, sig_fac, b, sum_1, sum_2, sum_3, empty(0)
-         integer :: min_dist_j, min_order, n, cnt, int_empty(0)
+         integer :: min_dist_j, min_order, n, cnt, int_empty(0), int_empty2(0)
          integer :: nsel, itrsig, nsig
          real(dp) :: els1, dels, sig1, sig2, dfsig
          integer :: num_l0_terms, k, i, j
@@ -162,7 +162,7 @@
             call set_to_closest(freq_target(0,:), &
                model_freq(0,:), empty, empty, &
                model_inertia(0,:), empty, empty, &
-               model_order(0,:), int_empty, int_empty, ierr)
+               model_order(0,:), int_empty, int_empty2, ierr)
 
             model_freq_alt_up(0,:) = model_freq(0,:)
             model_inertia_alt_up(0,:) = model_inertia(0,:)
