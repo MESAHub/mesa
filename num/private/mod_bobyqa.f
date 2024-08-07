@@ -905,27 +905,33 @@
       ONE=1.0D0
       ZERO=0.0D0
       CONST=ONE+DSQRT(2.0D0)
-      DO 10 K=1,NPT
-   10 HCOL(K)=ZERO
-      DO 20 J=1,NPT-N-1
-      TEMP=ZMAT(KNEW,J)
-      DO 20 K=1,NPT
-   20 HCOL(K)=HCOL(K)+TEMP*ZMAT(K,J)
+      DO K=1,NPT
+         HCOL(K)=ZERO
+      END DO
+      DO J=1,NPT-N-1
+        TEMP=ZMAT(KNEW,J)
+        DO K=1,NPT
+            HCOL(K)=HCOL(K)+TEMP*ZMAT(K,J)
+        END DO
+      END DO
       ALPHA=HCOL(KNEW)
       HA=HALF*ALPHA
 !
 !     Calculate the gradient of the KNEW-th Lagrange function at XOPT.
 !
-      DO 30 I=1,N
-   30 GLAG(I)=BMAT(KNEW,I)
-      DO 50 K=1,NPT
-      TEMP=ZERO
-      DO J=1,N
-         TEMP=TEMP+XPT(K,J)*XOPT(J)
+      DO I=1,N
+         GLAG(I)=BMAT(KNEW,I)
       END DO
-      TEMP=HCOL(K)*TEMP
-      DO 50 I=1,N
-   50 GLAG(I)=GLAG(I)+TEMP*XPT(K,I)
+      DO K=1,NPT
+        TEMP=ZERO
+        DO J=1,N
+            TEMP=TEMP+XPT(K,J)*XOPT(J)
+        END DO
+        TEMP=HCOL(K)*TEMP
+        DO I=1,N
+           GLAG(I)=GLAG(I)+TEMP*XPT(K,I)
+        END DO
+      END DO
 !
 !     Search for a large denominator along the straight lines through XOPT
 !     and another interpolation point. SLBD and SUBD will be lower and upper
@@ -934,105 +940,105 @@
 !     will be set to the largest admissible value of PREDSQ that occurs.
 !
       PRESAV=ZERO
-      DO 80 K=1,NPT
-      IF (K  ==  KOPT) GOTO 80
-      DDERIV=ZERO
-      DISTSQ=ZERO
-      DO I=1,N
-        TEMP=XPT(K,I)-XOPT(I)
-        DDERIV=DDERIV+GLAG(I)*TEMP
-        DISTSQ=DISTSQ+TEMP*TEMP
-      END DO
-      SUBD=ADELT/DSQRT(DISTSQ)
-      SLBD=-SUBD
-      ILBD=0
-      IUBD=0
-      SUMIN=DMIN1(ONE,SUBD)
+      DO K=1,NPT
+        IF (K  ==  KOPT) CYCLE
+        DDERIV=ZERO
+        DISTSQ=ZERO
+        DO I=1,N
+            TEMP=XPT(K,I)-XOPT(I)
+            DDERIV=DDERIV+GLAG(I)*TEMP
+            DISTSQ=DISTSQ+TEMP*TEMP
+        END DO
+        SUBD=ADELT/DSQRT(DISTSQ)
+        SLBD=-SUBD
+        ILBD=0
+        IUBD=0
+        SUMIN=DMIN1(ONE,SUBD)
 !
 !     Revise SLBD and SUBD if necessary because of the bounds in SL and SU.
 !
-      DO I=1,N
-        TEMP=XPT(K,I)-XOPT(I)
-        IF (TEMP  >  ZERO) THEN
-            IF (SLBD*TEMP  <  SL(I)-XOPT(I)) THEN
-                SLBD=(SL(I)-XOPT(I))/TEMP
-                ILBD=-I
+        DO I=1,N
+            TEMP=XPT(K,I)-XOPT(I)
+            IF (TEMP  >  ZERO) THEN
+                IF (SLBD*TEMP  <  SL(I)-XOPT(I)) THEN
+                    SLBD=(SL(I)-XOPT(I))/TEMP
+                    ILBD=-I
+                END IF
+                IF (SUBD*TEMP  >  SU(I)-XOPT(I)) THEN
+                    SUBD=DMAX1(SUMIN,(SU(I)-XOPT(I))/TEMP)
+                    IUBD=I
+                END IF
+            ELSE IF (TEMP  <  ZERO) THEN
+                IF (SLBD*TEMP  >  SU(I)-XOPT(I)) THEN
+                    SLBD=(SU(I)-XOPT(I))/TEMP
+                    ILBD=I
+                END IF
+                IF (SUBD*TEMP  <  SL(I)-XOPT(I)) THEN
+                    SUBD=DMAX1(SUMIN,(SL(I)-XOPT(I))/TEMP)
+                    IUBD=-I
+                END IF
             END IF
-            IF (SUBD*TEMP  >  SU(I)-XOPT(I)) THEN
-                SUBD=DMAX1(SUMIN,(SU(I)-XOPT(I))/TEMP)
-                IUBD=I
-            END IF
-        ELSE IF (TEMP  <  ZERO) THEN
-            IF (SLBD*TEMP  >  SU(I)-XOPT(I)) THEN
-                SLBD=(SU(I)-XOPT(I))/TEMP
-                ILBD=I
-            END IF
-            IF (SUBD*TEMP  <  SL(I)-XOPT(I)) THEN
-                SUBD=DMAX1(SUMIN,(SL(I)-XOPT(I))/TEMP)
-                IUBD=-I
-            END IF
-        END IF
-      END DO
+        END DO
 !
 !     Seek a large modulus of the KNEW-th Lagrange function when the index
 !     of the other interpolation point on the line through XOPT is KNEW.
 !
-      IF (K  ==  KNEW) THEN
-          DIFF=DDERIV-ONE
-          STEP=SLBD
-          VLAG=SLBD*(DDERIV-SLBD*DIFF)
-          ISBD=ILBD
-          TEMP=SUBD*(DDERIV-SUBD*DIFF)
-          IF (DABS(TEMP)  >  DABS(VLAG)) THEN
-              STEP=SUBD
-              VLAG=TEMP
-              ISBD=IUBD
-          END IF
-          TEMPD=HALF*DDERIV
-          TEMPA=TEMPD-DIFF*SLBD
-          TEMPB=TEMPD-DIFF*SUBD
-          IF (TEMPA*TEMPB  <  ZERO) THEN
-              TEMP=TEMPD*TEMPD/DIFF
-              IF (DABS(TEMP)  >  DABS(VLAG)) THEN
-                  STEP=TEMPD/DIFF
-                  VLAG=TEMP
-                  ISBD=0
-              END IF
-          END IF
+        IF (K  ==  KNEW) THEN
+            DIFF=DDERIV-ONE
+            STEP=SLBD
+            VLAG=SLBD*(DDERIV-SLBD*DIFF)
+            ISBD=ILBD
+            TEMP=SUBD*(DDERIV-SUBD*DIFF)
+            IF (DABS(TEMP)  >  DABS(VLAG)) THEN
+                STEP=SUBD
+                VLAG=TEMP
+                ISBD=IUBD
+            END IF
+            TEMPD=HALF*DDERIV
+            TEMPA=TEMPD-DIFF*SLBD
+            TEMPB=TEMPD-DIFF*SUBD
+            IF (TEMPA*TEMPB  <  ZERO) THEN
+                TEMP=TEMPD*TEMPD/DIFF
+                IF (DABS(TEMP)  >  DABS(VLAG)) THEN
+                    STEP=TEMPD/DIFF
+                    VLAG=TEMP
+                    ISBD=0
+                END IF
+            END IF
 !
 !     Search along each of the other lines through XOPT and another point.
 !
-      ELSE
-          STEP=SLBD
-          VLAG=SLBD*(ONE-SLBD)
-          ISBD=ILBD
-          TEMP=SUBD*(ONE-SUBD)
-          IF (DABS(TEMP)  >  DABS(VLAG)) THEN
-              STEP=SUBD
-              VLAG=TEMP
-              ISBD=IUBD
-          END IF
-          IF (SUBD  >  HALF) THEN
-              IF (DABS(VLAG)  <  0.25D0) THEN
-                  STEP=HALF
-                  VLAG=0.25D0
-                  ISBD=0
-              END IF
-          END IF
-          VLAG=VLAG*DDERIV
-      END IF
+        ELSE
+            STEP=SLBD
+            VLAG=SLBD*(ONE-SLBD)
+            ISBD=ILBD
+            TEMP=SUBD*(ONE-SUBD)
+            IF (DABS(TEMP)  >  DABS(VLAG)) THEN
+                STEP=SUBD
+                VLAG=TEMP
+                ISBD=IUBD
+            END IF
+            IF (SUBD  >  HALF) THEN
+                IF (DABS(VLAG)  <  0.25D0) THEN
+                    STEP=HALF
+                    VLAG=0.25D0
+                    ISBD=0
+                END IF
+            END IF
+            VLAG=VLAG*DDERIV
+        END IF
 !
 !     Calculate PREDSQ for the current line search and maintain PRESAV.
 !
-      TEMP=STEP*(ONE-STEP)*DISTSQ
-      PREDSQ=VLAG*VLAG*(VLAG*VLAG+HA*TEMP*TEMP)
-      IF (PREDSQ  >  PRESAV) THEN
-          PRESAV=PREDSQ
-          KSAV=K
-          STPSAV=STEP
-          IBDSAV=ISBD
-      END IF
-   80 CONTINUE
+        TEMP=STEP*(ONE-STEP)*DISTSQ
+        PREDSQ=VLAG*VLAG*(VLAG*VLAG+HA*TEMP*TEMP)
+        IF (PREDSQ  >  PRESAV) THEN
+            PRESAV=PREDSQ
+            KSAV=K
+            STPSAV=STEP
+            IBDSAV=ISBD
+        END IF
+      END DO
 !
 !     Construct XNEW in a way that satisfies the bound constraints exactly.
 !
@@ -2120,33 +2126,36 @@
       ZERO=0.0D0
       NPTM=NPT-N-1
       ZTEST=ZERO
-      DO 10 K=1,NPT
-      DO 10 J=1,NPTM
-   10 ZTEST=DMAX1(ZTEST,DABS(ZMAT(K,J)))
+      DO K=1,NPT
+        DO J=1,NPTM
+            ZTEST=DMAX1(ZTEST,DABS(ZMAT(K,J)))
+        END DO
+      END DO
       ZTEST=1.0D-20*ZTEST
 !
 !     Apply the rotations that put zeros in the KNEW-th row of ZMAT.
 !
       JL=1
-      DO 30 J=2,NPTM
-      IF (DABS(ZMAT(KNEW,J))  >  ZTEST) THEN
-          TEMP=DSQRT(ZMAT(KNEW,1)**2+ZMAT(KNEW,J)**2)
-          TEMPA=ZMAT(KNEW,1)/TEMP
-          TEMPB=ZMAT(KNEW,J)/TEMP
-          DO 20 I=1,NPT
-          TEMP=TEMPA*ZMAT(I,1)+TEMPB*ZMAT(I,J)
-          ZMAT(I,J)=TEMPA*ZMAT(I,J)-TEMPB*ZMAT(I,1)
-   20     ZMAT(I,1)=TEMP
-      END IF
-      ZMAT(KNEW,J)=ZERO
-   30 CONTINUE
+      DO J=2,NPTM
+        IF (DABS(ZMAT(KNEW,J))  >  ZTEST) THEN
+            TEMP=DSQRT(ZMAT(KNEW,1)**2+ZMAT(KNEW,J)**2)
+            TEMPA=ZMAT(KNEW,1)/TEMP
+            TEMPB=ZMAT(KNEW,J)/TEMP
+            DO I=1,NPT
+                TEMP=TEMPA*ZMAT(I,1)+TEMPB*ZMAT(I,J)
+                ZMAT(I,J)=TEMPA*ZMAT(I,J)-TEMPB*ZMAT(I,1)
+                ZMAT(I,1)=TEMP
+            END DO
+        END IF
+        ZMAT(KNEW,J)=ZERO
+      END DO
 
 !     Put the first NPT components of the KNEW-th column of HLAG into W,
 !     and calculate the parameters of the updating formula.
 
-      DO 40 I=1,NPT
-      W(I)=ZMAT(KNEW,1)*ZMAT(I,1)
-   40 CONTINUE
+      DO I=1,NPT
+         W(I)=ZMAT(KNEW,1)*ZMAT(I,1)
+      END DO
       ALPHA=W(KNEW)
       TAU=VLAG(KNEW)
       VLAG(KNEW)=VLAG(KNEW)-ONE
@@ -2161,15 +2170,16 @@
 
 !     Finally, update the matrix BMAT.
 
-      DO 60 J=1,N
-      JP=NPT+J
-      W(JP)=BMAT(KNEW,J)
-      TEMPA=(ALPHA*VLAG(JP)-TAU*W(JP))/DENOM
-      TEMPB=(-BETA*W(JP)-TAU*VLAG(JP))/DENOM
-      DO 60 I=1,JP
-      BMAT(I,J)=BMAT(I,J)+TEMPA*VLAG(I)+TEMPB*W(I)
-      IF (I  >  NPT) BMAT(JP,I-NPT)=BMAT(I,J)
-   60 CONTINUE
+      DO J=1,N
+        JP=NPT+J
+        W(JP)=BMAT(KNEW,J)
+        TEMPA=(ALPHA*VLAG(JP)-TAU*W(JP))/DENOM
+        TEMPB=(-BETA*W(JP)-TAU*VLAG(JP))/DENOM
+        DO I=1,JP
+            BMAT(I,J)=BMAT(I,J)+TEMPA*VLAG(I)+TEMPB*W(I)
+            IF (I  >  NPT) BMAT(JP,I-NPT)=BMAT(I,J)
+        END DO
+      END DO
       RETURN
       END SUBROUTINE UPDATE
 
