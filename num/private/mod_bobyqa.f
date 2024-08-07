@@ -899,8 +899,9 @@
    30 GLAG(I)=BMAT(KNEW,I)
       DO 50 K=1,NPT
       TEMP=ZERO
-      DO 40 J=1,N
-   40 TEMP=TEMP+XPT(K,J)*XOPT(J)
+      DO J=1,N
+         TEMP=TEMP+XPT(K,J)*XOPT(J)
+      END DO
       TEMP=HCOL(K)*TEMP
       DO 50 I=1,N
    50 GLAG(I)=GLAG(I)+TEMP*XPT(K,I)
@@ -916,10 +917,11 @@
       IF (K  ==  KOPT) GOTO 80
       DDERIV=ZERO
       DISTSQ=ZERO
-      DO 60 I=1,N
-      TEMP=XPT(K,I)-XOPT(I)
-      DDERIV=DDERIV+GLAG(I)*TEMP
-   60 DISTSQ=DISTSQ+TEMP*TEMP
+      DO I=1,N
+        TEMP=XPT(K,I)-XOPT(I)
+        DDERIV=DDERIV+GLAG(I)*TEMP
+        DISTSQ=DISTSQ+TEMP*TEMP
+      END DO
       SUBD=ADELT/DSQRT(DISTSQ)
       SLBD=-SUBD
       ILBD=0
@@ -928,28 +930,28 @@
 !
 !     Revise SLBD and SUBD if necessary because of the bounds in SL and SU.
 !
-      DO 70 I=1,N
-      TEMP=XPT(K,I)-XOPT(I)
-      IF (TEMP  >  ZERO) THEN
-          IF (SLBD*TEMP  <  SL(I)-XOPT(I)) THEN
-              SLBD=(SL(I)-XOPT(I))/TEMP
-              ILBD=-I
-          END IF
-          IF (SUBD*TEMP  >  SU(I)-XOPT(I)) THEN
-              SUBD=DMAX1(SUMIN,(SU(I)-XOPT(I))/TEMP)
-              IUBD=I
-          END IF
-      ELSE IF (TEMP  <  ZERO) THEN
-          IF (SLBD*TEMP  >  SU(I)-XOPT(I)) THEN
-              SLBD=(SU(I)-XOPT(I))/TEMP
-              ILBD=I
-          END IF
-          IF (SUBD*TEMP  <  SL(I)-XOPT(I)) THEN
-              SUBD=DMAX1(SUMIN,(SL(I)-XOPT(I))/TEMP)
-              IUBD=-I
-          END IF
-      END IF
-   70 CONTINUE
+      DO I=1,N
+        TEMP=XPT(K,I)-XOPT(I)
+        IF (TEMP  >  ZERO) THEN
+            IF (SLBD*TEMP  <  SL(I)-XOPT(I)) THEN
+                SLBD=(SL(I)-XOPT(I))/TEMP
+                ILBD=-I
+            END IF
+            IF (SUBD*TEMP  >  SU(I)-XOPT(I)) THEN
+                SUBD=DMAX1(SUMIN,(SU(I)-XOPT(I))/TEMP)
+                IUBD=I
+            END IF
+        ELSE IF (TEMP  <  ZERO) THEN
+            IF (SLBD*TEMP  >  SU(I)-XOPT(I)) THEN
+                SLBD=(SU(I)-XOPT(I))/TEMP
+                ILBD=I
+            END IF
+            IF (SUBD*TEMP  <  SL(I)-XOPT(I)) THEN
+                SUBD=DMAX1(SUMIN,(SL(I)-XOPT(I))/TEMP)
+                IUBD=-I
+            END IF
+        END IF
+      END DO
 !
 !     Seek a large modulus of the KNEW-th Lagrange function when the index
 !     of the other interpolation point on the line through XOPT is KNEW.
@@ -1013,9 +1015,10 @@
 !
 !     Construct XNEW in a way that satisfies the bound constraints exactly.
 !
-      DO 90 I=1,N
-      TEMP=XOPT(I)+STPSAV*(XPT(KSAV,I)-XOPT(I))
-   90 XNEW(I)=DMAX1(SL(I),DMIN1(SU(I),TEMP))
+      DO I=1,N
+         TEMP=XOPT(I)+STPSAV*(XPT(KSAV,I)-XOPT(I))
+         XNEW(I)=DMAX1(SL(I),DMIN1(SU(I),TEMP))
+      END DO
       IF (IBDSAV  <  0) XNEW(-IBDSAV)=SL(-IBDSAV)
       IF (IBDSAV  >  0) XNEW(IBDSAV)=SU(IBDSAV)
 !
@@ -1088,11 +1091,13 @@
 !     the square of this function.
 !
       CURV=ZERO
-      DO 160 K=1,NPT
-      TEMP=ZERO
-      DO 150 J=1,N
-  150 TEMP=TEMP+XPT(K,J)*W(J)
-  160 CURV=CURV+HCOL(K)*TEMP*TEMP
+      DO K=1,NPT
+        TEMP=ZERO
+        DO J=1,N
+            TEMP=TEMP+XPT(K,J)*W(J)
+        END DO
+        CURV=CURV+HCOL(K)*TEMP*TEMP
+      END DO
       IF (IFLAG  ==  1) CURV=-CURV
       IF (CURV  >  -GW .AND. CURV  <  -CONST*GW) THEN
           SCALE=-GW/CURV
@@ -1109,16 +1114,18 @@
 !     is chosen is the one that gives the larger value of CAUCHY.
 !
       IF (IFLAG  ==  0) THEN
-          DO 180 I=1,N
-          GLAG(I)=-GLAG(I)
-  180     W(N+I)=XALT(I)
+          DO I=1,N
+            GLAG(I)=-GLAG(I)
+            W(N+I)=XALT(I)
+          END DO
           CSAVE=CAUCHY
           IFLAG=1
           GOTO 100
       END IF
       IF (CSAVE  >  CAUCHY) THEN
-          DO 190 I=1,N
-  190     XALT(I)=W(N+I)
+          DO I=1,N
+             XALT(I)=W(N+I)
+          END DO
           CAUCHY=CSAVE
       END IF
   200 RETURN
@@ -1163,18 +1170,24 @@
 !     Set XBASE to the initial vector of variables, and set the initial
 !     elements of XPT, BMAT, HQ, PQ and ZMAT to zero.
 !
-      DO 20 J=1,N
-      XBASE(J)=X(J)
-      DO 10 K=1,NPT
-   10 XPT(K,J)=ZERO
-      DO 20 I=1,NDIM
-   20 BMAT(I,J)=ZERO
-      DO 30 IH=1,(N*NP)/2
-   30 HQ(IH)=ZERO
-      DO 40 K=1,NPT
-      PQ(K)=ZERO
-      DO 40 J=1,NPT-NP
-   40 ZMAT(K,J)=ZERO
+      DO J=1,N
+        XBASE(J)=X(J)
+        DO K=1,NPT
+            XPT(K,J)=ZERO
+        END DO
+        DO I=1,NDIM
+            BMAT(I,J)=ZERO
+        END DO
+      END DO
+      DO IH=1,(N*NP)/2
+         HQ(IH)=ZERO
+      END DO
+      DO K=1,NPT
+        PQ(K)=ZERO
+        DO J=1,NPT-NP
+            ZMAT(K,J)=ZERO
+        END DO
+      END DO
 !
 !     Begin the initialization procedure. NF becomes one more than the number
 !     of function values so far. The coordinates of the displacement of the
@@ -1349,49 +1362,57 @@
 !
       SUMPQ=ZERO
       WINC=ZERO
-      DO 20 K=1,NPT
-      DISTSQ=ZERO
-      DO 10 J=1,N
-      XPT(K,J)=XPT(K,J)-XOPT(J)
-   10 DISTSQ=DISTSQ+XPT(K,J)**2
-      SUMPQ=SUMPQ+PQ(K)
-      W(NDIM+K)=DISTSQ
-      WINC=DMAX1(WINC,DISTSQ)
-      DO 20 J=1,NPTM
-   20 ZMAT(K,J)=ZERO
+      DO K=1,NPT
+        DISTSQ=ZERO
+        DO J=1,N
+            XPT(K,J)=XPT(K,J)-XOPT(J)
+            DISTSQ=DISTSQ+XPT(K,J)**2
+        END DO
+        SUMPQ=SUMPQ+PQ(K)
+        W(NDIM+K)=DISTSQ
+        WINC=DMAX1(WINC,DISTSQ)
+         DO J=1,NPTM
+            ZMAT(K,J)=ZERO
+         END DO
+      END DO
 !
 !     Update HQ so that HQ and PQ define the second derivatives of the model
 !     after XBASE has been shifted to the trust region centre.
 !
       IH=0
-      DO 40 J=1,N
-      W(J)=HALF*SUMPQ*XOPT(J)
-      DO 30 K=1,NPT
-   30 W(J)=W(J)+PQ(K)*XPT(K,J)
-      DO 40 I=1,J
-      IH=IH+1
-   40 HQ(IH)=HQ(IH)+W(I)*XOPT(J)+W(J)*XOPT(I)
+      DO J=1,N
+        W(J)=HALF*SUMPQ*XOPT(J)
+        DO K=1,NPT
+            W(J)=W(J)+PQ(K)*XPT(K,J)
+        END DO
+        DO I=1,J
+            IH=IH+1
+            HQ(IH)=HQ(IH)+W(I)*XOPT(J)+W(J)*XOPT(I)
+        END DO
+      END DO
 !
 !     Shift XBASE, SL, SU and XOPT. Set the elements of BMAT to zero, and
 !     also set the elements of PTSAUX.
 !
-      DO 50 J=1,N
-      XBASE(J)=XBASE(J)+XOPT(J)
-      SL(J)=SL(J)-XOPT(J)
-      SU(J)=SU(J)-XOPT(J)
-      XOPT(J)=ZERO
-      PTSAUX(1,J)=DMIN1(DELTA,SU(J))
-      PTSAUX(2,J)=DMAX1(-DELTA,SL(J))
-      IF (PTSAUX(1,J)+PTSAUX(2,J)  <  ZERO) THEN
-          TEMP=PTSAUX(1,J)
-          PTSAUX(1,J)=PTSAUX(2,J)
-          PTSAUX(2,J)=TEMP
-      END IF
-      IF (DABS(PTSAUX(2,J))  <  HALF*DABS(PTSAUX(1,J))) THEN
-          PTSAUX(2,J)=HALF*PTSAUX(1,J)
-      END IF
-      DO 50 I=1,NDIM
-   50 BMAT(I,J)=ZERO
+      DO J=1,N
+        XBASE(J)=XBASE(J)+XOPT(J)
+        SL(J)=SL(J)-XOPT(J)
+        SU(J)=SU(J)-XOPT(J)
+        XOPT(J)=ZERO
+        PTSAUX(1,J)=DMIN1(DELTA,SU(J))
+        PTSAUX(2,J)=DMAX1(-DELTA,SL(J))
+        IF (PTSAUX(1,J)+PTSAUX(2,J)  <  ZERO) THEN
+            TEMP=PTSAUX(1,J)
+            PTSAUX(1,J)=PTSAUX(2,J)
+            PTSAUX(2,J)=TEMP
+        END IF
+        IF (DABS(PTSAUX(2,J))  <  HALF*DABS(PTSAUX(1,J))) THEN
+            PTSAUX(2,J)=HALF*PTSAUX(1,J)
+        END IF
+        DO I=1,NDIM
+            BMAT(I,J)=ZERO
+        END DO
+      END DO
       FBASE=FVAL(KOPT)
 !
 !     Set the identifiers of the artificial interpolation points that are
