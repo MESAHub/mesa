@@ -683,8 +683,9 @@
 !
       IF (KNEW == -1) GOTO 290
   530 IF (FOPT <= F) THEN
-          DO 540 I=1,N
-  540     X(I)=XBASE(I)+XOPT(I)
+          DO I=1,N
+            X(I)=XBASE(I)+XOPT(I)
+          END DO
           F=FOPT
       END IF
       IF (IPRINT >= 1) THEN
@@ -800,10 +801,11 @@
       TEMP=ONE/DSQRT(SSDEN)
       XOPTD=ZERO
       XOPTS=ZERO
-      DO 80 I=1,N
-      S(I)=TEMP*(DD*S(I)-DS*D(I))
-      XOPTD=XOPTD+XOPT(I)*D(I)
-   80 XOPTS=XOPTS+XOPT(I)*S(I)
+      DO I=1,N
+        S(I)=TEMP*(DD*S(I)-DS*D(I))
+        XOPTD=XOPTD+XOPT(I)*D(I)
+        XOPTS=XOPTS+XOPT(I)*S(I)
+      END DO
 !
 !     Set the coefficients of the first two terms of BETA.
 !
@@ -1072,22 +1074,26 @@
 !     XOPT, and multiply D by the second derivative matrix of LFUNC.
 !
       DD=ZERO
-      DO 30 I=1,N
-      D(I)=XPT(KNEW,I)-XOPT(I)
-      GC(I)=BMAT(KNEW,I)
-      GD(I)=ZERO
-   30 DD=DD+D(I)**2
-      DO 50 K=1,NPT
-      TEMP=ZERO
-      SUM=ZERO
-      DO 40 J=1,N
-      TEMP=TEMP+XPT(K,J)*XOPT(J)
-   40 SUM=SUM+XPT(K,J)*D(J)
-      TEMP=HCOL(K)*TEMP
-      SUM=HCOL(K)*SUM
-      DO 50 I=1,N
-      GC(I)=GC(I)+TEMP*XPT(K,I)
-   50 GD(I)=GD(I)+SUM*XPT(K,I)
+      DO I=1,N
+        D(I)=XPT(KNEW,I)-XOPT(I)
+        GC(I)=BMAT(KNEW,I)
+        GD(I)=ZERO
+        DD=DD+D(I)**2
+      END DO
+      DO K=1,NPT
+        TEMP=ZERO
+        SUM=ZERO
+        DO J=1,N
+            TEMP=TEMP+XPT(K,J)*XOPT(J)
+            SUM=SUM+XPT(K,J)*D(J)
+        END DO
+        TEMP=HCOL(K)*TEMP
+        SUM=HCOL(K)*SUM
+        DO I=1,N
+            GC(I)=GC(I)+TEMP*XPT(K,I)
+            GD(I)=GD(I)+SUM*XPT(K,I)
+        END DO
+      END DO
 !
 !     Scale D and GD, with a sign change if required. Set S to another
 !     vector in the initial two dimensional subspace.
@@ -1106,10 +1112,11 @@
       IF (SP*SP > 0.99D0*DD*GG) TEMP=ONE
       TAU=SCALE*(DABS(SP)+HALF*SCALE*DABS(DHD))
       IF (GG*DELSQ < 0.01D0*TAU*TAU) TEMP=ONE
-      DO 70 I=1,N
-      D(I)=SCALE*D(I)
-      GD(I)=SCALE*GD(I)
-   70 S(I)=GC(I)+TEMP*GD(I)
+      DO I=1,N
+        D(I)=SCALE*D(I)
+        GD(I)=SCALE*GD(I)
+        S(I)=GC(I)+TEMP*GD(I)
+      END DO
 !
 !     Begin the iteration by overwriting S with a vector that has the
 !     required length and direction, except that termination occurs if
@@ -1119,10 +1126,11 @@
       DD=ZERO
       SP=ZERO
       SS=ZERO
-      DO 90 I=1,N
-      DD=DD+D(I)**2
-      SP=SP+D(I)*S(I)
-   90 SS=SS+S(I)**2
+      DO I=1,N
+        DD=DD+D(I)**2
+        SP=SP+D(I)*S(I)
+        SS=SS+S(I)**2
+      END DO
       TEMP=DD*SS-SP*SP
       IF (TEMP <= 1.0D-8*DD*SS) GOTO 160
       DENOM=DSQRT(TEMP)
