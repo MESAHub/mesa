@@ -40,7 +40,6 @@ and when the luminosity falls below 1e3 Lsun a nova cycle is considered finished
    :width: 100%
 
 
-|br|
 The Python script used to create the figures above:
 
 .. literalinclude:: ../../../star/test_suite/wd_nova_burst/plot.py
@@ -49,9 +48,4 @@ The Python script used to create the figures above:
 
 Last-Updated: 07Aug2024 (MESA 0b40398b) by wmwolf.
 
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>
 Last-Run: 07Aug2024 (MESA 0b40398b) by wmwolf on Hercules in 431 seconds using 20 threads.
