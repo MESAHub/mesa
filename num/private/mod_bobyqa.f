@@ -1567,26 +1567,32 @@
         VLAG(K)=SUM
       END DO
       BETA=ZERO
-      DO 200 J=1,NPTM
-      SUM=ZERO
-      DO 190 K=1,NPT
-  190 SUM=SUM+ZMAT(K,J)*W(K)
-      BETA=BETA-SUM*SUM
-      DO 200 K=1,NPT
-  200 VLAG(K)=VLAG(K)+SUM*ZMAT(K,J)
+      DO J=1,NPTM
+        SUM=ZERO
+        DO K=1,NPT
+            SUM=SUM+ZMAT(K,J)*W(K)
+        END DO
+        BETA=BETA-SUM*SUM
+        DO K=1,NPT
+           VLAG(K)=VLAG(K)+SUM*ZMAT(K,J)
+        END DO
+      END DO
       BSUM=ZERO
       DISTSQ=ZERO
-      DO 230 J=1,N
-      SUM=ZERO
-      DO 210 K=1,NPT
-  210 SUM=SUM+BMAT(K,J)*W(K)
-      JP=J+NPT
-      BSUM=BSUM+SUM*W(JP)
-      DO 220 IP=NPT+1,NDIM
-  220 SUM=SUM+BMAT(IP,J)*W(IP)
-      BSUM=BSUM+SUM*W(JP)
-      VLAG(JP)=SUM
-  230 DISTSQ=DISTSQ+XPT(KNEW,J)**2
+      DO J=1,N
+        SUM=ZERO
+        DO K=1,NPT
+            SUM=SUM+BMAT(K,J)*W(K)
+        END DO
+        JP=J+NPT
+        BSUM=BSUM+SUM*W(JP)
+        DO IP=NPT+1,NDIM
+            SUM=SUM+BMAT(IP,J)*W(IP)
+        END DO
+        BSUM=BSUM+SUM*W(JP)
+        VLAG(JP)=SUM
+        DISTSQ=DISTSQ+XPT(KNEW,J)**2
+      END DO
       BETA=HALF*DISTSQ*DISTSQ+BETA-BSUM
       VLAG(KOPT)=VLAG(KOPT)+ONE
 !
@@ -1597,18 +1603,20 @@
 !
       DENOM=ZERO
       VLMXSQ=ZERO
-      DO 250 K=1,NPT
-      IF (PTSID(K) /= ZERO) THEN
-          HDIAG=ZERO
-          DO 240 J=1,NPTM
-  240     HDIAG=HDIAG+ZMAT(K,J)**2
-          DEN=BETA*HDIAG+VLAG(K)**2
-          IF (DEN > DENOM) THEN
-              KOLD=K
-              DENOM=DEN
-          END IF
-      END IF
-  250 VLMXSQ=DMAX1(VLMXSQ,VLAG(K)**2)
+      DO K=1,NPT
+        IF (PTSID(K) /= ZERO) THEN
+            HDIAG=ZERO
+            DO J=1,NPTM
+                HDIAG=HDIAG+ZMAT(K,J)**2
+            END DO
+            DEN=BETA*HDIAG+VLAG(K)**2
+            IF (DEN > DENOM) THEN
+                KOLD=K
+                DENOM=DEN
+            END IF
+        END IF
+        VLMXSQ=DMAX1(VLMXSQ,VLAG(K)**2)
+      END DO
       IF (DENOM <= 1.0D-2*VLMXSQ) THEN
           W(NDIM+KNEW)=-W(NDIM+KNEW)-WINC
           GOTO 120
@@ -1623,105 +1631,109 @@
 !     by putting the new point in XPT(KPT,.) and by setting PQ(KPT) to zero,
 !     except that a RETURN occurs if MAXFUN prohibits another value of F.
 !
-  260 DO 340 KPT=1,NPT
-      IF (PTSID(KPT) == ZERO) GOTO 340
-      IF (NF >= MAXFUN) THEN
-          NF=-1
-          GOTO 350
-      END IF
-      IH=0
-      DO 270 J=1,N
-      W(J)=XPT(KPT,J)
-      XPT(KPT,J)=ZERO
-      TEMP=PQ(KPT)*W(J)
-      DO 270 I=1,J
-      IH=IH+1
-  270 HQ(IH)=HQ(IH)+TEMP*W(I)
-      PQ(KPT)=ZERO
-      IP=PTSID(KPT)
-      IQ=DBLE(NP)*PTSID(KPT)-DBLE(IP*NP)
-      IF (IP > 0) THEN
-          XP=PTSAUX(1,IP)
-          XPT(KPT,IP)=XP
-      END IF
-      IF (IQ > 0) THEN
-          XQ=PTSAUX(1,IQ)
-          IF (IP == 0) XQ=PTSAUX(2,IQ)
-          XPT(KPT,IQ)=XQ
-      END IF
+  260 DO KPT=1,NPT
+        IF (PTSID(KPT) == ZERO) CYCLE
+        IF (NF >= MAXFUN) THEN
+            NF=-1
+            GOTO 350
+        END IF
+        IH=0
+        DO J=1,N
+            W(J)=XPT(KPT,J)
+            XPT(KPT,J)=ZERO
+            TEMP=PQ(KPT)*W(J)
+            DO I=1,J
+                IH=IH+1
+                HQ(IH)=HQ(IH)+TEMP*W(I)
+            END DO
+        END DO
+        PQ(KPT)=ZERO
+        IP=PTSID(KPT)
+        IQ=DBLE(NP)*PTSID(KPT)-DBLE(IP*NP)
+        IF (IP > 0) THEN
+            XP=PTSAUX(1,IP)
+            XPT(KPT,IP)=XP
+        END IF
+        IF (IQ > 0) THEN
+            XQ=PTSAUX(1,IQ)
+            IF (IP == 0) XQ=PTSAUX(2,IQ)
+            XPT(KPT,IQ)=XQ
+        END IF
 !
 !     Set VQUAD to the value of the current model at the new point.
 !
-      VQUAD=FBASE
-      IF (IP > 0) THEN
-          IHP=(IP+IP*IP)/2
-          VQUAD=VQUAD+XP*(GOPT(IP)+HALF*XP*HQ(IHP))
-      END IF
-      IF (IQ > 0) THEN
-          IHQ=(IQ+IQ*IQ)/2
-          VQUAD=VQUAD+XQ*(GOPT(IQ)+HALF*XQ*HQ(IHQ))
-          IF (IP > 0) THEN
-              IW=MAX0(IHP,IHQ)-IABS(IP-IQ)
-              VQUAD=VQUAD+XP*XQ*HQ(IW)
-          END IF
-      END IF
-      DO 280 K=1,NPT
-      TEMP=ZERO
-      IF (IP > 0) TEMP=TEMP+XP*XPT(K,IP)
-      IF (IQ > 0) TEMP=TEMP+XQ*XPT(K,IQ)
-  280 VQUAD=VQUAD+HALF*PQ(K)*TEMP*TEMP
+        VQUAD=FBASE
+        IF (IP > 0) THEN
+            IHP=(IP+IP*IP)/2
+            VQUAD=VQUAD+XP*(GOPT(IP)+HALF*XP*HQ(IHP))
+        END IF
+        IF (IQ > 0) THEN
+            IHQ=(IQ+IQ*IQ)/2
+            VQUAD=VQUAD+XQ*(GOPT(IQ)+HALF*XQ*HQ(IHQ))
+            IF (IP > 0) THEN
+                IW=MAX0(IHP,IHQ)-IABS(IP-IQ)
+                VQUAD=VQUAD+XP*XQ*HQ(IW)
+            END IF
+        END IF
+        DO K=1,NPT
+            TEMP=ZERO
+            IF (IP > 0) TEMP=TEMP+XP*XPT(K,IP)
+            IF (IQ > 0) TEMP=TEMP+XQ*XPT(K,IQ)
+            VQUAD=VQUAD+HALF*PQ(K)*TEMP*TEMP
+        END DO
 !
 !     Calculate F at the new interpolation point, and set DIFF to the factor
 !     that is going to multiply the KPT-th Lagrange function when the model
 !     is updated to provide interpolation to the new function value.
 !
-      DO 290 I=1,N
-      W(I)=DMIN1(DMAX1(XL(I),XBASE(I)+XPT(KPT,I)),XU(I))
-      IF (XPT(KPT,I) == SL(I)) W(I)=XL(I)
-      IF (XPT(KPT,I) == SU(I)) W(I)=XU(I)
-  290 CONTINUE
-      NF=NF+1
-      CALL CALFUN (N,W,F)
-      IF (IPRINT == 3) THEN
-          PRINT 300, NF,F,(W(I),I=1,N)
-  300     FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,
-     1      '    The corresponding X is:'/(2X,5D15.6))
-      END IF
-      FVAL(KPT)=F
-      IF (F < FVAL(KOPT)) KOPT=KPT
-      DIFF=F-VQUAD
+        DO I=1,N
+            W(I)=DMIN1(DMAX1(XL(I),XBASE(I)+XPT(KPT,I)),XU(I))
+            IF (XPT(KPT,I) == SL(I)) W(I)=XL(I)
+            IF (XPT(KPT,I) == SU(I)) W(I)=XU(I)
+        END DO
+        NF=NF+1
+        CALL CALFUN (N,W,F)
+        IF (IPRINT == 3) THEN
+            PRINT 300, NF,F,(W(I),I=1,N)
+  300     FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,'    The corresponding X is:'/(2X,5D15.6))
+        END IF
+        FVAL(KPT)=F
+        IF (F < FVAL(KOPT)) KOPT=KPT
+        DIFF=F-VQUAD
 !
 !     Update the quadratic model. The RETURN from the subroutine occurs when
 !     all the new interpolation points are included in the model.
 !
-      DO 310 I=1,N
-  310 GOPT(I)=GOPT(I)+DIFF*BMAT(KPT,I)
-      DO 330 K=1,NPT
-      SUM=ZERO
-      DO 320 J=1,NPTM
-  320 SUM=SUM+ZMAT(K,J)*ZMAT(KPT,J)
-      TEMP=DIFF*SUM
-      IF (PTSID(K) == ZERO) THEN
-          PQ(K)=PQ(K)+TEMP
-      ELSE
-          IP=PTSID(K)
-          IQ=DBLE(NP)*PTSID(K)-DBLE(IP*NP)
-          IHQ=(IQ*IQ+IQ)/2
-          IF (IP == 0) THEN
-              HQ(IHQ)=HQ(IHQ)+TEMP*PTSAUX(2,IQ)**2
-          ELSE
-              IHP=(IP*IP+IP)/2
-              HQ(IHP)=HQ(IHP)+TEMP*PTSAUX(1,IP)**2
-              IF (IQ > 0) THEN
-                  HQ(IHQ)=HQ(IHQ)+TEMP*PTSAUX(1,IQ)**2
-                  IW=MAX0(IHP,IHQ)-IABS(IQ-IP)
-                  HQ(IW)=HQ(IW)+TEMP*PTSAUX(1,IP)*PTSAUX(1,IQ)
-              END IF
-          END IF
-      END IF
-  330 CONTINUE
-      PTSID(KPT)=ZERO
-  340 CONTINUE
+        DO I=1,N
+            GOPT(I)=GOPT(I)+DIFF*BMAT(KPT,I)
+        END DO
+        DO K=1,NPT
+            SUM=ZERO
+            DO J=1,NPTM
+            SUM=SUM+ZMAT(K,J)*ZMAT(KPT,J)
+            END DO
+            TEMP=DIFF*SUM
+            IF (PTSID(K) == ZERO) THEN
+                PQ(K)=PQ(K)+TEMP
+            ELSE
+                IP=PTSID(K)
+                IQ=DBLE(NP)*PTSID(K)-DBLE(IP*NP)
+                IHQ=(IQ*IQ+IQ)/2
+                IF (IP == 0) THEN
+                    HQ(IHQ)=HQ(IHQ)+TEMP*PTSAUX(2,IQ)**2
+                ELSE
+                    IHP=(IP*IP+IP)/2
+                    HQ(IHP)=HQ(IHP)+TEMP*PTSAUX(1,IP)**2
+                    IF (IQ > 0) THEN
+                        HQ(IHQ)=HQ(IHQ)+TEMP*PTSAUX(1,IQ)**2
+                        IW=MAX0(IHP,IHQ)-IABS(IQ-IP)
+                        HQ(IW)=HQ(IW)+TEMP*PTSAUX(1,IP)*PTSAUX(1,IQ)
+                    END IF
+                END IF
+            END IF
+        END DO
+        PTSID(KPT)=ZERO
+      END DO
   350 RETURN
       END SUBROUTINE RESCUE
 
