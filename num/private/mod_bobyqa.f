@@ -432,47 +432,56 @@
 !
   210 CALL ALTMOV (N,NPT,XPT,XOPT,BMAT,ZMAT,NDIM,SL,SU,KOPT,
      1  KNEW,ADELT,XNEW,XALT,ALPHA,CAUCHY,W,W(NP),W(NDIM+1))
-      DO 220 I=1,N
-  220 D(I)=XNEW(I)-XOPT(I)
+      DO I=1,N
+         D(I)=XNEW(I)-XOPT(I)
+      END DO
 !
 !     Calculate VLAG and BETA for the current choice of D. The scalar
 !     product of D with XPT(K,.) is going to be held in W(NPT+K) for
 !     use when VQUAD is calculated.
 !
-  230 DO 250 K=1,NPT
-      SUMA=ZERO
-      SUMB=ZERO
-      SUM=ZERO
-      DO 240 J=1,N
-      SUMA=SUMA+XPT(K,J)*D(J)
-      SUMB=SUMB+XPT(K,J)*XOPT(J)
-  240 SUM=SUM+BMAT(K,J)*D(J)
-      W(K)=SUMA*(HALF*SUMA+SUMB)
-      VLAG(K)=SUM
-  250 W(NPT+K)=SUMA
+  230 DO K=1,NPT
+        SUMA=ZERO
+        SUMB=ZERO
+        SUM=ZERO
+        DO J=1,N
+            SUMA=SUMA+XPT(K,J)*D(J)
+            SUMB=SUMB+XPT(K,J)*XOPT(J)
+            SUM=SUM+BMAT(K,J)*D(J)
+        END DO
+        W(K)=SUMA*(HALF*SUMA+SUMB)
+        VLAG(K)=SUM
+        W(NPT+K)=SUMA
+      END DO
       BETA=ZERO
-      DO 270 JJ=1,NPTM
-      SUM=ZERO
-      DO 260 K=1,NPT
-  260 SUM=SUM+ZMAT(K,JJ)*W(K)
-      BETA=BETA-SUM*SUM
-      DO 270 K=1,NPT
-  270 VLAG(K)=VLAG(K)+SUM*ZMAT(K,JJ)
+      DO JJ=1,NPTM
+        SUM=ZERO
+        DO K=1,NPT
+            SUM=SUM+ZMAT(K,JJ)*W(K)
+        END DO
+        BETA=BETA-SUM*SUM
+        DO K=1,NPT
+            VLAG(K)=VLAG(K)+SUM*ZMAT(K,JJ)
+        END DO
+      END DO
       DSQ=ZERO
       BSUM=ZERO
       DX=ZERO
-      DO 300 J=1,N
+      DO J=1,N
       DSQ=DSQ+D(J)**2
       SUM=ZERO
-      DO 280 K=1,NPT
-  280 SUM=SUM+W(K)*BMAT(K,J)
+      DO K=1,NPT
+         SUM=SUM+W(K)*BMAT(K,J)
+      END DO
       BSUM=BSUM+SUM*D(J)
       JP=NPT+J
-      DO 290 I=1,N
-  290 SUM=SUM+BMAT(JP,I)*D(I)
+      DO I=1,N
+         SUM=SUM+BMAT(JP,I)*D(I)
+      END DO
       VLAG(JP)=SUM
       BSUM=BSUM+SUM*D(J)
-  300 DX=DX+D(J)*XOPT(J)
+      DX=DX+D(J)*XOPT(J)
+      END DO
       BETA=DX*DX+DSQ*(XOPTSQ+DX+DX+HALF*DSQ)+BETA-BSUM
       VLAG(KOPT)=VLAG(KOPT)+ONE
 !
@@ -483,17 +492,17 @@
       IF (NTRITS == 0) THEN
           DENOM=VLAG(KNEW)**2+ALPHA*BETA
           IF (DENOM < CAUCHY .AND. CAUCHY > ZERO) THEN
-              DO 310 I=1,N
-              XNEW(I)=XALT(I)
-  310         D(I)=XNEW(I)-XOPT(I)
+              DO I=1,N
+                XNEW(I)=XALT(I)
+                D(I)=XNEW(I)-XOPT(I)
+              END DO
               CAUCHY=ZERO
               GO TO 230
           END IF
           IF (DENOM <= HALF*VLAG(KNEW)**2) THEN
               IF (NF > NRESC) GOTO 190
               IF (IPRINT > 0) PRINT 320
-  320         FORMAT (/5X,'Return from BOBYQA because of much',
-     1          ' cancellation in a denominator.')
+  320         FORMAT (/5X,'Return from BOBYQA because of much cancellation in a denominator.')
               GOTO 720
           END IF
 !
@@ -665,21 +674,27 @@
 !     the old XOPT that are caused by the updating of the quadratic model.
 !
       FVAL(KNEW)=F
-      DO 490 I=1,N
-      XPT(KNEW,I)=XNEW(I)
-  490 W(I)=BMAT(KNEW,I)
-      DO 520 K=1,NPT
-      SUMA=ZERO
-      DO 500 JJ=1,NPTM
-  500 SUMA=SUMA+ZMAT(KNEW,JJ)*ZMAT(K,JJ)
-      SUMB=ZERO
-      DO 510 J=1,N
-  510 SUMB=SUMB+XPT(K,J)*XOPT(J)
-      TEMP=SUMA*SUMB
-      DO 520 I=1,N
-  520 W(I)=W(I)+TEMP*XPT(K,I)
-      DO 530 I=1,N
-  530 GOPT(I)=GOPT(I)+DIFF*W(I)
+      DO I=1,N
+        XPT(KNEW,I)=XNEW(I)
+        W(I)=BMAT(KNEW,I)
+      END DO
+      DO K=1,NPT
+        SUMA=ZERO
+        DO JJ=1,NPTM
+            SUMA=SUMA+ZMAT(KNEW,JJ)*ZMAT(K,JJ)
+        END DO
+        SUMB=ZERO
+        DO J=1,N
+           SUMB=SUMB+XPT(K,J)*XOPT(J)
+        END DO
+        TEMP=SUMA*SUMB
+        DO I=1,N
+            W(I)=W(I)+TEMP*XPT(K,I)
+        END DO
+      END DO
+      DO I=1,N
+         GOPT(I)=GOPT(I)+DIFF*W(I)
+      END DO
 !
 !     Update XOPT, GOPT and KOPT if the new calculated F is less than FOPT.
 !
@@ -687,20 +702,25 @@
           KOPT=KNEW
           XOPTSQ=ZERO
           IH=0
-          DO 540 J=1,N
-          XOPT(J)=XNEW(J)
-          XOPTSQ=XOPTSQ+XOPT(J)**2
-          DO 540 I=1,J
-          IH=IH+1
-          IF (I < J) GOPT(J)=GOPT(J)+HQ(IH)*D(I)
-  540     GOPT(I)=GOPT(I)+HQ(IH)*D(J)
-          DO 560 K=1,NPT
-          TEMP=ZERO
-          DO 550 J=1,N
-  550     TEMP=TEMP+XPT(K,J)*D(J)
-          TEMP=PQ(K)*TEMP
-          DO 560 I=1,N
-  560     GOPT(I)=GOPT(I)+TEMP*XPT(K,I)
+          DO J=1,N
+            XOPT(J)=XNEW(J)
+            XOPTSQ=XOPTSQ+XOPT(J)**2
+            DO I=1,J
+                IH=IH+1
+                IF (I < J) GOPT(J)=GOPT(J)+HQ(IH)*D(I)
+                GOPT(I)=GOPT(I)+HQ(IH)*D(J)
+            END DO
+          END DO
+          DO K=1,NPT
+            TEMP=ZERO
+            DO J=1,N
+                TEMP=TEMP+XPT(K,J)*D(J)
+            END DO
+            TEMP=PQ(K)*TEMP
+            DO I=1,N
+                GOPT(I)=GOPT(I)+TEMP*XPT(K,I)
+            END DO
+          END DO
       END IF
 !
 !     Calculate the parameters of the least Frobenius norm interpolant to
@@ -1468,17 +1488,18 @@
 !     Set any remaining identifiers with their nonzero elements of ZMAT.
 !
       IF (NPT >= N+NP) THEN
-          DO 70 K=2*NP,NPT
-          IW=(DBLE(K-NP)-HALF)/DBLE(N)
-          IP=K-NP-IW*N
-          IQ=IP+IW
-          IF (IQ > N) IQ=IQ-N
-          PTSID(K)=DBLE(IP)+DBLE(IQ)/DBLE(NP)+SFRAC
-          TEMP=ONE/(PTSAUX(1,IP)*PTSAUX(1,IQ))
-          ZMAT(1,K-NP)=TEMP
-          ZMAT(IP+1,K-NP)=-TEMP
-          ZMAT(IQ+1,K-NP)=-TEMP
-   70     ZMAT(K,K-NP)=TEMP
+          DO K=2*NP,NPT
+            IW=(DBLE(K-NP)-HALF)/DBLE(N)
+            IP=K-NP-IW*N
+            IQ=IP+IW
+            IF (IQ > N) IQ=IQ-N
+            PTSID(K)=DBLE(IP)+DBLE(IQ)/DBLE(NP)+SFRAC
+            TEMP=ONE/(PTSAUX(1,IP)*PTSAUX(1,IQ))
+            ZMAT(1,K-NP)=TEMP
+            ZMAT(IP+1,K-NP)=-TEMP
+            ZMAT(IQ+1,K-NP)=-TEMP
+          ZMAT(K,K-NP)=TEMP
+          END DO
       END IF
       NREM=NPT
       KOLD=1
@@ -1487,14 +1508,16 @@
 !     Reorder the provisional points in the way that exchanges PTSID(KOLD)
 !     with PTSID(KNEW).
 !
-   80 DO 90 J=1,N
-      TEMP=BMAT(KOLD,J)
-      BMAT(KOLD,J)=BMAT(KNEW,J)
-   90 BMAT(KNEW,J)=TEMP
-      DO 100 J=1,NPTM
-      TEMP=ZMAT(KOLD,J)
-      ZMAT(KOLD,J)=ZMAT(KNEW,J)
-  100 ZMAT(KNEW,J)=TEMP
+   80 DO J=1,N
+        TEMP=BMAT(KOLD,J)
+        BMAT(KOLD,J)=BMAT(KNEW,J)
+        BMAT(KNEW,J)=TEMP
+      END DO
+      DO J=1,NPTM
+        TEMP=ZMAT(KOLD,J)
+        ZMAT(KOLD,J)=ZMAT(KNEW,J)
+        ZMAT(KNEW,J)=TEMP
+      END DO
       PTSID(KOLD)=PTSID(KNEW)
       PTSID(KNEW)=ZERO
       W(NDIM+KNEW)=ZERO
@@ -1511,8 +1534,9 @@
 !
           CALL UPDATE (N,NPT,BMAT,ZMAT,NDIM,VLAG,BETA,DENOM,KNEW,W)
           IF (NREM == 0) GOTO 350
-          DO 110 K=1,NPT
-  110     W(NDIM+K)=DABS(W(NDIM+K))
+          DO K=1,NPT
+             W(NDIM+K)=DABS(W(NDIM+K))
+          END DO
       END IF
 !
 !     Pick the index KNEW of an original interpolation point that has not
@@ -2032,19 +2056,20 @@
       ISAV=0
       REDSAV=ZERO
       IU=17.0D0*ANGBD+3.1D0
-      DO 170 I=1,IU
-      ANGT=ANGBD*DBLE(I)/DBLE(IU)
-      STH=(ANGT+ANGT)/(ONE+ANGT*ANGT)
-      TEMP=SHS+ANGT*(ANGT*DHD-DHS-DHS)
-      REDNEW=STH*(ANGT*DREDG-SREDG-HALF*STH*TEMP)
-      IF (REDNEW > REDMAX) THEN
-          REDMAX=REDNEW
-          ISAV=I
-          RDPREV=REDSAV
-      ELSE IF (I == ISAV+1) THEN
-          RDNEXT=REDNEW
-      END IF
-  170 REDSAV=REDNEW
+      DO I=1,IU
+        ANGT=ANGBD*DBLE(I)/DBLE(IU)
+        STH=(ANGT+ANGT)/(ONE+ANGT*ANGT)
+        TEMP=SHS+ANGT*(ANGT*DHD-DHS-DHS)
+        REDNEW=STH*(ANGT*DREDG-SREDG-HALF*STH*TEMP)
+        IF (REDNEW > REDMAX) THEN
+            REDMAX=REDNEW
+            ISAV=I
+            RDPREV=REDSAV
+        ELSE IF (I == ISAV+1) THEN
+            RDNEXT=REDNEW
+        END IF
+        REDSAV=REDNEW
+      END DO
 !
 !     Return if the reduction is zero. Otherwise, set the sine and cosine
 !     of the angle of the alternative iteration, and calculate SDEC.
@@ -2066,14 +2091,15 @@
 !
       DREDG=ZERO
       GREDSQ=ZERO
-      DO 180 I=1,N
-      GNEW(I)=GNEW(I)+(CTH-ONE)*HRED(I)+STH*HS(I)
-      IF (XBDI(I) == ZERO) THEN
-          D(I)=CTH*D(I)+STH*S(I)
-          DREDG=DREDG+D(I)*GNEW(I)
-          GREDSQ=GREDSQ+GNEW(I)**2
-      END IF
-  180 HRED(I)=CTH*HRED(I)+STH*HS(I)
+      DO I=1,N
+        GNEW(I)=GNEW(I)+(CTH-ONE)*HRED(I)+STH*HS(I)
+        IF (XBDI(I) == ZERO) THEN
+            D(I)=CTH*D(I)+STH*S(I)
+            DREDG=DREDG+D(I)*GNEW(I)
+            GREDSQ=GREDSQ+GNEW(I)**2
+        END IF
+        HRED(I)=CTH*HRED(I)+STH*HS(I)
+      END DO
       QRED=QRED+SDEC
       IF (IACT > 0 .AND. ISAV == IU) THEN
           NACT=NACT+1
@@ -2086,12 +2112,13 @@
 !
       IF (SDEC > 0.01D0*QRED) GOTO 120
   190 DSQ=ZERO
-      DO 200 I=1,N
-      XNEW(I)=DMAX1(DMIN1(XOPT(I)+D(I),SU(I)),SL(I))
-      IF (XBDI(I) == ONEMIN) XNEW(I)=SL(I)
-      IF (XBDI(I) == ONE) XNEW(I)=SU(I)
-      D(I)=XNEW(I)-XOPT(I)
-  200 DSQ=DSQ+D(I)**2
+      DO I=1,N
+        XNEW(I)=DMAX1(DMIN1(XOPT(I)+D(I),SU(I)),SL(I))
+        IF (XBDI(I) == ONEMIN) XNEW(I)=SL(I)
+        IF (XBDI(I) == ONE) XNEW(I)=SU(I)
+        D(I)=XNEW(I)-XOPT(I)
+        DSQ=DSQ+D(I)**2
+      END DO
       RETURN
  
 !     The following instructions multiply the current S-vector by the second
