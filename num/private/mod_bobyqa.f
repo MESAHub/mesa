@@ -758,12 +758,12 @@
           end if 
           IF (do_replace) THEN    
               !stop 'bobyqa: do_replace'
-              DO 640 I=1,MAX0(NPT,NH)
-              IF (I <= N) GOPT(I)=VLAG(NPT+I)
-              IF (I <= NPT) PQ(I)=W(NPT+I)
-              IF (I <= NH) HQ(I)=ZERO
-              ITEST=0
-  640         CONTINUE
+              DO I=1,MAX0(NPT,NH)
+                IF (I <= N) GOPT(I)=VLAG(NPT+I)
+                IF (I <= NPT) PQ(I)=W(NPT+I)
+                IF (I <= NH) HQ(I)=ZERO
+                ITEST=0
+              END DO
           END IF
       END IF
 !
@@ -779,15 +779,16 @@
 !
       DISTSQ=DMAX1((TWO*DELTA)**2,(TEN*RHO)**2)
   650 KNEW=0
-      DO 670 K=1,NPT
-      SUM=ZERO
-      DO 660 J=1,N
-  660 SUM=SUM+(XPT(K,J)-XOPT(J))**2
-      IF (SUM > DISTSQ) THEN
-          KNEW=K
-          DISTSQ=SUM
-      END IF
-  670 CONTINUE
+      DO K=1,NPT
+        SUM=ZERO
+        DO J=1,N
+            SUM=SUM+(XPT(K,J)-XOPT(J))**2
+        END DO
+        IF (SUM > DISTSQ) THEN
+            KNEW=K
+            DISTSQ=SUM
+        END IF
+      END DO
 !
 !     If KNEW is positive, then ALTMOV finds alternative new positions for
 !     the KNEW-th interpolation point within distance ADELT of XOPT. It is
@@ -844,17 +845,16 @@
 !
       IF (NTRITS == -1) GOTO 360
   720 IF (FVAL(KOPT) <= FSAVE) THEN
-          DO 730 I=1,N
-          X(I)=DMIN1(DMAX1(XL(I),XBASE(I)+XOPT(I)),XU(I))
-          IF (XOPT(I) == SL(I)) X(I)=XL(I)
-          IF (XOPT(I) == SU(I)) X(I)=XU(I)
-  730     CONTINUE
+          DO I=1,N
+            X(I)=DMIN1(DMAX1(XL(I),XBASE(I)+XOPT(I)),XU(I))
+            IF (XOPT(I) == SL(I)) X(I)=XL(I)
+            IF (XOPT(I) == SU(I)) X(I)=XU(I)
+          END DO
           F=FVAL(KOPT)
       END IF
       IF (IPRINT >= 1) THEN
           PRINT 740, NF
-  740     FORMAT (/4X,'At the return from BOBYQA',5X,
-     1      'Number of function values =',I6)
+  740     FORMAT (/4X,'At the return from BOBYQA',5X,'Number of function values =',I6)
           PRINT 710, F,(X(I),I=1,N)
       END IF
       RETURN
@@ -1054,15 +1054,15 @@
       IFLAG=0
   100 WFIXSQ=ZERO
       GGFREE=ZERO
-      DO 110 I=1,N
-      W(I)=ZERO
-      TEMPA=DMIN1(XOPT(I)-SL(I),GLAG(I))
-      TEMPB=DMAX1(XOPT(I)-SU(I),GLAG(I))
-      IF (TEMPA > ZERO .OR. TEMPB < ZERO) THEN
-          W(I)=BIGSTP
-          GGFREE=GGFREE+GLAG(I)**2
-      END IF
-  110 CONTINUE
+      DO I=1,N
+        W(I)=ZERO
+        TEMPA=DMIN1(XOPT(I)-SL(I),GLAG(I))
+        TEMPB=DMAX1(XOPT(I)-SU(I),GLAG(I))
+        IF (TEMPA > ZERO .OR. TEMPB < ZERO) THEN
+            W(I)=BIGSTP
+            GGFREE=GGFREE+GLAG(I)**2
+        END IF
+      END DO
       IF (GGFREE == ZERO) THEN
           CAUCHY=ZERO
           GOTO 200
@@ -1075,20 +1075,20 @@
           WSQSAV=WFIXSQ
           STEP=DSQRT(TEMP/GGFREE)
           GGFREE=ZERO
-          DO 130 I=1,N
-          IF (W(I) == BIGSTP) THEN
-              TEMP=XOPT(I)-STEP*GLAG(I)
-              IF (TEMP <= SL(I)) THEN
-                  W(I)=SL(I)-XOPT(I)
-                  WFIXSQ=WFIXSQ+W(I)**2
-              ELSE IF (TEMP >= SU(I)) THEN
-                  W(I)=SU(I)-XOPT(I)
-                  WFIXSQ=WFIXSQ+W(I)**2
-              ELSE
-                  GGFREE=GGFREE+GLAG(I)**2
-              END IF
-          END IF
-  130     CONTINUE
+          DO I=1,N
+            IF (W(I) == BIGSTP) THEN
+                TEMP=XOPT(I)-STEP*GLAG(I)
+                IF (TEMP <= SL(I)) THEN
+                    W(I)=SL(I)-XOPT(I)
+                    WFIXSQ=WFIXSQ+W(I)**2
+                ELSE IF (TEMP >= SU(I)) THEN
+                    W(I)=SU(I)-XOPT(I)
+                    WFIXSQ=WFIXSQ+W(I)**2
+                ELSE
+                    GGFREE=GGFREE+GLAG(I)**2
+                END IF
+            END IF
+          END DO
           IF (WFIXSQ > WSQSAV .AND. GGFREE > ZERO) GOTO 120
       END IF
 !
@@ -1096,18 +1096,19 @@
 !     except that W may be scaled later.
 !
       GW=ZERO
-      DO 140 I=1,N
-      IF (W(I) == BIGSTP) THEN
-          W(I)=-STEP*GLAG(I)
-          XALT(I)=DMAX1(SL(I),DMIN1(SU(I),XOPT(I)+W(I)))
-      ELSE IF (W(I) == ZERO) THEN
-          XALT(I)=XOPT(I)
-      ELSE IF (GLAG(I) > ZERO) THEN
-          XALT(I)=SL(I)
-      ELSE
-          XALT(I)=SU(I)
-      END IF
-  140 GW=GW+GLAG(I)*W(I)
+      DO I=1,N
+        IF (W(I) == BIGSTP) THEN
+            W(I)=-STEP*GLAG(I)
+            XALT(I)=DMAX1(SL(I),DMIN1(SU(I),XOPT(I)+W(I)))
+        ELSE IF (W(I) == ZERO) THEN
+            XALT(I)=XOPT(I)
+        ELSE IF (GLAG(I) > ZERO) THEN
+            XALT(I)=SL(I)
+        ELSE
+            XALT(I)=SU(I)
+        END IF
+        GW=GW+GLAG(I)*W(I)
+      END DO
 !
 !     Set CURV to the curvature of the KNEW-th Lagrange function along W.
 !     Scale W by a factor less than one if that can reduce the modulus of
@@ -1125,9 +1126,10 @@
       IF (IFLAG == 1) CURV=-CURV
       IF (CURV > -GW .AND. CURV < -CONST*GW) THEN
           SCALE=-GW/CURV
-          DO 170 I=1,N
-          TEMP=XOPT(I)+SCALE*W(I)
-  170     XALT(I)=DMAX1(SL(I),DMIN1(SU(I),TEMP))
+          DO I=1,N
+             TEMP=XOPT(I)+SCALE*W(I)
+             XALT(I)=DMAX1(SL(I),DMIN1(SU(I),TEMP))
+          END DO
           CAUCHY=(HALF*GW*SCALE)**2
       ELSE
           CAUCHY=(GW+HALF*CURV)**2
@@ -1249,23 +1251,22 @@
 !     Calculate the next value of F. The least function value so far and
 !     its index are required.
 !
-      DO 60 J=1,N
-      X(J)=DMIN1(DMAX1(XL(J),XBASE(J)+XPT(NF,J)),XU(J))
-      IF (XPT(NF,J) == SL(J)) X(J)=XL(J)
-      IF (XPT(NF,J) == SU(J)) X(J)=XU(J)
-   60 CONTINUE
+      DO J=1,N
+        X(J)=DMIN1(DMAX1(XL(J),XBASE(J)+XPT(NF,J)),XU(J))
+        IF (XPT(NF,J) == SL(J)) X(J)=XL(J)
+        IF (XPT(NF,J) == SU(J)) X(J)=XU(J)
+      END DO
       CALL CALFUN (N,X,F)
       IF (IPRINT == 3) THEN
-          PRINT 70, NF,F,(X(I),I=1,N)
-   70      FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,
-     1       '    The corresponding X is:'/(2X,5D15.6))
+         PRINT 70, NF,F,(X(I),I=1,N)
+   70    FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,'    The corresponding X is:'/(2X,5D15.6))
       END IF
       FVAL(NF)=F
       IF (NF == 1) THEN
-          FBEG=F
-          KOPT=1
+         FBEG=F
+         KOPT=1
       ELSE IF (F < FVAL(KOPT)) THEN
-          KOPT=NF
+         KOPT=NF
       END IF
 !
 !     Set the nonzero initial elements of BMAT and the quadratic model in the
@@ -1444,25 +1445,25 @@
 !     nonzero elements of BMAT and ZMAT.
 !
       PTSID(1)=SFRAC
-      DO 60 J=1,N
-      JP=J+1
-      JPN=JP+N
-      PTSID(JP)=DBLE(J)+SFRAC
-      IF (JPN <= NPT) THEN
-          PTSID(JPN)=DBLE(J)/DBLE(NP)+SFRAC
-          TEMP=ONE/(PTSAUX(1,J)-PTSAUX(2,J))
-          BMAT(JP,J)=-TEMP+ONE/PTSAUX(1,J)
-          BMAT(JPN,J)=TEMP+ONE/PTSAUX(2,J)
-          BMAT(1,J)=-BMAT(JP,J)-BMAT(JPN,J)
-          ZMAT(1,J)=DSQRT(2.0D0)/DABS(PTSAUX(1,J)*PTSAUX(2,J))
-          ZMAT(JP,J)=ZMAT(1,J)*PTSAUX(2,J)*TEMP
-          ZMAT(JPN,J)=-ZMAT(1,J)*PTSAUX(1,J)*TEMP
-      ELSE
-          BMAT(1,J)=-ONE/PTSAUX(1,J)
-          BMAT(JP,J)=ONE/PTSAUX(1,J)
-          BMAT(J+NPT,J)=-HALF*PTSAUX(1,J)**2
-      END IF
-   60 CONTINUE
+      DO J=1,N
+        JP=J+1
+        JPN=JP+N
+        PTSID(JP)=DBLE(J)+SFRAC
+        IF (JPN <= NPT) THEN
+            PTSID(JPN)=DBLE(J)/DBLE(NP)+SFRAC
+            TEMP=ONE/(PTSAUX(1,J)-PTSAUX(2,J))
+            BMAT(JP,J)=-TEMP+ONE/PTSAUX(1,J)
+            BMAT(JPN,J)=TEMP+ONE/PTSAUX(2,J)
+            BMAT(1,J)=-BMAT(JP,J)-BMAT(JPN,J)
+            ZMAT(1,J)=DSQRT(2.0D0)/DABS(PTSAUX(1,J)*PTSAUX(2,J))
+            ZMAT(JP,J)=ZMAT(1,J)*PTSAUX(2,J)*TEMP
+            ZMAT(JPN,J)=-ZMAT(1,J)*PTSAUX(1,J)*TEMP
+        ELSE
+            BMAT(1,J)=-ONE/PTSAUX(1,J)
+            BMAT(JP,J)=ONE/PTSAUX(1,J)
+            BMAT(J+NPT,J)=-HALF*PTSAUX(1,J)**2
+        END IF
+      END DO
 !
 !     Set any remaining identifiers with their nonzero elements of ZMAT.
 !
@@ -1519,27 +1520,29 @@
 !     attention to the closeness to XOPT and to previous tries with KNEW.
 !
   120 DSQMIN=ZERO
-      DO 130 K=1,NPT
-      IF (W(NDIM+K) > ZERO) THEN
-          IF (DSQMIN == ZERO .OR. W(NDIM+K) < DSQMIN) THEN
-              KNEW=K
-              DSQMIN=W(NDIM+K)
-          END IF
-      END IF
-  130 CONTINUE
+      DO K=1,NPT
+        IF (W(NDIM+K) > ZERO) THEN
+            IF (DSQMIN == ZERO .OR. W(NDIM+K) < DSQMIN) THEN
+                KNEW=K
+                DSQMIN=W(NDIM+K)
+            END IF
+        END IF
+      END DO
       IF (DSQMIN == ZERO) GOTO 260
 !
 !     Form the W-vector of the chosen original interpolation point.
 !
-      DO 140 J=1,N
-  140 W(NPT+J)=XPT(KNEW,J)
-      DO 160 K=1,NPT
+      DO J=1,N
+         W(NPT+J)=XPT(KNEW,J)
+      END DO
+      DO K=1,NPT
       SUM=ZERO
       IF (K == KOPT) THEN
           CONTINUE
       ELSE IF (PTSID(K) == ZERO) THEN
-          DO 150 J=1,N
-  150     SUM=SUM+W(NPT+J)*XPT(K,J)
+          DO J=1,N
+             SUM=SUM+W(NPT+J)*XPT(K,J)
+          END DO
       ELSE
           IP=PTSID(K)
           IF (IP > 0) SUM=W(NPT+IP)*PTSAUX(1,IP)
@@ -1550,16 +1553,19 @@
               SUM=SUM+W(NPT+IQ)*PTSAUX(IW,IQ)
           END IF
       END IF
-  160 W(K)=HALF*SUM*SUM
+         W(K)=HALF*SUM*SUM
+      END DO
 !
 !     Calculate VLAG and BETA for the required updating of the H matrix if
 !     XPT(KNEW,.) is reinstated in the set of interpolation points.
 !
-      DO 180 K=1,NPT
-      SUM=ZERO
-      DO 170 J=1,N
-  170 SUM=SUM+BMAT(K,J)*W(NPT+J)
-  180 VLAG(K)=SUM
+      DO K=1,NPT
+        SUM=ZERO
+        DO J=1,N
+            SUM=SUM+BMAT(K,J)*W(NPT+J)
+        END DO
+        VLAG(K)=SUM
+      END DO
       BETA=ZERO
       DO 200 J=1,NPTM
       SUM=ZERO
