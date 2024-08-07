@@ -1,8 +1,11 @@
 &pgstar
 
-   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-   file_device = 'vcps'   ! postscript
+   ! device
+   file_white_on_black_flag = .true.
+   file_device = 'vcps'      ! postscript
    file_extension = 'ps'
+   !file_device = 'png'      ! png
+   !file_extension = 'png'
 
    pgstar_interval = 10
 
