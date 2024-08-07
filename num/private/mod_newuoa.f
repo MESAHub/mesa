@@ -5,9 +5,7 @@
       contains
       
       
-
-      SUBROUTINE do_newuoa (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,
-     >         CALFUN,max_valid_value)
+      SUBROUTINE do_newuoa(N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W,CALFUN,max_valid_value)
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION X(*),W(*)
       interface
@@ -52,8 +50,7 @@
       NPTM=NPT-NP
       IF (NPT < N+2 .OR. NPT > ((N+2)*NP)/2) THEN
           PRINT 10
-   10     FORMAT (/4X,'Return from NEWUOA because NPT is not in',
-     1      ' the required interval')
+   10     FORMAT (/4X,'Return from NEWUOA because NPT is not in the required interval')
           GO TO 20
       END IF
       NDIM=NPT+N
@@ -260,8 +257,7 @@
 !     to -1 if the purpose of the next F will be to improve the model.
 !
   100 KNEW=0
-      CALL TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,D,W,W(NP),
-     1  W(NP+N),W(NP+2*N),CRVMIN)
+      CALL TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,D,W,W(NP),W(NP+N),W(NP+2*N),CRVMIN)
       DSQ=ZERO
       DO I=1,N
          DSQ=DSQ+D(I)**2
@@ -362,8 +358,7 @@
 !     cancellation in DENOM.
 !
       IF (KNEW > 0) THEN
-          CALL BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DSTEP,
-     1      D,ALPHA,VLAG,VLAG(NPT+1),W,W(NP),W(NP+N))
+          CALL BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DSTEP,D,ALPHA,VLAG,VLAG(NPT+1),W,W(NP),W(NP+N))
       END IF
 !
 !     Calculate VLAG and BETA for the current choice of D. The first NPT
@@ -436,15 +431,13 @@
   310 IF (NF > NFTEST) THEN
           NF=NF-1
           IF (IPRINT > 0) PRINT 320
-  320     FORMAT (/4X,'Return from NEWUOA because CALFUN has been',
-     1      ' called MAXFUN times.')
+  320     FORMAT (/4X,'Return from NEWUOA because CALFUN has been called MAXFUN times.')
           GOTO 530
       END IF
       CALL CALFUN (N,X,F)
       IF (IPRINT == 3) THEN
-          PRINT 330, NF,F,(X(I),I=1,N)
-  330      FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,
-     1       '    The corresponding X is:'/(2X,5D15.6))
+         PRINT 330, NF,F,(X(I),I=1,N)
+  330    FORMAT (/4X,'Function number',I6,'    F =',1PD18.10,'    The corresponding X is:'/(2X,5D15.6))
       END IF
       IF (NF <= NPT) GOTO 70
       IF (KNEW == -1) GOTO 530
@@ -492,8 +485,7 @@
 !
       IF (VQUAD >= ZERO) THEN
           IF (IPRINT > 0) PRINT 370
-  370     FORMAT (/4X,'Return from NEWUOA because a trust',
-     1      ' region step has failed to reduce Q.')
+  370     FORMAT (/4X,'Return from NEWUOA because a trust region step has failed to reduce Q.')
           GOTO 530
       END IF
       RATIO=(F-FSAVE)/VQUAD
@@ -679,11 +671,9 @@
               IF (IPRINT >= 3) PRINT 500
   500         FORMAT (5X)
               PRINT 510, RHO,NF
-  510         FORMAT (/4X,'New RHO =',1PD11.4,5X,'Number of',
-     1          ' function values =',I6)
+  510         FORMAT (/4X,'New RHO =',1PD11.4,5X,'Number of function values =',I6)
               PRINT 520, FOPT,(XBASE(I)+XOPT(I),I=1,N)
-  520         FORMAT (4X,'Least value of F =',1PD23.15,9X,
-     1          'The corresponding X is:'/(2X,5D15.6))
+  520         FORMAT (4X,'Least value of F =',1PD23.15,9X,'The corresponding X is:'/(2X,5D15.6))
           END IF
           GOTO 90
       END IF
@@ -699,15 +689,13 @@
       END IF
       IF (IPRINT >= 1) THEN
           PRINT 550, NF
-  550     FORMAT (/4X,'At the return from NEWUOA',5X,
-     1      'Number of function values =',I6)
+  550     FORMAT (/4X,'At the return from NEWUOA',5X,'Number of function values =',I6)
           PRINT 520, F,(X(I),I=1,N)
       END IF
       RETURN
       END SUBROUTINE NEWUOB
 
-      SUBROUTINE BIGDEN (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,
-     1  KNEW,D,W,VLAG,BETA,S,WVEC,PROD)
+      SUBROUTINE BIGDEN(N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,KNEW,D,W,VLAG,BETA,S,WVEC,PROD)
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
      1  W(*),VLAG(*),S(*),WVEC(NDIM,*),PROD(NDIM,*)
@@ -749,13 +737,16 @@
 !     Store the first NPT elements of the KNEW-th column of H in W(N+1)
 !     to W(N+NPT).
 !
-      DO 10 K=1,NPT
-   10 W(N+K)=ZERO
-      DO 20 J=1,NPTM
-      TEMP=ZMAT(KNEW,J)
-      IF (J < IDZ) TEMP=-TEMP
-      DO 20 K=1,NPT
-   20 W(N+K)=W(N+K)+TEMP*ZMAT(K,J)
+      DO K=1,NPT
+         W(N+K)=ZERO
+      END DO
+      DO J=1,NPTM
+        TEMP=ZMAT(KNEW,J)
+        IF (J < IDZ) TEMP=-TEMP
+        DO K=1,NPT
+            W(N+K)=W(N+K)+TEMP*ZMAT(K,J)
+        END DO
+      END DO
       ALPHA=W(N+KNEW)
 !
 !     The initial search direction D is taken from the last call of BIGLAG,
@@ -767,33 +758,36 @@
       DS=ZERO
       SS=ZERO
       XOPTSQ=ZERO
-      DO 30 I=1,N
-      DD=DD+D(I)**2
-      S(I)=XPT(KNEW,I)-XOPT(I)
-      DS=DS+D(I)*S(I)
-      SS=SS+S(I)**2
-   30 XOPTSQ=XOPTSQ+XOPT(I)**2
+      DO I=1,N
+        DD=DD+D(I)**2
+        S(I)=XPT(KNEW,I)-XOPT(I)
+        DS=DS+D(I)*S(I)
+        SS=SS+S(I)**2
+        XOPTSQ=XOPTSQ+XOPT(I)**2
+      END DO
       IF (DS*DS > 0.99D0*DD*SS) THEN
           KSAV=KNEW
           DTEST=DS*DS/SS
-          DO 50 K=1,NPT
-          IF (K /= KOPT) THEN
-              DSTEMP=ZERO
-              SSTEMP=ZERO
-              DO 40 I=1,N
-              DIFF=XPT(K,I)-XOPT(I)
-              DSTEMP=DSTEMP+D(I)*DIFF
-   40         SSTEMP=SSTEMP+DIFF*DIFF
-              IF (DSTEMP*DSTEMP/SSTEMP < DTEST) THEN
-                  KSAV=K
-                  DTEST=DSTEMP*DSTEMP/SSTEMP
-                  DS=DSTEMP
-                  SS=SSTEMP
-              END IF
-          END IF
-   50     CONTINUE
-          DO 60 I=1,N
-   60     S(I)=XPT(KSAV,I)-XOPT(I)
+          DO K=1,NPT
+            IF (K /= KOPT) THEN
+                DSTEMP=ZERO
+                SSTEMP=ZERO
+                DO I=1,N
+                    DIFF=XPT(K,I)-XOPT(I)
+                    DSTEMP=DSTEMP+D(I)*DIFF
+                    SSTEMP=SSTEMP+DIFF*DIFF
+                END DO
+                IF (DSTEMP*DSTEMP/SSTEMP < DTEST) THEN
+                    KSAV=K
+                    DTEST=DSTEMP*DSTEMP/SSTEMP
+                    DS=DSTEMP
+                    SS=SSTEMP
+                END IF
+            END IF
+          END DO
+          DO I=1,N
+             S(I)=XPT(KSAV,I)-XOPT(I)
+          END DO
       END IF
       SSDEN=DD*SS-DS*DS
       ITERC=0
@@ -820,31 +814,35 @@
       DEN(3)=TWO*XOPTS*DD
       DEN(4)=TEMPA-TEMPB
       DEN(5)=XOPTD*XOPTS
-      DO 90 I=6,9
-   90 DEN(I)=ZERO
+      DO I=6,9
+         DEN(I)=ZERO
+      END DO
 !
 !     Put the coefficients of Wcheck in WVEC.
 !
-      DO 110 K=1,NPT
-      TEMPA=ZERO
-      TEMPB=ZERO
-      TEMPC=ZERO
-      DO 100 I=1,N
-      TEMPA=TEMPA+XPT(K,I)*D(I)
-      TEMPB=TEMPB+XPT(K,I)*S(I)
-  100 TEMPC=TEMPC+XPT(K,I)*XOPT(I)
-      WVEC(K,1)=QUART*(TEMPA*TEMPA+TEMPB*TEMPB)
-      WVEC(K,2)=TEMPA*TEMPC
-      WVEC(K,3)=TEMPB*TEMPC
-      WVEC(K,4)=QUART*(TEMPA*TEMPA-TEMPB*TEMPB)
-  110 WVEC(K,5)=HALF*TEMPA*TEMPB
-      DO 120 I=1,N
-      IP=I+NPT
-      WVEC(IP,1)=ZERO
-      WVEC(IP,2)=D(I)
-      WVEC(IP,3)=S(I)
-      WVEC(IP,4)=ZERO
-  120 WVEC(IP,5)=ZERO
+      DO K=1,NPT
+        TEMPA=ZERO
+        TEMPB=ZERO
+        TEMPC=ZERO
+        DO I=1,N
+            TEMPA=TEMPA+XPT(K,I)*D(I)
+            TEMPB=TEMPB+XPT(K,I)*S(I)
+            TEMPC=TEMPC+XPT(K,I)*XOPT(I)
+        END DO
+        WVEC(K,1)=QUART*(TEMPA*TEMPA+TEMPB*TEMPB)
+        WVEC(K,2)=TEMPA*TEMPC
+        WVEC(K,3)=TEMPB*TEMPC
+        WVEC(K,4)=QUART*(TEMPA*TEMPA-TEMPB*TEMPB)
+        WVEC(K,5)=HALF*TEMPA*TEMPB
+      END DO
+      DO I=1,N
+        IP=I+NPT
+        WVEC(IP,1)=ZERO
+        WVEC(IP,2)=D(I)
+        WVEC(IP,3)=S(I)
+        WVEC(IP,4)=ZERO
+        WVEC(IP,5)=ZERO
+      END DO
 !
 !     Put the coefficents of THETA*Wcheck in PROD.
 !
@@ -1026,8 +1024,7 @@
       END SUBROUTINE BIGDEN
       
       
-      SUBROUTINE BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,
-     1  DELTA,D,ALPHA,HCOL,GC,GD,S,W)
+      SUBROUTINE BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DELTA,D,ALPHA,HCOL,GC,GD,S,W)
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),BMAT(NDIM,*),ZMAT(NPT,*),D(*),
      1  HCOL(*),GC(*),GD(*),S(*),W(*)
@@ -1098,10 +1095,11 @@
       GG=ZERO
       SP=ZERO
       DHD=ZERO
-      DO 60 I=1,N
-      GG=GG+GC(I)**2
-      SP=SP+D(I)*GC(I)
-   60 DHD=DHD+D(I)*GD(I)
+      DO I=1,N
+        GG=GG+GC(I)**2
+        SP=SP+D(I)*GC(I)
+        DHD=DHD+D(I)*GD(I)
+      END DO
       SCALE=DELTA/DSQRT(DD)
       IF (SP*DHD < ZERO) SCALE=-SCALE
       TEMP=ZERO
@@ -1207,8 +1205,7 @@
   160 RETURN
       END SUBROUTINE BIGLAG
       
-      SUBROUTINE TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,STEP,
-     1  D,G,HD,HS,CRVMIN)
+      SUBROUTINE TRSAPP (N,NPT,XOPT,XPT,GQ,HQ,PQ,DELTA,STEP,D,G,HD,HS,CRVMIN)
       IMPLICIT real(dp) (A-H,O-Z)
       DIMENSION XOPT(*),XPT(NPT,*),GQ(*),HQ(*),PQ(*),STEP(*),
      1  D(*),G(*),HD(*),HS(*)
