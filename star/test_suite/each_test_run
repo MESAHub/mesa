@@ -92,11 +92,11 @@ function update_docs {
             if [ -e "$image_to_copy" ]; then
                 cp "$image_to_copy" docs/
                 echo "Updated image $filename.$extension in the docs"
-                # replace the line "Last-Updated: ..." in README.rst
-                LAST_UPDATED="Last-Updated: $(date '+%d%b%Y') (MESA $(git rev-parse --short HEAD)) by $USER on $(hostname) in $(expr `date +%s` - $start_time) seconds using $OMP_NUM_THREADS threads."
+                # replace the line "Last-Run: ..." in README.rst
+                LAST_RUN="Last-Run: $(date '+%d%b%Y') (MESA $(git rev-parse --short HEAD)) by $USER on $(hostname) in $(expr `date +%s` - $start_time) seconds using $OMP_NUM_THREADS threads."
                 # print name of 
-                sed -i "" "/Last-Updated: .*/d" README.rst
-                echo $LAST_UPDATED >> README.rst
+                sed -i "" "/Last-Run: .*/d" README.rst
+                echo $LAST_RUN >> README.rst
             else
                 echo "Error: $image_to_copy not found. Test may no longer be producing this file or may now be producing a different final snapshot number! Update test and README.rst accordingly."
             fi

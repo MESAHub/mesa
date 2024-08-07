@@ -1,0 +1,64 @@
+&pgstar
+
+   ! device
+   file_white_on_black_flag = .true.
+   file_device = 'vcps'      ! postscript
+   file_extension = 'ps'
+   !file_device = 'png'      ! png
+   !file_extension = 'png'
+
+   pgstar_interval = 1
+
+   Grid8_win_flag = .true.
+   Grid8_win_width = 12
+   Grid8_title = 'wd_nova_burst'
+
+   Summary_Burn_xaxis_name = 'logxq'
+   Summary_Burn_xaxis_reversed = .true.
+   Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
+   Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
+   Summary_Burn_title = ' '
+
+
+   Abundance_title = ' '
+   Abundance_xaxis_name = 'logxq'
+   Abundance_xaxis_reversed = .true.
+   Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
+   Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
+   Abundance_txt_scale = 0.8
+   Abundance_legend_max_cnt = 0
+
+   HR_title = ' '
+   HR_txt_scale = 0.8
+   HR_logT_min = 4.5
+   HR_logT_max = 6.0
+   HR_logL_min = -1.0
+   HR_logL_max = 5.0
+
+
+   TRho_title = ' '
+   TRho_txt_scale = 0.8
+   TRho_logT_min = -101d0
+   TRho_logT_max = -101d0
+   TRho_logRho_min = -101d0
+   TRho_logRho_max = -101d0
+
+
+   TRho_Profile_title = ' '
+   TRho_Profile_txt_scale = 0.7
+   TRho_Profile_xmin = -8.0
+   TRho_Profile_xmax = 9.0
+   TRho_Profile_ymin = 5.0
+   TRho_Profile_ymax = 9.0
+
+   Text_Summary1_name(5,2) = 'time_step_sec'
+   Text_Summary1_name(6,2) = 'max_tau_conv'
+
+   Grid8_file_flag = .true.
+   Grid8_file_dir = 'pgstar_out'
+   Grid8_file_prefix = 'grid8_'
+   Grid8_file_interval = 10000
+   Grid8_file_width = -1
+   Grid8_file_aspect_ratio = -1
+
+/ ! end of pgstar namelist
