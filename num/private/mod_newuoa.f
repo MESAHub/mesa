@@ -364,16 +364,18 @@
 !     Calculate VLAG and BETA for the current choice of D. The first NPT
 !     components of W_check will be held in W.
 !
-      DO 230 K=1,NPT
-      SUMA=ZERO
-      SUMB=ZERO
-      SUM=ZERO
-      DO 220 J=1,N
-      SUMA=SUMA+XPT(K,J)*D(J)
-      SUMB=SUMB+XPT(K,J)*XOPT(J)
-  220 SUM=SUM+BMAT(K,J)*D(J)
-      W(K)=SUMA*(HALF*SUMA+SUMB)
-  230 VLAG(K)=SUM
+      DO K=1,NPT
+        SUMA=ZERO
+        SUMB=ZERO
+        SUM=ZERO
+        DO J=1,N
+            SUMA=SUMA+XPT(K,J)*D(J)
+            SUMB=SUMB+XPT(K,J)*XOPT(J)
+            SUM=SUM+BMAT(K,J)*D(J)
+        END DO
+        W(K)=SUMA*(HALF*SUMA+SUMB)
+        VLAG(K)=SUM
+      END DO
       BETA=ZERO
       DO K=1,NPTM
         SUM=ZERO
@@ -509,10 +511,11 @@
       END IF
       DO K=1,NPT
         HDIAG=ZERO
-        DO 380 J=1,NPTM
-        TEMP=ONE
-        IF (J < IDZ) TEMP=-ONE
-  380   HDIAG=HDIAG+TEMP*ZMAT(K,J)**2
+        DO J=1,NPTM
+            TEMP=ONE
+            IF (J < IDZ) TEMP=-ONE
+            HDIAG=HDIAG+TEMP*ZMAT(K,J)**2
+        END DO
         TEMP=DABS(BETA*HDIAG+VLAG(K)**2)
         DISTSQ=ZERO
         DO J=1,N
@@ -533,11 +536,13 @@
   410 CALL UPDATE (N,NPT,BMAT,ZMAT,IDZ,NDIM,VLAG,BETA,KNEW,W)
       FVAL(KNEW)=F
       IH=0
-      DO 420 I=1,N
-      TEMP=PQ(KNEW)*XPT(KNEW,I)
-      DO 420 J=1,I
-      IH=IH+1
-  420 HQ(IH)=HQ(IH)+TEMP*XPT(KNEW,J)
+      DO I=1,N
+        TEMP=PQ(KNEW)*XPT(KNEW,I)
+        DO J=1,I
+            IH=IH+1
+            HQ(IH)=HQ(IH)+TEMP*XPT(KNEW,J)
+        END DO
+      END DO
       PQ(KNEW)=ZERO
 !
 !     Update the other second derivative parameters, and then the gradient
@@ -875,37 +880,40 @@
 !
 !     Include in DEN the part of BETA that depends on THETA.
 !
-      DO 210 K=1,NDIM
-      SUM=ZERO
-      DO 200 I=1,5
-      PAR(I)=HALF*PROD(K,I)*WVEC(K,I)
-  200 SUM=SUM+PAR(I)
-      DEN(1)=DEN(1)-PAR(1)-SUM
-      TEMPA=PROD(K,1)*WVEC(K,2)+PROD(K,2)*WVEC(K,1)
-      TEMPB=PROD(K,2)*WVEC(K,4)+PROD(K,4)*WVEC(K,2)
-      TEMPC=PROD(K,3)*WVEC(K,5)+PROD(K,5)*WVEC(K,3)
-      DEN(2)=DEN(2)-TEMPA-HALF*(TEMPB+TEMPC)
-      DEN(6)=DEN(6)-HALF*(TEMPB-TEMPC)
-      TEMPA=PROD(K,1)*WVEC(K,3)+PROD(K,3)*WVEC(K,1)
-      TEMPB=PROD(K,2)*WVEC(K,5)+PROD(K,5)*WVEC(K,2)
-      TEMPC=PROD(K,3)*WVEC(K,4)+PROD(K,4)*WVEC(K,3)
-      DEN(3)=DEN(3)-TEMPA-HALF*(TEMPB-TEMPC)
-      DEN(7)=DEN(7)-HALF*(TEMPB+TEMPC)
-      TEMPA=PROD(K,1)*WVEC(K,4)+PROD(K,4)*WVEC(K,1)
-      DEN(4)=DEN(4)-TEMPA-PAR(2)+PAR(3)
-      TEMPA=PROD(K,1)*WVEC(K,5)+PROD(K,5)*WVEC(K,1)
-      TEMPB=PROD(K,2)*WVEC(K,3)+PROD(K,3)*WVEC(K,2)
-      DEN(5)=DEN(5)-TEMPA-HALF*TEMPB
-      DEN(8)=DEN(8)-PAR(4)+PAR(5)
-      TEMPA=PROD(K,4)*WVEC(K,5)+PROD(K,5)*WVEC(K,4)
-  210 DEN(9)=DEN(9)-HALF*TEMPA
+      DO K=1,NDIM
+        SUM=ZERO
+        DO I=1,5
+            PAR(I)=HALF*PROD(K,I)*WVEC(K,I)
+            SUM=SUM+PAR(I)
+        END DO
+        DEN(1)=DEN(1)-PAR(1)-SUM
+        TEMPA=PROD(K,1)*WVEC(K,2)+PROD(K,2)*WVEC(K,1)
+        TEMPB=PROD(K,2)*WVEC(K,4)+PROD(K,4)*WVEC(K,2)
+        TEMPC=PROD(K,3)*WVEC(K,5)+PROD(K,5)*WVEC(K,3)
+        DEN(2)=DEN(2)-TEMPA-HALF*(TEMPB+TEMPC)
+        DEN(6)=DEN(6)-HALF*(TEMPB-TEMPC)
+        TEMPA=PROD(K,1)*WVEC(K,3)+PROD(K,3)*WVEC(K,1)
+        TEMPB=PROD(K,2)*WVEC(K,5)+PROD(K,5)*WVEC(K,2)
+        TEMPC=PROD(K,3)*WVEC(K,4)+PROD(K,4)*WVEC(K,3)
+        DEN(3)=DEN(3)-TEMPA-HALF*(TEMPB-TEMPC)
+        DEN(7)=DEN(7)-HALF*(TEMPB+TEMPC)
+        TEMPA=PROD(K,1)*WVEC(K,4)+PROD(K,4)*WVEC(K,1)
+        DEN(4)=DEN(4)-TEMPA-PAR(2)+PAR(3)
+        TEMPA=PROD(K,1)*WVEC(K,5)+PROD(K,5)*WVEC(K,1)
+        TEMPB=PROD(K,2)*WVEC(K,3)+PROD(K,3)*WVEC(K,2)
+        DEN(5)=DEN(5)-TEMPA-HALF*TEMPB
+        DEN(8)=DEN(8)-PAR(4)+PAR(5)
+        TEMPA=PROD(K,4)*WVEC(K,5)+PROD(K,5)*WVEC(K,4)
+        DEN(9)=DEN(9)-HALF*TEMPA
+      END DO
 !
 !     Extend DEN so that it holds all the coefficients of DENOM.
 !
       SUM=ZERO
-      DO 220 I=1,5
-      PAR(I)=HALF*PROD(KNEW,I)**2
-  220 SUM=SUM+PAR(I)
+      DO I=1,5
+         PAR(I)=HALF*PROD(KNEW,I)**2
+         SUM=SUM+PAR(I)
+      END DO
       DENEX(1)=ALPHA*DEN(1)+PAR(1)+SUM
       TEMPA=TWO*PROD(KNEW,1)*PROD(KNEW,2)
       TEMPB=PROD(KNEW,2)*PROD(KNEW,4)
@@ -997,30 +1005,37 @@
 !     Set S to half the gradient of the denominator with respect to D.
 !     Then branch for the next iteration.
 !
-      DO 300 I=1,N
-      TEMP=TEMPA*XOPT(I)+TEMPB*D(I)-VLAG(NPT+I)
-  300 S(I)=TAU*BMAT(KNEW,I)+ALPHA*TEMP
-      DO 320 K=1,NPT
-      SUM=ZERO
-      DO 310 J=1,N
-  310 SUM=SUM+XPT(K,J)*W(J)
-      TEMP=(TAU*W(N+K)-ALPHA*VLAG(K))*SUM
-      DO 320 I=1,N
-  320 S(I)=S(I)+TEMP*XPT(K,I)
+      DO I=1,N
+        TEMP=TEMPA*XOPT(I)+TEMPB*D(I)-VLAG(NPT+I)
+        S(I)=TAU*BMAT(KNEW,I)+ALPHA*TEMP
+      END DO
+      DO K=1,NPT
+        SUM=ZERO
+        DO J=1,N
+            SUM=SUM+XPT(K,J)*W(J)
+        END DO
+        TEMP=(TAU*W(N+K)-ALPHA*VLAG(K))*SUM
+        DO I=1,N
+            S(I)=S(I)+TEMP*XPT(K,I)
+        END DO
+      END DO
       SS=ZERO
       DS=ZERO
-      DO 330 I=1,N
-      SS=SS+S(I)**2
-  330 DS=DS+D(I)*S(I)
+      DO I=1,N
+        SS=SS+S(I)**2
+        DS=DS+D(I)*S(I)
+      END DO
       SSDEN=DD*SS-DS*DS
       IF (SSDEN >= 1.0D-8*DD*SS) GOTO 70
 !
 !     Set the vector W before the RETURN from the subroutine.
 !
-  340 DO 350 K=1,NDIM
+  340 DO K=1,NDIM
       W(K)=ZERO
-      DO 350 J=1,5
-  350 W(K)=W(K)+WVEC(K,J)*PAR(J)
+      DO J=1,5
+         W(K)=W(K)+WVEC(K,J)*PAR(J)
+      END DO
+      END DO
       VLAG(KOPT)=VLAG(KOPT)+ONE
       RETURN
       END SUBROUTINE BIGDEN
@@ -1061,13 +1076,16 @@
 !     KNEW-th column of H.
 !
       ITERC=0
-      DO 10 K=1,NPT
-   10 HCOL(K)=ZERO
-      DO 20 J=1,NPTM
-      TEMP=ZMAT(KNEW,J)
-      IF (J < IDZ) TEMP=-TEMP
-      DO 20 K=1,NPT
-   20 HCOL(K)=HCOL(K)+TEMP*ZMAT(K,J)
+      DO K=1,NPT
+         HCOL(K)=ZERO
+      END DO
+      DO J=1,NPTM
+        TEMP=ZMAT(KNEW,J)
+        IF (J < IDZ) TEMP=-TEMP
+        DO K=1,NPT
+            HCOL(K)=HCOL(K)+TEMP*ZMAT(K,J)
+        END DO
+      END DO
       ALPHA=HCOL(KNEW)
 !
 !     Set the unscaled initial direction D. Form the gradient of LFUNC at
