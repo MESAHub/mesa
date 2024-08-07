@@ -728,38 +728,46 @@
 !     into VLAG(NPT+I), I=1,2,...,N.
 !
       IF (NTRITS > 0) THEN
-          DO 570 K=1,NPT
-          VLAG(K)=FVAL(K)-FVAL(KOPT)
-  570     W(K)=ZERO
-          DO 590 J=1,NPTM
-          SUM=ZERO
-          DO 580 K=1,NPT
-  580     SUM=SUM+ZMAT(K,J)*VLAG(K)
-          DO 590 K=1,NPT
-  590     W(K)=W(K)+SUM*ZMAT(K,J)
-          DO 610 K=1,NPT
-          SUM=ZERO
-          DO 600 J=1,N
-  600     SUM=SUM+XPT(K,J)*XOPT(J)
-          W(K+NPT)=W(K)
-  610     W(K)=SUM*W(K)
+          DO K=1,NPT
+            VLAG(K)=FVAL(K)-FVAL(KOPT)
+            W(K)=ZERO
+          END DO
+          DO J=1,NPTM
+            SUM=ZERO
+            DO K=1,NPT
+                SUM=SUM+ZMAT(K,J)*VLAG(K)
+            END DO
+          END DO
+          DO K=1,NPT
+             W(K)=W(K)+SUM*ZMAT(K,J)
+          END DO
+          DO K=1,NPT
+            SUM=ZERO
+            DO J=1,N
+                SUM=SUM+XPT(K,J)*XOPT(J)
+            END DO
+            W(K+NPT)=W(K)
+            W(K)=SUM*W(K)
+          END DO
           GQSQ=ZERO
           GISQ=ZERO
-          DO 630 I=1,N
-          SUM=ZERO
-          DO 620 K=1,NPT
-  620     SUM=SUM+BMAT(K,I)*VLAG(K)+XPT(K,I)*W(K)
-          IF (XOPT(I) == SL(I)) THEN
-              GQSQ=GQSQ+DMIN1(ZERO,GOPT(I))**2
-              GISQ=GISQ+DMIN1(ZERO,SUM)**2
-          ELSE IF (XOPT(I) == SU(I)) THEN
-              GQSQ=GQSQ+DMAX1(ZERO,GOPT(I))**2
-              GISQ=GISQ+DMAX1(ZERO,SUM)**2
-          ELSE
-              GQSQ=GQSQ+GOPT(I)**2
-              GISQ=GISQ+SUM*SUM
-          END IF
-  630     VLAG(NPT+I)=SUM
+          DO I=1,N
+            SUM=ZERO
+            DO K=1,NPT
+                SUM=SUM+BMAT(K,I)*VLAG(K)+XPT(K,I)*W(K)
+            END DO
+            IF (XOPT(I) == SL(I)) THEN
+                GQSQ=GQSQ+DMIN1(ZERO,GOPT(I))**2
+                GISQ=GISQ+DMIN1(ZERO,SUM)**2
+            ELSE IF (XOPT(I) == SU(I)) THEN
+                GQSQ=GQSQ+DMAX1(ZERO,GOPT(I))**2
+                GISQ=GISQ+DMAX1(ZERO,SUM)**2
+            ELSE
+                GQSQ=GQSQ+GOPT(I)**2
+                GISQ=GISQ+SUM*SUM
+            END IF
+            VLAG(NPT+I)=SUM
+          END DO
 !
 !     Test whether to replace the new quadratic model by the least Frobenius
 !     norm interpolant, making the replacement if the test is satisfied.
