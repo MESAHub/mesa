@@ -432,6 +432,11 @@
 
          logical :: use_T_tau_gradr_factor
 
+      ! star spot controls
+
+         real(dp) :: fspot 
+         real(dp) :: xspot
+
       ! mass gain or loss
 
          real(dp) :: mass_change
