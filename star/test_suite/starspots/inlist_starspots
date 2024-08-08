@@ -62,11 +62,11 @@
 
    max_age = 24.63d9 !26d9 !0.8d9
 
-   use_other_mlt_results = .true. !.true.
-   use_other_surface_PT = .true. !.True.
+   use_other_mlt_results = .true.
+   use_other_surface_PT = .true.
 
-   fspot = 0.34d0 ! fspot
-   xspot = 0.85d0 ! xspot
+   fspot = 0.34d0
+   xspot = 0.85d0
 
    atm_option = 'table'
    atm_table = 'photosphere'
@@ -83,7 +83,7 @@
    photo_interval = 100
 
    ! starting specifications
-   initial_mass = 0.9 !1.0 ! in Msun units
+   initial_mass = 0.9 ! in Msun units
    min_timestep_limit=0
    max_model_number = -1 !1500
 
@@ -94,7 +94,7 @@
    Blocker_scaling_factor = 0.2
    max_wind = 1d-3
 
-   mixing_length_alpha = 1.9500 !1.95
+   mixing_length_alpha = 1.9500
    MLT_option = 'Henyey'
 
    do_element_diffusion = .false.
