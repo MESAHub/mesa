@@ -10,7 +10,7 @@ include $(MESA_DIR)/utils/makefile_header
 
 SRCS = \
    test_mtx_support.f90 test_block_tri_dble.f90 test_block_tri_quad.f90 \
-   test_square.f90 test_square_quad.f90 test_mtx.f90
+   test_square.f90 test_mtx.f90
 
 #################################################################
 #
