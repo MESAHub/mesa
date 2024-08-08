@@ -14,6 +14,12 @@ Changes in main
 New Features
 ------------
 
+**Update to starspots **
+star spot parameters 
+ ``fspot``
+ ``xspot``
+ have been added as general controls and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default 
+
 **Replacement of HDF5io by ForUM**
 
 The HDF5io module (in the :file:`hdf5io` subdirectory) has been
