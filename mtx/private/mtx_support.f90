@@ -666,7 +666,7 @@
 
 
       subroutine do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
-         use my_lapack95_dble, only: my_gemv_p1
+         use my_lapack95, only: my_gemv_p1
          integer, intent(in) :: nvar, nz    
          real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
          real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
