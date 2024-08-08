@@ -490,6 +490,9 @@
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
     use_T_tau_gradr_factor, &
+
+    ! star spots
+    fspot, xspot, &
     
     ! extra heat near surface to model irradiation
     irradiation_flux, column_depth_for_irradiation, &
@@ -1284,6 +1287,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% atm_build_errtol = atm_build_errtol
 
  s% use_T_tau_gradr_factor = use_T_tau_gradr_factor
+
+ ! star spots
+ s% fspot = fspot
+ s% xspot = xspot
 
  ! extra heat near surface to model irradiation
  s% irradiation_flux = irradiation_flux
@@ -2965,6 +2972,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  atm_build_errtol = s% atm_build_errtol
  
  use_T_tau_gradr_factor = s% use_T_tau_gradr_factor
+
+ ! star spots
+ fspot = s% fspot
+ xspot = s% xspot
 
  ! extra heat near surface to model irradiation
  irradiation_flux = s% irradiation_flux

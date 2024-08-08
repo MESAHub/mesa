@@ -57,8 +57,8 @@
          ! otherwise we use a null_ version which does nothing (except warn).
 
 
-         fspot = s% x_ctrl(1)
-         xspot = s% x_ctrl(2)
+         fspot = s% fspot
+         xspot = s% xspot
 
 
          s% extras_startup => extras_startup
