@@ -4636,6 +4636,15 @@
 
     use_T_tau_gradr_factor = .false.
 
+! star spot controls
+! =================
+
+      ! reiterate readme docs here
+      ! describe valid ranges for these parameters
+
+    fspot = 1.0 
+    xspot = 0.0 
+
 ! mass gain or loss
 ! =================
 

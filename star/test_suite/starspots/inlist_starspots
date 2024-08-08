@@ -65,8 +65,8 @@
    use_other_mlt_results = .true. !.true.
    use_other_surface_PT = .true. !.True.
 
-   x_ctrl(1) = 0.34d0 ! fspot
-   x_ctrl(2) = 0.85d0 ! xspot
+   fspot = 0.34d0 ! fspot
+   xspot = 0.85d0 ! xspot
 
    atm_option = 'table'
    atm_table = 'photosphere'
