@@ -175,7 +175,7 @@
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
-    ! mass gain or loss  
+    ! mass gain or loss
     mass_change, mass_change_full_on_dt, mass_change_full_off_dt, trace_dt_control_mass_change, &
     min_wind, max_wind, use_accreted_material_j, accreted_material_j, D_omega_mixing_rate, &
     D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region, nu_omega_mixing_rate, &
@@ -451,7 +451,7 @@
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
     delta_dX_div_X_drop_only, delta_lg_XH_drop_only, &
     delta_lg_XHe_drop_only, delta_lg_XC_drop_only, delta_lg_XNe_drop_only, delta_lg_XO_drop_only, delta_lg_XSi_drop_only, &
-    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &    
+    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &
     delta_lg_XH_cntr_min, delta_lg_XH_cntr_max, delta_lg_XH_cntr_limit, delta_lg_XH_cntr_hard_limit, &
     delta_lg_XHe_cntr_min, delta_lg_XHe_cntr_max, delta_lg_XHe_cntr_limit, delta_lg_XHe_cntr_hard_limit, &
     delta_lg_XC_cntr_min, delta_lg_XC_cntr_max, delta_lg_XC_cntr_limit, delta_lg_XC_cntr_hard_limit, &
@@ -491,7 +491,7 @@
 
     use_T_tau_gradr_factor, &
 
-    ! star spots
+    ! starspots
     fspot, xspot, &
     
     ! extra heat near surface to model irradiation
@@ -1288,7 +1288,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% use_T_tau_gradr_factor = use_T_tau_gradr_factor
 
- ! star spots
+ ! starspots
  s% fspot = fspot
  s% xspot = xspot
 
@@ -2973,7 +2973,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  
  use_T_tau_gradr_factor = s% use_T_tau_gradr_factor
 
- ! star spots
+ ! starspots
  fspot = s% fspot
  xspot = s% xspot
 
@@ -4151,7 +4151,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
       if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
 
