@@ -105,44 +105,4 @@ contains
 
    end subroutine test_format_conversion
 
-   subroutine test_quad_tridiag
-      integer, parameter :: n = 5
-      real(16), dimension(n) :: DL, D, DU, DU2, B
-      integer, dimension(n) :: ip
-      integer :: ierr, i
-
-      write (*, *) 'test_quad_tridiag'
-
-      DL = -2  ! subdiagonal
-      D = 3  ! diagonal
-      DU = -1  ! superdiagonal
-
-      do i = 1, n
-         b(i) = i - 1
-      end do
-
-      ierr = 0
-      ! factor
-      call qgttrf(n, DL, D, DU, DU2, ip, ierr)
-      if (ierr /= 0) then
-         write (*, *) 'failed in factoring'
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      ierr = 0
-      ! solve
-      call qgttrs('N', n, 1, DL, D, DU, DU2, ip, B, n, ierr)
-      if (ierr /= 0) then
-         write (*, *) 'failed in solving'
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      do i = 1, n
-         write (*, *) i, b(i)
-      end do
-      write (*, *)
-      write (*, *)
-
-   end subroutine test_quad_tridiag
-
 end module test_mtx_support

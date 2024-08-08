@@ -12,43 +12,14 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-
-LAPACK_QUAD_SRCS = \
-   qgttrf.f \
-   qgttrs.f \
-   qgtts2.f \
-   qgetrf.f \
-   qgetrs.f \
-   qgemv.f \
-   qgemm.f \
-   qgetf2.f \
-   qswap.f \
-   iqamax.f \
-   qtrsm.f \
-   qtrsv.f \
-   qger.f \
-   qscal.f \
-   qlamch.f \
-   qlaswp.f
-
 MTX_SRCS = \
    mtx_def.f \
-   my_lapack95_dble.f90 \
-   my_lapack95_quad.f90 \
+   my_lapack95.f90 \
    mtx_support.f90 \
    DGBSVX_wrapper.f90 \
    pre_conditioners.f90 \
    bcyclic.f90 \
    mtx_lib.f90 \
-
-ifneq ($(MAKECMDGOALS),clean)
-   $(shell $(CPP) -DDBLE $(MOD_PRIVATE_DIR)/my_lapack95.F90 > my_lapack95_dble.f90)
-   $(shell $(CPP)        $(MOD_PRIVATE_DIR)/my_lapack95.F90 > my_lapack95_quad.f90)
-   # Alter the timestamps so make wont force a recompile just because we copied the files,
-   # instead we only recompile if the original .F90 file was changed
-   $(shell touch -r $(MOD_PRIVATE_DIR)/my_lapack95.F90 my_lapack95_dble.f90)
-   $(shell touch -r $(MOD_PRIVATE_DIR)/my_lapack95.F90 my_lapack95_quad.f90)
-endif
 
 #################################################################
 #
@@ -56,7 +27,7 @@ endif
 
 MTX_LIB = libmtx.$(LIB_SUFFIX)
 
-MTX_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MTX_SRCS) $(LAPACK_QUAD_SRCS)))
+MTX_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(MTX_SRCS)))
 
 all : $(MTX_LIB)
 
@@ -96,8 +67,6 @@ COMPILE_XTRA_NO_OPT = $(COMPILE_BASIC) $(FCnowarn) $(FCfixed) -c
 
 COMPILE_CMD = $(COMPILE)
 
-$(LAPACK_QUAD_OBJS) : COMPILE_CMD = $(COMPILE_XTRA) -w
-
 %.o : %.mod
 
 %.o : %.f
@@ -123,7 +92,7 @@ endif
 #
 # DEPENDENCIES
 
-SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR):../lapack_quad
+SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
 
 vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)

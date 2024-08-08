@@ -23,19 +23,11 @@
 !
 ! ***********************************************************************
 
-#ifdef DBLE
-      module my_lapack95_dble
+      module my_lapack95
       use const_def, only: dp
       use utils_lib, only: mesa_error
       implicit none
       integer, parameter :: fltp = dp
-#else
-      module my_lapack95_quad
-      use const_def, only: qp
-      use utils_lib, only: mesa_error
-      implicit none
-      integer, parameter :: fltp = qp
-#endif
 
 
 
@@ -1432,9 +1424,4 @@
          end if      
       end subroutine my_laswp_dbg
 
-
-#ifdef DBLE
-      end module my_lapack95_dble
-#else
-      end module my_lapack95_quad
-#endif
+      end module my_lapack95
