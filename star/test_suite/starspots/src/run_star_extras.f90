@@ -27,7 +27,7 @@
       use const_def
       use math_lib
       use chem_def !! maybe taking up uncessary space but whatever
-      
+
 
       implicit none
       real(dp) :: fspot, xspot, PB_i, Teff_local
@@ -37,10 +37,10 @@
       contains
 
       include "test_suite_extras.inc"
-   
+
 
       ! these routines are called by the standard run_star check_model
-      
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -48,7 +48,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          ! this is the place to set any procedure pointers you want to change
          ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
 
@@ -69,7 +69,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          s% how_many_extra_history_header_items => how_many_extra_history_header_items
          s% data_for_extra_history_header_items => data_for_extra_history_header_items
@@ -92,7 +92,7 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
+
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
@@ -115,9 +115,9 @@
          ! set PB_i here and then other_mlt will know about it, because 
          ! quantities set here are carried over the course of a timestep, 
          ! AKA all newton iterations
-         
+
          mu_ideal_gas = s% mu(1)  !1.00794d0 ! for hydrogen, 1 gram per mole
-         !write(*,*) 'MESA def, my def: ', s% mu(1), mu_ideal_gas  
+         !write(*,*) 'MESA def, my def: ', s% mu(1), mu_ideal_gas
 
          R2 = pow2(s%R(1))
          Teff_local = pow(s%L(1)/(pi4*boltz_sigma*R2), 0.25d0)
@@ -162,7 +162,7 @@
         ierr = 0
         call star_ptr(id, s, ierr)
         if (ierr /= 0) return
-         
+
         !------------------------------
          !if (s% star_age >= 10d0) then
          if (.not. s% doing_relax .and. .not. s% doing_first_model_of_run) then
@@ -190,7 +190,7 @@
             logical, intent(in) :: skip_partials
 
             logical :: need_atm_Psurf, need_atm_Tsurf
-         
+
             real(dp), intent(out) :: &
                   lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -211,7 +211,7 @@
 
             need_atm_Psurf = .true.
             need_atm_Tsurf = .true. 
-            
+
             alp = 1d0 - fspot + fspot*pow4(xspot)
 
             ! This is the surface-average value for luminosity
@@ -248,7 +248,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going     
+         extras_check_model = keep_going
 
          if (.false. .and. s% star_mass_h1 < 0.35d0) then
             ! stop when star hydrogen mass drops to specified level
@@ -272,7 +272,7 @@
 
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
+
 
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
@@ -283,14 +283,14 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          ! note: do NOT add the extras names to history_columns.list
          ! the history_columns.list is only for the built-in history column options.
          ! it must not include the new column names you are adding here.
 
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -300,8 +300,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
@@ -381,8 +381,8 @@
          ! by default, indicate where (in the code) MESA terminated
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
