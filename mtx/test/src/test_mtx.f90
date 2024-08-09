@@ -29,7 +29,6 @@ program test_mtx
    use test_square
 
    use test_block_tri_dble, only: do_test_block_tri_dble
-   use test_block_tri_quad, only: do_test_block_tri_quad
 
    use utils_lib, only: mesa_error
 
@@ -49,7 +48,6 @@ program test_mtx
 
    call do_test_square
    call do_test_block_tri_dble
-   call do_test_block_tri_quad
    call test_format_conversion
 
 end program
