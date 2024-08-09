@@ -763,6 +763,7 @@
             atm_test_partials_val, atm_test_partials_dval_dx
          use chem_def
          use eos_lib, only: Radiation_Pressure
+         use starspots, only: starspot_tweak_PT, starspot_restore_PT
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
@@ -785,8 +786,12 @@
          real(dp) :: kap_surf
          real(dp) :: M_surf
 
-
          include 'formats'
+
+         ! starspot YREC routine
+         if (s% do_starspots) then
+            call starspot_tweak_PT(s)
+         end if
 
          ! Set up stellar surface parameters
          
@@ -812,7 +817,7 @@
 
          ! Evaluate surface temperature and pressure
              
-         if (.not. (need_atm_Psurf .or. need_atm_Tsurf)) then
+         if (.not. (need_atm_Psurf .or. need_atm_Tsurf) .and. .not. s% do_starspots) then
 
             ! Special-case boundary condition
 
@@ -999,6 +1004,11 @@
             write(*,1) 'lnP_surf', lnP_surf
             write(*,*) 'atm_option = ', trim(s% atm_option)
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
+         end if
+
+         ! starspot YREC routine
+         if (s% do_starspots) then
+            call starspot_restore_PT(s)
          end if
 
          ! Finish
