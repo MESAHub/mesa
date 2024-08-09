@@ -34,6 +34,6 @@ A plot of the HR diagram for the problem is included below:
    :width: 100%
 
 
-Last-Updated: 06Aug2024 by Meridith Joyce
+Last-Updated: 09Aug2024 by Meridith Joyce
 
 Last-Run: 06Aug2024 (MESA 7890d305) by pmocz on C916PXT6XW in 629 seconds using 8 threads.
