@@ -56,7 +56,6 @@
       integer, parameter :: square_matrix_type = 1
       integer, parameter :: banded_matrix_type = 2
       integer, parameter :: block_tridiag_dble_matrix_type = 3
-      integer, parameter :: block_tridiag_quad_matrix_type = 4
       
       
       ! parameter indices in newton iwork array
