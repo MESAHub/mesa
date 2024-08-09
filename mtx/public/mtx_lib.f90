@@ -26,7 +26,7 @@
 
       module mtx_lib
       
-      use const_def, only: dp, qp
+      use const_def, only: dp
       
       implicit none
 
@@ -237,15 +237,6 @@
          call read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
       end subroutine mtx_read_block_tridiagonal
          
-      subroutine mtx_read_quad_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
-         use mtx_support, only: read_quad_block_tridiagonal
-         integer, intent(in) :: iounit
-         integer, intent(out) :: nvar, nblk
-         real(qp), pointer, dimension(:) :: lblk1,dblk1,ublk1 ! =(nvar,nvar,nblk) will be allocated
-         integer, intent(out) :: ierr
-         call read_quad_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
-      end subroutine mtx_read_quad_block_tridiagonal
-      
       ! BCYCLIC multi-thread block tridiagonal
       include "mtx_bcyclic_dble_decsol.dek" 
          ! S.P.Hirshman, K.S.Perumalla, V.E.Lynch, & R.Sanchez,
@@ -263,17 +254,6 @@
          call do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
       end subroutine block_dble_mv
       
-
-      subroutine block_quad_mv(lblk, dblk, ublk, b, prod)
-         ! set prod = A*b with A = block tridiagonal given by lblk, dblk, ublk
-         use mtx_support, only: do_block_mv_quad
-         real(qp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
-         real(qp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(qp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)   
-         call do_block_mv_quad(lblk, dblk, ublk, b, prod)
-      end subroutine block_quad_mv
-      
-
 
       subroutine multiply_xa(n, A1, x, b)
          !  calculates b = x*A
@@ -295,18 +275,6 @@
          real(dp), intent(inout), pointer :: b1(:) ! =(nvar,nz)
          call do_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
       end subroutine block_multiply_xa
-
-
-      subroutine quad_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
-         !  calculates b = x*A
-         use mtx_support, only: do_quad_block_multiply_xa
-         integer, intent(in) :: nvar, nz
-         real(qp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
-         real(qp), intent(in), pointer :: x1(:) ! =(nvar,nz)
-         real(qp), intent(inout), pointer :: b1(:) ! =(nvar,nz)
-         call do_quad_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
-      end subroutine quad_block_multiply_xa
-
 
       subroutine band_multiply_xa(n, kl, ku, ab1, ldab, x, b)
          !  calculates b = x*a = transpose(a)*x
