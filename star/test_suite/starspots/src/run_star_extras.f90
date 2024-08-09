@@ -77,7 +77,7 @@
          s% data_for_extra_profile_header_items => data_for_extra_profile_header_items
 
          s% other_surface_PT => starspot_tweak_PT
-         s% other_mlt_results => YREC_spots_other_mlt_results
+         !!s% other_mlt_results => YREC_spots_other_mlt_results
 
       end subroutine extras_controls
 
@@ -165,15 +165,15 @@
 
         !------------------------------
          !if (s% star_age >= 10d0) then
-         if (.not. s% doing_relax .and. .not. s% doing_first_model_of_run) then
-            xspot_of_r = (P - PB_i)/P 
-            gradr_spot = gradr/( fspot*pow4(xspot_of_r) + 1d0 - fspot)
-         else
-            gradr_spot = gradr
-         end if
+         !!if (.not. s% doing_relax .and. .not. s% doing_first_model_of_run) then
+         !!   xspot_of_r = (P - PB_i)/P 
+         !!   gradr_spot = gradr/( fspot*pow4(xspot_of_r) + 1d0 - fspot)
+         !!else
+         !!   gradr_spot = gradr
+         !!end if
 
          call star_mlt_results(id, k, MLT_option, &
-            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr_spot, grada, scale_height, &
+            r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, thermohaline_coeff, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -212,16 +212,16 @@
             need_atm_Psurf = .true.
             need_atm_Tsurf = .true. 
 
-            alp = 1d0 - fspot + fspot*pow4(xspot)
+            !!!alp = 1d0 - fspot + fspot*pow4(xspot)
 
             ! This is the surface-average value for luminosity
-            L_init = s% L(1)
+            !!!L_init = s% L(1)
 
             ! Set the surface L to the unspotted, ambient L
-            s% L(1) = s% L(1) / alp
+            !!!s% L(1) = s% L(1) / alp
 
             ! Now, set the Teff. Used in atm table lookup to set boundary conditions
-            s% Teff = pow(s% L(1)/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
+            !!!s% Teff = pow(s% L(1)/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
 
             ! Set everything with Lamb.
             call star_get_surf_PT(id, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
@@ -229,8 +229,8 @@
                   lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                   ierr)
 
-            s% Teff = pow(L_init/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
-            s% L(1) = L_init
+            !!!s% Teff = pow(L_init/(pi4*pow2(s% r(1))*boltz_sigma), 0.25_dp)
+            !!!s% L(1) = L_init
 
       end subroutine starspot_tweak_PT
 

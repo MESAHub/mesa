@@ -60,6 +60,7 @@ contains
 
       real(dp) :: mu_ideal_gas, R2, Teff_local, PB_i
       type(auto_diff_real_star_order1) :: xspot_of_r ! xspot4
+
       if (.not. s%doing_relax .and. .not. s%doing_first_model_of_run) then
          mu_ideal_gas = s%mu(1)  !1.00794d0 ! for hydrogen, 1 gram per mole
          R2 = pow2(s%R(1))
@@ -82,6 +83,7 @@ contains
       type(star_info), pointer :: s
 
       real(dp) :: alp
+
       alp = 1d0 - s%fspot + s%fspot*pow4(s%xspot)
 
       ! This is the surface-average value for luminosity
@@ -101,6 +103,7 @@ contains
       ! ------------------------------------------------------------
 
       type(star_info), pointer :: s
+      
       s%Teff = pow(L_init/(pi4*pow2(s%r(1))*boltz_sigma), 0.25_dp)
       s%L(1) = L_init
 
