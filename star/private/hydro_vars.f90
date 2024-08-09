@@ -387,21 +387,26 @@
 
 
       subroutine set_Teff_info_for_eqns(s, skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf, r_surf, L_surf, Teff, &
+            need_atm_Psurf_in, need_atm_Tsurf_in, r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use star_utils, only: set_phot_info
          use atm_lib, only: atm_Teff
+         use starspots, only: starspot_tweak_PT, starspot_restore_PT
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf
+            need_atm_Psurf_in, need_atm_Tsurf_in
          real(dp), intent(out) :: r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
+         logical :: need_atm_Psurf, need_atm_Tsurf
 
          include 'formats'
+
+         need_atm_Psurf = need_atm_Psurf_in
+         need_atm_Tsurf = need_atm_Tsurf_in
 
          ierr = 0
          
@@ -435,11 +440,21 @@
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
          else
+            ! starspot YREC routine
+            if (s% do_starspots) then
+               need_atm_Psurf = .true.
+               need_atm_Tsurf = .true.
+               call starspot_tweak_PT(s)
+            end if
             call get_surf_PT( &
                s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
+            ! starspot YREC routine
+            if (s% do_starspots) then
+               call starspot_restore_PT(s)
+            end if
          end if
          if (ierr /= 0) then
             if (s% report_ierr) then
@@ -753,7 +768,7 @@
 
       subroutine get_surf_PT( &
             s, skip_partials, &
-            need_atm_Psurf_in, need_atm_Tsurf_in, &
+            need_atm_Psurf, need_atm_Tsurf, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -763,11 +778,10 @@
             atm_test_partials_val, atm_test_partials_dval_dx
          use chem_def
          use eos_lib, only: Radiation_Pressure
-         use starspots, only: starspot_tweak_PT, starspot_restore_PT
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            need_atm_Psurf_in, need_atm_Tsurf_in
+            need_atm_Psurf, need_atm_Tsurf
          real(dp), intent(out) :: &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -785,19 +799,8 @@
          real(dp) :: Pextra
          real(dp) :: kap_surf
          real(dp) :: M_surf
-         logical, intent(in) :: need_atm_Psurf, need_atm_Tsurf
 
          include 'formats'
-
-         need_atm_Psurf = need_atm_Psurf_in
-         need_atm_Tsurf = need_atm_Tsurf_in
-
-         ! starspot YREC routine
-         if (s% do_starspots) then
-            need_atm_Psurf = .true.
-            need_atm_Tsurf = .true.
-            call starspot_tweak_PT(s)
-         end if
 
          ! Set up stellar surface parameters
          
@@ -1010,11 +1013,6 @@
             write(*,1) 'lnP_surf', lnP_surf
             write(*,*) 'atm_option = ', trim(s% atm_option)
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'get PT surf')
-         end if
-
-         ! starspot YREC routine
-         if (s% do_starspots) then
-            call starspot_restore_PT(s)
          end if
 
          ! Finish
