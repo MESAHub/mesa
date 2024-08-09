@@ -105,13 +105,14 @@ contains
       
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
-         gradr, grada, scale_height, mixing_length_alpha, &
+         gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
+      use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
-      type(auto_diff_real_star_order1), intent(in) :: gradr, grada, scale_height
+      type(auto_diff_real_star_order1), intent(in) :: gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
@@ -120,9 +121,11 @@ contains
               
       real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
       integer :: iso, old_mix_type
-      type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
+      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
       include 'formats'
       ierr = 0
+
+      gradr = gradr_in
       
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
@@ -146,6 +149,11 @@ contains
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       else
+         ! starspot YREC routine
+         if (s% do_starspots) then
+            dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+            call starspot_tweak_gradr(s, P, gradr_in, gradr)
+         end if
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -157,17 +165,16 @@ contains
 
 
    subroutine Get_results(s, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr_in, grada, scale_height, &
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
-      use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         r, L, T, P, opacity, rho, dV_in, chiRho, chiT, Cp, gradr_in, grada, scale_height
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
       integer, intent(in) :: iso
       real(dp), intent(in) :: &
          XH1, cgrav, m, gradL_composition_term, &
@@ -176,9 +183,8 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: gradr, Pr, Pg, grav, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale
-      real(dp) :: dV
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -189,15 +195,6 @@ contains
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
-
-      gradr = gradr_in
-      dV = dV_in
-
-      ! starspot YREC routine
-      if (s% do_starspots) then
-         dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
-         call starspot_tweak_gradr(s, P, gradr_in, gradr)
-      end if
 
       ! Pre-calculate some things. 
       Pr = crad*pow4(T)/3d0

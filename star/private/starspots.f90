@@ -28,8 +28,6 @@ module starspots
    use star_private_def
    use const_def
    use utils_lib
-   use star_lib
-   use star_def
 
    implicit none
 
@@ -53,7 +51,7 @@ contains
       ! This subroutine is called at the beginning of Get_results()
       ! in turb_support.f90
       ! ------------------------------------------------------------
-      use auto_diff
+      use auto_diff_support
       type(star_info), pointer :: s
       type(auto_diff_real_star_order1), intent(in) :: P
       type(auto_diff_real_star_order1), intent(in) :: gradr
