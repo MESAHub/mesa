@@ -53,7 +53,7 @@ contains
       ! This subroutine is called at the beginning of Get_results()
       ! in turb_support.f90
       ! ------------------------------------------------------------
-      use auto_diff_support
+      use auto_diff
       type(star_info), pointer :: s
       type(auto_diff_real_star_order1), intent(in) :: P
       type(auto_diff_real_star_order1), intent(in) :: gradr
