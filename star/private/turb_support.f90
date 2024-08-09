@@ -145,7 +145,7 @@ contains
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
-      else         
+      else
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -157,16 +157,17 @@ contains
 
 
    subroutine Get_results(s, k, MLT_option, &  ! NOTE: k=0 is a valid arg
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr_in, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
+      use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
       type(auto_diff_real_star_order1), intent(in) :: &
-         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height
+         r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr_in, grada, scale_height
       integer, intent(in) :: iso
       real(dp), intent(in) :: &
          XH1, cgrav, m, gradL_composition_term, &
@@ -175,7 +176,7 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
+      type(auto_diff_real_star_order1) :: gradr, Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale
 
       ! these are used by use_superad_reduction
@@ -187,6 +188,13 @@ contains
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
+
+      gradr = gradr_in
+
+      ! starspot YREC routine
+      if (s% do_starspots) then
+         call starspot_tweak_gradr(s, P, gradr_in, gradr)
+      end if
 
       ! Pre-calculate some things. 
       Pr = crad*pow4(T)/3d0
@@ -226,7 +234,6 @@ contains
          write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
-
 
 
       ! check if this particular k can be done with TDC

@@ -433,6 +433,7 @@
          logical :: use_T_tau_gradr_factor
 
       ! starspots
+          logical :: do_starspots
           real(dp) :: fspot, xspot
 
       ! mass gain or loss
