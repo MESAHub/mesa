@@ -4640,20 +4640,34 @@
 ! =========
 
 
+      ! do_starspots
+      ! ~~~~~~~~~~~~
+
+      ! If ``.true.``, switch on impedence of the surface flux due to magnetic pressure from starspots, 
+      ! parameterized in the style of an atmospheric boundary modification. First described by 
+      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
+      ! Detailed discussion of this functionality can be found in |MESA VI|.
+
+      ! ::
+
+    do_starspots = .false.
+
+
       ! fspot
-      ! ~~~~~~~~~~~
+      ! ~~~~~
 
-      ! Filling Factor of starspots (in [0,1])
-
+      ! Filling Factor of starspots. Valid values between 0.0 and 1.0 (no spots to 100% coverage)
       ! ::
 
     fspot = 0d0
 
 
       ! xspot
-      ! ~~~~~~~~~~~
+      ! ~~~~~
 
-      ! Temperature contrast between the spotted and unspotted regions (in [0,1])
+      ! Temperature contrast between the spotted and unspotted regions. 
+      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5 
+      ! (half of the total pressure is due to magnetic pressure)
 
       ! ::
 
@@ -8291,7 +8305,7 @@
 
       ! Note that these parameters are not exactly the same
       ! as used by Paul Duffell.
-      ! His calibrated D is 2, where mesa has default D = 3 (see mesaIV paper).
+      ! His calibrated D is 2, where mesa has default D = 3 (see |MESA IV|).
       ! Users should try various values since the choice is not clear cut.
 
       ! ::
