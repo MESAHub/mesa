@@ -2845,8 +2845,6 @@
 
       ! e00(i,j,k) is partial of equ(i,k) wrt var(j,k)
       subroutine e00(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
@@ -2903,8 +2901,6 @@
 
       ! em1(i,j,k) is partial of equ(i,k) wrt var(j,k-1)
       subroutine em1(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
@@ -2958,8 +2954,6 @@
 
       ! ep1(i,j,k) is partial of equ(i,k) wrt var(j,k+1)
       subroutine ep1(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
