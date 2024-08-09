@@ -127,8 +127,8 @@ c HH: k2 loops over elements for which to calculate grad.
                ierr = 5
                return
             endif
-         enddo
-      enddo
+         end do
+      end do
 c      
       outer: do i = 1, nel
          inner: do n = 1, ipe
@@ -142,11 +142,11 @@ c
                endif
                cycle outer
             endif
-         enddo inner
+         end do inner
          write(6,*)'OP - CHEM. ELEMENT CANNOT BE INCLUDED: Z = ', izzp(i)
          ierr = 8
          return
-      enddo outer
+      end do outer
 c
 c Calculate mean atomic weight (flmu) and 
 c array kzz indicating elements for which to calculate g_rad
@@ -247,7 +247,7 @@ c Write grad in terms of local radiative flux instead of (Teff, r/R*):
       const = 13.30295d0 + log10(flux) ! = -log10(c) - log10(amu) + log10(flux)
       do k2 = 1, kk 
          grl1(k2) = const + flmu - log10(dble(am1(k2))) + f(k2) + g    ! log g_rad 
-      enddo   !k2
+      end do   !k2
 c      
       g1 = g                ! log kappa
 
@@ -321,12 +321,12 @@ c
               endif
               cycle outer
             endif
-          enddo inner
+          end do inner
           write(6,*)'OP - CHEM. ELEMENT CANNOT BE INCLUDED: Z = ',
      +      izzp(i)
           ierr=8
           return
-       enddo outer
+       end do outer
 
 c Calculate mean atomic weight (flmu) 
       call abund(nel, izz, fa, flmu, fmu1, nkz)
@@ -480,12 +480,12 @@ c
               endif
               cycle outer
             endif
-          enddo inner
+          end do inner
           write(6,*)'OP - CHEM. ELEMENT CANNOT BE INCLUDED: Z = ',
      +      izzp(i)
           ierr=8
           return
-       enddo outer
+       end do outer
 
 c Calculate mean atomic weight (flmu) 
       call abund(nel, izz, fa, flmu, nkz)

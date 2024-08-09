@@ -44,7 +44,7 @@
       use_gold2_tolerances = .true.
 
       ! limit max_model_number as part of test_suite
-      max_model_number = 10
+      max_model_number = 30
 
       ! we expect to be stopped by max_model_number before this
       xa_central_lower_limit_species(1) = 'h1'
