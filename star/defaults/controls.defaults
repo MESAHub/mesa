@@ -4645,7 +4645,7 @@
 
       ! If ``.true.``, switch on impedence of the surface flux due to magnetic pressure from starspots, 
       ! parameterized in the style of an atmospheric boundary modification. First described by 
-      ! Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S . 
+      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
       ! ::
