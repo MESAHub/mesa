@@ -11,6 +11,9 @@
 #include "mtx_decsolc.dek"
 #include"mtx_decsolcs.dek"
       end interface
+      integer :: ldjac, mljac, mujac, ldmas, mlmas, mumas, m1, m2, nm1, lde1, ier, ijob
+      integer :: n, mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lcd, lrd, lid
+      integer :: iphes(n)
       integer :: ia(:) ! (n+1)
       integer :: ja(:) ! (nzmax)
       double precision :: sa(nzmax), sar(nzmax), sai(nzmax)
@@ -21,9 +24,6 @@
       double precision, pointer :: e1_1D(:)
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1), cont(n)
       double precision, pointer, dimension(:) :: z1, z2, z3, f1, f2, f3 ! (n)
-      integer :: ldjac, mljac, mujac, ldmas, mlmas, mumas, m1, m2, nm1, lde1, ier, ijob
-      integer :: n, mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag, nzmax, isparse, lcd, lrd, lid
-      integer :: iphes(n)
       integer, pointer, dimension(:) :: ip1, ip2 ! (nm1)
       
       
