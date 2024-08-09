@@ -753,7 +753,7 @@
 
       subroutine get_surf_PT( &
             s, skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf, &
+            need_atm_Psurf_in, need_atm_Tsurf_in, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
@@ -767,7 +767,7 @@
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf
+            need_atm_Psurf_in, need_atm_Tsurf_in
          real(dp), intent(out) :: &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
@@ -785,11 +785,17 @@
          real(dp) :: Pextra
          real(dp) :: kap_surf
          real(dp) :: M_surf
+         logical, intent(in) :: need_atm_Psurf, need_atm_Tsurf
 
          include 'formats'
 
+         need_atm_Psurf = need_atm_Psurf_in
+         need_atm_Tsurf = need_atm_Tsurf_in
+
          ! starspot YREC routine
          if (s% do_starspots) then
+            need_atm_Psurf = .true.
+            need_atm_Tsurf = .true.
             call starspot_tweak_PT(s)
          end if
 
@@ -817,7 +823,7 @@
 
          ! Evaluate surface temperature and pressure
              
-         if (.not. (need_atm_Psurf .or. need_atm_Tsurf) .and. .not. s% do_starspots) then
+         if (.not. (need_atm_Psurf .or. need_atm_Tsurf)) then
 
             ! Special-case boundary condition
 
