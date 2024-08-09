@@ -4645,7 +4645,7 @@
 
       ! If ``.true.``, switch on impedence of the surface flux due to magnetic pressure from starspots, 
       ! parameterized in the style of an atmospheric boundary modification. First described by 
-      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__. 
+      ! Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S . 
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
       ! ::
@@ -4656,8 +4656,7 @@
       ! fspot
       ! ~~~~~
 
-      ! Filling Factor of starspots (in [0,1])
-
+      ! Filling Factor of starspots. Valid values between 0.0 and 1.0 (no spots to 100% coverage)
       ! ::
 
     fspot = 0d0
@@ -4666,7 +4665,9 @@
       ! xspot
       ! ~~~~~
 
-      ! Temperature contrast between the spotted and unspotted regions (in [0,1])
+      ! Temperature contrast between the spotted and unspotted regions. 
+      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5 
+      ! (half of the total pressure is due to magnetic pressure)
 
       ! ::
 

@@ -44,7 +44,8 @@ module starspots
 contains
 
 ! -------------
-! YREC routines
+! parameterized YREC routines
+! MESA models a pressure contrast rather than temperature contrast
 ! -------------
 
    subroutine starspot_tweak_gradr(s, P, gradr, gradr_spot)
