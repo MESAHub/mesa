@@ -2781,9 +2781,6 @@
       ! ~~~~~~~~~~~~~~
 
       ! Set to .true. to enable this set of parameters
-
-      ! ``predictive_mix`` is incompattible with ``convective premixing``
-      ! and mlt_option = ``TDC``, due to conflicting assumptions.
       
       ! ::
 
