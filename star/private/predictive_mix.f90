@@ -175,10 +175,10 @@ contains
              stop
           end if
 
-          if (s% MLT_option == 'TDC') then
-             call mesa_error(__FILE__,__LINE__,'Predictive mixing and TDC cannot be enabled at the same time')
-             stop
-          end if
+          !if (s% MLT_option == 'TDC') then
+          !   call mesa_error(__FILE__,__LINE__,'Predictive mixing and TDC cannot be enabled at the same time')
+          !   stop
+          !end if
 
           call do_predictive_mixing(s, i, j, ierr, mix_mask)
           if (ierr /= 0) return
@@ -375,6 +375,13 @@ contains
           k_bot_mz = k_bot_mz + 1
        endif
 
+       ! See if the mixed region has reached went out of bounds [1, s%nz-1]
+
+       if ((      outward .AND. k_top_mz < 1) .OR. &
+           (.NOT. outward .AND. k_bot_mz > s%nz-1)) then
+          exit search_loop
+       endif
+
        ! Evaluate average abundance in the mixed zone
 
        call eval_abundances(s, k_bot_mz, k_top_mz, xa_mz, xa_mz_burn)
@@ -487,13 +494,6 @@ contains
           if (DEBUG) then
              write(*,*) 'Exiting predictive search due to convection-zone split'
           endif
-          exit search_loop
-       endif
-
-       ! See if the mixed region has reached the center or surface
-
-       if ((      outward .AND. k_top_mz == 1) .OR. &
-           (.NOT. outward .AND. k_bot_mz == s%nz-1)) then
           exit search_loop
        endif
 
