@@ -2781,7 +2781,7 @@
       ! ~~~~~~~~~~~~~~
 
       ! Set to .true. to enable this set of parameters
-      
+
       ! ::
 
     predictive_mix(1) = .false.
