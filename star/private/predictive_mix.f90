@@ -375,7 +375,7 @@ contains
           k_bot_mz = k_bot_mz + 1
        endif
 
-       ! See if the mixed region has reached went out of bounds [1, s%nz-1]
+       ! See if the mixed region has gone out of bounds [1, s%nz-1]
 
        if ((      outward .AND. k_top_mz < 1) .OR. &
            (.NOT. outward .AND. k_bot_mz > s%nz-1)) then
