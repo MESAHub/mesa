@@ -151,7 +151,7 @@ contains
       else
          ! starspot YREC routine
          if (s% do_starspots) then
-            dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+            !dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
             call starspot_tweak_gradr(s, P, gradr_in, gradr)
          end if
          call Get_results(s, k, MLT_option, &
