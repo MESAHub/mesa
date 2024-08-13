@@ -683,7 +683,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
          call fgong_amdl( &
-            cgrav, nn, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
+            cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
          if (ierr /= 0) then
             write(*,*) 'read_and_store failed in fgong_amdl'
             call mesa_error(__FILE__,__LINE__)
