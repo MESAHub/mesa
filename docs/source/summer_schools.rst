@@ -37,7 +37,7 @@ Preparing a good program takes about a year. Historically, the program has taken
 We aim for 50-50 gender representation (50% men, 50% women and gender minorities) among both lecturers and TAs. We have succeeded in having 35% or greater representation among women and gender minorities in past programs.  
 
 9 months to 7 months out (November - January)
------------------------
+---------------------------------------------
 - Look for and apply to grant funding schemes. Previous supporters of the MESA Summer Schools include the International Research Network of Nuclear Astrophysics (IReNA; USA), the European ChETEC-INFRA network of research infrastructures, and individual research grants (NSF; Marie Curie scheme, ERC scheme). 
 
 - reserve accommodation. Hotel room blocks can be booked for discounted rates. Some univerisites are willing to provide discounted bulk accommodation through their own facilities (e.g. dorms), as was the case at Santa Barbara.
@@ -52,7 +52,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 
 5 months out (March)
------------------------
+--------------------
 - close applications
 
 - make selections among applications. An admissions rubric used for the 2022, 2023, and 2024 Summer School programs is available from Meridith Joyce (MESAdev) 
@@ -62,18 +62,18 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 - send acceptances to students, cc-ing superviors, while maintaining a ranked waitlist. If you do not hear back from an accepted student or their supervisor in, for example, 2 weeks, move on to the waitlist. There are typically several students admitted off the waitlist.  
 
 4 months out (April)
------------------------
+--------------------
 - Begin regular, bi-weekly, all-hands meetings to check in with the organizational team, lecturers, and TAs. Lecturers should begin to schedule separate group meetings with their TAs to design exercises. Bi-weekly meetings serve to check in on the progress of these groups.
 
 - begin preparing any visa or invitation letters necessary for international students
 
 1 month out (July)
------------------------
+------------------
 - Increase the cadence of all-hands meetings to weekly. Lab exercises should be distributed for testing among TAs, leaving at least two weeks before the start of Summer School for final corrections to be implemented. Labs should be tested for coherence, timing, and accessibility of the exercises 
 
 
 2 weeks out
------------------------
+-----------
 - final corrections to labs are underway
 
 - Lecturers' programs and slides should be near completion. It is helpful if all lecture materials are available before the start of the labs. All lab materials should also be available before the start of the program.
