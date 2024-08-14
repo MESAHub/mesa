@@ -1,14 +1,22 @@
 #!/bin/bash
 
 VERSION="$1"
+echo ${VERSION}
 
-if [[ ! -n ${VERSION}} ]]; then
-	echo 'Please specify version number, e.g. r2X.YY.Z ot r2X.YY.Z-rcA'
+if [[ ! -n ${VERSION} ]]; then
+	echo "Please specify version number. E.g. r2X.YY.Z or r2X.YY.Z-rcA"
+	exit 1
+fi
+
+if [[ ! ${VERSION} == r* ]]; then
+	echo "Version number must start with 'r'. E.g. r2X.YY.Z or r2X.YY.Z-rcA"
 	exit 1
 fi
 
 # strip the r and hypen from version number to create a PEP440 standard tag
-TAG=${${VERSION:1}//-}
+TAG=${VERSION:1}
+TAG=${TAG//-}
+echo "The associated (PEP440) tag version ${VERSION} is: ${TAG}"
 
 cd ${MESA_DIR} || exit 1
 
