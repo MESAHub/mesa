@@ -54,8 +54,8 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-#html_theme = 'sphinx_book_theme'
+#html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -70,29 +70,29 @@ autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 6
 
 # sphinx_rtd options
-html_theme_options = {
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False,
-    'logo_only': True
-}
-
-# sphinx_book_theme options
 #html_theme_options = {
 #    'collapse_navigation': True,
+#    'sticky_navigation': True,
 #    'navigation_depth': 4,
-#    'repository_url': "https://github.com/MESAHub/mesa",
-#    'use_repository_button': True,
-#    'icon_links': [
-#        {
-#            "name": "GitHub",
-#            "url": "https://github.com/MESAHub/mesa",
-#            "icon": "fa-brands fa-github",
-#        },
-#    ],
+#    'includehidden': True,
+#    'titles_only': False,
+#    'logo_only': True
 #}
+
+# sphinx_book_theme options
+html_theme_options = {
+    'collapse_navigation': True,
+    'navigation_depth': 4,
+    'repository_url': "https://github.com/MESAHub/mesa",
+    'use_repository_button': True,
+    'icon_links': [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/MESAHub/mesa",
+            "icon": "fa-brands fa-github",
+        },
+    ],
+}
 
 # sphinx_tags options
 tags_create_tags = True
