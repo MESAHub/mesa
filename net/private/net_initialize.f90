@@ -46,7 +46,8 @@
       contains
 
       subroutine set_ptrs_for_approx21(n)
-         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D, fill_with_NaNs_ad
+         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
+         !XXXuse auto_diff
 
          type(net_info) :: n
             
@@ -74,12 +75,12 @@
             call fill_with_NaNs_2D(n% dfdy)
             call fill_with_NaNs(n% d_epsnuc_dy)
             call fill_with_NaNs(n% d_epsneu_dy)
-            call fill_with_NaNs_ad(n% dratdumdy1)
-            call fill_with_NaNs_ad(n% dratdumdy2)
-            call fill_with_NaNs_ad(n% dydt1)
+            call fill_with_NaNs_ad(n% dratdumdy1)  ! ad
+            call fill_with_NaNs_ad(n% dratdumdy2)  ! ad
+            call fill_with_NaNs_ad(n% dydt1)  ! ad
             !call fill_with_NaNs(n% dfdt) dydt1 %d1val1
             !call fill_with_NaNs(n% dfdRho) dydt1 %d1val2
-            call fill_with_NaNs_ad(n% rate_screened_ad)
+            call fill_with_NaNs_ad(n% rate_screened_ad)  ! ad
          end if
          
       end subroutine set_ptrs_for_approx21

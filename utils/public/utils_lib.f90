@@ -1231,14 +1231,6 @@ contains
          real(dp) :: ptr(:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs
- 
-      subroutine fill_with_NaNs_ad(ptr)
-         use auto_diff
-         type(auto_diff_real_2var_order1) :: ptr(:)
-         call set_nan(ptr %val)
-         call set_nan(ptr %d1val1)
-         call set_nan(ptr %d1val2)
-      end subroutine fill_with_NaNs_ad
       
       
       subroutine fill_with_NaNs_2D(ptr)
