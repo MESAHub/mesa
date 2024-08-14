@@ -31,7 +31,7 @@
       use chem_lib, only: get_mass_excess
       use net_def, only: Net_General_Info, Net_Info
       use utils_lib, only: fill_with_NaNs
-      
+      use auto_diff
       implicit none
       
       
@@ -221,6 +221,9 @@
          ! if (.not. just_dxdt) d_dxdt_dx(:,:) = 0
          n% eps_nuc_categories(:) = 0
          n% eps_neu_total = 0
+         n% eps_neu_total_ad %val= 0
+         n% eps_neu_total_ad %d1val1= 0
+         n% eps_neu_total_ad %d1val2= 0
          n% d_eps_nuc_dy = 0
 
          if (g% doing_approx21) then
@@ -338,6 +341,16 @@
          d_dxdt_dT = n% d_dxdt_dT
          d_dxdt_dRho = n% d_dxdt_dRho
          d_dxdt_dx = n% d_dxdt_dx
+!
+!write(*,*) eps_nuc
+!write(*,*) d_eps_nuc_dT
+!write(*,*) d_eps_nuc_dRho
+!write(*,*) d_eps_nuc_dx(ih1)
+!write(*,*) dxdt(ih1)
+!write(*,*) d_dxdt_dT(ih1)
+!write(*,*) d_dxdt_dRho(ih1)
+!write(*,*) d_dxdt_dx(ih1,ih1)
+
 
          eps_neu_total = n% eps_neu_total
 
@@ -356,73 +369,121 @@
 
          integer :: ci, i, j, num_isos
          real(dp) :: Z_plus_N
+         real(dp) :: enuc_conv2
 
          ierr = 0
 
          g => n% g
 
          num_isos = g% num_isos
-         
+        
+        ! here we define our new auto_diff variable for reaction rates.
+        !auto_diff_real_2var_order1
+        n% rate_screened_ad %val = n% rate_screened
+        n% rate_screened_ad %d1val1 = n% rate_screened_dT  ! 1 is T
+        n% rate_screened_ad %d1val2 = n% rate_screened_dRho  ! 2 is rho
+        n% dydt1 %val = 0d0
+        n% dydt1 %d1val1 = 0d0
+        n% dydt1 %d1val2 = 0d0
+
+       !write (*,*) 'rate_screened_ad' , n% rate_screened_ad
+
          call approx21_special_reactions( &
             n% temp, n% rho, n% abar, n% zbar, n% y, &
             g% use_3a_fl87, Qconv * n% reaction_Qs(ir_he4_he4_he4_to_c12), &
-            n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
+            n% rate_screened_ad, &
             n% dratdumdy1, n% dratdumdy2, g% add_co56_to_approx21, ierr)
          if (ierr /= 0) return            
-         
+!         write(*,*), 'made it here 1'
          call approx21_dydt( &
-            n% y, n% rate_screened, n% rate_screened, &
+            n% y, n% rate_screened_ad, &
             n% dydt1, .false., g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
             g% fe56ec_n_neut, n% temp, n% rho, g% add_co56_to_approx21, ierr)
          if (ierr /= 0) return
             
          n% fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
-         
+!write(*,*), 'made it here 2'
+
+! values also get returned to screened rate inside eps_info.
          call get_approx21_eps_info( n, &
-               n% dydt1, n% rate_screened, .true., n% eps_total, n% eps_neu_total, &
+               n% dydt1, n% rate_screened_ad, .true., n% eps_total_ad, n% eps_neu_total_ad, &
                g% add_co56_to_approx21,  ierr)
                
+!write(*,*) 'made it here 3'
+
+ ! return eps_neu and neu total to eps_nuc
+n% eps_total = n% eps_total_ad %val
+n% eps_neu_total = n% eps_neu_total_ad %val
+
          if (ierr /= 0) return               
-         n% eps_nuc = n% eps_total - n% eps_neu_total
+         n% eps_nuc = n% eps_total_ad %val - n% eps_neu_total_ad %val
          
          do i=1, num_isos
-            n% dxdt(i) = chem_isos% Z_plus_N(g% chem_id(i)) * n% dydt1(i)
+            n% dxdt(i) = chem_isos% Z_plus_N(g% chem_id(i)) * n% dydt1(i)%val
          end do
+
+! we need to return our values here before exit for split burn.
+n% rate_screened = n% rate_screened_ad %val
+n% rate_screened_dT = n% rate_screened_ad %d1val1 ! 1 is T
+n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
 
          if (just_dxdt) return
 
          call approx21_dfdy( &
             n% y, n% dfdy, &
             g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, g% fe56ec_n_neut, &
-            n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
+            n% rate_screened_ad, &
             n% dratdumdy1, n% dratdumdy2, n% temp, g% add_co56_to_approx21,  ierr)
          if (ierr /= 0) return
 
-         call approx21_dfdT_dfdRho( & 
-            
-            ! NOTE: currently this gives d_eps_total_dy -- should fix to account for neutrinos too
-            
-            n% y, g% mion, n% dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-            g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
-            g% fe56ec_n_neut, n% temp, n% rho, n% dfdT, n% dfdRho, n% d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
-         if (ierr /= 0) return
+!
+! now calculated implicitly with auto_diff
+!         call approx21_dfdT_dfdRho( &
+!
+!            ! NOTE: currently this gives d_eps_total_dy -- should fix to account for neutrinos too
+!
+!            n% y, g% mion, n% dfdy, n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
+!            g% fe56ec_fake_factor, g% min_T_for_fe56ec_fake_factor, &
+!            g% fe56ec_n_neut, n% temp, n% rho, n% dfdT, n% dfdRho, n% d_epsnuc_dy, g% add_co56_to_approx21,  ierr)
+!         if (ierr /= 0) return
 
-         call get_approx21_eps_info( n, &
-            n% dfdT, n% rate_screened_dT, .false., n% deps_total_dT, n% deps_neu_dT, &
-            g% add_co56_to_approx21,  ierr)
+! energy generation rate partials (total energy; do neutrinos elsewhere)
+        enuc_conv2 = -avo*clight*clight
+        n% d_epsnuc_dy(1:species(g% add_co56_to_approx21))  = 0d0
+        do j=1,species(g% add_co56_to_approx21)
+           do i=1,species(g% add_co56_to_approx21)
+            n% d_epsnuc_dy(j) = n% d_epsnuc_dy(j) + n% dfdy(i,j)*g% mion(i)
+           enddo
+            n% d_epsnuc_dy(j) = n% d_epsnuc_dy(j) * enuc_conv2
+        enddo
 
+!         call get_approx21_eps_info( n, &
+!            n% dfdT, n% rate_screened_dT, .false., n% deps_total_dT, n% deps_neu_dT, &
+!            g% add_co56_to_approx21,  ierr)
+
+! return eps_neu and neu total to eps_nuc
+n% deps_total_dT = n% eps_total_ad %d1val1
+n% deps_neu_dT = n% eps_neu_total_ad %d1val1
+n% deps_total_dRho = n% eps_total_ad %d1val2
+n% deps_neu_dRho = n% eps_neu_total_ad %d1val2
+
+!write (*,*) ' n% eps_total_ad %d1val2' , ((n% eps_total_ad %d1val2)*log(n% eps_total_ad %val)/log(n% temp))
          if (ierr /= 0) return
-         n% d_eps_nuc_dT = n% deps_total_dT - n% deps_neu_dT
-                           
-         call get_approx21_eps_info( n, &
-            n% dfdRho, n% rate_screened_dRho, .false., n% deps_total_dRho, n% deps_neu_dRho, &
-            g% add_co56_to_approx21,  ierr)
+!         n% d_eps_nuc_dT = n% deps_total_dT - n% deps_neu_dT
+          n% d_eps_nuc_dT = n% eps_total_ad %d1val1 - n% eps_neu_total_ad %d1val1
+
+!         call get_approx21_eps_info( n, &
+!            n% dfdRho, n% rate_screened_dRho, .false., n% deps_total_dRho, n% deps_neu_dRho, &
+!            g% add_co56_to_approx21,  ierr)
 
          if (ierr /= 0) return             
-         n% d_eps_nuc_dRho = n% deps_total_dRho - n% deps_neu_dRho
-         
+!         n% d_eps_nuc_dRho = n% deps_total_dRho - n% deps_neu_dRho
+          n% d_eps_nuc_dRho = n% eps_total_ad %d1val2 - n% eps_neu_total_ad %d1val2
+!write (*,*) ' eps_total_ad %d1val2' , n% eps_total_ad %d1val2
+!write (*,*) ' eps_neu_total_ad %d1val2' , n% eps_neu_total_ad %d1val2
+
          call approx21_d_epsneu_dy( &
-            n% y, n% rate_screened, &
+            n% y, n% rate_screened_ad %val, &
             n% reaction_neuQs(irpp_to_he3), &   
             n% reaction_neuQs(ir34_pp2), &  
             n% reaction_neuQs(ir34_pp3), &  
@@ -437,13 +498,21 @@
             ci = g% chem_id(i)
             Z_plus_N = dble(chem_isos% Z_plus_N(ci))
             n% d_eps_nuc_dx(i) = (n% d_epsnuc_dy(i) - n% d_epsneu_dy(i))/Z_plus_N 
-            n% d_dxdt_dRho(i) = Z_plus_N * n% dfdRho(i)
-            n% d_dxdt_dT(i) = Z_plus_N * n% dfdT(i)
+            n% d_dxdt_dT(i) = Z_plus_N * n% dydt1(i) %d1val1 ! n% dfdRho(i)
+            n% d_dxdt_dRho(i) = Z_plus_N * n% dydt1(i) %d1val2  !n% dfdT(i)
             do j=1, num_isos
                n% d_dxdt_dx(i,j) = &
                   n% dfdy(i,j)*Z_plus_N/chem_isos% Z_plus_N(g% chem_id(j))
             end do
+!            write (*,*) 'd_dxdt_dT', n% d_dxdt_dT(i)
          end do
+!n% dfdT(i) = n% dydt1(i) %d1val1
+!n% dfdRho(i) = n% dydt1(i) %d1val=2
+! we need to return our values here before exit for split burn.
+n% rate_screened = n% rate_screened_ad %val
+n% rate_screened_dT = n% rate_screened_ad %d1val1 ! 1 is T
+n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
+
 
       end subroutine eval_net_approx21_procs
 
@@ -454,9 +523,9 @@
          use rates_def
          type(net_info) :: n
          type(net_general_info), pointer :: g=>null()
-         real(dp), intent(in), dimension(:) :: dydt1, rate_screened
+         type(auto_diff_real_2var_order1), dimension(:), intent(in) :: dydt1, rate_screened
          logical, intent(in) :: do_eps_nuc_categories
-         real(dp), intent(out) :: eps_total, eps_neu_total
+         type(auto_diff_real_2var_order1), intent(out) :: eps_total, eps_neu_total
          logical, intent(in) :: plus_co56
          integer, intent(out) :: ierr
          real(dp) :: Qtotal_rfe56ec, Qneu_rfe56ec
@@ -469,7 +538,7 @@
          call get_Qs_rfe56ec(n, Qtotal_rfe56ec, Qneu_rfe56ec)
 
          call approx21_eps_info( &
-            n, n% y, g% mion, dydt1, rate_screened, n% fII, &               
+            n, n% y, g% mion, dydt1, rate_screened, n% fII, &
             n% reaction_Qs(irpp_to_he3), n% reaction_neuQs(irpp_to_he3), & 
             n% reaction_Qs(ir_he3_he3_to_h1_h1_he4), &
             n% reaction_Qs(ir34_pp2), n% reaction_neuQs(ir34_pp2), & 
@@ -647,10 +716,17 @@
                n% rate_screened(i) = n% rate_raw(i)
                n% rate_screened_dT(i) = n% rate_raw_dT(i)
                n% rate_screened_dRho(i) = n% rate_raw_dRho(i)
+!               n% rate_screened_ad %val = n% rate_raw(i)
+!               n% rate_screened_ad %d1val1 = n% rate_raw_dT(i)  ! 1 is T
+!               n% rate_screened_ad %d1val2 = n% rate_raw_dRho(i)  ! 2 is rho
             end do
             do i=1,num
-               n% dratdumdy1(i) = 0d0
-               n% dratdumdy2(i) = 0d0
+               n% dratdumdy1(i) %val = 0d0
+               n% dratdumdy2(i) %val = 0d0
+               n% dratdumdy1(i) %d1val1 = 0d0
+               n% dratdumdy2(i) %d1val1 = 0d0
+               n% dratdumdy1(i) %d1val2 = 0d0
+               n% dratdumdy2(i) %d1val2 = 0d0
             end do           
          end if
 
