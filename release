@@ -41,7 +41,7 @@ git commit -a -m "Release: ${VERSION}"
 git tag ${TAG}
 
 # Make the archive
-git archive --prefix=mesa-${VERSION}/ --format=zip ${VERSION} > mesa-${VERSION}.zip
+git archive --prefix=mesa-${VERSION}/ --format=zip ${TAG} > mesa-${VERSION}.zip
 
 echo "Now check the archive builds before pushing the changes"
 
