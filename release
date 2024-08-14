@@ -3,9 +3,12 @@
 VERSION="$1"
 
 if [[ ! -n ${VERSION}} ]]; then
-	echo 'Please specify version number'
+	echo 'Please specify version number, e.g. r2X.YY.Z ot r2X.YY.Z-rcA'
 	exit 1
 fi
+
+# strip the r and hypen from version number to create a PEP440 standard tag
+TAG=${${VERSION:1}//-}
 
 cd ${MESA_DIR} || exit 1
 
@@ -27,7 +30,7 @@ sed -i 's/version\ =.*/version\ =\ '"'${VERSION}'"'/' docs/source/conf.py
 git add docs/source/conf.py
 
 git commit -a -m "Release: ${VERSION}"
-git tag ${VERSION}
+git tag ${TAG}
 
 # Make the archive
 git archive --prefix=mesa-${VERSION}/ --format=zip ${VERSION} > mesa-${VERSION}.zip
@@ -38,5 +41,5 @@ exit 0
 
 # Cleanup when testing
 git checkout main
-git tag -d ${VERSION}
+git tag -d ${TAG}
 git branch -D release/${VERSION}
