@@ -2305,6 +2305,15 @@
       ! Note that TDC does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
       ! even if that flag is set.
 
+      ! We caution that combining different mixing models in a stellar evolution
+      ! calculation might lead to physically inconsistent solutions,
+      ! because the different models have been developed separately,
+      ! and their underlying assumptions might not be compatible with each other.
+      ! Examples include combining the newly implemented time-dependent local limit
+      ! convection model ``TDC`` with an overshooting model, or combining ``TDC``
+      ! with other models for chemical composition gradients
+      ! (predictive mixing or convective premixing), rotation, etc. (MESA VI)
+      
       ! ::
 
     MLT_option = 'TDC'
