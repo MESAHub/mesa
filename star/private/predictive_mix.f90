@@ -96,7 +96,7 @@ contains
 
        criteria_loop : do j = 1, NUM_PREDICTIVE_PARAM_SETS
 
-          if (.NOT. s%predictive_mix(j)) cycle criteria_loop
+          if (.NOT. s% predictive_mix(j)) cycle criteria_loop
 
           ! Check if the criteria match the current boundary
 
@@ -170,10 +170,15 @@ contains
 
           ! Perform the predictive mixing for this boundary
 
-          if (s%do_conv_premix) then
+          if (s% do_conv_premix) then
              call mesa_error(__FILE__,__LINE__,'Predictive mixing and convective premixing cannot be enabled at the same time')
              stop
           end if
+
+          !if (s% MLT_option == 'TDC') then
+          !   call mesa_error(__FILE__,__LINE__,'Predictive mixing and TDC cannot be enabled at the same time')
+          !   stop
+          !end if
 
           call do_predictive_mixing(s, i, j, ierr, mix_mask)
           if (ierr /= 0) return
@@ -370,6 +375,13 @@ contains
           k_bot_mz = k_bot_mz + 1
        endif
 
+       ! Exit search if the mixed region has gone out of bounds
+
+       if ((      outward .AND. k_top_mz < 1) .OR. &
+           (.NOT. outward .AND. k_bot_mz > s%nz)) then
+          exit search_loop
+       endif
+
        ! Evaluate average abundance in the mixed zone
 
        call eval_abundances(s, k_bot_mz, k_top_mz, xa_mz, xa_mz_burn)
@@ -482,13 +494,6 @@ contains
           if (DEBUG) then
              write(*,*) 'Exiting predictive search due to convection-zone split'
           endif
-          exit search_loop
-       endif
-
-       ! See if the mixed region has reached the center or surface
-
-       if ((      outward .AND. k_top_mz == 1) .OR. &
-           (.NOT. outward .AND. k_bot_mz == s%nz-1)) then
           exit search_loop
        endif
 
