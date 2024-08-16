@@ -7,18 +7,30 @@ Changelog
 Changes in main
 ===============
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
-
 .. _New Features main:
 
 New Features
 ------------
 
-**Update to starspots **
-star spot parameters 
- ``fspot``
- ``xspot``
- have been added as general controls and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default 
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+Changes in r24.08.1
+===================
+
+.. _New Features r24.08.1:
+
+New Features
+------------
+
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
+**Update to starspots**
+
+Star spot parameters ``fspot``, and ``xspot`` have been added as general controls
+and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default. 
 
 **Replacement of HDF5io by ForUM**
 
@@ -53,22 +65,6 @@ been added to :file:`utils/makefile_header` to simplify linking
 against :file:`libgyre_mea.a`. These changes will likely only affect
 those users that make calls to GYRE from inside
 :file:`run_star_extras.f90`.
-
-.. _Bug Fixes main:
-
-Bug Fixes
----------
-
-
-Changes in r24.06.1-rc1
-=======================
-
-.. _New Features r24.06.1-rc1:
-
-New Features
-------------
-
-``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
 
 Kap
 ~~~
@@ -177,7 +173,7 @@ Chem
 New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
 are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
 
-.. _Bug Fixes r24.06.1-rc1:
+.. _Bug Fixes r24.08.1:
 
 Bug Fixes
 ---------
