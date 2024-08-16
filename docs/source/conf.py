@@ -21,8 +21,8 @@ project = 'MESA'
 copyright = '2024, The MESA Team'
 author = 'The MESA Team'
 language = 'en'
-version = 'main'
-release = version
+version = 'r24.08.1'
+release = 'r24.08.1'
 
 
 # -- General configuration ---------------------------------------------------
