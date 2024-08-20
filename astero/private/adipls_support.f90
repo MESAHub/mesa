@@ -287,8 +287,7 @@
 
          ivers = 0 ! It's not clear what this does in fgong_amdl
 
-         call fgong_amdl( &
-            cgrav, nn_in, iconst, ivar, ivers, global_data, point_data, data, aa, nn, ierr)
+         call fgong_amdl(cgrav, nn_in, iconst, ivar, ivers, global_data, point_data, data, aa, nn, ierr)
          deallocate(global_data, point_data)
 
          if (ierr /= 0) then
@@ -682,8 +681,7 @@
             write(*,*) 'read_and_store failed in read_fgong_file'
             call mesa_error(__FILE__,__LINE__)
          end if
-         call fgong_amdl( &
-            cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
+         call fgong_amdl(cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
          if (ierr /= 0) then
             write(*,*) 'read_and_store failed in fgong_amdl'
             call mesa_error(__FILE__,__LINE__)
@@ -726,8 +724,8 @@
       
          ! test for singular centre and/or surface
 
-         sincen=aa1(1,1).eq.0
-         sinsur=data(7).ge.0
+         sincen=aa1(1,1) == 0
+         sinsur=data(7) >= 0
          nsin=0
          if (sincen) nsin=nsin+1
          if (sinsur) nsin=nsin+1
@@ -735,7 +733,7 @@
          ! test for inclusion of g/(g tilde)
 
          idata8 = int(data(8)+0.1)
-         if (mod(idata8/10,10).eq.2) then
+         if (mod(idata8/10,10) == 2) then
             iggt = 1
             iturpr=8
          else
@@ -746,13 +744,13 @@
          
          ! test for number of nonsingular points
 
-         if (iriche.ne.1.or.mod(nn-nsin,2).eq.1) then
+         if (iriche /= 1.or.mod(nn-nsin,2) == 1) then
             nshift=0
          else
             nshift=1
          end if
          nnr=nn
-         if (nshift.ne.0) then
+         if (nshift /= 0) then
             nn=nn-nshift
          end if
          
@@ -772,7 +770,7 @@
             end do
          else
             do n=1,nnr
-               if (n.eq.1) then
+               if (n == 1) then
                   n1=1
                else
                   n1=n+nshift
@@ -788,16 +786,16 @@
 
          ! set g/gtilde (=1 in models without turbulent pressure)
 
-         if (iturpr.eq.1) then
+         if (iturpr == 1) then
             do n=1,nn
-               if (x(n).lt.0.999) then
+               if (x(n) < 0.999) then
                   ggt=1
                else
                   ggt=1./(x(n)*x(n)*x(n)*aa(1,n))
                end if
                aa(10,n)=ggt
             end do
-         else if (iggt.eq.1) then
+         else if (iggt == 1) then
             do n=1,nn
                aa(10,n)=aa(6,n)
             end do
@@ -815,8 +813,7 @@
       end subroutine store_amdl
             
       
-      subroutine fgong_amdl( &
-            cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
+      subroutine fgong_amdl(cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
          ! derived from fgong-amdl.d.f
          real(dp), intent(in) :: cgrav
          integer, intent(in) :: nn_in, iconst, ivar, ivers
@@ -834,7 +831,7 @@
          ierr = 0
          nn = nn_in
 
-         if (var(1,1).gt.var(1,nn)) then 
+         if (var(1,1) > var(1,nn)) then 
             nn1=nn+1
             do i=1,ivar
                do n=1,nn
@@ -846,7 +843,7 @@
             end do
          end if
          
-         if (var(1,1).gt.1.d6) then 
+         if (var(1,1) > 1.d6) then 
             do i=1,ivar
                do n=1,nn
                   var1(i,n+1)=var(i,n)
@@ -895,7 +892,7 @@
          aa(4,1)=var(10,1)
          aa(5,1)=0
          aa(6,1)=3.d0
-         if (aa(5,nn).le.10) then 
+         if (aa(5,nn) <= 10) then 
             nn=nn-1 
             !write(6,*) 'Chop off outermost point' 
          end if
@@ -903,7 +900,7 @@
          data(2)=glob(2)
          data(3)=var(4,1)
          data(4)=var(5,1)
-         if (glob(11).lt.0.and.glob(11).gt.-10000) then 
+         if (glob(11) < 0.and.glob(11) > -10000) then 
             data(5)=-glob(11)/var(10,1)
             data(6)=-glob(12) 
          else 
@@ -911,7 +908,7 @@
             d2amax=0.d0
             do n=2,nn
                d2amax=max(d2amax,aa(5,n)/x(n)**2)
-               if (x(n).ge.0.05d0) exit
+               if (x(n) >= 0.05d0) exit
             end do
             data(6)=d2amax+data(5)
             !write(6,140) data(5), data(6)

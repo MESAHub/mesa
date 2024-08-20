@@ -4,6 +4,7 @@
       use num_lib
       use math_lib
       use utils_lib, only: mesa_error
+      use const_def, only: dp
       
       implicit none
       
@@ -45,13 +46,13 @@
       !
         implicit none
 
-        real ( kind = 8 ) a
-        real ( kind = 8 ) b
-        real ( kind = 8 ) c
-        real ( kind = 8 ) e
-        real ( kind = 8 ) m
-        real ( kind = 8 ) machep
-        real ( kind = 8 ) t
+        real(dp) a
+        real(dp) b
+        real(dp) c
+        real(dp) e
+        real(dp) m
+        real(dp) machep
+        real(dp) t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_GLOMIN_ALL'
@@ -133,18 +134,19 @@
 
 
       subroutine test_glomin_one ( a, b, c, m, machep, e, t, f, title )
-         real*8, intent(in) :: a, b, c, m, machep, e, t
+         real(dp), intent(in) :: a, b, c, m, machep, e, t
          interface
-            real*8 function f(x)
-               real*8, intent(in) :: x
+            real(dp) function f(x)
+               use const_def, only: dp
+               real(dp), intent(in) :: x
             end function f
          end interface
 
-        real      ( kind = 8 ) fa
-        real      ( kind = 8 ) fb
-        real      ( kind = 8 ) fx
+        real      (dp) fa
+        real      (dp) fb
+        real      (dp) fx
         character ( len = *  ) title
-        real      ( kind = 8 ) x
+        real      (dp) x
         integer :: max_tries, ierr
         include 'formats'
         
@@ -167,28 +169,28 @@
       end subroutine test_glomin_one
 
 
-      real*8 function h_01 ( x )
-         real*8, intent(in) :: x
+      real(dp) function h_01 ( x )
+         real(dp), intent(in) :: x
          h_01 = 2.0D+00 - x
       end function h_01
       
-      real*8 function h_02 ( x )
-         real*8, intent(in) :: x
+      real(dp) function h_02 ( x )
+         real(dp), intent(in) :: x
          h_02 = x * x
       end function h_02
       
-      real*8 function h_03 ( x )
-         real*8, intent(in) :: x
+      real(dp) function h_03 ( x )
+         real(dp), intent(in) :: x
          h_03 = x * x * ( x + 1.0D+00 )
       end function h_03
       
-      real*8 function h_04 ( x )
-         real*8, intent(in) :: x
+      real(dp) function h_04 ( x )
+         real(dp), intent(in) :: x
          h_04 = ( x + sin ( x ) ) * exp( - x * x )
       end function h_04
       
-      real*8 function h_05 ( x )
-         real*8, intent(in) :: x
+      real(dp) function h_05 ( x )
+         real(dp), intent(in) :: x
          h_05 = ( x - sin ( x ) ) * exp( - x * x )
       end function h_05
       
@@ -213,10 +215,10 @@
       !
         implicit none
 
-        real ( kind = 8 ) a
-        real ( kind = 8 ) b
-        real ( kind = 8 ) eps
-        real ( kind = 8 ) t
+        real(dp) a
+        real(dp) b
+        real(dp) eps
+        real(dp) t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_LOCAL_MIN_ALL'
@@ -281,31 +283,32 @@
       !
       !  Parameters:
       !
-      !    Input, real ( kind = 8 ) A, B, the endpoints of the interval.
+      !    Input, real(dp) A, B, the endpoints of the interval.
       !
-      !    Input, real ( kind = 8 ) EPS, a positive relative error tolerance.
+      !    Input, real(dp) EPS, a positive relative error tolerance.
       !
-      !    Input, real ( kind = 8 ) T, a positive absolute error tolerance.
+      !    Input, real(dp) T, a positive absolute error tolerance.
       !
-      !    Input, external real ( kind = 8 ) F, the name of a user-supplied
+      !    Input, external real(dp) F, the name of a user-supplied
       !    function, of the form "FUNCTION F ( X )", which evaluates the
       !    function whose local minimum is being sought.
       !
       !    Input, character ( LEN = * ) TITLE, a title for the problem.
       !
         implicit none
-         real*8, intent(in) :: a, b, eps, t
+         real(dp), intent(in) :: a, b, eps, t
          interface
-            real*8 function f(x)
-               real*8, intent(in) :: x
+            real(dp) function f(x)
+               use const_def, only: dp
+               real(dp), intent(in) :: x
             end function f
          end interface
          character (len=*) :: title
 
-        real      ( kind = 8 ) fa
-        real      ( kind = 8 ) fb
-        real      ( kind = 8 ) fx
-        real      ( kind = 8 ) x
+        real      (dp) fa
+        real      (dp) fb
+        real      (dp) fx
+        real      (dp) x
         integer :: max_tries, ierr
         include 'formats'
         
@@ -327,86 +330,86 @@
         return
       end subroutine test_local_min_one
 
-      real*8 function g_01 ( x )
-         real*8, intent(in) :: x
+      real(dp) function g_01 ( x )
+         real(dp), intent(in) :: x
          g_01 = ( x - 2.0D+00 ) * ( x - 2.0D+00 ) + 1.0D+00
       end function g_01
       
-      real*8 function g_02 ( x )
-         real*8, intent(in) :: x
+      real(dp) function g_02 ( x )
+         real(dp), intent(in) :: x
          g_02 = x * x + exp( - x )
       end function g_02
       
-      real*8 function g_03 ( x )
-         real*8, intent(in) :: x
+      real(dp) function g_03 ( x )
+         real(dp), intent(in) :: x
          g_03 = ( ( x * x + 2.0D+00 ) * x + 1.0D+00 ) * x + 3.0D+00
       end function g_03
       
-      real*8 function g_04 ( x )
-         real*8, intent(in) :: x
+      real(dp) function g_04 ( x )
+         real(dp), intent(in) :: x
          g_04 = exp( x ) + 0.01D+00 / x
       end function g_04
       
-      real*8 function g_05 ( x )
-         real*8, intent(in) :: x
+      real(dp) function g_05 ( x )
+         real(dp), intent(in) :: x
          g_05 = exp( x ) - 2.0D+00 * x + 0.01D+00 / x - 0.000001D+00 / x / x
       end function g_05
 
 
-      real*8 function f_01 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
+      real(dp) function f_01 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real*8, intent(in) :: x
-         real*8, intent(out) :: dfdx
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_01 = sin ( x ) - 0.5D+00 * x
          ierr = 0
          dfdx = 0
       end function f_01
       
-      real*8 function f_02 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
+      real(dp) function f_02 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real*8, intent(in) :: x
-         real*8, intent(out) :: dfdx
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_02 = 2.0D+00 * x - exp( - x )
          ierr = 0
          dfdx = 0
       end function f_02
       
-      real*8 function f_03 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
+      real(dp) function f_03 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real*8, intent(in) :: x
-         real*8, intent(out) :: dfdx
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_03 = x * exp( - x )
          ierr = 0
          dfdx = 0
       end function f_03
       
-      real*8 function f_04 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
+      real(dp) function f_04 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real*8, intent(in) :: x
-         real*8, intent(out) :: dfdx
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_04 = exp( x ) - 1.0D+00 / 100.0D+00 / x / x
          ierr = 0
          dfdx = 0
       end function f_04
       
-      real*8 function f_05 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
+      real(dp) function f_05 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
-         real*8, intent(in) :: x
-         real*8, intent(out) :: dfdx
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real*8, intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
          f_05 = ( x + 3.0D+00 ) * ( x - 1.0D+00 ) * ( x - 1.0D+00 )
          ierr = 0
@@ -434,10 +437,10 @@
       !
         implicit none
 
-        real ( kind = 8 ) a
-        real ( kind = 8 ) b
-        real ( kind = 8 ) machep
-        real ( kind = 8 ) t
+        real(dp) a
+        real(dp) b
+        real(dp) machep
+        real(dp) t
 
         machep = epsilon ( machep )
         t = machep
@@ -497,15 +500,15 @@
       !
       !  Parameters:
       !
-      !    Input, real ( kind = 8 ) A, B, the two endpoints of the change of sign
+      !    Input, real(dp) A, B, the two endpoints of the change of sign
       !    interval.
       !
-      !    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine
+      !    Input, real(dp) MACHEP, an estimate for the relative machine
       !    precision.
       !
-      !    Input, real ( kind = 8 ) T, a positive error tolerance.
+      !    Input, real(dp) T, a positive error tolerance.
       !
-      !    Input, external real ( kind = 8 ) F, the name of a user-supplied
+      !    Input, external real(dp) F, the name of a user-supplied
       !    function, of the form "FUNCTION F ( X )", which evaluates the
       !    function whose zero is being sought.
       !
@@ -517,22 +520,22 @@
           include 'num_root_fcn.dek' ! f provides function values
        end interface
 
-        real ( kind = 8 ) a
-        real ( kind = 8 ) b
-        real ( kind = 8 ) fa
-        real ( kind = 8 ) fb
-        real ( kind = 8 ) fz
-        real ( kind = 8 ) machep
-        real ( kind = 8 ) t
+        real(dp) a
+        real(dp) b
+        real(dp) fa
+        real(dp) fb
+        real(dp) fz
+        real(dp) machep
+        real(dp) t
         character ( len = *  ) title
-        real ( kind = 8 ) z
-        real ( kind = 8 ) dfdx
+        real(dp) z
+        real(dp) dfdx
         
         integer, parameter :: lrpar = 0, lipar = 0
         integer :: ierr
-        real*8, target :: rpar_ary(lrpar) 
+        real(dp), target :: rpar_ary(lrpar) 
         integer, target :: ipar_ary(lipar)
-        real*8, pointer :: rpar(:)
+        real(dp), pointer :: rpar(:)
         integer, pointer :: ipar(:)
         
         include 'formats'
