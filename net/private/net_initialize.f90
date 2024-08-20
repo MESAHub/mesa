@@ -46,8 +46,7 @@
       contains
 
       subroutine set_ptrs_for_approx21(n)
-         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
-         !XXXuse auto_diff
+         use utils_lib, only: fill_with_NaNs
 
          type(net_info) :: n
             
@@ -72,15 +71,15 @@
 
 
          if(n% g% fill_arrays_with_NaNs) then
-            call fill_with_NaNs_2D(n% dfdy)
+            call fill_with_NaNs(n% dfdy)
             call fill_with_NaNs(n% d_epsnuc_dy)
             call fill_with_NaNs(n% d_epsneu_dy)
-            call fill_with_NaNs_ad(n% dratdumdy1)  ! ad
-            call fill_with_NaNs_ad(n% dratdumdy2)  ! ad
-            call fill_with_NaNs_ad(n% dydt1)  ! ad
+            call fill_with_NaNs(n% dratdumdy1)  ! ad
+            call fill_with_NaNs(n% dratdumdy2)  ! ad
+            call fill_with_NaNs(n% dydt1)  ! ad
             !call fill_with_NaNs(n% dfdt) dydt1 %d1val1
             !call fill_with_NaNs(n% dfdRho) dydt1 %d1val2
-            call fill_with_NaNs_ad(n% rate_screened_ad)  ! ad
+            call fill_with_NaNs(n% rate_screened_ad)  ! ad
          end if
          
       end subroutine set_ptrs_for_approx21
@@ -88,7 +87,7 @@
          
       subroutine setup_net_info(n)
          use chem_def
-         use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
+         use utils_lib, only: fill_with_NaNs
          type (Net_Info) :: n
          
          integer :: num_reactions, num_isos, num_wk_reactions
@@ -158,9 +157,9 @@
             call fill_with_NaNs(n% dxdt)
             call fill_with_NaNs(n% d_dxdt_dRho)
             call fill_with_NaNs(n% d_dxdt_dT)
-            call fill_with_NaNs_2D(n% d_dxdt_dx)
+            call fill_with_NaNs(n% d_dxdt_dx)
             call fill_with_NaNs(n% d_eps_nuc_dy)
-            call fill_with_NaNs_2D(n% d_dydt_dy)
+            call fill_with_NaNs(n% d_dydt_dy)
             call fill_with_NaNs(n% lambda)
             call fill_with_NaNs(n% dlambda_dlnT)
             call fill_with_NaNs(n% dlambda_dlnRho)

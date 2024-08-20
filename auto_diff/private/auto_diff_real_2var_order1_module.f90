@@ -65,7 +65,7 @@ module auto_diff_real_2var_order1_module
       dim, &
       differentiate_1, &
       differentiate_2, &
-      fill_with_NaNs_ad
+      fill_with_NaNs
    type :: auto_diff_real_2var_order1
       real(dp) :: val
       real(dp) :: d1val1
@@ -366,9 +366,9 @@ module auto_diff_real_2var_order1_module
       module procedure differentiate_auto_diff_real_2var_order1_2
    end interface differentiate_2
 
-   interface fill_with_NaNs_ad
+   interface fill_with_NaNs
       module procedure fill_with_NaNs_self
-   end interface fill_with_NaNs_ad
+   end interface fill_with_NaNs
    
    contains
 

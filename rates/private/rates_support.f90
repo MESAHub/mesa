@@ -297,7 +297,7 @@
 
          if (nrattab > 1) then ! create interpolants
             allocate(work(nrattab*mp_work_size,utils_OMP_GET_MAX_THREADS()), stat=ierr)
-            call fill_with_NaNs_2D(work)
+            call fill_with_NaNs(work)
             if (ierr /= 0) return
 !$OMP PARALLEL DO PRIVATE(i,operr,work1,f1,thread_num)
             do i=1,num_reactions

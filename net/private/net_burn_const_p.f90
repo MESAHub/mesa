@@ -30,7 +30,7 @@
       use net_def
       use rates_def, only: num_rvs
       use mtx_def
-      use utils_lib, only: fill_with_NaNs,fill_with_NaNs_2D
+      use utils_lib, only: fill_with_NaNs
       
       implicit none
 
@@ -555,7 +555,7 @@
             ld_dfdv = n
             allocate(dfdv(n,n),stat=ierr)
             if(g% fill_arrays_with_nans) then
-               call fill_with_NaNs_2D(dfdv)
+               call fill_with_NaNs(dfdv)
             end if
             if (ierr /= 0) return
             call burn_jacob(n,time,h,y,f,dfdv,ld_dfdv,lrpar,rpar,lipar,ipar,ierr)

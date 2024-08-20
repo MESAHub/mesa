@@ -68,11 +68,11 @@
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
+            if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% xh_old)
 
             call enlarge_if_needed_2(s% xa_old,s% species,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
-            if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
+            if (s% fill_arrays_with_NaNs) call fill_with_NaNs(s% xh_old)
 
             do k = 1, s% nz
                do j=1, s% nvar_hydro
@@ -188,8 +188,8 @@
 
          if (.not. s% RSP_flag) then
             if (s% fill_arrays_with_NaNs) then
-               call fill_with_NaNs_2d(s% xh)
-               call fill_with_NaNs_2d(s% xa)
+               call fill_with_NaNs(s% xh)
+               call fill_with_NaNs(s% xa)
             end if
             do k = 1, s% nz
                do j=1, s% nvar_hydro
