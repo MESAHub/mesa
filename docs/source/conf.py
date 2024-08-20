@@ -136,6 +136,7 @@ rst_prolog = r"""
 .. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
 .. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
 .. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
+.. |MESA VI| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`__
 .. |Msun| replace:: :math:`{\rm M}_\odot`
 .. |Lsun| replace:: :math:`{\rm L}_\odot`
 .. |Rsun| replace:: :math:`{\rm R}_\odot`
