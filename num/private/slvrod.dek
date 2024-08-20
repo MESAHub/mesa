@@ -40,8 +40,8 @@
       real(dp), pointer, dimension(:,:,:) :: uf_lblk, uf_dblk, uf_ublk
      
 !
-      if (hd.eq.0.d0) then
-         do  i=1,n
+      if (hd == 0.d0) then
+         do i=1,n
            ak(i)=dy(i)
          end do
       else
@@ -58,7 +58,7 @@
          if (nvar*nz /= n) stop 'bad nvar*nz /= n'
       
          if (not_stage1) then
-            !do  i=1,n
+            !do i=1,n
             !  write(*,*) 'in ak ynew', i, ak(i), ynew(i)
             !end do
             do i=1,n
@@ -66,7 +66,7 @@
             end do
          end if
 
-         !do  i=1,n
+         !do i=1,n
          !  write(*,*) 'in', i, ak(i)
          !end do
 
@@ -87,7 +87,7 @@
          
          
 
-         !do  i=1,n
+         !do i=1,n
          !  write(*,*) 'out', i, ak(i)
          !end do
          !write(*,*)
@@ -114,7 +114,7 @@
             sum = sum + abs(r_ary(i))
          end do
 
-         do  i=1,n
+         do i=1,n
            write(*,*) 'res', i, r_ary(i)
          end do
          write(*,*)
@@ -186,9 +186,9 @@
    9  continue
 ! ---  b is a banded matrix, jacobian a sparse matrix
       if (not_stage1) then
-      do  i=1,n
+      do i=1,n
          sum=0.d0
-         do  j=max(1,i-mlmas),min(n,i+mumas)
+         do j=max(1,i-mlmas),min(n,i+mumas)
             sum=sum+fmas(i-j+mbdiag,j)*ynew(j)
          end do
          ak(i)=ak(i)+sum
@@ -232,7 +232,7 @@
    2  continue
 ! ---  b=identity, jacobian a banded matrix
       if (not_stage1) then
-         !do  i=1,n
+         !do i=1,n
          !  write(*,*) 'in ak ynew', i, ak(i), ynew(i)
          !end do
          do i=1,n
@@ -240,13 +240,13 @@
          end do
       end if
 
-      !do  i=1,n
+      !do i=1,n
       !  write(*,*) 'in', i, ak(i)
       !end do
 
       call decsol(1,n,lde,e_1D,mle,mue,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)      
 
-      !do  i=1,n
+      !do i=1,n
       !  write(*,*) 'out', i, ak(i)
       !end do
       !write(*,*)
@@ -287,9 +287,9 @@
    3  continue
 ! ---  b is a banded matrix, jacobian a full matrix
       if (not_stage1) then
-      do  i=1,n
+      do i=1,n
          sum=0.d0
-         do  j=max(1,i-mlmas),min(n,i+mumas)
+         do j=max(1,i-mlmas),min(n,i+mumas)
             sum=sum+fmas(i-j+mbdiag,j)*ynew(j)
          end do
          ak(i)=ak(i)+sum
@@ -317,7 +317,7 @@
 !            ak(im1)=ak(im1)+sum
 !         end do
 !      end if
-!      if (ijob.eq.14) goto 45
+!      if (ijob == 14) goto 45
 !      goto 48
 !
 ! -----------------------------------------------------------
@@ -379,11 +379,13 @@
 ! ---  b is a full matrix, jacobian a banded matrix
 ! ---  this option is not provided
       if (not_stage1) then
-      do 624 i=1,n
+      do i=1,n
          sum=0.d0
-         do 623 j=1,n
-  623       sum=sum+fmas(i,j)*ynew(j)
-  624    ak(i)=ak(i)+sum
+         do j=1,n
+            sum=sum+fmas(i,j)*ynew(j)
+         end do
+         ak(i)=ak(i)+sum
+      end do
       call decsol(1,n,lde,e_1D,mle,mue,ak,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
       end if
       return
