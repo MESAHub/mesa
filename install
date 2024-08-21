@@ -363,21 +363,15 @@ do_one_parallel ionization
 if [ ! -r data/atm_data ]
 then
 	do_input_data atm
-fi
+fi 
 do_one atm
 
 do_one sample
-
 do_one_parallel gyre
-
 do_one adipls
-
 do_one_parallel star
-
 do_one_parallel binary
-
 do_one_parallel astero
-
 
 
 echo

@@ -20,40 +20,39 @@
 !
 ! ***********************************************************************
 
-      program test_mtx
-      use const_lib
-      use math_lib, only: math_init
-      use mtx_lib
-      use test_mtx_support
+program test_mtx
+   use const_lib
+   use math_lib, only: math_init
+   use mtx_lib
+   use test_mtx_support
 
-      use test_square
-      use test_square_quad
-      
-      use test_block_tri_dble, only: do_test_block_tri_dble
-      use test_block_tri_quad, only: do_test_block_tri_quad
-      
-      use utils_lib, only: mesa_error
+   use test_square
+   use test_square_quad
 
-      implicit none
-      
-      character (len=32) :: my_mesa_dir
-      integer :: ierr
+   use test_block_tri_dble, only: do_test_block_tri_dble
+   use test_block_tri_quad, only: do_test_block_tri_quad
 
-      my_mesa_dir = '../..'         
-      call const_init(my_mesa_dir,ierr)     
-      if (ierr /= 0) then
-         write(*,*) 'const_init failed'
-         call mesa_error(__FILE__,__LINE__)
-      end if        
-      
-      call math_init()
-      
-      call do_test_square
-      call do_test_square_quad
-      call do_test_block_tri_dble
-      call do_test_block_tri_quad      
-      call test_format_conversion      
+   use utils_lib, only: mesa_error
 
+   implicit none
 
-      end program
+   character(len=32) :: my_mesa_dir
+   integer :: ierr
+
+   my_mesa_dir = '../..'
+   call const_init(my_mesa_dir, ierr)
+   if (ierr /= 0) then
+      write (*, *) 'const_init failed'
+      call mesa_error(__FILE__, __LINE__)
+   end if
+
+   call math_init()
+
+   call do_test_square
+   call do_test_square_quad
+   call do_test_block_tri_dble
+   call do_test_block_tri_quad
+   call test_format_conversion
+
+end program
 

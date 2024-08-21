@@ -105,13 +105,14 @@ contains
       
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
-         gradr, grada, scale_height, mixing_length_alpha, &
+         gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
+      use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
-      type(auto_diff_real_star_order1), intent(in) :: gradr, grada, scale_height
+      type(auto_diff_real_star_order1), intent(in) :: gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
@@ -120,9 +121,11 @@ contains
               
       real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
       integer :: iso, old_mix_type
-      type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
+      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
       include 'formats'
       ierr = 0
+
+      gradr = gradr_in
       
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
@@ -145,7 +148,12 @@ contains
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
-      else         
+      else
+         ! starspot YREC routine
+         if (s% do_starspots) then
+            !dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+            call starspot_tweak_gradr(s, P, gradr_in, gradr)
+         end if
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -216,7 +224,7 @@ contains
 
       !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
-      ierr = 0          
+      ierr = 0
       if (k > 0) then
          s% tdc_num_iters(k) = 0
       end if
@@ -226,7 +234,6 @@ contains
          write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
-
 
 
       ! check if this particular k can be done with TDC
@@ -337,7 +344,7 @@ contains
                if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
-         end if         
+         end if
       end if 
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
@@ -348,7 +355,7 @@ contains
          Y_face = gradT - gradL
          conv_vel = 0d0
          D = 0d0
-         Gamma = 0d0            
+         Gamma = 0d0
       end if
 
       contains

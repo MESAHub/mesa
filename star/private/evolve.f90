@@ -536,7 +536,8 @@
             surf_omega_div_omega_crit_limit, dt
             
          integer :: ph_k, mdot_action
-         real(dp) :: implicit_mdot, ph_x, ph_L, iwind_tolerance, iwind_lambda
+         real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
+         real(dp) :: dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8
          integer :: iwind_redo_cnt, iwind_max_redo_cnt
          integer, parameter :: exit_loop = 1, cycle_loop = 0
 
@@ -798,7 +799,7 @@
             
             if (iwind_redo_cnt < iwind_max_redo_cnt .and. iwind_lambda > 0d0) then
                ! check mdot calculated at end of step
-               call get_phot_info(s, ph_x, ph_x, ph_x, ph_L, ph_x, ph_x, ph_x, ph_x, ph_x, ph_k)
+               call get_phot_info(s, dummy1, dummy2, dummy3, ph_L, dummy4, dummy5, dummy6, dummy7, dummy8, ph_k)
                call set_mdot(s, ph_L, s% mstar, s% Teff, ierr)
                if (ierr /= 0) then
                   do_step_part2 = retry

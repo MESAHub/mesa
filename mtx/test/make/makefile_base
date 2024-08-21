@@ -9,8 +9,8 @@ MESA_DIR = ../../..
 include $(MESA_DIR)/utils/makefile_header
 
 SRCS = \
-   test_mtx_support.f test_block_tri_dble.f test_block_tri_quad.f \
-   test_square.f test_square_quad.f test_mtx.f
+   test_mtx_support.f90 test_block_tri_dble.f90 test_block_tri_quad.f90 \
+   test_square.f90 test_square_quad.f90 test_mtx.f90
 
 #################################################################
 #
@@ -34,7 +34,7 @@ LOAD_OTHER = -L$(MESA_LIB_DIR) $(addprefix -l,$(LIBS_OTHER)) $(LOAD_LAPACK) $(LO
 
 TEST = $(TEST_DIR)/tester
 
-OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
+OBJS = $(patsubst %.f90,%.o,$(patsubst %.c,%.o,$(SRCS)))
 
 all : $(TEST)
 
@@ -47,7 +47,7 @@ else
 endif
 
 clean:
-	-@rm -f *.o *.mod .depend $(TEST) test_block_tri_dble.f test_block_tri_quad.f
+	-@rm -f *.o *.mod .depend $(TEST) test_block_tri_dble.f90 test_block_tri_quad.f90
 
 nodeps : $(.DEFAULT_GOAL)
 
@@ -57,7 +57,7 @@ nodeps : $(.DEFAULT_GOAL)
 
 PREPROCESS = $(FC) $(FCfree) $(FC_free_preprocess) -E
 
-test_block_tri_dble.f: test_block_tridiagonal.f
+test_block_tri_dble.f90: test_block_tridiagonal.f90
 ifneq ($(QUIET),)
 	@echo PREPROCESS $<
 	@$(PREPROCESS) -E -DDBLE $< > $@
@@ -65,7 +65,7 @@ else
 	$(PREPROCESS) -E -DDBLE $< > $@
 endif
 
-test_block_tri_quad.f: test_block_tridiagonal.f
+test_block_tri_quad.f90: test_block_tridiagonal.f90
 ifneq ($(QUIET),)
 	@echo PREPROCESS $<
 	@$(PREPROCESS) -E $< > $@
@@ -73,7 +73,7 @@ else
 	$(PREPROCESS) -E $< > $@
 endif
 
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfree) $<
@@ -87,7 +87,7 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 
