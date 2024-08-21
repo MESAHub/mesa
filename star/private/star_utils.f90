@@ -2963,9 +2963,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
-         integer :: b, q, vp1
-         real(qp) :: q1, q2
-         !logical, parameter :: dbg = .true.
+         integer :: vp1
          logical, parameter :: dbg = .false.
          include 'formats'
          
@@ -3377,7 +3375,7 @@
          type (star_info), pointer :: s
          character(len=*), intent(in) :: str
          logical, intent(in) :: advance
-         integer :: id, ierr, io
+         integer :: ierr, io
          if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
             open(newunit=io, file=trim(s% extra_terminal_output_file), &
