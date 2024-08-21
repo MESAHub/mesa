@@ -687,7 +687,7 @@ contains
 
        call set_penetration_velocities_(s, zi(i))
 
-       ! Set burn types and initial average abundances       
+       ! Set burn types and initial average abundances
 
        call set_burn_data_(s, zi(i))
        call set_abund_data_(s, zi(i))

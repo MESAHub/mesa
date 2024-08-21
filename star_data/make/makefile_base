@@ -108,11 +108,6 @@ FULLDEPS ?= yes
 # However, for when one is playing around with internals, in a way that doesn't 
 # affect public interfaces, it can be a time-saving measure to use order-only checking.
 
-# reminders for Bill: the name of the file must be the same as the name of the module
-       # and no upper case letters in filenames.
-       # use COMPILE_LEGACY for old files that do not comply with f2008 standards.
-       # use .f for fixed format, .f90 for free
-
 ifeq ($(filter clean,$(MAKECMDGOALS)),)
 
   DEPEND_DIRS = .:$(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)

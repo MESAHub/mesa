@@ -251,7 +251,7 @@
             old_chem_id(old_num_isos), old_net_iso(num_chem_isos)
          integer, intent(out) :: ierr
 
-         real(dp) :: &            
+         real(dp) :: &
             total_neut, total_h, total_he, total_c, total_n, total_o, &
             total_ne, total_mg, total_si, total_s, total_ar, total_ca, &
             total_fe, total_co, total_ni, other, &

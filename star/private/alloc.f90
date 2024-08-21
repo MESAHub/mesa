@@ -508,7 +508,7 @@
 
             if (action /= do_fill_arrays_with_NaNs) then
                ! these arrays must not be filled with NaNs  
-               ! because they contain the inputs to the step          
+               ! because they contain the inputs to the step
                call do2(s% xh, c% xh, nvar_hydro, 'xh')
                if (failed('xh')) exit
                call do2(s% xa, c% xa, species, 'xa')
@@ -526,7 +526,7 @@
                call do1(s% omega, c% omega)
                if (failed('omega')) exit
                call do1(s% j_rot, c% j_rot)
-               if (failed('j_rot')) exit               
+               if (failed('j_rot')) exit
                call do1(s% mlt_vc, c% mlt_vc)
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
@@ -573,7 +573,7 @@
             call do1(s% r_polar, c% r_polar)
             if (failed('r_polar')) exit
             call do1(s% r_equatorial, c% r_equatorial)
-            if (failed('r_equatorial')) exit               
+            if (failed('r_equatorial')) exit
 
             call do1(s% lnd, c% lnd)
             if (failed('lnd')) exit
@@ -769,7 +769,7 @@
             if (failed('dr_div_csound')) exit
 
             call do1(s% ergs_error, c% ergs_error)
-            if (failed('ergs_error')) exit            
+            if (failed('ergs_error')) exit
             call do1(s% gradr_factor, c% gradr_factor)
             if (failed('gradr_factor')) exit
             call do1(s% adjust_mlt_gradT_fraction, c% adjust_mlt_gradT_fraction)
