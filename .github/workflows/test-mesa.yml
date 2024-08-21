@@ -1,6 +1,6 @@
 name: Test Mesa
 
-on: [release]
+on: [pull_request, release]
 
 jobs:
   test_mesa:
