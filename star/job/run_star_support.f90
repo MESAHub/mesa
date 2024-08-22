@@ -184,7 +184,7 @@
          
          logical :: first_try
          integer :: id
-         integer :: result, model_number, source, nsteps, j, ci, nz
+         integer :: result, model_number
          
          include 'formats'
          
@@ -308,7 +308,6 @@
          end interface
          integer :: id_from_read_star_job
          character (len=*) :: inlist_fname, restart_filename
-         character (len=512) :: temp_fname
          logical, intent(in) :: dbg
          integer, intent(in) :: binary_id
          integer, intent(out) :: id, ierr
@@ -506,9 +505,8 @@
          integer, intent(in) :: id
          type (star_info), pointer :: s         
          integer, intent(out) :: ierr
-         integer :: k, model_number, j
-         real(dp) :: gamma1_integral, integral_norm
-         integer :: num_DT, num_PT, num_FreeEOS
+         integer :: model_number, j
+         integer :: num_DT, num_FreeEOS
          
          1 format(a35, 99(1pe26.16))
          2 format(a35, i7, 1pe26.16)
@@ -1134,7 +1132,6 @@
       
       logical function stop_is_requested(s)
          type (star_info), pointer :: s         
-         integer :: ierr
          logical :: file_exists
          stop_is_requested = .false.
          if (mod(s% model_number,100) /= 0) return
@@ -1167,9 +1164,8 @@
          real(dp) :: item_values(max_num_items)
          integer, target :: index_arry(max_num_items) 
          integer, pointer :: index(:) 
-         integer :: item_order(max_num_items)
          integer :: ierr, omp_num_threads, item_num, num_items, i, j
-         real(dp) :: total, misc, tmp
+         real(dp) :: total, tmp
          include 'formats'
          ierr = 0
          omp_num_threads = utils_OMP_GET_MAX_THREADS()
@@ -1257,8 +1253,7 @@
       end subroutine show_times
       
       
-      subroutine do_saves( &
-            id, ierr)
+      subroutine do_saves(id, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
 
@@ -1627,7 +1622,6 @@
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
          logical, parameter :: kap_use_cache = .true.
-         logical :: save_flag
          include 'formats'
       
          ierr = 0
@@ -1943,7 +1937,6 @@
          subroutine change_net(net_name)
             use const_def
             character (len=*), intent(in) :: net_name
-            integer :: j
             
             include 'formats'
             
@@ -1994,8 +1987,8 @@
          logical, intent(in) :: restart, pgstar_ok
          integer, intent(out) :: ierr
          
-         real(dp) :: log_m, log_lifetime, max_dt, max_timestep, minq, maxq
-         integer :: i, j, k, nzlo, nzhi, chem_id, chem_id1, chem_id2
+         real(dp) :: log_m, log_lifetime, max_dt, max_timestep
+         integer :: i, j, nzlo, nzhi, chem_id, chem_id1, chem_id2
          logical :: change_v, change_u
          include 'formats'
          
@@ -2988,7 +2981,7 @@
             integer :: num_pts, i, k, iounit
             ! these are needed to call eosPT_get
             real(dp) :: Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
-            real(dp) :: T, log10T
+            real(dp) :: log10T
             ! these are needed to call eosDT_get_T
             real(dp) :: T_guess_gas, T_guess_rad, logT_guess
             integer :: eos_calls
