@@ -58,7 +58,7 @@
       end subroutine do_phase_separation
 
       subroutine do_2component_phase_separation(s, dt, components, ierr)
-         use chem_def, only: chem_isos, ic12, io16, ine20
+         use chem_def, only: ic12, io16, ine20
          use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
@@ -150,7 +150,7 @@
       end subroutine do_2component_phase_separation
 
       subroutine move_one_zone(s,k,components)
-        use chem_def, only: chem_isos, ic12, io16, ine20
+        use chem_def, only: ic12, io16, ine20
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k

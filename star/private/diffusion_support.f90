@@ -79,8 +79,8 @@
          real(dp), dimension(:,:,:), intent(out) :: SIG_face, sigma_lnC
          integer, intent(out) :: ierr
          
-         integer :: i, j, jj, k, op_err, im
-         real(dp) :: dv_im, alfa, beta, cc, tmp, tinyX, dlamch, sfmin, &
+         integer :: i, j, k, op_err
+         real(dp) :: tmp, tinyX, dlamch, sfmin, &
             AD_dm_full_on, AD_dm_full_off, AD_boost_factor, sum_dm, &
             Vlimit_dm_full_on, Vlimit_dm_full_off, Vlimit, sigmax, &
             SIG_factor, GT_factor
@@ -283,7 +283,6 @@
          real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
          integer, intent(out) :: ierr
          
-         integer :: i, j
          real(dp), dimension(m) :: AP, AT, AR
          real(dp), dimension(m,m) :: kappa_st, Zdiff, Zdiff1, Zdiff2, AX
          
@@ -387,7 +386,7 @@
          real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda, alfa, Gamlo, Gamhi
          real(dp), dimension(m) :: charge, na
          real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff, Kdiff2
-         real(dp) :: Gamma, ai, lam_e, kappa, kappa_SM, Abar, Zbar, omegap
+         real(dp) :: Gamma, kappa_SM
          real(dp) :: Ddiff_Caplan(nc)
             
          do i = 1, nc
@@ -770,7 +769,7 @@
          real(dp), intent(inout) :: SIG_face(:,:) ! (nc,nc)
          
          integer :: i, j
-         real(dp) :: c, boost
+         real(dp) :: c
          
          include 'formats'
 
@@ -859,8 +858,8 @@
          real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:) ! (m)
          integer, intent(out) :: ierr
 
-         integer :: i, j, l, indx(n), nmax
-         real(dp) :: aamax, cc, ac, temp, ko, d, f
+         integer :: i, j, l, indx(n)
+         real(dp) :: cc, ac, ko, f
          real(dp), dimension(m,m) :: xx, y, yy, k
          real(dp), dimension(n) :: alpha, nu, ga, beta
          real(dp), dimension(n,n) :: delta, gamma
@@ -1085,7 +1084,7 @@
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
-        integer :: i,j,l,indx(n),nmax
+        integer :: i,j,l,indx(n)
         real(dp), dimension(n) :: alpha, beta, nu, ga
         ! Add in beta later for rad lev. ga is the temp holder for the
         ! columns of gamm when doing matrix solve one column at a time.
@@ -1252,7 +1251,7 @@
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
-        integer :: i,j,l,indx(n),nmax, rightshift, downshift
+        integer :: i,j,l,indx(n), rightshift, downshift
         real(dp), dimension(n) :: alpha, beta, nu, ga
         ! Add in beta later for rad lev. ga is the temp holder for the
         ! columns of gamm when doing matrix solve one column at a time.
@@ -1478,7 +1477,7 @@
         ! Fitting coefficients from Stanton & Murillo
         real(dp), dimension(2,3) :: a1,a2,a3,a4,a5,b0,b1,b2,b3,b4
         real(dp) :: lambda ! The screening length
-        integer :: i,j,k,facmo,no,mo ! Last two are used for different orders of collisions.
+        integer :: i,j,facmo,no,mo ! Last two are used for different orders of collisions.
 
         real(dp) :: lgp, gp1, gp2, gp3, gp4, gp5, kbT32, tmp
 

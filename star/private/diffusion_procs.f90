@@ -58,11 +58,8 @@
          real(dp), intent(out) :: bad_X, bad_sum, bad_Xsum
          integer, intent(out) :: bad_j, bad_k, ierr
 
-         integer :: i, j, jj, k, k1, op_err, rep, num_extreme, &
-            j_max, k_max, k_lo, k_hi, kk, cnt, maxcnt, nsmooth_x_in_fixup
-         real(dp) :: max_lnT_for_smooth, sum_m, m_00, dm, source_mass, frac, err, &
-            max_abs_dx, xm1, x00, xp1, m0, sum0, m1, sum1, x_new, xtotal_new, &
-            sum_m1, sum_00, sum_p1, m_m1, m_p1, xavg, dm_m1, dm_p1, x1
+         integer :: j, k, op_err, nsmooth_x_in_fixup
+         real(dp) :: max_lnT_for_smooth
 
          logical :: dbg
 
@@ -710,7 +707,7 @@
 
          integer :: k_source, max_iters, k, i, j
          real(dp) :: source_cell_mass, remaining_source_mass, cell_dm_k, &
-            remaining_needed_mass, frac, sumX, total_source, total_moved, &
+            remaining_needed_mass, sumX, total_source, total_moved, &
             dm0, dm1, old_sum, new_sum, mtotal, err, dm, diff_dm
          logical :: okay, dbg
 
@@ -1078,7 +1075,7 @@
          real(dp), dimension(:), intent(out) :: xm_face
          integer, intent(out) :: kmax_rad_accel, ierr
 
-         integer :: i, k, j, op_err, kmax
+         integer :: i, k, j, kmax
 
          logical, parameter :: dbg = .false.
 
@@ -1242,13 +1239,11 @@
             log10_g_rad, g_rad, rad_accel_face
          integer, intent(out) :: ierr
 
-         integer :: iZ(nc), iZ_rad(nc), n, i, j, k, kk, kmax, op_err, sz, offset, &
-            nptot, ipe, nrad, thread_num, k1, k2, dk
+         integer :: iZ(nc), iZ_rad(nc), i, j, k, kk, kmax, op_err, k1, k2, dk
          real(dp) :: alfa, beta, X_face(nc), blend_fac(-15:15)
 
 
-         integer :: np = 28016
-         real(dp) :: fk(17), fk_all(ngp,17), delta, blend
+         real(dp) :: fk(17), delta, blend
          character(len=4) :: e_name
 
          logical, parameter :: dbg = .false.
@@ -1401,7 +1396,7 @@
          integer, intent(out) :: ierr
 
          integer :: i, ii
-         real(dp) :: tot, logT, logRho, flux
+         real(dp) :: logT, logRho
          real(dp), dimension(17) ::lgrad, fk
          integer :: iZ_rad2(17)
          character(len=4) :: e_name

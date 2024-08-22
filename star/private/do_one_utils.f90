@@ -120,7 +120,7 @@
       
       subroutine do_show_terminal_header(s)
          type (star_info), pointer :: s
-         integer :: id, ierr, io
+         integer :: ierr, io
          call output_terminal_header(s,terminal_iounit)
          if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
@@ -234,7 +234,7 @@
       
       subroutine do_terminal_summary(s)
          type (star_info), pointer :: s
-         integer :: id, ierr, io
+         integer :: ierr, io
          call output_terminal_summary(s,terminal_iounit)
          if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
@@ -574,13 +574,13 @@
          use star_utils
          integer, intent(in) :: id
          type (star_info), pointer :: s
-         integer :: ierr, i, j, k, cid, k_burn, k_omega, nz, max_abs_vel_loc, &
+         integer :: ierr, i, j, k, cid, k_omega, nz, max_abs_vel_loc, &
             period_number, max_period_number
          real(dp) :: log_surface_gravity, log_surface_temperature, log_surface_density, &
             log_surface_pressure, v_div_csound_max, remnant_mass, ejecta_mass, &
             power_nuc_burn, power_h_burn, power_he_burn, power_z_burn, logQ, max_logQ, min_logQ, &
             envelope_fraction_left, avg_x, v_surf, csound_surf, delta_nu, v_surf_div_v_esc, &
-            ratio, dt_C, peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
+            peak_burn_vconv_div_cs, min_pgas_div_p, v_surf_div_v_kh, GREKM_avg_abs, &
             max_omega_div_omega_crit, omega_div_omega_crit, log_Teff, Lnuc_div_L, max_abs_vel, &
             species_mass_for_min_limit, species_mass_for_max_limit, center_gamma
             
@@ -1480,7 +1480,7 @@
          real(dp), parameter :: log_he_temp = 7.8d0
          real(dp), parameter :: d_tau_min = 1d-2, d_tau_max = 1d0
          real(dp), parameter :: little_step_factor = 10d0, little_step_size = 10d0
-         real(dp) :: v, surf_grav, power_he_burn, power_z_burn, &
+         real(dp) :: v, power_he_burn, power_z_burn, &
             power_neutrinos
          integer :: model, profile_priority, ierr
          integer, parameter :: tau_ramp = 50
