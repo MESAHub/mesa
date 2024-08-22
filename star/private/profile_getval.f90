@@ -252,7 +252,7 @@
       real(dp) function get_profile_val(s, id, k)
          type (star_info), pointer :: s
          integer, intent(in) :: id, k
-         integer :: ii, int_val
+         integer :: int_val
          logical :: int_flag
          if (id > max_profile_offset) then ! get from extras
             get_profile_val = s% extra_profile_col_vals(k, id - max_profile_offset)
@@ -276,13 +276,12 @@
          integer, intent(out) :: int_val
          logical, intent(inout) :: int_flag
 
-         real(dp) :: cno, z, x, frac, eps, eps_alt, L_rad, L_edd, Pbar_00, Pbar_p1, &
-            P_face, rho_face, dr, v, r00, rp1, v00, vp1, A00, Ap1, Amid, &
-            r00_start, rp1_start, dr3, dr3_start, d_drL, d_drR, flxR, mmid, &
+         real(dp) :: cno, z, x, L_rad, L_edd, &
+            r00, rp1, v00, vp1, Ap1, &
+            r00_start, rp1_start, dr3, dr3_start, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
-         integer :: j, nz, ionization_k, klo, khi, i, ii, kk, ierr
-         real(dp) :: ionization_res(num_ion_vals)
-         real(dp) :: f, lgT, full_on, full_off, am_nu_factor, Lconv, conv_vel
+         integer :: j, nz, ionization_k, klo, khi, i, ii
+         real(dp) :: f, lgT, full_on, full_off, am_nu_factor
          logical :: rsp_or_w
          include 'formats'
 
@@ -2358,7 +2357,7 @@
          real(dp) function get_dlogX_dlogP(j, k)
             integer, intent(in) :: j, k
             integer :: ii, i
-            real(dp) :: val, x00, xm1, dlogP, dlogX
+            real(dp) :: x00, xm1, dlogP, dlogX
             include 'formats'
             get_dlogx_dlogp = 0
             if (k > 1) then
@@ -2381,7 +2380,7 @@
          real(dp) function get_dlog_eps_dlogP(cat, k)
             integer, intent(in) :: cat, k
             integer :: ii
-            real(dp) :: val, eps, epsm1, dlogP, dlog_eps
+            real(dp) :: eps, epsm1, dlogP, dlog_eps
             get_dlog_eps_dlogP = 0
             if (k > 1) then
                ii = k
