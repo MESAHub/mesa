@@ -145,19 +145,14 @@
 
       subroutine do_report(s, ierr)
          use rates_def, only: &
-            i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
+            i_rate, i_rate_dRho, i_rate_dT
          use star_utils, only: get_phot_info
          use hydro_rotation, only: set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, i, j, ic, nz, kcore, &
-            h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
-            twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
-            prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
-            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum,&
-            mass_sum
+         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
+         real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
          logical, parameter :: new_only = .false.
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
@@ -500,7 +495,6 @@
             use interp_1d_def
             use interp_1d_lib
             real(dp), intent(in) :: q
-            real(dp) :: vp2, vp1, v00, vm1
             integer, parameter :: n_old = 4, n_new = 1, nwork = pm_work_size
             real(dp) :: qlo, x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
             integer :: k, nz, k00, ierr
@@ -853,7 +847,7 @@
          real(dp), pointer, intent(in) :: cell_masses(:)
          integer, intent(out) :: ierr
 
-         integer :: k, nz, j, nzlo, nzhi, kbdy, nzlo_prev
+         integer :: k, nz, j
          real(dp) :: cell_mass
          integer, pointer :: net_iso(:)
 
@@ -1216,7 +1210,7 @@
             core_m, core_r, core_lgT, core_lgRho, core_L, core_v, &
             core_omega, core_omega_div_omega_crit
 
-         integer :: j, jm1, j00
+         integer :: jm1, j00
          real(dp) :: dm1, d00, qm1, q00, core_q, &
             core_lgP, core_g, core_X, core_Y, &
             core_scale_height, core_dlnX_dr, core_dlnY_dr, core_dlnRho_dr
@@ -1271,8 +1265,8 @@
             bdy_scale_height, bdy_dlnX_dr, bdy_dlnY_dr, bdy_dlnRho_dr, &
             bdy_omega, bdy_omega_div_omega_crit
 
-         real(dp) :: x, x0, x1, x2, alfa, beta, bdy_omega_crit
-         integer :: k, ii, klo, khi
+         real(dp) :: x, x0, x1, x2, alfa, bdy_omega_crit
+         integer :: k, klo, khi
 
          include 'formats'
 
