@@ -588,16 +588,16 @@
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
          integer :: &
-            j, k, k0, k_max, i, nz, kmin, kmax, cnt, y_color, clr_sav, id, &
+            j, k, nz, y_color, clr_sav, id, &
             other_y_color, grid_min, grid_max, npts, yaxis_id, other_yaxis_id, ishape
-         real :: del, xpos, ypos, panel_dy, panel_ybot, panel_ytop, &
-            dx, dy, xpos0, dxpos, dypos, dxval, other_ytop, other_ybot, &
-            ybot, ytop, xmin, xmax, xleft, xright, xwidth, panels_xmargin, &
+         real :: panel_dy, panel_ybot, panel_ytop, &
+            dx, other_ytop, other_ybot, &
+            ybot, ytop, xmin, xmax, xleft, xright, panels_xmargin, &
             panels_xmin, panels_xmax, xwidth_left_frac, xwidth_right_frac, &
             xwidth_left_of_shock, xwidth_right_of_shock, shock_xmin, shock_xmax, &
             xshock_sp
-         real(dp) :: cs, x00, xp1, ms, photosphere_logxm, xshock
-         character (len=strlen) :: str, xname, yname, other_yname
+         real(dp) :: photosphere_logxm, xshock
+         character (len=strlen) :: xname, yname, other_yname
          logical :: found_shock
          real, allocatable, dimension(:) :: xvec, yvec, other_yvec, unshifted_xvec
          real, allocatable, dimension(:) :: yfile_xdata, other_yfile_xdata
