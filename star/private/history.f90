@@ -3285,7 +3285,7 @@ contains
       integer :: i, c, int_val, ierr, n, t, j, iounit
       real(dp) :: val, epsnuc_out(12), v_surf, csound_surf, envelope_fraction_left
       logical :: is_int_val, special_case
-      character (len = strlen) :: buffer, string
+      character (len = strlen) :: string
 
       include 'formats'
       ierr = 0
