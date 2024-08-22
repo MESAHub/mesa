@@ -71,16 +71,16 @@
          integer, intent(out) :: ierr
 
          integer :: &
-            i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
+            i_dv_dt, i_du_dt, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
             i_dalpha_RTI_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
-            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_w_div_wc, i_j_rot, &
-            i_alpha_RTI, i_xh1, i_xhe4, kmax_equ(nvar), species
-         real(dp) :: max_equ(nvar), L_phot_old
+            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_w_div_wc, i_j_rot, &
+            i_alpha_RTI, i_xh1, i_xhe4, species
+         real(dp) :: L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
-         logical :: v_flag, u_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
+         logical :: v_flag, u_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
             do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
 
@@ -318,7 +318,7 @@
          contains
 
          subroutine dump_equ
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -602,7 +602,7 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
+         real(dp) :: wwc
          real(dp) :: jr_lim1, jr_lim2, A, C
          type(auto_diff_real_star_order1) :: &
             w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
@@ -825,10 +825,9 @@
                dlnT_bc_dlnd, dlnT_bc_dlnT, dlnT_bc_dlnR, &
                dlnT_bc_dL, dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
                dlnkap_dlnd, dlnkap_dlnT, dPinv_dlnd, dPinv_dlnT, dP0, dT0, &
-               P_surf, T_surf, dlnP_bc_dlnPsurf, P_rad, &
+               P_surf, T_surf, dlnP_bc_dlnPsurf, &
                dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
                dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-               dlnP_dlnE_c_Rho, &
                d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
                dlnR00, dlnT00, dlnd00
             logical, parameter :: skip_partials = .false.

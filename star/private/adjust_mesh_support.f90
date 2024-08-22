@@ -56,11 +56,11 @@
          logical, intent(out), dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
 
-         integer :: j, k, other_ierr
+         integer :: j, k
          logical, parameter :: dbg = .false.
          real(dp), allocatable, dimension(:) :: src
          real(dp) :: eps_min_for_delta, &
-               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on, alfa_czb
+               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on
          real(dp), dimension(:,:), pointer :: gvals
 
          gvals(1:nz,1:num_gvals) => gvals1(1:nz*num_gvals)
