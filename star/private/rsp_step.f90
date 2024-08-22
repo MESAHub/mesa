@@ -43,8 +43,6 @@
       
       logical, parameter :: call_is_bad = .false.
       
-      real(dp) :: x_dbg
-      
       integer, parameter :: i_var_Vol = 99 ! for remeshing tests with dfridr
       
       integer, parameter :: &
@@ -3867,6 +3865,3 @@
 
 
       end module rsp_step
-      
-      
-            
