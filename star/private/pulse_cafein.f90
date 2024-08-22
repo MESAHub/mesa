@@ -299,7 +299,6 @@ contains
       real(dp) :: rho
       real(dp) :: P
       real(dp) :: T
-      real(dp) :: g
       real(dp) :: kap_rho
       real(dp) :: kap_T
       real(dp) :: kap_ad

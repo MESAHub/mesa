@@ -537,8 +537,6 @@ contains
       integer, intent(in) :: j
       integer, intent(in) :: k_a
       integer, intent(in) :: k_b
-
-      real(dp) :: dq_center
       
       ! Store data for the center into the point_data array at position j
 

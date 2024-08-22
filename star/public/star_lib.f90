@@ -558,7 +558,7 @@
             ! false if this is a repeat for a retry
          type (star_info), pointer :: s
          integer :: ierr
-         integer(8) :: time0, clock_rate
+         integer(8) :: time0
          real(dp) :: total
          star_evolve_step = terminate
          ierr = 0
@@ -2097,7 +2097,7 @@
             res, dres_dlnRho, dres_dlnT
          real(dp), intent(out) :: dres_dxa(:,:)
          integer, intent(out) :: ierr
-         type (star_info), pointer :: s
+         !type (star_info), pointer :: s
          !ierr = 0
          !call star_ptr(id, s, ierr)
          !if (ierr /= 0) return

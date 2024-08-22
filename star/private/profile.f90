@@ -60,7 +60,7 @@
          logical, intent(in) :: report
          integer, intent(out) :: ierr
 
-         integer :: iounit, n, i, t, id, j, k, num, nxt_spec, spec_err
+         integer :: iounit, n, i, t, j, k, nxt_spec, spec_err
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
 
@@ -379,9 +379,9 @@
          logical, pointer :: is_int(:)
          integer, intent(out) :: ierr
 
-         real(dp) :: msum, mstar, dt, Lnuc, frac
+         real(dp) :: mstar, dt
          integer :: io, i, j, jj, nz, col, k, kk, n, species, &
-            h1, he4, num_specs, numcols, num_extra_cols, num_extra_header_items, num_digits
+            num_specs, numcols, num_extra_cols, num_extra_header_items, num_digits
          integer, pointer :: chem_id(:)
          logical, parameter :: dbg = .false.
          character (len=strlen) :: fname1, dbl_fmt, int_fmt, txt_fmt, fname_out, fstring, str
@@ -807,7 +807,7 @@
             use profile_getval, only: getval_for_profile
             integer, intent(in) :: pass, j, jj, k
             integer :: i, c, int_val, ir
-            real(dp) :: val, cno, z, dr, eps, eps_alt
+            real(dp) :: val
             logical :: int_flag
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
@@ -911,7 +911,7 @@
          subroutine do_abundance_col(pass, j, jj, k)
             integer, intent(in) :: pass, j, jj, k
             real(dp) :: val
-            logical :: int_flag, log_abundance
+            logical :: log_abundance
             character (len=128) :: col_name
             logical, parameter :: dbg = .false.
             include 'formats'
@@ -952,7 +952,7 @@
          integer, intent(out) :: ierr
 
          integer, pointer, dimension(:) :: model_numbers, model_priorities, model_logs
-         integer :: nz, max_num_mods, num_models, model_profile_number, k
+         integer :: nz, max_num_mods, num_models, model_profile_number
          character (len=strlen) :: fname
          integer :: model_priority
 
@@ -1169,8 +1169,7 @@
          ! sets s% model_profile_filename and s% model_controls_filename
          type (star_info), pointer :: s
          integer, intent(in) :: model_profile_number
-         character (len=strlen) :: &
-            profile_prefix, controls_prefix, model_prefix, num_str, fstring
+         character (len=strlen) :: profile_prefix, controls_prefix, model_prefix, fstring
          integer :: num_digits
 
          profile_prefix = trim(s% log_directory) // '/' // trim(s% profile_data_prefix)

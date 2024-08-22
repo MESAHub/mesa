@@ -38,8 +38,6 @@
       contains
 
 
-
-
       subroutine do_clear_neu_for_cell(s,k,ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -59,8 +57,7 @@
       subroutine do_neu_for_cell(s,k,ierr)
          use neu_def
          use neu_lib
-         use chem_def, only: chem_isos
-         use const_def,only:ln10
+         use const_def, only:ln10
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
@@ -70,7 +67,6 @@
          real(dp) :: log10_rho, log10_T
          real(dp), parameter :: log10_Tlim = 7.5d0
          logical :: flags(num_neu_types) ! true if should include the type of loss
-         integer :: j
 
          include 'formats'
 
@@ -137,7 +133,6 @@
          end if
 
       end subroutine do_neu_for_cell
-
 
 
       end module neu

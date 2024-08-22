@@ -102,21 +102,20 @@
       real(dp) :: GGXM,GGX0,GGXP,GGY0,GGYP,GG,GPF
       real(dp) :: DFCX0,DFCXM,DFCXP,DFCY0,DFCYP,DFCZ0,DFCZP
       real(dp) :: DFCMX0,DFCMXM,DFCMXP,DFCMY0,DFCMYP,DFCMZ0,DFCMZP
-      real(dp) :: FLIM,FLD
       real(dp) :: T1,DLR,DLRP,DLRM,DLT,DLTP,DLMR,DLMRP,DLMRM,DLMT,DLMTP
       real(dp) :: W_00,W_out,BW,BK,T2,T3,DLK,DLKP,MINI
-      real(dp) :: T4,T5,P2,P3,P5,P6,P7,P8,P9,P10,POM3,POM2,POM,POM4
+      real(dp) :: T4,POM3,POM2,POM,POM4
       integer :: I,J,NZN3,IG,IE,IR,IC,INFO,IMI,LD_VL,LD_VR,n,op_err
-      real(dp) :: RES(12),VRRS(15),Q(15)
+      real(dp) :: VRRS(15),Q(15)
       character (len=250) FILENAME
       character (len=1) NUMER1
       character (len=2) NUMER2
-      complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),CPOM,DPEV,dP_dT_00URB
+      complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),DPEV,dP_dT_00URB
       real(dp) :: SGRP,SGRM
       real(dp) :: PSIG,TEMI,TEMM,TEM1
       real(dp) :: NORMC
       real(dp) :: QCHECK(15),ETOIEV(15),QWKPT(1000,15),ETOIPT(15),SGR(15)
-      real(dp) :: TT4,TT4P,EFL02   
+      real(dp) :: EFL02   
       real(dp) :: ETOI(15)
       
       !write(*,'(a55,i12,99(1pd26.16))') 'start LINA s% w(2)**2', &

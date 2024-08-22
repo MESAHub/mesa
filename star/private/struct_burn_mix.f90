@@ -273,10 +273,8 @@
 
 
       subroutine save_start_values(s, ierr)
-         use chem_def, only: num_categories
          use hydro_rsp2, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category
-         use chem_def, only: ih1
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j
@@ -513,7 +511,7 @@
 
          logical :: converged
          integer :: k, species, ierr, j1, j2, gold_tolerances_level
-         real(dp) :: r003, maxT
+         real(dp) :: maxT
 
          include 'formats'
 
@@ -967,7 +965,7 @@
          use net_lib, only: net_1_zone_burn_const_density, net_1_zone_burn, &
             show_net_reactions_and_info
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs
-         use chem_def, only: chem_isos, num_categories, category_name
+         use chem_def, only: num_categories
          use net, only: do1_net
          use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
@@ -1185,7 +1183,6 @@
 
 
          subroutine burn_finish_substep(nstp, time, y, ierr)
-            use chem_def, only: category_name
             integer,intent(in) :: nstp
             real(dp), intent(in) :: time, y(:)
             integer, intent(out) :: ierr
