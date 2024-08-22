@@ -315,7 +315,7 @@
          if (odd_storage(nlevel)% ul_size < min_sz) then
             if (odd_storage(nlevel)% ul_size > 0) &
                deallocate(odd_storage(nlevel)% umat1, odd_storage(nlevel)% lmat1)         
-            new_sz = min_sz*1.1 + 100
+            new_sz = FLOOR(min_sz*1.1) + 100
             odd_storage(nlevel)% ul_size = new_sz
             allocate (odd_storage(nlevel)% umat1(new_sz), &
                       odd_storage(nlevel)% lmat1(new_sz), stat=ierr)
