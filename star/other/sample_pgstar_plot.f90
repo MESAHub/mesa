@@ -207,8 +207,8 @@ contains
       real, intent(in) :: winxmin, winxmax, winymin, winymax, label_scale
       integer, intent(out) :: ierr
 
-      real :: windy, xmargin
-      real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy
+      real :: xmargin
+      real :: xmin, xmax, xleft, xright, dx, ymin, ymax, ymin2, ymax2, dy
       integer :: grid_min, grid_max, npts, nz
       real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
 
@@ -253,8 +253,7 @@ contains
          integer, intent(out) :: ierr
 
          integer :: lw, lw_sav, k
-         real :: ybot, eps, &
-                 default_ymax_left, default_ymin_left, &
+         real :: default_ymax_left, default_ymin_left, &
                  default_ymax_right, default_ymin_right
          character(len=128) :: str
 

@@ -95,12 +95,12 @@ contains
    contains
 
       subroutine my_burn_finish_substep(nstp, time, y, ierr)
-         use chem_def, only: category_name
+         !use chem_def, only: category_name
          integer, intent(in) :: nstp
          real(dp), intent(in) :: time, y(:)
          integer, intent(out) :: ierr
-         real(dp) :: frac, step_time
-         integer :: j, i
+         !real(dp) :: frac
+         !integer :: j, i
          include 'formats'
          ierr = 0
          ! This routine does nothing other than set ierr = 0,
