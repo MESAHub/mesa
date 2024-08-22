@@ -59,7 +59,7 @@
             num_gvals, j, cid, cid_max, unchanged, split, merged, revised
          type (star_info), target :: copy_info
          type (star_info), pointer :: c, prv
-         real(dp) :: delta_coeff, LH, sum_L_other, sum_L_other_limit, A_max, &
+         real(dp) :: delta_coeff, sum_L_other, sum_L_other_limit, A_max, &
             mesh_max_allowed_ratio, tmp, J_tot1, J_tot2, center_logT, alfa, beta, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          real(dp), pointer, dimension(:) :: &
@@ -71,7 +71,6 @@
          character (len=32) :: gval_names(max_allowed_gvals)
          logical, dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
-         logical :: changed_mesh
          logical, parameter :: dbg = .false.
 
          real(dp), parameter :: max_sum_abs = 10d0
@@ -528,7 +527,7 @@
          subroutine set_types_of_new_cells(cell_type, ierr)
             integer, pointer :: cell_type(:)
             integer, intent(out) :: ierr
-            integer :: k, k_old, k_old_prev, new_type
+            integer :: k, k_old, new_type
 
             include 'formats'
             ierr = 0

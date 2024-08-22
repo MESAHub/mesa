@@ -39,7 +39,7 @@
       public :: do_rsp_build
 
       real(dp) :: PREC,FSUB,TIN,CFIDDLE,ALF, &
-         HHFAC,DdmFAC,SVEL,EFL02,EMR,ELR, &
+         HHFAC,DdmFAC,EFL02,EMR,ELR, &
          E_0,E_1,T_0,T_1,V_0,V_1,P_0,P_1,QQ_0,QQ_1, &
          CP_0,CP_1,OP_0,OP_1,R_1,M_0,dm_bar_0
       real(dp), dimension(15) :: PERS,ETO
@@ -60,28 +60,17 @@
       real(dp) :: H,dmN
       integer :: NMODES            ! ilosc modow rozwazanych (N=NMODES)
       integer :: NDIM1,NDIM2       ! maks. ilosc modow/warstw 
-      real(dp) :: VEL0(15)
-      character (len=10) PARA
-      character (len=30) HEAD
-      character (len=72) HEAD2      
-      integer :: I,J,kk,NSEQ,NIT
-      real(dp) ::  GEFF,MBOL,DU,TET
-      integer :: IARG
-      character (len=8) II1,II2,II3,II4,II5
-      character (len=15) PROGNAME
+      real(dp) :: VEL0(15) 
+      integer :: I,J,kk,NSEQ
+      real(dp) ::  GEFF,MBOL
       character (len=250) FILENAME
-      integer :: IFROZEN,IRELAX,ICASTOR
       
-      integer :: IO,II,IX,iter
-      real(dp) :: SS,AA,BB,XX
+      integer :: IO,II
+      real(dp) :: SS, AA, BB
       real(dp), allocatable :: TA(:), VEL(:,:), TEMP(:)
-      real(dp) :: TAUTEFF,TAUATTEFF
+      real(dp) :: TAUTEFF, TAUATTEFF
       logical RELAX
-      complex(8) xC
-      real(dp) :: X1,X2,Y1,Y2,amix1,amix2
-      integer :: ISTAT
-      type (star_info), target :: copy_info
-      type (star_info), pointer :: c, prv
+      real(dp) :: amix1, amix2
       
       ierr = 0
    
@@ -333,14 +322,12 @@
          integer, intent(out) :: ierr
       
          real(dp) :: dmN,dm_0,H,Psurf,DDT
-         real(dp) :: OPVV,OPTT,POM
          real(dp) :: GPF
-         real(dp) :: DTN,DTLAST,RS00,RIN
-         real(dp) :: F2,F1,D,HH,TT,RAMA,dmL
-         real(dp) :: T4_1,RM,T4_0,WE,TNL,dmNL
+         real(dp) :: F2,F1,D,HH,TT,dmL
+         real(dp) :: T4_1,RM,T4_0,WE,dmNL
          real(dp) :: FACQ,HH1,HH2
-         integer :: N,N1,N2,I,ITIN,dmN_cnt,NCHANG,IG,H_cnt
-         real(dp) :: HP_0,HP_1,IGR_0,IGR_1,PII,w_0
+         integer :: N,N1,I,ITIN,dmN_cnt,NCHANG,IG,H_cnt
+         real(dp) :: HP_0,HP_1,IGR_0,IGR_1,w_0
          real(dp) :: Lr_0,Lc_0,SVEL_0,HSTART,tau_sum,TH0_tol,TIN_tol, &
             dmN_too_large, dmN_too_small, H_too_large, H_too_small
          logical :: adjusting_dmN, in_photosphere, in_outer_env, &
@@ -680,10 +667,8 @@
          use num_lib, only: safe_root_with_brackets
          real(dp) :: Tmax, epsx, epsy, residual, lnT, &
             lnT_min, lnT_max, resid_T_min, resid_T_max, dfdx
-         integer :: i, n, ierr
+         integer :: n, ierr
          integer, parameter :: lrpar=1, lipar=1, imax=50
-         real(dp), target :: rpar_target(lrpar)
-         integer, target :: ipar_target(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          include 'formats'
@@ -861,9 +846,9 @@
       subroutine ZNVAR(s,H,dmN,L,TE,M,ierr)
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
-      real(dp) :: H,dmN,L,TE,M,ha,Psurf
-      real(dp) :: T0,R,TAU0,Pdm,CKP,P,PZ,V,OP,DU1,DU2,CP,QQ, &
-         dtau, kap, alfa, G_M_dtau_div_R2, Prad, Pgas_0, Pgas_1, &
+      real(dp) :: H,dmN,L,TE,M,Psurf
+      real(dp) :: T0,R,TAU0,P,V, &
+         dtau, kap, alfa, G_M_dtau_div_R2, Prad, Pgas_0, &
          dP_dV, dkap_dV, xx, residual, d_residual_dlnV, &
          dkap_dlnV, dlnV, dP_dlnV, lnV
       integer :: I

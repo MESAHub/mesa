@@ -88,8 +88,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         integer :: k, i, j,  nz
-         real(dp) :: u00, um1, xm, total_radiation
+         integer :: k, nz
          include 'formats'
          ierr = 0
          nz = s% nz
@@ -218,12 +217,12 @@
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
 
-         integer :: iounit, n, i, k, t, file_type, &
+         integer :: iounit, n, i, t, file_type, &
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
             tau_factor, Tsurf_factor, opacity_factor, mixing_length_alpha
-         character (len=strlen) :: buffer, string, message
+         character (len=strlen) :: buffer, string
          character (len=net_name_len) :: net_name
          character(len=iso_name_length), pointer :: names(:) ! (species)
          integer, pointer :: perm(:) ! (species)
@@ -469,7 +468,6 @@
          subroutine read_prev_properties
             character (len=132) :: line
             real(dp) :: tmp, skip_val
-            integer :: i
             include 'formats'
             
             ierr = 0
@@ -540,7 +538,6 @@
             i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
-         real(dp) :: r00, rm1
          integer :: nvec
 
          include 'formats'

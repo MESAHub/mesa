@@ -3092,7 +3092,6 @@
          integer, intent(in) :: level
          integer, intent(out) :: ierr
          logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen) :: message
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
 

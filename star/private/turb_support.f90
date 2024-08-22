@@ -119,8 +119,8 @@ contains
          gradT, Y_face, mlt_vc, D, Gamma
       integer, intent(out) :: ierr 
               
-      real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
-      integer :: iso, old_mix_type
+      real(dp) :: cgrav, m, XH1
+      integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
       include 'formats'
       ierr = 0
@@ -190,8 +190,7 @@ contains
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
-
-      character (len=256) :: message        
+     
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'

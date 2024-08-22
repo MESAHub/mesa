@@ -40,7 +40,6 @@
       real(dp) :: X, Z, Y, G, abar, zbar, z2bar, z53bar, ye
       real (dp) :: Tmin,eps,R_try
 
-
       integer, parameter :: max_species=1000
       real(dp) :: xa(max_species)
       integer, pointer, dimension(:) :: net_iso, chem_id
@@ -76,7 +75,6 @@
       end subroutine get_create_star_ptr
 
 
-
       subroutine build_initial_model(s, ierr)
          use chem_lib, only: basic_composition_info, chem_Xsol
          use adjust_xyz, only: get_xa_for_standard_metals
@@ -88,7 +86,7 @@
 
          integer :: initial_zfracs, i_lum, i, j, k, itry, max_try, id0, id1, id2
          real(dp) :: M, R, initial_y, initial_h1, initial_h2, initial_he3, initial_he4, &
-            S0, Pc0, rhoc0, e0(2), S1, Pc1, e1(2), S2, Pc2, e2(2), det, dPc, dS, safefac, &
+            S0, Pc0, e0(2), S1, Pc1, e1(2), S2, Pc2, e2(2), det, dPc, dS, safefac, &
             initial_z, xsol_he3, xsol_he4, mass_correction, mat(2,2), minv(2,2), sumx
          type (create_star_info), pointer :: cs
 
@@ -255,13 +253,13 @@
       end subroutine build_initial_model
 
 
-
       ! output
       !errvec(1)=(mass-M)/M
       !errvec(2)=(radius-R)/R
       subroutine PSerrfunc(id,Pcguess,Sguess,M,R,errvec)
          integer, intent(in) :: id
-         real(dp) :: Pcguess,Sguess,M,R,errvec(2)
+         real(dp), intent(in) :: Pcguess,Sguess,M,R
+         real(dp), intent(out) :: errvec(2)
 
          integer :: ierr
          real(dp) :: rhoc,Tc,Pc,S
@@ -401,7 +399,6 @@
       end subroutine PSerrfunc
 
 
-
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -411,7 +408,8 @@
 
       subroutine derivs(cs,P,S,y,dydP)
          type (create_star_info), pointer :: cs
-         real(dp) :: P,S,y(3),dydP(3)
+         real(dp), intent(in) :: P,S,y(3)
+         real(dp), intent(out) :: dydP(3)
          real(dp) :: r,m,T,rho,intdmT
 
          r=y(1)
@@ -433,7 +431,8 @@
          use kap_def, only: num_kap_fracs
          use kap_lib
          type (create_star_info), pointer :: cs
-         real(dp) :: logrho,logT,kap
+         real(dp), intent(in) :: logrho,logT
+         real(dp), intent(out) :: kap
          real(dp) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
          real(dp) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp) :: dlnkap_dlnRho, dlnkap_dlnT
@@ -473,7 +472,8 @@
          use eos_lib
          use eos_def
          type (create_star_info), pointer :: cs
-         real(dp) :: P,S,T,rho
+         real(dp), intent(in) :: P,S
+         real(dp), intent(out) :: T,rho
 
          real(dp) :: logT_result,log10Rho,dlnRho_dlnPgas_const_T,dlnRho_dlnT_const_Pgas
          real(dp), dimension(num_eos_basic_results) :: &

@@ -45,10 +45,9 @@
          eval1_mesa_Rho_given_PT, eval1_gamma_PT_getRho
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
-      real(dp) :: T,V,P1,DPV,E,OP,F2,P,U,SVEL,CP,QQ
-      real(dp) :: DU1,DU2,DU3,DU4,DU5,DU6,DU7,DU8,DU9,DU10,DU11,DU12
-      integer :: k,I
-      real(dp) :: RES(12)
+      real(dp) :: T,V,P1,DPV,E,OP,F2,P,SVEL,CP,QQ
+      real(dp) :: DU1,DU2,DU3,DU4,DU5,DU6,DU7,DU8,DU9
+      integer :: k,i
 
       real(dp) :: R,A,PRECEQ,rho_guess,rho,Prad,P_test
       data R,A/8.317d7,7.5641d-15/
@@ -174,9 +173,9 @@
       
       real(dp) :: T1,DLR,DLRP,DLRM,DLT,DLTP,DLMR,DLMRP,DLMRM,DLMT,DLMTP
       real(dp) :: W_00,W_out,BW,BK,T2,T3,DLK,DLKP,SVEL,T_0
-      real(dp) :: DU1,DU2,POM3,POM2,POM,MAXFLUXD
+      real(dp) :: POM3,POM2,POM
       integer :: I,J,IW,IR,IC, IMAXR, IMAXW, IMAXC
-      real(dp) :: MAXR,MAXW,MAXC,PB,PPB,ELB,ELMB,RES(12)
+      real(dp) :: MAXR,MAXW,MAXC,PB,PPB,ELB,ELMB
       
       integer :: INFO,II,ITROUBC,ITROUBT,IZIP
       real(dp) :: XXR,XXC,XXT,EZH,DXH,DXXC,DXXT,DXKC,DXKT, &
@@ -185,7 +184,7 @@
       
       real(dp) :: FFXM,FFX0,FFXP,FFY0,FFYP,FF
       real(dp) :: GGXM,GGX0,GGXP,GGY0,GGYP,GG,GPF
-      real(dp) :: FLIM,FLD,EFL02
+      real(dp) :: EFL02
 
       real(dp) :: POM4,DXXR,TEM1,TEMI,TEMM
 
@@ -201,7 +200,7 @@
       integer :: NDIVAA, NDIVAP, NDIVAT, dmN_cnt, max_dmN_cnt
       logical :: ok_to_adjust_mass, ok_to_adjust_Tsurf
       real(dp) :: EDFAC, Psurf, CFIDDLE, FSUB, EMR, ELR
-      real(dp) :: PREC1, SOL, DAMPS,DAMPRS,DELTA,SOURS
+      real(dp) :: PREC1
 
       real(dp) :: XX_max, XX_max_val, XX_max_dx
       integer :: i_XX_max, var_XX_max, n, op_err

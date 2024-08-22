@@ -95,10 +95,10 @@
          logical, intent(in) :: report
          integer, intent(out) :: ierr
 
-         integer :: iounit, n, i, t, id, j, k, cnt, ii, nxt_spec, spec_err
+         integer :: iounit, n, i, t, j, cnt, ii, nxt_spec, spec_err
          character (len=strlen) :: buffer, string, filename
          integer, parameter :: max_level = 20
-         logical :: bad_item, special_case, exists
+         logical :: special_case, exists
          logical, parameter :: dbg = .false.
 
          include 'formats'

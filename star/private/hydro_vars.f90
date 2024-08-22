@@ -108,7 +108,7 @@
             skip_mixing_info, &
             skip_set_cz_bdy_mass, &
             skip_mlt
-         integer :: nz, ierr1, k, i
+         integer :: nz, k
          
          include 'formats'
          
@@ -178,8 +178,6 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer(8) :: time0, clock_rate
-         real(dp) :: total
          logical, parameter :: skip_other_cgrav = .false.
          logical, parameter :: skip_basic_vars = .false.
          logical, parameter :: skip_micro_vars = .false.
@@ -496,7 +494,7 @@
             skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt
          integer, intent(out) :: ierr
 
-         integer :: nz, num_nse, k, T_tau_id
+         integer :: nz, k, T_tau_id
          integer(8) :: time0
          logical, parameter :: dbg = .false.
          real(dp) :: total
@@ -683,13 +681,12 @@
 
 
       subroutine set_basic_vars(s, nzlo, nzhi, ierr)
-         use chem_def, only: ini56
          use star_utils, only: set_rv_info, set_rmid
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
          integer :: j, k, species, nz
-         real(dp) :: twoGmrc2, r2, alfa, beta, sum_xa, v, u00, um1, du
+         real(dp) :: twoGmrc2, sum_xa
 
          include 'formats'
 
@@ -1115,7 +1112,6 @@
             use star_utils, only: weighed_smoothing, threshold_smoothing
             logical, parameter :: preserve_sign = .false.
             real(dp), pointer, dimension(:) :: work
-            integer :: k
             include 'formats'
             ierr = 0
             work => dlnd
