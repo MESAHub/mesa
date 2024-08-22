@@ -334,11 +334,11 @@
 
             ! 4th order rk step
             dy1=dydP*d_P
-            call derivs(cs,P+dP/2d0,S,y+dy1/2d0,dydP)
+            call derivs(cs,P+d_P/2d0,S,y+dy1/2d0,dydP)
             dy2=dydP*d_P
-            call derivs(cs,P+dP/2d0,S,y+dy2/2d0,dydP)
+            call derivs(cs,P+d_P/2d0,S,y+dy2/2d0,dydP)
             dy3=dydP*d_P
-            call derivs(cs,P+dP,S,y+dy3,dydP)
+            call derivs(cs,P+d_P,S,y+dy3,dydP)
             dy4=dydP*d_P
             y=y+dy1/6.d0+dy2/3.d0+dy3/3.d0+dy4/6.d0
             P=P+d_P
