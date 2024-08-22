@@ -22,36 +22,28 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_momentum_implicit
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_momentum_implicit = .true.
-      ! procedure pointer: s% other_momentum_implicit => my_routine
+module other_momentum_implicit
 
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_momentum_implicit = .true.
+   ! procedure pointer: s% other_momentum_implicit => my_routine
 
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_momentum_implicit(id, ierr)
-         use star_def
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         ! s% extra_grav(1:s%nz) = 0 ! this is added to -G*m/r^2
-         ! note that extra_grav is type(auto_diff_real_star_order1) so includes partials.
-      end subroutine default_other_momentum_implicit
+   implicit none
 
+contains
 
-      end module other_momentum_implicit
-      
-      
-      
-      
+   subroutine default_other_momentum_implicit(id, ierr)
+      use star_def
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type(star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      ! s% extra_grav(1:s%nz) = 0 ! this is added to -G*m/r^2
+      ! note that extra_grav is type(auto_diff_real_star_order1) so includes partials.
+   end subroutine default_other_momentum_implicit
+
+end module other_momentum_implicit
+

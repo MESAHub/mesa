@@ -22,33 +22,27 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_build_initial_model
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_build_initial_model = .true.
-      ! procedure pointer: s% other_build_initial_model => my_routine
+module other_build_initial_model
 
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_build_initial_model(id, ierr)
-         use star_def
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-      end subroutine default_other_build_initial_model
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_build_initial_model = .true.
+   ! procedure pointer: s% other_build_initial_model => my_routine
 
+   implicit none
 
-      end module other_build_initial_model
-      
-      
-      
-      
+contains
+
+   subroutine default_other_build_initial_model(id, ierr)
+      use star_def
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type(star_info), pointer :: s
+      integer :: k
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine default_other_build_initial_model
+
+end module other_build_initial_model
+

@@ -86,7 +86,7 @@
 
          integer :: initial_zfracs, i_lum, i, j, k, itry, max_try, id0, id1, id2
          real(dp) :: M, R, initial_y, initial_h1, initial_h2, initial_he3, initial_he4, &
-            S0, Pc0, rhoc0, e0(2), S1, Pc1, e1(2), S2, Pc2, e2(2), det, dPc, dS, safefac, &
+            S0, Pc0, e0(2), S1, Pc1, e1(2), S2, Pc2, e2(2), det, dPc, dS, safefac, &
             initial_z, xsol_he3, xsol_he4, mass_correction, mat(2,2), minv(2,2), sumx
          type (create_star_info), pointer :: cs
 
