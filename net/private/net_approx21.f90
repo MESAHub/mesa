@@ -391,7 +391,7 @@
                      btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
                   ! convert from eps back to rate
                   xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
-                  ratdum(ir3a) = eps/xx
+                  ratdum(ir3a) %val= eps/xx
                   ratdum(ir3a) %d1val1 = deps_dT/xx
                   ratdum(ir3a) %d1val2 = deps_dRho/xx
                end if
@@ -899,7 +899,7 @@
             xx = 5.68d-03/(y(ih1)*1.57d0)
             ratdum(irnpg) %val = min(ratdum(irnpg)%val,xx)
             if (ratdum(irnpg) %val .eq. xx) then
-            dratdumdy1(irnpg) %val= -xx/y(ih1)
+            dratdumdy1(irnpg) = -xx/y(ih1)
             ratdum(irnpg) %d1val1 = 0.0d0
             ratdum(irnpg) %d1val2 = 0.0d0
             else
@@ -909,7 +909,7 @@
             xx = 0.0105d0/y(ih1)
             ratdum(iropg) %val = min(ratdum(iropg)%val,xx)
             if (ratdum(iropg)%val .eq. xx) then
-            dratdumdy1(iropg) %val = -xx/y(ih1)
+            dratdumdy1(iropg) = -xx/y(ih1)
             ratdum(iropg)  %d1val1 = 0.0d0
             ratdum(iropg)  %d1val2 = 0.0d0
             else
