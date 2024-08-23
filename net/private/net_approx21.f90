@@ -380,14 +380,6 @@
             
             ierr = 0
 
-!do i=1,num
-!n% dratdumdy1(i) %val = 0d0
-!n% dratdumdy2(i) %val = 0d0
-!n% dratdumdy1(i) %d1val1 = 0d0
-!n% dratdumdy2(i) %d1val1 = 0d0
-!n% dratdumdy1(i) %d1val2 = 0d0
-!n% dratdumdy2(i) %d1val2 = 0d0
-!end do
 
             if (use_3a_FL) then
                ! Fushiki and Lamb, Apj, 317, 368-388, 1987
@@ -400,11 +392,7 @@
                      btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
                   ! convert from eps back to rate
                   xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
-<<<<<<< Updated upstream
-                  ratdum(ir3a) %val    = eps/xx
-=======
-                  ratdum(ir3a) %val= eps/xx
->>>>>>> Stashed changes
+                  ratdum(ir3a) %val = eps/xx
                   ratdum(ir3a) %d1val1 = deps_dT/xx
                   ratdum(ir3a) %d1val2 = deps_dRho/xx
                end if
