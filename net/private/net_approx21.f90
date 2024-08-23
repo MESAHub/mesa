@@ -383,7 +383,7 @@
             if (use_3a_FL) then
                ! Fushiki and Lamb, Apj, 317, 368-388, 1987
                if (y(ihe4) < tiny_y) then
-                  ratdum(ir3a)  %val   = 0.0d0
+                  ratdum(ir3a) %val    = 0.0d0
                   ratdum(ir3a) %d1val1 = 0.0d0
                   ratdum(ir3a) %d1val2 = 0.0d0
                else
@@ -391,7 +391,7 @@
                      btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
                   ! convert from eps back to rate
                   xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
-                  ratdum(ir3a) %val= eps/xx
+                  ratdum(ir3a) %val    = eps/xx
                   ratdum(ir3a) %d1val1 = deps_dT/xx
                   ratdum(ir3a) %d1val2 = deps_dRho/xx
                end if
@@ -913,7 +913,7 @@
             ratdum(iropg)  %d1val1 = 0.0d0
             ratdum(iropg)  %d1val2 = 0.0d0
             else
-            dratdumdy1(iropg) %val = 0.0d0
+            dratdumdy1(iropg) = 0.0d0
             end if
 
          end if
@@ -972,14 +972,9 @@
             fe56ec_fake_factor = eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
 !         end if
 
-         dydt(1:species(plus_co56)) %val = 0.0d0
-         dydt(1:species(plus_co56)) %d1val1 = 0.0d0
-         dydt(1:species(plus_co56)) %d1val2 = 0.0d0
+         dydt(1:species(plus_co56)) = 0.0d0
 
-         qray(1:species(plus_co56)) %val= 0d0!0.0_qp
-         !qray(1:species(plus_co56)) %d1val1 = 0.0d0!0.0_qp
-         !qray(1:species(plus_co56)) %d1val2 = 0.0d0!0.0_qp
-
+         qray(1:species(plus_co56)) = 0d0
 
 ! this one is gonna be a pain, because we can't implement quad precision
 ! sums of our auto_diff variables so we need to make
