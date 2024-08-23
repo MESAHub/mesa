@@ -972,9 +972,13 @@
             fe56ec_fake_factor = eval_fe56ec_fake_factor(fe56ec_fake_factor_in, min_T, temp)
 !         end if
 
-         dydt(1:species(plus_co56)) = 0.0d0
-
-         qray(1:species(plus_co56)) = 0d0
+         dydt(1:species(plus_co56)) %val = 0.0d0
+         dydt(1:species(plus_co56)) %d1val1 = 0.0d0
+         dydt(1:species(plus_co56)) %d1val2 = 0.0d0
+   
+         qray(1:species(plus_co56)) %val= 0d0!0.0_qp
+         qray(1:species(plus_co56)) %d1val1 = 0.0d0!0.0_qp
+         qray(1:species(plus_co56)) %d1val2 = 0.0d0!0.0_qp
 
 ! this one is gonna be a pain, because we can't implement quad precision
 ! sums of our auto_diff variables so we need to make
