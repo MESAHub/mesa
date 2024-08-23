@@ -67,9 +67,9 @@ module auto_diff_real_2var_order1_module
       differentiate_2, &
       fill_with_NaNs
    type :: auto_diff_real_2var_order1
-      real(dp) :: val
-      real(dp) :: d1val1
-      real(dp) :: d1val2
+      real(dp) :: val=0.0_dp
+      real(dp) :: d1val1=0.0_dp
+      real(dp) :: d1val2=0.0_dp
    end type auto_diff_real_2var_order1
    
    interface assignment(=)
