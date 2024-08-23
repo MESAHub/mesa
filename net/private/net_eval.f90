@@ -382,9 +382,13 @@
         n% rate_screened_ad %val = n% rate_screened
         n% rate_screened_ad %d1val1 = n% rate_screened_dT  ! 1 is T
         n% rate_screened_ad %d1val2 = n% rate_screened_dRho  ! 2 is rho
-        n% dydt1 %val = 0d0
-        n% dydt1 %d1val1 = 0d0
-        n% dydt1 %d1val2 = 0d0
+        n% dydt1(1:species(g% add_co56_to_approx21)) %val = 0.0d0
+        n% dydt1(1:species(g% add_co56_to_approx21)) %d1val1 = 0.0d0
+        n% dydt1(1:species(g% add_co56_to_approx21)) %d1val2 = 0.0d0
+
+! should maybe be set just incase?
+!        n% eps_total_ad = 0.0d0
+!        n% eps_neu_total_ad = 0.0d0
 
        !write (*,*) 'rate_screened_ad' , n% rate_screened_ad
 
@@ -401,7 +405,7 @@
             g% fe56ec_n_neut, n% temp, n% rho, g% add_co56_to_approx21, ierr)
          if (ierr /= 0) return
             
-         n% fII = approx21_eval_PPII_fraction(n% y, n% rate_screened)
+         n% fII = approx21_eval_PPII_fraction(n% y, n% rate_screened_ad %val)
 !write(*,*), 'made it here 2'
 
 ! values also get returned to screened rate inside eps_info.
@@ -727,7 +731,7 @@ n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
                n% dratdumdy2(i) %d1val1 = 0d0
                n% dratdumdy1(i) %d1val2 = 0d0
                n% dratdumdy2(i) %d1val2 = 0d0
-            end do           
+            end do
          end if
 
          

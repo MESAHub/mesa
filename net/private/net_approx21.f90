@@ -380,6 +380,15 @@
             
             ierr = 0
 
+!do i=1,num
+!n% dratdumdy1(i) %val = 0d0
+!n% dratdumdy2(i) %val = 0d0
+!n% dratdumdy1(i) %d1val1 = 0d0
+!n% dratdumdy2(i) %d1val1 = 0d0
+!n% dratdumdy1(i) %d1val2 = 0d0
+!n% dratdumdy2(i) %d1val2 = 0d0
+!end do
+
             if (use_3a_FL) then
                ! Fushiki and Lamb, Apj, 317, 368-388, 1987
                if (y(ihe4) < tiny_y) then
@@ -391,7 +400,11 @@
                      btemp, bden, 4*y(ihe4), abar/zbar, eps, deps_dT, deps_dRho)
                   ! convert from eps back to rate
                   xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
+<<<<<<< Updated upstream
                   ratdum(ir3a) %val    = eps/xx
+=======
+                  ratdum(ir3a) %val= eps/xx
+>>>>>>> Stashed changes
                   ratdum(ir3a) %d1val1 = deps_dT/xx
                   ratdum(ir3a) %d1val2 = deps_dRho/xx
                end if
@@ -884,7 +897,7 @@
          xx            = 0.896d0/y(ihe4)
          ratdum(irhe3ag) %val = min(ratdum(irhe3ag)%val,xx)
          if (ratdum(irhe3ag) %val .eq. xx) then
-         dratdumdy1(irhe3ag) = -xx/y(ihe4)
+         dratdumdy1(irhe3ag) %val = -xx/y(ihe4)
          ratdum(irhe3ag) %d1val1  = 0.0d0
          ratdum(irhe3ag) %d1val2 = 0.0d0
          else
@@ -929,7 +942,7 @@
             ratdum(i) %d1val2 = 0
             dratdumdy1(i) = 0
             dratdumdy2(i) = 0
-         end subroutine turn_off_reaction         
+         end subroutine turn_off_reaction
 
          end subroutine approx21_special_reactions
          
@@ -1720,6 +1733,10 @@
             !write(*,1) 'reaction_Qs(irn14_to_o16) Qrn14_to_o16*Qconv', Qrn14_to_o16*Qconv
             
             ierr = 0
+            
+            ! just in case, we set to 0 first
+            eps_total = 0.0d0
+            eps_neu = 0.0d0
 
             xx = 0.0_qp
             do i=1,species(plus_co56)
