@@ -169,7 +169,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
-      character (len = 4) :: file_extension
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') &
          b% pg% file_digits, b% pg% file_digits
       write(num_str, fstring) b% model_number
