@@ -9,9 +9,9 @@
 
    pgstar_interval = 1
 
-   Grid8_win_flag = .true.
-   Grid8_win_width = 12
-   Grid8_title = 'wd_nova_burst'
+   Grid_win_flag(8) = .true.
+   Grid_win_width(8) = 12
+   Grid_title(8) = 'wd_nova_burst'
 
    Summary_Burn_xaxis_name = 'logxq'
    Summary_Burn_xaxis_reversed = .true.
@@ -51,14 +51,14 @@
    TRho_Profile_ymin = 5.0
    TRho_Profile_ymax = 9.0
 
-   Text_Summary1_name(5,2) = 'time_step_sec'
-   Text_Summary1_name(6,2) = 'max_tau_conv'
+   Text_Summary_name(1,5,2) = 'time_step_sec'
+   Text_Summary_name(1,6,2) = 'max_tau_conv'
 
-   Grid8_file_flag = .true.
-   Grid8_file_dir = 'pgstar_out'
-   Grid8_file_prefix = 'grid8_'
-   Grid8_file_interval = 10000
-   Grid8_file_width = -1
-   Grid8_file_aspect_ratio = -1
+   Grid_file_flag(8) = .true.
+   Grid_file_dir(8) = 'pgstar_out'
+   Grid_file_prefix(8) = 'grid8_'
+   Grid_file_interval(8) = 10000
+   Grid_file_width(8) = -1
+   Grid_file_aspect_ratio(8) = -1
 
 / ! end of pgstar namelist

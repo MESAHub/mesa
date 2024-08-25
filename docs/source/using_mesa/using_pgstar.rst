@@ -215,12 +215,12 @@ After looking at those, check out some of the defaults for a few of the
 multi-panel plots. As before, cut-and-paste these lines and replace the
 previous ones.::
 
-  Profile_Panels1_win_flag = .true.
-  Profile_Panels2_win_flag = .true.
-  History_Track1_win_flag = .true.
-  History_Panels1_win_flag = .true.
-  Grid1_win_flag = .true.
-  Grid2_win_flag = .true.
+  Profile_Panels_win_flag(1) = .true.
+  Profile_Panels_win_flag(2) = .true.
+  History_Track_win_flag(1) = .true.
+  History_Panels_win_flag(1) = .true.
+  Grid_win_flag(1) = .true.
+  Grid_win_flag(2) = .true.
 
   
 When you're finished admiring these beauties, delete the "win_flag"
@@ -303,11 +303,11 @@ plotting by editing the axis name and label. Here's an example.  After
 that, try plotting some other combinations; just pick axis names from
 the column headings in your current LOGS/history.data.::
 
-  History_Track1_win_flag = .true.
+  History_Track_win_flag(1) = .true.
 
-  History_Track1_xname = 'log_center_P'
-  History_Track1_xaxis_label = 'log P\dcenter'
-  History_Track1_title = 'L vs Center P'
+  History_Track_xname(1) = 'log_center_P'
+  History_Track_xaxis_label(1) = 'log P\dcenter'
+  History_Track_title(1) = 'L vs Center P'
 
 Turn on Profile\_Panels1 and History\_Panels1; they are set up with
 defaults for the number of panels and axes.  Change the defaults to
@@ -315,34 +315,34 @@ show other things -- for the profiles you can select anything that can
 be in a profile_columns.list; for the history you have to select one
 of the column headings in your current LOGS/history.data.::
 
-  History_Panels1_win_flag = .true.
-  History_Panels1_other_yaxis_name(1) = 'log_center_P'
+  History_Panels_win_flag(1) = .true.
+  History_Panels_other_yaxis_name(1,1) = 'log_center_P'
 
-  Profile_Panels1_win_flag = .true.
-  Profile_Panels1_xaxis_name = 'logP'
-  Profile_Panels1_xaxis_reversed = .true.
+  Profile_Panels_win_flag(1) = .true.
+  Profile_Panels_xaxis_name(1) = 'logP'
+  Profile_Panels_xaxis_reversed(1) = .true.
 
 Add another panel to the Profile plot.::
 
-  Profile_Panels1_num_panels = 3
-  Profile_Panels1_yaxis_name(3) = 'logtau'
-  Profile_Panels1_other_yaxis_name(3) = 'log_opacity'
+  Profile_Panels_num_panels(1) = 3
+  Profile_Panels_yaxis_name(1,3) = 'logtau'
+  Profile_Panels_other_yaxis_name(1,3) = 'log_opacity'
 
 Increase the y margins.::
 
-  Profile_Panels1_ymargin(1) = 0.2
-  Profile_Panels1_other_ymargin(1) = 0.2
-  Profile_Panels1_ymargin(2) = 0.2
-  Profile_Panels1_other_ymargin(2) = 0.2
-  Profile_Panels1_ymargin(3) = 0.2
-  Profile_Panels1_other_ymargin(3) = 0.2
+  Profile_Panels_ymargin(1,1) = 0.2
+  Profile_Panels_other_ymargin(1,1) = 0.2
+  Profile_Panels_ymargin(1,2) = 0.2
+  Profile_Panels_other_ymargin(1,2) = 0.2
+  Profile_Panels_ymargin(1,3) = 0.2
+  Profile_Panels_other_ymargin(1,3) = 0.2
 
 Change the aspect ratio, reduce the width, and fix the left and right margins.::
 
-  Profile_Panels1_win_aspect_ratio = 1.0 ! aspect_ratio = height/width
-  Profile_Panels1_win_width = 6
-  Profile_Panels1_xleft = 0.18
-  Profile_Panels1_xright = 0.82
+  Profile_Panels_win_aspect_ratio(1) = 1.0 ! aspect_ratio = height/width
+  Profile_Panels_win_width(1) = 6
+  Profile_Panels_xleft(1) = 0.18
+  Profile_Panels_xright(1) = 0.82
 
 Pick some other axis names and change what is shown in the panels.
 You can use any name that is valid in a profile_columns.list; unlike
@@ -352,86 +352,86 @@ your current list.
 Next, take a look at the following default definition for
 Profile\_Panels3.::
 
-  Profile_Panels3_xaxis_name = 'logP'
-  Profile_Panels3_xaxis_reversed = .true.
-  Profile_Panels3_num_panels = 3
-  Profile_Panels3_yaxis_name(1) = 'Abundance'
-  Profile_Panels3_yaxis_name(2) = 'Power'
-  Profile_Panels3_yaxis_name(3) = 'Mixing'
+  Profile_Panels_xaxis_name(3) = 'logP'
+  Profile_Panels_xaxis_reversed(3) = .true.
+  Profile_Panels_num_panels(3) = 3
+  Profile_Panels_yaxis_name(3,1) = 'Abundance'
+  Profile_Panels_yaxis_name(3,2) = 'Power'
+  Profile_Panels_yaxis_name(3,3) = 'Mixing'
 
 Open the plot window and then change the number of panels and the
 contents.  Revise the title and switch the xaxis to mass.::
 
-  Profile_Panels3_win_flag = .true.
-  Profile_Panels3_num_panels = 4
-  Profile_Panels3_yaxis_name(4) = 'Dynamo'
-  Profile_Panels3_title = 'Abundance-Power-Mixing-Dynamo'
-  Profile_Panels3_xaxis_name = 'mass'
-  Profile_Panels3_xaxis_reversed = .false.
+  Profile_Panels_win_flag(3) = .true.
+  Profile_Panels_num_panels(3) = 4
+  Profile_Panels_yaxis_name(3,4) = 'Dynamo'
+  Profile_Panels_title(3) = 'Abundance-Power-Mixing-Dynamo'
+  Profile_Panels_xaxis_name(3) = 'mass'
+  Profile_Panels_xaxis_reversed(3) = .false.
 
 Now, edit the definition of the Grid1 plot.  Replace the TRho\_Profile
 plot by the Kipp plot and adjust the margins and text scale.::
 
-  Grid1_win_flag = .true.
-  Grid1_plot_name(1) = 'Kipp'
-  Grid1_plot_pad_left(1) = 0.03 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(1) = 0.03 ! fraction of full window width for padding on right
-  Grid1_plot_pad_bot(1) = 0.12 ! fraction of full window height for padding at bottom
-  Grid1_txt_scale_factor(1) = 0.6 ! multiply txt_scale for subplot by this
+  Grid_win_flag(1) = .true.
+  Grid_plot_name(1,1) = 'Kipp'
+  Grid_plot_pad_left(1,1) = 0.03 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1,1) = 0.03 ! fraction of full window width for padding on right
+  Grid_plot_pad_bot(1,1) = 0.12 ! fraction of full window height for padding at bottom
+  Grid_txt_scale_factor(1,1) = 0.6 ! multiply txt_scale for subplot by this
 
 Move the text summary up to just below the Kipp plot, and increase the
 number of rows to make the HR and TRho plots taller.  This will
 temporarily mess us the spacing between the subplots, but we'll fix
 that next.::
 
-  Grid1_num_rows = 9 ! divide plotting region into this many equal height rows
-  Grid1_plot_row(2) = 7 ! number from 1 at top
-  Grid1_plot_rowspan(2) = 3 ! plot spans this number of rows
-  Grid1_plot_row(3) = 7 ! number from 1 at top
-  Grid1_plot_rowspan(3) = 3 ! plot spans this number of rows
-  Grid1_plot_row(4) = 5 ! number from 1 at top
-  Grid1_plot_rowspan(4) = 2 ! plot spans this number of rows
+  Grid_num_rows(1) = 9 ! divide plotting region into this many equal height rows
+  Grid_plot_row(1,2) = 7 ! number from 1 at top
+  Grid_plot_rowspan(1,2) = 3 ! plot spans this number of rows
+  Grid_plot_row(1,3) = 7 ! number from 1 at top
+  Grid_plot_rowspan(1,3) = 3 ! plot spans this number of rows
+  Grid_plot_row(1,4) = 5 ! number from 1 at top
+  Grid_plot_rowspan(1,4) = 2 ! plot spans this number of rows
 
 After that, fix the padding between the plots and adjust the text sizes.::
 
-  Grid1_plot_pad_top(2) = 0.01 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(2) = 0.1 ! fraction of full window height for padding at bottom
-  Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(2) = 0.1 ! fraction of full window width for padding on right
-  Grid1_txt_scale_factor(2) = 0.6 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_top(1,2) = 0.01 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1,2) = 0.1 ! fraction of full window height for padding at bottom
+  Grid_plot_pad_left(1,2) = 0.05 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1,2) = 0.1 ! fraction of full window width for padding on right
+  Grid_txt_scale_factor(1,2) = 0.6 ! multiply txt_scale for subplot by this
   
-  Grid1_plot_pad_top(3) = 0.01 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(3) = 0.1 ! fraction of full window height for padding at bottom
-  Grid1_plot_pad_left(3) = 0.1 ! fraction of full window width for padding on left
-  Grid1_plot_pad_right(3) = 0.05 ! fraction of full window width for padding on right
-  Grid1_txt_scale_factor(3) = 0.6 ! multiply txt_scale for subplot by this
+  Grid_plot_pad_top(1,3) = 0.01 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1,3) = 0.1 ! fraction of full window height for padding at bottom
+  Grid_plot_pad_left(1,3) = 0.1 ! fraction of full window width for padding on left
+  Grid_plot_pad_right(1,3) = 0.05 ! fraction of full window width for padding on right
+  Grid_txt_scale_factor(1,3) = 0.6 ! multiply txt_scale for subplot by this
   
-  Grid1_plot_pad_top(4) = 0.00 ! fraction of full window height for padding at top
-  Grid1_plot_pad_bot(4) = 0.05 ! fraction of full window height for padding at bottom
+  Grid_plot_pad_top(1,4) = 0.00 ! fraction of full window height for padding at top
+  Grid_plot_pad_bot(1,4) = 0.05 ! fraction of full window height for padding at bottom
 
 Change the text summary to report 'log\_L\_div\_Ledd' instead of 'log\_LH'.::
 
- Text_Summary1_name(3,4) = 'log_L_div_Ledd'
+ Text_Summary_name(1,3,4) = 'log_L_div_Ledd'
 
 Finally, take a quick look at the various multi-panel and grid
 defaults (listed above).  You are not limited to those, but they might
 give you ideas for your own personalized plots.  Here are some of my
 favorites -- you might also find them useful.::
 
-  Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
-  Profile_Panels4_win_flag = .true. ! Abundance, Power, Mixing, and Dynamo
-  History_Panels1_win_flag = .true. ! logT, logRho, log_L, log_Teff, mass, mdot
+  Grid_win_flag(8) = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
+  Profile_Panels_win_flag(4) = .true. ! Abundance, Power, Mixing, and Dynamo
+  History_Panels_win_flag(1) = .true. ! logT, logRho, log_L, log_Teff, mass, mdot
 
 If you don't have rotation turned on, change from Profile\_Panels4 to
 Profile\_Panels3, or edit your controls for Profile\_Panels4 to drop the
 last panel.::
 
-  Profile_Panels3_win_flag = .true. ! Abundance, Power, and Mixing
+  Profile_Panels_win_flag(3) = .true. ! Abundance, Power, and Mixing
 
 or::
 
-  Profile_Panels4_num_panels = 3
-  Profile_Panels4_title = 'Abundance-Power-Mixing'
+  Profile_Panels_num_panels(4) = 3
+  Profile_Panels_title(4) = 'Abundance-Power-Mixing'
 
 PGSTAR has a number of options to control its file output.
 
