@@ -75,9 +75,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp), dimension(num_eos_basic_results) :: dres_dabar, dres_dzbar
     integer :: j
-    logical :: off_table
 
     include 'formats'
 
@@ -229,7 +227,6 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -273,7 +270,6 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -411,8 +407,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp) :: rho_guess, logRho_guess, gamma, &
-         dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
+    real(dp) :: rho_guess, logRho_guess, gamma
 
     ! compute composition info
     real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx

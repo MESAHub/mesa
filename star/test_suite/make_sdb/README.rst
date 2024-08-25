@@ -11,7 +11,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_make_sdb``) first loads a prebuilt helium core model ``start_core_he_burn.mod`` that comes from the :ref:`1M_pre_ms_to_wd` test case (specifically ``inlist_to_end_core_he_burn`` is modified to stop when the mass fraction of helium dropes below 0.95). Then the hydrogen envelope is removed with ``relax_initial_mass_to_remove_H_env = .true.`` as a model for a common envelope event removal of the envelope. The model is then evolved until the mass fraction of carbon rises above 0.05 :
 
 .. image:: ../../../star/test_suite/make_sdb/docs/grid_000064.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the plot above:

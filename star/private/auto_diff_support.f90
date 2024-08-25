@@ -339,7 +339,7 @@
          if (k > 1) then
             w_m1 % val = s%w(k-1)
             w_m1 % d1Array(i_w_m1) = 1d0
-         end if            
+         end if
       end function wrap_w_m1
 
       function wrap_w_00(s, k) result(w_00)
@@ -1058,7 +1058,7 @@
                r_tc = 0.5d0*(r_tc + s% r_center)
             end if
          end if
-      end function wrap_opt_time_center_r_p1      
+      end function wrap_opt_time_center_r_p1
       
       function wrap_opt_time_center_v_m1(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -1075,7 +1075,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% u_face_start(k-1))
          end if
-      end function wrap_opt_time_center_v_m1      
+      end function wrap_opt_time_center_v_m1
       
       function wrap_opt_time_center_v_00(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -1091,7 +1091,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% u_face_start(k))
          end if
-      end function wrap_opt_time_center_v_00     
+      end function wrap_opt_time_center_v_00
       
       function wrap_opt_time_center_v_p1(s, k) result(v_tc)
          type (star_info), pointer :: s
@@ -1184,7 +1184,7 @@
          if (k > 1) then
             w_div_wc_m1 % val = s% w_div_w_crit_roche(k-1)
             w_div_wc_m1 % d1Array(i_w_div_wc_m1) = 1d0
-         end if            
+         end if
       end function wrap_w_div_wc_m1
 
       function wrap_w_div_wc_00(s, k) result(w_div_wc_00)
@@ -1216,7 +1216,7 @@
          if (k > 1) then
             jrot_m1 % val = s% j_rot(k-1)
             jrot_m1 % d1Array(i_jrot_m1) = 1d0
-         end if            
+         end if
       end function wrap_jrot_m1
 
       function wrap_jrot_00(s, k) result(jrot_00)
@@ -1248,7 +1248,7 @@
          jrot_m1 = wrap_jrot_m1(s,k)
          if (k > 1) then
             omega_m1 = jrot_m1/shift_m1(s% i_rot(k-1))
-         end if            
+         end if
       end function wrap_omega_m1
 
       function wrap_omega_00(s, k) result(omega_00)
@@ -1279,7 +1279,7 @@
          if (k > 1) then
             xtra1_m1 % val = 0d0
             xtra1_m1 % d1Array(i_xtra1_m1) = 1d0
-         end if            
+         end if
       end function wrap_xtra1_m1
 
       function wrap_xtra1_00(s, k) result(xtra1_00)
@@ -1311,7 +1311,7 @@
          if (k > 1) then
             xtra2_m1 % val = 0d0
             xtra2_m1 % d1Array(i_xtra2_m1) = 1d0
-         end if            
+         end if
       end function wrap_xtra2_m1
 
       function wrap_xtra2_00(s, k) result(xtra2_00)

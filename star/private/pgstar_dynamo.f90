@@ -127,8 +127,8 @@
             Dyn_reverse_xaxis, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
 
-         real :: windy, xmargin
-         real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy
+         real :: xmargin
+         real :: xmin, xmax, xleft, xright, dx, ymin, ymax, ymin2, ymax2, dy
          integer :: grid_min, grid_max, npts, nz
          real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
 
@@ -168,10 +168,9 @@
             integer, intent(out) :: ierr
 
             integer :: lw, lw_sav, k
-            real :: ybot, eps, &
+            real :: ybot, &
                default_ymax_left, default_ymin_left, &
                default_ymax_right, default_ymin_right
-            character (len=128) :: str
 
             include 'formats'
             ierr = 0

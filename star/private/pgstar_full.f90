@@ -649,7 +649,6 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer :: i
       integer(8) :: time0, time1, clock_rate
       logical :: pause
 
@@ -712,9 +711,8 @@ contains
       use utils_lib
       use chem_def
       use net_def
-      use net_lib, only: get_net_reaction_table
-      use rates_def, only: rates_reaction_id_max
-      use const_def, only: Msun, Rsun
+      use net_lib, only : get_net_reaction_table
+      use const_def, only : Msun, Rsun
 
       type (star_info), pointer :: s
       logical :: must_write_files_in
@@ -836,7 +834,7 @@ contains
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
-      integer :: iounit, i, n
+      integer :: iounit, n
       character (len = 1024) :: fname
       type (pgstar_hist_node), pointer :: pg
 
@@ -883,7 +881,7 @@ contains
       integer, intent(out) :: ierr
 
       logical :: fexist
-      integer :: iounit, i, n
+      integer :: iounit, n
       character (len = 1024) :: fname
       type (pgstar_hist_node), pointer :: pg
 
@@ -943,7 +941,7 @@ contains
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
-      integer :: num, i
+      integer :: num
       type (pgstar_hist_node), pointer :: pg
 
       include 'formats'

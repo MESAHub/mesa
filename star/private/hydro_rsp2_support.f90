@@ -52,8 +52,7 @@
          type (star_info), pointer :: s      
          integer, intent(out) :: ierr    
          integer :: k, j, nz_old, nz
-         real(dp) :: xm_anchor, P_surf, T_surf, &
-            old_logT_cntr, old_logT_1, old_L1, old_r1
+         real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
          real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
@@ -197,7 +196,7 @@
          end subroutine find_xm_anchor         
          
          subroutine set_xm_new ! sets xm, dm, m, dq, q
-            integer :: nz_outer, n_inner, iter, k, j
+            integer :: nz_outer, k
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
             include 'formats'
             nz_outer = s% RSP2_nz_outer
@@ -348,7 +347,7 @@
                kap_fracs(num_kap_fracs), kap, dlnkap_dlnRho, dlnkap_dlnT, &
                old_kap, new_P_surf, new_T_surf
             real(dp), dimension(num_eos_basic_results) :: &
-               res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+               res, d_dlnd, d_dlnT
             real(dp) :: dres_dxa(num_eos_d_dxa_results,s% species)
             include 'formats'
             ierr = 0

@@ -11,7 +11,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_env_header``) first creates an initial neutron star envelope through its significant ``run_star_extras.f90`` and saves the result as ``start.mod``.  This initial model is then loaded and the evolution begins. The envelope should remain stable - no changes in the thermodynamic or structure profiles - over the 10 million year evolution.
 
 .. image:: ../../../star/test_suite/make_env/docs/profile1_000172.svg
-   :scale: 100%
+   :width: 100%
 
 pgstar commands used for the plots above:
 

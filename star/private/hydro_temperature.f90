@@ -59,7 +59,7 @@
             kap_00, kap_m1, kap_face, d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
             P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
          
-         integer :: i_equL, i
+         integer :: i_equL
          logical :: dbg
          logical :: test_partials
 

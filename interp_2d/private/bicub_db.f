@@ -2461,9 +2461,8 @@ C
 !     bbar(x)=x**3-2*x**2+x  bbar'(x)=3*x**2-4*x+1
 !
       real(dp) :: sum
-      integer v,z36th,iadr,i,j
+      integer v,iadr,i,j
       real(dp) :: xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
-      real(dp) :: cx,cy,cyd,cxi,cyi,cydi,hx2,hy2,cxd,cxdi
       real(dp) :: ax,bx,axbar,bxbar,ay,by,aybar,bybar
       real(dp) :: axp,axbarp,bxp,bxbarp,ayp,aybarp,bybarp,byp
       real(dp), pointer :: fin(:,:,:)

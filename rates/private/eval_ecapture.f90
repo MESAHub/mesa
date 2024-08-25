@@ -61,7 +61,7 @@ contains
 
     logical, parameter :: dbg = .false.
 
-    integer :: i, ir, in, out, j, lhs, rhs
+    integer :: i, ir, j, lhs, rhs
     integer :: offset, ntrans, lo, hi
     integer :: offset_lhs, nstates_lhs, lo_lhs, hi_lhs
     integer :: offset_rhs, nstates_rhs, lo_rhs, hi_rhs

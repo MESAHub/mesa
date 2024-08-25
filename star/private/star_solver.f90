@@ -121,10 +121,9 @@
          real(dp), dimension(:,:), pointer :: dxsave=>null(), ddxsave=>null(), B=>null(), grad_f=>null(), soln=>null()
          real(dp), dimension(:), pointer :: dxsave1=>null(), ddxsave1=>null(), B1=>null(), grad_f1=>null(), &
             row_scale_factors1=>null(), col_scale_factors1=>null(), soln1=>null(), save_ublk1=>null(), save_dblk1=>null(), save_lblk1=>null()
-         real(dp), dimension(:,:), pointer ::  rhs=>null()
+         real(dp), dimension(:,:), pointer :: rhs=>null()
          integer, dimension(:), pointer :: ipiv1=>null()
-         real(dp), dimension(:,:), pointer :: &
-            ddx=>null(), xgg=>null(), ddxd=>null(), ddxdd=>null(), xder=>null(), equsave=>null()
+         real(dp), dimension(:,:), pointer :: ddx=>null(), xder=>null()
 
          integer, dimension(:), pointer :: ipiv_blk1=>null()
          character (len=s%nz) :: equed1
@@ -136,19 +135,19 @@
          real(dp)  ::  &
             coeff, f, slope, residual_norm, max_residual, &
             corr_norm_min, resid_norm_min, correction_factor, temp_correction_factor, &
-            correction_norm, corr_norm_initial, max_correction, slope_extra, &
+            correction_norm, max_correction, &
             tol_residual_norm, tol_max_residual, &
             tol_residual_norm2, tol_max_residual2, &
             tol_residual_norm3, tol_max_residual3, &
             tol_abs_slope_min, tol_corr_resid_product, &
             min_corr_coeff, max_corr_min, max_resid_min, max_abs_correction
-         integer :: nz, iter, max_tries, zone, tiny_corr_cnt, i, j, k, &
+         integer :: nz, iter, max_tries, tiny_corr_cnt, i, &
             force_iter_value, iter_for_resid_tol2, iter_for_resid_tol3, &
             max_corr_k, max_corr_j, max_resid_k, max_resid_j
-         integer(8) :: test_time1, time0, time1, clock_rate
+         integer(8) :: time0
          character (len=strlen) :: err_msg
          logical :: first_try, dbg_msg, passed_tol_tests, &
-            doing_extra, okay, disabled_resid_tests, pass_resid_tests, &
+            doing_extra, disabled_resid_tests, pass_resid_tests, &
             pass_corr_tests_without_coeff, pass_corr_tests_with_coeff
 
          integer, parameter :: num_tol_msgs = 15
@@ -632,10 +631,8 @@
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
             integer, intent(out) :: ierr
             
-            integer :: j, k, i_var, i_var_sink, i_equ, k_off, cnt_00, cnt_m1, cnt_p1, k_lo, k_hi
+            integer :: j, k, k_lo, k_hi
             real(dp), dimension(:,:), pointer :: save_equ, save_dx
-            real(dp) :: dvar, dequ, dxtra, &
-               dx_0, dvardx, dvardx_0, xdum, err
             logical :: testing_partial
 
             include 'formats'
@@ -732,7 +729,7 @@
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
             integer, intent(out) :: ierr
-            integer :: i, j, nz, neqns
+            integer :: nz, neqns
             include 'formats'
             ierr = 0
             nz = s% nz
@@ -760,12 +757,11 @@
             character (len=*), intent(out) :: err_msg
             integer, intent(out) :: ierr
 
-            integer :: i, j, k, iter, k_max_corr, i_max_corr
-            character (len=strlen) :: message
+            integer :: i, k, iter
             logical :: first_time
-            real(dp) :: a1, alam, alam2, alamin, a2, disc, f2, &
-               rhs1, rhs2, temp, test, tmplam, max_corr, fold, min_corr_coeff
-            real(dp) :: frac, f_target
+            real(dp) :: a1, alam, alam2, a2, disc, f2, &
+               rhs1, rhs2, tmplam, fold, min_corr_coeff
+            real(dp) :: f_target
             logical :: skip_eval_f, dbg_adjust
 
             real(dp), parameter :: alf = 1d-2 ! ensures sufficient decrease in f
@@ -1005,8 +1001,8 @@
          logical function solve_equ()
             use star_utils, only: start_time, update_time
             use rsp_def, only: NV, MAX_NZN
-            integer ::  i, k, ierr
-            real(dp) :: ferr, berr, total_time
+            integer ::  i, ierr
+            real(dp) :: total_time
 
             include 'formats'
             ierr = 0
@@ -1016,30 +1012,33 @@
                call start_time(s, time0, total_time)
             end if
             
-            !$omp simd
+            !$OMP PARALLEL DO SIMD
             do i=1,neq
                b1(i) = -equ1(i)
             end do
+            !$OMP END PARALLEL DO SIMD
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   save_ublk1(i) = ublk1(i)
                   save_dblk1(i) = dblk1(i)
                   save_lblk1(i) = lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
             
             call factor_mtx(ierr)
             if (ierr == 0) call solve_mtx(ierr)
             
             if (s% use_DGESVX_in_bcyclic) then
-               !$omp simd
+               !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
                   ublk1(i) = save_ublk1(i)
                   dblk1(i) = save_dblk1(i)
                   lblk1(i) = save_lblk1(i)
                end do
+               !$OMP END PARALLEL DO SIMD
             end if
 
             if (s% doing_timing) then
@@ -1148,7 +1147,6 @@
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
             real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
-            real(dp) :: dvardx_0
             integer :: i, j_var_xa_index, j_var_sink_xa_index
             include 'formats'
             if (i_equ /= 0) then
@@ -1615,7 +1613,7 @@
             !  an estimate of the error in the first derivative is returned in err.
             integer, parameter :: ntab = 20
             integer :: i,j
-            real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum,f1,f2
+            real(dp) :: errt,fac,hh,a(ntab,ntab),f1,f2
             real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
             include 'formats'
             dfridr = 0d0
@@ -1801,8 +1799,7 @@
 
             integer, intent(out) :: ierr
 
-            integer :: i, j
-            character (len=strlen) :: err_msg
+            integer :: i
 
             ierr = 0
 
@@ -1920,7 +1917,7 @@
          real(dp) function eval_slope(nvar, nz, grad_f, B)
             integer, intent(in) :: nvar, nz
             real(dp), intent(in), dimension(:,:) :: grad_f, B
-            integer :: k, i
+            integer :: i
             eval_slope = 0
             do i=1,nvar
                eval_slope = eval_slope + dot_product(grad_f(i,1:nz),B(i,1:nz))

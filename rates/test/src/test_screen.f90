@@ -42,16 +42,14 @@ module test_screen
       use math_lib
       
       integer, parameter :: num_isos = 8, max_z_to_cache = 12
-      integer :: chem_id(num_isos), i1, i2, jscr, ierr
+      integer :: chem_id(num_isos), i1, i2, ierr
       integer, pointer :: net_iso(:)
       real(dp) :: xin(num_isos), y(num_isos), iso_z(num_isos), xz, abar, zbar, z2bar, z53bar, ye, sumx, &
             dabar_dx(num_isos), dzbar_dx(num_isos), temp, den, logT, logRho, &
             sc1a, sc1adt, sc1add, xh, xhe, dmc_dx(num_isos), iso_z158(num_isos)
       type (Screen_Info) :: sc
-      real(dp) :: zg1, zg2, zg3, zg4
       real(dp) :: zs13, zhat, zhat2, lzav, aznut, zs13inv, mass_correction!approx_abar, approx_zbar
-      integer :: screening_mode, i
-      character(len=256) :: scr_option_str
+      integer :: i
       integer :: h1, he3, he4, c12, n14, o16, ne20, mg24
       character (len=32) :: my_mesa_dir
       

@@ -100,7 +100,6 @@
             xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
          real, allocatable, dimension(:) :: xvec, yvec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
             ymin, ymax, exp10_ymin, xmargin, &
@@ -151,7 +150,7 @@
             use rates_def
             integer, intent(out) :: ierr
 
-            integer :: ii, jj, i, j, cnt
+            integer :: i, j, cnt
             logical, parameter :: dbg = .false.
             real(dp) :: max_power(num_categories), max_power_copy(num_categories)
             real :: ybot
@@ -240,7 +239,7 @@
 
          integer function power_line(cnt, icat)
             integer, intent(in) :: cnt, icat
-            real :: ymx, xpos, dx, ypos, xpts(2), ypts(2)
+            real :: ymx
             integer :: iclr, k
             power_line = cnt
             ymx = maxval(s% eps_nuc_categories(icat,grid_min:grid_max))

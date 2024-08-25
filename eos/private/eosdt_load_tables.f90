@@ -575,7 +575,7 @@
 
          real(dp) :: X_in, Z_in, logT_min_in, logT_max_in, del_logT_in,  &
                logQ_min_in, logQ_max_in, del_logQ_in
-         integer :: num_logQs_in, num_logTs_in, version_in, i, j
+         integer :: num_logQs_in, num_logTs_in, version_in
          real(dp), parameter :: tiny = 1d-10
          
          include 'formats'

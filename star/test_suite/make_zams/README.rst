@@ -11,160 +11,17 @@ This test case has 1 part. Click to see a larger version of a plot.
 * Part 1 (``inlist_zams``) creates a 4 Msun, Z = 0.01 metallicity, pre-main sequence model and evolves the model to the zero age main sequence, terminating when Lnuc / L = 0.9.
 
 .. image:: ../../../star/test_suite/make_zams/docs/grid_000192.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the plot above:
 
-.. code-block:: console
-
- &pgstar
-
-  file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-  !file_device = 'png'            ! png
-  !file_extension = 'png'
-
-  file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
-
-  pgstar_interval = 10
-
-  Abundance_win_flag = .false.
-  Abundance_win_width = 15
-  Abundance_win_aspect_ratio = 0.75
-
-  Abundance_title = ''
-  Abundance_num_isos_to_show = 6
-
-  Abundance_which_isos_to_show(1)  = 'h1'
-  Abundance_which_isos_to_show(2)  = 'he3'
-  Abundance_which_isos_to_show(3)  = 'he4'
-  Abundance_which_isos_to_show(4)  = 'c12'
-  Abundance_which_isos_to_show(5)  = 'n14'
-  Abundance_which_isos_to_show(6)  = 'o16'
-
-  num_abundance_line_labels = 4
-  Abundance_line_txt_scale_factor = 1.0
-  Abundance_legend_max_cnt = 0
-
-  Abundance_xaxis_name = 'mass'
-  Abundance_xaxis_reversed = .false.
-  Abundance_xmin = 0.0
-  Abundance_xmax = 1.0
-
-  Abundance_log_mass_frac_min = -3.0
-  Abundance_log_mass_frac_max =  0.3
-
-
-  HR_win_flag = .false.
-  HR_win_width = 12
-  HR_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
-  HR_title = ''
-
-  HR_logT_min = 3.5
-  HR_logT_max = 4.5
-  HR_logL_min = 1.0
-  HR_logL_max = 3.0
-
-
-  Text_Summary_win_flag(1) = .false.
-  Text_Summary_win_width(1) = 10
-  Text_Summary_win_aspect_ratio(1) = 0.15
-
-  Text_Summary_xleft(1) = 0.01
-  Text_Summary_xright(1) = 0.99
-  Text_Summary_ybot(1) = 0.0
-  Text_Summary_ytop(1) = 1.0
-  Text_Summary_txt_scale(1) = 1.0
-
-  Text_Summary_num_rows(1) = 1 ! <= 20
-  Text_Summary_num_cols(1) = 3 ! <= 20
-  Text_Summary_name(1, :, :) = ''
-
-  Text_Summary_name(1, 1, 1) = 'star_mass'
-  Text_Summary_name(1, 1, 2) = 'log_LH'
-  Text_Summary_name(1, 1, 3) = 'num_zones'
-
-  Grid_title(1) = 'make_zams'
-  Grid_win_flag(1) = .true.
-  Grid_win_width(1) = 15
-  Grid_win_aspect_ratio(1) = 0.6
-
-  Grid_plot_name(1, :) = ''
-  Grid_plot_row(1, :) = 1           ! number from 1 at top
-  Grid_plot_rowspan(1, :) = 1       ! plot spans this number of rows
-  Grid_plot_col(1, :) =  1          ! number from 1 at left
-  Grid_plot_colspan(1, :) = 1       ! plot spans this number of columns
-  Grid_plot_pad_left(1, :) = 0.0    ! fraction of full window width for padding on left
-  Grid_plot_pad_right(1, :) = 0.0   ! fraction of full window width for padding on right
-  Grid_plot_pad_top(1, :) = 0.0     ! fraction of full window height for padding at top
-  Grid_plot_pad_bot(1, :) = 0.0     ! fraction of full window height for padding at bottom
-  Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
-
-  Grid_num_cols(1) = 6 ! divide plotting region into this many equal width cols
-  Grid_num_rows(1) = 2 ! divide plotting region into this many equal height rows
-  Grid_num_plots(1) = 10 ! <= 10
-
-   pgstar_show_model_number = .true.
-   pgstar_model_scale = 1.0
-   pgstar_model_lw = 3
-   pgstar_model_disp = 2.0
-   pgstar_model_coord = 0.92
-   pgstar_model_fjust = 1.0
-
-   pgstar_show_age = .true.
-   pgstar_age_scale = 1.0
-   pgstar_age_lw = 3
-   pgstar_age_disp = 2.0
-   pgstar_age_coord = -0.10
-   pgstar_age_fjust = 0.0
-
-  Grid_plot_name(1, 1) = 'Text_Summary1'
-  Grid_plot_row(1, 1) = 1           ! number from 1 at top
-  Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
-  Grid_plot_col(1, 1) =  1          ! number from 1 at left
-  Grid_plot_colspan(1, 1) = 6       ! plot spans this number of columns
-
-  Grid_plot_pad_left(1, 1) = -0.06    ! fraction of full window width for padding on left
-  Grid_plot_pad_right(1, 1) = 0.05   ! fraction of full window width for padding on right
-  Grid_plot_pad_top(1, 1) = -0.02     ! fraction of full window height for padding at top
-  Grid_plot_pad_bot(1, 1) = 0.39     ! fraction of full window height for padding at bottom
-  Grid_txt_scale_factor(1, 1) = 1.2 ! multiply txt_scale for subplot by this
-
-
-  Grid_plot_name(1, 2) = 'Abundance'
-  Grid_plot_row(1, 2) = 1           ! number from 1 at top
-  Grid_plot_rowspan(1, 2) = 2       ! plot spans this number of rows
-  Grid_plot_col(1, 2) =  1          ! number from 1 at left
-  Grid_plot_colspan(1, 2) = 3       ! plot spans this number of columns
-
-  Grid_plot_pad_left(1, 2) = -0.05    ! fraction of full window width for padding on left
-  Grid_plot_pad_right(1, 2) = 0.10   ! fraction of full window width for padding on right
-  Grid_plot_pad_top(1, 2) = 0.03     ! fraction of full window height for padding at top
-  Grid_plot_pad_bot(1, 2) = 0.03     ! fraction of full window height for padding at bottom
-  Grid_txt_scale_factor(1, 2) = 0.7 ! multiply txt_scale for subplot by this
-
-
-  Grid_plot_name(1, 3) = 'HR'
-  Grid_plot_row(1, 3) = 1          ! number from 1 at top
-  Grid_plot_rowspan(1, 3) = 2       ! plot spans this number of rows
-  Grid_plot_col(1, 3) =  5          ! Number from 1 at left
-  Grid_plot_colspan(1, 3) = 3       ! plot spans this number of columns
-
-  Grid_plot_pad_left(1, 3) = -0.15    ! fraction of full window width for padding on left
-  Grid_plot_pad_right(1, 3) = 0.20   ! fraction of full window width for padding on right
-  Grid_plot_pad_top(1, 3) = 0.03     ! fraction of full window height for padding at top
-  Grid_plot_pad_bot(1, 3) = 0.03     ! fraction of full window height for padding at bottom
-  Grid_txt_scale_factor(1, 3) = 0.7 ! multiply txt_scale for subplot by this
-
-
-  Grid_file_flag(1) = .true.
-  Grid_file_dir(1) = 'pgstar_out'
-  Grid_file_prefix(1) = 'grid_'
-  Grid_file_interval(1) = 10000
-  Grid_file_width(1) = -1       ! (inches) negative means use same value as for window
-
- / ! end of pgstar namelist
+.. literalinclude:: ../../../star/test_suite/make_zams/inlist_zams
+  :language: console
+  :start-at: &pgstar
+  :end-at: ! end of pgstar namelist
 
 
 Last-Updated: 20Jun2021 (MESA e2acbc2) by fxt.
+
+Last-Run: 06Aug2024 (MESA 76b223b5) by aurimontem on MWKMFHK9LH in 65 seconds using 8 threads.

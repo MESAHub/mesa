@@ -66,8 +66,8 @@ selected by the option :ref:`kap/defaults:kap_file_prefix`.
 
 A direct comparison between the Type 1 format of OPAL/OP tables and 
 the OPLIB tables are shown in the figure below
-taken from Figure 1 in Farag et al. 2024. Further comparisons
-between OP/OPAL/OPLIB can be found in Farag et al. 2024.
+taken from Figure 1 in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_. Further comparisons
+between OP/OPAL/OPLIB can be found in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 
 
 .. figure:: type1_format.png

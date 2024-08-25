@@ -55,7 +55,7 @@
          integer, intent(in) :: nz
 
          ! Intermediates
-         integer j
+         integer :: j
 
          real(qp), dimension(:), intent(out) :: mass_flux
 
@@ -72,7 +72,7 @@
          ! Inputs
          real(dp), dimension(:) :: vec
          real(qp), dimension(:) :: dm
-         integer nz, j
+         integer :: nz, j
 
          ! Intermediates
          real(dp) alpha, beta, dmbar1
@@ -133,10 +133,10 @@
          real(dp), dimension(:) :: L, grad_r_sub_grad_a, thermal_energy, leak_frac
          real(dp) eps_mdot_leak_frac_factor
          real(dp) dt
-         integer nz
+         integer :: nz
 
          ! Intermediates
-         integer k, km1
+         integer :: k, km1
          real(dp) mass_flux_bar
 
          !!! High-level explanation
@@ -178,21 +178,18 @@
                               total_mass_through_cell, eps_mdot_per_total_mass,&
                               accumulated, mdot_adiabatic_surface, leak_frac)
          ! Inputs
-         integer nz
+         integer :: nz
          integer, dimension(:,:) :: ranges
          real(dp) mdot_adiabatic_surface
          real(qp), dimension(:) :: mass_flux, dm, mesh_intersects, total_mass_through_cell
          real(dp), dimension(:) :: eps_mdot_per_total_mass, accumulated, leak_frac
 
          ! Intermediates
-         integer i, j, k
-         integer i0, i1
-         integer i_start, i_end
+         integer :: j
+         integer :: i_start, i_end
          integer, dimension(:), allocatable :: i_min, i_max, j_min, j_max
-         logical do_now
          real(qp) delta_m
          real(dp) sgn
-         real(dp), dimension(:), allocatable :: excess
          type(non_rect_array), dimension(:), allocatable :: pf
 
          !!! High-level explanation
@@ -335,7 +332,7 @@
                       total_mass_through_cell, mdot_adiabatic_surface)
 
          ! Inputs
-         integer nz, i_start, i_end
+         integer :: nz, i_start, i_end
          integer, dimension(:) :: i_min, i_max, j_min, j_max
          type(non_rect_array), dimension(:) :: pf
          real(qp) delta_m
@@ -345,7 +342,7 @@
 
 
          ! Intermediates
-         integer i, j, k, direction, ii
+         integer :: i, j, direction
          real(qp) pass_frac, next, pass_mass
          real(dp), dimension(:), allocatable :: excess
 
@@ -465,23 +462,22 @@
 
          ! Inputs
          type (star_info), pointer :: s
-         real(dp) dt
-         integer ierr
+         real(dp) :: dt
+         integer :: ierr
          
          ! Intermediates
          logical :: dbg = .false.
-         integer nz, j, k, l, n
-         real(dp) delta_m, sgn, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
+         integer :: nz, j
+         real(dp) delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
-            p_bar, rho_bar, te_bar, te, curr_m, &
+            p_bar, rho_bar, te_bar, te, &
             leak_frac, thermal_energy, density_weighted_flux, eps_mdot_per_total_mass,&
             accumulated, grad_r_sub_grad_a
          real(qp), dimension(:), allocatable :: change_in_dm, mass_flux, dm, prev_mesh_dm,&
              total_mass_through_cell
          type(accurate_real) sum
          integer, dimension(:,:), allocatable :: ranges
-         real(qp), dimension(:), allocatable :: remainders, mesh_intersects
-         real(qp) m
+         real(qp), dimension(:), allocatable :: mesh_intersects
 
          if (s% mstar_dot == 0d0 .or. dt <= 0d0) then
             s% eps_mdot(1:s%nz) = 0d0

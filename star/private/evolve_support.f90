@@ -157,7 +157,6 @@
          use hydro_rotation, only: use_xh_to_update_i_rot
          use utils_lib
          type (star_info), pointer :: s
-         real(dp), pointer :: p1(:)
          integer :: j, k, ierr
 
          include 'formats'
@@ -287,7 +286,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
 
-         integer :: iounit, k
+         integer :: iounit
          type (star_info), pointer :: s
          character(len=strlen) :: iomsg
 

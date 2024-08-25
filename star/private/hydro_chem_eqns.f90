@@ -60,24 +60,23 @@
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
-         use rates_def, only: reaction_Name, i_rate
+         use rates_def, only: i_rate
          use star_utils, only: em1, e00, ep1
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
-         integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
          integer :: nz, j, i, jj, ii, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
-            dxdt_expected_dlnd, dxdt_expected_dlnT, &
             dq, dm, dequ, dxdt_nuc, dxdt_mix, max_abs_residual, &
-            sum_dxdt_nuc, dx_expected_dlnd, dx_expected_dlnT, &
+            sum_dxdt_nuc, &
             d_dxdt_mix_dx00, d_dxdt_mix_dxm1, d_dxdt_mix_dxp1, &
             sum_dx_burning, sum_dx_mixing, residual, &
-            dxdt_factor, alpha, eqn_scale, d_dxdt_dx, &
-            dequ_dlnd, dequ_dlnT, dequ_dlnPgas_const_T, dequ_dlnT_const_Pgas
+            dxdt_factor, eqn_scale, &
+            dequ_dlnd, dequ_dlnT
          logical :: test_partials, doing_op_split_burn
          logical, parameter :: checking = .false.
 

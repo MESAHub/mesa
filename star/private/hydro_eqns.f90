@@ -71,16 +71,16 @@
          integer, intent(out) :: ierr
 
          integer :: &
-            i_dv_dt, i_du_dt, i_du_dk, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
+            i_dv_dt, i_du_dt, i_equL, i_dlnd_dt, i_dlnE_dt, i_dlnR_dt, &
             i_dalpha_RTI_dt, i_equ_w_div_wc, i_dj_rot_dt, i_detrb_dt, &
             i, k, j, nvar_hydro, nz, op_err
          integer :: &
-            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_du, i_w_div_wc, i_j_rot, &
-            i_alpha_RTI, i_xh1, i_xhe4, kmax_equ(nvar), species
-         real(dp) :: max_equ(nvar), L_phot_old
+            i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_w_div_wc, i_j_rot, &
+            i_alpha_RTI, i_xh1, i_xhe4, species
+         real(dp) :: L_phot_old
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
-         logical :: v_flag, u_flag, cv_flag, w_div_wc_flag, j_rot_flag, dump_for_debug, &
+         logical :: v_flag, u_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
             do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
 
@@ -318,7 +318,7 @@
          contains
 
          subroutine dump_equ
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -427,14 +427,14 @@
 
             if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
                i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
-               if (i_var .gt. s% nvar_hydro) then
+               if (i_var > s% nvar_hydro) then
                   i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
                end if
             end if
 
             ! if we're on an EOS where there aren't composition partials,
             ! approximate derivatives with finite differences
-            if (frac_without_dxa .gt. 0) then
+            if (frac_without_dxa > 0) then
 
                do j=1, s% species
                   dxa = s% xa(j,k) - s% xa_start(j,k)
@@ -443,7 +443,7 @@
                         s% solver_iter == s% solver_test_partials_iter_number) &
                      write(*,2) 'dxa', j, dxa
 
-                  if (abs(dxa) .ge. dxa_threshold) then
+                  if (abs(dxa) >= dxa_threshold) then
 
                      ! first, get eos with xa_start
 
@@ -513,11 +513,11 @@
                      if (k == s% solver_test_partials_k .and. s% solver_iter == s% solver_test_partials_iter_number) then
                         if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                            if (dxa < dxa_threshold) then
-                              if (j .eq. i_var - s% nvar_hydro) then
+                              if (j == i_var - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_var_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               endif
-                              if (j .eq. i_var_sink - s% nvar_hydro) then
+                              if (j == i_var_sink - s% nvar_hydro) then
                                  write(*,*) 'fix_d_eos_dxa_partials: skipping dxa derivative fix for ', trim (s% solver_test_partials_sink_name), &
                                     ' (dxa < dxa_threshold): ', abs(dxa), ' < ', dxa_threshold
                               end if
@@ -602,7 +602,7 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: wwc, dimless_rphi, dimless_rphi_given_wwc, w1, w2
+         real(dp) :: wwc
          real(dp) :: jr_lim1, jr_lim2, A, C
          type(auto_diff_real_star_order1) :: &
             w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
@@ -825,11 +825,9 @@
                dlnT_bc_dlnd, dlnT_bc_dlnT, dlnT_bc_dlnR, &
                dlnT_bc_dL, dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
                dlnkap_dlnd, dlnkap_dlnT, dPinv_dlnd, dPinv_dlnT, dP0, dT0, &
-               P_surf, T_surf, dlnP_bc_dlnPsurf, P_rad, &
+               P_surf, T_surf, dlnP_bc_dlnPsurf, &
                dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
                dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-               dlnT_bc_dlnE_const_Rho, dlnT_dlnE_const_Rho, dlnP_dlnE_c_Rho, &
-               dlnP_bc_dlnE_c_Rho, dlnT_bc_dlnd_c_E, dlnP_bc_dlnd_c_E, &
                d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
                dlnR00, dlnT00, dlnd00
             logical, parameter :: skip_partials = .false.
@@ -1083,7 +1081,7 @@
          subroutine set_compression_BC(ierr)
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               rho1, rho2, lnd1, lnd2, dlnd1, dlnd2, drho1, drho2
+               rho1, rho2, dlnd1, dlnd2
             include 'formats'
             ! gradient of compression vanishes fixes density for cell 1
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
@@ -1144,7 +1142,6 @@
          integer, intent(out) :: ierr
          integer :: i, k
          type (star_info), pointer :: s
-         real(dp), dimension(:, :), pointer :: equ
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)

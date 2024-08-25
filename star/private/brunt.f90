@@ -37,7 +37,6 @@
       logical, parameter :: dbg = .false.
 
 
-
       contains
 
 
@@ -50,7 +49,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
-         integer :: nz, k, i
+         integer :: nz, k
          real(dp), allocatable, dimension(:) :: smoothing_array
 
          include 'formats'
@@ -126,7 +125,7 @@
          real(dp), allocatable, dimension(:) :: &
             rho_P_chiT_chiRho, rho_P_chiT_chiRho_face
 
-         integer :: nz, k, i
+         integer :: nz, k
 
          include 'formats'
 
@@ -200,8 +199,7 @@
 
 
          real(dp), allocatable, dimension(:) :: T_face, rho_face, chiT_face, chiRho_face
-         real(dp) :: brunt_B
-         integer :: nz, species, k, i, op_err
+         integer :: nz, species, k, op_err
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -344,4 +342,3 @@
 
 
       end module brunt
-

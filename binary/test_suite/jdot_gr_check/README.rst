@@ -9,7 +9,7 @@ analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
-* Part 1 (``inlist_project``) loads a 0.5 Msun zero-age main sequence model and a 0.8 Msun point mass. The binary system is given an initial seperation of 2.0 Rsun, and is evolved until the onset of Roche Lobe overflow.  Along the way, the ``run_binary_extras.f90`` calculates the deviation from the analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
+* Part 1 (``inlist_project``) loads a 0.5 Msun zero-age main sequence model and a 0.8 Msun point mass. The binary system is given an initial separation of 2.0 Rsun, and is evolved until the onset of Roche Lobe overflow.  Along the way, the ``run_binary_extras.f90`` calculates the deviation from the analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
 
 .. code-block:: console
 

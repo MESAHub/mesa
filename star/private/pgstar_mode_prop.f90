@@ -96,11 +96,10 @@
             xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
          real, allocatable, dimension(:) :: xvec, log_brunt_nu, &
             log_lamb_Sl1, log_lamb_Sl2, log_lamb_Sl3, temp_vec
          real :: xmin, xmax, xleft, xright, dx, chScale, windy, &
-            ymin, ymax, exp10_ymin, xmargin, &
+            ymin, ymax, xmargin, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
          integer :: lw, lw_sav, grid_min, grid_max, npts, nz
          integer, parameter :: num_colors = 20
@@ -156,7 +155,7 @@
             use rates_def
             integer, intent(out) :: ierr
 
-            integer :: ii, jj, i, cnt, k
+            integer :: cnt, k
             logical, parameter :: dbg = .false.
             real :: ybot, nu_max, lg_nu_max, lg_2pt0_nu_max, lg_0pt5_nu_max, lg_nu_max_obs
             real, parameter :: teff_sun = 5777.0, nu_max_sun = 3100.0

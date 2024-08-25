@@ -30,7 +30,7 @@ C
      .                 RMAX, SSA, SSE, SSM, SUM, XMIN, YMIN
 C      DOUBLE PRECISION CS2VAL_db
       INTEGER          I, IER, J, K, KF, KFF, KFL, KS, LOUT,
-     .                 N, NC, NFUN, NP, NR, NSET, NW, NWMAX
+     .                 N, NC, NFUN, NP, NR, NSET, NW
 C
 C Data:
 C

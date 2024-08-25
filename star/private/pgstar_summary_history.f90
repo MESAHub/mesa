@@ -77,7 +77,7 @@
 
          character (len=strlen) :: yname
          real, allocatable, dimension(:) :: xvec, yvec
-         real :: xmin, xmax, windy, ymin, ymax, xmargin, &
+         real :: xmin, xmax, windy, ymin, ymax, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
          integer :: lw, lw_sav, num_lines, &
             npts, step_min, step_max
@@ -147,7 +147,7 @@
             use rates_def
             integer, intent(out) :: ierr
 
-            integer :: j, ii, jj, i, cnt, k, yaxis_id
+            integer :: j, cnt, k
             logical :: show(num_lines)
             logical, parameter :: dbg = .false.
             real :: ybot, yvec_min, yvec_max

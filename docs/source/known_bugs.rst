@@ -19,9 +19,9 @@ ZAMS Model Central Composition
 When ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``, we fall back
 to loading a ZAMS model based on interpolating from a grid of pre-computed ZAMS models found in
 ``data/star_data/zams_models``. The default file included in that directory is meant to start from
-a composition of X = 0.70 and Z = 0.02, but one of the models in the grid (1.26 Msun) has partially
+a composition of X = 0.70 and Z = 0.02, but one of the models in the grid (1.26 |Msun|) has partially
 proceeded through hydrogen burning already so that its central H abundance is X = 0.58. Interpolation
-in this grid of models will impact the central H abundance for initial masses between 1.0 and 1.58 Msun.
+in this grid of models will impact the central H abundance for initial masses between 1.0 and 1.58 |Msun|.
 
 This bug affects versions r15140 through r23.05.1, and will be fixed in the next release.
 For current MESA releases impacted by this bug, the following steps provide a workaround with a patched ZAMS file:
@@ -147,7 +147,7 @@ If you get an error:
 
     bad filter name: 
 
-First check that the name matches in your history_coloumns.list file and your color file. Next check for non-printing characters history_coloumns.list in the filter name. This can bee checked with:
+First check that the name matches in your history_columns .list file and your color file. Next check for non-printing characters history_columns.list in the filter name. This can bee checked with:
 
 .. code-block:: shell
 

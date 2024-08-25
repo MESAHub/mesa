@@ -4,7 +4,7 @@
 12M_pre_ms_to_core_collapse
 ***************************
 
-This test suite evolves a solar metalicity 12 |MSun| model from the pre-ms to core collapse.
+This test suite evolves a solar metallicity 12 |MSun| model from the pre-ms to core collapse.
 
 Physical checks
 ===============

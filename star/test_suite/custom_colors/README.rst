@@ -11,13 +11,13 @@ This test case has 1 part. Click to see a larger view of a plot.
 * Part 1 (``inlist_1.0``) builds a 1.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until core hydrogen depletion (mass fraction h1 < 0.1). This example loads the default |LCB98| color filter ''lcb98cor.dat'', a custom color filter ``data/blackbody_bc_v.txt`` which in this case is blackbody V band filter, and a custom extinction color correction file ``data/fake_av_v.txt``. Example color-color, color-magnitude, magnitude-color and magnitude-magnitude plots:
 
 .. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude1_000241.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude2_000241.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/custom_colors/docs/Color_magnitude3_000241.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the first 7 plots:

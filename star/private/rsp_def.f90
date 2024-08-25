@@ -406,7 +406,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
-         integer :: n, k, i
+         integer :: n
          include 'formats'
          call init_def(s) 
          ierr = 0
@@ -447,7 +447,7 @@
       
       subroutine finish_after_build_model(s)
          type (star_info), pointer :: s
-         integer :: k, ierr
+         integer :: k
          ! restore bit-for-bit erad = crad*T**4*Vol
          include 'formats'
          do k = 1, NZN
@@ -522,7 +522,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: sum_dm
-         integer :: i, k
+         integer :: k
          include 'formats'
          ierr = 0
          sum_dm = 0d0         
@@ -658,7 +658,6 @@
          type (star_info), pointer :: s      
          character (len=*), intent(in) :: str
          integer :: k
-         real(dp) :: V
          include 'formats'
          do k=s% nz,1,-1
             if (k == s% nz) then

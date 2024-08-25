@@ -590,7 +590,7 @@
 
         subroutine read_hd5_file
 
-          use hdf5io_lib
+          use forum_m, only: hdf5io_t, OPEN_FILE_RO
 
           character (len=256)                 :: filename
           type(hdf5io_t)                      :: hi
@@ -642,7 +642,7 @@
 
 
         subroutine extend
-            integer :: i, n
+            integer :: n
             type(weaklib_rate_table) :: table
 
             type(table_c), dimension(:), allocatable :: tmp_weak_reactions_tables

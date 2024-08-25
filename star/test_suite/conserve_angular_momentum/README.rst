@@ -13,7 +13,7 @@ This test case has 2 parts. Click to see a larger view of a plot.
 * Part 2 (``inlist_conserve_J``) imposes a uniform 10 km/s rotation profile, and continues the evolution until the helium core reaches a mass of 0.22 Msun. Throughout this evolution a relative change in the angular momentum (J_init - J)/J_init of order 3e-13 is reported in the terminal:
 
 .. image:: ../../../star/test_suite/conserve_angular_momentum/docs/grid_000455.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the first 7 plots:

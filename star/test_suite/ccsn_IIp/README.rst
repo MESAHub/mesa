@@ -4,50 +4,50 @@
 ccsn_IIp
 ********
 
-This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 This test case has 8 parts and ``src/run_star_extras.f90`` is important. Click to see a larger view of a plot.
 
 * Part 1 (``inlist_infall``) loads ``pre_ccsn.mod`` from ``make_pre_ccsn_IIp``. The evolution of the 11.7 MSun model with with cell center Riemann velocities (u) and a total energy of -9.4e50 erg continues util R_center drops below 400 km:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/infall.svg
-   :scale: 100%
+   :width: 100%
 
 
 * Part 2 (``inlist_end_infall``) continues the evolution for an additional 1e-5 sec using HLLC hydrodynamics:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/end_infall.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 3 (``inlist_edep``) injects thermal energy into the inner 0.2 Msun until the model reaches a total energy of 8e50 erg:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/edep.svg
-   :scale: 100%
+   :width: 100%
 
-* Part 4 (``inlist_shock_part1``) contnues the evolution until the outward bound shock reaches 1.83 Msun:
+* Part 4 (``inlist_shock_part1``) continues the evolution until the outward bound shock reaches 1.83 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part1.svg
-   :scale: 100%
+   :width: 100%
 
-* Part 5 (``inlist_shock_part2``) contnues the evolution until the outward bound shock reaches 2.68 Msun:
+* Part 5 (``inlist_shock_part2``) continues the evolution until the outward bound shock reaches 2.68 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part2.svg
-   :scale: 100%
+   :width: 100%
 
-* Part 6 (``inlist_shock_part3``) contnues the evolution until the outward bound shock reaches 3.88 Msun:
+* Part 6 (``inlist_shock_part3``) continues the evolution until the outward bound shock reaches 3.88 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part3.svg
-   :scale: 100%
+   :width: 100%
 
-* Part 7 (``inlist_shock_part4``) contnues the evolution until the outward bound shock reaches 11.64 Msun:
+* Part 7 (``inlist_shock_part4``) continues the evolution until the outward bound shock reaches 11.64 Msun:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part4.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 8 (``inlist_shock_part5``) continues the approach to shock breakout, terminating when the shock reaches 11.70 Msun, and creating the ``mesa.abn`` and ``mesa.abn`` files for subsequent use with STELLA:
 
 .. image:: ../../../star/test_suite/ccsn_IIp/docs/part5.svg
-   :scale: 100%
+   :width: 100%
 
 
 

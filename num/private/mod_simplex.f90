@@ -65,9 +65,9 @@
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr
          
          real(dp), dimension(n) :: c, x_reflect, x_expand, x_contract, x_ars
-         real(dp) :: f_reflect, f_expand, f_contract, f_ars, rand01, dist, min_dist, &
-            dx, term1, xmid, weight, sum_weight, term_val_x
-         integer :: h, s, l, i, j, k, iter, min_k
+         real(dp) :: f_reflect, f_expand, f_contract, f_ars, &
+            term1, weight, sum_weight, term_val_x
+         integer :: h, s, l, i, j
          
          logical, parameter :: dbg = .false.
          
