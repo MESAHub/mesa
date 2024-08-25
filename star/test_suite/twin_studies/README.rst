@@ -39,10 +39,8 @@ for star 1:
   
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    !file_device = 'png'            ! png
-   !file_extension = 'png'
 
    file_device = 'vcps'          ! postscript
-   file_extension = 'ps'
 
    Grid1_file_flag = .true.
    Grid1_file_dir = 'png1'
@@ -62,10 +60,8 @@ and for star 2:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    !file_device = 'png'            ! png
-   !file_extension = 'png'
 
    file_device = 'vcps'          ! postscript
-   file_extension = 'ps'
 
    Grid1_title = 'star2 - without overshooting'
    
