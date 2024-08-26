@@ -42,7 +42,7 @@
 
       subroutine do_element_diffusion(s, dt_in, ierr)
          ! return ierr /= 0 if cannot satisfy accuracy requirements
-         use chem_def, only: chem_isos, ihe4, ih1
+         use chem_def, only: chem_isos
          use chem_lib, only: chem_get_iso_id
          use star_utils, only: start_time, update_time
          use diffusion, only: &
@@ -52,16 +52,14 @@
          integer, intent(out) :: ierr
 
          integer :: i, j, k, kk, nc, m, nzlo, nzhi, nz, species, iounit, &
-            steps_used, total_num_iters, total_num_retries, cid, he4
+            steps_used, total_num_iters, total_num_retries, cid
          integer(8) :: time0
-         real(dp) :: s1, s2, dqsum, dist, r, Hp, dt, total, &
+         real(dp) :: s1, s2, dqsum, dt, total, &
             gradT_mid, gradRho_mid, alfa, gradRho_face, chiRho_face, chiT_face
-         real(dp) :: rho, Pgas, T, &
-            logRho, dlnRho_dlnPgas, dlnRho_dlnT, &
-            e, de, e_with_xa, Amass, Zcharge, min_D_mix
+         real(dp) :: Amass, Zcharge, min_D_mix
 
          integer, dimension(:), allocatable :: &
-            class, class_chem_id, mixing_type, mixing_type_arg
+            class, class_chem_id, mixing_type
          real(dp), dimension(:), allocatable :: &
             gamma, free_e, &
             dlnPdm_face, dlnT_dm_face, dlnRho_dm_face, &
@@ -74,7 +72,7 @@
          character (len=8), allocatable :: class_name(:)
 
 
-         logical :: dumping, okay
+         logical :: dumping
 
          include 'formats'
 
@@ -470,8 +468,6 @@
             use utils_lib
             use chem_def, only: chem_isos
             integer :: i, k, ierr
-            real(dp) :: alfa, rho_face, chiT_face, chiRho_face, &
-               dm_dr, gradRho, dlnRho_dm
 
             ierr = 0
             write(*, *)

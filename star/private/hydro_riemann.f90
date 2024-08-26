@@ -87,7 +87,7 @@
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
       
-         integer :: j, nz, i_du_dt, i_u
+         integer :: nz, i_du_dt
          type(auto_diff_real_star_order1) :: &
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
             geometry_source_ad, gravity_source_ad, &

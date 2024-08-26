@@ -150,8 +150,8 @@
             MixDs_xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
 
-         real :: chScale, windy, xmargin
-         real :: xmin, xmax, xleft, xright, dx, tmp, ymin, ymax, ymin2, ymax2, dy, &
+         real :: chScale, xmargin
+         real :: xmin, xmax, xleft, xright, dx, ymin, ymax, ymin2, ymax2, dy, &
             legend_xmin, legend_xmax, legend_ymin, legend_ymax
          integer :: grid_min, grid_max, npts, nz, number_of_legend_lines
          real, allocatable, dimension(:) :: &
@@ -197,8 +197,7 @@
 
             integer :: lw, lw_sav
             real :: val
-            character (len=128) :: str
-            integer :: i, ii, k, cnt
+            integer :: k, cnt
             logical :: rotation
             real(dp) :: &
                D_visc_factor, &

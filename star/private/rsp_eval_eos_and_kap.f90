@@ -48,7 +48,6 @@
       
       subroutine restart_rsp_eos_and_kap(s)
          type (star_info), pointer :: s
-         integer :: ierr
          eos_handle = s% eos_handle
          kap_handle = s% kap_handle
          net_iso => s% net_iso
@@ -60,7 +59,7 @@
          use adjust_xyz, only: get_xa_for_standard_metals
          type (star_info), pointer :: s
          
-         integer :: i, k, j, iz, ierr
+         integer :: i, iz, ierr
          real(dp) :: initial_z, initial_y, initial_x, &
             initial_h1, initial_h2, initial_he3, initial_he4, &
             xsol_he3, xsol_he4, z2bar, ye, mass_correction, sumx
@@ -207,15 +206,11 @@
          integer, intent(out) :: ierr
          
          integer :: j
-         real(dp) :: logT, logRho, T, Rho, energy, entropy, &
-            dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas, &
-            d_dlnRho_const_T, d_dlnT_const_Rho, E, dE_dV, dE_dT, &
+         real(dp) :: logT, logRho, T, Rho, E, dE_dV, dE_dT, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-            frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, &
             dlnd_dV, chiRho, chiT, dchiRho_dlnd, dchiRho_dlnT, &
-            dchiT_dlnd, dchiT_dlnT, dQ_dlnd, dQ_dlnT, opacity_factor
-         real(dp), dimension(num_eos_basic_results) :: &
-            res, d_dlnd, d_dlnT, d_dabar, d_dzbar
+            dchiT_dlnd, dchiT_dlnT, dQ_dlnd, dQ_dlnT
+         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
 
          include 'formats'
@@ -826,7 +821,6 @@
          real(dp) :: &
             lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
-         integer :: iter
          
          ierr = 0
 
@@ -871,7 +865,7 @@
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
-         integer :: max_iter, which_other, eos_calls, iter
+         integer :: max_iter, which_other, eos_calls
             
          include 'formats'
          ierr = 0         
@@ -917,7 +911,7 @@
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results, species)
-         integer :: max_iter, which_other, eos_calls, iter
+         integer :: max_iter, eos_calls
             
          include 'formats'
          ierr = 0         
@@ -989,7 +983,7 @@
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
-         integer :: max_iter, which_other, eos_calls, iter
+         integer :: max_iter, which_other, eos_calls
             
          include 'formats'
          ierr = 0         
@@ -1032,7 +1026,7 @@
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
-         integer :: max_iter, which_other, eos_calls, iter
+         integer :: max_iter, which_other, eos_calls
          ierr = 0         
          max_iter = 100
          which_other = i_lnE

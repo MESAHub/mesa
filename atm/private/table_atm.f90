@@ -83,8 +83,6 @@
             type(atm_info), intent(inout) :: ai
             integer, intent(out) :: ierr
             
-            integer :: nvec
-            character (len=500) :: buf
             real(dp), target :: vec_ary(20)
             real(dp), pointer :: vec(:)
 
@@ -505,7 +503,7 @@
             integer, intent(in)  :: iZ !index of Z table to be loaded
             integer, intent(out) :: ierr
             integer :: iounit, i, j, ibound_tmp(ng), ibcTmin, ibcTmax, ibcgmin, ibcgmax
-            integer :: cache_file_version, text_file_version, nvec
+            integer :: text_file_version, nvec
             real(dp) :: Teff_tmp(nT), logg_tmp(ng)
             real(dp) :: bcTmin(nT), bcTmax(ng), bcgmin(ng), bcgmax(ng), data_tmp(ng,nT)
             real(dp), target :: vec_ary(100)

@@ -79,10 +79,9 @@
          real(dp), allocatable :: smooth_work(:,:), saved(:,:)
          logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
 
-         integer :: nz, i, j, k, k0, which, op_err
-         real(dp) :: alfa, beta, growth_limit, age_fraction, &
-            D_omega_source, max_replacement_factor, &
-            dgtau, angsml, angsmt, out_q, prev_out_q, prev_out_q_m1, prev_q, prev_q_m1
+         integer :: nz, k, k0, which, op_err
+         real(dp) :: alfa, growth_limit, age_fraction, &
+            D_omega_source, dgtau, angsml, angsmt, prev_out_q, prev_out_q_m1, prev_q, prev_q_m1
 
          include 'formats'
 
@@ -447,7 +446,7 @@
                eps_nucm1, eps_nuc00, scale_height2, dlnRho_dlnP, dlnT_dlnP, &
                kap, dlnkap_dlnRho, dlnkap_dlnT
 
-            integer :: i, k, j
+            integer :: i, k
 
             include 'formats'
 
@@ -836,7 +835,7 @@
             use chem_def
             integer, intent(out) :: ierr
             integer :: i, k, kbot, ktop
-            real(dp) :: qe3, qe4, lambda, dynvisc, Prandtl, radcon, D
+            real(dp) :: qe3, qe4, dynvisc, Prandtl, radcon, D
             include 'formats'
 
             ierr = 0
@@ -921,7 +920,7 @@
          subroutine set_D_ES(ierr)
             integer, intent(out) :: ierr
             integer :: i, k, kbot, ktop
-            real(dp) :: instability_height, D, v, dln_v_es
+            real(dp) :: instability_height, D, v
             include 'formats'
             ierr = 0
 
@@ -1154,9 +1153,9 @@
             N2, N2_mu, opacity, kap_cond, scale_height
          integer, intent(out) :: ierr
 
-         integer :: nz, k, j, kk
+         integer :: nz, k, kk
          real(dp) :: xmagfmu, xmagft, xmagfdif, xmagfnu, &
-            xkap, xgamma, xlg, xsig1, xsig2, xsig3, xxx, ffff, xsig, &
+            xkap, xgamma, xsig, &
             xeta, xmagn, xmagnmu, xmagnt, xmagw, xmagdn, xmagtn, xmagrn, xmag4pd, &
             dlnomega_dlnr, xmagq, xmager2w, &
             xmagnn, xmagwn, xmagq0, xmagwa0, xmags0, xmagbphi0, xmagbr0, xmageta0, &

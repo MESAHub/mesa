@@ -43,8 +43,6 @@
       
       logical, parameter :: call_is_bad = .false.
       
-      real(dp) :: x_dbg
-      
       integer, parameter :: i_var_Vol = 99 ! for remeshing tests with dfridr
       
       integer, parameter :: &
@@ -195,11 +193,10 @@
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: DXXT, DXXC, DXXE, DXXL, PREC2, DXH, EZH, rel_err_energy, &
-            T_surf, P_surf, kap_surf, kap_guess, Teff_atm, &
-            R_center_start, dt_max, total
+         real(dp) :: DXXT, DXXC, DXXE, DXXL, PREC2, DXH, EZH, &
+            P_surf, R_center_start, dt_max, total
          integer :: &
-            i_min, i_max, num_tries, max_retries, max_iters, i, IT, k, nz, &
+            i_min, i_max, num_tries, max_retries, max_iters, k, nz, &
             kT_max, kW_max, kE_max, kL_max, iter_for_dfridr, test_partials_k
          integer(8) :: time0
          logical :: converged, dbg_msg, trace
@@ -327,7 +324,6 @@
          end subroutine set_min_k_for_turbulent_flux
                
          subroutine doing_retry
-            integer :: i
             include 'formats'
             if (num_tries  ==  max_retries+1) then
                write(*,*) 'NO CONVERGENCE IN HYD, TIME STEP num tries, max allowed', &
@@ -346,7 +342,6 @@
          end subroutine doing_retry
          
          subroutine write_msg
-            integer :: i, k
             include 'formats'
             !if (EZH < 1d0) write(*,3) 'undercorrection factor', s% model_number, iter, EZH
             write(*,'(i6, 2x, i3, 4(4x, a, 1x, i4, 1x, 1pe11.4, 1x, 1pe11.4))') &
@@ -628,8 +623,6 @@
       subroutine set_f_Edd(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: lim_f_Edd, lim_g_Edd
-         integer :: k, j
          include 'formats'
          ierr = 0
          s% g_Edd = 0.5d0
@@ -697,7 +690,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iter,i_min,i_max
          integer, intent(out) :: ierr
-         integer :: i, k, op_err
+         integer :: i, op_err
          integer(8) :: time0
          real(dp) :: total
          include 'formats'
@@ -741,11 +734,11 @@
       subroutine eval_eqns(s,P_surf)
          type (star_info), pointer :: s
          real(dp), intent(in) :: P_surf
-         integer :: i, k
+         integer :: i
          include 'formats'
          !$OMP PARALLEL DO PRIVATE(I) SCHEDULE(dynamic,2)
-         do I = 1,NZN
-            call calc_equations(s, I, P_surf)
+         do i = 1,NZN
+            call calc_equations(s, i, P_surf)
          end do
          !$OMP END PARALLEL DO
       end subroutine eval_eqns
@@ -760,22 +753,22 @@
          include 'formats'
          k = NZN+1-i
          T1 = P43/s% dm(k)
-         if (I /= 1) then
+         if (i /= 1) then
             q1 = T1
             q2 = s% r(k)
             q3 = s% r(k+1)
             q4 = q1*(q2**3 - q3**3)
             s% Vol(k) = dble(q4)
-            dVol_dr_in(I) = - 3.0d0*T1*s% r(k+1)**2
+            dVol_dr_in(i) = - 3.0d0*T1*s% r(k+1)**2
          else
             s% Vol(k) = T1*(s% r(k)**3 - s% R_center**3)
-            dVol_dr_in(I) = 0d0
+            dVol_dr_in(i) = 0d0
          end if
          if (s% Vol(k) <= 0d0) then
             write(*,2) 'bad Vol', k, s% Vol(k)
             call mesa_error(__FILE__,__LINE__,'do1_specific_volume')
          end if
-         dVol_dr_00(I) = 3.d0*T1*s% r(k)**2
+         dVol_dr_00(i) = 3.d0*T1*s% r(k)**2
       end subroutine do1_specific_volume
       
       
@@ -947,7 +940,7 @@
          real(dp), intent(in) :: DXH
          real(dp), intent(out) :: XXT, XXC, XXE, XXL, EZH
          integer, intent(out) :: kT_max,kW_max,kE_max,kL_max
-         integer :: i, k, IR, IT, IW, IU, IE, IL, kEZH, &
+         integer :: i, k, IR, IT, IW, IE, IL, kEZH, &
             iTM, kTM, iRM, kRM, iEM, kEM, iCM, kCM, iLM, kLM
          real(dp) :: old_w, XXR, DXXT, DXXC, DXXE, DXXL, DXRM, DXR, &
             EZH1, XXTM, XXCM, XXRM, XXEM, XXLM, DXKT, DXKC, DXKE, DXKL
@@ -1739,7 +1732,7 @@
          integer, intent(in) :: I      
          real(dp) :: RRI, RRM, UUI, UUM, POM, POM2
          integer :: k
-         logical :: test_partials, smoothed
+         logical :: test_partials
          include 'formats'
          k = NZN+1-i
          if (ALFA == 0d0 .or. I <= IBOTOM .or. I >= NZN) then
@@ -2147,8 +2140,7 @@
             dLt_der_00, dLt_der_out, &
             dLt_dw_00, dLt_dw_out
          real(dp) :: POM, POM2, POM3, TEM1, TEM2, &
-            d_POM2_dVol_00, d_POM2_dVol_out, rho2_face, &
-            d_rho2_face_dVol_00, d_rho2_face_dVol_out
+            d_POM2_dVol_00, d_POM2_dVol_out, rho2_face
          integer :: k
          logical :: test_partials
          include 'formats'
@@ -2331,8 +2323,8 @@
             dFr_dT_out, dFr_dT_00, &
             dFr_der_out, dFr_der_00
          real(dp) :: &
-            Vol_00, W_00, d_W_00_dr_in, d_W_00_dr_00, d_W_00_dVol_00, d_W_00_der_00, &
-            Vol_out, W_out, d_W_out_dr_00, d_W_out_dr_out, d_W_out_dVol_out, d_W_out_der_out, &
+            W_00, d_W_00_dr_in, d_W_00_dr_00, d_W_00_dVol_00, d_W_00_der_00, &
+            W_out, d_W_out_dr_00, d_W_out_dr_out, d_W_out_dVol_out, d_W_out_der_out, &
             Prad_factor, Fr2a, d_Fr2a_dW_00, d_Fr2a_dW_out, &
             Fr2b, d_Fr2b_dW_00, d_Fr2b_dW_out, &
             BW, kap_00, kap_out, BK, Fr1, Fr2, Fr3, &
@@ -3568,19 +3560,6 @@
          use const_def, only: crad, clight
          type (star_info), pointer :: s
          integer, intent(in) :: i
-         integer :: IE, k
-         real(dp) :: time_scale, residual, XP, d_XP_der, &
-            d_XP_dVol_00, d_XP_dr_00, d_XP_dr_in, &
-            area_00, area_00_start, area_in, area_in_start, &
-            Lr_00, Lr_00_start, d_Lr_00_dFr_00, d_Lr_00_dr_00, &
-            Lr_in, Lr_in_start, d_Lr_in_dFr_in, d_Lr_in_dr_in, &
-            L_00, L_in, dt, dm, dt_div_dm, DV, opacity, &
-            erad, erad_tw, Vol, T, COUPL_factor, COUPL, COUPL1, &
-            d_COUPL_dVol, d_COUPL_dT, d_COUPL_der, d_COUPL_dr_in, d_COUPL_dr_00, &
-            heat_exchange_time_scale, kE_fac, kP_fac, dt_term, &
-            d_dt_term_dT, d_dt_term_dr_in, d_dt_term_dr_00, &
-            u_div_r, d_u_div_r_dr_00, d_u_div_r_dr_in, u_div_r_factor
-         logical :: test_partials
          include 'formats'
          
          call T_form_of_erad_eqn(s, i)
@@ -3593,30 +3572,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: i
          integer :: IL, k
-         real(dp) :: residual, &
-            XP_00, d_XP_00_dVol_00, d_XP_00_der_00, d_XP_00_dr_00, d_XP_00_dr_in, &
-            XP_out, d_XP_out_der_out, d_XP_out_dr_out, d_XP_out_dr_00, &
-            u_div_r, d_u_div_r_dr_00, &
-            d_lnV, d_dlnV_dVol_00, d_dlnV_dr_in, d_dlnV_dr_00, d_dlnV_dr_out, &
-            Vol_out, d_Vol_out_dr_00, d_Vol_out_dr_out, &
-            rho_out, d_rho_out_dr_out, d_rho_out_dr_00, &
-            Vol_00, d_Vol_00_dr_in, d_Vol_00_dr_00, &
-            rho_00, d_rho_00_dVol_00, d_rho_00_dr_00, d_rho_00_dr_in, &
-            rho_face, d_rho_dVol_00, d_rho_dr_in, d_rho_dr_00, d_rho_dr_out, &
-            r, dt, dm_bar, dt_div_dm_bar, d_dXP_factor_dr_in, d_dXP_factor_dr_00, &
-            d_dXP_factor_dr_out, Fr, Fr_start, Fr_tw, &
-            kap_00, kap_out, kap_rho_face, rho_face_start, d_dlnV_drho_face, &
-            d_kap_00_dVol_00, d_kap_00_dT_00, d_kap_00_dr_00, d_kap_00_dr_in, &
-            d_kap_out_dT_out, d_kap_out_dr_00, d_kap_out_dr_out, &
-            area, d_area_dr_00, d_kaprho_dVol_00, d_kaprho_dT_00, d_kaprho_dT_out, &
-            d_kaprho_dr_in, d_kaprho_dr_00, d_kaprho_dr_out, &
-            dXP, dXP_factor, Fr_factor, d_dXP_factor_dVol_00, &
-            d_Fr_factor_dVol_00, d_Fr_factor_dT_00, d_Fr_factor_dT_out, &
-            d_Fr_factor_dr_in, d_Fr_factor_dr_00, d_Fr_factor_dr_out, &
-            erad_00, erad_out, erad_tw, erad_factor1, erad_factor, &
-            d_erad_factor_dVol_00, d_erad_factor_dr_in, &
-            d_erad_factor_dr_00, d_erad_factor_dr_out
-         logical :: test_partials, okay
+         real(dp) :: residual
 
          include 'formats'
          
@@ -3867,6 +3823,3 @@
 
 
       end module rsp_step
-      
-      
-            

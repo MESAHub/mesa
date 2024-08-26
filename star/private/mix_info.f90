@@ -56,8 +56,8 @@
          logical, intent(in) :: skip_set_cz_bdy_mass
          integer, intent(out) :: ierr
 
-         integer :: nz, i, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
-         real(dp) :: c, rho_face, f, Tmax, conv_vel, min_conv_vel_for_convective_mixing_type, &
+         integer :: nz, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
+         real(dp) :: rho_face, f, Tmax, min_conv_vel_for_convective_mixing_type, &
             region_bottom_q, region_top_q, L_val
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
@@ -426,7 +426,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, mt, mt1, mt2, nz
+         integer :: k, mt1, mt2, nz
          real(dp) :: dg0, dg1
 
          include 'formats'
@@ -537,8 +537,7 @@
 
          logical :: in_convective_region
          integer :: k, k_bot, i, j, iounit, max_conv_bdy
-         real(dp) :: dgrad00, dgradp1, turnover_time, &
-            bot_Hp, bot_r, top_Hp, top_r, dr
+         real(dp) :: turnover_time, bot_Hp, bot_r, top_Hp, top_r, dr
 
          logical :: dbg
          logical, parameter :: write_debug = .false.
@@ -654,7 +653,7 @@
 
 
          subroutine end_of_convective_region()
-            integer :: max_logT_loc, kk, op_err, mix_type
+            integer :: max_logT_loc, kk
             real(dp) :: max_logT, max_X, max_Y, Hp, max_eps
             logical :: end_dbg
 
@@ -800,7 +799,7 @@
          integer, intent(out) :: ierr
 
          logical :: in_mixing_region
-         integer :: k, k_bot, i, j, iounit, max_mix_bdy, nz
+         integer :: k, k_bot, i, max_mix_bdy, nz
 
          logical, parameter :: dbg = .false.
 
@@ -1113,7 +1112,7 @@
          real(dp), intent(in) :: min_gap
          integer, intent(out) :: ierr
 
-         integer :: k, kk, nz
+         integer :: k, nz
          logical :: in_region, dbg
          real(dp) :: rtop, rbot, Hp
          integer :: ktop, kbot ! k's for gap
@@ -1279,7 +1278,7 @@
 
 
          subroutine clean_region
-            integer :: kbot1, ktop1, kk
+            integer :: kbot1, ktop1
             include 'formats'
             if (dbg) write(*,3) 'clean_region semiconvective', kbot, ktop
             ! move top to below top convective region
@@ -1380,7 +1379,6 @@
 
 
       subroutine get_convection_sigmas(s, dt, ierr)
-         use chem_def, only: chem_isos
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
@@ -1389,10 +1387,8 @@
          real(dp) :: sig_term_limit ! sig_term_limit is used to help convergence
 
          real(dp) :: siglim, xmstar, dq00, dqm1, cdcterm, dmavg, rho_face, &
-            cdc, max_sig, D, xm1, x00, xp1, dm, dX, X, cushion, limit, &
-            Tc, full_off, full_on, X_lim, dX_lim, qbot, qtop, &
-            f1, f, df_dlnd00, df_dlndm1, df_dlnR, df_d_rho_face, alfa, beta
-         logical :: in_convective_region
+            cdc, max_sig, D, xm1, x00, dm, dX, X, cushion, limit, &
+            Tc, full_off, full_on, qbot, qtop, f1, f, alfa
          real(dp), dimension(:), pointer :: sig, D_mix
 
          include 'formats'
@@ -1564,7 +1560,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, nz, k0
+         integer :: k, nz
          logical :: set_min_am_nu_non_rot, okay
          real(dp) :: &
             am_nu_visc_factor, &
@@ -1943,13 +1939,13 @@
 
 
       subroutine set_RTI_mixing_info(s, ierr)
-         use chem_def, only: ih1, ihe4
+         use chem_def, only: ih1
          use star_utils, only: get_shock_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp) :: &
             C, alpha_face, f, v, &
-            am1, a00, ap1, min_dm, alfa0, alfa, cs, r, shock_mass_start, &
+            min_dm, alfa, cs, r, shock_mass_start, &
             log_max_boost, m_full_boost, m_no_boost, max_boost, &
             dm_for_center_eta_nondecreasing, min_eta
          integer :: k, nz, i_h1
@@ -2115,11 +2111,10 @@
       subroutine set_dPdr_dRhodr_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: rho, r00, alfa00, beta00, P_face00, rho_face00, &
-            rp1, alfap1, betap1, dr_m1, dr_00, &
-            c, d, am1, a00, ap1, v, rmid
+         real(dp) :: rho, r00, alfa00, beta00, &
+            dr_m1, dr_00, c, d, am1, a00, ap1, v, rmid
          real(dp), allocatable, dimension(:) :: dPdr, drhodr, P_face, rho_face
-         integer :: k, nz, width
+         integer :: k, nz
          logical, parameter :: do_slope_limiting = .false.
          include 'formats'
          ierr = 0
@@ -2236,7 +2231,7 @@
          integer, intent(in) :: number_iterations
          real(dp) :: val(:)
          integer, intent(out) :: ierr
-         integer :: nz, iter, k_center, k_inner, k_outer, j, k
+         integer :: nz, iter, k_center, k_inner, k_outer, k
          real(dp) :: mlo, mhi, mmid, smooth_m, v, dm_half, mtotal, mass_from_cell
          real(dp), allocatable :: work(:)
          include 'formats'

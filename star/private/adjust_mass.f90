@@ -186,12 +186,11 @@
          integer, intent(out) :: ierr
 
          real(dp) :: &
-            dt, delta_m, old_mstar, new_mstar, old_J, new_J, factor, total, &
-            frac, env_mass, mmax, alfa, new_xmstar, old_xmstar, removed, &
+            dt, delta_m, old_mstar, new_mstar, total, &
+            frac, env_mass, mmax, new_xmstar, old_xmstar, removed, &
             q_for_just_added, xq_for_CpT_absMdot_div_L, sum_dq, dm, sumx
 
-         real(dp), dimension(species) :: &
-            xaccrete, mtot_init, mtot_final
+         real(dp), dimension(species) :: xaccrete, mtot_init
          real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
             oldloc, newloc, oldval, newval, xm_old, xm_new, &
@@ -537,7 +536,7 @@
             ! when call this, s% j_rot is still for old mass
             integer, intent(out) :: ierr
             integer :: k
-            real(dp) :: r2, dmm1, dm00, dm, dm_sum, dm_lost
+            real(dp) :: dmm1, dm00, dm, dm_sum, dm_lost
             include 'formats'
             ierr = 0
             J = 0
@@ -621,12 +620,12 @@
          real(dp), intent(in) :: old_xmstar, new_xmstar, delta_m
          integer, intent(out) :: k_const_mass, ierr
 
-         integer :: k, kA, kB, j00, jp1, k_check
-         real(dp) :: lnTlim_A, lnTlim_B, sumdq, sumdq1, sumdq2, sumdq3, &
-            min_xq_const_mass, min_q_for_kB, mold_o_mnew, lnTmax, lnT_A, lnT_B, &
+         integer :: k, kA, kB, j00, jp1
+         real(dp) :: lnTlim_A, lnTlim_B, sumdq, &
+            mold_o_mnew, lnTmax, lnT_A, lnT_B, &
             xqA, xqB_old, xqB_new, qfrac, frac, dqacc
          real(dp) :: xq(nz)
-         real(qp) :: qfrac_qp, frac_qp, mold_o_mnew_qp, q1, q2, q3, q4
+         real(qp) :: qfrac_qp, frac_qp, mold_o_mnew_qp, q1, q2
          real(qp) :: adjust_mass_outer_frac, adjust_mass_mid_frac, adjust_mass_inner_frac
          integer, parameter :: min_kA = 5
          logical :: dbg, flag
@@ -889,7 +888,6 @@
             old_cell_xbdy, new_cell_xbdy, mmax, old_cell_mass, new_cell_mass, ierr)
          ! set new values for s% xa(:,k)
          use num_lib, only: binary_search
-         use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, species
          real(dp), intent(in) :: mmax
@@ -1139,11 +1137,10 @@
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot, extra_work
          integer, intent(out) :: ierr
 
-         integer :: k, k0, op_err, old_k, new_k, k_uniform
+         integer :: k, k0, op_err
          logical :: okay
-         real(dp) :: old_j_tot, new_j_tot, goal_total_added, actual_total_added, &
-            f, jtot_bdy, goal_total, bdy_j, bdy_total, inner_total, outer_total, &
-            msum, isum, jsum, omega_uniform
+         real(dp) :: old_j_tot, goal_total_added, actual_total_added, &
+            goal_total, bdy_j, bdy_total, inner_total, outer_total
 
          include 'formats'
 
@@ -1249,7 +1246,7 @@
          integer, intent(in) :: k, k_below_just_added
          logical, intent(in) :: jrot_known
 
-         real(dp) :: r00, r003, ri, ro, rp13, rm13
+         real(dp) :: r00
          real(dp) :: w_div_wcrit_roche
 
          r00 = get_r_from_xh(s,k)
@@ -1284,7 +1281,7 @@
 
          real(dp) :: xm_outer, xm_inner, j_tot, xm0, xm1, new_point_dmbar, &
             dm_sum, dm
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 

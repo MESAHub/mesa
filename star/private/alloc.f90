@@ -82,7 +82,6 @@
       integer :: num_allocs, num_deallocs
 
 
-
       contains
 
       
@@ -469,8 +468,7 @@
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
 
-         integer :: nz, species, num_reactions, &
-            nvar, nvar_hydro, nvar_chem, sz_new, psz_new, action
+         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -1416,7 +1414,6 @@
 
          subroutine do1_ad(ptr, other)
             type(auto_diff_real_star_order1), dimension(:), pointer :: ptr, other
-            type(auto_diff_real_star_order1), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_ad_with_NaNs(ptr,1,-1)
             else if (action == do_copy_pointers_and_resize) then
@@ -1444,7 +1441,6 @@
 
          subroutine do1(ptr, other)
             real(dp), dimension(:), pointer :: ptr, other
-            real(dp), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
@@ -1475,7 +1471,6 @@
 
          subroutine do1_neq(ptr, other)
             real(dp), dimension(:), pointer :: ptr, other
-            real(dp), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
@@ -1504,7 +1499,6 @@
 
          subroutine do1_integer(ptr, other)
             integer, dimension(:), pointer :: ptr, other
-            integer, dimension(:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) return
@@ -1522,7 +1516,6 @@
          subroutine do2_integer(ptr, other, sz1)
             integer, dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
-            real(dp), dimension(:,:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
@@ -1539,7 +1532,6 @@
 
          subroutine do1_logical(ptr, other)
             logical, dimension(:), pointer :: ptr, other
-            logical, dimension(:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) return
@@ -1558,7 +1550,6 @@
             real(dp), dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
             character (len=*), intent(in) :: str
-            real(dp), dimension(:,:), pointer :: tmp
             include 'formats'
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs_2d(ptr)
@@ -1589,7 +1580,6 @@
          subroutine do3(ptr, other, sz1, sz2)
             real(dp), dimension(:,:,:), pointer :: ptr, other
             integer, intent(in) :: sz1, sz2
-            real(dp), dimension(:,:,:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs_3d(ptr)
             elseif (action == do_copy_pointers_and_resize) then
@@ -1622,7 +1612,6 @@
          subroutine do2_quad(ptr, other, sz1)
             real(qp), dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
-            real(qp), dimension(:,:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
@@ -1889,7 +1878,6 @@
          integer, intent(in) :: sz1, sz2, action
          integer, intent(out) :: ierr
          real(qp), dimension(:,:), pointer :: ptr2
-         real(qp) :: nan
          integer :: old_sz2, j, i
          ierr = 0
          select case(action)
@@ -2968,7 +2956,6 @@
 
          logical function return1(itry)
             integer, intent(in) :: itry
-            integer, pointer :: p(:)
             if (associated(int_work_pointers(itry)% p)) then
                return1 = .false.
                return
@@ -3073,7 +3060,6 @@
 
          logical function return1(itry)
             integer, intent(in) :: itry
-            logical, pointer :: p(:)
             if (associated(logical_work_pointers(itry)% p)) then
                return1 = .false.
                return
@@ -3087,8 +3073,6 @@
 
       
       subroutine shutdown_alloc ()
-
-         integer :: i
 
          call free_work_arrays()
 
@@ -3230,8 +3214,4 @@
       end subroutine non_crit_return_work_array
 
 
-
-
       end module alloc
-
-

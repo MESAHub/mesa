@@ -166,7 +166,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: j, jj, k, species, nz, co56, ni56
-         real(dp) :: mtotal, dm56, alfa_co56, dm56_new, dm56_old, x56_new, x56_old, xsum
+         real(dp) :: mtotal, dm56, alfa_co56, dm56_new, dm56_old, x56_new, x56_old
          include 'formats'
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
@@ -245,7 +245,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k, k0, k1, nz
+         integer :: k, k0, nz
          real(dp) :: ie, ke, pe, rR, rL, rC, m_cntr, &
             sum_total_energy, speed_limit
          real(dp), pointer :: v(:)
@@ -385,7 +385,7 @@
          real(dp), intent(in) :: logP_limit
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k, k0
+         integer :: k
          real(dp) :: lnP_limit
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -554,7 +554,6 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_fe_core: get_star_ptr ierr', ierr
@@ -833,7 +832,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: k, k_vesc
-         real(dp) :: vesc, vesc_m1
+         real(dp) :: vesc
          real(dp), dimension(:), pointer :: v
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -888,8 +887,6 @@
          real(dp), intent(in) :: density
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k
-         real(dp) :: avg_rho
          ierr = 0
          include 'formats'
          call get_star_ptr(id, s, ierr)
@@ -1158,10 +1155,9 @@
             initial_z, initial_y, initial_mass, &
             cumulative_energy_error, cumulative_extra_heating
 
-         real(dp), pointer :: interp_work(:), conv_vel_interp(:)
          real(dp), pointer :: q(:), xq(:), xa(:,:), j_rot(:), entropy(:)
-         real(dp) :: conv_vel_temp, time
-         integer :: num_pts, k, k0, species
+         real(dp) :: time
+         integer :: num_pts, k0, species
          logical :: save_have_mlt_vc
          logical :: dbg = .false.
 

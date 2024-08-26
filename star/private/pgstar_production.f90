@@ -88,17 +88,13 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: &
-            winxmin, winxmax, winymin, winymax
+         real, intent(in) :: winxmin, winxmax, winymin, winymax
          character (len=*), intent(in) :: title
          real, intent(in) :: txt_scale
          logical, intent(in) :: subplot
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
-         real :: xmin, xmax, xleft, xright, dx, dylbl, chScale, windy, xmargin, &
-            ymin, ymax
-         integer :: lw, lw_sav, grid_min, grid_max, npts, i, nz
+         real :: xleft, xright, chScale, xmargin
          integer, parameter :: num_colors = 14
          integer :: colors(num_colors)
 
@@ -124,18 +120,16 @@
             use adjust_xyz, only: get_xa_for_standard_metals
             integer, intent(out) :: ierr
 
-            integer :: lw, lw_sav, k,i,j
-            real :: ybot, eps
+            integer :: i, j
 
-            integer :: amin,amax,z,n,a,plot_a,zmin,zmax
-            integer :: min_zone,max_zone,alternate,skip_cnt
-            real :: xhigh,xlow,extra_pad
+            integer :: amin,amax,z,n,a,zmin,zmax
+            integer :: min_zone,max_zone,alternate
+            real :: extra_pad
             real :: min_mass,max_mass,yloc
             real,parameter :: point_size=0.1
-            real :: ymin,ymax,r,g,b,log10_min_abun,log10_max_abun
+            real :: ymin, ymax
             real,parameter :: pad=1.0
-            real :: last_x,last_y,log_sa
-            logical :: z_in_use
+            real :: last_x,last_y
             real(dp),dimension(1:solsiz) :: scaled_abun,scaled_abun_init
             real(dp),dimension(:),allocatable :: init_comp,abun
 

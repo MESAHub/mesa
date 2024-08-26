@@ -236,7 +236,7 @@ contains
          get_op_mono_args, kap_get_op_mono, kap_get, &
          call_compute_kappa_mombarg
 
-    use chem_def, only: ih1, ihe3, ihe4, chem_isos
+    use chem_def, only: chem_isos
     use star_utils, only: get_XYZ, lookup_nameofvar
 
     type (star_info), pointer :: s
@@ -256,21 +256,18 @@ contains
     type(auto_diff_real_2var_order1) :: beta, lnkap, lnkap_op
     real(dp) :: kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, &
        Z, xh, xhe, xc, xn, xo, xne, &
-       kap_ross_cell, log_kap_rad, fk(17), delta
+       log_kap_rad, fk(17)
 
     character(len=4) :: e_name
 
-    !real(dp), pointer :: xa(:)
     integer, pointer :: net_iso(:)
     real, pointer :: &
          umesh(:), semesh(:), ff(:,:,:,:), rs(:,:,:)
     integer :: nel, izzp(s% species)
-    real(dp) :: fap(s% species), fac(s% species), gp1(s% species)
+    real(dp) :: fap(s% species), fac(s% species)
     logical :: screening
     real(dp), parameter :: &
          eps = 1d-6, minus_eps = -eps, one_plus_eps = 1d0 + eps
-
-    integer :: i_var
 
     include 'formats'
 

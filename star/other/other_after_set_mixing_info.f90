@@ -22,26 +22,20 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_after_set_mixing_info
 
-      implicit none
-      
-            
-      contains
-      
-   
-      subroutine default_other_after_set_mixing_info(id, ierr)
-         use const_def, only: dp
-         use star_def
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine default_other_after_set_mixing_info
+module other_after_set_mixing_info
 
+   implicit none
 
-      end module other_after_set_mixing_info
-      
-      
-      
-      
+contains
+
+   subroutine default_other_after_set_mixing_info(id, ierr)
+      use const_def, only: dp
+      use star_def
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine default_other_after_set_mixing_info
+
+end module other_after_set_mixing_info
+

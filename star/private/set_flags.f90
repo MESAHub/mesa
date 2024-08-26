@@ -41,7 +41,6 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, nz, i_v, i_u
-         real(dp) :: cs
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -133,7 +132,6 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, nz, i_u, i_v
-         real(dp) :: cs
          logical, parameter :: dbg = .false.
 
          integer :: num_u_vars
@@ -232,8 +230,7 @@
          logical, intent(in) :: RTI_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -307,7 +304,7 @@
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, i, k, j, nz, iounit
+         integer :: nvar_hydro_old, i, k, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -556,8 +553,7 @@
          logical, intent(in) :: w_div_wc_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -627,8 +623,7 @@
          logical, intent(in) :: j_rot_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'

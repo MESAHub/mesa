@@ -492,7 +492,7 @@
     use_T_tau_gradr_factor, &
 
     ! starspots
-    fspot, xspot, &
+    do_starspots, fspot, xspot, &
     
     ! extra heat near surface to model irradiation
     irradiation_flux, column_depth_for_irradiation, &
@@ -639,7 +639,6 @@
  integer, intent(in) :: level
  integer, intent(out) :: ierr
  logical, dimension(max_extra_inlists) :: read_extra
- character (len=strlen) :: message
  character (len=strlen), dimension(max_extra_inlists) :: extra
  integer :: unit, i
 
@@ -1289,6 +1288,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_T_tau_gradr_factor = use_T_tau_gradr_factor
 
  ! starspots
+ s% do_starspots = do_starspots
  s% fspot = fspot
  s% xspot = xspot
 
@@ -2974,6 +2974,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_T_tau_gradr_factor = s% use_T_tau_gradr_factor
 
  ! starspots
+ do_starspots = s% do_starspots
  fspot = s% fspot
  xspot = s% xspot
 

@@ -73,7 +73,7 @@
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
 
-         integer :: i, ii, n, step_min, step_max
+         integer :: i, n, step_min, step_max
          real :: xmin, xmax, ymin_L_axis, ymax_L_axis, &
             ymin_mass_axis, ymax_mass_axis, dx, burn_type_cutoff
          real, allocatable, dimension(:) :: xvec, &
@@ -517,7 +517,7 @@
 
 
          subroutine plot_L_lines
-            integer :: i, cnt, n
+            integer :: cnt, n
             real :: coords(4), fjusts(4)
 
             logical, parameter :: dbg = .false.
@@ -607,7 +607,6 @@
 
 
          subroutine plot_mass_lines
-            integer :: i
 
             include 'formats'
 

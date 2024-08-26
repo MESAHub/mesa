@@ -235,7 +235,6 @@
             r_00, Peos_00, d_00, Peos_m1, d_m1, Peos_div_rho, &
             d_face, Peos_face, alt_Hp_face, A
          real(dp) :: alfa, beta
-         integer :: j
          include 'formats'         
          ierr = 0
          if (k > s% nz) then
@@ -289,15 +288,14 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr         
-         integer :: j
          ! for OLD WAY
          type(auto_diff_real_star_order1) :: &
             d_turbulent_energy_ad, Ptrb_dV_ad, dt_C_ad, dt_Eq_ad
-         type(auto_diff_real_star_order1) :: xi0, xi1, xi2, A0, Af, w_00
+         type(auto_diff_real_star_order1) :: w_00
          type(auto_diff_real_star_order1) :: tst, resid_ad, dt_dLt_dm_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, test_partials
-         real(dp) :: residual, atol, rtol, scal
+         real(dp) :: residual, scal
          include 'formats'
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -374,8 +372,8 @@
 
          subroutine setup_dt_dLt_dm_ad(ierr) ! erg g^-1
             integer, intent(out) :: ierr            
-            type(auto_diff_real_star_order1) :: Lt_00, Lt_p1, dLt_ad
-            real(dp) :: Lt_00_start, Lt_p1_start, L_theta
+            type(auto_diff_real_star_order1) :: Lt_00, Lt_p1
+            real(dp) :: L_theta
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
@@ -629,10 +627,8 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Hp_cell
-         type(auto_diff_real_star_order1) :: &
-            d_00, Peos_00, rmid
+         type(auto_diff_real_star_order1) :: d_00, Peos_00, rmid
          real(dp) :: mmid, cgrav_mid
-         integer :: j
          include 'formats'         
          ierr = 0
          
@@ -769,7 +765,7 @@
          type(auto_diff_real_star_order1) :: &
             w_00, T_00, d_00, Peos_00, Cp_00, chiT_00, chiRho_00, QQ_00, &
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, &
-            grad_ad_00, P_QQ_div_Cp
+            P_QQ_div_Cp
          include 'formats'
          ierr = 0
          w_00 = wrap_w_00(s, k)
@@ -922,7 +918,6 @@
          type (star_info), pointer, intent(in) :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
-         real(dp) :: L_val
          integer, intent(out) :: ierr         
          include 'formats'
          ierr = 0
@@ -1115,7 +1110,7 @@
       subroutine set_etrb_start_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr         
-         integer :: k, op_err
+         integer :: k
          type(auto_diff_real_star_order1) :: Y_face, Lt
          include 'formats'
          ierr = 0
@@ -1138,8 +1133,8 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr    
          real(dp) :: PII_div_Hp, QQ, SOURCE, Hp_cell, DAMP, POM, POM2, DAMPR, del, soln
-         type(auto_diff_real_star_order1) :: x
-         integer :: k, op_err
+         !type(auto_diff_real_star_order1) :: x
+         integer :: k
          include 'formats'         
          ierr = 0
          if (s% mixing_length_alpha == 0d0) return

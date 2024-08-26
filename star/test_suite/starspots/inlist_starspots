@@ -61,10 +61,8 @@
    star_history_name = 'history.data'
 
    max_age = 24.63d9 !26d9 !0.8d9
-
-   use_other_mlt_results = .true.
-   use_other_surface_PT = .true.
-
+   
+   do_starspots = .true.
    fspot = 0.34d0
    xspot = 0.85d0
 

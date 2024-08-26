@@ -50,10 +50,9 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: use_omp = .true.
-         integer :: k, op_err, j, jj, cnt, kmax
-         integer(8) :: time0, clock_rate
+         integer :: k, op_err
+         integer(8) :: time0
          real(dp) :: total
-         integer, pointer :: ks(:)
          logical, parameter :: only_dlnT = .false.
          logical :: okay, check_op_split_burn
 
@@ -134,14 +133,13 @@
 
       subroutine do1_net(s, k, species, &
             num_reactions, check_op_split_burn, ierr)
-         use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate, &
-            star_debugging_rates_flag, rates_test_partials_val, rates_test_partials_dval_dx
+         use rates_def, only: std_reaction_Qs, std_reaction_neuQs, i_rate
          use net_def, only: Net_Info, net_test_partials, &
             net_test_partials_val, net_test_partials_dval_dx, net_test_partials_i, &
             net_test_partials_iother, get_net_ptr
          use net_lib, only: net_get
          use star_utils, only: lookup_nameofvar
-         use chem_def, only: chem_isos, category_name, i_ni56_co56, i_co56_fe56, &
+         use chem_def, only: category_name, i_ni56_co56, i_co56_fe56, &
             num_categories, iphoto, category_name
          use eos_def, only : i_eta
          use utils_lib,only: realloc_double, realloc_double3
@@ -151,10 +149,9 @@
          integer, intent(out) :: ierr
 
          integer :: i, j, kk, screening_mode, sz, i_var, i_var_sink
-         real(dp) :: log10_rho, log10_T, T, alfa, beta, eps_nuc_factor, &
-            d_eps_nuc_dRho, d_eps_nuc_dT, cat_factor, tau_gamma, eps_cat_sum
+         real(dp) :: log10_rho, log10_T, T, alfa, eps_nuc_factor, &
+            d_eps_nuc_dRho, d_eps_nuc_dT, tau_gamma, eps_cat_sum
          type (Net_Info) :: n
-         character (len=100) :: message
          real(dp), pointer :: reaction_neuQs(:)
          logical :: clipped_T
 
@@ -441,9 +438,7 @@
          real(dp) :: log10_Rho, log10_T
          real(dp), pointer :: v(:)
          integer, pointer :: index(:)
-         real(dp), pointer, dimension(:) :: &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            rate_raw, rate_raw_dT, rate_raw_dRho
+         real(dp), pointer, dimension(:) :: rate_screened, rate_raw
 
          include 'formats'
 
@@ -605,10 +600,8 @@
          character (len=*), intent(in) :: new_net_name
          integer, intent(out) :: ierr
 
-         integer :: i, ir
          integer :: old_num_reactions, old_nvar_chem, old_species
          integer, parameter :: num_lowT_rates = 10
-         integer, pointer :: net_reaction_ptr(:)
 
          include 'formats'
 

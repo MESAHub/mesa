@@ -79,7 +79,6 @@
          use const_def, only: Lsun, Rsun, Msun
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         integer :: i, j, k
          include 'formats'
          NSTART = 1
          s% nz = s% RSP_nz         
@@ -231,11 +230,8 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         type (star_info), target :: copy_info
-         type (star_info), pointer :: c, prv
          real(dp) :: tau_surf, kap_guess, T_surf, Psurf, kap_surf, Teff_atm, Y
-         integer :: i, k
-         logical :: okay
+         integer :: k
          include 'formats'
          ierr = 0
          if (s% RSP_use_atm_grey_with_kap_for_Psurf .and. &
@@ -311,13 +307,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         integer :: i, j, k, species, nz, op_err
-         real(dp), allocatable :: w_avg(:)
-         real(dp) :: &
-            dFr_dr_out, dFr_dr_in, dFr_dr_00, &
-            dFr_dT_out, dFr_dT_00, dFr_dVol_00, &
-            Lr, Lc, POM
-         logical :: okay
+         integer :: nz
          include 'formats'
          if (restart) then
             call finish_rsp_photo_in(s)
@@ -422,7 +412,7 @@
          type (star_info), pointer :: s      
          integer, intent(out) :: ierr    
          integer :: k, j, k_max_abs_rel_hse_err
-         real(dp) :: rand, hse_err, max_abs_rel_hse_err
+         real(dp) :: hse_err, max_abs_rel_hse_err
          logical :: restart
          
          include 'formats'
@@ -513,7 +503,7 @@
          subroutine add_to_map
             use profile_getval, only: get_profile_val
             integer :: i, k, NPCH1, NPCH2, IP, n, io
-            real(dp) :: ph_x, FASE
+            real(dp) :: FASE
             character (len=256) :: fname
             include 'formats'
             NPCH1 = s% RSP_map_first_period
@@ -780,7 +770,6 @@
          !     s% rsp_GREKM, s% rsp_GREKM_avg_abs, s% rsp_DeltaR, s% rsp_DeltaMAG
          type (star_info), pointer :: s
          logical :: cycle_complete
-         integer :: i, k
          include 'formats'
          if(s% L(1)/SUNL>LMAX) LMAX=s% L(1)/SUNL
          if(s% L(1)/SUNL<LMIN) LMIN=s% L(1)/SUNL      

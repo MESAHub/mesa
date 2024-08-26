@@ -22,33 +22,27 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_after_struct_burn_mix
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_after_struct_burn_mix = .true.
-      ! procedure pointer: s% other_after_struct_burn_mix => my_routine
+module other_after_struct_burn_mix
 
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_after_struct_burn_mix = .true.
+   ! procedure pointer: s% other_after_struct_burn_mix => my_routine
 
-      implicit none
-      
-            
-      contains
-      
-      ! your routine will be called after the standard struct_burn_mix routine
-   
-      subroutine null_other_after_struct_burn_mix(id, dt, res)
-         use const_def, only: dp
-         use star_def
-         integer, intent(in) :: id
-         real(dp), intent(in) :: dt
-         integer, intent(out) :: res ! keep_going, redo, retry, terminate
-         res = keep_going
-      end subroutine null_other_after_struct_burn_mix
+   implicit none
 
+contains
 
-      end module other_after_struct_burn_mix
-      
-      
-      
-      
+   ! your routine will be called after the standard struct_burn_mix routine
+
+   subroutine null_other_after_struct_burn_mix(id, dt, res)
+      use const_def, only: dp
+      use star_def
+      integer, intent(in) :: id
+      real(dp), intent(in) :: dt
+      integer, intent(out) :: res ! keep_going, redo, retry, terminate
+      res = keep_going
+   end subroutine null_other_after_struct_burn_mix
+
+end module other_after_struct_burn_mix
+

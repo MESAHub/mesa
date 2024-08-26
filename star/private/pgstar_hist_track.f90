@@ -648,11 +648,10 @@
          integer, intent(out) :: ierr
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
-         real :: xmin, xmax, ymin, ymax, xleft, xright, ybot, ytop
-         integer :: i, j, j_min, j_max, step_min, step_max
+         real :: xleft, xright, ybot, ytop
+         integer :: j, j_min, j_max, step_min, step_max
          real :: dx, dy, xplus, xminus, yplus, yminus
          real, dimension(:), allocatable :: xvec, yvec
-         character (len=strlen) :: str
          integer :: k, n
          integer :: ix, iy
          integer :: file_data_len

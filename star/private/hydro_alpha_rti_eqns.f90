@@ -41,7 +41,6 @@
 
       subroutine do1_dalpha_RTI_dt_eqn(s, k, nvar, ierr)
          use star_utils, only: em1, e00, ep1
-         use chem_def, only: ih1, ihe4
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -52,13 +51,12 @@
          type(auto_diff_real_4var_order1) :: source_minus, source_plus, dadt_source, dadt_actual
          type(auto_diff_real_4var_order1) :: dadt_mix, dadt_expected, resid
 
-         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk
+         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt
          real(dp), pointer, dimension(:) :: sig
-         logical :: okay
          real(dp) :: &
-            dq, dm, dr, d_dadt_mix_dap1, sig00, sigp1, &
+            dq, dm, sig00, sigp1, &
             eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, &
-            r00, rp1, drho, rho, rmid, cs, fac
+            r00, rho, rmid, cs, fac
          logical :: test_partials
 
          include 'formats'

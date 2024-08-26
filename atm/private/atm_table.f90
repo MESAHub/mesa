@@ -105,7 +105,6 @@ contains
     real(dp) :: dPrad_dL
     real(dp) :: dT_dlnR
     real(dp) :: dT_dlnM
-    real(dp) :: dT_dlnT
     real(dp) :: dT_dlnTeff
 
     include 'formats'

@@ -134,7 +134,6 @@ contains
 
     integer  :: k
     real(dp) :: r
-    real(dp) :: w
     real(dp) :: x0
     real(dp) :: x1
     real(dp) :: x2

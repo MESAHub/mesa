@@ -223,7 +223,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: entropy_start
-         type(auto_diff_real_star_order1) :: entropy, T, eps_grav_composition_term
+         type(auto_diff_real_star_order1) :: entropy, T
 
          include 'formats'
          ierr = 0
@@ -274,7 +274,7 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: eps_grav_composition_term
          integer, intent(out) :: ierr
-         real(dp) :: Rho, logRho, &
+         real(dp) :: &
             e, e_start, de, d_de_dlnd, d_de_dlnT, &
             e_with_xa_start, d_e_with_xa_start_dlnd, d_e_with_xa_start_dlnT, &
             e_with_DT_start, Pgas_with_DT_start

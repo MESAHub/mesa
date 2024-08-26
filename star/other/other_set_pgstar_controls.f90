@@ -22,33 +22,26 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_set_pgstar_controls
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_set_pgstar_controls = .true.
-      ! procedure pointer: s% other_set_pgstar_controls => my_routine
+module other_set_pgstar_controls
 
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_set_pgstar_controls = .true.
+   ! procedure pointer: s% other_set_pgstar_controls => my_routine
 
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_set_pgstar_controls(id)
-         use star_def
-         integer, intent(in) :: id
-         type (star_info), pointer :: s
-         integer :: ierr
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-      end subroutine default_other_set_pgstar_controls
+   implicit none
 
+contains
 
-      end module other_set_pgstar_controls
-      
-      
-      
-      
+   subroutine default_other_set_pgstar_controls(id)
+      use star_def
+      integer, intent(in) :: id
+      type(star_info), pointer :: s
+      integer :: ierr
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+   end subroutine default_other_set_pgstar_controls
+
+end module other_set_pgstar_controls
+

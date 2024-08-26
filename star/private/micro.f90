@@ -73,7 +73,7 @@ contains
     logical, intent(in) :: skip_eos, skip_net, skip_neu, skip_kap
     integer, intent(out) :: ierr
 
-    integer :: j, k, op_err, k_bad, res, i
+    integer :: k, op_err, i
     integer(8) :: time0
     real(dp) :: total, alfa, beta
     character(len=4) :: e_name
@@ -323,14 +323,11 @@ contains
     integer, intent(in) :: k
     integer, intent(out) :: ierr
 
-    real(dp), dimension(num_eos_basic_results) :: &
-         res, res_a, res_b, d_dlnd, d_dlnT
+    real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
     real(dp), dimension(num_eos_d_dxa_results,s% species) :: d_dxa
-    real(dp) :: &
-         sumx, dx, dxh_a, dxh_b, &
-         Rho, logRho, lnd, lnE, logT, T, logPgas, energy, logQ, frac
+    real(dp) :: sumx, logRho, logT, logPgas
     integer, pointer :: net_iso(:)
-    integer :: j, species, i_var, i_var_sink
+    integer :: species
     real(dp), parameter :: epsder = 1d-4, Z_limit = 0.5d0
     real(dp), parameter :: LOGRHO_TOL = 1d-8, LOGPGAS_TOL = 1d-8
 
@@ -588,22 +585,13 @@ contains
     integer, intent(in) :: k
     integer, intent(out) :: ierr
 
-    integer, pointer :: net_iso(:)
-    integer :: i, iz, kh
     real(dp) :: &
-         log10_rho, log10_T, dlnkap_dlnd, dlnkap_dlnT, &
-         opacity_max, opacity_max0, opacity_max1, zbar, &
+         log10_rho, log10_T, dlnkap_dlnd, dlnkap_dlnT, zbar, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
-         eta, d_eta_dlnRho, d_eta_dlnT, &
-         log_r, log_r_in, log_r_out, log_r_frac, frac, min_cno_for_kap_limit, &
-         P, Prad, Pgas, Ledd_factor, Ledd_kap, Ledd_log, &
-         a, b, da_dlnd, da_dlnT, db_dlnd, db_dlnT, opacity_factor
-         !kap_ross_cell, log_kap_rad, fk(17), delta
+         eta, d_eta_dlnRho, d_eta_dlnT, opacity_factor
 
     real(dp), dimension(num_kap_fracs) :: kap_fracs
-    !character(len=4) :: e_name
 
-    character (len=100) :: message
     real(dp), pointer :: xa(:)
     logical :: test_partials
 

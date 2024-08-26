@@ -73,9 +73,6 @@ endif
 
 # step 3) specify which LAPACK and BLAS libraries to use for mesa/mtx
 
-WHICH_LAPACK95 =
-WHICH_LAPACK =
-WHICH_BLAS =
 LOAD_LAPACK95 = `mesasdk_lapack95_link`
 LOAD_LAPACK = `mesasdk_lapack_link`
 LOAD_BLAS = `mesasdk_blas_link`
@@ -247,7 +244,7 @@ LOCAL_LIB_DIR = $(PACKAGE_DIR)/make
 MESA_LIB_DIR = $(MESA_DIR)/lib
 MESA_INCLUDE_DIR = $(MESA_DIR)/include
 TEST_INCLUDES = -I$(LOCAL_LIB_DIR) -I$(PACKAGE_DIR)/public -I$(MESA_INCLUDE_DIR)
-TEST_COMPILE_FLAGS = $(FCbasic) $(FCopenmp) $(TEST_INCLUDES) $(FCchecks) $(FCdebug) $(LIB_FLAGS) -c
+TEST_COMPILE_FLAGS = $(FCbasic) $(FCopenmp) $(TEST_INCLUDES) $(FCchecks) $(FCdebug) $(LIB_FLAGS) $(FCstandard) $(FCimpno) -c
 TEST_COMPILE = $(FC) $(TEST_COMPILE_FLAGS) $(LD_FLAGS)
 
 # Library lists / linking commands

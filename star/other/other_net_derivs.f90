@@ -22,13 +22,13 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-   module other_net_derivs
+
+module other_net_derivs
 
    implicit none
 
-   ! set use_other_net_derivs = .true. in your controls namelist   
-        
+   ! set use_other_net_derivs = .true. in your controls namelist
+
    ! edit the extras_controls routine to set the procedure pointer
    !  other_net_derivs => my_net_derivs
 
@@ -38,30 +38,26 @@
 
    ! This hook only works with soft nets (so no approx networks)
 
-   contains
+contains
 
-
-   subroutine default_other_net_derivs(&
+   subroutine default_other_net_derivs( &
       n, dydt, eps_nuc_MeV, eta, ye, logtemp, temp, den, abar, zbar, &
       num_reactions, rate_factors, &
       symbolic, just_dydt, ierr)
       use net_def
-      
+
       implicit none
 
       type(Net_Info) :: n
-      real(qp), pointer, intent(inout) :: dydt(:,:)
+      real(qp), pointer, intent(inout) :: dydt(:, :)
       real(qp), intent(out) :: eps_nuc_MeV(:)
       integer, intent(in) :: num_reactions
       real(dp), intent(in) ::eta, ye, logtemp, temp, den, abar, zbar, &
-         rate_factors(:)
+                              rate_factors(:)
       logical, intent(in) :: symbolic, just_dydt
       integer, intent(out) :: ierr
 
    end subroutine default_other_net_derivs
 
-   end module other_net_derivs        
-        
-        
-        
-  
+end module other_net_derivs
+

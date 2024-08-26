@@ -23,8 +23,8 @@
 //!
 //! ***********************************************************************
 
-int c_mkdir(const char * restrict path);
-int c_mkdir_p(const char * restrict path);
-int c_mv(const char * restrict src, const char * restrict dest);
-int c_cp(const char * restrict src, const char * restrict dest);
-int is_dir(const char * restrict path);
+int c_mkdir(const char *restrict path);
+int c_mkdir_p(const char *restrict path);
+int c_mv(const char *restrict src, const char *restrict dest);
+int c_cp(const char *restrict src, const char *restrict dest);
+int is_dir(const char *restrict path);

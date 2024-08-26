@@ -615,7 +615,6 @@
          use chem_def
          use net_def
          use net_lib, only: get_net_reaction_table
-         use rates_def, only: rates_reaction_id_max
          use const_def, only: Msun, Rsun
 
          type (star_info), pointer :: s
@@ -643,15 +642,14 @@
          real, allocatable, dimension(:) :: yfile_xdata, other_yfile_xdata
          real, allocatable, dimension(:) :: yfile_ydata, other_yfile_ydata
          integer :: i, ii, n, j, k, max_width, step_min, step_max, &
-            y_color, other_y_color, yaxis_id, other_yaxis_id, &
-            clr_sav, npts, yfile_data_len, other_yfile_data_len
-         real :: hist_xmin, xmin, xmax, dx, xleft, xright, &
+            y_color, other_y_color, &
+            yfile_data_len, other_yfile_data_len
+         real :: hist_xmin, xleft, xright, &
             ymargin, panel_dy, panel_ytop, panel_ybot, &
-            ymin, ymax, dy, ybot, ytop, xpt, ypt, errpt, &
-            other_ymin, other_ymax, other_ybot, other_ytop
+            ybot, ytop, xpt, ypt, errpt, &
+            other_ybot, other_ytop
          logical :: have_yaxis, have_other_yaxis
 
-         integer :: grid_min, grid_max
          integer :: ix, iounit, ishape, num_pts
 
          include 'formats'

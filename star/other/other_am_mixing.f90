@@ -22,31 +22,27 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_am_mixing
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_am_mixing = .true.
-      ! procedure pointer: s% other_am_mixing => my_routine
+module other_am_mixing
 
-      implicit none
-      
-      contains
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_am_mixing = .true.
+   ! procedure pointer: s% other_am_mixing => my_routine
 
-      ! for extra angular momentum mixing
-      ! you can revise vectors s% am_nu_omega(:) and s% am_nu_j(:)
-      
-      subroutine null_other_am_mixing(id, ierr)
-         use star_def
-         use const_def   
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         ierr = 0
-      end subroutine null_other_am_mixing
-      
-      
-      end module other_am_mixing
-      
-      
-      
-      
+   implicit none
+
+contains
+
+   ! for extra angular momentum mixing
+   ! you can revise vectors s% am_nu_omega(:) and s% am_nu_j(:)
+
+   subroutine null_other_am_mixing(id, ierr)
+      use star_def
+      use const_def
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      ierr = 0
+   end subroutine null_other_am_mixing
+
+end module other_am_mixing
+

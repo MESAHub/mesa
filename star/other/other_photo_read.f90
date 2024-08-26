@@ -22,31 +22,24 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_photo_read
 
+module other_photo_read
 
-      implicit none
+   implicit none
 
-      ! note: there is no flag "use_other_photo_read".  
-      ! the other routine is always called when a photo is read.
-      ! see private/model_in.f
-      
-      contains
-      
+   ! note: there is no flag "use_other_photo_read".
+   ! the other routine is always called when a photo is read.
+   ! see private/model_in.f
 
-      subroutine default_other_photo_read(id, iounit, ierr)
-         use star_def
-         integer, intent(in) :: id, iounit
-         integer, intent(out) :: ierr
-         ierr = 0
-         !read(iounit,iostat=ierr) stuff
-      end subroutine default_other_photo_read
+contains
 
+   subroutine default_other_photo_read(id, iounit, ierr)
+      use star_def
+      integer, intent(in) :: id, iounit
+      integer, intent(out) :: ierr
+      ierr = 0
+      !read(iounit,iostat=ierr) stuff
+   end subroutine default_other_photo_read
 
+end module other_photo_read
 
-      end module other_photo_read
-      
-      
-      
-      
