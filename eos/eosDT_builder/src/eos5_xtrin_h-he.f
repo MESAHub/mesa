@@ -52,7 +52,7 @@ c
 c
       save
       double precision results_out(iorder), pgas_out, prad_out
-		integer info ! returned = 0 if AOK
+      integer info ! returned = 0 if AOK
       character (len=*) filename
       integer w
       real moles
@@ -85,7 +85,7 @@ c
          stop
       endif
 
-		info = 0
+      info = 0
       xxi=xh
       ri=r
 c
@@ -355,22 +355,22 @@ c
       return
 
    61 continue
-		info = -61; return
-		write(*,'(" Mass fractions exceed unity (61)")')
+      info = -61; return
+      write(*,'(" Mass fractions exceed unity (61)")')
       stop 1
    62 continue
-		info = -62; return
-		write(*,'(" T6/LogR outside of table range (62)")')
+      info = -62; return
+      write(*,'(" T6/LogR outside of table range (62)")')
       write(*,*) 'T6', t6, 'LogR', log10(r), 'LogT', log10(t6*1d6)
       stop 1
    65 continue
-		info = -65; return
-		write(*,'("T6/log rho in empty region od table (65)")')
+      info = -65; return
+      write(*,'("T6/log rho in empty region od table (65)")')
       write (*,'("xh,t6,r=", 3e12.4)') xh,t6,r
       stop 1
    66 continue
-		info = -66; return
-		write(*,'(" Z does not match Z in EOS5_data* files you are",
+      info = -66; return
+      write(*,'(" Z does not match Z in EOS5_data* files you are",
      . " using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)')
@@ -492,9 +492,9 @@ c..... The purpose of this subroutine is to read the data tables
 !..... read  tables
 !       call system (' gunzip EOS5_data_H-He')
 !       open(2, FILE='EOS5_data_H-He')
-		
-		write(*,*) 'read ' // trim(filename)
-		
+      
+      write(*,*) 'read ' // trim(filename)
+      
        open(2, FILE=trim(filename), IOSTAT=ios)
       if (ios .ne. 0) then
          write(*,*) 'failed to open ', trim(filename)
