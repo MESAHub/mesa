@@ -400,7 +400,7 @@
          use binary_irradiation
          type (binary_info), pointer :: b
 
-         integer :: i, j, ierr, id
+         integer :: ierr, id
          logical :: implicit_rlo
          real(dp) :: new_mdot, q
 
@@ -506,7 +506,6 @@
 
       integer function binary_finish_step(b)
          type (binary_info), pointer :: b
-         real(dp) :: spin_period
 
          binary_finish_step = keep_going
          ! update change factor in case mtransfer_rate has changed

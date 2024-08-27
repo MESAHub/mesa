@@ -138,7 +138,6 @@
          real(dp), intent(in) :: osep ! orbital separation (cm)
          real(dp), intent(out) :: t_sync
          integer, intent(out) :: ierr
-         real(dp) :: rGyr_squared, moment_of_inertia
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
    
