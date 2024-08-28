@@ -108,13 +108,13 @@
          integer, intent(out) :: ierr
       
          type (star_info), pointer :: s
-         real(dp) :: G, m, m_lim, t_sync, r_phot, delta_total_J, &
+         real(dp) :: G, m, t_sync, r_phot, delta_total_J, &
             sum_J_sync, sum_J_non_sync, tdyn, tkh, rho_face, cv_face, &
             T_face, csound_face, ff, omega_orb
             
          real(dp), dimension(nz) :: j_sync, delta_j, tdyn_div_tkh         
          integer, dimension(nz) :: layers_in_sync
-         integer :: k, k_rl, k_xm, num_sync_layers
+         integer :: k, num_sync_layers
          type (binary_info), pointer :: b
 
          real(dp) :: a1,a2
