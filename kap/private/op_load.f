@@ -43,10 +43,9 @@
       integer, intent(out) :: ierr
 
 
-      integer,parameter :: ipz=28
       real :: am,amm,delp,dpack
       integer :: ios,it,ite11,ite22,ite33,itt,itte1,itte2,itte3,izz,jne,ite
-      integer :: jne1,jne22,jne33,jnn,k,n,ncount2,ncount3,ja,jn,jnw11
+      integer :: jne1,jne22,jne33,jnn,k,n,ncount2,ncount3,ja,jn
       integer :: jne11,jne2,nccc,ne,nfff,ntott,nn
       real :: orss,um,ux,umaxx,uminn,u
       real,dimension(nptot):: umesh, semesh
@@ -476,7 +475,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
       integer, intent(out) :: ntot
       real, intent(out) :: dv, uf(0:100), dscat
       real, intent(out) :: umesh(:), semesh(:) ! (nptot)
-      integer :: i, k, ntotv
+      integer :: i, ntotv
       real :: dvp, dv1, umin, umax, umeshp(nptot), semeshp(nptot)
       common /mesh/ ntotv, dvp, dv1, umeshp, semeshp
       save /mesh/

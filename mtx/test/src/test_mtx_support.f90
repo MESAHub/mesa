@@ -33,8 +33,7 @@ contains
    subroutine test_format_conversion
       use mtx_def
       integer, parameter :: n = 6
-      integer, parameter :: nzmax = n*n, nrow = n, ncol = n, ndns = n, ndim = n
-      integer, parameter :: iwk = nzmax, im = 10
+      integer, parameter :: nzmax = n*n, ndim = n
 
       real(dp) :: a(ndim, n), a2(ndim, n), values(nzmax)
       integer, parameter :: ml = 1, mu = 2, ldbb = 2*ml + mu + 1

@@ -507,7 +507,7 @@ contains
     use utils_lib, only : mkdir
     use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir, use_mesa_temp_cache
     character (*), intent(in) :: kap_cache_dir_in
-    integer :: ierr, i
+    integer :: i
     
     kap_test_partials = .false.
     

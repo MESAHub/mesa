@@ -137,9 +137,8 @@
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         real :: xmin, xmax, ymin, ymax, dx, dy, plot_delta_nu, freq, marker_scale, &
+         real :: xmin, xmax, ymin, ymax, dx, dy, plot_delta_nu, marker_scale, &
             x_obs, y_obs, x_model, y_model, y_txt, xpt_min, xpt_max, xmargin
-         character (len=256) :: str
          integer :: i, l, freq_color(0:3), freq_shape(0:3), model_color, model_shape
                      
          include 'formats'
@@ -410,9 +409,8 @@
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         real :: xmin, xmax, ymin, ymax, dx, dy, freq, &
-            x_obs, y_obs, x_model, y_model, y_txt, sig_max
-         character (len=256) :: str
+         real :: xmin, xmax, ymin, ymax, dx, dy, &
+            x_obs, y_obs, y_txt, sig_max
          logical :: show_model
          integer :: i, n, i0, i1, l0_first, l1_first, &
             r01_color, r01_shape, r10_color, r10_shape, &
@@ -627,7 +625,6 @@
          integer, intent(out) :: ierr
 
          character (len=256) :: format_string, num_str, name, extension
-         integer :: len
          
          ierr = 0
          

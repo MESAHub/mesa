@@ -1075,13 +1075,11 @@
          real(dp) :: logRho1_max, logRho1, logRho2, logRho5, logRho6, logRho7, &
             logRho8, logT5, logT6, logT3, logT4
          real(dp) :: logQ1, logQ2, logQ3, logQ4, logQmax, Z_all_HELM, Z_no_HELM
-         real(dp) :: beta, logRho_lo, logRho_hi, &
+         real(dp) :: beta, &
             logT1, logT2, logT7, logT8, logRho3, logRho4
          real(dp) :: logQ, A, B, dA_dlnT, dA_dlnRho, dB_dlnT, dB_dlnRho
          real(dp) :: c_dx, c_dy, d_dx_dlogT, d_dx_dlogRho, d_dy_dlogT, d_dy_dlogRho
          real(dp), parameter :: tiny = 1d-20
-         
-         logical :: debug
          
          include 'formats'
 

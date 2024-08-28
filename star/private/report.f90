@@ -153,7 +153,6 @@
 
          integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
          real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
-         logical, parameter :: new_only = .false.
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
 
