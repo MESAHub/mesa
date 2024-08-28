@@ -70,7 +70,7 @@ contains
       integer, intent(out) :: ierr
 
       type (binary_info), pointer :: b
-      integer :: c, int_val, i, j
+      integer :: c, int_val, j
       logical :: is_int_val
       real(dp) :: val
 
@@ -121,7 +121,7 @@ contains
       integer, intent(out) :: ierr
 
       character (len = strlen) :: fname, dbl_fmt, int_fmt, txt_fmt
-      integer :: numcols, io, i, nz, col, j, i0, n
+      integer :: numcols, io, i, col, j, i0, n
 
       integer :: num_extra_header_items, num_extra_cols
 
@@ -408,8 +408,7 @@ contains
       subroutine do_col_pass2(j) ! get the column name
          integer, intent(in) :: j
          character (len = 100) :: col_name
-         character (len = 10) :: str
-         integer :: c, i, ii
+         integer :: c
          c = b% binary_history_column_spec(j)
          col_name = trim(binary_history_column_name(c))
          call do_name(j, col_name)
@@ -418,9 +417,9 @@ contains
 
       subroutine do_col_pass3(c) ! get the column value
          integer, intent(in) :: c
-         integer :: i, ii, k, int_val
+         integer :: k, int_val
          logical :: is_int_val
-         real(dp) :: val, val1, Ledd, power_photo, frac
+         real(dp) :: val
          int_val = 0; val = 0; is_int_val = .false.
          call binary_history_getval(&
             b, c, val, int_val, is_int_val, ierr)
@@ -521,7 +520,6 @@ contains
       integer, intent(out) :: int_val
       logical, intent(out) :: is_int_val
       integer, intent(out) :: ierr
-      integer :: k, i
 
       include 'formats'
 
@@ -812,10 +810,7 @@ contains
       real(dp), intent(inout) :: values(:)
       logical, intent(out) :: failed_to_find_value(:)
 
-      integer :: i, c, int_val, ierr, n, t, j, iounit
-      real(dp) :: val
-      logical :: is_int_val, special_case
-      character (len = strlen) :: buffer, string
+      integer :: i, c, ierr
 
       include 'formats'
       ierr = 0
@@ -844,10 +839,8 @@ contains
       character (len = *) :: name
       real(dp), intent(out) :: val
       integer :: i, ierr, num_extra_cols
-      character (len = 80), pointer, dimension(:) :: &
-         extra_col_names, binary_col_names
-      real(dp), pointer, dimension(:) :: &
-         extra_col_vals, binary_col_vals
+      character (len = 80), pointer, dimension(:) :: extra_col_names
+      real(dp), pointer, dimension(:) :: extra_col_vals
       include 'formats'
 
       get1_binary_hist_value = .false.
