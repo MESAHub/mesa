@@ -479,7 +479,7 @@
          real(dp), intent(inout) :: rpar(:) ! (lrpar)
          integer, intent(inout) :: ipar(:) ! (lipar)
          integer, intent(out) :: ierr
-         real(dp), parameter :: xscale_min = 1d0
+         ! real(dp), parameter :: xscale_min = 1d0
          xscale = 1.d0 ! max(xscale_min, abs(xold))
          ierr = 0
       end subroutine diffusion_set_xscale

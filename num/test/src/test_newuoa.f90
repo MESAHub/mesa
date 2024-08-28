@@ -45,7 +45,7 @@ contains
       real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
 
-      integer :: I, J, IW, MAXFUN, NP
+      integer :: I, J, IW, NP
       real(dp) :: Y(10, 10), sum
       nfcn = nfcn + 1
       do J = 1, N

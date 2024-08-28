@@ -37,7 +37,7 @@
       use math_lib
       IMPLICIT real(dp) (A-H,O-Z)
       integer ierr,nvar,i,ipar(*)
-      integer, parameter :: N=40, NN=2*N, NCOM=N, NSQ=N*N, NQUATR=NSQ*NSQ, NNCOM=NN
+      integer, parameter :: N=40, NN=2*N, NSQ=N*N, NQUATR=NSQ*NSQ
       real(dp) rpar(*), an, deltas
         DIMENSION DF(NN),TH(150),U(150),V(150),W(150)
         DIMENSION ALPHA(150),BETA(150),STH(150),CTH(150)
