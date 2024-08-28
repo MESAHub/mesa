@@ -134,6 +134,9 @@ SKIP_NAN_TRAPS = YES
 FCbasic = -Wno-uninitialized -fno-range-check -fmax-errors=7 -fdiagnostics-color $(SPECIAL_FC_FLAGS) $(FCbasic2)
 FCbasic2 = -fprotect-parens -fno-sign-zero -fbacktrace -ggdb -finit-real=snan
 
+# For debugging, you may want to try some of these options:
+# -Wall -Wextra -Wimplicit-interface -Wno-unused-function -fPIC -g -fcheck=all,no-array-temps -fbacktrace -ffpe-trap=invalid,zero,overflow -finit-real=snan -finit-integer=-99999999
+
 # Set the fortran standard to compile against, files that can't be compiled to the standard and are 
 # unfixable should add a statement like:  $(filter-out -std=f2008, $(COMPILE))
 # to filter out the option in their makefile
