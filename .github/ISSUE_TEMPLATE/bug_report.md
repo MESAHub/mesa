@@ -23,9 +23,10 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+**Version**
+ - MESA version or SHA [e.g. r24.08.1]
+ - MESA SDK VERSION [e.g. aarch64-macos-24.7.1]
+ - OS: [e.g. MacOS 16.4.1]
 
 **Additional context**
 Add any other context about the problem here.
