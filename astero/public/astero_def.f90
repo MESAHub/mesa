@@ -963,7 +963,6 @@
          integer, intent(out) :: ierr
          
          logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen) :: message
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
          
@@ -1167,7 +1166,7 @@
          use num_lib, only: simplex_info_str
          integer, intent(in) :: i, iounit
             
-         integer :: j, k, l, op_code, ierr
+         integer :: k, l, op_code, ierr
          character (len=256) :: info_str, fmt
          
          ierr = 0
@@ -1270,7 +1269,6 @@
          integer, intent(in) :: iounit, i_total
          integer, intent(out) :: ierr
          integer :: i, j
-         character (len=strlen) :: int_fmt, txt_fmt
 
          ierr = 0
          ! sort results by increasing sample_chi2
@@ -1513,7 +1511,7 @@
          use utils_lib
          character (len=*), intent(in) :: results_fname
          integer, intent(out) :: ierr
-         integer :: iounit, num, i, j, model_number
+         integer :: iounit, num, j
          character (len=strlen) :: line
          
          include 'formats'
@@ -1595,7 +1593,6 @@
             
          integer :: i, k, l
          character (len=256) :: info_str, fmt
-         real(dp) :: logR
          
          include 'formats'
          
