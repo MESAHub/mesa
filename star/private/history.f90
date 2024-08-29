@@ -2034,7 +2034,7 @@ contains
             end if
          case(h_mu4)
             deltam = 0.3d0 * msun ! Ertl et al 2016
-            if (s% entropy(1) > 4.0) then
+            if (s% entropy(1) > 4.d0) then
                do k = nz - 1, 1, -1
                   if (s% entropy(k) > 4.d0) exit
                end do
@@ -2045,7 +2045,7 @@ contains
                val = (deltam / msun) / ((s% r(k2) - s% r(k)) / 1d8)
             end if
          case(h_m4)
-            if (s% entropy(1) > 4.0) then
+            if (s% entropy(1) > 4.d0) then
                do k = nz - 1, 1, -1
                   if (s% entropy(k) > 4.d0) exit
                end do

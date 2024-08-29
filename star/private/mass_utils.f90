@@ -37,8 +37,8 @@
          real(qp) sum, compensator
          integer l
 
-         sum = 0.0
-         compensator = 0.0
+         sum = 0d0
+         compensator = 0d0
          do l=nz,j,-1
             call neumaier_sum(sum, compensator, dm(l))
          end do
@@ -58,8 +58,8 @@
          real(qp) sum, compensator
          integer l
 
-         sum = 0.0
-         compensator = 0.0
+         sum = 0d0
+         compensator = 0d0
          do l=1,j
             call neumaier_sum(sum, compensator, dm(l))
          end do
@@ -110,8 +110,8 @@
          real(qp) summand
          integer l
 
-         sum % sum = 0.0
-         sum % compensator = 0.0
+         sum % sum = 0d0
+         sum % compensator = 0d0
 
          if (max(j,k) <= nz) then
             do l=nz,max(j,k),-1

@@ -220,7 +220,7 @@
             ! That is ALL it is used to do in this routine however, and the normalization
             ! is arbitrary (we just choose to use delta_m for convenience) so we can set it
             ! to anything we like.
-            delta_m = -1.
+            delta_m = -1.0d0
          end if
 
          ! Calculate pass fraction:

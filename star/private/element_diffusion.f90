@@ -567,8 +567,8 @@
             if (k==1) then
                dlnPdm(k) = 0; dlnT_dm(k) = 0; return
             end if
-            grav = -s% cgrav(k)*s% m(k)/s% r(k)**2
-            area = pi4*s% r(k)**2
+            grav = -s% cgrav(k)*s% m(k)/pow2(s% r(k))
+            area = pi4*pow2(s% r(k))
             P_face = 0.5d0*(s% Peos(k) + s% Peos(k-1))
             dlnPdm(k) = grav/(area*P_face) ! estimate based on QHSE
             dlnT_dm(k) = s% gradT(k)*dlnPdm(k)
