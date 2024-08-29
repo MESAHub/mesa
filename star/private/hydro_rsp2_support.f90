@@ -334,10 +334,9 @@
          
          subroutine revise_lnT_for_QHSE(P_surf, ierr)
             use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
-            use chem_lib
-            use chem_def
+            use chem_def, only: chem_isos
             use eos_support, only: solve_eos_given_DP
-            use eos_def
+            use eos_def, only: i_eta, i_lnfree_e
             use kap_def, only: num_kap_fracs
             use kap_support, only: get_kap
             real(dp), intent(in) :: P_surf
