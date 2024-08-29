@@ -1243,8 +1243,8 @@ contains
     real(dp), intent(out)    :: dres_dlnT(num_eos_basic_results)
     integer, intent(out)     :: ierr
 
-    real(dp), parameter :: LOGRHO_TOL = 1E-11_dp
-    real(dp), parameter :: LOGPGAS_TOL = 1E-11_dp
+    real(dp), parameter :: LOGRHO_TOL = 1d-11
+    real(dp), parameter :: LOGPGAS_TOL = 1d-11
 
     real(dp) :: T
     real(dp) :: P
@@ -1258,7 +1258,7 @@ contains
     P = exp(lnP)
 
     Prad = radiation_pressure(T)
-    Pgas = MAX(1.E-99_dp, P - Prad)
+    Pgas = MAX(1.d-99, P - Prad)
        
     gamma = 5d0/3d0
     call eos_gamma_PT_get_rho_energy( &

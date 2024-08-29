@@ -431,7 +431,7 @@ contains
          
       else if (s% op_mono_method == 'mombarg') then
          fk = 0
-         if (logT > 3.5 .and. logT < 8.0) then
+         if (logT > 3.5d0 .and. logT < 8.0d0) then
             do i=1, s% species
                e_name = chem_isos% name(s% chem_id(i))
                if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))
