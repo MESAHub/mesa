@@ -64,9 +64,9 @@ contains
          mu_ideal_gas = s%mu(1)  !1.00794d0 ! for hydrogen, 1 gram per mole
          R2 = pow2(s%R(1))
          Teff_local = pow(s%L(1)/(pi4*boltz_sigma*R2), 0.25d0)
-         PB_i = (cgas*s%rho(1)/mu_ideal_gas)*(1.0 - s%xspot)*Teff_local
+         PB_i = (cgas*s%rho(1)/mu_ideal_gas)*(1.0d0 - s%xspot)*Teff_local
          xspot_of_r = (P - PB_i)/P
-         gradr_spot = gradr/(s%fspot*pow4(xspot_of_r) + 1d0 - s%fspot)
+         gradr_spot = gradr/(s%fspot*pow4(xspot_of_r) + 1.0d0 - s%fspot)
       else
          gradr_spot = gradr
       end if
