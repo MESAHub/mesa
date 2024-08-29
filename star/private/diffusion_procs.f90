@@ -1250,7 +1250,7 @@
 
          include 'formats'
 
-         blend_fac =  (/(1._dp - DBLE(i)/31._dp, i=1,31)/)
+         blend_fac =  (/(1._dp - FLOAT(i)/31._dp, i=1,31)/)
          ierr = 0
 
          kmax = kmax_rad_accel

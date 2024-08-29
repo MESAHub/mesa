@@ -351,7 +351,7 @@
          real(dp), intent(in) :: f
          integer, intent(in) :: k
          include 'formats'         
-         if (f >= 0.0d0 .and. f <= 1.0d0) then
+         if (f >= 0.0 .and. f <= 1.0) then
             if (f == 0d0) then
                s% gradT_ad(k) = s% gradr_ad(k)
             else ! mix
@@ -375,7 +375,7 @@
          gradT_excess_alpha = s% gradT_excess_alpha
          s% gradT_excess_effect(k) = 0.0d0         
          gradT_sub_grada = s% gradT(k) - s% grada_face(k)
-         if (gradT_excess_alpha <= 0.0d0  .or. &
+         if (gradT_excess_alpha <= 0.0  .or. &
              gradT_sub_grada <= s% gradT_excess_f1) return
          if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) return
          log_tau = log10(s% tau(k))

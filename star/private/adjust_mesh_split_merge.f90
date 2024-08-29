@@ -741,7 +741,7 @@
          include 'formats'
          dm = s% dm(k)
          if (s% u_flag) then
-            KE = 0.5d0*pow2(dm*s% u(k))
+            KE = 0.5d0*dm*s% u(k)**2
          else if (s% v_flag) then
             v0 = s% v(k)
             if (k < s% nz) then
@@ -749,7 +749,7 @@
             else
                v1 = s% v_center
             end if
-            KE = 0.25d0*dm*(pow2(v0) + pow2(v1))
+            KE = 0.25d0*dm*(v0**2 + v1**2)
          else
             KE = 0d0
          end if
@@ -1397,16 +1397,16 @@
          total_KE = 0
          if (s% u_flag) then
             do k=1,s% nz
-               total_KE = total_KE + 0.5d0*s% dm(k)* pow2(s% u(k))
+               total_KE = total_KE + 0.5d0*s% dm(k)*s% u(k)**2
             end do
          else if (s% v_flag) then
             do k=1,s% nz-1
                total_KE = total_KE + &
-                  0.25d0*s% dm(k)*(pow2(s% v(k)) + pow2(s% v(k+1)))
+                  0.25d0*s% dm(k)*(s% v(k)**2 + s% v(k+1)**2)
             end do
             k = s% nz
             total_KE = total_KE + &
-               0.25d0*s% dm(k)*(pow2(s% v(k)) +pow2(s% v_center))
+               0.25d0*s% dm(k)*(s% v(k)**2 + s% v_center**2)
          end if
       end function total_KE
 

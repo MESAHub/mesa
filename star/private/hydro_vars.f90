@@ -980,7 +980,7 @@
                P_surf_atm = exp(lnP_surf)
                Pextra = s% Pextra_factor*(kap_surf/tau_surf)*(L_surf/M_surf)/(6._dp*pi*clight*s% cgrav(1))
                P_surf = P_surf_atm + Pextra
-               if (P_surf < 1d-50) then
+               if (P_surf < 1E-50_dp) then
                   lnP_surf = -50*ln10
                   if (.not. skip_partials) then
                      dlnP_dL = 0._dp
