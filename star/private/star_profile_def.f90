@@ -1431,7 +1431,7 @@
 
 
       integer function do_get_profile_id(cname)
-         use utils_lib
+         use utils_lib, only: integer_dict_lookup
          character (len=*), intent(in)  :: cname
          ! returns id for the profile column if there is a matching name
          ! returns 0 otherwise.
