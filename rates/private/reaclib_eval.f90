@@ -98,7 +98,7 @@
          type(reaction_data), intent(in) :: rates
          real(dp), dimension(:), intent(out) :: ln_lambda, lambda, dlambda_dlnT
          
-         real(dp) :: T9inv, logT, ln1
+         real(dp) :: T9inv, ln1
          real(dp), dimension(7) :: T9fac, dT9fac_dT9, dT9fac_dlnT
          integer :: i, j
          
@@ -161,7 +161,7 @@
          real(dp), dimension(:), intent(out) :: inv_lambda, dinv_lambda_dlnT
          
          integer :: indx,indxp
-         integer :: rstart, rend, i, j
+         integer :: i, j
          real(dp), dimension(num_lambdas) :: A, Qratio, dQratio_dlnT
          real(dp) :: tfac, dtfac_dlnT, lnT9, T9i, dT9i_dlnT, ln1, fac1, dfac1_dlnT, dln1_dlnT,blurp
          

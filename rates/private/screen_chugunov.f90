@@ -101,15 +101,15 @@
          real(dp) ::   a_e        !< electron sphere radius
          real(dp) ::   a_b        !< bohr radius
          real(dp) ::   rs         !< ion sphere radius normalised to bohr radius
-         real(dp) ::   m1, m2     !< ion masses
-         real(dp) ::   n1, n2     !< number density of ions of types 1 and 2
+         !real(dp) ::   m1, m2     !< ion masses
+         !real(dp) ::   n1, n2     !< number density of ions of types 1 and 2
          real(dp) ::   ntot, dntotdd       !< total number density of these ions
-         real(dp) ::   s          !< evaluated sigmoid function
+         !real(dp) ::   s          !< evaluated sigmoid function
          real(dp) ::   mav           !< average ion mass
          real(dp) ::   A, B, C, U, dAdt, dAdd, dBdt, dBdd, dCdt, dCdd
          real(dp) ::   temp, rho, abar, zbar, rr
-         real(dp) ::   alpha, dalphadgam, dbetadgam, dalphadh0, dbetadh0, dalphadtn,dbetadtn
-         real(dp) ::   tk, dtkdt, dtkdd, dtk2_dtp2dd
+         real(dp) ::   alpha, dalphadgam, dbetadgam, dalphadtn,dbetadtn
+         real(dp) ::   tk, dtkdt, dtkdd
    
          ! check whether both reactants are charged ions
    
