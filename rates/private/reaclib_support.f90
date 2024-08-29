@@ -704,7 +704,6 @@
          
          subroutine do_n_to_m(n,m)
             integer, intent(in) :: n, m ! each is either 1 or 2
-            integer :: j
             in1 = 0; in2 = 0; out1 = 0; out2 = 0
             if (.not. reverse) then
                in1 = pspecies(1)
