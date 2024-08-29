@@ -863,7 +863,7 @@
          end if
          if (abs(1d0-sum(xa_new(1:species))) > 1d-6) then
             ierr = -1
-            s% retry_message = 'set_composition requires new mass fractions to add to 1.'
+            s% retry_message = 'set_composition requires new mass fractions to add to 1'
             if (s% report_ierr) write(*, *) s% retry_message
             return
          end if
@@ -919,7 +919,7 @@
             end do
             if (abs(1d0 - sum(xa(1:species))) > 1d-2) then
                write(*,'(a)') &
-                  'get_xa_for_accretion: accretion species mass fractions do not add to 1.0'
+                  'get_xa_for_accretion: accretion species mass fractions do not add to 1'
                write(*,1) 'sum(xa(1:species))', sum(xa(1:species))
                do j=1,s% num_accretion_species
                   write(*,2) trim(s% accretion_species_id(j)), j, xa(j)

@@ -79,9 +79,9 @@
          integer, intent(out) :: ierr
       
          real(dp) :: sig_fac
-         integer :: nsel, itrsig, nsig, irotkr, nprtkr, igm1kr, npgmkr
+         integer :: nsel, itrsig, nsig
          real(dp) :: els1, dels, sig1, sig2, dfsig
-         integer :: k, i, j
+         integer :: i, j
          integer, pointer :: index(:) 
          
          logical, parameter :: dbg = .false.
@@ -181,7 +181,7 @@
          real(dp), intent(in) :: freq, inertia
          integer, intent(in) :: nn, iy, iaa, ispcpr
          real(dp), intent(in) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
-         integer :: iounit, ierr, i, j, skip
+         integer :: iounit, ierr, i, skip
          real(dp) :: y_r, y_h
          include 'formats'
          if (use_other_adipls_mode_info) then
@@ -235,7 +235,7 @@
          common/ccgrav/ cgrav
          real(dp) :: cgrav
 
-         integer :: i, iriche, iturpr
+         integer :: iriche, iturpr
          integer :: iconst, ivar, ivers, nn_in
          real(dp), allocatable :: global_data(:) ! (iconst)
          real(dp), allocatable :: point_data(:,:) ! (ivar,nn_in)
@@ -707,7 +707,7 @@
          integer, intent(out) :: nn, ierr
          
          ! local
-         integer :: i, j, nsin, iggt, inp, in, nshift, nnr, n, n1, nstart, idata8
+         integer :: i, j, nsin, iggt, nshift, nnr, n, n1, idata8
          logical :: sincen, sinsur
          real(dp), pointer :: aa1(:,:)
          real(dp) :: ggt
@@ -926,8 +926,7 @@
          real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
          integer, intent(out) :: ierr
       
-         real(dp), pointer :: var1(:,:) ! (ivar,nn)
-         integer :: ios, iounit, i, n, ir, nn1
+         integer :: ios, iounit, i, n
          character(80) :: head
       
   120 format(4i10)

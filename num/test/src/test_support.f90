@@ -259,7 +259,6 @@
          ! --- prints solution at equidistant output-points
          ! --- by using "contd8", the continuous collocation solution
          real(dp) :: xout, y1, y2
-         integer, parameter :: iprint = 6
          integer :: ierr
          xout = rpar(2)
          irtrn = 1
@@ -420,7 +419,7 @@
          write(*,*) 'binary_search, increasing values'
          
          loc = -1
-         val = [0d0, dble(n/3)**2 +2, vec(n)+1d0]
+         val = [0d0, FLOOR(n/3d0)**2+2d0, vec(n)+1d0]
          do k=1,3
             loc(k) = binary_search(n, vec, 0, val(k))
             if(loc(k) == 0 .and. val(k) < vec(1))then

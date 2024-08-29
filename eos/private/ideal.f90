@@ -72,8 +72,6 @@ module ideal
    integer, intent(out) :: ierr
    real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
    real(dp), intent(out), dimension(nv, species) :: d_dxa
-   
-   real(dp) :: logT_ion, logT_neutral
 
    ierr = 0
 

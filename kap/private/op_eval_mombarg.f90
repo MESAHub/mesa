@@ -39,7 +39,7 @@
       ! eumesh: sigma_i*(1 - exp(-u(v))) - a_k,i, where u=h*nu/(kT). OP mono grid is equally spaced in variable v. a_k,i are the correction factors. (nel,1648,nptot)
 
 
-      integer :: n, ke, nz, id, m, ik, i
+      integer :: ke, id, m, ik, i
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
@@ -55,7 +55,7 @@
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
       real(dp) :: logT_min, logRho_min, logT_grid(4,4), logRho_grid(4,4)
       integer :: offset1, offset2, tries, missing_point(4,4)
-      real(dp) :: log_amu_mix_cell, lkap_ross_face, gam
+      real(dp) :: log_amu_mix_cell, gam
       integer :: imin, imax
       logical :: retry
 
