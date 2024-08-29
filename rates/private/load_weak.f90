@@ -643,7 +643,6 @@
 
         subroutine extend
             integer :: n
-            type(weaklib_rate_table) :: table
 
             type(table_c), dimension(:), allocatable :: tmp_weak_reactions_tables
 

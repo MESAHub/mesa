@@ -307,7 +307,7 @@
 
 
          integer function do1(cnt, str, legend_flag)
-            use chem_lib
+            use chem_lib, only: chem_get_iso_id
             integer, intent(in) :: cnt
             character (len=*), intent(in) :: str
             logical, intent(in) :: legend_flag

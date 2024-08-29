@@ -928,7 +928,7 @@
          use utils_def
          integer, intent(out) :: ierr
          
-         integer :: iounit, n, i, t, id, read_int
+         integer :: iounit, n, i, t
          character (len=256) :: buffer, string, filename, list_filename
          
          ierr = 0
@@ -1006,7 +1006,6 @@
       subroutine weaklib_init(ierr)
          use const_def, only: mesa_data_dir
          integer, intent(out) :: ierr 
-         integer :: i
          ierr = 0
          weak_data_dir = trim(mesa_data_dir) // '/rates_data'
          nullify(weak_reactions_dict)
@@ -1043,8 +1042,6 @@
 
 
       subroutine ecapture_init(ierr)
-
-         use const_def, only: mesa_data_dir
 
          integer, intent(out) :: ierr 
 
@@ -1149,8 +1146,7 @@
 
       subroutine do_start_rates_def_init(ierr)
          use math_lib
-         integer, intent(out) :: ierr
-         integer :: i         
+         integer, intent(out) :: ierr     
          ierr = 0
          call set_rattab_range(5.30102999566398d0, 10.301029995664d0)
          
@@ -1193,7 +1189,6 @@
          use utils_lib, only: integer_dict_lookup
          character (len=*), intent(in)  :: reaction_name 
          integer :: ierr
-         integer :: indx
          ierr = 0
          call integer_dict_lookup(reaction_names_dict, reaction_name, value, ierr)
          if (ierr /= 0) value = 0
