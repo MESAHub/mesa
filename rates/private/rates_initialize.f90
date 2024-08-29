@@ -40,7 +40,7 @@
          use reaclib_input, only: do_extract_rates
          use chem_def, only: nuclide_set, chem_isos, num_chem_isos, iso_name_length
          use chem_lib, only: generate_nuclide_set
-         integer :: i, ierr
+         integer :: ierr
          character(len=iso_name_length), pointer :: names(:) =>null()
          type(nuclide_set), pointer :: set(:) =>null()
          integer, pointer :: chem_id(:) =>null()
@@ -77,7 +77,7 @@
          integer, intent(out) :: ierr
          
          integer :: ir, num_in, num_out
-         integer :: j, particles_in, particles_out
+         integer :: particles_in, particles_out
          logical :: already_defined
          integer :: iso_ids(max_num_reaction_inputs+max_num_reaction_outputs)
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
@@ -155,8 +155,8 @@
          integer, intent(in) :: indx ! index in reaclib rates
          integer, intent(out) :: ierr
          
-         integer :: i, ir, chapter, num_in, num_out, iso_in, iso_out
-         integer :: j, weak_j, particles_in, particles_out
+         integer :: i, ir, chapter, num_in, num_out
+         integer :: particles_in, particles_out
          logical :: weak, reverse, already_defined
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
          type (reaction_data), pointer :: r =>null()
@@ -531,9 +531,9 @@
          integer, intent(out) :: ierr
          
          type (rate_table_info), pointer :: ri =>null()
-         integer :: i, iounit, n, t, ir
-         character (len=256) :: line, dir, rate_name, rate_fname, filename, message
-         character (len=256) :: buffer, string
+         integer :: i, iounit, n, t
+         character (len=256) :: dir, rate_name, rate_fname, filename
+         character (len=256) :: buffer
          logical :: okay
          
          logical, parameter :: dbg = .false.
@@ -680,10 +680,9 @@
          character (len=*), intent(in) :: reactionlist_filename
          integer, intent(out) :: ierr
          
-         character (len=256) :: line, filename, rname, cname, iname, str, message
-         integer :: iounit, len, i, j, jj, k, cnt, ir, ic, ii, ye, rho, n, num_reactions, new_max
+         character (len=256) :: line, filename, rname, cname
+         integer :: iounit, len, i, j, jj, k, cnt, ir, ic, ii, n, num_reactions
          character (len=maxlen_reaction_Info) :: info
-         real(dp) :: Q
          logical, parameter :: dbg = .false.
          
          include 'formats'
@@ -1048,7 +1047,6 @@
          integer function read_iso()
             use chem_def, only: iso_name_length
             character (len=64) :: str
-            integer :: ierr
             str = line(i:j)
             read_iso = chem_get_iso_id(str)
          end function read_iso
@@ -1078,7 +1076,6 @@
          
          logical function missing_dbl()
             character (len=64) :: str
-            integer :: ierr
             str = line(i:j)
             missing_dbl = (len_trim(str) == 0)
          end function missing_dbl
