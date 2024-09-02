@@ -31,6 +31,12 @@ else
    export SHARED = no
 endif
 
+ifeq ($(USE_CRMATH), YES)
+   export CRMATH = yes
+else
+   export CRMATH = no
+endif
+
 all :
 	@$(MAKE) --no-print-directory -C $(GYRE_DIR) install
 
