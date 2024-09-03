@@ -24,7 +24,7 @@ New Features
 Bug Fixes
 ---------
 
-
+fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating inital models
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
