@@ -60,14 +60,14 @@ The energy equation can be written in the dLdm or the dedt form in MESA (see `ME
 Next we specify the starting model, i.e., its initial mass, metallicity, and helium  mass fraction. Here we only specify M and Z; the helium content is by default 0.24 + 2Z. 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  use_dedt
-   :end-before: opacity
+   :start-at:  initial_mass
+   :end-at: initial_z
 
-Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Z_base`` which gives the metal abundances previous to any CO enhancement. 
+Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Zbase`` which gives the metal abundances previous to any CO enhancement. 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  opacity controls
-   :end-before: mixing
+   :start-at: kap
+   :end-at: ! end of kap namelist
 
 We now specify the non-default mixing parameters we want to use.
 We will use the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__  with ``mixing_length_alpha=1.8``. We will use the Ledoux criterion and the "predictive mixing" scheme described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ to find the convective boundaries at the core and at the surface. 
@@ -143,8 +143,8 @@ We use the same mixing controls as for the PMS-to-TAMS part of the evolution.
 We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (our ZACheB model). 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
-   :start-after: threshold_for_smooth_brunt_B = 0.1
-   :end-before: max_
+   :start-at: HB_limit
+   :end-at: HB_limit
 
 .. warning:: It is sometimes useful to specify a maximum number of models to avoid running out of space on your drive with runaway runs! Here we specify  ``max_model_number = 25000``
 

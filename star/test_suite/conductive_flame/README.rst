@@ -24,8 +24,9 @@ center of the model.  The properties of this initial model can be
 controlled from the inlist.
 
 .. literalinclude:: ../../../star/test_suite/conductive_flame/inlist_conductive_flame
+   :language: fortran
    :start-after: ! use our own routine to build the model
-   :lines: 1-11
+   :end-at: x_ctrl(8)
 
 The inner boundary is at r = 0.  The outer boundary has a fixed
 temperature and a fixed pressure equal to the initial pressure of the
