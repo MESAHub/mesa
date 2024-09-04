@@ -379,9 +379,11 @@
         
         ! here we define our new auto_diff variable for reaction rates.
         !auto_diff_real_2var_order1
-        n% rate_screened_ad %val = n% rate_screened
-        n% rate_screened_ad %d1val1 = n% rate_screened_dT  ! 1 is T
-        n% rate_screened_ad %d1val2 = n% rate_screened_dRho  ! 2 is rho
+
+        ! This is done in "get_rates_with_screening" before approx21 is called.
+        !n% rate_screened_ad %val = n% rate_screened
+        !n% rate_screened_ad %d1val1 = n% rate_screened_dT  ! 1 is T
+        !n% rate_screened_ad %d1val2 = n% rate_screened_dRho  ! 2 is rho
         n% dydt1(1:species(g% add_co56_to_approx21)) %val = 0.0d0
         n% dydt1(1:species(g% add_co56_to_approx21)) %d1val1 = 0.0d0
         n% dydt1(1:species(g% add_co56_to_approx21)) %d1val2 = 0.0d0
@@ -689,7 +691,7 @@ n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
          call eval_using_rate_tables( &
             g% num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
             n% ye, n% logT, n% temp, n% rho, n% rate_factors, g% logttab, &
-            n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr) 
+            n% rate_raw_ad, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
             return
@@ -708,18 +710,27 @@ n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
          if (dbg) write(*,*) 'call screen_net with init=.false.'
          call screen_net( &
             g, g% num_isos, n% y, n% temp, n% rho, n% logT, n% logrho, .false.,  &
-            n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
-            n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-            n% screening_mode, &
+            n% rate_raw_ad, n% rate_screened_ad, n% screening_mode, &
             n% zbar, n% abar, n% z2bar, n% ye, ierr)
          if (dbg) write(*,*) 'done screen_net with init=.false.'
          if (ierr /= 0) return
+
+! Here we allocate rate_raw and screened ad variables to the original variables use in net, so the general net can function normally.
+n% rate_raw = n% rate_raw_ad%val
+n% rate_raw_dT = n% rate_raw_ad%d1val1
+n% rate_raw_dRho = n% rate_raw_ad%d1val2
+n% rate_screened = n% rate_screened_ad%val
+n% rate_screened_dT = n% rate_screened_ad%d1val1
+n% rate_screened_dRho = n% rate_screened_ad%d1val2
+
+
          if (g% doing_approx21) then
             num = num_reactions_func(g% add_co56_to_approx21)
             do i=g% num_reactions+1,num
-               n% rate_screened(i) = n% rate_raw(i)
-               n% rate_screened_dT(i) = n% rate_raw_dT(i)
-               n% rate_screened_dRho(i) = n% rate_raw_dRho(i)
+!               n% rate_screened(i) = n% rate_raw(i)
+!               n% rate_screened_dT(i) = n% rate_raw_dT(i)
+!               n% rate_screened_dRho(i) = n% rate_raw_dRho(i)
+                n% rate_screened_ad(i) = n% rate_raw_ad(i)
 !               n% rate_screened_ad %val = n% rate_raw(i)
 !               n% rate_screened_ad %d1val1 = n% rate_raw_dT(i)  ! 1 is T
 !               n% rate_screened_ad %d1val2 = n% rate_raw_dRho(i)  ! 2 is rho
@@ -750,10 +761,10 @@ n% rate_screened_dRho = n% rate_screened_ad %d1val2  ! 2 is rho
          integer, intent(out) :: ierr
          ierr = 0
          call approx21_pa_pg_fractions( &
-            n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr)
+            n% rate_raw_ad, ierr)
          if (ierr /= 0) return            
          call approx21_weak_rates( &
-            n% y, n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
+            n% y, n% rate_raw_ad, &
             n% temp, n% rho, n% ye, n% eta, n% zbar, &
             n% weak_rate_factor, plus_co56, ierr)
          if (ierr /= 0) return            

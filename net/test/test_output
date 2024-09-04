@@ -110,7 +110,7 @@
                                  eps_nuc     0.150607116E+25
 
                             d_lneps_dlnT        -0.249698205
-                          d_lneps_dlnRho         1.008277885
+                          d_lneps_dlnRho         1.008275422
 
 
  energy generation by category
@@ -151,7 +151,7 @@
                                  eps_nuc     0.150607116E+25
 
                             d_lneps_dlnT        -0.249698205
-                          d_lneps_dlnRho         1.008277885
+                          d_lneps_dlnRho         1.008275422
 
 
  energy generation by category
@@ -201,11 +201,11 @@
  test_one_zone_burn_const_P
                                       number of species          21
                                  large final abundances    1.0000000000000000D-02
-                                                    o16           1    7.1798810044269601D-01
-                                                   si28           2    1.6142410416068537D-01
-                                                    s32           3    6.0439378324440726D-02
-                                                   ar36           4    2.9692711889884055D-02
-                                                   ca40           5    1.6560528697490567D-02
+                                                    o16           1    7.1798810044270289D-01
+                                                   si28           2    1.6142410416067718D-01
+                                                    s32           3    6.0439378324444043D-02
+                                                   ar36           4    2.9692711889889530D-02
+                                                   ca40           5    1.6560528697495896D-02
 
                                                    xsum    1.0000000000000000D+00
 

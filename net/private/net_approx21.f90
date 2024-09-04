@@ -230,8 +230,9 @@
 
       ! call this after get raw rates
          subroutine approx21_pa_pg_fractions( &
-            ratraw,dratrawdt,dratrawdd,ierr)
-         real(dp), dimension(:) :: ratraw,dratrawdt,dratrawdd
+            ratraw,ierr)
+!         real(dp), dimension(:) :: ratraw,dratrawdt,dratrawdd
+          type(auto_diff_real_2var_order1), dimension(:) :: ratraw
          integer, intent(out) :: ierr
          
          include 'formats'
@@ -239,9 +240,10 @@
          ierr = 0
 
          call set1(ifa,irn15pg,irn15pa)
+!         ratraw(ifg)    = 1.0d0 - ratraw(ifa)
+!         dratrawdt(ifg) = -dratrawdt(ifa)
+!         dratrawdd(ifg) = -dratrawdd(ifa)
          ratraw(ifg)    = 1.0d0 - ratraw(ifa)
-         dratrawdt(ifg) = -dratrawdt(ifa)
-         dratrawdd(ifg) = -dratrawdd(ifa)
 
          call set1(irr1,iralpg,iralpa) ! al27
          call set1(irs1,irppg,irppa)   ! p31
@@ -256,30 +258,32 @@
 
          subroutine set1(ifa,irn15pg,irn15pa)
             integer, intent(in) :: ifa,irn15pg,irn15pa
-            real(dp) :: ff1,dff1dt,dff1dd,ff2,dff2dt,dff2dd, &
-               tot,dtotdt,dtotdd,invtot
+!            real(dp) :: ff1,dff1dt,dff1dd,ff2,dff2dt,dff2dd, &
+!               tot,dtotdt,dtotdd,invtot
+            type(auto_diff_real_2var_order1) :: ff1,ff2, &
+                tot,invtot
 
             ff1 = ratraw(irn15pg)
-            dff1dt = dratrawdt(irn15pg)
-            dff1dd = dratrawdd(irn15pg)
+            !dff1dt = dratrawdt(irn15pg)
+            !dff1dd = dratrawdd(irn15pg)
 
             ff2 = ratraw(irn15pa)
-            dff2dt = dratrawdt(irn15pa)
-            dff2dd = dratrawdd(irn15pa)
+            !dff2dt = dratrawdt(irn15pa)
+            !dff2dd = dratrawdd(irn15pa)
 
             tot            = ff1 + ff2
-            dtotdt         = dff1dt + dff2dt
-            dtotdd         = dff1dd + dff2dd
+            !dtotdt         = dff1dt + dff2dt
+            !dtotdd         = dff1dd + dff2dd
 
             if (tot > 1d-30) then
                invtot         = 1.0d0/tot
-               ratraw(ifa)    = ff2 * invtot
-               dratrawdt(ifa) = dff2dt * invtot - ff2 * invtot*invtot * dtotdt
-               dratrawdd(ifa) = dff2dd * invtot - ff2 * invtot*invtot * dtotdd
+               ratraw(ifa)    = ff2 * invtot ! derivatives are set automatically
+               !dratrawdt(ifa) = dff2dt * invtot - ff2 * invtot*invtot * dtotdt
+               !dratrawdd(ifa) = dff2dd * invtot - ff2 * invtot*invtot * dtotdd
             else
-               ratraw(ifa)    = 0.0d0
-               dratrawdt(ifa) = 0.0d0
-               dratrawdd(ifa) = 0.0d0
+               ratraw(ifa)    = 0.0d0 ! derivatives are set automatically
+               !dratrawdt(ifa) = 0.0d0
+               !dratrawdd(ifa) = 0.0d0
             end if
 
          end subroutine set1
@@ -289,13 +293,14 @@
          
          ! call this before screening
          subroutine approx21_weak_rates( &
-               y, ratraw, dratrawdt, dratrawdd, &
+               y, ratraw, &
                temp, den, ye, eta, zbar, &
                weak_rate_factor,  plus_co56, ierr)
             use rates_lib, only: eval_ecapnuc_rate
             use net_derivs, only: eval_ni56_ec_rate, eval_co56_ec_rate
             
-            real(dp), dimension(:) :: y, ratraw, dratrawdt, dratrawdd
+            real(dp), dimension(:) :: y!, ratraw, dratrawdt, dratrawdd
+            type(auto_diff_real_2var_order1), dimension(:) :: ratraw
             real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
             logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
@@ -306,20 +311,25 @@
             
             ierr = 0
             
+            ! this eval_ecapnuc_rate call could easily incorporate auto_diff if needed.
             call eval_ecapnuc_rate(eta, temp, den, rpen, rnep, spen, snep)
             
-            ratraw(irpen) = rpen
-            dratrawdt(irpen) = 0
-            dratrawdd(irpen) = 0
+            ratraw(irpen)%val = rpen
+            ratraw(irpen)%d1val1 = 0
+            ratraw(irpen)%d1val2 = 0
+            !dratrawdt(irpen) = 0
+            !dratrawdd(irpen) = 0
             if (rpen > 0) then
                Qneu = spen/rpen
             else
                Qneu = 0
             end if
             
-            ratraw(irnep) = rnep
-            dratrawdt(irnep) = 0
-            dratrawdd(irnep) = 0
+            ratraw(irnep)%val = rnep
+            ratraw(irnep)%d1val1 = 0
+            ratraw(irnep)%d1val1 = 0
+            !dratrawdt(irnep) = 0
+            !dratrawdd(irnep) = 0
             if (rnep > 0) then
                Qneu = snep/rnep
             else
@@ -334,10 +344,13 @@
                !write(*,*) 'failed in eval_ni56_ec_rate'
                return
             end if
-            ratraw(irn56ec) = rate
-            dratrawdt(irn56ec) = 0 
-            dratrawdd(irn56ec) = 0
-            
+!            ratraw(irn56ec) = rate
+!            dratrawdt(irn56ec) = 0
+!            dratrawdd(irn56ec) = 0
+            ratraw(irn56ec)%val = rate
+            ratraw(irn56ec)%d1val1 = 0
+            ratraw(irn56ec)%d1val2 = 0
+
             if (plus_co56) then         
                call eval_co56_ec_rate( &
                   temp, den, ye, eta, zbar, weak_rate_factor, &
@@ -347,9 +360,12 @@
                   !write(*,*) 'failed in eval_co56_ec_rate'
                   return
                end if
-               ratraw(irco56ec) = rate
-               dratrawdt(irco56ec) = 0 
-               dratrawdd(irco56ec) = 0           
+!               ratraw(irco56ec) = rate
+!               dratrawdt(irco56ec) = 0
+!               dratrawdd(irco56ec) = 0
+               ratraw(irco56ec)%val = rate
+               ratraw(irco56ec)%d1val1 = 0
+               ratraw(irco56ec)%d1val2 = 0
             end if
 
          end subroutine approx21_weak_rates

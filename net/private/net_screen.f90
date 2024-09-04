@@ -45,18 +45,14 @@
          y = 0
          call screen_net( &
             n% g, num_chem_isos, y, 1d0, 1d0, 0d0, 0d0, .true., &
-            n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, &
-            n% rate_screened, n% rate_screened_dT, n% rate_screened_dRho, &
-            n% screening_mode,  &
+            n% rate_raw_ad, n% rate_screened_ad, n% screening_mode,  &
              0d0, 0d0, 0d0, 1d0, ierr)
       end subroutine make_screening_tables
       
 
       subroutine screen_net( &
             g, num_isos, y, temp, den, logT, logRho, init,  &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho, &
-            screening_mode, &
+            rate_raw, rate_screened, screening_mode, &
             zbar, abar, z2bar, ye, ierr)
 
          use rates_def, only: Screen_Info, reaction_name
@@ -66,9 +62,11 @@
          integer, intent(in) :: num_isos, screening_mode
          real(dp), intent(in) :: y(:), temp, den, logT, logRho, &
             zbar, abar, z2bar, ye
-         real(dp), intent(inout), dimension(:) :: &
-            rate_raw, rate_raw_dT, rate_raw_dRho, &
-            rate_screened, rate_screened_dT, rate_screened_dRho
+         !real(dp), intent(inout), dimension(:) :: &
+         !   rate_raw, rate_raw_dT, rate_raw_dRho, &
+         !   rate_screened, rate_screened_dT, rate_screened_dRho
+         type(auto_diff_real_2var_order1), intent(inout), dimension(:) :: &
+            rate_raw,rate_screened
          logical, intent(in) :: init
          integer, intent(out) :: ierr
 
@@ -119,9 +117,10 @@
                   return
                end if
             else
-               rate_screened(i) = rate_raw(i)
-               rate_screened_dT(i) = rate_raw_dT(i)
-               rate_screened_dRho(i) = rate_raw_dRho(i)
+!               rate_screened(i) = rate_raw(i)
+!               rate_screened_dT(i) = rate_raw_dT(i)
+!               rate_screened_dRho(i) = rate_raw_dRho(i)
+               rate_screened(i) = rate_raw(i) ! ad_type, derivs are set automatically
             end if
          end do
          if (ierr /= 0) return
@@ -139,20 +138,27 @@
             if (logT <= g% logTcut_lo) then
                do i = 1, num_reactions
                   if (g% weak_reaction_index(i) > 0) cycle
-                  rate_screened(i) = 0
-                  rate_screened_dT(i) = 0
-                  rate_screened_dRho(i) = 0
+!                  rate_screened(i) = 0
+!                  rate_screened_dT(i) = 0
+!                  rate_screened_dRho(i) = 0
+                  rate_screened(i)%val = 0
+                  rate_screened(i)%d1val1 = 0
+                  rate_screened(i)%d1val2 = 0
+
                end do
-            else
+            else ! this could be reimplemented with autodiff too, but later.
                Tfactor = (logT - g% logTcut_lo)/(g% logTcut_lim - g% logTcut_lo)
                Tfactor = 0.5d0*(1 - cospi(Tfactor*Tfactor))
                dTfactordt = 0.5d0 * pi * sinpi(Tfactor*Tfactor) * &
                              2.d0/((g% logTcut_lim - g% logTcut_lo) * temp * ln10)
                do i = 1, num_reactions
                   if (g% weak_reaction_index(i) > 0) cycle
-                  rate_screened_dT(i) = Tfactor * rate_screened_dT(i) + dTfactordt * rate_screened(i)
-                  rate_screened_dRho(i) = Tfactor * rate_screened_dRho(i)
-                  rate_screened(i) = Tfactor * rate_screened(i)
+!                  rate_screened_dT(i) = Tfactor * rate_screened_dT(i) + dTfactordt * rate_screened(i)
+!                  rate_screened_dRho(i) = Tfactor * rate_screened_dRho(i)
+!                  rate_screened(i) = Tfactor * rate_screened(i)
+                  rate_screened(i)%d1val1 = Tfactor * rate_screened(i)%d1val1 + dTfactordt * rate_screened(i)%val
+                  rate_screened(i)%d1val2 = Tfactor * rate_screened(i)%d1val2
+                  rate_screened(i)%val = Tfactor * rate_screened(i)%val
                end do
             end if
          end if
@@ -216,9 +222,15 @@
             real(dp), intent(in) :: sc1a, sc1adt, sc1add
             include 'formats'
             if (i == 0) return         
-            rate_screened(i) = rate_raw(i)*sc1a
-            rate_screened_dT(i) = rate_raw_dT(i)*sc1a + rate_raw(i)*sc1adt
-            rate_screened_dRho(i) = rate_raw_dRho(i)*sc1a + rate_raw(i)*sc1add
+!            rate_screened(i) = rate_raw(i)*sc1a
+!            rate_screened_dT(i) = rate_raw_dT(i)*sc1a + rate_raw(i)*sc1adt
+!            rate_screened_dRho(i) = rate_raw_dRho(i)*sc1a + rate_raw(i)*sc1add
+
+            ! By adding auto_diff to the screening rate, we can do this implicitly,
+            ! but the screening routines need auto_diff for T,Rho to be implemented.
+             rate_screened(i) = rate_raw(i)%val*sc1a
+             rate_screened(i)%d1val1 = rate_raw(i)%d1val1*sc1a + rate_raw(i)%val*sc1adt
+             rate_screened(i)%d1val2 = rate_raw(i)%d1val2*sc1a + rate_raw(i)%val*sc1add
          end subroutine set_rate_screening      
       
          subroutine eval_screen_pair(init, jscr, i1, i2, i, sc, ir, ierr)
@@ -333,23 +345,23 @@
             ierr = 0
          
             if (rtab(ir34_pp2) /= 0 .and. rtab(ir34_pp3) /= 0) then
-               if (rate_screened(rtab(ir34_pp2)) /= &
-                     rate_screened(rtab(ir34_pp3))) then
+               if (rate_screened(rtab(ir34_pp2))%val /= &
+                     rate_screened(rtab(ir34_pp3))%val) then
                   ierr = -1
                   return
                end if
                if (rtab(ir_be7_wk_li7) /= 0) then
-                  rateII  = rate_screened(rtab(ir_be7_wk_li7))
+                  rateII  = rate_screened(rtab(ir_be7_wk_li7))%val
                else if (rtab(irbe7ec_li7_aux) /= 0) then
-                  rateII  = rate_screened(rtab(irbe7ec_li7_aux))
+                  rateII  = rate_screened(rtab(irbe7ec_li7_aux))%val
                else
                   write(*,*) 'need either r_be7_wk_li7 or rbe7ec_li7_aux'
                   call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
                end if
                if (rtab(ir_be7_pg_b8) /= 0) then
-                  rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(ir_be7_pg_b8))
+                  rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(ir_be7_pg_b8))%val
                else if (rtab(irbe7pg_b8_aux) /= 0) then
-                  rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(irbe7pg_b8_aux))
+                  rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(irbe7pg_b8_aux))%val
                else
                   write(*,*) 'need either r_be7_pg_b8 or rbe7pg_b8_aux'
                   call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
@@ -362,13 +374,22 @@
                end if
                fIII = 1d0 - fII
                
-               rate_screened(rtab(ir34_pp2)) = fII*rate_screened(rtab(ir34_pp2))
-               rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2))
-               rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2))
+!               rate_screened(rtab(ir34_pp2)) = fII*rate_screened(rtab(ir34_pp2))
+!               rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2))
+!               rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2))
+!
+!               rate_screened(rtab(ir34_pp3)) = fIII*rate_screened(rtab(ir34_pp3))
+!               rate_screened_dT(rtab(ir34_pp3)) = fIII*rate_screened_dT(rtab(ir34_pp3))
+!               rate_screened_dRho(rtab(ir34_pp3)) = fIII*rate_screened_dRho(rtab(ir34_pp3))
 
-               rate_screened(rtab(ir34_pp3)) = fIII*rate_screened(rtab(ir34_pp3))
-               rate_screened_dT(rtab(ir34_pp3)) = fIII*rate_screened_dT(rtab(ir34_pp3))
-               rate_screened_dRho(rtab(ir34_pp3)) = fIII*rate_screened_dRho(rtab(ir34_pp3))
+              ! Because we are using auto_diff, the derivatives are set automatically.
+              rate_screened(rtab(ir34_pp2)) = fII*rate_screened(rtab(ir34_pp2))
+!              rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2))
+!              rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2))
+
+              rate_screened(rtab(ir34_pp3)) = fIII*rate_screened(rtab(ir34_pp3))
+ !             rate_screened_dT(rtab(ir34_pp3)) = fIII*rate_screened_dT(rtab(ir34_pp3))
+ !             rate_screened_dRho(rtab(ir34_pp3)) = fIII*rate_screened_dRho(rtab(ir34_pp3))
 
             end if
 
@@ -526,8 +547,8 @@
                call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
          
-            pg_raw_rate = rate_raw(irpg)
-            pa_raw_rate = rate_raw(irpa)
+            pg_raw_rate = rate_raw(irpg)%val
+            pa_raw_rate = rate_raw(irpa)%val
          
             if (pg_raw_rate + pa_raw_rate < 1d-99) then ! avoid divide by 0
                pg_raw_rate = 1; pa_raw_rate = 1
@@ -537,28 +558,45 @@
             pa_frac = 1 - pg_frac
          
             x = pg_raw_rate + pa_raw_rate
+!            d_pg_frac_dT =  &
+!               (pa_raw_rate*rate_raw_dT(irpg) - pg_raw_rate*rate_raw_dT(irpa)) / (x*x)
+!            d_pa_frac_dT = -d_pg_frac_dT
+!
+!            d_pg_frac_dRho =  &
+!               (pa_raw_rate*rate_raw_dRho(irpg) - pg_raw_rate*rate_raw_dRho(irpa)) / (x*x)
+!            d_pa_frac_dRho = -d_pg_frac_dRho
+
             d_pg_frac_dT =  &
-               (pa_raw_rate*rate_raw_dT(irpg) - pg_raw_rate*rate_raw_dT(irpa)) / (x*x)
+            (pa_raw_rate*rate_raw(irpg)%d1val1 - pg_raw_rate*rate_raw(irpa)%d1val1) / (x*x)
             d_pa_frac_dT = -d_pg_frac_dT
-         
+
             d_pg_frac_dRho =  &
-               (pa_raw_rate*rate_raw_dRho(irpg) - pg_raw_rate*rate_raw_dRho(irpa)) / (x*x)
+            (pa_raw_rate*rate_raw(irpg)%d1val2 - pg_raw_rate*rate_raw(irpa)%d1val2) / (x*x)
             d_pa_frac_dRho = -d_pg_frac_dRho
          
-            r    = rate_screened(ir_start)
-            drdT = rate_screened_dT(ir_start)
-            drdd = rate_screened_dRho(ir_start)
+!            r    = rate_screened(ir_start)
+!            drdT = rate_screened_dT(ir_start)
+!            drdd = rate_screened_dRho(ir_start)
+            r    = rate_screened(ir_start)%val
+            drdT = rate_screened(ir_start)%d1val1
+            drdd = rate_screened(ir_start)%d1val2
          
             if (ir_with_pg /= 0) then
-               rate_screened(ir_with_pg) = r*pg_frac
-               rate_screened_dT(ir_with_pg) = r*d_pg_frac_dT + drdT*pg_frac
-               rate_screened_dRho(ir_with_pg) = r*d_pg_frac_dRho + drdd*pg_frac
+!               rate_screened(ir_with_pg) = r*pg_frac
+!               rate_screened_dT(ir_with_pg) = r*d_pg_frac_dT + drdT*pg_frac
+!               rate_screened_dRho(ir_with_pg) = r*d_pg_frac_dRho + drdd*pg_frac
+                rate_screened(ir_with_pg)%val = r*pg_frac
+                rate_screened(ir_with_pg)%d1val1 = r*d_pg_frac_dT + drdT*pg_frac
+                rate_screened(ir_with_pg)%d1val2 = r*d_pg_frac_dRho + drdd*pg_frac
             end if
          
             if (ir_with_pa /= 0) then
-               rate_screened(ir_with_pa)  = r*pa_frac
-               rate_screened_dT(ir_with_pa) = r*d_pa_frac_dT + drdT*pa_frac
-               rate_screened_dRho(ir_with_pa) = r*d_pa_frac_dRho + drdd*pa_frac
+!               rate_screened(ir_with_pa)  = r*pa_frac
+!               rate_screened_dT(ir_with_pa) = r*d_pa_frac_dT + drdT*pa_frac
+!               rate_screened_dRho(ir_with_pa) = r*d_pa_frac_dRho + drdd*pa_frac
+                rate_screened(ir_with_pa)%val  = r*pa_frac
+                rate_screened(ir_with_pa)%d1val1 = r*d_pa_frac_dT + drdT*pa_frac
+                rate_screened(ir_with_pa)%d1val2 = r*d_pa_frac_dRho + drdd*pa_frac
             end if
                
          end subroutine rate_for_pg_pa_branches

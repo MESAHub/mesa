@@ -68,6 +68,7 @@
 !         if(.not.allocated(n% dfdt)) allocate(n% dfdT(num_isos))
 !         if(.not.allocated(n% dfdRho))  allocate(n% dfdRho(num_isos))
          if(.not.allocated(n% rate_screened_ad)) allocate(n% rate_screened_ad(num_reactions))
+         if(.not.allocated(n% rate_raw_ad)) allocate(n% rate_raw_ad(num_reactions))
 
 
          if(n% g% fill_arrays_with_NaNs) then
@@ -79,6 +80,7 @@
             call fill_with_NaNs(n% dydt1)  ! ad
             !call fill_with_NaNs(n% dfdt) dydt1 %d1val1
             !call fill_with_NaNs(n% dfdRho) dydt1 %d1val2
+            call fill_with_NaNs(n% rate_raw_ad)  ! ad
             call fill_with_NaNs(n% rate_screened_ad)  ! ad
          end if
          
@@ -101,7 +103,10 @@
          end if
          
          if(.not.allocated(n% eps_nuc_categories)) allocate(n% eps_nuc_categories(num_categories))
-         
+       
+         ! ad version
+         if(.not.allocated(n% rate_screened_ad)) allocate(n% rate_screened_ad(num_reactions))
+
          if(.not.allocated(n% rate_screened)) allocate(n% rate_screened(num_reactions))
          if(.not.allocated(n% rate_screened_dT)) allocate(n% rate_screened_dT(num_reactions))
          if(.not.allocated(n% rate_screened_dRho)) allocate(n% rate_screened_dRho(num_reactions))
@@ -109,6 +114,9 @@
          if(.not.allocated(n% rate_raw)) allocate(n% rate_raw(num_reactions))
          if(.not.allocated(n% rate_raw_dT)) allocate(n% rate_raw_dT(num_reactions))
          if(.not.allocated(n% rate_raw_dRho)) allocate(n% rate_raw_dRho(num_reactions))
+
+         ! allocate for autodiff rate_raw of T,Rho
+         if(.not.allocated(n% rate_raw_ad)) allocate(n% rate_raw_ad(num_reactions))
 
          if(.not.allocated(n% rate_factors)) allocate(n% rate_factors(num_reactions))
 
@@ -144,6 +152,8 @@
 
          if(n% g% fill_arrays_with_NaNs) then
             call fill_with_NaNs(n% eps_nuc_categories)
+            call fill_with_NaNs(n% rate_raw_ad)
+            call fill_with_NaNs(n% rate_screened_ad)
             call fill_with_NaNs(n% rate_screened)
             call fill_with_NaNs(n% rate_screened_dt)
             call fill_with_NaNs(n% rate_screened_drho)

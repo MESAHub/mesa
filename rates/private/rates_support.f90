@@ -39,14 +39,16 @@
       subroutine do_get_raw_rates( &
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
             ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
+            rate_raw, ierr)
          use const_def, only : missing_value
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp_in, btemp, bden, raw_rate_factor(:),  &
             rattab(:,:), logttab(:)
          real(dp), pointer, intent(in) :: rattab_f1(:)
-         real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
+         ! make autodiff rate_raw variable with derivatives (1) T (2) Rho
+         type(auto_diff_real_2var_order1),intent(inout), dimension(:) :: rate_raw
+!         real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
          
          integer :: imax, iat0, iat, ir, i, irho
@@ -117,9 +119,12 @@
             call get_rates_from_table(1, num_reactions)
          else ! table only has a single temperature
             do i=1,num_reactions
-               rate_raw(i) = rattab(i,1)*dtab(i)
-               rate_raw_dT(i) = 0
-               rate_raw_dRho(i) = rate_raw(i)*ddtab(i)/dtab(i)
+!               rate_raw(i) = rattab(i,1)*dtab(i)
+!               rate_raw_dT(i) = 0
+!               rate_raw_dRho(i) = rate_raw(i)*ddtab(i)/dtab(i)
+               rate_raw(i)%val = rattab(i,1)*dtab(i)
+               rate_raw(i)%d1val1 = 0
+               rate_raw(i)%d1val2 = rate_raw(i)%val*ddtab(i)/dtab(i)
             end do
          end if
 
@@ -134,13 +139,15 @@
          
          do i=1,num_reactions
             fac = raw_rate_factor(i)
-            rate_raw(i) = rate_raw(i)*fac
-            rate_raw_dT(i) = rate_raw_dT(i)*fac
-            rate_raw_dRho(i) = rate_raw_dRho(i)*fac
+!            rate_raw(i) = rate_raw(i)*fac
+!            rate_raw_dT(i) = rate_raw_dT(i)*fac
+!            rate_raw_dRho(i) = rate_raw_dRho(i)*fac
+             rate_raw(i) = rate_raw(i)*fac ! this should apply to derivatives too
          end do
          
          if(logtemp .ge. max_safe_logT_for_rates) then
-            rate_raw_dT(1:num_reactions) = 0d0
+!            rate_raw_dT(1:num_reactions) = 0d0
+            rate_raw(1:num_reactions)%d1val1 = 0d0
          end if
 
          nullify(rattab_f)
@@ -167,17 +174,31 @@
             
             do i = r1,r2
             
-               rate_raw(i) =  &
+!               rate_raw(i) =  &
+!                     (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
+!                           dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
+!                              ) * dtab(i)
+!
+!               rate_raw_dRho(i) = rate_raw(i) * ddtab(i) / dtab(i)
+!
+!               rate_raw_dT(i) =  &
+!                     (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) +   &
+!                           1.5d0*dt*rattab_f(4,k,i)) &
+!                              ) * dtab(i) / (btemp * ln10)
+
+               rate_raw(i)%val =  &
                      (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
                            dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
                               ) * dtab(i)
 
-               rate_raw_dRho(i) = rate_raw(i) * ddtab(i) / dtab(i)
+               rate_raw(i)%d1val2 = rate_raw(i)%val * ddtab(i) / dtab(i)
 
-               rate_raw_dT(i) =  &
+               rate_raw(i)%d1val1 =  &
                      (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) +   &
                            1.5d0*dt*rattab_f(4,k,i)) &
                               ) * dtab(i) / (btemp * ln10)
+
+
 
             end do
             
@@ -297,7 +318,7 @@
 
          if (nrattab > 1) then ! create interpolants
             allocate(work(nrattab*mp_work_size,utils_OMP_GET_MAX_THREADS()), stat=ierr)
-            call fill_with_NaNs(work)
+            call fill_with_NaNs_2D(work)
             if (ierr /= 0) return
 !$OMP PARALLEL DO PRIVATE(i,operr,work1,f1,thread_num)
             do i=1,num_reactions

@@ -209,6 +209,9 @@
             rate_raw, rate_raw_dT, rate_raw_dRho ! (num_rates)
          ! raw rates are unscreened (but include density factors)
 
+         ! new auto_diff rate_raw for auto_diff T,rho
+         type(auto_diff_real_2var_order1), allocatable, dimension(:) :: &
+                rate_raw_ad
          real(dp), allocatable,dimension(:) :: rate_factors ! (num_rates)
                   
          ! pointers into work array ----------------------------------
