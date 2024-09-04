@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["21.4.1", "22.6.1", "23.7.3"]
+        sdk: ["22.6.1", "23.7.3", "24.7.1"]
 
     runs-on: ubuntu-latest
 

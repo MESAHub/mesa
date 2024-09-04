@@ -1,6 +1,6 @@
 name: Test Mesa
 
-on: [pull_request, release]
+on: [workflow_dispatch, release]
 
 jobs:
   test_mesa:
@@ -24,10 +24,10 @@ jobs:
           git log --pretty=format:'%h' -n 1
         shell: bash
 
-      - name: Install MESA on ${{ runner.os }} with SDK 23.7.3
+      - name: Install MESA on ${{ runner.os }} with SDK 24.7.1
         uses: ./.github/actions/install-mesa
         with:
-          sdk: "23.7.3"
+          sdk: "24.7.1"
 
       - name: Checkout mesa_test
         uses: actions/checkout@v4
