@@ -84,7 +84,7 @@
 &pgstar
 
 !pause = .true.
-Profile_Panels3_xmin = 0 ! -101d0
-Profile_Panels3_xmax = 2.6 ! -101d0
+Profile_Panels_xmin(3) = 0 ! -101d0
+Profile_Panels_xmax(3) = 2.6 ! -101d0
 
 / ! end of pgstar namelist

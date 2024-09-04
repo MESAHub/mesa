@@ -70,22 +70,22 @@ pgstar commands used for the plots above:
     pgstar_interval = 10
     file_digits = 8
 
-      Grid3_win_flag = .true.
+      Grid_win_flag(3) = .true.
          
-         Grid3_win_width = 12
-         Grid3_win_aspect_ratio = 0.7 ! aspect_ratio = height/width
+         Grid_win_width(3) = 12
+         Grid_win_aspect_ratio(3) = 0.7 ! aspect_ratio = height/width
          
-         Grid3_xleft = 0.10 ! fraction of full window width for margin on left
-         Grid3_xright = 0.89 ! fraction of full window width for margin on right
-         Grid3_ybot = 0.08 ! fraction of full window width for margin on bottom
-         Grid3_ytop = 0.92 ! fraction of full window width for margin on top
-         Grid3_title = 'Mixing'
+         Grid_xleft(3) = 0.10 ! fraction of full window width for margin on left
+         Grid_xright(3) = 0.89 ! fraction of full window width for margin on right
+         Grid_ybot(3) = 0.08 ! fraction of full window width for margin on bottom
+         Grid_ytop(3) = 0.92 ! fraction of full window width for margin on top
+         Grid_title(3) = 'Mixing'
 
-         Grid3_num_cols = 2 ! divide plotting region into this many equal width cols
-         Grid3_num_rows = 4 ! divide plotting region into this many equal height rows
-         Grid3_num_plots = 4 ! <= 10
+         Grid_num_cols(3) = 2 ! divide plotting region into this many equal width cols
+         Grid_num_rows(3) = 4 ! divide plotting region into this many equal height rows
+         Grid_num_plots(3) = 4 ! <= 10
          
-         Grid3_plot_name(1) = 'Mixing'
+         Grid_plot_name(3, 1) = 'Mixing'
 
          Mixing_xmin = 0.22 ! only used if /= -101d0
          Mixing_xmax = 0.28 ! only used if /= -101d0
@@ -95,51 +95,51 @@ pgstar commands used for the plots above:
          Mixing_dymin = -101d0 ! only used if /= -101d0
          
          
-         Grid3_plot_row(1) = 3 ! number from 1 at top
-         Grid3_plot_rowspan(1) = 2 ! plot spans this number of rows
-         Grid3_plot_col(1) =  2 ! number from 1 at left
-         Grid3_plot_colspan(1) = 1 ! plot spans this number of columns 
-         Grid3_plot_pad_left(1) = 0.08 ! fraction of full window width for padding on left
-         Grid3_plot_pad_right(1) = 0.00 ! fraction of full window width for padding on right
-         Grid3_plot_pad_top(1) = 0.08 ! fraction of full window height for padding at top
-         Grid3_plot_pad_bot(1) = 0.00 ! fraction of full window height for padding at bottom
-         Grid3_txt_scale_factor(1) = 0.7 ! multiply txt_scale for subplot by this
+         Grid_plot_row(3, 1) = 3 ! number from 1 at top
+         Grid_plot_rowspan(3, 1) = 2 ! plot spans this number of rows
+         Grid_plot_col(3, 1) =  2 ! number from 1 at left
+         Grid_plot_colspan(3, 1) = 1 ! plot spans this number of columns
+         Grid_plot_pad_left(3, 1) = 0.08 ! fraction of full window width for padding on left
+         Grid_plot_pad_right(3, 1) = 0.00 ! fraction of full window width for padding on right
+         Grid_plot_pad_top(3, 1) = 0.08 ! fraction of full window height for padding at top
+         Grid_plot_pad_bot(3, 1) = 0.00 ! fraction of full window height for padding at bottom
+         Grid_txt_scale_factor(3, 1) = 0.7 ! multiply txt_scale for subplot by this
          
-         Grid3_plot_name(2) = 'History_Panels1'
+         Grid_plot_name(3, 2) = 'History_Panels1'
          
-         History_Panels1_title = 'History'      
+         History_Panels_title(1) = 'History'
 
-         History_Panels1_num_panels = 2
-         History_Panels1_yaxis_name(1) = 'log_center_T' 
-         History_Panels1_other_yaxis_name(1) = 'log_L' 
-         History_Panels1_yaxis_name(2) = 'log_center_Rho' 
-         History_Panels1_other_yaxis_name(2) = 'log_Teff' 
+         History_Panels_num_panels(1) = 2
+         History_Panels_yaxis_name(1, 1) = 'log_center_T'
+         History_Panels_other_yaxis_name(1, 1) = 'log_L'
+         History_Panels_yaxis_name(1, 2) = 'log_center_Rho'
+         History_Panels_other_yaxis_name(1, 2) = 'log_Teff'
          
-         Grid3_plot_row(2) = 3 ! number from 1 at top
-         Grid3_plot_rowspan(2) = 2 ! plot spans this number of rows
-         Grid3_plot_col(2) =  1 ! number from 1 at left
-         Grid3_plot_colspan(2) = 1 ! plot spans this number of columns 
-         Grid3_plot_pad_left(2) = 0.00 ! fraction of full window width for padding on left
-         Grid3_plot_pad_right(2) = 0.08 ! fraction of full window width for padding on right
-         Grid3_plot_pad_top(2) = 0.08 ! fraction of full window height for padding at top
-         Grid3_plot_pad_bot(2) = 0.00 ! fraction of full window height for padding at bottom
-         Grid3_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
-
-         
-         Grid3_plot_name(3) = 'TRho_Profile'
-         Grid3_plot_row(3) = 1 ! number from 1 at top
-         Grid3_plot_rowspan(3) = 2 ! plot spans this number of rows
-         Grid3_plot_col(3) =  2 ! number from 1 at left
-         Grid3_plot_colspan(3) = 1 ! plot spans this number of columns 
-         Grid3_plot_pad_left(3) = 0.08 ! fraction of full window width for padding on left
-         Grid3_plot_pad_right(3) = 0.00 ! fraction of full window width for padding on right
-         Grid3_plot_pad_top(3) = 0.00 ! fraction of full window height for padding at top
-         Grid3_plot_pad_bot(3) = 0.08 ! fraction of full window height for padding at bottom
-         Grid3_txt_scale_factor(3) = 0.7 ! multiply txt_scale for subplot by this
+         Grid_plot_row(3, 2) = 3 ! number from 1 at top
+         Grid_plot_rowspan(3, 2) = 2 ! plot spans this number of rows
+         Grid_plot_col(3, 2) =  1 ! number from 1 at left
+         Grid_plot_colspan(3, 2) = 1 ! plot spans this number of columns
+         Grid_plot_pad_left(3, 2) = 0.00 ! fraction of full window width for padding on left
+         Grid_plot_pad_right(3, 2) = 0.08 ! fraction of full window width for padding on right
+         Grid_plot_pad_top(3, 2) = 0.08 ! fraction of full window height for padding at top
+         Grid_plot_pad_bot(3, 2) = 0.00 ! fraction of full window height for padding at bottom
+         Grid_txt_scale_factor(3, 2) = 0.7 ! multiply txt_scale for subplot by this
 
          
+         Grid_plot_name(3, 3) = 'TRho_Profile'
+         Grid_plot_row(3, 3) = 1 ! number from 1 at top
+         Grid_plot_rowspan(3, 3) = 2 ! plot spans this number of rows
+         Grid_plot_col(3, 3) =  2 ! number from 1 at left
+         Grid_plot_colspan(3, 3) = 1 ! plot spans this number of columns
+         Grid_plot_pad_left(3, 3) = 0.08 ! fraction of full window width for padding on left
+         Grid_plot_pad_right(3, 3) = 0.00 ! fraction of full window width for padding on right
+         Grid_plot_pad_top(3, 3) = 0.00 ! fraction of full window height for padding at top
+         Grid_plot_pad_bot(3, 3) = 0.08 ! fraction of full window height for padding at bottom
+         Grid_txt_scale_factor(3, 3) = 0.7 ! multiply txt_scale for subplot by this
+
          
-         Grid3_plot_name(4) = 'Kipp'
+         
+         Grid_plot_name(3, 4) = 'Kipp'
          
          Kipp_show_mass_boundaries = .false.
          Kipp_mass_max = 0.28 ! (Msun units) negative means use default
@@ -150,47 +150,47 @@ pgstar commands used for the plots above:
          Kipp_lgL_min = 1d0 ! only used if /= -101d0; (L in Lsun units)
          
          
-         Grid3_plot_row(4) = 1 ! number from 1 at top
-         Grid3_plot_rowspan(4) = 2 ! plot spans this number of rows
-         Grid3_plot_col(4) =  1 ! number from 1 at left
-         Grid3_plot_colspan(4) = 1 ! plot spans this number of columns 
-         Grid3_plot_pad_left(4) = 0.00 ! fraction of full window width for padding on left
-         Grid3_plot_pad_right(4) = 0.08 ! fraction of full window width for padding on right
-         Grid3_plot_pad_top(4) = 0.00 ! fraction of full window height for padding at top
-         Grid3_plot_pad_bot(4) = 0.08 ! fraction of full window height for padding at bottom
-         Grid3_txt_scale_factor(4) = 0.7 ! multiply txt_scale for subplot by this
+         Grid_plot_row(3, 4) = 1 ! number from 1 at top
+         Grid_plot_rowspan(3, 4) = 2 ! plot spans this number of rows
+         Grid_plot_col(3, 4) =  1 ! number from 1 at left
+         Grid_plot_colspan(3, 4) = 1 ! plot spans this number of columns
+         Grid_plot_pad_left(3, 4) = 0.00 ! fraction of full window width for padding on left
+         Grid_plot_pad_right(3, 4) = 0.08 ! fraction of full window width for padding on right
+         Grid_plot_pad_top(3, 4) = 0.00 ! fraction of full window height for padding at top
+         Grid_plot_pad_bot(3, 4) = 0.08 ! fraction of full window height for padding at bottom
+         Grid_txt_scale_factor(3, 4) = 0.7 ! multiply txt_scale for subplot by this
 
 
          ! file output
-         Grid3_file_flag = .true.
-         Grid3_file_dir = 'grid3_png'
-         Grid3_file_prefix = 'Mixing_'
-         Grid3_file_interval = 100 ! output when mod(model_number,Grid3_file_interval)==0
-         Grid3_file_width = 14        ! (inches) negative means use same value as for window
+         Grid_file_flag(3) = .true.
+         Grid_file_dir(3) = 'grid3_png'
+         Grid_file_prefix(3) = 'Mixing_'
+         Grid_file_interval(3) = 100 ! output when mod(model_number,Grid_file_interval(3))==0
+         Grid_file_width(3) = 14        ! (inches) negative means use same value as for window
 
 
   ! Brunt B profile
-     Profile_Panels1_win_flag = .true.
-     Profile_Panels1_win_width = 14
-     Profile_Panels1_title = '' 
-     Profile_Panels1_show_grid = .true.
+     Profile_Panels_win_flag(1) = .true.
+     Profile_Panels_win_width(1) = 14
+     Profile_Panels_title(1) = ''
+     Profile_Panels_show_grid(1) = .true.
 
-     Profile_Panels1_xaxis_name = 'mass'
-     Profile_Panels1_xmin = 0.235
-     Profile_Panels1_xmax = 0.26
-     Profile_Panels1_show_mix_regions_on_xaxis = .true.
+     Profile_Panels_xaxis_name(1) = 'mass'
+     Profile_Panels_xmin(1) = 0.235
+     Profile_Panels_xmax(1) = 0.26
+     Profile_Panels_show_mix_regions_on_xaxis(1) = .true.
 
-     Profile_Panels1_num_panels = 1
-     Profile_Panels1_yaxis_name(1) = 'brunt_B'
-     Profile_Panels1_ymin(:) = -0.00006 ! 0.633
-     Profile_Panels1_ymax(:) = 0.000001 ! 0.634
-     Profile_Panels1_other_yaxis_name(1) = ''
+     Profile_Panels_num_panels(1) = 1
+     Profile_Panels_yaxis_name(1, 1) = 'brunt_B'
+     Profile_Panels_ymin(1, :) = -0.00006 ! 0.633
+     Profile_Panels_ymax(1, :) = 0.000001 ! 0.634
+     Profile_Panels_other_yaxis_name(1, 1) = ''
 
-     Profile_Panels1_file_flag = .true.
-     Profile_Panels1_file_dir = 'profile_png'
-     Profile_Panels1_file_prefix = 'profile_panels1_'
-     Profile_Panels1_file_interval = 100
-     Profile_Panels1_file_width = 14
+     Profile_Panels_file_flag(1) = .true.
+     Profile_Panels_file_dir(1) = 'profile_png'
+     Profile_Panels_file_prefix(1) = 'profile_panels1_'
+     Profile_Panels_file_interval(1) = 100
+     Profile_Panels_file_width(1) = 14
 
 
   ! Abundance profile plot

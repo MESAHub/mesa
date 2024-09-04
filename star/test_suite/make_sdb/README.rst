@@ -29,14 +29,14 @@ pgstar commands used for the plot above:
 
   pgstar_interval = 10
 
-  Grid8_win_flag = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
-  Grid8_win_width = 12
-  Grid8_title = 'make_sdb'
+  Grid_win_flag(8) = .true. ! Summary_Burn, Abundance, HR, TRho, TRho_Profile, Text_Summary1
+  Grid_win_width(8) = 12
+  Grid_title(8) = 'make_sdb'
 
-  Grid8_file_flag = .true.
-  Grid8_file_dir = 'pgstar_out'
-  Grid8_file_prefix = 'grid_'
-  Grid8_file_interval = 10000
+  Grid_file_flag(8) = .true.
+  Grid_file_dir(8) = 'pgstar_out'
+  Grid_file_prefix(8) = 'grid_'
+  Grid_file_interval(8) = 10000
 
  / ! end of pgstar namelist
 

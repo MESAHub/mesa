@@ -98,9 +98,9 @@
 &pgstar
 
         ! override the pgstar x-axis settings for this phase of evolution
-        Profile_Panels3_xaxis_name = 'logxm'
-        Profile_Panels3_xmin = -8d0
-        Profile_Panels3_xmax = 0d0 ! 2.2
-        Profile_Panels3_xaxis_reversed = .true.
+        Profile_Panels_xaxis_name(3) = 'logxm'
+        Profile_Panels_xmin(3) = -8d0
+        Profile_Panels_xmax(3) = 0d0 ! 2.2
+        Profile_Panels_xaxis_reversed(3) = .true.
 
 / ! end of pgstar namelist

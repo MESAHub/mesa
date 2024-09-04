@@ -12,6 +12,32 @@ Changelog
 Changes in main
 ===============
 
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+``pgstar`` / ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Introduced ``pgstar_array_length``, to simplify a lot of internal coding abouted *listed* plot windows:
+
+   - Grid
+   - History_Panels
+   - History_Track
+   - Profile_Panels
+   - Text_Summary
+   - Color_Magnitude
+
+These plots are now addressed with (the first index of) an array, so that, for example:
+
+   - ``Grid2_num_cols`` => ``Grid_num_cols(2)``
+   - ``Text_Summary3_name(1,4)`` => ``Text_Summary_name(3, 1, 4)``
+   - ``History_Panels1_yaxis_name(1)`` => ``History_Panels_yaxis_name(1, 1)``
+
+You can adapt your existing ``pgstar``/``pgbinary`` inlists by running appropriate ``sed`` commands.
+You can also start from the inlists in the ``test_suite/``.
+
 .. _New Features main:
 
 New Features

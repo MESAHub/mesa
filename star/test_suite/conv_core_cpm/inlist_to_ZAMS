@@ -66,10 +66,11 @@
 / ! end of controls namelist
 
 &pgstar
-   Grid2_win_flag = .true.
+      
+   Grid_win_flag(2) = .true.
    file_digits = 7
-   Grid2_file_dir = 'png'
-   Grid2_file_prefix = 'grid'
+   Grid_file_dir(2) = 'png'
+   Grid_file_prefix(2) = 'grid'
 
    Abundance_xmax = 0.5
 

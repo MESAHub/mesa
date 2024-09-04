@@ -90,8 +90,8 @@
       end subroutine astero_pgstar_plots_info
             
 
-      subroutine echelle_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
+      subroutine echelle_plot(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -362,8 +362,8 @@
       end subroutine do_echelle_plot
       
 
-      subroutine ratios_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
+      subroutine ratios_plot(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s

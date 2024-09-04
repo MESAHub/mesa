@@ -35,9 +35,8 @@ module pgbinary_summary_history
 contains
 
 
-   subroutine summary_history_plot(id, device_id, ierr)
-      implicit none
-      integer, intent(in) :: id, device_id
+   subroutine summary_history_plot(id, device_id, array_ix, ierr)
+      integer, intent(in) :: id, device_id, array_ix
       integer, intent(out) :: ierr
 
       type (binary_info), pointer :: b

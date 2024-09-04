@@ -43,23 +43,23 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
       pgstar_model_disp = 3.9
 
-      History_Panels2_txt_scale = 0.7
-      Profile_Panels2_txt_scale = 0.6
+      History_Panels_txt_scale(2) = 0.7
+      Profile_Panels_txt_scale(2) = 0.6
       logL_R_txt_scale = 0.7
       logL_v_txt_scale = 0.7
       logL_Teff_txt_scale = 0.7
 
-       Grid2_win_flag = .true.
-       Grid2_win_width = 12
-       Grid2_title = 'rsp_RR_Lyrae'
-       Grid2_txt_scale_factor(:) = 1.0
+       Grid_win_flag(2) = .true.
+       Grid_win_width(2) = 12
+       Grid_title(2) = 'rsp_RR_Lyrae'
+       Grid_txt_scale_factor(2, :) = 1.0
 
-        Grid2_file_flag = .true.
-        Grid2_file_dir = 'pgstar_out'
-        Grid2_file_prefix = 'grid_'
-        Grid2_file_interval = 10000
-        Grid2_file_width = -1
-        Grid2_file_aspect_ratio = -1
+        Grid_file_flag(2) = .true.
+        Grid_file_dir(2) = 'pgstar_out'
+        Grid_file_prefix(2) = 'grid_'
+        Grid_file_interval(2) = 10000
+        Grid_file_width(2) = -1
+        Grid_file_aspect_ratio(2) = -1
 
  / ! end of pgstar namelist
 

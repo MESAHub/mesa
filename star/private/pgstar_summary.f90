@@ -36,310 +36,40 @@
       contains
 
 
-      subroutine Text_Summary1_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
+      subroutine Text_Summary_plot(id, device_id, array_ix, ierr)
+         integer, intent(in) :: id, device_id, array_ix
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
-         call do_Text_Summary1_plot(s, id, device_id, &
-            s% pg% Text_Summary1_xleft, s% pg% Text_Summary1_xright, &
-            s% pg% Text_Summary1_ybot, s% pg% Text_Summary1_ytop, .false., &
-            s% pg% Text_Summary1_title, s% pg% Text_Summary1_txt_scale, s% pg% Text_Summary1_dxval, ierr)
+         call do_Text_Summary_plot(s, id, device_id, array_ix, &
+            s% pg% Text_Summary_xleft(array_ix), s% pg% Text_Summary_xright(array_ix), &
+            s% pg% Text_Summary_ybot(array_ix), s% pg% Text_Summary_ytop(array_ix), .false., &
+            s% pg% Text_Summary_title(array_ix), s% pg% Text_Summary_txt_scale(array_ix), s% pg% Text_Summary_dxval(array_ix), ierr)
          if (ierr /= 0) return
          call pgebuf()
-      end subroutine Text_Summary1_plot
+      end subroutine Text_Summary_plot
 
 
-      subroutine do_Text_Summary1_plot(s, id, device_id, &
+      subroutine do_Text_Summary_plot(s, id, device_id, array_ix, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
+         integer, intent(in) :: id, device_id, array_ix
          real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
+
          call Summary_plot(s, device_id, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary1_num_rows, s% pg% Text_Summary1_num_cols, &
-            s% pg% Text_Summary1_name, ierr)
-      end subroutine do_Text_Summary1_plot
-
-
-      subroutine Text_Summary2_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary2_plot(s, id, device_id, &
-            s% pg% Text_Summary2_xleft, s% pg% Text_Summary2_xright, &
-            s% pg% Text_Summary2_ybot, s% pg% Text_Summary2_ytop, .false., &
-            s% pg% Text_Summary2_title, s% pg% Text_Summary2_txt_scale, s% pg% Text_Summary2_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary2_plot
-
-
-      subroutine do_Text_Summary2_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary2_num_rows, s% pg% Text_Summary2_num_cols, &
-            s% pg% Text_Summary2_name, ierr)
-      end subroutine do_Text_Summary2_plot
-
-
-      subroutine Text_Summary3_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary3_plot(s, id, device_id, &
-            s% pg% Text_Summary3_xleft, s% pg% Text_Summary3_xright, &
-            s% pg% Text_Summary3_ybot, s% pg% Text_Summary3_ytop, .false., &
-            s% pg% Text_Summary3_title, s% pg% Text_Summary3_txt_scale, s% pg% Text_Summary3_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary3_plot
-
-
-      subroutine do_Text_Summary3_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary3_num_rows, s% pg% Text_Summary3_num_cols, &
-            s% pg% Text_Summary3_name, ierr)
-      end subroutine do_Text_Summary3_plot
-
-
-      subroutine Text_Summary4_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary4_plot(s, id, device_id, &
-            s% pg% Text_Summary4_xleft, s% pg% Text_Summary4_xright, &
-            s% pg% Text_Summary4_ybot, s% pg% Text_Summary4_ytop, .false., &
-            s% pg% Text_Summary4_title, s% pg% Text_Summary4_txt_scale, s% pg% Text_Summary4_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary4_plot
-
-
-      subroutine do_Text_Summary4_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary4_num_rows, s% pg% Text_Summary4_num_cols, &
-            s% pg% Text_Summary4_name, ierr)
-      end subroutine do_Text_Summary4_plot
-
-
-      subroutine Text_Summary5_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary5_plot(s, id, device_id, &
-            s% pg% Text_Summary5_xleft, s% pg% Text_Summary5_xright, &
-            s% pg% Text_Summary5_ybot, s% pg% Text_Summary5_ytop, .false., &
-            s% pg% Text_Summary5_title, s% pg% Text_Summary5_txt_scale, s% pg% Text_Summary5_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary5_plot
-
-
-      subroutine do_Text_Summary5_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary5_num_rows, s% pg% Text_Summary5_num_cols, &
-            s% pg% Text_Summary5_name, ierr)
-      end subroutine do_Text_Summary5_plot
-
-
-      subroutine Text_Summary6_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary6_plot(s, id, device_id, &
-            s% pg% Text_Summary6_xleft, s% pg% Text_Summary6_xright, &
-            s% pg% Text_Summary6_ybot, s% pg% Text_Summary6_ytop, .false., &
-            s% pg% Text_Summary6_title, s% pg% Text_Summary6_txt_scale, s% pg% Text_Summary6_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary6_plot
-
-
-      subroutine do_Text_Summary6_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary6_num_rows, s% pg% Text_Summary6_num_cols, &
-            s% pg% Text_Summary6_name, ierr)
-      end subroutine do_Text_Summary6_plot
-
-
-      subroutine Text_Summary7_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary7_plot(s, id, device_id, &
-            s% pg% Text_Summary7_xleft, s% pg% Text_Summary7_xright, &
-            s% pg% Text_Summary7_ybot, s% pg% Text_Summary7_ytop, .false., &
-            s% pg% Text_Summary7_title, s% pg% Text_Summary7_txt_scale, s% pg% Text_Summary7_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary7_plot
-
-
-      subroutine do_Text_Summary7_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary7_num_rows, s% pg% Text_Summary7_num_cols, &
-            s% pg% Text_Summary7_name, ierr)
-      end subroutine do_Text_Summary7_plot
-
-
-      subroutine Text_Summary8_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary8_plot(s, id, device_id, &
-            s% pg% Text_Summary8_xleft, s% pg% Text_Summary8_xright, &
-            s% pg% Text_Summary8_ybot, s% pg% Text_Summary8_ytop, .false., &
-            s% pg% Text_Summary8_title, s% pg% Text_Summary8_txt_scale, s% pg% Text_Summary8_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary8_plot
-
-
-      subroutine do_Text_Summary8_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary8_num_rows, s% pg% Text_Summary8_num_cols, &
-            s% pg% Text_Summary8_name, ierr)
-      end subroutine do_Text_Summary8_plot
-
-
-      subroutine Text_Summary9_plot(id, device_id, ierr)
-         integer, intent(in) :: id, device_id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         ierr = 0
-         call get_star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         call pgslct(device_id)
-         call pgbbuf()
-         call pgeras()
-         call do_Text_Summary9_plot(s, id, device_id, &
-            s% pg% Text_Summary9_xleft, s% pg% Text_Summary9_xright, &
-            s% pg% Text_Summary9_ybot, s% pg% Text_Summary9_ytop, .false., &
-            s% pg% Text_Summary9_title, s% pg% Text_Summary9_txt_scale, s% pg% Text_Summary9_dxval, ierr)
-         if (ierr /= 0) return
-         call pgebuf()
-      end subroutine Text_Summary9_plot
-
-
-      subroutine do_Text_Summary9_plot(s, id, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, ierr)
-         type (star_info), pointer :: s
-         integer, intent(in) :: id, device_id
-         real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale, dxval
-         logical, intent(in) :: subplot
-         character (len=*), intent(in) :: title
-         integer, intent(out) :: ierr
-         call Summary_plot(s, device_id, &
-            winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, dxval, &
-            s% pg% Text_Summary9_num_rows, s% pg% Text_Summary9_num_cols, &
-            s% pg% Text_Summary9_name, ierr)
-      end subroutine do_Text_Summary9_plot
+            s% pg% Text_Summary_num_rows(array_ix), s% pg% Text_Summary_num_cols(array_ix), &
+            s% pg% Text_Summary_name(array_ix, :, :), ierr)
+      end subroutine do_Text_Summary_plot
 
 
       subroutine Summary_plot(s, device_id, &
@@ -357,7 +87,7 @@
          logical, intent(in) :: subplot
          character (len=*), intent(in) :: title
          integer, intent(in) :: Text_Summary_num_rows, Text_Summary_num_cols
-         character (len=*), intent(in) :: Text_Summary_name(:,:)
+         character (len=*), intent(in) :: Text_Summary_name(:, :)
          integer, intent(out) :: ierr
 
          integer :: col, num_cols, num_rows

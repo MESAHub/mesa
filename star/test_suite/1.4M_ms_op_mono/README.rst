@@ -48,37 +48,37 @@ pgstar commands used for the plots above:
    file_extension = 'ps'           
 
   ! two profile panels
-    Profile_Panels1_win_flag = .true.
+    Profile_Panels_win_flag(1) = .true.
 
-    Profile_Panels1_win_width = 15
-    Profile_Panels1_win_aspect_ratio = 0.75
+    Profile_Panels_win_width(1) = 15
+    Profile_Panels_win_aspect_ratio(1) = 0.75
 
-    Profile_Panels1_xleft = 0.15
-    Profile_Panels1_xright = 0.85
-    Profile_Panels1_ybot = 0.15
-    Profile_Panels1_ytop = 0.85
-    Profile_Panels1_txt_scale = 1.0
-    Profile_Panels1_title = '1.4_ms_op_mono'
+    Profile_Panels_xleft(1) = 0.15
+    Profile_Panels_xright(1) = 0.85
+    Profile_Panels_ybot(1) = 0.15
+    Profile_Panels_ytop(1) = 0.85
+    Profile_Panels_txt_scale(1) = 1.0
+    Profile_Panels_title(1) = '1.4_ms_op_mono'
 
-    Profile_Panels1_num_panels = 2
+    Profile_Panels_num_panels(1) = 2
 
-    Profile_Panels1_xaxis_name = 'logT'
-    Profile_Panels1_xaxis_reversed = .false.
-    Profile_Panels1_xmin = -101d0
-    Profile_Panels1_xmax = -101d0
+    Profile_Panels_xaxis_name(1) = 'logT'
+    Profile_Panels_xaxis_reversed(1) = .false.
+    Profile_Panels_xmin(1) = -101d0
+    Profile_Panels_xmax(1) = -101d0
 
-    Profile_Panels1_yaxis_name(1) = 'kap_frac_op_mono'
-    Profile_Panels1_other_yaxis_name(1) = 'log_opacity'
+    Profile_Panels_yaxis_name(1, 1) = 'kap_frac_op_mono'
+    Profile_Panels_other_yaxis_name(1, 1) = 'log_opacity'
 
-    Profile_Panels1_yaxis_name(2) = 'dlnkap_dlnd'
-    Profile_Panels1_other_yaxis_name(2) = 'dlnkap_dlnT'
+    Profile_Panels_yaxis_name(1, 2) = 'dlnkap_dlnd'
+    Profile_Panels_other_yaxis_name(1, 2) = 'dlnkap_dlnT'
 
-    Profile_Panels1_file_flag = .true.
-    Profile_Panels1_file_dir = 'pgstar_out'
-    Profile_Panels1_file_prefix = 'profile_panels1_'
-    Profile_Panels1_file_interval = 10
-    Profile_Panels1_file_width = 15
-    Profile_Panels1_file_aspect_ratio = -1
+    Profile_Panels_file_flag(1) = .true.
+    Profile_Panels_file_dir(1) = 'png'
+    Profile_Panels_file_prefix(1) = 'profile_panels1_'
+    Profile_Panels_file_interval(1) = 10
+    Profile_Panels_file_width(1) = 15
+    Profile_Panels_file_aspect_ratio(1) = -1
 
  / ! end of pgstar namelist
 

@@ -229,7 +229,7 @@ contains
          write(*, *) 'failed in open_device'
          return
       end if
-      call p% plot(s% id, p% id_file, ierr)
+      call p% plot(s% id, p% id_file, p% array_ix, ierr)
       call pgclos
       p% id_file = 0
       p% do_file = .false.
@@ -2077,13 +2077,13 @@ contains
       integer, intent(inout) :: ierr
       procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
-      if(use_flag)then
-         if(associated(pgstar_decorator))then
+      if (use_flag) then
+         if (associated(pgstar_decorator)) then
             call pgsave
             call PGQWIN(xmin, xmax, ymin, ymax)
             call pgstar_decorator(id, xmin, xmax, ymin, ymax, plot_num, ierr)
             call pgunsa
-            if(ierr/=0)then
+            if (ierr/=0) then
                write(*, *) "Error in pgstar_decorator"
             end if
          end if

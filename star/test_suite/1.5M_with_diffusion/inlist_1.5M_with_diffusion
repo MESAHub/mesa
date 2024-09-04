@@ -163,14 +163,14 @@
    Abundance_win_width = 9
    Abundance_win_aspect_ratio = 1.0d0
 
-   Grid2_win_flag = .false. ! switch to .true. to visualize in real-time
-   Grid2_file_flag = .false.
+   Grid_win_flag(2) = .false. ! switch to .true. to visualize in real-time
+   Grid_file_flag(2) = .false.
 
-   Grid2_win_width = 15
+   Grid_win_width(2) = 15
    file_digits = 7
-   Grid2_file_dir = 'pgstar_out2'
-   Grid2_file_prefix = 'grid'
-   Grid2_file_interval = 5
-   Grid2_file_width = 15
+   Grid_file_dir(2) = 'pgstar_out2'
+   Grid_file_prefix(2) = 'grid'
+   Grid_file_interval(2) = 5
+   Grid_file_width(2) = 15
 
 / ! end of pgstar namelist

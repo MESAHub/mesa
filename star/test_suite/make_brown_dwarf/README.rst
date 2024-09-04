@@ -29,22 +29,22 @@ pgstar commands used for the plots above:
 
    pgstar_interval = 10
 
-  Grid1_win_flag = .true.
-  Grid1_win_width = 14
-  Grid1_win_aspect_ratio = 0.75
-  Grid1_title = 'inlist_make_brown_dwarf' 
+  Grid_win_flag(1) = .true.
+  Grid_win_width(1) = 14
+  Grid_win_aspect_ratio(1) = 0.75
+  Grid_title(1) = 'inlist_make_brown_dwarf'
       
   TRho_Profile_xmin = -8
   TRho_Profile_xmax = 4
   TRho_Profile_ymin = 2
   TRho_Profile_ymax = 6
 
-  Grid1_file_flag = .true.
-  Grid1_file_dir = 'png'
-  Grid1_file_prefix = 'grid1_'
-  Grid1_file_interval = 10000 ! output when mod(model_number,file_interval)==0
-  Grid1_file_width = 14        ! (inches) negative means use same value as for window
-  Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+  Grid_file_flag(1) = .true.
+  Grid_file_dir(1) = 'png'
+  Grid_file_prefix(1) = 'grid1_'
+  Grid_file_interval(1) = 10000 ! output when mod(model_number,file_interval)==0
+  Grid_file_width(1) = 14        ! (inches) negative means use same value as for window
+  Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
  / ! end of pgstar namelist
 

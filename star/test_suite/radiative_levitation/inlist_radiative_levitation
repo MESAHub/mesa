@@ -206,21 +206,21 @@
 
          pgstar_interval = 1
 
-         ! Profile_Panels3_win_flag = .true. 
-         Profile_Panels3_file_flag = .true. 
-         Profile_Panels3_file_interval = 100000
-         Profile_Panels3_file_width = 7
+         ! Profile_Panels_win_flag(3) = .true.
+         Profile_Panels_file_flag(3) = .true.
+         Profile_Panels_file_interval(3) = 100000
+         Profile_Panels_file_width(3) = 7
 
-         Profile_Panels3_xaxis_name = 'logxm'
-         Profile_Panels3_xaxis_reversed = .true.
-         Profile_Panels3_xmin = -14 ! only used if /= -101d0
-         Profile_Panels3_xmax = -1 ! only used if /= -101d0
+         Profile_Panels_xaxis_name(3) = 'logxm'
+         Profile_Panels_xaxis_reversed(3) = .true.
+         Profile_Panels_xmin(3) = -14 ! only used if /= -101d0
+         Profile_Panels_xmax(3) = -1 ! only used if /= -101d0
 
-         Profile_Panels3_num_panels = 3
-         Profile_Panels3_yaxis_name(2) = 'opacity'
-         Profile_Panels3_other_yaxis_name(2) = 'gradr'
+         Profile_Panels_num_panels(3) = 3
+         Profile_Panels_yaxis_name(3, 2) = 'opacity'
+         Profile_Panels_other_yaxis_name(3, 2) = 'gradr'
 
-         Profile_Panels3_title = 'Abundance-Opacity-Mixing'
+         Profile_Panels_title(3) = 'Abundance-Opacity-Mixing'
 
 / ! end of pgstar namelist
 

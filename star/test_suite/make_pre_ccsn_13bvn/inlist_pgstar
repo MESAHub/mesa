@@ -24,74 +24,74 @@ file_extension = 'png'           ! common names are 'png' and 'ps'
 
 ! Text_Summary windows
 
-Text_Summary1_win_flag = .false.
-Text_Summary1_win_width = 10
-Text_Summary1_win_aspect_ratio = 0.15
+Text_Summary_win_flag(1) = .false.
+Text_Summary_win_width(1) = 10
+Text_Summary_win_aspect_ratio(1) = 0.15
 
-Text_Summary1_xleft = 0.01
-Text_Summary1_xright = 0.99
-Text_Summary1_ybot = 0.0
-Text_Summary1_ytop = 1.0
-Text_Summary1_txt_scale = 0.70
-Text_Summary1_title = ''
+Text_Summary_xleft(1) = 0.01
+Text_Summary_xright(1) = 0.99
+Text_Summary_ybot(1) = 0.0
+Text_Summary_ytop(1) = 1.0
+Text_Summary_txt_scale(1) = 0.70
+Text_Summary_title(1) = ''
 
-Text_Summary1_num_rows = 6 ! <= 20
-Text_Summary1_num_cols = 8 ! <= 20
-Text_Summary1_name(:,:) = ''
+Text_Summary_num_rows(1) = 6 ! <= 20
+Text_Summary_num_cols(1) = 8 ! <= 20
+Text_Summary_name(1, :, :) = ''
 
-Text_Summary1_name(1,1) = 'time_step'
-Text_Summary1_name(1,2) = 'num_zones'
-Text_Summary1_name(1,3) = 'species'
-Text_Summary1_name(1,4) = 'num_retries'
-Text_Summary1_name(1,5) = 'num_iters'
-Text_Summary1_name(1,6) = 'elapsed_time'
-Text_Summary1_name(1,7) = ''!
-Text_Summary1_name(1,8) = ''!
+Text_Summary_name(1, 1, 1) = 'time_step'
+Text_Summary_name(1, 1, 2) = 'num_zones'
+Text_Summary_name(1, 1, 3) = 'species'
+Text_Summary_name(1, 1, 4) = 'num_retries'
+Text_Summary_name(1, 1, 5) = 'num_iters'
+Text_Summary_name(1, 1, 6) = 'elapsed_time'
+Text_Summary_name(1, 1, 7) = ''!
+Text_Summary_name(1, 1, 8) = ''!
 
-Text_Summary1_name(2,1) = 'star_mass'
-Text_Summary1_name(2,2) = 'star_mdot'
-Text_Summary1_name(2,3) = 'center_T'
-Text_Summary1_name(2,4) = 'center_Rho'
-Text_Summary1_name(2,5) = 'center_P'
-Text_Summary1_name(2,6) = 'center_entropy'
-Text_Summary1_name(2,7) = 'lg_Lneu'
-Text_Summary1_name(2,8) = 'log_cntr_T'
+Text_Summary_name(1, 2, 1) = 'star_mass'
+Text_Summary_name(1, 2, 2) = 'star_mdot'
+Text_Summary_name(1, 2, 3) = 'center_T'
+Text_Summary_name(1, 2, 4) = 'center_Rho'
+Text_Summary_name(1, 2, 5) = 'center_P'
+Text_Summary_name(1, 2, 6) = 'center_entropy'
+Text_Summary_name(1, 2, 7) = 'lg_Lneu'
+Text_Summary_name(1, 2, 8) = 'log_cntr_T'
 
-Text_Summary1_name(3,1) = 'total_angular_momentum'
-Text_Summary1_name(3,2) = 'effective_T'
-Text_Summary1_name(3,3) = 'photosphere_L'
-Text_Summary1_name(3,4) = 'photosphere_r'
-Text_Summary1_name(3,5) = 'log_g'
-Text_Summary1_name(3,6) = 'lum_div_Ledd'
-Text_Summary1_name(3,7) = 'lg_Lnuc'
-Text_Summary1_name(3,8) = 'log_max_T'
+Text_Summary_name(1, 3, 1) = 'total_angular_momentum'
+Text_Summary_name(1, 3, 2) = 'effective_T'
+Text_Summary_name(1, 3, 3) = 'photosphere_L'
+Text_Summary_name(1, 3, 4) = 'photosphere_r'
+Text_Summary_name(1, 3, 5) = 'log_g'
+Text_Summary_name(1, 3, 6) = 'lum_div_Ledd'
+Text_Summary_name(1, 3, 7) = 'lg_Lnuc'
+Text_Summary_name(1, 3, 8) = 'log_max_T'
 
-Text_Summary1_name(4,1) = 'surf_avg_v_rot'   
-Text_Summary1_name(4,2) = 'surface h1'
-Text_Summary1_name(4,3) = 'surface he4'
-Text_Summary1_name(4,4) = 'surface c12'
-Text_Summary1_name(4,5) = 'surface n14' 
-Text_Summary1_name(4,6) = 'surface o16' 
-Text_Summary1_name(4,7) = 'surface fe56'
-Text_Summary1_name(4,8) = 'v_div_csound_surf'  ! 'v_surf_km_s'
+Text_Summary_name(1, 4, 1) = 'surf_avg_v_rot'
+Text_Summary_name(1, 4, 2) = 'surface h1'
+Text_Summary_name(1, 4, 3) = 'surface he4'
+Text_Summary_name(1, 4, 4) = 'surface c12'
+Text_Summary_name(1, 4, 5) = 'surface n14'
+Text_Summary_name(1, 4, 6) = 'surface o16'
+Text_Summary_name(1, 4, 7) = 'surface fe56'
+Text_Summary_name(1, 4, 8) = 'v_div_csound_surf'  ! 'v_surf_km_s'
 
-Text_Summary1_name(5,1) = 'center_h1'
-Text_Summary1_name(5,2) = 'center_he4'
-Text_Summary1_name(5,3) = 'center_c12'
-Text_Summary1_name(5,4) = 'center_o16' 
-Text_Summary1_name(5,5) = 'center_si28'
-Text_Summary1_name(5,6) = 'center_fe52' 
-Text_Summary1_name(5,7) = 'center_fe56' 
-Text_Summary1_name(5,8) = 'center_neut' 
+Text_Summary_name(1, 5, 1) = 'center_h1'
+Text_Summary_name(1, 5, 2) = 'center_he4'
+Text_Summary_name(1, 5, 3) = 'center_c12'
+Text_Summary_name(1, 5, 4) = 'center_o16'
+Text_Summary_name(1, 5, 5) = 'center_si28'
+Text_Summary_name(1, 5, 6) = 'center_fe52'
+Text_Summary_name(1, 5, 7) = 'center_fe56'
+Text_Summary_name(1, 5, 8) = 'center_neut'
 
-Text_Summary1_name(6,1) = 'neutron_rich_core_mass'
-Text_Summary1_name(6,2) = 'he_core_mass'
-Text_Summary1_name(6,3) = 'co_core_mass'
-Text_Summary1_name(6,4) = 'log_Teff'
-Text_Summary1_name(6,5) = 'log_dt' 
-Text_Summary1_name(6,6) = 'fe_core_mass'
-Text_Summary1_name(6,7) = 'center_ye'
-Text_Summary1_name(6,8) = 'center_eps_nuc'   
+Text_Summary_name(1, 6, 1) = 'neutron_rich_core_mass'
+Text_Summary_name(1, 6, 2) = 'he_core_mass'
+Text_Summary_name(1, 6, 3) = 'co_core_mass'
+Text_Summary_name(1, 6, 4) = 'log_Teff'
+Text_Summary_name(1, 6, 5) = 'log_dt'
+Text_Summary_name(1, 6, 6) = 'fe_core_mass'
+Text_Summary_name(1, 6, 7) = 'center_ye'
+Text_Summary_name(1, 6, 8) = 'center_eps_nuc'
 
 
 !------------------------------------------------------------------------------------
@@ -390,75 +390,75 @@ HR_file_aspect_ratio = -1 ! negative means use same value as for window
 
 ! Profile Panel - surface properties
 
-Profile_Panels1_win_flag = .false.
+Profile_Panels_win_flag(1) = .false.
 
-Profile_Panels1_num_panels = 3
+Profile_Panels_num_panels(1) = 3
 
-Profile_Panels1_show_grid = .true.
-Profile_Panels1_show_mix_regions_on_xaxis = .true.
+Profile_Panels_show_grid(1) = .true.
+Profile_Panels_show_mix_regions_on_xaxis(1) = .true.
 
 ! window properties
-Profile_Panels1_win_width = 10
-Profile_Panels1_win_aspect_ratio = 1.0
-Profile_Panels1_txt_scale = 0.6
-Profile_Panels1_title = '' 
+Profile_Panels_win_width(1) = 10
+Profile_Panels_win_aspect_ratio(1) = 1.0
+Profile_Panels_txt_scale(1) = 0.6
+Profile_Panels_title(1) = ''
 
 ! x-axis limits and properties
-!Profile_Panels1_xaxis_name = 'mass'
-!Profile_Panels1_xmin = 0.6
-!Profile_Panels1_xmax = 1.8
-!Profile_Panels1_xaxis_reversed = .false.
+!Profile_Panels_xaxis_name(1) = 'mass'
+!Profile_Panels_xmin(1) = 0.6
+!Profile_Panels_xmax(1) = 1.8
+!Profile_Panels_xaxis_reversed(1) = .false.
 
-!Profile_Panels1_xaxis_name = 'logP'
-!Profile_Panels1_xmin = 5.0
-!Profile_Panels1_xmax = 16.0 
-!Profile_Panels1_xaxis_reversed = .true.
+!Profile_Panels_xaxis_name(1) = 'logP'
+!Profile_Panels_xmin(1) = 5.0
+!Profile_Panels_xmax(1) = 16.0
+!Profile_Panels_xaxis_reversed(1) = .true.
 
-Profile_Panels1_xaxis_name = 'logtau'
-Profile_Panels1_xmin = 0.0
-Profile_Panels1_xmax = -101d0!10!8.0 
-Profile_Panels1_xaxis_reversed = .true.
+Profile_Panels_xaxis_name(1) = 'logtau'
+Profile_Panels_xmin(1) = 0.0
+Profile_Panels_xmax(1) = -101d0!10!8.0
+Profile_Panels_xaxis_reversed(1) = .true.
 
 ! contents of panel 1
-Profile_Panels1_yaxis_name(1) = 'radius'   
-Profile_Panels1_ymin(1) = 0 ! only used if /= -101d0
-Profile_Panels1_ymax(1) = -101d0 ! only used if /= -101d0
+Profile_Panels_yaxis_name(1, 1) = 'radius'
+Profile_Panels_ymin(1, 1) = 0 ! only used if /= -101d0
+Profile_Panels_ymax(1, 1) = -101d0 ! only used if /= -101d0
 
-Profile_Panels1_other_yaxis_name(1) = 'dvdt_drag'     
-Profile_Panels1_other_yaxis_log(1) = .true.             
-Profile_Panels1_other_ymin(1) = -10d0 ! only used if /= -101d0
-Profile_Panels1_other_ymax(1) = -101d0 ! only used if /= -101d0
+Profile_Panels_other_yaxis_name(1, 1) = 'dvdt_drag'
+Profile_Panels_other_yaxis_log(1, 1) = .true.
+Profile_Panels_other_ymin(1, 1) = -10d0 ! only used if /= -101d0
+Profile_Panels_other_ymax(1, 1) = -101d0 ! only used if /= -101d0
 
 
 ! contents of panel 2
-Profile_Panels1_yaxis_name(2) = 'FdotV_drag_energy'     
-Profile_Panels1_yaxis_log(2) = .true.                
-Profile_Panels1_ymin(2) = -10 ! only used if /= -101d0
-Profile_Panels1_ymax(2) = 10d0 ! only used if /= -101d0
+Profile_Panels_yaxis_name(1, 2) = 'FdotV_drag_energy'
+Profile_Panels_yaxis_log(1, 2) = .true.
+Profile_Panels_ymin(1, 2) = -10 ! only used if /= -101d0
+Profile_Panels_ymax(1, 2) = 10d0 ! only used if /= -101d0
 
-Profile_Panels1_other_yaxis_name(2) = 'log_rel_E_err' 
-Profile_Panels1_other_ymin(2) = -20d0 ! 1.0 ! only used if /= -101d0
-Profile_Panels1_other_ymax(2) = -7d0 ! only used if /= -101d0
+Profile_Panels_other_yaxis_name(1, 2) = 'log_rel_E_err'
+Profile_Panels_other_ymin(1, 2) = -20d0 ! 1.0 ! only used if /= -101d0
+Profile_Panels_other_ymax(1, 2) = -7d0 ! only used if /= -101d0
 
 
 ! contents of panel 3
-Profile_Panels1_yaxis_name(3) = 'vel_km_per_s'             
-Profile_Panels1_ymin(3) = -101d0!0.0 ! only used if /= -101d0
-Profile_Panels1_ymax(3) = -101d0!100.0 ! only used if /= -101d0
+Profile_Panels_yaxis_name(1, 3) = 'vel_km_per_s'
+Profile_Panels_ymin(1, 3) = -101d0!0.0 ! only used if /= -101d0
+Profile_Panels_ymax(1, 3) = -101d0!100.0 ! only used if /= -101d0
 
-Profile_Panels1_other_yaxis_name(3) = 'logL' 
-Profile_Panels1_other_ymin(3) = -2d0    ! only used if /= -101d0
-Profile_Panels1_other_ymax(3) = -101d0 ! only used if /= -101d0
+Profile_Panels_other_yaxis_name(1, 3) = 'logL'
+Profile_Panels_other_ymin(1, 3) = -2d0    ! only used if /= -101d0
+Profile_Panels_other_ymax(1, 3) = -101d0 ! only used if /= -101d0
 
 
 ! file output
-Profile_Panels1_file_flag = .false.
-Profile_Panels1_file_dir = 'surface_png'
-Profile_Panels1_file_prefix = 'surface_'
-Profile_Panels1_file_interval = 10     ! output when mod(model_number,file_interval)==0
-!Profile_Panels1_file_width = -1        ! (inches) negative means use same value as for window
-Profile_Panels1_file_width = 16        ! (inches) negative means use same value as for window
-Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for window
+Profile_Panels_file_flag(1) = .false.
+Profile_Panels_file_dir(1) = 'surface_png'
+Profile_Panels_file_prefix(1) = 'surface_'
+Profile_Panels_file_interval(1) = 10     ! output when mod(model_number,file_interval)==0
+!Profile_Panels_file_width(1) = -1        ! (inches) negative means use same value as for window
+Profile_Panels_file_width(1) = 16        ! (inches) negative means use same value as for window
+Profile_Panels_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 
 !------------------------------------------------------------------------------------
@@ -467,45 +467,45 @@ Profile_Panels1_file_aspect_ratio = -1 ! negative means use same value as for wi
 
 ! Profile Panel - core infall and ye
 
-Profile_Panels3_win_flag = .false.
+Profile_Panels_win_flag(3) = .false.
 
-Profile_Panels3_num_panels = 1
+Profile_Panels_num_panels(3) = 1
 
-Profile_Panels3_show_grid = .true.
-Profile_Panels3_show_mix_regions_on_xaxis = .true.
+Profile_Panels_show_grid(3) = .true.
+Profile_Panels_show_mix_regions_on_xaxis(3) = .true.
 
 ! window properties
-Profile_Panels3_win_width = 12
-Profile_Panels3_win_aspect_ratio = 1.0
-Profile_Panels3_txt_scale = 0.6
-Profile_Panels3_title = ''      
+Profile_Panels_win_width(3) = 12
+Profile_Panels_win_aspect_ratio(3) = 1.0
+Profile_Panels_txt_scale(3) = 0.6
+Profile_Panels_title(3) = ''
 
 ! x-axis limits and properties
-Profile_Panels3_xaxis_name = 'mass'
-Profile_Panels3_xmin = 0.0
-Profile_Panels3_xmax = 2.5
-Profile_Panels3_xaxis_reversed = .false.
+Profile_Panels_xaxis_name(3) = 'mass'
+Profile_Panels_xmin(3) = 0.0
+Profile_Panels_xmax(3) = 2.5
+Profile_Panels_xaxis_reversed(3) = .false.
 
 ! contents of panel 1
 
-Profile_Panels3_yaxis_name(1) = 'ye'
-Profile_Panels3_ymin(1) = 0.420 
-Profile_Panels3_ymax(1) = 0.502
+Profile_Panels_yaxis_name(3, 1) = 'ye'
+Profile_Panels_ymin(3, 1) = 0.420
+Profile_Panels_ymax(3, 1) = 0.502
 
-Profile_Panels3_other_yaxis_name(1) = 'vel_km_per_s'
-Profile_Panels3_other_ymin(1) = -101d0
-Profile_Panels3_other_ymax(1) = -101d0
+Profile_Panels_other_yaxis_name(3, 1) = 'vel_km_per_s'
+Profile_Panels_other_ymin(3, 1) = -101d0
+Profile_Panels_other_ymax(3, 1) = -101d0
 
 
 ! file output
-Profile_Panels3_file_flag = .false.
-Profile_Panels3_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
-Profile_Panels3_file_dir = 'infall_png'
-Profile_Panels3_file_prefix = 'infall_'
-Profile_Panels3_file_interval = 10     ! output when mod(model_number,file_interval)==0
-!Profile_Panels3_file_width = -1        ! (inches) negative means use same value as for window
-Profile_Panels3_file_width = 16        ! (inches) negative means use same value as for window
-Profile_Panels3_file_aspect_ratio = -1 ! negative means use same value as for window
+Profile_Panels_file_flag(3) = .false.
+Profile_Panels_file_interval(3) = 10     ! output when mod(model_number,Grid_file_interval(1))==0
+Profile_Panels_file_dir(3) = 'infall_png'
+Profile_Panels_file_prefix(3) = 'infall_'
+Profile_Panels_file_interval(3) = 10     ! output when mod(model_number,file_interval)==0
+!Profile_Panels_file_width(3) = -1        ! (inches) negative means use same value as for window
+Profile_Panels_file_width(3) = 16        ! (inches) negative means use same value as for window
+Profile_Panels_file_aspect_ratio(3) = -1 ! negative means use same value as for window
 
 
 
@@ -663,142 +663,142 @@ pgstar_right_yaxis_label_disp = 2.5
 
 ! non-rotational quantities, generally
 
-Grid1_win_flag = .true.
-Grid1_win_width = 13!21
-Grid1_win_aspect_ratio = 0.6
+Grid_win_flag(1) = .true.
+Grid_win_width(1) = 13!21
+Grid_win_aspect_ratio(1) = 0.6
 
 ! reset the defaults
 
-Grid1_plot_name(:) = ''
-Grid1_plot_row(:) = 1           ! number from 1 at top
-Grid1_plot_rowspan(:) = 1       ! plot spans this number of rows
-Grid1_plot_col(:) =  1          ! number from 1 at left
-Grid1_plot_colspan(:) = 1       ! plot spans this number of columns
-Grid1_plot_pad_left(:) = 0.0    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(:) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(:) = 0.0     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(:) = 0.0     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(:) = 0.7 ! multiply txt_scale for subplot by this
+Grid_plot_name(1, :) = ''
+Grid_plot_row(1, :) = 1           ! number from 1 at top
+Grid_plot_rowspan(1, :) = 1       ! plot spans this number of rows
+Grid_plot_col(1, :) =  1          ! number from 1 at left
+Grid_plot_colspan(1, :) = 1       ! plot spans this number of columns
+Grid_plot_pad_left(1, :) = 0.0    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, :) = 0.0   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, :) = 0.0     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, :) = 0.0     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, :) = 0.7 ! multiply txt_scale for subplot by this
 
 
-Grid1_title = ''
+Grid_title(1) = ''
 
-Grid1_num_cols = 6 ! divide plotting region into this many equal width cols
-Grid1_num_rows = 2 ! divide plotting region into this many equal height rows
-Grid1_num_plots = 10 ! <= 10
-
-
-Grid1_plot_name(1) = 'Text_Summary1'
-Grid1_plot_row(1) = 1           ! number from 1 at top
-Grid1_plot_rowspan(1) = 1       ! plot spans this number of rows
-Grid1_plot_col(1) =  1          ! number from 1 at left
-Grid1_plot_colspan(1) = 6       ! plot spans this number of columns
-
-Grid1_plot_pad_left(1) = 0.0    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(1) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(1) = -0.04     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(1) = 0.39     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(1) = 0.8 ! multiply txt_scale for subplot by this
-
-Grid1_plot_name(2) = 'Abundance'
-Grid1_plot_row(2) = 1           ! number from 1 at top
-Grid1_plot_rowspan(2) = 1       ! plot spans this number of rows
-Grid1_plot_col(2) =  1          ! number from 1 at left
-Grid1_plot_colspan(2) = 1       ! plot spans this number of columns
-
-Grid1_plot_pad_left(2) = -0.085    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(2) = 0.0   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(2) = 0.03     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(2) = 0.03     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(2) = 0.7 ! multiply txt_scale for subplot by this
+Grid_num_cols(1) = 6 ! divide plotting region into this many equal width cols
+Grid_num_rows(1) = 2 ! divide plotting region into this many equal height rows
+Grid_num_plots(1) = 10 ! <= 10
 
 
-Grid1_plot_name(3) = 'Power'
-Grid1_plot_row(3) = 1           ! number from 1 at top
-Grid1_plot_rowspan(3) = 1       ! plot spans this number of rows
-Grid1_plot_col(3) =  2          ! number from 1 at left
-Grid1_plot_colspan(3) = 1       ! plot spans this number of columns
+Grid_plot_name(1, 1) = 'Text_Summary1'
+Grid_plot_row(1, 1) = 1           ! number from 1 at top
+Grid_plot_rowspan(1, 1) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 1) =  1          ! number from 1 at left
+Grid_plot_colspan(1, 1) = 6       ! plot spans this number of columns
 
-Grid1_plot_pad_left(3) = 0.035    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(3) = -0.11   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(3) = 0.03     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(3) = 0.03     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(3) = 0.5 ! multiply txt_scale for subplot by this
+Grid_plot_pad_left(1, 1) = 0.0    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 1) = 0.0   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 1) = -0.04     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 1) = 0.39     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 1) = 0.8 ! multiply txt_scale for subplot by this
 
+Grid_plot_name(1, 2) = 'Abundance'
+Grid_plot_row(1, 2) = 1           ! number from 1 at top
+Grid_plot_rowspan(1, 2) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 2) =  1          ! number from 1 at left
+Grid_plot_colspan(1, 2) = 1       ! plot spans this number of columns
 
-Grid1_plot_name(4) = 'Kipp'
-Grid1_plot_row(4) = 2           ! number from 1 at top
-Grid1_plot_rowspan(4) = 1       ! plot spans this number of rows
-Grid1_plot_col(4) =  1          ! number from 1 at left
-Grid1_plot_colspan(4) = 1       ! plot spans this number of columns
-
-Grid1_plot_pad_left(4) = -0.08    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(4) = 0.065   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(4) = 0.05     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(4) = 0.0     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(4) = 0.5 ! multiply txt_scale for subplot by this
-
-
-Grid1_plot_name(5) = 'TRho_Profile'
-Grid1_plot_row(5) = 2          ! number from 1 at top
-Grid1_plot_rowspan(5) = 1       ! plot spans this number of rows
-Grid1_plot_col(5) =  2          ! number from 1 at left
-Grid1_plot_colspan(5) = 1       ! plot spans this number of columns
-
-Grid1_plot_pad_left(5) = -0.01    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(5) = 0.005   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(5) = 0.05     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(5) = -0.02     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(5) = 0.6 ! multiply txt_scale for subplot by this
+Grid_plot_pad_left(1, 2) = -0.085    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 2) = 0.0   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 2) = 0.03     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 2) = 0.03     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 2) = 0.7 ! multiply txt_scale for subplot by this
 
 
-Grid1_plot_name(6) = 'Profile_Panels1'
-Grid1_plot_row(6) = 1          ! number from 1 at top
-Grid1_plot_rowspan(6) = 2       ! plot spans this number of rows
-Grid1_plot_col(6) =  4          ! number from 1 at left
-Grid1_plot_colspan(6) = 2       ! plot spans this number of columns
+Grid_plot_name(1, 3) = 'Power'
+Grid_plot_row(1, 3) = 1           ! number from 1 at top
+Grid_plot_rowspan(1, 3) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 3) =  2          ! number from 1 at left
+Grid_plot_colspan(1, 3) = 1       ! plot spans this number of columns
 
-Grid1_plot_pad_left(6) = 0.051    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(6) = 0.05   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(6) = 0.03     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(6) = -0.025     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(6) = 0.7 ! multiply txt_scale for subplot by this
+Grid_plot_pad_left(1, 3) = 0.035    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 3) = -0.11   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 3) = 0.03     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 3) = 0.03     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 3) = 0.5 ! multiply txt_scale for subplot by this
 
 
-Grid1_plot_name(7) = 'TRho'
-Grid1_plot_row(7) = 2           ! number from 1 at top
-Grid1_plot_rowspan(7) = 1       ! plot spans this number of rows
-Grid1_plot_col(7) =  3          ! number from 1 at left
-Grid1_plot_colspan(7) = 1       ! plot spans this number of columns
+Grid_plot_name(1, 4) = 'Kipp'
+Grid_plot_row(1, 4) = 2           ! number from 1 at top
+Grid_plot_rowspan(1, 4) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 4) =  1          ! number from 1 at left
+Grid_plot_colspan(1, 4) = 1       ! plot spans this number of columns
 
-Grid1_plot_pad_left(7) = 0.04    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(7) = -0.01   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(7) = 0.05     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(7) = -0.02     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(7) = 0.7 ! multiply txt_scale for subplot by this
+Grid_plot_pad_left(1, 4) = -0.08    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 4) = 0.065   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 4) = 0.05     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 4) = 0.0     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 4) = 0.5 ! multiply txt_scale for subplot by this
 
-Grid1_plot_name(8) = 'History_Panels1'
-Grid1_plot_row(8) = 1           ! number from 1 at top
-Grid1_plot_rowspan(8) = 2       ! plot spans this number of rows
-Grid1_plot_col(8) =  6          ! number from 1 at left
-Grid1_plot_colspan(8) = 1       ! plot spans this number of columns
 
-Grid1_plot_pad_left(8) = 0.02    ! fraction of full window width for padding on left
-Grid1_plot_pad_right(8) = -0.01   ! fraction of full window width for padding on right
-Grid1_plot_pad_top(8) = 0.05     ! fraction of full window height for padding at top
-Grid1_plot_pad_bot(8) = -0.03     ! fraction of full window height for padding at bottom
-Grid1_txt_scale_factor(8) = 1.0 ! multiply txt_scale for subplot by this
+Grid_plot_name(1, 5) = 'TRho_Profile'
+Grid_plot_row(1, 5) = 2          ! number from 1 at top
+Grid_plot_rowspan(1, 5) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 5) =  2          ! number from 1 at left
+Grid_plot_colspan(1, 5) = 1       ! plot spans this number of columns
+
+Grid_plot_pad_left(1, 5) = -0.01    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 5) = 0.005   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 5) = 0.05     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 5) = -0.02     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 5) = 0.6 ! multiply txt_scale for subplot by this
+
+
+Grid_plot_name(1, 6) = 'Profile_Panels1'
+Grid_plot_row(1, 6) = 1          ! number from 1 at top
+Grid_plot_rowspan(1, 6) = 2       ! plot spans this number of rows
+Grid_plot_col(1, 6) =  4          ! number from 1 at left
+Grid_plot_colspan(1, 6) = 2       ! plot spans this number of columns
+
+Grid_plot_pad_left(1, 6) = 0.051    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 6) = 0.05   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 6) = 0.03     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 6) = -0.025     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 6) = 0.7 ! multiply txt_scale for subplot by this
+
+
+Grid_plot_name(1, 7) = 'TRho'
+Grid_plot_row(1, 7) = 2           ! number from 1 at top
+Grid_plot_rowspan(1, 7) = 1       ! plot spans this number of rows
+Grid_plot_col(1, 7) =  3          ! number from 1 at left
+Grid_plot_colspan(1, 7) = 1       ! plot spans this number of columns
+
+Grid_plot_pad_left(1, 7) = 0.04    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 7) = -0.01   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 7) = 0.05     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 7) = -0.02     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 7) = 0.7 ! multiply txt_scale for subplot by this
+
+Grid_plot_name(1, 8) = 'History_Panels1'
+Grid_plot_row(1, 8) = 1           ! number from 1 at top
+Grid_plot_rowspan(1, 8) = 2       ! plot spans this number of rows
+Grid_plot_col(1, 8) =  6          ! number from 1 at left
+Grid_plot_colspan(1, 8) = 1       ! plot spans this number of columns
+
+Grid_plot_pad_left(1, 8) = 0.02    ! fraction of full window width for padding on left
+Grid_plot_pad_right(1, 8) = -0.01   ! fraction of full window width for padding on right
+Grid_plot_pad_top(1, 8) = 0.05     ! fraction of full window height for padding at top
+Grid_plot_pad_bot(1, 8) = -0.03     ! fraction of full window height for padding at bottom
+Grid_txt_scale_factor(1, 8) = 1.0 ! multiply txt_scale for subplot by this
 
 
 
 ! file output
-Grid1_file_flag = .true.
-Grid1_file_dir = 'grid_png'
-Grid1_file_prefix = 'grid_'
-Grid1_file_interval = 1000     ! output when mod(model_number,Grid1_file_interval)==0
-!Grid1_file_width = -1        ! (inches) negative means use same value as for window
-Grid1_file_width = 24       ! (inches) negative means use same value as for window
-Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
+Grid_file_flag(1) = .true.
+Grid_file_dir(1) = 'grid_png'
+Grid_file_prefix(1) = 'grid_'
+Grid_file_interval(1) = 1000     ! output when mod(model_number,Grid_file_interval(1))==0
+!Grid_file_width(1) = -1        ! (inches) negative means use same value as for window
+Grid_file_width(1) = 24       ! (inches) negative means use same value as for window
+Grid_file_aspect_ratio(1) = -1 ! negative means use same value as for window
 
 !------------------------------------------------------------------------------------
 
@@ -834,110 +834,110 @@ Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_win_flag = .false.!.true.
-    History_Panels1_title = ''
+    History_Panels_win_flag(1) = .false.!.true.
+    History_Panels_title(1) = ''
 
       ! ::
 
-    History_Panels1_win_width = 16
-    History_Panels1_win_aspect_ratio = 0.75
+    History_Panels_win_width(1) = 16
+    History_Panels_win_aspect_ratio(1) = 0.75
 
       ! ::
 
-    History_Panels1_xleft = 0.15
-    History_Panels1_xright = 0.85
-    History_Panels1_ybot = 0.15
-    History_Panels1_ytop = 0.85
-    History_Panels1_txt_scale = 0.5
+    History_Panels_xleft(1) = 0.15
+    History_Panels_xright(1) = 0.85
+    History_Panels_ybot(1) = 0.15
+    History_Panels_ytop(1) = 0.85
+    History_Panels_txt_scale(1) = 0.5
 
       ! ::
 
-    History_Panels1_xaxis_name = 'model_number'
-    History_Panels1_xmin = -101d0
-    History_Panels1_xmax = -101d0
-    History_Panels1_max_width = 100
-    History_Panels1_dxmin = -1
-    History_Panels1_xaxis_reversed = .false.
-    History_Panels1_xaxis_log = .false.
-    History_Panels1_xmargin = 0.0
+    History_Panels_xaxis_name(1) = 'model_number'
+    History_Panels_xmin(1) = -101d0
+    History_Panels_xmax(1) = -101d0
+    History_Panels_max_width(1) = 100
+    History_Panels_dxmin(1) = -1
+    History_Panels_xaxis_reversed(1) = .false.
+    History_Panels_xaxis_log(1) = .false.
+    History_Panels_xmargin(1) = 0.0
 
       ! ::
 
 
-    History_Panels1_points_name(:) = ''
+    History_Panels_points_name(1, :) = ''
 
       ! setup default
 
       ! ::
 
-    History_Panels1_num_panels = 2
+    History_Panels_num_panels(1) = 2
 
       ! ::
 
-    History_Panels1_yaxis_name(1) = 'log_rel_run_E_err'
-    History_Panels1_yaxis_reversed(1) = .false.
-    History_Panels1_ymin(1) =-101d0
-    History_Panels1_ymax(1) =-101d0
-    History_Panels1_dymin(1) = -1
+    History_Panels_yaxis_name(1, 1) = 'log_rel_run_E_err'
+    History_Panels_yaxis_reversed(1, 1) = .false.
+    History_Panels_ymin(1, 1) =-101d0
+    History_Panels_ymax(1, 1) =-101d0
+    History_Panels_dymin(1, 1) = -1
 
       ! ::
 
-    History_Panels1_other_yaxis_name(1) = 'log_rel_E_err'
-    History_Panels1_other_yaxis_reversed(1) = .false.
-    History_Panels1_other_ymin(1) = -101d0
-    History_Panels1_other_ymax(1) = -101d0
-    History_Panels1_other_dymin(1) = -1
+    History_Panels_other_yaxis_name(1, 1) = 'log_rel_E_err'
+    History_Panels_other_yaxis_reversed(1, 1) = .false.
+    History_Panels_other_ymin(1, 1) = -101d0
+    History_Panels_other_ymax(1, 1) = -101d0
+    History_Panels_other_dymin(1, 1) = -1
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'log_LHe'
-    History_Panels1_yaxis_reversed(2) = .false.
-    History_Panels1_ymin(2) = -101d0
-    History_Panels1_ymax(2) = -101d0
-    History_Panels1_dymin(2) = -1
+    History_Panels_yaxis_name(1, 2) = 'log_LHe'
+    History_Panels_yaxis_reversed(1, 2) = .false.
+    History_Panels_ymin(1, 2) = -101d0
+    History_Panels_ymax(1, 2) = -101d0
+    History_Panels_dymin(1, 2) = -1
 
       ! ::
 
-    History_Panels1_other_yaxis_name(2) = 'log_total_drag_energy'
-    History_Panels1_other_yaxis_reversed(2) = .false.
-    History_Panels1_other_yaxis_log(2) = .false.
-    !History_Panels1_other_ymin(2) = -101d0
-    !History_Panels1_other_ymax(2) = 40d0
-    History_Panels1_other_dymin(2) = -1
+    History_Panels_other_yaxis_name(1, 2) = 'log_total_drag_energy'
+    History_Panels_other_yaxis_reversed(1, 2) = .false.
+    History_Panels_other_yaxis_log(1, 2) = .false.
+    !History_Panels_other_ymin(1, 2) = -101d0
+    !History_Panels_other_ymax(1, 2) = 40d0
+    History_Panels_other_dymin(1, 2) = -1
 
       ! ::
 
-    History_Panels1_yaxis_name(3) = ''
-    History_Panels1_yaxis_reversed(3) = .false.
-    History_Panels1_ymin(3) = -101d0
-    History_Panels1_ymax(3) = -101d0
-    History_Panels1_dymin(3) = -1
+    History_Panels_yaxis_name(1, 3) = ''
+    History_Panels_yaxis_reversed(1, 3) = .false.
+    History_Panels_ymin(1, 3) = -101d0
+    History_Panels_ymax(1, 3) = -101d0
+    History_Panels_dymin(1, 3) = -1
 
       ! ::
 
-    History_Panels1_other_yaxis_name(3) = ''
-    History_Panels1_other_yaxis_reversed(3) = .false.
-    History_Panels1_other_ymin(3) = -101d0
-    History_Panels1_other_ymax(3) = -101d0
-    History_Panels1_other_dymin(3) = -1
+    History_Panels_other_yaxis_name(1, 3) = ''
+    History_Panels_other_yaxis_reversed(1, 3) = .false.
+    History_Panels_other_ymin(1, 3) = -101d0
+    History_Panels_other_ymax(1, 3) = -101d0
+    History_Panels_other_dymin(1, 3) = -1
 
       ! Enables calling a subroutine to add extra information to a plot
       ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
 
       ! ::
 
-    History_Panels1_use_decorator = .false.
+    History_Panels_use_decorator(1) = .false.
 
       ! file output
 
       ! ::
 
-    History_Panels1_file_flag = .false.
-    History_Panels1_file_dir = 'Energy_Err_info_png'
-    History_Panels1_file_prefix = 'mlt_info'
-    History_Panels1_file_interval = 10
-    History_Panels1_file_width = -1
-    History_Panels1_file_aspect_ratio = -1
+    History_Panels_file_flag(1) = .false.
+    History_Panels_file_dir(1) = 'Energy_Err_info_png'
+    History_Panels_file_prefix(1) = 'mlt_info'
+    History_Panels_file_interval(1) = 10
+    History_Panels_file_width(1) = -1
+    History_Panels_file_aspect_ratio(1) = -1
 
 
     

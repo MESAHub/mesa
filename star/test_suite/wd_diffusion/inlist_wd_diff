@@ -97,16 +97,16 @@
 
 &pgstar
         
-        ! Profile_Panels2_win_flag = .true.
-        Profile_Panels2_file_flag = .true.
-        Profile_Panels2_file_interval = 100000
-        Profile_Panels2_yaxis_name(2) = 'eE_div_mg_element_diffusion'
-        Profile_Panels2_title = 'Abundance-Efield'
-        Profile_Panels2_xaxis_name = 'logxm'
-        Profile_Panels2_xaxis_reversed = .true.
-        Profile_Panels2_xmin = -8
-        Profile_Panels2_xmax = 0
-        Profile_Panels2_show_mix_regions_on_xaxis = .true.
+        ! Profile_Panels_win_flag(2) = .true.
+        Profile_Panels_file_flag(2) = .true.
+        Profile_Panels_file_interval(2) = 100000
+        Profile_Panels_yaxis_name(2, 2) = 'eE_div_mg_element_diffusion'
+        Profile_Panels_title(2) = 'Abundance-Efield'
+        Profile_Panels_xaxis_name(2) = 'logxm'
+        Profile_Panels_xaxis_reversed(2) = .true.
+        Profile_Panels_xmin(2) = -8
+        Profile_Panels_xmax(2) = 0
+        Profile_Panels_show_mix_regions_on_xaxis(2) = .true.
         
 
 / ! end of pgstar namelist

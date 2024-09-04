@@ -72,8 +72,8 @@
 
 &pgstar
 
-Profile_Panels3_xmin = 0 ! 2.5 ! -101d0
-Profile_Panels3_xmax = -101d0 ! 
+Profile_Panels_xmin(3) = 0 ! 2.5 ! -101d0
+Profile_Panels_xmax(3) = -101d0 !
 
 TRho_Profile_xmin = 2.5
 TRho_Profile_xmax = 7.5

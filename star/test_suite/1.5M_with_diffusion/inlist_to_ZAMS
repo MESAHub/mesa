@@ -79,10 +79,10 @@
    file_device = 'vcps' ! postscript
    file_extension = 'ps'
 
-   Grid2_win_flag = .false. ! switch to .true. to visualize in real-time
+   Grid_win_flag(2) = .false. ! switch to .true. to visualize in real-time
    file_digits = 7
-   Grid2_file_dir = 'pgstar_out1'
-   Grid2_file_prefix = 'grid'
+   Grid_file_dir(2) = 'pgstar_out1'
+   Grid_file_prefix(2) = 'grid'
 
    Abundance_win_flag = .false. ! switch to .true. to visualize in real-time
    Abundance_file_flag = .true.
