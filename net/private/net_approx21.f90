@@ -327,7 +327,7 @@
             
             ratraw(irnep)%val = rnep
             ratraw(irnep)%d1val1 = 0
-            ratraw(irnep)%d1val1 = 0
+            ratraw(irnep)%d1val2 = 0
             !dratrawdt(irnep) = 0
             !dratrawdd(irnep) = 0
             if (rnep > 0) then
@@ -581,27 +581,27 @@
 !         denomdt = dratdumdt(ir53gn) + y(ineut)*dratdumdt(ir53ng)
 !         denomdd = dratdumdd(ir53gn) + y(ineut)*dratdumdd(ir53ng)
 
-!      if (denom %val > tiny_denom .and. btemp .gt. 1.5d9) then
-!      zz      = 1.0d0/denom
-!
-!      ratdum(ir1f54)     = ratdum(ir54gn)*ratdum(ir53gn)*zz
-!      dratdumdy1(ir1f54) = -ratdum(ir1f54)*zz * ratdum(ir53ng)
-!!         dratdumdt(ir1f54)  = dratdumdt(ir54gn)*ratdum(ir53gn)*zz &
-!!                              + ratdum(ir54gn)*dratdumdt(ir53gn)*zz &
-!!                              - ratdum(ir1f54)*zz*denomdt
-!!         dratdumdd(ir1f54) = dratdumdd(ir54gn)*ratdum(ir53gn)*zz &
-!!                           + ratdum(ir54gn)*dratdumdd(ir53gn)*zz &
-!!                           - ratdum(ir1f54)*zz*denomdd
-!
-!      ratdum(ir2f54)     = ratdum(ir52ng)*ratdum(ir53ng)*zz
-!      dratdumdy1(ir2f54) = -ratdum(ir2f54)*zz * ratdum(ir53ng)
-!!         dratdumdt(ir2f54)  = dratdumdt(ir52ng)*ratdum(ir53ng)*zz &
-!!                              + ratdum(ir52ng)*dratdumdt(ir53ng)*zz &
-!!                              - ratdum(ir2f54)*zz*denomdt
-!!         dratdumdd(ir2f54) = dratdumdd(ir52ng)*ratdum(ir53ng)*zz &
-!!                           + ratdum(ir52ng)*dratdumdd(ir53ng)*zz &
-!!                           - ratdum(ir2f54)*zz*denomdd
-!      end if
+      if (denom %val > tiny_denom .and. btemp .gt. 1.5d9) then
+      zz      = 1.0d0/denom
+
+      ratdum(ir1f54)     = ratdum(ir54gn)*ratdum(ir53gn)*zz
+      dratdumdy1(ir1f54) = -ratdum(ir1f54)*zz * ratdum(ir53ng)
+!         dratdumdt(ir1f54)  = dratdumdt(ir54gn)*ratdum(ir53gn)*zz &
+!                              + ratdum(ir54gn)*dratdumdt(ir53gn)*zz &
+!                              - ratdum(ir1f54)*zz*denomdt
+!         dratdumdd(ir1f54) = dratdumdd(ir54gn)*ratdum(ir53gn)*zz &
+!                           + ratdum(ir54gn)*dratdumdd(ir53gn)*zz &
+!                           - ratdum(ir1f54)*zz*denomdd
+
+      ratdum(ir2f54)     = ratdum(ir52ng)*ratdum(ir53ng)*zz
+      dratdumdy1(ir2f54) = -ratdum(ir2f54)*zz * ratdum(ir53ng)
+!         dratdumdt(ir2f54)  = dratdumdt(ir52ng)*ratdum(ir53ng)*zz &
+!                              + ratdum(ir52ng)*dratdumdt(ir53ng)*zz &
+!                              - ratdum(ir2f54)*zz*denomdt
+!         dratdumdd(ir2f54) = dratdumdd(ir52ng)*ratdum(ir53ng)*zz &
+!                           + ratdum(ir52ng)*dratdumdd(ir53ng)*zz &
+!                           - ratdum(ir2f54)*zz*denomdd
+      end if
 
 ! fe54(n,g)fe55(n,g)fe56 equilibrium links
       ratdum(irfe56_aux1)     = 0.0d0
@@ -657,28 +657,28 @@
 !         denomdt = dratdumdt(irco57gp) + y(iprot)*dratdumdt(irco57pa)
 !         denomdd = dratdumdd(irco57gp) + y(iprot)*dratdumdd(irco57pa)
 
-!      if (denom %val > tiny_denom .and. btemp .gt. 1.5d9) then
-!      zz      = 1.0d0/denom
-!
-!      ratdum(irfe56_aux3)     = ratdum(irfe56pg) * ratdum(irco57pa) * zz
-!      dratdumdy1(irfe56_aux3) = -ratdum(irfe56_aux3) * zz * ratdum(irco57pa)
-!!         dratdumdt(irfe56_aux3)  = dratdumdt(irfe56pg) * ratdum(irco57pa) * zz &
-!!                                 + ratdum(irfe56pg) * dratdumdt(irco57pa) * zz &
-!!                                 - ratdum(irfe56_aux3) * zz * denomdt
-!!         dratdumdd(irfe56_aux3)  = dratdumdd(irfe56pg) * ratdum(irco57pa) * zz &
-!!                                 + ratdum(irfe56pg) * dratdumdd(irco57pa) * zz &
-!!                                 - ratdum(irfe56_aux3) * zz * denomdd
-!
-!      ratdum(irfe56_aux4)     = ratdum(irfe54ap) * ratdum(irco57gp) * zz
-!      dratdumdy1(irfe56_aux4) = -ratdum(irfe56_aux4) * zz * ratdum(irco57pa)
-!!         dratdumdt(irfe56_aux4)  = dratdumdt(irfe54ap) * ratdum(irco57gp) * zz &
-!!                                 + ratdum(irfe54ap) * dratdumdt(irco57gp) * zz &
-!!                                 - ratdum(irfe56_aux4) * zz * denomdt
-!!         dratdumdd(irfe56_aux4)  = dratdumdd(irfe54ap) * ratdum(irco57gp) * zz &
-!!                                 + ratdum(irfe54ap) * dratdumdd(irco57gp) * zz &
-!!                                 - ratdum(irfe56_aux4) * zz * denomdd
-!      end if
-!
+      if (denom %val > tiny_denom .and. btemp .gt. 1.5d9) then
+      zz      = 1.0d0/denom
+
+      ratdum(irfe56_aux3)     = ratdum(irfe56pg) * ratdum(irco57pa) * zz
+      dratdumdy1(irfe56_aux3) = -ratdum(irfe56_aux3) * zz * ratdum(irco57pa)
+!         dratdumdt(irfe56_aux3)  = dratdumdt(irfe56pg) * ratdum(irco57pa) * zz &
+!                                 + ratdum(irfe56pg) * dratdumdt(irco57pa) * zz &
+!                                 - ratdum(irfe56_aux3) * zz * denomdt
+!         dratdumdd(irfe56_aux3)  = dratdumdd(irfe56pg) * ratdum(irco57pa) * zz &
+!                                 + ratdum(irfe56pg) * dratdumdd(irco57pa) * zz &
+!                                 - ratdum(irfe56_aux3) * zz * denomdd
+
+      ratdum(irfe56_aux4)     = ratdum(irfe54ap) * ratdum(irco57gp) * zz
+      dratdumdy1(irfe56_aux4) = -ratdum(irfe56_aux4) * zz * ratdum(irco57pa)
+!         dratdumdt(irfe56_aux4)  = dratdumdt(irfe54ap) * ratdum(irco57gp) * zz &
+!                                 + ratdum(irfe54ap) * dratdumdt(irco57gp) * zz &
+!                                 - ratdum(irfe56_aux4) * zz * denomdt
+!         dratdumdd(irfe56_aux4)  = dratdumdd(irfe54ap) * ratdum(irco57gp) * zz &
+!                                 + ratdum(irfe54ap) * dratdumdd(irco57gp) * zz &
+!                                 - ratdum(irfe56_aux4) * zz * denomdd
+      end if
+
 
 ! fe54(p,g)co55(p,g)ni56 equilibrium links r3f54 r4f54
 ! fe52(a,p)co55(g,p)fe54 equilibrium links r5f54 r6f54
