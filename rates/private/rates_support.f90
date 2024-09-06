@@ -174,7 +174,7 @@
             rate_raw_dRho(i) = rate_raw(i) * (ddtab(i) / dtab(i))
 
             ! Derivative with respect to temperature (dT)
-            rate_raw_dT(i) = rate_raw(i) * (rattab_f(2,k,i) + 2*dt*rattab_f(3,k,i) + 3*dt**2*rattab_f(4,k,i)) / (btemp)
+            rate_raw_dT(i) = rate_raw(i) * (rattab_f(2,k,i) + 2*dt*rattab_f(3,k,i) + 3d0*dt**2*rattab_f(4,k,i)) / (btemp)
 
             end do
             
@@ -208,7 +208,8 @@
          include 'formats'
          
          ierr = 0
-         rate_logR = 0
+         rate_logR = 0d0
+
          rattab_f(1:4,1:nrattab,1:num_reactions) =>  &
                rattab_f1(1:4*nrattab*num_reactions)
          
@@ -284,7 +285,7 @@
                       if (rattab(j, i) > 0.0_dp) then  ! Only take log of positive values
                           rate_logR = log10(rattab(j, i))
                       else if (rattab(j, i) == 0.0_dp) then
-                          rate_logR = -999
+                          rate_logR = -999d0
                       else
                           ! warning for rates set to -1
                           ! like rni56ec_to_co56,rco56ec_to_fe56
