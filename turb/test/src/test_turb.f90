@@ -24,7 +24,7 @@ program test_turb
 
    subroutine check_efficient_MLT_scaling()
       type(auto_diff_real_star_order1) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
-      character(len=3) :: MLT_option = 'Cox'
+      character(len=3) :: MLT_option
       real(dp) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
       type(auto_diff_real_star_order1) :: Gamma, gradT, Y_face, conv_vel, conv_vel2, D, r, L
       integer :: mixing_type, ierr
