@@ -212,7 +212,7 @@ contains
       integer :: grid_min, grid_max, npts, nz
       real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
 
-      logical :: dbg = .false.
+      logical, parameter :: dbg = .false.
 
       include 'formats'
       ierr = 0

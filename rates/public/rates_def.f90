@@ -73,8 +73,8 @@
          r_one_four = 11
 
 
-      integer, dimension(nchapters) :: Nin = (/1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 1/)
-      integer, dimension(nchapters) :: Nout = (/1, 2, 3, 1, 2, 3, 4, 1, 2, 2, 4/)
+      integer, dimension(nchapters), parameter :: Nin = (/1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 1/)
+      integer, dimension(nchapters), parameter :: Nout = (/1, 2, 3, 1, 2, 3, 4, 1, 2, 2, 4/)
 
 
       type reaclib_data

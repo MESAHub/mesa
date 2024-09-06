@@ -33,7 +33,7 @@
 
 
       real(dp), parameter :: min_dlnz = -12
-      real(dp) :: min_z = 1d-12
+      real(dp), parameter :: min_z = 1d-12
 
       ! some relax routines depend on things such as other_energy and other_torque
       ! to which interpolation parameters cannot be passed directly. So for simplicity
