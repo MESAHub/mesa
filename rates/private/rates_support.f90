@@ -174,7 +174,7 @@
             rate_raw_dRho(i) = rate_raw(i) * (ddtab(i) / dtab(i))
 
             ! Derivative with respect to temperature (dT)
-            rate_raw_dT(i) = rate_raw(i) * (rattab_f(2,k,i) + 2*dt*rattab_f(3,k,i) + 3d0*dt**2*rattab_f(4,k,i)) / (btemp)
+            rate_raw_dT(i) = rate_raw(i) * (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) + 1.5d0*dt*rattab_f(4,k,i))) / (btemp)
 
             end do
             
@@ -285,13 +285,13 @@
                       if (rattab(j, i) > 0.0_dp) then  ! Only take log of positive values
                           rate_logR = log10(rattab(j, i))
                       else if (rattab(j, i) == 0.0_dp) then
-                          rate_logR = -999d0
+                          rate_logR = -323d0 ! set to a tiny value that won't underflow when exponentiated
                       else
                           ! warning for rates set to -1
                           ! like rni56ec_to_co56,rco56ec_to_fe56
                           !write(*, '(a,i4,2x,a)') 'Warning: non-positive value for rate in ',  &
                           !   j, trim(reaction_Name(reaction_id(j)))
-                          rate_logR = rattab(j, i) ! don't convert to log space.
+                          call set_nan(rate_logR)
                       end if
                       rattab(j, i) = rate_logR  ! Store value in rattab
                   end if
