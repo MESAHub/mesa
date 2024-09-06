@@ -493,7 +493,7 @@ contains
     s% grada(k) = res(i_grad_ad)
     s% dE_dRho(k) = res(i_dE_drho)
     s% Cv(k) = res(i_Cv)
-    s% cp(k) = res(i_cp)
+    s% Cp(k) = res(i_Cp)
     s% chiRho(k) = res(i_chiRho)
     s% chiT(k) = res(i_chiT)
     s% gamma1(k) = res(i_gamma1)
@@ -544,7 +544,7 @@ contains
     if (ierr /= 0) then
        if (s% report_ierr) then
           !$OMP critical (micro_crit1)
-          write(*,2) 's% cp(k)', k, s% cp(k)
+          write(*,2) 's% Cp(k)', k, s% Cp(k)
           write(*,2) 's% csound(k)', k, s% csound(k)
           write(*,2) 's% lnPeos(k)', k, s% lnPeos(k)
           write(*,2) 's% gam(k)', k, s% gam(k)
