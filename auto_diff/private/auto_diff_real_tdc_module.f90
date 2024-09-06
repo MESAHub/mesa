@@ -376,18 +376,18 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(out) :: this
       real(dp), intent(in) :: other
       this%val = other
-      this%d1val1 = 0_dp
-      this%d1Array = 0_dp
-      this%d1val1_d1Array = 0_dp
+      this%d1val1 = 0.0_dp
+      this%d1Array = 0.0_dp
+      this%d1val1_d1Array = 0.0_dp
    end subroutine assign_from_real_dp
    
    subroutine assign_from_int(this, other)
       type(auto_diff_real_tdc), intent(out) :: this
       integer, intent(in) :: other
       this%val = other
-      this%d1val1 = 0_dp
-      this%d1Array = 0_dp
-      this%d1val1_d1Array = 0_dp
+      this%d1val1 = 0.0_dp
+      this%d1Array = 0.0_dp
+      this%d1val1_d1Array = 0.0_dp
    end subroutine assign_from_int
    
    function equal_self(this, other) result(z)
@@ -1678,9 +1678,9 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc) :: derivative
       derivative%val = this%d1val1
-      derivative%d1val1 = 0_dp
+      derivative%d1val1 = 0.0_dp
       derivative%d1Array = this%d1val1_d1Array
-      derivative%d1val1_d1Array = 0_dp
+      derivative%d1val1_d1Array = 0.0_dp
    end function differentiate_auto_diff_real_tdc_1
    
 end module auto_diff_real_tdc_module

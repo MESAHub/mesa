@@ -83,9 +83,9 @@ contains
 
     character(len=80) :: group_name ! output buffer
 
-    character(len=30) :: efmt = '(A14, 99ES12.3)'
-    character(len=30) :: ffmt = '(A14, 99F8.3)'
-    character(len=30) :: ifmt = '(A14, I4)'
+    character(len=30), parameter :: efmt = '(A14, 99ES12.3)'
+    character(len=30), parameter :: ffmt = '(A14, 99F8.3)'
+    character(len=30), parameter :: ifmt = '(A14, I4)'
 
     logical :: file_exists 
 

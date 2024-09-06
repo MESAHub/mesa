@@ -416,7 +416,7 @@
 
         real(dp) :: logKap
 
-        logical :: dbg = .false.
+        logical, parameter :: dbg = .false.
 
         ierr = -1 ! should be set by each case, otherwise something is wrong
         frac_Type2 = 0d0

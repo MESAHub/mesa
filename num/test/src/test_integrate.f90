@@ -23,7 +23,7 @@
 
          subroutine test_basic
             real(dp) :: xlow=0, xhigh=1
-            real(dp) :: expected = 0.5d0
+            real(dp), parameter :: expected = 0.5d0
             real(dp) :: res
             integer :: ierr
 

@@ -54,7 +54,7 @@ contains
     type(star_info), pointer :: s
     integer, intent(out)     :: ierr
 
-    logical, parameter :: DEBUG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     integer  :: i
     integer  :: j
@@ -79,7 +79,7 @@ contains
 
     ierr = 0
 
-    if (DEBUG) then
+    if (dbg) then
        write(*, 3) 'add_overshooting; model, n_conv_bdy=', s%model_number, s%num_conv_boundaries
     end if
 
@@ -90,7 +90,7 @@ contains
        ! Skip this boundary if it's too close to the center
 
        if (s%conv_bdy_q(i) < s%min_overshoot_q) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'skip since s%conv_bdy_q(i) < min_overshoot_q', i
           endif
           cycle conv_bdy_loop
@@ -100,7 +100,7 @@ contains
        ! overshoot there
 
        if (s%conv_bdy_loc(i) == 1) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'skip since s%conv_bdy_loc(i) == 1', i
           endif
           cycle conv_bdy_loop
@@ -127,7 +127,7 @@ contains
                   s%burn_he_conv_region(i) .OR. &
                   s%burn_z_conv_region(i) )              
           case ('any')
-             match_zone_type = .TRUE.
+             match_zone_type = .true.
           case default
              write(*,*) 'Invalid overshoot_zone_type: j, s%overshoot_zone_type(j)=', j, s%overshoot_zone_type(j)
              ierr = -1
@@ -142,7 +142,7 @@ contains
           case ('shell')
              match_zone_loc = .NOT. is_core
           case ('any')
-             match_zone_loc = .TRUE.
+             match_zone_loc = .true.
           case default
              write(*,*) 'Invalid overshoot_zone_loc: j, s%overshoot_zone_loc(j)=', j, s%overshoot_zone_loc(j)
              ierr = -1
@@ -155,7 +155,7 @@ contains
           case ('top')
              match_bdy_loc = s%top_conv_bdy(i)
           case ('any')
-             match_bdy_loc = .TRUE.
+             match_bdy_loc = .true.
           case default
              write(*,*) 'Invalid overshoot_bdy_loc: j, s%overshoot_bdy_loc(j)=', j, s%overshoot_bdy_loc(j)
              ierr = -1
@@ -164,7 +164,7 @@ contains
 
           if (.NOT. (match_zone_type .AND. match_zone_loc .AND. match_bdy_loc)) cycle criteria_loop
 
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'Overshooting at convective boundary: i, j=', i, j
              write(*,*) '  s%overshoot_scheme=', TRIM(s%overshoot_scheme(j))
              write(*,*) '  s%overshoot_zone_type=', TRIM(s%overshoot_zone_type(j))

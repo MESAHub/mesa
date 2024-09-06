@@ -212,7 +212,7 @@ contains
 
     real(dp) :: decay, capture
 
-    logical :: dbg = .false.
+    logical, parameter :: dbg = .false.
 
     xget = T9
     yget = lYeRho

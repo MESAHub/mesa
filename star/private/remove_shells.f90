@@ -1159,7 +1159,7 @@
          real(dp) :: time
          integer :: num_pts, k0, species
          logical :: save_have_mlt_vc
-         logical :: dbg = .false.
+         logical, parameter :: dbg = .false.
 
          ierr = 0
          call get_star_ptr(id, s, ierr)

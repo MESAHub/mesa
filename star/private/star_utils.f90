@@ -2514,7 +2514,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: he4_limit
          integer :: nz, h1, he4
-         real(dp) :: small = 1d-4
+         real(dp), parameter :: small = 1d-4
          after_He_burn = .false.
          nz = s% nz
          h1 = s% net_iso(ih1)
@@ -2530,7 +2530,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: c12_limit
          integer :: nz, h1, he4, c12
-         real(dp) :: small = 1d-4
+         real(dp), parameter :: small = 1d-4
          after_C_burn = .false.
          nz = s% nz
          h1 = s% net_iso(ih1)

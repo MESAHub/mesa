@@ -80,7 +80,7 @@ contains
     real(dp), intent(out) :: dlnP_dlnkap
     integer, intent(out)  :: ierr
 
-    logical, parameter :: DBG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp) :: g
     real(dp) :: logg
@@ -125,14 +125,14 @@ contains
 
     ! Perform the table lookup
 
-    if (DBG) write(*,*) 'call get_table_values', id
+    if (dbg) write(*,*) 'call get_table_values', id
     call get_table_values( &
          id, Z, logg, Teff, &
          Pgas, dPgas_dTeff, dPgas_dlogg, &
          T, dT_dTeff, dT_dlogg, &
          ierr)
     if (ierr /= 0) then
-       if (DBG) write(*,*) 'get_table_values(_at_fixed_Z) ierr', ierr
+       if (dbg) write(*,*) 'get_table_values(_at_fixed_Z) ierr', ierr
        return
     end if
 
@@ -191,7 +191,7 @@ contains
 
     endif
 
-    if (DBG .or. is_bad(lnP) .or. is_bad(lnT)) then
+    if (dbg .or. is_bad(lnP) .or. is_bad(lnT)) then
        write(*,*) 'eval_table'
        write(*,1) 'Teff', Teff
        write(*,1) 'T', T
@@ -234,7 +234,7 @@ contains
     integer, parameter :: BLEND_IN_Y = 4
     integer, parameter :: BLEND_CORNER_OUT = 5
 
-    logical, parameter :: DBG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp)                :: g
     real(dp)                :: logTeff

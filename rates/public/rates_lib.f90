@@ -519,7 +519,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = '-'
+         character (len=1), parameter :: reaction_flag = '-'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_handle
       
@@ -528,7 +528,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = 'e'
+         character (len=1), parameter :: reaction_flag = 'e'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_ec_handle
       
@@ -537,7 +537,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = 'w'
+         character (len=1), parameter :: reaction_flag = 'w'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_wk_handle
       

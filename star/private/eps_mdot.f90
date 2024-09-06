@@ -466,7 +466,7 @@
          integer :: ierr
          
          ! Intermediates
-         logical :: dbg = .false.
+         logical, parameter :: dbg = .false.
          integer :: nz, j
          real(dp) delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
