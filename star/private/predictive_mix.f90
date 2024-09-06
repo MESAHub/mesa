@@ -52,7 +52,7 @@ contains
     type(star_info), pointer :: s
     integer, intent(out)     :: ierr
 
-    logical, parameter :: DEBUG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     integer  :: i
     integer  :: j
@@ -71,14 +71,14 @@ contains
 
     ierr = 0
 
-    if (DEBUG) then
+    if (dbg) then
        write(*, *) 'add_predictive_mixing; model, n_conv_bdy=', &
             s%model_number, s%num_conv_boundaries
     end if
 
     ! Loop over convective boundaries, from center to surface
 
-    mix_mask = .FALSE.
+    mix_mask = .false.
 
     conv_bdy_loop : do i = 1, s%num_conv_boundaries
 
@@ -86,7 +86,7 @@ contains
        ! predictively mix there
 
        if (s%conv_bdy_loc(i) == 1) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'skip since s%conv_bdy_loc(i) == 1', i
           endif
           cycle conv_bdy_loop
@@ -113,7 +113,7 @@ contains
                   s%burn_he_conv_region(i) .OR. &
                   s%burn_z_conv_region(i) )              
           case ('any')
-             match_zone_type = .TRUE.
+             match_zone_type = .true.
           case default
              write(*,*) 'Invalid predictive_zone_type: j, s%predictive_zone_type(j)=', j, s%predictive_zone_type(j)
              ierr = -1
@@ -136,7 +136,7 @@ contains
           case ('surf')
              match_zone_loc = is_surf_zone
           case ('any')
-             match_zone_loc = .TRUE.
+             match_zone_loc = .true.
           case default
              write(*,*) 'Invalid predictive_zone_loc: j, s%predictive_zone_loc(j)=', j, s%predictive_zone_loc(j)
              ierr = -1
@@ -149,7 +149,7 @@ contains
           case ('top')
              match_bdy_loc = s%top_conv_bdy(i)
           case ('any')
-             match_bdy_loc = .TRUE.
+             match_bdy_loc = .true.
           case default
              write(*,*) 'Invalid predictive_bdy_loc: j, s%predictive_bdy_loc(j)=', j, s%predictive_bdy_loc(j)
              ierr = -1
@@ -161,7 +161,7 @@ contains
           if (s%conv_bdy_q(i) < s%predictive_bdy_q_min(j) .OR. &
               s%conv_bdy_q(i) > s%predictive_bdy_q_max(j)) cycle criteria_loop
           
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'Predictive mixing at convective boundary: i, j=', i, j
              write(*,*) '  s%predictive_zone_type=', TRIM(s%predictive_zone_type(j))
              write(*,*) '  s%predictive_zone_loc=', TRIM(s%predictive_zone_loc(j))
@@ -219,8 +219,8 @@ contains
     integer, intent(out)     :: ierr
     logical, intent(inout)   :: mix_mask(:)
 
-    logical, parameter :: DEBUG = .FALSE.
-    logical, parameter :: DUMP_PREDICTIONS = .FALSE.
+    logical, parameter :: dbg = .false.
+    logical, parameter :: DUMP_PREDICTIONS = .false.
 
     real(dp)       :: superad_thresh 
     real(dp)       :: ingest_factor
@@ -330,7 +330,7 @@ contains
 
     end if
 
-    if (DEBUG) then
+    if (dbg) then
        if (k_bot_cz < s%nz) then
           write(*,*) 'Predictive mixing: i, j, q_top, q_bot:', i, j, s%q(k_top_cz), s%q(k_bot_cz+1)
        else
@@ -401,7 +401,7 @@ contains
 
           if (.NOT. ALL(s%gradr(k_a:k_b) > s%grada_face(k_a:k_b))) then
 
-             ledoux_extension = .FALSE.
+             ledoux_extension = .false.
 
           else
 
@@ -428,7 +428,7 @@ contains
           if (iso_r /= 0) then
 
              if (SIGN(1._dp, xa_mz_burn(iso_r)-xa_ez(iso_r)) /= SIGN(1._dp, xa_ez_burn(iso_r)-xa_ez(iso_r))) then
-                if (DEBUG) then
+                if (dbg) then
                    write(*,*) 'Exiting predictive search due to abundance reversal'
                 end if
                 exit search_loop
@@ -457,7 +457,7 @@ contains
              ! If the mass ingested exceeds the limit, finish the search
 
              if (m_ingest > m_ingest_limit) then
-                if (DEBUG) then
+                if (dbg) then
                    write(*,*) 'Exiting predictive search due to ingestion limit exceeded'
                 end if
                 exit search_loop
@@ -473,7 +473,7 @@ contains
 
        if ((      outward .AND. gradr(k_a) < grada(k_a)) .OR. &
            (.NOT. outward .AND. gradr(k_b) < grada(k_b))) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'Exiting predictive search due to non-convective growing boundary'
           endif
           exit search_loop
@@ -491,7 +491,7 @@ contains
        endif
 
        if (superad_min <= superad_thresh) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'Exiting predictive search due to convection-zone split'
           endif
           exit search_loop
@@ -528,18 +528,18 @@ contains
        end do
        call mesa_error(__FILE__,__LINE__,'Double predictive')
     else
-       mix_mask(k_top_mz:k_bot_mz) = .FALSE.
+       mix_mask(k_top_mz:k_bot_mz) = .false.
     endif
 
     ! Return now if no additional mixing should occur
 
     if (outward .AND. k_top_mz == k_top_cz) then
-       if (DEBUG) then
+       if (dbg) then
           write(*,*) 'No predictive mixing at top of zone; boundary i=', i
        endif
        return
     elseif (.NOT. outward .AND. k_bot_mz == k_bot_cz) then
-       if (DEBUG) then
+       if (dbg) then
           write(*,*) 'No predictive mixing at bottom of zone; boundary i=', i
        endif
        return
@@ -553,7 +553,7 @@ contains
     call eval_mixing_coeffs(s, k_bot_mz, k_top_mz, xa_mz_burn, &
                             k_a, k_b, D, vc, grada, gradr, ierr)
     if (ierr /= 0) then
-       if (DEBUG) write(*,*) 'Non-zero return from eval_mixing_coeffs in do_predictive_mixing/predictive_mix'
+       if (dbg) write(*,*) 'Non-zero return from eval_mixing_coeffs in do_predictive_mixing/predictive_mix'
        return
     endif
 
@@ -638,7 +638,7 @@ contains
 
     end if
 
-    if (DEBUG) then
+    if (dbg) then
        write(*,*) 'Predictive mixing: i, k_a, k_b, q_a, q_b, superad_min=', i, k_a, k_b, s%q(k_a), s%q(k_b), &
             superad_min
     endif
@@ -709,7 +709,7 @@ contains
     real(dp), intent(out)    :: gradr(:)
     integer, intent(out)     :: ierr
 
-    logical, parameter :: DEBUG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp) :: xh
     real(dp) :: xhe
@@ -912,7 +912,7 @@ contains
     real(dp), intent(out)    :: d_dlnT(:)
     integer, intent(out)     :: ierr
 
-    logical, parameter  :: DEBUG = .FALSE.
+    logical, parameter  :: dbg = .false.
     real(dp), parameter :: LOGRHO_TOL = 1E-8_dp
     real(dp), parameter :: LOGPGAS_TOL = 1E-8_dp
 
@@ -924,7 +924,7 @@ contains
     ! pressure are as specified in the model, but with abundances
     ! given by xa and other input abundance parameters
 
-    ! (NEEDS FIXING TO HANDLE CASE WHEN LNPGAS_FLAG = .TRUE.)
+    ! (NEEDS FIXING TO HANDLE CASE WHEN LNPGAS_FLAG = .true.)
 
     call solve_eos_given_PgasT( &
          s, k, xa, &
@@ -932,7 +932,7 @@ contains
          logRho, res, d_dlnd, d_dlnT, d_dxa, &
        ierr)
     if (ierr /= 0) then
-       if (DEBUG) write(*,*) 'Non-zero return from solve_eos_given_PgasT in eval_eos/predictive_mix'
+       if (dbg) write(*,*) 'Non-zero return from solve_eos_given_PgasT in eval_eos/predictive_mix'
        return
     endif
 
