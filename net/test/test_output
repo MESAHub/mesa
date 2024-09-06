@@ -9,7 +9,7 @@
 
                                  eps_nuc     0.839654151E+13
 
-                            d_lneps_dlnT         9.328757835
+                            d_lneps_dlnT         9.328757799
                           d_lneps_dlnRho         1.009292766
 
 
@@ -34,7 +34,7 @@
 
                                  eps_nuc     0.302124143E+11
 
-                            d_lneps_dlnT        11.356884345
+                            d_lneps_dlnT        11.356884263
                           d_lneps_dlnRho         1.015667220
 
 
@@ -59,7 +59,7 @@
 
                                  eps_nuc     0.835361769E+13
 
-                            d_lneps_dlnT         9.326560302
+                            d_lneps_dlnT         9.326560266
                           d_lneps_dlnRho         1.009292884
 
 
@@ -84,7 +84,7 @@
 
                                  eps_nuc     0.536017372E+09
 
-                            d_lneps_dlnT        11.559205087
+                            d_lneps_dlnT        11.559204995
                           d_lneps_dlnRho         1.013842798
 
 
@@ -109,7 +109,7 @@
 
                                  eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.253424018
+                            d_lneps_dlnT        -0.253423995
                           d_lneps_dlnRho         1.008418067
 
 
@@ -151,7 +151,7 @@
 
                                  eps_nuc     0.150660462E+25
 
-                            d_lneps_dlnT        -0.253424018
+                            d_lneps_dlnT        -0.253423995
                           d_lneps_dlnRho         1.008418067
 
 
@@ -194,22 +194,22 @@
  test_one_zone_burn_small_net
                                       number of species          21
                                  large final abundances    1.0000000000000000D-02
-                                                    c12           1    9.8714342254068388D-01
-                                                    he4           2    1.2802186836379657D-02
+                                                    c12           1    9.8714342283429213D-01
+                                                    he4           2    1.2802186549072116D-02
 
-                                                   xsum    1.0000000000006330D+00
+                                                   xsum    1.0000000000005884D+00
 
 
  test_one_zone_burn_const_P
                                       number of species          21
                                  large final abundances    1.0000000000000000D-02
-                                                    o16           1    7.1798810044269901D-01
-                                                   si28           2    1.6142410416068431D-01
-                                                    s32           3    6.0439378324441878D-02
-                                                   ar36           4    2.9692711889885499D-02
-                                                   ca40           5    1.6560528697491497D-02
+                                                    o16           1    7.1798810044342576D-01
+                                                   si28           2    1.6142410415591074D-01
+                                                    s32           3    6.0439378327695317D-02
+                                                   ar36           4    2.9692711893868861D-02
+                                                   ca40           5    1.6560528702226556D-02
 
-                                                   xsum    1.0000000000000000D+00
+                                                   xsum    1.0000000000000002D+00
 
 
 

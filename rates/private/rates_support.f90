@@ -167,17 +167,14 @@
             
             do i = r1,r2
             
-               rate_raw(i) =  &
-                     (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
-                           dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
-                              ) * dtab(i)
+            rate_raw(i) = exp10(rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
+            dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) ) * dtab(i)
 
-               rate_raw_dRho(i) = rate_raw(i) * ddtab(i) / dtab(i)
+            ! Derivative with respect to density (dRho)
+            rate_raw_dRho(i) = rate_raw(i) * (ddtab(i) / dtab(i))
 
-               rate_raw_dT(i) =  &
-                     (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) +   &
-                           1.5d0*dt*rattab_f(4,k,i)) &
-                              ) * dtab(i) / (btemp * ln10)
+            ! Derivative with respect to temperature (dT)
+            rate_raw_dT(i) = rate_raw(i) * (rattab_f(2,k,i) + 2*dt*rattab_f(3,k,i) + 3*dt**2*rattab_f(4,k,i)) / (btemp)
 
             end do
             
@@ -201,7 +198,7 @@
          integer, intent(out) :: ierr
          
          integer :: i, j, operr, num_to_add_to_cache,thread_num
-         real(dp) :: logT, btemp
+         real(dp) :: logT, btemp, rate_logR
          real(dp), pointer ::  work1(:)=>null(), f1(:)=>null(), rattab_f(:,:,:)=>null()
          integer, pointer :: reaction_id(:) =>null()
          real(dp), allocatable, target :: work(:,:)
@@ -211,7 +208,7 @@
          include 'formats'
          
          ierr = 0
-         
+         rate_logR = 0
          rattab_f(1:4,1:nrattab,1:num_reactions) =>  &
                rattab_f1(1:4*nrattab*num_reactions)
          
@@ -282,6 +279,20 @@
                      write(*, '(a,i4,2x,a)') 'missing raw rate for ',  &
                         j, trim(reaction_Name(reaction_id(j)))
                      a_okay = .false.
+                  else
+                    ! **New Addition: Store the logarithm of the rate**
+                      if (rattab(j, i) > 0.0_dp) then  ! Only take log of positive values
+                          rate_logR = log10(rattab(j, i))
+                      else if (rattab(j, i) == 0.0_dp) then
+                          rate_logR = -999
+                      else
+                          ! warning for rates set to -1
+                          ! like rni56ec_to_co56,rco56ec_to_fe56
+                          !write(*, '(a,i4,2x,a)') 'Warning: non-positive value for rate in ',  &
+                          !   j, trim(reaction_Name(reaction_id(j)))
+                          rate_logR = rattab(j, i) ! don't convert to log space.
+                      end if
+                      rattab(j, i) = rate_logR  ! Store value in rattab
                   end if
                end do
                if (.not. a_okay) all_okay = .false.
