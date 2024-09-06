@@ -144,7 +144,7 @@
       
       real(dp) :: starting_logT
       
-      logical :: dbg = .false.
+      logical, parameter :: dbg = .false.
       
       
       contains

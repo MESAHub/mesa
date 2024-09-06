@@ -106,7 +106,7 @@
          ! stop seaching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer :: ierr
-         real(dp) :: expected_root = 0.74800611d0
+         real(dp), parameter :: expected_root = 0.74800611d0
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:) ! (lipar)
