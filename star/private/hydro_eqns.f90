@@ -405,7 +405,7 @@
 
             integer :: i_var, i_var_sink
 
-            real(dp) :: dxa_threshold = 1d-4
+            real(dp), parameter :: dxa_threshold = 1d-4
 
             logical, parameter :: checking = .true.
 

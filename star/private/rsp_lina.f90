@@ -944,7 +944,7 @@
                  WORKx,4*NZN3,INFO)         
       if(INFO/=0)then
          write(*,*) 'FAILED!'
-         write(*,*) 'LAPACK/DGEEV error, ier= ',INFO
+         write(*,*) 'LAPACK/DGEEV error, ierr= ',INFO
          ierr = -1
          return
          stop

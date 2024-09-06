@@ -61,7 +61,7 @@ contains
     integer, allocatable, intent(out) :: k_b(:)
     logical, intent(in)               :: include_last_face
 
-    logical, parameter :: DEBUG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp) :: grad_mu(s%nz)
     logical  :: mask(s%nz)
@@ -102,13 +102,13 @@ contains
 
           call qsort(i, s%nz, -ABS(grad_mu))
 
-          mask(i(n_mk+1:)) = .FALSE.
+          mask(i(n_mk+1:)) = .false.
 
        endif
 
     else
        
-       mask = .FALSE.
+       mask = .false.
 
     endif
 
@@ -131,7 +131,7 @@ contains
           sg = sg + 1
           k_a(sg) = k
 
-          if (DEBUG) then
+          if (dbg) then
              write(*, 100) k, grad_mu(k)
 100          format('placing double point at k=', I6, 1X, '(grad_mu=', 1PE10.3, ')')
           endif

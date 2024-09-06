@@ -113,7 +113,7 @@ contains
 
     real(dp) :: decay, capture, nu, decay_nu, capture_nu
 
-    logical :: dbg = .false.
+    logical, parameter :: dbg = .false.
 
     logT = log10(T9) + 9d0
 
