@@ -1,6 +1,6 @@
 c
-c ***********************************************************
-c
+! ***********************************************************
+!
       subroutine slvseu(n,fjac,ldjac,mljac,mujac,fmas,ldmas,mlmas,mumas,
      &          m1,m2,nm1,fac1,e,lde,ip,iphes,del,ijob,
      &          mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag,
@@ -8,7 +8,7 @@ c
      &          caller_id, nvar, nz, lblk, dblk, ublk,
      &          nzmax,isparse,ia,ja,sa,
      &          lrd,rpar_decsol,lid,ipar_decsol,ier)
-      implicit real*8 (a-h,o-z)
+      implicit real(dp) (a-h,o-z)
       interface
 #include "mtx_decsol.dek"
 #include"mtx_decsols.dek"
@@ -28,8 +28,8 @@ c
       integer, pointer :: ip(:) ! (nm1)
       dimension fjac(ldjac,n),fmas(ldmas,nm1)
       dimension iphes(n)
-c      common/linal/mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag
-c
+!     common/linal/mle,mue,mbjac,mbb,mdiag,mdiff,mbdiag
+!
 
       ier = 0
       if (nvar > 0) then
@@ -39,11 +39,11 @@ c
       end if
       
       goto (1,2,1,2,1,55,55,8,8,55,11,12,11,12,11), ijob
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    1  continue
-c ---  b=identity, jacobian a full matrix
+! ---  b=identity, jacobian a full matrix
       
         ! write(*,*) 'rhs(1)', del(1)
         ! write(*,*) 'rhs(2)', del(2)
@@ -52,25 +52,25 @@ c ---  b=identity, jacobian a full matrix
         ! write(*,*) 'del(2)', del(2)
         ! write(*,*)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    2  continue
-c ---  b=identity, jacobian a banded matrix
+! ---  b=identity, jacobian a banded matrix
       call decsol(1,n,lde,e,mle,mue,del,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    8  continue
-c ---  b=identity, jacobian a sparse matrix
+! ---  b=identity, jacobian a sparse matrix
       call decsols(1,n,nzmax,ia,ja,sa,del,lrd,rpar_decsol,lid,ipar_decsol,ier)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   11  continue
-c ---  b=identity, jacobian a full matrix, second order
+! ---  b=identity, jacobian a full matrix, second order
       mm=m1/m2
       do j=1,m2
          sum=0.d0
@@ -89,11 +89,11 @@ c ---  b=identity, jacobian a full matrix, second order
          del(i)=(del(i)+del(m2+i))/fac1
       end do
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   12  continue
-c ---  b=identity, jacobian a banded matrix, second order
+! ---  b=identity, jacobian a banded matrix, second order
       mm=m1/m2
       do j=1,m2
          sum=0.d0
@@ -112,13 +112,13 @@ c ---  b=identity, jacobian a banded matrix, second order
          del(i)=(del(i)+del(m2+i))/fac1
       end do
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   55  continue
        write(*,*) 'slvseu: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! slvseu
       end subroutine slvseu
-c
-c     end of subroutine slvseu
-c
+!
+!    end of subroutine slvseu
+!

@@ -18,7 +18,7 @@
       real(dp), pointer, intent(out) :: sig(:,:,:)
       real(dp), pointer, intent(out):: epatom(:,:),amamu(:),eumesh(:,:,:)
 
-      integer :: n, m, ke, ik
+      integer :: n, m, ke
       CHARACTER(LEN=72) :: FMT
       integer :: nel, nptot, np
       parameter(nel = 17, nptot = 10000, np=1648) !number of elements and number of u-mesh points.

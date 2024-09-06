@@ -26,7 +26,8 @@
       module interp_1d_misc
       
       use const_lib, only: dp
-
+      use auto_diff
+      
       implicit none
       
       contains
@@ -181,7 +182,75 @@
 
    
       end subroutine do_interp_values
+
+      subroutine do_interp_values_autodiff(init_x, nx, f1, nv, x, vals, ierr)
+         type(auto_diff_real_2var_order1), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx ! length of init_x vector
+         type(auto_diff_real_2var_order1), intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv ! length of new x vector and vals vector
+         type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+            ! strictly monotonic in same way as init_x
+            ! values out of range of init_x's are clipped to boundaries of init_x's
+         type(auto_diff_real_2var_order1), intent(inout) :: vals(:) ! (nv)
+         integer, intent(out) :: ierr ! 0 means aok
+   
+         integer :: k_old, k_new
+         type(auto_diff_real_2var_order1) :: xk_old, xkp1_old, xk_new, delta
+         logical :: increasing
+         type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         
+         ierr = 0
+         
+         if (nx == 1) then            
+            vals(1:nv) = f1(1)
+            return
+         end if
+
+         f(1:4,1:nx) => f1(1:4*nx)
+
+         if(init_x(1) < init_x(nx)) then
+            increasing = .true.
+         end if
+         
+         k_old = 1; xk_old = init_x(k_old); xkp1_old = init_x(k_old+1)
+                  
+         do k_new = 1, nv
       
+            xk_new = x(k_new)
+            if (increasing) then
+               if (xk_new > init_x(nx)) then
+                  xk_new = init_x(nx)
+               else if (xk_new < init_x(1)) then
+                  xk_new = init_x(1)
+               end if
+            else ! decreasing
+               if (xk_new < init_x(nx)) then
+                  xk_new = init_x(nx)
+               else if (xk_new > init_x(1)) then
+                  xk_new = init_x(1)
+               end if
+            end if
+            do while ((increasing .and. xk_new > xkp1_old) .or. ((.not. increasing) .and. xk_new < xkp1_old))
+               k_old = k_old + 1
+               if (k_old >= nx) then
+                  k_old = k_old - 1
+                  xk_new = xkp1_old
+                  exit
+               end if
+               xk_old = xkp1_old
+               xkp1_old = init_x(k_old+1)
+            end do
+         
+            delta = xk_new - xk_old
+         
+            vals(k_new) =  &
+                  f(1, k_old) + delta*(f(2, k_old)  &
+                     + delta*(f(3, k_old) + delta*f(4, k_old)))
+            
+         end do
+
+   
+      end subroutine do_interp_values_autodiff
       
       subroutine do_interp_values_and_slopes(init_x, nx, f1, nv, x, vals, slopes, ierr)
          real(dp), intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
@@ -576,10 +645,10 @@
          call minmod(z, n, z, f3)
          call minmod(z, n, z, f4)
       end subroutine minmod4
-      
-      
+
+
       subroutine median(z, n, f1, f2, f3)
-         real(dp), intent(inout) :: z(:)     
+         real(dp), intent(inout) :: z(:)
          integer, intent(in) :: n       ! length of vectors
          real(dp), intent(in) :: f1(:), f2(:), f3(:)
          real(dp), target :: tmp1_ary(n), tmp2_ary(n)
@@ -591,6 +660,63 @@
          call minmod(z(1:n), n, tmp1(1:n), tmp2(1:n))
          z(1:n) = z(1:n) + f1(1:n)
       end subroutine median
+
+
+      type(auto_diff_real_2var_order1) function minmod1_autodiff(f1, f2)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(in) :: f1, f2
+         minmod1_autodiff = 0.5d0 * (sign(f1) + sign(f2)) * min(abs(f1), abs(f2))
+      end function minmod1_autodiff
+
+
+      type(auto_diff_real_2var_order1) function median1_autodiff(f1, f2, f3)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(in) :: f1, f2, f3
+         median1_autodiff = f1 + minmod1_autodiff(f2 - f1, f3 - f1)
+      end function median1_autodiff
+
+
+      subroutine minmod_autodiff(z, n, f1, f2)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         integer :: k
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:)
+         do k =1, n
+         z(k) = 0.5d0 * (sign(f1(k)) + sign(f2(k))) * min(abs(f1(k)), abs(f2(k)))
+         end do
+      end subroutine minmod_autodiff
+
+      subroutine minmod4_autodiff(z, n, f1, f2, f3, f4)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:), f3(:), f4(:)
+         call minmod_autodiff(z, n, f1, f2)
+         call minmod_autodiff(z, n, z, f3)
+         call minmod_autodiff(z, n, z, f4)
+      end subroutine minmod4_autodiff
+
+
+      subroutine median_autodiff(z, n, f1, f2, f3)
+         use auto_diff
+         type(auto_diff_real_2var_order1), intent(inout) :: z(:)
+         integer, intent(in) :: n       ! length of vectors
+         integer :: k
+         type(auto_diff_real_2var_order1), intent(in) :: f1(:), f2(:), f3(:)
+         type(auto_diff_real_2var_order1), target :: tmp1_ary(n), tmp2_ary(n)
+         type(auto_diff_real_2var_order1), pointer :: tmp1(:), tmp2(:)
+         tmp1 => tmp1_ary
+         tmp2 => tmp2_ary
+         do k =1,n
+         tmp1(k) = f2(k) - f1(k)
+         tmp2(k) = f3(k) - f1(k)
+         end do
+         call minmod_autodiff(z, n, tmp1, tmp2)
+         do k =1,n
+         z(k) = z(k) + f1(k)
+         end do
+      end subroutine median_autodiff
 
 
       end module interp_1d_misc

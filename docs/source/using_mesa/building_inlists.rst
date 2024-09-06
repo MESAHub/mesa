@@ -14,7 +14,7 @@ In this section of the inlist, you'll have to make choices for which atmosphere 
 You will also specify here some information about your starting model, and about the output of the evolution.
 Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`. 
 
-starting model
+Starting model
 --------------
 
 To start an evolution you can either create a pre main sequence model and start from there (case 1) or you can start from a previously calculated model (case 2). In the latter case, it is highly recommended to start from a model which was calculated with the same MESA version as the one used for the subsequent evolution.
@@ -31,7 +31,7 @@ Case 2:
    :start-after: ! Start Case 2
    :end-before: ! Output history
 
-output
+Output
 ------
 
 There are a number of controls to specify what we want as MESA outputs.
@@ -58,14 +58,14 @@ You can also use pre-defined chemical compositions based on published data. Thes
 By default, the initial composition in MESA is ``initial_zfracs = 3`` which corresponds to the `GS98 <https://link.springer.com/article/10.1023%2FA%3A1005161325181>`__ metal fraction. There are 8 possible predefined choices for this control in MESA.
 
 If you want for example to use the more recent available solar composition given in `AGSS09 <https://www.annualreviews.org/doi/pdf/10.1146/annurev.astro.46.060407.145222>`__ , you need to set ``initial_zfracs = 6``.
-Since it is very important to use the opacity tables which are built using the solar composition used, we also have to set the ``kappa_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
+Since it is very important to use the opacity tables which are built using the solar composition used, we also have to set the ``kap_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
 
 .. literalinclude:: inlist_example
    :start-after: ! Modifications to model
    :end-before: ! Nuclear reactions
 
 
-nuclear reactions
+Nuclear reactions
 -----------------
 
 Choice of network of nuclear reactions. This network should be chosen according to the physics to be studied. Choosing a very comprehensive set of nuclear reactions when studying main sequence evolution is not necessary and will slow down the computation considerably. It would however be essential when studying advanced burning stages of evolution. The description of the available nuclear reactions networks in MESA is given in the README file in ``$MESA_DIR/data/net_data``. The default reactions network used by MESA is ``basic.net``.

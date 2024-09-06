@@ -189,7 +189,7 @@
             write(iounit, fmt='(i5, 1x)', advance='no') k
             call write1(s% lnd(k),ierr); if (ierr /= 0) exit
             call write1(s% lnT(k),ierr); if (ierr /= 0) exit
-            call write1(s% lnR(k),ierr); if (ierr /= 0) exit            
+            call write1(s% lnR(k),ierr); if (ierr /= 0) exit
             if (RSP_flag) then
                call write1(s% RSP_Et(k),ierr); if (ierr /= 0) exit
                call write1(s% erad(k),ierr); if (ierr /= 0) exit
@@ -198,7 +198,7 @@
                call write1(s% w(k),ierr); if (ierr /= 0) exit
                call write1(s% Hp_face(k),ierr)
                if (ierr /= 0) exit
-            end if            
+            end if
             call write1(s% L(k),ierr); if (ierr /= 0) exit
             call write1(s% dq(k),ierr); if (ierr /= 0) exit
             if (v_flag) then

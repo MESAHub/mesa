@@ -120,11 +120,11 @@
       real(dp) :: S1, S1H, S1DH, S1DHH, S1DG, S1DHG
       real(dp) :: B2, B2DH, B2DHH, SQGE, B3, B3DH, B3DHH
       real(dp) :: S2, S2H, S2DH, S2DHH, S2DG, S2DGG, S2DHG
-      real(dp) :: R3, R3H, R3DH, R3DHH, R3DG, R3DGG, R3DHG
+      real(dp) :: R3, R3DH, R3DHH, R3DG, R3DGG, R3DHG
       real(dp) :: S3, S3DH, S3DHH, S3DG, S3DGG, S3DHG
       real(dp) :: B4, B4DH, B4DHH
       real(dp) :: C4, C4DH, C4DHH, C4DG, C4DGG, C4DHG
-      real(dp) :: S4A, S4AH, S4ADH, S4ADHH, S4ADG, S4ADGG, S4ADHG
+      real(dp) :: S4A, S4AH, S4ADH, S4ADHH
       real(dp) :: S4B, S4BDH, S4BDHH, UP1, DN1, UP2, DN2
       real(dp) :: S4C, S4CDH, S4CDHH, S4CDG, S4CDGG, S4CDHG
       real(dp) :: S4, S4DH, S4DHH, S4DG, S4DGG, S4DHG

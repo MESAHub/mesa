@@ -56,7 +56,6 @@ contains
   function new_weaklib_rate_table(T9s, lYeRhos)
     real(dp), intent(in), dimension(:) :: T9s, lYeRhos
     type(weaklib_rate_table) :: new_weaklib_rate_table
-    integer :: N
 
     new_weaklib_rate_table% num_T9 = size(T9s)
     allocate(new_weaklib_rate_table% T9s(new_weaklib_rate_table% num_T9))
@@ -206,7 +205,6 @@ contains
     real(dp) :: yp, ypi, yp2, ypi2, cy, cyi, hy2, cyd, cydi, hy, hyi
 
     real(dp) :: delta_T9, dT9, dlYeRho, delta_lYeRho, y_alfa, y_beta, x_alfa, x_beta
-    integer :: iT9, ilYeRho
 
     real(dp) :: ldecay, d_ldecay_dT9, d_ldecay_dlYeRho, &
          lcapture, d_lcapture_dT9, d_lcapture_dlYeRho, &
@@ -275,8 +273,7 @@ contains
   contains
 
     subroutine find_location ! set ix, jy; x is T9; y is lYeRho
-      integer i, j
-      real(dp) :: del
+      integer :: i, j
       include 'formats'
       ! x0 <= T9 <= x1
       ix = table % num_T9-1 ! since weak_num_T9 is small, just do a linear search
@@ -302,8 +299,6 @@ contains
     end subroutine find_location
 
     subroutine setup_for_bicubic_interpolations
-      integer i, j
-      real(dp) :: del
 
       include 'formats'
 

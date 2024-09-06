@@ -72,9 +72,8 @@
 
          integer :: nz, k
          real :: xmin, xmax, ymin, ymax, xpos, ypos, dx, dy, &
-            txt_scale, vpxmin, vpxmax, vpymin, vpymax, vpymargin, vpwinheight, lgT1, lgT2
+            txt_scale, lgT1, lgT2
          real, allocatable, dimension(:) :: xvec, yvec
-         character (len=128) :: str
          real, parameter :: lgrho1 = -8, lgrho2 = 5
 
          include 'formats'
@@ -264,7 +263,7 @@
 
 
          subroutine do_kap_regions
-            real :: logT_lo, logT_hi, logT_max, logR, logRho_lo, logRho_hi, logRho_min
+            real :: logT_lo, logT_hi, logT_max
             real, parameter :: min_logR_for_freedman = 1
             real, parameter :: freg_blend_logT2 = 4.10
             real, parameter :: freg_blend_logT1 = 3.93
@@ -329,7 +328,6 @@
 
 
          subroutine do_eos_regions
-            integer :: ierr
             real :: logRho0, logRho1, logRho2, logRho3, logRho4, logRho5, logRho6
             real :: logT1, logT2, logT3, logT4, logT5, logT6
 

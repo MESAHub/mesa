@@ -192,7 +192,7 @@
          subroutine read_reaclib_cache(io,ios)
             integer, intent(in) :: io
             integer, intent(out) :: ios
-            integer :: i,n            
+            integer :: n            
             ios = 0
             read(io,iostat=ios) nreaclib
             if (ios /= 0) return
@@ -211,7 +211,7 @@
          
          subroutine write_reaclib_cache(io)
             integer, intent(in) :: io
-            integer :: i, n
+            integer :: n
             write(io) nreaclib
             n = nreaclib
             write(io) &
@@ -230,7 +230,7 @@
 
       subroutine extract_rates_from_reaclib(reaclib,nreaclib,nuclides,rates,set,use_weaklib,ierr)
          use chem_def, only: &
-            nuclide_set, nuclide_not_found, del_Mp, del_Mn, &
+            nuclide_set, nuclide_not_found, &
             ipp, icno, i3alf, i_burn_c, i_burn_n, i_burn_o, i_burn_ne, i_burn_na, i_burn_mg, &
             i_burn_si, i_burn_s, i_burn_ar, i_burn_ca, i_burn_ti, i_burn_cr, i_burn_fe, icc, &
             ico, ioo, iphoto, iother
@@ -247,7 +247,7 @@
          type(reaction_data) :: r ! temporary storage
          integer :: i,j,l,count,loc_count,nt,indx,cat, &
             weaklib_count,chapter,num_in,num_out,num_skip_for_weaklib,num_from_reaclib, &
-            max_lhs_Z, min_Z, i1, i2, cid_in, cid_out
+            max_lhs_Z, min_Z
          logical :: include_this_rate, already_included_from_weaklib, found_it, is_weak
          integer, dimension(max_species_per_reaction) :: pspecies
          character(len=max_id_length) :: handle
@@ -662,7 +662,6 @@
 
       ! Fowler, Caughlan, Zimmerman, Annual Review Astro. Astrophys., 1975.12:69-112. eqn (1).
       real(dp) function neutrino_Q(b1, b2)
-         use chem_def, only: chem_isos
          real(dp), intent(in) :: b1, b2
          real(dp) :: sum, sum2
          sum    = b2 - b1 - 0.782d0 - 1.022d0

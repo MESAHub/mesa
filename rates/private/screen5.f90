@@ -124,7 +124,7 @@
                        tau12, tau12dt, alph12, alph12dt, alph12dd,  &
                        xlgfac, dxlgfacdt, dxlgfacdd,  &
                        gamp14, gamp14dt, gamp14dd, h12x, dh12xdt, dh12xdd,  &
-                       gamefx, gamefs, alfa, beta, temp, den, zbar, abar, z2bar,&
+                       gamefx, gamefs, temp, den, zbar, abar, z2bar,&
                        dgamma
 
 !..screening variables

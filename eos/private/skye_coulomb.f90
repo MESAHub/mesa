@@ -49,9 +49,9 @@ module skye_coulomb
 
       integer :: IX
       integer :: LIQSOL
-      real(dp) :: Zion, Zmean, Z2mean, Z52, Z53, Z321, norm
+      real(dp) :: Zmean, Z2mean, Z52, Z53, Z321
       type(auto_diff_real_2var_order3) :: GAME, RS, DENS, Smix, F_phase_independent
-      type(auto_diff_real_2var_order3) :: kT, dF_sol, dF_liq, latent_S, min_S
+      type(auto_diff_real_2var_order3) :: kT, dF_sol, dF_liq
 
       ! Compute various mean charge quantities
       Zmean=0d0
@@ -211,7 +211,7 @@ module skye_coulomb
       character(len=128), intent(in) :: Skye_solid_mixing_rule
 
       ! Intermediates and constants
-      integer :: i,j
+      integer :: i
       type(auto_diff_real_2var_order3) :: FMIX, f
       real(dp), parameter :: TINY=1.d-7
 

@@ -56,11 +56,11 @@
          logical, intent(out), dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
 
-         integer :: j, k, other_ierr
+         integer :: j, k
          logical, parameter :: dbg = .false.
          real(dp), allocatable, dimension(:) :: src
          real(dp) :: eps_min_for_delta, &
-               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on, alfa_czb
+               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on
          real(dp), dimension(:,:), pointer :: gvals
 
          gvals(1:nz,1:num_gvals) => gvals1(1:nz*num_gvals)
@@ -290,7 +290,7 @@
            ! 0.5 < alfa < 1 : linear (coeff_start -> 1)
 
            beta = 2d0 * (alfa - 0.5d0)
-           if (beta .lt. 0d0) then
+           if (beta < 0d0) then
               coef = coef_start
            else
               coef = coef_start*(1d0 - beta) + beta

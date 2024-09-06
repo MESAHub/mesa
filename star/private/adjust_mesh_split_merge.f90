@@ -86,20 +86,19 @@
 
 
       subroutine amr(s,ierr)
-         use chem_def, only: ih1
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
          use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall, dr, minE
-         real(dp) :: grad_xa(s% species), cell_time, test_dr, new_xa(s% species), &
+         real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall
+         real(dp) :: grad_xa(s% species), new_xa(s% species), &
             tau_center, r00
-         integer :: iTooBig, iTooSmall, iter, k, k0, species, &
-            nz, i_h1, num_split, num_merge, nz_old
+         integer :: iTooBig, iTooSmall, iter, k, species, &
+            nz, num_split, num_merge, nz_old
          include 'formats'
          species = s% species
          nz_old = s% nz
-         ierr = 0         
+         ierr = 0
          num_split = 0
          num_merge = 0
          MaxTooSmall = s% split_merge_amr_MaxShort
@@ -254,13 +253,13 @@
          real(dp), intent(out) :: TooBig, TooSmall
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
-            oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
+            oversize_ratio, undersize_ratio, abs_du_div_cs, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
             du_div_cs_limit_flag
-         integer :: nz, nz_baseline, k, kmin, nz_r_core
+         integer :: nz, nz_baseline, k, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
 
          include 'formats'
@@ -270,7 +269,7 @@
          flipped_hydrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
-         nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_baseline = s% split_merge_amr_nz_baseline
          nz_r_core = s% split_merge_amr_nz_r_core
          if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
             nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
@@ -484,24 +483,21 @@
          real(dp), intent(inout) :: new_xa(species)
          integer, intent(out) :: ierr
          logical :: merge_center
-         integer :: i, ip, i0, im, k, q, nz, qi_max, qim_max, op_err
-         real(dp) :: max_lgT_diff, max_lgrho_diff
+         integer :: i, ip, i0, im, q, nz, qi_max, qim_max
          real(dp) :: &
-            rR, rL, drR, drL, rC, rho, P, v, &
-            dm, dm_i, dm_ip, m_old, star_PE0, star_PE1, &
-            cell_mom, cell_ie, cell_etrb, min_IE, d_IE, d_KE, d_Esum, &
+            drR, drL, v, &
+            dm, dm_i, dm_ip, star_PE0, star_PE1, &
+            cell_ie, cell_etrb, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
-            Esum, KE, PE, IE, Esum1, KE1, PE1, IE1, &
-            Etot0, KEtot0, PEtot0, IEtot0, &
-            Etot1, KEtot1, PEtot1, IEtot1, &
-            vt_i, vt_ip, j_rot_new, j_rot_p1_new, J_old, &
+            KE, &
+            j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
             dmbar_new, dmbar_p1_new
          include 'formats'
 
          ierr = 0
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
@@ -525,7 +521,7 @@
             end if
          end if
 
-         merge_center = (i == nz)         
+         merge_center = (i == nz)
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
@@ -700,7 +696,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
          integer :: k
-         real(dp) :: frac, r, star_PE, new_frac
+         real(dp) :: frac
          include 'formats'
          if (star_PE1 == 0d0 .or. star_PE0 == star_PE1) return
          frac = star_PE1/star_PE0
@@ -821,24 +817,22 @@
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
          integer, intent(out) :: ierr
          integer :: i, ip, j, jp, q, nz, nz_old, &
-            iR, iC, iL, imin, imax, op_err
+            iR, iC, iL
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
             rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
             v, v2, energy, v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
-            sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, got_cell_Esum, &
-            got_cell_Esum_R, got_cell_KE_R, got_cell_PE_R, got_cell_IE_R, &
-            got_cell_Esum_L, got_cell_KE_L, got_cell_PE_L, got_cell_IE_L, &
+            sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
-         logical :: okay, done, use_new_grad_rho
+         logical :: done, use_new_grad_rho
          include 'formats'
 
          ierr = 0
          star_PE0 = get_star_PE(s)
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          nz = s% nz
          s% num_hydro_splits = s% num_hydro_splits + 1
          done = .false.
@@ -891,7 +885,7 @@
             write(*,2) 'tauR', i, tauR
             write(*,2) 'nz', nz
             call mesa_error(__FILE__,__LINE__,'do_split')
-            !$omp end critical (adjust_mesh_split_merge_crit1)         
+            !$omp end critical (adjust_mesh_split_merge_crit1)
          end if
                  
          dr = rR - rL
@@ -980,7 +974,7 @@
             v_R = s% u(iR)
             v2_R = v_R*v_R
             v_C = s% u(iC)
-            v2_C = v_C*v_C         
+            v2_C = v_C*v_C
             v_L = s% u(iL)
             v2_L = v_L*v_L
             if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
@@ -1111,7 +1105,7 @@
                write(*,2) 'rho_L', iC, rho_L
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'failed in do_split extrapolation of density from above')
-   !$omp end critical  (adjust_mesh_split_merge_crit2)        
+   !$omp end critical  (adjust_mesh_split_merge_crit2)
             end if
          
          end if
@@ -1332,7 +1326,7 @@
          integer, intent(in) :: i, species
          real(dp) :: new_xa(species)
          integer, intent(out) :: ierr
-         real(dp) :: rho, logRho, new_lnT, revised_energy, xsum
+         real(dp) :: rho, logRho, new_lnT, revised_energy
          integer :: q
          include 'formats'
          ierr = 0
@@ -1399,7 +1393,6 @@
       real(dp) function total_KE(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: v0, v1
          include 'formats'
          total_KE = 0
          if (s% u_flag) then
@@ -1437,7 +1430,7 @@
       real(dp) function total_IE(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: specific_ie, egas
+         real(dp) :: specific_ie
          total_IE = 0
          do k=1,s% nz
             specific_ie = s% energy(k)

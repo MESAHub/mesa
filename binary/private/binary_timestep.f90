@@ -39,7 +39,7 @@
       subroutine set_star_timesteps(b) ! sets the smallest next timestep for all stars
          type (binary_info), pointer :: b
          integer :: i, l
-         real(dp) :: dt_min, rel_overlap
+         real(dp) :: dt_min
          type (star_info), pointer :: s
          integer :: ierr, num_stars
          ierr = 0

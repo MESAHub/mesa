@@ -24,8 +24,9 @@ center of the model.  The properties of this initial model can be
 controlled from the inlist.
 
 .. literalinclude:: ../../../star/test_suite/conductive_flame/inlist_conductive_flame
+   :language: fortran
    :start-after: ! use our own routine to build the model
-   :lines: 1-11
+   :end-at: x_ctrl(8)
 
 The inner boundary is at r = 0.  The outer boundary has a fixed
 temperature and a fixed pressure equal to the initial pressure of the
@@ -47,7 +48,14 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 
 
 
-.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000427.png
+.. image:: ../../../star/test_suite/conductive_flame/docs/grid1000597.png
+   :width: 100%
+
+pgstar commands used for the plots above:
+
+.. literalinclude:: ../../../star/test_suite/conductive_flame/inlist_pgstar
+  :language: console
+
 
 .. |Timmes1992| replace:: `Timmes & Woosley (1992) <https://ui.adsabs.harvard.edu/abs/1992ApJ...396..649T/abstract>`__
 
@@ -58,3 +66,4 @@ routine ``flame_properties`` in the ``run_star_extras.f90``.
 
 Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab, + documentation 2024-01-22 EbF
 
+Last-Run: 06Aug2024 (MESA 1adbf1aa) by pmocz on C916PXT6XW in 327 seconds using 8 threads.

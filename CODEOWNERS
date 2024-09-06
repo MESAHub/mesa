@@ -24,10 +24,10 @@ linters/
 turb/ 
 math/ @rhdtownsend
 mtx/  @mjoyceGR
-net/ @fxt44
-neu/ @fxt44
+net/ @fxt44 @Debraheem
+neu/ @fxt44 @Debraheem
 num/ 
-rates/ @fxt44
+rates/ @fxt44 @Debraheem
 #star/
 #star_data/
 #stella/ 
@@ -56,7 +56,7 @@ star/test_suite/adjust_net
 star/test_suite/c13_pocket @fxt44
 star/test_suite/carbon_kh @evbauer
 star/test_suite/cburn_inward 
-star/test_suite/ccsn_IIp @fxt44
+star/test_suite/ccsn_IIp @fxt44 @aurimontem
 star/test_suite/check_redo @fxt44
 star/test_suite/check_pulse_atm @warrickball
 star/test_suite/conductive_flame @fxt44 
@@ -89,7 +89,7 @@ star/test_suite/make_he_wd @evbauer @fxt44
 star/test_suite/make_metals @fxt44
 star/test_suite/make_o_ne_wd @fxt44 @evbauer
 star/test_suite/make_planets @fxt44
-star/test_suite/make_pre_ccsn_13bvn @Debraheem
+star/test_suite/make_pre_ccsn_13bvn @Debraheem @aurimontem
 star/test_suite/make_sdb @evbauer
 star/test_suite/make_zams @fxt44
 star/test_suite/make_zams_low_mass @fxt44
