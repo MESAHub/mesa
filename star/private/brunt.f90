@@ -330,7 +330,6 @@
                write(*,2) 'lnP1', k, lnP1
                write(*,2) 'lnP2', k, lnP2
                write(*,'(A)')
-               !call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)

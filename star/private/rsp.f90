@@ -680,8 +680,8 @@
          if (s% dt > max_dt) then
             if (s% RSP_report_limit_dt) then
                write(*,4) 'limit to RSP_max_dt_times_min_dr_div_cs', s% model_number, max_dt, s% dt
-               call mesa_error(__FILE__,__LINE__,'do1_step 1')
             end if
+            call mesa_error(__FILE__,__LINE__,'do1_step 1')
             s% dt = max_dt
          end if
          

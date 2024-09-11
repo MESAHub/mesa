@@ -11216,7 +11216,7 @@
       ! stop_for_bad_nums
       ! ~~~~~~~~~~~~~~~~~
 
-      ! If true and report_ierr is also true, then stop for bad numbers (NaNs or infinity).
+      ! If true and ``report_ierr`` is also true, then stop for bad numbers (NaNs or infinity).
       ! this replaces old control stop_for_NaNs
 
       ! ::

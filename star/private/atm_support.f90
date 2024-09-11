@@ -532,7 +532,6 @@ contains
        s% retry_message = 'atm get_table: L < 0'
        if (s% report_ierr) then
           write(*,2) 'atm get_table: L < 0', s% model_number, L
-          !call mesa_error(__FILE__,__LINE__)
        end if
        ierr = -1
        return
