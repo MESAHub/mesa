@@ -935,7 +935,6 @@
             do_burn = retry
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
-               !call mesa_error(__FILE__,__LINE__,'do_burn')
             end if
             call restore
             return

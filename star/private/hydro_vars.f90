@@ -890,8 +890,8 @@
                if (L_surf < 0._dp) then
                   if (s% report_ierr) then
                      write(*,2) 'get_surf_PT: L_surf <= 0', s% model_number, L_surf
-                     call mesa_error(__FILE__,__LINE__)
                   end if
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__)
                   s% retry_message = 'L_surf < 0'
                   ierr = -1
                   return
