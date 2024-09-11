@@ -382,6 +382,7 @@ contains
          s% d_eos_dxa(:,:,k), ierr)
     if (ierr /= 0) then
        if (s% report_ierr) then
+          write(*, *) s% retry_message
           write(*,*) 'do_eos_for_cell: get_eos ierr', ierr
        end if
        if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
