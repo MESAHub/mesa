@@ -86,7 +86,7 @@ runs:
     - name: Get SDK ${{ runner.os }} '24.7.1'
       if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  inputs.sdk == '24.7.1') }}
       run: |
-        wget -q http://user.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-24.7.1.tar.gz
+        wget -q https://zenodo.org/records/13768913/files/mesasdk-x86_64-linux-24.7.1.tar.gz
       shell: bash
 
     - name: Unpack SDK ${{ runner.os }} ${{inputs.sdk}}
