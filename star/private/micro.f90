@@ -357,8 +357,8 @@ contains
        if (ierr /= 0) then
           if (s% report_ierr) then
              write(*,*) 'do_eos_for_cell: solve_eos_given_PT ierr', ierr
-             !call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
           end if
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
           return
        end if
 
@@ -382,9 +382,10 @@ contains
          s% d_eos_dxa(:,:,k), ierr)
     if (ierr /= 0) then
        if (s% report_ierr) then
+          write(*, *) s% retry_message
           write(*,*) 'do_eos_for_cell: get_eos ierr', ierr
-          !call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
        end if
+       if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
        return
     end if
 
@@ -404,7 +405,7 @@ contains
        s% solver_call_number == s% solver_test_partials_call_number .and. &
        s% solver_iter == s% solver_test_partials_iter_number) then
        call write_eos_call_info(s,k)
-       call mesa_error(__FILE__,__LINE__,'do_eos_for_cell: write_eos_call_info')
+       if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell: write_eos_call_info')
     end if
 
   contains
@@ -423,9 +424,8 @@ contains
          if (s% report_ierr) then
             call write_eos_call_info(s,k)
             write(*,2) 'store_eos_for_cell failed', k
-            if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
-            return
          end if
+         if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_eos_for_cell')
          return
       end if
 
@@ -465,9 +465,9 @@ contains
              write(*,2) 'd_dlnT ' // trim(eosDT_result_names(i)), k, d_dlnT(i)
              write(*,'(A)')
              call write_eos_call_info(s,k)
-             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
              !$OMP end critical (micro_crit0)
           end if
+          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
           return
        end if
     end do
@@ -493,7 +493,7 @@ contains
     s% grada(k) = res(i_grad_ad)
     s% dE_dRho(k) = res(i_dE_drho)
     s% Cv(k) = res(i_Cv)
-    s% cp(k) = res(i_cp)
+    s% Cp(k) = res(i_Cp)
     s% chiRho(k) = res(i_chiRho)
     s% chiT(k) = res(i_chiT)
     s% gamma1(k) = res(i_gamma1)
@@ -544,7 +544,7 @@ contains
     if (ierr /= 0) then
        if (s% report_ierr) then
           !$OMP critical (micro_crit1)
-          write(*,2) 's% cp(k)', k, s% cp(k)
+          write(*,2) 's% Cp(k)', k, s% Cp(k)
           write(*,2) 's% csound(k)', k, s% csound(k)
           write(*,2) 's% lnPeos(k)', k, s% lnPeos(k)
           write(*,2) 's% gam(k)', k, s% gam(k)
@@ -558,9 +558,9 @@ contains
           write(*,2) 'zbar', k, s% zbar(k)
           write(*,*)
           call write_eos_call_info(s,k)
-          call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
           !$OMP end critical (micro_crit1)
        end if
+       if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'store_eos_for_cell')
        ierr = -1
     end if
 
@@ -636,9 +636,9 @@ contains
           write(*,*) 'do_kap_for_cell: get_kap ierr', ierr
           !$omp critical (star_kap_get)
           call show_stuff()
-          if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
           !$omp end critical (star_kap_get)
        end if
+       if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do_kap_for_cell')
        ierr = -1
        return
     end if
