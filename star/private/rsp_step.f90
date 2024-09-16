@@ -254,8 +254,8 @@
                   write(*,2) 'old dt', s% model_number, s% dt
                   write(*,2) 'reduced dt', s% model_number, dt_max
                   write(*,'(A)')
-                  call mesa_error(__FILE__,__LINE__,'HYD compressing innermost cell')
                end if
+               call mesa_error(__FILE__,__LINE__,'HYD compressing innermost cell')
                s% dt = dt_max
                if (call_is_bad) then
                   if (is_bad(s% dt)) then
