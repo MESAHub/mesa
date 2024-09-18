@@ -62,6 +62,17 @@ jobs:
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
         shell: bash
+        
+      - name: Check Install
+        env:
+          OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
+          NPROCS: ${{env.NPROCS}}
+          MESASDK_ROOT: ${{env.MESASDK_ROOT}}
+          MESA_DIR: ${{env.MESA_DIR}}
+        run: |
+          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+          mesa_test submit --empty
+        shell: bash
 
       - name: Test Problem 13
         env:
@@ -71,7 +82,7 @@ jobs:
           MESA_DIR: ${{env.MESA_DIR}}
         run: |
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          mesa_test test 13
+          mesa_test test 13 --module=star
         shell: bash
 
       - name: Test Problem 15
@@ -82,7 +93,7 @@ jobs:
           MESA_DIR: ${{env.MESA_DIR}}
         run: |
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          mesa_test test 15
+          mesa_test test 15 --module=star
         shell: bash
 
       - name: Test Problem 29
@@ -93,7 +104,7 @@ jobs:
           MESA_DIR: ${{env.MESA_DIR}}
         run: |
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          mesa_test test 29
+          mesa_test test 29 --module=star
         shell: bash
 
       - name: Test Problem 41
@@ -104,5 +115,5 @@ jobs:
           MESA_DIR: ${{env.MESA_DIR}}
         run: |
           source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          mesa_test test 41
+          mesa_test test 41 --module=star
         shell: bash
