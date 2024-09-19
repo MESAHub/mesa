@@ -40,9 +40,7 @@ endif
 # step 3) specify which BLAS and LAPACK libraries to use for mesa/mtx
 
 # these are the standard defaults
-WHICH_LAPACK = USE_SRCS
 LOAD_LAPACK = -lmesalapack
-WHICH_BLAS = USE_SRCS
 LOAD_BLAS = -lmesablas
 MKL_INCLUDE = 
 

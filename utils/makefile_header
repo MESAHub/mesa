@@ -73,9 +73,6 @@ endif
 
 # step 3) specify which LAPACK and BLAS libraries to use for mesa/mtx
 
-WHICH_LAPACK95 =
-WHICH_LAPACK =
-WHICH_BLAS =
 LOAD_LAPACK95 = `mesasdk_lapack95_link`
 LOAD_LAPACK = `mesasdk_lapack_link`
 LOAD_BLAS = `mesasdk_blas_link`
