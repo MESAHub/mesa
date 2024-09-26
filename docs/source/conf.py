@@ -111,7 +111,7 @@ tags_badge_colors = {
 master_doc = 'index'
 
 # Set logo
-html_logo = 'mesa-logo-200.png'
+html_logo = 'mesa-logo2-200.png'
 html_favicon = 'mesa-favicon.png'
 
 # Set canonical URL from the Read the Docs Domain
