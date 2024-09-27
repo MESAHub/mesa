@@ -63,6 +63,7 @@ the focus of MESA.
 Links
 =====
 
+* `Landing page <https://mesastar.org/>`__ for links to all things MESA.
 * `Code repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
 * `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA. 
