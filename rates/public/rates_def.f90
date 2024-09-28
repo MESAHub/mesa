@@ -793,6 +793,7 @@
       
       
       real(dp) :: reaclib_min_T9 ! for T9 < this, return 0 for reaclib strong rates
+      real(dp) :: nacre_factor ! factor for scaling s factors in nacre rates
 
       type (integer_dict), pointer :: reaction_names_dict
       
@@ -1155,6 +1156,7 @@
             ! pre-ms deuterium burning needs much lower (4d-4)
             ! but that seems to cause problems during advanced burning.
                         
+         nacre_factor = 1d0 ! default is to not scale the s_factors at all.
       end subroutine do_start_rates_def_init
       
       

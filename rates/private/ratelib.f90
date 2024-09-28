@@ -1536,7 +1536,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, rev
+         real(dp) term, rev, new_a0, new_a0r
          ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
          !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
          ! + c0 T9i32 exp(-c1/T9)
@@ -1545,17 +1545,28 @@
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
-         end if 
+         end if
           
+         ! let's scale the n14 pg rate.
+         new_a0 = 4.83d7 ! initialize to default
+         new_a0r = 2.699d10 ! initialize to default
+         if (nacre_factor /= 1d0) then
+             !write(*,*) "scale_factor =", nacre_factor
+             !factor = (s% xtra(1)lxtra/3.2)
+             !write(*,*) "factor =", nacre_factor
+             new_a0 = nacre_factor*4.83d7
+             new_a0r = nacre_factor*2.699d10
+         end if
+
          call rnacre(tf,  &
-            4.83d7, 15.231d0, 1d0/0.8d0, & ! a0, a1, a2
+            new_a0, 15.231d0, 1d0/0.8d0, & ! a0, a1, a2
             -2.00d0, 3.41d0, -2.43d0, 0d0, 0d0, & ! b0, b1, b2, b3, b4
             2.36d3, 3.010d0, &  ! c0, c1
             0d0, 0d0, & ! d0, d1
             6.72d3, 0.380d0, 9.530d0, & ! e0, e1, e2
             term)        
          call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
-            2.699d10, 84.677d0, &  ! a0, a1
+            new_a0r, 84.677d0, &  ! a0, a1
             rev)     
          fr    = term 
          rr    = rev * term 

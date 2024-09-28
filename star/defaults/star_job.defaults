@@ -2584,6 +2584,13 @@
     jina_reaclib_min_T9 = -1
 
 
+
+      ! nacre_factor
+      ! ~~~~~~~~~~~~~~~~~~~
+      ! default is 1d0. This is set this to scale the S factor of a given Nacre Rate. Default is n14pg.
+
+      nacre_factor = -1
+
       ! rate_tables_dir
       ! ~~~~~~~~~~~~~~~
 

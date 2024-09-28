@@ -407,6 +407,7 @@
             use_suzuki_weak_rates, &
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9_in, &
+            nacre_factor_in, &
             rate_tables_dir, rates_cache_suffix, &
             ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
@@ -418,7 +419,7 @@
          use kap_lib, only: kap_init
          use eos_lib, only: eos_init
          use rates_lib, only: rates_init
-         use rates_def, only: reaclib_min_T9
+         use rates_def, only: reaclib_min_T9, nacre_factor
          use net_lib, only: net_init
          use ionization_lib, only: ionization_init
          use atm_lib
@@ -439,7 +440,7 @@
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
          integer , intent(in):: color_num_colors(:)
-         real(dp), intent(in) :: reaclib_min_T9_in
+         real(dp), intent(in) :: reaclib_min_T9_in, nacre_factor_in
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          integer, intent(out) :: ierr
 
@@ -513,6 +514,21 @@
             write(*,'(A)')
             write(*,1) 'change reaclib_min_T9', reaclib_min_T9
             write(*,1) 'must clear data/rates_data/cache of old reaclib rates'
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+         end if
+
+         if (nacre_factor_in > 0 .and. nacre_factor_in /= nacre_factor) then
+            nacre_factor= nacre_factor_in
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,'(A)')
+            write(*,1) 'change nacre_factor', nacre_factor
+            write(*,1) 'must clear data/rates_data/cache of old nacre rates'
             write(*,'(A)')
             write(*,'(A)')
             write(*,'(A)')

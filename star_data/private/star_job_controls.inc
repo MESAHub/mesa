@@ -332,6 +332,7 @@
 
       character (len=strlen) :: net_reaction_filename, jina_reaclib_filename
       real(dp) :: jina_reaclib_min_T9
+      real(dp) :: nacre_factor
 
       character (len=strlen) :: rate_tables_dir, rate_cache_suffix
 

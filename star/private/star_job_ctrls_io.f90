@@ -494,6 +494,7 @@
          net_reaction_filename, &
          jina_reaclib_filename, &
          jina_reaclib_min_T9, &
+         nacre_factor, &
          rate_tables_dir, &
          rate_cache_suffix, &
          read_extra_star_job_inlist, &
@@ -1081,6 +1082,7 @@
          s% job% net_reaction_filename = net_reaction_filename
          s% job% jina_reaclib_filename = jina_reaclib_filename
          s% job% jina_reaclib_min_T9 = jina_reaclib_min_T9
+         s% job% nacre_factor = nacre_factor
          s% job% rate_tables_dir = rate_tables_dir
          s% job% rate_cache_suffix = rate_cache_suffix
          s% job% read_extra_star_job_inlist = read_extra_star_job_inlist
@@ -1632,6 +1634,7 @@
          net_reaction_filename = s% job% net_reaction_filename
          jina_reaclib_filename = s% job% jina_reaclib_filename
          jina_reaclib_min_T9 = s% job% jina_reaclib_min_T9
+         nacre_factor = s% job% nacre_factor
          rate_tables_dir = s% job% rate_tables_dir
          rate_cache_suffix = s% job% rate_cache_suffix
          read_extra_star_job_inlist = s% job% read_extra_star_job_inlist
