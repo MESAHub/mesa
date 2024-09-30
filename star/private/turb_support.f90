@@ -33,6 +33,8 @@ use utils_lib
 use auto_diff_support
 use star_utils
 use turb
+use magnetic_diffusion
+use kap_lib
 
 implicit none
 
@@ -178,6 +180,9 @@ contains
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, N2_T
       real(dp) :: conv_vel_start, scale
 
+      ! these are used to evaluate the magnetic diffusivity, used by thermohaline
+      real(dp) :: kap_cond, dlnkap_cond_dlnRho, dlnkap_cond_dlnT, eta
+      
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
@@ -321,16 +326,33 @@ contains
 
       ! If we're not convecting, try thermohaline and semiconvection.
       if (mixing_type == no_mixing) then
+
          if (gradL_composition_term < 0) then
+
+            ! Thermohaline
+
+            ! Calcuate some additional data we'll need
+
+            call kap_get_elect_cond_opacity( &
+                 s% kap_handle, s% zbar(k), log10(rho% val), log10(T% val),  &
+                 kap_cond, dlnkap_cond_dlnRho, dlnkap_cond_dlnT, ierr)
+            if (ierr /= 0) return
+
+            eta = calc_eta(calc_sige(s% abar(k), s% zbar(k), rho%val, T% val, Cp% val, kap_cond, opacity% val))
+            
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-                              iso, XH1, thermohaline_coeff, &
+                              iso, XH1, thermohaline_coeff, eta, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
                return
             end if
+            
          else if (gradr > grada) then
+
+            ! Semiconvection
+            
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
@@ -341,7 +363,8 @@ contains
                return
             end if
          end if         
-      end if 
+
+      end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
       if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then

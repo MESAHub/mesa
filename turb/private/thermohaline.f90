@@ -59,11 +59,11 @@ contains
    !! @param ierr Output, error index.
    subroutine get_D_thermohaline(thermohaline_option, &
          grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, D_thrm, ierr)
+         iso, XH1, thermohaline_coeff, eta, D_thrm, ierr)
       character(len=*) :: thermohaline_option
       real(dp), intent(in) :: &
          grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, XH1, &
-         thermohaline_coeff
+         thermohaline_coeff, eta
       integer, intent(in) :: iso      
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
@@ -133,7 +133,7 @@ contains
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
-            Pm = 0.1d0 ! Magnetic Prandtl number. TODO: calculate self-consistently from plasma conditions
+            Pm = nu/eta ! Magnetic Prandtl number. TODO: calculate self-consistently from plasma conditions [DONE!]
             DB = Pr/Pm
 
             ! This may evolve. Rich is working on optimization
