@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module astero_lib
-      ! library for calculating calculation of asteroseismic variables
+      ! library for calculation of asteroseismic variables
       
       use const_def, only: dp
       use gyre_support, only: GYRE_IS_ENABLED
