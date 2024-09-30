@@ -20,7 +20,7 @@ module parasite_model
    ! Adrian said we can get rid of ideal, badks_exception, delta. 
    ! delta = Floquet wavenumber. delta = 0 means we are doing the analyisis for just one finger (n=1). For n > 1, delta = 1/n (e.g. 1/2 for 2 fingers). 
    ! Adrian says for most (all) cases delta = 0 is enough. We're keeping it there in case this turns out to be false in some edge case. 
-   ! For now ideal = 1 or 0. Ideal = 1 means ideal gas. Be sure it is an integer, not logical 
+   ! For now ideal = 1 or 0. Ideal = 1 means ideal MHD (zero resistivity or viscosity). Be sure it is an integer, not logical 
    ! badks_exception true should throw a warning telling the kz search domain does not contain sigma_max, so the search didn't complete. Changed that in kh_instability.
    ! Note we will need to decide what MESA should use as input for ks (the grid of kz values over which we do the search). Need to be robust
 
@@ -134,13 +134,20 @@ module parasite_model
   
     end function wf
 
-    function wf_withTC(pr, tau, r0, hb, db, ks, n, get_kmax, lamhat, l2hat) result(w)
+    function wf_withTC(pr, tau, r0, hb, db, ks, n, get_kmax, safety, lamhat, l2hat) result(w)
 
       ! Root finding for wf
+      ! safety = 0: Low-tau limit, low-Rm limit, ditch "block a" (which has the ordinary KH mode), use HG19 away from large R0
+      ! safety = 1: low-tau limit, uses low-Rm limit for "block b", still calculates "block a"
+      ! (I wonder if there's a middle ground here that's basically safety=2 but we use HG19 away from large R0?
+      !  would require knowing a priori what constitutes "large R0")
+      ! safety = 2: low-tau limit
+      ! safety = 3 (max): use full model (I don't think this option will ever be needed since tau is always tiny)
+      ! safety = 4 (actual max for now while debugging): use the original implementation; gives same answers as safety=3 but needlessly slower
   
       real(dp), intent(in) :: pr, tau, r0, hb, db 
       real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n ! n MUST be odd
+      integer, intent(in) :: n, safety ! n MUST be odd
       logical, intent(in) :: get_kmax
       real(dp), intent(in), optional :: lamhat, l2hat
       real(dp) :: w
@@ -171,17 +178,17 @@ module parasite_model
       lhat = sqrt(l2hat_)
   
       ! Set bracketing interval
-      w1 = 2.0_dp*pi*lamhat_/lhat
-      w2 = w1 + sqrt(2.0_dp*hb)
+      w1 = 2.0_dp*pi*lamhat_/lhat  ! this is the BGS13 solution
+      w2 = w1 + sqrt(2.0_dp*hb)  ! this is the HG19 solution for large HB. I wonder if we should use the actual HG19 solution
 
       lrpar = 8 + size(ks)
-      lipar = 1
+      lipar = 2
       allocate(rpar(lrpar))
       allocate(ipar(lipar))
       
       ! Arguments to pass
       rpar = [lamhat_, lhat, hb, pr, tau, r0, db, C2, ks]
-      ipar = [n]
+      ipar = [n, safety]
       dfdx = 0d0 ! unused for bracket search
       
       y1 = gx_m_lam_withTC(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
@@ -204,7 +211,8 @@ module parasite_model
          y2 = y1
          
          w1 = w1/10d0
-         y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+         ! y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)  ! TODO: shouldn't this be gx_m_lam_withTC?
+         y1 = gx_m_lam_withTC(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
       end do
       
       i = 0
@@ -234,7 +242,7 @@ module parasite_model
       ! needs more work on gammax_kscan
       if (get_kmax) then
          call khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
-         gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, .false.)
+         gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, .false., safety)
       end if
 
       deallocate(rpar)
@@ -297,7 +305,7 @@ module parasite_model
 
       dfdx = 0d0 ! unused for bracket search
       
-      if (lipar /= 1) then
+      if (lipar /= 2) then
          ierr = -1
          write(*,*) "lrpar, lipar", lrpar, lipar
          stop "wrong number of parameters for bracketed root solve"
@@ -314,9 +322,10 @@ module parasite_model
            db => rpar(7), &
            C2 => rpar(8), &
            ks => rpar(9:), & 
-           n => ipar(1))
+           n => ipar(1), &
+           safety => ipar(2))
 
-        f = gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, r0, db, ks, n, .false.)
+        f = gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, r0, db, ks, n, .false., safety)
       end associate
 
       ierr = 0
