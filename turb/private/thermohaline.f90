@@ -68,9 +68,9 @@ contains
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th, Pm, DB
-      real(dp) :: l2hat, lamhat, w, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
+      real(dp) :: l2hat, lamhat, w, w_HG19, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
       real(dp), allocatable :: ks(:)
-      integer :: j, nks, spectral_resolution ! for FRG model
+      integer :: j, nks, spectral_resolution, safety ! for FRG model
       logical :: withTC
       logical, parameter :: dbg = .true.
       
@@ -137,6 +137,7 @@ contains
             DB = Pr/Pm
 
             ! This may evolve. Rich is working on optimization
+            ! TODO: I don't think I've ever seen k/lhat > 1 being relevant
             allocate(ks(nks*2))
             do j = 1,nks
                ! first nks entries are log space from 1e-6 to 0.1 (don't include endpoint)
@@ -147,8 +148,19 @@ contains
             
             ! solve for w based on Fraser model
             if(withTC) then
-               w = wf_withTC(pr, tau, R0, HB, DB, ks, spectral_resolution, .false., lamhat, l2hat)
-            else
+               w = wf_withTC(pr, tau, R0, HB, DB, ks, spectral_resolution, .false., safety, lamhat, l2hat)
+               if (safety == 0) then
+                  call solve_hg19_eqn32(HB,l2hat,lamhat,w_HG19,ierr)
+                  if(ierr /= 0 .and. dbg) then
+                     write(*,*) "failed in solve_hg19_eqn32"
+                     write(*,*) "HB", HB
+                     write(*,*) "l2hat", l2hat
+                     write(*,*) "lamhat", lamhat
+                     write(*,*) "w", w
+                  end if
+                  w = MIN(w, w_HG19)  ! TODO: is this a sane way to go about this?
+               end if
+            else  ! TODO: we really should just ditch everything that isn't withTC, in hindsight
                w = wf(pr, tau, R0, HB, DB, ks, spectral_resolution, 0d0, 0, .false., .false., lamhat, l2hat)
             end if
 
