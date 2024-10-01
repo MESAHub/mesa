@@ -735,10 +735,10 @@
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
-            Chi_00 = compute_Chi_cell(s,k,ierr)  ! s% Chi_ad(k)
+            Chi_00 = compute_Chi_cell(s,k,ierr)  ! s% Chi_ad(k) XXX
             if (k > 1) then
                Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
-               !Chi_m1 = shift_m1(s% Chi_ad(k-1))
+               !Chi_m1 = shift_m1(s% Chi_ad(k-1)) XXX
                if (ierr /= 0) return
             else
                Chi_m1 = 0d0
