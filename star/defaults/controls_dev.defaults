@@ -188,7 +188,7 @@
 
       ! ::  
 
-    include_alfam = .false.
+    include_alfam = .true.
     alpha_TDC_DampM = 0.25
 
 
