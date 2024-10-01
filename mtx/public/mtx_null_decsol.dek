@@ -22,18 +22,6 @@
       end subroutine null_decsolblk
 
 
-      subroutine null_decsolblk_quad(iop,caller_id,nvar,nz,lblk,dblk,ublk,brhs,ipiv,lrd,rpar_decsol,lid,ipar_decsol,ierr)
-         integer, intent(in) :: caller_id, iop, nvar, nz, lrd, lid
-         integer, pointer, intent(inout) :: ipiv(:) ! =(nvar,nz)
-         real(qp), dimension(:), pointer, intent(inout) :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         real(qp), pointer, intent(inout)  :: brhs(:) ! =(nvar,nz)     
-         real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
-         integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
-         integer, intent(out) :: ierr
-         ierr = -1
-      end subroutine null_decsolblk_quad
-
-
       subroutine null_decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
          integer, intent(in) :: iop, n, ndim, lcd, lrd, lid, ml, mu
          integer, intent(inout) :: ip(n)

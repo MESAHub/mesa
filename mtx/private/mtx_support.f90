@@ -558,39 +558,6 @@
       end subroutine do_dense_to_col_sparse_0_based_qp
 
       
-      subroutine do_quad_dense_to_col_sparse_0_based( &
-            n,ndim,a,nzmax,nz,colptr,rowind,values,diags,ierr)
-         integer, intent(in) :: n,ndim,nzmax
-         real(qp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: colptr(:) ! (n+1)
-         integer, intent(inout) :: rowind(:) ! (nzmax)
-         real(qp), intent(out) :: values(:) ! (nzmax)
-         logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
-         ierr = 0
-         nz = 0
-         do j=1,n
-            colptr(j) = nz ! index in values of first entry in this column
-            do i=1,n
-               if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
-                  if (.not. diags) cycle
-                  ! else include diagonals even if are == 0
-               end if
-               nz = nz+1
-               if (nz > nzmax) then
-                  ierr = j
-                  return
-               end if
-               values(nz) = a(i,j)
-               rowind(nz) = i-1
-            end do
-         end do
-         colptr(n+1) = nz  
-      end subroutine do_quad_dense_to_col_sparse_0_based
-
-
       subroutine do_column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
          integer, intent(in) :: n,ndim,nz
          real(dp), intent(inout) :: a(ndim,n)
@@ -615,28 +582,6 @@
             end do
          end do
       end subroutine do_column_sparse_to_dense
-
-
-      subroutine do_quad_column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
-         integer, intent(in) :: n,ndim,nz
-         real(qp), intent(out) :: a(ndim,n)
-         integer, intent(in) :: colptr(n+1),rowind(nz)
-         real(qp), intent(in) :: values(nz)
-         integer, intent(out) :: ierr     
-         integer :: i,j,k
-         ierr = 0
-         a = 0
-         do j=1,n
-            do k=colptr(j),colptr(j+1)-1
-               i = rowind(k) 
-               if (i > n) then
-                  ierr = j
-                  return
-               endif
-               a(i,j) = values(k)
-            end do
-         end do
-      end subroutine do_quad_column_sparse_to_dense
 
 
       subroutine do_col_sparse_0_based_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
@@ -666,7 +611,7 @@
 
 
       subroutine do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
-         use my_lapack95_dble, only: my_gemv_p1
+         use my_lapack95, only: my_gemv_p1
          integer, intent(in) :: nvar, nz    
          real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
          real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
@@ -683,56 +628,6 @@
             end if
          end do      
       end subroutine do_block_dble_mv                  
-      
-      
-      subroutine do_block_mv_quad(lblk, dblk, ublk, b, prod)
-         real(qp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
-         real(qp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(qp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)         
-         integer :: nvar, nz, k        
-         include 'formats'
-         nvar = size(b,dim=1)
-         nz = size(b,dim=2)         
-!$OMP PARALLEL DO PRIVATE(k)
-         do k = 1, nz
-            prod(:,k) = 0
-            call qdgemv(nvar,nvar,dblk(:,:,k),nvar,b(:,k),prod(:,k))
-            if (k > 1) then
-               call qdgemv(nvar,nvar,lblk(:,:,k),nvar,b(:,k-1),prod(:,k))
-            end if
-            if (k < nz) then
-               call qdgemv(nvar,nvar,ublk(:,:,k),nvar,b(:,k+1),prod(:,k))
-            end if
-         end do      
-!$OMP END PARALLEL DO
-
-         contains
-         
-         subroutine qdgemv(m,n,a,lda,x,y)
-            ! y := alpha*a*x + beta*y
-         use const_def, only: dp
-      
-         integer lda,m,n
-         real(qp) a(lda,*),x(*),y(*)
-         real(qp) :: tmp
-         ! trans = 'n'
-         ! alpha = 1
-         ! beta = 1
-         ! incx = 1
-         ! incy = 1
-         integer :: j, i
-           do j = 1,n
-               tmp = x(j)
-               if (tmp.ne.0d0) then
-                   do i = 1,m
-                       y(i) = y(i) + tmp*a(i,j)
-                   end do
-               end if
-           end do
-         end subroutine qdgemv
-         
-         
-      end subroutine do_block_mv_quad
       
       
       subroutine do_LU_factored_block_dble_mv(lblk, dblk, ublk, b, ipiv, prod)
@@ -836,21 +731,6 @@
       end subroutine do_multiply_xa
 
 
-      subroutine do_quad_multiply_xa(n, A1, x, b)
-         !  calculates b = x*A
-         integer, intent(in) :: n
-         real(qp), pointer, intent(in) :: A1(:) ! =(n, n)
-         real(qp), pointer, intent(in) :: x(:) ! (n)
-         real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: j
-         real(qp), pointer :: A(:,:) ! (n, n)
-         A(1:n,1:n) => A1(1:n*n)
-         do j = 1, n
-            b(j) = dot_product(x(1:n),A(1:n,j))
-         end do
-      end subroutine do_quad_multiply_xa
-
-
       subroutine do_multiply_xa_plus_c(n, A1, x, c, b)
          !  calculates b = x*A + c
          integer, intent(in) :: n
@@ -865,22 +745,6 @@
             b(j) = dot_product(x(1:n),A(1:n,j)) + c(j)
          end do
       end subroutine do_multiply_xa_plus_c
-
-
-      subroutine do_quad_multiply_xa_plus_c(n, A1, x, c, b)
-         !  calculates b = x*A + c
-         integer, intent(in) :: n
-         real(qp), pointer, intent(in) :: A1(:) ! =(n, n)
-         real(qp), pointer, intent(in) :: x(:) ! (n)
-         real(qp), pointer, intent(in) :: c(:) ! (n)
-         real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: j
-         real(qp), pointer :: A(:,:) ! (n, n)
-         A(1:n,1:n) => A1(1:n*n)
-         do j = 1, n
-            b(j) = dot_product(x(1:n),A(1:n,j)) + c(j)
-         end do
-      end subroutine do_quad_multiply_xa_plus_c
 
 
       subroutine do_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
@@ -919,42 +783,6 @@
       end subroutine do_block_multiply_xa
 
 
-      subroutine do_quad_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
-         !  calculates b = x*A
-         integer, intent(in) :: nvar, nz
-         real(qp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
-         real(qp), intent(in), pointer :: x1(:) ! =(nvar,nz)
-         real(qp), intent(inout), pointer :: b1(:) ! =(nvar,nz)
-         integer :: k, shift, shift2, nvar2
-         real(qp), pointer, dimension(:) :: p1, p2, p3, p4
-         nvar2 = nvar*nvar
-!$OMP PARALLEL DO PRIVATE(k,shift,shift2,p1,p2,p3,p4)
-         do k = 1, nz
-            shift = nvar*(k-1)
-            shift2 = nvar2*(k-1)
-            p1(1:nvar2) => dblk1(shift2+1:shift2+nvar2)
-            p2(1:nvar) => x1(shift+1:shift+nvar)
-            p3(1:nvar) => b1(shift+1:shift+nvar)
-            call do_quad_multiply_xa(nvar,p1,p2,p3)
-            if (k > 1) then
-               p1(1:nvar2) => ublk1(shift2+1:shift2+nvar2)
-               p2(1:nvar) => x1(shift+1:shift+nvar)
-               p3(1:nvar) => b1(shift+1:shift+nvar)
-               p4(1:nvar) => b1(shift+1:shift+nvar)
-               call do_quad_multiply_xa_plus_c(nvar,p1,p2,p3,p4)
-            end if
-            if (k < nz) then
-               p1(1:nvar2) => lblk1(shift2+1:shift2+nvar2)
-               p2(1:nvar) => x1(shift+1+nvar:shift+2*nvar)
-               p3(1:nvar) => b1(shift+1:shift+nvar)
-               p4(1:nvar) => b1(shift+1:shift+nvar)
-               call do_quad_multiply_xa_plus_c(nvar,p1,p2,p3,p4)
-            end if
-         end do
-!$OMP END PARALLEL DO
-      end subroutine do_quad_block_multiply_xa
-
-
       subroutine do_band_multiply_xa(n, kl, ku, ab1, ldab, x, b)
          !  calculates b = x*a = transpose(a)*x
             integer, intent(in) :: n
@@ -988,38 +816,6 @@
       end subroutine do_band_multiply_xa      
 
 
-      subroutine do_quad_band_multiply_xa(n, kl, ku, ab, ldab, x, b)
-         !  calculates b = x*a = transpose(a)*x
-            integer, intent(in) :: n
-         !          the number of linear equations, i.e., the order of the
-         !          matrix a.  n >= 0.
-            integer, intent(in) :: kl
-         !          the number of subdiagonals within the band of a.  kl >= 0.
-            integer, intent(in) :: ku
-         !          the number of superdiagonals within the band of a.  ku >= 0.
-            integer, intent(in) :: ldab
-         !          the leading dimension of the array ab.  ldab >= kl+ku+1.
-            real(qp), intent(in) :: ab(:,:) ! (ldab, n)
-         !          the matrix a in band storage, in rows 1 to kl+ku+1;
-         !          the j-th column of a is stored in the j-th column of the
-         !          array ab as follows:
-         !          ab(ku+1+i-j, j) = a(i, j) for max(1, j-ku)<=i<=min(n, j+kl)
-            real(qp), intent(in) :: x(:) ! (n)
-         !          the input vector to be multiplied by the matrix.
-            real(qp), intent(inout) :: b(:) ! (n)
-         !          on exit, set to matrix product of x*a = b
-         integer ::  i, j, k
-         do j = 1, n
-            k = ku+1-j
-            b(j) = 0
-            do i = max(1, j-ku), min(n, j+kl)
-               b(j) = b(j) + x(i)*ab(k+i, j)
-            end do
-         end do
-      end subroutine do_quad_band_multiply_xa      
-      
-      
-      
       subroutine do_clip_blocks( &
             mblk, clip_limit, lmat, dmat, umat, dmat_nnz, total_nnz)
          integer, intent(in) :: mblk
@@ -1104,52 +900,6 @@
 
 
       end subroutine read_hbcode1
-
-
-      subroutine read_hbcode1_quad(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
-
-      CHARACTER      TITLE*72 , KEY*8    , MXTYPE*3 , &
-                     PTRFMT*16, INDFMT*16, VALFMT*20, RHSFMT*20
-
-      INTEGER        TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
-                     iounit, NROW  , NCOL  , NNZERO, NELTVL
-
-      INTEGER, pointer ::        COLPTR (:), ROWIND (:)
-
-      REAL(qp), pointer ::        VALUES (:)
-      integer, intent(out) :: ierr
-      
-      integer :: i
-      ierr = 0
-      READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
-                           TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
-                           MXTYPE, NROW  , NCOL  , NNZERO, NELTVL, &
-                           PTRFMT, INDFMT, VALFMT, RHSFMT
-      if (ierr /= 0) return
- 1000 FORMAT ( A72, A8 / 5I14 / A3, 11X, 4I14 / 2A16, 2A20 )
- 
-      allocate(VALUES(NNZERO), ROWIND(NNZERO), COLPTR(NCOL+1), stat=ierr)
-      if (ierr /= 0) return
-
-      READ (iounit, PTRFMT, iostat=ierr ) ( COLPTR (I), I = 1, NCOL+1 )
-      if (ierr /= 0) return
-
-      READ (iounit, INDFMT, iostat=ierr ) ( ROWIND (I), I = 1, NNZERO )
-      if (ierr /= 0) return
-
-      IF  ( VALCRD .GT. 0 )  THEN
-
-!         ----------------------
-!         ... READ MATRIX VALUES
-!         ----------------------
-
-          READ (iounit, VALFMT, iostat=ierr ) ( VALUES (I), I = 1, NNZERO )
-          if (ierr /= 0) return
-
-      ENDIF
-
-
-      end subroutine read_hbcode1_quad
 
 
       subroutine write_hbcode1(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
@@ -1304,37 +1054,6 @@
       end subroutine read_block_tridiagonal
          
          
-      subroutine read_quad_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
-         integer, intent(in) :: iounit
-         integer, intent(out) :: nvar, nblk
-         real(qp), pointer, dimension(:) :: lblk1,dblk1,ublk1 ! will be allocated
-         integer, intent(out) :: ierr
-         integer :: k
-         real(qp), pointer, dimension(:,:,:) :: lblk,dblk,ublk
-         ierr = 0
-         read(iounit,*,iostat=ierr) nvar, nblk
-         if (ierr /= 0) return
-         allocate(lblk1(nvar*nvar*nblk), dblk1(nvar*nvar*nblk), ublk1(nvar*nvar*nblk), stat=ierr)
-         if (ierr /= 0) return
-         lblk(1:nvar,1:nvar,1:nblk) => lblk1(1:nvar*nvar*nblk)
-         dblk(1:nvar,1:nvar,1:nblk) => dblk1(1:nvar*nvar*nblk)
-         ublk(1:nvar,1:nvar,1:nblk) => ublk1(1:nvar*nvar*nblk)
-         do k=1,nblk
-            if (k > 1) then
-               call read1_sparse_block_quad(iounit, nvar, lblk(:,:,k), ierr)
-               if (ierr /= 0) return
-            end if
-            call read1_sparse_block_quad(iounit, nvar, dblk(:,:,k), ierr)
-            if (ierr /= 0) return
-            if (k < nblk) then
-               call read1_sparse_block_quad(iounit, nvar, ublk(:,:,k), ierr)
-               if (ierr /= 0) return
-            end if
-         end do
-         
-      end subroutine read_quad_block_tridiagonal
-      
-      
       subroutine read1_sparse_block(iounit, nvar, blk, ierr)
          integer, intent(in) :: iounit, nvar
          real(dp) :: blk(:,:) ! (nvar,nvar)
@@ -1350,21 +1069,6 @@
       end subroutine read1_sparse_block
       
       
-      subroutine read1_sparse_block_quad(iounit, nvar, blk, ierr)
-         integer, intent(in) :: iounit, nvar
-         real(qp) :: blk(:,:) ! (nvar,nvar)
-         integer, intent(out) :: ierr
-         integer :: nnz, nrow, ncol
-         integer, pointer :: rowind(:), colptr(:)
-         real(qp), pointer :: values(:)
-         ierr = 0
-         call read_hbcode1_quad(iounit, nrow, ncol, nnz, values, rowind, colptr,ierr)
-         if (ierr /= 0 .or. nrow /= nvar .or. nrow /= ncol) return
-         call do_quad_column_sparse_to_dense(nrow,ncol,blk,nnz,colptr,rowind,values,ierr) 
-         deallocate(colptr,rowind,values)
-      end subroutine read1_sparse_block_quad
-         
-         
       subroutine write_block_tridiagonal(iounit,nvar,nblk,lblk,dblk,ublk,ierr)
          integer, intent(in) :: iounit, nvar, nblk
          real(dp), intent(in), dimension(:,:,:) :: lblk,dblk,ublk
