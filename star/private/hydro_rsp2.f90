@@ -664,7 +664,7 @@
          real(dp) :: f, ALFAM_ALFA
          include 'formats'
          ierr = 0
-         ALFAM_ALFA = s% RSP2_alfam*s% mixing_length_alpha
+         ALFAM_ALFA = s% RSP2_alfam * s% mixing_length_alpha
          if (ALFAM_ALFA == 0d0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
                k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
@@ -735,10 +735,10 @@
             Uq_face = 0d0
          else
             r_00 = wrap_opt_time_center_r_00(s,k)
-            Chi_00 = s% Chi_ad(k) ! compute_Chi_cell(s,k,ierr)
+            Chi_00 = compute_Chi_cell(s,k,ierr)  ! s% Chi_ad(k)
             if (k > 1) then
-               !Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
-               Chi_m1 = shift_m1(s% Chi_ad(k-1))
+               Chi_m1 = shift_m1(compute_Chi_cell(s,k-1,ierr))
+               !Chi_m1 = shift_m1(s% Chi_ad(k-1))
                if (ierr /= 0) return
             else
                Chi_m1 = 0d0
