@@ -221,7 +221,7 @@
          end subroutine setup_dL_dm
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            !use hydro_rsp2, only: compute_Eq_cell
+            use hydro_rsp2, only: compute_Eq_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
@@ -264,12 +264,9 @@
                others_ad%val = others_ad%val + s% eps_pre_mix(k)
             if (s% do_phase_separation .and. s% do_phase_separation_heating) &
                others_ad%val = others_ad%val + s% eps_phase_separation(k)
-            
-            Eq_ad = 0d0
-            if (s% RSP2_flag) then             
-               Eq_ad = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr)
-               if (ierr /= 0) return
-            end if   
+                       
+            Eq_ad = compute_Eq_cell(s, k, ierr) ! s% Eq_ad(k) XXX 
+            if (ierr /= 0) return
             
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
