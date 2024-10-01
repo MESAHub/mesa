@@ -1795,7 +1795,7 @@
 
 
          subroutine pointers(ierr)
-            use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
+            use utils_lib, only: fill_with_NaNs
 
             integer, intent(out) :: ierr
 
@@ -1837,9 +1837,9 @@
                call fill_with_NaNs(ddxsave1)
                call fill_with_NaNs(B1)
                call fill_with_NaNs(soln1)
-               call fill_with_NaNs_2D(rhs)
-               call fill_with_NaNs_2D(xder)
-               call fill_with_NaNs_2D(ddx)
+               call fill_with_NaNs(rhs)
+               call fill_with_NaNs(xder)
+               call fill_with_NaNs(ddx)
                call fill_with_NaNs(row_scale_factors1)
                call fill_with_NaNs(col_scale_factors1)
                call fill_with_NaNs(save_ublk1)

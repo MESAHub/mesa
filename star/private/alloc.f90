@@ -27,9 +27,7 @@
 
       use star_private_def
       use const_def, only: ln10
-      use utils_lib, only: &
-         fill_with_NaNs, fill_with_NaNs_2D, fill_with_NaNs_3d, set_nan, &
-         is_bad, mesa_error
+      use utils_lib, only: fill_with_NaNs, set_nan, is_bad, mesa_error
 
       implicit none
 
@@ -1552,17 +1550,17 @@
             character (len=*), intent(in) :: str
             include 'formats'
             if (action == do_fill_arrays_with_NaNs) then
-               call fill_with_NaNs_2d(ptr)
+               call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   if (s% zero_when_allocate) ptr(:,:) = 0
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz1, sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+               if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:,:) = 0
             else
                if (action == do_reallocate) then
@@ -1570,7 +1568,7 @@
                end if
                call do2D(s, ptr, sz1, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(ptr)
+                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   if (s% zero_when_allocate) ptr(:,:) = 0
                end if
             end if
@@ -1581,18 +1579,18 @@
             real(dp), dimension(:,:,:), pointer :: ptr, other
             integer, intent(in) :: sz1, sz2
             if (action == do_fill_arrays_with_NaNs) then
-               call fill_with_NaNs_3d(ptr)
+               call fill_with_NaNs(ptr)
             elseif (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. sz2 == size(ptr, dim=2) &
                      .and. nz <= size(ptr, dim=3)) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   if (s% zero_when_allocate) ptr(:,:,:) = 0
                   return
                end if
                deallocate(ptr)
                allocate(ptr(sz1, sz2, sz_new), stat=ierr)
-               if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+               if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                if (s% zero_when_allocate) ptr(:,:,:) = 0
             else
                if (action == do_reallocate) then
@@ -1602,7 +1600,7 @@
                end if
                call do3D(s, ptr, sz1, sz2, sz_new, action, ierr)
                if (action == do_allocate) then
-                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs_3d(ptr)
+                  if (s% fill_arrays_with_NaNs) call fill_with_NaNs(ptr)
                   if (s% zero_when_allocate) ptr(:,:,:) = 0
                end if
             end if

@@ -29,7 +29,7 @@
       use chem_def
       use net_def
          
-      use utils_lib, only: is_bad,fill_with_NaNs,fill_with_NaNs_2D
+      use utils_lib, only: is_bad,fill_with_NaNs
       
       use net_burn_support, only: netint
       use net_approx21, only : num_reactions_func => num_reactions
@@ -77,8 +77,8 @@
          if (g% fill_arrays_with_nans) then
             call fill_with_NaNs(dratdumdy1)
             call fill_with_NaNs(dratdumdy2)
-            call fill_with_NaNs_2D(dens_dfdy)
-            call fill_with_NaNs_2D(dmat)
+            call fill_with_NaNs(dens_dfdy)
+            call fill_with_NaNs(dmat)
          end if
          
       end subroutine get_pointers
