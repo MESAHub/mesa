@@ -197,12 +197,19 @@ contains
       logical, parameter :: report = .false.
       include 'formats'
 
+      using_TDC = .false.
+      if (s% MLT_option == 'TDC') using_TDC = .true.
+      if (.not. s% have_mlt_vc) using_TDC = .false.
+      if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
+      if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
+
       ! Pre-calculate some things.
-      if (s% mlt_vc_old(k) > 0d0) then
-        check_Eq = compute_Eq_cell(s, k, ierr)
-        Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3) ! maybe should be using conv_vel???
-      else
-        Eq_div_w = 0
+      Eq_div_w = 0d0
+      if (using_TDC) then
+         if (s% mlt_vc_old(k) > 0d0) then
+            check_Eq = compute_Eq_cell(s, k, ierr)
+            Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3) ! maybe should be using conv_vel???
+         end if
       end if
       !write(*,*) "k, Eq_div_w, compute_Eq_cell(s,k), s% mlt_vc_old(k)", k, Eq_div_w % val, check_Eq %val, s% mlt_vc_old(k)
       Pr = crad*pow4(T)/3d0
@@ -245,11 +252,6 @@ contains
 
 
       ! check if this particular k can be done with TDC
-      using_TDC = .false.
-      if (s% MLT_option == 'TDC') using_TDC = .true.
-      if (.not. s% have_mlt_vc) using_TDC = .false.
-      if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
-      if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
 
       if (k >= 1) then
          s% dvc_dt_TDC(k) = 0d0

@@ -79,7 +79,7 @@ program test_turb
       real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma, Eq_div_w
       real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
@@ -107,6 +107,7 @@ program test_turb
       opacity = 1d0
       grada = 0.4d0
       gradL = grada
+      Eq_div_w = 0d0
 
       L = 70 * Lsun
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
@@ -136,7 +137,7 @@ program test_turb
       call set_TDC(&
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, Eq_div_w, ierr)
 
       write(*,1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel% val, dt
 
@@ -154,7 +155,7 @@ program test_turb
       real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
-      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D
+      type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Eq_div_w
       integer :: mixing_type, ierr, tdc_num_iters
       logical :: report
       integer :: j
@@ -187,6 +188,7 @@ program test_turb
       chiT = 1d0
       chiRho = 1d0
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * cgrav * m)
+      Eq_div_w = 0d0
 
       write(*,*) "####################################"
       write(*,*) "Running dt test"
@@ -196,7 +198,7 @@ program test_turb
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, Eq_div_w, ierr)
 
          write(*,1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel% val
          if (report) stop
