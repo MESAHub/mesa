@@ -72,4 +72,5 @@ Links
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.
 * `MESA Test Hub <https://testhub.mesastar.org/>`__ to view results of regression testing (for Developers).
 * `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub (for Developers).
+* `mesa-dev yt channel <https://www.youtube.com/@mesa-dev>`__ youtube channel for recorded dev meetings (for Developers).
 
