@@ -35,8 +35,26 @@ use parasite_model
 
 implicit none
 
+! Indices for thrm_extras
+
+integer, parameter :: I_PR = 1
+integer, parameter :: I_TAU = 2
+integer, parameter :: I_R0 = 3
+integer, parameter :: I_DB = 4
+integer, parameter :: I_HB = 5
+integer, parameter :: I_LAMHAT = 6
+integer, parameter :: I_L2HAT = 7
+integer, parameter :: I_W = 8
+integer, parameter :: I_W_TC = 9
+integer, parameter :: I_W_HG19 = 10
+integer, parameter :: I_D_THRM = 11
+
+integer, parameter :: N_THRM_EXTRAS = 11
+
 private
 public :: get_D_thermohaline, nuC, solve_hg19_eqn32
+public :: I_PR, I_TAU, I_R0, I_DB, I_HB, I_LAMHAT, I_L2HAT, &
+          I_W, I_W_TC, I_W_HG19, I_D_THRM, N_THRM_EXTRAS
 
 contains
 
@@ -55,20 +73,31 @@ contains
    !! @param iso The index of the species that drives thermohaline mixing.
    !! @param XH1 Mass fraction of H1.
    !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
+   !! @param thermohaline_mag_B Magnetic field strength (guass) for HG19 and FRG24 prescriptions.
+   !! @param thermohaline_FRG24_safety Safety parameter for choosing approximations in FRG24 prescription.
+   !! @param thermohaline_FRG24_nks Number of vertical wavenumbers in FRG24 prescription.
+   !! @param thermohaline_FRG24_res Resolution in FRG24 prescription.
+   !! @param thermohaline_FRG24_with_TC Include temperature & composition in FRG24 prescription.
    !! @param D_thrm Output, diffusivity.
+   !! @param thrm_extras Output, debugging data (ignored if null)
    !! @param ierr Output, error index.
    subroutine get_D_thermohaline(thermohaline_option, &
          grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, eta, D_thrm, ierr)
+         iso, XH1, thermohaline_coeff, thermohaline_mag_B, &
+         thermohaline_FRG24_safety, thermohaline_FRG24_nks, &
+         thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
+         eta, D_thrm, thrm_extras, ierr)
       character(len=*) :: thermohaline_option
       real(dp), intent(in) :: &
          grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, XH1, &
-         thermohaline_coeff, eta
-      integer, intent(in) :: iso      
+         thermohaline_coeff, thermohaline_mag_B, eta
+      integer, intent(in) :: iso, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_res
+      logical, intent(in) :: thermohaline_FRG24_with_TC
       real(dp), intent(out) :: D_thrm
+      real(dp), pointer, intent(in) :: thrm_extras(:)
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th, Pm, DB
-      real(dp) :: l2hat, lamhat, w, w_HG19, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
+      real(dp) :: l2hat, lamhat, w, w_TC, w_HG19, d2, HB, B0, l2hat_test, lamhat_test, reldiff, reldiff2
       real(dp), allocatable :: ks(:)
       integer :: j, nks, spectral_resolution, safety ! for FRG model
       logical :: withTC
@@ -77,6 +106,9 @@ contains
       include 'formats'     
       dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
+
+      if (ASSOCIATED(thrm_extras)) thrm_extras = 0._dp
+
       if (thermohaline_option == 'Kippenhahn') then
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
          D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
@@ -88,6 +120,13 @@ contains
          R0 = (gradr - grada)/gradL_composition_term
          Pr = nu/K_T
          tau = K_mu/K_T
+
+         if (ASSOCIATED(thrm_extras)) then
+            thrm_extras(I_PR) = Pr
+            thrm_extras(I_TAU) = tau
+            thrm_extras(I_R0) = R0
+         end if
+
          r_th = (R0 - 1d0)/(1d0/tau - 1d0)
          if (r_th >= 1d0) then ! stable if R0 >= 1/tau
             D_thrm = 0d0
@@ -101,10 +140,16 @@ contains
          else if (thermohaline_option == 'Brown_Garaud_Stellmach_13') then
             call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
             D_thrm = K_mu*(nuC_brown(tau, l2hat, lamhat) - 1d0)
+
+            if (ASSOCIATED(thrm_extras)) then
+               thrm_extras(I_LAMHAT) = lamhat
+               thrm_extras(I_L2HAT) = l2hat
+            endif
+
          else if (thermohaline_option == 'Harrington_Garaud_19') then
             call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
 
-            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            B0 = thermohaline_mag_B
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
@@ -121,15 +166,22 @@ contains
             ! KB = 1.24 for Harrington model.
             D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 1.24d0) - 1d0)
 
+            if (ASSOCIATED(thrm_extras)) then
+               thrm_extras(I_HB) = HB
+               thrm_extras(I_LAMHAT) = lamhat
+               thrm_extras(I_L2HAT) = l2hat
+            endif
+
          else if (thermohaline_option == 'Fraser_Reifenstein_Garaud_24') then
             call gaml2max(pr, tau, R0, lamhat, l2hat, ierr)
 
-            ! TODO: promote these to inlist options
-            nks = 50
-            spectral_resolution = 17
-            withTC = .true.
+            ! TODO: promote these to inlist options [done]
+            nks = thermohaline_FRG24_nks
+            spectral_resolution = thermohaline_FRG24_res
+            withTC = thermohaline_FRG24_with_TC
+            safety = thermohaline_FRG24_safety
             
-            B0 = 10d0 ! Gauss. TODO: promote this to optional input specified by magnetic field from MESA model
+            B0 = thermohaline_mag_B
             d2 = pow(K_T*nu/N2_T,0.5d0) ! width of fingers squared
             HB = B0*B0*d2/(pi4*rho*K_T*K_T)
 
@@ -148,7 +200,7 @@ contains
             
             ! solve for w based on Fraser model
             if(withTC) then
-               w = wf_withTC(pr, tau, R0, HB, DB, ks, spectral_resolution, .false., safety, lamhat, l2hat)
+               w_TC = wf_withTC(pr, tau, R0, HB, DB, ks, spectral_resolution, .false., safety, lamhat, l2hat)
                if (safety == 0) then
                   call solve_hg19_eqn32(HB,l2hat,lamhat,w_HG19,ierr)
                   if(ierr /= 0 .and. dbg) then
@@ -156,11 +208,13 @@ contains
                      write(*,*) "HB", HB
                      write(*,*) "l2hat", l2hat
                      write(*,*) "lamhat", lamhat
-                     write(*,*) "w", w
+                     write(*,*) "w_TC", w_TC
                   end if
-                  w = MIN(w, w_HG19)  ! TODO: is this a sane way to go about this?
+                  w = MIN(w_TC, w_HG19)  ! TODO: is this a sane way to go about this?
                end if
             else  ! TODO: we really should just ditch everything that isn't withTC, in hindsight
+               w_TC = 0._dp
+               w_HG19 = 0._dp
                w = wf(pr, tau, R0, HB, DB, ks, spectral_resolution, 0d0, 0, .false., .false., lamhat, l2hat)
             end if
 
@@ -168,7 +222,23 @@ contains
             D_thrm = K_mu*(nuC(tau, w, lamhat, l2hat, 0.62d0) - 1d0)
 
             deallocate(ks)
+
+            if (ASSOCIATED(thrm_extras)) then
+               thrm_extras(I_HB) = HB
+               thrm_extras(I_DB) = DB
+               thrm_extras(I_LAMHAT) = lamhat
+               thrm_extras(I_L2HAT) = l2hat
+               thrm_extras(I_W) = w
+               thrm_extras(I_W_TC) = w_TC
+               thrm_extras(I_W_HG19) = w_HG19
+            end if
+
          endif
+
+         if (ASSOCIATED(thrm_extras)) then
+            thrm_extras(I_D_THRM) = D_thrm
+         endif
+
       else
          D_thrm = 0
          ierr = -1

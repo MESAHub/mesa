@@ -251,6 +251,11 @@
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
+         real(dp) :: thermohaline_mag_B
+         integer  :: thermohaline_FRG24_safety
+         integer  :: thermohaline_FRG24_nks
+         integer  :: thermohaline_FRG24_res
+         logical :: thermohaline_FRG24_with_TC
          real(dp) :: mixing_length_alpha, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term

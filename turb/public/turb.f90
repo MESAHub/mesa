@@ -3,12 +3,15 @@ module turb
    use num_lib
    use utils_lib
    use auto_diff
+   use thermohaline
 
    implicit none
 
    private
    public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection, &
         thermohaline_mode_properties, calc_hg19_w, calc_frg24_w, thermohaline_nusseltC
+   public :: I_PR, I_TAU, I_R0, I_DB, I_HB, I_LAMHAT, I_L2HAT, &
+             I_W, I_W_TC, I_W_HG19, I_D_THRM, N_THRM_EXTRAS
 
    contains
 
@@ -30,15 +33,19 @@ module turb
    !! @param D_thrm Output, diffusivity.
    !! @param ierr Output, error index.
    subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-                              iso, XH1, thermohaline_coeff, eta, &
-                              D, gradT, Y_face, conv_vel, mixing_type, ierr)
+         iso, XH1, thermohaline_coeff, thermohaline_mag_B, &
+         thermohaline_FRG24_safety, thermohaline_FRG24_nks, &
+         thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
+         eta, D, gradT, Y_face, conv_vel, mixing_type, thrm_extras, ierr)
       use thermohaline
       character(len=*), intent(in) :: thermohaline_option
       type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, N2_T, T, opacity, rho, Cp
-      real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff, eta
-      integer, intent(in) :: iso
+      real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff, thermohaline_mag_B, eta
+      integer, intent(in) :: iso, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_res
+      logical, intent(in) :: thermohaline_FRG24_with_TC
 
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
+      real(dp), pointer, intent(in) :: thrm_extras(:)
       integer, intent(out) :: mixing_type, ierr
 
       real(dp) :: D_thrm
@@ -46,7 +53,10 @@ module turb
       call get_D_thermohaline(&
          thermohaline_option, grada%val, gradr%val, N2_T%val, T%val, opacity%val, rho%val, &
          Cp%val, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, eta, D_thrm, ierr)
+         iso, XH1, thermohaline_coeff, thermohaline_mag_B, &
+         thermohaline_FRG24_safety, thermohaline_FRG24_nks, &
+         thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
+         eta, D_thrm, thrm_extras, ierr)
 
       D = D_thrm
       gradT = gradr

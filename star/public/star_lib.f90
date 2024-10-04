@@ -3098,7 +3098,7 @@
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, thermohaline_coeff, &
-            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, thrm_extras, ierr)
          use const_def, only: dp
          use auto_diff
          use turb_support, only: Get_results
@@ -3113,7 +3113,8 @@
             mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
          integer, intent(out) :: mixing_type
          type(auto_diff_real_star_order1), intent(out) :: &
-            gradT, Y_face, conv_vel, D, Gamma
+              gradT, Y_face, conv_vel, D, Gamma
+         real(dp), pointer, intent(in) :: thrm_extras(:)
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: dV
          type (star_info), pointer :: s         
@@ -3124,7 +3125,7 @@
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             alpha_semiconvection, thermohaline_coeff, &
-            mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+            mixing_type, gradT, Y_face, conv_vel, D, Gamma, thrm_extras, ierr)
       end subroutine star_mlt_results
 
 

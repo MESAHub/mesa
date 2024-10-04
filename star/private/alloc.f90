@@ -465,6 +465,7 @@
          use rates_def, only: num_rvs
          use chem_def, only: num_categories
          use const_def, only: standard_cgrav
+         use turb, only: N_THRM_EXTRAS
          type (star_info), pointer :: s, c_in
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
@@ -1034,6 +1035,8 @@
             if (failed('mlt_mixing_length')) exit
             call do1(s% mlt_D, c% mlt_D)
             if (failed('mlt_D')) exit
+            call do2(s% thrm_extras, c% thrm_extras, N_THRM_EXTRAS, 'thrm_extras')
+            if (failed('thrm_extras')) exit
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit

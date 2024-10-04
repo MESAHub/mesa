@@ -363,6 +363,7 @@
          real(dp), pointer :: mlt_gradT(:) ! prior to adjustments
          real(dp), pointer :: mlt_cdc(:) 
          real(dp), pointer :: L_conv(:)
+         real(dp), pointer :: thrm_extras(:,:) ! extra data for tracing thermohaline (var,nz)
          
          integer, pointer :: tdc_num_iters(:)
          

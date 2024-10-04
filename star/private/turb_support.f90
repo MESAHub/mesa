@@ -77,6 +77,7 @@ contains
       type(auto_diff_real_star_order1) :: &
          gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
          Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
+      real(dp), pointer :: thrm_extras(:) => null()
       ierr = 0
       r_ad = r
       L_ad = L
@@ -96,7 +97,7 @@ contains
          gradr_ad, grada_ad, scale_height_ad, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          s% alpha_semiconvection, s% thermohaline_coeff, &
-         mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
+         mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, thrm_extras, ierr)
       gradT = gradT_ad%val
       Y_face = Y_face_ad%val
       conv_vel = mlt_vc_ad%val
@@ -108,7 +109,7 @@ contains
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
          gradr, grada, scale_height, mixing_length_alpha, &
-         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, thrm_extras, ierr)
       use chem_def, only: ih1
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -117,7 +118,8 @@ contains
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
-         gradT, Y_face, mlt_vc, D, Gamma
+           gradT, Y_face, mlt_vc, D, Gamma
+      real(dp), pointer, intent(in) :: thrm_extras(:)
       integer, intent(out) :: ierr 
               
       real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
@@ -152,7 +154,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, thrm_extras, ierr)
       end if
 
    end subroutine do1_mlt_eval
@@ -162,7 +164,7 @@ contains
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
-         mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+         mixing_type, gradT, Y_face, conv_vel, D, Gamma, thrm_extras, ierr)
       use star_utils
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -175,6 +177,7 @@ contains
          mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
+      real(dp), pointer, intent(in) :: thrm_extras(:)
       integer, intent(out) :: ierr
       
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, N2_T
@@ -211,6 +214,7 @@ contains
       Y_face = gradT - gradL
       conv_vel = 0d0
       D = 0d0
+      thrm_extras = 0d0
       Gamma = 0d0  
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
@@ -342,8 +346,10 @@ contains
             
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-                              iso, XH1, thermohaline_coeff, eta, &
-                              D, gradT, Y_face, conv_vel, mixing_type, ierr)
+                 iso, XH1, thermohaline_coeff, s% thermohaline_mag_B, &
+                 s% thermohaline_FRG24_safety, s% thermohaline_FRG24_nks, &
+                 s% thermohaline_FRG24_res, s% thermohaline_FRG24_with_TC, &
+                 eta, D, gradT, Y_face, conv_vel, mixing_type, thrm_extras, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
                return

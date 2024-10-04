@@ -2251,10 +2251,70 @@
       ! + ``'Traxler_Garaud_Stellmach_11'`` : use method of Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
       ! + ``'Brown_Garaud_Stellmach_13'`` : use method of Brown, Garaud, & Stellmach, ApJ 768:34 (2013)
       !   Recommends ``thermohaline_coeff = 1``, but it can nevertheless be changed.
+      ! + ``'Harrington_Garaud_19'`` : use method of Harrington & Garaud, ApJ Letters, 870:L5 (2019; HG19)
+      ! + ``'Fraser_Reifenstein_Garaud_24'`` : use method of Fraser, Reifenstein, & Garaud, ApJ 964:184 (2024; FRG24)
 
       ! ::
 
     thermohaline_option = 'Kippenhahn'
+
+
+      ! thermohaline_mag_B
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Nominal magnetic field strength (in gauss) to use in  thermohaline prescriptions that
+      ! include magnetic fields (i.e., HG19 and FRG24).
+
+      ! ::
+
+    thermohaline_mag_B = 10
+
+
+      ! thermohaline_FRG24_safety
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Safety parameter that determines which approximations can be made in the FRG24 prescription.
+
+      ! + 4 : use full prescription
+      ! + 3 : perform parity-splitting on the parasitic modes
+      ! + 2 : same as 3, but also assume the tau << 1 limit
+      ! + 1 : same as 2, but also assume the Rm << 1 limit
+      ! + 0 : same as 1, but replace the saturation velocity with that from HG19, if the latter is smaller.
+
+      ! ::
+
+    thermohaline_FRG24_safety = 4
+
+
+      ! thermohaline_FRG24_nks
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Number of vertical wavenumbers to consider when searching for the fastest-growing parasitic mode
+      ! in the FRG24 prescription.
+
+      ! ::
+
+    thermohaline_FRG24_nks = 50
+
+
+      ! thermohaline_FRG24_res
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Spectral resolution to adopt when constructing parasitic modes in the FRG24 prescription.
+
+      ! ::
+
+    thermohaline_FRG24_res = 17
+
+
+      ! thermohaline_FRG24_with_TC
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Include temperature & composition perturbations in the FRG24 prescription.
+
+      ! ::
+
+    thermohaline_FRG24_with_TC = .true.
 
 
       ! alt_scale_height_flag

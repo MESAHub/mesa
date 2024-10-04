@@ -960,3 +960,17 @@
       ! c12_boundary_limit
       ! burn_min1
       ! burn_min2
+
+! thermohaline extras
+thrm_extras_Pr
+thrm_extras_tau
+thrm_extras_R0
+thrm_extras_HB
+thrm_extras_DB
+thrm_extras_lamhat
+thrm_extras_l2hat
+thrm_extras_w
+thrm_extras_w_TC
+thrm_extras_w_HG19
+thrm_extras_D_thrm
+

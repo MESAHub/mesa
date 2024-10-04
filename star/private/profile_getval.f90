@@ -31,6 +31,9 @@
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
+      use turb, only: I_PR, I_TAU, I_R0, I_DB, I_HB, I_LAMHAT, I_L2HAT, &
+             I_W, I_W_TC, I_W_HG19, I_D_THRM
+
 
       implicit none
 
@@ -1670,6 +1673,28 @@
                val = s% mlt_vc(k)
             case (p_mlt_D)
                val = s% mlt_D(k)
+            case (p_thrm_extras_Pr)
+               val = s% thrm_extras(I_PR, k)
+            case (p_thrm_extras_tau)
+               val = s% thrm_extras(I_TAU, k)
+            case (p_thrm_extras_R0)
+               val = s% thrm_extras(I_R0, k)
+            case (p_thrm_extras_HB)
+               val = s% thrm_extras(I_HB, k)
+            case (p_thrm_extras_DB)
+               val = s% thrm_extras(I_DB, k)
+            case (p_thrm_extras_lamhat)
+               val = s% thrm_extras(I_LAMHAT, k)
+            case (p_thrm_extras_l2hat)
+               val = s% thrm_extras(I_L2HAT, k)
+            case (p_thrm_extras_w)
+               val = s% thrm_extras(I_W, k)
+            case (p_thrm_extras_w_TC)
+               val = s% thrm_extras(I_W_TC, k)
+            case (p_thrm_extras_w_HG19)
+               val = s% thrm_extras(I_W_HG19, k)
+            case (p_thrm_extras_D_thrm)
+               val = s% thrm_extras(I_D_THRM, k)
             case (p_mlt_gradT)
                val = s% mlt_gradT(k)
             case (p_mlt_Y_face)
