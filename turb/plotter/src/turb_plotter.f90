@@ -1,157 +1,134 @@
 program turb_plotter
 
-  use utils_lib
-  use const_lib
-  use math_lib
-  use turb
-  
-  implicit none
+   use utils_lib
+   use const_lib
+   use math_lib
+   use turb, only: set_results_HG19, set_results_FRG24, th_results_t
 
-  integer :: ierr, op_err
-  character (len=32) :: my_mesa_dir
+   implicit none
 
-  integer               :: nR0, nks, j, jmax, spectral_resolution, safety
-  real(dp), allocatable :: ks(:), res(:,:)
-  real(dp)              :: tau, Pr, Pm, HB1, HB2, DB, R0
-  real(dp)              :: HB(3)
-  logical               :: FRG_withTC
-  integer               :: iounit
+   integer :: ierr, op_err
+   character (len=32) :: my_mesa_dir
 
-  real(dp), parameter :: UNSET = -999
-  
-  namelist /plotter/ &
-       tau, Pr, Pm, HB1, HB2, nR0, nks, spectral_resolution, FRG_withTC, safety
+   integer                :: n_R_0, nks, j, jmax, N, safety
+   real(dp), allocatable  :: k_z(:), res(:,:)
+   real(dp)               :: tau, Pr, Pm, H_B_1, H_B_2, D_B, R_0
+   real(dp)               :: H_B(3)
+   integer                :: iounit
 
-  include 'formats'
+   real(dp), parameter :: UNSET = -999
 
-  ierr = 0
+   namelist /plotter/ &
+      tau, Pr, Pm, H_B_1, H_B_2, n_R_0, nks, N, safety
 
-  my_mesa_dir = '../..'
-  call const_init(my_mesa_dir,ierr)
-  if (ierr /= 0) then
-     write(*,*) 'const_init failed'
-     call mesa_error(__FILE__,__LINE__)
-  end if
+   include 'formats'
 
-  call math_init()
+   ierr = 0
 
-  tau = UNSET
-  Pr = UNSET
-  Pm = UNSET
-  HB1 = UNSET
-  HB2 = UNSET
-  nR0 = UNSET
-  nks = UNSET
-  spectral_resolution = UNSET
-  
-  ! get info from namelist
-  open(newunit=iounit, file='inlist_plotter')
-  read(iounit, nml=plotter)
-  close(iounit)
+   my_mesa_dir = '../..'
+   call const_init(my_mesa_dir,ierr)
+   if (ierr /= 0) then
+      write(*,*) 'const_init failed'
+      call mesa_error(__FILE__,__LINE__)
+   end if
 
-  HB = [0d0, HB1, HB2]
-  DB = Pr/Pm
-  
-  ! spectral_resolution must be odd integer, so promote to next odd number if even
-  spectral_resolution = (spectral_resolution/2)*2 + 1
+   call math_init()
 
-  allocate(ks(nks*2))
-  allocate(res(nR0,7))
-  res(:,:) = 0d0
-  
-  do j = 1,nks
-     ! first nks entries are log space from 1e-6 to 0.1 (don't include endpoint)
-     ks(j) = pow(10d0,-6d0 + (j-1)*(-1d0 + 6d0)/nks)
+   tau = UNSET
+   Pr = UNSET
+   Pm = UNSET
+   H_B_1 = UNSET
+   H_B_2 = UNSET
+   n_R_0 = UNSET
+   nks = UNSET
+   N = UNSET
 
-     ! last nks entries are linear space from 0.1 to 2
-     ks(j+nks) = 0.1d0 + (j-1)*(2d0 - 0.1d0)/(nks - 1)
-  end do
-  
-  ! loop stays interior to interval 1 < R0 < 1/tau,
-  ! so need two extra points to define the endpoints.
-  jmax = nR0 + 2
-  
-!$OMP PARALLEL DO PRIVATE(j, R0, op_err) SCHEDULE(dynamic,2)
-  do j = 2,jmax-1
-     R0 = 1d0 + (1d0/tau - 1d0)*(j - 1)/(jmax - 1)
-     call set_res_for(j-1, R0, op_err)
-     if(op_err /= 0) ierr = op_err
-  end do
-!$OMP END PARALLEL DO
+   ! get info from namelist
+   open(newunit=iounit, file='inlist_plotter')
+   read(iounit, nml=plotter)
+   close(iounit)
 
-  ! file for output
-  open(newunit=iounit, file='turb_plotter.dat')
-  ! header for use by numpy genfromtxt in plotter.py
-  write(iounit,*) "# index R0 Dth_HG19_HB0 Dth_HG19_HB1 Dth_HG19_HB2 Dth_FRG24_HB0 Dth_FRG24_HB1 Dth_FRG24_HB2"
+   H_B = [0d0, H_B_1, H_B_2]
+   D_B = Pr/Pm
 
-  ! write out results
-  do j = 1,nR0
-     write(iounit,*) j, res(j,:)
-  end do
-  
-  deallocate(ks)
-  deallocate(res)
-  
+   allocate(res(n_R_0,7))
+
+   ! loop stays interior to interval 1 < R_0 < 1/tau,
+   ! so need two extra points to define the endpoints.
+   jmax = n_R_0 + 2
+
+   !$OMP PARALLEL DO PRIVATE(j, R_0, op_err) SCHEDULE(dynamic,2)
+   do j = 2,jmax-1
+
+      R_0 = 1d0 + (1d0/tau - 1d0)*(j - 1)/(jmax - 1)
+      call set_res_for(j-1, R_0, op_err)
+      if(op_err /= 0) ierr = op_err
+
+   end do
+   !$OMP END PARALLEL DO
+
+   ! file for output
+   open(newunit=iounit, file='turb_plotter.dat')
+   ! header for use by numpy genfromtxt in plotter.py
+   write(iounit,*) "# index R_0 Dth_HG19_HB0 Dth_HG19_HB1 Dth_HG19_HB2 Dth_FRG24_HB0 Dth_FRG24_HB1 Dth_FRG24_HB2"
+
+   ! write out results
+   do j = 1, n_R_0
+      write(iounit,*) j, res(j,:)
+   end do
+
 contains
 
-  subroutine set_res_for(j, R0, ierr)
-     integer, intent(in)  :: j
-     real(dp), intent(in) :: R0
-     integer, intent(out) :: ierr
+   subroutine set_res_for(j, R_0, ierr)
 
-     real(dp) :: l2hat, lamhat, w
-     integer  :: i
-  
-     ! calculate lamhat and l2hat
-     call thermohaline_mode_properties(Pr, tau, R0, lamhat, l2hat, ierr)
-     if (ierr /= 0) then
-        write(*,*) 'thermohaline_mode_properties failed'
-        call mesa_error(__FILE__,__LINE__)
-     end if
+      integer, intent(in)  :: j
+      real(dp), intent(in) :: R_0
+      integer, intent(out) :: ierr
 
-     res(j,1) = R0
+      type(th_results_t) :: th_results
+      integer  :: i
 
-     ! Calculate results for 3 different magnetic field strengths (0,HB1,HB2)
-     do i = 1,3
-        ! use mode properties to calculate velocity w (Harrington model for now)
-        call calc_hg19_w(HB(i), l2hat, lamhat, w, ierr)
-        if (ierr /= 0) then
-           write(*,*) 'calc_hg19_w failed'
-           write(*,*) 'R0', R0
-           write(*,*) '1/tau', 1/tau
-           write(*,*) 'HB', HB(i)
-           write(*,*) 'l2hat', l2hat
-           write(*,*) 'lamhat', lamhat
-           write(*,*) 'w', w
-           call mesa_error(__FILE__,__LINE__)
-        end if
-        
-        ! caclulate resulting D/kappa_T as function of tau, Pr, R0
-        ! KB = 1.24 for Harrington model
-        res(j,i+1) = thermohaline_nusseltC(tau, w, lamhat, l2hat, 1.24d0) - 1d0
+      ! Set parameters in th_results
 
-     end do
+      th_results%Pr = Pr
+      th_results%tau = tau
+      th_results%R_0 = R_0
+      th_results%r = (th_results%R_0 - 1._dp)/(1._dp/th_results%tau - 1._dp)
+      th_results%D_B = D_B
+      th_results%K_C = 1._dp ! Required so that D_thrm = D_thrm/K_C
 
-     ! Now calculate again for full FRG24 model (adds in Pm dependence)
-     do i = 1,3
-        call calc_frg24_w(Pr, tau, R0, HB(i), DB, ks, spectral_resolution, w, FRG_withTC, safety, ierr, lamhat, l2hat)
-        if (ierr /= 0) then
-           write(*,*) 'calc_frg24_w failed'
-           write(*,*) 'R0', R0
-           write(*,*) '1/tau', 1/tau
-           write(*,*) 'HB', HB(i)
-           write(*,*) 'DB', DB
-           write(*,*) 'l2hat', l2hat
-           write(*,*) 'lamhat', lamhat
-           write(*,*) 'w', w
-           write(*,*) 'ierr', ierr
-           call mesa_error(__FILE__,__LINE__)
-        end if
-        write(*,*) "calc_frg24_w, R0, HB, w", R0, HB(i), w
-        ! KB = 0.62 for Fraser model
-        res(j,i+4) = thermohaline_nusseltC(tau, w, lamhat, l2hat, 0.62d0) - 1d0
-     end do
-     
+      res(j, 1) = R_0
+
+      ! Calculate HG19 results for 3 different magnetic field strengths (0,HB1,HB2)
+
+      do i = 1,3
+
+         th_results%H_B = H_B(i)
+
+         call set_results_HG19(th_results, ierr)
+         if (ierr /= 0) then
+            call mesa_error(__FILE__,__LINE__)
+         end if
+
+         res(j,i+1) = th_results%D_thrm
+
+      end do
+
+      ! Now calculate again for full FRG24 model (adds in Pm dependence)
+
+      do i = 1,3
+
+         th_results%H_B = H_B(i)
+
+         call set_results_FRG24(safety, nks, N, th_results, ierr)
+         if (ierr /= 0) then
+            call mesa_error(__FILE__,__LINE__)
+         end if
+
+         res(j,i+4) = th_results%D_thrm
+
+      end do
+
    end subroutine set_res_for
 
 end program turb_plotter

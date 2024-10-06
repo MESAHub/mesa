@@ -1,337 +1,360 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010-2024  The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
 module parasite_model
 
-    use const_def, only: dp, pi
-    use num_lib
-    use fingering_modes, only: gaml2max
-    use kh_instability, only: khparams_from_fingering, gammax_kscan, gammax_minus_lambda, &
-         gammax_kscan_withTC, gammax_minus_lambda_withTC
-    
-    implicit none
-  
-    private
-    public :: wf
-    public :: wf_withTC
-  
-    real(dp), parameter :: CH = 1.66_dp
-    real(dp), parameter :: C2 = 0.33d0
-  
-  contains
-  
-   ! Adrian said we can get rid of ideal, badks_exception, delta. 
-   ! delta = Floquet wavenumber. delta = 0 means we are doing the analyisis for just one finger (n=1). For n > 1, delta = 1/n (e.g. 1/2 for 2 fingers). 
-   ! Adrian says for most (all) cases delta = 0 is enough. We're keeping it there in case this turns out to be false in some edge case. 
-   ! For now ideal = 1 or 0. Ideal = 1 means ideal MHD (zero resistivity or viscosity). Be sure it is an integer, not logical 
-   ! badks_exception true should throw a warning telling the kz search domain does not contain sigma_max, so the search didn't complete. Changed that in kh_instability.
-   ! Note we will need to decide what MESA should use as input for ks (the grid of kz values over which we do the search). Need to be robust
+   use const_def, only: dp, pi
+   use num_lib
+   use math_lib
+   use fingering_modes
+   use parasite_model_matrices
 
-    function wf(pr, tau, r0, hb, db, ks, n, delta, ideal, badks_exception, get_kmax, &
-         lamhat, l2hat) result(w)
-  
-      ! Root finding for wf
-  
-      real(dp), intent(in) :: pr, tau, r0, hb, db 
-      real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n, ideal ! n MUST be odd
-      real(dp), intent(in) :: delta  
-      logical, intent(in) ::  badks_exception, get_kmax
-      real(dp), intent(in), optional :: lamhat, l2hat
-      real(dp) :: w
-      ! real(dp), optional :: kmax
-  
-      integer, parameter  :: IMAX = 50
-      real(dp), parameter :: EPSX = 2e-12_dp ! may want to put more thought into optimal x and y tolerances
-      real(dp), parameter :: EPSY = 0._dp
+   use f95_lapack
 
-      real(dp) :: lamhat_, l2hat_
-      real(dp) :: lhat, w1, w2, y1, y2, hb_star, re, rm, dfdx, gammax
-      real(dp), pointer :: rpar(:)
-      integer, pointer  :: ipar(:)
-      integer :: lrpar, lipar
-      integer :: i, ierr
-      
-      if(mod(n,2) == 0) then
-         stop "thermohaline parasite wf: n must be odd"
-      end if
-      
-      if (present(lamhat)) then
-         lamhat_ = lamhat
-         l2hat_ = l2hat
-      else
-         call gaml2max(pr, tau, r0, lamhat_, l2hat_, ierr)
-      end if
-  
-      lhat = sqrt(l2hat_)
-  
-      ! Set bracketing interval
-      w1 = 2.0_dp*pi*lamhat_/lhat
-      w2 = w1 + sqrt(2.0_dp*hb)
+   implicit none
 
-      lrpar = 7 + size(ks)
-      lipar = 1
-      allocate(rpar(lrpar))
-      allocate(ipar(lipar))
-      
-      ! Arguments to pass
-      rpar = [lamhat_, lhat, hb, pr, db, delta, CH, ks]
-      ipar = [n]
-      dfdx = 0d0 ! unused for bracket search
-      
-      y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
-      y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+   real(dp), parameter :: C2 = 0.33_dp
 
-      i = 0
-      ! check whether y1 < 0, and if necessary adjust until w1 is valid lower bound
-      do while (y1 > 0d0)
-         ! write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
+   private
+   public :: eval_parasite_saturation
 
-         if(i > 20) then ! we tried decresasing w1 by 20 orders of magnitude, so need to break
-            write(*,*) "Can't find valid lower bracket for FRG w search"
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         i = i+1
-         
-         ! set new lower bound
-         w2 = w1
-         y2 = y1
-         
-         w1 = w1/10d0
-         y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
-      end do
-      
-      i = 0
-      ! check whether y2 > 0, and if necessary adjust until w2 is valid upper bound
-      do while (y2 < 0d0)
-         ! write(*,*) "y2 < 0, resetting brackets", w2, " -->", 10*w2
+   !real(dp), parameter :: CH = 1.66_dp
 
-         if(i > 20) then ! we tried increasing w2 by 20 orders of magnitude, so need to break
-            write(*,*) "Can't find valid upper bracket for FRG w search"
-            call mesa_error(__FILE__,__LINE__)
-         end if
-         
-         i = i+1
-         
-         ! set new lower bound
-         w1 = w2
-         y1 = y2
-         
-         w2 = w2*10d0
-         y2 = gx_m_lam(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
-      end do
+contains
 
-      ! Call bracketed root finder
-      w = safe_root_with_brackets( &
-           gx_m_lam, w1, w2, y1, y2, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+   subroutine eval_parasite_saturation(Pr, tau, R_0, H_B, D_B, &
+      lam_hat, l2_hat, k_z, N, safety, sigma_max, k_z_max, w, ierr)
 
-      ! needs more work on gammax_kscan
-      if (get_kmax) then
-         call khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
-         gammax = gammax_kscan(delta, hb_star, re, rm, ks, n, .false., badks_exception) !, kmax) 
-      end if
-
-      deallocate(rpar)
-      deallocate(ipar)
-  
-    end function wf
-
-    function wf_withTC(pr, tau, r0, hb, db, ks, n, get_kmax, safety, lamhat, l2hat) result(w)
-
-      ! Root finding for wf
-      ! safety = 0: Low-tau limit, low-Rm limit, ditch "block a" (which has the ordinary KH mode), use HG19 away from large R0
-      ! safety = 1: low-tau limit, uses low-Rm limit for "block b", still calculates "block a"
-      ! (I wonder if there's a middle ground here that's basically safety=2 but we use HG19 away from large R0?
-      !  would require knowing a priori what constitutes "large R0")
+      ! Evaluate the parasitic-mode saturation defined by eqn.(28) of Fraser, Reifenstein, & Garaud (2024, FRG24).
+      ! This is implemented as a root finding problem with w the search variable. safety controls the level of
+      ! performance-enhancing optimizations/approximations:
+      !
+      ! safety = 0: Low-tau limit, low-Rm limit, ditch even-parity block a (which has the ordinary KH mode), use HG19 away from large R_0
+      ! safety = 1: low-tau limit, uses low-Rm limit for odd-parity block, still calculates even-parity block
+      ! (I wonder if there's a middle ground here that's basically safety=2 but we use HG19 away from large R_0?
+      !  would require knowing a priori what constitutes "large R_0")
       ! safety = 2: low-tau limit
       ! safety = 3 (max): use full model (I don't think this option will ever be needed since tau is always tiny)
       ! safety = 4 (actual max for now while debugging): use the original implementation; gives same answers as safety=3 but needlessly slower
-  
-      real(dp), intent(in) :: pr, tau, r0, hb, db 
-      real(dp), intent(in) :: ks(:)
-      integer, intent(in) :: n, safety ! n MUST be odd
-      logical, intent(in) :: get_kmax
-      real(dp), intent(in), optional :: lamhat, l2hat
-      real(dp) :: w
-      ! real(dp), optional :: kmax
-  
+
+      real(dp), intent(in)  :: Pr
+      real(dp), intent(in)  :: tau
+      real(dp), intent(in)  :: R_0
+      real(dp), intent(in)  :: H_B
+      real(dp), intent(in)  :: D_B
+      real(dp), intent(in)  :: lam_hat
+      real(dp), intent(in)  :: l2_hat
+      real(dp), intent(in)  :: k_z(:)
+      integer, intent(in)   :: N ! +/- bounds of mode expansion in eqn. (40) of FRG24
+      integer, intent(in)   :: safety
+      real(dp), intent(out) :: sigma_max
+      real(dp), intent(out) :: k_z_max
+      real(dp), intent(out) :: w
+      integer, intent(out)  :: ierr
+
       integer, parameter  :: IMAX = 50
       real(dp), parameter :: EPSX = 2e-12_dp ! may want to put more thought into optimal x and y tolerances
       real(dp), parameter :: EPSY = 0._dp
 
-      real(dp) :: lamhat_, l2hat_
-      real(dp) :: lhat, w1, w2, y1, y2, hb_star, re, rm, dfdx, gammax
-      real(dp), pointer :: rpar(:)
-      integer, pointer  :: ipar(:)
-      integer :: lrpar, lipar
-      integer :: i, ierr
-      
-      if(mod(n,2) == 0) then
-         stop "thermohaline parasite wf: n must be odd"
-      end if
-      
-      if (present(lamhat)) then
-         lamhat_ = lamhat
-         l2hat_ = l2hat
-      else
-         call gaml2max(pr, tau, r0, lamhat_, l2hat_, ierr)
-      end if
-  
-      lhat = sqrt(l2hat_)
-  
-      ! Set bracketing interval
-      w1 = 2.0_dp*pi*lamhat_/lhat  ! this is the BGS13 solution
-      w2 = w1 + sqrt(2.0_dp*hb)  ! this is the HG19 solution for large HB. I wonder if we should use the actual HG19 solution
+      real(dp) :: l_hat
+      real(dp) :: w_1
+      real(dp) :: w_2
+      real(dp) :: f_1
+      real(dp) :: f_2
+      real(dp) :: dfdx
+      integer  :: i
 
-      lrpar = 8 + size(ks)
-      lipar = 2
-      allocate(rpar(lrpar))
-      allocate(ipar(lipar))
-      
-      ! Arguments to pass
-      rpar = [lamhat_, lhat, hb, pr, tau, r0, db, C2, ks]
-      ipar = [n, safety]
-      dfdx = 0d0 ! unused for bracket search
-      
-      y1 = gx_m_lam_withTC(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
-      y2 = gx_m_lam_withTC(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      real(dp), pointer :: rpar(:) => null() ! not used, but needed to pass to safe_root_with_brackets
+      integer, pointer  :: ipar(:) => null() ! not used, but needed to pass to safe_root_with_brackets
+      integer           :: lrpar = 0         ! not used, but needed to pass to safe_root_with_brackets
+      integer           :: lipar = 0         ! not used, but needed to pass to safe_root_with_brackets
+
+      ierr = 0
+
+      l_hat = sqrt(l2_hat)
+
+      ! Set initial bracketing interval
+
+      w_1 = 2.0_dp*pi*lam_hat/l_hat ! this is the BGS13 solution
+      w_2 = w_1 + sqrt(2.0_dp*H_B)  ! this is the HG19 solution for large HB. I wonder if we should use the actual HG19 solution
+
+      f_1 = root_func_(w_1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      if (ierr /= 0) return
+
+      f_2 = root_func_(w_2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+      if (ierr /= 0) return
+
+      ! Check whether f_1 < 0, and if necessary adjust until w_1 is
+      ! valid lower bound
 
       i = 0
-      ! check whether y1 < 0, and if necessary adjust until w1 is valid lower bound
-      do while (y1 > 0d0)
-         write(*,*) "y1 > 0, resetting brackets", w1, " -->", w1/10d0
 
-         if(i > 20) then ! we tried decreasing w1 by 20 orders of magnitude, so need to break
-            write(*,*) "Can't find valid lower bracket for FRG w search"
-            call mesa_error(__FILE__,__LINE__)
+      do while (f_1 > 0._dp)
+
+         write(*,*) 'f_1 > 0, resetting brackets:', w_1, '-->', w_1/10d0
+
+         if (i > 20) then ! we tried decreasing w_1 by 20 orders of magnitude, so need to break
+            write(*, *) 'Can''t find valid lower bracket for FRG w search'
+            ierr = -1
+            return
          end if
-         
-         i = i+1
-         
-         ! set new lower bound
-         w2 = w1
-         y2 = y1
-         
-         w1 = w1/10d0
-         ! y1 = gx_m_lam(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)  ! TODO: shouldn't this be gx_m_lam_withTC?
-         y1 = gx_m_lam_withTC(w1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+
+         i = i + 1
+
+         ! Set new lower bound
+
+         w_2 = w_1
+         f_2 = f_1
+
+         w_1 = w_1/10._dp
+         f_1 = root_func_(w_1, dfdx, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
+
       end do
-      
-      i = 0
-      ! check whether y2 > 0, and if necessary adjust until w2 is valid upper bound
-      do while (y2 < 0d0)
-         ! write(*,*) "y2 < 0, resetting brackets", w2, " -->", 10*w2
 
-         if(i > 20) then ! we tried increasing w2 by 20 orders of magnitude, so need to break
-            write(*,*) "Can't find valid upper bracket for FRG w search"
-            call mesa_error(__FILE__,__LINE__)
+      ! Check whether f_2 > 0, and if necessary adjust until w_2 is
+      ! valid upper bound
+
+      i = 0
+
+      do while (f_2 < 0._dp)
+
+         !write(*,*) 'f_2 < 0, resetting brackets:', w_2, '-->', 10*w_2
+
+         if (i > 20) then ! we tried increasing w_2 by 20 orders of magnitude, so need to break
+            write(*, *) 'Can''t find valid upper bracket for FRG w search'
+            ierr = -1
          end if
+
+         i = i + 1
+
+         ! Set new lower bound
+
+         w_1 = w_2
+         f_1 = f_2
+
+         w_2 = w_2*10._dp
+         f_2 = root_func_(w_2, dfdx, lrpar, rpar, lipar, ipar, ierr)
+         if (ierr /= 0) return
          
-         i = i+1
-         
-         ! set new lower bound
-         w1 = w2
-         y1 = y2
-         
-         w2 = w2*10d0
-         y2 = gx_m_lam_withTC(w2, dfdx, lrpar, rpar, lipar, ipar, ierr)
       end do
 
       ! Call bracketed root finder
-      w = safe_root_with_brackets( &
-           gx_m_lam_withTC, w1, w2, y1, y2, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
 
-      ! needs more work on gammax_kscan
-      if (get_kmax) then
-         call khparams_from_fingering(w, lhat, hb, pr, db, hb_star, re, rm)
-         gammax = gammax_kscan_withTC(w, hb, db, pr, tau, R0, lamhat, lhat, ks, n, .false., safety)
-      end if
+      w = safe_root_with_brackets(root_func_, &
+         w_1, w_2, f_1, f_2, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
+      if (ierr /= 0) return
 
-      deallocate(rpar)
-      deallocate(ipar)
-  
-    end function wf_withTC
-        
-    ! wrapper for gammax_minus_lambda for use with safe_root_with_brackets
-    real(dp) function gx_m_lam(x, dfdx, lrpar, rpar, lipar, ipar, ierr) result(f)
+      ! Set sigma_max and k_max
+
+      call find_fastest_parasite(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, safety, sigma_max, k_z_max, ierr)
       
-      real(dp), intent(in)             :: x
-      real(dp), intent(out)            :: dfdx
-      integer, intent(in)              :: lrpar
-      real(dp), intent(inout), pointer :: rpar(:)
-      integer, intent(in)              :: lipar
-      integer, intent(inout), pointer  :: ipar(:)
-      integer, intent(out)             :: ierr
+   contains
 
-      dfdx = 0d0 ! unused for bracket search
-      
-      if (lipar /= 1) then
-         ierr = -1
-         write(*,*) "lrpar, lipar", lrpar, lipar
-         stop "wrong number of parameters for bracketed root solve"
-      end if
-      
-      associate( &
-           w => x, &
-           lamhat => rpar(1), &
-           lhat => rpar(2), &
-           hb => rpar(3), &
-           pr => rpar(4), &
-           db => rpar(5), &
-           delta => rpar(6), &
-           CH => rpar(7), &
-           ks => rpar(8:), & 
-           n => ipar(1))
+      function root_func_(x, dfdx, lrpar, rpar, lipar, ipar, ierr) result(f)
 
-        f = gammax_minus_lambda(w, lamhat, lhat, hb, pr, db, delta, ks, n, .false., .false.)
-        ! ideal = .false., and ignoring badks_exception right now
-        
-      end associate
+         real(dp), intent(in)             :: x
+         real(dp), intent(out)            :: dfdx
+         integer, intent(in)              :: lrpar
+         real(dp), intent(inout), pointer :: rpar(:)
+         integer, intent(in)              :: lipar
+         integer, intent(inout), pointer  :: ipar(:)
+         integer, intent(out)             :: ierr
+         real(dp)                         :: f
+
+         real(dp) :: sigma_max, k_z_max
+
+         ! Evaluate the root func, defined as rhs - lhs of eqn. (28) of FRG24
+
+         associate (w => x)
+            call find_fastest_parasite(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, safety, sigma_max, k_z_max, ierr)
+         end associate
+
+         f = sigma_max*C2 - lam_hat
+
+         dfdx = 0._dp
+
+      end function root_func_
+
+   end subroutine eval_parasite_saturation
+         
+   !****
+
+   subroutine find_fastest_parasite(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, safety, sigma_max, k_z_max, ierr)
+
+      real(dp), intent(in)  :: w
+      real(dp), intent(in)  :: k_z(:)
+      real(dp), intent(in)  :: Pr
+      real(dp), intent(in)  :: tau
+      real(dp), intent(in)  :: R_0
+      real(dp), intent(in)  :: H_B
+      real(dp), intent(in)  :: D_B
+      real(dp), intent(in)  :: lam_hat
+      real(dp), intent(in)  :: l_hat
+      integer, intent(in)   :: N
+      integer, intent(in)   :: safety
+      real(dp), intent(out) :: sigma_max
+      real(dp), intent(out) :: k_z_max
+      integer, intent(out)  :: ierr
+
+      real(dp) :: sigma_max_i
+      integer  :: i
+      integer  :: i_max
+      integer  :: n_k_z
+
+      ! Over the range of wavenumbers k_z(:), find the fastest-growing parasite mode
 
       ierr = 0
 
-      return
-      
-    end function gx_m_lam
+      sigma_max = -HUGE(0._dp)
+      k_z_max = -HUGE(0._dp)
 
-    ! wrapper for gammax_minus_lambda_withTC for use with safe_root_with_brackets
-    real(dp) function gx_m_lam_withTC(x, dfdx, lrpar, rpar, lipar, ipar, ierr) result(f)
-      
-      real(dp), intent(in)             :: x
-      real(dp), intent(out)            :: dfdx
-      integer, intent(in)              :: lrpar
-      real(dp), intent(inout), pointer :: rpar(:)
-      integer, intent(in)              :: lipar
-      integer, intent(inout), pointer  :: ipar(:)
-      integer, intent(out)             :: ierr
+      n_k_z = SIZE(k_z)
 
-      dfdx = 0d0 ! unused for bracket search
-      
-      if (lipar /= 2) then
-         ierr = -1
-         write(*,*) "lrpar, lipar", lrpar, lipar
-         stop "wrong number of parameters for bracketed root solve"
-      end if
-      
-      associate( &
-           w => x, &
-           lamhat => rpar(1), &
-           lhat => rpar(2), &
-           hb => rpar(3), &
-           pr => rpar(4), &
-           tau => rpar(5), &
-           r0 => rpar(6), &
-           db => rpar(7), &
-           C2 => rpar(8), &
-           ks => rpar(9:), & 
-           n => ipar(1), &
-           safety => ipar(2))
+      k_loop : do i = 1, n_k_z
 
-        f = gammax_minus_lambda_withTC(w, lamhat, lhat, hb, pr, tau, r0, db, ks, n, .false., safety)
-      end associate
+         call find_fastest_parasite_k_z(w, k_z(i), Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, safety, sigma_max_i, ierr)
+         if (ierr /= 0) return
+
+         if (sigma_max_i > sigma_max) then 
+            sigma_max = sigma_max_i
+            k_z_max = k_z(i)
+            i_max = i
+         end if
+
+      end do k_loop
+
+      ! Check for marginal cases (commented out for now)
+
+      ! if (sigma_max > 0._dp .AND. &
+      !     (i_max == 1 .OR. i_max == n_k_z)) then
+      !    write(*,*) 'warning: most unstable growth at edge of k range:', k_z(1), k_z(n_k_z), k_z(i_max)
+      !    ierr = -1
+      ! end if
+
+   end subroutine find_fastest_parasite
+
+   !****
+
+   subroutine find_fastest_parasite_k_z(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, safety, sigma_max, ierr)
+
+      real(dp), intent(in)  :: w
+      real(dp), intent(in)  :: k_z
+      real(dp), intent(in)  :: Pr
+      real(dp), intent(in)  :: tau
+      real(dp), intent(in)  :: R_0
+      real(dp), intent(in)  :: H_B
+      real(dp), intent(in)  :: D_B
+      real(dp), intent(in)  :: lam_hat
+      real(dp), intent(in)  :: l_hat
+      integer, intent(in)   :: N
+      integer, intent(in)   :: safety
+      real(dp), intent(out) :: sigma_max
+      integer, intent(out)  :: ierr
+
+      real(dp) :: sigma_max_odd
+      real(dp) :: sigma_max_even
+
+      ! For the given flow speed w and vertical wavenumber k_z, find
+      ! the fastest-growing parasite mode
 
       ierr = 0
 
-      return
-      
-    end function gx_m_lam_withTC
-    
-  end module parasite_model
+      select case(safety)
+      case (0)
+!         call eval_max_eigval_(build_parasite_matrix_LPN_QS, sigma_max_odd, parity='ODD')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_odd, parity='ODD')
+         sigma_max = sigma_max_odd
+      case (1)
+!         call eval_max_eigval_(build_parasite_matrix_LPN, sigma_max_even, parity='EVEN')
+ !        call eval_max_eigval_(build_parasite_matrix_LPN_QS, sigma_max_odd, parity='ODD')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_even, parity='EVEN')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_odd, parity='ODD')
+         sigma_max = MAX(sigma_max_even, sigma_max_odd)
+      case (2)
+!         call eval_max_eigval_(build_parasite_matrix_LPN, sigma_max_even, parity='EVEN')
+!         call eval_max_eigval_(build_parasite_matrix_LPN, sigma_max_odd, parity='ODD')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_even, parity='EVEN')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_odd, parity='ODD')
+         sigma_max = MAX(sigma_max_even, sigma_max_odd)
+      case (3)
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_even, parity='EVEN')
+         call eval_max_eigval_(build_parasite_matrix, sigma_max_odd, parity='ODD')
+         sigma_max = MAX(sigma_max_even, sigma_max_odd)
+      case (4)
+         call eval_max_eigval_(build_parasite_matrix, sigma_max)
+      case default
+         write(*, *) '** invalid safety option in find_fastest_parasite_k'
+         ierr = -1
+      end select
+
+   contains
+
+      subroutine eval_max_eigval_(build_matrix, sigma_max, parity)
+
+         interface
+            subroutine build_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity)
+               use const_def, only: dp
+               real(dp), intent(in)               :: w
+               real(dp), intent(in)               :: k_z
+               real(dp), intent(in)               :: Pr
+               real(dp), intent(in)               :: tau
+               real(dp), intent(in)               :: R_0
+               real(dp), intent(in)               :: H_B
+               real(dp), intent(in)               :: D_B
+               real(dp), intent(in)               :: lam_hat
+               real(dp), intent(in)               :: l_hat
+               integer, intent(in)                :: N
+               real(dp), allocatable, intent(out) :: L(:,:)
+               character(*), intent(in), optional :: parity
+            end subroutine build_matrix
+         end interface
+         real(dp), intent(out)              :: sigma_max
+         character(*), intent(in), optional :: parity
+
+         real(dp), allocatable :: L(:,:)
+         real(dp), allocatable :: sigma_r(:)
+         real(dp), allocatable :: sigma_i(:)
+
+         ! Build the matrix
+
+         call build_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity)
+
+         allocate(sigma_r(SIZE(L, 1)))
+         allocate(sigma_i(SIZE(L, 1)))
+
+         ! Calculate its eigenvalues
+
+         call LA_GEEV(L, sigma_r, sigma_i)
+
+         ! Extract the maximal real part
+
+         sigma_max = MAXVAL(sigma_r)
+
+      end subroutine eval_max_eigval_
+
+   end subroutine find_fastest_parasite_k_z
+
+end module parasite_model

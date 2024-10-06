@@ -18,8 +18,8 @@ SRCS = \
      tdc.f90 \
      magnetic_diffusion.f90 \
      fingering_modes.f90 \
-     kh_instability.f90 \
      parasite_model.f90 \
+     parasite_model_matrices.f90 \
      thermohaline.f90 \
      semiconvection.f90 \
      turb.f90

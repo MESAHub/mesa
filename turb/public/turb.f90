@@ -1,6 +1,33 @@
+! ***********************************************************************
+!
+!   Copyright (C) 2010-2024  The MESA Team
+!
+!   MESA is free software; you can use it and/or modify
+!   it under the combined terms and restrictions of the MESA MANIFESTO
+!   and the GNU General Library Public License as published
+!   by the Free Software Foundation; either version 2 of the License,
+!   or (at your option) any later version.
+!
+!   You should have received a copy of the MESA MANIFESTO along with
+!   this software; if not, it is available at the mesa website:
+!   http://mesa.sourceforge.net/
+!
+!   MESA is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU Library General Public License for more details.
+!
+!   You should have received a copy of the GNU Library General Public License
+!   along with this software; if not, write to the Free Software
+!   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+!
+! ***********************************************************************
+
 module turb
-   use const_def
+
+   use const_def, only: dp
    use num_lib
+   use math_lib
    use utils_lib
    use auto_diff
    use thermohaline
@@ -8,12 +35,15 @@ module turb
    implicit none
 
    private
-   public :: set_thermohaline, set_mlt, set_tdc, set_semiconvection, &
-        thermohaline_mode_properties, calc_hg19_w, calc_frg24_w, thermohaline_nusseltC
-   public :: I_PR, I_TAU, I_R0, I_DB, I_HB, I_LAMHAT, I_L2HAT, &
-             I_W, I_W_TC, I_W_HG19, I_D_THRM, N_THRM_EXTRAS
+   public :: set_thermohaline
+   public :: th_results_t
+   public :: set_results_HG19  ! Used by plotter routine
+   public :: set_results_FRG24 ! Used by plotter routine
+   public :: set_mlt
+   public :: set_tdc
+   public :: set_semiconvection
 
-   contains
+contains
 
    !> Computes the diffusivity of thermohaline mixing when the
    !! thermal gradient is stable and the composition gradient is unstable.
@@ -23,148 +53,74 @@ module turb
    !! @param gradr Radiative temperature gradient dlnT/dlnP, equals the actual gradient because there's no convection
    !! @param N2_T Structure part of brunt squared (excludes composition term)
    !! @param T Temperature
-   !! @param opacity opacity
    !! @param rho Density
    !! @param Cp Heat capacity at constant pressure
+   !! @param opacity opacity
    !! @param gradL_composition_term dlnMu/dlnP where Mu is the mean molecular weight.
-   !! @param iso The index of the species that drives thermohaline mixing.
    !! @param XH1 Mass fraction of H1.
+   !! @param eta Magnetic diffusivity.
+   !! @param iso The index of the species that drives thermohaline mixing.
    !! @param thermohaline_coeff Free parameter multiplying the thermohaline diffusivity.
-   !! @param D_thrm Output, diffusivity.
+   !! @param thermohaline_mag_B Magnetic field strength (guass) for HG19 and FRG24 prescriptions.
+   !! @param thermohaline_FRG24_safety Safety parameter for choosing approximations in FRG24 prescription.
+   !! @param thermohaline_FRG24_nks Number of vertical wavenumbers to search over in FRG24 prescription.
+   !! @param thermohaline_FRG24_N Maximal mode index in FRG24 prescription.
+   !! @param D Output, thermohaline diffusivity.
+   !! @param gradT Output, temperature gradient.
+   !! @param Y_face Output, superadiabaticity at face.
+   !! @param conv_vel Output, convective velocity.
+   !! @param mixing_type Output, mixing type.
    !! @param ierr Output, error index.
-   subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, N2_T, T, opacity, rho, Cp, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, thermohaline_mag_B, &
-         thermohaline_FRG24_safety, thermohaline_FRG24_nks, &
-         thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
-         eta, D, gradT, Y_face, conv_vel, mixing_type, thrm_extras, ierr)
-      use thermohaline
-      character(len=*), intent(in) :: thermohaline_option
-      type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, N2_T, T, opacity, rho, Cp
-      real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff, thermohaline_mag_B, eta
-      integer, intent(in) :: iso, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_res
-      logical, intent(in) :: thermohaline_FRG24_with_TC
+   !! @param th_results Output, detailed thermohaline results (see thermohaline.f90)
+   subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, N2_T, T, rho, Cp, opacity, &
+      gradL_composition_term, XH1, eta, iso, &
+      thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+      D, gradT, Y_face, conv_vel, mixing_type, ierr, th_results)
 
-      type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
-      real(dp), pointer, intent(in) :: thrm_extras(:)
-      integer, intent(out) :: mixing_type, ierr
+      character(*), intent(in)                      :: thermohaline_option
+      type(auto_diff_real_star_order1), intent(in)  :: Lambda
+      type(auto_diff_real_star_order1), intent(in)  :: grada
+      type(auto_diff_real_star_order1), intent(in)  :: gradr
+      type(auto_diff_real_star_order1), intent(in)  :: N2_T
+      type(auto_diff_real_star_order1), intent(in)  :: T
+      type(auto_diff_real_star_order1), intent(in)  :: rho
+      type(auto_diff_real_star_order1), intent(in)  :: Cp
+      type(auto_diff_real_star_order1), intent(in)  :: opacity
+      real(dp), intent(in)                          :: gradL_composition_term
+      real(dp), intent(in)                          :: XH1
+      real(dp), intent(in)                          :: eta
+      integer, intent(in)                           :: iso
+      real(dp),intent(in)                           :: thermohaline_coeff
+      real(dp), intent(in)                          :: thermohaline_mag_B
+      integer, intent(in)                           :: thermohaline_FRG24_safety
+      integer, intent(in)                           :: thermohaline_FRG24_nks
+      integer, intent(in)                           :: thermohaline_FRG24_N
+      type(auto_diff_real_star_order1), intent(out) :: D
+      type(auto_diff_real_star_order1), intent(out) :: gradT
+      type(auto_diff_real_star_order1), intent(out) :: Y_face
+      type(auto_diff_real_star_order1), intent(out) :: conv_vel
+      integer, intent(out)                          :: mixing_type
+      integer, intent(out)                          :: ierr
+      type(th_results_t), intent(out), optional     :: th_results
 
-      real(dp) :: D_thrm
+      type(th_results_t) :: th_results_
 
-      call get_D_thermohaline(&
-         thermohaline_option, grada%val, gradr%val, N2_T%val, T%val, opacity%val, rho%val, &
-         Cp%val, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, thermohaline_mag_B, &
-         thermohaline_FRG24_safety, thermohaline_FRG24_nks, &
-         thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
-         eta, D_thrm, thrm_extras, ierr)
+      call get_thermohaline_results( &
+         thermohaline_option, grada%val, gradr%val, N2_T%val, T%val, rho%val, Cp%val, opacity%val, &
+         gradL_composition_term, XH1, eta, iso, &
+         thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+         th_results_, ierr)
 
-      D = D_thrm
+      D = th_results_%D_thrm
       gradT = gradr
       Y_face = gradT - grada
-      conv_vel = 3d0*D/Lambda
-      mixing_type = thermohaline_mixing 
+      conv_vel = 3._dp*D/Lambda
+      mixing_type = thermohaline_mixing
+
+      if (PRESENT(th_results)) th_results = th_results_
+
    end subroutine set_thermohaline
 
-   !! Helper functions used in turb/plotter for plotting mixing in terms of dimensionless parameters
-   subroutine thermohaline_mode_properties(Pr, tau, R0, lamhat, l2hat, ierr, method)
-     use fingering_modes
-
-     real(dp), intent(in)               :: Pr
-     real(dp), intent(in)               :: tau
-     real(dp), intent(in)               :: R0
-     real(dp), intent(out)              :: lamhat
-     real(dp), intent(out)              :: l2hat
-     integer, intent(out)               :: ierr
-     character(*), intent(in), optional :: method
-
-     real(dp) :: lhat
-     
-     if (PRESENT(method)) then
-        
-        select case(method)
-        case('OPT')
-           call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr, 'OPT')
-        case('CUBIC')
-           call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr, 'CUBIC')
-        case('2D_ROOT')
-           call calc_mode_properties(R0, Pr, tau, l2hat, lhat, lamhat)
-        case default
-           write(*, *) 'invalid method in call to gaml2max'
-           ierr = -1
-           return
-        end select
-
-      else
-
-         call gaml2max(Pr, tau, R0, lamhat, l2hat, ierr)
-
-      end if
-
-      return
-   end subroutine thermohaline_mode_properties
-
-   real(dp) function thermohaline_nusseltC(tau, w, lamhat, l2hat, KB)
-     use thermohaline, only: nuC
-     real(dp), intent(in) :: tau, w, lamhat, l2hat, KB
-     thermohaline_nusseltC = nuC(tau, w, lamhat, l2hat, KB)
-     return 
-   end function thermohaline_nusseltC
-
-   subroutine calc_hg19_w(HB, l2hat, lamhat, w, ierr)
-     use thermohaline, only: solve_hg19_eqn32
-
-     real(dp), intent(in)           :: HB
-     real(dp), intent(in)           :: l2hat
-     real(dp), intent(in)           :: lamhat
-     real(dp), intent(out)          :: w
-     integer, intent(out)           :: ierr
-
-     call solve_hg19_eqn32(HB, l2hat, lamhat, w, ierr)
-     
-   end subroutine calc_hg19_w
-
-   subroutine calc_frg24_w(pr, tau, r0, hb, db, ks, n, w, withTC, safety, ierr, lamhat, l2hat)
-     use parasite_model
-     use thermohaline, only: solve_hg19_eqn32
-
-     real(dp), intent(in) :: pr, tau, r0, hb, db 
-     real(dp), intent(in) :: ks(:)
-     integer, intent(in) :: n, safety ! n MUST be odd
-     real(dp), intent(out) :: w
-     logical, intent(in) :: withTC
-     integer, intent(out) :: ierr
-     real(dp), intent(in), optional :: lamhat, l2hat
-
-     ierr = 0
-
-     ! these calls to wf ignore delta, ideal, badks_exception, get_kmax (0,0,false,false)
-     if (present(lamhat)) then
-        ! lamhat and l2hat already calculated, so can pass as arguments
-        if(withTC) then
-           if (safety == 0) then
-             ! TODO: is it bad for this minimization to be occurring here AND in thermohaline.f90?
-             call solve_hg19_eqn32(hb, l2hat, lamhat, w, ierr)
-             w = MIN(w, wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety, lamhat, l2hat))
-           else
-             w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety, lamhat, l2hat)
-           end if
-        else
-           w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false., lamhat, l2hat)
-        end if
-     else
-        ! lamhat and l2hat need to be calculated inside the wf routine
-        if(withTC) then
-           if (safety == 0) then  ! TODO: fix this
-            stop "In turb.f90 calc_frg24_w, have not yet implemented safety=0 for case where lamhat, l2hat not already calculated"
-           end if
-           w = wf_withTC(pr, tau, r0, hb, db, ks, n, .false., safety)
-        else
-           w = wf(pr, tau, r0, hb, db, ks, n, 0d0, 0, .false., .false.)
-        end if
-     end if
-  
-   end subroutine calc_frg24_w
-   
    !> Computes the outputs of time-dependent convection theory following the model specified in
    !! Radek Smolec's thesis [https://users.camk.edu.pl/smolec/phd_smolec.pdf], which in turn
    !! follows the model of Kuhfuss 1986.

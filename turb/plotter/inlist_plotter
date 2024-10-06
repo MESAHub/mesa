@@ -5,16 +5,15 @@
   ! ignore_ierr = .true.
 
   ! calculate over nR0 points in the range 1 < R0 < 1/tau
-  nR0 = 50
+  n_R_0 = 50
 
   ! resolution used by FRG calculations
-  spectral_resolution = 17 ! 9
+  N = 8
 
   ! For FRG, we use 2*nks points in k space to scan for fastest growing mode
   nks = 50 ! 20
 
   ! whether or not to include T&C terms for extended matrix of FRG24 model
-  FRG_withTC = .true.
   safety = 3  ! balance between accuracy and speed for FRG24 model, safety=0 is less accurate but faster, safety=3 (max) is accurate but slow
 
   !! Parameters for thermohaline calculations
@@ -24,8 +23,8 @@
   Pr = 1d-6
   Pm = 0.1d0
   ! Magnetic field parameters (see HG19)
-  HB1 = 1d-7 ! ~100 Gauss
-  HB2 = 1d-5 ! ~1000 Gauss  
+  H_B_1 = 1d-7 ! ~100 Gauss
+  H_B_2 = 1d-5 ! ~1000 Gauss
   
   !! For WDs
   ! tau = 1d-3
