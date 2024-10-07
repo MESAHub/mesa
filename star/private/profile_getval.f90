@@ -31,8 +31,7 @@
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
-      use turb, only: I_PR, I_TAU, I_R0, I_DB, I_HB, I_LAMHAT, I_L2HAT, &
-             I_W, I_W_TC, I_W_HG19, I_D_THRM
+      use turb, only: th_results_t
 
 
       implicit none
@@ -1673,28 +1672,44 @@
                val = s% mlt_vc(k)
             case (p_mlt_D)
                val = s% mlt_D(k)
-            case (p_thrm_extras_Pr)
-               val = s% thrm_extras(I_PR, k)
-            case (p_thrm_extras_tau)
-               val = s% thrm_extras(I_TAU, k)
-            case (p_thrm_extras_R0)
-               val = s% thrm_extras(I_R0, k)
-            case (p_thrm_extras_HB)
-               val = s% thrm_extras(I_HB, k)
-            case (p_thrm_extras_DB)
-               val = s% thrm_extras(I_DB, k)
-            case (p_thrm_extras_lamhat)
-               val = s% thrm_extras(I_LAMHAT, k)
-            case (p_thrm_extras_l2hat)
-               val = s% thrm_extras(I_L2HAT, k)
-            case (p_thrm_extras_w)
-               val = s% thrm_extras(I_W, k)
-            case (p_thrm_extras_w_TC)
-               val = s% thrm_extras(I_W_TC, k)
-            case (p_thrm_extras_w_HG19)
-               val = s% thrm_extras(I_W_HG19, k)
-            case (p_thrm_extras_D_thrm)
-               val = s% thrm_extras(I_D_THRM, k)
+            case (p_th_results_K_therm)
+               val = s% th_results(k)%K_therm
+            case (p_th_results_K_T)
+               val = s% th_results(k)%K_T
+            case (p_th_results_K_C)
+               val = s% th_results(k)%K_C
+            case (p_th_results_nu)
+               val = s% th_results(k)%nu
+            case (p_th_results_Pr)
+               val = s% th_results(k)%Pr
+            case (p_th_results_tau)
+               val = s% th_results(k)%tau
+            case (p_th_results_R_0)
+               val = s% th_results(k)%R_0
+            case (p_th_results_r)
+               val = s% th_results(k)%r
+            case (p_th_results_H_B)
+               val = s% th_results(k)%H_B
+            case (p_th_results_Pm)
+               val = s% th_results(k)%Pm
+            case (p_th_results_D_B)
+               val = s% th_results(k)%D_B
+            case (p_th_results_lam_hat)
+               val = s% th_results(k)%lam_hat
+            case (p_th_results_l2_hat)
+               val = s% th_results(k)%l2_hat
+            case (p_th_results_sigma_max)
+               val = s% th_results(k)%sigma_max
+            case (p_th_results_w)
+               val = s% th_results(k)%w
+            case (p_th_results_w_HG19)
+               val = s% th_results(k)%w_HG19
+            case (p_th_results_w_FRG24)
+               val = s% th_results(k)%w_FRG24
+            case (p_th_results_Nu_C)
+               val = s% th_results(k)%Nu_C
+            case (p_th_results_D_thrm)
+               val = s% th_results(k)%D_thrm
             case (p_mlt_gradT)
                val = s% mlt_gradT(k)
             case (p_mlt_Y_face)

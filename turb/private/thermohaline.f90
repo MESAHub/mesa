@@ -57,7 +57,7 @@ module thermohaline
       real(dp) :: w = 0._dp         ! Saturation flow speed
       real(dp) :: w_HG19 = 0._dp    ! Saturation flow speed in HG19 treatment
       real(dp) :: w_FRG24 = 0._dp   ! Saturation flow speed in FRG24 treatment
-      real(dp) :: nu_C = 0._dp      ! Compositional Nusselt number
+      real(dp) :: Nu_C = 0._dp      ! Compositional Nusselt number
       real(dp) :: D_thrm = 0._dp    ! Effective thermohaline mixing diffusivity
    end type th_results_t
 
@@ -344,7 +344,7 @@ contains
       call eval_fastest_fingering(th_results%Pr, th_results%tau, th_results%R_0, th_results%lam_hat, th_results%l2_hat, ierr)
       if (ierr /= 0) return
 
-      th_results%nu_C = Nu_C_brown(th_results%tau, th_results%l2_hat, th_results%lam_hat)
+      th_results%Nu_C = Nu_C_brown(th_results%tau, th_results%l2_hat, th_results%lam_hat)
       th_results%D_thrm = th_results%K_C*(th_results%Nu_C - 1._dp)
 
    end subroutine set_results_BGS13

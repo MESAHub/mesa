@@ -134,8 +134,8 @@
     use_superad_reduction, superad_reduction_gamma_limit, superad_reduction_gamma_limit_scale, D_mix_zero_region_top_q, &
     superad_reduction_gamma_inv_scale, superad_reduction_diff_grads_limit, superad_reduction_limit, &
     make_gradr_sticky_in_solver_iters, min_logT_for_make_gradr_sticky_in_solver_iters, &
-    thermohaline_coeff, thermohaline_option, thermohaline_mag_B, &
-    thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_res, thermohaline_FRG24_with_TC, &
+    thermohaline_coeff, thermohaline_option, &
+    thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
     max_logT_for_mlt, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
@@ -1068,8 +1068,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% thermohaline_mag_B = thermohaline_mag_B
  s% thermohaline_FRG24_safety = thermohaline_FRG24_safety
  s% thermohaline_FRG24_nks = thermohaline_FRG24_nks
- s% thermohaline_FRG24_res = thermohaline_FRG24_res
- s% thermohaline_FRG24_with_TC = thermohaline_FRG24_with_TC
+ s% thermohaline_FRG24_N = thermohaline_FRG24_N
  s% mixing_length_alpha = mixing_length_alpha
  s% remove_small_D_limit = remove_small_D_limit
  s% alt_scale_height_flag = alt_scale_height_flag
@@ -2753,8 +2752,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  thermohaline_mag_B = s% thermohaline_mag_B
  thermohaline_FRG24_safety = s% thermohaline_FRG24_safety
  thermohaline_FRG24_nks = s% thermohaline_FRG24_nks
- thermohaline_FRG24_res = s% thermohaline_FRG24_res
- thermohaline_FRG24_with_TC = s% thermohaline_FRG24_with_TC
+ thermohaline_FRG24_N = s% thermohaline_FRG24_N
  mixing_length_alpha = s% mixing_length_alpha
  remove_small_D_limit = s% remove_small_D_limit
  alt_scale_height_flag = s% alt_scale_height_flag

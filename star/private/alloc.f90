@@ -1,6 +1,6 @@
 ! ***********************************************************************
 !
-!   Copyright (C) 2010-2019  The MESA Team
+!   Copyright (C) 2010-2024  The MESA Team
 !
 !   MESA is free software; you can use it and/or modify
 !   it under the combined terms and restrictions of the MESA MANIFESTO
@@ -465,7 +465,7 @@
          use rates_def, only: num_rvs
          use chem_def, only: num_categories
          use const_def, only: standard_cgrav
-         use turb, only: N_THRM_EXTRAS
+         use turb, only: th_results_t
          type (star_info), pointer :: s, c_in
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
@@ -1035,8 +1035,8 @@
             if (failed('mlt_mixing_length')) exit
             call do1(s% mlt_D, c% mlt_D)
             if (failed('mlt_D')) exit
-            call do2(s% thrm_extras, c% thrm_extras, N_THRM_EXTRAS, 'thrm_extras')
-            if (failed('thrm_extras')) exit
+            call do1_th_results(s% th_results, c% th_results)
+            if (failed('th_results')) exit
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
@@ -1556,7 +1556,25 @@
             end if
          end subroutine do1_logical
 
+         
+         subroutine do1_th_results(ptr, other)
+            use turb, only: th_results_t
+            type(th_results_t), dimension(:), pointer :: ptr, other
+            type(th_results_t), dimension(:), pointer :: tmp
+            if (action == do_copy_pointers_and_resize) then
+               ptr => other
+               if (nz <= size(ptr,dim=1)) return
+               deallocate(ptr)
+               allocate(ptr(sz_new), stat=ierr)
+            else
+               if (action == do_reallocate) then
+                  if (nz <= size(ptr,dim=1)) return
+               end if
+               call do1D_th_results(s, ptr, sz_new, action, ierr)
+            end if
+         end subroutine do1_th_results
 
+         
          subroutine do2(ptr, other, sz1, str)
             real(dp), dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
@@ -2311,6 +2329,54 @@
       end subroutine do1D_logical
 
 
+      subroutine do1D_th_results(s, ptr, sz, action, ierr)
+         use turb, only: th_results_t
+         type (star_info), pointer :: s
+         type(th_results_t), dimension(:), pointer:: ptr
+         integer, intent(in) :: sz, action
+         integer, intent(out) :: ierr
+         type(th_results_t), dimension(:), pointer :: ptr2
+         integer :: old_sz, j
+         ierr = 0
+         select case(action)
+            case (do_deallocate)
+               if (associated(ptr)) then
+                  deallocate(ptr)
+                  nullify(ptr)
+               end if
+            case (do_allocate)
+               allocate(ptr(sz), stat=ierr)
+               if (s% zero_when_allocate) ptr = th_results_t()
+            case (do_check_size)
+               if (size(ptr,dim=1) < sz) ierr = -1
+            case (do_remove_from_center)
+               allocate(ptr2(sz), stat=ierr)
+               old_sz = size(ptr,dim=1)
+               do j=1,min(old_sz,sz)
+                  ptr2(j) = ptr(j)
+               end do
+               deallocate(ptr)
+               if (ierr /= 0) return
+               ptr => ptr2
+            case (do_reallocate)
+               if (associated(ptr)) then
+                  if (size(ptr,dim=1) >= sz) return
+               else
+                  ierr = -1
+                  return
+               end if
+               allocate(ptr2(sz), stat=ierr)
+               old_sz = size(ptr,dim=1)
+               do j=1,old_sz
+                  ptr2(j) = ptr(j)
+               end do
+               deallocate(ptr)
+               if (ierr /= 0) return
+               ptr => ptr2
+         end select
+      end subroutine do1D_th_results
+
+      
       subroutine set_var_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr

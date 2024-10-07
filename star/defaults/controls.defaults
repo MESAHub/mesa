@@ -2263,7 +2263,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! Nominal magnetic field strength (in gauss) to use in  thermohaline prescriptions that
-      ! include magnetic fields (i.e., HG19 and FRG24).
+      ! include magnetic fields (e.g., HG19 and FRG24).
 
       ! ::
 
@@ -2297,24 +2297,14 @@
     thermohaline_FRG24_nks = 50
 
 
-      ! thermohaline_FRG24_res
-      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! thermohaline_FRG24_N
+      ! ~~~~~~~~~~~~~~~~~~~~
 
-      ! Spectral resolution to adopt when constructing parasitic modes in the FRG24 prescription.
-
-      ! ::
-
-    thermohaline_FRG24_res = 17
-
-
-      ! thermohaline_FRG24_with_TC
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Include temperature & composition perturbations in the FRG24 prescription.
+      ! Maximal mode index to adopt when constructing parasitic modes in the FRG24 prescription.
 
       ! ::
 
-    thermohaline_FRG24_with_TC = .true.
+    thermohaline_FRG24_N = 8
 
 
       ! alt_scale_height_flag
