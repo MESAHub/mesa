@@ -32,7 +32,6 @@ use num_lib
 use utils_lib
 use auto_diff_support
 use star_utils
-use turb
 use magnetic_diffusion
 use kap_lib
 
@@ -170,8 +169,10 @@ contains
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          alpha_semiconvection, thermohaline_coeff, &
-         mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr, th_results)
+         mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr, th_info)
       use star_utils
+      use turb_lib
+      use turb_def
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
@@ -184,7 +185,7 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
-      type(th_results_t), intent(out), optional :: th_results
+      type(th_info_t), intent(out), optional :: th_info
       
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta, N2_T
       real(dp) :: conv_vel_start, scale
@@ -219,7 +220,7 @@ contains
       Y_face = gradT - gradL
       conv_vel = 0d0
       D = 0d0
-      if (PRESENT(th_results)) th_results = th_results_t()
+      if (PRESENT(th_info)) th_info = th_info_t()
       Gamma = 0d0  
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
@@ -353,7 +354,7 @@ contains
                gradL_composition_term, XH1, eta, iso, &
                thermohaline_coeff, &
                s% thermohaline_mag_B, s% thermohaline_FRG24_safety, s% thermohaline_FRG24_nks, s% thermohaline_FRG24_N, &
-               D, gradT, Y_face, conv_vel, mixing_type, ierr, th_results)
+               D, gradT, Y_face, conv_vel, mixing_type, ierr, th_info)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
                return

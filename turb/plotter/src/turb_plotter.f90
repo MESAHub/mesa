@@ -3,7 +3,8 @@ program turb_plotter
    use utils_lib
    use const_lib
    use math_lib
-   use turb, only: set_results_HG19, set_results_FRG24, th_results_t
+   use turb_lib, only: set_info_HG19, set_info_FRG24
+   use turb_def
 
    implicit none
 
@@ -85,17 +86,17 @@ contains
       real(dp), intent(in) :: R_0
       integer, intent(out) :: ierr
 
-      type(th_results_t) :: th_results
+      type(th_info_t) :: th_info
       integer  :: i
 
-      ! Set parameters in th_results
+      ! Set parameters in th_info
 
-      th_results%Pr = Pr
-      th_results%tau = tau
-      th_results%R_0 = R_0
-      th_results%r = (th_results%R_0 - 1._dp)/(1._dp/th_results%tau - 1._dp)
-      th_results%D_B = D_B
-      th_results%K_C = 1._dp ! Required so that D_thrm = D_thrm/K_C
+      th_info%Pr = Pr
+      th_info%tau = tau
+      th_info%R_0 = R_0
+      th_info%r = (th_info%R_0 - 1._dp)/(1._dp/th_info%tau - 1._dp)
+      th_info%D_B = D_B
+      th_info%K_C = 1._dp ! Required so that D_thrm = D_thrm/K_C
 
       res(j, 1) = R_0
 
@@ -103,14 +104,14 @@ contains
 
       do i = 1,3
 
-         th_results%H_B = H_B(i)
+         th_info%H_B = H_B(i)
 
-         call set_results_HG19(th_results, ierr)
+         call set_info_HG19(th_info, ierr)
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         res(j,i+1) = th_results%D_thrm
+         res(j,i+1) = th_info%D_thrm
 
       end do
 
@@ -118,14 +119,14 @@ contains
 
       do i = 1,3
 
-         th_results%H_B = H_B(i)
+         th_info%H_B = H_B(i)
 
-         call set_results_FRG24(safety, nks, N, th_results, ierr)
+         call set_info_FRG24(safety, nks, N, th_info, ierr)
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         res(j,i+4) = th_results%D_thrm
+         res(j,i+4) = th_info%D_thrm
 
       end do
 

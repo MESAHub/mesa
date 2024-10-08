@@ -2,7 +2,7 @@ program test_turb
    use math_lib
    use auto_diff
    use const_def
-   use turb
+   use turb_lib
 
    call check_efficient_MLT_scaling()
    call check_TDC()

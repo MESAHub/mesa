@@ -22,7 +22,8 @@ SRCS = \
      parasite_model_matrices.f90 \
      thermohaline.f90 \
      semiconvection.f90 \
-     turb.f90
+     turb_lib.f90 \
+     turb_def.f90
 
 #################################################################
 #
@@ -54,14 +55,13 @@ clean:
 	-@rm -f *.o *.mod *genmod.f90 *.so *.a .depend *.smod
 
 install:
-	@$(CP_IF_NEWER) turb.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) turb_lib.mod turb_def.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 ifneq (,$(findstring ifort,$(FC)))
 	@$(CP_IF_NEWER) mlt.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) tdc.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) semiconvection.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) thermohaline.mod $(MESA_DIR)/include
-	@$(CP_IF_NEWER) turb.mod $(MESA_DIR)/include
 endif
 
 nodeps : $(.DEFAULT_GOAL)

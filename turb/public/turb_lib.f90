@@ -23,22 +23,22 @@
 !
 ! ***********************************************************************
 
-module turb
+module turb_lib
 
    use const_def, only: dp
    use num_lib
    use math_lib
    use utils_lib
    use auto_diff
-   use thermohaline
-
+   use turb_def
+   use thermohaline, only: set_info_HG19, set_info_FRG24 ! Used by plotter routine
+   
    implicit none
 
    private
    public :: set_thermohaline
-   public :: th_results_t
-   public :: set_results_HG19  ! Used by plotter routine
-   public :: set_results_FRG24 ! Used by plotter routine
+   public :: set_info_HG19
+   public :: set_info_FRG24
    public :: set_mlt
    public :: set_tdc
    public :: set_semiconvection
@@ -75,7 +75,9 @@ contains
    subroutine set_thermohaline(thermohaline_option, Lambda, grada, gradr, N2_T, T, rho, Cp, opacity, &
       gradL_composition_term, XH1, eta, iso, &
       thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
-      D, gradT, Y_face, conv_vel, mixing_type, ierr, th_results)
+      D, gradT, Y_face, conv_vel, mixing_type, ierr, th_info)
+
+      use thermohaline
 
       character(*), intent(in)                      :: thermohaline_option
       type(auto_diff_real_star_order1), intent(in)  :: Lambda
@@ -101,23 +103,23 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: conv_vel
       integer, intent(out)                          :: mixing_type
       integer, intent(out)                          :: ierr
-      type(th_results_t), intent(out), optional     :: th_results
+      type(th_info_t), intent(out), optional        :: th_info
 
-      type(th_results_t) :: th_results_
+      type(th_info_t) :: th_info_
 
-      call get_thermohaline_results( &
+      call get_thermohaline_info( &
          thermohaline_option, grada%val, gradr%val, N2_T%val, T%val, rho%val, Cp%val, opacity%val, &
          gradL_composition_term, XH1, eta, iso, &
          thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
-         th_results_, ierr)
+         th_info_, ierr)
 
-      D = th_results_%D_thrm
+      D = th_info_%D_thrm
       gradT = gradr
       Y_face = gradT - grada
       conv_vel = 3._dp*D/Lambda
       mixing_type = thermohaline_mixing
 
-      if (PRESENT(th_results)) th_results = th_results_
+      if (PRESENT(th_info)) th_info = th_info_
 
    end subroutine set_thermohaline
 
@@ -307,4 +309,4 @@ contains
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
    end subroutine set_MLT
 
-end module turb
+end module turb_lib

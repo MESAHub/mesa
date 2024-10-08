@@ -28,47 +28,20 @@ module thermohaline
    use const_def, only: dp
    use num_lib
    use math_lib
-   use utils_lib
-   use auto_diff
    use chem_def, only: chem_isos
    use fingering_modes
    use parasite_model
+   use turb_def
 
    implicit none
 
-   ! Derived-type definitions
-
-   type th_results_t
-      real(dp) :: K_therm = 0._dp   ! Thermal conductivity
-      real(dp) :: K_T = 0._dp       ! Thermal diffusivity
-      real(dp) :: K_C = 0._dp       ! Chemical diffusivity
-      real(dp) :: nu = 0._dp        ! Viscosity
-      real(dp) :: Pr = 0._dp        ! Prandtl number
-      real(dp) :: tau = 0._dp       ! Chemical diffusivity ratio
-      real(dp) :: R_0 = 0._dp       ! Density ratio
-      real(dp) :: r = 0._dp         ! Reduced density ratio
-      real(dp) :: H_B = 0._dp       ! Lorentz force coefficient
-      real(dp) :: Pm = 0._dp        ! Magnetic Prandtl number
-      real(dp) :: D_B = 0._dp       ! Magnetic diffusivity
-      real(dp) :: lam_hat = 0._dp   ! Growth rate of fastest-growing fingering mode
-      real(dp) :: l2_hat = 0._dp    ! Horizontal wavenumber squared of fastest-growing fingering mode
-      real(dp) :: sigma_max = 0._dp ! Growth rate of fastest-growing parasitic mode
-      real(dp) :: k_z_max = 0._dp   ! Vertical wavenumber of fastest-growing parasitic mode
-      real(dp) :: w = 0._dp         ! Saturation flow speed
-      real(dp) :: w_HG19 = 0._dp    ! Saturation flow speed in HG19 treatment
-      real(dp) :: w_FRG24 = 0._dp   ! Saturation flow speed in FRG24 treatment
-      real(dp) :: Nu_C = 0._dp      ! Compositional Nusselt number
-      real(dp) :: D_thrm = 0._dp    ! Effective thermohaline mixing diffusivity
-   end type th_results_t
-
    private
-   public :: get_thermohaline_results
-   public :: set_results_HG19, set_results_FRG24 ! Used by plotter routines
-   public :: th_results_t
+   public :: get_thermohaline_info
+   public :: set_info_HG19, set_info_FRG24 ! Used by plotter routines
 
 contains
 
-   !> Computes detialed results for thermohaline mixing --- when the
+   !> Computes detialed information for thermohaline mixing --- when the
    !! thermal gradient is stable and the composition gradient is unstable.
    !!
    !! @param thermohaline_option A string specifying which thermohaline prescription to use.
@@ -88,33 +61,33 @@ contains
    !! @param thermohaline_FRG24_safety Safety parameter for choosing approximations in FRG24 prescription.
    !! @param thermohaline_FRG24_nks Number of vertical wavenumbers to search over in FRG24 prescription.
    !! @param thermohaline_FRG24_N Maximal mode index in FRG24 prescription.
-   !! @param th_results Output, thermohaline results stored in th_results_t structure
+   !! @param th_info Output, detailed thermohaline info stored in th_info_t structure
    !! @param ierr Output, error index.
-   subroutine get_thermohaline_results(thermohaline_option, &
+   subroutine get_thermohaline_info(thermohaline_option, &
       grada, gradr, N2_T, T, rho, Cp, opacity, &
       gradL_composition_term, XH1, eta, iso, &
       thermohaline_coeff, thermohaline_mag_B, thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
-      th_results, ierr)
+      th_info, ierr)
 
-      character(*), intent(in)        :: thermohaline_option
-      real(dp), intent(in)            :: grada
-      real(dp), intent(in)            :: gradr
-      real(dp), intent(in)            :: N2_T
-      real(dp), intent(in)            :: T
-      real(dp), intent(in)            :: rho
-      real(dp), intent(in)            :: Cp
-      real(dp), intent(in)            :: opacity
-      real(dp), intent(in)            :: gradL_composition_term
-      real(dp), intent(in)            :: XH1
-      real(dp), intent(in)            :: eta
-      integer, intent(in)             :: iso
-      real(dp), intent(in)            :: thermohaline_coeff
-      real(dp), intent(in)            :: thermohaline_mag_B
-      integer, intent(in)             :: thermohaline_FRG24_safety
-      integer, intent(in)             :: thermohaline_FRG24_nks
-      integer, intent(in)             :: thermohaline_FRG24_N
-      type(th_results_t), intent(out) :: th_results
-      integer, intent(out)            :: ierr
+      character(*), intent(in)     :: thermohaline_option
+      real(dp), intent(in)         :: grada
+      real(dp), intent(in)         :: gradr
+      real(dp), intent(in)         :: N2_T
+      real(dp), intent(in)         :: T
+      real(dp), intent(in)         :: rho
+      real(dp), intent(in)         :: Cp
+      real(dp), intent(in)         :: opacity
+      real(dp), intent(in)         :: gradL_composition_term
+      real(dp), intent(in)         :: XH1
+      real(dp), intent(in)         :: eta
+      integer, intent(in)          :: iso
+      real(dp), intent(in)         :: thermohaline_coeff
+      real(dp), intent(in)         :: thermohaline_mag_B
+      integer, intent(in)          :: thermohaline_FRG24_safety
+      integer, intent(in)          :: thermohaline_FRG24_nks
+      integer, intent(in)          :: thermohaline_FRG24_N
+      type(th_info_t), intent(out) :: th_info
+      integer, intent(out)         :: ierr
       
       include 'formats'
 
@@ -122,16 +95,16 @@ contains
 
       ! Calculate common data
 
-      call set_results_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, thermohaline_mag_B, th_results)
-      call set_results_strat(grada, gradr, gradL_composition_term, th_results)
+      call set_info_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, thermohaline_mag_B, th_info)
+      call set_info_strat(grada, gradr, gradL_composition_term, th_info)
 
       ! Handle cases where this routine shouldn't have been called in the first place
  
-      if (th_results%Pr < 0._dp) then
-         write(*, *) 'warning: get_thermohaline_results being called when Pr < 0'
+      if (th_info%Pr < 0._dp) then
+         write(*, *) 'warning: get_thermohaline_info being called when Pr < 0'
          return
-      else if (th_results%r > 1._dp) then
-         write(*, *) 'warning: get_thermohaline_results being called when r > 1'
+      else if (th_info%r > 1._dp) then
+         write(*, *) 'warning: get_thermohaline_info being called when r > 1'
          return
       end if
 
@@ -141,29 +114,29 @@ contains
 
       case ('Kippenhahn')
 
-         call set_results_KRT80(grada, gradr, gradL_composition_term, rho, Cp, &
-            th_results)
+         call set_info_KRT80(grada, gradr, gradL_composition_term, rho, Cp, &
+            th_info)
 
       case ('Traxler_Garaud_Stellmach_11')
 
-         call set_results_TGS11(th_results)
+         call set_info_TGS11(th_info)
 
       case ('Brown_Garaud_Stellmach_13')
          
-         call set_results_BGS13(th_results, ierr)
+         call set_info_BGS13(th_info, ierr)
 
       case ('Harrington_Garaud_19')
 
-         call set_results_HG19(th_results, ierr)
+         call set_info_HG19(th_info, ierr)
 
       case ('Fraser_Reifenstein_Garaud_24')
 
-         call set_results_FRG24(thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
-            th_results, ierr)
+         call set_info_FRG24(thermohaline_FRG24_safety, thermohaline_FRG24_nks, thermohaline_FRG24_N, &
+            th_info, ierr)
 
       case default
 
-         th_results%D_thrm = 0._dp
+         th_info%D_thrm = 0._dp
          ierr = -1
          write(*,*) 'unknown for MLT thermohaline_option' // trim(thermohaline_option)
 
@@ -171,31 +144,31 @@ contains
 
       ! Rescale the thermohaline diffusivity
 
-      th_results%D_thrm = thermohaline_coeff*th_results%D_thrm
+      th_info%D_thrm = thermohaline_coeff*th_info%D_thrm
 
-   end subroutine get_thermohaline_results
+   end subroutine get_thermohaline_info
 
    !****
 
-   subroutine set_results_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, B0, th_results)
+   subroutine set_info_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, B0, th_info)
 
-      real(dp), intent(in)              :: T
-      real(dp), intent(in)              :: rho
-      real(dp), intent(in)              :: Cp
-      real(dp), intent(in)              :: opacity
-      integer, intent(in)               :: iso
-      real(dp), intent(in)              :: XH1
-      real(dp), intent(in)              :: eta
-      real(dp), intent(in)              :: N2_T
-      real(dp), intent(in)              :: B0
-      type(th_results_t), intent(inout) :: th_results
+      real(dp), intent(in)           :: T
+      real(dp), intent(in)           :: rho
+      real(dp), intent(in)           :: Cp
+      real(dp), intent(in)           :: opacity
+      integer, intent(in)            :: iso
+      real(dp), intent(in)           :: XH1
+      real(dp), intent(in)           :: eta
+      real(dp), intent(in)           :: N2_T
+      real(dp), intent(in)           :: B0
+      type(th_info_t), intent(inout) :: th_info
 
       real(dp) :: K_therm, qe4, loglambdah, loglambdacx, loglambdacy, ccx, ccy
       real(dp) :: Bcoeff, chemA, chemZ, acx, acy, nu_mol, nu_rad
       real(dp) :: K_T, K_C, nu
       real(dp) :: d2
 
-      ! Set fluid coefficients in th_results
+      ! Set fluid coefficients in th_info
 
       K_therm = 4._dp*crad*clight*pow3(T)/(3._dp*opacity*rho) ! thermal conductivity
 
@@ -271,134 +244,142 @@ contains
 
       ! Store results
 
-      th_results%K_therm = K_therm
-      th_results%K_T = K_T
-      th_results%K_C = K_C
-      th_results%nu = nu
-      th_results%Pr = nu/K_T
-      th_results%Pm = nu/eta
-      th_results%tau = K_C/K_T
-      th_results%H_B = B0*B0*d2/(pi4*rho*K_T*K_T)
-      th_results%D_B = th_results%Pr/th_results%Pm
+      th_info%K_therm = K_therm
+      th_info%K_T = K_T
+      th_info%K_C = K_C
+      th_info%nu = nu
+      th_info%Pr = nu/K_T
+      th_info%Pm = nu/eta
+      th_info%tau = K_C/K_T
+      th_info%H_B = B0*B0*d2/(pi4*rho*K_T*K_T)
+      th_info%D_B = th_info%Pr/th_info%Pm
 
-   end subroutine set_results_coeffs
+   end subroutine set_info_coeffs
 
    !****
 
-   subroutine set_results_strat(grada, gradr, gradL_composition_term, th_results)
+   subroutine set_info_strat(grada, gradr, gradL_composition_term, th_info)
 
-      real(dp), intent(in) :: grada, gradr, gradL_composition_term
-      type(th_results_t), intent(inout) :: th_results
+      real(dp), intent(in)           :: grada
+      real(dp), intent(in)           :: gradr
+      real(dp), intent(in)           :: gradL_composition_term
+      type(th_info_t), intent(inout) :: th_info
 
-      ! Set stratification coefficients in th_results
+      ! Set stratification coefficients in th_info
 
-      th_results%R_0 = (gradr - grada)/gradL_composition_term
-      th_results%r = (th_results%R_0 - 1._dp)/(1._dp/th_results%tau - 1._dp)
+      th_info%R_0 = (gradr - grada)/gradL_composition_term
+      th_info%r = (th_info%R_0 - 1._dp)/(1._dp/th_info%tau - 1._dp)
 
-   end subroutine set_results_strat
+   end subroutine set_info_strat
       
    !****
 
-   subroutine set_results_KRT80(grada, gradr, gradL_composition_term, rho, Cp, &
-      th_results)
+   subroutine set_info_KRT80(grada, gradr, gradL_composition_term, rho, Cp, &
+      th_info)
 
-      real(dp), intent(in) :: grada, gradr, gradL_composition_term, rho, Cp
-      type(th_results_t), intent(inout) :: th_results
+      real(dp), intent(in)           :: grada
+      real(dp), intent(in)           :: gradr
+      real(dp), intent(in)           :: gradL_composition_term
+      real(dp), intent(in)           :: rho
+      real(dp), intent(in)           :: Cp
+      type(th_info_t), intent(inout) :: th_info
 
       real(dp) :: dgrad
 
-      ! Set components of th_results following Kippenhahn, R.,
+      ! Set components of th_info following Kippenhahn, R.,
       ! Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175 (KRT80)
 
-      dgrad = max(1d-40, grada - gradr) ! this seems a bit janky, and is incompatible with set_results_strat
+      dgrad = max(1d-40, grada - gradr) ! this seems a bit janky, and is incompatible with set_info_strat
 
-      th_results%D_thrm = -3._dp*th_results%K_therm/(2*rho*Cp)*gradL_composition_term/dgrad
+      th_info%D_thrm = -3._dp*th_info%K_therm/(2*rho*Cp)*gradL_composition_term/dgrad
 
-   end subroutine set_results_KRT80
+   end subroutine set_info_KRT80
 
    !****
 
-   subroutine set_results_TGS11(th_results)
+   subroutine set_info_TGS11(th_info)
 
-      type(th_results_t), intent(inout) :: th_results
+      type(th_info_t), intent(inout) :: th_info
       
-      ! Set components of th_results following Traxler, Garaud, &
+      ! Set components of th_info following Traxler, Garaud, &
       ! Stellmach, ApJ Letters, 728:L29 (2011). Also see
       ! Denissenkov. ApJ 723:563–579, 2010.
 
-      th_results%D_thrm = 101._dp*sqrt(th_results%K_C*th_results%nu)* &
-         exp(-3.6_dp*th_results%r)*pow(1._dp - th_results%r, 1.1_dp) ! eqn. (24)
+      th_info%D_thrm = 101._dp*sqrt(th_info%K_C*th_info%nu)* &
+         exp(-3.6_dp*th_info%r)*pow(1._dp - th_info%r, 1.1_dp) ! eqn. (24)
       
-   end subroutine set_results_TGS11
+   end subroutine set_info_TGS11
 
    !****
 
-   subroutine set_results_BGS13(th_results, ierr)
+   subroutine set_info_BGS13(th_info, ierr)
 
-      type(th_results_t), intent(inout) :: th_results
-      integer, intent(out) :: ierr
+      type(th_info_t), intent(inout) :: th_info
+      integer, intent(out)           :: ierr
       
-      ! Set components of th_results following Brown, Garaud, &
+      ! Set components of th_info following Brown, Garaud, &
       ! Stellmach, ApJ 768:34 (2013)
 
-      call eval_fastest_fingering(th_results%Pr, th_results%tau, th_results%R_0, th_results%lam_hat, th_results%l2_hat, ierr)
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
       if (ierr /= 0) return
 
-      th_results%Nu_C = Nu_C_brown(th_results%tau, th_results%l2_hat, th_results%lam_hat)
-      th_results%D_thrm = th_results%K_C*(th_results%Nu_C - 1._dp)
+      th_info%Nu_C = Nu_C_brown(th_info%tau, th_info%l2_hat, th_info%lam_hat)
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
 
-   end subroutine set_results_BGS13
+   end subroutine set_info_BGS13
 
    !****
 
-   subroutine set_results_HG19(th_results, ierr)
+   subroutine set_info_HG19(th_info, ierr)
 
-      type(th_results_t), intent(inout) :: th_results
-      integer, intent(out) :: ierr
+      type(th_info_t), intent(inout) :: th_info
+      integer, intent(out)           :: ierr
 
       real(dp), parameter :: K_B = 1.24
       
-      ! Set componets of th_results following Harrington & Garaud, ApJ
+      ! Set componets of th_info following Harrington & Garaud, ApJ
       ! Letters, 870:L5 (2019; HG19)
 
-      call eval_fastest_fingering(th_results%Pr, th_results%tau, th_results%R_0, th_results%lam_hat, th_results%l2_hat, ierr)
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
       if (ierr /= 0) return
 
       ! Solve for w_HG19
 
-      call solve_HG19_eqn32(th_results%H_B, th_results%l2_hat, th_results%lam_hat, th_results%w_HG19, ierr)
+      call solve_HG19_eqn32(th_info%H_B, th_info%l2_hat, th_info%lam_hat, th_info%w_HG19, ierr)
       if (ierr /= 0) then
          write(*,*) 'failed in solve_HG19_eqn32'
-         write(*,*) 'H_B', th_results%H_B
-         write(*,*) 'l2_hat', th_results%l2_hat
-         write(*,*) 'lam_hat', th_results%lam_hat
-         write(*,*) 'w', th_results%w_HG19
+         write(*,*) 'H_B', th_info%H_B
+         write(*,*) 'l2_hat', th_info%l2_hat
+         write(*,*) 'lam_hat', th_info%lam_hat
+         write(*,*) 'w', th_info%w_HG19
          return
       end if
 
-      th_results%w = th_results%w_HG19
+      th_info%w = th_info%w_HG19
 
       ! Evaluate Nu_C and D_thrm
 
-      th_results%Nu_C = Nu_C(th_results%tau, th_results%w, th_results%lam_hat, th_results%l2_hat, K_B)
-      th_results%D_thrm = th_results%K_C*(th_results%Nu_C - 1._dp)
+      th_info%Nu_C = Nu_C(th_info%tau, th_info%w, th_info%lam_hat, th_info%l2_hat, K_B)
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
 
-   end subroutine set_results_HG19
+   end subroutine set_info_HG19
 
    !****
   
-   subroutine set_results_FRG24(safety, nks, N, th_results, ierr)
+   subroutine set_info_FRG24(safety, nks, N, th_info, ierr)
 
-      integer, intent(in) :: safety, nks, N
-      type(th_results_t), intent(inout) :: th_results
-      integer, intent(out) :: ierr
+      integer, intent(in)            :: safety
+      integer, intent(in)            :: nks
+      integer, intent(in)            :: N
+      type(th_info_t), intent(inout) :: th_info
+      integer, intent(out)           :: ierr
 
       real(dp), parameter :: K_B = 0.62_dp
 
       real(dp), allocatable :: k_z(:)
       integer :: j
       
-      ! Set components of th_results following Fraser, Reifenstein, &
+      ! Set components of th_info following Fraser, Reifenstein, &
       ! Garaud, ApJ 964:184 (2024; FRG24)
 
       ! Define grid of vertical wavenumbers. This may evolve. Rich is
@@ -416,44 +397,44 @@ contains
 
       ! Solve for w_FRG24
 
-      call eval_parasite_saturation(th_results%Pr, th_results%tau, th_results%R_0, th_results%H_B, th_results%D_B, &
-         th_results%lam_hat, th_results%l2_hat, k_z, N, safety, th_results%sigma_max, th_results%k_z_max, th_results%w_FRG24, ierr)
+      call eval_parasite_saturation(th_info%Pr, th_info%tau, th_info%R_0, th_info%H_B, th_info%D_B, &
+         th_info%lam_hat, th_info%l2_hat, k_z, N, safety, th_info%sigma_max, th_info%k_z_max, th_info%w_FRG24, ierr)
       if (ierr /= 0) then
          write(*,*) 'failed in eval_parasite_saturation'
-         write(*,*) 'Pr', th_results%Pr
-         write(*,*) 'tau', th_results%tau
-         write(*,*) 'R_0', th_results%R_0
-         write(*,*) 'H_B', th_results%H_B
-         write(*,*) 'D_B', th_results%D_B
-         write(*,*) 'l2_hat', th_results%l2_hat
-         write(*,*) 'lam_hat', th_results%lam_hat
-         write(*,*) 'w_HG19', th_results%w_HG19
+         write(*,*) 'Pr', th_info%Pr
+         write(*,*) 'tau', th_info%tau
+         write(*,*) 'R_0', th_info%R_0
+         write(*,*) 'H_B', th_info%H_B
+         write(*,*) 'D_B', th_info%D_B
+         write(*,*) 'l2_hat', th_info%l2_hat
+         write(*,*) 'lam_hat', th_info%lam_hat
+         write(*,*) 'w_HG19', th_info%w_HG19
          return
       end if
 
       ! For safety = 0, merge with w_HG19
 
       if (safety == 0) then
-         call solve_HG19_eqn32(th_results%H_B, th_results%l2_hat, th_results%lam_hat, th_results%w_HG19, ierr)
+         call solve_HG19_eqn32(th_info%H_B, th_info%l2_hat, th_info%lam_hat, th_info%w_HG19, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in solve_HG19_eqn32'
-            write(*,*) 'H_B', th_results%H_B
-            write(*,*) 'l2_hat', th_results%l2_hat
-            write(*,*) 'lam_hat', th_results%lam_hat
-            write(*,*) 'w_HG19', th_results%w_HG19
+            write(*,*) 'H_B', th_info%H_B
+            write(*,*) 'l2_hat', th_info%l2_hat
+            write(*,*) 'lam_hat', th_info%lam_hat
+            write(*,*) 'w_HG19', th_info%w_HG19
             return
          end if
-         th_results%w = MIN(th_results%w_FRG24, th_results%w_HG19)  ! TODO: is this a sane way to go about this?
+         th_info%w = MIN(th_info%w_FRG24, th_info%w_HG19)  ! TODO: is this a sane way to go about this?
       else
-         th_results%w = th_results%w_FRG24
+         th_info%w = th_info%w_FRG24
       end if
 
       ! Evaluate Nu_C and D_thrm
 
-      th_results%Nu_C = Nu_C(th_results%tau, th_results%w, th_results%lam_hat, th_results%l2_hat, K_B)
-      th_results%D_thrm = th_results%K_C*(th_results%Nu_C - 1._dp)
+      th_info%Nu_C = Nu_C(th_info%tau, th_info%w, th_info%lam_hat, th_info%l2_hat, K_B)
+      th_info%D_thrm = th_info%K_C*(th_info%Nu_C - 1._dp)
 
-   end subroutine set_results_FRG24
+   end subroutine set_info_FRG24
 
    !****
 
