@@ -31,8 +31,6 @@
       use star_utils
       use utils_lib
       use auto_diff_support, only: get_w, get_etrb
-      use turb, only: th_results_t
-
 
       implicit none
 
@@ -1672,44 +1670,6 @@
                val = s% mlt_vc(k)
             case (p_mlt_D)
                val = s% mlt_D(k)
-            case (p_th_results_K_therm)
-               val = s% th_results(k)%K_therm
-            case (p_th_results_K_T)
-               val = s% th_results(k)%K_T
-            case (p_th_results_K_C)
-               val = s% th_results(k)%K_C
-            case (p_th_results_nu)
-               val = s% th_results(k)%nu
-            case (p_th_results_Pr)
-               val = s% th_results(k)%Pr
-            case (p_th_results_tau)
-               val = s% th_results(k)%tau
-            case (p_th_results_R_0)
-               val = s% th_results(k)%R_0
-            case (p_th_results_r)
-               val = s% th_results(k)%r
-            case (p_th_results_H_B)
-               val = s% th_results(k)%H_B
-            case (p_th_results_Pm)
-               val = s% th_results(k)%Pm
-            case (p_th_results_D_B)
-               val = s% th_results(k)%D_B
-            case (p_th_results_lam_hat)
-               val = s% th_results(k)%lam_hat
-            case (p_th_results_l2_hat)
-               val = s% th_results(k)%l2_hat
-            case (p_th_results_sigma_max)
-               val = s% th_results(k)%sigma_max
-            case (p_th_results_w)
-               val = s% th_results(k)%w
-            case (p_th_results_w_HG19)
-               val = s% th_results(k)%w_HG19
-            case (p_th_results_w_FRG24)
-               val = s% th_results(k)%w_FRG24
-            case (p_th_results_Nu_C)
-               val = s% th_results(k)%Nu_C
-            case (p_th_results_D_thrm)
-               val = s% th_results(k)%D_thrm
             case (p_mlt_gradT)
                val = s% mlt_gradT(k)
             case (p_mlt_Y_face)

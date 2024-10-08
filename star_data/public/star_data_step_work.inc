@@ -171,10 +171,11 @@
       real(dp), pointer :: richardson_number(:) ! defined at cell boundaries
       
       ! diffusion coefs defined at cell boundaries (cm^2/s)
+
       real(dp), pointer :: D_mix_non_rotation(:) ! from non-rotation sources
       real(dp), pointer :: D_mix_rotation(:) ! from non-rotation sources
-
-      ! convection, semiconvection, thermohaline, overshooting
+         ! convection, semiconvection, thermohaline, overshooting
+         
       real(dp), pointer :: D_visc(:) ! kinematic shear viscosity
       real(dp), pointer :: D_DSI(:) ! dynamical shear instability 
       real(dp), pointer :: D_SH(:) ! Solberg-Hoiland instability
@@ -362,7 +363,6 @@
          real(dp), pointer :: mlt_gradT(:) ! prior to adjustments
          real(dp), pointer :: mlt_cdc(:) 
          real(dp), pointer :: L_conv(:)
-         type(th_results_t), pointer :: th_results(:) ! detailed results from thermohaline routines
          
          integer, pointer :: tdc_num_iters(:)
          

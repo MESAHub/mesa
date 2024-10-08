@@ -108,7 +108,7 @@ contains
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
          gradr, grada, scale_height, mixing_length_alpha, &
-         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr, th_results)
+         mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -117,9 +117,8 @@ contains
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
-           gradT, Y_face, mlt_vc, D, Gamma
+         gradT, Y_face, mlt_vc, D, Gamma
       integer, intent(out) :: ierr
-      type(th_results_t), intent(out), optional :: th_results
               
       real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
       integer :: iso, old_mix_type
@@ -153,7 +152,7 @@ contains
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
-            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr, th_results)
+            mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       end if
 
    end subroutine do1_mlt_eval
@@ -184,7 +183,7 @@ contains
 
       ! these are used to evaluate the magnetic diffusivity, used by thermohaline
       real(dp) :: kap_cond, dlnkap_cond_dlnRho, dlnkap_cond_dlnT, eta
-      
+
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
@@ -213,7 +212,7 @@ contains
       Y_face = gradT - gradL
       conv_vel = 0d0
       D = 0d0
-      th_results = th_results_t()
+      if (PRESENT(th_results)) th_results = th_results_t()
       Gamma = 0d0  
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
@@ -342,7 +341,7 @@ contains
             if (ierr /= 0) return
 
             eta = calc_eta(calc_sige(s% abar(k), s% zbar(k), rho%val, T% val, Cp% val, kap_cond, opacity% val))
-            
+
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
             call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, N2_T, T, rho, Cp, opacity, &
                gradL_composition_term, XH1, eta, iso, &
@@ -353,11 +352,11 @@ contains
                if (s% report_ierr) write(*,*) 'ierr from set_thermohaline'
                return
             end if
-            
+
          else if (gradr > grada) then
 
             ! Semiconvection
-            
+
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, P, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
@@ -367,8 +366,7 @@ contains
                if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
-         end if         
-
+         end if
       end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.

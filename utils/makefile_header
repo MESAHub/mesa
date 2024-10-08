@@ -332,7 +332,7 @@ CHECK_SDK_VERSION = $(MESA_DIR)/utils/check_sdk_version
 # makedepf90 invocation (depends on whether we have the SDK2-patched version that
 # supports the -X flag)
 ifneq ($(shell makedepf90 -V | grep sdk2),)
-    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env ieee_arithmetic crmath hdf5
+    MAKEDEPF90_IGNORE_MODS = intrinsic omp_lib iso_c_binding iso_fortran_env ieee_arithmetic crmath hdf5 f95_lapack
     MAKEDEPF90 = makedepf90 -m %m.mod -X $(addprefix -u,$(MAKEDEPF90_IGNORE_MODS))
 else
     MAKEDEPF90 = makedepf90 -m %m.mod

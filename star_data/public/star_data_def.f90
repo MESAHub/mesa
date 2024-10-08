@@ -34,7 +34,6 @@
       use eos_def, only: EoS_General_Info
       use kap_def, only: Kap_General_Info
       use net_def, only: Net_General_Info, other_net_derivs_interface
-      use turb, only: th_results_t
       use colors_def, only:  max_num_color_files, max_num_bcs_per_file
       use auto_diff, only: auto_diff_real_star_order1
       use star_pgstar, only: pgstar_controls

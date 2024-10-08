@@ -82,7 +82,6 @@
          ! get convection info for point k
          use star_utils
          use turb_support, only: do1_mlt_eval
-         use turb, only: th_results_t
          use eos_def
          use chem_def, only: ih1
          use auto_diff_support
@@ -103,7 +102,6 @@
          type(auto_diff_real_star_order1) :: &
             grada_face_ad, scale_height_ad, gradr_ad, rho_face_ad, &
             gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
-         type(th_results_t) :: th_results
          include 'formats'
 
          ierr = 0
@@ -234,7 +232,7 @@
             
          call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
-            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr, th_results)
+            mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) then
                write(*,*) 'ierr in do1_mlt_eval for k', k
@@ -295,8 +293,6 @@
                  
             s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
-
-            s% th_results(k) = th_results
             
          end subroutine store_results
 
@@ -323,8 +319,6 @@
             s% mlt_D_ad(k) = 0d0
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
-
-            s% th_results(k) = th_results_t()
             
             s% mlt_Gamma_ad(k) = 0d0
             s% mlt_Gamma(k) = 0d0

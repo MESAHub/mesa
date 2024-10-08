@@ -535,27 +535,7 @@
    
    !mix_type
 
-!# Detailed results from the thermohaline solver
-   !th_results_K_therm   ! Thermal conductivity
-   !th_results_K_T       ! Thermal diffusivity
-   !th_results_K_C       ! Chemical diffusivity
-   !th_results_nu        ! Viscosity
-   !th_results_Pr        ! Prandtl number
-   !th_results_tau       ! Chemical diffusivity ratio
-   !th_results_R_0       ! Density ratio
-   !th_results_r         ! Reduced density ratio
-   !th_results_H_B       ! Lorentz force coefficient
-   !th_results_Pm        ! Magnetic Prandtl number
-   !th_results_D_B       ! Magnetic diffusivity
-   !th_results_lam_hat   ! Growth rate of fastest-growing fingering mode
-   !th_results_l2_hat    ! Horizontal wavenumber squared of fastest-growing fingering mode
-   !th_results_sigma_max ! Growth rate of fastest-growing parasitic mode
-   !th_results_k_z_max   ! Vertical wavenumber of fastest-growing parasitic mode
-   !th_results_w         ! Saturation flow speed
-   !th_results_w_HG19    ! Saturation flow speed in HG19 treatment
-   !th_results_w_FRG24   ! Saturation flow speed in FRG24 treatment
-   !th_results_Nu_C      ! Compositional Nusselt number
-   !th_results_D_thrm    ! Effective thermohaline mixing diffusivity
+
 
 !# Optical Depth
    !tau ! optical depth
@@ -980,4 +960,3 @@
       ! c12_boundary_limit
       ! burn_min1
       ! burn_min2
-
