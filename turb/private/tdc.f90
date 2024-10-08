@@ -30,7 +30,6 @@ use const_def
 use num_lib
 use utils_lib
 use auto_diff
-use star_data_def
 use tdc_support
 
 implicit none
