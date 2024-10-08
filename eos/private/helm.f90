@@ -110,8 +110,7 @@
       
 !..for the interpolations
       integer          iat, jat
-      real(dp) dth, dt2, dti, dt2i, dt3i, dd, dd2, ddi, dd2i, dd3i, &
-                       xt, xd, mxt, mxd, fi(36), &
+      real(dp) xt, xd, mxt, mxd, fi(36), &
                        din, dindd, dinda, dindz, dindda, dinddz, dindaa, &
                        dindaz, dindzz, dinddaa, dinddaz, &
                        w0t, w1t, w2t, w0mt, w1mt, w2mt, &
@@ -255,6 +254,13 @@
        if (ierr /= 0) then
          if (dbg) write(*,*) 'failed in helm_sum_totals'
          return
+       end if
+
+       ! error out for very low pgas,egas,sgas (previously just set hard floor at this value)
+       if(pgas < 1d-20 .or. egas < 1d-20 .or. sgas < 1d-20) then
+          ierr = 1
+          if (dbg) write(*,*) 'failed in helm, sums too small'
+          return
        end if
 
 !..compute the derivative quantities (cv, gamma1 ...etc)

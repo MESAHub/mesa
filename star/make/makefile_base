@@ -205,6 +205,7 @@ SRCS = \
    star_solver.f90 \
    struct_burn_mix.f90 \
    winds.f90 \
+   starspots.f90 \
    gravity_darkening.f90 \
    mass_utils.f90 \
    eps_mdot.f90 \

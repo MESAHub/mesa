@@ -210,7 +210,7 @@
          real(dp) :: fgong_zero_A_inside_r
          real(dp) :: trace_mass_location, &
             min_tau_for_max_abs_v_location, min_q_for_inner_mach1_location, &
-            max_q_for_outer_mach1_location, mass_depth_for_L_surf, &
+            max_q_for_outer_mach1_location, &
             conv_core_gap_dq_limit
          real(dp) :: mixing_D_limit_for_log
 
@@ -431,6 +431,10 @@
          real(dp) :: atm_build_errtol
 
          logical :: use_T_tau_gradr_factor
+
+      ! starspots
+          logical :: do_starspots
+          real(dp) :: fspot, xspot
 
       ! mass gain or loss
 
@@ -807,7 +811,7 @@
       ! asteroseismology controls
 
          logical :: get_delta_nu_from_scaled_solar
-         real(dp) :: nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq
+         real(dp) :: nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq
 
 
       ! hydro parameters
@@ -830,6 +834,7 @@
             L_theta_for_velocity_time_centering
          integer :: steps_before_use_velocity_time_centering
 
+         logical :: use_drag_energy
          real(dp) :: &
             drag_coefficient, &
             min_q_for_drag
@@ -844,8 +849,8 @@
          logical :: retry_for_v_above_clight
 
          logical :: include_composition_in_eps_grav
-         real(dp) :: velocity_logT_lower_bound, &
-            max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound
+         real(dp) :: velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, &
+            velocity_tau_lower_bound, velocity_q_upper_bound
          real(dp) :: Gamma_lnS_eps_grav_full_on, Gamma_lnS_eps_grav_full_off
          integer :: max_num_surf_revisions
          real(dp) :: max_abs_rel_change_surf_lnS
@@ -1079,6 +1084,7 @@
          logical :: do_phase_separation
          logical :: do_phase_separation_heating
          logical :: phase_separation_mixing_use_brunt
+         character (len=32) :: phase_separation_option
 
       ! timestep parameters
       

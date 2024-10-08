@@ -37,6 +37,7 @@
       namelist /star_job/ &
          mesa_dir, &
          eosDT_cache_dir, &
+         ionization_cache_dir, &
          kap_cache_dir, &
          rates_cache_dir, &
          pause_before_terminate, &
@@ -516,6 +517,8 @@
          save_pulse_data_filename, &
          
          chem_isotopes_filename, &
+         ionization_file_prefix, &
+         ionization_Z1_suffix, &
          extras_lipar, &
          extras_lrpar, &
          extras_lcpar, &
@@ -562,7 +565,6 @@
          integer, intent(in) :: level
          integer, intent(out) :: ierr
          logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen) :: message
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
 
@@ -627,6 +629,7 @@
 
          s% job% mesa_dir = mesa_dir
          s% job% eosDT_cache_dir = eosDT_cache_dir
+         s% job% ionization_cache_dir = ionization_cache_dir
          s% job% kap_cache_dir = kap_cache_dir
          s% job% rates_cache_dir = rates_cache_dir
          s% job% pause_before_terminate = pause_before_terminate
@@ -1103,6 +1106,8 @@
          s% job% save_pulse_data_filename = save_pulse_data_filename
          
          s% job% chem_isotopes_filename = chem_isotopes_filename
+         s% job% ionization_file_prefix = ionization_file_prefix
+         s% job% ionization_Z1_suffix = ionization_Z1_suffix
          s% job% extras_lipar = extras_lipar
          s% job% extras_lrpar = extras_lrpar
          s% job% extras_lcpar = extras_lcpar
@@ -1177,6 +1182,7 @@
 
          mesa_dir = s% job% mesa_dir
          eosDT_cache_dir = s% job% eosDT_cache_dir
+         ionization_cache_dir = s% job% ionization_cache_dir
          kap_cache_dir = s% job% kap_cache_dir
          rates_cache_dir = s% job% rates_cache_dir
          pause_before_terminate = s% job% pause_before_terminate
@@ -1651,6 +1657,8 @@
          save_pulse_data_filename = s% job% save_pulse_data_filename
          
          chem_isotopes_filename = s% job% chem_isotopes_filename
+         ionization_file_prefix = s% job% ionization_file_prefix
+         ionization_Z1_suffix = s% job% ionization_Z1_suffix
          extras_lipar = s% job% extras_lipar
          extras_lrpar = s% job% extras_lrpar
          extras_lcpar = s% job% extras_lcpar

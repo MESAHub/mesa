@@ -41,8 +41,7 @@
    subroutine setup
       use chem_def
       
-      integer :: ierr, iso_A, iso_B, iso_C, iso_D
-      real(dp) :: W_A, W_B, W_C, W_D, a, b, g_A, g_B, g_C, g_D, Q
+      integer :: ierr
       character (len=32) :: my_mesa_dir
       
       include 'formats'
@@ -91,8 +90,8 @@
       integer :: ierr
       type (T_Factors), target :: tf_rec
       type (T_Factors), pointer :: tf
-      real(dp) :: logT, temp, raw_rate
-      integer :: i, t,ir
+      real(dp) :: logT, temp
+      integer :: i, t
       
       integer :: nrates_to_eval
       integer, allocatable :: irs(:)
@@ -163,7 +162,7 @@
       type (T_Factors), target :: tf_rec
       type (T_Factors), pointer :: tf
       real(dp) :: logT, temp, raw_rate, raw_rate1, raw_rate2
-      integer :: i, ir
+      integer :: ir
       logical, parameter :: dbg = .false.
       
       include 'formats'
@@ -246,7 +245,7 @@
       type (T_Factors), target :: tf_rec
       type (T_Factors), pointer :: tf
       real(dp) :: logT, temp, raw_rate
-      integer :: i, ir
+      integer :: ir
       logical, parameter :: dbg = .false.
       
       include 'formats'

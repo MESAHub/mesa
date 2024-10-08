@@ -1,7 +1,0 @@
-#!/bin/sh
-#
-# Regenerate source files from preprocessor files
-
-for f in *.fypp; do
-    fypp $f ${f%.fypp}.f90
-done

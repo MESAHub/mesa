@@ -145,20 +145,14 @@
 
       subroutine do_report(s, ierr)
          use rates_def, only: &
-            i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
+            i_rate, i_rate_dRho, i_rate_dT
          use star_utils, only: get_phot_info
          use hydro_rotation, only: set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, i, j, ic, nz, kcore, &
-            h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
-            twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
-            prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
-            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum,&
-            mass_sum
-         logical, parameter :: new_only = .false.
+         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
+         real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
 
@@ -356,7 +350,7 @@
             s% delta_nu = 1d6/(2*s% photosphere_acoustic_r) ! microHz
          else
             s% delta_nu = &
-               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% Teff_sun) / &
+               s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
          
@@ -364,7 +358,7 @@
          if (failed('get_mass_info')) return
          
          s% nu_max = s% nu_max_sun*s% star_mass/ &
-            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% Teff_sun))
+            (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% astero_Teff_sun))
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
@@ -404,10 +398,11 @@
             if (s% fe_core_mass > 0) then
                do k=1, nz
                   if (s% m(k) > Msun*s% fe_core_mass) cycle
-                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% m(k)
+                  if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
 
-               if(mass_sum > s% fe_core_infall_mass*msun) then
+               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
+                   (s%m(k_min) <= s%fe_core_mass*msun)) then
                   s% fe_core_infall = -velocity(k_min)
                end if
             end if
@@ -419,10 +414,11 @@
                do k=1, nz
                   if (s% m(k) > Msun * non_fe_core_mass) cycle
                   if (s% m(k) < Msun * s% fe_core_mass) exit
-                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% m(k)
+                  if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
    
-               if(mass_sum > s% non_fe_core_infall_mass*msun) then
+               if ((mass_sum > s% non_fe_core_infall_mass*msun) .and. &
+                   (s%m(k_min) <= s% he_core_mass * msun)) then
                   s% non_fe_core_infall = -velocity(k_min)
                end if
                
@@ -498,7 +494,6 @@
             use interp_1d_def
             use interp_1d_lib
             real(dp), intent(in) :: q
-            real(dp) :: vp2, vp1, v00, vm1
             integer, parameter :: n_old = 4, n_new = 1, nwork = pm_work_size
             real(dp) :: qlo, x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
             integer :: k, nz, k00, ierr
@@ -765,7 +760,7 @@
          ierr = 0
          bzm_1 = null_zone; bzm_2 = null_zone; bzm_3 = null_zone; bzm_4 = null_zone
          burn_zone = 0 ! haven't entered the zone yet
-         if (i_start .ne. s% nz) then
+         if (i_start /= s% nz) then
             i = i_start+1
             prev_m = s% m(i)
             prev_x = s% eps_nuc(i)
@@ -778,16 +773,16 @@
             cur_x = s% eps_nuc(i)
             select case (burn_zone)
                case (0)
-                  if ( cur_x .gt. burn_min2 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  if ( cur_x > burn_min2 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_2 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      end if
                      bzm_1 = bzm_2
                      burn_zone = 2
-                  elseif ( cur_x .gt. burn_min1 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  elseif ( cur_x > burn_min1 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_1 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_1 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
@@ -795,27 +790,27 @@
                      burn_zone = 1
                   end if
                case (1) ! in the initial eps > burn_min1 region
-                  if ( cur_x .gt. burn_min2 ) then
+                  if ( cur_x > burn_min2 ) then
                      bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 2
-                  else if ( cur_x .lt. burn_min1 ) then
+                  else if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return
                   end if
                case (2) ! in the initial eps > burn_min2 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      bzm_3 = bzm_4
                      i_start = i
                      return
                   end if
-                  if ( cur_x .lt. burn_min2 ) then
+                  if ( cur_x < burn_min2 ) then
                      bzm_3 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 3
                   end if
                case (3) ! in the final eps > burn_min1 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return
@@ -851,7 +846,7 @@
          real(dp), pointer, intent(in) :: cell_masses(:)
          integer, intent(out) :: ierr
 
-         integer :: k, nz, j, nzlo, nzhi, kbdy, nzlo_prev
+         integer :: k, nz, j
          real(dp) :: cell_mass
          integer, pointer :: net_iso(:)
 
@@ -1214,7 +1209,7 @@
             core_m, core_r, core_lgT, core_lgRho, core_L, core_v, &
             core_omega, core_omega_div_omega_crit
 
-         integer :: j, jm1, j00
+         integer :: jm1, j00
          real(dp) :: dm1, d00, qm1, q00, core_q, &
             core_lgP, core_g, core_X, core_Y, &
             core_scale_height, core_dlnX_dr, core_dlnY_dr, core_dlnRho_dr
@@ -1269,8 +1264,8 @@
             bdy_scale_height, bdy_dlnX_dr, bdy_dlnY_dr, bdy_dlnRho_dr, &
             bdy_omega, bdy_omega_div_omega_crit
 
-         real(dp) :: x, x0, x1, x2, alfa, beta, bdy_omega_crit
-         integer :: k, ii, klo, khi
+         real(dp) :: x, x0, x1, x2, alfa, bdy_omega_crit
+         integer :: k, klo, khi
 
          include 'formats'
 

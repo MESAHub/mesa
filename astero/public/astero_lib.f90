@@ -24,9 +24,7 @@
 ! ***********************************************************************
 
       module astero_lib
-      ! library for calculating neutrino losses from non-nuclear-burning sources
-      ! neutrino losses that occur during nuclear reactions are included in the nuclear library
-      ! the data interface for the library is defined in neu_def
+      ! library for calculation of asteroseismic variables
       
       use const_def, only: dp
       use gyre_support, only: GYRE_IS_ENABLED

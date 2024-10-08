@@ -24,7 +24,7 @@ access to this:
 - It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
-If MESAHub gets unsynced from this and is no long on the eduction plan:
+If MESAHub gets unsynced from this and is no longer on the eduction plan:
 
 - Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``
@@ -36,7 +36,8 @@ This is currently tied to Rob's account.
 mesastar.org
 ------------
 
-This is a long-standing domain name used by MESA.
+This is a long-standing domain name used by MESA. 
+The main website redirects to a landing page hosted on `GitHub Pages <https://mesastar.org>`__
 
 Domain Name
 ^^^^^^^^^^^
@@ -47,8 +48,8 @@ renewing it, updating nameservers, etc.
 DNS Servers
 ^^^^^^^^^^^
 
-The mesastar.org domain is configured to use Digital Ocean nameservers
-and the DNS records are managed by Josiah.
+The mesastar.org domain is configured to use Cloudflare nameservers
+and the DNS records are managed by Philip.
 
 Mailing lists
 ^^^^^^^^^^^^^
@@ -64,8 +65,8 @@ New account signups are handled by Frank, Evan, and Rob.
 Marketplace
 ^^^^^^^^^^^
 
-The address mesastar.org redirects to the `MESA marketplace
-<http://cococubed.asu.edu/mesa_market/>`__, which is controlled and
+The `MESA marketplace
+<http://cococubed.com/mesa_market/>`__ is controlled and
 hosted by Frank at ASU.
 
 

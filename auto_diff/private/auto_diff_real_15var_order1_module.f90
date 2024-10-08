@@ -306,14 +306,14 @@ module auto_diff_real_15var_order1_module
       type(auto_diff_real_15var_order1), intent(out) :: this
       real(dp), intent(in) :: other
       this%val = other
-      this%d1Array = 0_dp
+      this%d1Array = 0.0_dp
    end subroutine assign_from_real_dp
    
    subroutine assign_from_int(this, other)
       type(auto_diff_real_15var_order1), intent(out) :: this
       integer, intent(in) :: other
       this%val = other
-      this%d1Array = 0_dp
+      this%d1Array = 0.0_dp
    end subroutine assign_from_int
    
    function equal_self(this, other) result(z)

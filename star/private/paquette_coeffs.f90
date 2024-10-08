@@ -61,7 +61,7 @@
 ! Local variables
       real(dp) :: PSI_ST, EPS_ST, GAMMA_ST2, A, E_PSI_ST
       real(dp) :: AA, BB, CC, EE, Ps, Pt, Pst, Qs, Qt, Qst, Ss, &
-           St, Ms, Mt, Xs, Xt, Xe, Me, Pe, Se, DELTA
+           St, Ms, Mt, Xs, Xt, DELTA
       real(dp) :: DPSI_N1, DPSI_N
       integer :: i, J, N, K, NREF
       real(dp) :: NZZ, NE
@@ -96,7 +96,7 @@
          E_PSI_ST = log(1.0D0+GAMMA_ST2)
          PSI_ST = log(E_PSI_ST)
 ! Evaluate the collision integral
-         if (PSI_ST.le.3.0D0) then
+         if (PSI_ST<=3.0D0) then
 ! if PSI_ST falls outside range of Paquette's fit, then just take border value
             PSI_ST = MAX(-7.D0, PSI_ST)
 ! Use spline interpolation to evaluate the collision integrals
@@ -188,7 +188,7 @@
                   F1(3) = 1.99814D0*E_PSI_ST - 0.64413D0
                   F22   = 1.99016D0*E_PSI_ST - 4.56958D0
                endif
-            elseif (PSI_ST.ge.4.0D0) then
+            elseif (PSI_ST>=4.0D0) then
 ! repulsive and attractive coeffcients are the same in this range
                F1(1) = 1.00141D0*E_PSI_ST - 3.18209D0
                F1(2) = 0.99559D0*E_PSI_ST - 1.29553D0

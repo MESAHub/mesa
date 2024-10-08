@@ -101,7 +101,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt ! timestep just completed
 
-         real(dp) :: dt_limit_ratio(numTlim), dt_limit, limit, order, max_timestep_factor
+         real(dp) :: dt_limit_ratio(numTlim), order, max_timestep_factor
          integer :: i_limit, nz, ierr
          logical :: skip_hard_limit
          integer :: num_mix_boundaries ! boundaries of regions with mixing_type /= no_mixing
@@ -352,8 +352,8 @@
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'max_timestep_factor', s% model_number, max_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
          end if
 
@@ -363,8 +363,8 @@
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'min_timestep_factor', s% model_number, s% min_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             if (i_limit == Tlim_struc) i_limit = Tlim_min_timestep_factor
          end if
 
@@ -375,7 +375,6 @@
 
          logical function return_now(i_limit)
             integer, intent(in) :: i_limit
-            integer :: k
             if (do_timestep_limits == keep_going) then
                return_now = .false.
                return
@@ -420,7 +419,7 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
-         integer :: max_steps, i
+         integer :: max_steps
          check_burn_steps_limit = keep_going
          if (.not. s% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% op_split_burn_min_T) return
  
@@ -1118,7 +1117,7 @@
                write(*,1) trim(msg) // ' hard_lim', hard_lim
             end if
             check_lgL = retry
-            s% retry_message = 'lgL hard limit'
+            s% retry_message = trim(msg) // ' hard limit'
             return
          end if
 
@@ -2189,9 +2188,9 @@
          subroutine do1(k)
             integer, intent(in) :: k
 
-            integer :: j, jj, ii
+            integer :: j
             real(dp) :: dx, dx_drop, dm, dt_dm, dx_burning, dx_inflow, dxdt_nuc
-            real(dp) ::dx00, dxp1, sig00, sigp1, flux00, fluxp1
+            real(dp) :: dx00, dxp1, sig00, sigp1, flux00, fluxp1
 
             include 'formats'
 
@@ -2320,7 +2319,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: j, nterms, nvar_hydro, nz, k, kk
+         integer :: j, nterms, nvar_hydro, nz, k
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), parameter :: xscale_min = 1
 
@@ -2431,8 +2430,8 @@
                write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
                write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
                write(*,2) 'filter_dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
          end if
 
 

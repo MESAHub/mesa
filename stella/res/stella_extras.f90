@@ -13,11 +13,11 @@ program main
    implicit none
 
    integer :: i,j,k,zone,denjmax,idum,ierr
-   real*8, allocatable,dimension(:,:) :: &
+   real(dp), allocatable,dimension(:,:) :: &
       r,v,temp,den,kap,tempr,xm,smooth,tau,lum,n_bar,n_e
-   real*8, allocatable,dimension(:) :: &
+   real(dp), allocatable,dimension(:) :: &
       t,m,dm,h,he,c,n,o,ne,na,mg,al,si,s,ar,ca,fe,ni
-   real*8 :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
+   real(dp) :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
    character*132 runname,filestr,fname,test_str
    character*256 line, my_mesa_dir
 

@@ -60,7 +60,7 @@ module skye_coulomb_solid
       type(auto_diff_real_2var_order3), intent(in) :: GAMI,TPT_in
 
       ! Intermediates
-      type(auto_diff_real_2var_order3) :: TPT, UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
+      type(auto_diff_real_2var_order3) :: TPT, UP, DN, EA, EB, EG, E0
       type(auto_diff_real_2var_order3) :: Fth, U0
       
       ! Output
@@ -161,7 +161,7 @@ module skye_coulomb_solid
          real(dp) :: s, b1, b2, b3, b4, COTPT
          real(dp), parameter :: aTF = 0.00352d0
 
-         type(auto_diff_real_2var_order3) :: TPT, x, f_inf, A, Q, xr, eta, supp, g, alpha, Fliq, gr, switch
+         type(auto_diff_real_2var_order3) :: TPT, f_inf, A, Q, xr, supp, g, alpha, Fliq, gr, switch
          type(auto_diff_real_2var_order3) :: F
 
          s = 1d0 / (1d0 + 1d-2 * pre_z(int(Z))% logz_3_2 + 0.097d0 / pre_z(int(Z))% z2)

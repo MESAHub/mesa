@@ -23,7 +23,7 @@
 
 module math_constants
 
-  use kinds,                           only: dp
+  use kinds, only: dp
 
   implicit none
 
@@ -33,7 +33,7 @@ module math_constants
   public :: deq,dgt,dne,dle,dlt,dge
   public :: dNeqZero, dEqZero, dLtZero, dGtZero
  
-  real(kind=dp), public :: one=1.0_dp,  eps=2*epsilon(one)
+  real(kind=dp), parameter, public :: one=1.0_dp,  eps=2*epsilon(one)
 
   real (kind=dp), parameter :: p_pi = 3.14159265358979323846264338_dp
   real (kind=dp), parameter :: p_pio2 = 1.57079632679489661923132169_dp

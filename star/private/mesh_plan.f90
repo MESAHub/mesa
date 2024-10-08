@@ -86,7 +86,7 @@
          integer :: j, k, k_old, k_new, nz, new_capacity, iounit, species, &
             max_num_merge_surface_cells, max_k_old_for_split, min_k_old_for_split
          real(dp) :: D_mix_cutoff, next_xq, next_dq, max_dq_cntr, &
-            dq_sum, tmp, min_dq, min_dq_for_xa, min_dq_for_logT
+            dq_sum, min_dq, min_dq_for_xa, min_dq_for_logT
 
          logical, parameter :: write_plan_debug = .false.
 
@@ -411,7 +411,7 @@
                if (ierr /= 0) return
             end if
             nz_new = nz_new + 1
-            if (nz_new > max_allowed_nz) then
+            if (max_allowed_nz > 0 .and. nz_new > max_allowed_nz) then
                write(*,*) 'tried to increase number of mesh points beyond max allowed nz', max_allowed_nz
                ierr = -1
                return
@@ -473,7 +473,7 @@
          logical function okay_to_split1(k_old, dq_new, remaining_dq_old)
             integer, intent(in) :: k_old
             real(dp), intent(in) :: dq_new, remaining_dq_old
-            real(dp) :: dlnR_old, dr_old, min_dr, rR, rL, dlnR_new
+            real(dp) :: dr_old, min_dr, rR, rL, dlnR_new
             logical :: dbg
 
             include 'formats'
@@ -612,7 +612,7 @@
             integer, intent(out) :: ierr
 
             logical :: dbg, force_merge_with_one_more
-            real(dp) :: dqsum, prev_dq, dq_limit, maxval_delta_xa, next_dq_max, beta_limit, &
+            real(dp) :: maxval_delta_xa, next_dq_max, beta_limit, &
                remaining_dq_old, min_dr
             integer :: kk, k_old_init, k_old_next, k_old_next_max, j00, jm1, i, max_merge
 
@@ -868,7 +868,7 @@
                dq_sum = sum(dq_new(1:k_new))
 
                k_new = k_new + 1
-               if (k_new > max_allowed_nz) then
+               if (max_allowed_nz > 0 .and. k_new > max_allowed_nz) then
                   write(*,*) 'tried to increase number of mesh points beyond max allowed nz', max_allowed_nz
                   ierr = -1
                   return

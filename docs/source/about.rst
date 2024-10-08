@@ -65,7 +65,7 @@ Use of MESA requires:
    `2018 <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`_, 
    `2019 <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`_,
    Jermyn et al.
-   `2022 <https://ui.adsabs.harvard.edu/abs/2022arXiv220803651J/abstract>`_)
+   `2023 <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`_)
 
 2. That users share in a timely fashion all information needed for others to
    recreate their MESA results (e.g., on `MESA Zenodo <https://zenodo.org/communities/mesa>`__).
@@ -114,10 +114,11 @@ Developers
 * Eoin Farrell
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * Pablo Marchant
+* `Philip Mocz <https://pmocz.github.io/>`__
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
-* `Frank Timmes <http://cococubed.asu.edu/>`__
+* `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
 

@@ -27,7 +27,7 @@ module run_star_extras
       use const_def
       use math_lib
       use auto_diff
-      use gyre_lib
+      use gyre_mesa_m
 
       implicit none
       
@@ -67,7 +67,7 @@ module run_star_extras
       subroutine rsp_set_gyre_linear_analysis(id,restart,ierr)
          use const_def
          use math_lib
-         use gyre_lib
+         use gyre_mesa_m
          integer, intent(in) :: id
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
@@ -97,17 +97,17 @@ module run_star_extras
          allocate(r(modes,nz+10), v(modes,nz+10))
          npts = 0
 
-         call gyre_init('gyre.in')
+         call init('gyre.in')
 
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
+         call set_constant('G_GRAVITY', standard_cgrav)
+         call set_constant('C_LIGHT', clight)
+         call set_constant('A_RADIATION', crad)
 
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
+         call set_constant('M_SUN', Msun)
+         call set_constant('R_SUN', Rsun)
+         call set_constant('L_SUN', Lsun)
 
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+         call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
          
          mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
@@ -123,7 +123,7 @@ module run_star_extras
             'GYRE', 'gyre.data', global_data, point_data, ierr)
          if (ierr /= 0) return
 
-         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
+         call set_model(global_data, point_data, s%gyre_data_schema)
 
          write(*, 100) 'order', 'freq (Hz)', 'P (sec)', &
            'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'
@@ -136,9 +136,9 @@ module run_star_extras
          ipar(4) = 3 ! max number of modes to output per call
          ipar(5) = 0 ! num_written
 
-         call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
+         call get_modes(mode_l, process_mode_, ipar, rpar)
 
-         call gyre_final()
+         call final()
          
          amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
          amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone

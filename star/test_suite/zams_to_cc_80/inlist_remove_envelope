@@ -10,17 +10,13 @@
       save_model_filename = 'removed_envelope.mod'
       required_termination_code_string = 'max_model_number'
 
-      set_initial_age = .true.
-      initial_age = 0
-
-      set_initial_model_number = .true.
       set_initial_number_retries = .true.
 
       ! uncomment the following to remove H env
       !relax_initial_mass_to_remove_H_env = .true.
       !lg_max_abs_mdot = -2
 
-      pgstar_flag = .false.
+      !pgstar_flag = .false.
 
 / ! end of star_job namelist
 
@@ -43,8 +39,6 @@
 ! rotation
 
 ! mlt
-      alpha_semiconvection = 0
-      thermohaline_coeff = 0
 
 ! mixing
 
@@ -64,7 +58,7 @@
       !history_interval = 1
       !terminal_interval = 1
 
-      x_integer_ctrl(2) = 4 ! Part number
+      x_integer_ctrl(5) =  4 ! Inlist part number
 
 / ! end of controls namelist
 

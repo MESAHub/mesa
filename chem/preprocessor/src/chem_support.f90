@@ -2,7 +2,8 @@ module chem_support
    use const_def
    use const_lib
    use math_lib
-   
+   use utils_lib, only: mesa_error
+
    real(dp), parameter :: no_mass_table_entry = -999.d0
    character(len=256) :: data_dir, output_dir, masstable_filename, winvn_filename
    integer :: masstable_header_length
@@ -116,6 +117,7 @@ module chem_support
       do i = 1, nlines
          read(mass_unit,'(A)',iostat = ios) buf
          call parse_line_mass_unit(buf, Z, A, eval, mass, error,ierr)
+         if (ierr /= 0) cycle
          N = A-Z
          ! store mass and convert from keV to MeV
          mass_table(Z,N) = mass*keV_to_MeV

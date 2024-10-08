@@ -273,7 +273,6 @@
             use read_model, only: read_properties
             integer :: year_month_day_when_created, iprop
             real(dp) :: dprop, initial_z, initial_y
-            character (len=net_name_len) :: net_name
             read(iounit, *, iostat=ierr) ! skip blank line before property list
             include 'formats'
             if (ierr /= 0) return

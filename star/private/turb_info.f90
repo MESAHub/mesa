@@ -83,7 +83,6 @@
          use star_utils
          use turb_support, only: do1_mlt_eval
          use eos_def
-         use chem_def, only: ih1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -93,11 +92,11 @@
             mixing_length_alpha_in, gradL_composition_term_in
 
          type(auto_diff_real_star_order1) :: gradr_factor
-         real(dp) :: v, f, xh_face, &
-            gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
+         real(dp) :: f, gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
          real(dp), pointer :: vel(:)
-         integer :: i, mixing_type, h1, nz, k_T_max
+         integer :: i, mixing_type, nz, k_T_max
          real(dp), parameter :: conv_vel_mach_limit = 0.9d0
+         real(dp) :: crystal_pad
          logical :: no_mix
          type(auto_diff_real_star_order1) :: &
             grada_face_ad, scale_height_ad, gradr_ad, rho_face_ad, &
@@ -150,7 +149,9 @@
             return
          end if
 
-         if (s% phase(k) > 0.5d0 .and. s% mu(k) > 1.7d0) then
+         crystal_pad = s% min_dq * s% m(1) * 0.5d0
+         if ((s% phase(k) > 0.5d0 .and. s% mu(k) > 1.7d0) &
+              .or. s% crystal_core_boundary_mass + crystal_pad > s% m(k)) then
             ! mu(k) check is so that we only evaluate this in C/O dominated material or heavier.
             ! Helium can return bad phase info on Skye, so we don't want it to shut off
             ! convection because of wrong phase information.
@@ -422,7 +423,7 @@
          use chem_def, only: ih1, ihe4
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: beta, lambda, phi, tmp, alpha, alpha2, &
+         real(dp) :: beta, lambda, tmp, alpha, &
             beta_limit, lambda1, beta1, lambda2, beta2, dlambda, dbeta
          integer :: k, k_beta, k_lambda, nz, h1, he4
          include 'formats'
@@ -538,7 +539,7 @@
          include 'formats'
          ! check_for_redo_MLT assumes that nzlo = 1, nzhi = nz
          ! that is presently true; make sure that assumption doesn't change
-         if (.not. ((nzlo.eq.1).and.(nzhi.eq.s%nz))) then
+         if (.not. ((nzlo==1).and.(nzhi==s%nz))) then
             write(*,*) 'nzlo != 1 or nzhi != nz'
             call mesa_error(__FILE__,__LINE__)
          endif
@@ -572,7 +573,7 @@
          contains
 
          subroutine end_of_convective_region()
-            integer :: kk, op_err, mix_type
+            integer :: kk, op_err
             real(dp) :: Hp
             logical :: end_dbg
             9 format(a40, 3i7, 99(1pd26.16))

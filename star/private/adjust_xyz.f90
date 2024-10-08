@@ -160,7 +160,6 @@
             real(dp), pointer :: xa_new(:,:)
             real(dp), parameter :: max_sum_abs = 10d0
             real(dp), parameter :: xsum_tol = 1d-2
-            integer :: k, i
             allocate(xa_new(species, nz + nz_alloc_extra), stat=ierr)
             if (ierr /= 0) return
             call set_x_new( &
@@ -251,10 +250,10 @@
             old_chem_id(old_num_isos), old_net_iso(num_chem_isos)
          integer, intent(out) :: ierr
 
-         real(dp) :: &            
+         real(dp) :: &
             total_neut, total_h, total_he, total_c, total_n, total_o, &
             total_ne, total_mg, total_si, total_s, total_ar, total_ca, &
-            total_fe, total_co, total_ni, other, &
+            total_fe, total_co, other, &
             old_total_neut, old_total_h, old_total_he, old_total_c, old_total_n, old_total_o, &
             old_total_ne, old_total_mg, old_total_si, old_total_s, old_total_ar, old_total_ca, &
             old_total_fe, old_total_co, old_total_ni, old_other, &
@@ -643,8 +642,7 @@
          real(dp), intent(in) :: y
          integer, intent(out) :: ierr
 
-         real(dp) :: xh1, xhe3, xhe4, z, ratio, desired_xh1, desired_xhe4, &
-            new_xh1, new_xhe3, new_xhe4, new_z, new_ratio
+         real(dp) :: xh1, xhe3, xhe4, z, ratio, desired_xh1, desired_xhe4
          include 'formats'
 
          ierr = 0
@@ -865,7 +863,7 @@
          end if
          if (abs(1d0-sum(xa_new(1:species))) > 1d-6) then
             ierr = -1
-            s% retry_message = 'set_composition requires new mass fractions to add to 1.'
+            s% retry_message = 'set_composition requires new mass fractions to add to 1'
             if (s% report_ierr) write(*, *) s% retry_message
             return
          end if
@@ -921,7 +919,7 @@
             end do
             if (abs(1d0 - sum(xa(1:species))) > 1d-2) then
                write(*,'(a)') &
-                  'get_xa_for_accretion: accretion species mass fractions do not add to 1.0'
+                  'get_xa_for_accretion: accretion species mass fractions do not add to 1'
                write(*,1) 'sum(xa(1:species))', sum(xa(1:species))
                do j=1,s% num_accretion_species
                   write(*,2) trim(s% accretion_species_id(j)), j, xa(j)
@@ -1013,6 +1011,10 @@
                zfrac(:) = L09_element_zfrac(:)
             case (A09_Prz_zfracs)
                zfrac(:) = A09_Prz_zfrac(:)
+            case (MB22_photospheric_zfracs)
+               zfrac(:) = MB22_photospheric_element_zfrac(:)
+            case (AAG21_photospheric_zfracs)
+               zfrac(:) = AAG21_photospheric_element_zfrac(:)
             case (Custom_zfracs) ! use non-standard values given in controls
                zfrac(:) = 0
                zfrac(e_li) = s% z_fraction_li

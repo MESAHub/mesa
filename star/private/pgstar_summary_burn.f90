@@ -74,7 +74,7 @@
          real, intent(in) :: txt_scale
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: yname, xaxis_name, str
+         character (len=strlen) :: xaxis_name, str
          logical :: xaxis_reversed
          real, allocatable, dimension(:) :: xvec, yvec, yvec2, yvec3
          real :: xmin, xmax, xleft, xright, dx, windy, dy, &
@@ -129,7 +129,7 @@
 
             integer :: j, ii, jj, i, cnt, k
             logical, parameter :: dbg = .false.
-            real :: ybot, yvec_min, yvec_max
+            real :: ybot
 
             include 'formats'
 

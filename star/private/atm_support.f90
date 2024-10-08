@@ -73,9 +73,6 @@ contains
     integer, intent(out)      :: ierr
 
     real(dp) :: kap
-    real(dp) :: tau
-    real(dp) :: r_surf
-    real(dp) :: L_surf
     
     if (is_bad(tau_surf)) then
        write(*,*) 'tau_surf', tau_surf
@@ -517,7 +514,6 @@ contains
     real(dp) :: dlnP_dlnM_b
     real(dp) :: dlnP_dlnkap_b
     real(dp) :: kap_a
-    real(dp) :: tau_b
 
     include 'formats'
 
@@ -536,7 +532,6 @@ contains
        s% retry_message = 'atm get_table: L < 0'
        if (s% report_ierr) then
           write(*,2) 'atm get_table: L < 0', s% model_number, L
-          !call mesa_error(__FILE__,__LINE__)
        end if
        ierr = -1
        return
@@ -1256,8 +1251,6 @@ contains
     real(dp) :: Pgas
     real(dp) :: rho, gamma, energy
     real(dp) :: logRho, logRho_guess
-    real(dp) :: dlnRho_dlnPgas
-    real(dp) :: dlnRho_dlnT
     real(dp) :: dres_dxa(num_eos_basic_results,s% species)
 
     T = exp(lnT)

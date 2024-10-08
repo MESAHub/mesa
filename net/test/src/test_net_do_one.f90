@@ -209,7 +209,7 @@
          logical, intent(in) :: extended_set
          logical, intent(in) :: sorted
          
-         integer :: ierr, j
+         integer :: j
             
          include 'formats'
                            
@@ -335,8 +335,6 @@
          real(dp) :: mx
          integer :: k, j, jmx
          logical :: flgs(rates_reaction_id_max)
-   
-         integer :: info
          
          write(*, *)
          write(*, *) 'energy generation by category'

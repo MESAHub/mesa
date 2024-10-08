@@ -33,7 +33,7 @@
 
 
       real(dp), parameter :: min_dlnz = -12
-      real(dp) :: min_z = 1d-12
+      real(dp), parameter :: min_z = 1d-12
 
       ! some relax routines depend on things such as other_energy and other_torque
       ! to which interpolation parameters cannot be passed directly. So for simplicity
@@ -477,7 +477,7 @@
                ! if the abundance switches back and forth between 0 and 1d-99,
                ! then small negative abundances ~ -1d-115 can be generated
                do k = 1, nz
-                  if (vals(j,k) .lt. 0d0) vals(j,k) = 0d0
+                  if (vals(j,k) < 0d0) vals(j,k) = 0d0
                end do
                if (op_err /= 0) ierr = op_err
                s% xa(j,1:nz) = (1d0-lambda)*s% xa(j,1:nz) + lambda*vals(j,1:nz)
@@ -496,7 +496,7 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
-         integer :: num_steps_to_use, starting_model_number, ierr
+         integer :: num_steps_to_use, starting_model_number
 
          include 'formats'
 
@@ -539,7 +539,7 @@
          real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor
          logical :: do_element_diffusion
          type (star_info), pointer :: s
-         real(dp), pointer :: xa(:), f1(:), f(:,:,:)
+         real(dp), pointer :: xa(:)
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
          ipar => ipar_ary
@@ -813,7 +813,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: num_pts, ierr, max_model_number
-         real(dp) :: lambda, avg_err
+         real(dp) :: avg_err
          real(dp), pointer :: x(:) ! =(num_pts)
          real(dp), pointer :: f1(:) ! =(4, num_pts)
 
@@ -901,7 +901,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: k, nz, num_pts, op_err
+         integer :: k, nz, num_pts
          real(dp), pointer :: vals(:), xq(:), x(:), f(:)
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -1069,7 +1069,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: num_pts, ierr, max_model_number
-         real(dp) :: lambda, avg_err
+         real(dp) :: avg_err
          real(dp), pointer :: x(:) ! =(num_pts)
          real(dp), pointer :: f1(:) ! =(4, num_pts)
 
@@ -1859,14 +1859,13 @@
          integer, intent(out) :: ierr
 
          integer, parameter ::  lipar=2, lrpar=2
-         integer :: max_model_number, i
+         integer :: max_model_number
          real(dp) :: max_years_for_timestep
          type (star_info), pointer :: s
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
          real(dp), target :: rpar_ary(lrpar)
          real(dp), pointer :: rpar(:)
-         logical :: adding_mass
 
          rpar => rpar_ary
          ipar => ipar_ary
@@ -1936,7 +1935,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
 
          integer :: adjust_model, max_num_steps, num_steps
-         real(dp) :: init_mass_change, final_mass_change, mass_change, frac
+         real(dp) :: init_mass_change, final_mass_change, frac
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -2694,7 +2693,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_v_center, dv_per_step, relax_v_center_dt, next
          logical, parameter :: dbg = .false.
 
@@ -2946,7 +2944,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_value, per_step_multiplier
          logical, parameter :: dbg = .false.
 
@@ -3051,7 +3048,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr
          real(dp) :: new_value, per_step_multiplier
          logical, parameter :: dbg = .false.
 
@@ -3386,9 +3382,6 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer :: ierr, klo, khi
-         real(dp) :: lnbc_target, new_pre_ms, new_lnbc, dlnbc, lnbc, &
-            current_pre_ms, next_pre_ms
 
          logical, parameter :: dbg = .false.
 
@@ -3885,6 +3878,7 @@
          s% Nieuwenhuijzen_scaling_factor = 0d0
          s% Vink_scaling_factor = 0d0
          s% Dutch_scaling_factor = 0d0
+         s% Bjorklund_scaling_factor = 0d0
          s% use_other_wind = .false.
       end subroutine turn_off_winds
 
@@ -3944,7 +3938,7 @@
             steps_before_use_gold_tolerances, steps_before_use_gold2_tolerances
          real(dp) :: star_age, time, max_age, max_age_in_days, max_age_in_seconds, max_timestep, &
             Reimers_scaling_factor, Blocker_scaling_factor, de_Jager_scaling_factor, Dutch_scaling_factor, &
-            van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, &
+            van_Loon_scaling_factor, Nieuwenhuijzen_scaling_factor, Vink_scaling_factor, Bjorklund_scaling_factor,&
             dxdt_nuc_factor, tol_correction_norm, tol_max_correction, warning_limit_for_max_residual, &
             tol_residual_norm1, tol_max_residual1, &
             tol_residual_norm2, tol_max_residual2, &
@@ -4164,6 +4158,7 @@
             Nieuwenhuijzen_scaling_factor = s% Nieuwenhuijzen_scaling_factor
             Vink_scaling_factor = s% Vink_scaling_factor
             Dutch_scaling_factor = s% Dutch_scaling_factor
+            Bjorklund_scaling_factor = s% Bjorklund_scaling_factor
             use_other_wind = s% use_other_wind
 
             num_retries = s% num_retries
@@ -4221,6 +4216,7 @@
             s% Nieuwenhuijzen_scaling_factor = Nieuwenhuijzen_scaling_factor
             s% Vink_scaling_factor = Vink_scaling_factor
             s% Dutch_scaling_factor = Dutch_scaling_factor
+            s% Bjorklund_scaling_factor = Bjorklund_scaling_factor
             s% use_other_wind = use_other_wind
             s% num_retries = num_retries
             s% star_age = star_age

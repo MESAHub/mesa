@@ -954,7 +954,7 @@
      >   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
      >   f1,inf2,ny)
 !
-      integer nx, ny
+      integer ny
       integer ict(6)                    ! requested output control
       integer ivec                      ! vector length
       integer ivecd                     ! vector dimension (1st dim of fval)
@@ -1733,9 +1733,8 @@
 !     bbar(x)=x**3-2*x**2+x  bbar'(x)=3*x**2-4*x+1
 !
       real sum
-      integer v,z36th,iadr,i,j
+      integer v,iadr,i,j
       real xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
-      real cx,cy,cyd,cxi,cyi,cydi,hx2,hy2,cxd,cxdi
       real ax,bx,axbar,bxbar,ay,by,aybar,bybar
       real axp,axbarp,bxp,bxbarp,ayp,aybarp,bybarp,byp
 !
@@ -2374,8 +2373,8 @@
       integer ier                       ! output -- =0 if OK
 !
 !  ier=1 is returned if x(1...inx) is NOT STRICTLY ASCENDING...
-      real dxavg,dyavg,zeps,zdiffx,zdiffy,zdiff
-      integer ix,iy
+      real dxavg,zeps,zdiffx,zdiff
+      integer ix
 !
 !-------------------------------
 !

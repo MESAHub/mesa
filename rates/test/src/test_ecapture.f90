@@ -152,12 +152,12 @@ contains
 
     logical, intent(in) :: use_special
 
-    real(dp) :: Rho, T, Pgas, log10Rho, log10T
+    real(dp) :: Rho, T, log10Rho, log10T
     real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
     real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
     integer :: ierr
 
-    integer :: i, ir, nr
+    integer :: i, nr
     integer, pointer :: ids(:), reaction_ids(:)
     type(Coulomb_Info), pointer :: cc
 
@@ -165,9 +165,8 @@ contains
          lambda, dlambda_dlnT, dlambda_dlnRho, &
          Q, dQ_dlnT, dQ_dlnRho, &
          Qneu, dQneu_dlnT, dQneu_dlnRho
-    real(dp) :: lntwo, logT, T9, dT9, dlnT, YeRho, &
-         ye, logRho, dlogRho, eta, d_eta_dlnT, d_eta_dlnRho, &
-         Prad, energy, entropy
+    real(dp) :: logT, T9, YeRho, &
+         ye, logRho, eta, d_eta_dlnT, d_eta_dlnRho
     character(len=iso_name_length), dimension(2) :: weak_lhs, weak_rhs
 
     allocate(cc)
@@ -271,7 +270,7 @@ contains
     use chem_def
     use chem_lib
 
-    real(dp) :: frac, dabar_dx(species), dzbar_dx(species),   &
+    real(dp) :: dabar_dx(species), dzbar_dx(species),   &
          sumx, xh, xhe, xz, mass_correction, dmc_dx(species)
 
     allocate(net_iso(num_chem_isos), chem_id(species), stat=ierr)

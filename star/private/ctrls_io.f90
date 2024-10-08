@@ -110,7 +110,7 @@
     write_model_with_profile, model_data_prefix, model_data_suffix, &
     mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
     min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
-    mass_depth_for_L_surf, conv_core_gap_dq_limit, &
+    conv_core_gap_dq_limit, &
     alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, &
     
     ! burn zone eps definitions for use in logs and profiles
@@ -175,7 +175,7 @@
     RSP_relax_initial_model, RSP_trace_RSP_build_model, &
    RSP_GREKM_avg_abs_limit, RSP_GREKM_avg_abs_frac_new, RSP_kap_density_factor, RSP_map_columns_filename, &
    RSP_relax_alfap_before_alfat, RSP_max_outer_dm_tries, RSP_max_inner_scale_tries, RSP_T_anchor_tolerance, &
-    ! mass gain or loss  
+    ! mass gain or loss
     mass_change, mass_change_full_on_dt, mass_change_full_off_dt, trace_dt_control_mass_change, &
     min_wind, max_wind, use_accreted_material_j, accreted_material_j, D_omega_mixing_rate, &
     D_omega_mixing_across_convection_boundary, max_q_for_D_omega_zero_in_convection_region, nu_omega_mixing_rate, &
@@ -314,6 +314,7 @@
 
     ! WD phase separation
     do_phase_separation, &
+    phase_separation_option, &
     do_phase_separation_heating, &
     phase_separation_mixing_use_brunt, &
     phase_separation_no_diffusion, &
@@ -330,7 +331,7 @@
     include_L_in_correction_limits, include_v_in_correction_limits, include_u_in_correction_limits, include_w_in_correction_limits, &
     
     ! asteroseismology controls
-    get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, Teff_sun, delta_Pg_mode_freq, &
+    get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq, &
     
     ! hydro parameters
     energy_eqn_option, &
@@ -349,8 +350,8 @@
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_q_upper_bound, &
-    drag_coefficient, min_q_for_drag, &
+    velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
+    use_drag_energy, drag_coefficient, min_q_for_drag, &
     retry_for_v_above_clight, &
 
     ! hydro solver
@@ -450,7 +451,7 @@
     delta_dX_div_X_cntr_min, delta_dX_div_X_cntr_max, delta_dX_div_X_cntr_limit, delta_dX_div_X_cntr_hard_limit, &
     delta_dX_div_X_drop_only, delta_lg_XH_drop_only, &
     delta_lg_XHe_drop_only, delta_lg_XC_drop_only, delta_lg_XNe_drop_only, delta_lg_XO_drop_only, delta_lg_XSi_drop_only, &
-    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &    
+    delta_XH_drop_only, delta_XHe_drop_only, delta_XC_drop_only, delta_XNe_drop_only, delta_XO_drop_only, delta_XSi_drop_only, &
     delta_lg_XH_cntr_min, delta_lg_XH_cntr_max, delta_lg_XH_cntr_limit, delta_lg_XH_cntr_hard_limit, &
     delta_lg_XHe_cntr_min, delta_lg_XHe_cntr_max, delta_lg_XHe_cntr_limit, delta_lg_XHe_cntr_hard_limit, &
     delta_lg_XC_cntr_min, delta_lg_XC_cntr_max, delta_lg_XC_cntr_limit, delta_lg_XC_cntr_hard_limit, &
@@ -489,6 +490,9 @@
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
     use_T_tau_gradr_factor, &
+
+    ! starspots
+    do_starspots, fspot, xspot, &
     
     ! extra heat near surface to model irradiation
     irradiation_flux, column_depth_for_irradiation, &
@@ -635,7 +639,6 @@
  integer, intent(in) :: level
  integer, intent(out) :: ierr
  logical, dimension(max_extra_inlists) :: read_extra
- character (len=strlen) :: message
  character (len=strlen), dimension(max_extra_inlists) :: extra
  integer :: unit, i
 
@@ -990,7 +993,6 @@
  s% min_q_for_inner_mach1_location = min_q_for_inner_mach1_location
  s% max_q_for_outer_mach1_location = max_q_for_outer_mach1_location
  
- s% mass_depth_for_L_surf = mass_depth_for_L_surf
  s% conv_core_gap_dq_limit = conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
@@ -1284,6 +1286,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% atm_build_errtol = atm_build_errtol
 
  s% use_T_tau_gradr_factor = use_T_tau_gradr_factor
+
+ ! starspots
+ s% do_starspots = do_starspots
+ s% fspot = fspot
+ s% xspot = xspot
 
  ! extra heat near surface to model irradiation
  s% irradiation_flux = irradiation_flux
@@ -1777,6 +1784,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  ! WD phase separation
  s% do_phase_separation = do_phase_separation
+ s% phase_separation_option = phase_separation_option
  s% do_phase_separation_heating = do_phase_separation_heating
  s% phase_separation_mixing_use_brunt = phase_separation_mixing_use_brunt
  s% phase_separation_no_diffusion = phase_separation_no_diffusion
@@ -1806,7 +1814,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% get_delta_nu_from_scaled_solar = get_delta_nu_from_scaled_solar
  s% nu_max_sun = nu_max_sun
  s% delta_nu_sun = delta_nu_sun
- s% Teff_sun = Teff_sun
+ s% astero_Teff_sun = astero_Teff_sun
  s% delta_Pg_mode_freq = delta_Pg_mode_freq
 
 
@@ -1859,11 +1867,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RTI_m_full_boost = RTI_m_full_boost
  s% RTI_m_no_boost = RTI_m_no_boost
 
+ s% use_drag_energy = use_drag_energy
  s% drag_coefficient = drag_coefficient
  s% min_q_for_drag = min_q_for_drag
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
+ s% velocity_tau_lower_bound = velocity_tau_lower_bound
  s% velocity_q_upper_bound = velocity_q_upper_bound
 
  s% retry_for_v_above_clight = retry_for_v_above_clight
@@ -2672,7 +2682,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  min_q_for_inner_mach1_location = s% min_q_for_inner_mach1_location
  max_q_for_outer_mach1_location = s% max_q_for_outer_mach1_location
  
- mass_depth_for_L_surf = s% mass_depth_for_L_surf
  conv_core_gap_dq_limit = s% conv_core_gap_dq_limit
 
  ! burn zone eps definitions for use in logs and profiles
@@ -2963,6 +2972,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  atm_build_errtol = s% atm_build_errtol
  
  use_T_tau_gradr_factor = s% use_T_tau_gradr_factor
+
+ ! starspots
+ do_starspots = s% do_starspots
+ fspot = s% fspot
+ xspot = s% xspot
 
  ! extra heat near surface to model irradiation
  irradiation_flux = s% irradiation_flux
@@ -3392,6 +3406,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  diffusion_dt_limit = s% diffusion_dt_limit
 
  do_phase_separation = s% do_phase_separation
+ phase_separation_option = s% phase_separation_option
  do_phase_separation_heating = s% do_phase_separation_heating
  phase_separation_mixing_use_brunt = s% phase_separation_mixing_use_brunt
  phase_separation_no_diffusion = s% phase_separation_no_diffusion
@@ -3477,7 +3492,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  get_delta_nu_from_scaled_solar = s% get_delta_nu_from_scaled_solar
  nu_max_sun = s% nu_max_sun
  delta_nu_sun = s% delta_nu_sun
- Teff_sun = s% Teff_sun
+ astero_Teff_sun = s% astero_Teff_sun
  delta_Pg_mode_freq = s% delta_Pg_mode_freq
 
  ! hydro parameters
@@ -3528,12 +3543,13 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  RTI_m_full_boost = s% RTI_m_full_boost
  RTI_m_no_boost = s% RTI_m_no_boost
 
-
+ use_drag_energy = s% use_drag_energy
  drag_coefficient = s% drag_coefficient
  min_q_for_drag = s% min_q_for_drag
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound
+ velocity_tau_lower_bound = s% velocity_tau_lower_bound
  velocity_q_upper_bound = s% velocity_q_upper_bound
 
  retry_for_v_above_clight = s% retry_for_v_above_clight
@@ -4136,7 +4152,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
       if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
 

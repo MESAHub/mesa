@@ -96,8 +96,9 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
+            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            kap_cache_dir, rates_cache_dir, &
+            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          use paquette_coeffs, only: initialise_collision_integrals
@@ -107,16 +108,15 @@
             jina_reaclib_filename, rate_tables_dir, &
             special_weak_states_file, special_weak_transitions_file, &
             rates_cache_suffix, &
+            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            kap_cache_dir, rates_cache_dir
+            ionization_cache_dir, kap_cache_dir, rates_cache_dir
          logical, intent(in) :: use_suzuki_weak_rates, use_special_weak_rates
          real(dp), intent(in) :: reaclib_min_T9
          integer, intent(in) :: color_num_files
          character (len=*), intent(in) :: color_file_names(:)
          integer , intent(in):: color_num_colors(:)
          integer, intent(out) :: ierr
-         integer :: iam, nprocs, nprow, npcol, i, n
-         integer, dimension(:), allocatable :: seed
          include 'formats'
          ierr = 0
          if (have_done_starlib_init) return
@@ -129,8 +129,9 @@
             use_special_weak_rates, special_weak_states_file, special_weak_transitions_file, &
             reaclib_min_T9, &
             rate_tables_dir, rates_cache_suffix, &
+            ionization_file_prefix, ionization_Z1_suffix, &
             eosDT_cache_dir, &
-            kap_cache_dir, rates_cache_dir, &
+            ionization_cache_dir, kap_cache_dir, rates_cache_dir, &
             color_num_files,color_file_names,color_num_colors,&
             ierr)
          if (ierr /= 0) then
@@ -173,7 +174,6 @@
 
 
       subroutine alloc_star_data(id, ierr)
-         use rates_def, only: rates_reaction_id_max
          use chem_def, only: num_categories
          use net, only: default_set_rate_factors, &
             default_set_op_mono_factors
@@ -846,12 +846,11 @@
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         real(dp) :: initial_mass, initial_z, dlgm_per_step
+         real(dp) :: initial_mass, initial_z
          real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
-         logical :: restore_at_end
-         real(dp) :: xm, total_radiation, warning_limit_for_max_residual
+         real(dp) :: total_radiation, warning_limit_for_max_residual
          integer :: k, num_trace_history_values
          real(dp) :: save_Pextra_factor
          character (len=256):: save_atm_option, &
