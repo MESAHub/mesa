@@ -53,7 +53,6 @@
 
          type (star_info), pointer :: s
          integer :: id, i, ierr
-         character (len=256) :: inlist_fname
          
          include 'formats'
 
@@ -207,7 +206,7 @@
             
          type (star_info), pointer :: s
          logical :: restart
-         integer :: id, i      
+         integer :: id   
 
          include 'formats'
          
@@ -647,7 +646,7 @@
          integer, intent(out) :: ierr
          integer, parameter :: maxfun = 1000, iprint = 0
          real(dp), pointer, dimension(:) :: xl, xu, x, w
-         real(dp) :: min_chi2, rhobeg, max_value
+         real(dp) :: rhobeg, max_value
          integer :: i, npt
          include 'formats'
          ierr = 0
@@ -815,8 +814,7 @@
          use num_lib
          integer, intent(out) :: ierr
          
-         real(dp) :: final_mass, final_alpha, final_Y, final_FeH, &
-              final_param(1:max_parameters)
+         real(dp) :: final_param(1:max_parameters)
          real(dp), dimension(:), pointer :: x_first, x_lower, x_upper, x_final
          real(dp), pointer :: simplex(:,:), f(:)
          real(dp) :: f_final
@@ -825,7 +823,7 @@
          real(dp), pointer :: rpar(:) ! (lrpar)
          integer :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars
-         integer :: seed, i, j, k, num_samples
+         integer :: i, num_samples
          logical :: start_from_given_simplex_and_f
          
          include 'formats'
@@ -1047,7 +1045,7 @@
       
       
       subroutine set_sample_averages
-         integer :: ierr, jj, j, n
+         integer :: jj, j, n
          real(dp) :: avg_age_top_samples2, avg_model_number_top_samples2
          
          include 'formats'

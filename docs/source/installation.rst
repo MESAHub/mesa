@@ -22,6 +22,10 @@ The minimum system requirements for MESA are:
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.
 
+Ensure you have Python (3.5 or newer) installed on your system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) to be installed.
+
 Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -107,6 +111,9 @@ uses export to set variables):
     # The directory shown is only an example and must be modified for your particular system.
     export MESASDK_ROOT=/Applications/mesasdk
     source $MESASDK_ROOT/bin/mesasdk_init.sh
+
+    # add shmesa (the MESA command line tool) to your PATH 
+    export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
 
 If your machine uses csh as its shell, use ``setenv`` instead of ``export``.

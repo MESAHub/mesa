@@ -402,7 +402,6 @@
          integer, dimension(:), intent(in) :: Z, A
          character(len=iso_name_length), dimension(size(Z)), intent(out) :: names
          integer :: i, ierr, count_isomer
-         character(len=80) :: message
          logical :: use_al26_isomers
 
          count_isomer = 0
@@ -439,7 +438,6 @@
          integer, dimension(:), intent(in) :: Z, A
          character(len=long_name_length), dimension(size(Z)), intent(out) :: long_names
          integer :: i, ierr, count_isomer
-         character(len=80) :: message
          logical :: use_al26_isomers
 
          count_isomer = 0
@@ -614,7 +612,7 @@
          integer,intent(in) :: num_species
          real(dp),dimension(:),intent(in) :: abun_in
          real(dp),dimension(:),intent(out) :: abun_out
-         integer :: i,j,a,z,n
+         integer :: i,j,a,z
          logical :: found
 
          abun_out(1:solsiz)=0.d0
@@ -705,7 +703,13 @@
                ysolar = L09_ysol
             case(A09_Prz_zfracs)
                zsolar = A09_Prz_zsol
-               ysolar = A09_Prz_ysol 
+               ysolar = A09_Prz_ysol
+            case(MB22_photospheric_zfracs)
+               zsolar = MB22_photospheric_zsol
+               ysolar = MB22_photospheric_ysol
+            case(AAG21_photospheric_zfracs)
+               zsolar = AAG21_photospheric_zsol
+               ysolar = AAG21_photospheric_ysol
             case(Custom_zfracs)
                call mesa_error(__FILE__,__LINE__,"[M/H] not supported with custom zfracs.")
             case default

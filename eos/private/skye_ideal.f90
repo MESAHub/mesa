@@ -73,7 +73,7 @@ module skye_ideal
 
       !..for the interpolations
       integer          iat, jat
-      real(dp) dth, dt2, dti, dt2i, dt3i, dd, dd2, ddi, dd2i, dd3i, &
+      real(dp) dth, dt2, dti, dt2i, dt3i, dd, &
                        xt, xd, mxt, mxd, fi(36), &
                        dindd, dinda, dindz, dindda, dinddz, dindaa, &
                        dindaz, dindzz, dinddaa, dinddaz, &

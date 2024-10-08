@@ -144,7 +144,7 @@
       
       real(dp) :: starting_logT
       
-      logical :: dbg = .false.
+      logical, parameter :: dbg = .false.
       
       
       contains
@@ -1011,7 +1011,7 @@
             integer, intent(inout), target :: iwork_y(*)
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            real(dp) :: lgt,lgrho
+            real(dp) :: lgt, lgrho
             integer :: i, cid
             interface
                include 'num_interp_y.dek'

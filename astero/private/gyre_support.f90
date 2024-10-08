@@ -29,7 +29,8 @@ module gyre_support
   use star_def
   use const_def
   use utils_lib
-  use gyre_lib
+
+  use gyre_mesa_m
 
   ! No implicit typing
       
@@ -66,19 +67,19 @@ contains
 
     ! Initialize GYRE
 
-    call gyre_init(gyre_file)
+    call init(gyre_file)
 
     ! Set constants
 
-    call gyre_set_constant('G_GRAVITY', standard_cgrav)
-    call gyre_set_constant('C_LIGHT', clight)
-    call gyre_set_constant('A_RADIATION', crad)
+    call set_constant('G_GRAVITY', standard_cgrav)
+    call set_constant('C_LIGHT', clight)
+    call set_constant('A_RADIATION', crad)
 
-    call gyre_set_constant('M_SUN', Msun)
-    call gyre_set_constant('R_SUN', Rsun)
-    call gyre_set_constant('L_SUN', Lsun)
+    call set_constant('M_SUN', Msun)
+    call set_constant('R_SUN', Rsun)
+    call set_constant('L_SUN', Lsun)
 
-    call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+    call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
     write(*,*) 'done init_gyre'
 
@@ -99,7 +100,6 @@ contains
 
     integer  :: ipar(1)
     real(dp) :: rpar(1)
-    integer  :: i
     integer(8) :: time0, time1, clock_rate
     real(dp) :: time
          
@@ -124,7 +124,7 @@ contains
        call system_clock(time0, clock_rate)
     end if
          
-    call gyre_get_modes(el, gyre_call_back, ipar, rpar)  
+    call get_modes(el, gyre_call_back, ipar, rpar)
          
     if (trace_time_in_oscillation_code) then
        call system_clock(time1, clock_rate)
@@ -204,7 +204,7 @@ contains
          
     if (dbg) write(*,2) 'call gyre_set_model', s%model_number
 
-    call gyre_set_model(global_data, point_data, s%gyre_data_schema)
+    call set_model(global_data, point_data, s%gyre_data_schema)
 
     if (dbg) write(*,2) 'done gyre_set_model', s%model_number
 
@@ -305,8 +305,7 @@ contains
     real(dp), intent(inout)  :: rpar(:)
     integer, intent(out)     :: ierr
 
-    integer :: iounit, i, j, skip, nn
-    real(dp) :: y_r, y_h
+    integer :: iounit
 
     include 'formats'
          

@@ -31,41 +31,56 @@
 
       implicit none
 
-      private
-      public :: do_phase_separation
-
       logical, parameter :: dbg = .false.
 
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
       
+      private
+      public :: do_phase_separation
+
       contains
 
-
       subroutine do_phase_separation(s, dt, ierr)
-         use chem_def, only: chem_isos, ic12, io16
-         use chem_lib, only: chem_get_iso_id
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
+
+         if(s% phase_separation_option == 'CO') then
+            call do_2component_phase_separation(s, dt, 'CO', ierr)
+         else if(s% phase_separation_option == 'ONe') then
+            call do_2component_phase_separation(s, dt, 'ONe', ierr)
+         else
+            write(*,*) 'invalid phase_separation_option'
+            stop
+         end if
+      end subroutine do_phase_separation
+
+      subroutine do_2component_phase_separation(s, dt, components, ierr)
+         use chem_def, only: ic12, io16, ine20
+         use chem_lib, only: chem_get_iso_id
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: dt
+         character (len=*), intent(in) :: components
+         integer, intent(out) :: ierr
          
-         real(dp) :: dq_crystal, XO, XC, pad
-         integer :: k, k_bound, kstart, net_ic12, net_io16
+         real(dp) :: XNe, XO, XC, pad
+         integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
          logical :: save_Skye_use_ion_offsets
 
+         ! Set phase separation mixing mass negative at beginning of phase separation
+         s% phase_sep_mixing_mass = -1d0
          s% eps_phase_separation(1:s%nz) = 0d0
          
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
-
-         ! Set phase separation mixing mass negative at beginning of phase separation
-         s% phase_sep_mixing_mass = -1d0
-
+         
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
+         net_ine20 = s% net_iso(ine20)
          
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
@@ -75,15 +90,17 @@
                exit
             end if
          end do
-
-         ! Check that we're still in C/O dominated material, otherwise skip phase separation
-         XO = s% xa(net_io16,k_bound)
+         
          XC = s% xa(net_ic12,k_bound)
-         if (XO + XC < 0.9d0) return
+         XO = s% xa(net_io16,k_bound)
+         XNe = s% xa(net_ine20,k_bound)
+         ! Check that we're still in C/O or O/Ne dominated material as appropriate,
+         ! otherwise skip phase separation
+         if(components == 'CO'.and. XO + XC < 0.9d0) return
+         if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
          
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
-            dq_crystal = 0d0
 
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
             ! to account for loss of precision during remeshing.
@@ -112,17 +129,15 @@
                   exit
                end if
 
-               call move_one_zone(s,k,dq_crystal)
+               call move_one_zone(s,k,components)
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
-               if(dq_crystal > 0d0) then
-                  call mix_outward(s, k-1)
-               end if
+               call mix_outward(s, k-1, 0)
                
             end do
 
             call update_model_(s,1,s%nz,.false.)
-            
+
             ! phase separation heating term for use by energy equation
             do k=1,s% nz
                s% eps_phase_separation(k) = (s% eps_phase_separation(k) - s% energy(k)) / dt
@@ -132,66 +147,86 @@
          end if
 
          ierr = 0
-      end subroutine do_phase_separation
+      end subroutine do_2component_phase_separation
 
-      subroutine move_one_zone(s,k,dq_crystal)
-        use chem_def, only: chem_isos, ic12, io16
+      subroutine move_one_zone(s,k,components)
+        use chem_def, only: ic12, io16, ine20
         use chem_lib, only: chem_get_iso_id
         type(star_info), pointer :: s
         integer, intent(in) :: k
-        real(dp), intent(inout) :: dq_crystal
+        character (len=*), intent(in) :: components
         
-        real(dp) :: XC, XO, XC1, XO1, dXO, Xfac, dqsum
-        integer :: net_ic12, net_io16
-        
-        dq_crystal = dq_crystal + s% dq(k)
+        real(dp) :: XC, XO, XNe, XC1, XO1, XNe1, dXO, dXNe, Xfac
+        integer :: net_ic12, net_io16, net_ine20
         
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
+        net_ine20 = s% net_iso(ine20)
         
-        XO = s% xa(net_io16,k)
-        XC = s% xa(net_ic12,k)
+        if(components == 'CO') then
+           XO = s% xa(net_io16,k)
+           XC = s% xa(net_ic12,k)
         
-        ! Call Blouin 2021 phase diagram.
-        ! Need to rescale temporarily because phase diagram assumes XO + XC = 1
-        Xfac = XO + XC
-        XO = XO/Xfac
-        XC = XC/Xfac
-
-        dXO = blouin_delta_xo(XO)
-
-        s% xa(net_io16,k) = Xfac*(XO + dXO)
-        s% xa(net_ic12,k) = Xfac*(XC - dXO)
+           ! Call Blouin phase diagram.
+           ! Need to rescale temporarily because phase diagram assumes XO + XC = 1
+           Xfac = XO + XC
+           XO = XO/Xfac
+           XC = XC/Xfac
+           
+           dXO = blouin_delta_xo(XO)
+           
+           s% xa(net_io16,k) = Xfac*(XO + dXO)
+           s% xa(net_ic12,k) = Xfac*(XC - dXO)
+           
+           ! Redistribute change in C,O into zone k-1,
+           ! conserving total mass of C,O
+           XC1 = s% xa(net_ic12,k-1)
+           XO1 = s% xa(net_io16,k-1)
+           s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
+           s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
+        else if(components == 'ONe') then
+           XNe = s% xa(net_ine20,k)
+           XO = s% xa(net_io16,k)
         
-        ! Redistribute change in X,O into zone k-1,
-        ! conserving total mass of X,O
-        XC1 = s% xa(net_ic12,k-1)
-        XO1 = s% xa(net_io16,k-1)
-        s% xa(net_ic12,k-1) = XC1 + Xfac*dXO * s% dq(k) / s% dq(k-1)
-        s% xa(net_io16,k-1) = XO1 - Xfac*dXO * s% dq(k) / s% dq(k-1)
+           ! Call Blouin phase diagram.
+           ! Need to rescale temporarily because phase diagram assumes XO + XNe = 1
+           Xfac = XO + XNe
+           XO = XO/Xfac
+           XNe = XNe/Xfac
+           
+           dXNe = blouin_delta_xne(XNe)
+           
+           s% xa(net_ine20,k) = Xfac*(XNe + dXNe)
+           s% xa(net_io16,k) = Xfac*(XO - dXNe)
+           
+           ! Redistribute change in Ne,O into zone k-1,
+           ! conserving total mass of Ne,O
+           XO1 = s% xa(net_io16,k-1)
+           XNe1 = s% xa(net_ine20,k-1)
+           s% xa(net_io16,k-1) = XO1 + Xfac*dXNe * s% dq(k) / s% dq(k-1)
+           s% xa(net_ine20,k-1) = XNe1 - Xfac*dXNe * s% dq(k) / s% dq(k-1)
+        else
+           write(*,*) 'invalid components option in phase separation'
+           stop
+        end if
 
         call update_model_(s,k-1,s%nz,.true.)
         
       end subroutine move_one_zone
-      
-      ! mix composition outward until reaching stable composition profile
-      subroutine mix_outward(s,kbot)
-        use chem_def, only: chem_isos, ihe4, ic12, io16
 
+      ! mix composition outward until reaching stable composition profile
+      subroutine mix_outward(s,kbot,min_mix_zones)
         type(star_info), pointer :: s
-        integer, intent(in)      :: kbot
+        integer, intent(in)      :: kbot, min_mix_zones
         
         real(dp) :: avg_xa(s%species)
-        real(dp) :: mass, dXC_top, dXC_bot, dXO_top, dXO_bot, B_term, grada, gradr
-        integer :: k, l, ktop, net_ihe4, net_ic12, net_io16
+        real(dp) :: mass, B_term, grada, gradr
+        integer :: k, l, ktop
         logical :: use_brunt
         
         use_brunt = s% phase_separation_mixing_use_brunt
-        net_ihe4 = s% net_iso(ihe4)
-        net_ic12 = s% net_iso(ic12)
-        net_io16 = s% net_iso(io16)
 
-        do k=kbot,1,-1
+        do k=kbot-min_mix_zones,1,-1
            ktop = k
 
            if (s% m(ktop) > s% phase_sep_mixing_mass) then
@@ -234,7 +269,7 @@
         end do
 
         ! Call a final update over all mixed cells now.
-        call update_model_(s, ktop, kbot, .true.)
+        call update_model_(s, ktop, kbot+1, .true.)
        
       end subroutine mix_outward
 
@@ -269,7 +304,39 @@
         
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
-      
+
+      real(dp) function blouin_delta_xne(Xin)
+        real(dp), intent(in) :: Xin ! mass fraction
+        real(dp) :: Xnew ! mass fraction
+        real(dp) :: xne, dxne ! number fractions
+        real(dp) :: a0, a1, a2, a3, a4, a5
+
+        ! Convert input mass fraction to number fraction, assuming O/Ne mixture
+        xne = (Xin/20d0)/(Xin/20d0 + (1d0 - Xin)/16d0)
+        
+        a0 = 0d0
+        a1 = -0.120299d0
+        a2 = 1.304399d0
+        a3 = -1.722625d0
+        a4 = 0.393996d0
+        a5 = 0.144529d0
+
+        dxne = &
+             a0 + &
+             a1*xne + &
+             a2*xne*xne + &
+             a3*xne*xne*xne + &
+             a4*xne*xne*xne*xne + &
+             a5*xne*xne*xne*xne*xne
+
+        xne = xne + dxne
+
+        ! Convert back to mass fraction
+        Xnew = 20d0*xne/(20d0*xne + 16d0*(1d0-xne))
+        
+        blouin_delta_xne = Xnew - Xin
+      end function blouin_delta_xne
+
       subroutine update_model_ (s, kc_t, kc_b, do_brunt)
 
         use turb_info, only: set_mlt_vars
@@ -338,8 +405,7 @@
         return
         
       end subroutine update_model_
-      
-      
+
       end module phase_separation
 
 

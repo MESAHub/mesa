@@ -54,7 +54,7 @@
           return
        end if
 
-       call gyre_set_model(global_data, point_data, s%gyre_data_schema)
+       call set_model(global_data, point_data, s%gyre_data_schema)
        
        if (growth_lim > 0d0) then
           write(*, 100) 'model', 'order', 'freq (Hz)', &
@@ -69,7 +69,7 @@
        ipar(1) = s% id
        ipar(2) = 0 ! num_written
 
-       call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
+       call get_modes(mode_l, process_mode_, ipar, rpar)
        
        s% ixtra3_array(1) = ipar(2)
 

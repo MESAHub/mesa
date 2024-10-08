@@ -2,13 +2,225 @@
 Changelog
 *********
 
+.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) be installed.
+
+.. note:: This section describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+
+
+
 
 Changes in main
 ===============
 
-.. note:: This describes changes present in the development version of MESA (``main`` branch) relative to the most recent release.
+.. _New Features main:
 
-.. _Backwards-incompatible changes main:
+New Features
+------------
+
+``mesa_reader`` can now be installed with ``pip``.
+
+.. _Bug Fixes main:
+
+Bug Fixes
+---------
+
+fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating inital models
+
+
+.. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+
+Changes in r24.08.1
+===================
+
+.. _New Features r24.08.1:
+
+New Features
+------------
+
+``max_allowed_nz`` is now ignored if the value is less than or equal to zero.
+
+**Update to starspots**
+
+Star spot parameters ``fspot``, and ``xspot`` have been added as general controls
+and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default. 
+
+**Replacement of HDF5io by ForUM**
+
+The HDF5io module (in the :file:`hdf5io` subdirectory) has been
+replaced by the ForUM module (in the :file:`forum`
+subdirectory). HDF5io provided a high-level wrapper around the `HDF5
+input/output library <https://www.hdfgroup.org/solutions/hdf5/>`__; it
+was based on source files copied from an alpha version of
+ForUM. :git:`ForUM <rhdtownsend/forum>` (short for Fortran Utility
+Modules) is a small library providing input/output, operating system,
+memory management and utility routines for Fortran.
+
+Now that ForUM has officially been released, and also that recent GYRE
+releases also require ForUM, it made sense to include the official
+distribution of ForUM within MESA. One important consequence of this
+decision is that ForUM uses :git:`fypp <aradi/fypp>` for
+pre-processing and templating, and fypp in turn requires a Python
+interpreter. As a consequence, building MESA now requires Python (3.5
+or newer) be installed.
+
+**Update to GYRE 7.2.1**
+
+The GYRE distribution bundled with MESA has been updated to release
+7.2.1. Full details about this release can be found on the `GYRE
+documentation page <https://gyre.readthedocs.io/en/v7.2.1/>`__. From
+the perspective of MESA users, the significant change arising from
+this update is that the MESA-to-GYRE interface is now provided via the
+library file :file:`libgyre_mesa.a` and the module file
+:file:`gyre_mesa_m.mod` (previously, these were :file:`libgyre.a` and
+:file:`gyre_lib.mod`, respectively). A new variable, `LOAD_GYRE`, has
+been added to :file:`utils/makefile_header` to simplify linking
+against :file:`libgyre_mea.a`. These changes will likely only affect
+those users that make calls to GYRE from inside
+:file:`run_star_extras.f90`.
+
+Kap
+~~~
+
+**High Temperature Opacity Tables**
+
+Type 1 Rosseland-mean opacity tables from The Los Alamos
+OPLIB database (`Colgan et al. 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`_) are now available (`Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_).
+These tables cover the region :math:`0.0 \leq X \leq 1-Z` and
+:math:`0.0\leq Z \leq 0.2`. Each set of OPLIB
+opacity tables contains 1194 individual tables, a
+dramatic increase in table density (in the X--Z plane) over the standard
+126 individual tables provided in previous opacity releases. These tables
+are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
+(`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
+adopt this new set of tables by selecting one of the following
+options for ``kap_file_prefix``:
+
++ ``'oplib_gs98'``
++ ``'oplib_agss09'``
++ ``'oplib_aag21'``
++ ``'oplib_mb22'``
+ 
+See :ref:`kap/overview:Overview of kap module` and
+:ref:`kap/defaults:kap_file_prefix` for more details on the
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
+the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
+in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
+
+
+**Low Temperature Opacity Tables**
+
+Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
+solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
+computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
+adopt this new set of tables by selecting one of the following
+options for :ref:`kap/defaults:kap_lowT_prefix`:
+
++ ``'lowT_fa05_mb22'``
++ ``'lowT_fa05_aag21'``
+
+**Opacity interpolation**
+
+We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation in composition.
+
+MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consecutive 1D splines.
+MESA offers users the ability to choose linear or cubic interpolation for these splines, 
+while leaving the default as linear interpolation::
+
+  cubic_interpolation_in_X = .false.
+  cubic_interpolation_in_Z = .false.
+
+This choice of default was primarily due to the fact that
+the previous cubic composition interpolation scheme in MESA suffered from poor quality interpolated opacity derivatives with respect to
+density and temperature, which often disagreed with the numerical derivatives produced via nearest neighbor
+Richardson extrapolation. The figure below shows this comparison on a logarithmic scale, where in general red indicates poor quality
+derivatives and blue indicates high quality derivatives.
+
+.. figure:: changelog_plots/cubic_dfridr_dkapdT.png
+   :alt: old cubic relative kap derivative error
+
+   This figure shows the logarithmic relative error in the derivative :math:`\partial \kappa / \partial T` (:math:`X` = 0.625, :math:`Z` = 0.015),
+   for an OPAL opacity table grid using Grevesse & Sauval (1998) abundances, generated from MESA’s kap module, using the previous cubic interpolation scheme.
+   The OPLIB log(:math:`R`) = −8, 1.5 table boundaries are marked with a solid black line and the OPAL/OP log(:math:`R`) = 1.0 boundary is shown with a dashed line.
+   The approximate location of the Z-dependent transition to an electron conduction dominated opacity is marked with dot-dash blue curve.
+   Regions for Atomic, molecular, and compton scattering opacity are labeled and presented with their associated blending regions.
+
+
+While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the Jacobian matrix for MESA's implicit solver.
+Numerically unstable opacity derivatives can halt the progress of the solver and ultimately crash a calculation. 
+
+To improve the numerical stability of MESA's cubic opacity interpolation routines, we have implemented
+automatic differentiation into the opacity interpolating functions. Now, when using cubic interpolation, the opacity derivatives for an arbitrary mixture
+in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
+has led to a significant reduction in the relative derivative error and an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
+
+.. figure:: changelog_plots/cubic_dfridr_dkapdT_ad.png
+   :alt: new cubic relative kap derivative error
+
+   Same as previous figure, but for new cubic interpolation scheme taking advantage of automatic differentiation.
+
+
+This new implementation of cubic interpolation in composition for opacity tables comes close to achieving the derivative quality of the linear interpolation
+option (shown below), while also providing more accurate opacity physics between opacity table grid points.
+
+.. figure:: changelog_plots/linear_dfridr_dkapdT.png
+   :alt: linear relative kap derivative error
+
+   Same as previous figure, but for linear interpolation instead of cubic.
+
+
+For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
+while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
+However, adopting cubic interpolation has been shown to consistently increase the overall 
+opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
+We anticipate making cubic interpolation the default in a future MESA release version. 
+We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
+
+
+Chem
+~~~~
+New initial metal mass fractions ``initial_zfracs`` taken from photospheric estimates of the solar heavy element abundances in (AAG21, Asplund et al. 2021) and (MB22, Magg et al. 2022)
+are now available. See :ref:`reference/star_job:initial_zfracs` for more details.
+
+.. _Bug Fixes r24.08.1:
+
+Bug Fixes
+---------
+
+Rates
+~~~~~
+
+There has been a bug present in the rates module due to the incorrect
+phase space factors for reverse reaction rates involving greater than 2 reactants or 
+products. This bug resulted in inconsistent equilibrium compositions when the network
+evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK. 
+This bug effects users who evolve models into NSE using large reaction networks. This
+includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
+networks are less affected. We strongly recommend that users update to the latest MESA release.
+
+See `gh-575 <https://github.com/MESAHub/mesa/issues/575>`_
+
+``max_allowed_nz``
+~~~~~~~~~~~~~~~~~~
+
+MESA no longer produces a segmentation fault if it tries to increase
+the number of cells beyond ``max_allowed_nz``.
+
+``pgbinary``
+~~~~~~~~~~~~
+A bug in the `pgbinary` axes definitions resulted in models crashing when running in single star mode and has been corrected.
+Another bug inhibited the mass of the not modeled star from being displayed in the `pgbinary` panel and has also been corrected.
+
+See `gh-634 <https://github.com/MESAHub/mesa/issues/634>`_ 
+
+
+Changes in r24.03.1
+===================
+
+.. _Backwards-incompatible changes r24.03.1:
 
 Backwards-incompatible changes
 ------------------------------
@@ -24,15 +236,42 @@ pressure with respect to other variables.
 run_star_extras
 ~~~~~~~~~~~~~~~
 
-Previously we had logic to determine if a extra history value should be saved
+Previously we had logic to determine if an extra history value should be saved
 as an int or a float (users can only provide data as a float). This was error
 prone, so now we save extra history values as floats.
 
+Asteroseismic scaling relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _New Features main:
+The default values of the parameters ``delta_nu_sun`` and ``nu_max_sun`` used in the asteroseismic scaling relations
+have been updated to the values reported by `Lund et al. (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L/abstract>`_
+(:math:`\Delta\nu_\odot = \mathrm{134.91}\,\mu\mathrm{Hz}` and :math:`\nu_{\mathrm{max},\odot} = \mathrm{3078}\,\mu\mathrm{Hz}`).
+The parameter ``Teff_sun`` has been renamed ``astero_Teff_sun`` to avoid confusion
+with the fixed constant ``Teffsun`` in the ``const`` module.  ``astero_Teff_sun``'s
+default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.adsabs.harvard.edu/abs/2015arXiv151007674M>`_.
+
+stash.py
+~~~~~~~~
+The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+
+
+.. _New Features r24.03.1:
 
 New Features
 ------------
+
+shmesa
+~~~~~~
+
+We have introduced a new set of command line utilities for interacting with MESA. 
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__. 
+
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
+``run_star_extras.f90`` template (``shmesa extras``). 
+
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+
 
 Rates
 ~~~~~
@@ -46,7 +285,6 @@ These can be loaded, either by the normal mechanism of adding the filename
 to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
 Several examples in the test suite now make use of these rates, such as
 massive stars and models for building white dwarfs.
-
 
 Maximum net size
 ~~~~~~~~~~~~~~~~
@@ -77,11 +315,40 @@ produced GYRE-format files that are backward-compatible with older
 GYRE releases. (If using GSM-format files, set to 110 instead for
 backward compatibility).
 
+White Dwarf O/Ne Phase Separation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _Bug Fixes main:
+Phase separation for crystallizing white dwarfs now supports options
+for either C/O or O/Ne phase diagrams. You can select the appropriate
+option with the ``phase_separation_option`` in the ``&controls`` inlist
+section (see documentation at :ref:`reference/controls:phase_separation_option`).
+The phase diagram for O/Ne separation comes from
+`Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+
+Massive Star test_suite Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``12Msun_pre_ms_to_core_collapse``, ``20Msun_pre_ms_to_core_collapse``, and ``zams_to_cc_80``
+test_suites have each been updated and now fully evolve models at solar metallicities to core
+collapse while keeping their surface boundaries at tau = 1. The models offer a framework which
+has been tested to function with large reaction networks containing > 200 isotopes thanks to
+'op_split_burn'. This updates includes the revival of the ``make_pre_ccsn_13bvn`` test_suite
+as seen in section 6.9 of MESA IV.
+
+Reintroduction of Velocity Drag for v_flag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The option to apply a drag term to the velocities in the outer envelope
+with the control ``drag_coefficient`` and ``min_q_for_drag`` was removed after
+version 15140, but has now been reintroduced. The logical control ``use_drag_energy``
+has been introduced as well, so users can decide whether the drag energy is included
+in the energy equation. We also provide an additional option to turn off the 
+velocities above a desired optical depth with the control ``velocity_tau_lower_bound``.
+
+.. _Bug Fixes r24.03.1:
 
 Bug Fixes
 ---------
+
 The ZAMS model data used to generate the initial model for simulations with
 ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
 had an issue where stars between 1.0 and 1.58 Msun would have a starting 
@@ -89,6 +356,21 @@ central hydrogen mass fraction markedly lower than other masses. The grid of
 starting models has been recalculated with a more stringent stopping condition, 
 and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
 near 0.697.
+
+The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
+atmosphere options were removed in r15140. We have reimplemented them although we
+caution users that their implementation could conflict with ``mlt_option = 'TDC'``.
+
+The EOS coverage regions have been updated to fall back to ideal gas in a region
+previously covered by HELM where it returned unphysical floor values of ``1e-20``
+for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
+be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
+
+A bug in the implementation of the ``fe_core_infall_limit`` sometimes resulted 
+in the premature termination of a model due to large negative velocities outside
+the fe core.
+
+ See `gh-626 <https://github.com/MESAHub/mesa/issues/626#issue-2157840823>`_
 
 Changes in r23.05.1
 ===================
@@ -134,6 +416,8 @@ this ``sed`` command (along with ``sed`` commands for the next changlog entry as
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
 
+.. code-block:: console
+
   $MESA_DIR/scripts/update_inlists
 
 This script will save the previous versions of your inlists to a directory named
@@ -162,6 +446,8 @@ been renamed:
 
 You can substitute the new names for the old ones using the command
 line tool ``sed`` with, e.g. ::
+
+.. code-block:: console
 
     $ sed 's/log_center_density_limit/log_center_density_upper_limit/' -i <inlist_filename>
 
@@ -2176,7 +2462,7 @@ terms that contributed to that component.
 The format of the OP_MONO opacity table cache has changed.  If you have
 used these files in a previous version of MESA then you should do:
 
-::
+.. code-block:: console
 
    rm $MESA_OP_MONO_DATA_CACHE_FILENAME
 
@@ -2304,7 +2590,7 @@ ionization routine. This was due to a typo in the original paper that
 presented the ionization scheme. Restored the missing factor of
 rho^1/3 thanks to a later presentation of this same scheme (Dupuis et
 al. 1992) and a note `here
-<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`_.
+<http://www1.astrophysik.uni-kiel.de/~koester/astrophysics/astrophysics.html>`__.
 
 Added a user control (``D_mix_ignore_diffusion``) for when to ignore
 element diffusion in surface or core mixing regions. Previously,
@@ -2318,7 +2604,7 @@ turn it off, but weaker mixing won't.
 Gravity Darkening (Aaron)
 -------------------------
 
-Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`_ for more info.
+Added options to include gravity darkening, in the form of projected (surface-averaged) luminosities and effective temperatures of the star viewed along the equator and pole, to the history file.  Assumes the star is an oblate spheroid; see `here <https://github.com/aarondotter/GDit>`__ for more info.
 
 ::
 

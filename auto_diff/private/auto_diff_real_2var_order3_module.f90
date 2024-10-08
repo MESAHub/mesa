@@ -393,30 +393,30 @@ module auto_diff_real_2var_order3_module
       type(auto_diff_real_2var_order3), intent(out) :: this
       real(dp), intent(in) :: other
       this%val = other
-      this%d1val1 = 0_dp
-      this%d1val2 = 0_dp
-      this%d2val1 = 0_dp
-      this%d1val1_d1val2 = 0_dp
-      this%d2val2 = 0_dp
-      this%d3val1 = 0_dp
-      this%d2val1_d1val2 = 0_dp
-      this%d1val1_d2val2 = 0_dp
-      this%d3val2 = 0_dp
+      this%d1val1 = 0.0_dp
+      this%d1val2 = 0.0_dp
+      this%d2val1 = 0.0_dp
+      this%d1val1_d1val2 = 0.0_dp
+      this%d2val2 = 0.0_dp
+      this%d3val1 = 0.0_dp
+      this%d2val1_d1val2 = 0.0_dp
+      this%d1val1_d2val2 = 0.0_dp
+      this%d3val2 = 0.0_dp
    end subroutine assign_from_real_dp
    
    subroutine assign_from_int(this, other)
       type(auto_diff_real_2var_order3), intent(out) :: this
       integer, intent(in) :: other
       this%val = other
-      this%d1val1 = 0_dp
-      this%d1val2 = 0_dp
-      this%d2val1 = 0_dp
-      this%d1val1_d1val2 = 0_dp
-      this%d2val2 = 0_dp
-      this%d3val1 = 0_dp
-      this%d2val1_d1val2 = 0_dp
-      this%d1val1_d2val2 = 0_dp
-      this%d3val2 = 0_dp
+      this%d1val1 = 0.0_dp
+      this%d1val2 = 0.0_dp
+      this%d2val1 = 0.0_dp
+      this%d1val1_d1val2 = 0.0_dp
+      this%d2val2 = 0.0_dp
+      this%d3val1 = 0.0_dp
+      this%d2val1_d1val2 = 0.0_dp
+      this%d1val1_d2val2 = 0.0_dp
+      this%d3val2 = 0.0_dp
    end subroutine assign_from_int
    
    function equal_self(this, other) result(z)
@@ -3317,10 +3317,10 @@ module auto_diff_real_2var_order3_module
       derivative%d2val1 = this%d3val1
       derivative%d1val1_d1val2 = this%d2val1_d1val2
       derivative%d2val2 = this%d1val1_d2val2
-      derivative%d3val1 = 0_dp
-      derivative%d2val1_d1val2 = 0_dp
-      derivative%d1val1_d2val2 = 0_dp
-      derivative%d3val2 = 0_dp
+      derivative%d3val1 = 0.0_dp
+      derivative%d2val1_d1val2 = 0.0_dp
+      derivative%d1val1_d2val2 = 0.0_dp
+      derivative%d3val2 = 0.0_dp
    end function differentiate_auto_diff_real_2var_order3_1
    
    function differentiate_auto_diff_real_2var_order3_2(this) result(derivative)
@@ -3332,10 +3332,10 @@ module auto_diff_real_2var_order3_module
       derivative%d2val1 = this%d2val1_d1val2
       derivative%d1val1_d1val2 = this%d1val1_d2val2
       derivative%d2val2 = this%d3val2
-      derivative%d3val1 = 0_dp
-      derivative%d2val1_d1val2 = 0_dp
-      derivative%d1val1_d2val2 = 0_dp
-      derivative%d3val2 = 0_dp
+      derivative%d3val1 = 0.0_dp
+      derivative%d2val1_d1val2 = 0.0_dp
+      derivative%d1val1_d2val2 = 0.0_dp
+      derivative%d3val2 = 0.0_dp
    end function differentiate_auto_diff_real_2var_order3_2
    
 end module auto_diff_real_2var_order3_module

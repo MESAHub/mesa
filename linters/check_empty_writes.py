@@ -7,16 +7,14 @@ from pathlib import Path
 
 MESA_DIR = os.environ["MESA_DIR"]
 
-# Search files for instances on an empty writing usin* as the format i.e write(*,*) 
-# and replace with calls to write(*,'(A)') 
+# Search files for instances on an empty writing usin* as the format i.e write(*,*)
+# and replace with calls to write(*,'(A)')
 # This makes writes more portable to ifort
 
 # Files or folders to skip
-skip_folders = [
-]
+skip_folders = []
 
-skip_files = [
-]
+skip_files = []
 
 
 def check_skip(path):
@@ -29,10 +27,12 @@ def check_skip(path):
     return False
 
 
-write = re.compile("^ *write\([*a-zA-Z0-9]+\,[*]\)$")
+write = re.compile(r"^ *write\([*a-zA-Z0-9]+\,[*]\)$")
+
 
 def replace(match):
-    return match.string.split(',')[0] + ",'(A)')"
+    return match.string.split(",")[0] + ",'(A)')"
+
 
 if len(sys.argv) > 1:
     files = sys.argv[1:]

@@ -79,8 +79,8 @@
          real(dp), dimension(:,:,:), intent(out) :: SIG_face, sigma_lnC
          integer, intent(out) :: ierr
          
-         integer :: i, j, jj, k, op_err, im
-         real(dp) :: dv_im, alfa, beta, cc, tmp, tinyX, dlamch, sfmin, &
+         integer :: i, j, k, op_err
+         real(dp) :: tmp, tinyX, dlamch, sfmin, &
             AD_dm_full_on, AD_dm_full_off, AD_boost_factor, sum_dm, &
             Vlimit_dm_full_on, Vlimit_dm_full_off, Vlimit, sigmax, &
             SIG_factor, GT_factor
@@ -208,12 +208,12 @@
          
          !write(*,1) 'GT_factor SIG_factor', GT_factor, SIG_factor
 
-         do k = nzlo+1, nzhi         
+         do k = nzlo+1, nzhi
             call get1_flow_coeffs( &
                k, nc, m, v_advection_face(:,k), v_advection_max, &
                SIG_factor, GT_factor, sigma_lnC(:,:,k), &
                four_pi_r2_rho_face(k), dm_bar(k), &
-               C_div_X_face(:,k), GT_face(:,k), D_self_face(:,k), SIG_face(:,:,k))            
+               C_div_X_face(:,k), GT_face(:,k), D_self_face(:,k), SIG_face(:,:,k))
             if (sum_dm >= AD_dm_full_off) then
                AD_face(k) = 0d0
             else
@@ -228,7 +228,7 @@
                         (AD_dm_full_on - AD_dm_full_off)
                !write(*,2) 'boost factor AD_face', k, AD_face(k)/sigmax, AD_face(k)
             end if
-            sum_dm = sum_dm + cell_dm(k)              
+            sum_dm = sum_dm + cell_dm(k)
          end do
          
          do j=1,nc ! not used, but copy just for sake of plotting
@@ -283,7 +283,6 @@
          real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
          integer, intent(out) :: ierr
          
-         integer :: i, j
          real(dp), dimension(m) :: AP, AT, AR
          real(dp), dimension(m,m) :: kappa_st, Zdiff, Zdiff1, Zdiff2, AX
          
@@ -322,7 +321,7 @@
             k, nz, nc, m, nzlo, nzhi, C, X, Z, A, alfa_face, tiny_C, &
             d_dr_factor, dlnRho_dr_face, C_face, X_face, Z_face, C_div_X_face, &
             dC_dr_face, dlnne_dr_face)
-         integer, intent(in) :: k, nc, m, nz, nzlo, nzhi         
+         integer, intent(in) :: k, nc, m, nz, nzlo, nzhi
          real(dp), dimension(:,:), intent(in) :: C, X, Z ! (m,nz)
          real(dp), intent(in) :: A(:) ! (m) atomic number
          real(dp), intent(in) :: alfa_face(:), d_dr_factor, dlnRho_dr_face
@@ -387,7 +386,7 @@
          real(dp) :: ac, ni, cz, xij, ne, ao, lambdad, lambda, alfa, Gamlo, Gamhi
          real(dp), dimension(m) :: charge, na
          real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff, Kdiff2
-         real(dp) :: Gamma, ai, lam_e, kappa, kappa_SM, Abar, Zbar, omegap
+         real(dp) :: Gamma, kappa_SM
          real(dp) :: Ddiff_Caplan(nc)
             
          do i = 1, nc
@@ -399,8 +398,8 @@
             ! Get number densities (per cm^3)
             do i = 1, nc
                na(i) = rho*X(i)/(A(i)*amu)   
-            end do         
-            na(m) = 0.d0      
+            end do
+            na(m) = 0.d0
             do i = 1, nc
                na(m) = na(m) + charge(i)*na(i)
             end do
@@ -553,7 +552,7 @@
                     e_ap1,e_at1,e_ar1,e_ax1,ierr)
 
                if (ierr /= 0) then
-                  !return      
+                  !return
                   write(*,2) 'solve_burgers_cgs_no_thermal failed', k
                   do i=1,m-1
                      write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -595,7 +594,7 @@
             g_ax(1:m) = 0d0
             
             if (ierr /= 0) then
-               !return      
+               !return
                write(*,2) 'solve_burgers_cgs failed', k
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -612,7 +611,7 @@
                ierr)
 
             if (ierr /= 0) then
-               !return      
+               !return
                write(*,2) 'do1_solve_thoul_hu failed', k
                do i=1,m-1
                   write(*,2) 'A X Z C', i, A(i), X(i), Z(i), C(i)
@@ -770,7 +769,7 @@
          real(dp), intent(inout) :: SIG_face(:,:) ! (nc,nc)
          
          integer :: i, j
-         real(dp) :: c, boost
+         real(dp) :: c
          
          include 'formats'
 
@@ -779,7 +778,7 @@
             GT_face(i) = GT_factor*four_pi_r2_rho_face*v_advection_face(i)
             D_self_face(i) = sigma_lnC_face(i,i)  
             do j = 1, nc
-               SIG_face(i,j) = c*sigma_lnC_face(i,j)/C_div_X_face(j)               
+               SIG_face(i,j) = c*sigma_lnC_face(i,j)/C_div_X_face(j)
             end do
          end do
          
@@ -859,8 +858,8 @@
          real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:) ! (m)
          integer, intent(out) :: ierr
 
-         integer :: i, j, l, indx(n), nmax
-         real(dp) :: aamax, cc, ac, temp, ko, d, f
+         integer :: i, j, l, indx(n)
+         real(dp) :: cc, ac, ko, f
          real(dp), dimension(m,m) :: xx, y, yy, k
          real(dp), dimension(n) :: alpha, nu, ga, beta
          real(dp), dimension(n,n) :: delta, gamma
@@ -878,7 +877,7 @@
 
          ierr = 0
          ko = 2d0  
-         indx(1:n) = 0    
+         indx(1:n) = 0
 
          ! calculate cc and ac:
       
@@ -1085,7 +1084,7 @@
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
-        integer :: i,j,l,indx(n),nmax
+        integer :: i,j,l,indx(n)
         real(dp), dimension(n) :: alpha, beta, nu, ga
         ! Add in beta later for rad lev. ga is the temp holder for the
         ! columns of gamm when doing matrix solve one column at a time.
@@ -1252,7 +1251,7 @@
         real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:)
         integer, intent(out) :: ierr
 
-        integer :: i,j,l,indx(n),nmax, rightshift, downshift
+        integer :: i,j,l,indx(n), rightshift, downshift
         real(dp), dimension(n) :: alpha, beta, nu, ga
         ! Add in beta later for rad lev. ga is the temp holder for the
         ! columns of gamm when doing matrix solve one column at a time.
@@ -1354,7 +1353,7 @@
                  delta(i+downshift,j+rightshift) = Kdiff(i,j)* &
                       ( 3d0 + zdiff1(i,j) - 0.8d0*zdiff2(i,j) )* &
                       A(i)*A(j)/pow2(A(i)+A(j))
-              end if              
+              end if
            end do
            
            ! Term multiplying the electric field. (doesn't appear in energy equations)
@@ -1478,7 +1477,7 @@
         ! Fitting coefficients from Stanton & Murillo
         real(dp), dimension(2,3) :: a1,a2,a3,a4,a5,b0,b1,b2,b3,b4
         real(dp) :: lambda ! The screening length
-        integer :: i,j,k,facmo,no,mo ! Last two are used for different orders of collisions.
+        integer :: i,j,facmo,no,mo ! Last two are used for different orders of collisions.
 
         real(dp) :: lgp, gp1, gp2, gp3, gp4, gp5, kbT32, tmp
 
@@ -1570,7 +1569,7 @@
               else if( g_plasma(i,j) < 1d0) then ! Use eqn C23 for weakly coupled
                  do no=1,2
                     do mo=1,3 ! Implementing the (m-1)! term with a simple if statement.
-                       if(mo .eq. 3) then
+                       if(mo == 3) then
                           facmo = 2 ! (3-1)!
                        else
                           facmo = 1 ! (1-1)! and (2-1)!

@@ -824,7 +824,7 @@
                               ratdum(irdgn) * zz &
                   + ratdum(irhegn)*dratdumdd(irhegp)*ratdum(irdgn)*zz &
                   + ratdum(irhegn)*ratdum(irhegp)*dratdumdd(irdgn)*zz &
-                  - ratdum(iralf1)*zz*denomdt
+                  - ratdum(iralf1)*zz*denomdd
 
 
          ratdum(iralf2)     = ratdum(irheng)*ratdum(irdpg)* &

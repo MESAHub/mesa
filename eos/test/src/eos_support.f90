@@ -104,7 +104,6 @@
 
          character (len=256) :: my_mesa_dir
          integer :: info
-         real(dp) :: logT_all_HELM, logT_all_OPAL
          logical :: use_cache
          
          info = 0

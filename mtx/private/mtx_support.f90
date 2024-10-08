@@ -827,7 +827,7 @@
          real(dp), pointer, intent(in) :: A1(:) ! =(n, n)
          real(dp), pointer, intent(in) :: x(:) ! (n)
          real(dp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(dp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -842,7 +842,7 @@
          real(qp), pointer, intent(in) :: A1(:) ! =(n, n)
          real(qp), pointer, intent(in) :: x(:) ! (n)
          real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(qp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -858,7 +858,7 @@
          real(dp), pointer, intent(in) :: x(:) ! (n)
          real(dp), pointer, intent(in) :: c(:) ! (n)
          real(dp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(dp), pointer :: A(:,:) ! (n,n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -874,7 +874,7 @@
          real(qp), pointer, intent(in) :: x(:) ! (n)
          real(qp), pointer, intent(in) :: c(:) ! (n)
          real(qp), pointer, intent(inout) :: b(:) ! (n)
-         integer :: i, j
+         integer :: j
          real(qp), pointer :: A(:,:) ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
@@ -1073,7 +1073,7 @@
       REAL(dp), pointer ::        VALUES (:)
       integer, intent(out) :: ierr
       
-      integer i
+      integer :: i
       ierr = 0
       READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
                            TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
@@ -1119,7 +1119,7 @@
       REAL(qp), pointer ::        VALUES (:)
       integer, intent(out) :: ierr
       
-      integer i
+      integer :: i
       ierr = 0
       READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
                            TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
@@ -1164,7 +1164,7 @@
 
       REAL(dp)         VALUES (*)
       
-      integer i
+      integer :: i
       
       ierr = 0
 

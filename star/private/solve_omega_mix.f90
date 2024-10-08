@@ -43,9 +43,9 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt_total
 
-         integer :: ierr, nz, i, j, k, max_iters_per_substep, &
+         integer :: ierr, nz, k, max_iters_per_substep, &
             max_iters_total, total_num_iters, num_iters
-         integer(8) :: time0, clock_rate
+         integer(8) :: time0
          integer :: steps_used, max_steps, min_steps
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
@@ -418,7 +418,7 @@
             integer, intent(out) :: ierr
 
             real(qp) :: m
-            integer i
+            integer :: i
 
             ierr = 0
 

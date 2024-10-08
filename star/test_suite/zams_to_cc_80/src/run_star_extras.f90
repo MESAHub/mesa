@@ -27,7 +27,6 @@
       use const_def
       use math_lib
       use auto_diff
-      use gyre_lib
       
       implicit none
       
@@ -35,25 +34,11 @@
 
 ! here are the x controls used below
 
-!gyre
-      !x_logical_ctrl(37) = .false. ! if true, then run GYRE
-      !x_integer_ctrl(1) = 2 ! output GYRE info at this step interval
-      !x_logical_ctrl(1) = .false. ! save GYRE info whenever save profile
-      !x_integer_ctrl(2) = 2 ! max number of modes to output per call
-      !x_logical_ctrl(2) = .false. ! output eigenfunction files
-      !x_integer_ctrl(3) = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
-      !x_integer_ctrl(4) = 1 ! order
-      !x_ctrl(1) = 0.158d-05 ! freq ~ this (Hz)
-      !x_ctrl(2) = 0.33d+03 ! growth < this (days)
-
 !alpha_mlt_routine
          !alpha_H = s% x_ctrl(21)
          !alpha_other = s% x_ctrl(22)
          !H_limit = s% x_ctrl(23)
 
-! inlists
-      ! x_integer_ctrl(2) = X ! part number of inlist
-      
       contains
 
       include "test_suite_extras.inc"
@@ -119,26 +104,10 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)         
+         call test_suite_startup(s, restart, ierr)
          
          if (.not. s% x_logical_ctrl(37)) return
          
-         ! Initialize GYRE
-
-         call gyre_init('gyre.in')
-
-         ! Set constants
-
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
-
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
-
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-
       end subroutine extras_startup
       
       
@@ -153,18 +122,12 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-         select case (s% x_integer_ctrl(2))
-         case(7)
-            testhub_extras_names(1) = 'fe_core_mass'
-            testhub_extras_vals(1) = s% fe_core_mass
-            testhub_extras_names(2) = 'compactness'
-            testhub_extras_vals(2) = star_get_history_output(s, 'compactness_parameter')
-            testhub_extras_names(3) = 'mu4'
-            testhub_extras_vals(3) = star_get_history_output(s, 'mu4')
-            testhub_extras_names(4) = 'm4'
-            testhub_extras_vals(4) = star_get_history_output(s, 'm4')
-
+         nz = s% nz
+         write(*,'(A)')
+         select case (s% x_integer_ctrl(5))
+         case (7)
+            ! put target info in TestHub output
+            testhub_extras_names(1) = 'fe_core_mass'; testhub_extras_vals(1) = s% fe_core_mass
 
             if(s% fe_core_mass < 1d0) then
                write(*,1) "Bad fe_core_mass", s%fe_core_mass
@@ -176,14 +139,8 @@
                end if
             end if
          end select
-
-
-
-
          call test_suite_after_evolve(s, ierr)
-         if (ierr /= 0) return         
          if (.not. s% x_logical_ctrl(37)) return
-         call gyre_final()
       end subroutine extras_after_evolve
       
 
@@ -251,11 +208,7 @@
             vals(k,1) = s% zbar(k)/s% abar(k)
          end do
       end subroutine data_for_extra_profile_columns
-
   
-      include 'gyre_in_mesa_extras_finish_step.inc'
-     
-
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -266,12 +219,9 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
          if (.not. s% x_logical_ctrl(37)) return
-         extras_finish_step = gyre_in_mesa_extras_finish_step(id)
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
 
       end module run_star_extras
       

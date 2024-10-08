@@ -4,7 +4,7 @@
 12M_pre_ms_to_core_collapse
 ***************************
 
-This test suite evolves a solar metalicity 12 |MSun| model from the pre-ms to core collapse.
+This test suite evolves a solar metallicity 12 |MSun| model from the pre-ms to core collapse.
 
 Physical checks
 ===============
@@ -24,10 +24,10 @@ This test case has six parts.
 
 * Part 4 (``inlist_to_end_core_c_burn``) takes the model to core carbon depletion.
 
-* Part 5 (``inlist_to_lgTmax``) evolves the model until the core temperature reaches log T =9.55 (approximately silicon burning)
+* Part 5 (``inlist_to_lgTmax``) evolves the model until the core temperature reaches log T =9.60 (approximately silicon burning)
 
 * Part 6 (``inlist_to_cc``) evolves until core collapse.
 
 
-Last-Updated: 04Aug2023 by EbF
+Last-Updated: 18Dec2023 by EbF
 

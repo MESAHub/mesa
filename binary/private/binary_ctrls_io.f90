@@ -224,6 +224,10 @@
          use_other_CE_rlo_mdot, &
          use_other_CE_binary_evolve_step, &
          use_other_CE_binary_finish_step, &
+         x_ctrl, &
+         x_integer_ctrl, &
+         x_logical_ctrl, &
+         x_character_ctrl, &
 
          ! extra files
          read_extra_binary_controls_inlist, extra_binary_controls_inlist_name
@@ -273,7 +277,6 @@
          integer, intent(in) :: level
          integer, intent(out) :: ierr
          logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen) :: message
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
          
@@ -530,6 +533,11 @@
          b% use_other_CE_rlo_mdot = use_other_CE_rlo_mdot
          b% use_other_CE_binary_evolve_step = use_other_CE_binary_evolve_step
          b% use_other_CE_binary_finish_step = use_other_CE_binary_finish_step
+
+         b% x_ctrl = x_ctrl
+         b% x_integer_ctrl = x_integer_ctrl
+         b% x_logical_ctrl = x_logical_ctrl
+         b% x_character_ctrl = x_character_ctrl
          
       end subroutine store_binary_controls
 
@@ -720,6 +728,11 @@
          use_other_CE_binary_evolve_step = b% use_other_CE_binary_evolve_step
          use_other_CE_binary_finish_step = b% use_other_CE_binary_finish_step
          
+         x_ctrl = b% x_ctrl
+         x_integer_ctrl = b% x_integer_ctrl
+         x_logical_ctrl = b% x_logical_ctrl
+         x_character_ctrl = b% x_character_ctrl
+
       end subroutine set_binary_controls_for_writing
       
       subroutine write_binary_controls(io,ierr)

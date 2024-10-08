@@ -567,7 +567,7 @@
          real(dp), intent(in) :: x1, y1, x2, y2, x3, y3
          real(dp), intent(out) :: xmax, ymax
          integer, intent(out) :: ierr
-         real(dp) :: a, b, c, s2, denom, dx1, dx2, dxmax
+         real(dp) :: a, b, c, dx1, dx2, dxmax
          ierr = 0; xmax = 0; ymax = 0
          dx1 = x2 - x1
          dx2 = x3 - x2

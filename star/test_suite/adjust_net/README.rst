@@ -21,13 +21,13 @@ This test case has two parts. Click to see a larger view of a plot.
 * Part 2 (``inlist_adjust_net_header``) continues the evolution, activates the adaptive nuclear reaction network, and terminates at about 2 million years with 62 isotopes in the reaction network:
 
 .. image:: ../../../star/test_suite/adjust_net/docs/track1_000234.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/adjust_net/docs/Network_000205.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/adjust_net/docs/Network_000234.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the plots above:

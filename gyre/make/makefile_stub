@@ -12,7 +12,7 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-SRCS = gyre_lib_stub.f
+SRCS = gyre_mesa_m_stub.f90
 
 #################################################################
 #
@@ -28,7 +28,7 @@ endif
 #
 # TARGETS
 
-LIB = libgyre.$(LIB_SUFFIX)
+LIB = libgyre_mesa.$(LIB_SUFFIX)
 
 OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
 
@@ -41,10 +41,10 @@ else
 endif
 
 clean:
-	-@rm -f *.o *.f90 *.fpp *.mod .depend *.so *.a ../public/gyre_lib.f
+	-@rm -f *.o *.f90 *.fpp *.mod .depend *.so *.a ../public/gyre_mesa_m.f90
 
 install:
-	@$(CP_IF_NEWER) gyre_lib.mod $(MESA_DIR)/include
+	@$(CP_IF_NEWER) gyre_mesa_m.mod $(MESA_DIR)/include
 	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
 
 #################################################################
@@ -54,7 +54,7 @@ install:
 COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree)
 #COMPILE = $(COMPILE_TO_TEST) $(FCfree)
 
-%.o : %.f
+%.o : %.f90
 ifneq ($(QUIET),)
 	@echo COMPILE $<
 	@$(COMPILE) $<
@@ -66,6 +66,6 @@ endif
 #
 # DEPENDENCIES
 
-SRC_PATH = $(MOD_PUBLIC_DIR):$(MOD_PRIVATE_DIR)
+SRC_PATH = $(MOD_PUBLIC_DIR)
 
-vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)

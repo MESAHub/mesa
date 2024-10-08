@@ -211,8 +211,8 @@
       integer, parameter :: p_grada = p_logE + 1
       integer, parameter :: p_dE_dRho = p_grada + 1
       integer, parameter :: p_Cv = p_dE_dRho + 1
-      integer, parameter :: p_cp = p_Cv + 1
-      integer, parameter :: p_thermal_time_to_surface = p_cp + 1
+      integer, parameter :: p_Cp = p_Cv + 1
+      integer, parameter :: p_thermal_time_to_surface = p_Cp + 1
       integer, parameter :: p_log_thermal_time_to_surface = p_thermal_time_to_surface + 1
       integer, parameter :: p_log_CpT = p_log_thermal_time_to_surface + 1
       integer, parameter :: p_log_CpT_absMdot_div_L = p_log_CpT + 1
@@ -505,8 +505,8 @@
       integer, parameter :: p_mixing_type = p_mix_type + 1
 
       integer, parameter :: p_log_mlt_D_mix = p_mixing_type + 1
-      integer, parameter :: p_log_cp_T_div_t_sound = p_log_mlt_D_mix + 1
-      integer, parameter :: p_log_t_thermal = p_log_cp_T_div_t_sound + 1
+      integer, parameter :: p_log_Cp_T_div_t_sound = p_log_mlt_D_mix + 1
+      integer, parameter :: p_log_t_thermal = p_log_Cp_T_div_t_sound + 1
       integer, parameter :: p_log_t_sound = p_log_t_thermal + 1
       integer, parameter :: p_pressure_scale_height_cm = p_log_t_sound + 1
       integer, parameter :: p_pressure_scale_height = p_pressure_scale_height_cm + 1
@@ -904,10 +904,10 @@
          profile_column_name(p_logE) = 'logE'
          profile_column_name(p_grada) = 'grada'
          profile_column_name(p_dE_dRho) = 'dE_dRho'
-         profile_column_name(p_cv) = 'cv'
+         profile_column_name(p_Cv) = 'cv'
          profile_column_name(p_thermal_time_to_surface) = 'thermal_time_to_surface'
          profile_column_name(p_log_thermal_time_to_surface) = 'log_thermal_time_to_surface'
-         profile_column_name(p_cp) = 'cp'
+         profile_column_name(p_Cp) = 'cp'
          profile_column_name(p_log_CpT) = 'log_CpT'
          profile_column_name(p_log_CpT_absMdot_div_L) = 'log_CpT_absMdot_div_L'
          profile_column_name(p_logS) = 'logS'
@@ -1191,7 +1191,7 @@
          profile_column_name(p_mix_type) = 'mix_type'
          profile_column_name(p_mixing_type) = 'mixing_type'
          profile_column_name(p_log_mlt_D_mix) = 'log_mlt_D_mix'
-         profile_column_name(p_log_cp_T_div_t_sound) = 'log_cp_T_div_t_sound'
+         profile_column_name(p_log_Cp_T_div_t_sound) = 'log_cp_T_div_t_sound'
          profile_column_name(p_log_t_thermal) = 'log_t_thermal'
          profile_column_name(p_log_t_sound) = 'log_t_sound'
          profile_column_name(p_pressure_scale_height_cm) = 'pressure_scale_height_cm'
@@ -1431,7 +1431,7 @@
 
 
       integer function do_get_profile_id(cname)
-         use utils_lib
+         use utils_lib, only: integer_dict_lookup
          character (len=*), intent(in)  :: cname
          ! returns id for the profile column if there is a matching name
          ! returns 0 otherwise.

@@ -542,7 +542,7 @@
       !   Format originally defined for the GONG solar model project.  A
       !   definition was given in 2005 for the `CoRoT/ESTA project`_ and
       !   `GONG itself <https://phys.au.dk/~jcd/solar_models/file-format.pdf>`_.
-      !   MESA's implementation largely follows this subsequent 
+      !   MESA's implementation largely follows this subsequent
       !   `2015 definition <https://phys.au.dk/~jcd/ASTEC_results/file-format.pdf>`_.
 
       ! ``'OSC'``
@@ -673,7 +673,7 @@
       ! format_for_OSC_data
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! float format for ``'OSC'`` data format 
+      ! float format for ``'OSC'`` data format
 
       ! ::
 
@@ -855,16 +855,6 @@
       ! ::
 
     surface_avg_abundance_dq = 1d-8
-
-
-      ! mass_depth_for_L_surf
-      ! ~~~~~~~~~~~~~~~~~~~~~
-
-      ! only if ``use_flux_limiting_with_dPrad_dm_form``
-
-      ! ::
-
-    mass_depth_for_L_surf = 0d0
 
 
       ! conv_core_gap_dq_limit
@@ -1348,7 +1338,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       !     envelope_fraction_left = (star_mass - he_core_mass)/(initial_mass - he_core_mass)
-      
+
       ! Stop when ``envelope_fraction_left`` < this limit.
 
       ! ::
@@ -1360,7 +1350,7 @@
       ! ~~~~~~~~~~~~~~~~
 
       !     xmstar = mstar - M_center
-      
+
       ! stop when xmstar in grams is < this.  <= 0 means no limit.
 
       ! ::
@@ -1372,7 +1362,7 @@
       ! ~~~~~~~~~~~~~~~~
 
       !     xmstar = mstar - M_center
-      
+
       ! stop when xmstar in grams is > this.  <= 0 means no limit.
 
       ! ::
@@ -1812,7 +1802,7 @@
       ! fe_core_infall_mass
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a 
+      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``fe_core_infall`` but there will be a greater chance of a
       ! transistent velocity spike causing the model to prematurely exit.  In solar masses
 
 
@@ -1831,7 +1821,7 @@
       ! non_fe_core_infall_mass
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``non_fe_core_infall`` but there will be a greater chance of a 
+      ! Amount of mass to check if collapsing, the smaller this is the closer the velocity minima will be to ``non_fe_core_infall`` but there will be a greater chance of a
       ! transistent velocity spike causing the model to prematurely exit. In solar masses
 
 
@@ -1926,8 +1916,8 @@
       ! ::
 
     stop_near_zams = .false.
-    
-    
+
+
       ! stop_at_phase_PreMS
       ! ~~~~~~~~~~~~~~~~~~~
       ! stop_at_phase_ZAMS
@@ -1955,10 +1945,14 @@
       ! stop_at_phase_WDCS
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! if true, when phase of evolution reaches this point.
+      ! if true, terminate model when phase of evolution reaches this point.
+      ! Definitions for stop_at_phase_* can be found in
+      ! $MESA_DIR/star/private/star_utils.f90 inside the
+      ! subroutine ``set_phase_of_evolution``
+      ! ::
 
       ! ::
-    
+
     stop_at_phase_PreMS = .false.
     stop_at_phase_ZAMS = .false.
     stop_at_phase_IAMS = .false.
@@ -1972,7 +1966,7 @@
     stop_at_phase_O_Burn = .false.
     stop_at_phase_Si_Burn = .false.
     stop_at_phase_WDCS = .false.
-    
+
 
       ! Lnuc_div_L_upper_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~
@@ -2312,7 +2306,7 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
-      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``   
+      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
       ! even if that flag is set.
 
       ! ::
@@ -2361,6 +2355,15 @@
       ! Note that TDC does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
       ! even if that flag is set.
 
+      ! We caution that combining different mixing models in a stellar evolution
+      ! calculation might lead to physically inconsistent solutions,
+      ! because the different models have been developed separately,
+      ! and their underlying assumptions might not be compatible with each other.
+      ! Examples include combining the newly implemented time-dependent local limit
+      ! convection model ``TDC`` with an overshooting model, or combining ``TDC``
+      ! with other models for chemical composition gradients
+      ! (predictive mixing or convective premixing), rotation, etc. (MESA VI)
+      
       ! ::
 
     MLT_option = 'TDC'
@@ -2428,7 +2431,6 @@
       ! ::
 
     mlt_make_surface_no_mixing = .false.
-    
 
 
       ! T_mix_limit
@@ -3168,7 +3170,7 @@
     RSP_nz_outer = 40
     RSP_T_anchor = 11d3
     RSP_T_inner = 2d6
-    RSP_testing = .false. 
+    RSP_testing = .false.
 
       ! ::
 
@@ -3415,7 +3417,7 @@
       ! Mixing coefficients are multiplied by this factor.
       ! The ``mix_factor`` is applied in subroutine ``get_convection_sigmas`` in ``star/private/mix_info.f90`` --
       ! the lagrangian diffusion coefficient sigma(k) at cell boundary k is set to
-      ! ``mix_factor*D*(4*pi*r(k)^2*rho_face(k))^2``. 
+      ! ``mix_factor*D*(4*pi*r(k)^2*rho_face(k))^2``.
       ! Note that the value of D is not changed -- it is just used as a term in calculating sigma.
 
       ! ::
@@ -4051,7 +4053,7 @@
       ! use_other_j_for_adjust_J_lost option to specify a specific angular momentum
       ! of removed material different from j_rot_surf
 
-      ! In order to prevent the algorithm from digging to deep to adjust J, 
+      ! In order to prevent the algorithm from digging to deep to adjust J,
       ! there is a timestep limit adjust_J_q_limit
 
       ! ::
@@ -4116,7 +4118,7 @@
 
       ! When w_div_wc_flag is true, rather than a hard limit on w_div_wcrit
       ! we use w_div_wcrit_max2<w_div_wcrit_max to provide a smooth transition.
-      ! In the limit of j_rot->infinity, the resulting w_div_wc will match 
+      ! In the limit of j_rot->infinity, the resulting w_div_wc will match
       ! w_div_wcrit_max, while nothing is done when w_div_wcrit_max<w_div_wcrit_max2
 
       ! ::
@@ -4223,15 +4225,16 @@
       ! ~~~~~~~~~~
 
       ! Controls how the surface temperature Tsurf and pressure Psurf are evaluated when
-      ! setting up outer boundary conditions
+      ! setting up outer boundary conditions. We caution that the use of ``'fixed_'`` atmosphere
+      ! options might conflict with mlt_option = ``TDC``.
 
-      ! + ``'T_tau'``: 
+      ! + ``'T_tau'``:
       !   set Tsurf and Psurf by solving for the atmosphere structure given a T(tau) relation.
       !   The choice of relation is set by the ``atm_T_tau_relation`` control. See also
       !   the ``atm_T_tau_opacity``, ``atm_T_tau_errtol``, ``atm_T_tau_max_tries`` and
       !   ``atm_T_tau_max_steps`` controls.
       !
-      ! + ``'table'``: 
+      ! + ``'table'``:
       !   set Tsurf and Psurf by interpolating in pre-calculated tables based on model
       !   atmospheres. The choice of table is set by the ``atm_table`` control.
       !   Requires tau_factor = 1, as surface of the model must always attach at the base
@@ -4242,12 +4245,33 @@
       !   Teff and log_g. This is consistent with the assumptions used for table construction:
       !   geometrically thin atmospheres with constant flux.
       !
-      ! + ``'irradiated_grey'``: 
+      ! + ``'irradiated_grey'``:
       !   set Tsurf by solving for the atmosphere structure given the irradiated-grey
       !   T(tau) relation of Guillot, T, and Havel, M., A&A 527, A20 (2011).
       !   See also the ``atm_irradiated_opacity``, ``atm_irradiated_errtol``, ``atm_irradiated_T_eq``,
       !   ``atm_irradiated_T_eq``, ``atm_irradiated_kap_v``, ``atm_irradiated_kap_v_div_kap_th``,
       !   ``atm_irradiated_P_surf`` and ``atm_irradiated_max_tries`` controls.
+      !
+      ! + ``'fixed_Teff'`` :
+      !    set Tsurf from Eddington T(tau) relation
+      !    for current surface tau and Teff = ``atm_fixed_Teff``.
+      !    set Psurf = Radiation_Pressure(Tsurf)
+      !
+      ! + ``'fixed_Tsurf'`` :
+      !    get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      !    set Teff from Eddington T(tau) relation for given Tsurf and tau=2/3
+      !    set Psurf = Radiation_Pressure(Tsurf)
+      !
+      ! + ``'fixed_Psurf'`` :
+      !    get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      !    set Tsurf from L and R using ``L = 4*pi*R^2*boltz_sigma*T^4``.
+      !    set Teff using Eddington T(tau) relation for tau=2/3 and T=Tsurf.
+      !
+      ! + ``'fixed_Psurf_and_Tsurf'`` :
+      !    get value of Psurf from control parameter ``atm_fixed_Psurf``.
+      !    get value of Tsurf from control parameter ``atm_fixed_Tsurf``.
+      !    see the ``conductive_flame`` test_suite for an example of
+      !    this boundary condition implemented via the ``other_surface_PT`` hook.
 
       ! ::
 
@@ -4357,11 +4381,11 @@
       ! + ``'fixed'``:
       !   use a uniform opacity, fixed to the opacity of the outermost cell of the
       !   interior model
-      
+
       ! + ``'iterated'``:
       !   use a uniform opacity, iterated to be consistent with the final Tsurf and
       !   Psurf at the base of the atmosphere.
-      
+
       ! + ``'varying'``:
       !   use a varying opacity consistent with the local T and P throughout the
       !   atmosphere. Involves numerical integration of the hydrostatic equilibrium
@@ -4421,7 +4445,7 @@
       !   model atmospheres (Allard et al. 2001) for Teff < 3000 K.
       !   where no published results are available, the table has been
       !   filled in using integration of the Eddington T(tau) relation
-      
+
       ! + ``'photosphere'``:
       !   use model atmosphere tables for photosphere; range of Z's,
       !   as described in MESA Paper I (Paxton et al. 2011), Sec. 5.3.
@@ -4433,7 +4457,7 @@
       !   and the models by Castelli & Kurucz (2003).  where
       !   neither is available, an entry is generated by
       !   integrating the Eddington T(tau) relation
-      
+
       ! + ``'WD_tau_25'``:
       !   hydrogen atmosphere tables for cool white dwarfs
       !   giving Pgas and T at log10(tau) = 1.4 (tau = 25.11886)
@@ -4442,7 +4466,7 @@
       !   R.D. Rohrmann, L.G. Althaus, and S.O. Kepler,
       !   Lyman α wing absorption in cool white dwarf stars,
       !   Mon. Not. R. Astron. Soc. 411, 781–791 (2011)
-      
+
       ! + ``'DB_WD_tau_25'``:
       !   helium dominated (log(H/He)=-5.0) atmosphere tables for DB
       !   white dwarfs, provided by Odette Toloza and Detlev Koester.
@@ -4665,10 +4689,49 @@
 
       ! If ``.true.``, modify the radiative gradient so that the
       ! temperature profile of the optically thin layers follow the
-      ! T(τ) relation chosen by ``atm_T_tau_relation``.  
+      ! T(τ) relation chosen by ``atm_T_tau_relation``.
       ! ::
 
     use_T_tau_gradr_factor = .false.
+
+
+! starspots
+! =========
+
+
+      ! do_starspots
+      ! ~~~~~~~~~~~~
+
+      ! If ``.true.``, switch on impedence of the surface flux due to magnetic pressure from starspots, 
+      ! parameterized in the style of an atmospheric boundary modification. First described by 
+      ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
+      ! Detailed discussion of this functionality can be found in |MESA VI|.
+
+      ! ::
+
+    do_starspots = .false.
+
+
+      ! fspot
+      ! ~~~~~
+
+      ! Filling Factor of starspots. Valid values between 0.0 and 1.0 (no spots to 100% coverage)
+      ! ::
+
+    fspot = 0d0
+
+
+      ! xspot
+      ! ~~~~~
+
+      ! Temperature contrast between the spotted and unspotted regions. 
+      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5 
+      ! (half of the total pressure is due to magnetic pressure)
+
+      ! ::
+
+    xspot = 1d0
+
 
 ! mass gain or loss
 ! =================
@@ -4685,10 +4748,9 @@
     mass_change = 0d0
 
 
-
       ! mdot_omega_power
       ! ~~~~~~~~~~~~~~~~
-      
+
       ! Enhanced mass loss due to rotation
       ! as in Heger, Langer, and Woosley, 2000, ApJ, 528:368-396.
 
@@ -4879,9 +4941,6 @@
     RGB_to_AGB_wind_switch = 1d-4
 
       ! The code will automatically choose between an RGB wind and an AGB wind.
-
-      ! ::
-
       ! The following names for the different schemes are recognized:
 
       ! + 'Reimers'
@@ -5638,6 +5697,7 @@
       ! ~~~~~~~~~~~~~~
 
       ! Maximum number of grid points allowed.
+      ! Array allowed to grow arbitrarily large if max_allowed_nz <= 0
 
       ! ::
 
@@ -7123,8 +7183,6 @@
    dq_D_mix_zero_at_H_C_crossover = -1d0
 
 
-
-
       ! diffusion_min_T_for_radaccel
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! diffusion_max_T_for_radaccel
@@ -7324,13 +7382,26 @@
       ! do_phase_separation
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Phase separation upon crystallization in WD cores (currently only for C/O white dwarf cores)
-      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_
-      ! with the phase diagram of `Blouin et al. (2021) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
+      ! Phase separation upon crystallization in WD cores
+      ! using the implementation of `Bauer (2023) <https://ui.adsabs.harvard.edu/abs/2023arXiv230310110B/abstract>`_.
 
       ! ::
 
     do_phase_separation = .false.
+
+      ! phase_separation_option
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Choice of appropriate option for the WD core mixture:
+
+      ! + ``'CO'`` : carbon-oxygen phase separation using the two-component
+      !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B/abstract>`_.
+      ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
+      !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B/abstract>`_.
+
+      ! ::
+
+    phase_separation_option = 'CO'
 
       ! do_phase_separation_heating
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -7358,7 +7429,7 @@
       ! ::
 
     phase_separation_mixing_use_brunt = .true.
-    
+
 
 ! eos controls
 ! ============
@@ -7459,10 +7530,10 @@
    ! _________________
 
       ! The ``OP_mono`` opacities use data and code from the OP website
-      ! as modified by Haili Hu.  Since the tar.gz file is large (656 MB),
+      ! as modified by Haili Hu.  Since the tar.xz file is large (462 MB),
       ! it is not included in the standard mesa download.
 
-      ! You can get ``OP4STARS_1.3.tar.xz`` from http://sourceforge.net/projects/mesa/files
+      ! You can get ``OP4STARS_1.3.tar.xz`` from https://zenodo.org/records/4390522
 
       ! Put it any place you want on your disk.
 
@@ -7513,7 +7584,7 @@
       ! or use the faster method by allowing for a small tolerance on the mixture used for the computations of these variables (``'mombarg'``).
 
       ! ::
-      
+
       op_mono_method = 'hu'
 
       ! emesh_data_for_op_mono_path
@@ -7529,7 +7600,7 @@
       ! and then unpack it in place with ``unxz -v OP_mono_master_grid_MESA_emesh.txt.xz``
 
       ! ::
-      
+
     emesh_data_for_op_mono_path = ''      ! '' defaults to $MESA_OP_MONO_MASTER_GRID
 
 
@@ -7612,43 +7683,59 @@
 
       ! get_delta_nu_from_scaled_solar
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If ``get_delta_nu_from_scaled_solar`` is ``.false.``, the
+      ! large separation ``delta_nu`` is the inverse of the sound
+      ! crossing time from one side of the star to the other, through
+      ! the center.  This is sometimes called the "asymptotic" large
+      ! separation.
 
-      ! use scaled solar values
+      ! Otherwise, ``delta_nu`` is calculated from the asteroseismic
+      ! scaling relations (see `Ulrich 1986`_, `Brown et al. 1991`_
+      ! and `Kjeldsen & Bedding 1995`_) using solar reference values
+      ! ``nu_max_sun``, ``delta_nu_sun`` and ``astero_Teff_sun``.
+
+      ! ``nu_max`` is always computed from the scaling relation.
+
+      ! .. _Ulrich 1986: https://ui.adsabs.harvard.edu/abs/1986ApJ...306L..37U
+      ! .. _Brown et al. 1991:  https://ui.adsabs.harvard.edu/abs/1991ApJ...368..599B
+      ! .. _Kjeldsen & Bedding 1995: https://ui.adsabs.harvard.edu/abs/1995A%26A...293...87K
 
       ! ::
 
     get_delta_nu_from_scaled_solar = .false.
 
-
       ! nu_max_sun
       ! ~~~~~~~~~~
-
-      ! solar value of ``nu_max``
-
-      ! ::
-
-    nu_max_sun = 3100d0
-
-
       ! delta_nu_sun
       ! ~~~~~~~~~~~~
+      ! astero_Teff_sun
+      ! ~~~~~~~~~~~~~~~
 
-      ! solar value of ``delta_nu``
+      ! Solar reference values used in the asteroseismic scaling relations
+      ! for ``delta_nu`` (if ``get_delta_nu_from_scaled_solar`` is ``.false.``)
+      ! and ``nu_max`` (always).
+
+      ! The default ``nu_max_sun`` is the Sun-as-as-star value reported by `Lund
+      ! et al. (2017)`_, which is consistent with but conceptually
+      ! different from the result of 3073.59 ± 0.18 μHz by `Kiefer et
+      ! al. (2018)`_.
+
+      ! The default ``delta_nu_sun`` is also taken from `Lund et al. (2017)`_.
+
+      ! The default ``astero_Teff_sun`` is the value adopted in IAU 2015 Resolution B3.
+      ! This should not be confused with the constant ``Teffsun``, which is always
+      ! equal to the IAU value and not controlled by a parameter.  The "asteroseismic"
+      ! value can be changed in case one needs to reproduce previous calculations
+      ! using the scaling relations.
+
+      ! .. _Lund et al. (2017): https://ui.adsabs.harvard.edu/abs/2017ApJ...835..172L
+      ! .. _Kiefer et al. (2018): https://ui.adsabs.harvard.edu/abs/2018SoPh..293..151K
 
       ! ::
 
-    delta_nu_sun = 135d0
-
-
-      ! Teff_sun
-      ! ~~~~~~~~
-
-      ! solar value of Teff
-
-      ! ::
-
-    Teff_sun = 5777d0
-
+    nu_max_sun = 3078d0 ! μHz
+    delta_nu_sun = 134.91d0 ! μHz
+    astero_Teff_sun = 5772d0 ! kelvin
 
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
@@ -7720,12 +7807,8 @@
     min_magnitude_brunt_B = -1d99
 
 
-
-
-
 ! structure equations
 ! ===================
-
 
 
       ! energy_eqn_option
@@ -7896,6 +7979,17 @@
 
     velocity_q_upper_bound = 1d99
 
+      ! velocity_tau_lower_bound
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Local override for global ``v_flag``.
+      ! If local tau < this bound, local ``v_flag`` is set false,
+      ! else local ``v_flag`` is set to global ``v_flag``.
+      ! this lets you force v = 0 in outer envelope.
+
+      ! ::
+
+    velocity_tau_lower_bound = -1d99
 
       ! velocity_logT_lower_bound
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8197,9 +8291,9 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
-    
-    
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+
+
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
@@ -8212,15 +8306,25 @@
       ! burning in massive stars and AGB stars.
 
       ! Under certain circumstances we will not have drag in the surface k=1 zone
-      ! To force the drag term to be on in the outer zone you must enable one of the 
+      ! To force the drag term to be on in the outer zone you must enable one of the
       ! following surface boundary conditions:
       ! ``use_momentum_outer_BC``, ``use_zero_Pgas_outer_BC``, or ``use_fixed_Psurf_outer_BC``
 
+      ! If use_drag_energy = .true. adds the work done by the drag force
+      ! to the energy balance. Since the drag force is proportional to
+      ! the velocity which is subject to numerical spikes and
+      ! oscillations, you may not want to use the work done by it in the
+      ! model If set to .false. but drag_coefficient is nonzero, the
+      ! drag force will be applied in the momentum equation (as a
+      ! numerical trick to damp spurious velocities) but not in the
+      ! energy equation.
+
       ! ::
 
+    use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
-    
+
 
       ! for hydro comparison tests (e.g., Sedov)
 
@@ -8260,7 +8364,7 @@
 
       ! Note that these parameters are not exactly the same
       ! as used by Paul Duffell.
-      ! His calibrated D is 2, where mesa has default D = 3 (see mesaIV paper).
+      ! His calibrated D is 2, where mesa has default D = 3 (see |MESA IV|).
       ! Users should try various values since the choice is not clear cut.
 
       ! ::
@@ -8290,7 +8394,7 @@
     RTI_m_full_boost = 4d0
     RTI_m_no_boost = 5d0
 
-    
+
       ! retry_for_v_above_clight
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8301,7 +8405,7 @@
       ! ::
 
     retry_for_v_above_clight = .true.
-    
+
 
 ! solver controls
 ! ===============
@@ -8508,7 +8612,6 @@
     include_w_in_correction_limits = .true.
 
 
-
       ! max_X_for_conv_timescale
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! min_X_for_conv_timescale
@@ -8523,7 +8626,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! ::
-    
+
     max_X_for_conv_timescale = 1d0
     min_X_for_conv_timescale = 0d0
     max_q_for_conv_timescale = 1d0
@@ -8672,7 +8775,7 @@
 
       ! do_normalize_dqs_as_part_of_set_qs
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+
       ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
       ! ok for create pre ms etc., but not for read model
       ! create_pre_ms calls normalize_dqs even if this flag is false.
@@ -8680,12 +8783,12 @@
       ! ::
 
    do_normalize_dqs_as_part_of_set_qs = .false.
-   
+
 
       ! use_DGESVX_in_bcyclic
       ! use_equilibration_in_DGESVX
       ! report_min_rcond_from_DGESXV
-      
+
       ! FOR DEBUGGING ONLY.   NOT FOR GENERAL USE.
 
       ! ::
@@ -9134,8 +9237,6 @@
 
       ! op_split_burn_min_T
       ! ~~~~~~~~~~~~~~~~~~~
-      ! op_split_burn_min_T_for_variable_T_solver
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! op_split_burn_eps
       ! ~~~~~~~~~~~~~~~~~
       ! op_split_burn_odescal
@@ -9146,7 +9247,6 @@
       ! ::
 
     op_split_burn_min_T = 2d9
-    op_split_burn_min_T_for_variable_T_solver = 1d99
     op_split_burn_eps = 1d-5
     op_split_burn_odescal = 1d-5
 
@@ -9176,7 +9276,7 @@
       !          'Lnuc_cat'             delta_lgL_nuc_cat_limit
       !          'Lnuc_H'               delta_lgL_H_limit
       !          'Lnuc_He'              delta_lgL_He_limit
-      !          'lgL_power_phot'       delta_lgL_power_photo_limit 
+      !          'lgL_power_phot'       delta_lgL_power_photo_limit
       !          'Lnuc_z'               delta_lgL_z_limit
       !          'bad_X_sum'            (solver found bad mass sum)
       !          'dL/L'                 dL_div_L_limit
@@ -9238,12 +9338,12 @@
       ! time_delta_coeff - smaller forces smaller timesteps giving better time resolution.
       ! multiplier for all real number timestep limits and hard limits.
       ! does not apply to integer valued limits such as
-      
+
       ! + solver_iters_timestep_limit
       ! + burn_steps_limit
       ! + diffusion_steps_limit
       ! + diffusion_iters_limit
-      
+
       ! does not apply to varcontrol_target.
       ! analogous to mesh_delta_coeff for better spatial resolution.
 
@@ -9576,12 +9676,19 @@
 
     dX_mix_dist_limit = 1d-4
 
-      ! Limit on magnitude of decrease in any cell hydrogen abundance during a single timestep.
-      ! dH here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg 'h1', 'he4', etc.
-      ! special 'species' X (any hydrogen), Y (any helium) and Z (any metals) are
-      ! allowed here. E.g. 'Z' will trigger the timestep control if any metal isotope
+      ! dX_limit_species
+      ! ~~~~~~~~~~~~~~~~
+
+      ! Specify which species the ``dX_limit``, ``dX_div_X_limit``, etc array entries apply to.
+      ! These are limits on magnitude of decrease in any cell abundance during a single timestep.
+      ! dX here is ``abs(xa(j,k) - xa_old(j,k))`` for any cell k and all species j, eg ``'h1'``, ``'he4'``, etc.
+      ! Special 'species' ``'X'`` (any hydrogen), ``'Y'`` (any helium) and ``'Z'`` (any metals) are
+      ! allowed here. E.g. ``'Z'`` will trigger the timestep control if any metal isotope
       ! abundance individually satisfies the conditions below.
       ! Considers all cells except where have convective mixing.
+
+
+      ! ::
 
     dX_limit_species(1) = 'h1'
     dX_limit_species(2) = 'he4'
@@ -10307,7 +10414,7 @@
     min_lgT_for_lgL_power_photo_limit = 9d0
     lgL_power_photo_burn_min = 10d0
     lgL_power_photo_drop_factor = 10
-    
+
 
       ! limits based on changes at photosphere
 
@@ -10404,7 +10511,7 @@
       ! ``abs_du_div_cs`` > ``min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit`` and
       ! and
       ! ``abs_u_div_cs`` > ``min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit``
-      ! 
+      !
       ! allow focus on regions near shock face.
 
       ! ::
@@ -10841,7 +10948,6 @@
     delta_lg_XSi_cntr_hard_limit = -1
 
 
-
       ! delta_XH_cntr_limit
       ! ~~~~~~~~~~~~~~~~~~~
 
@@ -11000,9 +11106,9 @@
       ! ~~~~~~~~~~~~~~~~~~
       ! delta_XSi_drop_only
       ! ~~~~~~~~~~~~~~~~~~~
-         
 
-      ! If true, then only limit drops in abundance. 
+
+      ! If true, then only limit drops in abundance.
 
       ! ::
 
@@ -11083,7 +11189,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! hard_limit_for_rel_error_in_energy_conservation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
       ! ::
 
       !     rel_error_in_energy_conservation = abs(error_in_energy_conservation/total_energy)
@@ -11160,7 +11266,7 @@
       ! stop_for_bad_nums
       ! ~~~~~~~~~~~~~~~~~
 
-      ! If true and report_ierr is also true, then stop for bad numbers (NaNs or infinity).
+      ! If true, then stop for bad numbers (NaNs or infinity).
       ! this replaces old control stop_for_NaNs
 
       ! ::
@@ -11214,7 +11320,7 @@
     solver_test_partials_write_eos_call_info = .false.
     solver_epsder_struct = 1d-5
     solver_epsder_chem = 1d-5
-    
+
     energy_conservation_dump_model_number = -1
 
 
@@ -11451,7 +11557,7 @@
     use_other_set_pgstar_controls = .false.
     use_other_accreting_state = .false.
     use_other_eval_i_rot = .false.
-    
+
       ! ::
 
     use_other_export_pulse_data = .false.

@@ -94,10 +94,7 @@
          logical, intent(in) :: subplot
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
-         real :: xmin, xmax, xleft, xright, dx, dylbl, chScale, windy, xmargin, &
-            ymin, ymax
-         integer :: lw, lw_sav, grid_min, grid_max, npts, i, nz
+         real :: xleft, xright, chScale, xmargin
 
          include 'formats'
          ierr = 0
@@ -114,13 +111,12 @@
             use chem_def
             integer, intent(out) :: ierr
 
-            integer :: lw, lw_sav, k,i,j
-            real :: ybot, eps
+            integer :: i, j
 
             integer :: z,n,zmax,zmin,nmin,nmax
-            integer :: base_z,base_n,clr,mid_map
+            integer :: clr,mid_map
             real :: abun,xhigh,xlow
-            real :: ymin,ymax,r,g,b,log10_min_abun,log10_max_abun
+            real :: ymin,ymax,log10_min_abun,log10_max_abun
             real,parameter :: pad=2.5,step=0.5
 
             include 'formats'
@@ -200,7 +196,7 @@
 
                abun=safe_log10(dble(abun))
 
-               if(z.lt.ymin .or. z.gt.ymax .or. n.lt.xleft .or.n.gt.xright)CYCLE
+               if(z<ymin .or. z>ymax .or. n<xleft .or.n>xright)CYCLE
 
                if (s% pg% Network_show_element_names) THEN
                   call pgsci(1)
@@ -247,7 +243,7 @@
          real,intent(in) :: winxmin, winxmax, winymin, winymax,abun_min,abun_max
          real :: legend_xmin,legend_xmax,legend_ymin,legend_ymax
          real :: xmin,xmax,ymin,ymax
-         real :: ymx, dx, dyline, ypos, xpts(2),yt,yb,text
+         real :: dx, dyline, xpts(2),yt,yb,text
          character(len=16) :: str
          
          integer :: i,j,clr,mid_map,num_cms

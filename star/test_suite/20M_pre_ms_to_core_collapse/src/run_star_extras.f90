@@ -27,17 +27,18 @@
       use const_def
       use math_lib
       use auto_diff
-      use gyre_lib
       
       implicit none
       
       include "test_suite_extras_def.inc"
 
+! here are the x controls used below
+
 !alpha_mlt_routine
          !alpha_H = s% x_ctrl(21)
          !alpha_other = s% x_ctrl(22)
          !H_limit = s% x_ctrl(23)
-      
+
       contains
 
       include "test_suite_extras.inc"
@@ -103,12 +104,15 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)         
+         call test_suite_startup(s, restart, ierr)
+         
+         if (.not. s% x_logical_ctrl(37)) return
          
       end subroutine extras_startup
       
       
       subroutine extras_after_evolve(id, ierr)
+         use num_lib, only: find0
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -118,10 +122,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-
-
+         nz = s% nz
          write(*,'(A)')
-         select case (s% x_integer_ctrl(1))
+         select case (s% x_integer_ctrl(5))
          case (7)
             ! put target info in TestHub output
             testhub_extras_names(1) = 'fe_core_mass'; testhub_extras_vals(1) = s% fe_core_mass
@@ -136,12 +139,8 @@
                end if
             end if
          end select
-
-
-
          call test_suite_after_evolve(s, ierr)
-         if (ierr /= 0) return         
-
+         if (.not. s% x_logical_ctrl(37)) return
       end subroutine extras_after_evolve
       
 
@@ -209,7 +208,7 @@
             vals(k,1) = s% zbar(k)/s% abar(k)
          end do
       end subroutine data_for_extra_profile_columns
-
+  
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -219,12 +218,10 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-
+         if (.not. s% x_logical_ctrl(37)) return
          if (extras_finish_step == terminate) &
              s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
 
       end module run_star_extras
       

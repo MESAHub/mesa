@@ -318,7 +318,6 @@
       
       
       subroutine Read_Colors_Data(fname, thead, col_names, n_colors, ierr)
-         use const_def, only: mesa_data_dir
          integer, intent(out) :: ierr ! 0 means ok
          type (lgt_list), pointer,intent(inout) :: thead
          character (len=*),intent(in) :: fname
@@ -535,7 +534,6 @@
          type (lgt_list), pointer,intent(inout) :: thead
          
          !real(dp), parameter :: Zsol = 0.02d0, colors_bol_sun = 4.746d0
-         real(dp) :: colors_bol
          
          real(dp) :: lgg, lgz, lgt, alfa, beta
          real(dp),dimension(max_num_bcs_per_file) :: results1, results2

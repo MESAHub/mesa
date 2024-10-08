@@ -1,11 +1,13 @@
 
       
       subroutine my_getf2(m, a, lda, ipiv, info)
-         integer :: info, lda, m
-         integer :: ipiv(:)
-         real(dp) :: a(:,:),aj(m)
-         real(dp), parameter :: one=1, zero=0
-         integer :: i, j, jp, ii, jj, n, mm
+         integer, intent(in) :: m, lda
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(:)
+         real(dp), intent(inout) :: a(:,:)
+         real(dp) :: aj(m)
+         real(dp), parameter :: one=1.0_dp, zero=0.0_dp
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da, ajjj
          do j = 1, m
             info = 0
@@ -36,8 +38,8 @@
                do jj = j+1, m
                   ajjj = a(j,jj)
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - aj(ii)*ajjj
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - aj(i)*ajjj
                   end do
                end do
             end if
@@ -46,12 +48,12 @@
 
       
       subroutine my_getf2_n4(a, ipiv, info)
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:)
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(4)
+         real(dp), intent(inout) :: a(4,4)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=4, lda=4
-         integer :: i, j, jp, ii, jj, n, mm
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -80,8 +82,8 @@
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
@@ -90,12 +92,12 @@
 
       
       subroutine my_getf2_n5(a, ipiv, info)
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:)
+         integer, intent(out) :: info
+         integer, intent(out) :: ipiv(5)
+         real(dp), intent(inout) :: a(5,5)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: m=5, lda=5
-         integer :: i, j, jp, ii, jj, n, mm
+         integer :: i, j, jp, jj
          real(dp) :: tmp, da
          do j = 1, m
             info = 0
@@ -124,8 +126,8 @@
                !call dger( m-j, m-j, -one, a( j+1, j ), 1, a( j, j+1 ), lda, a( j+1, j+1 ), lda )
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
@@ -138,8 +140,7 @@
          integer :: ipiv(:)
          real(dp) :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i, j, k
          info = 0
          call my_laswp(nrhs, b, ldb, 1, n, ipiv, 1 )
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )
@@ -169,11 +170,11 @@
       end subroutine my_getrs
       
       
-      subroutine my_laswp( n,   a, lda,  k1, k2, ipiv,  incx )
+      subroutine my_laswp( n, a, lda,  k1, k2, ipiv, incx )
          integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
          real(dp) :: a(:,:) ! a( lda, * )
-         integer :: i, i1, i2, inc, ip, ix, ix0, j, k, n32
+         integer :: i, i1, i2, inc, ip, ix, ix0, k
          real(dp) :: temp
          ! interchange row i with row ipiv(i) for each of rows k1 through k2.
          if( incx.gt.0 ) then
@@ -194,7 +195,7 @@
             ip = ipiv( ix )
             if( ip.ne.i ) then
                !$omp simd private(temp)
-               do k = 1, n
+               do k = 1,n
                   temp = a( i, k )
                   a( i, k ) = a( ip, k )
                   a( ip, k ) = temp
@@ -206,15 +207,16 @@
             
       
       subroutine my_getrs1( n, a, lda, ipiv, b, ldb, info )
-         integer :: info, lda, ldb, n
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(:), lda, ldb, n
+         real(dp), intent(in) :: a(:,:)
+         real(dp), intent(inout) :: b(:)
          real(dp), parameter :: one=1, zero=0
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
          !$omp simd private(temp)
-         do i = 1, n
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
@@ -240,15 +242,17 @@
             
       
       subroutine my_getrs1_n4( a, ipiv, b, info )
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(4)
+         real(dp), intent(in) :: a(4,4)
+         real(dp), intent(inout) :: b(4)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: n = 4
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
@@ -274,15 +278,17 @@
             
       
       subroutine my_getrs1_n5( a, ipiv, b, info )
-         integer :: info
-         integer :: ipiv(:)
-         real(dp) :: a(:,:), b(:)
+         integer, intent(out) :: info
+         integer, intent(in) :: ipiv(5)
+         real(dp), intent(in) :: a(5,5)
+         real(dp), intent(inout) :: b(5)
          real(dp), parameter :: one=1, zero=0
          integer, parameter :: n = 5
          real(dp) :: temp
-         integer :: i,k
+         integer :: i, k
          info = 0
-         do i = 1, n
+         !$omp simd private(temp)
+         do i = 1,n
             temp = b(i)
             b(i) = b(ipiv(i))
             b(ipiv(i)) = temp
@@ -310,7 +316,6 @@
       subroutine my_gemm0_p1(m,n,k,a,lda,b,ldb,c,ldc) ! c := -a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(dp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
-         integer :: j, i
          real(dp), parameter :: zero=0
          include 'formats'
          ! transa = 'n'
@@ -407,7 +412,7 @@
 
 
       subroutine my_gemv_mv(m,n,a,x,b,z,y) ! y = y - a*x - b*z
-         integer lda,m,n
+         integer m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -463,7 +468,7 @@
 
 
       subroutine my_gemv_p_mv(m,n,a,x,b,z,y) ! y = y + a*x + b*z
-         integer lda,m,n
+         integer m,n
          real(dp) :: a(:,:), b(:,:)
          real(dp) :: x(:), z(:), y(:)
          real(dp) :: tmp_x, tmp_z
@@ -522,8 +527,8 @@
          integer :: info, lda, m
          real(dp) :: a(:,:)
          real(dp), parameter :: one=1, zero=0
-         integer :: i, j, ii, jj, n, mm
-         real(dp) :: tmp, da
+         integer :: i, j, jj
+         real(dp) :: da
          do j = 1, m
             info = 0
             if( a( j, j ).ne.zero ) then
@@ -540,8 +545,8 @@
             if( j.lt.m ) then
                do jj = j+1, m
                   !$omp simd
-                  do ii = j+1, m
-                     a(ii,jj) = a(ii,jj) - a(ii,j)*a(j,jj)
+                  do i = j+1, m
+                     a(i,jj) = a(i,jj) - a(i,j)*a(j,jj)
                   end do
                end do
             end if
@@ -553,8 +558,7 @@
          integer :: info, lda, ldb, n, nrhs
          real(dp) :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
-         integer :: i,j,k, n32, ix, ip
+         integer :: i,j,k
          info = 0
          do j = 1,nrhs
             do k = 1,n
@@ -584,7 +588,6 @@
          integer :: info, lda, ldb, n
          real(dp) :: a(:,:), b(:)
          real(dp), parameter :: one=1, zero=0
-         real(dp) :: temp
          integer :: i,k
          info = 0
          do k = 1,n

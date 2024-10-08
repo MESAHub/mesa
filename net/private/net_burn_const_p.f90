@@ -195,6 +195,7 @@
          t = 0
          tend = times(ntimes)
          
+         rpar(r_burn_const_P_rho) = 1d-99 ! dummy value, will be calculated later
          rpar(r_burn_const_P_pressure) = exp10(log10Ps_f1(1)) ! no interpolation yet
          rpar(r_burn_const_P_temperature) = starting_temp
          rpar(r_burn_const_P_init_rho) = -1d99

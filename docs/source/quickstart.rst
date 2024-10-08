@@ -32,7 +32,7 @@ Please beware that the examples in the test suite are not necessarily at the cor
 
 There is a section in the documentation about `building inlists <using_mesa/building_inlists.html>`__.  
 
-Another source of examples is the `MESA Marketplace <http://cococubed.asu.edu/mesa_market/>`__ and the `MESA Zenodo community <https://zenodo.org/communities/mesa/>`__.
+Another source of examples is the `MESA Marketplace <http://cococubed.com/mesa_market/>`__ and the `MESA Zenodo community <https://zenodo.org/communities/mesa/>`__.
 There you will find inlists used in published papers and MESA Summer School material. You will also find MESA community written guidance on using MESA.
 
 3. YouTube videos

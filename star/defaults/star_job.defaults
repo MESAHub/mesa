@@ -46,6 +46,8 @@
 
       ! eosDT_cache_dir
       ! ~~~~~~~~~~~~~~~
+      ! ionization_cache_dir
+      ! ~~~~~~~~~~~~~~~~~~~~
       ! kap_cache_dir
       ! ~~~~~~~~~~~~~
       ! rates_cache_dir
@@ -71,13 +73,14 @@
       ! ::
 
       !     eosDT_cache_dir = '/Users/bpaxton/mesa_caches/eosDT_cache'
+      !     ionization_cache_dir = '/Users/bpaxton/mesa_caches/ionization_cache'
       !     kap_cache_dir = '/Users/bpaxton/mesa_caches/kap_cache'
       !     rates_cache_dir = '/Users/bpaxton/mesa_caches/rates_cache'
 
       ! If you give an empty string for the ``cache_dir``, then
       ! if you have set the environment variable ``MESA_CACHES_DIR``, then
       ! the cache is a subdirectory of that with one of the following names:
-      ! ``eosDT_cache``, ``kap_cache``, ``rates_cache``
+      ! ``eosDT_cache``, ``kap_cache``, ``ionization_cache``, ``rates_cache``
       ! if ``MESA_CACHES_DIR`` is not set or is the empty string, then
       ! the cache is a subdirectory of the corresponding data subdirectory,
       ! such as ``data/rates_data/cache`` for the rates cache.
@@ -85,6 +88,7 @@
       ! ::
 
     eosDT_cache_dir = ''
+    ionization_cache_dir = ''
     kap_cache_dir = ''
     rates_cache_dir = ''
 
@@ -705,13 +709,14 @@
       ! + ``GS98_zfracs = 3``
       ! + ``L03_zfracs = 4``
       ! + ``AGS05_zfracs = 5``
-      ! + ``AGSS09_zfracs = 6``
+      ! + ``AGSS09_photospheric_zfracs = 6``
       ! + ``L09_zfracs = 7``
       ! + ``A09_Prz_zfracs = 8``
-
-      ! for example, ``initial_zfracs = 3`` for ``GS98_zfracs``
-      ! or set ``initial_zfracs = 0`` to use the special list of z fractions specified in controls
-      ! (i.e., ``z_fraction_li``, ``z_fraction_be``, ``z_fraction_b``, etc.)
+      ! + ``MB22_photospheric_zfracs = 9``
+      ! + ``AAG21_photospheric_zfracs = 10``
+      !   for example, ``initial_zfracs = 3`` for ``GS98_zfracs``
+      !   or set ``initial_zfracs = 0`` to use the special list of z fractions specified in controls
+      !   (i.e., ``z_fraction_li``, ``z_fraction_be``, ``z_fraction_b``, etc.)
 
       ! ::
 
@@ -1677,8 +1682,8 @@
       ! rather than force you to stop the run near zams, change the inlist, and restart.
       ! The following will turn on rotation automatically.
       ! The working definition of "near zams" is
-      ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_upper_limit``
-      ! ``Lnuc_div_L_upper_limit`` is in the controls part of the inlist.
+      ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_zams_limit``
+      ! ``Lnuc_div_L_zams_limit`` is in the controls part of the inlist.
 
       ! The following apply when rotation is off and model satisfies the "near zams" test.
       ! Each turns on rotation and sets a step limit
@@ -1748,8 +1753,8 @@
       ! ``relax_initial_omega`` only applies at start of run, not for restarts.
       ! ``near_zams_relax``+omega applies when "near zams".
       ! The working definition of "near zams" is
-      ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_upper_limit``
-      ! ``Lnuc_div_L_upper_limit`` is in the controls part of the inlist.
+      ! ``L_nuc_burn_total/L_phot >= Lnuc_div_L_zams_limit``
+      ! ``Lnuc_div_L_zams_limit`` is in the controls part of the inlist.
 
       ! ::
 
@@ -2782,6 +2787,22 @@
       ! ::
 
     electron_coulomb_corrections = 'none'
+
+! ionization controls
+! ===================
+
+
+      ! ionization_file_prefix
+      ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! ionization_Z1_suffix
+      ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Prefix and suffix of ionization files.
+
+      ! ::
+
+    ionization_file_prefix = 'ion'
+    ionization_Z1_suffix = ''
 
 ! "extra" parameters
 ! ==================

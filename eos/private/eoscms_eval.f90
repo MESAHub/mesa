@@ -181,7 +181,7 @@ contains
       real(dp) :: dres1_dlnT(nv), dres2_dlnT(nv), dres3_dlnT(nv), dres4_dlnT(nv)
       real(dp) :: dres1_dlnRho(nv), dres2_dlnRho(nv), dres3_dlnRho(nv), dres4_dlnRho(nv)
       real(dp) :: d_dX(nv)
-      real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dw, dX
+      real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dX
       rq => eos_handles(handle)
 
       if(rq% CMS_use_fixed_composition)then !do fixed composition (one table only)

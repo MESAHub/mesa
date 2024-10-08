@@ -40,9 +40,7 @@ endif
 # step 3) specify which BLAS and LAPACK libraries to use for mesa/mtx
 
 # these are the standard defaults
-WHICH_LAPACK = USE_SRCS
 LOAD_LAPACK = -lmesalapack
-WHICH_BLAS = USE_SRCS
 LOAD_BLAS = -lmesablas
 MKL_INCLUDE = 
 
@@ -365,7 +363,7 @@ LOAD_MESA_MICRO_INT = $(addprefix -l,$(LIBS_MESA_MICRO))
 LOAD_MESA_MICRO_EXT = $(LOAD_MESA_NUMERICS_EXT)
 LOAD_MESA_MICRO = $(LOAD_MESA_MICRO_INT) $(LOAD_MESA_MICRO_EXT)
 
-LIBS_MESA_MACRO = atm colors turb $(LIBS_MESA_MICRO)
+LIBS_MESA_MACRO = ionization atm colors turb $(LIBS_MESA_MICRO)
 LOAD_MESA_MACRO_INT = $(addprefix -l,$(LIBS_MESA_MACRO))
 LOAD_MESA_MACRO_EXT = $(LOAD_MESA_MICRO_EXT)
 LOAD_MESA_MACRO = $(LOAD_MESA_MACRO_INT) $(LOAD_MESA_MACRO_EXT)

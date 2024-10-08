@@ -14,8 +14,8 @@ MESA_DIR = os.environ["MESA_DIR"]
 # Files or folders to skip
 skip_folders = [
     "utils/",
-    'eos/eosCMS_builder',
-    'eos/eosFreeEOS_builder',
+    "eos/eosCMS_builder",
+    "eos/eosFreeEOS_builder",
 ]
 
 skip_files = [
@@ -42,6 +42,7 @@ def mesa_error(message=None):
         return "call mesa_error(__FILE__,__LINE__)"
     else:
         return f"call mesa_error(__FILE__,__LINE__,{message})"
+
 
 if len(sys.argv) > 1:
     files = sys.argv[1:]

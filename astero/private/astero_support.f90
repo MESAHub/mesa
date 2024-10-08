@@ -69,12 +69,11 @@
          character (len=*), intent(in) :: code
          integer, intent(out) :: ierr
                   
-         real(dp) :: nu_obs, dist_j, nu, dist, min_dist, min_freq, &
-            R, G, M, sig_fac, b, sum_1, sum_2, sum_3, empty(0)
-         integer :: min_dist_j, min_order, n, cnt, int_empty(0)
+         real(dp) :: dist, min_dist, R, G, M, sig_fac, b, sum_1, sum_2, sum_3, empty(0)
+         integer :: min_dist_j, cnt, int_empty(0), int_empty2(0)
          integer :: nsel, itrsig, nsig
          real(dp) :: els1, dels, sig1, sig2, dfsig
-         integer :: num_l0_terms, k, i, j
+         integer :: i, j
          integer, pointer :: index(:) 
 
          include 'formats'
@@ -162,7 +161,7 @@
             call set_to_closest(freq_target(0,:), &
                model_freq(0,:), empty, empty, &
                model_inertia(0,:), empty, empty, &
-               model_order(0,:), int_empty, int_empty, ierr)
+               model_order(0,:), int_empty, int_empty2, ierr)
 
             model_freq_alt_up(0,:) = model_freq(0,:)
             model_inertia_alt_up(0,:) = model_inertia(0,:)
@@ -597,8 +596,7 @@
          integer, intent(out) :: ierr
          
          integer :: i, cnt, norders
-         integer, dimension(max_nl) :: orders
-         real(dp) :: sum_1, sum_2, sum_3, range, nmax
+         real(dp) :: sum_1, sum_2, range, nmax
          real(dp) :: x, y, isig2, sum_xy, sum_x, sum_y, sum_x2, sum_isig2, d
          
          logical, parameter :: dbg = .false.
@@ -1393,7 +1391,7 @@
          integer, intent(out) :: ierr
 
          integer :: i, l, n, chi2N1, chi2N2
-         real(dp) :: chi2term, Teff, logL, chi2sum1, chi2sum2, frac, &
+         real(dp) :: chi2term, chi2sum1, chi2sum2, frac, &
             model_r01, model_r10, model_r02
          
          ! calculate chi^2 following Brandao et al, 2011, eqn 11

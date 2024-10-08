@@ -694,17 +694,26 @@
 
    !..equation 3.7, compute the expensive trig functions only one time
          cos1 = cos(fac1*tau)
-         cos2 = cos(fac1*2.0d0*tau)
-         cos3 = cos(fac1*3.0d0*tau)
-         cos4 = cos(fac1*4.0d0*tau)
-         cos5 = cos(fac1*5.0d0*tau)
-         last = cos(fac2*tau)
-
          sin1 = sin(fac1*tau)
-         sin2 = sin(fac1*2.0d0*tau)
-         sin3 = sin(fac1*3.0d0*tau)
-         sin4 = sin(fac1*4.0d0*tau)
-         sin5 = sin(fac1*5.0d0*tau)
+
+         ! double, triple, etc. angle formulas
+         ! sin/cos (2 fac1 tau)
+         sin2 = 2.0d0 * sin1 * cos1
+         cos2 = 2.0d0 * cos1 * cos1 - 1.0d0
+
+         ! sin/cos (3 fac1 tau)
+         sin3 = sin1 * (3.0d0 - 4.0d0 * sin1 * sin1)
+         cos3 = cos1 * (4.0d0 * cos1 * cos1 - 3.0d0)
+
+         ! sin/cos (4 fac1 tau) -- use double angle on sin2/cos2
+         sin4 = 2.0d0 * sin2 * cos2
+         cos4 = 2.0d0 * cos2 * cos2 - 1.0d0
+
+         ! sin/cos (5 fac1 tau)
+         sin5 = sin1 * (5.0d0 - sin1 * sin1 * (20.0d0 - 16.0d0 * sin1 * sin1))
+         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0)
+
+         last = cos(fac2*tau)
          xast = sin(fac2*tau)
 
          a0 = 0.5d0*c00  &
@@ -842,7 +851,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,c00,c01,c02,c03,c04, &
+         real(dp) :: a0,c00,c01,c02,c03,c04, &
          dd00,dd01,dd02,&
          f0,z, &
          dum,dumdt,dumdd,dumda,dumdz
@@ -992,7 +1001,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,c00,c01,c02,c03, &
+         real(dp) :: a0,a1,c00,c01,c02,c03, &
          z, &
          dum,dumdt,dumdd,dumda,dumdz
 
@@ -1021,16 +1030,25 @@
 
    !..compute the expensive trig functions of equation 5.21 only once
          cos1 = cos(u)
-         cos2 = cos(2.0d0*u)
-         cos3 = cos(3.0d0*u)
-         cos4 = cos(4.0d0*u)
-         cos5 = cos(5.0d0*u)
-
          sin1 = sin(u)
-         sin2 = sin(2.0d0*u)
-         sin3 = sin(3.0d0*u)
-         sin4 = sin(4.0d0*u)
-         sin5 = sin(5.0d0*u)
+
+         ! double, triple, etc. angle formulas
+         ! sin/cos (2 u)
+         sin2 = 2.0d0 * sin1 * cos1
+         cos2 = 2.0d0 * cos1 * cos1 - 1.0d0
+
+         ! sin/cos (3 u)
+         sin3 = sin1 * (3.0d0 - 4.0d0 * sin1 * sin1)
+         cos3 = cos1 * (4.0d0 * cos1 * cos1 - 3.0d0)
+
+         ! sin/cos (4 u) -- use double angle on sin2/cos2
+         sin4 = 2.0d0 * sin2 * cos2
+         cos4 = 2.0d0 * cos2 * cos2 - 1.0d0
+
+         ! sin/cos (5 u)
+         sin5 = sin1 * (5.0d0 - sin1 * sin1 * (20.0d0 - 16.0d0 * sin1 * sin1))
+         cos5 = cos1 * (cos1 * cos1 * (16.0d0 * cos1 * cos1 - 20.0d0) + 5.0d0)
+
 
    !..equation 5.21
          fb =  0.5d0 * 0.17946d0  + 0.00945d0*u + 0.34529d0    &
@@ -1153,7 +1171,7 @@
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,tfermi
+         real(dp) ::tfermi
 
          ! brem
 
@@ -1409,7 +1427,7 @@
          real(dp), intent(out) :: splas,splasdt,splasdd,splasda,splasdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,a3,b1,b2,c00,c01,c02,c03,c04,xlnt,cc, &
+         real(dp) :: a1,a2,a3,b1,b2,c00,c01,c02,c03,c04,xlnt,cc, &
                      c,d,f1,&
                      dumdt,dumdd,dumda,dumdz, gum
 
@@ -1596,7 +1614,7 @@
          real(dp), intent(out) :: spair,spairdt,spairdd,spairda,spairdz
          type(inputs), intent(in) :: input
 
-         real(dp) :: a0,a1,a2,a3,b1,b2,c,d, gl,gldt
+         real(dp) :: a1,a2,a3,b1,b2,c,d, gl,gldt
          
          real(dp) :: xnum,xnumdt,xnumdd,xnumda,xnumdz, &
          xden,xdendt,xdendd,xdenda,xdendz

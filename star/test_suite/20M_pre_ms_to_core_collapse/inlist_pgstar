@@ -24,7 +24,7 @@ Grid1_file_flag = .true.
 Grid1_file_dir = 'png'
 Grid1_file_prefix = 'Grid1_'
 Grid1_file_interval = 25     ! output when mod(model_number,Grid1_file_interval)==0
-Grid1_file_width = -1        ! (inches) negative means use same value as for window
+Grid1_file_width = 27        ! (inches) negative means use same value as for window
 Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
 ! reset the defaults
@@ -412,7 +412,7 @@ Abundance_legend_max_cnt = 10
 Abundance_legend_txt_scale_factor = 1.3
          
 ! yaxis limits 
-Abundance_log_mass_frac_min = -6.4 ! -3.5 
+Abundance_log_mass_frac_min = -4!-6.4 ! -3.5 
 Abundance_log_mass_frac_max =  0.3
          
 ! file output
@@ -495,7 +495,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
    !# HR window
       ! history of `lg_L` vs. `lg_Teff`
 
-         HR_win_flag = .false.
+         HR_win_flag = .true.
 
          HR_win_width = 6
          HR_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
@@ -591,7 +591,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = ''
+    History_Panels1_yaxis_name(2) = 'lum_div_Ledd'
     History_Panels1_yaxis_reversed(2) = .false.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
@@ -607,7 +607,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(3) = 'log_R'
+    History_Panels1_yaxis_name(3) = 'radius'
     History_Panels1_yaxis_reversed(3) = .false.
     History_Panels1_ymin(3) = -101d0
     History_Panels1_ymax(3) = -101d0
@@ -677,7 +677,8 @@ file_extension = 'png'           ! common names are 'png' and 'ps'
 
 kipp_win_flag=.true.
 kipp_file_flag=.true.
-
+Kipp_mix_interval = 1
+Kipp_show_luminosities = .true.
 
 / ! end of pgstar namelist
 

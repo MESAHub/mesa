@@ -68,7 +68,9 @@ contains
     call setup_lowT(kap_lowT_z_tables(rq% kap_lowT_option)% ar)
     call setup(kap_z_tables(rq% kap_option)% ar)
     
-    rq% logT_Compton_blend_hi = kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logT_max - 0.01d0
+    rq% logT_Compton_blend_hi = & ! apply whichever is minimum for Type1 and Type2 options
+        min(kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logT_max - 0.01d0, &
+            kap_CO_z_tables(rq% kap_CO_option)% ar(1)% x_tables(1)% logT_max - 0.01d0)
       !rq% kap_z_tables(1)% x_tables(1)% logT_max - 0.01d0
     rq% logR_Compton_blend_lo = kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logR_min + 0.01d0
       !rq% kap_z_tables(1)% x_tables(1)% logR_min + 0.01d0
@@ -395,8 +397,6 @@ contains
 
     subroutine Setup_Kap_X_Table(ierr)
       integer, intent(out) :: ierr
-
-      integer :: i
 
       xErr = abs(xin - X); zErr = abs(zz - Z)
       if (xErr > tiny .or. zErr > tiny) then

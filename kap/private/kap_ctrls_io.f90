@@ -144,7 +144,6 @@
       character (len=*), intent(in) :: inlist
       integer, intent(out) :: ierr ! 0 means AOK.
       type (Kap_General_Info), pointer :: rq
-      integer :: iz, j
       include 'formats'
       call get_kap_ptr(handle,rq,ierr)
       if (ierr /= 0) return
@@ -161,7 +160,6 @@
       integer, intent(in) :: level
       integer, intent(out) :: ierr
       logical, dimension(max_extra_inlists) :: read_extra
-      character (len=strlen) :: message
       character (len=strlen), dimension(max_extra_inlists) :: extra
       integer :: unit, i
 
