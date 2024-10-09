@@ -30,7 +30,6 @@
       ! matrix solver options
       integer, parameter :: lapack = 1
       integer, parameter :: block_thomas_dble = 2
-      integer, parameter :: block_thomas_quad = 3
       integer, parameter :: block_thomas_refine = 4
       integer, parameter :: bcyclic_dble = 5
 
