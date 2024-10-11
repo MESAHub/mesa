@@ -52,7 +52,7 @@ contains
    !! @param opacity opacity
    !! @param rho Density
    !! @param Cp Heat capacity at constant pressure
-   !! @param gradL_composition_term dlnMu/dlnP where Mu is the mean molecular weight.
+   !! @param gradL_composition_term B = (phi/delta)*dlnMu/dlnP where Mu is the mean molecular weight.
    !! @param iso The index of the species that drives thermohaline mixing.
    !! @param XH1 Mass fraction of H1.
    !! @param eta Magnetic diffusivity.
