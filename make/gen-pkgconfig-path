@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+BUILD_DIR=$(realpath ${BUILD_DIR})
+PKG_CONFIG_PATH="$BUILD_DIR/$1/lib/pkgconfig"
+
+shift
+
+for m in $@; do
+    PKG_CONFIG_PATH=$BUILD_DIR/$m/lib/pkgconfig:$PKG_CONFIG_PATH
+done
+
+echo $PKG_CONFIG_PATH

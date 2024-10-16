@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+
+MAKE=$1
+shift
+
+for subdir in $@; do \
+  DEPS=`$MAKE --no-print-directory -sC ${subdir} print-mesa-deps`
+  cat <<EOF
+${subdir}: ${DEPS} data/version_number
+	\$(MAKE) -C ${subdir} BUILD_DIR=\$(BUILD_DIR)
+
+${subdir}-install: ${subdir}
+	\$(MAKE) -C ${subdir} install BUILD_DIR=\$(BUILD_DIR)
+
+${subdir}-check: ${subdir}-install \$(addsuffix -install,${DEPS})
+	\$(MAKE) -C ${subdir} check BUILD_DIR=\$(BUILD_DIR)
+EOF
+done
