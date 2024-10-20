@@ -405,7 +405,7 @@ contains
                if (parity_switch) then
                   L(i:i+1,i+2:i+4) = 2*B([1,3],:)
                else
-                  L(i:i,i+2:i+4) = 2*B([2],:)
+                  L(i:i,i+1:i+3) = 2*B([2],:)
                end if
             else
                L(i:i+2,i+3:i+5) = B
@@ -589,7 +589,7 @@ contains
          stop '** invalid parity in build_parasite_matrix_LPN_QS'
       end select
 
-      allocate(L(2*N+2,2*N+2))
+      allocate(L(2*N+1,2*N+1))
 
       L = 0._dp
 
