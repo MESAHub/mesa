@@ -631,9 +631,9 @@ contains
 
             if (m == 0) then
                if (parity_switch) then
-                  L(i:i,i+2:i+3) = 2*B([1],:)
+                  L(i:i,i+1:i+2) = 2*B([1],:)
                else
-                  L(i:i,i+2:i+3) = 2*B([2],:)
+                  L(i:i,i+1:i+2) = 2*B([2],:)
                end if
             else
                L(i:i+1,i+2:i+3) = B
