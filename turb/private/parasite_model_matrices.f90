@@ -329,7 +329,7 @@ contains
       real(dp), intent(in)               :: l_hat
       integer, intent(in)                :: N
       real(dp), allocatable, intent(out) :: L(:,:)
-      character(*), intent(in)           :: parity
+      character(*), intent(in), optional :: parity
 
       real(dp) :: E_psi
       real(dp) :: E_C
@@ -337,6 +337,10 @@ contains
       integer  :: i
       integer  :: m
       real(dp) :: B(3,3)
+
+      if (.NOT. PRESENT(parity)) then
+         stop 'unsplit option not implemented for build_parasite_matrix_LPN'
+      end if
 
       ! Build the parasite model matrix in the low Peclet number (LPN)
       ! limit tau << 1
@@ -556,7 +560,7 @@ contains
       real(dp), intent(in)               :: l_hat
       integer, intent(in)                :: N
       real(dp), allocatable, intent(out) :: L(:,:)
-      character(*), intent(in)           :: parity
+      character(*), intent(in), optional :: parity
 
       real(dp) :: E_psi
       real(dp) :: E_C
@@ -564,6 +568,10 @@ contains
       integer  :: i
       integer  :: m
       real(dp) :: B(2,2)
+
+      if (.NOT. PRESENT(parity)) then
+         stop 'unsplit option not implemented for build_parasite_matrix_LPN_QS'
+      end if
 
       ! Build the parasite model matrix in the low Peclet number (LPN)
       ! limit tau << 1 and quasi-static limit Rm << 1
