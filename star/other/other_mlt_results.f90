@@ -37,10 +37,11 @@ contains
                                      r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
                                      iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
                                      alpha_semiconvection, thermohaline_coeff, &
-                                     mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
+                                     mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr, th_info)
       use const_def, only: dp
       use auto_diff
       use star_def
+      use turb_def
       integer, intent(in) :: id
       integer, intent(in) :: k
       character(len=*), intent(in) :: MLT_option
@@ -54,6 +55,7 @@ contains
       type(auto_diff_real_star_order1), intent(out) :: &
          gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
+      type(th_info_t), intent(out), optional :: th_info
       ierr = 0
    end subroutine null_other_mlt_results
 
