@@ -1,9 +1,6 @@
 MESA Summer Schools
 ===================
 
-************************************************************
-MESA Summer School Programs -- this page under construction!
-************************************************************
 
 History of the MESA Summer School Program
 -----------------------------------------
