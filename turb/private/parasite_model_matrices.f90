@@ -410,6 +410,7 @@ contains
             else
                L(i:i+2,i+3:i+5) = B
             end if
+
          end if
 
          if (m == 0) then
@@ -421,7 +422,7 @@ contains
          else
             i = i + 3
          end if
-         
+
       end do block_loop
 
    contains
@@ -449,7 +450,7 @@ contains
 
             B(3,1) = k_z
             B(3,2) = 0
-            B(3,4) = -D_B*k2_m
+            B(3,3) = -D_B*k2_m
 
          else
 
