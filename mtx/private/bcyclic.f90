@@ -23,7 +23,7 @@
       module bcyclic
 
       use const_def, only: dp
-      use my_lapack95_dble
+      use my_lapack95
       use utils_lib, only: set_nan, mesa_error
       
       implicit none
