@@ -117,7 +117,7 @@ contains
       gradT = gradr
       Y_face = gradT - grada
       conv_vel = 3._dp*D/Lambda
-      mixing_type = thermohaline_mixing
+      mixing_type = th_info_%mixing_type
 
       if (PRESENT(th_info)) th_info = th_info_
 

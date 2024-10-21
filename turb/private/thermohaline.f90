@@ -25,7 +25,7 @@
 
 module thermohaline
 
-   use const_def, only: dp
+   use const_def, only: dp, no_mixing, thermohaline_mixing
    use num_lib
    use math_lib
    use chem_def, only: chem_isos
@@ -98,15 +98,21 @@ contains
       call set_info_coeffs(T, rho, Cp, opacity, iso, XH1, eta, N2_T, thermohaline_mag_B, th_info)
       call set_info_strat(grada, gradr, gradL_composition_term, th_info)
 
-      ! Handle cases where this routine shouldn't have been called in the first place
+      ! Check for sensible Prandtl number
  
       if (th_info%Pr < 0._dp) then
          write(*, *) 'warning: get_thermohaline_info being called when Pr < 0'
          return
-      else if (th_info%r > 1._dp) then
-         write(*, *) 'warning: get_thermohaline_info being called when r > 1'
+      end if
+
+      ! Check for thermohaline instability
+
+      if (th_info%r > 1._dp) then
+         th_info%mixing_type = no_mixing
          return
       end if
+
+      th_info%mixing_type = thermohaline_mixing
 
       ! Dispatch to the various implementations
       
