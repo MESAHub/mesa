@@ -388,6 +388,9 @@ contains
       ! Set components of th_info following Fraser, Reifenstein, &
       ! Garaud, ApJ 964:184 (2024; FRG24)
 
+      call eval_fastest_fingering(th_info%Pr, th_info%tau, th_info%R_0, th_info%lam_hat, th_info%l2_hat, ierr)
+      if (ierr /= 0) return
+
       ! Define grid of vertical wavenumbers. This may evolve. Rich is
       ! working on optimization TODO: I don't think I've ever seen
       ! k/lhat > 1 being relevant
