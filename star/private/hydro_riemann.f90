@@ -410,11 +410,10 @@
              end if
          end if
          
-         if (s% RSP2_flag) then ! include Uq in u_face
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
-         end if
+         ! include Uq in u_face
+         Uq_ad = compute_Uq_face(s, k, ierr)
+         if (ierr /= 0) return
+         s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          
          s% u_face_val(k) = s% u_face_ad(k)%val
 
