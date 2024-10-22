@@ -27,7 +27,7 @@ function update_docs {
     if [ -e plot.py ]; then
         echo "Running plot.py"
         if ! python plot.py; then
-            echo "Error: plot.py failed to run"
+            echo "ERROR: plot.py failed to run"
         fi
     fi
     # check for image filenames in README.rst
@@ -73,13 +73,13 @@ function update_docs {
                 if [ -e $img_dir/$filename.ps ]; then
                     echo "Converting $filename.ps to $filename.svg"
                     if [ ! command -v epstool &> /dev/null]; then
-                        echo "Error: 'epstool' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'epstool' could not be found! Please install it. Will not be able to convert image to optmized .svg"
                     elif [ ! command -v ps2pdf &> /dev/null]; then
-                        echo "Error: 'ps2pdf' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'ps2pdf' could not be found! Please install it. Will not be able to convert image to optmized .svg"
                     elif [ ! command -v inkscape &> /dev/null]; then
-                        echo "Error: 'inkscape' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'inkscape' could not be found! Please install it. Will not be able to convert image to optmized .svg"
                     elif [ ! command -v svgo &> /dev/null]; then
-                        echo "Error: 'svgo' could not be found! Please install it. Will not be able to convert image to optmized .svg"
+                        echo "ERROR: 'svgo' could not be found! Please install it. Will not be able to convert image to optmized .svg"
                     fi
                     epstool --copy --bbox  $img_dir/$filename.ps $img_dir/_TMP_$filename.ps
                     ps2pdf -dEPSCrop $img_dir/_TMP_$filename.ps $img_dir/_TMP_$filename.pdf
@@ -98,7 +98,7 @@ function update_docs {
                 sed -i "" "/Last-Run: .*/d" README.rst
                 echo $LAST_RUN >> README.rst
             else
-                echo "Error: $image_to_copy not found. Test may no longer be producing this file or may now be producing a different final snapshot number! Update test and README.rst accordingly."
+                echo "ERROR: $image_to_copy not found. Test may no longer be producing this file or may now be producing a different final snapshot number! Update test and README.rst accordingly."
             fi
         done
     else
