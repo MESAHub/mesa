@@ -30,10 +30,10 @@ Detailed discussion of this functionality can be found in
 
 A plot of the HR diagram for the problem is included below:
 
-.. image:: ../../../star/test_suite/starspots/docs/hr_starspots_001496.svg
+.. image:: ../../../star/test_suite/starspots/docs/hr_starspots_001497.svg
    :width: 100%
 
 
 Last-Updated: 09Aug2024 by Meridith Joyce
 
-Last-Run: 06Aug2024 (MESA 7890d305) by pmocz on C916PXT6XW in 629 seconds using 8 threads.
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 656 seconds using 8 threads.

@@ -14,7 +14,7 @@ Prior to generating a release
 -----------------------------
 
 - Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to an hour or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
-
+- Update figures in the docs by running the ``update_docs_figures`` script in the ``star/test_suite/`` folder. These figures should be checked to make sure they look reasonable. Currently not all test suite problems autogenerate figures. Pay special attention if the model numbers in the filenames of saved figures have changed (script will print an ERROR message) -- this indicates some commit to MESA has slightly changed the results of these problems, and currently the README.rst file needs to be manually updated with the new image filename and the test as to be re-run (e.g. ``./each_test_run -u 13``). A new release should not be made if one of the figures degrade in quality.
 
 Removing files
 --------------

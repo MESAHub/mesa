@@ -66,4 +66,4 @@ pgstar commands used for the plots above:
 
 Last-Updated: 2021-06-21 (mesa b2364463) by Josiah Schwab, + documentation 2024-01-22 EbF
 
-Last-Run: 06Aug2024 (MESA 1adbf1aa) by pmocz on C916PXT6XW in 327 seconds using 8 threads.
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 325 seconds using 8 threads.
