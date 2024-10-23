@@ -149,7 +149,7 @@ ax4.legend(loc='upper left')
 ax4b = ax4.twinx()
 ax4b.semilogy(h.star_age[mask], h.R[mask], ls='--', color='C1')
 ax4.set_ylabel(r"Eff. Temp. [K]", color='C0')
-ax4b.set_ylabel('Radius [$R_{\odot}$]', color='C1')
+ax4b.set_ylabel(r"Radius [$R_{\odot}$]", color='C1')
 ax4.set_xticklabels([])
 
 # mass loss and envelope mass
