@@ -48,4 +48,4 @@ The Python script used to create the figures above:
 
 Last-Updated: 07Aug2024 (MESA 0b40398b) by wmwolf.
 
-Last-Run: 07Aug2024 (MESA 0b40398b) by wmwolf on Hercules in 431 seconds using 20 threads.
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 603 seconds using 8 threads.
