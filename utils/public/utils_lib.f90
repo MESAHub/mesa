@@ -43,6 +43,15 @@ module utils_lib
   character(*), private, parameter :: LOWER_CASE = 'abcdefghijklmnopqrstuvwxyz'
   CHARACTER(*), private, parameter :: UPPER_CASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+  ! Interfaces
+
+  interface fill_with_NaNs
+     module procedure fill_with_NaNs_1D
+     module procedure fill_with_NaNs_2D
+     module procedure fill_with_NaNs_3D
+     module procedure fill_with_NaNs_4D
+  end interface fill_with_NaNs
+
   ! Procedures
 
 contains
@@ -1227,10 +1236,10 @@ contains
          is_bad_quad = is_bad(x)
       end function is_bad_quad
             
-      subroutine fill_with_NaNs(ptr)
+      subroutine fill_with_NaNs_1D(ptr)
          real(dp) :: ptr(:)
          call set_nan(ptr)
-      end subroutine fill_with_NaNs
+      end subroutine fill_with_NaNs_1D
       
       
       subroutine fill_with_NaNs_2D(ptr)

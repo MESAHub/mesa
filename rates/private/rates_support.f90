@@ -39,28 +39,51 @@
       subroutine do_get_raw_rates( &
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
             ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
-            rate_raw, rate_raw_dT, rate_raw_dRho, ierr)
+            rate_raw, ierr)
          use const_def, only : missing_value
          integer, intent(in) :: num_reactions, reaction_id(:), nT8s
          real(dp), intent(in) ::  &
             ye, logtemp_in, btemp, bden, raw_rate_factor(:),  &
             rattab(:,:), logttab(:)
          real(dp), pointer, intent(in) :: rattab_f1(:)
-         real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
+         ! make autodiff rate_raw variable with derivatives (1) T (2) Rho
+         type(auto_diff_real_2var_order1),intent(inout), dimension(:) :: rate_raw
+!         real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
          
          integer :: imax, iat0, iat, ir, i, irho
          integer, parameter :: mp = 4
-         real(dp), allocatable :: dtab(:), ddtab(:)
+!         real(dp), allocatable :: dtab(:), ddtab(:)
+         type(auto_diff_real_2var_order1) , allocatable :: dtab(:), ddtab(:)
          real(dp), pointer :: rattab_f(:,:,:) 
          real(dp) :: logtemp, fac
+         type(auto_diff_real_2var_order1) :: logtemp_ad, logtemp_in_ad, &
+                bden_ad, btemp_ad
          
          include 'formats'
 
          ierr = 0
 
          nullify(rattab_f)
+        ! these two variables below are never nullified which concerns me.
          allocate(dtab(num_reactions), ddtab(num_reactions))
+
+! set to 0 to initialized, but gets set later.
+logtemp_ad = 0._dp
+
+bden_ad %val = bden
+bden_ad %d1val1 = 0._dp ! dT (lT)
+bden_ad %d1val2 = 1._dp ! dRho (rho)
+
+
+btemp_ad %val = btemp
+btemp_ad %d1val1 = 1._dp ! dT (lT)
+btemp_ad %d1val2 = 0._dp ! dRho (rho)
+
+
+logtemp_in_ad %val = logtemp_in ! log10(btemp)
+logtemp_in_ad %d1val1 = 1/(btemp_ad %val * ln10) ! dT (lT)
+logtemp_in_ad %d1val2 = 0._dp ! dRho (rho)
 
          rattab_f(1:4,1:nT8s,1:num_reactions) => rattab_f1(1:4*nT8s*num_reactions)
 
@@ -70,27 +93,33 @@
             !dtab(i) = ye**reaction_ye_rho_exponents(1,ir)
             select case(reaction_ye_rho_exponents(1,ir))
             case (0)
-               dtab(i) = 1d0
+               dtab(i) %val = 1d0
+               dtab(i) %d1val1 = 0._dp
+               dtab(i) %d1val2 = 0._dp
             case (1)
                dtab(i) = ye
+               dtab(i) %d1val1 = 0._dp
+               dtab(i) %d1val2 = 0._dp
             case (2)
                dtab(i) = ye*ye
+               dtab(i) %d1val1 = 0._dp
+               dtab(i) %d1val2 = 0._dp
             end select
 
             !dtab(i) = dtab(i)*bden**reaction_ye_rho_exponents(2,ir)
             irho = reaction_ye_rho_exponents(2,ir)
             select case(irho)
             case (1)
-               dtab(i) = dtab(i)*bden
+               dtab(i) = dtab(i)*bden_ad
             case (2)
-               dtab(i) = dtab(i)*bden*bden
+               dtab(i) = dtab(i)*bden_ad*bden_ad
             case (3)
-               dtab(i) = dtab(i)*bden*bden*bden
+               dtab(i) = dtab(i)*bden_ad*bden_ad*bden_ad
             case (4)
-               dtab(i) = dtab(i)*bden*bden*bden*bden
+               dtab(i) = dtab(i)*bden_ad*bden_ad*bden_ad*bden_ad
             end select
 
-            ddtab(i) = irho*dtab(i)/bden
+            ddtab(i) = irho*dtab(i)/bden_ad
             
          end do
          
@@ -100,26 +129,33 @@
          end if
          
          
-         if(logtemp_in .ge. max_safe_logT_for_rates) then
+         if(logtemp_in_ad%val .ge. max_safe_logT_for_rates) then
             logtemp = max_safe_logT_for_rates
+            logtemp_ad %val = max_safe_logT_for_rates
+            logtemp_ad %d1val1 = 1._dp/(pow(10,max_safe_logT_for_rates)*ln10) ! logT
+            logtemp_ad %d1val2 = 0._dp ! Rho
          else
             logtemp = logtemp_in
+            logtemp_ad = logtemp_in_ad
          end if
          
          if (nrattab > 1) then
             imax = nrattab
-            if (logtemp > rattab_thi) then
+            if (logtemp_ad%val > rattab_thi) then
                ierr = -1
                return
             end if
-            iat0 = int((logtemp - rattab_tlo)/rattab_tstp) + 1
+            iat0 = int((logtemp_ad%val - rattab_tlo)/rattab_tstp) + 1
             iat = max(1, min(iat0 - mp/2 + 1, imax - mp + 1))
             call get_rates_from_table(1, num_reactions)
          else ! table only has a single temperature
             do i=1,num_reactions
-               rate_raw(i) = rattab(i,1)*dtab(i)
-               rate_raw_dT(i) = 0
-               rate_raw_dRho(i) = rate_raw(i)*ddtab(i)/dtab(i)
+!               rate_raw(i) = rattab(i,1)*dtab(i)
+!               rate_raw_dT(i) = 0
+!               rate_raw_dRho(i) = rate_raw(i)*ddtab(i)/dtab(i)
+               rate_raw(i) = rattab(i,1)*dtab(i) ! ad var with derivs implicit.
+               !rate_raw(i)%d1val1 = 0
+               !rate_raw(i)%d1val2 = rate_raw(i)%val*ddtab(i)/dtab(i)
             end do
          end if
 
@@ -134,13 +170,15 @@
          
          do i=1,num_reactions
             fac = raw_rate_factor(i)
-            rate_raw(i) = rate_raw(i)*fac
-            rate_raw_dT(i) = rate_raw_dT(i)*fac
-            rate_raw_dRho(i) = rate_raw_dRho(i)*fac
+!            rate_raw(i) = rate_raw(i)*fac
+!            rate_raw_dT(i) = rate_raw_dT(i)*fac
+!            rate_raw_dRho(i) = rate_raw_dRho(i)*fac
+             rate_raw(i) = rate_raw(i)*fac ! this should apply to derivatives too
          end do
          
-         if(logtemp .ge. max_safe_logT_for_rates) then
-            rate_raw_dT(1:num_reactions) = 0d0
+         if(logtemp_ad%val .ge. max_safe_logT_for_rates) then
+!            rate_raw_dT(1:num_reactions) = 0d0
+            rate_raw(1:num_reactions)%d1val1 = 0d0
          end if
 
          nullify(rattab_f)
@@ -152,32 +190,52 @@
             integer, intent(in) :: r1, r2
             
             integer :: i, k
-            real(dp) :: dt
-            
+            !real(dp) :: dt
+            type(auto_diff_real_2var_order1) :: dt
+
             include 'formats'
                
             k = iat+1 ! starting guess for search
-            do while (logtemp < logttab(k) .and. k > 1)
+            do while (logtemp_ad%val < logttab(k) .and. k > 1)
                k = k-1
             end do
-            do while (logtemp > logttab(k+1) .and. k+1 < nrattab)
+            do while (logtemp_ad%val > logttab(k+1) .and. k+1 < nrattab)
                k = k+1
             end do
-            dt = logtemp - logttab(k)
+            dt = logtemp_ad - logttab(k) ! does this apply to the derivative too?
             
             do i = r1,r2
             
-               rate_raw(i) =  &
-                     (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
-                           dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
-                              ) * dtab(i)
+!               rate_raw(i) =  &
+!                     (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
+!                           dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
+!                              ) * dtab(i)
+!
+!               rate_raw_dRho(i) = rate_raw(i) * ddtab(i) / dtab(i)
+!
+!               rate_raw_dT(i) =  &
+!                     (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) +   &
+!                           1.5d0*dt*rattab_f(4,k,i)) &
+!                              ) * dtab(i) / (btemp * ln10)
 
-               rate_raw_dRho(i) = rate_raw(i) * ddtab(i) / dtab(i)
+                rate_raw(i) =  &
+                (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
+                dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
+                ) * dtab(i)
 
-               rate_raw_dT(i) =  &
-                     (rattab_f(2,k,i) + 2*dt*(rattab_f(3,k,i) +   &
-                           1.5d0*dt*rattab_f(4,k,i)) &
-                              ) * dtab(i) / (btemp * ln10)
+!               rate_raw(i) =  &
+!                     (rattab_f(1,k,i) + dt%val*(rattab_f(2,k,i) +   &
+!                           dt%val*(rattab_f(3,k,i) + dt%val*rattab_f(4,k,i))) &
+!                              ) * dtab(i)%val
+!
+!               rate_raw(i)%d1val2 = rate_raw(i)%val * ddtab(i)%val / dtab(i)%val
+!
+!               rate_raw(i)%d1val1 =  &
+!                     (rattab_f(2,k,i) + 2*dt%val*(rattab_f(3,k,i) +   &
+!                           1.5d0*dt%val*rattab_f(4,k,i)) &
+!                              ) * dtab(i)%val / (btemp_ad%val * ln10)
+
+
 
             end do
             
