@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+use feature 'signatures';
+use strict;
+use warnings "all";
+use File::Basename;
+use Getopt::Long;
+
+Getopt::Long::Configure ("bundling_values", "ignorecase_always");
+GetOptions('i=s', \my @include_dirs);
+
+# ARGV will now only contain the main source files
+
+my %include_files;
+
+my $build_dir_module = $ENV{'BUILD_DIR_MODULE'};
+my $install_includes = $ENV{'INSTALL_INCLUDES'};
+my $modules = $ENV{'MODULES'};
+
+foreach my $include_dir (@include_dirs) {
+    opendir my $include_dir_handle, $include_dir or do { warn "Could not open $include_dir"; continue };
+    foreach my $include_file (readdir $include_dir_handle) {
+        $include_files{$include_file} = "$include_dir/$include_file";
+    }
+    closedir $include_dir_handle;
+}
+
+
+sub trim {
+   return $_[0] =~ s/^\s+|\s+$//rg;
+}
+
+my @provided_modules;
+my @parsed_files;
+
+sub process_file ($filename) {
+    my @output_files;
+    my @not_found_mod_dependency;
+    my @dependency;
+    my $current_mod = '';
+    my $has_submod = 0;
+
+    open(my $fh, '<:encoding(UTF-8)', $filename) or die "Could not open file '$filename' $!";
+
+    my @handles = ($fh);
+
+    while (@handles) {
+        my $fh = pop(@handles);
+        while (my $line = <$fh>) {
+            $line = trim($line);
+            if ($line =~ /^module ([^\s!]*)\s*(!.*)?$/i) {
+                $current_mod = lc $1;
+                push(@output_files, "$build_dir_module/modules/$current_mod.mod");
+                $has_submod = 0;
+            } elsif ($line =~ /^module\s+(subroutine|function)/i and !$has_submod) {
+                push(@output_files, "$build_dir_module/modules/$current_mod.smod");
+                $has_submod = 1;
+            } elsif ($line =~ /^use\s+([^\s,]*)/i) {
+                my $mod = lc $1;
+                if (exists $include_files{"$mod.mod"}) {
+                    push(@dependency, $include_files{"$mod.mod"});
+                } else {
+                    push(@not_found_mod_dependency, "$build_dir_module/modules/$mod.mod");
+                }
+            } elsif ($line =~ /^submodule\s+\((?:[^:]*:)*([^\)])\)\s+(.*)$/i) {
+                my $parent_mod = lc $1;
+                $current_mod = lc $2;
+                push(@dependency, "$build_dir_module/modules/$parent_mod.smod");
+                push(@output_files, "$build_dir_module/modules/$current_mod.mod");
+                $has_submod = 0;
+            } elsif ($line =~ /^include (?:'|")([^'"]*)(?:'|")/i) {
+                push(@handles, $fh);
+                my $inc_file = $include_files{$1} or do { warn "Could not find include file $1"; next };
+                push(@dependency, $inc_file);
+                open(my $fh2, '<:encoding(UTF-8)', $inc_file) or die "Could not open file '$inc_file' $!";
+                $fh = $fh2;
+            }
+        }
+    }
+
+    push(@provided_modules, @output_files);
+    push(@parsed_files, [$filename, \@output_files, \@not_found_mod_dependency, \@dependency]);
+}
+
+sub output_make ($filename, $output_files, $not_found_mod_dependency, $dependency) {
+    my @output_files = @$output_files;
+    my @not_found_mod_dependency = @$not_found_mod_dependency;
+    my @dependency = @$dependency;
+    foreach my $mod (@not_found_mod_dependency) {
+        foreach my $othermod (@provided_modules) {
+            if ($mod eq $othermod) {
+                push(@dependency, $mod);
+            }
+        }
+    }
+
+    my $obj = "$build_dir_module/$filename";
+    $obj =~ s{$build_dir_module/$build_dir_module}{$build_dir_module};
+    $obj =~ s/(.*)\.([^\.]*)/$1.o/;
+    my $obj_dir = dirname($obj);
+    my $obj_fname = basename($obj);
+    my $compiler = "FCOMPILE";
+    my $module_compiler = "FCOMPILE_MODULE";
+
+    if ($filename =~ /(.*).f$/) {
+        $compiler = "FCOMPILE_FIXED";
+        $module_compiler = "FCOMPILE_MODULE_FIXED";
+    }
+
+    print <<~"MAKEFILE"
+    $obj.anc : $filename ${ \join(" ", @dependency) } | \$(MODULE_DIR)/ $obj_dir/
+    \t\@touch \$@
+    \t\@echo $module_compiler $filename && \$($module_compiler) $filename -J \$(MODULE_DIR)
+    ${ \join(" ", @output_files) } : $obj.anc
+    $obj :  $filename ${ \join(" ", @dependency) } | \$(SCRATCH_DIR)/ $obj_dir/ \$(MODULE_DIR)/
+    \t\@rm -rf \$(SCRATCH_DIR)/$obj_fname/
+    \t\@mkdir \$(SCRATCH_DIR)/$obj_fname/
+    \t\@echo $compiler $filename && \$($compiler) $filename -o $obj -I \$(MODULE_DIR) -J \$(SCRATCH_DIR)/$obj_fname/
+    \t\@rm -rf \$(SCRATCH_DIR)/$obj_fname/
+    MAKEFILE
+}
+
+foreach my $file (@ARGV) {
+    process_file($file);
+}
+
+foreach my $pars (@parsed_files) {
+    my ($filename, $output_files, $not_found_mod_dependency, $dependency) = @$pars;
+    output_make($filename, $output_files, $not_found_mod_dependency, $dependency)
+}
+
+foreach my $f (split " ","$install_includes $modules") {
+    my $basename_f = basename($f);
+    print <<~"MAKEFILE"
+    $build_dir_module/include/$basename_f : $f | $build_dir_module/include/
+    \tcp \$^ \$@
+    MAKEFILE
+}
