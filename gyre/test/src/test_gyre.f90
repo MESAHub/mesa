@@ -20,7 +20,7 @@ contains
 
     call init('gyre.in')
 
-    call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+    call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/build/gyre/src')
 
     ! Read a model from file
 

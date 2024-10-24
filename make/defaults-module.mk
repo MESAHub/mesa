@@ -12,4 +12,5 @@ VERSION ?= $(file <$(MAKE_DIR)../data/version_number)
 PROFILE ?= release-with-dbg-info
 WITH_OPENMP ?= yes
 WITH_CRLIBM ?= yes
+WITH_GYRE ?= yes
 PREFIX ?= $(MAKE_DIR)/..

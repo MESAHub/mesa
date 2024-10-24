@@ -361,7 +361,6 @@ do_one turb
 do_one sample
 
 do_one star_data
-do_one_parallel gyre
 do_one adipls
 do_one_parallel star
 do_one_parallel binary
