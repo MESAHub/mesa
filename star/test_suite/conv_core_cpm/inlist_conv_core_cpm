@@ -99,7 +99,6 @@
 ! file output
    file_white_on_black_flag = .true.
    file_device = 'vcps'
-   file_extension = 'ps'
    Grid1_file_flag = .true.
    Grid1_file_dir = 'pgstar_out'
    Grid1_file_prefix = 'grid_'

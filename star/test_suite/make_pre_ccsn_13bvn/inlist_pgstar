@@ -13,14 +13,6 @@ pgstar_show_age = .true.
 ! white_on_black flags -- true means white foreground color on black background
 file_white_on_black_flag = .true.
 file_device = 'png'            ! options 'png' and 'vcps' for png and postscript respectively
-file_extension = 'png'           ! common names are 'png' and 'ps'
-
-
-!file_white_on_black_flag = .false.
-!file_device = 'vcps'            ! options 'png' and 'vcps' for png and postscript respectively
-!file_extension = 'ps'           ! common names are 'png' and 'ps'
-
-
 
 ! Text_Summary windows
 
