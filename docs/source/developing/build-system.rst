@@ -37,6 +37,7 @@ The following properties control building and running the tests of the module:
 
 * **SRCS_CHECK**: Source files that are part of the test binary. Typically, all the .f or .f90 files under ``module-name/test/src``.
 * **CHECK_RESULTS_GOLDEN**: File to compare the output from the test binary against. If this is left empty, no tests will be run.
+* **CHECK_DIFF_PROG**: For setting a different a program to compare the output to the golden output (e.g. ndiff). By default this is `diff -b`.
 
 Finally, we have the install settings, which control what files are made available to other modules:
 
