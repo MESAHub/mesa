@@ -53,7 +53,7 @@ contains
       character (len = *), intent(in) :: history_columns_file
       integer, intent(out) :: ierr
 
-      integer :: iounit, n, i, t, id, j, cnt, ii, nxt_spec
+      integer :: iounit, n, i, t, j, nxt_spec
       character (len = 256) :: buffer, string, filename
       integer, parameter :: max_level = 20
       logical :: bad_item
@@ -196,7 +196,7 @@ contains
       use utils_def
       use chem_lib
 
-      integer :: iounit, t, n, i, j, id
+      integer :: iounit, t, n, i, j
       character (len = *) :: string, buffer
       logical, intent(in) :: report
       integer, intent(out) :: ierr
