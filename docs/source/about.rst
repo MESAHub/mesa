@@ -112,17 +112,17 @@ Developers
 * Matthias Fabry
 * Ebraheem Farag
 * Eoin Farrell
+* `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
-* Pablo Marchant
+* `Pablo Marchant <https://orlox.github.io/>`__
 * `Philip Mocz <https://pmocz.github.io/>`__
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
+* `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
 * `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
-* `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
-* `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 
 Past Developers
 ---------------
