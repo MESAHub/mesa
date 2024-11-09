@@ -24,7 +24,6 @@ do_one astero
 do_one atm
 do_one binary
 do_one ionization
-do_one kap
 do_one net
 do_one neu
 do_one rates
