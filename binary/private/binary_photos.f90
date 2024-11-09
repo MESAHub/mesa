@@ -40,7 +40,7 @@ contains
    subroutine do_saves_for_binary(b, ierr)
       type(binary_info), pointer :: b
       integer, intent(out) :: ierr
-      integer :: iounit, id
+      integer :: iounit
       character (len = strlen) :: str_photo, filename, iomsg, report_str
 
       call string_for_model_number('x', b% model_number, b% photo_digits, str_photo)

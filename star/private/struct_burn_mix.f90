@@ -46,7 +46,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: skip_global_corr_coeff_limit
 
-         integer :: nz, nvar, species, ierr, j, k, k_bad
+         integer :: nz, nvar, species, ierr, k
          integer(8) :: time0
          logical :: do_chem
          real(dp) :: dt, tol_correction_norm, tol_max_correction, total
@@ -238,8 +238,6 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
 
-         integer :: ierr
-
          do_mix_omega = keep_going
 
          if (s% rotation_flag) then
@@ -275,13 +273,11 @@
 
 
       subroutine save_start_values(s, ierr)
-         use chem_def, only: num_categories
          use hydro_rsp2, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category
-         use chem_def, only: ih1
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         integer :: k, j, i_h1
+         integer :: k, j
          include 'formats'
          ierr = 0
 
@@ -380,7 +376,7 @@
          logical, intent(in) :: skip_global_corr_coeff_limit
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
-         integer :: ierr, nz, k, n
+         integer :: ierr, nz, n
          logical :: report
 
          include 'formats'
@@ -514,8 +510,8 @@
          real(dp), intent(in) :: tol_correction_norm, tol_max_correction
 
          logical :: converged
-         integer :: i, k, species, ierr, alph, j1, j2, gold_tolerances_level
-         real(dp) :: varscale, r003, rp13, dV, frac, maxT
+         integer :: k, species, ierr, j1, j2, gold_tolerances_level
+         real(dp) :: maxT
 
          include 'formats'
 
@@ -749,9 +745,8 @@
          logical, intent(out) :: converged
          integer, intent(out) :: ierr
 
-         integer :: i, k, j, matrix_type, neq
+         integer :: k, j, neq
          logical :: failure
-         real(dp) :: varscale
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -794,7 +789,6 @@
             use star_solver, only: solver
             use rates_def, only: warn_rates_for_high_temp
             integer, intent(out) :: ierr
-            integer :: k, j
             logical :: save_warn_rates_flag
             include 'formats'
             s% doing_solver_iterations = .true.
@@ -823,11 +817,11 @@
 
          integer :: &
             k_bad, ierr, max_num_iters_k, nz, op_err, &
-            i, j, k, num_iters, species, max_num_iters_used, &
+            k, num_iters, species, max_num_iters_used, &
             screening_mode, kmin
-         integer(8) :: time0, clock_rate
+         integer(8) :: time0
          real(dp) :: total, avg_epsnuc, min_T_for_const_density_solver
-         logical :: trace, dbg, okay, skip_burn
+         logical :: trace, dbg, skip_burn
          logical, parameter :: burn_dbg = .false.
 
          include 'formats'
@@ -941,7 +935,6 @@
             do_burn = retry
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
-               !call mesa_error(__FILE__,__LINE__,'do_burn')
             end if
             call restore
             return
@@ -971,7 +964,7 @@
          use net_lib, only: net_1_zone_burn_const_density, net_1_zone_burn, &
             show_net_reactions_and_info
          use rates_def, only: std_reaction_Qs, std_reaction_neuQs
-         use chem_def, only: chem_isos, num_categories, category_name
+         use chem_def, only: num_categories
          use net, only: do1_net
          use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh
          type (star_info), pointer :: s
@@ -1189,12 +1182,11 @@
 
 
          subroutine burn_finish_substep(nstp, time, y, ierr)
-            use chem_def, only: category_name
             integer,intent(in) :: nstp
             real(dp), intent(in) :: time, y(:)
             integer, intent(out) :: ierr
-            real(dp) :: frac, step_time
-            integer :: j, i
+            !real(dp) :: frac, step_time
+            !integer :: j, i
             include 'formats'
             ierr = 0
             ! This routine does nothing other than set ierr = 0,

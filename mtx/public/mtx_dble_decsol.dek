@@ -16,7 +16,6 @@
          real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ier
-         integer :: i, j, iounit
          include 'formats'
          ier = 0
          if (iop == 0) then ! factor
@@ -118,7 +117,6 @@
          
          complex(dp), pointer :: a(:,:)
          integer :: i, j
-         character (len=100) :: message
          
          i=1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -130,7 +128,7 @@
          
          do j=1,n
             do i=1,ndim
-               a(i,j) = cmplx(ar(i,j),ai(i,j))
+               a(i,j) = cmplx(ar(i,j),ai(i,j), kind=dp)
             end do
          end do
          call zgetrf(n, n, a, ndim, ip, ier)
@@ -159,7 +157,6 @@
          
          complex(dp), pointer :: a(:,:)
          integer :: i, j
-         character (len=100) :: message
          
          i=1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -171,7 +168,7 @@
          
          do j=1,n
             do i=1,ndim
-               a(i,j) = cmplx(ar(i,j),ai(i,j))
+               a(i,j) = cmplx(ar(i,j),ai(i,j), kind=dp)
             end do
          end do
          call zgbtrf(n, n, ml, mu, a, ndim, ip, ier)
@@ -199,7 +196,6 @@
          
          complex(dp), pointer :: a(:,:), b(:)
          integer :: i, j
-         character (len=100) :: message
          
          i = 1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -212,9 +208,9 @@
          
          do j=1,n
             do i=1,ndim
-               a(i,j) = cmplx(ar(i,j),ai(i,j))
+               a(i,j) = cmplx(ar(i,j),ai(i,j), kind=dp)
             end do
-            b(j) = cmplx(br(j),bi(j))
+            b(j) = cmplx(br(j),bi(j), kind=dp)
          end do
          call zgetrs('N', n, 1, a, ndim, ip, b, n, ier)
          do j=1,n
@@ -241,7 +237,6 @@
          
          complex(dp), pointer :: a(:,:), b(:)
          integer :: i, j
-         character (len=100) :: message
          
          i = 1
          a(1:ndim,1:n) => cpar_decsol(i:i+n*ndim-1)
@@ -254,9 +249,9 @@
          
          do j=1,n
             do i=1,ndim
-               a(i,j) = cmplx(ar(i,j),ai(i,j))
+               a(i,j) = cmplx(ar(i,j),ai(i,j), kind=dp)
             end do
-            b(j) = cmplx(br(j),bi(j))
+            b(j) = cmplx(br(j),bi(j), kind=dp)
          end do
          call zgbtrs('N', n, ml, mu, 1, a, ndim, ip, b, n, ier)
          do j=1,n

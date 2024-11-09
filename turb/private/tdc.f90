@@ -30,7 +30,6 @@ use const_def
 use num_lib
 use utils_lib
 use auto_diff
-use star_data_def
 use tdc_support
 
 implicit none
@@ -245,8 +244,8 @@ contains
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
       
-      type(auto_diff_real_tdc) :: Y, Z, Q, Q_lb, Q_ub, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
-      type(auto_diff_real_tdc) :: dQdZ, Q0
+      type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
+      type(auto_diff_real_tdc) :: dQdZ
       integer :: iter, line_iter
       logical :: converged, have_derivatives, corr_has_derivatives
       real(dp), parameter :: correction_tolerance = 1d-13

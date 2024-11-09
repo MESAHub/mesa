@@ -48,7 +48,7 @@ contains
    subroutine add_to_pgbinary_hist(b, pg_hist_new)
       type (binary_info), pointer :: b
       type (pgbinary_hist_node), pointer :: pg_hist_new
-      type (pgbinary_hist_node), pointer :: pg_hist => null(), next => null()
+      type (pgbinary_hist_node), pointer :: next => null()
       integer :: step
       step = pg_hist_new% step
       do
@@ -73,7 +73,7 @@ contains
 
    subroutine pgbinary_clear(b)
       type (binary_info), pointer :: b
-      integer :: i, num
+      integer :: i
       type (pgbinary_win_file_data), pointer :: p
       type (pgbinary_hist_node), pointer :: pg_hist => null(), next => null()
       pg_hist => b% pg% pgbinary_hist
@@ -211,8 +211,8 @@ contains
       integer, intent(out) :: id
       integer, intent(out) :: ierr
 
-      integer :: pgopen, system
-      character (len = strlen) :: dir, cmd
+      integer :: pgopen
+      character (len = strlen) :: dir
       logical :: white_on_black_flag
       real :: width, ratio
 
@@ -296,7 +296,7 @@ contains
       integer, intent(in) :: step_min, step_max, numpts
       real, intent(out) :: vec(:)
       integer, intent(out) :: ierr
-      integer :: i, n
+      integer :: i
       type (pgbinary_hist_node), pointer :: pg
       ierr = 0
       if (numpts == 0) return
@@ -342,7 +342,7 @@ contains
       type (binary_info), pointer :: b
       integer, intent(in) :: step_min, step_max, numpts, index
       real, intent(out) :: vec(:)
-      integer :: i, n
+      integer :: i
       type (pgbinary_hist_node), pointer :: pg => null()
       include 'formats'
       if (numpts == 0) return
@@ -576,7 +576,7 @@ contains
       character (len = 32) :: age_str, units_str
       real(dp) :: age
       real :: ch
-      integer :: len, i, j, iE, n
+      integer :: len, i, j, iE
       if (.not. b% pg% pgbinary_show_age) return
       age = b% binary_age
       if (b% pg% pgbinary_show_age_in_seconds) then

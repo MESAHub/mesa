@@ -92,12 +92,12 @@
          if (tf% t9 .le. 3d0) then
             aa   = 4.01d-15 * tf% t9i23 * exp(-3.380d0*tf% t9i13) 
             bb   = 1.0d0 + 0.123d0*tf% t913 + 1.09d0*tf% t923 + 0.938d0*tf% t9 
-            term    = aa * bb
+            term = aa * bb
          else
-            term    = 1.1581136d-15
+            term = 1.1581136d-15
          end if
-         fr    = term 
-         rr    = 0.0d0
+         fr = term 
+         rr = 0.0d0
       end subroutine rate_pp_fxt
       
       
@@ -159,12 +159,12 @@
          if ((tf% T9)  <=  3d0) then
             aa   = 1.36d-20 * (tf% T9i76) * exp(-3.380d0*(tf% T9i13))
             bb   = (1.0d0 - 0.729d0*(tf% T913) + 9.82d0*(tf% T923))
-            term    = aa * bb
+            term = aa * bb
          else
-            term    = 7.3824387d-21
+            term = 7.3824387d-21
          end if
-         fr    = term 
-         rr    = 0.0d0
+         fr = term 
+         rr = 0.0d0
       end subroutine rate_pep_fxt
       
 
@@ -197,11 +197,11 @@
             fr = 0; rr = 0; return
          end if 
           
-         aa      = 2.24d+03 * tf% t9i23 * exp(-3.720d0*tf% t9i13) 
-         bb      = 1.0d0 + 0.112d0*tf% t913 + 3.38d0*tf% t923 + 2.65d0*tf% t9
-         term    = aa * bb 
+         aa    = 2.24d+03 * tf% t9i23 * exp(-3.720d0*tf% t9i13) 
+         bb    = 1.0d0 + 0.112d0*tf% t913 + 3.38d0*tf% t923 + 2.65d0*tf% t9
+         term  = aa * bb 
          fr    = term 
-         rev      = 1.63d+10 * tf% t932 * exp(-63.750d0*tf% t9i)
+         rev   = 1.63d+10 * tf% t932 * exp(-63.750d0*tf% t9i)
          rr    = rev * term
          !if (temp > 3.1d6 .and. temp < 3.2d6) write(*,1) 'rates dpg', fr, temp
       end subroutine rate_dpg_fxt
@@ -211,7 +211,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb
+         real(dp) term, rev
 
          if (tf% t9 < lowT9pp_cutoff) then
             fr = 0; rr = 0; return
@@ -290,7 +290,7 @@
 !      dtermdt = 4.4d4 * daa
 
       fr    = term 
-      rev      = 4.71d+09 * (tf% T932) * exp(-25.82d0*(tf% T9i))
+      rev   = 4.71d+09 * (tf% T932) * exp(-25.82d0*(tf% T9i))
       rr    = rev * term
 
       end subroutine rate_png_fxt
@@ -339,12 +339,12 @@
           
          if ((tf% T9)  <=  3d0) then
             aa   = 8.78d-13 * (tf% T9i23) * exp(-6.141d0*(tf% T9i13))
-            term    = aa
+            term = aa
          else
-            term    = 5.9733434d-15
+            term = 5.9733434d-15
          end if
-         fr    = term 
-         rr    = 0.0d0
+         fr = term 
+         rr = 0.0d0
       end subroutine rate_hep_fxt
 
 
@@ -395,7 +395,6 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, rev
 !       he3  he3  h1 h1 he4         
          call jina_reaclib_2_3(ihe3, ihe3, ih1, ih1, ihe4, tf, fr, rr, 'rate_he3he3_jina')
       end subroutine rate_he3he3_jina
@@ -542,14 +541,14 @@
                bb = 0
             end if      
          else
-            bb    = 3.44d-16*(1 +     0.0158d0*pow(tf% T9,-0.65d0))
+            bb = 3.44d-16*(1 + 0.0158d0*pow(tf% T9,-0.65d0))
          end if      
-         term    = r2abe * rbeac * bb
+         term = r2abe * rbeac * bb
          call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
             2.003d20, 84.415d0, &  ! a0, a1
             rev)     
-         fr    = term
-         rr    = rev * term
+         fr = term
+         rr = rev * term
       end subroutine rate_tripalf_nacre
 
 
@@ -558,9 +557,9 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 
-      real(dp) term, dtermdt, rev, drevdt, r2abe, dr2abedt, rbeac,  &
-                       drbeacdt, aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee,  &
-                       ff, dff, xx, dxx, yy, dyy, zz, dzz, uu, vv, f1, df1, rc28,  &
+      real(dp) term, rev, r2abe, rbeac,  &
+                       aa, bb, cc, dd, ee, ff,  &
+                       xx, yy, zz, uu, vv, f1, rc28,  &
                        q1, q2
       parameter        (rc28   = 0.1d0,  &
                         q1     = 1.0d0/0.009604d0,  &
@@ -597,7 +596,7 @@
 
 ! high temperature rate
          if ((tf% t9).gt.0.08d0) then
-          term    = 2.90d-16 * r2abe * rbeac + xx
+          term = 2.90d-16 * r2abe * rbeac + xx
 
 
 ! low temperature rate
@@ -637,9 +636,9 @@
          end if 
           
 ! he3(n, g)he4
-      term    = 6.62d0 * (1.0d0 + 905.0d0*(tf% T9))
+      term  = 6.62d0 * (1.0d0 + 905.0d0*(tf% T9))
       fr    = term 
-      rev      = 2.61d+10 * (tf% T932) * exp(-238.81d0*(tf% T9i))
+      rev   = 2.61d+10 * (tf% T932) * exp(-238.81d0*(tf% T9i))
       rr    = rev * term
       end subroutine rate_he3ng_fxt
       
@@ -702,21 +701,21 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, bb, dbb
+         real(dp) term, aa, bb
 
          if (tf% t9 < lowT9pp_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
          if (tf% T9 <= 3d0 .and. tf% T9 >= 1d-3) then
-            aa  = 0.0027d0*(tf% T9i) * exp(2.515d-3*(tf% T9i)) 
-            bb  = 1.0d0 - 0.537d0*(tf% T913) + 3.86d0*(tf% T923) + aa
-            term    = 1.34d-10 * (tf% T9i12) * bb
+            aa   = 0.0027d0*(tf% T9i) * exp(2.515d-3*(tf% T9i)) 
+            bb   = 1.0d0 - 0.537d0*(tf% T913) + 3.86d0*(tf% T923) + aa
+            term = 1.34d-10 * (tf% T9i12) * bb
          else
-            term    = 0.0d0
+            term = 0.0d0
          endif
-         fr    = term
-         rr    = 0.0d0
+         fr = term
+         rr = 0.0d0
       end subroutine rate_be7em_fxt
 
 
@@ -740,7 +739,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, aa, bb, cc
+         real(dp) term, rev
          ! a0 T9i23 exp(-a1 T9i13 - (T9*a2)^2) 
          !     * (1 + b0 T9 + b1 T92 + b2 T93 + b3 T94 + b4 T95) 
          ! + c0 T9i32 exp(-c1/T9)
@@ -901,9 +900,7 @@
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
 
-         real(dp) term, dtermdt, rev, drevdt, aa, daa, bb, dbb, cc, dcc,  &
-                        dd, ddd, ee, dee, ff, dff, gg, dgg, hh, dhh, f1, df1, f2, df2,  &
-                        zz, q1, termE1, dtermE1, termE2, dtermE2, termRes, dtermRes
+         real(dp) term, rev, aa, bb, cc, dd, ee, ff, gg, hh, f1, f2, zz, q1
          parameter        (q1 = 1.0d0/12.222016d0)
 
             if (tf% t9 < lowT9_cutoff) then
@@ -922,12 +919,12 @@
          f1   = cc*zz
          zz   = 1.0d0/ee
          f2   = ff*zz
-         term    = 1.04d8*f1  + 1.76d8*f2 + gg + hh
+         term = 1.04d8*f1  + 1.76d8*f2 + gg + hh
    ! 1.7 times cf88 value
-         term     = 1.7d0 * term
-         rev    = 5.13d10 * (tf% t932) * exp(-83.111d0*(tf% t9i))
-         fr    = term
-         rr     = rev * term
+         term = 1.7d0 * term
+         rev  = 5.13d10 * (tf% t932) * exp(-83.111d0*(tf% t9i))
+         fr   = term
+         rr   = rev * term
       end subroutine rate_c12ag_fxt
 
 
@@ -948,16 +945,16 @@
          aa   = 6.66d7 * (tf% T9i2) * exp(-32.123d0*(tf% T9i13) - (tf% T92)/(4.6d0*4.6d0)) 
          bb   = 1 + 2.54d0*(tf% T9) + 1.04d0*(tf% T92) -  0.226d0*(tf% T93) 
          if (bb < 0) bb = 0
-         cc    = 1.39d3 * (tf% T9i32) * exp(-28.930d0*(tf% T9i)) 
-         termE1    = aa * bb + cc
+         cc      = 1.39d3 * (tf% T9i32) * exp(-28.930d0*(tf% T9i)) 
+         termE1  = aa * bb + cc
          aa   = 6.56d7 * (tf% T9i2) * exp(-32.123d0*(tf% T9i13) - (tf% T92)/(1.3d0*1.3d0)) 
          bb   = 1 + 9.23d0*(tf% T9) - 13.7d0*(tf% T92) +  7.4d0*(tf% T93) 
-         termE2    = aa * bb
-         termRes   = 19.2d0 * (tf% T92) * exp(-26.9d0*(tf% T9i)) 
+         termE2  = aa * bb
+         termRes = 19.2d0 * (tf% T92) * exp(-26.9d0*(tf% T9i)) 
          term    = termE1 + termE2 + termRes
-         rev      = 5.132d10 * (tf% T932) * exp(-83.109d0*(tf% T9i))
-         fr    = term
-         rr     = rev * term
+         rev     = 5.132d10 * (tf% T932) * exp(-83.109d0*(tf% T9i))
+         fr      = term
+         rr      = rev * term
       end subroutine rate_c12ag_nacre
       
 
@@ -981,10 +978,10 @@
          cc   = a4 * (tf% T9i2) * exp(-a6*(tf% T9i13)) 
          dd   = 1 / pow(1 + a5*(tf% T9i23),2)
          ee   = a9tilda * (tf% T9i13) * exp(-a11*(tf% T9i13)) 
-         term    = aa*bb + cc*dd + ee         
-         rev      = 5.132d10 * (tf% T932) * exp(-83.109d0*(tf% T9i))         
-         fr    = term         
-         rr     = rev * term
+         term = aa*bb + cc*dd + ee         
+         rev  = 5.132d10 * (tf% T932) * exp(-83.109d0*(tf% T9i))         
+         fr   = term         
+         rr   = rev * term
       end subroutine rate_c12ag_kunz
       
 
@@ -1436,10 +1433,10 @@
       ee   = 1.41d+06 * (tf% T9i32) * exp(-11.873d0*(tf% T9i))
       ff   = 2.0d+09 * (tf% T9i32) * exp(-20.409d0*(tf% T9i))
       gg   = 2.92d+09 * (tf% T9i32) * exp(-29.283d0*(tf% T9i))
-      term    = cc + dd + ee + ff + gg
-      fr    = term 
-      rev    = 5.79d+00 * exp(-25.711d0*(tf% T9i))
-      rr    = rev * term
+      term = cc + dd + ee + ff + gg
+      fr   = term 
+      rev  = 5.79d+00 * exp(-25.711d0*(tf% T9i))
+      rr   = rev * term
       end subroutine rate_c13an_fxt
 
 
@@ -1528,10 +1525,10 @@
       cc   = aa * bb
       dd   = 2.37d+03 * (tf% T9i32) * exp(-3.011d0*(tf% T9i))
       ee   = 2.19d+04 * exp(-12.530d0*(tf% T9i))
-      term    = cc + dd + ee
-      rev    = 2.70d+10 * (tf% T932) * exp(-84.678d0*(tf% T9i))
-      fr    = term 
-      rr    = rev * term 
+      term = cc + dd + ee
+      rev  = 2.70d+10 * (tf% T932) * exp(-84.678d0*(tf% T9i))
+      fr   = term 
+      rr   = rev * term 
       end subroutine rate_n14pg_fxt
       
 
@@ -1622,10 +1619,10 @@
          dd  = 3.31d+04 * (tf% T9i32) * exp(-11.733d0*(tf% T9i))
          ee  = 1.79d+07 * (tf% T9i32) * exp(-22.609d0*(tf% T9i)) 
          ff  = 9.00d+03 * (tf% T9113) * exp(-12.517d0*(tf% T9i))
-         term    = cc + dd + ee + ff
-         fr    = term 
-         rev      = 4.93d-01*exp(-13.820d0*(tf% T9i))
-         rr    = rev * term 
+         term = cc + dd + ee + ff
+         fr   = term 
+         rev  = 4.93d-01*exp(-13.820d0*(tf% T9i))
+         rr   = rev * term 
       end subroutine rate_o14ap_fxt
 
 
@@ -1681,10 +1678,10 @@
          ff  = dd*ee
          gg  = 3.95d-1 * (tf% T9i32) * exp(-5.849d0*(tf% T9i))
          hh  = 1.90d+1 * pow((tf% T9),2.85d0) * exp(-7.356d0*(tf% T9i) - (tf% T92)*q3)
-         term    = cc + ff + gg + hh
-         fr    = term
-         rev      = 5.54d+10 * (tf% T932) * exp(-40.957d0*(tf% T9i))
-         rr    = rev * term
+         term = cc + ff + gg + hh
+         fr   = term
+         rev  = 5.54d+10 * (tf% T932) * exp(-40.957d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_o15ag_fxt
 
 
@@ -1711,15 +1708,15 @@
             fr = 0; rr = 0; return
          end if 
           
-         aa   = 7.37d7 * pow((tf% T9),-0.82d0) * exp(-16.696d0*(tf% T9i13))          
+         aa   = 7.37d7 * pow((tf% T9),-0.82d0) * exp(-16.696d0*(tf% T9i13))
          bbm1 = 202d0 * exp(-70.348d0*(tf% T9i) - 0.161d0*(tf% T9))
          bb   = 1 + bbm1         
-         term    = aa * bb         
+         term = aa * bb         
          call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
             3.037d9, 6.966d0, &  ! a0, a1
             rev)     
-         fr    = term 
-         rr    = rev * term 
+         fr   = term 
+         rr   = rev * term 
       end subroutine rate_o16pg_nacre
          
 
@@ -1910,8 +1907,8 @@
          b32p  = 1.0d0 - b32d - b32a - b32n
 
          ! o16(o16, n)s31
-         term    = aa * b32n
-         fr1     = term
+         term   = aa * b32n
+         fr1    = term
          rev    = 0.0d0
          if ((tf% T9) .gt. 0.1d0) then
          rev    = 5.92d0 * exp(-16.8038228d0*(tf% T9i))
@@ -1919,8 +1916,8 @@
          rr1    = rev * term
 
          ! o16(o16, p)p31
-         term    = aa * b32p
-         fr2     = term
+         term   = aa * b32p
+         fr2    = term
          rev    = 0.0d0
          if ((tf% T9) .gt. 0.1d0) then
          rev    = 5.92d0*exp(-89.0788286d0*(tf% T9i))
@@ -1928,8 +1925,8 @@
          rr2    = rev * term
 
          ! o16(o16, a)si28
-         term    = aa * b32a
-         fr3     = term
+         term   = aa * b32a
+         fr3    = term
          rev    = 0.0d0
          if ((tf% T9) .gt. 0.1d0) then
          rev    = 3.46d0*exp(-111.3137212d0*(tf% T9i))
@@ -1937,8 +1934,8 @@
          rr3    = rev * term
 
          ! o16(o16, d)p30
-         term    = aa * b32d
-         fr4     = term
+         term   = aa * b32d
+         fr4    = term
          rev    = 0.0d0
          if ((tf% T9) .gt. 0.1d0) then
          rev    = 0.984d0*exp(27.9908982d0*(tf% T9i))
@@ -2103,10 +2100,10 @@
          dd  = 8.1d-05 * (tf% T9i32) * exp(-1.05d0*(tf% T9i))
          ee  = 8.9d-04 * (tf% T9i32) * exp(-1.51d0*(tf% T9i))
          ff  = 3.0d+05 * (tf% T9i32) * exp(-4.29d0*(tf% T9i))
-         term    = aa + bb + cc + dd + ee + ff
-         fr    = term 
-         rev      = 4.93d-01 * exp(-33.433d0*(tf% T9i))
-         rr    = rev * term 
+         term = aa + bb + cc + dd + ee + ff
+         fr   = term 
+         rev  = 4.93d-01 * exp(-33.433d0*(tf% T9i))
+         rr   = rev * term 
       end subroutine rate_f18pa_wk82
 
 
@@ -2158,9 +2155,9 @@
             3.27d7, -0.193d0, 6.587d0, & ! e0, e1, e2
             gs)              
          dd   = 7.30d8 * pow(tf% T9,-0.201d0) * exp(-16.249d0*(tf% T9i)) 
-         gs    = gs + dd
+         gs   = gs + dd
          bb   = 0.755d0 * exp(-1.755d0*(tf% T9i) - 0.174d0*(tf% T9))
-         term    = gs * (1 + bb)
+         term = gs * (1 + bb)
          call rnacre_rev(tf, &  ! a0 T932 exp(-a1/T9)
             6.538d-1, 94.154d0, &  ! a0, a1
             rev)     
@@ -2244,10 +2241,10 @@
          cc  = (tf% T923) * bb
          dd = pow(aa,oneth)
          ee  = (tf% T9i13) * dd
-         term    = c1*exp(c3 - c4*ee)/cc 
-         fr    = term 
-         rev    = 0.0d0
-         rr    = 0.0d0
+         term = c1*exp(c3 - c4*ee)/cc 
+         fr   = term 
+         rev  = 0.0d0
+         rr   = 0.0d0
       end subroutine rate_ne18ap_fxt
 
       subroutine rate_ne18ap_jina(tf, temp, fr, rr) ! jina reaclib    
@@ -2296,10 +2293,10 @@
             + 2.80d0*(tf% T943) + 1.07d0*(tf% T953)
          ff  = dd*ee
          gg  = 8.45d+3 * (tf% T9i54) * exp(-7.64d0*(tf% T9i))
-         term    = cc + ff + gg
-         fr    = term 
-         rev      = 7.39d+09 * (tf% T932) * exp(-25.519d0*(tf% T9i))
-         rr    = rev * term 
+         term = cc + ff + gg
+         fr   = term 
+         rev  = 7.39d+09 * (tf% T932) * exp(-25.519d0*(tf% T9i))
+         rr   = rev * term 
       end subroutine rate_ne19pg_fxt
       
       
@@ -2324,7 +2321,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, rev, aa, bb, cc, dd, ff, gg, zz, gs
+         real(dp) term, rev, aa, bb, gs
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2342,10 +2339,10 @@
          if (bb > 1) then ! guard against rate going negative
             bb  = 1
          end if         
-         term    = gs * (1 - bb)
-         rev      = 4.637d9 * (tf% T932) * exp(-28.214d0*(tf% T9i))
-         fr    = term 
-         rr    = rev * term
+         term = gs * (1 - bb)
+         rev  = 4.637d9 * (tf% T932) * exp(-28.214d0*(tf% T9i))
+         fr   = term 
+         rr   = rev * term
       end subroutine rate_ne20pg_nacre
       
       
@@ -2363,7 +2360,6 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) :: fr1, rr1
       include 'formats'
 !       he4 ne20    p na23                  ha04rv   -2.37900d+00          
       call jina_reaclib_2_2(ih1, ina23, ihe4, ine20, tf, rr, fr, 'rate_ne20ap_jina')
@@ -2419,7 +2415,6 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) :: fr1
       rr = 0
 !         p na23 mg24                       ha04r     1.16910d+01          
          call jina_reaclib_2_1(ih1, ina23, img24, tf, fr, rr, 'rate_na23pg_jina')
@@ -2433,8 +2428,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee,  &
-                       ff, dff, gg, dgg, hh, hhi, rev, drevdt, rc121
+         real(dp) :: term, aa, bb, cc, dd, ee, ff, gg, hh, hhi, rev, rc121
       parameter        (rc121 = 0.1d0)
 
          if (tf% t9 < lowT9_cutoff) then
@@ -2450,9 +2444,9 @@
          gg    = 5.0d0*exp(-15.882d0*(tf% T9i))
          hh    = 1.0d0 + gg
          hhi   = 1.0d0/hh
-         term    = (aa + bb + cc + dd + ee + ff) * hhi
+         term  = (aa + bb + cc + dd + ee + ff) * hhi
          fr    = term
-         rev      = 6.27d+10 * (tf% T932) * exp(-115.862d0*(tf% T9i))
+         rev   = 6.27d+10 * (tf% T932) * exp(-115.862d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_mg24ag_fxt
 
@@ -2475,9 +2469,8 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee,  &
-                       ff, dff, gg, dgg, term1, dterm1, term2, dterm2,  &
-                       rev, drevdt, rc148, q1
+         real(dp) term, aa, bb, cc, dd, ee, ff, gg,  &
+                       term1, term2, rev, rc148, q1
          parameter        (rc148 = 0.1d0,  &
                         q1    = 1.0d0/0.024649d0)                    
 
@@ -2497,8 +2490,8 @@
          ee     = oneth*exp(-9.792d0*(tf% T9i))
          ff     =  twoth * exp(-11.773d0*(tf% T9i))
          gg     = 1.0d0 + ee + ff
-         term    = (term1 + term2)/gg
-         rev      = 1.81d0 * exp(-18.572d0*(tf% T9i))
+         term   = (term1 + term2)/gg
+         rev    = 1.81d0 * exp(-18.572d0*(tf% T9i))
          fr    = rev * term
          rr    = term
       end subroutine rate_mg24ap_fxt
@@ -2508,7 +2501,6 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) :: fr1
       rr = 0
 !       he4 mg24    p al27                  il01rv   -1.60060d+00          
          call jina_reaclib_2_2(ih1, ial27, ihe4, img24, tf, rr, fr, 'rate_mg24ap_jina')
@@ -2535,17 +2527,16 @@
          ee  = 4.29d+01 * (tf% T9i32) * exp(-3.273d0*(tf% T9i))
          ff  = 1.34d+02 * (tf% T9i32) * exp(-3.654d0*(tf% T9i))
          gg  = 1.77d+04 * pow(tf% T9, 0.53d0) * exp(-4.588d0*(tf% T9i))
-         term    = aa + bb + cc + dd + ee + ff + gg
-         fr    = term 
-         rev   = 1.13d+11 * (tf% T932) * exp(-134.434d0*(tf% T9i))
-         rr    = rev * term
+         term = aa + bb + cc + dd + ee + ff + gg
+         fr   = term 
+         rev  = 1.13d+11 * (tf% T932) * exp(-134.434d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_al27pg_c96
       
       subroutine rate_al27pg_jina(tf, temp, fr, rr)
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) :: fr1
 !         p al27 si28                       il01r     1.15860d+01          
          call jina_reaclib_2_1(ih1, ial27, isi28, tf, fr, rr, 'rate_al27pg_jina')
       end subroutine rate_al27pg_jina
@@ -2569,7 +2560,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
          
          include 'formats'
 
@@ -2581,9 +2572,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 6.340d-2*z + 2.541d-3*z2 - 2.900d-4*z3
-         term    = 4.82d+22 * (tf% T9i23) * exp(-61.015d0*(tf% T9i13) * aa)
+         term  = 4.82d+22 * (tf% T9i23) * exp(-61.015d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 6.461d+10 * (tf% T932) * exp(-80.643d0*(tf% T9i))
+         rev   = 6.461d+10 * (tf% T932) * exp(-80.643d0*(tf% T9i))
          rr    = rev * term
 
          !if (abs(temp - 3.0097470376051402D+09) < 1d2) then
@@ -2602,7 +2593,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2612,8 +2603,8 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 2.798d-3*z + 2.763d-3*z2 - 2.341d-4*z3
-         term    = 4.16d+13 * (tf% T9i23) * exp(-25.631d0*(tf% T9i13) * aa)
-         rev      = 0.5825d0 * exp(-22.224d0*(tf% T9i))
+         term  = 4.16d+13 * (tf% T9i23) * exp(-25.631d0*(tf% T9i13) * aa)
+         rev   = 0.5825d0 * exp(-22.224d0*(tf% T9i))
          fr    = rev * term
          rr    = term
       end subroutine rate_si28ap_fxt
@@ -2623,7 +2614,6 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) :: fr1
 !       he4 si28    p  p31                  il01rv   -1.91710d+00          
          call jina_reaclib_2_2(ih1, ip31, ihe4, isi28, tf, rr, fr, 'rate_si28ap_jina')
       end subroutine rate_si28ap_jina
@@ -2640,7 +2630,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
          include 'formats'
 
          if (tf% t9 < lowT9_cutoff) then
@@ -2651,9 +2641,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 1.928d-1*z - 1.540d-2*z2 + 6.444d-4*z3
-         term    = 1.08d+16 * (tf% T9i23) * exp(-27.042d0*(tf% T9i13) * aa)
+         term  = 1.08d+16 * (tf% T9i23) * exp(-27.042d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 3.764d+10 * (tf% T932) * exp(-102.865d0*(tf% T9i))
+         rev   = 3.764d+10 * (tf% T932) * exp(-102.865d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_p31pg_fxt
 
@@ -2689,7 +2679,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2699,9 +2689,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 4.913d-2*z + 4.637d-3*z2 - 4.067d-4*z3
-         term    = 1.16d+24 * (tf% T9i23) * exp(-66.690d0*(tf% T9i13) * aa)
+         term  = 1.16d+24 * (tf% T9i23) * exp(-66.690d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 6.616d+10 * (tf% T932) * exp(-77.080d0*(tf% T9i))
+         rev   = 6.616d+10 * (tf% T932) * exp(-77.080d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_s32ag_fxt
 
@@ -2715,7 +2705,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2725,8 +2715,8 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 1.041d-1*z - 1.368d-2*z2 + 6.969d-4*z3
-         term    = 1.27d+16 * (tf% T9i23) * exp(-31.044d0*(tf% T9i13) * aa)
-         rev      = 1.144d0 * exp(-21.643d0*(tf% T9i))
+         term  = 1.27d+16 * (tf% T9i23) * exp(-31.044d0*(tf% T9i13) * aa)
+         rev   = 1.144d0 * exp(-21.643d0*(tf% T9i))
          fr    = rev * term
          rr    = term
       end subroutine rate_s32ap_fxt
@@ -2752,16 +2742,16 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt
+         real(dp) term, aa, rev
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
          aa    = 1.0d0 + 1.761d-1*(tf% T9) - 1.322d-2*(tf% T92) + 5.245d-4*(tf% T93)
-         term    =  4.48d+16 * (tf% T9i23) * exp(-29.483d0*(tf% T9i13) * aa)
+         term  =  4.48d+16 * (tf% T9i23) * exp(-29.483d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 7.568d+10*(tf% T932)*exp(-98.722d0*(tf% T9i))
+         rev   = 7.568d+10*(tf% T932)*exp(-98.722d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_cl35pg_fxt
 
@@ -2795,20 +2785,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
-          
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 1.458d-1*z - 1.069d-2*z2 + 3.790d-4*z3
-         term    = 2.81d+30 * (tf% T9i23) * exp(-78.271d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 6.740d+10 * (tf% T932) * exp(-81.711d0*(tf% T9i))
-         rr    = rev * term
+
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 1.458d-1*z - 1.069d-2*z2 + 3.790d-4*z3
+         term = 2.81d+30 * (tf% T9i23) * exp(-78.271d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 6.740d+10 * (tf% T932) * exp(-81.711d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_ar36ag_fxt
 
 ! rar36ga, ar36(g,a)s32             
@@ -2820,20 +2810,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 4.826d-3*z - 5.534d-3*z2 + 4.021d-4*z3
-         term    = 2.76d+13 * (tf% T9i23) * exp(-34.922d0*(tf% T9i13) * aa)
-         rev      = 1.128d0*exp(-14.959d0*(tf% T9i))
-         fr    = rev * term
-         rr    = term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 4.826d-3*z - 5.534d-3*z2 + 4.021d-4*z3
+         term = 2.76d+13 * (tf% T9i23) * exp(-34.922d0*(tf% T9i13) * aa)
+         rev  = 1.128d0*exp(-14.959d0*(tf% T9i))
+         fr   = rev * term
+         rr   = term
       end subroutine rate_ar36ap_fxt
 
 
@@ -2856,20 +2846,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 1.622d-1*z - 1.119d-2*z2 + 3.910d-4*z3
-         term    = 4.09d+16 * (tf% T9i23) * exp(-31.727d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 7.600d+10 * (tf% T932) * exp(-96.657d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 1.622d-1*z - 1.119d-2*z2 + 3.910d-4*z3
+         term = 4.09d+16 * (tf% T9i23) * exp(-31.727d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 7.600d+10 * (tf% T932) * exp(-96.657d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_k39pg_fxt
 
 
@@ -2903,20 +2893,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 1.650d-2*z + 5.973d-3*z2 - 3.889d-04*z3
-         term    = 4.66d+24 * (tf% T9i23) * exp(-76.435d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 6.843d+10 * (tf% T932) * exp(-59.510d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 1.650d-2*z + 5.973d-3*z2 - 3.889d-04*z3
+         term = 4.66d+24 * (tf% T9i23) * exp(-76.435d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 6.843d+10 * (tf% T932) * exp(-59.510d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_ca40ag_fxt
 
 
@@ -2929,7 +2919,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2939,8 +2929,8 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 - 1.206d-2*z + 7.753d-3*z2 - 5.071d-4*z3
-         term    = 4.54d+14 * (tf% T9i23) * exp(-32.177d0*(tf% T9i13) * aa)
-         rev      = 2.229d0 * exp(-40.966d0*(tf% T9i))
+         term  = 4.54d+14 * (tf% T9i23) * exp(-32.177d0*(tf% T9i13) * aa)
+         rev   = 2.229d0 * exp(-40.966d0*(tf% T9i))
          fr    = rev * term
          rr    = term
       end subroutine rate_ca40ap_fxt
@@ -2969,7 +2959,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -2979,9 +2969,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 1.023d-1*z - 2.242d-3*z2 - 5.463d-5*z3
-         term    = 3.85d+16 * (tf% T9i23) * exp(-33.234d0*(tf% T9i13) * aa)
+         term  = 3.85d+16 * (tf% T9i23) * exp(-33.234d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 1.525d+11 * (tf% T932) * exp(-100.475d0*(tf% T9i))
+         rev   = 1.525d+11 * (tf% T932) * exp(-100.475d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_sc43pg_fxt
 
@@ -3017,20 +3007,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 1.066d-1*z - 1.102d-2*z2 + 5.324d-4*z3
-         term    = 1.37d+26 * (tf% T9i23) * exp(-81.227d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 6.928d+10*(tf% T932)*exp(-89.289d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 1.066d-1*z - 1.102d-2*z2 + 5.324d-4*z3
+         term = 1.37d+26 * (tf% T9i23) * exp(-81.227d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 6.928d+10*(tf% T932)*exp(-89.289d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_ti44ag_fxt
 
 
@@ -3043,20 +3033,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 2.655d-2*z - 3.947d-3*z2 + 2.522d-4*z3
-         term    = 6.54d+20 * (tf% T9i23) * exp(-66.678d0*(tf% T9i13) * aa)
-         rev      = 1.104d0 * exp(-4.723d0*(tf% T9i))
-         fr    = rev * term
-         rr    = term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 2.655d-2*z - 3.947d-3*z2 + 2.522d-4*z3
+         term = 6.54d+20 * (tf% T9i23) * exp(-66.678d0*(tf% T9i13) * aa)
+         rev  = 1.104d0 * exp(-4.723d0*(tf% T9i))
+         fr   = rev * term
+         rr   = term
       end subroutine rate_ti44ap_fxt
 
 
@@ -3081,20 +3071,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 9.979d-2*z - 2.269d-3*z2 - 6.662d-5*z3
-         term    = 2.05d+17 * (tf% T9i23) * exp(-35.568d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 7.649d+10*(tf% T932)*exp(-93.999d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 9.979d-2*z - 2.269d-3*z2 - 6.662d-5*z3
+         term = 2.05d+17 * (tf% T9i23) * exp(-35.568d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 7.649d+10*(tf% T932)*exp(-93.999d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_v47pg_fxt
 
 
@@ -3129,20 +3119,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 6.325d-2*z - 5.671d-3*z2 + 2.848d-4*z3
-         term    = 1.04d+23 * (tf% T9i23) * exp(-81.420d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 7.001d+10 * (tf% T932) * exp(-92.177d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 6.325d-2*z - 5.671d-3*z2 + 2.848d-4*z3
+         term = 1.04d+23 * (tf% T9i23) * exp(-81.420d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 7.001d+10 * (tf% T932) * exp(-92.177d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_cr48ag_fxt
 
 
@@ -3155,7 +3145,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3165,9 +3155,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 1.384d-2*z + 1.081d-3*z2 - 5.933d-5*z3
-         term    = 1.83d+26 * (tf% T9i23) * exp(-86.741d0*(tf% T9i13) * aa)
+         term  = 1.83d+26 * (tf% T9i23) * exp(-86.741d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 0.6087d0*exp(-6.510d0*(tf% T9i))
+         rev   = 0.6087d0*exp(-6.510d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_cr48ap_fxt
 
@@ -3193,7 +3183,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3203,9 +3193,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 8.922d-2*z - 1.256d-3*z2 - 9.453d-5*z3
-         term    = 3.77d+17 * (tf% T9i23) * exp(-37.516d0*(tf% T9i13) * aa)
+         term  = 3.77d+17 * (tf% T9i23) * exp(-37.516d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 1.150d+11*(tf% T932)*exp(-85.667d0*(tf% T9i))
+         rev   = 1.150d+11*(tf% T932)*exp(-85.667d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_mn51pg_fxt
 
@@ -3229,7 +3219,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3239,9 +3229,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 7.846d-2*z - 7.430d-3*z2 + 3.723d-4*z3
-         term    = 1.05d+27 * (tf% T9i23) * exp(-91.674d0*(tf% T9i13) * aa)
+         term  = 1.05d+27 * (tf% T9i23) * exp(-91.674d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 7.064d+10*(tf% T932)*exp(-92.850d0*(tf% T9i))
+         rev   = 7.064d+10*(tf% T932)*exp(-92.850d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_fe52ag_fxt
 
@@ -3255,7 +3245,7 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3265,9 +3255,9 @@
          z2    = z*z
          z3    = z2*z
          aa    = 1.0d0 + 1.367d-2*z + 7.428d-4*z2 - 3.050d-5*z3
-         term    = 1.30d+27 * (tf% T9i23) * exp(-91.674d0*(tf% T9i13) * aa)
+         term  = 1.30d+27 * (tf% T9i23) * exp(-91.674d0*(tf% T9i13) * aa)
          fr    = term
-         rev      = 0.4597d0*exp(-9.470d0*(tf% T9i))
+         rev   = 0.4597d0*exp(-9.470d0*(tf% T9i))
          rr    = rev * term
       end subroutine rate_fe52ap_fxt
 
@@ -3290,17 +3280,17 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) term, dtermdt, rev, drevdt, tq2
+      real(dp) term, rev, tq2
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
 ! fe52(n, g)fe53
-      tq2     = (tf% T9) - 0.348d0
-      term    = 9.604d+05 * exp(-0.0626d0*tq2)
+      tq2   = (tf% T9) - 0.348d0
+      term  = 9.604d+05 * exp(-0.0626d0*tq2)
       fr    = term
-      rev      = 2.43d+09 * (tf% T932) * exp(-123.951d0*(tf% T9i)) 
+      rev   = 2.43d+09 * (tf% T932) * exp(-123.951d0*(tf% T9i)) 
       rr    = rev * term
       end subroutine rate_fe52ng_fxt
 
@@ -3309,7 +3299,7 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) term, dtermdt, rev, drevdt, tq1, tq10, dtq10, tq2
+      real(dp) term, rev, tq1, tq10, tq2
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3319,9 +3309,9 @@
       tq1   = (tf% T9)/0.348d0
       tq10  = pow(tq1, 0.10d0)
       tq2   = (tf% T9) - 0.348d0
-      term    = 1.817d+06 * tq10 * exp(-0.06319d0*tq2)
+      term  = 1.817d+06 * tq10 * exp(-0.06319d0*tq2)
       fr    = term
-      rev      = 1.56d+11 * (tf% T932) * exp(-155.284d0*(tf% T9i))
+      rev   = 1.56d+11 * (tf% T932) * exp(-155.284d0*(tf% T9i))
       rr    = rev * term
       end subroutine rate_fe53ng_fxt
 
@@ -3339,7 +3329,7 @@
       type (T_Factors) :: tf
       real(dp), intent(in) :: temp
       real(dp), intent(out) :: fr, rr
-      real(dp) term, dtermdt, rev, drevdt, aa, daa, z, z2, z3
+      real(dp) term, rev, aa, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
@@ -3350,9 +3340,9 @@
       z2    = z*z
       z3    = z2*z
       aa    = 1.0d0 + 9.593d-2*z - 3.445d-3*z2 + 8.594d-5*z3
-      term    = 4.51d+17 * (tf% T9i23) * exp(-38.483d0*(tf% T9i13) * aa)
+      term  = 4.51d+17 * (tf% T9i23) * exp(-38.483d0*(tf% T9i13) * aa)
       fr    = term
-      rev      = 2.400d+09 * (tf% T932) * exp(-58.605d0*(tf% T9i))
+      rev   = 2.400d+09 * (tf% T932) * exp(-58.605d0*(tf% T9i))
       rr    = rev * term
       end subroutine rate_fe54pg_fxt
 
@@ -3402,20 +3392,20 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) term, dtermdt, aa, daa, rev, drevdt, z, z2, z3
+         real(dp) term, aa, rev, z, z2, z3
 
          if (tf% t9 < lowT9_cutoff) then
             fr = 0; rr = 0; return
          end if 
           
-         z     = min((tf% T9), 10.0d0)
-         z2    = z*z
-         z3    = z2*z
-         aa    = 1.0d0 + 9.894d-2*z - 3.131d-3*z2 - 2.160d-5*z3
-         term    = 1.21d+18 * (tf% T9i23) * exp(-39.604d0*(tf% T9i13) * aa)
-         fr    = term
-         rev      = 1.537d+11*(tf% T932)*exp(-83.382d0*(tf% T9i))
-         rr    = rev * term
+         z    = min((tf% T9), 10.0d0)
+         z2   = z*z
+         z3   = z2*z
+         aa   = 1.0d0 + 9.894d-2*z - 3.131d-3*z2 - 2.160d-5*z3
+         term = 1.21d+18 * (tf% T9i23) * exp(-39.604d0*(tf% T9i13) * aa)
+         fr   = term
+         rev  = 1.537d+11*(tf% T932)*exp(-83.382d0*(tf% T9i))
+         rr   = rev * term
       end subroutine rate_co55pg_fxt
 
 
@@ -3434,7 +3424,6 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: temp
          real(dp), intent(out) :: fr, rr
-         real(dp) :: fr1
 !         p  v44 cr45                       rath      3.10000d+00          
          call jina_reaclib_2_1(ih1, iv44, icr45, tf, fr, rr, 'rate_v44pg_jina')
       end subroutine rate_v44pg_jina
@@ -3691,8 +3680,8 @@
          type (T_Factors) :: tf
          real(dp), intent(in) :: a0, a1, a2, b0, b1, b2, b3, b4,  &
                c0, c1, d0, d1, e0, e1, e2
-         real(dp), intent(out) :: term         
-         real(dp) :: aa, daa, bb, dbb, cc, dcc, dd, ddd, ee, dee         
+         real(dp), intent(out) :: term
+         real(dp) :: aa, bb, cc, dd, ee
          aa   = a0 * (tf% T9i23) * exp(-a1*(tf% T9i13) - (tf% T92)*(a2*a2)) 
          bb   = 1 + b0*(tf% T9) + b1*(tf% T92) +  b2*(tf% T93) +   b3*(tf% T94) +   b4*(tf% T95)
          if (bb < 0) then
@@ -3701,7 +3690,7 @@
          cc   = c0 * (tf% T9i32) * exp(-c1*(tf% T9i)) 
          dd   = d0 * (tf% T9i32) * exp(-d1*(tf% T9i)) 
          ee   = e0 * pow(tf% T9,e1) * exp(-e2*(tf% T9i)) 
-         term    = aa * bb + cc + dd + ee
+         term = aa * bb + cc + dd + ee
       end subroutine rnacre
 
       
@@ -4165,9 +4154,8 @@
          integer, intent(in) :: num_out, nuclides_out(:)
          real(dp), intent(in) :: T9
          real(dp), intent(out) :: lambda, rlambda
-         integer, intent(out) :: ierr        
+         integer, intent(out) :: ierr
          character (len=max_id_length) :: handle
-         integer :: lo, hi, i
          integer :: iso_ids(num_in+num_out)
          include 'formats'
          ierr = 0
@@ -4183,9 +4171,9 @@
          character (len=*), intent(in) :: handle
          real(dp), intent(in) :: T9
          real(dp), intent(out) :: lambda, rlambda
-         integer, intent(out) :: ierr                 
-         real(dp) :: dlambda_dlnT, drlambda_dlnT         
-         integer :: lo, hi, i
+         integer, intent(out) :: ierr
+         real(dp) :: dlambda_dlnT, drlambda_dlnT
+         integer :: lo, hi
          logical, parameter :: forward_only = .false.
          include 'formats'
          ierr = 0
@@ -4206,7 +4194,7 @@
             lo, hi, T9, reaclib_rates, chem_isos, forward_only, &
             lambda, dlambda_dlnT,  &
             rlambda, drlambda_dlnT,  &
-            ierr)      
+            ierr)
          if (ierr /= 0) then
             write(*,'(a)')  &
                'reaclib_rate_for_handle: failed in reaclib_reaction_rates '  &
@@ -4380,7 +4368,7 @@
 !  sn56ec = ni56 neutrino loss rate
 
 !  declare 
-      integer          ifirst,jp,kp,jr,jd,ii,ik,ij,j,k 
+      integer          jp,kp,jr,jd,ii,ik,ij
       real(dp) rnt(2),rne(2,7),datn(2,6,7),  &
                        t9,r,rfm,rf0,rf1,rf2,dfacm,dfac0,dfac1,dfac2,  &
                        tfm,tf0,tf1,tf2,tfacm,tfac0,tfac1,tfac2

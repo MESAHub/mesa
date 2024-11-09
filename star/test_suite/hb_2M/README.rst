@@ -33,7 +33,7 @@ Then we specify the output. We save the final model, which will be the starting 
    :end-before: initial_zfracs = 6 
 
 Next, we specify the initial composition. There is no consensus yet on which is "the best" solar composition. By default, the initial composition in MESA is ``initial_zfracs = 3`` which corresponds to the `GS98 <https://link.springer.com/article/10.1023%2FA%3A1005161325181>`__ metal fraction. Here we want to use the more recent available solar composition given in `AGSS09 <https://www.annualreviews.org/doi/pdf/10.1146/annurev.astro.46.060407.145222>`__ , therefore we set ``initial_zfracs = 6``.
-Since it is very important to use the opacity tables which are built using the solar composition we use, we also have to set the ``kappa_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
+Since it is very important to use the opacity tables which are built using the solar composition we use, we also have to set the ``kap_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-after: history_columns_file = 'history_columns.list' 
@@ -43,7 +43,7 @@ We also have to choose a network of nuclear reactions. This network should be ch
 Here we want to use a nuclear reactions network, called ``pp_and_cno_extras.net``, which provides a more complete coverage for hydrogen and helium burning.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  kappa_file_prefix = 'a09'
+   :start-after:  kap_file_prefix = 'a09'
    :end-before: /
 
 We do not specify anything about the eos, which means we use the default one.
@@ -60,14 +60,14 @@ The energy equation can be written in the dLdm or the dedt form in MESA (see `ME
 Next we specify the starting model, i.e., its initial mass, metallicity, and helium  mass fraction. Here we only specify M and Z; the helium content is by default 0.24 + 2Z. 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  use_dedt
-   :end-before: opacity
+   :start-at:  initial_mass
+   :end-at: initial_z
 
-Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Z_base`` which gives the metal abundances previous to any CO enhancement. 
+Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Zbase`` which gives the metal abundances previous to any CO enhancement. 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after:  opacity controls
-   :end-before: mixing
+   :start-at: kap
+   :end-at: ! end of kap namelist
 
 We now specify the non-default mixing parameters we want to use.
 We will use the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__  with ``mixing_length_alpha=1.8``. We will use the Ledoux criterion and the "predictive mixing" scheme described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ to find the convective boundaries at the core and at the surface. 
@@ -143,8 +143,8 @@ We use the same mixing controls as for the PMS-to-TAMS part of the evolution.
 We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (our ZACheB model). 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
-   :start-after: threshold_for_smooth_brunt_B = 0.1
-   :end-before: max_
+   :start-at: HB_limit
+   :end-at: HB_limit
 
 .. warning:: It is sometimes useful to specify a maximum number of models to avoid running out of space on your drive with runaway runs! Here we specify  ``max_model_number = 25000``
 
@@ -203,7 +203,7 @@ We specify the output. Here we use the default LOG directory, so we do not speci
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_hb_2M
    :start-after: output controls
-   :end-before: !num_trace_history_values = 2
+   :end-before: num_trace_history_values = 2
 
 
 

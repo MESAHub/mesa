@@ -89,7 +89,7 @@ contains
     real(dp), intent(in) :: x
     real(dp)             :: powm1_x
 
-    powm1_x = 1_dp / x
+    powm1_x = 1.0_dp / x
 
   end function powm1_
 

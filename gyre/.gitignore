@@ -1,2 +1,3 @@
 gyre/
-public/gyre_lib.f
+public/gyre_mesa_m.f90
+

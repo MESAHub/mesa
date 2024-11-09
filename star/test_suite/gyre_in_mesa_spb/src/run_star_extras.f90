@@ -28,8 +28,9 @@ module run_star_extras
   use star_def
   use const_def
   use math_lib
-      use auto_diff
-  use gyre_lib
+  use auto_diff
+
+  use gyre_mesa_m
 
   ! No implicit typing
       
@@ -81,19 +82,19 @@ contains
 
     ! Initialize GYRE
 
-    call gyre_init('gyre.in')
+    call init('gyre.in')
 
     ! Set constants
 
-    call gyre_set_constant('G_GRAVITY', standard_cgrav)
-    call gyre_set_constant('C_LIGHT', clight)
-    call gyre_set_constant('A_RADIATION', crad)
+    call set_constant('G_GRAVITY', standard_cgrav)
+    call set_constant('C_LIGHT', clight)
+    call set_constant('A_RADIATION', crad)
 
-    call gyre_set_constant('M_SUN', Msun)
-    call gyre_set_constant('R_SUN', Rsun)
-    call gyre_set_constant('L_SUN', Lsun)
+    call set_constant('M_SUN', Msun)
+    call set_constant('R_SUN', Rsun)
+    call set_constant('L_SUN', Lsun)
 
-    call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+    call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
   end subroutine extras_startup
 
@@ -140,7 +141,7 @@ contains
 
     ! Finalize GYRE
 
-    call gyre_final()
+    call final()
 
   end subroutine extras_after_evolve
 

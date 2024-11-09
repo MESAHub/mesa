@@ -297,7 +297,7 @@
          integer, intent(in) :: id
 
          type (star_info), pointer :: s
-         integer :: ierr, j, k, nz
+         integer :: ierr, k, nz
          integer(8) :: time0, clock_rate
          real(dp) :: total_radiation
 
@@ -525,22 +525,20 @@
 
          type (star_info), pointer :: s
          integer :: ierr, &
-            j, k, j_cnt, mdot_redo_cnt, max_mdot_redo_cnt, cnt, max_cnt, nz
+            k, mdot_redo_cnt, max_mdot_redo_cnt, nz
          integer(8) :: time0, clock_rate
-         logical :: okay, trace, skip_global_corr_coeff_limit, &
+         logical :: trace, skip_global_corr_coeff_limit, &
             have_too_large_wind_mdot, have_too_small_wind_mdot, &
             ignored_first_step, was_in_implicit_wind_limit
-         real(dp) :: J_tot1, J_tot2, rel_error, &
-            w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
+         real(dp) :: w_div_w_crit, w_div_w_crit_prev, mstar_dot, mstar_dot_prev, abs_mstar_delta, &
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
-            too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, total, &
-            surf_omega_div_omega_crit_limit, dt, time, max_dt, total_energy
+            too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
+            surf_omega_div_omega_crit_limit, dt
             
          integer :: ph_k, mdot_action
-         real(dp) :: r, m, xm, v, L, cs, kap, ysum, &
-            implicit_mdot, ph_x, ph_L, iwind_tolerance, iwind_lambda, total_nuclear_heating, &
-            total_radiation
-         integer :: k_phot, iwind_redo_cnt, iwind_max_redo_cnt
+         real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
+         real(dp) :: dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8
+         integer :: iwind_redo_cnt, iwind_max_redo_cnt
          integer, parameter :: exit_loop = 1, cycle_loop = 0
 
          logical, parameter :: dbg = .false.
@@ -801,7 +799,7 @@
             
             if (iwind_redo_cnt < iwind_max_redo_cnt .and. iwind_lambda > 0d0) then
                ! check mdot calculated at end of step
-               call get_phot_info(s, ph_x, ph_x, ph_x, ph_L, ph_x, ph_x, ph_x, ph_x, ph_x, ph_k)
+               call get_phot_info(s, dummy1, dummy2, dummy3, ph_L, dummy4, dummy5, dummy6, dummy7, dummy8, ph_k)
                call set_mdot(s, ph_L, s% mstar, s% Teff, ierr)
                if (ierr /= 0) then
                   do_step_part2 = retry
@@ -1104,12 +1102,12 @@
 
          logical function okay_energy_conservation()
             use rsp, only: rsp_total_energy_integrals
-            integer :: nz, k, ierr
+            integer :: nz, k
             real(dp) :: phase1_sources_and_sinks, phase2_sources_and_sinks, phase2_work, &
                phase1_total_energy_from_mdot, phase2_total_energy_from_mdot, &
                expected_sum_cell_others, expected_sum_cell_sources, L_theta, &
                diff_total_gravitational_energy, diff_total_internal_energy, diff_total_kinetic_energy, &
-               diff_total_rotational_kinetic_energy, diff_total_turbulent_energy, &
+               diff_total_turbulent_energy, &
                virial, total_radiation, L_surf, sum_cell_de, sum_cell_detrb, &
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing,&
@@ -1639,7 +1637,7 @@
          real(dp) :: start_time, end_time, left_to_inject, &
             q00, qp1, qmin, qmax, qtop, qbot, extra, dt, &
             target_injection_time, target_injection_ergs, &
-            kap_gamma, tau_gamma_sum, expect_to_inject
+            kap_gamma, tau_gamma_sum
          integer :: k, nz, k1
 
          include 'formats'
@@ -1764,8 +1762,7 @@
          integer, intent(out) :: ierr
 
          logical :: trace
-         integer :: nz, k
-         real(dp) :: total_radiation
+         integer :: nz
 
          include 'formats'
 
@@ -1824,10 +1821,8 @@
 
          type (star_info), pointer :: s
 
-         integer :: ierr, k, j, k0_old, k1_old, k0_new, k1_new
-         real(dp) :: total_energy, force_timestep_min, delta_E, sum_delta_E, &
-            force_timestep, total_radiation
-         real(dp), pointer :: energy_profile_after_remesh(:)
+         integer :: ierr, k
+         real(dp) :: force_timestep_min, force_timestep
          logical :: trace
 
          include 'formats'
@@ -1973,8 +1968,7 @@
          use adjust_mesh_split_merge, only: remesh_split_merge
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
-         integer(8) :: time0, clock_rate
-         integer :: ierr, k
+         integer(8) :: time0
          real(dp) :: total
          include 'formats'
          do_mesh = keep_going
@@ -2009,7 +2003,7 @@
 
          type (star_info), pointer :: s
 
-         integer :: ierr, i, j, k
+         integer :: ierr
          real(dp) :: screening
 
          include 'formats'
@@ -2309,10 +2303,7 @@
 
          type (star_info), pointer :: s
          integer, parameter :: nvals = 1, n_ivals = 0
-         integer :: j, k, nz, &
-            current_num_iounits_in_use, prev_num_iounits_in_use
-         integer :: ivals(n_ivals)
-         real(dp) :: vals(nvals)
+         integer :: nz, current_num_iounits_in_use, prev_num_iounits_in_use
          logical :: trace, will_do_photo
 
          include 'formats'

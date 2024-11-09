@@ -385,7 +385,7 @@
          integer, intent(in) :: iso_ids(:)
          character (len=*), intent(out) :: handle
          logical, parameter :: reverse = .true.
-         character (len=1) :: reaction_flag = '-'
+         character (len=1), parameter :: reaction_flag = '-'
          call get1_reaction_handle(num_in, num_out, iso_ids, chem_isos, reverse, reaction_flag, handle)
       end subroutine reverse_reaction_handle         
       
@@ -405,7 +405,7 @@
          type(nuclide_data), intent(in) :: nuclides
          character (len=*), intent(out) :: handle
          logical, parameter :: reverse = .true.
-         character (len=1) :: reaction_flag = '-'
+         character (len=1), parameter :: reaction_flag = '-'
          call get1_reaction_handle(num_in, num_out, pspecies, nuclides, reverse, reaction_flag, handle)
       end subroutine get_reverse_reaction_handle
       
@@ -704,7 +704,6 @@
          
          subroutine do_n_to_m(n,m)
             integer, intent(in) :: n, m ! each is either 1 or 2
-            integer :: j
             in1 = 0; in2 = 0; out1 = 0; out2 = 0
             if (.not. reverse) then
                in1 = pspecies(1)

@@ -66,8 +66,8 @@
          
          integer :: max_el_for_chi2, ierr, i, j, l, n
          logical :: store_model, checking_age
-         real(dp) :: age_limit, model_limit, err, target_l0, X, Y, Z, &
-            frac, surface_X, surface_Z, chi2_freq_and_ratios_fraction, &
+         real(dp) :: age_limit, model_limit, &
+            frac, chi2_freq_and_ratios_fraction, &
             remaining_years, prev_max_years, min_max
          
          include 'formats'
@@ -676,7 +676,7 @@
       real(dp) function get_chi2_spectro(s)
          type (star_info), pointer :: s
          integer :: cnt, i
-         real(dp) :: logL, sum
+         real(dp) :: sum
          include 'formats'
          cnt = 0
          sum = 0
@@ -866,8 +866,7 @@
          integer, intent(in) :: num
          integer :: ierr, iounit
          character (len=256) :: format_string, num_string, filename
-         integer, parameter :: max_len_out = 2000
-         character (len=max_len_out) :: script         
+         integer, parameter :: max_len_out = 2000     
          ierr = 0
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) return
@@ -1094,7 +1093,6 @@
          character (len=maxlen_profile_column_name) :: astero_names(n)
          real(dp) :: vals(nz,n)
          integer, intent(out) :: ierr
-         integer :: k
          ierr = 0
          call star_astero_procs% data_for_extra_profile_columns( &
             id, n, nz, astero_names, vals, ierr)
@@ -1177,7 +1175,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: op
          
-         integer :: i, j, num_ints, num_dbls, ierr
+         integer :: i, num_ints, num_dbls, ierr
          
          i = 0
          ! call move_int or move_flg 

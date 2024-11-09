@@ -35,7 +35,7 @@ module ion_offset
                                                    23221.0,25820.0,28582.0,31514.0,34619.0,37899.0,41356.0]
 
          integer :: k, Z(species)
-         real(dp) :: A(species), W(species), ya(species), norm
+         real(dp) :: A(species), ya(species), norm
 
          ! Get basic species info
          norm = 0d0

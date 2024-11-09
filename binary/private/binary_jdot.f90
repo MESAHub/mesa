@@ -120,7 +120,6 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
-         real(dp) :: alfa
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then
@@ -212,7 +211,7 @@
          real(dp), intent(out) :: qconv_env
          
          real(dp) :: qconv_core
-         integer :: i, k, id
+         integer :: k
 
          include 'formats'
 
@@ -256,7 +255,6 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
-         logical :: apply_mdot_mb
          real(dp) :: rsun4,two_pi_div_p3, qconv_env, jdot_scale
          logical :: apply_jdot_mb
          ierr = 0

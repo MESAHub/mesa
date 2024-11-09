@@ -22,34 +22,26 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
-      module other_opacity_factor
 
-      ! consult star/other/README for general usage instructions
-      ! control name: use_other_opacity_factor = .true.
-      ! procedure pointer: s% other_opacity_factor => my_routine
+module other_opacity_factor
 
-      implicit none
-      
-            
-      contains
-      
-      
-      subroutine default_other_opacity_factor(id, ierr)
-         use star_def
-         integer, intent(in) :: id
-         integer, intent(out) :: ierr
-         type (star_info), pointer :: s
-         integer :: k
-         ierr = 0
-         call star_ptr(id, s, ierr)
-         if (ierr /= 0) return
-         s% extra_opacity_factor(1:s% nz) = s% opacity_factor
-      end subroutine default_other_opacity_factor
+   ! consult star/other/README for general usage instructions
+   ! control name: use_other_opacity_factor = .true.
+   ! procedure pointer: s% other_opacity_factor => my_routine
 
+   implicit none
 
-      end module other_opacity_factor
-      
-      
-      
-      
+contains
+
+   subroutine default_other_opacity_factor(id, ierr)
+      use star_def
+      integer, intent(in) :: id
+      integer, intent(out) :: ierr
+      type(star_info), pointer :: s
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      s%extra_opacity_factor(1:s%nz) = s%opacity_factor
+   end subroutine default_other_opacity_factor
+
+end module other_opacity_factor
