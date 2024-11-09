@@ -290,8 +290,6 @@
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
-            if (just_dydt) return
-
             Q = n% reaction_Qs(ir)*eps_factor
             b_f = Q*b_f
             b_r = -Q*b_r
@@ -331,7 +329,9 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+         
+            if (just_dydt) return
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -456,8 +456,6 @@
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
-            if (just_dydt) return
-
             Q = n% reaction_Qs(ir)*eps_factor
             b_f = Q*b_f
             b_r = -Q*b_r
@@ -498,7 +496,9 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+
+            if (just_dydt) return
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -705,8 +705,6 @@
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
-            if (just_dydt) return
-
             Q = n% reaction_Qs(ir)*eps_factor
             b_f = Q*b_f
             b_r = -Q*b_r
@@ -749,7 +747,9 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+ 
+            if (just_dydt) return            
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -853,8 +853,6 @@
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
-            if (just_dydt) return
-
             Q = n% reaction_Qs(ir)*eps_factor
             eps_nuc_MeV(i_rate) = eps_nuc_MeV(i_rate) + b*Q
             n% eps_nuc_categories(icat_f) = n% eps_nuc_categories(icat_f) + b_f*Q
@@ -889,7 +887,9 @@
             dydt(i_rate_dRho,i3) = dydt(i_rate_dRho,i3) + b
             dydt(i_rate_dRho,i4) = dydt(i_rate_dRho,i4) + b
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b*Q
-            
+
+            if (just_dydt) return
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -994,8 +994,6 @@
             
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
-            
-            if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
             eps_nuc_MeV(i_rate) = eps_nuc_MeV(i_rate) + b*Q
@@ -1028,7 +1026,9 @@
             dydt(i_rate_dRho,i2) = dydt(i_rate_dRho,i2) - b
             dydt(i_rate_dRho,i3) = dydt(i_rate_dRho,i3) + b
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b*Q
-            
+
+            if (just_dydt) return
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
