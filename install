@@ -335,12 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-if [ ! -r data/kap_data ]
-then
-	do_input_data kap
-fi
-do_one_parallel kap
-
 do_one_parallel rates
 do_one_parallel neu
 do_one_parallel net
