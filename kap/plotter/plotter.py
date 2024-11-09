@@ -2,9 +2,7 @@
 
 import copy
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
 
 def parse(fname):
     nY, nX = np.loadtxt(fname, max_rows=1, skiprows=3, unpack=True, dtype=int)
@@ -32,7 +30,7 @@ ax.set_xlim(Xran.min(), Xran.max())
 ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
-cmap = copy.copy(mpl.cm.get_cmap("coolwarm"))
+cmap = copy.copy(plt.get_cmap("coolwarm"))
 cmap.set_over('tab:red')
 cmap.set_under('black')
 
