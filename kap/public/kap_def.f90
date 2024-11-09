@@ -393,7 +393,7 @@ module kap_def
   logical :: clip_to_kap_table_boundaries = .true. ! typically, this should be set true.
    ! if this is set true, then temperature and density args are
    ! clipped to the boundaries of the table.
-  real(dp) :: kap_min_logRho = -40d0
+  real(dp), parameter :: kap_min_logRho = -40d0
    ! below this, clip logRho and set partials wrt logRho to zero
 
 
@@ -507,7 +507,7 @@ contains
     use utils_lib, only : mkdir
     use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir, use_mesa_temp_cache
     character (*), intent(in) :: kap_cache_dir_in
-    integer :: ierr, i
+    integer :: i
     
     kap_test_partials = .false.
     

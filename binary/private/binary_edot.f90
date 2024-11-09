@@ -196,7 +196,7 @@
        integer, intent(out) :: ierr
        type (binary_info), pointer :: b
        integer :: i
-       real(dp) :: de, Mtot, xfer, costh
+       real(dp) :: de, Mtot, costh
 
        ierr = 0
        call binary_ptr(binary_id, b, ierr)

@@ -57,7 +57,7 @@
 
 
       subroutine do_test_chem
-         real(dp) :: c, n, o, cno, w
+         real(dp) :: c, n, o, cno
          integer :: ic12, in14, io16
          include 'formats'
          
@@ -184,7 +184,7 @@
       end subroutine do_test_Qtotal
       
       subroutine do_test_lodders
-            integer :: ierr, i
+            integer :: i
             real(dp) :: percent
 
             write (*,*)

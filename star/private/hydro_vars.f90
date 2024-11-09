@@ -108,7 +108,7 @@
             skip_mixing_info, &
             skip_set_cz_bdy_mass, &
             skip_mlt
-         integer :: nz, ierr1, k, i
+         integer :: nz, k
          
          include 'formats'
          
@@ -178,8 +178,6 @@
          real(dp), intent(in) :: dt
          integer, intent(out) :: ierr
 
-         integer(8) :: time0, clock_rate
-         real(dp) :: total
          logical, parameter :: skip_other_cgrav = .false.
          logical, parameter :: skip_basic_vars = .false.
          logical, parameter :: skip_micro_vars = .false.
@@ -387,21 +385,26 @@
 
 
       subroutine set_Teff_info_for_eqns(s, skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf, r_surf, L_surf, Teff, &
+            need_atm_Psurf_in, need_atm_Tsurf_in, r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
          use star_utils, only: set_phot_info
          use atm_lib, only: atm_Teff
+         use starspots, only: starspot_tweak_PT, starspot_restore_PT
          type (star_info), pointer :: s
          logical, intent(in) :: skip_partials, &
-            need_atm_Psurf, need_atm_Tsurf
+            need_atm_Psurf_in, need_atm_Tsurf_in
          real(dp), intent(out) :: r_surf, L_surf, Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
          integer, intent(out) :: ierr
+         logical :: need_atm_Psurf, need_atm_Tsurf
 
          include 'formats'
+
+         need_atm_Psurf = need_atm_Psurf_in
+         need_atm_Tsurf = need_atm_Tsurf_in
 
          ierr = 0
          
@@ -435,11 +438,21 @@
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
          else
+            ! starspot YREC routine
+            if (s% do_starspots) then
+               need_atm_Psurf = .true.
+               need_atm_Tsurf = .true.
+               call starspot_tweak_PT(s)
+            end if
             call get_surf_PT( &
                s, skip_partials, need_atm_Psurf, need_atm_Tsurf, &
                lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
                lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
                ierr)
+            ! starspot YREC routine
+            if (s% do_starspots) then
+               call starspot_restore_PT(s)
+            end if
          end if
          if (ierr /= 0) then
             if (s% report_ierr) then
@@ -481,7 +494,7 @@
             skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt
          integer, intent(out) :: ierr
 
-         integer :: nz, num_nse, k, T_tau_id
+         integer :: nz, k, T_tau_id
          integer(8) :: time0
          logical, parameter :: dbg = .false.
          real(dp) :: total
@@ -668,13 +681,12 @@
 
 
       subroutine set_basic_vars(s, nzlo, nzhi, ierr)
-         use chem_def, only: ini56
          use star_utils, only: set_rv_info, set_rmid
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
          integer :: j, k, species, nz
-         real(dp) :: twoGmrc2, r2, alfa, beta, sum_xa, v, u00, um1, du
+         real(dp) :: twoGmrc2, sum_xa
 
          include 'formats'
 
@@ -785,7 +797,6 @@
          real(dp) :: kap_surf
          real(dp) :: M_surf
 
-
          include 'formats'
 
          ! Set up stellar surface parameters
@@ -879,8 +890,8 @@
                if (L_surf < 0._dp) then
                   if (s% report_ierr) then
                      write(*,2) 'get_surf_PT: L_surf <= 0', s% model_number, L_surf
-                     call mesa_error(__FILE__,__LINE__)
                   end if
+                  if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__)
                   s% retry_message = 'L_surf < 0'
                   ierr = -1
                   return
@@ -1101,7 +1112,6 @@
             use star_utils, only: weighed_smoothing, threshold_smoothing
             logical, parameter :: preserve_sign = .false.
             real(dp), pointer, dimension(:) :: work
-            integer :: k
             include 'formats'
             ierr = 0
             work => dlnd

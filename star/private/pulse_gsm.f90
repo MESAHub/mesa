@@ -28,7 +28,7 @@ module pulse_gsm
   ! Uses
 
   use star_private_def
-  use hdf5io_lib
+  use forum_m, only: hdf5io_t, CREATE_FILE
 
   ! No implicit typing
 

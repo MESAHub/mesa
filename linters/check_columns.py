@@ -9,6 +9,7 @@ MESA_DIR = "../"
 ENABLE_TEST_SUITE_HIST_CHECKS = True
 ENABLE_TEST_SUITE_PROF_CHECKS = True
 
+
 # inspiration from https://stackoverflow.com/a/27531275
 class CaseInsensitiveSet(MutableSet):
     def __init__(self, iterable):
@@ -73,9 +74,9 @@ def print_options(options):
 def delete_command(options, filename):
     print("for i in", " ".join(options), end=";")
     print("do ", end="")
-    print('sed -i "/^\s*\!$i/d" */' + filename, end=";")
-    print('sed -i "/^\s*\!\s*$i/d" */' + filename, end=";")
-    print('sed -i "/^\s*$i/d" */' + filename, end=";")
+    print(r'sed -i "/^\s*\!$i/d" */' + filename, end=";")
+    print(r'sed -i "/^\s*\!\s*$i/d" */' + filename, end=";")
+    print(r'sed -i "/^\s*$i/d" */' + filename, end=";")
     print("done")
 
 
@@ -88,7 +89,7 @@ def get_history_columns(filename="star/defaults/history_columns.list"):
     # that is, they may or may not be commented out
     # and may or may not have a trailing comment
 
-    regexp = "^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
+    regexp = r"^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
 
     return get_columns(filename, regexp)
 
@@ -99,7 +100,7 @@ def get_star_history_def(filename="star/private/star_history_def.f90"):
     # these lines look like:
     #   history_column_name(h_star_mass) = 'star_mass'
     #                                       ^^^^^^^^^
-    regexp = "history_column_name\\(h_\w+\\)[ ]*=[&\s]*'(\w+)'"
+    regexp = r"history_column_name\\(h_\w+\\)[ ]*=[&\s]*'(\w+)'"
 
     return get_options(filename, regexp)
 
@@ -110,7 +111,7 @@ def get_star_history(filename="star/private/history.f90"):
     # these lines look like:
     #   case(h_star_mass)
     #          ^^^^^^^^^
-    regexp = "case[ ]*\\(h_(\w+)\\)"
+    regexp = r"case[ ]*\\(h_(\w+)\\)"
 
     return get_options(filename, regexp)
 
@@ -273,7 +274,7 @@ def get_profile_getval(filename="star/private/profile_getval.f90"):
     # these lines look like:
     #   case(p_zone)
     #          ^^^^
-    regexp = "case[ ]*\\(p_(\w+)\\)"
+    regexp = r"case[ ]*\\(p_(\w+)\\)"
 
     return get_options(filename, regexp)
 
@@ -285,7 +286,7 @@ def get_profile_def(filename="star/private/star_profile_def.f90"):
     # these lines look like:
     #   profile_column_name(p_zone) = 'zone'
     #                                  ^^^^^
-    regexp = "profile_column_name\\(p_\w+\\)[ ]*=[&\s]*'(\w+)'"
+    regexp = r"profile_column_name\\(p_\w+\\)[ ]*=[&\s]*'(\w+)'"
 
     return get_options(filename, regexp)
 
@@ -299,7 +300,7 @@ def get_profile_columns(filename="star/defaults/profile_columns.list"):
     # that is, they may or may not be commented out
     # and may or may not have a trailing comment
 
-    regexp = "^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
+    regexp = r"^[ \t]*!?[ ]?(\w+)[ ^t]*(!.*)?$"
 
     return get_columns(filename, regexp)
 

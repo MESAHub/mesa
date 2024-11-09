@@ -75,9 +75,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp), dimension(num_eos_basic_results) :: dres_dabar, dres_dzbar
     integer :: j
-    logical :: off_table
 
     include 'formats'
 
@@ -89,7 +87,7 @@ contains
     if(logRho < -25) then
       ! Provide some hard lower limit on what we would even try to evalue the eos at
       ! Going to low causes FPE's when we try to evaluate certain derviatives that need (rho**power)
-      s% retry_message = 'eos evaluted at too low a density'
+      s% retry_message = 'eos evaluated at too low a density'
       ierr = -1
       return
     end if
@@ -229,7 +227,6 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -273,7 +270,6 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -411,8 +407,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp) :: rho_guess, logRho_guess, gamma, &
-         dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
+    real(dp) :: rho_guess, logRho_guess, gamma
 
     ! compute composition info
     real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx

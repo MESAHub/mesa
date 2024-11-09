@@ -45,7 +45,6 @@
                P, Pgas, Prad, T, Rho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dlnT(num_eos_basic_results), &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
                res2(num_eos_basic_results), d_dlnd2(num_eos_basic_results), &
                d_dxa2(num_eos_d_dxa_results, species), &
                d_dlnT2(num_eos_basic_results)
@@ -163,14 +162,9 @@
       
       subroutine Do_One(quietly)
          logical, intent(in) :: quietly
-         real(dp) :: T, rho, log10_rho, log10_T
-         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
-         integer :: info, i
-         real(dp) :: XC, XO, Ah, Zh, Yh, Ahe, Zhe, Yhe, Az, Zz, Yz, ddabar, ddzbar, &
-               helm_ddXh, helm_ddXz, opal_ddXh, opal_ddXz, XC0, XO0, &
-               helm_P, helm_PX, helm_PZ, opal_P, opal_PX, opal_PZ, X1, X2, Z1, Z2, &
-               abar1, zbar1, dXC, dlnP_dabar, dlnP_dzbar, dlnP_dXC, &
-               dabar_dZ, dzbar_dZ, dlnP_dZ, P, logRhoguess
+         real(dp) :: T, rho
+         real(dp), dimension(num_eos_basic_results) :: res
+         real(dp) :: dXC
          
          if (.true.) then
             ! pure Helium
@@ -246,10 +240,9 @@
          subroutine test_get_Rho_T ! using most recent values from subroutine Do_One_TRho
             real(dp) :: tol, othertol, &
                result, result_log10, log10_T, log10_rho, lnS, Prad, Pgas, logP, &
-               clipped_log10rho, clipped_log10temp, &
                logRho_guess, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                logT_guess, logT_bnd1, logT_bnd2
-            integer :: i, which_other, max_iter, eos_calls, ierr
+            integer :: max_iter, eos_calls, ierr
             real(dp), dimension(num_eos_basic_results) :: &
                   d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, species) :: &
@@ -380,7 +373,7 @@
          real(dp) :: &
                energy, abar, zbar, X, Z, logPgas, logT_tol, other_tol, other, &
                logT_guess, logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_result, new_energy, &
+               logT_result, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results), &
@@ -458,7 +451,7 @@
       subroutine test_components
          real(dp) :: &
             X_test, Z, XC_test, XO_test, &
-            logT, logRho, Pgas, Prad, energy, entropy
+            logT, logRho, Pgas, energy, entropy
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          integer:: ierr
@@ -531,7 +524,7 @@
          real(dp) :: &
                X, Z, abar, zbar, logRho, egas_want, egas_tol, logT_tol, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, logT_result, erad, egas, energy, &
-               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
+               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results)
          integer:: ierr, eos_calls, max_iter
@@ -622,7 +615,7 @@
          real(dp), dimension(num_eos_d_dxa_results, species) :: &
                d_dxa
          integer :: info, i
-         real(dp) :: dlnT, dlnRho, lnRho_2, Prad, Pgas, P
+         real(dp) :: Prad, Pgas, P
 
   101    format(a30,4x,1pe24.16)
   102    format(a30,3x,1pe24.16)
@@ -691,7 +684,7 @@
 
       
       subroutine test_dirac_integrals
-         real(dp) :: dk, T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e
+         real(dp) :: T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e
  1       format(a40,1pe26.16)
          eta = 1.46722890948893d0
          T = 11327678.5183021d0

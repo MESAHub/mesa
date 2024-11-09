@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# A job script to run tests and automatically update the figures in the docs.
+# Currently not all tests generate figures, so we just run a subset of tests:
+# This should be run at least with each MESA release.
+
+./each_test_run -u 13
+./each_test_run -u 15
+./each_test_run -u 17
+./each_test_run -u 21
+./each_test_run -u 27
+./each_test_run -u 29
+./each_test_run -u 32
+./each_test_run -u 41
+./each_test_run -u 56
+./each_test_run -u 77
+./each_test_run -u 87

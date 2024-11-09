@@ -153,7 +153,7 @@
          real(dp) :: T, T9, YeRho, lYeRho
          integer :: i, ir, in, out, rxn_idx
          logical :: neg
-         real(dp) :: decay, capture, Qx, Qn, conv, mue, d_mue_dlnRho, d_mue_dlnT
+         real(dp) :: Qx, conv, mue, d_mue_dlnRho, d_mue_dlnT
          character(len=iso_name_length) :: weak_lhs, weak_rhs
          integer, parameter :: nwork = pm_work_size
 

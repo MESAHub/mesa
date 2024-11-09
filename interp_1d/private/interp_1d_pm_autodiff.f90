@@ -54,7 +54,6 @@
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          logical, parameter :: dbg = .true.
          type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
@@ -169,7 +168,6 @@
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          
@@ -258,7 +256,6 @@
 
          type(auto_diff_real_2var_order1), dimension(:), pointer :: h, s, p
          integer :: i
-         character (len=256) :: message
          type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          
@@ -344,7 +341,6 @@
          integer, intent(out) :: ierr
 
          type(auto_diff_real_2var_order1) :: h, s
-         character (len=256) :: message
          type(auto_diff_real_2var_order1), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
          

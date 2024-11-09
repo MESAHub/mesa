@@ -2,7 +2,7 @@
 
 include $(MESA_DIR)/utils/makefile_header
 
-LOAD_MESA = $(LOAD_EXTRAS1) $(LOAD_MESA_STAR) $(LOAD_EXTRAS)
+LOAD_MESA = $(LOAD_EXTRAS1) $(LOAD_MESA_STAR) $(LOAD_GYRE) $(LOAD_EXTRAS)
 
 #################################################################
 
@@ -18,7 +18,7 @@ WORK_SRC_DIR = $(WORK_DIR)/src
 STAR_JOB_DIR = $(MESA_DIR)/star/job
 
 $(STAR) : $(OBJS)
-	$(LOADER) $(FCopenmp) -o $(WORK_DIR)/$(STAR) $(OBJS) $(LOAD_MESA) -lgyre
+	$(LOADER) $(FCopenmp) -o $(WORK_DIR)/$(STAR) $(OBJS) $(LOAD_MESA)
 
 #################################################################
 

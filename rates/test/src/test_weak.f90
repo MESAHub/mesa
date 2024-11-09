@@ -47,12 +47,10 @@ module test_weak
          lambda, dlambda_dlnT, dlambda_dlnRho, &
          Q, dQ_dlnT, dQ_dlnRho, &
          Qneu, dQneu_dlnT, dQneu_dlnRho
-      real(dp) :: logT, T, T9, dT9, dlnT, YeRho, &
-         ye, rho, logRho, dlogRho, eta, d_eta_dlnT, d_eta_dlnRho
+      real(dp) :: logT, T, T9, YeRho, &
+         ye, rho, logRho, eta, d_eta_dlnT, d_eta_dlnRho
       character(len=iso_name_length) :: weak_lhs, weak_rhs
       character(len=2*iso_name_length+1) :: key
-
-      real(dp) :: abar, zbar, z2bar
 
       real(dp) :: dvardx, dvardx_0, dx_0, err, var_0, xdum
       logical :: doing_d_dlnd

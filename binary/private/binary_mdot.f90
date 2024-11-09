@@ -502,7 +502,7 @@
          use binary_wind, only: eval_wind_xfer_fractions
          type (binary_info), pointer :: b
 
-         real(dp) :: fixed_xfer_fraction, actual_mtransfer_rate
+         real(dp) :: actual_mtransfer_rate
          integer :: ierr
 
          actual_mtransfer_rate = 0d0
@@ -690,7 +690,7 @@
 
       subroutine get_info_for_ritter(b)
          type(binary_info), pointer :: b
-         real(dp) :: rho_exponent, F1, q, rho, p, grav, hp, v_th, rl3, q_temp
+         real(dp) :: F1, q, rho, p, grav, hp, v_th, rl3, q_temp
          include 'formats'
 
          !--------------------- Optically thin MT rate -----------------------------------------------
@@ -735,7 +735,7 @@
       real(dp) function calculate_kolb_mdot_thick(b, indexR, rl_d) result(mdot_thick)
          real(dp), intent(in) :: rl_d
          integer, intent(in) :: indexR
-         real(dp) :: F1, F3, G1, dP, q, rho, p, grav, hp, v_th, rl3, q_temp
+         real(dp) :: F1, F3, G1, d_P, q, q_temp
          integer :: i
          type(binary_info), pointer :: b
          include 'formats'
@@ -751,12 +751,12 @@
             mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / &
                (mp * b% s_donor% mu(i)))*(b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
          end do
-         ! only take a fraction of dP for last cell 
+         ! only take a fraction of d_P for last cell 
          G1 = b% s_donor% gamma1(i)
          F3 = sqrt(G1) * pow(2d0/(G1+1d0), (G1+1d0)/(2d0*G1-2d0))
-         dP = (b% s_donor% r(indexR) - rl_d) / &
+         d_P = (b% s_donor% r(indexR) - rl_d) / &
             (b% s_donor% r(indexR) - b% s_donor% r(indexR+1)) * (b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
-         mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / (mp*b% s_donor% mu(i)))*dP
+         mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / (mp*b% s_donor% mu(i)))*d_P
 
          q = b% m(b% a_i)/b% m(b% d_i) ! Mass ratio, as defined in Ritter 1988
                                        ! (Kolb & Ritter 1990 use the opposite!)
@@ -769,8 +769,6 @@
       
       subroutine get_info_for_kolb(b)
          type(binary_info), pointer :: b
-         real(dp) :: F3, FF, G1, x_L1, q, g
-         real(dp) :: mdot_thick0,  R_gas, dP, rl, s_div_rl
          integer :: i, indexR
          include 'formats'
 
@@ -841,7 +839,7 @@
       subroutine get_info_for_ritter_eccentric(b)
          type(binary_info), pointer :: b
          integer :: i
-         real(dp) :: rho_exponent, F1, q, q_temp, rho, p, grav, hp, v_th, dm
+         real(dp) :: F1, q, q_temp, rho, p, grav, hp, v_th, dm
          real(dp), DIMENSION(b% anomaly_steps):: mdot0, mdot, Erit, rl_d
          include 'formats'
          

@@ -370,7 +370,6 @@
       ! i.e., A + B -> C exothermic
       subroutine rates_two_to_one_reverse_factor( &
             Q, T9, T932, iso_A, iso_B, iso_C, rev, d_rev_dT, ierr) ! A + B <-> C
-         use chem_def, only: chem_isos
          use math_lib
          real(dp), intent(in) :: Q, T9, T932
          integer, intent(in) :: iso_A, iso_B, iso_C
@@ -417,7 +416,6 @@
       ! i.e., A + B -> C + D exothermic
       subroutine rates_two_to_two_reverse_factor( &
             Q, T9, iso_A, iso_B, iso_C, iso_D, rev, d_rev_dT, ierr) ! A + B <-> C + D
-         use chem_def, only: chem_isos
          use math_lib
          real(dp), intent(in) :: Q, T9
          integer, intent(in) :: iso_A, iso_B, iso_C, iso_D
@@ -521,7 +519,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = '-'
+         character (len=1), parameter :: reaction_flag = '-'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_handle
       
@@ -530,7 +528,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = 'e'
+         character (len=1), parameter :: reaction_flag = 'e'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_ec_handle
       
@@ -539,7 +537,7 @@
          integer, intent(in) :: num_in, num_out
          integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
-         character (len=1) :: reaction_flag = 'w'
+         character (len=1), parameter :: reaction_flag = 'w'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)   
       end subroutine reaclib_create_wk_handle
       

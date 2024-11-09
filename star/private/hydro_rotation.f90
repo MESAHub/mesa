@@ -216,7 +216,7 @@
       subroutine set_i_rot(s, skip_w_div_w_crit_roche)
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
-         integer :: k, nz
+         integer :: k
          include 'formats'
 
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
@@ -292,7 +292,7 @@
       subroutine update1_i_rot_from_xh(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r00, r003, rp1, rp13, rm1, rm13, r_in, r_out
+         real(dp) :: r00
          include 'formats'
 
          r00 = get_r_from_xh(s,k)
@@ -477,7 +477,6 @@
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
          integer, intent(out) :: ierr
-         integer :: k
          include 'formats'
          ierr = 0
 
@@ -507,7 +506,7 @@
          real(dp) :: &
             dm, dmsum, omega_sum, omega_crit_sum, omega_div_omega_crit_sum, &
             v_rot_sum, v_crit_sum, v_div_v_crit_sum, Lrad_div_Ledd_sum, &
-            kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
+            gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
          integer :: k, ierr
@@ -682,8 +681,7 @@
 
          logical :: dbg
 
-         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, fp_temp, ft_temp
 
          include 'formats'
 

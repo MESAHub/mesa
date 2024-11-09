@@ -117,8 +117,6 @@
          character (len=*), intent(in) :: color_file_names(:)
          integer , intent(in):: color_num_colors(:)
          integer, intent(out) :: ierr
-         integer :: iam, nprocs, nprow, npcol, i, n
-         integer, dimension(:), allocatable :: seed
          include 'formats'
          ierr = 0
          if (have_done_starlib_init) return
@@ -176,7 +174,6 @@
 
 
       subroutine alloc_star_data(id, ierr)
-         use rates_def, only: rates_reaction_id_max
          use chem_def, only: num_categories
          use net, only: default_set_rate_factors, &
             default_set_op_mono_factors
@@ -849,12 +846,11 @@
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
-         real(dp) :: initial_mass, initial_z, dlgm_per_step
+         real(dp) :: initial_mass, initial_z
          real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
-         logical :: restore_at_end
-         real(dp) :: xm, total_radiation, warning_limit_for_max_residual
+         real(dp) :: total_radiation, warning_limit_for_max_residual
          integer :: k, num_trace_history_values
          real(dp) :: save_Pextra_factor
          character (len=256):: save_atm_option, &

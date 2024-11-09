@@ -22,6 +22,10 @@ The minimum system requirements for MESA are:
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.
 
+Ensure you have Python (3.5 or newer) installed on your system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) to be installed.
+
 Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 

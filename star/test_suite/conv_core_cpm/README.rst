@@ -15,7 +15,9 @@ grid below must show that the red dot falls within the white box.
 The gold curve in that panel shows the expected evolution of the convective
 core if the model continued to evolve beyond its stopping condition.
 
-.. image:: ../../../star/test_suite/conv_core_cpm/docs/grid_000092.png
-
+.. image:: ../../../star/test_suite/conv_core_cpm/docs/grid_000092.svg
+   :width: 100%
 
 Last-Updated: 2023-03-14 (MESA d6bbdf4) by Evan Bauer
+
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 124 seconds using 8 threads.

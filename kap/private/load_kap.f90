@@ -398,8 +398,6 @@ contains
     subroutine Setup_Kap_X_Table(ierr)
       integer, intent(out) :: ierr
 
-      integer :: i
-
       xErr = abs(xin - X); zErr = abs(zz - Z)
       if (xErr > tiny .or. zErr > tiny) then
          ierr = -1

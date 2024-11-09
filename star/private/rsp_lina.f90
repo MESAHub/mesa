@@ -102,21 +102,20 @@
       real(dp) :: GGXM,GGX0,GGXP,GGY0,GGYP,GG,GPF
       real(dp) :: DFCX0,DFCXM,DFCXP,DFCY0,DFCYP,DFCZ0,DFCZP
       real(dp) :: DFCMX0,DFCMXM,DFCMXP,DFCMY0,DFCMYP,DFCMZ0,DFCMZP
-      real(dp) :: FLIM,FLD
       real(dp) :: T1,DLR,DLRP,DLRM,DLT,DLTP,DLMR,DLMRP,DLMRM,DLMT,DLMTP
       real(dp) :: W_00,W_out,BW,BK,T2,T3,DLK,DLKP,MINI
-      real(dp) :: T4,T5,P2,P3,P5,P6,P7,P8,P9,P10,POM3,POM2,POM,POM4
+      real(dp) :: T4,POM3,POM2,POM,POM4
       integer :: I,J,NZN3,IG,IE,IR,IC,INFO,IMI,LD_VL,LD_VR,n,op_err
-      real(dp) :: RES(12),VRRS(15),Q(15)
+      real(dp) :: VRRS(15),Q(15)
       character (len=250) FILENAME
       character (len=1) NUMER1
       character (len=2) NUMER2
-      complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),CPOM,DPEV,dP_dT_00URB
+      complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),DPEV,dP_dT_00URB
       real(dp) :: SGRP,SGRM
       real(dp) :: PSIG,TEMI,TEMM,TEM1
       real(dp) :: NORMC
       real(dp) :: QCHECK(15),ETOIEV(15),QWKPT(1000,15),ETOIPT(15),SGR(15)
-      real(dp) :: TT4,TT4P,EFL02   
+      real(dp) :: EFL02   
       real(dp) :: ETOI(15)
       
       !write(*,'(a55,i12,99(1pd26.16))') 'start LINA s% w(2)**2', &
@@ -191,7 +190,7 @@
 
 !     SET ALL NECESSARY DERIVATIVES AND VALUES EQUAL 0
 !     FOR FROZEN-IN APPROXIMATION, OR IN CASE ALFA=0 (RADIATIVE)
-      if(ALFA.eq.0.d0)then
+      if(ALFA==0.d0)then
          do I=1,NZN
             Et(I)=0.d0
             EFL02=0.d0
@@ -231,7 +230,7 @@
       !$OMP PARALLEL DO PRIVATE(I,T1,op_err) SCHEDULE(dynamic,2)
       do 1 I=1,NZN
 
-         if(Et(I).le.EFL02) Et(I)=EFL02
+         if(Et(I)<=EFL02) Et(I)=EFL02
 
          call mesa_eos_kap(s,0, &
               T(I),Vol(I),P(I),DPV(I),dP_dT_00(I), &
@@ -242,7 +241,7 @@
 
          T1=P43/dm(I)
          DVR(I)=3.d0*T1*R(I)**2    
-         if(I.eq.1) goto 2        
+         if(I==1) goto 2        
          DVRM(I)=-3.d0*T1*R(max(1,I-1))**2 
              ! bp: max(1,i-1) to prevent bogus warning from gfortran
          goto 3
@@ -261,7 +260,7 @@
 
 !     SKIP ALL DERIVATIVE CALCULATIONS IN CASE OF FROZEN-IN
 !     APPROXIMATION OR ALFA=0 (RADIATIVE CASE)
-      if(ALFA.eq.0.d0) goto 999
+      if(ALFA==0.d0) goto 999
 
 !     SET E_T (NOW =w) BELOW AND ABOVE BOUNDARIES
       Et(NZN) = 0.d0
@@ -411,8 +410,8 @@
 !       THIS IS FORMULATION USED IN BUDAPEST-FLORIDA CODE
 !       IT REQUIRES E_T AS MAIN VARIABLE - OTHERWISE CONVERGENCE
 !       IS EXTREMELY SLOW, AND POSSIBLE ONLY IF LOW ACCURACY
-!       FOR CONVERGENCE CONDITION, DXXC.LT. 1d-2 - 1.d-4, IS SET
-!        if(SOURCE(I).le.0.d0)then
+!       FOR CONVERGENCE CONDITION, DXXC< 1d-2 - 1.d-4, IS SET
+!        if(SOURCE(I)<=0.d0)then
 !           SOURCE(I) = 0.d0
 !           dsrc_dr_out(I) = 0.d0
 !           dsrc_dr_00(I) = 0.d0
@@ -439,7 +438,7 @@
          d_damp_dw_00(I) =1.5d0*(CEDE/ALFA)/POM2*sqrt(Et(I))
 
 !        RADIATIVE DAMP TERM
-         if(GAMMAR.eq.0.d0)then
+         if(GAMMAR==0.d0)then
             DAMPR(I)   = 0.d0
             d_dampR_dr_out(I) = 0.d0
             d_dampR_dr_00(I) = 0.d0
@@ -523,9 +522,9 @@
          DLCY0(I)=POM*dPII_dT_00(I)+POM2/Vol(I)
          DLCYP(I)=POM*dPII_dT_out(I)+POM2/Vol(I+1)
 
-         if(I.eq.IBOTOM) DLCZ0(I)=0.d0
-         if(I.eq.NZN-1)  DLCZP(I)=0.d0
-         if(Et(I).lt.EFL02*1d-10)then
+         if(I==IBOTOM) DLCZ0(I)=0.d0
+         if(I==NZN-1)  DLCZP(I)=0.d0
+         if(Et(I)<EFL02*1d-10)then
             Lc(I)=0.d0
             DLCX0(I)=0.d0
             DLCXM(I)=0.d0
@@ -536,7 +535,7 @@
             DLCZP(I)=0.d0
          endif
 
-!         if(PII(I).lt.0.d0.or.ALFA.eq.0.d0)then
+!         if(PII(I)<0.d0.or.ALFA==0.d0)then
 !            Lc(I)=0.d0
 !            DLCX0(I)=0.d0
 !            DLCXM(I)=0.d0
@@ -548,7 +547,7 @@
 !         endif
 
 !        TURBULENT LUMINOSITY
-         if(ALFAT.eq.0.d0.or.ALFA.eq.0.d0)then
+         if(ALFAT==0.d0.or.ALFA==0.d0)then
             Lt(I)=0.d0
             DLTX0(I)=0.d0
             DLTXM(I)=0.d0
@@ -580,7 +579,7 @@
 
 !     TURBULENT PRESSURE (ZONE)
       do I=IBOTOM+1,NZN-1
-         if(ALFAP.eq.0.d0)then
+         if(ALFAP==0.d0)then
             PTURB(I) = 0.d0
             dPtrb_dw_00(I) = 0.d0
             dPtrb_dr_00(I) = 0.d0
@@ -596,7 +595,7 @@
 
 !     EDDY VISCOSITY
       do I=IBOTOM+1,NZN-1
-         if(ALFAM.ge.0d0) then
+         if(ALFAM>=0d0) then
 !           Kuhfuss (1986) tensor EDDY VISCOSITY
             POM=16.d0/3.d0*PI*ALFA*ALFAM*sqrt(Et(I))
             POM1=1.d0/Vol(I)**2/dm(I)
@@ -713,7 +712,7 @@
          DFCMYP = DFCYP
          DFCMZ0 = DFCZ0
          DFCMZP = DFCZP
-         if(I.eq.NZN) goto 6
+         if(I==NZN) goto 6
 !        Lr(I)=Eq. A.4, Stellingwerf 1975, Appendix A
 !        CALC LUM(I)
          W_00=T(I)**4
@@ -776,7 +775,7 @@
          EZ10(I) =                             -T4*(     -DFCMZ0)
          EZ00(I) =                  -dC_dw_00(I)  -T4*(DFCZ0-DFCMZP)
          EZ01(I) =                             -T4*(DFCZP       )
-         if(I.eq.1) then
+         if(I==1) then
             EU10(I) =  T3*s% R_center**2
          else
             EU10(I) =  T3*R(max(1,I-1))**2
@@ -807,7 +806,7 @@
          CY01(I) = dC_dT_out(I)  -T4*(DLTYP(I)           )
          CX01(I) = dC_dr_out(I)  -T4*(DLTXP(I)           )
          CZ01(I) =           -T4*(DLTZP(I)           )
-         if(I.eq.1) then
+         if(I==1) then
             CU10(I) =  T3*s% R_center**2
          else
             CU10(I) =  T3*R(max(1,I-1))**2
@@ -817,13 +816,13 @@
 
 !        CALC MOMENTUM EQUATION(I)
          T1=P4*R(I)**2/dm_bar(I)
-         if(ALFAM.ge.0.d0) T4=P4/(dm_bar(I)*R(I))
-         if(ALFAM.lt.0.d0) T4=-T1
+         if(ALFAM>=0.d0) T4=P4/(dm_bar(I)*R(I))
+         if(ALFAM<0.d0) T4=-T1
          MU10(I) =  T4*(-EVUUM(I))
          MZ00(I) = -T1*(-dPtrb_dw_00(I))
          MX10(I) = -T1*(-dP_dr_in(I)-dPtrb_dr_in(I))
          MY00(I) = -T1*(-dP_dT_00(I))
-         if(I.ne.NZN)then
+         if(I/=NZN)then
             MX00(I) =  4.d0*G*M(I)/R(I)**3 &
                       -T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))
             MX01(I) = -T1*(dP_dr_00(I+1)        +dPtrb_dr_00(I+1))
@@ -867,12 +866,12 @@
 ! ENERGY EQ. IN ROWS IE
 ! TURBULENT ENERGY EQ. IN ROWS IC
 ! NAMING SCHEME FOR ELEMENTS OF LLL:
-! EX00(I) - d(energy.eq.)/dR_i
-! EX01(I) - d(energy.eq.)/dR_i+1
-! EX10(I) - d(energy.eq.)/dR_i-1
-! EY00(I) - d(energy.eq.)/dT_i
-! EU00(I) - d(energy.eq.)/dU_i
-! MY00(I) - d(moment.eq.)/dT_i
+! EX00(I) - d(energy==)/dR_i
+! EX01(I) - d(energy==)/dR_i+1
+! EX10(I) - d(energy==)/dR_i-1
+! EY00(I) - d(energy==)/dT_i
+! EU00(I) - d(energy==)/dU_i
+! MY00(I) - d(moment==)/dT_i
 ! e.t.c.
 ! VELOCITY DEF. AND MOMENTUM EQ. AT THE INTERFACE 1....NZN
 ! ENERGY EQUATIONS IN THE ZONE 1....NZN
@@ -884,56 +883,56 @@
          IE=4*I-1
          IC=4*I
 
-         if(IG+1.le.NZN3) LLL(IG,IG+1) = 1.d0
+         if(IG+1<=NZN3) LLL(IG,IG+1) = 1.d0
 !---------------------------------------
-         if(IR-4.ge.1)    LLL(IR,IR-4)  = MU10(I)
+         if(IR-4>=1)    LLL(IR,IR-4)  = MU10(I)
                           LLL(IR,IR)    = MU00(I)
-         if(IR+4.le.NZN3) LLL(IR,IR+4)  = MU01(I)
+         if(IR+4<=NZN3) LLL(IR,IR+4)  = MU01(I)
 
-         if(IR-5.ge.1)    LLL(IR,IR-5)  = MX10(I)
-         if(IR-1.ge.1)    LLL(IR,IR-1)  = MX00(I)
-         if(IR+3.le.NZN3) LLL(IR,IR+3)  = MX01(I)
+         if(IR-5>=1)    LLL(IR,IR-5)  = MX10(I)
+         if(IR-1>=1)    LLL(IR,IR-1)  = MX00(I)
+         if(IR+3<=NZN3) LLL(IR,IR+3)  = MX01(I)
 
-         if(IR+1.le.NZN3) LLL(IR,IR+1)  = MY00(I)
-         if(IR+5.le.NZN3) LLL(IR,IR+5)  = MY01(I)
+         if(IR+1<=NZN3) LLL(IR,IR+1)  = MY00(I)
+         if(IR+5<=NZN3) LLL(IR,IR+5)  = MY01(I)
 
-         if(IR+2.le.NZN3) LLL(IR,IR+2)  = MZ00(I)
-         if(IR+6.le.NZN3) LLL(IR,IR+6)  = MZ01(I)
+         if(IR+2<=NZN3) LLL(IR,IR+2)  = MZ00(I)
+         if(IR+6<=NZN3) LLL(IR,IR+6)  = MZ01(I)
 !---------------------------------------
-         if(IE-5.ge.1)    LLL(IE,IE-5)  = EU10(I)/dE_dT_00(I)
-         if(IE-1.ge.1)    LLL(IE,IE-1)  = EU00(I)/dE_dT_00(I)
+         if(IE-5>=1)    LLL(IE,IE-5)  = EU10(I)/dE_dT_00(I)
+         if(IE-1>=1)    LLL(IE,IE-1)  = EU00(I)/dE_dT_00(I)
 
-         if(IE-10.ge.1)   LLL(IE,IE-10) = EX20(I)/dE_dT_00(I)
-         if(IE-6.ge.1)    LLL(IE,IE-6)  = EX10(I)/dE_dT_00(I)
-         if(IE-2.ge.1)    LLL(IE,IE-2)  = EX00(I)/dE_dT_00(I)
-         if(IE+2.le.NZN3) LLL(IE,IE+2)  = EX01(I)/dE_dT_00(I)
+         if(IE-10>=1)   LLL(IE,IE-10) = EX20(I)/dE_dT_00(I)
+         if(IE-6>=1)    LLL(IE,IE-6)  = EX10(I)/dE_dT_00(I)
+         if(IE-2>=1)    LLL(IE,IE-2)  = EX00(I)/dE_dT_00(I)
+         if(IE+2<=NZN3) LLL(IE,IE+2)  = EX01(I)/dE_dT_00(I)
 
-         if(IE-4.ge.1)    LLL(IE,IE-4)  = EY10(I)/dE_dT_00(I)
+         if(IE-4>=1)    LLL(IE,IE-4)  = EY10(I)/dE_dT_00(I)
                           LLL(IE,IE)    = EY00(I)/dE_dT_00(I)
-         if(IE+4.le.NZN3) LLL(IE,IE+4)  = EY01(I)/dE_dT_00(I)
+         if(IE+4<=NZN3) LLL(IE,IE+4)  = EY01(I)/dE_dT_00(I)
 
-         if(IE-3.ge.1)    LLL(IE,IE-3)  = EZ10(I)/dE_dT_00(I)
-         if(IE+1.le.NZN3) LLL(IE,IE+1)  = EZ00(I)/dE_dT_00(I)
-         if(IE+5.le.NZN3) LLL(IE,IE+5)  = EZ01(I)/dE_dT_00(I)
+         if(IE-3>=1)    LLL(IE,IE-3)  = EZ10(I)/dE_dT_00(I)
+         if(IE+1<=NZN3) LLL(IE,IE+1)  = EZ00(I)/dE_dT_00(I)
+         if(IE+5<=NZN3) LLL(IE,IE+5)  = EZ01(I)/dE_dT_00(I)
 !---------------------------------------
-         if(IC-11.ge.1)   LLL(IC,IC-11) = CX20(I)
-         if(IC-7.ge.1)    LLL(IC,IC-7)  = CX10(I)
-         if(IC-3.ge.1)    LLL(IC,IC-3)  = CX00(I)
-         if(IC+1.le.NZN3) LLL(IC,IC+1)  = CX01(I)
+         if(IC-11>=1)   LLL(IC,IC-11) = CX20(I)
+         if(IC-7>=1)    LLL(IC,IC-7)  = CX10(I)
+         if(IC-3>=1)    LLL(IC,IC-3)  = CX00(I)
+         if(IC+1<=NZN3) LLL(IC,IC+1)  = CX01(I)
   
-         if(IC-6.ge.1)    LLL(IC,IC-6)  = CU10(I) 
-         if(IC-2.ge.1)    LLL(IC,IC-2)  = CU00(I) 
+         if(IC-6>=1)    LLL(IC,IC-6)  = CU10(I) 
+         if(IC-2>=1)    LLL(IC,IC-2)  = CU00(I) 
 
-         if(IC-5.ge.1)    LLL(IC,IC-5)  = CY10(I) 
-         if(IC-1.ge.1)    LLL(IC,IC-1)  = CY00(I) 
-         if(IC+3.le.NZN3) LLL(IC,IC+3)  = CY01(I)
+         if(IC-5>=1)    LLL(IC,IC-5)  = CY10(I) 
+         if(IC-1>=1)    LLL(IC,IC-1)  = CY00(I) 
+         if(IC+3<=NZN3) LLL(IC,IC+3)  = CY01(I)
 
-         if(IC-4.ge.1)    LLL(IC,IC-4)  = CZ10(I) 
+         if(IC-4>=1)    LLL(IC,IC-4)  = CZ10(I) 
                           LLL(IC,IC)    = CZ00(I)
-         if(IC+4.le.NZN3) LLL(IC,IC+4)  = CZ01(I)
+         if(IC+4<=NZN3) LLL(IC,IC+4)  = CZ01(I)
          
          IF (IE+4 <= NZN3) then
-            if(LLL(IE,IE+4).lt.0.d0)then
+            if(LLL(IE,IE+4)<0.d0)then
                !write(*,*) 'rerrrrrrrrrrrrrrrrrrrrrrrr',i
             endif
          endif
@@ -943,9 +942,9 @@
          write(*,*) 'waiting for DGEEV to solve eigenvalue problem....'
       call DGEEV('n','v',NZN3,LLL,LD_LLL,WRx,WIx,VLx,LD_VL,VRx,LD_VR, &
                  WORKx,4*NZN3,INFO)         
-      if(INFO.ne.0)then
+      if(INFO/=0)then
          write(*,*) 'FAILED!'
-         write(*,*) 'LAPACK/DGEEV error, ier= ',INFO
+         write(*,*) 'LAPACK/DGEEV error, ierr= ',INFO
          ierr = -1
          return
          stop
@@ -967,9 +966,9 @@
       IMI=0
       !write(15,'(a)') '     I                R              PERIOD'
       do I=1,NZN3
-!         if(WIx(I).lt.MINI.and.WIx(I).gt.1d-9)then
-         if((WIx(I).lt.MINI) .and.(WIx(I).gt.1.d-9))then
-            if(P4*WRx(I)/WIx(I).gt.-.3d+1)then
+!         if(WIx(I)<MINI.and.WIx(I)>1d-9)then
+         if((WIx(I)<MINI) .and.(WIx(I)>1.d-9))then
+            if(P4*WRx(I)/WIx(I)>-.3d+1)then
                MINI=WIx(I)
                IMI=I
             end if
@@ -986,7 +985,7 @@
 
       do J=1,NMODES
  444     continue
-         if(P4*WRx(IMI+J-1)/WIx(IMI+J-1).lt.-.5d+1)then
+         if(P4*WRx(IMI+J-1)/WIx(IMI+J-1)<-.5d+1)then
             IMI=IMI+1
             goto 444
          endif
@@ -1035,7 +1034,7 @@
 !           DVRC(I,J) IS SCALED dOMEGA/OMEGA EIGENVECTOR OF THE MODE (J)
 !           (dOMEGA_i/OMEGA_i)/(dR_NZN/R_NZN)
             DVRC(I,J)=VRC(I,J)
-            if(NORMC.lt.abs(DVRC(I,J))) NORMC=abs(DVRC(I,J))
+            if(NORMC<abs(DVRC(I,J))) NORMC=abs(DVRC(I,J))
             PHC(I,J)=datan2(aimag(DVRC(I,J)),dble(DVRC(I,J)))
 
 !           VRU(I,J) IS THE dU EIGENVECTOR OF THE MODE J 
@@ -1048,7 +1047,7 @@
             EK(J)=EK(J)+0.5d0*dm_bar(I)*(OMEG(J)*abs(VRR(I,J)*SCALE(J)))**2
 
 !           WORK DONE IN ZONE I (FOR THE MODE J)
-            if(I.eq.1) then
+            if(I==1) then
                DV_0=DVR(I)*VRR(I,J)*SCALE(J)
             else
                DV_0=(DVR(I)*VRR(I,J)+DVRM(I)*VRR(I-1,J))*SCALE(J)
@@ -1056,37 +1055,37 @@
             DP_0=(DPV(I)*DV_0+dP_dT_00(I)*VRT(I,J)*SCALE(J))
 
             DPEV=EVUU0(I)*VRU(I,J)
-            if(I.ge.2)DPEV=DPEV+EVUUM(I)*VRU(I-1,J)
+            if(I>=2)DPEV=DPEV+EVUUM(I)*VRU(I-1,J)
             DPEV=DPEV*SCALE(J)
 
             dP_dT_00URB=dPtrb_dr_00(I)*VRR(I,J)
-            if(I.ge.2) dP_dT_00URB=dP_dT_00URB+dPtrb_dr_in(I)*VRR(I-1,J)
+            if(I>=2) dP_dT_00URB=dP_dT_00URB+dPtrb_dr_in(I)*VRR(I-1,J)
             dP_dT_00URB=dP_dT_00URB+dPtrb_dw_00(I)*VRC(I,J)
             dP_dT_00URB=dP_dT_00URB*SCALE(J)
 
             QWK(I,J)=-PI*dm(I)*aimag(conjg(DP_0)*DV_0) 
-            if(ALFAM.lt.0.d0)QWKEV(I,J)=-PI*dm(I)*aimag(conjg(DPEV)*DV_0) 
+            if(ALFAM<0.d0)QWKEV(I,J)=-PI*dm(I)*aimag(conjg(DPEV)*DV_0) 
             QWKPT(I,J)=-PI*dm(I)*aimag(conjg(dP_dT_00URB)*DV_0) 
-            if(ALFAM.gt.0.d0)then
+            if(ALFAM>0.d0)then
                QWKEV(I,J)=PI*dm(I)*aimag(conjg(DPEV)*(DV_0/R(I)**3- &
                         3.d0*Vol(I)/R(I)**4*VRR(I,J)*SCALE(J)))
             endif
 
-            if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J).ge.0.d0) &
+            if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)>=0.d0) &
               SGRP=SGRP+QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)
-            if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J).lt.0.d0) &
+            if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)<0.d0) &
               SGRM=SGRM+abs(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J))
         
             VEL(I,J)=abs(VRR(I,J))/VRRS(J)
-            if(abs(PHR(I,J)).gt.1.57d0)VEL(I,J)=-VEL(I,J)
+            if(abs(PHR(I,J))>1.57d0)VEL(I,J)=-VEL(I,J)
          enddo
 
 !        WRITE WORK-INTEGRALS INTO FILE
-         if(J.le.9)then
+         if(J<=9)then
             write(NUMER1,'(I1)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER1//'.data'
          endif
-         if(J.ge.10)then
+         if(J>=10)then
             write(NUMER2,'(I2)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_work'//NUMER2//'.data'
          endif
@@ -1118,8 +1117,8 @@
             VRL(I,J)= ELT(I)*VRT(I,J) &
                      +ELR(I)*VRR(I,J) &
                      +ELZ0(I)*VRC(I,J)
-            if(I.ne.1)   VRL(I,J)=VRL(I,J)+ELRM(I)*VRR(I-1,J)
-            if(I.ne.NZN) VRL(I,J)=VRL(I,J)+ELTP(I)*VRT(I+1,J) &
+            if(I/=1)   VRL(I,J)=VRL(I,J)+ELRM(I)*VRR(I-1,J)
+            if(I/=NZN) VRL(I,J)=VRL(I,J)+ELTP(I)*VRT(I+1,J) &
                                           +ELRP(I)*VRR(I+1,J) &
                                           +ELZP(I)*VRC(I+1,J)
 !           DVRL(I,J) IS SCALED dL/L EIGENVECTOR OF THE MODE (J)
@@ -1129,11 +1128,11 @@
          enddo
 
 !        WRITE EIGENVECTORS TO FILE
-         if(J.le.9)then
+         if(J<=9)then
             write(NUMER1,'(I1)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER1//'.data'
          endif
-         if(J.ge.10)then
+         if(J>=10)then
             write(NUMER2,'(I2)') J
             FILENAME=trim(s% log_directory) // '/' // 'LINA_eigen'//NUMER2//'.data'
          endif
@@ -1234,7 +1233,7 @@
       L=N/2+1
       IR=N
 10    continue
-        if(L.gt.1)then
+        if(L>1)then
            L=L-1
            RRA=RA(L)
            RRB=RB(L)
@@ -1247,7 +1246,7 @@
            RB(IR)=RB(1)
            ISORT(IR)=ISORT(1)
            IR=IR-1
-           if(IR.eq.1)then
+           if(IR==1)then
               RA(1)=RRA
               RB(1)=RRB
               ISORT(1)=RRI
@@ -1256,11 +1255,11 @@
         endif
         I=L
         J=L+L
- 20     if(J.le.IR)then
-           if(J.lt.IR)then
-              if(RA(J).lt.RA(J+1))J=J+1
+ 20     if(J<=IR)then
+           if(J<IR)then
+              if(RA(J)<RA(J+1))J=J+1
            endif
-           if(RRA.lt.RA(J))then
+           if(RRA<RA(J))then
               RA(I)=RA(J)
               RB(I)=RB(J)
               ISORT(I)=ISORT(J)
