@@ -335,12 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-if [ ! -r data/colors_data ]
-then
-	do_input_data colors
-fi
-do_one_parallel colors
-
 if [ ! -r data/kap_data ]
 then
 	do_input_data kap
