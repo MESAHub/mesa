@@ -272,6 +272,10 @@
       dkapz1=quad(is,iw,zzl,dkapdtr(m1),dkapdtr(m2),dkapdtr(m3),zza(m1),zza(m2),zza(m3))
       dkapz3=quad(is,iw,zzl,dkapdrt(m1),dkapdrt(m2),dkapdrt(m3),zza(m1),zza(m2),zza(m3))
       if (mfm == m3) then
+        if (kapz1 .le. 0) then
+          write(*,*) kapz1,kapz(m1),kapz(m2),kapz(m3),zza(m1),zza(m2),zza(m3),z,zza(mz)
+          call mesa_error(__FILE__,__LINE__)
+        end if
         opact=log10(kapz1)   ! converts K to logK
         dopact=dkapz1
         dopacr=dkapz3
