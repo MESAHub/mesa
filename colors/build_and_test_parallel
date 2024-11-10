@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-../utils/build_and_test_parallel
