@@ -1,3 +1,0 @@
-#!/bin/bash
-
-../utils/build_and_test_parallel
