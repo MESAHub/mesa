@@ -949,11 +949,11 @@
                case default
                   j1 = i; j2 = i
                   name_loop: do
-                     if (i+1 > n) exit
-                     if (buffer(i+1:i+1) == ' ') exit
-                     if (buffer(i+1:i+1) == '(') exit
-                     if (buffer(i+1:i+1) == ')') exit
-                     if (buffer(i+1:i+1) == ',') exit
+                     if (i+1 > n) exit name_loop
+                     if (buffer(i+1:i+1) == ' ') exit name_loop
+                     if (buffer(i+1:i+1) == '(') exit name_loop
+                     if (buffer(i+1:i+1) == ')') exit name_loop
+                     if (buffer(i+1:i+1) == ',') exit name_loop
                      i = i+1
                      j2 = i
                   end do name_loop

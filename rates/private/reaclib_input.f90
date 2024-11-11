@@ -322,7 +322,7 @@
                l = get_nuclide_index_in_set(reaclib% species(j,i),set)
                if (l == nuclide_not_found) then
                   include_this_rate = .false.
-                  exit
+                  exit loop_over_nuclides
                else
                   pspecies(j) = l
                end if
@@ -369,7 +369,7 @@
                         write(*,*) 'failed to find', indx
                         call mesa_error(__FILE__,__LINE__)
                      end if
-                     cycle
+                     cycle loop_over_rates
                   end if
                end if
                count = count + 1

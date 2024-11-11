@@ -5,5 +5,5 @@
       
       call Do_One(.true.)
 
-      end   
+      end program test_kap_quietly
 

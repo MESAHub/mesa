@@ -177,7 +177,7 @@
             if (init_m > 1) s% mesh_delta_coeff = 0.8d0
             if (init_m > 80) s% mesh_delta_coeff = 1
             
-            if (init_m > exp10(mhi)) exit
+            if (init_m > exp10(mhi)) exit mass_loop
             do j=1, 10
                write(*, *)
             end do
@@ -196,13 +196,13 @@
                s% job% initial_zfracs, &
                s% job% dump_missing_metals_into_heaviest, &
                .false., '', s% job% pre_ms_relax_num_steps, ierr)
-            if (failed('star_create_pre_ms_model')) exit
+            if (failed('star_create_pre_ms_model')) exit mass_loop
             
             call evolve_to_zams(s, id, ierr)
-            if (failed('evolve_to_zams')) exit 
+            if (failed('evolve_to_zams')) exit mass_loop
 
             call write_model(id, io_ms_mod, io_ms_index, ierr)             
-            if (failed('write_model')) exit  
+            if (failed('write_model')) exit mass_loop
 
          end do mass_loop
          
