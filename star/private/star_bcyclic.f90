@@ -141,13 +141,13 @@
                return
             end if
 
-            if (nstemp == 1) exit
+            if (nstemp == 1) exit factor_cycle
 
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit factor_cycle
 
          end do factor_cycle
          !call cali_end_phase('factor_cycle')
@@ -745,13 +745,13 @@
                return
             end if
 
-            if (nstemp == 1) exit
+            if (nstemp == 1) exit forward_cycle
 
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit forward_cycle
 
          end do forward_cycle
 
@@ -777,7 +777,7 @@
             nlevel = nlevel-1
             if (nlevel < 1) then
                ierr = -1
-               exit
+               exit back_cycle
             end if
             nstemp = nslevel(nlevel)
             call cycle_solve( &

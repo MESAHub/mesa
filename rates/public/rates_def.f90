@@ -954,7 +954,7 @@
          
       reaction_loop: do
             t = token(iounit, n, i, buffer, string)
-            if (t == eof_token) exit
+            if (t == eof_token) exit reaction_loop
             if (t /= name_token) then
                call error; return
             end if

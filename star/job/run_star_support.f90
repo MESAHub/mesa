@@ -208,7 +208,7 @@
             if (stop_is_requested(s)) then
                continue_evolve_loop = .false.
                result = terminate
-               exit
+               exit step_loop
             end if
          
             result = star_evolve_step(id, first_try)

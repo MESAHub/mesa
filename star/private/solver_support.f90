@@ -406,7 +406,7 @@
                    j == skip3 .or. &
                    j == skip4 .or. &
                    j == skip5 .or. &
-                   j == s% i_alpha_RTI) cycle
+                   j == s% i_alpha_RTI) cycle var_loop
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
                      found_bad_num = .true.
@@ -423,11 +423,11 @@
                      max_var = j
                      exit cell_loop
                      
-                     cycle
+                     cycle var_loop
                   end if
                end if
                if (j > nvar_hydro) then
-                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle
+                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle var_loop
                end if
 
                abs_corr = abs(B(j,k)*s% correction_weight(j,k))

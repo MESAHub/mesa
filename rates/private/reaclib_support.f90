@@ -205,7 +205,7 @@
                rates% inverse_coefficients(:,i) = (/-huge(1d0), 0d0/)
                rates% inverse_exp(i) = 0d0
                rates% inverse_part(:,i) = 1d0
-               cycle
+               cycle loop_over_rates
             end if
             Ni = Nin(rates% chapter(i))
             No = Nout(rates% chapter(i))

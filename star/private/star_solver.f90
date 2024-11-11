@@ -827,7 +827,7 @@
                      ! need this to rescue create pre-main-sequence model in some nasty cases.
                      alam = max(alam/10, min_corr_coeff)
                      ierr = 0
-                     cycle
+                     cycle search_loop
                   end if
                   write(err_msg,*) 'adjust_correction failed in eval_equations'
                   if (dbg_msg .or. dbg_adjust) &
@@ -856,7 +856,7 @@
                   if (alam > min_corr_coeff) then
                      alam = max(alam/10, min_corr_coeff)
                      ierr = 0
-                     cycle
+                     cycle search_loop
                   end if
                   err_msg = 'equ norm is NaN or other bad num'
                   ierr = -1

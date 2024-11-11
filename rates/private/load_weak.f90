@@ -516,7 +516,7 @@
 
         rate_loop: do
            t = token(iounit, n, i, buffer, rate_name)
-           if (t == eof_token) exit
+           if (t == eof_token) exit rate_loop
            if (t /= name_token) then
               call error; return
            end if
