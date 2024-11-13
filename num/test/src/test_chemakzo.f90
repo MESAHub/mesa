@@ -40,7 +40,7 @@
       end subroutine chemakzo_jacob
 
 
-      subroutine chemakzo_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)  
+      subroutine chemakzo_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)
          ! sparse jacobian. format either compressed row or compressed column.
          use mtx_lib,only:dense_to_row_sparse_with_diag,dense_to_col_sparse_with_diag
          use test_int_support,only:ipar_sparse_format
@@ -73,7 +73,7 @@
          ! x is the current x value; xold is the previous x value.
          ! y is the current y value.
          ! irtrn negative means terminate integration.
-         ! rwork and iwork hold info for 
+         ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
          real(dp), intent(inout) :: y(:) ! (n)
@@ -114,7 +114,7 @@
             end do
             write(*,*)
          end if
-         
+
       end subroutine chemakzo_solout
 
 
@@ -144,8 +144,8 @@
             am(1,i) = 0
          end do
       end subroutine chemakzo_mas_full
-      
-      
+
+
       subroutine do_test_chemakzo(which_solver,which_decsol,m_band,numerical_jacobian,show_all,quiet)
          use test_support,only:show_results,show_statistics,check_results
          use test_int_support,only:do_test_stiff_int
@@ -160,47 +160,47 @@
          integer, parameter :: ndisc = 0
          real(dp) :: h0, t(0:ndisc+1), atol(1), rtol(1)
          integer :: mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
-         real(dp), target :: rpar_ary(lrpar) 
+         real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar, nz
          real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
          real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
-         
+
          nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
          caller_id = 0
          nvar = 0
          nz = 0
-                  
+
          rpar => rpar_ary
          ipar => ipar_ary
          y => y_ary
-            
+
          if (.not. quiet) write(*,*) 'chemakzo'
-         
+
          t(0)   = 0
          t(1)   = 180d0
-         
+
          itol = 0 ! scalar tolerances
          rtol(1) = 1d-8
          atol(1) = 1d-8
          h0 = 1d-10 ! initial step size
-         
+
          mljac = n ! square matrix
          mujac = n
          matrix_type_spec = square_matrix_type
 
          imas = 1
          m1 = 0
-         m2 = 0     
-         
+         m2 = 0
+
          call chemakzo_init(n,y,yprime,consis)
-         nstep=0   
+         nstep=0
          if (m_band) then
             write(*,*) 'M banded'
             ! mass matrix is diagonal
-            mlmas = 0 
+            mlmas = 0
             mumas = 0
             call do_test_stiff_int(which_solver,which_decsol,numerical_jacobian, &
                chemakzo_derivs,chemakzo_jacob,chemakzo_sjac,chemakzo_solout,iout, &
@@ -210,8 +210,8 @@
                t,rtol,atol,itol,h0,y,nstep,lrpar,rpar,lipar,ipar,quiet,ierr)
          else
             write(*,*) 'M full'
-            mlmas = n 
-            mumas = n 
+            mlmas = n
+            mumas = n
             call do_test_stiff_int(which_solver,which_decsol,numerical_jacobian, &
                chemakzo_derivs,chemakzo_jacob,chemakzo_sjac,chemakzo_solout,iout, &
                null_fcn_blk_dble,null_jac_blk_dble, &
@@ -223,19 +223,19 @@
             write(*,*) 'chemakzo ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call chemakzo_solut(n,0d0,yexact)
          call check_results(n,y,yexact,rtol(1)*10,ierr)
          if (ierr /= 0) then
             write(*,*) 'check results ierr', ierr
             call mesa_error(__FILE__,__LINE__) ! do_test_vdpol
          end if
-         
+
          if (quiet) return
 
          call show_results(n,y,yexact,show_all)
          call show_statistics(ipar(i_nfcn),ipar(i_njac),nstep,show_all)
 
       end subroutine do_test_chemakzo
-     
+
       end module test_chemakzo

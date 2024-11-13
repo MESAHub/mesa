@@ -195,7 +195,7 @@
       integer, parameter :: h_log_avg_abs_v = h_avg_abs_v + 1
       integer, parameter :: h_max_abs_v = h_log_avg_abs_v + 1
       integer, parameter :: h_log_max_abs_v = h_max_abs_v + 1
-      
+
       integer, parameter :: h_total_internal_energy_after_adjust_mass = h_log_max_abs_v + 1
       integer, parameter :: h_total_gravitational_energy_after_adjust_mass = &
          h_total_internal_energy_after_adjust_mass + 1
@@ -222,7 +222,7 @@
       integer, parameter :: h_log_total_radial_kinetic_energy = h_log_total_turbulent_energy + 1
       integer, parameter :: h_log_total_rotational_kinetic_energy = h_log_total_radial_kinetic_energy + 1
       integer, parameter :: h_log_total_energy = h_log_total_rotational_kinetic_energy + 1
-      
+
       integer, parameter :: h_total_IE_div_IE_plus_KE = h_log_total_energy + 1
 
       integer, parameter :: h_total_entropy = h_total_IE_div_IE_plus_KE + 1
@@ -277,13 +277,13 @@
       integer, parameter :: h_log_LHe = h_log_LH + 1
       integer, parameter :: h_power_photo = h_log_LHe + 1
       integer, parameter :: h_Lnuc_photo = h_power_photo + 1
-      
+
       integer, parameter :: h_Lsurf_m = h_Lnuc_photo + 1
       integer, parameter :: h_luminosity_ergs_s = h_Lsurf_m + 1
       integer, parameter :: h_log_L_ergs_s = h_luminosity_ergs_s + 1
       integer, parameter :: h_luminosity = h_log_L_ergs_s + 1
       integer, parameter :: h_log_L = h_luminosity + 1
-      
+
       integer, parameter :: h_power_z_burn = h_log_L + 1
       integer, parameter :: h_log_LZ = h_power_z_burn + 1
 
@@ -312,7 +312,7 @@
       integer, parameter :: h_avg_skipped_setvars_per_step = h_logQ_min + 1
       integer, parameter :: h_avg_setvars_per_step = h_avg_skipped_setvars_per_step + 1
       integer, parameter :: h_avg_solver_setvars_per_step = h_avg_setvars_per_step + 1
-      
+
       integer, parameter :: h_num_retries = h_avg_solver_setvars_per_step + 1
       integer, parameter :: h_h1_czb_mass = h_num_retries + 1
       integer, parameter :: h_surf_c12_minus_o16 = h_h1_czb_mass + 1
@@ -499,14 +499,14 @@
 
       integer, parameter :: h_min_t_eddy = h_log_total_angular_momentum + 1
       integer, parameter :: h_elapsed_time = h_min_t_eddy + 1
-      
+
       integer, parameter :: h_num_hydro_merges = h_elapsed_time + 1
       integer, parameter :: h_num_hydro_splits = h_num_hydro_merges + 1
-      
+
       integer, parameter :: h_RSP_DeltaR = h_num_hydro_splits + 1
       integer, parameter :: h_RSP_DeltaMag = h_RSP_DeltaR + 1
       integer, parameter :: h_RSP_GREKM = h_RSP_DeltaMag + 1
-      
+
       integer, parameter :: h_rsp_phase = h_RSP_GREKM + 1
       integer, parameter :: h_rsp_period_in_days = h_rsp_phase + 1
       integer, parameter :: h_rsp_num_periods = h_rsp_period_in_days + 1
@@ -515,7 +515,7 @@
       integer, parameter :: h_total_num_solver_calls_made = h_total_num_solver_iterations + 1
       integer, parameter :: h_total_num_solver_calls_converged = h_total_num_solver_calls_made + 1
       integer, parameter :: h_total_num_solver_calls_failed = h_total_num_solver_calls_converged + 1
-      
+
       integer, parameter :: h_total_num_solver_relax_iterations = h_total_num_solver_calls_failed + 1
       integer, parameter :: h_total_num_solver_relax_calls_made = h_total_num_solver_relax_iterations + 1
       integer, parameter :: h_total_num_solver_relax_calls_converged = h_total_num_solver_relax_calls_made + 1
@@ -526,20 +526,20 @@
       integer, parameter :: h_total_step_redos = h_total_step_retries + 1
       integer, parameter :: h_total_steps_taken = h_total_step_redos + 1
       integer, parameter :: h_total_steps_finished = h_total_steps_taken + 1
-      
+
       integer, parameter :: h_total_relax_step_attempts = h_total_steps_finished + 1
       integer, parameter :: h_total_relax_step_retries = h_total_relax_step_attempts + 1
       integer, parameter :: h_total_relax_step_redos = h_total_relax_step_retries + 1
       integer, parameter :: h_total_relax_steps_taken = h_total_relax_step_redos + 1
       integer, parameter :: h_total_relax_steps_finished = h_total_relax_steps_taken + 1
-      
+
       integer, parameter :: h_avg_num_solver_iters = h_total_relax_steps_finished + 1
       integer, parameter :: h_num_solver_iterations = h_avg_num_solver_iters + 1
       integer, parameter :: h_num_iters = h_num_solver_iterations + 1
 
       integer, parameter :: h_photosphere_cell_density = h_num_iters + 1
       integer, parameter :: h_photosphere_cell_log_density = h_photosphere_cell_density + 1
-      
+
       integer, parameter :: h_photosphere_cell_log_opacity = h_photosphere_cell_log_density + 1
       integer, parameter :: h_photosphere_cell_opacity = h_photosphere_cell_log_opacity + 1
 
@@ -570,7 +570,7 @@
 
       integer, parameter :: h_min_opacity = h_photosphere_r + 1
       integer, parameter :: h_log_min_opacity = h_min_opacity + 1
-      
+
       integer, parameter :: h_delta_nu = h_log_min_opacity + 1
       integer, parameter :: h_delta_Pg = h_delta_nu + 1
       integer, parameter :: h_nu_max = h_delta_Pg + 1
@@ -627,7 +627,7 @@
       integer, parameter :: h_tot_Et = h_log_tot_PE + 1
       integer, parameter :: h_log_tot_Et = h_tot_Et + 1
 
-      integer, parameter :: h_tot_IE_div_IE_plus_KE = h_log_tot_Et + 1      
+      integer, parameter :: h_tot_IE_div_IE_plus_KE = h_log_tot_Et + 1
 
       integer, parameter :: h_burn_solver_maxsteps = h_tot_IE_div_IE_plus_KE + 1
       integer, parameter :: h_rotation_solver_steps = h_burn_solver_maxsteps + 1
@@ -802,20 +802,20 @@
          history_column_name(h_log_dt_sec) = 'log_dt_sec'
          history_column_name(h_time_step_days) = 'time_step_days'
          history_column_name(h_log_dt_days) = 'log_dt_days'
-         
+
 
          history_column_name(h_power_h_burn) = 'power_h_burn'
          history_column_name(h_log_LH) = 'log_LH'
-         
+
          history_column_name(h_power_he_burn) = 'power_he_burn'
          history_column_name(h_log_LHe) = 'log_LHe'
-         
+
          history_column_name(h_power_photo) = 'power_photo'
          history_column_name(h_Lnuc_photo) = 'Lnuc_photo'
-         
+
          history_column_name(h_power_z_burn) = 'power_z_burn'
          history_column_name(h_log_LZ) = 'log_LZ'
-         
+
          history_column_name(h_luminosity) = 'luminosity'
          history_column_name(h_Lsurf_m) = 'Lsurf_m'
          history_column_name(h_log_L) = 'log_L'
@@ -881,14 +881,14 @@
 
          history_column_name(h_cumulative_energy_error) = 'cumulative_energy_error'
          history_column_name(h_rel_cumulative_energy_error) = 'rel_cumulative_energy_error'
-         
+
          history_column_name(h_abs_rel_E_err) = 'abs_rel_E_err'
          history_column_name(h_log_rel_E_err) = 'log_rel_E_err'
-         
+
          history_column_name(h_tot_E_equ_err) = 'tot_E_equ_err'
          history_column_name(h_tot_E_err) = 'tot_E_err'
          history_column_name(h_rel_E_err) = 'rel_E_err'
-         
+
          history_column_name(h_rel_run_E_err) = 'rel_run_E_err'
          history_column_name(h_log_rel_run_E_err) = 'log_rel_run_E_err'
          history_column_name(h_log_rel_cumulative_energy_error) = 'log_rel_cumulative_energy_error'
@@ -932,7 +932,7 @@
          history_column_name(h_RSP_DeltaR) = 'rsp_DeltaR'
          history_column_name(h_RSP_DeltaMag) = 'rsp_DeltaMag'
          history_column_name(h_RSP_GREKM) = 'rsp_GREKM'
-         
+
          history_column_name(h_rsp_phase) = 'rsp_phase'
          history_column_name(h_rsp_period_in_days) = 'rsp_period_in_days'
          history_column_name(h_rsp_num_periods) = 'rsp_num_periods'
@@ -953,7 +953,7 @@
          history_column_name(h_total_step_redos) = 'total_step_redos'
          history_column_name(h_total_steps_taken) = 'total_steps_taken'
          history_column_name(h_total_steps_finished) = 'total_steps_finished'
-      
+
          history_column_name(h_total_relax_step_attempts) = 'total_relax_step_attempts'
          history_column_name(h_total_relax_step_retries) = 'total_relax_step_retries'
          history_column_name(h_total_relax_step_redos) = 'total_relax_step_redos'
@@ -967,13 +967,13 @@
          history_column_name(h_avg_skipped_setvars_per_step) = 'avg_skipped_setvars_per_step'
          history_column_name(h_avg_setvars_per_step) = 'avg_setvars_per_step'
          history_column_name(h_avg_solver_setvars_per_step) = 'avg_solver_setvars_per_step'
-         
+
          history_column_name(h_num_retries) = 'num_retries'
 
          history_column_name(h_total_num_solver_iterations) = 'total_num_solver_iterations'
-         
-         
-         
+
+
+
          history_column_name(h_h1_czb_mass) = 'h1_czb_mass'
          history_column_name(h_surf_c12_minus_o16) = 'surf_c12_minus_o16'
          history_column_name(h_surf_num_c12_div_num_o16) = 'surf_num_c12_div_num_o16'
@@ -1203,7 +1203,7 @@
 
          history_column_name(h_photosphere_cell_log_density) = 'photosphere_cell_log_density'
          history_column_name(h_photosphere_cell_density) = 'photosphere_cell_density'
-         
+
          history_column_name(h_photosphere_cell_log_opacity) = 'photosphere_cell_log_opacity'
          history_column_name(h_photosphere_cell_opacity) = 'photosphere_cell_opacity'
 
@@ -1304,14 +1304,14 @@
 
          history_column_name(h_grav_dark_L_polar) = 'grav_dark_L_polar'
          history_column_name(h_grav_dark_Teff_polar) = 'grav_dark_Teff_polar'
-         
+
          history_column_name(h_grav_dark_L_equatorial) = 'grav_dark_L_equatorial'
          history_column_name(h_grav_dark_Teff_equatorial) = 'grav_dark_Teff_equatorial'
 
          history_column_name(h_apsidal_constant_k2) = 'apsidal_constant_k2'
 
          history_column_name(h_phase_of_evolution) = 'phase_of_evolution'
-         
+
 ! items corresponding to names on terminal output lines
          history_column_name(h_lg_Lnuc) = 'lg_Lnuc'
          history_column_name(h_H_rich) = 'H_rich'
@@ -1338,7 +1338,7 @@
          history_column_name(h_C_cntr) = 'C_cntr'
          history_column_name(h_retries) = 'retries'
          history_column_name(h_TDC_num_cells) = 'TDC_num_cells'
-         
+
          cnt = 0
          do i=1,h_col_id_max
             if (len_trim(history_column_name(i)) == 0) then

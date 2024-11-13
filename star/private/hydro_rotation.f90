@@ -63,7 +63,7 @@
             end if
          else
             ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly 
+            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
             ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
             wr = max_w
             rphi_lim1 = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
@@ -81,7 +81,7 @@
          wr_high = wr
          wr_low = 0
          do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low) 
+            wr = 0.5d0*(wr_high+wr_low)
             new_dimless_rphi = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
             if (dimless_rphi > new_dimless_rphi) then
                wr_low = wr
@@ -96,7 +96,7 @@
          end if
 
       end function w_div_w_roche_omega
-      
+
       ! compute w_div_w_roche for a known specific angular momentum jrot, rphi, and Mphi
       real(dp) function w_div_w_roche_jrot(rphi,Mphi,jrot,cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
          real(dp), intent(in) :: rphi,Mphi,jrot,cgrav, max_w, max_w2
@@ -126,7 +126,7 @@
             end if
          else
             ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly 
+            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
             ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
             wr = max_w
             A = 1d0-0.1076d0*pow4(wr)-0.2336d0*pow6(wr)-0.5583d0*log(1d0-pow4(wr))
@@ -147,7 +147,7 @@
          wr_high = wr
          wr_low = 0
          do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low) 
+            wr = 0.5d0*(wr_high+wr_low)
             w2 = pow2(wr)
             w4 = pow4(wr)
             w6 = pow6(wr)
@@ -201,7 +201,7 @@
             re = r*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
             B = (1d0+w2/5d0-0.2735d0*w4-0.4327d0*w6-3d0/2d0*0.5583d0*lg_one_sub_w4)
             A = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-            
+
             ir =  two_thirds*pow2(re)*B/A
 
             i_rot = 0d0
@@ -345,7 +345,7 @@
 
          ierr = 0
          nz = s% nz
-         
+
          allocate(am_nu(nz), am_sig(nz))
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
@@ -527,7 +527,7 @@
             s% logRho_avg_surf = 0
             return
          end if
-         
+
          ierr = 0
          call set_rotation_info(s,.true.,ierr)
          if (ierr /= 0) then

@@ -24,17 +24,17 @@
 ! ***********************************************************************
 
       module binary_ctrls_io
-      
+
       use const_def
       use binary_def
 
       implicit none
-      
-      include "binary_controls.inc"      
-      
+
+      include "binary_controls.inc"
+
       logical, dimension(max_extra_inlists) :: read_extra_binary_controls_inlist
       character (len=strlen), dimension(max_extra_inlists) :: extra_binary_controls_inlist_name
-      
+
       namelist /binary_controls/ &
          ! specifications for starting model
          m1, &
@@ -82,12 +82,12 @@
          varcontrol_ms, &
          varcontrol_post_ms, &
          dt_reduction_factor_for_j, &
-         
+
          ! when to stop
          accretor_overflow_terminate, &
          terminate_if_initial_overflow, &
          terminate_if_L2_overflow, &
-             
+
          ! mass transfer controls
          mass_transfer_alpha, &
          mass_transfer_beta, &
@@ -161,7 +161,7 @@
          do_initial_orbit_sync_1, &
          do_initial_orbit_sync_2, &
          tidal_reduction, &
-         
+
          ! eccentricity controls
          do_tidal_circ, &
          circ_type_1, &
@@ -198,7 +198,7 @@
          CE_energy_factor_HeIII_toHeII, &
          CE_energy_factor_H2, &
          CE_fixed_lambda, &
-         
+
          ! miscellaneous controls
          keep_donor_fixed, &
          mdot_limit_donor_switch, &
@@ -233,8 +233,8 @@
          read_extra_binary_controls_inlist, extra_binary_controls_inlist_name
 
       contains
-      
-      
+
+
       subroutine do_one_binary_setup(b, inlist, ierr)
          use utils_lib
          type (binary_info), pointer :: b
@@ -264,12 +264,12 @@
          type (binary_info), pointer :: b
          character(*), intent(in) :: filename
          integer, intent(out) :: ierr
-         
+
          call read_binary_controls_file(b, filename, 1, ierr)
-         
+
       end subroutine read_binary_controls
-         
-         
+
+
       recursive subroutine read_binary_controls_file(b, filename, level, ierr)
          use utils_lib
          character(*), intent(in) :: filename
@@ -279,9 +279,9 @@
          logical, dimension(max_extra_inlists) :: read_extra
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
-         
-         ierr = 0        
-         
+
+         ierr = 0
+
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra binary controls inlist files'
             ierr = -1
@@ -294,40 +294,40 @@
                write(*, *) 'Failed to open binary control namelist file ', trim(filename)
                return
             end if
-            read(unit, nml=binary_controls, iostat=ierr)  
+            read(unit, nml=binary_controls, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
-               write(*, *) 
-               write(*, *) 
-               write(*, *) 
-               write(*, *) 
+               write(*, *)
+               write(*, *)
+               write(*, *)
+               write(*, *)
                write(*, '(a)') &
                   'Failed while trying to read binary control namelist file: ' // trim(filename)
                write(*, '(a)') &
                   'Perhaps the following runtime error message will help you find the problem.'
-               write(*, *) 
+               write(*, *)
                open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=binary_controls)
                close(unit)
                return
             end if
          end if
-         
+
          call store_binary_controls(b, ierr)
-         
+
          ! recursive calls to read other inlists
          do i=1, max_extra_inlists
             read_extra(i) = read_extra_binary_controls_inlist(i)
             read_extra_binary_controls_inlist(i) = .false.
             extra(i) = extra_binary_controls_inlist_name(i)
             extra_binary_controls_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read_binary_controls_file(b, extra(i), level+1, ierr)
                if (ierr /= 0) return
             end if
          end do
-         
+
       end subroutine read_binary_controls_file
 
 
@@ -340,9 +340,9 @@
          use utils_lib, only: mkdir
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr
-         
+
          ierr = 0
-         
+
          ! specifications for starting model
          b% m1 = m1
          b% m2 = m2
@@ -470,7 +470,7 @@
          b% do_initial_orbit_sync_1 = do_initial_orbit_sync_1
          b% do_initial_orbit_sync_2 = do_initial_orbit_sync_2
          b% tidal_reduction = tidal_reduction
-         
+
          ! eccentricity controls
          b% do_tidal_circ = do_tidal_circ
          b% circ_type_1 = circ_type_1
@@ -507,7 +507,7 @@
          b% CE_energy_factor_HeIII_toHeII = CE_energy_factor_HeIII_toHeII
          b% CE_energy_factor_H2 = CE_energy_factor_H2
          b% CE_fixed_lambda = CE_fixed_lambda
-         
+
          ! miscellaneous controls
          b% keep_donor_fixed = keep_donor_fixed
          b% mdot_limit_donor_switch = mdot_limit_donor_switch
@@ -538,14 +538,14 @@
          b% x_integer_ctrl = x_integer_ctrl
          b% x_logical_ctrl = x_logical_ctrl
          b% x_character_ctrl = x_character_ctrl
-         
+
       end subroutine store_binary_controls
 
 
       subroutine set_binary_controls_for_writing(b, ierr)
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr
-         
+
          ierr = 0
 
          ! specifications for starting model
@@ -668,7 +668,7 @@
          do_initial_orbit_sync_1 = b% do_initial_orbit_sync_1
          do_initial_orbit_sync_2 = b% do_initial_orbit_sync_2
          tidal_reduction = b% tidal_reduction
-         
+
          ! eccentricity controls
          do_tidal_circ = b% do_tidal_circ
          circ_type_1 = b% circ_type_1
@@ -701,7 +701,7 @@
          CE_terminate_when_core_overflows = b% CE_terminate_when_core_overflows
          CE_min_period_in_minutes = b% CE_min_period_in_minutes
          CE_fixed_lambda = b% CE_fixed_lambda
-         
+
          ! miscellaneous controls
          keep_donor_fixed = b% keep_donor_fixed
          mdot_limit_donor_switch = b% mdot_limit_donor_switch
@@ -727,18 +727,18 @@
          use_other_CE_rlo_mdot = b% use_other_CE_rlo_mdot
          use_other_CE_binary_evolve_step = b% use_other_CE_binary_evolve_step
          use_other_CE_binary_finish_step = b% use_other_CE_binary_finish_step
-         
+
          x_ctrl = b% x_ctrl
          x_integer_ctrl = b% x_integer_ctrl
          x_logical_ctrl = b% x_logical_ctrl
          x_character_ctrl = b% x_character_ctrl
 
       end subroutine set_binary_controls_for_writing
-      
+
       subroutine write_binary_controls(io,ierr)
          integer, intent(in) :: io
          integer, intent(out) :: ierr
-         write(io, nml=binary_controls, iostat=ierr)  
+         write(io, nml=binary_controls, iostat=ierr)
       end subroutine write_binary_controls
 
 
@@ -748,26 +748,26 @@
          character(len=*),intent(in) :: name
          character(len=*), intent(out) :: val
          integer, intent(out) :: ierr
-   
+
          character(len(name)) :: upper_name
          character(len=512) :: str
          integer :: iounit,iostat,ind,i
-   
-   
+
+
          ! First save current controls
          call set_binary_controls_for_writing(b, ierr)
          if(ierr/=0) return
-   
+
          ! Write namelist to temporay file
          open(newunit=iounit,status='scratch')
          write(iounit,nml=binary_controls)
          rewind(iounit)
-   
+
          ! Namelists get written in captials
          upper_name = StrUpCase(name)
          val = ''
          ! Search for name inside namelist
-         do 
+         do
             read(iounit,'(A)',iostat=iostat) str
             ind = index(str,trim(upper_name))
             if( ind /= 0 ) then
@@ -778,34 +778,34 @@
                exit
             end if
             if(is_iostat_end(iostat)) exit
-         end do   
-   
+         end do
+
          if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
-   
+
          close(iounit)
-   
+
       end subroutine get_binary_control
-   
+
       subroutine set_binary_control(b, name, val, ierr)
          type (binary_info), pointer :: b
          character(len=*), intent(in) :: name, val
          character(len=len(name)+len(val)+19) :: tmp
          integer, intent(out) :: ierr
-   
+
          ! First save current controls
          call set_binary_controls_for_writing(b, ierr)
          if(ierr/=0) return
-   
+
          tmp=''
          tmp = '&binary_controls '//trim(name)//'='//trim(val)//' /'
-   
+
          ! Load into namelist
          read(tmp, nml=binary_controls)
-   
+
          ! Add to star
          call store_binary_controls(b, ierr)
          if(ierr/=0) return
-   
+
       end subroutine set_binary_control
 
       end module binary_ctrls_io

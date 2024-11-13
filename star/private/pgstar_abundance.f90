@@ -174,7 +174,7 @@
             end if
 
             num_labels = max(0,min(max_num_labels, s% pg% num_abundance_line_labels))
-            
+
             iloc_abundance_label = -HUGE(grid_min)
             xloc_abundance_label = -HUGE(grid_min)
             do i=1,num_labels
@@ -238,7 +238,7 @@
             end if
 
             call pgunsa
-            
+
             if (s% pg% Abundance_show_photosphere_location .and. &
                   (xaxis_name == 'mass' .or. &
                    xaxis_name == 'logxm' .or. &
@@ -271,7 +271,7 @@
                call pgdraw(dx, 1.0)
                call pgunsa
             end if
-            
+
          call show_pgstar_decorator(s%id,s% pg% Abundance_use_decorator,s% pg% Abundance_pgstar_decorator,0, ierr)
 
          end subroutine plot

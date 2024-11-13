@@ -34,7 +34,7 @@ module overshoot
   use overshoot_utils
   use overshoot_exp
   use overshoot_step
-  
+
   ! No implicit typing
 
   implicit none
@@ -125,7 +125,7 @@ contains
              match_zone_type = .NOT. ( &
                   s%burn_h_conv_region(i) .OR. &
                   s%burn_he_conv_region(i) .OR. &
-                  s%burn_z_conv_region(i) )              
+                  s%burn_z_conv_region(i) )
           case ('any')
              match_zone_type = .true.
           case default
@@ -212,7 +212,7 @@ contains
              ! Check if the overshoot will be stabilized by the stratification
 
              if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
-                
+
                 if (.not. s% calculate_Brunt_N2) &
                    call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
@@ -233,7 +233,7 @@ contains
              if (D(k) < s%overshoot_D_min) then
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
-                ! Convective regions can happen to be entirely below s%overshoot_D_min, 
+                ! Convective regions can happen to be entirely below s%overshoot_D_min,
                 ! in which case we ignore this correction.
                 if (s%top_conv_bdy(i)) then
                    if (s%D_mix(k+1) > s%overshoot_D_min) then
@@ -277,7 +277,7 @@ contains
              else
                 rho = s%rho(k)
              endif
-       
+
              cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
 
              call eval_conv_bdy_r(s, i, r_cb, ierr)
@@ -310,7 +310,7 @@ contains
           s%D_mix(k:k_cb:dk) = 0._dp
           s%conv_vel(k:k_cb:dk) = 0._dp
           s%mixing_type(k:k_cb:dk) = no_mixing
-          
+
           ! Finish (we apply at most a single overshoot scheme to each boundary)
 
           exit criteria_loop

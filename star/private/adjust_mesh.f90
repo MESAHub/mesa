@@ -411,7 +411,7 @@
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
 
          if (dbg_remesh) write(*,*) 'call do_mesh_adjust'
-         
+
          call do_mesh_adjust( &
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
@@ -611,8 +611,8 @@
             call return_integer_work_array(s, which_gval)
             call do_work_arrays1(.false., ierr)
          end subroutine do_dealloc1
-            
-            
+
+
          subroutine do_work_arrays1(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr
@@ -653,8 +653,8 @@
             if (ierr /= 0) return
             call return_logical_work_array(s, do_not_split)
          end subroutine do_dealloc2
-            
-            
+
+
          subroutine do_work_arrays2(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr

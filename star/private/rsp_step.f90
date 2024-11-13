@@ -30,7 +30,7 @@
       use utils_lib, only: is_bad
 
       implicit none
-      
+
       private
       public :: calculate_energies, init_HYD, HYD, &
          turn_off_time_weighting, turn_on_time_weighting, &
@@ -40,14 +40,14 @@
          calc_PII_face, calc_Pvsc, calc_Pturb, calc_Chi, calc_Eq, &
          calc_source_sink, acceleration_eqn, calc_cell_equations, &
          T_form_of_calc_Fr, calc_Lc, calc_Lt, rsp_set_Teff
-      
+
       logical, parameter :: call_is_bad = .false.
-      
+
       integer, parameter :: i_var_Vol = 99 ! for remeshing tests with dfridr
-      
+
       integer, parameter :: &
          i_var_T = 2, i_var_w = 3, i_var_er = 4, i_var_Fr = 5, i_var_R = 6, & ! R must be last
-      
+
          i_r_dr_in2 = 1, &
          i_r_dT_in = 2, &
          i_r_dw_in = 3, &
@@ -58,77 +58,77 @@
          i_r_dr_00 = i_r_dr_in + NV, &
          i_r_dr_out = i_r_dr_00 + NV, &
          i_r_dr_out2 = i_r_dr_out + NV, &
-         
+
          i_r_dT_00 = i_r_dT_in + NV, &
          i_r_dT_out = i_r_dT_00 + NV, &
          i_r_dT_out2 = i_r_dT_out + NV, &
-         
+
          i_r_dw_00 = i_r_dw_in + NV, &
          i_r_dw_out = i_r_dw_00 + NV, &
          i_r_dw_out2 = i_r_dw_out + NV, &
-         
+
          i_r_der_00 = i_r_der_in + NV, &
          i_r_der_out = i_r_der_00 + NV, &
          i_r_der_out2 = i_r_der_out + NV, &
-         
+
          i_r_dFr_00 = i_r_dFr_in + NV, &
          i_r_dFr_out = i_r_dFr_00 + NV, &
          i_r_dFr_out2 = i_r_dFr_out + NV, &
-         
+
          i_T_dT_in2 = 1, &
          i_T_dw_in2 = 2, &
          i_T_der_in2 = 3, &
          i_T_dFr_in2 = 4, &
          i_T_dr_in2 = 5, &
-         
+
          i_T_dT_in = i_T_dT_in2 + NV, &
          i_T_dT_00 = i_T_dT_in + NV, &
          i_T_dT_out = i_T_dT_00 + NV, &
          i_T_dT_out2 = i_T_dT_out + NV, &
-         
+
          i_T_dw_in = i_T_dw_in2 + NV, &
          i_T_dw_00 = i_T_dw_in + NV, &
          i_T_dw_out = i_T_dw_00 + NV, &
-         
+
          i_T_der_in = i_T_der_in2 + NV, &
          i_T_der_00 = i_T_der_in + NV, &
          i_T_der_out = i_T_der_00 + NV, &
-         
+
          i_T_dFr_in = i_T_dFr_in2 + NV, &
          i_T_dFr_00 = i_T_dFr_in + NV, &
          i_T_dFr_out = i_T_dFr_00 + NV, &
-         
+
          i_T_dr_in = i_T_dr_in2 + NV, &
          i_T_dr_00 = i_T_dr_in + NV, &
          i_T_dr_out = i_T_dr_00 + NV, &
-         
+
          i_w_dw_in2 = 1, &
          i_w_der_in2 = 2, &
          i_w_dFr_in2 = 3, &
          i_w_dr_in2 = 4, &
          i_w_dT_in = 5, &
-         
+
          i_w_dw_in = i_w_dw_in2 + NV, &
          i_w_dw_00 = i_w_dw_in + NV, &
          i_w_dw_out = i_w_dw_00 + NV, &
          i_w_dw_out2 = i_w_dw_out + NV, &
-         
+
          i_w_der_in = i_w_der_in2 + NV, &
          i_w_der_00 = i_w_der_in + NV, &
          i_w_der_out = i_w_der_00 + NV, &
-         
+
          i_w_dFr_in = i_w_dFr_in2 + NV, &
          i_w_dFr_00 = i_w_dFr_in + NV, &
          i_w_dFr_out = i_w_dFr_00 + NV, &
-         
+
          i_w_dr_in = i_w_dr_in2 + NV, &
          i_w_dr_00 = i_w_dr_in + NV, &
          i_w_dr_out = i_w_dr_00 + NV, &
-         
+
          i_w_dT_00 = i_w_dT_in + NV, &
          i_w_dT_out = i_w_dT_00 + NV, &
          i_w_dT_out2 = i_w_dT_out + NV, &
-         
+
          i_er_der_in2 = 1, &
          i_er_dFr_in2 = 2, &
          i_er_dr_in2 = 3, &
@@ -139,7 +139,7 @@
          i_er_der_00 = i_er_der_in + NV, &
          i_er_der_out = i_er_der_00 + NV, &
          i_er_der_out2 = i_er_der_out + NV, &
-         
+
          i_er_dFr_in = i_er_dFr_in2 + NV, &
          i_er_dFr_00 = i_er_dFr_in + NV, &
          i_er_dFr_out = i_er_dFr_00 + NV, &
@@ -147,15 +147,15 @@
          i_er_dr_in = i_er_dr_in2 + NV, &
          i_er_dr_00 = i_er_dr_in + NV, &
          i_er_dr_out = i_er_dr_00 + NV, &
-         
+
          i_er_dT_00 = i_er_dT_in + NV, &
          i_er_dT_out = i_er_dT_00 + NV, &
          i_er_dT_out2 = i_er_dT_out + NV, &
-         
+
          i_er_dw_00 = i_er_dw_in + NV, &
          i_er_dw_out = i_er_dw_00 + NV, &
          i_er_dw_out2 = i_er_dw_out + NV, &
-         
+
          i_Fr_dFr_in2 = 1, &
          i_Fr_dr_in2 = 2, &
          i_Fr_dT_in = 3, &
@@ -170,22 +170,22 @@
          i_Fr_dr_in = i_Fr_dr_in2 + NV, &
          i_Fr_dr_00 = i_Fr_dr_in + NV, &
          i_Fr_dr_out = i_Fr_dr_00 + NV, &
-         
+
          i_Fr_dT_00 = i_Fr_dT_in + NV, &
          i_Fr_dT_out = i_Fr_dT_00 + NV, &
          i_Fr_dT_out2 = i_Fr_dT_out + NV, &
-         
+
          i_Fr_dw_00 = i_Fr_dw_in + NV, &
          i_Fr_dw_out = i_Fr_dw_00 + NV, &
          i_Fr_dw_out2 = i_Fr_dw_out + NV, &
-         
+
          i_Fr_der_00 = i_Fr_der_in + NV, &
          i_Fr_der_out = i_Fr_der_00 + NV, &
          i_Fr_der_out2 = i_Fr_der_out + NV
-      
+
       integer :: iter, min_k_for_turbulent_flux
-      
-      
+
+
       contains
 
 
@@ -201,7 +201,7 @@
          integer(8) :: time0
          logical :: converged, dbg_msg, trace
          include 'formats'
-         
+
          ierr = 0
          dbg_msg = s% report_solver_progress
          trace = s% trace_evolve
@@ -213,11 +213,11 @@
               .and. s% solver_test_partials_dx_0 > 0 &
               .and. s% solver_test_partials_iter_number > 0 &
               .and. test_partials_k > 0) then
-            iter_for_dfridr = s% solver_test_partials_iter_number   
+            iter_for_dfridr = s% solver_test_partials_iter_number
             s% solver_test_partials_var = 0
             s% solver_test_partials_val = 0
             s% solver_test_partials_dval_dx = 0
-         end if   
+         end if
          nz = s% nz
          i_min = 1
          i_max = nz
@@ -240,7 +240,7 @@
          else
             min_k_for_turbulent_flux = 0
          end if
-         
+
          if (s% v_center > s% v(nz) .and. s% v_center > 0d0) then ! compressing innermost cell
             dt_max = 1d-2*(s% r(nz) - s% r_center)/(s% v_center - s% v(nz))
             if (s% dt > dt_max) then
@@ -275,8 +275,8 @@
             call set_1st_iter_R_using_v_start(s)
             s% R_center = s% R_center + s% dt*s% v_center
 ! write(*,3) 'RSP HYD w', 22, 0, s% RSP_w(22)
-            
-            iter_loop: do iter = 1, max_iters  
+
+            iter_loop: do iter = 1, max_iters
                s% solver_iter = iter
                if (iter == iter_for_dfridr) then
                   s% solver_test_partials_k = test_partials_k
@@ -288,7 +288,7 @@
                if (converged) then
                   s% num_solver_iterations = iter - 1
                   s% solver_test_partials_k = test_partials_k
-                  return      
+                  return
                end if
                if (s% doing_timing) call start_time(s, time0, total)
                call solve_for_corrections(s,iter)
@@ -299,15 +299,15 @@
 ! write(*,3) 'RSP HYD w', 22, iter, s% RSP_w(22)
                if (iter == 1) cycle iter_loop
                converged = (abs(DXXT) < PREC2 .and. abs(DXXC) < PREC2)
-            end do iter_loop      
+            end do iter_loop
             call doing_retry
          end do retry_loop
-      
+
          write(*,*) ' NO CONVERGENCE IN HYD, TIME STEP: ',s% model_number
          stop
-      
+
          contains
-         
+
          subroutine set_min_k_for_turbulent_flux
             real(dp) :: tau, rmid
             integer :: k
@@ -322,17 +322,17 @@
                end if
             end do
          end subroutine set_min_k_for_turbulent_flux
-               
+
          subroutine doing_retry
             include 'formats'
             if (num_tries  ==  max_retries+1) then
                write(*,*) 'NO CONVERGENCE IN HYD, TIME STEP num tries, max allowed', &
                   s% model_number, num_tries, max_retries+1
                call mesa_error(__FILE__,__LINE__,'RSP: step num_retries = RSP_max_retries_per_step')
-            end if  
+            end if
             call restore_start_vars(s)
             s% R_center = R_center_start
-            s% dt = s% dt/2.d0   
+            s% dt = s% dt/2.d0
             s% num_retries = s% num_retries + 1
             if (s% max_number_retries < 0) return
             if (s% num_retries > s% max_number_retries) then
@@ -340,7 +340,7 @@
                call mesa_error(__FILE__,__LINE__,'RSP: num_retries > max_number_retries')
             end if
          end subroutine doing_retry
-         
+
          subroutine write_msg
             include 'formats'
             !if (EZH < 1d0) write(*,3) 'undercorrection factor', s% model_number, iter, EZH
@@ -351,26 +351,26 @@
                'erad', kE_max, DXXE, s% erad(max(1,kE_max)), &
                'Fr', kL_max, DXXL, s% Fr(max(1,kL_max))
          end subroutine write_msg
-      
+
          subroutine check_partial
             integer :: i_var
             real(dp) :: dvardx_0, dx_0, dvardx, xdum, err
             include 'formats'
-            i_var = s% solver_test_partials_var 
+            i_var = s% solver_test_partials_var
             dvardx_0 = s% solver_test_partials_dval_dx ! analytic partial
             if (i_var <= 0) then
                write(*,2) 'need to set test_partials_var', i_var
                call mesa_error(__FILE__,__LINE__,'check_partial')
-            end if            
+            end if
             dx_0 = get1_val(i_var, s% solver_test_partials_k)
             dx_0 = s% solver_test_partials_dx_0*max(1d-99, abs(dx_0))
             dvardx = dfridr(dx_0,err)
             xdum = (dvardx - dvardx_0)/max(abs(dvardx_0),1d-50)
             write(*,1) 'analytic numeric err rel_diff',dvardx_0,dvardx,err,xdum
             !write(*,*)
-            call mesa_error(__FILE__,__LINE__,'check_partial')            
-         end subroutine check_partial         
-         
+            call mesa_error(__FILE__,__LINE__,'check_partial')
+         end subroutine check_partial
+
          real(dp) function get1_val(i_var,k) result(val)
             integer, intent(in) :: i_var, k
             include 'formats'
@@ -386,13 +386,13 @@
                val = s% Fr(k)
             else if (i_var == i_var_Vol) then
                val = s% Vol(k)
-            else 
+            else
                write(*,2) 'bad value for solver_test_partials_var', i_var
                call mesa_error(__FILE__,__LINE__,'solver_test_partials')
             end if
          end function get1_val
-         
-         subroutine store1_val(i_var, k, val) 
+
+         subroutine store1_val(i_var, k, val)
             integer, intent(in) :: i_var, k
             real(dp), intent(in) :: val
             include 'formats'
@@ -411,7 +411,7 @@
                s% Fr(k) = val
             else if (i_var == i_var_Vol) then
                s% Vol(k) = val
-            else 
+            else
                write(*,2) 'bad value for solver_test_partials_var', i_var
                call mesa_error(__FILE__,__LINE__,'solver_test_partials')
             end if
@@ -490,10 +490,10 @@
                end if
             end do
          end function dfridr
-      
+
       end subroutine HYD
-      
-      
+
+
       real(dp) function get_Psurf(s,ierr) result(P_surf)
          use rsp_eval_eos_and_kap, only: get_surf_P_T_kap
          type (star_info), pointer :: s
@@ -540,15 +540,15 @@
             ETHE = ETHE + (s% egas(k)+s% erad(k))*s% dm(k)
             ECON = ECON + s% RSP_w(k)**2*s% dm(k)
             EKIN = EKIN + cell_specific_KE(s,k,d_dv00,d_dvp1)*s% dm(k)
-            EGRV = EGRV + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)*s% dm(k)           
-            
-            !EKIN = EKIN + 0.5d0*s% v(k)**2*s% dm_bar(k)               
+            EGRV = EGRV + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)*s% dm(k)
+
+            !EKIN = EKIN + 0.5d0*s% v(k)**2*s% dm_bar(k)
             !if (k < NZN) then
             !   EGRV = EGRV - s% cgrav(k) * (s%m(k)-0.5d0*s%dm(k))*s%dm(k)/(0.5d0*(s%r(k)+s%r(k+1)))
             !else
             !   EGRV = EGRV - s% cgrav(k) * (s%m(k)-0.5d0*s%dm(k))*s%dm(k)/(0.5d0*(s%r(k)+s%r_center))
             !end if
-            
+
          enddo
          if (s% RSP_hydro_only) then
             total_radiation = 0d0
@@ -589,7 +589,7 @@
          type (star_info), pointer :: s
          real(dp) :: EH1,EHJT
          integer :: k
-         include 'formats'         
+         include 'formats'
          EHJT = 1.d0
          do k = 1,NZN
             if (k /= NZN) then
@@ -614,12 +614,12 @@
          type (star_info), pointer :: s
          real(dp) :: r, m, v, L, T_phot, cs, kap, logg, ysum
          integer :: k_phot
-         include 'formats'         
+         include 'formats'
          call get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
          s% Teff = atm_Teff(L,r)
       end subroutine rsp_set_Teff
-      
-      
+
+
       subroutine set_f_Edd(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -628,8 +628,8 @@
          s% g_Edd = 0.5d0
          s% f_Edd(1:NZN) = f_Edd_isotropic
       end subroutine set_f_Edd
-      
-      
+
+
       subroutine save_start_vars(s)
          type (star_info), pointer :: s
          integer :: I, k
@@ -655,8 +655,8 @@
             s% COUPL_start(k) = s% COUPL(k)
          end do
       end subroutine save_start_vars
-      
-      
+
+
       subroutine restore_start_vars(s)
          type (star_info), pointer :: s
          integer :: I, k
@@ -681,10 +681,10 @@
             s% Lc(k) = s% Lc_start(k)
             s% Lt(k) = s% Lt_start(k)
             s% COUPL(k) = s% COUPL_start(k)
-         end do            
+         end do
       end subroutine restore_start_vars
-      
-      
+
+
       subroutine eval_vars(s,iter,i_min,i_max,ierr)
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
@@ -727,10 +727,10 @@
             call calc_source_sink(s,i)
          end do
          !$OMP END PARALLEL DO
-         call zero_boundaries(s)               
+         call zero_boundaries(s)
       end subroutine eval_vars
-      
-      
+
+
       subroutine eval_eqns(s,P_surf)
          type (star_info), pointer :: s
          real(dp), intent(in) :: P_surf
@@ -770,15 +770,15 @@
          end if
          dVol_dr_00(i) = 3.d0*T1*s% r(k)**2
       end subroutine do1_specific_volume
-      
-      
+
+
       subroutine solve_for_corrections(s,iter)
          type (star_info), pointer :: s
          integer, intent(in) :: iter
          integer :: i, j, info, IR, IT, IW, IE, IL, N
          logical :: okay
          include 'formats'
-         
+
          !if (s% model_number >= s% max_model_number-1 .and. iter == 1) then
          !if (.false. .and. s% model_number == s% max_model_number) then !.and. iter == 1) then
          if (.false.) then
@@ -791,7 +791,7 @@
                IW = i_var_w + NV*(i-1)
                IE = i_var_er + NV*(i-1)
                IL = i_var_Fr + NV*(i-1)
-               
+
                if (is_bad(HR(IR))) then
                   write(*,4) 'HR(IR)', iter, i, IR, HR(IR)
                   okay = .false.
@@ -808,9 +808,9 @@
                   write(*,4) 'HR(IL)', iter, i, IL, HR(IL)
                   okay = .false.
                end if
-               
+
                if (.not. okay) call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
-               
+
                do j = 1,LD_HD
                   if (is_bad(HD(j,IR))) then
                      write(*,5) 'HD(j,IR)', iter, i, j, IR, HD(j,IR)
@@ -832,9 +832,9 @@
                      write(*,5) 'HD(j,IL)', iter, i, j, IL, HD(j,IL)
                      okay = .false.
                   end if
-               
+
                   if (.not. okay) call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
-                  
+
                end do
 
                cycle
@@ -843,34 +843,34 @@
                write(*,3) 'HR(IT)', iter, i, HR(IT)
                write(*,3) 'HR(IW)', iter, i, HR(IW)
                write(*,3) 'HR(IL)', iter, i, HR(IL)
-               
+
                do j = 1,13
                   write(*,5) 'HD(j,IR)', iter, j, IR, i, HD(j,IR)
                end do
-               
+
                do j = 1,13
                   write(*,5) 'HD(j,IT)', iter, j, IT, i, HD(j,IT)
                end do
-               
+
                do j = 1,13
                   write(*,5) 'HD(j,IW)', iter, j, IW, i, HD(j,IW)
                end do
-               
+
                write(*,3) 'HR(IE)', iter, i, HR(IE)
                do j = 1,13
                   write(*,5) 'HD(j,IE)', iter, j, IE, i, HD(j,IE)
                end do
-               
+
                do j = 1,13
                   write(*,5) 'HD(j,IL)', iter, j, IL, i, HD(j,IL)
                end do
-               
+
             end do
             !call mesa_error(__FILE__,__LINE__,'solve_for_corrections')
          end if
-         
+
          N = NV*NZN+1
-         
+
          if (.false.) then ! check HR and HD for NaN's
             do I = 1,N
                if (is_bad(HR(I))) then
@@ -887,37 +887,37 @@
                end do
             end do
          end if
-     
+
          do J = 1,2*NV     ! translate hd into band storage of LAPACK
             do I = 1,N
                ABB(J,I) = 0.0d0
             end do
-         end do      
-         do J = 1,2*NV      
+         end do
+         do J = 1,2*NV
             do I = 1,N - J
                ABB(LD_HD - J,I + J) = HD(HD_DIAG + J,I) ! upper diagonals
-            end do  
+            end do
          end do
-         do J = 1,2*NV     
+         do J = 1,2*NV
             do I = 1,N - J
                ABB(LD_HD + J,I) = HD(HD_DIAG - J,I + J) ! lower diagonals
-            end do  
+            end do
          end do
          do I = 1,N
             ABB(LD_HD,I) = HD(HD_DIAG,I)
-         end do  
-      
+         end do
+
          call DGBTRF(N,N,2*NV,2*NV,ABB,LD_ABB,IPVT,INFO)
          if (INFO/= 0) then
             write(*,*) 'hyd: LAPACK/dgbtrf problem',INFO
             stop
          end if
-      
+
          call DGBTRS('n',N,2*NV,2*NV,1,ABB,LD_ABB,IPVT,HR,N,INFO)
          if (INFO/= 0) then
             write(*,*) 'hyd: LAPACK/dgbtrs problem',INFO
             stop
-         end if             
+         end if
 
          do I = 1,N
             DX(I) = HR(I)
@@ -931,7 +931,7 @@
 
       end subroutine solve_for_corrections
 
-      
+
       subroutine apply_corrections(s, &
             DXH, XXT, XXC, XXE, XXL, EZH, &
             kT_max, kW_max, kE_max, kL_max)
@@ -965,39 +965,39 @@
                end if
             else
                XXC = 0d0
-            end if      
+            end if
             if (i == 1) then
                DXR = -DX(IR)
                XXR = (DXR/(s% r(k) - s% r_center))/DXH
                if (XXR > XXRM) then
                   DXRM = DXR/(s% r(k) - s% r_center)
                   XXRM = XXR; kRM = k; iRM = IR
-               end if      
-            else      
+               end if
+            else
                DXR = DX(IR-NV) - DX(IR)
                XXR = (DXR/(s% r(k) - s% r(k+1)))/DXH
                if (XXR > XXRM) then
                   DXRM = DXR/(s% r(k) - s% r(k+1))
                   XXRM = XXR; kRM = k; iRM = IR
-               end if      
-            end if      
+               end if
+            end if
             XXE = abs(DX(IE)/s% erad(k))/DXH
             if (XXE > XXEM) then
                XXEM = XXE; kEM = k; iEM = IE
-            end if            
+            end if
             XXL = abs(DX(IL)/s% Fr(k))/DXH
             if (XXL > XXLM) then
                XXLM = XXL; kLM = k; iLM = IL
-            end if            
+            end if
             XXT = abs(DX(IT)/s% T(k))/DXH
             if (XXT > XXTM) then
                XXTM = XXT; kTM = k; iTM = IT
-            end if    
-            EZH1 = EZH       
+            end if
+            EZH1 = EZH
             EZH = 1.d0/max(1.d0/EZH,XXR,XXT,XXC,XXE)
             if (EZH1 /= EZH) kEZH = k
          end do
-         
+
          if (EZH < 1d0 .and. s% RSP_report_undercorrections) then
             write(*,'(i6, 2x, i3, 6(4x, a, 1x, i4, 1x, 1pe10.3))') &
                s% model_number, iter, &
@@ -1069,7 +1069,7 @@
                kL_max = k; XXL = DX(IL)/s% Fr(k)
             end if
          end do
-      
+
       end subroutine apply_corrections
 
 
@@ -1090,8 +1090,8 @@
             erad, d_erad_dVol, d_erad_dT, &
             s% csound(k), s% Cp(k), dCp_dVol(I), dCp_dT(I), &
             s% QQ(k), dQQ_dVol(I), dQQ_dT(I), &
-            s% opacity(k), dK_dVol(I), dK_dT(I),ierr)   
-         if (ierr /= 0) return         
+            s% opacity(k), dK_dVol(I), dK_dT(I),ierr)
+         if (ierr /= 0) return
          d_Pg_dr_00(I) = d_Pg_dVol(I)*dVol_dr_00(I)
          d_Pg_dr_in(I) = d_Pg_dVol(I)*dVol_dr_in(I)
          d_egas_dr_00(I) = d_egas_dVol(I)*dVol_dr_00(I)
@@ -1111,8 +1111,8 @@
             end if
          end if
       end subroutine do1_eos_and_kap
-      
-      
+
+
       subroutine calc_Prad(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -1130,7 +1130,7 @@
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
-         
+
          if (test_partials) then
             s% solver_test_partials_val = s% Prad(k)
             s% solver_test_partials_var = i_var_er
@@ -1138,63 +1138,63 @@
             write(*,*) 'calc_Prad', s% solver_test_partials_var
             write(*,2) 'erad Prad f_Edd', k, s% erad(k), s% Prad(k), s% f_Edd(k)
          end if
-         
+
       end subroutine calc_Prad
 
 
       subroutine calc_Hp_face(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: POM
          integer :: k
          logical :: test_partials
          include 'formats'
          k = NZN+1-i
          if (I < NZN) then
-         
+
             POM = (s% r(k)**2)/(2.d0*s% cgrav(k)*s% m(k))
             s% Hp_face(k) = POM*( &
                (s% Pgas(k) + s% Prad(k))*s% Vol(k) &
              + (s% Pgas(k-1) + s% Prad(k-1))*s% Vol(k-1))
-            
+
             dHp_dVol_00(I) = POM*( &
                + s% Vol(k)*(d_Pg_dVol(i) + d_Pr_dVol(i)) &
                + s% Pgas(k) + s% Prad(k))
             dHp_dVol_out(I) = POM*( &
                + s% Vol(k-1)*(d_Pg_dVol(i+1) + d_Pr_dVol(i+1)) &
                + s% Pgas(k-1) + s% Prad(k-1))
-               
+
             dHp_dr_in(I) = POM*( &
                (s% Pgas(k) + s% Prad(k))*dVol_dr_in(I) &
-             + (d_Pg_dr_in(I) + d_Pr_dr_in(I))*s% Vol(k)) !             
+             + (d_Pg_dr_in(I) + d_Pr_dr_in(I))*s% Vol(k)) !
             dHp_dr_00(I) = 2.d0*s% Hp_face(k)/s% r(k) + POM*( &
                 (s% Pgas(k) + s% Prad(k))*dVol_dr_00(I) &
               + (d_Pg_dr_00(I) + d_Pr_dr_00(I))*s% Vol(k) &
               + (s% Pgas(k-1) + s% Prad(k-1))*dVol_dr_in(i+1) &
-              + (d_Pg_dr_in(i+1) + d_Pr_dr_in(i+1))*s% Vol(k-1)) !                   
+              + (d_Pg_dr_in(i+1) + d_Pr_dr_in(i+1))*s% Vol(k-1)) !
             dHp_dr_out(I) = POM*( &
                (s% Pgas(k-1) + s% Prad(k-1))*dVol_dr_00(i+1) &
-             + (d_Pg_dr_00(i+1) + d_Pr_dr_00(i+1))*s% Vol(k-1)) ! 
-             
-            dHp_dT_00(I) = POM*s% Vol(k)*d_Pg_dT(I) ! 
-            dHp_dT_out(I) = POM*s% Vol(k-1)*d_Pg_dT(I+1) ! 
-              
-            dHp_der_00(I) = POM*s% Vol(k)*d_Pr_der(I) ! 
-            dHp_der_out(I) = POM*s% Vol(k-1)*d_Pr_der(I+1) ! 
+             + (d_Pg_dr_00(i+1) + d_Pr_dr_00(i+1))*s% Vol(k-1)) !
+
+            dHp_dT_00(I) = POM*s% Vol(k)*d_Pg_dT(I) !
+            dHp_dT_out(I) = POM*s% Vol(k-1)*d_Pg_dT(I+1) !
+
+            dHp_der_00(I) = POM*s% Vol(k)*d_Pr_der(I) !
+            dHp_der_out(I) = POM*s% Vol(k-1)*d_Pr_der(I+1) !
 
          else ! surface
-         
+
             POM = (s% r(k)**2)/(s% cgrav(k)*s% M(k))
             s% Hp_face(k) = POM*(s% Pgas(k) + s% Prad(k))*s% Vol(k)
-            
+
             dHp_dVol_00(I) = POM*( &
                + s% Vol(k)*(d_Pg_dVol(i) + d_Pr_dVol(i)) &
                + s% Pgas(k) + s% Prad(k))
             dHp_dVol_out(I) = 0d0
-            
+
             dHp_dr_in(i) = POM*( &
                (s% Pgas(k) + s% Prad(k))*dVol_dr_in(i) &
-             + (d_Pg_dr_in(i) + d_Pr_dr_in(i))*s% Vol(k))  
+             + (d_Pg_dr_in(i) + d_Pr_dr_in(i))*s% Vol(k))
             dHp_dr_00(i) = 2.d0*s% Hp_face(k)/s% r(k) + POM*( &
                (s% Pgas(k) + s% Prad(k))*dVol_dr_00(i) &
              + (d_Pg_dr_00(i) + d_Pr_dr_00(i))*s% Vol(k))
@@ -1203,7 +1203,7 @@
             dHp_dT_out(i) = 0.d0
             dHp_der_00(i) = POM*s% Vol(k)*d_Pr_der(i)
             dHp_der_out(i) = 0.d0
-            
+
          end if
 
          !test_partials = (k-1 == s% solver_test_partials_k)
@@ -1216,11 +1216,11 @@
          end if
 
       end subroutine calc_Hp_face
-      
-      
+
+
       subroutine calc_Y_face(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: POM, POM2, &
             Y1, d_Y1_dr_00, d_Y1_dr_in, d_Y1_dr_out, &
             d_Y1_dVol_00, d_Y1_dVol_out, &
@@ -1241,75 +1241,75 @@
                0.5d0*(s% QQ(k)/s% Cp(k)+ s% QQ(k-1)/s% Cp(k-1))* &
                      ((s% Pgas(k-1) + s% Prad(k-1)) - (s% Pgas(k) + s% Prad(k))) &
                - (s% lnT(k-1) - s% lnT(k))
-            
+
             d_Y1_dVol_00 = &
                - POM*(d_Pg_dVol(i) + d_Pr_dVol(i)) &
                + POM2*(dQQ_dVol(i) - s% QQ(k)*dCp_dVol(i)/s% Cp(k))/s% Cp(k)
             d_Y1_dVol_out = &
                + POM*(d_Pg_dVol(i+1) + d_Pr_dVol(i+1)) &
                + POM2*(dQQ_dVol(i+1) - s% QQ(k-1)*dCp_dVol(i+1)/s% Cp(k-1))/s% Cp(k-1)
-               
+
             d_Y1_dr_00 = &
                POM2*( &
                   (dQQ_dr_00(I) - s% QQ(k)/s% Cp(k)*dCp_dr_00(I))/s% Cp(k)&
                  +(dQQ_dr_in(i+1) - s% QQ(k-1)/s% Cp(k-1)*dCp_dr_in(i+1))/s% Cp(k-1)) &
               + POM*(d_Pg_dr_in(i+1) - d_Pg_dr_00(I) + d_Pr_dr_in(i+1) - d_Pr_dr_00(I))
-                    
+
             d_Y1_dr_in = &
                  POM2*(dQQ_dr_in(I) - s% QQ(k)/s% Cp(k)*dCp_dr_in(I))/s% Cp(k) &
                + POM*(- d_Pg_dr_in(I) - d_Pr_dr_in(I))
-               
+
             d_Y1_dr_out = &
                  POM2*(dQQ_dr_00(i+1) - s% QQ(k-1)/s% Cp(k-1)*dCp_dr_00(i+1))/s% Cp(k-1) &
                + POM*(d_Pg_dr_00(i+1) + d_Pr_dr_00(i+1))
-               
+
             d_Y1_dT_00 = &
                  POM2*(dQQ_dT(I) - s% QQ(k)/s% Cp(k)*dCp_dT(I))/s% Cp(k) &
                - POM*d_Pg_dT(I) &
                + 1.d0/s% T(k)
-               
+
             d_Y1_dT_out = &
                  POM2*(dQQ_dT(i+1) - s% QQ(k-1)/s% Cp(k-1)*dCp_dT(i+1))/s% Cp(k-1) &
                + POM*d_Pg_dT(I+1) &
                - 1.d0/s% T(k-1)
-               
+
             d_Y1_der_00 = -POM*d_Pr_der(I)
-               
+
             d_Y1_der_out = POM*d_Pr_der(I+1)
 
             POM = 2.d0/(s% Vol(k) + s% Vol(k-1))
             POM2 = 8.d0*PI*(s% r(k)**2)/s% dm_bar(k)*s% Hp_face(k)
             Y2 = 4.d0*PI*(s% r(k)**2)*s% Hp_face(k)*POM/s% dm_bar(k)
-            
+
             d_Y2_dVol_00 = &
-               + Y2/s% Hp_face(k)*dHp_dVol_00(i) & 
+               + Y2/s% Hp_face(k)*dHp_dVol_00(i) &
                - POM2/(s% Vol(k) + s% Vol(k-1))**2
             d_Y2_dVol_out = &
-               + Y2/s% Hp_face(k)*dHp_dVol_out(i) & 
+               + Y2/s% Hp_face(k)*dHp_dVol_out(i) &
                - POM2/(s% Vol(k) + s% Vol(k-1))**2
-            
+
             d_Y2_dr_00 = 2.d0*Y2/s% r(k) &
                + Y2/s% Hp_face(k)*dHp_dr_00(I) &
                - POM2/(s% Vol(k) + s% Vol(k-1))**2*(dVol_dr_00(I) + dVol_dr_in(i+1))
-               
+
             d_Y2_dr_in = - POM2/(s% Vol(k) &
                + s% Vol(k-1))**2*dVol_dr_in(I) &
                + Y2/s% Hp_face(k)*dHp_dr_in(I)
-               
+
             d_Y2_dr_out = - POM2/(s% Vol(k) &
                + s% Vol(k-1))**2*dVol_dr_00(i+1) &
                + Y2/s% Hp_face(k)*dHp_dr_out(I)
-               
+
             d_Y2_dT_00 = Y2/s% Hp_face(k)*dHp_dT_00(I)
-            
+
             d_Y2_dT_out = Y2/s% Hp_face(k)*dHp_dT_out(I)
-               
+
             d_Y2_der_00 = Y2/s% Hp_face(k)*dHp_der_00(I)
-            
+
             d_Y2_der_out = Y2/s% Hp_face(k)*dHp_der_out(I)
 
             s% Y_face(k) = Y1*Y2
-            
+
             if (k==-35 .and. iter == 1) then
                write(*,3) 'RSP Y_face Y1 Y2', k, s% solver_iter, s% Y_face(k), Y1, Y2
                write(*,3) 'Peos', k, s% solver_iter, s% Pgas(k) + s% Prad(k)
@@ -1324,16 +1324,16 @@
                write(*,3) 'lgd', k-1, s% solver_iter, log(1d0/s% Vol(k-1))/ln10
             end if
 
-            dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 ! 
-            dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in ! 
-            dY_dr_out(I) = Y1*d_Y2_dr_out + Y2*d_Y1_dr_out ! 
-            dY_dVol_00(I) = Y1*d_Y2_dVol_00 + Y2*d_Y1_dVol_00 ! 
-            dY_dVol_out(I) = Y1*d_Y2_dVol_out + Y2*d_Y1_dVol_out ! 
-            dY_dT_00(I) = Y1*d_Y2_dT_00 + Y2*d_Y1_dT_00 ! 
-            dY_dT_out(I) = Y1*d_Y2_dT_out + Y2*d_Y1_dT_out ! 
-            dY_der_00(I) = Y1*d_Y2_der_00 + Y2*d_Y1_der_00 ! 
-            dY_der_out(I) = Y1*d_Y2_der_out + Y2*d_Y1_der_out ! 
-            
+            dY_dr_00(I) = Y1*d_Y2_dr_00 + Y2*d_Y1_dr_00 !
+            dY_dr_in(I) = Y1*d_Y2_dr_in + Y2*d_Y1_dr_in !
+            dY_dr_out(I) = Y1*d_Y2_dr_out + Y2*d_Y1_dr_out !
+            dY_dVol_00(I) = Y1*d_Y2_dVol_00 + Y2*d_Y1_dVol_00 !
+            dY_dVol_out(I) = Y1*d_Y2_dVol_out + Y2*d_Y1_dVol_out !
+            dY_dT_00(I) = Y1*d_Y2_dT_00 + Y2*d_Y1_dT_00 !
+            dY_dT_out(I) = Y1*d_Y2_dT_out + Y2*d_Y1_dT_out !
+            dY_der_00(I) = Y1*d_Y2_der_00 + Y2*d_Y1_der_00 !
+            dY_der_out(I) = Y1*d_Y2_der_out + Y2*d_Y1_der_out !
+
             if (call_is_bad) then
                if (is_bad(s% Y_face(k))) then
                   !$omp critical (rsp_step_2)
@@ -1349,7 +1349,7 @@
                   !$omp end critical (rsp_step_2)
                end if
             end if
-         
+
          else
             s% Y_face(k) = 0
             dY_dr_00(I) = 0
@@ -1371,10 +1371,10 @@
             s% solver_test_partials_dval_dx = dY_dVol_00(I)
             write(*,*) 'calc_Y_face', s% solver_test_partials_var
          end if
-      
+
       end subroutine calc_Y_face
 
-      
+
       subroutine calc_PII_face(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: I
@@ -1386,7 +1386,7 @@
          if (k == 1 .or. k == s% nz .or. ALFA == 0d0) then
             s% PII(k) = 0
             dPII_dr_00(I) = 0
-            dPII_dr_in(I) = 0 
+            dPII_dr_in(I) = 0
             dPII_dr_out(I) = 0
             dPII_dVol_00(I) = 0
             dPII_dVol_out(I) = 0
@@ -1394,7 +1394,7 @@
             dPII_dT_out(I) = 0
             dPII_der_00(I) = 0
             dPII_der_out(I) = 0
-         else         
+         else
             POM = ALFAS*ALFA
             POM2 = 0.5d0*(s% Cp(k) + s% Cp(k-1))
             s% PII(k) = POM*POM2*s% Y_face(k)
@@ -1403,18 +1403,18 @@
                POM*(POM2*dY_dVol_00(I) + s% Y_face(k)*0.5d0*dCp_dVol(I))
             dPII_dVol_out(I) = &
                POM*(POM2*dY_dVol_out(I) + s% Y_face(k)*0.5d0*dCp_dVol(I+1))
-            dPII_dr_in(I) = & ! 
+            dPII_dr_in(I) = & !
                POM*(POM2*dY_dr_in(I) + s% Y_face(k)*0.5d0*dCp_dr_in(I))
-            dPII_dr_00(I) = & ! 
+            dPII_dr_00(I) = & !
                POM*(POM2*dY_dr_00(I) + s% Y_face(k)*0.5d0*(dCp_dr_00(I) + dCp_dr_in(i+1)))
-            dPII_dr_out(I) = & ! 
+            dPII_dr_out(I) = & !
                POM*(POM2*dY_dr_out(I) + s% Y_face(k)*0.5d0*dCp_dr_00(i+1))
-            dPII_dT_00(I) = & ! 
+            dPII_dT_00(I) = & !
                POM*(POM2*dY_dT_00(I) + s% Y_face(k)*0.5d0*dCp_dT(I))
-            dPII_dT_out(I) = & ! 
+            dPII_dT_out(I) = & !
                POM*(POM2*dY_dT_out(I) + s% Y_face(k)*0.5d0*dCp_dT(i+1))
-            dPII_der_00(I) = POM*POM2*dY_der_00(I) ! 
-            dPII_der_out(I) = POM*POM2*dY_der_out(I) ! 
+            dPII_der_00(I) = POM*POM2*dY_der_00(I) !
+            dPII_der_out(I) = POM*POM2*dY_der_out(I) !
          end if
 
          !test_partials = (k-1 == s% solver_test_partials_k)
@@ -1425,13 +1425,13 @@
             s% solver_test_partials_dval_dx = dPII_dVol_out(I)
             write(*,*) 'calc_PII_face', s% solver_test_partials_var
          end if
-      
+
       end subroutine calc_PII_face
-      
-      
+
+
       subroutine calc_Pvsc(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: &
             dv, dv1, P, dP_dT, dP_der, dP_dr_in, dP_dr_00, V, sqrt_PV, &
             d_PV_dT, d_PV_der, d_PV_dr_in, d_PV_dr_00, &
@@ -1479,35 +1479,35 @@
          d_PV_der = dP_der*V
          d_PV_dr_in = dP_dr_in*V + P*dVol_dr_in(I)
          d_PV_dr_00 = dP_dr_00*V + P*dVol_dr_00(I)
-         
+
          d_sqrt_PV_dT = 0.5d0*d_PV_dT/sqrt_PV
          d_sqrt_PV_dVol = 0.5d0*d_PV_dVol/sqrt_PV
          d_sqrt_PV_der = 0.5d0*d_PV_der/sqrt_PV
          d_sqrt_PV_dr_in = 0.5d0*d_PV_dr_in/sqrt_PV
          d_sqrt_PV_dr_00 = 0.5d0*d_PV_dr_00/sqrt_PV
-         
+
          dv1 = dv
          dv = dv - ZSH*sqrt_PV
-         
+
          d_dv_dT = - ZSH*d_sqrt_PV_dT
          d_dv_dVol = - ZSH*d_sqrt_PV_dVol
          d_dv_der = - ZSH*d_sqrt_PV_der
-         
+
          d_dv_dr_in = 2d0/s% dt - ZSH*d_sqrt_PV_dr_in ! not used if I == 1
          d_dv_dr_00 = -2d0/s% dt - ZSH*d_sqrt_PV_dr_00
-         
+
          ! Pvsc = CQ*P*(dv1/sqrt_PV - cut)^2  eqn 3.60
          !     = CQ*P*((dv1 - cut*sqrt_PV)/sqrt_PV)^2
          !     = CQ*P/(P*V)*dv^2
          !     = CQ/V*dv^2
-         
+
          s% Pvsc(k) = CQ/V*dv**2
          d_Pvsc_dVol(i) = -s% Pvsc(k)/V + 2d0*d_dv_dVol*CQ/V*dv
          d_Pvsc_dT(i) = CQ/V*2d0*dv*d_dv_dT
          d_Pvsc_der(i) = CQ/V*2d0*dv*d_dv_der
          d_Pvsc_dr_in(i) = CQ/V*2d0*dv*d_dv_dr_in - CQ*dv**2*dVol_dr_in(I)/V**2
          d_Pvsc_dr_00(i) = CQ/V*2d0*dv*d_dv_dr_00 - CQ*dv**2*dVol_dr_00(I)/V**2
-         
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -1518,13 +1518,13 @@
          end if
       end subroutine calc_Pvsc
 
-      
+
       subroutine check_omega(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: i   
+         integer, intent(in) :: i
          real(dp) :: SOURS, DAMPS, DAMPRS, DELTA, SOL, POM, POM2, POM3, POM4, w_start
          integer :: k
-         include 'formats'         
+         include 'formats'
          if (I > IBOTOM .and. I < NZN .and. ALFA /= 0d0) then
          !     JAK OKRESLIC OMEGA DLA PIERWSZEJ ITERACJI
             k = NZN+1-i
@@ -1535,7 +1535,7 @@
             SOURS = POM*POM2
             DAMPS = (CEDE/ALFA)/((s% Hp_face(k) + s% Hp_face(k+1))*0.5d0)
             POM3 = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
-            POM4 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))       
+            POM4 = (s% T(k)**3)*(s% Vol(k)**2)/(s% Cp(k)*s% opacity(k))
             DAMPRS = POM3*POM4/((s% Hp_face(k)**2 + s% Hp_face(k+1)**2)*0.5d0)
             DELTA = DAMPRS**2 + 4.d0*DAMPS*SOURS
             if (k==-35) then
@@ -1563,11 +1563,11 @@
             end if
          end if
       end subroutine check_omega
-      
-      
+
+
       subroutine calc_Pturb(s,i) ! TURBULENT PRESSURE (ZONE)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: TEM1, Vol
          integer :: k
          logical :: test_partials
@@ -1598,11 +1598,11 @@
             write(*,*) 'calc_Pturb', s% solver_test_partials_var
          end if
       end subroutine calc_Pturb
-      
-      
+
+
       subroutine calc_Chi(s,i) ! eddy viscosity (Kuhfuss 1986)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: POM, POM1, POM2, POM3, POM4, &
             POMT1, POMT2, POMT3, POMT4, Vol
          integer :: k
@@ -1610,14 +1610,14 @@
          include 'formats'
          k = NZN+1-i
          if (ALFA == 0d0 .or. I <= IBOTOM .or. I >= NZN) then
-            s% Chi(k) = 0      
-            dChi_dT_out(I) = 0  
+            s% Chi(k) = 0
+            dChi_dT_out(I) = 0
             dChi_dT_00(I) = 0
             dChi_dT_in(I) = 0
-            dChi_der_out(I) = 0  
+            dChi_der_out(I) = 0
             dChi_der_00(I) = 0
             dChi_der_in(I) = 0
-            dChi_dw_00(I) = 0            
+            dChi_dw_00(I) = 0
             dChi_dr_out(I) = 0
             dChi_dr_00(I) = 0
             dChi_dr_in(I) = 0
@@ -1626,7 +1626,7 @@
             !s% profile_extra(k,3) = 0
             !s% profile_extra(k,4) = 0
          else
-            POM = (16.d0/3.d0)*PI*ALFA*ALFAM/s% dm(k)  
+            POM = (16.d0/3.d0)*PI*ALFA*ALFAM/s% dm(k)
             Vol = s% Vol(k)
             POM1 = s% RSP_w(k)/Vol**2
             POM2 = 0.5d0*(s% r(k)**6 + s% r(k+1)**6)
@@ -1659,7 +1659,7 @@
                   !$omp end critical (rsp_step_3)
                end if
             end if
-         
+
             dChi_dVol_out(I) = &
                  POMT4*0.5d0*dHp_dVol_out(I)
             dChi_dVol_00(I) = &
@@ -1668,29 +1668,29 @@
             dChi_dVol_in(I) = &
                  POMT4*0.5d0*dHp_dVol_00(i-1)
 
-            dChi_dT_out(I) = POMT4*0.5d0*dHp_dT_out(I) ! 
-            dChi_dT_00(I) = POMT4*0.5d0*(dHp_dT_00(I) + dHp_dT_out(i-1)) ! 
-            dChi_dT_in(I) = POMT4*0.5d0*dHp_dT_00(i-1) ! 
+            dChi_dT_out(I) = POMT4*0.5d0*dHp_dT_out(I) !
+            dChi_dT_00(I) = POMT4*0.5d0*(dHp_dT_00(I) + dHp_dT_out(i-1)) !
+            dChi_dT_in(I) = POMT4*0.5d0*dHp_dT_00(i-1) !
 
-            dChi_der_out(I) = POMT4*0.5d0*(dHp_der_out(I)) ! 
-            dChi_der_00(I) = POMT4*0.5d0*(dHp_der_00(I) + dHp_der_out(i-1)) ! 
-            dChi_der_in(I) = POMT4*0.5d0*(dHp_der_00(i-1)) ! 
+            dChi_der_out(I) = POMT4*0.5d0*(dHp_der_out(I)) !
+            dChi_der_00(I) = POMT4*0.5d0*(dHp_der_00(I) + dHp_der_out(i-1)) !
+            dChi_der_in(I) = POMT4*0.5d0*(dHp_der_00(i-1)) !
 
-            dChi_dw_00(I) = POMT1/Vol**2 ! 
-            
-            dChi_dr_out(I) = POMT4*0.5d0*(dHp_dr_out(I)) ! 
+            dChi_dw_00(I) = POMT1/Vol**2 !
+
+            dChi_dr_out(I) = POMT4*0.5d0*(dHp_dr_out(I)) !
             dChi_dr_00(I) = &
-               - 2.d0*s% Chi(k)/Vol*dVol_dr_00(I) & ! 
+               - 2.d0*s% Chi(k)/Vol*dVol_dr_00(I) & !
                + POMT2*3.d0*s% r(k)**5 &
                + POMT3*(2.d0/s% dt/s% r(k) - s% v(k)/s% r(k)**2) &
                + POMT4*0.5d0*(dHp_dr_00(I) + dHp_dr_out(i-1))
             dChi_dr_in(I) = &
-               - 2.d0*s% Chi(k)/Vol*dVol_dr_in(I) & ! 
+               - 2.d0*s% Chi(k)/Vol*dVol_dr_in(I) & !
                + POMT2*3.d0*s% r(k+1)**5 &
                - POMT3*(2.d0/s% dt/s% r(k+1) - s% v(k+1)/s% r(k+1)**2) &
                + POMT4*0.5d0*(dHp_dr_in(I) + dHp_dr_00(i-1))
-            dChi_dr_in2(I) = POMT4*0.5d0*dHp_dr_in(i-1) ! 
-            
+            dChi_dr_in2(I) = POMT4*0.5d0*dHp_dr_in(i-1) !
+
             if (call_is_bad) then
                if (is_bad(dChi_dr_in(I))) then
                   !$omp critical (rsp_step_4)
@@ -1709,13 +1709,13 @@
                   !$omp end critical (rsp_step_4)
                end if
             end if
-            
+
          end if
-            
+
             !if (k==194) then
             !   write(*,2) 'RSP Chi', k, s% Chi(k)
             !end if
-         
+
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -1729,7 +1729,7 @@
 
       subroutine calc_Eq(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: RRI, RRM, UUI, UUM, POM, POM2
          integer :: k
          logical :: test_partials
@@ -1752,38 +1752,38 @@
             dEq_der_in(I) = 0
             dEq_dw_00(I) = 0
          else
-         
+
             RRI = 0.5d0*(s% r(k) + s% r_start(k))
             RRM = 0.5d0*(s% r(k+1) + s% r_start(k+1))
             UUI = 0.5d0*(s% v(k) + s% v_start(k))
             UUM = 0.5d0*(s% v(k+1) + s% v_start(k+1))
-            
+
             POM = P4/s% dm(k)*(UUI/RRI - UUM/RRM)
             POM2 = P4/s% dm(k)*(THETAU*s% Chi(k) + THETAU1*s% Chi_start(k))
-         
+
             s% Eq(k) = POM*(THETAU*s% Chi(k) + THETAU1*s% Chi_start(k))
-      
+
             POM = POM*THETAU
 
             dEq_dVol_out(I) = POM*THETAU*dChi_dVol_out(i)
             dEq_dVol_00(I) = POM*THETAU*dChi_dVol_00(i)
             dEq_dVol_in(I) = POM*THETAU*dChi_dVol_in(i)
-            
-            dEq_dr_out(I) = POM*dChi_dr_out(I) ! 
-            dEq_dr_00(I) = POM*dChi_dr_00(I) & ! 
+
+            dEq_dr_out(I) = POM*dChi_dr_out(I) !
+            dEq_dr_00(I) = POM*dChi_dr_00(I) & !
                + POM2*(1.d0/(RRI*s% dt) - 0.5d0*UUI/(RRI**2))
-            dEq_dr_in(I) = POM*dChi_dr_in(I) & ! 
+            dEq_dr_in(I) = POM*dChi_dr_in(I) & !
                - POM2*(1.d0/(RRM*s% dt) - 0.5d0*UUM/(RRM**2))
-            dEq_dr_in2(I) = POM*dChi_dr_in2(I) ! 
-            dEq_dT_out(I) = POM*dChi_dT_out(I) ! 
-            dEq_dT_00(I) = POM*dChi_dT_00(I) ! 
-            dEq_dT_in(I) = POM*dChi_dT_in(I) ! 
-            dEq_der_out(I) = POM*dChi_der_out(I) ! 
-            dEq_der_00(I) = POM*dChi_der_00(I) ! 
-            dEq_der_in(I) = POM*dChi_der_in(I) ! 
-            dEq_dw_00(I) = POM*dChi_dw_00(I) ! 
+            dEq_dr_in2(I) = POM*dChi_dr_in2(I) !
+            dEq_dT_out(I) = POM*dChi_dT_out(I) !
+            dEq_dT_00(I) = POM*dChi_dT_00(I) !
+            dEq_dT_in(I) = POM*dChi_dT_in(I) !
+            dEq_der_out(I) = POM*dChi_der_out(I) !
+            dEq_der_00(I) = POM*dChi_der_00(I) !
+            dEq_der_in(I) = POM*dChi_der_in(I) !
+            dEq_dw_00(I) = POM*dChi_dw_00(I) !
          end if
-         
+
          !test_partials = (k+1 == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -1793,11 +1793,11 @@
             write(*,*) 'calc_Eq', s% solver_test_partials_var
          end if
       end subroutine calc_Eq
-      
-      
+
+
       subroutine calc_source_sink(s,i)
          type (star_info), pointer :: s
-         integer, intent(in) :: I      
+         integer, intent(in) :: I
          real(dp) :: POM, POM2, POM3, POM4, TEM1, TEMI, TEMM, &
             dsrc_dr_in2, dsrc_dr_in, dsrc_dr_00, dsrc_dr_out, &
             dsrc_dVol_out, dsrc_dVol_00, dsrc_dVol_in, &
@@ -1825,20 +1825,20 @@
             s% SOURCE(k) = 0
             s% DAMP(k) = 0
             s% DAMPR(k) = 0
-            s% COUPL(k) = 0            
+            s% COUPL(k) = 0
          else
             ! SOURCE TERM
             POM = 0.5d0*(s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
             QQ_div_Cp = s% QQ(k)/s% Cp(k)
             POM2 = s% T(k)*(s% Pgas(k) + s% Prad(k))*QQ_div_Cp
-            POM3 = s% RSP_w(k)            
+            POM3 = s% RSP_w(k)
             s% SOURCE(k) = POM*POM2*POM3
-         
+
             ! P*QQ/Cp = grad_ad
             if (k==-109) write(*,3) 'w grada PII_00 PII_p1 SOURCE', k, s% solver_iter, &
                s% RSP_w(k), (s% Pgas(k) + s% Prad(k))*QQ_div_Cp, s% PII(k), &
                s% PII(k+1), s% SOURCE(k)
-      
+
             TEM1 = POM2*POM3*0.5d0
             TEMI = - s% PII(k)/s% Hp_face(k)**2
             TEMM = - s% PII(k+1)/s% Hp_face(k+1)**2
@@ -1902,7 +1902,7 @@
                + s% T(k)*s% QQ(k)*d_Pg_dT(I) &
                + s% T(k)*(s% Pgas(k) + s% Prad(k))*dQQ_dT(I) &
                - s% T(k)*(s% Pgas(k) + s% Prad(k))*s% QQ(k)/s% Cp(k)*dCp_dT(I))
-               
+
             dsrc_der_00 = dsrc_der_00 &
                + POM/s% Cp(k)*s% T(k)*s% QQ(k)*d_Pr_der(I)
 
@@ -1919,9 +1919,9 @@
             POM = (CEDE/ALFA)*(s% RSP_w(k)**3 - EFL0**3)
             POM2 = 0.5d0*(s% Hp_face(k) + s% Hp_face(k+1))
             s% DAMP(k) = POM/POM2
-      
+
             TEM1 = - 0.5d0*POM/POM2**2
-            
+
             d_damp_dVol_out = TEM1*dHp_dVol_out(I)
             d_damp_dVol_00 = TEM1*(dHp_dVol_00(I) + dHp_dVol_out(i-1))
             d_damp_dVol_in = TEM1*dHp_dVol_00(i-1)
@@ -1936,7 +1936,7 @@
             d_damp_der_out = TEM1*dHp_der_out(I)
             d_damp_der_in = TEM1*dHp_der_00(i-1)
             d_damp_dw_00 = 3.0d0*(CEDE/ALFA)/POM2*s% RSP_w(k)**2
-            
+
             ! RADIATIVE DAMP TERM
             if (GAMMAR == 0.d0)then
                s% DAMPR(k) = 0.d0
@@ -1954,7 +1954,7 @@
                d_dampR_der_in = 0.d0
                d_dampR_der_00 = 0.d0
                d_dampR_dw_00 = 0.d0
-            else   
+            else
                POM = (GAMMAR**2)/(ALFA**2)*4.d0*SIG
                POM2a = s% T(k)**3*s% Vol(k)**2
                POM2b = 1d0/(s% Cp(k)*s% opacity(k))
@@ -1962,7 +1962,7 @@
                POM3 = s% RSP_w(k)**2
                POM4 = 0.5d0*(s% Hp_face(k)**2 + s% Hp_face(k+1)**2)
                s% DAMPR(k) = POM*POM2*POM3/POM4
-      
+
                TEM1 = - s% DAMPR(k)/POM4
 
                d_POM2a_dVol_00 = 2d0*s% T(k)**3*s% Vol(k)
@@ -1972,25 +1972,25 @@
                d_POM4_dVol_00 = &
                   s% Hp_face(k)*dHp_dVol_00(I) + &
                   s% Hp_face(k+1)*dHp_dVol_out(I-1)
-               
+
                d_dampR_dVol_out = TEM1*s% Hp_face(k)*dHp_dVol_out(I)
                d_dampR_dVol_00 = POM*POM3*( &
                   d_POM2_dVol_00 - POM2*d_POM4_dVol_00/POM4)/POM4
-               
+
                d_dampR_dVol_in = TEM1*s% Hp_face(k+1)*dHp_dVol_00(i-1)
-               
+
                d_dampR_dr_out = TEM1*s% Hp_face(k)*dHp_dr_out(I)
                d_dampR_dr_00 = TEM1*(s% Hp_face(k)*dHp_dr_00(I) &
                   + s% Hp_face(k+1)*dHp_dr_out(i-1))
                d_dampR_dr_in = TEM1*(s% Hp_face(k)*dHp_dr_in(I) &
                   + s% Hp_face(k+1)*dHp_dr_00(i-1))
                d_dampR_dr_in2 = TEM1*s% Hp_face(k+1)*dHp_dr_in(i-1)
-               
+
                d_dampR_dT_out = TEM1*s% Hp_face(k)*dHp_dT_out(I)
                d_dampR_dT_00 = TEM1*(s% Hp_face(k)*dHp_dT_00(I) &
                   + s% Hp_face(k+1)*dHp_dT_out(i-1))
                d_dampR_dT_in = TEM1*s% Hp_face(k+1)*dHp_dT_00(i-1)
-               
+
                d_dampR_der_out = TEM1*s% Hp_face(k)*dHp_der_out(I)
                d_dampR_der_00 = TEM1*(s% Hp_face(k)*dHp_der_00(I) &
                   + s% Hp_face(k+1)*dHp_der_out(i-1))
@@ -2003,7 +2003,7 @@
                   + TEM1*s% T(k)**3*(2.d0*s% Vol(k)*dVol_dr_00(I) &
                   - s% Vol(k)**2*(1.d0/s% Cp(k)*dCp_dr_00(I) &
                   + 1.d0/s% opacity(k)*dK_dr_00(I))) &
-                  /(s% Cp(k)*s% opacity(k))              
+                  /(s% Cp(k)*s% opacity(k))
 
                d_dampR_dr_in = d_dampR_dr_in &
                   + TEM1*s% T(k)**3*(&
@@ -2019,22 +2019,22 @@
                   /(s% Cp(k)*s% opacity(k))
 
             end if
- 
+
             s% COUPL(k) = s% SOURCE(k) - s% DAMP(k) - s% DAMPR(k)
-            dC_dr_00(I) = dsrc_dr_00 - d_damp_dr_00 - d_dampR_dr_00 ! 
-            dC_dr_out(I) = dsrc_dr_out - d_damp_dr_out - d_dampR_dr_out ! 
-            dC_dr_in(I) = dsrc_dr_in - d_damp_dr_in - d_dampR_dr_in ! 
-            dC_dr_in2(I) = dsrc_dr_in2 - d_damp_dr_in2 - d_dampR_dr_in2 ! 
-            dC_dVol_00(I) = dsrc_dVol_00 - d_damp_dVol_00 - d_dampR_dVol_00 ! 
-            dC_dVol_out(I) = dsrc_dVol_out - d_damp_dVol_out - d_dampR_dVol_out ! 
-            dC_dVol_in(I) = dsrc_dVol_in - d_damp_dVol_in - d_dampR_dVol_in ! 
-            dC_dT_00(I) = dsrc_dT_00 - d_damp_dT_00 - d_dampR_dT_00 ! 
-            dC_dT_out(I) = dsrc_dT_out - d_damp_dT_out - d_dampR_dT_out ! 
-            dC_dT_in(I) = dsrc_dT_in - d_damp_dT_in - d_dampR_dT_in ! 
-            dC_der_00(I) = dsrc_der_00 - d_damp_der_00 - d_dampR_der_00 ! 
-            dC_der_out(I) = dsrc_der_out - d_damp_der_out - d_dampR_der_out ! 
-            dC_der_in(I) = dsrc_der_in - d_damp_der_in - d_dampR_der_in ! 
-            dC_dw_00(I) = dsrc_dw_00 - d_damp_dw_00 - d_dampR_dw_00 ! 
+            dC_dr_00(I) = dsrc_dr_00 - d_damp_dr_00 - d_dampR_dr_00 !
+            dC_dr_out(I) = dsrc_dr_out - d_damp_dr_out - d_dampR_dr_out !
+            dC_dr_in(I) = dsrc_dr_in - d_damp_dr_in - d_dampR_dr_in !
+            dC_dr_in2(I) = dsrc_dr_in2 - d_damp_dr_in2 - d_dampR_dr_in2 !
+            dC_dVol_00(I) = dsrc_dVol_00 - d_damp_dVol_00 - d_dampR_dVol_00 !
+            dC_dVol_out(I) = dsrc_dVol_out - d_damp_dVol_out - d_dampR_dVol_out !
+            dC_dVol_in(I) = dsrc_dVol_in - d_damp_dVol_in - d_dampR_dVol_in !
+            dC_dT_00(I) = dsrc_dT_00 - d_damp_dT_00 - d_dampR_dT_00 !
+            dC_dT_out(I) = dsrc_dT_out - d_damp_dT_out - d_dampR_dT_out !
+            dC_dT_in(I) = dsrc_dT_in - d_damp_dT_in - d_dampR_dT_in !
+            dC_der_00(I) = dsrc_der_00 - d_damp_der_00 - d_dampR_der_00 !
+            dC_der_out(I) = dsrc_der_out - d_damp_der_out - d_dampR_der_out !
+            dC_der_in(I) = dsrc_der_in - d_damp_der_in - d_dampR_der_in !
+            dC_dw_00(I) = dsrc_dw_00 - d_damp_dw_00 - d_dampR_dw_00 !
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -2063,7 +2063,7 @@
             dEq_dT_in(I) = 0.d0
             dEq_dT_00(I) = 0.d0
             dEq_dT_out(I) = 0.d0
-            dEq_dw_00(I) = 0.d0! - 
+            dEq_dw_00(I) = 0.d0! -
             s% Chi(k) = 0.d0
             dChi_dr_in2(I) = 0.d0
             dChi_dr_in(I) = 0.d0
@@ -2072,7 +2072,7 @@
             dChi_dT_in(I) = 0.d0
             dChi_dT_00(I) = 0.d0
             dChi_dT_out(I) = 0.d0
-            dChi_dw_00(I) = 0.d0! - 
+            dChi_dw_00(I) = 0.d0! -
             s% COUPL(k) = 0.d0
             dC_dr_00(I) = 0.d0
             dC_dr_out(I) = 0.d0
@@ -2081,11 +2081,11 @@
             dC_dT_in(I) = 0.d0
             dC_dT_00(I) = 0.d0
             dC_dT_out(I) = 0.d0
-            dC_dw_00(I) = 0.d0! - 
+            dC_dw_00(I) = 0.d0! -
             s% Ptrb(k) = 0.d0
-            dPtrb_dr_00(I) = 0.d0 
+            dPtrb_dr_00(I) = 0.d0
             dPtrb_dr_in(I) = 0.d0
-            dPtrb_dw_00(I) = 0.d0! - 
+            dPtrb_dw_00(I) = 0.d0! -
          end do
          do I = NZN,NZN
             k = NZN+1-i
@@ -2097,7 +2097,7 @@
             dEq_dT_in(I) = 0.d0
             dEq_dT_00(I) = 0.d0
             dEq_dT_out(I) = 0.d0
-            dEq_dw_00(I) = 0.d0! - 
+            dEq_dw_00(I) = 0.d0! -
             s% Chi(k) = 0.d0
             dChi_dr_in2(I) = 0.d0
             dChi_dr_in(I) = 0.d0
@@ -2106,7 +2106,7 @@
             dChi_dT_in(I) = 0.d0
             dChi_dT_00(I) = 0.d0
             dChi_dT_out(I) = 0.d0
-            dChi_dw_00(I) = 0.d0! - 
+            dChi_dw_00(I) = 0.d0! -
             s% COUPL(k) = 0.d0
             dC_dr_00(I) = 0.d0
             dC_dr_out(I) = 0.d0
@@ -2115,15 +2115,15 @@
             dC_dT_in(I) = 0.d0
             dC_dT_00(I) = 0.d0
             dC_dT_out(I) = 0.d0
-            dC_dw_00(I) = 0.d0! - 
+            dC_dw_00(I) = 0.d0! -
             s% Ptrb(k) = 0.d0
             dPtrb_dr_00(I) = 0.d0
             dPtrb_dr_in(I) = 0.d0
-            dPtrb_dw_00(I) = 0.d0! - 
+            dPtrb_dw_00(I) = 0.d0! -
          end do
       end subroutine zero_boundaries
 
-         
+
       subroutine calc_Lt(s,i,Lt_00, &
             dLt_dr_00, dLt_dr_in, dLt_dr_out, &
             dLt_dVol_00, dLt_dVol_out, &
@@ -2131,7 +2131,7 @@
             dLt_der_00, dLt_der_out, &
             dLt_dw_00, dLt_dw_out)
          type (star_info), pointer :: s
-         integer, intent(in) :: I         
+         integer, intent(in) :: I
          real(dp), intent(out) :: &
             Lt_00, &
             dLt_dr_00, dLt_dr_in, dLt_dr_out, &
@@ -2151,11 +2151,11 @@
             dLt_dr_00 = 0.d0
             dLt_dr_in = 0.d0
             dLt_dr_out = 0.d0
-            dLt_dVol_00 = 0.d0 
+            dLt_dVol_00 = 0.d0
             dLt_dVol_out = 0.d0
-            dLt_dT_00 = 0.d0 
+            dLt_dT_00 = 0.d0
             dLt_dT_out = 0.d0
-            dLt_der_00 = 0.d0 
+            dLt_der_00 = 0.d0
             dLt_der_out = 0.d0
             dLt_dw_00 = 0.d0
             dLt_dw_out = 0.d0
@@ -2164,36 +2164,36 @@
             POM = - 2.d0/3.d0*ALFA*ALFAT*(P4*(s% r(k)**2))**2
             rho2_face = 0.5d0*(1.d0/s% Vol(k)**2 + 1.d0/s% Vol(k-1)**2)
             POM2 = s% Hp_face(k)*rho2_face
-            Lt_00 = POM*POM2*POM3       
-                 
+            Lt_00 = POM*POM2*POM3
+
             TEM1 = Lt_00/s% Hp_face(k)
             TEM2 = Lt_00/POM2*s% Hp_face(k)
-            
+
             d_POM2_dVol_00 = dHp_dVol_00(i)*rho2_face - s% Hp_face(k)/s% Vol(k)**3
             d_POM2_dVol_out = dHp_dVol_out(i)*rho2_face - s% Hp_face(k)/s% Vol(k-1)**3
             dLt_dVol_00 = POM*POM3*d_POM2_dVol_00
             dLt_dVol_out = POM*POM3*d_POM2_dVol_out
-            
-            dLt_dr_00 = 4.d0*Lt_00/s% r(k) & ! 
+
+            dLt_dr_00 = 4.d0*Lt_00/s% r(k) & !
                - TEM2/s% Vol(k)**3*dVol_dr_00(I) &
                - TEM2/s% Vol(k-1)**3*dVol_dr_in(i+1) &
                + TEM1*dHp_dr_00(I)
             dLt_dr_in = &
-               - TEM2/s% Vol(k)**3*dVol_dr_in(I) & ! 
+               - TEM2/s% Vol(k)**3*dVol_dr_in(I) & !
                + TEM1*dHp_dr_in(I)
             dLt_dr_out = &
-               - TEM2/s% Vol(k-1)**3*dVol_dr_00(i+1) & ! 
+               - TEM2/s% Vol(k-1)**3*dVol_dr_00(i+1) & !
                + TEM1*dHp_dr_out(I)
-            dLt_dT_00 = TEM1*dHp_dT_00(I) ! 
-            dLt_dT_out = TEM1*dHp_dT_out(I) ! 
-            dLt_der_00 = TEM1*dHp_der_00(I) ! 
-            dLt_der_out = TEM1*dHp_der_out(I) ! 
-            TEM1 = POM*POM2*3.0d0/s% dm_bar(k) 
-            dLt_dw_00 = -TEM1*s% RSP_w(k)**2 ! 
-            dLt_dw_out = TEM1*s% RSP_w(k-1)**2 ! 
+            dLt_dT_00 = TEM1*dHp_dT_00(I) !
+            dLt_dT_out = TEM1*dHp_dT_out(I) !
+            dLt_der_00 = TEM1*dHp_der_00(I) !
+            dLt_der_out = TEM1*dHp_der_out(I) !
+            TEM1 = POM*POM2*3.0d0/s% dm_bar(k)
+            dLt_dw_00 = -TEM1*s% RSP_w(k)**2 !
+            dLt_dw_out = TEM1*s% RSP_w(k-1)**2 !
          end if
          if (i > 0) s% Lt(k) = Lt_00
-         
+
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -2203,8 +2203,8 @@
             write(*,*) 'calc_Lt', s% solver_test_partials_var
          end if
       end subroutine calc_Lt
-      
-      
+
+
       subroutine calc_Lc(s,i,Lc_00, &
             dLc_dr_in, dLc_dr_00, dLc_dr_out, &
             dLc_dVol_00, dLc_dVol_out, &
@@ -2212,7 +2212,7 @@
             dLc_der_00, dLc_der_out, &
             dLc_dw_00, dLc_dw_out)
          type (star_info), pointer :: s
-         integer, intent(in) :: I         
+         integer, intent(in) :: I
          real(dp), intent(out) :: &
             Lc_00, dLc_dr_in, dLc_dr_00, dLc_dr_out, &
             dLc_dVol_00, dLc_dVol_out, &
@@ -2224,7 +2224,7 @@
          logical :: test_partials
          include 'formats'
          k = NZN+1-i
-         if (I <= IBOTOM .or. I == NZN .or. ALFA == 0d0)then 
+         if (I <= IBOTOM .or. I == NZN .or. ALFA == 0d0)then
             Lc_00 = 0.d0 !DODANE SMOLEC
             dLc_dr_in = 0.d0
             dLc_dr_00 = 0.d0
@@ -2236,7 +2236,7 @@
             dLc_der_00 = 0.d0
             dLc_der_out = 0.d0
             dLc_dw_00 = 0.d0
-            dLc_dw_out = 0.d0! - 
+            dLc_dw_out = 0.d0! -
          else if (s% RSP_w(k) < EFL0*1d-8)then
             Lc_00 = 0.d0
             dLc_dr_00 = 0.d0
@@ -2251,50 +2251,50 @@
             dLc_dw_00 = 0.d0
             dLc_dw_out = 0.d0
          else
-            
+
             POM3 = 0.5d0*(s% RSP_w(k) + s% RSP_w(k-1))
 
             POM = P4*(s% r(k)**2)*(ALFAC/ALFAS)* &
                0.5d0*(s% T(k)/s% Vol(k) + s% T(k-1)/s% Vol(k-1))
-            Lc_00 = POM*s% PII(k)*POM3 
-            
-            dLc_dw_00 = POM*s% PII(k)*0.5d0 ! 
+            Lc_00 = POM*s% PII(k)*POM3
+
+            dLc_dw_00 = POM*s% PII(k)*0.5d0 !
             if (I >= NZN - 1) then
                dLc_dw_out = 0.d0
             else
-               dLc_dw_out = POM*s% PII(k)*0.5d0 ! 
+               dLc_dw_out = POM*s% PII(k)*0.5d0 !
             end if
-            
+
             POM2 = P4*(s% r(k)**2)*s% PII(k)*POM3*0.5d0*(ALFAC/ALFAS)
             POM = POM*POM3
-            
-            dLc_dr_00 = & ! 
+
+            dLc_dr_00 = & !
                  POM*dPII_dr_00(I) &
                + 2.d0*Lc_00/s% r(k) &
                - POM2*(s% T(k)/(s% Vol(k)**2)*dVol_dr_00(I) + &
                         s% T(k-1)/(s% Vol(k-1)**2)*dVol_dr_in(i+1))
             dLc_dr_in = &
                  POM*dPII_dr_in(I) &
-               - POM2*s% T(k)/(s% Vol(k)**2)*dVol_dr_in(I) ! 
+               - POM2*s% T(k)/(s% Vol(k)**2)*dVol_dr_in(I) !
             dLc_dr_out = &
                  POM*dPII_dr_out(I) &
-               - POM2*s% T(k-1)/(s% Vol(k-1)**2)*dVol_dr_00(i+1) ! 
+               - POM2*s% T(k-1)/(s% Vol(k-1)**2)*dVol_dr_00(i+1) !
 
             dLc_dVol_00 = &
                  POM*dPII_dVol_00(I) &
-               - POM2*s% T(k)/(s% Vol(k)**2) ! 
+               - POM2*s% T(k)/(s% Vol(k)**2) !
             dLc_dVol_out = &
                  POM*dPII_dVol_out(I) &
-               - POM2*s% T(k-1)/(s% Vol(k-1)**2) ! 
-               
-            dLc_dT_00 = POM*dPII_dT_00(I) + POM2/s% Vol(k) ! 
-            dLc_dT_out = POM*dPII_dT_out(I) + POM2/s% Vol(k-1) ! 
-               
-            dLc_der_00 = POM*dPII_der_00(I) ! 
-            dLc_der_out = POM*dPII_der_out(I) ! 
-            
+               - POM2*s% T(k-1)/(s% Vol(k-1)**2) !
+
+            dLc_dT_00 = POM*dPII_dT_00(I) + POM2/s% Vol(k) !
+            dLc_dT_out = POM*dPII_dT_out(I) + POM2/s% Vol(k-1) !
+
+            dLc_der_00 = POM*dPII_der_00(I) !
+            dLc_der_out = POM*dPII_der_out(I) !
+
          end if
-         
+
          if (i > 0) s% Lc(k) = Lc_00
 
          !test_partials = (k-1 == s% solver_test_partials_k)
@@ -2306,17 +2306,17 @@
             write(*,*) 'calc_Lc', s% solver_test_partials_var
          end if
       end subroutine calc_Lc
-      
+
       ! in diffusion limit, radiative flux equation reduces to Fr calculated from d_erad_dm as below.
       ! note that can have nonequilibrium diffusion regime with different T for gas and photons.
       ! this happens when absorption mean opacity is different than Planck mean opacity.
-      subroutine calc_Fr(s, i, Fr_00, & !rs Stellingwerf 1975, Appendix A 
+      subroutine calc_Fr(s, i, Fr_00, & !rs Stellingwerf 1975, Appendix A
             dFr_dr_out, dFr_dr_00, dFr_dr_in, &
             dFr_dVol_out, dFr_dVol_00, &
             dFr_dT_out, dFr_dT_00, &
             dFr_der_out, dFr_der_00)
          type (star_info), pointer :: s
-         integer, intent(in) :: I         
+         integer, intent(in) :: I
          real(dp), intent(out) :: &
             Fr_00, dFr_dr_out, dFr_dr_00, dFr_dr_in, &
             dFr_dVol_out, dFr_dVol_00, &
@@ -2332,9 +2332,9 @@
          integer :: k
          logical :: test_partials
          include 'formats'
-         
+
          k = NZN+1-i
-         
+
          if (i < 1) then
             if (s% RSP_hydro_only) then
                Fr_00 = 0d0
@@ -2343,7 +2343,7 @@
             end if
             Fr_00 = Fr_00/(4d0*pi*s% r_center**2)
             dFr_dr_out = 0
-            dFr_dr_00 = 0 
+            dFr_dr_00 = 0
             dFr_dr_in = 0
             dFr_dVol_out = 0
             dFr_dVol_00 = 0
@@ -2353,14 +2353,14 @@
             dFr_der_00 = 0
             return
          end if
-         
+
          Prad_factor = 3d0/crad ! 3d0 to cancel the 1/3d0 factor in CL below
          W_00 = Prad_factor*s% Prad(k) ! replaces s% T(k)**4
          d_W_00_dVol_00 = Prad_factor*d_Pr_dVol(i)
          d_W_00_dr_in = Prad_factor*d_Pr_dr_in(i)
          d_W_00_dr_00 = Prad_factor*d_Pr_dr_00(i)
-         d_W_00_der_00 = Prad_factor*d_Pr_der(i) 
-         
+         d_W_00_der_00 = Prad_factor*d_Pr_der(i)
+
          if (k == 1) then ! surface
             Fr1 = s% g_Edd*4d0*SIG
             Fr_00 = Fr1*W_00 ! s% T(k)**4 => W_00
@@ -2375,14 +2375,14 @@
             dFr_der_00 = Fr1*d_W_00_der_00
             return
          end if
-         
+
          W_out = Prad_factor*s% Prad(k-1) ! replaces s% T(k-1)**4
          d_W_out_dVol_out = Prad_factor*d_Pr_dVol(i+1)
          d_W_out_dr_00 = Prad_factor*d_Pr_dr_in(i+1)
          d_W_out_dr_out = Prad_factor*d_Pr_dr_00(i+1)
          d_W_out_der_out = Prad_factor*d_Pr_der(i+1)
-         
-         BW = log(W_out/W_00) 
+
+         BW = log(W_out/W_00)
          if (abs(BW) < 1d-30) then
             Fr_00 = 0
             dFr_dr_out = 0
@@ -2396,21 +2396,21 @@
             dFr_der_00 = 0
             return
          end if
-         
+
          kap_00 = s% opacity(k)
          kap_out = s% opacity(k-1)
          BK = log(kap_out/kap_00)
 
          Fr1 = -CL*s% r(k)**2/(4d0*pi*s% dm_bar(k))   ! CL = 4d0*(4d0*PI)**2*SIG/3d0
-         
+
          Fr2a = W_out/kap_out - W_00/kap_00
          d_Fr2a_dW_00 = -1d0/kap_00
          d_Fr2a_dW_out = 1d0/kap_out
-         
+
          Fr2b = 1d0 - BK/BW
          d_Fr2b_dW_00 = -BK/BW**2/W_00
          d_Fr2b_dW_out = BK/BW**2/W_out
-         
+
          Fr2 = Fr2a/Fr2b
          Fr_00 = Fr1*Fr2
          d_Fr_dW_00 = Fr1*(d_Fr2a_dW_00 - Fr2*d_Fr2b_dW_00)/Fr2b
@@ -2419,19 +2419,19 @@
          Fr3 = Fr1/(BW - BK)
          d_Fr_dK_00 = (Fr3/kap_00)*(W_00*BW/kap_00 - Fr2)
          d_Fr_dK_out = -(Fr3/kap_out)*(W_out*BW/kap_out - Fr2)
-         
-         dFr_dr_in = & ! 
+
+         dFr_dr_in = & !
             + d_Fr_dK_00*dK_dr_in(i) &
             + d_Fr_dW_00*d_W_00_dr_in
-         dFr_dr_00 = 2d0*Fr_00/s% r(k) & ! 
+         dFr_dr_00 = 2d0*Fr_00/s% r(k) & !
             + d_Fr_dK_00*dK_dr_00(i) &
             + d_Fr_dK_out*dK_dr_in(i+1) &
             + d_Fr_dW_00*d_W_00_dr_00 &
             + d_Fr_dW_out*d_W_out_dr_00
-         dFr_dr_out = & ! 
+         dFr_dr_out = & !
             + d_Fr_dK_out*dK_dr_00(i+1) &
             + d_Fr_dW_out*d_W_out_dr_out
-         
+
          dFr_dVol_00 = &
             + d_Fr_dK_00*dK_dVol(i) &
             + d_Fr_dW_00*d_W_00_dVol_00
@@ -2439,16 +2439,16 @@
             + d_Fr_dK_out*dK_dVol(i+1) &
             + d_Fr_dW_out*d_W_out_dVol_out
 
-         dFr_dT_out = & ! 
+         dFr_dT_out = & !
             + d_Fr_dK_out*dK_dT(i+1)
-         dFr_dT_00 = & ! 
+         dFr_dT_00 = & !
             + d_Fr_dK_00*dK_dT(i)
-            
-         dFr_der_out = & ! 
+
+         dFr_der_out = & !
             + d_Fr_dW_out*d_W_out_der_out
-         dFr_der_00 = & ! 
+         dFr_der_00 = & !
             + d_Fr_dW_00*d_W_00_der_00
-         
+
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -2457,7 +2457,7 @@
             s% solver_test_partials_dval_dx = dFr_dVol_out
             write(*,*) 'calc_Fr', s% solver_test_partials_var
          end if
-         
+
          if (call_is_bad) then
             if (is_bad(Fr_00)) then
    !$omp critical (rsp_step_5)
@@ -2481,7 +2481,7 @@
    !$omp end critical (rsp_step_5)
             end if
          end if
-         
+
       end subroutine calc_Fr
 
 
@@ -2499,7 +2499,7 @@
          logical :: test_partials
          integer :: k
          include 'formats'
-         
+
          k = NZN+1-i
          if (k == 0) then ! pressure outside of surface
             if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
@@ -2523,7 +2523,7 @@
          else
             Prad_factor = 0d0
          end if
-         
+
          XP = THETA*(s% Pgas(k) + Prad_factor*s% Prad(k)) &
             + THETA1*(s% Pgas_start(k) + Prad_factor*s% Prad_start(k)) &
             + THETAQ*s% Pvsc(k) + THETAQ1*s% Pvsc_start(k) &
@@ -2532,18 +2532,18 @@
               THETA*(d_Pg_dVol(i) + Prad_factor*d_Pr_dVol(i)) &
             + THETAQ*d_Pvsc_dVol(i) &
             + THETAT*dPtrb_dVol_00(i)
-         d_XP_dT_00 = THETA*d_Pg_dT(i) + THETAQ*d_Pvsc_dT(i) ! 
-         d_XP_der_00 = THETA*Prad_factor*d_Pr_der(i) ! 
-         d_XP_dw_00 = THETAT*dPtrb_dw_00(i) ! 
-         d_XP_dr_in = & ! 
+         d_XP_dT_00 = THETA*d_Pg_dT(i) + THETAQ*d_Pvsc_dT(i) !
+         d_XP_der_00 = THETA*Prad_factor*d_Pr_der(i) !
+         d_XP_dw_00 = THETAT*dPtrb_dw_00(i) !
+         d_XP_dr_in = & !
               THETA*(d_Pg_dr_in(i) + Prad_factor*d_Pr_dr_in(i)) &
             + THETAQ*d_Pvsc_dr_in(i) &
             + THETAT*dPtrb_dr_in(i)
-         d_XP_dr_00 = & ! 
+         d_XP_dr_00 = & !
               THETA*(d_Pg_dr_00(i) + Prad_factor*d_Pr_dr_00(i)) &
             + THETAQ*d_Pvsc_dr_00(i) &
             + THETAT*dPtrb_dr_00(i)
-            
+
          if (call_is_bad) then
             if (is_bad(XP)) then
    !$omp critical (rsp_step_6)
@@ -2568,10 +2568,10 @@
             s% solver_test_partials_var = i_var_Vol
             s% solver_test_partials_dval_dx = d_XP_dVol_00
             write(*,*) 'rsp_calc_XP', s% solver_test_partials_var
-         end if        
+         end if
       end subroutine rsp_calc_XP
-      
-      
+
+
       subroutine calc_equations(s,i,P_surf)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -2579,17 +2579,17 @@
          call calc_face_equations(s,i,P_surf)
          call calc_cell_equations(s,i,P_surf,.true.,.true.,.true.)
       end subroutine calc_equations
-      
-      
+
+
       subroutine calc_face_equations(s,i,P_surf)
          type (star_info), pointer :: s
          integer, intent(in) :: i
          real(dp), intent(in) :: P_surf
          call acceleration_eqn(s,i,P_surf)
-         call Fr_eqn(s,i)         
+         call Fr_eqn(s,i)
       end subroutine calc_face_equations
-      
-      
+
+
       subroutine calc_cell_equations( &
             s, i, P_surf, do_etot, do_eturb, do_erad)
          type (star_info), pointer :: s
@@ -2608,17 +2608,17 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00                        
+            dLt_in_dw_in, dLt_in_dw_00
 
          include 'formats'
-         
+
          ! HR = -residual
-         ! partials of residual go in HD            
+         ! partials of residual go in HD
 
          k = NZN+1-i
 
-         call get_Lt 
-         
+         call get_Lt
+
          if (do_etot) call total_energy_eqn(s, i, P_surf, &
             Lt_00, Lt_00_start, Lt_in, Lt_in_start, &
             dLt_00_dr_00, dLt_00_dr_in, dLt_00_dr_out, &
@@ -2630,8 +2630,8 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00)                    
-            
+            dLt_in_dw_in, dLt_in_dw_00)
+
          if (do_eturb) call turbulent_energy_eqn(s, i, &
             Lt_00, Lt_00_start, Lt_in, Lt_in_start, &
             dLt_00_dr_00, dLt_00_dr_in, dLt_00_dr_out, &
@@ -2643,20 +2643,20 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00)                    
-         
+            dLt_in_dw_in, dLt_in_dw_00)
+
          if (do_erad) call erad_eqn(s,i)
-            
+
          if (I == 1) call inner_boundary_eqn
-         
+
          contains
-         
-         subroutine inner_boundary_eqn 
-            HR(1) = 0.d0              
-            HD(1:LD_HD,1) = 0.d0            
-            HD(i_r_dr_00,1) = 1.d0              
-         end subroutine inner_boundary_eqn          
-                  
+
+         subroutine inner_boundary_eqn
+            HR(1) = 0.d0
+            HD(1:LD_HD,1) = 0.d0
+            HD(i_r_dr_00,1) = 1.d0
+         end subroutine inner_boundary_eqn
+
          subroutine get_Lt
             integer :: k
             k = NZN+1-i
@@ -2665,7 +2665,7 @@
                dLt_in_dVol_in, dLt_in_dVol_00, &
                dLt_in_dT_in, dLt_in_dT_00, &
                dLt_in_der_in, dLt_in_der_00, &
-               dLt_in_dw_in, dLt_in_dw_00)        
+               dLt_in_dw_in, dLt_in_dw_00)
             call calc_Lt(s,i,Lt_00, &
                dLt_00_dr_00, dLt_00_dr_in, dLt_00_dr_out, &
                dLt_00_dVol_00, dLt_00_dVol_out, &
@@ -2673,7 +2673,7 @@
                dLt_00_der_00, dLt_00_der_out, &
                dLt_00_dw_00, dLt_00_dw_out)
             if (I == NZN) then
-               Lt_00_start = 0.d0   
+               Lt_00_start = 0.d0
             else
                Lt_00_start = s% Lt_start(k)
             end if
@@ -2681,12 +2681,12 @@
                Lt_in_start = 0
             else
                Lt_in_start = s% Lt_start(k+1)
-            end if         
-         end subroutine get_Lt   
+            end if
+         end subroutine get_Lt
 
       end subroutine calc_cell_equations
-      
-      
+
+
       subroutine acceleration_eqn(s, i, P_surf)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -2718,27 +2718,27 @@
          logical :: test_partials, use_Prad
 
          include 'formats'
-         
+
          use_Prad = .true. ! s% RSP_accel_eqn_use_Prad_instead_of_Fr_term
-         
+
          dvdt_factor = 1d0
 
          k = NZN+1-i
          IR = i_var_R + NV*(i-1)
-         HD(1:LD_HD,IR) = 0.d0   
-         
+         HD(1:LD_HD,IR) = 0.d0
+
          dt = s% dt
          !if (s% use_compression_outer_BC .and. I == NZN) then
          !   call mesa_error(__FILE__,__LINE__,'no rsp support for use_compression_outer_BC')
          !end if
-         
+
          ! XP doesn't include Prad for acceleration equation
          ! instead introduce term using Fr
-         
+
          call rsp_calc_XP(s, P_surf, i+1, use_Prad, &
             XP_out, dXP_out_dVol_out, dXP_out_dT_out, dXP_out_der_out, &
             dXP_out_dw_out, dXP_out_dr_00, dXP_out_dr_out)
-            
+
          call rsp_calc_XP(s, P_surf, i, use_Prad, &
             XP_00, dXP_00_dVol_00, dXP_00_dT_00, dXP_00_der_00, &
             dXP_00_dw_00, dXP_00_dr_in, dXP_00_dr_00)
@@ -2750,7 +2750,7 @@
          dv_dr = 2d0/dt
          dXP_dm = (XP_out - XP_00)/dm_bar
          grav = - s% cgrav(k)*s% m(k)/(s% r(k)*s% r_start(k))
-        
+
          R_00 = 0.5d0*(s% r(k) + s% r_start(k))
          Uq1 = P4/(dm_bar*R_00)
          d_Uq1_dr_00 = -Uq1*0.5d0/R_00
@@ -2767,7 +2767,7 @@
          d_Chi_00_dr_in2 = THETAU*dChi_dr_in2(i)
          d_Chi_00_dr_in = THETAU*dChi_dr_in(i)
          d_Chi_00_dr_00 = THETAU*dChi_dr_00(i)
-         d_Chi_00_dr_out = THETAU*dChi_dr_out(i)   
+         d_Chi_00_dr_out = THETAU*dChi_dr_out(i)
          if (I == NZN) then
             Chi_out = 0d0
             d_Chi_out_dVol_00 = 0d0
@@ -2783,7 +2783,7 @@
             d_Chi_out_dr_out = 0d0
             d_Chi_out_dr_out2 = 0d0
          else
-            Chi_out = THETAU*s% Chi(k-1) + THETAU1*s% Chi_start(k-1)         
+            Chi_out = THETAU*s% Chi(k-1) + THETAU1*s% Chi_start(k-1)
             d_Chi_out_dVol_00 = THETAU*dChi_dVol_in(i+1)
             d_Chi_out_dT_00 = THETAU*dChi_dT_in(i+1)
             d_Chi_out_dT_out = THETAU*dChi_dT_00(i+1)
@@ -2795,10 +2795,10 @@
             d_Chi_out_dr_in = THETAU*dChi_dr_in2(i+1)
             d_Chi_out_dr_00 = THETAU*dChi_dr_in(i+1)
             d_Chi_out_dr_out = THETAU*dChi_dr_00(i+1)
-            d_Chi_out_dr_out2 = THETAU*dChi_dr_out(i+1)   
-         end if                          
+            d_Chi_out_dr_out2 = THETAU*dChi_dr_out(i+1)
+         end if
 
-         s% Uq(k) = Uq1*(Chi_out - Chi_00)         
+         s% Uq(k) = Uq1*(Chi_out - Chi_00)
          d_Uq_dVol_00 = Uq1*(d_Chi_out_dVol_00 - d_Chi_00_dVol_00)
          d_Uq_dT_in = -Uq1*d_Chi_00_dT_in
          d_Uq_dT_00 = Uq1*(d_Chi_out_dT_00 - d_Chi_00_dT_00)
@@ -2807,9 +2807,9 @@
          d_Uq_der_in = -Uq1*d_Chi_00_der_in
          d_Uq_der_00 = Uq1*(d_Chi_out_der_00 - d_Chi_00_der_00)
          d_Uq_der_out = Uq1*(d_Chi_out_der_out - d_Chi_00_der_out)
-         d_Uq_der_out2 = Uq1*d_Chi_out_der_out2         
+         d_Uq_der_out2 = Uq1*d_Chi_out_der_out2
          d_Uq_dw_00 = -Uq1*d_Chi_00_dw_00
-         d_Uq_dw_out = Uq1*d_Chi_out_dw_out         
+         d_Uq_dw_out = Uq1*d_Chi_out_dw_out
          d_Uq_dr_in2 = -Uq1*d_Chi_00_dr_in2
          d_Uq_dr_in = Uq1*(d_Chi_out_dr_in - d_Chi_00_dr_in)
          d_Uq_dr_00 = &
@@ -2855,36 +2855,36 @@
             d_Fr_term_dr_00 = Fr_term*d_kap_dr_00/kap_face
             d_Fr_term_dr_out = Fr_term*d_kap_dr_out/kap_face
          end if
-         
+
          residual = &
             dvdt_factor*(s% v(k) - s% v_start(k))/dt &
            + area*dXP_dm - grav - s% Uq(k) - Fr_term
          HR(IR) = -residual
-         
+
          !s% xtra1_array(k) = s% Pgas(k) + s% Prad(k)
          !s% xtra2_array(k) = s% Vol(k)
          !s% xtra3_array(k) = s% T(k)
          !s% xtra4_array(k) = s% v(k)
          !s% xtra5_array(k) = s% RSP_w(k)**2
          !s% xtra6_array(k) = s% r(k)
-            
+
          HD(i_r_dFr_00,IR) = - d_Fr_term_dFr_00
 
          HD(i_r_dT_in,IR) = &
             - d_Uq_dT_in
          HD(i_r_dT_00,IR) = &
-            + A_dm*(-dXP_00_dT_00) & 
+            + A_dm*(-dXP_00_dT_00) &
             - d_Uq_dT_00 &
             - d_Fr_term_dT_00
          HD(i_r_dT_out,IR) = &
-            + A_dm*dXP_out_dT_out & 
+            + A_dm*dXP_out_dT_out &
             - d_Uq_dT_out &
             - d_Fr_term_dT_out
-         HD(i_r_dT_out2,IR) = & 
+         HD(i_r_dT_out2,IR) = &
             - d_Uq_dT_out2
-                  
+
          HD(i_r_dr_in2,IR) = - d_Uq_dr_in2
-         HD(i_r_dr_in,IR) = & ! 
+         HD(i_r_dr_in,IR) = & !
             + A_dm*(-dXP_00_dr_in) &
             - d_Uq_dr_in &
             - d_Fr_term_dr_in
@@ -2901,59 +2901,59 @@
             + A_dm*dXP_out_dr_out &
             - d_Uq_dr_out &
             - d_Fr_term_dr_out
-         HD(i_r_dr_out2,IR) = & ! 
+         HD(i_r_dr_out2,IR) = & !
             - d_Uq_dr_out2
 
          HD(i_r_der_in,IR) = &
             - d_Uq_der_in
          HD(i_r_der_00,IR) = &
-            + A_dm*(-dXP_00_der_00) & 
+            + A_dm*(-dXP_00_der_00) &
             - d_Uq_der_00
          HD(i_r_der_out,IR) = &
-            + A_dm*dXP_out_der_out & 
+            + A_dm*dXP_out_der_out &
             - d_Uq_der_out
-         HD(i_r_der_out2,IR) = & 
+         HD(i_r_der_out2,IR) = &
             - d_Uq_der_out2
 
-         HD(i_r_dw_in,IR) = 0.d0      
+         HD(i_r_dw_in,IR) = 0.d0
          if (I <= IBOTOM .or. I == NZN) then
-            HD(i_r_dw_00,IR) = 0.d0   
-         else     
+            HD(i_r_dw_00,IR) = 0.d0
+         else
             HD(i_r_dw_00,IR) = &
-               + A_dm*(-dXP_00_dw_00) & 
+               + A_dm*(-dXP_00_dw_00) &
                - d_Uq_dw_00
          end if
          if (I <= IBOTOM - 1 .or. I >= NZN - 1) then
-            HD(i_r_dw_out,IR) = 0.d0  
+            HD(i_r_dw_out,IR) = 0.d0
          else
             HD(i_r_dw_out,IR) = &
                + A_dm*dXP_out_dw_out &
                - d_Uq_dw_out
          end if
-         HD(i_r_dw_out2,IR) = 0.0d0   
-         
-         !call check_is_bad
-         
+         HD(i_r_dw_out2,IR) = 0.0d0
 
-         !HD(i_r_dr_in2,IR) !  
+         !call check_is_bad
+
+
+         !HD(i_r_dr_in2,IR) !
          !HD(i_r_dr_in,IR) ! ok
          !HD(i_r_dr_00,IR) !  ok
          !HD(i_r_dr_out,IR) ! ok
-         !HD(i_r_dr_out2,IR) ! 
-         
+         !HD(i_r_dr_out2,IR) !
+
          !HD(i_r_dT_in,IR) ! 0
          !HD(i_r_dT_00,IR) ! ok
          !HD(i_r_dT_out,IR) ! need 1d-3 like for er
          !HD(i_r_dT_out2,IR) ! 0
-         
+
          ! NOTE: may need solver_test_partials_dx_0 = 1d-3 for er
-         !HD(i_r_der_in,IR) ! 
+         !HD(i_r_der_in,IR) !
          !HD(i_r_der_00,IR) ! 0
          !HD(i_r_der_out,IR) ! 0
-         !HD(i_r_der_out2,IR) ! 
-         
-         !HD(i_r_dw_00,IR) ! 
-         !HD(i_r_dw_out,IR) ! 
+         !HD(i_r_der_out2,IR) !
+
+         !HD(i_r_dw_00,IR) !
+         !HD(i_r_dw_out,IR) !
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -2963,10 +2963,10 @@
             s% solver_test_partials_var = i_var_r
             s% solver_test_partials_dval_dx = i_r_dr_00
             write(*,*) 'acceleration_eqn', s% solver_test_partials_var
-         end if    
-         
+         end if
+
          contains
-         
+
          subroutine check_is_bad
             include 'formats'
             if (is_bad(residual)) then
@@ -3099,8 +3099,8 @@
          end subroutine check_is_bad
 
       end subroutine acceleration_eqn
-               
-      
+
+
       subroutine total_energy_eqn(s, i, P_surf, &
             Lt_00, Lt_00_start, Lt_in, Lt_in_start, &
             dLt_00_dr_00, dLt_00_dr_in, dLt_00_dr_out, &
@@ -3112,7 +3112,7 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00)                    
+            dLt_in_dw_in, dLt_in_dw_00)
          type (star_info), pointer :: s
          integer, intent(in) :: i
          real(dp), intent(in) :: P_surf, &
@@ -3126,7 +3126,7 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00             
+            dLt_in_dw_in, dLt_in_dw_00
          integer :: IT, k
          real(dp) :: dt, dm, residual, erad, erad_tw, DV, dt_div_dm, &
             area_00, area_00_start, area_in, area_in_start, &
@@ -3137,12 +3137,12 @@
             dLc_in_dVol_in, dLc_in_dVol_00, &
             dLc_in_dT_in, dLc_in_dT_00, &
             dLc_in_der_in, dLc_in_der_00, &
-            dLc_in_dw_in, dLc_in_dw_00, &    
+            dLc_in_dw_in, dLc_in_dw_00, &
             dLc_00_dr_00, dLc_00_dr_in, dLc_00_dr_out, &
             dLc_00_dVol_00, dLc_00_dVol_out, &
             dLc_00_dT_00, dLc_00_dT_out, &
             dLc_00_der_00, dLc_00_der_out, &
-            dLc_00_dw_00, dLc_00_dw_out, &        
+            dLc_00_dw_00, dLc_00_dw_out, &
             XP_00, dXP_00_dr_00, dXP_00_dr_in, &
             dXP_00_dVol_00, dXP_00_dT_00, dXP_00_der_00, dXP_00_dw_00, &
             u_div_r, d_u_div_r_dr_00, d_u_div_r_dr_in, u_div_r_factor
@@ -3160,28 +3160,28 @@
             dLc_in_dVol_in, dLc_in_dVol_00, &
             dLc_in_dT_in, dLc_in_dT_00, &
             dLc_in_der_in, dLc_in_der_00, &
-            dLc_in_dw_in, dLc_in_dw_00)    
+            dLc_in_dw_in, dLc_in_dw_00)
          call calc_Lc(s, i, Lc_00, &
             dLc_00_dr_in, dLc_00_dr_00, dLc_00_dr_out, &
             dLc_00_dVol_00, dLc_00_dVol_out, &
             dLc_00_dT_00, dLc_00_dT_out, &
             dLc_00_der_00, dLc_00_der_out, &
-            dLc_00_dw_00, dLc_00_dw_out)        
+            dLc_00_dw_00, dLc_00_dw_out)
 
          if (I == NZN) then
-            Lc_00_start = 0.d0    
+            Lc_00_start = 0.d0
          else
             Lc_00_start = s% Lc_start(k)
          end if
          if (i == 1) then
             Lc_in_start = 0
          else
-            Lc_in_start = s% Lc_start(k+1)  
-         end if         
-         
+            Lc_in_start = s% Lc_start(k+1)
+         end if
+
          area_00 = 4d0*pi*s% r(k)**2
          Lr_00 = s% Fr(k)*area_00
-         d_Lr_00_dFr_00 = area_00    
+         d_Lr_00_dFr_00 = area_00
          d_Lr_00_dr_00 = 2d0*Lr_00/s% r(k)
          area_00_start = 4d0*pi*s% r_start(k)**2
          Lr_00_start = s% Fr_start(k)*area_00_start
@@ -3191,30 +3191,30 @@
             else
                Lr_in = s% L_center
             end if
-            d_Lr_in_dFr_in = 0d0      
-            d_Lr_in_dr_in = 0d0      
-            Lr_in_start = Lr_in 
+            d_Lr_in_dFr_in = 0d0
+            d_Lr_in_dr_in = 0d0
+            Lr_in_start = Lr_in
          else
             area_in = 4d0*pi*s% r(k+1)**2
             Lr_in = s% Fr(k+1)*area_in
-            d_Lr_in_dFr_in = area_in       
+            d_Lr_in_dFr_in = area_in
             d_Lr_in_dr_in = 2d0*Lr_in/s% r(k+1)
             area_in_start = 4d0*pi*s% r_start(k+1)**2
             Lr_in_start = s% Fr_start(k+1)*area_in_start
-         end if         
-         
+         end if
+
          L_00 = &
             WTR*Lr_00 + WTC*Lc_00 + WTT*Lt_00 + &
             WTR1*Lr_00_start + WTC1*Lc_00_start + WTT1*Lt_00_start
          L_in = &
             WTR*Lr_in + WTC*Lc_in + WTT*Lt_in + &
             WTR1*Lr_in_start + WTC1*Lc_in_start + WTT1*Lt_in_start
-         
+
          dt = s% dt
          dm = s% dm(k)
          dt_div_dm = dt/dm
          DV = s% Vol(k) - s% Vol_start(k)
-         
+
          if (s% f_Edd(k) == f_Edd_isotropic .or. k == NZN) then
             u_div_r = 0d0
             d_u_div_r_dr_00 = 0d0
@@ -3226,10 +3226,10 @@
             d_u_div_r_dr_in = 0.5d0*(2d0/dt - s% v(k+1)/s% r(k+1))/s% r(k+1)
             u_div_r_factor = dt*(1d0 - 3d0*s% f_Edd(k))
          end if
-         
+
          erad = s% erad(k)
          erad_tw = THETAE*erad + THETAE1*s% erad_start(k)
-         
+
          call rsp_calc_XP(s, P_surf, i, .true., &
             XP_00, dXP_00_dVol_00, dXP_00_dT_00, dXP_00_der_00, &
             dXP_00_dw_00, dXP_00_dr_in, dXP_00_dr_00)
@@ -3255,20 +3255,20 @@
             - dt_div_dm*WTT*dLt_in_dr_in2 &
             - dt*dEq_dr_in2(I)
          HD(i_T_dr_in,IT) = &
-            + d_egas_dr_in(i) & 
+            + d_egas_dr_in(i) &
             - dt_div_dm*WTR*d_Lr_in_dr_in &
             + dt_div_dm*WTC*(dLc_00_dr_in - dLc_in_dr_in) &
             + dt_div_dm*WTT*(dLt_00_dr_in - dLt_in_dr_in) &
-            + dVol_dr_in(I)*XP_00 & 
+            + dVol_dr_in(I)*XP_00 &
             + DV*dXP_00_dr_in &
             + erad_tw*u_div_r_factor*d_u_div_r_dr_in &
-            - dt*dEq_dr_in(I)             
+            - dt*dEq_dr_in(I)
          HD(i_T_dr_00,IT) = &
-            + d_egas_dr_00(i) & 
+            + d_egas_dr_00(i) &
             + dt_div_dm*WTR*d_Lr_00_dr_00 &
             + dt_div_dm*WTC*(dLc_00_dr_00 - dLc_in_dr_00) &
             + dt_div_dm*WTT*(dLt_00_dr_00 - dLt_in_dr_00) &
-            + dVol_dr_00(I)*XP_00 & 
+            + dVol_dr_00(I)*XP_00 &
             + DV*dXP_00_dr_00 &
             + erad_tw*u_div_r_factor*d_u_div_r_dr_00 &
             - dt*dEq_dr_00(I)
@@ -3280,59 +3280,59 @@
          HD(i_T_dT_in,IT) = &
             - dt_div_dm*WTC*dLc_in_dT_in &
             - dt_div_dm*WTT*dLt_in_dT_in &
-            - dt*dEq_dT_in(I)  
+            - dt*dEq_dT_in(I)
          HD(i_T_dT_00,IT) = &
-              d_egas_dT(i) & 
-            + DV*dXP_00_dT_00 &     
+              d_egas_dT(i) &
+            + DV*dXP_00_dT_00 &
             + dt_div_dm*WTC*(dLc_00_dT_00 - dLc_in_dT_00) &
             + dt_div_dm*WTT*(dLt_00_dT_00 - dLt_in_dT_00) &
             - dt*dEq_dT_00(I)
-         HD(i_T_dT_out,IT) = & ! 
+         HD(i_T_dT_out,IT) = & !
             + dt_div_dm*WTC*dLc_00_dT_out &
             + dt_div_dm*WTT*dLt_00_dT_out &
-            - dt*dEq_dT_out(I)                    
+            - dt*dEq_dT_out(I)
 
          HD(i_T_der_in,IT) = &
             - dt_div_dm*WTC*dLc_in_der_in &
             - dt_div_dm*WTT*dLt_in_der_in &
-            - dt*dEq_der_in(I)  
+            - dt*dEq_der_in(I)
          HD(i_T_der_00,IT) = &
-              1d0 & 
-            + DV*dXP_00_der_00 &     
+              1d0 &
+            + DV*dXP_00_der_00 &
             + dt_div_dm*WTC*(dLc_00_der_00 - dLc_in_der_00) &
             + dt_div_dm*WTT*(dLt_00_der_00 - dLt_in_der_00) &
             + THETAE*u_div_r_factor*u_div_r &
             - dt*dEq_der_00(I)
-         HD(i_T_der_out,IT) = & ! 
+         HD(i_T_der_out,IT) = & !
             + dt_div_dm*WTC*dLc_00_der_out &
             + dt_div_dm*WTT*dLt_00_der_out &
-            - dt*dEq_der_out(I)                    
-    
+            - dt*dEq_der_out(I)
+
          if (I <= IBOTOM + 1) then
-            HD(i_T_dw_in,IT) = 0.d0   
+            HD(i_T_dw_in,IT) = 0.d0
          else
-            HD(i_T_dw_in,IT) = & 
+            HD(i_T_dw_in,IT) = &
                - dt_div_dm*WTC*dLc_in_dw_in &
-               - dt_div_dm*WTT*dLt_in_dw_in      
-         end if         
+               - dt_div_dm*WTT*dLt_in_dw_in
+         end if
          if (I <= IBOTOM .or. I == NZN) then
-            HD(i_T_dw_00,IT) = 0.d0  
+            HD(i_T_dw_00,IT) = 0.d0
          else
             HD(i_T_dw_00,IT) = &
-               2.d0*s% RSP_w(k) & 
+               2.d0*s% RSP_w(k) &
                + dt_div_dm*WTC*(dLc_00_dw_00 - dLc_in_dw_00) &
                + dt_div_dm*WTT*(dLt_00_dw_00 - dLt_in_dw_00) &
                + DV*dXP_00_dw_00 &
-               - dt*dEq_dw_00(I) 
-         end if                   
+               - dt*dEq_dw_00(I)
+         end if
          if (I <= IBOTOM - 1 .or. I >= NZN - 1) then
             HD(i_T_dw_out,IT) = 0.d0
          else
             HD(i_T_dw_out,IT) = &
-               dt_div_dm*WTT*dLt_00_dw_out & 
+               dt_div_dm*WTT*dLt_00_dw_out &
                + dt_div_dm*WTC*dLc_00_dw_out
          end if
-         
+
          if (i == -6 .and. s% model_number == s% max_model_number) then
             write(*,5) 'HD(i_T_dw_00,IT)', k, i, iter, s% model_number, HD(i_T_dw_00,IT)
             write(*,5) 's% RSP_w(k)', k, i, iter, s% model_number, s% RSP_w(k)
@@ -3349,22 +3349,22 @@
             write(*,5) 'dEq_dw_00(I)', k, i, iter, s% model_number, dEq_dw_00(I)
          endif
 
-         !HD(i_T_dr_in2,IT) ! 
+         !HD(i_T_dr_in2,IT) !
          !HD(i_T_dr_in,IT) ! ok
          !HD(i_T_dr_00,IT) ! ok
-         !HD(i_T_dr_out,IT) ! 
+         !HD(i_T_dr_out,IT) !
 
          !HD(i_T_dT_in,IT) ! 0
          !HD(i_T_dT_00,IT) ! ok
          !HD(i_T_dT_out,IT) ! 0
 
-         !HD(i_T_der_in,IT) ! 
+         !HD(i_T_der_in,IT) !
          !HD(i_T_der_00,IT) ! ok
-         !HD(i_T_der_out,IT) ! 
-    
-         !HD(i_T_dw_in,IT) ! 
-         !HD(i_T_dw_00,IT) ! 
-         !HD(i_T_dw_out,IT) ! 
+         !HD(i_T_der_out,IT) !
+
+         !HD(i_T_dw_in,IT) !
+         !HD(i_T_dw_00,IT) !
+         !HD(i_T_dw_out,IT) !
 
          !test_partials = (k+1 == s% solver_test_partials_k)
          test_partials = .false.
@@ -3374,11 +3374,11 @@
             s% solver_test_partials_var = i_var_r
             s% solver_test_partials_dval_dx = HD(i_T_dr_00,IT)
             write(*,*) 'total_energy_eqn', s% solver_test_partials_var
-         end if        
+         end if
 
       end subroutine total_energy_eqn
-      
-      
+
+
       subroutine turbulent_energy_eqn(s, i, &
             Lt_00, Lt_00_start, Lt_in, Lt_in_start, &
             dLt_00_dr_00, dLt_00_dr_in, dLt_00_dr_out, &
@@ -3390,7 +3390,7 @@
             dLt_in_dVol_in, dLt_in_dVol_00, &
             dLt_in_dT_in, dLt_in_dT_00, &
             dLt_in_der_in, dLt_in_der_00, &
-            dLt_in_dw_in, dLt_in_dw_00)                    
+            dLt_in_dw_in, dLt_in_dw_00)
          type (star_info), pointer :: s
          integer, intent(in) :: i
          real(dp), intent(in) :: &
@@ -3412,11 +3412,11 @@
          include 'formats'
 
          k = NZN+1-i
-      
-         IW = i_var_w + NV*(i-1) 
-         HD(1:LD_HD,IW) = 0.d0            
 
-         if (ALFA == 0d0 .or. I <= IBOTOM .or. I == NZN) then         
+         IW = i_var_w + NV*(i-1)
+         HD(1:LD_HD,IW) = 0.d0
+
+         if (ALFA == 0d0 .or. I <= IBOTOM .or. I == NZN) then
             HD(i_w_dw_00,IW) = 1.d0
             HR(IW) = 0.d0
             return
@@ -3424,7 +3424,7 @@
 
          L_00 = WTT*Lt_00 + WTT1*Lt_00_start
          L_in = WTT*Lt_in + WTT1*Lt_in_start
-         
+
          dt = s% dt
          dm = s% dm(k)
          dt_div_dm = dt/dm
@@ -3437,7 +3437,7 @@
             + DV*Ptrb_tw &
             - dt*(GAM*s% COUPL(k) + GAM1*s% COUPL_start(k) + s% Eq(k))
          HR(IW) = -residual
-         
+
          if (k==-35) then
             write(*,3) 'RSP w dEt PdV dtC dtEq', k, iter, &
                s% RSP_w(k), s% RSP_w(k)**2 - s% RSP_w_start(k)**2, DV*Ptrb_tw, &
@@ -3451,36 +3451,36 @@
             !write(*,2) 'RSP PII_00 PII_p1 Hp_00 Hp_p1', k, &
             !   s% PII(k), s% PII(k+1), s% Hp_face(k), s% Hp_face(k+1)
          end if
-         
-         HD(i_w_dw_in2,IW) = 0.d0          
-         HD(i_w_dw_in,IW) = - dt_div_dm*WTT*dLt_in_dw_in  
+
+         HD(i_w_dw_in2,IW) = 0.d0
+         HD(i_w_dw_in,IW) = - dt_div_dm*WTT*dLt_in_dw_in
          HD(i_w_dw_00,IW) = &
-            2.d0*s% RSP_w(k) & 
+            2.d0*s% RSP_w(k) &
             - dt*GAM*dC_dw_00(I) &
             - dt*dEq_dw_00(I) &
             + dt_div_dm*WTT*(dLt_00_dw_00 - dLt_in_dw_00) &
             + DV*THETAT*dPtrb_dw_00(I)
-         HD(i_w_dw_out,IW) = dt_div_dm*WTT*dLt_00_dw_out  
-         HD(i_w_dw_out2,IW) = 0.d0           
+         HD(i_w_dw_out,IW) = dt_div_dm*WTT*dLt_00_dw_out
+         HD(i_w_dw_out2,IW) = 0.d0
 
          HD(i_w_dr_in2,IW) = &
-            - dt*GAM*dC_dr_in2(I) & 
+            - dt*GAM*dC_dr_in2(I) &
             - dt_div_dm*WTT*dLt_in_dr_in2 &
-            - dt*dEq_dr_in2(I)                      
+            - dt*dEq_dr_in2(I)
          HD(i_w_dr_in,IW) = &
-            - dt*GAM*dC_dr_in(I) &  
+            - dt*GAM*dC_dr_in(I) &
             - dt*dEq_dr_in(I) &
             + dt_div_dm*WTT*(dLt_00_dr_in - dLt_in_dr_in) &
             + DV*THETAT*dPtrb_dr_in(I) &
             + (THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k))*dVol_dr_in(I)
          HD(i_w_dr_00,IW) = &
-            - dt*GAM*dC_dr_00(I) & 
+            - dt*GAM*dC_dr_00(I) &
             - dt*dEq_dr_00(I) &
             + dt_div_dm*WTT*(dLt_00_dr_00 - dLt_in_dr_00) &
             + DV*THETAT*dPtrb_dr_00(I) &
             + (THETAT*s% Ptrb(k) + THETAT1*s% Ptrb_start(k))*dVol_dr_00(I)
          HD(i_w_dr_out,IW) = &
-            - dt*GAM*dC_dr_out(I) &   
+            - dt*GAM*dC_dr_out(I) &
             + dt_div_dm*WTT*dLt_00_dr_out &
             - dt*dEq_dr_out(I)
 
@@ -3488,19 +3488,19 @@
             HD(i_w_dT_in,IW) = 0.d0
          else
             HD(i_w_dT_in,IW) = &
-               - dt_div_dm*WTT*dLt_in_dT_in &  
+               - dt_div_dm*WTT*dLt_in_dT_in &
                - dt*dEq_dT_in(I) &
-               - dt*GAM*dC_dT_in(I)  
+               - dt*GAM*dC_dT_in(I)
          end if
          HD(i_w_dT_00,IW) = &
-            - dt*GAM*dC_dT_00(I) & 
+            - dt*GAM*dC_dT_00(I) &
             - dt*dEq_dT_00(I) &
             + dt_div_dm*WTT*(dLt_00_dT_00 - dLt_in_dT_00)
-         if (I <= IBOTOM - 1 .or. I >= NZN - 1) then 
+         if (I <= IBOTOM - 1 .or. I >= NZN - 1) then
             HD(i_w_dT_out,IW) = 0.d0
          else
             HD(i_w_dT_out,IW) = &
-               - dt*GAM*dC_dT_out(I) &  
+               - dt*GAM*dC_dT_out(I) &
                + dt_div_dm*WTT*dLt_00_dT_out &
                - dt*dEq_dT_out(I)
          end if
@@ -3509,40 +3509,40 @@
             HD(i_w_der_in,IW) = 0.d0
          else
             HD(i_w_der_in,IW) = &
-               - dt_div_dm*WTT*dLt_in_der_in &  
+               - dt_div_dm*WTT*dLt_in_der_in &
                - dt*dEq_der_in(I) &
-               - dt*GAM*dC_der_in(I)  
+               - dt*GAM*dC_der_in(I)
          end if
          HD(i_w_der_00,IW) = &
-            - dt*GAM*dC_der_00(I) & 
+            - dt*GAM*dC_der_00(I) &
             - dt*dEq_der_00(I) &
             + dt_div_dm*WTT*(dLt_00_der_00 - dLt_in_der_00)
-         if (I <= IBOTOM - 1 .or. I >= NZN - 1) then 
+         if (I <= IBOTOM - 1 .or. I >= NZN - 1) then
             HD(i_w_der_out,IW) = 0.d0
          else
             HD(i_w_der_out,IW) = &
-               - dt*GAM*dC_der_out(I) &  
+               - dt*GAM*dC_der_out(I) &
                + dt_div_dm*WTT*dLt_00_der_out &
                - dt*dEq_der_out(I)
          end if
 
-         !HD(i_w_dw_in,IW) ! 
-         !HD(i_w_dw_00,IW) ! 
-         !HD(i_w_dw_out,IW) ! 
-         
-         !HD(i_w_dr_in2,IW) !           
-         !HD(i_w_dr_in,IW) ! 
-         !HD(i_w_dr_00,IW) ! 
-         !HD(i_w_dr_out,IW) ! 
-         
-         !HD(i_w_dT_in,IW) ! 
-         !HD(i_w_dT_00,IW) ! 
-         !HD(i_w_dT_out,IW) ! 
-         
-         !HD(i_w_der_in,IW) ! 
-         !HD(i_w_der_00,IW) ! 
-         !HD(i_w_der_out,IW) ! 
-         
+         !HD(i_w_dw_in,IW) !
+         !HD(i_w_dw_00,IW) !
+         !HD(i_w_dw_out,IW) !
+
+         !HD(i_w_dr_in2,IW) !
+         !HD(i_w_dr_in,IW) !
+         !HD(i_w_dr_00,IW) !
+         !HD(i_w_dr_out,IW) !
+
+         !HD(i_w_dT_in,IW) !
+         !HD(i_w_dT_00,IW) !
+         !HD(i_w_dT_out,IW) !
+
+         !HD(i_w_der_in,IW) !
+         !HD(i_w_der_00,IW) !
+         !HD(i_w_der_out,IW) !
+
          !test_partials = (k+1 == s% solver_test_partials_k)
          test_partials = .false.
 
@@ -3551,22 +3551,22 @@
             s% solver_test_partials_var = i_var_r
             s% solver_test_partials_dval_dx = HD(i_w_dr_00,IW)
             write(*,*) 'turbulent_energy_eqn', s% solver_test_partials_var
-         end if        
-      
+         end if
+
       end subroutine turbulent_energy_eqn
 
-      
-      subroutine erad_eqn(s, i)  
+
+      subroutine erad_eqn(s, i)
          use const_def, only: crad, clight
          type (star_info), pointer :: s
          integer, intent(in) :: i
          include 'formats'
-         
+
          call T_form_of_erad_eqn(s, i)
 
       end subroutine erad_eqn
-      
-      
+
+
       subroutine Fr_eqn(s, i)
          use const_def, only: clight
          type (star_info), pointer :: s
@@ -3575,22 +3575,22 @@
          real(dp) :: residual
 
          include 'formats'
-         
+
          if (s% RSP_hydro_only) then
             k = NZN+1-i
             IL = i_var_Fr + NV*(i-1)
-            HD(1:LD_HD,IL) = 0d0        
+            HD(1:LD_HD,IL) = 0d0
             residual = - s% Fr(k)  ! want Fr = 0d0
             HR(IL) = -residual
             HD(i_Fr_dFr_00,IL) = -1d0
             return
          end if
-         
+
          call T_form_of_Fr_eqn(s,i)
 
       end subroutine Fr_eqn
-      
-      
+
+
       subroutine d_Prad_dm_Fr_eqn(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -3607,26 +3607,26 @@
 
          k = NZN+1-i
          IL = i_var_Fr + NV*(i-1)
-         HD(1:LD_HD,IL) = 0d0        
+         HD(1:LD_HD,IL) = 0d0
 
          call calc_Fr(s, i, Fr_00, &
             dFr_dr_out, dFr_dr_00, dFr_dr_in, &
             dFr_dVol_out, dFr_dVol_00, &
             dFr_dT_out, dFr_dT_00, &
             dFr_der_out, dFr_der_00)
-             
-         residual = Fr_00 - s% Fr(k) 
+
+         residual = Fr_00 - s% Fr(k)
          HR(IL) = -residual
-                   
+
          HD(i_Fr_der_00,IL) = dFr_der_00
          HD(i_Fr_der_out,IL) = dFr_der_out
-         HD(i_Fr_dr_in,IL) = dFr_dr_in ! 
-         HD(i_Fr_dr_00,IL) = dFr_dr_00 ! 
-         HD(i_Fr_dr_out,IL) = dFr_dr_out ! 
+         HD(i_Fr_dr_in,IL) = dFr_dr_in !
+         HD(i_Fr_dr_00,IL) = dFr_dr_00 !
+         HD(i_Fr_dr_out,IL) = dFr_dr_out !
          HD(i_Fr_dT_00,IL) = dFr_dT_00
          HD(i_Fr_dT_out,IL) = dFr_dT_out
          HD(i_Fr_dFr_00,IL) = -1d0
-         
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
@@ -3635,11 +3635,11 @@
             s% solver_test_partials_var = i_var_er
             s% solver_test_partials_dval_dx = dFr_der_00
             write(*,*) 'd_Prad_dm_Fr_eqn', s% solver_test_partials_var
-         end if        
-            
+         end if
+
       end subroutine d_Prad_dm_Fr_eqn
 
-      
+
       subroutine T_form_of_erad_eqn(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -3650,21 +3650,21 @@
          include 'formats'
 
          k = NZN+1-i
-         IE = i_var_er + NV*(i-1) 
-         HD(1:LD_HD,IE) = 0.d0            
-         
+         IE = i_var_er + NV*(i-1)
+         HD(1:LD_HD,IE) = 0.d0
+
          T = s% T(k)
          V = s% Vol(k)
          erad_expected = crad*T**4*V ! ergs/gm
          residual = erad_expected - s% erad(k)
-         
+
          HR(IE) = -residual
-         
+
          HD(i_er_der_00,IE) = -1d0
          HD(i_er_dT_00,IE) = 4d0*crad*T**3*V
          HD(i_er_dr_00,IE) = crad*T**4*dVol_dr_00(i)
          HD(i_er_dr_in,IE) = crad*T**4*dVol_dr_in(i)
-         
+
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
 
@@ -3673,15 +3673,15 @@
             s% solver_test_partials_var = i_var_T
             s% solver_test_partials_dval_dx = HD(i_er_dT_00,IE)
             write(*,*) 'T_form_of_erad_eqn', s% solver_test_partials_var
-         end if        
+         end if
       end subroutine T_form_of_erad_eqn
-      
-      
-      subroutine T_form_of_calc_Fr(s, i, Fr_00, & !rs Stellingwerf 1975, Appendix A 
+
+
+      subroutine T_form_of_calc_Fr(s, i, Fr_00, & !rs Stellingwerf 1975, Appendix A
             dFr_dr_out, dFr_dr_in, dFr_dr_00, &
             dFr_dT_out, dFr_dT_00, dFr_dVol_00)
          type (star_info), pointer :: s
-         integer, intent(in) :: I         
+         integer, intent(in) :: I
          real(dp), intent(out) :: &
             Fr_00, dFr_dr_out, dFr_dr_in, &
             dFr_dr_00, dFr_dT_out, dFr_dT_00, dFr_dVol_00
@@ -3697,7 +3697,7 @@
                Fr_00 = s% L_center
             end if
             Fr_00 = Fr_00/(4d0*pi*s% r_center**2)
-            dFr_dr_00 = 0 
+            dFr_dr_00 = 0
             dFr_dT_00 = 0
             dFr_dK_00 = 0
             dFr_dK_out = 0
@@ -3706,7 +3706,7 @@
             dFr_dT_out = 0
          else if (i == NZN) then
             Fr_00 = 2d0*SIG*s% T(k)**4 !EDDI
-            dFr_dT_00 = 4.d0*Fr_00/s% T(k)   
+            dFr_dT_00 = 4.d0*Fr_00/s% T(k)
             dFr_dK_00 = 0
             dFr_dK_out = 0
             dFr_dr_out = 0
@@ -3715,7 +3715,7 @@
             dFr_dT_out = 0
          else
             Fr_00 = 0d0
-            dFr_dr_00 = 0d0 
+            dFr_dr_00 = 0d0
             dFr_dT_00 = 0d0
             dFr_dK_00 = 0d0
             dFr_dK_out = 0d0
@@ -3734,19 +3734,19 @@
             T3 = T1/(BW - BK)
             !rs radiative luminosity derivatives
             dFr_dK_00 = (T3/s% opacity(k))*(W*BW/s% opacity(k) - T2)
-            dFr_dK_out = -(T3/s% opacity(k-1))*(WP*BW/s% opacity(k-1) - T2)            
-            dFr_dr_out = dFr_dK_out*dK_dr_00(i+1) ! 
-            dFr_dr_in = dFr_dK_00*dK_dr_in(I) ! 
-            dFr_dr_00 = 2d0*Fr_00/s% r(k) & ! 
+            dFr_dK_out = -(T3/s% opacity(k-1))*(WP*BW/s% opacity(k-1) - T2)
+            dFr_dr_out = dFr_dK_out*dK_dr_00(i+1) !
+            dFr_dr_in = dFr_dK_00*dK_dr_in(I) !
+            dFr_dr_00 = 2d0*Fr_00/s% r(k) & !
                + dFr_dK_00*dK_dr_00(I) &
                + dFr_dK_out*dK_dr_in(i+1)
-            dFr_dT_out = & ! 
+            dFr_dT_out = & !
                  4.d0*(T3/s% T(k-1))*(WP*BW/s% opacity(k-1) &
                - T2*BK/BW) + dFr_dK_out*dK_dT(i+1)
-            dFr_dT_00 = & ! 
+            dFr_dT_00 = & !
                - 4.d0*(T3/s% T(k))*(W*BW/s% opacity(k) - T2*BK/BW) &
                + dFr_dK_00*dK_dT(I)
-            
+
             if (call_is_bad) then
                if (is_bad(dFr_dT_out + dFr_dT_00)) then
                   write(*,3) 'dFr_dT_out', i, k, dFr_dT_out
@@ -3767,10 +3767,10 @@
                   call mesa_error(__FILE__,__LINE__,'T_form_of_calc_Fr')
                end if
             end if
-            
-            dFr_dVol_00 = dFr_dK_00*dK_dVol(I)            
+
+            dFr_dVol_00 = dFr_dK_00*dK_dVol(I)
          end if
-         
+
          !test_partials = (k-1 == s% solver_test_partials_k)
          test_partials = .false.
          if (test_partials) then
@@ -3780,8 +3780,8 @@
             write(*,*) 'T_form_of_calc_Fr', s% solver_test_partials_var
          end if
       end subroutine T_form_of_calc_Fr
-      
-      
+
+
       subroutine T_form_of_Fr_eqn(s,i)
          type (star_info), pointer :: s
          integer, intent(in) :: i
@@ -3795,15 +3795,15 @@
 
          k = NZN+1-i
          IL = i_var_Fr + NV*(i-1)
-         HD(1:LD_HD,IL) = 0d0        
+         HD(1:LD_HD,IL) = 0d0
 
          call T_form_of_calc_Fr(s, i, Fr_00, &
             dFr_00_dr_out, dFr_00_dr_in, dFr_00_dr_00, &
             dFr_00_dT_out, dFr_00_dT_00, dFr_dVol_00)
-             
-         residual = Fr_00 - s% Fr(k) 
+
+         residual = Fr_00 - s% Fr(k)
          HR(IL) = -residual
-                   
+
          HD(i_Fr_dFr_00,IL) = -1d0
          HD(i_Fr_dr_in,IL) = dFr_00_dr_in
          HD(i_Fr_dr_00,IL) = dFr_00_dr_00
@@ -3818,7 +3818,7 @@
             s% solver_test_partials_var = i_var_T
             s% solver_test_partials_dval_dx = HD(i_Fr_dT_00,IL)
             write(*,*) 'T_form_of_Fr_eqn', s% solver_test_partials_var
-         end if        
+         end if
       end subroutine T_form_of_Fr_eqn
 
 

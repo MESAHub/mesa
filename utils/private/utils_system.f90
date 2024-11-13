@@ -26,19 +26,19 @@
 module utils_system
    implicit none
 
-   interface 
+   interface
       function f_mkdir_p(folder) bind(C,name='c_mkdir_p')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_mkdir_p
          character(kind=C_CHAR) :: folder(*)
       end function f_mkdir_p
-   
+
       function f_mv(src, dest) bind(C,name='c_mv')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_mv
          character(kind=C_CHAR) :: src(*), dest(*)
       end function f_mv
-      
+
       function f_cp(src, dest) bind(C,name='c_cp')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_cp
@@ -53,51 +53,51 @@ module utils_system
 
    end interface
 
-   private 
+   private
    public :: mkdir_p, mv, cp, is_dir
 
 
    contains
-   
-   
-   ! Converts a fortran string to a NULL terminated string 
+
+
+   ! Converts a fortran string to a NULL terminated string
    pure function f_c_string (f_str) result (c_str)
       use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_NULL_CHAR
       character(len=*), intent(in) :: f_str
       character(len=1,kind=C_CHAR) :: c_str(len_trim(f_str)+1)
       integer                      :: n, i
-      
+
       n = len_trim(f_str)
       do i = 1, n
          c_str(i) = f_str(i:i)
       end do
       c_str(n + 1) = C_NULL_CHAR
-   
-   end function f_c_string 
-   
+
+   end function f_c_string
+
    ! Makes a directory, potentially making any needed parent directories
    integer function mkdir_p(folder)
       character(len=*), intent(in) :: folder
 
       mkdir_p = f_mkdir_p(f_c_string(folder))
-   
+
    end function mkdir_p
-   
+
    ! Moves src to dest, if dest is on a different filesystem, do a cp
    ! to the same filesystem then mv to dest
    integer function mv(src,dest)
       character(len=*), intent(in) :: src, dest
-      
+
       mv = f_mv(f_c_string(src),f_c_string(dest))
-   
+
    end function mv
-   
+
    ! Copies src to dest
    integer function cp(src,dest)
       character(len=*), intent(in) :: src, dest
-      
+
       cp = f_cp(f_c_string(src),f_c_string(dest))
-   
+
    end function cp
 
    ! Checks if folder exists or not
@@ -119,10 +119,10 @@ end module utils_system
 !   implicit none
 !   integer :: num, res
 !   character(len=256) :: f1, f2
-   
+
 !   num = command_argument_count()
 !   call get_command_argument(1,f1)
-   
+
 !   if(num==1) then
 !      write(*,*) "Test mkdir_p ",trim(f1)
 !      res = mkdir_p(f1)
@@ -133,7 +133,7 @@ end module utils_system
 !      write(*,*) "Test cp ",trim(f1)," * ",trim(f2)
 !      res = cp(f1,f2)
 !   end if
-   
+
 !   write(*,*) "Result: ", res
 
 !end program sys

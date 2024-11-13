@@ -24,15 +24,15 @@
 ! ***********************************************************************
 
       module mod_simplex
-      
+
       use const_def, only: dp
       use math_lib
       use num_def
-      
+
 
       contains
 
-      
+
       subroutine do_simplex( &
             n, x_lower, x_upper, x_first, x_final, f_final, &
             simplex, f, start_from_given_simplex_and_f, &
@@ -63,22 +63,22 @@
          real(dp), intent(out) :: f_final
          integer, intent(out) :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr
-         
+
          real(dp), dimension(n) :: c, x_reflect, x_expand, x_contract, x_ars
          real(dp) :: f_reflect, f_expand, f_contract, f_ars, &
             term1, weight, sum_weight, term_val_x
          integer :: h, s, l, i, j
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
          num_fcn_calls = 0
          num_fcn_calls_for_ars = 0
          num_accepted_for_ars = 0
          num_iters = 0
-         
+
          if (.not. start_from_given_simplex_and_f) then
             call set_initial_simplex(ierr)
             if (ierr /= 0) then
@@ -86,14 +86,14 @@
                return
             end if
          end if
-                  
-         do 
-            
+
+         do
+
             num_iters = num_iters + 1
-            
+
             if (dbg) write(*,*)
             if (dbg) write(*,2) 'iter', num_iters
-            
+
             ! h = index of max f
             ! s = index of 2nd max f
             ! l = index of min f
@@ -111,7 +111,7 @@
                   s = j
                end if
             end do
-            
+
             if (dbg) write(*,2) 'worst', h, f(h), simplex(1:n,h)
             if (dbg) write(*,2) '2nd worst', s, f(s), simplex(1:n,s)
             if (dbg) write(*,2) 'best', l, f(l), simplex(1:n,l)
@@ -128,10 +128,10 @@
             end do
             if (dbg) write(*,1) 'term_val_x', term_val_x
             if (term_val_x <= 1d0) exit
-            
+
             ! check for failure to converge in allowed iterations or function calls
             if (num_iters > iter_max .or. num_fcn_calls > fcn_calls_max) exit
-         
+
             ! c = centroid excluding worst point
             c(1:n) = 0
             sum_weight = 0d0
@@ -153,13 +153,13 @@
                c(i) = c(i)/sum_weight
             end do
             if (dbg) write(*,1) 'c', c(1:n)
-         
+
             ! transform the simplex
-            
+
             call reflect(ierr)
             if (ierr /= 0) return
             if (dbg) write(*,1) 'reflect', f_reflect, x_reflect(1:n)
-         
+
             if (f_reflect < f(s)) then ! accept reflect
                if (dbg) write(*,2) 'accept reflect', num_iters
                do i=1,n
@@ -197,9 +197,9 @@
                   call shrink
                end if
             end if
-         
+
          end do
-         
+
          f_final = f(l)
          do i=1,n
             x_final(i) = simplex(i,l)
@@ -208,19 +208,19 @@
          if (dbg) write(*,*)
          if (dbg) write(*,1) 'final', f_final, x_final(1:n)
          if (dbg) write(*,*)
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine set_initial_simplex(ierr)
             integer, intent(out) :: ierr
             integer :: j, i, k
             logical :: okay
             include 'formats'
-            
+
             ierr = 0
-            
+
             do i=1,n
                simplex(i,n+1) = x_first(i)
             end do
@@ -229,7 +229,7 @@
                if (dbg) write(*,2) 'failed to get value for first simplex point'
                return
             end if
-            
+
             do j=1,n
                do i=1,n
                   simplex(i,j) = x_first(i)
@@ -261,8 +261,8 @@
             end do
 
          end subroutine set_initial_simplex
-         
-         
+
+
          real(dp) function get_val(x, op_code, ierr) result(f)
             real(dp), intent(in) :: x(:)
             integer, intent(in) :: op_code ! what nelder-mead is doing for this call
@@ -283,8 +283,8 @@
             num_fcn_calls = num_fcn_calls + 1
             f = fcn(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          end function get_val
-         
-         
+
+
          subroutine reflect(ierr)
             integer, intent(out) :: ierr
             integer :: i
@@ -295,8 +295,8 @@
             end do
             f_reflect = get_val(x_reflect, simplex_reflect, ierr)
          end subroutine reflect
-         
-         
+
+
          subroutine expand(ierr)
             integer, intent(out) :: ierr
             integer :: i
@@ -307,8 +307,8 @@
             end do
             f_expand = get_val(x_expand, simplex_expand, ierr)
          end subroutine expand
-         
-         
+
+
          subroutine contract(ierr)
             integer, intent(out) :: ierr
             integer :: i, op_code
@@ -329,8 +329,8 @@
             end if
             f_contract = get_val(x_contract, op_code, ierr)
          end subroutine contract
-         
-         
+
+
          subroutine ARS(ierr)
             integer, intent(out) :: ierr
             integer :: i, k, k_max
@@ -338,7 +338,7 @@
             ierr = 0
             k_max = 100
             do k=1,k_max ! keep trying until find a better random point
-               if (num_fcn_calls > fcn_calls_max) exit           
+               if (num_fcn_calls > fcn_calls_max) exit
                call get_point_for_ars(ierr)
                if (ierr /= 0) return
                if (dbg) write(*,2) 'adaptive_random_search', num_iters, f_ars, x_ars(1:n)
@@ -354,8 +354,8 @@
                if (dbg) write(*,2) 'reject adaptive random search', num_iters, f_ars, x_ars(1:n)
             end do
          end subroutine ARS
-         
-         
+
+
          subroutine get_point_for_ars(ierr)
             use mod_random, only: r8_uniform_01
             integer, intent(out) :: ierr
@@ -371,8 +371,8 @@
             num_fcn_calls_for_ars = num_fcn_calls_for_ars + 1
             f_ars = get_val(x_ars, simplex_random, ierr)
          end subroutine get_point_for_ars
-         
-         
+
+
          subroutine shrink ! shrink the simplex towards the best point
             integer :: j, i
             include 'formats'
@@ -387,7 +387,7 @@
             end do
          end subroutine shrink
 
-      
+
       end subroutine do_simplex
 
 

@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 module run_star_extras
 
       use star_lib
@@ -29,7 +29,7 @@ module run_star_extras
       use auto_diff
 
       implicit none
-      
+
       include "test_suite_extras_def.inc"
       logical :: need_to_write_LINA_data
 
@@ -37,7 +37,7 @@ module run_star_extras
 
       include "test_suite_extras.inc"
 
-      
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -53,10 +53,10 @@ module run_star_extras
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
       end subroutine extras_controls
 
-      
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -72,7 +72,7 @@ module run_star_extras
             need_to_write_LINA_data = .false.
          end if
       end subroutine extras_startup
-      
+
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
@@ -92,7 +92,7 @@ module run_star_extras
             need_to_write_LINA_data = .false.
          end if
       end function extras_start_step
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -127,8 +127,8 @@ module run_star_extras
          write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -139,7 +139,7 @@ module run_star_extras
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -149,7 +149,7 @@ module run_star_extras
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -162,8 +162,8 @@ module run_star_extras
          if (ierr /= 0) return
          how_many_extra_history_columns = 8
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -185,7 +185,7 @@ module run_star_extras
          names(i) = 'delta_Mag'; vals(i) = 0; i=i+1
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -196,8 +196,8 @@ module run_star_extras
          if (ierr /= 0) return
          how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -219,9 +219,9 @@ module run_star_extras
             end if
          end do
       end subroutine data_for_extra_profile_columns
-      
-      
+
+
 
 
       end module run_star_extras
-      
+

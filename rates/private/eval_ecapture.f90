@@ -105,7 +105,7 @@ contains
     kT = 1d3 * keV * T9 ! in MeV
     kT% d1val1 = kT% val
     kT% d1val2 = 0d0
-    
+
     mec2 = me * clight*clight / mev_to_ergs ! in MeV
     beta = mec2/kT ! dimesionless
 

@@ -22,18 +22,18 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module mod_other_tsync
 
       ! NOTE: remember to set true:
       ! use_other_tsync = .true.
-      
+
 ! you can add your own routine for use instead of the default ones
 
 ! here's how to do it.
 
 ! Before doing anything, let's make sure your working copy of run_binary_extras works.
-! edit the extras_binary_controls routine 
+! edit the extras_binary_controls routine
 !      subroutine extras_binary_controls(binary_id, ierr)
 !         integer :: binary_id
 !         integer, intent(out) :: ierr
@@ -66,7 +66,7 @@
 !      subroutine my_tsync(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
 !         integer, intent(in) :: id
 !         character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-!         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ). 
+!         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
 !         real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
 !         real(dp), intent(in) :: m
 !         real(dp), intent(in) :: r_phot
@@ -76,7 +76,7 @@
 !         real(dp) :: rGyr_squared, moment_of_inertia
 !         type (binary_info), pointer :: b
 !         type (star_info), pointer :: s
-!   
+!
 !         ierr = 0
 !         call star_ptr(id, s, ierr)
 !         if (ierr /= 0) then
@@ -91,7 +91,7 @@
 !         end if
 !         t_sync = 1d99
 !      end subroutine my_tsync
-         
+
       ! NOTE: if you'd like to have some inlist controls for your routine,
       ! you can use the x_ctrl array of real(dp) variables that is in &controls
       ! e.g., in the &controls inlist, you can set
@@ -109,29 +109,29 @@
       !         end if
       !
       ! To get the binary pointer using the provided binary_id, add these lines.
-      !     
+      !
       !      type (binary_info), pointer :: b
       !      call binary_ptr(binary_id, b, ierr)
       !      if (ierr /= 0) then ! failure in  binary_ptr
       !         return
       !      end if
-      ! 
+      !
       ! for integer control values, you can use x_integer_ctrl
       ! for logical control values, you can use x_logical_ctrl
 
 
       implicit none
-      
-            
+
+
       contains
-      
+
       subroutine null_other_tsync(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
          use const_def, only: dp, strlen
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : star_info, star_ptr
          integer, intent(in) :: id
          character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ). 
+         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
          real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
          real(dp), intent(in) :: m
          real(dp), intent(in) :: r_phot
@@ -140,7 +140,7 @@
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
-   
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) then

@@ -108,7 +108,7 @@
                   b% r(2) = b% r(1)
                end if
             end if
-            
+
             if (b% initial_period_in_days <= 0) then ! calculate from initial_separation_in_Rsuns
                call set_separation_eccentricity(b% binary_id, &
                   b% initial_separation_in_Rsuns*Rsun, b% initial_eccentricity, ierr)
@@ -125,7 +125,7 @@
 
          ! Set all parameters nessessary for integration over the binary orbit
          ! 1) true anomaly = polar angle from periastron 0 -> 2pi
-            do i = 1,b% anomaly_steps 
+            do i = 1,b% anomaly_steps
                b% theta_co(i) = (i-1) * (2 * pi) / b% anomaly_steps
             end do
             ! 2) time between periastron and polar angle theta 0 -> 1 (fraction of the
@@ -139,7 +139,7 @@
                   b% time_co(i) = b% time_co(i) + b% time_co(b% anomaly_steps/2+1) * 2
                end if
             end do
-   
+
             if (is_bad(b% rl_relative_gap(1))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
             if (is_bad(b% rl_relative_gap(2))) call mesa_error(__FILE__,__LINE__,'binarydata_init')
             b% using_jdot_mb(1) = .false.
@@ -164,7 +164,7 @@
                ! zero spin (r_isco = 6).
                b% eq_initial_bh_mass = b% m(b% point_mass_i) * sqrt(r_isco/6d0)
             end if
-            
+
             write(*,'(A)')
             write(*,1) 'm2', b% m2
             write(*,1) 'm1', b% m1
@@ -208,7 +208,7 @@
                b% s_accretor => b% s1
             end if
          end if
-          
+
       end subroutine
 
       subroutine set_donor_star(b)
@@ -232,7 +232,7 @@
             b% mdot_hi = - b% mdot_lo
             b% mdot_lo = - mdot_hi_temp
             if (.not. b% have_mdot_lo) then
-               b% have_mdot_hi = .false.  
+               b% have_mdot_hi = .false.
             end if
             b% have_mdot_lo = .true.
             b% fixed_delta_mdot = b% fixed_delta_mdot / 2.0d0
@@ -266,7 +266,7 @@
          use binary_edot, only: get_edot
          type(binary_info), pointer :: b
          integer :: i
-         
+
          include 'formats'
 
          ! store the final mdots used for each star
@@ -287,7 +287,7 @@
          else
             b% m(b% a_i) = b% m(b% d_i)
          end if
-         
+
          if (b% point_mass_i /= 1) then
             b% r(1) = Rsun*b% s1% photosphere_r
          else
@@ -332,7 +332,7 @@
             binary_evolve_step = retry
             return
          end if
-         
+
          ! update the eccentricity (ignore in first step)
          if (.not. b% doing_first_model_of_run) then
             b% eccentricity = b% eccentricity + get_edot(b) *b% time_step*secyer
@@ -344,7 +344,7 @@
             b% extra_edot = 0d0
             b% edot = 0d0
          end if
-         
+
          !use new eccentricity to calculate new time coordinate
          do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
             b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
@@ -355,23 +355,23 @@
                b% time_co(i) = b% time_co(i) + b% time_co(b% anomaly_steps/2+1) * 2
             end if
          end do
-         
+
          ! use the new j to calculate new separation
          b% separation = (pow2(b% angular_momentum_j/(b% m(1)*b% m(2)))) *&
              (b% m(1)+b% m(2)) / standard_cgrav * 1 / (1 - pow2(b% eccentricity))
          if (b% separation < b% min_binary_separation) &
             b% min_binary_separation = b% separation
-         
+
          b% period = 2*pi*sqrt(pow3(b% separation)/&
-               (standard_cgrav*(b% m(1)+b% m(2)))) 
+               (standard_cgrav*(b% m(1)+b% m(2))))
          if (b% period < min_binary_period) min_binary_period = b% period
-         
+
          ! use the new separation to calculate the new roche lobe radius
-         
+
          b% rl(1) = eval_rlobe(b% m(1), b% m(2), b% separation)
          b% rl(2) = eval_rlobe(b% m(2), b% m(1), b% separation)
          b% rl_relative_gap(1) = (b% r(1) - b% rl(1) * (1 - b% eccentricity) ) / &
-             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact 
+             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact
          b% rl_relative_gap(2) = (b% r(2) - b% rl(2) * (1 - b% eccentricity) ) / &
              b% rl(2) / (1 - b% eccentricity) ! gap < 0 means out of contact
 
@@ -409,11 +409,11 @@
 
          binary_check_model = retry
          ierr = 0
-         
+
          implicit_rlo = (b% max_tries_to_achieve > 0 .and. b% implicit_scheme_tolerance > 0d0)
-         
+
          binary_check_model = keep_going
-                  
+
          if (.not. b% ignore_rlof_flag) then
             if (implicit_rlo) then ! check agreement between new r and new rl
                if (.not. b% use_other_check_implicit_rlo) then
@@ -449,7 +449,7 @@
                end if
                ! smooth out the changes in mdot
                new_mdot = b% cur_mdot_frac*b% mtransfer_rate + (1-b% cur_mdot_frac)*new_mdot
-               if (-new_mdot/(Msun/secyer) > b% max_explicit_abs_mdot) new_mdot = -b% max_explicit_abs_mdot*Msun/secyer 
+               if (-new_mdot/(Msun/secyer) > b% max_explicit_abs_mdot) new_mdot = -b% max_explicit_abs_mdot*Msun/secyer
             end if
             b% mtransfer_rate = new_mdot
          else
@@ -649,7 +649,7 @@
       integer function binary_after_evolve(b)
          type (binary_info), pointer :: b
          binary_after_evolve = keep_going
-         
+
          !take care of deallocating binary arrays here
          if (associated(b% theta_co)) then
             deallocate(b% theta_co)

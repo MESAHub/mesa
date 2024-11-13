@@ -111,7 +111,7 @@ contains
              match_zone_type = .NOT. ( &
                   s%burn_h_conv_region(i) .OR. &
                   s%burn_he_conv_region(i) .OR. &
-                  s%burn_z_conv_region(i) )              
+                  s%burn_z_conv_region(i) )
           case ('any')
              match_zone_type = .true.
           case default
@@ -127,7 +127,7 @@ contains
           else
              is_surf_zone = s%conv_bdy_loc(i+1) == 1
           endif
-                
+
           select case (s%predictive_zone_loc(j))
           case ('core')
              match_zone_loc = is_core_zone
@@ -160,7 +160,7 @@ contains
 
           if (s%conv_bdy_q(i) < s%predictive_bdy_q_min(j) .OR. &
               s%conv_bdy_q(i) > s%predictive_bdy_q_max(j)) cycle criteria_loop
-          
+
           if (dbg) then
              write(*,*) 'Predictive mixing at convective boundary: i, j=', i, j
              write(*,*) '  s%predictive_zone_type=', TRIM(s%predictive_zone_type(j))
@@ -222,13 +222,13 @@ contains
     logical, parameter :: dbg = .false.
     logical, parameter :: DUMP_PREDICTIONS = .false.
 
-    real(dp)       :: superad_thresh 
+    real(dp)       :: superad_thresh
     real(dp)       :: ingest_factor
     integer        :: iso_id
     integer        :: iso_r
     integer        :: iso_i
     integer        :: k_bot_cz
-    integer        :: k_top_cz  
+    integer        :: k_top_cz
     integer        :: k_bot_ez
     integer        :: k_top_ez
     integer        :: k_bot_mz
@@ -310,7 +310,7 @@ contains
           end if
           k_bot_cz = s%conv_bdy_loc(i-1) - 1
        endif
-       
+
        k_top_cz = s%conv_bdy_loc(i)
 
     else
@@ -341,7 +341,7 @@ contains
     ! Determine average abundances of the initial convection zone
 
     call eval_abundances(s, k_bot_cz, k_top_cz, xa_cz, xa_cz_burn)
-    
+
     ! Decide whether we are starting in the "Ledoux extension" phase,
     ! where the boundary moves to where it would be if the
     ! Schwarzschild (rather than Ledoux) criterion had been used in
@@ -356,10 +356,10 @@ contains
     k_top_ez = k_top_cz
 
     call eval_abundances(s, k_bot_ez, k_top_ez, xa_ez, xa_ez_burn)
-    
+
     ! Begin the predictive mixing search, expanding the extent of the
     ! mixed zone until one of a number of criteria are met
- 
+
     outward = s%top_conv_bdy(i)
 
     k_bot_mz = k_bot_cz
@@ -424,7 +424,7 @@ contains
           ! Check whether the predictive mixing will lead to a
           ! reversal in the abundance evolution of isotope iso_r due
           ! to nuclear burning; if so, finish the search.
-       
+
           if (iso_r /= 0) then
 
              if (SIGN(1._dp, xa_mz_burn(iso_r)-xa_ez(iso_r)) /= SIGN(1._dp, xa_ez_burn(iso_r)-xa_ez(iso_r))) then
@@ -438,7 +438,7 @@ contains
 
           ! Check whether the predictive mixing will cause the
           ! ingestion rate for isotope iso_i to exceed the limit
-       
+
           if (iso_i /= 0) then
 
              ! Calculate the mass ingested
@@ -511,7 +511,7 @@ contains
        close(unit)
        print *,'Writing prediction data to file:',TRIM(filename)
     end if
-   
+
     ! Back off the mixing by one zone
 
     if (outward) then
@@ -590,7 +590,7 @@ contains
        else
           rho = s%rho(k)
        endif
-       
+
        cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
 
        s%cdc(k) = cdc
@@ -626,7 +626,7 @@ contains
 
        dg0 = grada(k_b) - gradr(k_b)
        dg1 = s%grada_face(k_b+1) - s%gradr(k_b+1)
-          
+
        if (dg0*dg1 < 0) then
           s%cz_bdy_dq(k_bot_mz) = find0(0._dp, dg0, s%dq(k_bot_mz), dg1)
           if (s%cz_bdy_dq(k_bot_mz) < 0._dp .or. s%cz_bdy_dq(k_bot_mz) > s%dq(k_bot_mz)) then
@@ -688,9 +688,9 @@ contains
     return
 
   end subroutine eval_abundances
-    
+
   !****
-  
+
   subroutine eval_mixing_coeffs (s, k_bot_mz, k_top_mz, xa_mx, k_a, k_b, D, vc, grada, gradr, ierr)
 
     use eos_def
@@ -950,7 +950,7 @@ contains
     lnfree_e = res(i_lnfree_e)
 
     ! Finish
-    
+
     return
 
   end subroutine eval_eos
@@ -981,7 +981,7 @@ contains
        alfa = s%dq(k-1)/(s%dq(k-1) + s%dq(k))
     end if
     beta = 1._dp - alfa
-    
+
     T_face = alfa*s%T(k) + beta*s%T(k-1)
 
     ! Evaluate the limit

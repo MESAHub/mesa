@@ -87,7 +87,7 @@ contains
   !****
 
   subroutine eval_T_tau (id, tau, Teff, lnT, ierr)
-    
+
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
@@ -134,14 +134,14 @@ contains
 
     real(dp) :: Teff4
     real(dp) :: T4
-    
+
     ! Evaluate the Eddington T-tau relation
 
     Teff4 = Teff*Teff*Teff*Teff
     T4 = 0.75d0*Teff4*(tau + two_thirds)
 
     lnT = log(T4)*0.25d0
-    
+
     ! Finish
 
     return
@@ -180,7 +180,7 @@ contains
     T4 = 0.75d0*Teff4*(tau + Q1 + Q2*e1 + Q4*e2)
 
     lnT = log(T4)*0.25d0
-    
+
     ! Finish
 
     return
@@ -211,12 +211,12 @@ contains
 
     e1 = exp(-Q3*tau)
     e2 = exp(-Q5*tau)
-    
+
     Teff4 = Teff*Teff*Teff*Teff
     T4 = 0.75d0*Teff4*(tau + Q1 + Q2*e1 + Q4*e2)
 
     lnT = log(T4)*0.25d0
-    
+
     ! Finish
 
     return
@@ -265,7 +265,7 @@ contains
   !****
 
   subroutine eval_T_tau_dq_dtau (id, tau, dq_dtau, ierr)
-    
+
     use atm_def, only: &
          ATM_T_TAU_EDDINGTON, &
          ATM_T_TAU_SOLAR_HOPF, &
@@ -311,7 +311,7 @@ contains
 
     real(dp), intent(in)  :: tau
     real(dp), intent(out) :: dq_dtau
-    
+
     ! Evaluate the Eddington q'(τ)
 
     dq_dtau = 0.0_dp
@@ -347,7 +347,7 @@ contains
     e2 = exp(-Q5*tau)
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
-    
+
     ! Finish
 
     return
@@ -376,7 +376,7 @@ contains
     e2 = exp(-Q5*tau)
 
     dq_dtau = - Q2*Q3*e1 - Q4*Q5*e2
-    
+
     ! Finish
 
     return

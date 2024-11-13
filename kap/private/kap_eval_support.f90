@@ -27,12 +27,12 @@
 
       use const_def, only: dp, one_sixth
       use math_lib
-      
+
       implicit none
-            
+
       contains
-      
-      
+
+
       subroutine Locate_log( &
             rq, num_logs, log_min_in, log_max_in, ili_logs, logs, log_find, i, log0, log1, ierr)
          use kap_def
@@ -49,7 +49,7 @@
          integer, intent(out) :: ierr
          real(dp) :: dlog, log_min, log_max
          integer :: j
-         ierr = 0     
+         ierr = 0
          log_min = max(log_min_in, logs(1))
          log_max = min(log_max_in, logs(num_logs))
          if (num_logs == 1) then
@@ -59,11 +59,11 @@
             log1 = log_find
             return
          end if
-         if (log_find < log_min .or. log_find > log_max) then      
+         if (log_find < log_min .or. log_find > log_max) then
             if (.not. clip_to_kap_table_boundaries) then
                ierr = -1
                return
-            end if         
+            end if
             if (log_find < log_min) then
                i = 1
                log_find = log_min
@@ -74,7 +74,7 @@
          else if (abs(log_find-log_max) < 1d-7) then
             i = num_logs-1
             log_find = log_max
-         else if (ili_logs == 1) then ! logs equally spaced 
+         else if (ili_logs == 1) then ! logs equally spaced
             dlog = (log_max-log_min)/(num_logs-1)
             i = int((log_find-log_min) / dlog) + 1
             ! might not be exactly evenly spaced, so minor fixup if necessary
@@ -84,7 +84,7 @@
                i = i+1
             end if
          else
-            i = binary_search(num_logs, logs, 0, log_find)                
+            i = binary_search(num_logs, logs, 0, log_find)
             if (i >= num_logs) then
                ierr = -1
                return
@@ -93,9 +93,9 @@
                write(*,*) 'num_logs', num_logs
                call mesa_error(__FILE__,__LINE__,'Locate_log')
 !$OMP end critical (kap_eval_crit1)
-            end if       
+            end if
          end if
-         
+
          if (i < 1 .or. i >= num_logs) then
             ierr = -1
             return
@@ -103,7 +103,7 @@
             write(*,*) 'num_logs', num_logs
             call mesa_error(__FILE__,__LINE__,'Locate_log')
          end if
-         
+
          if (logs(i) > log_find .or. log_find > logs(i+1)) then
             ierr = -1
 !$OMP critical (kap_eval_crit2)
@@ -137,8 +137,8 @@
 !$OMP end critical (kap_eval_crit3)
          end if
       end subroutine Locate_log
-      
-      
+
+
       subroutine Locate_logT( &
             rq, num_logTs, logT_min, logT_max, ili_logTs, logTs, logT, iT, logT0, logT1, ierr)
          use kap_def
@@ -153,7 +153,7 @@
          call Locate_log( &
             rq, num_logTs, logT_min, logT_max, ili_logTs, logTs, logT, iT, logT0, logT1, ierr)
       end subroutine Locate_logT
-      
+
 
       subroutine Locate_logR( &
             rq, num_logRs, logR_min, logR_max, ili_logRs, logRs, logR, iR, logR0, logR1, ierr)
@@ -167,37 +167,37 @@
          real(dp), intent(out) :: logR0, logR1
          integer, intent(out) :: ierr
          call Locate_log( &
-            rq, num_logRs, logR_min, logR_max, ili_logRs, logRs, logR, iR, logR0, logR1, ierr)       
+            rq, num_logRs, logR_min, logR_max, ili_logRs, logRs, logR, iR, logR0, logR1, ierr)
       end subroutine Locate_logR
-      
-      
+
+
       subroutine Do_Kap_Interpolations( &
             fin1, nx, ny, i, j, x0, xget, x1, y0, yget, y1, fval, df_dx, df_dy)
-         ! derived from routines in the PSPLINE package written by Doug McCune 
-         
+         ! derived from routines in the PSPLINE package written by Doug McCune
+
          real(dp), dimension(:), pointer :: fin1 ! the spline data array, dimensions (4, nx, ny)
          integer, intent(in) :: nx, ny, i, j           ! target cell in the spline data
          real(dp), intent(in) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(i), x1 = xs(i+1)
          real(dp), intent(in) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(j), y1 = ys(j+1)
          real(dp), intent(out) :: fval, df_dx, df_dy
-   
+
          real(dp), parameter :: z36th = 1d0 / 36d0
-         
+
          real(dp), pointer :: fin(:,:,:)
 
          real(dp) :: xp, xpi, xp2, xpi2, cx, cxi, hx2, cxd, cxdi, hx, hxi
          real(dp) :: yp, ypi, yp2, ypi2, cy, cyi, hy2, cyd, cydi, hy, hyi
-      
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          fin(1:4,1:nx,1:ny) => fin1(1:4*nx*ny)
-         
+
          hx=x1-x0
          hxi=1d0/hx
          hx2=hx*hx
-   
+
          xp=(xget-x0)*hxi
          xpi=1d0-xp
          xp2=xp*xp
@@ -207,11 +207,11 @@
          cxi=xpi*(xpi2-1d0)
          cxd=3d0*xp2-1d0
          cxdi=-3d0*xpi2+1d0
-   
+
          hy=y1-y0
          hyi=1d0/hy
          hy2=hy*hy
-   
+
          yp=(yget-y0)*hyi
          ypi=1d0-yp
          yp2=yp*yp
@@ -221,7 +221,7 @@
          cyi=ypi*(ypi2-1d0)
          cyd=3d0*yp2-1d0
          cydi=-3d0*ypi2+1d0
-         
+
          ! bicubic spline interpolation
          fval = &
             xpi*(ypi*fin(1,i,j)  +yp*fin(1,i,j+1)) &
@@ -235,7 +235,7 @@
             +z36th*hx2*hy2*( &
                cxi*(cyi*fin(4,i,j) +cy*fin(4,i,j+1))+ &
                cx*(cyi*fin(4,i+1,j)+cy*fin(4,i+1,j+1)))
-         
+
          if (.false.) then
             write(*,3) 'fin(1,i,j)', i, j, fin(1,i,j)
             write(*,3) 'fin(1,i,j+1)', i, j+1, fin(1,i,j+1)
@@ -278,7 +278,7 @@
                cx*(cyi*fin(4,i+1,j)+cy*fin(4,i+1,j+1)))
             write(*,1) 'fval', fval
          end if
-         
+
          ! derivatives of bicubic splines
          df_dx = &
             hxi*( &
@@ -312,4 +312,4 @@
 
 
       end module kap_eval_support
-      
+

@@ -76,7 +76,7 @@ contains
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
          f, f0, f1, f2, radiative_conductivity, convective_conductivity
-      include 'formats' 
+      include 'formats'
       if (gradr > gradL) then
          ! Convection zone
 
@@ -92,12 +92,12 @@ contains
             select case(trim(MLT_option))
             case ('Henyey')
                ff1=1.0d0/Henyey_MLT_nu_param
-               ff2=0.5d0 
+               ff2=0.5d0
                ff3=8.0d0/Henyey_MLT_y_param
                ff4=1.0d0/Henyey_MLT_y_param
             case ('ML1')
-               ff1=0.125d0 
-               ff2=0.5d0 
+               ff1=0.125d0
+               ff2=0.5d0
                ff3=24.0d0
                ff4=0.0d0
             case ('ML2')
@@ -106,8 +106,8 @@ contains
                ff3=16.0d0
                ff4=0.0d0
             case ('Mihalas')
-               ff1=0.125d0 
-               ff2=0.5d0 
+               ff1=0.125d0
+               ff2=0.5d0
                ff3=16.0d0
                ff4=2.0d0
             case default
@@ -122,16 +122,16 @@ contains
             A_2 = mixing_length_alpha*omega*ff4_omega2_plus_1
             A_numerator = A_1*A_2
             A_denom = ff3*crad*clight*pow3(T)
-            A = A_numerator/A_denom   
-         end if 
+            A = A_numerator/A_denom
+         end if
 
          ! 'B' param  C&G 14.81
-         Bcubed = (pow2(A)/a0)*(gradr - gradL)   
+         Bcubed = (pow2(A)/a0)*(gradr - gradL)
 
          ! now solve cubic equation for convective efficiency, Gamma
          ! a0*Gamma^3 + Gamma^2 + Gamma - a0*Bcubed == 0   C&G 14.82,
-         ! leave it to Mathematica to find an expression for the root we want      
-         delta = a0*Bcubed               
+         ! leave it to Mathematica to find an expression for the root we want
+         delta = a0*Bcubed
          f = -2d0 + 9d0*a0 + 27d0*a0*a0*delta
          if (f > 1d100) then
             f0 = f
@@ -140,13 +140,13 @@ contains
             if (f0 <= 0d0) then
                f0 = f
             else
-               f0 = sqrt(f0)         
+               f0 = sqrt(f0)
             end if
          end if
-         f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0  
+         f1 = -2d0 + 9d0*a0 + 27d0*a0*a0*delta + f0
          if (f1 <= 0d0) return
-         f1 = pow(f1,one_third)     
-         f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1       
+         f1 = pow(f1,one_third)
+         f2 = 2d0*two_13*(1d0 - 3d0*a0) / f1
          Gamma = (four_13*f1 + f2 - 2d0) / (6d0*a0)
 
          if (Gamma <= 0d0) return
@@ -172,15 +172,15 @@ contains
       if (is_bad(Zeta%val)) return
       if (Zeta > 1d0) then
          Zeta = 1d0
-      end if            
-      
-      gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79      
+      end if
+
+      gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79
       Y_face = gradT - gradL
-      
+
       if (Y_face > 0d0) then
          mixing_type = convective_mixing
       end if
 
-   end subroutine calc_MLT   
+   end subroutine calc_MLT
 
 end module MLT

@@ -26,19 +26,19 @@
       module rates_names
 
       use utils_lib, only: mesa_error
-      
+
       implicit none
-      
-      
+
+
       contains
-      
+
       subroutine set_reaction_names
          use rates_def
          integer :: i, cnt
-         
+
          cnt = 0
          reaction_Name(:) = ''
-      
+
          reaction_Name(ir1212) = 'r1212'
          reaction_Name(ir1216) = 'r1216'
          reaction_Name(ir1216_to_mg24) = 'r1216_to_mg24'
@@ -241,10 +241,10 @@
          reaction_Name(irneut_to_prot) = 'rneut_to_prot'
          reaction_Name(irni56ec_to_fe54) = 'rni56ec_to_fe54'
          reaction_Name(irni56ec_to_fe56) = 'rni56ec_to_fe56'
-         
+
          reaction_Name(irni56ec_to_co56) = 'rni56ec_to_co56'
-         reaction_Name(irco56ec_to_fe56) = 'rco56ec_to_fe56'      
-            
+         reaction_Name(irco56ec_to_fe56) = 'rco56ec_to_fe56'
+
          reaction_Name(irni56gp_aux) = 'rni56gp_aux'
          reaction_Name(irni56gp_to_fe52) = 'rni56gp_to_fe52'
          reaction_Name(irni56gprot_aux) = 'rni56gprot_aux'
@@ -352,14 +352,14 @@
          reaction_Name(ir_al26_1_to_al26_2) = 'r_al26-1_to_al26-2'
          reaction_Name(ir_al26_2_to_al26_1) = 'r_al26-2_to_al26-1'
 
-         !reaction_Name(i) = ''     
+         !reaction_Name(i) = ''
 
          cnt = 0
          do i=1,num_predefined_reactions
             if (len_trim(reaction_Name(i)) == 0) then
                write(*,*) 'missing name for reaction', i
                if (i > 1) write(*,*) 'following ' // trim(reaction_Name(i-1))
-               write(*,*) 
+               write(*,*)
                cnt = cnt+1
             end if
          end do
@@ -368,7 +368,7 @@
 
       end subroutine set_reaction_names
 
-         
+
       end module rates_names
 
 

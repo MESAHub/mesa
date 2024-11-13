@@ -749,7 +749,7 @@
             do k=1,npts
                xvec(k) = xvec(k+grid_min-1)
             end do
-         end if 
+         end if
 
          do j = 1, panels_num_panels
 
@@ -913,14 +913,14 @@
                   npts, yvec, panels_ymin(j), panels_ymax(j), panels_ycenter(j), panels_ymargin(j), &
                   panels_yaxis_reversed(j), panels_dymin(j), ybot, ytop)
             end if
-            
+
             if (panels_same_yaxis_range(j) .and. len_trim(panels_other_yaxis_name(j)) > 0) then
                if (other_ybot < ybot) ybot = other_ybot
                if (ybot < other_ybot) other_ybot = ybot
                if (other_ytop > ytop) ytop = other_ytop
                if (ytop > other_ytop) other_ytop = ytop
             end if
-               
+
             if (len_trim(panels_other_yaxis_name(j)) > 0) then
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
@@ -949,7 +949,7 @@
                end if
                call pgslw(1)
             end if
-            
+
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
             call pgsci(1)
@@ -993,7 +993,7 @@
             end if
             call pgslw(1)
             call pgsci(1)
-         
+
             call show_pgstar_decorator(s% id, use_decorator, pgstar_decorator, j, ierr)
          end do
 
