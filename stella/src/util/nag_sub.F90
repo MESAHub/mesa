@@ -20,12 +20,7 @@ module nag_sub
 
   implicit none
   private
-    
-  character(len=*), parameter, private :: mdl_name = 'lnag_sub' 
-  
-  public :: nag_d01gaf 
-  
-contains
+     character(len=*), parameter, private :: mdl_name = 'lnag_sub'   public :: nag_d01gaf contains
 
 !!******
 !!
@@ -45,19 +40,14 @@ contains
 !!      see SUBROUTINE D01GAF in NAG
 !!
 !!   OUTPUT
-!!       - 
-!!   SOURCE
+!!       -!!   SOURCE
 !!
 !!*** **********************************************************************
   subroutine nag_d01gaf (X,y,N,ans,err)
-    real (kind=dp), dimension(:), intent(in)   :: X 
-    real (kind=dp), dimension(:), intent(in)   ::  y 
-    integer, intent(in) :: N 
-    real (kind=dp), intent(out)  :: ans, err
+    real (kind=dp), dimension(:), intent(in)   :: X    real (kind=dp), dimension(:), intent(in)   ::  y    integer, intent(in) :: N    real (kind=dp), intent(out)  :: ans, err
     character(len=*), parameter ::  subrtn_name = 'd01gaf' &
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
     integer  ::  ifail
- 
 
     call d01gaf(X,y,N,ans,err,ifail)
     if(ifail > 0)  then

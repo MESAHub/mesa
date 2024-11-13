@@ -46,30 +46,30 @@
          real(dp), intent(out) :: T, log10T
          real(dp), intent(inout), dimension(:) :: &
             res, d_dlnRho_const_T, d_dlnT_const_Rho
-         real(dp), intent(out) :: & 
+         real(dp), intent(out) :: &
             dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
             dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
          integer, intent(out) :: ierr
-         
+
          real(dp) :: avo_k_div_abar, P, entropy
          include 'formats'
-         
+
          ierr = 0
-         
+
          res(1:nv) = 0d0
          d_dlnRho_const_T(1:nv) = 0d0
          d_dlnT_const_Rho(1:nv) = 0d0
 
          avo_k_div_abar = avo*kerg/abar
-         
+
          P = (gamma - 1d0)*energy*rho
          T = (gamma - 1d0)*energy/avo_k_div_abar
          log10T = log10(T)
 
          res(i_Cv) = avo_k_div_abar/(gamma - 1) ! energy/T
-         
+
          entropy = res(i_Cv)*log(P/pow(rho,gamma)) + 1d9 ! offset to keep it > 0
-         
+
          if (is_bad(entropy) .or. entropy <= 0d0) then
             if (.false.) then
 !$OMP critical (eosde_eval_crit1)
@@ -88,7 +88,7 @@
             end if
             entropy = 1d-99
          end if
-         
+
          res(i_lnPgas) = log(P) ! treat P as Pgas
          res(i_lnE) = log10E*ln10
          res(i_lnS) = log(entropy)
@@ -104,20 +104,20 @@
          res(i_gamma3) = gamma
          res(i_lnfree_e) = -1d99
          res(i_eta) = 0d0
-         
+
          d_dlnRho_const_T(i_lnPgas) = 1
-         
+
          d_dlnT_const_Rho(i_lnPgas) = 1
          d_dlnT_const_Rho(i_lnE) = 1
-         
+
          dlnT_dlnd_c_E = 0
          dlnPgas_dlnd_c_E = 1
 
          dlnT_dlnE_c_Rho = 1
          dlnPgas_dlnE_c_Rho = 1
-         
+
       end subroutine Get_eos_gamma_DE_Results
 
 
       end module eosDE_eval
-      
+

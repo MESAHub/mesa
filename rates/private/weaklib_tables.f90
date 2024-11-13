@@ -216,7 +216,7 @@ contains
 
     xget = T9
     yget = lYeRho
-    
+
     if (weak_bicubic) then
        call setup_for_bicubic_interpolations
     else
@@ -269,7 +269,7 @@ contains
     Qneu = exp10(lneutrino)/lambda
     dQneu_dlnT = ln10*T9*Qneu*d_lneutrino_dT9 - dlambda_dlnT*Qneu/lambda
     dQneu_dlnRho = Qneu*d_lneutrino_dlYeRho - dlambda_dlnRho*Qneu/lambda
-        
+
   contains
 
     subroutine find_location ! set ix, jy; x is T9; y is lYeRho
@@ -345,7 +345,7 @@ contains
     end subroutine setup_for_bicubic_interpolations
 
     subroutine do_bicubic_interpolations(fin, fval, df_dx, df_dy, ierr)
-      ! derived from routines in the PSPLINE package written by Doug McCune 
+      ! derived from routines in the PSPLINE package written by Doug McCune
       real(dp), dimension(:,:,:) :: fin ! the spline data array, dimensions (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
@@ -433,7 +433,7 @@ contains
       dlYeRho = lYeRho - y0
       delta_lYeRho = y1 - y0
       y_beta = dlYeRho / delta_lYeRho ! fraction of y1 result
-      y_alfa = 1 - y_beta ! fraction of y0 result     
+      y_alfa = 1 - y_beta ! fraction of y0 result
       if (is_bad(y_alfa) .or. y_alfa < 0 .or. y_alfa > 1) then
          write(*,1) 'weaklib: y_alfa', y_alfa
          write(*,1) 'T9', T9
@@ -456,13 +456,13 @@ contains
          write(*,1) 'y_alfa, y_beta', y_alfa, y_beta
          write(*,'(A)')
       end if
-      
+
     end subroutine setup_for_linear_interp
 
     subroutine do_linear_interp(f, fval, df_dx, df_dy, ierr)
       use interp_1d_lib
       use utils_lib, only: is_bad
-      real(dp), dimension(:,:,:) :: f ! (4, nx, ny)         
+      real(dp), dimension(:,:,:) :: f ! (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 
@@ -480,7 +480,7 @@ contains
 
       fval = x_alfa*fx0 + x_beta*fx1
       df_dx = (fx1 - fx0)/(x1 - x0)
-      df_dy = (fy1 - fy0)/(y1 - y0)    
+      df_dy = (fy1 - fy0)/(y1 - y0)
 
       if (is_bad(fval)) then
          ierr = -1

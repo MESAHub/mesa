@@ -189,7 +189,7 @@ module skye_ideal
         dindaz  = -den*ww
         dinddaa = 2.0d0*ye*ww
         dinddaz = -ww
-        dindzz = 0.0d0 
+        dindzz = 0.0d0
 
 
 !..hash locate this temperature and density
@@ -281,7 +281,7 @@ module skye_ideal
         ddsi0t =   ddpsi0(xt) * ht% dt2i_sav(jat)
         ddsi1t =   ddpsi1(xt) * ht% dti_sav(jat)
         ddsi2t =   ddpsi2(xt)
- 
+
         ddsi0mt =  ddpsi0(mxt) * ht% dt2i_sav(jat)
         ddsi1mt = -ddpsi1(mxt) * ht% dti_sav(jat)
         ddsi2mt =  ddpsi2(mxt)
@@ -298,7 +298,7 @@ module skye_ideal
         dddsi0t =   dddpsi0(xt) * ht% dt3i_sav(jat)
         dddsi1t =   dddpsi1(xt) * ht% dt2i_sav(jat)
         dddsi2t =   dddpsi2(xt) * ht% dti_sav(jat)
- 
+
         dddsi0mt = -dddpsi0(mxt) * ht% dt3i_sav(jat)
         dddsi1mt =  dddpsi1(mxt) * ht% dt2i_sav(jat)
         dddsi2mt = -dddpsi2(mxt) * ht% dti_sav(jat)
@@ -362,7 +362,7 @@ module skye_ideal
                 si0t, si1t, si2t, si0mt, si1mt, si2mt, &
                 dddsi0d, dddsi1d, dddsi2d, dddsi0md, dddsi1md, dddsi2md)
 
-!..now get the pressure derivative with density, chemical potential, and 
+!..now get the pressure derivative with density, chemical potential, and
 !..electron positron number densities
 !..get the cubic interpolation weight functions
 
@@ -407,7 +407,7 @@ module skye_ideal
         dddsi0d  = xdddpsi0(xd) * ht% dd3i_sav(iat)
         dddsi1d  = xdddpsi1(xd) * ht% dd2i_sav(iat)
         dddsi0md = -xdddpsi0(mxd) * ht% dd3i_sav(iat)
-        dddsi1md = xdddpsi1(mxd) * ht% dd2i_sav(iat)      
+        dddsi1md = xdddpsi1(mxd) * ht% dd2i_sav(iat)
 
 !..look in the electron chemical potential table only once
         fi(1)  = ht% ef(iat,jat)
@@ -438,7 +438,7 @@ module skye_ideal
         x       = h3(iat,jat,fi, &
                      si0t,   si1t,   si0mt,   si1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
-        detadd  = ye * x  
+        detadd  = ye * x
         detadt  = h3(iat,jat,fi, &
                     dsi0t,  dsi1t,  dsi0mt,  dsi1mt, &
                      si0d,   si1d,   si0md,   si1md)
@@ -462,14 +462,14 @@ module skye_ideal
         detadta = z * dinda
         detadtz = z * dindz
         detadaa = (y*din + 2.0d0*x)*din*ww
-        detadaz = -(y*dindz*din + x*den*ytot1)*ytot1 
+        detadaz = -(y*dindz*din + x*den*ytot1)*ytot1
         detadzz = y*dindz*den*ytot1
 
 !..third derivatives
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
-                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)        
-        detadddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)  
+                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
+        detadddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         detadttt = h3(iat,jat,fi, &
@@ -478,12 +478,12 @@ module skye_ideal
 
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)    
+                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
         detadddt = ye * ye * y ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)    
+                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
         detaddtt = ye * y ! d/drho d/dT^2
 
@@ -546,7 +546,7 @@ module skye_ideal
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
                     ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        dxneddd = ye * ye * y  
+        dxneddd = ye * ye * y
         z       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,   dsi0mt,   dsi1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
@@ -559,14 +559,14 @@ module skye_ideal
         dxnedta = z * dinda
         dxnedtz = z * dindz
         dxnedaa = (y*din + 2.0d0*x)*din*ytot1*ytot1
-        dxnedaz = -(y*dindz*din + x*den*ytot1)*ytot1 
+        dxnedaz = -(y*dindz*din + x*den*ytot1)*ytot1
         dxnedzz = y*dindz*den*ytot1
 
 !..third derivatives
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
-                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)        
-        dxneferdddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)  
+                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
+        dxneferdddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         dxneferdttt = h3(iat,jat,fi, &
@@ -576,12 +576,12 @@ module skye_ideal
 
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)    
+                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
         dxneferdddt = ye * ye * y ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)    
+                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
         dxneferddtt = ye * y ! d/drho d/dT^2
 

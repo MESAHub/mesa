@@ -22,7 +22,7 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module pgstar_astero_plots
       use star_lib
       use star_def
@@ -30,15 +30,15 @@
       use star_pgstar
 
       implicit none
-         
+
 
       contains
-      
-      
+
+
       subroutine astero_pgstar_plots_info(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
-         
+
          integer :: i, plot_id
          type (pgstar_win_file_data), pointer :: p
          type (star_info), pointer :: s
@@ -46,7 +46,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          i = 1
          plot_id = i_Other + i - 1
          p => s% pg% pgstar_win_file_ptr(plot_id)
@@ -65,7 +65,7 @@
          p% file_interval = echelle_file_interval
          p% file_width = echelle_file_width
          p% file_aspect_ratio = echelle_file_aspect_ratio
-         
+
          if (nl(1) > 0) then
             i = i+1
             plot_id = i_Other + i - 1
@@ -86,9 +86,9 @@
             p% file_width = ratios_file_width
             p% file_aspect_ratio = ratios_file_aspect_ratio
          end if
-         
+
       end subroutine astero_pgstar_plots_info
-            
+
 
       subroutine echelle_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -99,23 +99,23 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
-         
+
          call do_echelle_plot(id, device_id, &
             echelle_xleft, echelle_xright, &
             echelle_ybot, echelle_ytop, &
             .false., echelle_title, echelle_txt_scale, ierr)
 
          call pgebuf()
-      
+
       end subroutine echelle_plot
 
 
       subroutine do_echelle_plot_in_grid( &
-            id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)         
+            id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          integer, intent(out) :: ierr
@@ -126,10 +126,10 @@
 
       subroutine do_echelle_plot( &
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
-            
+
          use utils_lib
          use const_def
-         
+
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          logical, intent(in) :: subplot
@@ -140,12 +140,12 @@
          real :: xmin, xmax, ymin, ymax, dx, dy, plot_delta_nu, marker_scale, &
             x_obs, y_obs, x_model, y_model, y_txt, xpt_min, xpt_max, xmargin
          integer :: i, l, freq_color(0:3), freq_shape(0:3), model_color, model_shape
-                     
+
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          plot_delta_nu = echelle_delta_nu
          if (plot_delta_nu <= 0) plot_delta_nu = delta_nu
          if (plot_delta_nu <= 0) then
@@ -153,7 +153,7 @@
             ierr = -1
             return
          end if
-         
+
          xpt_min = 1e9
          xpt_max = -1e9
          ymin = 1e9
@@ -176,9 +176,9 @@
          xmargin = max(plot_delta_nu/5, (plot_delta_nu - (xpt_max - xpt_min))/2)
          xmin = -xmargin
          xmax = 2*plot_delta_nu + xmargin
-         
+
          call pgsave
-         
+
          call pgsch(txt_scale)
          call pgsvp(xleft, xright, ybot, ytop)
          call pgswin(xmin, xmax, ymin, ymax)
@@ -193,9 +193,9 @@
             call pgstar_show_age(s)
          end if
          call pgstar_show_title(s, title)
-         
+
          call pgslw(1)
-         
+
          ! label
          y_obs = ymin + dy*0.12
          y_txt = ymin + dy*0.17
@@ -204,23 +204,23 @@
          else
             dx = (xmax-xmin)/3d0
          end if
-         
+
          freq_color(0) = clr_Teal
          freq_shape(0) = 0840 ! circle
-         
+
          freq_color(1) = clr_Crimson
          freq_shape(1) = 0842 ! triangle
-         
+
          freq_color(2) = clr_BrightBlue
          freq_shape(2) = 0841 ! square
-         
+
          freq_color(3) = clr_Coral
          freq_shape(3) = 0843 ! diamond
-            
+
          model_color = clr_Silver
          model_shape = 0828 ! bullet
-         
-         
+
+
          x_obs = xmin + dx/2
          call pgsci(freq_color(0))
          call pgsch(1.6*txt_scale)
@@ -228,7 +228,7 @@
          call pgsci(1)
          call pgsch(txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=0')
-         
+
          x_obs = x_obs+dx
          call pgsci(freq_color(1))
          call pgsch(1.6*txt_scale)
@@ -236,7 +236,7 @@
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=1')
-         
+
          x_obs = x_obs+dx
          call pgsci(freq_color(2))
          call pgsch(1.6*txt_scale)
@@ -244,7 +244,7 @@
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=2')
-         
+
          if (nl(3) > 0) then
             x_obs = x_obs+dx
             call pgsci(freq_color(3))
@@ -254,7 +254,7 @@
             call pgsch(1.0*txt_scale)
             call pgptxt(x_obs, y_txt, 0.0, 0.5, 'l=3')
          end if
-         
+
          marker_scale = 2.4*txt_scale
          call pgsch(marker_scale)
 
@@ -278,29 +278,29 @@
                end do
             end if
          end do
-         
-         
+
+
          call pgsci(clr_SlateGray)
          call pgsls(1)
          call pgslw(8)
-         
+
          call pgmove(0., ymax - dy*0.08)
          call pgdraw(0., ymax)
          call pgmove(plot_delta_nu, ymax - dy*0.08)
          call pgdraw(plot_delta_nu, ymax)
          call pgmove(2*plot_delta_nu, ymax - dy*0.08)
          call pgdraw(2*plot_delta_nu, ymax)
-         
+
          call pgmove(0., ymin + dy*0.08)
          call pgdraw(0., ymin)
          call pgmove(plot_delta_nu, ymin + dy*0.08)
          call pgdraw(plot_delta_nu, ymin)
          call pgmove(2*plot_delta_nu, ymin + dy*0.08)
          call pgdraw(2*plot_delta_nu, ymin)
-         
+
 
          call pgunsa
-      
+
          call show_pgstar_annotations(s, &
             show_echelle_annotation1, &
             show_echelle_annotation2, &
@@ -308,18 +308,18 @@
 
 
          contains
-         
-         
+
+
          subroutine show_obs(freq, color, shape)
             real(dp), intent(in) :: freq
             integer, intent(in) :: color, shape
             y_obs = freq
-            x_obs = mod(freq,plot_delta_nu)               
+            x_obs = mod(freq,plot_delta_nu)
             call pgsci(color)
             call pgpt1(x_obs, y_obs, shape)
             call pgpt1(x_obs + plot_delta_nu, y_obs, shape)
          end subroutine show_obs
-         
+
          subroutine show_model( &
                freq_obs, freq, freq_alt_up, freq_alt_down, &
                inertia, inertia_alt_up, inertia_alt_down, color)
@@ -340,7 +340,7 @@
             call pgdraw(x_model, y_model)
             call pgpt1(x_model + plot_delta_nu, y_model, model_shape)
             call pgmove(x_obs + plot_delta_nu, y_obs)
-            call pgdraw(x_model + plot_delta_nu, y_model)            
+            call pgdraw(x_model + plot_delta_nu, y_model)
             if (freq_alt_up > 0d0 .and. show_echelle_next_best_at_higher_frequency) then
                y_model_alt_up = freq_alt_up + y_model_alt_shift
                x_model_alt_up = (freq_alt_up - freq_obs) + x_obs
@@ -348,7 +348,7 @@
                call pgpt1(x_model_alt_up, y_model_alt_up, model_shape)
                call pgpt1(x_model_alt_up + plot_delta_nu, y_model_alt_up, model_shape)
                call pgsch(marker_scale)
-            end if            
+            end if
             if (freq_alt_down > 0d0 .and. show_echelle_next_best_at_lower_frequency) then
                y_model_alt_down = freq_alt_down - y_model_alt_shift
                x_model_alt_down = (freq_alt_down - freq_obs) + x_obs
@@ -356,11 +356,11 @@
                call pgpt1(x_model_alt_down, y_model_alt_down, model_shape)
                call pgpt1(x_model_alt_down + plot_delta_nu, y_model_alt_down, model_shape)
                call pgsch(marker_scale)
-            end if           
+            end if
          end subroutine show_model
-         
+
       end subroutine do_echelle_plot
-      
+
 
       subroutine ratios_plot(id, device_id, ierr)
          integer, intent(in) :: id, device_id
@@ -371,23 +371,23 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          call pgslct(device_id)
          call pgbbuf()
          call pgeras()
-         
+
          call do_ratios_plot(id, device_id, &
             ratios_xleft, ratios_xright, &
             ratios_ybot, ratios_ytop, &
             .false., ratios_title, ratios_txt_scale, ierr)
 
          call pgebuf()
-      
+
       end subroutine ratios_plot
 
 
       subroutine do_ratios_plot_in_grid( &
-            id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)         
+            id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          integer, intent(out) :: ierr
@@ -398,10 +398,10 @@
 
       subroutine do_ratios_plot( &
             id, device_id, xleft, xright, ybot, ytop, subplot, title, txt_scale, ierr)
-            
+
          use utils_lib
          use const_def
-         
+
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          logical, intent(in) :: subplot
@@ -415,21 +415,21 @@
          integer :: i, n, i0, i1, l0_first, l1_first, &
             r01_color, r01_shape, r10_color, r10_shape, &
             r02_color, r02_shape, model_color, model_shape
-                     
+
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (chi2_seismo_r_010_fraction <= 0d0 .and. &
              chi2_seismo_r_02_fraction <= 0d0) then
             return
          end if
-         
+
          if (nl(1) <= 0 .or. ratios_n <= 0) then
             return
          end if
-         
+
          n = ratios_n
          l0_first = ratios_l0_first
          l1_first = ratios_l1_first
@@ -438,7 +438,7 @@
          xmin = HUGE(xmin)
          do i=1,n
             i0 = i + l0_first
-            i1 = i + l1_first            
+            i1 = i + l1_first
             if (ratios_r01(i) > xmax) xmax = ratios_r01(i)
             if (ratios_r01(i) < xmin) xmin = ratios_r01(i)
             if (ratios_r10(i) > xmax) xmax = ratios_r10(i)
@@ -457,7 +457,7 @@
          dx = max(dx, 0.02)
          xmin = xmin - dx*0.1
          xmax = xmax + dx*0.1
-         
+
          ymin = freq_target(0,1 + l0_first)
          ymax = freq_target(1,n + l1_first)
          do i=2,nl(0)
@@ -469,7 +469,7 @@
          dy = max(dy, 1.0)
          ymin = ymin - dy*0.25
          ymax = ymax + dy*0.12
-         
+
          call pgsave
 
          call pgsvp(xleft, xright, ybot, ytop)
@@ -484,26 +484,26 @@
             call pgstar_show_age(s)
          end if
          call pgstar_show_title(s, title)
-         
+
          call pgslw(1)
-         
+
          r01_color = clr_Teal
          r01_shape = 0840 ! circle
-         
+
          r10_color = clr_Crimson
          r10_shape = 0842 ! triangle
-         
+
          r02_color = clr_BrightBlue
          r02_shape = 0841 ! square
-         
+
          model_color = clr_Silver
          model_shape = 0828 ! bullet
-         
+
          ! label
          y_obs = ymin + dy*0.06
          y_txt = ymin + dy*0.10
          dx = (xmax-xmin)/4d0
-         
+
          x_obs = xmin+dx
          call pgsci(r01_color)
          call pgsch(1.6*txt_scale)
@@ -511,7 +511,7 @@
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r01')
-         
+
          x_obs = x_obs+dx
          call pgsci(r10_color)
          call pgsch(1.6*txt_scale)
@@ -519,7 +519,7 @@
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r10')
-         
+
          x_obs = x_obs+dx
          call pgsci(r02_color)
          call pgsch(1.6*txt_scale)
@@ -527,31 +527,31 @@
          call pgsci(1)
          call pgsch(1.0*txt_scale)
          call pgptxt(x_obs, y_txt, 0.0, 0.5, 'r02')
-                  
+
          show_model = &
             (model_ratios_n == ratios_n .and. &
                model_ratios_l0_first == ratios_l0_first .and. &
                   model_ratios_l1_first == ratios_l1_first)
-         
+
          call pgsch(2.4*txt_scale)
          do i=1,n
             call show_r01(i)
             call show_r10(i)
          end do
-         
+
          do i=1,nl(0)
             call show_r02(i)
          end do
-         
+
          call pgunsa
-      
+
          call show_pgstar_annotations(s, &
             show_ratios_annotation1, &
             show_ratios_annotation2, &
             show_ratios_annotation3)
 
          contains
-         
+
          subroutine show_r01(i)
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
@@ -571,7 +571,7 @@
             end if
             call pgpt1(x_obs, y_obs, r01_shape)
          end subroutine show_r01
-         
+
          subroutine show_r10(i)
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
@@ -591,7 +591,7 @@
             end if
             call pgpt1(x_obs, y_obs, r10_shape)
          end subroutine show_r10
-         
+
          subroutine show_r02(i)
             integer, intent(in) :: i
             real :: x_obs, y_obs, sig_obs, x_model, y_model
@@ -612,10 +612,10 @@
             end if
             call pgpt1(x_obs, y_obs, r02_shape)
          end subroutine show_r02
-         
+
       end subroutine do_ratios_plot
-      
-      
+
+
       subroutine write_plot_to_file(s, p, file_prefix, number, ierr)
          use star_lib, only: pgstar_write_plot_to_file
          type (star_info), pointer :: s
@@ -625,31 +625,31 @@
          integer, intent(out) :: ierr
 
          character (len=256) :: format_string, num_str, name, extension
-         
+
          ierr = 0
-         
+
          if (len_trim(file_prefix) == 0 .or. .not. associated(p)) return
-         
+
          write(format_string, '( "(i",i2.2,".",i2.2,")" )') num_digits, num_digits
          write(num_str, format_string) number
-         
+
          if (len_trim(p% file_dir) > 0) then
             name = trim(p% file_dir) // '/' // trim(file_prefix)
          else
             name = file_prefix
          end if
-         
+
          extension = 'png' ! s% file_extension
          name = trim(name) // '_sample' // trim(num_str) // '.' // trim(extension)
-         
+
          write(*,'(a)') 'write plot to file ' // trim(name)
          call pgstar_write_plot_to_file(s, p, name, ierr)
-      
+
       end subroutine write_plot_to_file
-      
+
 
       end module pgstar_astero_plots
-      
-      
-      
-      
+
+
+
+

@@ -71,11 +71,11 @@
          RTI_flag = s% RTI_flag
          rotation_flag = s% rotation_flag
          RSP_flag = s% RSP_flag
-         RSP2_flag = s% RSP2_flag 
+         RSP2_flag = s% RSP2_flag
          write_mlt_vc = s% have_mlt_vc
-         
+
          species = s% species
-         
+
          open(newunit=iounit, file=trim(filename), action='write', status='replace')
          write(iounit,'(a)') '! note: initial lines of file can contain comments'
          write(iounit,'(a)') '!'
@@ -90,7 +90,7 @@
          if (RSP_flag) file_type = file_type + 2**bit_for_RSP
          if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2
          if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
-                  
+
          write(iounit, '(i14)', advance='no') file_type
          write(iounit,'(a)',advance='no') ' -- model for mesa/star'
          if (BTEST(file_type, bit_for_velocity)) &
@@ -181,7 +181,7 @@
                'log_rel_run_E_err', &
                safe_log10(abs(s% cumulative_energy_error/s% total_energy))
          write(iounit, 2) 'num_retries', s% num_retries
-         write(iounit, '(a)') ! blank line for end of property list      
+         write(iounit, '(a)') ! blank line for end of property list
 
          call header
          do k=1, nz

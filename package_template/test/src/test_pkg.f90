@@ -5,10 +5,10 @@
       contains
 
       subroutine do_test
-         
+
          write(*,*) 'done'
-         
-      end subroutine do_test 
+
+      end subroutine do_test
 
 
       end module test_xxx_mod

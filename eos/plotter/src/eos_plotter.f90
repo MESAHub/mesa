@@ -542,14 +542,14 @@ contains
          use eos_def
          use eos_lib
          use chem_lib, only: basic_composition_info
-         integer, intent(in) :: handle, i_eos, species 
+         integer, intent(in) :: handle, i_eos, species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions         
+         real(dp), intent(in) :: xa(:) ! mass fractions
          real(dp), intent(in) :: Rho, logRho ! the density
-         real(dp), intent(in) :: T, logT ! the temperature         
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)         
-         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results) 
+         real(dp), intent(in) :: T, logT ! the temperature
+         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
          integer, intent(out) :: ierr ! 0 means AOK.

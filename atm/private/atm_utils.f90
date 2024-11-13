@@ -103,7 +103,7 @@ contains
     ! Evaluate the effective temperature and surface gravity
 
     Teff = pow(L/(4._dp*pi*R*R*boltz_sigma), 0.25_dp)
-   
+
     g = cgrav * M / (R*R)
 
   end subroutine eval_Teff_g
@@ -114,7 +114,7 @@ contains
        T, P, rho, tau, kap, L, M, R, cgrav) result (gradr)
 
     use eos_lib, only: radiation_pressure
-    
+
     real(dp), intent(in) :: T
     real(dp), intent(in) :: P
     real(dp), intent(in) :: rho
@@ -125,7 +125,7 @@ contains
     real(dp), intent(in) :: M
     real(dp), intent(in) :: cgrav
     real(dp)             :: gradr
-    
+
     real(dp) :: Prad
     real(dp) :: dilution_factor
     real(dp) :: s
@@ -159,7 +159,7 @@ contains
     return
 
   end function eval_Paczynski_gradr
-       
+
   !****
 
   subroutine eval_E2(x, E2, dE2_dx, ierr)
@@ -195,9 +195,9 @@ contains
     dE2_dx = slope*ln10*E2
 
   end subroutine eval_E2
-  
+
   !****
-       
+
   subroutine create_E2_interpolant(ierr)
 
     use interp_1d_lib

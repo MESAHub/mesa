@@ -207,7 +207,7 @@
             s% pg% show_TRho_Profile_annotation3)
 
          deallocate(xvec, yvec)
-         
+
          call show_pgstar_decorator(s%id,s% pg% TRho_Profile_use_decorator,&
             s% pg% TRho_Profile_pgstar_decorator, 0, ierr)
 
@@ -362,7 +362,7 @@
             call pgsls(Line_Type_Dot)
 
             logRho0 = logRho1
-            
+
             logT1 = s% eos_rq% logT_cut_FreeEOS_hi
             logT2 = s% eos_rq% logT_cut_FreeEOS_lo
             logT3 = s% eos_rq% logT_min_FreeEOS_hi
@@ -379,12 +379,12 @@
 
             call stroke_line(logRho0, logT1, logRho2, logT1)
             call stroke_line(logRho2, logT1, logRho4, logT3)
-            call stroke_line(logRho4, logT3, logRho5, logT3)            
+            call stroke_line(logRho4, logT3, logRho5, logT3)
 
             call stroke_line(logRho0, logT2, logRho1, logT2)
             call stroke_line(logRho1, logT2, logRho3, logT4)
             call stroke_line(logRho3, logT4, logRho5, logT4)
-            
+
             call stroke_line(logRho0, logT5, logRho6, logT6)
             call stroke_line(logRho5, logT6, logRho6, logT6)
 
@@ -394,7 +394,7 @@
             call show_label(-1.5, 3.7, 0.0, 0.5, 'OPAL/SCVH')
             call show_label(-1.5, 9.7, 0.0, 0.5, 'HELM/Skye EOS')
             call show_label(6.0, 4.5, 0.0, 0.5, 'Skye EOS')
-            
+
             call pgunsa
          end subroutine do_eos_regions
 

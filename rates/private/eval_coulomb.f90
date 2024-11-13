@@ -173,9 +173,9 @@ contains
 
     type(auto_diff_real_2var_order1) :: gamma
 
-    ! expressions taken from 
+    ! expressions taken from
     ! [CP98]: Chabrier, G., \& Potekhin, A.~Y.\ 1998, \pre, 58, 4941
-    ! [PC00]: Potekhin, A.~Y., \& Chabrier, G.\ 2000, \pre, 62, 8554 
+    ! [PC00]: Potekhin, A.~Y., \& Chabrier, G.\ 2000, \pre, 62, 8554
     ! [P+09a]: Potekhin, A.~Y., Chabrier, G., \& Rogers, F.~J.\ 2009, \pre, 79, 016411
     ! [P+09b]: Potekhin, A.~Y., Chabrier, G., Chugunov, A.~I., Dewitt, H.~E., \& Rogers, F.~J.\ 2009, \pre, 80, 047401
 
@@ -215,7 +215,7 @@ contains
       f = A1 * (sqrt(gamma * (A2 + gamma)) - A2 * log(sqrt(gamma/A2) + sqrt(1+gamma/A2))) + &
           2 * A3 * (sqrt(gamma) - atan(sqrt(gamma)))
 
-      return 
+      return
 
     end function fii
 
@@ -257,7 +257,7 @@ contains
       h1 = 1d0 / (1d0 + pow(x/sqrt(1+x*x),6d0) * pow(Z,-1d0/3d0))
       h2 = 1d0 / sqrt(1+x*x)
 
-      f = - gamma_e * (c_DH * sqrt(gamma_e) + c_TF * a * pow(gamma_e, nu) * g1 * h1) / & 
+      f = - gamma_e * (c_DH * sqrt(gamma_e) + c_TF * a * pow(gamma_e, nu) * g1 * h1) / &
                       (1d0 + (b * sqrt(gamma_e) + a * g2 * pow(gamma_e, nu)/rs) * h2)
 
 
@@ -325,7 +325,7 @@ contains
 
     type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
 
-    ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380 
+    ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380
 
     integer :: i
     type(auto_diff_real_2var_order1) :: rs, rs0, s, fj

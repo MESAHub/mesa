@@ -60,7 +60,7 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
-      
+
       logical :: Y_is_positive
       type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
       type(auto_diff_real_tdc) :: Q, Q0
@@ -71,7 +71,7 @@ contains
       ierr = 0
       if (info%mixing_length_alpha == 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
-      end if         
+      end if
 
       ! Determine the sign of the solution.
       !
@@ -165,7 +165,7 @@ contains
                   ! ierr /= 0 should be impossible, because we checked the necessary conditions
                   ! for the bisection search above. Nonetheless, bugs can crop up, so we leave this
                   ! check in here and leave the checks in Af_bisection_search.
-                  if (ierr /= 0) return 
+                  if (ierr /= 0) return
                   Y0 = set_Y(.false., Z0)
                   call compute_Q(info, Y0, Q, Af)
                   if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
@@ -218,7 +218,7 @@ contains
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
       Y_face = unconvert(Y)
-      conv_vel = sqrt_2_div_3*unconvert(Af)   
+      conv_vel = sqrt_2_div_3*unconvert(Af)
 
    end subroutine get_TDC_solution
 
@@ -243,7 +243,7 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
-      
+
       type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ
       integer :: iter, line_iter
@@ -382,7 +382,7 @@ contains
 
       ! Unpack output
       Y_face = unconvert(Y)
-      tdc_num_iters = iter          
+      tdc_num_iters = iter
    end subroutine bracket_plus_Newton_search
 
 end module tdc

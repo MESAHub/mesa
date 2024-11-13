@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 module run_star_extras
 
   ! Uses
@@ -33,7 +33,7 @@ module run_star_extras
   use gyre_mesa_m
 
   ! No implicit typing
-      
+
   implicit none
   include "test_suite_extras_def.inc"
 
@@ -42,7 +42,7 @@ module run_star_extras
 contains
 
   include "test_suite_extras.inc"
-      
+
   subroutine extras_controls(id, ierr)
 
     integer, intent(in) :: id
@@ -59,7 +59,7 @@ contains
     s% extras_finish_step => extras_finish_step
     s% extras_after_evolve => extras_after_evolve
 
-    s% job% warn_run_star_extras =.false.       
+    s% job% warn_run_star_extras =.false.
 
   end subroutine extras_controls
 
@@ -77,7 +77,7 @@ contains
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
     call test_suite_startup(s, restart, ierr)
-    
+
     if (s% job% create_pre_main_sequence_model) return
 
     ! Initialize GYRE
@@ -99,28 +99,28 @@ contains
   end subroutine extras_startup
 
   !****
-  
+
   include 'gyre_in_mesa_extras_finish_step.inc'
 
   integer function extras_finish_step(id)
     integer, intent(in) :: id
-    integer :: ierr  
-    
+    integer :: ierr
+
     type (star_info), pointer :: s
-    
+
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
-    
+
     extras_finish_step = keep_going
-    
+
     if (s% job% create_pre_main_sequence_model) return
-    
+
     extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-    
+
     if (extras_finish_step == terminate) &
        s% termination_code = t_extras_finish_step
-    
+
   end function extras_finish_step
 
   !****
@@ -129,7 +129,7 @@ contains
 
     integer, intent(in)  :: id
     integer, intent(out) :: ierr
-    
+
     type (star_info), pointer :: s
 
     ierr = 0

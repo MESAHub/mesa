@@ -142,7 +142,7 @@
             call pgsave
             call pgsch(txt_scale)
             call pgsvp(winxmin, winxmax, winymin, winymax)
-            
+
             amax=0
             amin=0.0
             zmax=0
@@ -216,14 +216,14 @@
             end do
 
             !Get stable isotope abundances
-            call get_stable_mass_frac(s%chem_id,s%species,dble(abun),scaled_abun) 
-            call get_stable_mass_frac(s%chem_id,s%species,init_comp,scaled_abun_init)           
+            call get_stable_mass_frac(s%chem_id,s%species,dble(abun),scaled_abun)
+            call get_stable_mass_frac(s%chem_id,s%species,init_comp,scaled_abun_init)
 
             do i=1,solsiz
-               
+
                la=safe_log10(scaled_abun(i))
                lac=safe_log10(scaled_abun_init(i))
-   
+
                !Remove low abundance isotopes, low in star and low in solar can lead to large production factor
                if(la <s% pg%production_min_mass_frac .or. lac <s% pg%production_min_mass_frac) then
                   scaled_abun(i)=-HUGE(ymin)
@@ -232,7 +232,7 @@
                   ymax=max(ymax,real(scaled_abun(i),kind=kind(ymax)))
                   ymin=min(ymin,real(scaled_abun(i),kind=kind(ymin)))
                end if
-      
+
                if(zmax==izsol(i)) amax=int(iasol(i))
 
             end do
@@ -279,13 +279,13 @@
                call show_model_number_pgstar(s)
                call show_age_pgstar(s)
             end if
-            call show_title_pgstar(s, title)           
+            call show_title_pgstar(s, title)
 
             alternate=-1
             i=1
-            outer: do 
+            outer: do
                if(i>solsiz) exit outer
-      
+
                ! Z is greater than zmax
                if(izsol(i)>zmax) exit outer
 
@@ -306,7 +306,7 @@
                last_y=-HUGE(last_y)
 
                inner: do j=i,solsiz
-               
+
                   if(izsol(j)==izsol(i))then
                      if((scaled_abun(j)>= ymin) .and. (scaled_abun(j) <= ymax)&
                         .and.(iasol(j)<=xright).and.(iasol(j)>=xleft)) then
@@ -322,7 +322,7 @@
 
                         !Save last x,y pair we saw
                         last_x=A*1.0
-                        last_y=scaled_abun(j)               
+                        last_y=scaled_abun(j)
                      end if
                   else
                      exit inner
@@ -335,11 +335,11 @@
 
             call pgunsa
             deallocate(abun,init_comp)
-            
+
             call show_pgstar_decorator(id,s% pg% production_use_decorator,&
                   s% pg% production_pgstar_decorator, 0, ierr)
 
-            
+
          end subroutine plot
 
          subroutine set_line_style(cnt)

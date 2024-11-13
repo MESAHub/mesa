@@ -61,13 +61,13 @@ contains
     kap_dir = trim(mesa_data_dir) // '/kap_data'
 
     kap_use_cache = use_cache
-    
+
     call Setup_Kap_CO_Tables(rq, kap_CO_z_tables(rq% kap_CO_option)% ar, use_cache, load_on_demand, ierr)
     if (ierr /= 0) return
-    
+
     call setup_lowT(kap_lowT_z_tables(rq% kap_lowT_option)% ar)
     call setup(kap_z_tables(rq% kap_option)% ar)
-    
+
     rq% logT_Compton_blend_hi = & ! apply whichever is minimum for Type1 and Type2 options
         min(kap_z_tables(rq% kap_option)% ar(1)% x_tables(1)% logT_max - 0.01d0, &
             kap_CO_z_tables(rq% kap_CO_option)% ar(1)% x_tables(1)% logT_max - 0.01d0)
@@ -201,7 +201,7 @@ contains
     call Get_Filenames(rq, z_tables, X, Z, &
          kap_dir, fname, filename, cache_filename, temp_cache_filename, ierr)
     if (ierr /= 0) return
-    
+
     if (rq% show_info) write(*,*) 'read filename <' // trim(filename) // '>'
 
     call Prepare_Kap_X_Table(rq, &
@@ -257,9 +257,9 @@ contains
        write(*,'(A)')
        write(*,'(A)')
        write(*,*) 'NOTICE: missing kap data ' // trim(filename)
-       write(*,*) 
+       write(*,*)
        write(*,*) 'Please check the validity of the kap_prefix string for this file.'
-       write(*,*) 
+       write(*,*)
        write(*,*) 'If it is okay, you may need to install new kap data.'
        write(*,*) 'To do that, remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
@@ -411,7 +411,7 @@ contains
          return
       end if
 
-      x_tables(ix)% not_loaded_yet = .true.            
+      x_tables(ix)% not_loaded_yet = .true.
       x_tables(ix)% X = X
       x_tables(ix)% Z = Z
       x_tables(ix)% logR_min = logR_min
@@ -450,7 +450,7 @@ contains
 
       vec => vec_ary
       nvec=-1
-      
+
       if (reading_cache) then
 
          ios = 0
@@ -495,7 +495,7 @@ contains
          ierr = -1
          return
       end if
-      
+
       if (show_allocations) write(*,2) 'x_tables ' // trim(filename), &
         num_logRs + num_logTs + sz_per_Kap_point*num_logRs*num_logTs
       allocate(x_tables(ix)% logRs(num_logRs), x_tables(ix)% logTs(num_logTs), &
@@ -578,7 +578,7 @@ contains
 
          read(io_unit, iostat=ierr) &
               x_tables(ix)% logRs(1:num_logRs), &
-              x_tables(ix)% logTs(1:num_logTs)            
+              x_tables(ix)% logTs(1:num_logTs)
          if (ierr /= 0) return
 
          read(io_unit, iostat=ierr) kap1
@@ -697,8 +697,8 @@ contains
             x_tables(ix)% logT_max
        !write(io_unit) &
        !   x_tables(ix)% logRs(:), &
-       !   x_tables(ix)% logTs(:)                            
-       !write(io_unit) x_tables(ix)% kap(:,:,:)   
+       !   x_tables(ix)% logTs(:)
+       !write(io_unit) x_tables(ix)% kap(:,:,:)
     else
        write(io_unit) version, x_tables(ix)% num_logTs, x_tables(ix)% num_logRs
        write(io_unit) &
@@ -707,12 +707,12 @@ contains
             x_tables(ix)% logR_min, &
             x_tables(ix)% logR_max, &
             x_tables(ix)% logT_min, &
-            x_tables(ix)% logT_max                           
-       write(io_unit) x_tables(ix)% ili_logRs, x_tables(ix)% ili_logTs 
+            x_tables(ix)% logT_max
+       write(io_unit) x_tables(ix)% ili_logRs, x_tables(ix)% ili_logTs
        write(io_unit) &
             x_tables(ix)% logRs(:), &
-            x_tables(ix)% logTs(:)                             
-       write(io_unit) x_tables(ix)% kap1(:) 
+            x_tables(ix)% logTs(:)
+       write(io_unit) x_tables(ix)% kap1(:)
     end if
 
   end subroutine Write_Kap_X_Table_Cache
@@ -746,7 +746,7 @@ contains
     character (len=256) :: zstr, xstr, prefix
 
     ierr=0
-    
+
     if (z_tables(1)% lowT_flag .and. rq% kap_lowT_option == kap_lowT_Freedman11) then
        call get_output_string(Z,zstr,ierr)
        fname = trim(kap_lowT_option_str(rq% kap_lowT_option)) // '_z' // trim(zstr) // '.data'

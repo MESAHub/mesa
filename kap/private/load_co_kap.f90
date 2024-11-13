@@ -88,9 +88,9 @@ contains
          kap_CO_Zs(iz, rq% kap_CO_option), kap_CO_Xs(ix, rq% kap_CO_option), kap_dir, fname, filename, &
          cache_filename, temp_cache_filename, ierr)
     if (ierr /= 0) return
-    
+
     if (rq% show_info) write(*,*) 'read filename <' // trim(filename) // '>'
-   
+
     call Prepare_Kap_CO_X_Table(rq, &
        iz, co_z_tables, co_z_tables(iz)% x_tables, &
        ix, kap_CO_Xs(ix, rq% kap_CO_option), kap_CO_Zs(iz, rq% kap_CO_option), &
@@ -125,8 +125,8 @@ contains
     type (Kap_CO_Table), dimension(:), pointer :: co_tables
     integer :: num_dXC_gt_dXO ! the number of tables with dXC > dXO
     integer :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs)
-    integer :: next_dXO_table(max_num_CO_tables) 
-    integer :: next_dXC_table(max_num_CO_tables) 
+    integer :: next_dXO_table(max_num_CO_tables)
+    integer :: next_dXC_table(max_num_CO_tables)
     character (len=256) :: message
     real(dp), target :: vec_ary(30)
     real(dp), pointer :: vec(:)
@@ -158,9 +158,9 @@ contains
        write(*,'(A)')
        write(*,'(A)')
        write(*,*) 'NOTICE: missing kap data ' // trim(filename)
-       write(*,*) 
+       write(*,*)
        write(*,*) 'Please check the validity of the kap_prefix string for this file.'
-       write(*,*) 
+       write(*,*)
        write(*,*) 'If it is okay, you may need to install new kap data.'
        write(*,*) 'To do that, remove the directory mesa/data/kap_data,'
        write(*,*) 'and rerun the mesa ./install script.'
@@ -438,7 +438,7 @@ contains
 
          read(io_unit, iostat=ierr) &
               x_tables(ix)% logRs(1:num_logRs), &
-              x_tables(ix)% logTs(1:num_logTs)            
+              x_tables(ix)% logTs(1:num_logTs)
          if (ierr /= 0) return
 
          x_tables(ix)% num_dXC_gt_dXO = num_dXC_gt_dXO
@@ -522,7 +522,7 @@ contains
     integer :: table_num, i, j, ios, status, iXC, iXO
     real(dp) :: X, Z, xin, zz, Y, dXC, dXO, err, logT
     real(dp), allocatable, target :: kap_table(:) ! data & spline coefficients
-    real(dp), pointer :: kap(:,:,:)       
+    real(dp), pointer :: kap(:,:,:)
     real(dp) :: logKs(num_logRs), logRs(num_logRs)
     character (len=1000) :: message
     real(dp), target :: vec_ary(50)
@@ -669,7 +669,7 @@ contains
        kap(1:sz_per_Kap_point,1:num_logRs,1:num_logTs) => &
             co_tables(n)% kap1(1:sz_per_Kap_point*num_logRs*num_logTs)
 
-       do i = 1, num_logTs        
+       do i = 1, num_logTs
 
           read(io_unit,'(a)',iostat=ierr) message
           if (ierr == 0) call str_to_vector(message, vec, nvec, ierr)
@@ -751,7 +751,7 @@ contains
     kap(1:sz_per_kap_point,1:num_logRs,1:num_logTs) => &
          co_tables(n)% kap1(1:sz_per_kap_point*num_logRs*num_logTs)
 
-    do j=1,num_logTs 
+    do j=1,num_logTs
        do i=1,num_logRs
           table(1,i,j) = kap(1,i,j)
        end do
@@ -771,7 +771,7 @@ contains
 
     call Check_Interpolation_Data
 
-    do i=1,sz_per_kap_point*num_logRs*num_logTs 
+    do i=1,sz_per_kap_point*num_logRs*num_logTs
        co_tables(n)% kap1(i) = table1(i)
     end do
 
@@ -817,7 +817,7 @@ contains
     real(dp) :: X, Z, Y, dXC, dXO
     real(dp), allocatable, target :: kap_table(:) ! data & spline coefficients
     include 'formats'
-         
+
     if (show_allocations) write(*,2) 'Write_Kap_CO_X_Table_Cache', &
        sz_per_Kap_point*num_logRs*num_logTs
     allocate(kap_table(sz_per_Kap_point*num_logRs*num_logTs))
@@ -846,7 +846,7 @@ contains
 
     write(io_unit) &
          x_tables(ix)% logRs(1:num_logRs), &
-         x_tables(ix)% logTs(1:num_logTs)            
+         x_tables(ix)% logTs(1:num_logTs)
 
     do n = 1, num_tables
        dXC = co_tables(n)% dXC
@@ -903,7 +903,7 @@ contains
     integer, intent(out) :: ierr
     character (len=16) :: zstr, xstr
     ierr=0
-    call get_output_string(Z, zstr,ierr)        
+    call get_output_string(Z, zstr,ierr)
     call get_output_string(X, xstr,ierr)
 
     write(fname,'(a)') trim(kap_CO_option_str(rq% kap_CO_option)) // '_z' // &

@@ -28,14 +28,14 @@
       use math_lib
       use rates_def
       use utils_lib, only: mv, switch_str, mesa_error
-      
+
       implicit none
 
       integer, parameter :: cache_version = 4
-      
-      
+
+
       contains
-      
+
       subroutine do_get_raw_rates( &
             num_reactions, reaction_id, rattab, rattab_f1, nT8s, &
             ye, logtemp_in, btemp, bden, raw_rate_factor, logttab, &
@@ -48,13 +48,13 @@
          real(dp), pointer, intent(in) :: rattab_f1(:)
          real(dp), intent(inout), dimension(:) :: rate_raw, rate_raw_dT, rate_raw_dRho
          integer, intent(out) :: ierr
-         
+
          integer :: imax, iat0, iat, ir, i, irho
          integer, parameter :: mp = 4
          real(dp), allocatable :: dtab(:), ddtab(:)
-         real(dp), pointer :: rattab_f(:,:,:) 
+         real(dp), pointer :: rattab_f(:,:,:)
          real(dp) :: logtemp, fac
-         
+
          include 'formats'
 
          ierr = 0
@@ -65,7 +65,7 @@
          rattab_f(1:4,1:nT8s,1:num_reactions) => rattab_f1(1:4*nT8s*num_reactions)
 
          do i = 1,num_reactions
-         
+
             ir = reaction_id(i)
             !dtab(i) = ye**reaction_ye_rho_exponents(1,ir)
             select case(reaction_ye_rho_exponents(1,ir))
@@ -91,21 +91,21 @@
             end select
 
             ddtab(i) = irho*dtab(i)/bden
-            
+
          end do
-         
+
          if(warn_rates_for_high_temp .and. logtemp_in .ge. max_safe_logT_for_rates) then
             write(*,'(A,F0.6,A,F0.6,A)') "WARNING: evaluating rates with lgT=",logtemp_in," which is above lgT=",&
                                     max_safe_logT_for_rates,", rates have been truncated"
          end if
-         
-         
+
+
          if(logtemp_in .ge. max_safe_logT_for_rates) then
             logtemp = max_safe_logT_for_rates
          else
             logtemp = logtemp_in
          end if
-         
+
          if (nrattab > 1) then
             imax = nrattab
             if (logtemp > rattab_thi) then
@@ -131,31 +131,31 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          do i=1,num_reactions
             fac = raw_rate_factor(i)
             rate_raw(i) = rate_raw(i)*fac
             rate_raw_dT(i) = rate_raw_dT(i)*fac
             rate_raw_dRho(i) = rate_raw_dRho(i)*fac
          end do
-         
+
          if(logtemp .ge. max_safe_logT_for_rates) then
             rate_raw_dT(1:num_reactions) = 0d0
          end if
 
          nullify(rattab_f)
-         
+
          contains
-         
+
          subroutine get_rates_from_table(r1, r2)
             use const_def, only: ln10
             integer, intent(in) :: r1, r2
-            
+
             integer :: i, k
             real(dp) :: dt
-            
+
             include 'formats'
-               
+
             k = iat+1 ! starting guess for search
             do while (logtemp < logttab(k) .and. k > 1)
                k = k-1
@@ -164,9 +164,9 @@
                k = k+1
             end do
             dt = logtemp - logttab(k)
-            
+
             do i = r1,r2
-            
+
                rate_raw(i) =  &
                      (rattab_f(1,k,i) + dt*(rattab_f(2,k,i) +   &
                            dt*(rattab_f(3,k,i) + dt*rattab_f(4,k,i))) &
@@ -180,16 +180,16 @@
                               ) * dtab(i) / (btemp * ln10)
 
             end do
-            
+
          end subroutine get_rates_from_table
-         
-      
+
+
       end subroutine do_get_raw_rates
 
-      
+
       subroutine do_make_rate_tables( &
            num_reactions, cache_suffix, net_reaction_id, &
-           rattab, rattab_f1, nT8s, ttab, logttab, ierr)  
+           rattab, rattab_f1, nT8s, ttab, logttab, ierr)
          use const_def
          use interp_1d_lib, only: interp_pm, interp_m3q
          use interp_1d_def, only: pm_work_size, mp_work_size
@@ -199,7 +199,7 @@
          real(dp) :: rattab(:,:), ttab(:), logttab(:)
          real(dp), pointer :: rattab_f1(:)
          integer, intent(out) :: ierr
-         
+
          integer :: i, j, operr, num_to_add_to_cache,thread_num
          real(dp) :: logT, btemp
          real(dp), pointer ::  work1(:)=>null(), f1(:)=>null(), rattab_f(:,:,:)=>null()
@@ -207,17 +207,17 @@
          real(dp), allocatable, target :: work(:,:)
 
          logical :: all_okay, a_okay, all_in_cache
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          rattab_f(1:4,1:nrattab,1:num_reactions) =>  &
                rattab_f1(1:4*nrattab*num_reactions)
-         
+
          allocate(reaction_id(num_reactions))
          reaction_id(:) = net_reaction_id(:)
-         
+
          num_to_add_to_cache = 0
          if (nrattab == 1) then
             all_in_cache = .false.
@@ -235,9 +235,9 @@
                !stop
             end do
          end if
-         
+
          if (all_in_cache) then
-         
+
 !$OMP PARALLEL DO PRIVATE(i, logT, btemp)
             do i=1, nrattab
                logT = rattab_tlo + real(i-1,kind=dp)*rattab_tstp
@@ -247,15 +247,15 @@
             end do
 !$OMP END PARALLEL DO
 
-         else 
-            
+         else
+
             if (num_to_add_to_cache > 20) then
                write(*,2) 'number not already in cache:', num_to_add_to_cache
                if (num_to_add_to_cache > 100) write(*,*) 'this will take some time .....'
             end if
             all_okay = .true.
 !x$OMP PARALLEL DO PRIVATE(i, operr, logT, btemp, a_okay, j)
-            ! Disable parralisation as this can cause bugs in the 
+            ! Disable parralisation as this can cause bugs in the
             ! load tables See github bug #360
             do i=1, nrattab
                logT = rattab_tlo + real(i-1,kind=dp)*rattab_tstp
@@ -313,19 +313,19 @@
 !$OMP END PARALLEL DO
             deallocate(work)
          end if
-         
+
          if (ierr == 0 .and. nrattab > 1 .and. .not. all_in_cache) then
             do i=1, num_reactions
                if (reaction_id(i) <= 0) cycle
-               call write_reaction_to_cache(reaction_id, cache_suffix, i, rattab) 
+               call write_reaction_to_cache(reaction_id, cache_suffix, i, rattab)
             end do
          end if
-         
+
          deallocate(reaction_id)
 
       end subroutine do_make_rate_tables
-      
-      
+
+
       subroutine reaction_filename(ir, cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          integer, intent(in) :: ir, which
          character (len=*), intent(in) :: cache_suffix
@@ -350,61 +350,61 @@
          write(cache_filename,'(a)')  &
                trim(rates_cache_dir) // '/' //  &
                trim(reaction_Name(ir)) // '_' // trim(suffix) // '.bin'
-               
+
          write(temp_cache_filename,'(a)') &
                trim(rates_temp_cache_dir) // '/' //  &
                trim(reaction_Name(ir)) // '_' // trim(suffix) // '.bin'
       end subroutine reaction_filename
-      
 
-      
-      logical function read_reaction_from_cache(reaction_id, cache_suffix, i, rattab) 
+
+
+      logical function read_reaction_from_cache(reaction_id, cache_suffix, i, rattab)
          integer, intent(in) :: i, reaction_id(:)
          character (len=*), intent(in) :: cache_suffix
          real(dp),intent(out) :: rattab(:,:)
-         
+
          integer :: file_version, file_nrattab, file_which
          real(dp) :: file_rattab_thi, file_rattab_tlo, file_rattab_tstp
          character (len=256) :: cache_filename, temp_cache_filename
          integer :: io_unit, ios, ir, which, j, ierr, rir
          real(dp), parameter :: tiny = 1d-6
          character (len=maxlen_reaction_Name) :: name
-         
+
          logical, parameter :: show_read_cache = .false.
          logical :: reverse_is_table
 
          ierr = 0
          read_reaction_from_cache = .false.
          if (.not. rates_use_cache) return
-         
+
          ir = reaction_id(i)
          which = 1
-         
+
          reverse_is_table = .false.
          rir = reverse_reaction_id(ir)
          if(rir>0) reverse_is_table = raw_rates_records(reverse_reaction_id(ir))% use_rate_table
-         
-         
+
+
          if (raw_rates_records(ir)% use_rate_table .or. reverse_is_table) then
             which = 0
             !Dont read a cached version of a users local rate
             return
          end if
-         
+
          call reaction_filename(reaction_id(i), cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          if (ierr /= 0) then
             if (show_read_cache) write(*,*) 'read cache -- bad reaction_filename ' // trim(cache_filename)
             return
-         end if   
-         
+         end if
+
          ios = 0
          open(newunit=io_unit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
          if (ios /= 0) then
             if (show_read_cache) write(*,*) 'read cache failed for open ' // trim(cache_filename)
             return
-         end if       
-         
+         end if
+
          read(io_unit, iostat=ios)  &
                name, file_which, file_version, file_nrattab,  &
                file_rattab_thi, file_rattab_tlo, file_rattab_tstp
@@ -412,20 +412,20 @@
             if (show_read_cache) write(*,*) 'read cache failed for read header ' // trim(cache_filename)
             close(io_unit)
             return
-         end if       
-         
+         end if
+
          if (name /= reaction_Name(ir)) then
             if (show_read_cache) write(*,*) 'read cache failed for name'
             close(io_unit)
             return
          end if
-         
+
          if (which /= file_which) then
             if (show_read_cache) write(*,*) 'read cache failed for which reaction'
             close(io_unit)
             return
          end if
-         
+
          if (cache_version /= file_version) then
             if (show_read_cache) write(*,*) 'read cache failed for version'
             close(io_unit)
@@ -449,7 +449,7 @@
             close(io_unit)
             return
          end if
-         
+
          do j = 1, nrattab
             read(io_unit, iostat=ios) rattab(i,j)
             if (ios /= 0) then
@@ -457,17 +457,17 @@
                close(io_unit)
                return
             end if
-         end do         
-         
+         end do
+
          close(io_unit)
-         
+
          read_reaction_from_cache = .true.
-      
+
       end function read_reaction_from_cache
-      
-      
-      
-      subroutine write_reaction_to_cache(reaction_id, cache_suffix,  i, rattab) 
+
+
+
+      subroutine write_reaction_to_cache(reaction_id, cache_suffix,  i, rattab)
          integer, intent(in) :: i
          character (len=*), intent(in) :: cache_suffix
          integer, intent(in) :: reaction_id(:)
@@ -475,30 +475,30 @@
 
          character (len=256) :: cache_filename, temp_cache_filename
          integer :: io_unit, ios, ir, which, ierr, j, rir
-         
+
          logical, parameter :: show_write_cache = .true.
          logical :: reverse_is_table
-         
+
          ierr = 0
          if (.not. rates_use_cache) return
-         
+
          ir = reaction_id(i)
          which = 1
 
          reverse_is_table = .false.
          rir = reverse_reaction_id(ir)
          if(rir>0) reverse_is_table = raw_rates_records(reverse_reaction_id(ir))% use_rate_table
-         
+
 
          if (raw_rates_records(ir)% use_rate_table .or. reverse_is_table) which = 0
 
-         
-         ! Write cache file to temporary storage that is local to the run, 
-         ! then at the end move the file atomicly to the final cache location 
+
+         ! Write cache file to temporary storage that is local to the run,
+         ! then at the end move the file atomicly to the final cache location
          call reaction_filename(reaction_id(i), cache_suffix, which, cache_filename, temp_cache_filename, ierr)
          if (ierr /= 0) return
-         
-         ios = 0   
+
+         ios = 0
          open(newunit=io_unit, file=trim(switch_str(temp_cache_filename, cache_filename, use_mesa_temp_cache)),&
           iostat=ios, action='write', form='unformatted')
          if (ios /= 0) then
@@ -507,26 +507,26 @@
          end if
 
          if (show_write_cache) write(*,'(a)') 'write ' // trim(cache_filename)
-         
+
          write(io_unit)  &
             reaction_Name(ir), which, cache_version, nrattab,  &
             rattab_thi, rattab_tlo, rattab_tstp
 
          do j = 1, nrattab
             write(io_unit) rattab(i,j)
-         end do         
+         end do
 
          close(io_unit)
          if(use_mesa_temp_cache) call mv(temp_cache_filename,cache_filename,.true.)
-         
-      
+
+
       end subroutine write_reaction_to_cache
 
-      
-      subroutine do_show_reaction_from_cache(cache_filename, ierr) 
+
+      subroutine do_show_reaction_from_cache(cache_filename, ierr)
          character (len=*) :: cache_filename
          integer, intent(out) :: ierr
-         
+
          integer :: version, nrattab, which
          real(dp) :: rattab_thi, rattab_tlo, rattab_tstp, rate, T8, logT
          integer :: ios, j, io_unit
@@ -540,8 +540,8 @@
          if (ios /= 0) then
             write(*,*) 'read cache failed for open ' // trim(cache_filename)
             return
-         end if       
-         
+         end if
+
          read(io_unit, iostat=ios)  &
                name, which, version, nrattab,  &
                rattab_thi, rattab_tlo, rattab_tstp
@@ -549,12 +549,12 @@
             write(*,*) 'read cache failed for read header ' // trim(cache_filename)
             close(io_unit)
             return
-         end if       
-         
+         end if
+
          write(*,'(a)') '#    T8     rate'
          write(*,'(A)')
          write(*,*) nrattab
-         
+
          do j = 1, nrattab
             read(io_unit, iostat=ios) rate
             if (ios /= 0) then
@@ -565,11 +565,11 @@
             logT = rattab_tlo + dble(j-1)*rattab_tstp
             T8 = exp10(logT - 8d0)
             write(*,'(1pe26.16,3x,1pe26.16e3)') T8, rate
-         end do         
+         end do
          write(*,'(A)')
-         
+
          close(io_unit)
-      
+
       end subroutine do_show_reaction_from_cache
 
 
@@ -583,12 +583,12 @@
          integer, intent(in) :: num_reactions, reaction_id(:)
          real(dp), intent(inout) :: rates(:)
          integer, intent(out) :: ierr
-      
+
          integer :: i, ir
          type (T_Factors) :: tf
 
          include 'formats'
-         
+
          ierr = 0
 
          call tfactors(tf, logT, btemp)
@@ -604,10 +604,10 @@
                call mesa_error(__FILE__,__LINE__,'get_net_rates_for_tables')
             end if
          end do
-               
+
       end subroutine get_net_rates_for_tables
-      
-      
+
+
       subroutine do_eval_reaclib_21( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
@@ -615,29 +615,29 @@
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
-         
+
          real(dp) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
-         
+
          include 'formats'
-         
+
          ierr = 0
          call get_reaclib_rate_and_dlnT( &
             ir, temp, lambda, dlambda_dlnT, rlambda, drlambda_dlnT, ierr)
          if (ierr /= 0) return
-                  
+
          if (reaction_ye_rho_exponents(2,ir) /= 1) then
             ierr = -1
             return
          end if
-            
+
          rate_raw(i_rate) = lambda*den
          rate_raw(i_rate_dT) = dlambda_dlnT*den/temp
          rate_raw(i_rate_dRho) = lambda
-            
+
          reverse_rate_raw(i_rate) = rlambda
          reverse_rate_raw(i_rate_dT) = drlambda_dlnT/temp
          reverse_rate_raw(i_rate_dRho) = 0d0
-         
+
          return
 
 !$omp critical  (rates_eval_reaclib_21)
@@ -655,10 +655,10 @@
          write(*,1) 'reverse_rate_raw', reverse_rate_raw(1:num_rvs)
          write(*,'(A)')
 !$omp end critical  (rates_eval_reaclib_21)
-         
+
       end subroutine do_eval_reaclib_21
 
-      
+
       subroutine do_eval_reaclib_22( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
@@ -666,29 +666,29 @@
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
-         
+
          real(dp) :: lambda, dlambda_dlnT, rlambda, drlambda_dlnT
-         
+
          include 'formats'
-         
+
          ierr = 0
          call get_reaclib_rate_and_dlnT( &
             ir, temp, lambda, dlambda_dlnT, rlambda, drlambda_dlnT, ierr)
          if (ierr /= 0) return
-                  
+
          if (reaction_ye_rho_exponents(2,ir) /= 1) then
             ierr = -1
             return
          end if
-            
+
          rate_raw(i_rate) = lambda*den
          rate_raw(i_rate_dT) = dlambda_dlnT*den/temp
          rate_raw(i_rate_dRho) = lambda
-            
+
          reverse_rate_raw(i_rate) = rlambda*den
          reverse_rate_raw(i_rate_dT) = drlambda_dlnT*den/temp
          reverse_rate_raw(i_rate_dRho) = rlambda
-         
+
          return
 
 !$omp critical  (rates_eval_reaclib_22)
@@ -707,9 +707,9 @@
          write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'do_eval_reaclib_22')
 !$omp end critical  (rates_eval_reaclib_22)
-         
+
       end subroutine do_eval_reaclib_22
-      
+
 
       end module rates_support
 

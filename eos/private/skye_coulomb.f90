@@ -14,9 +14,9 @@ module skye_coulomb
    private
 
    public :: nonideal_corrections
-   
+
    contains
-      
+
    !! Computes the non-ideal free energy correction for a Coulomb system.
    !! This is done for both the liquid phase and the solid phase, and the resulting
    !! free energies are then combined in a way that blends from the solid phase when
@@ -110,7 +110,7 @@ module skye_coulomb
       end if
 
    end subroutine nonideal_corrections
-   
+
 
    !> Computes the free energy, phase, and latent heat across the phase transition
    !! between liquid and solid. The latent heat is blurred / smeared out over a finite
@@ -155,11 +155,11 @@ module skye_coulomb
       ! Latent entropy
       latent_S = -(differentiate_1(dF_blur)) ! S = -dF/dT
 
-      ! T dS/dlnT = T^2 dS/dT 
+      ! T dS/dlnT = T^2 dS/dT
       latent_ddlnT = differentiate_1(latent_S) *  pow2(temp)
 
       ! T dS/dlnRho = T Rho dS/dRho
-      latent_ddlnRho = temp * rho * differentiate_2(latent_S)      
+      latent_ddlnRho = temp * rho * differentiate_2(latent_S)
 
    end subroutine decide_phase
 
@@ -230,7 +230,7 @@ module skye_coulomb
                f = f + ocp_liquid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
             else
                f = f + ocp_solid_screening_free_energy_correction(AZion(i), ACMI(i), GAME, RS) ! screening corrections
-            end if               
+            end if
             dF = dF + AY(i) * f
 
          end if
@@ -255,7 +255,7 @@ module skye_coulomb
    !! @param temp Temperature (K)
    !! @param RS Electron density parameter
    !! @param Zion Charge of the species of interest in electron charges.
-   !! @param CMI Mass of the species of interest in AMU. 
+   !! @param CMI Mass of the species of interest in AMU.
    !! @param F non-ideal free energy per ion per kT
    function extrapolate_free_energy(LIQSOL, temp, RS, Zion, CMI, min_gamma_for_solid, max_gamma_for_liquid) result(F)
       ! Inputs
@@ -297,7 +297,7 @@ module skye_coulomb
          temp_boundary = temp%val * GAMI%val / gamma_boundary
 
          ! Make d(temp_boundary)/dT = 1 so we can extract dF/dT at the boundary.
-         temp_boundary%d1val1 = 1d0 
+         temp_boundary%d1val1 = 1d0
 
          ! Compute new (differentiable) Gamma and TPT at the boundary
          g = pre_z(int(Zion))% z5_3 * qe * qe / (rbohr * boltzm * temp_boundary * RS) ! ion Coulomb parameter Gamma_i
@@ -350,7 +350,7 @@ module skye_coulomb
    !!
    !! @param LIQSOL Integer specifying the phase: 0 for liquid, 1 for solid.
    !! @param Zion Charge of the species of interest in electron charges.
-   !! @param CMI Mass of the species of interest in AMU. 
+   !! @param CMI Mass of the species of interest in AMU.
    !! @param GAMI Ion coupling parameter (Gamma_i)
    !! @param TPT effective T_p/T - ion quantum parameter
    !! @param F non-ideal free energy per ion per kT
@@ -366,7 +366,7 @@ module skye_coulomb
       if (LIQSOL == 0) then
          F = classical_ocp_liquid_free_energy(GAMI)                  ! classical ion-ion interaction
          F = F + quantum_ocp_liquid_free_energy_correction(TPT)   ! quantum ion-ion corrections
-      else     
+      else
          F = ocp_solid_harmonic_free_energy(GAMI,TPT) ! harmonic classical and quantum ion-ion corrections
          F = F + ocp_solid_anharmonic_free_energy(GAMI,TPT) ! anharmonic classical and quantum ion-ion corrections
       endif

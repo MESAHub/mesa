@@ -140,7 +140,7 @@
          end if
 
          call get_hist_points(s, step_min, step_max, n, ix, xvec, ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             write(*,*) 'pgstar get_hist_points failed ' // trim(s% pg% rti_xaxis_name)
             call dealloc
             ierr = 0
@@ -224,12 +224,12 @@
          call finish_rti_plot
 
          call pgunsa
-         
+
          call dealloc
 
 
          contains
-         
+
          subroutine dealloc
             deallocate(xvec, star_mass, star_M_center, log_xmstar, &
                he_core_mass, &
@@ -316,7 +316,7 @@
                call show_age_pgstar(s)
             end if
             call show_title_pgstar(s, title)
-            
+
             call show_pgstar_decorator(s% pg%id, s% pg% rti_use_decorator, &
                s% pg% rti_pgstar_decorator, 0, ierr)
 

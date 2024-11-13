@@ -26,17 +26,17 @@
       module interp_1d_pm_sg ! piecewise monotonic algorithms
 
       implicit none
-      
+
       contains
 
-      ! the following produce piecewise monotonic interpolants 
+      ! the following produce piecewise monotonic interpolants
       ! rather than monotonicity preserving
-      ! this stricter limit never introduces interpolated values exceeding the given values, 
+      ! this stricter limit never introduces interpolated values exceeding the given values,
       ! even in places where the given values are not monotonic.
       ! the downside is reduced accuracy on smooth data compared to the mp routines.
-      
-      
-      subroutine mk_pmcub_sg(x, nx, f1, slope_only, nwork, work1, str, ierr) 
+
+
+      subroutine mk_pmcub_sg(x, nx, f1, slope_only, nwork, work1, str, ierr)
          ! make piecewise monotonic cubic interpolant
          use interp_1d_def
          integer, intent(in) :: nx       ! length of x vector (nx >= 2)
@@ -53,43 +53,43 @@
          logical, parameter :: dbg = .true.
          real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          if (nx < 2) then
             return
          end if
-         
+
          if (nx == 2) then
             call mk_pmlinear_sg(x, f1, slope_only, nwork, work1, str, ierr)
             return
          end if
-         
+
          if (nx == 3) then
             call mk_pmquad_sg(x, f1, slope_only, nwork, work1, str, ierr)
             return
          end if
-         
+
          if (nx == 4) then
             call mk_pmcub4_sg(x, f1, slope_only, nwork, work1, str, ierr)
             return
          end if
-         
+
          if (nwork < pm_work_size) then
             ierr = -1
             return
          end if
-         
+
          h(1:nx) => work1(1:nx)
          s(1:nx) => work1(1+nx:2*nx)
          p(1:nx) => work1(1+2*nx:3*nx)
-         
+
          if (dbg) then
             h(:) = 0; s(:) = 0; p(:) = 0
          end if
-         
+
          do i=1,nx-1
             h(i) = x(i+1) - x(i) ! width of interval
          end do
@@ -101,21 +101,21 @@
                return
             end if
          end do
-         
+
          do i=1,nx-1
             s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
          end do
-         do i=2,nx-1 
-            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i)) 
+         do i=2,nx-1
+            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
             ! slope at i of parabola through i-1, i, and i+1
          end do
-         do i=2,nx-1 
+         do i=2,nx-1
             f(2,i) = (sign(1.0, s(i-1))+sign(1.0, s(i)))* &
                         min(abs(s(i-1)), abs(s(i)), 0.5*abs(p(i)))
             ! "safe" slope at i to ensure monotonic -- see Steffen's paper for explanation.
          end do
 
-         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2)) 
+         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2))
             ! slope at 1 of parabola through 1st 3 points
          if (p(1)*s(1) <= 0) then
             f(2, 1) = 0
@@ -124,9 +124,9 @@
          else
             f(2, 1) = p(1)
          end if
-            
+
          p(nx) = s(nx-1)*(1 + h(nx-1) / (h(nx-1) + h(nx-2)))  &
-                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2)) 
+                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2))
             ! slope at nx of parabola through last 3 points
          if (p(nx)*s(nx-1) <= 0) then
             f(2,nx) = 0
@@ -135,7 +135,7 @@
          else
             f(2,nx) = p(nx)
          end if
-         
+
          if (slope_only) return
 
          do i=1,nx-1
@@ -144,10 +144,10 @@
          end do
          f(3,nx) = 0
          f(4,nx) = 0
-               
+
       end subroutine mk_pmcub_sg
 
-      
+
       ! optimize special case for nx = 4
       subroutine mk_pmcub4_sg(x, f1, slope_only, nwork, work1, str, ierr)
          use interp_1d_def
@@ -164,18 +164,18 @@
          integer :: i
          real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
-         
+
          ierr = 0
-         
+
          if (nwork < pm_work_size) then
             ierr = -1
             return
          end if
-         
+
          h(1:nx) => work1(1:nx)
          s(1:nx) => work1(1+nx:2*nx)
          p(1:nx) => work1(1+2*nx:3*nx)
-         
+
          do i=1,nx-1
             h(i) = x(i+1) - x(i) ! width of interval
          end do
@@ -187,21 +187,21 @@
                return
             end if
          end do
-         
+
          do i=1,nx-1
             s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
          end do
-         do i=2,nx-1 
-            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i)) 
+         do i=2,nx-1
+            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
             ! slope at i of parabola through i-1, i, and i+1
          end do
-         do i=2,nx-1 
+         do i=2,nx-1
             f(2,i) = (sign(1.0, s(i-1))+sign(1.0, s(i)))* &
                         min(abs(s(i-1)), abs(s(i)), 0.5*abs(p(i)))
             ! "safe" slope at i to ensure monotonic -- see Steffen's paper for explanation.
          end do
 
-         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2)) 
+         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2))
             ! slope at 1 of parabola through 1st 3 points
          if (p(1)*s(1) <= 0) then
             f(2, 1) = 0
@@ -210,9 +210,9 @@
          else
             f(2, 1) = p(1)
          end if
-            
+
          p(nx) = s(nx-1)*(1 + h(nx-1) / (h(nx-1) + h(nx-2)))  &
-                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2)) 
+                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2))
             ! slope at nx of parabola through last 3 points
          if (p(nx)*s(nx-1) <= 0) then
             f(2, nx) = 0
@@ -221,7 +221,7 @@
          else
             f(2, nx) = p(nx)
          end if
-         
+
          if (slope_only) return
 
          do i=1,nx-1
@@ -230,12 +230,12 @@
          end do
          f(3,nx) = 0
          f(4,nx) = 0
-      
+
       end subroutine mk_pmcub4_sg
-      
-      
+
+
       ! optimize special case for nx = 3
-      subroutine mk_pmquad_sg(x, f1, slope_only, nwork, work1, str, ierr) 
+      subroutine mk_pmquad_sg(x, f1, slope_only, nwork, work1, str, ierr)
          ! make piecewise monotonic quadratic interpolant
          use interp_1d_def
          integer, parameter :: nx = 3
@@ -251,17 +251,17 @@
          integer :: i
          real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
-         
+
          if (nwork < pm_work_size) then
             ierr = -1
             return
          end if
          ierr = 0
-         
+
          h(1:nx) => work1(1:nx)
          s(1:nx) => work1(1+nx:2*nx)
          p(1:nx) => work1(1+2*nx:3*nx)
-         
+
          do i=1,nx-1
             h(i) = x(i+1) - x(i) ! width of interval
             if (h(i) == 0) then
@@ -271,21 +271,21 @@
                return
             end if
          end do
-         
+
          do i=1,nx-1
             s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
          end do
-         do i=2,nx-1 
-            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i)) 
+         do i=2,nx-1
+            p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
             ! slope at i of parabola through i-1, i, and i+1
          end do
-         do i=2,nx-1 
+         do i=2,nx-1
             f(2,i) = (sign(1.0, s(i-1))+sign(1.0, s(i)))* &
                         min(abs(s(i-1)), abs(s(i)), 0.5*abs(p(i)))
             ! "safe" slope at i to ensure monotonic -- see Steffen's paper for explanation.
          end do
 
-         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2)) 
+         p(1) = s(1)*(1 + h(1) / (h(1) + h(2))) - s(2) * h(1) / (h(1) + h(2))
             ! slope at 1 of parabola through 1st 3 points
          if (sign(1.0,p(1)) /= sign(1.0,s(1))) then
             f(2, 1) = 0
@@ -294,9 +294,9 @@
          else
             f(2, 1) = p(1)
          end if
-            
+
          p(nx) = s(nx-1)*(1 + h(nx-1) / (h(nx-1) + h(nx-2)))  &
-                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2)) 
+                     - s(nx-2)*h(nx-1) / (h(nx-1) + h(nx-2))
             ! slope at nx of parabola through last 3 points
          if (sign(1.0,p(nx)) /= sign(1.0,s(nx-1))) then
             f(2, nx) = 0
@@ -305,19 +305,19 @@
          else
             f(2, nx) = p(nx)
          end if
-         
+
          if (slope_only) return
-         
+
          do i=1,nx-1
             f(3,i) = (3*s(i) - 2*f(2,i) - f(2,i+1)) / h(i)
             f(4,i) = (f(2,i) + f(2,i+1) - 2*s(i)) / (h(i)*h(i))
          end do
-         f(3,nx) = 0         
+         f(3,nx) = 0
          f(4,nx) = 0
-      
+
       end subroutine mk_pmquad_sg
-      
-      
+
+
       ! optimize special case for nx = 2
       subroutine mk_pmlinear_sg(x, f1, slope_only, nwork, work1, str, ierr)
          use interp_1d_def
@@ -333,14 +333,14 @@
          real :: h, s
          real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
-         
+
          ierr = 0
-         
+
          if (nwork < pm_work_size) then
             ierr = -1
             return
          end if
-         
+
          h = x(2) - x(1) ! width of interval
          if (h == 0) then
             write(*, '(a,1x,2i5,1x,a)')  &
@@ -348,20 +348,20 @@
             ierr = -1
             return
          end if
-         
+
          s = (f(1, 2) - f(1, 1)) / h ! slope across interval
          f(2, 1) = s
          f(2, 2) = 0
-         
+
          if (slope_only) return
 
          f(3, 1:2) = 0
          f(4, 1:2) = 0
-      
+
       end subroutine mk_pmlinear_sg
-      
-      
-      subroutine mk_pmcub_uniform_sg(dx, n, f1, slope_only, nwork, work1, str, ierr) 
+
+
+      subroutine mk_pmcub_uniform_sg(dx, n, f1, slope_only, nwork, work1, str, ierr)
          ! make piecewise monotonic cubic interpolant on unit spaced mesh
          use interp_1d_def
          integer, intent(in) :: n     ! length of vector
@@ -378,13 +378,13 @@
          integer :: i
          real, pointer :: f(:,:) ! (4, n)  ! data & interpolation coefficients
          f(1:4,1:n) => f1(1:4*n)
-         
+
          ierr = 0
-         
+
          if (n < 2) then
             return
          end if
-         
+
          if (n == 2) then
             x(1) = 0
             x(2) = dx
@@ -396,23 +396,23 @@
             ierr = -1
             return
          end if
-         
+
          if (nwork < pm_work_size) then
             ierr = -1
             return
          end if
          ierr = 0
-         
+
          s(1:n) => work1(1:n)
          p(1:n) => work1(1+n:2*n)
 
          ierr = 0
-         
-         do i=1,n-1 
+
+         do i=1,n-1
             s(i) = f(1,i+1) - f(1,i) ! slope across interval
          end do
-         do i=2,n-1 
-            p(i) = 0.5*(s(i-1) + s(i)) 
+         do i=2,n-1
+            p(i) = 0.5*(s(i-1) + s(i))
             ! slope at i of parabola through i-1, i, and i+1
          end do
          do i=2,n-1
@@ -420,7 +420,7 @@
                min(abs(s(i-1)), abs(s(i)), 0.5*abs(p(i)))
             ! "safe" slope at i to ensure monotonic -- see Steffen's paper for explanation.
          end do
-         
+
          p(1) = 1.5 * s(1) - 0.5 * s(2)
             ! slope at 1 of parabola through 1st 3 points
          if (p(1)*s(1) <= 0) then
@@ -430,7 +430,7 @@
          else
             f(2, 1) = p(1)
          end if
-            
+
          p(n) = 1.5 * s(n-1) - 0.5 * s(n-2)
             ! slope at n of parabola through last 3 points
          if (p(n)*s(n-1) <= 0) then
@@ -440,19 +440,19 @@
          else
             f(2, n) = p(n)
          end if
-         
+
          f(2, 1:n) = f(2, 1:n) / dx
-         
+
          if (slope_only) return
-         
+
          ! 2nd and 3rd derivatives
          do i=1,n-1
-            f(3,i) = (3*s(i) - 2*f(2,i) - f(2,i+1)) / dx       
+            f(3,i) = (3*s(i) - 2*f(2,i) - f(2,i+1)) / dx
             f(4,i) = (f(2,i) + f(2,i+1) - 2*s(i)) / (dx*dx)
          end do
          f(3,n) = (3*f(1, n-1) - 3*f(1, n) + (f(2, n-1) + 2*f(2, n)) * dx) / (dx*dx)
          f(4,n) = (-2*f(1, n-1) + 2*f(1, n) - (f(2, n-1) + f(2, n))*dx) / (dx*dx*dx)
-      
+
       end subroutine mk_pmcub_uniform_sg
 
 

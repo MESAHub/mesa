@@ -89,7 +89,7 @@
 
          dq = s% dq(k)
          dm = s% dm(k)
-         
+
          max_abs_residual = 0
          sum_dxdt_nuc = 0
 
@@ -109,7 +109,7 @@
 
          sum_dx_burning = 0
          sum_dx_mixing = 0
-         
+
          do j=1,species ! composition equation for species j in cell k
 
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
@@ -118,7 +118,7 @@
             i = s%nvar_hydro+j
 
             dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
-            
+
             doing_op_split_burn = s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T
             if (s% do_burn .and. .not. doing_op_split_burn) then
                dxdt_nuc = s% dxdt_nuc(j,k)
@@ -139,7 +139,7 @@
             eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)/s% dt)
             residual = (dxdt_expected - dxdt_actual)/eqn_scale
             s% equ(i,k) = residual
-            
+
             if (abs(residual) > max_abs_residual) &
                max_abs_residual = abs(s% equ(i,k))
 
@@ -172,10 +172,10 @@
                   if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')
                   call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
-               
+
                dequ_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)/eqn_scale
                call e00(s, i, s% i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
-               
+
                dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
                call e00(s, i, s% i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
@@ -202,7 +202,7 @@
 
             end if
 
-            if (test_partials) then   
+            if (test_partials) then
                s% solver_test_partials_dx_sink = s% net_iso(img24)
                s% solver_test_partials_val = s% dxdt_nuc(j,k)
                s% solver_test_partials_var = s% nvar_hydro + j
@@ -211,9 +211,9 @@
             end if
 
          end do
-         
+
          contains
-         
+
          subroutine check_dequ(dequ, str)
             real(dp), intent(in) :: dequ
             character (len=*), intent(in) :: str

@@ -200,7 +200,7 @@
             end if
             deallocate(adjusted_energy,interp_work)
          end if
-          
+
       end subroutine
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
@@ -293,7 +293,7 @@
             b% CE_Ebind2 = Ebind
             b% CE_lambda2 = lambda
          end if
-         
+
          initial_Eorb = -standard_cgrav*b% CE_initial_Mdonor*b% CE_initial_Maccretor/(2*b% CE_initial_separation)
 
          separation = -b% CE_alpha*standard_cgrav*s% m(1)*b% CE_initial_Maccretor &
@@ -304,7 +304,7 @@
          if (b% point_mass_i == 0) then
             b% m(b% a_i) = b% s_accretor% mstar
          end if
-         
+
          if (b% point_mass_i /= 1) then
             b% r(1) = Rsun*b% s1% photosphere_r
          else

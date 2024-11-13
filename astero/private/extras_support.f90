@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module extras_support
 
       use star_lib
@@ -34,8 +34,8 @@
 
 
       contains
-      
-      
+
+
       subroutine get_all_el_info(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -57,21 +57,21 @@
          end do
 
       end subroutine get_all_el_info
-      
+
 
       integer function do_astero_extras_check_model(s, id)
 
          type (star_info), pointer :: s
          integer, intent(in) :: id
-         
+
          integer :: max_el_for_chi2, ierr, i, j, l, n
          logical :: store_model, checking_age
          real(dp) :: age_limit, model_limit, &
             frac, chi2_freq_and_ratios_fraction, &
             remaining_years, prev_max_years, min_max
-         
+
          include 'formats'
-         
+
          do_astero_extras_check_model = keep_going
          astero_max_dt_next = 1d99
          chi2 = -1
@@ -83,7 +83,7 @@
          correction_r = -1
          checking_age = &
             eval_chi2_at_target_age_only .or. include_age_in_chi2_spectro
-         
+
          if (checking_age) then
             if (num_smaller_steps_before_age_target <= 0 .or. &
                 dt_for_smaller_steps_before_age_target <= 0) then
@@ -128,7 +128,7 @@
                      i = floor(remaining_years/s% max_years_for_timestep + 1d-6)
                      write(*,3) 'remaining steps and years until age target', &
                         s% model_number, i, remaining_years
-                  else 
+                  else
                      write(*,2) 'remaining_years until age target', &
                         s% model_number, remaining_years
                   end if
@@ -153,12 +153,12 @@
             s% max_years_for_timestep = max_yrs_dt_when_cold
          end if
 
-         if (include_age_in_chi2_spectro .and. s% star_age < min_age_for_chi2) return         
+         if (include_age_in_chi2_spectro .and. s% star_age < min_age_for_chi2) return
          if (eval_chi2_at_target_age_only .and. s% star_age < age_target) return
-         
+
          delta_nu_model = s% delta_nu
          nu_max_model = s% nu_max
-         
+
          chi2_seismo_delta_nu_fraction = &
             min(1d0, max(0d0, chi2_seismo_delta_nu_fraction))
          chi2_seismo_nu_max_fraction = &
@@ -172,14 +172,14 @@
                chi2_seismo_r_02_fraction + &
                chi2_seismo_delta_nu_fraction + &
                chi2_seismo_nu_max_fraction)))
-         
+
          if (s% L_nuc_burn_total < s% L_phot*Lnuc_div_L_limit .or. &
                s% star_age < min_age_limit) then
             return
          end if
-         
+
          if (.not. checking_age) then
-         
+
             age_limit = avg_age_top_samples + avg_age_sigma_limit*avg_age_sigma
             if (s% star_age > age_limit) then
                write(*,1) 'star age > limit from top samples', s% star_age, age_limit
@@ -189,7 +189,7 @@
                do_astero_extras_check_model = terminate
                return
             end if
-         
+
             model_limit = &
                avg_model_number_top_samples + &
                   avg_model_number_sigma_limit*avg_model_number_sigma
@@ -204,18 +204,18 @@
             end if
 
          end if
-         
+
          ! must set constraint values before checking limits
          do i = 1, max_constraints
             if (constraint_name(i) == '') cycle
             call star_astero_procs% set_constraint_value(id, constraint_name(i), constraint_value(i), ierr)
             if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'ierr /=0 in set_constraint_value')
          end do
-         
+
          call check_limits
          if (do_astero_extras_check_model /= keep_going) return
 
-         chi2_spectro = get_chi2_spectro(s)         
+         chi2_spectro = get_chi2_spectro(s)
          if (is_bad(chi2_spectro)) then
             write(*,1) 'bad chi2_spectro', chi2_spectro
 
@@ -228,7 +228,7 @@
             return
             !stop
          end if
-         
+
          have_radial = .false.
          have_nonradial = .false.
          model_ratios_n = 0
@@ -236,7 +236,7 @@
          do l = 0, 3
             model_freq(l,1:nl(l)) = 0
          end do
-         
+
          if (delta_nu_sigma > 0) then
             chi2_delta_nu = pow2((delta_nu - delta_nu_model)/delta_nu_sigma)
             if (trace_chi2_seismo_delta_nu_info) &
@@ -244,14 +244,14 @@
          else
             chi2_delta_nu = 0
          end if
-         
+
          chi2_nu_max = 0
          if (chi2_seismo_nu_max_fraction > 0) then
             if (nu_max <= 0) then
                write(*,2) 'must supply nu_max'
                do_astero_extras_check_model = terminate
                return
-            end if         
+            end if
             if (nu_max_sigma <= 0) then
                write(*,2) 'must supply nu_max_sigma'
                do_astero_extras_check_model = terminate
@@ -259,21 +259,21 @@
             end if
             chi2_nu_max = pow2((nu_max - nu_max_model)/nu_max_sigma)
             if (trace_chi2_seismo_nu_max_info) &
-               write(*,1) 'chi2_nu_max', chi2_nu_max 
+               write(*,1) 'chi2_nu_max', chi2_nu_max
          end if
-         
+
          chi2_freq_and_ratios_fraction = &
             chi2_seismo_freq_fraction + &
             chi2_seismo_r_010_fraction + &
             chi2_seismo_r_02_fraction
-            
+
          if (chi2_seismo_fraction <= 0d0) then
             ! no need to get frequencies
             chi2_seismo = &
                chi2_seismo_delta_nu_fraction*chi2_delta_nu + &
                chi2_seismo_nu_max_fraction*chi2_nu_max
             frac = chi2_seismo_fraction
-            chi2 = frac*chi2_seismo + (1-frac)*chi2_spectro         
+            chi2 = frac*chi2_seismo + (1-frac)*chi2_spectro
             write(*,'(a50,i6,99f16.2)') 'chi^2 combined, chi^2 seismo, chi^2 spectro', &
                s% model_number, chi2, chi2_seismo, chi2_spectro
             if (best_chi2 < 0 .or. chi2 < best_chi2) call save_best_info(s)
@@ -289,7 +289,7 @@
             call check_too_many_bad
             return
          end if
-         
+
          if (chi2_delta_nu > chi2_delta_nu_limit) then
             write(*,'(a50,i6,99f16.2)') 'chi2_delta_nu > limit', &
                   s% model_number, chi2_delta_nu, chi2_delta_nu_limit, &
@@ -298,7 +298,7 @@
             return
          end if
 
-         ! chi2_spectro <= limit and chi2_delta_nu <= limit        
+         ! chi2_spectro <= limit and chi2_delta_nu <= limit
 
          if (.not. checking_age) then
             s% max_years_for_timestep = max_yrs_dt_when_warm
@@ -310,11 +310,11 @@
                      s% model_number, max_yrs_dt_when_warm
                do_astero_extras_check_model = redo
                return
-            end if            
+            end if
          end if
-         
+
          if (.not. checking_age) then
-            s% max_years_for_timestep = max_yrs_dt_when_hot 
+            s% max_years_for_timestep = max_yrs_dt_when_hot
             if (s% dt > max_yrs_dt_when_hot*secyer) then
                s% dt = max_yrs_dt_when_hot*secyer
                s% timestep_hold = s% model_number + 10
@@ -325,7 +325,7 @@
                return
             end if
          end if
-         
+
          store_model = .true.
          if (nl(0) > 0 .and. chi2_freq_and_ratios_fraction > 0d0) then
             if (.not. get_radial(oscillation_code)) then
@@ -341,7 +341,7 @@
                   write(*,'(A)')
                end if
                call check_too_many_bad
-               return 
+               return
             end if
             store_model = .false.
             have_radial = .true.
@@ -374,9 +374,9 @@
                store_model = .false.
             end if
          end do
-         
+
          have_nonradial = .true.
-         
+
          if (chi2_freq_and_ratios_fraction > 0d0) then
             call get_freq_corr(s, .false., ierr)
             if (ierr /= 0) then
@@ -395,7 +395,7 @@
          else
             max_el_for_chi2 = -1
          end if
-         
+
          !write(*,2) 'max_el_for_chi2', max_el_for_chi2
          if (chi2_seismo_r_010_fraction > 0 .and. max_el_for_chi2 >= 1) then
 
@@ -403,7 +403,7 @@
                .false., nl(0), model_freq_corr(0,:), nl(1), model_freq_corr(1,:), &
                model_ratios_n, model_ratios_l0_first, model_ratios_l1_first, &
                model_ratios_r01, model_ratios_r10)
-            
+
             if (model_ratios_n /= ratios_n .or. &
                   model_ratios_l0_first /= ratios_l0_first .or. &
                      model_ratios_l1_first /= ratios_l1_first) then
@@ -418,16 +418,16 @@
                   write(*,*) 'model_ratios_l1_first /= ratios_l1_first', &
                      model_ratios_l1_first, ratios_l1_first
                call check_too_many_bad
-               return               
+               return
             end if
-            
+
          end if
-               
+
          if (chi2_seismo_r_02_fraction > 0 .and. max_el_for_chi2 >= 2) then
             call get_r02_frequency_ratios( &
                .false., nl(0), model_freq_corr(0,:), nl(1), model_freq_corr(1,:), nl(2), model_freq_corr(2,:), model_ratios_r02)
          end if
-         
+
          chi2 = get_chi2(s, max_el_for_chi2, .true., ierr)
          if (ierr /= 0) then
             write(*,'(a40,i6)') 'failed to calculate chi^2', s% model_number
@@ -436,7 +436,7 @@
          end if
          write(*,'(a50,i6,99f16.2)') 'chi^2 total, chi^2 radial', &
             s% model_number, chi2, chi2_radial
-         
+
          if (use_other_after_get_chi2) then
             ierr = 0
             call astero_other_procs% other_after_get_chi2(s% id, ierr)
@@ -445,11 +445,11 @@
                return
             end if
          end if
-          
+
          if (checking_age) then
             ! leave max_years_for_timestep as is
          else if (chi2 <= chi2_limit_for_smallest_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit
             if (s% dt > max_yrs_dt_chi2_smallest_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smallest_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -458,9 +458,9 @@
                   max_yrs_dt_chi2_smallest_limit
                do_astero_extras_check_model = redo
                return
-            end if         
+            end if
          else if (chi2 <= chi2_limit_for_smaller_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit
             if (s% dt > max_yrs_dt_chi2_smaller_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smaller_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -469,9 +469,9 @@
                   max_yrs_dt_chi2_smaller_limit
                do_astero_extras_check_model = redo
                return
-            end if         
+            end if
          else if (chi2 <= chi2_limit_for_small_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit
             if (s% dt > max_yrs_dt_chi2_small_limit*secyer) then
                s% dt = max_yrs_dt_chi2_small_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -480,19 +480,19 @@
                   max_yrs_dt_chi2_small_limit
                do_astero_extras_check_model = redo
                return
-            end if         
+            end if
          end if
-         
+
          if (best_chi2 <= 0 .or. chi2 < best_chi2) then
             call save_best_info(s)
          end if
-            
+
          call final_checks
 
-         
+
          contains
-         
-         
+
+
          subroutine check_too_many_bad
             if (best_chi2 > 0) then
                num_chi2_too_big = num_chi2_too_big + 1
@@ -504,8 +504,8 @@
             end if
             num_chi2_too_big = 0
          end subroutine check_too_many_bad
-         
-         
+
+
          subroutine final_checks
             if (include_age_in_chi2_spectro .and. s% star_age >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
@@ -533,7 +533,7 @@
                num_chi2_too_big = 0
             end if
          end subroutine final_checks
-         
+
 
          logical function get_radial(code)
             character (len=*), intent(in) :: code
@@ -599,8 +599,8 @@
             end if
             get_radial = .true.
          end function get_radial
-         
-         
+
+
          logical function have_all_l0_freqs()
             integer :: i, cnt
             real(dp) :: prev
@@ -620,8 +620,8 @@
             end do
             if (cnt > 0) write(*,*)
          end function have_all_l0_freqs
-         
-         
+
+
          subroutine check_limits
             real(dp) :: delta_nu_limit, constraint_limit
             integer :: nz, i
@@ -667,12 +667,12 @@
                   end if
                end if
             end do
-            
-         end subroutine check_limits         
+
+         end subroutine check_limits
 
       end function do_astero_extras_check_model
-      
-      
+
+
       real(dp) function get_chi2_spectro(s)
          type (star_info), pointer :: s
          integer :: cnt, i
@@ -700,23 +700,23 @@
             get_chi2_spectro = sum
          end if
       end function get_chi2_spectro
-      
-      
+
+
       subroutine store_best_info(s)
          type (star_info), pointer :: s
          integer :: i, l
-      
+
          best_chi2 = chi2
          best_chi2_seismo = chi2_seismo
          best_chi2_spectro = chi2_spectro
-         
+
          best_age = s% star_age
          best_model_number = s% model_number
 
          best_constraint_value(1:max_constraints) = constraint_value(1:max_constraints)
 
          best_param(1:max_parameters) = param(1:max_parameters)
-         
+
          best_delta_nu = delta_nu_model
          best_nu_max = nu_max_model
          best_surf_coef1 = surf_coef1
@@ -730,7 +730,7 @@
                best_inertia(l,i) = model_inertia(l,i)
             end do
          end do
-         
+
          best_ratios_r01(:) = 0d0
          best_ratios_r10(:) = 0d0
          best_ratios_r02(:) = 0d0
@@ -739,22 +739,22 @@
             best_ratios_r01(i) = model_ratios_r01(i)
             best_ratios_r10(i) = model_ratios_r10(i)
          end do
-         
+
          do i=1,nl(0)
             best_ratios_r02(i) = model_ratios_r02(i)
          end do
-      
+
       end subroutine store_best_info
 
 
       subroutine set_current_from_best(s)
          type (star_info), pointer :: s
          integer :: i, l
-      
+
          chi2 = best_chi2
          chi2_seismo = best_chi2_seismo
          chi2_spectro = best_chi2_spectro
-         
+
          delta_nu_model = best_delta_nu
          nu_max_model = best_nu_max
          surf_coef1 = best_surf_coef1
@@ -768,28 +768,28 @@
                model_inertia(l,i) = best_inertia(l,i)
             end do
          end do
-         
+
          do i=1,ratios_n
             model_ratios_r01(i) = best_ratios_r01(i)
             model_ratios_r10(i) = best_ratios_r10(i)
          end do
-         
+
          do i=1,nl(0)
             model_ratios_r02(i) = best_ratios_r02(i)
          end do
-      
+
       end subroutine set_current_from_best
-      
-      
-      subroutine save_best_info(s)     
+
+
+      subroutine save_best_info(s)
          use pgstar_astero_plots, only: write_plot_to_file
          type (star_info), pointer :: s
          integer :: ierr
          logical :: write_controls_info_with_profile
          character (len=256) :: filename
-         
+
          include 'formats'
-         
+
          if (save_model_for_best_model) then
             ierr = 0
             filename = trim(astero_results_directory) // '/' // trim(best_model_save_model_filename)
@@ -801,7 +801,7 @@
             end if
             write(*, '(a,i7)') 'save ' // filename, s% model_number
          end if
-         
+
          if (write_fgong_for_best_model) then
             ierr = 0
             filename = trim(astero_results_directory) // '/' // trim(best_model_fgong_filename)
@@ -813,7 +813,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end if
-         
+
          if (write_gyre_for_best_model) then
             ierr = 0
             filename = trim(astero_results_directory) // '/' // trim(best_model_gyre_filename)
@@ -825,7 +825,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end if
-         
+
          if (write_profile_for_best_model) then
             ierr = 0
             filename = trim(astero_results_directory) // '/' // trim(best_model_profile_filename)
@@ -843,30 +843,30 @@
                write(*,*) 'failed in save_profile'
                call mesa_error(__FILE__,__LINE__)
             end if
-         end if         
-         
+         end if
+
          if (len_trim(echelle_best_model_file_prefix) > 0) then
             ! note: sample_number hasn't been incremented yet so must add 1
             call write_plot_to_file( &
-               s, p_echelle, echelle_best_model_file_prefix, sample_number+1, ierr)        
+               s, p_echelle, echelle_best_model_file_prefix, sample_number+1, ierr)
          end if
-         
+
          if (len_trim(ratios_best_model_file_prefix) > 0) then
             ! note: sample_number hasn't been incremented yet so must add 1
             call write_plot_to_file( &
-               s, p_ratios, ratios_best_model_file_prefix, sample_number+1, ierr)   
+               s, p_ratios, ratios_best_model_file_prefix, sample_number+1, ierr)
          end if
-         
+
          call store_best_info(s)
-            
+
       end subroutine save_best_info
-      
-      
+
+
       subroutine write_best(num)
          integer, intent(in) :: num
          integer :: ierr, iounit
          character (len=256) :: format_string, num_string, filename
-         integer, parameter :: max_len_out = 2000     
+         integer, parameter :: max_len_out = 2000
          ierr = 0
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) return
@@ -889,11 +889,11 @@
 
 
       integer function astero_extras_check_model(id)
-            
+
          integer, intent(in) :: id
          integer :: other_check, ierr
          type (star_info), pointer :: s
-         
+
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -909,14 +909,14 @@
             if (other_check > astero_extras_check_model) &
                astero_extras_check_model = other_check
          end if
-         
+
          star_model_number = s% model_number
          if (star_model_number /= save_mode_model_number) return
          call get_all_el_info(s,ierr)
-               
+
       end function astero_extras_check_model
 
-      
+
       integer function astero_extras_finish_step(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -934,11 +934,11 @@
          end if
          astero_extras_finish_step = star_astero_procs% extras_finish_step(id)
          call store_extra_info(s)
-         
+
          s% dt_next = min(s% dt_next, astero_max_dt_next)
-         
+
       end function astero_extras_finish_step
-      
+
 
       subroutine astero_extras_controls(id, ierr)
          !use run_star_extras, only: extras_controls, set_param
@@ -953,13 +953,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          write(*,*) 'enter astero_extras_controls'
-         
+
          call star_astero_procs% extras_controls(id, ierr)
          if (ierr /= 0) return
-         
-         
+
+
          s% extras_startup => astero_extras_startup
          s% extras_check_model => astero_extras_check_model
          s% extras_finish_step => astero_extras_finish_step
@@ -967,13 +967,13 @@
          s% how_many_extra_history_columns => astero_how_many_extra_history_columns
          s% data_for_extra_history_columns => astero_data_for_extra_history_columns
          s% how_many_extra_profile_columns => astero_how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => astero_data_for_extra_profile_columns  
-         
+         s% data_for_extra_profile_columns => astero_data_for_extra_profile_columns
+
          if (s% job% astero_just_call_my_extras_check_model) return
-         
+
          s% other_pgstar_plots_info => astero_pgstar_plots_info
          s% use_other_pgstar_plots = .true.
-         
+
          do i = 1, max_parameters
             if (param_name(i) /= '') then
                if (vary_param(i)) then
@@ -989,12 +989,12 @@
                end if
             end if
          end do
-         
+
          current_param(1:max_parameters) = param(1:max_parameters)
-         
+
       end subroutine astero_extras_controls
-      
-      
+
+
       subroutine astero_extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -1025,8 +1025,8 @@
             astero_how_many_extra_history_columns = &
                astero_how_many_extra_history_columns + num_extra_history_columns
       end function astero_how_many_extra_history_columns
-      
-      
+
+
       subroutine astero_data_for_extra_history_columns(id, n, astero_names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: astero_names(n)
@@ -1034,37 +1034,37 @@
          integer, intent(out) :: ierr
          integer :: i, num_extra
          type (star_info), pointer :: s
-         
+
          include 'formats'
-         
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          call star_astero_procs% data_for_extra_history_columns( &
             id, n, astero_names, vals, ierr)
          if (ierr /= 0) return
          if (s% job% astero_just_call_my_extras_check_model) return
-         
+
          num_extra = star_astero_procs% how_many_extra_history_columns(id)
-         
+
          i = num_extra+1
-         astero_names(i) = 'chi2'         
+         astero_names(i) = 'chi2'
          i = i+1
-         astero_names(i) = 'delta_nu'         
+         astero_names(i) = 'delta_nu'
          i = i+1
-         astero_names(i) = 'delta_nu_model'         
+         astero_names(i) = 'delta_nu_model'
          i = i+1
          astero_names(i) = trim(surf_coef1_name)
          i = i+1
          astero_names(i) = trim(surf_coef2_name)
-         
+
          if (i /= (num_extra_history_columns + num_extra)) then
             write(*,2) 'i', i
             write(*,2) 'num_extra_history_columns', num_extra_history_columns
             call mesa_error(__FILE__,__LINE__,'bad num_extra_history_columns')
          end if
-         
+
          i = num_extra+1
          vals(i) = chi2
          i = i+1
@@ -1075,18 +1075,18 @@
          vals(i) = surf_coef1
          i = i+1
          vals(i) = surf_coef2
-         
-         
+
+
       end subroutine astero_data_for_extra_history_columns
 
-      
+
       integer function astero_how_many_extra_profile_columns(id)
          integer, intent(in) :: id
          astero_how_many_extra_profile_columns = &
             star_astero_procs% how_many_extra_profile_columns(id)
       end function astero_how_many_extra_profile_columns
-      
-      
+
+
       subroutine astero_data_for_extra_profile_columns( &
             id, n, nz, astero_names, vals, ierr)
          integer, intent(in) :: id, n, nz
@@ -1098,7 +1098,7 @@
             id, n, nz, astero_names, vals, ierr)
       end subroutine astero_data_for_extra_profile_columns
 
-      
+
       subroutine astero_extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -1115,7 +1115,7 @@
             !write(*,*) 'call do_astero_extras_check_model before terminate'
             ckm = do_astero_extras_check_model(s, id)
             !write(*,*) 'done do_astero_extras_check_model before terminate'
-         end if         
+         end if
          call star_astero_procs% extras_after_evolve(id, ierr)
          if (save_info_for_last_model) then
             write(*,1) 'chi2', chi2
@@ -1139,55 +1139,55 @@
             write(*,*) 'done show_best'
             call free_iounit(iounit)
          end if
-         
+
          if (s% job% astero_just_call_my_extras_check_model) return
 
       end subroutine astero_extras_after_evolve
-      
-      
+
+
       ! routines for saving and restoring extra data so can do restarts
-      
+
       subroutine alloc_extra_info(s)
          integer, parameter :: extra_info_alloc = 1
          type (star_info), pointer :: s
          call move_extra_info(s,extra_info_alloc)
       end subroutine alloc_extra_info
-      
-      
+
+
       subroutine unpack_extra_info(s)
          integer, parameter :: extra_info_get = 2
          type (star_info), pointer :: s
          call move_extra_info(s,extra_info_get)
       end subroutine unpack_extra_info
-      
-      
+
+
       subroutine store_extra_info(s)
          integer, parameter :: extra_info_put = 3
          type (star_info), pointer :: s
          call move_extra_info(s,extra_info_put)
       end subroutine store_extra_info
-      
-      
+
+
       subroutine move_extra_info(s,op)
          integer, parameter :: extra_info_alloc = 1
          integer, parameter :: extra_info_get = 2
          integer, parameter :: extra_info_put = 3
          type (star_info), pointer :: s
          integer, intent(in) :: op
-         
+
          integer :: i, num_ints, num_dbls, ierr
-         
+
          i = 0
-         ! call move_int or move_flg 
+         ! call move_int or move_flg
          num_ints = i
-         
+
          i = 0
          ! call move_dbl
          num_dbls = i
-         
+
          if (op /= extra_info_alloc) return
          if (num_ints == 0 .and. num_dbls == 0) return
-         
+
          ierr = 0
          call star_alloc_extras(s% id, num_ints, num_dbls, ierr)
          if (ierr /= 0) then
@@ -1196,9 +1196,9 @@
             write(*,*) 'alloc_extras num_dbls', num_dbls
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          contains
-         
+
          subroutine move_dbl(dbl)
             real(dp) :: dbl
             i = i+1
@@ -1209,7 +1209,7 @@
                s% extra_work(i) = dbl
             end select
          end subroutine move_dbl
-         
+
          subroutine move_int(int)
             integer :: int
             i = i+1
@@ -1220,7 +1220,7 @@
                s% extra_iwork(i) = int
             end select
          end subroutine move_int
-         
+
          subroutine move_flg(flg)
             logical :: flg
             i = i+1
@@ -1235,7 +1235,7 @@
                end if
             end select
          end subroutine move_flg
-      
+
       end subroutine move_extra_info
 
 

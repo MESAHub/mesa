@@ -309,7 +309,7 @@
             do k=2,nz
                vals(k,i) = vals(k,i) + vals(k-1,i)
             end do
-            
+
          end subroutine do_conv_bdy
 
          subroutine do1_xa_function(k,i)

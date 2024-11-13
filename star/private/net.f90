@@ -96,7 +96,7 @@
          end if
 
          check_op_split_burn = s% op_split_burn
-         
+
          if (nzlo == nzhi) then
             call do1_net(s, nzlo, s% species, &
                s% num_reactions, &
@@ -169,7 +169,7 @@
 
          n% star_id = s% id
          n% zone = k
-         
+
          s% eps_nuc(k) = 0d0
          s% d_epsnuc_dlnd(k) = 0d0
          s% d_epsnuc_dlnT(k) = 0d0
@@ -189,7 +189,7 @@
          log10_rho = s% lnd(k)/ln10
          log10_T = s% lnT(k)/ln10
          T = s% T(k)
-         
+
          clipped_T = (s% max_logT_for_net > 0 .and. log10_T > s% max_logT_for_net)
          if (clipped_T) then
             log10_T = s% max_logT_for_net
@@ -218,7 +218,7 @@
                s% solver_call_number == s% solver_test_partials_call_number .and. &
                s% solver_iter == s% solver_test_partials_iter_number)
              ! if the test is for a partial wrt an abundance, do this
-             ! in inlist set solver_test_partials_var_name and solver_test_partials_sink_name 
+             ! in inlist set solver_test_partials_var_name and solver_test_partials_sink_name
              ! set solver_test_partials_equ_name = ''
              i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
              i_var_sink = lookup_nameofvar(s, s% solver_test_partials_sink_name)
@@ -231,7 +231,7 @@
              net_test_partials_i = i_var - s% nvar_hydro ! index in xa for var
              net_test_partials_iother = i_var_sink - s% nvar_hydro ! index in xa for var
          end if
-         
+
          if (s% use_other_net_get) then
             call s% other_net_get( &
                s% id, k, &
@@ -289,14 +289,14 @@
             write(*,2) trim(s% net_name), s% species
             call mesa_error(__FILE__,__LINE__,'after net_get in star')
          end if
-         
+
          if (s% solver_test_net_partials .and. net_test_partials) then
             s% solver_test_partials_val = net_test_partials_val
             s% solver_test_partials_dval_dx = net_test_partials_dval_dx
          end if
-         
+
          if (ierr == 0) then
-     
+
             if (clipped_T) then
                d_eps_nuc_dT = 0
                s% d_dxdt_nuc_dT(1:species,k) = 0
@@ -311,14 +311,14 @@
                tau_gamma = tau_gamma*s% nonlocal_NiCo_kap_gamma
                s% eps_nuc(k) = s% eps_nuc(k)*(1d0 - exp(-tau_gamma))
             end if
-         
+
             if (abs(s% eps_nuc(k)) > s% max_abs_eps_nuc) then
                s% eps_nuc(k) = sign(s% max_abs_eps_nuc, s% eps_nuc(k))
                d_eps_nuc_dRho = 0d0
                d_eps_nuc_dT = 0d0
                s% d_epsnuc_dx(:,k) = 0d0
             end if
-            
+
             eps_cat_sum = sum(s% eps_nuc_categories(:,k))
             if (abs(eps_cat_sum) < 1d-10) then
                alfa = 1d0
@@ -392,7 +392,7 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_net')
             return
          end if
-         
+
          if (k == -1) then
             write(*,'(A)')
             call show_stuff(s,k)
@@ -402,7 +402,7 @@
             write(*,5) 'eps_nuc', k, s% solver_iter, s% model_number, s% solver_adjust_iter, &
                         s% eps_nuc(k)
          end if
-         
+
          if (.false.) then
             write(*,'(A)')
             call show_stuff(s,k)
@@ -531,7 +531,7 @@
                      trim(chem_isos% name(s% chem_id(j))) // '))= ', s% xa(j,k)
             end do
          end if
-         
+
          if (.false.) then
             do i=1,species
                write(*,'(a,i3,a,d26.16)') 'values_for_Xinit(', i, ')= ', s% xa(i,k)
@@ -658,7 +658,7 @@
             write(*,*) 'set_net failed in get_net_iso_table_ptr'
             return
          end if
-         
+
          if (s% net_iso(ih1) == 0 .or. s% net_iso(ihe4) == 0) then
             write(*,*) 'mesa/star requires both h1 and he4 in net isotopes'
             write(*,*) 'but they are not included in ' // trim(new_net_name)
@@ -687,7 +687,7 @@
          end if
 
          s% net_rq% use_3a_fl87 = s% job% use_3a_fl87
-         
+
          s% need_to_setvars = .true.
 
          s% net_rq% fill_arrays_with_nans = s% fill_arrays_with_NaNs

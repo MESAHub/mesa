@@ -8,14 +8,14 @@ module skye
 
       logical, parameter :: dbg = .false.
       !logical, parameter :: dbg = .true.
-      
-      
+
+
       private
       public :: Get_Skye_EOS_Results, Get_Skye_alfa, Get_Skye_alfa_simple, get_Skye_for_eosdt
 
       contains
 
-      subroutine Get_Skye_alfa( & 
+      subroutine Get_Skye_alfa( &
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
@@ -36,12 +36,12 @@ module skye
          type (Helm_Table), pointer :: ht
 
          ierr = 0
-         ht => eos_ht 
+         ht => eos_ht
          skye_blend_width = 0.1d0
 
          ! Avoid catastrophic loss of precision in HELM tables
          bounds(1,1) = ht% logdlo
-         bounds(1,2) = 8.3d0 
+         bounds(1,2) = 8.3d0
 
          ! Rough ionization temperature from Jermyn+2021 Equation 52 (treating denominator as ~1).
          ! We put a lower bound of logT=7.3 to ensure that solar models never use Skye.
@@ -186,11 +186,11 @@ module skye
          ! mark this one
          res(i_frac_Skye) = 1.0
 
-      end subroutine get_Skye_for_eosdt            
+      end subroutine get_Skye_for_eosdt
 
       subroutine Get_Skye_EOS_Results( &
                rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
-               species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)   
+               species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X, abar, zbar
          real(dp), intent(in) :: Rho, logRho, T, logT
@@ -200,9 +200,9 @@ module skye
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
-         
+
          real(dp) :: logT_ion, logT_neutral
-         
+
          include 'formats'
 
          ierr = 0
@@ -231,22 +231,22 @@ module skye
                call mesa_error(__FILE__,__LINE__,'Get_Skye_EOS_Results')
             end if
             return
-         end if     
+         end if
 
       end subroutine Get_Skye_EOS_Results
 
 
-      !>..given a temperature temp [K], density den [g/cm**3], and a composition 
-      !!..this routine returns most of the other 
-      !!..thermodynamic quantities. of prime interest is the pressure [erg/cm**3], 
-      !!..specific thermal energy [erg/gr], the entropy [erg/g/K], along with 
+      !>..given a temperature temp [K], density den [g/cm**3], and a composition
+      !!..this routine returns most of the other
+      !!..thermodynamic quantities. of prime interest is the pressure [erg/cm**3],
+      !!..specific thermal energy [erg/gr], the entropy [erg/g/K], along with
       !!..their derivatives with respect to temperature, density, abar, and zbar.
       !!..other quantites such the normalized chemical potential eta (plus its
-      !!..derivatives), number density of electrons and positron pair (along 
-      !!..with their derivatives), adiabatic indices, specific heats, and 
+      !!..derivatives), number density of electrons and positron pair (along
+      !!..with their derivatives), adiabatic indices, specific heats, and
       !!..relativistically correct sound speed are also returned.
       !!..
-      !!..this routine assumes planckian photons, an ideal gas of ions, 
+      !!..this routine assumes planckian photons, an ideal gas of ions,
       !!..and an electron-positron gas with an arbitrary degree of relativity
       !!..and degeneracy. interpolation in a table of the helmholtz free energy
       !!..is used to return the electron-positron thermodynamic quantities.
@@ -286,7 +286,7 @@ module skye
          integer, intent(out) :: ierr
          real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
          real(dp), intent(out), dimension(nv, species) :: d_dxa
-         
+
          integer :: relevant_species, lookup(species)
          type(auto_diff_real_2var_order3) :: temp, logtemp, den, logden, din
          real(dp) :: AZION(species), ACMI(species), A(species), select_xa(species), ya(species)
