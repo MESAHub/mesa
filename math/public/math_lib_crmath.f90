@@ -145,7 +145,7 @@ contains
     sqrt_x = SQRT(MAX(x, 0._dp))
 
   end function safe_sqrt_
-  
+
   !****
 
   elemental function safe_log_ (x) result (log_x)
@@ -203,7 +203,7 @@ contains
        do i = 1, ABS(ix)
           exp10_x = exp10_x*10._dp
        end do
-       
+
        if (ix < 0) exp10_x = 1._dp/exp10_x
 
     else
@@ -223,7 +223,7 @@ contains
     real(dp)             :: pow_x
 
     integer :: i
-    
+
     if (x == 0._dp) then
 
        pow_x = 0._dp
@@ -231,13 +231,13 @@ contains
     else
 
        pow_x = 1._dp
-          
+
        do i = 1, ABS(iy)
           pow_x = pow_x*x
        end do
 
        if (iy < 0) pow_x = 1._dp/pow_x
-          
+
     endif
 
   end function pow_i_
@@ -252,7 +252,7 @@ contains
 
     integer :: iy
     integer :: i
-    
+
     if (x == 0._dp) then
 
        pow_x = 0._dp
@@ -264,13 +264,13 @@ contains
        if (y == iy .AND. ABS(iy) < 100) then ! integer power of x
 
           pow_x = 1._dp
-          
+
           do i = 1, ABS(iy)
              pow_x = pow_x*x
           end do
 
           if (iy < 0) pow_x = 1._dp/pow_x
-          
+
        else
 
           pow_x = exp(log(x)*y)

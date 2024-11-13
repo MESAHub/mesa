@@ -217,11 +217,11 @@
                   do jj=2,species
                      if (s% xa(jj,nz) > s% xa(j,nz)) j = jj
                   end do
-                  
+
                   s% xa(co56,nz) = x56_new*alfa_co56
                   s% xa(ni56,nz) = x56_new*(1d0 - alfa_co56)
                   s% xa(j,nz) = s% xa(j,nz) - (x56_new - x56_old)
-                  
+
                   write(*,1) 'new s% xa(co56,nz)', s% xa(co56,nz)
                   write(*,1) 'new s% xa(ni56,nz)', s% xa(ni56,nz)
                   mtotal = dot_product(s% dm(1:nz), &
@@ -249,15 +249,15 @@
          real(dp) :: ie, ke, pe, rR, rL, rC, m_cntr, &
             sum_total_energy, speed_limit
          real(dp), pointer :: v(:)
-         
+
          include 'formats'
-         
+
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_fallback: get_star_ptr ierr', ierr
             return
          end if
-         
+
          if (s% u_flag) then
             v => s% u
          else if (s% v_flag) then
@@ -265,9 +265,9 @@
          else
             return
          end if
-         
+
          nz = s% nz
-         
+
          ! check to see how far extend fallback above innermost cell
          k0 = nz
          if (s% job% fallback_check_total_energy) then ! remove_bound_inner_region
@@ -277,7 +277,7 @@
             do k = nz,1,-1
                ie = s% energy(k)*s% dm(k)
                ke = 0.5d0*v(k)*v(k)*s% dm(k)
-               if (k == s% nz) then   
+               if (k == s% nz) then
                   rL = s% R_center
                else
                   rL = s% r(k+1)
@@ -330,11 +330,11 @@
                if (-v(k) < speed_limit*s% csound(k)) exit
             end do
          end if
-         
+
          !call mesa_error(__FILE__,__LINE__,'do_remove_fallback')
-         
+
          !write(*,3) 'k0 old nz', k0, s% nz, s% m(k0)/Msun
-         
+
          ! remove cells k0..nz
          call do_remove_inner_fraction_q(id, s% q(k0), ierr)
 
@@ -351,13 +351,13 @@
          integer :: k, k0
          real(dp) :: lnd_limit
          include 'formats'
-         
+
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_remove_center_by_logRho: get_star_ptr ierr', ierr
             return
          end if
-         
+
          lnd_limit = logRho_limit*ln10
          k0 = 0
          do k = s% nz,1,-1
@@ -367,10 +367,10 @@
             end if
             if (s% q(k) > 0.01d0) return
          end do
-         
+
          ! k0 is innermost cell with density below limit
          ! search out from there for outermost with density too low
-         
+
          do k = k0,1,-1
             if (s% lnd(k) < lnd_limit) cycle
             call do_remove_inner_fraction_q(id, s% q(k), ierr)
@@ -392,7 +392,7 @@
          if (ierr /= 0) then
             write(*,*) 'do_limit_center_logP: get_star_ptr ierr', ierr
             return
-         end if         
+         end if
          lnP_limit = logP_limit*ln10
          k = s% nz
          if (s% lnPeos(k) > lnP_limit) then
@@ -1002,7 +1002,7 @@
                write(*,*) 'remove surface currently requires model with inner boundary at true center of star'
                ierr = -1
                call mesa_error(__FILE__,__LINE__,'do_remove_surface')
-            end if         
+            end if
             call do_relax_to_star_cut( &
                id, surface_k, s% job% remove_surface_do_jrot, &
                s% job% remove_surface_do_entropy, &
@@ -1121,9 +1121,9 @@
 
          if (dbg) write(*,1) 'do_remove_surface tau_factor, Tsurf_factor', &
             s% tau_factor, s% Tsurf_factor
-            
+
          if (dbg) call mesa_error(__FILE__,__LINE__,'do_remove_surface')
-            
+
       end subroutine do_remove_surface
 
 
@@ -1143,7 +1143,7 @@
 
          integer, intent(in) :: id, k_remove
          logical, intent(in) :: do_jrot, do_entropy
-         logical, intent(in) :: turn_off_energy_sources_and_sinks 
+         logical, intent(in) :: turn_off_energy_sources_and_sinks
             ! determines if we turn off non_nuc_neu and eps_nuc for entropy relax
          integer, intent(out) :: ierr
 
@@ -1366,7 +1366,7 @@
          s% photo_interval = photo_interval
 
          deallocate(q, xq)
-         
+
          s% need_to_setvars = .true.
 
       end subroutine do_relax_to_star_cut

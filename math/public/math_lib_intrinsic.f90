@@ -163,7 +163,7 @@ contains
     sqrt_x = SQRT(MAX(x, 0._dp))
 
   end function safe_sqrt_
-  
+
   !****
 
   elemental function safe_log_ (x) result (log_x)
@@ -243,7 +243,7 @@ contains
        do i = 1, ABS(ix)
           exp10_x = exp10_x*10._dp
        end do
-       
+
        if (ix < 0) exp10_x = 1._dp/exp10_x
 
     else
@@ -274,7 +274,7 @@ contains
     real(dp)             :: pow_x
 
     pow_x = x**iy
-    
+
   end function pow_i_
 
   !****
@@ -286,7 +286,7 @@ contains
     real(dp)             :: pow_x
 
     pow_x = x**y
-    
+
   end function pow_r_
 
   !****

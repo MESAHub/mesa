@@ -28,14 +28,14 @@
       use chem_def, only: chem_has_been_initialized
       use const_def, only: dp
       use math_lib
-      
+
       implicit none
 
 
       contains
-      
-      
-      subroutine chem_init(isotopes_filename, ierr) 
+
+
+      subroutine chem_init(isotopes_filename, ierr)
          ! uses mesa_data_dir from const_def
          use chem_def
          use chem_isos_io, only: do_read_chem_isos
@@ -89,18 +89,18 @@
       ! "Solar System Abundances and Condensation Temperatures of the Elements",
       ! ApJ, 591, 1220-1247 (2003).
       ! Table 6: Abundances of the Isotopes in the Solar System
-      
+
       ! These are element atom percentages (i.e., by number, not by mass)
-      
+
       ! NOTE: The data here stops at ge -- the table in the paper goes to 92U
-      
+
       ! TO DO: add the rest of the info from the paper
             use chem_def
             use lodders_mod
             character(len=*), intent(in) :: nuclei
             real(dp) :: percent
             integer :: ierr
-            
+
             if (.not. chem_has_been_initialized) then
                write(*,*) 'must call chem_init before calling any other routine in chem_lib'
               percent = -1.0d0
@@ -109,7 +109,7 @@
             percent = get_lodders03_isotopic_abundance(nuclei, ierr)
             if (ierr /= 0) percent = 0.0d0
       end function lodders03_element_atom_percent
-      
+
 
       ! returns the index of a particular nuclide in a particular set
       ! returns nuclide_not_found if name not found
@@ -134,8 +134,8 @@
          set = [(nuclide_set(names(i), i), i=1, size(names))]
          call sort_nuclide_set(set)
       end subroutine generate_nuclide_set
-      
-      
+
+
       subroutine basic_composition_info( &
             num_isos, chem_id, x, xh, xhe, z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
@@ -150,8 +150,8 @@
             abar, zbar, z2bar, z53bar, ye, mass_correction, &
             sumx, .true., dabar_dx, dzbar_dx, dmc_dx)
       end subroutine basic_composition_info
-      
-         
+
+
       subroutine composition_info( &
             num_isos, chem_id, x, xh, xhe, z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, &
@@ -167,8 +167,8 @@
             abar, zbar, z2bar, z53bar, ye, mass_correction, &
             sumx, .false., dabar_dx, dzbar_dx, dmc_dx)
       end subroutine composition_info
-      
-         
+
+
       subroutine get_composition_info( &
             num_isos, chem_id, x, xh, xhe, xz, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, &
@@ -179,9 +179,9 @@
              ! A(i) ion atomic mass number
          ! W(i) ion atomic weight (g/mole)
          ! Z(i) ion charge (number of protons)
-         ! Y(i) = X(i)/A(i), ion abundance 
+         ! Y(i) = X(i)/A(i), ion abundance
          ! n(i) = rho*avo*Y(i), ion number density (g/cm^3)*(#/mole)*(mole/g) -> (#/cm^3)
-         
+
          ! abar = sum(n(i)*A(i))/sum(n(i)) -- average atomic mass number
          ! zbar = sum(n(i)*Z(i))/sum(n(i)) -- average charge number
          ! z2bar = sum(n(i)*Z(i)^2)/sum(n(i)) -- average charge^2
@@ -201,7 +201,7 @@
                xh, xhe, xz, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          logical, intent(in) :: skip_partials
          real(dp), dimension(:) :: dabar_dx, dzbar_dx, dmc_dx
-     
+
          real(dp), dimension(num_isos) :: y, z, w, a
          integer :: i, cid, iz
          if (.not. chem_has_been_initialized) then
@@ -224,7 +224,7 @@
                   xhe = xhe + x(i)
             end select
          end do
-         
+
          xz = max(0d0, min(1d0, 1d0 - (xh + xhe)))
          sumx = sum(x(1:num_isos))     ! this should be one, always, since we define x as a baryon fraction
          abar = sumx / sum(y(1:num_isos))
@@ -241,39 +241,39 @@
          z53bar = z53bar * abar
 
          if (skip_partials) return
-         
+
          do i=1,num_isos
             dabar_dx(i) = abar*(a(i)-abar)/a(i)/sumx
             dzbar_dx(i) = abar*(z(i)-zbar)/a(i)/sumx
             dmc_dx(i) = w(i)/a(i) - mass_correction
          end do
-         
+
       end subroutine get_composition_info
-      
-      
+
+
       ! Q:  Is positron annihilation actually included in Qtotal?
       ! A: (from Frank Timmes)
       !
-      !   the formula used in the code is the atomic mass excess - not the nuclear mass excess - 
+      !   the formula used in the code is the atomic mass excess - not the nuclear mass excess -
       !   in terms of the binding energy and Deltas. as bill notes, this formulation
-      !   implicitly takes care of the electron masses. i can see why some confusion may 
-      !   arise at first blush because of the notation used in the code - its says “Mp” but 
+      !   implicitly takes care of the electron masses. i can see why some confusion may
+      !   arise at first blush because of the notation used in the code - its says “Mp” but
       !   really means “Mh” where Mh = m_p + m_e.
       !
       !   p + p -> d + e^+ + nu
       !
-      !   let’s do it by hand and then by code, neglecting binding energy terms of 
+      !   let’s do it by hand and then by code, neglecting binding energy terms of
       !   the atom (13.6 eV and such) as they are a million times smaller than the nuclear terms.
       !
       !   by hand:
       !
-      !   mass excess left-hand-side = twice hydrogen mass excess = 
+      !   mass excess left-hand-side = twice hydrogen mass excess =
       !   2 * (m_h - 1 amu) = 2 (m_p + m_e - 1 amu)
       !
-      !   mass excess right-hand-side = 
+      !   mass excess right-hand-side =
       !   m_h + m_n - B(d) - 2 amu = m_p + m_e + m_n - B(d) - 2 amu
       !
-      !   Q = left - right = m_p + m_e - m_n + B(d) 
+      !   Q = left - right = m_p + m_e - m_n + B(d)
       !
       !   which may be written (adding and subtracting m_p)
       !
@@ -293,8 +293,8 @@
       !
       !
       !   third loop
-      !   Q = B(d) - del_Mp - del_Mn 
-      !    = B(d) - (m_h - 1 amu) - (m_n - 1 amu) 
+      !   Q = B(d) - del_Mp - del_Mn
+      !    = B(d) - (m_h - 1 amu) - (m_n - 1 amu)
       !    = B(d) - (m_p + m_e - 1 amu) - (m_n - 1 amu)
       !    = B(d) - (mp + m_e + m_n - 2 amu)             ! note this is the negative of the right-hand-side term above
       !
@@ -303,8 +303,8 @@
       !
       !
       !   i think the confusion lay between the code nomenclature
-      !   and nuclear vs atomic mass excesses. 
-      
+      !   and nuclear vs atomic mass excesses.
+
       real(dp) function reaction_Qtotal(num_in,num_out,reactants,nuclides)
          use chem_def
          integer, intent(in) :: num_in,num_out,reactants(:)
@@ -320,17 +320,17 @@
             else
                reaction_Qtotal = reaction_Qtotal + Q
             end if
-  
+
          end do
       end function reaction_Qtotal
-            
-      
-      integer function chem_get_element_id(cname) 
+
+
+      integer function chem_get_element_id(cname)
       ! NOTE: this is for elements like 'h', not for isotopes like 'h1'
       ! use chem_get_iso_id for looking up isotope names
          use chem_def
          use utils_lib
-         character (len=*), intent(in)  :: cname 
+         character (len=*), intent(in)  :: cname
          ! name of the element (e.g. 'h', 'he', 'ne')
          ! same names as in chem_element_Name
          ! returns id for the element if there is a matching name
@@ -345,10 +345,10 @@
          if (ierr /= 0) value = -1
          chem_get_element_id = value
       end function chem_get_element_id
-      
-      
+
+
       real(dp) function chem_Xsol(nam)
-         character (len=*), intent(in)  :: nam 
+         character (len=*), intent(in)  :: nam
             ! name of the isotope (e.g. 'h1', 'he4', 'ne20')
          real(dp) :: z, a, xelem
          integer :: ierr
@@ -364,13 +364,13 @@
             chem_Xsol = xelem
          end if
       end function chem_Xsol
-      
+
 
       subroutine chem_get_solar(nam, z, a, xelem, ierr)
          use chem_def
          use utils_lib
          ! returns data from Anders and Grevesse, 1989
-         character (len=*), intent(in)  :: nam 
+         character (len=*), intent(in)  :: nam
             ! name of the isotope (e.g. 'h1', 'he4', 'ne20')
             ! note that these names match those in the nuclear net library iso_Names array
             ! but some net isotopes are not here (ex/ be7, n13, o14, o15, f17, f18, ... fe52, ni56 )
@@ -394,8 +394,8 @@
          xelem = solx(i)
       end subroutine chem_get_solar
 
-      
-      
+
+
       ! given an array of Z, A, returns an array of names in chem_isos format
       subroutine generate_nuclide_names(Z, A, names)
          use chem_def
@@ -431,7 +431,7 @@
             names(i) = adjustr(names(i))
          end do
       end subroutine generate_nuclide_names
-      
+
 
       subroutine generate_long_nuclide_names(Z, A, long_names)
          use chem_def
@@ -466,29 +466,29 @@
             end select
          end do
       end subroutine generate_long_nuclide_names
-      
-      
+
+
       ! nuclide information comes from the chem_isos tables
       ! the storage container for the data is called 'chem_isos'
       ! it has name, A, Z, N, spin, and B for each nuclide
-      ! use the function chem_get_iso_id to find the index given the name.      
+      ! use the function chem_get_iso_id to find the index given the name.
       integer function chem_get_iso_id(cname)
          use chem_def, only: get_nuclide_index
          character(len=*), intent(in) :: cname
          chem_get_iso_id = get_nuclide_index(cname)
-      end function chem_get_iso_id  
-            
-      
+      end function chem_get_iso_id
+
+
       integer function lookup_ZN(Z,N)
          integer, intent(in) :: Z, N
          lookup_ZN = lookup_ZN_isomeric_state(Z,N,0)
-      end function lookup_ZN  
-            
-      
+      end function lookup_ZN
+
+
       integer function lookup_ZN_isomeric_state(Z,N,isomeric_state)
          use chem_def, only: chem_isos, num_chem_isos
          integer, intent(in) :: Z, N, isomeric_state
-         integer :: cid, i       
+         integer :: cid, i
          iso_loop: do cid = 1, num_chem_isos
             if (chem_isos% Z(cid) == Z .and. chem_isos% N(cid) == N) then
                if (chem_isos% isomeric_state(cid) == isomeric_state) then
@@ -505,13 +505,13 @@
             end if
          end do iso_loop
          lookup_ZN_isomeric_state = 0 ! indicating failure
-      end function lookup_ZN_isomeric_state  
-            
-      
+      end function lookup_ZN_isomeric_state
+
+
       integer function rates_category_id(cname)
          use chem_def, only: category_names_dict
          use utils_lib
-         character (len=*), intent(in)  :: cname 
+         character (len=*), intent(in)  :: cname
          ! returns id for the category if there is a matching name
          ! returns 0 otherwise.
          integer :: ierr, value
@@ -519,7 +519,7 @@
          if (ierr /= 0) value = 0
          rates_category_id = value
       end function rates_category_id
-      
+
 
       function binding_energy(nuclides, Y) result (B)
          use chem_def
@@ -528,7 +528,7 @@
          real(dp) :: B
          B = dot_product(nuclides% binding_energy, Y)
       end function binding_energy
-      
+
       ! returns mass excess in MeV
       function get_mass_excess(nuclides,chem_id) result (mass_excess)
          use chem_def
@@ -536,7 +536,7 @@
          integer, intent(in) :: chem_id
          real(dp) :: mass_excess
          logical :: use_nuclides_mass_excess=.false.
-         
+
          ! These should be identical but can have slight ~ulp difference
          ! due to floating point maths
          if(use_nuclides_mass_excess)then
@@ -544,19 +544,19 @@
          else
             mass_excess = nuclides% Z(chem_id)*del_Mp + nuclides% N(chem_id)*del_Mn -&
                         nuclides% binding_energy(chem_id)
-         end if   
-               
+         end if
+
       end function
-      
+
       function get_Q(nuclides,chem_id) result (q)
          use chem_def
          type(nuclide_data), intent(in) :: nuclides
          integer, intent(in) :: chem_id
          real(dp) :: q
-         
+
          !Minus the mass excess
          q=-get_mass_excess(nuclides,chem_id)
-               
+
       end function
 
       ! returns the indx corresponding to Tpart just less than T9
@@ -595,18 +595,18 @@
          end do
          ! should never get here
          indx = low-1
-         
+
       end function get_partition_fcn_indx
 
       ! Given a the chem_id's and abundances for a set of isotopes
       ! return the abundances of the stable isotopes where the unstable ones
       ! have decayed to the stable versions.
-      ! Code from Frank Timmes "decay.zip" 
+      ! Code from Frank Timmes "decay.zip"
       ! Note this makes some asumptions, firstly that isotopes can only decay to one
       ! output (thus there are no branches), also we assume an inifinite timescale
       ! for decay. If you need a high precision output I suggest you use a one zone
       ! burn model rather than this.
-      subroutine get_stable_mass_frac(chem_id,num_species,abun_in,abun_out) 
+      subroutine get_stable_mass_frac(chem_id,num_species,abun_in,abun_out)
          use chem_def
          integer,intent(in),dimension(:) :: chem_id
          integer,intent(in) :: num_species
@@ -638,7 +638,7 @@
                    (z.le.izsol(j) .and. jcode(j).eq.2) .or. &
                    (z.eq.izsol(j) .and. jcode(j).eq.3) .or. &
                    (Z==17 .and. A==36 .and. izsol(j) == 18 .and. iasol(j) == 36)  .or. & ! cl36 -> ar36 special case
-                   (Z==21 .and. A==46 .and. izsol(j) == 22 .and. iasol(j) == 46)  .or. & ! sc46 -> ti46 special case 
+                   (Z==21 .and. A==46 .and. izsol(j) == 22 .and. iasol(j) == 46)  .or. & ! sc46 -> ti46 special case
                    (Z==21 .and. A==48 .and. izsol(j) == 22 .and. iasol(j) == 48)  .or. & ! sc48 -> ti48 special case
                    (Z==25 .and. A==54 .and. izsol(j) == 24 .and. iasol(j) == 54)  .or. & ! mn54 -> cr54 special case
                    (Z==27 .and. A==58 .and. izsol(j) == 26 .and. iasol(j) == 58)  .or. & ! co58-> fe58 special case
@@ -647,7 +647,7 @@
                    (Z==33 .and. A==74 .and. izsol(j) == 32 .and. iasol(j) == 74)  .or. & ! as74 -> ge74 special case
                    (Z==33 .and. A==76 .and. izsol(j) == 34 .and. iasol(j) == 76)  .or. & ! as76 -> se76 special case
                    (Z==35 .and. A==78 .and. izsol(j) == 34 .and. iasol(j) == 78)  .or. & ! br78 -> se78 special case
-                   (Z==35 .and. A==80 .and. izsol(j) == 36 .and. iasol(j) == 80)  .or. & ! br80 -> kr80 special case    
+                   (Z==35 .and. A==80 .and. izsol(j) == 36 .and. iasol(j) == 80)  .or. & ! br80 -> kr80 special case
                    (Z==35 .and. A==82 .and. izsol(j) == 36 .and. iasol(j) == 82)  .or. & ! br82 -> kr82 special case
                    (Z==37 .and. A==84 .and. izsol(j) == 36 .and. iasol(j) == 84)   & ! rb84 -> kr84 special case
                    ) then
@@ -664,19 +664,19 @@
 
          !Normalise results
          abun_out(1:solsiz)=abun_out(1:solsiz)/sum(abun_out(1:solsiz))
-         
+
       end subroutine get_stable_mass_frac
 
 
-      real(dp) function chem_M_div_h(x,z,zfrac_choice) ! Returns [M/H] 
+      real(dp) function chem_M_div_h(x,z,zfrac_choice) ! Returns [M/H]
          use chem_def
          use utils_lib, only: mesa_error
          real(dp), intent(in) :: x ! Hydrogen fraction
          real(dp), intent(in) :: z ! metal fraction
          integer, intent(in) :: zfrac_choice ! See chem_def, *_zfracs options
-      
+
          real(dp) :: zsolar,ysolar
-         
+
          zsolar = 0d0
          ysolar = 0d0
          select case(zfrac_choice)
@@ -715,10 +715,10 @@
             case default
                call mesa_error(__FILE__,__LINE__,"Bad zfrac_choice")
          end select
-         
+
          chem_M_div_h = log10(z/x)-log10(zsolar/(1.d0-zsolar-ysolar))
-      
-      
+
+
       end function chem_M_div_h
 
 

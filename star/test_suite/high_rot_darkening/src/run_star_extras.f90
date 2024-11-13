@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,8 +19,8 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
-      module run_star_extras 
+
+      module run_star_extras
 
       use star_lib
       use star_def
@@ -30,20 +30,20 @@
       use const_def
       use chem_def
       use num_lib
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
       integer, parameter :: restart_info_alloc = 1
       integer, parameter :: restart_info_get = 2
       integer, parameter :: restart_info_put = 3
-      
-      
+
+
       contains
 
       include "test_suite_extras.inc"
-      
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -51,10 +51,10 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          ! this is the place to set any procedure pointers you want to change
          ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
-         
+
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -63,12 +63,12 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          s% job% warn_run_star_extras=.false.
 
       end subroutine extras_controls
-      
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -81,7 +81,7 @@
          call test_suite_startup(s, restart, ierr)
 
       end subroutine extras_startup
-      
+
       integer function extras_start_step(id)
          integer, intent(in) :: id
          integer :: ierr
@@ -109,8 +109,8 @@
          integer, intent(in) :: id
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_profile_column_name) :: names(n)
@@ -123,13 +123,13 @@
 
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          integer, intent(in) :: id
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
@@ -141,7 +141,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -152,7 +152,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         
+
          if (s% job% create_pre_main_sequence_model) return
 
          write(*,*) "omega/omega_crit is:", s% w_div_w_crit_avg_surf,&
@@ -170,7 +170,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       end module run_star_extras
-      
+

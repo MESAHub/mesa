@@ -347,21 +347,21 @@
             call show_left_yaxis_label_pgstar(s,'log D (cm\u2\d s\u-1\d)')
 
             call pgsch(txt_scale*s% pg% Mixing_legend_txt_scale_factor)
-            
+
             if (rotation) then
-            
-               if (s% D_omega_flag) then         
-                  
+
+               if (s% D_omega_flag) then
+
                   do k=grid_min, grid_max
                      yvec(k) = safe_log10(s% D_mix_rotation(k))
                   end do
                   call pgsci(clr_rotation)
                   call pgslw(lw)
                   call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
-                  call pgslw(lw_sav)               
-                  
+                  call pgslw(lw_sav)
+
                else if (.not. s% pg% Mixing_show_rotation_details) then
-               
+
                   do k=grid_min, grid_max
                      yvec(k) = safe_log10( &
                         s% D_DSI_factor  * s% D_DSI(k)  + &
@@ -375,9 +375,9 @@
                   call pgslw(lw)
                   call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
                   call pgslw(lw_sav)
-                  
+
                end if
-            
+
                if (s% pg% Mixing_show_rotation_details) then
 
                   D_DSI_factor = s% D_DSI_factor
@@ -444,11 +444,11 @@
                   call pgslw(lw)
                   call pgline(npts, xvec(grid_min:grid_max), yvec(grid_min:grid_max))
                   call pgslw(lw_sav)
-               
+
                end if
-            
+
             end if
-            
+
             call pgsci(clr_convection)
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), y_conv(grid_min:grid_max))
@@ -480,12 +480,12 @@
                call pgline(npts, xvec(grid_min:grid_max), y_RTI_mix(grid_min:grid_max))
                call pgslw(lw_sav)
             end if
-            
+
             call pgsci(clr_minimum)
             call pgslw(lw)
             call pgline(npts, xvec(grid_min:grid_max), y_min_mix(grid_min:grid_max))
             call pgslw(lw_sav)
-            
+
             ! now do legend lines
 
             call pgsave
@@ -508,7 +508,7 @@
                   lw, lw_sav, txt_scale, 'thermohaline')
             end if
             if (rotation) then
-               if (s% D_omega_flag) then         
+               if (s% D_omega_flag) then
                   cnt = mixing_line_legend(cnt, clr_rotation, &
                      lw, lw_sav, txt_scale, 'D_mix_rotation')
                else
@@ -536,7 +536,7 @@
                cnt = mixing_line_legend(cnt, clr_MediumSlateBlue, &
                   lw, lw_sav, txt_scale, 'GSF')
             end if
-            
+
             call pgunsa
 
             call show_pgstar_decorator(s%id,s% pg% mixing_use_decorator,s% pg% mixing_pgstar_decorator, 0, ierr)

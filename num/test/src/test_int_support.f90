@@ -4,15 +4,15 @@
       use utils_lib, only: mesa_error
 
       implicit none
-            
+
       integer, parameter :: ipar_sparse_format = 1
          ! =0 means compressed row format; else, compressed column format.
       integer, parameter :: i_nfcn=2
       integer, parameter :: i_njac=3
 
       contains
-      
-      
+
+
       subroutine do_test_stiff_int( &
             which_solver, which_decsol, numerical_jacobian, &
             fcn, jac, sjac, solout, iout_input, &
@@ -54,17 +54,17 @@
          real(dp), pointer :: work(:) !(lwork)
          integer, pointer :: ipar_decsol(:) !(lid)
          real(dp), pointer :: rpar_decsol(:) !(lrd)
-         
+
          iout = iout_input
          if (quiet) iout = 0
          max_steps = 500000
-         max_step_size = 0 
+         max_step_size = 0
          isparse = 0
          lout = 6
-         
+
          y_min = -1d199
          y_max = 1d199
-         
+
          if (numerical_jacobian) then
             ijac = 0
          else
@@ -72,7 +72,7 @@
          end if
 
          ipar = 0
-         rpar = 0         
+         rpar = 0
 
          nrdens = n
          max_cols_exptrap = 0 ! use default
@@ -92,23 +92,23 @@
          end if
 
          call isolve_work_sizes(n,nzmax,imas,mljac,mujac,mlmas,mumas,liwork,lwork)
-         
+
          allocate(iwork(liwork),work(lwork),ipar_decsol(lid),rpar_decsol(lrd),stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'allocate ierr', ierr
             call mesa_error(__FILE__,__LINE__) ! test_int_support
          end if
-      
+
          iwork = 0
          work = 0
-      
+
          iwork(9) = m1
          iwork(10) = m2
 
          nstep = 0
          eps = rtol(1)
          do i=0,ndisc
-            ierr = 0             
+            ierr = 0
             h = h0
             select case(which_solver)
             case (ros2_solver)
@@ -147,10 +147,10 @@
          end do
 
          deallocate(iwork,work,ipar_decsol,rpar_decsol)
-            
+
          contains
-         
-         
+
+
          subroutine do_isolve(decsol, decsols, decsolblk)
             interface
                include "mtx_decsol.dek"
@@ -160,26 +160,26 @@
             integer :: j
             include 'formats'
             call isolve( &
-               which_solver, n, fcn, t(i), y, t(i+1), & 
-               h, max_step_size, max_steps, & 
-               rtol, atol, itol, y_min, y_max, & 
-               jac, ijac, sjac, nzmax, isparse, mljac, mujac, & 
-               mas, imas, mlmas, mumas, & 
-               solout, iout, & 
+               which_solver, n, fcn, t(i), y, t(i+1), &
+               h, max_step_size, max_steps, &
+               rtol, atol, itol, y_min, y_max, &
+               jac, ijac, sjac, nzmax, isparse, mljac, mujac, &
+               mas, imas, mlmas, mumas, &
+               solout, iout, &
                decsol, decsols, decsolblk, &
-               lrd, rpar_decsol, lid, ipar_decsol, &  
+               lrd, rpar_decsol, lid, ipar_decsol, &
                caller_id, nvar_blk_dble, nz_blk_dble, &
-               lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, & 
+               lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
                fcn_blk_dble, jac_blk_dble, &
-               work, lwork, iwork, liwork, & 
-               lrpar, rpar, lipar, ipar, & 
+               work, lwork, iwork, liwork, &
+               lrpar, rpar, lipar, ipar, &
                lout, idid)
             return
             do j=1,n
                write(*,2) 'y(j)', j, y(j)
             end do
          end subroutine do_isolve
-         
+
 
       end subroutine do_test_stiff_int
 

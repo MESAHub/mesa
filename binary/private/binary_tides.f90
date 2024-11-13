@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module binary_tides
 
       use star_lib
@@ -28,13 +28,13 @@
       use utils_lib
       use math_lib
       use binary_def
-      
+
       implicit none
 
 
       contains
-      
-      
+
+
       subroutine sync_spin_orbit_torque(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -43,9 +43,9 @@
          real(dp) :: qratio ! mass_other_star/mass_this_star
          real(dp) :: rlr ! roche lobe radius (cm)
          real(dp) :: dt_next ! next timestep
-         real(dp) :: Ftid  ! efficiency of tidal synchronization. (time scale × FSYNC). 
+         real(dp) :: Ftid  ! efficiency of tidal synchronization. (time scale × FSYNC).
          character (len=strlen) :: sync_type
-         character (len=strlen) :: sync_mode 
+         character (len=strlen) :: sync_mode
          type (binary_info), pointer :: b
          ierr = 0
 
@@ -90,9 +90,9 @@
          else
             call sync_spin_to_orbit(s% id, s% nz, osep, qratio, rlr, dt_next, Ftid, sync_type, sync_mode, ierr)
          end if
-         
+
       end subroutine sync_spin_orbit_torque
-      
+
       subroutine sync_spin_to_orbit(id, nz, osep, qratio, rl, dt_next, Ftid, sync_type, sync_mode, ierr)
          ! initially based on spiba.f kindly provided by Norbert Langer and group.
          integer, intent(in) :: id
@@ -101,26 +101,26 @@
          real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
          real(dp), intent(in) :: rl ! roche lobe radius (cm)
          real(dp), intent(in) :: dt_next ! next timestep
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ). 
-         
+         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
+
          character (len=strlen), intent(in) :: sync_type ! synchronization timescale
          character (len=strlen), intent(in) :: sync_mode ! where to put/take angular momentum
          integer, intent(out) :: ierr
-      
+
          type (star_info), pointer :: s
          real(dp) :: G, m, t_sync, r_phot, delta_total_J, &
             sum_J_sync, sum_J_non_sync, tdyn, tkh, rho_face, cv_face, &
             T_face, csound_face, ff, omega_orb
-            
-         real(dp), dimension(nz) :: j_sync, delta_j, tdyn_div_tkh         
+
+         real(dp), dimension(nz) :: j_sync, delta_j, tdyn_div_tkh
          integer, dimension(nz) :: layers_in_sync
          integer :: k, num_sync_layers
          type (binary_info), pointer :: b
 
          real(dp) :: a1,a2
-      
+
          include 'formats'
-      
+
          ierr = 0
 
          call star_ptr(id, s, ierr)
@@ -141,9 +141,9 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         
+
          t_sync = 0
-      
+
          G = standard_cgrav
 
          if (is_donor(b, s)) then
@@ -153,12 +153,12 @@
             m = b% m(b% a_i)
             r_phot = b% r(b% a_i)
          end if
-         
+
          omega_orb = 2d0*pi/b% period
          do k=1,nz
             j_sync(k) = omega_orb*s% i_rot(k)% val
          end do
-      
+
          if (sync_type == "Instantaneous") then ! instantaneous synchronisation
             do k=1,nz
                delta_j(k) = s% j_rot(k) - j_sync(k)
@@ -201,7 +201,7 @@
                   layers_in_sync(k) = 0
                end do
                delta_total_J = delta_total_J*(1d0 - exp(-dt_next/t_sync))
-      
+
                ! Iteratively solve the scaling factor ff to add (or remove) delta_total_J.
                ! At each iteration, ff is solved such that each zone k has a change on
                ! its angular momentum J_k of the form:
@@ -253,7 +253,7 @@
                   delta_j(k) = 0d0
                end do
             end if
-      
+
          end if
 
          if (b% point_mass_i /= 1 .and. b% s1% id == s% id) then
@@ -270,64 +270,64 @@
                s% extra_jdot(k) = s% extra_jdot(k) - delta_j(k)/dt_next
             end do
          end if
-      
+
       end subroutine sync_spin_to_orbit
 
 
       real(dp) function f2(e)
          real(dp), intent(in) :: e
-         
+
          f2 = 1d0
 
          ! Hut 1981, A&A, 99, 126, definition of f2 after eq. 11
          if (e > 0d0) then
              f2 = 1d0 + 15d0/2d0*pow2(e) + 45d0/8d0*pow4(e) + 5d0/16d0*pow6(e)
          end if
-          
+
       end function f2
-    
+
       real(dp) function f3(e)
          real(dp), intent(in) :: e
-         
+
          f3 = 1d0
 
          ! Hut 1981, A&A, 99, 126, definition of f3 after eq. 11
          if (e > 0d0) then
              f3 = 1d0 + 15d0/4d0*pow2(e) + 15d0/8d0*pow4(e) + 5d0/64d0*pow6(e)
          end if
-          
+
       end function f3
-      
-      
+
+
       real(dp) function f4(e)
          real(dp), intent(in) :: e
-         
+
          f4 = 1d0
 
          ! Hut 1981, A&A, 99, 126, definition of f4 after eq. 11
          if (e > 0d0) then
              f4 = 1d0 + 3d0/2d0*pow2(e) + 1d0/8d0*pow4(e)
          end if
-          
+
       end function f4
-      
+
 
       real(dp) function f5(e)
          real(dp), intent(in) :: e
-         
+
          f5 = 1d0
 
          ! Hut 1981, A&A, 99, 126, definition of f5 after eq. 11
          if (e > 0d0) then
              f5 = 1d0 + 3d0*pow2(e) + 3d0/8d0*pow4(e)
          end if
-          
+
       end function f5
-      
+
       subroutine get_tsync(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
          integer, intent(in) :: id
          character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ). 
+         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
          real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
          real(dp), intent(in) :: m
          real(dp), intent(in) :: r_phot
@@ -338,9 +338,9 @@
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
          integer :: k
-      
+
          include 'formats'
-   
+
          ierr = 0
 
          call star_ptr(id, s, ierr)
@@ -455,9 +455,9 @@
                ! E2 from Hurley 2002 eq 43 based on Zahn 1975
                e2 = 1.592d-9*pow(m/Msun,2.84d0)
             end if
-            k_div_T = k_div_T*e2/secyer 
+            k_div_T = k_div_T*e2/secyer
          end if
-          
+
       end function k_div_T
 
       end module binary_tides

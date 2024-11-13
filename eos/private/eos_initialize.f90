@@ -29,8 +29,8 @@
       implicit none
 
       contains
-            
-      
+
+
       subroutine Init_eos( &
            eosDT_cache_dir_in, &
            use_cache, ierr)
@@ -41,7 +41,7 @@
          character(*), intent(IN) :: eosDT_cache_dir_in
          logical, intent(in) :: use_cache
          integer, intent(OUT) :: ierr ! 0 means AOK.
-         !integer, parameter :: imax = 261, jmax = 101  
+         !integer, parameter :: imax = 261, jmax = 101
             ! dimensions of small version of helm table
          !integer, parameter :: imax = 1081, jmax = 401
             ! dimensions of medium version of helm table; 40 points per decade
@@ -65,20 +65,20 @@
             eosDT_temp_cache_dir = trim(mesa_temp_caches_dir) // '/eosDT_cache'
             if(use_mesa_temp_cache) call mkdir(eosDT_temp_cache_dir)
          end if
-         
+
          call alloc_helm_table(eos_ht, imax, jmax, ierr)
          if (ierr /= 0) return
-         
+
          call read_helm_table(eos_ht, &
             eosDT_data_dir, eosDT_cache_dir, eosDT_temp_cache_dir, use_cache_for_eos, ierr)
          if (ierr /= 0) return
 
          call eos_def_init
          ! replace defaults from eos_def_init by argument
-         
+
          eos_root_is_initialized = .true.
-      
+
       end subroutine Init_eos
-      
-      
+
+
       end module eos_initialize

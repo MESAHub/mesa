@@ -849,7 +849,7 @@
                if (other_ytop > ytop) ytop = other_ytop
                if (ytop > other_ytop) other_ytop = ytop
             end if
-            
+
             if (have_other_yaxis) then
                !write(*,1) trim(other_yname), other_ybot, other_ytop
                call pgswin(xleft, xright, other_ybot, other_ytop)
@@ -891,7 +891,7 @@
                      call show_box_pgstar(s,'BCNST','BNSTV')
                   end if
                end if
-               
+
                if (len_trim(hist_points_name(j)) > 0) then
                   iounit = 33
                   open(unit=iounit, file=trim(hist_points_name(j)), &
@@ -930,7 +930,7 @@
                   call show_left_yaxis_label_pgstar(s,'log ' // yname)
                else
                   call show_left_yaxis_label_pgstar(s,yname)
-               end if               
+               end if
                call pgslw(s% pg% pgstar_lw)
                if (yfile_data_len > 0) then
                   call pgsls(s% pg% pgstar_history_line_style)
@@ -958,7 +958,7 @@
          deallocate(xvec, yvec, other_yvec)
 
          call pgunsa
-         
+
          contains
 
 

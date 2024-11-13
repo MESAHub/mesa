@@ -28,9 +28,9 @@
       use kap_eval_support
       use const_def, only: dp
       use math_lib
-      
+
       implicit none
-            
+
       contains
 
 
@@ -39,7 +39,7 @@
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
          use kap_def
          use const_def
-         
+
          ! INPUT
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: Zbase, X, dXC, dXO
@@ -49,19 +49,19 @@
          ! OUTPUT
          real(dp), intent(out) :: logKap, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr ! 0 means AOK.
-         
+
          integer :: iz, use_iz, num_Zs, CO_option
          real(dp) :: Z0, Z1,log10_Zbase, log10_Z0, log10_Z1
          real(dp) ::  alfa, beta
          real(dp) :: logK0, dlogK0_dlogRho, dlogK0_dlogT, logK1, dlogK1_dlogRho, dlogK1_dlogT
          character (len=256) :: message
-      
+
          logical, parameter :: use_closest_Z = .false.
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          CO_option = rq% kap_CO_option
          num_Zs = num_kap_CO_Zs(CO_option)
 
@@ -70,8 +70,8 @@
                ierr = -3
                return
             end if
-         end if         
-         
+         end if
+
          if (num_Zs == 1 .or. &
                Zbase >= kap_co_z_tables(CO_option)% ar(num_Zs)% Zbase) then ! use the largest Zbase
             if (dbg) write(*,*) 'use the largest Zbase', &
@@ -81,7 +81,7 @@
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             return
          end if
-         
+
          if (Zbase <= kap_co_z_tables(CO_option)% ar(1)% Zbase) then ! use the smallest Zbase
             if (dbg) then
                write(*,*) 'use the smallest Zbase'
@@ -97,10 +97,10 @@
          do iz = 1, num_Zs-1
             if (Zbase < kap_co_z_tables(CO_option)% ar(iz+1)% Zbase) exit
          end do
-      
+
          Z0 = kap_co_z_tables(CO_option)% ar(iz)% Zbase
          Z1 = kap_co_z_tables(CO_option)% ar(iz+1)% Zbase
-         
+
          if (Zbase <= Z0) then ! use the Z0 table
             if (dbg) write(*,*) 'use the Z0 table', Z0
             call Get_Kap_for_CO_X( &
@@ -108,7 +108,7 @@
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             return
          end if
-         
+
          if (Zbase >= Z1) then ! use the Z1 table
             if (dbg) write(*,*) 'use the Z1 table', Z1
             call Get_Kap_for_CO_X( &
@@ -116,7 +116,7 @@
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             return
          end if
-         
+
          if (use_closest_Z) then
             log10_Z0 = kap_co_z_tables(CO_option)% ar(iz)% log10_Zbase
             log10_Z1 = kap_co_z_tables(CO_option)% ar(iz+1)% log10_Zbase
@@ -132,7 +132,7 @@
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             return
          end if
-         
+
          if (dbg) then
             write(*,*) 'iz', iz
             write(*,*) '   Z0', Z0
@@ -140,7 +140,7 @@
             write(*,*) '   Z1', Z1
             write(*,'(A)')
          end if
-         
+
          if (num_Zs >= 4 .and. rq% cubic_interpolation_in_Z) then
             if (dbg) write(*,*) 'call Get_Kap_for_CO_Z_cubic'
             call Get_Kap_for_CO_Z_cubic(rq, iz, Zbase, X, dXC, dXO, logRho, logT, &
@@ -160,8 +160,8 @@
          end if
 
       end subroutine Get1_kap_CO_Results
-      
-      
+
+
       ! use tables iz-1 to iz+2 to do piecewise monotonic cubic interpolation in Z
       subroutine Get_Kap_for_CO_Z_cubic(rq, iz, Z, X, dXC, dXO, logRho, logT, &
                logK, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -176,7 +176,7 @@
          real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlnkap_dlnRho, dlnkap_dlnT
          integer, intent(out) :: ierr
-         
+
          integer, parameter :: n_old = 4, n_new = 1
          real(dp), dimension(n_old) :: logKs, dlogKs_dlogRho, dlogKs_dlogT
          type(auto_diff_real_2var_order1), dimension(n_old) :: logKs_ad
@@ -185,16 +185,16 @@
          type(auto_diff_real_2var_order1), target :: work_ary(n_old*pm_work_size)
          type(auto_diff_real_2var_order1), pointer :: work(:)
          integer :: i, i1, izz, num_Zs, CO_option
-         
+
          logical, parameter :: dbg = .false.
-         
+
          11 format(a40,e20.10)
-         
+
          ierr = 0
          work => work_ary
          CO_option = rq% kap_CO_option
          num_Zs = num_kap_CO_Zs(CO_option)
-         
+
          if (iz+2 > num_Zs) then
             i1 = num_Zs-2
          else if (iz == 1) then
@@ -202,7 +202,7 @@
          else
             i1 = iz
          end if
-         
+
          if (dbg) then
             write(*,*) 'n_old', n_old
             write(*,*) 'i1', i1
@@ -210,7 +210,7 @@
             write(*,*) 'Z', Z
             write(*,'(A)')
          end if
-         
+
          do i=1,n_old
             izz = i1-2+i
             z_old(i) %val= kap_co_z_tables(CO_option)% ar(izz)% Zbase
@@ -248,14 +248,14 @@
          dlnkap_dlnRho = logK_ad % d1val2
 
          if (dbg) then
-         
+
             do i=1,n_old
                write(*,*) 'z_old(i)', z_old(i)
             end do
             write(*,'(A)')
             write(*,*) 'z_new(1)', z_new(1)
             write(*,'(A)')
-         
+
             do i=1,n_old
                write(*,*) 'logK', i, logKs(i)
             end do
@@ -269,18 +269,18 @@
             write(*,'(A)')
             write(*,*) 'dlnkap_dlnRho', dlnkap_dlnRho
             write(*,'(A)')
-         
+
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT', i, dlogKs_dlogT(i)
             end do
             write(*,'(A)')
             write(*,*) 'dlnkap_dlnT', dlnkap_dlnT
             write(*,'(A)')
-            
+
          end if
-         
+
          contains
-         
+
          subroutine interp1(old, new, ierr)
             type(auto_diff_real_2var_order1), intent(in) :: old(n_old)
             type(auto_diff_real_2var_order1), intent(out) :: new
@@ -295,10 +295,10 @@
                'Get_Kap_for_CO_Z_cubic', ierr)
             new = v_new(1)
          end subroutine interp1
-      
+
       end subroutine Get_Kap_for_CO_Z_cubic
-      
-      
+
+
       subroutine Get_Kap_for_CO_Z_linear( &
                rq, iz, Z, Z0, Z1, X, dXC, dXO, logRho, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -312,7 +312,7 @@
 
          real(dp) :: logK0, dlogK0_dlogRho, dlogK0_dlogT, logK1, dlogK1_dlogRho, dlogK1_dlogT
          real(dp) :: alfa, beta
-      
+
          logical, parameter :: dbg = .false.
 
          ierr = 0
@@ -322,7 +322,7 @@
             logK0, dlogK0_dlogRho, dlogK0_dlogT, ierr)
          if (ierr /= 0) return
          if (dbg) write(*,*) 'logK0', logK0
-      
+
          call Get_Kap_for_CO_X( &
             rq, dXC, dXO, iz+1, X, logRho, logT, &
             logK1, dlogK1_dlogRho, dlogK1_dlogT, ierr)
@@ -337,8 +337,8 @@
          dlnkap_dlnT = beta*dlogK0_dlogT + alfa*dlogK1_dlogT
 
       end subroutine Get_Kap_for_CO_Z_linear
-      
-      
+
+
       subroutine Get_Kap_for_CO_X(rq, dXC, dXO, iz, X, logRho, logT, &
                logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          use kap_def
@@ -349,24 +349,24 @@
          real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
-         
+
          type (Kap_CO_X_Table), dimension(:), pointer :: x_tables
          real(dp) :: logK0, dlogK0_dlogRho, dlogK0_dlogT, logK1, dlogK1_dlogRho, dlogK1_dlogT
          real(dp) :: X0, X1
          real(dp) :: alfa, beta
          integer :: ix, i, num_Xs, CO_option
-         
+
          logical, parameter :: dbg = .false.
 
          CO_option = rq% kap_CO_option
          num_Xs = num_kap_CO_Xs(CO_option)
          x_tables => kap_co_z_tables(CO_option)% ar(iz)% x_tables
-                  
+
          if (X < 0 .or. X > 1) then
             ierr = -3
             return
          end if
-         
+
          if (num_Xs > 1) then
             if (x_tables(1)% X >= x_tables(2)% X) then
                ierr = -3
@@ -379,9 +379,9 @@
             call Get_Kap_for_dXCO( &
                rq, iz, x_tables, dXC, dXO, num_Xs, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
-            return    
+            return
          end if
-         
+
          if (X <= x_tables(1)% X) then ! use the first X
             if (dbg) write(*,*) 'use the first X'
             call Get_Kap_for_dXCO( &
@@ -398,36 +398,36 @@
                ix = i; exit
             end if
          end do
-         
+
          if (ix == num_Xs) then
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, num_Xs, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-         
+
          X0 = x_tables(ix)% X
          X1 = x_tables(ix+1)% X
-         
+
          if (X1 <= X0) then
             ierr = 1
             return
          end if
-         
+
          if (X0 >= X) then ! use the X0 table
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ix, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-         
+
          if (X1 <= X) then ! use the X1 table
             call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ix+1, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-         
+
          if (num_Xs >= 4 .and. rq% cubic_interpolation_in_X) then
             call Get_Kap_for_CO_X_cubic( &
                   rq, iz, ix, dXC, dXO, x_tables, X, logRho, logT, &
@@ -437,10 +437,10 @@
                   rq, iz, ix, dXC, dXO, x_tables, X, X0, X1, logRho, logT, &
                   logK, dlogK_dlogRho, dlogK_dlogT, ierr)
          end if
-      
+
       end subroutine Get_Kap_for_CO_X
-      
-      
+
+
       ! use tables ix-1 to ix+2 to do piecewise monotonic cubic interpolation in X
       subroutine Get_Kap_for_CO_X_cubic( &
             rq, iz, ix, dXC, dXO, x_tables, X, logRho, logT, &
@@ -458,7 +458,7 @@
          real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
-         
+
          integer, parameter :: n_old = 4, n_new = 1
          real(dp), dimension(n_old) :: logKs, dlogKs_dlogRho, dlogKs_dlogT
          type(auto_diff_real_2var_order1), dimension(n_old) :: logKs_ad
@@ -467,16 +467,16 @@
          type(auto_diff_real_2var_order1), target :: work_ary(n_old*pm_work_size)
          type(auto_diff_real_2var_order1), pointer :: work(:)
          integer :: i, i1, ixx, num_Xs
-         
+
          logical, parameter :: dbg = .false.
-         
+
          11 format(a40,e20.10)
-         
+
          ierr = 0
          work => work_ary
 
          num_Xs = num_kap_CO_Xs(rq% kap_CO_option)
-         
+
          if (ix+2 > num_Xs) then
             i1 = num_Xs-2
          else if (ix == 1) then
@@ -484,9 +484,9 @@
          else
             i1 = ix
          end if
-         
+
          if (dbg) write(*,*) 'ix', ix
-         
+
          do i=1,n_old
             ixx = i1-2+i
             if (dbg) write(*,*) 'ixx', ixx
@@ -515,20 +515,20 @@
             call mesa_error(__FILE__,__LINE__,'failed in interp1 for logK')
             return
          end if
-                 
+
         ! unpack auto_diff pack into output reals
         logK = logK_ad % val
         dlogK_dlogT = logK_ad % d1val1
         dlogK_dlogRho = logK_ad % d1val2
 
          if (dbg) then
-         
+
             do i=1,n_old
                write(*,*) 'x_old(i)', x_old(i)
             end do
             write(*,*) 'x_new(1)', x_new(1)
             write(*,'(A)')
-         
+
             do i=1,n_old
                write(*,*) 'logKs(i)', logKs(i)
             end do
@@ -540,17 +540,17 @@
             end do
             write(*,*) 'dlogK_dlogRho', dlogK_dlogRho
             write(*,'(A)')
-         
+
             do i=1,n_old
                write(*,*) 'dlogKs_dlogT(i)', dlogKs_dlogT(i)
             end do
             write(*,*) 'dlogK_dlogT', dlogK_dlogT
             write(*,'(A)')
-            
+
          end if
-         
+
          contains
-         
+
          subroutine interp1(old, new, ierr)
             type(auto_diff_real_2var_order1), intent(in) :: old(n_old)
             type(auto_diff_real_2var_order1), intent(out) :: new
@@ -565,10 +565,10 @@
                   'Get_Kap_for_CO_X_cubic', ierr)
             new = v_new(1)
          end subroutine interp1
-      
+
       end subroutine Get_Kap_for_CO_X_cubic
-      
-      
+
+
       subroutine Get_Kap_for_CO_X_linear( &
             rq, iz, ix, dXC, dXO, x_tables, X, X0, X1, logRho, logT, &
             logK, dlogK_dlogRho, dlogK_dlogT, ierr)
@@ -581,11 +581,11 @@
          real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
-         
+
          real(dp) :: logK0, dlogK0_dlogRho, dlogK0_dlogT, logK1, dlogK1_dlogRho, dlogK1_dlogT
          real(dp) :: alfa, beta
          integer :: i
-         
+
          logical, parameter :: dbg = .false.
 
          ierr = 0
@@ -593,20 +593,20 @@
                   rq, iz, x_tables, dXC, dXO, ix, &
                   logRho, logT, logK0, dlogK0_dlogRho, dlogK0_dlogT, ierr)
          if (ierr /= 0) return
-      
+
          call Get_Kap_for_dXCO( &
                   rq, iz, x_tables, dXC, dXO, ix+1, &
                   logRho, logT, logK1, dlogK1_dlogRho, dlogK1_dlogT, ierr)
          if (ierr /= 0) return
-         
+
          ! X0 result in logK0, X1 result in logK1
          beta = (X - X1) / (X0 - X1) ! beta -> 1 as X -> X0
          alfa = 1d0 - beta
-         
+
          logK = beta*logK0 + alfa*logK1
          dlogK_dlogRho = beta*dlogK0_dlogRho + alfa*dlogK1_dlogRho
-         dlogK_dlogT = beta*dlogK0_dlogT + alfa*dlogK1_dlogT      
-      
+         dlogK_dlogT = beta*dlogK0_dlogT + alfa*dlogK1_dlogT
+
       end subroutine Get_Kap_for_CO_X_linear
 
 
@@ -623,7 +623,7 @@
          real(dp), intent(inout) :: logRho, logT
          real(dp), intent(out) :: logK, dlogK_dlogRho, dlogK_dlogT
          integer, intent(out) :: ierr
-         
+
          type (Kap_CO_Table), dimension(:), pointer :: co_tables ! stored by table number
          real(dp) :: dXC, dXO, fac, dXCO_max, Z, dXC_lookup, dXO_lookup
          integer :: num_CO_tables, num_dXC_gt_dXO, i1, i2, i3, i4
@@ -635,16 +635,16 @@
          real(dp) :: logK_2_4, dlogK_2_4_dlogRho, dlogK_2_4_dlogT
          real(dp) :: logK_1_3, dlogK_1_3_dlogRho, dlogK_1_3_dlogT
          logical, parameter :: read_later = .false., dbg = .false.
-         
+
          include 'formats'
 
          ierr = 0
-         
+
          if (dbg) write(*,1) 'enter Get_Kap_for_dXCO dXC_in dXO_in', dXC_in, dXO_in
-         
+
          dXC = max(0.0_dp, dXC_in)
          dXO = max(0.0_dp, dXO_in)
-         
+
          if (x_tables(ix)% not_loaded_yet) then ! avoid doing critical section if possible
 !$omp critical (load_co_table)
             if (x_tables(ix)% not_loaded_yet) then
@@ -653,11 +653,11 @@
 !$omp end critical (load_co_table)
          end if
          if (ierr /= 0) return
-         
+
          co_tables => x_tables(ix)% co_tables
          num_CO_tables = x_tables(ix)% num_CO_tables
          if (dbg) write(*,2) 'num_CO_tables', num_CO_tables
-         
+
          if (num_CO_tables < 1) then
             ierr = -1
             write(*,2) 'num_CO_tables', num_CO_tables
@@ -673,10 +673,10 @@
             dXC = fac*dXC
             dXO = fac*dXO
          end if
-         
+
          dXC_lookup = get_dX_lookup(dXC, Z)
          dXO_lookup = get_dX_lookup(dXO, Z)
-         
+
          if (dbg) write(*,2) 'call Find_CO_Tables', ix
          call Find_CO_Tables(rq, x_tables, ix, x_tables(ix)% CO_table_numbers,  &
                      x_tables(ix)% next_dXO_table, x_tables(ix)% next_dXC_table,  &
@@ -686,27 +686,27 @@
             write(*,*) 'kap failed in Find_CO_Tables'
             return
          endif
-         
+
          if (i1 > 0 .and. i2 <= 0 .and. i3 <= 0 .and. i4 <= 0) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i1, logRho, logT,  &
                      logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-                  
+
          if (i1 <= 0 .or. i2 <= 0 .or. i3 <= 0) call mesa_error(__FILE__,__LINE__,'error in result from Find_CO_Tables')
-         
+
          if (matches_table(i2)) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i2, logRho, logT,  &
                      logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-         
+
          if (matches_table(i3)) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i3, logRho, logT,  &
                      logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
-         
+
          if (i4 > 0) then
             if (matches_table(i4)) then
                call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i4, logRho, logT,  &
@@ -714,25 +714,25 @@
                return
             end if
          end if
-         
+
          call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i1, logRho, logT,  &
                      logK1, dlogK1_dlogRho, dlogK1_dlogT, ierr)
          if (ierr /= 0) return
          dXC1_lookup = co_tables(i1)% dXC_lookup
          dXO1_lookup = co_tables(i1)% dXO_lookup
-         
+
          call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i2, logRho, logT,  &
                      logK2, dlogK2_dlogRho, dlogK2_dlogT, ierr)
          if (ierr /= 0) return
          dXC2_lookup = co_tables(i2)% dXC_lookup
          dXO2_lookup = co_tables(i2)% dXO_lookup
-         
+
          call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i3, logRho, logT,  &
                      logK3, dlogK3_dlogRho, dlogK3_dlogT, ierr)
          if (ierr /= 0) return
          dXC3_lookup = co_tables(i3)% dXC_lookup
          dXO3_lookup = co_tables(i3)% dXO_lookup
-         
+
          if (i4 > 0) then
             call Get_CO_Kap_for_logRho_logT(rq, x_tables, ix, co_tables, i4, logRho, logT,  &
                      logK4, dlogK4_dlogRho, dlogK4_dlogT, ierr)
@@ -746,14 +746,14 @@
             dXC4_lookup = dXC3_lookup
             dXO4_lookup = dXO3_lookup
          end if
-                     
+
          if (dXC >= dXO) then ! use values on lines i1-i3 and i2-i4 at dXO
-         
+
             call Get_Kap_at_dXO(dXO_lookup, &
                            dXC2_lookup, dXO2_lookup, logK2, dlogK2_dlogRho, dlogK2_dlogT,  &
                            dXC4_lookup, dXO4_lookup, logK4, dlogK4_dlogRho, dlogK4_dlogT,  &
                            logK_2_4, dlogK_2_4_dlogRho, dlogK_2_4_dlogT, dXC_2_4_lookup)
-            
+
             call Get_Kap_at_dXO(dXO_lookup, &
                            dXC1_lookup, dXO1_lookup, logK1, dlogK1_dlogRho, dlogK1_dlogT,  &
                            dXC3_lookup, dXO3_lookup, logK3, dlogK3_dlogRho, dlogK3_dlogT,  &
@@ -763,9 +763,9 @@
             else
                alfa = (dXC_lookup - dXC_2_4_lookup) / (dXC_1_3_lookup - dXC_2_4_lookup)
             end if
-            
+
          else ! use values on lines i1-i3 and i2-i4 at dXC
-         
+
             call Get_Kap_at_dXC(dXC_lookup, &
                            dXC2_lookup, dXO2_lookup, logK2, dlogK2_dlogRho, dlogK2_dlogT,  &
                            dXC4_lookup, dXO4_lookup, logK4, dlogK4_dlogRho, dlogK4_dlogT,  &
@@ -780,7 +780,7 @@
             else
                alfa = (dXO_lookup - dXO_2_4_lookup) / (dXO_1_3_lookup - dXO_2_4_lookup)
             end if
-         
+
          end if
 
          beta = 1d0 - alfa
@@ -788,7 +788,7 @@
          logK = alfa*logK_1_3 + beta*logK_2_4
          dlogK_dlogRho = alfa*dlogK_1_3_dlogRho + beta*dlogK_2_4_dlogRho
          dlogK_dlogT = alfa*dlogK_1_3_dlogT + beta*dlogK_2_4_dlogT
-         
+
          if (is_bad(logK)) then
             ierr = -1
             return
@@ -810,10 +810,10 @@
             write(*,1) 'dXO', dXO
             call mesa_error(__FILE__,__LINE__,'Get_Kap_for_dXCO')
          end if
-         
-         contains       
-         
-         
+
+         contains
+
+
          logical function matches_table(i)
             integer :: i
             if (i < 1 .or. i > num_CO_tables) then
@@ -841,24 +841,24 @@
             real(dp), intent(in) :: logK_b, dlogK_b_dlogRho, dlogK_b_dlogT
             real(dp), intent(out) :: logK_a_b, dlogK_a_b_dlogRho, dlogK_a_b_dlogT
             real(dp), intent(out) :: dXC_a_b_lookup
-            
+
             real(dp) :: alfa, beta
-            
+
             if (dXO_a_lookup == dXO_b_lookup) then
                alfa = 0d0
             else
                alfa = (dXO_lookup - dXO_b_lookup) / (dXO_a_lookup - dXO_b_lookup)
             end if
-               
+
             dXC_a_b_lookup = dXC_b_lookup + (dXC_a_lookup - dXC_b_lookup)*alfa
             beta = 1d0 - alfa
             logK_a_b = alfa*logK_a + beta*logK_b
             dlogK_a_b_dlogRho = alfa*dlogK_a_dlogRho + beta*dlogK_b_dlogRho
             dlogK_a_b_dlogT = alfa*dlogK_a_dlogT + beta*dlogK_b_dlogT
-            
+
          end subroutine Get_Kap_at_dXO
-         
-         
+
+
          subroutine Get_Kap_at_dXC(dXC_lookup, &
                            dXC_a_lookup, dXO_a_lookup, logK_a, dlogK_a_dlogRho, dlogK_a_dlogT,  &
                            dXC_b_lookup, dXO_b_lookup, logK_b, dlogK_b_dlogRho, dlogK_b_dlogT,  &
@@ -870,44 +870,44 @@
             real(dp), intent(in) :: logK_b, dlogK_b_dlogRho, dlogK_b_dlogT
             real(dp), intent(out) :: logK_a_b, dlogK_a_b_dlogRho, dlogK_a_b_dlogT
             real(dp), intent(out) :: dXO_a_b_lookup
-            
+
             real(dp) :: alfa, beta
-            
+
             if (dXC_a_lookup == dXC_b_lookup) then
                alfa = 0d0
             else
                alfa = (dXC_lookup - dXC_b_lookup) / (dXC_a_lookup - dXC_b_lookup)
             end if
-            
+
             dXO_a_b_lookup = dXO_b_lookup + (dXO_a_lookup - dXO_b_lookup)*alfa
             beta = 1d0 - alfa
-            
+
             logK_a_b = alfa*logK_a + beta*logK_b
             dlogK_a_b_dlogRho = alfa*dlogK_a_dlogRho + beta*dlogK_b_dlogRho
             dlogK_a_b_dlogT = alfa*dlogK_a_dlogT + beta*dlogK_b_dlogT
-            
+
          end subroutine Get_Kap_at_dXC
 
 
       end subroutine Get_Kap_for_dXCO
 
-         
+
       subroutine Find_CO_Tables( &
                   rq, x_tables, ix, CO_table_numbers, next_dXO_table, next_dXC_table,  &
                   co_tables, num_CO_tables, num_dXC_gt_dXO, &
                   dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup, i1, i2, i3, i4, ierr)
-      
-         ! for linear interpolation to be smooth, 
+
+         ! for linear interpolation to be smooth,
          ! must use the smallest convex hull around the given point
          use kap_def
          use load_CO_kap
-         
+
          type (Kap_General_Info), pointer :: rq
          type (Kap_CO_X_Table), dimension(:), pointer :: x_tables
          integer :: ix
          integer, intent(in) :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs)
-         integer, intent(in) :: next_dXO_table(max_num_CO_tables) 
-         integer, intent(in) :: next_dXC_table(max_num_CO_tables) 
+         integer, intent(in) :: next_dXO_table(max_num_CO_tables)
+         integer, intent(in) :: next_dXC_table(max_num_CO_tables)
          type (Kap_CO_Table), dimension(:), pointer :: co_tables
          integer, intent(in) :: num_CO_tables, num_dXC_gt_dXO
          real(dp), intent(in) :: dXCO_max, dXC, dXO, dXC_lookup, dXO_lookup
@@ -917,11 +917,11 @@
          real(dp) :: dXC2_lookup, dXO2_lookup, dXC4_lookup, dXO4_lookup
          integer :: idXC, idXO
          real(dp), parameter :: tiny = 1d-7
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          if (dbg) write(*,*) 'enter Find_CO_Tables'
          if (dbg) write(*,*) 'associated(co_tables)', associated(co_tables)
          if (dbg) write(*,*) 'size(co_tables,dim=1)', size(co_tables,dim=1)
@@ -929,19 +929,19 @@
          if (dbg) write(*,2) 'num_CO_tables', num_CO_tables
 
          ierr = 0
-         
+
          ! find idXC s.t. kap_CO_dXs(idXC-1) < dXC <= kap_CO_dXs(idXC)
          do idXC = 2, num_kap_CO_dXs
             if (kap_CO_dXs(idXC) >= dXC) exit
          end do
          if (dbg) write(*,2) 'idXC', idXC
-         
+
          ! find idXO s.t. kap_CO_dXs(idXO-1) < dXO <= kap_CO_dXs(idXO)
          do idXO = 2, num_kap_CO_dXs
             if (kap_CO_dXs(idXO) >= dXO) exit
          end do
          if (dbg) write(*,2) 'idXO', idXO
-         
+
          i1 = CO_table_numbers(idXC-1,idXO-1)
          if (dbg) write(*,2) 'i1', i1
          if (matches_table(i1)) then
@@ -949,7 +949,7 @@
             if (dbg) write(*,2) 'matches_table(i1)', i1
             return
          end if
-         
+
          if (dbg) write(*,*) '(dXC >= dXO)', (dXC >= dXO)
          if (dXC >= dXO) then
             i2 = CO_table_numbers(idXC,idXO-1)
@@ -967,20 +967,20 @@
 
          if (i4 > 0) then
             if (i1 <= 0 .or. i2 <= 0 .or. i3 <= 0) then
-            
+
                write(*,2) 'i1', i1
                write(*,2) 'i2', i2
                write(*,2) 'i3', i3
                write(*,2) 'i4', i4
                write(*,2) 'idXC', idXC
                write(*,2) 'idXO', idXO
-               
+
                write(*,1) 'dXCO_max', dble(dXCO_max)
                write(*,1) 'dXC', dble(dXC)
                write(*,1) 'dXO', dble(dXO)
                write(*,1) 'dXC_lookup', dble(dXC_lookup)
                write(*,1) 'dXO_lookup', dble(dXO_lookup)
-               
+
                call mesa_error(__FILE__,__LINE__,'logical failure1 in looking for CO tables')
             end if
             if (matches_table(i2)) then
@@ -994,7 +994,7 @@
             end if
             return
          end if
-        
+
          if (on_midline(i1)) then ! middle triangle
             if (dXC >= dXO) then
                i2 = next_dXC_table(i1)
@@ -1005,11 +1005,11 @@
             end if
             return
          end if
-         
+
          ! trapezoid or triangle near the diagonal boundary
-            
+
          if (dXC >= dXO) then
-         
+
             if (i3 <= 0) then
                if (on_diagonal(i1)) then
                   i3 = num_CO_tables
@@ -1020,7 +1020,7 @@
                   i3 = num_dXC_gt_dXO
                end if
             end if
-            
+
             if (.not. on_diagonal(i3)) then
                i4 = next_dXC_table(i3)
                if (.not. on_diagonal(i4)) then ! bail -- just use i1
@@ -1029,8 +1029,8 @@
             end if
             if (i2 <= 0) i2 = next_dXC_table(i1)
             if (on_diagonal(i2)) return
-            
-            
+
+
             dXC4_lookup = co_tables(i4)% dXC_lookup
             if (dXC_lookup <= dXC4_lookup) return
             ! check if on smaller dXC_lookup side of the line from i2 to i4
@@ -1045,11 +1045,11 @@
                i2 = -1; i3 = -1; i4 = -1; return
             end if
             i3 = i4; i4 = -1
-            
+
          else ! dXC < dXO
-         
+
             ! reverse roles of dXC and dXO
-         
+
             if (i3 <= 0) then ! must be in one of the triangles
                if (on_diagonal(i1)) then
                   i3 = num_dXC_gt_dXO
@@ -1082,13 +1082,13 @@
                i2 = -1; i3 = -1; i4 = -1; return
             end if
             i3 = num_CO_tables; i4 = -1
-         
+
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          logical function matches_table(i)
             integer :: i
             include 'formats'
@@ -1101,8 +1101,8 @@
             end if
             if (dbg) write(*,*) 'matches_table', matches_table
          end function matches_table
-         
-         
+
+
          logical function on_midline(i)
             integer :: i
             if (abs(co_tables(i)% dXC - co_tables(i)% dXO) < tiny) then
@@ -1111,8 +1111,8 @@
                on_midline = .false.
             end if
          end function on_midline
-         
-         
+
+
          logical function on_diagonal(i)
             integer :: i
             if (abs((co_tables(i)% dXC + co_tables(i)% dXO) - dXCO_max) < tiny) then
@@ -1121,11 +1121,11 @@
                on_diagonal = .false.
             end if
          end function on_diagonal
-         
+
 
       end subroutine Find_CO_Tables
 
-      
+
       subroutine Get_CO_Kap_for_logRho_logT( &
                rq, x_tables, ix, co_tables, ico, &
                logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
@@ -1145,16 +1145,16 @@
          logical :: clipped_logR
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          if (dbg) write(*,1) 'enter Get_CO_Kap_for_logRho_logT', logRho, logT
-         
+
          ierr = 0
 
          ! logR from inputs
          logR_in = logRho - 3d0*logT + 18d0
-         
+
          ! blends at higher levels MUST prevent
          ! these tables from being called off their
          ! high/low T and low R edges
@@ -1174,7 +1174,7 @@
             return
          end if
 
-         
+
          ! off the high R edge, we use the input temperature
          ! but clip logR to the table edge value
 
@@ -1231,7 +1231,7 @@
             iR, jtemp, logR0, logR, logR1, logT0, logT, logT1, &
             logK, df_dx, df_dy)
          if (clipped_logR) df_dx = 0
-         
+
          if (dbg) write(*,1) 'Do_Kap_Interpolations: logK', logK
 
          ! convert df_dx and df_dy to dlogK_dlogRho, dlogK_dlogT
@@ -1244,4 +1244,4 @@
 
 
       end module kap_eval_co
-      
+

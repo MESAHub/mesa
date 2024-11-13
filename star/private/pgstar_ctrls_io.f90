@@ -716,7 +716,7 @@
             logg_Teff_file_width, &
             logg_Teff_file_aspect_ratio, &
             logg_Teff_use_decorator, &
-            
+
             logL_Teff_win_flag, &
             logL_Teff_file_flag, &
             show_logL_Teff_target_box, &
@@ -753,7 +753,7 @@
             logL_Teff_file_width, &
             logL_Teff_file_aspect_ratio, &
             logL_Teff_use_decorator, &
-            
+
             logL_R_win_flag, &
             logL_R_file_flag, &
             show_logL_R_target_box, &
@@ -1245,7 +1245,7 @@
             History_Track2_txt_scale, &
             History_Track2_title, &
             History_Track2_use_decorator, &
-            
+
             History_Track3_win_flag, &
             History_Track3_file_flag, &
             History_Track3_file_interval, &
@@ -2147,7 +2147,7 @@
             History_Panels9_ymargin, &
             History_Panels9_other_ymargin, &
             History_Panels9_use_decorator, &
-            
+
             History_Panel_points_error_bars, &
             History_Panel_points_interval, &
             History_Panel_points_marker, &
@@ -2639,7 +2639,7 @@
             Summary_Burn_title, &
             Summary_Burn_title_shift, &
             Summary_Burn_use_decorator, &
-            
+
             Summary_Profile_win_flag, &
             Summary_Profile_file_flag, &
             Summary_Profile_file_interval, &
@@ -2664,7 +2664,7 @@
             Summary_Profile_legend, &
             Summary_Profile_num_lines, &
             Summary_Profile_use_decorator, &
-            
+
             Summary_History_win_flag, &
             Summary_History_file_flag, &
             Summary_History_file_interval, &
@@ -3136,7 +3136,7 @@
             read_extra_pgstar_inlist(i) = .false.
             extra(i) = extra_pgstar_inlist_name(i)
             extra_pgstar_inlist_name(i) = 'undefined'
-   
+
             if (read_extra(i)) then
                call read_pgstar_file(s, extra(i), level+1, ierr)
                if (ierr /= 0) return
@@ -4631,7 +4631,7 @@
          s% pg% History_Track4_txt_scale = History_Track4_txt_scale
          s% pg% History_Track4_title = History_Track4_title
          s% pg% History_Track4_use_decorator = History_Track4_use_decorator
-         
+
          s% pg% History_Track5_win_flag = History_Track5_win_flag
          s% pg% History_Track5_file_flag = History_Track5_file_flag
          s% pg% History_Track5_file_interval = History_Track5_file_interval
@@ -4721,7 +4721,7 @@
          s% pg% History_Track6_txt_scale = History_Track6_txt_scale
          s% pg% History_Track6_title = History_Track6_title
          s% pg% History_Track6_use_decorator = History_Track6_use_decorator
-         
+
          s% pg% History_Track7_win_flag = History_Track7_win_flag
          s% pg% History_Track7_file_flag = History_Track7_file_flag
          s% pg% History_Track7_file_interval = History_Track7_file_interval
@@ -4996,7 +4996,7 @@
          s% pg% profile_mass_point_str_clr = profile_mass_point_str_clr
          s% pg% profile_mass_point_str_scale = profile_mass_point_str_scale
          s% pg% TRho_Profile_use_decorator = TRho_Profile_use_decorator
- 
+
 
          s% pg% History_Panels1_win_flag = History_Panels1_win_flag
          s% pg% History_Panels1_win_width = History_Panels1_win_width
@@ -5385,7 +5385,7 @@
          s% pg% History_Panels9_ymargin = History_Panels9_ymargin
          s% pg% History_Panels9_other_ymargin = History_Panels9_other_ymargin
          s% pg% History_Panels9_use_decorator = History_Panels9_use_decorator
-         
+
          s% pg% History_Panel_points_error_bars = History_Panel_points_error_bars
          s% pg% History_Panel_points_interval = History_Panel_points_interval
          s% pg% History_Panel_points_marker = History_Panel_points_marker
@@ -5826,7 +5826,7 @@
          s% pg% Summary_Burn_title = Summary_Burn_title
          s% pg% Summary_Burn_title_shift = Summary_Burn_title_shift
          s% pg% Summary_Burn_use_decorator = Summary_Burn_use_decorator
-         
+
          s% pg% Summary_Profile_win_flag = Summary_Profile_win_flag
          s% pg% Summary_Profile_file_flag = Summary_Profile_file_flag
          s% pg% Summary_Profile_file_interval = Summary_Profile_file_interval
@@ -5931,7 +5931,7 @@
          s% pg% Abundance_txt_scale = Abundance_txt_scale
          s% pg% Abundance_title = Abundance_title
          s% pg% Abundance_use_decorator = Abundance_use_decorator
-         
+
          s% pg% dPg_dnu_win_flag = dPg_dnu_win_flag
          s% pg% dPg_dnu_file_flag = dPg_dnu_file_flag
          s% pg% dPg_dnu_xleft = dPg_dnu_xleft

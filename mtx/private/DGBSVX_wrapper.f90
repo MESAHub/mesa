@@ -46,7 +46,7 @@
 
          ! Fixed arguments
 
-         FACT = 'N' ! We've already equilibrated the matrix            
+         FACT = 'N' ! We've already equilibrated the matrix
          TRANS = 'N' ! This argument is irrelevant if FACT == 'N'
          EQUED = 'N' ! No equilibration
          NRHS = 1                ! Number of columns in equ for A.x=b.
@@ -70,7 +70,7 @@
          ! (k,j) -> (n_upper_bands+1+k-j,j)
          AB = 0d0
 
-         ! In the upper bands, upper band i at index j (bands(i,j)) corresponds to 
+         ! In the upper bands, upper band i at index j (bands(i,j)) corresponds to
          ! position (j, n_upper_bands - i + j + 1) in the matrix. This is then
          ! position (i, n_upper_bands - i + j + 1) in AB.
          do i=1,n_upper_bands
@@ -79,7 +79,7 @@
             end do
          end do
 
-         ! In the lower bands, lower band i+1+n_upper_bands at index j corresponds to 
+         ! In the lower bands, lower band i+1+n_upper_bands at index j corresponds to
          ! position (i+j, j) in the matrix. This is then
          ! position (n_upper_bands+1+i, j) in AB.
          do i=1,n_lower_bands
@@ -106,7 +106,7 @@
             write(*,*) 'ierr = ', ierr
             write(*,*) 'N = ', matrix_size
 
-            open(unit=10, file="bands.data")            
+            open(unit=10, file="bands.data")
             do j=1,LDAB
                do i=1,matrix_size
                   write(10,*) bands(j,i)
@@ -163,15 +163,15 @@
 
          ! Fixed arguments
 
-         FACT = 'N' ! We've already equilibrated the matrix            
+         FACT = 'N' ! We've already equilibrated the matrix
          TRANS = 'N' ! This argument is irrelevant if FACT == 'N'
          EQUED = 'N' ! No equilibration
          N = nblocks * nvar ! Number of equations
-         KL = 2 * nvar ! Number of lower bands. We round up to the max number 
+         KL = 2 * nvar ! Number of lower bands. We round up to the max number
                        ! which could be held by the block triadiagonal matrix.
                        ! If performance is ever an issue this solve can be sped
                        ! up by tightening KL.
-         KU = 2 * nvar ! Number of upper bands. We round up to the max number 
+         KU = 2 * nvar ! Number of upper bands. We round up to the max number
                        ! which could be held by the block triadiagonal matrix.
                        ! If performance is ever an issue this solve can be sped
                        ! up by tightening KU.

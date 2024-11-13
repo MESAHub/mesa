@@ -58,11 +58,11 @@ program test_auto_diff
       x = 3d0
       x%d1Array(4) = 1d0
       do i=1,15
-         if (i /= 4) then    
+         if (i /= 4) then
             call should_print0('', 0d0, x%d1Array(i))
          else
             call should_print0('', 1d0, x%d1Array(i))
-         end if            
+         end if
       end do
 
       call header('Testing unary operators')

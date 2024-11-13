@@ -28,9 +28,9 @@
       use math_lib
       use utils_lib, only: is_bad, mesa_error
       use mtx_def, only: lapack
-      
+
       implicit none
-      
+
 
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
 
@@ -40,14 +40,14 @@
 
 
       contains
-      
-      
-            
+
+
+
       subroutine netint( &
             start,stptry,stpmin,max_steps,stopp,y, &
             eps,species,nvar,nok,nbad,nstp,odescal,dens_dfdy,dmat, &
             derivs,jakob,burner_finish_substep,ierr)
-      
+
 ! input:
 ! start    = beginning integration point
 ! stptry   = suggested first step size
@@ -70,13 +70,13 @@
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
       integer, intent(out) :: ierr
-      
+
       interface
          include 'burner_derivs.inc'
-      end interface         
+      end interface
       interface
          include 'burner_jakob.inc'
-      end interface         
+      end interface
       interface
          include 'burner_finish_substep.inc'
       end interface
@@ -87,7 +87,7 @@
       real(dp) :: yscal(nvar),dydx(nvar),cons,x,h,hdid,hnext,xx
       real(dp), parameter  :: tiny=1.0d-15
 
-      
+
       real(dp) :: y0(nvar),a(stifbs_imax),alf(kmaxx,kmaxx),epsold,xnew,scale,red
       integer :: i,kmax,kopt,nseq(stifbs_imax),nvold
       logical :: first
@@ -104,7 +104,7 @@
       nok    = 0
       nbad   = 0
       ierr = 0
-      
+
       do i=1,nvar
          y0(i) = y(i)
       end do
@@ -122,7 +122,7 @@
          end if
          y(i) = min(1.0d0, max(y(i),1.0d-30))
        end do
-               
+
        call burner_finish_substep(nstp, x, y, ierr)
        if (ierr /= 0) return
 
@@ -132,7 +132,7 @@
          return
          write(*,*) 'derivs failed in netint'
        end if
-       
+
       do i=1,nvar
          yscal(i) = max(odescal,abs(y(i)))
       end do
@@ -166,7 +166,7 @@
 ! normal timestep choice
        h = hnext
 
-! die 
+! die
        if (abs(h).lt.stpmin) then
         write(*,*) 'netint failed: abs(h).lt.stpmin', abs(h), stpmin
         ierr = -1
@@ -180,7 +180,7 @@
         write(6,230) (y0(i), i=1,nvar)
         write(6,220) 'current composition:'
         write(6,230) (y(i), i=1,nvar)
-        
+
         !call mesa_error(__FILE__,__LINE__,'h < stpmin in netint')
 
 210     format(1x,a,4i6)
@@ -198,7 +198,7 @@
       end subroutine netint
 
 
-      
+
 
       subroutine stifbs(y,dydx,nvar,x,htry,eps,yscal,hdid,hnext, &
             a,alf,epsold,first,kmax,kopt,nseq,nvold,xnew,scale,red, &
@@ -224,13 +224,13 @@
 
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
-      
+
       interface
          include 'burner_derivs.inc'
-      end interface         
+      end interface
       interface
          include 'burner_jakob.inc'
-      end interface         
+      end interface
 
       logical          reduct
       integer          nvar
@@ -246,7 +246,7 @@
       integer          nstp, ierr2
 
       ierr = 0
-      
+
 ! a new tolerance or a new number, so reinitialize
       if (eps .ne. epsold  .or.  nvar .ne. nvold) then
        hnext = -1.0d29
@@ -336,9 +336,9 @@
 
          write(*,*) 'simpr failed in stifbs'
          return
-         
-         
-         
+
+
+
        end if
        xest = (h/nseq(k))*(h/nseq(k))
        call net_pzextr(k,xest,yseq,y,yerr,nvar,qcol,x_pzextr)
@@ -432,13 +432,13 @@
          derivs,ierr)
 !
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
-      
+
       interface
          include 'burner_derivs.inc'
       end interface
-      
+
       integer, intent(out) :: ierr
-      
+
       integer          nvar,nstep
       integer          i,j,nn,ii
       real(dp) y(:),dydx(:),xs,htot, &
@@ -447,7 +447,7 @@
 !..for the linear algebra
       integer, target :: indx_a(nvar)
       integer, pointer :: indx(:)
-      
+
       include 'formats'
 
       indx => indx_a
@@ -456,22 +456,22 @@
       h = htot/nstep
       do j=1,nvar
        do i=1,nvar
-        dmat(i,j) = -h * dens_dfdy(i,j) 
+        dmat(i,j) = -h * dens_dfdy(i,j)
        enddo
       enddo
       do i=1,nvar
        dmat(i,i) = 1.0d0 + dmat(i,i)
       end do
 
-!..factor the matrix 
-      call my_getf2(nvar, dmat, nvar, indx, ierr)  
+!..factor the matrix
+      call my_getf2(nvar, dmat, nvar, indx, ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'my_getf2 failed in simpr'
          return
-      end if    
+      end if
 
 ! use yout as temporary storage; the first step
-      do i=1,nvar 
+      do i=1,nvar
          yout(i) = h * dydx(i)
          if (dbg) then
             if (is_bad(yout(i))) then
@@ -480,44 +480,44 @@
             end if
          end if
       enddo
-      
-      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)  
+
+      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'my_getrs1 failed in simpr'
          return
-      end if     
+      end if
 
       do i=1,nvar
          del(i)   = yout(i)
          ytemp(i) = y(i) + del(i)
          if (dbg) then
             if (is_bad(ytemp(i))) then
-         
+
                do j=1,nvar
                 do ii=1,nvar
-                 if (dens_dfdy(ii,j) /= 0) write(*,3) 'dens_dfdy(ii,j)', ii, j, dens_dfdy(ii,j) 
+                 if (dens_dfdy(ii,j) /= 0) write(*,3) 'dens_dfdy(ii,j)', ii, j, dens_dfdy(ii,j)
                 enddo
                enddo
-            
+
                do ii=1,nvar
                  if (dydx(ii) /= 0) write(*,2) 'dydx(ii)', ii, dydx(ii)
                enddo
-            
+
                do j=1,nvar
                 do ii=1,nvar
-                 if (dmat(ii,j) /= 0) write(*,3) 'dmat(ii,j)', ii, j, dmat(ii,j) 
+                 if (dmat(ii,j) /= 0) write(*,3) 'dmat(ii,j)', ii, j, dmat(ii,j)
                 enddo
                enddo
-            
+
                do ii=1,nvar
                  if (yout(ii) /= 0) write(*,2) 'yout(ii)', ii, yout(ii)
                enddo
-            
+
                write(*,*) 'first step: bad ytemp in simpr nstep i ytemp', nstep, i, ytemp(i), del(i), y(i)
                call mesa_error(__FILE__,__LINE__,'simpr')
-            
+
             end if
-            
+
          end if
       enddo
 
@@ -531,8 +531,8 @@
 ! use yout as temporary storage; general step
 
       do nn=2,nstep
-       do 15 i=1,nvar 
-        yout(i) = h*yout(i) - del(i) 
+       do 15 i=1,nvar
+        yout(i) = h*yout(i) - del(i)
          if (dbg) then
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr nn i yout', nn, i, yout(i)
@@ -540,11 +540,11 @@
             end if
          end if
 15     continue
-      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)  
+      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'my_getrs1 failed in simpr'
          return
-      end if     
+      end if
        do i=1,nvar
         del(i)   = del(i) + 2.0d0 * yout(i)
         ytemp(i) = ytemp(i) + del(i)
@@ -565,21 +565,21 @@
       enddo
 
 ! take the last step
-      do 18 i=1,nvar 
-       yout(i) = h * yout(i) - del(i)  
-         if (dbg) then 
+      do 18 i=1,nvar
+       yout(i) = h * yout(i) - del(i)
+         if (dbg) then
             if (is_bad(yout(i))) then
                write(*,*) 'bad yout in simpr last step: nstep i yout', nstep, i, yout(i)
                call mesa_error(__FILE__,__LINE__,'simpr')
             end if
          end if
 18    continue
-      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)  
+      call my_getrs1(nvar, dmat, nvar, indx, yout, nvar, ierr)
       if (ierr /= 0) then
          write(*,*) 'my_getrs1 failed in simpr'
          return
-      end if     
-      
+      end if
+
       do i=1,nvar
          yout(i) = ytemp(i) + yout(i)
          if (dbg) then
@@ -592,8 +592,8 @@
 
       return
       end subroutine simpr
-      
-      
+
+
       subroutine net_pzextr(iest,xest,yest,yz,dy,nvar,qcol,x)
 ! use polynomial extrapolation to evaluate nvar functions at x=0 by fitting
 ! a polynomial to a sequence of estimates with progressively smaller values
@@ -653,11 +653,11 @@
       return
       end subroutine net_pzextr
 
-      
+
       include 'mtx_solve_routines.inc'
 
 
-      
+
 
       end module net_burn_support
 

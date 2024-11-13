@@ -1,6 +1,6 @@
 
       program test_num
-      
+
       use test_support
       use test_brent
       use test_newuoa
@@ -9,24 +9,24 @@
       !use test_radau5_pollu, only: do_test_radau5_pollu
       !use test_radau5_hires, only: do_test_radau5_hires
       use test_int_support
-      
+
       use test_beam
       use test_chemakzo
       use test_medakzo
       use test_vdpol
-      
+
       use test_diffusion
       use test_simplex
 
       use test_integrate
-            
+
       use const_def
       use const_lib
       use num_def
       use mtx_lib
       use mtx_def
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
 
@@ -37,26 +37,26 @@
       logical :: do_numerical_jacobian, m_band, j_band, quiet
       character (len=32) :: my_mesa_dir
 
-      my_mesa_dir = '../..'         
-      call const_init(my_mesa_dir,ierr)     
+      my_mesa_dir = '../..'
+      call const_init(my_mesa_dir,ierr)
       if (ierr /= 0) then
          write(*,*) 'const_init failed'
          call mesa_error(__FILE__,__LINE__)
-      end if        
+      end if
       call math_init()
 
-      quiet = .false.   
-      m_band = .false.   
-      j_band = .false.   
-      do_numerical_jacobian = .false.   
+      quiet = .false.
+      m_band = .false.
+      j_band = .false.
+      do_numerical_jacobian = .false.
       decsol = lapack
 
       ! newton solver
       do_numerical_jacobian = .false.
- 
+
       write(*,*) 'call do_test_newton lapack'
       call do_test_newton(do_numerical_jacobian, lapack)
- 
+
       write(*,*) 'call do_test_newton block_thomas_dble'
       call do_test_newton(do_numerical_jacobian, block_thomas_dble)
 
@@ -88,7 +88,7 @@
       call test_root_with_brackets
       call test_root2
       call test_root3
-      
+
       ! explicit solvers
       call test_dopri(.false.,show_all)
       call test_dopri(.true.,show_all)
@@ -103,14 +103,14 @@
       do_numerical_jacobian = .true.
       do i=1,num_solvers
          call do_test_vdpol(i,decsol,do_numerical_jacobian,show_all,quiet)
-      end do    
+      end do
 
       write(*,*) 'analytical jacobians'
       do_numerical_jacobian = .false.
       do i=1,num_solvers
          call do_test_vdpol(i,decsol,do_numerical_jacobian,show_all,quiet)
       end do
-      
+
       ! test each implicit solver with banded matrix
       !   ijob      M     J           test
       !     2       I     B           medakzo
@@ -122,15 +122,15 @@
          if (i <= ros3p_solver) cycle
          call do_test_medakzo(i,decsol,do_numerical_jacobian,show_all,quiet)
       end do
-      
-      
+
+
       write(*,*) 'analytical jacobians'
       do_numerical_jacobian = .false.
       do i=1,num_solvers
          if (i <= ros3p_solver) cycle
          call do_test_medakzo(i,decsol,do_numerical_jacobian,show_all,quiet)
       end do
-      
+
 
 ! as of dec, 2013, non-identity mass matrix causes diff results with ifort vs gfortran
 !      ! test each implicit solver with banded implicit ODE system and dense matrix
@@ -155,8 +155,8 @@
 !         if (i <= ros3p_solver) cycle
 !         call do_test_chemakzo(i,decsol,m_band,do_numerical_jacobian,show_all,quiet)
 !      end do
-            
-            
+
+
       ! test with m1 /= 0
       !   ijob      M     J           test
       !    11       I     F     x     beam

@@ -78,8 +78,8 @@
                   end if
                end do
             end if
-         end do  
-                
+         end do
+
          if (s% eps_nuc_factor == 0d0) then
             s% power_nuc_burn = 0d0
             s% power_nuc_neutrinos = 0d0
@@ -89,7 +89,7 @@
             s% power_he_burn = 0d0
             s% power_z_burn = 0d0
             s% power_photo = 0d0
-         else            
+         else
             ! better if set power_nuc_burn using eps_nuc instead of categories
             ! categories can be subject to numerical jitters at very high temperatures
             s% power_nuc_burn = 0d0
@@ -101,14 +101,14 @@
                end if
                s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
             end do
-            s% power_nuc_burn = s% power_nuc_burn/Lsun            
+            s% power_nuc_burn = s% power_nuc_burn/Lsun
             s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)
             s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
             s% power_photo = s% L_by_category(iphoto)
          end if
-         
+
          if (s% non_nuc_neu_factor == 0d0) then
             s% power_nonnuc_neutrinos = 0d0
          else
@@ -117,7 +117,7 @@
          end if
          s% power_neutrinos = s% power_nuc_neutrinos + s% power_nonnuc_neutrinos
          s% L_nuc_burn_total = s% power_nuc_burn
-         
+
          contains
 
          real(dp) function center_value_eps_burn(j)
@@ -158,7 +158,7 @@
 
          include 'formats'
 
-         ierr = 0         
+         ierr = 0
          nz = s% nz
          net_iso => s% net_iso
 
@@ -173,7 +173,7 @@
          si28 = net_iso(isi28)
          co56 = net_iso(ico56)
          ni56 = net_iso(ini56)
-         
+
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
             ! log10(stellar radius in solar units)
@@ -204,7 +204,7 @@
             s% center_omega = center_value(s, s% omega)
             s% center_omega_div_omega_crit = center_omega_div_omega_crit()
          end if
-         
+
          luminosity = s% L(1)
 
          if (s% u_flag) then
@@ -216,7 +216,7 @@
          end if
 
          call set_surf_avg_rotation_info(s)
-         
+
          call set_min_gamma1(s)
 
          ! s% time is in seconds
@@ -228,27 +228,27 @@
             s% time_days = 0d0
             s% time_years = 0d0
          end if
-         
+
          ! s% dt is in seconds
          s% time_step = s% dt/secyer         ! timestep in years
          s% dt_years = s% dt/secyer
          s% dt_days = s% dt/secday
-         
+
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
-         
+
          if (is_bad(s% kh_timescale)) then
             write(*,1) 's% kh_timescale', s% kh_timescale
             write(*,1) 's% cgrav(1)', s% cgrav(1)
             write(*,1) 'mstar', mstar
             write(*,1) 'radius', radius
             write(*,1) 'luminosity', luminosity
-            stop 
+            stop
          end if
-         
+
          if (luminosity > 0d0) then
             s% nuc_timescale = 1d10*s% star_mass/(luminosity/Lsun)
          else
@@ -262,7 +262,7 @@
          end if
 
          ! center_avg_x and surface_avg_x check if the species is not in the net
-         ! and set's the values to 0 if so. So dont check species here. 
+         ! and set's the values to 0 if so. So dont check species here.
          s% center_h1 = center_avg_x(s,h1)
          s% surface_h1 = surface_avg_x(s,h1)
          s% center_he3 = center_avg_x(s,he3)
@@ -304,7 +304,7 @@
                if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
-            
+
             if (s% u_flag) then
                v = s% u(k)
             else if (s% v_flag) then
@@ -319,7 +319,7 @@
                if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
-            
+
             s% v_div_csound(k) = v/s% csound_face(k)
             if (is_bad(s% v_div_csound(k))) then
                ierr = -1
@@ -330,7 +330,7 @@
             end if
 
          end do
-         
+
          call set_phot_info(s)
 
          if (s% photosphere_r*Rsun >= s% r(1)) then
@@ -353,10 +353,10 @@
                s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
-         
+
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
-         
+
          s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% astero_Teff_sun))
          s% acoustic_cutoff = &
@@ -416,12 +416,12 @@
                   if (s% m(k) < Msun * s% fe_core_mass) exit
                   if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
-   
+
                if ((mass_sum > s% non_fe_core_infall_mass*msun) .and. &
                    (s%m(k_min) <= s% he_core_mass * msun)) then
                   s% non_fe_core_infall = -velocity(k_min)
                end if
-               
+
                s% non_fe_core_rebound = maxval(velocity(s%he_core_k:s%fe_core_k),dim=1)
 
             end if
@@ -457,7 +457,7 @@
                   do k = j+1, s% n_conv_regions
                      if (s% cz_bot_mass(k) - s% cz_top_mass(k-1) >= dm_limit) exit
                      s% mass_conv_core = s% cz_top_mass(k)/Msun
-                  end do 
+                  end do
                   exit
                end if
             end do
@@ -892,7 +892,7 @@
          s% star_mass_n14 = s% star_mass_n14 / Msun
          s% star_mass_o16 = s% star_mass_o16 / Msun
          s% star_mass_ne20 = s% star_mass_ne20 / Msun
-         
+
          call get_core_info(s)
          call get_shock_info(s)
 
@@ -991,7 +991,7 @@
             mach1_k = 0
             return
          end if
-         
+
          mach1_radius = r/Rsun
          mach1_k = k
          if (k < s% nz) then

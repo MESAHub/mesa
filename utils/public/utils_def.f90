@@ -25,20 +25,20 @@
 
       module utils_def
       implicit none
-      
+
       integer, parameter :: min_io_unit = 29
       integer, parameter :: max_io_unit = 99
-      
-      
+
+
       integer, parameter :: eof_token = 1
       integer, parameter :: string_token = 2
       integer, parameter :: name_token = 3
       integer, parameter :: left_paren_token = 4
       integer, parameter :: right_paren_token = 5
       integer, parameter :: comma_token = 6
-            
+
       integer, parameter :: maxlen_key_string = 50
-      
+
       ! see http://en.wikipedia.org/wiki/AVL_tree
       type integer_dict
          character (len=maxlen_key_string) :: key
@@ -52,8 +52,8 @@
       type hash_entry
          type (integer_dict), pointer :: ptr
       end type hash_entry
-      
-      
+
+
       type integer_idict
          integer :: key1, key2, value
          integer :: height
@@ -65,10 +65,10 @@
       type ihash_entry
          type (integer_idict), pointer :: ptr
       end type ihash_entry
-      
-      
-      
-      
-      
+
+
+
+
+
       end module utils_def
 

@@ -25,24 +25,24 @@
 
 
       module mtx_lib
-      
+
       use const_def, only: dp
-      
+
       implicit none
 
-      
+
       contains
-      
+
       ! mesa includes sources for a subset of BLAS and dble.
       ! you can use those, or, better yet, you can use a package optimized
-      ! for your machine such as GotoBLAS or Intel's MKL. 
+      ! for your machine such as GotoBLAS or Intel's MKL.
       ! see utils/makefile_header for details.
 
-      ! see mtx/blas_src for the subset of BLAS routines included in mtx_lib     
-      ! see mtx/dble_src for the subset of dble routines included in mtx_lib     
-      
+      ! see mtx/blas_src for the subset of BLAS routines included in mtx_lib
+      ! see mtx/dble_src for the subset of dble routines included in mtx_lib
+
       ! subroutines for dense and banded matrix decompositions and solves
-         
+
       include "mtx_dble_decsol.dek" ! dble versions
 
       !> Wraps the lapack DGBSVX routine for banded matrices to be used with block tridiagonal matrices.
@@ -65,7 +65,7 @@
 
          ! Intermediates
          real(dp) :: pre_conditioner(nvar, nblocks)
-         
+
          ! Outputs
          real(dp), dimension(:,:), intent(out) :: x
          real(dp), intent(out) :: rcond
@@ -130,7 +130,7 @@
          real(dp) :: pre_conditioner(nvar, nblocks)
          real(dp) :: rcond
 
-         
+
          ! Outputs
          real(dp), dimension(:,:), intent(out) :: x
          integer, intent(out) :: ierr
@@ -199,16 +199,16 @@
 
       ! sometimes you just need a null version of a routine
       include "mtx_null_decsol.dek"
-      
+
       ! sometimes you need to debug a jacobian by saving it to plotting data files
       include "mtx_debug_decsol.dek"
 
-      ! sparse matrices come in many formats.  
+      ! sparse matrices come in many formats.
       ! for example, compressed row sparse format is used by SPARSKIT,
       ! while compressed column sparse format is used by Super_LU.
       ! here are conversion routines for these two options.
       include "mtx_formats.dek"
-      
+
       subroutine mtx_write_hbcode1(iounit, n, nnzero, values, rowind, colptr, ierr)
          use mtx_support, only: write_hbcode1
          integer, intent(in) :: iounit, n, nnzero
@@ -218,8 +218,8 @@
          integer, intent(out) :: ierr
          call write_hbcode1(iounit, n, n, nnzero, values, rowind, colptr, ierr)
       end subroutine mtx_write_hbcode1
-      
-      
+
+
       subroutine mtx_write_block_tridiagonal(iounit,nvar,nblk,lblk,dblk,ublk,ierr)
          use mtx_support, only: write_block_tridiagonal
          integer, intent(in) :: iounit, nvar, nblk
@@ -227,7 +227,7 @@
          integer, intent(out) :: ierr
          call write_block_tridiagonal(iounit,nvar,nblk,lblk,dblk,ublk,ierr)
       end subroutine mtx_write_block_tridiagonal
-         
+
       subroutine mtx_read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
          use mtx_support, only: read_block_tridiagonal
          integer, intent(in) :: iounit
@@ -236,9 +236,9 @@
          integer, intent(out) :: ierr
          call read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
       end subroutine mtx_read_block_tridiagonal
-         
+
       ! BCYCLIC multi-thread block tridiagonal
-      include "mtx_bcyclic_dble_decsol.dek" 
+      include "mtx_bcyclic_dble_decsol.dek"
          ! S.P.Hirshman, K.S.Perumalla, V.E.Lynch, & R.Sanchez,
          ! BCYCLIC: A parallel block tridiagonal matrix cyclic solver,
          ! J. Computational Physics, 229 (2010) 6392-6404.
@@ -250,10 +250,10 @@
          integer, intent(in) :: nvar, nz
          real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
          real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)   
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
          call do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
       end subroutine block_dble_mv
-      
+
 
       subroutine multiply_xa(n, A1, x, b)
          !  calculates b = x*A
@@ -278,7 +278,7 @@
 
       subroutine band_multiply_xa(n, kl, ku, ab1, ldab, x, b)
          !  calculates b = x*a = transpose(a)*x
-         use mtx_support, only: do_band_multiply_xa         
+         use mtx_support, only: do_band_multiply_xa
          integer, intent(in) :: n
          !          the number of linear equations, i.e., the order of the
          !          matrix a.  n >= 0.
@@ -299,17 +299,17 @@
          !          on exit, set to matrix product of x*a = b
          call do_band_multiply_xa(n, kl, ku, ab1, ldab, x, b)
       end subroutine band_multiply_xa
-      
-      
-      include "mtx_lapack95.dek" 
-      
-      
+
+
+      include "mtx_lapack95.dek"
+
+
       ! utilities for working with jacobians
       include "mtx_jac.dek"
-      
+
       ! the following call dble routines to estimate matrix condition numbers.
       include "mtx_rcond.dek"
-      
+
       integer function decsol_option(which_decsol_option, ierr)
          use mtx_def
          character (len=*), intent(in) :: which_decsol_option
@@ -317,40 +317,40 @@
          character (len=64) :: option
          ierr = 0
          option = which_decsol_option
-         
+
          if (option == 'lapack') then
             decsol_option = lapack
 
          else if (option == 'bcyclic_dble') then
             decsol_option = bcyclic_dble
-            
+
          else
             ierr = -1
             decsol_option = -1
-         end if 
+         end if
       end function decsol_option
-      
-      
+
+
       subroutine decsol_option_str(which_decsol_option, decsol_option, ierr)
          use mtx_def
          integer, intent(in) :: which_decsol_option
          character (len=*), intent(out) :: decsol_option
          integer, intent(out) :: ierr
          ierr = 0
-         
+
          if (which_decsol_option == lapack) then
             decsol_option = 'lapack'
          else if (which_decsol_option == bcyclic_dble) then
             decsol_option = 'bcyclic_dble'
-                        
+
          else
             ierr = -1
             decsol_option = ''
-         end if 
-         
+         end if
+
       end subroutine decsol_option_str
-      
-      
+
+
       logical function is_block_tridiagonal_decsol(which_decsol_option)
          use mtx_def
          integer, intent(in) :: which_decsol_option

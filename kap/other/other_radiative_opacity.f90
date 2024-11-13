@@ -60,7 +60,7 @@
             ierr = -1
 
             ! can first call kap_lib routine to get standard results, if desired
-            
+
             ! call kap_get_radiative_opacity( &
             !    handle, &
             !    X, Z, XC, XN, XO, XNe, logRho, logT, &

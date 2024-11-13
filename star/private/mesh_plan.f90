@@ -93,15 +93,15 @@
          include 'formats'
 
          ierr = 0
-         
+
          min_dq = min_dq_in
-         
+
          if (max_k_old_for_split_in < 0) then
             max_k_old_for_split = nz_old + max_k_old_for_split_in
          else
             max_k_old_for_split = max_k_old_for_split_in
          end if
-         
+
          if (min_k_old_for_split_in < 0) then
             min_k_old_for_split = nz_old + min_k_old_for_split_in
          else
@@ -164,7 +164,7 @@
 
          call pick_new_points(s, ierr)
          if (ierr /= 0) return
-         
+
          if (min_k_old_for_split <= 1) then
             do while (dq_new(1) > max(max_surface_cell_dq,2*min_dq,min_dq_for_split))
                call split1(1, ierr)
@@ -648,14 +648,14 @@
                   write(*,'(A)')
                   write(*,3) 'call pick_next_dq', k_old, k_new, next_dq_max
                end if
-               
+
                if (s% gradr(k_old) > s% grada(k_old) .and. &
                      s% min_dq_for_xa_convective > 0d0) then
                   min_dq_for_xa = s% min_dq_for_xa_convective
                else
                   min_dq_for_xa = s% min_dq_for_xa
                end if
-               
+
                min_dq_for_logT = s% min_dq_for_logT
 
                next_dq = pick_next_dq(s, &
@@ -723,14 +723,14 @@
                         next_dq > dq_old(k_old) - min_dq/2) then
 
                      if (.not. okay_to_merge) then
-                     
+
                         k_old_next = k_old + 1
-                        
+
                      else if (k_old < min_k_old_for_split .or. &
                               k_old > max_k_old_for_split) then
-                     
+
                         k_old_next = k_old + 1
-                              
+
                      else ! consider doing merge
 
                         if (next_dq > 1.5d0*dq_old(k_old)) then
@@ -1012,7 +1012,7 @@
             end do
             return
          end if
-         
+
          default = pick_next_dq ! default size. can be reduced according to gradients of gvals
          do j=1,num_gvals
             nxt_dqs(j) = pick1_dq(s, &
@@ -1182,10 +1182,10 @@
             write(*,1) 'default', default
          end if
          pick1_dq = max(min_dq, sz, xq - xq_new(k_new))
-         
+
          if (is_xa_function .and. pick1_dq < min_dq_for_xa) &
             pick1_dq = min_dq_for_xa
-         
+
          if (is_logT_function .and. pick1_dq < min_dq_for_logT) &
             pick1_dq = min_dq_for_logT
 

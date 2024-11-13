@@ -33,7 +33,7 @@
 
 
       !..various numerical constants
-      
+
       real(dp), parameter :: con1   = 1.0d0/5.9302d0
 
       !..cv and ca are the vector and axial currents.
@@ -191,18 +191,18 @@
 
       end function zfermim12
 
-      
+
 
       subroutine neutrinos(T, logT, Rho, logRho, abar, zbar, log10_Tlim,  &
                   flags, loss, sources, info)
       use utils_lib, only: is_bad
-      
+
       !..this routine computes neutrino losses from the analytic fits of
-      !..itoh et al. apjs 102, 411, 1996, and also returns their derivatives. 
-      
+      !..itoh et al. apjs 102, 411, 1996, and also returns their derivatives.
+
       ! provide T or logT or both (the code needs both, so pass 'em if you've got 'em!)
       ! same for Rho and logRho
-      
+
       real(dp), intent(in) :: T ! temperature
       real(dp), intent(in) :: logT ! log10 of temperature
       real(dp), intent(in) :: Rho ! density
@@ -232,7 +232,7 @@
 
 
       info = 0
-   
+
       if ((T /= arg_not_provided .and. T .le. Tmin_neu) .or. &
             (logT /= arg_not_provided .and. logT .le. log10Tmin_neu)) then
          loss = 0d0
@@ -249,18 +249,18 @@
       else
          temp = T
       end if
-         
+
       if (T <= 0) then
          info = -1
          return
       end if
-      
+
       if (logT == arg_not_provided) then
          logtemp = log10(T)
       else
          logtemp = logT
       end if
-      
+
       if (logtemp > 20) then
          info = -1
          return
@@ -275,7 +275,7 @@
       else
          den = Rho
       end if
-         
+
       if (Rho <= 0) then
          info = -1
          return
@@ -286,13 +286,13 @@
       else
          logden = logRho
       end if
-      
+
       if (logden > 20) then
          info = -1
          return
       end if
 
-!..initialize 
+!..initialize
       spair   = 0.0d0
       spairdt = 0.0d0
       spairdd = 0.0d0
@@ -331,7 +331,7 @@
 
 
       call set_inputs(input,temp,logtemp,den,logden,abar,zbar)
-      
+
 !..do the requested types
 
       if (flags(pair_neu_type)) call pair_neu(spair,spairdt,spairdd,spairda,spairdz, input)
@@ -340,38 +340,38 @@
       if (flags(brem_neu_type)) call brem_neu(sbrem,sbremdt,sbremdd,sbremda,sbremdz, input)
       if (flags(reco_neu_type)) call reco_neu(sreco,srecodt,srecodd,srecoda,srecodz, input)
 
-!..convert from erg/cm^3/s to erg/g/s 
+!..convert from erg/cm^3/s to erg/g/s
 !..comment these out to duplicate the itoh et al plots
 
       spair   = spair   * input% deni
       spairdt = spairdt * input% deni
       spairdd = spairdd * input% deni - spair * input% deni
       spairda = spairda * input% deni
-      spairdz = spairdz * input% deni  
+      spairdz = spairdz * input% deni
 
       splas   = splas   * input% deni
       splasdt = splasdt * input% deni
       splasdd = splasdd * input% deni - splas * input% deni
       splasda = splasda * input% deni
-      splasdz = splasdz * input% deni  
+      splasdz = splasdz * input% deni
 
       sphot   = sphot   * input% deni
       sphotdt = sphotdt * input% deni
       sphotdd = sphotdd * input% deni - sphot * input% deni
       sphotda = sphotda * input% deni
-      sphotdz = sphotdz * input% deni  
+      sphotdz = sphotdz * input% deni
 
       sbrem   = sbrem   * input% deni
       sbremdt = sbremdt * input% deni
       sbremdd = sbremdd * input% deni - sbrem * input% deni
       sbremda = sbremda * input% deni
-      sbremdz = sbremdz * input% deni  
+      sbremdz = sbremdz * input% deni
 
       sreco   = sreco   * input% deni
       srecodt = srecodt * input% deni
       srecodd = srecodd * input% deni - sreco * input% deni
       srecoda = srecoda * input% deni
-      srecodz = srecodz * input% deni  
+      srecodz = srecodz * input% deni
 
 !..calculate temperature cutoff factor
 
@@ -379,8 +379,8 @@
           dtlim = log10_Tlim - log10Tmin_neu
          tcutoff_factor = 0.5d0* &
             (1 - cospi((input% logtemp - log10Tmin_neu)/(log10_Tlim - log10Tmin_neu)))
-     
-     
+
+
          dtcutoff_factordt = 0.5d0 * pi * sinpi((input% logtemp - log10Tmin_neu)/dtlim) * &
                              1.d0/(dtlim * temp * ln10)
 
@@ -389,42 +389,42 @@
          splasda = tcutoff_factor * splasda
          splasdz = tcutoff_factor * splasdz
          splas   = tcutoff_factor * splas
-     
+
          spairdt = tcutoff_factor * spairdt + dtcutoff_factordt * spair
          spairdd = tcutoff_factor * spairdd
          spairda = tcutoff_factor * spairda
          spairdz = tcutoff_factor * spairdz
-         spair   = tcutoff_factor * spair     
-     
+         spair   = tcutoff_factor * spair
+
          sphotdt = tcutoff_factor * sphotdt + dtcutoff_factordt * sphot
          sphotdd = tcutoff_factor * sphotdd
          sphotda = tcutoff_factor * sphotda
          sphotdz = tcutoff_factor * sphotdz
          sphot   = tcutoff_factor * sphot
-     
+
          sbremdt = tcutoff_factor * sbremdt + dtcutoff_factordt * sbrem
          sbremdd = tcutoff_factor * sbremdd
          sbremda = tcutoff_factor * sbremda
          sbremdz = tcutoff_factor * sbremdz
          sbrem   = tcutoff_factor * sbrem
-     
+
          srecodt = tcutoff_factor * srecodt + dtcutoff_factordt * sreco
          srecodd = tcutoff_factor * srecodd
          srecoda = tcutoff_factor * srecoda
          srecodz = tcutoff_factor * srecodz
          sreco   = tcutoff_factor * sreco
 
-         
+
       end if
 
 
 !..the total neutrino loss rate
       snu    =  splas   + spair   + sphot   + sbrem   + sreco
-      dsnudt =  splasdt + spairdt + sphotdt + sbremdt + srecodt  
-      dsnudd =  splasdd + spairdd + sphotdd + sbremdd + srecodd 
-      dsnuda =  splasda + spairda + sphotda + sbremda + srecoda 
-      dsnudz =  splasdz + spairdz + sphotdz + sbremdz + srecodz 
-      
+      dsnudt =  splasdt + spairdt + sphotdt + sbremdt + srecodt
+      dsnudd =  splasdd + spairdd + sphotdd + sbremdd + srecodd
+      dsnuda =  splasda + spairda + sphotda + sbremda + srecoda
+      dsnudz =  splasdz + spairdz + sphotdz + sbremdz + srecodz
+
       if (is_bad(snu)) then
          info = -1
          return
@@ -437,17 +437,17 @@
       loss(3) = dsnudd
       loss(4) = dsnuda
       loss(5) = dsnudz
-      
+
       call store(pair_neu_type, spair, spairdt, spairdd, spairda, spairdz)
       call store(plas_neu_type, splas, splasdt, splasdd, splasda, splasdz)
       call store(phot_neu_type, sphot, sphotdt, sphotdd, sphotda, sphotdz)
       call store(brem_neu_type, sbrem, sbremdt, sbremdd, sbremda, sbremdz)
       call store(reco_neu_type, sreco, srecodt, srecodd, srecoda, srecodz)
-      
+
 
       contains
-      
-      
+
+
          subroutine store(neu_type, s, sdt, sdd, sda, sdz)
             integer, intent(in) :: neu_type
             real(dp), intent(in) :: s, sdt, sdd, sda, sdz
@@ -457,7 +457,7 @@
             sources(neu_type,4) = sda
             sources(neu_type,5) = sdz
          end subroutine store
-         
+
       end subroutine neutrinos
 
 
@@ -480,13 +480,13 @@
          input% tempi = 1.0d0 / input% temp
          input% abari = 1.0d0 / input% abar
          input% zbari  = 1.0d0 / input% zbar
-   
-   
+
+
    !..some composition variables
          input% ye    = input% zbar * input% abari
          !xmue  = abar * zbari
-   
-   
+
+
    !..some frequent factors
          input% t9     = input% temp * 1.0d-9
          input% xl     = input% t9 * con1
@@ -504,9 +504,9 @@
          input% xlm1   = 1.0d0 / input% xl
          input% xlm2   = input% xlm1*input% xlm1
          input% xlm3   = input% xlm1*input% xlm2
-         input% xlm4   = input% xlm1*input% xlm3      
-         
-         
+         input% xlm4   = input% xlm1*input% xlm3
+
+
          input% rm     = input% den*input% ye
          input% rmdd   = input% ye
          input% rmda   = -input% rm*input% abari
@@ -519,10 +519,10 @@
          input% zeta   = a1 * input% xlm1
          input% zetadt = -a1 * input% xlm2 * input% xldt
          a2     = one_third * a1*input%rmi * input% xlm1
-         input% zetadd = a2 * input%rmdd 
+         input% zetadd = a2 * input%rmdd
          input% zetada = a2 * input%rmda
          input% zetadz = a2 * input%rmdz
-         
+
          input% zeta2 = input%zeta * input%zeta
          input% zeta3 = input%zeta2 * input%zeta
 
@@ -533,7 +533,7 @@
       subroutine phot_neu(sphot,sphotdt,sphotdd,sphotda,sphotdz, input)
          real(dp), intent(out) :: sphot,sphotdt,sphotdd,sphotda,sphotdz
          type(inputs), intent(in) :: input
-   
+
          real(dp) tau,taudt,cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
             sin3,sin4,sin5,last,xast, &
             fphot,fphotdt,fphotdd,fphotda,fphotdz, &
@@ -550,7 +550,7 @@
 
          real(dp) :: dccdt
 
-   !..photoneutrino process section  
+   !..photoneutrino process section
    !..for reactions like e- + gamma => e- + nu_e + nubar_e
    !..                   e+ + gamma => e+ + nu_e + nubar_e
    !..equation 3.8 for tau, equation 3.6 for cc,
@@ -584,7 +584,7 @@
             c15  = -5.249d9
             c16  = -5.153d9
             c20  =  1.067d11
-            c21  = -9.782d9 
+            c21  = -9.782d9
             c22  = -7.193d9
             c23  = -6.936d9
             c24  = -6.893d9
@@ -610,41 +610,41 @@
             tau   =  input% logtemp - 8d0
             cc   =  1.5654d0
             dccdt = 0d0
-            c00  =  9.889d10 
+            c00  =  9.889d10
             c01  = -4.524d8
-            c02  = -6.088d6 
-            c03  =  4.269d7 
-            c04  =  5.172d7 
-            c05  =  4.910d7 
+            c02  = -6.088d6
+            c03  =  4.269d7
+            c04  =  5.172d7
+            c05  =  4.910d7
             c06  =  4.388d7
             c10  =  1.813d11
-            c11  = -7.556d9 
-            c12  = -3.304d9  
+            c11  = -7.556d9
+            c12  = -3.304d9
             c13  = -1.031d9
-            c14  = -1.764d9  
+            c14  = -1.764d9
             c15  = -1.851d9
             c16  = -1.928d9
             c20  =  9.750d10
             c21  =  3.484d10
-            c22  =  5.199d9  
-            c23  = -1.695d9  
-            c24  = -2.865d9  
-            c25  = -3.395d9  
+            c22  =  5.199d9
+            c23  = -1.695d9
+            c24  = -2.865d9
+            c25  = -3.395d9
             c26  = -3.418d9
-            dd01 = -1.135d8   
-            dd02 =  1.256d8   
-            dd03 =  5.149d7   
-            dd04 =  3.436d7   
+            dd01 = -1.135d8
+            dd02 =  1.256d8
+            dd03 =  5.149d7
+            dd04 =  3.436d7
             dd05 =  1.005d7
-            dd11 =  1.652d9  
-            dd12 = -3.119d9  
-            dd13 = -1.839d9  
-            dd14 = -1.458d9  
+            dd11 =  1.652d9
+            dd12 = -3.119d9
+            dd13 = -1.839d9
+            dd14 = -1.458d9
             dd15 = -8.956d8
             dd21 = -1.548d10
-            dd22 = -9.338d9  
-            dd23 = -5.899d9  
-            dd24 = -3.035d9  
+            dd22 = -9.338d9
+            dd23 = -5.899d9
+            dd24 = -3.035d9
             dd25 = -1.598d9
 
          else if (input% temp .ge. 1.0d9) then
@@ -653,34 +653,34 @@
             dccdt = 0d0
             c00  =  9.581d10
             c01  =  4.107d8
-            c02  =  2.305d8   
-            c03  =  2.236d8   
-            c04  =  1.580d8   
-            c05  =  2.165d8   
+            c02  =  2.305d8
+            c03  =  2.236d8
+            c04  =  1.580d8
+            c05  =  2.165d8
             c06  =  1.721d8
             c10  =  1.459d12
             c11  =  1.314d11
-            c12  = -1.169d11  
-            c13  = -1.765d11  
-            c14  = -1.867d11  
-            c15  = -1.983d11  
+            c12  = -1.169d11
+            c13  = -1.765d11
+            c14  = -1.867d11
+            c15  = -1.983d11
             c16  = -1.896d11
             c20  =  2.424d11
             c21  = -3.669d9
-            c22  = -8.691d9  
-            c23  = -7.967d9  
-            c24  = -7.932d9  
-            c25  = -7.987d9  
+            c22  = -8.691d9
+            c23  = -7.967d9
+            c24  = -7.932d9
+            c25  = -7.987d9
             c26  = -8.333d9
             dd01 =  4.724d8
-            dd02 =  2.976d8   
-            dd03 =  2.242d8   
-            dd04 =  7.937d7   
+            dd02 =  2.976d8
+            dd03 =  2.242d8
+            dd04 =  7.937d7
             dd05 =  4.859d7
             dd11 = -7.094d11
             dd12 = -3.697d11
-            dd13 = -2.189d11  
-            dd14 = -1.273d11  
+            dd13 = -2.189d11
+            dd14 = -1.273d11
             dd15 = -5.705d10
             dd21 = -2.254d10
             dd22 = -1.551d10
@@ -777,7 +777,7 @@
          fphotdd = (xnumdd - fphot*xdendd)*dum
          fphotda = (xnumda - fphot*xdenda)*dum
          fphotdz = (xnumdz - fphot*xdendz)*dum
-   
+
 
    !..equation 3.3
          a0     = 1.0d0 + 2.045d0 * input% xl
@@ -812,10 +812,10 @@
 
          a1      = sphot
          sphot   = input% rm*a1
-         sphotdt = input% rm*sphotdt  
-         sphotdd = input% rm*sphotdd + input% rmdd*a1  
-         sphotda = input% rm*sphotda + input% rmda*a1  
-         sphotdz = input% rm*sphotdz + input% rmdz*a1  
+         sphotdt = input% rm*sphotdt
+         sphotdd = input% rm*sphotdd + input% rmdd*a1
+         sphotda = input% rm*sphotda + input% rmda*a1
+         sphotdz = input% rm*sphotdz + input% rmdz*a1
 
          a1      = tfac4*(1.0d0 - tfac3 * qphot)
          a2      = -tfac4*tfac3
@@ -827,12 +827,12 @@
          sphotda = a1*sphotda + a2*qphotda*a3
          sphotdz = a1*sphotdz + a2*qphotdz*a3
 
-            
+
          if (.false.) then
             write(*,*) 'logT', input% logtemp
             write(*,*) 'logRho', input% logden
             write(*,*) 'sphot', sphot
-            write(*,*) 
+            write(*,*)
          end if
 
          if (sphot .le. 0.0d0) then
@@ -844,8 +844,8 @@
          end if
 
       end subroutine phot_neu
-      
-      
+
+
       subroutine brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
          type(t8s), intent(in) :: t8
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
@@ -864,7 +864,7 @@
          real(dp) :: eta,etadt,etadd,etada,etadz,etam1,etam2,etam3, &
          fbrem,fbremdt,fbremdd,fbremda,fbremdz, &
          gbrem,gbremdt,gbremdd,gbremda,gbremdz
-         
+
          real(dp) :: p
 
          sbrem=0d0
@@ -872,7 +872,7 @@
          sbremdd=0d0
          sbremda=0d0
          sbremdz=0d0
-         
+
    !..equation 5.3
          dum   = 7.05d6 * t8% t832 + 5.12d4 * t8% t83
          dumdt = (1.5d0*7.05d6*t8% t812 + 3.0d0*5.12d4*t8% t82)*1.0d-8
@@ -907,7 +907,7 @@
          c02   = z*etadd
          c03   = z*etada
          c04   = z*etadz
-         
+
          z      = 1.0d0/dum
          xden   = c00*z
          xdendt = (c01 - xden*dumdt)*z
@@ -927,7 +927,7 @@
          a0    = 230.0d0 + 6.7d5*t8% t8m2 + 7.66d9*t8% t8m5
          f0    = (-2.0d0*6.7d5*t8% t8m3 - 5.0d0*7.66d9*t8% t8m6)*1.0d-8
 
-         z     = 1.0d0 + input% rm*1.0d-9 
+         z     = 1.0d0 + input% rm*1.0d-9
          dum   = a0*z
          dumdt = f0*z
          z     = a0*1.0d-9
@@ -941,26 +941,26 @@
          xnumdd = z*dumdd
          xnumda = z*dumda
          xnumdz = z*dumdz
-         
+
          p = pow(t8% t8,3.85d0)
          c00   = 7.75d5*t8% t832 + 247.0d0*p
          dd00  = (1.5d0*7.75d5*t8% t812 + 3.85d0*247.0d0*p/t8% T8)*1.0d-8
-         
+
          p = pow(t8% t8,1.4d0)
          c01   = 4.07d0 + 0.0240d0 * p
          dd01  = 1.4d0*0.0240d0*(p/t8% T8)*1.0d-8
-         
+
          p = pow(t8% t8,-0.110d0)
          c02   = 4.59d-5 * p
          dd02  = -0.11d0*4.59d-5*(p/t8% T8)*1.0d-8
 
          z     = pow(input% den,0.656d0)
-         dum   = c00*input% rmi  + c01  + c02*z 
+         dum   = c00*input% rmi  + c01  + c02*z
          dumdt = dd00*input% rmi + dd01 + dd02*z
          z     = -c00*input% rmi*input% rmi
          dumdd = z*input% rmdd + 0.656d0*c02*pow(input% den,-0.344d0)
-         dumda = z*input% rmda 
-         dumdz = z*input% rmdz 
+         dumda = z*input% rmda
+         dumdz = z*input% rmdz
 
          xden  = 1.0d0/dum
          z      = -xden*xden
@@ -987,15 +987,15 @@
 
          z       = tfac4*fbrem - tfac5*gbrem
          sbrem   = dum * z
-         sbremdt = dumdt*z + dum*(tfac4*fbremdt - tfac5*gbremdt) 
-         sbremdd = dumdd*z + dum*(tfac4*fbremdd - tfac5*gbremdd) 
-         sbremda = dumda*z + dum*(tfac4*fbremda - tfac5*gbremda) 
-         sbremdz = dumdz*z + dum*(tfac4*fbremdz - tfac5*gbremdz) 
+         sbremdt = dumdt*z + dum*(tfac4*fbremdt - tfac5*gbremdt)
+         sbremdd = dumdd*z + dum*(tfac4*fbremdd - tfac5*gbremdd)
+         sbremda = dumda*z + dum*(tfac4*fbremda - tfac5*gbremda)
+         sbremdz = dumdz*z + dum*(tfac4*fbremdz - tfac5*gbremdz)
 
-         
+
       end subroutine brem_neu_weak_degen
-      
-      
+
+
       subroutine brem_neu_liquid_metal(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
          type(t8s), intent(in) :: t8
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
@@ -1009,7 +1009,7 @@
 
          real(dp) :: u,gm1,gm2,gm13,gm23,gm43,gm53,v,w,fb,gt,gb, &
          fliq,fliqdt,fliqdd,fliqda,fliqdz,  &
-         gliq,gliqdt,gliqdd,gliqda,gliqdz 
+         gliq,gliqdt,gliqdd,gliqda,gliqdz
 
          real(dp) :: cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
          sin3,sin4,sin5
@@ -1022,7 +1022,7 @@
          sbremda=0d0
          sbremdz=0d0
 
-         
+
    !..liquid metal with c12 parameters (not too different for other elements)
    !..equation 5.18 and 5.16
          u     = fac3 * (input% logden - 3.0d0)
@@ -1056,30 +1056,30 @@
                - 0.01089d0*cos2 - 0.01584d0*sin2 &
                - 0.01147d0*cos3 - 0.00504d0*sin3 &
                - 0.00656d0*cos4 - 0.00281d0*sin4 &
-               - 0.00519d0*cos5 
+               - 0.00519d0*cos5
 
          c00 =  a0*(0.00945d0  &
                + 0.05821d0*sin1       - 0.04969d0*cos1 &
                + 0.01089d0*sin2*2.0d0 - 0.01584d0*cos2*2.0d0 &
                + 0.01147d0*sin3*3.0d0 - 0.00504d0*cos3*3.0d0 &
                + 0.00656d0*sin4*4.0d0 - 0.00281d0*cos4*4.0d0 &
-               + 0.00519d0*sin5*5.0d0) 
+               + 0.00519d0*sin5*5.0d0)
 
-      
+
    !..equation 5.22
          ft =  0.5d0 * 0.06781d0 - 0.02342d0*u + 0.24819d0 &
                - 0.00944d0*cos1 - 0.02213d0*sin1 &
                - 0.01289d0*cos2 - 0.01136d0*sin2 &
                - 0.00589d0*cos3 - 0.00467d0*sin3 &
                - 0.00404d0*cos4 - 0.00131d0*sin4 &
-               - 0.00330d0*cos5 
+               - 0.00330d0*cos5
 
          c01 = a0*(-0.02342d0   &
                + 0.00944d0*sin1       - 0.02213d0*cos1 &
                + 0.01289d0*sin2*2.0d0 - 0.01136d0*cos2*2.0d0 &
                + 0.00589d0*sin3*3.0d0 - 0.00467d0*cos3*3.0d0 &
                + 0.00404d0*sin4*4.0d0 - 0.00131d0*cos4*4.0d0 &
-               + 0.00330d0*sin5*5.0d0) 
+               + 0.00330d0*sin5*5.0d0)
 
 
    !..equation 5.23
@@ -1104,14 +1104,14 @@
                - 0.00184d0*cos2 - 0.00354d0*sin2 &
                + 0.00146d0*cos3 - 0.00014d0*sin3 &
                + 0.00031d0*cos4 - 0.00018d0*sin4 &
-               + 0.00069d0*cos5 
+               + 0.00069d0*cos5
 
          c03 = a0*(-0.00829d0 &
                - 0.00356d0*sin1       + 0.01052d0*cos1 &
                + 0.00184d0*sin2*2.0d0 - 0.00354d0*cos2*2.0d0 &
                - 0.00146d0*sin3*3.0d0 - 0.00014d0*cos3*3.0d0 &
                - 0.00031d0*sin4*4.0d0 - 0.00018d0*cos4*4.0d0 &
-               - 0.00069d0*sin5*5.0d0) 
+               - 0.00069d0*sin5*5.0d0)
 
 
          dum   = 2.275d-1 * input% zbar * input% zbar*t8% t8m1 * pow(input% den6*input% abari, one_third)
@@ -1119,7 +1119,7 @@
          dumdd = one_third*dum * input% deni
          dumda = -one_third*dum*input% abari
          dumdz = 2.0d0*dum*input% zbari
-      
+
          gm1   = 1.0d0/dum
          gm2   = gm1*gm1
          gm13  = pow(gm1,one_third)
@@ -1139,7 +1139,7 @@
    !..equation 5.19 and 5.20
          fliq   = v*fb + (1.0d0 - v)*ft
          fliqdt = a0*dumdt*(fb - ft)
-         fliqdd = a0*dumdd*(fb - ft) + v*c00 + (1.0d0 - v)*c01 
+         fliqdd = a0*dumdd*(fb - ft) + v*c00 + (1.0d0 - v)*c01
          fliqda = a0*dumda*(fb - ft)
          fliqdz = a0*dumdz*(fb - ft)
 
@@ -1159,14 +1159,14 @@
 
          z       = tfac4*fliq - tfac5*gliq
          sbrem   = dum * z
-         sbremdt = dumdt*z + dum*(tfac4*fliqdt - tfac5*gliqdt) 
-         sbremdd = dumdd*z + dum*(tfac4*fliqdd - tfac5*gliqdd) 
-         sbremda = dumda*z + dum*(tfac4*fliqda - tfac5*gliqda) 
-         sbremdz = dumdz*z + dum*(tfac4*fliqdz - tfac5*gliqdz) 
-      
+         sbremdt = dumdt*z + dum*(tfac4*fliqdt - tfac5*gliqdt)
+         sbremdd = dumdd*z + dum*(tfac4*fliqdd - tfac5*gliqdd)
+         sbremda = dumda*z + dum*(tfac4*fliqda - tfac5*gliqda)
+         sbremdz = dumdz*z + dum*(tfac4*fliqdz - tfac5*gliqdz)
+
       end subroutine brem_neu_liquid_metal
-      
-      
+
+
       subroutine brem_neu(sbrem,sbremdt,sbremdd,sbremda,sbremdz, input)
          real(dp), intent(out) :: sbrem,sbremdt,sbremdd,sbremda,sbremdz
          type(inputs), intent(in) :: input
@@ -1177,8 +1177,8 @@
 
          type(t8s) :: t8
 
-         
-   !..bremsstrahlung neutrino section 
+
+   !..bremsstrahlung neutrino section
    !..for reactions like e- + (z,a) => e- + (z,a) + nu + nubar
    !..                   n  + n     => n + n + nu + nubar
    !..                   n  + p     => n + p + nu + nubar
@@ -1205,7 +1205,7 @@
          t8% t812   = sqrt(t8% t8)
          t8% t832   = t8% t8 * t8% t812
          t8% t82    = t8% t8*t8% t8
-         t8% t83    = t8% t82*t8% t8 
+         t8% t83    = t8% t82*t8% t8
          t8% t85    = t8% t82*t8% t83
          t8% t86    = t8% t85*t8% t8
          t8% t8m1   = 1.0d0/t8% t8
@@ -1219,84 +1219,84 @@
          B = 1.d0
          C = 1.018d0
          D = 1.0d0
-         
+
          U = pow(input% den6*input% ye,two_thirds)
          tfermi = A * (sqrt(U) - D)
-         
+
          if (input% temp .ge. tfhi * tfermi) then
-         
+
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
 
          else if (input% temp .le. tflo * tfermi) then
 
             call brem_neu_liquid_metal(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
-         
+
          else ! blend
-         
+
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
             sb   = sbrem
             sbdt = sbremdt
             sbdd = sbremdd
             sbda = sbremda
             sbdz = sbremdz
-         
+
             call brem_neu_liquid_metal(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
             sb2   = sbrem
             sbdt2 = sbremdt
             sbdd2 = sbremdd
             sbda2 = sbremda
             sbdz2 = sbremdz
-            
+
             dtf = tfhi - tflo
             tfrac = (input% temp / tfermi - tflo) / dtf
             alfa = 0.5d0 * (1d0 - cospi(tfrac))
             beta = 1d0 - alfa
-            
+
 
             dtfermidu = (1d0/2d0) * A * pow(U,-1d0/2d0)
             dtfracdtfermi = -input% temp/(tfermi * tfermi * dtf )
-            
+
             ! v = den6* ye  = den *10**-6 * ye
             dudv = two_thirds * pow(input% den6 * input% ye,-1d0/3d0)
-            
+
             dudd = dudv * 1d-6 * input% ye
             duda = dudv * input% den6 * input% ye * input% abari * (-1d0)
             dudz = dudv * input% den6 * input% abari
-            
-   
+
+
             dtfermidd = dtfermidu * dudd
             dtfermida = dtfermidu * duda
             dtfermidz = dtfermidu * dudz
-            
-            dtfracdt = 1.0d0/(tfermi * dtf) 
-            
+
+            dtfracdt = 1.0d0/(tfermi * dtf)
+
             dtfracdd = dtfermidd * dtfracdtfermi
             dtfracda = dtfermida * dtfracdtfermi
             dtfracdz = dtfermidz * dtfracdtfermi
-            
+
             dalfadt = dtfracdt * 0.5d0 * pi * sinpi(tfrac)
-            dalfadd = dtfracdd * 0.5d0 * pi * sinpi(tfrac) 
-            dalfada = dtfracda * 0.5d0 * pi * sinpi(tfrac) 
-            dalfadz = dtfracdz * 0.5d0 * pi * sinpi(tfrac) 
-            
+            dalfadd = dtfracdd * 0.5d0 * pi * sinpi(tfrac)
+            dalfada = dtfracda * 0.5d0 * pi * sinpi(tfrac)
+            dalfadz = dtfracdz * 0.5d0 * pi * sinpi(tfrac)
+
             dbetadt = -dalfadt
             dbetadd = -dalfadd
             dbetada = -dalfada
             dbetadz = -dalfadz
-            
+
             sbrem   = alfa * sb   + beta * sb2
             sbremdt = alfa * sbdt + beta * sbdt2 + dalfadt * sb + dbetadt * sb2
             sbremdd = alfa * sbdd + beta * sbdd2 + dalfadd * sb + dbetadd * sb2
             sbremda = alfa * sbda + beta * sbda2 + dalfada * sb + dbetada * sb2
             sbremdz = alfa * sbdz + beta * sbdz2 + dalfadz * sb + dbetadz * sb2
 
-   
+
          end if
 
-      
+
       end subroutine brem_neu
-      
-      
+
+
       subroutine reco_neu(sreco,srecodt,srecodd,srecoda,srecodz, input)
          real(dp), intent(out) :: sreco,srecodt,srecodd,srecoda,srecodz
          type(inputs), intent(in) :: input
@@ -1318,7 +1318,7 @@
          srecodd=0d0
          srecoda=0d0
          srecodz=0d0
-         
+
    !..recombination neutrino section
    !..for reactions like e- (continuum) => e- (bound) + nu_e + nubar_e
 
@@ -1375,29 +1375,29 @@
             zetada = 0.0d0
             zetadz = 2.0d0*zeta*input% zbari
 
-            c00    = 1.0d0/(1.0d0 + f1*nu + f2*nu2 + f3*nu3)  
+            c00    = 1.0d0/(1.0d0 + f1*nu + f2*nu2 + f3*nu3)
             c01    = f1 + f2*2.0d0*nu + f3*3.0d0*nu2
             dum    = zeta*c00
             dumdt  = zetadt*c00 -1d0 * c00 * c00 * zeta*c01*nudt
             dumdd  = -1d0 * c00 * c00 * zeta*c01*nudd
             dumda  = -1d0 * c00 * c00 * zeta*c01*nuda
             dumdz  = zetadz*c00 -1d0 * c00 *c00 * zeta*c01*nudz
-         
+
             z      = 1.0d0/dum
-            dd00   = pow(dum,-2.25d0) 
+            dd00   = pow(dum,-2.25d0)
             dd01   = pow(dum,-4.55d0)
             c00    = a1*z + a2*dd00 + a3*dd01
             c01    = -(a1*z + 2.25d0*a2*dd00 + 4.55d0*a3*dd01)*z
-         
-            z      = exp(c*nu)  
-            dd00   = b*z*(1.0d0 + d*dum)        
-            gum    = 1.0d0 + dd00
-            gumdt  = dd00*c*nudt + b*z*d*dumdt  
-            gumdd  = dd00*c*nudd + b*z*d*dumdd  
-            gumda  = dd00*c*nuda + b*z*d*dumda  
-            gumdz  = dd00*c*nudz + b*z*d*dumdz  
 
-            z   = exp(nu)  
+            z      = exp(c*nu)
+            dd00   = b*z*(1.0d0 + d*dum)
+            gum    = 1.0d0 + dd00
+            gumdt  = dd00*c*nudt + b*z*d*dumdt
+            gumdd  = dd00*c*nudd + b*z*d*dumdd
+            gumda  = dd00*c*nuda + b*z*d*dumda
+            gumdz  = dd00*c*nudz + b*z*d*dumdz
+
+            z   = exp(nu)
             a1  = 1.0d0/gum
 
             bigj   = c00 * z * a1
@@ -1418,11 +1418,11 @@
             srecoda = sreco*(-1.0d0*input% abari + bigjda*a2 - z*(zetada+nuda)*a1)
             srecodz = sreco*(14.0d0*input% zbari + bigjdz*a2 - z*(zetadz+nudz)*a1)
 
-         end if 
+         end if
 
-      
+
       end subroutine reco_neu
-      
+
       subroutine plas_neu(splas,splasdt,splasdd,splasda,splasdz, input)
          real(dp), intent(out) :: splas,splasdt,splasdd,splasda,splasdz
          type(inputs), intent(in) :: input
@@ -1443,8 +1443,8 @@
          splasdd=0d0
          splasda=0d0
          splasdz=0d0
-         
-   !..plasma neutrino section 
+
+   !..plasma neutrino section
    !..for collective reactions like gamma_plasmon => nu_e + nubar_e
    !..equation 4.6
 
@@ -1454,7 +1454,7 @@
 
          b1   =  sqrt(1.0d0 + a2)
          b2   = 1.0d0/b1
-   
+
          c00  = 1.0d0/(input% temp*input% temp*b1)
 
          gl2   = 1.1095d11 * input% rm * c00
@@ -1464,7 +1464,7 @@
          gl2dd = 1.1095d11 * (input% rmdd*c00  - d*input% rmdd)
          gl2da = 1.1095d11 * (input% rmda*c00  - d*input% rmda)
          gl2dz = 1.1095d11 * (input% rmdz*c00  - d*input% rmdz)
-         
+
 
          gl    = sqrt(gl2)
          gl12  = sqrt(gl)
@@ -1493,12 +1493,12 @@
          c    = 1.0d0/b1
          fl   = a1*c
 
-         d    = (a2 - fl*b2)*c       
+         d    = (a2 - fl*b2)*c
          fldt = d*gl2dt
          fldd = d*gl2dd
          flda = d*gl2da
          fldz = d*gl2dz
-      
+
 
    !..equation 4.9 and 4.10
          cc   = log10(2.0d0*input% rm)
@@ -1508,14 +1508,14 @@
          xnumdt = -iln10*0.5d0*input% tempi
          a2     = iln10*one_sixth*input% rmi
          xnumdd = a2*input% rmdd
-         xnumda = a2*input% rmda 
-         xnumdz = a2*input% rmdz 
+         xnumda = a2*input% rmda
+         xnumdz = a2*input% rmdz
 
          xden   = one_sixth * (-24.5d0 + cc + 3.0d0*xlnt)
          xdendt = iln10*0.5d0*input% tempi
          xdendd = a2*input% rmdd
-         xdenda = a2*input% rmda 
-         xdendz = a2*input% rmdz 
+         xdenda = a2*input% rmda
+         xdendz = a2*input% rmdz
 
 
    !..equation 4.11
@@ -1526,7 +1526,7 @@
             fxydz = 0.0d0
             fxyda = 0.0d0
 
-         else 
+         else
 
             a1  = 0.39d0 - 1.25d0*xnum - 0.35d0*sin(4.5d0*xnum)
             a2  = -1.25d0 - 4.5d0*0.35d0*cos(4.5d0*xnum)
@@ -1601,11 +1601,11 @@
          a1      = splas
          splas   = a2*a1
          splasdt = a2*splasdt + a3*a1
-         splasdd = a2*splasdd 
-         splasda = a2*splasda 
-         splasdz = a2*splasdz 
+         splasdd = a2*splasdd
+         splasda = a2*splasda
+         splasdz = a2*splasdz
 
-      
+
       end subroutine plas_neu
 
 
@@ -1615,7 +1615,7 @@
          type(inputs), intent(in) :: input
 
          real(dp) :: a1,a2,a3,b1,b2,c,d, gl,gldt
-         
+
          real(dp) :: xnum,xnumdt,xnumdd,xnumda,xnumdz, &
          xden,xdendt,xdendd,xdenda,xdendz
 
@@ -1623,9 +1623,9 @@
          qpair,qpairdt,qpairdd,qpairda,qpairdz
 
    !..pair neutrino section
-   !..for reactions like e+ + e- => nu_e + nubar_e 
+   !..for reactions like e+ + e- => nu_e + nubar_e
 
-   !..equation 2.8 
+   !..equation 2.8
          gl   = 1.0d0 - 13.04d0*input% xl2 +133.5d0*input% xl4 +1534.0d0*input% xl6 +918.6d0*input% xl8
          gldt = input% xldt*(-26.08d0*input% xl +534.0d0*input% xl3 +9204.0d0*input% xl5 +7348.8d0*input% xl7)
 
@@ -1641,7 +1641,7 @@
             b1     = exp(-4.9924d0*input% zeta)
             b2     = -b1*4.9924d0
          end if
-         
+
          xnum   = a1 * b1
          c      = a2*b1 + a1*b2
          xnumdt = c*input% zetadt
@@ -1653,8 +1653,8 @@
             a1   = 9.383d-1*input% xlm1 - 4.141d-1*input% xlm2 + 5.829d-2*input% xlm3
             a2   = -9.383d-1*input% xlm2 + 2.0d0*4.141d-1*input% xlm3 - 3.0d0*5.829d-2*input% xlm4
          else
-            a1   = 1.2383d0*input% xlm1 - 8.141d-1*input% xlm2 
-            a2   = -1.2383d0*input% xlm2 + 2.0d0*8.141d-1*input% xlm3 
+            a1   = 1.2383d0*input% xlm1 - 8.141d-1*input% xlm2
+            a2   = -1.2383d0*input% xlm2 + 2.0d0*8.141d-1*input% xlm3
          end if
 
          b1   = 3.0d0*input% zeta2
@@ -1675,7 +1675,7 @@
 
    !..equation 2.6
          a1     = 10.7480d0*input% xl2 + 0.3967d0*input% xlp5 + 1.005d0
-         a2     = input% xldt*(2.0d0*10.7480d0*input% xl + 0.5d0*0.3967d0*input% xlmp5) 
+         a2     = input% xldt*(2.0d0*10.7480d0*input% xl + 0.5d0*0.3967d0*input% xlmp5)
          xnum   = 1.0d0/a1
          xnumdt = -xnum*xnum*a2
 
@@ -1689,9 +1689,9 @@
 
          d      = -0.3d0*xden/b1
          xdendt = -d*input% rm*c*c*a2
-         xdendd = d*input% rmdd*c 
-         xdenda = d*input% rmda*c 
-         xdendz = d*input% rmdz*c 
+         xdendd = d*input% rmdd*c
+         xdenda = d*input% rmda*c
+         xdendz = d*input% rmdz*c
 
          qpair   = xnum*xden
          qpairdt = xnumdt*xden + xnum*xdendt
@@ -1725,11 +1725,11 @@
          spairdd = a1*spairdd + a2*qpairdd*a3
          spairda = a1*spairda + a2*qpairda*a3
          spairdz = a1*spairdz + a2*qpairdz*a3
-      
+
       end subroutine pair_neu
 
 
       end module mod_neu
-   
+
 
 

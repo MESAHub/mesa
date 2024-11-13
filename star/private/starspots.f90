@@ -102,7 +102,7 @@ contains
       ! ------------------------------------------------------------
 
       type(star_info), pointer :: s
-      
+
       s%Teff = pow(L_init/(pi4*pow2(s%r(1))*boltz_sigma), 0.25_dp)
       s%L(1) = L_init
 

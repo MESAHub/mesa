@@ -99,13 +99,13 @@
             end if
             b% have_to_reduce_timestep_due_to_j = .false.
          end if
-         
+
       end subroutine set_star_timesteps
 
       integer function binary_pick_next_timestep(b)
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
-         
+
          real(dp) :: &
             env_change, dtm, dtj, dta, dtr, dte, dtdm, &
             j_change, sep_change, rel_gap_change, e_change, set_dt, &
@@ -137,19 +137,19 @@
             else
                env_change = 0
             end if
-            
+
             if (b% rl_relative_gap_old(b% d_i) /= 0) then
                rel_gap_change = b% rl_relative_gap_old(b% d_i) - b% rl_relative_gap(b% d_i)
             else
                rel_gap_change = 0
             end if
-            
+
             if (b% angular_momentum_j_old /= 0) then
                j_change = b% angular_momentum_j - b% angular_momentum_j_old
             else
                j_change = 0
             end if
-            
+
             if (b% separation_old /= 0) then
                sep_change = b% separation - b% separation_old
             else
@@ -167,7 +167,7 @@
             sep_change = 0
             e_change = 0
          end if
-   
+
          ! get limits for dt based on relative changes
          if (b% fj > 0) then
             rel_change = abs(j_change/b% angular_momentum_j)
@@ -193,7 +193,7 @@
             end if
             dtm = s% time_step/(rel_change/(b% fm * b% time_delta_coeff)+1d-99)
          end if
-         
+
          if (b% fr > 0) then
             rel_change = abs(rel_gap_change/max(abs(b% rl_relative_gap(b% d_i)), b% fr_limit))
             if (.not. b% ignore_hard_limits_this_step .and. &
@@ -324,8 +324,8 @@
          end if
 
          b% ignore_hard_limits_this_step = .false.
-         
+
       end function binary_pick_next_timestep
-      
+
 
       end module binary_timestep
