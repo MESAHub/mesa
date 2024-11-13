@@ -25,12 +25,12 @@
 ! ***********************************************************************
 
       module chem_def
-      
+
       use utils_def, only: integer_dict
       use const_def, only: dp
       use math_lib, only: exp10
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
       ! Some notes on solar abundance scales:
@@ -77,7 +77,7 @@
       logical, parameter :: convert_mass_excess_to_binding_energy = .true.
       integer, parameter :: nuclide_not_found = -1 ! warning flag
 
-      integer, dimension(0:max_el_z) :: element_min_N, element_max_N 
+      integer, dimension(0:max_el_z) :: element_min_N, element_max_N
          ! for isos included in chem_isos
 
       ! element names
@@ -94,7 +94,7 @@
             'tl','pb','bi','po','at','rn','fr','ra','ac','th', &
             'pa','u','np','pu','am','cm','bk','cf','es','fm','md', &
             'no','lr','rf','db','sg','bh','hs','mt','ds','rg','cn']
-            
+
       character(len=long_name_length), dimension(0:max_el_z) ::  &
             el_long_name = [character(len=long_name_length) ::  &
             'neutron','hydrogen','helium','lithium','beryllium', &
@@ -127,8 +127,8 @@
       character(len=long_name_length), dimension(2:3) :: &
          long_al_isomers = [character(len=long_name_length) ::  &
             'Aluminum-gs','Aluminum-ex']
-      
-      
+
+
       ! chem element id numbers (up to Cn)
       ! note: for isotope i, the element id number = chem_Z(i)
 
@@ -175,7 +175,7 @@
       integer, parameter :: e_se = 34
       integer, parameter :: e_br = 35
       integer, parameter :: e_kr = 36
-      
+
       !periodic table, row 5
       integer, parameter :: e_rb = 37
       integer, parameter :: e_sr = 38
@@ -198,7 +198,7 @@
 
       !periodic table, row 6
       integer, parameter :: e_cs = 55
-      integer, parameter :: e_ba = 56      
+      integer, parameter :: e_ba = 56
       integer, parameter :: e_la = 57
       integer, parameter :: e_ce = 58
       integer, parameter :: e_pr = 59
@@ -229,7 +229,7 @@
       integer, parameter :: e_po = 84
       integer, parameter :: e_at = 85
       integer, parameter :: e_rn = 86
-      
+
       !periodic table, row 7
       integer, parameter :: e_fr = 87
       integer, parameter :: e_ra = 88
@@ -257,10 +257,10 @@
       integer, parameter :: e_ds = 110
       integer, parameter :: e_rg = 111
       integer, parameter :: e_cn = 112
-         
+
       integer, parameter :: num_chem_elements = max_el_z
 
-      
+
       ! anders & grevesse 1989
       integer, parameter :: solsiz = 286
       integer, parameter :: solnamelen = 5
@@ -268,8 +268,8 @@
       integer :: izsol(solsiz),iasol(solsiz),jcode(solsiz)
       real(dp) :: solx(solsiz), zsol, yesol ! according to AG89
       type (integer_dict), pointer :: Xsol_names_dict
-      
-      
+
+
       ! various values for current solar Z and Y (at photosphere)
       ! note that these have been reduced by diffusion from pre-MS values.
       ! values updated from Asplund et al. ARAA, 2009, 47, 481
@@ -284,7 +284,7 @@
       real(dp), parameter :: A09_Prz_zsol = 0.014d0
       real(dp), parameter :: MB22_photospheric_zsol = 0.0169d0
       real(dp), parameter :: AAG21_photospheric_zsol = 0.0139d0
-      
+
       real(dp), parameter :: AG89_ysol   = 0.2485d0
       real(dp), parameter :: GN93_ysol   = 0.2485d0
       real(dp), parameter :: GS98_ysol   = 0.2485d0
@@ -295,13 +295,13 @@
       real(dp), parameter :: A09_Prz_ysol = 0.276d0
       real(dp), parameter :: MB22_photospheric_ysol = 0.2485
       real(dp), parameter :: AAG21_photospheric_ysol = 0.2485
-      
+
       character(len=iso_name_length) :: chem_element_main_iso_name(num_chem_elements)
       integer, parameter :: chem_element_name_len = iso_name_length
-      character (len=chem_element_name_len)  :: chem_element_Name(num_chem_elements) 
+      character (len=chem_element_name_len)  :: chem_element_Name(num_chem_elements)
          ! names for elements
-      
-      
+
+
       ! identifiers for different Z fractions.
       integer, parameter :: Custom_zfracs = 0
       integer, parameter :: AG89_zfracs = 1
@@ -314,40 +314,40 @@
       integer, parameter :: A09_Prz_zfracs = 8
       integer, parameter :: MB22_photospheric_zfracs = 9
       integer, parameter :: AAG21_photospheric_zfracs = 10
-      
-         
+
+
       real(dp) :: AG89_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Anders & Grevesse 1989
-         
+
       real(dp) :: GN93_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Grevesse and Noels 1993 abundances
-         
+
       real(dp) :: GS98_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Grevesse and Sauval 1998 abundances
-         
+
       real(dp) :: L03_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Lodders 2003 abundances
-         
+
       real(dp) :: AGS05_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Asplund, Grevesse, and Sauval 2005 abundances
-         
+
       real(dp) :: AGSS09_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Asplund, Grevesse, Sauval, and Scott 2009 abundances
          ! Annu. Rev. Astron. Astrophys. 2009. 47:481–522
-         
+
       real(dp) :: L09_element_zfrac(num_chem_elements) ! fraction by mass of total Z
          ! Lodders and Palme, 2009.  (http://adsabs.harvard.edu/abs/2009M%26PSA..72.5154L)
-         
+
       real(dp) :: A09_Prz_zfrac(num_chem_elements)  ! fraction by mass of the total Z
          ! Abundances are abased on Asplund, Grevesse, Sauval, and Scott 2009, ARA&A, 47:481–522
          ! but that of the some key elements are updated based on:
-         ! "Present-day cosmic abundances ..." 
-            ! by Nieva, M.-F. & Przybilla, N. 2012, A&A, 539, 143 
+         ! "Present-day cosmic abundances ..."
+            ! by Nieva, M.-F. & Przybilla, N. 2012, A&A, 539, 143
          ! and the proceeding paper
             ! "Hot Stars and Cosmic Abundances" by
             ! Przybilla N. Nieva M. F., Irrgang A. and Butler K. 2013, EAS Publ. Ser.
             ! in preparation
-         ! The modified abundances w.r.t. A09 are (eps_El = log(El/H)+12.0) 
+         ! The modified abundances w.r.t. A09 are (eps_El = log(El/H)+12.0)
             ! eps_He = 10.99
             ! eps_C  = 8.33
             ! eps_N  = 7.79
@@ -358,7 +358,7 @@
             ! eps_Si = 7.50
             ! eps_S  = 7.14
             ! eps_Ar = 6.50
-            ! eps_Fe = 7.52   
+            ! eps_Fe = 7.52
 
       real(dp) :: MB22_photospheric_element_zfrac(num_chem_elements) ! fraction by mass of total Z
           ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
@@ -368,16 +368,16 @@
 
       type (integer_dict), pointer :: chem_element_names_dict
 
-         
+
       real(dp) :: element_atomic_weight(num_chem_elements)
          ! de Laeter et al, Pure and Applied Chemistry 75(6), 683–799, 2003.
          ! (IUPAC Technical Report)
-      
+
 
 
       ! temperature values at which partition function is defined
       real(dp), dimension(npart) :: Tpart
-         
+
 
       ! mass excess of proton, neutron in MeV (for calculating binding energies)
       ! should be consistent with the mass excess of the prot and neut from the isotopes.data file
@@ -402,7 +402,7 @@
          real(dp), dimension(:,:), pointer :: pfcn ! table of partition function
          real(dp), dimension(:), pointer :: mass_excess
          real(dp), dimension(:), pointer :: Z53 ! cache expensive Z^5/3 result
-      end type nuclide_data      
+      end type nuclide_data
 
       type (nuclide_data) :: chem_isos ! from winvn
       type (integer_dict), pointer :: chem_isos_dict
@@ -415,14 +415,14 @@
          character(len=iso_name_length) :: nuclide
          integer :: rank
       end type nuclide_set
-               
-      
+
+
       ! reaction categories
 
       integer, parameter :: ipp = 1 ! pp chains
       integer, parameter :: icno = 2 ! cno cycles
-      integer, parameter :: i3alf = 3 ! triple alpha  
-      
+      integer, parameter :: i3alf = 3 ! triple alpha
+
       ! "burn" in the following means decays or captures of protons, alphas, or neutrons
       integer, parameter :: i_burn_c = 4
       integer, parameter :: i_burn_n = 5
@@ -437,28 +437,28 @@
       integer, parameter :: i_burn_ti = 14
       integer, parameter :: i_burn_cr = 15
       integer, parameter :: i_burn_fe = 16
-      
+
       integer, parameter :: icc = 17 ! c12 + c12
       integer, parameter :: ico = 18 ! c12 + o16
       integer, parameter :: ioo = 19 ! o16 + o16
-      
+
       integer, parameter :: ipnhe4 = 20 ! 2prot + 2neut -> he4
-      
+
       integer, parameter :: iphoto = 21 ! photodisintegration
          ! note: for photodisintegrations, eps_nuc will be negative.
-         
+
       integer, parameter :: i_ni56_co56 = 22 ! ni56 -> co56
       integer, parameter :: i_co56_fe56 = 23 ! co56 -> fe56
       integer, parameter :: iother = 24 ! misc.
-   
+
       integer, parameter :: num_categories = iother
 
       integer, parameter :: maxlen_category_name = 16
-      character (len=maxlen_category_name) :: category_name(num_categories)      
+      character (len=maxlen_category_name) :: category_name(num_categories)
       type (integer_dict), pointer :: category_names_dict
 
-      
-      ! some commonly used values of get_nuclide_index      
+
+      ! some commonly used values of get_nuclide_index
       integer :: &
          ih1, ih2, ih3,  &
          ihe3, ihe4,  &
@@ -527,49 +527,49 @@
       logical :: chem_has_been_initialized = .false.
 
 
-      
+
       contains
-      
-      
+
+
       subroutine init_chem_tables
          use utils_lib, only: integer_dict_define, integer_dict_create_hash
-      
+
          integer :: i, ierr
-         
+
          Tpart = (/  &
             0.10d0, 0.15d0, 0.20d0, 0.30d0, 0.40d0, 0.50d0, &
             0.60d0, 0.70d0, 0.80d0, 0.90d0, 1.00d0, 1.50d0, &
             2.00d0, 2.50d0, 3.00d0, 3.50d0, 4.00d0, 4.50d0, &
             5.00d0, 6.00d0, 7.00d0, 8.00d0, 9.00d0, 10.0d0 /)
-            
+
          call init_ag_data
-      
+
          call init_chem_element_names
-      
+
          call init_chem_element_main_iso_names
-      
+
          call init_element_atomic_weights
-         
+
          call init_AG89_data
-         
+
          call init_GN93_data
-         
+
          call init_GS98_data
-         
+
          call init_L03_data
-         
+
          call init_AGS05_data
-         
+
          call init_AGSS09_data
-         
+
          call init_A09_Przybilla_data
 
          call init_MB22_photospheric_data
 
          call init_AAG21_photospheric_data
-         
+
          call init_L09_data
-         
+
          nullify(chem_element_names_dict)
          do i=1,num_chem_elements
             call integer_dict_define(chem_element_names_dict, chem_element_Name(i), i, ierr)
@@ -585,7 +585,7 @@
             flush(6)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call set_category_names
          nullify(category_names_dict)
          do i=1,num_categories
@@ -602,13 +602,13 @@
             flush(6)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
       end subroutine init_chem_tables
-      
-      
+
+
       subroutine init_ag_data
          use utils_lib
-      
+
          real(dp) :: sum
          integer :: i, j, ierr
 
@@ -728,7 +728,7 @@
              1.2023D-10, 2.7882D-10, 6.7411D-10, 3.1529D-10, 3.1369D-09, &
              3.4034D-09, 9.6809D-09, 7.6127D-10, 1.9659D-10, 3.8519D-13, &
              5.3760D-11 /)
-                                                          
+
 
 !..charge of the stable isotopes
 
@@ -742,7 +742,7 @@
         31,  32,  32,  32,  32,  32,  33,  34,  34,  34,  34,  34,  34, &
         35,  35,  36,  36,  36,  36,  36,  36,  37,  37,  38,  38,  38, &
         38,  39,  40,  40,  40,  40,  40,  41,  42,  42,  42,  42,  42 /)
- 
+
          izsol(118:234)  = (/ &
         42,  42,  44,  44,  44,  44,  44,  44,  44,  45,  46,  46,  46, &
         46,  46,  46,  47,  47,  48,  48,  48,  48,  48,  48,  48,  48, &
@@ -822,7 +822,7 @@
          0,   0,   1,   1,   0,   0,   2,   2,   0,   1,   1,   0,   0, &
          0,   0,   2,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0/)
 
-      
+
    ! get sum and stuff residual into hydrogen
         sum = 0.0d0
         do j=1,solsiz
@@ -830,7 +830,7 @@
         enddo
         sum = 1.0d0 - sum
         solx(1) = solx(1) + sum
-        
+
         sum  = 0.0d0
         do j=1,solsiz
            if (izsol(j) .ge. 3) then
@@ -838,13 +838,13 @@
            endif
         enddo
         zsol = sum
-        
+
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + dble(izsol(j))/dble(iasol(j))*solx(j)
         enddo
         yesol = sum
-        
+
         nullify(Xsol_names_dict)
         ierr = 0
         do i=1,solsiz
@@ -873,10 +873,10 @@
            flush(6)
            call mesa_error(__FILE__,__LINE__)
         end if
-         
+
       end subroutine init_ag_data
-            
-      
+
+
       subroutine init_chem_element_names
          integer :: i
          chem_element_name(:) = ''
@@ -887,14 +887,14 @@
             if (len_trim(chem_element_name(i)) == 0) then
                write(*,*)'missing chem_element_name(i)', i
                flush(6)
-               call mesa_error(__FILE__,__LINE__) 
+               call mesa_error(__FILE__,__LINE__)
             end if
          end do
 
       end subroutine init_chem_element_names
 
-      
-      
+
+
       subroutine init_chem_element_main_iso_names
          ! the iso with the largest number abundance according to Lodders03
          integer :: i
@@ -913,7 +913,7 @@
          chem_element_main_iso_name(e_o) = 'o16'
          chem_element_main_iso_name(e_f) = 'f19'
          chem_element_main_iso_name(e_ne) = 'ne20'
-         
+
          !periodic table, row 3
          chem_element_main_iso_name(e_na) = 'na23'
          chem_element_main_iso_name(e_mg) = 'mg24'
@@ -1030,13 +1030,13 @@
             if (len_trim(chem_element_main_iso_name(i)) == 0) then
                write(*,*)'missing chem_element_main_iso_name', i
                flush(6)
-               call mesa_error(__FILE__,__LINE__) 
+               call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
       end subroutine init_chem_element_main_iso_names
-      
-      
+
+
       subroutine init_element_atomic_weights
          use utils_lib, only: integer_dict_lookup
          integer :: i, isotope_index, ierr
@@ -1052,15 +1052,15 @@
             element_atomic_weight(i) = chem_isos% W(isotope_index)
          end do
       end subroutine init_element_atomic_weights
-      
-      
+
+
       subroutine init_AG89_data ! fraction by mass of total Z
          ! anders & grevesse 1989, paper not available on ADS
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
 
          AG89_element_zfrac(:) = 0d0
-         
+
          AG89_element_zfrac(e_li) =     5.2663415161043120D-07
          AG89_element_zfrac(e_be) =     8.7533846996258026D-09
          AG89_element_zfrac(e_b)  =     3.0535981584981396D-07
@@ -1089,23 +1089,23 @@
          AG89_element_zfrac(e_ni) =     3.8650578305194534D-03
          AG89_element_zfrac(e_cu) =     4.4243068859971588D-05
          AG89_element_zfrac(e_zn) =     1.0994428157112287D-04
-         
+
          z_sum = sum(AG89_element_zfrac(:))
          do i = e_li, e_zn
             AG89_element_zfrac(i) = AG89_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AG89_data
 
 
       subroutine init_GN93_data ! fraction by mass of total Z
          ! Grevesse and Noels 1993
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          GN93_element_zfrac(:) = -20.0d0
-         
+
         !GN93_element_zfrac(e_H)=12.00d0
         !GN93_element_zfrac(e_He)=10.99d0
          GN93_element_zfrac(e_Li)=3.31d0 !meteor
@@ -1202,12 +1202,12 @@
          end do
 
       end subroutine init_GN93_data
-      
-      
+
+
       subroutine init_GS98_data ! fraction by mass of total Z
          ! Grevesse and Sauval 1998, Table 1
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          GS98_element_zfrac(:) = -20.0d0
@@ -1295,7 +1295,7 @@
          GS98_element_zfrac(e_Bi)=0.71d0
          GS98_element_zfrac(e_Th)=0.09d0
          GS98_element_zfrac(e_U)=-0.50d0
-         
+
          ! convert to fraction of Z by mass
          z_sum = 0d0
          do i = e_li, e_u
@@ -1306,17 +1306,17 @@
          do i = e_li, e_u
             GS98_element_zfrac(i) = GS98_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_GS98_data
-            
+
       subroutine init_L03_data ! fraction by mass of total Z
          ! Lodders 2003, ApJ, Table 1 recommended abundance
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          L03_element_zfrac(:) = -20.0d0
-         
+
         !L03_element_zfrac(e_H)=12d0
         !L03_element_zfrac(e_He)=10.89d0
         L03_element_zfrac(e_Li)=3.28d0
@@ -1411,18 +1411,18 @@
          do i = e_li, e_u
             L03_element_zfrac(i) = L03_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_L03_data
-      
-      
+
+
       subroutine init_AGS05_data ! fraction by mass of total Z
-         ! Asplund, Grevesse and Sauval 2005      
+         ! Asplund, Grevesse and Sauval 2005
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          AGS05_element_zfrac(:) = -20.0d0
-                  
+
          ! first store log abundances from the paper (photosphere unless otherwise noted)
          ! relative to log abundance of H = 12.00d0
          AGS05_element_zfrac(e_li) = 3.25d0 !meteor
@@ -1517,19 +1517,19 @@
          do i = e_li, e_u
             AGS05_element_zfrac(i) = AGS05_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AGS05_data
-      
-      
+
+
       subroutine init_AGSS09_data ! fraction by mass of total Z
          ! Asplund, Grevesse, Sauval, and Scott 2009 abundances
          ! Annu. Rev. Astron. Astrophys. 2009. 47:481–522
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          AGSS09_element_zfrac(:) = -20.0d0
-         
+
          ! first store log abundances from the paper
          AGSS09_element_zfrac(e_li) = 3.26d0
          AGSS09_element_zfrac(e_be) = 1.38d0
@@ -1612,7 +1612,7 @@
          AGSS09_element_zfrac(e_Bi) = 0.65d0
          AGSS09_element_zfrac(e_Th) = 0.02d0
          AGSS09_element_zfrac(e_U) = -0.54d0
-         
+
          ! convert to fraction of Z by mass
          z_sum = 0
          do i = e_li, e_u
@@ -1623,7 +1623,7 @@
          do i = e_li, e_u
             AGSS09_element_zfrac(i) = AGSS09_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AGSS09_data
 
 
@@ -1634,9 +1634,9 @@
          ! Przybilla et al. (2013), EAS proceeding to be published
          ! The modified elements are: he, c, n, o, ne, mg, al, si, s, ar, fe
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          A09_Prz_zfrac(:)  = -20.0d0
 
 !         A09_Prz_zfrac(e_h ) = 12.00d0
@@ -1722,7 +1722,7 @@
          A09_Prz_zfrac(e_bi) = 0.65d0
          A09_Prz_zfrac(e_th) = 0.02d0
          A09_Prz_zfrac(e_u ) = -0.54d0
-                           
+
          ! convert to fraction of Z by mass
          z_sum = 0d0
          do i = e_li, e_u
@@ -1733,16 +1733,16 @@
          do i = e_li, e_u
             A09_Prz_zfrac(i) = A09_Prz_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_A09_Przybilla_data
-    
+
     subroutine init_MB22_photospheric_data ! fraction by mass of total Z
        ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
        ! supplimented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
        integer :: i
        real(dp) :: z_sum
        include 'formats'
-       
+
        MB22_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
@@ -1838,7 +1838,7 @@
          do i = e_li, e_u
             MB22_photospheric_element_zfrac(i) = MB22_photospheric_element_zfrac(i) / z_sum
          end do
-       
+
       end subroutine init_MB22_photospheric_data
 
 
@@ -1850,7 +1850,7 @@
        integer :: i
        real(dp) :: z_sum
        include 'formats'
-       
+
        AAG21_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
@@ -1946,17 +1946,17 @@
          do i = e_li, e_u
             AAG21_photospheric_element_zfrac(i) = AAG21_photospheric_element_zfrac(i) / z_sum
          end do
-       
+
       end subroutine init_AAG21_photospheric_data
-      
+
       subroutine init_L09_data ! fraction by mass of total Z
          ! Lodders 09
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          L09_element_zfrac(:) = 0
-         
+
          ! mass fractions
          L09_element_zfrac(e_li) = 1.054594933683d-08
          L09_element_zfrac(e_be) = 1.5087555571d-10
@@ -2039,20 +2039,20 @@
          L09_element_zfrac(e_Bi) = 7.9004226175D-10
          L09_element_zfrac(e_Th) = 2.7961831384D-10
          L09_element_zfrac(e_U) = 1.546830543D-10
-         
+
          ! convert from mass fraction to fraction of Z by mass
          z_sum = sum(L09_element_zfrac(e_li:e_u))
          do i = e_li, e_u
             L09_element_zfrac(i) = L09_element_zfrac(i) / z_sum
          end do
-                  
+
       end subroutine init_L09_data
 
 
       subroutine allocate_nuclide_data(d,n,ierr)
          type(nuclide_data), intent(out) :: d
          integer, intent(in) :: n
-         integer, intent(out) :: ierr  
+         integer, intent(out) :: ierr
          ierr = 0
          allocate(d% name(n), d% W(n), d% Z(n), d% N(n), d% Z_plus_N(n),  &
                d% spin(N), d% binding_energy(n), d% Z53(n), &
@@ -2061,7 +2061,7 @@
          if (ierr /= 0) return
          d% nnuclides = n
       end subroutine allocate_nuclide_data
-      
+
 
       subroutine free_nuclide_data(n)
          type(nuclide_data), intent(inout) :: n
@@ -2071,8 +2071,8 @@
                n% isomeric_state, n% mass_excess, n% pfcn, n% chem_id, n% nuclide)
          n% nnuclides = 0
       end subroutine free_nuclide_data
-      
-      
+
+
       subroutine free_lodders03_table()
             use utils_lib, only : integer_dict_free
             deallocate(lodders03_tab6% isotopic_percent)
@@ -2097,7 +2097,7 @@
          if (ierr /= 0) indx = nuclide_not_found
       end function get_nuclide_index
 
-      
+
       subroutine set_some_isos
          ih1 = get_nuclide_index('h1')
          ih2 = get_nuclide_index('h2')
@@ -2505,7 +2505,7 @@
          izn72 = get_nuclide_index('zn72')
          izn73 = get_nuclide_index('zn73')
          izn74 = get_nuclide_index('zn74')
-         
+
          iga60 = get_nuclide_index('ga60')
          iga61 = get_nuclide_index('ga61')
          iga62 = get_nuclide_index('ga62')
@@ -2522,7 +2522,7 @@
          iga73 = get_nuclide_index('ga73')
          iga74 = get_nuclide_index('ga74')
          iga75 = get_nuclide_index('ga75')
-         
+
          ige59 = get_nuclide_index('ge59')
          ige60 = get_nuclide_index('ge60')
          ige61 = get_nuclide_index('ge61')
@@ -2541,7 +2541,7 @@
          ige74 = get_nuclide_index('ge74')
          ige75 = get_nuclide_index('ge75')
          ige76 = get_nuclide_index('ge76')
-         
+
          ias71 = get_nuclide_index('as71')
          ias72 = get_nuclide_index('as72')
          ias73 = get_nuclide_index('as73')
@@ -2551,7 +2551,7 @@
          ias77 = get_nuclide_index('as77')
          ias78 = get_nuclide_index('as78')
          ias79 = get_nuclide_index('as79')
-         
+
          ise68 = get_nuclide_index('se68')
          ise69 = get_nuclide_index('se69')
          ise70 = get_nuclide_index('se70')
@@ -2585,12 +2585,12 @@
          isn104 = get_nuclide_index('sn104')
          ineut = get_nuclide_index('neut')
          iprot = get_nuclide_index('prot')
-         
+
       end subroutine set_some_isos
-         
-         
+
+
       integer function category_id(cname)
-         character (len=*), intent(in)  :: cname 
+         character (len=*), intent(in)  :: cname
          ! returns id for the category if there is a matching name
          ! returns 0 otherwise.
          integer :: i, len
@@ -2611,8 +2611,8 @@
          end do
          category_id = 0
       end function category_id
-      
-      
+
+
       subroutine set_category_names
          integer :: i
          category_name(:) = ''
@@ -2641,12 +2641,12 @@
 
          category_name(iphoto) = 'photo'
          category_name(ipnhe4) = 'pnhe4'
-         
+
          category_name(i_ni56_co56) = 'ni56_co56'
          category_name(i_co56_fe56) = 'co56_fe56'
 
          category_name(iother) = 'other'
-         
+
          i=1 ! write it this way to avoid stupid compiler warning.
          if (len_trim(category_name(i)) == 0) then
             write(*,*) 'missing name for category', i
@@ -2661,7 +2661,7 @@
                call mesa_error(__FILE__,__LINE__,'set_category_names')
             end if
          end do
-         
+
       end subroutine set_category_names
 
 

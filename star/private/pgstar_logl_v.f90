@@ -72,7 +72,7 @@
          logical, parameter :: reverse_xaxis = .false., reverse_yaxis = .false.
          character (len=64) :: xname, xaxis_label
          ierr = 0
-         if (show_photosphere_v) then 
+         if (show_photosphere_v) then
             xname = 'photosphere_v_km_s'
             xaxis_label = 'v\dphot (km/s)'
          else

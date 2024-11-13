@@ -75,8 +75,8 @@
          if(abs(val1-val2) < atol .or. abs(val1-val2)/val1 < rtol ) then
             res = val2
          else
-            val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr) 
-            val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr) 
+            val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr)
+            val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr)
 
             res = val1+val2
             if(ierr/=0) return

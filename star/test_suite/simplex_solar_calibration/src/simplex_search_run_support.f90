@@ -33,13 +33,13 @@
       use const_def
       use simplex_search_data
 
-      
-      implicit none
-      
-      
-      contains        
 
-               
+      implicit none
+
+
+      contains
+
+
       subroutine do_run_star_simplex( &
             extras_controls, inlist_simplex_search_controls_fname)
          use run_star_support, only: do_read_star_job, id_from_read_star_job
@@ -47,14 +47,14 @@
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
+            end subroutine extras_controls
          end interface
          character (len=256) :: inlist_simplex_search_controls_fname
          optional inlist_simplex_search_controls_fname
 
          integer :: id, ierr
          character (len=256) :: inlist_fname
-         
+
          include 'formats'
 
          ierr = 0
@@ -67,10 +67,10 @@
          star_id = id
 
          okay_to_restart = .true.
-         
+
          call init_simplex_search_data(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          star_simplex_procs% extras_controls => extras_controls
 
          if (present(inlist_simplex_search_controls_fname)) then
@@ -84,7 +84,7 @@
             write(*,*) 'failed in read_simplex_search_controls'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (Y_depends_on_Z .and. vary_Y) then
             vary_Y = .false.
             write(*,*) &
@@ -98,12 +98,12 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end if
-         
+
          next_Y_to_try = -1
          next_FeH_to_try = -1
-         next_mass_to_try = -1      
+         next_mass_to_try = -1
          next_alpha_to_try = -1
-         next_f_ov_to_try = -1 
+         next_f_ov_to_try = -1
          sample_number = 0
          max_num_samples = 0
          num_chi2_too_big = 0
@@ -118,7 +118,7 @@
          my_param1 = 0
          my_param2 = 0
          my_param3 = 0
-         
+
          call init_sample_ptrs
 
          if (just_do_first_values) then
@@ -136,12 +136,12 @@
          end if
 
       end subroutine do_run_star_simplex
-      
-      
+
+
       subroutine do_simplex(ierr)
          use num_lib
          integer, intent(out) :: ierr
-         
+
          real(dp) :: final_mass, final_alpha, final_Y, final_FeH
          real(dp), dimension(:), pointer :: x_first, x_lower, x_upper, x_final
          real(dp), pointer :: simplex(:,:), f(:)
@@ -153,11 +153,11 @@
             num_fcn_calls_for_ars, num_accepted_for_ars
          integer :: seed, i, j, k, num_samples
          logical :: start_from_given_simplex_and_f
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          if (vary_mass) then
             nvar = nvar+1; i_mass = nvar
             if (min_mass >= max_mass) then
@@ -174,7 +174,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_FeH) then
             nvar = nvar+1; i_FeH = nvar
             if (min_FeH >= max_FeH) then
@@ -183,7 +183,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_alpha) then
             nvar = nvar+1; i_alpha = nvar
             if (min_alpha >= max_alpha) then
@@ -192,7 +192,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_f_ov) then
             nvar = nvar+1; i_f_ov = nvar
             if (min_f_ov >= max_f_ov) then
@@ -201,7 +201,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_my_param1) then
             nvar = nvar+1; i_my_param1 = nvar
             if (min_my_param1 >= max_my_param1) then
@@ -210,7 +210,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_my_param2) then
             nvar = nvar+1; i_my_param2 = nvar
             if (min_my_param2 >= max_my_param2) then
@@ -219,7 +219,7 @@
                ierr = -1
             end if
          end if
-         
+
          if (vary_my_param3) then
             nvar = nvar+1; i_my_param3 = nvar
             if (min_my_param3 >= max_my_param3) then
@@ -230,13 +230,13 @@
          end if
 
          if (ierr /= 0) return
-         
+
          lrpar = 0; lipar = 0
 
          allocate( &
             rpar(lrpar), ipar(lipar), simplex(nvar,nvar+1), f(nvar+1), &
             x_lower(nvar), x_upper(nvar), x_first(nvar), x_final(nvar))
-         
+
          if (.not. scale_simplex_params) then
             call set_xs
          else ! values are scaled to -1..1 with first at 0
@@ -244,7 +244,7 @@
             x_upper(1:nvar) = 1
             x_first(1:nvar) = 0
          end if
-                  
+
          if (restart_simplex_from_file) then
             call read_samples_from_file(simplex_output_filename, ierr)
             if (ierr /= 0) return
@@ -255,13 +255,13 @@
             end if
             num_samples = sample_number
             call setup_simplex_and_f(ierr)
-            if (ierr /= 0) return            
+            if (ierr /= 0) return
             start_from_given_simplex_and_f = .true.
             call set_sample_averages
          else
             start_from_given_simplex_and_f = .false.
          end if
-         
+
          call NM_simplex( &
             nvar, x_lower, x_upper, x_first, x_final, f_final, &
             simplex, f, start_from_given_simplex_and_f, simplex_f, &
@@ -274,7 +274,7 @@
             lrpar, rpar, lipar, ipar, &
             num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
-         
+
          if (vary_Y) &
             final_Y = simplex_param( &
                x_final(i_Y), first_Y, min_Y, max_Y)
@@ -283,32 +283,32 @@
             final_FeH = simplex_param( &
                x_final(i_FeH), first_FeH, &
                min_FeH, max_FeH)
-         
+
          if (vary_mass) &
             final_mass = simplex_param( &
                x_final(i_mass), first_mass, &
                min_mass, max_mass)
-         
+
          if (vary_alpha) &
             final_alpha = simplex_param( &
                x_final(i_alpha), first_alpha, &
                min_alpha, max_alpha)
-         
+
          if (vary_f_ov) &
             final_f_ov = simplex_param( &
                x_final(i_f_ov), first_f_ov, &
                min_f_ov, max_f_ov)
-         
+
          if (vary_my_param1) &
             final_my_param1 = simplex_param( &
                x_final(i_my_param1), first_my_param1, &
                min_my_param1, max_my_param1)
-         
+
          if (vary_my_param2) &
             final_my_param2 = simplex_param( &
                x_final(i_my_param2), first_my_param2, &
                min_my_param2, max_my_param2)
-         
+
          if (vary_my_param3) &
             final_my_param3 = simplex_param( &
                x_final(i_my_param3), first_my_param3, &
@@ -316,11 +316,11 @@
 
          deallocate( &
             rpar, ipar, simplex, f, x_lower, x_upper, x_first, x_final)
-            
-            
+
+
          contains
-         
-         
+
+
          subroutine set_xs ! x_first, x_lower, x_upper
             if (vary_Y) then
                x_first(i_Y) = first_Y
@@ -346,35 +346,35 @@
                x_first(i_f_ov) = first_f_ov
                x_lower(i_f_ov) = min_f_ov
                x_upper(i_f_ov) = max_f_ov
-            end if         
+            end if
             if (vary_my_param1) then
                x_first(i_my_param1) = first_my_param1
                x_lower(i_my_param1) = min_my_param1
                x_upper(i_my_param1) = max_my_param1
-            end if         
+            end if
             if (vary_my_param2) then
                x_first(i_my_param2) = first_my_param2
                x_lower(i_my_param2) = min_my_param2
                x_upper(i_my_param2) = max_my_param2
-            end if         
+            end if
             if (vary_my_param3) then
                x_first(i_my_param3) = first_my_param3
                x_lower(i_my_param3) = min_my_param3
                x_upper(i_my_param3) = max_my_param3
-            end if         
+            end if
          end subroutine set_xs
-         
-         
+
+
          subroutine setup_simplex_and_f(ierr)
             use num_lib, only: qsort
             integer, intent(out) :: ierr
-            
+
             integer :: j, i, k, max_i, jj
             integer, pointer :: index(:)
             ! sort results by increasing sample_chi2
-            
+
             include 'formats'
-            
+
             ierr = 0
             allocate(index(num_samples), stat=ierr)
             if (ierr /= 0) then
@@ -397,17 +397,17 @@
                   simplex(i_FeH,j) = &
                      simplex_inverse(sample_init_FeH(i), first_FeH, min_FeH, max_FeH)
                   write(*,3) 'FeH', j, i, sample_init_FeH(i)
-               end if         
+               end if
                if (vary_mass) then
                   simplex(i_mass,j) = &
                      simplex_inverse(sample_mass(i), first_mass, min_mass, max_mass)
                   write(*,3) 'mass', j, i, sample_mass(i)
-               end if        
+               end if
                if (vary_alpha) then
                   simplex(i_alpha,j) = &
                      simplex_inverse(sample_alpha(i), first_alpha, min_alpha, max_alpha)
                   write(*,3) 'alpha', j, i, sample_alpha(i)
-               end if         
+               end if
                if (vary_f_ov) then
                   simplex(i_f_ov,j) = &
                      simplex_inverse(sample_f_ov(i), first_f_ov, min_f_ov, max_f_ov)
@@ -430,7 +430,7 @@
                end if
                 write(*,'(A)')
             end do
-            
+
             deallocate(index)
 
             write(*,2) 'num_samples', max_i
@@ -458,9 +458,9 @@
             write(*,'(A)')
             write(*,'(A)')
             num_samples = max_i
-            
+
          end subroutine setup_simplex_and_f
-         
+
       end subroutine do_simplex
 
 
@@ -475,15 +475,15 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
-         
+
          integer :: prev_sample_number
          include 'formats'
-         
+
          ierr = 0
-         
+
          write(*,'(A)')
          write(*,'(A)')
-         
+
          if (vary_Y) then
             next_Y_to_try = simplex_param( &
                x(i_Y), first_Y, min_Y, max_Y)
@@ -501,7 +501,7 @@
             write(*,1) 'next_FeH_to_try', &
                next_FeH_to_try, x(i_FeH)
          end if
-         
+
          if (vary_mass) then
             next_mass_to_try = simplex_param(&
                x(i_mass), first_mass, min_mass, max_mass)
@@ -513,7 +513,7 @@
                return
             end if
          end if
-         
+
          if (vary_alpha) then
             next_alpha_to_try = simplex_param( &
                x(i_alpha), first_alpha, min_alpha, max_alpha)
@@ -525,7 +525,7 @@
                return
             end if
          end if
-         
+
          if (vary_f_ov) then
             next_f_ov_to_try = simplex_param( &
                x(i_f_ov), first_f_ov, min_f_ov, max_f_ov)
@@ -537,7 +537,7 @@
                return
             end if
          end if
-         
+
          if (vary_my_param1) then
             next_my_param1_to_try = simplex_param( &
                x(i_my_param1), first_my_param1, min_my_param1, max_my_param1)
@@ -549,7 +549,7 @@
                return
             end if
          end if
-         
+
          if (vary_my_param2) then
             next_my_param2_to_try = simplex_param( &
                x(i_my_param2), first_my_param2, min_my_param2, max_my_param2)
@@ -561,7 +561,7 @@
                return
             end if
          end if
-         
+
          if (vary_my_param3) then
             next_my_param3_to_try = simplex_param( &
                x(i_my_param3), first_my_param3, min_my_param3, max_my_param3)
@@ -573,7 +573,7 @@
                return
             end if
          end if
-         
+
          prev_sample_number = sample_number
          simplex_f = eval1(star_id, ierr)
          if (ierr /= 0) then
@@ -582,13 +582,13 @@
             simplex_f = 1d99
             return
          end if
-         
+
          if (sample_number == prev_sample_number) then
             write(*,*) 'failed to get new chi^2 -- try again'
             simplex_f = 1d99
             return
          end if
-         
+
          call save_best_for_sample(sample_number, op_code)
 
          call save_sample_results_to_file(-1, simplex_output_filename, ierr)
@@ -602,10 +602,10 @@
             ierr = -1
             return
          endif
-         
+
       end function simplex_f
 
-      
+
       real(dp) function simplex_param(x, first, min, max) result(param)
          real(dp), intent(in) :: x, first, min, max
          if (.not. scale_simplex_params) then
@@ -619,7 +619,7 @@
          end if
       end function simplex_param
 
-      
+
       real(dp) function simplex_inverse(param, first, min, max) result(x)
          real(dp), intent(in) :: param, first, min, max
          if (.not. scale_simplex_params) then
@@ -641,11 +641,11 @@
          end if
       end function simplex_inverse
 
-      
+
       subroutine save_best_for_sample(i, op_code)
          integer, intent(in) :: i, op_code
          integer :: ierr
-                
+
          if (i <= 0) return
          if (i > max_num_samples) then
             call alloc_sample_ptrs(ierr)
@@ -655,10 +655,10 @@
                return
             end if
          end if
-                  
+
          sample_op_code(i) = op_code
          sample_chi2(i) = best_chi2
-         
+
          sample_age(i) = best_age
          sample_init_Y(i) = current_Y
          sample_init_FeH(i) = current_FeH
@@ -676,7 +676,7 @@
          sample_Teff(i) = best_Teff
          sample_logg(i) = best_logg
          sample_FeH(i) = best_FeH
-         
+
          sample_logR(i) = best_logR
          sample_surface_Z_div_X(i) = best_surface_Z_div_X
          sample_surface_He(i) = best_surface_He
@@ -693,14 +693,14 @@
          call set_sample_averages
 
       end subroutine save_best_for_sample
-      
-      
+
+
       subroutine set_sample_averages
          integer :: ierr, jj, j, n
          real(dp) :: avg_age_top_samples2, avg_model_number_top_samples2
-         
+
          include 'formats'
-      
+
          call set_sample_index_by_chi2
          n = min(sample_number, max_num_samples_for_avg)
          if (n < max(2,min_num_samples_for_avg)) then
@@ -738,7 +738,7 @@
             sqrt(max(0d0,(avg_model_number_top_samples2 - &
                   avg_model_number_top_samples*avg_model_number_top_samples/n)/(n-1)))
          avg_model_number_top_samples = avg_model_number_top_samples/n
-         
+
          write(*,'(A)')
          write(*,2) 'n for averages', n
          write(*,1) 'avg_age_top_samples', avg_age_top_samples
@@ -751,10 +751,10 @@
                avg_model_number_sigma_limit*avg_model_number_sigma
          write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'set_sample_averages')
-         
+
       end subroutine set_sample_averages
-      
-      
+
+
       subroutine zero_best_info
          best_chi2 = 0
          best_init_h1 = 0
@@ -780,36 +780,36 @@
          best_my_param3 = 0
       end subroutine zero_best_info
 
-      
-      real(dp) function eval1(id_in,ierr)         
+
+      real(dp) function eval1(id_in,ierr)
          use run_star_support, only: run1_star
-         
+
          integer, intent(in) :: id_in
          integer, intent(out) :: ierr
-         
+
          logical, parameter :: &
             do_alloc_star = .false., &
             do_free_star = .false.
-            
+
          type (star_info), pointer :: s
          logical :: restart
-         integer :: id, i      
+         integer :: id, i
 
          include 'formats'
-         
+
          ierr = 0
          id = id_in
-         
-         call star_ptr(id, s, ierr) 
+
+         call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
          eval1 = -1
-         
+
          ! init for start of run
-         best_chi2 = -1    
-         num_chi2_too_big = 0     
+         best_chi2 = -1
+         num_chi2_too_big = 0
          simplex_max_dt_next = 1d99
-         
+
          call run1_star( &
             do_alloc_star, do_free_star, &   ! note that these are both false
             okay_to_restart, &
@@ -817,33 +817,33 @@
             simplex_extras_controls, &
             ierr)
          if (ierr /= 0) return
-         
+
          s% max_years_for_timestep = initial_max_years_for_timestep
          simplex_using_revised_max_yr_dt = .false.
          simplex_revised_max_yr_dt = s% max_years_for_timestep
-                  
+
          okay_to_restart = .false. ! only allow restart on 1st call to run1_star
-         
+
          eval1 = best_chi2
-         
+
          if (simplex_just_call_my_extras_check_model) return
-         
+
          if (best_chi2 < 0) then
             write(*,*) 'failed to find chi^2 for this run'
             call zero_best_info
             best_chi2 = 999999d0
             return
          end if
-         
+
          sample_number = sample_number + 1
-         write(*,*)         
+         write(*,*)
          call show_best(6)
-         
+
          if (write_best_model_data_for_each_sample) &
             call write_best(sample_number)
-         
+
       end function eval1
-      
+
 
       subroutine simplex_extras_controls(id, ierr)
          integer, intent(in) :: id
@@ -854,12 +854,12 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-          
+
          call star_simplex_procs% extras_controls(id, ierr)
          if (ierr /= 0) return
 
          initial_max_years_for_timestep = s% max_years_for_timestep
-         
+
          if (simplex_just_call_my_extras_check_model) return
 
          ! overwrite various inlist controls
@@ -899,7 +899,7 @@
          else
             f_ov = first_f_ov
          end if
-      
+
          if (vary_FeH) then
             FeH = next_FeH_to_try
          else
@@ -916,7 +916,7 @@
             X = (1d0 - Y0)/c
             Y = (Y0 + a*(b + Y0))/c
             Z = 1d0 - (X + Y)
-         else 
+         else
             if (vary_Y) then
                Y = next_Y_to_try
             else
@@ -931,30 +931,30 @@
          else
             s% job% new_mass = first_mass
          end if
-         
+
          s% job% relax_initial_mass = .true.
          s% initial_mass = s% job% new_mass
-         
+
          initial_Y = Y
          !s% initial_Z = Z << don't do this. it interferes with use of zams file.
-         
+
          s% job% initial_h1 = X
          s% job% initial_h2 = 0
          s% job% initial_he3 = Y_frac_he3*Y
          s% job% initial_he4 = Y - s% job% initial_he3
-         s% job% set_uniform_initial_composition = .true. 
-         
+         s% job% set_uniform_initial_composition = .true.
+
          current_Y = Y
          current_FeH = FeH
          current_mass = s% job% new_mass
          current_alpha = s% mixing_length_alpha
          current_f_ov = f_ov
-         
+
          current_h1 = X
          current_he3 = s% job% initial_he3
          current_he4 = s% job% initial_he4
          current_Z = Z
-         
+
          if (f_ov /= 0d0) then
             s% overshoot_scheme(1) = 'exponential'
             s% overshoot_zone_type(1) = 'any'
@@ -963,19 +963,19 @@
             s% overshoot_f(1) = f_ov
             s% overshoot_f0(1) = f0_ov_div_f_ov*f_ov
          end if
-         
+
          s% extras_check_model => simplex_extras_check_model
          s% extras_finish_step => simplex_extras_finish_step
          s% extras_after_evolve => simplex_extras_after_evolve
-           
+
       end subroutine simplex_extras_controls
 
 
-      integer function simplex_extras_check_model(id)            
+      integer function simplex_extras_check_model(id)
          integer, intent(in) :: id
          integer :: other_check, ierr
          type (star_info), pointer :: s
-         
+
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
@@ -991,24 +991,24 @@
             if (other_check > simplex_extras_check_model) &
                simplex_extras_check_model = other_check
          end if
-         
+
          star_model_number = s% model_number
-               
+
       end function simplex_extras_check_model
 
-      
+
       integer function simplex_extras_finish_step(id)
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
-         simplex_extras_finish_step = star_simplex_procs% extras_finish_step(id)         
+         simplex_extras_finish_step = star_simplex_procs% extras_finish_step(id)
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          s% dt_next = min(s% dt_next, simplex_max_dt_next)
       end function simplex_extras_finish_step
 
-      
+
       subroutine simplex_extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -1024,7 +1024,7 @@
             !write(*,*) 'call do_simplex_extras_check_model before terminate'
             ckm = do_simplex_extras_check_model(s, id)
             !write(*,*) 'done do_simplex_extras_check_model before terminate'
-         end if         
+         end if
          call star_simplex_procs% extras_after_evolve(id, ierr)
          if (save_info_for_last_model) then
             write(*,1) 'chi2', chi2
@@ -1051,21 +1051,21 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: id
-         
+
          integer :: ierr, i, j, n
          logical :: store_model, checking_age
          real(dp) :: age_limit, model_limit, err, X, Y, Z, &
             surface_X, surface_Z, remaining_years, prev_max_years, min_max
-         
+
          include 'formats'
-         
+
          do_simplex_extras_check_model = keep_going
          simplex_max_dt_next = 1d99
          chi2 = -1
          FeH = -1
          checking_age = &
             eval_chi2_at_target_age_only .or. include_age_in_chi2
-         
+
          if (checking_age) then
             if (num_smaller_steps_before_age_target <= 0 .or. &
                 dt_for_smaller_steps_before_age_target <= 0) then
@@ -1113,7 +1113,7 @@
                         i = floor(remaining_years/s% max_years_for_timestep + 1d-6)
                         write(*,3) 'remaining steps and years until age target', &
                            s% model_number, i, remaining_years
-                     else 
+                     else
                         write(*,2) 'remaining_years until age target', &
                            s% model_number, remaining_years
                      end if
@@ -1141,16 +1141,16 @@
             return
          end if
 
-         if (include_age_in_chi2 .and. s% star_age < min_age_for_chi2) return         
+         if (include_age_in_chi2 .and. s% star_age < min_age_for_chi2) return
          if (eval_chi2_at_target_age_only .and. s% star_age < age_target) return
 
          if (s% L_nuc_burn_total < s% L_phot*Lnuc_div_L_limit .or. &
                s% star_age < min_age_limit) then
             return
          end if
-         
+
          if (.not. checking_age) then
-         
+
             age_limit = avg_age_top_samples + avg_age_sigma_limit*avg_age_sigma
             if (s% star_age > age_limit) then
                write(*,1) 'star age > limit from top samples', s% star_age, age_limit
@@ -1160,7 +1160,7 @@
                do_simplex_extras_check_model = terminate
                return
             end if
-         
+
             model_limit = &
                avg_model_number_top_samples + &
                   avg_model_number_sigma_limit*avg_model_number_sigma
@@ -1175,7 +1175,7 @@
             end if
 
          end if
-         
+
          surface_X = max(s% surface_h1, 1d-10)
          surface_He = s% surface_he3 + s% surface_he4
          surface_Z = max(1d-99, min(1d0, 1 - (surface_X + surface_He)))
@@ -1201,10 +1201,10 @@
          else
             solar_cs_rms = 0
          end if
-         
+
          call check_limits
          if (do_simplex_extras_check_model /= keep_going) return
-         
+
          chi2 = get_chi2(s, .true., ierr)
          if (ierr /= 0) then
             write(*,'(a40,i6)') 'failed to calculate chi^2', s% model_number
@@ -1234,11 +1234,11 @@
          write(*,'(a50,i6,99f16.2)') 'chi^2', s% model_number, chi2
 
          store_model = .true.
-          
+
          if (checking_age) then
             ! leave max_years_for_timestep as is
          else if (chi2 <= chi2_limit_for_smallest_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_smallest_limit
             if (s% dt > max_yrs_dt_chi2_smallest_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smallest_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1247,9 +1247,9 @@
                   max_yrs_dt_chi2_smallest_limit
                do_simplex_extras_check_model = redo
                return
-            end if         
+            end if
          else if (chi2 <= chi2_limit_for_smaller_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_smaller_limit
             if (s% dt > max_yrs_dt_chi2_smaller_limit*secyer) then
                s% dt = max_yrs_dt_chi2_smaller_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1258,9 +1258,9 @@
                   max_yrs_dt_chi2_smaller_limit
                do_simplex_extras_check_model = redo
                return
-            end if         
+            end if
          else if (chi2 <= chi2_limit_for_small_timesteps) then
-            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit 
+            s% max_years_for_timestep = max_yrs_dt_chi2_small_limit
             if (s% dt > max_yrs_dt_chi2_small_limit*secyer) then
                s% dt = max_yrs_dt_chi2_small_limit*secyer
                s% timestep_hold = s% model_number + 10
@@ -1269,19 +1269,19 @@
                   max_yrs_dt_chi2_small_limit
                do_simplex_extras_check_model = redo
                return
-            end if         
+            end if
          end if
-         
+
          if (best_chi2 <= 0 .or. chi2 < best_chi2) then
             call save_best_info(s)
          end if
-            
+
          call final_checks
 
-         
+
          contains
-         
-         
+
+
          subroutine check_too_many_bad
             if (best_chi2 > 0) then
                num_chi2_too_big = num_chi2_too_big + 1
@@ -1293,8 +1293,8 @@
             end if
             num_chi2_too_big = 0
          end subroutine check_too_many_bad
-         
-         
+
+
          subroutine final_checks
             if (include_age_in_chi2 .and. s% star_age >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
@@ -1322,8 +1322,8 @@
                num_chi2_too_big = 0
             end if
          end subroutine final_checks
-         
-         
+
+
          subroutine check_limits
             real(dp) :: logg_limit, logL_limit, Teff_limit, &
                logR_limit, surface_Z_div_X_limit, surface_He_limit, solar_Rcz_limit, &
@@ -1331,7 +1331,7 @@
             integer :: nz
             include 'formats'
             nz = s% nz
-            
+
             if (s% star_age >= max_age_for_chi2) then
                write(*,*) 'have reached max_age_for_chi2'
                do_simplex_extras_check_model = terminate
@@ -1348,14 +1348,14 @@
                   write(*,'(A)')
                   do_simplex_extras_check_model = terminate
                   return
-               end if    
+               end if
                if (trace_limits) then
                   write(*,1) 'Teff', s% Teff
                   write(*,1) 'Teff_limit', Teff_limit
                end if
             end if
-            
-            if (sigmas_coeff_for_logg_limit /= 0 .and. logg_sigma > 0) then    
+
+            if (sigmas_coeff_for_logg_limit /= 0 .and. logg_sigma > 0) then
                logg_limit = logg_target + logg_sigma*sigmas_coeff_for_logg_limit
                if ((sigmas_coeff_for_logg_limit > 0 .and. logg > logg_limit) .or. &
                    (sigmas_coeff_for_logg_limit < 0 .and. logg < logg_limit)) then
@@ -1371,7 +1371,7 @@
                   write(*,1) 'logg_limit', logg_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_logL_limit /= 0 .and. logL_sigma > 0) then
                logL_limit = logL_target + logL_sigma*sigmas_coeff_for_logL_limit
                if ((sigmas_coeff_for_logL_limit > 0 .and. s% log_surface_luminosity > logL_limit) .or. &
@@ -1388,7 +1388,7 @@
                   write(*,1) 'logL_limit', logL_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_logR_limit /= 0 .and. logR_sigma > 0) then
                logR_limit = logR_target + logR_sigma*sigmas_coeff_for_logR_limit
                if ((sigmas_coeff_for_logR_limit > 0 .and. logR > logR_limit) .or. &
@@ -1405,7 +1405,7 @@
                   write(*,1) 'logR_limit', logR_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_surface_Z_div_X_limit /= 0 .and. surface_Z_div_X_sigma > 0) then
                surface_Z_div_X_limit = surface_Z_div_X_target + &
                   surface_Z_div_X_sigma*sigmas_coeff_for_surface_Z_div_X_limit
@@ -1425,7 +1425,7 @@
                   write(*,1) 'surface_Z_div_X_limit', surface_Z_div_X_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_surface_He_limit /= 0 .and. surface_He_sigma > 0) then
                surface_He_limit = surface_He_target + &
                      surface_He_sigma*sigmas_coeff_for_surface_He_limit
@@ -1445,7 +1445,7 @@
                   write(*,1) 'surface_He_limit', surface_He_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_solar_Rcz_limit /= 0 .and. Rcz_sigma > 0) then
                solar_Rcz_limit = Rcz_target + Rcz_sigma*sigmas_coeff_for_solar_Rcz_limit
                if ((sigmas_coeff_for_solar_Rcz_limit > 0 .and. Rcz > solar_Rcz_limit) .or. &
@@ -1462,7 +1462,7 @@
                   write(*,1) 'solar_Rcz_limit', solar_Rcz_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_solar_cs_rms_limit /= 0 .and. solar_cs_rms_sigma > 0) then
                solar_cs_rms_limit = solar_cs_rms_target + &
                      solar_cs_rms_sigma*sigmas_coeff_for_solar_cs_rms_limit
@@ -1482,7 +1482,7 @@
                   write(*,1) 'solar_cs_rms_limit', solar_cs_rms_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_my_var1_limit /= 0 .and. my_var1_sigma > 0) then
                my_var1_limit = &
                   my_var1_target + my_var1_sigma*sigmas_coeff_for_my_var1_limit
@@ -1502,7 +1502,7 @@
                   write(*,1) 'my_var1_limit', my_var1_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_my_var2_limit /= 0 .and. my_var2_sigma > 0) then
                my_var2_limit = &
                   my_var2_target + my_var2_sigma*sigmas_coeff_for_my_var2_limit
@@ -1522,7 +1522,7 @@
                   write(*,1) 'my_var2_limit', my_var2_limit
                end if
             end if
-            
+
             if (sigmas_coeff_for_my_var3_limit /= 0 .and. my_var3_sigma > 0) then
                my_var3_limit = &
                   my_var3_target + my_var3_sigma*sigmas_coeff_for_my_var3_limit
@@ -1542,20 +1542,20 @@
                   write(*,1) 'my_var3_limit', my_var3_limit
                end if
             end if
-            
+
          end subroutine check_limits
 
 
          subroutine setup_solar_data_for_calc_rms(ierr)
             use const_def, only: mesa_data_dir
             integer, intent(out) :: ierr
-         
+
             integer, parameter :: lines_to_skip = 11
             integer :: iounit, i, k
             real(dp) :: jnk
-         
+
             character (len=256) :: fname
-         
+
             have_sound_speed_data = .true.
             ierr = 0
             iounit = alloc_iounit(ierr)
@@ -1568,8 +1568,8 @@
                write(*,*) 'failed to open ' // trim(fname)
                call free_iounit(iounit)
                return
-            end if                  
-         
+            end if
+
             do i=1,lines_to_skip
                read(iounit,fmt=*,iostat=ierr)
                if (ierr /= 0) then
@@ -1579,7 +1579,7 @@
                   return
                end if
             end do
-         
+
             do i=1,npts
                read(iounit,fmt=*,iostat=ierr) &
                   data_r(i), jnk, data_csound(i), jnk, jnk, jnk, data_width(i)
@@ -1593,7 +1593,7 @@
 
             close(iounit)
             call free_iounit(iounit)
-      
+
          end subroutine setup_solar_data_for_calc_rms
 
 
@@ -1602,7 +1602,7 @@
             use interp_1d_def
             type (star_info), pointer :: s
             integer, intent(in) :: nz
-         
+
             logical, parameter :: dbg = .false.
             real(dp), target :: calc_rms_f1_ary(4*nz)
             real(dp), pointer :: calc_rms_f1(:), calc_rms_f(:,:)
@@ -1611,10 +1611,10 @@
             real(dp), target :: pm_work_ary(nz*pm_work_size)
             real(dp), pointer :: pm_work(:)
             integer :: k, i, ierr
-         
+
             include 'formats'
-         
-            calc_current_rms = -1  
+
+            calc_current_rms = -1
             pm_work => pm_work_ary
             calc_rms_f1 => calc_rms_f1_ary
             calc_rms_f(1:4,1:nz) => calc_rms_f1(1:4*nz)
@@ -1627,7 +1627,7 @@
                   return
                end if
             end if
-         
+
             do k=1,nz
                if (k == 1) then
                   calc_rms_f(1,k) = s% csound(k)
@@ -1661,19 +1661,19 @@
                if (dr < 0) dr = -dr
                ! change to weigh by point rather than by dr
                dr = 1
-            
+
                sumdr = sumdr + dr
                y2 = dr*pow2((cs - data_csound(i))/data_csound(i))
                sumy2 = sumy2 + y2
                if (dbg) write(*,2) 'rms cs, data_cs, reldiff, y2, dr', i, cs, data_csound(i), &
                   (cs - data_csound(i))/data_csound(i), y2, dr
             end do
-         
+
             calc_current_rms = sqrt(sumy2/sumdr)
             if (dbg) write(*,1) 'calc_current_rms', calc_current_rms
 
          end function calc_current_rms
-         
+
       end function do_simplex_extras_check_model
 
 
@@ -1684,17 +1684,17 @@
 
          integer :: i, n, chi2N
          real(dp) :: chi2term, Teff, logL, chi2sum
-         
+
          ! calculate chi^2 following Brandao et al, 2011, eqn 11
          include 'formats'
-         
+
          ierr = 0
          chi2sum = 0
          chi2N = 0
-         
+
          call star_simplex_procs% set_my_vars(s% id, ierr)
          if (ierr /= 0) return
-         
+
          if (Teff_sigma > 0 .and. include_Teff_in_chi2) then
             Teff = s% Teff
             chi2term = pow2((Teff - Teff_target)/Teff_sigma)
@@ -1703,7 +1703,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (logL_sigma > 0 .and. include_logL_in_chi2) then
             logL = s% log_surface_luminosity
             chi2term = pow2((logL - logL_target)/logL_sigma)
@@ -1712,7 +1712,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (logg_sigma > 0 .and. include_logg_in_chi2) then
             chi2term = pow2((logg - logg_target)/logg_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1720,7 +1720,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (FeH_sigma > 0 .and. include_FeH_in_chi2) then
             chi2term = pow2((FeH - FeH_target)/FeH_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1728,7 +1728,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (logR_sigma > 0 .and. include_logR_in_chi2) then
             chi2term = pow2((logR - logR_target)/logR_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1736,7 +1736,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (age_sigma > 0 .and. include_age_in_chi2) then
             chi2term = pow2((s% star_age - age_target)/age_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1744,7 +1744,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (surface_Z_div_X_sigma > 0 .and. include_surface_Z_div_X_in_chi2) then
             chi2term = pow2((surface_Z_div_X - surface_Z_div_X_target)/surface_Z_div_X_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1752,7 +1752,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (surface_He_sigma > 0 .and. include_surface_He_in_chi2) then
             chi2term = pow2((surface_He - surface_He_target)/surface_He_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1760,7 +1760,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (Rcz_sigma > 0 .and. include_Rcz_in_chi2) then
             chi2term = pow2((Rcz - Rcz_target)/Rcz_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1768,7 +1768,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (solar_cs_rms_sigma > 0 .and. include_solar_cs_rms_in_chi2) then
             chi2term = pow2((solar_cs_rms - solar_cs_rms_target)/solar_cs_rms_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1776,7 +1776,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (my_var1_sigma > 0 .and. include_my_var1_in_chi2) then
             chi2term = pow2((my_var1 - my_var1_target)/my_var1_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1784,7 +1784,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (my_var2_sigma > 0 .and. include_my_var2_in_chi2) then
             chi2term = pow2((my_var2 - my_var2_target)/my_var2_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1792,7 +1792,7 @@
             chi2sum = chi2sum + chi2term
             chi2N = chi2N + 1
          end if
-         
+
          if (my_var3_sigma > 0 .and. include_my_var3_in_chi2) then
             chi2term = pow2((my_var3 - my_var3_target)/my_var3_sigma)
             if (trace_okay .and. trace_chi2_info) &
@@ -1805,17 +1805,17 @@
          chi2 = chi2sum/max(1,chi2N)
 
          get_chi2 = chi2
-                           
+
       end function get_chi2
-      
-      
-      subroutine save_best_info(s)     
+
+
+      subroutine save_best_info(s)
          type (star_info), pointer :: s
          integer :: ierr
          logical :: write_controls_info_with_profile
-         
+
          include 'formats'
-         
+
          if (save_model_for_best_model) then
             ierr = 0
             call star_write_model(s% id, best_model_save_model_filename, ierr)
@@ -1841,13 +1841,13 @@
                write(*,*) 'failed in save_profile'
                call mesa_error(__FILE__,__LINE__)
             end if
-         end if         
-         
+         end if
+
          call store_best_info(s)
-            
+
       end subroutine save_best_info
-            
-   
+
+
       subroutine init_sample_ptrs
          nullify( &
             sample_chi2, &
@@ -1877,14 +1877,14 @@
             sample_model_number, &
             sample_index_by_chi2)
       end subroutine init_sample_ptrs
-      
-      
+
+
       subroutine alloc_sample_ptrs(ierr)
          use utils_lib
          integer, intent(out) :: ierr
          ierr = 0
          max_num_samples = 1.5*max_num_samples + 200
-         
+
          call realloc_double(sample_chi2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_age,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_init_Y,max_num_samples,ierr); if (ierr /= 0) return
@@ -1901,27 +1901,27 @@
          call realloc_double(sample_Teff,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_logg,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_FeH,max_num_samples,ierr); if (ierr /= 0) return
-         
+
          call realloc_double(sample_logR,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_surface_Z_div_X,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_surface_He,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_Rcz,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_solar_cs_rms,max_num_samples,ierr); if (ierr /= 0) return
-         
+
          call realloc_double(sample_my_var1,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_var2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_var3,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_param1,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_param2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_my_param3,max_num_samples,ierr); if (ierr /= 0) return
-         
+
          call realloc_integer(sample_index_by_chi2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_integer(sample_op_code,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_integer(sample_model_number,max_num_samples,ierr); if (ierr /= 0) return
 
       end subroutine alloc_sample_ptrs
-   
-   
+
+
       subroutine read_simplex_search_controls(filename, ierr)
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
@@ -1930,37 +1930,37 @@
          ierr = 0
          call read1_simplex_search_inlist(filename, 1, ierr)
       end subroutine read_simplex_search_controls
-      
-      
+
+
       subroutine set_simplex_search_defaults
             include 'simplex_solar.defaults'
       end subroutine set_simplex_search_defaults
 
-         
+
       recursive subroutine read1_simplex_search_inlist(filename, level, ierr)
          character (len=*), intent(in) :: filename
-         integer, intent(in) :: level  
+         integer, intent(in) :: level
          integer, intent(out) :: ierr
-         
+
          logical :: read_extra1, read_extra2, read_extra3, read_extra4, read_extra5
          character (len=256) :: message, extra1, extra2, extra3, extra4, extra5
          integer :: unit
-         
+
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
             ierr = -1
             return
          end if
-         
+
          ierr = 0
          unit=alloc_iounit(ierr)
          if (ierr /= 0) return
-         
+
          open(unit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
          if (ierr /= 0) then
             write(*, *) 'Failed to open simplex search inlist file ', trim(filename)
          else
-            read(unit, nml=simplex_search_controls, iostat=ierr)  
+            read(unit, nml=simplex_search_controls, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) &
@@ -1968,73 +1968,73 @@
                write(*, '(a)') trim(message)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(unit=unit, file=trim(filename), &
                   action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=simplex_search_controls)
                close(unit)
-            end if  
+            end if
          end if
          call free_iounit(unit)
          if (ierr /= 0) return
-         
+
          ! recursive calls to read other inlists
-         
+
          read_extra1 = read_extra_simplex_search_inlist1
          read_extra_simplex_search_inlist1 = .false.
          extra1 = extra_simplex_search_inlist1_name
          extra_simplex_search_inlist1_name = 'undefined'
-         
+
          read_extra2 = read_extra_simplex_search_inlist2
          read_extra_simplex_search_inlist2 = .false.
          extra2 = extra_simplex_search_inlist2_name
          extra_simplex_search_inlist2_name = 'undefined'
-         
+
          read_extra3 = read_extra_simplex_search_inlist3
          read_extra_simplex_search_inlist3 = .false.
          extra3 = extra_simplex_search_inlist3_name
          extra_simplex_search_inlist3_name = 'undefined'
-         
+
          read_extra4 = read_extra_simplex_search_inlist4
          read_extra_simplex_search_inlist4 = .false.
          extra4 = extra_simplex_search_inlist4_name
          extra_simplex_search_inlist4_name = 'undefined'
-         
+
          read_extra5 = read_extra_simplex_search_inlist5
          read_extra_simplex_search_inlist5 = .false.
          extra5 = extra_simplex_search_inlist5_name
          extra_simplex_search_inlist5_name = 'undefined'
-         
+
          if (read_extra1) then
             !write(*,*) 'read extra simplex_search inlist1 from ' // trim(extra1)
             call read1_simplex_search_inlist(extra1, level+1, ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (read_extra2) then
             !write(*,*) 'read extra simplex_search inlist2 from ' // trim(extra2)
             call read1_simplex_search_inlist(extra2, level+1, ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (read_extra3) then
             !write(*,*) 'read extra simplex_search inlist3 from ' // trim(extra3)
             call read1_simplex_search_inlist(extra3, level+1, ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (read_extra4) then
             !write(*,*) 'read extra simplex_search inlist4 from ' // trim(extra4)
             call read1_simplex_search_inlist(extra4, level+1, ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (read_extra5) then
             write(*,*) 'read extra simplex_search inlist5 from ' // trim(extra5)
             call read1_simplex_search_inlist(extra5, level+1, ierr)
             if (ierr /= 0) return
          end if
-         
+
       end subroutine read1_simplex_search_inlist
 
 
@@ -2061,7 +2061,7 @@
             close(unit)
          end if
          call free_iounit(unit)
-         
+
          write(*,'(A)')
          write(*,*) 'saved initial &simplex_search_controls to ' // trim(filename)
          write(*,'(A)')
@@ -2083,10 +2083,10 @@
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
          close(iounit)
-         call free_iounit(iounit)         
+         call free_iounit(iounit)
       end subroutine save_sample_results_to_file
-      
-      
+
+
       subroutine set_sample_index_by_chi2
          use num_lib, only: qsort
          if (sample_number <= 0) return
@@ -2096,17 +2096,17 @@
          end if
          call qsort(sample_index_by_chi2, sample_number, sample_chi2)
       end subroutine set_sample_index_by_chi2
-      
-      
+
+
       subroutine show_sample_header(iounit)
          integer, intent(in) ::iounit
-         
+
          integer :: j
          character (len=10) :: str
-      
+
          write(iounit,'(2x,a6,7a26,a16,99a26)') &
             'sample', &
-            
+
             'chi2', &
             'mass', &
             'init_Y', &
@@ -2114,9 +2114,9 @@
             'alpha', &
             'f_ov', &
             'age', &
-            
+
             'model_number', &
-            
+
             'init_h1', &
             'init_he3', &
             'init_he4', &
@@ -2137,20 +2137,20 @@
             trim(my_param1_name), &
             trim(my_param2_name), &
             trim(my_param3_name)
-                                                   
+
       end subroutine show_sample_header
-      
-      
+
+
       subroutine show1_sample_results(i, iounit)
          use num_lib, only: simplex_info_str
          integer, intent(in) :: i, iounit
-            
+
          integer :: j, k, op_code, ierr
          character (len=256) :: info_str
-         
+
          ierr = 0
 
-         op_code = sample_op_code(i) 
+         op_code = sample_op_code(i)
          if (op_code <= 0) then
             info_str = ''
          else
@@ -2160,7 +2160,7 @@
                ierr = 0
             end if
          end if
-         
+
          write(iounit,'(3x,i5,7(1pd26.16),i16,99(1pd26.16))',advance='no') i, &
             sample_chi2(i), &
             sample_mass(i), &
@@ -2190,15 +2190,15 @@
             sample_my_param1(i), &
             sample_my_param2(i), &
             sample_my_param3(i)
-            
+
          if (iounit == 6) return
 
          write(iounit,'(a12)') trim(info_str)
-      
-      
+
+
       end subroutine show1_sample_results
-      
-      
+
+
       subroutine show_all_sample_results(iounit, i_total, ierr)
          integer, intent(in) :: iounit, i_total
          integer, intent(out) :: ierr
@@ -2225,10 +2225,10 @@
 
       end subroutine show_all_sample_results
 
-      
+
       subroutine show_best(io)
          integer, intent(in) :: io
-         
+
          real(dp) :: chi2term
          include 'formats'
 
@@ -2240,7 +2240,7 @@
             call write1('Teff_obs', Teff_target)
             call write1('Teff_sigma', Teff_sigma)
          end if
-         
+
          if (logL_sigma > 0 .and. include_logL_in_chi2) then
             chi2term = pow2((best_logL - logL_target)/logL_sigma)
             write(io,'(A)')
@@ -2249,7 +2249,7 @@
             call write1('logL_obs', logL_target)
             call write1('logL_sigma', logL_sigma)
          end if
-         
+
          if (logg_sigma > 0 .and. include_logg_in_chi2) then
             chi2term = pow2((best_logg - logg_target)/logg_sigma)
             write(io,'(A)')
@@ -2258,7 +2258,7 @@
             call write1('logg_obs', logg_target)
             call write1('logg_sigma', logg_sigma)
          end if
-         
+
          if (FeH_sigma > 0 .and. include_FeH_in_chi2) then
             chi2term = pow2((best_FeH - FeH_target)/FeH_sigma)
             write(io,'(A)')
@@ -2267,7 +2267,7 @@
             call write1('FeH_obs', FeH_target)
             call write1('FeH_sigma', FeH_sigma)
          end if
-         
+
          if (logR_sigma > 0 .and. include_logR_in_chi2) then
             chi2term = pow2((best_logR - logR_target)/logR_sigma)
             write(io,'(A)')
@@ -2276,7 +2276,7 @@
             call write1('logR_obs', logR_target)
             call write1('logR_sigma', logR_sigma)
          end if
-         
+
          if (age_sigma > 0 .and. include_age_in_chi2) then
             chi2term = pow2((best_age - age_target)/age_sigma)
             write(io,'(A)')
@@ -2285,7 +2285,7 @@
             write(io,'(a40,1pd20.10)') 'age_target', age_target
             write(io,'(a40,1pd20.10)') 'age_sigma', age_sigma
          end if
-         
+
          if (surface_Z_div_X_sigma > 0 .and. &
                include_surface_Z_div_X_in_chi2) then
             chi2term = &
@@ -2296,7 +2296,7 @@
             call write1('surface_Z_div_X_obs', surface_Z_div_X_target)
             call write1('surface_Z_div_X_sigma', surface_Z_div_X_sigma)
          end if
-         
+
          if (surface_He_sigma > 0 .and. include_surface_He_in_chi2) then
             chi2term = pow2((best_surface_He - surface_He_target)/surface_He_sigma)
             write(io,'(A)')
@@ -2305,7 +2305,7 @@
             call write1('surface_He_obs', surface_He_target)
             call write1('surface_He_sigma', surface_He_sigma)
          end if
-         
+
          if (Rcz_sigma > 0 .and. include_Rcz_in_chi2) then
             chi2term = pow2((best_Rcz - Rcz_target)/Rcz_sigma)
             write(io,'(A)')
@@ -2314,7 +2314,7 @@
             call write1('Rcz_obs', Rcz_target)
             call write1('Rcz_sigma', Rcz_sigma)
          end if
-         
+
          if (solar_cs_rms_sigma > 0 .and. include_solar_cs_rms_in_chi2) then
             chi2term = pow2((best_solar_cs_rms - solar_cs_rms_target)/solar_cs_rms_sigma)
             write(io,'(A)')
@@ -2323,7 +2323,7 @@
             call write1('solar_cs_rms_obs', solar_cs_rms_target)
             call write1('solar_cs_rms_sigma', solar_cs_rms_sigma)
          end if
-         
+
          if (my_var1_sigma > 0 .and. include_my_var1_in_chi2) then
             chi2term = pow2( &
                   (best_my_var1 - my_var1_target)/my_var1_sigma)
@@ -2333,7 +2333,7 @@
             call write1(trim(my_var1_name) // '_obs', my_var1_target)
             call write1(trim(my_var1_name) // '_sigma', my_var1_sigma)
          end if
-         
+
          if (my_var2_sigma > 0 .and. include_my_var2_in_chi2) then
             chi2term = pow2( &
                   (best_my_var2 - my_var2_target)/my_var2_sigma)
@@ -2343,7 +2343,7 @@
             call write1(trim(my_var2_name) // '_obs', my_var2_target)
             call write1(trim(my_var2_name) // '_sigma', my_var2_sigma)
          end if
-         
+
          if (my_var3_sigma > 0 .and. include_my_var3_in_chi2) then
             chi2term = pow2( &
                   (best_my_var3 - my_var3_target)/my_var3_sigma)
@@ -2353,7 +2353,7 @@
             call write1(trim(my_var3_name) // '_obs', my_var3_target)
             call write1(trim(my_var3_name) // '_sigma', my_var3_sigma)
          end if
-         
+
          write(io,'(A)')
          call write1('R/Rsun', best_radius)
          call write1('logL/Lsun', best_logL)
@@ -2365,14 +2365,14 @@
          call write1('surface_He', best_surface_He)
          call write1('Rcz', best_Rcz)
          call write1('solar_cs_rms', best_solar_cs_rms)
-         write(io,*)        
+         write(io,*)
          call write1('initial h1', current_h1)
          call write1('initial he3', current_he3)
          call write1('initial he4', current_he4)
          call write1('initial Y', current_Y)
          call write1('initial Z', current_Z)
          call write1('initial FeH', current_FeH)
-         write(io,*)        
+         write(io,*)
          call write1('mass/Msun', current_mass)
          call write1('alpha', current_alpha)
          call write1('f_ov', current_f_ov)
@@ -2383,9 +2383,9 @@
          write(io,'(a40,i16)') 'model number', best_model_number
          write(io,'(A)')
          write(io,'(A)')
-         
+
          contains
-         
+
          subroutine write1(str,x)
             character (len=*), intent(in) :: str
             real(dp), intent(in) :: x
@@ -2398,13 +2398,13 @@
 
       end subroutine show_best
 
-      
+
       subroutine store_best_info(s)
          type (star_info), pointer :: s
          integer :: i
-      
+
          best_chi2 = chi2
-         
+
          best_age = s% star_age
          best_model_number = s% model_number
          best_radius = s% photosphere_r
@@ -2412,30 +2412,30 @@
          best_Teff = s% Teff
          best_logg = logg
          best_FeH = FeH
-         
+
          best_logR = logR
          best_surface_Z_div_X = surface_Z_div_X
          best_surface_He = surface_He
          best_Rcz = Rcz
          best_solar_cs_rms = solar_cs_rms
-         
+
          best_my_var1 = my_var1
          best_my_var2 = my_var2
          best_my_var3 = my_var3
          best_my_param1 = my_param1
          best_my_param2 = my_param2
          best_my_param3 = my_param3
-      
+
       end subroutine store_best_info
-      
-      
+
+
       subroutine write_best(num)
          use utils_lib, only: mkdir
          integer, intent(in) :: num
          integer :: ierr, iounit
          character (len=256) :: format_string, num_string, filename
          integer, parameter :: max_len_out = 2000
-         character (len=max_len_out) :: script         
+         character (len=max_len_out) :: script
          ierr = 0
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) return
@@ -2462,30 +2462,30 @@
          integer, intent(out) :: ierr
          integer :: iounit, num, i, j, model_number
          character (len=100) :: line
-         
+
          include 'formats'
-         
-         ierr = 0         
+
+         ierr = 0
          write(*,*) 'read samples from file ' // trim(results_fname)
-         
+
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)
-            call free_iounit(iounit) 
+            call free_iounit(iounit)
             return
          end if
-         
+
          read(iounit, fmt=*, iostat=ierr) num
          if (ierr /= 0) then
             write(*,*) 'failed to read number of samples on 1st line of ' // trim(results_fname)
             call done
             return
          end if
-         
+
          write(*,2) 'number of samples in file', num
-         
+
          read(iounit, fmt='(a)', iostat=ierr) line
          if (ierr /= 0) then
             write(*,*) 'failed to read 2nd line of ' // trim(results_fname)
@@ -2493,7 +2493,7 @@
             call done
             return
          end if
-         
+
          do while (max_num_samples < num)
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
@@ -2502,7 +2502,7 @@
                return
             end if
          end do
-         
+
          do j = 1, num
             call read1_sample_from_file(j, iounit, ierr)
             if (ierr /= 0) then
@@ -2511,36 +2511,36 @@
                return
             end if
          end do
-                  
+
          sample_number = num
          write(*,2) 'number of samples read from file', num
-         
+
          call done
 
-         
+
          contains
-         
-         
+
+
          subroutine done
             close(iounit)
-            call free_iounit(iounit)         
+            call free_iounit(iounit)
          end subroutine done
-         
+
 
       end subroutine read_samples_from_file
-      
-      
+
+
       subroutine read1_sample_from_file(j, iounit, ierr)
          use num_lib, only: simplex_op_code
          integer, intent(in) :: j, iounit
          integer, intent(out) :: ierr
-            
+
          integer :: i, k
          character (len=256) :: info_str
          real(dp) :: logR
-         
+
          include 'formats'
-         
+
          ierr = 0
          read(iounit,fmt='(i8)',advance='no',iostat=ierr) i
          if (ierr /= 0) return
@@ -2549,7 +2549,7 @@
             ierr = -1
             return
          end if
-         
+
          read(iounit,'(7(1pd26.16),i16,99(1pd26.16))',advance='no',iostat=ierr) &
             sample_chi2(i), &
             sample_mass(i), &
@@ -2580,7 +2580,7 @@
             sample_my_param2(i), &
             sample_my_param3(i)
          if (failed('results')) return
-            
+
          sample_radius(i) = exp10(logR)
 
          read(iounit,'(a12)',iostat=ierr) info_str
@@ -2589,7 +2589,7 @@
             sample_op_code(i) = 0
             return
          end if
-      
+
          if (len_trim(info_str) == 0) then
             sample_op_code(i) = 0
          else
@@ -2600,11 +2600,11 @@
                return
             end if
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          logical function failed(str)
             character (len=*), intent(in) :: str
             include 'formats'
@@ -2613,10 +2613,10 @@
             write(*,2) 'failed reading ' // trim(str) // ' data for sample number', i
             failed = .true.
          end function failed
-         
-      
+
+
       end subroutine read1_sample_from_file
-      
+
 
 
       end module simplex_search_run_support

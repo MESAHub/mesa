@@ -33,56 +33,56 @@
          store_rho_in_xh, get_rho_and_lnd_from_xh
 
       implicit none
-      
+
       integer, parameter :: MAX_NZN = 1501
-      
+
       real(dp), parameter :: f_Edd_isotropic = 1d0/3d0, f_Edd_free_stream = 1d0
 
       real(dp) :: rsp_tau_factor, rsp_min_dr_div_cs, rsp_min_rad_diff_time, Psurf_from_atm
       integer :: i_min_dr_div_cs, i_min_rad_diff_time
-      
+
       real(dp), pointer, dimension(:) :: &
          dVol_dr_00, dVol_dr_in, &
          d_egas_dVol, d_egas_dT, d_egas_dr_00, d_egas_dr_in, &
-         d_Pg_dVol, d_Pg_dT, d_Pg_dr_00, d_Pg_dr_in, &   
+         d_Pg_dVol, d_Pg_dT, d_Pg_dr_00, d_Pg_dr_in, &
          dK_dVol, dK_dT, dK_dr_00, dK_dr_in, &
          dQQ_dVol, dQQ_dT, dQQ_dr_00, dQQ_dr_in, &
          dCp_dVol, dCp_dT, dCp_dr_00, dCp_dr_in, &
-         d_Pr_dVol, d_Pr_der, d_Pr_dr_00, d_Pr_dr_in, &   
+         d_Pr_dVol, d_Pr_der, d_Pr_dr_00, d_Pr_dr_in, &
 
          dHp_dr_out, dHp_dr_00, dHp_dr_in, &
          dHp_dVol_00, dHp_dVol_out, &
          dHp_dT_00, dHp_dT_out, &
          dHp_der_00, dHp_der_out, &
-         
+
          dY_dr_in, dY_dr_00, dY_dr_out, &
          dY_dVol_00, dY_dVol_out, &
          dY_dT_00, dY_dT_out, &
          dY_der_00, dY_der_out, &
-         
+
          dPII_dr_in, dPII_dr_00, dPII_dr_out, &
          dPII_dVol_00, dPII_dVol_out, &
          dPII_dT_00, dPII_dT_out, &
          dPII_der_00, dPII_der_out, &
-         
+
          d_Pvsc_dr_00, d_Pvsc_dr_in, &
          d_Pvsc_dVol, d_Pvsc_dT, d_Pvsc_der, &
-         
+
          dPtrb_dr_00, dPtrb_dr_in, dPtrb_dVol_00, dPtrb_dw_00, &
-         
-         dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &  
+
+         dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &
          dChi_dVol_in, dChi_dVol_00, dChi_dVol_out, &
          dChi_dT_in, dChi_dT_00, dChi_dT_out, &
          dChi_der_in, dChi_der_00, dChi_der_out, &
          dChi_dw_00, &
-                
+
          dEq_dr_out, dEq_dr_00, dEq_dr_in, dEq_dr_in2, &
          dEq_dVol_out, dEq_dVol_00, dEq_dVol_in, &
          dEq_dT_out, dEq_dT_00, dEq_dT_in, &
          dEq_der_out, dEq_der_00, dEq_der_in, &
          dEq_dw_00, &
-         
-         dC_dr_in2, dC_dr_in, dC_dr_00, dC_dr_out, &         
+
+         dC_dr_in2, dC_dr_in, dC_dr_00, dC_dr_out, &
          dC_dVol_in, dC_dVol_00, dC_dVol_out, &
          dC_dT_in, dC_dT_00, dC_dT_out, &
          dC_der_in, dC_der_00, dC_der_out, &
@@ -96,13 +96,13 @@
       integer, parameter :: NV=5
       integer, parameter :: HD_DIAG=2*NV+1, LD_HD=4*NV+1, LD_ABB=6*NV+1, LPSZ=NV*MAX_NZN+1
       real(dp) DX(LPSZ), HR(LPSZ), HD(LD_HD, LPSZ), ABB(LD_ABB, LPSZ)
-      integer IPVT(LPSZ)      
-      
+      integer IPVT(LPSZ)
+
       integer, parameter :: LD_LLL = 4*MAX_NZN
       real(dp), dimension(LD_LLL, LD_LLL) :: LLL, VLx, VRx
       integer :: ISORTx(LD_LLL)
       real(dp) :: WORKx(4*LD_LLL), WRx(LD_LLL), WIx(LD_LLL)
-      
+
       ! for rsp_eval_eos_and_kap
       real(dp), pointer :: xa(:)
       real(dp) :: X, Z, Y, abar, zbar, z53bar, XC, XN, XO, Xne
@@ -115,17 +115,17 @@
          PDVWORK, FASE0
       real(dp), pointer, dimension(:) :: &
          PPP0, PPQ0, PPT0, PPC0, VV0, &
-         WORK, WORKQ, WORKT, WORKC               
+         WORK, WORKQ, WORKT, WORKC
       integer :: INSIDE, IWORK, ID, NSTART, FIRST, &
          run_num_retries_prev_period, prev_cycle_run_num_steps, &
          run_num_iters_prev_period
-      
+
       ! for maps
       logical :: writing_map, done_writing_map
       integer, parameter :: max_map_cols = 200
       integer :: map_ids(max_map_cols), num_map_cols
       character(256) :: map_col_names(max_map_cols)
-      
+
       ! marsaglia and zaman random number generator. period is 2**43 with
       ! 900 million different sequences. the state of the generator (for restarts)
       integer, parameter :: rn_u_len=97
@@ -133,28 +133,28 @@
       real(dp) :: rn_u(rn_u_len), rn_c, rn_cd, rn_cm
 
       ! from const
-      real(dp) :: G, SIG, SUNL, SUNM, SUNR, CL, P43, P4      
-      
+      real(dp) :: G, SIG, SUNL, SUNM, SUNR, CL, P43, P4
+
       ! these are set from inlist
       real(dp) :: ALFA, ALFAP, ALFAM, ALFAT, ALFAS, ALFAC, CEDE, GAMMAR
       real(dp) :: THETA, THETAT, THETAQ, THETAU, THETAE, WTR, WTC, WTT, GAM
       real(dp) :: THETA1, THETAT1, THETAQ1, THETAU1, THETAE1, WTR1, WTC1, WTT1, GAM1
       real(dp) :: EFL0, CQ, ZSH, kapE_factor, kapP_factor
       integer :: NZN, IBOTOM
-      
+
 
       contains
-      
-      
+
+
       subroutine init_def(s)
          use const_def, only: standard_cgrav, boltz_sigma, &
             Lsun, Msun, Rsun
          use utils_lib, only: mkdir, folder_exists
          type (star_info), pointer :: s
-         
+
          P4=4.d0*PI
          P43=P4/3.d0
-         
+
          G=standard_cgrav
          SIG=boltz_sigma
          SUNL=Lsun
@@ -176,7 +176,7 @@
          ALFAC = ALFAC*(1.d0/2.d0)*sqrt(2.d0/3.d0)
          CEDE  = CEDE*(8.d0/3.d0)*sqrt(2.d0/3.d0)
          GAMMAR = GAMMAR*2.d0*sqrt(3.d0)
-         
+
          call turn_on_time_weighting(s)
 
          CQ = s% RSP_cq
@@ -184,16 +184,16 @@
          EFL0 = s% RSP_efl0
          kapE_factor = 1d0 ! s% RSP_kapE_factor
          kapP_factor = 1d0 ! s% RSP_kapP_factor
-         
+
          if (ALFA == 0.d0) EFL0=0.d0
-         
+
          writing_map = .false.
 
          if(.not. folder_exists(trim(s% log_directory))) call mkdir(trim(s% log_directory))
-            
+
       end subroutine init_def
-      
-         
+
+
       subroutine turn_off_time_weighting(s)
          type (star_info), pointer :: s
          THETA = 1d0
@@ -215,8 +215,8 @@
          THETAE1=0d0
          THETAU1=0d0
       end subroutine turn_off_time_weighting
-      
-      
+
+
       subroutine turn_on_time_weighting(s)
          type (star_info), pointer :: s
          THETA = s% RSP_theta
@@ -238,8 +238,8 @@
          THETAE1=1.d0-THETAE
          THETAU1=1.d0-THETAU
       end subroutine turn_on_time_weighting
-      
-      
+
+
       subroutine init_allocate(s,nz)
          !use rsp_eddfac, only: eddfac_allocate
          type (star_info), pointer :: s
@@ -255,33 +255,33 @@
          allocate(xa(s% species), &
             dVol_dr_00(n), dVol_dr_in(n), &
             d_egas_dVol(n), d_egas_dT(n), d_egas_dr_00(n), d_egas_dr_in(n), &
-            d_Pg_dVol(n), d_Pg_dT(n), d_Pg_dr_00(n), d_Pg_dr_in(n), &   
-            d_Pr_dVol(n), d_Pr_der(n), d_Pr_dr_00(n), d_Pr_dr_in(n), &   
+            d_Pg_dVol(n), d_Pg_dT(n), d_Pg_dr_00(n), d_Pg_dr_in(n), &
+            d_Pr_dVol(n), d_Pr_der(n), d_Pr_dr_00(n), d_Pr_dr_in(n), &
             dK_dVol(n), dK_dT(n), dK_dr_00(n), dK_dr_in(n), &
             dQQ_dVol(n), dQQ_dT(n), dQQ_dr_00(n), dQQ_dr_in(n), &
             dCp_dVol(n), dCp_dT(n), dCp_dr_00(n), dCp_dr_in(n), &
             dHp_dr_out(n), dHp_dr_00(n), dHp_dr_in(n), &
             dHp_dVol_00(n), dHp_dVol_out(n), &
-            dHp_dT_00(n), dHp_dT_out(n), dHp_der_00(n), dHp_der_out(n), &         
+            dHp_dT_00(n), dHp_dT_out(n), dHp_der_00(n), dHp_der_out(n), &
             dY_dr_in(n), dY_dr_00(n), dY_dr_out(n), &
             dY_dVol_00(n), dY_dVol_out(n), &
-            dY_dT_00(n), dY_dT_out(n), dY_der_00(n), dY_der_out(n), &         
+            dY_dT_00(n), dY_dT_out(n), dY_der_00(n), dY_der_out(n), &
             dPII_dr_in(n), dPII_dr_00(n), dPII_dr_out(n), &
             dPII_dVol_00(n), dPII_dVol_out(n), &
-            dPII_dT_00(n), dPII_dT_out(n), dPII_der_00(n), dPII_der_out(n), &         
-            d_Pvsc_dr_00(n), d_Pvsc_dr_in(n), d_Pvsc_dVol(n), d_Pvsc_dT(n), d_Pvsc_der(n), &         
-            dPtrb_dr_00(n), dPtrb_dr_in(n), dPtrb_dVol_00(n), dPtrb_dw_00(n), &         
-            dChi_dr_in2(n), dChi_dr_in(n), dChi_dr_00(n), dChi_dr_out(n), &  
+            dPII_dT_00(n), dPII_dT_out(n), dPII_der_00(n), dPII_der_out(n), &
+            d_Pvsc_dr_00(n), d_Pvsc_dr_in(n), d_Pvsc_dVol(n), d_Pvsc_dT(n), d_Pvsc_der(n), &
+            dPtrb_dr_00(n), dPtrb_dr_in(n), dPtrb_dVol_00(n), dPtrb_dw_00(n), &
+            dChi_dr_in2(n), dChi_dr_in(n), dChi_dr_00(n), dChi_dr_out(n), &
             dChi_dVol_in(n), dChi_dVol_00(n), dChi_dVol_out(n), &
             dChi_dT_in(n), dChi_dT_00(n), dChi_dT_out(n), &
             dChi_der_in(n), dChi_der_00(n), dChi_der_out(n), &
-            dChi_dw_00(n), &                
+            dChi_dw_00(n), &
             dEq_dr_out(n), dEq_dr_00(n), dEq_dr_in(n), dEq_dr_in2(n), &
             dEq_dVol_out(n), dEq_dVol_00(n), dEq_dVol_in(n), &
             dEq_dT_out(n), dEq_dT_00(n), dEq_dT_in(n), &
             dEq_der_out(n), dEq_der_00(n), dEq_der_in(n), &
-            dEq_dw_00(n), &         
-            dC_dr_in2(n), dC_dr_in(n), dC_dr_00(n), dC_dr_out(n), &         
+            dEq_dw_00(n), &
+            dC_dr_in2(n), dC_dr_in(n), dC_dr_00(n), dC_dr_out(n), &
             dC_dVol_in(n), dC_dVol_00(n), dC_dVol_out(n), &
             dC_dT_in(n), dC_dT_00(n), dC_dT_out(n), &
             dC_der_in(n), dC_der_00(n), dC_der_out(n), dC_dw_00(n), &
@@ -291,41 +291,41 @@
             PPP0(n), PPQ0(n), PPT0(n), PPC0(n), VV0(n), &
             WORK(n), WORKQ(n), WORKT(n), WORKC(n))
       end subroutine init_allocate
-      
-      
+
+
       subroutine init_free(s)
          type (star_info), pointer :: s
          deallocate(xa, &
             dVol_dr_00, dVol_dr_in, &
             d_egas_dVol, d_egas_dT, d_egas_dr_00, d_egas_dr_in, &
-            d_Pg_dVol, d_Pg_dT, d_Pg_dr_00, d_Pg_dr_in, &   
-            d_Pr_dVol, d_Pr_der, d_Pr_dr_00, d_Pr_dr_in, &   
+            d_Pg_dVol, d_Pg_dT, d_Pg_dr_00, d_Pg_dr_in, &
+            d_Pr_dVol, d_Pr_der, d_Pr_dr_00, d_Pr_dr_in, &
             dK_dVol, dK_dT, dK_dr_00, dK_dr_in, &
             dQQ_dVol, dQQ_dT, dQQ_dr_00, dQQ_dr_in, &
             dCp_dVol, dCp_dT, dCp_dr_00, dCp_dr_in, &
             dHp_dr_out, dHp_dr_00, dHp_dr_in, &
             dHp_dVol_00, dHp_dVol_out, &
             dHp_dT_00, dHp_dT_out, &
-            dHp_der_00, dHp_der_out, &         
+            dHp_der_00, dHp_der_out, &
             dY_dr_in, dY_dr_00, dY_dr_out, &
             dY_dVol_00, dY_dVol_out, &
-            dY_dT_00, dY_dT_out, dY_der_00, dY_der_out, &         
+            dY_dT_00, dY_dT_out, dY_der_00, dY_der_out, &
             dPII_dr_in, dPII_dr_00, dPII_dr_out, &
             dPII_dVol_00, dPII_dVol_out, &
-            dPII_dT_00, dPII_dT_out, dPII_der_00, dPII_der_out, &         
-            d_Pvsc_dr_00, d_Pvsc_dr_in, d_Pvsc_dVol, d_Pvsc_dT, d_Pvsc_der, &         
-            dPtrb_dr_00, dPtrb_dr_in, dPtrb_dVol_00, dPtrb_dw_00, &         
-            dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &  
+            dPII_dT_00, dPII_dT_out, dPII_der_00, dPII_der_out, &
+            d_Pvsc_dr_00, d_Pvsc_dr_in, d_Pvsc_dVol, d_Pvsc_dT, d_Pvsc_der, &
+            dPtrb_dr_00, dPtrb_dr_in, dPtrb_dVol_00, dPtrb_dw_00, &
+            dChi_dr_in2, dChi_dr_in, dChi_dr_00, dChi_dr_out, &
             dChi_dVol_in, dChi_dVol_00, dChi_dVol_out, &
             dChi_dT_in, dChi_dT_00, dChi_dT_out, &
             dChi_der_in, dChi_der_00, dChi_der_out, &
-            dChi_dw_00, &                
+            dChi_dw_00, &
             dEq_dr_out, dEq_dr_00, dEq_dr_in, dEq_dr_in2, &
             dEq_dVol_out, dEq_dVol_00, dEq_dVol_in, &
             dEq_dT_out, dEq_dT_00, dEq_dT_in, &
             dEq_der_out, dEq_der_00, dEq_der_in, &
-            dEq_dw_00, &         
-            dC_dr_in2, dC_dr_in, dC_dr_00, dC_dr_out, &         
+            dEq_dw_00, &
+            dC_dr_in2, dC_dr_in, dC_dr_00, dC_dr_out, &
             dC_dVol_in, dC_dVol_00, dC_dVol_out, &
             dC_dT_in, dC_dT_00, dC_dT_out, &
             dC_der_in, dC_der_00, dC_der_out, dC_dw_00, &
@@ -335,41 +335,41 @@
             PPP0, PPQ0, PPT0, PPC0, VV0, &
             WORK, WORKQ, WORKT, WORKC)
       end subroutine init_free
-      
-      
+
+
       real(dp) function rsp_phase_time0()
          rsp_phase_time0 = TT1
       end function rsp_phase_time0
-      
-      
+
+
       real(dp) function rsp_WORK(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          rsp_WORK = WORK(k)
       end function rsp_WORK
-      
-      
+
+
       real(dp) function rsp_WORKQ(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          rsp_WORKQ = WORKQ(k)
       end function rsp_WORKQ
-      
-      
+
+
       real(dp) function rsp_WORKT(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          rsp_WORKT = WORKT(k)
       end function rsp_WORKT
-      
-      
+
+
       real(dp) function rsp_WORKC(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          rsp_WORKC = WORKC(k)
       end function rsp_WORKC
-      
-      
+
+
       subroutine rsp_photo_out(s, iounit)
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
@@ -400,15 +400,15 @@
             PPP0(1:n), PPQ0(1:n), PPT0(1:n), PPC0(1:n), VV0(1:n), &
             WORK(1:n), WORKQ(1:n), WORKT(1:n), WORKC(1:n)
       end subroutine rsp_photo_out
-      
-      
+
+
       subroutine rsp_photo_in(s, iounit, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
          integer :: n
          include 'formats'
-         call init_def(s) 
+         call init_def(s)
          ierr = 0
          read(iounit, iostat=ierr) NZN
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'read failed in rsp_photo_in')
@@ -443,8 +443,8 @@
             writing_map = .false.
          end if
       end subroutine rsp_photo_in
-      
-      
+
+
       subroutine finish_after_build_model(s)
          type (star_info), pointer :: s
          integer :: k
@@ -455,8 +455,8 @@
             s% Prad(k) = s% f_Edd(k)*s% erad(k)/s% Vol(k)
          end do
       end subroutine finish_after_build_model
-      
-      
+
+
       subroutine finish_rsp_photo_in(s)
          use star_utils, only: set_rmid
          type (star_info), pointer :: s
@@ -488,8 +488,8 @@
             call mesa_error(__FILE__,__LINE__,'finish_rsp_photo_in')
          end if
       end subroutine finish_rsp_photo_in
-      
-      
+
+
       subroutine set_build_vars(s, &
             m, dm, dm_bar, r, Vol, T, RSP_Et, Lr, Lc)
          type (star_info), pointer :: s
@@ -516,8 +516,8 @@
             end if
          end do
       end subroutine set_build_vars
-      
-      
+
+
       subroutine set_star_vars(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -525,7 +525,7 @@
          integer :: k
          include 'formats'
          ierr = 0
-         sum_dm = 0d0         
+         sum_dm = 0d0
          do k=1, NZN
             sum_dm = sum_dm + s% dm(k)
          end do
@@ -546,17 +546,17 @@
             end if
          end if
          call set_qs(s, s% nz, s% q, s% dq, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in set_qs')         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in set_qs')
          s% m(1) = s% mstar
          do k=2,s% nz
             s% dm(k-1) = s% dq(k-1)*s% xmstar
             s% m(k) = s% m(k-1) - s% dm(k-1)
          end do
          k = s% nz
-         s% dm(k) = s% m(k) - s% m_center         
-         call set_dm_bar(s, s% nz, s% dm, s% dm_bar)                  
+         s% dm(k) = s% m(k) - s% m_center
+         call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
          do k=1, NZN
-         
+
             if (k==NZN) then
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
@@ -567,26 +567,26 @@
             if (is_bad(s% Vol(k)))then
                write(*, 2) 's% Vol(k)', k, s% Vol(k)
                call mesa_error(__FILE__,__LINE__,'set_star_vars')
-            end if       
-                 
+            end if
+
             s% rho(k) = 1d0/s% Vol(k)
             call store_rho_in_xh(s, k, s% rho(k))
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
-            s% Vol(k) = 1d0/s% rho(k)  
+            s% Vol(k) = 1d0/s% rho(k)
 
             call store_T_in_xh(s, k, s% T(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
-            
+
             call store_r_in_xh(s, k, s% r(k))
             call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
 
             s% RSP_Et(k) = s% RSP_w(k)*s% RSP_w(k)
-            s% xh(s% i_Et_RSP, k) = s% RSP_Et(k)               
-            s% xh(s% i_v, k) = s% v(k)            
+            s% xh(s% i_Et_RSP, k) = s% RSP_Et(k)
+            s% xh(s% i_v, k) = s% v(k)
          end do
       end subroutine set_star_vars
-      
-      
+
+
       subroutine copy_from_xh_to_rsp(s, nz_new) ! do this when load a file
          use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
@@ -631,7 +631,7 @@
 
 
       subroutine check_for_T_or_P_inversions(s,str)
-         type (star_info), pointer :: s      
+         type (star_info), pointer :: s
          character (len=*), intent(in) :: str
          integer :: k
          logical :: okay
@@ -655,7 +655,7 @@
 
 
       subroutine check_R(s,str)
-         type (star_info), pointer :: s      
+         type (star_info), pointer :: s
          character (len=*), intent(in) :: str
          integer :: k
          include 'formats'
@@ -673,8 +673,8 @@
             end if
          end do
       end subroutine check_R
-      
-      
+
+
       subroutine rsp_dump_for_debug(s)
          type (star_info), pointer :: s
          integer :: k
@@ -711,12 +711,12 @@
             write(*,2) 's% erad(k)', k, s% erad(k)
             write(*,2) 's% Prad(k)', k, s% Prad(k)
             write(*,2) 's% Fr(k)', k, s% Fr(k)
-            !write(*,2) '', k, 
+            !write(*,2) '', k,
          end do
-         !call mesa_error(__FILE__,__LINE__,'rsp_dump_for_debug')      
+         !call mesa_error(__FILE__,__LINE__,'rsp_dump_for_debug')
       end subroutine rsp_dump_for_debug
-      
-      
+
+
       subroutine cleanup_for_LINA( &
             s, M, DM, DM_BAR, R, Vol, T, RSP_Et, Peos, ierr)
          use star_utils, only: normalize_dqs, set_qs, set_m_and_dm, set_dm_bar
@@ -724,14 +724,14 @@
          real(dp), intent(inout), dimension(:) :: &
             M, DM, DM_BAR, R, Vol, T, RSP_Et, Peos
          integer, intent(out) :: ierr
-         
+
          integer :: I, k
-         
+
          include 'formats'
-         
+
          ! get
          do i=1,NZN
-            k = NZN+1-i 
+            k = NZN+1-i
             s% m(k) = M(i)
             s% dq(k) = DM(i)/s% xmstar
             s% r(k) = R(i)
@@ -741,9 +741,9 @@
             s% Peos(k) = Peos(i)
             s% Prad(k) = crad*s% T(k)**4/3d0
             s% Pgas(k) = s% Peos(k) - s% Prad(k)
-         end do                    
+         end do
          s% dq(s% nz) = (s% m(NZN) - s% M_center)/s% xmstar
-         
+
          ! fix
          if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, NZN, s% dq, ierr)
@@ -767,10 +767,10 @@
          s% Lt(1:s% nz) = 0d0
          s% csound(1:s% nz) = 0d0
          call copy_results(s)
-         
+
          ! put back
          do i=1,NZN
-            k = NZN+1-i 
+            k = NZN+1-i
             M(i) = s% m(k)
             DM(i) = s% dm(k)
             DM_BAR(i) = s% dm_bar(k)
@@ -778,11 +778,11 @@
             Vol(i) = s% Vol(k)
             T(i) = s% T(k)
             RSP_Et(i) = s% RSP_w(k)**2
-         end do                    
-      
+         end do
+
       end subroutine cleanup_for_LINA
-      
-      
+
+
       subroutine copy_results(s)
          use star_utils, only: set_rmid, store_r_in_xh, &
             get_r_and_lnR_from_xh, store_r_in_xh, &
@@ -792,32 +792,32 @@
          integer :: i, k, ierr
          real(dp) :: RSP_efl0_2
          real(qp) :: q1, q2, q3, q4
-      
+
          RSP_efl0_2 = EFL0**2
          do i=1, NZN
-         
+
             k = NZN+1 - i
             s% xh(s% i_v,k) = s% v(k)
             s% xh(s% i_erad_RSP,k) = s% erad(k)
             s% xh(s% i_Fr_RSP,k) = s% Fr(k)
-            
+
             ! sqrt(w**2) /= original w, so need to redo
             s% RSP_Et(k) = s% RSP_w(k)**2
-            s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)               
+            s% xh(s% i_Et_RSP,k) = s% RSP_Et(k)
             s% RSP_w(k) = sqrt(s% xh(s% i_Et_RSP,k))
-            
+
             ! exp(log(r)) /= original r, so need to redo
             call store_r_in_xh(s, k, s% r(k))
             call get_r_and_lnR_from_xh(s, k, s% r(k), s% lnR(k))
-            
+
             ! exp(log(T)) /= original T, so need to redo
             call store_T_in_xh(s, k, s% T(k))
             call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
-            
+
             s% Peos(k) = s% Pgas(k) + s% Prad(k)
             if (k > 1) s% gradT(k) = &
                s% Y_face(k) + 0.5d0*(s% grada(k-1) + s% grada(k))
-            
+
          end do
          s% gradT(1) = s% gradT(2)
 
@@ -826,9 +826,9 @@
             write(*,*) 'copy_results failed in set_rmid'
             call mesa_error(__FILE__,__LINE__,'copy_results')
          end if
-         
-         do i=1, NZN         
-            k = NZN+1 - i            
+
+         do i=1, NZN
+            k = NZN+1 - i
             ! revise Vol and rho using revised r
             if (i==1) then
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
@@ -839,7 +839,7 @@
                q4 = q1*(q2**3 - q3**3)
                s% Vol(k) = dble(q4)
             end if
-            s% rho(k) = 1d0/s% Vol(k)            
+            s% rho(k) = 1d0/s% Vol(k)
             call store_rho_in_xh(s, k, s% rho(k))
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)
@@ -848,9 +848,9 @@
                s% mixing_type(k) = convective_mixing
             else
                s% mixing_type(k) = no_mixing
-            end if      
+            end if
          end do
-         
+
          ! set some things for mesa output reporting
          i = 1
          s% rho_face(i) = s% rho(i)
@@ -861,7 +861,7 @@
             s% P_face_ad(i)%val = 0.5d0*(s% Peos(i) + s% Peos(i-1))
             s% csound_face(i) = 0.5d0*(s% csound(i) + s% csound(i-1))
          end do
-         
+
          ! these are necessary to make files consistent with photos.
          s% R_center = pow(s% r(NZN)**3 - s% Vol(NZN)*s% dm(NZN)/P43, 1d0/3d0)
          s% M_center = s% mstar - s% xmstar
@@ -870,4 +870,4 @@
 
 
       end module rsp_def
-      
+

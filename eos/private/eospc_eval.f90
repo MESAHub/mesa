@@ -32,12 +32,12 @@
       use math_lib
 
       implicit none
-         
-      
+
+
       contains
 
-      
-      subroutine Get_PC_alfa( & 
+
+      subroutine Get_PC_alfa( &
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
@@ -49,22 +49,22 @@
          real(dp) :: logGe0, logGe, logGe_lo, logGe_hi, &
             A, B, dA_dlnT, dA_dlnRho, dB_dlnT, dB_dlnRho, dlogGe_dlogT, dlogGe_dlogRho, &
             logT_lo, logT_hi, logRho_lo, logRho_hi
-         
+
          include 'formats'
 
          ierr = 0
-         
+
          d_alfa_dlogT = 0d0
          d_alfa_dlogRho = 0d0
 
          logRho_lo = rq% logRho2_PC_limit ! don't use PC for logRho < this
          logRho_hi = rq% logRho1_PC_limit ! okay for pure PC for logRho > this
-         
+
          if (rq% PC_use_Gamma_limit_instead_of_T) then
             !gamma_e = (qe**2)*(four_thirds_pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
             !logGe = logGe0 + logRho/3 - logT
             ! where Ge0 = (qe**2)*(four_thirds_pi*avo*zbar/abar)**one_third/kerg
-            logGe0 = log10( & 
+            logGe0 = log10( &
                  qe*qe*pow(four_thirds_pi*avo*zbar/abar, one_third)/kerg)
             logGe = logGe0 + logRho/3 - logT
             logGe_lo = rq% log_Gamma_e_all_HELM ! HELM for logGe <= this
@@ -167,13 +167,13 @@
          real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
          real(dp), intent(inout) :: d_dxa(:,:) ! (nv, species)
          integer, intent(out) :: ierr
-         
+
          real(dp) :: start_crystal, full_crystal
          real(dp), dimension(species) :: AY, AZion, ACMI
          integer :: i, j
-         
+
          include 'formats'
-         
+
          ierr = 0
          AZion(1:species) = chem_isos% Z(chem_id(1:species))
          ACMI(1:species) = chem_isos% W(chem_id(1:species)) ! this really is atomic weight.
@@ -194,7 +194,7 @@
 
          ! composition derivatives not provided
          d_dxa = 0
-         
+
          if (is_bad(res(i_lnS))) then
             ierr = -1
             write(*,1) 'res(i_lnS), logRho, logT', res(i_lnS), logRho, logT
@@ -202,7 +202,7 @@
          end if
 
          contains
-         
+
          subroutine do1(show,RHO_real,T_real,start_crystal,full_crystal,res,d_dlnT_c_Rho,d_dlnRho_c_T,ierr)
             logical, intent(in) :: show
             real(dp), intent(in) :: start_crystal, full_crystal
@@ -220,15 +220,15 @@
             real(dp), parameter :: UN_T6=0.3157746d0
 
             include 'formats'
-            
+
             ierr = 0
-            
+
             T = T_real
             T%d1val1 = 1d0
 
             RHO = RHO_real
             RHO%d1val2 = 1d0
-         
+
             TEMP=T*1d-6/UN_T6 ! T [au]
 
             if (show) then
@@ -256,7 +256,7 @@
             else ! blend of liquid and solid
                phase = (GAMImean - start_crystal)/(full_crystal - start_crystal) ! 1 for solid, 0 for liquid
             end if
-            
+
             if (ierr /= 0) then
                return
                write(*,1) 'RHO', RHO
@@ -266,7 +266,7 @@
                write(*,*) 'ierr from MELANGE9'
                call mesa_error(__FILE__,__LINE__,'debug eos')
             end if
-            
+
             if (show) then
                write(*,1) 'PRADnkT', PRADnkT
                write(*,1) 'DENS', DENS
@@ -284,7 +284,7 @@
                write(*,1) 'CHIT', CHIT
                write(*,'(A)')
             end if
-            
+
             Tnk=8.31447d7/CMImean*RHO*T ! n_i kT [erg/cc]
             Pgas = PnkT*Tnk
             if (rq% include_radiation) then
@@ -368,9 +368,9 @@
             d_dlnRho_c_T(i_phase) = phase % d1val2 * RHO % val
 
          end subroutine do1
-     
+
       end subroutine Get_PC_Results
-         
+
 
       end module eospc_eval
-      
+

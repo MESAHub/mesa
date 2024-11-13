@@ -23,11 +23,11 @@
       program test_net
 
       use mod_test_net, only: test
-      
+
       implicit none
-      
+
       call test(.false.)
-      
+
       end program test_net
 
 

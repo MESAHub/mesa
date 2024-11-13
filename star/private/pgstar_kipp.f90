@@ -205,7 +205,7 @@
 
          xmin=max(s% pg% kipp_xmin,xvec(1))
          xmax=min(s% pg% kipp_xmax,xvec(n))
-         
+
          burn_type_cutoff = s% pg% Kipp_burn_type_cutoff
 
          call set_xleft_xright( &
@@ -279,12 +279,12 @@
          call finish_Kipp_plot
 
          call pgunsa
-         
+
          call dealloc
 
 
          contains
-         
+
          subroutine dealloc
             deallocate(xvec, &
                log_L, &
@@ -347,10 +347,10 @@
             call show_title_pgstar(s, title)
             call show_mix_legend
             call show_burn_legend
-            
+
             call show_pgstar_decorator(s%id, s% pg% kipp_use_decorator,s% pg% kipp_pgstar_decorator, 0, ierr)
 
-            
+
          end subroutine finish_Kipp_plot
 
 

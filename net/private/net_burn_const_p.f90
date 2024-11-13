@@ -31,7 +31,7 @@
       use rates_def, only: num_rvs
       use mtx_def
       use utils_lib, only: fill_with_NaNs,fill_with_NaNs_2D
-      
+
       implicit none
 
       contains
@@ -47,20 +47,20 @@
             ending_x, ending_temp, ending_rho, ending_lnS, initial_rho, initial_lnS, &
             nfcn, njac, nstep, naccpt, nrejct, time_doing_net, time_doing_eos, ierr)
          use num_def
-         use num_lib 
+         use num_lib
          use mtx_lib
          use rates_def, only: rates_reaction_id_max
-         
+
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: num_isos
          integer, intent(in) :: num_reactions
          real(dp), pointer, intent(in) :: starting_x(:) ! (num_isos)
          real(dp), intent(in) :: starting_temp
          logical, intent(in) :: clip ! if true, set negative x's to zero during burn.
-         
+
          integer, intent(in) :: which_solver ! as defined in num_def.f
          integer, intent(in) :: ntimes ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times) 
+         real(dp), pointer, intent(in) :: times(:) ! (num_times)
          real(dp), pointer, intent(in) :: log10Ps_f1(:) ! =(4,numtimes) interpolant for log10P(time)
 
          real(dp), intent(in) :: rate_factors(:) ! (num_reactions)
@@ -68,9 +68,9 @@
          real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
          real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
          integer, intent(in) :: screening_mode
-         
+
          ! args to control the solver -- see num/public/num_isolve.dek
-         real(dp), intent(inout) :: h 
+         real(dp), intent(inout) :: h
          real(dp), intent(in) :: max_step_size ! maximal step size.
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          ! absolute and relative error tolerances
@@ -98,7 +98,7 @@
             ! if < 0, then ignore
             ! else on return has input value plus time spent doing eos
          integer, intent(out) :: ierr
-         
+
          type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
          integer :: ijac, nzmax, isparse, mljac, mujac, imas, mlmas, mumas, lrd, lid, &
@@ -106,9 +106,9 @@
          integer, pointer :: ipar(:), iwork(:), ipar_burn_const_P_decsol(:)
          real(dp), pointer :: rpar(:), work(:), v(:), rpar_burn_const_P_decsol(:)
          real(dp) :: t, lgT, lgRho, tend
-         
+
          include 'formats'
-                  
+
          ending_x = 0
          ending_temp = 0
          ending_rho = 0
@@ -119,24 +119,24 @@
          naccpt = 0
          nrejct = 0
          ierr = 0
-         
+
          nvar = num_isos + 1
 
          call get_net_ptr(net_handle, g, ierr)
          if (ierr /= 0) then
             return
          end if
-         
+
          if (g% num_isos /= num_isos) then
             write(*,*) 'invalid num_isos', num_isos
             return
          end if
-         
+
          if (g% num_reactions /= num_reactions) then
             write(*,*) 'invalid num_reactions', num_reactions
             return
          end if
-         
+
          if (which_decsol == lapack) then
             nzmax = 0
             isparse = 0
@@ -145,22 +145,22 @@
             write(*,1) 'net 1 zone burn const P: unknown value for which_decsol', which_decsol
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          ijac = 1
          mljac = nvar ! square matrix
          mujac = nvar
 
          imas = 0
          mlmas = 0
-         mumas = 0        
-         
+         mumas = 0
+
          lout = 0
-                  
+
          call isolve_work_sizes(nvar, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
 
          lipar = burn_lipar
-         lrpar = burn_const_P_lrpar 
-         
+         lrpar = burn_const_P_lrpar
+
          allocate(v(nvar), iwork(liwork), work(lwork), rpar(lrpar), ipar(lipar), &
                ipar_burn_const_P_decsol(lid), rpar_burn_const_P_decsol(lrd), stat=ierr)
          if (ierr /= 0) then
@@ -175,9 +175,9 @@
             call fill_with_NaNs(rpar_burn_const_P_decsol)
          end if
 
-         
+
          i = burn_const_P_lrpar
-            
+
          ipar(i_burn_caller_id) = caller_id
          ipar(i_net_handle) = net_handle
          ipar(i_eos_handle) = eos_handle
@@ -191,10 +191,10 @@
 
          iwork = 0
          work = 0
-         
+
          t = 0
          tend = times(ntimes)
-         
+
          rpar(r_burn_const_P_rho) = 1d-99 ! dummy value, will be calculated later
          rpar(r_burn_const_P_pressure) = exp10(log10Ps_f1(1)) ! no interpolation yet
          rpar(r_burn_const_P_temperature) = starting_temp
@@ -205,7 +205,7 @@
 
          v(1:num_isos) = starting_x(1:num_isos)
          v(nvar) = log(starting_temp)
-                     
+
          if (which_decsol == lapack) then
             call do_isolve(lapack_decsol, null_decsols, ierr)
          else
@@ -221,7 +221,7 @@
          njac = iwork(15)
          nstep = iwork(16)
          naccpt = iwork(17)
-         nrejct = iwork(18)            
+         nrejct = iwork(18)
          time_doing_net = rpar(r_burn_const_P_time_net)
          time_doing_eos = rpar(r_burn_const_P_time_eos)
 
@@ -231,7 +231,7 @@
          ending_lnS = rpar(r_burn_const_P_lnS)
          initial_rho = rpar(r_burn_const_P_init_rho)
          initial_lnS = rpar(r_burn_const_P_init_lnS)
-         
+
          if (ierr /= 0) then
             write(*, '(a30,i10)') 'nfcn', nfcn
             write(*, '(a30,i10)') 'njac', njac
@@ -240,18 +240,18 @@
             write(*, '(a30,i10)') 'nrejct', nrejct
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call dealloc
-      
-         
+
+
          contains
-         
-         
+
+
          subroutine dealloc
             deallocate(iwork, work, rpar, ipar, ipar_burn_const_P_decsol, rpar_burn_const_P_decsol)
          end subroutine dealloc
-         
-         
+
+
          subroutine do_isolve(decsol, decsols, ierr)
             interface
                include "mtx_decsol.dek"
@@ -261,7 +261,7 @@
             integer :: caller_id, nvar_blk, nz_blk
             real(dp), dimension(:), pointer :: &
                lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk
-         
+
             nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
             caller_id = 0
             nvar_blk = 0
@@ -279,7 +279,7 @@
                decsol, decsols, null_decsolblk, &
                lrd, rpar_burn_const_P_decsol, lid, ipar_burn_const_P_decsol, &
                caller_id, nvar_blk, nz_blk, &
-               lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, & 
+               lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
                null_fcn_blk_dble, null_jac_blk_dble, &
                work, lwork, iwork, liwork, &
                lrpar, rpar, lipar, ipar, &
@@ -318,7 +318,7 @@
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
             integer, intent(out) :: ierr
-         
+
             integer :: net_handle, num_reactions, eos_handle
             real(dp) :: &
                   abar, zbar, z2bar, z53bar, ye, mass_correction, sumx, T, logT, &
@@ -328,7 +328,7 @@
             real(dp) :: eps_neu_total, eps_nuc
             real(dp) :: d_eps_nuc_dT
             real(dp) :: d_eps_nuc_dRho
-            real(dp) :: d_eps_nuc_dx(nvar-1) 
+            real(dp) :: d_eps_nuc_dx(nvar-1)
             real(dp) :: dxdt(nvar-1)
             real(dp) :: d_dxdt_dRho(nvar-1)
             real(dp) :: d_dxdt_dT(nvar-1)
@@ -342,9 +342,9 @@
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
             real(dp) :: dlnRho_dlnT_const_P, d_epsnuc_dlnT_const_P, d_Cp_dlnT
             real(dp) :: res(num_eos_basic_results)
-            real(dp) :: d_dlnRho_const_T(num_eos_basic_results) 
-            real(dp) :: d_dlnT_const_Rho(num_eos_basic_results) 
-            real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, nvar-1) 
+            real(dp) :: d_dlnRho_const_T(num_eos_basic_results)
+            real(dp) :: d_dlnT_const_Rho(num_eos_basic_results)
+            real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, nvar-1)
             integer, pointer :: net_iso(:), chem_id(:)
 
             type (Net_General_Info), pointer :: g
@@ -353,33 +353,33 @@
             actual_Qs => null()
             actual_neuQs => null()
             from_weaklib => null()
-         
+
             include 'formats'
-         
+
             num_isos = nvar-1
-         
+
             ierr = 0
             f = 0
             dfdv = 0
-         
+
             eos_handle = ipar(i_eos_handle)
-         
+
             net_handle = ipar(i_net_handle)
             call get_net_ptr(net_handle, g, ierr)
             if (ierr /= 0) then
                write(*,*) 'invalid handle for eval_net -- did you call alloc_net_handle?'
                return
             end if
-         
+
             v(1:num_isos) = max(1d-30, min(1d0, v(1:num_isos)))
                ! positive definite mass fractions
             v(1:num_isos) = v(1:num_isos)/sum(v(1:num_isos))
             x(1:num_isos) = v(1:num_isos)
-         
+
             num_reactions = g% num_reactions
 
             i = burn_const_P_lrpar
-         
+
             if (ipar(i_clip) /= 0) then
                do i=1,num_isos
                   x(i) = max(0d0, min(1d0, x(i)))
@@ -388,11 +388,11 @@
 
             call basic_composition_info( &
                num_isos, g% chem_id, x, xh, Y, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-     
+
             logT = v(nvar)/ln10
             T = exp10(logT)
 
-            pressure = rpar(r_burn_const_P_pressure)         
+            pressure = rpar(r_burn_const_P_pressure)
             Prad = Radiation_Pressure(T)
             Pgas = pressure - Prad
             if (Pgas <= 0) then
@@ -404,13 +404,13 @@
 
             chem_id => g% chem_id
             net_iso => g% net_iso
-                  
+
             if (rpar(r_burn_const_P_time_eos) >= 0) then
                call system_clock(time0,clock_rate)
             else
                time0 = 0
             endif
-         
+
             call eosPT_get( &
                eos_handle, &
                num_isos, chem_id, net_iso, x, &
@@ -486,9 +486,9 @@
 
             if (ierr /= 0) then
                return
-            
-            
-            
+
+
+
                write(*,*) 'eval_net failed'
                write(*,1) 'xh', xh
                write(*,1) 'Y', Y
@@ -505,40 +505,40 @@
                write(*,1) 'logRho', logRho
                write(*,1) 'Cp', Cp
                ierr = -1
-            
-            
+
+
                call mesa_error(__FILE__,__LINE__,'net_burn_const_P')
-            
+
                return
             end if
-         
+
             f(1:num_isos) = dxdt
             dlnT_dt = eps_nuc/(Cp*T)
             f(nvar) = dlnT_dt
-         
+
             if (ld_dfdv > 0) then
 
                dlnRho_dlnT_const_P = -res(i_chiT)/res(i_chiRho)
                d_epsnuc_dlnT_const_P = d_eps_nuc_dT*T + d_eps_nuc_dRho*Rho*dlnRho_dlnT_const_P
                d_Cp_dlnT = d_dlnT_const_Rho(i_Cp) + d_dlnRho_const_T(i_Cp)*dlnRho_dlnT_const_P
-            
+
                dfdv(1:num_isos,1:num_isos) = d_dxdt_dx
 
                dfdv(nvar,nvar) = d_epsnuc_dlnT_const_P/(Cp*T) - dlnT_dt*(1 + d_Cp_dlnT/Cp)
-            
+
                ! d_dxdt_dlnT
                dfdv(1:num_isos,nvar) = &
                   d_dxdt_dT(1:num_isos)*T + d_dxdt_dRho(1:num_isos)*Rho*dlnRho_dlnT_const_P
-            
+
                ! d_dlnTdt_dx
                dfdv(nvar,1:num_isos) = d_eps_nuc_dx(1:num_isos)/(Cp*T)
 
             end if
-         
+
          end subroutine burn_jacob
 
 
-         subroutine burn_sjac(n,time,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)  
+         subroutine burn_sjac(n,time,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)
             use mtx_lib, only: dense_to_sparse_with_diag
             integer, intent(in) :: n, nzmax, lrpar, lipar
             real(dp), intent(in) :: time, h
@@ -580,10 +580,10 @@
                ipar(i_sparse_format),n,n,dfdv,nzmax,nz,ia,ja,values,ierr)
             deallocate(dfdv)
          end subroutine burn_sjac
-      
-         
+
+
       end subroutine burn_1_zone_const_P
-      
+
 
       end module net_burn_const_P
 

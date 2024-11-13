@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,19 +27,19 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
-      
+
       include 'test_suite_extras_def.inc'
-      
+
       logical :: use_hydro
       integer :: inlist_part
       real(dp) :: eta_ledd, eta_medd,target_mass
-      
+
       contains
 
       include 'test_suite_extras.inc'
-      
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -55,7 +55,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
 
          s% other_cgrav => my_other_cgrav
@@ -70,8 +70,8 @@
 
 
       end subroutine extras_controls
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -82,8 +82,8 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -114,18 +114,18 @@
                   call star_set_v_flag(s% id, .true., ierr)
                   if(ierr/=0) return
                end if
-      
+
             ! Eddington L
             l_center =  (4d0 * pi * standard_cgrav * s% m_center * clight)/s% opacity(s% nz)
-      
+
             ! eddington limited accretion
             m_center = eta_medd * l_center / (clight*clight)
-      
+
             s% m_center = s% m_center + m_center * s% dt
             s% xmstar = s% mstar - s% M_center
-      
+
             s% L_center = eta_ledd * l_center
-   
+
          end select
 
 
@@ -140,8 +140,8 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going   
-         
+         extras_check_model = keep_going
+
          if(s% m_center/msun > target_mass .and. inlist_part == 4) then
             termination_code_str(t_xtra1) = 'PASS: Have reached requested NS mass'
             s% termination_code = t_xtra1
@@ -160,8 +160,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -173,7 +173,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -184,8 +184,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -199,7 +199,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -211,10 +211,10 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
 
-   ! use the Tolman–Oppenheimer–Volkoff (TOV) equation. 
-   ! See first equation in https://en.wikipedia.org/wiki/Tolman%E2%80%93Oppenheimer%E2%80%93Volkoff_equation.  
+
+   ! use the Tolman–Oppenheimer–Volkoff (TOV) equation.
+   ! See first equation in https://en.wikipedia.org/wiki/Tolman%E2%80%93Oppenheimer%E2%80%93Volkoff_equation.
    ! want to replace -G*m/r^2 by -G*m/r^2*(1 + P/(rho c^2))(1 + 4 pi r^3 P /(m c^2))/(1 - 2 G m/(r c^2))
       subroutine my_other_cgrav(id, ierr)
          use star_def
@@ -260,7 +260,7 @@
          end do
          !write(*,*) 'done my_other_cgrav', s% model_number
       end subroutine my_other_cgrav
-      
+
 
       end module run_star_extras
-      
+

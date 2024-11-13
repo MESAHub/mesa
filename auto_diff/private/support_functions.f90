@@ -12,7 +12,7 @@ module support_functions
       module procedure log_int
    end interface log
 
-   interface max 
+   interface max
       module procedure max_int_real
       module procedure max_real_int
    end interface max

@@ -81,7 +81,7 @@
          nz = s% nz
 
          s% num_diffusion_solver_steps = 0
-         
+
          s% eps_diffusion(1:nz) = 0d0
          do k = 1, nz
             s% energy_start(k) = s% energy(k)
@@ -98,7 +98,7 @@
                   s% model_number, dt, s% diffusion_dt_limit
             return
          end if
-                         
+
          s% need_to_setvars = .true.
 
          if (s% use_other_diffusion_factor) then
@@ -115,8 +115,8 @@
                write(*,*) 'do_element_diffusion failed in other_diffusion_factor'
             return
          end if
-         
-         if (s% doing_timing) call start_time(s, time0, total)  
+
+         if (s% doing_timing) call start_time(s, time0, total)
 
          nz = s% nz
          nzlo = 1
@@ -253,7 +253,7 @@
          if ( s% diffusion_use_full_net ) then
             s% diffusion_calculates_ionization = .true. ! class_typical_charges can't be used, so make sure they aren't.
          end if
-         
+
          if (.not. s% diffusion_calculates_ionization) then
             do j=1,nc
                typical_charge(j,1:nz) = s% diffusion_class_typical_charge(j)
@@ -306,7 +306,7 @@
          ! print *, "class_chem_id:  ", class_chem_id
          ! print *, "class:          ", class
          ! print *, "class name:     ", class_name
-         
+
          ! args are at cell center points.
          !if (s% show_diffusion_info) write(*,*) 'call solve_diffusion'
          !write(*,4) 'call do_solve_diffusion nzlo nzhi nz', nzlo, nzhi, nz, &
@@ -368,7 +368,7 @@
          end if
 
          if (dumping) call mesa_error(__FILE__,__LINE__,'debug: dump_diffusion_info')
-         
+
          do k=nzlo+1,nzhi
             do j=1,species
                i = class(j)
@@ -385,7 +385,7 @@
             write(*,*) "do_diffusion_heating is incompatible with do_WD_sedimentation_heating"
             write(*,*) "at least one of these options must be set to .false."
             call mesa_error(__FILE__,__LINE__,'do_element_diffusion')
-         end if         
+         end if
 
          s% eps_WD_sedimentation(1:nz) = 0d0
 
@@ -415,7 +415,7 @@
             end do
          end if
 
-         
+
          do k=1,nzlo
             do j=1,species
                s% diffusion_D_self(j,k) = s% diffusion_D_self(j,nzlo+1)
@@ -576,16 +576,16 @@
 
 
       end subroutine do_element_diffusion
-      
+
       subroutine finish_element_diffusion(s,dt)
         type (star_info), pointer :: s
         real(dp), intent(in) :: dt
         integer :: k
-        
+
         do k=1,s% nz
            s% eps_diffusion(k) = (s% energy_start(k) - s% energy(k))/dt
         end do
-        
+
       end subroutine finish_element_diffusion
 
       end module element_diffusion

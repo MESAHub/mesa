@@ -6,9 +6,9 @@
       use utils_lib, only: mesa_error
 
       implicit none
-      
+
       integer :: mljac, mujac, nstep
-      
+
       integer, parameter :: nz=48
       integer, parameter :: diff_mujac=1, diff_mljac=1, diff_ldjac=diff_mujac+diff_mljac+1
 
@@ -28,13 +28,13 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
-         
+
          real(dp) :: sig1, sig2
          integer :: i
          ierr = 0
 
          f = 0; dfdy=0
-         
+
          sig2 = 0
          do i=1,n
             sig1 = sig2
@@ -62,7 +62,7 @@
          end do
 
       end subroutine diffusion_op
-      
+
 
       subroutine diffusion_derivs(n, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, lrpar, lipar
@@ -72,9 +72,9 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
-         
+
          real(dp) :: dfdy(0,n)
-         
+
          ierr = 0
          ipar(i_nfcn) = ipar(i_nfcn) + 1
          call diffusion_op(n,x,h,y,f,dfdy,0,lrpar,rpar,lipar,ipar,ierr)
@@ -94,20 +94,20 @@
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
          call diffusion_op(n,x,h,y,f,dfdy,ld_dfdy,lrpar,rpar,lipar,ipar,ierr)
-         
+
          return
-         
+
          dfdy2(2,1:n) = dfdy(1,1:n)
          dfdy2(3,1:n) = dfdy(2,1:n) - 1
          dfdy2(4,1:n) = dfdy(3,1:n)
-         
+
          call mtx_rcond_banded('N', n, n, 1, 1, dfdy2, 4, ipiv, rcond, work, iwork, info)
          write(*,2) 'diffusion_jacob rcond', info, x, safe_log10(rcond)
-         
+
       end subroutine diffusion_jacob
 
 
-      subroutine diffusion_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)  
+      subroutine diffusion_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)
          ! sparse jacobian. format either compressed row or compressed column.
          use mtx_lib,only:band_to_row_sparse_with_diag,band_to_col_sparse_with_diag,mtx_rcond_banded
          use test_int_support,only:ipar_sparse_format
@@ -121,7 +121,7 @@
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr ! nonzero means terminate integration
-         
+
          real(dp) :: dfdy(n,n)
          integer :: ld_dfdy, nz
          ld_dfdy = n
@@ -141,7 +141,7 @@
          ! x is the current x value; xold is the previous x value.
          ! y is the current y value.
          ! irtrn negative means terminate integration.
-         ! rwork and iwork hold info for 
+         ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
          real(dp), intent(inout) :: y(:) ! (n)
@@ -164,8 +164,8 @@
          integer, intent(out) :: irtrn
          irtrn = 0
       end subroutine diffusion_solout
-      
-      
+
+
       subroutine do_test_diffusion(which_solver,which_decsol,numerical_jacobian,show_all,quiet)
          use test_support,only:show_results,show_statistics,check_results
          use test_int_support,only:do_test_stiff_int
@@ -182,50 +182,50 @@
          real(dp), pointer :: y(:)
          real(dp) :: result(n_soln), soln(n_soln), h0, atol(1), rtol(1), t(0:ndisc+1)
          integer :: i, k, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol
-         real(dp), target :: rpar_ary(lrpar) 
+         real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar_blk_dble, nz_blk_dble
          real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
          real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
-         
+
          nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
          caller_id = 0
          nvar_blk_dble = 0
          nz_blk_dble = 0
-                  
+
          rpar => rpar_ary
          ipar => ipar_ary
          y => y_ary
-            
+
          if (.not. quiet) write(*,*) 'diffusion'
 
          t(0)   = 0d0
          t(1)   = tend
-         
+
          itol = 0 ! scalar tolerances
          rtol = 1d-6
          atol = 1d-6
          h0 = atol(1)*1d-1 ! initial step size
-         
+
          matrix_type_spec = banded_matrix_type
          mljac = diff_mljac
          mujac = diff_mujac
 
          imas = 0
          mlmas = 0
-         mumas = 0        
-         
+         mumas = 0
+
          m1 = 0
-         m2 = 0     
-         
+         m2 = 0
+
          k=nz/2
          y(1:k) = 0
          y(k+1:nz) = ystart
-         
+
          y0 = y
-         
+
          do k=1,nz
             if (k == 1) then
                sig_dm(k) = 0;
@@ -237,8 +237,8 @@
                sig_dm(k) = sig;
             end if
          end do
-         
-         nstep=0        
+
+         nstep=0
 
          call do_test_stiff_int(which_solver,which_decsol,numerical_jacobian, &
                diffusion_derivs,diffusion_jacob,diffusion_sjac,diffusion_solout,iout, &
@@ -250,9 +250,9 @@
             write(*,*) 'test_diffusion ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          !call write_diffusion_results
-         
+
          call set_yexact
          i=0
          do k=10,nz-10,(nz-10)/12
@@ -261,12 +261,12 @@
             soln(i) = yexact(k)
             result(i) = y(k)
          end do
-         
+
          call show_results(n_soln,result,soln,show_all)
          call show_statistics(ipar(i_nfcn),ipar(i_njac),nstep,show_all)
-         
+
          contains
-         
+
          subroutine set_yexact
             ! for nz=48, sig = 1d-2, ystart = 1d0, tend = 1d4
             yexact( 1)=    0.0000000000000000D+00
@@ -318,7 +318,7 @@
             yexact(47)=    1.0000000000000000D+00
             yexact(48)=    1.0000000000000000D+00
          end subroutine set_yexact
-         
+
          subroutine write_diffusion_results
             use utils_lib, only: mkdir
             use const_def
@@ -343,8 +343,8 @@
          end subroutine write_diffusion_results
 
       end subroutine do_test_diffusion
-      
-      
-            
-      
+
+
+
+
       end module test_diffusion

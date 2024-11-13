@@ -136,8 +136,8 @@
             end if
          end do
       end subroutine my_gemv_p_mv
-      
-      
+
+
       subroutine my_gemm(m,n,k,a,lda,b,ldb,c,ldc) ! c := c - a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(fltp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
@@ -158,10 +158,10 @@
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm
-      
-      
+
+
       subroutine my_gemm_p1(m,n,k,a,lda,b,ldb,c,ldc) ! c := c + a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
          real(fltp), dimension(:,:) :: a, b, c ! a(lda,*),b(ldb,*),c(ldc,*)
@@ -182,10 +182,10 @@
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm_p1
-      
-      
+
+
       subroutine my_gemm_plus_mm(m,n,k,a,b,d,e,c) ! c := c + a*b + d*e
          integer, intent(in) :: k,m,n
          real(fltp), dimension(:,:) :: a, b, c, d, e
@@ -212,10 +212,10 @@
                   end do
                end if
             end do
-         end do      
+         end do
       end subroutine my_gemm_plus_mm
-      
-      
+
+
       subroutine my_gemm0(m,n,k,a,lda,b,ldb,c,ldc)
          ! c := -a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
@@ -235,8 +235,8 @@
          end do
          call my_gemm(m,n,k,a,lda,b,ldb,c,ldc)
       end subroutine my_gemm0
-      
-      
+
+
       subroutine my_gemm0_p1(m,n,k,a,lda,b,ldb,c,ldc)
          ! c := -a*b
          integer, intent(in) :: k,lda,ldb,ldc,m,n
@@ -257,7 +257,7 @@
          call my_gemm_p1(m,n,k,a,lda,b,ldb,c,ldc)
       end subroutine my_gemm0_p1
 
-      
+
       subroutine my_getf2(m, a, lda, ipiv, sfmin, info)
          integer :: info, lda, m
          integer :: ipiv(:)
@@ -285,7 +285,7 @@
                      a(jp,i) = tmp
                   end do
                end if
-               if( j.lt.m ) then 
+               if( j.lt.m ) then
                   if( abs(a( j, j )) .ge. sfmin ) then
                      da = one / a( j, j )
                      n = m-j
@@ -305,11 +305,11 @@
                         end do
                      end if
                   else ! no scale
-                    do i = 1, m-j 
-                       a( j+i, j ) = a( j+i, j ) / a( j, j ) 
-                    end do 
-                  end if 
-               end if 
+                    do i = 1, m-j
+                       a( j+i, j ) = a( j+i, j ) / a( j, j )
+                    end do
+                  end if
+               end if
             else if( info.eq.0 ) then
                info = j
             end if
@@ -324,7 +324,7 @@
          end do
       end subroutine my_getf2
 
-      
+
       subroutine my_getf2_4_by_4(a, lda, ipiv, sfmin, info)
          integer :: info, lda !  m=4
          integer :: ipiv(:)
@@ -334,7 +334,7 @@
          integer :: jp
          real(fltp) :: tmp, da
          info = 0
-         
+
          jp = maxloc(abs(a(1:lda,1)),dim=1)
          ipiv( 1 ) = jp
          if( a( jp, 1 ).ne.zero ) then
@@ -358,10 +358,10 @@
                a(3,1) = da*a(3,1)
                a(4,1) = da*a(4,1)
             else ! no scale
-               a( 2, 1 ) = a( 2, 1 ) / a( 1, 1 ) 
-               a( 3, 1 ) = a( 3, 1 ) / a( 1, 1 ) 
-               a( 4, 1 ) = a( 4, 1 ) / a( 1, 1 ) 
-            end if 
+               a( 2, 1 ) = a( 2, 1 ) / a( 1, 1 )
+               a( 3, 1 ) = a( 3, 1 ) / a( 1, 1 )
+               a( 4, 1 ) = a( 4, 1 ) / a( 1, 1 )
+            end if
          else if( info.eq.0 ) then
             info = 1
          end if
@@ -374,7 +374,7 @@
          a(2,4) = a(2,4) - a(2,1)*a(1,4)
          a(3,4) = a(3,4) - a(3,1)*a(1,4)
          a(4,4) = a(4,4) - a(4,1)*a(1,4)
-         
+
          jp = 1 + maxloc(abs(a(2:lda,2)),dim=1)
          ipiv( 2 ) = jp
          if( a( jp, 2 ).ne.zero ) then
@@ -399,7 +399,7 @@
             else ! no scale
                a( 3, 2 ) = a( 3, 2 ) / a( 2, 2 )
                a( 4, 2 ) = a( 4, 2 ) / a( 2, 2 )
-            end if 
+            end if
          else if( info.eq.0 ) then
             info = 2
          end if
@@ -407,7 +407,7 @@
          a(4,3) = a(4,3) - a(4,2)*a(2,3)
          a(3,4) = a(3,4) - a(3,2)*a(2,4)
          a(4,4) = a(4,4) - a(4,2)*a(2,4)
-         
+
          jp = 2 + maxloc(abs(a(3:lda,3)),dim=1)
          ipiv( 3 ) = jp
          if( a( jp, 3 ).ne.zero ) then
@@ -429,13 +429,13 @@
                da = one / a( 3, 3 )
                a(4,3) = da*a(4,3)
             else ! no scale
-               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 ) 
-            end if 
+               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 )
+            end if
          else if( info.eq.0 ) then
             info = 3
          end if
          a(4,4) = a(4,4) - a(4,3)*a(3,4)
-         
+
          jp = 3 + maxloc(abs(a(4:lda,4)),dim=1)
          ipiv( 4 ) = jp
          if( a( jp, 4 ).ne.zero ) then
@@ -459,7 +459,7 @@
 
       end subroutine my_getf2_4_by_4
 
-      
+
       subroutine my_getf2_5_by_5(a, lda, ipiv, sfmin, info)
          integer :: info, lda !  m=5
          integer :: ipiv(:)
@@ -496,11 +496,11 @@
                a(4,1) = da*a(4,1)
                a(5,1) = da*a(5,1)
             else ! no scale
-               a( 2, 1 ) = a( 2, 1 ) / a( 1, 1 ) 
-               a( 3, 1 ) = a( 3, 1 ) / a( 1, 1 ) 
-               a( 4, 1 ) = a( 4, 1 ) / a( 1, 1 ) 
-               a( 5, 1 ) = a( 5, 1 ) / a( 1, 1 ) 
-            end if 
+               a( 2, 1 ) = a( 2, 1 ) / a( 1, 1 )
+               a( 3, 1 ) = a( 3, 1 ) / a( 1, 1 )
+               a( 4, 1 ) = a( 4, 1 ) / a( 1, 1 )
+               a( 5, 1 ) = a( 5, 1 ) / a( 1, 1 )
+            end if
          else if( info.eq.0 ) then
             info = 1
          end if
@@ -520,7 +520,7 @@
          a(3,5) = a(3,5) - a(3,1)*a(1,5)
          a(4,5) = a(4,5) - a(4,1)*a(1,5)
          a(5,5) = a(5,5) - a(5,1)*a(1,5)
-         
+
          jp = 1 + maxloc(abs(a(2:lda,2)),dim=1)
          ipiv( 2 ) = jp
          if( a( jp, 2 ).ne.zero ) then
@@ -550,7 +550,7 @@
                a( 3, 2 ) = a( 3, 2 ) / a( 2, 2 )
                a( 4, 2 ) = a( 4, 2 ) / a( 2, 2 )
                a( 5, 2 ) = a( 5, 2 ) / a( 2, 2 )
-            end if 
+            end if
          else if( info.eq.0 ) then
             info = 2
          end if
@@ -563,7 +563,7 @@
          a(3,5) = a(3,5) - a(3,2)*a(2,5)
          a(4,5) = a(4,5) - a(4,2)*a(2,5)
          a(5,5) = a(5,5) - a(5,2)*a(2,5)
-         
+
          jp = 2 + maxloc(abs(a(3:lda,3)),dim=1)
          ipiv( 3 ) = jp
          if( a( jp, 3 ).ne.zero ) then
@@ -589,9 +589,9 @@
                a(4,3) = da*a(4,3)
                a(5,3) = da*a(5,3)
             else ! no scale
-               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 ) 
-               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 ) 
-            end if 
+               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 )
+               a( 4, 3 ) = a( 4, 3 ) / a( 3, 3 )
+            end if
          else if( info.eq.0 ) then
             info = 3
          end if
@@ -599,7 +599,7 @@
          a(5,4) = a(5,4) - a(5,3)*a(3,4)
          a(4,5) = a(4,5) - a(4,3)*a(3,5)
          a(5,5) = a(5,5) - a(5,3)*a(3,5)
-         
+
          jp = 3 + maxloc(abs(a(4:lda,4)),dim=1)
          ipiv( 4 ) = jp
          if( a( jp, 4 ).ne.zero ) then
@@ -624,13 +624,13 @@
                da = one / a( 4, 4 )
                a(5,4) = da*a(5,4)
             else ! no scale
-              a( 5, 4 ) = a( 5, 4 ) / a( 4, 4 ) 
-            end if 
+              a( 5, 4 ) = a( 5, 4 ) / a( 4, 4 )
+            end if
          else if( info.eq.0 ) then
             info = 4
          end if
          a(5,5) = a(5,5) - a(5,4)*a(4,5)
-         
+
          jp = 4 + maxloc(abs(a(5:lda,5)),dim=1)
          ipiv( 5 ) = jp
          if( a( jp, 5 ).ne.zero ) then
@@ -656,8 +656,8 @@
          end if
 
       end subroutine my_getf2_5_by_5
-      
-      
+
+
       subroutine my_laswp( n,   a, lda,  k1, k2, ipiv,  incx )
          integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
@@ -709,10 +709,10 @@
                end if
                ix = ix + incx
             end do
-         end if      
+         end if
       end subroutine my_laswp
-      
-               
+
+
       subroutine my_laswp_4_by_1( a, lda, ipiv )
          ! n == 1, k1 == 1, k2 == 4, incx == 1
          integer :: lda
@@ -746,8 +746,8 @@
             a( ip, 1 ) = temp
          end if
       end subroutine my_laswp_4_by_1
-      
-               
+
+
       subroutine my_laswp_5_by_1( a, lda, ipiv )
          ! n == 1, k1 == 1, k2 == 5, incx == 1
          integer :: lda
@@ -787,8 +787,8 @@
             a( ip, 1 ) = temp
          end if
       end subroutine my_laswp_5_by_1
-      
-      
+
+
       subroutine my_laswp_4_by_4( a, lda, ipiv )
          integer :: lda
          integer :: ipiv(:)
@@ -857,8 +857,8 @@
             a( ip, 4 ) = temp
          end if
       end subroutine my_laswp_4_by_4
-            
-      
+
+
       subroutine my_laswp_5_by_5( a, lda, ipiv )
          integer :: lda
          integer :: ipiv(:)
@@ -957,8 +957,8 @@
             a( ip, 5 ) = temp
          end if
       end subroutine my_laswp_5_by_5
-            
-      
+
+
       subroutine my_getrs( n, nrhs, a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb, n, nrhs
          integer, pointer :: ipiv(:)
@@ -966,7 +966,7 @@
          real(fltp), parameter :: one=1, zero=0
          integer :: i, j, k
          info = 0
-         
+
          if (nrhs == 1) then
             if (n == 4) then
                call my_getrs_4_by_1( a, lda, ipiv, b, ldb, info )
@@ -981,7 +981,7 @@
             return
          else if (nrhs == 5 .and. n == 5) then
             call my_getrs_5_by_5( a, lda, ipiv, b, ldb, info )
-            return         
+            return
          end if
 
          call my_laswp(nrhs, b, ldb, 1, n, ipiv, 1 )
@@ -1006,18 +1006,18 @@
                end if
             end do
          end do
-         
+
       end subroutine my_getrs
-      
+
 
       subroutine my_getrs_5_by_5( a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb ! , n=5, nrhs=5
          integer, pointer :: ipiv(:)
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: zero=0
-         
+
          info = 0
-      
+
          !call my_laswp(5, b, ldb, 1, 5, ipiv, 1 )
          call my_laswp_5_by_5( b, ldb, ipiv )
 
@@ -1031,7 +1031,7 @@
          b(4,1) = b(4,1) - b(3,1)*a(4,3)
          b(5,1) = b(5,1) - b(3,1)*a(5,3)
          b(5,1) = b(5,1) - b(4,1)*a(5,4)
-      
+
          b(2,2) = b(2,2) - b(1,2)*a(2,1)
          b(3,2) = b(3,2) - b(1,2)*a(3,1)
          b(4,2) = b(4,2) - b(1,2)*a(4,1)
@@ -1075,7 +1075,7 @@
          b(4,5) = b(4,5) - b(3,5)*a(4,3)
          b(5,5) = b(5,5) - b(3,5)*a(5,3)
          b(5,5) = b(5,5) - b(4,5)*a(5,4)
-         
+
          !call dtrsm( 'left', 'upper', 'no transpose', 'non-unit', n, nrhs, one, a, lda, b, ldb )
          b(5,1) = b(5,1)/a(5,5)
          b(1,1) = b(1,1) - b(5,1)*a(1,5)
@@ -1092,7 +1092,7 @@
          b(2,1) = b(2,1)/a(2,2)
          b(1,1) = b(1,1) - b(2,1)*a(1,2)
          b(1,1) = b(1,1)/a(1,1)
-      
+
          b(5,2) = b(5,2)/a(5,5)
          b(1,2) = b(1,2) - b(5,2)*a(1,5)
          b(2,2) = b(2,2) - b(5,2)*a(2,5)
@@ -1108,7 +1108,7 @@
          b(2,2) = b(2,2)/a(2,2)
          b(1,2) = b(1,2) - b(2,2)*a(1,2)
          b(1,2) = b(1,2)/a(1,1)
-      
+
          b(5,3) = b(5,3)/a(5,5)
          b(1,3) = b(1,3) - b(5,3)*a(1,5)
          b(2,3) = b(2,3) - b(5,3)*a(2,5)
@@ -1124,7 +1124,7 @@
          b(2,3) = b(2,3)/a(2,2)
          b(1,3) = b(1,3) - b(2,3)*a(1,2)
          b(1,3) = b(1,3)/a(1,1)
-      
+
          b(5,4) = b(5,4)/a(5,5)
          b(1,4) = b(1,4) - b(5,4)*a(1,5)
          b(2,4) = b(2,4) - b(5,4)*a(2,5)
@@ -1140,7 +1140,7 @@
          b(2,4) = b(2,4)/a(2,2)
          b(1,4) = b(1,4) - b(2,4)*a(1,2)
          b(1,4) = b(1,4)/a(1,1)
-      
+
          b(5,5) = b(5,5)/a(5,5)
          b(1,5) = b(1,5) - b(5,5)*a(1,5)
          b(2,5) = b(2,5) - b(5,5)*a(2,5)
@@ -1158,7 +1158,7 @@
          b(1,5) = b(1,5)/a(1,1)
 
       end subroutine my_getrs_5_by_5
-      
+
 
       subroutine my_getrs_5_by_1( a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb ! , n=5, nrhs=1
@@ -1178,7 +1178,7 @@
          b(4,1) = b(4,1) - b(3,1)*a(4,3)
          b(5,1) = b(5,1) - b(3,1)*a(5,3)
          b(5,1) = b(5,1) - b(4,1)*a(5,4)
-         
+
          !call dtrsm( 'left', 'upper', 'no transpose', 'non-unit', n, nrhs, one, a, lda, b, ldb )
          b(5,1) = b(5,1)/a(5,5)
          b(1,1) = b(1,1) - b(5,1)*a(1,5)
@@ -1188,16 +1188,16 @@
          b(4,1) = b(4,1)/a(4,4)
          b(1,1) = b(1,1) - b(4,1)*a(1,4)
          b(2,1) = b(2,1) - b(4,1)*a(2,4)
-         b(3,1) = b(3,1) - b(4,1)*a(3,4)         
+         b(3,1) = b(3,1) - b(4,1)*a(3,4)
          b(3,1) = b(3,1)/a(3,3)
          b(1,1) = b(1,1) - b(3,1)*a(1,3)
-         b(2,1) = b(2,1) - b(3,1)*a(2,3)         
+         b(2,1) = b(2,1) - b(3,1)*a(2,3)
          b(2,1) = b(2,1)/a(2,2)
          b(1,1) = b(1,1) - b(2,1)*a(1,2)
          b(1,1) = b(1,1)/a(1,1)
 
       end subroutine my_getrs_5_by_1
-      
+
 
       subroutine my_getrs_4_by_4( a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb ! , n=4, nrhs=4
@@ -1205,9 +1205,9 @@
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: zero=0
          info = 0
-      
+
          call my_laswp_4_by_4( b, ldb, ipiv )
-         
+
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )
          b(2,1) = b(2,1) - b(1,1)*a(2,1)
          b(3,1) = b(3,1) - b(1,1)*a(3,1)
@@ -1215,7 +1215,7 @@
          b(3,1) = b(3,1) - b(2,1)*a(3,2)
          b(4,1) = b(4,1) - b(2,1)*a(4,2)
          b(4,1) = b(4,1) - b(3,1)*a(4,3)
-      
+
          b(2,2) = b(2,2) - b(1,2)*a(2,1)
          b(3,2) = b(3,2) - b(1,2)*a(3,1)
          b(4,2) = b(4,2) - b(1,2)*a(4,1)
@@ -1236,7 +1236,7 @@
          b(3,4) = b(3,4) - b(2,4)*a(3,2)
          b(4,4) = b(4,4) - b(2,4)*a(4,2)
          b(4,4) = b(4,4) - b(3,4)*a(4,3)
-         
+
          !call dtrsm( 'left', 'upper', 'no transpose', 'non-unit', n, nrhs, one, a, lda, b, ldb )
          b(4,1) = b(4,1)/a(4,4)
          b(1,1) = b(1,1) - b(4,1)*a(1,4)
@@ -1248,7 +1248,7 @@
          b(2,1) = b(2,1)/a(2,2)
          b(1,1) = b(1,1) - b(2,1)*a(1,2)
          b(1,1) = b(1,1)/a(1,1)
-      
+
          b(4,2) = b(4,2)/a(4,4)
          b(1,2) = b(1,2) - b(4,2)*a(1,4)
          b(2,2) = b(2,2) - b(4,2)*a(2,4)
@@ -1259,7 +1259,7 @@
          b(2,2) = b(2,2)/a(2,2)
          b(1,2) = b(1,2) - b(2,2)*a(1,2)
          b(1,2) = b(1,2)/a(1,1)
-      
+
          b(4,3) = b(4,3)/a(4,4)
          b(1,3) = b(1,3) - b(4,3)*a(1,4)
          b(2,3) = b(2,3) - b(4,3)*a(2,4)
@@ -1270,7 +1270,7 @@
          b(2,3) = b(2,3)/a(2,2)
          b(1,3) = b(1,3) - b(2,3)*a(1,2)
          b(1,3) = b(1,3)/a(1,1)
-      
+
          b(4,4) = b(4,4)/a(4,4)
          b(1,4) = b(1,4) - b(4,4)*a(1,4)
          b(2,4) = b(2,4) - b(4,4)*a(2,4)
@@ -1283,17 +1283,17 @@
          b(1,4) = b(1,4)/a(1,1)
 
       end subroutine my_getrs_4_by_4
-      
+
 
       subroutine my_getrs_4_by_1( a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb ! , n=4, nrhs=1
          integer, pointer :: ipiv(:)
          real(fltp), pointer :: a(:,:), b(:,:) ! a( lda, * ), b( ldb, * )
          real(fltp), parameter :: zero=0
-         
+
          info = 0
          call my_laswp_4_by_1( b, ldb, ipiv )
-         
+
          !call dtrsm( 'left', 'lower', 'no transpose', 'unit', n, nrhs, one, a, lda, b, ldb )
          b(2,1) = b(2,1) - b(1,1)*a(2,1)
          b(3,1) = b(3,1) - b(1,1)*a(3,1)
@@ -1301,7 +1301,7 @@
          b(3,1) = b(3,1) - b(2,1)*a(3,2)
          b(4,1) = b(4,1) - b(2,1)*a(4,2)
          b(4,1) = b(4,1) - b(3,1)*a(4,3)
-         
+
          !call dtrsm( 'left', 'upper', 'no transpose', 'non-unit', n, nrhs, one, a, lda, b, ldb )
          b(4,1) = b(4,1)/a(4,4)
          b(1,1) = b(1,1) - b(4,1)*a(1,4)
@@ -1313,10 +1313,10 @@
          b(2,1) = b(2,1)/a(2,2)
          b(1,1) = b(1,1) - b(2,1)*a(1,2)
          b(1,1) = b(1,1)/a(1,1)
-         
+
       end subroutine my_getrs_4_by_1
-      
-      
+
+
       subroutine my_getrs_dbg( n, nrhs, a, lda, ipiv, b, ldb, info )
          integer :: info, lda, ldb, n, nrhs
          integer, pointer :: ipiv(:)
@@ -1347,8 +1347,8 @@
             end do
          end do
       end subroutine my_getrs_dbg
-      
-      
+
+
       subroutine my_laswp_dbg( n,   a, lda,  k1, k2, ipiv,  incx )
          integer :: incx, k1, k2, lda, n
          integer :: ipiv(:)
@@ -1399,19 +1399,19 @@
             ix = ix0
             do i = i1, i2, inc
                ip = ipiv( ix )
-               
-               
-               
+
+
+
                if (ip == 0) then
-               
+
                   stop 'my_lapack95  ip == 0'
-               
-               
+
+
                end if
-               
-               
-               
-               
+
+
+
+
                if( ip.ne.i ) then
                   do k = n32, n
                      temp = a( i, k )
@@ -1421,7 +1421,7 @@
                end if
                ix = ix + incx
             end do
-         end if      
+         end if
       end subroutine my_laswp_dbg
 
       end module my_lapack95

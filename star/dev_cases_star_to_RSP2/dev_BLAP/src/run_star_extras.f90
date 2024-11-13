@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,15 +27,15 @@
       use const_def
       use math_lib
       use run_star_support
-      
+
       implicit none
-      
+
       include 'test_suite_extras_def.inc'
       include 'multi_stars_extras_def.inc'
 
       integer :: RSP2_num_periods
       real(dp) :: RSP2_period, time_started
-            
+
       contains
 
       include 'test_suite_extras.inc'
@@ -52,8 +52,8 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end function extras_start_step
-      
-      
+
+
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -107,8 +107,8 @@
          write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -124,7 +124,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
          s% other_photo_write => photo_write
          s% other_photo_read => photo_read
       end subroutine extras_controls
@@ -142,8 +142,8 @@
          ierr = 0
          read(iounit, iostat=ierr) RSP2_num_periods, RSP2_period, time_started
       end subroutine photo_read
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -152,15 +152,15 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call test_suite_startup(s, restart, ierr)    
-         if (.not. restart) then     
+         call test_suite_startup(s, restart, ierr)
+         if (.not. restart) then
             RSP2_num_periods = 0
             RSP2_period = 0
             time_started = 0
          end if
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -181,7 +181,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -194,8 +194,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -206,7 +206,7 @@
          ierr = 0
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -217,8 +217,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -229,9 +229,9 @@
          type (star_info), pointer :: s
          integer :: k
          include 'formats'
-         ierr = 0            
+         ierr = 0
       end subroutine data_for_extra_profile_columns
 
 
       end module run_star_extras
-      
+

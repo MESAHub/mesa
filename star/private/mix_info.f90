@@ -70,13 +70,13 @@
 
          ierr = 0
          nz = s% nz
-         
+
          min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
-         
+
          RSP2_or_RSP = s% RSP_flag .or. s% RSP2_flag
 
          if (s% doing_timing) call start_time(s, time0, total)
-         
+
          if (s% RTI_flag) then
             call set_RTI_mixing_info(s, ierr)
             if (failed('set_RTI_mixing_info')) return
@@ -104,13 +104,13 @@
          if (.not. associated(s% burn_z_mix_region)) allocate(s% burn_z_mix_region(max_mix_bdy))
 
          allocate(eps_h(nz), eps_he(nz), eps_z(nz), cdc_factor(nz))
-         
+
          if (.not. RSP2_or_RSP) then
             do k = 1, nz
                s% mixing_type(k) = s% mlt_mixing_type(k)
             end do
          end if
-         
+
          cdc_factor(1) = 1d0
          do k = 2, nz
             rho_face = (s% dq(k-1)*s% rho(k) + s% dq(k)*s% rho(k-1))/&
@@ -118,7 +118,7 @@
             f = pi4*s% r(k)*s% r(k)*rho_face
             cdc_factor(k) = f*f
          end do
-         
+
          if (s% RSP_flag) then
             do k = 1, nz
                s% mixing_type(k) = no_mixing
@@ -149,9 +149,9 @@
                s% conv_vel(k) = s% mlt_vc(k)
             end do
          end if
-         
+
          call check('after get mlt_D')
-         
+
          if (s% remove_mixing_glitches .and. .not. RSP2_or_RSP) then
 
             call remove_tiny_mixing(s, ierr)
@@ -176,7 +176,7 @@
               if (failed('remove_embedded_semiconvection')) return
 
          end if
-         
+
          call check('after get remove_mixing_glitches')
 
          call do_mix_envelope(s)
@@ -187,7 +187,7 @@
             eps_he(k) = s% eps_nuc_categories(i3alf,k)
             eps_z(k) = s% eps_nuc(k) - (eps_h(k) + eps_he(k))
          end do
-         
+
          if (.not. s% RSP_flag) then
 
             call set_cz_boundary_info(s, ierr)
@@ -197,12 +197,12 @@
                s, nz, eps_h, eps_he, eps_z, s% mstar, &
                s% q, s% cdc, ierr)
             if (failed('locate_convection_boundaries')) return
-        
+
             call add_predictive_mixing(s, ierr)
             if (failed('add_predictive_mixing')) return
-            
+
          end if
-         
+
          call check('after add_predictive_mixing')
 
          ! NB: re-call locate_convection_boundries to take into
@@ -217,12 +217,12 @@
 
             call locate_mixing_boundaries(s, eps_h, eps_he, eps_z, ierr)
             if (failed('locate_mixing_boundaries')) return
-         
+
             call add_overshooting(s, ierr)
             if (failed('add_overshooting')) return
-            
+
          end if
-         
+
          call check('after add_overshooting')
 
          call add_RTI_turbulence(s, ierr)
@@ -279,7 +279,7 @@
          do k=1,nz
             s% D_mix_non_rotation(k) = s% D_mix(k)
          end do
-         
+
          call check('before rotation_flag')
 
          if (s% rotation_flag) then
@@ -297,12 +297,12 @@
             s% cdc(1) = s% cdc(2)
 
          end if
-         
+
          call check('after update_rotation_mixing_info')
-         
+
          region_bottom_q = s% D_mix_zero_region_bottom_q
          region_top_q = s% D_mix_zero_region_top_q
-         
+
          if (s% dq_D_mix_zero_at_H_He_crossover > 0d0) then
             i_h1 = s% net_iso(ih1)
             i_he4 = s% net_iso(ihe4)
@@ -319,7 +319,7 @@
                end do
             end if
          end if
-         
+
          if (region_bottom_q < region_top_q) then
             do k=2,nz
                if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
@@ -328,7 +328,7 @@
                end if
             end do
          end if
-         
+
          region_bottom_q = 1d99
          region_top_q = -1d99
          if (s% dq_D_mix_zero_at_H_C_crossover > 0d0) then
@@ -347,7 +347,7 @@
                end do
             end if
          end if
-         
+
          if (region_bottom_q < region_top_q) then
             do k=2,nz
                if (s% q(k) >= region_bottom_q .and. s% q(k) <= region_top_q) then
@@ -356,7 +356,7 @@
                end if
             end do
          end if
-      
+
          ! as last thing, update conv_vel from D_mix and mixing length.
          do k=2,nz
             if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
@@ -511,7 +511,7 @@
          if (in_convective_region) then
             s% cz_top_mass(s% n_conv_regions) = s% mstar
          end if
-         
+
          s% have_new_cz_bdy_info = .true.
 
          if (dbg) then
@@ -714,7 +714,7 @@
                end if
             end do
             if (max_logT > s% burn_z_mix_region_logT &
-                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then            
+                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then
                s% burn_z_conv_region(i) = .true.
                if (i > 1) s% burn_z_conv_region(i-1) = .true.
                !write(*,*) 'burn z mix region', i, &
@@ -849,7 +849,7 @@
             call end_of_mixing_region
          end if
 
-            
+
          !do i=1,s% num_conv_boundaries
          !   write(*,*) 'locate_mixing_boundaries region burn_h he z', i, &
          !      s% burn_h_mix_region(i), s% burn_he_conv_region(i), s% burn_z_conv_region(i)
@@ -894,7 +894,7 @@
                end if
             end do
             if (max_logT > s% burn_z_mix_region_logT &
-                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then            
+                  .and. max_Y < s% max_Y_for_burn_z_mix_region) then
                s% burn_z_mix_region(i) = .true.
                if (i > 1) s% burn_z_mix_region(i-1) = .true.
                !write(*,*) 'burn z mix region', i
@@ -1585,7 +1585,7 @@
                write(*,*) 'update_rotation_mixing_info failed in call to set_rotation_mixing_info'
             return
          end if
-         
+
          call check('after set_rotation_mixing_info')
          if (s% D_omega_flag) call check_D_omega('check_D_omega after set_rotation_mixing_info')
 
@@ -1616,7 +1616,7 @@
             end if
             s% D_mix(k) = s% D_mix_non_rotation(k) + s% D_mix_rotation(k)
          end do
-         
+
          call check('after include rotation part for mixing abundances')
 
          am_nu_DSI_factor = s% am_nu_DSI_factor
@@ -1626,7 +1626,7 @@
          am_nu_GSF_factor = s% am_nu_GSF_factor
          am_nu_ST_factor = s% am_nu_ST_factor
          am_nu_visc_factor = s% am_nu_visc_factor
-         
+
          if ((.not. s% am_nu_rot_flag) .and. &
                (s% D_omega_flag .and. .not. s% job% use_D_omega_for_am_nu_rot)) then
             ! check for any am_nu factors > 0 and not same as for D_omega
@@ -1646,7 +1646,7 @@
                return
             end if
          end if
-         
+
          ! If am_nu_..._factor < -1, use the D_..._factor
          if (am_nu_DSI_factor < 0) am_nu_DSI_factor = s% D_DSI_factor
          if (am_nu_SH_factor < 0) am_nu_SH_factor = s% D_SH_factor
@@ -1719,7 +1719,7 @@
             call s% other_am_mixing(s% id, ierr)
             if (ierr /= 0) return
          end if
-         
+
          contains
 
          subroutine check(str)
@@ -1774,7 +1774,7 @@
                end if
             end do
          end subroutine check_D_omega
-         
+
          subroutine set_am_nu_rot(ierr)
             use alloc
             use rotation_mix_info, only: smooth_for_rotation
@@ -1784,17 +1784,17 @@
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
                d_dt, d_dt_in, d_dt_out, am_nu_rot_source
             include 'formats'
-         
+
             ierr = 0
             nz = s% nz
             dt = s% dt
-         
+
             if (s% am_nu_rot_flag .and. s% doing_finish_load_model) then
                do k=1,nz
                   s% am_nu_rot(k) = 0d0
                end do
             else if (s% am_nu_rot_flag) then
-                     
+
                do k=1,nz
                   if (s% q(k) <= s% max_q_for_nu_omega_zero_in_convection_region .and. &
                       s% mixing_type(k) == convective_mixing) then
@@ -1820,18 +1820,18 @@
                      call mesa_error(__FILE__,__LINE__,'set am_nu_rot')
                   end if
                end do
-               
+
                if (s% smooth_am_nu_rot > 0 .or. &
                     (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0)) then
-                  
+
                   allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
 
                   if (s% smooth_am_nu_rot > 0) then
                      call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
                   end if
-            
+
                   if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
-            
+
                      rate = min(s% nu_omega_mixing_rate, 1d0/dt)
                      do k=2,nz-1
                         if (s% am_nu_rot(k) == 0 .or. s% am_nu_rot(k+1) == 0) then
@@ -1843,11 +1843,11 @@
                             sig(k) = 0
                         else
                            sig(k) = rate*dt
-                        end if       
+                        end if
                      end do
                      sig(1) = 0
                      sig(nz) = 0
-            
+
                      do k=1,nz
                         if (k < nz) then
                            d_dt_in = sig(k)*(s% am_nu_rot(k+1) - s% am_nu_rot(k))
@@ -1872,10 +1872,10 @@
                         else
                            du(k) = 0
                         end if
-                        if (k > 1) dl(k-1) = -d_ddt_dm1               
+                        if (k > 1) dl(k-1) = -d_ddt_dm1
                      end do
                      dl(nz) = 0
-            
+
                      ! solve tridiagonal
                      bp(1) = d(1)
                      vp(1) = rhs(1)
@@ -1896,7 +1896,7 @@
                         xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
                         x(i) = xp(i)
                      end do
-            
+
                      do k=2,nz
                         if (is_bad(x(k))) then
                            return
@@ -1905,7 +1905,7 @@
                            call mesa_error(__FILE__,__LINE__,'mix_am_nu_rot')
                         end if
                      end do
-            
+
                      ! update am_nu_rot
                      do k=2,nz
                         s% am_nu_rot(k) = s% am_nu_rot(k) + x(k)
@@ -1916,13 +1916,13 @@
                         if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                      end do
                      s% am_nu_rot(1) = 0d0
-                  
+
                   end if
 
                end if
-            
+
             end if
-         
+
             if (s% am_nu_rot_flag) then ! check
                do k=1,nz
                   if (is_bad(s% am_nu_rot(k))) then
@@ -1931,8 +1931,8 @@
                   end if
                   if (s% am_nu_rot(k) < 0d0) s% am_nu_rot(k) = 0d0
                end do
-            end if         
-         
+            end if
+
          end subroutine set_am_nu_rot
 
       end subroutine update_rotation_mixing_info
@@ -1952,7 +1952,7 @@
          include 'formats'
          ierr = 0
          if (.not. s% RTI_flag) return
- 
+
          nz = s% nz
 
          s% eta_RTI(1:nz) = 0d0
@@ -1962,9 +1962,9 @@
          s% sigmid_RTI(1:nz) = 0d0
 
          if (s% RTI_C <= 0d0) return
-             
+
          i_h1 = s% net_iso(ih1)
-         
+
          shock_mass_start = 1d99
          do k = 1, nz
             if (s% u_flag) then
@@ -1977,21 +1977,21 @@
                exit
             end if
          end do
-          
-         min_dm = s% RTI_min_dm_behind_shock_for_full_on*Msun         
+
+         min_dm = s% RTI_min_dm_behind_shock_for_full_on*Msun
          log_max_boost = s% RTI_log_max_boost
          max_boost = exp10(log_max_boost)
          m_full_boost = s% RTI_m_full_boost*Msun
          m_no_boost = s% RTI_m_no_boost*Msun
-         
+
          min_eta = -1d0
          dm_for_center_eta_nondecreasing = Msun*s% RTI_dm_for_center_eta_nondecreasing
-         
+
          do k=1,nz
-            
+
             f = max(0d0, s% X(k) - s% RTI_C_X0_frac*s% surface_h1)
             C = s% RTI_C*(1d0 + f*f*s% RTI_C_X_factor)
-            
+
             if (s% m(k) < m_no_boost) then
                if (s% m(k) <= m_full_boost) then
                   C = C*max_boost
@@ -2011,7 +2011,7 @@
                cs = s% csound_face(k)
                r = s% r(k)
                s% eta_RTI(k) = C*alpha_face*cs*r
-               
+
                if (is_bad(s% eta_RTI(k))) then
                   ierr = -1
                   return
@@ -2020,7 +2020,7 @@
                      call mesa_error(__FILE__,__LINE__,'set_RTI_mixing_info')
                   end if
                end if
-            
+
                if (s% m(k) - s% M_center <= dm_for_center_eta_nondecreasing) then
                   if (min_eta < 0d0) then
                      min_eta = s% eta_RTI(k)
@@ -2030,24 +2030,24 @@
                end if
 
             end if
-            
+
             s% etamid_RTI(k) = max(min_eta, C*s% alpha_RTI(k)*s% csound(k)*s% rmid(k))
             s% boost_for_eta_RTI(k) = C/s% RTI_C
-            
+
             if (is_bad(s% etamid_RTI(k))) then
                ierr = -1
                return
             end if
 
          end do
-         
+
          call get_shock_info(s)
 
          ! sig_RTI(k) is mixing flow across face k in (gm sec^1)
          call get_RTI_sigmas(s, s% sig_RTI, s% eta_RTI, &
             s% rho_face, s% r, s% dm_bar, s% dt, ierr)
          if (ierr /= 0) return
-         
+
          if (s% v_flag) then
             ! sigmid_RTI(k) is mixing flow at center k in (gm sec^1)
             call get_RTI_sigmas(s, s% sigmid_RTI, s% etamid_RTI, &
@@ -2125,7 +2125,7 @@
          end if
 
          nz = s% nz
-         
+
          allocate(dPdr(nz), drhodr(nz), P_face(nz), rho_face(nz))
 
          do k=2,nz
@@ -2154,7 +2154,7 @@
                dr_m1 = s% r(k-1) - s% r(k)
                dr_00 = s% r(k) - s% r(k+1)
                dPdr(k) = slope_limit(P_face, k, dr_m1, dr_00)
-               drhodr(k) = slope_limit(rho_face, k, dr_m1, dr_00)     
+               drhodr(k) = slope_limit(rho_face, k, dr_m1, dr_00)
             else
                !dr_00 = s% r(k) - s% r(k+1)
                rmid = 0.5d0*(s% r(k) + s% r(k+1))

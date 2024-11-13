@@ -1,5 +1,5 @@
       module ion_table_plot
-      
+
       use const_def
       use ion_tables_eval
       use math_lib
@@ -7,45 +7,45 @@
 
       implicit none
 
-      
+
       contains
-      
-            
+
+
       subroutine do_create_table_plot_files
 
          character (len=256) :: dir
-   
+
          real(dp) :: lgT_min, lgT_max, lgRho_min, lgRho_max, dlgT, &
             dlgRho, lgRho, lgT, Rho, T, Z, X, lgQ_min, lgQ_max
-   
+
          integer :: lgT_points, lgRho_points
          integer :: i, j, k, ierr, io, io_first, io_last, io_params, io_rho, io_tmp, num_vals
 
          integer, parameter :: io_unit0 = 40
 
          real(dp), allocatable :: output_values(:,:,:)
-         
+
          Z = 0.018
          X = 0.72
 
          !..set the sample size
          lgT_points = 300
          lgRho_points = 300
-      
+
          !lgT_points = 100
          !lgRho_points = 100
-      
+
          !lgT_points = 2
          !lgRho_points = 2
-            
+
          !..set the ranges
-               
+
          ! check opal/scvh
          lgT_max = 7.7d0
          lgT_min = 2.0d0
          lgRho_min = -5d0
          lgRho_max = 5.5d0
-                  
+
          ! table full range
          lgT_max = 8.2
          lgT_min = 2.1
@@ -53,13 +53,13 @@
          lgQ_max = 5.69
          lgRho_min = -9 ! lgQ_min + 2*lgT_min - 12
          lgRho_max = 8 ! lgQ_max + 2*lgT_max - 12
-         
+
          ! test
          lgT_max = 7.5d0
          lgT_min = 3d0
          lgRho_max = 3d0
          lgRho_min = -7d0
-            
+
          io_params = io_unit0
          io_rho = io_unit0+1
          io_tmp = io_unit0+2
@@ -72,7 +72,7 @@
          close(io_params)
          num_vals  = io_last - io_first + 1
          allocate(output_values(lgRho_points,lgT_points,num_vals))
-         
+
          dlgT = (lgT_max - lgT_min)/(lgT_points-1)
          dlgRho = (lgRho_max - lgRho_min)/(lgRho_points-1)
 
@@ -88,7 +88,7 @@
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
             end do
          end do
-   
+
          write(*,*) 'write plot files'
          do k = 1, num_vals
             write(*,*) k
@@ -100,17 +100,17 @@
             write(io_tmp,*) lgT
          end do
          close(io_tmp)
-      
+
          do j=1,lgRho_points
             lgRho = lgRho_min + dlgRho*(j-1)
             write(io_rho,*) lgRho
          end do
          close(io_rho)
-   
+
          do io=io_first,io_last
             close(io)
          end do
-   
+
          deallocate(output_values)
 
       end subroutine do_create_table_plot_files
@@ -125,9 +125,9 @@
 
          real(dp), dimension(num_ion_vals) :: res
          integer :: k
-         
+
          include 'formats'
-                     
+
          ierr = 0
          call Get_ion_Results(Z, X, Rho, lgRho, T, lgT, res, ierr)
          if (ierr /= 0) then
@@ -165,11 +165,11 @@
             call save1('logpp_Mg', res(ion_ilogpp_Mg))
             call save1('logpp_Si', res(ion_ilogpp_Si))
             call save1('logpp_Fe', res(ion_ilogpp_Fe))
-         
+
          end if
-         
+
          contains
-         
+
          subroutine save1(str,v)
             character (len=*), intent(in) :: str
             real(dp), intent(in) :: v
@@ -177,24 +177,24 @@
          end subroutine save1
 
       end subroutine plot_one
-      
-      
+
+
       subroutine open_plot_files(io_first, io_last, io_params, io_rho, io_tmp, dir)
          integer, intent(IN) :: io_first, io_params, io_rho, io_tmp
          integer, intent(OUT) :: io_last
          character (len=256), intent(IN) :: dir
          character (len=256) :: fname
          integer :: io
-         
+
          fname = trim(dir) // '/params.data'
          open(unit=io_params,file=trim(fname))
-         
+
          fname = trim(dir) // '/logRho.data'
          open(unit=io_rho,file=trim(fname))
-         
+
          fname = trim(dir) // '/logT.data'
          open(unit=io_tmp,file=trim(fname))
-         
+
          io = io_first-1
          !call open1('logP')
          !call open1('logPgas')
@@ -242,23 +242,23 @@
          !call open1('logE')
          !call open1('logW')
          io_last = io
-         
-         
-         contains 
-         
-         
+
+
+         contains
+
+
          subroutine open1(name)
             character (len=*), intent(in) :: name
             fname = trim(dir) // '/' // trim(name) // '.data'
             io = io+1; open(unit=io,file=trim(fname))
          end subroutine open1
-      
+
       end subroutine open_plot_files
 
 
-         
-      
-      
+
+
+
 
       end module ion_table_plot
 

@@ -197,11 +197,11 @@ contains
     s% need_to_setvars = .true.
 
     if (s% doing_timing) call update_time(s, time0, total, s% time_conv_premix)
-    
+
     return
 
   end subroutine do_conv_premix
-  
+
   !****
 
   subroutine advance_bdy_ (s, update_mode, zi, i_bdy, t_bdy, sd, j_it)
@@ -250,7 +250,7 @@ contains
        elseif (.NOT. t_bdy .AND. zi(i_bdy)%kc_b == s%nz) then
           zi(i_bdy)%sel_b = .FALSE.
        endif
-       
+
        ! Check whether the advancing face is still selected
 
        if ((t_bdy .AND. .NOT. zi(i_bdy)%sel_t) .OR. &
@@ -361,7 +361,7 @@ contains
     if (t_bdy) then
 
        if (zi(i_bdy)%dt_t + delta_dt > dt_limit) then
-        
+
           zi(i_bdy)%sel_t = .FALSE.
 
           if (TRACE_MIX_CELL) then
@@ -476,7 +476,7 @@ contains
           ! subcells
 
           m_zone = SUM(s%dm(kc_t:kc_b))
-   
+
           do l = 1, s%species
              avg_xa(l) = (SUM(s%dm(kc_t:kc_b)*s%xa(l,kc_t:kc_b)) + &
                           SUM(m_sub*xa_sub(l,1:kc_sub))) / (m_zone + m_sub*kc_sub)
@@ -517,7 +517,7 @@ contains
              ! advancing boundary)
 
              has_split = .TRUE.
-             
+
              if (t_bdy) then
 
                 search_down_loop : do kf = kf_t+1, kf_b-1
@@ -539,7 +539,7 @@ contains
 
                 kc_t = kf
                 kf_t = kc_t
-                
+
                 if (TRACE_MIX_SUBCELL) then
                    write(*,*) '  Moved upper boundary to', kc_t
                 end if
@@ -621,7 +621,7 @@ contains
     ! Determine whether the face just inside the advancing boundary
     ! has become/remained convective; if not, revert back to the
     ! starting model and return
-       
+
     if (t_bdy) then
 
        if (s%mlt_mixing_type(kf_t+1) /= convective_mixing) then
@@ -639,7 +639,7 @@ contains
        endif
 
     else
-       
+
        if (s%mlt_mixing_type(kf_b-1) /= convective_mixing) then
 
           call restore_model_(s, update_mode, sd)
@@ -852,7 +852,7 @@ contains
                 write(*,*) 'Truncated zone above to', zi(i_bdy+1)%kc_b, zi(i_bdy+1)%vc_b, &
                      s%mlt_mixing_type(zi(i_bdy+1)%kc_b), zi(i_bdy+1)%kc_b-zi(i_bdy+1)%kc_t+1
              endif
-             
+
           else
 
              ! Delete the zone
@@ -876,18 +876,18 @@ contains
           if (zi(i_bdy-1)%kc_b-zi(i_bdy-1)%kc_t > 1) then
 
              ! Truncate the zone
-          
+
              zi(i_bdy-1)%kc_t = zi(i_bdy-1)%kc_t + 1
              zi(i_bdy-1)%vc_t = s%mlt_vc(zi(i_bdy-1)%kc_t+1)
 
              if (TRACE_UPDATE_ZONE) then
                 write(*,*) 'Truncated zone below to', zi(i_bdy-1)%kc_t
              endif
-             
+
           else
 
              ! Delete the zone
-             
+
              zi = [zi(:i_bdy-2),zi(i_bdy:)]
              i_bdy = i_bdy - 1
 
@@ -928,7 +928,7 @@ contains
                 zi_new(i)%sel_t = .FALSE.
              endif
           endif
-          
+
           if (zi_new(i)%kc_b == zi(i_bdy)%kc_b) then
              zi_new(i)%dt_b = zi(i_bdy)%dt_b
              zi_new(i)%sel_b = zi(i_bdy)%sel_b
@@ -950,7 +950,7 @@ contains
 
           call set_burn_data_(s, zi_new(i))
 
-          ! Initial abundances 
+          ! Initial abundances
 
           zi_new(i)%avg_xa = zi(i_bdy)%avg_xa
           zi_new(i)%davg_xa_dt = zi(i_bdy)%davg_xa_dt
@@ -1072,7 +1072,7 @@ contains
     integer  :: kc
 
     ! Set burning data for the zone info
-    
+
     iso_h1 = s%net_iso(chem_get_iso_id('h1'))
     iso_he4 = s%net_iso(chem_get_iso_id('he4'))
     iso_c12 = s%net_iso(chem_get_iso_id('c12'))
@@ -1097,7 +1097,7 @@ contains
                         s%eps_nuc_categories(icno, kc)
             eps_he_max = s%eps_nuc_categories(i3alf, kc) + &
                          s%eps_nuc_categories(i_burn_c, kc)
-            
+
          endif
 
       end do cell_loop
@@ -1169,7 +1169,7 @@ contains
     integer  :: l
 
     ! Set abundance data for the zone info
-    
+
     allocate(zi%avg_xa(s%species))
     allocate(zi%davg_xa_dt(s%species))
 
@@ -1248,7 +1248,7 @@ contains
        ! (iv) Overlapping zone (cells inside previous/next zone)
 
        if (i > 1) then
-          if (zi(i)%kc_b >= zi(max(1,i-1))%kc_t) then 
+          if (zi(i)%kc_b >= zi(max(1,i-1))%kc_t) then
              ! bp: max(1,i-1) to prevent bogus warning from gfortran
              write(*,*) 'conv_premix: Zone bottom inside previous zone'
              valid = .FALSE.
@@ -1440,7 +1440,7 @@ contains
        write(*,*) 'conv_premix: error from call to set_grads'
        stop
     end if
-       
+
     ! Dump the snapshot
 
     open(NEWUNIT=unit, FILE=filename, STATUS='REPLACE')
@@ -1530,7 +1530,7 @@ contains
     end if
 
     sd%update_mode(kc_t:kc_b) = update_mode(kc_t:kc_b)
-    
+
     sd%xa(:,kc_t:kc_b) = s%xa(:,kc_t:kc_b)
 
     sd%lnd(kc_t:kc_b) = s%lnd(kc_t:kc_b)
@@ -1548,7 +1548,7 @@ contains
        write(*,*) '    kf_t:', kf_t
        write(*,*) '    kf_b:', kf_b
     end if
-    
+
     sd%gradL_composition_term(kf_t+1:kf_b-1) = s%gradL_composition_term(kf_t+1:kf_b-1)
 
     ! Store indices (used when we call restore_model_)
@@ -1594,12 +1594,12 @@ contains
     end if
 
     update_mode(kc_t:kc_b) = sd%update_mode(kc_t:kc_b)
-    
+
     s%xa(:,kc_t:kc_b) = sd%xa(:,kc_t:kc_b)
-    
+
     s%lnd(kc_t:kc_b) = sd%lnd(kc_t:kc_b)
     s%rho(kc_t:kc_b) = sd%rho(kc_t:kc_b)
-    
+
     s%lnPgas(kc_t:kc_b) = sd%lnPgas(kc_t:kc_b)
     s%Pgas(kc_t:kc_b) = sd%Pgas(kc_t:kc_b)
 
@@ -1612,7 +1612,7 @@ contains
        write(*,*) '    kf_t:', kf_t
        write(*,*) '    kf_b:', kf_b
     end if
-    
+
     s%gradL_composition_term(kf_t+1:kf_b-1) = sd%gradL_composition_term(kf_t+1:kf_b-1)
 
     ! Update the model set those quantities that are not stored

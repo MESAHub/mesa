@@ -7,12 +7,12 @@
       use math_lib
 
       implicit none
-      
-      
+
+
       logical, parameter :: dbg = .false.
       !logical, parameter :: dbg = .true.
-      
-      
+
+
       private :: dbg
 
       contains
@@ -36,21 +36,21 @@
          include_elec_pos
       logical, intent(out) :: off_table
       integer, intent(out) :: ierr
-      
+
       logical :: skip_elec_pos
 
       include 'formats'
-      
+
       ierr = 0
       off_table = .false.
-      
+
       skip_elec_pos = .not. include_elec_pos
       call helmeos2aux( &
          T, logT, Rho, logRho, abar_in, zbar_in,   &
          coulomb_temp_cut, coulomb_den_cut, helm_res,  &
          clip_to_table_boundaries, include_radiation, (.not. include_elec_pos), off_table, ierr)
       if (off_table) return
-     
+
       end subroutine helmeos2
 
 
@@ -63,7 +63,7 @@
       use helm_polynomials
       use const_def, asol => crad
       use utils_lib, only: is_bad
-      
+
       implicit none
 
       real(dp), intent(in) :: temp_in, logtemp_in, den_in, logden_in
@@ -75,23 +75,23 @@
 
       real(dp) :: h ! = planck_h
       type (Helm_Table), pointer :: ht
-      
+
 
 !..declare local variables
       include 'helm_declare_local_variables.dek'
-      
 
-!..given a temperature temp [K], density den [g/cm**3], and a composition 
-!..characterized by abar and zbar, this routine returns most of the other 
-!..thermodynamic quantities. of prime interest is the pressure [erg/cm**3], 
-!..specific thermal energy [erg/gr], the entropy [erg/g/K], along with 
+
+!..given a temperature temp [K], density den [g/cm**3], and a composition
+!..characterized by abar and zbar, this routine returns most of the other
+!..thermodynamic quantities. of prime interest is the pressure [erg/cm**3],
+!..specific thermal energy [erg/gr], the entropy [erg/g/K], along with
 !..their derivatives with respect to temperature, density, abar, and zbar.
 !..other quantites such the normalized chemical potential eta (plus its
-!..derivatives), number density of electrons and positron pair (along 
-!..with their derivatives), adiabatic indices, specific heats, and 
+!..derivatives), number density of electrons and positron pair (along
+!..with their derivatives), adiabatic indices, specific heats, and
 !..relativistically correct sound speed are also returned.
 !..
-!..this routine assumes planckian photons, an ideal gas of ions, 
+!..this routine assumes planckian photons, an ideal gas of ions,
 !..and an electron-positron gas with an arbitrary degree of relativity
 !..and degeneracy. interpolation in a table of the helmholtz free energy
 !..is used to return the electron-positron thermodynamic quantities.
@@ -107,7 +107,7 @@
 
       real(dp) abar, zbar, temp, logtemp, den, logden
       logical skip_elec_pos
-      
+
 !..for the interpolations
       integer          iat, jat
       real(dp) xt, xd, mxt, mxd, fi(36), &
@@ -143,7 +143,7 @@
 
          ierr = 0
          off_table = .false.
-         
+
          h = planck_h
          third  = 1.0d0/3.0d0
          sioncon = (2.0d0 * pi * amu * kerg)/(h*h)
@@ -159,7 +159,7 @@
          teninth = 10.0d0/9.0d0
          esqu    = qe*qe
          forthpi = forth * pi
-         
+
          abar = abar_in
          zbar = zbar_in
          temp = temp_in
@@ -168,29 +168,29 @@
          logden = logden_in
 
 !..for very low T, convert all H to H2.  adjust abar and zbar accordingly.
-         
+
          ! NOTE: table lookup uses din rather than den
          ytot1 = 1.0d0/abar
          ye    = ytot1 * zbar
          din     = ye*den
-         
+
          skip_elec_pos = must_skip_elec_pos
          if (.not. skip_elec_pos) then ! see if need to set it true
             if (temp < ht% templo) then
                ierr = 1
                return
             end if
-         
+
             if (din < ht% denlo) then
                ierr = 1
                return
             end if
 
-            if (temp > ht% temphi) then            
+            if (temp > ht% temphi) then
                ierr = 1
                return
             end if
-            
+
             if (din > ht% denhi) then
                ierr = 1
                return
@@ -203,7 +203,7 @@
             return
          end if
 
-!..very neutron rich compositions may need to be bounded, 
+!..very neutron rich compositions may need to be bounded,
 !..avoid that extrema for now in order to increase efficiency
 !       ye    = max(1.0d-16, ye)
 
@@ -281,7 +281,7 @@
       include 'helm_store_results.dek'
       helm_res(h_crp:h_valid) = 0
 
-!..debugging printout      
+!..debugging printout
       if (.false.) then
          include 'helm_print_results.dek'
       end if
@@ -295,46 +295,46 @@
             write(*,'(99e15.6)') w0t, w1t, w2t, w0mt, w1mt, w2mt, w0d, w1d, w2d, w0md, w1md, w2md
             write(*,'(a30,99e26.16)') 'fi(1)*w0d*w0t', fi(1)*w0d*w0t, fi(1),w0d,w0t
             write(*,'(a30,99e26.16)') 'fi(2)*w0md*w0t', fi(2)*w0md*w0t, fi(2),w0md,w0t
-            write(*,'(a30,99e26.16)') 'fi(3)*w0d*w0mt', fi(3)*w0d*w0mt, fi(3),w0d,w0mt 
+            write(*,'(a30,99e26.16)') 'fi(3)*w0d*w0mt', fi(3)*w0d*w0mt, fi(3),w0d,w0mt
             write(*,'(a30,99e26.16)') 'fi(4)*w0md*w0mt', fi(4)*w0md*w0mt, fi(4),w0md,w0mt
             write(*,'(a30,99e26.16)') '1 + 2 + 3 + 4', fi(1)*w0d*w0t + fi(2)*w0md*w0t + fi(3)*w0d*w0mt + fi(4)*w0md*w0mt
             write(*,'(A)')
-            write(*,'(a30,99e26.16)') 'fi(5)*w0d*w1t', fi(5)*w0d*w1t, fi(5),w0d,w1t  
+            write(*,'(a30,99e26.16)') 'fi(5)*w0d*w1t', fi(5)*w0d*w1t, fi(5),w0d,w1t
             write(*,'(a30,99e26.16)') 'fi(6)*w0md*w1t', fi(6)*w0md*w1t, fi(6),w0md,w1t
-            write(*,'(a30,99e26.16)') 'fi(7)*w0d*w1mt', fi(7)*w0d*w1mt, fi(7),w0d,w1mt 
+            write(*,'(a30,99e26.16)') 'fi(7)*w0d*w1mt', fi(7)*w0d*w1mt, fi(7),w0d,w1mt
             write(*,'(a30,99e26.16)') 'fi(8)*w0md*w1mt', fi(8)*w0md*w1mt, fi(8),w0md,w1mt
             write(*,'(a30,99e26.16)') 'fi(9)*w0d*w2t', fi(9)*w0d*w2t, fi(9),w0d,w2t
             write(*,'(a30,99e26.16)') 'fi(10)*w0md*w2t', fi(10)*w0md*w2t, fi(10),w0md,w2t
-            write(*,'(a30,99e26.16)') 'fi(11)*w0d*w2mt', fi(11)*w0d*w2mt,  fi(11),w0d,w2mt 
-            write(*,'(a30,99e26.16)') 'fi(12)*w0md*w2mt', fi(12)*w0md*w2mt, fi(12),w0md,w2mt 
-            write(*,'(a30,99e26.16)') 'fi(13)*w1d*w0t', fi(13)*w1d*w0t, fi(13),w1d,w0t   
+            write(*,'(a30,99e26.16)') 'fi(11)*w0d*w2mt', fi(11)*w0d*w2mt,  fi(11),w0d,w2mt
+            write(*,'(a30,99e26.16)') 'fi(12)*w0md*w2mt', fi(12)*w0md*w2mt, fi(12),w0md,w2mt
+            write(*,'(a30,99e26.16)') 'fi(13)*w1d*w0t', fi(13)*w1d*w0t, fi(13),w1d,w0t
             write(*,'(a30,99e26.16)') 'fi(14)*w1md*w0t', fi(14)*w1md*w0t, fi(14),w1md,w0t
-            write(*,'(a30,99e26.16)') 'fi(15)*w1d*w0mt', fi(15)*w1d*w0mt, fi(15),w1d,w0mt   
+            write(*,'(a30,99e26.16)') 'fi(15)*w1d*w0mt', fi(15)*w1d*w0mt, fi(15),w1d,w0mt
             write(*,'(a30,99e26.16)') 'fi(16)*w1md*w0mt', fi(16)*w1md*w0mt, fi(16),w1md,w0mt
-            write(*,'(a30,99e26.16)') 'fi(17)*w2d*w0t', fi(17)*w2d*w0t,  fi(17),w2d,w0t  
+            write(*,'(a30,99e26.16)') 'fi(17)*w2d*w0t', fi(17)*w2d*w0t,  fi(17),w2d,w0t
             write(*,'(a30,99e26.16)') 'fi(18)*w2md*w0t', fi(18)*w2md*w0t, fi(18),w2md,w0t
-            write(*,'(a30,99e26.16)') 'fi(19)*w2d*w0mt', fi(19)*w2d*w0mt, fi(19),w2d,w0mt  
-            write(*,'(a30,99e26.16)') 'fi(20)*w2md*w0mt', fi(20)*w2md*w0mt, fi(20),w2md,w0mt 
-            write(*,'(a30,99e26.16)') 'fi(21)*w1d*w1t', fi(21)*w1d*w1t, fi(21),w1d,w1t   
+            write(*,'(a30,99e26.16)') 'fi(19)*w2d*w0mt', fi(19)*w2d*w0mt, fi(19),w2d,w0mt
+            write(*,'(a30,99e26.16)') 'fi(20)*w2md*w0mt', fi(20)*w2md*w0mt, fi(20),w2md,w0mt
+            write(*,'(a30,99e26.16)') 'fi(21)*w1d*w1t', fi(21)*w1d*w1t, fi(21),w1d,w1t
             write(*,'(a30,99e26.16)') 'fi(22)*w1md*w1t', fi(22)*w1md*w1t, fi(22),w1md,w1t
-            write(*,'(a30,99e26.16)') 'fi(23)*w1d*w1mt', fi(23)*w1d*w1mt, fi(23),w1d,w1mt  
+            write(*,'(a30,99e26.16)') 'fi(23)*w1d*w1mt', fi(23)*w1d*w1mt, fi(23),w1d,w1mt
             write(*,'(a30,99e26.16)') 'fi(24)*w1md*w1mt', fi(24)*w1md*w1mt, fi(24),w1md,w1mt
-            write(*,'(a30,99e26.16)') 'fi(25)*w2d*w1t', fi(25)*w2d*w1t, fi(25),w2d,w1t   
+            write(*,'(a30,99e26.16)') 'fi(25)*w2d*w1t', fi(25)*w2d*w1t, fi(25),w2d,w1t
             write(*,'(a30,99e26.16)') 'fi(26)*w2md*w1t', fi(26)*w2md*w1t, fi(26),w2md,w1t
-            write(*,'(a30,99e26.16)') 'fi(27)*w2d*w1mt', fi(27)*w2d*w1mt, fi(27),w2d,w1mt  
+            write(*,'(a30,99e26.16)') 'fi(27)*w2d*w1mt', fi(27)*w2d*w1mt, fi(27),w2d,w1mt
             write(*,'(a30,99e26.16)') 'fi(28)*w2md*w1mt', fi(28)*w2md*w1mt, fi(28),w2md,w1mt
-            write(*,'(a30,99e26.16)') 'fi(29)*w1d*w2t', fi(29)*w1d*w2t, fi(29),w1d,w2t   
+            write(*,'(a30,99e26.16)') 'fi(29)*w1d*w2t', fi(29)*w1d*w2t, fi(29),w1d,w2t
             write(*,'(a30,99e26.16)') 'fi(30)*w1md*w2t', fi(30)*w1md*w2t, fi(30),w1md,w2t
-            write(*,'(a30,99e26.16)') 'fi(31)*w1d*w2mt', fi(31)*w1d*w2mt, fi(31),w1d,w2mt  
+            write(*,'(a30,99e26.16)') 'fi(31)*w1d*w2mt', fi(31)*w1d*w2mt, fi(31),w1d,w2mt
             write(*,'(a30,99e26.16)') 'fi(32)*w1md*w2mt', fi(32)*w1md*w2mt, fi(32),w1md,w2mt
-            write(*,'(a30,99e26.16)') 'fi(33)*w2d*w2t', fi(33)*w2d*w2t, fi(33),w2d,w2t   
+            write(*,'(a30,99e26.16)') 'fi(33)*w2d*w2t', fi(33)*w2d*w2t, fi(33),w2d,w2t
             write(*,'(a30,99e26.16)') 'fi(34)*w2md*w2t', fi(34)*w2md*w2t, fi(34),w2md,w2t
-            write(*,'(a30,99e26.16)') 'fi(35)*w2d*w2mt', fi(35)*w2d*w2mt, fi(35),w2d,w2mt  
+            write(*,'(a30,99e26.16)') 'fi(35)*w2d*w2mt', fi(35)*w2d*w2mt, fi(35),w2d,w2mt
             write(*,'(a30,99e26.16)') 'fi(36)*w2md*w2mt', fi(36)*w2md*w2mt, fi(36),w2md,w2mt
       end subroutine show_h5
 
-      
+
       end module
-      
+
 
 
