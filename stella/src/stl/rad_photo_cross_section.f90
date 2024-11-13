@@ -12,7 +12,7 @@ module rad_photo_cross_section
     interface photoCross
      module procedure photoCrossVerner, ics_full
     end interface
-  
+
     real (kind=sp), parameter, private :: p_e_max = 5.d4
  	integer i
     integer, dimension(7) :: L, IS2Ne
