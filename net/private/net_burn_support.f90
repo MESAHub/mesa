@@ -46,7 +46,7 @@
       subroutine netint( &
             start,stptry,stpmin,max_steps,stopp,y, &
             eps,species,nvar,nok,nbad,nstp,odescal,dens_dfdy,dmat, &
-            derivs,jakob,burner_finish_substep,ierr,k)
+            derivs,jakob,burner_finish_substep,ierr)
 
 ! input:
 ! start    = beginning integration point
@@ -70,7 +70,6 @@
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
       integer, intent(out) :: ierr
-      integer, intent(in) :: k
 
       interface
          include 'burner_derivs.inc'
@@ -128,7 +127,7 @@
        if (ierr /= 0) return
 
 ! get the right hand sides and form scaling vector
-       call derivs(x,y,dydx,nvar,ierr,k)
+       call derivs(x,y,dydx,nvar,ierr)
        if (ierr /= 0) then
          return
          write(*,*) 'derivs failed in netint'
@@ -203,7 +202,7 @@
 
       subroutine stifbs(y,dydx,nvar,x,htry,eps,yscal,hdid,hnext, &
             a,alf,epsold,first,kmax,kopt,nseq,nvold,xnew,scale,red, &
-            dens_dfdy,dmat,derivs,jakob,nstp,ierr,k)
+            dens_dfdy,dmat,derivs,jakob,nstp,ierr)
 !
 ! for dense analytic jacobians, lu decomposition linear algebra
 !
@@ -222,7 +221,6 @@
       integer :: kmax,kopt,nseq(stifbs_imax),nvold
       logical :: first
       integer :: ierr
-      integer, intent(in) :: k
 
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)
@@ -291,7 +289,7 @@
       enddo
 
 ! get the dense jacobian in dens_dfdy
-      call jakob(x,y,dens_dfdy,nvar,ierr,k)
+      call jakob(x,y,dens_dfdy,nvar,ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'jakob failed in stifbs'
          return
@@ -524,7 +522,7 @@
       enddo
 
       x = xs + h
-      call derivs(x,ytemp,yout,nvar,ierr,k)
+      call derivs(x,ytemp,yout,nvar,ierr)
       if (ierr /= 0) then
          if (dbg) write(*,*) 'init derivs failed in simpr'
          return
@@ -559,7 +557,7 @@
        enddo
 
        x = x + h
-       call derivs(x,ytemp,yout,nvar,ierr,k)
+       call derivs(x,ytemp,yout,nvar,ierr)
        if (ierr /= 0) then
          if (dbg) write(*,*) 'derivs failed in simpr general step'
          return

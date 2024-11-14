@@ -1611,8 +1611,7 @@
                do_eps_nuc_categories, eps_nuc_categories, &
                dbg, &
                plus_co56, &
-               ierr, &
-               k)
+               ierr)
             use const_def, only: Qconv
             use chem_def, only: num_categories, category_name, chem_isos, &
                ipp, icno, i3alf, i_burn_c, i_burn_n, i_burn_o, i_burn_ne, i_burn_na, &
@@ -1664,7 +1663,6 @@
             real(dp), intent(out) :: eps_total, eps_neu, eps_nuc_categories(:)
             logical, intent(in) :: dbg
             integer, intent(out) :: ierr
-            integer, intent(in) :: k
 
             integer :: i, fe56ec_n_neut
             real(qp) :: a1, a2, xx, eps_neu_q, eps_nuc_cat(num_categories), eps_total_q, &
