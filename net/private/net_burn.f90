@@ -286,10 +286,11 @@
 
       contains
 
-         subroutine burner_derivs(x,y,f,species,ierr)
+         subroutine burner_derivs(x,y,f,species,ierr,kk)
             integer, intent(in) :: species
             real(dp) :: x, y(:), f(:)
             integer, intent(out) :: ierr
+            integer, intent(in) :: kk
             integer, parameter :: ld_dfdx = 0
             real(dp), target :: dfdx_arry(ld_dfdx,species)
             real(dp), pointer :: dfdx(:,:)
@@ -306,16 +307,17 @@
             ierr = 0
             nfcn = nfcn + 1
             dfdx => dfdx_arry
-            call jakob_or_derivs(x,y,f,dfdx,ierr)
+            call jakob_or_derivs(x,y,f,dfdx,ierr,k)
             if (ierr /= 0) return
 
          end subroutine burner_derivs
 
-         subroutine burner_jakob(x,y,dfdy,species,ierr)
+         subroutine burner_jakob(x,y,dfdy,species,ierr,kk)
             integer, intent(in) :: species
             real(dp) :: x, y(:)
             real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
+            integer, intent(in) :: kk
             real(dp), target :: f_arry(0)
             real(dp), pointer :: f(:)
 
@@ -328,12 +330,12 @@
             njac = njac + 1
             f => f_arry
 
-            call jakob_or_derivs(x,y,f,dfdy,ierr)
+            call jakob_or_derivs(x,y,f,dfdy,ierr,kk)
             if (ierr /= 0) return
 
          end subroutine burner_jakob
 
-         subroutine jakob_or_derivs(time,y,f,dfdy,ierr)
+         subroutine jakob_or_derivs(time,y,f,dfdy,ierr,kk)
             use chem_lib, only: basic_composition_info
             use chem_def, only: chem_isos, num_categories, category_name, ih1
             use net_eval, only: eval_net
@@ -345,6 +347,7 @@
             real(dp) :: time, y(:), f(:)
             real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
+            integer, intent(in) :: kk
 
             real(dp) :: rho, lgRho, T, lgT, rate_limit, rat, dratdt, dratdd
             real(dp) :: eta, d_eta_dlnT, d_eta_dlnRho
@@ -454,7 +457,7 @@
                dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
                screening_mode, &
                eps_nuc_categories, eps_neu_total, &
-               actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
+               actual_Qs, actual_neuQs, from_weaklib, .false., ierr, k)
 
             if (size(f,dim=1) > 0) then
                do j = 1, species

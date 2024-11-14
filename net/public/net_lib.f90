@@ -564,7 +564,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            ierr)
+            ierr, k)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -622,6 +622,7 @@
          integer, intent(in) :: screening_mode
 
          integer, intent(out) :: ierr ! 0 means okay
+         integer, intent(in) :: k
 
          integer(8) :: time0, time1
          type (Net_General_Info), pointer :: g
@@ -657,7 +658,7 @@
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                actual_Qs, actual_neuQs, from_weaklib, symbolic, &
-               ierr)
+               ierr, k)
          if (g% doing_timing) then
             call system_clock(time1)
             g% clock_net_get = g% clock_net_get + (time1 - time0)
@@ -672,7 +673,7 @@
             rate_factors, weak_rate_factor, &
             reaction_Qs, reaction_neuQs, &
             screening_mode,  &
-            ierr)
+            ierr, k)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -712,6 +713,7 @@
          integer, intent(in) :: screening_mode
 
          integer, intent(out) :: ierr ! 0 means okay
+         integer, intent(in) :: k
 
          integer(8) :: time0, time1
          type (Net_General_Info), pointer :: g
@@ -764,7 +766,7 @@
                screening_mode,  &
                eps_nuc_categories, eps_neu_total, &
                actual_Qs, actual_neuQs, from_weaklib, symbolic, &
-               ierr)
+               ierr, k)
          if (g% doing_timing) then
             call system_clock(time1)
             g% clock_net_get = g% clock_net_get + (time1 - time0)
@@ -786,7 +788,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
-            ierr)
+            ierr, k)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -841,6 +843,8 @@
          integer, intent(in) :: screening_mode ! Selects which screening mode to use, see rates_def for definition
 
          integer, intent(out) :: ierr
+         integer, intent(in) :: k
+
             ! ierr = 0 means AOK
             ! ierr = -1 means mass fractions don't add to something very close to 1.0
             ! ierr = -2 means neither T nor logT were provided
@@ -878,7 +882,7 @@
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             actual_Qs, actual_neuQs, from_weaklib, symbolic, &
-            ierr)
+            ierr, k)
 
       end subroutine net_get_symbolic_d_dxdt_dx
 
@@ -893,7 +897,7 @@
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             actual_Qs, actual_neuQs, from_weaklib, &
-            ierr)
+            ierr, k)
          use chem_def, only: num_categories
          use net_eval, only: eval_net
          use net_def, only: Net_General_Info, Net_Info, get_net_ptr
@@ -929,6 +933,7 @@
          real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs ! ignore if null  (num_reactions)
          logical, pointer :: from_weaklib(:) ! ignore if null
          integer, intent(out) :: ierr
+         integer, intent(in) :: k
 
          logical, parameter :: rates_only = .false.
          logical, parameter :: symbolic = .false.
@@ -959,7 +964,7 @@
             screening_mode,  &
             eps_nuc_categories, eps_neu_total, &
             actual_Qs, actual_neuQs, from_weaklib, symbolic, &
-            ierr)
+            ierr, k)
          if (g% doing_timing) then
             call system_clock(time1)
             g% clock_net_get = g% clock_net_get + (time1 - time0)

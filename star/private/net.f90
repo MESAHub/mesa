@@ -257,6 +257,24 @@
                s% dxdt_nuc(:,k), s% d_dxdt_nuc_dRho(:,k), s% d_dxdt_nuc_dT(:,k), s% d_dxdt_nuc_dx(:,:,k), &
                screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), ierr)
+
+
+               if (k == 1815 .or. k == 1816 .or. k == 1817 .or. k == 1818 .or. k == 1819) then
+                  write(*,*) 'XXX CELL ', k
+                  write(*,*) 'eps_nuc', s% eps_nuc(k)
+                  !write(*,*) 'eps_nuc', s% eps_nuc(k), s% rho(k), T
+                  !write(*,*) 'eps_nuc', s% eps_nuc(k), s% d_epsnuc_dx(:,k)
+                  !write(*,*) 'eps_nuc', s% eps_nuc(k), s% abar(k), s% zbar(k), s% z2bar(k), s% ye(k)
+                  !write(*,*) 'eps_nuc', s% eps_nuc(k), d_eps_nuc_dRho, d_eps_nuc_dT
+                  !!write(*,*) 'd_eps_nuc_dRho', d_eps_nuc_dRho
+                  !!write(*,*) 'd_eps_nuc_dT', d_eps_nuc_dT
+                  !write(*,*) 'd_epsnuc_dx', s% d_epsnuc_dx(:,k)
+                  !write(*,*) 'dxdt_nuc', s% dxdt_nuc(:,k)
+                  !write(*,*) 'd_dxdt_nuc_dRho', s% d_dxdt_nuc_dRho(:,k)
+                  !write(*,*) 'd_dxdt_nuc_dT', s% d_dxdt_nuc_dT(:,k)
+                  !write(*,*) 'd_dxdt_nuc_dx', s% d_dxdt_nuc_dx(:,:,k)
+               end if
+
          end if
 
 

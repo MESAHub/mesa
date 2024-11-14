@@ -49,7 +49,7 @@
             dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
             screening_mode, &
             eps_nuc_categories, eps_neu_total, &
-            actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr)
+            actual_Qs, actual_neuQs, from_weaklib, symbolic, ierr, k)
          use net_initialize, only: &
             setup_net_info, set_ptrs_for_approx21
          use net_approx21, only: num_reactions_func => num_reactions
@@ -92,6 +92,7 @@
          logical, pointer :: from_weaklib(:) ! ignore if null
          logical, intent(in) :: symbolic
          integer, intent(out) :: ierr
+         integer, intent(in) :: k
 
          integer, parameter :: max_z_for_cache = 14
          real(dp) :: enuc, T9, total, prev, curr, prev_T
@@ -224,7 +225,7 @@
          n% d_eps_nuc_dy = 0
 
          if (g% doing_approx21) then
-            call eval_net_approx21_procs(n, just_dxdt, ierr)
+            call eval_net_approx21_procs(n, just_dxdt, ierr,k)
             if (ierr /= 0) return
 
             if (net_test_partials) then
@@ -346,13 +347,14 @@
       end subroutine unpack_for_export
 
 
-      subroutine eval_net_approx21_procs(n,just_dxdt, ierr)
+      subroutine eval_net_approx21_procs(n,just_dxdt, ierr, k)
          use net_approx21
          use rates_def
          type(net_info) :: n
          type(net_general_info), pointer :: g=>null()
          logical,intent(in) :: just_dxdt
          integer :: ierr
+         integer,intent(in) :: k
 
          integer :: ci, i, j, num_isos
          real(dp) :: Z_plus_N
@@ -380,7 +382,7 @@
 
          call get_approx21_eps_info( n, &
                n% dydt1, n% rate_screened, .true., n% eps_total, n% eps_neu_total, &
-               g% add_co56_to_approx21,  ierr)
+               g% add_co56_to_approx21,  ierr, k)
 
          if (ierr /= 0) return
          n% eps_nuc = n% eps_total - n% eps_neu_total
@@ -409,14 +411,14 @@
 
          call get_approx21_eps_info( n, &
             n% dfdT, n% rate_screened_dT, .false., n% deps_total_dT, n% deps_neu_dT, &
-            g% add_co56_to_approx21,  ierr)
+            g% add_co56_to_approx21,  ierr, k)
 
          if (ierr /= 0) return
          n% d_eps_nuc_dT = n% deps_total_dT - n% deps_neu_dT
 
          call get_approx21_eps_info( n, &
             n% dfdRho, n% rate_screened_dRho, .false., n% deps_total_dRho, n% deps_neu_dRho, &
-            g% add_co56_to_approx21,  ierr)
+            g% add_co56_to_approx21,  ierr, k)
 
          if (ierr /= 0) return
          n% d_eps_nuc_dRho = n% deps_total_dRho - n% deps_neu_dRho
@@ -449,7 +451,7 @@
 
 
       subroutine get_approx21_eps_info(n, &
-            dydt1, rate_screened, do_eps_nuc_categories, eps_total, eps_neu_total, plus_co56, ierr)
+            dydt1, rate_screened, do_eps_nuc_categories, eps_total, eps_neu_total, plus_co56, ierr, k)
          use net_approx21, only: approx21_eps_info
          use rates_def
          type(net_info) :: n
@@ -459,6 +461,7 @@
          real(dp), intent(out) :: eps_total, eps_neu_total
          logical, intent(in) :: plus_co56
          integer, intent(out) :: ierr
+         integer, intent(in) :: k
          real(dp) :: Qtotal_rfe56ec, Qneu_rfe56ec
 
          g => n% g
@@ -514,7 +517,7 @@
             n% reaction_Qs(irhe4_rebuild), &
             eps_total, eps_neu_total, & ! Dont use n% here as we call this for both eps_neu and eps_neu_dt and drho
             do_eps_nuc_categories, n% eps_nuc_categories, &
-            .false., plus_co56, ierr)
+            .false., plus_co56, ierr, k)
 
       end subroutine get_approx21_eps_info
 

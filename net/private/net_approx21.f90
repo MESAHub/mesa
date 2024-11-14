@@ -1611,7 +1611,8 @@
                do_eps_nuc_categories, eps_nuc_categories, &
                dbg, &
                plus_co56, &
-               ierr)
+               ierr, &
+               k)
             use const_def, only: Qconv
             use chem_def, only: num_categories, category_name, chem_isos, &
                ipp, icno, i3alf, i_burn_c, i_burn_n, i_burn_o, i_burn_ne, i_burn_na, &
@@ -1663,6 +1664,7 @@
             real(dp), intent(out) :: eps_total, eps_neu, eps_nuc_categories(:)
             logical, intent(in) :: dbg
             integer, intent(out) :: ierr
+            integer, intent(in) :: k
 
             integer :: i, fe56ec_n_neut
             real(qp) :: a1, a2, xx, eps_neu_q, eps_nuc_cat(num_categories), eps_total_q, &
@@ -1683,7 +1685,17 @@
                xx = xx + a1*a2
             end do
             eps_total_q = -m3(avo,clight,clight) * xx
+            ! XXX error here??? eps_total is really negative?
             eps_total = eps_total_q
+            if (eps_total < 0) then
+               xx = 0.0_qp
+               do i=1,species(plus_co56)
+                  a1 = dydt(i)
+                  a2 = mion(i)
+                  xx = xx + a1*a2
+                  write(*,*) eps_total, i, a1, a2, xx
+               end do
+            end if
 
             fe56ec_fake_factor = eval_fe56ec_fake_factor( &
                n% g% fe56ec_fake_factor, n% g% min_T_for_fe56ec_fake_factor, n% temp)
