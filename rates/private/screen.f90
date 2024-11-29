@@ -27,11 +27,11 @@
       use const_def
       use rates_def
       use math_lib
-      
+
       implicit none
-      
+
       contains
-      
+
       subroutine do_screen_set_context( &
             sc, temp, den, logT, logRho, zbar, abar, z2bar, &
             screening_mode, num_isos, y, iso_z158)
@@ -42,8 +42,8 @@
             y(:), &
             iso_z158(:) ! Z**1.58
          integer, intent(in) :: screening_mode
-      
-         real(dp), parameter :: x13   = 1.0d0/3.0d0 
+
+         real(dp), parameter :: x13   = 1.0d0/3.0d0
          real(dp), parameter :: x14   = 1.0d0/4.0d0
          real(dp), parameter :: x53   = 5.0d0/3.0d0
          real(dp), parameter :: x532  = 5.0d0/32.0d0
@@ -52,10 +52,10 @@
          real(dp), parameter :: co2   = x13 * 4.248719d3
          real(dp) :: qq
          integer :: j
-      
+
          logical, parameter :: debug = .false.
          !logical, parameter :: debug = .true.
-      
+
          include 'formats'
 
          if (screening_mode == no_screening .or. zbar == 0d0) return
@@ -68,7 +68,7 @@
          sc% abar  = abar
          sc% z2bar = z2bar
 
-         ! get the info that depends only on temp, den, and overall composition         
+         ! get the info that depends only on temp, den, and overall composition
 
          sc% ytot     = 1.0d0/abar
          sc% rr       = den * sc% ytot
@@ -82,9 +82,9 @@
          end do
          sc% z1pt58bar = abar * qq
          sc% zbar13 = pow(zbar,1d0/3d0)
-           
-         sc% pp       = sqrt(sc% rr * sc% tempi * (z2bar + zbar)) 
-         qq            = 0.5d0/(sc% pp) *(z2bar + zbar) 
+
+         sc% pp       = sqrt(sc% rr * sc% tempi * (z2bar + zbar))
+         qq            = 0.5d0/(sc% pp) *(z2bar + zbar)
          sc% dppdt    = qq*sc% rr*sc% dtempi
          sc% dppdd    = qq*sc% ytot*sc% tempi
 
@@ -102,11 +102,11 @@
          sc% aa     = 2.27493d5 * sc% tempi * sc% xni
          sc% daadt  = 2.27493d5 * sc% dtempi * sc% xni
          sc% daadd  = 2.27493d5 * sc% tempi * sc% dxnidd
-         
+
          ! ion and electron sphere radii (itoh 1979 eq 1-3)
          sc% ntot  = den / (amu*abar)
          sc% a_e = pow((3.d0 /(pi4 * zbar * sc% ntot)),x13)
-      
+
       end subroutine do_screen_set_context
 
 

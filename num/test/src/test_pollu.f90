@@ -34,12 +34,12 @@
          double precision :: yprime(n)
          ierr = 0
          ipar(i_njac) = ipar(i_njac) + 1
-         call pollu_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar) 
-         if (ierr == 0) call pollu_derivs(n, x, y, f, lrpar,rpar,lipar,ipar, ierr)      
+         call pollu_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar)
+         if (ierr == 0) call pollu_derivs(n, x, y, f, lrpar,rpar,lipar,ipar, ierr)
       end subroutine pollu_jacob
 
 
-      subroutine pollu_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)  
+      subroutine pollu_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)
          ! sparse jacobian. format either compressed row or compressed column.
          use mtx_lib,only:dense_to_row_sparse_with_diag,dense_to_col_sparse_with_diag
          use test_int_support,only:ipar_sparse_format
@@ -70,7 +70,7 @@
          ! x is the current x value; xold is the previous x value.
          ! y is the current y value.
          ! irtrn negative means terminate integration.
-         ! rwork and iwork hold info for 
+         ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          double precision, intent(in) :: xold, x
          double precision, intent(inout) :: y(n)
@@ -93,8 +93,8 @@
          irtrn = 0
          !write(*,*) nr
       end subroutine pollu_solout
-      
-      
+
+
       subroutine do_test_pollu(which_solver,which_decsol,numerical_jacobian,show_all,quiet)
          use test_support,only:show_results,show_statistics,check_results
          use test_int_support,only:do_test_stiff_int
@@ -110,18 +110,18 @@
          double precision :: h0, t(0:ndisc+1), atol(1), rtol(1)
          integer :: i, mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, nstep
          integer :: ivect(nzo), jvect(nzo)
-         real(dp), target :: rpar_ary(lrpar) 
+         real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar, nz
          real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         
+
          nullify(lblk, dblk, ublk)
          caller_id = 0
          nvar = 0
          nz = 0
-                  
+
          rpar => rpar_ary
          ipar => ipar_ary
 
@@ -129,24 +129,24 @@
 
          t(0)   = 0
          t(1)   = 60d0
-         
+
          itol = 0 ! scalar tolerances
          rtol(1) = 1d-5
          atol(1) = 1d-5
          h0 = 1d-7 ! initial step size
-         
+
          call pollu_init(n,y,yprime,consis)
-         nstep=0   
+         nstep=0
          mljac = n ! square matrix
          mujac = n
          matrix_type_spec = square_matrix_type
 
          imas = 0
          mlmas = 0
-         mumas = 0        
-         
+         mumas = 0
+
          m1 = 0
-         m2 = 0     
+         m2 = 0
 
          call do_test_stiff_int(which_solver,which_decsol,numerical_jacobian, &
             pollu_derivs,pollu_jacob,pollu_sjac,pollu_solout,iout, &
@@ -158,20 +158,20 @@
             write(*,*) 'test_pollu ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-      
+
          call pollu_solut(n,0d0,yexact)
          call check_results(n,y,yexact,rtol(1)*2,ierr)
          if (ierr /= 0) then
             write(*,*) 'check results ierr', ierr
             call mesa_error(__FILE__,__LINE__) ! do_test_vdpol
          end if
-         
+
          if (quiet) return
-         
+
          call show_results(n,y,yexact,show_all)
          call show_statistics(ipar(i_nfcn),ipar(i_njac),nstep,show_all)
 
       end subroutine do_test_pollu
-      
-      
+
+
       end module test_pollu

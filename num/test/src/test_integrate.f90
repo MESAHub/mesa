@@ -38,11 +38,11 @@
                real(dp), intent(in) :: x
                real(dp), intent(in) :: args(:)
                integer, intent(inout) :: ierr
- 
+
                ierr = 0
                linear = x
 
-            end function linear 
+            end function linear
 
          end subroutine test_basic
 
@@ -65,7 +65,7 @@
                real(dp), intent(in) :: x
                real(dp), intent(in) :: args(:)
                integer, intent(inout) :: ierr
- 
+
                ierr = 0
                sine = sin(x)
 
@@ -93,7 +93,7 @@
                real(dp), intent(in) :: x
                real(dp), intent(in) :: args(:)
                integer, intent(inout) :: ierr
- 
+
                ierr = 0
                iexp = exp(x)
 
@@ -121,9 +121,9 @@
                real(dp), intent(in) :: x
                real(dp), intent(in) :: args(:)
                integer, intent(inout) :: ierr
- 
+
                ierr = 0
-         
+
                if(x<1) then
                   box = 0d0
                else if(x.ge.1d0 .and. x.le.2d0) then

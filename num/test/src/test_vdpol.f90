@@ -7,11 +7,11 @@
       use utils_lib, only: mesa_error
 
       implicit none
-      
+
       logical, parameter :: dbg = .false.
-      
+
       integer :: cnt = 0
-      
+
 
       contains
 
@@ -70,7 +70,7 @@
          integer,intent(inout),pointer :: ipar(:) ! (lipar)
          real(dp),intent(inout),pointer :: rpar(:) ! (lrpar)
          integer,intent(out) :: ierr
-         
+
          real(dp),dimension(:,:,:),pointer :: lblk,dblk,ublk ! =(nvar,nvar,nz)
          integer, parameter :: ld_dfdy = 2 ! for vdpol
          real(dp), target :: dfdy1(ld_dfdy*n)
@@ -105,7 +105,7 @@
          call vdpol_jeval(ld_dfdy,n,x,y,yprime,dfdy,ierr,rpar,ipar)
          if (ierr == 0) call vdpol_derivs(n, x, h, y, f, lrpar,rpar,lipar,ipar, ierr)
 
-      
+
          if (.false.) then
             write(*,*) 'jac_fcn y(1)', y(1)
             write(*,*) 'jac_fcn y(2)', y(2)
@@ -119,7 +119,7 @@
       end subroutine vdpol_jacob
 
 
-      subroutine vdpol_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)  
+      subroutine vdpol_sjac(n,x,h,y,f,nzmax,ia,ja,values,lrpar,rpar,lipar,ipar,ierr)
          ! sparse jacobian. format either compressed row or compressed column.
          use mtx_lib,only:dense_to_row_sparse_with_diag,dense_to_col_sparse_with_diag
          use test_int_support,only:ipar_sparse_format
@@ -152,7 +152,7 @@
          ! x is the current x value; xold is the previous x value.
          ! y is the current y value.
          ! irtrn negative means terminate integration.
-         ! rwork and iwork hold info for 
+         ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
          real(dp), intent(inout) :: y(:) ! (n)
@@ -175,10 +175,10 @@
          integer, intent(out) :: irtrn
          real(dp) :: xout, y1, y2
          integer :: ierr
-         
+
          if (dbg .and. nr > 450) stop
-         
-         
+
+
          ierr = 0
          irtrn = 0
          xout = rpar(1)
@@ -206,8 +206,8 @@
          rpar(1) = xout
   99     format(1x,'x =',f5.2,'    y =',2e18.10,'    nstep =',i8)
       end subroutine vdpol_solout
-      
-      
+
+
       subroutine do_test_vdpol(which_solver,which_decsol,numerical_jacobian,show_all,quiet)
          use test_support,only:show_results,show_statistics,check_results
          use test_int_support,only:do_test_stiff_int
@@ -223,62 +223,62 @@
          integer, parameter :: ndisc = 0
          real(dp) :: h0, t(0:ndisc+1), atol(1), rtol(1)
          integer :: mujac, mljac, matrix_type_spec, ierr, imas, mlmas, mumas, m1, m2, itol, iout, nstep
-         real(dp), target :: rpar_ary(lrpar) 
+         real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar_blk_dble, nz_blk_dble
          real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
          real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
-                  
+
          rpar => rpar_ary
          ipar => ipar_ary
          y => y_ary
-            
+
          if (.not. quiet) write(*,*) 'vdpol'
 
          nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
          caller_id = 0
          nvar_blk_dble = 0
          nz_blk_dble = 0
-         
+
          t(0)   = 0
          t(1)   = 2d0
-         
+
          itol = 0 ! scalar tolerances
          rtol(1) = 1d-8
          atol(1) = 1d-8
          h0 = 1d-10 ! initial step size
-         
+
          rtol(1) = 1d-6
          atol(1) = 1d-6
          h0 = 1d-8 ! initial step size
-         
+
          rtol(1) = 1d-4
          atol(1) = 1d-4
          h0 = 1d-4 ! initial step size
-         
+
          mljac = n ! square matrix
          mujac = n
          matrix_type_spec = square_matrix_type
 
          imas = 0
          mlmas = 0
-         mumas = 0        
-         
+         mumas = 0
+
          m1 = 0
-         m2 = 0     
-         
+         m2 = 0
+
          if (show_all) then
             iout = 1
          else
             iout = 0
          end if
-         
+
          ipar = 0
-         
+
          call vdpol_init(n,y,yprime,consis)
-         nstep=0  
+         nstep=0
 
          if (nvar_blk_dble == 0) then
             call do_test_stiff_int(which_solver,which_decsol,numerical_jacobian, &
@@ -299,20 +299,20 @@
             write(*,*) 'test_vdpol ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call vdpol_solut(n,0d0,yexact)
          !call check_results(n,y,yexact,rtol(1)*2,ierr)
          if (ierr /= 0) then
             write(*,*) 'check results ierr', ierr
             call mesa_error(__FILE__,__LINE__) ! do_test_vdpol
          end if
-         
+
          if (quiet) return
-         
+
          call show_results(n,y,yexact,show_all)
          call show_statistics(ipar(i_nfcn),ipar(i_njac),nstep,show_all)
 
       end subroutine do_test_vdpol
-            
-      
+
+
       end module test_vdpol

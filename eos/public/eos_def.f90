@@ -25,12 +25,12 @@
 ! ***********************************************************************
 
       module eos_def
-      
+
       use const_def, only: dp, use_mesa_temp_cache, strlen
       use chem_def, only: max_el_z
-      
+
       implicit none
-  
+
       ! interfaces for procedure pointers
       abstract interface
 
@@ -91,45 +91,45 @@
 
       logical, parameter :: show_allocations = .false.  ! for debugging memory usage
       integer, parameter :: eos_name_length = 20 ! String length for storing EOS variable names
- 
-        
+
+
       ! cgs units
 
       ! the basic eos results
-      
+
       integer, parameter :: i_lnPgas = 1
             ! gas pressure (total pressure minus radiation pressure)
-      integer, parameter :: i_lnE = i_lnPgas+1 
+      integer, parameter :: i_lnE = i_lnPgas+1
             ! internal energy per gram
-      integer, parameter :: i_lnS = i_lnE+1 
+      integer, parameter :: i_lnS = i_lnE+1
             ! entropy per gram
-      integer, parameter :: i_mu = i_lnS+1 
+      integer, parameter :: i_mu = i_lnS+1
             ! mean molecular weight per gas particle (ions + free electrons)
       integer, parameter :: i_lnfree_e = i_mu+1
             ! free_e := total combined number per nucleon of free electrons
-      integer, parameter :: i_eta = i_lnfree_e+1 
+      integer, parameter :: i_eta = i_lnfree_e+1
             ! electron degeneracy parameter (eta > 1 for significant degeneracy)
             ! eta = ratio of electron chemical potential to kT
       integer, parameter :: i_grad_ad = i_eta+1
             ! dlnT_dlnP at constant S
       integer, parameter :: i_chiRho = i_grad_ad+1
             ! dlnP_dlnRho at constant T
-      integer, parameter :: i_chiT = i_chiRho+1 
+      integer, parameter :: i_chiT = i_chiRho+1
             ! dlnP_dlnT at constant Rho
       integer, parameter :: i_Cp = i_chiT+1
             ! dh_dT at constant P, specific heat at constant total pressure
             ! where h is enthalpy, h = E + P/Rho
-      integer, parameter :: i_Cv = i_Cp+1 
+      integer, parameter :: i_Cv = i_Cp+1
             ! dE_dT at constant Rho, specific heat at constant volume
       integer, parameter :: i_dE_dRho = i_Cv+1
             ! at constant T
-      integer, parameter :: i_dS_dT = i_dE_dRho+1 
+      integer, parameter :: i_dS_dT = i_dE_dRho+1
             ! at constant Rho
-      integer, parameter :: i_dS_dRho = i_dS_dT+1 
+      integer, parameter :: i_dS_dRho = i_dS_dT+1
             ! at constant T
-      integer, parameter :: i_gamma1 = i_dS_dRho+1 
+      integer, parameter :: i_gamma1 = i_dS_dRho+1
             ! dlnP_dlnRho at constant S
-      integer, parameter :: i_gamma3 = i_gamma1+1 
+      integer, parameter :: i_gamma3 = i_gamma1+1
             ! gamma3 - 1 = dlnT_dlnRho at constant S
       integer, parameter :: i_phase = i_gamma3+1
             ! phase: 1 for solid, 0 for liquid, in-between for blend
@@ -165,7 +165,7 @@
       ! i_frac:i_frac+num_eos_frac_results-1
       integer, parameter :: i_frac = i_frac_HELM ! first frac entry
       integer, parameter :: num_eos_frac_results = 7
-      
+
       integer, parameter :: num_eos_basic_results = i_frac_ideal
       integer, parameter :: nv = num_eos_basic_results
 
@@ -181,21 +181,21 @@
       integer, parameter :: i_logPtot = 0  ! log10 total pressure (gas + radiation)
       integer, parameter :: i_egas = -1 ! gas specific energy density (no radiation)
 
-      
-      ! NOTE: the calculation of eta is based on the following equation for ne, 
+
+      ! NOTE: the calculation of eta is based on the following equation for ne,
       ! the mean number of free electrons per cm^3,
       ! assuming non-relativistic electrons (okay for T < 10^9 at least)
       !
       !  ne = 4 Pi / h^3 (2 me k T)^1.5 F[1/2,eta]   -- see, for example, Clayton, eqn 2-57
-      !        where F is the fermi-dirac integral: 
+      !        where F is the fermi-dirac integral:
       !        F[beta,eta] := Integrate[(u^beta)/(1+E^(u-eta)),{u,0,Infinity}]
-      ! 
-      ! CAVEAT: when free_e, the mean number of free electrons per nucleon gets really small, 
+      !
+      ! CAVEAT: when free_e, the mean number of free electrons per nucleon gets really small,
       ! eta isn't very interesting because there aren't a lot of free electrons to be degenerate!
       ! our calculation of eta gets flaky at this point as well.
-      ! we sweep this problem under the rug by making eta tend to a fairly large negative value 
+      ! we sweep this problem under the rug by making eta tend to a fairly large negative value
       ! when free_e < 0.01 or so. this roughly corresponds to T < 10^4 or less.
-      
+
       integer, parameter :: eosdt_OPAL_SCVH = 1
       integer, parameter :: eosdt_max_FreeEOS = 2
 
@@ -204,7 +204,7 @@
 
       integer, parameter :: num_eosDT_Zs = 3
       integer, parameter :: num_eosDT_Xs = 6
-      
+
       integer, parameter :: num_FreeEOS_Zs = 15
       integer, parameter :: num_FreeEOS_Xs = 12
 
@@ -214,7 +214,7 @@
          integer :: nXs_for_Z(max_num_DT_Zs)
          real(dp) :: Xs_for_Z(max_num_DT_Xs, max_num_DT_Zs)
       end type DT_XZ_Info
-      
+
       type (DT_XZ_Info), target :: eosDT_XZ_struct, FreeEOS_XZ_struct
 
       integer, parameter :: sz_per_eos_point = 4 ! for bicubic spline interpolation
@@ -226,7 +226,7 @@
          real(dp) :: logT_all_HELM ! all HELM for lgT >= this
          real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
          real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
-         
+
          ! limits for OPAL_SCVH
          logical :: use_OPAL_SCVH
          real(dp) :: logT_low_all_SCVH ! SCVH for lgT >= this
@@ -237,7 +237,7 @@
          real(dp) :: logQ_max_OPAL_SCVH ! no OPAL/SCVH for logQ > this
          real(dp) :: logQ_min_OPAL_SCVH ! no OPAL/SCVH for logQ <= this.
          real(dp) :: Z_all_OPAL ! all OPAL for Z <= this
-         
+
          ! limits for FreeEOS
          logical :: use_FreeEOS
          real(dp) :: logQ_max_FreeEOS_hi
@@ -262,7 +262,7 @@
          real(dp) :: logT_cut_FreeEOS_hi
          real(dp) :: logT_cut_FreeEOS_lo
          character (len=30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
-         
+
          ! limits for CMS
          logical :: use_CMS, CMS_use_fixed_composition
          integer :: CMS_fixed_composition_index ! in [0,10]
@@ -272,9 +272,9 @@
          real(dp) :: logRho_max_for_all_CMS, logRho_max_for_any_CMS  ! for upper blend zone in logRho
          real(dp) :: logRho_min_for_all_CMS, logRho_min_for_any_CMS  ! for lower blend zone in logRho
          real(dp) :: logT_max_for_all_CMS, logT_max_for_any_CMS      ! for upper blend zone in logT
-         real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT      
+         real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT
          real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He ! upper logT blend zone is different for pure He
-         
+
          ! limits for PC
          logical :: use_PC
          real(dp) :: mass_fraction_limit_for_PC ! skip any species with abundance < this
@@ -307,11 +307,11 @@
          logical :: include_radiation, include_elec_pos
          logical :: eosDT_use_linear_interp_for_X
          logical :: eosDT_use_linear_interp_to_HELM
-      
+
          character(len=128) :: eosDT_file_prefix
 
          logical :: okay_to_convert_ierr_to_skip
-         
+
          ! other eos
          logical :: use_other_eos_component
          procedure (other_eos_frac_interface), pointer, nopass :: &
@@ -321,14 +321,14 @@
          logical :: use_other_eos_results
          procedure (other_eos_interface), pointer, nopass :: &
             other_eos_results => null()
-         
+
          ! debugging
          logical :: dbg
          real(dp) :: logT_lo, logT_hi
          real(dp) :: logRho_lo, logRho_hi
          real(dp) :: X_lo, X_hi
          real(dp) :: Z_lo, Z_hi
-         
+
          ! bookkeeping
          integer :: handle
          logical :: in_use
@@ -342,17 +342,17 @@
 
       end type EoS_General_Info
 
-      
+
       include 'helm_def.dek'
 
 
       ! THE FOLLOWING ARE PRIVATE DEFS -- NOT FOR USE BY CLIENTS
-      
-      
+
+
       ! data table types
-      
+
       type (HELM_Table), pointer :: eos_ht
-      
+
       ! for mesa (logQ,logT) tables
       type EosDT_XZ_Info
          real(dp) :: logQ_min ! logQ = logRho - 2*logT + 12
@@ -378,7 +378,7 @@
       logical, dimension(num_eosDT_Xs, num_eosDT_Zs) :: &
          eosDT_XZ_loaded, eosSCVH_XZ_loaded, eosCMS_XZ_loaded
       logical, dimension(num_FreeEOS_Xs, num_FreeEOS_Zs) :: FreeEOS_XZ_loaded
-      
+
 
       ! interpolation info for eosPC support tables FITION9
       type FITION_Info
@@ -396,10 +396,10 @@
          real(dp) :: lnGAME_min, lnGAME_max, dlnGAME
          real(dp), pointer :: lnRSs(:) ! (nlnRS)
          real(dp), pointer :: lnGAMEs(:) ! (nlnGAME)
-         real(dp), pointer :: tbl1(:) ! (4,nvals,nlnRS,nlnGAME) 
+         real(dp), pointer :: tbl1(:) ! (4,nvals,nlnRS,nlnGAME)
          real(dp), pointer :: tbl(:,:,:,:) ! => tbl1(:)
       end type eosPC_Support_Info
-      
+
       integer, parameter :: max_FSCRliq8_Zion = max_el_z
       type (eosPC_Support_Info), target :: FSCRliq8_data(max_FSCRliq8_Zion)
       logical, dimension(max_FSCRliq8_Zion) :: FSCRliq8_Zion_loaded
@@ -409,7 +409,7 @@
 
       integer, parameter :: max_eos_handles = 10
       type (EoS_General_Info), target :: eos_handles(max_eos_handles)
-      
+
       logical :: use_cache_for_eos = .true.
       logical :: eos_root_is_initialized = .false.
 
@@ -418,16 +418,16 @@
 
       logical :: eos_test_partials
       real(dp) :: eos_test_partials_val, eos_test_partials_dval_dx ! for dfridr from star
-      
-      
+
+
       contains
-      
-      
+
+
       subroutine eos_def_init
          integer :: i
          type (DT_XZ_Info), pointer :: eosDT_XZ_ptr, FreeEOS_XZ_ptr
          include 'formats'
-         
+
          use_cache_for_eos = .true.
          eos_root_is_initialized = .false.
          eos_test_partials = .false.
@@ -469,12 +469,12 @@
          end do
          FreeEOS_XZ_ptr% Xs_for_Z(1:2,14) = (/ 0.0d0, 0.1d0 /) ! 0.9
          FreeEOS_XZ_ptr% Xs_for_Z(1,15) = 0.0d0 ! 1.0
-         
+
          eosDT_XZ_loaded(:,:) = .false.
          eosSCVH_XZ_loaded(:,:)=.false.
          FreeEOS_XZ_loaded(:,:)=.false.
          eosCMS_XZ_loaded(:,:)=.false.
-         
+
          eosDT_result_names(i_lnPgas) = 'lnPgas'
          eosDT_result_names(i_lnE) = 'lnE'
          eosDT_result_names(i_lnS) = 'lnS'
@@ -504,7 +504,7 @@
 
       end subroutine eos_def_init
 
-      
+
       integer function do_alloc_eos(ierr) result(handle)
          integer, intent(out) :: ierr
          integer :: i
@@ -543,10 +543,10 @@
          rq% other_eos_frac => null_other_eos_frac
          rq% other_eos_component => null_other_eos_component
          rq% other_eos_results => null_other_eos_results
-         
+
       end subroutine init_eos_handle_data
-            
-      
+
+
       subroutine do_free_eos_handle(handle)
          integer, intent(in) :: handle
          type (EoS_General_Info), pointer :: rq
@@ -555,12 +555,12 @@
             eos_handles(handle)% in_use = .false.
          end if
       end subroutine do_free_eos_handle
-      
+
 
       subroutine get_eos_ptr(handle,rq,ierr)
          integer, intent(in) :: handle
          type (EoS_General_Info), pointer :: rq
-         integer, intent(out):: ierr         
+         integer, intent(out):: ierr
          if (handle < 1 .or. handle > max_eos_handles) then
             ierr = -1
             return
@@ -568,8 +568,8 @@
          rq => eos_handles(handle)
          ierr = 0
       end subroutine get_eos_ptr
-      
-      
+
+
       subroutine eos_def_shutdown
          type (eosPC_Support_Info), pointer :: fq
          type (FITION_Info), pointer :: fi
@@ -600,19 +600,19 @@
          fq => EXCOR7_data
          call free_eosPC_support_Info(fq)
          EXCOR7_table_loaded = .false.
-         
+
          do iz = 1, max_FSCRliq8_Zion
             if (.not. FSCRliq8_Zion_loaded(iz)) cycle
             fq => FSCRliq8_data(iz)
             call free_eosPC_support_Info(fq)
          end do
          FSCRliq8_Zion_loaded(:) = .false.
-         
+
          eos_root_is_initialized = .false.
-         
-         
+
+
          contains
-         
+
          subroutine free_eosPC_support_Info(fq)
             type (eosPC_Support_Info), pointer :: fq
             if (ASSOCIATED(fq% lnRSs)) deallocate(fq% lnRSs)
@@ -620,7 +620,7 @@
             if (ASSOCIATED(fq% tbl1)) deallocate(fq% tbl1)
             nullify(fq% tbl)
          end subroutine free_eosPC_support_Info
-         
+
          subroutine free_EosDT_XZ_Info(d, flgs, numXs, numZs)
             integer, intent(in) :: numXs, numZs
             type (EosDT_XZ_Info), dimension(numXs, numZs) :: d
@@ -646,4 +646,4 @@
 
 
       end module eos_def
-      
+

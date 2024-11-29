@@ -2,15 +2,15 @@
 
       module mod_qsort
       use const_def, only: dp
-      
-      
+
+
       implicit none
 
 
       contains
 
 
-  
+
            ! FILE: sort.f
          ! PURPOSE: demonstrate the use of "qsort_inline.inc" and
          ! "qsort_inline_index.inc". These can be used as specific
@@ -53,7 +53,7 @@
              end do
              index(left)=hold
            end subroutine rshift
-  
+
            logical &
            function less_than(a,b)
              integer, intent(in) :: a,b
@@ -63,7 +63,7 @@
                less_than = ( string(index(a)) < string(index(b)) )
              end if
            end function less_than
-           
+
          end subroutine sortp_string
          !---------------------------------------------------------------
          ! Sort an array of indices into a string array, with any string length.
@@ -104,7 +104,7 @@
              end do
              index(left)=hold
            end subroutine rshift
-           
+
            logical &
            function less_than(a,b)
              integer, intent(in) :: a,b
@@ -114,7 +114,7 @@
                less_than = ( string(str_index(index(a))) < string(str_index(index(b))) )
              end if
            end function less_than
-           
+
          end subroutine sortp_string_index
          !---------------------------------------------------------------
          ! Sort a double-precision array by index
@@ -154,17 +154,17 @@
              end do
              index(left)=hold
            end subroutine rshift
-  
+
            logical &
            function less_than(a,b)
              integer, intent(in) :: a,b
              less_than = value(index(a)) < value(index(b))
            end function less_than
-           
+
          end subroutine sortp_dp
 
 
-      
-      
+
+
       end module mod_qsort
-      
+

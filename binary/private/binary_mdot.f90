@@ -42,14 +42,14 @@
       integer function check_implicit_rlo(binary_id, new_mdot)
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: new_mdot
-         
+
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
          real(dp) :: function_to_solve, explicit_mdot, q, slope_contact
          integer :: ierr
          logical :: use_sum, detached
          character (len=90) :: rlo_result
-         
+
          include 'formats'
          ierr = 0
          call binary_ptr(binary_id, b, ierr)
@@ -60,7 +60,7 @@
          s => b% s_donor
          use_sum = .false.
          detached = .false.
-         
+
          ! NOTE: keep in mind that for mass loss, mdot is negative.
          ! b% mtransfer_rate will be considered valid if function_to_solve = 0
          ! within the tolerance given by b% implicit_scheme_tolerance, i.e.
@@ -76,7 +76,7 @@
          ! For other schemes, function_to_solve is chosen as the difference between
          ! b% mtransfer_rate and the explicit transfer rate, divided by the
          ! explicit transfer rate.
-         
+
          check_implicit_rlo = keep_going
          new_mdot = b% mtransfer_rate
          b% num_tries = b% num_tries + 1
@@ -128,7 +128,7 @@
             ! If accretor is overflowing its Roche lobe, then the contact scheme needs to be used.
             ! Otherwise, if accretor radius is (within tolerance) below the equipotential
             ! of the donor, or donor is below tolerance for detachment, then use regular roche_lobe scheme.
-            if (b% rl_relative_gap(b% a_i) < 0 .and. & 
+            if (b% rl_relative_gap(b% a_i) < 0 .and. &
                 (b% rl_relative_gap(b% d_i)*slope_contact - b% rl_relative_gap(b% a_i) &
                  > b% implicit_scheme_tolerance .or. &
                  b% rl_relative_gap(b% d_i) < - b% implicit_scheme_tolerance)) then
@@ -207,7 +207,7 @@
             end if
             return
          end if
-         
+
          if (b% num_tries > b% max_tries_to_achieve) then
             check_implicit_rlo = retry
             if (b% report_rlo_solver_progress) then
@@ -216,7 +216,7 @@
             end if
             return
          end if
-            
+
          if (b% num_tries == 1) then
             b% have_mdot_lo = .false.
             b% have_mdot_hi = .false.
@@ -224,7 +224,7 @@
             b% mdot_hi = 0
             b% fixed_delta_mdot = b% mtransfer_rate * (1 - b% change_factor)
          end if
-         
+
          new_mdot = pick_mdot_for_implicit_rlo(b, function_to_solve, b% mtransfer_rate, use_sum, ierr)
 
          !if this iteration is done using the maximum mass transfer rate,
@@ -254,7 +254,7 @@
             end if
             return
          end if
-         
+
          if (-new_mdot < b% roche_min_mdot*Msun/secyer .and. function_to_solve < 0 .and. &
              (b% mdot_scheme == "roche_lobe" .or. (b% mdot_scheme == "contact" .and. &
              .not. use_sum))) then
@@ -266,7 +266,7 @@
             end if
             return
          end if
-         
+
          if (b% have_mdot_hi .and. b% have_mdot_lo) then
             if (abs(b% mdot_hi - b% mdot_lo) < &
                   b% implicit_scheme_tiny_factor*min(abs(b% mdot_hi),abs(b% mdot_lo))) then
@@ -293,7 +293,7 @@
             rlo_result = 'redo'
             call report_rlo_iter
          end if
-         
+
          check_implicit_rlo = redo
 
          contains
@@ -334,14 +334,14 @@
          real(dp), intent(in) :: new_function_to_solve, mdot_current
          logical, intent(in) :: use_sum
          integer, intent(out) :: ierr
-         
+
          real(dp) :: starting_mdot, current_change_factor
          logical :: do_cubic
          include 'formats'
-         
+
          ! NOTE: keep in mind that for mass loss, mdot is negative
-         
-         
+
+
          starting_mdot = -b% starting_mdot*Msun/secyer
          current_change_factor = pow(b% change_factor, b% num_tries+1)
 
@@ -427,7 +427,7 @@
                end if
             end if
          end if
-         
+
       end function pick_mdot_for_implicit_rlo
 
 
@@ -506,7 +506,7 @@
          integer :: ierr
 
          actual_mtransfer_rate = 0d0
-         
+
          if (b% use_other_adjust_mdots) then
             call b% other_adjust_mdots(b% binary_id, ierr)
             if (ierr /= 0) then
@@ -514,7 +514,7 @@
                stop
             end if
             return
-         end if 
+         end if
 
          b% fixed_xfer_fraction = 1 - b% mass_transfer_alpha - b% mass_transfer_beta - &
             b% mass_transfer_delta
@@ -612,7 +612,7 @@
             b% mdot_system_transfer(b% d_i) = 0d0
             b% mdot_system_transfer(b% a_i) = 0d0
             b% mdot_system_cct = 0d0
-         else 
+         else
             b% mdot_system_transfer(b% d_i) = b% mtransfer_rate * b% mass_transfer_alpha
             b% mdot_system_cct = b% mtransfer_rate * b% mass_transfer_delta
             if (b% point_mass_i == 0 .or. b% model_twins_flag) then
@@ -661,23 +661,23 @@
             mdot = b% mdot_thin
             call get_info_for_kolb(b)
             mdot = mdot + b% mdot_thick
-            
+
          else if (b% mdot_scheme == "Kolb" .and. b% eccentricity > 0.0d0) then
             call get_info_for_ritter_eccentric(b)
             mdot = b% mdot_thin
             call get_info_for_kolb_eccentric(b)
             mdot = mdot + b% mdot_thick
-            
+
          else if (b% mdot_scheme == "Ritter" .and. b% eccentricity <= 0.0d0) then
             call get_info_for_ritter(b)
             mdot = b% mdot_thin
-            
+
          else if (b% mdot_scheme == "Ritter" .and. b% eccentricity > 0.0d0) then
             call get_info_for_ritter_eccentric(b)
             mdot = b% mdot_thin
 
          end if
-            
+
          if (b% mdot_scheme == "Arras") then
             if (b% eccentricity > 0d0) &
                write(*,*) "mdot_scheme = Arras is not properly implemented for e>0"
@@ -731,7 +731,7 @@
          end if
 
       end subroutine get_info_for_ritter
-      
+
       real(dp) function calculate_kolb_mdot_thick(b, indexR, rl_d) result(mdot_thick)
          real(dp), intent(in) :: rl_d
          integer, intent(in) :: indexR
@@ -742,7 +742,7 @@
 
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! As described in Kolb and H. Ritter 1990, A&A 236,385-392
-         
+
          ! compute integral in Eq. (A17 of Kolb & Ritter 1990)
          mdot_thick = 0d0
          do i=1,indexR-1
@@ -751,7 +751,7 @@
             mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / &
                (mp * b% s_donor% mu(i)))*(b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
          end do
-         ! only take a fraction of d_P for last cell 
+         ! only take a fraction of d_P for last cell
          G1 = b% s_donor% gamma1(i)
          F3 = sqrt(G1) * pow(2d0/(G1+1d0), (G1+1d0)/(2d0*G1-2d0))
          d_P = (b% s_donor% r(indexR) - rl_d) / &
@@ -764,9 +764,9 @@
          q_temp = min(max(q,0.5d0),10d0)
          F1 = (1.23d0  + 0.5D0* log10(q_temp))
          mdot_thick = -2.0D0*pi*F1*rl_d*rl_d*rl_d/(standard_cgrav*b% m(b% d_i))*mdot_thick
-      
+
       end function calculate_kolb_mdot_thick
-      
+
       subroutine get_info_for_kolb(b)
          type(binary_info), pointer :: b
          integer :: i, indexR
@@ -783,7 +783,7 @@
             do while (b% s_donor% r(i) > b% rl(b% d_i))
                i=i+1
             end do
-            
+
             if (i .eq. 1) then
                b% mdot_thick = 0d0
             else
@@ -842,8 +842,8 @@
          real(dp) :: F1, q, q_temp, rho, p, grav, hp, v_th, dm
          real(dp), DIMENSION(b% anomaly_steps):: mdot0, mdot, Erit, rl_d
          include 'formats'
-         
-         ! Optically thin MT rate adapted for eccentric orbits 
+
+         ! Optically thin MT rate adapted for eccentric orbits
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
          rho = b% s_donor% rho(1) ! density at surface in g/cm^3
@@ -851,7 +851,7 @@
          grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
          hp = p/(grav*rho) ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1))) ! kerg = Boltzmann's constant
-         
+
          ! phase dependant RL radius
          do i = 1, b% anomaly_steps
             rl_d(i) = b% rl(b% d_i) * (1d0 - pow2(b% eccentricity)) / &
@@ -864,8 +864,8 @@
          F1 = (1.23d0  + 0.5D0* log10(q_temp))
 
          mdot0 = (2.0D0*pi/exp(0.5d0)) * pow3(v_th) * rl_d*rl_d*rl_d / &
-             (standard_cgrav*b% m(b% d_i)) * rho * F1   
-             
+             (standard_cgrav*b% m(b% d_i)) * rho * F1
+
          q_temp = min(max(q,0.04d0),20d0)
          if (q_temp < 1.0d0) then
             b% ritter_h = hp/( 0.954D0 + 0.025D0*log10(q_temp) - 0.038D0*pow2(log10(q_temp)) )
@@ -888,50 +888,50 @@
                mdot(i) = -1 * mdot0(i) * exp(Erit(i))
             end do
          end if
-         
+
          b% mdot_donor_theta = mdot
-         
+
          !integrate to get total massloss
          dm = 0d0
          do i = 2,b% anomaly_steps ! trapezoidal integration
-            dm = dm + 0.5d0 * (mdot(i-1) + mdot(i)) * (b% time_co(i) - b% time_co(i-1)) 
+            dm = dm + 0.5d0 * (mdot(i-1) + mdot(i)) * (b% time_co(i) - b% time_co(i-1))
          end do
-         
+
          b% mdot_thin = dm
 
       end subroutine get_info_for_ritter_eccentric
-      
+
       subroutine get_info_for_kolb_eccentric(b)
          type(binary_info), pointer :: b
          real(dp) :: e, dm
          integer :: i, j
          real(dp), DIMENSION(b% anomaly_steps):: rl_d_i, mdot_thick_i
          include 'formats'
-         
+
          ! Optically thick MT rate adapted for eccentric orbits
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
          b% mdot_thick = 0d0
          e = b% eccentricity
-         
+
          ! If the radius of the donor is smaller as the smallest RL radius,
          ! there is only atmospheric RLOF, thus return.
          if ( b% r(b% d_i) < b% rl(b% d_i) * (1-e*e)/(1+e) ) then
             return
          end if
-         
-         ! For each point in the orbit calculate mdot_thick 
+
+         ! For each point in the orbit calculate mdot_thick
          do i = 1,b% anomaly_steps
             ! phase dependent RL radius
             rl_d_i(i) = b% rl(b% d_i) * (1d0 - e*e) / &
                  (1 + e*cos(b% theta_co(i)) )
-         
+
             ! find how deep in the star we are
             j=1
             do while (b% s_donor% r(j) > rl_d_i(i))
                j=j+1
             end do
-            
+
             ! calculate mdot_thick
             if (j .eq. 1) then
                mdot_thick_i(i) = 0d0
@@ -939,18 +939,18 @@
                mdot_thick_i(i) = calculate_kolb_mdot_thick(b, j-1, rl_d_i(i))
             end if
          end do
-         
+
          b% mdot_donor_theta = b% mdot_donor_theta + mdot_thick_i
-         
+
          ! Integrate mdot_thick over the orbit
          dm = 0d0
          do i = 2,b% anomaly_steps ! trapezoidal integration
             dm = dm + 0.5d0 * (mdot_thick_i(i-1) + mdot_thick_i(i)) * &
-                              (b% time_co(i) - b% time_co(i-1)) 
+                              (b% time_co(i) - b% time_co(i-1))
          end do
-         
+
          b% mdot_thick = dm
-         
+
       end subroutine get_info_for_kolb_eccentric
 
       subroutine eval_accreted_material_j(binary_id, ierr)
@@ -977,7 +977,7 @@
          if (b% r(b% a_i) < min_r) then
             b% accretion_mode = 2
             b% s_accretor% accreted_material_j = &
-               sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i)) 
+               sqrt(standard_cgrav * b% m(b% a_i) * b% r(b% a_i))
          else
             b% accretion_mode = 1
             b% s_accretor% accreted_material_j = &
@@ -1001,7 +1001,7 @@
          if (acc_index == b% a_i) then
             !set accreted material composition
             b% s_accretor% num_accretion_species = b% s_donor% species
-            
+
             if(b% s_donor% species > size(b% s_accretor% accretion_species_id,dim=1)) then
                call mesa_error(__FILE__,__LINE__,'Nuclear network is too large for accretor, increase max_num_accretion_species')
             end if

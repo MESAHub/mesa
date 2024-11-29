@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,11 +19,11 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 module gyre_support
 
   ! Uses
-      
+
   use astero_def
   use star_lib
   use star_def
@@ -33,11 +33,11 @@ module gyre_support
   use gyre_mesa_m
 
   ! No implicit typing
-      
+
   implicit none
 
   ! Module variables
-      
+
   logical, parameter :: GYRE_IS_ENABLED = .true.
 
   ! Access specifiers
@@ -51,11 +51,11 @@ module gyre_support
   public :: store_model_for_gyre
   public :: gyre_call_back
   public :: save_gyre_mode_info
-  
+
   ! Procedures
 
 contains
-      
+
   subroutine init_gyre (gyre_file, ierr)
 
     use const_def
@@ -90,7 +90,7 @@ contains
   end subroutine init_gyre
 
   !****
-      
+
   subroutine do_gyre_get_modes (s, el, store_model, ierr)
 
     type (star_info), pointer :: s
@@ -102,13 +102,13 @@ contains
     real(dp) :: rpar(1)
     integer(8) :: time0, time1, clock_rate
     real(dp) :: time
-         
+
     include 'formats'
-         
+
     ierr = 0
 
     ! If necessary, store the model
-         
+
     if (store_model) then
        call store_model_for_gyre( &
             s, add_center_point, keep_surface_point, add_atmosphere, ierr)
@@ -119,13 +119,13 @@ contains
     end if
 
     ! Get modes
-         
+
     if (trace_time_in_oscillation_code) then
        call system_clock(time0, clock_rate)
     end if
-         
+
     call get_modes(el, gyre_call_back, ipar, rpar)
-         
+
     if (trace_time_in_oscillation_code) then
        call system_clock(time1, clock_rate)
        time = dble(time1-time0)/clock_rate
@@ -140,8 +140,8 @@ contains
   end subroutine do_gyre_get_modes
 
   !****
-  
-  subroutine null_gyre_call_back (md, ipar, rpar, ierr)         
+
+  subroutine null_gyre_call_back (md, ipar, rpar, ierr)
     type(mode_t), intent(in) :: md
     integer, intent(inout)   :: ipar(:)
     real(dp), intent(inout)  :: rpar(:)
@@ -150,9 +150,9 @@ contains
   end subroutine null_gyre_call_back
 
   !****
-      
+
   subroutine store_model_for_gyre (s, add_center_point, keep_surface_point, add_atmosphere, ierr)
-            
+
     type (star_info), intent(in) :: s
     logical, intent(in)          :: add_center_point
     logical, intent(in)          :: keep_surface_point
@@ -163,13 +163,13 @@ contains
     real(dp), allocatable     :: point_data(:,:)
     !character(:), allocatable :: filename
     character (len=1000)       :: filename  ! temporary until gfortran stops giving bogus warning
-         
+
     logical, parameter :: dbg = .false.
-            
+
     include 'formats'
 
     ! If necessary, write an FGONG file
-         
+
     if (write_fgong_for_each_model) then
 
        if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
@@ -201,7 +201,7 @@ contains
     if (dbg) write(*,2) 'done star_pulse_data (GYRE)', s%model_number
 
     ! Pass the data to GYRE
-         
+
     if (dbg) write(*,2) 'call gyre_set_model', s%model_number
 
     call set_model(global_data, point_data, s%gyre_data_schema)
@@ -209,7 +209,7 @@ contains
     if (dbg) write(*,2) 'done gyre_set_model', s%model_number
 
     ! If necessary, write a GYRE file
-         
+
     if (write_gyre_for_each_model) then
 
        if (.not. folder_exists(trim(astero_results_directory))) call mkdir(trim(astero_results_directory))
@@ -243,7 +243,7 @@ contains
 
        write(format_string, 100) model_num_digits, model_num_digits
 100    format('I',I2.2,'.',I2.2)
-               
+
        write(num_string, format_string) s%model_number
 
        ! Finish
@@ -259,15 +259,15 @@ contains
   subroutine gyre_call_back(md, ipar, rpar, ierr)
 
     use astero_def, only: store_new_oscillation_results
-         
+
     type(mode_t), intent(in) :: md
     integer, intent(inout)   :: ipar(:)
     real(dp), intent(inout)  :: rpar(:)
     integer, intent(out)     :: ierr
-    
+
     integer  :: new_el, new_order, new_em
     real(dp) :: new_inertia, new_cyclic_freq, new_growth_rate
-    
+
     include 'formats'
 
     ierr = 0
@@ -278,10 +278,10 @@ contains
     new_cyclic_freq = REAL(md% freq('UHZ'))
     new_growth_rate = AIMAG(md% freq('RAD_PER_SEC'))
     new_em = 0
-         
+
     call store_new_oscillation_results( &
          new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, ierr)
-         
+
     call save_gyre_mode_info( &
          new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, &
          md, ipar, rpar, ierr)
@@ -293,7 +293,7 @@ contains
   end subroutine gyre_call_back
 
   !****
-      
+
   subroutine save_gyre_mode_info( &
        new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, &
        md, ipar, rpar, ierr)
@@ -308,14 +308,14 @@ contains
     integer :: iounit
 
     include 'formats'
-         
+
     !if (use_other_gyre_mode_info) then
     !   call astero_other_procs% other_gyre_mode_info(md, ipar, rpar, ierr)
     !end if
-         
+
     if (star_model_number /= save_mode_model_number) return
     if (new_el /= el_to_save .or. new_order /= order_to_save) return
-         
+
     if (len_trim(save_mode_filename) <= 0) save_mode_filename = 'save_mode.data'
     write(*,*) 'save eigenfunction info to file ' // trim(save_mode_filename)
     write(*,'(3a8,99a20)') 'el', 'order', 'em', 'freq (microHz)', 'inertia', 'growth rate (s)'
@@ -332,7 +332,7 @@ contains
 
     close(iounit)
 
-    call free_iounit(iounit)         
+    call free_iounit(iounit)
 
   end subroutine save_gyre_mode_info
 

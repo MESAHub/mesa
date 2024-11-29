@@ -31,7 +31,7 @@
       use math_lib
 
       implicit none
-      
+
       ! the file EOS data
       integer, parameter :: jlogPgas = 1
       integer, parameter :: jlogE = 2
@@ -53,11 +53,11 @@
 
       integer, parameter :: file_max_num_logQs = 1000
 
-      
+
 
       contains
-      
-      
+
+
       subroutine request_user_to_reinstall
          write(*,'(A)')
          write(*,'(A)')
@@ -72,8 +72,8 @@
          write(*,'(A)')
          call mesa_error(__FILE__,__LINE__)
       end subroutine request_user_to_reinstall
-      
-      
+
+
       subroutine check_for_error_in_eosDT_data(ierr, fname)
          integer, intent(in) :: ierr
          character (len=*) :: fname
@@ -92,7 +92,7 @@
          call mesa_error(__FILE__,__LINE__)
       end subroutine check_for_error_in_eosDT_data
 
-    
+
     subroutine load_single_eosDT_table_by_id( &
              rq, which_eosdt, ep, ix, iz, ierr)
          use utils_lib
@@ -101,7 +101,7 @@
          type (EosDT_XZ_Info), pointer :: ep
          integer,intent(in) :: iz, ix
          integer, intent(out) :: ierr
-      
+
       if (which_eosdt == eosdt_max_FreeEOS) then
          ep => FreeEOS_XZ_data(ix,iz)
          if (FreeEOS_XZ_loaded(ix,iz)) return
@@ -112,7 +112,7 @@
          ierr = -1
          return
       end if
-      
+
 !$OMP CRITICAL(eosDT_load)
       if (which_eosdt == eosdt_max_FreeEOS) then
          if (.not. FreeEOS_XZ_loaded(ix,iz)) call do_read
@@ -120,9 +120,9 @@
          if (.not. eosDT_XZ_loaded(ix,iz)) call do_read
       end if
 !$OMP END CRITICAL(eosDT_load)
-         
+
          contains
-         
+
          subroutine do_read
             call read_one(ix,iz,ierr)
             if (ierr /= 0) return
@@ -132,18 +132,18 @@
                eosDT_XZ_loaded(ix,iz) = .true.
             end if
          end subroutine do_read
-         
+
          subroutine read_one(ix,iz,ierr)
             use const_def, only: mesa_data_dir
             integer, intent(in) :: ix, iz
             integer, intent(out) :: ierr
             character (len=256) :: fname, cache_filename, temp_cache_filename
-            integer :: iounit1, iounit2        
-            real(dp) :: X, Z    
+            integer :: iounit1, iounit2
+            real(dp) :: X, Z
             type (DT_xz_Info), pointer :: xz
             include 'formats'
             iounit1 = alloc_iounit(ierr); if (ierr /= 0) return
-            iounit2 = alloc_iounit(ierr); if (ierr /= 0) return            
+            iounit2 = alloc_iounit(ierr); if (ierr /= 0) return
             if (which_eosdt == eosdt_max_FreeEOS) then
                xz => FreeEOS_xz_struct
             else
@@ -159,10 +159,10 @@
             call free_iounit(iounit2)
             call free_iounit(iounit1)
          end subroutine read_one
-         
+
       end subroutine load_single_eosDT_table_by_id
-      
-      
+
+
       subroutine Get_eosDT_Table_Filenames(rq, which_eosdt, xz, &
             ix, iz, data_dir, fname, cache_filename, temp_cache_filename)
          type (EoS_General_Info), pointer :: rq
@@ -173,13 +173,13 @@
          character (len=*), intent(out) :: fname, cache_filename, temp_cache_filename
          character (len=256) :: Zstr, Xstr, suffix, data_dir_name, data_prefix
          real(dp) :: X, Z
-         
+
          Z = xz% Zs(iz)
          X = xz% Xs_for_Z(ix,iz)
-         
+
          call setstr(Z,Zstr)
          call setstr(X,Xstr)
-         suffix = ''         
+         suffix = ''
          if (which_eosdt == eosdt_max_FreeEOS) then
             data_dir_name = '/eosFreeEOS_data/'
             data_prefix = '-FreeEOS_'
@@ -188,19 +188,19 @@
             data_dir_name = '/eosDT_data/'
             data_prefix = '-eosDT_'
          end if
-         
+
          fname = trim(data_dir) //  &
                trim(data_dir_name) // trim(rq% eosDT_file_prefix) // trim(data_prefix) // &
                trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.data'
          cache_filename = trim(eosDT_cache_dir) //  &
                '/' // trim(rq% eosDT_file_prefix) // trim(data_prefix) // &
-               trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.bin'         
+               trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.bin'
          temp_cache_filename = trim(eosDT_temp_cache_dir) //  &
                '/' // trim(rq% eosDT_file_prefix) // trim(data_prefix) // &
                trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.bin'
-         
+
          contains
-         
+
          subroutine setstr(v,str)
             real(dp), intent(in) :: v
             character (len=*) :: str
@@ -212,10 +212,10 @@
                write(str, '(a,i1)') '0', floor(100d0 * v + 0.5d0)
             end if
          end subroutine setstr
-              
+
       end subroutine Get_eosDT_Table_Filenames
-      
-      
+
+
       subroutine Load1_eosDT_Table(rq, which_eosdt, ep, xz, &
             ix, iz, filename, cache_filename, temp_cache_filename, &
             io_unit, cache_io_unit, use_cache, info)
@@ -228,7 +228,7 @@
          integer, intent(in) :: io_unit, cache_io_unit
          logical, intent(in) :: use_cache
          integer, intent(out) :: info
-         
+
          real(dp) :: X, Z, logQ, logT, X_in, Z_in
          integer :: j, i, k, iQ, ios, status
          character (len=1000) :: message
@@ -238,22 +238,22 @@
          real(dp), target :: vec_ary(50)
          real(dp), pointer :: vec(:)
          integer :: n
-         
+
          include 'formats'
 
-         info = 0    
+         info = 0
          vec => vec_ary
          Z = xz% Zs(iz)
          X = xz% Xs_for_Z(ix,iz)
 
          write(message,*) 'open ', trim(filename)
-         
+
          open(UNIT=io_unit, FILE=trim(filename), ACTION='READ', STATUS='OLD', IOSTAT=ios)
          call check_for_error_in_eosDT_data(ios, filename)
 
          read(io_unit,*,iostat=info)
          if (info /= 0) return
-         
+
          read(io_unit,'(a)',iostat=info) message
          if (info == 0) call str_to_vector(message, vec, n, info)
          if (info /= 0 .or. n < 11) then
@@ -291,7 +291,7 @@
             call request_user_to_reinstall
             return
          end if
-         
+
          if (show_allocations) write(*,2) 'Load1_eosDT_Table ep% tbl1', &
              sz_per_eos_point*nv*ep% num_logQs*ep% num_logTs + ep% num_logQs + ep% num_logTs
          allocate(ep% tbl1(sz_per_eos_point*nv*ep% num_logQs*ep% num_logTs), &
@@ -301,16 +301,16 @@
             write(*,*)  "Info: ",info
             call mesa_error(__FILE__,__LINE__, "Allocation in Load1_eosDT_Table failed, you're likely out of memory")
          end if
-         
+
          tbl(1:sz_per_eos_point,1:nv,1:ep% num_logQs,1:ep% num_logTs) =>  &
                ep% tbl1(1:sz_per_eos_point*nv*ep% num_logQs*ep% num_logTs)
-         
+
          ep% logQs(1) = ep% logQ_min
          do i = 2, ep% num_logQs-1
             ep% logQs(i) = ep% logQs(i-1) + ep% del_logQ
          end do
          ep% logQs(ep% num_logQs) = ep% logQ_max
-         
+
          ep% logTs(1) = ep% logT_min
          do i = 2, ep% num_logTs-1
             ep% logTs(i) = ep% logTs(i-1) + ep% del_logT
@@ -324,22 +324,22 @@
                return
             end if
          end if
-                  
+
          status = 0
          allocate(tbl2_1(num_eos_file_vals*ep% num_logQs*ep% num_logTs), STAT=status)
          if (status .ne. 0) then
             info = -1
             return
          end if
-         
+
          tbl2(1:num_eos_file_vals,1:ep% num_logQs,1:ep% num_logTs) =>  &
                tbl2_1(1:num_eos_file_vals*ep% num_logQs*ep% num_logTs)
 
          do iQ=1,ep% num_logQs
-         
+
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
-                        
+
             read(io_unit,'(a)',iostat=info) message
             if (info == 0) call str_to_double(message, vec(1), info)
             if (failed('read logQ')) return
@@ -347,12 +347,12 @@
 
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
-            
+
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
-            
+
             do i=1,ep% num_logTs
-            
+
                read(io_unit,'(a)',iostat=info) message
                if (failed('read line')) then
                   write(*,'(a)') trim(message)
@@ -362,7 +362,7 @@
                   write(*,*) 'bad input line?'
                   call mesa_error(__FILE__,__LINE__)
                end if
-               
+
                call str_to_vector(message, vec, n, info)
                if (info /= 0 .or. n < 1+num_eos_file_vals) then
                   write(*,'(a)') trim(message)
@@ -376,25 +376,25 @@
                do j=1,num_eos_file_vals
                   tbl2(j,iQ,i) = vec(1+j)
                end do
-               
+
             enddo
-            
+
             if(iQ == ep% num_logQs) exit
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
-            
+
          end do
-            
+
          close(io_unit)
-         
+
          call Make_XEoS_Interpolation_Data(ep, tbl2_1, info)
          deallocate(tbl2_1)
          if (failed('Make_XEoS_Interpolation_Data')) return
-         
+
          call Check_XEoS_Interpolation_Data(ep)
-         
+
          if (.not. use_cache) return
 
          open(unit=cache_io_unit, &
@@ -412,10 +412,10 @@
             close(cache_io_unit)
             if(use_mesa_temp_cache) call mv(temp_cache_filename, cache_filename,.true.)
          end if
-         
-         
+
+
          contains
-         
+
          subroutine Check_XEoS_Interpolation_Data(ep)
             use utils_lib,only:is_bad
             type (EosDT_XZ_Info), pointer :: ep
@@ -434,17 +434,17 @@
                end do
             end do
          end subroutine Check_XEoS_Interpolation_Data
-         
+
          logical function failed(str)
             character (len=*), intent(in) :: str
             failed = (info /= 0)
             if (failed) write(*,*) 'Load1_eosDT_Table failed: ' // trim(str)
          end function failed
-         
+
 
       end subroutine Load1_eosDT_Table
-      
-      
+
+
       subroutine Make_XEoS_Interpolation_Data(ep, tbl2_1, info)
          use interp_2d_lib_db
          use const_def, only: crad, ln10
@@ -473,13 +473,13 @@
          real(dp) :: gamma3, gamma1, grad_ad, Prad, E, S
          integer :: iQ, jtemp, ilogT, ilogQ
          real(dp) :: fval(num_eos_file_vals), df_dx(num_eos_file_vals), df_dy(num_eos_file_vals)
-         
+
          real(dp) :: x, y, dlnT, energy, lnE, entropy, lnS, Pgas, lnPgas, dlogT, &
             dlnPgas_dlnd, dlnE_dlnd, dlnS_dlnd, dlnPgas_dlnT, dlnE_dlnT, dlnS_dlnT
-         
+
          integer :: v, vlist(3), var, i, j, num_logQs, num_logTs, ii, jj
          character (len=256) :: message
-         
+
          include 'formats'
 
          info = 0
@@ -489,22 +489,22 @@
          ibcxmax = 0; bcxmax(:) = 0
          ibcymin = 0; bcymin(:) = 0
          ibcymax = 0; bcymax(:) = 0
-         
+
          num_logQs = ep% num_logQs
          num_logTs = ep% num_logTs
-         
+
          ep_tbl(1:sz_per_eos_point,1:nv,1:num_logQs,1:num_logTs) =>  &
                ep% tbl1(1:sz_per_eos_point*nv*num_logQs*num_logTs)
 
          tbl2(1:num_eos_file_vals,1:num_logQs,1:num_logTs) =>  &
                tbl2_1(1:num_eos_file_vals*num_logQs*num_logTs)
-         
+
          allocate(f1_ary(sz_per_eos_point * ep% num_logQs * ep% num_logTs))
-         
+
          f1 => f1_ary
          f(1:sz_per_eos_point,1:num_logQs,1:num_logTs) => &
                f1_ary(1:sz_per_eos_point*num_logQs*num_logTs)
-         
+
          do iQ = 1, ep% num_logQs
             logQs(iQ) = ep% logQ_min + (iQ-1) * ep% del_logQ
          end do
@@ -512,7 +512,7 @@
          do jtemp = 1, ep% num_logTs
             logTs(jtemp) = ep% logT_min + (jtemp-1) * ep% del_logT
          end do
-         
+
          ! copy file eos variables to internal eos interpolation tables
          do j=1,num_logTs
             do i=1,num_logQs
@@ -532,11 +532,11 @@
                   ! to protect against non-monotonic interpolation caused by extreme values
                ep_tbl(1,i_gamma1,i,j) = tbl2(jgamma1,i,j)
                ep_tbl(1,i_gamma3,i,j) = tbl2(jgamma3,i,j)
-               ep_tbl(1,i_eta,i,j) = tbl2(jeta,i,j)  
-            end do             
+               ep_tbl(1,i_eta,i,j) = tbl2(jeta,i,j)
+            end do
          end do
 
-         ! create tables for bicubic spline interpolation         
+         ! create tables for bicubic spline interpolation
          do v = 1, nv
             do i=1,ep% num_logQs
                do j=1,ep% num_logTs
@@ -561,11 +561,11 @@
                end do
             end do
          end do
-         
-         
+
+
       end subroutine Make_XEoS_Interpolation_Data
-      
-      
+
+
       subroutine Read_EoS_Cache(X, Z, ep, cache_filename, io_unit, ios)
          real(dp), intent(in) :: X, Z
          type (EosDT_XZ_Info), pointer :: ep
@@ -577,19 +577,19 @@
                logQ_min_in, logQ_max_in, del_logQ_in
          integer :: num_logQs_in, num_logTs_in, version_in
          real(dp), parameter :: tiny = 1d-10
-         
+
          include 'formats'
-         
+
          ios = 0
          open(unit=io_unit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
          if (ios /= 0) return
-         
+
          read(io_unit, iostat=ios)  &
                X_in, Z_in, num_logTs_in, logT_min_in, logT_max_in, del_logT_in,  &
                num_logQs_in, logQ_min_in, logQ_max_in, del_logQ_in, version_in
          if (ios /= 0) return
-         
+
          if (ep% version /= version_in) then
             ios = 1
             write(*,*) 'read cache failed for version_in'
@@ -597,7 +597,7 @@
          if (ep% num_logQs /= num_logQs_in) then
             ios = 1
             write(*,*) 'read cache failed for ep% num_logQs'
-         end if 
+         end if
          if (ep% num_logTs /= num_logTs_in) then
             ios = 1
             write(*,*) 'read cache failed for ep% num_logTs'
@@ -613,19 +613,19 @@
          if (abs(ep% logT_min-logT_min_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for eos_logT_min'
-         end if    
+         end if
          if (abs(ep% logT_max-logT_max_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for eos_logT_max'
-         end if    
+         end if
          if (abs(ep% del_logT-del_logT_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for eos_del_logT'
-         end if    
+         end if
          if (abs(ep% logQ_min-logQ_min_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for eos_logQ_min'
-         end if    
+         end if
          if (abs(ep% logQ_max-logQ_max_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for eos_logQ_max'
@@ -634,7 +634,7 @@
             ios = 1
             write(*,*) 'read cache failed for eos_del_logQ'
          end if
-         
+
          if (ios /= 0) then
             close(io_unit); return
          end if
@@ -645,10 +645,10 @@
          if (ios /= 0) then
             close(io_unit); return
          end if
-         
+
          close(io_unit)
 
       end subroutine Read_EoS_Cache
-      
-      
+
+
       end module eosDT_load_tables

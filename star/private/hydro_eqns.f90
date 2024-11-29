@@ -106,7 +106,7 @@
          do_chem = (do_mix .or. s% do_burn)
 
          call unpack
-         
+
          ! set flags indicating the variables currently in use
          do_dlnd_dt = (i_dlnd_dt > 0 .and. i_dlnd_dt <= nvar)
          do_dv_dt = (i_dv_dt > 0 .and. i_dv_dt <= nvar)
@@ -165,7 +165,7 @@
                return
             end if
          end if
-            
+
 !$OMP PARALLEL DO PRIVATE(op_err,k) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             s% dblk(:,:,k) = 0
@@ -283,7 +283,7 @@
             end if
          end do
 !$OMP END PARALLEL DO
-         
+
          if (ierr == 0 .and. nzlo == 1) then
             call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
             if (ierr /= 0) then
@@ -296,7 +296,7 @@
             if (s% report_ierr) write(*,*) 'ierr in eval_equ_for_solver'
             return
          end if
-         
+
          if (.false. .and. s% model_number == 2) then !  .and. .not. s% doing_relax) then
             if (.false.) then
                i = s% i_dv_dt
@@ -313,7 +313,7 @@
             call mesa_error(__FILE__,__LINE__,'after dump_equ')
          end if
 
-         
+
          contains
 
          subroutine dump_equ
@@ -416,7 +416,7 @@
             ! some EOSes have composition partials and some do not
             ! those currently without dx partials are PC & Skye & ideal
             frac_without_dxa = s% eos_frac_PC(k) + s% eos_frac_Skye(k) + s% eos_frac_ideal(k)
-            
+
             if (debug .and. k == s% solver_test_partials_k) then
               write(*,2) 's% eos_frac_PC(k)', k, s% eos_frac_PC(k)
               write(*,2) 's% eos_frac_Skye(k)', k, s% eos_frac_Skye(k)
@@ -469,13 +469,13 @@
                         res, dres_dlnd, dres_dlnT, dres_dxa, ierr)
                      if (is_bad(res(i_lnPgas))) ierr = -1
                      if (ierr /= 0) then
-                        
+
                         ! punt silently for now
                         s% dlnE_dxa_for_partials(:,k) = 0d0
                         s% dlnPeos_dxa_for_partials(:,k) = 0d0
                         ierr = 0
                         return
-                        
+
                         if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
                         return
                      end if
@@ -574,7 +574,7 @@
 
          lnR_expected = log(rp13 + dr3)/3d0
          lnR_actual = wrap_lnR_00(s,k)
-         
+
          resid_ad = lnR_actual - lnR_expected
          s% equ(s% i_dlnd_dt, k) = resid_ad%val
 
@@ -583,16 +583,16 @@
          end if
 
          call save_eqn_residual_info( &
-            s, k, nvar, s% i_dlnd_dt, resid_ad, 'do1_density_eqn', ierr)           
+            s, k, nvar, s% i_dlnd_dt, resid_ad, 'do1_density_eqn', ierr)
 
-         if (test_partials) then   
+         if (test_partials) then
             s% solver_test_partials_var = 0
             s% solver_test_partials_dval_dx = 0
             write(*,*) 'do1_density_eqn', s% solver_test_partials_var
          end if
 
       end subroutine do1_density_eqn
-      
+
 
       subroutine do1_w_div_wc_eqn(s, k, nvar, ierr)
          use hydro_rotation
@@ -608,9 +608,9 @@
             jrot_ratio, sigmoid_jrot_ratio
          logical :: test_partials
          include 'formats'
-         
+
          ierr = 0
-         
+
          !test_partials = (k == s% solver_test_partials_k-1)
          test_partials = .false.
 
@@ -651,17 +651,17 @@
          s% equ(i_equ_w_div_wc, k) = resid_ad% val
 
          call save_eqn_residual_info( &
-            s, k, nvar, i_equ_w_div_wc, resid_ad, 'do1_w_div_wc_eqn', ierr)           
+            s, k, nvar, i_equ_w_div_wc, resid_ad, 'do1_w_div_wc_eqn', ierr)
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_w_div_wc
             s% solver_test_partials_dval_dx = 1d0
             write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
          end if
-         
+
       end subroutine do1_w_div_wc_eqn
-      
-      
+
+
       subroutine do1_dj_rot_dt_eqn(s, k, nvar, ierr)
          use hydro_rotation
          use star_utils, only: save_eqn_residual_info
@@ -673,7 +673,7 @@
          type(auto_diff_real_star_order1) :: resid_ad, jrot00, djrot_dt, F00, Fm1, flux_diff
          logical :: test_partials
          include 'formats'
-         
+
          ierr = 0
 
          !test_partials = (k == s% solver_test_partials_k)
@@ -702,7 +702,7 @@
          s% equ(i_dj_rot_dt, k) = resid_ad% val
 
          call save_eqn_residual_info( &
-            s, k, nvar, i_dj_rot_dt, resid_ad, 'do1_dj_rot_dt_eqn', ierr)           
+            s, k, nvar, i_dj_rot_dt, resid_ad, 'do1_dj_rot_dt_eqn', ierr)
 
          !if (test_partials) then
          !   s% solver_test_partials_val = s% i_rot(k)
@@ -713,7 +713,7 @@
          !   s% solver_test_partials_dval_dx = s% di_rot_dlnR(k)
          !   write(*,*) 'do1_w_div_wc_eqn', s% solver_test_partials_var
          !end if
-         
+
       end subroutine do1_dj_rot_dt_eqn
 
 
@@ -736,7 +736,7 @@
          include 'formats'
 
          !test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
-         test_partials = .false.         
+         test_partials = .false.
          ierr = 0
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
@@ -747,11 +747,11 @@
 
          if(s% drag_coefficient > 0) then
             ! We dont call expected_non_HSE_term with k==1 unless we call set_momentum_BC
-            ! so lets initilize this to zero, then if we dont call set_momentum_BC we have a 
+            ! so lets initilize this to zero, then if we dont call set_momentum_BC we have a
             ! sensible value here.
-            s% dvdt_drag(1) = 0 
+            s% dvdt_drag(1) = 0
          end if
-         
+
          need_P_surf = .false.
          if (s% use_compression_outer_BC) then
             call set_compression_BC(ierr)
@@ -763,29 +763,29 @@
             call set_momentum_BC(ierr)
          else if (s% use_fixed_vsurf_outer_BC) then
             call set_fixed_vsurf_outer_BC(ierr)
-         else 
+         else
             need_P_surf = .true.
          end if
          if (ierr /= 0) return
 
          need_T_surf = .false.
          if ((.not. do_equL) .or. &
-               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then 
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then
             ! no Tsurf BC
          else
             need_T_surf = .true.
          end if
          if (ierr /= 0) return
-         
+
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
-         
+
          offset_T_to_cell_center = .true.
          if (s% use_other_surface_PT .or. s% RSP2_flag) &
             offset_T_to_cell_center = .false.
 
          call get_PT_bc_ad(ierr)
          if (ierr /= 0) return
-         
+
          if (need_P_surf) then
             if (s% use_momentum_outer_BC) then
                call set_momentum_BC(ierr)
@@ -795,7 +795,7 @@
             if (ierr /= 0) return
          end if
 
-         if (need_T_surf) then       
+         if (need_T_surf) then
             call set_Tsurf_BC(ierr)
             if (ierr /= 0) return
          end if
@@ -811,7 +811,7 @@
          end if
 
          contains
-         
+
          subroutine get_PT_bc_ad(ierr) ! set P_bc_ad and T_bc_ad
             use hydro_vars, only: set_Teff_info_for_eqns
             use chem_def
@@ -832,7 +832,7 @@
             logical, parameter :: skip_partials = .false.
             include 'formats'
             ierr = 0
-         
+
             call set_Teff_info_for_eqns(s, skip_partials, &
                need_P_surf, need_T_surf, r, L, Teff, &
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
@@ -848,7 +848,7 @@
             ! P_surf and T_surf are at outer boundary of cell 1
             P_surf = exp(lnP_surf)
             T_surf = exp(lnT_surf)
-            
+
             s% P_surf = P_surf
             s% T_surf = T_surf
 
@@ -858,13 +858,13 @@
                dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(r))
             if (offset_T_to_cell_center) &
                dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
-         
+
             P_bc = P_surf + dP0
             T_bc = T_surf + dT0
 
             lnP_bc = log(P_bc)
             lnT_bc = log(T_bc)
-         
+
             if (is_bad(P_bc)) then
                write(*,1) 'lnP_bc', lnP_bc
                write(*,1) 'P_bc', P_bc
@@ -874,7 +874,7 @@
                write(*,1) 'r', r
                call mesa_error(__FILE__,__LINE__,'P bc')
             end if
-         
+
             if (is_bad(T_bc)) then
                write(*,1) 'lnT_bc', lnT_bc
                write(*,1) 'T_bc', T_bc
@@ -883,17 +883,17 @@
                write(*,1) 'lnT_surf', lnT_surf
                call mesa_error(__FILE__,__LINE__,'T bc')
             end if
-            
+
             dP0_dlnR = 0
             if (offset_P_to_cell_center) then ! include partials of dP0
                dP0_dlnR = -4*dP0
             end if
-            
+
             dT0_dlnR = 0
             dT0_dlnT = 0
             dT0_dlnd = 0
             dT0_dL = 0
-            if (offset_T_to_cell_center) then ! include partials of dT0         
+            if (offset_T_to_cell_center) then ! include partials of dT0
                d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
                d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
                d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
@@ -993,7 +993,7 @@
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
-            
+
          end subroutine get_PT_bc_ad
 
 
@@ -1006,7 +1006,7 @@
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
-            ierr = 0  
+            ierr = 0
             if (s% RSP2_flag) then ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
@@ -1015,7 +1015,7 @@
                T4_00_actual = pow4(wrap_T_00(s,1))
                resid_ad = T4_00_expected/T4_00_actual - 1d0
             else
-               lnT1_ad = wrap_lnT_00(s,1)            
+               lnT1_ad = wrap_lnT_00(s,1)
                resid_ad = lnT_bc_ad/lnT1_ad - 1d0
             end if
             residual = resid_ad%val
@@ -1030,7 +1030,7 @@
                s% solver_test_partials_val = 0
             end if
             call save_eqn_residual_info( &
-               s, 1, nvar, s% i_equL, resid_ad, 'set_Tsurf_BC', ierr)           
+               s, 1, nvar, s% i_equL, resid_ad, 'set_Tsurf_BC', ierr)
             if (test_partials) then
                s% solver_test_partials_var = 0
                s% solver_test_partials_dval_dx = 0
@@ -1038,7 +1038,7 @@
             end if
          end subroutine set_Tsurf_BC
 
- 
+
          subroutine set_Psurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
@@ -1046,34 +1046,34 @@
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
-            ierr = 0           
-            lnP1_ad = wrap_lnPeos_00(s,1)            
+            ierr = 0
+            lnP1_ad = wrap_lnPeos_00(s,1)
             resid_ad = lnP_bc_ad/lnP1_ad - 1d0
             s% equ(i_P_eqn, 1) = resid_ad%val
             if (test_partials) then
                s% solver_test_partials_val = 0
             end if
             call save_eqn_residual_info( &
-               s, 1, nvar, i_P_eqn, resid_ad, 'set_Psurf_BC', ierr)           
+               s, 1, nvar, i_P_eqn, resid_ad, 'set_Psurf_BC', ierr)
             if (test_partials) then
                s% solver_test_partials_var = 0
                s% solver_test_partials_dval_dx = 0
                write(*,*) 'set_Psurf_BC', s% solver_test_partials_var
             end if
          end subroutine set_Psurf_BC
-         
+
 
          subroutine set_momentum_BC(ierr)
             use hydro_riemann, only: do_surf_Riemann_dudt_eqn
             use hydro_momentum, only: do_surf_momentum_eqn
             integer, intent(out) :: ierr
             include 'formats'
-            ierr = 0            
+            ierr = 0
             if (s% u_flag) then
                call do_surf_Riemann_dudt_eqn(s, P_bc_ad, nvar, ierr)
             else
                call do_surf_momentum_eqn(s, P_bc_ad, nvar, ierr)
-            end if            
+            end if
          end subroutine set_momentum_BC
 
 
@@ -1084,15 +1084,15 @@
             include 'formats'
             ! gradient of compression vanishes fixes density for cell 1
                ! d_dt(1/rho(1)) = d_dt(1/rho(2))  e.g., Grott, Chernigovski, Glatzel, 2005.
-            ierr = 0            
+            ierr = 0
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
             dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
             dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
-            resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt            
-            s% equ(i_P_eqn, 1) = resid_ad%val     
+            resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt
+            s% equ(i_P_eqn, 1) = resid_ad%val
             call save_eqn_residual_info( &
-               s, 1, nvar, i_P_eqn, resid_ad, 'set_compression_BC', ierr)           
+               s, 1, nvar, i_P_eqn, resid_ad, 'set_compression_BC', ierr)
          end subroutine set_compression_BC
 
 
@@ -1109,11 +1109,11 @@
                ierr = -1
                write(*,*) 'set_fixed_vsurf_outer_BC requires u_flag or v_flag true'
                return
-            end if 
+            end if
             resid_ad = (vsurf - s% fixed_vsurf)/s% csound_start(1)
             s% equ(i_P_eqn,1) = resid_ad%val
             call save_eqn_residual_info( &
-               s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)           
+               s, 1, nvar, i_P_eqn, resid_ad, 'set_fixed_vsurf_outer_BC', ierr)
          end subroutine set_fixed_vsurf_outer_BC
 
 

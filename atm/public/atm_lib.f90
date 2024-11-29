@@ -27,7 +27,7 @@
 module atm_lib
 
   ! Uses
-  
+
   use const_def, only: dp
 
   use atm_utils, only: &
@@ -51,7 +51,7 @@ module atm_lib
 
   use atm_irradiated, only: &
        atm_eval_irradiated => eval_irradiated
-  
+
   ! No implicit typing
 
   implicit none
@@ -102,6 +102,6 @@ contains
     real(dp), intent(in) :: L, R
     atm_black_body_T = pow(L / (4d0*pi*R*R*boltz_sigma), 0.25d0)
   end function atm_black_body_T
- 
+
 end module atm_lib
 

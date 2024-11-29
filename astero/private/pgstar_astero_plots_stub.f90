@@ -22,18 +22,18 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module pgstar_astero_plots
       use star_lib
       use star_def
       use star_pgstar
 
       implicit none
-         
+
 
       contains
-      
-      
+
+
       subroutine astero_pgstar_plots_info(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -52,7 +52,7 @@
 
 
       end module pgstar_astero_plots
-      
-      
-      
-      
+
+
+
+

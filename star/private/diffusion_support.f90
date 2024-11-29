@@ -33,7 +33,7 @@
 
       implicit none
 
-      
+
       real(dp), parameter :: Xlim = 1d-14
       real(dp), parameter :: tiny_mass = 1d3 ! a kilogram
       real(dp), parameter :: tinyX = 1d-50
@@ -55,7 +55,7 @@
             g_ap, g_at, g_ar, g_ax, g_field_face, &
             v_advection_face, v_total_face, vlnP_face, vlnT_face, v_rad_face, &
             GT_face, D_self_face, AD_face, SIG_face, sigma_lnC, ierr)
-         
+
          type (star_info), pointer :: s
          integer, intent(in) :: &
             nz, nc, m, nzlo, nzhi, ih1, ihe4
@@ -78,7 +78,7 @@
             vlnP_face, vlnT_face, v_rad_face, GT_face, e_ax, g_ax, D_self_face
          real(dp), dimension(:,:,:), intent(out) :: SIG_face, sigma_lnC
          integer, intent(out) :: ierr
-         
+
          integer :: i, j, k, op_err
          real(dp) :: tmp, tinyX, dlamch, sfmin, &
             AD_dm_full_on, AD_dm_full_off, AD_boost_factor, sum_dm, &
@@ -87,12 +87,12 @@
          real(dp), dimension(m) :: C_face, Z_face, dC_dr_face
          real(dp), dimension(nc) :: total_diffusion_factor
          real(dp) :: dlnne_dr_face
-         
+
          include 'formats'
-         
+
          ierr = 0
-         sfmin = dlamch('S')  
-            
+         sfmin = dlamch('S')
+
          tinyX = 1d-50
          do k=nzlo,nzhi
             do j=1,nc
@@ -104,14 +104,14 @@
                C(j,k) = X(j,k)*C_div_X(j,k)
             end do
             C(m,k) = 1d0
-            X(m,k) = A(m)/dot_product(A(1:nc),C(1:nc,k)) 
+            X(m,k) = A(m)/dot_product(A(1:nc),C(1:nc,k))
          end do
-         
+
          Vlimit_dm_full_on = s% diffusion_Vlimit_dm_full_on*Msun
          Vlimit_dm_full_off = s% diffusion_Vlimit_dm_full_off*Msun
          Vlimit = s% diffusion_Vlimit
 
-         
+
 !$OMP PARALLEL DO PRIVATE(k, j, i, total_diffusion_factor, op_err, C_face, Z_face, dC_dr_face, dlnne_dr_face, tmp) SCHEDULE(dynamic,2)
 
          do k = nzlo+1, nzhi
@@ -126,12 +126,12 @@
             else
                total_diffusion_factor(1:nc) = diffusion_factor(1:nc)
             end if
-            
+
             call get1_CXZn_face( &
                k, nz, nc, m, nzlo, nzhi, C, X, Z, A, alfa_face, tiny_C, &
                four_pi_r2_rho_face(k)/dm_bar(k), dlnRho_dr_face(k), &
                C_face, X_face, Z_face, C_div_X_face, dC_dr_face, dlnne_dr_face)
-            
+
             op_err = 0
             call get1_coeffs_face( &
                s, k, nz, nc, m, nzlo, nzhi, ih1, ihe4, pure_Coulomb, &
@@ -191,21 +191,21 @@
                   v_total_face(i,k) = v_total_face(i,k) - sigma_lnC(i,j,k)*dC_dr_face(j)/C_face(j)
                end do
             end do
-            
+
          end do
 
 !$OMP END PARALLEL DO
 
          if (ierr /= 0) return
          sum_dm = cell_dm(nzlo)
-         
+
          AD_dm_full_on = s% diffusion_AD_dm_full_on*Msun
          AD_dm_full_off = s% diffusion_AD_dm_full_off*Msun
          AD_boost_factor = s% diffusion_AD_boost_factor
-         
+
          SIG_factor = s% diffusion_SIG_factor
          GT_factor = s% diffusion_GT_factor
-         
+
          !write(*,1) 'GT_factor SIG_factor', GT_factor, SIG_factor
 
          do k = nzlo+1, nzhi
@@ -230,7 +230,7 @@
             end if
             sum_dm = sum_dm + cell_dm(k)
          end do
-         
+
          do j=1,nc ! not used, but copy just for sake of plotting
             D_self_face(j,nzlo) = D_self_face(j,nzlo+1)
             v_advection_face(j,nzlo) = v_advection_face(j,nzlo+1)
@@ -243,10 +243,10 @@
                SIG_face(i,j,nzlo) = SIG_face(i,j,nzlo+1)
             end do
          end do
-                              
+
       end subroutine get_matrix_coeffs
-      
-      
+
+
       subroutine get1_coeffs_face( &
             s, k, nz, nc, m, nzlo, nzhi, ih1, ihe4, pure_Coulomb, &
             rho_face, T_face, gamma_T_limit_coeff_face, &
@@ -261,7 +261,7 @@
             e_ap, e_at, e_ar, e_ax, &
             g_ap, g_at, g_ar, g_ax, &
             sigma_lnC, ierr)
-            
+
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nc, m, nzlo, nzhi, ih1, ihe4
          logical, intent(in) :: pure_Coulomb
@@ -273,7 +273,7 @@
               dlnRho_dr_face, grav, dlnne_dr_face
          real(dp), intent(in), dimension(:) :: &
             A, X_face, Z_face, C_face, C_div_X_face, &
-            rad_accel_face, diffusion_factor 
+            rad_accel_face, diffusion_factor
          logical, intent(in) :: use_cgs_solver, rad
          real(dp), intent(in) :: eta, eta_on, eta_off
          real(dp), intent(inout), dimension(:) :: &
@@ -282,19 +282,19 @@
          real(dp), intent(inout) :: e_ax(:), g_ax(:) ! (m)
          real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
          integer, intent(out) :: ierr
-         
+
          real(dp), dimension(m) :: AP, AT, AR
          real(dp), dimension(m,m) :: kappa_st, Zdiff, Zdiff1, Zdiff2, AX
-         
+
          include 'formats'
-         
+
          ierr = 0
-            
+
          call get1_burgers_coeffs( &
             s, k, nc, m, A, Z_face, X_face, C_face, &
             rho_face, T_face, pure_Coulomb, &
             kappa_st, Zdiff, Zdiff1, Zdiff2)
-         
+
          call get1_gradient_coeffs( &
             k, m, sfmin, A, Z_face, X_face, C_face, rho_face, T_face, &
             use_cgs_solver, eta, eta_on, eta_off, &
@@ -304,7 +304,7 @@
             g_ap, g_at, g_ar, g_ax, &
             ierr)
          if (ierr /= 0) return
-         
+
          call get1_diffusion_velocities( &
             k, nc, m, nzlo, nzhi, AP, AT, AR, AX, rho_face, T_face, &
             dlnP_dr_face, dlnT_dr_face, dlnRho_dr_face, &
@@ -312,11 +312,11 @@
             Vlimit_dm_full_on, Vlimit_dm_full_off, Vlimit, xm_face, r_mid, s% dt, &
             gamma_T_limit_coeff_face, v_advection_max, diffusion_factor, &
             use_cgs_solver, &
-            v_advection_face, vlnP_face, vlnT_face, v_rad_face, sigma_lnC)  
-         
+            v_advection_face, vlnP_face, vlnT_face, v_rad_face, sigma_lnC)
+
       end subroutine get1_coeffs_face
 
-            
+
       subroutine get1_CXZn_face( &
             k, nz, nc, m, nzlo, nzhi, C, X, Z, A, alfa_face, tiny_C, &
             d_dr_factor, dlnRho_dr_face, C_face, X_face, Z_face, C_div_X_face, &
@@ -366,14 +366,14 @@
          dlnne_dr_face = dlnRho_dr_face + dlntmp_dr_face
 
       end subroutine get1_CXZn_face
-      
-      
+
+
       subroutine get1_burgers_coeffs( &
             s, k, nc, m, A, Z, X, C, rho, T, pure_Coulomb, &
             kappa_st, Zdiff, Zdiff1, Zdiff2)
-         
+
          use paquette_coeffs, only: paquette_coefficients
-         
+
          type (star_info), pointer :: s
          integer, intent(in) :: k, nc, m
          real(dp), intent(in) :: rho, T
@@ -388,22 +388,22 @@
          real(dp), dimension(m,m) :: cl, Ath, Ddiff, Kdiff, Kdiff2
          real(dp) :: Gamma, kappa_SM
          real(dp) :: Ddiff_Caplan(nc)
-            
+
          do i = 1, nc
             charge(i) = max(1d0, Z(i)) ! assume some ionization
          end do
          charge(m) = Z(m)
-         
+
          if (.not. pure_Coulomb) then ! use Paquette coeffs
             ! Get number densities (per cm^3)
             do i = 1, nc
-               na(i) = rho*X(i)/(A(i)*amu)   
+               na(i) = rho*X(i)/(A(i)*amu)
             end do
             na(m) = 0.d0
             do i = 1, nc
                na(m) = na(m) + charge(i)*na(i)
             end do
-            ! Compute resistance coefficients from Paquette&al (1986)   
+            ! Compute resistance coefficients from Paquette&al (1986)
             call paquette_coefficients( &
                rho, T, m, A, charge, na, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
 
@@ -438,22 +438,22 @@
 
             ! Unit conversion conveniently applies to both Paquette and Stanton&Murillo
             kappa_st(:,:) = Kdiff(:,:)/(1.41D-25*pow(T,-1.5D0)*na(m)*na(m))
-               ! = kappa_st of eq 37, Thoul&al 1994 
+               ! = kappa_st of eq 37, Thoul&al 1994
             return
          end if
-         
+
          ! calculate density of electrons (ne) from mass density (rho):
          ac=0.d0
          do i=1, m
             ac=ac+a(i)*c(i)
-         end do   
-         ne=rho/(mp*ac) 
-         ! calculate interionic distance (ao): 
+         end do
+         ne=rho/(mp*ac)
+         ! calculate interionic distance (ao):
          ni=0.d0
          do i=1, nc
             ni=ni+c(i)*ne
          end do
-         ao=pow(0.23873d0/ni,one_third) 
+         ao=pow(0.23873d0/ni,one_third)
          ! calculate debye length (lambdad):
          cz=0.d0
          do i=1, m
@@ -481,7 +481,7 @@
                      c(i)*c(j)*charge(i)*charge(i)*charge(j)*charge(j)
             end do
          end do
-         
+
       end subroutine get1_burgers_coeffs
 
 
@@ -504,7 +504,7 @@
          real(dp), intent(inout) :: e_ap, e_at, e_ar, e_ax(:) ! (m)
          real(dp), intent(inout) :: g_ap, g_at, g_ar, g_ax(:) ! (m)
          integer, intent(out) :: ierr
-           
+
          integer :: i, j
          real(dp) :: charge(m), nd(m), Kdiff(m,m), alfa, beta
 
@@ -513,11 +513,11 @@
          real(dp) :: e_ap1, e_at1, e_ar1, e_ax1(m)
          real(dp) :: AP2(m), AT2(m), AR2(m), AX2(m,m)
          real(dp) :: e_ap2, e_at2, e_ar2, e_ax2(m)
-         
+
          include 'formats'
-         
+
          ierr = 0
-            
+
          do i=1,m-1
             charge(i) = max(1d0, Z(i))
          end do
@@ -530,7 +530,7 @@
                nd(i) = rho*X(i)/(A(i)*amu)
                nd(m) = nd(m) + nd(i)*charge(i) ! Electron Number Density satisfies charge neutrality
             end do
-            
+
             Kdiff(:,:) = kappa_st(:,:)*(1.41D-25*pow(T,-1.5D0)*nd(m)*nd(m))
 
             if(eta < eta_on) then
@@ -546,7 +546,7 @@
                ! Call both and do a linear blend of all coefficients.
                alfa = (eta - eta_on)/(eta_off - eta_on) ! alfa = 1 means no thermal diffusion.
                beta = 1d0 - alfa ! beta = 1 means full thermal diffusion.
-               
+
                call solve_burgers_cgs_no_thermal(m+1,m,A,charge,nd,rad_accel,rad, &
                     Kdiff,AP1,AT1,AR1,AX1, &
                     e_ap1,e_at1,e_ar1,e_ax1,ierr)
@@ -570,7 +570,7 @@
                !    print *, "Thermal diffusion changing temperature coefficient by more than factor of two."
                !    print *, "Relative difference: ", abs((AT1(3) - AT2(3))/AT1(3))
                ! end if
-               
+
                ! Blending between the two solutions.
                do i = 1,m
                   AP(i) = alfa*AP1(i) + beta*AP2(i)
@@ -592,7 +592,7 @@
             g_at = 0d0
             g_ar = 0d0
             g_ax(1:m) = 0d0
-            
+
             if (ierr /= 0) then
                !return
                write(*,2) 'solve_burgers_cgs failed', k
@@ -620,10 +620,10 @@
             end if
          end if
 
-         
+
       end subroutine get1_gradient_coeffs
-      
-      
+
+
       subroutine get1_diffusion_velocities( &
             k, nc, m, nzlo, nzhi, AP, AT, AR, AX, rho, T, &
             dlnP_dr, dlnT_dr, dlnRho_dr, grav, dlnne_dr, X_face, &
@@ -641,14 +641,14 @@
          logical, intent(in) :: use_cgs_solver
          real(dp), intent(inout), dimension(:) :: vgt, vlnP, vlnT, vrad
          real(dp), intent(inout) :: sigma_lnC(:,:) ! (nc,nc)
-         
+
          integer :: i, j, im
          real(dp) :: coef, coef_vrad, dv_im, dr, T2pt5, &
             vcross, vmax, vmax_limit, frac, alfa, beta
          real(dp) :: tau0  ! = 6d13*secyer, solar diffusion time (seconds)
          real(dp), parameter :: rho_unit = 1d2
          real(dp), parameter :: T_unit = 1d7
-         
+
          include 'formats'
 
          if (limit_coeff <= 0) then
@@ -656,7 +656,7 @@
             sigma_lnC(:,:) = 0
             return
          end if
-         
+
          dr = r_mid(k-1) - r_mid(k)
          vcross = dr/dt
          if (xm_face >= Vlimit_dm_full_off .or. Vlimit <= 0d0) then
@@ -673,7 +673,7 @@
             beta = 1d0 - alfa ! fraction of normal v when it is > vmax
             vmax_limit = vcross*Vlimit/alfa ! Want to scale to no limit at alfa = 0
          end if
-         
+
          if(use_cgs_solver) then ! Converts coefficients to velocities
             ! assuming cgs routine.
             do i=1,nc
@@ -685,14 +685,14 @@
                vrad(i) = AR(i)*diffusion_factor(i)*limit_coeff ! AR already contains all constants.
                vgt(i) = vlnP(i) + vlnT(i) + vrad(i)
             end do
-            
+
             do i = 1,nc
                ! Converting from Iben/MacDonald notation to Thoul
                ! notation using electron number density gradient.
                vgt(i) = vgt(i) - dlnne_dr*sum(sigma_lnC(i,1:nc))
                if (X_face(i) < 1d-15) vgt(i) = 0d0
             end do
-            
+
          else ! converts coefficients to velocities assuming Thoul.
             tau0 = 6d13*secyer
             T2pt5 = pow(T/T_unit,2.5d0)
@@ -716,12 +716,12 @@
                if (X_face(i) < 1d-15) vgt(i) = 0d0
             end do
          end if
-         
+
          ! final fixup for vgt of most abundant so it gives baryon conservation.
          im = maxloc(X_face(1:nc),dim=1)
          dv_im = -dot_product(X_face(1:nc), vgt(1:nc))/X_face(im)
          vgt(im) = vgt(im) + dv_im
-         
+
          vmax = maxval(abs(vgt(1:nc)))
          if (vmax > v_advection_max) then
             frac = v_advection_max/vmax
@@ -749,10 +749,10 @@
                end do
             end do
          end if
-         
+
       end subroutine get1_diffusion_velocities
-      
-      
+
+
       subroutine get1_flow_coeffs( &
             k, nc, m, &
             v_advection_face, v_advection_max, SIG_factor, GT_factor, &
@@ -767,21 +767,21 @@
          real(dp), intent(inout) :: GT_face(:) ! (nc)
          real(dp), intent(inout) :: D_self_face(:) ! (nc)
          real(dp), intent(inout) :: SIG_face(:,:) ! (nc,nc)
-         
+
          integer :: i, j
          real(dp) :: c
-         
+
          include 'formats'
 
          c = SIG_factor*four_pi_r2_rho_face*four_pi_r2_rho_face/dm_bar
          do i = 1, nc
             GT_face(i) = GT_factor*four_pi_r2_rho_face*v_advection_face(i)
-            D_self_face(i) = sigma_lnC_face(i,i)  
+            D_self_face(i) = sigma_lnC_face(i,i)
             do j = 1, nc
                SIG_face(i,j) = c*sigma_lnC_face(i,j)/C_div_X_face(j)
             end do
          end do
-         
+
       end subroutine get1_flow_coeffs
 
 
@@ -794,10 +794,10 @@
 !*************************************************************
 ! This routine inverses the burgers equations.
 !
-! The system contains N equations with N unknowns. 
-! The equations are: the M momentum equations, 
-!                    the M energy equations, 
-!                    two constraints: the current neutrality 
+! The system contains N equations with N unknowns.
+! The equations are: the M momentum equations,
+!                    the M energy equations,
+!                    two constraints: the current neutrality
 !                                     the zero fluid velocity.
 ! The unknowns are: the M diffusion velocities,
 !                   the M heat fluxes,
@@ -812,7 +812,7 @@
    ! if alpha is the r.h.s., we obtain the coefficient A_p
    ! if nu    ---------------------------------------- A_T
    ! if gamma(i,j) ----------------------------------- A_Cj
-   ! 
+   !
    ! If I=1, we obtain the hydrogen diffusion velocity
    ! If I=2, ------------- helium   ------------------
    ! If I=3,M-1, --------- heavy element -------------
@@ -834,14 +834,14 @@
          ! the parameter m is the number of fluids considered (ions+electrons)
          ! the parameter n is the number of equations (2*m+2).
          !
-         ! the vectors a,z and x contain the atomic mass numbers, 
+         ! the vectors a,z and x contain the atomic mass numbers,
          ! the charges (ionization), and the mass fractions, of the elements.
          ! note: since m is the electron fluid, its mass and charge must be
          !      a(m)=m_e/m_u
          !      z(m)=-1.
          !
          ! the array cl contains the values of the coulomb logarithms.
-         ! the vector ap, at, and array ax contains the results for the diffusion 
+         ! the vector ap, at, and array ax contains the results for the diffusion
          ! coefficients.
 
          integer, intent(in) :: m,n
@@ -867,20 +867,20 @@
          ! the vector c contains the concentrations
          ! cc is the total concentration: cc=sum(c_s)
          ! ac is proportional to the mass density: ac=sum(a_s c_s)
-         ! the arrays xx,y,yy and k are various parameters which appear in 
+         ! the arrays xx,y,yy and k are various parameters which appear in
          ! burgers equations.
          ! the vectors and arrays alpha, nu, gamma, delta, and ga represent
-         ! the "right- and left-hand-sides" of burgers equations, and later 
+         ! the "right- and left-hand-sides" of burgers equations, and later
          ! the diffusion coefficients.
-      
+
          ! initialize:
 
          ierr = 0
-         ko = 2d0  
+         ko = 2d0
          indx(1:n) = 0
 
          ! calculate cc and ac:
-      
+
          cc=sum(c(1:m))
          ac=dot_product(a(1:m),c(1:m))
 
@@ -896,7 +896,7 @@
          end do
 
          ! write the burgers equations and the two constraints as
-         ! alpha_s dp + nu_s dt + sum_t(not ihe or m) gamma_st dc_t 
+         ! alpha_s dp + nu_s dt + sum_t(not ihe or m) gamma_st dc_t
          !                     = sum_t delta_st w_t
 
          do i=1,m
@@ -904,7 +904,7 @@
             nu(i)=0d0
             gamma(i,1:n)=0d0
             if (rad) then
-               beta(i) = -(amu/boltzm)*alpha(i)*a(i)*rad_accel(i)  
+               beta(i) = -(amu/boltzm)*alpha(i)*a(i)*rad_accel(i)
             else
                beta(i) = 0d0
             end if
@@ -916,28 +916,28 @@
                end if
             end do
          end do
-      
+
          do i=m+1,n-2
             alpha(i)=0d0
             nu(i)=2.5d0*c(i-m)/cc
             beta(i) = 0d0
             gamma(i,1:n)=0d0
          end do
-      
+
          alpha(n-1)=0d0
          nu(n-1)=0d0
          beta(n-1)=0d0
          gamma(n-1,1:n)=0d0
-      
+
          alpha(n)=0d0
          nu(n)=0d0
          beta(n)=0d0
          gamma(n,1:n)=0d0
-      
+
          delta(1:n,1:n) = 0d0
-      
+
          do i=1,m
-         
+
             do j=1,m
                if (j == i) then
                   do l=1,m
@@ -949,7 +949,7 @@
                   delta(i,j)=k(i,j)
                end if
             end do
-         
+
             do j=m+1,n-2
                if (j-m == i) then
                   do l=1,m
@@ -960,15 +960,15 @@
                   delta(i,j) = -Zdiff(i,j-m)*y(i,j-m)*k(i,j-m)
                end if
             end do
-         
+
             delta(i,n-1)=c(i)*z(i)
-         
+
             delta(i,n)=-c(i)*a(i)
-            
+
          end do
-      
+
          do i=m+1,n-2
-         
+
             do j=1,m
                if (j == i-m) then
                   do l=1,m
@@ -979,7 +979,7 @@
                   delta(i,j) = -(2.5d0*Zdiff(i-m,j))*xx(i-m,j)*k(i-m,j)
                end if
             end do
-         
+
             do j=m+1,n-2
                if (j-m == i-m) then
                   do l=1,m
@@ -992,35 +992,35 @@
                         (3D0 + Zdiff1(i-m,j-m) - 0.8D0*Zdiff2(i-m,j-m))
                end if
             end do
-         
+
             delta(i,n-1:n)=0d0
-            
+
          end do
-      
+
          do j=1,m
             delta(n-1,j) = c(j)*z(j)
          end do
          delta(n-1,m+1:n) = 0d0
-      
+
          do j=1,m
             delta(n,j) = c(j)*a(j)
          end do
          delta(n,m+1:n) = 0d0
-         
+
          call dgetrf(n, n, delta, n, indx, ierr)
          if (ierr /= 0) return
-      
+
          call dgetrs( 'n', n, 1, delta, n, indx, alpha, n, ierr )
          if (ierr /= 0) return
-      
+
          call dgetrs( 'n', n, 1, delta, n, indx, nu, n, ierr )
          if (ierr /= 0) return
-      
+
          if (rad) then
             call dgetrs( 'n', n, 1, delta, n, indx, beta, n, ierr )
             if (ierr /= 0) return
          end if
-      
+
          do j=1,n
             do i=1,n
                ga(i)=gamma(i,j)
@@ -1031,7 +1031,7 @@
                gamma(i,j)=ga(i)
             end do
          end do
-         
+
          f = ko*ac*cc
          do j=1,m
             ap(j)=alpha(j)*f
@@ -1041,7 +1041,7 @@
                ax(i,j)=gamma(i,j)*f
             end do
          end do
-         
+
          e_ap=alpha(n-1)*f
          g_ap=alpha(n)*f
 
@@ -1050,7 +1050,7 @@
 
          e_ar=beta(n-1)*f
          g_ar=beta(n)*f
-         
+
          do i=1,m
             e_ax(i)=gamma(n-1,i)*f
             g_ax(i)=gamma(n,i)*f
@@ -1065,7 +1065,7 @@
            n, m, A, Z, nd, rad_accel, rad, &
            Kdiff, ap, at, ar, ax, &
            e_ap, e_at, e_ar, e_ax, ierr)
-        
+
         ! nd = array of number densities
         ! m = # of species including electrons
         ! n = m+1 without thermal diffusion
@@ -1074,7 +1074,7 @@
         !                          2 conservation equations.
         !   Thermal diffusion  on: 2m diffusion equations (maybe 2*m-1)
         !                          2 conservation equations.
-        
+
         integer, intent(in) :: m,n
         real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel ! (m)
         logical, intent(in) :: rad
@@ -1104,7 +1104,7 @@
         e_at = 0d0
         e_ar = 0d0
         e_ax(1:m) = 0d0
-        
+
         ! Assign the RHS Matrix multiplying the unkown quantities.
         ! Right now this is for thermal diffusion off, assuming gravity
         ! is a known, so there are m uknown diffusion velocities and
@@ -1161,7 +1161,7 @@
            ! print *, "Factoring failed!"
            return
         end if
-        
+
         call dgetrs('N',n,1,delta,n,indx,alpha,n,ierr)
         if( ierr /= 0 ) then
            ! print *, "solve failed on alpha"
@@ -1183,7 +1183,7 @@
         else
            beta(1:n) = 0d0
         end if
-        
+
         do j=1,n
            do i=1,n
               ga(i) = gamm(i,j)
@@ -1197,10 +1197,10 @@
               gamm(i,j) = ga(i)
            end do
         end do
-                
+
         ! Assign the results of the matrix solve to the output
         ! arrays/matrix.
-        
+
         do j = 1,m
            ap(j) = alpha(j)
            at(j) = nu(j)
@@ -1209,14 +1209,14 @@
               ax(i,j) = gamm(i,j)
            end do
         end do
-        
+
         e_ap = alpha(n)
         e_at = nu(n)
         e_ar = beta(n)
         do i=1,m
            e_ax(i) = gamm(n,i)
         end do
-        
+
       end subroutine solve_burgers_cgs_no_thermal
 
 
@@ -1225,7 +1225,7 @@
            Kdiff, zdiff, zdiff1, zdiff2, &
            ap, at, ar, ax, &
            e_ap, e_at, e_ar, e_ax, ierr)
-        
+
         ! nd = array of number densities
         ! m = # of species including electrons
         ! n = 2*m+1 with thermal diffusion
@@ -1240,7 +1240,7 @@
         ! there is degeneracy. Having it in this form makes it easier to transition
         ! between ideal gas (where this solver is valid) and solve_burgers_cgs
         ! (which is much better when things are degenerate).
-        
+
         integer, intent(in) :: m,n
         real(dp), intent(in), dimension(:) :: A, Z, nd, rad_accel ! (m)
         logical, intent(in) :: rad
@@ -1275,7 +1275,7 @@
         ! by making block matrices and then shifting them into the proper position.
         ! This makes the comparisons for checking the subdiagonals easier, as well
         ! as indexing of the coefficients.
-        rightshift = m 
+        rightshift = m
         downshift = m-1 ! Because electron momentum equation dropped.
 
         ! Assign the RHS Matrix multiplying the unkown quantities.
@@ -1300,7 +1300,7 @@
               end if
            end do
 
-           ! Terms that multiply the heat flow vectors. 
+           ! Terms that multiply the heat flow vectors.
            do j = 1,m
               if (j == i) then
                  do l = 1,m
@@ -1320,7 +1320,7 @@
 
         ! Terms corresponding to the energy equations.
         do i = 1,m ! All these entries get shifted lower into the i+downshift position.
-           
+
            ! Terms that multiply the diffusion velocities.
            do j = 1,m
               if (j == i) then
@@ -1355,7 +1355,7 @@
                       A(i)*A(j)/pow2(A(i)+A(j))
               end if
            end do
-           
+
            ! Term multiplying the electric field. (doesn't appear in energy equations)
            delta(i+downshift,n) = 0d0
         end do
@@ -1400,7 +1400,7 @@
            ! print *, "Factoring failed!"
            return
         end if
-        
+
         call dgetrs('N',n,1,delta,n,indx,alpha,n,ierr)
         if( ierr /= 0 ) then
            ! print *, "solve failed on alpha"
@@ -1436,11 +1436,11 @@
               gamm(i,j) = ga(i)
            end do
         end do
-        
+
 
         ! Assign the results of the matrix solve from the diffusion
         ! velocity part of the arrays to the solution vectors.
-        
+
         do j = 1,m
            ap(j) = alpha(j)
            at(j) = nu(j)
@@ -1458,11 +1458,11 @@
         do i=1,m
            e_ax(i) = gamm(n,i)
         end do
-        
+
       end subroutine solve_burgers_cgs_with_thermal
 
 
-      
+
       ! Calculate coefficients given in Appendix C.3 of Stanton & Murillo, PR E 93, 043203 (2016)
       subroutine get_SM_coeffs(nc,m,rho,T,A,Z,nd,Kdiff,zdiff,zdiff1,zdiff2,kappa)
         integer, intent(in) :: nc, m
@@ -1624,7 +1624,7 @@
         ! touched the electron entries. They exit this routine unchanged, so they
         ! either need to be initialized before this routine is called or somehow
         ! calculated later.
-        
+
       end subroutine get_SM_coeffs
 
       ! Screening Length according to Stanton & Murillo
@@ -1699,15 +1699,15 @@
         do j = 1,nc
            Zp6bar = Zp6bar + pow(Z(j),0.6d0)*nd(j)/ni_sum
         end do
-        
+
         ! Set kappa as input for Dstar calculation,
         ! also sets omegap, ai, lam_e for converting to cgs units later.
         call kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
-        
+
         ! Calculate Dstar using fit of Eqn (5)
         call get_Dstar_OCP(Gamma,kappa,DstarOCP)
         Docp = DstarOCP*ai*ai*omegap ! convert from dimensionless to cgs units
-        
+
         ! Eqn (11)
         do j = 1,nc
            Ddiff(j) = Docp*pow(Z(j)/Zbar,-0.6d0)
@@ -1722,7 +1722,7 @@
         end do
 
       end subroutine get_CBF_coeffs
-      
+
       subroutine get_Dstar_OCP(Gamma,kappa,DstarOCP)
         real(dp), intent(in) :: Gamma, kappa
         real(dp), intent(out) :: DstarOCP
@@ -1733,16 +1733,16 @@
         a0 = 1.55973d0
         a1 = 1.10941d0
         a2 = 1.36909d0
-        
+
         b0 = 0.0070782d0
         b1 = 0.80499d0
         b2 = 4.53523d0
-        
+
         c0 = 2.20689d0
         c1 = 1.351594d0
         c2 = 1.57138d0
         c3 = 3.34187d0
-        
+
         Ak = sqrt(pi/3d0)*(a0 + a1*pow(kappa,a2))
         Bk = b0*exp(-b1*pow(kappa,b2))
         Ck = c0 + c1*bitsafe_erf_fit(c2*pow(kappa,c3))
@@ -1751,7 +1751,7 @@
         DstarOCP = sqrt(pi/3d0)*Ak*pow(Gamma,-2.5d0)*exp(-Bk*Gamma)/log(1d0 + Ck*pow(Gamma,-1.5d0)/sqrt(3d0))
 
       end subroutine get_Dstar_OCP
-      
+
       ! Screening Length for CBF diffusion coefficients.
       ! Only electron screening, accounts for potentially relativistic electron degeneracy.
       subroutine kappa_CBF(nc,m,rho,T,Abar,Zbar,nd,omegap,ai,lam_e,kappa)
@@ -1806,6 +1806,6 @@
 
         bitsafe_erf_fit = 1d0 - (a1*t + a2*t*t + a3*t*t*t)*exp(-x*x)
       end function bitsafe_erf_fit
-      
+
       end module diffusion_support
 

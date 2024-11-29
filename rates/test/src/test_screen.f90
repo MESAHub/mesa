@@ -25,11 +25,11 @@
 
 
 module test_screen
-   
+
    use rates_lib
    use rates_def
    use utils_lib, only: mesa_error
-   
+
    implicit none
 
    contains
@@ -40,7 +40,7 @@ module test_screen
       use chem_lib
       use const_lib
       use math_lib
-      
+
       integer, parameter :: num_isos = 8, max_z_to_cache = 12
       integer :: chem_id(num_isos), i1, i2, ierr
       integer, pointer :: net_iso(:)
@@ -52,24 +52,24 @@ module test_screen
       integer :: i
       integer :: h1, he3, he4, c12, n14, o16, ne20, mg24
       character (len=32) :: my_mesa_dir
-      
+
       include 'formats'
-      
+
       ierr = 0
-      my_mesa_dir = '../..'         
-      call const_init(my_mesa_dir,ierr)     
+      my_mesa_dir = '../..'
+      call const_init(my_mesa_dir,ierr)
       if (ierr /= 0) then
          write(*,*) 'const_init failed'
          call mesa_error(__FILE__,__LINE__)
-      end if        
+      end if
       call math_init()
-      
+
       call chem_init('isotopes.data', ierr)
       if (ierr /= 0) then
          write(*,*) 'chem_init failed'
          call mesa_error(__FILE__,__LINE__)
       end if
-      
+
       h1 = 1
       he3 = 2
       he4 = 3
@@ -78,11 +78,11 @@ module test_screen
       o16 = 6
       ne20 = 7
       mg24 = 8
-      
+
       allocate(net_iso(num_chem_isos))
-      
+
       net_iso = 0
-      
+
       net_iso(ih1)=h1; chem_id(h1) = ih1
       net_iso(ihe3)=he3; chem_id(he3) = ihe3
       net_iso(ihe4)=he4; chem_id(he4) = ihe4
@@ -91,7 +91,7 @@ module test_screen
       net_iso(io16)=o16; chem_id(o16) = io16
       net_iso(ine20)=ne20; chem_id(ne20) = ine20
       net_iso(img24)=mg24; chem_id(mg24) = img24
-   
+
                         logT =    7.7110722845770692D+00
                      logRho =    4.5306372623742392D+00
 
@@ -106,9 +106,9 @@ module test_screen
 
          i1 = ihe4
          i2 = ic12
-         
+
          if (.false.) then  ! TESTING
-               
+
                   xin = 0
                   xin(net_iso(ih1))=     0.72d0
                   xin(net_iso(ihe4))=     0.26d0
@@ -116,43 +116,43 @@ module test_screen
 
                   i1 = ih1
                   i2 = in14
-                  
+
                   write(*,1) 'sum(xin)', sum(xin(:))
-                  
+
                                  logT =    7d0
                               logRho =    1d0
-         
+
          end if
-      
+
       call composition_info( &
             num_isos, chem_id, xin, xh, xhe, xz, abar, zbar, z2bar, z53bar,  &
             ye, mass_correction, sumx, dabar_dx, dzbar_dx, dmc_dx)
-   
+
       iso_z(:) = chem_isos% Z(chem_id(:))
-      
+
       do i=1,num_isos
          iso_z158(i) = pow(real(chem_isos% Z(chem_id(i)),kind=dp),1.58d0)
       end do
       y(:) = xin(:)/chem_isos% Z_plus_N(chem_id(:))
-      
+
       call do1(salpeter_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       call do1(extended_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       call do1(chugunov_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       call do1(no_screening, ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       deallocate(net_iso)
 
       write(*,*) 'done'
-      
+
       contains
-      
+
       subroutine do1(sc_mode, ierr)
          use math_lib
          integer, intent(in) :: sc_mode
@@ -162,10 +162,10 @@ module test_screen
          call screening_option_str(sc_mode, sc_str, ierr)
          if (ierr /= 0) return
          write(*,*) trim(sc_str)
-      
+
          temp = exp10(logT)
          den = exp10(logRho)
-                     
+
          call screen_init_AZ_info( &
             chem_isos% W(i1), dble(chem_isos% Z(i1)),  &
             chem_isos% W(i2), dble(chem_isos% Z(i2)), &
@@ -200,8 +200,8 @@ module test_screen
          write(*,'(A)')
 
       end subroutine do1
-      
-   end subroutine do_test_screen 
+
+   end subroutine do_test_screen
 
    end module test_screen
 

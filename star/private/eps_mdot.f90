@@ -101,14 +101,14 @@
          ! (vec(j)-vec(j-1))/(dm-bar(j)),
          !
          ! where
-         ! 
+         !
          ! dm-bar(j) = (1/2)(dm(j-1) + dm(j)).
          !
          ! This is done because these finite differences are what
          ! MESA is using elsewhere, so in order to ensure consistency
          ! we want our interpolated vector to have derivatives consistent
          ! with these.
-         ! 
+         !
          ! When j == 1 we can't do this because we don't know vec(j-1), so
          ! we take vec(j-1) == vec(j) and return vec(1).
          ! When j == length(vec) + 1 we likewise need to assume vec(j-1) == vec(j)
@@ -365,7 +365,7 @@
          ! decremented from the excess.
          ! When the material reaches whatever cell it ends in (i == j) the excess is deposited
          ! in that cell. If material exits the star the excess it leaves with is accounted for
-         ! in mdot_adiabatic_surface. 
+         ! in mdot_adiabatic_surface.
 
 
 
@@ -419,10 +419,10 @@
                      ! counting that contribution is accounted for in the loop
                      ! at the end of leak_frac.
                      accumulated(i) = accumulated(i) + excess(j)
-                     excess(j) = 0                    
+                     excess(j) = 0
                   else if (i == i_end .and. i == 1 .and. j == 0) then
                      ! Material with j == 0 exits the star. Note that this implies direction == -1.
-                     ! For i > 1 this material can be handled by the 'just passing through' else 
+                     ! For i > 1 this material can be handled by the 'just passing through' else
                      ! clause, so we only need to think about the i == 1 case.
 
                      ! Because this material isn't in the star at the end, we have to account
@@ -464,7 +464,7 @@
          type (star_info), pointer :: s
          real(dp) :: dt
          integer :: ierr
-         
+
          ! Intermediates
          logical, parameter :: dbg = .false.
          integer :: nz, j
@@ -491,7 +491,7 @@
             s% total_energy_after_adjust_mass = 0d0
             return
          end if
-         
+
          s% need_to_setvars = .true.
 
          ! Stellar properties
@@ -505,7 +505,7 @@
          call find_mass_flux(nz, change_in_dm, mass_flux)
 
          ! Tabulate cell intersection widths between the new mesh and the old
-         allocate(mesh_intersects(2*nz))               
+         allocate(mesh_intersects(2*nz))
          allocate(ranges(2*nz,2))
          call make_compressed_intersect(dm, prev_mesh_dm, nz, mesh_intersects, ranges)
 
@@ -514,7 +514,7 @@
          allocate(density_weighted_flux(nz+1))
          density_weighted_flux(nz+1) = 0
          do j=nz,1,-1
-            density_weighted_flux(j) = density_weighted_flux(j+1) + change_in_dm(j) / s%rho(j) 
+            density_weighted_flux(j) = density_weighted_flux(j+1) + change_in_dm(j) / s%rho(j)
          end do
 
          ! We attribute eps_mdot evenly to all of the mass which is at any point within a cell.
@@ -550,9 +550,9 @@
          !$OMP PARALLEL DO
          do j=1,nz+1
             ! We use the previous mesh for interpolation because that's the one for which our derivatives were calculated.
-            p_bar(j) = interpolate_onto_faces(s%Peos, prev_mesh_dm, nz, j) 
-            rho_bar(j) = interpolate_onto_faces(s%rho, prev_mesh_dm, nz, j) 
-            te_bar(j) = interpolate_onto_faces(te, prev_mesh_dm, nz, j) 
+            p_bar(j) = interpolate_onto_faces(s%Peos, prev_mesh_dm, nz, j)
+            rho_bar(j) = interpolate_onto_faces(s%rho, prev_mesh_dm, nz, j)
+            te_bar(j) = interpolate_onto_faces(te, prev_mesh_dm, nz, j)
          end do
          !$OMP END PARALLEL DO
 

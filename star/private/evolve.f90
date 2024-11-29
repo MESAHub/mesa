@@ -28,7 +28,7 @@
       use star_private_def
       use const_def
       use star_utils
- 
+
       implicit none
 
       private
@@ -48,19 +48,19 @@
          type (star_info), pointer :: s
          integer :: ierr
          include 'formats'
-         
+
          do_evolve_step_part1 = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
          if (s% trace_evolve) write(*,'(/,a)') 'start evolve step'
-         
+
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
             call mesa_error(__FILE__,__LINE__,'do_evolve_step_part1')
          end if
-         
+
          if (first_try .and. s% fill_arrays_with_NaNs .and. .not. s% RSP_flag) then
             if (mod(s% model_number, s% terminal_interval) == 0) &
                write(*,*) 'fill_arrays_with_NaNs at start of step'
@@ -69,7 +69,7 @@
             if (ierr /= 0) return
             call star_info_old_arrays(s, do_fill_arrays_with_NaNs, ierr)
             if (ierr /= 0) return
-         end if         
+         end if
          do_evolve_step_part1 = do_step_part1(id, first_try)
          s% total_step_attempts = s% total_step_attempts + 1
          if (s% doing_relax) &
@@ -83,10 +83,10 @@
             if (s% doing_relax) &
                s% total_relax_step_retries = s% total_relax_step_retries + 1
          end if
-         
+
          contains
-         
-         subroutine test_set_undefined  
+
+         subroutine test_set_undefined
             ! should include everything in star_data_step_work.inc
             ! may be missing some.  if so, please add them.
             use utils_lib, only: set_to_NaN
@@ -95,10 +95,10 @@
 
             s% nz_old = -999
             s% model_number_old = -999
-            s% prev_mesh_nz = -999   
+            s% prev_mesh_nz = -999
             s% num_conv_boundaries = -999
             s% num_mix_boundaries = -999
-            s% num_mix_regions = -999   
+            s% num_mix_regions = -999
             s% num_mixing_regions = -999
             s% n_conv_regions = -999
             s% atm_structure_num_pts = -999
@@ -122,12 +122,12 @@
             do j=1,max_num_mixing_regions
                call set_to_NaN(s% cz_top_mass_old(j))
                call set_to_NaN(s% cz_bot_mass_old(j))
-            end do      
+            end do
 
             do j=1,num_categories
                call set_to_NaN(s% L_by_category(j))
             end do
-            
+
             ! sorted to help remove duplicates
             call set_to_NaN(s% L_center_old)
             call set_to_NaN(s% L_for_BB_outer_BC)
@@ -163,15 +163,15 @@
             call set_to_NaN(s% dt_old)
             call set_to_NaN(s% dt_start)
             call set_to_NaN(s% dt_years)
-            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)               
+            call set_to_NaN(s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot)
             call set_to_NaN(s% error_in_energy_conservation)
             call set_to_NaN(s% explicit_mstar_dot)
             call set_to_NaN(s% gradT_excess_max_lambda)
             call set_to_NaN(s% gradT_excess_min_beta)
-            call set_to_NaN(s% h1_czb_mass)    
+            call set_to_NaN(s% h1_czb_mass)
             call set_to_NaN(s% initial_L_center)
             call set_to_NaN(s% initial_R_center)
-            call set_to_NaN(s% initial_timestep)   
+            call set_to_NaN(s% initial_timestep)
             call set_to_NaN(s% initial_v_center)
             call set_to_NaN(s% max_conv_time_scale)
             call set_to_NaN(s% max_residual)
@@ -210,7 +210,7 @@
             call set_to_NaN(s% surf_r_equatorial)
             call set_to_NaN(s% surf_rho)
             call set_to_NaN(s% surface_cell_specific_total_energy_old)
-            call set_to_NaN(s% tau_center)  
+            call set_to_NaN(s% tau_center)
             call set_to_NaN(s% time_days)
             call set_to_NaN(s% time_old)
             call set_to_NaN(s% time_step)
@@ -219,16 +219,16 @@
             call set_to_NaN(s% total_abs_angular_momentum)
             call set_to_NaN(s% total_angular_momentum)
             call set_to_NaN(s% total_angular_momentum_old)
-            call set_to_NaN(s% total_energy)           
-            call set_to_NaN(s% total_energy_after_adjust_mass)                
-            call set_to_NaN(s% total_energy_before_adjust_mass)          
-            call set_to_NaN(s% total_energy_change_from_mdot) 
-            call set_to_NaN(s% total_energy_end)                  
+            call set_to_NaN(s% total_energy)
+            call set_to_NaN(s% total_energy_after_adjust_mass)
+            call set_to_NaN(s% total_energy_before_adjust_mass)
+            call set_to_NaN(s% total_energy_change_from_mdot)
+            call set_to_NaN(s% total_energy_end)
             call set_to_NaN(s% total_energy_from_diffusion)
             call set_to_NaN(s% total_energy_from_phase_separation)
             call set_to_NaN(s% total_energy_old)
             call set_to_NaN(s% total_energy_sources_and_sinks)
-            call set_to_NaN(s% total_energy_start)           
+            call set_to_NaN(s% total_energy_start)
             call set_to_NaN(s% total_eps_grav)
             call set_to_NaN(s% total_eps_mdot)
             call set_to_NaN(s% total_extra_heating)
@@ -275,11 +275,11 @@
             call set_to_NaN(s% work_inward_at_center)
             call set_to_NaN(s% work_outward_at_surface)
             call set_to_NaN(s% xmstar_old)
-            
+
          end subroutine test_set_undefined
-         
+
       end function do_evolve_step_part1
-      
+
 
       integer function do_step_part1(id, first_try)
          use evolve_support, only: set_current_to_old
@@ -309,7 +309,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% termination_code = 0
          s% retry_message = ''
          s% doing_solver_iterations = .false.
@@ -321,8 +321,8 @@
          s% need_to_setvars = .true. ! always start fresh
          s% okay_to_set_mixing_info = .true. ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false. ! don't change mlt_vc until have set mlt_vc_old
-         
-         if (s% timestep_hold > s% model_number + 10000) then 
+
+         if (s% timestep_hold > s% model_number + 10000) then
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
             call mesa_error(__FILE__,__LINE__,'do_step_part1')
          end if
@@ -338,7 +338,7 @@
          if (failed('set_qs')) return
          call set_m_and_dm(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)
-         
+
          if (s% rotation_flag) then
             call set_cgrav(s, ierr)
             if (failed('set_cgrav')) return
@@ -353,7 +353,7 @@
             call set_rotation_info(s, .true., ierr)
             if (failed('set_rotation_info')) return
          end if
-         
+
          if (s% doing_first_model_of_run) then
             if (s% do_history_file) then
                if (first_try) then
@@ -397,9 +397,9 @@
                end if
             end if
          end if
-         
+
          call reset_epsnuc_vectors(s)
-         
+
          call set_current_to_old(s)
          do_step_part1 = prepare_for_new_try(s)
          if (do_step_part1 /= keep_going) then
@@ -407,7 +407,7 @@
                write(*,*) 'do_step_part1: prepare_for_new_try'
             return
          end if
-         
+
          call set_start_of_step_info(s, 'after prepare_for_new_try', ierr) ! does set_vars_if_needed
          if (failed('set_start_of_step_info')) return
 
@@ -415,7 +415,7 @@
             call set_cz_bdy_mass(s, ierr)
             if (failed('set_cz_bdy_mass')) return
          end if
-         
+
          if (s% RSP_flag) then
             s% mstar_dot = 0
             call rsp_total_energy_integrals(s, &
@@ -437,7 +437,7 @@
                s% total_turbulent_energy_old, &
                s% total_energy_old)
          end if
-                  
+
          s% surface_cell_specific_total_energy_old = cell_specific_total_energy(s,1)
 
          if (.not. s% have_initial_energy_integrals) then
@@ -534,7 +534,7 @@
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
-            
+
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
          real(dp) :: dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8
@@ -544,7 +544,7 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
+
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -562,15 +562,15 @@
          nz = s% nz
 
          call setup_for_implicit_mdot_loop
-        
+
       implicit_mdot_loop: do
-            
+
             dt = s% dt
             s% time = s% time_old + dt
             s% star_age = s% time/secyer
             s% okay_to_set_mixing_info = .true.
 
-            if (s% v_center /= 0d0) then ! adjust R_center               
+            if (s% v_center /= 0d0) then ! adjust R_center
                s% R_center = s% R_center_old + dt*s% v_center
                if (s% R_center < 0d0) then
                   write(*,2) 's% R_center', s% model_number, s% R_center
@@ -578,15 +578,15 @@
                   return
                end if
             end if
-      
+
             call set_vars_if_needed(s, dt, 'start of implicit_mdot_loop', ierr)
             if (failed('set_vars_if_needed start of implicit_mdot_loop')) return
 
-            if (s% RSP_flag) then      
-                  
+            if (s% RSP_flag) then
+
                call set_cgrav(s, ierr)
                if (failed('set_cgrav')) return
-                                  
+
             else
 
                call do_adjust_mass(s, s% species, ierr)
@@ -597,14 +597,14 @@
 
                call calculate_eps_mdot(s, dt, ierr)
                if (failed('calculate_eps_mdot')) return
-               
+
                if (s% mstar_dot /= 0d0) then
                   s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot = &
                      s% total_energy_after_adjust_mass - s% total_energy_before_adjust_mass
                else
                   s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot = 0d0
                end if
-               
+
                call set_vars_if_needed(s, dt, 'after calculate_eps_mdot', ierr)
                if (failed('set_vars_if_needed after calculate_eps_mdot')) return
 
@@ -624,7 +624,7 @@
                if(s% do_phase_separation) then
                   call do_phase_separation(s, dt, ierr)
                   if (failed('do_phase_separation')) return
-                  
+
                   call set_vars_if_needed(s, dt, 'after phase separation', ierr)
                   if (failed('set_vars_if_needed after phase separation')) return
                else
@@ -632,19 +632,19 @@
                end if
 
                s% okay_to_set_mixing_info = .false. ! no mixing changes in set_vars after this point
-               
+
                if (s% do_element_diffusion) then
                   call do_element_diffusion(s, dt, ierr)
                   if (failed('do_element_diffusion')) return
                   call set_vars_if_needed(s, dt, 'after element diffusion', ierr)
                   if (failed('set_vars_if_needed after element diffusion')) return
-                  call finish_element_diffusion(s,dt) ! calculates eps_diffusion from energy changes                  
+                  call finish_element_diffusion(s,dt) ! calculates eps_diffusion from energy changes
                   if (.false.) then
                      write(*,1) 'dt*dm*eps_diffusion/total_energy_old', &
                         dt*dot_product(s% dm(1:s% nz), s% eps_diffusion(1:s% nz))/s% total_energy_old
                   end if
                end if
-            
+
             end if
 
             if (s% rotation_flag .and. s% premix_omega .and. .not. s% j_rot_flag) then
@@ -655,24 +655,24 @@
                call set_vars_if_needed(s, dt, 'after do_solve_omega_mix', ierr)
                if (failed('after do_solve_omega_mix')) return
             end if
-            
+
             if (s% use_other_pressure) then
                call s% other_pressure(s% id, ierr)
                if (failed('other_pressure returned ierr')) return
             end if
             call set_vars_if_needed(s, dt, 'after other_pressure', ierr)
             if (failed('set_vars_if_needed after other_pressure')) return
-            
+
             call check_for_extra_heat(s, ierr)
             if (failed('check_for_extra_heat')) return
             call set_vars_if_needed(s, dt, 'after check_for_extra_heat', ierr)
             if (failed('set_vars_if_needed after check_for_extra_heat')) return
-            
+
             if (.not. s% have_new_cz_bdy_info) then
                call set_cz_bdy_mass(s, ierr)
                if (failed('set_cz_bdy_mass')) return
             end if
-            
+
             skip_global_corr_coeff_limit = (first_try .or. &
                 s% model_number_for_last_retry /= s% model_number) ! last alternative is for redo's
 
@@ -688,7 +688,7 @@
             if (do_step_part2 /= keep_going) return
             if (mdot_action == exit_loop) exit implicit_mdot_loop
             if (s% trace_evolve) write(*,*) 'cycle implicit_mdot_loop'
-            
+
          end do implicit_mdot_loop
 
          s% solver_iter = 0 ! to indicate that no longer doing solver iterations
@@ -699,7 +699,7 @@
             if (s% okay_to_set_mlt_vc .and. .not. s% have_mlt_vc) then
                s% have_mlt_vc = .true.
             end if
-            s% okay_to_set_mlt_vc = .false.         
+            s% okay_to_set_mlt_vc = .false.
          end if
 
          if (.not. okay_energy_conservation()) return
@@ -723,13 +723,13 @@
          call do_report(s, ierr)
          if (failed('do_report')) return
          call set_phase_of_evolution(s)
-            
+
          call system_clock(time0,clock_rate)
          s% current_system_clock_time = time0
          s% total_elapsed_time = &
             dble(time0 - s% starting_system_clock_time)/dble(clock_rate)
-         
-         
+
+
          contains
 
 
@@ -778,12 +778,12 @@
             end if
 
             abs_mstar_delta = 0
-         
+
             iwind_redo_cnt = 0
             iwind_max_redo_cnt = s% max_tries_for_implicit_wind
             iwind_tolerance = s% iwind_tolerance
-            iwind_lambda = s% iwind_lambda         
-            
+            iwind_lambda = s% iwind_lambda
+
          end subroutine setup_for_implicit_mdot_loop
 
 
@@ -791,12 +791,12 @@
             use hydro_rotation, only: set_surf_avg_rotation_info
             integer, intent(out) :: ierr
             include 'formats'
-            
+
             select_mdot_action = exit_loop
             if (s% mstar_dot == 0 .or. max_mdot_redo_cnt <= 0) return
                ! the test of max_mdot_redo_cnt <= 0 belongs here.  it was erroneously placed
                ! after possible select_mdot_action = cycle_loop, return.  BP: Apr 25, 2021.
-            
+
             if (iwind_redo_cnt < iwind_max_redo_cnt .and. iwind_lambda > 0d0) then
                ! check mdot calculated at end of step
                call get_phot_info(s, dummy1, dummy2, dummy3, ph_L, dummy4, dummy5, dummy6, dummy7, dummy8, ph_k)
@@ -827,13 +827,13 @@
                select_mdot_action = exit_loop
                return
             end if
-            
+
             ! check for omega > omega_crit
 
             mstar_dot_prev = mstar_dot
             mstar_dot = s% mstar_dot
             wind_mdot = -s% mstar_dot
-            
+
             if (mdot_redo_cnt == 1 .or. ignored_first_step) then
                ! this is the 1st correction to mdot
                r_phot = sqrt(s% L(1)/(pi*crad*clight*pow4(s% Teff)))
@@ -1112,7 +1112,7 @@
                sum_cell_dke, sum_cell_dpe, sum_cell_dL, sum_cell_ergs_error, sum_cell_others, &
                sum_cell_sources, sum_cell_terms, sum_cell_work, total_energy_from_pre_mixing,&
                total_energy_from_fixed_m_grav
-               
+
             include 'formats'
 
 
@@ -1165,16 +1165,16 @@
                   s% total_turbulent_energy_end, &
                   s% total_energy_end)
             end if
-               
+
             if (s% mstar_dot == 0d0) then
                s% total_energy_change_from_mdot = 0d0
                s% total_eps_mdot = 0d0
-            else 
+            else
                s% total_energy_change_from_mdot = &
                   s% mstar_dot*dt*s% surface_cell_specific_total_energy_old
                s% total_eps_mdot = dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
             end if
-               
+
             virial = 3*sum(s% dm(1:nz)*s% Peos(1:nz)/s% rho(1:nz))
             s% virial_thm_P_avg = virial
 
@@ -1184,7 +1184,7 @@
                write(*,2) 'u_flag energy accounting ignores total_eps_grav', s% model_number, s% total_eps_grav
                s% total_eps_grav = 0
             end if
-            
+
             ! notes from Adam:
             ! When there are mass changes the total energy of the model changes.
             ! We can split this change into three parts:
@@ -1193,7 +1193,7 @@
             ! 3. The mass in the model changes state. Near the surface matter changes to maintain the same rho(q) and T(q).
             !    Below the surface regions there is a transition region where the state interpolates between fixed-m and fixed-q.
             !    Still deeper the state is approximately maintained at fixed rho(m), T(m).
-            ! 
+            !
             ! Change (1) is accounted for entirely by the term s% total_energy_change_from_mdot.
             ! Change (2) is accounted for entirely by the term s% mdot_acoustic_surface.
             !
@@ -1206,7 +1206,7 @@
             ! state specified by the other_accreting_surface hook (if used). Matter not present in the model
             ! after adjust_mass is in a state calculated by comparing the thermal and mass-loss time-scales,
             ! and differences between this and the surface state are accounted for by the term mdot_adiabatic_surface.
-            ! 
+            !
             ! By adding eps_mdot, we cause a change in energy during the Newton iterations which
             ! cancels the change in (3). Thus eps_mdot does not enter into the energy *accounting*, just into
             ! the energy equation. A consequence of this is that the sum
@@ -1223,7 +1223,7 @@
                      associated(s% binary_other_torque))) then
                ! keep track of rotational kinetic energy
             end if
-            
+
             if (s% eps_nuc_factor == 0d0 .or. s% nonlocal_NiCo_decay_heat) then
                s% total_nuclear_heating = 0d0
             else if (s% op_split_burn) then
@@ -1240,7 +1240,7 @@
             else
                s% total_nuclear_heating = dt*dot_product(s% dm(1:nz), s% eps_nuc(1:nz))
             end if
-            
+
             if (s% RSP_flag) then
                s% total_non_nuc_neu_cooling = 0d0
                s% total_irradiation_heating = 0d0
@@ -1250,19 +1250,19 @@
                s% total_irradiation_heating = &
                   dt*dot_product(s% dm(1:nz), s% irradiation_heat(1:nz))
             end if
-            
+
             s% total_WD_sedimentation_heating = 0d0
             if (s% do_element_diffusion .and. s% do_WD_sedimentation_heating) then
                s% total_WD_sedimentation_heating = &
                   dt*dot_product(s% dm(1:nz), s% eps_WD_sedimentation(1:nz))
             end if
-            
+
             s% total_energy_from_diffusion = 0d0
             if (s% do_element_diffusion .and. s% do_diffusion_heating) then
                s% total_energy_from_diffusion = &
                   dt*dot_product(s% dm(1:nz), s% eps_diffusion(1:nz))
             end if
-            
+
             total_energy_from_pre_mixing = 0d0
             if (s% do_conv_premix) then
                total_energy_from_pre_mixing = &
@@ -1277,11 +1277,11 @@
 
             phase2_total_energy_from_mdot = &
                dt*dot_product(s% dm(1:nz), s% eps_mdot(1:nz))
-            
+
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)
 
             phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
-            
+
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
                      s% include_L_in_velocity_time_centering) then
@@ -1335,7 +1335,7 @@
                - s% total_non_nuc_neu_cooling &
                + s% total_irradiation_heating &
                + s% total_extra_heating &
-               - total_radiation & 
+               - total_radiation &
                - phase2_work
 
             s% total_energy_sources_and_sinks = &
@@ -1354,11 +1354,11 @@
                write(*,2) 'phase2_work', s% model_number, phase2_work
                write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
                write(*,2) 's% work_inward_at_center', s% model_number, s% work_inward_at_center
-               !write(*,2) '', s% model_number, 
-               !write(*,2) '', s% model_number, 
+               !write(*,2) '', s% model_number,
+               !write(*,2) '', s% model_number,
                call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
             end if
-  
+
             s% error_in_energy_conservation = &
                s% total_energy_end - (s% total_energy_old + s% total_energy_sources_and_sinks)
 
@@ -1399,9 +1399,9 @@
                write(*,2) 's% total_energy_end', s% model_number, s% total_energy_end
                write(*,2) 's% total_energy_sources_and_sinks', s% model_number, s% total_energy_sources_and_sinks
                write(*,'(A)')
-               
+
                if (trim(s% energy_eqn_option) == 'dedt') then
-                  
+
                   write(*,'(A)')
                   write(*,*) 'for debugging phase1_sources_and_sinks'
                   write(*,'(A)')
@@ -1422,7 +1422,7 @@
                   write(*,2) 's% mdot_adiabatic_surface', s% model_number, s% mdot_adiabatic_surface
                   write(*,2) 's% total_energy_change_from_mdot', s% model_number, s% total_energy_change_from_mdot
                   write(*,2) 'phase1_sources_and_sinks', s% model_number, phase1_sources_and_sinks
-                  write(*,*) 
+                  write(*,*)
                   write(*,2) 'energy_start - energy_old', s% model_number, s% total_energy_start - s% total_energy_old
                   write(*,2) 'err phase1_sources_and_sinks', s% model_number, &
                       s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks)
@@ -1430,12 +1430,12 @@
                      (s% total_energy_start - (s% total_energy_old + phase1_sources_and_sinks))/s% total_energy
                   write(*,'(A)')
                   write(*,'(A)')
-                  
-                  
-                  
+
+
+
                   write(*,*) 'for debugging phase2_sources_and_sinks'
                   write(*,'(A)')
-                  
+
                   write(*,2) 's% total_nuclear_heating', s% model_number, s% total_nuclear_heating
                   write(*,2) 's% total_non_nuc_neu_cooling', s% model_number, s% total_non_nuc_neu_cooling
                   write(*,2) 's% total_irradiation_heating', s% model_number, s% total_irradiation_heating
@@ -1453,7 +1453,7 @@
                   write(*,2) 'phase2_work', s% model_number, phase2_work
                   write(*,2) 'total_radiation', s% model_number, total_radiation
                   write(*,2) 's% non_epsnuc_energy_change_from_split_burn', s% model_number, &
-                     s% non_epsnuc_energy_change_from_split_burn 
+                     s% non_epsnuc_energy_change_from_split_burn
                   write(*,'(A)')
 
                   write(*,2) 's% work_outward_at_surface', s% model_number, s% work_outward_at_surface
@@ -1461,7 +1461,7 @@
                   write(*,2) 'L_surf', s% model_number, L_surf
                   write(*,2) 'L_center', s% model_number, s% L_center
                   write(*,'(A)')
-                  
+
                   sum_cell_dL = dt*dot_product(s% dm(1:nz), s% dL_dm(1:nz))
                   sum_cell_sources = dt*dot_product(s% dm(1:nz), s% energy_sources(1:nz))
                   sum_cell_others = dt*dot_product(s% dm(1:nz), s% energy_others(1:nz))
@@ -1475,7 +1475,7 @@
                      - sum_cell_detrb - sum_cell_dke - sum_cell_dpe - sum_cell_de
                   sum_cell_terms = -sum_cell_terms ! to make it the same sign as sum_cell_ergs_error
                   sum_cell_ergs_error = sum(s% ergs_error(1:nz))
-                  
+
                   expected_sum_cell_others = &
                      - total_energy_from_pre_mixing &
                      - s% total_energy_from_phase_separation &
@@ -1487,7 +1487,7 @@
                      - s% total_non_nuc_neu_cooling &
                      + s% total_irradiation_heating &
                      + s% total_extra_heating
-                  
+
                   !write(*,2) 'rel err sum all cell terms', s% model_number, &
                   !   (phase2_sources_and_sinks - &
                   !      (sum_cell_others + sum_cell_sources + sum_cell_dL + sum_cell_work))/s% total_energy
@@ -1502,7 +1502,7 @@
                   write(*,2) 'rel err sum_cell_work', s% model_number, &
                      (sum_cell_work - phase2_work)/s% total_energy, sum_cell_work, phase2_work
                   write(*,'(A)')
-                  
+
                   diff_total_internal_energy = &
                      s% total_internal_energy_end - s% total_internal_energy_start
                   diff_total_gravitational_energy = &
@@ -1513,7 +1513,7 @@
                   !   s% total_rotational_kinetic_energy_end - s% total_rotational_kinetic_energy_start
                   diff_total_turbulent_energy = &
                      s% total_turbulent_energy_end - s% total_turbulent_energy_start
-                     
+
                   write(*,2) 'phase2 rel err sum_cell_de', s% model_number, &
                      (sum_cell_de - diff_total_internal_energy)/s% total_energy, &
                      sum_cell_de, diff_total_internal_energy
@@ -1530,8 +1530,8 @@
                      (sum_cell_detrb - diff_total_turbulent_energy)/s% total_energy, &
                      sum_cell_detrb, diff_total_turbulent_energy
                   write(*,'(A)')
-                     
-                     
+
+
                   write(*,2) 'expected rel sum_cell_ergs_error', s% model_number, &
                      sum_cell_ergs_error/s% total_energy, &
                      sum_cell_ergs_error, s% total_energy
@@ -1544,7 +1544,7 @@
                      s% error_in_energy_conservation, s% total_energy
                   write(*,'(A)')
                end if
-               
+
                call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
 
             end if
@@ -1576,7 +1576,7 @@
                call mesa_error(__FILE__,__LINE__,'okay_energy_conservation')
                return
             end if
-                                    
+
             if (is_bad_num(s% cumulative_energy_error)) then
                write(*,2) 's% cumulative_energy_error', &
                   s% model_number, s% cumulative_energy_error
@@ -1611,7 +1611,7 @@
          type(star_info), pointer :: s
          integer :: k, j
          include 'formats'
-         
+
          return
 
          if (.not. s% rotation_flag) return
@@ -1626,7 +1626,7 @@
                   s% xa(j,k), s% abar(k)
          !end do
       end subroutine debug
-         
+
 
       subroutine check_for_extra_heat(s, ierr)
          use hydro_vars, only: set_vars
@@ -1650,7 +1650,7 @@
          do k=1,nz
             s% extra_heat(k) = s% extra_power_source
          end do
-         
+
          if (s% use_other_energy) then
             call s% other_energy(s% id, ierr)
             if (ierr /= 0) then
@@ -1695,7 +1695,7 @@
          end if
 
          if (s% inject_until_reach_model_with_total_energy <= s% total_energy_initial &
-               .or. dt <= 0d0 .or. s% total_mass_for_inject_extra_ergs_sec <= 0d0) return         
+               .or. dt <= 0d0 .or. s% total_mass_for_inject_extra_ergs_sec <= 0d0) return
 
          start_time = s% start_time_for_inject_extra_ergs_sec
          if (s% time < start_time) return
@@ -1710,11 +1710,11 @@
             end_time = s% max_age*secyer
          end if
          if (s% time_old > end_time) return
-         
+
          target_injection_ergs = &
             s% inject_until_reach_model_with_total_energy - s% total_energy_initial
          target_injection_time = end_time - start_time
-         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time 
+         s% inject_extra_ergs_sec = target_injection_ergs/target_injection_time
          left_to_inject = &
             s% inject_until_reach_model_with_total_energy - s% total_energy_old
          qp1 = 0d0
@@ -1746,7 +1746,7 @@
             end if
             qp1 = q00
          end do
-         
+
       end subroutine check_for_extra_heat
 
 
@@ -1772,12 +1772,12 @@
 
          if (.not. s% RSP_flag) then
             call set_vars_if_needed(s, s% dt, str, ierr)
-            if (failed('set_vars_if_needed')) return     
+            if (failed('set_vars_if_needed')) return
             s% edv(1:s% species, 1:s% nz) = 0
             call set_luminosity_by_category(s)
             s% total_angular_momentum = total_angular_momentum(s)
             call do_report(s, ierr)
-            if (failed('do_report ierr')) return     
+            if (failed('do_report ierr')) return
          end if
 
          ! save a few things from start of step that will need later
@@ -1791,7 +1791,7 @@
          s% surf_rho = s% rho(1)
          s% prev_Ledd = eval_Ledd(s,ierr)
          if (failed('eval_Ledd ierr')) return
-         
+
          if (.not. s% RSP_flag) then
             call set_gradT_excess_alpha(s, ierr)
             if (failed('set_gradT_excess_alpha ierr')) return
@@ -1892,11 +1892,11 @@
                if (prepare_for_new_step /= keep_going) return
             end if
          end if
-         
+
          call set_vars_if_needed(s, s% dt_next, 'prepare_for_new_step', ierr)
          if (failed('set_vars_if_needed ierr')) return
          call set_phot_info(s) ! this sets Teff and other stuff
-         
+
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
          s% generations = 2
@@ -1916,9 +1916,9 @@
                   .and. s% max_age_in_days > 0) then
             s% dt_next = max(0d0, s% max_age_in_days*secday - s% time)
          end if
-         
+
          s% dt = s% dt_next
-            
+
          force_timestep_min = s% force_timestep_min
          if (force_timestep_min == 0) &
             force_timestep_min = secyer*s% force_timestep_min_years
@@ -1926,15 +1926,15 @@
             s% dt = min(s% dt*s% force_timestep_min_factor, force_timestep_min)
             write(*,2) 'force increase in timestep', s% model_number, s% dt
          end if
-         
+
          force_timestep = s% force_timestep
          if (force_timestep == 0) &
             force_timestep = secyer*s% force_timestep_years
          if (force_timestep > 0) s% dt = force_timestep
-         
+
          s% dt_start = s% dt
          s% time_step = s% dt/secyer
-         
+
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
             call mesa_error(__FILE__,__LINE__,'prepare_for_new_step')
@@ -1976,7 +1976,7 @@
          if (s% restore_mesh_on_retry &
             .and. s% model_number_for_last_retry > s% model_number - s% num_steps_to_hold_mesh_after_retry) return
          s% need_to_setvars = .true.
-         if (s% doing_timing) call start_time(s, time0, total)        
+         if (s% doing_timing) call start_time(s, time0, total)
          if (s% use_split_merge_amr) then
             do_mesh = remesh_split_merge(s) ! sets s% need_to_setvars = .true. if changes anything
             if (do_mesh /= keep_going .and. s% report_ierr) &
@@ -2013,7 +2013,7 @@
          s% termination_code = 0
          s% solver_iter = 0
          s% solver_adjust_iter = 0
-         
+
          s% model_number = s% model_number_old + 1
 
          prepare_for_new_try = keep_going
@@ -2023,9 +2023,9 @@
          s% termination_code = 0
          s% solver_iter = 0
          s% solver_adjust_iter = 0
-         
+
          if (.not. s% RSP_flag) then
-         
+
             screening = get_screening_mode(s,ierr)
             if (ierr /= 0) then
                write(*,*) 'bad value for screening_mode ' // trim(s% screening_mode)
@@ -2053,15 +2053,15 @@
          pick_next_timestep = terminate
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% RSP_flag) then
             pick_next_timestep = keep_going
             s% dt_next = s% RSP_dt
             s% dt_next_unclipped = s% dt_next
             s% why_Tlim = Tlim_max_timestep
             return
-         end if         
-         
+         end if
+
          if (s% trace_evolve) write(*,'(/,a)') 'pick_next_timestep'
 
          if (s% max_years_for_timestep > 0) then
@@ -2172,8 +2172,8 @@
             return
          end if
          prepare_to_redo = keep_going
-         if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_redo'         
-         call set_current_to_old(s)         
+         if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_redo'
+         call set_current_to_old(s)
          s% need_to_setvars = .true.
       end function prepare_to_redo
 
@@ -2191,7 +2191,7 @@
             prepare_to_retry = terminate
             return
          end if
-         
+
          s% need_to_setvars = .true.
 
          if (s% restore_mesh_on_retry .and. .not. s% RSP_flag) then
@@ -2212,9 +2212,9 @@
                s% nz_old = s% prev_mesh_nz
             end if
          end if
-         
+
          if (s% trace_evolve) write(*,'(/,a)') 'prepare_to_retry'
-         
+
          s% retry_cnt = s% retry_cnt + 1
          if (s% retry_limit > 0 .and. s% retry_cnt > s% retry_limit) then
             s% dt_start = sqrt(s% dt*s% dt_start)
@@ -2260,7 +2260,7 @@
          end if
 
          call set_current_to_old(s)
-         
+
          s% num_retries = s% num_retries+1
          if (s% num_retries > s% max_number_retries .and. s% max_number_retries >= 0) then
             write(*,2) 'num_retries', s% num_retries

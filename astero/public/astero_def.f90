@@ -30,20 +30,20 @@
       use math_lib
       use utils_lib
       use star_pgstar
-      
+
       implicit none
-      
+
       ! oscillation code results
-      
+
       integer :: num_results
       integer, pointer, dimension(:) :: el, order, em
       real(dp), pointer, dimension(:) :: inertia, cyclic_freq, growth_rate
-      real(dp) :: total_time_in_oscillation_code 
+      real(dp) :: total_time_in_oscillation_code
 
-         
+
       ! interfaces for procedure pointers
       abstract interface
-      
+
          subroutine other_proc_interface(id, ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr
@@ -58,24 +58,24 @@
             real(dp), intent(in) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
             integer, intent(out) :: ierr
          end subroutine other_adipls_mode_info_interface
-         
+
       end interface
-      
+
       type astero_info
-      
+
          procedure(other_proc_interface), pointer, nopass :: &
             other_after_get_chi2 => null()
-            
+
          procedure(other_adipls_mode_info_interface), pointer, nopass :: &
             other_adipls_mode_info => null()
-            
+
       end type astero_info
-      
+
       type (astero_info), save :: astero_other_procs
-      
+
       logical :: use_other_after_get_chi2 = .false.
       logical :: use_other_adipls_mode_info = .false.
-      
+
 
       ! chi2 = chi2_seismo*chi2_seismo_fraction &
       !      + chi2_spectroscopic_and_photometric*(1 - chi2_seismo_fraction)
@@ -86,7 +86,7 @@
       real(dp) :: chi2_seismo_nu_max_fraction
       real(dp) :: chi2_seismo_r_010_fraction
       real(dp) :: chi2_seismo_r_02_fraction
-      
+
       logical :: &
          trace_chi2_seismo_delta_nu_info, &
          trace_chi2_seismo_nu_max_info, &
@@ -117,7 +117,7 @@
       real(dp) :: sigmas_coeff_for_constraint_limit(max_constraints)
 
       character (len=strlen) :: constraint_name(max_constraints)
-      
+
       real(dp) :: Z_div_X_solar
 
       integer, parameter :: max_nl = 1000 ! increase this if necessary
@@ -129,9 +129,9 @@
 
       integer, parameter :: max_parameters = 100
       integer :: num_parameters
-            
+
       character (len=100) :: search_type
-      
+
       logical :: eval_chi2_at_target_age_only
       real(dp) :: min_age_for_chi2, max_age_for_chi2
 
@@ -140,7 +140,7 @@
 
       character (len=256) :: bobyqa_output_filename
       real(dp) :: bobyqa_rhoend ! search control for bobyqa
-      
+
       character (len=256) :: simplex_output_filename
       integer :: simplex_itermax, &
          simplex_fcn_calls_max, simplex_seed
@@ -156,14 +156,14 @@
          simplex_x_rtol, &
          simplex_chi2_tol, &
          simplex_centroid_weight_power
-      
+
       character (len=256) :: scan_grid_output_filename
       logical :: restart_scan_grid_from_file
       character (len=256) :: filename_for_parameters
       integer :: max_num_from_file
       integer :: file_column_for_param(max_parameters)
       character (len=256) :: from_file_output_filename
-      
+
       logical :: Y_depends_on_Z
       real(dp) :: Y0, dYdZ
 
@@ -171,10 +171,10 @@
       real(dp), dimension(max_parameters) :: &
          first_param, min_param, max_param, delta_param
       character (len=strlen) :: param_name(max_parameters)
-      
+
       real(dp) :: f0_ov_div_f_ov, Lnuc_div_L_limit, &
          chi2_spectroscopic_limit, chi2_radial_limit, chi2_delta_nu_limit
-      
+
       real(dp) :: max_yrs_dt_when_cold, max_yrs_dt_when_warm, max_yrs_dt_when_hot, &
          max_yrs_dt_chi2_small_limit, chi2_limit_for_small_timesteps, &
          max_yrs_dt_chi2_smaller_limit, chi2_limit_for_smaller_timesteps, &
@@ -183,25 +183,25 @@
          avg_age_sigma_limit, avg_model_number_sigma_limit
 
       real(dp) :: sigmas_coeff_for_delta_nu_limit
-         
+
       integer :: min_num_samples_for_avg, max_num_samples_for_avg, &
          limit_num_chi2_too_big
-      
+
       real(dp) :: min_age_limit
-      
+
       character(len=32) :: correction_scheme, &
          surf_coef1_name, surf_coef2_name
-      
+
       real(dp) :: correction_b, correction_factor
       integer :: l0_n_obs(max_nl)
-      
+
       ! frequency ratios for observations
       integer :: ratios_n, ratios_l0_first, ratios_l1_first
       real(dp), dimension(max_nl) :: &
          ratios_r01, sigmas_r01, &
          ratios_r10, sigmas_r10, &
          ratios_r02, sigmas_r02
-      
+
       ! output controls
       character (len=256) :: astero_results_directory
 
@@ -212,30 +212,30 @@
       logical :: write_best_model_data_for_each_sample
       integer :: num_digits
       character (len=256) :: sample_results_prefix, sample_results_postfix
-      
+
       integer :: model_num_digits
 
       logical :: write_fgong_for_each_model
-      character (len=256) :: fgong_prefix, fgong_postfix      
+      character (len=256) :: fgong_prefix, fgong_postfix
       logical :: write_fgong_for_best_model
       character (len=256) :: best_model_fgong_filename
-      
+
       logical :: write_gyre_for_each_model
-      character (len=256) :: gyre_prefix, gyre_postfix     
+      character (len=256) :: gyre_prefix, gyre_postfix
       logical :: write_gyre_for_best_model
       character (len=256) :: best_model_gyre_filename
       integer :: max_num_gyre_points
-      
+
       logical :: write_profile_for_best_model
       character (len=256) :: best_model_profile_filename
-      
+
       logical :: save_model_for_best_model
       character (len=256) :: best_model_save_model_filename
-      
+
       logical :: save_info_for_last_model
       character (len=256) :: last_model_save_info_filename
-      
-      
+
+
       ! miscellaneous
 
       logical :: save_next_best_at_higher_frequency, &
@@ -245,35 +245,35 @@
 
       logical :: save_controls
       character (len=256) :: save_controls_filename
-      
+
       real(dp) :: Y_frac_he3
-      
+
       integer :: save_mode_model_number = -1
       character (len=256) :: save_mode_filename
       integer :: el_to_save = -1
       integer :: order_to_save = -1
       integer :: em_to_save = -1
-      
+
       character (len=256) :: &
          oscillation_code, &
          gyre_input_file
       logical :: gyre_non_ad
-      
-      logical :: trace_time_in_oscillation_code 
-      
-      logical :: add_atmosphere     
-      logical :: keep_surface_point      
+
+      logical :: trace_time_in_oscillation_code
+
+      logical :: add_atmosphere
+      logical :: keep_surface_point
       logical :: add_center_point
 
       logical :: do_redistribute_mesh
       ! note: number of zones for redistribute is set in the redistrb.c input file
-               
+
       integer :: iscan_factor(0:3) ! iscan for adipls = this factor times expected number of modes
       real(dp) :: nu_lower_factor, nu_upper_factor
-         ! frequency range for adipls is set from observed frequencies times these            
+         ! frequency range for adipls is set from observed frequencies times these
       integer :: & ! misc adipls parameters
          adipls_irotkr, adipls_nprtkr, adipls_igm1kr, adipls_npgmkr
-      
+
       logical, dimension(max_extra_inlists) :: read_extra_astero_search_inlist
       character (len=strlen), dimension(max_extra_inlists) :: extra_astero_search_inlist_name
 
@@ -294,7 +294,7 @@
          normalize_chi2_seismo_r_02, &
          delta_nu, delta_nu_sigma, &
          nu_max, nu_max_sigma, &
-         
+
          include_age_in_chi2_spectro, &
          age_target, age_sigma, &
          num_smaller_steps_before_age_target, &
@@ -302,18 +302,18 @@
 
          include_constraint_in_chi2_spectro, &
          constraint_target, constraint_sigma, constraint_name, &
-         
+
          Z_div_X_solar, &
          nl, &
          freq_target, &
          freq_sigma, &
-         
+
          search_type, &
-         
+
          eval_chi2_at_target_age_only, &
          min_age_for_chi2, &
          max_age_for_chi2, &
-         
+
          simplex_output_filename, &
          simplex_itermax, &
          simplex_fcn_calls_max, simplex_seed, &
@@ -331,7 +331,7 @@
          newuoa_rhoend, &
          bobyqa_output_filename, &
          bobyqa_rhoend, &
-         
+
          scan_grid_output_filename, &
          restart_scan_grid_from_file, &
          filename_for_parameters, &
@@ -374,16 +374,16 @@
          num_digits, &
          sample_results_prefix, sample_results_postfix, &
          model_num_digits, &
-         
+
          write_fgong_for_each_model, &
          fgong_prefix, fgong_postfix, &
          write_fgong_for_best_model, best_model_fgong_filename, &
-         
+
          write_gyre_for_each_model, &
          gyre_prefix, gyre_postfix, &
          write_gyre_for_best_model, best_model_gyre_filename, &
          max_num_gyre_points, &
-         
+
          write_profile_for_best_model, best_model_profile_filename, &
          save_model_for_best_model, best_model_save_model_filename, &
          save_info_for_last_model, last_model_save_info_filename, &
@@ -392,11 +392,11 @@
          save_mode_model_number, save_mode_filename, &
          save_next_best_at_higher_frequency, &
          save_next_best_at_lower_frequency, &
-         
+
          oscillation_code, &
          gyre_input_file, &
          gyre_non_ad, &
-         
+
          el_to_save, &
          order_to_save, &
          em_to_save, &
@@ -410,8 +410,8 @@
          nu_lower_factor, nu_upper_factor, &
          read_extra_astero_search_inlist, &
          extra_astero_search_inlist_name
-            
-      
+
+
       ! pgstar plots
 
       logical :: echelle_win_flag, echelle_file_flag
@@ -428,7 +428,7 @@
          show_echelle_next_best_at_lower_frequency, &
          show_echelle_annotation1, &
          show_echelle_annotation2, &
-         show_echelle_annotation3      
+         show_echelle_annotation3
 
       logical :: ratios_win_flag, ratios_file_flag
       integer :: ratios_file_interval
@@ -442,11 +442,11 @@
       logical :: &
          show_ratios_annotation1, &
          show_ratios_annotation2, &
-         show_ratios_annotation3      
-      
+         show_ratios_annotation3
+
       logical, dimension(max_extra_inlists) :: read_extra_astero_pgstar_inlist
       character (len=strlen), dimension(max_extra_inlists) :: extra_astero_pgstar_inlist_name
-         
+
       namelist /astero_pgstar_controls/ &
          echelle_win_flag, echelle_file_flag, &
          echelle_file_interval, &
@@ -476,8 +476,8 @@
 
 
       ! private data
-      
-      
+
+
       ! working storage for models and search results
       real(dp) :: model_freq(0:3,max_nl)
       real(dp) :: model_freq_corr(0:3,max_nl)
@@ -492,7 +492,7 @@
       real(dp) :: model_freq_corr_alt_up(0:3,max_nl)
       real(dp) :: model_inertia_alt_up(0:3,max_nl)
       integer  :: model_order_alt_up(0:3,max_nl)
-         
+
       ! next best fit at lower frequency
       real(dp) :: model_freq_alt_down(0:3,max_nl)
       real(dp) :: model_freq_corr_alt_down(0:3,max_nl)
@@ -507,12 +507,12 @@
          model_ratios_r01, &
          model_ratios_r10, &
          model_ratios_r02
-      
+
       logical :: have_radial, have_nonradial
-      
+
       real(dp) :: min_sample_chi2_so_far = -1
       integer :: sample_number, nvar, num_chi2_too_big
-      
+
       integer :: i_param(max_parameters)
       real(dp) :: final_param(max_parameters)
 
@@ -541,10 +541,10 @@
          best_surf_coef1, &
          best_surf_coef2, &
          best_constraint_value(max_constraints)
-         
+
       integer :: &
          best_model_number
-         
+
       integer  :: best_order(0:3,max_nl)
       real(dp) :: best_freq(0:3,max_nl)
       real(dp) :: best_freq_corr(0:3,max_nl)
@@ -554,10 +554,10 @@
          best_ratios_r01, &
          best_ratios_r10, &
          best_ratios_r02
-         
+
       integer :: max_num_samples
       integer :: scan_grid_skip_number
-             
+
       real(dp), pointer, dimension(:) :: &
          sample_chi2, &
          sample_chi2_seismo, &
@@ -570,12 +570,12 @@
 
       real(dp), pointer, dimension(:,:) :: sample_constraint_value
       real(dp), pointer, dimension(:,:) :: sample_param
-         
+
       integer, pointer, dimension(:) :: &
          sample_index_by_chi2, &
          sample_model_number, &
          sample_op_code
-         
+
       integer,  pointer, dimension(:,:,:) :: sample_order
       real(dp), pointer, dimension(:,:,:) :: sample_freq
       real(dp), pointer, dimension(:,:,:) :: sample_freq_corr
@@ -587,7 +587,7 @@
          sample_ratios_r02
 
       real(dp) :: astero_max_dt_next
-            
+
       real(dp) :: avg_age_top_samples, avg_age_sigma, &
          avg_model_number_top_samples, avg_model_number_sigma
 
@@ -602,7 +602,7 @@
 
       integer :: star_id, star_model_number
       integer :: num_chi2_seismo_terms, num_chi2_spectro_terms
-      
+
       ! current values for parameters set by adipls_extras_controls
       real(dp) :: current_param(max_parameters)
 
@@ -655,9 +655,9 @@
 
       type (astero_procs), target, save :: star_astero_procs
          ! gfortran seems to require "save" here.  at least it did once upon a time.
-      
+
       contains
-      
+
       subroutine init_astero_def
          star_astero_procs% set_constraint_value => null()
          star_astero_procs% set_param => null()
@@ -672,18 +672,18 @@
          star_astero_procs% data_for_extra_profile_columns => null()
       end subroutine init_astero_def
 
-      
-      
+
+
       subroutine store_new_oscillation_results( &
             new_el, new_order, new_em, new_inertia, new_cyclic_freq, new_growth_rate, ierr)
          integer, intent(in) :: new_el, new_order, new_em
          real(dp), intent(in) :: new_inertia, new_cyclic_freq, new_growth_rate
          integer, intent(out) :: ierr
-         
+
          integer :: n
-         
+
          include 'formats'
-         
+
          ierr = 0
          n = num_results*3/2 + 50
          if (.not. associated(el)) allocate(el(n))
@@ -692,7 +692,7 @@
          if (.not. associated(cyclic_freq)) allocate(cyclic_freq(n))
          if (.not. associated(growth_rate)) allocate(growth_rate(n))
          if (.not. associated(inertia)) allocate(inertia(n))
-         
+
          if (num_results >= size(el,dim=1)) then ! enlarge
             call realloc_integer(el,n,ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
@@ -708,7 +708,7 @@
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          end if
          num_results = num_results+1
-         
+
          n = num_results
          el(n) = new_el
          order(n) = new_order
@@ -716,10 +716,10 @@
          growth_rate(n) = new_growth_rate
          inertia(n) = new_inertia
          em(n) = new_em
-         
+
       end subroutine store_new_oscillation_results
 
-         
+
       subroutine init_sample_ptrs
          nullify( &
             sample_chi2, &
@@ -743,14 +743,14 @@
             sample_ratios_r10, &
             sample_ratios_r02)
       end subroutine init_sample_ptrs
-      
-      
+
+
       subroutine alloc_sample_ptrs(ierr)
          use utils_lib
          integer, intent(out) :: ierr
          ierr = 0
          max_num_samples = 1.5*max_num_samples + 200
-         
+
          call realloc_double(sample_chi2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_chi2_seismo,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_chi2_spectro,max_num_samples,ierr); if (ierr /= 0) return
@@ -759,14 +759,14 @@
          call realloc_double2(sample_param,max_parameters,max_num_samples,ierr); if (ierr /= 0) return
 
          call realloc_double2(sample_constraint_value,max_constraints,max_num_samples,ierr); if (ierr /= 0) return
-         
+
          call realloc_double(sample_delta_nu,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_nu_max,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_surf_coef1,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_surf_coef2,max_num_samples,ierr); if (ierr /= 0) return
 
          call realloc_integer(sample_index_by_chi2,max_num_samples,ierr); if (ierr /= 0) return
-            
+
          call realloc_integer(sample_op_code,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_integer(sample_model_number,max_num_samples,ierr); if (ierr /= 0) return
 
@@ -781,7 +781,7 @@
 
       end subroutine alloc_sample_ptrs
 
-   
+
       ! for the frequency arrays sample_{order,freq,freq_corr,inertia}, the first index
       ! is 0:3, so here are some specific realloc routines for that case
       ! basically copied from utils/public/utils_lib.f
@@ -851,33 +851,33 @@
          ierr = 0
          call read1_astero_search_inlist(filename, 1, ierr)
       end subroutine read_astero_search_controls
-         
-         
+
+
       recursive subroutine read1_astero_search_inlist(filename, level, ierr)
          character (len=*), intent(in) :: filename
-         integer, intent(in) :: level  
+         integer, intent(in) :: level
          integer, intent(out) :: ierr
-         
+
          logical, dimension(max_extra_inlists) :: read_extra
          character (len=strlen) :: message
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
-         
+
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
             ierr = -1
             return
          end if
-         
+
          ierr = 0
          unit=alloc_iounit(ierr)
          if (ierr /= 0) return
-         
+
          open(unit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
          if (ierr /= 0) then
             write(*, *) 'Failed to open astero search inlist file ', trim(filename)
          else
-            read(unit, nml=astero_search_controls, iostat=ierr)  
+            read(unit, nml=astero_search_controls, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) &
@@ -885,30 +885,30 @@
                write(*, '(a)') trim(message)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(unit=unit, file=trim(filename), &
                   action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=astero_search_controls)
                close(unit)
-            end if  
+            end if
          end if
          call free_iounit(unit)
          if (ierr /= 0) return
-         
+
          ! recursive calls to read other inlists
          do i=1, max_extra_inlists
             read_extra(i) = read_extra_astero_search_inlist(i)
             read_extra_astero_search_inlist(i) = .false.
             extra(i) = extra_astero_search_inlist_name(i)
             extra_astero_search_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read1_astero_search_inlist(extra(i), level+1, ierr)
                if (ierr /= 0) return
             end if
          end do
-        
-         
+
+
       end subroutine read1_astero_search_inlist
 
 
@@ -935,81 +935,81 @@
             close(unit)
          end if
          call free_iounit(unit)
-         
+
          write(*,'(A)')
          write(*,*) 'saved initial &astero_search_controls to ' // trim(filename)
          write(*,'(A)')
          write(*,'(A)')
 
       end subroutine write_astero_search_controls
-   
-   
+
+
       subroutine read_astero_pgstar_controls(filename, ierr)
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
-         
+
          ! initialize controls to default values
          include 'astero_pgstar.defaults'
-         
+
          ierr = 0
          call read1_astero_pgstar_inlist(filename, 1, ierr)
-         
+
       end subroutine read_astero_pgstar_controls
-      
-   
+
+
       recursive subroutine read1_astero_pgstar_inlist(filename, level, ierr)
          character (len=*), intent(in) :: filename
-         integer, intent(in) :: level  
+         integer, intent(in) :: level
          integer, intent(out) :: ierr
-         
+
          logical, dimension(max_extra_inlists) :: read_extra
          character (len=strlen), dimension(max_extra_inlists) :: extra
          integer :: unit, i
-         
+
          if (level >= 10) then
             write(*,*) 'ERROR: too many levels of nested extra star_job inlist files'
             ierr = -1
             return
          end if
-         
+
          ierr = 0
          unit=alloc_iounit(ierr)
          if (ierr /= 0) return
-         
+
          open(unit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
          if (ierr /= 0) then
             write(*, *) 'Failed to open astero pgstar inlist file ', trim(filename)
          else
-            read(unit, nml=astero_pgstar_controls, iostat=ierr)  
+            read(unit, nml=astero_pgstar_controls, iostat=ierr)
             close(unit)
             if (ierr /= 0) then
                write(*, *) &
                   'Failed while trying to read astero pgstar inlist file ', trim(filename)
                write(*, '(a)') &
                   'The following runtime error message might help you find the problem'
-               write(*, *) 
+               write(*, *)
                open(unit=unit, file=trim(filename), &
                   action='read', delim='quote', status='old', iostat=ierr)
                read(unit, nml=astero_pgstar_controls)
                close(unit)
-            end if  
+            end if
          end if
          call free_iounit(unit)
          if (ierr /= 0) return
-         
+
                   ! recursive calls to read other inlists
          do i=1, max_extra_inlists
             read_extra(i) = read_extra_astero_pgstar_inlist(i)
             read_extra_astero_pgstar_inlist(i) = .false.
             extra(i) = extra_astero_pgstar_inlist_name(i)
             extra_astero_pgstar_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read1_astero_pgstar_inlist(extra(i), level+1, ierr)
                if (ierr /= 0) return
             end if
          end do
-         
+
       end subroutine read1_astero_pgstar_inlist
 
 
@@ -1026,10 +1026,10 @@
          if (ierr /= 0) return
          call show_all_sample_results(iounit, i_total, ierr)
          close(iounit)
-         call free_iounit(iounit)         
+         call free_iounit(iounit)
       end subroutine save_sample_results_to_file
-      
-      
+
+
       subroutine set_sample_index_by_chi2
          use num_lib, only: qsort
          if (sample_number <= 0) return
@@ -1039,11 +1039,11 @@
          end if
          call qsort(sample_index_by_chi2, sample_number, sample_chi2)
       end subroutine set_sample_index_by_chi2
-      
-      
+
+
       subroutine show_sample_header(iounit)
          integer, intent(in) :: iounit
-         
+
          integer :: i, j, k, l
          character (len=strlen) :: fmt
          character (len=10) :: str
@@ -1102,7 +1102,7 @@
             trim(surf_coef2_name), &
             'chi2_seismo', &
             'chi2_spectro', &
-            
+
             'nl0', &
             'nl1', &
             'nl2', &
@@ -1110,7 +1110,7 @@
             'ratios_n', &
             'ratios_l0_first', &
             'ratios_l1_first'
-         
+
          if (chi2_seismo_fraction > 0) then
 
             do l=0,3
@@ -1150,28 +1150,28 @@
                      'r02_' // trim(str)
                end do
             end if
-         
+
          end if
 
          if (search_type == 'simplex') then
             write(iounit, astero_results_txt_format, advance='no') 'step_type'
          end if
-         
+
          write(iounit, '(a)') ! end of column names line
-                                          
+
       end subroutine show_sample_header
-      
-      
+
+
       subroutine show1_sample_results(i, iounit)
          use num_lib, only: simplex_info_str
          integer, intent(in) :: i, iounit
-            
+
          integer :: k, l, op_code, ierr
          character (len=256) :: info_str, fmt
-         
+
          ierr = 0
 
-         op_code = sample_op_code(i) 
+         op_code = sample_op_code(i)
          if (op_code <= 0) then
             info_str = ''
          else
@@ -1209,7 +1209,7 @@
          call write1_int(ratios_n)
          call write1_int(ratios_l0_first)
          call write1_int(ratios_l1_first)
-            
+
          if (iounit == 6) return
 
          if (chi2_seismo_fraction > 0) then
@@ -1239,7 +1239,7 @@
                      ratios_r02(k), sigmas_r02(k), sample_ratios_r02(k,i)
                end do
             end if
-         
+
          end if
 
          if (search_type == 'simplex') then
@@ -1261,10 +1261,10 @@
 
             write(iounit, astero_results_int_format, advance='no', iostat=ierr) i
          end subroutine write1_int
-      
+
       end subroutine show1_sample_results
-      
-      
+
+
       subroutine show_all_sample_results(iounit, i_total, ierr)
          integer, intent(in) :: iounit, i_total
          integer, intent(out) :: ierr
@@ -1337,17 +1337,17 @@
          end subroutine write_int
 
       end subroutine show_all_sample_results
-      
-      
+
+
       subroutine show_best_el_info(io)
          integer, intent(in) :: io
-         
+
          real(dp) :: chi2term
          integer :: i, l
 
          ! elaborate shenanigans to preserve header format
          character(len=8), dimension(5) :: header
-          
+
          do l = 0, 3
             if (nl(l) > 0) then
                write(header(1), '(a2,i1)') 'l=', l
@@ -1368,19 +1368,19 @@
                end do
             end if
          end do
-      
+
       end subroutine show_best_el_info
-      
-      
+
+
       subroutine show_best_r010_ratios_info(io)
          integer, intent(in) :: io
-         
+
          real(dp) :: chi2term
          integer :: i, l0_first, l1_first
 
          l0_first = ratios_l0_first
          l1_first = ratios_l1_first
-          
+
          write(io,'(/,2a6,99a20)') &
             'r01', 'l=0 n', 'chi2term', 'r01', 'r01_obs', 'r01_sigma', 'l0_obs'
          do i=1,ratios_n
@@ -1390,7 +1390,7 @@
                chi2term, model_ratios_r01(i), ratios_r01(i), sigmas_r01(i), &
                freq_target(0,i + l0_first)
          end do
-          
+
          write(io,'(/,2a6,99a20)') &
             'r10', 'l=1 n', 'chi2term', 'r10', 'r10_obs', 'r10_sigma', 'l1_obs'
          do i=1,ratios_n
@@ -1400,16 +1400,16 @@
                chi2term, model_ratios_r10(i), ratios_r10(i), sigmas_r10(i), &
                freq_target(1,i + l1_first)
          end do
-               
+
       end subroutine show_best_r010_ratios_info
 
-          
+
       subroutine show_best_r02_ratios_info(io)
          integer, intent(in) :: io
-         
+
          real(dp) :: chi2term
          integer :: i
-         
+
          write(io,'(/,2a6,99a20)') &
             'r02', 'l=0 n', 'chi2term', 'r02', 'r02_obs', 'r02_sigma', 'l0_obs'
          do i=1,nl(0)
@@ -1420,21 +1420,21 @@
                chi2term, model_ratios_r02(i), ratios_r02(i), sigmas_r02(i), &
                freq_target(0,i)
          end do
-               
+
       end subroutine show_best_r02_ratios_info
-      
-      
+
+
       subroutine show_best(io)
          integer, intent(in) :: io
-         
+
          real(dp) :: chi2term
          integer :: i
          include 'formats'
-         
+
          if (chi2_seismo_fraction > 0) then
-            call show_best_el_info(io)         
+            call show_best_el_info(io)
             if (chi2_seismo_r_010_fraction > 0) &
-               call show_best_r010_ratios_info(io)        
+               call show_best_r010_ratios_info(io)
             if (chi2_seismo_r_02_fraction > 0) &
                call show_best_r02_ratios_info(io)
          end if
@@ -1462,14 +1462,14 @@
                call write1(trim(constraint_name(i)) // ' chi2term', chi2term)
             end if
          end do
-         
+
          write(io,'(A)')
          call write1('delta_nu', best_delta_nu)
          call write1('nu_max', best_nu_max)
-         write(io,*)        
+         write(io,*)
          write(io,'(a40,1pes20.10)') trim(surf_coef1_name), best_surf_coef1
          write(io,'(a40,1pes20.10)') trim(surf_coef2_name), best_surf_coef2
-         write(io,*)        
+         write(io,*)
 
          do i = 1, max_parameters
             if (param_name(i) /= '') call write1(trim(param_name(i)), current_param(i))
@@ -1491,9 +1491,9 @@
          write(io,'(a40,i16)') 'model number', best_model_number
          write(io,'(A)')
          write(io,'(A)')
-         
+
          contains
-         
+
          subroutine write1(str,x)
             character (len=*), intent(in) :: str
             real(dp), intent(in) :: x
@@ -1513,31 +1513,31 @@
          integer, intent(out) :: ierr
          integer :: iounit, num, j
          character (len=strlen) :: line
-         
+
          include 'formats'
-         
-         ierr = 0         
+
+         ierr = 0
          write(*,*) 'read samples from file ' // trim(results_fname)
-         
+
          iounit = alloc_iounit(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'alloc_iounit failed')
          open(unit=iounit, file=trim(results_fname), action='read', status='old', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(results_fname)
-            call free_iounit(iounit) 
+            call free_iounit(iounit)
             return
          end if
 
          read(iounit, fmt='(a)') line
          read(iounit, fmt='(a)') line
-         
+
          read(iounit, fmt=astero_results_int_format, iostat=ierr) num
          if (ierr /= 0) then
             write(*,*) 'failed to read number of samples on line 3 of ' // trim(results_fname)
             call done
             return
          end if
-         
+
          write(*,2) 'number of samples in file', num
 
          do j = 4, 6
@@ -1549,7 +1549,7 @@
                return
             end if
          end do
-         
+
          do while (max_num_samples < num)
             call alloc_sample_ptrs(ierr)
             if (ierr /= 0) then
@@ -1558,7 +1558,7 @@
                return
             end if
          end do
-         
+
          do j = 1, num
             call read1_sample_from_file(j, iounit, ierr)
             if (ierr /= 0) then
@@ -1567,35 +1567,35 @@
                return
             end if
          end do
-                  
+
          sample_number = num
          write(*,2) 'number of samples read from file', num
-         
+
          call done
 
-         
+
          contains
-         
-         
+
+
          subroutine done
             close(iounit)
-            call free_iounit(iounit)         
+            call free_iounit(iounit)
          end subroutine done
-         
+
 
       end subroutine read_samples_from_file
-      
-      
+
+
       subroutine read1_sample_from_file(j, iounit, ierr)
          use num_lib, only: simplex_op_code
          integer, intent(in) :: j, iounit
          integer, intent(out) :: ierr
-            
+
          integer :: i, k, l
          character (len=256) :: info_str, fmt
-         
+
          include 'formats'
-         
+
          ierr = 0
          call read1_int(i)
          if (ierr /= 0) return
@@ -1631,7 +1631,7 @@
          call read1_int(ratios_l1_first)
 
          if (failed('results')) return
-            
+
          if (chi2_seismo_fraction > 0) then
 
             write(fmt,'(a)') '(' // trim(astero_results_int_format) // &
@@ -1662,16 +1662,16 @@
                   if (failed('ratios_r02')) return
                end do
             end if
-         
+
          end if
-            
+
          read(iounit, '(a12)', iostat=ierr) info_str
          if (ierr /= 0) then
             ierr = 0
             sample_op_code(i) = 0
             return
          end if
-      
+
          if (len_trim(info_str) == 0) then
             sample_op_code(i) = 0
          else
@@ -1682,11 +1682,11 @@
                return
             end if
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          logical function failed(str)
             character (len=*), intent(in) :: str
             include 'formats'
@@ -1707,8 +1707,8 @@
 
             read(iounit, astero_results_int_format, advance='no', iostat=ierr) i
          end subroutine read1_int
-         
-      
+
+
       end subroutine read1_sample_from_file
 
 

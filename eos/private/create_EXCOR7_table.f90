@@ -21,20 +21,20 @@
 ! ***********************************************************************
 
       module create_EXCOR7_table
-      
+
       use const_def
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
-      
+
       implicit none
 
       public :: do_create_EXCOR7_table
       private
 
-      
+
    contains
-   
+
    subroutine do_create_EXCOR7_table(fname)
       character (len=*), intent(in) :: fname
       real(dp) :: logRS, logRS_min, logRS_max, dlogRS
@@ -47,19 +47,19 @@
       logRS_max = 0.0d0
       dlogRS = 1d-2
       nlogRS = (logRS_max - logRS_min)/dlogRS + 1
-      
+
       logGAME_min = -2d0
       logGAME_max = 4d0
       dlogGAME = 1d-2
       nlogGAME = (logGAME_max - logGAME_min)/dlogGAME + 1
-                  
+
       !write(*,'(a)') 'create ' // trim(fname)
 
       open(newunit=io_unit,file=trim(fname))
-      
+
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
       		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
-      
+
       write(io_unit,'(2(i10,4x,3(f14.4)),i10)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
          nlogGAME, logGAME_min, logGAME_max, dlogGAME, 0
@@ -67,7 +67,7 @@
       do i = 1, nlogRS
          logRS = logRS_min + (i-1) * dlogRS
          RS = exp10(logRS)
-         write(io_unit,'(/,7x,a)') 'logRS' 
+         write(io_unit,'(/,7x,a)') 'logRS'
          write(io_unit,'(2x,f14.6/)') logRS
          write(io_unit,'(99(a26))') &
             'logGAME', 'FXC', 'UXC', 'PXC', 'CVXC', 'SXC', 'PDTXC', 'PDRXC', 'RS', 'GAME'
@@ -87,7 +87,7 @@
       write(io_unit,*)
       write(io_unit,*)
       close(io_unit)
-         
+
    end subroutine do_create_EXCOR7_table
 
 
@@ -300,6 +300,6 @@
       PDTXC=GAME*(THETA*FXCDHG-GAME*FXCDGG/3.d0)-THETA*(FXCDH/0.75d0+THETA*FXCDHH/1.5d0)
       return
       end subroutine EXCOR7
-      
-      
+
+
       end module create_EXCOR7_table

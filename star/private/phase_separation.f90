@@ -36,7 +36,7 @@
       ! offset to higher phase than 0.5 to avoid interference
       ! between phase separation mixing and latent heat for Skye.
       real(dp), parameter :: eos_phase_boundary = 0.9d0
-      
+
       private
       public :: do_phase_separation
 
@@ -64,7 +64,7 @@
          real(dp), intent(in) :: dt
          character (len=*), intent(in) :: components
          integer, intent(out) :: ierr
-         
+
          real(dp) :: XNe, XO, XC, pad
          integer :: k, k_bound, kstart, net_ic12, net_io16, net_ine20
          logical :: save_Skye_use_ion_offsets
@@ -72,16 +72,16 @@
          ! Set phase separation mixing mass negative at beginning of phase separation
          s% phase_sep_mixing_mass = -1d0
          s% eps_phase_separation(1:s%nz) = 0d0
-         
+
          if(s% phase(s% nz) < eos_phase_boundary) then
             s% crystal_core_boundary_mass = 0d0
             return
          end if
-         
+
          net_ic12 = s% net_iso(ic12)
          net_io16 = s% net_iso(io16)
          net_ine20 = s% net_iso(ine20)
-         
+
          ! Find zone of phase transition from liquid to solid
          k_bound = -1
          do k = s%nz,1,-1
@@ -90,7 +90,7 @@
                exit
             end if
          end do
-         
+
          XC = s% xa(net_ic12,k_bound)
          XO = s% xa(net_io16,k_bound)
          XNe = s% xa(net_ine20,k_bound)
@@ -98,7 +98,7 @@
          ! otherwise skip phase separation
          if(components == 'CO'.and. XO + XC < 0.9d0) return
          if(components == 'ONe'.and. XNe + XO < 0.8d0) return ! O/Ne mixtures tend to have more byproducts of burning mixed in
-         
+
          ! If there is a phase transition, reset the composition at the boundary
          if(k_bound > 0) then
 
@@ -120,7 +120,7 @@
             do k=1,s% nz
                s% eps_phase_separation(k) = s% energy(k)
             end do
-            
+
             ! loop runs outward starting at previous crystallization boundary
             do k = kstart,1,-1
                ! Start by checking if this material should be crystallizing
@@ -133,7 +133,7 @@
                ! crystallized out to k now, liquid starts at k-1.
                ! now mix the liquid material outward until stably stratified
                call mix_outward(s, k-1, 0)
-               
+
             end do
 
             call update_model_(s,1,s%nz,.false.)
@@ -155,29 +155,29 @@
         type(star_info), pointer :: s
         integer, intent(in) :: k
         character (len=*), intent(in) :: components
-        
+
         real(dp) :: XC, XO, XNe, XC1, XO1, XNe1, dXO, dXNe, Xfac
         integer :: net_ic12, net_io16, net_ine20
-        
+
         net_ic12 = s% net_iso(ic12)
         net_io16 = s% net_iso(io16)
         net_ine20 = s% net_iso(ine20)
-        
+
         if(components == 'CO') then
            XO = s% xa(net_io16,k)
            XC = s% xa(net_ic12,k)
-        
+
            ! Call Blouin phase diagram.
            ! Need to rescale temporarily because phase diagram assumes XO + XC = 1
            Xfac = XO + XC
            XO = XO/Xfac
            XC = XC/Xfac
-           
+
            dXO = blouin_delta_xo(XO)
-           
+
            s% xa(net_io16,k) = Xfac*(XO + dXO)
            s% xa(net_ic12,k) = Xfac*(XC - dXO)
-           
+
            ! Redistribute change in C,O into zone k-1,
            ! conserving total mass of C,O
            XC1 = s% xa(net_ic12,k-1)
@@ -187,18 +187,18 @@
         else if(components == 'ONe') then
            XNe = s% xa(net_ine20,k)
            XO = s% xa(net_io16,k)
-        
+
            ! Call Blouin phase diagram.
            ! Need to rescale temporarily because phase diagram assumes XO + XNe = 1
            Xfac = XO + XNe
            XO = XO/Xfac
            XNe = XNe/Xfac
-           
+
            dXNe = blouin_delta_xne(XNe)
-           
+
            s% xa(net_ine20,k) = Xfac*(XNe + dXNe)
            s% xa(net_io16,k) = Xfac*(XO - dXNe)
-           
+
            ! Redistribute change in Ne,O into zone k-1,
            ! conserving total mass of Ne,O
            XO1 = s% xa(net_io16,k-1)
@@ -211,19 +211,19 @@
         end if
 
         call update_model_(s,k-1,s%nz,.true.)
-        
+
       end subroutine move_one_zone
 
       ! mix composition outward until reaching stable composition profile
       subroutine mix_outward(s,kbot,min_mix_zones)
         type(star_info), pointer :: s
         integer, intent(in)      :: kbot, min_mix_zones
-        
+
         real(dp) :: avg_xa(s%species)
         real(dp) :: mass, B_term, grada, gradr
         integer :: k, l, ktop
         logical :: use_brunt
-        
+
         use_brunt = s% phase_separation_mixing_use_brunt
 
         do k=kbot-min_mix_zones,1,-1
@@ -270,7 +270,7 @@
 
         ! Call a final update over all mixed cells now.
         call update_model_(s, ktop, kbot+1, .true.)
-       
+
       end subroutine mix_outward
 
       real(dp) function blouin_delta_xo(Xin)
@@ -281,7 +281,7 @@
 
         ! Convert input mass fraction to number fraction, assuming C/O mixture
         xo = (Xin/16d0)/(Xin/16d0 + (1d0 - Xin)/12d0)
-        
+
         a0 = 0d0
         a1 = -0.311540d0
         a2 = 2.114743d0
@@ -301,7 +301,7 @@
 
         ! Convert back to mass fraction
         Xnew = 16d0*xo/(16d0*xo + 12d0*(1d0-xo))
-        
+
         blouin_delta_xo = Xnew - Xin
       end function blouin_delta_xo
 
@@ -313,7 +313,7 @@
 
         ! Convert input mass fraction to number fraction, assuming O/Ne mixture
         xne = (Xin/20d0)/(Xin/20d0 + (1d0 - Xin)/16d0)
-        
+
         a0 = 0d0
         a1 = -0.120299d0
         a2 = 1.304399d0
@@ -333,7 +333,7 @@
 
         ! Convert back to mass fraction
         Xnew = 20d0*xne/(20d0*xne + 16d0*(1d0-xne))
-        
+
         blouin_delta_xne = Xnew - Xin
       end function blouin_delta_xne
 
@@ -342,12 +342,12 @@
         use turb_info, only: set_mlt_vars
         use brunt, only: do_brunt_B
         use micro
-        
+
         type(star_info), pointer :: s
         integer, intent(in)      :: kc_t
         integer, intent(in)      :: kc_b
         logical, intent(in)      :: do_brunt
-        
+
         integer  :: ierr
         integer  :: kf_t
         integer  :: kf_b
@@ -366,9 +366,9 @@
            stop
         end if
         s%fix_Pgas = .false.
-        
+
         ! Update opacities across cells kc_t:kc_b (this also sets rho_face
-        ! and related quantities on faces kc_t:kc_b)        
+        ! and related quantities on faces kc_t:kc_b)
         call set_micro_vars(s, kc_t, kc_b, &
              skip_eos=.TRUE., skip_net=.TRUE., skip_neu=.TRUE., skip_kap=.FALSE., ierr=ierr)
         if (ierr /= 0) then
@@ -390,20 +390,20 @@
         end if
 
         ! Finally update MLT for interior faces
-        
+
         kf_t = kc_t
         kf_b = kc_b + 1
-        
+
         call set_mlt_vars(s, kf_t+1, kf_b-1, ierr)
         if (ierr /= 0) then
            write(*,*) 'phase_separation: failed in call to set_mlt_vars during update_model_'
            stop
         endif
-        
+
         ! Finish
-        
+
         return
-        
+
       end subroutine update_model_
 
       end module phase_separation

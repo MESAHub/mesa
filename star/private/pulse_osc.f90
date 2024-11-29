@@ -202,12 +202,12 @@ contains
 
     ! global_data(13) should be the initial rotation rate, but we lack
     ! that datum
-    
+
     ! Store point data
 
     allocate(point_data(IVAR+IABUND,nn))
     point_data = 0d0
-    
+
     j = 1
 
     ! Atmosphere (we skip the point at the base of the atm to
@@ -217,7 +217,7 @@ contains
        call store_point_data_atm(j, k, k_a(1), k_b(1))
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     sg = 1
@@ -235,7 +235,7 @@ contains
 
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
-             
+
        endif
 
     end do env_loop
@@ -309,7 +309,7 @@ contains
            X_O17 => point_data(34,j), &
            X_Be9 => point_data(35,j), &
            X_Si28 => point_data(36,j))
-      
+
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
         lnq = log(s%m_grav(1)/m_outer)
         T = exp(s%atm_structure(atm_lnT,k))
@@ -412,7 +412,7 @@ contains
            X_O17 => point_data(34,j), &
            X_Be9 => point_data(35,j), &
            X_Si28 => point_data(36,j))
-      
+
         r = s%r(k)
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)

@@ -40,7 +40,7 @@
 
       contains
 
-      
+
       subroutine remesh_for_RSP2(s,ierr)
          ! uses these controls
          !  RSP2_nz = 150
@@ -49,14 +49,14 @@
          !  RSP2_dq_1_factor = 2d0
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib, only: interpolate_vector_pm
-         type (star_info), pointer :: s      
-         integer, intent(out) :: ierr    
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
          integer :: k, j, nz_old, nz
          real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1
          real(dp), allocatable, dimension(:) :: &
             xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
          real(dp), pointer :: work1(:) ! =(nz_old+1, pm_work_size)
-         include 'formats'         
+         include 'formats'
          ierr = 0
          nz_old = s% nz
          nz = s% RSP2_nz
@@ -91,13 +91,13 @@
          do k=1,nz
             call set_Hp_face(k)
          end do
-         deallocate(work1)  
+         deallocate(work1)
          s% nz = nz
          write(*,1) 'new old L_surf/Lsun', s% xh(s% i_lum,1)/Lsun, old_L1/Lsun
          write(*,1) 'new old R_surf/Rsun', exp(s% xh(s% i_lnR,1))/Rsun, old_r1/Rsun
          write(*,'(A)')
          !call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2')
-         
+
          contains
 
          subroutine setvars(ierr)
@@ -128,7 +128,7 @@
                skip_mixing_info, skip_set_cz_bdy_mass, skip_mlt, ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'remesh_for_RSP2 failed in set_hydro_vars')
          end subroutine setvars
-         
+
          subroutine get_PT_surf(P_surf, T_surf, ierr)
             use atm_support, only: get_atm_PT
             real(dp), intent(out) :: P_surf, T_surf
@@ -149,7 +149,7 @@
             P_surf = exp(lnP_surf)
             T_surf = exp(lnT_surf)
             return
-            
+
             write(*,1) 'get_PT_surf P_surf', P_surf
             write(*,1) 'get_PT_surf T_surf', T_surf
             write(*,1) 'get_PT_surf Teff', Teff
@@ -157,7 +157,7 @@
             write(*,1)
             !call mesa_error(__FILE__,__LINE__,'get_PT_surf')
          end subroutine get_PT_surf
-         
+
          subroutine set_xm_old
             xm_old(1) = 0d0
             do k=2,nz_old
@@ -168,7 +168,7 @@
                xm_mid_old(k) = xm_old(k) + 0.5d0*s% dm(k)
             end do
          end subroutine set_xm_old
-         
+
          subroutine find_xm_anchor
             real(dp) :: lnT_anchor, xmm1, xm00, lnTm1, lnT00
             include 'formats'
@@ -193,8 +193,8 @@
                   return
                end if
             end do
-         end subroutine find_xm_anchor         
-         
+         end subroutine find_xm_anchor
+
          subroutine set_xm_new ! sets xm, dm, m, dq, q
             integer :: nz_outer, k
             real(dp) :: dq_1_factor, dxm_outer, lnx, dlnx
@@ -236,14 +236,14 @@
             end do
             call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
             return
-            
+
             do k=2,nz
                write(*,2) 'dm(k)/dm(k-1) m(k)', k, s%dm(k)/s%dm(k-1), s%m(k)/Msun
             end do
             write(*,1) 'm_center', s% m_center/msun
             call mesa_error(__FILE__,__LINE__,'set_xm_new')
          end subroutine set_xm_new
-         
+
          subroutine interpolate1_face_val(i, cntr_val)
             integer, intent(in) :: i
             real(dp), intent(in) :: cntr_val
@@ -257,7 +257,7 @@
                s% xh(i,k) = v_new(k)
             end do
          end subroutine interpolate1_face_val
-         
+
          subroutine check_new_lnR
             include 'formats'
             do k=1,nz
@@ -275,7 +275,7 @@
                call mesa_error(__FILE__,__LINE__,'check_new_lnR remesh rsp2')
             end if
          end subroutine check_new_lnR
-         
+
          subroutine set_new_lnd
             real(dp) :: vol, r300, r3p1
             include 'formats'
@@ -296,7 +296,7 @@
                end if
             end do
          end subroutine set_new_lnd
-         
+
          subroutine interpolate1_cell_val(i)
             integer, intent(in) :: i
             do k=1,nz_old
@@ -308,7 +308,7 @@
                s% xh(i,k) = v_new(k)
             end do
          end subroutine interpolate1_cell_val
-         
+
          subroutine interpolate1_xa(j)
             integer, intent(in) :: j
             do k=1,nz_old
@@ -320,7 +320,7 @@
                s% xa(j,k) = v_new(k)
             end do
          end subroutine interpolate1_xa
-         
+
          subroutine rescale_xa
             integer :: k, j
             real(dp) :: sum_xa
@@ -331,7 +331,7 @@
                end do
             end do
          end subroutine rescale_xa
-         
+
          subroutine revise_lnT_for_QHSE(P_surf, ierr)
             use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results
             use chem_def, only: chem_isos
@@ -395,7 +395,7 @@
                !write(*,2) 'logP dlogT logT logT_guess logRho', k, &
                !   logP, logT - logT_guess, logT, logT_guess, logRho
                P_m1 = P_00
-               
+
                if (k == 1) then ! get opacity and recheck surf BCs
                  call get_kap( & ! assume zbar is set
                      s, k, s% zbar(k), s% xa(:,k), logRho, logT, &
@@ -419,7 +419,7 @@
                   write(*,1) 'new old kap(1)', kap, old_kap
                   !call mesa_error(__FILE__,__LINE__,'revise_lnT_for_QHSE')
                end if
-               
+
             end do
             !write(*,1) 'after revise_lnT_for_QHSE: logT cntr', s% lnT(nz)/ln10
             !stop
