@@ -8252,7 +8252,7 @@
       ! min_q_for_drag
       ! ~~~~~~~~~~~~~~
 
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only when v_flag = .true.. Adjusts both v and energy transfer from kinetic to thermal.
       ! only for v(k) when q(k) > min_q_for_drag.
       ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
       ! useful for preventing the development radial pulsations during advanced
@@ -8289,9 +8289,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
 
-      ! Implemented only for u_flag right now. Adds a pseudo drag term of the form
+      ! Only when u_flag = .true.. Adds a pseudo drag term of the form
       ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
-      ! of a star. Effect is full on for q>q_for_v_drag_full_on and full off for
+      ! of a star, useful for smoothing out spurious shocks colliding in ejected layers. 
+      ! Effect is full on for q>q_for_v_drag_full_on and full off for
       ! q < q_for_v_drag_full_off.
 
       ! ::
