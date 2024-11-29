@@ -26,7 +26,7 @@
       use star_def
       use const_def
       use math_lib
-      use gyre_lib
+      use gyre_mesa_m
       
       implicit none
 
@@ -514,7 +514,7 @@
       subroutine gyre_linear_analysis_and_set_velocities(s,restart,ierr)
          use const_def
          use math_lib
-         use gyre_lib
+         use gyre_mesa_m
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
