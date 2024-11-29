@@ -248,7 +248,7 @@
 
             fix1: do j=1,nc
 
-               if (mass(j,k) >= 0d0) cycle
+               if (mass(j,k) >= 0d0) cycle fix1
                if (mass(j,k) >= -1d-13*cell_dm(k)) then
                   mass(j,k) = 0d0
                   cycle fix1

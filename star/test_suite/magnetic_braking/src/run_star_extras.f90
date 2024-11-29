@@ -100,7 +100,7 @@
 
          ! Calculate total angular momentum
          j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
-        
+
          if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
            write(*,*) 'j_tot: ', j_tot, s% omega(1), v_rot/1d5
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
@@ -208,7 +208,7 @@
          end if
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
 
       ! returns either keep_going, retry, or terminate.

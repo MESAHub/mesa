@@ -22,14 +22,14 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module mod_other_binary_edot
 
       ! NOTE: remember to set one of:
       ! use_other_edot_tidal = .true.
       ! use_other_edot_enhance = .true.
       ! use_other_extra_edot = .true.
-      
+
 ! you can add your own routine to add an extra edot.
 ! to override the entire edot calculation, turn off other contributions
 ! by setting do_tidal_circ = .false. and use_eccentricity_enhancement = .false.
@@ -37,7 +37,7 @@
 ! here's how to do it.
 
 ! Before doing anything, let's make sure your working copy of run_binary_extras works.
-! edit the extras_binary_controls routine 
+! edit the extras_binary_controls routine
 !      subroutine extras_binary_controls(binary_id, ierr)
 !         integer :: binary_id
 !         integer, intent(out) :: ierr
@@ -77,9 +77,9 @@
 !            write(*,*) 'failed in binary_ptr'
 !            return
 !         end if
-!         b% edot_tidal = 0d0 
+!         b% edot_tidal = 0d0
 !      end subroutine my_edot_tidal
-         
+
       ! NOTE: if you'd like to have some inlist controls for your routine,
       ! you can use the x_ctrl array of real(dp) variables that is in &controls
       ! e.g., in the &controls inlist, you can set
@@ -97,22 +97,22 @@
       !         end if
       !
       ! To get the binary pointer using the provided binary_id, add these lines.
-      !     
+      !
       !      type (binary_info), pointer :: b
       !      call binary_ptr(binary_id, b, ierr)
       !      if (ierr /= 0) then ! failure in  binary_ptr
       !         return
       !      end if
-      ! 
+      !
       ! for integer control values, you can use x_integer_ctrl
       ! for logical control values, you can use x_logical_ctrl
 
 
       implicit none
-      
-            
+
+
       contains
-      
+
       subroutine null_other_edot_tidal(binary_id, ierr)
          use const_def, only: dp
          use binary_def, only : binary_info, binary_ptr
@@ -125,9 +125,9 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         b% edot_tidal = 0d0 
+         b% edot_tidal = 0d0
       end subroutine null_other_edot_tidal
-      
+
       subroutine null_other_edot_enhance(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
@@ -139,9 +139,9 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         b% edot_enhance = 0d0 
+         b% edot_enhance = 0d0
       end subroutine null_other_edot_enhance
-      
+
       subroutine null_other_extra_edot(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id
@@ -153,7 +153,7 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         b% extra_edot = 0d0 
+         b% extra_edot = 0d0
       end subroutine null_other_extra_edot
 
       end module mod_other_binary_edot

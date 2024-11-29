@@ -365,7 +365,7 @@
          s% mix_factor = mix_factor
          s% do_element_diffusion = do_element_diffusion
          s% include_composition_in_eps_grav = include_composition_in_eps_grav
-         
+
          call error_check('relax composition',ierr)
 
          deallocate(rpar)
@@ -715,10 +715,10 @@
          x(1:num_pts) => rpar(1:num_pts)
          f1(1:4*num_pts) => rpar(num_pts+1:lrpar)
          f(1:4,1:num_pts) => f1(1:4*num_pts)
-    
+
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
-         
+
          ! need to use global variables, as relax_entropy uses
          ! the other_energy routine to which it can't pass rpar
          relax_num_pts = num_pts
@@ -887,7 +887,7 @@
             do k=1,nz
                entropy(k) = exp(s% lnS(k))
             end do
-            
+
             dentropy_sum = sum(abs((entropy(1:nz)-vals(1:nz))/vals(1:nz)))
             avg_err = dentropy_sum/nz
             deallocate(vals, xq, entropy)
@@ -971,7 +971,7 @@
          f(1:4,1:num_pts) => f1(1:4*num_pts)
          call store_rpar(num_pts, ierr)
          if (ierr /= 0) return
-         
+
          ! need to use global variables, as relax_angular_momentum uses
          ! the other_torque routine to which it can't pass rpar
          relax_num_pts = num_pts
@@ -1237,7 +1237,7 @@
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. s% rotation_flag) return
 
          rpar(1) = target_value
@@ -1644,13 +1644,13 @@
             write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'do_relax_Tsurf_factor')
          end if
-         
+
          if (new_Tsurf_factor == 1d0) then
             s% force_Tsurf_factor = 0d0
          else
             s% force_Tsurf_factor = s% Tsurf_factor
          end if
-         
+
          call error_check('relax tsurf factor',ierr)
 
       end subroutine do_relax_Tsurf_factor
@@ -2144,11 +2144,11 @@
             write(*,1) 's% xmstar', s% xmstar
             write(*,'(A)')
          end if
-         
+
          if(end_now) then
             relax_core_check_model = terminate
             s% termination_code = t_relax_finished_okay
-            return         
+            return
          end if
 
       end function relax_core_check_model
@@ -2410,7 +2410,7 @@
 
          if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0) &
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
-         
+
          end_now=.false.
          if (new_mass < s% star_mass) then
             next = exp10(safe_log10(s% star_mass) - dlgm_per_step)
@@ -3125,7 +3125,7 @@
                id, before_evolve_relax_opacity_max, &
                relax_opacity_max_adjust_model, relax_opacity_max_check_model, &
                null_finish_model, .true., lipar, ipar, lrpar, rpar, ierr)
-         
+
          s% max_model_number = max_model_number
          s% opacity_max = new_value
          s% dt_next = rpar(1) ! keep dt from relax
@@ -3318,7 +3318,7 @@
          include 'formats'
          ierr = 0
          if (num_steps <= 0) return
-         
+
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -3377,7 +3377,7 @@
 
       integer function relax_num_steps_check_model(s, id, lipar, ipar, lrpar, rpar)
          use do_one_utils, only:do_bare_bones_check_model
-         
+
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -3417,14 +3417,14 @@
 
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% star_mass < s% job% pre_ms_check_radiative_core_min_mass) then
             write(*,*) 'stop relax to begin radiative core because star_mass < pre_ms_check_radiative_core_min_mass'
             return
          end if
-         
+
          max_timestep = 1d3*secyer  ! can provide a parameter for this if necessary
-         
+
          write(*,'(A)')
          write(*,1) 'relax_to_radiative_core'
          write(*,'(A)')
@@ -3701,17 +3701,17 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          khi = k_for_q(s, minq)
          klo = k_for_q(s, maxq)
-         
+
          y = eval_current_y(s, klo, khi, ierr)
          if (ierr /= 0) return
          if (is_bad(y)) then
             write(*,1) 'y', y
             call mesa_error(__FILE__,__LINE__,'do_relax_Y')
          end if
-         
+
          if (abs(new_Y - y) <= 1d-6*new_Y) return
          if (new_Y < 0 .or. new_Y > 1) then
             ierr = -1
@@ -3784,14 +3784,14 @@
          dy = rpar(2)
          minq = rpar(3)
          maxq = rpar(4)
-         
+
          khi = k_for_q(s, minq)
          klo = k_for_q(s, maxq)
 
          if (ydbg) then
             write(*,4) 'klo, khi nz', klo, khi, s% nz
          end if
-         
+
          current_y = eval_current_y(s, klo, khi, ierr)
          if (is_bad(current_y)) then
             write(*,1) 'current_y', current_y
@@ -3951,7 +3951,7 @@
          procedure(integer), pointer :: tmp_ptr1 => null(), tmp_ptr3 => null()
          procedure(), pointer :: tmp_ptr2 => null(), tmp_ptr4 => null()
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
 
          ierr = 0
@@ -3980,26 +3980,26 @@
             s% tol_correction_norm = s% relax_tol_correction_norm
          if (s% relax_tol_max_correction /= 0) &
             s% tol_max_correction = s% relax_tol_max_correction
-            
+
          if (s% relax_iter_for_resid_tol2 /= 0) &
             s% iter_for_resid_tol2 = s% relax_iter_for_resid_tol2
          if (s% relax_tol_residual_norm1 /= 0) &
             s% tol_residual_norm1 = s% relax_tol_residual_norm1
          if (s% relax_tol_max_residual1 /= 0) &
             s% tol_max_residual1 = s% relax_tol_max_residual1
-         
+
          if (s% relax_iter_for_resid_tol3 /= 0) &
             s% iter_for_resid_tol3 = s% relax_iter_for_resid_tol3
          if (s% relax_tol_residual_norm2 /= 0) &
             s% tol_residual_norm2 = s% relax_tol_residual_norm2
          if (s% relax_tol_max_residual2 /= 0) &
             s% tol_max_residual2 = s% relax_tol_max_residual2
-            
+
          if (s% relax_tol_residual_norm3 /= 0) &
             s% tol_residual_norm3 = s% relax_tol_residual_norm3
          if (s% relax_tol_max_residual3 /= 0) &
             s% tol_max_residual3 = s% relax_tol_max_residual3
-            
+
          if (s% relax_maxT_for_gold_tolerances /= 0) &
             s% maxT_for_gold_tolerances = s% relax_maxT_for_gold_tolerances
 
@@ -4041,7 +4041,7 @@
             first_try = .true.
 
             step_loop: do ! may need to repeat this loop for retry
-            
+
                result = do_evolve_step_part1(id, first_try)
                if (result == keep_going) &
                   result = adjust_model(s, id, lipar, ipar, lrpar, rpar)
@@ -4069,12 +4069,12 @@
                if(dbg) write(*,2) 'after step_loop: call update_pgstar_data', s% model_number
                call update_pgstar_data(s, ierr)
                if (failed()) return
-               call do_read_pgstar_controls(s, s% inlist_fname, ierr) 
+               call do_read_pgstar_controls(s, s% inlist_fname, ierr)
                if (failed()) return
                call do_pgstar_plots( s, .false., ierr)
                if (failed()) return
             end if
-            
+
             result = finish_model(s)
             if (result /= keep_going) exit evolve_loop
 
@@ -4126,7 +4126,7 @@
          if (associated(s% finished_relax)) call s% finished_relax(id)
 
          if (restore_at_end) call restore_stuff
-         
+
          if (s% job% set_cumulative_energy_error_each_relax) &
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
 
@@ -4137,7 +4137,7 @@
          s% model_number_for_last_retry = -100
 
          contains
-         
+
          logical function failed()
             failed = .false.
             if (ierr == 0) return
@@ -4179,20 +4179,20 @@
             dt_next = s% dt_next
             max_number_retries = s% max_number_retries
             MLT_option = s% MLT_option
-            
+
             use_gold2_tolerances = s% use_gold2_tolerances
             steps_before_use_gold2_tolerances = s% steps_before_use_gold2_tolerances
             use_gold_tolerances = s% use_gold_tolerances
             steps_before_use_gold_tolerances = s% steps_before_use_gold_tolerances
             solver_iters_timestep_limit = s% solver_iters_timestep_limit
             tol_correction_norm = s% tol_correction_norm
-            tol_max_correction = s% tol_max_correction            
+            tol_max_correction = s% tol_max_correction
             iter_for_resid_tol2 = s% iter_for_resid_tol2
             tol_residual_norm1 = s% tol_residual_norm1
-            tol_max_residual1 = s% tol_max_residual1         
+            tol_max_residual1 = s% tol_max_residual1
             iter_for_resid_tol3 = s% iter_for_resid_tol3
             tol_residual_norm2 = s% tol_residual_norm2
-            tol_max_residual2 = s% tol_max_residual2         
+            tol_max_residual2 = s% tol_max_residual2
             tol_residual_norm3 = s% tol_residual_norm3
             tol_max_residual3 = s% tol_max_residual3
             maxT_for_gold_tolerances = s% maxT_for_gold_tolerances
@@ -4236,7 +4236,7 @@
             s% dt_next = dt_next
             s% max_number_retries = max_number_retries
             s% MLT_option = MLT_option
-            
+
             s% use_gold2_tolerances = use_gold2_tolerances
             s% steps_before_use_gold2_tolerances = steps_before_use_gold2_tolerances
             s% use_gold_tolerances = use_gold_tolerances

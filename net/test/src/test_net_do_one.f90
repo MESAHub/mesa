@@ -9,7 +9,7 @@
 !   by the Free Software Foundation; either version 2 of the License, or
 !   (at your option) any later version.
 !
-!   MESA is distributed in the hope that it will be useful, 
+!   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !   GNU Library General Public License for more details.
@@ -28,9 +28,9 @@
       use const_def
       use rates_def
       use utils_lib, only: mesa_error
-      
+
       implicit none
-         
+
       logical, parameter :: extended_set = .false.
       logical, parameter :: sorted = .true.
 
@@ -40,16 +40,16 @@
       real(dp) :: z, abar, zbar, z2bar, z53bar, ye, &
          eta, d_eta_dlnT, d_eta_dlnRho, eps_neu_total
       integer :: screening_mode
-      real(dp) :: test_logT, test_logRho     
+      real(dp) :: test_logT, test_logRho
       integer, pointer :: reaction_id(:)
       real(dp), dimension(:), pointer ::  &
          xin, xin_copy, d_eps_nuc_dx, dxdt, d_dxdt_dRho, d_dxdt_dT
-      real(dp), pointer :: d_dxdt_dx(:,:)  
-      
+      real(dp), pointer :: d_dxdt_dx(:,:)
+
 
       contains
-      
-      
+
+
       subroutine do1_net(handle, symbolic)
          use chem_lib, only:composition_info
          integer, intent(in) :: handle
@@ -65,24 +65,24 @@
          type (Net_General_Info), pointer  :: g
          type (Net_Info) :: n
          logical :: skip_jacobian
-         
+
          info = 0
          call get_net_ptr(handle, g, info)
          if (info /= 0) call mesa_error(__FILE__,__LINE__)
 
-         num_reactions = g% num_reactions         
+         num_reactions = g% num_reactions
 
          logRho = test_logRho
          logT   = test_logT
 
          if (.not. qt) write(*,*)
-         
+
          allocate( &
             rate_factors(num_reactions), &
             eps_nuc_categories(num_categories), &
             stat=info)
          if (info /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call get_chem_id_table(handle, species, chem_id, info)
          if (info /= 0) call mesa_error(__FILE__,__LINE__)
 
@@ -92,13 +92,13 @@
 
          Rho = exp10(logRho)
          T   = exp10(logT)
-         
+
          if (net_file == '19_to_ni56.net') then
             logT = 9D+00
             logRho = 8D+00
             eta = 3D+00
          end if
-         
+
          if (net_file == 'approx21_cr60_plus_co56.net') then
             logT =    4.6233007922659333D+00
             logRho =   -1.0746410107891649D+01
@@ -111,7 +111,7 @@
          skip_jacobian = .false.
          d_eta_dlnT = 0d0
          d_eta_dlnRho = 0d0
-         
+
          if (symbolic) then
             call net_get_symbolic_d_dxdt_dx(handle, n, species, num_reactions,  &
                   xin, T, logT, Rho, logRho,  &
@@ -139,7 +139,7 @@
             write(*, *) 'bad return from net_get'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (symbolic .and..not. qt) then
             write(*,*) 'nonzero d_dxdt_dx entries'
             k = 0
@@ -161,11 +161,11 @@
                   g, n, logT, logRho, species, num_reactions, xin,  &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx,  &
-                  n% eps_nuc_categories, extended_set, sorted)         
+                  n% eps_nuc_categories, extended_set, sorted)
          end if
 
          deallocate(rate_factors, eps_nuc_categories)
- 
+
          return
 
          write(*, *)
@@ -200,19 +200,19 @@
          real(dp), intent(in) :: eps_nuc
          real(dp), intent(in) :: d_eps_nuc_dT
          real(dp), intent(in) :: d_eps_nuc_dRho
-         real(dp), intent(in) :: d_eps_nuc_dx(species) 
-         real(dp), intent(in) :: dxdt(species) 
-         real(dp), intent(in) :: d_dxdt_dRho(species) 
-         real(dp), intent(in) :: d_dxdt_dT(species) 
-         real(dp), intent(in) :: d_dxdt_dx(species, species) 
-         real(dp), intent(in), dimension(num_categories) :: eps_nuc_categories 
+         real(dp), intent(in) :: d_eps_nuc_dx(species)
+         real(dp), intent(in) :: dxdt(species)
+         real(dp), intent(in) :: d_dxdt_dRho(species)
+         real(dp), intent(in) :: d_dxdt_dT(species)
+         real(dp), intent(in) :: d_dxdt_dx(species, species)
+         real(dp), intent(in), dimension(num_categories) :: eps_nuc_categories
          logical, intent(in) :: extended_set
          logical, intent(in) :: sorted
-         
+
          integer :: j
-            
+
          include 'formats'
-                           
+
          if (net_file == 'approx21_cr60_plus_co56.net') then
             write(*, *)
             write(*, '(a40, f20.9)') 'log temp', logT
@@ -226,29 +226,29 @@
                n% rate_raw(g% net_reaction(j))
             return
          end if
-         
+
          write(*, *)
          call show_summary_results(logT, logRho, &
-               eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx) 
-         
+               eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx)
+
          if (extended_set) then
             write(*, *)
             call show_all_rates( &
                 g, num_reactions, n, &
                 logT, logRho, sorted)
          end if
-         
+
          write(*, *)
          call show_by_category( &
                   g, num_reactions, eps_nuc_categories,  &
                   eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx,  &
                   sorted)
-         
+
          if (.not. extended_set) return
-         
+
          write(*, *)
          call show_dx_dt(g, species, xin, dxdt, sorted)
-         
+
          write(*, *)
          call show_d_eps_nuc_dx(g, species, xin, d_eps_nuc_dx, sorted)
 
@@ -256,14 +256,14 @@
 
       end subroutine show_results
 
-      
+
       subroutine show_summary_results(logT, logRho,  &
-               eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx) 
+               eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx)
          real(dp), intent(in) :: logT, logRho
          real(dp), intent(in) :: eps_nuc
          real(dp), intent(in) :: d_eps_nuc_dT
          real(dp), intent(in) :: d_eps_nuc_dRho
-         real(dp), intent(in) :: d_eps_nuc_dx(species) 
+         real(dp), intent(in) :: d_eps_nuc_dx(species)
 
          real(dp) :: T, Rho, eps, d_eps_dt, d_eps_dd
          T = exp10(logT); Rho = exp10(logRho)
@@ -281,10 +281,10 @@
          write(*, *)
          write(*, '(a40, f20.9)') 'd_lneps_dlnT', d_eps_dt * T / eps
          write(*, '(a40, f20.9)') 'd_lneps_dlnRho', d_eps_dd * Rho / eps
-      
+
       end subroutine show_summary_results
 
-      
+
       subroutine show_all_rates( &
             g, num_reactions, n, logT, logRho, sorted)
          type (Net_General_Info), pointer  :: g
@@ -293,7 +293,7 @@
          real(dp), intent(in) :: logT, logRho
          logical, intent(in) :: sorted
          real(dp), dimension(num_reactions) :: rfact
-         
+
          integer :: i
          real(dp) :: T, Rho
          T = exp10(logT); Rho = exp10(logRho)
@@ -335,7 +335,7 @@
          real(dp) :: mx
          integer :: k, j, jmx
          logical :: flgs(rates_reaction_id_max)
-         
+
          write(*, *)
          write(*, *) 'energy generation by category'
          write(*, *)
@@ -358,15 +358,15 @@
             end if
             write(*, '(a40, 2x, f15.6, e15.6)')  &
                   trim(category_name(jmx)), safe_log10(eps_nuc_categories(jmx)), &
-                  eps_nuc_categories(jmx)     
+                  eps_nuc_categories(jmx)
          end do
          write(*, *)
          !write(*, '(a40, 2x, f15.6, e15.6)')  &
          !         'log10(-photodisintegration)', safe_log10(-eps_nuc_categories(iphoto)), &
          !         -eps_nuc_categories(iphoto)
-         
+
          write(*, *)
-         
+
       end subroutine show_by_category
 
 
@@ -374,13 +374,13 @@
          type (Net_General_Info), pointer  :: g
          real(dp), intent(in) :: rts(rates_reaction_id_max), T, Rho
          logical, intent(in) :: sorted
-         
+
          logical :: flgs(rates_reaction_id_max)
          real(dp) :: mx
          integer :: k, j, jmx
-         
+
          flgs = .false.
-         
+
          do k = 1, g% num_reactions
             if (.not. sorted) then
                jmx = k; mx = rts(jmx)
@@ -398,7 +398,7 @@
             if (mx == 1) cycle
             write(*, '(a40, e20.9, 2e17.6)') trim(reaction_name(reaction_id(jmx))), mx
          end do
-         
+
       end subroutine show_rates
 
 
@@ -406,13 +406,13 @@
          type (Net_General_Info), pointer  :: g
          real(dp), intent(in) :: rts(:), T, Rho
          logical, intent(in) :: sorted
-         
+
          logical :: flgs(rates_reaction_id_max)
          real(dp) :: mx
          integer :: k, j, jmx
-         
+
          flgs = .false.
-         
+
          do k = 1, g% num_reactions
             if (.not. sorted) then
                jmx = k; mx = rts(jmx)
@@ -430,10 +430,10 @@
             if (mx == 1) cycle
             write(*, '(a40, f20.9, 2e17.6)') trim(reaction_name(reaction_id(jmx))), safe_log10(mx)
          end do
-         
+
       end subroutine show_log_rates
-      
-      
+
+
       subroutine show_dx_dt(g, species, xin, dxdt, sorted)
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: species
@@ -446,10 +446,10 @@
          write(*, *)
          write(*, '(a40, 2(a17))') 'isotope', 'x initial', 'dx_dt   '
          call show_partials(g, species, xin, dxdt, .true., sorted)
-         
+
       end subroutine show_dx_dt
-      
-      
+
+
       subroutine show_d_eps_nuc_dx(g, species, xin, d_eps_nuc_dx, sorted)
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: species
@@ -462,10 +462,10 @@
          write(*, *)
          write(*, '(a40, a17)') 'isotope', 'd_eps_nuc_dx'
          call show_partials(g, species, xin, d_eps_nuc_dx, .false., sorted)
-         
+
       end subroutine show_d_eps_nuc_dx
-      
-      
+
+
       subroutine show_partials(g, species, xin, derivs, initX_flag, sorted)
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: species
@@ -500,10 +500,10 @@
             end if
             iflgs(jmx) = .true.
          end do
-         
+
       end subroutine show_partials
 
-      
+
       end module test_net_do_one
 
 

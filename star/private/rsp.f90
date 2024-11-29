@@ -31,15 +31,15 @@
       use utils_lib, only: mesa_error
 
       implicit none
-      
+
       private
       public :: rsp_setup_part1, rsp_setup_part2, rsp_one_step, &
          build_rsp_model, rsp_total_energy_integrals, do1_rsp_build
-      
+
       contains
-      
-      
-      subroutine do1_rsp_build(s,ierr) 
+
+
+      subroutine do1_rsp_build(s,ierr)
          ! call from other_rsp_build_model after changing params.
          ! can change rsp_* params; but cannot change nz or net.
          ! multiple calls are ok to search.
@@ -50,7 +50,7 @@
          integer :: k
          include 'formats'
          call init_def(s)
-         call init_for_rsp_eos_and_kap(s)  
+         call init_for_rsp_eos_and_kap(s)
          s% rsp_period = 0d0
          call do_rsp_build(s,ierr)
          if (ierr /= 0) return
@@ -81,7 +81,7 @@
          integer, intent(out) :: ierr
          include 'formats'
          NSTART = 1
-         s% nz = s% RSP_nz         
+         s% nz = s% RSP_nz
          if (s% job% change_initial_net) then
             call do_micro_change_net(s, s% job% new_net_name, ierr)
          else
@@ -90,10 +90,10 @@
          if (ierr /= 0) then
             write(*,*) 'failed in do_micro_change_net'
             return
-         end if         
+         end if
          s% tau_factor = s% RSP_surface_tau/s% tau_base
          call init_def(s)
-         call init_allocate(s,s% nz)         
+         call init_allocate(s,s% nz)
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in allocate_star_info_arrays'
@@ -104,7 +104,7 @@
             write(*,*) 'failed in set_RSP_flag'
             return
          end if
-         call init_for_rsp_eos_and_kap(s)  
+         call init_for_rsp_eos_and_kap(s)
          s% rsp_period = 0d0
          if (s% RSP_use_atm_grey_with_kap_for_Psurf) then
             s% tau_factor = s% RSP_tau_surf_for_atm_grey_with_kap/s% tau_base
@@ -121,7 +121,7 @@
             if (ierr /= 0) then
                write(*,*) 'failed in do_rsp_build'
                return
-            end if            
+            end if
          end if
          if (.not. s% use_RSP_new_start_scheme) &
             call set_random_velocities(s)
@@ -138,28 +138,28 @@
             write(*,1) 'dt', s% dt
             return
          end if
-         call finish_build_rsp_model(s, ierr)      
+         call finish_build_rsp_model(s, ierr)
          write(*,2) 'nz', s%nz
-         write(*,1) 'T(nz)', s% T(s%nz)             
-         write(*,1) 'L_center/Lsun', s% L_center/Lsun           
-         write(*,1) 'R_center/Rsun', s% R_center/Rsun           
-         write(*,1) 'M_center/Msun', s% M_center/Msun           
-         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun           
-         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun           
-         write(*,1) 'M(1)/Msun', s% m(1)/Msun           
-         write(*,1) 'v(1)/1d5', s% v(1)/1d5       
-         write(*,1) 'tau_factor', s% tau_factor   
-         write(*,1) 'tau_base', s% tau_base   
-         write(*,*) 
+         write(*,1) 'T(nz)', s% T(s%nz)
+         write(*,1) 'L_center/Lsun', s% L_center/Lsun
+         write(*,1) 'R_center/Rsun', s% R_center/Rsun
+         write(*,1) 'M_center/Msun', s% M_center/Msun
+         write(*,1) 'L(1)/Lsun', s% L(1)/Lsun
+         write(*,1) 'R(1)/Rsun', s% r(1)/Rsun
+         write(*,1) 'M(1)/Msun', s% m(1)/Msun
+         write(*,1) 'v(1)/1d5', s% v(1)/1d5
+         write(*,1) 'tau_factor', s% tau_factor
+         write(*,1) 'tau_base', s% tau_base
+         write(*,*)
       end subroutine build_rsp_model
-      
+
 
       subroutine finish_build_rsp_model(s,ierr)
          use star_utils, only: &
             normalize_dqs, set_qs, set_m_and_dm, set_dm_bar, set_m_grav_and_grav, &
             store_rho_in_xh, store_T_in_xh, store_r_in_xh
          type (star_info), pointer :: s
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          integer :: i, k, j
          include 'formats'
          do i=1,NZN
@@ -203,7 +203,7 @@
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
       end subroutine finish_build_rsp_model
 
-      
+
       subroutine set_random_velocities(s)
          use star_utils, only: rand
          type (star_info), pointer :: s
@@ -216,9 +216,9 @@
             end do
             write(*,*) 'set random velocities'
             s% RSP_have_set_velocities = .true.
-         end if      
+         end if
       end subroutine set_random_velocities
-      
+
 
       subroutine rsp_setup_part1(s,restart,ierr)
          ! called by finish_load_model before set_vars
@@ -259,17 +259,17 @@
             if (.not. s% job% create_RSP_model) then
                call init_def(s)
                call init_allocate(s,s% nz)
-               call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)               
+               call get_XYZ(s, s% xa(:,1), s% RSP_X, Y, s% RSP_Z)
                call init_for_rsp_eos_and_kap(s)
                IWORK=0
                NZN = s% nz
                ELSTA = s% L(1)
-               RSTA = s% r(1)  
+               RSTA = s% r(1)
                s% rsp_dt = s% dt_next
                if (s% max_timestep > 0d0 .and. s% rsp_dt > s% max_timestep) &
                   s% rsp_dt = s% max_timestep
                rsp_tau_factor = s% tau_factor
-               s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)               
+               s% rsp_period = s% rsp_dt*dble(s% RSP_target_steps_per_cycle)
                s% RSP_have_set_velocities = .true.
                call copy_from_xh_to_rsp(s,-1)
                do k=1,NZN
@@ -294,11 +294,11 @@
             end if
             rsp_min_dr_div_cs = 1d99
             rsp_min_rad_diff_time = 1d99
-            call begin_calculation(s,restart,ierr)  
-         end if  
+            call begin_calculation(s,restart,ierr)
+         end if
          s% tau_factor = rsp_tau_factor
       end subroutine rsp_setup_part1
-         
+
 
       subroutine rsp_setup_part2(s, restart, ierr)
          use hydro_vars, only: set_Teff
@@ -316,7 +316,7 @@
          ierr = 0
          nz = s% nz
          call finish_after_build_model(s)
-         call copy_results(s)  
+         call copy_results(s)
          call set_Teff(s, ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
@@ -339,30 +339,30 @@
 
       subroutine get_LINA_info(s,ierr)
          use rsp_lina, only: do_LINA
-         type (star_info), pointer :: s      
-         integer, intent(out) :: ierr  
-         
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
          real(dp), allocatable :: VEL(:,:)
          real(dp), allocatable, dimension(:) :: &
             M, DM, DM_BAR, R, Vol, T, RSP_Et, Lr
          integer :: NMODES, I, k, sz
          real(dp) :: amix1, amix2, velkm
-         
+
          include 'formats'
          ierr = 0
-         
+
          if (s% RSP_kick_vsurf_km_per_sec == 0d0) then
             write(*,*) 'skip calling LINA since RSP_kick_vsurf_km_per_sec = 0'
             return
          end if
-         
+
          sz = NZN+1
-         
+
          allocate(VEL(sz,15), &
             M(sz), DM(sz), DM_BAR(sz), R(sz), Vol(sz), T(sz), RSP_Et(sz), Lr(sz))
-            
+
          do i=1,NZN
-            k = NZN+1-i 
+            k = NZN+1-i
             M(i) = s% m(k)
             DM(i) = s% dm(k)
             DM_BAR(i) = s% dm_bar(k)
@@ -371,8 +371,8 @@
             T(i) = s% T(k)
             RSP_Et(i) = s% RSP_Et(k)
             Lr(i) = 4d0*pi*s% r(k)**2*s% Fr(k)
-         end do                    
-        
+         end do
+
          NMODES = s% RSP_nmodes
 
          call do_LINA(s, s% RSP_L*SUNL, NZN, NMODES, VEL, &
@@ -386,41 +386,41 @@
                s% rsp_LINA_periods(I)/86400.d0, &
                s% rsp_LINA_growth_rates(I)
          enddo
-         
+
          s% rsp_period = &
             s% rsp_LINA_periods(s% RSP_mode_for_setting_PERIODLIN + 1)
-         
+
          amix1 = s% RSP_fraction_1st_overtone
          amix2 = s% RSP_fraction_2nd_overtone
          velkm = s% RSP_kick_vsurf_km_per_sec
          s% v_center = 0d0
          do i=1,NZN
-            k = NZN+1-i    
+            k = NZN+1-i
             s% v(k)=1.0d5*VELKM* &
                ((1.0d0-AMIX1-AMIX2)*vel(i,1)+AMIX1*vel(i,2)+AMIX2*vel(i,3))
          end do
-            
+
          s% RSP_have_set_velocities = .true.
-         
-      end subroutine get_LINA_info  
+
+      end subroutine get_LINA_info
 
 
       subroutine rsp_one_step(s,ierr)
          use brunt, only: do_brunt_N2
          use rsp_step, only: rsp_set_Teff, &
             turn_off_time_weighting, turn_on_time_weighting
-         type (star_info), pointer :: s      
-         integer, intent(out) :: ierr    
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
          integer :: k, j, k_max_abs_rel_hse_err
          real(dp) :: hse_err, max_abs_rel_hse_err
          logical :: restart
-         
+
          include 'formats'
 
          ierr = 0
          s% RSP_just_set_velocities = .false.
          if (.not. s% RSP_have_set_velocities) then
-         
+
             max_abs_rel_hse_err = 0d0
             k_max_abs_rel_hse_err = 0
             do k=2,s% nz
@@ -433,14 +433,14 @@
             end do
 
             s% need_to_save_profiles_now = .true.
-            s% RSP_just_set_velocities = .true.        
-         
+            s% RSP_just_set_velocities = .true.
+
             write(*,3) 'relaxation max_abs_rel_hse_err, days', s% model_number, k_max_abs_rel_hse_err, &
                max_abs_rel_hse_err, s% time/(24*3600)
-            
-            if (.not. s% use_other_RSP_linear_analysis) then    
-               call get_LINA_info(s,ierr)               
-            else               
+
+            if (.not. s% use_other_RSP_linear_analysis) then
+               call get_LINA_info(s,ierr)
+            else
                ! must set gradT before calling since gyre needs it.
                ! Y_face is superadiabatic gradient
                do k=1,NZN
@@ -465,41 +465,41 @@
                   if (s% report_ierr) &
                      write(*,*) 'other_rsp_linear_analysis ierr', ierr
                   return
-               end if  
-               s% RSP_have_set_velocities = .true.                
-            end if                              
-            
+               end if
+               s% RSP_have_set_velocities = .true.
+            end if
+
             PERIODLIN = s% rsp_period
             s% rsp_dt = s% rsp_period/dble(s% rsp_target_steps_per_cycle)
-            s% dt = s% rsp_dt  
-            
+            s% dt = s% rsp_dt
+
             s% cumulative_energy_error_old = 0d0
             s% time = 0d0
             s% time_old = 0d0
             write(*,*) 'automatically resets age and cumulative energy error info when sets velocities'
             s% need_to_save_profiles_now = .true.
-            
+
             call set_random_velocities(s)
-            
-         end if 
-         
+
+         end if
+
          s% do_history_file = s% RSP_have_set_velocities ! don't write history entries until set velocities
          !call turn_on_time_weighting(s)
-         
+
          if (s% dt > s% RSP_max_dt .and. s% RSP_max_dt > 0d0) then
             s% dt = s% RSP_max_dt
          end if
-         
-         call do1_step(s,ierr) 
+
+         call do1_step(s,ierr)
          if (ierr /= 0) return
-         
-         call copy_results(s)  
+
+         call copy_results(s)
          call rsp_set_Teff(s)
          if (s% RSP_write_map) call add_to_map
 
-         
+
          contains
-                           
+
          subroutine add_to_map
             use profile_getval, only: get_profile_val
             integer :: i, k, NPCH1, NPCH2, IP, n, io
@@ -537,7 +537,7 @@
                   s% need_to_set_history_names_etc = .true.
                   s% star_history_name = s% RSP_map_history_filename
                   FASE0 = s% time
-               endif     
+               endif
                FASE=(s% time-FASE0)/s% rsp_period
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
                do k=1,NZN,s% RSP_map_zone_interval ! gnuplot pm3d map
@@ -565,12 +565,12 @@
                write(*,*) '  close ' // trim(fname)
                done_writing_map = .true.
             end if
- 778  format(d16.10,1x,i3,14(1x,d16.10))                     
+ 778  format(d16.10,1x,i3,14(1x,d16.10))
          end subroutine add_to_map
-         
+
       end subroutine rsp_one_step
-      
-      
+
+
       subroutine read_map_specs(s,ierr)
          use utils_lib
          use utils_def
@@ -584,7 +584,7 @@
          include 'formats'
 
          ierr = 0
-            
+
          filename = s% RSP_map_columns_filename
          if (len_trim(filename) == 0) filename = 'map_columns.list'
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -596,7 +596,7 @@
          n = 0
          i = 0
          col = 0
-         
+
          num_map_cols = 0
 
          do
@@ -625,20 +625,20 @@
             map_col_names(col) = trim(string)
             map_ids(col) = id
          end do
-         
+
          num_map_cols = col
 
          close(iounit)
-         
+
          contains
 
          subroutine error
             ierr = -1
             close(iounit)
          end subroutine error
-      
+
       end subroutine read_map_specs
-      
+
 
       subroutine do1_step(s,ierr)
          type (star_info), pointer :: s
@@ -647,9 +647,9 @@
          real(dp) :: dr_div_cs, r_in, r_00, max_dt, target_dt, total_radiation
 
          include 'formats'
-         
+
          ID=ID+1
-      
+
          target_dt = min( &
             s% rsp_period/dble(s% RSP_target_steps_per_cycle), &
             s% dt*s% max_timestep_factor)
@@ -684,9 +684,9 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'do1_step 1')
             s% dt = max_dt
          end if
-         
+
          if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
-         
+
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
             write(*,1) 'RSP_max_dt_times_min_dr_div_cs', s% RSP_max_dt_times_min_dr_div_cs
@@ -694,14 +694,14 @@
             write(*,1) 'rsp_min_rad_diff_time', rsp_min_rad_diff_time
             call mesa_error(__FILE__,__LINE__,'do1_step 2')
          end if
-         
+
          ierr = 0
-         call HYD(s,ierr) 
+         call HYD(s,ierr)
          if (ierr /= 0) return
          ! s% dt might have been reduced by retries in HYD
          s% time = s% time_old + s% dt
          s% rsp_dt = s% dt ! will be used to set dt for next step
-         
+
          ! set this here for use in next step. to avoid restart problems.
          rsp_min_dr_div_cs = 1d99
          i_min_dr_div_cs = -1
@@ -718,20 +718,20 @@
                i_min_dr_div_cs = i
             end if
          end do
-         
+
          rsp_min_rad_diff_time = 1d99
          i_min_rad_diff_time = -1
          if (s% RSP_max_dt_times_min_rad_diff_time > 0d0) then
             rsp_min_rad_diff_time = dt_for_radiative_diffusion(i_min_rad_diff_time)
          end if
-         
-         call calculate_work_integrals(s)      
+
+         call calculate_work_integrals(s)
          call calculate_energies(s,total_radiation)
          call gather_pulse_statistics(s)
          if (s% RSP_max_num_periods < 0 .or. &
              s% rsp_num_periods < s% RSP_max_num_periods) return
          call get_GRPDV(s)
-                  
+
          contains
 
          real(dp) function dt_for_radiative_diffusion(i_min_rad_diff_time)
@@ -760,20 +760,20 @@
             end do
             i_min_rad_diff_time = NZN-k_min_dt+1
             dt_for_radiative_diffusion = min_dt
-         end function dt_for_radiative_diffusion         
-         
+         end function dt_for_radiative_diffusion
+
       end subroutine do1_step
-      
-      
+
+
       subroutine gather_pulse_statistics(s) ! assumes have set EKMAX and EKMIN
-         ! updates LMAX, LMIN, RMAX, RMIN, 
+         ! updates LMAX, LMIN, RMAX, RMIN,
          !     s% rsp_GREKM, s% rsp_GREKM_avg_abs, s% rsp_DeltaR, s% rsp_DeltaMAG
          type (star_info), pointer :: s
          logical :: cycle_complete
          include 'formats'
          if(s% L(1)/SUNL>LMAX) LMAX=s% L(1)/SUNL
-         if(s% L(1)/SUNL<LMIN) LMIN=s% L(1)/SUNL      
-         INSIDE=0      
+         if(s% L(1)/SUNL<LMIN) LMIN=s% L(1)/SUNL
+         INSIDE=0
          call check_cycle_completed(s,cycle_complete)
          ULL=UN
          TE_start=s% time
@@ -815,8 +815,8 @@
          s% rsp_GRPDV=PDVWORK/EKDEL
          if (is_bad(s% rsp_GRPDV)) s% rsp_GRPDV=0d0
       end subroutine get_GRPDV
-      
-      
+
+
       subroutine begin_calculation(s,restart,ierr)
          type (star_info), pointer :: s
          logical, intent(in) :: restart
@@ -824,7 +824,7 @@
          real(dp) :: total_radiation
          include 'formats'
          ierr = 0
-         FIRST  = 0 
+         FIRST  = 0
          TT1    = 0.d0
          EKMAX  = -10.d50
          EKMIN  = -EKMAX
@@ -851,15 +851,15 @@
          s% rsp_DeltaMAG = 0
          ID   = 0
          E0   = 0.d0
-         call init_HYD(s,ierr)         
+         call init_HYD(s,ierr)
          if (ierr /= 0) return
          s% rsp_num_periods = 0
          call calculate_energies(s,total_radiation)
-         E0 = EDE_start 
-         call calculate_work_integrals(s)   
+         E0 = EDE_start
+         call calculate_work_integrals(s)
       end subroutine begin_calculation
-      
-      
+
+
       subroutine calculate_work_integrals(s)
          type (star_info), pointer :: s
          integer :: i, k
@@ -867,7 +867,7 @@
          character (len=256) :: fname
          dt = s% dt
          ! LAST STEP OF PdV
-         if(INSIDE==1.and.IWORK==1) then  
+         if(INSIDE==1.and.IWORK==1) then
             IWORK=0
             do I=1,NZN
                k = NZN+1-i
@@ -901,7 +901,7 @@
             do I=1,NZN
                k = NZN+1-i
                PDVWORK=PDVWORK+WORK(I)
-               WORK(I)=0.d0    
+               WORK(I)=0.d0
                WORKQ(I)=0.d0
                WORKT(I)=0.d0
                WORKC(I)=0.d0
@@ -912,7 +912,7 @@
          ! INITIAL STEP OF PdV:
          if((INSIDE==1.and.IWORK==0).or. &
             (s% rsp_num_periods==0.and.IWORK==0))then
-            IWORK=1 
+            IWORK=1
             do I=1,NZN
                k = NZN+1-i
                VV0(I) = s% Vol_start(k)
@@ -920,7 +920,7 @@
                PPQ0(I) = s% Pvsc_start(k)
                PPT0(I) = s% Ptrb_start(k)
                PPC0(I) = s% Chi_start(k)
-            enddo      
+            enddo
          endif
 
          ! FIRST AND NEXT STEPS of PdV:
@@ -938,7 +938,7 @@
                WORKQ(I)=  WORKQ(I) + dm*dVol*Pvsc_tw
                WORKT(I)=  WORKT(I) + dm*dVol*Ptrb_tw
                WORKC(I)=  WORKC(I) - dt*dm*s% Eq(k)
-            enddo       
+            enddo
          endif
       end subroutine calculate_work_integrals
 
@@ -962,12 +962,12 @@
          sum_total = ETOT
       end subroutine rsp_total_energy_integrals
 
-      
+
       subroutine check_cycle_completed(s,cycle_complete)
          ! uses ULL, FIRST, s% RSP_min_max_R_for_periods, PERIODLIN, s% RSP_min_PERIOD_div_PERIODLIN
          ! depends on s% RSP_have_set_velocities = .true.
          ! sets s% rsp_num_periods, s% rsp_period
-         
+
          type (star_info), pointer :: s
          logical, intent(out) :: cycle_complete
          real(dp) :: TET, min_PERIOD
@@ -990,7 +990,7 @@
          if (abs(UN-ULL)>1.0d-10) T0=TE_start-(TE_start-TET)*ULL/(ULL-UN)
          if (min_PERIOD > 0d0 .and. T0-TT1 < min_PERIOD) return
          if (s% r(1)/SUNR - RMIN < s% RSP_min_deltaR_for_periods) return
-         if(FIRST==1)then   
+         if(FIRST==1)then
             cycle_complete = .true.
             s% rsp_num_periods=s% rsp_num_periods+1
             s% rsp_period=T0-TT1
@@ -1018,7 +1018,7 @@
             run_num_iters_prev_period = s% total_num_solver_iterations
             run_num_retries_prev_period = s% num_retries
             TT1=T0
-            INSIDE=1 
+            INSIDE=1
             VMAX = 0d0
          else
              write(*,*) 'first maximum radius, period calculations start at model, day', &
@@ -1028,7 +1028,7 @@
              ID=0
          endif
       end subroutine check_cycle_completed
-      
- 
+
+
       end module rsp
-      
+

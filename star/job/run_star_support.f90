@@ -22,7 +22,7 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module run_star_support
 
       use star_lib
@@ -38,7 +38,7 @@
       use other_extras
 
       implicit none
-      
+
       integer :: id_from_read_star_job = 0
 
       ! Set MESA_INLIST_RESOLVED to true when you no longer want the routine
@@ -55,13 +55,13 @@
       public :: id_from_read_star_job
       public :: MESA_INLIST_RESOLVED
       public :: do_star_job_controls_before, do_star_job_controls_after
-      
+
       ! deprecated, but kept around for use by binary
       public :: before_evolve_loop, after_step_loop, before_step_loop, do_saves, &
          resolve_inlist_fname, terminate_normal_evolve_loop, null_binary_controls
-      
-      contains 
-            
+
+      contains
+
 
       subroutine run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
@@ -69,30 +69,30 @@
             extras_controls, &
             ierr, &
             inlist_fname_arg)
-         
+
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
          integer, intent(inout) :: id ! input if not do_alloc_star
          logical, intent(inout) :: restart ! input if not do_alloc_star
          character (len=*) :: inlist_fname_arg
          integer, intent(out) :: ierr
          optional inlist_fname_arg
-         
+
          interface
 
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
-     
+            end subroutine extras_controls
+
          end interface
-         
+
          logical :: continue_evolve_loop
          type (star_info), pointer :: s
          character (len=strlen) :: restart_filename
-            
+
          logical, parameter :: pgstar_ok = .true.
          logical, parameter :: dbg = .false.
-         
+
          1 format(a35, 99(1pe26.16))
          2 format(a55, i7, 1pe26.16)
          3 format(a15, 2x, f15.6)
@@ -114,7 +114,7 @@
 
          if (dbg) write(*,*) 'start evolve_loop'
          evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
-         
+
             continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)
             if (failed('do_evolve_one_step',ierr)) return
 
@@ -123,14 +123,14 @@
          call after_evolve_loop(s% id, do_free_star, ierr)
          if (failed('after_evolve_loop',ierr)) return
 
-      end subroutine run1_star  
-      
-      
+      end subroutine run1_star
+
+
       subroutine start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
             id, restart, restart_filename, pgstar_ok, dbg, &
             extras_controls, ierr, inlist_fname_arg)
-            
+
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
          integer, intent(inout) :: id ! input if not do_alloc_star
          logical, intent(inout) :: restart ! input if not do_alloc_star
@@ -138,19 +138,19 @@
          character (len=*) :: restart_filename, inlist_fname_arg
          optional inlist_fname_arg
          integer, intent(out) :: ierr
-         
+
          interface
 
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
-     
+            end subroutine extras_controls
+
          end interface
 
          type (star_info), pointer :: s
          character (len=strlen) :: inlist_fname
-         
+
          include 'formats'
 
          ierr = 0
@@ -175,19 +175,19 @@
          s% job% time0_initial = 0
 
       end subroutine start_run1_star
-      
-      
+
+
       logical function do_evolve_one_step(s, dbg, ierr) result(continue_evolve_loop)
          type (star_info), pointer :: s
          logical, intent(in) :: dbg
          integer, intent(out) :: ierr
-         
+
          logical :: first_try
          integer :: id
          integer :: result, model_number
-         
+
          include 'formats'
-         
+
          ierr = 0
          id = s% id
          continue_evolve_loop = .true.
@@ -195,36 +195,36 @@
          call before_step_loop(s% id, ierr)
          if (failed('before_step_loop',ierr)) return
 
-         result = s% extras_start_step(id)  
+         result = s% extras_start_step(id)
          if (result /= keep_going) then
             continue_evolve_loop = .false.
-            return 
-         end if        
+            return
+         end if
 
          first_try = .true.
-      
+
          step_loop: do ! may need to repeat this loop
-         
+
             if (stop_is_requested(s)) then
                continue_evolve_loop = .false.
                result = terminate
-               exit
+               exit step_loop
             end if
-         
+
             result = star_evolve_step(id, first_try)
             if (result == keep_going) result = star_check_model(id)
             if (result == keep_going) result = s% extras_check_model(id)
-            if (result == keep_going) result = star_pick_next_timestep(id)            
+            if (result == keep_going) result = star_pick_next_timestep(id)
             if (result == keep_going) exit step_loop
-            
+
             model_number = get_model_number(id, ierr)
             if (failed('get_model_number',ierr)) return
-                           
+
             if (result == retry .and. s% job% report_retries) then
                write(*,'(i6,3x,a,/)') model_number, &
                   'retry reason ' // trim(result_reason_str(s% result_reason))
             end if
-            
+
             if (result == redo) then
                result = star_prepare_to_redo(id)
             end if
@@ -236,16 +236,16 @@
                exit step_loop
             end if
             first_try = .false.
-            
+
          end do step_loop
-         
+
          ! once we get here, the only options are keep_going or terminate.
          ! redo or retry must be done inside the step_loop
-         
+
          call after_step_loop(s% id, s% inlist_fname, &
              dbg, result, ierr)
          if (failed('after_step_loop',ierr)) return
-            
+
          if (result /= keep_going) then
             if (result /= terminate) then
                write(*,2) 'ERROR in result value in run_star_extras: model', &
@@ -253,7 +253,7 @@
                write(*,2) 'extras_finish_step must return keep_going or terminate'
                write(*,2) 'result', result
                continue_evolve_loop = .false.
-               return 
+               return
             end if
             if (s% result_reason == result_reason_normal) then
                call terminate_normal_evolve_loop(s% id, &
@@ -261,9 +261,9 @@
                if (failed('terminate_normal_evolve_loop',ierr)) return
             end if
             continue_evolve_loop = .false.
-            return 
+            return
          end if
-         
+
          call do_saves(id, ierr)
          if (failed('do_saves',ierr)) return
 
@@ -275,9 +275,9 @@
             s% job% check_after_step_timing = s% job% check_after_step_timing + &
                (s% job% check_time_end - s% job% check_time_start)
          end if
-         
+
       end function do_evolve_one_step
-            
+
 
       subroutine null_binary_controls(id, binary_id, ierr)
          integer, intent(in) :: id, binary_id
@@ -300,11 +300,11 @@
             subroutine binary_controls(id, binary_id, ierr)
                integer, intent(in) :: id, binary_id
                integer, intent(out) :: ierr
-            end subroutine binary_controls     
+            end subroutine binary_controls
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
+            end subroutine extras_controls
          end interface
          integer :: id_from_read_star_job
          character (len=*) :: inlist_fname, restart_filename
@@ -317,8 +317,8 @@
               id_from_read_star_job, inlist_fname, restart_filename, &
               dbg, binary_id, id, ierr)
       end subroutine before_evolve_loop
-      
-      
+
+
       subroutine do_before_evolve_loop( &
               do_alloc_star, okay_to_restart, restart, pgstar_ok, &
               binary_controls, extras_controls, &
@@ -330,11 +330,11 @@
             subroutine binary_controls(id, binary_id, ierr)
                integer, intent(in) :: id, binary_id
                integer, intent(out) :: ierr
-            end subroutine binary_controls     
+            end subroutine binary_controls
             subroutine extras_controls(id, ierr)
                integer, intent(in) :: id
                integer, intent(out) :: ierr
-            end subroutine extras_controls      
+            end subroutine extras_controls
          end interface
          integer :: id_from_read_star_job
          character (len=*) :: inlist_fname, restart_filename
@@ -343,19 +343,19 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: id, ierr
 
-         type (star_info), pointer :: s         
-         
+         type (star_info), pointer :: s
+
          include 'formats'
-         
-         if (do_alloc_star) then           
-            if (id_from_read_star_job /= 0) then 
+
+         if (do_alloc_star) then
+            if (id_from_read_star_job /= 0) then
                ! already allocated by read_star_job
                id = id_from_read_star_job
                id_from_read_star_job = 0
             else
                call alloc_star(id, ierr)
                if (failed('alloc_star',ierr)) return
-            end if         
+            end if
             call star_ptr(id, s, ierr)
             if (failed('star_ptr',ierr)) return
          else
@@ -364,32 +364,32 @@
             call init_starting_star_data(s, ierr)
             if (failed('init_starting_star_data',ierr)) return
          end if
-         
+
          s% inlist_fname = inlist_fname
-         
+
          if (dbg) write(*,*) 'call starlib_init'
          call starlib_init(s, ierr) ! okay to do extra calls on this
          if (failed('star_init',ierr)) return
-         
+
          if (dbg) write(*,*) 'call star_set_kap_and_eos_handles'
          call star_set_kap_and_eos_handles(id, ierr)
          if (failed('set_star_kap_and_eos_handles',ierr)) return
-         
+
          if (dbg) write(*,*) 'call star_setup'
          call star_setup(id, inlist_fname, ierr)
          if (failed('star_setup',ierr)) return
-         
+
          if(dbg) write(*,*) 'call add_fpe_checks'
          call add_fpe_checks(id, s, ierr)
          if (failed('add_fpe_checks',ierr)) return
-         
+
          if(dbg) write(*,*) 'call multiply_tolerances'
          call multiply_tolerances(id, s, ierr)
          if (failed('multiply_tolerances',ierr)) return
 
          if(dbg) write(*,*) 'call pgstar_env_check'
          call pgstar_env_check(id, s, ierr)
-         if (failed('pgstar_env_check',ierr)) return        
+         if (failed('pgstar_env_check',ierr)) return
 
          ! testing module-level (atm/eos/kap/net) partials requires single-threaded execution
          if (s% solver_test_atm_partials .or. s% solver_test_eos_partials .or. &
@@ -399,14 +399,14 @@
                call omp_set_num_threads(1)
             end if
          end if
-         
+
          if (len_trim(s% op_mono_data_path) == 0) &
             call get_environment_variable( &
                "MESA_OP_MONO_DATA_PATH", s% op_mono_data_path)
-         
+
          if (len_trim(s% op_mono_data_cache_filename) == 0) &
             call get_environment_variable( &
-               "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)         
+               "MESA_OP_MONO_DATA_CACHE_FILENAME", s% op_mono_data_cache_filename)
 
          if (len_trim(s% emesh_data_for_op_mono_path) == 0) &
             call get_environment_variable( &
@@ -436,7 +436,7 @@
          else
             restart = .false.
          end if
-         
+
          if (s% job% show_log_description_at_start .and. .not. restart) then
             write(*,'(A)')
             call show_log_description(id, ierr)
@@ -446,7 +446,7 @@
          if (dbg) write(*,*) 'call binary_controls'
          call binary_controls(id, binary_id, ierr)
          if (ierr /= 0) return
-         
+
          if (dbg) write(*,*) 'call do_star_job_controls_before'
          call do_star_job_controls_before(id, s, restart, ierr)
          if (ierr /= 0) return
@@ -454,14 +454,14 @@
          if (dbg) write(*,*) 'call do_load1_star'
          call do_load1_star(id, s, restart, restart_filename, ierr)
          if (failed('do_load1_star',ierr)) return
-         
+
          if (dbg) write(*,*) 'call do_star_job_controls_after'
          call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
          write(*,'(A)')
          write(*,'(A)')
-         
+
          if (.not. restart) then
             if (dbg) write(*,*) 'call before_evolve'
             call before_evolve(id, ierr)
@@ -470,7 +470,7 @@
             call show_terminal_header(id, ierr)
             if (failed('show_terminal_header',ierr)) return
          end if
-         
+
          if (dbg) write(*,*) 'call extras_startup'
          call s% extras_startup(id, restart, ierr)
          if (failed('extras_startup',ierr)) return
@@ -478,7 +478,7 @@
          if (s% job% profile_starting_model .and. .not. restart) then
             call star_set_vars(id, 0d0, ierr)
             if (failed('star_set_vars',ierr)) return
-            write(*, '(a, i12)') 'save profile for model number ', s% model_number            
+            write(*, '(a, i12)') 'save profile for model number ', s% model_number
             call save_profile(id,3,ierr)
             if (failed('save_profile',ierr)) return
          end if
@@ -486,12 +486,12 @@
          if (s% model_number == s% job% save_model_number) then
             call star_set_vars(id, 0d0, ierr)
             if (failed('star_set_vars',ierr)) return
-            write(*, '(a, i12)') 'write initial model ', s% model_number            
+            write(*, '(a, i12)') 'write initial model ', s% model_number
             call star_write_model(id, 'initial.mod', ierr)
             if (failed('star_write_model',ierr)) return
             write(*, *) 'saved to ' // 'initial.mod' ! trim(s% job% save_model_filename)
          end if
-         
+
          if (len_trim(s% job% echo_at_start) > 0) then
             write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_start)
@@ -503,11 +503,11 @@
 
       subroutine before_step_loop(id, ierr)
          integer, intent(in) :: id
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: model_number, j
          integer :: num_DT, num_FreeEOS
-         
+
          1 format(a35, 99(1pe26.16))
          2 format(a35, i7, 1pe26.16)
          3 format(a15, 2x, f15.6)
@@ -519,7 +519,7 @@
          if (ierr/=0) return
 
          s% result_reason = result_reason_normal
-         
+
          if (s% job% first_model_for_timing >= 0 .and. &
                s% model_number >= s% job% first_model_for_timing .and. &
                .not. s% doing_timing) then
@@ -532,12 +532,12 @@
             s% job% after_step_timing = 0
             s% job% before_step_timing = 0
          end if
-         
+
          if (s% doing_timing) then
             call system_clock(s% job% time0_extra,s% job% clock_rate)
             s% job% check_time_start = eval_total_times(s% id, ierr)
          end if
-         
+
          if(s% job% num_steps_for_garbage_collection > 0 .and. s% model_number > 1) then
             if(mod(s% model_number, s% job% num_steps_for_garbage_collection) == 0)then
                if (s% job% report_garbage_collection) then
@@ -549,7 +549,7 @@
                call star_do_garbage_collection(s% id,ierr)
                if (failed('star_do_garbage_collection',ierr)) return
             end if
-            
+
             ! If reporting, we want to look at the step and the next step (to see the difference)
             if(mod(s% model_number-1, s% job% num_steps_for_garbage_collection) == 0 &
                   .and. s% job% report_garbage_collection)then
@@ -559,7 +559,7 @@
                               "num FreeEOS",num_FreeEOS
             end if
          end if
-         
+
          if (s% job% enable_adaptive_network) then
             call star_adjust_net(s% id, &
                s% job% min_x_for_keep, &
@@ -571,12 +571,12 @@
                ierr)
             if (failed('star_adjust_net',ierr)) return
          end if
-         
+
          if (s% job% auto_extend_net) then
             call extend_net(s, ierr)
             if (failed('extend_net',ierr)) return
          end if
-         
+
          if (s% use_other_remove_surface) then
             call s% other_remove_surface(id, ierr, j)
             if (failed('other_remove_surface',ierr)) return
@@ -588,24 +588,24 @@
             call do_remove_surface(id, s, ierr)
             if (failed('do_remove_surface',ierr)) return
          end if
-         
+
          if (s% job% remove_fallback_at_each_step) then
             call star_remove_fallback(id,ierr)
             if (failed('star_remove_fallback',ierr)) return
          end if
-         
+
          if (s% job% limit_center_logP_at_each_step > -1d90) then
             call star_limit_center_logP( &
                id, s% job% limit_center_logP_at_each_step, ierr)
             if (failed('star_limit_center_logP',ierr)) return
          end if
-         
+
          if (s% job% remove_center_logRho_limit > -1d90) then
             call star_remove_center_by_logRho( &
                id, s% job% remove_center_logRho_limit, ierr)
             if (failed('star_remove_center_by_logRho',ierr)) return
          end if
-         
+
          if (s% center_ye <= s% job% center_ye_limit_for_v_flag &
                .and. (.not. s% v_flag) .and. (.not. s% u_flag)) then
             write(*,1) 'have reached center ye limit', &
@@ -615,33 +615,33 @@
             if (failed('star_set_v_flag',ierr)) return
             if (ierr /= 0) return
          end if
-         
+
          if (s% job% change_RSP2_flag_at_model_number == s% model_number) then
             write(*,*) 'have reached model number for new_RSP2_flag', &
                s% model_number, s% job% new_RSP2_flag
             call star_set_RSP2_flag(id, s% job% new_RSP2_flag, ierr)
             if (failed('star_set_RSP2_flag',ierr)) return
          end if
-         
+
          if (s% job% report_mass_not_fe56) call do_report_mass_not_fe56(s)
          if (s% job% report_cell_for_xm > 0) call do_report_cell_for_xm(s)
-         
+
          model_number = get_model_number(id, ierr)
          if (failed('get_model_number',ierr)) return
-         
+
          if (s% star_age < s% job% set_cumulative_energy_error_each_step_if_age_less_than) then
             if (mod(model_number, s% terminal_interval) == 0) &
                write(*,1) 'cumulative_energy_error reset to', s% job% new_cumulative_energy_error
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
-         
+
          if (s% doing_timing) then
-         
+
             call system_clock(s% job% time1_extra, s% job% clock_rate)
             s% job% before_step_timing = &
                s% job% before_step_timing + &
                   dble(s% job% time1_extra - s% job% time0_extra) / s% job% clock_rate
-            
+
             s% job% check_time_end = eval_total_times(s% id, ierr)
             s% job% check_before_step_timing = &
                s% job% check_before_step_timing + &
@@ -657,7 +657,7 @@
 
       subroutine after_step_loop(id, inlist_fname, dbg, result, ierr)
          integer, intent(in) :: id
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          character (len=*) :: inlist_fname
          logical, intent(in) :: dbg
          integer, intent(out) :: ierr
@@ -665,28 +665,28 @@
          logical :: will_read_pgstar_inlist
 
          real(dp) :: tmp
-         
+
          include 'formats'
 
          call star_ptr(id, s, ierr)
          if (ierr/=0) return
 
-         if (s% doing_timing) then            
+         if (s% doing_timing) then
             call system_clock(s% job% time1_extra,s% job% clock_rate)
             s% job% step_loop_timing = s% job% step_loop_timing + &
-               dble(s% job% time1_extra - s% job% time0_extra) / s% job% clock_rate               
+               dble(s% job% time1_extra - s% job% time0_extra) / s% job% clock_rate
             s% job% check_time_end = eval_total_times(s% id, ierr)
             s% job% check_step_loop_timing = s% job% check_step_loop_timing + &
                 (s% job% check_time_end - s% job% check_time_start)
             s% job% time0_extra = s% job% time1_extra
-            s% job% check_time_start = s% job% check_time_end               
+            s% job% check_time_start = s% job% check_time_end
          end if
-         
+
          if (s% model_number == s% job% set_cumulative_energy_error_at_step) then
             write(*,1) 'set_cumulative_energy_error', s% job% new_cumulative_energy_error
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
-         
+
          if (is_bad(s% total_energy_end)) then
             ierr = 1
             return
@@ -699,7 +699,7 @@
                   s% model_number, abs(s% cumulative_energy_error/s% total_energy_end)
             end if
          end if
-         
+
          if (.not. (s% rotation_flag .or. s% u_flag .or. s% use_mass_corrections &
                .or. s% v_flag .or. s% m_center > 0 .or. s% star_mdot /= 0d0)) then
             tmp = abs(1d0 + s% total_gravitational_energy_end/s% virial_thm_P_avg)
@@ -709,8 +709,8 @@
                   abs(s% total_gravitational_energy_end), s% virial_thm_P_avg
             end if
          end if
-                     
-         if (result == keep_going) then 
+
+         if (result == keep_going) then
             if (s% job% pgstar_flag) then
                 will_read_pgstar_inlist = .false.
                 if (s% pg% pgstar_interval <= 0) then
@@ -719,43 +719,43 @@
                     will_read_pgstar_inlist  = .true.
                 end if
                 if(will_read_pgstar_inlist) then
-                  call read_pgstar_inlist(s, inlist_fname, ierr) 
+                  call read_pgstar_inlist(s, inlist_fname, ierr)
                   if (failed('read_pgstar_controls',ierr)) return
                end if
             end if
          end if
-      
+
          if (result == keep_going) then
-            result = s% extras_finish_step(id)      
-         else if (result == terminate) then 
+            result = s% extras_finish_step(id)
+         else if (result == terminate) then
             ! call extras_finish_step one last time before terminate
-            result = s% extras_finish_step(id)      
+            result = s% extras_finish_step(id)
             result = terminate
          end if
-         
+
          if (result == keep_going) then
             if (dbg) write(*,*) 'call star_finish_step'
             result = star_finish_step(id, ierr)
             if (failed('star_finish_step',ierr)) return
          end if
-                     
+
          if (result == keep_going .and. s% job% pgstar_flag) then
             if (dbg) write(*,*) 'call update_pgstar_plots'
             call update_pgstar_plots(s, .false., ierr)
             if (failed('update_pgstar_plots',ierr)) return
          end if
-         
-         if (result == keep_going) then 
+
+         if (result == keep_going) then
             call adjust_tau_factor(s)
             if (s% L_nuc_burn_total/s% L_phot >= s% Lnuc_div_L_zams_limit &
-                  .and. .not. s% rotation_flag) then  
+                  .and. .not. s% rotation_flag) then
                call do_rotation_near_zams(s,ierr)
                if (ierr /= 0) return
-            end if           
-            if (s% rotation_flag) then      
+            end if
+            if (s% rotation_flag) then
                call do_rotation(s,ierr)
                if (ierr /= 0) return
-            end if 
+            end if
          end if
 
       end subroutine after_step_loop
@@ -764,7 +764,7 @@
       subroutine terminate_normal_evolve_loop(id, &
              dbg, result, ierr)
          integer, intent(in) :: id
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          logical, intent(in) :: dbg
          integer, intent(out) :: result, ierr
          integer :: i
@@ -774,18 +774,18 @@
          if (ierr/=0) return
 
          if (dbg) write(*,*) 'call star_pick_next_timestep'
-         result = star_pick_next_timestep(id) ! for saved model if any  
+         result = star_pick_next_timestep(id) ! for saved model if any
          if (dbg) write(*,*) 'call save_profile'
          call save_profile(id, 3, ierr)
          s% need_to_save_profiles_now = .false.
          s% need_to_update_history_now = .true.
          if (dbg) write(*,*) 'call star_finish_step'
          result = star_finish_step(id, ierr)
-         if (failed('star_finish_step',ierr)) return         
+         if (failed('star_finish_step',ierr)) return
          if (s% job% save_photo_when_terminate .and. termination_code_string_okay()) &
             s% job% save_photo_number = s% model_number
          if (s% job% save_model_when_terminate .and. termination_code_string_okay()) &
-            s% job% save_model_number = s% model_number 
+            s% job% save_model_number = s% model_number
          if (s% job% save_pulse_data_when_terminate) &
             s% job% save_pulse_data_for_model_number = s% model_number
          if (s% job% write_profile_when_terminate) then
@@ -796,7 +796,7 @@
                if (failed('star_write_profile_info',ierr)) return
             else
                write(*,*) "filename_for_profile_when_terminate must be non empty"
-               ierr = -1 
+               ierr = -1
                return
             end if
          end if
@@ -818,9 +818,9 @@
          end if
          call do_saves(id, ierr)
          if (failed('do_saves terminate_normal_evolve_loop',ierr)) return
-         
+
          contains
-         
+
          logical function termination_code_string_okay()
             integer :: j, n
             termination_code_string_okay = .true.
@@ -844,7 +844,7 @@
       subroutine after_evolve_loop(id, &
              do_free_star, ierr)
          integer, intent(in) :: id
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          logical, intent(in) :: do_free_star
          integer, intent(out) :: ierr
 
@@ -857,17 +857,17 @@
                 dble(s% job% time1 - s% job% time0_initial) / s% job% clock_rate
             call show_times(id,s)
          end if
-         
+
          if (s% result_reason /= result_reason_normal) then
             write(*, '(a)') 'terminated evolution: ' // &
                trim(result_reason_str(s% result_reason))
          end if
-         
+
          if (s% termination_code > 0 .and. s% termination_code <= num_termination_codes) then
             write(*, '(a)') 'termination code: ' // &
                trim(termination_code_str(s% termination_code))
          end if
-         
+
          if (s% job% pause_before_terminate) then
             write(*,'(a)') 'pause_before_terminate: hit RETURN to continue'
             read(*,*)
@@ -877,7 +877,7 @@
          if (failed('after_evolve_extras',ierr)) return
 
          if (s% result_reason == result_reason_normal) then
-         
+
             if (s% job% pgstar_flag) &
                call update_pgstar_plots( &
                   s, s% job% save_pgstar_files_when_terminate, &
@@ -886,37 +886,37 @@
 
             call show_terminal_header(id, ierr)
             if (failed('show_terminal_header',ierr)) return
-            
+
             call write_terminal_summary(id, ierr)
             if (failed('write_terminal_summary',ierr)) return
-         
+
          end if
-         
+
          if (len_trim(s% job% echo_at_end) > 0) then
             write(*,'(A)')
             write(*,'(a)') trim(s% job% echo_at_end)
             write(*,'(A)')
          end if
-         
+
          if (do_free_star) then
             call free_star(id, ierr)
             if (failed('free_star',ierr)) return
          end if
 
       end subroutine after_evolve_loop
-         
-      
+
+
       subroutine adjust_tau_factor(s)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          include 'formats'
-         
+
          if (s% job% adjust_tau_factor_to_surf_density .and. &
                s% job% base_for_adjust_tau_factor_to_surf_density > 0d0) then
             s% tau_factor = s% rho(1)/s% job% base_for_adjust_tau_factor_to_surf_density
             !write(*,1) 'adjust_tau_factor_to_surf_density', s% tau_factor
             s% need_to_setvars = .true.
          end if
-         
+
          if (s% job% set_tau_factor_after_core_He_burn > 0 .and. &
                abs(s% tau_factor - s% job% set_to_this_tau_factor) > &
                   1d-6*max(s% tau_factor, s% job% set_to_this_tau_factor)) then
@@ -926,7 +926,7 @@
                s% need_to_setvars = .true.
             end if
          end if
-   
+
          if (s% job% set_tau_factor_after_core_C_burn > 0 .and. &
                abs(s% tau_factor - s% job% set_to_this_tau_factor) > &
                   1d-6*max(s% tau_factor, s% job% set_to_this_tau_factor)) then
@@ -936,14 +936,14 @@
                s% need_to_setvars = .true.
             end if
          end if
-   
+
          if (s% job% relax_tau_factor_after_core_He_burn > 0 .and. &
                abs(s% tau_factor - s% job% relax_to_this_tau_factor) > &
                   1d-6*max(s% tau_factor, s% job% relax_to_this_tau_factor)) then
             if (check_for_after_He_burn(s, s% job% relax_tau_factor_after_core_He_burn)) &
                call relax_tau_factor(s)
          end if
-   
+
          if (s% job% relax_tau_factor_after_core_C_burn > 0 .and. &
                abs(s% tau_factor - s% job% relax_to_this_tau_factor) > &
                   1d-6*max(s% tau_factor, s% job% relax_to_this_tau_factor)) then
@@ -954,26 +954,26 @@
 
       end subroutine adjust_tau_factor
 
-            
+
       subroutine do_rotation(s,ierr)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         
+
          if (s% model_number <= s% job% set_surf_rotation_v_step_limit) then
             s% job% new_omega = s% job% new_surface_rotation_v*1d5/(s% photosphere_r*Rsun)
             write(*,2) 'surface_rotation_v', s% model_number, s% job% new_surface_rotation_v
             write(*,2) 'omega', s% model_number, s% job% new_omega
             call star_set_uniform_omega(s% id, s% job% new_omega, ierr)
             if (failed('star_set_uniform_omega',ierr)) return
-         
+
          else if (s% model_number <= s% job% set_omega_step_limit) then
             write(*,2) 'omega', s% model_number, s% job% new_omega
             if (failed('star_surface_omega_crit',ierr)) return
             call star_set_uniform_omega(s% id, s% job% new_omega, ierr)
             if (failed('star_set_uniform_omega',ierr)) return
-         
+
          else if (s% model_number <= s% job% set_omega_div_omega_crit_step_limit) then
             s% job% new_omega = &
                s% job% new_omega_div_omega_crit*star_surface_omega_crit(s% id, ierr)
@@ -983,16 +983,16 @@
             if (failed('star_surface_omega_crit',ierr)) return
             call star_set_uniform_omega(s% id, s% job% new_omega, ierr)
             if (failed('star_set_uniform_omega',ierr)) return
-         end if    
-      end subroutine do_rotation  
-                     
-      
+         end if
+      end subroutine do_rotation
+
+
       subroutine do_rotation_near_zams(s,ierr)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-                      
+
          if (s% job% set_near_zams_surface_rotation_v_steps > 0 .and. &
                   s% job% new_surface_rotation_v /= 0d0) then
             s% job% new_rotation_flag = .true.
@@ -1059,12 +1059,12 @@
                s% job% relax_omega_max_yrs_dt, ierr)
             if (failed('star_relax_uniform_omega',ierr)) return
 
-         end if  
-      end subroutine do_rotation_near_zams   
+         end if
+      end subroutine do_rotation_near_zams
 
-         
+
       subroutine relax_tau_factor(s)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          real(dp) :: next
          include 'formats'
          write(*,*) 'relax_to_this_tau_factor < s% tau_factor', &
@@ -1087,9 +1087,9 @@
          end if
       end subroutine relax_tau_factor
 
-         
+
       subroutine relax_Tsurf_factor(s)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          real(dp) :: next
          include 'formats'
          write(*,*) 'relax_to_this_Tsurf_factor < s% Tsurf_factor', &
@@ -1109,10 +1109,10 @@
          write(*,1) 'relax_Tsurf_factor', next, s% job% relax_to_this_Tsurf_factor
       end subroutine relax_Tsurf_factor
 
-         
+
       subroutine check_if_want_to_stop_warnings(s)
          use utils_lib
-         type (star_info), pointer :: s    
+         type (star_info), pointer :: s
          character (len=200) :: fname
          integer :: iounit, ierr
          ierr = 0
@@ -1127,11 +1127,11 @@
             end if
          end if
          ierr = 0
-      end subroutine check_if_want_to_stop_warnings     
-      
-      
+      end subroutine check_if_want_to_stop_warnings
+
+
       logical function stop_is_requested(s)
-         type (star_info), pointer :: s         
+         type (star_info), pointer :: s
          logical :: file_exists
          stop_is_requested = .false.
          if (mod(s% model_number,100) /= 0) return
@@ -1142,28 +1142,28 @@
             trim(s% job% stop_if_this_file_exists)
          stop_is_requested = .true.
       end function stop_is_requested
-      
-      
+
+
       logical function failed(str,ierr)
          character (len=*), intent(in) :: str
          integer, intent(in) :: ierr
          failed = (ierr /= 0)
          if (failed) write(*, *) trim(str) // ' ierr', ierr
       end function failed
-      
-      
+
+
       subroutine show_times(id, s)
          use utils_lib, only: utils_OMP_GET_MAX_THREADS
          use num_lib, only: qsort
-         
+
          integer, intent(in) :: id
          type (star_info), pointer :: s
 
          integer, parameter :: max_num_items = 50
          character(len=60) :: item_names(max_num_items)
          real(dp) :: item_values(max_num_items)
-         integer, target :: index_arry(max_num_items) 
-         integer, pointer :: index(:) 
+         integer, target :: index_arry(max_num_items)
+         integer, pointer :: index(:)
          integer :: ierr, omp_num_threads, item_num, num_items, i, j
          real(dp) :: total, tmp
          include 'formats'
@@ -1171,7 +1171,7 @@
          omp_num_threads = utils_OMP_GET_MAX_THREADS()
          s% time_total = s% job% check_before_step_timing + &
              s% job% check_step_loop_timing + s% job% check_after_step_timing
-         
+
          write(*,'(A)')
          write(*,'(a50,i18)') 'nz', s% nz
          write(*,'(a50,i18)') 'nvar_total', s% nvar_total
@@ -1207,11 +1207,11 @@
          call save1('run1_star', s% job% elapsed_time - total, total)
          tmp = 0
          call save1('total', total, tmp)
-         
+
          num_items = item_num
          index(1:num_items) => index_arry(1:num_items)
          call qsort(index, num_items, item_values)
-         
+
          write(*,'(A)')
          write(*,'(A)')
          do i=1,num_items
@@ -1221,7 +1221,7 @@
                item_values(j), item_values(j)/total
             if (j == num_items) write(*,*)
          end do
-         
+
          if (s% job% step_loop_timing/s% job% elapsed_time < 0.9d0) then
             write(*,'(A)')
             write(*,'(A)')
@@ -1232,11 +1232,11 @@
          end if
          write(*,'(A)')
          write(*,'(A)')
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine save1(name, value, total)
             use utils_lib, only: is_bad_num
             character (len=*), intent(in) :: name
@@ -1248,34 +1248,34 @@
             item_values(item_num) = value
             total = total + value
          end subroutine save1
-         
+
 
       end subroutine show_times
-      
-      
+
+
       subroutine do_saves(id, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
 
          integer :: ierr
          ierr = 0
-      
+
          call star_ptr(id, s, ierr)
-         if (ierr/=0) return        
-      
+         if (ierr/=0) return
+
          if (s% model_number == s% job% save_model_number) then
             call star_write_model(id, s% job% save_model_filename, ierr)
             if (failed('star_write_model',ierr)) return
             write(*, *) 'model saved to ' // trim(s% job% save_model_filename)
          end if
-      
+
          if (s% model_number == s% job% save_photo_number) then
             call star_write_photo(id, s% job% save_photo_filename, ierr)
             if (failed('star_write_photo',ierr)) return
             if (len_trim(s% job% save_photo_filename) > 0) &
                write(*, *) 'photo saved to ' // trim(s% job% save_photo_filename)
          end if
-         
+
          if (s% model_number == s% job% save_pulse_data_for_model_number) then
             call star_export_pulse_data(id, s%pulse_data_format, s%job%save_pulse_data_filename, &
                  s%add_center_point_to_pulse_data, s%keep_surface_point_for_pulse_data, &
@@ -1284,16 +1284,16 @@
             write(*, *) 'pulsation data saved to ' // &
                trim(s% job% save_pulse_data_filename)
          end if
-         
+
          if (s% model_number == s% job% profile_model_number) then
             write(*, '(a, i7)') 'save profile for model number', s% model_number
             call save_profile(id, 3, ierr)
             if (failed('save_profile',ierr)) return
          end if
-         
+
       end subroutine do_saves
 
-                  
+
       subroutine write_colors_info(id, s, ierr)
          use colors_lib
          use colors_def
@@ -1301,7 +1301,7 @@
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         
+
          integer :: io, i, j
          character (len=strlen) :: fname
          real(dp)  :: log_Teff ! log10 of surface temp
@@ -1311,18 +1311,18 @@
          ! output
          real(dp),dimension(bc_total_num_colors) :: results
          real(dp) :: log_g
-         
+
          character(len=strlen),dimension(bc_total_num_colors) :: names
-         
+
          ierr = 0
-         
+
          call get_all_bc_names(names,ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             ierr=-1
             call cleanup
             return
          end if
-         
+
          fname = 'colors.log'
          !if (s% doing_first_model_of_run) then
          if (.false.) then
@@ -1354,7 +1354,7 @@
             call cleanup
             return
          end if
-         
+
          log_Teff = log10(s% Teff)
          log_L = s% log_surface_luminosity
          mass = s% star_mass
@@ -1365,14 +1365,14 @@
             call cleanup
             return
          end if
-         
+
          call get_bcs_all(log_Teff, log_g, Fe_H, results, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in colors_get'
             call cleanup
             return
          end if
-         
+
          1 format(1x,f24.12)
          write(io,fmt='(i10)',advance='no') s% model_number
          write(io,fmt=1,advance='no') log_Teff
@@ -1383,36 +1383,36 @@
             write(io,fmt=1,advance='no') results(i)
          end do
          write(io,1) log_g
-         
+
          call cleanup
-         
+
          contains
-         
+
          subroutine cleanup
             close(io)
          end subroutine cleanup
-      
+
       end subroutine write_colors_info
-      
-      
+
+
       subroutine read_masses(filename, masses, nmasses, ierr)
          character (len=*), intent(in) :: filename
          real(dp), pointer, intent(inout) :: masses(:)
          integer, intent(out) :: nmasses, ierr
          call read_items(filename, masses, nmasses, 'masses', ierr)
       end subroutine read_masses
-      
-      
+
+
       subroutine read_items(filename, items, nitems, name, ierr)
          use utils_lib
          use utils_def
          character (len=*), intent(in) :: filename, name
          real(dp), pointer, intent(inout) :: items(:)
          integer, intent(out) :: nitems, ierr
-         
+
          integer :: iounit, n, i, t, capacity
          character (len=strlen) :: buffer, string
-         
+
          nitems = 0
          if (.not. associated(items)) then
             capacity = 10
@@ -1420,7 +1420,7 @@
          else
             capacity = size(items,dim=1)
          end if
-         
+
          ierr = 0
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -1428,10 +1428,10 @@
             write(*,*) 'failed to open file ' // trim(filename)
             return
          end if
-         
+
          n = 0
          i = 0
-         
+
          do
             t = token(iounit, n, i, buffer, string)
             select case(t)
@@ -1449,21 +1449,21 @@
                case default
                   call error; return
             end select
-            
+
          end do
-         
+
          close(iounit)
-         
+
          contains
-         
-         
+
+
          subroutine error
             ierr = -1
             write(*,*) 'error in reading file' // trim(filename)
             close(iounit)
          end subroutine error
-         
-         
+
+
          subroutine do_read_items(ierr)
             integer, intent(out) :: ierr
             real(dp) :: mass
@@ -1497,11 +1497,11 @@
                end if
             end do mass_loop
          end subroutine do_read_items
-         
-      
+
+
       end subroutine read_items
-      
-      
+
+
       subroutine do_report_mass_not_fe56(s)
          use const_def
          type (star_info), pointer :: s
@@ -1527,8 +1527,8 @@
             end if
          end do
       end subroutine do_report_mass_not_fe56
-      
-      
+
+
       subroutine do_report_cell_for_xm(s)
          use const_def
          type (star_info), pointer :: s
@@ -1557,7 +1557,7 @@
          end do
          write(*,2) 'total mass in cells from 1 to nz', s% nz, s% xmstar
       end subroutine do_report_cell_for_xm
-            
+
       subroutine set_rate_factors(id, ierr)
          use net_lib, only: get_net_reaction_table_ptr
          use rates_lib, only: rates_reaction_id
@@ -1565,16 +1565,16 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: j, i, ir
-         integer, pointer :: net_reaction_ptr(:) 
+         integer, pointer :: net_reaction_ptr(:)
          logical :: error
-         
+
          include 'formats'
-         
+
          ierr = 0
          error = .false.
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% rate_factors(:) = 1
          if (s% job% num_special_rate_factors <= 0) return
 
@@ -1585,10 +1585,10 @@
                return
          end if
 
-         
+
          call get_net_reaction_table_ptr(s% net_handle, net_reaction_ptr, ierr)
          if (ierr /= 0) return
-         
+
          do i=1,s% job% num_special_rate_factors
             if (len_trim(s% job% reaction_for_special_factor(i)) == 0) cycle
             ir = rates_reaction_id(s% job% reaction_for_special_factor(i))
@@ -1608,7 +1608,7 @@
          end do
 
          if(error) call mesa_error(__FILE__,__LINE__)
-         
+
       end subroutine set_rate_factors
 
 
@@ -1623,11 +1623,11 @@
          integer, intent(out) :: ierr
          logical, parameter :: kap_use_cache = .true.
          include 'formats'
-      
+
          ierr = 0
 
          s% set_rate_factors => set_rate_factors ! will be called after net is defined
-         
+
          call get_atm_tau_base(s, s% tau_base, ierr)
          if (failed('atm_tau_base',ierr)) return
 
@@ -1636,42 +1636,42 @@
 
       end subroutine do_star_job_controls_before
 
-      
+
       subroutine do_read_star_job_and_return_id(filename, id, ierr)
          character(*), intent(in) :: filename
-         integer, intent(out) :: id  
-         integer, intent(out) :: ierr  
+         integer, intent(out) :: id
+         integer, intent(out) :: ierr
          type (star_info), pointer :: s
          character(len=strlen) :: inlist_fname
-         
+
          include 'formats'
-         ierr = 0   
+         ierr = 0
 
          if (id_from_read_star_job /= 0) then
             write(*,2) 'id_from_read_star_job', id_from_read_star_job
             ierr = -1
             return
          end if
-         
+
          call alloc_star(id, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_read_star_job failed in alloc_star'
             return
          end if
-         
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_read_star_job failed in star_ptr'
             return
          end if
-         
+
          call resolve_inlist_fname(inlist_fname,filename)
          call read_star_job(s, inlist_fname, ierr)
          if (ierr /= 0) then
             write(*,*) 'ierr from read_star_job ' // trim(inlist_fname)
             return
          end if
-         
+
          id_from_read_star_job = id
 
          if (s% job% save_star_job_namelist) then
@@ -1682,27 +1682,27 @@
                return
             end if
          end if
-         
+
       end subroutine do_read_star_job_and_return_id
-      
+
       ! in a perfect world, we'd pass s as an arg to this routine.
       ! but for backward compatibility for a large number of users
       ! we do it this strange way instead.
       subroutine do_read_star_job(filename, ierr)
          character(*), intent(in) :: filename
-         integer, intent(out) :: ierr  
+         integer, intent(out) :: ierr
          integer :: id
          call do_read_star_job_and_return_id(filename, id, ierr)
       end subroutine do_read_star_job
-      
-      
+
+
       subroutine do_load1_star(id, s, restart, restart_filename, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          character (len=*), intent(in) :: restart_filename
          integer, intent(out) :: ierr
-      
+
          if (restart) then
             call star_load_restart_photo(id, restart_filename, ierr)
             if (failed('star_load_restart_photo',ierr)) return
@@ -1880,9 +1880,9 @@
             s% job% change_mass_years_for_dt, ierr)
          deallocate(xq,xa)
          if (failed('star_relax_mass_scale',ierr)) return
-         
+
       end subroutine create_merger_model
-      
+
 
       subroutine extend_net(s, ierr)
          use net_def
@@ -1890,15 +1890,15 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          real(dp), parameter :: tiny = 1d-10, small = 1d-2
-         
+
          real(dp) :: cntr_h, cntr_he
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          !write(*,2) 'extend_net: current net ' // trim(s% net_name), s% model_number
-         
+
          if (s% net_name == s% job% adv_net) return
 
          if (s% net_name == s% job% co_net) then
@@ -1911,7 +1911,7 @@
             end if
             return
          end if
-         
+
          if (s% net_name == s% job% h_he_net) then
             cntr_h = current_abundance_at_point(s% id, ih1, s% nz, ierr)
             !write(*,2) 'cntr_h', s% model_number, cntr_h, tiny
@@ -1929,17 +1929,17 @@
                   s% id, s% job% profile_columns_file, .true., ierr)
             end if
          end if
-         
-         
+
+
          contains
-                  
-         
+
+
          subroutine change_net(net_name)
             use const_def
             character (len=*), intent(in) :: net_name
-            
+
             include 'formats'
-            
+
             call star_change_to_new_net( &
                s% id, s% job% adjust_abundances_for_new_isos, net_name, ierr)
             if (ierr /= 0) then
@@ -1947,7 +1947,7 @@
                call mesa_error(__FILE__,__LINE__,'change_net')
                return
             end if
-            
+
             if (net_name /= s% net_name) then
                write(*,*) '   new net_name ', trim(net_name)
                write(*,*) 'old s% net_name ', trim(s% net_name)
@@ -1964,17 +1964,17 @@
             !write(*,1) 'reduce timestep', log10(s% dt_next/secyer)
             write(*,'(A)')
          end subroutine change_net
-         
-         
-      end subroutine extend_net         
+
+
+      end subroutine extend_net
 
 
       subroutine before_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0
-      end subroutine before_evolve         
-       
+      end subroutine before_evolve
+
 
       subroutine do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          use const_def
@@ -1986,20 +1986,20 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart, pgstar_ok
          integer, intent(out) :: ierr
-         
+
          real(dp) :: log_m, log_lifetime, max_dt, max_timestep
          integer :: i, j, nzlo, nzhi, chem_id, chem_id1, chem_id2
          logical :: change_v, change_u
          include 'formats'
-         
-         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then         
+
+         if (s% job% change_net .or. (s% job% change_initial_net .and. .not. restart)) then
             call star_change_to_new_net( &
                id, s% job% adjust_abundances_for_new_isos, s% job% new_net_name, ierr)
             if (failed('star_change_to_new_net',ierr)) return
          end if
 
          if (s% job% change_small_net .or. &
-               (s% job% change_initial_small_net .and. .not. restart)) then         
+               (s% job% change_initial_small_net .and. .not. restart)) then
             write(*,*) 'change small net to ' // trim(s% job% new_small_net_name)
             call star_change_to_new_small_net( &
                id, s% job% adjust_abundances_for_new_isos, s% job% new_small_net_name, ierr)
@@ -2012,12 +2012,12 @@
             write(*,*) 'read ' // trim(s% job% history_columns_file)
          call star_set_history_columns(id, s% job% history_columns_file, .true., ierr)
          if (failed('star_set_history_columns',ierr)) return
-         
+
          if (len_trim(s% job% profile_columns_file) > 0) &
             write(*,*) 'read ' // trim(s% job% profile_columns_file)
          call star_set_profile_columns(id, s% job% profile_columns_file, .true., ierr)
          if (failed('star_set_profile_columns',ierr)) return
-         
+
          if (pgstar_ok) then
             if (s% job% clear_pgstar_history .or. &
                   (s% job% clear_initial_pgstar_history .and. .not. restart)) then
@@ -2028,19 +2028,19 @@
                if (failed('restart_run_for_pgstar',ierr)) return
             end if
          end if
-         
+
          if (s% job% set_tau_factor .or. &
                (s% job% set_initial_tau_factor .and. .not. restart)) then
             write(*,1) 'set_tau_factor', s% job% set_to_this_tau_factor
             s% tau_factor = s% job% set_to_this_tau_factor
          end if
-         
+
          if (s% job% set_Tsurf_factor .or. &
                (s% job% set_initial_Tsurf_factor .and. .not. restart)) then
             write(*,1) 'set_Tsurf_factor', s% job% set_to_this_Tsurf_factor
             s% Tsurf_factor = s% job% set_to_this_Tsurf_factor
          end if
-         
+
          if (s% job% set_initial_age .and. .not. restart) then
             write(*,1) 'set_initial_age', s% job% initial_age ! in years
             call star_set_age(id, s% job% initial_age, ierr)
@@ -2106,27 +2106,27 @@
             write(*,2) 'steps_before_start_timing', &
                s% job% steps_before_start_timing
          end if
-                  
+
          if (abs(s% job% T9_weaklib_full_off - T9_weaklib_full_off) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off', s% job% T9_weaklib_full_off
             T9_weaklib_full_off = s% job% T9_weaklib_full_off
          end if
-         
+
          if (abs(s% job% T9_weaklib_full_on - T9_weaklib_full_on) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_on', s% job% T9_weaklib_full_on
             T9_weaklib_full_on = s% job% T9_weaklib_full_on
          end if
-         
+
          if (s% job% weaklib_blend_hi_Z /= weaklib_blend_hi_Z) then
             write(*,1) 'set weaklib_blend_hi_Z', s% job% weaklib_blend_hi_Z
             weaklib_blend_hi_Z = s% job% weaklib_blend_hi_Z
          end if
-         
+
          if (abs(s% job% T9_weaklib_full_off_hi_Z - T9_weaklib_full_off_hi_Z) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_off_hi_Z', s% job% T9_weaklib_full_off_hi_Z
             T9_weaklib_full_off_hi_Z = s% job% T9_weaklib_full_off_hi_Z
          end if
-         
+
          if (abs(s% job% T9_weaklib_full_on_hi_Z - T9_weaklib_full_on_hi_Z) > 1d-6) then
             write(*,1) 'set T9_weaklib_full_on_hi_Z', s% job% T9_weaklib_full_on_hi_Z
             T9_weaklib_full_on_hi_Z = s% job% T9_weaklib_full_on_hi_Z
@@ -2135,7 +2135,7 @@
          ! set up coulomb corrections for the special weak rates
          which_mui_coulomb = get_mui_value(s% job% ion_coulomb_corrections)
          which_vs_coulomb = get_vs_value(s% job% electron_coulomb_corrections)
-         
+
          change_v = s% job% change_v_flag .or. &
                (s% job% change_initial_v_flag .and. .not. restart)
          change_u = s% job% change_u_flag .or. &
@@ -2170,7 +2170,7 @@
             call star_set_RTI_flag(id, s% job% new_RTI_flag, ierr)
             if (failed('star_set_RTI_flag',ierr)) return
          end if
-         
+
          if (s% job% change_RSP2_flag .or. &
                (s% job% change_initial_RSP2_flag .and. .not. restart)) then
             write(*,*) 'new_RSP2_flag', s% job% new_RSP2_flag
@@ -2267,17 +2267,17 @@
             call star_set_uniform_omega(id, s% job% new_omega, ierr)
             if (failed('star_set_uniform_omega',ierr)) return
          end if
-         
+
          if (s% job% set_to_xa_for_accretion .or. &
                (s% job% set_initial_to_xa_for_accretion .and. .not. restart)) then
             write(*,*) 'set_to_xa_for_accretion'
             call change_to_xa_for_accretion(id, s% job% set_nzlo, s% job% set_nzhi, ierr)
             if (failed('set_to_xa_for_accretion',ierr)) return
          end if
-         
+
          if (s% job% first_model_for_timing > 0) &
             write(*,2) 'first_model_for_timing', s% job% first_model_for_timing
-         
+
          if (s% job% set_uniform_initial_composition .and. .not. restart) then
             write(*,'(A)')
             write(*,1) 'set_uniform_initial_composition'
@@ -2315,12 +2315,12 @@
                s% job% dump_missing_metals_into_heaviest, ierr)
             if (failed('set_uniform_initial_composition',ierr)) return
          end if
-         
+
          if (s% job% relax_initial_composition .and. .not. restart) then
             call do_relax_initial_composition(ierr)
             if (failed('do_relax_initial_composition',ierr)) return
          end if
-         
+
          if (s% job% relax_initial_to_xaccrete .and. .not. restart) then
             call star_relax_to_xaccrete(id, s% job% num_steps_to_relax_composition, ierr)
             if (failed('star_relax_to_xaccrete',ierr)) return
@@ -2330,17 +2330,17 @@
             call star_uniform_xa_from_file(id, s% job% file_for_uniform_xa, ierr)
             if (failed('star_uniform_xa_from_file',ierr)) return
          end if
-         
+
          if (s% job% relax_initial_angular_momentum .and. .not. restart) then
             call do_relax_initial_angular_momentum(ierr)
             if (failed('do_relax_initial_angular_momentum',ierr)) return
          end if
-         
+
          if (s% job% relax_initial_entropy .and. .not. restart) then
             call do_relax_initial_entropy(ierr)
             if (failed('do_relax_initial_entropy',ierr)) return
          end if
-         
+
          if (s% job% mix_section .or. &
                (s% job% mix_initial_section .and. .not. restart)) then
             write(*,*) 'mix_section'
@@ -2368,7 +2368,7 @@
             call star_uniform_xa_from_file(id, s% job% file_for_uniform_xa, ierr)
             if (failed('star_uniform_xa_from_file',ierr)) return
          end if
-         
+
          ! do change Z before change Y since changing Z can change Y
          if (s% job% change_Z) then
             call star_set_z(id, s% job% new_Z, ierr)
@@ -2403,7 +2403,7 @@
             if (nzhi <= 0) nzhi = s% nz
             if (nzlo <= 0) nzlo = 1
             write(*, *) 'set_abundance of ', &
-               trim(s% job% chem_name), s% job% new_frac, nzlo, nzhi 
+               trim(s% job% chem_name), s% job% new_frac, nzlo, nzhi
             chem_id = get_nuclide_index(s% job% chem_name)
             if (chem_id <= 0) then
                write(*,*) 'failed to find ' // trim(s% job% chem_name)
@@ -2412,7 +2412,7 @@
             call set_abundance_in_section(id, chem_id, s% job% new_frac, nzlo, nzhi, ierr)
             if (failed('set_abundance_in_section',ierr)) return
          end if
-         
+
          if (s% job% replace_element .or. &
                (s% job% replace_initial_element .and. .not. restart)) then
             write(*, *) 'replace_element ', &
@@ -2443,19 +2443,19 @@
             s% irradiation_flux = s% job% set_to_this_irrad_flux
             s% column_depth_for_irradiation = s% job% irrad_col_depth
          end if
-         
+
          if (s% job% do_special_test) then
             write(*, *) 'do_special_test'
             call star_special_test(id, ierr)
             if (failed('star_special_test',ierr)) return
          end if
-         
+
          if (s% job% set_v_center .or. &
                (s% job% set_initial_v_center .and. .not. restart)) then
             write(*, 1) 'set_v_center', s% job% new_v_center
             s% v_center = s% job% new_v_center
          end if
-         
+
          if (s% job% set_L_center .or. &
                (s% job% set_initial_L_center .and. .not. restart)) then
             write(*, 1) 'set_L_center', s% job% new_L_center
@@ -2463,7 +2463,7 @@
          end if
 
          ! do "set" before "relax"
-         
+
          ! must do relax Z before relax Y since relax Z can change Y
          ! (Warrick Ball pointed out this requirement)
          if (s% job% relax_initial_Z .and. .not. restart) then
@@ -2581,7 +2581,7 @@
 
          call do_remove_center(id, s, restart, ierr)
          if (ierr /= 0) return
-         
+
          if (s% job% relax_M_center .or. &
                (s% job% relax_initial_M_center .and. .not. restart)) then
             write(*, 1) 'relax_M_center', s% job% new_mass
@@ -2589,7 +2589,7 @@
                id, s% job% new_mass, s% job% dlgm_per_step, s% job% relax_M_center_dt, ierr)
             if (failed('star_relax_M_center',ierr)) return
          end if
-         
+
          if (s% job% relax_R_center .or. &
                (s% job% relax_initial_R_center .and. .not. restart)) then
             write(*, 1) 'relax_R_center', s% job% new_R_center
@@ -2597,7 +2597,7 @@
                id, s% job% new_R_center, s% job% dlgR_per_step, s% job% relax_R_center_dt, ierr)
             if (failed('star_relax_R_center',ierr)) return
          end if
-         
+
          if (s% job% relax_v_center .or. &
                (s% job% relax_initial_v_center .and. .not. restart)) then
             write(*, 1) 'relax_v_center', s% job% new_v_center
@@ -2605,7 +2605,7 @@
                id, s% job% new_v_center, s% job% dv_per_step, s% job% relax_v_center_dt, ierr)
             if (failed('star_relax_v_center',ierr)) return
          end if
-         
+
          if (s% job% relax_L_center .or. &
                (s% job% relax_initial_L_center .and. .not. restart)) then
             write(*, 1) 'relax_L_center', s% job% new_L_center
@@ -2613,7 +2613,7 @@
                id, s% job% new_L_center, s% job% dlgL_per_step, s% job% relax_L_center_dt, ierr)
             if (failed('star_relax_L_center',ierr)) return
          end if
-         
+
          if (s% job% relax_Tsurf_factor .or. &
                (s% job% relax_initial_Tsurf_factor .and. .not. restart)) then
             write(*,1) 'relax_Tsurf_factor', s% job% relax_to_this_Tsurf_factor
@@ -2621,7 +2621,7 @@
                id, s% job% relax_to_this_Tsurf_factor, s% job% dlogTsurf_factor, ierr)
             if (failed('star_relax_Tsurf_factor',ierr)) return
          end if
-         
+
          if (s% job% relax_tau_factor .or. &
                (s% job% relax_initial_tau_factor .and. .not. restart)) then
             write(*,1) 'relax_tau_factor', s% job% relax_to_this_tau_factor
@@ -2629,7 +2629,7 @@
                id, s% job% relax_to_this_tau_factor, s% job% dlogtau_factor, ierr)
             if (failed('star_relax_tau_factor',ierr)) return
          end if
-         
+
          if (s% job% relax_opacity_factor .or. &
                (s% job% relax_initial_opacity_factor .and. .not. restart)) then
             write(*,1) 'relax_opacity_factor', s% job% relax_to_this_opacity_factor
@@ -2666,10 +2666,10 @@
                s% job% relax_mass_change_max_yrs_dt, ierr)
             if (failed('star_relax_mass_change',ierr)) return
          end if
-         
+
          call do_remove_initial_surface(id, s, restart, ierr)
          if (ierr /= 0) return
-         
+
          call do_remove_surface(id, s, ierr)
          if (ierr /= 0) return
 
@@ -2751,56 +2751,56 @@
                  log10(s% max_timestep/secyer)
            end if
         end if
-         
+
          ! print out info about selected non-standard parameter settings
-         
+
          write(*,*) 'net name ' // trim(s% net_name)
 
          if (s% do_element_diffusion) &
             write(*,*) 'do_element_diffusion', s% do_element_diffusion
-         
+
          if (s% RSP_flag) &
             write(*,*) 'RSP_flag', s% RSP_flag
-         
+
          if (s% v_flag) &
             write(*,*) 'v_flag', s% v_flag
-         
+
          if (s% u_flag) &
             write(*,*) 'u_flag', s% u_flag
-         
+
          if (s% rotation_flag) &
             write(*,*) 'rotation_flag', s% rotation_flag
-         
+
          if (s% w_div_wc_flag) &
             write(*,*) 'w_div_wc_flag', s% w_div_wc_flag
-         
+
          if (s% j_rot_flag) &
             write(*,*) 'j_rot_flag', s% j_rot_flag
-         
+
          if (s% mix_factor /= 1d0) &
             write(*,1) 'mix_factor', s% mix_factor
-            
+
          if (abs(s% tau_base - 2d0/3d0) > 1d-4) &
             write(*,1) 'tau_base', s% tau_base
-            
+
          if (abs(s% tau_factor - 1) > 1d-4) &
             write(*,1) 'tau_factor', s% tau_factor
-            
+
          if (s% eps_grav_factor /= 1) &
             write(*,1) 'eps_grav_factor', s% eps_grav_factor
-            
+
          if (s% eps_mdot_factor /= 1) &
             write(*,1) 'eps_mdot_factor', s% eps_mdot_factor
 
          if (s% dxdt_nuc_factor /= 1) &
             write(*,1) 'dxdt_nuc_factor', s% dxdt_nuc_factor
-            
+
          if (.NOT. ( &
               s% atm_option == 'T_tau' .AND. &
               s% atm_T_tau_relation == 'Eddington' .AND. &
               s% atm_T_tau_opacity == 'fixed')) &
             write(*,1) 'atm_option: ' // trim(s% atm_option)
-           
+
          if (s% M_center /= 0) then
             write(*,1) 'xmstar/mstar', s% xmstar/s% mstar
             write(*,1) 'xmstar (g)', s% xmstar
@@ -2808,44 +2808,44 @@
             write(*,1) 'xmstar/Msun', s% xmstar/Msun
             write(*,1) 'M_center/Msun', s% M_center/Msun
          end if
-         
+
          if (s% v_flag .or. s% u_flag) then
             if (s% v_center /= 0) &
                write(*,1) 'v_center (cm/s)', s% v_center
          end if
-            
+
          if (s% R_center /= 0) then
             write(*,1) 'R_center (cm)', s% R_center
             write(*,1) 'R_center/Rsun', s% R_center/Rsun
             write(*,1) 'core density', &
                s% M_center/(4*pi/3*s% R_center*s% R_center*s% R_center)
          end if
-         
+
          if (s% L_center /= 0) &
             write(*,1) 'L_center/Lsun', s% L_center/Lsun
-                     
+
          if (s% opacity_max > 0) &
             write(*,1) 'opacity_max', s% opacity_max
-         
+
          if (s% job% show_net_reactions_info) then
             write(*,'(a)') ' net reactions '
             call show_net_reactions_and_info(s% net_handle, 6, ierr)
             if (failed('show_net_reactions_and_info',ierr)) return
          end if
-         
+
          if (s% job% list_net_reactions) then
             write(*,'(a)') ' net reactions '
             call show_net_reactions(s% net_handle, 6, ierr)
             if (failed('show_net_reactions',ierr)) return
          end if
-         
+
          if (s% job% set_cumulative_energy_error .or. &
                (s% job% set_initial_cumulative_energy_error .and. .not. restart) .or. &
                (s% model_number == s% job% set_cumulative_energy_error_at_step)) then
             write(*,1) 'set_cumulative_energy_error', s% job% new_cumulative_energy_error
             s% cumulative_energy_error = s% job% new_cumulative_energy_error
          end if
-         
+
          if (s% job% show_net_species_info) then
             write(*,'(a)') ' species'
             do j=1,s% species
@@ -2853,21 +2853,21 @@
             end do
             write(*,'(A)')
          end if
-         
+
          if (s% job% show_eqns_and_vars_names) then
             do i=1,s% nvar_total
                write(*,*) i, s% nameofvar(i), s% nameofequ(i)
             end do
             write(*,'(A)')
-         end if         
-         
+         end if
+
          write(*,*) 'kap_option ' // trim(kap_option_str(s% kap_rq% kap_option))
          write(*,*) 'kap_CO_option ' // trim(kap_CO_option_str(s% kap_rq% kap_CO_option))
          write(*,*) 'kap_lowT_option ' // trim(kap_lowT_option_str(s% kap_rq% kap_lowT_option))
          write(*,2) 'OMP_NUM_THREADS', utils_omp_get_max_threads()
-               
+
          call check_if_want_to_stop_warnings(s)
-         
+
          contains
 
          subroutine do_relax_initial_composition(ierr)
@@ -2876,7 +2876,7 @@
             real(dp), pointer :: xq(:), xa(:,:)
             integer :: num_pts, num_species, i, iounit
             include 'formats'
-            
+
             write(*,'(A)')
             write(*,1) 'relax_initial_composition'
 
@@ -2917,20 +2917,20 @@
                end if
             end do
             close(iounit)
-            
+
             call star_relax_composition( &
                id, s% job% num_steps_to_relax_composition, num_pts, num_species, xa, xq, ierr)
             deallocate(xq,xa)
-            
+
          end subroutine do_relax_initial_composition
-         
+
          subroutine do_relax_initial_angular_momentum(ierr)
             use utils_lib
             integer, intent(out) :: ierr
             real(dp), pointer :: xq(:), angular_momentum(:)
             integer :: num_pts, i, iounit
             include 'formats'
-            
+
             write(*,'(A)')
             write(*,1) 'relax_initial_angular_momentum'
 
@@ -2967,7 +2967,7 @@
                num_pts, angular_momentum, xq, ierr)
             deallocate(xq,angular_momentum)
          end subroutine do_relax_initial_angular_momentum
-         
+
          subroutine do_relax_initial_entropy(ierr)
             use utils_lib
             use eos_def
@@ -2991,7 +2991,7 @@
             real(dp), parameter :: logT_tol = 1d-8, logE_tol = 1d-8
             integer, parameter :: MAX_ITERS = 20
             include 'formats'
-            
+
             write(*,'(A)')
             write(*,1) 'relax_initial_entropy'
 
@@ -3089,7 +3089,7 @@
          end subroutine do_relax_initial_entropy
 
       end subroutine do_star_job_controls_after
-       
+
 
       subroutine do_remove_center(id, s, restart, ierr)
          integer, intent(in) :: id
@@ -3097,14 +3097,14 @@
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
          include 'formats'
-         
+
          if (s% job% remove_center_by_temperature > 0) then
             write(*, 1) 'remove_center_by_temperature', s% job% remove_center_by_temperature
             call star_remove_center_by_temperature( &
                id, s% job% remove_center_by_temperature, ierr)
             if (failed('star_remove_center_by_temperature',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_temperature > 0 .and. .not. restart) then
             write(*, 1) 'remove_initial_center_by_temperature', &
                s% job% remove_initial_center_by_temperature
@@ -3112,7 +3112,7 @@
                id, s% job% remove_initial_center_by_temperature, ierr)
             if (failed('star_remove_center_by_temperature',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_radius_cm > s% R_center .and. &
                s% job% remove_center_by_radius_cm < s% r(1)) then
             write(*, 1) 'remove_center_by_radius_cm', &
@@ -3121,7 +3121,7 @@
                id, s% job% remove_center_by_radius_cm, ierr)
             if (failed('star_remove_center_by_radius_cm',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_radius_cm > s% R_center .and. &
                s% job% remove_initial_center_by_radius_cm < s% r(1) .and. .not. restart) then
             write(*, 1) 'remove_initial_center_by_radius_cm', &
@@ -3130,7 +3130,7 @@
                id, s% job% remove_initial_center_by_radius_cm, ierr)
             if (failed('star_remove_center_by_radius_cm',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_he4 > 0d0 .and. &
                s% job% remove_initial_center_by_he4 < 1d0 &
                   .and. .not. restart) then
@@ -3140,7 +3140,7 @@
                id, s% job% remove_initial_center_by_he4, ierr)
             if (failed('star_remove_initial_center_by_he4',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_he4 > 0d0 .and. &
                s% job% remove_center_by_he4 < 1d0) then
             write(*, 1) 'remove_center_by_he4', &
@@ -3149,7 +3149,7 @@
                id, s% job% remove_center_by_he4, ierr)
             if (failed('star_remove_center_by_he4',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_c12_o16 > 0d0 .and. &
                s% job% remove_initial_center_by_c12_o16 < 1d0 &
                   .and. .not. restart) then
@@ -3159,7 +3159,7 @@
                id, s% job% remove_initial_center_by_c12_o16, ierr)
             if (failed('star_remove_initial_center_by_c12_o16',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_c12_o16 > 0d0 .and. &
                s% job% remove_center_by_c12_o16 < 1d0) then
             write(*, 1) 'remove_center_by_c12_o16', &
@@ -3168,7 +3168,7 @@
                id, s% job% remove_center_by_c12_o16, ierr)
             if (failed('star_remove_center_by_c12_o16',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_si28 > 0d0 .and. &
                s% job% remove_initial_center_by_si28 < 1d0 &
                   .and. .not. restart) then
@@ -3178,7 +3178,7 @@
                id, s% job% remove_initial_center_by_si28, ierr)
             if (failed('star_remove_initial_center_by_si28',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_si28 > 0d0 .and. &
                s% job% remove_center_by_si28 < 1d0) then
             write(*, 1) 'remove_center_by_si28', &
@@ -3187,7 +3187,7 @@
                id, s% job% remove_center_by_si28, ierr)
             if (failed('star_remove_center_by_si28',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_to_reduce_co56_ni56 > 0d0 &
                   .and. .not. restart) then
             write(*, 1) 'remove_initial_center_to_reduce_co56_ni56', &
@@ -3196,7 +3196,7 @@
                id, s% job% remove_initial_center_to_reduce_co56_ni56, ierr)
             if (failed('star_remove_initial_center_to_reduce_co56_ni56',ierr)) return
          end if
-         
+
          if (s% job% remove_center_to_reduce_co56_ni56 > 0d0) then
             write(*, 1) 'remove_center_to_reduce_co56_ni56', &
                s% job% remove_center_to_reduce_co56_ni56
@@ -3204,7 +3204,7 @@
                id, s% job% remove_center_to_reduce_co56_ni56, ierr)
             if (failed('star_remove_center_to_reduce_co56_ni56',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_ye > 0d0 .and. &
                s% job% remove_initial_center_by_ye < 1d0 &
                   .and. .not. restart) then
@@ -3214,7 +3214,7 @@
                id, s% job% remove_initial_center_by_ye, ierr)
             if (failed('star_remove_initial_center_by_ye',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_ye > 0d0 .and. &
                s% job% remove_center_by_ye < 1d0) then
             write(*, 1) 'remove_center_by_ye', &
@@ -3223,7 +3223,7 @@
                id, s% job% remove_center_by_ye, ierr)
             if (failed('star_remove_center_by_ye',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_entropy > 0d0 &
                   .and. .not. restart) then
             write(*, 1) 'remove_initial_center_by_entropy', &
@@ -3232,7 +3232,7 @@
                id, s% job% remove_initial_center_by_entropy, ierr)
             if (failed('star_remove_initial_center_by_entropy',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_entropy > 0d0) then
             write(*, 1) 'remove_center_by_entropy', &
                s% job% remove_center_by_entropy
@@ -3240,7 +3240,7 @@
                id, s% job% remove_center_by_entropy, ierr)
             if (failed('star_remove_center_by_entropy',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_infall_kms /= 0d0 &
                   .and. .not. restart) then
             write(*, 1) 'remove_initial_center_by_infall_kms', &
@@ -3249,7 +3249,7 @@
                id, s% job% remove_initial_center_by_infall_kms, ierr)
             if (failed('star_remove_initial_center_by_infall_kms',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_infall_kms /= 0d0) then
             write(*, 1) 'remove_center_by_infall_kms', &
                s% job% remove_center_by_infall_kms
@@ -3257,32 +3257,32 @@
                id, s% job% remove_center_by_infall_kms, ierr)
             if (failed('star_remove_center_by_infall_kms',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_at_inner_max_abs_v &
                   .and. .not. restart) then
             write(*, 1) 'remove_initial_center_at_inner_max_abs_v'
             call star_remove_center_at_inner_max_abs_v(id, ierr)
             if (failed('remove_center_at_inner_max_abs_v',ierr)) return
          end if
-         
+
          if (s% job% remove_center_at_inner_max_abs_v) then
             write(*, 1) 'remove_initial_center_at_inner_max_abs_v'
             call star_remove_center_at_inner_max_abs_v(id, ierr)
             if (failed('remove_center_at_inner_max_abs_v',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_fe_core .and. .not. restart) then
             write(*, 1) 'remove_initial_fe_core'
             call star_remove_fe_core(id, ierr)
             if (failed('remove_fe_core',ierr)) return
          end if
-         
+
          if (s% job% remove_fe_core) then
             write(*, 1) 'remove_initial_fe_core'
             call star_remove_fe_core(id, ierr)
             if (failed('remove_fe_core',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_mass_fraction_q > 0d0 .and. &
                s% job% remove_initial_center_by_mass_fraction_q < 1d0 &
                   .and. .not. restart) then
@@ -3292,7 +3292,7 @@
                id, s% job% remove_initial_center_by_mass_fraction_q, ierr)
             if (failed('star_remove_initial_center_by_mass_fraction_q',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_mass_fraction_q > 0d0 .and. &
                s% job% remove_center_by_mass_fraction_q < 1d0) then
             write(*, 1) 'remove_center_by_mass_fraction_q', &
@@ -3301,7 +3301,7 @@
                id, s% job% remove_center_by_mass_fraction_q, ierr)
             if (failed('star_remove_center_by_mass_fraction_q',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_delta_mass_gm > 0) then
             write(*, 1) 'remove_center_by_delta_mass_gm', &
                s% job% remove_center_by_delta_mass_gm
@@ -3309,7 +3309,7 @@
                s% M_center + s% job% remove_center_by_delta_mass_gm, ierr)
             if (failed('star_remove_center_by_mass',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_delta_mass_gm > 0 .and. &
                .not. restart) then
             write(*, 1) 'remove_initial_center_by_delta_mass_gm', &
@@ -3318,7 +3318,7 @@
                s% M_center + s% job% remove_initial_center_by_delta_mass_gm, ierr)
             if (failed('star_remove_center_by_mass',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_delta_mass_Msun > 0) then
             write(*, 1) 'remove_center_by_delta_mass_Msun', &
                s% job% remove_center_by_delta_mass_Msun
@@ -3326,7 +3326,7 @@
                s% M_center + s% job% remove_center_by_delta_mass_Msun*Msun, ierr)
             if (failed('star_remove_center_by_mass',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_delta_mass_Msun > 0 .and. &
                .not. restart) then
             write(*, 1) 'remove_initial_center_by_delta_mass_Msun', &
@@ -3335,7 +3335,7 @@
                s% M_center + s% job% remove_initial_center_by_delta_mass_Msun*Msun, ierr)
             if (failed('star_remove_center_by_mass',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_mass_gm > s% M_center .and. &
                s% job% remove_center_by_mass_gm < s% m(1)) then
             write(*, 1) 'remove_center_by_mass_gm', &
@@ -3344,7 +3344,7 @@
                id, s% job% remove_center_by_mass_gm, ierr)
             if (failed('star_remove_center_by_mass_gm',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_mass_gm > s% M_center .and. &
                s% job% remove_initial_center_by_mass_gm < s% m(1) .and. .not. restart) then
             write(*, 1) 'remove_initial_center_by_mass_gm', &
@@ -3353,7 +3353,7 @@
                id, s% job% remove_initial_center_by_mass_gm, ierr)
             if (failed('star_remove_center_by_mass_gm',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_mass_Msun > s% M_center/Msun .and. &
                s% job% remove_center_by_mass_Msun < s% m(1)/Msun) then
             write(*, 1) 'remove_center_by_mass_Msun', &
@@ -3362,7 +3362,7 @@
                id, s% job% remove_center_by_mass_Msun*Msun, ierr)
             if (failed('star_remove_center_by_mass_Msun',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_mass_Msun > s% M_center/Msun .and. &
                s% job% remove_initial_center_by_mass_Msun < s% m(1)/Msun .and. &
                .not. restart) then
@@ -3372,7 +3372,7 @@
                id, s% job% remove_initial_center_by_mass_Msun*Msun, ierr)
             if (failed('star_remove_center_by_mass_Msun',ierr)) return
          end if
-         
+
          if (s% job% remove_center_by_radius_Rsun > s% R_center/Rsun .and. &
                s% job% remove_center_by_radius_Rsun < s% r(1)/Rsun) then
             write(*, 1) 'remove_center_by_radius_Rsun', &
@@ -3381,7 +3381,7 @@
                id, s% job% remove_center_by_radius_Rsun*Rsun, ierr)
             if (failed('star_remove_center_by_radius_Rsun',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_center_by_radius_Rsun > s% R_center/Rsun .and. &
                s% job% remove_initial_center_by_radius_Rsun < s% r(1)/Rsun .and. &
                .not. restart) then
@@ -3406,9 +3406,9 @@
             call star_remove_center_at_cell_k(id, s% job% remove_center_at_cell_k, ierr)
             if (failed('star_remove_center_at_cell_k',ierr)) return
          end if
-         
+
       end subroutine do_remove_center
-       
+
 
       subroutine do_remove_initial_surface(id,s,restart,ierr)
          integer, intent(in) :: id
@@ -3417,7 +3417,7 @@
          integer, intent(out) :: ierr
 
          include 'formats'
-         
+
          ierr = 0
 
          if (s% job% remove_initial_surface_at_he_core_boundary > 0 .and. .not. restart) then
@@ -3435,7 +3435,7 @@
                id, s% job% remove_initial_surface_by_optical_depth, ierr)
             if (failed('star_remove_surface_by_optical_depth',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_density > 0 .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_density', &
                s% job% remove_initial_surface_by_density
@@ -3443,7 +3443,7 @@
                id, s% job% remove_initial_surface_by_density, ierr)
             if (failed('star_remove_surface_by_density',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_pressure > 0 .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_pressure', &
                s% job% remove_initial_surface_by_pressure
@@ -3451,7 +3451,7 @@
                id, s% job% remove_initial_surface_by_pressure, ierr)
             if (failed('star_remove_surface_by_pressure',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_radius_cm > s% R_center .and. &
                s% job% remove_initial_surface_by_radius_cm < s% r(1) .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_radius_cm', &
@@ -3460,7 +3460,7 @@
                id, s% job% remove_initial_surface_by_radius_cm, ierr)
             if (failed('star_remove_surface_by_radius_cm',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_mass_fraction_q > 0d0 .and. &
                s% job% remove_initial_surface_by_mass_fraction_q < 1d0 &
                   .and. .not. restart) then
@@ -3470,7 +3470,7 @@
                id, s% job% remove_initial_surface_by_mass_fraction_q, ierr)
             if (failed('star_remove_initial_surface_by_mass_fraction_q',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_mass_gm > s% M_center .and. &
                s% job% remove_initial_surface_by_mass_gm < s% m(1) .and. .not. restart) then
             write(*, 1) 'remove_initial_surface_by_mass_gm', &
@@ -3479,7 +3479,7 @@
                id, s% job% remove_initial_surface_by_mass_gm, ierr)
             if (failed('star_remove_surface_by_mass_gm',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_radius_Rsun > s% R_center/Rsun .and. &
                s% job% remove_initial_surface_by_radius_Rsun < s% r(1)/Rsun .and. &
                .not. restart) then
@@ -3489,7 +3489,7 @@
                id, s% job% remove_initial_surface_by_radius_Rsun*Rsun, ierr)
             if (failed('star_remove_surface_by_radius_Rsun',ierr)) return
          end if
-         
+
          if (s% job% remove_initial_surface_by_mass_Msun > s% M_center/Msun .and. &
                s% job% remove_initial_surface_by_mass_Msun < s% m(1)/Msun .and. &
                .not. restart) then
@@ -3533,7 +3533,7 @@
          end if
 
       end subroutine do_remove_initial_surface
-             
+
 
       subroutine do_remove_surface(id,s,ierr)
          integer, intent(in) :: id
@@ -3541,7 +3541,7 @@
          integer, intent(out) :: ierr
 
          include 'formats'
-         
+
          ierr = 0
 
          if (s% job% remove_surface_at_he_core_boundary > 0) then
@@ -3557,21 +3557,21 @@
                id, s% job% remove_surface_by_optical_depth, ierr)
             if (failed('star_remove_surface_by_optical_depth',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_density > 0) then
             !write(*, 1) 'remove_surface_by_density', s% job% remove_surface_by_density
             call star_remove_surface_by_density( &
                id, s% job% remove_surface_by_density, ierr)
             if (failed('star_remove_surface_by_density',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_pressure > 0) then
             !write(*, 1) 'remove_surface_by_pressure', s% job% remove_surface_by_pressure
             call star_remove_surface_by_pressure( &
                id, s% job% remove_surface_by_pressure, ierr)
             if (failed('star_remove_surface_by_pressure',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_radius_cm > s% R_center .and. &
                s% job% remove_surface_by_radius_cm < s% r(1)) then
             !write(*, 1) 'remove_surface_by_radius_cm', s% job% remove_surface_by_radius_cm
@@ -3579,7 +3579,7 @@
                id, s% job% remove_surface_by_radius_cm, ierr)
             if (failed('star_remove_surface_by_radius_cm',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_mass_fraction_q > 0d0 .and. &
                s% job% remove_surface_by_mass_fraction_q < 1d0) then
             !write(*, 1) 'remove_surface_by_mass_fraction_q', &
@@ -3588,7 +3588,7 @@
                id, s% job% remove_surface_by_mass_fraction_q, ierr)
             if (failed('star_remove_surface_by_mass_fraction_q',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_mass_gm > s% M_center .and. &
                s% job% remove_surface_by_mass_gm < s% m(1)) then
             !write(*, 1) 'remove_surface_by_mass_gm', &
@@ -3597,7 +3597,7 @@
                id, s% job% remove_surface_by_mass_gm, ierr)
             if (failed('star_remove_surface_by_mass_gm',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_radius_Rsun > s% R_center/Rsun .and. &
                s% job% remove_surface_by_radius_Rsun < s% r(1)/Rsun) then
             !write(*, 1) 'remove_surface_by_radius_Rsun', &
@@ -3606,7 +3606,7 @@
                id, s% job% remove_surface_by_radius_Rsun*Rsun, ierr)
             if (failed('star_remove_surface_by_radius_Rsun',ierr)) return
          end if
-         
+
          if (s% job% remove_surface_by_mass_Msun > s% M_center/Msun .and. &
                s% job% remove_surface_by_mass_Msun < s% m(1)/Msun) then
             !write(*, 1) 'remove_surface_by_mass_Msun', &
@@ -3689,8 +3689,8 @@
         return
 
       end subroutine resolve_inlist_fname
-      
-      
+
+
       subroutine add_fpe_checks(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -3712,26 +3712,26 @@
          end if
 
       end subroutine add_fpe_checks
-      
-      
-      
+
+
+
       subroutine multiply_tolerances(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: status
-         
+
          real(dp) :: test_suite_res_factor = 1
          character(len=20) :: test_suite_resolution_factor_str
-         
+
          include 'formats'
-         
+
          ierr = 0
          call GET_ENVIRONMENT_VARIABLE('MESA_TEST_SUITE_RESOLUTION_FACTOR', &
             test_suite_resolution_factor_str, STATUS=status)
          if (status /= 0) return
-         
-         if (test_suite_resolution_factor_str .ne. "") then 
+
+         if (test_suite_resolution_factor_str .ne. "") then
             read(test_suite_resolution_factor_str, *) test_suite_res_factor
             write(*,*) ""
             write(*,*) "***"
@@ -3756,10 +3756,10 @@
             write(*,*)    "   new max_model_number = ",   s% max_model_number
             write(*,*)    ""
          end if
-      
+
       end subroutine multiply_tolerances
-      
-      
+
+
       subroutine pgstar_env_check(id, s, ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
@@ -3780,13 +3780,13 @@
             s% job% pgstar_flag = .true.
          case ("FALSE", "false")
             write(*,*) "PGSTAR forced off"
-            s% job% pgstar_flag = .false.     
+            s% job% pgstar_flag = .false.
          end select
 
       end subroutine pgstar_env_check
 
       end module run_star_support
-      
-      
-      
-      
+
+
+
+

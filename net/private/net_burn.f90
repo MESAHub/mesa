@@ -28,29 +28,29 @@
       use math_lib
       use chem_def
       use net_def
-         
+
       use utils_lib, only: is_bad,fill_with_NaNs,fill_with_NaNs_2D
-      
+
       use net_burn_support, only: netint
       use net_approx21, only : num_reactions_func => num_reactions
-         
+
       implicit none
-      
-      
+
+
       !logical, parameter :: use_ludcmp = .true.
       logical, parameter :: use_ludcmp = .false.
-      
+
       !logical, parameter :: show_mesa_rates = .true.
       logical, parameter :: show_mesa_rates = .false.
-      
+
       !logical, parameter :: report_ierr = .true.
       logical, parameter :: report_ierr = .false.
 
 
-      
+
 
       contains
-      
+
       subroutine get_pointers( &
             g, species, num_reactions, &
             dratdumdy1, dratdumdy2, dens_dfdy, dmat, i, ierr)
@@ -64,13 +64,13 @@
          integer :: sz
          include 'formats'
          ierr = 0
-                  
+
          sz = num_reactions
          if (g% doing_approx21) sz = num_reactions_func(g% add_co56_to_approx21)
 
          allocate(dratdumdy1(1:sz))
          allocate(dratdumdy2(1:sz))
-         
+
          allocate(dens_dfdy(1:species,1:species))
          allocate(dmat(1:species,1:species))
 
@@ -80,10 +80,10 @@
             call fill_with_NaNs_2D(dens_dfdy)
             call fill_with_NaNs_2D(dmat)
          end if
-         
+
       end subroutine get_pointers
 
-      
+
       subroutine burn_1_zone( &
             net_handle, eos_handle, species, num_reactions, t_start, t_end, starting_x, &
             ntimes, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
@@ -95,7 +95,7 @@
             ending_x, eps_nuc_categories, avg_eps_nuc, eps_neu_total, &
             nfcn, njac, nstep, naccpt, nrejct, ierr)
          use num_def
-         use num_lib 
+         use num_lib
          use mtx_lib
          use mtx_def
          use rates_def, only: rates_reaction_id_max, reaction_Name, reaction_categories
@@ -103,14 +103,14 @@
          use net_initialize, only: setup_net_info
          use chem_lib, only: basic_composition_info, get_Q
          use net_approx21, only: approx21_nrat
-         
+
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: species
          integer, intent(in) :: num_reactions
          real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (species)
          integer, intent(in) :: ntimes ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times) 
-         real(dp), pointer, intent(in) :: log10Ts_f1(:) 
+         real(dp), pointer, intent(in) :: times(:) ! (num_times)
+         real(dp), pointer, intent(in) :: log10Ts_f1(:)
             ! =(4,numtimes) interpolant for log10T(time)
          real(dp), pointer, intent(in) :: log10Rhos_f1(:)
             ! =(4,numtimes) interpolant for log10Rho(time)
@@ -140,17 +140,17 @@
          integer, intent(out) :: naccpt  ! number of accepted steps
          integer, intent(out) :: nrejct  ! number of rejected steps
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer :: g
          integer :: ijac, lrd, lid, lout, i, j, ir, idid, sz
          logical :: okay, have_set_rate_screened
          real(dp) :: temp, rho, eta, lgT, lgRho, r, prev_lgRho, prev_lgT
-         
+
          integer :: stpmax, imax_dydx, nstp
          real(dp) :: &
             h, start, stptry, stpmin, stopp, max_dydx, abs_max_dydx, &
             burn_ergs, dx
-                  
+
          real(dp), dimension(species), target :: starting_y_a, ending_y_a, save_x_a
          real(dp), dimension(:), pointer :: starting_y, ending_y, save_x
          real(dp), dimension(:), allocatable :: dratdumdy1, dratdumdy2
@@ -159,18 +159,18 @@
 
          real(dp) :: xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          real(dp) :: aion(species)
-      
+
          logical :: dbg
-         
+
          type (Net_Info) :: n
-         
+
          integer :: iwork, cid
-         
+
          include 'formats'
-         
+
          !dbg = .true.
          dbg = burn_dbg
-         
+
          if (dbg) then
             do i=1,species
                write(*,2) 'starting_x', i, starting_x(i)
@@ -180,9 +180,9 @@
          starting_y => starting_y_a
          ending_y => ending_y_a
          save_x => save_x_a
-         
+
          have_set_rate_screened = .false.
-         
+
          lgT = log10Ts_f1(1)
          temp = exp10(lgT)
          lgRho = log10Rhos_f1(1)
@@ -190,7 +190,7 @@
          eta = etas_f1(1)
          prev_lgT = -1d99
          prev_lgRho = -1d99
-         
+
          ierr = 0
          call get_net_ptr(net_handle, g, ierr)
          if (ierr /= 0) then
@@ -202,18 +202,18 @@
             write(*,*) 'invalid species', species
             return
          end if
-         
+
          if (g% num_reactions /= num_reactions) then
             write(*,*) 'invalid num_reactions', num_reactions
             return
          end if
-         
+
          nfcn = 0
          njac = 0
          nstep = 0
          naccpt = 0
          nrejct = 0
-         
+
          do i=1,species
             cid = g% chem_id(i)
             if (cid < 0) cid = g% approx21_ye_iso
@@ -223,24 +223,24 @@
             starting_y(i) = starting_x(i)/aion(i)
             ending_y(i) = starting_y(i)
          end do
-         
+
          start = t_start
          stptry = stptry_in
          if (stptry == 0d0) stptry = t_end
-         
+
          !write(*,1) 'stptry', stptry
-         
+
          stpmin = min(t_end*1d-20,stptry*1d-6)
          stopp = t_end
          stpmax = max_steps
 
          n% screening_mode = screening_mode
          n% g => g
-                  
+
          if (dbg) write(*,*) 'call setup_net_info'
-         call setup_net_info(n) 
+         call setup_net_info(n)
          if (dbg) write(*,*) 'done setup_net_info'
-      
+
          if (dbg) write(*,*) 'call get_pointers'
          call get_pointers( &
             g, species, num_reactions, &
@@ -276,16 +276,16 @@
             ending_x(i) = ending_y(i)*aion(i)
             dx = ending_x(i) - save_x(i)
             !write(*,2) 'dx aion end_x', i, dx, aion(i), ending_x(i)
-            cid = g% chem_id(i)             
+            cid = g% chem_id(i)
             burn_ergs = burn_ergs + &
                (get_Q(chem_isos,cid))*dx/chem_isos% Z_plus_N(cid)
          end do
          burn_ergs = burn_ergs*Qconv
          !write(*,1) 'burn_ergs', burn_ergs
          avg_eps_nuc = burn_ergs/(t_end - t_start) - eps_neu_total
-      
+
       contains
-         
+
          subroutine burner_derivs(x,y,f,species,ierr)
             integer, intent(in) :: species
             real(dp) :: x, y(:), f(:)
@@ -300,15 +300,15 @@
 
             real(dp), target :: f21_a(species)
             real(dp), pointer :: f21(:)
-            
+
             include 'formats'
-            
+
             ierr = 0
             nfcn = nfcn + 1
             dfdx => dfdx_arry
             call jakob_or_derivs(x,y,f,dfdx,ierr)
-            if (ierr /= 0) return            
-         
+            if (ierr /= 0) return
+
          end subroutine burner_derivs
 
          subroutine burner_jakob(x,y,dfdy,species,ierr)
@@ -318,7 +318,7 @@
             integer, intent(out) :: ierr
             real(dp), target :: f_arry(0)
             real(dp), pointer :: f(:)
-            
+
             real(dp) :: Z_plus_N, df_t, df_m
             integer :: i, ci, j, cj
             logical :: okay
@@ -330,7 +330,7 @@
 
             call jakob_or_derivs(x,y,f,dfdy,ierr)
             if (ierr /= 0) return
-                     
+
          end subroutine burner_jakob
 
          subroutine jakob_or_derivs(time,y,f,dfdy,ierr)
@@ -341,53 +341,53 @@
             use interp_1d_lib, only: interp_value
             use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_eta
             use eos_lib, only: eosDT_get
-         
+
             real(dp) :: time, y(:), f(:)
             real(dp) :: dfdy(:,:)
             integer, intent(out) :: ierr
-         
+
             real(dp) :: rho, lgRho, T, lgT, rate_limit, rat, dratdt, dratdd
             real(dp) :: eta, d_eta_dlnT, d_eta_dlnRho
             real(dp) :: eps_nuc
             real(dp) :: d_eps_nuc_dT
             real(dp) :: d_eps_nuc_dRho
-            real(dp) :: d_eps_nuc_dx(species) 
+            real(dp) :: d_eps_nuc_dx(species)
             real(dp) :: dxdt(species)
             real(dp) :: d_dxdt_dRho(species)
             real(dp) :: d_dxdt_dT(species)
             real(dp) :: d_dxdt_dx(species, species)
-            
+
             logical :: rates_only, dxdt_only, okay
             integer :: i, j, k, ir
 
             real(dp), pointer, dimension(:) :: actual_Qs, actual_neuQs
             real(dp) :: xsum
             logical, pointer :: from_weaklib(:)
-            
+
             real(dp), target :: x_a(species), dfdx_a(species,species)
             real(dp), pointer :: x(:), dfdx(:,:)
 
             real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
             real(dp) :: d_dxa(num_eos_d_dxa_results,species)
-         
+
             include 'formats'
-         
+
             ierr = 0
 
             x => x_a
             dfdx => dfdx_a
-            
+
             actual_Qs => null()
             actual_neuQs => null()
             from_weaklib => null()
-         
+
             if (ntimes == 1) then
-         
+
                lgT = log10Ts_f1(1)
                lgRho = log10Rhos_f1(1)
-            
+
             else
-         
+
                call interp_value(times, ntimes, log10Ts_f1, time, lgT, ierr)
                if (ierr /= 0) then
                   if (report_ierr) &
@@ -403,8 +403,8 @@
                end if
 
             end if
-            
-            xsum = 0 
+
+            xsum = 0
             do i=1,species
                if (is_bad(y(i))) then
                   ierr = -1
@@ -412,7 +412,7 @@
                      write(*,2) 'net_burn failed in jakob_or_derivs: bad y(i) lgT lgRho', i, y(i), lgT, lgRho
                   return
                   stop
-               end if               
+               end if
                y(i) = min(1.0d0, max(y(i),1.0d-30))
                x(i) = y(i)*aion(i)
                xsum = xsum + x(i)
@@ -421,11 +421,11 @@
 
             rho = exp10(lgRho)
             T = exp10(lgT)
-                
+
             call basic_composition_info( &
                species, g% chem_id, x, xh, xhe, z, &
                abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-            
+
 
             call eosDT_get( &
                eos_handle, species, g% chem_id, g% net_iso, x, &
@@ -439,10 +439,10 @@
             d_eta_dlnT = d_dlnT(i_eta)
             d_eta_dlnRho = d_dlnd(i_eta)
 
-            
+
             rates_only = .false.
             dxdt_only = (size(dfdy,dim=1) == 0)
-            
+
             call eval_net( &
                n, g, rates_only, dxdt_only, &
                species, num_reactions, g% num_wk_reactions, &
@@ -455,7 +455,7 @@
                screening_mode, &
                eps_nuc_categories, eps_neu_total, &
                actual_Qs, actual_neuQs, from_weaklib, .false., ierr)
-            
+
             if (size(f,dim=1) > 0) then
                do j = 1, species
                   f(j) = dxdt(j)/aion(j)
@@ -479,15 +479,15 @@
                   end do
                end do
             end if
-            
-         
+
+
          end subroutine jakob_or_derivs
-         
-         
-         
+
+
+
 
       end subroutine burn_1_zone
-      
+
 
 
 

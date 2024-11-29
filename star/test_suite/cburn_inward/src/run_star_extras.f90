@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,7 +27,7 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
 
       ! Tracks quanties when the flame ignited
@@ -35,12 +35,12 @@
 
       include "test_suite_extras_def.inc"
 
-      
+
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -48,7 +48,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
@@ -56,14 +56,14 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          s% other_photo_read => extras_photo_read
          s% other_photo_write => extras_photo_write
 
       end subroutine extras_controls
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -80,8 +80,8 @@
             flame_mass = -1
          end if
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -92,7 +92,7 @@
          if (ierr /= 0) return
 
 
-         select case (s% x_integer_ctrl(1)) 
+         select case (s% x_integer_ctrl(1))
 
          case(2) ! inlist_cburn_inward
 
@@ -111,7 +111,7 @@
 
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -121,7 +121,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -134,8 +134,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 4
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -155,7 +155,7 @@
          vals(4) = flame_mass/msun
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -166,8 +166,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -181,7 +181,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -194,17 +194,17 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-      
-         
-         ! Store initial flame location 
-         select case (s% x_integer_ctrl(1)) 
+
+
+         ! Store initial flame location
+         select case (s% x_integer_ctrl(1))
 
          case(2) ! inlist_cburn_inward
             flame_cell = -1
             ! Check to see if carbon has ignited
              do k=s%nz, 1, -1
-                if (has_ignited(s, k)) then 
-                   flame_cell = k 
+                if (has_ignited(s, k)) then
+                   flame_cell = k
                    exit
                 end if
             end do
@@ -222,7 +222,7 @@
                ! Final flame location
                if(ign_mass > 0d0 .and. s% m(flame_cell) < 0.5d0*ign_mass) then
                   extras_finish_step = terminate
-                  write(*,'(a)') "Terminate as flame reached half way" 
+                  write(*,'(a)') "Terminate as flame reached half way"
                   s% termination_code = t_extras_finish_step
                end if
             end if
@@ -230,8 +230,8 @@
          end select
 
       end function extras_finish_step
-      
-      
+
+
       logical function has_ignited(s, k)
          use net_def
          use chem_def
@@ -241,12 +241,12 @@
          integer,intent(in) :: k
          real(dp) :: neAbun,naAbun,mgAbun,heAbun
          real(dp) :: netEng,ne_burn,o_burn
-         
+
          has_ignited = .false.
          if(s% co_core_mass > 0d0) then
             if(s%m(k)/Msun < s%co_core_mass)THEN
                netEng = star_get_profile_output(s,'net_nuclear_energy',k)
-         
+
                if(netEng >= 0.0)THEN
                   neAbun = s%xa(s%net_iso(chem_get_iso_id('ne20')),k)
                   naAbun = s%xa(s%net_iso(chem_get_iso_id('na23')),k)
@@ -266,35 +266,35 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
- 
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
- 
+
          select case (s% x_integer_ctrl(1))
          case(2)
             read(iounit,iostat=ierr) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select
- 
+
        end subroutine extras_photo_read
- 
+
        subroutine extras_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
          integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
- 
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
- 
+
          select case (s% x_integer_ctrl(1))
          case(2)
             write(iounit) ign_mass, ign_density, ign_co_core_mass,flame_mass
          end select
- 
+
        end subroutine extras_photo_write
 
 
 
 
       end module run_star_extras
-      
+

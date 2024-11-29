@@ -76,7 +76,7 @@
    real(dp) :: logT_cut_FreeEOS_hi
    real(dp) :: logT_cut_FreeEOS_lo
    character (len=30) :: suffix_for_FreeEOS_Z(num_FreeEOS_Zs)
-         
+
    ! controls for CMS
    logical :: use_CMS, CMS_use_fixed_composition
    integer :: CMS_fixed_composition_index
@@ -86,7 +86,7 @@
    real(dp) :: logRho_max_for_all_CMS, logRho_max_for_any_CMS  ! for upper blend zone in logRho
    real(dp) :: logRho_min_for_all_CMS, logRho_min_for_any_CMS  ! for lower blend zone in logRho
    real(dp) :: logT_max_for_all_CMS, logT_max_for_any_CMS      ! for upper blend zone in logT
-   real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT      
+   real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT
    real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He ! upper logT blend zone is different for pure He
 
    ! controls for PC
@@ -126,7 +126,7 @@
 
    ! other eos
    logical :: use_other_eos_component, use_other_eos_results
-   
+
    ! debugging
    logical :: dbg
    real(dp) :: logT_lo, logT_hi
@@ -146,14 +146,14 @@
 
    namelist /eos/ &
       use_FreeEOS, &
-      
+
       ! controls for HELM
       Z_all_HELM, & ! all HELM for Z >= this unless use_FreeEOS
       logT_all_HELM, & ! all HELM for lgT >= this
       logT_low_all_HELM, & ! all HELM for lgT <= this
       coulomb_temp_cut_HELM, &
       coulomb_den_cut_HELM, &
-      
+
       ! controls for OPAL_SCVH
       use_OPAL_SCVH, &
       logT_low_all_SCVH, & ! SCVH for lgT >= this
@@ -164,7 +164,7 @@
       logQ_max_OPAL_SCVH, & ! no OPAL/SCVH for logQ > this
       logQ_min_OPAL_SCVH, & ! no OPAL/SCVH for logQ <= this.
       Z_all_OPAL, & ! all OPAL for Z <= this
-      
+
       ! controls for FreeEOS
       use_FreeEOS, &
       logQ_max_FreeEOS_hi, &
@@ -189,7 +189,7 @@
       logT_cut_FreeEOS_hi, &
       logT_cut_FreeEOS_lo, &
       suffix_for_FreeEOS_Z, &
-      
+
       ! controls for CMS
       use_CMS, CMS_use_fixed_composition, &
       CMS_fixed_composition_index, &
@@ -206,10 +206,10 @@
       logT_max_for_all_CMS, &
       logT_max_for_any_CMS, &      ! for upper blend zone in logT
       logT_min_for_all_CMS, &
-      logT_min_for_any_CMS, &      ! for lower blend zone in logT      
+      logT_min_for_any_CMS, &      ! for lower blend zone in logT
       logT_max_for_all_CMS_pure_He, &
       logT_max_for_any_CMS_pure_He, & ! upper logT blend zone is different for pure He
-      
+
       ! controls for PC
       use_PC, &
       mass_fraction_limit_for_PC, & ! skip any species with abundance < this
@@ -244,7 +244,7 @@
       eosDT_use_linear_interp_for_X, &
       eosDT_use_linear_interp_to_HELM, &
       eosDT_file_prefix, &
-      
+
       okay_to_convert_ierr_to_skip, &
       tiny_fuzz, &
 
@@ -257,7 +257,7 @@
       logRho_lo, logRho_hi, &
       X_lo, X_hi, &
       Z_lo, Z_hi, &
-      
+
       read_extra_eos_inlist, extra_eos_inlist_name,&
 
    ! User supplied inputs
@@ -306,7 +306,7 @@
          ierr = -1
          return
       end if
-      
+
       if (len_trim(filename) > 0) then
          open(newunit=unit, file=trim(filename), &
             action='read', delim='quote', status='old', iostat=ierr)
@@ -343,7 +343,7 @@
       end if
 
       call store_controls(rq)
-      
+
       if (len_trim(filename) == 0) return
 
       ! recursive calls to read other inlists
@@ -352,7 +352,7 @@
          read_extra_eos_inlist(i) = .false.
          extra(i) = extra_eos_inlist_name(i)
          extra_eos_inlist_name(i) = 'undefined'
-   
+
          if (read_extra(i)) then
             call read_controls_file(rq, extra(i), level+1, ierr)
             if (ierr /= 0) return
@@ -375,7 +375,7 @@
       rq% logT_all_HELM = logT_all_HELM
       rq% logT_low_all_HELM = logT_low_all_HELM
       rq% coulomb_temp_cut_HELM = coulomb_temp_cut_HELM
-      rq% coulomb_den_cut_HELM = coulomb_den_cut_HELM      
+      rq% coulomb_den_cut_HELM = coulomb_den_cut_HELM
       ! controls for OPAL_SCVH
       rq% use_OPAL_SCVH = use_OPAL_SCVH
       rq% logT_low_all_SCVH = logT_low_all_SCVH
@@ -385,7 +385,7 @@
       rq% logRho_min_OPAL_SCVH_limit = logRho_min_OPAL_SCVH_limit
       rq% logQ_max_OPAL_SCVH = logQ_max_OPAL_SCVH
       rq% logQ_min_OPAL_SCVH = logQ_min_OPAL_SCVH
-      rq% Z_all_OPAL = Z_all_OPAL      
+      rq% Z_all_OPAL = Z_all_OPAL
       ! controls for FreeEOS
       rq% use_FreeEOS = use_FreeEOS
       rq% logQ_max_FreeEOS_hi = logQ_max_FreeEOS_hi
@@ -410,7 +410,7 @@
       rq% logT_cut_FreeEOS_hi = logT_cut_FreeEOS_hi
       rq% logT_cut_FreeEOS_lo = logT_cut_FreeEOS_lo
       rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs) = &
-         suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
+         suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)
       ! controls for CMS
       rq% use_CMS = use_CMS
       rq% CMS_use_fixed_composition = CMS_use_fixed_composition
@@ -430,7 +430,7 @@
       rq% logT_min_for_all_CMS = logT_min_for_all_CMS
       rq% logT_min_for_any_CMS = logT_min_for_any_CMS
       rq% logT_max_for_all_CMS_pure_He = logT_max_for_all_CMS_pure_He
-      rq% logT_max_for_any_CMS_pure_He = logT_max_for_any_CMS_pure_He      
+      rq% logT_max_for_any_CMS_pure_He = logT_max_for_any_CMS_pure_He
       ! controls for PC
       rq% use_PC = use_PC
       rq% mass_fraction_limit_for_PC = mass_fraction_limit_for_PC
@@ -460,8 +460,8 @@
       rq% include_radiation = include_radiation
       rq% include_elec_pos = include_elec_pos
       rq% eosDT_use_linear_interp_for_X = eosDT_use_linear_interp_for_X
-      rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM      
-      rq% eosDT_file_prefix = eosDT_file_prefix      
+      rq% eosDT_use_linear_interp_to_HELM = eosDT_use_linear_interp_to_HELM
+      rq% eosDT_file_prefix = eosDT_file_prefix
       rq% okay_to_convert_ierr_to_skip = okay_to_convert_ierr_to_skip
       rq% tiny_fuzz = tiny_fuzz
 
@@ -491,7 +491,7 @@
    subroutine write_namelist(handle, filename, ierr)
       integer, intent(in) :: handle
       character(*), intent(in) :: filename
-      integer, intent(out) :: ierr 
+      integer, intent(out) :: ierr
       type (EoS_General_Info), pointer :: rq
       integer :: iounit
       open(newunit=iounit, file=trim(filename), &
@@ -504,8 +504,8 @@
       if (ierr /= 0) then
          close(iounit)
          return
-      end if      
-      call set_controls_for_writing(rq)      
+      end if
+      call set_controls_for_writing(rq)
       write(iounit, nml=eos, iostat=ierr)
       close(iounit)
    end subroutine write_namelist
@@ -518,7 +518,7 @@
       logT_all_HELM = rq% logT_all_HELM
       logT_low_all_HELM = rq% logT_low_all_HELM
       coulomb_temp_cut_HELM = rq% coulomb_temp_cut_HELM
-      coulomb_den_cut_HELM = rq% coulomb_den_cut_HELM      
+      coulomb_den_cut_HELM = rq% coulomb_den_cut_HELM
       ! controls for OPAL_SCVH
       use_OPAL_SCVH = rq% use_OPAL_SCVH
       logT_low_all_SCVH = rq% logT_low_all_SCVH
@@ -528,7 +528,7 @@
       logRho_min_OPAL_SCVH_limit = rq% logRho_min_OPAL_SCVH_limit
       logQ_max_OPAL_SCVH = rq% logQ_max_OPAL_SCVH
       logQ_min_OPAL_SCVH = rq% logQ_min_OPAL_SCVH
-      Z_all_OPAL = rq% Z_all_OPAL      
+      Z_all_OPAL = rq% Z_all_OPAL
       ! controls for FreeEOS
       use_FreeEOS = rq% use_FreeEOS
       logQ_max_FreeEOS_hi = rq% logQ_max_FreeEOS_hi
@@ -553,7 +553,7 @@
       logT_cut_FreeEOS_hi = rq% logT_cut_FreeEOS_hi
       logT_cut_FreeEOS_lo = rq% logT_cut_FreeEOS_lo
       suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs) = &
-         rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)      
+         rq% suffix_for_FreeEOS_Z(1:num_FreeEOS_Zs)
       ! controls for CMS
       use_CMS = rq% use_CMS
       CMS_use_fixed_composition = rq% CMS_use_fixed_composition
@@ -573,7 +573,7 @@
       logT_min_for_all_CMS = rq% logT_min_for_all_CMS
       logT_min_for_any_CMS = rq% logT_min_for_any_CMS
       logT_max_for_all_CMS_pure_He = rq% logT_max_for_all_CMS_pure_He
-      logT_max_for_any_CMS_pure_He = rq% logT_max_for_any_CMS_pure_He      
+      logT_max_for_any_CMS_pure_He = rq% logT_max_for_any_CMS_pure_He
       ! controls for PC
       use_PC = rq% use_PC
       mass_fraction_limit_for_PC = rq% mass_fraction_limit_for_PC
@@ -589,9 +589,9 @@
       ! controls for Skye
       use_Skye = rq% use_Skye
       Skye_use_ion_offsets = rq% Skye_use_ion_offsets
-      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye   
+      mass_fraction_limit_for_Skye = rq% mass_fraction_limit_for_Skye
       Skye_min_gamma_for_solid = rq% Skye_min_gamma_for_solid
-      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid  
+      Skye_max_gamma_for_liquid = rq% Skye_max_gamma_for_liquid
       Skye_solid_mixing_rule = rq% Skye_solid_mixing_rule
       use_simple_Skye_blends = rq% use_simple_Skye_blends
       logRho_min_for_any_Skye = rq% logRho_min_for_any_Skye
@@ -603,8 +603,8 @@
       include_radiation = rq% include_radiation
       include_elec_pos = rq% include_elec_pos
       eosDT_use_linear_interp_for_X = rq% eosDT_use_linear_interp_for_X
-      eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM      
-      eosDT_file_prefix = rq% eosDT_file_prefix      
+      eosDT_use_linear_interp_to_HELM = rq% eosDT_use_linear_interp_to_HELM
+      eosDT_file_prefix = rq% eosDT_file_prefix
       okay_to_convert_ierr_to_skip = rq% okay_to_convert_ierr_to_skip
       tiny_fuzz = rq% tiny_fuzz
 
@@ -629,7 +629,7 @@
       Z_lo = rq% Z_lo
       Z_hi = rq% Z_hi
    end subroutine set_controls_for_writing
-   
+
 
    subroutine get_eos_controls(rq, name, val, ierr)
       use utils_lib, only: StrUpCase
@@ -657,7 +657,7 @@
       upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
-      do 
+      do
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
@@ -668,7 +668,7 @@
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
       if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
 

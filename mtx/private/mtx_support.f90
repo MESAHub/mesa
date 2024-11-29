@@ -25,21 +25,21 @@
 
 
       module mtx_support
-      
+
       use const_def, only: dp, qp
       use utils_lib, only: mesa_error
-      
+
       integer, parameter :: num_chunks = 4
 
       contains
 
 
-      
+
       subroutine do_dense_to_band(n,ndim,a,ml,mu,ab,ldab,ierr)
          integer, intent(in) :: n,ndim,ml,mu,ldab
          real(dp), intent(in) :: a(:,:) ! (ndim,n)
          real(dp), intent(inout) :: ab(:,:) ! (ldab,n)
-         integer, intent(out) :: ierr 
+         integer, intent(out) :: ierr
          integer :: i, j
          if (ml+mu+1 > n) then
             ierr = -1
@@ -54,12 +54,12 @@
          end do
       end subroutine do_dense_to_band
 
-      
+
       subroutine do_band_to_dense(n,ml,mu,ab,ldab,ndim,a,ierr)
          integer, intent(in) :: n,ndim,ml,mu,ldab
          real(dp), intent(in) :: ab(:,:) ! (ldab,n)
          real(dp), intent(inout) :: a(:,:) ! (ndim,n)
-         integer, intent(out) :: ierr 
+         integer, intent(out) :: ierr
          integer :: i, j
          if (ml+mu+1 > n) then
             ierr = -1
@@ -74,7 +74,7 @@
          end do
       end subroutine do_band_to_dense
 
-      
+
       subroutine do_band_to_column_sparse(n,ml,mu,ab,ldab,nzmax,nz,colptr,rowind,values,diags,ierr)
          integer, intent(in) :: n,ml,mu,nzmax,ldab
          real(dp), intent(in) :: ab(ldab,n)
@@ -85,7 +85,7 @@
 !         integer, intent(inout) :: rowind(:) ! (nzmax)
 !         real(dp), intent(inout) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr 
+         integer, intent(out) :: nz,ierr
          integer :: i, j
          if (ml+mu+1 > n) then
             ierr = -1
@@ -110,13 +110,13 @@
                rowind(nz) = i
             end do
          end do
-         colptr(n+1) = nz+1      
+         colptr(n+1) = nz+1
       end subroutine do_band_to_column_sparse
-      
-      
+
+
       subroutine do_column_sparse_to_band(n,ml,mu,ab,ldab,nz,colptr,rowind,values,ierr)
          integer, intent(in) :: n,ml,mu,nz,ldab
-         
+
          real(dp), intent(inout) :: ab(ldab,n)
          integer, intent(in) :: colptr(n+1),rowind(nz)
          real(dp), intent(in) :: values(nz)
@@ -124,13 +124,13 @@
 !         integer, intent(inout) :: colptr(:) ! (n+1)
 !         integer, intent(inout) :: rowind(:) ! (nzmax)
 !         real(dp), intent(in) :: values(:) ! (nz)
-         integer, intent(out) :: ierr 
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          ab = 0
          do j=1,n
             do k=colptr(j),colptr(j+1)-1
-               i = rowind(k) 
+               i = rowind(k)
                if (i > j+ml .or. i < j-mu) then
                   ierr = j
                   return
@@ -140,10 +140,10 @@
          end do
       end subroutine do_column_sparse_to_band
 
-      
+
       subroutine do_band_to_row_sparse(n,ml,mu,ab,ldab,nzmax,nz,rowptr,colind,values,diags,ierr)
          integer, intent(in) :: n,ml,mu,nzmax,ldab
-         
+
          real(dp), intent(in) :: ab(ldab,n)
          integer, intent(inout) :: rowptr(n+1),colind(nzmax)
          real(dp), intent(inout) :: values(nzmax)
@@ -155,13 +155,13 @@
          integer, intent(out) :: ierr, nz
          integer :: idiag, op_err, j1, j2, k, i, nz1
          integer, dimension(num_chunks) :: nz_per_chunk, nz_start, nz_max, i_lo, i_hi
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          if (dbg) write(*,*) 'enter do_band_to_row_sparse'
-         
+
          if (ml+mu+1 > n) then
             ierr = -1
             if (dbg) then
@@ -171,11 +171,11 @@
             end if
             return
          end if
-         
+
          ierr = 0
          nz = 0
          idiag = ldab - ml
-         
+
          nz_start(1) = 1
          i_lo(1) = 1
          do k = 2, num_chunks
@@ -186,7 +186,7 @@
          end do
          nz_max(num_chunks) = nzmax
          i_hi(num_chunks) = n
-         
+
          if (dbg) write(*,*) 'do_band_to_row_sparse - do chunks'
          op_err = 0
 !$OMP PARALLEL DO PRIVATE(k,op_err)
@@ -198,15 +198,15 @@
          end do
 !$OMP END PARALLEL DO
          if (dbg) write(*,*) 'do_band_to_row_sparse - done chunks'
-         
+
          if (ierr /= 0) then
-         
+
             write(*,*) 'do_band_to_row_sparse: failed to fit in chunks'
             write(*,*) 'please increase the max fill factor for your sparse matrix'
             call mesa_error(__FILE__,__LINE__)
-         
-         else 
-            
+
+         else
+
             if (dbg) then
                do k=1,num_chunks
                   write(*,2) 'k', k
@@ -218,7 +218,7 @@
                   write(*,'(A)')
                end do
             end if
-            
+
             ! reposition the chunk results
             if (dbg) write(*,*) 'reposition the chunk results'
             i = nz_per_chunk(1)
@@ -245,11 +245,11 @@
             end do
             nz = i
          end if
-         
+
 
          rowptr(n+1) = nz+1
          !write(*,*) 'done do_band_to_row_sparse - fill fraction', dble(nz)/dble(nzmax)
-                  
+
       end subroutine do_band_to_row_sparse
 
 
@@ -268,13 +268,13 @@
 !         real(dp), intent(inout) :: values(:) ! (nzmax)
          integer, dimension(num_chunks) :: nz_per_chunk, nz_start, nz_max, i_lo, i_hi
          integer, intent(out) :: ierr
-         
+
          integer :: i, j, nz
          real(dp) :: val
-         
+
          logical, parameter :: dbg = .false.
          include 'formats'
-         
+
          ierr = 0
          nz = nz_start(num) - 1
          do i = i_lo(num), i_hi(num)
@@ -303,7 +303,7 @@
       end subroutine do_chunk_band_to_row_sparse
 
 
-      
+
       subroutine do_row_sparse_to_band(n,ml,mu,ab,ldab,nz,rowptr,colind,values,ierr)
          integer, intent(in) :: n,ml,mu,nz,ldab
          real(dp), intent(inout) :: ab(ldab,n)
@@ -313,13 +313,13 @@
 !         integer, intent(inout) :: rowptr(:) ! (n+1)
 !         integer, intent(inout) :: colind(:) ! (nz)
 !         real(dp), intent(in) :: values(:) ! (nz)
-         integer, intent(out) :: ierr 
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          ab = 0
          do i=1,n
             do k=rowptr(i),rowptr(i+1)-1
-               j = colind(k) 
+               j = colind(k)
                if (i > j+ml .or. i < j-mu) then
                   ierr = j
                   return
@@ -331,7 +331,7 @@
 
 
       ! sparse conversion based on similar routines from sparskit_src/formats.f
-      
+
       subroutine do_dense_to_row_sparse(n,ndim,a,nzmax,nz,rowptr,colind,values,diags,ierr)
          integer, intent(in) :: n,ndim,nzmax
          !real(dp), intent(in) :: a(ndim,n)
@@ -342,8 +342,8 @@
          integer, intent(inout) :: colind(:) ! (nzmax)
          real(dp), intent(inout) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
+         integer, intent(out) :: nz,ierr
+         integer :: i,j
          ierr = 0
          nz = 0
          do i=1,n
@@ -363,10 +363,10 @@
                colind(nz) = j
             end do
          end do
-         rowptr(n+1) = nz+1      
+         rowptr(n+1) = nz+1
       end subroutine do_dense_to_row_sparse
-      
-      
+
+
       subroutine do_dense_to_row_sparse_0_based( &
             n,ndim,a,nzmax,nz,rowptr,colind,values,diags,ierr)
          integer, intent(in) :: n,ndim,nzmax
@@ -378,8 +378,8 @@
          integer, intent(inout) :: colind(:) ! (nzmax)
          real(dp), intent(inout) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
+         integer, intent(out) :: nz,ierr
+         integer :: i,j
          ierr = 0
          nz = 0
          do i=1,n
@@ -399,11 +399,11 @@
                colind(nz) = j-1
             end do
          end do
-         rowptr(n+1) = nz      
+         rowptr(n+1) = nz
       end subroutine do_dense_to_row_sparse_0_based
 
 
-      subroutine do_row_sparse_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr) 
+      subroutine do_row_sparse_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr)
          integer, intent(in) :: n,ndim,nz
          real(dp), intent(inout) :: a(ndim,n)
          integer, intent(in) :: rowptr(n+1),colind(nz)
@@ -412,13 +412,13 @@
 !         integer, intent(inout) :: rowptr(:) ! (n+1)
 !         integer, intent(inout) :: colind(:) ! (nz)
 !         real(dp), intent(inout) :: values(:) ! (nz)
-         integer, intent(out) :: ierr     
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          a = 0
          do i=1,n
             do k=rowptr(i),rowptr(i+1)-1
-               j = colind(k) 
+               j = colind(k)
                if (j > n) then
                   ierr = i
                   return
@@ -429,18 +429,18 @@
       end subroutine do_row_sparse_to_dense
 
 
-      subroutine do_row_sparse_0_based_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr) 
+      subroutine do_row_sparse_0_based_to_dense(n,ndim,a,nz,rowptr,colind,values,ierr)
          integer, intent(in) :: n,ndim,nz
          real(dp), intent(inout) :: a(ndim,n)
          integer, intent(in) :: rowptr(0:n),colind(0:nz-1)
          real(dp), intent(in) :: values(nz)
-         integer, intent(out) :: ierr     
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          a = 0
          do i=1,n
             do k=rowptr(i),rowptr(i+1)-1
-               j = colind(k) 
+               j = colind(k)
                if (j > n) then
                   ierr = i
                   return
@@ -450,7 +450,7 @@
          end do
       end subroutine do_row_sparse_0_based_to_dense
 
-      
+
       subroutine do_dense_to_column_sparse(n,ndim,a,nzmax,nz,colptr,rowind,values,diags,ierr)
          integer, intent(in) :: n,ndim,nzmax
          !real(dp), intent(in) :: a(ndim,n)
@@ -461,8 +461,8 @@
          integer, intent(inout) :: rowind(:) ! (nzmax)
          real(dp), intent(inout) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
+         integer, intent(out) :: nz,ierr
+         integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
@@ -482,10 +482,10 @@
                rowind(nz) = i
             end do
          end do
-         colptr(n+1) = nz+1      
+         colptr(n+1) = nz+1
       end subroutine do_dense_to_column_sparse
 
-      
+
       subroutine do_dense_to_col_sparse_0_based( &
             n,ndim,a,nzmax,nz,colptr,rowind,values,diags,ierr)
          integer, intent(in) :: n,ndim,nzmax
@@ -497,8 +497,8 @@
          integer, intent(inout) :: rowind(:) ! (nzmax)
          real(dp), intent(inout) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
+         integer, intent(out) :: nz,ierr
+         integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
@@ -518,10 +518,10 @@
                rowind(nz) = i-1
             end do
          end do
-         colptr(n+1) = nz  
+         colptr(n+1) = nz
       end subroutine do_dense_to_col_sparse_0_based
 
-      
+
       subroutine do_dense_to_col_sparse_0_based_qp( &
             n,ndim,a,nzmax,nz,colptr,rowind,values,diags,ierr)
          integer, intent(in) :: n,ndim,nzmax
@@ -533,8 +533,8 @@
          integer, intent(inout) :: rowind(:) ! (nzmax)
          real(qp), intent(out) :: values(:) ! (nzmax)
          logical, intent(in) :: diags
-         integer, intent(out) :: nz,ierr         
-         integer :: i,j         
+         integer, intent(out) :: nz,ierr
+         integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
@@ -554,11 +554,11 @@
                rowind(nz) = i-1
             end do
          end do
-         colptr(n+1) = nz  
+         colptr(n+1) = nz
       end subroutine do_dense_to_col_sparse_0_based_qp
 
-      
-      subroutine do_column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+
+      subroutine do_column_sparse_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr)
          integer, intent(in) :: n,ndim,nz
          real(dp), intent(inout) :: a(ndim,n)
          integer, intent(in) :: colptr(n+1),rowind(nz)
@@ -567,13 +567,13 @@
 !         integer, intent(in) :: colptr(:) ! (n+1)
 !         integer, intent(in) :: rowind(:) ! (nz)
 !         real(dp), intent(in) :: values(:) ! (nz)
-         integer, intent(out) :: ierr     
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          a = 0
          do j=1,n
             do k=colptr(j),colptr(j+1)-1
-               i = rowind(k) 
+               i = rowind(k)
                if (i > n) then
                   ierr = j
                   return
@@ -584,7 +584,7 @@
       end subroutine do_column_sparse_to_dense
 
 
-      subroutine do_col_sparse_0_based_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr) 
+      subroutine do_col_sparse_0_based_to_dense(n,ndim,a,nz,colptr,rowind,values,ierr)
          integer, intent(in) :: n,ndim,nz
          real(dp), intent(inout) :: a(ndim,n)
          integer, intent(in) :: colptr(n+1),rowind(nz)
@@ -593,7 +593,7 @@
 !         integer, intent(in) :: colptr(:) ! (n+1)
 !         integer, intent(in) :: rowind(:) ! (nz)
 !         real(dp), intent(in) :: values(:) ! (nz)
-         integer, intent(out) :: ierr     
+         integer, intent(out) :: ierr
          integer :: i,j,k
          ierr = 0
          a = 0
@@ -612,11 +612,11 @@
 
       subroutine do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
          use my_lapack95, only: my_gemv_p1
-         integer, intent(in) :: nvar, nz    
+         integer, intent(in) :: nvar, nz
          real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
          real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)         
-         integer :: k        
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
+         integer :: k
          do k = 1, nz
             prod(1:nvar,k) = 0
             call my_gemv_p1(nvar,nvar,dblk(1:nvar,1:nvar,k),nvar,b(1:nvar,k),prod(1:nvar,k))
@@ -626,20 +626,20 @@
             if (k < nz) then
                call my_gemv_p1(nvar,nvar,ublk(1:nvar,1:nvar,k),nvar,b(1:nvar,k+1),prod(1:nvar,k))
             end if
-         end do      
-      end subroutine do_block_dble_mv                  
-      
-      
+         end do
+      end subroutine do_block_dble_mv
+
+
       subroutine do_LU_factored_block_dble_mv(lblk, dblk, ublk, b, ipiv, prod)
          real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
          real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
          integer, intent(in) :: ipiv(:,:) ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)                  
-         integer :: nvar, nz, k, incx, incy         
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
+         integer :: nvar, nz, k, incx, incy
          nvar = size(b,dim=1)
-         nz = size(b,dim=2)         
+         nz = size(b,dim=2)
          incx = 1
-         incy = 1         
+         incy = 1
 !$OMP PARALLEL DO PRIVATE(k)
          do k = 1, nz
             call do_LU_factored_square_mv(nvar,dblk(:,:,k),b(:,k),ipiv(:,k),prod(:,k))
@@ -649,11 +649,11 @@
             if (k < nz) then
                call dgemv('N',nvar,nvar,1d0,ublk(:,:,k),nvar,b(:,k+1),incx,1d0,prod(:,k),incy)
             end if
-         end do      
+         end do
 !$OMP END PARALLEL DO
       end subroutine do_LU_factored_block_dble_mv
-      
-      
+
+
       subroutine do_LU_factored_square_mv(m,a,b,ipiv,x) ! set x = A*b
          ! A factored in LU manner = P*L*U.
          integer, intent(in) :: m
@@ -681,8 +681,8 @@
          ! x = P*x
          call dlaswp(1, x, m, 1, m, ipiv, -1)
       end subroutine do_LU_factored_square_mv
-      
-      
+
+
       subroutine do_LU_factored_square_mm(m,A,B,ipiv,C) ! set C = A*B
          ! A factored in LU manner = P*L*U.
          integer, intent(in) :: m
@@ -813,7 +813,7 @@
                b(j) = b(j) + x(i)*ab(k+i,j)
             end do
          end do
-      end subroutine do_band_multiply_xa      
+      end subroutine do_band_multiply_xa
 
 
       subroutine do_clip_blocks( &
@@ -838,8 +838,8 @@
             end do
          end do
       end subroutine do_clip_blocks
-      
-      
+
+
       subroutine do_clip_block(mblk, clip_limit, dmat, dmat_nnz)
          integer, intent(in) :: mblk
          real(dp), intent(in) :: clip_limit
@@ -868,7 +868,7 @@
 
       REAL(dp), pointer ::        VALUES (:)
       integer, intent(out) :: ierr
-      
+
       integer :: i
       ierr = 0
       READ (iounit, 1000, iostat=ierr ) TITLE , KEY   , &
@@ -877,7 +877,7 @@
                            PTRFMT, INDFMT, VALFMT, RHSFMT
       if (ierr /= 0) return
  1000 FORMAT ( A72, A8 / 5I14 / A3, 11X, 4I14 / 2A16, 2A20 )
- 
+
       allocate(VALUES(NNZERO), ROWIND(NNZERO), COLPTR(NCOL+1), stat=ierr)
       if (ierr /= 0) return
 
@@ -913,9 +913,9 @@
       INTEGER        COLPTR (*), ROWIND (*), ierr
 
       REAL(dp)         VALUES (*)
-      
+
       integer :: i
-      
+
       ierr = 0
 
 !    ------------------------
@@ -925,13 +925,13 @@
 !  Line 1 (A72, A8)
 !       Col. 1 - 72   Title (TITLE)
 !       Col. 73 - 80  Matrix name / identifier (MTRXID)
-! 
+!
 !  Line 2 (I14, 3(1X, I13))
 !       Col. 1 - 14   Total number of lines excluding header (TOTCRD)
 !       Col. 16 - 28  Number of lines for pointers (PTRCRD)
 !       Col. 30 - 42  Number of lines for row (or variable) indices (INDCRD)
 !       Col. 44 - 56  Number of lines for numerical values (VALCRD)
-! 
+!
 !  Line 3 (A3, 11X, 4(1X, I13))
 !       Col. 1 - 3    Matrix type (see below) (MXTYPE)
 !       Col. 15 - 28  Compressed Column: Number of rows (NROW)
@@ -942,19 +942,19 @@
 !                     Elemental: Number of variable indeces (NVARIX)
 !       Col. 58 - 70  Compressed Column: Unused, explicitly zero
 !                     Elemental: Number of elemental matrix entries (NELTVL)
-! 
+!
 !  Line 4 (2A16, A20)
 !       Col. 1 - 16   Fortran format for pointers (PTRFMT)
 !       Col. 17 - 32  Fortran format for row (or variable) indices (INDFMT)
 !       Col. 33 - 52  Fortran format for numerical values of coefficient matrix
 !                     (VALFMT)
 !                     (blank in the case of matrix patterns)
-! 
+!
 !  The three character type field on line 3 describes the matrix type.
 !  The following table lists the permitted values for each of the three
 !  characters. As an example of the type field, RSA denotes that the matrix
 !  is real, symmetric, and assembled.
-! 
+!
 !  First Character:
 !       R Real matrix
 !       C Complex matrix
@@ -962,24 +962,24 @@
 !       P Pattern only (no numerical values supplied)
 !       Q Pattern only (numerical values supplied in associated auxiliary value
 !         file)
-! 
+!
 !  Second Character:
 !       S Symmetric
 !       U Unsymmetric
 !       H Hermitian
 !       Z Skew symmetric
 !       R Rectangular
-! 
+!
 !  Third Character:
 !       A Compressed column form
 !       E Elemental form
-! 
+!
 
 
 
       TITLE = ''
       KEY = ''
-      
+
       PTRFMT = '(10I8)'
       INDFMT = '(12I6)'
       use_VALFMT = '(5(1pE27.16))'
@@ -991,10 +991,10 @@
       VALCRD = NNZERO/5 + 1 ! number of lines for VALUES
       RHSCRD = 0
       TOTCRD = 3 + PTRCRD + INDCRD + VALCRD + RHSCRD
-      
+
       MXTYPE = 'RUA'
       NELTVL = 0
-      
+
       WRITE (iounit, 1000 ) TITLE , KEY   , &
                            TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
                            MXTYPE, NROW  , NCOL  , NNZERO, NELTVL, &
@@ -1021,8 +1021,8 @@
 
       return
       end subroutine write_hbcode1
-         
-         
+
+
       subroutine read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
          integer, intent(in) :: iounit
          integer, intent(out) :: nvar, nblk
@@ -1050,10 +1050,10 @@
                if (ierr /= 0) return
             end if
          end do
-         
+
       end subroutine read_block_tridiagonal
-         
-         
+
+
       subroutine read1_sparse_block(iounit, nvar, blk, ierr)
          integer, intent(in) :: iounit, nvar
          real(dp) :: blk(:,:) ! (nvar,nvar)
@@ -1064,11 +1064,11 @@
          ierr = 0
          call read_hbcode1(iounit, nrow, ncol, nnz, values, rowind, colptr,ierr)
          if (ierr /= 0 .or. nrow /= nvar .or. nrow /= ncol) return
-         call do_column_sparse_to_dense(nrow,ncol,blk,nnz,colptr,rowind,values,ierr) 
+         call do_column_sparse_to_dense(nrow,ncol,blk,nnz,colptr,rowind,values,ierr)
          deallocate(colptr,rowind,values)
       end subroutine read1_sparse_block
-      
-      
+
+
       subroutine write_block_tridiagonal(iounit,nvar,nblk,lblk,dblk,ublk,ierr)
          integer, intent(in) :: iounit, nvar, nblk
          real(dp), intent(in), dimension(:,:,:) :: lblk,dblk,ublk
@@ -1089,8 +1089,8 @@
             end if
          end do
       end subroutine write_block_tridiagonal
-      
-      
+
+
       subroutine write1_sparse_block(iounit, nvar, blk, ierr)
          integer, intent(in) :: iounit, nvar
          real(dp), intent(in) :: blk(:,:) ! (nvar,nvar)

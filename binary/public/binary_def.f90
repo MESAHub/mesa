@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -32,13 +32,13 @@
 
       real(dp) :: initial_binary_period ! (seconds)
       real(dp) :: min_binary_period ! (seconds)
-      
+
       real(dp) :: initial_mass(2) ! (msun)
 
       integer, parameter :: maxlen_binary_history_column_name = 80
       integer, parameter :: binary_num_xtra_vals = 30
       integer, parameter :: binary_num_x_ctrls = 100
-      
+
       ! time_step limit identifiers
       integer, parameter :: b_Tlim_comp = 1
       integer, parameter :: b_Tlim_roche = b_Tlim_comp + 1
@@ -50,7 +50,7 @@
       integer, parameter :: b_numTlim = b_Tlim_dm
 
       character (len=24) :: binary_dt_why_str(b_numTlim) ! indicates the reson for the timestep choice
-         
+
       !interfaces for procedure pointers
       abstract interface
 
@@ -60,7 +60,7 @@
             real(dp), intent(out) :: rlo_mdot
             integer, intent(out) :: ierr
          end subroutine other_rlo_mdot_interface
-         
+
          integer function other_check_implicit_rlo_interface(binary_id, new_mdot)
             use const_def, only: dp
             integer, intent(in) :: binary_id
@@ -151,26 +151,26 @@
          integer function other_CE_binary_evolve_step_interface(binary_id)
             integer, intent(in) :: binary_id
          end function other_CE_binary_evolve_step_interface
-         
+
          integer function other_CE_binary_finish_step_interface(binary_id)
             integer, intent(in) :: binary_id
          end function other_CE_binary_finish_step_interface
-         
+
          integer function extras_binary_startup_interface(binary_id,restart,ierr)
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
-            logical,intent(in) :: restart    
+            logical,intent(in) :: restart
          end function extras_binary_startup_interface
-         
+
          integer function extras_binary_start_step_interface(binary_id, ierr)
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end function extras_binary_start_step_interface
-         
+
          integer function extras_binary_check_model_interface(binary_id)
             integer, intent(in) :: binary_id
          end function extras_binary_check_model_interface
-         
+
          integer function extras_binary_finish_step_interface(binary_id)
             integer, intent(in) :: binary_id
          end function extras_binary_finish_step_interface
@@ -195,7 +195,7 @@
             real(dp),intent (out) :: e2
             integer, intent(out) :: ierr
          end subroutine other_e2_interface
-               
+
          subroutine other_pgbinary_plots_info_interface(id, ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr
@@ -225,8 +225,8 @@
       integer, parameter :: max_binary_handles = 10 ! this can be increased as necessary
       type (binary_info), target, save :: binary_handles(max_binary_handles)
          ! gfortran seems to require "save" here.  at least it did once upon a time.
-      
-      
+
+
       contains
 
       subroutine binary_ptr(binary_id, b, ierr)
@@ -240,7 +240,7 @@
       subroutine get_binary_ptr(binary_id, b, ierr)
          integer, intent(in) :: binary_id
          type (binary_info), pointer :: b
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          if (binary_id < 1 .or. binary_id > max_binary_handles) then
              ierr = -1
              return
@@ -248,16 +248,16 @@
          b => binary_handles(binary_id)
          ierr = 0
       end subroutine get_binary_ptr
-      
+
 
       logical function is_donor(b, s)
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
          is_donor = (s% id == b% d_i)
       end function is_donor
-      
+
       subroutine init_binary_data
-      
+
       end subroutine init_binary_data
 
       end module binary_def

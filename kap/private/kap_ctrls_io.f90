@@ -88,7 +88,7 @@
 
    logical, dimension(max_extra_inlists) :: read_extra_kap_inlist
    character (len=strlen), dimension(max_extra_inlists) :: extra_kap_inlist_name
-   
+
    ! User supplied inputs
    real(dp) :: kap_ctrl(10)
    integer :: kap_integer_ctrl(10)
@@ -97,7 +97,7 @@
 
    namelist /kap/ &
 
-      Zbase, & 
+      Zbase, &
 
       kap_file_prefix, kap_CO_prefix, kap_lowT_prefix, aesopus_filename, &
 
@@ -215,7 +215,7 @@
          read_extra_kap_inlist(i) = .false.
          extra(i) = extra_kap_inlist_name(i)
          extra_kap_inlist_name(i) = 'undefined'
-   
+
          if (read_extra(i)) then
             call read_controls_file(rq, extra(i), level+1, ierr)
             if (ierr /= 0) return
@@ -486,7 +486,7 @@
       upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
-      do 
+      do
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
@@ -497,7 +497,7 @@
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
       if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
 

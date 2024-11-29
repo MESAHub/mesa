@@ -2,8 +2,8 @@
       use test_kap_support
       use kap_lib
       implicit none
-      
-      call Do_One(.false.)      
 
-      end   
+      call Do_One(.false.)
+
+      end
 

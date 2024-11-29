@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 module run_star_extras
 
       use star_lib
@@ -30,17 +30,17 @@ module run_star_extras
       use gyre_mesa_m
 
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       include 'run_star_extras.inc'
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -55,14 +55,14 @@ module run_star_extras
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          if (.not. s% use_other_RSP_linear_analysis) return
 
          s% other_rsp_linear_analysis => rsp_set_gyre_linear_analysis
 
       end subroutine extras_controls
-      
+
 
       subroutine rsp_set_gyre_linear_analysis(id,restart,ierr)
          use const_def
@@ -72,24 +72,24 @@ module run_star_extras
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         
+
          real(dp), allocatable     :: global_data(:)
          real(dp), allocatable     :: point_data(:,:)
          integer                   :: ipar(5), mode_l
          real(dp)                  :: rpar(1)
-         
+
          integer, parameter :: modes = 3
          integer :: npts(modes), nz, i, k
          real(dp), allocatable, dimension(:,:) :: r, v
          real(dp) :: velkm, v_surf, amix1, amix2, amixF, &
             period(modes)
-         
+
          include 'formats'
-         
+
          if (restart) return
-         
+
          write(*,*) 'set gyre starting velocities'
-         
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -108,17 +108,17 @@ module run_star_extras
          call set_constant('L_SUN', Lsun)
 
          call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-         
+
          mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
-         
+
          call star_get_pulse_data(s%id, 'GYRE', &
             .FALSE., .FALSE., .FALSE., global_data, point_data, ierr)
          if (ierr /= 0) then
             print *,'Failed when calling get_pulse_data'
             return
          end if
-         
+
          call star_write_pulse_data(s%id, &
             'GYRE', 'gyre.data', global_data, point_data, ierr)
          if (ierr /= 0) return
@@ -139,16 +139,16 @@ module run_star_extras
          call get_modes(mode_l, process_mode_, ipar, rpar)
 
          call final()
-         
+
          amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
          amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
-            write(*,*) 'AMIX DO NOT ADD UP RIGHT' 
+            write(*,*) 'AMIX DO NOT ADD UP RIGHT'
             call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
          end if
          velkm = s% x_ctrl(6) ! s% RSP_kick_vsurf_km_per_sec
          amixF = 1d0 - (amix1 + amix2)
-         
+
          if (amixF > 0d0 .and. npts(1) /= nz-1) then
             write(*,3) 'amixF > 0d0 .and. npts(1) /= nz-1', npts(1)
             write(*,*) 'cannot use fundamental for setting starting velocities'
@@ -157,7 +157,7 @@ module run_star_extras
             ierr = -1
             return
          end if
-         
+
          if (AMIX1 > 0d0 .and. npts(2) /= nz-1) then
             write(*,3) 'AMIX1 > 0d0 .and. npts(2) /= nz-1', npts(2)
             write(*,*) 'cannot use 1st overtone for setting starting velocities'
@@ -166,7 +166,7 @@ module run_star_extras
             ierr = -1
             return
          end if
-         
+
          if (AMIX2 > 0d0 .and. npts(2) /= nz-1) then
             write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
@@ -175,7 +175,7 @@ module run_star_extras
             ierr = -1
             return
          end if
-         
+
          v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)
 
          do i=1,nz-1
@@ -185,13 +185,13 @@ module run_star_extras
          end do
          s% v(1) = s% v(2)
          s% v_center = 0d0
-         
+
          do k=1,nz
             s% xh(s% i_v,k) = s% v(k)
          end do
-         
+
          s% rsp_period = period(s% RSP_mode_for_setting_PERIODLIN + 1)
-         
+
          !write(*,*) 'amix1 amix2 amixF velkm v_surf period', amix1, amix2, amixF, velkm, v_surf, s% rsp_period
 
          contains
@@ -232,7 +232,7 @@ module run_star_extras
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
             end if
-            
+
             if (md%n_pg > modes) return
 
             gr = md%grid()
@@ -241,7 +241,7 @@ module run_star_extras
             npts(md%n_pg) = md%n
             do k = 1, md%n
                r(md%n_pg,k) = gr%pt(k)%x
-               v(md%n_pg,k) = md%xi_r(k)            
+               v(md%n_pg,k) = md%xi_r(k)
             end do
 
             if (write_flag) then
@@ -263,9 +263,9 @@ module run_star_extras
             retcode = 0
 
          end subroutine process_mode_
-         
+
       end subroutine rsp_set_gyre_linear_analysis
-      
+
 
       end module run_star_extras
-      
+

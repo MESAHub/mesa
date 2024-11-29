@@ -138,13 +138,13 @@
             read_extra_binary_job_inlist(i) = .false.
             extra(i) = extra_binary_job_inlist_name(i)
             extra_binary_job_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read_binary_job_file(b, extra(i), level+1, ierr)
                if (ierr /= 0) return
             end if
          end do
-         
+
       end subroutine read_binary_job_file
 
 
@@ -272,26 +272,26 @@
          character(len=*),intent(in) :: name
          character(len=*), intent(out) :: val
          integer, intent(out) :: ierr
-   
+
          character(len(name)) :: upper_name
          character(len=512) :: str
          integer :: iounit,iostat,ind,i
-   
-   
+
+
          ! First save current controls
          call set_binary_job_controls_for_writing(b, ierr)
          if(ierr/=0) return
-   
+
          ! Write namelist to temporay file
          open(newunit=iounit,status='scratch')
          write(iounit,nml=binary_job)
          rewind(iounit)
-   
+
          ! Namelists get written in captials
          upper_name = StrUpCase(name)
          val = ''
          ! Search for name inside namelist
-         do 
+         do
             read(iounit,'(A)',iostat=iostat) str
             ind = index(str,trim(upper_name))
             if( ind /= 0 ) then
@@ -302,34 +302,34 @@
                exit
             end if
             if(is_iostat_end(iostat)) exit
-         end do   
-   
+         end do
+
          if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
-   
+
          close(iounit)
-   
+
       end subroutine get_binary_job
-   
+
       subroutine set_binary_job(b, name, val, ierr)
          type (binary_info), pointer :: b
          character(len=*), intent(in) :: name, val
          character(len=len(name)+len(val)+14) :: tmp
          integer, intent(out) :: ierr
-   
+
          ! First save current controls
          call set_binary_job_controls_for_writing(b, ierr)
          if(ierr/=0) return
-   
+
          tmp=''
          tmp = '&binary_job '//trim(name)//'='//trim(val)//' /'
-   
+
          ! Load into namelist
          read(tmp, nml=binary_job)
-   
+
          ! Add to star
          call store_binary_job_controls(b, ierr)
          if(ierr/=0) return
-   
+
       end subroutine set_binary_job
 
 

@@ -444,7 +444,7 @@
          ! this ignores lnfree and eta
          lnfree_e=0; d_lnfree_e_dlnRho=0; d_lnfree_e_dlnT=0
          eta=0; d_eta_dlnRho=0; d_eta_dlnT=0
-         
+
          call kap_get( &
               kap_handle, species, chem_id, net_iso, xa, &
               logRho, logT, &

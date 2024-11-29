@@ -27,14 +27,14 @@
       use const_def
       use math_lib
       use rates_def
-      
-      
+
+
       implicit none
-            
-      
+
+
       contains
-      
-      
+
+
       subroutine finish_rates_def_init
          use utils_lib, only: integer_dict_define, integer_dict_create_hash, integer_dict_size
          use reaclib_input, only: do_extract_rates
@@ -47,19 +47,19 @@
             ! will be allocated by extract_nuclides_from_chem_isos
          logical :: use_weaklib
          include 'formats'
-         
+
          ierr = 0
          call integer_dict_create_hash(reaction_names_dict, ierr)
          if (ierr /= 0) then
             write(*,*) 'FATAL ERROR: rates_def_init failed in integer_dict_create_hash'
             return
          end if
-         
+
          ! set up reaclib info
          allocate(set(num_chem_isos))
-         
+
          call generate_nuclide_set(chem_isos% name, set)
-         
+
          use_weaklib = .true.
          call do_extract_rates(set, chem_isos, reaclib_rates, use_weaklib, ierr)
          deallocate(set)
@@ -67,52 +67,52 @@
             write(*,*) 'FATAL ERROR: extract_reaclib_rates failed in rates_def_init'
             return
          end if
-         
+
       end subroutine finish_rates_def_init
-         
-         
+
+
       subroutine do_add_reaction_for_handle(reaction_handle, ierr)
          use reaclib_support, only: do_parse_reaction_handle
          character (len=*), intent(in) :: reaction_handle ! to be added
          integer, intent(out) :: ierr
-         
+
          integer :: ir, num_in, num_out
          integer :: particles_in, particles_out
          logical :: already_defined
          integer :: iso_ids(max_num_reaction_inputs+max_num_reaction_outputs)
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
          character (len=16) :: op ! e.g., 'pg', 'wk', 'to', or ...
-         
+
          logical, parameter :: weak = .false.
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          if (dbg) write(*,*) 'do_add_reaction_for_handle ' // trim(reaction_handle)
-         
+
          call do_parse_reaction_handle( &
             reaction_handle, particles_in, particles_out, iso_ids, op, ierr)
          if (ierr /= 0) then
             write(*,'(a)') 'add_reaction_for_handle failed in reaclib_parse_handle ' //  &
-               trim(reaction_handle)       
+               trim(reaction_handle)
             return
          end if
-         
+
          call alloc_reaction_ir(reaction_handle, ir, already_defined, ierr)
          if (already_defined) return
          if (ierr /= 0) return
-      
+
          reaction_inputs(:,ir) = 0
          reaction_outputs(:,ir) = 0
-         
+
          cin(:) = 1
          cout(:) = 1
 
          call setup(reaction_inputs(:,ir), num_in, cin, 0, particles_in)
          call setup(reaction_outputs(:,ir), num_out, cout, particles_in, particles_out)
-         
+
          call set_reaction_info( &
                ir, num_in, num_out, particles_in, particles_out, weak, reaction_handle, ierr)
          if (ierr /= 0) then
@@ -120,10 +120,10 @@
          end if
 
          if (dbg) write(*,*) 'done do_add_reaction_for_handle ' // trim(reaction_handle)
-         
-            
+
+
          contains
-         
+
 
          subroutine setup(reaction_io, num, cnt, k, num_particles)
             integer :: reaction_io(:), num, cnt(:), k, num_particles
@@ -146,35 +146,35 @@
 
 
       end subroutine do_add_reaction_for_handle
-         
-         
+
+
       subroutine do_add_reaction_from_reaclib(reaction_handle, reverse_handle, indx, ierr)
-         
+
          character (len=*), intent(in) :: reaction_handle ! to be added
          character (len=*), intent(in) :: reverse_handle ! = '' if not a reverse
          integer, intent(in) :: indx ! index in reaclib rates
          integer, intent(out) :: ierr
-         
+
          integer :: i, ir, chapter, num_in, num_out
          integer :: particles_in, particles_out
          logical :: weak, reverse, already_defined
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
          type (reaction_data), pointer :: r =>null()
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
          i = indx
          reverse = (len_trim(reverse_handle) > 0)
          r => reaclib_rates
-         
+
          cin(:) = 1
          cout(:) = 1
-         
+
          if (dbg) write(*,'(a, 2x, i5)') 'do_add_reaction_from_reaclib ' // trim(reaction_handle), i
-         
+
          if (reverse) then
             if (reverse_handle /= r% reaction_handle(i)) then
                write(*,'(a)') trim(reverse_handle) // ' ' // trim(r% reaction_handle(i))
@@ -190,14 +190,14 @@
                return
             end if
          end if
-         
+
          chapter = r% chapter(i)
          weak = (adjustl(r% reaction_flag(i)) == 'w')
-         
+
          call alloc_reaction_ir(reaction_handle, ir, already_defined, ierr)
          if (already_defined) return
          if (ierr /= 0) return
-      
+
          reaction_inputs(:,ir) = 0
          reaction_outputs(:,ir) = 0
 
@@ -212,7 +212,7 @@
             call setup(reaction_inputs(:,ir), num_in, cin, particles_out, particles_in)
             call setup(reaction_outputs(:,ir), num_out, cout, 0, particles_out)
          end if
-         
+
          call set_reaction_info( &
                ir, num_in, num_out, particles_in, particles_out, weak, reaction_handle, ierr)
          if (ierr /= 0) then
@@ -220,10 +220,10 @@
          end if
 
          if (dbg) write(*,*) 'done do_add_reaction_from_reaclib'
-         
-            
+
+
          contains
-         
+
 
          subroutine setup(reaction_test, num, cnt, k, num_particles)
             integer :: reaction_test(:), num, cnt(:), k, num_particles
@@ -246,16 +246,16 @@
 
 
       end subroutine do_add_reaction_from_reaclib
-      
-      
+
+
       subroutine alloc_reaction_ir(reaction_handle, ir, already_defined, ierr)
          character (len=*), intent(in) :: reaction_handle
          integer, intent(out) :: ir
          logical, intent(out) :: already_defined
-         integer, intent(out) :: ierr         
-         logical, parameter :: dbg = .false.         
+         integer, intent(out) :: ierr
+         logical, parameter :: dbg = .false.
          include 'formats'
-         ierr = 0        
+         ierr = 0
          ir = get_rates_reaction_id(reaction_handle)
          if (ir > 0) then
             already_defined = .true.
@@ -276,8 +276,8 @@
          end if
 !$omp end critical (lock_alloc_reaction_ir)
       end subroutine alloc_reaction_ir
-      
-      
+
+
       subroutine set_reaction_info( &
             ir, num_in, num_out, particles_in, particles_out, weak, reaction_handle, ierr)
          use chem_def
@@ -286,22 +286,22 @@
          logical, intent(in) :: weak
          character (len=*), intent(in) :: reaction_handle
          integer, intent(out) :: ierr
-         
+
          integer :: j, iso_in, iso_out, weak_j, cin1
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          reaction_Name(ir) = reaction_handle
-        
+
          if (dbg) write(*,*) 'call get_Qtotal'
          std_reaction_Qs(ir) = get_Qtotal(ir)
          std_reaction_neuQs(ir) = 0d0
          weak_lowT_rate(ir) = -1d99
-         
+
          iso_in = reaction_inputs(num_in*2,ir)
          cin1 = reaction_inputs(num_in*2-1,ir)
          iso_out = reaction_outputs(num_out*2,ir)
@@ -314,7 +314,7 @@
             end do
             call mesa_error(__FILE__,__LINE__,'set_reaction_info')
          end if
-         
+
          if (iso_out < 0 .or. iso_out > num_chem_isos) then
             write(*,2) 'bad iso_out', iso_out
             write(*,2) 'num_out', num_out
@@ -325,7 +325,7 @@
             end do
             call mesa_error(__FILE__,__LINE__,'set_reaction_info')
          end if
-      
+
          if (weak) then
             weak_reaction_info(1,ir) = iso_in
             weak_reaction_info(2,ir) = iso_out
@@ -338,7 +338,7 @@
          end if
 
          reaction_ye_rho_exponents(1,ir) = 0 ! 1 for electron captures, 0 for rest.
-      
+
          if (particles_in > 1) then
             reaction_screening_info(1,ir) = reaction_inputs(2,ir)
             if (cin1 > 1) then
@@ -394,21 +394,21 @@
             end select
          else if (particles_in == 1 .and. particles_out == 2 .and. .not. weak) then
             reaction_categories(ir) = iphoto
-         end if 
+         end if
 
          reaction_Info(ir) = reaction_handle
-         
+
          if (dbg) write(*,'(a,3x,i5)') 'call integer_dict_define ' // trim(reaction_handle), ir
 
          call integer_dict_define(reaction_names_dict, reaction_handle, ir, ierr)
          if (ierr /= 0) then
             write(*,*) 'FATAL ERROR: set_reaction_info failed in integer_dict_define'
             return
-         end if         
-      
+         end if
+
       end subroutine set_reaction_info
 
-      
+
       subroutine set_weak_lowT_rate(ir, ierr)
          use chem_def
          use utils_lib, only: integer_dict_define
@@ -420,11 +420,11 @@
          integer, intent(out) :: ierr
          integer :: i, lo, hi, weak_reaclib_id_i
          real(dp) :: half_life, lambda, dlambda_dlnT, rlambda, drlambda_dlnT
-         
+
          include 'formats'
-         
+
          weak_reaclib_id_i = 0
-         
+
          if (weak_reaction_info(1,ir) == 0 .or. weak_reaction_info(2,ir) == 0) return
 
          call do_reaclib_indices_for_reaction( &
@@ -434,7 +434,7 @@
             i = do_get_weak_info_list_id( &
                chem_isos% name(weak_reaction_info(1,ir)), &
                chem_isos% name(weak_reaction_info(2,ir)))
-            if (i > 0) then 
+            if (i > 0) then
                half_life = weak_info_list_halflife(i)
                if (half_life > 0d0) then
                   weak_lowT_rate(ir) = ln2/half_life
@@ -464,10 +464,10 @@
             chem_isos% name(weak_reaction_info(2,ir)))
          if (weak_reaclib_id_i == 0) return
          weak_reaclib_id(weak_reaclib_id_i) = ir
-             
+
       end subroutine set_weak_lowT_rate
-      
-      
+
+
       logical function is_pp_reaction(reaction_handle)
          character (len=*), intent(in) :: reaction_handle
          is_pp_reaction =  &
@@ -480,10 +480,10 @@
             reaction_handle == 'r_h1_li7_to_he4_he4' .or.  &
             reaction_handle == 'r_li7_pa_he4' .or.  &
             reaction_handle == 'r_be7_pg_b8' .or.  &
-            reaction_handle == 'r_b8_wk_he4_he4'                                             
+            reaction_handle == 'r_b8_wk_he4_he4'
       end function is_pp_reaction
-      
-      
+
+
       logical function is_cno_reaction(reaction_handle)
          character (len=*), intent(in) :: reaction_handle
          is_cno_reaction =  &
@@ -509,8 +509,8 @@
             reaction_handle == 'r_f19_pa_o16' .or.  &
             reaction_handle == 'r_ne18_wk_f18'
       end function is_cno_reaction
-      
-      
+
+
       subroutine free_raw_rates_records
          type (rate_table_info), pointer :: ri =>null()
          integer :: i
@@ -523,27 +523,27 @@
             deallocate(raw_rates_records)
          end if
       end subroutine free_raw_rates_records
-      
-      
+
+
       subroutine init_raw_rates_records(ierr)
          use utils_lib
          use utils_def
          integer, intent(out) :: ierr
-         
+
          type (rate_table_info), pointer :: ri =>null()
          integer :: i, iounit, n, t
          character (len=256) :: dir, rate_name, rate_fname, filename
          character (len=256) :: buffer
          logical :: okay
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          if (dbg) write(*,*) 'init_raw_rates_records'
-         
+
          ierr = 0
-         
+
          ! first try local rate_tables_dir
          dir = rates_table_dir
          filename = trim(dir) // '/rate_list.txt'
@@ -559,7 +559,7 @@
             end if
          end if
          rates_table_dir = dir
-         
+
          n = 0
          i = 0
 
@@ -567,7 +567,7 @@
 
          rate_loop: do
             t = token(iounit, n, i, buffer, rate_name)
-            if (t == eof_token) exit
+            if (t == eof_token) exit rate_loop
             if (t /= name_token) then
                call error; return
             end if
@@ -581,25 +581,25 @@
                if (ierr /= 0) call error()
 
          end do rate_loop
-         
+
          close(iounit)
-         
+
          if (dbg) call mesa_error(__FILE__,__LINE__,'read rates')
          !call check
-         
-         
-         
+
+
+
          contains
-         
-         
+
+
          subroutine check
             ! check that there are cases for all of the rates
             use ratelib, only: tfactors
             use raw_rates, only: set_raw_rate
             real(dp) :: logT, temp, raw_rate
             integer :: i, ierr
-            type (T_Factors) :: tf 
-         
+            type (T_Factors) :: tf
+
             logT = 8
             temp = exp10(logT)
             call tfactors(tf, logT, temp)
@@ -615,8 +615,8 @@
             end do
             if (.not. okay) call mesa_error(__FILE__,__LINE__,'init_raw_rates_records')
          end subroutine check
-         
-         
+
+
          logical function failed(str)
             character (len=*), intent(in) :: str
             failed = .false.
@@ -629,14 +629,14 @@
             failed = .true.
             return
          end function failed
-         
-         
+
+
          subroutine error
             ierr = -1
             close(iounit)
          end subroutine error
-      
-      
+
+
       end subroutine init_raw_rates_records
 
       subroutine rate_from_file(rate_name, filename, ierr)
@@ -647,7 +647,7 @@
          logical,parameter :: dbg=.false.
          type (rate_table_info), pointer :: ri =>null()
 
-         ierr = 0 
+         ierr = 0
 
          if (len_trim(rate_name) == 0 .or. len_trim(filename)==0) return
 
@@ -658,7 +658,7 @@
             if (ierr /= 0 .or. ir <= 0) then
                write(*,*) 'invalid rate file ' // trim(rate_name)
                ierr = -1
-               return 
+               return
             end if
          end if
          if (dbg) write(*,*) 'rate_fname ', trim(filename)
@@ -671,7 +671,7 @@
 
       end subroutine rate_from_file
 
-      
+
       subroutine read_reaction_parameters(reactionlist_filename, ierr)
          use utils_lib
          use chem_lib
@@ -679,19 +679,19 @@
          use const_def, only: mesa_data_dir
          character (len=*), intent(in) :: reactionlist_filename
          integer, intent(out) :: ierr
-         
+
          character (len=256) :: line, filename, rname, cname
          integer :: iounit, len, i, j, jj, k, cnt, ir, ic, ii, n, num_reactions
          character (len=maxlen_reaction_Info) :: info
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
 
          ierr = 0
-         
+
          call alloc_and_init_reaction_parameters(ierr)
          if (ierr /= 0) return
-         
+
          ! first try the reaction_filename alone
          filename = trim(reactionlist_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -724,12 +724,12 @@
                if (dbg) write(*,*) '(line(1:1) == !)'
                cycle
             end if
-            
+
             i = 1; j = 35
             rname = line(i:j)
-            
+
             if (dbg) write(*,*) trim(rname)
-            
+
             if (line(i:i+1) == 'r ') then
                call increase_num_reactions(ierr)
                if (ierr /= 0) then
@@ -749,7 +749,7 @@
                end if
                ir = rates_reaction_id_max
                if (dbg) write(*,*) 'size(reaction_Name,dim=1), ir', size(reaction_Name,dim=1), ir
-               reaction_Name(ir) = rname               
+               reaction_Name(ir) = rname
                call integer_dict_define(reaction_names_dict, reaction_Name(ir), ir, ierr)
                if (ierr /= 0) then
                   write(*,*) 'FATAL ERROR: rates_def_init failed in integer_dict_define'
@@ -757,7 +757,7 @@
                end if
             end if
 
-            i = 36; j = 70           
+            i = 36; j = 70
             call read_inputs
             if (ierr /= 0) return
 
@@ -768,44 +768,44 @@
             i = 110; j = 127
             call read_Q
             if (ierr /= 0) return
-      
+
             i = 128; j = 143
             call read_Qneu
             if (ierr /= 0) return
-         
+
             i = 144; j = 149
             call read_ye_rho_exponent1
             if (ierr /= 0) return
-         
+
             i = 150; j = 155
             call read_ye_rho_exponent2
             if (ierr /= 0) return
-         
+
             i = 156; j = 160
             call read_screening_info(1)
             if (ierr /= 0) return
-         
+
             i = 162; j = 166
             call read_screening_info(2)
             if (ierr /= 0) return
-         
+
             i = 168; j = 172
             call read_screening_info(3)
             if (ierr /= 0) return
-         
+
             i = 174; j = 178
             call read_weak_info(1)
             if (ierr /= 0) return
-         
+
             i = 180; j = 184
             call read_weak_info(2)
             if (ierr /= 0) return
-               
+
             if (std_reaction_neuQs(ir) > 0) then
                weak_reaction_info(1,ir) = reaction_inputs(2,ir)
                weak_reaction_info(2,ir) = reaction_outputs(2,ir)
             end if
-               
+
             if (std_reaction_neuQs(ir) == 0 .and. &
                   weak_reaction_info(1,ir) > 0 .and. weak_reaction_info(2,ir) > 0) then
                j = do_get_weak_info_list_id(  &
@@ -814,7 +814,7 @@
                if (j > 0) std_reaction_neuQs(ir) = weak_info_list_Qneu(j)
                if (ierr /= 0) return
             end if
-            
+
             if (std_reaction_neuQs(ir) > 0) then
                call set_weak_lowT_rate(ir, ierr)
                if (ierr /= 0) return
@@ -823,35 +823,35 @@
             i = 190; j = 203
             call read_category_id
             if (ierr /= 0) return
-         
+
             i = 208
             call read_reaction_Info
             if (ierr /= 0) return
-            
+
             if (dbg) write(*,*)
-            
+
             num_reactions = cnt
-            
+
          end do
-         
+
          if (dbg) write(*,*) 'num_reactions', num_reactions
-         
+
          ierr = 0
          close(iounit)
-         
+
          num_reactions = rates_reaction_id_max
-         
+
          call check_std_reaction_Qs
          call check_std_reaction_neuQs
          call check_reaction_categories
          call check_reaction_info
-         
+
          if (dbg) call mesa_error(__FILE__,__LINE__,'read_reaction_parameters')
-         
-         
+
+
          contains
-            
-            
+
+
          subroutine read_inputs
             if (dbg) write(*,*) '  inputs <' // line(i:j) // '>',i,j
 
@@ -862,7 +862,7 @@
                if (n == 0) exit
                if (dbg) write(*,*) 'n <' // line(i:j) // '>', i, j
                reaction_inputs(k,ir) = n
- 
+
 ! fxt
               i = j+1; j = i+7
 
@@ -883,7 +883,7 @@
             end do
          end subroutine read_inputs
 
-            
+
          subroutine read_outputs
             if (dbg) write(*,*) ' outputs: ' // line(i:j)
 
@@ -963,13 +963,13 @@
             integer :: jj
             ii = read_iso()
             reaction_screening_info(which,ir) = ii
-            
+
           !Hack to get around a bug in ifort 17,18, which returns len_trim(line(i:j)) < 0
             empty=.true.
             do jj=i,j
                if(len_trim(line(jj:jj)) /= 0) empty=.false.
             end do
-            
+
             if (ii <= 0 .and. .not. empty) then
                write(*,'(a)') 'bad iso name for screening in reaction_parameters file <' // line(i:j) // '>'
                write(*,'(a)') trim(line)
@@ -986,16 +986,16 @@
             integer, intent(in) :: which
             logical :: empty
             integer :: jj
-            
+
             ii = read_iso()
             weak_reaction_info(which,ir) = ii
-            
+
             !Hack to get around a bug in ifort 7, 18 which returns len_trim(line(i:j)) < 0
             empty=.true.
             do jj=i,j
                if(len_trim(line(jj:jj)) /= 0) empty=.false.
             end do
-            
+
             if (ii <= 0 .and. .not. empty) then
                write(*,'(a)') 'bad iso name for weak in reaction_parameters file <' // line(i:j) // '>'
                write(*,'(a)') trim(line)
@@ -1036,22 +1036,22 @@
                   info(j:j) = line(i:i)
                   i = i+1
                else
-                  info(j:j) = ' ' 
+                  info(j:j) = ' '
                end if
             end do
             reaction_Info(ir) = info
             if (dbg) write(*,*)  'info: ' // trim(reaction_Info(ir))
          end subroutine read_reaction_Info
-         
-         
+
+
          integer function read_iso()
             use chem_def, only: iso_name_length
             character (len=64) :: str
             str = line(i:j)
             read_iso = chem_get_iso_id(str)
          end function read_iso
-         
-         
+
+
          integer function read_int()
             character (len=64) :: str
             integer :: ierr
@@ -1059,8 +1059,8 @@
             read(str,fmt=*,iostat=ierr) read_int
             if (ierr /= 0) read_int = 0
          end function read_int
-         
-         
+
+
          real(dp) function read_dbl()
             use math_lib, only: str_to_double
             integer :: ierr
@@ -1072,8 +1072,8 @@
                read_dbl = 0d0
             end if
          end function read_dbl
-         
-         
+
+
          logical function missing_dbl()
             character (len=64) :: str
             str = line(i:j)
@@ -1087,39 +1087,39 @@
             do i=1,num_reactions
                if (std_reaction_Qs(i) < -1d50) then
                   write(*,*) 'missing reaction_Q for reaction ' // trim(reaction_Name(i)), i, cnt+1
-                  write(*,*) 
+                  write(*,*)
                   cnt = cnt+1
                end if
             end do
             if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_std_reaction_Qs')
          end subroutine check_std_reaction_Qs
-      
-      
+
+
          subroutine check_std_reaction_neuQs
             integer :: i, cnt
             cnt = 0
             do i=1,num_reactions
                if (std_reaction_neuQs(i) < -1d50) then
                   write(*,*) 'missing std_reaction_neuQs for reaction ' // trim(reaction_Name(i))
-                  write(*,*) 
+                  write(*,*)
                   cnt = cnt+1
                end if
             end do
             if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_std_reaction_neuQs')
          end subroutine check_std_reaction_neuQs
-      
-      
+
+
          subroutine check_reaction_categories
             integer :: cnt, i
             cnt = 0
             do i=1,num_reactions
                if (reaction_categories(i) < 0) then
                   write(*,*) 'missing reaction_category for reaction ' // trim(reaction_Name(i))
-                  write(*,*) 
+                  write(*,*)
                   cnt = cnt+1
                end if
             end do
-            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_reaction_categories')      
+            if (cnt > 0) call mesa_error(__FILE__,__LINE__,'check_reaction_categories')
          end subroutine check_reaction_categories
 
 
@@ -1130,7 +1130,7 @@
                if (len_trim(reaction_Info(i)) == 0) then
                   write(*,*) 'missing info for reaction', i
                   if (i > 1) write(*,*) 'following ' // trim(reaction_Info(i-1))
-                  write(*,*) 
+                  write(*,*)
                   cnt = cnt+1
                end if
             end do
@@ -1143,28 +1143,28 @@
 
       subroutine increase_num_reactions(ierr)
          integer, intent(out) :: ierr
-         
+
          integer :: old_max, new_max, i
          type (rate_table_info), pointer :: old_raw_rates_records(:) =>null()
          type (rate_table_info), pointer :: ri =>null()
-         
+
          include 'formats'
 
          old_max = rates_reaction_id_max
          rates_reaction_id_max = rates_reaction_id_max + 1
-      
+
          if (rates_reaction_id_max > size(std_reaction_Qs,dim=1)) then
-         
+
             new_max = rates_reaction_id_max*2 + 1000
             !write(*,3) 'increase size', rates_reaction_id_max, new_max
-            
+
             old_raw_rates_records => raw_rates_records
             allocate(raw_rates_records(new_max))
             do i=1,old_max
                raw_rates_records(i) = old_raw_rates_records(i)
             end do
             deallocate(old_raw_rates_records)
-            
+
             call grow_reactions_arrays(old_max, new_max, ierr)
             if (ierr /= 0) return
          end if
@@ -1181,7 +1181,7 @@
 
       subroutine alloc_and_init_reaction_parameters(ierr)
          integer, intent(out) :: ierr
-      
+
          allocate( &
                reaction_Info(rates_reaction_id_max),  &
                reaction_categories(rates_reaction_id_max),  &
@@ -1199,7 +1199,7 @@
                weak_lowT_rate(rates_reaction_id_max),   &
                stat=ierr)
          if (ierr /= 0) return
-         
+
          reaction_Info(:) = ''
          reaction_categories(:) = -1
          reaction_is_reverse(:) = 0
@@ -1214,15 +1214,15 @@
          std_reaction_Qs(:) = -1d99
          std_reaction_neuQs(:) = -1d99
          weak_lowT_rate(:) = -1d99
-      
+
       end subroutine alloc_and_init_reaction_parameters
-      
-      
+
+
       real(dp) function get_Qtotal(ir)
          use chem_lib, only: reaction_Qtotal
          use chem_def, only: chem_isos
          integer, intent(in) :: ir
-         
+
          integer :: num_in, num_out, reactants(100), k, n, i, ii, j
          include 'formats'
          i = 0
@@ -1250,13 +1250,13 @@
       end function get_Qtotal
 
 
-   
-      
+
+
       subroutine init_rates_info(reactionlist_filename, ierr)
          character (len=*), intent(in) :: reactionlist_filename
-         integer, intent(out) :: ierr ! 0 means AOK.           
+         integer, intent(out) :: ierr ! 0 means AOK.
          include 'formats'
-         
+
          ierr = 0
          call init1_rates_info
 
@@ -1265,7 +1265,7 @@
             write(*,*) 'start_rates_def_init failed'
             return
          end if
-         
+
          call read_reaction_parameters(reactionlist_filename, ierr)
          if (ierr /= 0) then
             write(*,*) 'rates_init failed in read_reaction_parameters'
@@ -1277,11 +1277,11 @@
          if (ierr /= 0) then
             write(*,*) 'rates_init failed in do_rates_init'
             return
-         end if        
-      
+         end if
+
       end subroutine init_rates_info
-      
-      
+
+
       subroutine init1_rates_info
          use rates_names, only: set_reaction_names
          type (rate_table_info), pointer :: ri =>null()
@@ -1300,8 +1300,8 @@
          end do
          call set_reaction_names
       end subroutine init1_rates_info
-      
-         
+
+
       integer function lookup_rate_name(str) ! -1 if not found
          use rates_def
          character (len=*), intent(in) :: str
@@ -1323,9 +1323,9 @@
          character (len=maxlen_reaction_Name), pointer :: new_reaction_Name(:) =>null()
          character (len=maxlen_reaction_Info), pointer :: new_reaction_Info(:) =>null()
          integer :: i
-         
+
          include 'formats'
-         
+
          allocate(new_reaction_Name(new_max))
          do i=1,old_max
             new_reaction_Name(i) = reaction_Name(i)
@@ -1348,9 +1348,9 @@
 
          call realloc_double(std_reaction_Qs,new_max,ierr); if (ierr /= 0) return
          call realloc_double(std_reaction_neuQs,new_max,ierr); if (ierr /= 0) return
-         
+
          call realloc_double(weak_lowT_rate,new_max,ierr); if (ierr /= 0) return
-         
+
          call realloc_integer2( &
             reaction_screening_info,size( &
             reaction_screening_info,dim=1),new_max,ierr); if (ierr /= 0) return
@@ -1362,7 +1362,7 @@
             reaction_inputs,2*max_num_reaction_inputs,new_max,ierr); if (ierr /= 0) return
          call realloc_integer2( &
             reaction_outputs,2*max_num_reaction_outputs,new_max,ierr); if (ierr /= 0) return
-         
+
          reaction_Info(rates_reaction_id_max:new_max) = ''
          reaction_categories(rates_reaction_id_max:new_max) = -1
 
@@ -1379,10 +1379,10 @@
          std_reaction_Qs(rates_reaction_id_max:new_max) = -1d99
          std_reaction_neuQs(rates_reaction_id_max:new_max) = -1d99
          weak_lowT_rate(rates_reaction_id_max:new_max) = -1d99
-      
+
       end subroutine grow_reactions_arrays
 
-      
+
       subroutine free_reaction_arrays()
 
         if (ASSOCIATED(reaction_Name)) deallocate(reaction_Name)
@@ -1422,7 +1422,7 @@
 
       end subroutine free_reaction_arrays
 
-      
+
       subroutine do_rates_init(ierr)
          use ratelib, only: mazurek_init
          integer, intent(out) :: ierr

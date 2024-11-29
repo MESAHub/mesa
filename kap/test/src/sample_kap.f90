@@ -9,7 +9,7 @@
 !   by the Free Software Foundation; either version 2 of the License, or
 !   (at your option) any later version.
 !
-!   MESA is distributed in the hope that it will be useful, 
+!   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !   GNU Library General Public License for more details.
@@ -28,7 +28,7 @@
       use const_lib
       use math_lib
       use utils_lib, only: mesa_error
-      
+
       implicit none
       !this program demonstrates how to use mesa/kap in a stellar structure code
       !it reads in a mesa/star model of an AGB star so that it makes full use
@@ -41,7 +41,7 @@
       type (Kap_General_Info), pointer :: rq1, rq2
       integer, parameter :: maxpts = 2000, maxspec = 31
       integer :: ierr
-      
+
       integer, parameter :: h1 = 1
       integer, parameter :: h2 = 2
       integer, parameter :: he3 = 3
@@ -73,7 +73,7 @@
       integer, parameter :: si30 = 29
       integer, parameter :: p31 = 30
       integer, parameter :: s32 = 31
-      
+
       real(dp) :: Mstar, Xc, Xn, Xo, Xne, xc_base, xn_base, xo_base, xne_base, &
          lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
          eta, d_eta_dlnRho, d_eta_dlnT
@@ -96,17 +96,17 @@
 
       ! initialization and setup
 
-      my_mesa_dir = '../..'         
-      call const_init(my_mesa_dir,ierr)     
+      my_mesa_dir = '../..'
+      call const_init(my_mesa_dir,ierr)
       if (ierr /= 0) then
          write(*,*) 'const_init failed'
          call mesa_error(__FILE__,__LINE__)
-      end if        
-      
+      end if
+
       call math_init()
 
       call chem_init('isotopes.data', ierr)
-      call kap_init(use_cache, '', ierr) 
+      call kap_init(use_cache, '', ierr)
       if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem in kap_init')
 
       !next it is necessary to create a 'handle' for the general kap structure
@@ -115,7 +115,7 @@
       handle1 = alloc_kap_handle_using_inlist('inlist_sample', ierr)
       call kap_ptr(handle1, rq1, ierr)
       rq1% use_Type2_opacities = .false.
-      
+
       handle2 = alloc_kap_handle_using_inlist('inlist_sample', ierr)
       call kap_ptr(handle2, rq2, ierr)
       rq2% use_Type2_opacities = .true.
@@ -136,10 +136,10 @@
       read(iounit,2) Nspec      !read number of chemical species in model
       read(iounit,*)            !skip 2 lines
       read(iounit,*)
-      
+
       write(*,*) ' Npts', Npts
       write(*,*) 'Nspec', Nspec
-      
+
       do i=1,Npts               !read model
          read(iounit,*) ii, lnRho(i), lnT(i), lnR(i), L, dq(i), X(1:Nspec,i)
          if (ii /= i) then
@@ -155,9 +155,9 @@
 
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init
-      
+
       logRho(:) = lnRho(:)/ln10 !convert ln's to log10's
-      logT(:)   = lnT(:)  /ln10   
+      logT(:)   = lnT(:)  /ln10
 
       ! these should come from an eos call
       lnfree_e = 0d0            ! needed for Compton at high T
@@ -178,7 +178,7 @@
       end do
 
 !$omp parallel do private(i,ierr) schedule(dynamic)
-      do i=1,Npts            
+      do i=1,Npts
 
          call kap_get( &
             handle1, Nspec, chem_id, net_iso, X(1:Nspec,i), logRho(i), logT(i), &
@@ -199,7 +199,7 @@
 
       open(unit=iounit,file=trim(output_file),iostat=ierr)
       if(ierr/=0) call mesa_error(__FILE__,__LINE__,'problem opening kap_test.data file')
-      
+
       write(*,*) 'write ' // trim(output_file)
 
       write(iounit,3) 'grid', 'log_T', 'log_Rho', 'kappa', 'kappa_CO', &
@@ -209,7 +209,7 @@
          write(iounit,4) i, logT(i), logRho(i), kappa(i), kappaCO(i), &
          dlnkap_dlnRho(i), dlnkap_dlnT(i)
        enddo
-       
+
        close(iounit)
 
       !all finished? then deallocate the handle and unload the opacity tables
@@ -222,5 +222,5 @@
  2    format(37x,i6)
  3    format(a28,99(a26,1x))
  4    format(i28,99(1pes26.16e3,1x))
-      
-      end program
+
+      end program sample_kap

@@ -22,10 +22,10 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module reaclib_input
       use rates_def
-      use utils_lib, only: mesa_error      
+      use utils_lib, only: mesa_error
 
       implicit none
 
@@ -33,8 +33,8 @@
       integer :: nreaclib
 
       contains
-      
-      
+
+
       subroutine do_extract_rates(set,nuclides,rates,use_weaklib,ierr)
          use reaclib_support
          use chem_def, only: nuclide_set, nuclide_data
@@ -48,20 +48,20 @@
          if (dbg) write(*,*) 'call extract_rates_from_reaclib', nreaclib
          call extract_rates_from_reaclib(reaclib,nreaclib,nuclides,rates,set,use_weaklib,ierr)
          if (failed('extract_rates_from_reaclib')) return
-         
+
          if (dbg) write(*,*) 'call set_up_network_information'
          call set_up_network_information(rates)
-         
+
          if (dbg) write(*,*) 'call assign_weights'
          call assign_weights(rates)
-         
+
          if (dbg) write(*,*) 'call compute_rev_ratio'
          call compute_rev_ratio(rates,nuclides)
-         
+
          if (dbg) write(*,*) 'return from do_extract_rates'
 
          contains
-         
+
          logical function failed(msg)
             character (len=*), intent(in) :: msg
             if (ierr /= 0) then
@@ -71,10 +71,10 @@
                failed = .false.
             end if
          end function failed
-         
+
       end subroutine do_extract_rates
-      
-      
+
+
       subroutine do_read_reaclib(ierr)
          use utils_lib, only: integer_dict_define, integer_dict_create_hash
          use math_lib, only: str_to_double
@@ -88,15 +88,15 @@
          character(len=iso_name_length) :: species
          character(len=256) :: filename, cache_filename, buf
          character(len=12) :: Qvalue_str
-         
+
          logical, parameter :: use_cache = .true.
-         
+
          include 'formats'
 
          ierr = 0
-         
+
          cache_filename = trim(rates_cache_dir) // '/jina_reaclib.bin'
-         
+
          filename = trim(reaclib_dir) // '/' //trim(reaclib_filename)
          open(newunit=reaclib_unitno, file=filename, iostat=ierr, status="old", action="read")
          if ( ierr /= 0 ) then
@@ -126,7 +126,7 @@
          do i = 1, max_nreaclib
             read(unit=reaclib_unitno, fmt=line0, iostat=ierr) reaclib% chapter(i)
             if (ierr /= 0 ) then ! assume end of file
-               ierr = 0; exit 
+               ierr = 0; exit
             end if
             read(unit=reaclib_unitno,fmt=line1,iostat=ierr,err=100) &
                reaclib% species(1,i), reaclib% species(2,i), reaclib% species(3,i), &
@@ -168,7 +168,7 @@
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
             count = count + 1
          end do
-         
+
          nreaclib = count
          close(reaclib_unitno)
 
@@ -184,15 +184,15 @@
 
          return
       100 call mesa_error(__FILE__,__LINE__,'error in do_read_reaclib')
-      
-      
+
+
          contains
-         
-         
+
+
          subroutine read_reaclib_cache(io,ios)
             integer, intent(in) :: io
             integer, intent(out) :: ios
-            integer :: n            
+            integer :: n
             ios = 0
             read(io,iostat=ios) nreaclib
             if (ios /= 0) return
@@ -204,11 +204,11 @@
                reaclib% reaction_flag(1:n), &
                reaclib% reverse_flag(1:n), &
                reaclib% Qvalue(1:n), &
-               reaclib% coefficients(1:ncoefficients,1:n) 
-            if (ios /= 0) return          
+               reaclib% coefficients(1:ncoefficients,1:n)
+            if (ios /= 0) return
          end subroutine read_reaclib_cache
-         
-         
+
+
          subroutine write_reaclib_cache(io)
             integer, intent(in) :: io
             integer :: n
@@ -221,12 +221,12 @@
                reaclib% reaction_flag(1:n), &
                reaclib% reverse_flag(1:n), &
                reaclib% Qvalue(1:n), &
-               reaclib% coefficients(1:ncoefficients,1:n) 
-         end subroutine write_reaclib_cache         
-         
-         
+               reaclib% coefficients(1:ncoefficients,1:n)
+         end subroutine write_reaclib_cache
+
+
       end subroutine do_read_reaclib
-      
+
 
       subroutine extract_rates_from_reaclib(reaclib,nreaclib,nuclides,rates,set,use_weaklib,ierr)
          use chem_def, only: &
@@ -257,11 +257,11 @@
          integer :: rate_ipp, rate_ipep
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
 
          ierr = 0
-         
+
          if (dbg) write(*,*) 'call allocate_reaction_data'
          call allocate_reaction_data(r,max_nreaclib,max_weaklib_rates,ierr)
          if (ierr /= 0) then
@@ -269,7 +269,7 @@
             return
          end if
 
-         count = 0         
+         count = 0
          if (use_weaklib) then ! add weaklib rates first
             if (dbg) write(*,*) 'add weaklib rates'
             do i = 1, nuclides% nnuclides
@@ -285,7 +285,7 @@
                   r% weaklib_ids(count) = indx
                   r% also_in_reaclib(count) = .false.
                   r% chapter(count) = 1
-                  r% pspecies(1,count) = get_nuclide_index_in_set(name_i,set) 
+                  r% pspecies(1,count) = get_nuclide_index_in_set(name_i,set)
                   r% pspecies(2,count) = get_nuclide_index_in_set(name_j,set)
                   r% pspecies(3:max_species_per_reaction,count) = 0
                   r% coefficients(:,count) = 0
@@ -294,7 +294,7 @@
                   call get_reaction_handle( &
                      1, 1, r% pspecies(:,count), nuclides, &
                      r% reaction_flag(count), r% reaction_handle(count))
-                  r% reverse_handle(count) = '' 
+                  r% reverse_handle(count) = ''
                   r% Q(count) = 0
                   r% Qneu(count) = 0
                   r% reaction_flag(count) = 'w'
@@ -303,13 +303,13 @@
                end do
             end do
          end if
-         
-         weaklib_count = count         
+
+         weaklib_count = count
          num_skip_for_weaklib = 0
          num_from_reaclib = 0
          loc_count = 0
          rate_ipp = 0; rate_ipep = 0
-                  
+
          if (dbg) write(*,*) 'loop_over_rates'
          loop_over_rates: do i = 1,nreaclib
             include_this_rate = .true.
@@ -322,14 +322,14 @@
                l = get_nuclide_index_in_set(reaclib% species(j,i),set)
                if (l == nuclide_not_found) then
                   include_this_rate = .false.
-                  exit
+                  exit loop_over_nuclides
                else
                   pspecies(j) = l
                end if
 
             end do loop_over_nuclides
 
-            is_weak = (use_weaklib .and. num_in == 1 .and. num_out == 1) 
+            is_weak = (use_weaklib .and. num_in == 1 .and. num_out == 1)
 
             ! only include forward rates
             ! Define the reverse rate as being the endothermic reaction, always
@@ -369,7 +369,7 @@
                         write(*,*) 'failed to find', indx
                         call mesa_error(__FILE__,__LINE__)
                      end if
-                     cycle
+                     cycle loop_over_rates
                   end if
                end if
                count = count + 1
@@ -402,26 +402,26 @@
                      r% Q(count) = r% Q(count) + Q
                   end if
                end do
-               
+
                r% Qneu(count) = 0
-               
+
                if (handle == 'r_b8_to_he4_he4') then
                   r% Qneu(count) = 0.6735D+01
-                  
+
                else if (handle == 'r_h1_he3_to_he4') then
                   r% Qneu(count) = 9.628D0
-                  
+
                else if (handle == 'r_h1_h1_ec_h2') then
                   rate_ipep = count
                   r% Qneu(count) = 1.445D0
-                  
+
                else if (handle == 'r_h1_h1_wk_h2') then
                   rate_ipp = count
                   r% Qneu(count) = 0.2668D0
-                  
+
                else if (handle == 'r_he3_ec_h3') then
                   r% Qneu(count) = 10D0 ! who knows?  who cares?
-                  
+
                else if (adjustl(reaclib% reaction_flag(i)) == 'w') then ! check weak_info list
                   name1 = reaclib% species(1,i)
                   if (num_out == 1) then
@@ -437,14 +437,14 @@
                      write(*,2) trim(name1) // ' ' // trim(name2) // &
                         ' ' // trim(handle) // ' Qneu', count, r% Qneu(count)
                end if
-               
+
                if (reaclib% reaction_flag(i) == 'w' .and. .false.) then
                   write(*,2) 'reaclib weak ' // trim(handle) // ' Qneu', count, r% Qneu(count)
                end if
 
             end if
          end do loop_over_rates
-         
+
          if (.false.) then
             write(*,2) 'num_skip_for_weaklib', num_skip_for_weaklib
             write(*,2) 'weaklib_count', weaklib_count
@@ -453,17 +453,17 @@
             write(*,2) 'total num reactions', count
             call mesa_error(__FILE__,__LINE__,'extract_rates_from_reaclib')
          end if
-         
+
 
          ! we can now stuff our temporary file into the output and discard the temporary
-         
+
          if (dbg) write(*,*) 'call allocate_reaction_data'
          call allocate_reaction_data(rates,count,weaklib_count,ierr)
          if (ierr /= 0) then
             print *,'unable to allocate storage for rates'
             return
          end if
-         
+
          rates% nreactions = count
          rates% nuclides => nuclides
 
@@ -472,7 +472,7 @@
             rates% weaklib_ids(i) = r% weaklib_ids(i)
             rates% also_in_reaclib(i) = r% also_in_reaclib(i)
          end do
-         
+
          do i=1,count
             rates% reaction_handle(i) = r% reaction_handle(i)
             rates% reverse_handle(i) = r% reverse_handle(i)
@@ -487,7 +487,7 @@
                rates% coefficients(j,i) = r% coefficients(j,i)
             end do
          end do
-         
+
          nullify(rates% reaction_dict)
          nullify(rates% reverse_dict)
          do i=1,count
@@ -502,7 +502,7 @@
             do j=1,num_in+num_out
                min_Z = min(min_Z, nuclides% Z(rates% pspecies(j,i)))
             end do
-            cat = -1   
+            cat = -1
             ! NOTE: reaction categories that are used by net are set in rates_initialize
             if (chapter == r_one_one) then
                if (min_Z > 0) then
@@ -598,12 +598,12 @@
                   cat = i_burn_cr
                else if (max_lhs_Z <= 28) then
                   cat = i_burn_fe
-               else 
+               else
                   cat = iother
                end if
             end if
             rates% category(i) = cat
-            
+
             call integer_dict_define(rates% reaction_dict, rates% reaction_handle(i), i, ierr)
             if (ierr /= 0) then
                write(*,*) 'FATAL ERROR: extract_rates_from_reaclib failed in integer_dict_define'
@@ -617,14 +617,14 @@
                end if
             end if
          end do
-         
+
          if (dbg) write(*,*) 'call integer_dict_create_hash reaction_dict'
          call integer_dict_create_hash(rates% reaction_dict, ierr)
          if (ierr /= 0) then
             write(*,*) 'FATAL ERROR: extract_rates_from_reaclib failed in integer_dict_create_hash'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (dbg) write(*,*) 'call integer_dict_create_hash reverse_dict'
          call integer_dict_create_hash(rates% reverse_dict, ierr)
          if (ierr /= 0) then
@@ -639,11 +639,11 @@
          where (rates% reaction_flag == ' ') rates% reaction_flag = '-'
 
          if (dbg) write(*,*) 'done extract_rates_from_reaclib'
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine get_weaklib_name(i,name)
             integer, intent(in) :: i
             character (len=iso_name_length), intent(out) :: name
@@ -670,7 +670,7 @@
          neutrino_Q = abs(0.5d0 * sum * 0.511d0 * (1.0d0 - 1.0d0/sum2) &
                      * (1.0d0 - 1.0d0/(4.0d0*sum) - 1.0d0/(9.0d0*sum2)))
       end function neutrino_Q
-      
-      
+
+
 
       end module reaclib_input

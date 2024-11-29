@@ -32,7 +32,7 @@
       use const_def, only: Qconv, secyer, kerg, avo, ln10
       use rates_def
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
       character(len=256) :: net_name
@@ -46,7 +46,7 @@
       character(len=256):: T_Rho_history_filename
       logical :: read_T_Rho_history
 
-      
+
       character(len=256):: burn_filename
       real(dp) :: burn_tend, burn_rho, burn_temp, &
          burn_rtol, burn_atol, burn_P, burn_xmin, burn_xmax, &
@@ -54,7 +54,7 @@
       logical :: trace, burn_dbg, use_pivoting
       real(dp) :: min_for_show_peak_abundances
       integer :: max_num_for_show_peak_abundances
-      
+
       integer, parameter :: max_num_burn_isos_to_show = 1000
       character(len=iso_name_length) :: names_of_isos_to_show(max_num_burn_isos_to_show)
       integer :: num_names_of_isos_to_show
@@ -76,12 +76,12 @@
       character (len=32) :: small_mtx_decsol, large_mtx_decsol
 
       logical :: show_net_reactions_info
-      
+
       real(dp) :: rattab_logT_lower_bound, rattab_logT_upper_bound
 
       character(len=256):: data_filename, data_heading_line
       character (len=64) :: net_file, cache_suffix
-      
+
       integer :: handle, eos_handle, net_handle
       type (Net_General_Info), pointer  :: g
       integer :: species, num_reactions
@@ -92,8 +92,8 @@
       real(dp) :: eta, d_eta_dlnT, d_eta_dlnRho
       real(dp), dimension(:), pointer :: &
             xin, xin_copy, d_eps_nuc_dx, dxdt, d_dxdt_dRho, d_dxdt_dT
-      real(dp), pointer :: d_dxdt_dx(:, :)  
-      
+      real(dp), pointer :: d_dxdt_dx(:, :)
+
       real(dp) :: weak_rate_factor
 
       integer :: max_steps ! maximal number of allowed steps.
@@ -103,7 +103,7 @@
       real(dp) :: burn_lnE, burn_lnS
       real(dp) :: burn_logT, burn_logRho, &
          burn_eta, burn_deta_dlnT, burn_Cv, burn_d_Cv_dlnT
-      
+
       real(dp) :: T_prev, time_prev, eps_nuc_prev, eps_neu_prev, cp_prev
       real(dp), pointer :: x_previous(:) ! (species)
 
@@ -122,14 +122,14 @@
       real(dp) :: max_step_size ! maximal step size.
 
       real(dp), pointer :: rate_factors(:) ! (num_reactions)
-      integer, pointer :: net_reaction_ptr(:) 
-      
+      integer, pointer :: net_reaction_ptr(:)
+
       integer, parameter :: max_num_reactions_to_track = 100
       integer :: num_reactions_to_track
       character(len=maxlen_reaction_Name) :: &
          reaction_to_track(max_num_reactions_to_track)
       integer :: index_for_reaction_to_track(max_num_reactions_to_track)
-      
+
       integer, parameter :: max_num_special_rate_factors = 100
       integer :: num_special_rate_factors
       real(dp) :: special_rate_factor(max_num_special_rate_factors)
@@ -138,30 +138,30 @@
 
       character (len=16) :: set_rate_c12ag, set_rate_n14pg, set_rate_3a, &
          set_rate_1212
-      
+
       logical :: show_Qs, quiet, complete_silence_please, &
          show_ye_stuff
-      
+
       real(dp) :: starting_logT
-      
+
       logical, parameter :: dbg = .false.
-      
-      
+
+
       contains
-      
-      
+
+
       integer function burn_isos_for_Xinit(i)
-         integer, intent(in) :: i 
+         integer, intent(in) :: i
          burn_isos_for_Xinit = chem_get_iso_id(names_of_isos_for_Xinit(i))
       end function burn_isos_for_Xinit
-      
-      
+
+
       integer function burn_isos_to_show(i)
-         integer, intent(in) :: i 
+         integer, intent(in) :: i
          burn_isos_to_show = chem_get_iso_id(names_of_isos_to_show(i))
       end function burn_isos_to_show
 
-      
+
       subroutine Do_One_Zone_Burn(net_file_in)
          use num_lib, only: solver_option
          use mtx_lib, only: decsol_option
@@ -173,9 +173,9 @@
          use net_lib, only: get_net_reaction_table_ptr
          use rates_lib, only: rates_reaction_id
          use utils_lib, only: set_nan
-         
+
          character (len=*), intent(in) :: net_file_in
-         
+
          character (len=256) :: net_file
          real(dp) :: logRho, logT, Rho, T, xsum, &
            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT
@@ -188,14 +188,14 @@
             log10Ts_f1, log10Rhos_f1, etas_f1, log10Ps_f1
          real(dp), dimension(:,:), pointer :: &
             log10Ts_f, log10Rhos_f, etas_f, log10Ps_f
-         
+
          ! args to control the solver -- see num/public/num_isolve.dek
-         real(dp) :: h 
+         real(dp) :: h
          ! absolute and relative error tolerances
          real(dp), pointer :: rtol(:) ! relative error tolerance (species)
          real(dp), pointer :: atol(:) ! absolute error tolerance (species)
          integer :: itol ! switch for rtol and atol
-         
+
          real(dp), pointer :: ending_x(:) ! (species)
          integer :: nfcn    ! number of function evaluations
          integer :: njac    ! number of jacobian evaluations
@@ -203,7 +203,7 @@
          integer :: naccpt  ! number of accepted steps
          integer :: nrejct  ! number of rejected steps
          integer :: max_order_used
-         
+
          integer :: iout, caller_id, cid, ir
          integer(8) :: time0, time1, clock_rate
 
@@ -214,15 +214,15 @@
 
          integer, parameter :: nwork = pm_work_size
          real(dp), pointer :: pm_work(:)
-         
+
          type (Net_Info) :: n
          type (Net_General_Info), pointer :: g
-         
+
          include 'formats'
-         
+
          ierr = 0
          told = 0
-         
+
          net_file = net_file_in
 
          call test_net_setup(net_file)
@@ -233,12 +233,12 @@
 
          call Setup_eos(eos_handle)
 !         g% max_rate_times_dt = max_rate_times_dt
-         
+
          logT = burn_logT
-         T = burn_temp     
+         T = burn_temp
          logRho = burn_logRho
          Rho = burn_rho
-         
+
          if (read_T_Rho_history) then
             num_times = max_num_times
          else if (num_times_for_burn <= 0) then
@@ -248,7 +248,7 @@
          end if
 
          if (num_names_of_isos_to_show < 0) num_names_of_isos_to_show = species
-         
+
          allocate( &
             rate_factors(num_reactions), rtol(species), atol(species), &
             x_initial(species), x_previous(species), ending_x(species), times(num_times), &
@@ -260,7 +260,7 @@
             write(*,*) 'allocate failed for Do_One_Zone_Burn'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call get_net_reaction_table_ptr(net_handle, net_reaction_ptr, ierr)
          if (ierr /= 0) then
             write(*,*) 'bad net?  get_net_reaction_table_ptr failed'
@@ -281,7 +281,7 @@
                      trim(reaction_for_special_factor(i)), special_rate_factor(i)
             end do
          end if
-         
+
          if (num_reactions_to_track > 0) then
             do i=1,num_reactions_to_track
                index_for_reaction_to_track(i) = 0
@@ -294,23 +294,23 @@
                write(*,1) 'track rate ' // trim(reaction_to_track(i))
             end do
          end if
-         
+
          log10Ts_f(1:4,1:num_times) => log10Ts_f1(1:4*num_times)
          log10Rhos_f(1:4,1:num_times) => log10Rhos_f1(1:4*num_times)
          etas_f(1:4,1:num_times) => etas_f1(1:4*num_times)
          log10Ps_f(1:4,1:num_times) => log10Ps_f1(1:4*num_times)
-         
+
          peak_abundance(:) = 0
 
          xin = 0
          eta = 0
-         
+
          iout = 1
-         itol = 0         
-         
+         itol = 0
+
          rtol(:) = burn_rtol
          atol(:) = burn_atol
-         
+
          xin = 0
          if (read_initial_abundances) then
             call read_X(ierr)
@@ -332,14 +332,14 @@
                xin(j) = values_for_Xinit(i)
             end do
          end if
-         
+
          !xin(:) = xin(:)/sum(xin(:))
-         
+
          if (read_T_Rho_history) then
             call do_read_T_Rho_history(ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (num_times_for_burn <= 0) then
             times(1) = burn_tend
             log10Ts_f(1,1) = logT
@@ -371,16 +371,16 @@
             end if
          end if
          starting_logT = logT
-         
+
          h = 1d-2*burn_tend ! 1d-14
          !write(*,1) 'h', h
          !stop
-         
+
          x_initial(1:species) = xin(1:species)
          x_previous(1:species) = xin(1:species)
          caller_id = 0
          dxdt_source_term => null()
-         
+
          if (.not. quiet) then
             write(*,'(A)')
             write(*,'(A)')
@@ -400,11 +400,11 @@
             write(*,1) 'initial abundances'
             call show_X(xin,.false.,.false.)
          end if
-            
-! data_heading_line was not set and writing out nulls. change it - fxt 
+
+! data_heading_line was not set and writing out nulls. change it - fxt
 !         write(io_out,'(a)') trim(data_heading_line)
          write(data_heading_line,'(99(a,1pe14.6))') 'temp =',burn_temp,' rho =',burn_rho
-         write(io_out,'(a)') trim(data_heading_line) 
+         write(io_out,'(a)') trim(data_heading_line)
 
          write(io_out,'(a7,99(a26,1x))',advance='no') &
             'i', &
@@ -429,7 +429,7 @@
             'lg_dt', &
             'ye', &
             'xsum_sub_1'
-      
+
          do i=1,num_names_of_isos_to_show
             if (num_names_of_isos_to_show < species) then
                cid = burn_isos_to_show(i)
@@ -459,8 +459,8 @@
             write(io_out,'(a26,1x)',advance='no')  'raw_' // trim(reaction_to_track(i))
             write(io_out,'(a26,1x)',advance='no')  'scrn_' // trim(reaction_to_track(i))
          end do
-         write(io_out,*) 
-         
+         write(io_out,*)
+
          if (show_net_reactions_info) then
             write(*,'(a)') ' species'
             do j=1,species
@@ -483,7 +483,7 @@
             end if
             write(*,'(A)')
          end if
-         
+
          if (.not. quiet) then
             write(*,1) 'h', h
             write(*,1) 'max_step_size', max_step_size
@@ -491,7 +491,7 @@
             write(*,2) 'screening_mode', screening_mode
             write(*,'(A)')
          end if
-         
+
          if (species >= decsol_switch) then
             decsol_choice = decsol_option(large_mtx_decsol, ierr)
             if (ierr /= 0) then
@@ -505,25 +505,25 @@
                return
             end if
          end if
-         
+
          solver_choice = solver_option(which_solver, ierr)
          if (ierr /= 0) then
             write(*,*) 'ERROR: unknown value for which_solver ' // trim(which_solver)
             return
          end if
-         
+
          nullify(pm_work)
-         
+
          call system_clock(time0,clock_rate)
          time_doing_net = -1
          time_doing_eos = -1
-            
+
          if (burn_at_constant_density) then
-                        
+
             starting_log10T = burn_logT
             logT = burn_logT
             logRho = burn_logRho
-            
+
             call net_1_zone_burn_const_density( &
                net_handle, eos_handle, species, num_reactions, &
                0d0, burn_tend, xin, logT, logRho, &
@@ -566,7 +566,7 @@
                call interp_pm(times, num_times, log10Ps_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logTs')
             end if
-            
+
             call net_1_zone_burn_const_P( &
                net_handle, eos_handle, species, num_reactions, &
                solver_choice, starting_temp, xin, clip, &
@@ -597,19 +597,19 @@
                call interp_pm(times, num_times, etas_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for etas')
             end if
-            
+
             call net_1_zone_burn( &
                net_handle, eos_handle, species, num_reactions, 0d0, burn_tend, xin, &
                num_times, times, log10Ts_f1, log10Rhos_f1, etas_f1, dxdt_source_term, &
                rate_factors, weak_rate_factor, &
                std_reaction_Qs, std_reaction_neuQs, &
-               screening_mode,  & 
+               screening_mode,  &
                stptry, max_steps, eps, odescal, &
                use_pivoting, trace, burn_dbg, burn_finish_substep, &
                ending_x, eps_nuc_categories, &
                avg_eps_nuc, eps_neu_total, &
                nfcn, njac, nstep, naccpt, nrejct, ierr)
-                           
+
          end if
          call system_clock(time1,clock_rate)
          dt = dble(time1 - time0) / clock_rate
@@ -618,12 +618,12 @@
             write(*,*) 'net_1_zone_burn returned ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (.not. quiet) then
             write(*,'(A)')
             write(*,'(A)')
          end if
-         
+
          if (.not. complete_silence_please) then
             if (nstep >= max_steps) then
                write(*,2) 'hit max number of steps', nstep
@@ -698,7 +698,7 @@
             write(*,'(/,a30,99f18.3,/)') 'runtime (seconds)', dt
             write(*,'(A)')
          end if
-         
+
          if (save_final_abundances) then
             if (.not. quiet) write(*,*) 'save final abundances to ' // trim(final_abundances_filename)
             open(newunit=iounit, file=trim(final_abundances_filename), iostat=ierr)
@@ -716,7 +716,7 @@
                close(iounit)
             end if
          end if
-         
+
          if (associated(pm_work)) deallocate(pm_work)
          deallocate( &
             rate_factors, rtol, atol, &
@@ -724,11 +724,11 @@
             log10Ts_f1, log10Rhos_f1, &
             etas_f1, log10Ps_f1, &
             peak_abundance, peak_time)
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine get_eos_info_for_burn_at_const_density( &
                eos_handle, species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
@@ -746,15 +746,15 @@
 
             real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
             real(dp) :: d_dxa(num_eos_d_dxa_results,species)
-            
+
             include 'formats'
             ierr = 0
-            
+
             Cv = burn_Cv
             d_Cv_dlnT = burn_d_Cv_dlnT
             eta = burn_eta
             d_eta_dlnT = burn_deta_dlnT
-            
+
             if (burn_Cv <= 0d0 .or. burn_eta <= 0d0) then
                call eosDT_get( &
                   eos_handle, species, chem_id, net_iso, xa, &
@@ -774,7 +774,7 @@
                   d_eta_dlnT = d_dlnT(i_eta)
                end if
             end if
-         
+
          end subroutine get_eos_info_for_burn_at_const_density
 
 
@@ -782,20 +782,20 @@
             integer,intent(in) :: step
             real(dp), intent(in) :: time, y(:)
             real(dp), dimension(size(y)) :: x
-            integer, intent(out) :: ierr 
+            integer, intent(out) :: ierr
             include 'formats'
-            ierr = 0            
+            ierr = 0
             !if (burn_at_constant_density) then
             !write(*,2) 'finish_substep time xh logT T', &
             !   step, time, y(1), y(species+1)/ln10, exp(y(species+1))
             !return
             !end if
-            
+
             do i=1,species
                cid = chem_id(i)
                x(i) = y(i)*dble(chem_isos% Z_plus_N(cid))
             end do
-            
+
             if (burn_at_constant_density) then
                 x(species+1) = y(species+1)
                 logT = x(species+1)/ln10
@@ -804,7 +804,7 @@
                step, told, time, logT, logRho, species, x, ierr)
             told = time
          end subroutine burn_finish_substep
-         
+
 
          real(dp) function interp_y(i, s, rwork_y, iwork_y, ierr)
             use const_def, only: dp
@@ -822,9 +822,9 @@
             integer, intent(out) :: ierr
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
-            
+
             include 'formats'
-            
+
             ierr = 0
             write(*,*) 'read T Rho history from ' // trim(T_Rho_history_filename)
             open(newunit=iounit, file=trim(T_Rho_history_filename), &
@@ -833,22 +833,22 @@
                write(*,*) 'failed to open'
                return
             end if
-            
+
             read(iounit,*,iostat=ierr) num_times
             if (ierr /= 0) then
                write(*,*) 'first line should have num_times'
                close(iounit)
                return
             end if
-            
+
             if (num_times > max_num_times) then
                write(*,3) 'num_times > max_num_times', num_times, max_num_times
                close(iounit)
                return
             end if
-            
+
             if (.false.) write(*,2) 'num_times', num_times
-            
+
             do i=1,num_times
                read(iounit,*,iostat=ierr) times_for_burn(i), log10Ts_for_burn(i), &
                   log10Rhos_for_burn(i), etas_for_burn(i)
@@ -860,23 +860,23 @@
                if (.false.) write(*,2) 'history', i, times_for_burn(i), log10Ts_for_burn(i), &
                   log10Rhos_for_burn(i), etas_for_burn(i)
             end do
-         
+
             close(iounit)
-            
+
             num_times_for_burn = num_times
 
          end subroutine do_read_T_Rho_history
-         
-         
+
+
          subroutine read_X(ierr)
             use utils_def
             use utils_lib
             integer, intent(out) :: ierr
             character (len=256) :: buffer, string
             integer :: i, n, iounit, t, num_isos, id, k
-            
+
             include 'formats'
-            
+
             write(*,*) 'read initial abundances from ' // trim(initial_abundances_filename)
             open(newunit=iounit, file=trim(initial_abundances_filename), &
                action='read', status='old', iostat=ierr)
@@ -884,7 +884,7 @@
                write(*,*) 'failed to open'
                return
             end if
-            
+
             n = 0
             i = 0
             t = token(iounit, n, i, buffer, string)
@@ -934,16 +934,16 @@
             end do
             close(iounit)
          end subroutine read_X
-         
-   
+
+
          subroutine show_X(X,show_peak,do_sort)
             use num_lib, only: qsort
             real(dp) :: X(:)
-            logical, intent(in) :: show_peak, do_sort 
-            real(dp), target :: v_t(species) 
-            integer, target :: index_t(species) 
-            real(dp), pointer :: v(:) 
-            integer, pointer :: index(:) 
+            logical, intent(in) :: show_peak, do_sort
+            real(dp), target :: v_t(species)
+            integer, target :: index_t(species)
+            real(dp), pointer :: v(:)
+            integer, pointer :: index(:)
             integer :: j
             real(dp) :: xsum
             include 'formats'
@@ -951,7 +951,7 @@
             index => index_t
 
             if (do_sort) then
-            
+
                v(1:species) = abs(x(1:species))
                call qsort(index, species, v)
                do i=1,species
@@ -964,7 +964,7 @@
                      call mesa_error(__FILE__,__LINE__)
                   end if
                end do
-               
+
             else
 
                do j=1, species
@@ -1026,7 +1026,7 @@
                lgrho = log10(rpar(r_burn_const_P_rho))
             end if
 
-            
+
             call burn_solout1( &
                step, told, time, lgt, lgrho, n, x, irtrn)
          end subroutine burn_solout
@@ -1050,16 +1050,16 @@
             real(dp) :: dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
             real(dp) :: dlnRho_dlnT_const_P, d_epsnuc_dlnT_const_P, d_Cv_dlnT
             real(dp) :: res(num_eos_basic_results)
-            real(dp) :: d_dlnRho_const_T(num_eos_basic_results) 
-            real(dp) :: d_dlnT_const_Rho(num_eos_basic_results) 
-            real(dp) :: d_dabar_const_TRho(num_eos_basic_results) 
+            real(dp) :: d_dlnRho_const_T(num_eos_basic_results)
+            real(dp) :: d_dlnT_const_Rho(num_eos_basic_results)
+            real(dp) :: d_dabar_const_TRho(num_eos_basic_results)
             real(dp) :: d_dzbar_const_TRho(num_eos_basic_results)
             real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results, species)
 
             real(dp) :: Rho, T, xsum, d_eps_nuc_dx(species), dx, enuc, &
                   dt, energy, entropy, burn_ergs, &
                   xh, xhe, Z, mass_correction
-         
+
             integer :: i, j, adjustment_iso, cid, ierr, max_j
             real(dp), dimension(species) :: dabar_dx, dzbar_dx, eps_nuc_dx, dmc_dx
             real(dp), pointer :: actual_Qs(:), actual_neuQs(:)
@@ -1069,13 +1069,13 @@
             logical :: skip_jacobian
 
             include 'formats'
-         
+
             irtrn = 0
             if (time == 0) return
 
             logT = logT_in
             logRho = logRho_in
-            
+
             if ((.not. quiet) .and. step > 1 .and. mod(step,50) == 0) then
                max_j = maxloc(x(1:species),dim=1)
                write(*,2) 'step, time, logT, logRho, ' // trim(chem_isos% name(chem_id(max_j))), &
@@ -1090,20 +1090,20 @@
             end if
 
             ierr = 0
-         
+
             allocate( &
                   actual_Qs(num_reactions), actual_neuQs(num_reactions), &
                   from_weaklib(num_reactions), &
                   stat=ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
             xin(1:species) = x(1:species)
 
             call composition_info( &
                   species, chem_id, xin(1:species), xh, xhe, z, abar, zbar, z2bar, z53bar, ye, &
                   mass_correction, xsum, dabar_dx, dzbar_dx, dmc_dx)
             Z = max(0d0, min(1d0, 1d0 - (xh + xhe)))
-         
+
             if (burn_at_constant_P) then
 
                logT = x(n)/ln10
@@ -1111,7 +1111,7 @@
                Prad = Radiation_Pressure(T)
                Pgas = pressure - Prad
                lgPgas = log10(Pgas)
-         
+
                call eosPT_get( &
                   eos_handle, &
                   species, chem_id, net_iso, x, &
@@ -1123,12 +1123,12 @@
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
             else ! this is okay for burn_at_constant_density as well as constant T and Rho
-         
+
               ! logT = rpar(r_burn_prev_lgT)
               ! logRho = rpar(r_burn_prev_lgRho)
                T = exp10(logT)
                Rho = exp10(logRho)
-         
+
                call eosDT_get( &
                   eos_handle, &
                   species, chem_id, net_iso, x, &
@@ -1137,9 +1137,9 @@
                   d_dxa_const_TRho, ierr)
                   !Pgas, Prad, energy, entropy, ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-            
+
             end if
-         
+
             lgPgas = res(i_lnPgas)/ln10
             Pgas = exp10(lgPgas)
             Prad = Radiation_Pressure(T)
@@ -1151,11 +1151,11 @@
 
             call get_net_ptr(handle, g, ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
 
             netinfo% g => g
 
-         
+
             call net_get_with_Qs( &
                   handle, skip_jacobian, netinfo, species, num_reactions, &
                   xin(1:species), T, logT, Rho, logRho, &
@@ -1183,16 +1183,16 @@
             burn_ergs = 0
             do i=1,species
                cid = chem_id(i)
-               
+
                dx = x(i) - x_initial(i)
                xsum = xsum + x(i)
                burn_ergs = burn_ergs + &
                   (get_Q(chem_isos,cid))*dx/chem_isos% Z_plus_N(cid)
-                     
+
                dx = x(i) - x_previous(i)
                eps_nuc = eps_nuc + &
                   (get_Q(chem_isos,cid))*dx/chem_isos% Z_plus_N(cid)
-                     
+
             end do
             avg_eps_nuc = burn_ergs*Qconv/time - eps_neu_total
             eps_nuc = eps_nuc*Qconv/dt - eps_neu_total
@@ -1200,11 +1200,11 @@
             burn_logRho = logRho
             burn_lnS = res(i_lnS)
             burn_lnE = res(i_lnE)
-         
+
             x_previous(1:species) = x(1:species)
-         
+
             if (time >= data_output_min_t) then
-         
+
                write(io_out,'(i7,99(1pe26.16,1x))',advance='no') &
                   step, &
                   sign(1d0,avg_eps_nuc)*log10(max(1d0,abs(avg_eps_nuc))), &
@@ -1257,7 +1257,7 @@
                   write(io_out,'(1pe26.16,1x)',advance='no') netinfo% rate_raw(j)
                   write(io_out,'(1pe26.16,1x)',advance='no') netinfo% rate_screened(j)
                end do
-               write(io_out,*) 
+               write(io_out,*)
                do j=1, species
                   if (x(j) > peak_abundance(j)) then
                      peak_abundance(j) = x(j)
@@ -1284,39 +1284,39 @@
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'show_Qs')
             end if
-         
-         
+
+
             deallocate(actual_Qs, actual_neuQs, from_weaklib)
 
          end subroutine burn_solout1
 
 
       end subroutine Do_One_Zone_Burn
-      
-      
+
+
       subroutine test_net_setup(net_file_in)
          character (len=*), intent(in) :: net_file_in
          integer :: ierr, i
-         
+
          include 'formats'
-         
+
          net_file = net_file_in
 
          call net_init(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          handle = alloc_net_handle(ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc_net_handle failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call net_start_def(handle, ierr)
          if (ierr /= 0) then
             write(*,*) 'net_start_def failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call read_net_file(net_file, handle, ierr)
          if (ierr /= 0) then
             write(*,*) 'read_net_file failed ', trim(net_file)
@@ -1328,13 +1328,13 @@
             write(*,*) 'net_finish_def failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call net_ptr(handle, g, ierr)
          if (ierr /= 0) then
             write(*,*) 'net_ptr failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          species = g% num_isos
          num_reactions = g% num_reactions
 
@@ -1345,13 +1345,13 @@
             write(*,*) 'net_setup_tables failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call get_chem_id_table(handle, species, chem_id, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_chem_id_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call get_net_iso_table(handle, net_iso, ierr)
          if (ierr /= 0) then
             write(*,*) 'get_net_iso_table failed'
@@ -1363,13 +1363,13 @@
             write(*,*) 'get_reaction_id_table failed'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          allocate( &
                xin(species), xin_copy(species), d_eps_nuc_dx(species), &
                dxdt(species), d_dxdt_dRho(species), d_dxdt_dT(species), d_dxdt_dx(species, species))
-     
+
       end subroutine test_net_setup
-      
+
 
       end module mod_one_zone_support
 
@@ -1386,11 +1386,11 @@
       use mtx_def
 
       use mod_one_zone_support
-      
+
       implicit none
-      
+
       integer :: ierr, unit
-         
+
       namelist /one_zone/ &
          mesa_dir, net_name, quiet, show_ye_stuff, num_names_of_isos_to_show, names_of_isos_to_show, &
          final_abundances_filename, save_final_abundances, show_peak_x_and_time, &
@@ -1415,17 +1415,17 @@
          num_special_rate_factors, reaction_for_special_factor, special_rate_factor
 
       contains
-      
-      
+
+
       subroutine do_one_burn(filename, qt)
       character(len=*) :: filename
       logical, intent(in) :: qt
-      
+
       include 'formats'
-      
+
       ! set defaults
-      
-      mesa_dir = '../..'         
+
+      mesa_dir = '../..'
       net_name = 'test.net'
       quiet = .false.
       show_ye_stuff = .false.
@@ -1479,14 +1479,14 @@
       etas_for_burn = 0
       log10Ps_for_burn = 0
       max_step_size = 0
-      
+
       min_for_show_peak_abundances = 1d-3 ! show if peak is > this
       max_num_for_show_peak_abundances = 21
       show_peak_x_and_time = .true.
-      
+
       data_filename = 'one_zone_burn.data'
       data_output_min_t = -99
-      
+
       num_names_of_isos_to_show = -1
 
       num_isos_for_Xinit = 4
@@ -1494,40 +1494,40 @@
          'he4', 'c12', 'n14', 'o16' /)
       values_for_Xinit(1:num_isos_for_Xinit) = (/ &
          0.95d0, 0.005d0, 0.035d0, 0.010d0 /)
-      
+
       screening_mode = extended_screening
 
       num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
       reaction_for_special_factor(:) = ''
       special_rate_factor(:) = 1
-      
+
       num_reactions_to_track = 0
       reaction_to_track(:) = ''
 
       weak_rate_factor = 1
-      
+
       ! read inlist
-      
+
       open(newunit=unit, file=trim(filename), action='read', delim='quote', iostat=ierr)
       if (ierr /= 0) then
          write(*, *) 'Failed to open control namelist file ', trim(filename)
          call mesa_error(__FILE__,__LINE__)
       else
-         read(unit, nml=one_zone, iostat=ierr)  
+         read(unit, nml=one_zone, iostat=ierr)
          close(unit)
          if (ierr /= 0) then
             write(*, *) 'Failed while trying to read control namelist file ', trim(filename)
             write(*, '(a)') &
                'The following runtime error message might help you find the problem'
-            write(*, *) 
+            write(*, *)
             open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
             read(unit, nml=one_zone)
             call mesa_error(__FILE__,__LINE__)
-         end if  
+         end if
       end if
 
       ! do initialization
-      
+
       if(burn_temp<0.d0 .and. burn_logT<0.d0) then
          call mesa_error(__FILE__,__LINE__,"Must set either burn_temp or burn_logT")
          stop
@@ -1544,20 +1544,20 @@
       starting_temp = burn_temp
 
       allocate(net_iso(num_chem_isos), chem_id(num_chem_isos))
-      
+
       !reaclib_filename = 'jina_reaclib_results_20130213default2'
       !write(*,*) 'changing reaclib_filename'
-      
+
       open(unit=io_out, file=trim(data_filename), action='write', iostat=ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       complete_silence_please = qt
       call Do_One_Zone_Burn(net_name)
-         
+
       open(unit=io_out, file=trim(data_filename), action='write', iostat=ierr)
       if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-      
+
       end subroutine do_one_burn
-      
-      
+
+
       end module mod_one_zone_burn

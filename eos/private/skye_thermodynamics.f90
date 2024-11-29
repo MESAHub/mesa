@@ -126,14 +126,14 @@ module skye_thermodynamics
 
       ! Compute base thermodynamic quantities
       call thermodynamics_from_free_energy(F_gas, temp, dens, sgas, egas, pgas)
-      
+
       ! Write the radiation terms explicitly to avoid having rho^2/rho^2 term that
       ! auto_diff gives for prad when calling thermodynamics_from_free_energy on F_rad.
       ! This avoids some subtractions for quantities that should be 0 like chid.
       prad = crad * pow4(temp) / 3d0
       erad = crad * pow4(temp) / dens
       srad = 4d0 * crad * pow3(temp) / (3d0 * dens)
-      
+
       p = prad + pgas
       e = erad + egas
       s = srad + sgas
@@ -146,7 +146,7 @@ module skye_thermodynamics
       lnS = log(s)
       lnE = log(e)
       lnPgas = log(pgas)
-      
+
       ! assuming complete ionization
       mu = abar / (1d0 + zbar)
       lnfree_e = log(max(1d-99, xnefer)/(avo*dens))
@@ -192,7 +192,7 @@ module skye_thermodynamics
       d_dlnT(i_eta) = etaele%d1val1 * temp%val
       d_dlnT(i_phase) = phase%d1val1 * temp%val
       d_dlnT(i_latent_ddlnT) = latent_ddlnT%d1val1 * temp%val
-      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val     
+      d_dlnT(i_latent_ddlnRho) = latent_ddlnRho%d1val1 * temp%val
 
       d_dlnRho(i_lnS) = lnS%d1val2 * dens%val
       d_dlnRho(i_lnE) = lnE%d1val2 * dens%val

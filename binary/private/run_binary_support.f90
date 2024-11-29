@@ -290,7 +290,7 @@ contains
       call binarydata_init(b, doing_restart)
       call binary_private_def_init
       call binary_history_column_names_init(ierr)
-      call set_binary_history_columns(b, b% job% binary_history_columns_file, ierr)
+      call set_binary_history_columns(b, b% job% binary_history_columns_file, .true., ierr)
 
       ! setup pgbinary
       if (.not. doing_restart) then

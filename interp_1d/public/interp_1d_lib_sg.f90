@@ -25,10 +25,10 @@
 
       module interp_1d_lib_sg
       implicit none
-      
+
       contains
 
-      
+
       ! this routine is a simply wrapper for making an interpolant and then using it.
       subroutine interpolate_vector_sg( &
                n_old, x_old, n_new, x_new, v_old, v_new, interp_vec_sg, nwork, work1, str, ierr)
@@ -68,8 +68,8 @@
          call interp_values_sg(x_old, n_old, f1, n_new, x_new, v_new, ierr)
          deallocate(f1)
       end subroutine interpolate_vector_sg
-      
-      
+
+
       ! this routine is a simply wrapper for making an interpolant with interp_pm and then using it.
       subroutine interpolate_vector_pm_sg( &
                n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
@@ -97,10 +97,10 @@
          call interp_values_sg(x_old, n_old, f1, n_new, x_new, v_new, ierr)
          deallocate(f1)
       end subroutine interpolate_vector_pm_sg
-      
-      
+
+
       subroutine interp_4_to_1_sg( &
-               pdqm1, pdq00, pdqp1, ndq00, pfm1, pf00, pfp1, pfp2, nf00, str, ierr) 
+               pdqm1, pdq00, pdqp1, ndq00, pfm1, pf00, pfp1, pfp2, nf00, str, ierr)
          ! 4 points in, 1 point out
          ! piecewise monotonic cubic interpolation
          use interp_1d_def, only: pm_work_size
@@ -124,14 +124,14 @@
          v_old(2) = pf00
          v_old(3) = pfp1
          v_old(4) = pfp2
-         x_new(1) = ndq00       
+         x_new(1) = ndq00
          call interpolate_vector_pm_sg( &
-            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)        
-         nf00 = v_new(1)         
+            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
+         nf00 = v_new(1)
       end subroutine interp_4_to_1_sg
-         
-         
-      subroutine interp_3_to_1_sg(pdqm1, pdq00, ndqm1, pfm1, pf00, pfp1, nf00, str, ierr) 
+
+
+      subroutine interp_3_to_1_sg(pdqm1, pdq00, ndqm1, pfm1, pf00, pfp1, nf00, str, ierr)
          ! 3 points in, 1 point out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
@@ -146,21 +146,21 @@
          real, target :: work1_ary(n_old*pm_work_size)
          real, pointer :: work1(:)
          work1 => work1_ary
-         ierr = 0         
+         ierr = 0
          x_old(1) = 0.0
          x_old(2) = pdqm1
          x_old(3) = pdqm1+pdq00
          v_old(1) = pfm1
          v_old(2) = pf00
          v_old(3) = pfp1
-         x_new(1) = ndqm1         
+         x_new(1) = ndqm1
          call interpolate_vector_pm_sg( &
-            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)         
+            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
          nf00 = v_new(1)
       end subroutine interp_3_to_1_sg
-         
-         
-      subroutine interp_3_to_2_sg(pdqm1, pdq00, ndqm1, ndq00, pfm1, pf00, pfp1, nf00, nfp1, str, ierr) 
+
+
+      subroutine interp_3_to_2_sg(pdqm1, pdq00, ndqm1, ndq00, pfm1, pf00, pfp1, nf00, nfp1, str, ierr)
          ! 3 points in, 2 points out
          ! piecewise monotonic quadratic interpolation
          use interp_1d_def, only: pm_work_size
@@ -175,28 +175,28 @@
          real, target :: work1_ary(n_old*pm_work_size)
          real, pointer :: work1(:)
          work1 => work1_ary
-         ierr = 0         
+         ierr = 0
          x_old(1) = 0d0
          x_old(2) = pdqm1
          x_old(3) = pdqm1+pdq00
          v_old(1) = pfm1
          v_old(2) = pf00
          v_old(3) = pfp1
-         x_new(1) = ndqm1       
-         x_new(2) = ndqm1+ndq00        
+         x_new(1) = ndqm1
+         x_new(2) = ndqm1+ndq00
          call interpolate_vector_pm_sg( &
-            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)         
+            n_old, x_old, n_new, x_new, v_old, v_new, work1, str, ierr)
          nf00 = v_new(1)
-         nfp1 = v_new(2)         
+         nfp1 = v_new(2)
       end subroutine interp_3_to_2_sg
 
-      
+
       ! general routines
-      
+
       ! these routines use previously created interpolant information (f)
       ! the interpolant can come from either the piecewise monotonic routines, or
       ! from the monotonicity preserving routines -- they use the same format for f.
-      
+
       subroutine interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
@@ -211,8 +211,8 @@
          integer, intent(out) :: ierr ! 0 means AOK
          call do_interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
       end subroutine interp_values_sg
-      
-      
+
+
       subroutine interp_value_sg(init_x, nx, f1, xval, val, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
@@ -228,8 +228,8 @@
          call do_interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
          val = vals(1)
       end subroutine interp_value_sg
-      
-      
+
+
       subroutine interp_values_and_slopes_sg(init_x, nx, f1, nv, x, vals, slopes, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
@@ -245,8 +245,8 @@
          integer, intent(out) :: ierr ! 0 means AOK
          call do_interp_values_and_slopes_sg(init_x, nx, f1, nv, x, vals, slopes, ierr)
       end subroutine interp_values_and_slopes_sg
-      
-      
+
+
       subroutine interp_value_and_slope_sg(init_x, nx, f1, xval, val, slope, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
@@ -264,7 +264,7 @@
          slope = slopes(1)
       end subroutine interp_value_and_slope_sg
 
-      
+
       subroutine integrate_values_sg(init_x, nx, f1, nv, x, vals, ierr)
          use interp_1d_def
          use interp_1d_misc_sg
@@ -281,23 +281,23 @@
          integer, intent(out) :: ierr ! 0 means AOK
 
          call do_integrate_values_sg(init_x, nx, f1, nv, x, vals, ierr)
-   
+
       end subroutine integrate_values_sg
-      
-      
+
+
       ! piecewise monotonic routines
 
       ! the following produce piecewise monotonic interpolants rather than monotonicity preserving
-      ! this stricter limit never introduces interpolated values exceeding the given values, 
+      ! this stricter limit never introduces interpolated values exceeding the given values,
       ! even in places where the given values are not monotonic.
       ! the downside is reduced accuracy on smooth data compared to the mp routines.
-      
-      
-      ! Steffen, M., "A simple method for monotonic interpolation in one dimension", 
+
+
+      ! Steffen, M., "A simple method for monotonic interpolation in one dimension",
       !        Astron. Astrophys., (239) 1990, 443-450.
-      
-      
-      subroutine interp_pm_sg(x, nx, f1, nwork, work1, str, ierr) 
+
+
+      subroutine interp_pm_sg(x, nx, f1, nwork, work1, str, ierr)
          ! make piecewise monotonic cubic interpolant
          use interp_1d_def
          use interp_1d_pm_sg
@@ -307,11 +307,11 @@
          integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
          real, intent(inout), pointer :: work1(:) ! =(nx,nwork)
          character (len=*) :: str ! for debugging
-         integer, intent(out) :: ierr   
-         call mk_pmcub_sg(x, nx, f1, .false., nwork, work1, str, ierr)         
+         integer, intent(out) :: ierr
+         call mk_pmcub_sg(x, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_sg
-      
-      
+
+
       subroutine interp_pm_slopes_only_sg(x, nx, f1, nwork, work1, str, ierr)
          ! identical to interp_pm, but only calculates slopes and stores them in f(2,:)
          ! this is a little faster for the special case in which you just want the slopes at x
@@ -323,18 +323,18 @@
          integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
          real, intent(inout), pointer :: work1(:) ! =(nx,nwork)
          character (len=*) :: str ! for debugging
-         integer, intent(out) :: ierr   
-         call mk_pmcub_sg(x, nx, f1, .true., nwork, work1, str, ierr)         
+         integer, intent(out) :: ierr
+         call mk_pmcub_sg(x, nx, f1, .true., nwork, work1, str, ierr)
       end subroutine interp_pm_slopes_only_sg
-      
-      
-      subroutine interp_4pt_pm_sg(x, y, a) 
+
+
+      subroutine interp_4pt_pm_sg(x, y, a)
          ! returns coefficients for monotonic cubic interpolation from x(2) to x(3)
          real, intent(in)    :: x(4)    ! junction points, strictly monotonic
          real, intent(in)    :: y(4)    ! data values at x's
          real, intent(inout)   :: a(3)    ! coefficients
          real :: h1, h2, h3, s1, s2, s3, p2, p3, as2, ss2, yp2, yp3
-         ! for x(2) <= x <= x(3) and dx = x-x(2), 
+         ! for x(2) <= x <= x(3) and dx = x-x(2),
          ! y(x) = y(2) + dx*(a(1) + dx*(a(2) + dx*a(3)))
          h1 = x(2)-x(1)
          h2 = x(3)-x(2)
@@ -352,9 +352,9 @@
          a(2) = (3*s2-2*yp2-yp3)/h2
          a(3) = (yp2+yp3-2*s2)/(h2*h2)
       end subroutine interp_4pt_pm_sg
-      
-      
-      subroutine interp_pm_on_uniform_grid_sg(dx, nx, f1, nwork, work1, str, ierr) 
+
+
+      subroutine interp_pm_on_uniform_grid_sg(dx, nx, f1, nwork, work1, str, ierr)
          ! make piecewise monotonic cubic interpolant on uniformly spaced mesh
          use interp_1d_def
          use interp_1d_pm_sg
@@ -365,20 +365,20 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call mk_pmcub_uniform_sg(dx, nx, f1, .false., nwork, work1, str, ierr)      
+         call mk_pmcub_uniform_sg(dx, nx, f1, .false., nwork, work1, str, ierr)
       end subroutine interp_pm_on_uniform_grid_sg
-      
-      
-      
+
+
+
       ! monotonicity preserving routines
-      
+
       ! Huynh, H.T., "Accurate Monotone Cubic Interpolation", SIAM J Numer. Anal. (30) 1993, 57-100.
-      
+
       ! Suresh, A, and H.T. Huynh, "Accurate Monotonicity-Preserving Schemes with Runge-Kutta
       !        Time Stepping", JCP (136) 1997, 83-99.
-      
-      
-      subroutine interp_m3_sg(x, nx, f1, which, nwork, work1, str, ierr) 
+
+
+      subroutine interp_m3_sg(x, nx, f1, which, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
@@ -390,11 +390,11 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_sg(x, nx, f1, which, .false., nwork, work1, str, ierr)     
+         call m3_sg(x, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_sg
 
 
-      subroutine interp_m3a_sg(x, nx, f1, nwork, work1, str, ierr) 
+      subroutine interp_m3a_sg(x, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
@@ -405,11 +405,11 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_sg(x, nx, f1, average, .false., nwork, work1, str, ierr)      
+         call m3_sg(x, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_sg
 
 
-      subroutine interp_m3b_sg(x, nx, f1, nwork, work1, str, ierr) 
+      subroutine interp_m3b_sg(x, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
@@ -420,11 +420,11 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_sg(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)     
+         call m3_sg(x, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_sg
 
 
-      subroutine interp_m3q_sg(x, nx, f1, nwork, work1, str, ierr) 
+      subroutine interp_m3q_sg(x, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on arbitrarily spaced grid
          use interp_1d_def
          use interp_1d_mp_sg
@@ -435,10 +435,10 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_sg(x, nx, f1, quartic, .false., nwork, work1, str, ierr)      
+         call m3_sg(x, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_sg
-            
-      
+
+
       subroutine interp_m3_on_uniform_grid_sg(dx, nx, f1, which, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
@@ -451,10 +451,10 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid_sg(dx, nx, f1, which, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_sg(dx, nx, f1, which, .false., nwork, work1, str, ierr)
       end subroutine interp_m3_on_uniform_grid_sg
-            
-      
+
+
       subroutine interp_m3a_on_uniform_grid_sg(dx, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
@@ -466,10 +466,10 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid_sg(dx, nx, f1, average, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_sg(dx, nx, f1, average, .false., nwork, work1, str, ierr)
       end subroutine interp_m3a_on_uniform_grid_sg
-            
-      
+
+
       subroutine interp_m3b_on_uniform_grid_sg(dx, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
@@ -481,10 +481,10 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid_sg(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)         
+         call m3_on_uniform_grid_sg(dx, nx, f1, super_bee, .false., nwork, work1, str, ierr)
       end subroutine interp_m3b_on_uniform_grid_sg
-            
-      
+
+
       subroutine interp_m3q_on_uniform_grid_sg(dx, nx, f1, nwork, work1, str, ierr)
          ! make monotonicity preserving cubic interpolant on uniformly spaced grid
          use interp_1d_def
@@ -496,8 +496,8 @@
          real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
          character (len=*) :: str ! for debugging
          integer, intent(out) :: ierr
-         call m3_on_uniform_grid_sg(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)        
+         call m3_on_uniform_grid_sg(dx, nx, f1, quartic, .false., nwork, work1, str, ierr)
       end subroutine interp_m3q_on_uniform_grid_sg
-      
+
 
       end module interp_1d_lib_sg
