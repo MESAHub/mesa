@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
     module binary_edot
-    
+
     use const_def
     use star_lib
     use star_def
@@ -61,11 +61,11 @@
            else
               b% edot_tidal = 0d0
            end if
-           
+
            if (b% edot_tidal < -b% max_abs_edot_tidal) then
               b% edot_tidal = -b% max_abs_edot_tidal
            end if
-           
+
            ! eccentricity enhancement
            if (b% use_eccentricity_enhancement) then
               if (.not. b% use_other_edot_enhance) then
@@ -80,11 +80,11 @@
            else
               b% edot_enhance = 0d0
            end if
-           
+
            if (b% edot_enhance > b% max_abs_edot_enhance) then
               b% edot_enhance = b% max_abs_edot_enhance
            end if
-           
+
            ! user defined eccentricity changes
            if (b% use_other_extra_edot) then
               call b% other_extra_edot(b% binary_id, ierr)
@@ -95,9 +95,9 @@
            else
               b% extra_edot = 0d0
            end if
-           
+
            b% edot = b% edot_tidal + b% edot_enhance + b% extra_edot
-           
+
        end if
 
        edot = b% edot
@@ -118,7 +118,7 @@
           write(*,*) 'failed in binary_ptr'
           return
        end if
-       
+
        b% edot_tidal = 0d0
 
        if (b% point_mass_i /= 1) then
@@ -184,13 +184,13 @@
        edot_tidal = edot_tidal*(f3(b% eccentricity) - &
            11d0/18d0 * omega_s / omega_sync * f4(b% eccentricity) * &
            pow(1-pow2(b% eccentricity),1.5d0))
-    
+
     end function edot_tidal_Hut
-    
+
     ! ==========================================
     ! Edot MASS LOSS
     ! ==========================================
-    
+
     subroutine edot_enhancement_Isotropic(binary_id, ierr)
        integer, intent(in) :: binary_id
        integer, intent(out) :: ierr
@@ -210,29 +210,29 @@
        ! cos_cr isn't vectorised, so we have to do this in a loop
        do i = 1, b% anomaly_steps
           costh = cos(b% theta_co(i))
-       
+
           b% e1(i) = b% eccentricity + costh
           b% e2(i) = 2d0*costh + b% eccentricity*(1d0 + costh*costh)
           b% e3(i) = b% eccentricity*(1d0-costh*costh)  ! = b% eccentricity*sin(b% theta_co)**2
        end do
-       
+
 !        xfer = min(b% wind_xfer_fraction, b% xfer_fraction)
        Mtot = b% m(1) + b% m(2) ! total mass in gr
-       
+
        b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1 !-&
 !               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot *&
 !               ((b% m(b% a_i)**2 / b% m(b% d_i)**2 - 1 ) * e2 - e3 ))
-       
+
        !integrate to get total eccentricity enhancement
        de = 0d0
        do i = 2,b% anomaly_steps ! trapezoidal integration
-          de = de + 0.5d0 * (b% edot_theta(i-1) + b% edot_theta(i)) * (b% time_co(i) - b% time_co(i-1)) 
+          de = de + 0.5d0 * (b% edot_theta(i-1) + b% edot_theta(i)) * (b% time_co(i) - b% time_co(i-1))
        end do
-       
+
        b% edot_enhance = de
-    
+
     end subroutine edot_enhancement_Isotropic
-    
+
 
     end module binary_edot
 

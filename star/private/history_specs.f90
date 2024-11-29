@@ -56,7 +56,7 @@
       integer, parameter :: abs_mag_offset = bc_offset + idel
       integer, parameter :: lum_band_offset = abs_mag_offset + idel
       integer, parameter :: log_lum_band_offset = lum_band_offset + idel
-      
+
       integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
       integer, parameter :: screened_rate_offset = raw_rate_offset + idel
       integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
@@ -131,7 +131,7 @@
 
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(history_columns_file)
             return
          end if
@@ -224,7 +224,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_total_mass') then
                call do_abundances(total_mass_offset, spec_err)
                if (spec_err /= 0) then
@@ -260,7 +260,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_lum_band') then
                call do_colors(lum_band_offset,'lum_band_', spec_err)
                if (spec_err /= 0) then
@@ -269,7 +269,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_log_lum_band') then
                call do_colors(log_lum_band_offset,'log_lum_band_', spec_err)
                if (spec_err /= 0) then
@@ -626,8 +626,8 @@
                ! We have string value (i.e total_mass c12)
                call func(offset)
                do1 = .true.
-            else if(string(1:len_trim(name)+1) == trim(name)//'_') then  
-               ! We have string_value (i.e total_mass_c12) 
+            else if(string(1:len_trim(name)+1) == trim(name)//'_') then
+               ! We have string_value (i.e total_mass_c12)
                ! Rewrite string so its in the form string value (i.e total_mass c12)
                ! By finding the last _ and replacing with a space
                k = index(string,'_',.true.)

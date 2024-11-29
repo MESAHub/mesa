@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module eval_weak
-      
+
       use const_def, only: dp
       use math_lib
       use utils_lib, only: mesa_error
@@ -34,7 +34,7 @@
 
 
       contains
-      
+
       subroutine do_eval_weak_reaction_info( &
             n, ids, reaction_ids, T9, YeRho, &
             eta, d_eta_dlnT, d_eta_dlnRho, &
@@ -53,7 +53,7 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
          integer, intent(out) :: ierr
-         
+
          real(dp) :: alfa, beta, d_alfa_dlnT, alfa_hi_Z, beta_hi_Z, d_alfa_hi_Z_dlnT
          integer :: i, ir, cid
 
@@ -72,8 +72,8 @@
          end if
 
          !if (T9 >= max(T9_weaklib_full_on, T9_weaklib_full_on_hi_Z)) return
-         
-         ! revise lambda using rate for low T         
+
+         ! revise lambda using rate for low T
          ! alfa is fraction from weaklib
          if (T9 >= T9_weaklib_full_on) then
             alfa = 1d0
@@ -108,7 +108,7 @@
             if (ir == 0) cycle
             cid = weak_reaction_info(1,ir)
             if (weak_lowT_rate(ir) <= 0d0) cycle
-            if (cid <= 0) cycle  
+            if (cid <= 0) cycle
             if (ids(i) <= 0) then
                lambda(i) = weak_lowT_rate(ir)
                dlambda_dlnT(i) = 0d0
@@ -125,10 +125,10 @@
                dlambda_dlnRho(i) = alfa*dlambda_dlnRho(i)
             end if
          end do
-         
+
       end subroutine do_eval_weak_reaction_info
 
-      
+
       subroutine do_eval_weaklib_reaction_info( &
             n, ids, T9_in, YeRho_in, &
             eta, d_eta_dlnT, d_eta_dlnRho, &
@@ -147,9 +147,9 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
          integer, intent(out) :: ierr
-         
+
          logical, parameter :: dbg = .false.
-         
+
          real(dp) :: T, T9, YeRho, lYeRho
          integer :: i, ir, in, out, rxn_idx
          logical :: neg
@@ -168,27 +168,27 @@
          include 'formats'
 
          ierr = 0
-         
+
          T9 = T9_in
          YeRho = YeRho_in
          lYeRho = log10(YeRho_in)
          if (is_bad(lYeRho)) then
             ierr = -1
             return
-            
+
             write(*,1) 'lYeRho', lYeRho
             write(*,1) 'YeRho_in', YeRho_in
             write(*,1) 'log10(YeRho_in)', log10(YeRho_in)
             !call mesa_error(__FILE__,__LINE__,'weak lYeRho')
          end if
-         
+
          if (n == 0) then
             write(*,*) 'problem in eval_weak_reaction_info: n == 0'
             write(*,2) 'n', n
             write(*,1) 'T9', T9
            return
          end if
-         
+
        do i = 1, n
 
             lambda(i) = 0d0
@@ -241,7 +241,7 @@
             lYeRho = table % lYeRhos(table % num_lYeRho)
 
             call table% interpolate(T9, lYeRho, &
-               lambda(i), dlambda_dlnT(i), dlambda_dlnRho(i), & 
+               lambda(i), dlambda_dlnT(i), dlambda_dlnRho(i), &
                Qneu(i), dQneu_dlnT(i), dQneu_dlnRho(i), ierr)
 
             in = weak_lhs_nuclide_id(ir)
@@ -306,18 +306,18 @@
                write(*,2) 'Qneu', i, Qneu(i)
                call show_stuff
             end if
-            
+
          end do
-                  
+
          if (is_bad(lYeRho)) then
             ierr = -1
             return
             call show_stuff
          end if
-      
-      
+
+
          contains
-         
+
          subroutine show_stuff
             integer :: i
             include 'formats'
@@ -345,10 +345,10 @@
                end if
             end do
             call mesa_error(__FILE__,__LINE__)
-         end subroutine show_stuff         
-         
+         end subroutine show_stuff
+
       end subroutine do_eval_weaklib_reaction_info
-      
+
 
 
 

@@ -171,7 +171,7 @@
             include 'formats'
 
             err_msg = ''
-            
+
             nz = s% nz
 
             AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
@@ -198,7 +198,7 @@
 
             call set_param_defaults
             dbg_msg = s% report_solver_progress
-            
+
             if (gold_tolerances_level == 2) then
                tol_residual_norm = s% gold2_tol_residual_norm1
                tol_max_residual = s% gold2_tol_max_residual1
@@ -229,7 +229,7 @@
             else
                min_corr_coeff = s% corr_coeff_limit
             end if
-            
+
             if (gold_tolerances_level == 2) then
                iter_for_resid_tol2 = s% gold2_iter_for_resid_tol2
                iter_for_resid_tol3 = s% gold2_iter_for_resid_tol3
@@ -268,15 +268,15 @@
                convergence_failure = .true.
                return
             end if
-            
-            call do_equations(ierr)                 
+
+            call do_equations(ierr)
             if (ierr /= 0) then
                if (dbg_msg) &
                   write(*, *) 'solver failure: eval_equations returned ierr', ierr
                convergence_failure = .true.
                return
             end if
-            
+
             call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             if (ierr /= 0) then
                if (dbg_msg) &
@@ -304,11 +304,11 @@
             tiny_corr_cnt = 0
 
             s% num_solver_iterations = 0
-            
+
          iter_loop: do while (.not. passed_tol_tests)
 
                if (dbg_msg .and. first_try) write(*, *)
-               
+
                max_resid_j = -1
                max_corr_j = -1
 
@@ -334,21 +334,21 @@
                   write(*,1) 'tol1 residual tolerances: norm, max', &
                      tol_residual_norm, tol_max_residual
                end if
-               
+
                call solver_test_partials(nvar, xder, ierr)
                if (ierr /= 0) then
                   call write_msg('solver_test_partials returned ierr /= 0')
                   convergence_failure = .true.
                   exit iter_loop
                end if
-               
+
                s% num_solver_iterations = s% num_solver_iterations + 1
                if (s% model_number == 1 .and. &
                   s% num_solver_iterations > 60 .and. &
                   mod(s% num_solver_iterations,10) == 0) &
                      write(*,*) 'first model is slow to converge: num tries', &
                         s% num_solver_iterations
-            
+
                if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
                   write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
                   call oops(err_msg)
@@ -400,7 +400,7 @@
                if (correction_norm*correction_factor > s% scale_correction_norm) then
                   correction_factor = min(correction_factor,s% scale_correction_norm/correction_norm)
                end if
-               
+
                if (max_abs_correction*correction_factor > s% scale_max_correction) then
                   temp_correction_factor = s% scale_max_correction/max_abs_correction
                end if
@@ -445,7 +445,7 @@
                   slope = 0d0
 
                end if
-               
+
                f = 0d0
                call adjust_correction( &
                   min_corr_coeff, correction_factor, grad_f1, f, slope, coeff, err_msg, ierr)
@@ -478,7 +478,7 @@
                   end if
                   exit iter_loop
                end if
-               
+
                if (is_bad_num(max_residual)) then
                   call oops('max_residual is a a bad number (NaN or Infinity)')
                   if (s% stop_for_bad_nums) then
@@ -494,7 +494,7 @@
                s% max_residual = max_residual
                resid_norm_min = min(residual_norm, resid_norm_min)
                max_resid_min = min(max_residual, max_resid_min)
-               
+
                disabled_resid_tests = &
                   tol_max_residual > 1d2 .and. tol_residual_norm > 1d2
                pass_resid_tests = &
@@ -511,7 +511,7 @@
                passed_tol_tests = &
                   (pass_resid_tests .and. pass_corr_tests_with_coeff) .or. &
                   (disabled_resid_tests .and. pass_corr_tests_without_coeff)
-               
+
                if (.not. passed_tol_tests) then
 
                   if (iter >= max_tries) then
@@ -617,20 +617,20 @@
                first_try = .false.
 
             end do iter_loop
-               
+
             if (max_residual > s% warning_limit_for_max_residual .and. .not. convergence_failure) &
                write(*,2) 'WARNING: max_residual > warning_limit_for_max_residual', &
                   s% model_number, max_residual, s% warning_limit_for_max_residual
 
          end subroutine do_solver_work
-         
-         
+
+
          subroutine solver_test_partials(nvar, xder, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             integer, intent(in) :: nvar
             real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
             integer, intent(out) :: ierr
-            
+
             integer :: j, k, k_lo, k_hi
             real(dp), dimension(:,:), pointer :: save_equ, save_dx
             logical :: testing_partial
@@ -656,7 +656,7 @@
                   save_equ(j,k) = equ(j,k)
                end do
             end do
-            
+
             s% doing_check_partials = .true. ! let set_vars_for_solver know
             k_lo = s% solver_test_partials_k_low
             if (k_lo > 0 .and. k_lo <= s% nz) then
@@ -672,7 +672,7 @@
                end do
             else
                k = s% solver_test_partials_k
-               call test_cell_partials(s, k, save_dx, save_equ, ierr) 
+               call test_cell_partials(s, k, save_dx, save_equ, ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
             end if
             deallocate(save_dx, save_equ)
@@ -713,8 +713,8 @@
             call write_msg(full_msg)
             convergence_failure = .true.
          end subroutine oops
-         
-         
+
+
          subroutine do_equations(ierr)
             integer, intent(out) :: ierr
             call prepare_solver_matrix(nvar, xder, ierr)
@@ -819,15 +819,15 @@
                s% solver_adjust_iter = iter
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
-               
-               call do_equations(ierr)               
+
+               call do_equations(ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
                      ! need this to rescue create pre-main-sequence model in some nasty cases.
                      alam = max(alam/10, min_corr_coeff)
                      ierr = 0
-                     cycle
+                     cycle search_loop
                   end if
                   write(err_msg,*) 'adjust_correction failed in eval_equations'
                   if (dbg_msg .or. dbg_adjust) &
@@ -856,7 +856,7 @@
                   if (alam > min_corr_coeff) then
                      alam = max(alam/10, min_corr_coeff)
                      ierr = 0
-                     cycle
+                     cycle search_loop
                   end if
                   err_msg = 'equ norm is NaN or other bad num'
                   ierr = -1
@@ -1011,13 +1011,13 @@
             if (s% doing_timing) then
                call start_time(s, time0, total_time)
             end if
-            
+
             !$OMP PARALLEL DO SIMD
             do i=1,neq
                b1(i) = -equ1(i)
             end do
             !$OMP END PARALLEL DO SIMD
-            
+
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
@@ -1027,10 +1027,10 @@
                end do
                !$OMP END PARALLEL DO SIMD
             end if
-            
+
             call factor_mtx(ierr)
             if (ierr == 0) call solve_mtx(ierr)
-            
+
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD
                do i = 1, nvar*nvar*nz
@@ -1072,7 +1072,7 @@
          end subroutine solve_mtx
 
 
-         subroutine test_cell_partials(s, k, save_dx, save_equ, ierr) 
+         subroutine test_cell_partials(s, k, save_dx, save_equ, ierr)
             use star_utils, only: lookup_nameofvar, lookup_nameofequ
             type (star_info), pointer :: s
             integer, intent(in) :: k
@@ -1082,7 +1082,7 @@
             include 'formats'
             ierr = 0
             write(*,'(A)')
-            i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)      
+            i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)
             if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
                if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
                   i_equ = -1
@@ -1100,11 +1100,11 @@
                   i_equ = -7
                else if (s% solver_test_partials_equ_name == 'grad_ad') then
                   i_equ = -8
-               end if 
+               end if
             else if (i_equ /= 0) then
                write(*,1) 'equ name ' // trim(s% solver_test_partials_equ_name)
             end if
-            i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)            
+            i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
             if (i_var /= 0) write(*,1) 'var name ' // trim(s% solver_test_partials_var_name)
             if (i_var > s% nvar_hydro) then ! get index in xa
                i_var_xa_index = i_var - s% nvar_hydro
@@ -1127,16 +1127,16 @@
                do i_equ = 1, s% nvar_hydro
                   call test_equ_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                     k, save_dx, save_equ, ierr)   
+                     k, save_dx, save_equ, ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end do
             else
                call test_equ_partials(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  k, save_dx, save_equ, ierr)   
+                  k, save_dx, save_equ, ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
-            end if     
-         end subroutine test_cell_partials               
+            end if
+         end subroutine test_cell_partials
 
 
          subroutine test_equ_partials(s, &
@@ -1164,7 +1164,7 @@
                   call test3_partials(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                      k, save_dx, save_equ, ierr)
-                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')               
+                  if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end if
             else ! i_equ == 0
                if (i_var /= 0) then
@@ -1192,15 +1192,15 @@
                   end if
                   call test1_partial(s, &
                      i_equ, s% solver_test_partials_var, s% solver_test_partials_dx_sink, &
-                     j_var_xa_index, j_var_sink_xa_index, &                     
+                     j_var_xa_index, j_var_sink_xa_index, &
                      k, 0, s% solver_test_partials_dval_dx, save_dx, save_equ, ierr)
                end if
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
-            end if               
+            end if
             write(*,'(A)')
          end subroutine test_equ_partials
-         
-         
+
+
          subroutine get_lnE_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1209,7 +1209,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var_xa_index > 0) then 
+            if (i_var_xa_index > 0) then
                dvardx0_00 = s% d_eos_dxa(i_lnE,i_var_xa_index,k) - &
                         s% d_eos_dxa(i_lnE,i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
@@ -1218,8 +1218,8 @@
                dvardx0_00 = s% Cv_for_partials(k)*s% T(k)/s% energy(k)
             end if
          end subroutine get_lnE_partials
-         
-         
+
+
          subroutine get_lnP_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1228,7 +1228,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var_xa_index > 0) then 
+            if (i_var_xa_index > 0) then
                dvardx0_00 = s% Pgas(k)/s% Peos(k) * &
                   (s% d_eos_dxa(i_lnPgas,i_var_xa_index,k) - s% d_eos_dxa(i_lnPgas,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
@@ -1237,8 +1237,8 @@
                dvardx0_00 = s% chiT_for_partials(k)
             end if
          end subroutine get_lnP_partials
-         
-         
+
+
          subroutine get_grad_ad_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1247,7 +1247,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var_xa_index > 0) then 
+            if (i_var_xa_index > 0) then
                dvardx0_00 = &
                   (s% d_eos_dxa(i_grad_ad,i_var_xa_index,k) - s% d_eos_dxa(i_grad_ad,i_var_sink_xa_index,k))
             else if (i_var == s% i_lnd) then
@@ -1256,8 +1256,8 @@
                dvardx0_00 = s% d_eos_dlnT(i_grad_ad,k)
             end if
          end subroutine get_grad_ad_partials
-         
-         
+
+
          subroutine get_eps_nuc_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1265,7 +1265,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var > s% nvar_hydro) then 
+            if (i_var > s% nvar_hydro) then
                dvardx0_00 = s% d_epsnuc_dx(i_var_xa_index,k) - s% d_epsnuc_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_epsnuc_dlnd(k)
@@ -1273,8 +1273,8 @@
                dvardx0_00 = s% d_epsnuc_dlnT(k)
             end if
          end subroutine get_eps_nuc_partials
-         
-         
+
+
          subroutine get_non_nuc_neu_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1282,7 +1282,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var > s% nvar_hydro) then 
+            if (i_var > s% nvar_hydro) then
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_nonnucneu_dlnd(k)
@@ -1290,8 +1290,8 @@
                dvardx0_00 = s% d_nonnucneu_dlnT(k)
             end if
          end subroutine get_non_nuc_neu_partials
-         
-         
+
+
          subroutine get_gradT_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1299,7 +1299,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var > s% nvar_hydro) then 
+            if (i_var > s% nvar_hydro) then
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_m1 = s% gradT_ad(k)%d1Array(i_lnd_m1)
@@ -1315,8 +1315,8 @@
                dvardx0_00 = s% gradT_ad(k)%d1Array(i_w_00)
             end if
          end subroutine get_gradT_partials
-         
-         
+
+
          subroutine get_mlt_vc_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1324,7 +1324,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var > s% nvar_hydro) then 
+            if (i_var > s% nvar_hydro) then
                dvardx0_00 = 0d0
             else if (i_var == s% i_lnd) then
                dvardx0_m1 = s% mlt_vc_ad(k)%d1Array(i_lnd_m1)
@@ -1338,8 +1338,8 @@
                dvardx0_00 = s% mlt_vc_ad(k)%d1Array(i_L_00)
             end if
          end subroutine get_mlt_vc_partials
-         
-         
+
+
          subroutine get_opacity_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1347,7 +1347,7 @@
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
-            if (i_var > s% nvar_hydro) then 
+            if (i_var > s% nvar_hydro) then
                dvardx0_00 = 0d0 ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_opacity_dlnd(k)
@@ -1397,24 +1397,24 @@
             else if (i_equ == -4) then ! 'lnP'
                call get_lnP_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -5) then ! 'non_nuc_neu'
                call get_non_nuc_neu_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -6) then ! 'gradT'
                call get_gradT_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -7) then ! 'mlt_vc'
                call get_mlt_vc_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
             else if (i_equ == -8) then ! 'grad_ad'
                call get_grad_ad_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1) 
-            end if 
+                  dvardx0_m1, dvardx0_00, dvardx0_p1)
+            end if
             if (k > 1) then
                call test1_partial(s, &
                   i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
@@ -1432,7 +1432,7 @@
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
             end if
          end subroutine test3_partials
-         
+
 
          subroutine test1_partial(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
@@ -1444,7 +1444,7 @@
             real(dp), intent(in) :: dvardx_0
             real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             character (len=3) :: k_off_str
-            integer, intent(out) :: ierr 
+            integer, intent(out) :: ierr
             character (len = 32) :: equ_str
             real(dp) :: dx_0, err, dvardx, xdum, uncertainty
             include 'formats'
@@ -1497,7 +1497,7 @@
                else if (uncertainty > 1d-7) then
                   write(*, '(a5,1x)', advance='no') '?????'
                else
-                  write(*, '(6x)', advance='no') 
+                  write(*, '(6x)', advance='no')
                end if
                if (i_equ > 0) then
                   equ_str = s% nameofequ(i_equ)
@@ -1531,7 +1531,7 @@
 !                  k, safe_log10(xdum), 'log uncertainty', safe_log10(uncertainty), &
 !                  'analytic', dvardx_0, 'numeric', dvardx, &
 !                  'analytic/numeric', abs(dvardx_0)/max(1d-99,abs(dvardx))
-                  
+
             else
                write(*,'(A)')
                write(*,1) 'analytic and numeric partials wrt ' // trim(s% nameofvar(i_var)), &
@@ -1541,8 +1541,8 @@
                if (dvardx_0 /= 0d0) write(*,1) 'rel_diff', xdum
             end if
          end subroutine test1_partial
-            
-            
+
+
          real(dp) function dfridr_func(s, &
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                k, k_off, delta_x, save_dx) result(val)
@@ -1696,8 +1696,8 @@
                end if
             end do
          end subroutine set_xtras
-            
-         
+
+
          subroutine store_mix_type_str(str, integer_string, i, k)
             character (len=5) :: str
             character (len=10) :: integer_string
@@ -1720,36 +1720,36 @@
          subroutine write_msg(msg)
             use const_def, only: secyer
             character(*)  :: msg
-            
+
             integer :: k
             character (len=64) :: max_resid_str, max_corr_str
             character (len=5) :: max_resid_mix_type_str, max_corr_mix_type_str
             character (len=10) :: integer_string
             include 'formats'
-            
+
             if (.not. dbg_msg) return
-            
+
             if (max_resid_j < 0) then
                call sizequ(s, nvar, residual_norm, max_residual, max_resid_k, max_resid_j, ierr)
             end if
-            
+
             if (max_resid_j > 0) then
                write(max_resid_str,*) 'max resid ' // trim(s% nameofequ(max_resid_j))
             else
                max_resid_str = ''
             end if
-            
+
             if (max_corr_j < 0) then
                call sizeB(s, nvar, B, &
                   max_correction, correction_norm, max_corr_k, max_corr_j, ierr)
             end if
-            
+
             if (max_corr_j > 0) then
                write(max_corr_str,*) 'max corr ' // trim(s% nameofvar(max_corr_j))
             else
                max_corr_str = ''
             end if
-            
+
             integer_string = '0123456789'
             k = max_corr_k
             call store_mix_type_str(max_corr_mix_type_str, integer_string, 1, k-2)
@@ -1757,7 +1757,7 @@
             call store_mix_type_str(max_corr_mix_type_str, integer_string, 3, k)
             call store_mix_type_str(max_corr_mix_type_str, integer_string, 4, k+1)
             call store_mix_type_str(max_corr_mix_type_str, integer_string, 5, k+2)
-            
+
             k = max_resid_k
             call store_mix_type_str(max_resid_mix_type_str, integer_string, 1, k-2)
             call store_mix_type_str(max_resid_mix_type_str, integer_string, 2, k-1)
@@ -1788,7 +1788,7 @@
                ' ' // trim(msg)
 !               'mix type ' // trim(max_corr_mix_type_str),  &
 !               '   ' // trim(msg)
-               
+
             if (is_bad(slope)) call mesa_error(__FILE__,__LINE__,'write_msg')
 
          end subroutine write_msg
@@ -1909,7 +1909,7 @@
             nullify(equ, equ1, dxsave1,dxsave, ddxsave, B1, &
                      soln1, grad_f1, rhs, xder, ddx, row_scale_factors1,&
                      col_scale_factors1, save_ublk1, save_dblk1, save_lblk1,&
-                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1) 
+                     B, soln, grad_f,ipiv1, ublk1, dblk1, lblk1, ublkF1,dblkF1, lblkF1)
 
          end subroutine cleanup
 

@@ -1,6 +1,6 @@
    module mod_brent
    use const_def, only: dp
-      
+
    implicit none
 
    contains
@@ -75,7 +75,7 @@
         real    ( kind = 8 ) z0
         real    ( kind = 8 ) z1
         real    ( kind = 8 ) z2
-        
+
         ierr = 0
         a0 = b
         x = a0
@@ -115,7 +115,7 @@
         end if
 
         do iter = 1, max_tries+1
-       
+
           if (iter > max_tries) then
             ierr = -1
             exit
@@ -358,7 +358,7 @@
      integer ( kind = 4 ) iter
 
      ierr = 0
-     
+
    !
    !  C is the square of the inverse of the golden ratio.
    !
@@ -386,7 +386,7 @@
        if ( abs ( x - m ) <= t2 - 0.5D+00 * ( sb - sa ) ) then
          exit
        end if
-       
+
        if (iter > max_tries) then
          ierr = -1
          exit
@@ -528,7 +528,7 @@
    !
    !  Licensing:
    !
-   !    This code is distributed under the GNU LGPL license. 
+   !    This code is distributed under the GNU LGPL license.
    !
    !  Modified:
    !
@@ -549,7 +549,7 @@
    !
    !  Parameters:
    !
-   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of 
+   !    Input, real ( kind = 8 ) A, B, the endpoints of the change of
    !    sign interval.
    !
    !    Input, real ( kind = 8 ) MACHEP, an estimate for the relative machine
@@ -565,9 +565,9 @@
    !    the function F.
    !
      implicit none
-     
+
      interface
-#include "num_root_fcn.dek" 
+#include "num_root_fcn.dek"
      end interface
      integer, intent(in) :: lipar, lrpar
      integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -593,9 +593,9 @@
      real ( kind = 8 ) t, epsy
      real ( kind = 8 ) tol
      real ( kind = 8 ) dfdx
-     
+
      ierr = 0
-     
+
    !
    !  Make local copies of A and B.
    !

@@ -234,7 +234,7 @@ contains
        call store_point_data_atm(j, k)
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     sg = 1
@@ -252,7 +252,7 @@ contains
 
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
-             
+
        endif
 
     end do env_loop
@@ -330,7 +330,7 @@ contains
       return
 
     end subroutine store_point_data_atm
-      
+
     !****
 
     subroutine store_point_data_env (j, k, k_a, k_b)
@@ -436,7 +436,7 @@ contains
       return
 
     end subroutine store_point_data_ctr
-    
+
   end subroutine get_gyre_data
 
   !****
@@ -491,7 +491,7 @@ contains
     end do
 
     ! Close the file
-    
+
     close(iounit)
 
     ! Finish

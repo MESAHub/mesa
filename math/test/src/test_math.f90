@@ -1,5 +1,5 @@
 program test_math
-  
+
   use const_lib
   use utils_lib
   use math_lib

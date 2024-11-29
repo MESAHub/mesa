@@ -54,7 +54,7 @@
          part_number = 0 ! part_numbers are just a consistency check on the data file
 
          write(iounit) star_def_version
-         
+
          call write_part_number(iounit)
          write(iounit) &
             s% initial_z, & ! need this since read_model can change what is in the inlist
@@ -108,12 +108,12 @@
          write(iounit) &
             s% recent_log_header, s% phase_of_evolution, s% dt_next, s% dt_next_unclipped
 
-         call write_part_number(iounit) 
+         call write_part_number(iounit)
          write(iounit) &
-            s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
+            s% num_skipped_setvars, s% num_retries, s% num_setvars, &
             s% total_num_solver_iterations, &
             s% total_num_solver_relax_iterations, &
-            s% total_num_solver_calls_made, &            
+            s% total_num_solver_calls_made, &
             s% total_num_solver_relax_calls_made, &
             s% total_num_solver_calls_converged, &
             s% total_num_solver_relax_calls_converged, &
@@ -162,7 +162,7 @@
                write(iounit) s% history_names(k)
             end do
          end if
-         
+
          if (s% rsp_flag) call rsp_photo_out(s, iounit)
 
          call write_part_number(iounit)
@@ -170,7 +170,7 @@
          call s% other_photo_write(s% id, iounit)
 
          call write_part_number(iounit)
-         
+
          s% need_to_setvars = .true.
 
          contains

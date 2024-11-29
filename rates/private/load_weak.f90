@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module load_weak
-      
+
       use rates_def
       use const_def, only: dp
       use utils_lib, only: mesa_error
@@ -32,15 +32,15 @@
       use suzuki_tables, only: private_load_suzuki_tables
 
       implicit none
-      
+
       private :: private_load_weak_tables
 
       contains
-      
-      
+
+
       subroutine load_weak_data(ierr)
-         integer, intent(out) :: ierr         
-         ierr = 0         
+         integer, intent(out) :: ierr
+         ierr = 0
          call private_load_weak_tables(ierr)
          if (ierr /= 0) return
 
@@ -53,13 +53,13 @@
 
          call load_weak_info_list(ierr)
       end subroutine load_weak_data
-      
-      
+
+
       subroutine load_weak_info_list(ierr)
          use utils_lib
          use math_lib, only: str_to_vector
          integer, intent(out) :: ierr
-         
+
          integer :: iounit, i, nvec
          character (len=256) :: filename, string
          character(len=iso_name_length) :: lhs, rhs
@@ -71,10 +71,10 @@
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
+
          ierr = 0
          vec => vec_ary
-         
+
          filename = trim(weak_data_dir) // '/weak_info.list'
          ierr = 0
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -82,7 +82,7 @@
             write(*,*) 'failed to open ' // trim(filename)
             return
          end if
-         
+
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'weak info filename <' // trim(filename) // '>'
@@ -101,7 +101,7 @@
          allocate(weak_info_list_halflife(max_num_weak_info))
          allocate(weak_info_list_Qneu(max_num_weak_info))
          num_weak_info_list_reactions = 0
-         do i = 1, max_num_weak_info ! keep reading until end of file         
+         do i = 1, max_num_weak_info ! keep reading until end of file
             read(iounit,fmt='(a5,a5,a)',iostat=ierr) lhs, rhs, string
             if (ierr == 0) then
                call str_to_vector(string, vec, nvec, ierr)
@@ -111,40 +111,40 @@
                ierr = 0; exit
             end if
             weak_info_list_halflife(i) = vec(1)
-            weak_info_list_Qneu(i) = vec(2)    
+            weak_info_list_Qneu(i) = vec(2)
             call create_weak_dict_key(lhs, rhs, key)
             !write(*,'(a)') 'weak info list key ' // trim(key)
             call integer_dict_define(weak_info_list_dict, key, i, ierr)
             if (failed('integer_dict_define')) return
             num_weak_info_list_reactions = i
          end do
-         
+
          close(iounit)
-         
+
          if (num_weak_info_list_reactions == 0) then
             ierr = -1
             write(*,*) 'failed trying to read weak_info.list -- no reactions?'
             return
          end if
-         
+
          if (num_weak_info_list_reactions == max_num_weak_info) then
             ierr = -1
             write(*,*) 'failed trying to read weak_info.list -- too many reactions?'
             return
          end if
-         
+
          call integer_dict_create_hash(weak_info_list_dict, ierr)
          if (ierr /= 0) return
-         
+
          call realloc_double(weak_info_list_halflife, num_weak_info_list_reactions, ierr)
          if (ierr /= 0) return
-         
+
          call realloc_double(weak_info_list_Qneu, num_weak_info_list_reactions, ierr)
          if (ierr /= 0) return
-         
-         
+
+
          contains
-         
+
          logical function failed(str)
             character (len=*) :: str
             failed = (ierr /= 0)
@@ -152,17 +152,17 @@
                write(*,*) 'failed: ' // trim(str)
             end if
          end function failed
-         
-         
+
+
       end subroutine load_weak_info_list
-      
-      
+
+
       subroutine private_load_weak_tables(ierr)
          use utils_lib
          use chem_lib, only: chem_get_iso_id
          use chem_def, only: iso_name_length
          integer, intent(out) :: ierr
-         
+
          integer :: iounit, i, ios, id
          character (len=256) :: filename, cache_filename, string
          character(len=iso_name_length) :: lhs1, rhs1, lhs2, rhs2, weak_lhs, weak_rhs
@@ -177,11 +177,11 @@
          integer, parameter :: i_ldecay = 1, i_lcapture = 2, i_lneutrino = 3
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          ios = -1
          if (rates_use_cache) then
             cache_filename = trim(rates_cache_dir) // '/weakreactions.bin'
@@ -193,9 +193,9 @@
                close(iounit)
             end if
          end if
-         
+
          if (ios /= 0) then ! need to read data file
-         
+
             filename = trim(weak_data_dir) // '/weakreactions.tables'
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -203,7 +203,7 @@
                write(*,*) 'failed to open ' // trim(filename)
                return
             end if
-         
+
             if (dbg) then
                write(*,'(A)')
                write(*,*) 'weaklib filename <' // trim(filename) // '>'
@@ -219,15 +219,15 @@
             end do
 
             if (.not. skip_line()) return
-         
+
             read(iounit,*,iostat=ierr) num_weak_reactions
             if (failed('read num_weak_reactions')) return
-         
+
             if (dbg) write(*,2) 'num_weak_reactions', num_weak_reactions
-         
+
             call alloc
             if (failed('allocate')) return
-         
+
             do i = 1, num_weak_reactions
                if (.not. skip_line()) return
                if (mod(i,2)==1) then ! first of pair
@@ -280,9 +280,9 @@
                call read_table(i,i_lneutrino)
                if (failed('read lneutrino')) return
             end do
-         
+
             close(iounit)
-         
+
             if (rates_use_cache) then
                open(newunit=iounit, file=trim(cache_filename), iostat=ios, &
                      action='write', form='unformatted')
@@ -291,16 +291,16 @@
                   close(iounit)
                end if
             end if
-         
+
          end if
-         
+
          nullify(weak_reactions_dict)
          do i = 1, num_weak_reactions
             call create_weak_dict_key(weak_lhs_nuclide_name(i), weak_rhs_nuclide_name(i), key)
             call integer_dict_define(weak_reactions_dict, key, i, ierr)
             if (failed('integer_dict_define')) return
          end do
-         
+
          call integer_dict_create_hash(weak_reactions_dict, ierr)
          if (failed('integer_dict_create_hash')) return
 
@@ -312,8 +312,8 @@
          end do
 
          if (dbg) write(*,*) 'finished load_weak_tables'
-         
-         
+
+
          contains
 
 
@@ -321,19 +321,19 @@
             integer, intent(in) :: iounit
             integer, intent(out) :: ios
             integer :: n, i
-            
+
             include 'formats'
-         
+
             read(iounit,iostat=ios) num_weak_reactions
             if (ios /= 0) return
-         
+
             if (dbg) write(*,2) 'num_weak_reactions', num_weak_reactions
-         
+
             call alloc
             if (failed('allocate')) return
-            
+
             n = num_weak_reactions
-            
+
             read(iounit,iostat=ios) &
                weak_lhs_nuclide_id(1:n), &
                weak_rhs_nuclide_id(1:n), &
@@ -345,20 +345,20 @@
                read(iounit, iostat=ios) &
                     weak_reactions_tables(i) % t % data(1,1:weak_num_T9,1:weak_num_lYeRho,1:3)
             end do
-               
+
          end subroutine read_weak_cache
 
 
          subroutine write_weak_cache(iounit)
             integer, intent(in) :: iounit
             integer :: n, i
-            
+
             include 'formats'
-         
+
             write(iounit) num_weak_reactions
-            
+
             n = num_weak_reactions
-            
+
             write(iounit) &
                weak_lhs_nuclide_id(1:n), &
                weak_rhs_nuclide_id(1:n), &
@@ -370,15 +370,15 @@
                write(iounit, iostat=ios) &
                     weak_reactions_tables(i) % t % data(1,1:weak_num_T9,1:weak_num_lYeRho,1:3)
             end do
-               
+
          end subroutine write_weak_cache
-                        
-         
+
+
          subroutine alloc
 
             integer :: i
             type(weaklib_rate_table) :: table
-         
+
             allocate( &
                weak_reaclib_id(num_weak_reactions), &
                weak_lhs_nuclide_name(num_weak_reactions), &
@@ -392,10 +392,10 @@
                table = weaklib_rate_table(weak_reaction_T9s, weak_reaction_lYeRhos)
                allocate(weak_reactions_tables(i)% t, source=table)
             end do
-               
+
          end subroutine alloc
-         
-         
+
+
          subroutine adjust_name(nm)
             character(len=iso_name_length) :: nm
             nm = adjustl(nm)
@@ -405,8 +405,8 @@
                nm = 'neut'
             end if
          end subroutine adjust_name
-         
-         
+
+
          subroutine read_table(i,ii)
             use math_lib, only: str_to_vector
             integer, intent(in) :: i, ii
@@ -445,8 +445,8 @@
                !if (dbg) write(*,'(a,2i6,99f9.3)') 'read_table', j, skip, buffer
             end do
          end subroutine read_table
-         
-         
+
+
          logical function failed(str)
             character (len=*) :: str
             failed = (ierr /= 0)
@@ -454,8 +454,8 @@
                write(*,*) 'failed: ' // trim(str)
             end if
          end function failed
-         
-         
+
+
          logical function skip_line()
             logical, parameter :: dbg = .false.
             if (dbg) then
@@ -516,7 +516,7 @@
 
         rate_loop: do
            t = token(iounit, n, i, buffer, rate_name)
-           if (t == eof_token) exit
+           if (t == eof_token) exit rate_loop
            if (t /= name_token) then
               call error; return
            end if

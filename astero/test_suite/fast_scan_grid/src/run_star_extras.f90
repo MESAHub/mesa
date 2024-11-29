@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,25 +19,25 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
       use star_def
       use const_def
       use math_lib
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
-      
+
       ! these routines are called by the standard run_star check_model
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          use astero_def, only: star_astero_procs
          integer, intent(in) :: id
@@ -54,7 +54,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          s% how_many_extra_history_header_items => how_many_extra_history_header_items
          s% data_for_extra_history_header_items => data_for_extra_history_header_items
@@ -64,7 +64,7 @@
          include 'set_star_astero_procs.inc'
       end subroutine extras_controls
 
-      
+
       subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
          use astero_def, only: Z_div_X_solar
 
@@ -120,8 +120,8 @@
          end select
 
       end subroutine set_constraint_value
-      
-      
+
+
       subroutine set_param(id, name, val, ierr) ! called from star_astero code
          use astero_def, only: f0_ov_div_f_ov, Y_frac_he3, Z_div_X_solar, &
             Y_depends_on_Z, dYdZ, Y0
@@ -192,8 +192,8 @@
             end select
 
       end subroutine set_param
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -204,8 +204,8 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          use astero_def
          use utils_lib, only: mv
@@ -246,17 +246,17 @@
          end subroutine move
 
       end subroutine extras_after_evolve
-      
+
 
       integer function extras_check_model(id)
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          include 'formats'
 
          ! if you want to check multiple conditions, it can be useful
@@ -281,8 +281,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -294,7 +294,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -305,8 +305,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -378,7 +378,7 @@
          ! vals(1) = s% mixing_length_alpha
 
       end subroutine data_for_extra_profile_header_items
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -390,8 +390,8 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
-      
+
+
 
       end module run_star_extras
-      
+

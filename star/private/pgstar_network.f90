@@ -229,7 +229,7 @@
             if(s% pg% network_show_colorbar)then
                call network_colorbar_legend(winxmin, winxmax, winymin, winymax,log10_min_abun,log10_max_abun)
             end if
-            
+
             call show_pgstar_decorator(s%id,s% pg% network_use_decorator,s% pg% network_pgstar_decorator, 0, ierr)
 
 
@@ -237,15 +237,15 @@
 
 
       end subroutine do_network_panel
-      
-      
+
+
       subroutine network_colorbar_legend(winxmin, winxmax, winymin, winymax,abun_min,abun_max)
          real,intent(in) :: winxmin, winxmax, winymin, winymax,abun_min,abun_max
          real :: legend_xmin,legend_xmax,legend_ymin,legend_ymax
          real :: xmin,xmax,ymin,ymax
          real :: dx, dyline, xpts(2),yt,yb,text
          character(len=16) :: str
-         
+
          integer :: i,j,clr,mid_map,num_cms
 
          call PGQWIN(xmin, xmax, ymin, ymax)
@@ -259,7 +259,7 @@
          num_cms=colormap_size-mid_map
          dyline = (ymax-ymin)/num_cms
          dx = 0.1
-         
+
          xpts(1) = 2.0*dx
          xpts(2) = xpts(1) + 2.0*dx
 
@@ -272,7 +272,7 @@
             call pgsci(clr)
             yt = ymin + (i)*dyline
             yb = ymin + (i-1)*dyline
-         
+
             call pgrect(xpts(1),xpts(2),yb,yt)
          end do
 
@@ -282,7 +282,7 @@
             write(str,'(F8.3)') text
             call pgptxt(xpts(2) + 0.025, ymin+(j-1)*(ymax-ymin)/4.0, 0.0, 0.0, trim(str))
          end do
-         
+
          call pgunsa
 
       end subroutine network_colorbar_legend

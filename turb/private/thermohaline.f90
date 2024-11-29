@@ -61,12 +61,12 @@ contains
       real(dp), intent(in) :: &
          grada, gradr, T, opacity, rho, Cp, gradL_composition_term, XH1, &
          thermohaline_coeff
-      integer, intent(in) :: iso      
+      integer, intent(in) :: iso
       real(dp), intent(out) :: D_thrm
       integer, intent(out) :: ierr
-      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th            
-      include 'formats'     
-      dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable               
+      real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
+      include 'formats'
+      dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
       K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
       if (thermohaline_option == 'Kippenhahn') then
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
@@ -83,7 +83,7 @@ contains
          else if (Pr < 0d0) then
             ! Bad results from get_diff_coeffs will just result in NaNs from thermohaline options, so skip
             D_thrm = 0d0
-         else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11') then 
+         else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11') then
             ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
             ! also see Denissenkov. ApJ 723:563–579, 2010.
             D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
@@ -102,20 +102,20 @@ contains
    subroutine get_diff_coeffs(K_therm, Cp, rho, T, opacity, iso, XH1, kt, kmu, vis)
       use chem_def, only: chem_isos
       real(dp), intent(in) :: K_therm, Cp, rho, T, opacity, XH1
-      integer, intent(in) :: iso      
+      integer, intent(in) :: iso
       real(dp), intent(out) :: kt, kmu, vis
       real(dp) :: loglambdah, loglambdacx, loglambdacy, ccx, ccy, qe4
-      real(dp) :: Bcoeff, chemA, chemZ, acx, acy, nu_mol, nu_rad      
-      real(dp), parameter :: sqrt5 = sqrt(5d0)           
+      real(dp) :: Bcoeff, chemA, chemZ, acx, acy, nu_mol, nu_rad
+      real(dp), parameter :: sqrt5 = sqrt(5d0)
       kt = K_therm/(Cp*rho)       ! thermal diffusivity (assumes radiatively dominated)
       qe4=pow4(qe)
 
       ! Log Lambda for pure H (equation 10 from Proffitt Michaud 93)
-      loglambdah = -19.26d0 - 0.5d0*log(rho) + 1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1+XH1)) 
+      loglambdah = -19.26d0 - 0.5d0*log(rho) + 1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1+XH1))
       nu_rad = 4d0*crad*pow4(T)/(15d0*clight*opacity*pow2(rho)) ! radiative viscosity
-      nu_mol = 0.406d0*sqrt(amu)*pow(boltzm*T,2.5d0)/(qe4*loglambdah*rho) 
+      nu_mol = 0.406d0*sqrt(amu)*pow(boltzm*T,2.5d0)/(qe4*loglambdah*rho)
       ! From Spitzer "Physics of Fully Ionized Gases equation 5-54
-      ! Assumes pure H. Still trying to work out what it would be for a mixture. 
+      ! Assumes pure H. Still trying to work out what it would be for a mixture.
       vis = nu_mol + nu_rad   ! total viscosity
 
       ! The following is from Proffitt & Michaud, 1993.
@@ -128,7 +128,7 @@ contains
       if(chemZ.gt.2) then
       ! This is if the driving chemical is NOT He.
          ! Log Lambda for H-dominant chem mixture (equation 10)
-         loglambdacx = loglambdah - log(chemz)  
+         loglambdacx = loglambdah - log(chemz)
          ! Log Lambda for He-dominant chem mixture (equation 10)
          loglambdacy = loglambdah - log(2.d0*chemz)
          ! Calculation of C_ij coeffs (equation 12)
@@ -144,12 +144,12 @@ contains
       else
          ! Log Lambda for H-He mixture (equation 10)
          loglambdah = -19.26d0 - log(2d0) - 0.5d0*log(rho) + &
-            1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1+XH1)) 
+            1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1+XH1))
          ! Calculation of C_ij coeffs (equation 12)
          ccy = log(exp(1.2d0*loglambdah)+1d0)/1.2d0
          ! My formula (see notes) based on Proffitt and Michaud 1993
          kmu = (Bcoeff*pow(T,2.5d0)/(rho*ccy))*(3+XH1)/((1+XH1)*(3+5*XH1)*(0.7d0+0.3d0*XH1))
-      
+
       endif
       ! write(57,*) kt,kmu,vis,chemZ
 
@@ -158,7 +158,7 @@ contains
 
    real(dp) function numu(R0,r_th,prandtl,diffratio)
       !Function calculates Nu_mu from input parameters, following Brown et al. 2013.
-      !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
+      !Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting.
 
       real(dp), intent(in) :: R0,r_th,prandtl,diffratio
       real(dp) :: maxl2,maxl,lambdamax
@@ -167,18 +167,18 @@ contains
 
       ! Initialize guess using estimates from Brown et al. 2013
       call analytical_estimate_th(maxl,lambdamax,r_th,prandtl,diffratio)
-            
+
       myvars(1) = maxl
       myvars(2) = lambdamax
 
      !Call Newton relaxation algorithm
      call NR(myvars,prandtl,diffratio,R0,ierr)
-    
-     !If the growth rate is negative, then try another set of parameters as first guess.  
+
+     !If the growth rate is negative, then try another set of parameters as first guess.
      !Repeat as many times as necessary until convergence is obtained.
      iter = 1
      max_iters = 200
-     do while(iter<=max_iters .and. ((myvars(2)<0).or.(ierr /= 0))) 
+     do while(iter<=max_iters .and. ((myvars(2)<0).or.(ierr /= 0)))
         !write(*,*) 'Alternative', r_th,prandtl,diffratio,iter
         !Reset guess values
         myvars(1) = maxl
@@ -189,9 +189,9 @@ contains
         if(ierr.eq.0) call NR(myvars,prandtl,diffratio,R0,ierr)
         !write(*,*) prandtl,diffratio,R0,myvars(1),myvars(2),ierr
         !Otherwise, increase counter and try again.
-        iter = iter + 1            
+        iter = iter + 1
      enddo
-     
+
      if((myvars(2)<0).or.(ierr /= 0)) then
         write(*,*) "WARNING: thermohaline Newton relaxation failed to converge, falling back to estimate"
         maxl2 = maxl*maxl
@@ -206,7 +206,7 @@ contains
      numu = 1.d0 + 49.d0*lambdamax*lambdamax/(diffratio*maxl2*(lambdamax+diffratio*maxl2))
 
       return
-   end function numu 
+   end function numu
 
 
    subroutine thermohaline_rhs(myx,myf,myj,prandtl,diffratio,R0)
@@ -215,7 +215,7 @@ contains
       ! lambda^3 + a_2 lambda^2 + a_1 lambda + a_0 = 0 (eq. 19 of Brown et al.)
       ! b_2 lambda^2 + b_1 lambda + b_0 = 0 (eq. 20 of Brown et al.)
       ! Inputs f, the equations, and j, their jacobian.
-      ! Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
+      ! Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting.
 
       real(dp), intent(in) :: myx(2),  prandtl, diffratio, R0
       real(dp), intent(out) :: myf(2), myj(2,2)
@@ -248,7 +248,7 @@ contains
       myj(2,2) = 2*b_2*myx(2) + b_1
 
       return
-   end subroutine thermohaline_rhs               
+   end subroutine thermohaline_rhs
 
 
    subroutine analytical_estimate_th(maxl,lambdamax,r_th,prandtl,diffratio)
@@ -260,13 +260,13 @@ contains
 
       if(r_th .lt. 0.5d0) then
          if(r_th .gt. prandtl) then
-            maxl = pow((1.d0/(1.d0+phi)) - 2.d0*dsqrt(r_th*phi)/pow(1d0+phi,2.5d0),0.25d0)   
+            maxl = pow((1.d0/(1.d0+phi)) - 2.d0*dsqrt(r_th*phi)/pow(1d0+phi,2.5d0),0.25d0)
                ! Equation (B14)
             maxl4 = maxl*maxl*maxl*maxl
             maxl6 = maxl4*maxl*maxl
             lambdamax = 2*prandtl*phi*maxl6/(1d0-(1d0+phi)*maxl4)    ! Equation (B11)
          else
-            maxl = dsqrt(dsqrt(1d0/(1d0+phi)) - dsqrt(prandtl)*(1d0+phi/((1d0+phi)*(1d0+phi))))  
+            maxl = dsqrt(dsqrt(1d0/(1d0+phi)) - dsqrt(prandtl)*(1d0+phi/((1d0+phi)*(1d0+phi))))
                ! Equation (B5)
             lambdamax = dsqrt(prandtl) - prandtl*dsqrt(1d0+phi)   !Equation (B5)
          endif
@@ -288,7 +288,7 @@ contains
 
    subroutine NR(xrk,prandtl,diffratio,R0,ierr)
       ! Newton Relaxation routine used to solve cubic & quadratic in thermohaline case.
-      ! Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting. 
+      ! Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting.
 
       real(dp), parameter :: acy = 1.d-13 ! accuracy of NR solution.
       integer, parameter :: niter = 20  ! max number of iterations allowed before giving up.
@@ -301,7 +301,7 @@ contains
             ldx = n
 
       integer :: iter,ierr
-      real(dp) :: xrk(2), f(2) ! Functions f 
+      real(dp) :: xrk(2), f(2) ! Functions f
       real(dp) :: j(2,2) ! Jacobian
       real(dp) :: err,errold ! Error at each iteration
       real(dp) :: x1_sav,x2_sav
@@ -324,12 +324,12 @@ contains
 
       !While error is too large .and. decreasing, iterate.
       do while ((err.gt.acy).and.(ierr.eq.0).and.(iter.lt.niter))
-         call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)    
-      
+         call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)
+
          fact = 'E'
          trans = 'N'
          equed = ''
-         
+
          A  = j
          B(1,1) = f(1)
          B(2,1) = f(2)
@@ -349,19 +349,19 @@ contains
             err = dsqrt(f(1)*f(1)+f(2)*f(2)) ! Calculate the new error
             ! If, after a while, the error is still not decreasing, give up and exit NR.
             ! Otherwise, continue.
-            if((iter.gt.5).and.(err.gt.errold)) then              
+            if((iter.gt.5).and.(err.gt.errold)) then
                ! Write(*,2) 'Error not decreasing at iter', iter, err, errold
                ierr = 1
                ! Reset xs and exit loop.
                xrk(1) = x1_sav
-               xrk(2) = x2_sav                   
+               xrk(2) = x2_sav
             else
-               xrk = xrk - f ! The solution is now in f, so update x 
+               xrk = xrk - f ! The solution is now in f, so update x
                errold = err
             endif
          endif
       enddo
-      
+
       if(err<=acy) then
          ierr = 0
       else

@@ -22,17 +22,17 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module mod_other_e2
 
       ! NOTE: remember to set true:
       ! use_other_e2 = .true.
-      
+
       implicit none
-      
-            
+
+
       contains
-      
+
       subroutine null_other_e2(id, e2, ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : star_info, star_ptr
@@ -42,7 +42,7 @@
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
          type (star_info), pointer :: s
-   
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) then

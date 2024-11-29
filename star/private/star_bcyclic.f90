@@ -61,14 +61,14 @@
          character (len=1) :: equed
          real(dp) :: min_rcond_from_DGESVX, rpgfac
          integer :: k_min_rcond_from_DGESVX
-         
+
          integer, allocatable :: factored(:)
 
          include 'formats'
-         
+
          if (s% use_DGESVX_in_bcyclic .and. s% report_min_rcond_from_DGESXV) &
             min_rcond_from_DGESVX = 1d99
-         
+
          allocate(factored(nz))
          do k=1,nz
             factored(k) = 0
@@ -141,13 +141,13 @@
                return
             end if
 
-            if (nstemp == 1) exit
+            if (nstemp == 1) exit factor_cycle
 
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit factor_cycle
 
          end do factor_cycle
          !call cali_end_phase('factor_cycle')
@@ -171,7 +171,7 @@
             call dealloc
             return
          end if
-         
+
          do k=1,nz ! check that every cell factored exactly once
             if (factored(k) /= 1) then
                write(*,3) 'factored /= 1', k, factored(k)
@@ -180,7 +180,7 @@
          end do
 
          call dealloc
-            
+
          if (s% use_DGESVX_in_bcyclic .and. s% report_min_rcond_from_DGESXV) then
             write(*,4) 'DGESVX: k_min, iter, model, min rcond, rpgfac', &
                k_min_rcond_from_DGESVX, iter, s% model_number, min_rcond_from_DGESVX, rpgfac
@@ -602,12 +602,12 @@
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         
+
          if (s% use_DGESVX_in_bcyclic) then
             call factor_with_DGESVX
             return
          end if
-         
+
          if (nvar == 4) then
             call my_getf2_n4(mtxF, ipivot, ierr)
          else if (nvar == 5) then
@@ -615,9 +615,9 @@
          else
             call my_getf2(nvar, mtxF, nvar, ipivot, ierr)
          end if
-         
+
          contains
-         
+
          subroutine factor_with_DGESVX
             character (len=1) :: fact, trans
             integer, parameter :: nrhs = 0
@@ -633,7 +633,7 @@
                   a(i,j) = mtxF(i,j)
                end do
             end do
-            
+
             if (s% use_equilibration_in_DGESVX) then
                fact = 'E' ! matrix A will be equilibrated, then copied to AF and factored
             else
@@ -648,7 +648,7 @@
             call DGESVX(fact, trans, nvar, nrhs, a, nvar, af, nvar, ipiv, &
                         equed, r, c, b, nvar, x, nvar, rcond, ferr, berr, &
                         work, iwork, ierr)
-               
+
             if (ierr > 0 .and. ierr <= nvar) then ! singular
                write(*,3) 'singular matrix for DGESVX', k, ierr
                call mesa_error(__FILE__,__LINE__,'factor_with_DGESVX')
@@ -657,7 +657,7 @@
                write(*,2) 'DGESVX reports bad matrix conditioning: k, rcond', k, rcond
                ierr = 0
             end if
-            
+
             do i=1,nvar
                do j=1,nvar
                   mtx(i,j) = a(i,j)
@@ -667,7 +667,7 @@
                col_scale_factors(i) = c(i)
                ipivot(i) = ipiv(i)
             end do
-            
+
             if (s% report_min_rcond_from_DGESXV .and. rcond < min_rcond_from_DGESVX) then
                !$OMP CRITICAL (bcyclic_dense_factor_crit)
                min_rcond_from_DGESVX = rcond
@@ -677,9 +677,9 @@
             end if
 
          end subroutine factor_with_DGESVX
-         
+
       end subroutine dense_factor
-   
+
 
       subroutine bcyclic_solve ( &
             s, nvar, nz, lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, ipivot1, &
@@ -704,7 +704,7 @@
 
 
          if (dbg) write(*,*) 'start bcyclic_solve'
-         
+
          ! copy B to soln
          !$OMP PARALLEL DO SIMD
          do i=1,nvar*nz
@@ -745,13 +745,13 @@
                return
             end if
 
-            if (nstemp == 1) exit
+            if (nstemp == 1) exit forward_cycle
 
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit forward_cycle
 
          end do forward_cycle
 
@@ -777,7 +777,7 @@
             nlevel = nlevel-1
             if (nlevel < 1) then
                ierr = -1
-               exit
+               exit back_cycle
             end if
             nstemp = nslevel(nlevel)
             call cycle_solve( &
@@ -829,7 +829,7 @@
          integer :: i
          real(dp), pointer :: X(:)
          ierr = 0
-         
+
          if (s% use_DGESVX_in_bcyclic) then
             call solve_with_DGESVX
             return
@@ -841,9 +841,9 @@
                row_scale_factors, col_scale_factors, equed, ierr)
             if (ierr /= 0) return
          end do
-         
+
          contains
-         
+
          subroutine solve_with_DGESVX
             character (len=1) :: fact, trans
             real(dp) :: rcond
@@ -867,7 +867,7 @@
                c(i) = col_scale_factors(i)
                ipiv(i) = ipivot(i)
             end do
-            
+
             fact = 'F' ! factored
             trans = 'N' ! no transpose
 
@@ -881,7 +881,7 @@
             if (ierr /= 0) then
                write(*,2) 'solve_with_DGESVX failed', k
             end if
-            
+
             do i=1,nvar
                !$OMP SIMD
                do j=1,nvar
@@ -906,12 +906,12 @@
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
-         
+
          if (s% use_DGESVX_in_bcyclic) then
             call solve1_with_DGESVX
             return
          end if
-         
+
          if (nvar == 4) then
             call my_getrs1_n4(mtxF, ipivot, X_vec, ierr)
          else if (nvar == 5) then
@@ -919,9 +919,9 @@
          else
             call my_getrs1(nvar, mtxF, nvar, ipivot, X_vec, nvar, ierr)
          end if
-         
+
          contains
-         
+
          subroutine solve1_with_DGESVX
             character (len=1) :: fact, trans
             real(dp) :: rcond
@@ -945,7 +945,7 @@
                c(i) = col_scale_factors(i)
                ipiv(i) = ipivot(i)
             end do
-            
+
             fact = 'F' ! factored
             trans = 'N' ! no transpose
 
@@ -956,7 +956,7 @@
             call DGESVX(fact, trans, nvar, nrhs, a, nvar, af, nvar, ipiv, &
                         equed, r, c, b, nvar, x, nvar, rcond, ferr, berr, &
                         work, iwork, ierr)
-            
+
             !$OMP SIMD
             do i=1,nvar
                X_vec(i) = x(i,1)

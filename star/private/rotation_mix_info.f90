@@ -259,13 +259,13 @@
          end do
 !$OMP END PARALLEL DO
          if (failed('set_rotation_mixing_info instabilities', ierr)) return
-         
+
          if (s% D_omega_flag .and. s% doing_finish_load_model) then
             do k=1,nz
                s% D_omega(k) = 0d0
             end do
          else if (s% D_omega_flag) then
-                     
+
             do k=1,nz
                if (s% q(k) <= s% max_q_for_D_omega_zero_in_convection_region .and. &
                    s% mixing_type(k) == convective_mixing) then
@@ -302,7 +302,7 @@
                   call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
             end do
-            
+
             if (s% smooth_D_omega > 0) then
                call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, smooth_work(1:nz,1))
                do k=1,nz
@@ -312,9 +312,9 @@
                   end if
                end do
             end if
-            
+
             if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) then
-               call mix_D_omega 
+               call mix_D_omega
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after mix_D_omega s% D_omega(k)', k, s% D_omega(k)
@@ -322,9 +322,9 @@
                   end if
                end do
             end if
-            
+
          end if
-         
+
          if (s% D_omega_flag) then
             do k=1,nz
                if (is_bad(s% D_omega(k))) then
@@ -337,8 +337,8 @@
 
 
          contains
-         
-         
+
+
          subroutine mix_D_omega
             integer :: i, k, nz
             real(dp), dimension(:), allocatable :: & ! work vectors
@@ -347,13 +347,13 @@
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
                d_dt, d_dt_in, d_dt_out
             include 'formats'
-            
+
             nz = s% nz
             dt = s% dt
             if (dt == 0) return
-            
+
             allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
-            
+
             rate = min(s% D_omega_mixing_rate, 1d0/dt)
             do k=2,nz-1
                if (s% D_omega(k) == 0 .or. s% D_omega(k+1) == 0) then
@@ -365,11 +365,11 @@
                    sig(k) = 0
                else
                   sig(k) = rate*dt
-               end if               
+               end if
             end do
             sig(1) = 0
             sig(nz) = 0
-            
+
             do k=1,nz
                if (k < nz) then
                   d_dt_in = sig(k)*(s% D_omega(k+1) - s% D_omega(k))
@@ -394,10 +394,10 @@
                else
                   du(k) = 0
                end if
-               if (k > 1) dl(k-1) = -d_ddt_dm1               
+               if (k > 1) dl(k-1) = -d_ddt_dm1
             end do
             dl(nz) = 0
-            
+
             ! solve tridiagonal
             bp(1) = d(1)
             vp(1) = rhs(1)
@@ -412,7 +412,7 @@
                xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
                x(i) = xp(i)
             end do
-            
+
             do k=2,nz
                if (is_bad(x(k))) then
                   return
@@ -420,9 +420,9 @@
                   call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
             end do
-            
+
             ! update D_omega
-            
+
             do k=2,nz
                s% D_omega(k) = s% D_omega(k) + x(k)
                if (is_bad(s% D_omega(k))) then
@@ -432,7 +432,7 @@
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
             s% D_omega(1) = 0d0
-         
+
          end subroutine mix_D_omega
 
 
@@ -465,7 +465,7 @@
             grav => s% grav
             visc => s% D_visc
             Ri => s% richardson_number
-            
+
             allocate( &
                csound(nz), rho(nz), T(nz), P(nz), cp(nz), cv(nz), chiRho(nz), abar(nz), zbar(nz), &
                opacity(nz), kap_cond(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
@@ -1236,14 +1236,14 @@
                xmagnn = xmagnt*xmagft ! N^2
                xmagwn = xmagw/sqrt(xmagnn) ! omega/N
                xmagkr2n = xkap/(xmagrn*xmagrn*sqrt(xmagnn)) ! kappa/(r^2 N)
-               
+
                !xmagq1 = pow(xmager2w*xmagwn*pow3(xeta/xkap)/pow7(xmagwn),0.25D0) ! q_1
                if(xmagwn > 1d-42) then ! fix from rob
                   xmagq1 = pow(xmager2w*xmagwn*pow3(xeta/xkap)/pow7(xmagwn),0.25D0) ! q_1
                else
                   xmagq1 = 0d0
                end if
-               
+
                xmagwa1 = sqrt(xmagq)*xmagw*pow(xmagwn*xmagkr2n,0.125D0) ! \omega_A
                xmags1a = xmagdn*pow2(xmagw*xmagrn)*xmagq*sqrt(xmagwn*xmagkr2n) ! S_1a
                xmags1b = xmagdn*pow2(xmagw)*pow2(xmagrn)*pow3(xmagq)*pow4(xmagwn) ! S_1b

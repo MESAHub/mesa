@@ -56,7 +56,7 @@
 
          ierr = 0
          nz = s% nz
-         
+
          if (.not. s% calculate_Brunt_B) then
             call set_nan(s% brunt_B(1:nz))
             call set_nan(s% unsmoothed_brunt_B(1:nz))
@@ -233,7 +233,7 @@
 !$OMP END PARALLEL DO
 
       end subroutine do_brunt_B_MHM_form
-      
+
 
       subroutine get_brunt_B(s, species, nz, k, T_face, rho_face, chiT_face, chiRho_face, ierr)
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas

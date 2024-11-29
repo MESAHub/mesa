@@ -864,7 +864,7 @@
             end if
 
             call pgsci(1)
-            
+
             call show_pgstar_decorator(s%id,color_use_decorator,color_pgstar_decorator, j, ierr)
 
          end do
@@ -876,11 +876,11 @@
          end if
 
          call pgunsa
-         
+
          call dealloc
 
          contains
-         
+
          subroutine dealloc
             deallocate(xvec, yvec, other_yvec, yvec1, yvec2, other_yvec1, other_yvec2)
          end subroutine dealloc

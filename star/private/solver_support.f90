@@ -135,7 +135,7 @@
          end if
 
          if (ierr /= 0) return
-         
+
          if (.not. s% stop_for_bad_nums) return
 
          cnt = 0
@@ -154,7 +154,7 @@
                end if
             end do
          end do
-         
+
          if (cnt > 0) then
             ierr = -1
             return
@@ -188,23 +188,23 @@
 
          integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq
-         
+
          logical :: dbg
 
          include 'formats'
 
          ierr = 0
-         
+
          equ_norm = 0d0
          equ_max = 0d0
          k_max = 0
          j_max = 0
-         
+
          dbg = s% solver_check_everything
 
          nvar_hydro = min(nvar, s% nvar_hydro)
          nvar_chem = s% nvar_chem
-         
+
          nz = s% nz
          n = nz
          num_terms = 0
@@ -286,13 +286,13 @@
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
             k_max, s% solver_iter, s% model_number, equ_max, equ_norm
-         
+
          if (dbg) call dump_equ
-         
+
          return
          call dump_equ
          call mesa_error(__FILE__,__LINE__,'sizequ')
-         
+
          contains
 
          subroutine dump_equ
@@ -376,7 +376,7 @@
             skip3 = s% i_w
          end if
          skip4 = s% i_Hp
-                 
+
          skip5 = 0
 
          max_zone = 0
@@ -406,7 +406,7 @@
                    j == skip3 .or. &
                    j == skip4 .or. &
                    j == skip5 .or. &
-                   j == s% i_alpha_RTI) cycle
+                   j == s% i_alpha_RTI) cycle var_loop
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
                      found_bad_num = .true.
@@ -418,16 +418,16 @@
                            j, k, B(j,k)*s% correction_weight(j,k)
                         call mesa_error(__FILE__,__LINE__,'sizeB')
                      end if
-                     
+
                      max_zone = k
                      max_var = j
                      exit cell_loop
-                     
-                     cycle
+
+                     cycle var_loop
                   end if
                end if
                if (j > nvar_hydro) then
-                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle
+                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle var_loop
                end if
 
                abs_corr = abs(B(j,k)*s% correction_weight(j,k))
@@ -707,9 +707,9 @@
                trim(chem_isos% name(s% chem_id(bad_j))), bad_k, &
                s% model_number, s% solver_iter, min_alpha
          end if
-         
+
          contains
-         
+
          subroutine clip_so_non_negative(i,minval)
             integer, intent(in) :: i
             real(dp), intent(in) :: minval
@@ -858,17 +858,17 @@
 
          xh_start => s% xh_start
          xa_start => s% xa_start
-         
+
          report_dx = &
             s% solver_test_partials_dx_0 > 0d0 .and. &
             s% solver_test_partials_k > 0 .and. &
             s% solver_call_number == s% solver_test_partials_call_number .and. &
             s% solver_test_partials_iter_number == s% solver_iter .and. &
             len_trim(s% solver_test_partials_show_dx_var_name) > 0
-            
+
          if (report_dx) then
             k = s% solver_test_partials_k
-            i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)            
+            i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)
             if (i_var > 0) then
                if (i_var > nvar_hydro) then
                   dx_for_i_var = s% solver_dx(i_var,k)
@@ -995,7 +995,7 @@
                end do
             end do
          end if
-         
+
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
@@ -1022,7 +1022,7 @@
             end if
             return
          end if
-         
+
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
@@ -1125,7 +1125,7 @@
             include 'formats'
             ierr = 0
             v = 0
-            
+
             k_below_just_added = 1
 
             do j=1,min(nvar, nvar_hydro)
@@ -1134,7 +1134,7 @@
             end do
 
             if (do_lnT) then
-               
+
                s% lnT(k) = x(i_lnT)
                s% T(k) = exp(s% lnT(k))
                s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
@@ -1224,7 +1224,7 @@
                   if (report) write(*,2) 'bad num Hp_face', k, s% Hp_face(k)
                end if
             end if
-            
+
             if (do_v) then
                s% v(k) = x(i_v)
                s% dxh_v(k) = s% solver_dx(i_v,k)

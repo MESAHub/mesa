@@ -5,11 +5,11 @@
       use const_def, only: dp, PI
 
       implicit none
-      
+
       contains
-      
+
 !* Equation of state for fully ionized electron-ion plasmas (EOS EIP)
-! A.Y.Potekhin & G.Chabrier, Contrib. Plasma Phys., 50 (2010) 82, 
+! A.Y.Potekhin & G.Chabrier, Contrib. Plasma Phys., 50 (2010) 82,
 !       and references therein
 ! Please communicate comments/suggestions to Alexander Potekhin:
 !                                            palex@astro.ioffe.ru
@@ -54,7 +54,7 @@
 !  ELECT11 - for an ideal electron gas of arbitrary degeneracy and
 !          relativity at given temperature and electron chemical
 !          potential, renders number density (in atomic units), free
-!          energy, pressure, internal energy, entropy, heat capacity 
+!          energy, pressure, internal energy, entropy, heat capacity
 !          (normalized to the electron ideal-gas values), logarithmic
 !          derivatives of pressure over temperature and density.
 !  EXCOR7 - electron-electron (exchange-correlation) contributions to
@@ -187,7 +187,7 @@
 ! C%C  113 format(I3,2F8.3,1PE12.4)
 ! C%C  114 format('       Z      CMI        x_j')
 ! C%C      end
-      
+
       subroutine MELANGE9(NMIX,AY,AZion,ACMI,RHO,TEMP, &
          GAMIlo,GAMIhi,PRADnkT, &
          DENS,Zmean,CMImean,Z2mean,GAMImean,CHI,TPT,LIQSOL, &
@@ -197,7 +197,7 @@
 !          Wigner-Kirkwood correction for the entropy corrected 28.05.15
 ! Stems from MELANGE8 v.26.12.09.
 ! Difference: output PRADnkT instead of input KRAD
-! + EOS of fully ionized electron-ion plasma mixture.     
+! + EOS of fully ionized electron-ion plasma mixture.
 ! Limitations:
 ! (a) inapplicable in the regimes of
 !      (1) bound-state formation,
@@ -242,7 +242,7 @@
       type(auto_diff_real_2var_order1), intent(out) :: PRADnkT, DENS, GAMImean
       real(dp), intent(out) :: Zmean, CMImean, Z2mean
       type(auto_diff_real_2var_order1), intent(out) :: CHI, TPT, PnkT, UNkT, SNk, CV, CHIR, CHIT
-      
+
       integer :: IX, I, J
       real(dp) :: Y, Z13, Z52, Z53, Z73, Z321, Zion, CMI
       type(auto_diff_real_2var_order1) :: UINTRAD, PRESSRAD
@@ -352,7 +352,7 @@
          CMI=ACMI(IX)
          GAMI=pow(Zion,5d0/3d0)*GAME ! Gamma_i for given ion species
          DNI=DENSI*AY(IX) ! number density of ions of given type
-         PRI=DNI*TEMP ! = ideal-ions partial pressure (normalization)         
+         PRI=DNI*TEMP ! = ideal-ions partial pressure (normalization)
          if (LIQSOL == 0 .or. LIQSOL == 1) then
             call EOSFI8(LIQSOL,CMI,Zion,RS,GAMI, &
                FC1,UC1,PC1,SC1,CV1,PDT1,PDR1, &
@@ -381,7 +381,7 @@
             CV2 = alfa*CV2_1 + beta*CV2_0
             PDT2 = alfa*PDT2_1 + beta*PDT2_0
             PDR2 = alfa*PDR2_1 + beta*PDR2_0
-         end if         
+         end if
 ! First-order TD functions:
          UINT=UINT+UC2*PRI ! internal energy density (e+i+Coul.)
          Stot=Stot+DNI*(SC2-log(AY(IX))) !entropy per unit volume[a.u.]
@@ -457,11 +457,11 @@
 ! Second-order:
       CV=CVtot/DENSI ! C_V per ion
       CHIR=PDLR/PRESS ! d ln P / d ln\rho
-      CHIT=PDLT/PRESS ! d ln P / d ln T      
+      CHIT=PDLT/PRESS ! d ln P / d ln T
 !      CHIT=CHIT+4.*PRESSRAD/PRESS ! d ln P / d ln T
       return
       end subroutine MELANGE9
-      
+
       subroutine EOSFI8(LIQSOL,CMI,Zion,RS,GAMI, &
         FC1,UC1,PC1,SC1,CV1,PDT1,PDR1, &
         FC2,UC2,PC2,SC2,CV2,PDT2,PDR2,ierr)
@@ -471,18 +471,18 @@
 !                                               slight cleaning 10.12.14
 ! Non-ideal parts of thermodynamic functions in the fully ionized plasma
 ! Stems from EOSFI5 and EOSFI05 v.04.10.05
-! Input: LIQSOL=0/1(liquid/solid), 
+! Input: LIQSOL=0/1(liquid/solid),
 !        Zion,CMI - ion charge and mass numbers,
 !        RS=r_s (electronic density parameter),
 !        GAMI=Gamma_i (ion coupling),
-! Output: FC1 and UC1 - non-ideal "ii+ie+ee" contribution to the 
+! Output: FC1 and UC1 - non-ideal "ii+ie+ee" contribution to the
 !         free and internal energies (per ion per kT),
 !         PC1 - analogous contribution to pressure divided by (n_i kT),
 !         CV1 - "ii+ie+ee" heat capacity per ion [units of k]
 !         PDT1=(1/n_i kT)*(d P_C/d ln T)_V
 !         PDR1=(1/n_i kT)*(d P_C/d ln\rho)_T
 ! FC2,UC2,PC2,SC2,CV2 - analogous to FC1,UC1,PC1,SC1,CV1, but including
-! the part corresponding to the ideal ion gas. This is useful for 
+! the part corresponding to the ideal ion gas. This is useful for
 ! preventing accuracy loss in some cases (e.g., when SC2 << SC1).
 ! FC2 does not take into account the entropy of mixing S_{mix}: in a
 ! mixture, S_{mix}/(N_i k) has to be added externally (see MELANGE9).
@@ -504,8 +504,8 @@
       type(auto_diff_real_2var_order1) :: Fah,Uah,Pah,CVah,PDTah,PDRah
       type(auto_diff_real_2var_order1) :: FSCR,USCR,PSCR,S_SCR,CVSCR,PDTSCR,PDRSCR
       type(auto_diff_real_2var_order1) :: FC0, UC0, PC0, SC0, CV0, PDT0, PDR0
-      
-      real(dp), parameter :: TINY=1.d-20 
+
+      real(dp), parameter :: TINY=1.d-20
       real(dp), parameter :: AUM=1822.888d0 ! a.m.u/m_e
 
       ierr = 0
@@ -602,7 +602,7 @@
       PC2=PItot+PC0
       SC2=SCItot+SC0
       CV2=CVItot+CV0
-      PDT2=PDTi+PDT0      
+      PDT2=PDTi+PDT0
       PDR2=PDRi+PDR0
       return
       end subroutine EOSFI8
@@ -635,7 +635,7 @@
       real(dp), parameter :: C2=-8.4d-5
       real(dp), parameter :: G2=.0037d0
       real(dp), parameter :: SQ32=.8660254038d0 ! SQ32=sqrt(3)/2
-      
+
       real(dp) :: &
          xFION, dFION_dlnGAMI, &
          xUION, dUION_dlnGAMI, &
@@ -669,7 +669,7 @@
          PDTii=CVii/3.0d0 ! p_{ii} + d p_{ii} / d ln T
 
       endif
-      
+
       if (use_FITION9_table .or. debug_FITION9_table) then
          ierr = 0
          call get_FITION9(GAMI%val, &
@@ -733,7 +733,7 @@
 
 
       contains
-      
+
       logical function check1(v, xv, str)
          type(auto_diff_real_2var_order1), intent(in) :: v
          real(dp), intent(in) :: xv
@@ -790,10 +790,10 @@
       type(auto_diff_real_2var_order1) :: DN1, DN1DX, DN1DG, DN1DXX, DN1DGG, DN1DXG
       type(auto_diff_real_2var_order1) :: DN, DNDX, DNDG, DNDXX, DNDGG, DNDXG
       type(auto_diff_real_2var_order1) :: FX, FXDG, FDX, FG, FDG, FDGDH, FDXX, FDGG, FDXG
-      
+
       real(dp), parameter :: XRS=.0140047d0
       real(dp), parameter :: TINY=1.d-19
-      
+
       real(dp) :: &
          xFSCR, dFSCR_dlnRS, dFSCR_dlnGAME, &
          xUSCR, dUSCR_dlnRS, dUSCR_dlnGAME, &
@@ -821,7 +821,7 @@
          PDRSCR=0.d0
          return
       endif
-      
+
       if (use_FSCRliq8_table .or. debug_FSCRliq8_table) then
          ierr = 0
          call get_FSCRliq8(int(Zion), RS%val, GAME%val, &
@@ -831,7 +831,7 @@
             xCVSCR, dCVSCR_dlnRS, dCVSCR_dlnGAME, &
             xPDTSCR, dPDTSCR_dlnRS, dPDTSCR_dlnGAME, &
             xPDRSCR, dPDRSCR_dlnRS, dPDRSCR_dlnGAME, skip, ierr)
-         if (ierr /= 0) return      
+         if (ierr /= 0) return
       else
          skip = .true.
       endif
@@ -981,7 +981,7 @@
          CVSCR% d1val2 = dCVSCR_dlnRS * dlnRS_dRho + dCVSCR_dlnGAME * dlnGAME_dRho
          PDTSCR% d1val2 = dPDTSCR_dlnRS * dlnRS_dRho + dPDTSCR_dlnGAME * dlnGAME_dRho
          PDRSCR% d1val2 = dPDRSCR_dlnRS * dlnRS_dRho + dPDRSCR_dlnGAME * dlnGAME_dRho
-         
+
       end if
 
       contains
@@ -1045,7 +1045,7 @@
       type(auto_diff_real_2var_order1) :: GR3, GR3X, GR3DX, GR3G, GR3DG, GR3DXX, GR3DGG, GR3DXG
       type(auto_diff_real_2var_order1) :: W, WDX, WDG, WDXX, WDGG, WDXG
       type(auto_diff_real_2var_order1) :: FDX, FDG, FDXX, FDGG, FDXG
-      
+
       real(dp) :: AP(4)
       real(dp) :: ENAT
       real(dp) :: TINY
@@ -1191,7 +1191,7 @@
       type(auto_diff_real_2var_order1), intent(in) :: GAMI,TPT
       type(auto_diff_real_2var_order1), intent(out) :: Fah,Uah,Pah,CVah,PDTah,PDRah
       integer, parameter :: NM=3
-      
+
       integer :: N
       real(dp) :: AA(3)
       type(auto_diff_real_2var_order1) :: CK, TPT2, TPT4, TQ, TK2, SUP
@@ -1205,7 +1205,7 @@
       AA(2) = 247.0d0
       AA(3) = 1.765d5
 
-      
+
       CK=B1/AA(1) ! fit coefficient
       TPT2=TPT*TPT
       TPT4=TPT2*TPT2
@@ -1242,7 +1242,7 @@
       subroutine FHARM12(GAMI,TPT, &
          Fharm,Uharm,Pharm,CVth,Sharm,PDTharm,PDRharm)
 ! Thermodynamic functions of a harmonic crystal, incl.stat.Coul.lattice
-! 
+!
 !                                                       Version 27.04.12
 ! Stems from FHARM8 v.15.02.08
 ! Replaced HLfit8 with HLfit12: rearranged output.
@@ -1255,9 +1255,9 @@
 
       type(auto_diff_real_2var_order1) :: Fth,Uth,Sth,U0,E0
       type(auto_diff_real_2var_order1) :: F,U,U1
-      
+
       real(dp), parameter :: CM = .895929256d0 ! Madelung
-      
+
       call HLfit12(TPT,F,U,CVth,Sth,U1,1)
       U0=-CM*GAMI ! perfect lattice
       E0=1.5d0*U1*TPT ! zero-point energy
@@ -1294,10 +1294,10 @@
       real(dp) :: B0, B2, B4, B5, B6, B7, B9, B11
       real(dp) :: C9, C11
       type(auto_diff_real_2var_order1) :: UP, DN, EA, EB, EG, UP1, UP2, DN1, DN2, E0
-      
+
       real(dp) :: EPS
       real(dp) :: TINY
-      
+
       EPS=1.d-5
       TINY=1.d-99
 
@@ -1414,11 +1414,11 @@
 
       type(auto_diff_real_2var_order1) :: GAMImean, Dif0, DifR, DifFDH, D
       type(auto_diff_real_2var_order1) :: P3, D0, GP, FMIX0, Q, R, GQ, G, GDG, UDG
-      
+
       real(dp) :: TINY
 
       TINY=1.d-9
-      
+
       GAMImean=GAME*Z53
       if (RS.lt.TINY) then ! OCP
          Dif0=Z52-sqrt(Z2mean*Z2mean*Z2mean/Zmean)
@@ -1462,7 +1462,7 @@
         DlnDH,DlnDT,DlnDHH,DlnDTT,DlnDHT)
 !                                                       Version 17.11.11
 ! ELECT9 v.04.03.09 + smooth match of two fits at chi >> 1 + add.outputs
-! Compared to ELECTRON v.06.07.00, this S/R is completely rewritten: 
+! Compared to ELECTRON v.06.07.00, this S/R is completely rewritten:
 !        numerical differentiation is avoided now.
 ! Compared to ELECT7 v.06.06.07,
 !    - call BLIN7 is changed to call BLIN9,
@@ -1486,7 +1486,7 @@
       type(auto_diff_real_2var_order1) :: X2, FP, FM
       type(auto_diff_real_2var_order1) :: DENSa,FEida,PEida,UEida,SEida,CVEa,CHITEa,CHIREa,DlnDHa,DlnDTa,DlnDHHa,DlnDTTa,DlnDHTa
       type(auto_diff_real_2var_order1) :: DENSb,FEidb,PEidb,UEidb,SEidb,CVEb,CHITEb,CHIREb,DlnDHb,DlnDTb,DlnDHHb,DlnDTTb,DlnDHTb
-      
+
       type(auto_diff_real_2var_order1) :: CHI1
       type(auto_diff_real_2var_order1) :: CHI2
       type(auto_diff_real_2var_order1) :: XMAX
@@ -1500,7 +1500,7 @@
       DCHI1=0.1d0
       DCHI2=CHI2-CHI1-DCHI1
       XSCAL2=XMAX/DCHI2
-      
+
       X2=(CHI-CHI2)*XSCAL2
       if (X2.lt.-XMAX) then
          call ELECT11a(TEMP,CHI, &
@@ -1549,14 +1549,14 @@
       type(auto_diff_real_2var_order1) :: W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT
       type(auto_diff_real_2var_order1) :: W0XXX,W0XTT,W0XXT
       type(auto_diff_real_2var_order1) :: TPI, DENR, PR, U
-      type(auto_diff_real_2var_order1) :: dndT, dPdT, dUdT, dndH, dPdH, dUdH      
+      type(auto_diff_real_2var_order1) :: dndT, dPdT, dUdT, dndH, dPdH, dUdH
       type(auto_diff_real_2var_order1) :: dndHH, dndHT, dndTT
 
       type(auto_diff_real_2var_order1) :: BOHR
       type(auto_diff_real_2var_order1) :: PI2
       type(auto_diff_real_2var_order1) :: BOHR2
       type(auto_diff_real_2var_order1) :: BOHR3
-      
+
       BOHR=137.036d0
       PI2=PI*PI
       BOHR2=BOHR*BOHR
@@ -1612,7 +1612,7 @@
       type(auto_diff_real_2var_order1) :: TEMR, EF, DeltaEF, G, PF, F, DF, P, DelP, S, U
       type(auto_diff_real_2var_order1) :: DENR, DT, D1, D2
       type(auto_diff_real_2var_order1) :: TPI, dndH, dndT, dndHH, dndHT, dndTT
-      type(auto_diff_real_2var_order1) :: W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT,W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT      
+      type(auto_diff_real_2var_order1) :: W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT,W1,W1DX,W1DT,W1DXX,W1DTT,W1DXT,W2,W2DX,W2DT,W2DXX,W2DTT,W2DXT,W0XXX,W0XTT,W0XXT
 
       type(auto_diff_real_2var_order1) :: BOHR
       type(auto_diff_real_2var_order1) :: PI2
@@ -1803,7 +1803,7 @@
       type(auto_diff_real_2var_order1), intent(in) :: X
       type(auto_diff_real_2var_order1) :: XMAX  ! not sure if this side-effect is desired
       type(auto_diff_real_2var_order1), intent(out) :: FP, FM
-      
+
       if (XMAX.lt.3.d0) XMAX = 3d0 !call mesa_error(__FILE__,__LINE__,'FERMI: XMAX')
       if (X.gt.XMAX) then
          FP=0.d0
@@ -1889,7 +1889,7 @@
       endif
 
       if (.not. use_EXCOR7_table .or. debug_EXCOR7_table .or. skip) then
-      
+
          THETA=0.543d0*RS/GAME ! non-relativistic degeneracy parameter
          SQTH=sqrt(THETA)
          THETA2=THETA*THETA
@@ -2110,9 +2110,9 @@
          PDRXC% d1val2 = dPDRXC_dlnRS * dlnRS_dRho + dPDRXC_dlnGAME * dlnGAME_dRho
 
       end if
-      
+
       contains
-      
+
       logical function check1(v, xv, str)
          type(auto_diff_real_2var_order1), intent(in) :: v
          real(dp), intent(in) :: xv
@@ -2157,7 +2157,7 @@
       integer :: I
       type(auto_diff_real_2var_order1) :: P, T, T1, T2, UP, UP1, UP2, DOWN, DOWN1, DOWN2
       type(auto_diff_real_2var_order1) :: R, R1, R2, RT
-      
+
       ! The next four are really parameters but there isn't a clean way to initialize them
       ! at declaration time. - Adam Jermyn 4/2/2020
       real(dp) :: A(0:5,0:3) ! read only after initialization
@@ -2225,7 +2225,7 @@
           -2.315515517515d-2,9.198776585252d-2,-3.835879295548d-1, &
              5.415026856351d-1,-3.847241692193d-1,3.739781456585d-2, &
              -3.008504449098d-2/) ! X_{5/2}
-      
+
       if (N.lt.0d0 .or.N.gt.3d0) call mesa_error(__FILE__,__LINE__,'FERINV7: Invalid subscript')
       if (F.le.0.d0) F = 1d-99 !call mesa_error(__FILE__,__LINE__,'FERINV7: Non-positive argument')
       if (F.lt.4.d0) then
@@ -2310,7 +2310,7 @@
       type(auto_diff_real_2var_order1) :: W1b,W1DXb,W1DTb,W1DXXb,W1DTTb,W1DXTb
       type(auto_diff_real_2var_order1) :: W2b,W2DXb,W2DTb,W2DXXb,W2DTTb,W2DXTb
       type(auto_diff_real_2var_order1) :: W0XXXb,W0XTTb,W0XXTb
-      
+
       type(auto_diff_real_2var_order1) :: CHI1
       type(auto_diff_real_2var_order1) :: CHI2
       type(auto_diff_real_2var_order1) :: XMAX
@@ -2326,7 +2326,7 @@
       DCHI2=CHI2-CHI1-DCHI1
       XSCAL1=XMAX/DCHI1
       XSCAL2=XMAX/DCHI2
-      
+
       X1=(CHI-CHI1)*XSCAL1
       X2=(CHI-CHI2)*XSCAL2
       if (X1.lt.-XMAX) then
@@ -2381,7 +2381,7 @@
          W2DT=W2DTa*FP+W2DTb*FM
          W2DXX=W2DXXa*FP+W2DXXb*FM !! +2.d0*(W2DXa-W2DXb)*F1+(W2a-W2b)*F2
          W2DTT=W2DTTa*FP+W2DTTb*FM
-         W2DXT=W2DXTa*FP+W2DXTb*FM !! 
+         W2DXT=W2DXTa*FP+W2DXTb*FM !!
       else
          call BLIN9c(TEMP,CHI, &
            W0,W0DX,W0DT,W0DXX,W0DTT,W0DXT, &
@@ -2538,7 +2538,7 @@
          (/.29505869d0, .32064856d0, 7.3915570d-2,  &
               3.6087389d-3, 2.3369894d-5/) ! \bar{V}_i
       real(dp), parameter :: EPS=1.d-3
-      
+
       if (CHI.lt.EPS) CHI = EPS !call mesa_error(__FILE__,__LINE__,'BLIN9b: CHI is too small')
         do K=0,2
            W=0.d0
@@ -2660,7 +2660,7 @@
       type(auto_diff_real_2var_order1) :: FJ0XXX, FJ0XXT, FJ0XTT
       type(auto_diff_real_2var_order1) :: FJ1, FJ1DX, FJ1DT, FJ1DXX, FJ1DXT, FJ1DTT
       type(auto_diff_real_2var_order1) :: FJ2, FJ2DX, FJ2DT, FJ2DXX, FJ2DXT, FJ2DTT
-      
+
       integer :: J, K
       real(dp), parameter :: PI26=PI*PI/6.
 
@@ -2874,7 +2874,7 @@
       type(auto_diff_real_2var_order1), intent(out) :: CHI
 
       type(auto_diff_real_2var_order1) :: DENR,TEMR,CMU1,CMUDENR,CMUDT,CMUDTT
-      
+
       DENR=DENS/2.5733806d6 ! n_e in rel.un.=\lambda_{Compton}^{-3}
       TEMR=TEMP/1.8778865d4 ! T in rel.un.=(mc^2/k)=5.93e9 K
       call CHEMFIT7(DENR,TEMR,CHI,CMU1,0,CMUDENR,CMUDT,CMUDTT)
@@ -2909,13 +2909,13 @@
       type(auto_diff_real_2var_order1) :: HDY, HDT, HDYY, HDTT, HDYT
       type(auto_diff_real_2var_order1) :: CTY, CTT, CTDY, CTDT, CTDYY, CTDTT, CTDYT
       type(auto_diff_real_2var_order1) :: CHIDT, CHIDTT, CHIDYT
-      
+
       real(dp), parameter :: PARA=1.612d0
       real(dp), parameter :: PARB=6.192d0
       real(dp), parameter :: PARC=0.0944d0
       real(dp), parameter :: PARF=5.535d0
       real(dp), parameter :: PARG=0.698d0
-      
+
       PF0=pow(29.6088132d0*DENR,1d0/3d0) ! Classical Fermi momentum
       if (PF0.gt.1.d-4) then
          TF=sqrt(1.d0+PF0*PF0)-1.d0 ! Fermi temperature
@@ -2931,7 +2931,7 @@
       THETAG=pow(THETA,PARG)
       D3=PARB*THETAC*T1*T1+PARF*THETAG
       Q3=1.365568127d0-U3/D3 ! 1.365...=2/\pi^{1/3}
-      if (THETA.gt.1.d-5) then 
+      if (THETA.gt.1.d-5) then
          Q1=1.5d0*T1/(1.d0-T1)
       else
          Q1=1.5d0/THETA
@@ -2958,7 +2958,7 @@
       CHIDY=-XDF/THETA52 ! d\chi/d\theta
       CHIDYY=(XDFF/pow4(THETA)-2.5d0*CHIDY)/THETA ! d^2\chi/d\theta^2
 ! (b): Relativistic corrections:
-      if (THETA.gt.1.d-5) then 
+      if (THETA.gt.1.d-5) then
          Q1D=-Q1/(1.d0-T1)
          Q1DD=-Q1D*(1.d0+T1)/(1.d0-T1)
       else
@@ -3002,5 +3002,5 @@
       CMUDTT=2.d0*(CHIDY/TF+CHIDT+THETA*CHIDYT)+THETA/TF*CHIDYY+TEMR*CHIDTT
       return
       end subroutine CHEMFIT7
-      
+
       end module pc_eos

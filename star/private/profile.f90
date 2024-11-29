@@ -94,7 +94,7 @@
          end if
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(profile_columns_file)
             return
          end if
@@ -137,25 +137,25 @@
                   ierr = -1; call error; return
                end if
                call count_specs
-               
+
             case ('add_eps_neu_rates')
                call insert_spec(eps_neu_rate_offset, 'add_eps_neu_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_eps_nuc_rates')
                call insert_spec(eps_nuc_rate_offset, 'add_eps_nuc_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_screened_rates')
                call insert_spec(screened_rate_offset, 'add_screened_rates', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_raw_rates')
                call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
                if (spec_err /= 0) then
@@ -297,8 +297,8 @@
          if (dbg) write(*,*) 'num profile columns', cnt-1
          if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_profile_columns')
       end subroutine set_profile_columns
-      
-      
+
+
       integer function do_get_num_standard_profile_columns(s) ! not inluding extra profile columns
          use star_def, only: star_info
          type (star_info), pointer :: s
@@ -314,8 +314,8 @@
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
             else if (s% profile_column_spec(j) == raw_rate_offset .or. &
-                     s% profile_column_spec(j) == screened_rate_offset .or. & 
-                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. & 
+                     s% profile_column_spec(j) == screened_rate_offset .or. &
+                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. &
                      s% profile_column_spec(j) == eps_neu_rate_offset) then
                numcols = numcols + s% num_reactions
             else
@@ -370,7 +370,7 @@
          use pulse, only: export_pulse_data
          use math_lib, only: math_backend
          use utils_lib, only: mkdir, folder_exists
-         
+
          type (star_info), pointer :: s
          character (len=*) :: fname
          logical, intent(in) :: write_flag
@@ -417,7 +417,7 @@
             write(*,*) 'WARNING: do not have any output specified for profiles.'
             return
          end if
-      
+
          numcols = do_get_num_standard_profile_columns(s)
 
          num_extra_cols = s% how_many_extra_profile_columns(s% id)
@@ -579,7 +579,7 @@
                call do_val(i, 'time_seconds', s% time)
 
                call do_string(i, 'version_number', version_number)
-               
+
                if (s% profile_header_include_sys_details) then ! make this optional
                   call do_string(i, 'compiler', compiler_name)
                   call do_string(i, 'build', compiler_version_name)
@@ -725,7 +725,7 @@
 
          contains
 
-           
+
            subroutine do_string(pass, col_name, val)
              integer, intent(in) :: pass
              character (len=*), intent(in) :: col_name, val

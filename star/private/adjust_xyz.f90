@@ -100,7 +100,7 @@
          nz = max(s% nz, s% prev_mesh_nz)
          chem_id => s% chem_id
          num_reactions = s% num_reactions
-         
+
          write(*,*) 'change to "' // trim(new_net_name)//'"'
          write(*,*) 'number of species', s% species
 
@@ -131,7 +131,7 @@
          if (associated(s% d_eos_dxa)) deallocate(s% d_eos_dxa)
          allocate(s% d_eos_dxa(num_eos_d_dxa_results, species, nz + nz_alloc_extra), stat=ierr)
          if (ierr /= 0) return
-         
+
          call realloc(s% xa_sub_xa_start); if (ierr /= 0) return
          call realloc(s% xa_start); if (ierr /= 0) return
          call realloc(s% prev_mesh_xa); if (ierr /= 0) return
@@ -139,13 +139,13 @@
          if (s% generations > 1) call do_xa(s% nz_old, s% xh_old, s% xa_old)
 
          call realloc_reactions(s% raw_rate)
-         if(ierr/=0) return 
+         if(ierr/=0) return
          call realloc_reactions(s% screened_rate)
-         if(ierr/=0) return 
+         if(ierr/=0) return
          call realloc_reactions(s% eps_nuc_rate)
-         if(ierr/=0) return 
+         if(ierr/=0) return
          call realloc_reactions(s% eps_neu_rate)
-         if(ierr/=0) return 
+         if(ierr/=0) return
 
          s% need_to_setvars = .true.
          s% prev_mesh_species_or_nvar_hydro_changed = .true.
@@ -668,7 +668,7 @@
          end if
 
          call set_abundance_ratio(s% id, ih1, ihe4, ratio, nzlo, nzhi, ierr)
-         
+
       end subroutine set_y
 
 

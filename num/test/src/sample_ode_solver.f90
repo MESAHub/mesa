@@ -9,7 +9,7 @@
 !   by the Free Software Foundation; either version 2 of the License, or
 !   (at your option) any later version.
 !
-!   MESA is distributed in the hope that it will be useful, 
+!   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !   GNU Library General Public License for more details.
@@ -21,7 +21,7 @@
 ! ***********************************************************************
 
       module vdpol
-      
+
       ! for information about this problem,
       ! see http://pitagora.dm.uniba.it/~testset/problems/vdpol.php
 
@@ -30,40 +30,40 @@
       use mtx_lib
       use math_lib
       use utils_lib, only: mesa_error
-      
+
       implicit none
-      
+
       ! stiffness parameter
       real(dp), parameter :: mu = 1d-3
-      
-         
-      
+
+
+
       contains
-      
-      
+
+
       subroutine solve_vdpol
-      
+
          ! args for isolve -- see num_isolve.dek in num/public
-      
+
          integer, parameter :: which_solver = ros3p_solver ! as defined in num_def.f
-      
+
          integer, parameter :: n = 2 ! the number of variables in the "vdpol" system of ODEs
 
-         real(dp) :: x 
+         real(dp) :: x
             ! input: initial x value
             ! output: x value for which the solution has been computed.
-         real(dp), pointer :: y(:) 
+         real(dp), pointer :: y(:)
             ! input: initial values for y
             ! output: values of y for final value of x.
          real(dp) :: xend ! desired final x value (positive or negative)
-         real(dp) :: h 
+         real(dp) :: h
             ! input: initial step size guess
             ! output: predicted next step size from the last accepted step
          real(dp) :: max_step_size
          integer :: max_steps
-      
+
          ! absolute and relative error tolerances
-         real(dp) :: rtol(1), atol(1) 
+         real(dp) :: rtol(1), atol(1)
          integer :: itol
 
          ! information about the jacobian matrix
@@ -71,10 +71,10 @@
 
          ! information about the "mass" matrix
          integer :: imas, mlmas, mumas
-      
+
          ! switch for calling the subroutine solout or nor
          integer :: iout
-      
+
          integer :: lrd, lid
          real(dp), pointer :: rpar_decsol(:) ! (lrd)
          integer, pointer :: ipar_decsol(:) ! (lid)
@@ -82,30 +82,30 @@
          integer :: caller_id, nvar, nz
          real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
          real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
-         
-      
+
+
          ! work arrays.
          integer :: lwork, liwork
          real(dp), pointer :: work(:) ! (lwork)
          integer, pointer :: iwork(:) ! (liwork)
-         
+
          ! parameter arrays.
          integer, parameter :: lrpar = 1, lipar = 3
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
-               
+
          ! io unit for warnings and errors
          integer :: lout
-      
+
          ! result code
          integer :: idid
-      
+
          integer :: ierr, i
          real(dp) :: yexact(n), y_min, y_max
          real(dp), target :: y_ary(n)
-         
+
          ipar => ipar_ary
          rpar => rpar_ary
          y => y_ary
@@ -114,9 +114,9 @@
          caller_id = 0
          nvar = 0
          nz = 0
-         
+
          x = 0
-         
+
          y(1) = 2d0
          y(2) = 0d0
 
@@ -124,16 +124,16 @@
 
          h = 1d-10
 
-         max_step_size = 0 
+         max_step_size = 0
          max_steps = 500000
 
          rtol(1) = 1d-8
          atol(1) = 1d-8
          itol = 0
-         
+
          y_min = -1d199
          y_max = 1d199
-         
+
          ijac = 1
          nzmax = 0
          isparse = 0
@@ -142,64 +142,64 @@
 
          imas = 0
          mlmas = 0
-         mumas = 0        
-         
+         mumas = 0
+
          iout = 1
-         
+
          lid = 0
          lrd = 0
 
          ipar = 0
-         rpar = 0         
+         rpar = 0
 
          lout = 6
 
          call lapack_work_sizes(n, lrd, lid)
 
          call isolve_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
-         
+
          allocate(iwork(liwork), work(lwork), ipar_decsol(lid), rpar_decsol(lrd), stat=ierr)
          if (ierr /= 0) then
             write(*, *) 'allocate ierr', ierr
             call mesa_error(__FILE__,__LINE__)
          end if
-      
+
          iwork = 0
          work = 0
-         
+
          write(*,*)
          write(*,*) 'vdpol'
          write(*,*)
-         
+
          call isolve( &
-            which_solver, n, vdpol_derivs, x, y, xend, & 
-            h, max_step_size, max_steps, & 
-            rtol, atol, itol, y_min, y_max, & 
-            vdpol_jacob, ijac, null_sjac, nzmax, isparse, mljac, mujac, & 
-            null_mas, imas, mlmas, mumas, & 
-            vdpol_solout, iout, & 
+            which_solver, n, vdpol_derivs, x, y, xend, &
+            h, max_step_size, max_steps, &
+            rtol, atol, itol, y_min, y_max, &
+            vdpol_jacob, ijac, null_sjac, nzmax, isparse, mljac, mujac, &
+            null_mas, imas, mlmas, mumas, &
+            vdpol_solout, iout, &
             lapack_decsol, null_decsols, null_decsolblk, &
-            lrd, rpar_decsol, lid, ipar_decsol, &  
-            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, & 
+            lrd, rpar_decsol, lid, ipar_decsol, &
+            caller_id, nvar, nz, lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk, &
             null_fcn_blk_dble, null_jac_blk_dble, &
-            work, lwork, iwork, liwork, & 
-            lrpar, rpar, lipar, ipar, & 
+            work, lwork, iwork, liwork, &
+            lrpar, rpar, lipar, ipar, &
             lout, idid)
-            
+
          if (idid /= 1) ierr = -1
          if (ierr /= 0) then
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          write(*,*)
          write(*,*) 'nsteps', iwork(16)
-         
+
          deallocate(iwork, work, ipar_decsol, rpar_decsol)
-         
+
          ! expected solution for stiffness param = 1d-3
-         yexact(1) =  1.7632345401889102d+00           
+         yexact(1) =  1.7632345401889102d+00
          yexact(2) = -8.3568868191466206d-01
-         
+
          write(*,'(/,a5,99a20)') 'i', 'calculated    ', 'reference    ', 'lg(abs rel diff)'
          do i=1, n
             write(*,'(i5,2e20.10,f20.10)') i, y(i), yexact(i), &
@@ -261,10 +261,10 @@
             end function interp_y
          end interface
          integer, intent(out) :: irtrn
-         
+
          real(dp) :: xout, y1, y2
          integer :: ierr
-         
+
          ierr = 0
          irtrn = 0
          xout = rpar(1)
@@ -291,17 +291,17 @@
          end if
          rpar(1) = xout
   99     format(1x, 'x =', f5.2, '    y =', 2e18.10, '    nstep =', i8)
-  
+
       end subroutine vdpol_solout
 
 
       end module vdpol
-      
+
 
       program sample_ode_solver
       use vdpol
       implicit none
-      
+
       call solve_vdpol
-      
+
       end program sample_ode_solver

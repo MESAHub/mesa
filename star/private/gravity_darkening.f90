@@ -8,7 +8,7 @@
 !!%
 !!%         0 (no rotation) <= omega <= 1 (critical rotation)
 !!%         0 (equator) <= inclination in radians <= pi/2 (pole)
-!!% 
+!!%
 !!%
 !!% The coefficients are obtained via 2D interpolation using the interp_2d
 !!% module in tables. The tables were computed using the code at
@@ -45,7 +45,7 @@ module gravity_darkening
 
   private
   public :: gravity_darkening_Teff_coeff, gravity_darkening_L_coeff
-  
+
 contains
 
   subroutine GD_init(ierr)
@@ -63,7 +63,7 @@ contains
     ibcxmin = 0; bcxmin = 0
     ibcxmax = 0; bcxmax = 0
     ibcymin = 0; bcymin = 0
-    ibcymax = 0; bcymax = 0    
+    ibcymax = 0; bcymax = 0
 
     coefficient_filename = trim(mesa_data_dir) // '/star_data/gravity_darkening_coefficients.data'
 
@@ -90,7 +90,7 @@ contains
          ibcxmin, bcxmin, ibcxmax, bcxmax, ibcymin, bcymin, ibcymax, bcymax, &
          ilinx, iliny, ierr)
 
-    if(ierr==0) GD_initialized = .true.    
+    if(ierr==0) GD_initialized = .true.
   end subroutine GD_init
 
 

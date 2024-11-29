@@ -3,7 +3,7 @@ program create_table
    use iso_fortran_env, only : error_unit
    character(len=64) :: inlist_fname
    integer :: ios
-   
+
    ios = 0
    call get_command_argument(1,inlist_fname,status=ios)
    if (ios /= 0) then
