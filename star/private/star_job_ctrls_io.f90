@@ -135,7 +135,7 @@
          new_v_center, &
          dv_per_step, &
          relax_v_center_dt, &
-         
+
          zero_alpha_RTI, &
          zero_initial_alpha_RTI, &
 
@@ -216,7 +216,7 @@
          remove_surface_do_entropy, &
          remove_surface_turn_off_energy_sources_and_sinks, &
          remove_surface_by_relax_to_star_cut, &
-         
+
          remove_initial_surface_at_cell_k, &
          remove_initial_surface_at_he_core_boundary, &
          remove_initial_surface_by_optical_depth, &
@@ -292,53 +292,53 @@
          relax_mass_change_max_yrs_dt, &
          relax_mass_change_init_mdot, &
          relax_mass_change_final_mdot, &
-         
+
          change_RTI_flag, &
          change_initial_RTI_flag, &
          new_RTI_flag, &
-         
+
          change_RSP_flag, &
          change_initial_RSP_flag, &
          new_RSP_flag, &
-         
+
          change_RSP2_flag, &
          change_initial_RSP2_flag, &
          change_RSP2_flag_at_model_number, &
          new_RSP2_flag, &
          create_RSP2_model, &
-         
+
          change_w_div_wc_flag, &
          change_initial_w_div_wc_flag, &
          new_w_div_wc_flag, &
-         
+
          change_j_rot_flag, &
          change_initial_j_rot_flag, &
          new_j_rot_flag, &
-         
+
          create_RSP_model, &
-         
+
          change_v_flag, &
          change_initial_v_flag, &
          new_v_flag, &
-         
+
          change_D_omega_flag, &
          change_initial_D_omega_flag, &
          new_D_omega_flag, &
-         
+
          change_am_nu_rot_flag, &
          change_initial_am_nu_rot_flag, &
          new_am_nu_rot_flag, &
-         
+
          use_D_omega_for_am_nu_rot, &
-         
+
          change_u_flag, &
          change_initial_u_flag, &
          new_u_flag, &
-         
+
          change_reconstruction_flag, &
          change_initial_reconstruction_flag, &
          new_reconstruction_flag, &
-         
+
          center_ye_limit_for_v_flag, &
          change_rotation_flag, &
          change_initial_rotation_flag, &
@@ -346,7 +346,7 @@
          use_w_div_wc_flag_with_rotation, &
          use_j_rot_flag_with_rotation, &
 
-         
+
          set_omega, &
          set_initial_omega, &
          set_omega_step_limit, &
@@ -430,21 +430,21 @@
          limit_initial_dt, &
          years_for_initial_dt, &
          seconds_for_initial_dt, &
- 
+
          set_initial_cumulative_energy_error, &
          set_cumulative_energy_error, &
          set_cumulative_energy_error_at_step, &
          set_cumulative_energy_error_each_step_if_age_less_than, &
          set_cumulative_energy_error_each_relax, &
          new_cumulative_energy_error, &
-         
+
          change_net, &
          change_initial_net, &
          new_net_name, &
          change_small_net, &
          change_initial_small_net, &
          new_small_net_name, &
-         
+
          h_he_net, &
          co_net, &
          adv_net, &
@@ -452,7 +452,7 @@
          set_uniform_xa_from_file, &
          set_uniform_initial_xa_from_file, &
          file_for_uniform_xa, &
-      
+
          mix_section, mix_initial_section, &
          mix_section_nzlo, mix_section_nzhi, &
 
@@ -511,11 +511,11 @@
          chem_name2, &
          replace_element_nzlo, replace_element_nzhi, &
          do_special_test, &
-         
+
          save_pulse_data_for_model_number, &
          save_pulse_data_when_terminate, &
          save_pulse_data_filename, &
-         
+
          chem_isotopes_filename, &
          ionization_file_prefix, &
          ionization_Z1_suffix, &
@@ -535,7 +535,7 @@
          color_file_names,&
          color_num_colors,&
          warn_run_star_extras, &
-         
+
          report_garbage_collection, &
          num_steps_for_garbage_collection
 
@@ -609,7 +609,7 @@
             read_extra_star_job_inlist(i) = .false.
             extra(i) = extra_star_job_inlist_name(i)
             extra_star_job_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read_star_job_file(s, extra(i), level+1, ierr)
                if (ierr /= 0) return
@@ -730,7 +730,7 @@
          s% job% new_v_center = new_v_center
          s% job% dv_per_step = dv_per_step
          s% job% relax_v_center_dt = relax_v_center_dt
-         
+
          s% job% zero_alpha_RTI = zero_alpha_RTI
          s% job% zero_initial_alpha_RTI = zero_initial_alpha_RTI
 
@@ -820,7 +820,7 @@
          s% job% remove_surface_by_v_surf_div_v_escape = remove_surface_by_v_surf_div_v_escape
          s% job% min_q_for_remove_surface_by_v_surf_div_v_escape = min_q_for_remove_surface_by_v_surf_div_v_escape
          s% job% max_q_for_remove_surface_by_v_surf_div_v_escape = max_q_for_remove_surface_by_v_surf_div_v_escape
-         
+
          s% job% remove_surface_do_jrot = remove_surface_do_jrot
          s% job% remove_surface_do_entropy = remove_surface_do_entropy
          s% job% remove_surface_turn_off_energy_sources_and_sinks = remove_surface_turn_off_energy_sources_and_sinks
@@ -904,7 +904,7 @@
          s% job% change_j_rot_flag = change_j_rot_flag
          s% job% change_initial_j_rot_flag = change_initial_j_rot_flag
          s% job% new_j_rot_flag = new_j_rot_flag
-         
+
          s% job% create_RSP_model = create_RSP_model
 
          s% job% change_v_flag = change_v_flag
@@ -925,7 +925,7 @@
          s% job% change_reconstruction_flag = change_reconstruction_flag
          s% job% change_initial_reconstruction_flag = change_initial_reconstruction_flag
          s% job% new_reconstruction_flag = new_reconstruction_flag
-         
+
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
          s% job% change_rotation_flag = change_rotation_flag
          s% job% change_initial_rotation_flag = change_initial_rotation_flag
@@ -1015,21 +1015,21 @@
          s% job% limit_initial_dt = limit_initial_dt
          s% job% years_for_initial_dt = years_for_initial_dt
          s% job% seconds_for_initial_dt = seconds_for_initial_dt
- 
+
          s% job% set_initial_cumulative_energy_error = set_initial_cumulative_energy_error
          s% job% set_cumulative_energy_error = set_cumulative_energy_error
          s% job% set_cumulative_energy_error_at_step = set_cumulative_energy_error_at_step
          s% job% set_cumulative_energy_error_each_step_if_age_less_than = set_cumulative_energy_error_each_step_if_age_less_than
          s% job% new_cumulative_energy_error = new_cumulative_energy_error
          s% job% set_cumulative_energy_error_each_relax = set_cumulative_energy_error_each_relax
-         
+
          s% job% change_net = change_net
          s% job% change_initial_net = change_initial_net
          s% job% new_net_name = new_net_name
          s% job% change_small_net = change_small_net
          s% job% change_initial_small_net = change_initial_small_net
          s% job% new_small_net_name = new_small_net_name
-         
+
          s% job% h_he_net = h_he_net
          s% job% co_net = co_net
          s% job% adv_net = adv_net
@@ -1100,11 +1100,11 @@
          s% job% replace_element_nzlo = replace_element_nzlo
          s% job% replace_element_nzhi = replace_element_nzhi
          s% job% do_special_test = do_special_test
-         
+
          s% job% save_pulse_data_for_model_number = save_pulse_data_for_model_number
          s% job% save_pulse_data_when_terminate = save_pulse_data_when_terminate
          s% job% save_pulse_data_filename = save_pulse_data_filename
-         
+
          s% job% chem_isotopes_filename = chem_isotopes_filename
          s% job% ionization_file_prefix = ionization_file_prefix
          s% job% ionization_Z1_suffix = ionization_Z1_suffix
@@ -1212,7 +1212,7 @@
          create_pre_main_sequence_model = s% job% create_pre_main_sequence_model
          pre_ms_relax_to_start_radiative_core = s% job% pre_ms_relax_to_start_radiative_core
          pre_ms_relax_num_steps = s% job% pre_ms_relax_num_steps
-         pre_ms_min_steps_before_check_radiative_core = s% job% pre_ms_min_steps_before_check_radiative_core 
+         pre_ms_min_steps_before_check_radiative_core = s% job% pre_ms_min_steps_before_check_radiative_core
          pre_ms_check_radiative_core_start = s% job% pre_ms_check_radiative_core_start
          pre_ms_check_radiative_core_stop = s% job% pre_ms_check_radiative_core_stop
          pre_ms_check_radiative_core_Lnuc_div_L_limit = s% job% pre_ms_check_radiative_core_Lnuc_div_L_limit
@@ -1283,7 +1283,7 @@
          new_v_center = s% job% new_v_center
          dv_per_step = s% job% dv_per_step
          relax_v_center_dt = s% job% relax_v_center_dt
-         
+
          zero_alpha_RTI = s% job% zero_alpha_RTI
          zero_initial_alpha_RTI = s% job% zero_initial_alpha_RTI
 
@@ -1358,12 +1358,12 @@
          remove_surface_by_v_surf_div_v_escape = s% job% remove_surface_by_v_surf_div_v_escape
          min_q_for_remove_surface_by_v_surf_div_v_escape = s% job% min_q_for_remove_surface_by_v_surf_div_v_escape
          max_q_for_remove_surface_by_v_surf_div_v_escape = s% job% max_q_for_remove_surface_by_v_surf_div_v_escape
-         
+
          remove_surface_do_jrot = s% job% remove_surface_do_jrot
          remove_surface_do_entropy = s% job% remove_surface_do_entropy
          remove_surface_turn_off_energy_sources_and_sinks = s% job% remove_surface_turn_off_energy_sources_and_sinks
          remove_surface_by_relax_to_star_cut = s% job% remove_surface_by_relax_to_star_cut
-         
+
          remove_initial_surface_at_cell_k = s% job% remove_initial_surface_at_cell_k
          remove_initial_surface_at_he_core_boundary = s% job% remove_initial_surface_at_he_core_boundary
          remove_initial_surface_by_optical_depth = s% job% remove_initial_surface_by_optical_depth
@@ -1566,21 +1566,21 @@
          limit_initial_dt = s% job% limit_initial_dt
          years_for_initial_dt = s% job% years_for_initial_dt
          seconds_for_initial_dt = s% job% seconds_for_initial_dt
- 
+
          set_initial_cumulative_energy_error = s% job% set_initial_cumulative_energy_error
          set_cumulative_energy_error = s% job% set_cumulative_energy_error
          set_cumulative_energy_error_at_step = s% job% set_cumulative_energy_error_at_step
          set_cumulative_energy_error_each_step_if_age_less_than = s% job% set_cumulative_energy_error_each_step_if_age_less_than
          new_cumulative_energy_error = s% job% new_cumulative_energy_error
          set_cumulative_energy_error_each_relax = s% job% set_cumulative_energy_error_each_relax
-         
+
          change_net = s% job% change_net
          change_initial_net = s% job% change_initial_net
          new_net_name = s% job% new_net_name
          change_small_net = s% job% change_small_net
          change_initial_small_net = s% job% change_initial_small_net
          new_small_net_name = s% job% new_small_net_name
-         
+
          h_he_net = s% job% h_he_net
          co_net = s% job% co_net
          adv_net = s% job% adv_net
@@ -1651,11 +1651,11 @@
          replace_element_nzlo = s% job% replace_element_nzlo
          replace_element_nzhi = s% job% replace_element_nzhi
          do_special_test = s% job% do_special_test
-         
+
          save_pulse_data_for_model_number = s% job% save_pulse_data_for_model_number
          save_pulse_data_when_terminate = s% job% save_pulse_data_when_terminate
          save_pulse_data_filename = s% job% save_pulse_data_filename
-         
+
          chem_isotopes_filename = s% job% chem_isotopes_filename
          ionization_file_prefix = s% job% ionization_file_prefix
          ionization_Z1_suffix = s% job% ionization_Z1_suffix
@@ -1670,7 +1670,7 @@
          num_special_rate_factors = s% job% num_special_rate_factors
          special_rate_factor = s% job% special_rate_factor
          filename_of_special_rate = s% job% filename_of_special_rate
-         
+
          reaction_for_special_factor = s% job% reaction_for_special_factor
          color_num_files = s% job% color_num_files
          color_file_names = s% job% color_file_names
@@ -1715,27 +1715,27 @@
          character(len=*),intent(in) :: name
          character(len=*), intent(out) :: val
          integer, intent(out) :: ierr
-   
+
          character(len(name)+1) :: upper_name
          character(len=512) :: str
          integer :: iounit,iostat,ind,i
-   
+
          ierr = 0
 
          ! First save current controls
          call set_star_job_controls_for_writing(s, ierr)
          if(ierr/=0) return
-   
+
          ! Write namelist to temporay file
          open(newunit=iounit,status='scratch')
          write(iounit,nml=star_job)
          rewind(iounit)
-   
+
          ! Namelists get written in captials
          upper_name = trim(StrUpCase(name))//'='
          val = ''
          ! Search for name inside namelist
-         do 
+         do
             read(iounit,'(A)',iostat=iostat) str
             ind = index(trim(str),trim(upper_name))
             if( ind /= 0 ) then
@@ -1746,36 +1746,36 @@
                exit
             end if
             if(is_iostat_end(iostat)) exit
-         end do   
-   
+         end do
+
          if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
-   
+
          close(iounit)
-   
+
       end subroutine get_star_job
-   
+
       subroutine set_star_job(s, name, val, ierr)
          type (star_info), pointer :: s
          character(len=*), intent(in) :: name, val
          character(len=len(name)+len(val)+12) :: tmp
          integer, intent(out) :: ierr
-   
+
          ierr = 0
 
          ! First save current star_job
          call set_star_job_controls_for_writing(s, ierr)
          if(ierr/=0) return
-   
+
          tmp=''
          tmp = '&star_job '//trim(name)//'='//trim(val)//'/'
-   
+
          ! Load into namelist
          read(tmp, nml=star_job)
-   
+
          ! Add to star
          call store_star_job_controls(s, ierr)
          if(ierr/=0) return
-   
+
       end subroutine set_star_job
 
 

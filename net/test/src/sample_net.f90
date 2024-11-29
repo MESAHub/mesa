@@ -30,16 +30,16 @@
 ! this program does not do a time integration of a reaction network;
 ! for that you want to see $MESA_DIR/net/test/one_zone_burn.f90.
 
-      
+
       call test
-      
+
       contains
-      
-      
-      
+
+
+
       subroutine test
          use chem_def, only: num_categories
-         
+
          integer :: ierr, handle, species, &
             num_reactions
          integer, pointer :: chem_id(:), net_iso(:)
@@ -47,10 +47,10 @@
          character (len=64) :: mesa_dir
 
 
-! explicitly set my_mesa_dir to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used         
+! explicitly set my_mesa_dir to your $MESA_DIR, or use a blank string, in which case your $MESA_DIR is automagically used
 
-         mesa_dir = '../..'         
-!         mesa_dir = ''         
+         mesa_dir = '../..'
+!         mesa_dir = ''
 
 ! choose the network to use
 
@@ -62,22 +62,22 @@
          call initialize(mesa_dir, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
-! set up the network         
+! set up the network
          call setup_net( &
             net_file, handle, &
             species, chem_id, net_iso, num_reactions, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
 
-! call the burner         
+! call the burner
          call do1_net_eval( &
             handle, species, num_reactions, &
             chem_id, net_iso,  ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+
       end subroutine test
-      
-      
+
+
 
       subroutine initialize(mesa_dir, ierr)
          use const_lib, only: const_init
@@ -90,10 +90,10 @@
          ierr = 0
 
          call math_init()
-         
-         call const_init(mesa_dir,ierr)     
+
+         call const_init(mesa_dir,ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-            
+
          call chem_init('isotopes.data', ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
@@ -101,71 +101,71 @@
         call rates_init('reactions.list', '', 'rate_tables', .false., .false.,&
                      '', '', '',  ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call rates_warning_init(.true., 10d0)
-         
+
          call net_init(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-          
+
       end subroutine initialize
-      
-      
+
+
       subroutine setup_net( &
             net_file, handle, &
             species, chem_id, net_iso, num_reactions, ierr)
          use net_lib
          use rates_def, only: rates_reaction_id_max
-         
+
          character (len=*), intent(in) :: net_file
          integer, pointer :: chem_id(:), net_iso(:) ! set, but not allocated
          integer, intent(out) :: handle, species, num_reactions, ierr
-         
+
          ierr = 0
          handle = alloc_net_handle(ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call net_start_def(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          write(*,*) 'load ' // trim(net_file)
          call read_net_file(net_file, handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call net_finish_def(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-               
+
          call net_setup_tables(handle, '', ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          species = net_num_isos(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call get_chem_id_table_ptr(handle, chem_id, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          call get_net_iso_table_ptr(handle, net_iso, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
          num_reactions = net_num_reactions(handle, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
       end subroutine setup_net
-      
-      
+
+
       subroutine do1_net_eval( &
             handle, species, num_reactions, chem_id, net_iso, ierr)
-            
+
          use rates_def
          use chem_def
          use net_def
          use net_lib
          use chem_lib
-      
-! declare the pass   
+
+! declare the pass
          integer, intent(in) :: handle, species, num_reactions, &
             chem_id(:), net_iso(:)
          integer, intent(out) :: ierr
-         
+
 
 ! locals
          integer :: screening_mode, i
@@ -181,7 +181,7 @@
          logical :: skip_jacobian
          type (Net_Info) :: n
          character (len=80) :: string
-         
+
          include "formats"
 
 
@@ -190,7 +190,7 @@
 22    format(1x,t2,a,1p7e15.6)
 23    format(1x,t2,a7,1pe14.6,t24,a7,1pe14.6,t46,a7,1pe14.6,t68,a7,1pe14.6)
 24    format(1x,t2,a12,1pe14.6,t30,a12,1pe14.6,t60,a12,1pe14.6,t90,a12,1pe14.6,t120,a12,1pe14.6)
-         
+
 
 ! set some pointers and options
          ierr = 0
@@ -208,10 +208,10 @@
 ! main loop, keep returning here
 100   xa(:) = 0
 
-      write(6,*)  
+      write(6,*)
       write(6,*) 'give the temperature, density, and mass fractions (h1, he4, c12, n14, o16, ne20, mg24) =>'
       write(6,*) 'hit return for T = 1e9 K, Rho = 1e4 g/cc, x(c12) = 1 ; enter -1 to stop'
-      write(6,*)  
+      write(6,*)
       read(5,'(a)') string
 
 ! stop
@@ -221,7 +221,7 @@
 ! read the conditions
       else
        if (string(1:6) .ne. '      ') then
-        read(string,*) T,Rho, xa(net_iso(ih1)), xa(net_iso(ihe4)), xa(net_iso(ic12)), & 
+        read(string,*) T,Rho, xa(net_iso(ih1)), xa(net_iso(ihe4)), xa(net_iso(ic12)), &
                        xa(net_iso(in14)), xa(net_iso(io16)), xa(net_iso(ine20)), xa(net_iso(img24))
 ! or set some defaults
        else
@@ -239,28 +239,28 @@
             species, chem_id, xa, xh, xhe, z, abar, zbar, z2bar, z53bar, &
             ye, mass_correction, xsum, dabar_dx, dzbar_dx, dmc_dx)
 
-         
+
 ! this is the instantaneous eps_nuc only
 
          call net_get( &
             handle, skip_jacobian, n, species, num_reactions, &
-            xa, T, logT, Rho, logRho, & 
+            xa, T, logT, Rho, logRho, &
             abar, zbar, z2bar, ye, eta, d_eta_dlnT, d_eta_dlnRho, &
-            rate_factors, weak_rate_factor, & 
+            rate_factors, weak_rate_factor, &
             std_reaction_Qs, std_reaction_neuQs, &
-            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, & 
-            dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, & 
-            screening_mode, &     
-            eps_nuc_categories, eps_neu_total, & 
+            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, d_eps_nuc_dx, &
+            dxdt, d_dxdt_dRho, d_dxdt_dT, d_dxdt_dx, &
+            screening_mode, &
+            eps_nuc_categories, eps_neu_total, &
             ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-         
+
 
 ! say the initial conditions
          write(6,23) 'T     =',T,       'Rho   =',Rho,      'abar  =',abar,   'zbar  =',zbar
          write(6,23) 'h1    =',xa(net_iso(ih1)),  'he4   =',xa(net_iso(ihe4)),  'c12   =',xa(net_iso(ic12)), 'n14   =',xa(net_iso(in14))
          write(6,23) 'o16   =',xa(net_iso(io16)), 'ne20  =',xa(net_iso(ine20)), 'mg24  =',xa(net_iso(img24))
- 
+
 
 ! write out the mass fraction changes
          write(6,'(A)')
@@ -283,9 +283,9 @@
 
 
       end subroutine do1_net_eval
-      
-      
-      
+
+
+
       end program sample_net
 
 

@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -18,23 +18,23 @@
 !   along with this software; if not, write to the free software
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
-! *********************************************************************** 
-      module run_binary_extras 
+! ***********************************************************************
+      module run_binary_extras
 
       use star_lib
       use star_def
       use const_def
       use math_lib
       use binary_def
-      
+
       implicit none
-      
+
       include "binary_test_suite_extras_def.inc"
 
       contains
 
       include "binary_test_suite_extras.inc"
-      
+
       subroutine extras_binary_controls(binary_id, ierr)
          integer :: binary_id
          integer, intent(out) :: ierr
@@ -64,7 +64,7 @@
          ! Once you have set the function pointers you want, then uncomment this (or set it in your star_job inlist)
          ! to disable the printed warning message,
           b% warn_binary_extra =.false.
-         
+
       end subroutine extras_binary_controls
 
 
@@ -95,7 +95,7 @@
          integer, intent(in) :: binary_id
          how_many_extra_binary_history_columns = 0
       end function how_many_extra_binary_history_columns
-      
+
       subroutine data_for_extra_binary_history_columns(binary_id, n, names, vals, ierr)
          use const_def, only: dp
          type (binary_info), pointer :: b
@@ -111,10 +111,10 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         
+
       end subroutine data_for_extra_binary_history_columns
-      
-      
+
+
       integer function extras_binary_startup(binary_id,restart,ierr)
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
@@ -127,7 +127,7 @@
          end if
 
          call test_suite_startup(b, restart, ierr)
-         
+
          extras_binary_startup = keep_going
       end function extras_binary_startup
 
@@ -141,9 +141,9 @@
          if (ierr /= 0) then ! failure in  binary_ptr
             return
          end if
-      
+
       end function  extras_binary_start_step
-      
+
       !Return either keep_going, retry or terminate
       integer function extras_binary_check_model(binary_id)
          type (binary_info), pointer :: b
@@ -152,12 +152,12 @@
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then ! failure in  binary_ptr
             return
-         end if  
+         end if
          extras_binary_check_model = keep_going
-        
+
       end function extras_binary_check_model
-      
-      
+
+
       ! returns either keep_going or terminate.
       ! note: cannot request retry; extras_check_model can do that.
       integer function extras_binary_finish_step(binary_id)
@@ -167,11 +167,11 @@
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then ! failure in  binary_ptr
             return
-         end if  
+         end if
          extras_binary_finish_step = keep_going
-         
+
       end function extras_binary_finish_step
-      
+
       subroutine extras_binary_after_evolve(binary_id, ierr)
          type (binary_info), pointer :: b
          integer, intent(in) :: binary_id
@@ -179,12 +179,12 @@
          call binary_ptr(binary_id, b, ierr)
          if (ierr /= 0) then ! failure in  binary_ptr
             return
-         end if      
-         
- 
+         end if
+
+
 
          call test_suite_after_evolve(b, ierr)
 
-      end subroutine extras_binary_after_evolve     
-      
+      end subroutine extras_binary_after_evolve
+
       end module run_binary_extras

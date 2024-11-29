@@ -62,7 +62,7 @@ module skye_coulomb_solid
       ! Intermediates
       type(auto_diff_real_2var_order3) :: TPT, UP, DN, EA, EB, EG, E0
       type(auto_diff_real_2var_order3) :: Fth, U0
-      
+
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
@@ -239,13 +239,13 @@ module skye_coulomb_solid
    !> Calculates the correction to the linear mixing rule for a Coulomb solid mixture
    !! by extending a two-component deltaG prescription to the multi-component case, using the
    !! prescription of Medin & Cumming 2010.
-   !! 
+   !!
    !! @param n Number of species
    !! @param AY Array of length NMIX holding the masses of species
    !! @param AZion Array of length NMIX holding the charges of species
    !! @param GAME election interaction parameter
    !! @param F mixing free energy correction per ion per kT.
-   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)      
+   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)
       ! Inputs
       character(len=128), intent(in) :: Skye_solid_mixing_rule
       integer, intent(in) :: n
@@ -302,7 +302,7 @@ module skye_coulomb_solid
             if (unique_charges(j) < unique_charges(i)) cycle
 
             RZ = unique_charges(j)/unique_charges(i) ! Charge ratio
-         
+
             ! max avoids divergence.
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.

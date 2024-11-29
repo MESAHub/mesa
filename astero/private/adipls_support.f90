@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,20 +19,20 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 
       module adipls_support
-      
+
       use astero_def
       use star_lib
       use star_def
       use const_def
       use utils_lib
 
-      
+
       implicit none
-      
-      
+
+
       ! args for adipls
       integer, save :: i_paramset, ierr_param, i_inout, nn
       real(dp), save, pointer :: x(:) => null() ! (nn)
@@ -44,15 +44,15 @@
       integer, save :: iounit_dev_null = -1
 
       integer, save :: nn_redist ! set from redistrb.c input file
-      
-      
+
+
       real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
       integer, save :: nn_arg
       real(dp), save :: data_arg(8)
-      
+
       logical, parameter :: ADIPLS_IS_ENABLED = .true.
 
-      
+
       contains
 
 
@@ -77,17 +77,17 @@
          real(dp), pointer, dimension(:) :: l_freq, l_inertia
          integer, pointer, dimension(:) :: l_order, l_em
          integer, intent(out) :: ierr
-      
+
          real(dp) :: sig_fac
          integer :: nsel, itrsig, nsig
          real(dp) :: els1, dels, sig1, sig2, dfsig
          integer :: i, j
-         integer, pointer :: index(:) 
-         
+         integer, pointer :: index(:)
+
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
+
          ierr = 0
          sig_fac = (2*pi)**2*pow3(R)/(G*M)
          nsel = 0
@@ -98,7 +98,7 @@
          sig2 = sig_fac*(nu2*1d-6)*(nu2*1d-6)
          nsig = 2
          dfsig = sig_fac*delta_nu_model*delta_nu_model
-         
+
          if (dbg) write(*,*) 'call set_adipls_controls'
          call set_adipls_controls( &
             l, nsel, els1, dels, itrsig, iscan, sig1, sig2, dfsig, nsig, &
@@ -108,7 +108,7 @@
          el_to_save = l
          order_to_save = order_to_save_in
          save_mode_filename = save_mode_filename_in
-      
+
          num_results = 0
          if (dbg) write(*,*) 'call run_adipls'
          call run_adipls(s, .false., store_for_adipls, &
@@ -120,12 +120,12 @@
             return
          end if
          num = num_results
-         
+
          if (num_results == 0) then
             write(*,*) 'failed to find any modes in specified frequency range'
             return
          end if
-         
+
          ! sort results by increasing frequency
          allocate(index(num_results), stat=ierr)
          if (ierr /= 0) then
@@ -161,7 +161,7 @@
             call realloc_double(l_inertia,num_results,ierr)
             if (ierr /= 0) return
          end if
-         
+
          do j = 1, num_results
             i = index(j)
             l_freq(j) = cyclic_freq(i)
@@ -169,12 +169,12 @@
             l_order(j) = order(i)
             l_em(j) = em(i)
          end do
-         
+
          deallocate(index)
-         
+
       end subroutine do_adipls_get_one_el_info
 
-      
+
       subroutine adipls_mode_info( &
             l, order, em, freq, inertia, x, y, aa, data, nn, iy, iaa, ispcpr)
          integer, intent(in) :: l, order, em
@@ -221,10 +221,10 @@
             write(iounit,'(i6,4e26.16)') i-skip, x(i), y_r, y_h
          end do
          close(iounit)
-         call free_iounit(iounit)         
+         call free_iounit(iounit)
       end subroutine adipls_mode_info
-      
-      
+
+
       subroutine store_model_for_adipls (s, add_atmosphere, do_redistribute_mesh, ierr)
 
         type (star_info), pointer :: s
@@ -240,11 +240,11 @@
          real(dp), allocatable :: global_data(:) ! (iconst)
          real(dp), allocatable :: point_data(:,:) ! (ivar,nn_in)
          character (len=2000) :: format_string, num_string, filename
-         
+
          ierr = 0
          iriche = 0
          iturpr = 0
-         
+
          if (associated(x)) deallocate(x)
          if (associated(aa)) deallocate(aa)
 
@@ -259,7 +259,7 @@
          end if
 
          ! If necessary, write it
-         
+
          if (write_fgong_for_each_model) then
 
             write(format_string,'( "(i",i2.2,".",i2.2,")" )') &
@@ -294,23 +294,23 @@
             write(*,*) 'failed in fgong_amdl'
             call mesa_error(__FILE__,__LINE__)
          end if
-        
+
          call store_amdl(nn, iriche, iturpr, data, aa, x, nn, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in store_amdl'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call redist_amdl(ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in redist_amdl'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine redist_amdl(ierr)
             integer, intent(out) :: ierr
             real(dp), pointer :: aa_new(:,:)
@@ -333,11 +333,11 @@
             nn = nn_new
             if (ierr_param < 0) ierr = -1
          end subroutine redist_amdl
-      
-      
+
+
       end subroutine store_model_for_adipls
-      
-      
+
+
       subroutine run_adipls( &
             s, first_time, store_model, &
             add_center_point, keep_surface_point, add_atmosphere, &
@@ -348,20 +348,20 @@
             add_center_point, keep_surface_point, add_atmosphere, &
             do_redistribute_mesh
          integer, intent(out) :: ierr
-         
+
          integer :: iounit, nn_arg_0
          integer(8) :: time0, time1, clock_rate
          real(dp) :: time, x_arg0(0), aa_arg0(0,0)
          character (len=256) :: filename
          common/cstdio/ istdin, istdou, istdpr, istder
          integer :: istdin, istdou, istdpr, istder
-         
+
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          i_inout = 0
          i_paramset = 1
          ierr_param = 0
@@ -372,7 +372,7 @@
             call setup_adipls
             return
          end if
-         
+
          if (iounit_dev_null > 0) then
             close(iounit_dev_null)
          else
@@ -382,26 +382,26 @@
                call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if
          end if
-         
+
          filename = 'adipls.stdout'
          open(unit=iounit_dev_null, file=trim(filename), iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'adipls failed to open ' // trim(filename)
             call mesa_error(__FILE__,__LINE__,'run_adipls')
-         end if            
+         end if
          istdou = iounit_dev_null
          istdpr = iounit_dev_null
-         
+
          if (store_model) then
             if (dbg) write(*,*) 'call store_model_for_adipls'
             call store_model_for_adipls(s, add_atmosphere, do_redistribute_mesh, ierr)
             if (dbg) write(*,*) 'done store_model_for_adipls'
             if (ierr /= 0) return
          end if
-         
-         ! ivarmd and iaa_arg are defined in file with store_amdl         
+
+         ! ivarmd and iaa_arg are defined in file with store_amdl
          if (dbg) write(*,*) 'call adipls'
-         
+
          if (trace_time_in_oscillation_code) then
             call system_clock(time0, clock_rate)
          end if
@@ -409,7 +409,7 @@
          call adipls(i_paramset, ierr_param, i_inout, &
                x, aa, data, nn, ivarmd, iaa_arg)
          if (dbg) write(*,*) 'done adipls'
-         
+
          if (trace_time_in_oscillation_code) then
             call system_clock(time1, clock_rate)
             time = dble(time1-time0)/clock_rate
@@ -422,11 +422,11 @@
             write(*,*) 'call to adipls failed'
             call mesa_error(__FILE__,__LINE__,'run_adipls')
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine setup_adipls
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
@@ -436,21 +436,21 @@
             filename = 'adipls.c.pruned.in'
             open(unit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
             if (ierr /= 0) then
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
+               write(*,*)
+               write(*,*)
+               write(*,*)
+               write(*,*)
                write(*,*) 'ERROR: failed to open ' // trim(filename)
                write(*,*) 'please convert adipls.c.in to "pruned" form'
                write(*,*) 'e.g., you can run the get-input script from mesa/adipls/adipack.c/bin:'
                write(*,*) './../../adipls/adipack.c/bin/get-input adipls.c.in > adipls.c.pruned.in'
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
+               write(*,*)
+               write(*,*)
+               write(*,*)
+               write(*,*)
                call mesa_error(__FILE__,__LINE__,'run_adipls')
-            end if            
-            
+            end if
+
             write(*,'(A)')
             write(*,'(a)') 'call adipls to read ' // trim(filename)
             call setups_adi
@@ -459,28 +459,28 @@
             call adipls(i_paramset, ierr_param, i_inout, &
                   x_arg0, aa_arg0, data_arg, nn_arg_0, ivarmd, iaa_arg)
             close(iounit)
-            
+
             call free_iounit(iounit)
-            
+
             if (ierr_param < 0) then
                ierr = ierr_param
                write(*,*) '1st call to adipls failed in setup_adipls'
                call mesa_error(__FILE__,__LINE__,'run_adipls')
             end if
-            
+
             write(*,*) 'back from 1st call on adipls'
             write(*,'(A)')
 
          end subroutine setup_adipls
 
-         
+
          subroutine setup_redist
 
             common/comgrp/ isprtp
             integer :: isprtp
 
             if (.not. do_redistribute_mesh) return
-            
+
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
                write(*,*) 'setup_redist failed in alloc_iounit'
@@ -490,54 +490,54 @@
             open(unit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
             if (ierr /= 0) then
                write(*,*) 'setup_redist failed to open ' // trim(filename)
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
+               write(*,*)
+               write(*,*)
+               write(*,*)
+               write(*,*)
                write(*,*) 'ERROR: failed to open ' // trim(filename)
                write(*,*) 'please convert redistrb.c.in to "pruned" form'
                write(*,*) 'e.g., you can run the get-input script from mesa/adipls/adipack.c/bin:'
                write(*,*) './../../adipls/adipack.c/bin/get-input redistrb.c.in > redistrb.c.pruned.in'
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
-               write(*,*) 
+               write(*,*)
+               write(*,*)
+               write(*,*)
+               write(*,*)
                call mesa_error(__FILE__,__LINE__,'run_adipls')
                call mesa_error(__FILE__,__LINE__,'run_rdist')
-            end if 
-            
+            end if
+
             read(iounit,*,iostat=ierr) nn_redist
             if (ierr /= 0) then
                write(*,*) 'setup_redist failed to read nn_redist from ' // trim(filename)
                call mesa_error(__FILE__,__LINE__,'run_rdist')
-            end if 
+            end if
             write(*,*) 'nn_redist', nn_redist
-            
+
             rewind(iounit)
-                       
+
             write(*,'(A)')
             write(*,'(a)') 'call srdist to read ' // trim(filename)
-            
+
             istdin = iounit
             i_inout = 0
             i_paramset = 1
             ierr_param = 0
             isprtp = 0
-            
+
             call srdist(i_paramset, ierr_param, i_inout, &
                x_arg0, aa_arg0, data_arg, x_arg0, aa_arg0, &
                nn_arg_0, nn_arg_0, ivarmd, iaa_arg, iaa_arg)
-                  
+
             close(iounit)
-            
+
             call free_iounit(iounit)
-            
+
             if (ierr_param < 0) then
                ierr = ierr_param
                write(*,*) '1st call to srdist failed'
                call mesa_error(__FILE__,__LINE__,'run_rdist')
             end if
-            
+
             write(*,*) 'back from 1st call on srdist'
             write(*,'(A)')
 
@@ -545,8 +545,8 @@
 
 
       end subroutine run_adipls
-      
-      
+
+
       subroutine set_adipls_controls( &
             el, nsel, els1, dels, itrsig, iscan, sig1, sig2, dfsig, nsig, &
             irotkr, nprtkr, igm1kr, npgmkr)
@@ -563,14 +563,14 @@
             para_el, para_els1, para_dels, para_dfsig1, para_dfsig2, &
             para_sig1, para_sig2, para_dfsig, para_eltrw1, para_eltrw2, &
             para_sgtrw1, para_sgtrw2
-            
+
          common/cadi_param/ &
             ipara_nsel, ipara_nsig1, ipara_nsig2, ipara_itrsig, ipara_nsig, &
             ipara_istsig, ipara_inomd1, ipara_iscan
          integer :: &
             ipara_nsel, ipara_nsig1, ipara_nsig2, ipara_itrsig, ipara_nsig, &
             ipara_istsig, ipara_inomd1, ipara_iscan
-            
+
          common/coutpt/ &
             ipara_nout, ipara_nprcen, ipara_iper, ipara_irotkr, ipara_nprtkr, &
             ipara_igm1kr, ipara_npgmkr, ipara_nfmode, ipara_nfmesh, ipara_ispcpr, &
@@ -579,7 +579,7 @@
             ipara_nout, ipara_nprcen, ipara_iper, ipara_irotkr, ipara_nprtkr, &
             ipara_igm1kr, ipara_npgmkr, ipara_nfmode, ipara_nfmesh, ipara_ispcpr, &
             ipara_npout, ipara_nobs_stmx, ipara_nfmscn
-         
+
          para_el = dble(el)
          ipara_nsel = nsel
          para_els1 = els1
@@ -594,10 +594,10 @@
          ipara_nprtkr = nprtkr
          ipara_igm1kr = igm1kr
          ipara_npgmkr = npgmkr
-      
+
       end subroutine set_adipls_controls
-      
-      
+
+
       ! this is called by modmod
       subroutine check_arg_data(nn, data, ldaa, aa, x, ierr)
          integer, intent(in) :: nn, ldaa
@@ -605,25 +605,25 @@
          real(dp) :: aa(ldaa,nn)
          real(dp) :: x(nn)
          integer, intent(out) :: ierr
-         
+
          real(dp), parameter :: rtol = 1d-9, atol = 1d-9
-         
+
          integer :: i, j
-         
+
          ierr = 0
-         
+
          if (ldaa /= iaa_arg) then
             write(*,*) 'ldaa /= iaa_arg', ldaa, iaa_arg
             ierr = -1
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (nn /= nn_arg) then
             write(*,*) 'nn /= nn_arg', nn, nn_arg
             ierr = -1
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          do i=1,8
             if (is_bad(data(i),data_arg(i))) then
                write(*,'(a40,i6,99e26.16)') 'data(i) /= data_arg(i)', i, data(i), data_arg(i)
@@ -631,7 +631,7 @@
                call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
          do j=1,nn
             if (is_bad(x(j),x_arg(j))) then
                write(*,'(a40,i6,99e26.16)') 'x(j) /= x_arg(j)', j, x(j), x_arg(j)
@@ -646,23 +646,23 @@
                end if
             end do
          end do
-         
+
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'check_arg_data')
-         
-         
+
+
          contains
-         
+
          logical function is_bad(v1,v2)
             real(dp), intent(in) :: v1, v2
             real(dp) :: err
             err = abs(v1-v2)/(atol + rtol*max(abs(v1),abs(v2)))
             is_bad = (err > 1d0)
          end function is_bad
-         
-      
+
+
       end subroutine check_arg_data
-      
-      
+
+
       subroutine read_and_store(iriche, iturpr, cgrav)
          integer, intent(inout) :: iriche, iturpr
          real(dp), intent(in) :: cgrav
@@ -673,7 +673,7 @@
          real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
          real(dp), pointer :: x(:) ! (nn)   will be allocated
          real(dp) :: data(8)
-         
+
          ierr = 0
          fname = 'test.fgong'
          call read_fgong_file(fname, nn_in, iconst, ivar, ivers, glob, var, ierr)
@@ -692,10 +692,10 @@
             write(*,*) 'read_and_store failed in store_amdl'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
       end subroutine read_and_store
-      
-      
+
+
       subroutine store_amdl(nn_in, iriche, iturpr, data, aa, x, nn, ierr)
          ! derived from adipls readml.n.d.f
          integer, intent(in) :: nn_in, iriche
@@ -705,13 +705,13 @@
          real(dp), pointer :: x(:) ! (nn)     will be allocated
          ! nn can be less than nn_in
          integer, intent(out) :: nn, ierr
-         
+
          ! local
          integer :: i, j, nsin, iggt, nshift, nnr, n, n1, idata8
          logical :: sincen, sinsur
          real(dp), pointer :: aa1(:,:)
          real(dp) :: ggt
-         
+
          ierr = 0
          nn = nn_in
 
@@ -721,7 +721,7 @@
                aa1(j,i) = aa(j,i)
             end do
          end do
-      
+
          ! test for singular centre and/or surface
 
          sincen=aa1(1,1) == 0
@@ -741,7 +741,7 @@
          end if
 
          ! we always take every point in model
-         
+
          ! test for number of nonsingular points
 
          if (iriche /= 1.or.mod(nn-nsin,2) == 1) then
@@ -753,9 +753,9 @@
          if (nshift /= 0) then
             nn=nn-nshift
          end if
-         
+
          allocate(x(nn))
-         
+
          if (sincen) then
             x(1)=aa1(1,1)
             do i=1,ivarmd
@@ -781,7 +781,7 @@
                end do
             end do
          end if
-         
+
          deallocate(aa1)
 
          ! set g/gtilde (=1 in models without turbulent pressure)
@@ -804,15 +804,15 @@
                aa(10,n)=1
             end do
          end if
-         
+
          x_arg => x
          aa_arg => aa
          nn_arg = nn
          data_arg(:) = data(:)
 
       end subroutine store_amdl
-            
-      
+
+
       subroutine fgong_amdl(cgrav, nn_in, iconst, ivar, ivers, glob, var, data, aa, nn, ierr)
          ! derived from fgong-amdl.d.f
          real(dp), intent(in) :: cgrav
@@ -822,16 +822,16 @@
          real(dp), intent(inout) :: data(8)
          real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
          integer, intent(out) :: nn, ierr
-         
+
          integer, parameter :: ireset(16) = &
             (/3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20/)
          integer :: nn1, i, n, ir
          real(dp) :: d2amax, var1(ivar,nn_in+100), q(nn_in+100), x(nn_in+100)
-      
+
          ierr = 0
          nn = nn_in
 
-         if (var(1,1) > var(1,nn)) then 
+         if (var(1,1) > var(1,nn)) then
             nn1=nn+1
             do i=1,ivar
                do n=1,nn
@@ -842,41 +842,41 @@
                end do
             end do
          end if
-         
-         if (var(1,1) > 1.d6) then 
+
+         if (var(1,1) > 1.d6) then
             do i=1,ivar
                do n=1,nn
                   var1(i,n+1)=var(i,n)
                end do
             end do
-         
+
             do i=1,ivar
                var1(i,1)=0
             end do
-         
+
             do ir=1,16
                i=ireset(ir)
                var1(i,1)=var1(i,2)
             end do
-         
-            nn=nn+1 
+
+            nn=nn+1
             do i=1,ivar
                do n=1,nn
                   var(i,n)=var1(i,n)
                end do
             end do
          end if
-         
+
          do n=1,nn
             q(n)=exp(var(2,n))
             x(n)=var(1,n)/glob(2)
          end do
-         
+
          x(1)=0
          q(1)=0
-         
+
          allocate(aa(iaa_arg,nn))
-         
+
          do n=2,nn
             aa(1,n)=x(n)
             aa(2,n)=q(n)/pow3(x(n))
@@ -885,25 +885,25 @@
             aa(5,n)=var(15,n)
             aa(6,n)=pi4*var(5,n)*pow3(var(1,n))/(glob(1)*q(n))
          end do
-         
+
          aa(1,1)=0
          aa(2,1)=four_thirds_pi*var(5,1)*pow3(glob(2))/glob(1)
          aa(3,1)=0
          aa(4,1)=var(10,1)
          aa(5,1)=0
          aa(6,1)=3.d0
-         if (aa(5,nn) <= 10) then 
-            nn=nn-1 
-            !write(6,*) 'Chop off outermost point' 
+         if (aa(5,nn) <= 10) then
+            nn=nn-1
+            !write(6,*) 'Chop off outermost point'
          end if
          data(1)=glob(1)
          data(2)=glob(2)
          data(3)=var(4,1)
          data(4)=var(5,1)
-         if (glob(11) < 0.and.glob(11) > -10000) then 
+         if (glob(11) < 0.and.glob(11) > -10000) then
             data(5)=-glob(11)/var(10,1)
-            data(6)=-glob(12) 
-         else 
+            data(6)=-glob(12)
+         else
             data(5)=four_thirds_pi*cgrav*(var(5,1)*glob(2))**2/(var(4,1)*var(10,1))
             d2amax=0.d0
             do n=2,nn
@@ -915,9 +915,9 @@
          end if
          data(7)=-1.d0
          data(8)=0.d0
-      
+
       end subroutine fgong_amdl
-      
+
 
       subroutine read_fgong_file(fin, nn, iconst, ivar, ivers, glob, var, ierr)
          character (len=*), intent(in) :: fin
@@ -925,10 +925,10 @@
          real(dp), pointer :: glob(:) ! (iconst)   will be allocated
          real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
          integer, intent(out) :: ierr
-      
+
          integer :: ios, iounit, i, n
          character(80) :: head
-      
+
   120 format(4i10)
   130 format(5e16.9)
 
@@ -938,7 +938,7 @@
             write(*,*) 'failed in read_fgong_file'
             return
          end if
-      
+
          ios = 0
          open(iounit,file=trim(fin),status='old', iostat=ios)
          if (ios /= 0) then
@@ -959,29 +959,29 @@
             write(*,*) 'failed to read dimensions'
             return
          end if
-      
+
          allocate(glob(iconst), var(ivar,nn+10))
-      
+
          read(iounit,130, iostat=ios) (glob(i),i=1,iconst)
          if (ios /= 0) then
             write(*,*) 'failed to read globals'
             return
-         end if      
+         end if
 
          do n=1,nn
             read(iounit,130, iostat=ios) (var(i,n),i=1,ivar)
             if (ios /= 0) exit
          end do
          close(iounit)
-      
+
          if (ios /= 0) then
             write(*,*) 'failed to read vars'
             return
          end if
 
       end subroutine read_fgong_file
-      
-      
+
+
       ! for testing
       subroutine dump(filename_for_dump,nn,glob,var,ierr)
          character (len=*), intent(in) :: filename_for_dump
@@ -989,10 +989,10 @@
          real(dp), pointer :: glob(:) ! (iconst)
          real(dp), pointer :: var(:,:) ! (ivar,nn)
          integer, intent(out) :: ierr
-      
+
          real(dp), parameter :: Msun = 1.9892d33, Rsun = 6.9598d10, Lsun = 3.8418d33
          integer :: iounit, k, offset
-      
+
          ierr = 0
          if (len_trim(filename_for_dump) == 0) return
 
@@ -1001,7 +1001,7 @@
             write(*,*) 'failed in alloc_iounit for dump fgong'
             return
          end if
-      
+
          open(iounit, file=trim(filename_for_dump),  iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'dump fgong failed to open ' // trim(filename_for_dump)
@@ -1009,28 +1009,28 @@
          end if
 
          write(*,*) 'dump fgong data to ' // trim(filename_for_dump)
-      
+
          if (VAR(1,1) <= 1) then ! skip tny r
             offset = 1
          else
             offset = 0
          end if
-      
+
          write(iounit,'(99a24)') &
             'num_zones', 'star_mass', 'star_radius', 'star_L', 'initial_z',  &
             'mlt_alpha', 'star_age', 'star_Teff'
          write(iounit,fmt='(i24,99e24.12)') &
             nn-offset, GLOB(1)/Msun, GLOB(2)/Rsun, GLOB(3)/Lsun, GLOB(4),  &
-            GLOB(6), GLOB(13), GLOB(14)      
-      
+            GLOB(6), GLOB(13), GLOB(14)
+
          write(iounit,'(a5,99a24)')  &
             'i', 'r', 'm', 'temperature', 'pressure', 'density', &
             'xh1', 'luminosity', 'opacity', 'eps', 'gamma1', &
             'grada', 'chiT_div_chiRho', 'cp', 'free_e', 'brunt_A', &
             'dxdt_nuc_h1', 'z', 'dr_to_surf', 'eps_grav', 'xhe3', &
             'xc12', 'xc13', 'xn14', 'xo16', 'xh2', 'xhe4', 'xli7', &
-            'xbe7', 'xn15', 'xo17', 'xo18', 'xne20'                               
-      
+            'xbe7', 'xn15', 'xo17', 'xo18', 'xne20'
+
          do k=1+offset,nn
             write(iounit,fmt='(i5,99e24.12)') k-offset, &
                VAR(1,k), &
@@ -1064,10 +1064,10 @@
                VAR(33,k), &
                VAR(34,k), &
                VAR(35,k), &
-               VAR(36,k)                               
+               VAR(36,k)
          end do
          close(iounit)
-      
+
       end subroutine dump
 
 

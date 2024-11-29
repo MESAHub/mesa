@@ -9,7 +9,7 @@
 !   by the Free Software Foundation; either version 2 of the License, or
 !   (at your option) any later version.
 !
-!   MESA is distributed in the hope that it will be useful, 
+!   MESA is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
 !   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !   GNU Library General Public License for more details.
@@ -42,10 +42,10 @@
       integer :: species
       integer, pointer, dimension(:) :: net_iso, chem_id
       integer :: eos_handle, kap_handle
-      
+
       contains
-      
-      
+
+
       subroutine restart_rsp_eos_and_kap(s)
          type (star_info), pointer :: s
          eos_handle = s% eos_handle
@@ -54,23 +54,23 @@
          chem_id => s% chem_id
          species = s% species
       end subroutine restart_rsp_eos_and_kap
-      
+
       subroutine init_for_rsp_eos_and_kap(s)
          use adjust_xyz, only: get_xa_for_standard_metals
          type (star_info), pointer :: s
-         
+
          integer :: i, iz, ierr
          real(dp) :: initial_z, initial_y, initial_x, &
             initial_h1, initial_h2, initial_he3, initial_he4, &
             xsol_he3, xsol_he4, z2bar, ye, mass_correction, sumx
          include 'formats'
-         ierr = 0         
+         ierr = 0
          eos_handle = s% eos_handle
          kap_handle = s% kap_handle
          net_iso => s% net_iso
          chem_id => s% chem_id
          species = s% species
-         
+
          initial_x = max(0d0, min(1d0, s% RSP_X))
          initial_z = max(0d0, min(1d0, s% RSP_Z))
          initial_y = max(0d0,1d0 - (initial_x + initial_z))
@@ -145,13 +145,13 @@
          write(*,1) 'init_for_rsp_eos_and_kap X', X
          write(*,1) 'Y', Y
          write(*,1) 'Z', Z
-         
-         
-         
-         
-         
-         
-         
+
+
+
+
+
+
+
          write(*,1) 'abar', abar
          write(*,1) 'zbar', zbar
          write(*,1) 'XC', XC
@@ -164,8 +164,8 @@
          write(*,*) trim(s% net_name)
          call mesa_error(__FILE__,__LINE__,'init_for_rsp_eos_and_kap')
       end subroutine init_for_rsp_eos_and_kap
-      
-      
+
+
       subroutine eval_mesa_eos_and_kap(&
             s,k,T_in,V, &
             Pg,d_Pg_dV,d_Pg_dT,Pr,d_Pr_dT, &
@@ -185,8 +185,8 @@
             egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
             CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
       end subroutine eval_mesa_eos_and_kap
-      
-      
+
+
       subroutine eval1_mesa_eos_and_kap( &
             s,k,skip_kap,T_in,V, &
             Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
@@ -204,7 +204,7 @@
             egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
             CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT
          integer, intent(out) :: ierr
-         
+
          integer :: j
          real(dp) :: logT, logRho, T, Rho, E, dE_dV, dE_dT, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
@@ -214,13 +214,13 @@
          real(dp) :: d_dxa(num_eos_d_dxa_results,s% species)
 
          include 'formats'
-         
+
          rho = 1d0/V
          T = T_in
          logRho = log10(rho)
          dlnd_dV = -rho
-         logT = log10(T)  
-         
+         logT = log10(T)
+
          if (k > 0 .and. k <= s% nz) then
             call store_rho_in_xh(s, k, rho)
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
@@ -253,10 +253,10 @@
             if (ierr == 0) then
                Prad = crad*T**4/3d0
                Pgas = exp(res(i_lnPgas))
-               CSND = sqrt(max(0d0, res(i_gamma1)*(Prad+Pgas)/Rho)) 
+               CSND = sqrt(max(0d0, res(i_gamma1)*(Prad+Pgas)/Rho))
             end if
          end if
-                   
+
          if (ierr /= 0) then
             !$omp critical (rsp_eval_eos_and_kap_1)
             if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
@@ -274,7 +274,7 @@
             !return
             call mesa_error(__FILE__,__LINE__,'RSP failed in get_eos')
          end if
-         
+
          if (skip_kap) then
             OP=0; OPV=0; OPT=0
          else
@@ -282,55 +282,55 @@
                V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
                res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
          end if
-         
+
          lnfree_e = res(i_lnfree_e)
          d_lnfree_e_dlnRho = d_dlnd(i_lnfree_e)
          d_lnfree_e_dlnT = d_dlnT(i_lnfree_e)
-         
+
          Prad = crad*T**4/3d0  ! erg/cm^2
          d_Pr_dT = 4d0*Prad/T
 
          erad = 3d0*Prad/rho ! 3*Prad*V   erg/gm
          d_erad_dT = 3d0*d_Pr_dT/rho
          d_erad_dV = 3d0*Prad
-         
+
          E = exp(res(i_lnE))
          dE_dV = E*d_dlnd(i_lnE)*dlnd_dV
          dE_dT = E*d_dlnT(i_lnE)/T
          egas = E - erad
          d_egas_dV = dE_dV - d_erad_dV
          d_egas_dT = dE_dT - d_erad_dT
-         
+
          Pgas = exp(res(i_lnPgas))
          d_Pg_dV = Pgas*d_dlnd(i_lnPgas)*dlnd_dV
          d_Pg_dT = Pgas*d_dlnT(i_lnPgas)/T
-         
+
          CP = res(i_Cp)
          CPV = d_dlnd(i_Cp)*dlnd_dV
          CPT = d_dlnT(i_Cp)/T
-         
+
          chiT = res(i_chiT)
          dchiT_dlnd = d_dlnd(i_chiT)
          dchiT_dlnT = d_dlnT(i_chiT)
-         
+
          chiRho = res(i_chiRho)
          dchiRho_dlnd = d_dlnd(i_chiRho)
          dchiRho_dlnT = d_dlnT(i_chiRho)
-         
+
          Q = chiT/(rho*T*chiRho) ! thermal expansion coefficient
          dQ_dlnd = Q*(dchiT_dlnd/chiT - dchiRho_dlnd/chiRho - 1d0)
          dQ_dlnT = Q*(dchiT_dlnT/chiT - dchiRho_dlnT/chiRho - 1d0)
          QV = dQ_dlnd*dlnd_dV
          QT = dQ_dlnT/T
-         
+
          if (is_bad(egas) .or. egas <= 0d0) then
             ierr = -1
             return
          end if
-          
+
       end subroutine eval1_mesa_eos_and_kap
-      
-      
+
+
       subroutine eval1_mesa_eosDEgas_and_kap( &
             s, k, skip_kap, egas, V, T, Pgas, CSND, CP, Q, OP, ierr)
          use star_utils, only: write_eos_call_info
@@ -342,21 +342,21 @@
          real(dp), intent(in) :: egas, V
          real(dp), intent(out) :: T, Pgas, CSND, CP, Q, OP
          integer, intent(out) :: ierr
-         
+
          integer :: j, eos_calls
          real(dp) :: rho, logRho, dlnd_dV, egas_tol, logT, &
             logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results, species)
-         
+
          include 'formats'
          ierr = 0
 
          rho = 1d0/V
          logRho = log10(rho)
          dlnd_dV = -rho
-         
+
          if (egas <= 0d0 .or. is_bad(egas)) then
             !$OMP critical (RSP_eosDEgas)
             write(*,2) 'egas', k, egas
@@ -388,7 +388,7 @@
                new_erad = crad*T**4/rho
                new_egas = exp(res(i_lnE)) - new_erad
                if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
-                     abs(new_egas - egas) > 1d3*egas_tol) then               
+                     abs(new_egas - egas) > 1d3*egas_tol) then
                   !$OMP critical (RSP_eosDEgas)
                   write(*,1) 'logRho', s% lnd(k)/ln10
                   write(*,1) 'logT_guess', logT_guess
@@ -434,7 +434,7 @@
             ierr = -1
             return
          end if
-                   
+
          if (ierr /= 0) then
             !$OMP critical (RSP_eosDEgas)
             if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
@@ -453,7 +453,7 @@
             return
             call mesa_error(__FILE__,__LINE__,'RSP failed in eval1_mesa_eosDEgas_and_kap')
          end if
-         
+
          if (skip_kap) then
             OP=0
          else
@@ -461,14 +461,14 @@
                V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
                res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
          end if
-         
+
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
          Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
-         
+
       end subroutine eval1_mesa_eosDEgas_and_kap
-      
-      
+
+
       subroutine eval1_mesa_eosDE_and_kap( &  ! for eos, energy = egas + erad
             s, k, skip_kap, energy, V, T, Pgas, CSND, CP, Q, OP, ierr)
          use star_utils, only: write_eos_call_info
@@ -480,14 +480,14 @@
          real(dp), intent(in) :: energy, V
          real(dp), intent(out) :: T, Pgas, CSND, CP, Q, OP
          integer, intent(out) :: ierr
-         
+
          integer :: j, eos_calls
          real(dp) :: rho, logRho, dlnd_dV, logE, logE_want, logE_tol, logT, &
             logT_guess, logT_tol, new_erad, new_egas, OPV, OPT
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results, species)
-         
+
          include 'formats'
          ierr = 0
 
@@ -495,7 +495,7 @@
          logRho = log10(rho)
          logE_want = log10(energy)
          dlnd_dV = -rho
-         
+
          if (energy <= 0d0 .or. is_bad(energy)) then
             !$OMP critical (RSP_eosDE)
             write(*,2) 'energy', k, energy
@@ -515,7 +515,7 @@
             logT_guess = s% lnT(k)/ln10
             logT_tol = 1d-11
             logE_tol = 1d-11
-            
+
             call solve_eos_given_DE( &
                s, k, xa, &
                logRho, logE_want, logT_guess, logT_tol, logE_tol, &
@@ -528,7 +528,7 @@
                new_erad = crad*T**4/rho
                new_egas = exp(res(i_lnE)) - new_erad
                logE = res(i_lnE)/ln10
-               if (is_bad(logE) .or. logE <= -20d0) then               
+               if (is_bad(logE) .or. logE <= -20d0) then
                   !$OMP critical (RSP_eosDE)
                   write(*,1) 'logRho', s% lnd(k)/ln10
                   write(*,1) 'Z', Z
@@ -566,7 +566,7 @@
             ierr = -1
             return
          end if
-                   
+
          if (ierr /= 0) then
             !$OMP critical (RSP_eosDE)
             if (k > 0 .and. k < s% nz) call write_eos_call_info(s,k)
@@ -584,7 +584,7 @@
             return
             call mesa_error(__FILE__,__LINE__,'RSP failed in eval1_mesa_eosDE_and_kap')
          end if
-         
+
          if (skip_kap) then
             OP=0
          else
@@ -592,14 +592,14 @@
                V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
                res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
          end if
-         
+
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
          Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
-         
+
       end subroutine eval1_mesa_eosDE_and_kap
-      
-      
+
+
       subroutine eval1_kap(s, k, skip_kap, &
             V, logRho, dlnd_dV, T, logT, species, chem_id, net_iso, xa, &
             res, d_dlnd, d_dlnT, OP, OPV, OPT, ierr)
@@ -608,27 +608,27 @@
          logical, intent(in) :: skip_kap
          integer, intent(in) :: species
          integer, pointer :: chem_id(:), net_iso(:)
-         real(dp), intent(in) :: xa(:) 
+         real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: V, logRho, T, logT, dlnd_dV
          real(dp), intent(in), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
          real(dp), intent(out) :: OP, OPV, OPT
          integer, intent(out) :: ierr
-         
+
          real(dp) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
             eta, d_eta_dlnRho, d_eta_dlnT, &
             frac_Type2, opacity, dlnkap_dlnd, dlnkap_dlnT, opacity_factor
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
-         
+
          include 'formats'
          ierr = 0
-         
+
          if (s% RSP_kap_density_factor > 0d0) then
             OP = s% RSP_kap_density_factor*V
             OPV = s% RSP_kap_density_factor
             OPT = 0d0
             return
          end if
-      
+
          lnfree_e = res(i_lnfree_e)
          d_lnfree_e_dlnRho = d_dlnd(i_lnfree_e)
          d_lnfree_e_dlnT = d_dlnT(i_lnfree_e)
@@ -698,17 +698,17 @@
          if (k > 0 .and. k <= s% nz) then
             s% opacity(k) = opacity
          end if
-      
+
       end subroutine eval1_kap
-      
-      
+
+
       subroutine eval1_mesa_T_given_DP(s, k, Vol, P, T_guess, T, ierr)
          use eos_support, only: solve_eos_given_DP
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: Vol, P, T_guess
          real(dp), intent(out) :: T
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          real(dp) :: rho, logRho, logP, logT_guess, &
             logT_tol, logP_tol, logT
          real(dp), dimension(num_eos_basic_results) :: &
@@ -729,23 +729,23 @@
             ierr)
          T = exp10(logT)
       end subroutine eval1_mesa_T_given_DP
-      
-      
+
+
       subroutine eval1_mesa_Rho_given_PT(s, k, P, T, rho_guess, rho, ierr)
          use eos_support, only: solve_eos_given_PT
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: P, T, rho_guess
          real(dp), intent(out) :: rho
-         integer, intent(out) :: ierr           
-                
+         integer, intent(out) :: ierr
+
          real(dp) :: logT, logP, logRho_guess, logRho, &
               logRho_tol, logP_tol
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          integer :: iter
-            
+
          include 'formats'
 
          ierr = 0
@@ -764,7 +764,7 @@
                  s, k, xa, &
                  logT, logP, logRho_guess, logRho_tol, logP_tol, &
                  logRho, res, d_dlnd, d_dlnT, d_dxa, &
-                 ierr)            
+                 ierr)
             if (ierr == 0) exit
             logRho_tol = logRho_tol*3d0
             logP_tol = logP_tol*3d0
@@ -782,22 +782,22 @@
             write(*,2) 'logP', k, logP
             write(*,2) 'logRho_guess', k, logRho_guess
          end if
-               
+
       end subroutine eval1_mesa_Rho_given_PT
-      
-      
+
+
       real(dp) function eval1_gamma_PT_getRho(s, k, P, T, ierr)
          use eos_lib, only: eos_gamma_PT_get
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: P, T
-         integer, intent(out) :: ierr                  
+         integer, intent(out) :: ierr
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          real(dp) :: logP, logT, logRho, rho, gamma
          include 'formats'
          logP = log10(P)
-         logT = log10(T)         
+         logT = log10(T)
          gamma = 5d0/3d0
          call eos_gamma_PT_get( &
             eos_handle, abar, P, logP, T, logT, gamma, &
@@ -816,16 +816,16 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: M, R, L, tau, kap_guess
          real(dp), intent(out) :: T, P, kap, Teff
-         integer, intent(out) :: ierr                  
-         
+         integer, intent(out) :: ierr
+
          real(dp) :: &
             lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap
-         
+
          ierr = 0
 
          call get_atm_PT_legacy_grey_and_kap( &
-              s, tau, L, R, M, s% cgrav(1), .TRUE., & 
+              s, tau, L, R, M, s% cgrav(1), .TRUE., &
               Teff, kap, &
               lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
               lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -833,14 +833,14 @@
 
          T = exp(lnT)
          P = exp(lnP)
-         
+
       end subroutine get_surf_P_T_kap
 
 
       subroutine update_eos_and_kap(s,kk,ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
+         integer, intent(in) :: kk
+         integer, intent(out) :: ierr
          real(dp) :: &
             T,V,Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
             egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
@@ -851,14 +851,14 @@
             s,kk,T,V, &
             Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT, &
             egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
-            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)       
+            CSND,CP,CPV,CPT,Q,QV,QT,OP,OPV,OPT,ierr)
       end subroutine update_eos_and_kap
 
 
       subroutine set_Rho_for_new_Pgas(s,kk,ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
+         integer, intent(in) :: kk
+         integer, intent(out) :: ierr
          real(dp) :: &
             other_value, other_tol, logRho_bnd1, other_at_bnd1, &
             logRho_bnd2, other_at_bnd2, logRho_guess, logRho_result, logRho_tol
@@ -866,9 +866,9 @@
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls
-            
+
          include 'formats'
-         ierr = 0         
+         ierr = 0
          max_iter = 100
          which_other = i_lnPgas
          other_value = log(s% Pgas(kk))
@@ -881,7 +881,7 @@
          logRho_guess = log10(s% rho(kk))
          call store_T_in_xh(s, kk, s% T(kk))
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
-         
+
          call eosDT_get_Rho( &
             eos_handle, &
             species, chem_id, net_iso, xa, &
@@ -891,19 +891,19 @@
             logRho_result, res, d_dlnd, d_dlnT, &
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
-               
+
          s% lnd(kk) = logRho_result*ln10
          s% xh(s% i_lnd,kk) = s% lnd(kk)
          s% rho(kk) = exp(s% lnd(kk))
          s% Vol(kk) = 1d0/s% rho(kk)
-         
+
       end subroutine set_Rho_for_new_Pgas
 
 
       subroutine set_T_for_new_egas(s,kk,ierr)  ! uses s% T(kk), s% egas(kk) and s% lnd(kk)
          type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
+         integer, intent(in) :: kk
+         integer, intent(out) :: ierr
 
          real(dp) :: &
             egas_tol, logT_bnd1, egas_at_bnd1, new_egas, egas_want, &
@@ -912,9 +912,9 @@
             res, d_dlnd, d_dlnT
          real(dp) :: d_dxa(num_eos_d_dxa_results, species)
          integer :: max_iter, eos_calls
-            
+
          include 'formats'
-         ierr = 0         
+         ierr = 0
          max_iter = 100
          egas_want = s% egas(kk)
          egas_tol = egas_want*1d-12
@@ -924,7 +924,7 @@
          logT_bnd2 = arg_not_provided
          egas_at_bnd2 = arg_not_provided
          logT_guess = log10(s% T(kk))
-         
+
          call eosDT_get_T( &
             eos_handle, &
             species, chem_id, net_iso, xa, &
@@ -934,13 +934,13 @@
             logT_result, res, d_dlnd, d_dlnT, &
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
-               
+
          call store_lnT_in_xh(s, kk, logT_result*ln10)
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
-         
+
          new_egas = exp(res(i_lnE)) - crad*s% T(kk)**4/s% rho(kk)
          if (is_bad(new_egas) .or. new_egas <= 0d0 .or. &
-               abs(new_egas - egas_want) > 1d3*egas_tol) then               
+               abs(new_egas - egas_want) > 1d3*egas_tol) then
             write(*,1) 'logRho', s% lnd(kk)/ln10
             write(*,1) 'logT_guess', logT_guess
             write(*,1) 'egas_want', egas_want
@@ -969,14 +969,14 @@
                abs(new_egas - egas_want), egas_tol
             call mesa_error(__FILE__,__LINE__,'set_T_for_new_egas')
          end if
-         
+
       end subroutine set_T_for_new_egas
 
 
       subroutine set_T_for_new_Pgas(s,kk,ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         integer, intent(out) :: ierr  
+         integer, intent(in) :: kk
+         integer, intent(out) :: ierr
          real(dp) :: &
             other_value, other_tol, logT_bnd1, other_at_bnd1, &
             logT_bnd2, other_at_bnd2, logT_guess, logT_result, logT_tol
@@ -984,9 +984,9 @@
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls
-            
+
          include 'formats'
-         ierr = 0         
+         ierr = 0
          max_iter = 100
          which_other = i_lnPgas
          other_value = log(s% Pgas(kk))
@@ -997,7 +997,7 @@
          logT_bnd2 = arg_not_provided
          other_at_bnd2 = arg_not_provided
          logT_guess = log10(s% T(kk))
-         
+
          call eosDT_get_T( &
             eos_handle, &
             species, chem_id, net_iso, xa, &
@@ -1007,7 +1007,7 @@
             logT_result, res, d_dlnd, d_dlnT, &
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
-               
+
          call store_lnT_in_xh(s, kk, logT_result*ln10)
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
 
@@ -1017,9 +1017,9 @@
       subroutine set_T_for_new_energy(s,kk,logT_tol,other_tol,ierr)
          use eos_lib, only: eosDT_get_T
          type (star_info), pointer :: s
-         integer, intent(in) :: kk  
-         real(dp), intent(in) :: logT_tol, other_tol  
-         integer, intent(out) :: ierr  
+         integer, intent(in) :: kk
+         real(dp), intent(in) :: logT_tol, other_tol
+         integer, intent(out) :: ierr
          real(dp) :: &
             other_value, logT_bnd1, other_at_bnd1, &
             logT_bnd2, other_at_bnd2, logT_guess, logT_result
@@ -1027,7 +1027,7 @@
             res, d_dlnd, d_dlnT
          real(dp), dimension(num_eos_d_dxa_results, species) :: d_dxa
          integer :: max_iter, which_other, eos_calls
-         ierr = 0         
+         ierr = 0
          max_iter = 100
          which_other = i_lnE
          other_value = log(s% energy(kk))
@@ -1038,7 +1038,7 @@
          logT_bnd2 = arg_not_provided
          other_at_bnd2 = arg_not_provided
          logT_guess = log10(s% T(kk))
-         
+
          call eosDT_get_T( &
             eos_handle, &
             species, chem_id, net_iso, xa, &
@@ -1048,12 +1048,12 @@
             logT_result, res, d_dlnd, d_dlnT, &
             d_dxa, eos_calls, ierr)
          if (ierr /= 0) return
-               
+
          call store_lnT_in_xh(s, kk, logT_result*ln10)
          call get_T_and_lnT_from_xh(s, kk, s% T(kk), s% lnT(kk))
-      end subroutine set_T_for_new_energy                
+      end subroutine set_T_for_new_energy
 
 
       end module rsp_eval_eos_and_kap
-      
+
 

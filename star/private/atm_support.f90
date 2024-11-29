@@ -73,7 +73,7 @@ contains
     integer, intent(out)      :: ierr
 
     real(dp) :: kap
-    
+
     if (is_bad(tau_surf)) then
        write(*,*) 'tau_surf', tau_surf
        ierr = -1
@@ -106,7 +106,7 @@ contains
             ierr)
 
     case ('irradiated_grey')
-    
+
        call get_irradiated( &
             s, s% atm_irradiated_opacity, skip_partials, L, R, M, cgrav, &
             Teff, &
@@ -228,7 +228,7 @@ contains
        ! All other options use this
 
        tau_base = 2._dp/3._dp
-       
+
     end select
 
     ! Finish
@@ -302,7 +302,7 @@ contains
     select case (T_tau_opacity)
 
     case ('fixed')
-       
+
        ! ok to use s% opacity(1) for fixed
        call atm_eval_T_tau_uniform( &
             tau_surf, L, R, M, cgrav, s% opacity(1), s% Pextra_factor, &
@@ -321,7 +321,7 @@ contains
          if (s% report_ierr) write(*, *) s% retry_message
           return
        endif
-       
+
        ! need to start iterations from same kap each time, so use opacity_start
        if (s% solver_iter > 0) then
           kap_guess = s% opacity_start(1)
@@ -358,7 +358,7 @@ contains
        kap = 0._dp ! This value is not used
 
     case default
-       
+
        write(*,*) 'Unknown value for atm_T_tau_opacity: ' // trim(T_tau_opacity)
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
@@ -383,7 +383,7 @@ contains
       real(dp), intent(out) :: dres_dlnT(:)
       integer, intent(out)  :: ierr
       include 'formats'
-      
+
       call eos_proc( &
            s, lnP, lnT, &
            lnRho, res, dres_dlnRho, dres_dlnT, &
@@ -408,14 +408,14 @@ contains
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
       include 'formats'
-      
+
       call kap_proc( &
            s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
            kap, dlnkap_dlnRho, dlnkap_dlnT, &
            ierr)
 
     end subroutine kap_proc_for_get_T_tau
-    
+
   end subroutine get_T_tau
 
   !****
@@ -427,7 +427,7 @@ contains
          ATM_T_TAU_SOLAR_HOPF, &
          ATM_T_TAU_KRISHNA_SWAMY, &
          ATM_T_TAU_TRAMPEDACH_SOLAR
-    
+
     character(*), intent(in) :: T_tau_relation
     integer, intent(out)     :: T_tau_id
     integer, intent(out)     :: ierr
@@ -556,7 +556,7 @@ contains
        if (s% report_ierr) write(*, *) s% retry_message
        return
     endif
-    
+
     ! If completely off the table, may need to reset tau_base to the
     ! T_Tau value to get the expected off-table behavior.
     if(beta == 0._dp) then
@@ -596,7 +596,7 @@ contains
           s% tau_base = tau_base
        end if
     end if
-    
+
     ! Evaluate temperature and pressure from the table
 
     if (beta /= 0._dp) then
@@ -626,7 +626,7 @@ contains
        dlnP_dlnR_b = 0._dp
        dlnP_dlnM_b = 0._dp
        dlnP_dlnkap_b = 0._dp
-       
+
     endif
 
     ! Evaluate temperature and pressure from the backup atmosphere
@@ -661,7 +661,7 @@ contains
 
           write(*,*) 'Unknown value for atm_off_table_option: ' // trim(s% atm_off_table_option)
           call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
-          
+
        end select
 
     else
@@ -677,7 +677,7 @@ contains
        dlnP_dlnR_a = 0._dp
        dlnP_dlnM_a = 0._dp
        dlnP_dlnkap_a = 0._dp
-       
+
     end if
 
     ! Blend the results together
@@ -686,12 +686,12 @@ contains
     lnP = alfa*lnP_a + beta*lnP_b
 
     if (.not. skip_partials) then
-       
+
        dlnT_dL = alfa*dlnT_dL_a + beta*dlnT_dL_b
        dlnT_dlnR = alfa*dlnT_dlnR_a + beta*dlnT_dlnR_b
        dlnT_dlnM = alfa*dlnT_dlnM_a + beta*dlnT_dlnM_b
        dlnT_dlnkap = alfa*dlnT_dlnkap_a + beta*dlnT_dlnkap_b
-    
+
        dlnP_dL = alfa*dlnP_dL_a + beta*dlnP_dL_b
        dlnP_dlnR = alfa*dlnP_dlnR_a + beta*dlnP_dlnR_b
        dlnP_dlnM = alfa*dlnP_dlnM_a + beta*dlnP_dlnM_b
@@ -769,7 +769,7 @@ contains
   end subroutine get_table_id
 
   !****
-    
+
   subroutine get_irradiated( &
        s, irradiated_opacity, skip_partials, L, R, M, cgrav, &
        Teff, &
@@ -802,7 +802,7 @@ contains
     real(dp) :: tau_surf
 
     include 'formats'
-    
+
     if (s% solver_iter > 0) then
        kap_for_atm = s% opacity_start(1)
     else
@@ -854,7 +854,7 @@ contains
             Teff, kap, tau_surf, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             ierr)
-       
+
     case default
 
        write(*,*) 'Unknown value for atm_irradiated_opacity: ' // trim(irradiated_opacity)
@@ -874,7 +874,7 @@ contains
     ! Update tau_factor
 
     s% tau_factor = tau_surf/s% tau_base
-    
+
     ! Finish
 
     return
@@ -893,7 +893,7 @@ contains
       real(dp), intent(out) :: dres_dlnRho(:)
       real(dp), intent(out) :: dres_dlnT(:)
       integer, intent(out)  :: ierr
-      
+
       call eos_proc( &
            s, lnP, lnT, &
            lnRho, res, dres_dlnRho, dres_dlnT, &
@@ -917,14 +917,14 @@ contains
       real(dp), intent(out) :: dlnkap_dlnRho
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
-      
+
       call kap_proc( &
            s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
            kap, dlnkap_dlnRho, dlnkap_dlnT, &
            ierr)
 
     end subroutine kap_proc_for_get_irradiated
-    
+
   end subroutine get_irradiated
 
   !****
@@ -1024,7 +1024,7 @@ contains
        write(*,*) '   atm_irradiated_opacity = ''varying'' (if atm_grey_irradiated_simple_kap_th = .false.)'
 
     case default
- 
+
       write(*,*) 'Unknown value for atm_option: ' // trim(s% atm_option)
 
     end select
@@ -1048,7 +1048,7 @@ contains
     type(star_info), pointer :: s
     real(dp), intent(in)     :: L, R, Teff, M, cgrav
     integer, intent(out)     :: ierr
-       
+
     ! Create the atmosphere structure by dispatching to the
     ! appropriate internal routine
 
@@ -1083,7 +1083,7 @@ contains
     use atm_lib, only: &
          atm_build_T_tau_uniform, &
          atm_build_T_tau_varying
-    
+
     type(star_info), pointer :: s
     real(dp), intent(in)     :: tau_surf, L, R, Teff, M, cgrav
     character(*), intent(in) :: T_tau_relation
@@ -1164,7 +1164,7 @@ contains
        end if
 
     case default
-       
+
        write(*,*) 'Unknown value for atm_T_tau_opacity: ' // trim(T_tau_opacity)
        call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
@@ -1188,7 +1188,7 @@ contains
       real(dp), intent(out) :: dres_dlnRho(:)
       real(dp), intent(out) :: dres_dlnT(:)
       integer, intent(out)  :: ierr
-      
+
       call eos_proc( &
            s, lnP, lnT, &
            lnRho, res, dres_dlnRho, dres_dlnT, &
@@ -1212,16 +1212,16 @@ contains
       real(dp), intent(out) :: dlnkap_dlnRho
       real(dp), intent(out) :: dlnkap_dlnT
       integer, intent(out)  :: ierr
-      
+
       call kap_proc( &
            s, lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
            kap, dlnkap_dlnRho, dlnkap_dlnT, &
            ierr)
 
     end subroutine kap_proc_for_build_T_tau
-    
+
   end subroutine build_T_tau
-    
+
   !****
 
   subroutine eos_proc( &
@@ -1258,7 +1258,7 @@ contains
 
     Prad = radiation_pressure(T)
     Pgas = MAX(1.E-99_dp, P - Prad)
-       
+
     gamma = 5d0/3d0
     call eos_gamma_PT_get_rho_energy( &
        s% abar(1), P, T, gamma, rho, energy, ierr)
@@ -1266,7 +1266,7 @@ contains
        s% retry_message = 'Call to eos_gamma_PT_get_rho_energy failed in eos_proc'
        if (s% report_ierr) write(*, *) trim(s% retry_message)
     end if
-    
+
     logRho_guess = log10(rho)
 
     call solve_eos_given_PgasT( &
@@ -1282,7 +1282,7 @@ contains
     lnRho = logRho*ln10
 
     ! Finish
-    
+
 
     return
 
@@ -1311,7 +1311,7 @@ contains
     integer, intent(out)     :: ierr
 
     real(dp) :: kap_fracs(num_kap_fracs)
-    
+
     include 'formats'
 
     call get_kap( &
@@ -1326,7 +1326,7 @@ contains
     end if
 
     ! Finish
-    
+
     if (kap <= 0d0 .or. is_bad(kap)) then
        write(*,1) 'bad kap', kap
        write(*,1) 's% zbar(1)', s% zbar(1)

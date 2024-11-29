@@ -33,7 +33,7 @@ module utils_nan_dp
   use ISO_C_BINDING
 
   ! No implicit typing
-      
+
   implicit none
 
   ! Parameters
@@ -76,7 +76,7 @@ module utils_nan_dp
   public :: set_nan
 
   ! Procedures
-      
+
 contains
 
   elemental function is_nan_dp (x, signal) result (is_nan)
@@ -95,7 +95,7 @@ contains
     ix = TRANSFER(x, ix)
 
     ! Split out IEEE fields
-    
+
     frac = IBITS(ix, 0, FRAC_BITS_64)
     expn = IBITS(ix, FRAC_BITS_64, EXPN_BITS_64)
     sign = IBITS(ix, FRAC_BITS_64+EXPN_BITS_64, 1)
@@ -131,7 +131,7 @@ contains
     ix = TRANSFER(x, ix)
 
     ! Split out IEEE fields
-    
+
     frac = IBITS(ix, 0, FRAC_BITS_64)
     expn = IBITS(ix, FRAC_BITS_64, EXPN_BITS_64)
     sign = IBITS(ix, FRAC_BITS_64+EXPN_BITS_64, 1)
@@ -164,7 +164,7 @@ contains
   end function is_bad_dp
 
   !****
-      
+
   subroutine set_nan_dp_0d (x, signal)
 
     real(dp), target, intent(out) :: x

@@ -6,8 +6,8 @@ module ion_offset
 
       logical, parameter :: dbg = .false.
       !logical, parameter :: dbg = .true.
-      
-      
+
+
       private
       public :: compute_ion_offset
 

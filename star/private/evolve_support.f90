@@ -48,7 +48,7 @@
 
          ierr = 0
          nz = s% nz
-         
+
          if (.not. s% rsp_flag) then
 
             call copy_to_old(s% dq, s% dq_old, ierr)
@@ -62,7 +62,7 @@
 
             call copy_to_old(s% j_rot, s% j_rot_old, ierr)
             if (ierr /= 0) return
-            
+
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 
@@ -82,9 +82,9 @@
                   s% xa_old(j,k) = s% xa(j,k)
                end do
             end do
-         
+
          end if
-         
+
          s% model_number_old = s% model_number
          s% nz_old = s% nz
          s% time_old = s% time
@@ -104,7 +104,7 @@
          s% power_h_burn_old = s% power_h_burn
          s% power_he_burn_old = s% power_he_burn
          s% power_z_burn_old = s% power_z_burn
-         s% power_photo_old = s% power_photo         
+         s% power_photo_old = s% power_photo
          s% mstar_dot_old = s% mstar_dot
          s% L_phot_old = s% L_phot
          s% L_surf_old = s% L_surf
@@ -125,7 +125,7 @@
          s% lxtra_old = s% lxtra
 
          call s% other_new_generation(s% id, ierr)
-         
+
          s% need_to_setvars = .true.
 
          contains
@@ -201,7 +201,7 @@
                s% mlt_vc(k) = s% mlt_vc_old(k)
             end do
             s% okay_to_set_mlt_vc = .true.
-            
+
             call set_qs(s, s% nz, s% q, s% dq, ierr)
             if (ierr /= 0) then
                write(*,*) 'set_current_to_old failed in set_qs'

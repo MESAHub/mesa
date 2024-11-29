@@ -28,15 +28,15 @@
       use utils_lib, only: is_bad, mesa_error
       use const_def, only: dp, crad
       use rsp_def
-      
+
       implicit none
-      
+
       private
       public :: mesa_eos_kap, SORT, do_LINA
 
-      
+
       contains
-      
+
 
       subroutine do_LINA(s, L0, NZN, NMODES, VEL, PERS, ETO, &
          M, DM, DM_BAR, R, Vol, T, Et, Lr, ierr)
@@ -51,7 +51,7 @@
       real(dp), intent(inout), dimension(:) :: &
          M, DM, DM_BAR, R, Vol, T, Et, Lr
       integer, intent(out) :: ierr
-      
+
       real(dp), dimension(15) :: OMEG, EK
       real(dp), allocatable, dimension(:) :: &
          E, P, Lc, Hp_face, Y_face, K, CPS, QQS, &
@@ -95,7 +95,7 @@
          QWK,QWKEV,PHR,PHT,PHL,PHU,PHC,ZZZ
       complex(8), allocatable, dimension(:,:) :: &
          VRR,VRT,VRL,VRC,DVRR,DVRT,DVRL,DVRC,VRU
-      
+
       real(dp) :: FFXM,FFX0,FFXP,FFY0,FFYP,FF,POM1
       real(dp) :: IGR1,IGR1XM,IGR1X0,IGR1XP,IGR1Y0,IGR1YP
       real(dp) :: IGR2,IGR2XM,IGR2X0,IGR2XP,IGR2Y0,IGR2YP
@@ -115,12 +115,12 @@
       real(dp) :: PSIG,TEMI,TEMM,TEM1
       real(dp) :: NORMC
       real(dp) :: QCHECK(15),ETOIEV(15),QWKPT(1000,15),ETOIPT(15),SGR(15)
-      real(dp) :: EFL02   
+      real(dp) :: EFL02
       real(dp) :: ETOI(15)
-      
+
       !write(*,'(a55,i12,99(1pd26.16))') 'start LINA s% w(2)**2', &
       !   2, s% w(2)**2, Et(NZN-1)
-      
+
       if (.false.) then
       write(*,*) 'L0', L0
       do I=1,NZN
@@ -136,7 +136,7 @@
       end do
       call mesa_error(__FILE__,__LINE__,'do_LINA')
       end if
-      
+
       ierr = 0
       EFL02 = EFL0*EFL0
       n = NZN+1
@@ -226,7 +226,7 @@
       endif
 
 !     LOOP 1 .. EOS
- 
+
       !$OMP PARALLEL DO PRIVATE(I,T1,op_err) SCHEDULE(dynamic,2)
       do 1 I=1,NZN
 
@@ -240,20 +240,20 @@
          if (ierr /= 0) cycle
 
          T1=P43/dm(I)
-         DVR(I)=3.d0*T1*R(I)**2    
-         if(I==1) goto 2        
-         DVRM(I)=-3.d0*T1*R(max(1,I-1))**2 
+         DVR(I)=3.d0*T1*R(I)**2
+         if(I==1) goto 2
+         DVRM(I)=-3.d0*T1*R(max(1,I-1))**2
              ! bp: max(1,i-1) to prevent bogus warning from gfortran
          goto 3
  2       DVRM(I)=-3.d0*T1*s% R_center**2
  3       continue
-         dP_dr_00(I) =DPV(I)*DVR(I) 
+         dP_dr_00(I) =DPV(I)*DVR(I)
          dP_dr_in(I)=DPV(I)*DVRM(I)
          dCp_dr_00(I) =CPV(I)*DVR(I)
          dCp_dr_in(I)=CPV(I)*DVRM(I)
          dQQ_dr_00(I) =QQV(I)*DVR(I)
          dQQ_dr_in(I)=QQV(I)*DVRM(I)
-         
+
  1    continue
       !$OMP END PARALLEL DO
       if (ierr /= 0) return
@@ -274,20 +274,20 @@
          Hp_face(I)=POM2
          dHp_dr_in(I)=POM*(P(I)*DVRM(I)+Vol(I)*dP_dr_in(I))
          dHp_dr_00(I)=2.d0*Hp_face(I)/R(I)+POM*(P(I)*DVR(I)+Vol(I)*dP_dr_00(I) &
-                   +P(I+1)*DVRM(I+1)+Vol(I+1)*dP_dr_in(I+1)) 
+                   +P(I+1)*DVRM(I+1)+Vol(I+1)*dP_dr_in(I+1))
          dHp_dr_out(I)=POM*(P(I+1)*DVR(I+1)+Vol(I+1)*dP_dr_00(I+1))
          dHp_dT_00(I)=POM*Vol(I)*dP_dT_00(I)
          dHp_dT_out(I)=POM*Vol(I+1)*dP_dT_00(I+1)
       enddo
       POM=(R(NZN)**2)/(2.d0*G*M(NZN))
       Hp_face(NZN)=POM*P(NZN)*Vol(NZN)
-      dHp_dr_in(NZN)=POM*(P(NZN)*DVRM(NZN)+Vol(NZN)*dP_dr_in(NZN))     
+      dHp_dr_in(NZN)=POM*(P(NZN)*DVRM(NZN)+Vol(NZN)*dP_dr_in(NZN))
       dHp_dr_00(NZN)=2.d0*Hp_face(NZN)/R(NZN)+POM* &
       (P(NZN)*DVR(NZN)+Vol(NZN)*dP_dr_00(NZN))
       dHp_dr_out(NZN)=0.d0
       dHp_dT_00(NZN)=POM*Vol(NZN)*dP_dT_00(NZN)
       dHp_dT_out(NZN)=0.d0
-      
+
       !call mesa_error(__FILE__,__LINE__,'Hp_face')
 
       do I=1,NZN-1
@@ -326,7 +326,7 @@
          dY_dT_00(I)=IGR1*IGR2Y0+IGR2*IGR1Y0
          dY_dT_out(I)=IGR1*IGR2YP+IGR2*IGR1YP
       enddo
-      
+
       !call mesa_error(__FILE__,__LINE__,'IGRS')
 
       do I=1,NZN-1
@@ -341,7 +341,7 @@
               ((DEV(I+1)+P(I+1))*DVRM(I+1)+Vol(I+1)*dP_dr_in(I+1)) &
               /T(I+1))
          FFXM=POM* ((DEV(I)  +P(I)  )*DVRM(I) +Vol(I)*dP_dr_in(I))/T(I)
-         
+
          POM=ALFAS*ALFA
          POM2=0.5d0*(CPS(I)+CPS(I+1))
          GG=POM*POM2*Y_face(I)
@@ -358,12 +358,12 @@
          PII(I)=POM*GG
          DPIIZ0(I)=0.d0
          dPII_dr_00(I)=POM*GGX0
-         dPII_dr_in(I)=POM*GGXM 
+         dPII_dr_in(I)=POM*GGXM
          dPII_dr_out(I)=POM*GGXP
          dPII_dT_00(I)=POM*GGY0
          dPII_dT_out(I)=POM*GGYP
       enddo
- 
+
       !call mesa_error(__FILE__,__LINE__,'LINA')
 
       do I=IBOTOM+1,NZN-1
@@ -473,7 +473,7 @@
                      +TEM1*T(I)**3*(2.d0*Vol(I)*DVR(I) &
                     -Vol(I)**2*( 1.d0/CPS(I)*dCp_dr_00(I) &
                                  +1.d0/K(I)*dK_dV_00(I)*DVR(I))) &
-                      /(CPS(I)*K(I))              
+                      /(CPS(I)*K(I))
 
             d_dampR_dr_in(I)=d_dampR_dr_in(I) &
                     +TEM1*T(I)**3*(2.d0*Vol(I)*DVRM(I) &
@@ -488,7 +488,7 @@
                          /(CPS(I)*K(I))
 
          endif
-  
+
          dC_dr_00(I) =dsrc_dr_00(I) -d_damp_dr_00(I) -d_dampR_dr_00(I)
          dC_dr_out(I) =dsrc_dr_out(I) -d_damp_dr_out(I) -d_dampR_dr_out(I)
          dC_dr_in(I) =dsrc_dr_in(I) -d_damp_dr_in(I) -d_dampR_dr_in(I)
@@ -497,9 +497,9 @@
          dC_dT_00(I) =dsrc_dT_00(I) -d_damp_dT_00(I) -d_dampR_dT_00(I)
          dC_dT_out(I) =dsrc_dT_out(I) -d_damp_dT_out(I) -d_dampR_dT_out(I)
          dC_dw_00(I) =dsrc_dw_00(I) -d_damp_dw_00(I) -d_dampR_dw_00(I)
-         
+
       enddo
- 
+
        !call mesa_error(__FILE__,__LINE__,'LINA')
 
       do I=IBOTOM,NZN-1
@@ -572,8 +572,8 @@
                     +Lt(I)/Hp_face(I)*dHp_dr_out(I)
             DLTY0(I)=Lt(I)/Hp_face(I)*dHp_dT_00(I)
             DLTYP(I)=Lt(I)/Hp_face(I)*dHp_dT_out(I)
-            DLTZ0(I)=-POM*POM2*1.5d0*sqrt(Et(I)  )/dm_bar(I) 
-            DLTZP(I)= POM*POM2*1.5d0*sqrt(Et(I+1))/dm_bar(I) 
+            DLTZ0(I)=-POM*POM2*1.5d0*sqrt(Et(I)  )/dm_bar(I)
+            DLTZP(I)= POM*POM2*1.5d0*sqrt(Et(I+1))/dm_bar(I)
          endif
       enddo
 
@@ -603,12 +603,12 @@
             EVUU0(I)= POM*POM1*POM2/R(I)
             EVUUM(I)=-POM*POM1*POM2/R(I-1)
          else
-!           Kollath et al. 2002  EDDY VISCOSITY pressure 
+!           Kollath et al. 2002  EDDY VISCOSITY pressure
             POM=-(16.d0/3.d0)*PI*ALFA*abs(ALFAM)*sqrt(Et(I))
             POM1=1.d0/Vol(I)**2/dm(I)
             POM2=(R(I)**3+R(I-1)**3)*(Hp_face(I)+Hp_face(I-1))*0.25d0
             EVUU0(I)= POM*POM1*POM2/R(I)
-            EVUUM(I)=-POM*POM1*POM2/R(I-1) 
+            EVUUM(I)=-POM*POM1*POM2/R(I-1)
           endif
       enddo
 
@@ -673,7 +673,7 @@
       dC_dT_in(NZN) = 0.d0
       dC_dT_00(NZN) = 0.d0
       dC_dT_out(NZN) = 0.d0
-      dC_dw_00(NZN) = 0.d0 
+      dC_dw_00(NZN) = 0.d0
       EVUU0(NZN)= 0.d0
       EVUUM(NZN)= 0.d0
 
@@ -725,7 +725,7 @@
          DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
          DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
          DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
-         DLRM= DLK *dK_dV_00(I)  *DVRM(I)         
+         DLRM= DLK *dK_dV_00(I)  *DVRM(I)
          DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
          DLTP=4.d0*(T3/T(I+1))*(W_out*BW/K(I+1)-T2*BK/BW)+DLKP*dK_dT_00(I+1)
          DLT=-4.d0*(T3/T(I))*(W_00*BW/K(I)-T2*BK/BW)+DLK*dK_dT_00(I)
@@ -759,7 +759,7 @@
          ELTP(I) = DLTP  +DFCYP +DLTYP(I)
          ELT(I)  = DLT   +DFCY0 +DLTY0(I)
          ELZ0(I) =        DFCZ0 +DLTZ0(I)
-         ELZP(I) =        DFCZP +DLTZP(I) 
+         ELZP(I) =        DFCZP +DLTZP(I)
 
 !        CALC ENERGY EQUATION(I)
          T2=P4/dm(I)
@@ -839,7 +839,7 @@
             MU01(I) = 0.d0
             MZ01(I) = 0.d0
          endif
-      
+
   5    continue
 
       do I=1,NZN3
@@ -856,7 +856,7 @@
 ! ENERGY EQUATION
 ! (c_v)(dT/dt) = - (p+(de/dV)_T)(dV/dR)U - (dLr/dm)
 ! TURBULENT ENERGY EQUATION
-! (de_t/dt) = 
+! (de_t/dt) =
 ! SEE CODE DOCUMENTATION FOR LINEARIZATION
 !
 ! EIGENVALUE PROBLEM: LLL*X=SIGMA*X
@@ -919,29 +919,29 @@
          if(IC-7>=1)    LLL(IC,IC-7)  = CX10(I)
          if(IC-3>=1)    LLL(IC,IC-3)  = CX00(I)
          if(IC+1<=NZN3) LLL(IC,IC+1)  = CX01(I)
-  
-         if(IC-6>=1)    LLL(IC,IC-6)  = CU10(I) 
-         if(IC-2>=1)    LLL(IC,IC-2)  = CU00(I) 
 
-         if(IC-5>=1)    LLL(IC,IC-5)  = CY10(I) 
-         if(IC-1>=1)    LLL(IC,IC-1)  = CY00(I) 
+         if(IC-6>=1)    LLL(IC,IC-6)  = CU10(I)
+         if(IC-2>=1)    LLL(IC,IC-2)  = CU00(I)
+
+         if(IC-5>=1)    LLL(IC,IC-5)  = CY10(I)
+         if(IC-1>=1)    LLL(IC,IC-1)  = CY00(I)
          if(IC+3<=NZN3) LLL(IC,IC+3)  = CY01(I)
 
-         if(IC-4>=1)    LLL(IC,IC-4)  = CZ10(I) 
+         if(IC-4>=1)    LLL(IC,IC-4)  = CZ10(I)
                           LLL(IC,IC)    = CZ00(I)
          if(IC+4<=NZN3) LLL(IC,IC+4)  = CZ01(I)
-         
+
          IF (IE+4 <= NZN3) then
             if(LLL(IE,IE+4)<0.d0)then
                !write(*,*) 'rerrrrrrrrrrrrrrrrrrrrrrrr',i
             endif
          endif
       enddo
-      
+
       if (s% RSP_trace_RSP_build_model) &
          write(*,*) 'waiting for DGEEV to solve eigenvalue problem....'
       call DGEEV('n','v',NZN3,LLL,LD_LLL,WRx,WIx,VLx,LD_VL,VRx,LD_VR, &
-                 WORKx,4*NZN3,INFO)         
+                 WORKx,4*NZN3,INFO)
       if(INFO/=0)then
          write(*,*) 'FAILED!'
          write(*,*) 'LAPACK/DGEEV error, ierr= ',INFO
@@ -994,7 +994,7 @@
                        VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2) !surface value
          VTTS(J)=VRx(4*NZN-3,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                        VRx(4*NZN-3,ISORTx(IMI+J-1)+1)
- 
+
          SCALE(J)=R(NZN)/VTTS(J)
 !        PERS(J) IS THE PERIOD OF THE MODE J (IN SECONDS)
          OMEG(J)=WIx(IMI+J-1)
@@ -1010,7 +1010,7 @@
 !           SEE LAPACK USERS GUIDE FOR CONSTRUCTION OF EIGENVECTORS
 
 !           VRR(I,J) IS THE dR EIGENVECTOR OF THE MODE J
-!           dR_i 
+!           dR_i
             VRR(I,J)=VRx(4*I-3,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                      VRx(4*I-3,ISORTx(IMI+J-1)+1)
 !           DVRR(I,J) IS SCALED dR/R EIGENVECTOR OF THE MODE (J)
@@ -1018,7 +1018,7 @@
             DVRR(I,J)=VRR(I,J)/R(I)*SCALE(J)
             PHR(I,J)=datan2(aimag(DVRR(I,J)),dble(DVRR(I,J)))
 
-!           VRT(I,J) IS THE dT EIGENVECTOR OF THE MODE J 
+!           VRT(I,J) IS THE dT EIGENVECTOR OF THE MODE J
 !           dT_i
             VRT(I,J)=VRx(4*I-1,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                      VRx(4*I-1,ISORTx(IMI+J-1)+1)
@@ -1027,7 +1027,7 @@
             DVRT(I,J)=VRT(I,J)/T(I)*SCALE(J)
             PHT(I,J)=datan2(aimag(DVRT(I,J)),dble(DVRT(I,J)))
 
-!           VRC(I,J) IS THE dT EIGENVECTOR OF THE MODE J 
+!           VRC(I,J) IS THE dT EIGENVECTOR OF THE MODE J
 !           dOMEGA_i
             VRC(I,J)=VRx(4*I,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                      VRx(4*I,ISORTx(IMI+J-1)+1)
@@ -1037,7 +1037,7 @@
             if(NORMC<abs(DVRC(I,J))) NORMC=abs(DVRC(I,J))
             PHC(I,J)=datan2(aimag(DVRC(I,J)),dble(DVRC(I,J)))
 
-!           VRU(I,J) IS THE dU EIGENVECTOR OF THE MODE J 
+!           VRU(I,J) IS THE dU EIGENVECTOR OF THE MODE J
 !           dU_i
             VRU(I,J)=VRx(4*I-2,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                      VRx(4*I-2,ISORTx(IMI+J-1)+1)
@@ -1063,9 +1063,9 @@
             dP_dT_00URB=dP_dT_00URB+dPtrb_dw_00(I)*VRC(I,J)
             dP_dT_00URB=dP_dT_00URB*SCALE(J)
 
-            QWK(I,J)=-PI*dm(I)*aimag(conjg(DP_0)*DV_0) 
-            if(ALFAM<0.d0)QWKEV(I,J)=-PI*dm(I)*aimag(conjg(DPEV)*DV_0) 
-            QWKPT(I,J)=-PI*dm(I)*aimag(conjg(dP_dT_00URB)*DV_0) 
+            QWK(I,J)=-PI*dm(I)*aimag(conjg(DP_0)*DV_0)
+            if(ALFAM<0.d0)QWKEV(I,J)=-PI*dm(I)*aimag(conjg(DPEV)*DV_0)
+            QWKPT(I,J)=-PI*dm(I)*aimag(conjg(dP_dT_00URB)*DV_0)
             if(ALFAM>0.d0)then
                QWKEV(I,J)=PI*dm(I)*aimag(conjg(DPEV)*(DV_0/R(I)**3- &
                         3.d0*Vol(I)/R(I)**4*VRR(I,J)*SCALE(J)))
@@ -1075,7 +1075,7 @@
               SGRP=SGRP+QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)
             if(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J)<0.d0) &
               SGRM=SGRM+abs(QWK(I,J)+QWKEV(I,J)+QWKPT(I,J))
-        
+
             VEL(I,J)=abs(VRR(I,J))/VRRS(J)
             if(abs(PHR(I,J))>1.57d0)VEL(I,J)=-VEL(I,J)
          enddo
@@ -1112,7 +1112,7 @@
 
 !        CALCULATE LUMINOSITY EIGENFUNCTIONS
          do I=1,NZN
-!           VRL(I,J) IS THE dL EIGENVECTOR OF THE MODE J 
+!           VRL(I,J) IS THE dL EIGENVECTOR OF THE MODE J
 !           dL_i
             VRL(I,J)= ELT(I)*VRT(I,J) &
                      +ELR(I)*VRR(I,J) &
@@ -1167,17 +1167,17 @@
  26      format('control: f: (',1P,D15.8,' , ',D15.8,'), abs(f):',D15.8)
 
       enddo
-      
+
       !write(*,'(a55,i12,99(1pd26.16))') 'end LINA s% w(2)**2 Et', &
       !   2, s% w(2)**2, Et(NZN-1)
 
       return
       end subroutine do_LINA
-     
-     
+
+
       SUBROUTINE mesa_eos_kap (s,k,G,H, &   !input: temp,volume  &
                P,PV,PT,E,EV,ET,CP,CPV,dCp_dT_00, &
-               Q,QV,QT,OP,OPV,OPT,ierr) 
+               Q,QV,QT,OP,OPV,OPT,ierr)
       use rsp_eval_eos_and_kap, only : eval_mesa_eos_and_kap
       implicit none
       type (star_info), pointer :: s
@@ -1202,7 +1202,7 @@
                Pgas,d_Pg_dV,d_Pg_dT,Prad,d_Pr_dT,&
                egas,d_egas_dV,d_egas_dT,erad,d_erad_dV,d_erad_dT, &
                cs,CP,CPV,dCp_dT_00, &
-               Q,QV,QT,OP,OPV,OPT,ierr) 
+               Q,QV,QT,OP,OPV,OPT,ierr)
       if (ierr /= 0) return
       E = egas + erad
       EV = d_egas_dV + d_erad_dV
@@ -1225,7 +1225,7 @@
       real(dp) :: RA(N),RB(N)
       integer :: L,IR,I,J,RRI
       real(dp) ::  RRA,RRB
-   
+
       do I=1,N
          ISORT(I)=I
       enddo
@@ -1276,5 +1276,5 @@
       goto 10
       end subroutine SORT
 
-            
+
       end module rsp_lina

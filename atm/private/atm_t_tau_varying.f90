@@ -25,7 +25,7 @@
 ! ***********************************************************************
 
 module atm_T_tau_varying
-  
+
   ! Uses
 
   use const_def
@@ -48,7 +48,7 @@ module atm_T_tau_varying
 contains
 
   ! Evaluate atmosphere data from T-tau relation with varying opacity
-  
+
   subroutine eval_T_tau_varying( &
        tau_surf, L, R, M, cgrav, &
        T_tau_id, eos_proc, kap_proc, &
@@ -102,9 +102,9 @@ contains
     real(dp) :: dlnP_dlnTeff
 
     ierr = 0
-    
+
     ! Sanity checks
-    
+
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
        ierr = -1
        return
@@ -141,7 +141,7 @@ contains
        dlnP_dlnkap = 0._dp
 
     else
- 
+
        ! Partials required, use finite differencing in Teff (we could
        ! in principle get dlnT_dlnTeff from the T-tau relation, but
        ! for consistency with dln_dlnTeff we use the same finite
@@ -155,12 +155,12 @@ contains
        !$OMP SECTIONS
 
        !$OMP SECTION
-            
+
        call eval_data( &
             tau_surf, exp(lnTeff), g, &
             T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
             lnT, lnP, ierr)
-            
+
        !$OMP SECTION
 
        call eval_data( &
@@ -188,7 +188,7 @@ contains
 
        dlnTeff_dlnR = -0.5_dp
        dlnTeff_dL = 0.25_dp/L
-         
+
        dlnT_dlnTeff = (lnT_p - lnT_m) / (lnTeff_p - lnTeff_m)
        dlnT_dL = dlnT_dlnTeff*dlnTeff_dL
        dlnT_dlnR = dlnT_dlnTeff*dlnTeff_dlnR
@@ -202,7 +202,7 @@ contains
        dlnP_dlnkap = 0._dp
 
     endif
-         
+
     ! Finish
 
     return
@@ -210,9 +210,9 @@ contains
   end subroutine eval_T_tau_varying
 
   !****
-       
+
   ! Evaluate atmosphere data from T-tau relation with varying opacity
-  
+
   subroutine eval_data( &
        tau_surf, Teff, g, &
        T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
@@ -322,7 +322,7 @@ contains
     integer           :: idid
 
     ierr = 0
-        
+
     ! Allocate work arrays for the integrator
 
     call dopri5_work_sizes(NUM_VARS, NRDENS, liwork, lwork)
@@ -346,20 +346,20 @@ contains
     ! Pgas from low-density ideal gas law)
 
     lnTeff = log(Teff)
-  
+
     call eval_T_tau(T_tau_id, tau_outer, Teff, lnT, ierr)
     if (ierr /= 0) then
        write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
        return
     end if
-    
+
     T_outer = exp(lnT)
     Pgas_outer = cgas*RHO_OUTER*T_outer
     P_outer = Pgas_outer + radiation_pressure(T_outer)
     lnP = log(P_outer)
 
     y(1) = lnP
-    
+
     ! Integrate inward from tau_outer to tau_surf
 
     lntau_outer = log(tau_outer)
@@ -372,11 +372,11 @@ contains
 
     call dopri5( &
          NUM_VARS, eval_fcn, lntau_outer, y, lntau_surf, &
-         dlntau, DLNTAU_MAX, max_steps, & 
-         rtol, atol, 1, & 
-         eval_solout, IOUT, & 
-         work, lwork, iwork, liwork, & 
-         LRPAR, rpar, LIPAR, ipar, & 
+         dlntau, DLNTAU_MAX, max_steps, &
+         rtol, atol, 1, &
+         eval_solout, IOUT, &
+         work, lwork, iwork, liwork, &
+         LRPAR, rpar, LIPAR, ipar, &
          LOUT, idid)
     if (idid < 0) then
        write(*,*) 'Call to dopri5 failed in eval_data_try: idid=', idid
@@ -387,7 +387,7 @@ contains
     ! Store the final pressure and temperature
 
     lnP = y(1)
-    
+
     call eval_T_tau(T_tau_id, tau_surf, Teff, lnT, ierr)
     if (ierr /= 0) then
        write(*,*) 'atm: Call to eval_T_tau failed in eval_data_try'
@@ -463,7 +463,7 @@ contains
           write(*,*) 'atm: Call to kap_proc failed in eval_fcn'
           return
        end if
-      
+
       ! Set up the rhs for the hydrostatic eqm equation
        ! dlnP/dlntau = tau*g/P*kappa
 
@@ -633,11 +633,11 @@ contains
 
     call dopri5( &
          NUM_VARS, build_fcn, lntau_surf, y, lntau_outer, &
-         dlntau, dlntau_max, MAX_STEPS, & 
-         rtol, atol, 1, & 
-         build_solout, IOUT, & 
-         work, lwork, iwork, liwork, & 
-         LRPAR, rpar, LIPAR, ipar, & 
+         dlntau, dlntau_max, MAX_STEPS, &
+         rtol, atol, 1, &
+         build_solout, IOUT, &
+         work, lwork, iwork, liwork, &
+         LRPAR, rpar, LIPAR, ipar, &
          LOUT, idid)
     if (idid < 0) then
        write(*,*) 'atm: Call to dopri5 failed in build_T_tau_varying: idid=', idid
@@ -688,7 +688,7 @@ contains
       ! Set up the rhs for the optical depth and hydrostatic
       ! equilibrium equations
       ! dr/dlntau = -tau/(kappa*rho)
-      ! 
+      !
 
       tau = exp(x)
       P = exp(y(2))
@@ -822,7 +822,7 @@ contains
           write(*,*) 'atm: Call to kap_proc failed in build_data'
           return
        end if
-      
+
       ! Evaluate radiative temperature gradient
 
       gradr = eval_Paczynski_gradr(exp(lnT), exp(lnP), exp(lnRho), tau, kap, L, M, R, cgrav)

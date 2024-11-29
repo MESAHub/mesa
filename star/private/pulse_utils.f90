@@ -31,7 +31,7 @@ module pulse_utils
   use const_def
   use num_lib
   use star_utils
-  
+
   ! No implicit typing
 
   implicit none
@@ -107,7 +107,7 @@ contains
        endif
 
     else
-       
+
        mask = .false.
 
     endif
@@ -149,7 +149,7 @@ contains
   end subroutine set_segment_indices
 
   !****
-  
+
   real(dp) function eval_face (dq, v, k, k_a, k_b, v_lo, v_hi) result (v_face)
 
     real(dp), intent(in)           :: dq(:)
@@ -167,7 +167,7 @@ contains
     if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face: out-of-bounds interpolation')
 
     if (k_b == k_a) then
-            
+
        ! Using a single cell
 
        v_face = v(k_a)
@@ -175,7 +175,7 @@ contains
     else
 
        ! Using multiple cells
-       
+
        if (k == k_a) then
           v_face = v(k_a) - dq(k_a)*(v(k_a+1) - v(k_a))/(dq(k_a+1) + dq(k_a))
        elseif (k == k_a+1) then
@@ -203,11 +203,11 @@ contains
     ! Finish
 
     return
-    
+
   end function eval_face
 
   !****
-  
+
   real(dp) function eval_face_X (s, i, k, k_a, k_b) result (X_face)
 
     type(star_info), intent(in)    :: s
@@ -223,9 +223,9 @@ contains
     if (k < k_a .OR. k > k_b+1) call mesa_error(__FILE__,__LINE__,'eval_face_X: out-of-bounds interpolation')
 
     if (i >= 1) then
-    
+
        if (k_b == k_a) then
-            
+
           ! Using a single cell
 
           X_face = s%xa(i,k_a)
@@ -233,7 +233,7 @@ contains
        else
 
           ! Using multiple cells
-       
+
           if (k == k_a) then
              X_face = s%xa(i,k_a) - s%dq(k_a)*(s%xa(i,k_a+1) - s%xa(i,k_a))/(s%dq(k_a+1) + s%dq(k_a))
           elseif (k == k_a+1) then
@@ -261,7 +261,7 @@ contains
     ! Finish
 
     return
-    
+
   end function eval_face_X
 
   !****
@@ -302,7 +302,7 @@ contains
 
           A_ast_1 = s%brunt_N2(k_b-1)*s%r(k_b-1)/s%grav(k_b)
           A_ast_2 = s%brunt_N2(k_b)*s%r(k_b)/s%grav(k_b)
-          
+
           A_ast_face = A_ast_2 + s%dq(k_b)*(A_ast_2 - A_ast_1)/s%dq(k_b-1)
 
        else
@@ -312,7 +312,7 @@ contains
        endif
 
     end if
-    
+
     ! Finish
 
     return
@@ -380,7 +380,7 @@ contains
   !****
 
   real(dp) function eval_center (r, v, k_a, k_b, v_lo, v_hi) result (v_center)
- 
+
     real(dp), intent(in)           :: r(:)
     real(dp), intent(in)           :: v(:)
     integer, intent(in)            :: k_a
@@ -466,7 +466,7 @@ contains
 
           ! Using the innermost two cells/faces in k_a:k_b; fit a parabola,
           ! with dv/dr = 0 at the center
-          
+
           r_1 = s%rmid(k_b)
           r_2 = s%rmid(k_b-1)
 
@@ -496,7 +496,7 @@ contains
   !****
 
   real(dp) function eval_center_rho (s, k_b) result (rho_center)
- 
+
     type(star_info), intent(in) :: s
     integer, intent(in)         :: k_b
 

@@ -753,7 +753,7 @@ contains
 
    end subroutine binary_history_getval
 
-   subroutine get_binary_history_specs(b, num, names, specs)
+   subroutine get_binary_history_specs(b, num, names, specs, report)
 
       use utils_lib
       use utils_def
@@ -762,6 +762,7 @@ contains
       integer, intent(in) :: num
       character (len = *), intent(in) :: names(:)
       integer, intent(out) :: specs(:)
+      logical, intent(in) :: report
 
       integer :: i, ierr, n, j, iounit, t
       character (len = strlen) :: buffer, string
@@ -778,15 +779,16 @@ contains
          j = 0
          t = token(iounit, n, j, buffer, string)
          if (t /= name_token) then
-            if (len_trim(names(i)) > 0) &
+            if (len_trim(names(i)) > 0 .and. report) &
                write(*, *) 'bad value for name of history item ' // trim(names(i))
             specs(i) = -1
             ierr = 0
             cycle
          end if
          specs(i) = do1_binary_history_spec(&
-            iounit, t, n, j, string, buffer, ierr)
+            iounit, t, n, j, string, buffer, report, ierr)
          if (ierr /= 0) then
+            if (report) write(*, *) 'get_binary_history_specs failed for ' // trim(names(i))
             specs(i) = -1
             ierr = 0
          end if
@@ -833,7 +835,7 @@ contains
    end subroutine get_binary_history_values
 
    logical function get1_binary_hist_value(b, name, val)
-      ! includes other_history_columns from run_star_extras
+      ! includes other_history_columns from run_binary_extras
       use utils_lib, only : integer_dict_lookup
       type (binary_info), pointer :: b
       character (len = *) :: name

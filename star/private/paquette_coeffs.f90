@@ -6,7 +6,7 @@
       implicit none
 
       private
-      
+
       public :: paquette_coefficients
       public :: initialise_collision_integrals
       public :: free_collision_integrals
@@ -674,7 +674,7 @@
 !$omp end critical (collision_integrals)
       end subroutine initialise_collision_integrals
 
-      
+
       subroutine free_collision_integrals
 
 !$omp critical (collision_integrals_shutdown)
@@ -700,5 +700,5 @@
 !$omp end critical (collision_integrals_shutdown)
       end subroutine free_collision_integrals
 
-      
+
       end module paquette_coeffs

@@ -1434,7 +1434,7 @@ contains
             read_extra_pgbinary_inlist(i) = .false.
             extra(i) = extra_pgbinary_inlist_name(i)
             extra_pgbinary_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read_pgbinary_file(b, extra(i), level+1, ierr)
                if (ierr /= 0) return

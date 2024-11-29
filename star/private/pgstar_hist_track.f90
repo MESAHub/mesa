@@ -807,7 +807,7 @@
          call pgunsa
 
          call show_pgstar_decorator(s%id, use_decorator, pgstar_decorator, 0, ierr)
-            
+
          deallocate(xvec, yvec)
 
          contains

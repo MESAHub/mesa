@@ -23,14 +23,14 @@
 !
 !
 ! ***********************************************************************
- 
+
       module nuclide_set_mod
-      use chem_def   
+      use chem_def
       use const_def
-      
+
       implicit none
 
-      contains      
+      contains
 
       function rank_in_set(iso, set)
          character(len=iso_name_length), intent(in) :: iso
@@ -43,7 +43,7 @@
          if (adjustl(iso) < adjustl(set(low)% nuclide) .or. adjustl(iso) > adjustl(set(high)% nuclide)) then
             rank_in_set = nuclide_not_found
             return
-         end if   
+         end if
          do i = 1, max_cycles
             if (high-low <=1) then
                if (adjustl(iso) == adjustl(set(high)% nuclide)) then
@@ -64,13 +64,13 @@
          end do
          rank_in_set = nuclide_not_found
       end function rank_in_set
-      
+
 
       subroutine sort_nuclide_set(set)
-         type(nuclide_set), dimension(:), intent(inout) :: set 
+         type(nuclide_set), dimension(:), intent(inout) :: set
          integer :: n, i, ir, j, l
          type(nuclide_set) :: ts
-   
+
          n = size(set)
          if (size(set) < 2) return
          l = n/2+1
@@ -107,13 +107,13 @@
          end do
 
          contains
-         
+
          logical function compare_lt(a, b)
             type(nuclide_set), intent(in) :: a, b
             compare_lt = (adjustl(a% nuclide) < adjustl(b% nuclide))
          end function compare_lt
-         
+
       end subroutine sort_nuclide_set
-      
+
 
       end module nuclide_set_mod

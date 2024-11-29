@@ -34,7 +34,7 @@ module star_pgstar
       ! pgstar data
 
    abstract interface
-      
+
       subroutine pgstar_plot_interface(id, device_id, ierr)
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
@@ -50,7 +50,7 @@ module star_pgstar
       subroutine pgstar_decorator_interface(id, xmin, xmax, ymin, ymax, plot_num, ierr)
          integer, intent(in) :: id
          !Not doubles
-         real, intent(in) :: xmin, xmax, ymin, ymax 
+         real, intent(in) :: xmin, xmax, ymin, ymax
          integer, intent(in) :: plot_num
          integer, intent(out) :: ierr
       end subroutine pgstar_decorator_interface
@@ -81,7 +81,7 @@ module star_pgstar
       real(dp), pointer :: vals(:) => null() ! values of items in history_columns list
       type (pgstar_hist_node), pointer :: next => null()
          ! list kept in strictly decreasing order by age & step
-   end type pgstar_hist_node  
+   end type pgstar_hist_node
 
 
    integer, parameter :: max_Abundance_num_isos_to_show = 1000

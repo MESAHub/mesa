@@ -21,21 +21,21 @@
 ! ***********************************************************************
 
       module create_FSCRliq8_table
-      
+
       use const_def
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
-      
+
       implicit none
 
       public :: do_create_FSCRliq8_table
       private
 
-      
+
    contains
-   
-   
+
+
    subroutine do_create_FSCRliq8_table(fname,iZion)
       character (len=*), intent(in) :: fname
       integer, intent(in) :: iZion
@@ -44,28 +44,28 @@
       integer :: nlogRS, nlogGAME, io_unit, i, j, ierr
       real(dp) :: Zion, RS, GAME, FSCR, USCR, PSCR, CVSCR, PDTSCR, PDRSCR
       include 'formats'
-      
+
       Zion = iZion
-      
+
       logRS_min = -3.5d0
       logRS_max = 0.0d0
       dlogRS = 1d-2
       nlogRS = (logRS_max - logRS_min)/dlogRS + 1
-      
+
       logGAME_min = -2d0
       logGAME_max = 4d0
       dlogGAME = 1d-2
       nlogGAME = (logGAME_max - logGAME_min)/dlogGAME + 1
 
       io_unit = 40
-         
+
       !write(*,'(a)') 'create ' // trim(fname)
 
       open(unit=io_unit,file=trim(fname))
-      
+
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
       		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME', 'Zion'
-      
+
       write(io_unit,'(2(i10,4x,3(f14.4)),i14)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
          nlogGAME, logGAME_min, logGAME_max, dlogGAME, iZion
@@ -73,7 +73,7 @@
       do i = 1, nlogRS
          logRS = logRS_min + (i-1) * dlogRS
          RS = exp10(logRS)
-         write(io_unit,'(/,7x,a)') 'logRS' 
+         write(io_unit,'(/,7x,a)') 'logRS'
          write(io_unit,'(2x,f14.6/)') logRS
          write(io_unit,'(99(a26))') &
             'logGAME', 'FSCR', 'USCR', 'PSCR', 'CVSCR', 'PDTSCR', 'PDRSCR', 'RS', 'GAME'
@@ -101,7 +101,7 @@
       write(io_unit,*)
       write(io_unit,*)
       close(io_unit)
-         
+
    end subroutine do_create_FSCRliq8_table
 
 
@@ -135,7 +135,7 @@
       real(dp) :: DN1, DN1DX, DN1DG, DN1DXX, DN1DGG, DN1DXG
       real(dp) :: DN, DNDX, DNDG, DNDXX, DNDGG, DNDXG
       real(dp) :: FX, FXDG, FDX, FG, FDG, FDGDH, FDXX, FDGG, FDXG
-      
+
       real(dp), parameter :: XRS=.0140047d0
       real(dp), parameter :: TINY=1.d-19
 

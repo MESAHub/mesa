@@ -25,21 +25,21 @@
       use const_def, only: dp
       use my_lapack95
       use utils_lib, only: set_nan, mesa_error
-      
+
       implicit none
-    
+
       type ulstore
          integer :: ul_size    ! size of umat1 & lmat1 (0 if not allocated)
          real(dp), pointer :: umat1(:), lmat1(:)
       end type ulstore
 
       type(ulstore), pointer :: odd_storage(:) => null()
-      
+
       logical, parameter :: dbg = .false.
-      
+
       logical, parameter :: do_fill_with_NaNs = .false.
-      
-      
+
+
       contains
 
 
@@ -58,7 +58,7 @@
          real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
-      
+
          integer, pointer :: nslevel(:), ipivot(:)
          integer :: ncycle, nstemp, maxlevels, nlevel
          logical :: have_odd_storage
@@ -66,9 +66,9 @@
          real(dp) :: dlamch, sfmin
 
          include 'formats'
-            
-         ierr = 0      
-         
+
+         ierr = 0
+
          if (dbg) write(*,*) 'start bcyclic_factor'
 
          ! compute number of cyclic reduction levels
@@ -79,7 +79,7 @@
             maxlevels = maxlevels+1
          end do
          maxlevels = max(1, maxlevels)
-      
+
          have_odd_storage = associated(odd_storage)
          if (have_odd_storage) then
             if (size(odd_storage) < maxlevels) then
@@ -101,12 +101,12 @@
 
          allocate (nslevel(maxlevels), stat=ierr)
          if (ierr /= 0) return
-      
+
          if (sparse) then
             write(*,*) 'no support for sparse matrix in bcyclic'
             ierr = -1
             return
-         end if  
+         end if
 
          ncycle = 1
          nstemp = nz
@@ -117,7 +117,7 @@
          factor_cycle: do ! perform cyclic-reduction factorization
 
             nslevel(nlevel) = nstemp
-            
+
             if (dbg) write(*,2) 'call cycle_onestep', nstemp
 
             call cycle_onestep( &
@@ -129,41 +129,41 @@
                return
             end if
 
-            if (nstemp == 1) exit
-         
+            if (nstemp == 1) exit factor_cycle
+
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit factor_cycle
 
          end do factor_cycle
 
          if (dbg) write(*,*) 'done factor_cycle'
-      
+
          ! factor row 1
          dmat(1:nvar,1:nvar) => dblk1(1:nvar*nvar)
-         sfmin = dlamch('S')  
+         sfmin = dlamch('S')
          ipivot(1:nvar) => ipivot1(1:nvar)
-         call my_getf2(nvar, dmat, nvar, ipivot, sfmin, ierr)         
+         call my_getf2(nvar, dmat, nvar, ipivot, sfmin, ierr)
          if (ierr /= 0) then
             write(*,*) 'row 1 factor failed in bcyclic_factor'
             call dealloc
             return
          end if
-      
+
          call dealloc
-      
-         
+
+
          if (dbg) write(*,*) 'done bcyclic_factor'
-      
-         contains 
-      
+
+         contains
+
          subroutine dealloc
             deallocate (nslevel)
          end subroutine dealloc
-      
-      
+
+
       end subroutine bcyclic_factor
 
 
@@ -182,17 +182,17 @@
          real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
          integer, intent(out) :: ierr
-      
+
          integer, pointer :: nslevel(:), ipivot(:)
          integer :: ncycle, nstemp, maxlevels, nlevel, nvar2
          real(dp), pointer, dimension(:,:) :: dmat, bptr2
 
          include 'formats'
-      
-         
+
+
          if (dbg) write(*,*) 'start bcyclic_solve'
 
-         ierr = 0      
+         ierr = 0
          nvar2 = nvar*nvar
          ncycle = 1
          maxlevels = 0
@@ -208,7 +208,7 @@
          ncycle = 1
          nstemp = nz
          nlevel = 1
-         
+
          if (dbg) write(*,*) 'start forward_cycle'
 
          forward_cycle: do
@@ -222,18 +222,18 @@
                return
             end if
 
-            if (nstemp == 1) exit
-         
+            if (nstemp == 1) exit forward_cycle
+
             nstemp = (nstemp+1)/2
             nlevel = nlevel+1
             ncycle = 2*ncycle
 
-            if (nlevel > maxlevels) exit
+            if (nlevel > maxlevels) exit forward_cycle
 
          end do forward_cycle
-         
+
          if (dbg) write(*,*) 'done forward_cycle'
-         
+
          ipivot(1:nvar) => ipivot1(1:nvar)
          dmat(1:nvar,1:nvar) => dblk1(1:nvar2)
          bptr2(1:nvar,1:1) => brhs1(1:nvar)
@@ -243,35 +243,35 @@
             call dealloc
             return
          end if
-      
+
          ! back solve for even x's
-         back_cycle: do while (ncycle > 1)      
+         back_cycle: do while (ncycle > 1)
             ncycle = ncycle/2
             nlevel = nlevel-1
             if (nlevel < 1) then
                ierr = -1
-               exit
+               exit back_cycle
             end if
             nstemp = nslevel(nlevel)
             call cycle_solve( &
                nvar, nz, ncycle, nstemp, nlevel, sparse, lblk1, ublk1, brhs1)
          end do back_cycle
-      
+
          call dealloc
-         
+
          if (dbg) write(*,*) 'done bcyclic_solve'
-      
-      
-         contains 
-      
+
+
+         contains
+
          subroutine dealloc
             deallocate (nslevel)
          end subroutine dealloc
 
 
       end subroutine bcyclic_solve
-      
-      
+
+
       subroutine clear_storage
          integer :: nlevel
          nlevel = size(odd_storage)
@@ -295,7 +295,7 @@
          real(dp), pointer, intent(inout) :: lblk1(:), dblk1(:), ublk1(:)
          integer, pointer, intent(inout) :: ipivot1(:)
          integer, intent(out) :: ierr
-     
+
          integer, pointer :: ipivot(:)
          real(dp), pointer, dimension(:,:) :: dmat, umat, lmat, umat0, lmat0
          real(dp), pointer, dimension(:,:) :: lnext, unext, lprev, uprev
@@ -303,18 +303,18 @@
          integer :: i, shift, min_sz, new_sz, shift1, shift2, nvar2, &
             ns, ierr_loc, nmin, kcount, k
          real(dp) :: dlamch, sfmin
-      
+
          include 'formats'
 
          ierr = 0
-         sfmin = dlamch('S')  
-         nvar2 = nvar*nvar     
+         sfmin = dlamch('S')
+         nvar2 = nvar*nvar
          nmin = 1
          kcount = 1+(nblk-nmin)/2
          min_sz = nvar2*kcount
          if (odd_storage(nlevel)% ul_size < min_sz) then
             if (odd_storage(nlevel)% ul_size > 0) &
-               deallocate(odd_storage(nlevel)% umat1, odd_storage(nlevel)% lmat1)         
+               deallocate(odd_storage(nlevel)% umat1, odd_storage(nlevel)% lmat1)
             new_sz = FLOOR(min_sz*1.1) + 100
             odd_storage(nlevel)% ul_size = new_sz
             allocate (odd_storage(nlevel)% umat1(new_sz), &
@@ -342,10 +342,10 @@
             ierr = -1
             return
          end if
-         
+
          if (dbg) write(*,*) 'start lu factorization'
          ! compute lu factorization of even diagonal blocks
-         nmin = 2         
+         nmin = 2
 !$omp parallel do schedule(static,3) &
 !$omp private(ipivot,dmat,ns,ierr_loc,shift1,shift2,k)
          do ns = nmin, nblk, 2
@@ -355,11 +355,11 @@
             dmat(1:nvar,1:nvar) => dblk1(shift2+1:shift2+nvar2)
             ierr_loc = 0
             ipivot(1:nvar) => ipivot1(shift1+1:shift1+nvar)
-            call my_getf2(nvar, dmat, nvar, ipivot, sfmin, ierr_loc)         
+            call my_getf2(nvar, dmat, nvar, ipivot, sfmin, ierr_loc)
             if (ierr_loc /= 0) then
                ierr = ierr_loc
             end if
-         end do 
+         end do
 !$omp end parallel do
          if (ierr /= 0) then
             !write(*,*) 'factorization failed in bcyclic'
@@ -370,7 +370,7 @@
 
 !$omp parallel do schedule(static,3) &
 !$omp private(ns,k,shift1,shift2,ipivot,dmat,umat,lmat,mat1,ierr_loc)
-         do ns = nmin, nblk, 2       
+         do ns = nmin, nblk, 2
             ! compute new l=-d[-1]l, u=-d[-1]u for even blocks
             k = ncycle*(ns-1) + 1
             shift1 = nvar*(k-1)
@@ -385,7 +385,7 @@
             call my_getrs(nvar, nvar, dmat, nvar, ipivot, umat, nvar, ierr_loc)
             if (ierr_loc /= 0) ierr = ierr_loc
             umat = -umat
-         end do 
+         end do
 !$omp end parallel do
          if (dbg) write(*,*) 'done solve'
 
@@ -397,7 +397,7 @@
 !$omp parallel do schedule(static,3) &
 !$omp private(i,ns,shift2,dmat,umat,lmat,lnext,unext,lprev,uprev,kcount,shift,umat0,lmat0,k)
          do i = 1, 3*(1+(nblk-nmin)/2)
-         
+
             ns = 2*((i-1)/3) + nmin
             k = ncycle*(ns-1) + 1
             shift2 = nvar2*(k-1)
@@ -427,7 +427,7 @@
                if (ns > 1) then
                   ! lmat = matmul(lmat0, lprev)
                   call my_gemm0_p1(nvar,nvar,nvar,lmat0,nvar,lprev,nvar,lmat,nvar)
-               end if  
+               end if
             case (1)
                if (ns < nblk) then
                   ! umat = matmul(umat0, unext)
@@ -445,7 +445,7 @@
                else if (ns > 1) then
                   ! dmat = dmat + matmul(lmat0,uprev)
                   call my_gemm_p1(nvar,nvar,nvar,lmat0,nvar,uprev,nvar,dmat,nvar)
-               end if  
+               end if
             end select
 
          end do
@@ -463,14 +463,14 @@
          real(dp), pointer, intent(inout) :: brhs1(:)
          integer, pointer, intent(in) :: ipivot1(:)
          integer, intent(out) :: ierr
-      
+
          integer :: k, ns, ierr_loc, nmin, kcount, shift, shift1, shift2, nvar2
          integer, pointer :: ipivot(:)
          real(dp), pointer, dimension(:,:) :: dmat, umat, lmat, bptr2
          real(dp), pointer, dimension(:) :: bprev, bnext, bptr
-      
+
          include 'formats'
-      
+
          ierr = 0
          nvar2 = nvar*nvar
          ! compute dblk[-1]*brhs for even indices and store in brhs(even)
@@ -500,7 +500,7 @@
             shift1 = nvar*ncycle*(ns-1)
             bptr(1:nvar) => brhs1(shift1+1:shift1+nvar)
             kcount = 1+(ns-nmin)/2
-            shift = nvar2*(kcount-1)         
+            shift = nvar2*(kcount-1)
             umat(1:nvar,1:nvar) => odd_storage(nlevel)% umat1(shift+1:shift+nvar2)
             lmat(1:nvar,1:nvar) => odd_storage(nlevel)% lmat1(shift+1:shift+nvar2)
             if (ns > 1) then
@@ -521,7 +521,7 @@
                ! bptr = bptr - matmul(lmat,bprev)
                call my_gemv(nvar,nvar,lmat,nvar,bprev,bptr)
             end if
-         end do 
+         end do
 !$omp end parallel do
 
          if (nvar2*kcount > odd_storage(nlevel)% ul_size) then
@@ -537,7 +537,7 @@
       ! odd index solutions at this level.
       ! note at this point, the odd brhs values have been replaced (at the highest cycle)
       ! with the solution values (x), at subsequent (lower) cycles, the
-      ! odd values are replaced by the even solutions at the next highest cycle. the even 
+      ! odd values are replaced by the even solutions at the next highest cycle. the even
       ! brhs values were multiplied by d[-1] and stored in cycle_rhs
       ! solve for even index values in terms of (computed at this point) odd index values
       subroutine cycle_solve( &
@@ -582,7 +582,7 @@
 !$omp end parallel do
 
       end subroutine cycle_solve
-      
+
 
       subroutine bcyclic_deallocate ( &
             lblk1, dblk1, ublk1, ipivot1, brhs1, nvar, nz, sparse, &
@@ -598,9 +598,9 @@
          integer, intent(in) :: lrd, lid
          real(dp), pointer, intent(inout) :: rpar_decsol(:) ! (lrd)
          integer, pointer, intent(inout) :: ipar_decsol(:) ! (lid)
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          ierr = 0
       end subroutine bcyclic_deallocate
-      
-      
+
+
       end module bcyclic

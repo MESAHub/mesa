@@ -67,7 +67,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
@@ -75,7 +75,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
       end subroutine extras_controls
 
 
@@ -110,7 +110,7 @@
         use rates_def
 
          integer, intent(in) :: id
-         
+
          integer :: mg24, na24, ne20, ierr
          real(dp) :: center_mg24, center_na24, center_ne20
          type (star_info), pointer :: s
@@ -212,8 +212,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp

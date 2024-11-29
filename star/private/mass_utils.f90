@@ -7,7 +7,7 @@
       use const_def
       use accurate_sum  ! Provides the accurate_real type, which enables us to do
                         !sums and differences without much loss of precision.
- 
+
 
       implicit none
 
@@ -78,7 +78,7 @@
       !
       ! The reason we specify dm's rather than m's is to avoid
       ! having to subtract large numbers and incur the resultant
-      ! penalty in precision. 
+      ! penalty in precision.
       !
       ! We require length(dm1) == length(dm2) == nz.
       ! We permit j and k to range from 1 ... nz+1 inclusive.
@@ -92,12 +92,12 @@
       ! to perform this sum accurately. As a preprocessing step we present
       ! terms to this algorithm with alternating signs and
       ! descending magnitudes for as long as possible.
-      ! Hence we actually begin with the 
+      ! Hence we actually begin with the
       !
       ! Sum_{l = nz ... max(j,k)} dm1(l) - dm2(l) ()
       !
       ! If j < k we then add Sum_{l=k-1 ... j} dm1(l).
-      ! If j > k we then subtract Sum_{l=j-1 ... k} dm2(l). 
+      ! If j > k we then subtract Sum_{l=j-1 ... k} dm2(l).
       !
       ! Not currently used, but helpful for debugging.
       real(qp) function accurate_mass_difference(dm1, dm2, j, k, nz)
@@ -117,8 +117,8 @@
             do l=nz,max(j,k),-1
                sum = sum + dm1(l)
                sum = sum - dm2(l)
-            end do 
-         end if           
+            end do
+         end if
 
          if (j /= k) then
             do l=max(j,k) - 1,min(j,k),-1
@@ -171,7 +171,7 @@
       ! overlap (0,1) is non-zero, as is the overlap (nz,nz). Because
       ! mass is monotonic, the (j,k) with non-zero overlaps form a sequence
       ! which is monotonic in both j and k. There are at most 2*nz points in
-      ! such a sequence. To avoid allocating a quadratic amount of memory in nz 
+      ! such a sequence. To avoid allocating a quadratic amount of memory in nz
       ! we therefore store just 2*nz overlaps. The locations of these overlaps are
       ! given by j == ranges(:,1), k == ranges(:,2). Some of these j's or k's
       ! will generally be zero, corresponding to the padding described above.
@@ -205,7 +205,7 @@
          !    terminate, because all remaining overlaps will be zero.
          ! 2. Calculate the overlap between the new cell and the old one on the other side.
          ! 3. Return to 1.
-         ! 
+         !
          ! Along the way we store overlaps in the order in which we encounter them.
          ! As discussed in the comments above, we know there will be precisely 2*nz of these.
          ! The indices of these are stored as ranges(counter,1) = j, ranges(counter,2) = k.
@@ -250,7 +250,7 @@
             remainders1(j) = remainders1(j) - dm1(j)
             remainders2(j) = remainders2(j) - dm1(j)
             diff = dm2(k) - dm1(j)
-         end if      
+         end if
 
          do while (k > 0 .and. j > 0 .and. ((side == 1 .and. k > 1) .or. (side == 2 .and. j > 1)))
             if (side == 1) then
@@ -313,7 +313,7 @@
 
          end do
 
-         if (j > 1) then   
+         if (j > 1) then
             do i=j,1,-1
                ranges(counter,1) = i
                ranges(counter,2) = 0
@@ -405,7 +405,7 @@
                pf(j)%arr(i) = pf(j)%arr(i) + pf(j)%arr(i - 1)
             end do
             do i=i_max(j)-1,max(j,i_min(j)),-1
-               pf(j)%arr(i) = pf(j)%arr(i) + pf(j)%arr(i + 1)               
+               pf(j)%arr(i) = pf(j)%arr(i) + pf(j)%arr(i + 1)
             end do
          end do
 
