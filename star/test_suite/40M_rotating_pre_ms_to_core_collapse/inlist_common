@@ -62,8 +62,8 @@
 
 &controls
     use_drag_energy = .false.
-    !drag_coefficient = 0.9d0
-    !min_q_for_drag = 0.8d0
+    drag_coefficient = 0.9d0
+    min_q_for_drag = 0.8d0
 
 ! wind
       ! Dutch scaling factor set in inlist_mass_Z_wind_rotation      
