@@ -128,8 +128,11 @@
             do k=1,s%nz
                ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
                if (s% Hp_face(k) <= 0) then
+                  ! write (*,*) s% Hp_face(k), 's% Hp_face(k)'
                    ! this scale height for face is already calculated in TDC
                    s% Hp_face(k) = s% scale_height(k) !get_scale_height_face_val(s,k)
+!write (*,*) s% Hp_face(k), 's% Hp_face(k)'
+
 !                   write(*,*) 'k, hp_face, hp_cell', k, s% Hp_face(k), s% scale_height(k)
 !                  s% xh(s% i_Hp,k) = s% Hp_face(k)
                end if
@@ -139,20 +142,27 @@
               if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 1', s% model_number
               return
            end if
+!write (*,*) 'before loop'
+
            !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
            do k=1,s% nz
+               ! write (*,*) 'before compute_Chi_cell'
               x = compute_Chi_cell(s, k, op_err)
+           ! write (*,*) 'before compute_Eq_cell'
               if (op_err /= 0) ierr = op_err
               x = compute_Eq_cell(s, k, op_err)
               if (op_err /= 0) ierr = op_err
-             ! x = compute_Uq_face(s, k, op_err)
-              !if (op_err /= 0) ierr = op_err
+              x = compute_Uq_face(s, k, op_err)
+              if (op_err /= 0) ierr = op_err
 !              x = compute_C(s, k, op_err) ! COUPL
 !              if (op_err /= 0) ierr = op_err
 !              x = compute_L_face(s, k, op_err) ! Lr, Lt, Lc
 !              if (op_err /= 0) ierr = op_err
            end do
+
            !$OMP END PARALLEL DO
+!write (*,*) 'finished loop'
+
            if (ierr /= 0) then
               if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 2', s% model_number
               return
@@ -658,13 +668,13 @@
          if (r_p1%val == 0d0) r_p1 = 1d0
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
 
-        ! Debugging output to trace values
-!        if (k == 63) then
-!            write(*,*) 'test d_v_div_r, k:', k
-!            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
-!            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
-!            write(*,*) 'd_v_div_r:', d_v_div_r %val
-!        end if
+!         Debugging output to trace values
+        if (k == 766) then
+            write(*,*) 'test d_v_div_r, k:', k
+            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
+            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
+            write(*,*) 'd_v_div_r:', d_v_div_r %val
+        end if
       end function compute_d_v_div_r
       
       
@@ -750,9 +760,9 @@
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
             
-            ! use mlt_vc_old instead of wrap w if using TDC.
+            
             if (s% include_alfam) then
-                w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC ! maybe should be using mlt_vc?
+                w_00 = s% mlt_vc(k)/sqrt_2_div_3! same as info%A0 from TDC
             else ! normal RSP2
                 w_00 = wrap_w_00(s,k)
             end if
@@ -769,18 +779,18 @@
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
-!        if (k==100) then
-!                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
-!                write(*,*) 'Hp_cell', Hp_cell %val
-!                write(*,*) 'd_v_div_r', d_v_div_r %val
-!                write(*,*) ' f',  f
-!                write(*,*) 'w_00',w_00 %val
-!                write(*,*) 'd_00 ', d_00 %val
-!                write(*,*) 'rho2 ', rho2 %val
-!                write(*,*) 'r_00',  r_00 %val
-!                write(*,*) 'r_p1 ',  r_p1 %val
-!                write(*,*) 'r6_cell',  r6_cell %val
-!        end if
+        if (k==766) then
+                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
+                write(*,*) 'Hp_cell', Hp_cell %val
+                write(*,*) 'd_v_div_r', d_v_div_r %val
+                write(*,*) ' f',  f
+                write(*,*) 'w_00',w_00 %val
+                write(*,*) 'd_00 ', d_00 %val
+                write(*,*) 'rho2 ', rho2 %val
+                write(*,*) 'r_00',  r_00 %val
+                write(*,*) 'r_p1 ',  r_p1 %val
+                write(*,*) 'r6_cell',  r6_cell %val
+        end if
       end function compute_Chi_cell
 
       

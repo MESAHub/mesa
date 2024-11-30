@@ -442,6 +442,9 @@
 
          if (s% include_alfam) then ! Uq(k) is turbulent viscosity drag at face k
             Uq_ad = compute_Uq_face(s, k, ierr)
+                if (k==661) then
+                write(*,*) 'test Uq, k', Uq_ad %val , k
+                end if
             if (ierr /= 0) return
          end if
          

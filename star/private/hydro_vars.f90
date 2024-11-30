@@ -596,15 +596,6 @@
             else
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
-            
-            if (s% include_alfam) then
-               call set_viscosity_vars_TDC(s,ierr)
-               if (ierr /= 0) then
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'set_viscosity_vars_TDC failed'
-                  if (s% report_ierr) write(*,*) 'ierr from set_viscosity_vars_TDC'
-                  return
-               end if
-            end if
 
             call set_mlt_vars(s, nzlo, nzhi, ierr)
             if (failed('set_mlt_vars')) return
@@ -643,6 +634,15 @@
             end if
          end if
 
+
+            if (s% include_alfam) then
+               call set_viscosity_vars_TDC(s,ierr)
+               if (ierr /= 0) then
+                  if (len_trim(s% retry_message) == 0) s% retry_message = 'set_viscosity_vars_TDC failed'
+                  if (s% report_ierr) write(*,*) 'ierr from set_viscosity_vars_TDC'
+                  return
+               end if
+            end if
 
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_set_hydro_vars)

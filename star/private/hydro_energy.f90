@@ -270,14 +270,15 @@
                Eq_ad = s% Eq_ad(k) ! compute_Eq_cell(s, k, ierr)
                if (ierr /= 0) return
             end if
-            
-            if (s% include_alfam) then
-                Eq_ad = s% Eq_ad(k) !compute_Eq_cell(s, k, ierr)
-!                if (k==91) then
+
+!            ! already included in deturb/dt
+!            if (s% include_alfam) then
+!                Eq_ad = s% Eq_ad(k) !compute_Eq_cell(s, k, ierr)
+!                if (k==661) then
 !                write(*,*) 'test Eq, k', Eq_ad %val , k
 !                end if
-                if (ierr /= 0) return
-            end if
+!                if (ierr /= 0) return
+!            end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
