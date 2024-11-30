@@ -2228,11 +2228,16 @@ contains
          case(h_log_Lnuc)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
+         case(h_Lnuc)
+            power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
+            val = s% power_nuc_burn - power_photo
          case(h_log_Lnuc_ergs_s)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz))
             val = safe_log10(s% power_nuc_burn * Lsun - power_photo)
          case(h_log_power_nuc_burn)
             val = safe_log10(s% power_nuc_burn)
+         case(h_power_nuc_burn)
+            val = s% power_nuc_burn
          case(h_log_Lnuc_sub_log_L)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
@@ -2857,7 +2862,7 @@ contains
 
             ! following items correspond to names on terminal output lines
 
-         case(h_lg_Lnuc)
+         case(h_lg_Lnuc_tot)! _tot indicates the inclusion of photodisintegations
             val = safe_log10(s% power_nuc_burn)
 
          case(h_H_rich)
