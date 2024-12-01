@@ -206,7 +206,7 @@ contains
       ! Pre-calculate some things.
       Eq_div_w = 0d0
       if (using_TDC) then
-         if (s% mlt_vc_old(k) > 0d0) then
+         if (s% mlt_vc(k) > 0d0) then
             check_Eq = compute_Eq_cell(s, k, ierr)
             Eq_div_w = check_Eq/(s% mlt_vc(k)/sqrt_2_div_3)
          end if
