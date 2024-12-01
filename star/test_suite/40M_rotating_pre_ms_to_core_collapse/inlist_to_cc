@@ -10,11 +10,11 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
  
-      change_v_flag = .true.
-      new_v_flag = .false.
+      !change_v_flag = .true.
+      !new_v_flag = .false.
 	
-      change_u_flag = .true.
-      new_u_flag = .true.
+      !change_u_flag = .true.
+      !new_u_flag = .true.
 
 / ! end of star_job namelist
 
@@ -26,15 +26,16 @@
 
 &controls
 
-! surface BC
-use_momentum_outer_BC = .true.
-Pextra_factor = 1 ! soften to 1.
 
-! meshing
+! surface BC, for u_flag. 
+!use_momentum_outer_BC = .true.
+!Pextra_factor = 1 ! soften to 1 u_flag. 2 by default in inlist_common
+
+! meshing options 
 okay_to_remesh = .true.
-use_split_merge_amr = .true. ! will default to logR zoning unless otherwise set
-!split_merge_amr_log_zoning = .true.
-split_merge_amr_logtau_zoning = .true.
+use_split_merge_amr = .false. !.true. ! will default to logR zoning unless otherwise set
+!split_merge_amr_log_zoning = .true. ! default is .true.
+split_merge_amr_logtau_zoning = .true. ! default is .false.
 !split_merge_amr_flipped_hybrid_zoning = .true.
 
 split_merge_amr_r_core_cm = 1d8
@@ -70,17 +71,15 @@ max_abs_du_div_cs_for_convection = 0.03d0 !5d-3
 max_v_div_cs_for_convection = 1d2
 max_v_for_convection = 1d4
 
-! u_flag controls above
+! meshing controls above for shock capturing.
 
 
 
-! to avoid a host of retries we relax our limits on split_burn
-! for speed/stability in test_suite, at reduced time resolution.
-!op_split_burn_min_T = 1d9
 
-! prevent development of radial pulses during advanced burning
+! for v_flag only, prevent development of radial pulses during advanced burning
       !drag_coefficient = 1d0
       !min_q_for_drag = 0.8d0
+! We comment these out as they interefere with CC. We want no drag on short timescales.
 
       set_min_D_mix = .true.
       min_D_mix = 1d-2 
