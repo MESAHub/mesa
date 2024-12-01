@@ -726,12 +726,12 @@
    !DAMPR
    !SOURCE
    !Chi
-   !Eq
+   Eq
    !Hp_face
    !PII_face
    !Ptrb
    !Pvsc
-   !Uq
+   Uq
    !Y_face
 
 !# RTI

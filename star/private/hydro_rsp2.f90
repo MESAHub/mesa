@@ -669,12 +669,12 @@
          d_v_div_r = v_00/r_00 - v_p1/r_p1 ! units s^-1
 
 !         Debugging output to trace values
-        if (k == 766) then
-            write(*,*) 'test d_v_div_r, k:', k
-            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
-            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
-            write(*,*) 'd_v_div_r:', d_v_div_r %val
-        end if
+!        if (k == 766) then
+!            write(*,*) 'test d_v_div_r, k:', k
+!            write(*,*) 'v_00:', v_00%val, 'v_p1:', v_p1%val
+!            write(*,*) 'r_00:', r_00%val, 'r_p1:', r_p1%val
+!            write(*,*) 'd_v_div_r:', d_v_div_r %val
+!        end if
       end function compute_d_v_div_r
       
       
@@ -715,7 +715,7 @@
          
          Hp_cell = wrap_Hp_cell(s, k)
          return
-         
+         ! below material is never called, because of the return statement?
          d_00 = wrap_d_00(s, k)
          Peos_00 = wrap_Peos_00(s, k)
          if (k < s% nz) then
@@ -779,18 +779,18 @@
          end if
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
-        if (k==766) then
-                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
-                write(*,*) 'Hp_cell', Hp_cell %val
-                write(*,*) 'd_v_div_r', d_v_div_r %val
-                write(*,*) ' f',  f
-                write(*,*) 'w_00',w_00 %val
-                write(*,*) 'd_00 ', d_00 %val
-                write(*,*) 'rho2 ', rho2 %val
-                write(*,*) 'r_00',  r_00 %val
-                write(*,*) 'r_p1 ',  r_p1 %val
-                write(*,*) 'r6_cell',  r6_cell %val
-        end if
+!        if (k==766) then
+!                write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
+!                write(*,*) 'Hp_cell', Hp_cell %val
+!                write(*,*) 'd_v_div_r', d_v_div_r %val
+!                write(*,*) ' f',  f
+!                write(*,*) 'w_00',w_00 %val
+!                write(*,*) 'd_00 ', d_00 %val
+!                write(*,*) 'rho2 ', rho2 %val
+!                write(*,*) 'r_00',  r_00 %val
+!                write(*,*) 'r_p1 ',  r_p1 %val
+!                write(*,*) 'r6_cell',  r6_cell %val
+!        end if
       end function compute_Chi_cell
 
       
