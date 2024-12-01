@@ -471,10 +471,10 @@
                      if (ierr /= 0) then
 
                         ! punt silently for now
-                        s% dlnE_dxa_for_partials(:,k) = 0d0
-                        s% dlnPeos_dxa_for_partials(:,k) = 0d0
-                        ierr = 0
-                        return
+                        ! s% dlnE_dxa_for_partials(:,k) = 0d0
+                        ! s% dlnPeos_dxa_for_partials(:,k) = 0d0
+                        ! ierr = 0
+                        ! return
 
                         if (s% report_ierr) write(*,2) 'failed in get_eos with xa_start_1', k
                         return
