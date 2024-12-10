@@ -73,7 +73,8 @@ cool_wind_RGB_scheme = 'Dutch'
 cool_wind_AGB_scheme = 'Dutch'
 hot_wind_scheme = 'Dutch'
 Dutch_wind_lowT_scheme = 'de Jager'
-
+! N.B.: winds are turned off at high core T for stability
+max_T_center_for_any_mass_loss = 2d9
 max_T_center_for_any_mass_loss = 1.1d9
 
 ! atmosphere
@@ -112,6 +113,9 @@ premix_omega                              = .true.
 remove_small_D_limit                      = 1d-10
 mixing_D_limit_for_log                    = 1d-10
 max_mdot_jump_for_rotation                = 1.5d0
+! N.B.: rotational mixing is turned off at very high core T for stability
+D_mix_rotation_max_logT_full_on           = 9.4d0
+D_mix_rotation_min_logT_full_off          = 9.5d0
 ! smooth mixing coefficients across 2 adjacent cells to avoid infinite derivatives
 smooth_D_DSI                              = 2
 smooth_D_SH                               = 2
@@ -128,7 +132,7 @@ smooth_nu_ST                              = 2
 MLT_option                                = 'Henyey'
 use_ledoux_criterion                      = .false.
 mixing_length_alpha                       = 1.5d0
-min_convective_gap                        = 0.1d0
+! min_convective_gap                        = 0.1d0
 alpha_semiconvection                      = 0.0d0
 
 ! If you would like to be bold, try radiative damping, although it
