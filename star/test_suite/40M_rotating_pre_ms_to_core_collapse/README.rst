@@ -4,7 +4,7 @@
 40M_rotating_pre_ms_to_core_collapse
 ***************************
 
-This test suite evolves a solar metalicity 40 |MSun| model from the pre-ms to core collapse. 
+This test suite evolves a Z=1e-3, 40 |MSun| model from the pre-ms to core collapse.
 For bit for bit convergence, we recomended to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.
 
@@ -42,4 +42,3 @@ This test case has seven parts.
 
 
 Last-Updated: 29Nov2024 by EbF
-
