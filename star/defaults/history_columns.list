@@ -236,11 +236,13 @@
       !power_he_burn ! total thermal power from triple-alpha, excluding neutrinos (in Lsun units)
       !power_photo
       !power_z_burn
-      !log_power_nuc_burn ! total thermal power from all burning, excluding photodisintegrations
+      log_power_nuc_burn ! total thermal power from all burning, including photodisintegrations
+      power_nuc_burn ! total thermal power from all burning, including photodisintegrations
       log_LH ! log10 power_h_burn
       log_LHe ! log10 power_he_burn
       log_LZ ! log10 total burning power including LC, but excluding LH and LHe and photodisintegrations
-      log_Lnuc ! log(LH + LHe + LZ)
+      log_Lnuc ! log(LH + LHe + LZ) ! does not include photodisintegration
+      Lnuc ! (LH + LHe + LZ) ! does not include photodisintegration
       !log_Lnuc_ergs_s
       !log_Lnuc_sub_log_L
       !lnuc_photo

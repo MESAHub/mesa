@@ -348,9 +348,11 @@
       integer, parameter :: h_log_extra_L = h_eps_grav_integral + 1
       integer, parameter :: h_extra_L = h_log_extra_L + 1
       integer, parameter :: h_log_power_nuc_burn = h_extra_L + 1
-      integer, parameter :: h_log_Lnuc_ergs_s = h_log_power_nuc_burn + 1
+      integer, parameter :: h_power_nuc_burn = h_log_power_nuc_burn + 1
+      integer, parameter :: h_log_Lnuc_ergs_s = h_power_nuc_burn + 1
       integer, parameter :: h_log_Lnuc = h_log_Lnuc_ergs_s + 1
-      integer, parameter :: h_mass_ext_to_max_eps_nuc = h_log_Lnuc + 1
+      integer, parameter :: h_Lnuc = h_log_Lnuc + 1
+      integer, parameter :: h_mass_ext_to_max_eps_nuc = h_Lnuc + 1
       integer, parameter :: h_mass_loc_of_max_eps_nuc = h_mass_ext_to_max_eps_nuc + 1
 
       integer, parameter :: h_diffusion_time_H_He_bdy = h_mass_loc_of_max_eps_nuc + 1
@@ -642,8 +644,8 @@
 
       integer, parameter :: h_phase_of_evolution = h_apsidal_constant_k2 + 1
 
-      integer, parameter :: h_lg_Lnuc = h_phase_of_evolution + 1
-      integer, parameter :: h_H_rich = h_lg_Lnuc + 1
+      integer, parameter :: h_lg_Lnuc_tot = h_phase_of_evolution + 1
+      integer, parameter :: h_H_rich = h_lg_Lnuc_tot + 1
       integer, parameter :: h_N_cntr = h_H_rich + 1
       integer, parameter :: h_lg_Lneu = h_N_cntr + 1
       integer, parameter :: h_He_core = h_lg_Lneu + 1
@@ -1061,8 +1063,10 @@
          history_column_name(h_extra_L) = 'extra_L'
          history_column_name(h_log_extra_L) = 'log_extra_L'
          history_column_name(h_log_power_nuc_burn) = 'log_power_nuc_burn'
+         history_column_name(h_power_nuc_burn) = 'power_nuc_burn'
          history_column_name(h_log_Lnuc_ergs_s) = 'log_Lnuc_ergs_s'
          history_column_name(h_log_Lnuc) = 'log_Lnuc'
+         history_column_name(h_Lnuc) = 'Lnuc'
          history_column_name(h_log_Lneu) = 'log_Lneu'
          history_column_name(h_mass_loc_of_max_eps_nuc) = 'mass_loc_of_max_eps_nuc'
          history_column_name(h_mass_ext_to_max_eps_nuc) = 'mass_ext_to_max_eps_nuc'
@@ -1313,7 +1317,7 @@
          history_column_name(h_phase_of_evolution) = 'phase_of_evolution'
 
 ! items corresponding to names on terminal output lines
-         history_column_name(h_lg_Lnuc) = 'lg_Lnuc'
+         history_column_name(h_lg_Lnuc_tot) = 'lg_Lnuc_tot'
          history_column_name(h_H_rich) = 'H_rich'
          history_column_name(h_N_cntr) = 'N_cntr'
          history_column_name(h_lg_Lneu) = 'lg_Lneu'
