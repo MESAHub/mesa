@@ -1897,8 +1897,8 @@
       ! ::
 
    Text_Summary1_win_flag = .false.
-   Text_Summary1_win_width = 10
-   Text_Summary1_win_aspect_ratio = 0.15
+   Text_Summary1_win_width = 7
+   Text_Summary1_win_aspect_ratio = 0.6
 
       ! ::
 
@@ -1906,7 +1906,7 @@
    Text_Summary1_xright = 0.98
    Text_Summary1_ybot = 0.08
    Text_Summary1_ytop = 0.98
-   Text_Summary1_txt_scale = 4.5
+   Text_Summary1_txt_scale = 3.0
    Text_Summary1_title = ''
 
       ! setup default
