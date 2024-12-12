@@ -1913,13 +1913,17 @@
 
       ! ::
 
-   Text_Summary1_num_rows = 8
-   Text_Summary1_num_cols = 4
+   Text_Summary1_num_rows = 5
+   Text_Summary1_num_cols = 1
    Text_Summary1_name(:, :) = ''
 
       ! ::
 
    Text_Summary1_name(1, 1) = 'model_number'
+   Text_Summary1_name(2, 1) = 'jdot'
+   Text_Summary1_name(3, 1) = 'mass_ratio'
+   Text_Summary1_name(4, 1) = 'period_days'
+   Text_Summary1_name(5, 1) = 'rl_relative_overflow_1'
 
       ! file output
 
