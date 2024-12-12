@@ -57,7 +57,9 @@
       integer, parameter :: bh_star_2_mass = bh_lg_star_1_mass + 1
       integer, parameter :: bh_lg_star_2_mass = bh_star_2_mass + 1
       integer, parameter :: bh_sum_of_masses = bh_lg_star_2_mass + 1
-      integer, parameter :: bh_lg_mtransfer_rate = bh_sum_of_masses + 1
+      integer, parameter :: bh_mass_ratio = bh_sum_of_masses + 1
+      integer, parameter :: bh_obs_mass_ratio = bh_mass_ratio + 1
+      integer, parameter :: bh_lg_mtransfer_rate = bh_obs_mass_ratio + 1
       integer, parameter :: bh_lg_mstar_dot_1 = bh_lg_mtransfer_rate + 1
       integer, parameter :: bh_lg_mstar_dot_2 = bh_lg_mstar_dot_1 + 1
       integer, parameter :: bh_lg_system_mdot_1 = bh_lg_mstar_dot_2 + 1
