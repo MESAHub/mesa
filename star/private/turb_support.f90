@@ -206,10 +206,13 @@ contains
       ! Pre-calculate some things.
       Eq_div_w = 0d0
       if (using_TDC) then
-         if (s% mlt_vc(k) > 0d0) then
+        if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
+            check_Eq = compute_Eq_cell(s, k, ierr)
+            Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3)
+        else
             check_Eq = compute_Eq_cell(s, k, ierr)
             Eq_div_w = check_Eq/(s% mlt_vc(k)/sqrt_2_div_3)
-         end if
+        end if
       end if
       !write(*,*) "k, Eq_div_w, compute_Eq_cell(s,k), s% mlt_vc_old(k)", k, Eq_div_w % val, check_Eq %val, s% mlt_vc_old(k)
       Pr = crad*pow4(T)/3d0

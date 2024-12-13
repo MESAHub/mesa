@@ -148,12 +148,11 @@
            do k=1,s% nz
                ! write (*,*) 'before compute_Chi_cell'
               x = compute_Chi_cell(s, k, op_err)
-           ! write (*,*) 'before compute_Eq_cell'
               if (op_err /= 0) ierr = op_err
               x = compute_Eq_cell(s, k, op_err)
               if (op_err /= 0) ierr = op_err
-              x = compute_Uq_face(s, k, op_err)
-              if (op_err /= 0) ierr = op_err
+!              x = compute_Uq_face(s, k, op_err)
+!              if (op_err /= 0) ierr = op_err
 !              x = compute_C(s, k, op_err) ! COUPL
 !              if (op_err /= 0) ierr = op_err
 !              x = compute_L_face(s, k, op_err) ! Lr, Lt, Lc
@@ -762,7 +761,11 @@
             
             
             if (s% include_alfam) then
-                w_00 = s% mlt_vc(k)/sqrt_2_div_3! same as info%A0 from TDC
+                if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
+                   w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
+                else
+                   w_00 = s% mlt_vc(k)/sqrt_2_div_3! same as info%A0 from TDC
+                end if
             else ! normal RSP2
                 w_00 = wrap_w_00(s,k)
             end if
