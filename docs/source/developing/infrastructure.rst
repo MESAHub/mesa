@@ -57,10 +57,10 @@ Mailing lists
 The mesa-users@lists.mesastar.org and
 mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
 <https://www.mailmanlists.net/>`__.  The account is controlled by
-Frank who pays the hosting fees (through grants at ASU).
+Matteo who pays the hosting fees through Flatiron.
 This costs about $100/year.
 
-New account signups are handled by Frank.
+New account signups are handled by Earl, Eb, and Warrick.
 
 Marketplace
 ^^^^^^^^^^^
