@@ -759,7 +759,7 @@
             d_v_div_r = compute_d_v_div_r(s, k, ierr)
             if (ierr /= 0) return
             
-            
+            ! I don't need to check if mlt_vc > 0 here.
             if (s% include_alfam) then
                 if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
                    w_00 = s% mlt_vc_old(k)/sqrt_2_div_3! same as info%A0 from TDC
