@@ -1,4 +1,5 @@
 OBJ_OUT := $(BUILD_DIR_MODULE)/lib/lib$(MODULE_NAME).so
+LIB_NAMES := $(MODULE_NAME)
 INSTALL_COMMANDS += install-lib
 
 $(OBJ_OUT): $(OBJS) | $(BUILD_DIR_MODULE)/lib/

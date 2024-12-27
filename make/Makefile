@@ -40,6 +40,7 @@ ifeq ($(NOCOMPILE),)
     include $(MAKE_DIR)/link-dynamic.mk
   else ifeq ($(BINTYPE), executable)
     include $(MAKE_DIR)/link-exec.mk
+  else ifeq ($(BINTYPE), manual)
   else
     $(error Unknown or unset BINTYPE)
   endif
