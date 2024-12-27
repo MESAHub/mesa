@@ -1,3 +1,3 @@
 define clean-comp
-$(shell realpath -s --relative-to=$${PWD} $1)
+$(shell perl -e 'use Cwd; use File::Spec; print File::Spec->abs2rel(Cwd::realpath("$1"))' )
 endef
