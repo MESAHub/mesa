@@ -30,7 +30,8 @@ The following properties control the main compilation of the module:
 * **SRCS**: Source files (.f, .f90) that are part of this module. Include files (.inc, .dek) should not be included in this list.
 * **INTERNAL_DEPENDS_ON**: Which MESA modules this module directly depends on. Transitive dependencies do not need to be filled in here.
 * **EXTERNAL_DEPENDS_ON**: Which external packages (e.g. lapack) this module depends on.
-* **BINTYPE**: What the eventual output of the build should be, can be ``static-lib``, ``dynamic-lib`` or ``executable``.
+* **BINTYPE**: What the eventual output of the build should be, can be ``static-lib``, ``dynamic-lib``, ``executable`` or ``manual``. The ``manual`` option skips the generation of the final binary object. This is used in the gyre module, as more than one library is created.
+* **LIB_NAMES**: Which output libraries are produced in case ``BINTYPE`` is set to ``manual``.
 * **INCLUDE_DIRS**: In which directories are the source files found, prefixed by ``-I``. By default, this is ``-Ipublic -Iprivate``.
 
 The following properties control building and running the tests of the module:

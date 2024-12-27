@@ -11,27 +11,30 @@ INTERNAL_DEPENDS_ON := forum const
 EXTERNAL_DEPENDS_ON := hdf5_fortran lapack95 lapack crlibm-fortran
 CHECK_RESULTS_GOLDEN := test/test_output
 CHECK_DIFF_PROG := ndiff -quiet -relerr 1.0e-6
+BINTYPE := manual
+LIB_NAMES = gyre_mesa gyre
+INSTALL_COMMANDS := install-lib
+
 else
+
 SRCS := public/gyre_mesa_m_stub.f90
 SRCS_CHECK :=
 INTERNAL_DEPENDS_ON := forum
 EXTERNAL_DEPENDS_ON :=
 CHECK_RESULTS_GOLDEN :=
-endif
 BINTYPE := static-lib
+
+endif
+
 INCLUDE_DIRS :=
-
-# Testing
-
-
-# Install
-
-MODULES := gyre_mesa_m.mod
 INSTALL_INCLUDES :=
+MODULES := gyre_mesa_m.mod
 
 include $(MAKE_DIR)/Makefile
 
 ifeq ($(WITH_GYRE),yes)
+
+include $(MAKE_DIR)/pkg-config.mk
 
 ifeq ($(PROFILE),debug)
   GYRE_DEBUG = yes
@@ -46,21 +49,23 @@ else
 endif
 
 BUILD_DIR_GYRE_BUILD := $(BUILD_DIR_MODULE)/src
+OBJ_OUT := $(BUILD_DIR_MODULE)/lib/libgyre.a $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a
 
 $(BUILD_DIR_GYRE_BUILD): gyre-7.2.1.tar.gz | $(BUILD_DIR_GYRE_BUILD)/ $(BUILD_DIR_MODULE)/include/
 	tar --strip-components=1 -xf $< -C $(BUILD_DIR_GYRE_BUILD)
 
-wrap-gyre: $(BUILD_DIR_GYRE_BUILD)
+$(BUILD_DIR_GYRE_BUILD)/build-complete: $(BUILD_DIR_GYRE_BUILD)
 	$(MAKE) -C $(BUILD_DIR_GYRE_BUILD) SHARED=no DEBUG=$(GYRE_DEBUG) OMP=$(WITH_OPENMP) CRMATH=$(WITH_CRLIBM) FPE=yes VERSION_CHECK=passed FPP="$(FPP)" LDFLAGS="$(LIB_DEP_ARGS)" FFLAGS="$(FLAGS_DEPS)" FRONTENDS=no TOOLS=no FORUM=no IFACES=yes
+	touch $@
 
 
-$(OBJ_OUT): wrap-gyre | $(BUILD_DIR_MODULE)/lib/
-	echo -e "create $@\naddlib $(BUILD_DIR_GYRE_BUILD)/build/libgyre.a\naddlib $(BUILD_DIR_GYRE_BUILD)/build/libgyre_mesa.a\nsave\nend" | ar -M
-
-$(BUILD_DIR_MODULE)/modules/gyre_mesa_m.mod: wrap-gyre | $(BUILD_DIR_MODULE)/modules/
+$(BUILD_DIR_MODULE)/lib/libgyre.a $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/lib/
 	cp $(BUILD_DIR_GYRE_BUILD)/build/$(notdir $@) $@
 
-.PHONY: wrap-gyre
+$(BUILD_DIR_MODULE)/modules/gyre_mesa_m.mod: $(BUILD_DIR_GYRE_BUILD)/build-complete | $(BUILD_DIR_MODULE)/modules/
+	cp $(BUILD_DIR_GYRE_BUILD)/build/$(notdir $@) $@
+
+all: $(PKG_CONFIG) $(BUILD_DIR_MODULE)/lib/libgyre_mesa.a $(BUILD_DIR_MODULE)/lib/libgyre.a
 
 else
 

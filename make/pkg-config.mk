@@ -10,7 +10,7 @@ Name: mesa-$(MODULE_NAME)
 Requires: $(DEPENDS_ON)
 Description: MESA $(MODULE_NAME) module
 Cflags: -I$${prefix}/include
-Libs: -L$${prefix}/lib -l$(MODULE_NAME)
+Libs: -L$${prefix}/lib $(addprefix -l,$(LIB_NAMES))
 endef
 
 $(PKG_CONFIG): | $(BUILD_DIR_MODULE)/lib/pkgconfig/
