@@ -335,8 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-do_one_parallel net
-
 if [ ! -r data/ionization_data ]
 then
 	do_input_data ionization
