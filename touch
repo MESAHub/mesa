@@ -25,7 +25,6 @@ do_one atm
 do_one binary
 do_one ionization
 do_one net
-do_one neu
 do_one sample
 do_one star
 do_one star_data
