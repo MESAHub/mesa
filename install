@@ -335,7 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-do_one_parallel rates
 do_one_parallel neu
 do_one_parallel net
 
