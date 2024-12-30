@@ -335,11 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-if [ ! -r data/atm_data ]
-then
-	do_input_data atm
-fi
-do_one atm
 do_one turb
 
 do_one sample
