@@ -335,8 +335,6 @@ function do_input_data {
 	cd ..
 }
 
-do_one turb
-
 do_one sample
 
 do_one star_data
