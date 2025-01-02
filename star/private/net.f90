@@ -262,7 +262,7 @@
                screening_mode, s% eps_nuc_categories(:,k), &
                s% eps_nuc_neu_total(k), ierr)
 
-
+!               For debugging by spitting out to terminal all net terms.
 !               if (k == 1815 .or. k == 1816 .or. k == 1817 .or. k == 1818 .or. k == 1819) then
 !                  write(*,*) 'XXX CELL ', k
 !                  write(*,*) 'eps_nuc', s% eps_nuc(k)
@@ -280,46 +280,48 @@
 !               end if
 
 
-            if (k == 1815 .or. k == 1816 .or. k == 1817 .or. k == 1818 .or. k == 1819) then
-            ! Construct the filename based on the zone
-            write(filename, '("zone_",I0,".txt")') k
-            ! Assign a unique unit number for file I/O
-            unit_number = 10 + k - 1815  ! Unit numbers from 10 upwards
-            ! Open the file in append mode
-            open(unit=unit_number, file=filename, status='unknown', position='append')
-            ! Write the iteration marker
-            write(unit_number, '(A,I0)') 'Iteration: ', s%num_solver_iterations
-!            write(unit_number, '(A,I0)') 'solver_adjust_iter: ', s% solver_adjust_iter
-            ! Write scalar variables with modified format
-            write(unit_number, '(A,ES23.15E3)') 'eps_nuc: ', s%eps_nuc(k)
-            write(unit_number, '(A,ES23.15E3)') 'rho: ', s%rho(k)
-            write(unit_number, '(A,ES23.15E3)') 'T: ', T
-            write(unit_number, '(A,ES23.15E3)') 'd_eps_nuc_dRho: ', d_eps_nuc_dRho
-            write(unit_number, '(A,ES23.15E3)') 'd_eps_nuc_dT: ', d_eps_nuc_dT
-            ! Determine the number of isotopes
-            num_isotopes = size(s%d_epsnuc_dx,1)
-            ! Write vector variables with modified format
-            write(unit_number, '(A)') 'd_epsnuc_dx: '
-            write(unit_number, '(ES23.15E3,1X)') (s%d_epsnuc_dx(ii,k), ii=1,num_isotopes)
-            write(unit_number, *)
-            write(unit_number, '(A)') 'dxdt_nuc: '
-            write(unit_number, '(ES23.15E3,1X)') (s%dxdt_nuc(ii,k), ii=1,num_isotopes)
-            write(unit_number, *)
-            write(unit_number, '(A)') 'd_dxdt_nuc_dRho: '
-            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dRho(ii,k), ii=1,num_isotopes)
-            write(unit_number, *)
-            write(unit_number, '(A)') 'd_dxdt_nuc_dT: '
-            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dT(ii,k), ii=1,num_isotopes)
-            write(unit_number, *)
-            ! Write the 2D array variable
-            write(unit_number, '(A)') 'd_dxdt_nuc_dx: '
-            do ii = 1, num_isotopes
-            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dx(ii,jj,k), jj=1,num_isotopes)
-            end do
-            write(unit_number, *)  ! New line
-            ! Close the file
-            close(unit_number)
-            end if
+!               For debugging by spitting out to file all net terms.
+
+!            if (k == 1815 .or. k == 1816 .or. k == 1817 .or. k == 1818 .or. k == 1819) then
+!            ! Construct the filename based on the zone
+!            write(filename, '("zone_",I0,".txt")') k
+!            ! Assign a unique unit number for file I/O
+!            unit_number = 10 + k - 1815  ! Unit numbers from 10 upwards
+!            ! Open the file in append mode
+!            open(unit=unit_number, file=filename, status='unknown', position='append')
+!            ! Write the iteration marker
+!            write(unit_number, '(A,I0)') 'Iteration: ', s%num_solver_iterations
+!!            write(unit_number, '(A,I0)') 'solver_adjust_iter: ', s% solver_adjust_iter
+!            ! Write scalar variables with modified format
+!            write(unit_number, '(A,ES23.15E3)') 'eps_nuc: ', s%eps_nuc(k)
+!            write(unit_number, '(A,ES23.15E3)') 'rho: ', s%rho(k)
+!            write(unit_number, '(A,ES23.15E3)') 'T: ', T
+!            write(unit_number, '(A,ES23.15E3)') 'd_eps_nuc_dRho: ', d_eps_nuc_dRho
+!            write(unit_number, '(A,ES23.15E3)') 'd_eps_nuc_dT: ', d_eps_nuc_dT
+!            ! Determine the number of isotopes
+!            num_isotopes = size(s%d_epsnuc_dx,1)
+!            ! Write vector variables with modified format
+!            write(unit_number, '(A)') 'd_epsnuc_dx: '
+!            write(unit_number, '(ES23.15E3,1X)') (s%d_epsnuc_dx(ii,k), ii=1,num_isotopes)
+!            write(unit_number, *)
+!            write(unit_number, '(A)') 'dxdt_nuc: '
+!            write(unit_number, '(ES23.15E3,1X)') (s%dxdt_nuc(ii,k), ii=1,num_isotopes)
+!            write(unit_number, *)
+!            write(unit_number, '(A)') 'd_dxdt_nuc_dRho: '
+!            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dRho(ii,k), ii=1,num_isotopes)
+!            write(unit_number, *)
+!            write(unit_number, '(A)') 'd_dxdt_nuc_dT: '
+!            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dT(ii,k), ii=1,num_isotopes)
+!            write(unit_number, *)
+!            ! Write the 2D array variable
+!            write(unit_number, '(A)') 'd_dxdt_nuc_dx: '
+!            do ii = 1, num_isotopes
+!            write(unit_number, '(ES23.15E3,1X)') (s%d_dxdt_nuc_dx(ii,jj,k), jj=1,num_isotopes)
+!            end do
+!            write(unit_number, *)  ! New line
+!            ! Close the file
+!            close(unit_number)
+!            end if
 
          end if
 

@@ -1028,8 +1028,13 @@
                !$OMP END PARALLEL DO SIMD
             end if
 
-            call factor_mtx(ierr)
-            if (ierr == 0) call solve_mtx(ierr)
+            ! instead of the following two routines, which are wrappers
+            ! for a bcyclic reduction algorithm, we can directly
+            ! call superLU or another sparse matrix solving library
+            ! here, to see if they can perform better. We just need
+            ! the library to return B, and perhaps ublk1, dblk1, lblk1.
+            call factor_mtx(ierr) ! factor the MESA matrix
+            if (ierr == 0) call solve_mtx(ierr) ! solve MESA matrix
 
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD

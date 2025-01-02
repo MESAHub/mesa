@@ -2823,7 +2823,11 @@
          do i = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofequ(i)
             do j = 1, nvar
-               write(*,'(e13.4,2x)', advance = 'no') dmat(i,j)
+               ! full precision, for checking/solving jacobian outside MESA
+                write(*,'(es24.16,2x)', advance = 'no') dmat(i,j)
+
+               ! limited output, 4 decimal place
+               !write(*,'(e13.4,2x)', advance = 'no') dmat(i,j)
             end do
             write(*,'(A)')
          end do
