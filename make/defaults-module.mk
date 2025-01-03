@@ -17,4 +17,5 @@ else
 WITH_FPE_CHECKS ?= no
 endif
 WITH_GYRE ?= yes
+WITH_ADIPLS ?= yes
 PREFIX ?= $(MAKE_DIR)/..

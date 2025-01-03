@@ -25,7 +25,7 @@ c
 c
       save
 c
-      data icasep,mlnamp,xtrncp /-1,4*8h        ,0./
+      data icasep,mlnamp,xtrncp /-1,4*z'20202020',0./
       data datp /8*0.d0/
 c
       if(ids.ge.0) go to 5
