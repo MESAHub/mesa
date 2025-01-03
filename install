@@ -336,7 +336,6 @@ function do_input_data {
 }
 
 do_one_parallel binary
-do_one_parallel astero
 
 
 echo
