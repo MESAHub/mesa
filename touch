@@ -19,7 +19,6 @@ function do_one {
 
 make clean
 check_okay
-do_one adipls
 do_one astero
 do_one binary
 do_one sample
