@@ -21,7 +21,6 @@ make clean
 check_okay
 do_one astero
 do_one binary
-do_one star
 
 echo "cleaning lib directory."
 rm -rf lib
