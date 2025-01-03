@@ -4,8 +4,9 @@ C AUTHOR KARA BURKE, JULY 2006
 
       subroutine delta2(x,y,del2,del2as,xis,aa,omgrtp,sig,iy,ia,nn,el)
        
-      implicit real*8 (a-h,o-z)
-      integer*4 v
+      use const_def
+      implicit real(dp) (a-h,o-z)
+      integer(4) v
       include 'adipls.c.d.incl'
       parameter(iwork=10*nnmax)
       real mass, rad, gconst, oms2, f4, f4int, oms
@@ -32,7 +33,6 @@ c
       common/cstdio/ istdin, istdou, istdpr, istder
 
  
-      pi = 4.d0*atan(1.d0)
       ell = el*(el+1.)
       freq = sqrt(cs(20))
       mass = cs(2)/1000
