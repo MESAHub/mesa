@@ -22,7 +22,8 @@ c
 c
       save
 c
-      data dot,blank,peh,el /1h.,1h ,1hp,1hl/
+c     '.', ' ', 'p', 'l'
+      data dot,blank,peh,el /z'2e',z'20',z'70',z'6c'/
       data iaper,inw1 /87,105,99,111,6,7,7,8/
 c
       nr=0
