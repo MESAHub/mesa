@@ -19,7 +19,6 @@ function do_one {
 
 make clean
 check_okay
-do_one astero
 do_one binary
 
 echo "cleaning lib directory."
