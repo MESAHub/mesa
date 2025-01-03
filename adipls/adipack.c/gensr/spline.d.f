@@ -44,7 +44,10 @@
       goto 1
       endif
       h=xa(khi)-xa(klo)
-      if (h.eq.0.d0) pause 'bad xa input.'
+      if (h.eq.0.d0) then
+         write(*,*) 'Bad XA input.'
+         call mesa_error(__FILE__,__LINE__)
+      endif
       a=(xa(khi)-x)/h
       b=(x-xa(klo))/h
       y=a*ya(klo)+b*ya(khi)+
