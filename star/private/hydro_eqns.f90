@@ -299,6 +299,8 @@
 
 
          ! matrix debugging.
+         write (*,*) 's% model_number', s% model_number
+         write (*,*) 's% model_number', s% solver_iter
          if (.true. .and. s% model_number == 2132 .and. s% solver_iter == 25) then !  .and. .not. s% doing_relax) then
            !write(*,*) 'inside print matrix'
 
@@ -385,7 +387,10 @@
             ! output jabobian, the A term in Ax = b
 
             if (.false.) call dump_equ ! debugging, false for now.
-            call mesa_error(__FILE__,__LINE__,'after dump_equ')
+            if (.true.) call mesa_error(__FILE__,__LINE__,'after dump_equ')
+            ! we will let inspect B end the model, so we can have
+            ! ublk,lblk,dblk, -equi = b, for before the solve.
+            ! and the B from after the solve, from inspectB in solver_support.f90
          end if
 
 

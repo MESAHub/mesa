@@ -271,7 +271,7 @@ def main():
     
     # As described:
     nvar = 27
-    nz   = 1841
+    nz   = 1842
     
     print("Parsing block files...")
     dblk = parse_dblk_file(file_dblk, nvar, nz)

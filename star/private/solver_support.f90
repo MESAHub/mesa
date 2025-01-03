@@ -734,14 +734,16 @@
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
-         integer, parameter :: inspectB_iter_stop = -1
+         integer, parameter :: inspectB_iter_stop = 25!-1
          include 'formats'
 
          if (dbg) write(*, *) 'inspectB', s% solver_iter
          ierr = 0
          if (s% solver_iter == inspectB_iter_stop) then
-            call dumpB
-            call mesa_error(__FILE__,__LINE__,'debug: inspectB')
+            !call dumpB
+            call dumpB_to_file
+            write (*,*) 'dumped B, dx, and xscale to file.'
+            !call mesa_error(__FILE__,__LINE__,'debug: inspectB')
          end if
 
          contains
@@ -759,6 +761,52 @@
             end do
             call mesa_error(__FILE__,__LINE__,'dumpB')
          end subroutine dumpB
+
+        subroutine dumpB_to_file
+        !real(dp), intent(in) :: B(:,:)  ! Input array B
+        integer :: nz, nvar
+        integer :: k
+        character(len=100) :: file_B, file_xscale, file_dx
+
+        nz = s% nz
+        nvar = size(B, 1)
+
+        ! File names
+        file_B = 'B_output.txt'
+        file_xscale = 'xscale_output.txt'
+        file_dx = 'dx_output.txt'
+
+        ! Output B
+        open(unit=10, file=file_B, status='replace')
+        write(10, '(A)') 'B values:'
+        do k = 1, nz
+        write(10, '(A, I5)') 'Zone:', k
+        write(10, '(500(es24.16E3, 1x))') B(:, k)
+        end do
+        close(10)
+
+        ! Output xscale
+        open(unit=11, file=file_xscale, status='replace')
+        write(11, '(A)') 'xscale values:'
+        do k = 1, nz
+        write(11, '(A, I5)') 'Zone:', k
+        write(11, '(500(es24.16E3, 1x))') s% x_scale(:, k)
+        end do
+        close(11)
+
+        ! Output dx
+        open(unit=12, file=file_dx, status='replace')
+        write(12, '(A)') 'dx values:'
+        do k = 1, nz
+        write(12, '(A, I5)') 'Zone:', k
+        write(12, '(500(es24.16E3, 1x))') s% solver_dx(:, k)
+        end do
+        close(12)
+
+        write(*,*) 'B, xscale, and dx output completed.'
+
+        end subroutine dumpB_to_file
+
 
       end subroutine inspectB
 
