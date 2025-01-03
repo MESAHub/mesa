@@ -14,4 +14,5 @@ WITH_CRLIBM ?= yes
 WITH_FPE_CHECKS ?= no
 WITH_GYRE ?= yes
 WITH_ADIPLS ?= yes
+WITH_PGSTAR ?= yes
 PREFIX ?= $(MAKE_DIR)/..
