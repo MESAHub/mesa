@@ -26,10 +26,10 @@ GYRE_SRCS = gyre_support_stub.f90
 endif
 
 ifeq ($(USE_ADIPLS),YES)
-ADIPLS_SRCS = adipls_support.f90 adipls_support_procs.f90
+ADIPLS_SRCS = adipls_support.f90
 ADIPLS_LIB = -ladipls
 else
-ADIPLS_SRCS = adipls_support_stub.f90 adipls_support_procs_stub.f90
+ADIPLS_SRCS = adipls_support_stub.f90
 ADIPLS_LIB =
 endif
 

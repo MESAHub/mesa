@@ -13,4 +13,5 @@ WITH_OPENMP ?= yes
 WITH_CRLIBM ?= yes
 WITH_FPE_CHECKS ?= no
 WITH_GYRE ?= yes
+WITH_ADIPLS ?= yes
 PREFIX ?= $(MAKE_DIR)/..

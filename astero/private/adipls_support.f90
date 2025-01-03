@@ -415,8 +415,8 @@
 
          contains
 
-
          subroutine setup_adipls
+            use adipls_callbacks, only: spcout_adi_ptr
             iounit = alloc_iounit(ierr)
             if (ierr /= 0) then
                write(*,*) 'setup_adipls failed in alloc_iounit'
@@ -445,6 +445,9 @@
             call setups_adi
             nn_arg_0 = 0
             istdin = iounit
+
+            spcout_adi_ptr => spcout_adi
+
             call adipls(i_paramset, ierr_param, i_inout, &
                   x_arg0, aa_arg0, data_arg, nn_arg_0, ivarmd, iaa_arg)
             close(iounit)
@@ -462,6 +465,48 @@
 
          end subroutine setup_adipls
 
+         subroutine spcout_adi(x, y, aa, data, nn, iy, iaa, ispcpr)
+            ! must set ispcpr > 0 to get this called
+            use astero_def, only: store_new_oscillation_results, &
+               el, order, em, cyclic_freq, inertia, num_results
+            use const_def, only: dp, pi4
+            use utils_lib, only: mesa_error
+
+            implicit none
+
+            integer :: nn, iy, iaa, ispcpr
+            real(dp) :: x(1:nn), y(1:iy,1:nn), aa(1:iaa,1:nn), data(8)
+
+            !  common for storage of model parameters
+            !  degree, order, cyclic frequency (microHz), inertia
+            common/cobs_param/ icobs_st, nobs_st, obs_st
+            real(dp) :: csummm(50)
+            common/csumma/ csummm
+
+            integer :: icobs_st, nobs_st
+            real(dp) :: obs_st(10,100000)  ! huge 2nd dimension to satisfy bounds checking
+
+            integer :: ierr, new_el, new_order, new_em, n
+            real(dp) :: new_inertia, new_cyclic_freq
+
+            include 'formats'
+
+            new_el = int(obs_st(1,nobs_st) + 0.5_dp)
+            new_order = int(obs_st(2,nobs_st) + 0.5_dp)
+            new_em = csummm(38)
+            new_inertia = obs_st(4,nobs_st)*pi4
+            new_cyclic_freq = obs_st(3,nobs_st)
+
+            call store_new_oscillation_results( &
+               new_el, new_order, new_em, new_inertia, new_cyclic_freq, 0._dp, ierr)
+            if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+
+            n = num_results
+            call adipls_mode_info( &
+               el(n), order(n), em(n), cyclic_freq(n), inertia(n), &
+               x, y, aa, data, nn, iy, iaa, ispcpr)
+
+         end subroutine spcout_adi
 
          subroutine setup_redist
 
