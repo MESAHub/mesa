@@ -338,7 +338,6 @@ function do_input_data {
 do_one sample
 
 do_one star_data
-do_one adipls
 do_one_parallel star
 do_one_parallel binary
 do_one_parallel astero
