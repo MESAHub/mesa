@@ -1,8 +1,0 @@
-echo 'building FreeEOS'
-cd free_eos-2.2.1
-./install
-
-cd ..
-echo 'building FreeEOS builder'
-cd make
-make
