@@ -54,16 +54,15 @@ program create_table_atm
   integer :: ierr, i_Teff, i_logg
   character(len=256) :: clogZ, output_file, ctau_base
   logical, parameter :: use_cache = .true.
-  real(dp) :: M, R, L, X, Y, Z, XC, XN, XO, XNe, XMg, abar, zbar, z2bar, z53bar, kap, err
-  real(dp) :: Pextra_factor, Teff, lnP, lnT, tau_base, Teff_out, ye
-  real(dp) :: dabar_dx(num_isos), dzbar_dx(num_isos), Xsun, Ysun, Zsun, logZ
+  real(dp) :: M, R, L, X, Y, Z, XC, XN, XO, XNe, XMg, abar, zbar, z2bar, z53bar, kap
+  real(dp) :: Pextra_factor, lnP, lnT, tau_base
+  real(dp) :: Xsun, Ysun, Zsun, logZ
   real(dp) :: dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap
   real(dp) :: dlnP_dL, dlnP_dlnR, dlnP_dlnm, dlnP_dlnkap, Xbbn, Ybbn
   real(dp) :: logg_array(num_logg), Teff_array(num_Teff)
   real(dp) :: Pgas(num_logg, num_Teff), T(num_logg, num_Teff)
   integer, parameter :: max_iters = 100
   real(dp), parameter :: errtol = 1d-6
-  integer :: iters
 
   !process command line args
   if( COMMAND_ARGUMENT_COUNT() /= 3 ) then
@@ -109,7 +108,7 @@ program create_table_atm
         call atm_eval_T_tau_uniform( &
              tau_base, L, R, M, standard_cgrav, 0.2d0*(1 + X), Pextra_factor, &
              ATM_T_TAU_EDDINGTON, eos_proc, kap_proc, errtol, max_iters, .TRUE., &
-             Teff, kap, &
+             Teff_array(i_Teff), kap, &
              lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
              lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
              ierr)    
@@ -146,6 +145,8 @@ contains
 
     call const_init(' ',ierr)
     if(ierr/=0) call mesa_error(__FILE__,__LINE__)
+
+    call math_init()
 
     call chem_init('isotopes.data',ierr)
     if(ierr/=0) call mesa_error(__FILE__,__LINE__)

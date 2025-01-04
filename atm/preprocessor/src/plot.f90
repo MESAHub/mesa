@@ -26,7 +26,7 @@
       implicit none
 
       contains
-      
+
       subroutine make_plot_files
 
          character (len=256) :: filename
@@ -34,21 +34,19 @@
          integer :: table_atm_version = 1
          character(len=40) :: table_atm_files(nZ)
          character(len=8):: atm_mix(nZ) !not used currently -- nor is alphaFe
-      
+
          real(dp) :: Teff_array(nT), logg_array(ng), Teff_bound(ng)
          real(dp) :: logZ(nZ), alphaFe(nZ), Pgas(ng,nT,nZ)
          real(dp) :: Teff_tmp(nT), logg_tmp(ng)
-         integer :: ierr, iounit, i, j, ii, jj, ibound_tmp(ng), nZ_tmp, nT_tmp, ng_tmp, &
+         integer :: ierr, iounit, i, j, ibound_tmp(ng), nZ_tmp, nT_tmp, ng_tmp, &
             tmp_version(nZ), ibound(ng,nZ), iZ, text_file_version
 
          real(dp), parameter :: Pfill = 1d2 !used for interpolation in filling missing values
-         real(dp) :: d0, d1, Pinterp_max, Pinterp
-         integer :: i_max, j_max
-         
+
          logical, parameter :: dbg = .false.
 
          include 'formats'
-         
+
          iounit = 33
 
          filename = 'atm_data/table_summary.txt'
@@ -93,7 +91,7 @@
                Teff_bound(i) = min( Teff_bound(i) , Teff_array(ibound(i,j)) )
             enddo
          enddo
-         
+
          do iZ=1,nZ
             filename = 'atm_data/' // trim(table_atm_files(iZ))
             open(iounit,file=trim(filename),action='read',status='old',iostat=ierr)
@@ -108,7 +106,7 @@
                write(*,*)
                error stop 1
             endif
-            
+
             read(iounit,'(13x,f5.2,8x,f4.1,1x,a8,1x,15x,13i4)') &
                logZ(iZ), alphaFe(iZ), atm_mix(iZ), ibound_tmp(:)
             read(iounit,'(15x,13(9x,f5.2,1x))') logg_tmp(:)
@@ -117,7 +115,7 @@
             enddo
             close(iounit)
          end do
-         
+
          do iZ=1, nZ
             filename = 'plot_data/' // trim(table_atm_files(iZ)) // '.data'
             write(*,*) 'write ' // trim(filename)
@@ -130,22 +128,22 @@
             write(iounit,'(e20.10)') log10(max(1d-99,Pgas(:,:,iZ)))
             close(iounit)
          end do
-         
+
          filename = 'plot_data/logg.data'
          write(*,*) 'write ' // trim(filename)
          open(iounit,file=trim(filename),action='write',iostat=ierr)
          write(iounit,'(e20.10)') logg_array(:)
          close(iounit)
-         
+
          filename = 'plot_data/Teff.data'
          write(*,*) 'write ' // trim(filename)
          open(iounit,file=trim(filename),action='write',iostat=ierr)
          write(iounit,'(e20.10)') Teff_array(:)
          close(iounit)
-                  
+
       end subroutine make_plot_files
-         
-      
+
+
       end module plot_support
 
 

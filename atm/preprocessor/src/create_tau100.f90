@@ -41,7 +41,7 @@ module mod_tau100
 
   real(dp) :: tau_base ! tau at base of atm (1, 10, or 100)
   integer :: which_cond_layer, which_ck_layer
-  character(len=256) :: my_mesa_dir, output_file1, output_file2  
+  character(len=256) :: my_mesa_dir, output_file1, output_file2
 
   integer, parameter :: &
        cond_layer_tau1m2 = 26, cond_layer_tau1m1 = 32, cond_layer_tau1 = 38, &
@@ -61,13 +61,12 @@ contains
     integer, pointer :: chem_id(:), net_iso(:)
     real(dp), pointer :: xa(:)
 
-    integer :: i, j, k, ierr, i_Teff, i_logg, logg_i_lo, logg_i_hi, &
-         io_out1, io_out2, io, ii, jj
+    integer :: i, j, ierr, io_out1, io_out2, io, ii, jj
     include 'tau100_Ts.dek'
-    character(len=256) :: filename     
+    character(len=256) :: filename
     integer, parameter :: ng = 13, nT = num_tau100_Ts, num_layers = 50
-    real(dp) :: loggs(ng), Teffs(nT), vals(num_layers), jnk1, jnk2
-    real(dp) :: T(ng,nT), Pgas(ng,nT), logT(ng,nT), logPgas(ng,nT)
+    real(dp) :: loggs(ng), Teffs(nT), vals(num_layers)
+    real(dp) :: T(ng,nT), Pgas(ng,nT)
     real(dp) :: logT_plot(nT,ng), logPgas_plot(nT,ng)
     real(dp) :: X, Y, Z, XC, XN, XO, XNe, XMg, abar, zbar, z2bar, z53bar, logg, Teff
     integer, parameter :: nt_for_CK = 76, max_ng_for_CK = 11
@@ -75,7 +74,7 @@ contains
 
     include 'formats'
 
-    write(*,1) 'tau_base', tau_base     
+    write(*,1) 'tau_base', tau_base
 
     ng_for_CK_Teff(1:11) = 11
     ng_for_CK_Teff(12:17)= 10
@@ -271,9 +270,9 @@ contains
     end subroutine smooth
 
     !****
-    
+
     subroutine write_plots()
-      
+
       integer :: i, j, ii, jj
 
       ! rearrange for plotting
@@ -313,12 +312,12 @@ contains
     subroutine write_output
       write(*,*) trim(output_file1)
       io_out1 = 33
-      open(io_out1, file=output_file1)         
+      open(io_out1, file=output_file1)
       write(*,*) trim(output_file2)
       io_out2 = 34
-      open(io_out2, file=output_file2)         
-      write(io_out1,'(a15)',advance='no') "#Teff(K)| Pgas@" 
-      write(io_out2,'(a15)',advance='no') "#Teff(K)|    T@" 
+      open(io_out2, file=output_file2)
+      write(io_out1,'(a15)',advance='no') "#Teff(K)| Pgas@"
+      write(io_out2,'(a15)',advance='no') "#Teff(K)|    T@"
       do i = 1, ng
          write(io_out1,fmt='("  log g =",f5.2," ")',advance='no') loggs(i)
          write(io_out2,fmt='("  log g =",f5.2," ")',advance='no') loggs(i)
@@ -340,7 +339,7 @@ contains
     end subroutine write_output
 
     !****
-    
+
     subroutine read_COND()
       ! read COND; store logg = 2.5 to 6.0, Teff = 100 to 3600
       write(*,*) 'read COND'
@@ -415,7 +414,7 @@ contains
     end subroutine read_file
 
     !****
-    
+
     subroutine read_vals(skip)
       logical, intent(in) :: skip
       integer :: k
@@ -495,8 +494,7 @@ contains
       real(dp), intent(out) :: Pgas, T
       integer, intent(out) :: ierr
 
-      integer :: iters
-      real(dp) :: M, R, L, Teff_out, kap, err, Pextra_factor
+      real(dp) :: M, R, L, Teff_out, kap, Pextra_factor
       real(dp) :: lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap
       real(dp) :: lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnm, dlnP_dlnkap
 
@@ -504,7 +502,7 @@ contains
       integer, parameter :: max_iters = 100
       real(dp), parameter :: errtol = 1d-6
       M = Msun
-      R = sqrt ( standard_cgrav*M / 10d0**logg )               
+      R = sqrt ( standard_cgrav*M / 10d0**logg )
       L = pi*crad*clight * R**2 * Teff**4
       ierr = 0
       Pextra_factor = 1
@@ -514,7 +512,7 @@ contains
            Teff_out, kap, &
            lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
            lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-           ierr)    
+           ierr)
       if (ierr /= 0 .or. abs(Teff-Teff_out) > 1d-2) then
          Pgas = -1
          T = -1
@@ -529,11 +527,11 @@ contains
 
     subroutine set_table_composition()
       integer :: i
-      real(dp) :: dabar_dx(num_isos), dzbar_dx(num_isos), ye, sumx, &
-           xh, xhe, xz, approx_abar, approx_zbar, mass_correction
+      real(dp) :: ye, sumx, &
+           xh, xhe, xz, mass_correction
       real(dp), parameter :: &
            Xbbn   = 0.75d0, &
-           Ybbn   = 0.25d0, &           
+           Ybbn   = 0.25d0, &
            Xsun   = 7.348d-1, &
            Ysun   = 2.348d-1, &
            Zsun   = 1.685d-2
@@ -565,7 +563,7 @@ contains
     end subroutine set_table_composition
 
     !****
-    
+
     subroutine eos_proc( &
          lnP, lnT, &
          lnRho, res, dres_dlnRho, dres_dlnT, &
@@ -643,19 +641,19 @@ contains
   subroutine mesa_init(ierr)
     integer, intent(out) :: ierr
     logical, parameter :: use_cache = .true.
-    call const_init(my_mesa_dir, ierr)      
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
+    call const_init(my_mesa_dir, ierr)
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
     call math_init()
     call chem_init('isotopes.data', ierr)
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)         
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
     call eos_init(' ', use_cache, ierr)
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
     eos_handle = alloc_eos_handle(ierr)
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            
-    call kap_init(use_cache, ' ', ierr) 
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
+    call kap_init(use_cache, ' ', ierr)
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
     kap_handle = alloc_kap_handle(ierr)
-    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)            
+    if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
     call atm_init(.false., ierr)
     if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
   end subroutine mesa_init
