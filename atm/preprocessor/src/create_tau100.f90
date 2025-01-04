@@ -57,13 +57,12 @@ contains
       integer, pointer :: chem_id(:), net_iso(:)
       real(dp), pointer :: xa(:)
 
-      integer :: i, j, k, ierr, i_Teff, i_logg, logg_i_lo, logg_i_hi, &
-                 io_out1, io_out2, io, ii, jj
+      integer :: i, j, ierr, io_out1, io_out2, io, ii, jj
       include 'tau100_Ts.dek'
       character(len=256) :: filename
       integer, parameter :: ng = 13, nT = num_tau100_Ts, num_layers = 50
-      real(dp) :: loggs(ng), Teffs(nT), vals(num_layers), jnk1, jnk2
-      real(dp) :: T(ng, nT), Pgas(ng, nT), logT(ng, nT), logPgas(ng, nT)
+      real(dp) :: loggs(ng), Teffs(nT), vals(num_layers)
+      real(dp) :: T(ng, nT), Pgas(ng, nT)
       real(dp) :: logT_plot(nT, ng), logPgas_plot(nT, ng)
       real(dp) :: X, Y, Z, XC, XN, XO, XNe, XMg, abar, zbar, z2bar, z53bar, logg, Teff
       integer, parameter :: nt_for_CK = 76, max_ng_for_CK = 11
@@ -492,7 +491,7 @@ contains
          integer, intent(out) :: ierr
 
          integer :: iters
-         real(dp) :: M, R, L, Teff_out, kap, err, Pextra_factor
+         real(dp) :: M, R, L, Teff_out, kap, Pextra_factor
          real(dp) :: lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap
          real(dp) :: lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnm, dlnP_dlnkap
 
@@ -525,8 +524,7 @@ contains
 
       subroutine set_table_composition()
          integer :: i
-         real(dp) :: dabar_dx(num_isos), dzbar_dx(num_isos), ye, sumx, &
-                     xh, xhe, xz, approx_abar, approx_zbar, mass_correction
+         real(dp) :: ye, sumx, xh, xhe, xz, mass_correction
          real(dp), parameter :: &
             Xbbn = 0.75d0, &
             Ybbn = 0.25d0, &
