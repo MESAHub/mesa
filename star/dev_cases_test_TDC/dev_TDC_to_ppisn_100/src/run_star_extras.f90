@@ -134,8 +134,7 @@
          call gyre_set_constant('R_SUN', Rsun)
          call gyre_set_constant('L_SUN', Lsun)
 
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-
+         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/build/gyre/src')
       end subroutine extras_startup
 
 

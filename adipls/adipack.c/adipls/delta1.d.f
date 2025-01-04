@@ -4,8 +4,9 @@ C AUTHOR KARA BURKE, JULY 2006
 
       subroutine delta1(x,y,del1,del1as,aa,omgrtp,sig,iy,ia,nn,el)
 
-      IMPLICIT REAL*8 (a-h,o-z)
-      INTEGER*4 v
+      use const_def, only: dp
+      IMPLICIT real(dp) (a-h,o-z)
+      INTEGER(4) v
       include 'adipls.c.d.incl'
       parameter(iwork=10*nnmax)
       REAL mass, rad, gconst, oms2, oms

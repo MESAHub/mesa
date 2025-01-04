@@ -1,8 +1,0 @@
-cp AESOPUS_AGSS09.h5 ../..
-
-echo "**************"
-echo "**************"
-echo "next step is"
-echo "cd ../.. ; ./build_data_and_export"
-echo "**************"
-echo "**************"

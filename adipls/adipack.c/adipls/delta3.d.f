@@ -7,8 +7,9 @@ C CORRECTLY. CURRENTLY I AM USING EQUATIONS LIFTED FROM MJT. -- KDB 11/04/07
       subroutine delta3(x,y,del3,del3as,u,aa,omgrtp,sig,iy,ia,nn,el)
 
 
-      implicit real*8 (a-h,o-z)
-      integer*4 v
+      use const_lib, only: dp
+      implicit real(dp) (a-h,o-z)
+      integer(4) v
       include 'adipls.c.d.incl'
       parameter(iwork=10*nnmax)
 

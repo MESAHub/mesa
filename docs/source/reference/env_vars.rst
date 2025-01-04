@@ -18,7 +18,7 @@ GYRE_DIR
 
 Location of the GYRE source code (only needed if running GYRE).  If
 you haven't moved it from the ``$MESA_DIR`` then set as 
-``GYRE_DIR=$MESA_DIR/gyre/gyre``.
+``GYRE_DIR=$MESA_DIR/build/gyre/src``.
 
 
 

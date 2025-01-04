@@ -4,8 +4,9 @@ C AUTHOR KARA BURKE, JULY 2006
 
       subroutine sph(x,y,xis,aa,omgrtp,el,sig,iy,ia,nn)
 
-      implicit real*8 (a-h,o-z)
-      integer*4 v
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
+      integer(4) v
       include 'adipls.c.d.incl'
       parameter (iw=10*nnmax)
 
@@ -140,7 +141,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       subroutine rhskdbsph(x,y,zk,ap,aq,f,fd,h,hd,ifd,n)
 
-      implicit real*8 (a-h,o-z)
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
 
       include 'adipls.c.d.incl'
       dimension y(*),f(*),fd(ifd,*),h(*),hd(ifd,*),zk(1),ap(*)
@@ -221,7 +223,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       subroutine bckdbsph(x1,x2,y1,y2,zk,ap,aq,g,gd,ig,id,n)
       
-      implicit real*8(a-h,o-z)
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
 
       include 'adipls.c.d.incl'
       dimension y1(*),y2(*),g(*),gd(ig,*),zk(1),ap(*),aq(20,*)

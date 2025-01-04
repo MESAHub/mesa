@@ -4,8 +4,9 @@ C AUTHOR KARA BURKE, MAY 2006
 
       subroutine uhx(x,u,aa,omgrtp,ia,nn)
 
-      implicit real*8 (a-h,o-z)
-      integer*4 v
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
+      integer(4) v
       include 'adipls.c.d.incl'
       parameter(iwork=10*nnmax)
 
@@ -84,7 +85,8 @@ c
 ccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       subroutine rhskdbh(x,y,zk,ap,aq,f,fd,h,hd,ifd,n)
-      implicit real*8 (a-h,o-z)
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
       real mass, rad, gconst, oms2
 
       include 'adipls.c.d.incl'
@@ -137,7 +139,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       subroutine bckdbh(x1,x2,y1,y2,zk,ap,aq,g,gd,ig,id,n)
-      implicit real*8(a-h,o-z)
+      use const_def, only: dp
+      implicit real(dp) (a-h,o-z)
       real mass, rad, gconst, oms2
 
       include 'adipls.c.d.incl'
