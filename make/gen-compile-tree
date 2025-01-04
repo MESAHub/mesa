@@ -17,7 +17,7 @@ my $install_includes = $ENV{'INSTALL_INCLUDES'};
 my $modules = $ENV{'MODULES'};
 
 foreach my $include_dir (@include_dirs) {
-    opendir my $include_dir_handle, $include_dir or do { warn "Could not open $include_dir"; continue };
+    opendir my $include_dir_handle, $include_dir or do { warn "Could not open $include_dir"; next };
     foreach my $include_file (readdir $include_dir_handle) {
         $include_files{$include_file} = "$include_dir/$include_file";
     }
