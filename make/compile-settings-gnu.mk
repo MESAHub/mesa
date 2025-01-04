@@ -54,9 +54,9 @@ _CFLAGS := $(FLAGS_CODE_SANITY) $(FLAGS_REPRO) $(FLAGS_OPT) $(FLAGS_DEBUG) $(FLA
 
 PREPROCESS := gfortran -cpp -E
 FCOMPILE := gfortran $(_FFLAGS) -c
-FCOMPILE_MODULE := gfortran $(_FFLAGS) -c -fsyntax-only
+FCOMPILE_MODULE := gfortran $(_FFLAGS) -w -c -fsyntax-only
 FCOMPILE_FIXED := gfortran $(FFLAGS_FIXED) -c
-FCOMPILE_MODULE_FIXED:= gfortran $(FFLAGS_FIXED) -c -fsyntax-only
+FCOMPILE_MODULE_FIXED:= gfortran $(FFLAGS_FIXED) -w -c -fsyntax-only
 CCOMPILE := gcc $(_CFLAGS) -c
 LIB_DEP_ARGS := $(call pkg-config, --libs,$(DEPENDS_ON))
 LIB_TOOL_STATIC := ar rcs
