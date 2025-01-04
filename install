@@ -343,9 +343,6 @@ function do_input_data {
 	cd ..
 }
 
-do_one_parallel binary
-
-
 echo
 echo
 echo
