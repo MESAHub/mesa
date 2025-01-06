@@ -100,7 +100,7 @@ contains
     real(dp), pointer :: C1(:)
     real(dp) :: coeff, coeff_eval(6), safe_omega, safe_incl
     integer, parameter :: ict(6)=[1,0,0,0,0,0]
-    integer ierr
+    integer :: ierr
     if(.not.GD_initialized) call GD_init(ierr)
     !ensure that omega and inclination are within table bounds
     safe_omega = min(max(omega,0.0d0),1.0d0)
