@@ -3,4 +3,4 @@
 
       call do_run_binary(.true.)
 
-      end program run_binary
+      end program binary_run
