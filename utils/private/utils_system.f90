@@ -30,25 +30,25 @@ module utils_system
       function f_mkdir_p(folder) bind(C,name='c_mkdir_p')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_mkdir_p
-         character(kind=C_CHAR) :: folder(*)
+         character(kind=C_CHAR) :: folder(:)
       end function f_mkdir_p
 
       function f_mv(src, dest) bind(C,name='c_mv')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_mv
-         character(kind=C_CHAR) :: src(*), dest(*)
+         character(kind=C_CHAR) :: src(:), dest(:)
       end function f_mv
 
       function f_cp(src, dest) bind(C,name='c_cp')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_cp
-         character(kind=C_CHAR) :: src(*), dest(*)
+         character(kind=C_CHAR) :: src(:), dest(:)
       end function f_cp
 
       function f_is_dir(folder) bind(C,name='is_dir')
          use, intrinsic :: ISO_C_BINDING, only: C_CHAR, C_INT
          integer(C_INT) :: f_is_dir
-         character(kind=C_CHAR) :: folder(*)
+         character(kind=C_CHAR) :: folder(:)
       end function f_is_dir
 
    end interface
