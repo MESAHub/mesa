@@ -535,7 +535,7 @@
 
       subroutine bobyqa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(:)
+         double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
 
          character(len=256) :: filename
@@ -560,7 +560,7 @@
 
       subroutine newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(:)
+         double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
 
          character(len=256) :: filename
@@ -585,7 +585,7 @@
 
       subroutine bobyqa_or_newuoa_fun(n,x,f)
          integer, intent(in) :: n
-         double precision, intent(in) :: x(:)
+         double precision, intent(in) :: x(*)
          double precision, intent(out) :: f
          integer :: ierr, prev_sample_number, i
          include 'formats'

@@ -810,8 +810,8 @@
             use const_def, only: dp
             integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
             real(dp), intent(in) :: s ! interpolation x value (between xold and x).
-            real(dp), intent(inout), target :: rwork_y(:)
-            integer, intent(inout), target :: iwork_y(:)
+            real(dp), intent(inout), target :: rwork_y(*)
+            integer, intent(inout), target :: iwork_y(*)
             integer, intent(out) :: ierr
             ierr = 0
             interp_y = 0
@@ -1007,8 +1007,8 @@
             integer, intent(in) :: step, n, lrpar, lipar
             real(dp), intent(in) :: told, time
             real(dp), intent(inout) :: x(:)
-            real(dp), intent(inout), target :: rwork_y(:)
-            integer, intent(inout), target :: iwork_y(:)
+            real(dp), intent(inout), target :: rwork_y(*)
+            integer, intent(inout), target :: iwork_y(*)
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
             real(dp) :: lgt, lgrho

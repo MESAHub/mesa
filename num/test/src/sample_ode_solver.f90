@@ -246,8 +246,8 @@
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
          real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout), target :: rwork(:)
-         integer, intent(inout), target :: iwork(:)
+         real(dp), intent(inout), target :: rwork(*)
+         integer, intent(inout), target :: iwork(*)
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          interface
@@ -255,8 +255,8 @@
                use const_def, only: dp
                integer, intent(in) :: i
                real(dp), intent(in) :: s
-               real(dp), intent(inout), target :: rwork(:)
-               integer, intent(inout), target :: iwork(:)
+               real(dp), intent(inout), target :: rwork(*)
+               integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
             end function interp_y
          end interface
