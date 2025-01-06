@@ -10,5 +10,5 @@
       call Do_One(quietly)
       call test1_eosPT_for_ck(quietly)
 
-      end
+      end program test_eos_quietly
 

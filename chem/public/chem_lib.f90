@@ -546,7 +546,7 @@
                         nuclides% binding_energy(chem_id)
          end if
 
-      end function
+      end function get_mass_excess
 
       function get_Q(nuclides,chem_id) result (q)
          use chem_def
@@ -557,7 +557,7 @@
          !Minus the mass excess
          q=-get_mass_excess(nuclides,chem_id)
 
-      end function
+      end function get_Q
 
       ! returns the indx corresponding to Tpart just less than T9
       ! T9 is the temperature in units of GK

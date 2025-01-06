@@ -12,4 +12,4 @@
 
       call do_run_star
 
-      end program
+      end program run

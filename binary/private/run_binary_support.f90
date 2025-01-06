@@ -1002,6 +1002,6 @@ contains
          end if
       end if
 
-   end subroutine
+   end subroutine do_binary_job_controls_after
 
 end module run_binary_support
