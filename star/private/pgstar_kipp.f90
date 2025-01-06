@@ -107,12 +107,11 @@
 
          integer :: ix,k
          real :: xleft,xright,now
-         real :: dxmin
+         real, save :: dxmin = -1.d0
 
          include 'formats'
 
          ierr = 0
-         dxmin=-1.d0
 
          mix_clr(convective_mixing) = clr_convection
          mix_clr(overshoot_mixing) = clr_overshoot
