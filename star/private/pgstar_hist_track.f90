@@ -641,6 +641,7 @@
             show_annotation1, show_annotation2, show_annotation3, use_decorator
          interface
             subroutine decorate(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine decorate

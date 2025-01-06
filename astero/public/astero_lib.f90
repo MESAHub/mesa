@@ -50,6 +50,7 @@
          use astero_def, only: init_astero_def
          interface
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls

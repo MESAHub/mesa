@@ -44,6 +44,7 @@
          use gyre_support, only: gyre_is_enabled, init_gyre
          interface
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls

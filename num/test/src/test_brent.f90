@@ -138,6 +138,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
@@ -300,6 +301,7 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface

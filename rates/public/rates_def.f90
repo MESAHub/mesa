@@ -212,6 +212,7 @@
          abstract interface
             subroutine setup_weak_table(table, ierr)
               import weak_rate_table
+              implicit none
               class(weak_rate_table), intent(inout) :: table
               integer, intent(out) :: ierr
             end subroutine setup_weak_table
@@ -223,6 +224,7 @@
                  Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
               use const_def, only : dp
               import weak_rate_table
+              implicit none
               class(weak_rate_table), intent(inout) :: table
               real(dp), intent(in) :: T9, lYeRho
               real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
