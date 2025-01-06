@@ -535,7 +535,9 @@
          type(nuclide_data), intent(in) :: nuclides
          integer, intent(in) :: chem_id
          real(dp) :: mass_excess
-         logical :: use_nuclides_mass_excess=.false.
+         logical :: use_nuclides_mass_excess
+
+         use_nuclides_mass_excess = .false.
 
          ! These should be identical but can have slight ~ulp difference
          ! due to floating point maths
