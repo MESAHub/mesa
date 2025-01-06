@@ -145,8 +145,8 @@
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
          real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout), target :: rwork(*)
-         integer, intent(inout), target :: iwork(*)
+         real(dp), intent(inout), target :: rwork(:)
+         integer, intent(inout), target :: iwork(:)
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          interface
@@ -156,8 +156,8 @@
                use const_def, only: dp
                integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
                real(dp), intent(in) :: s ! interpolation x value (between xold and x).
-               real(dp), intent(inout), target :: rwork(*)
-               integer, intent(inout), target :: iwork(*)
+               real(dp), intent(inout), target :: rwork(:)
+               integer, intent(inout), target :: iwork(:)
                integer, intent(out) :: ierr
             end function interp_y
          end interface

@@ -910,9 +910,9 @@
       INTEGER        TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
                      iounit, NROW  , NCOL  , NNZERO, NELTVL
 
-      INTEGER        COLPTR (*), ROWIND (*), ierr
+      INTEGER        COLPTR (:), ROWIND (:), ierr
 
-      REAL(dp)         VALUES (*)
+      REAL(dp)         VALUES (:)
 
       integer :: i
 
