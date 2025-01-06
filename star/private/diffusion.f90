@@ -838,8 +838,8 @@
             real(dp), intent(in) :: xold, time
             real(dp), intent(inout) :: y(:)
             ! y can be modified if necessary to keep it in valid range of possible solutions.
-            real(dp), intent(inout), target :: rwork_y(*)
-            integer, intent(inout), target :: iwork_y(*)
+            real(dp), intent(inout), target :: rwork_y(:)
+            integer, intent(inout), target :: iwork_y(:)
             integer, intent(inout), pointer :: ipar(:) ! (lipar)
             real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
             interface
