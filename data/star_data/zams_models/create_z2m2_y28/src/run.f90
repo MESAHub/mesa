@@ -5,4 +5,4 @@
 
       call do_run ! create zams
 
-      end program
+      end program run

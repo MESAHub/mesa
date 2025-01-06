@@ -219,7 +219,7 @@
          include 'binary_controls.inc'
 
          type (pgbinary_controls) :: pg
-      end type
+      end type binary_info
 
       logical :: have_initialized_binary_handles = .false.
       integer, parameter :: max_binary_handles = 10 ! this can be increased as necessary

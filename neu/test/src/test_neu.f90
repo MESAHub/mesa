@@ -16,4 +16,4 @@
       call math_init()
       call do_test_neutrinos()
 
-      end program
+      end program test_neu

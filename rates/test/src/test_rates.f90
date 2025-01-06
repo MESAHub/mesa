@@ -347,4 +347,4 @@ program test_rates
 
    call teardown
 
-end program
+end program test_rates

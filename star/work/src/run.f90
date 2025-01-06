@@ -15,4 +15,4 @@
 
       call do_run_star(inlist_fname)
 
-      end program
+      end program run

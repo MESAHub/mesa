@@ -234,7 +234,7 @@
 
             if (.not. quietly) write(*,*)
 
-         end subroutine
+         end subroutine doit
 
 
          subroutine test_get_Rho_T ! using most recent values from subroutine Do_One_TRho

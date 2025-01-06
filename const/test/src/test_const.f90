@@ -48,5 +48,5 @@ contains
 
    end subroutine do_test_const
 
-end program
+end program test_const
 

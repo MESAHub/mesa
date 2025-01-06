@@ -209,7 +209,7 @@
             end if
          end if
 
-      end subroutine
+      end subroutine binarydata_init
 
       subroutine set_donor_star(b)
          type (binary_info), pointer :: b
@@ -258,7 +258,7 @@
                b% s_accretor => b% s1
             end if
          end if
-      end subroutine
+      end subroutine set_donor_star
 
       integer function binary_evolve_step(b)
          use utils_lib, only: is_bad
