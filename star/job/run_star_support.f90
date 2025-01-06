@@ -3721,7 +3721,7 @@
          integer, intent(out) :: ierr
          integer :: status
 
-         real(dp) :: test_suite_res_factor = 1
+         real(dp), save :: test_suite_res_factor = 1
          character(len=20) :: test_suite_resolution_factor_str
 
          include 'formats'
