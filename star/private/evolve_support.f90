@@ -252,6 +252,7 @@
          use star_utils, only: get_name_for_restart_file
          interface
             subroutine save_restart_info(iounit, id, ierr)
+               implicit none
                integer, intent(in) :: iounit
                integer, intent(in) :: id
                integer, intent(out) :: ierr

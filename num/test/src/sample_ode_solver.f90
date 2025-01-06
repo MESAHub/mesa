@@ -253,6 +253,7 @@
          interface
             real(dp) function interp_y(i, s, rwork, iwork, ierr)
                use const_def, only: dp
+               implicit none
                integer, intent(in) :: i
                real(dp), intent(in) :: s
                real(dp), intent(inout), target :: rwork(*)

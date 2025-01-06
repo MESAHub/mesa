@@ -74,18 +74,19 @@
          integer, intent(in) :: nr, n, lrpar, lipar
          double precision, intent(in) :: xold, x
          double precision, intent(inout) :: y(n)
-         real(dp), intent(inout), target :: rwork(:)
-         integer, intent(inout), target :: iwork(:)
+         real(dp), intent(inout), target :: rwork(*)
+         integer, intent(inout), target :: iwork(*)
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             double precision function interp_y(i,s,rwork,iwork,ierr)
+               implicit none
                integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
                double precision, intent(in) :: s ! interpolation x value (between xold and x).
-               double precision, intent(inout), target :: rwork(:)
-               integer, intent(inout), target :: iwork(:)
+               double precision, intent(inout), target :: rwork(*)
+               integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
             end function interp_y
          end interface

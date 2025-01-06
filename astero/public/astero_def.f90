@@ -45,6 +45,7 @@
       abstract interface
 
          subroutine other_proc_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine other_proc_interface
@@ -52,6 +53,7 @@
          subroutine other_adipls_mode_info_interface( &
                l, order, freq, inertia, x, y, aa, data, nn, iy, iaa, ispcpr, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: l, order
             real(dp), intent(in) :: freq, inertia
             integer, intent(in) :: nn, iy, iaa, ispcpr
@@ -614,6 +616,7 @@
 
          subroutine set_constraint_value_interface(id, name, val, ierr)
             use const_def, only: dp, strlen
+            implicit none
             integer, intent(in) :: id
             character(len=strlen), intent(in) :: name
             real(dp), intent(out) :: val
@@ -622,6 +625,7 @@
 
          subroutine set_param_interface(id, name, val, ierr)
             use const_def, only: dp, strlen
+            implicit none
             integer, intent(in) :: id
             character(len=strlen), intent(in) :: name ! which param to set
             real(dp), intent(in) :: val
@@ -629,6 +633,7 @@
          end subroutine set_param_interface
 
          subroutine extras_controls_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine extras_controls_interface

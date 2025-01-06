@@ -43,6 +43,7 @@
             subroutine interp_vec(x, nx, f1, nwork, work1, str, ierr) ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
                use const_lib, only: dp
+               implicit none
                integer, intent(in) :: nx       ! length of x vector
                real(dp), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
                real(dp), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients
@@ -87,6 +88,7 @@
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
                use const_lib, only: dp
                use auto_diff
+               implicit none
                integer, intent(in) :: nx       ! length of x vector
                type(auto_diff_real_2var_order1), intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
                type(auto_diff_real_2var_order1), intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients

@@ -56,6 +56,7 @@
 
          subroutine other_rlo_mdot_interface(binary_id, rlo_mdot, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: rlo_mdot
             integer, intent(out) :: ierr
@@ -63,12 +64,14 @@
 
          integer function other_check_implicit_rlo_interface(binary_id, new_mdot)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: new_mdot
          end function other_check_implicit_rlo_interface
 
          subroutine other_implicit_function_to_solve_interface(binary_id, function_to_solve, use_sum, detachment, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: function_to_solve
             logical, intent(out) :: use_sum, detachment
@@ -77,6 +80,7 @@
 
          subroutine other_tsync_interface(id, sync_type, Ftid, qratio, m, r_phot, osep, t_sync, ierr)
             use const_def, only: dp, strlen
+            implicit none
             integer, intent(in) :: id
             character (len=strlen), intent(in) :: sync_type
             real(dp), intent(in) :: Ftid
@@ -90,6 +94,7 @@
 
          subroutine other_sync_spin_to_orbit_interface(id, nz, osep, qratio, rl, dt_next, Ftid, sync_type, sync_mode, ierr)
             use const_def, only: dp, strlen
+            implicit none
             integer, intent(in) :: id
             integer, intent(in) :: nz
             real(dp), intent(in) :: osep
@@ -104,6 +109,7 @@
 
          subroutine other_mdot_edd_interface(binary_id, mdot_edd, mdot_edd_eta, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: mdot_edd
             real(dp), intent(out) :: mdot_edd_eta
@@ -111,31 +117,37 @@
          end subroutine other_mdot_edd_interface
 
          subroutine other_adjust_mdots_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end subroutine other_adjust_mdots_interface
 
          subroutine other_accreted_material_j_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end subroutine other_accreted_material_j_interface
 
          subroutine other_jdot_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end subroutine other_jdot_interface
 
          subroutine other_binary_wind_transfer_interface(binary_id, s_i, ierr)
+            implicit none
             integer, intent(in) :: binary_id, s_i
             integer, intent(out) :: ierr
          end subroutine other_binary_wind_transfer_interface
 
          subroutine other_edot_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end subroutine other_edot_interface
 
          subroutine other_CE_init_interface(binary_id, restart, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             logical, intent(in) :: restart
             integer, intent(out) :: ierr
@@ -143,60 +155,72 @@
 
          subroutine other_CE_rlo_mdot_interface(binary_id, rlo_mdot, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: binary_id
             real(dp), intent(out) :: rlo_mdot
             integer, intent(out) :: ierr
          end subroutine other_CE_rlo_mdot_interface
 
          integer function other_CE_binary_evolve_step_interface(binary_id)
+            implicit none
             integer, intent(in) :: binary_id
          end function other_CE_binary_evolve_step_interface
 
          integer function other_CE_binary_finish_step_interface(binary_id)
+            implicit none
             integer, intent(in) :: binary_id
          end function other_CE_binary_finish_step_interface
 
          integer function extras_binary_startup_interface(binary_id,restart,ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
             logical,intent(in) :: restart
          end function extras_binary_startup_interface
 
          integer function extras_binary_start_step_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end function extras_binary_start_step_interface
 
          integer function extras_binary_check_model_interface(binary_id)
+            implicit none
             integer, intent(in) :: binary_id
          end function extras_binary_check_model_interface
 
          integer function extras_binary_finish_step_interface(binary_id)
+            implicit none
             integer, intent(in) :: binary_id
          end function extras_binary_finish_step_interface
 
          subroutine extras_binary_after_evolve_interface(binary_id, ierr)
+            implicit none
             integer, intent(in) :: binary_id
             integer, intent(out) :: ierr
          end subroutine extras_binary_after_evolve_interface
 
          subroutine other_binary_photo_write_interface(binary_id, iounit)
+            implicit none
             integer, intent(in) :: binary_id, iounit
          end subroutine other_binary_photo_write_interface
 
          subroutine other_binary_photo_read_interface(binary_id, iounit, ierr)
+            implicit none
             integer, intent(in) :: binary_id, iounit
             integer, intent(out) :: ierr
          end subroutine other_binary_photo_read_interface
 
          subroutine other_e2_interface(id, e2, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: id
             real(dp),intent (out) :: e2
             integer, intent(out) :: ierr
          end subroutine other_e2_interface
 
          subroutine other_pgbinary_plots_info_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine other_pgbinary_plots_info_interface

@@ -1606,6 +1606,7 @@
             subroutine before_evolve(s, id, lipar, ipar, lrpar, rpar, ierr)
                use const_def, only: dp
                use star_def, only: star_info
+               implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
                integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -1617,6 +1618,7 @@
                ! for okay termination, set s% termination_code = t_relax_finished_okay
                use const_def, only: dp
                use star_def, only: star_info
+               implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
                integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -1627,6 +1629,7 @@
                ! for okay termination, set s% termination_code = t_relax_finished_okay
                use const_def, only: dp
                use star_def, only: star_info
+               implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: id, lipar, lrpar
                integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -1634,6 +1637,7 @@
             end function check_model
             integer function finish_model(s)
                use star_def, only:star_info
+               implicit none
                type (star_info), pointer :: s
             end function finish_model
          end interface

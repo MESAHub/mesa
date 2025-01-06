@@ -74,8 +74,8 @@
          real(dp), intent(in) :: max_step_size ! maximal step size.
          integer, intent(in) :: max_steps ! maximal number of allowed steps.
          ! absolute and relative error tolerances
-         real(dp), intent(inout) :: rtol(:) ! relative error tolerance(s)
-         real(dp), intent(inout) :: atol(:) ! absolute error tolerance(s)
+         real(dp), intent(inout) :: rtol(*) ! relative error tolerance(s)
+         real(dp), intent(inout) :: atol(*) ! absolute error tolerance(s)
          integer, intent(in) :: itol ! switch for rtol and atol
          real(dp), intent(in) :: x_min, x_max ! bounds on allowed values
          integer, intent(in) :: which_decsol ! from mtx_def
