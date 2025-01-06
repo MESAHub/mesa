@@ -41,7 +41,7 @@ contains
    subroutine calfun(n, x, f)
       use const_def, only: dp
       integer, intent(in) :: n
-      real(dp), intent(in) :: x(:)
+      real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
       integer :: i, j, iw, np
       real(dp) :: sum
@@ -75,7 +75,7 @@ contains
 
    subroutine xCALFUN(N, X, F)
       integer, intent(in) :: n
-      real(dp), intent(in) :: x(:)
+      real(dp), intent(in) :: x(*)
       real(dp), intent(out) :: f
       integer :: i, j
       real(dp) :: temp

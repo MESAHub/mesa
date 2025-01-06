@@ -483,8 +483,8 @@ contains
       integer, intent(in) :: nr, n, lrpar, lipar
       real(dp), intent(in) :: xold, x
       real(dp), intent(inout) :: y(:)
-      real(dp), intent(inout), target :: rwork_y(:)
-      integer, intent(inout), target :: iwork_y(:)
+      real(dp), intent(inout), target :: rwork_y(*)
+      integer, intent(inout), target :: iwork_y(*)
       integer, intent(inout), pointer :: ipar(:)
       real(dp), intent(inout), pointer :: rpar(:)
       interface
@@ -492,8 +492,8 @@ contains
            use const_def, only: dp
            integer, intent(in) :: i
            real(dp), intent(in) :: s
-           real(dp), intent(inout), target :: rwork_y(:)
-           integer, intent(inout), target :: iwork_y(:)
+           real(dp), intent(inout), target :: rwork_y(*)
+           integer, intent(inout), target :: iwork_y(*)
            integer, intent(out) :: ierr
          end function interp_y
       end interface
@@ -712,8 +712,8 @@ contains
       integer, intent(in) :: nr, n, lrpar, lipar
       real(dp), intent(in) :: xold, x
       real(dp), intent(inout) :: y(:)
-      real(dp), intent(inout), target :: rwork_y(:)
-      integer, intent(inout), target :: iwork_y(:)
+      real(dp), intent(inout), target :: rwork_y(*)
+      integer, intent(inout), target :: iwork_y(*)
       integer, intent(inout), pointer :: ipar(:)
       real(dp), intent(inout), pointer :: rpar(:)
       interface
@@ -721,8 +721,8 @@ contains
            use const_def, only: dp
            integer, intent(in) :: i
            real(dp), intent(in) :: s
-           real(dp), intent(inout), target :: rwork_y(:)
-           integer, intent(inout), target :: iwork_y(:)
+           real(dp), intent(inout), target :: rwork_y(*)
+           integer, intent(inout), target :: iwork_y(*)
            integer, intent(out) :: ierr
          end function interp_y
       end interface
