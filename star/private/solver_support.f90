@@ -803,7 +803,8 @@
         end do
         close(12)
 
-        write(*,*) 'B, xscale, and dx output completed.'
+        write(*,*) 'XXXXXXXX B, xscale, and dx output completed.'
+        if (.true.) call mesa_error(__FILE__,__LINE__,'after inspectB')
 
         end subroutine dumpB_to_file
 

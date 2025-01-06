@@ -45,6 +45,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
+         write(*,*) 'XXX calling eval_equ_for_solver'
          call eval_equ_for_solver(s, nvar, 1, s% nz, ierr)
       end subroutine eval_equ
 
@@ -301,7 +302,7 @@
          ! matrix debugging.
          write (*,*) 's% model_number', s% model_number
          write (*,*) 's% model_number', s% solver_iter
-         if (.true. .and. s% model_number == 2132 .and. s% solver_iter == 25) then !  .and. .not. s% doing_relax) then
+         if (.true. .and. s% model_number == 2132 .and. s% solver_iter == 24) then !  .and. .not. s% doing_relax) then
            !write(*,*) 'inside print matrix'
 
             ! for debugging velocities.
@@ -383,11 +384,12 @@
             ! s% lblk is lower diagonal block
 
             write(*,*) 'call show_matrix'
+            write(*,*) 'XXX calling output_block_diagonals'
             call output_block_diagonals(s)
             ! output jabobian, the A term in Ax = b
 
             if (.false.) call dump_equ ! debugging, false for now.
-            if (.true.) call mesa_error(__FILE__,__LINE__,'after dump_equ')
+            ! XXX if (.true.) call mesa_error(__FILE__,__LINE__,'after dump_equ')
             ! we will let inspect B end the model, so we can have
             ! ublk,lblk,dblk, -equi = b, for before the solve.
             ! and the B from after the solve, from inspectB in solver_support.f90
@@ -464,7 +466,7 @@
         end do
         close(13)
 
-        write(*,*) 'Block diagonals and residuals output completed.'
+        write(*,*) 'XXXXXXXX Block diagonals and residuals output completed.'
 
         deallocate(dblk, ublk, lblk)
 
