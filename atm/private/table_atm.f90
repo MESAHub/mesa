@@ -543,7 +543,7 @@
                write(*,'(A)')
                write(*,'(A)')
                write(*,'(A)')
-               write(*,*) 'FATAL ERROR: out-of-date verion of atm data.'
+               write(*,*) 'FATAL ERROR: out-of-date version of atm data.'
                write(*,*) 'Please update by removing the directory mesa/data/atm_data,'
                write(*,*) 'and rerunning the mesa ./install script.'
                write(*,'(A)')

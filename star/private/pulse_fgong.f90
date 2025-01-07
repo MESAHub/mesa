@@ -44,7 +44,7 @@ module pulse_fgong
 
   implicit none
 
-  ! Parameter definitions (these values are for FGONG format verions
+  ! Parameter definitions (these values are for FGONG format versions
   ! 300 & 1300)
 
   integer, parameter :: ICONST = 15
@@ -143,7 +143,7 @@ contains
     o18 = s%net_iso(io18)
     ne20 = s%net_iso(ine20)
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     allocate(dres_dxa(num_eos_basic_results, s% species))
     allocate(xa(s% species))

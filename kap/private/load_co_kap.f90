@@ -591,7 +591,7 @@ contains
        if (reading_cache) then
           ierr = 1; return
        end if
-       write(*,*) 'abudance error in opacity table for X=', &
+       write(*,*) 'abundance error in opacity table for X=', &
             X, 'Z=', Z, 'dXC=', dXC, 'dXO=', dXO
        ierr = -1
        return

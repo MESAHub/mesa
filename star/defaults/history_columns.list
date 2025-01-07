@@ -413,7 +413,7 @@
       !fe_core_omega_div_omega_crit
       !fe_core_k
 
-   !## neuton rich core
+   !## neutron rich core
       neutron_rich_core_mass
       !neutron_rich_core_radius
       !neutron_rich_core_lgT

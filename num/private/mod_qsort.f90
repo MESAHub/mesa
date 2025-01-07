@@ -46,7 +46,7 @@
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
-             ! This sytnax is valid, but has poor optimization in GFortran:
+             ! This syntax is valid, but has poor optimization in GFortran:
              ! index(left+1:right)=index(left:right-1)
              do i=right,left+1,-1
                index(i)=index(i-1)
@@ -97,7 +97,7 @@
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
-             ! This sytnax is valid, but has poor optimization in GFortran:
+             ! This syntax is valid, but has poor optimization in GFortran:
              ! index(left+1:right)=index(left:right-1)
              do i=right,left+1,-1
                index(i)=index(i-1)
@@ -147,7 +147,7 @@
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
-             ! This sytnax is valid, but has poor optimization in GFortran:
+             ! This syntax is valid, but has poor optimization in GFortran:
              ! index(left+1:right)=index(left:right-1)
              do i=right,left+1,-1
                index(i)=index(i-1)

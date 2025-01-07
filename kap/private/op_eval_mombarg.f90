@@ -293,7 +293,7 @@
 
       integer :: n, ke, nz, id, m, ik, i, j
 
-      !real(dp) :: fk_norm_fac !Local fractional abudance per element and normalization factor.
+      !real(dp) :: fk_norm_fac !Local fractional abundance per element and normalization factor.
       real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
       real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot

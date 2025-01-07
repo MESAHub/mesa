@@ -290,7 +290,7 @@
             end if
          else if (.not. (apply_jdot_mb .or. b% keep_mb_on) .and. b% using_jdot_mb_old(b% d_i)) then
             ! required mdot for the implicit scheme may drop drastically,
-            ! so its neccesary to increase change factor to avoid implicit
+            ! so its necessary to increase change factor to avoid implicit
             ! scheme from getting stuck
             b% change_factor = b% max_change_factor
             b% using_jdot_mb(b% d_i) = .false.
@@ -320,7 +320,7 @@
                end if
             else if (.not. (apply_jdot_mb .or. b% keep_mb_on) .and. b% using_jdot_mb_old(b% a_i)) then
                ! required mdot for the implicit scheme may drop drastically,
-               ! so its neccesary to increase change factor to avoid implicit
+               ! so its necessary to increase change factor to avoid implicit
                ! scheme from getting stuck
                b% change_factor = b% max_change_factor
                b% using_jdot_mb(b% a_i) = .false.

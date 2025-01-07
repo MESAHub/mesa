@@ -65,7 +65,7 @@
          write(*,'(A)')
          write(*,'(A)')
          write(*,'(A)')
-         write(*,*) 'NOTICE: you need to install a new verion of the eos data.'
+         write(*,*) 'NOTICE: you need to install a new version of the eos data.'
          write(*,*) 'Please update by removing the directory mesa/data/eosDT_data,'
          write(*,*) 'and rerunning the mesa ./install script.'
          write(*,'(A)')

@@ -588,7 +588,7 @@ contains
 
     g = cgrav*M/(R*R)
 
-    ! Allocte atm_structure at its initial size
+    ! Allocate atm_structure at its initial size
 
     allocate(atm_structure(num_results_for_build_atm,INIT_NUM_PTS))
 
