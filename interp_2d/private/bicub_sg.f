@@ -2222,7 +2222,7 @@
 !  make a 2-coefficient 1d spline
 !
 !  only 2 coefficients, the data and its 2nd derivative, are needed to
-!  fully specify a spline.  See e.g. Numerical Recipies in Fortran-77
+!  fully specify a spline.  See e.g. Numerical Recipes in Fortran-77
 !  (2nd edition) chapter 3, section on cubic splines.
 !
 !  input:
@@ -2587,7 +2587,7 @@
           f(2,n)=2.0*f(4,n-1)
           f(3,n)=f(4,n-1)*bn/3.0
 !xxx          f(4,n-1)=0.0  ! dmc: preserve f(4,n-1) for back subst.
-          elemnn1=0.0  !  lower diaganol only (dmc)
+          elemnn1=0.0  !  lower diagonal only (dmc)
         ELSEIF(k_bcn.eq.7) THEN
           f(2,n)=-f(4,n-1)
           f(3,n)=f(3,n-1)/(x(n)-x(n-2))-f(3,n-2)/(x(n-1)-x(n-3))

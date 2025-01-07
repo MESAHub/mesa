@@ -64,8 +64,8 @@
 ! optionally followed by anything else such as lnT.
 
 ! output:
-! nok      = number of succesful steps taken
-! nbad     = number of bad steps taken, bad but retried and then succesful
+! nok      = number of successful steps taken
+! nbad     = number of bad steps taken, bad but retried and then successful
 ! nstp     = total number of steps taken
 
       real(dp) :: dens_dfdy(:,:),dmat(:,:)

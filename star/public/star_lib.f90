@@ -393,7 +393,7 @@
          real(dp), intent(in) :: d_log10_P
             ! standard point spacing in initial model is d_log10_P
             ! set to 0 to use default
-         ! model contruction is from inside out and stops when at either of the following.
+         ! model construction is from inside out and stops when at either of the following.
          real(dp), intent(in) :: logT_surf_limit
             ! set to 0 to use default
          real(dp), intent(in) :: logP_surf_limit
@@ -711,7 +711,7 @@
       end subroutine star_save_for_restart
 
 
-      integer function num_standard_history_columns(s) ! not inluding any extra columns
+      integer function num_standard_history_columns(s) ! not including any extra columns
          type (star_info), pointer :: s
          num_standard_history_columns = size(s% history_column_spec, dim=1)
       end function num_standard_history_columns
@@ -729,7 +729,7 @@
       end subroutine get_data_for_history_columns
 
 
-      integer function num_standard_profile_columns(s) ! not inluding extra profile columns
+      integer function num_standard_profile_columns(s) ! not including extra profile columns
          use profile, only: do_get_num_standard_profile_columns
          type (star_info), pointer :: s
          num_standard_profile_columns = do_get_num_standard_profile_columns(s)
@@ -1663,7 +1663,7 @@
       ! rotation
 
       ! note: this applies to the current model only;
-      ! subsequenct models may evolve away from solid body rotation.
+      ! subsequent models may evolve away from solid body rotation.
       subroutine star_set_uniform_omega(id, omega, ierr)
          use hydro_rotation, only: set_uniform_omega
          integer, intent(in) :: id

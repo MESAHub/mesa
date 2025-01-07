@@ -67,7 +67,7 @@ contains
        return
     end if
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     nn = s%nz
 

@@ -648,12 +648,12 @@
       ! First save current controls
       call set_controls_for_writing(rq)
 
-      ! Write namelist to temporay file
+      ! Write namelist to temporary file
       open(newunit=iounit,status='scratch')
       write(iounit,nml=eos)
       rewind(iounit)
 
-      ! Namelists get written in captials
+      ! Namelists get written in capitals
       upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist

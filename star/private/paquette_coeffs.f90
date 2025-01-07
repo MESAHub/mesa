@@ -34,7 +34,7 @@
 ! KZN1:            charge [e]
 ! NA1:            number density [cm^-3]
 ! The output are the resistance coefficients in Burgers equations K_ij, z_ij, z'_ij and z''_ij
-! It is also possible to output diffusion coefficients D_ij and thermal diffusion coeffcient
+! It is also possible to output diffusion coefficients D_ij and thermal diffusion coefficient
 !  A_th used in Cowling&Chapman formalism, note Ath(NN,i) is Ath_ei
 
       subroutine paquette_coefficients(rho, T, NN, CAN1, KZN1, NA1, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
@@ -122,7 +122,7 @@
                F22   = 1.99016D0*E_PSI_ST - 4.56958D0
             endif
          elseif (PSI_ST >= 4.0D0) then
-! repulsive and attractive coeffcients are the same in this range
+! repulsive and attractive coefficients are the same in this range
             F22   = 1.99016D0*E_PSI_ST - 4.56958D0
          endif
          OMEGA2(I)   = EPS_ST*F22
@@ -189,7 +189,7 @@
                   F22   = 1.99016D0*E_PSI_ST - 4.56958D0
                endif
             elseif (PSI_ST>=4.0D0) then
-! repulsive and attractive coeffcients are the same in this range
+! repulsive and attractive coefficients are the same in this range
                F1(1) = 1.00141D0*E_PSI_ST - 3.18209D0
                F1(2) = 0.99559D0*E_PSI_ST - 1.29553D0
                F1(3) = 1.99814D0*E_PSI_ST - 0.64413D0

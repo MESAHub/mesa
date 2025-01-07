@@ -1632,7 +1632,7 @@
             !   hh, (save_dx(s% solver_test_partials_var,s% solver_test_partials_k) + hh)/ln10, &
             !   save_dx(s% solver_test_partials_var,s% solver_test_partials_k)/ln10
             err = big
-            ! succesive columns in the neville tableu will go to smaller stepsizes
+            ! successive columns in the neville tableu will go to smaller stepsizes
             ! and higher orders of extrapolation
             do i=2,ntab
                hh = hh/con
@@ -1648,7 +1648,7 @@
                !write(*,2) 'dfdx', i, a(1,i), &
                !   hh, (save_dx(s% solver_test_partials_var,s% solver_test_partials_k) + hh)/ln10, &
                !   save_dx(s% solver_test_partials_var,s% solver_test_partials_k)/ln10
-               ! compute extrapolations of various orders; the error stratagy is to compare
+               ! compute extrapolations of various orders; the error strategy is to compare
                ! each new extrapolation to one order lower but both at the same stepsize
                ! and at the previous stepsize
                fac = con2

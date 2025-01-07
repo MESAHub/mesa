@@ -49,7 +49,7 @@
       integer, parameter :: b_Tlim_dm = b_Tlim_ecc + 1
       integer, parameter :: b_numTlim = b_Tlim_dm
 
-      character (len=24) :: binary_dt_why_str(b_numTlim) ! indicates the reson for the timestep choice
+      character (len=24) :: binary_dt_why_str(b_numTlim) ! indicates the reason for the timestep choice
 
       !interfaces for procedure pointers
       abstract interface

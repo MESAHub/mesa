@@ -91,7 +91,7 @@ contains
        return
     end if
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)

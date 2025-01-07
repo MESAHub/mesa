@@ -653,9 +653,9 @@
                        0.024113535d0*pow(gamma,0.49999098d0)
                ! dynamic shear viscosity
                dynvisc = 5.53d3*zbar(i)*pow(rho6,5d0/6d0)*ctmp/pow(abar(i),one_third)
-               ! add contibution of radiation
+               ! add contribution of radiation
                dynvisc = dynvisc + 4.D0*crad*pow4(T(i))/(15.D0*clight*opacity(i)*rho(i))
-               ! add contibution of electrons
+               ! add contribution of electrons
                dynvisc = dynvisc + 1.893d6*pow(rm23,2.5d0)/(zbar(i)*ctmp*xi2)
                ! kinematic shear viscosity
                visc(i) = dynvisc/rho(i)

@@ -718,7 +718,7 @@
                   else if (correction_norm > tol_correction_norm*coeff
      >                  .and. (correction_norm > work(r_corr_norm_jump_limit)*corr_norm_min)
      >                  .and. (.not. first_try)) then
-                     call oops('avg corrrection jumped')
+                     call oops('avg correction jumped')
                      exit
                   else if (residual_norm > tol_residual_norm*coeff
      >                  .and. (residual_norm > work(r_resid_norm_jump_limit)*resid_norm_min)
@@ -728,7 +728,7 @@
                   else if (max_correction > tol_max_correction*coeff
      >                  .and. (max_correction > work(r_max_corr_jump_limit)*max_corr_min)
      >                  .and. (.not. first_try)) then
-                     call oops('max corrrection jumped')
+                     call oops('max correction jumped')
                      exit
                   else if (residual_norm > tol_residual_norm*coeff
      >                  .and. (max_residual > work(r_max_resid_jump_limit)*max_resid_min)

@@ -431,7 +431,7 @@ contains
 
                id = b% star_ids(j)
 
-               ! Avoid repeting the accretor when using the implicit scheme plus
+               ! Avoid repeating the accretor when using the implicit scheme plus
                ! rotation and implicit winds. When this happens the accretor won't
                ! usually care about the result of the evolution of the donor.
                if (j == b% a_i .and. b% num_tries >0 .and. s% was_in_implicit_wind_limit) &
@@ -498,7 +498,7 @@ contains
                end do
             end if
 
-            ! do not evolve binary step on failure, its unnecesary and some variables are not properly
+            ! do not evolve binary step on failure, its unnecessary and some variables are not properly
             ! set when the newton solver fails.
             if (result == keep_going) then
                if (.not. b% CE_flag) then
@@ -584,7 +584,7 @@ contains
                   end if
                   id = b% star_ids(i)
 
-                  ! Avoid repeting the accretor when using the implicit scheme plus
+                  ! Avoid repeating the accretor when using the implicit scheme plus
                   ! rotation and implicit winds. When this happens the accretor won't
                   ! usually care about the result of the evolution of the donor.
 

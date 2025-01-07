@@ -531,7 +531,7 @@
          if(ierr/=0) return
 
          ! These must come first otherwise things like center_mu will be caught by the
-         ! center abundaces check
+         ! center abundances check
          id = do_get_history_id(string)
          if (id > 0) then
             spec = id
@@ -699,7 +699,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id
+            id = g% net_reaction(id) ! Convert to net id not the global rate id
             if (ierr/=0) return
             if (id > 0) then
                spec = offset + id
