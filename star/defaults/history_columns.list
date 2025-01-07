@@ -289,7 +289,7 @@
    !## information about individual reactions
    
           ! adds columns for all of the reactions that are in the current net 
-      ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for thier rates
+      ! Note that if using op_split_burn=.true. then zones which have been split will report 0 for their rates
       !add_raw_rates      ! raw reaction rates,       reactions/second
       !add_screened_rates ! screened reaction rates reactions/second
       !add_eps_nuc_rates  ! Nuclear energy (minus neutrino losses) released   erg/s
@@ -694,7 +694,7 @@
       total_mass he4
       ! etc.
 
-      ! individial log10  mass totals for entire star (in Msun units)
+      ! individual log10  mass totals for entire star (in Msun units)
       !log_total_mass h1
       !log_total_mass he4
       ! etc.
