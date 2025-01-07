@@ -34,6 +34,7 @@
          subroutine rate_fcn(tf, temp, fr, rr)
            use const_def, only: dp
            use ratelib, only: T_factors
+           implicit none
            type (T_Factors) :: tf
            real(dp), intent(in) :: temp
            real(dp), intent(out) :: fr, rr

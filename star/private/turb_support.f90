@@ -420,7 +420,7 @@ contains
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
             gradr_scaled = grad_scale*gradr
          end if
-      end
+      end subroutine set_superad_reduction
    end subroutine Get_results
 
 

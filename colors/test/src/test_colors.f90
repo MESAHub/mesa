@@ -227,7 +227,7 @@
       end subroutine create_plot_files
 
 
-      end program
+      end program test_colors
 
 
 

@@ -92,27 +92,27 @@
          real(dp) :: lgz ! [Fe_H]
          type (lgz_list), pointer :: nxt => null()
          real(dp),dimension(max_num_bcs_per_file) :: colors = -1d99
-      end type
+      end type lgz_list
 
       type :: lgt_list ! sorted in decreasing order of lgt
          real(dp) :: lgt ! logTeff
          integer :: n_colors
          type (lgt_list), pointer :: nxt => null()
          type (lgg_list), pointer :: glist => null()
-      end type
+      end type lgt_list
 
       type :: lgg_list ! sorted in decreasing order of lgg
          real(dp) :: lgg ! log g
          type (lgg_list), pointer :: nxt => null()
          type (lgz_list), pointer :: zlist => null()
-      end type
+      end type lgg_list
 
       type :: col_list
          !Main data store
          type(lgt_list), pointer :: thead => null()
          CHARACTER(len=strlen),dimension(max_num_bcs_per_file) :: color_names
          integer :: n_colors
-      end type
+      end type col_list
 
       integer :: num_thead
       type (col_list),dimension(:),pointer :: thead_all => null()

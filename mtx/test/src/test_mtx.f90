@@ -50,5 +50,5 @@ program test_mtx
    call do_test_block_tri_dble
    call test_format_conversion
 
-end program
+end program test_mtx
 

@@ -77,11 +77,13 @@ contains
       interface
 
          subroutine extras_controls(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine extras_controls
 
          subroutine extras_binary_controls(binary_id, ierr)
+            implicit none
             integer :: binary_id
             integer, intent(out) :: ierr
          end subroutine extras_binary_controls
@@ -1002,6 +1004,6 @@ contains
          end if
       end if
 
-   end subroutine
+   end subroutine do_binary_job_controls_after
 
 end module run_binary_support

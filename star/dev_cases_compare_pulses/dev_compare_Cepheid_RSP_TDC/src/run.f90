@@ -3,4 +3,4 @@
 
       call do_run_multi_stars
 
-      end program
+      end program run

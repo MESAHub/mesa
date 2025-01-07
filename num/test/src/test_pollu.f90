@@ -82,6 +82,7 @@
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             double precision function interp_y(i,s,rwork,iwork,ierr)
+               implicit none
                integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
                double precision, intent(in) :: s ! interpolation x value (between xold and x).
                double precision, intent(inout), target :: rwork(*)

@@ -20,4 +20,4 @@
       use test_xxx_mod
       implicit none
       call do_test
-      end program
+      end program test_xxx

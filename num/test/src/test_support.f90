@@ -248,6 +248,7 @@
             ! it computes interpolated values for y components during the just completed step.
             real(dp) function interp_y(i,s,rwork,iwork,ierr)
                use const_def, only: dp
+               implicit none
                integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
                real(dp), intent(in) :: s ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)

@@ -35,6 +35,7 @@
          type (integer_idict), pointer :: idict
          interface
             subroutine fcn(key1, key2, value, ierr)
+               implicit none
                integer, intent(in) :: key1, key2, value
                integer, intent(out) :: ierr ! /= 0 means terminate map calls
             end subroutine fcn
