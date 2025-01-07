@@ -46,6 +46,7 @@
          interface
             subroutine do1(s,k,ierr)
                use star_private_def
+               implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: k
                integer, intent(out) :: ierr

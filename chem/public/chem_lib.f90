@@ -535,7 +535,9 @@
          type(nuclide_data), intent(in) :: nuclides
          integer, intent(in) :: chem_id
          real(dp) :: mass_excess
-         logical :: use_nuclides_mass_excess=.false.
+         logical :: use_nuclides_mass_excess
+
+         use_nuclides_mass_excess = .false.
 
          ! These should be identical but can have slight ~ulp difference
          ! due to floating point maths
@@ -546,7 +548,7 @@
                         nuclides% binding_energy(chem_id)
          end if
 
-      end function
+      end function get_mass_excess
 
       function get_Q(nuclides,chem_id) result (q)
          use chem_def
@@ -557,7 +559,7 @@
          !Minus the mass excess
          q=-get_mass_excess(nuclides,chem_id)
 
-      end function
+      end function get_Q
 
       ! returns the indx corresponding to Tpart just less than T9
       ! T9 is the temperature in units of GK

@@ -35,6 +35,7 @@
          type (integer_dict), pointer :: dict
          interface
             subroutine fcn(key, value, ierr)
+               implicit none
                character (len=*), intent(in) :: key
                integer, intent(in) :: value
                integer, intent(out) :: ierr ! /= 0 means terminate map calls

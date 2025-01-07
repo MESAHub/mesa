@@ -201,7 +201,7 @@
             deallocate(adjusted_energy,interp_work)
          end if
 
-      end subroutine
+      end subroutine CE_init
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
          use const_def, only: dp

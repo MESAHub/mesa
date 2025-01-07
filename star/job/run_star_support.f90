@@ -80,6 +80,7 @@
          interface
 
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls
@@ -142,6 +143,7 @@
          interface
 
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls
@@ -298,10 +300,12 @@
          logical :: restart
          interface
             subroutine binary_controls(id, binary_id, ierr)
+               implicit none
                integer, intent(in) :: id, binary_id
                integer, intent(out) :: ierr
             end subroutine binary_controls
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls
@@ -328,10 +332,12 @@
          logical :: restart
          interface
             subroutine binary_controls(id, binary_id, ierr)
+               implicit none
                integer, intent(in) :: id, binary_id
                integer, intent(out) :: ierr
             end subroutine binary_controls
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls
@@ -3721,7 +3727,7 @@
          integer, intent(out) :: ierr
          integer :: status
 
-         real(dp) :: test_suite_res_factor = 1
+         real(dp), save :: test_suite_res_factor = 1
          character(len=20) :: test_suite_resolution_factor_str
 
          include 'formats'

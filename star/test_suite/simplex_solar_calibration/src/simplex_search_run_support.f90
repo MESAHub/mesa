@@ -45,6 +45,7 @@
          use run_star_support, only: do_read_star_job, id_from_read_star_job
          interface
             subroutine extras_controls(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine extras_controls

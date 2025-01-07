@@ -17,5 +17,5 @@
 
       call do_test_eos_blend()
 
-      end
+      end program test_eos
 

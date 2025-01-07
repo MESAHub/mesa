@@ -71,7 +71,7 @@ contains
 
   subroutine get_compiler_version(compiler_name,compiler_version_name)
     character(len=*) :: compiler_name, compiler_version_name
-    integer :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
+    integer, save :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
     character(len=3) :: gcc_major_string, gcc_minor_string, gcc_patch_string
     if (.false.) intel_compiler_build_date = 0
 #ifdef __INTEL_COMPILER
@@ -776,6 +776,7 @@ contains
     type (integer_dict), pointer :: dict
     interface
        subroutine fcn(key, value, ierr)
+         implicit none
          character (len=*), intent(in) :: key
          integer, intent(in) :: value
          integer, intent(out) :: ierr ! /= 0 means terminate map calls
@@ -862,6 +863,7 @@ contains
     type (integer_idict), pointer :: idict
     interface
        subroutine fcn(key1, key2, value, ierr)
+         implicit none
          integer, intent(in) :: key1, key2, value
          integer, intent(out) :: ierr ! /= 0 means terminate map calls
        end subroutine fcn

@@ -41,6 +41,7 @@
             frac, dfrac_dlogRho, dfrac_dlogT, &
             ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
             integer, intent(in) :: species
             integer, pointer :: chem_id(:) ! maps species to chem id
@@ -68,6 +69,7 @@
             Rho, logRho, T, logT, &
             res, d_dlnd, d_dlnT, d_dxa, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
 
             integer, intent(in) :: species

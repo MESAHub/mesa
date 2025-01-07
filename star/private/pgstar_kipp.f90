@@ -107,7 +107,7 @@
 
          integer :: ix,k
          real :: xleft,xright,now
-         real :: dxmin=-1.d0
+         real, save :: dxmin = -1.d0
 
          include 'formats'
 
