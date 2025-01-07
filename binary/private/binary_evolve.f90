@@ -123,7 +123,7 @@
                   end if
             end if
 
-         ! Set all parameters nessessary for integration over the binary orbit
+         ! Set all parameters necessary for integration over the binary orbit
          ! 1) true anomaly = polar angle from periastron 0 -> 2pi
             do i = 1,b% anomaly_steps
                b% theta_co(i) = (i-1) * (2 * pi) / b% anomaly_steps
@@ -445,7 +445,7 @@
                if (new_mdot > 0) then
                   new_mdot = 0.0d0
                   write(*,*) "WARNING: explicit computation of mass transfer results in accreting donor"
-                  write(*,*) "Not transfering mass"
+                  write(*,*) "Not transferring mass"
                end if
                ! smooth out the changes in mdot
                new_mdot = b% cur_mdot_frac*b% mtransfer_rate + (1-b% cur_mdot_frac)*new_mdot

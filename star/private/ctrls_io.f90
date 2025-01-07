@@ -4137,7 +4137,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
       write(iounit,nml=controls)
       rewind(iounit)
 
-      ! Namelists get written in captials
+      ! Namelists get written in capitals
       upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist

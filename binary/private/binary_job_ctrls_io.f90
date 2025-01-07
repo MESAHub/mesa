@@ -282,12 +282,12 @@
          call set_binary_job_controls_for_writing(b, ierr)
          if(ierr/=0) return
 
-         ! Write namelist to temporay file
+         ! Write namelist to temporary file
          open(newunit=iounit,status='scratch')
          write(iounit,nml=binary_job)
          rewind(iounit)
 
-         ! Namelists get written in captials
+         ! Namelists get written in capitals
          upper_name = StrUpCase(name)
          val = ''
          ! Search for name inside namelist

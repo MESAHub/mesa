@@ -812,7 +812,7 @@
          ! NOTE: if change these, must edit raw_rates to match.
 
          ! NACRE = Angulo et al. 1999 Nucl. Phys. A, 656, 3
-            ! This is for reactions that care about thier values beloew 10^7K
+            ! This is for reactions that care about their values below 10^7K
          ! JR = jina reaclib -- (Sakharuk et al. 2006)
             ! This is for everything else
          ! CF88 = Frank Timmes' version of

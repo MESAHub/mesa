@@ -387,7 +387,7 @@
                      exit start_from_top_loop ! done
                   end if
                   if (H_cnt >= s% RSP_max_inner_scale_tries) then
-                     write(*,*) 'failed to find inner dm scaling to satisify tolerance for T_inner'
+                     write(*,*) 'failed to find inner dm scaling to satisfy tolerance for T_inner'
                      write(*,*) 'you might try increasing RSP_T_inner_tolerance'
                      ierr = -1
                      return
@@ -417,7 +417,7 @@
                   if (s% RSP_trace_RSP_build_model) &
                      write(*,*) 'call next_dmN', dmN_cnt, NZN-N+1, T_0, TH0, abs(T_0-TH0), TH0_tol*TH0
                   if (dmN_cnt >= s% RSP_max_outer_dm_tries) then
-                     write(*,*) 'failed to find outer dm to satisify tolerance for T_anchor'
+                     write(*,*) 'failed to find outer dm to satisfy tolerance for T_anchor'
                      write(*,*) 'you might try increasing RSP_T_anchor_tolerance'
                      ierr = -1
                      return
@@ -620,7 +620,7 @@
          QQ_1  = QQ_0
          T_1 = sqrt(sqrt(T4_1))
          E_1 = E_0
-         !     RESET dm FOR THE INNNER ZONES
+         !     RESET dm FOR THE INNER ZONES
          if(N==NZN-1) then
             dm_0=dmN
          else if (T_1 > TH0) then

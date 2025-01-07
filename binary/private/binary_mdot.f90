@@ -120,7 +120,7 @@
             if (b% point_mass_i /= 0) then
                new_mdot = 0d0
                write(*,*) "WARNING: contact scheme requires evolve_both_stars=.true."
-               write(*,*) "Not transfering mass"
+               write(*,*) "Not transferring mass"
                return
             end if
             q = b% m(b% a_i) / b% m(b% d_i)
@@ -646,12 +646,12 @@
 
          if (b% mdot_scheme == "roche_lobe") then
             write(*,*) "mdot_scheme = roche_lobe not applicable for explicit scheme"
-            write(*,*) "Not transfering mass"
+            write(*,*) "Not transferring mass"
             mdot = 0
             return
          else if (b% mdot_scheme /= "Ritter" .and. b% mdot_scheme /= "Kolb" .and. b% mdot_scheme /= "Arras") then
             write(*,*) "mdot_scheme = " , b% mdot_scheme , " not recognized"
-            write(*,*) "Not transfering mass"
+            write(*,*) "Not transferring mass"
             mdot = 0
             return
          end if

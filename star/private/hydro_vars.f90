@@ -526,7 +526,7 @@
          if (failed('get_tau')) return
 
          if (.not. skip_m_grav_and_grav) then
-            ! don't change m_grav or grav during solver iteratons
+            ! don't change m_grav or grav during solver iterations
             if (dbg) write(*,*) 'call set_m_grav_and_grav'
             call set_m_grav_and_grav(s)
          end if

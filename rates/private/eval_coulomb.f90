@@ -84,7 +84,7 @@ contains
 
     type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
-    ! calulate the chemical potential of an ion
+    ! calculate the chemical potential of an ion
 
     type(auto_diff_real_2var_order1) :: gamma
     real(dp) :: zr, zr_m1o3
@@ -130,7 +130,7 @@ contains
 
     type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
 
-    ! calulate the chemical potential of an ion
+    ! calculate the chemical potential of an ion
 
     ! form from W.L. Slattery, G.D. Doolen, H.E. DeWitt, Phys. Rev. A 26 (1982) 2255.
     ! values from Ichimaru, S. 1993, Reviews of Modern Physics, 65, 255
@@ -162,7 +162,7 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    ! calulate the chemical potential of an ion
+    ! calculate the chemical potential of an ion
 
     implicit none
 

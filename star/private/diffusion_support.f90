@@ -1069,7 +1069,7 @@
         ! nd = array of number densities
         ! m = # of species including electrons
         ! n = m+1 without thermal diffusion
-        !   is the number of equations and unkowns
+        !   is the number of equations and unknowns
         !   Thermal diffusion off: (m-1) diffusion equations,
         !                          2 conservation equations.
         !   Thermal diffusion  on: 2m diffusion equations (maybe 2*m-1)
@@ -1105,10 +1105,10 @@
         e_ar = 0d0
         e_ax(1:m) = 0d0
 
-        ! Assign the RHS Matrix multiplying the unkown quantities.
+        ! Assign the RHS Matrix multiplying the unknown quantities.
         ! Right now this is for thermal diffusion off, assuming gravity
-        ! is a known, so there are m uknown diffusion velocities and
-        ! one unkown electric field, corresponding to (m-1) ion equaitions
+        ! is a known, so there are m unknown diffusion velocities and
+        ! one unknown electric field, corresponding to (m-1) ion equaitions
         ! (no electron equation) and 2 conservation equations.
         do i = 1,(m-1)
 
@@ -1229,7 +1229,7 @@
         ! nd = array of number densities
         ! m = # of species including electrons
         ! n = 2*m+1 with thermal diffusion
-        !   is the number of equations and unkowns
+        !   is the number of equations and unknowns
         !   Thermal diffusion on: 2m-1 diffusion equations (m-1 momentum + m energy)
         !                         2 conservation equations.
         ! There is one less momentum equation because we are neglecting the electron
@@ -1278,10 +1278,10 @@
         rightshift = m
         downshift = m-1 ! Because electron momentum equation dropped.
 
-        ! Assign the RHS Matrix multiplying the unkown quantities.
-        ! Assuming gravity is a known, so there are m uknown
+        ! Assign the RHS Matrix multiplying the unknown quantities.
+        ! Assuming gravity is a known, so there are m unknown
         ! diffusion velocities, m unknown heat flow vectors, and
-        ! one unkown electric field, corresponding to (m-1) momentum equations
+        ! one unknown electric field, corresponding to (m-1) momentum equations
         ! (no electron equation), m energy equations, and 2 conservation equations.
 
         ! Terms corresponding to the momentum equations.

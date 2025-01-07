@@ -190,7 +190,7 @@
      &   ' insufficient storage for iwork, min. liwork=',istore
         arret=.true.
       end if
-! ------ when a fail has occured, we return with idid=-1
+! ------ when a fail has occurred, we return with idid=-1
       if (arret) then
          idid=-1
          return

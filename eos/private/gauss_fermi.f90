@@ -1,6 +1,6 @@
 ! from Frank Timmes' site, http://www.cococubed.com/code_pages/fermi_dirac.shtml
 
-!..routine dfermi gets the fermi-dirac functions and their derivaties
+!..routine dfermi gets the fermi-dirac functions and their derivatives
 !..routine fdfunc1 forms the integrand of the fermi-dirac functions
 !..routine fdfunc2 same as fdfunc but with the change of variable z**2=x
 !..routine dqleg010 does 10 point gauss-legendre integration  9 fig accuracy
