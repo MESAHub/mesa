@@ -211,7 +211,7 @@ This test suite example checks the inward propagation of a carbon burning front 
 :ref:`ccsn_IIp`
 ^^^^^^^^^^^^^^^
 
-This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 
 :ref:`check_pulse_atm`
@@ -526,7 +526,7 @@ This test case exercises the simplex framework with a check of the chi^2 value f
 :ref:`split_burn_big_net`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
+This test case tests MESA's ability to perform a split-burn calculation in a 25 |Msun| star during silicon burning.
 
 :ref:`starspots`
 ^^^^^^^^^^^^^^^^
