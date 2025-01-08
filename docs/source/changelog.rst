@@ -24,7 +24,7 @@ New Features
 Bug Fixes
 ---------
 
-fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating inital models
+fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
 
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
@@ -412,7 +412,7 @@ like to see the changes without modifying the file.
 
 ``sed`` is a standard tool that is included with macOS and most Linux distributions.
 For convenience, we have also included a bash script that will call a version of
-this ``sed`` command (along with ``sed`` commands for the next changlog entry as well)
+this ``sed`` command (along with ``sed`` commands for the next changelog entry as well)
 to update all inlist files (``inlist*``), which you can run in any work directory
 where you want to update every inlist by invoking ::
 
@@ -687,7 +687,7 @@ about the ``net_general_info`` derived type. ``g`` can be had from a call to ``g
 The pointer array ``net_work`` and its size ``net_lwork`` have been removed from the net interface, thus these variables should be removed form any ``other_net_get`` and ``other_split_burn`` hooks.
 The following routines have also been removed as they are no longer needed ``net_work_size``, ``get_net_rate_ptrs``, ``net_1_zone_burn_work_size``, ``get_burn_work_array_pointers``, ``net_1_zone_burn_const_density_work_size``, and ``get_burn_const_density_work_array_pointers``
 
-Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicity.
+Previously you could pass ``arg_not_provided`` for either the temperature (density) or log(temperature) (log(density)). Now you must pass both explicitly.
 
 ADIPLS
 ------

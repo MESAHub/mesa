@@ -88,7 +88,7 @@ service.
 Website
 ^^^^^^^
 
-We still use the mesa.sourceforge.net website domian name, but only for a top-level
+We still use the mesa.sourceforge.net website domain name, but only for a top-level
 redirect to docs.mesastar.org.
 
 The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.
