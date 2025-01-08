@@ -265,7 +265,7 @@
 ! Limits to timestep controls give by fm, fr and fe.
 ! As these three quantities evolve naturally to zero,
 ! following strictly the timestep limit given by fX would
-! reduce timesteps infinitely. These fX_limit avoid this problem
+! reduce timesteps indefinitely. These fX_limit avoid this problem
 ! by computing the limit to the timestep as
 
 ! ::
