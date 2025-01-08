@@ -537,7 +537,7 @@
 ! explicit mass transfer computation.
 ! ___________________________________
 
-! MESA can compute mass transfer rates either explicitly (at the begging
+! MESA can compute mass transfer rates either explicitly (at the beginning
 ! of the step) or implicitly (iterating the solution until the mass transfer
 ! rate matches the value computed at the end of the step). The explicit method
 ! is used if ``max_tries_to_achieve <= 0``.
