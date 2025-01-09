@@ -1,0 +1,6 @@
+./rn_nomodfiles   inlist_make_late_pre_zams_header
+./re_nomodfiles . inlist_to_zams_header
+./re_nomodfiles . inlist_to_end_core_he_burn_header
+./re_nomodfiles . inlist_to_end_core_c_burn_header
+./re_nomodfiles . inlist_to_lgTmax_header
+./re_nomodfiles . inlist_to_cc_header
