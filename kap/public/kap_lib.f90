@@ -160,7 +160,7 @@
       ! kap evaluation
       ! you can call these routines after you've setup the tables for the handle.
       ! NOTE: the structures referenced via the handle are read-only
-      ! for the evaulation routines, so you can do multiple evaluations in parallel
+      ! for the evaluation routines, so you can do multiple evaluations in parallel
       ! using the same handle.
 
 

@@ -33,8 +33,8 @@
 
 
       contains
-            
-      
+
+
       subroutine Init_ion_tables(file_prefix, Z1_suffix, use_cache, ierr)
          character(*), intent(in) :: file_prefix, Z1_suffix
          logical, intent(in) :: use_cache
@@ -48,8 +48,8 @@
          if (ierr /= 0) return
          ion_root_is_initialized = .true.
       end subroutine Init_ion_tables
-      
-      
+
+
       subroutine ion_read_sizes(ierr)
          use utils_lib
          integer, intent(out) :: ierr
@@ -57,9 +57,9 @@
          character (len=256) :: message, fname, cache_filename, temp_cache_filename
          integer :: iounit
          real(dp) :: xin, zz
-         
+
          ierr = 0
-         
+
          call Get_ion_Table_Filenames(ion_Zs(1), ion_Xs(1), fname, cache_filename, temp_cache_filename)
          open(newunit=iounit, file=trim(fname), action='read', status='old', iostat=ierr)
          call check_for_error_in_ion_data(ierr, fname)
@@ -73,12 +73,12 @@
          call check_for_error_in_ion_data(ierr, fname)
 
          close(iounit)
-         
+
          if (ion_version < min_version) call request_user_to_reinstall
 
       end subroutine ion_read_sizes
-      
-      
+
+
       subroutine request_user_to_reinstall
          write(*,*)
          write(*,*)
@@ -93,8 +93,8 @@
          write(*,*)
          call mesa_error(__FILE__,__LINE__)
       end subroutine request_user_to_reinstall
-      
-      
+
+
       subroutine check_for_error_in_ion_data(ierr, fname)
          integer, intent(in) :: ierr
          character (len=*) :: fname
@@ -111,24 +111,24 @@
          write(*,*)
          call mesa_error(__FILE__,__LINE__)
       end subroutine check_for_error_in_ion_data
-      
-      
+
+
       subroutine Load_ion_Table(ierr)
          use utils_lib
          integer, intent(out) :: ierr
-         
+
          integer :: iz, ix, i
-         
+
          ierr = 0
 !$OMP CRITICAL (load_ionization_table)
          call do_read
 !$OMP END CRITICAL (load_ionization_table)
-         
+
          contains
-         
+
          subroutine do_read
             integer :: sz_ion_tbl
-            
+
             if (ion_is_initialized) return
             sz_ion_tbl = sz_per_ion_point*num_ion_vals* &
                                  ion_num_logQs*ion_num_logTs*num_ion_Xs*num_ion_Zs
@@ -145,7 +145,7 @@
                ion_logQs(i) = ion_logQs(i-1) + ion_del_logQ
             end do
             ion_logQs(ion_num_logQs) = ion_logQ_max
-            
+
             ion_logTs(1) = ion_logT_min
             do i = 2, ion_num_logTs-1
                ion_logTs(i) = ion_logTs(i-1) + ion_del_logT
@@ -159,18 +159,18 @@
                   if (ierr /= 0) return
                end do
             end do
-         
+
             ion_is_initialized = .true.
          end subroutine do_read
-         
+
          subroutine read_one(ix,iz,ierr)
             integer, intent(in) :: ix, iz
             integer, intent(out) :: ierr
 
             character (len=256) :: fname, cache_filename, temp_cache_filename
-            
+
             include 'formats'
-            
+
             call Get_ion_Table_Filenames(&
                      ion_Zs(iz), ion_Xs(ix), fname, cache_filename, temp_cache_filename)
             call Load1_ion_Table(&
@@ -181,16 +181,16 @@
             end if
 
          end subroutine read_one
-         
+
       end subroutine Load_ion_Table
-      
-      
+
+
       subroutine Get_ion_Table_Filenames(Z, X, fname, cache_filename, temp_cache_filename)
          use const_def, only: mesa_data_dir
          real(dp), intent(in) :: Z, X
          character (len=*), intent(out) :: fname, cache_filename, temp_cache_filename
          character (len=256) :: Zstr, Xstr, suffix
-         
+
          call setstr(Z,Zstr)
          call setstr(X,Xstr)
          if (Zstr == '100') then
@@ -198,20 +198,20 @@
          else
             suffix = ''
          end if
-         
+
          fname = trim(mesa_data_dir) // &
                '/ionization_data/' // trim(ion_file_prefix) // '_' //&
                trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.data'
          cache_filename = trim(ionization_cache_dir) // &
                '/' // trim(ion_file_prefix) // '_' //&
                trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.bin'
-         
+
          temp_cache_filename = trim(ionization_temp_cache_dir) // &
                '/' // trim(ion_file_prefix) // '_' //&
                trim(Zstr) // 'z' // trim(Xstr) // 'x' // trim(suffix) // '.bin'
-         
+
          contains
-         
+
          subroutine setstr(v,str)
             real(dp), intent(in) :: v
             character (len=*) :: str
@@ -223,10 +223,10 @@
                write(str, '(a,i1)') '0', floor(100d0 * v + 0.5d0)
             end if
          end subroutine setstr
-              
+
       end subroutine Get_ion_Table_Filenames
-      
-      
+
+
       subroutine Load1_ion_Table(&
             X, Z, tbl, filename, cache_filename, temp_cache_filename, use_cache, info)
          real(dp), intent(in) :: X, Z
@@ -236,17 +236,17 @@
          integer, intent(out) :: info
 
          integer :: io_unit, cache_io_unit
-         
+
          integer :: num_logQs_in, num_logTs_in, version_in
          real(dp) :: logT_min_in, logT_max_in, del_logT_in, vals(num_ion_vals),&
                logQ_min_in, logQ_max_in, del_logQ_in, X_in, Z_in, logQ, logT
          integer :: j,i,k,iQ,ios,status,line_number
          character (len=500) :: message, input_line
          real(dp), parameter :: tiny = 1e-6
-         
+
          include 'formats'
 
-         info = 0            
+         info = 0
 
          write(message,*) 'open ', trim(filename)
          open(NEWUNIT=io_unit, FILE=trim(filename), ACTION='READ', STATUS='OLD', IOSTAT=ios)
@@ -294,7 +294,7 @@
             write(*,*)
             write(*,1) 'ion_logT_max', ion_logT_max
             write(*,1) 'logT_max_in', logT_max_in
-            stop 
+            stop
             return
          end if
 
@@ -305,7 +305,7 @@
                return
             end if
          end if
-         
+
          do iQ=1,ion_num_logQs
             read(io_unit,*,iostat=info)
             if (failed('skip line')) return
@@ -342,14 +342,14 @@
             if (failed('skip line')) return
             line_number = line_number + 1
          end do
-            
+
          close(io_unit)
-         
+
          call Make_ion_Interpolation_Data(tbl, info)
          if (failed('Make_ion_Interpolation_Data')) return
-         
+
          call Check_ion_Interpolation_Data(tbl)
-         
+
          if (.not. use_cache) return
 
          open(NEWUNIT=cache_io_unit, file=trim(switch_str(temp_cache_filename, cache_filename, use_mesa_temp_cache)),&
@@ -365,18 +365,18 @@
             close(cache_io_unit)
             if(use_mesa_temp_cache) call mv(temp_cache_filename, cache_filename,.true.)
          end if
-         
+
          contains
-         
+
          subroutine Check_ion_Interpolation_Data(tbl)
             use utils_lib,only:is_bad
             real(dp) :: tbl(sz_per_ion_point, num_ion_vals, ion_num_logQs, ion_num_logTs)
-         
+
             ! for logT > 6.8 and logRho < -10, splines can get bogus higher order terms
             ! replace NaN's and Infinities with 0
-         
+
             integer :: i, j, iQ, jtemp
-            
+
             do i = 1, sz_per_ion_point
                do j = 1, num_ion_vals
                   do iQ = 1, ion_num_logQs
@@ -388,9 +388,9 @@
                   end do
                end do
             end do
-         
+
          end subroutine Check_ion_Interpolation_Data
-         
+
          logical function failed(str)
             character (len=*), intent(in) :: str
             failed = (info /= 0)
@@ -401,11 +401,11 @@
                   ' Load1_ion_Table failed: ' // trim(str) // ' line', line_number
             end if
          end function failed
-         
+
 
       end subroutine Load1_ion_Table
-      
-      
+
+
       subroutine Make_ion_Interpolation_Data(tbl, info)
          use interp_2d_lib_db
          use const_def, only: crad, ln10
@@ -433,15 +433,15 @@
          real(dp) :: gamma3, gamma1, grad_ad, Prad, E, S
          integer :: iQ, jtemp, ilogT, ilogQ
          real(dp) :: fval(num_ion_vals), df_dx(num_ion_vals), df_dy(num_ion_vals)
-         
+
          integer :: v, vlist(3), var, i, j
          character (len=256) :: message
-         
+
          allocate(f1_ary(sz_per_ion_point*ion_num_logQs*ion_num_logTs))
-         
+
          f1 => f1_ary
          f(1:sz_per_ion_point,1:ion_num_logQs,1:ion_num_logTs) => &
-            f1_ary(1:sz_per_ion_point*ion_num_logQs*ion_num_logTs) 
+            f1_ary(1:sz_per_ion_point*ion_num_logQs*ion_num_logTs)
 
          info = 0
 
@@ -459,9 +459,9 @@
          ibcymin = 0; bcymin(:) = 0
          ibcymax = 0; bcymax(:) = 0
 
-         ! create tables for bicubic spline interpolation         
+         ! create tables for bicubic spline interpolation
          do v = 1, num_ion_vals
-         
+
             f(1,:,:) = tbl(1,v,:,:)
             call interp_mkbicub_db(&
                   logQs,ion_num_logQs,logTs,ion_num_logTs,f1,ion_num_logQs,&
@@ -474,12 +474,12 @@
                return
             end if
             tbl(2:4,v,:,:) = f(2:4,:,:)
-            
+
          end do
-         
+
       end subroutine Make_ion_Interpolation_Data
-      
-      
+
+
       subroutine Read_ion_Cache(X, Z, tbl, cache_filename, ios)
          real(dp), intent(in) :: X, Z
          real(dp) :: tbl(sz_per_ion_point, num_ion_vals, ion_num_logQs, ion_num_logTs)
@@ -492,17 +492,17 @@
                logQ_min_in, logQ_max_in, del_logQ_in
          integer :: num_logQs_in, num_logTs_in, version_in
          real(dp), parameter :: tiny = 1d-6
-         
+
          ios = 0
          open(newunit=io_unit,file=trim(cache_filename),action='read',&
                status='old',iostat=ios,form='unformatted')
          if (ios /= 0) return
-         
+
          read(io_unit, iostat=ios) &
                X_in, Z_in, num_logTs_in, logT_min_in, logT_max_in, del_logT_in, &
                num_logQs_in, logQ_min_in, logQ_max_in, del_logQ_in, version_in
          if (ios /= 0) return
-         
+
          if (ion_version /= version_in) then
             ios = 1
             write(*,*) 'read cache failed for version_in'
@@ -510,7 +510,7 @@
          if (ion_num_logQs /= num_logQs_in) then
             ios = 1
             write(*,*) 'read cache failed for ion_num_logQs'
-         end if 
+         end if
          if (ion_num_logTs /= num_logTs_in) then
             ios = 1
             write(*,*) 'read cache failed for ion_num_logTs'
@@ -526,19 +526,19 @@
          if (abs(ion_logT_min-logT_min_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for ion_logT_min'
-         end if    
+         end if
          if (abs(ion_logT_max-logT_max_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for ion_logT_max'
-         end if    
+         end if
          if (abs(ion_del_logT-del_logT_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for ion_del_logT'
-         end if    
+         end if
          if (abs(ion_logQ_min-logQ_min_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for ion_logQ_min'
-         end if    
+         end if
          if (abs(ion_logQ_max-logQ_max_in) > tiny) then
             ios = 1
             write(*,*) 'read cache failed for ion_logQ_max'
@@ -547,7 +547,7 @@
             ios = 1
             write(*,*) 'read cache failed for ion_del_logQ'
          end if
-         
+
          if (ios /= 0) then
             close(io_unit); return
          end if
@@ -557,10 +557,10 @@
          if (ios /= 0) then
             close(io_unit); return
          end if
-         
+
          close(io_unit)
 
       end subroutine Read_ion_Cache
-      
-      
+
+
       end module ion_tables_load

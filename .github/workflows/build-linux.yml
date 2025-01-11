@@ -7,102 +7,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["21.4.1", "22.6.1", "23.7.3"]
+        sdk: ["22.6.1", "23.7.3", "24.7.1"]
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: Delete unused packages
-        run: |
-          # runners have 150GB of disk space and the Ubuntu image is big so we sometimes found it ran out of space for MESA
-          # others have encountered this too so we took commands from this action
-          # https://github.com/jlumbroso/free-disk-space
-          # currently commented because we don't need it and these commands can need changing when the Ubuntu image changes
-          sudo rm -rf /usr/local/lib/android
-          # sudo apt-get remove -y '^aspnetcore-.*'
-          # sudo apt-get remove -y '^dotnet-.*' # 990 MB
-          # sudo apt-get remove -y '^llvm-.*' # 1052 MB
-          # sudo apt-get remove -y 'php.*' # 56.6 MB
-          # sudo apt-get remove -y '^mysql-.*' # 209 MB
-          # sudo apt-get remove -y azure-cli google-cloud-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri # 2274 MB
-          sudo apt-get autoremove -y # 771 MB
-          sudo apt-get clean
-
       - name: Checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v4
 
-      - name: Create LFS file list
-        run: |
-          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-
-      - name: Restore LFS cache
-        uses: actions/cache@v3
-        id: lfs-cache
+      - name: Install MESA on ${{ runner.os }} with SDK ${{matrix.sdk}}
+        uses: ./.github/actions/install-mesa
         with:
-          path: .git/lfs
-          key: ${{ runner.os }}-${{ hashFiles('.lfs-assets-id') }}-v1
-
-      - name: Git LFS Pull
-        run: git lfs pull
-        if: steps.lfs-cache.outputs.cache-hit != 'true'
-
-      - name: Git LFS Checkout
-        run: git lfs checkout
-        if: steps.lfs-cache.outputs.cache-hit == 'true'
-
-      - name: Install dependencies Linux
-        run: |
-          sudo apt-get -y update
-          sudo apt-get -y install wget binutils make perl libx11-6 libx11-dev zlib1g zlib1g-dev tcsh
-        shell: bash
-
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: |
-            mesasdk-x86_64-linux-${{matrix.sdk}}.tar.gz
-          key: ${{ runner.os }}-${{matrix.sdk}}
-
-
-      - name: Get SDK ${{ runner.os }} '21.4.1'
-        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '21.4.1') }}
-        run: |
-            wget -q https://zenodo.org/record/5802444/files/mesasdk-x86_64-linux-21.4.1.tar.gz
-        shell: bash
-
-      - name: Get SDK ${{ runner.os }} '22.6.1'
-        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk ==  '22.6.1') }}
-        run: |
-            wget -q https://zenodo.org/record/7457681/files/mesasdk-x86_64-linux-22.6.1.tar.gz
-        shell: bash
-
-      - name: Get SDK ${{ runner.os }} '23.7.3'
-        if: ${{ (steps.cache.outputs.cache-hit != 'true') && (  matrix.sdk == '23.7.3') }}
-        run: |
-            wget -q https://zenodo.org/record/10624843/files/mesasdk-x86_64-linux-23.7.3.tar.gz
-        shell: bash
-
-      - name: Unpack SDK ${{ runner.os }} ${{matrix.sdk}}
-        run: |
-            tar xvf mesasdk-x86_64-linux-${{matrix.sdk}}.tar.gz
-        shell: bash
-
-      - name: Compile
-        shell: bash
-        run: |
-          # Linux runners have 4 cores
-          # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-          export OMP_NUM_THREADS=4
-          export NPROCS=4
-          export "MESASDK_ROOT=$(readlink -f mesasdk)"
-          source "${MESASDK_ROOT}/bin/mesasdk_init.sh"
-          export "MESA_DIR=$(readlink -f ./)"
-          # Everything is run as root so we need to disable the root check in the install script
-          sed -i 's/\${EUID:-\$(id -u)}/1/' install
-          # Turn off caching during build to save more space
-          sed -i 's/use_cache_for_eos = .true./use_cache_for_eos = .false./g' $MESA_DIR/eos/public/eos_def.f90
-          sed -i 's/use_cache = .true./use_cache = .false./g' $MESA_DIR/star/private/star_private_def.f90
-          ./install
-          if [ ! -f lib/libbinary.a ]; then
-            exit 1
-          fi
+          sdk: ${{matrix.sdk}}

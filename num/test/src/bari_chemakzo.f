@@ -56,7 +56,7 @@ c-----------------------------------------------------------------------
       integer ierr,ipar(0)
       double precision rpar(0)
 
-      double precision k1,k2,k3,k4,kbig,kla,ks
+      double precision ks
       parameter (
      +   ks   =115.83d0
      +)

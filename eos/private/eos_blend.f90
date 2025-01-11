@@ -30,7 +30,7 @@ module eos_blend
       end function quadrant
 
       !! Determines the winding number of a polygon around the origin.
-      !! 
+      !!
       !! Implements the winding number algorithm of
       !! Moscato, Titolo, Feliu, and Munoz (https://shemesh.larc.nasa.gov/people/cam/publications/FM2019-draft.pdf)
       !!
@@ -107,7 +107,7 @@ module eos_blend
       end function is_contained
 
       !! Computes the minimum distance from a given point to a given line segment.
-      !! 
+      !!
       !! @param line_start The coordinates of the start of the line segment (x,y).
       !! @param line_end The coordinates of the end of the line segment (x,y).
       !! @param p The point whose distance to compute.
@@ -152,9 +152,9 @@ module eos_blend
       end function min_distance_from_point_to_line_segment
 
       !! Computes the distance to the nearest line segment.
-      !! This is done by looping over segments, computing the minimum distance to each, and 
+      !! This is done by looping over segments, computing the minimum distance to each, and
       !! returning the smallest of those differences.
-      !! 
+      !!
       !! @param num_points The number of points specifying the polygon.
       !! @param coords The coordinates of the polygon. An array of shape (num_points, 2) storing (x,y) pairs.
       !! @param p The point whose distance to compute.

@@ -11,27 +11,27 @@ This test case has 5 parts. Click to see a larger view of a plot.
 * Part 1 (``inlist_core``) builds a 2.0 Msun, Z=0.02 metallicity, pre-main sequence model and evolves until the helium core reaches 0.3 Msun:
 
 .. image:: ../../../star/test_suite/custom_rates/docs/abund_001005.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 2 (``inlist_make_he_wd``) removes the outer 1.7 Msun by gradually changing the total mass to 0.3 Msun by a wind:
 
 .. image:: ../../../star/test_suite/custom_rates/docs/abund_001102.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 3 (``inlist_cool``) continues the evolution until the central temperature cools to log10(T/K) = 7.43.
 
 * Part 4 (``inlist_NCO_hashimoto``) loads the custom reaction rates, including those from |Hash86|, begins accreting mass at 1e-9 Msun/year, and continues the evolution to just before the nitrogen-carbon-oxygen (NCO) driven flash:
 
 .. image:: ../../../star/test_suite/custom_rates/docs/trho_001540.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 5 (``inlist_NCO_flash``) continues the evolution and terminates when nuclear burning NCO runaway causes the temperature to exceed log10(T/K) = 7.8. See |BSB17| for a science application. The evolution one would get by using the default JINA reaclib rates (yellow curve) instead of the custom rates (green curve) :
 
 .. image:: ../../../star/test_suite/custom_rates/docs/trho_000508.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/custom_rates/docs/abund_000508.svg
-   :scale: 100%
+   :width: 100%
 
 
 pgstar commands used for the first 7 plots:

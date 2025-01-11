@@ -44,7 +44,7 @@ shmesa_help () {
  |___/_| |_|_|  |_|_____|____/_/   \_\
                                       
 EOF
-    echo "Usage: shmesa [work|change|defaults|cp|grep|extras|zip|help] [arguments]"
+    echo "Usage: shmesa [work|change|defaults|cp|grep|extras|zip|version|help] [arguments]"
     echo
     echo "Subcommands:"
     echo "  work      copy the work directory to the current location"
@@ -55,6 +55,7 @@ EOF
     echo "  extras    fill in the full run_star_extras.f90 template"
     echo "  zip       prepare a MESA directory for sharing"
     echo "  help      display this helpful message"
+    echo "  version   print the version of MESA"
     echo "  -h        flag for getting additional details about any of the above"
     echo
 }
@@ -252,6 +253,24 @@ shmesa_zip () {
 }
 
 
+shmesa_version() {
+    if shmesa_check_h_flag "$@"; then
+        echo "Usage: shmesa version"
+        echo "prints the version of MESA"
+        return 0
+    fi
+    if [ -f "$MESA_DIR/data/version_number" ]; then
+        echo "$(cat $MESA_DIR/data/version_number)"
+    elif [ -d ".git" ] || [ -f ".git" ]; then
+        # Limits hashes to 7 characters
+        version=$(git rev-parse HEAD)
+        echo "%s" "${version:0:7}"
+    else
+        echo "Error: Cannot find the version number of MESA."
+    fi
+}
+
+
 shmesa_extras () {
     if shmesa_check_h_flag "$@"; then
         echo "Usage: shmesa extras [src/run_star_extras.f90]"
@@ -324,7 +343,7 @@ shmesa_test () {
     # since we will be calling shmesa, we need it to be in our path 
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
     
-    # shmesa [work|change|defaults|cp|grep|zip|help]
+    # shmesa [work|change|defaults|cp|grep|zip|version|help]
     rm -rf $MESA_SHMESA_TEST
     rm -rf '$MESA_SHMESA_TEST'_cp
     
@@ -462,6 +481,9 @@ case "$subcommand" in
         ;;
     zip)
         shmesa_zip "$@"
+        ;;
+    version)
+        shmesa_version "$@"
         ;;
     test)
         shmesa_test "$@"

@@ -74,7 +74,7 @@
          logical, parameter :: reverse_xaxis = .false., reverse_yaxis = .false.
          character (len=64) :: xname, xaxis_label
          ierr = 0
-         if (show_photosphere_r) then 
+         if (show_photosphere_r) then
             xname = 'photosphere_r'
             xaxis_label = 'R\dphot\u/R\d\(2281)'
          else

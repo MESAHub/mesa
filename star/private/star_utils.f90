@@ -46,6 +46,7 @@
          interface
             subroutine do1(s,k,ierr)
                use star_private_def
+               implicit none
                type (star_info), pointer :: s
                integer, intent(in) :: k
                integer, intent(out) :: ierr
@@ -280,8 +281,8 @@
             s% grav(k) = s% cgrav(k)*s% m_grav(k)/(r*r)
          end do
       end subroutine set_m_grav_and_grav
-      
-      
+
+
       subroutine get_r_and_lnR_from_xh(s, k, r, lnR, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -296,8 +297,8 @@
          lnR = xh(s% i_lnR,k)
          r = exp(lnR)
       end subroutine get_r_and_lnR_from_xh
-      
-      
+
+
       real(dp) function get_r_from_xh(s, k, xh_in) result(r)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -310,8 +311,8 @@
          end if
          r = exp(xh(s% i_lnR,k))
       end function get_r_from_xh
-      
-      
+
+
       real(dp) function get_lnR_from_xh(s, k, xh_in) result(lnR)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -323,8 +324,8 @@
             xh => s% xh
          end if
          lnR = xh(s% i_lnR,k)
-      end function get_lnR_from_xh      
-      
+      end function get_lnR_from_xh
+
       subroutine store_r_in_xh(s, k, r, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -338,8 +339,8 @@
          end if
          xh(s% i_lnR,k) = log(r)
       end subroutine store_r_in_xh
-      
-      
+
+
       subroutine store_lnR_in_xh(s, k, lnR, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -353,8 +354,8 @@
          end if
          xh(s% i_lnR,k) = lnR
       end subroutine store_lnR_in_xh
-      
-      
+
+
       subroutine get_T_and_lnT_from_xh(s, k, T, lnT, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -369,8 +370,8 @@
          lnT = xh(s% i_lnT,k)
          T =  exp(lnT)
       end subroutine get_T_and_lnT_from_xh
-      
-      
+
+
       real(dp) function get_T_from_xh(s, k, xh_in) result(T)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -383,8 +384,8 @@
          end if
          T =  exp(xh(s% i_lnT,k))
       end function get_T_from_xh
-      
-      
+
+
       real(dp) function get_lnT_from_xh(s, k, xh_in) result(lnT)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -397,8 +398,8 @@
          end if
          lnT = xh(s% i_lnT,k)
       end function get_lnT_from_xh
-      
-      
+
+
       subroutine store_T_in_xh(s, k, T, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -412,8 +413,8 @@
          end if
          xh(s% i_lnT,k) = log(T)
       end subroutine store_T_in_xh
-      
-      
+
+
       subroutine store_lnT_in_xh(s, k, lnT, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -427,8 +428,8 @@
          end if
          xh(s% i_lnT,k) = lnT
       end subroutine store_lnT_in_xh
-      
-      
+
+
       subroutine get_rho_and_lnd_from_xh(s, k, rho, lnd, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -443,8 +444,8 @@
          lnd = xh(s% i_lnd,k)
          rho =  exp(lnd)
       end subroutine get_rho_and_lnd_from_xh
-            
-      
+
+
       subroutine store_rho_in_xh(s, k, rho, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -458,8 +459,8 @@
          end if
          xh(s% i_lnd,k) = log(rho)
       end subroutine store_rho_in_xh
-      
-      
+
+
       subroutine store_lnd_in_xh(s, k, lnd, xh_in)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -479,7 +480,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, nz, i_lnR, i_lnd
-         real(dp) :: rL, rR, dm, dV, rho, old_lnd, new_lnd
+         real(dp) :: rL, rR, dm, dV, rho
          include 'formats'
          ierr = 0
          i_lnR = s% i_lnR
@@ -620,7 +621,7 @@
          do k=nz, midq+1, -1
             dqsum2 = dqsum2 + dq(k)
             q(k) = dqsum2
-         end do         
+         end do
       end subroutine set_qs
 
 
@@ -719,7 +720,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k
-         real(dp) :: kap, kap_min
+         real(dp) :: kap
          include 'formats'
          ierr = 0
          k = 1
@@ -744,7 +745,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          ! tau(k) is optical depth at outer boundary of cell k
-         real(dp) :: dtau, dr, Z, kap_min, kap, dm_sum, L_sum
+         real(dp) :: dtau, kap, dm_sum, L_sum
          integer :: k
          logical, parameter :: dbg = .true.
          include 'formats'
@@ -900,7 +901,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: r
          integer, intent(out) :: ierr
-         real(dp) :: dtau, dr, tau_m1, tau_00
+         real(dp) :: dtau, tau_m1, tau_00
          integer :: k
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -921,8 +922,8 @@
             dtau = s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          end do
       end function get_tau_at_r
-      
-      
+
+
       subroutine set_phot_info(s)
          use atm_lib, only: atm_black_body_T
          type (star_info), pointer :: s
@@ -967,7 +968,7 @@
             Tface_0, Tface_1
 
          include 'formats'
-         
+
          ! set values for surface as defaults in case phot not in model
          r = s% r(1)
          m = s% m(1)
@@ -1099,12 +1100,12 @@
 
       subroutine set_abs_du_div_cs(s)
          type (star_info), pointer :: s
-         
+
          integer :: k, nz, j
          real(dp) :: abs_du, cs
          include 'formats'
          nz = s% nz
-         
+
          if (s% v_flag) then
             do k=2,nz
                abs_du = abs(s% v_start(k) - s% v_start(k-1))
@@ -1153,9 +1154,8 @@
                s% abs_du_div_cs(k) = 1d99
             end do
          end if
-      
-      end subroutine set_abs_du_div_cs
 
+      end subroutine set_abs_du_div_cs
 
 
       subroutine get_shock_info(s)
@@ -1178,7 +1178,7 @@
          s% shock_entropy = 0d0
          s% shock_tau = 0d0
          s% shock_k = 0
-         
+
          if (s% u_flag) then
             v => s% u
          else if (s% v_flag) then
@@ -1217,7 +1217,7 @@
             end if
          end do
          if (shock_radius < 0d0) return
-         
+
          call get_shock_location_info( &
             s, .false., k-1, v, shock_radius, &
             s% shock_mass, &
@@ -1293,7 +1293,7 @@
             shock_k = 0
             return
          end if
-         
+
          shock_radius = r/Rsun
          shock_k = k
          if (k < s% nz) then
@@ -1321,9 +1321,8 @@
       real(dp) function min_dr_div_cs(s,min_k) ! seconds
          type (star_info), pointer :: s
          integer, intent(out) :: min_k
-         integer :: k, nz, j, k_min
-         real(dp) :: dr, dt, D, abs_du, cs, min_q, max_q, &
-            min_abs_u_div_cs, min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
+         integer :: k, nz, k_min
+         real(dp) :: dr, dt, min_q, max_q, min_abs_u_div_cs, min_abs_du_div_cs, r00, rp1, dr_div_cs, remnant_mass
          include 'formats'
          nz = s% nz
          min_k = nz
@@ -1373,7 +1372,7 @@
             end if
          end do
       end function min_dr_div_cs
-      
+
 
       subroutine reset_epsnuc_vectors(s)
          type (star_info), pointer :: s
@@ -1446,7 +1445,7 @@
          call store_partials( &
             s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
       end subroutine save_eqn_residual_info
-      
+
 
 
       subroutine unpack_residual_partials(s, k, nvar, i_eqn, &
@@ -1457,7 +1456,7 @@
          integer, intent(in) :: k, nvar, i_eqn
          type(auto_diff_real_star_order1) :: residual
          real(dp) :: d_dm1(nvar), d_d00(nvar), d_dp1(nvar)
-         
+
          real(dp) :: val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
@@ -1467,7 +1466,6 @@
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
             dxtra2_m1, dxtra2_00, dxtra2_p1
-         integer :: j
 
          include 'formats'
 
@@ -1479,8 +1477,8 @@
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
-            dxtra2_m1, dxtra2_00, dxtra2_p1) 
-                     
+            dxtra2_m1, dxtra2_00, dxtra2_p1)
+
          d_dm1 = 0; d_d00 = 0; d_dp1 = 0
          call unpack1(s% i_lnd, dlnd_m1, dlnd_00, dlnd_p1)
          call unpack1(s% i_lnT, dlnT_m1, dlnT_00, dlnT_p1)
@@ -1492,19 +1490,19 @@
          if (s% i_Hp /= 0) call unpack1(s% i_Hp, dHp_m1, dHp_00, dHp_p1)
          if (s% i_w_div_wc /= 0) call unpack1(s% i_w_div_wc, dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1)
          if (s% i_j_rot /= 0) call unpack1(s% i_j_rot, djrot_m1, djrot_00, djrot_p1)
-         
+
          contains
-         
+
          subroutine unpack1(j, dvar_m1, dvar_00, dvar_p1)
             integer, intent(in) :: j
             real(dp), intent(in) :: dvar_m1, dvar_00, dvar_p1
             d_dm1(j) = dvar_m1
             d_d00(j) = dvar_00
             d_dp1(j) = dvar_p1
-         end subroutine unpack1         
-         
+         end subroutine unpack1
+
       end subroutine unpack_residual_partials
-      
+
       subroutine store_partials(s, k, i_eqn, nvar, d_dm1, d_d00, d_dp1, str, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: k, i_eqn, nvar
@@ -1526,8 +1524,8 @@
                if (checking) call check_dequ(d_dp1(j),trim(str) // ' d_dp1')
                call ep1(s, i_eqn, j, k, nvar, d_dp1(j))
             end if
-         end do            
-         
+         end do
+
          contains
 
          subroutine check_dequ(dequ, str)
@@ -1545,7 +1543,7 @@
                return
             end if
          end subroutine check_dequ
-         
+
       end subroutine store_partials
 
 
@@ -1607,7 +1605,7 @@
       real(dp) function eval_Ledd(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: dtau1, dtau, dr, tau, dqsum, Ledd_sum
+         real(dp) :: dtau1, dtau, tau, dqsum, Ledd_sum
          integer :: k
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -1750,13 +1748,13 @@
             s% time_set_mixing_info
       end function total_times
 
-      
+
       real(dp) function get_remnant_mass(s)
          type (star_info), pointer :: s
          get_remnant_mass = s% m(1) - get_ejecta_mass(s)
       end function get_remnant_mass
-      
-      
+
+
       real(dp) function get_ejecta_mass(s)
          use num_lib, only: find0
          type (star_info), pointer :: s
@@ -1768,7 +1766,7 @@
          v_div_vesc_prev = 0d0
          do k=1,s% nz
             if (s% u_flag) then
-               !v = s% u_face_ad(k)%val ! CANNOT USE u_face for this 
+               !v = s% u_face_ad(k)%val ! CANNOT USE u_face for this
                ! approximate value is good enough for this estimate
                if (k == 1) then
                   v = s% u(k)
@@ -1971,16 +1969,15 @@
          L_rad_div_Ledd = &
             -(area*area*crad*(del_T4/del_m)/3)/(pi4*s% cgrav(j)*s% m_grav(j))
       end function get_Lrad_div_Ledd
-      
-      
+
+
       real(dp) function cell_start_specific_KE(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: ke
          cell_start_specific_KE = cell_start_specific_KE_qp(s,k)
       end function cell_start_specific_KE
-      
-      
+
+
       real(qp) function cell_start_specific_KE_qp(s,k)
          ! for consistency with dual cells at faces, use <v**2> instead of <v>**2
          type (star_info), pointer :: s
@@ -2008,17 +2005,16 @@
             cell_start_specific_KE_qp = 0d0
          end if
       end function cell_start_specific_KE_qp
-      
-      
+
+
       real(dp) function cell_specific_KE(s,k,d_dv00,d_dvp1)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: d_dv00, d_dvp1
-         real(dp) :: v2, dv2_dv00, dv2_dvp1
          cell_specific_KE = cell_specific_KE_qp(s,k,d_dv00,d_dvp1)
       end function cell_specific_KE
-      
-      
+
+
       real(qp) function cell_specific_KE_qp(s,k,d_dv00,d_dvp1)
          ! for consistency with dual cells at faces, use <v**2> instead of <v>**2
          type (star_info), pointer :: s
@@ -2057,16 +2053,16 @@
             d_dvp1 = 0d0
          end if
       end function cell_specific_KE_qp
-      
-      
+
+
       real(dp) function cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(out) :: d_dlnR00,d_dlnRp1
          cell_specific_PE = cell_specific_PE_qp(s,k,d_dlnR00,d_dlnRp1)
       end function cell_specific_PE
-      
-      
+
+
       real(qp) function cell_specific_PE_qp(s,k,d_dlnR00,d_dlnRp1)
          ! for consistency with dual cells at faces, <m/r>_cntr => (m(k)/r(k) + m(k+1)/r(k+1))/2 /= m_cntr/r_cntr
          ! i.e., use avg of m/r at faces of cell rather than ratio of cell center mass over cell center r.
@@ -2113,15 +2109,15 @@
             call mesa_error(__FILE__,__LINE__,'cell_specific_PE')
          end if
       end function cell_specific_PE_qp
-      
-      
+
+
       real(dp) function cell_start_specific_PE(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          cell_start_specific_PE = cell_start_specific_PE_qp(s,k)
       end function cell_start_specific_PE
-      
-      
+
+
       real(dp) function cell_start_specific_PE_qp(s,k)
          ! for consistency with dual cells at faces, <m/r>_cntr => (m(k)/r(k) + m(k+1)/r(k+1))/2 /= m_cntr/r_cntr
          ! i.e., use avg of m/r at faces of cell rather than ratio of cell center mass over cell center r.
@@ -2161,8 +2157,8 @@
             call mesa_error(__FILE__,__LINE__,'cell_start_specific_PE_qp')
          end if
       end function cell_start_specific_PE_qp
-      
-      
+
+
       real(dp) function cell_specific_rotational_energy(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -2176,12 +2172,12 @@
          cell_specific_rotational_energy = 0.5d0*(e_p1 + e_00)
       end function cell_specific_rotational_energy
 
-      
+
       subroutine get_dke_dt_dpe_dt(s, k, dt, &
             dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
             dpe_dt, d_dpedt_dlnR00, d_dpedt_dlnRp1, ierr)
-         type (star_info), pointer :: s      
-         integer, intent(in) :: k 
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
          real(dp), intent(in) :: dt
          real(dp), intent(out) :: &
             dke_dt, d_dkedt_dv00, d_dkedt_dvp1, &
@@ -2189,7 +2185,6 @@
          integer, intent(out) :: ierr
          real(dp) :: PE_start, PE_new, KE_start, KE_new, q1
          real(dp) :: dpe_dlnR00, dpe_dlnRp1, dke_dv00, dke_dvp1
-         integer :: nz
          include 'formats'
          ierr = 0
          ! rate of change in specific PE (erg/g/s)
@@ -2198,17 +2193,17 @@
          q1 = PE_new - PE_start
          dpe_dt = q1/dt ! erg/g/s
          d_dpedt_dlnR00 = dpe_dlnR00/dt
-         d_dpedt_dlnRp1 = dpe_dlnRp1/dt    
+         d_dpedt_dlnRp1 = dpe_dlnRp1/dt
          ! rate of change in specific KE (erg/g/s)
          KE_start = cell_start_specific_KE_qp(s,k)
          KE_new = cell_specific_KE_qp(s,k,dke_dv00,dke_dvp1)
          q1 = KE_new - KE_start
          dke_dt = q1/dt ! erg/g/s
          d_dkedt_dv00 = dke_dv00/dt
-         d_dkedt_dvp1 = dke_dvp1/dt   
+         d_dkedt_dvp1 = dke_dvp1/dt
       end subroutine get_dke_dt_dpe_dt
-      
-      
+
+
       real(dp) function eval_deltaM_total_from_profile( &
             deltaM, premesh_dm, profile)
          real(dp), intent(in) :: deltaM
@@ -2231,8 +2226,8 @@
          end do
          eval_deltaM_total_from_profile = total
       end function eval_deltaM_total_from_profile
-      
-      
+
+
       real(dp) function cell_specific_total_energy(s, k) result(cell_total)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -2247,8 +2242,8 @@
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
-      
-      
+
+
       subroutine eval_integrated_total_energy_profile(s, arr, direction, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: direction
@@ -2272,7 +2267,7 @@
          do k=start+direction, finish, direction
             arr(k) = arr(k-direction) + cell_specific_total_energy(s,k) * s%dm(k)
          end do
-            
+
       end subroutine eval_integrated_total_energy_profile
 
       subroutine eval_deltaM_total_energy_integrals( &
@@ -2291,10 +2286,9 @@
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
          integer :: k
-         real(dp) :: rR, rL, rC, dVR, dV, dm, m_cntr, rho, egas, v, sum_dm, &
-            cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
          include 'formats'
-         
+
          total_internal_energy = 0d0
          total_gravitational_energy = 0d0
          total_radial_kinetic_energy = 0d0
@@ -2303,7 +2297,7 @@
          sum_total = 0d0
 
          if (klo < 1 .or. khi > s% nz .or. klo > khi) return
-         
+
          sum_dm = 0
          do k=klo,khi
             if (sum_dm >= deltaM) exit
@@ -2344,7 +2338,7 @@
 
          sum_total = total_internal_energy + total_gravitational_energy + &
             total_radial_kinetic_energy + total_turbulent_energy
-            
+
          if (s% include_rotation_in_total_energy) &
             sum_total = sum_total + total_rotational_kinetic_energy
 
@@ -2356,10 +2350,9 @@
          real(dp), intent(out), dimension(:) :: total_energy_profile
 
          integer :: k
-         real(dp) :: rR, rL, rC, dVR, dV, dm, m_cntr, rho, egas, v, &
-            cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
          include 'formats'
-         
+
          do k=1, s%nz
             cell_total = 0
             dm = s% dm(k)
@@ -2386,10 +2379,10 @@
             end if
             total_energy_profile(k) = cell_total
          end do
-            
+
       end subroutine eval_total_energy_profile
-      
-      
+
+
       real(dp) function eval_cell_section_total_energy( &
             s, klo, khi) result(sum_total)
          type (star_info), pointer :: s
@@ -2522,7 +2515,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: he4_limit
          integer :: nz, h1, he4
-         real(dp) :: small = 1d-4
+         real(dp), parameter :: small = 1d-4
          after_He_burn = .false.
          nz = s% nz
          h1 = s% net_iso(ih1)
@@ -2538,7 +2531,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: c12_limit
          integer :: nz, h1, he4, c12
-         real(dp) :: small = 1d-4
+         real(dp), parameter :: small = 1d-4
          after_C_burn = .false.
          nz = s% nz
          h1 = s% net_iso(ih1)
@@ -2549,8 +2542,8 @@
              s% xa(c12,nz) > c12_limit) return
          after_C_burn = .true.
       end function after_C_burn
-      
-      
+
+
       integer function lookup_nameofvar(s, namestr)
          type (star_info), pointer :: s
          character (len=*), intent(in) :: namestr
@@ -2563,8 +2556,8 @@
             end if
          end do
       end function lookup_nameofvar
-      
-      
+
+
       integer function lookup_nameofequ(s, namestr)
          type (star_info), pointer :: s
          character (len=*), intent(in) :: namestr
@@ -2659,7 +2652,7 @@
 
       end subroutine weighed_smoothing
 
-      
+
       subroutine threshold_smoothing (dd, dd_thresh, n, ns, preserve_sign, ddold)
 
         ! Same as weighed_smoothing, but only smooth contiguous regions where |dd| >= dd_thresh
@@ -2675,7 +2668,7 @@
         integer :: i
         integer :: i_a
         integer :: i_b
-        
+
         include 'formats'
 
         ! Process regions
@@ -2717,7 +2710,7 @@
         return
 
       end subroutine threshold_smoothing
-      
+
 
       real(dp) function eval_kh_timescale(G,M,R,L) result(kh)
          real(dp), intent(in) :: G,M,R,L
@@ -2727,7 +2720,6 @@
             kh = 0.75d0*G*M*M/(R*L) ! 0.75 is based on sun.  Hansen & Kawaler eqn 1.30
          end if
       end function eval_kh_timescale
-
 
 
       real(dp) function yrs_for_init_timestep(s)
@@ -2744,8 +2736,7 @@
          use rates_def, only: i_rate
          use chem_def
          type (star_info), pointer :: s
-         real(dp) :: power_he_burn, power_c_burn, power_neutrinos, &
-            center_h1, center_he4
+         real(dp) :: center_h1, center_he4
          integer :: nz, j
          include 'formats'
          nz = s% nz
@@ -2753,7 +2744,6 @@
          s% phase_of_evolution = phase_starting
          if (s%doing_first_model_of_run) return
 
-         
          j = s% net_iso(ih1)
          if (j > 0) then
             center_h1 = center_avg_x(s,j)
@@ -2784,27 +2774,26 @@
             any(s% burn_he_conv_region(1:s% num_conv_boundaries))) then
             s% phase_of_evolution = phase_TP_AGB
          else if (center_he4 <= 1d-4) then
-            s% phase_of_evolution = phase_TACHeB          
+            s% phase_of_evolution = phase_TACHeB
          else if (s% center_eps_burn(i3alf) > 1d2) then
             s% phase_of_evolution = phase_ZACHeB
          else if (s% L_by_category(i3alf) > 1d2) then
             s% phase_of_evolution = phase_He_Burn
          else if (center_h1 <= 1d-6) then
-            s% phase_of_evolution = phase_TAMS            
+            s% phase_of_evolution = phase_TAMS
          else if (center_h1 <= 0.3d0) then
-            s% phase_of_evolution = phase_IAMS            
+            s% phase_of_evolution = phase_IAMS
          else if (s% L_nuc_burn_total >= s% L_phot*s% Lnuc_div_L_zams_limit) then
             s% phase_of_evolution = phase_ZAMS
          else if (s% log_center_temperature > 5d0) then
             s% phase_of_evolution = phase_PreMS
          else
             s% phase_of_evolution = phase_starting
-         end if 
-         
+         end if
+
       end subroutine set_phase_of_evolution
 
-      
-      
+
       subroutine set_rv_info(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -2819,15 +2808,15 @@
             s% vc(k) = 0d0
          end if
       end subroutine set_rv_info
-      
-      
+
+
       subroutine show_matrix(s, dmat, nvar)
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp) :: dmat(nvar,nvar)
          integer :: i, j
          write(*,'(A)')
-         write(*,'(18x)', advance = 'no') 
+         write(*,'(18x)', advance = 'no')
          do j = 1, nvar
             write(*,'(a15)', advance = 'no') s% nameofvar(j)
          end do
@@ -2845,30 +2834,25 @@
 
       ! e00(i,j,k) is partial of equ(i,k) wrt var(j,k)
       subroutine e00(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
-         integer :: b, q, v00
-         real(qp) :: q1, q2
-         !logical, parameter :: dbg = .true.
          logical, parameter :: dbg = .false.
          include 'formats'
-         
+
          if (mdb .and. k==397 .and. v /= 0d0) &
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-         
+
          !if (j == s% i_lnd .and. k /= s% nz) return ! this variable is being held constant
-         
+
          if (v == 0d0) return
-         
+
          if (.false. .and. j == s% i_lnT .and. k == 30) then
             write(*,4) 'e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k)
          end if
-         
+
          if (is_bad(v)) then
 !$omp critical (star_utils_e00_crit1)
             write(*,4) 'e00(i,j,k) ' // &
@@ -2876,15 +2860,15 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'1 e00')
 !$omp end critical (star_utils_e00_crit1)
          end if
-         
+
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k e00(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
             call mesa_error(__FILE__,__LINE__,'2 e00')
          end if
-         
+
          if (j > nvar) return ! hybrid
-         
+
          if (i > nvar) then
 !$omp critical (star_utils_e00_crit2)
             write(*,5) 'bad i e00(i,j,k) ' // &
@@ -2903,29 +2887,24 @@
 
       ! em1(i,j,k) is partial of equ(i,k) wrt var(j,k-1)
       subroutine em1(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
-         integer :: b, q, vm1
-         real(qp) :: q1, q2
-         !logical, parameter :: dbg = .true.
          logical, parameter :: dbg = .false.
          if (k == 1) return
          include 'formats'
-         
+
          if (mdb .and. k==397 .and. v /= 0d0) &
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-         
+
          if (v == 0d0) return
-         
+
          if (.false. .and. j == s% i_lnT .and. k == 31) then
             write(*,4) 'em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k-1)
          end if
-         
+
          if (is_bad(v)) then
 !$omp critical (star_utils_em1_crit1)
             write(*,4) 'em1(i,j,k) ' // &
@@ -2933,15 +2912,15 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'em1')
 !$omp end critical (star_utils_em1_crit1)
          end if
-         
+
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
             call mesa_error(__FILE__,__LINE__,'em1')
          end if
-         
+
          if (j > nvar) return ! hybrid
-         
+
          if (i > nvar) then
             write(*,5) 'bad i em1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
@@ -2958,28 +2937,23 @@
 
       ! ep1(i,j,k) is partial of equ(i,k) wrt var(j,k+1)
       subroutine ep1(s,i,j,k,nvar,v)
-         use num_def, only: &
-            block_tridiag_dble_matrix_type, block_tridiag_quad_matrix_type
          type (star_info), pointer :: s
          integer, intent(in) :: i, j, k, nvar
          real(dp), intent(in) :: v
-         integer :: b, q, vp1
-         real(qp) :: q1, q2
-         !logical, parameter :: dbg = .true.
          logical, parameter :: dbg = .false.
          include 'formats'
-         
+
          if (mdb .and. k==397 .and. v /= 0d0) &
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
-         
+
          if (v == 0d0) return
-         
+
          if (.false. .and. j == s% i_lnT .and. k == 29) then
             write(*,4) 'ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v, s% x_scale(j,k+1)
          end if
-         
+
          if (is_bad(v)) then
 !$omp critical (star_utils_ep1_crit1)
             write(*,4) 'ep1(i,j,k) ' // &
@@ -2987,15 +2961,15 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'ep1')
 !$omp end critical (star_utils_ep1_crit1)
          end if
-         
+
          if (i <= 0 .or. j <= 0 .or. k <= 0 .or. k > s% nz) then
             write(*,4) 'bad i,j,k ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), i, j, k, v
             call mesa_error(__FILE__,__LINE__,'ep1')
          end if
-         
+
          if (j > nvar) return
-         
+
          if (i > nvar) then
             write(*,5) 'bad i ep1(i,j,k) ' // &
                trim(s% nameofequ(i)) // ' ' // trim(s% nameofvar(j)), &
@@ -3076,7 +3050,6 @@
 
          ! interpolant f(dq) = a + b*dq + (c/2)*dq^2, with dq = q - q_midpoint
          ! c0 holds a's, c1 holds b's, and c2 holds c's.
-
 
 
       subroutine get1_lpp(k, nz, &
@@ -3165,8 +3138,8 @@
 
       end subroutine get1_lpp
 
- 
-      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr) 
+
+      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr)
          ! note: Ptrb_div_etrb is not time weighted
          ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
@@ -3215,7 +3188,7 @@
             !s% solver_test_partials_dval_dx = 0 ! d_residual_dr_00
             write(*,*) 'calc_Ptrb_ad_tw', s% solver_test_partials_var
          end if
-         
+
       end subroutine calc_Ptrb_ad_tw
 
 
@@ -3223,7 +3196,7 @@
       subroutine calc_Ptot_ad_tw( &
             s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
          use auto_diff_support
-          type (star_info), pointer :: s 
+          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: skip_Peos, skip_mlt_Pturb
          type(auto_diff_real_star_order1), intent(out) :: Ptot_ad
@@ -3235,10 +3208,10 @@
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
          logical :: time_center
          include 'formats'
-         
+
          ierr = 0
          d_Ptot_dxa = 0d0
-         
+
          time_center = (s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
@@ -3247,8 +3220,8 @@
             alfa = 1d0
          end if
          beta = 1d0 - alfa
-         
-         Peos_ad = 0d0         
+
+         Peos_ad = 0d0
          if (.not. skip_Peos) then
             Peos_ad = wrap_peos_00(s, k)
             Peos_ad = alfa*Peos_ad + beta*s% Peos_start(k)
@@ -3264,10 +3237,10 @@
             if (ierr /= 0) return
             ! NO TIME CENTERING FOR Pvsc: Pvsc_ad = alfa*Pvsc_ad + beta*s% Pvsc_start(k)
          end if
-         
+
          Ptrb_ad = 0d0
          if (s% RSP2_flag) then
-            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr) 
+            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr)
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
          end if
@@ -3280,20 +3253,20 @@
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_ad = alfa*mlt_Pturb_ad + beta*mlt_Pturb_start
             end if
-         end if           
-         
+         end if
+
          Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad
-         
+
          if (s% use_other_pressure) Ptot_ad = Ptot_ad + s% extra_pressure(k)
 
       end subroutine calc_Ptot_ad_tw
-      
-      
+
+
       subroutine get_Pvsc_ad(s, k, Pvsc, ierr)
          use auto_diff
          use auto_diff_support
-         type (star_info), pointer :: s      
-         integer, intent(in) :: k 
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Pvsc
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: v00, vp1, Peos, rho, &
@@ -3318,12 +3291,12 @@
          s% Pvsc(k) = Pvsc%val
          if (Pvsc_start < 0d0) s% Pvsc_start(k) = s% Pvsc(k)
       end subroutine get_Pvsc_ad
-      
-      
+
+
       ! marsaglia and zaman random number generator. period is 2**43 with
       ! 900 million different sequences. the state of the generator (for restarts)
       subroutine init_random(s)
-         type (star_info), pointer :: s      
+         type (star_info), pointer :: s
          integer :: ijkl,ij,kl,i,j,k,l,ii,jj,m
          real(dp) :: x,t
          ijkl = 54217137
@@ -3342,7 +3315,7 @@
                j = k
                k = m
                l = mod(53*l + 1, 169)
-               if (mod(l*m,64) .ge. 32) x = x + t
+               if (mod(l*m,64) >= 32) x = x + t
                t = 0.5d0 * t
             enddo
             s% rand_u(ii) = x
@@ -3353,22 +3326,22 @@
          s% rand_i97 = 97
          s% rand_j97 = 33
       end subroutine init_random
-      
-      
+
+
       real(dp) function rand(s)
-         type (star_info), pointer :: s      
+         type (star_info), pointer :: s
          real(dp) :: uni
          uni = s% rand_u(s% rand_i97) - s% rand_u(s% rand_j97)
-         if (uni .lt. 0.0d0) uni = uni + 1.0d0
+         if (uni < 0.0d0) uni = uni + 1.0d0
          s% rand_u(s% rand_i97) = uni
          s% rand_i97 = s% rand_i97 - 1
-         if (s% rand_i97 .eq. 0) s% rand_i97 = 97
+         if (s% rand_i97 == 0) s% rand_i97 = 97
          s% rand_j97 = s% rand_j97 - 1
-         if (s% rand_j97 .eq. 0) s% rand_j97 = 97
+         if (s% rand_j97 == 0) s% rand_j97 = 97
          s% rand_c = s% rand_c - s% rand_cd
-         if (s% rand_c .lt. 0.0d0) s% rand_c = s% rand_c + s% rand_cm
+         if (s% rand_c < 0.0d0) s% rand_c = s% rand_c + s% rand_cm
          uni = uni - s% rand_c
-         if (uni .lt. 0.0d0) uni = uni + 1.0d0
+         if (uni < 0.0d0) uni = uni + 1.0d0
          rand = uni
       end function rand
 
@@ -3377,7 +3350,7 @@
          type (star_info), pointer :: s
          character(len=*), intent(in) :: str
          logical, intent(in) :: advance
-         integer :: id, ierr, io
+         integer :: ierr, io
          if (len_trim(s% extra_terminal_output_file) > 0) then
             ierr = 0
             open(newunit=io, file=trim(s% extra_terminal_output_file), &
@@ -3395,8 +3368,8 @@
             end if
          end if
       end subroutine write_to_extra_terminal_output_file
-      
-      
+
+
       subroutine write_eos_call_info(s,k)
          use chem_def
          type (star_info), pointer :: s
@@ -3460,7 +3433,6 @@
 
 
       real(dp) function surface_avg_x(s,j)
-         use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: j
          real(dp) :: sum_x, sum_dq
@@ -3505,8 +3477,8 @@
          end do
          center_avg_x = sum_x/sum_dq
       end function center_avg_x
-      
-      
+
+
       subroutine get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
          use auto_diff_support
          type (star_info), pointer :: s
@@ -3525,8 +3497,8 @@
             inv_R2 = 1d0/r2_00
          end if
       end subroutine get_area_info_opt_time_center
-      
-      
+
+
       subroutine set_energy_eqn_scal(s, k, scal, ierr) ! 1/(erg g^-1 s^-1)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3542,13 +3514,13 @@
          end if
          if (s% dedt_eqn_r_scale > 0d0) then
             cell_energy_fraction_start = &
-               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old                    
-            scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale) 
+               s% energy_start(k)*s% dm(k)/s% total_internal_energy_old
+            scal = min(scal, cell_energy_fraction_start*s% dedt_eqn_r_scale)
          end if
          scal = scal*s% dt/s% energy_start(k)
       end subroutine set_energy_eqn_scal
-      
-      
+
+
       real(dp) function conv_time_scale(s,k_in) result(tau_conv)
          type (star_info), pointer :: s
          integer, intent(in) :: k_in
@@ -3578,8 +3550,8 @@
             tau_conv = 0d0
          end if
       end function conv_time_scale
-      
-      
+
+
       subroutine set_conv_time_scales(s)
          type (star_info), pointer :: s
          integer :: k
@@ -3600,9 +3572,9 @@
          end do
          if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
          if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
-      end subroutine set_conv_time_scales      
-      
-      
+      end subroutine set_conv_time_scales
+
+
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3616,17 +3588,17 @@
          end if
          tau_qhse = abs_dv/(s% cgrav(k)*s% m_grav(k)/pow2(s% r(k)))
       end function QHSE_time_scale
-      
-      
-      
-      
+
+
+
+
       real(dp) function eps_nuc_time_scale(s,k) result(tau_epsnuc)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          tau_epsnuc = s% Cp(k)*s% T(k)/max(1d-10,abs(s% eps_nuc(k)))
       end function eps_nuc_time_scale
-      
-      
+
+
       real(dp) function cooling_time_scale(s,k) result(tau_cool)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3634,8 +3606,8 @@
          thermal_conductivity = (4d0*crad*clight*pow3(s% T(k)))/(3d0*s% opacity(k)*s% rho(k)*s% Cp(k))
          tau_cool = pow2(s% scale_height(k)) / thermal_conductivity
       end function cooling_time_scale
-      
-      
+
+
       function get_rho_face(s,k) result(rho_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3648,8 +3620,8 @@
          call get_face_weights(s, k, alfa, beta)
          rho_face = alfa*wrap_d_00(s,k) + beta*wrap_d_m1(s,k)
       end function get_rho_face
-      
-      
+
+
       real(dp) function get_rho_face_val(s,k) result(rho_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3661,8 +3633,8 @@
          call get_face_weights(s, k, alfa, beta)
          rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
       end function get_rho_face_val
-      
-      
+
+
       function get_T_face(s,k) result(T_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3675,16 +3647,16 @@
          call get_face_weights(s, k, alfa, beta)
          T_face = alfa*wrap_T_00(s,k) + beta*wrap_T_m1(s,k)
       end function get_T_face
-      
-      
+
+
       function get_Prad_face(s,k) result(Prad_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Prad_face
          Prad_face = crad*pow4(get_T_face(s,k))/3d0
       end function get_Prad_face
-      
-      
+
+
       function get_Peos_face(s,k) result(Peos_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3697,8 +3669,8 @@
          call get_face_weights(s, k, alfa, beta)
          Peos_face = alfa*wrap_Peos_00(s,k) + beta*wrap_Peos_m1(s,k)
       end function get_Peos_face
-      
-      
+
+
       function get_Cp_face(s,k) result(Cp_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3711,8 +3683,8 @@
          call get_face_weights(s, k, alfa, beta)
          Cp_face = alfa*wrap_Cp_00(s,k) + beta*wrap_Cp_m1(s,k)
       end function get_Cp_face
-      
-      
+
+
       function get_ChiRho_face(s,k) result(ChiRho_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3725,8 +3697,8 @@
          call get_face_weights(s, k, alfa, beta)
          ChiRho_face = alfa*wrap_ChiRho_00(s,k) + beta*wrap_ChiRho_m1(s,k)
       end function get_ChiRho_face
-      
-      
+
+
       function get_ChiT_face(s,k) result(ChiT_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3739,8 +3711,8 @@
          call get_face_weights(s, k, alfa, beta)
          ChiT_face = alfa*wrap_ChiT_00(s,k) + beta*wrap_ChiT_m1(s,k)
       end function get_ChiT_face
-      
-      
+
+
       function get_kap_face(s,k) result(kap_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3753,8 +3725,8 @@
          call get_face_weights(s, k, alfa, beta)
          kap_face = alfa*wrap_kap_00(s,k) + beta*wrap_kap_m1(s,k)
       end function get_kap_face
-      
-      
+
+
       function get_grada_face(s,k) result(grada_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3767,8 +3739,8 @@
          call get_face_weights(s, k, alfa, beta)
          grada_face = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
       end function get_grada_face
-      
-      
+
+
       function get_gradr_face(s,k) result(gradr)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3779,10 +3751,10 @@
          opacity = get_kap_face(s,k)
          L = wrap_L_00(s,k)
          Pr = get_Prad_face(s,k)
-         gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr) 
+         gradr = P*opacity*L/(16d0*pi*clight*s% m_grav(k)*s% cgrav(k)*Pr)
       end function get_gradr_face
-      
-      
+
+
       function get_scale_height_face(s,k) result(scale_height)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3804,8 +3776,8 @@
             end if
          end if
       end function get_scale_height_face
-      
-      
+
+
       real(dp) function get_scale_height_face_val(s,k) result(scale_height)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3828,21 +3800,21 @@
          end if
       end function get_scale_height_face_val
 
-      
+
       function get_QQ_cell(s,k) result(QQ_cell)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: QQ_cell
          type(auto_diff_real_star_order1) :: &
             T_00, d_00, chiT_00, chiRho_00
-         T_00 = wrap_T_00(s,k)                  
-         d_00 = wrap_d_00(s,k)         
+         T_00 = wrap_T_00(s,k)
+         d_00 = wrap_d_00(s,k)
          chiT_00 = wrap_chiT_00(s,k)
          chiRho_00 = wrap_chiRho_00(s,k)
          QQ_cell = chiT_00/(d_00*T_00*chiRho_00)
       end function get_QQ_cell
-      
-      
+
+
       subroutine get_face_weights(s, k, alfa, beta)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3928,6 +3900,6 @@
          s% alpha_RTI(1:s% nz) = 0d0
          s% need_to_setvars = .true.
       end subroutine set_zero_alpha_RTI
-      
+
 
       end module star_utils

@@ -588,16 +588,16 @@
          procedure(pgstar_decorator_interface), pointer :: pgstar_decorator
 
          integer :: &
-            j, k, k0, k_max, i, nz, kmin, kmax, cnt, y_color, clr_sav, id, &
+            j, k, nz, y_color, clr_sav, id, &
             other_y_color, grid_min, grid_max, npts, yaxis_id, other_yaxis_id, ishape
-         real :: del, xpos, ypos, panel_dy, panel_ybot, panel_ytop, &
-            dx, dy, xpos0, dxpos, dypos, dxval, other_ytop, other_ybot, &
-            ybot, ytop, xmin, xmax, xleft, xright, xwidth, panels_xmargin, &
+         real :: panel_dy, panel_ybot, panel_ytop, &
+            dx, other_ytop, other_ybot, &
+            ybot, ytop, xmin, xmax, xleft, xright, panels_xmargin, &
             panels_xmin, panels_xmax, xwidth_left_frac, xwidth_right_frac, &
             xwidth_left_of_shock, xwidth_right_of_shock, shock_xmin, shock_xmax, &
             xshock_sp
-         real(dp) :: cs, x00, xp1, ms, photosphere_logxm, xshock
-         character (len=strlen) :: str, xname, yname, other_yname
+         real(dp) :: photosphere_logxm, xshock
+         character (len=strlen) :: xname, yname, other_yname
          logical :: found_shock
          real, allocatable, dimension(:) :: xvec, yvec, other_yvec, unshifted_xvec
          real, allocatable, dimension(:) :: yfile_xdata, other_yfile_xdata
@@ -749,7 +749,7 @@
             do k=1,npts
                xvec(k) = xvec(k+grid_min-1)
             end do
-         end if 
+         end if
 
          do j = 1, panels_num_panels
 
@@ -913,14 +913,14 @@
                   npts, yvec, panels_ymin(j), panels_ymax(j), panels_ycenter(j), panels_ymargin(j), &
                   panels_yaxis_reversed(j), panels_dymin(j), ybot, ytop)
             end if
-            
+
             if (panels_same_yaxis_range(j) .and. len_trim(panels_other_yaxis_name(j)) > 0) then
                if (other_ybot < ybot) ybot = other_ybot
                if (ybot < other_ybot) other_ybot = ybot
                if (other_ytop > ytop) ytop = other_ytop
                if (ytop > other_ytop) other_ytop = ytop
             end if
-               
+
             if (len_trim(panels_other_yaxis_name(j)) > 0) then
                call pgswin(xleft, xright, other_ybot, other_ytop)
                call pgscf(1)
@@ -949,7 +949,7 @@
                end if
                call pgslw(1)
             end if
-            
+
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
             call pgsci(1)
@@ -993,7 +993,7 @@
             end if
             call pgslw(1)
             call pgsci(1)
-         
+
             call show_pgstar_decorator(s% id, use_decorator, pgstar_decorator, j, ierr)
          end do
 

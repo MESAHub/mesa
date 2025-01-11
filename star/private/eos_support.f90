@@ -51,7 +51,7 @@ module eos_support
   public :: solve_eos_given_PT
   public :: solve_eos_given_PgasT
   public :: solve_eos_given_PgasT_auto
-  
+
   ! Procedures
 
 contains
@@ -75,9 +75,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp), dimension(num_eos_basic_results) :: dres_dabar, dres_dzbar
     integer :: j
-    logical :: off_table
 
     include 'formats'
 
@@ -88,8 +86,8 @@ contains
 
     if(logRho < -25) then
       ! Provide some hard lower limit on what we would even try to evalue the eos at
-      ! Going to low causes FPE's when we try to evaluate certain derviatives that need (rho**power)
-      s% retry_message = 'eos evaluted at too low a density'
+      ! Going to low causes FPE's when we try to evaluate certain derivatives that need (rho**power)
+      s% retry_message = 'eos evaluated at too low a density'
       ierr = -1
       return
     end if
@@ -161,7 +159,7 @@ contains
     if (s% doing_timing) s% timing_num_solve_eos_calls = s% timing_num_solve_eos_calls + eos_calls
 
   end subroutine solve_eos_given_DE
-  
+
   !****
 
   ! Solve for temperature & eos results data given density & gas energy
@@ -196,7 +194,7 @@ contains
 
     call eosDT_get_T( &
        s% eos_handle, &
-       s% species, s% chem_id, s% net_iso, xa, &            
+       s% species, s% chem_id, s% net_iso, xa, &
        logRho, i_egas, egas, logT_tol, egas_tol, MAX_ITER_FOR_SOLVE, logT_guess, &
        arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
        logT, res, dres_dlnRho, dres_dlnT, &
@@ -229,7 +227,6 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
@@ -244,7 +241,7 @@ contains
        arg_not_provided, arg_not_provided, arg_not_provided, arg_not_provided, &
        logT, res, dres_dlnRho, dres_dlnT, &
        dres_dxa, eos_calls, ierr)
-          
+
   end subroutine solve_eos_given_DP
 
   !****
@@ -273,12 +270,11 @@ contains
     integer, intent(out) :: ierr
 
     integer :: eos_calls
-    real(dp) :: eos_x, eos_z
 
     include 'formats'
 
     ierr = 0
-    
+
     call eosDT_get_T( &
        s% eos_handle, &
        s% species, s% chem_id, s% net_iso, xa, &
@@ -411,8 +407,7 @@ contains
     real(dp), intent(out) :: dres_dxa(num_eos_d_dxa_results,s% species)
     integer, intent(out) :: ierr
 
-    real(dp) :: rho_guess, logRho_guess, gamma, &
-         dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
+    real(dp) :: rho_guess, logRho_guess, gamma
 
     ! compute composition info
     real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
@@ -420,7 +415,7 @@ contains
     call basic_composition_info( &
        s% species, s% chem_id, xa, X, Y, Z, &
        abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
-    
+
     gamma = 5d0/3d0
     call eos_gamma_PT_get( &
        s% eos_handle, abar, exp10(logPgas), logPgas, exp10(logT), logT, gamma, &
@@ -438,7 +433,7 @@ contains
        ierr)
 
   end subroutine solve_eos_given_PgasT_auto
-         
+
   !****
 
 end module eos_support

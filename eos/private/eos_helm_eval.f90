@@ -33,7 +33,7 @@
       use helm
 
       implicit none
-      
+
       logical, parameter :: stop_for_is_bad = .false.
       logical, parameter :: dbg = .false.
 
@@ -107,11 +107,11 @@
 
       end subroutine get_helm_for_eosdt
 
-         
+
       subroutine Get_HELMEOS_Results( &
                rq, Z, abar, zbar, Rho, logRho, T, logT, &
                res, d_dlnd, d_dlnT, d_dabar, d_dzbar, &
-               helm_res, off_table, ierr)   
+               helm_res, off_table, ierr)
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, abar, zbar
          real(dp), intent(in) :: Rho, logRho, T, logT
@@ -122,17 +122,17 @@
          integer, intent(out) :: ierr
 
          logical, parameter :: clip_to_table_boundaries = .true.
-         
+
          logical :: include_elec_pos, include_radiation
-         
+
          include 'formats'
 
          ierr = 0
          off_table = .false.
-         
+
          include_elec_pos = rq% include_elec_pos
          include_radiation = rq% include_radiation
-         
+
          call helmeos2( &
             T, logT, Rho, logRho, abar, zbar, &
             rq% coulomb_temp_cut_HELM, rq% coulomb_den_cut_HELM, &
@@ -163,7 +163,7 @@
          if (ierr /= 0) then
             if (dbg) write(*,*) 'failed in do_convert_helm_results'
             return
-         end if         
+         end if
 
       end subroutine Get_HELMEOS_Results
 
@@ -184,12 +184,12 @@
 
          real(dp) :: mu, P, Pgas, energy, entropy, free_e, dse, dpe, dsp
          integer :: j, k, ci
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
-         if (.false. .and. eos_test_partials) then   
+
+         if (.false. .and. eos_test_partials) then
             eos_test_partials_val = helm_res(h_etot)
             eos_test_partials_dval_dx = helm_res(h_dea)
             write(*,1) 'logRho', log10(Rho)
@@ -206,12 +206,12 @@
             write(*,1) 'detot_dzbar', helm_res(h_dez)
             call mesa_error(__FILE__,__LINE__,'do_convert_helm_results')
          end if
-         
+
          energy = helm_res(h_etot)
          entropy = helm_res(h_stot)
          P = helm_res(h_ptot)
          Pgas = helm_res(h_pgas)
-         
+
          res(i_lnE) = log(energy)
          res(i_lnS) = log(entropy)
          res(i_lnPgas) = log(Pgas)
@@ -231,11 +231,11 @@
          res(i_gamma1) = helm_res(h_gam1)
          res(i_gamma3) = helm_res(h_gam3)
          res(i_eta) = helm_res(h_etaele)
-         
+
          d_dlnRho_c_T(i_lnS) = helm_res(h_dsd)*Rho/entropy
          d_dlnRho_c_T(i_lnPgas) = helm_res(h_dpgasd)*Rho/Pgas
          d_dlnRho_c_T(i_lnE) = helm_res(h_ded)*Rho/energy
-         
+
          d_dlnRho_c_T(i_grad_ad) = helm_res(h_dnabdd)*Rho
          d_dlnRho_c_T(i_chiRho) = helm_res(h_dchiddd)*Rho
          d_dlnRho_c_T(i_chiT) = helm_res(h_dchitdd)*Rho
@@ -249,11 +249,11 @@
          d_dlnRho_c_T(i_gamma1) = helm_res(h_dgam1dd)*Rho
          d_dlnRho_c_T(i_gamma3) = helm_res(h_dgam3dd)*Rho
          d_dlnRho_c_T(i_eta) = helm_res(h_detad)*Rho
-           
+
          d_dlnT_c_Rho(i_lnS) = helm_res(h_dst)*T/entropy
          d_dlnT_c_Rho(i_lnPgas) = helm_res(h_dpgast)*T/Pgas
          d_dlnT_c_Rho(i_lnE) = helm_res(h_det)*T/energy
-         
+
          d_dlnT_c_Rho(i_grad_ad) = helm_res(h_dnabdt)*T
          d_dlnT_c_Rho(i_chiRho) = helm_res(h_dchiddt)*T
          d_dlnT_c_Rho(i_chiT) = helm_res(h_dchitdt)*T
@@ -269,8 +269,8 @@
          d_dlnT_c_Rho(i_eta) = helm_res(h_detat)*T
 
          d_dlnRho_c_T(i_lnE) = helm_res(h_ded)*Rho/energy
-         d_dlnT_c_Rho(i_lnE) = helm_res(h_det)*T/energy         
-         
+         d_dlnT_c_Rho(i_lnE) = helm_res(h_det)*T/energy
+
          d_dlnRho_c_T(i_lnS) = helm_res(h_dsd)*Rho/entropy
          d_dlnT_c_Rho(i_lnS) = helm_res(h_dst)*T/entropy
 
@@ -281,7 +281,7 @@
          d_dabar_c_TRho(i_lnS) = helm_res(h_dsa)/entropy
          d_dabar_c_TRho(i_lnPgas) = helm_res(h_dpgasa)/Pgas
          d_dabar_c_TRho(i_lnE) = helm_res(h_dea)/energy
-         
+
          d_dabar_c_TRho(i_grad_ad) = helm_res(h_dnabda)
          d_dabar_c_TRho(i_chiRho) = helm_res(h_dchidda)
          d_dabar_c_TRho(i_chiT) = helm_res(h_dchitda)
@@ -299,7 +299,7 @@
          d_dzbar_c_TRho(i_lnS) = helm_res(h_dsz)/entropy
          d_dzbar_c_TRho(i_lnPgas) = helm_res(h_dpgasz)/Pgas
          d_dzbar_c_TRho(i_lnE) = helm_res(h_dez)/energy
-         
+
          d_dzbar_c_TRho(i_grad_ad) = helm_res(h_dnabdz)
          d_dzbar_c_TRho(i_chiRho) = helm_res(h_dchiddz)
          d_dzbar_c_TRho(i_chiT) = helm_res(h_dchitdz)
@@ -314,10 +314,10 @@
          d_dzbar_c_TRho(i_gamma3) = helm_res(h_dgam3dz)
          d_dzbar_c_TRho(i_eta) = helm_res(h_detaz)
 
-         
+
       end subroutine do_convert_helm_results
 
-      
+
       subroutine Get_HELM_Results( &
                abar, zbar, arho, alogrho, atemp, alogtemp, &
                coulomb_temp_cut, coulomb_den_cut, &
@@ -329,7 +329,7 @@
          type (EoS_General_Info), pointer :: rq
          real(dp), intent(in) :: abar, zbar
          real(dp), intent(in) :: arho, alogrho
-         real(dp), intent(in) :: atemp, alogtemp 
+         real(dp), intent(in) :: atemp, alogtemp
          real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
          logical, intent(in) :: include_radiation, include_elec_pos
          real(dp), intent(inout) :: res(:) ! (num_helm_results)
@@ -337,11 +337,11 @@
          integer, intent(out) :: ierr ! 0 means AOK.
 
          real(dp) :: Rho, logRho, T, logT, dse, dpe, dsp
-         
+
          logical, parameter :: clip_to_table_boundaries = .true.
-         
+
          include 'formats'
-         
+
          ierr = 0
          off_table = .false.
 
@@ -351,21 +351,21 @@
             ierr = -2; return
          end if
          if (atemp == arg_not_provided) T = exp10(logT)
-         
+
          Rho = arho; logrho = alogrho
          if (arho == arg_not_provided .and. alogrho == arg_not_provided) then
             ierr = -3; return
          end if
          if (arho == arg_not_provided) Rho = exp10(logRho)
-         
+
          call helmeos2(T, logT, Rho, logRho, abar, zbar, &
                   coulomb_temp_cut, coulomb_den_cut, &
                   res, clip_to_table_boundaries, include_radiation, &
                   include_elec_pos, off_table, ierr)
          res(h_valid) = 1
-         
+
       end subroutine Get_HELM_Results
 
 
       end module eos_HELM_eval
-      
+

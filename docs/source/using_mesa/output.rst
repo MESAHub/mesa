@@ -12,8 +12,8 @@ are text-based and can fed into your favorite plotting program. You
 should visit the
 `Add-ons <http://cococubed.com/mesa_market/add-ons.html>`__ section
 of the MESA forum and see if someone has contributed code in your
-language of choice. (There are reasonably mature routines for python,
-IDL, ruby and Mathematica.) An example of python plotting is shown
+language of choice. (There are reasonably mature routines for Python,
+IDL, ruby and Mathematica.) An example of Python plotting is shown
 `later on this page <#python>`__.
 
 In the LOGS directory, you'll find the following files.
@@ -104,7 +104,7 @@ the `numpy <http://www.numpy.org>`__ and
 While you may want to write your own tools to read and analyze the
 output of your MESA calculations, `many already
 exist <http://cococubed.com/mesa_market/add-ons.html>`__. In that
-vein, we introduce a simple module for use in python scripts and
+vein, we introduce a simple module for use in Python scripts and
 interactive sessions called ``mesa_reader``, which only requires
 `numpy <http://www.numpy.org>`__.
 
@@ -116,17 +116,30 @@ to read in the contents of a typical ``LOGS`` directory. These three
 classes are called ``MesaData``, which corresponds to data in profiles
 or history files, ``MesaProfileIndex``, which corresponds to data found
 in ``profiles.index``, and ``MesaLogDir``, which ties together data in
-profiles, the profile index, and the history file.
+profiles, the profile index, and the history file. 
+Full documentation for how MESA Reader is installed and how to use the
+three classes can be found at the project's `GitHub
+repository <https://github.com/wmwolf/py_mesa_reader>`__ and
+accompanying
+`documentation <https://wmwolf.github.io/py_mesa_reader>`__. 
+
+How to install MESA Reader?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The most stable release of `mesa_reader` can be installed
+through 
+`pip <https://pip.pypa.io/en/stable>`__
+via
+
+.. code:: console
+
+   pip install mesa_reader
+
 
 Examples
 ~~~~~~~~
 
-Full documentation for how MESA Reader is installed and how to use the
-three classes can be found at the project's `Github
-repository <https://github.com/wmwolf/py_mesa_reader>`__ and
-accompanying
-`documentation <https://wmwolf.github.io/py_mesa_reader>`__. Below, we
-show some simple example use cases of MESA Reader.
+Below, we show some simple example use cases of MESA Reader.
 
 The Basics
 ^^^^^^^^^^

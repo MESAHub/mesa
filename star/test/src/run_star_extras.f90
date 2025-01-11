@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -20,18 +20,18 @@
 !
 ! ***********************************************************************
 
-      module run_star_extras
+module run_star_extras
 
-      use star_lib
-      use star_def
-      use const_def
-      use math_lib
+   use star_lib
+   use star_def
+   use const_def
+   use math_lib
 
-      implicit none
+   implicit none
 
-      ! these routines are called by the standard run_star
-      contains
+   ! these routines are called by the standard run_star
+contains
 
-      include '../../job/standard_run_star_extras.inc'
+   include '../../job/standard_run_star_extras.inc'
 
-      end module run_star_extras
+end module run_star_extras

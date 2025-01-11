@@ -64,7 +64,6 @@ contains
       use utils_lib, only : integer_dict_create_hash, integer_dict_free, mkdir, folder_exists
       use chem_def, only : category_name
       use math_lib, only : math_backend
-      use rates_def, only : rates_reaction_id_max
       use net_def, only : Net_General_Info, get_net_ptr
       type (star_info), pointer :: s
 
@@ -477,7 +476,6 @@ contains
 
       subroutine do_extra_col(pass, j, col_offset)
          integer, intent(in) :: pass, j, col_offset
-         integer :: int_val
          include 'formats'
          if (pass == 1) then
             if (write_flag) write(io, fmt = int_fmt, advance = 'no') j + col_offset
@@ -815,7 +813,7 @@ contains
          use num_lib, only : find0
          integer, intent(in) :: k
          integer :: bv, bv0, bv1
-         real(dp) :: eps, eps0, eps1, d0, d1, q0, q1
+         real(dp) :: eps, eps0, eps1, d0, d1
          include 'formats'
          if (k <= 0) then
             val = -1; return
@@ -1007,7 +1005,7 @@ contains
          integer, intent(in) :: c
          integer :: i, ii, k, int_val
          logical :: is_int_val
-         real(dp) :: val, val1, Ledd, power_photo, frac
+         real(dp) :: val, frac
          int_val = 0; val = 0; is_int_val = .false.
 
          if (c > burn_relr_offset) then
@@ -1188,8 +1186,7 @@ contains
       integer, intent(out) :: ierr
 
       integer :: k, i, min_k, k2
-      real(dp) :: Ledd, L_rad, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, &
-         min_gamma1, deltam
+      real(dp) :: Ledd, phi_Joss, power_photo, tmp, r, m_div_h, w_div_w_Kep, deltam
       real(dp), pointer :: v(:)
       logical :: v_flag
 
@@ -2231,11 +2228,16 @@ contains
          case(h_log_Lnuc)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
+         case(h_Lnuc)
+            power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
+            val = s% power_nuc_burn - power_photo
          case(h_log_Lnuc_ergs_s)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz))
             val = safe_log10(s% power_nuc_burn * Lsun - power_photo)
          case(h_log_power_nuc_burn)
             val = safe_log10(s% power_nuc_burn)
+         case(h_power_nuc_burn)
+            val = s% power_nuc_burn
          case(h_log_Lnuc_sub_log_L)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
@@ -2860,7 +2862,7 @@ contains
 
             ! following items correspond to names on terminal output lines
 
-         case(h_lg_Lnuc)
+         case(h_lg_Lnuc_tot)! _tot indicates the inclusion of photodisintegations
             val = safe_log10(s% power_nuc_burn)
 
          case(h_H_rich)
@@ -2951,7 +2953,6 @@ contains
 
       real(dp) function max_eps_nuc_log_x(j)
          integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
          integer :: k
          max_eps_nuc_log_x = 0
          if (j == 0) return
@@ -2963,7 +2964,6 @@ contains
 
       real(dp) function cz_top_max_log_x(j)
          integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
          integer :: k
          cz_top_max_log_x = 0
          if (s% largest_conv_mixing_region == 0) return
@@ -2975,7 +2975,6 @@ contains
 
       real(dp) function cz_max_log_x(j)
          integer, intent(in) :: j
-         real(dp) :: sum_x, sum_dq
          integer :: k
          cz_max_log_x = 0
          if (s% largest_conv_mixing_region == 0) return
@@ -3022,7 +3021,7 @@ contains
       real(dp), intent(in) :: nu_factor
 
       real(dp) :: integral, cs2, r2, n2, sl2, omega2, &
-         L2, kr2, dr, r0_outer, r0_inner, sl2_next, xh1
+         L2, kr2, dr, r0_outer, r0_inner, xh1
       integer :: k, k1, k_inner, k_outer, h1
 
       logical :: dbg
@@ -3282,10 +3281,8 @@ contains
       real(dp), intent(inout) :: values(:)
       logical, intent(out) :: failed_to_find_value(:)
 
-      integer :: i, c, int_val, ierr, n, t, j, iounit
-      real(dp) :: val, epsnuc_out(12), v_surf, csound_surf, envelope_fraction_left
-      logical :: is_int_val, special_case
-      character (len = strlen) :: buffer, string
+      integer :: i, c, ierr
+      real(dp) :: epsnuc_out(12), v_surf, csound_surf, envelope_fraction_left
 
       include 'formats'
       ierr = 0

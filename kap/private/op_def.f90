@@ -22,14 +22,14 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
 
 MODULE op_def
    IMPLICIT NONE
 
    integer, parameter :: nptot = 10000
    integer, parameter :: nrad = 17
-   integer, parameter :: ipe = 17      
+   integer, parameter :: ipe = 17
 
    integer,dimension(140:320),parameter :: JS=(/14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 18, 19, 22, 23,&
    26, 27, 30, 31, 34, 34, 34, 34, 36, 36, 36, 36, 36, 36, 38, 38,&
@@ -58,7 +58,7 @@ MODULE op_def
    112,112,112,112,112,114,114,114,114,114,114,115,116,116,116,116,&
    116,116,116,118,118/)
 
-!        
+!
    INTEGER,DIMENSION(17),parameter :: kz=(/1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28/)
    character(len=2), dimension(17),parameter :: name=(/'H ','He','C ','N ','O ','Ne','Na',&
                                        'Mg','Al','Si','S ','Ar','Ca','Cr','Mn',&
@@ -66,10 +66,10 @@ MODULE op_def
    REAL,DIMENSION(17),PARAMETER :: AMASS=(/1.0080,4.0026,12.0111,14.0067,15.9994,20.179,&
                                  22.9898,24.305,26.9815,28.086,32.06,39.948,  &
                                  40.08,51.996,54.9380,55.847,58.71/)
-   
+
    integer,save :: ite1, ite2, ite3, jne3 , ntotp, nc, nf
-   integer,dimension(91),save :: jn1, jn2 
-   integer,dimension(17),save :: int    
+   integer,dimension(91),save :: jn1, jn2
+   integer,dimension(17),save :: int
    real,save :: umin, umax
    real,dimension(17,91,25),save :: epatom, oplnck
    integer,dimension(17,91,25),save :: ne1p, ne2p,np,kp1,kp2,kp3,npp
@@ -78,5 +78,5 @@ MODULE op_def
    INTEGER,allocatable,DIMENSION(:),save :: nx
 
    integer, parameter :: op_cache_version = 1
-   
+
 END module op_def

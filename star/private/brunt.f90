@@ -37,7 +37,6 @@
       logical, parameter :: dbg = .false.
 
 
-
       contains
 
 
@@ -50,7 +49,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
-         integer :: nz, k, i
+         integer :: nz, k
          real(dp), allocatable, dimension(:) :: smoothing_array
 
          include 'formats'
@@ -207,8 +206,7 @@
 
 
          real(dp), allocatable, dimension(:) :: T_face, rho_face, chiT_face, chiRho_face
-         real(dp) :: brunt_B
-         integer :: nz, species, k, i, op_err
+         integer :: nz, species, k, op_err
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -248,7 +246,7 @@
 !$OMP END PARALLEL DO
 
       end subroutine do_brunt_B_MHM_form
-      
+
 
       subroutine get_brunt_B(s, species, nz, k, T_face, rho_face, chiT_face, chiRho_face, ierr)
          use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
@@ -345,7 +343,6 @@
                write(*,2) 'lnP1', k, lnP1
                write(*,2) 'lnP2', k, lnP2
                write(*,'(A)')
-               !call mesa_error(__FILE__,__LINE__,'do_brunt_B_MHM_form')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 's% brunt_B(k)', k, s% brunt_B(k)
@@ -357,4 +354,3 @@
 
 
       end module brunt
-

@@ -5,24 +5,24 @@
      &            lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol)
       use mtx_lib,only:find_loc_in_sparse
       implicit none
-      !implicit real*8 (a-h,o-z)
+      !implicit real(dp) (a-h,o-z)
       interface
 #include "mtx_decsolc.dek"
 #include "mtx_decsolcs.dek"
       end interface
+      integer :: m1, m2, nm1, lde1, ijob
+      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag
+      integer :: nzmax, isparse, lcd, lrd, lid
+      integer :: ierr, ip2(nm1), n, ldjac, ldmas, mlmas, mumas
       integer :: ia(*), ja(nzmax)  ! ia(n+1) when used; ia(2) when not.
       double precision :: sparse_jac(nzmax)
       double precision :: sar(nzmax), sai(nzmax)
-      complex*16, intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+      complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
       real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
       double precision :: fjac(ldjac,n), fmas(ldmas,nm1)
       double precision :: e2r(lde1,nm1), e2i(lde1,nm1)
       double precision :: br(n), bi(n), alphn, betan
-      integer :: ierr, ip2(nm1), n, ldjac, ldmas, mlmas, mumas
-      integer :: m1, m2, nm1, lde1, ijob
-      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag
-      integer :: nzmax, isparse, lcd, lrd, lid
       
       ! LOCALS
       integer :: i, j, k, jm1, mm, imle, ib, hint
@@ -30,11 +30,11 @@
      
       ierr = 0
       goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    1  continue
-c ---  b=identity, jacobian a full matrix
+! ---  b=identity, jacobian a full matrix
       do j=1,n
          do i=1,n
             e2r(i,j)=-fjac(i,j)
@@ -45,11 +45,11 @@ c ---  b=identity, jacobian a full matrix
       end do
       call decsolc(0,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    8  continue
-c ---  b=identity, jacobian a sparse matrix
+! ---  b=identity, jacobian a sparse matrix
       do j=1,nzmax
          sar(j) = -sparse_jac(j)
       end do
@@ -66,11 +66,11 @@ c ---  b=identity, jacobian a sparse matrix
       end do
       call decsolcs(0,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   11  continue
-c ---  b=identity, jacobian a full matrix, second order
+! ---  b=identity, jacobian a full matrix, second order
       do j=1,nm1
          jm1=j+m1
          do i=1,nm1
@@ -99,11 +99,11 @@ c ---  b=identity, jacobian a full matrix, second order
       end do
       call decsolc(0,nm1,lde1,e2r,e2i,nm1,nm1,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    2  continue
-c ---  b=identity, jacobian a banded matrix
+! ---  b=identity, jacobian a banded matrix
       do j=1,n
          do i=1,mbjac
             imle=i+mle
@@ -115,11 +115,11 @@ c ---  b=identity, jacobian a banded matrix
       end do
       call decsolc(0,n,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   12  continue
-c ---  b=identity, jacobian a banded matrix, second order
+! ---  b=identity, jacobian a banded matrix, second order
       do j=1,nm1
          jm1=j+m1
          do i=1,mbjac
@@ -149,11 +149,11 @@ c ---  b=identity, jacobian a banded matrix, second order
       end do
       call decsolc(0,nm1,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    3  continue
-c ---  b is a banded matrix, jacobian a full matrix
+! ---  b is a banded matrix, jacobian a full matrix
       do  j=1,n
          do  i=1,n
             e2r(i,j)=-fjac(i,j)
@@ -169,11 +169,11 @@ c ---  b is a banded matrix, jacobian a full matrix
       end do
       call decsolc(0,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    9  continue
-c ---  b is a banded matrix, jacobian a sparse matrix
+! ---  b is a banded matrix, jacobian a sparse matrix
       do j=1,nzmax
          sar(j) = -sparse_jac(j)
       end do
@@ -200,11 +200,11 @@ c ---  b is a banded matrix, jacobian a sparse matrix
       call decsolcs(0,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       !write(*,*) 'decomc back decsolcs'
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   13  continue
-c ---  b is a banded matrix, jacobian a full matrix, second order
+! ---  b is a banded matrix, jacobian a full matrix, second order
       do j=1,nm1
          jm1=j+m1
          do i=1,nm1
@@ -218,11 +218,11 @@ c ---  b is a banded matrix, jacobian a full matrix, second order
          end do
       end do
       goto 45
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    4  continue
-c ---  b is a banded matrix, jacobian a banded matrix
+! ---  b is a banded matrix, jacobian a banded matrix
       do j=1,n
          do i=1,mbjac
             imle=i+mle
@@ -238,11 +238,11 @@ c ---  b is a banded matrix, jacobian a banded matrix
       end do
       call decsolc(0,n,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   14  continue
-c ---  b is a banded matrix, jacobian a banded matrix, second order
+! ---  b is a banded matrix, jacobian a banded matrix, second order
       do j=1,nm1
          jm1=j+m1
          do i=1,mbjac
@@ -257,11 +257,11 @@ c ---  b is a banded matrix, jacobian a banded matrix, second order
          end do
       end do
       goto 46
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    5  continue
-c ---  b is a full matrix, jacobian a full matrix
+! ---  b is a full matrix, jacobian a full matrix
       do j=1,n
          do i=1,n
             bb=fmas(i,j)
@@ -271,11 +271,11 @@ c ---  b is a full matrix, jacobian a full matrix
       end do
       call decsolc(0,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   15  continue
-c ---  b is a full matrix, jacobian a full matrix, second order
+! ---  b is a full matrix, jacobian a full matrix, second order
       do j=1,nm1
          jm1=j+m1
          do i=1,nm1
@@ -284,22 +284,22 @@ c ---  b is a full matrix, jacobian a full matrix, second order
          end do
       end do
       goto 45
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    6  continue
-c ---  b is a full matrix, jacobian a banded matrix
-c ---  this option is not provided
+! ---  b is a full matrix, jacobian a banded matrix
+! ---  this option is not provided
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   55  continue
        write(*,*) 'decomc: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! decomc
       end subroutine decomc
-c
-c ***********************************************************
+!
+! ***********************************************************
 
 
 
@@ -313,12 +313,16 @@ c ***********************************************************
 #include "mtx_decsolc.dek"
 #include "mtx_decsolcs.dek"
       end interface
+      integer :: m1, m2, nm1, lde1, ijob
+      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag
+      integer :: nzmax, isparse, lcd, lrd, lid
+      integer :: ierr, ip2(nm1), n, ldjac, ldmas, mlmas, mumas
       integer :: ia(:) ! (n+1)
       integer :: ja(:) ! (nzmax)
       real(dp) :: sparse_jac(:) ! (nzmax)
       real(dp) :: sar(:) ! (nzmax)
       real(dp) :: sai(:) ! (nzmax)
-      complex*16, intent(inout), pointer :: cpar_decsol(:) ! (lcd)
+      complex(dp), intent(inout), pointer :: cpar_decsol(:) ! (lcd)
       real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
       
@@ -328,109 +332,105 @@ c ***********************************************************
       
       double precision :: br(n), bi(n), alphn, betan
       
-      integer :: ierr, ip2(nm1), n, ldjac, ldmas, mlmas, mumas
-      integer :: m1, m2, nm1, lde1, ijob
-      integer :: mle, mue, mbjac, mbb, mdiag, mdiff, mbdiag
-      integer :: nzmax, isparse, lcd, lrd, lid
 
 
       goto (1,2,3,4,5,6,55,8,9,55,11,12,13,14,15), ijob
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    1  continue
-c ---  b=identity, jacobian a full matrix
+! ---  b=identity, jacobian a full matrix
       call decsolc(2,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    8  continue
-c ---  b=identity, jacobian a sparse matrix
+! ---  b=identity, jacobian a sparse matrix
       call decsolcs(2,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   11  continue
-c ---  b=identity, jacobian a full matrix, second order
+! ---  b=identity, jacobian a full matrix, second order
   45  continue
       call decsolc(2,nm1,lde1,e2r,e2i,nm1,nm1,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    2  continue
-c ---  b=identity, jacobian a banded matrix
+! ---  b=identity, jacobian a banded matrix
       call decsolc(2,n,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   12  continue
-c ---  b=identity, jacobian a banded matrix, second order
+! ---  b=identity, jacobian a banded matrix, second order
   46  continue
       call decsolc(2,nm1,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    3  continue
-c ---  b is a banded matrix, jacobian a full matrix
+! ---  b is a banded matrix, jacobian a full matrix
       call decsolc(2,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    9  continue
-c ---  b is a banded matrix, jacobian a sparse matrix
+! ---  b is a banded matrix, jacobian a sparse matrix
       call decsolcs(2,n,nzmax,ia,ja,sar,sai,br,bi,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   13  continue
-c ---  b is a banded matrix, jacobian a full matrix, second order
+! ---  b is a banded matrix, jacobian a full matrix, second order
       goto 45
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    4  continue
-c ---  b is a banded matrix, jacobian a banded matrix
+! ---  b is a banded matrix, jacobian a banded matrix
       call decsolc(2,n,lde1,e2r,e2i,mle,mue,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   14  continue
-c ---  b is a banded matrix, jacobian a banded matrix, second order
+! ---  b is a banded matrix, jacobian a banded matrix, second order
       goto 46
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    5  continue
-c ---  b is a full matrix, jacobian a full matrix
+! ---  b is a full matrix, jacobian a full matrix
       call decsolc(2,n,lde1,e2r,e2i,n,n,br,bi,ip2,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ierr)
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   15  continue
-c ---  b is a full matrix, jacobian a full matrix, second order
+! ---  b is a full matrix, jacobian a full matrix, second order
       goto 45
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
    6  continue
-c ---  b is a full matrix, jacobian a banded matrix
-c ---  this option is not provided
+! ---  b is a full matrix, jacobian a banded matrix
+! ---  this option is not provided
       return
-c
-c -----------------------------------------------------------
-c
+!
+! -----------------------------------------------------------
+!
   55  continue
        write(*,*) 'decsolc_done: invalid ijob', ijob
        call mesa_error(__FILE__,__LINE__) ! decsolc_done
       end subroutine decsolc_done
-c
-c ***********************************************************
+!
+! ***********************************************************

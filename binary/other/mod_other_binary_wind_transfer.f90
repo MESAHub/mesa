@@ -22,18 +22,18 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module mod_other_binary_wind_transfer
 
       ! NOTE: remember to set true:
       ! use_other_binary_wind_transfer = .true.
-      
+
 ! you can add your own routine for use instead of the default ones
 
 ! here's how to do it.
 
 ! Before doing anything, let's make sure your working copy of run_binary_extras works.
-! edit the extras_binary_controls routine 
+! edit the extras_binary_controls routine
 !      subroutine extras_binary_controls(binary_id, ierr)
 !         integer :: binary_id
 !         integer, intent(out) :: ierr
@@ -94,24 +94,24 @@
 !            write(*,*) 'failed in binary_ptr'
 !            return
 !         end if
-!         
+!
 !         ! Dust radius based on Hofner 2007, ASPC, 378, 145
 !         r_dust = 0.5d0 * b% r(s_i) * (b% s_donor % Teff / 1500d0)**2.5d0
 !         x = r_dust / b% rl(s_i)
-!         
+!
 !         ! constants from Abate et al. eq. 5
 !         q2 = ( b% m(3-s_i)/b% m(s_i) )**2d0
 !         c1 = -0.284d0
 !         c2 = 0.918d0
 !         c3 = -0.234d0
-!         
+!
 !         ! WRLOF transfer fraction from Abate et al. eq. 9
 !         b% wind_xfer_fraction(s_i) = 25d0 / 9d0 * q2 * (c1*x**2 + c2*x + c3)
-!         
+!
 !         b% wind_xfer_fraction(s_i) = min(b% wind_xfer_fraction(s_i), 5d-1)
-!       
+!
 !      end subroutine WRLOF_wind_transfer
-         
+
       ! NOTE: if you'd like to have some inlist controls for your routine,
       ! you can use the x_ctrl array of real(dp) variables that is in &controls
       ! e.g., in the &controls inlist, you can set
@@ -129,22 +129,22 @@
       !         end if
       !
       ! To get the binary pointer using the provided binary_id, add these lines.
-      !     
+      !
       !      type (binary_info), pointer :: b
       !      call binary_ptr(binary_id, b, ierr)
       !      if (ierr /= 0) then ! failure in  binary_ptr
       !         return
       !      end if
-      ! 
+      !
       ! for integer control values, you can use x_integer_ctrl
       ! for logical control values, you can use x_logical_ctrl
 
 
       implicit none
-      
-            
+
+
       contains
-      
+
       subroutine null_other_binary_wind_transfer(binary_id, s_i, ierr)
          use binary_def, only : binary_info, binary_ptr
          integer, intent(in) :: binary_id, s_i
@@ -156,7 +156,7 @@
             write(*,*) 'failed in binary_ptr'
             return
          end if
-         b% wind_xfer_fraction(s_i) = 0 
+         b% wind_xfer_fraction(s_i) = 0
       end subroutine null_other_binary_wind_transfer
 
       end module mod_other_binary_wind_transfer

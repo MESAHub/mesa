@@ -25,11 +25,11 @@
 ! ***********************************************************************
 
       module star_data_lib
-      
+
       implicit none
 
-      contains           
-            
+      contains
+
       subroutine star_data_init(mesa_dir_init,ierr)
          use star_data_def, only: do_star_def_init
          character (len=*), intent(in) :: mesa_dir_init

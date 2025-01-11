@@ -120,7 +120,7 @@ c declare variables in common block, by default: real (a-h, o-z), integer (i-n)
       include 'formats'
 
 c
-c  i=temperature inex
+c  i=temperature index
 c  j=density index
 c  k=frequency index
 c  n=element index

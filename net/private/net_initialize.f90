@@ -31,7 +31,7 @@
 
       use net_approx21, only : num_reactions_func => num_reactions, &
                                num_mesa_reactions_func => num_mesa_reactions
-      
+
       implicit none
 
       integer, parameter :: max_num_special_case_reactants = 5
@@ -49,7 +49,7 @@
          use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
 
          type(net_info) :: n
-            
+
          integer :: num_isos, num_reactions
 
          num_reactions = num_reactions_func(n% g% add_co56_to_approx21)
@@ -58,7 +58,7 @@
          else
             num_isos = 21
          end if
-         
+
          if(.not.allocated(n% dfdy)) allocate(n% dfdy(num_isos,num_isos))
          if(.not.allocated(n% dratdumdy1)) allocate(n% dratdumdy1(num_reactions))
          if(.not.allocated(n% dratdumdy2)) allocate(n% dratdumdy2(num_reactions))
@@ -79,17 +79,17 @@
             call fill_with_NaNs(n% dfdt)
             call fill_with_NaNs(n% dfdRho)
          end if
-         
+
       end subroutine set_ptrs_for_approx21
 
-         
+
       subroutine setup_net_info(n)
          use chem_def
          use utils_lib, only: fill_with_NaNs, fill_with_NaNs_2D
          type (Net_Info) :: n
-         
+
          integer :: num_reactions, num_isos, num_wk_reactions
-         
+
          num_isos = n% g% num_isos
          num_wk_reactions = n% g% num_wk_reactions
          if (n% g% doing_approx21) then
@@ -97,13 +97,13 @@
          else
             num_reactions = n% g% num_reactions
          end if
-         
+
          if(.not.allocated(n% eps_nuc_categories)) allocate(n% eps_nuc_categories(num_categories))
-         
+
          if(.not.allocated(n% rate_screened)) allocate(n% rate_screened(num_reactions))
          if(.not.allocated(n% rate_screened_dT)) allocate(n% rate_screened_dT(num_reactions))
          if(.not.allocated(n% rate_screened_dRho)) allocate(n% rate_screened_dRho(num_reactions))
-         
+
          if(.not.allocated(n% rate_raw)) allocate(n% rate_raw(num_reactions))
          if(.not.allocated(n% rate_raw_dT)) allocate(n% rate_raw_dT(num_reactions))
          if(.not.allocated(n% rate_raw_dRho)) allocate(n% rate_raw_dRho(num_reactions))
@@ -119,7 +119,7 @@
          if(.not.allocated(n% d_dxdt_dT)) allocate(n% d_dxdt_dT(num_isos))
          if(.not.allocated(n% dydt)) allocate(n% dydt(num_rvs, num_isos))
          if(.not.allocated(n% d_dxdt_dx)) allocate(n% d_dxdt_dx(num_isos, num_isos))
-         
+
          if(.not.allocated(n% d_eps_nuc_dy)) allocate(n% d_eps_nuc_dy(num_isos))
          if(.not.allocated(n% d_dydt_dy)) allocate(n% d_dydt_dy(num_isos,num_isos))
 
@@ -175,24 +175,24 @@
 
 
       end subroutine setup_net_info
-      
+
 
       subroutine alloc_net_general_info(handle, cache_suffix, ierr)
          use rates_def, only: extended_screening
          use rates_lib, only: make_rate_tables
          use chem_def, only: chem_isos
-         
+
          integer, intent(in) :: handle
          character (len=*), intent(in) :: cache_suffix
          integer, intent(out) :: ierr
-         
+
          type (Net_Info) :: n
          integer :: ios, status, lwork, num_reactions, &
             num_isos, num_wk_reactions, i, iwork
          type (Net_General_Info), pointer  :: g
-                  
+
          include 'formats'
-         
+
          ierr = 0
 
          call get_net_ptr(handle, g, ierr)
@@ -202,15 +202,15 @@
 
          n% reaction_Qs => std_reaction_Qs
          n% reaction_neuQs => std_reaction_neuQs
-                  
+
          num_reactions = g% num_reactions
          num_isos = g% num_isos
          num_wk_reactions = g% num_wk_reactions
 
-         call setup_net_info(n) 
-         
-         g% cache_suffix = trim(cache_suffix)         
-         
+         call setup_net_info(n)
+
+         g% cache_suffix = trim(cache_suffix)
+
          call make_rate_tables( &
             g% num_reactions, g% cache_suffix, g% reaction_id,  &
             g% rate_table, g% rattab_f1, nrattab, g% ttab, g% logttab, ierr)
@@ -218,17 +218,17 @@
             write(*,*) 'alloc_net_general_info failed in call on make_rate_tables'
             return
          end if
-         
+
          call make_screening_tables(n, ierr)
          if (ierr /= 0) then
             write(*,*) 'alloc_net_general_info failed in make_screening_tables'
             return
          end if
-         
-         
+
+
       end subroutine alloc_net_general_info
-      
-         
+
+
       subroutine set_reaction_max_Z(g)
          type (Net_General_Info), pointer  :: g
          integer :: i, ir, max_Z, max_Z_plus_N
@@ -247,9 +247,9 @@
             g% reaction_max_Z_plus_N_for_max_Z(i) = max_Z_plus_N
             !write(*,3) trim(reaction_name(ir)), max_Z, max_Z_plus_N
          end do
-         
+
          contains
-         
+
          subroutine update_max_Z(iso)
             use chem_def, only: chem_isos
             integer, intent(in) :: iso
@@ -264,11 +264,11 @@
             else if (Z_plus_N > max_Z_plus_N) then
                max_Z_plus_N = Z_plus_N
             end if
-         end subroutine update_max_Z         
-         
-      end subroutine set_reaction_max_Z         
-      
-            
+         end subroutine update_max_Z
+
+      end subroutine set_reaction_max_Z
+
+
       recursive subroutine do_read_net_file(net_filename, handle, ierr)
          use utils_def
          use utils_lib
@@ -277,18 +277,18 @@
          character (len=*), intent(in) :: net_filename
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
-         
+
          integer :: iounit, n, i, j, k, t, id, h1, he4, neut
          character (len=256) :: buffer, string, filename
          logical, parameter :: dbg = .false.
          type (Net_General_Info), pointer  :: g
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (len_trim(g% net_filename) == 0) g% net_filename = trim(net_filename)
-         
+
          ! first look in local directory
          filename = trim(net_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -296,7 +296,7 @@
             filename = 'nets/' // trim(net_filename)
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-            if (ierr /= 0) then ! look in global nets directory           
+            if (ierr /= 0) then ! look in global nets directory
                filename = trim(net_dir) // '/nets/' // trim(net_filename)
                ierr = 0
                open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -306,7 +306,7 @@
                end if
             end if
          end if
-         
+
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'read_net_file <' // trim(filename) // '>'
@@ -316,61 +316,61 @@
 
          n = 0
          i = 0
-         
+
          do
             t = token(iounit, n, i, buffer, string)
             select case(t)
                case(name_token)
                   select case(string)
-                  
+
                      case ('add_isos')
                         call do_isos(.true., ierr)
                         if (ierr /= 0) return
-                  
+
                      case ('add_iso')
                         call do_isos(.true., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('remove_isos')
                         call do_isos(.false., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('remove_iso')
                         call do_isos(.false., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('add_reaction')
                         call do_reactions(.true., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('add_reactions')
                         call do_reactions(.true., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('remove_reaction')
                         call do_reactions(.false., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('remove_reactions')
                         call do_reactions(.false., ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('add_iso_and_reactions')
                         call do_basic_reactions_for_isos(ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('add_isos_and_reactions')
                         call do_basic_reactions_for_isos(ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('approx21')
                         call do_approx21(1,ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('approx21_plus_co56')
                         call do_approx21(2,ierr)
                         if (ierr /= 0) return
-                        
+
                      case ('include')
                         t = token(iounit, n, i, buffer, string)
                         if (t /= string_token) then
@@ -378,19 +378,19 @@
                         end if
                         call do_read_net_file(string, handle, ierr)
                         if (ierr /= 0) return
-                        
+
                      case default
                         call error; return
-                        
+
                   end select
                case(eof_token)
                   exit
                case default
                   call error; return
             end select
-            
+
          end do
-         
+
          close(iounit)
 
 
@@ -404,7 +404,7 @@
            k = chem_get_iso_id('al26-2')
 !           if (dbg) write(6,*) k, trim(chem_isos% name(k)), g% net_iso(k)
 
-           if ( (g% net_iso(i) == 1 .and. g% net_iso(j) == 1) .or. & 
+           if ( (g% net_iso(i) == 1 .and. g% net_iso(j) == 1) .or. &
                 (g% net_iso(i) == 1 .and. g% net_iso(k) == 1)) then
             string = 'cannot specify al26 and al26-1 or al26-2'
             call error ; return
@@ -421,17 +421,17 @@
            end if
 
 ! done with network veracity checks
-         
+
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'done read_net_file ' // trim(filename)
             write(*,'(A)')
          end if
-         
-         
+
+
          contains
-         
-         
+
+
          subroutine error
             character (len=256) :: message
             ierr = -1
@@ -439,9 +439,9 @@
                   // ' error somewhere around here <' // trim(string) // &
                   '>.  please check for missing comma or other typo.'
             close(iounit)
-         end subroutine error     
-             
-         
+         end subroutine error
+
+
          subroutine do_approx21(which_case, ierr) ! e.g. approx21(cr56)
             use chem_lib, only: chem_get_iso_id
             use chem_def, only: chem_isos
@@ -469,10 +469,10 @@
                (chem_isos% N(id) - chem_isos% N(ife56)) - &
                (chem_isos% Z(ife56) - chem_isos% Z(id))
             g% doing_approx21 = .true.
-            g% add_co56_to_approx21 = (which_case == 2) 
+            g% add_co56_to_approx21 = (which_case == 2)
          end subroutine do_approx21
-             
-         
+
+
          subroutine do_isos(add_flag, ierr)
             use chem_lib, only: chem_get_element_id
             use chem_lib, only: lookup_ZN
@@ -566,8 +566,8 @@
                               call error; return
                            end if
                         end if
-                     
-                     end if            
+
+                     end if
                   end do
                end if
                t = token(iounit, n, i, buffer, string)
@@ -580,7 +580,7 @@
             end do iso_loop
          end subroutine do_isos
 
-         
+
          subroutine do_reactions(add_flag, ierr)
             use rates_lib, only: rates_reaction_id
             logical, intent(in) :: add_flag
@@ -635,8 +635,8 @@
             end do reaction_loop
             if (cnt > 0) ierr = -1
          end subroutine do_reactions
-         
-         
+
+
          subroutine do_basic_reactions_for_isos(ierr)
             use chem_lib, only: chem_get_element_id
             use chem_lib, only: lookup_ZN
@@ -717,10 +717,10 @@
                   have_next_token = .false.
                end if
             end do iso_loop
-            
+
          end subroutine do_basic_reactions_for_isos
-         
-         
+
+
          subroutine do1_iso(id,Z,A,A1,A2,ierr)
             integer, intent(in) :: id,Z,A,A1,A2
             integer, intent(out) :: ierr
@@ -737,7 +737,7 @@
                   write(*,*) 'failed in add_net_iso for ' // trim(chem_isos% name(id))
                   call error; return
                end if
-            end if            
+            end if
             call do_basic_reactions_for_iso(id, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_basic_reactions_for_iso for ' // &
@@ -745,8 +745,8 @@
                call error; return
             end if
          end subroutine do1_iso
-         
-         
+
+
          subroutine do_basic_reactions_for_iso(id, ierr)
             ! pg X, X gp, ag X, X ag, ap X, X pa, ng X, X gn,
             ! X wk, X wk_minus, X wk_h1, X wk_he4
@@ -755,7 +755,7 @@
             integer :: Z, N, Z2, N2, other_id
             integer :: i, j, k, ir, r_ir
             logical :: matches
-            
+
             include 'formats'
 
             ierr = 0
@@ -797,33 +797,33 @@
                   !write(*,*) 'failed to find reverse for special ' // trim(reaction_name(r_ir))
                end if
                if (r_ir > 0) then
-                  reverse_reaction_id(r_ir) = ir 
+                  reverse_reaction_id(r_ir) = ir
                else if (ir > 0) then
                   !write(*,*) 'failed to find reverse for special ' // trim(reaction_name(ir))
                end if
 
             end do special_loop
-            
+
             Z = chem_isos% Z(id)
             N = chem_isos% N(id)
 
-            if (g% net_iso(ih1) > 0) then              
+            if (g% net_iso(ih1) > 0) then
                other_id = get_iso_id(Z-1, N)
                call add_basic_reaction(other_id, id, 'pg', 'gp', .true., ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                call add_basic_reaction(id, other_id, 'gp', 'pg', .true., r_ir, ierr)
                if (ierr /= 0) return
                if (ir > 0) reverse_reaction_id(ir) = r_ir
-               if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+               if (r_ir > 0) reverse_reaction_id(r_ir) = ir
                other_id = get_iso_id(Z+1, N)
                call add_basic_reaction(id, other_id, 'pg', 'gp', .true., ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                call add_basic_reaction(other_id, id, 'gp', 'pg', .true., r_ir, ierr)
-               if (ierr /= 0) return        
+               if (ierr /= 0) return
                if (ir > 0) reverse_reaction_id(ir) = r_ir
-               if (r_ir > 0) reverse_reaction_id(r_ir) = ir                   
+               if (r_ir > 0) reverse_reaction_id(r_ir) = ir
             end if
-            
+
             if (g% net_iso(ihe4) > 0) then
                if (id == ib8) then
                   call add_this_reaction('r_b8_wk_he4_he4', ir, ierr)
@@ -833,56 +833,56 @@
                call add_basic_reaction(other_id, id, 'ag', 'ga', .true., ir, ierr)
                if (ierr /= 0) return
                call add_basic_reaction(id, other_id, 'ga', 'ag', .true., r_ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                if (ir > 0) reverse_reaction_id(ir) = r_ir
-               if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+               if (r_ir > 0) reverse_reaction_id(r_ir) = ir
                other_id = get_iso_id(Z+2, N+2)
                call add_basic_reaction(id, other_id, 'ag', 'ga', .true., ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                call add_basic_reaction(other_id, id, 'ga', 'ag', .true., r_ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                if (ir > 0) reverse_reaction_id(ir) = r_ir
-               if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+               if (r_ir > 0) reverse_reaction_id(r_ir) = ir
             end if
-            
+
             if (g% net_iso(ih1) > 0 .and. g% net_iso(ihe4) > 0) then
                if (id /= ihe4) then
                   other_id = get_iso_id(Z-1, N-2)
                   call add_basic_reaction(other_id, id, 'ap', 'pa', .true., ir, ierr)
-                  if (ierr /= 0) return            
+                  if (ierr /= 0) return
                   call add_basic_reaction(id, other_id, 'pa', 'ap', .true., r_ir, ierr)
                   if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
-                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir
                   other_id = get_iso_id(Z+1, N+2)
                   call add_basic_reaction(id, other_id, 'ap', 'pa', .true., ir, ierr)
-                  if (ierr /= 0) return            
+                  if (ierr /= 0) return
                   call add_basic_reaction(other_id, id, 'pa', 'ap', .true., r_ir, ierr)
                   if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
                   if (r_ir > 0) reverse_reaction_id(r_ir) = ir
-               end if          
+               end if
             end if
-            
+
             if (id /= ih1 .and. g% net_iso(ih1) > 0 .and. g% net_iso(ineut) > 0) then
                other_id = get_iso_id(Z-1, N+1)
                call add_basic_reaction(id, other_id, 'np', 'pn', .true., ir, ierr)
                if (ierr /= 0) return
                call add_basic_reaction(other_id, id, 'pn', 'np', .true., r_ir, ierr)
-               if (ierr /= 0) return          
+               if (ierr /= 0) return
                if (ir > 0) reverse_reaction_id(ir) = r_ir
-               if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+               if (r_ir > 0) reverse_reaction_id(r_ir) = ir
                if (id /= ineut) then
                   other_id = get_iso_id(Z+1, N-1)
                   call add_basic_reaction(other_id, id, 'np', 'pn', .true., ir, ierr)
                   if (ierr /= 0) return
                   call add_basic_reaction(id, other_id, 'pn', 'np', .true., r_ir, ierr)
-                  if (ierr /= 0) return 
+                  if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
-                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir
                end if
             end if
-            
+
             if (id /= ihe4 .and. g% net_iso(ihe4) > 0 .and. g% net_iso(ineut) > 0) then
                other_id = get_iso_id(Z-2, N-1)
                if (other_id /= ihe4) then
@@ -891,8 +891,8 @@
                   call add_basic_reaction(other_id, id, 'an', 'na', .true., r_ir, ierr)
                   if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
-                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
-               end if   
+                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir
+               end if
                other_id = get_iso_id(Z+2, N+1)
                if (other_id /= ihe4) then
                   call add_basic_reaction(other_id, id, 'na', 'an', .true., ir, ierr)
@@ -900,20 +900,20 @@
                   call add_basic_reaction(id, other_id, 'an', 'na', .true., r_ir, ierr)
                   if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
-                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
-               end if   
+                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir
+               end if
             end if
-            
-            if (g% net_iso(ineut) > 0 .and. id /= ih2) then            
+
+            if (g% net_iso(ineut) > 0 .and. id /= ih2) then
                other_id = get_iso_id(Z, N-1)
                call add_basic_reaction(other_id, id, 'ng', 'gn', .true., ir, ierr)
-               if (ierr /= 0) return            
+               if (ierr /= 0) return
                call add_basic_reaction(id, other_id, 'gn', 'ng', .true., r_ir, ierr)
                if (ierr /= 0) return
                   if (ir > 0) reverse_reaction_id(ir) = r_ir
-                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir 
+                  if (r_ir > 0) reverse_reaction_id(r_ir) = ir
             end if
-            
+
             other_id = get_iso_id(Z-1, N+1)
             call add_basic_reaction(id, other_id, 'wk', '', .true., ir, ierr)
             if (ierr /= 0) return
@@ -924,7 +924,7 @@
             end if
             if (ir > 0) reverse_reaction_id(ir) = r_ir
             if (r_ir > 0) reverse_reaction_id(r_ir) = ir
-            
+
             other_id = get_iso_id(Z+1, N-1)
             call add_basic_reaction(other_id, id, 'wk', '', .true., ir, ierr)
             if (ierr /= 0) return
@@ -935,8 +935,8 @@
             end if
             if (ir > 0) reverse_reaction_id(ir) = r_ir
             if (r_ir > 0) reverse_reaction_id(r_ir) = ir
-            
-            if (g% net_iso(ih1) > 0) then  
+
+            if (g% net_iso(ih1) > 0) then
                other_id = get_iso_id(Z-2, N+1)
                call add_basic_reaction(id, other_id, 'wk-h1', '', .false., ir, ierr)
                if (ierr /= 0) return
@@ -944,8 +944,8 @@
                call add_basic_reaction(other_id, id, 'wk-h1', '', .false., ir, ierr)
                if (ierr /= 0) return
             end if
-            
-            if (g% net_iso(ihe4) > 0) then  
+
+            if (g% net_iso(ihe4) > 0) then
                other_id = get_iso_id(Z-3, N-1)
                call add_basic_reaction(id, other_id, 'wk-he4', '', .false., ir, ierr)
                if (ierr /= 0) return
@@ -966,8 +966,8 @@
             end if
 
          end subroutine do_basic_reactions_for_iso
-         
-         
+
+
          integer function get_iso_id(Z, N)
             use chem_lib, only: lookup_ZN
             integer, intent(in) :: Z, N
@@ -975,8 +975,8 @@
             if (get_iso_id <= 0) return
             if (g% net_iso(get_iso_id) <= 0) get_iso_id = 0
          end function get_iso_id
-         
-         
+
+
          subroutine add_this_reaction(string, ir, ierr)
             use rates_lib, only: rates_reaction_id
             character (len=*), intent(in) :: string
@@ -1017,7 +1017,7 @@
             if (dbg) write(*,*) 'add_reaction_for_this_handle ' // trim(string)
             if (dbg) call mesa_error(__FILE__,__LINE__,'add_this_reaction')
          end subroutine add_this_reaction
-         
+
 
          logical function add_reaction_for_this_handle(string, ir, ierr)
             use rates_lib, only: rates_reaction_id, add_reaction_for_handle
@@ -1029,12 +1029,12 @@
             ir = rates_reaction_id(string)
             if (ir == 0) then ! check if reaction is defined in reaclib
                call add_reaction_for_handle(string, ierr)
-               if (ierr /= 0) then  
+               if (ierr /= 0) then
                   write(*,*) 'failed in add_reaction_for_handle for ' // trim(string)
                   return
                end if
                ir = rates_reaction_id(string)
-            end if            
+            end if
             if (ir > 0) then
                call add_net_reaction(handle, ir, ierr)
                if (ierr /= 0) then
@@ -1042,9 +1042,9 @@
                   call error
                end if
                add_reaction_for_this_handle = .true.
-            end if            
+            end if
          end function add_reaction_for_this_handle
-         
+
 
          logical function add_this_reaclib_forward_reaction(string, ir, ierr)
             use rates_lib, only: rates_reaction_id, add_reaction_from_reaclib, reaclib_lookup
@@ -1059,13 +1059,13 @@
                indx = reaclib_lookup(string, reaclib_rates% reaction_dict)
                if (indx > 0) then ! add a definition for it
                   call add_reaction_from_reaclib(string, '', indx, ierr)
-                  if (ierr /= 0) then  
+                  if (ierr /= 0) then
                      write(*,*) 'failed in add_this_reaclib_forward_reaction for ' // trim(string)
                      return
                   end if
                   ir = rates_reaction_id(string)
                end if
-            end if            
+            end if
             if (ir > 0) then
                call add_net_reaction(handle, ir, ierr)
                if (ierr /= 0) then
@@ -1073,10 +1073,10 @@
                   call error
                end if
                add_this_reaclib_forward_reaction = .true.
-            end if            
+            end if
          end function add_this_reaclib_forward_reaction
-         
-         
+
+
          logical function add_this_reaclib_reverse_reaction(string, ir, ierr)
             use rates_lib, only: rates_reaction_id, add_reaction_from_reaclib, reaclib_lookup
             character (len=*), intent(in) :: string
@@ -1087,14 +1087,14 @@
             add_this_reaclib_reverse_reaction = .false.
             ir = rates_reaction_id(string)
             if (ir == 0) then ! check if reaction is defined in reaclib
-               indx = reaclib_lookup(string, reaclib_rates% reverse_dict)              
+               indx = reaclib_lookup(string, reaclib_rates% reverse_dict)
                if (indx > 0) then ! add a definition for it
                   call add_reaction_from_reaclib( &
                            string, reaclib_rates% reaction_handle(indx), indx, ierr)
                   if (ierr /= 0) return
                   ir = rates_reaction_id(string)
                end if
-            end if            
+            end if
             if (ir > 0) then
                call add_net_reaction(handle, ir, ierr)
                if (ierr /= 0) then
@@ -1102,10 +1102,10 @@
                end if
                add_this_reaclib_reverse_reaction = .true.
                return
-            end if            
+            end if
          end function add_this_reaclib_reverse_reaction
-         
-         
+
+
          subroutine add_basic_reaction(iso_in, iso_out, op, reverse_op, warn, ir, ierr)
             use rates_lib, only: rates_reaction_id, add_reaction_from_reaclib, reaclib_lookup
             use rates_def, only: reaction_inputs
@@ -1119,34 +1119,34 @@
             include 'formats'
             ierr = 0
             ir = 0
-            
+
             if (iso_in <= 0 .or. iso_out <= 0) return
-            
+
             string = 'r_' // trim(chem_isos% name(iso_in)) // '_' // &
                   trim(op) // '_' // trim(chem_isos% name(iso_out))
-            
+
             ir = rates_reaction_id(string)
-                  
+
             if (ir < 0 .or. ir > rates_reaction_id_max) then
                write(*,*) 'failed in rates_reaction_id for ' // trim(string)
                call mesa_error(__FILE__,__LINE__,'net_init')
             end if
-                  
+
             if (ir == 0) then ! check if reaction or reverse is defined in reaclib
                indx = reaclib_lookup(string, reaclib_rates% reaction_dict)
                if (indx > 0) then ! add a definition for it
                   call add_reaction_from_reaclib(string, '', indx, ierr)
-                  if (ierr /= 0) then  
+                  if (ierr /= 0) then
                      write(*,*) 'failed in add_reaction_from_reaclib for ' // trim(string)
                      return
                   end if
                   ir = rates_reaction_id(string)
-                  
+
                   if (ir < 0 .or. ir > rates_reaction_id_max) then
                      write(*,*) 'failed in rates_reaction_id for ' // trim(string)
                      call mesa_error(__FILE__,__LINE__,'net_init')
                   end if
-                  
+
                else
                   ierr = 0
                   if (len_trim(reverse_op) > 0) then ! check for the reverse reaction in reaclib
@@ -1155,7 +1155,7 @@
                      indx = reaclib_lookup(reverse, reaclib_rates% reaction_dict)
                      if (indx > 0) then ! add a definition for it
                         call add_reaction_from_reaclib(string, reverse, indx, ierr)
-                        if (ierr /= 0) then  
+                        if (ierr /= 0) then
                            write(*,'(a)') 'failed in add_reaction_from_reaclib for '  &
                               // trim(string) // ' reverse ' // trim(reverse)
                            return
@@ -1167,7 +1167,7 @@
                   end if
                end if
             end if
-            
+
             if (ir > 0) then
                call add_net_reaction(handle, ir, ierr)
                if (ierr /= 0) then
@@ -1177,53 +1177,53 @@
                if (dbg) write(*,*) 'add_basic_reaction ' // trim(string)
                return
             end if
-            
+
             if (warn) then
                call integer_dict_lookup(skip_warnings_dict, string, i, ierr)
                if (ierr /= 0 .or. i <= 0) then
                   ierr = 0
                end if
             end if
-            
-         end subroutine add_basic_reaction
-         
 
-         
+         end subroutine add_basic_reaction
+
+
+
       end subroutine do_read_net_file
 
-            
+
       subroutine start_net_def(handle, ierr)
          use rates_def, only: rates_reaction_id_max
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_iso)) then
             allocate(g% net_iso(num_chem_isos), stat=ierr)
             if (ierr /= 0) return
          end if
          g% net_iso(:) = 0
-         
+
          if (.not. associated(g% net_reaction)) then
             allocate(g% net_reaction(rates_reaction_id_max), stat=ierr)
             if (ierr /= 0) return
          end if
-         g% net_reaction(:) = 0    
-         
-         g% net_has_been_defined = .false. 
-         g% net_filename = ''  
-         
-         
+         g% net_reaction(:) = 0
+
+         g% net_has_been_defined = .false.
+         g% net_filename = ''
+
+
          !call show_scr3('start_net_def')
-         
+
       end subroutine start_net_def
-      
-      
+
+
       subroutine show_scr3(str)
          use rates_def
          use chem_def
@@ -1240,8 +1240,8 @@
          end do
          write(*,'(A)')
       end subroutine show_scr3
-      
-      
+
+
       subroutine finish_net_def(handle, ierr)
          use rates_def, only: reaction_names_dict
          use utils_lib, only: integer_dict_create_hash, realloc_integer
@@ -1249,21 +1249,21 @@
          use chem_lib, only: get_mass_excess
          integer, intent(in) :: handle
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
          integer :: i
-         
+
          logical, parameter :: dbg = .false.
          !logical, parameter :: dbg = .true.
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          if (dbg) write(*,*) 'finish_net_def'
-         
+
          ! may have defined some new reactions as part of loading the net
-         ! so recreate the dict hash 
+         ! so recreate the dict hash
          call integer_dict_create_hash(reaction_names_dict, ierr)
          if (ierr /= 0) then
             write(*,*) 'FATAL ERROR: finish_net_def failed in integer_dict_create_hash'
@@ -1272,17 +1272,17 @@
 
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_iso)) then
             ierr = -1
             return
          end if
-         
+
          if (.not. associated(g% net_reaction)) then
             ierr = -1
             return
          end if
-         
+
          if (size(g% net_reaction, dim=1) > rates_reaction_id_max) then
             if (dbg) write(*,*) 'call realloc_integer'
             call realloc_integer(g% net_reaction, rates_reaction_id_max, ierr)
@@ -1291,27 +1291,27 @@
                return
             end if
          end if
-         
+
          if (g% doing_approx21) then
             if (dbg) write(*,*) 'call mark_approx21'
             call do_mark_approx21(handle, ierr)
             if (ierr /= 0) return
          end if
-         
+
          if (dbg) write(*,*) 'call setup_iso_info'
          call setup_iso_info(g, ierr)
          if (ierr /= 0) return
 
          if (dbg) write(*,*) 'call setup_reaction_info'
          call setup_reaction_info(g, ierr)
-         if (ierr /= 0) return         
-         
+         if (ierr /= 0) return
+
          allocate( &
             g% reaction_max_Z(g% num_reactions),  &
             g% reaction_max_Z_plus_N_for_max_Z(g% num_reactions),  &
             stat=ierr)
          if (ierr /= 0) return
-         
+
          allocate( &
             g% z158(g% num_isos),  &
             g% z52(g% num_isos),  &
@@ -1327,11 +1327,11 @@
          do i=1, g% num_isos
             g% mion(i) = get_mass_excess(chem_isos, g% chem_id(i)) * mev2gr
          end do
-         
+
          call set_reaction_max_Z(g)
 
-         g% net_has_been_defined = .true.   
-         
+         g% net_has_been_defined = .true.
+
          if (g% doing_approx21) then
             if (dbg) write(*,*) 'call set_approx21'
             call do_set_approx21(handle, ierr)
@@ -1339,37 +1339,37 @@
          end if
 
          if (dbg) write(*,*) 'done finish_net_def'
-         
+
          contains
-         
+
          subroutine do_mark_approx21(handle, ierr)
             use net_approx21, only: mark_approx21
             integer, intent(in) :: handle
             integer, intent(out) :: ierr
             call mark_approx21(handle, ierr)
          end subroutine do_mark_approx21
-      
-         
+
+
          subroutine do_set_approx21(handle, ierr)
             use net_approx21, only: set_approx21
             integer, intent(in) :: handle
             integer, intent(out) :: ierr
             call set_approx21(handle, ierr)
          end subroutine do_set_approx21
-         
-      
+
+
       end subroutine finish_net_def
-      
-         
+
+
       subroutine check_for_hardwired_pairs ! especially for approx21
          call check_pair('r_he4_he4_he4_to_c12', 'r_c12_to_he4_he4_he4')
-         call check_pair('rhe4_breakup', 'rhe4_rebuild') 
+         call check_pair('rhe4_breakup', 'rhe4_rebuild')
                               ! << should treat this as he4 + n + p -> 3 n + 3 p ???
          call check_pair('rprot_to_neut', 'rneut_to_prot')
          call check_pair('r_c12_ag_o16', 'r_o16_ga_c12')
          call check_pair('rc12ap_to_o16', 'ro16gp_to_c12')
          call check_pair('r_o16_ag_ne20', 'r_ne20_ga_o16')
-         call check_pair('ro16ap_to_ne20', 'rne20gp_to_o16')      
+         call check_pair('ro16ap_to_ne20', 'rne20gp_to_o16')
          call check_pair('r_ne20_ag_mg24', 'r_mg24_ga_ne20')
          call check_pair('rne20ap_to_mg24', 'rmg24gp_to_ne20')
          call check_pair('r_mg24_ag_si28', 'r_si28_ga_mg24')
@@ -1385,17 +1385,17 @@
          call check_pair('r_ti44_ag_cr48', 'r_cr48_ga_ti44')
          call check_pair('rti44ap_to_cr48', 'rcr48gp_to_ti44')
          call check_pair('r_cr48_ag_fe52', 'r_fe52_ga_cr48')
-         call check_pair('rcr48ap_to_fe52', 'rfe52gp_to_cr48')              
-         call check_pair('rfe52aprot_to_fe54', 'rfe54prot_to_fe52')     
-         call check_pair('rfe52neut_to_fe54', 'rfe54g_to_fe52')     
-         call check_pair('rfe54ng_to_fe56', 'rfe56gn_to_fe54')     
-         call check_pair('r_fe52_ag_ni56', 'r_ni56_ga_fe52')     
-         call check_pair('rfe52aprot_to_ni56', 'rni56gprot_to_fe52')     
-         call check_pair('rfe54prot_to_ni56', 'rni56gprot_to_fe54')     
-         call check_pair('rfe54prot_to_ni56', 'rni56gprot_to_fe54')     
+         call check_pair('rcr48ap_to_fe52', 'rfe52gp_to_cr48')
+         call check_pair('rfe52aprot_to_fe54', 'rfe54prot_to_fe52')
+         call check_pair('rfe52neut_to_fe54', 'rfe54g_to_fe52')
+         call check_pair('rfe54ng_to_fe56', 'rfe56gn_to_fe54')
+         call check_pair('r_fe52_ag_ni56', 'r_ni56_ga_fe52')
+         call check_pair('rfe52aprot_to_ni56', 'rni56gprot_to_fe52')
+         call check_pair('rfe54prot_to_ni56', 'rni56gprot_to_fe54')
+         call check_pair('rfe54prot_to_ni56', 'rni56gprot_to_fe54')
       end subroutine check_for_hardwired_pairs
-         
-         
+
+
       subroutine check_pair(s1,s2)
          use rates_def, only: get_rates_reaction_id, reverse_reaction_id
          character (len=*), intent(in) :: s1, s2
@@ -1413,15 +1413,15 @@
          reverse_reaction_id(ir) = r_ir
          reverse_reaction_id(r_ir) = ir
       end subroutine check_pair
-         
-      
-         
+
+
+
       subroutine set_reaction_kinds(g)
          use chem_def, only: chem_isos
          use rates_lib, only: &
             reaclib_create_handle, reaclib_parse_handle, is_weak_reaction
          type (Net_General_Info), pointer  :: g
-         
+
          integer :: iso_in1, iso_in2, iso_out1, iso_out2, &
             num_in1, num_in2, num_out1, num_out2, in_a, in_b, out_c, out_d, &
             num_basic_ng_kind, num_basic_pn_kind, num_basic_pg_kind, &
@@ -1432,12 +1432,12 @@
          character (len=100) :: reverse_handle, op
          character (len=4) :: rstr
          integer, pointer :: kind(:), reverse_id(:)
-         
+
          include 'formats'
-         
+
          kind => g% reaction_reaclib_kind
          reverse_id => g% reverse_id_for_kind_ne_other
-         
+
          num_basic_ng_kind = 0
          num_basic_pn_kind = 0
          num_basic_pg_kind = 0
@@ -1447,13 +1447,13 @@
          num_general_one_one_kind = 0
          num_general_two_one_kind = 0
          num_general_two_two_kind = 0
-         
+
          do i=1, g% num_reactions
-         
+
             kind(i) = other_kind
             reverse_id(i) = 0
-            ir = g% reaction_id(i)         
-            
+            ir = g% reaction_id(i)
+
             if (is_weak_reaction(ir)) cycle ! don't do weak reactions
             if (reaction_name(ir)(1:2) /= 'r_') cycle ! don't mess with special ones.
 
@@ -1464,9 +1464,9 @@
             reverse_id(i) = r_ir
             r_i = g% net_reaction(r_ir)
             if (r_i <= 0) then
-               cycle ! reverse reaction not in this net 
+               cycle ! reverse reaction not in this net
             end if
-            
+
             if (reaction_inputs(6,ir) /= 0) then
                cycle ! more than 2 input species
             end if
@@ -1476,13 +1476,13 @@
 
             num_in1 = reaction_inputs(1,ir)
             iso_in1 = reaction_inputs(2,ir)
-            
+
             num_in2 = reaction_inputs(3,ir)
             iso_in2 = reaction_inputs(4,ir)
-            
+
             num_out1 = reaction_outputs(1,ir)
             iso_out1 = reaction_outputs(2,ir)
-            
+
             num_out2 = reaction_outputs(3,ir)
             iso_out2 = reaction_outputs(4,ir)
 
@@ -1492,7 +1492,7 @@
             if (num_in1 > 3 .or. num_out1 > 3) then
                cycle ! non-standard reaction
             end if
-            
+
             if (iso_in2 == 0) then ! only 1 species on lhs
                if (iso_out2 > 0) cycle ! 1 to many is treated as reverse of many to 1
                ! 1 species to 1 species reaction
@@ -1505,9 +1505,9 @@
                end if
                cycle
             end if
-            
+
             if (is_weak_reaction(ir)) cycle
-            
+
             if (iso_out2 == 0) then ! 2 to 1
                if (num_in1 > 1 .or. num_in2 > 1 .or. num_out1 > 1) then
                   kind(i) = general_two_one_kind
@@ -1532,7 +1532,7 @@
 
             ! if get here, have a + b on left with different species a and b
             ! and only have 1 of each species on left and right
-            
+
             if (chem_isos% Z(iso_in1) <= chem_isos% Z(iso_in2)) then
                in_a = iso_in1
                in_b = iso_in2
@@ -1543,13 +1543,13 @@
             ! a + b => c; Z(a) <= Z(b)
 
             if (iso_out2 == 0) then ! 2-to-1
-               
+
                if (in_a == ineut) then
                   kind(i) = ng_kind
                   num_basic_ng_kind = num_basic_ng_kind + 1
                else if (in_a == ihe4) then
                   kind(i) = ag_kind
-                  num_basic_ag_kind = num_basic_ag_kind + 1                     
+                  num_basic_ag_kind = num_basic_ag_kind + 1
                else if (in_a == ih1) then
                   kind(i) = pg_kind
                   num_basic_pg_kind = num_basic_pg_kind + 1
@@ -1564,9 +1564,9 @@
                      !write(*,*) 'general 2-1 ' // trim(reaction_name(ir))
                   end if
                end if
-               
+
             else ! 2-to-2. only do ap,an,pn.  skip pa,na,np.
-            
+
                if (chem_isos% Z(iso_out1) <= chem_isos% Z(iso_out2)) then
                   out_c = iso_out1
                   out_d = iso_out2
@@ -1605,9 +1605,9 @@
                else
                   kind(i) = general_two_two_kind
                end if
-                              
+
             end if
-            
+
             if (kind(i) == general_two_two_kind) then
                if (r_ir > ir) then
                   kind(i) = other_kind
@@ -1616,14 +1616,14 @@
                   num_general_two_two_kind = num_general_two_two_kind + 1
                end if
             end if
-                     
+
          end do
-         
+
          return
-         
+
          if (.true.) then
             do i=1, g% num_reactions
-               ir = g% reaction_id(i)  
+               ir = g% reaction_id(i)
                write(*,3) trim(reaction_name(ir)), i, kind(i)
                !r_ir = reverse_reaction_id(ir)
                !if (kind(i) == ag_kind) write(*,'(a60,i5)') trim(reaction_name(ir)) // &
@@ -1632,11 +1632,11 @@
                !   ' ' // trim(reaction_name(r_ir)), kind(i)
             end do
          end if
-         
+
          stop
-         
+
          !return
-         
+
          write(*,2) 'num_basic_ag_kind', num_basic_ag_kind
          write(*,2) 'num_basic_pg_kind', num_basic_pg_kind
          write(*,2) 'num_basic_ng_kind', num_basic_ng_kind
@@ -1647,44 +1647,44 @@
          write(*,2) 'num_general_two_one_kind', num_general_two_one_kind
          write(*,2) 'num_general_two_two_kind', num_general_two_two_kind
          write(*,'(A)')
-         
+
          !stop
 
-      end subroutine set_reaction_kinds      
-      
-      
+      end subroutine set_reaction_kinds
+
+
       subroutine add_net_iso(handle, iso_id, ierr)
          use chem_def, only: chem_isos
          integer, intent(in) :: handle
          integer, intent(in) :: iso_id
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_iso)) then
             ierr = -1
             return
          end if
-         
+
          if (g% net_has_been_defined) then
             ierr = -1
             return
          end if
-         
+
          if (iso_id < 0 .or. iso_id > num_chem_isos) then
             ierr = -1
             return
          end if
-         
+
          g% net_iso(iso_id) = 1 ! mark as added
 
       end subroutine add_net_iso
-      
-      
+
+
       subroutine add_net_isos(handle, num_isos, iso_ids, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: num_isos, iso_ids(num_isos)
@@ -1696,41 +1696,41 @@
             if (ierr /= 0) return
          end do
       end subroutine add_net_isos
-      
-      
+
+
       subroutine remove_net_iso(handle, iso_id, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: iso_id
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_iso)) then
             ierr = -1
             return
          end if
-         
+
          if (g% net_has_been_defined) then
             ierr = -1
             return
          end if
-         
+
          if (iso_id < 0 .or. iso_id > num_chem_isos) then
             ierr = -1
             return
          end if
-         
+
          g% net_iso(iso_id) = 0 ! mark as removed
-         
+
          call remove_reactions_for_iso(g, iso_id, ierr)
-         
+
       end subroutine remove_net_iso
-      
-      
+
+
       subroutine remove_net_isos(handle, num_isos, iso_ids, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: num_isos, iso_ids(:)
@@ -1742,39 +1742,39 @@
             if (ierr /= 0) return
          end do
       end subroutine remove_net_isos
-      
-      
+
+
       subroutine add_net_reaction(handle, reaction_id, ierr)
          use utils_lib, only: realloc_integer
          integer, intent(in) :: handle
          integer, intent(in) :: reaction_id
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
          integer :: old_sz, new_sz
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_reaction)) then
             ierr = -1
             write(*,*) 'must call net_start_def before calling net_add_reaction'
             return
          end if
-         
+
          if (g% net_has_been_defined) then
             ierr = -1
             write(*,*) 'must call net_start_def before calling net_add_reaction'
             return
          end if
-         
+
          if (reaction_id < 0 .or. reaction_id > rates_reaction_id_max) then
             ierr = -1
             write(*,*) 'invalid reaction_id for net_add_reaction'
             return
          end if
-         
+
          old_sz = size(g% net_reaction, dim=1)
          if (reaction_id > old_sz) then
             new_sz = (reaction_id*11)/10 + 100
@@ -1785,12 +1785,12 @@
             end if
             g% net_reaction(old_sz+1:new_sz) = 0
          end if
-         
+
          g% net_reaction(reaction_id) = 1 ! mark as added
-         
+
       end subroutine add_net_reaction
-      
-      
+
+
       subroutine add_net_reactions(handle, num_reactions, reaction_ids, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: num_reactions, reaction_ids(:)
@@ -1802,39 +1802,39 @@
             if (ierr /= 0) return
          end do
       end subroutine add_net_reactions
-      
-      
+
+
       subroutine remove_net_reaction(handle, reaction_id, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: reaction_id
          integer, intent(out) :: ierr
-         
+
          type (Net_General_Info), pointer  :: g
-         
+
          ierr = 0
          call get_net_ptr(handle, g, ierr)
          if (ierr /= 0) return
-         
+
          if (.not. associated(g% net_reaction)) then
             ierr = -1
             return
          end if
-         
+
          if (g% net_has_been_defined) then
             ierr = -1
             return
          end if
-         
+
          if (reaction_id <= 0 .or. reaction_id > rates_reaction_id_max) then
             ierr = -1
             return
          end if
-         
+
          g% net_reaction(reaction_id) = 0 ! mark as removed
-         
+
       end subroutine remove_net_reaction
-      
-      
+
+
       subroutine remove_net_reactions(handle, num_reactions, reaction_ids, ierr)
          integer, intent(in) :: handle
          integer, intent(in) :: num_reactions, reaction_ids(:)
@@ -1846,18 +1846,18 @@
             if (ierr /= 0) return
          end do
       end subroutine remove_net_reactions
-      
+
 
       subroutine setup_iso_info(g, ierr)
          type (Net_General_Info), pointer  :: g
          integer, intent(out) :: ierr
-         
+
          integer :: i, iso_num, num_isos
          integer, pointer :: itab(:), chem_id(:)
-         
+
          ierr = 0
          itab => g% net_iso
-         
+
          num_isos = sum(itab(:))
          if (num_isos <= 0) then
             ierr = -1
@@ -1868,7 +1868,7 @@
          allocate(g% chem_id(num_isos), stat=ierr)
          if (ierr /= 0) return
          chem_id => g% chem_id
-         
+
          iso_num = 0
          do i = 1, num_chem_isos
             if (itab(i) == 0) cycle
@@ -1892,10 +1892,10 @@
          ierr = 0
          rtab => g% net_reaction
          itab => g% net_iso
-         
+
          !if (target_iso /= 0) &
          !   write(*,*) 'remove_reactions_for_iso ' // trim(chem_isos% name(target_iso))
-         
+
          do ir = 1, size(rtab,dim=1)
             if (rtab(ir) == 0) cycle ! not used
             num_reaction_inputs = get_num_reaction_inputs(ir)
@@ -1917,7 +1917,7 @@
                end if
             end do
          end do
-         
+
       end subroutine remove_reactions_for_iso
 
 
@@ -1927,7 +1927,7 @@
          use num_lib, only: qsort_string_index
          type (Net_General_Info), pointer  :: g
          integer, intent(out) :: ierr
-         
+
          integer :: i, j, k, kind, reaction_num, num_reactions, &
             r1, r2, r3, &
             num_wk_reactions, ir, cid_lhs, cid_rhs, r_ir, r_i, &
@@ -1936,12 +1936,12 @@
          integer, pointer, dimension(:) :: &
             rtab, index, ids, reaction_kind, &
             reaction_reaclib_kind, reaction_id, reverse_id_for_kind_ne_other
-         
+
          include 'formats'
-         
+
          ierr = 0
          rtab => g% net_reaction
-         
+
          num_reactions = sum(rtab(:))
          g% num_reactions = num_reactions
          allocate( &
@@ -1964,9 +1964,9 @@
          reaction_reaclib_kind => g% reaction_reaclib_kind
          reaction_id => g% reaction_id
          reverse_id_for_kind_ne_other => g% reverse_id_for_kind_ne_other
-         
+
          reaction_num = 0
-         num_wk_reactions = 0    
+         num_wk_reactions = 0
          do ir = 1, rates_reaction_id_max
             if (rtab(ir) == 0) cycle ! reaction not in this net
             reaction_num = reaction_num + 1
@@ -1979,9 +1979,9 @@
             write(*,*) 'reaction_num /= num_reactions', reaction_num, num_reactions
             call mesa_error(__FILE__,__LINE__,'setup_reaction_info')
          end if
-         
+
          call check_for_hardwired_pairs
-                  
+
          ! need to order reactions to ensure bit-for-bit results
          ! so sort reaction_id by reaction_Name
          index(1:num_reactions) => g% reaction_kind(1:num_reactions)
@@ -1997,7 +1997,7 @@
          end do
 
          call set_reaction_kinds(g)
-         
+
          do i = 1, num_reactions
             ir = reaction_id(i)
             if (ir < 1 .or. ir > rates_reaction_id_max) then
@@ -2007,8 +2007,8 @@
             end if
             rtab(ir) = i
          end do
-         
-         i = 1 
+
+         i = 1
 kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes last
             do while (reaction_reaclib_kind(i) == kind)
                i = i+1
@@ -2018,9 +2018,9 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
                found_one = .false.
                do j=i+1,num_reactions ! locate the next instance of current kind of reaction
                   if (reaction_reaclib_kind(j) /= kind) cycle
-                  
+
                   ! exchange
-                  
+
                   r1 = reaction_reaclib_kind(j)
                   r2 = reverse_id_for_kind_ne_other(j)
                   r3 = reaction_id(j)
@@ -2028,24 +2028,24 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
                   reaction_reaclib_kind(j) = reaction_reaclib_kind(i)
                   reverse_id_for_kind_ne_other(j) = reverse_id_for_kind_ne_other(i)
                   reaction_id(j) = reaction_id(i)
-                  
+
                   reaction_reaclib_kind(i) = r1
                   reverse_id_for_kind_ne_other(i) = r2
                   reaction_id(i) = r3
 
                   rtab(reaction_id(i)) = i
                   rtab(reaction_id(j)) = j
-                  
+
                   found_one = .true.
                   exit
                end do
-               
+
                if (.not. found_one) exit ! look for another kind
                i = i+1 ! next destination
                if (i > num_reactions) exit
-            end do   
+            end do
          end do kind_loop
-         
+
          i = 0
          !g% have_all_reverses = .true.
          do ! reorder so that forward + reverse pairs are adjacent.
@@ -2074,23 +2074,23 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
                write(*,*) 'r_i <= i'
                stop
             end if
-            
+
             i = i+1
-            
+
             do k=r_i-1,i,-1
                reaction_reaclib_kind(k+1) = reaction_reaclib_kind(k)
                reverse_id_for_kind_ne_other(k+1) = reverse_id_for_kind_ne_other(k)
                reaction_id(k+1) = reaction_id(k)
                rtab(reaction_id(k+1)) = k+1
             end do
-            
+
             reaction_reaclib_kind(i) = other_kind
             reverse_id_for_kind_ne_other(i) = ir
             reaction_id(i) = r_ir
             rtab(r_ir) = i
-            
+
          end do
-         
+
          g% num_wk_reactions = num_wk_reactions
          allocate( &
                g% weak_reaction_num(num_wk_reactions), &
@@ -2144,7 +2144,7 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
          end if
 
       end subroutine setup_reaction_info
-      
+
 
       ! Fowler, Caughlan, Zimmerman, Annual Review Astro. Astrophys., 1975.12:69-112. eqn (1).
       real(dp) function neutrino_Q(i1, i2)
@@ -2161,127 +2161,127 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
       subroutine init_special_case_reaction_info
          integer :: i
          include 'formats'
-         
+
          i = 0
-         
+
          call set(ih1, ih2, 0, 0, 0, 'r_h1_h1_wk_h2', 'r_h1_h1_ec_h2')
-         
+
          call set(ineut, ih1, ih2, 0, 0, 'r_neut_h1_h1_to_h1_h2', 'r_h1_h2_to_neut_h1_h1')
-         
+
          call set(ih1, ih2, ih3, 0, 0, 'r_h2_h2_to_h1_h3', 'r_h1_h3_to_h2_h2')
-         
+
          call set(ih3, ihe3, 0, 0, 0, 'r_he3_ec_h3', '')
-         
+
          call set(ineut, ih2, ihe3, 0, 0, 'r_h2_h2_to_neut_he3', 'r_neut_he3_to_h2_h2')
-         
+
          call set(ih1, ihe3, ihe4, 0, 0, 'r_h1_he3_wk_he4', '')
-         
+
          call set(ih2, ihe4, 0, 0, 0, 'r_h2_h2_to_he4', 'r_he4_to_h2_h2')
-         
+
          call set(ineut, ih2, ih3, ihe4, 0, 'r_h2_h3_to_neut_he4', 'r_neut_he4_to_h2_h3')
-         
+
          call set(ih1, ih2, ihe3, ihe4, 0, 'r_h2_he3_to_h1_he4', 'r_h1_he4_to_h2_he3')
-         
+
          call set(ih2, ih3, ihe3, ihe4, 0, 'r_h3_he3_to_h2_he4', 'r_h2_he4_to_h3_he3')
-         
+
          call set(ineut, ih3, ihe4, 0, 0, 'r_h3_h3_to_neut_neut_he4', 'r_neut_neut_he4_to_h3_h3')
-         
+
          call set(ih1, ihe3, ihe4, 0, 0, 'r_he3_he3_to_h1_h1_he4', 'r_h1_h1_he4_to_he3_he3')
-         
+
          call set(ineut, ih1, ihe4, ili6, 0, 'r_li6_to_neut_h1_he4', 'r_neut_h1_he4_to_li6')
-         
+
          call set(ineut, ih2, ihe4, ili7, 0, 'r_h2_li7_to_neut_he4_he4', &
             'r_neut_he4_he4_to_h2_li7')
-         
+
          call set(ineut, ih3, ihe4, ili7, 0, &
                'r_h3_li7_to_neut_neut_he4_he4', 'r_neut_neut_he4_he4_to_h3_li7')
-         
+
          call set(ih1, ih2, ili6, ili7, 0, 'r_h1_li7_to_h2_li6', 'r_h2_li6_to_h1_li7')
-         
+
          call set(ibe7, ili7, 0, 0, 0, 'r_be7_wk_li7', '')
-         
+
          ! might also need reverse for r_n13_wk_c13, r_o15_wk_n15
-         
+
          call set(ih1, ih2, ihe4, ibe7, 0, 'r_h2_be7_to_h1_he4_he4', 'r_h1_he4_he4_to_h2_be7')
-         
+
          call set(ineut, ihe4, ibe7, 0, 0, 'r_neut_be7_to_he4_he4', 'r_he4_he4_to_neut_be7')
-         
+
          call set(ih1, ihe3, ihe4, ibe7, 0, 'r_he3_be7_to_h1_h1_he4_he4', &
             'r_h1_h1_he4_he4_to_he3_be7')
-         
+
          call set(ineut, ih2, ili6, ibe7, 0, 'r_neut_be7_to_h2_li6', 'r_h2_li6_to_neut_be7')
-         
+
          call set(ineut, ih3, ili7, ibe9, 0, 'r_neut_be9_to_h3_li7', 'r_h3_li7_to_neut_be9')
-         
+
          call set(ineut, ihe4, ibe9, 0, 0, 'r_be9_to_neut_he4_he4', 'r_neut_he4_he4_to_be9')
-         
+
          call set(ih1, ih2, ihe4, ibe9, 0, 'r_h1_be9_to_h2_he4_he4', 'r_h2_he4_he4_to_h1_be9')
-         
+
          call set(ineut, ih1, ihe4, ib8, 0, 'r_neut_b8_to_h1_he4_he4', 'r_h1_he4_he4_to_neut_b8')
-         
+
          call set(ih1, ihe4, ib11, 0, 0, 'r_h1_b11_to_he4_he4_he4', 'r_he4_he4_he4_to_h1_b11')
-         
+
          call set(ineut, ih3, ibe9, ib11, 0, 'r_neut_b11_to_h3_be9', 'r_h3_be9_to_neut_b11')
-         
+
          call set(ih1, ihe4, ic9, 0, 0, 'r_c9_wk_h1_he4_he4', '')
-         
+
          call set(ineut, ihe4, ic11, 0, 0, 'r_neut_c11_to_he4_he4_he4', &
             'r_he4_he4_he4_to_neut_c11')
-         
+
          call set(ihe4, ic12, 0, 0, 0, 'r_he4_he4_he4_to_c12', 'r_c12_to_he4_he4_he4')
-         
+
          call set(ineut, ih2, ic13, in14, 0, 'r_neut_n14_to_h2_c13', 'r_h2_c13_to_neut_n14')
-         
+
          call set(ineut, ih2, ic14, in15, 0, 'r_neut_n15_to_h2_c14', 'r_h2_c14_to_neut_n15')
-         
+
          call set(ih1, ihe4, io13, io15, 0, 'r_he4_o13_to_h1_h1_o15', 'r_h1_h1_o15_to_he4_o13')
-         
+
          call set(ihe4, ic12, ine20, 0, 0, 'r_c12_c12_to_he4_ne20', 'r_he4_ne20_to_c12_c12')
-         
+
          call set(ih1, ic12, ina23, 0, 0, 'r_c12_c12_to_h1_na23', 'r_h1_na23_to_c12_c12')
-         
+
          call set(ineut, ic12, img23, 0, 0, 'r_neut_mg23_to_c12_c12', 'r_c12_c12_to_neut_mg23')
-         
+
          call set(ihe4, ic12, io16, img24, 0, 'r_c12_o16_to_he4_mg24', 'r_he4_mg24_to_c12_o16')
-         
+
          call set(ih1, ic12, io16, ial27, 0, 'r_c12_o16_to_h1_al27', 'r_h1_al27_to_c12_o16')
-         
+
          call set(ineut, ic12, io16, isi27, 0, 'r_neut_si27_to_c12_o16', 'r_c12_o16_to_neut_si27')
-         
+
          call set(ihe4, io16, isi28, 0, 0, 'r_o16_o16_to_he4_si28', 'r_he4_si28_to_o16_o16')
-         
+
          call set(ihe4, ic12, ine20, isi28, 0, 'r_c12_ne20_to_he4_si28', 'r_he4_si28_to_c12_ne20')
-         
+
          call set(ih1, io16, ip31, 0, 0, 'r_o16_o16_to_h1_p31', 'r_h1_p31_to_o16_o16')
-         
+
 !         call set(ih2, io16, ip30, 0, 0, 'r_o16_o16_to_h2_p30', 'r_h2_p30_to_o16_o16')
-         
+
          call set(ih1, ic12, ine20, ip31, 0, 'r_c12_ne20_to_h1_p31', 'r_h1_p31_to_c12_ne20')
-         
+
          call set(ih1, ial25, is27, 0, 0, 'r_s27_wk_h1_h1_al25', '')
-         
+
          call set(ineut, io16, is31, 0, 0, 'r_o16_o16_to_neut_s31', 'r_neut_s31_to_o16_o16')
-         
+
          call set(ineut, ic12, ine20, is31, 0, 'r_c12_ne20_to_neut_s31', 'r_neut_s31_to_c12_ne20')
-         
+
          call set(ih1, ip29, iar31, 0, 0, 'r_ar31_wk_h1_h1_p29', '')
-         
+
          call set(ih1, ihe4, ica36, ica38, 0, 'r_he4_ca36_to_h1_h1_ca38', &
             'r_h1_h1_ca38_to_he4_ca36')
-         
+
          call set(ineut, ih1, ih3, ihe3, ihe4, 'r_h3_he3_to_neut_h1_he4', '')
-         
+
          call set(ineut, ih1, ihe3, ihe4, ili7, 'r_he3_li7_to_neut_h1_he4_he4', '')
-         
+
          call set(ineut, ih1, ih3, ihe4, ibe7, 'r_h3_be7_to_neut_h1_he4_he4', '')
-         
+
          num_special_case_reactions = i
-         
+
          !write(*,2) 'num_special_case_reactions', num_special_case_reactions
-         
-         
+
+
          contains
-         
+
          subroutine set(i1, i2, i3, i4, i5, s1_in, s2_in)
             integer, intent(in) :: i1, i2, i3, i4, i5
             character (len=*), intent(in) :: s1_in, s2_in
@@ -2294,13 +2294,13 @@ kind_loop: do kind = 1, max_kind ! reorder by kind of reaction; other_kind goes 
             special_case_reactants(5,i) = i5
             s1 = s1_in
             s2 = s2_in
-            special_case_reactions(1,i) = s1      
-            special_case_reactions(2,i) = s2    
+            special_case_reactions(1,i) = s1
+            special_case_reactions(2,i) = s2
          end subroutine set
-      
+
       end subroutine init_special_case_reaction_info
 
-      
+
 
       end module net_initialize
 

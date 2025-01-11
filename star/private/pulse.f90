@@ -39,7 +39,7 @@ module pulse
   use pulse_gr1d
 
   ! No implicit typing
-  
+
   implicit none
 
   ! Access specifiers
@@ -174,7 +174,7 @@ contains
     real(dp), intent(in)     :: global_data(:)
     real(dp), intent(in)     :: point_data(:,:)
     integer, intent(out)     :: ierr
-    
+
     ! Write pulsation data
 
     select case (StrLowCase(data_format))

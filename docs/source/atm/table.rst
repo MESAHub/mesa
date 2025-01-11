@@ -4,7 +4,7 @@ Table Atmospheres
 When the ``atm_option`` control is set to ``'table'``, MESA uses
 pre-computed tables from separate model atmosphere calculations to
 interpolate :math:`T_{\rm surf}` and :math:`P_{\rm surf}` values for
-the boundary conditions. The interpolations are peformed using
+the boundary conditions. The interpolations are performed using
 :math:`T_{\rm eff}` and :math:`\log g` as independent variables. The
 ``atm_table`` control determines the choice of table, as follows:
 

@@ -36,86 +36,16 @@ and when the luminosity falls below 1e3 Lsun a nova cycle is considered finished
   have finished burst
 
 
-.. image:: ../../../star/test_suite/wd_nova_burst/docs/grid8_000586.svg
+.. image:: ../../../star/test_suite/wd_nova_burst/docs/wd_nova_burst_grid.svg
    :width: 100%
 
 
-|br|
-pgstar commands used for the plots above:
+The Python script used to create the figures above:
 
-.. code-block:: console
-
- &pgstar
-
-  file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
-  !file_device = 'png'            ! png
-  !file_extension = 'png'
-
-  file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
-
-          pgstar_interval = 1
-
-         Grid8_win_flag = .true.
-         Grid8_win_width = 12
-         Grid8_title = 'wd_nova_burst'
-
-         Summary_Burn_xaxis_name = 'logxq' 
-         Summary_Burn_xaxis_reversed = .true.
-         Summary_Burn_xmin = -14 ! -101d0 ! only used if /= -101d0
-         Summary_Burn_xmax = -3 ! -101d0 ! only used if /= -101d0
-         Summary_Burn_title = ' '
+.. literalinclude:: ../../../star/test_suite/wd_nova_burst/plot.py
+  :language: python
 
 
-         Abundance_title = ' '
-         Abundance_xaxis_name = 'logxq' 
-         Abundance_xaxis_reversed = .true.
-         Abundance_xmin = -14 ! -101d0 ! only used if /= -101d0
-         Abundance_xmax = -3 ! -101d0 ! only used if /= -101d0
-         Abundance_txt_scale = 0.8
-         Abundance_legend_max_cnt = 0
+Last-Updated: 07Aug2024 (MESA 0b40398b) by wmwolf.
 
-         HR_title = ' '
-         HR_txt_scale = 0.8
-         HR_logT_min = 4.5
-         HR_logT_max = 6.0
-         HR_logL_min = -1.0
-         HR_logL_max = 5.0
-
-
-         TRho_title = ' '
-         TRho_txt_scale = 0.8
-         TRho_logT_min = -101d0
-         TRho_logT_max = -101d0
-         TRho_logRho_min = -101d0
-         TRho_logRho_max = -101d0
-
-
-         TRho_Profile_title = ' '
-         TRho_Profile_txt_scale = 0.7
-         TRho_Profile_xmin = -8.0
-         TRho_Profile_xmax = 9.0
-         TRho_Profile_ymin = 5.0
-         TRho_Profile_ymax = 9.0
-
-        Text_Summary1_name(5,2) = 'time_step_sec'
-        Text_Summary1_name(6,2) = 'max_tau_conv'
-
-        Grid8_file_flag = .true.
-        Grid8_file_dir = 'pgstar_out'
-        Grid8_file_prefix = 'grid8_'
-        Grid8_file_interval = 10000
-        Grid8_file_width = -1
-        Grid8_file_aspect_ratio = -1
-
- / ! end of pgstar namelist
-
-
-
-Last-Updated: 08Jul2021 (MESA 094ff71) by fxt.
-
-
-.. # define a hard line break for HTML
-.. |br| raw:: html
-
-      <br>
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 603 seconds using 8 threads.

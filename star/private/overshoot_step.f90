@@ -166,7 +166,7 @@ contains
           k_b = k
           exit face_loop
        endif
-          
+
     end do face_loop
 
     ! Finish

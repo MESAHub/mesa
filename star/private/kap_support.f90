@@ -146,7 +146,7 @@ contains
     else
        frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
     end if
-    
+
     beta = frac% val
 
   end function fraction_of_op_mono
@@ -236,7 +236,7 @@ contains
          get_op_mono_args, kap_get_op_mono, kap_get, &
          call_compute_kappa_mombarg
 
-    use chem_def, only: ih1, ihe3, ihe4, chem_isos
+    use chem_def, only: chem_isos
     use star_utils, only: get_XYZ, lookup_nameofvar
 
     type (star_info), pointer :: s
@@ -256,21 +256,18 @@ contains
     type(auto_diff_real_2var_order1) :: beta, lnkap, lnkap_op
     real(dp) :: kap_op, dlnkap_op_dlnRho, dlnkap_op_dlnT, &
        Z, xh, xhe, xc, xn, xo, xne, &
-       kap_ross_cell, log_kap_rad, fk(17), delta
+       log_kap_rad, fk(17)
 
     character(len=4) :: e_name
 
-    !real(dp), pointer :: xa(:)
     integer, pointer :: net_iso(:)
     real, pointer :: &
          umesh(:), semesh(:), ff(:,:,:,:), rs(:,:,:)
     integer :: nel, izzp(s% species)
-    real(dp) :: fap(s% species), fac(s% species), gp1(s% species)
+    real(dp) :: fap(s% species), fac(s% species)
     logical :: screening
     real(dp), parameter :: &
          eps = 1d-6, minus_eps = -eps, one_plus_eps = 1d0 + eps
-
-    integer :: i_var
 
     include 'formats'
 
@@ -333,7 +330,7 @@ contains
     else
        beta = frac_op_mono(s, logRho, logT)
     end if
-    
+
     if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = beta % val
 
     if (beta > 0d0) then
@@ -363,7 +360,7 @@ contains
             nptot = s% op_mono_nptot
             ipe = s% op_mono_ipe
             nrad = s% op_mono_nrad
-            
+
             sz = nptot; offset = thread_num*sz
             umesh(1:nptot) => s% op_mono_umesh1(offset+1:offset+sz)
             semesh(1:nptot) => s% op_mono_semesh1(offset+1:offset+sz)
@@ -380,16 +377,16 @@ contains
                rs(1:nptot,1:4,1:4) => s% op_mono_rs1(offset+1:offset+sz)
                sz = nptot*nrad*4*4; offset = thread_num*sz
             end if
-            
+
          else
-            
+
             call load_op_mono_data( &
                  s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'error while loading OP data, ierr = ',ierr
                return
             end if
-            
+
             call get_op_mono_params(nptot, ipe, nrad)
             if (s% use_op_mono_alt_get_kap) then
                allocate( &
@@ -401,15 +398,15 @@ contains
                     rs(nptot,4,4), stat=ierr)
             end if
             if (ierr /= 0) return
-            
+
          end if
-         
+
          if (s% solver_test_kap_partials) then
             kap_test_partials = (k == s% solver_test_partials_k .and. &
                  s% solver_call_number == s% solver_test_partials_call_number .and. &
                  s% solver_iter == s% solver_test_partials_iter_number )
          end if
-       
+
          screening = .true.
          if (s% use_other_kap) then
             call s% other_kap_get_op_mono( &
@@ -431,7 +428,7 @@ contains
          end if
 
          if (.not. associated(s% op_mono_umesh1)) deallocate(umesh, semesh, ff, rs)
-         
+
       else if (s% op_mono_method == 'mombarg') then
          fk = 0
          if (logT > 3.5 .and. logT < 8.0) then

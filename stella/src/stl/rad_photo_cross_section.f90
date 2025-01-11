@@ -1,18 +1,18 @@
 module rad_photo_cross_section
     use kinds,            only: sp, dp
- 
+
     implicit none
-    
+
     public :: photoCross
 
     private
- 
-    character(len=*), parameter, private :: mdl_name = 'rad_photo_cross_section' 
-    
+
+    character(len=*), parameter, private :: mdl_name = 'rad_photo_cross_section'
+
     interface photoCross
      module procedure photoCrossVerner, ics_full
     end interface
-  	
+
     real (kind=sp), parameter, private :: p_e_max = 5.d4
  	integer i
     integer, dimension(7) :: L, IS2Ne
@@ -26,13 +26,13 @@ module rad_photo_cross_section
 !       COMMON/NTOT/NTOT(30)
 !       COMMON/PH1/PH1(6,30,30,7)
 !       COMMON/PH2/PH2(7,30,30)
-      
+
       DATA (L(i),i=1,7) /0,0,1,0,1,2,0/
       DATA (IS2Ne(i),i=1,7) /2,4,10,12,18,28,30/
       DATA (NINN(i),i=1,30) /0,0,1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,5,5,5,5,5,5,5,5,5,5,5,5/
       DATA (NTOT(i),i=1,30) /1,1,2,2,3,3,3,3,3,3,4,4,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,7,7/
       DATA (NFULL(i),i=1,30) /1,1,2,2,3,3,3,3,3,3,4,4,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,7,7,7/
-      
+
       DATA (PH1(i, 1, 1, 1),i=1,6) /1.360E+01, 4.298E-01,   5.475E+04, 3.288E+01, 2.963E+00, 0.000E+00/
       DATA (PH1(i, 2, 1, 1),i=1,6) /5.442E+01, 1.720E+00, 1.369E+04, 3.288E+01, 2.963E+00, 0.000E+00/
       DATA (PH1(i, 2, 2, 1),i=1,6) /2.459E+01, 5.996E+00, 4.470E+03, 2.199E+00, 6.098E+00, 0.000E+00/
@@ -3192,7 +3192,7 @@ module rad_photo_cross_section
          1.017E+04, 5.288E+00, 1.736E+01, 4.667E-01/
       DATA (PH1(i,30,30, 7),i=1,6) /9.394E+00, 1.673E+01,&
          1.236E+00, 1.029E+03, 4.259E+00, 3.962E-02/
-         
+
       DATA (PH2(i, 1, 1),i=1,7) /4.298E-01, 5.475E+04, 3.288E+01, 2.963E+00, 0.000E+00, 0.000E+00, 0.000E+00/
       DATA (PH2(i, 2, 1),i=1,7) /1.720E+00, 1.369E+04,3.288E+01, 2.963E+00, 0.000E+00, 0.000E+00, 0.000E+00/
       DATA (PH2(i, 2, 2),i=1,7) /1.361E+01, 9.492E+02,1.469E+00, 3.188E+00, 2.039E+00, 4.434E-01, 2.136E+00/
@@ -3718,7 +3718,7 @@ contains
 ! !   Written by D. A. Verner, verner@pa.uky.edu
 ! !  Modified by D. A. Badjin, June 15, 2008
 ! !  Inner-shell ionization energies of some low-ionized species are slightly
-! !  improved to fit smoothly the experimental inner-shell ionization energies 
+! !  improved to fit smoothly the experimental inner-shell ionization energies
 ! !  of neutral atoms.
 ! ! ******************************************************************************
 ! !  This subroutine calculates partial photoionization cross sections
@@ -3731,29 +3731,29 @@ contains
 ! !   Verner and Yakovlev, 1995, A&AS, 109, 125 ("old" fit)
 !!
 !!   ARGUMENTS
-!!       nz - atomic number from 1 to 30 (integer) 
+!!       nz - atomic number from 1 to 30 (integer)
 !!      ne - number of electrons from 1 to iz (integer)
 !!      npts - the number of points in frequences and sigma.
 !!      fr(npts) - contains the frequency grid at which the cross sections should be computed
-!! 
+!!
 !!   Output
 !!       sigma(npts) - array of cross sections, in cm^2
 !!
 !!   AUTHOR
 !!      D. A. Verner
-!!      
+!!
 !!
 !!   SOURCE
 !!***************************************************************************
 
    subroutine ics_full(nz,ne,npts,fr,sigma)
      integer, intent(in)  ::  nz,ne, npts
-      real*8, dimension(npts), intent(in)  ::  fr
+      real(dp), dimension(npts), intent(in)  ::  fr
       real (kind=dp), dimension(npts), intent(out)  :: sigma
       character(len=*), parameter ::  subrtn_name = 'ics_full'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
       integer k, is, nint, nout
-      real*8 a,b,e,einn,p1,q,s,x,y,z
+      real(dp) a,b,e,einn,p1,q,s,x,y,z
 !       common/l/l(7)
 !       common/ninn/ninn(30)
 !       common/ntot/ntot(30)
@@ -3762,16 +3762,16 @@ contains
 
 ! *** Hertz to electron-Volt transition coefficient
 
-      real*8, parameter :: hztoev=4.13566727333d-15
+      real(dp), parameter :: hztoev=4.13566727333d-15
 
 
-! *** creating null-filled sigma-array      
+! *** creating null-filled sigma-array
 
          sigma(:)=0.d+00
-      
+
 ! *** some test to find an error
 
-      if(nz.lt.1.or.nz.gt.30)return      
+      if(nz.lt.1.or.nz.gt.30)return
       if(ne.lt.1.or.ne.gt.nz)return
 
 
@@ -3781,13 +3781,13 @@ contains
       if(nz.eq.ne.and.nz.gt.18) nout=7
       if(nz.eq.(ne+1).and.(nz.eq.20.or.nz.eq.21.or.nz.eq.22.or. &
           nz.eq.25.or.nz.eq.26)) nout=7
-      
+
 
 ! *** do-cycle, over the frequency grid
 
       do k=1,npts
-        e=hztoev*fr(k) 
-  
+        e=hztoev*fr(k)
+
 ! ***   do-cycle, over shells
 
          do is=1,nout
@@ -3817,9 +3817,9 @@ contains
               endif
             endif
 
-! ***      if the current shell is treated as inner one 
+! ***      if the current shell is treated as inner one
 ! ***      or the current energy is high enough, then use "old" fit
-            
+
             if(is.le.nint.or.e.ge.einn)then
               p1=-ph1(5,nz,ne,is)
               y=e/ph1(2,nz,ne,is)
@@ -3834,15 +3834,15 @@ contains
             else
 ! ***      else use "new" fit for outer shells and low energies
 
-! ***        also we have to take into account that 
+! ***        also we have to take into account that
 ! ***        1) for systems with outer p-shells the "new" fit computes
-! ***            cross sections both for p- and s- shells; 
+! ***            cross sections both for p- and s- shells;
 ! ***        2) the same thing is for FeI and FeII with (3d+4s);
 ! ***        3)calcium has no 3d electrons, i.e. has no shell with number is=6
 
               if(((nout.eq.3).and.(is.eq.2)).or.((nout.eq.5) &
                    .and.(is.eq.4)).or.(((nz.eq.26).and.((ne.eq.26).or.(ne.eq.25))) &
-                   .and.(is.eq.6)).or.((nz.eq.20).and.(is.eq.6)))  then 
+                   .and.(is.eq.6)).or.((nz.eq.20).and.(is.eq.6)))  then
                 s=0
 
 ! ***        after all this checkings we can finally use the "new" fit
@@ -3866,7 +3866,7 @@ contains
 
         end do
       end do
-      
+
       sigma(:)=sigma(:)*1.d-18! *1.e-18 transform from Mb to sm^2
 
       return
@@ -3881,15 +3881,15 @@ contains
 !!   FUNCTION
 !!  This subroutine finds shell number, using photon  energy, and then
 !!  calculates partial photoionization cross sections
-!! 	for all ionization stages of all atoms from H to Zn (Z=30) by use of 
+!! 	for all ionization stages of all atoms from H to Zn (Z=30) by use of
 !!  Verner's  subroutine "phfit2"
 !!  http://www.pa.uky.edu/~verner/photo.html
 !!
 !!   ARGUMENTS
-!! 		nz - atomic number from 1 to 30 (integer) 
+!! 		nz - atomic number from 1 to 30 (integer)
 !! 		ne - number of electrons from 1 to iz (integer)
-!! 		e - photon energy, eV 
-!! 
+!! 		e - photon energy, eV
+!!
 !!	 Output
 !! 	  s - photoionization cross section, Mb
 !!
@@ -3902,13 +3902,13 @@ contains
   subroutine   photoCrossVerner( nz,ne, e, s)
 ! subroutine   photoCrossVerner( nz,ne, e, s)
       integer, intent(in)  ::  nz,ne
-      real*8, intent(in)  ::  e
+      real(dp), intent(in)  ::  e
       real (kind=dp), intent(out)  :: s
       character(len=*), parameter ::  subrtn_name = 'photoCrossVerner'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
       integer i, is_max, nint,tmpne
       real (kind=dp) e_max, tmps
-      
+
       if(nz < 1.or.nz > 30)return
       if(ne < 1.or.ne > nz)return
   	  is_max = NFULL(ne)
@@ -3922,7 +3922,7 @@ contains
 ! 	  enddo
 
 !       if( e > p_e_max) return ! energy is to high for this fit
-!       
+!
 ! 	write(*,*)'BEGIN: nz=', nz, 'ne=', ne;
 !       e_max = p_Emax(nz,ne)
 !   	  is = ntot(ne)
@@ -3951,7 +3951,7 @@ end subroutine photoCrossVerner
 !!
 !!   FUNCTION
 !! 	Inner-shell ionization energies of some low-ionized species are slightly
-!! 	improved to fit smoothly the experimental inner-shell ionization energies 
+!! 	improved to fit smoothly the experimental inner-shell ionization energies
 !! 	of neutral atoms.
 !! 	******************************************************************************
 !! 	This subroutine calculates partial photoionization cross sections
@@ -3964,17 +3964,17 @@ end subroutine photoCrossVerner
 
 !!
 !!   ARGUMENTS
-!! 		nz - atomic number from 1 to 30 (integer) 
+!! 		nz - atomic number from 1 to 30 (integer)
 !! 		ne - number of electrons from 1 to iz (integer)
 !! 		is - shell number (integer)
-!! 		e - photon energy, eV 
-!! 
+!! 		e - photon energy, eV
+!!
 !! 		Shell numbers:
-!! 		1 - 1s, 2 - 2s, 3 - 2p, 4 - 3s, 5 - 3p, 6 - 3d, 7 - 4s. 
+!! 		1 - 1s, 2 - 2s, 3 - 2p, 4 - 3s, 5 - 3p, 6 - 3d, 7 - 4s.
 !! 		If a species in the ground state has no electrons on the given shell,
 !! 		the subroutine returns s=0.
 
-!! 
+!!
 !!	 Output
 !! 	  s - photoionization cross section, Mb
 !!
@@ -3989,11 +3989,11 @@ end subroutine photoCrossVerner
 !!***************************************************************************
  subroutine   phfit2(nz,ne,is,e,s)
       integer, intent(in)  ::  nz,ne, is
-      real*8, intent(in)  ::  e
+      real(dp), intent(in)  ::  e
       real (kind=dp), intent(out)  :: s
       character(len=*), parameter ::  subrtn_name = 'phfit2'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
-      
+
       integer  ::  nout, nint
       real (kind=sp) :: p1, y, q,a, b, x, z, einn
 
@@ -4035,4 +4035,4 @@ end subroutine photoCrossVerner
       return
 end subroutine   phfit2
 
-end module rad_photo_cross_section    
+end module rad_photo_cross_section

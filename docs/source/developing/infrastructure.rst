@@ -24,7 +24,7 @@ access to this:
 - It is set up, if you have access to this https://github.com/community/Global-Campus-Teachers repository
 - Github claims they will periodically require revalidation of your credentials, so this may need repeating in the future.
 
-If MESAHub gets unsynced from this and is no long on the eduction plan:
+If MESAHub gets unsynced from this and is no longer on the eduction plan:
 
 - Goto `Global campus <https://education.github.com/globalcampus/teacher#>`__
 - Find ``Upgrade your academic organizations``
@@ -36,7 +36,8 @@ This is currently tied to Rob's account.
 mesastar.org
 ------------
 
-This is a long-standing domain name used by MESA.
+This is a long-standing domain name used by MESA. 
+The main website redirects to a landing page hosted on `GitHub Pages <https://mesastar.org>`__
 
 Domain Name
 ^^^^^^^^^^^
@@ -47,8 +48,8 @@ renewing it, updating nameservers, etc.
 DNS Servers
 ^^^^^^^^^^^
 
-The mesastar.org domain is configured to use Digital Ocean nameservers
-and the DNS records are managed by Josiah.
+The mesastar.org domain is configured to use Cloudflare nameservers
+and the DNS records are managed by Philip.
 
 Mailing lists
 ^^^^^^^^^^^^^
@@ -56,16 +57,16 @@ Mailing lists
 The mesa-users@lists.mesastar.org and
 mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
 <https://www.mailmanlists.net/>`__.  The account is controlled by
-Frank who pays the hosting fees (through grants at ASU).
+Matteo who pays the hosting fees through Flatiron.
 This costs about $100/year.
 
-New account signups are handled by Frank, Evan, and Rob.
+New account signups are handled by Earl, Eb, and Warrick.
 
 Marketplace
 ^^^^^^^^^^^
 
-The address mesastar.org redirects to the `MESA marketplace
-<http://cococubed.com/mesa_market/>`__, which is controlled and
+The `MESA marketplace
+<http://cococubed.com/mesa_market/>`__ is controlled and
 hosted by Frank at ASU.
 
 
@@ -73,7 +74,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Evan, and Joey have access to it).  This is
+<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it).  This is
 currently free for open source software.
 
 
@@ -87,7 +88,7 @@ service.
 Website
 ^^^^^^^
 
-We still use the mesa.sourceforge.net website domian name, but only for a top-level
+We still use the mesa.sourceforge.net website domain name, but only for a top-level
 redirect to docs.mesastar.org.
 
 The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.

@@ -15,7 +15,7 @@
          end interface
          integer, parameter :: ntab = 20
          integer :: i,j
-         real(dp) :: x,errt,fac,hh,a(ntab,ntab),xdum,ydum
+         real(dp) :: errt,fac,hh,a(ntab,ntab)
          real(dp), parameter :: con2=2d0, con=sqrt(con2), big=1d50, safe=2d0
          include 'formats'
          dfridr = 0d0

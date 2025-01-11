@@ -25,7 +25,7 @@
 ! ***********************************************************************
 
 module atm_table
-  
+
   ! Uses
 
   use const_def
@@ -80,7 +80,7 @@ contains
     real(dp), intent(out) :: dlnP_dlnkap
     integer, intent(out)  :: ierr
 
-    logical, parameter :: DBG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp) :: g
     real(dp) :: logg
@@ -105,7 +105,6 @@ contains
     real(dp) :: dPrad_dL
     real(dp) :: dT_dlnR
     real(dp) :: dT_dlnM
-    real(dp) :: dT_dlnT
     real(dp) :: dT_dlnTeff
 
     include 'formats'
@@ -126,14 +125,14 @@ contains
 
     ! Perform the table lookup
 
-    if (DBG) write(*,*) 'call get_table_values', id
+    if (dbg) write(*,*) 'call get_table_values', id
     call get_table_values( &
          id, Z, logg, Teff, &
          Pgas, dPgas_dTeff, dPgas_dlogg, &
          T, dT_dTeff, dT_dlogg, &
          ierr)
     if (ierr /= 0) then
-       if (DBG) write(*,*) 'get_table_values(_at_fixed_Z) ierr', ierr
+       if (dbg) write(*,*) 'get_table_values(_at_fixed_Z) ierr', ierr
        return
     end if
 
@@ -148,7 +147,7 @@ contains
     ! Set up partials
 
     if (.NOT. skip_partials) then
-       
+
        dlnTeff_dlnR = -0.5_dp
        dlnTeff_dL = 0.25_dp/L
        dTeff_dlnR = Teff*dlnTeff_dlnR
@@ -184,7 +183,7 @@ contains
        dlnP_dlnR = 0._dp
        dlnP_dlnM = 0._dp
        dlnP_dlnkap = 0._dp
-       
+
        dlnT_dL = 0._dp
        dlnT_dlnR = 0._dp
        dlnT_dlnM = 0._dp
@@ -192,7 +191,7 @@ contains
 
     endif
 
-    if (DBG .or. is_bad(lnP) .or. is_bad(lnT)) then
+    if (dbg .or. is_bad(lnP) .or. is_bad(lnT)) then
        write(*,*) 'eval_table'
        write(*,1) 'Teff', Teff
        write(*,1) 'T', T
@@ -211,7 +210,7 @@ contains
   end subroutine eval_table
 
   !****
-  
+
   subroutine get_table_alfa_beta( &
        L, Teff, R, M, cgrav, id, alfa, beta, ierr)
 
@@ -235,7 +234,7 @@ contains
     integer, parameter :: BLEND_IN_Y = 4
     integer, parameter :: BLEND_CORNER_OUT = 5
 
-    logical, parameter :: DBG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     real(dp)                :: g
     real(dp)                :: logTeff
@@ -419,7 +418,7 @@ contains
        alfa = min(1d0, sqrt(c_dx*c_dx + c_dy*c_dy))
        beta = 1 - alfa
     case default
-       write(*,*) 'Invalid iregion in get_table_alfa_beta:', iregion 
+       write(*,*) 'Invalid iregion in get_table_alfa_beta:', iregion
        call mesa_error(__FILE__,__LINE__)
     end select
 

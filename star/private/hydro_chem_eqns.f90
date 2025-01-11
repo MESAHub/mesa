@@ -60,24 +60,23 @@
 
          use chem_def
          use net_lib, only: show_net_reactions, show_net_params
-         use rates_def, only: reaction_Name, i_rate
+         use rates_def, only: i_rate
          use star_utils, only: em1, e00, ep1
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
-         integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
+         !integer, pointer :: reaction_id(:) ! maps net reaction number to reaction id
          integer :: nz, j, i, jj, ii, species
          real(dp) :: &
             dxdt_expected_dxa, dxdt_expected, dxdt_actual, &
-            dxdt_expected_dlnd, dxdt_expected_dlnT, &
             dq, dm, dequ, dxdt_nuc, dxdt_mix, max_abs_residual, &
-            sum_dxdt_nuc, dx_expected_dlnd, dx_expected_dlnT, &
+            sum_dxdt_nuc, &
             d_dxdt_mix_dx00, d_dxdt_mix_dxm1, d_dxdt_mix_dxp1, &
             sum_dx_burning, sum_dx_mixing, residual, &
-            dxdt_factor, alpha, eqn_scale, d_dxdt_dx, &
-            dequ_dlnd, dequ_dlnT, dequ_dlnPgas_const_T, dequ_dlnT_const_Pgas
+            dxdt_factor, eqn_scale, &
+            dequ_dlnd, dequ_dlnT
          logical :: test_partials, doing_op_split_burn
          logical, parameter :: checking = .false.
 
@@ -90,7 +89,7 @@
 
          dq = s% dq(k)
          dm = s% dm(k)
-         
+
          max_abs_residual = 0
          sum_dxdt_nuc = 0
 
@@ -110,7 +109,7 @@
 
          sum_dx_burning = 0
          sum_dx_mixing = 0
-         
+
          do j=1,species ! composition equation for species j in cell k
 
             !test_partials = (k == s% solver_test_partials_k .and. s% net_iso(ihe4) == j)
@@ -119,7 +118,7 @@
             i = s%nvar_hydro+j
 
             dxdt_actual = s% xa_sub_xa_start(j,k)/s% dt
-            
+
             doing_op_split_burn = s% op_split_burn .and. s% T_start(k) >= s% op_split_burn_min_T
             if (s% do_burn .and. .not. doing_op_split_burn) then
                dxdt_nuc = s% dxdt_nuc(j,k)
@@ -140,7 +139,7 @@
             eqn_scale = max(s% min_chem_eqn_scale, s% x_scale(i,k)/s% dt)
             residual = (dxdt_expected - dxdt_actual)/eqn_scale
             s% equ(i,k) = residual
-            
+
             if (abs(residual) > max_abs_residual) &
                max_abs_residual = abs(s% equ(i,k))
 
@@ -173,10 +172,10 @@
                   if (checking) call check_dequ(dequ,'d_dxdt_nuc_dx')
                   call e00(s, i, ii, k, nvar, dxdt_factor*dequ)
                end do
-               
+
                dequ_dlnd = s% d_dxdt_nuc_drho(j,k)*s% rho(k)/eqn_scale
                call e00(s, i, s% i_lnd, k, nvar, dxdt_factor*dequ_dlnd)
-               
+
                dequ_dlnT = s% d_dxdt_nuc_dT(j,k)*s% T(k)/eqn_scale
                call e00(s, i, s% i_lnT, k, nvar, dxdt_factor*dequ_dlnT)
 
@@ -203,7 +202,7 @@
 
             end if
 
-            if (test_partials) then   
+            if (test_partials) then
                s% solver_test_partials_dx_sink = s% net_iso(img24)
                s% solver_test_partials_val = s% dxdt_nuc(j,k)
                s% solver_test_partials_var = s% nvar_hydro + j
@@ -212,9 +211,9 @@
             end if
 
          end do
-         
+
          contains
-         
+
          subroutine check_dequ(dequ, str)
             real(dp), intent(in) :: dequ
             character (len=*), intent(in) :: str

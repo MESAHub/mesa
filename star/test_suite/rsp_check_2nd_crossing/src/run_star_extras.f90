@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
 module run_star_extras
 
       use star_lib
@@ -29,14 +29,14 @@ module run_star_extras
       use auto_diff
 
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -51,21 +51,21 @@ module run_star_extras
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-         
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
+
          if (s% use_other_rsp_build_model) &
             s% other_rsp_build_model => rsp_check_2nd_crossing
 
       end subroutine extras_controls
-      
+
 
       subroutine rsp_check_2nd_crossing(id, ierr)
          use interp_1d_def, only: pm_work_size
          use interp_1d_lib
          integer, intent(in) :: id
-         integer, intent(out) :: ierr  
+         integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         
+
          integer, parameter :: io_in=34, io_out=35, max_n = 200, max_cnt = 9000
          real(dp) :: logT1, logL1, logT2, logL2, logT3, logL3, logT4, logL4, &
             delta_Teff, mass, X, Z, log_Teff, log_L, prev_Teff, &
@@ -80,14 +80,14 @@ module run_star_extras
          real(dp), pointer, dimension(:) :: &
             f1, work1, x_old, v_old, x_new, v_new
          logical :: okay, finished_1st_crossing, have_first, in_2nd_crossing, just_failed
-         
+
          include 'formats'
-         
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          write(*,*) 'rsp_check_2nd_crossing'
-         
+
          delta_Teff = s% x_ctrl(1)
          ! approx edges
          logT1 = s% x_ctrl(2)
@@ -98,30 +98,30 @@ module run_star_extras
          logL3 = s% x_ctrl(7)
          logT4 = s% x_ctrl(8)
          logL4 = s% x_ctrl(9)
-         
+
          skip_cols = s% x_integer_ctrl(1)
          col_model_number = s% x_integer_ctrl(2)
          col_star_age = s% x_integer_ctrl(3)
          col_log_Teff = s% x_integer_ctrl(4)
          col_log_L = s% x_integer_ctrl(5)
-         
+
          num_cols_to_read = max(col_model_number, col_star_age, col_log_Teff, col_log_L)
          allocate(vals(num_cols_to_read), &
             growth(max_cnt), period(max_cnt), temp(max_cnt), lum(max_cnt), &
             Ts(max_cnt), Ls(max_cnt), ages(max_cnt), modnums(max_cnt), model(max_cnt), &
             f1(4*max_cnt), work1(max_cnt*pm_work_size), &
             x_old(max_n), v_old(max_n), x_new(max_n), v_new(max_n))
-         
+
          open(unit=io_in, file=trim(s% x_character_ctrl(1)), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open history data file ' // trim(s% x_character_ctrl(1))
             return
-         end if        
-         
+         end if
+
          do i=1,skip_cols
             read(io_in,*)
          end do
-         
+
          model_cnt = 0
          read_loop: do
             read(io_in,fmt=*,iostat=ierr) vals(1:num_cols_to_read)
@@ -131,11 +131,11 @@ module run_star_extras
             modnums(model_cnt) = int(vals(col_model_number))
             ages(model_cnt) = vals(col_star_age)
             Ts(model_cnt) = exp10(vals(col_log_Teff))
-            Ls(model_cnt) = exp10(vals(col_log_L))         
+            Ls(model_cnt) = exp10(vals(col_log_L))
          end do read_loop
          num_models = model_cnt
          close(io_in)
-         
+
          open(unit=io_out, file=TRIM(s% x_character_ctrl(2)), status='REPLACE', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'failed to open output data file ' // trim(s% x_character_ctrl(2))
@@ -145,7 +145,7 @@ module run_star_extras
          mass = s% RSP_mass
          X = s% RSP_X
          Z = s% RSP_Z
-         
+
          write(io_out,1) 'RSP_mass', s% RSP_mass
          write(io_out,1) 'RSP_X', s% RSP_X
          write(io_out,1) 'RSP_Z', s% RSP_Z
@@ -154,7 +154,7 @@ module run_star_extras
          write(io_out,1) 'RSP_alfat', s% RSP_alfat
          write(io_out,1) 'RSP_gammar', s% RSP_gammar
          write(io_out,*)
-         
+
          write(io_out,'(99a20)') 'model_number', 'period(d)', 'growth', &
             'Teff', 'L', 'star_age'
 
@@ -182,8 +182,8 @@ module run_star_extras
                prev_Teff = s% RSP_Teff
                cycle search_loop ! still going to lower Ts
             end if
-            max_T = exp10(get_blue_logT(log_L))            
-            min_T = exp10(get_red_logT(log_L))            
+            max_T = exp10(get_blue_logT(log_L))
+            min_T = exp10(get_red_logT(log_L))
             if (s% RSP_Teff < min_T - 4*delta_Teff) then
                !write(*,2) 'too far from red edge', modnums(model_cnt), s% RSP_Teff, min_T
                prev_Teff = s% RSP_Teff
@@ -227,7 +227,7 @@ module run_star_extras
             if (num_beyond_blue_edge == 2 .or. n == max_n) exit search_loop
             prev_Teff = s% RSP_Teff
          end do search_loop
-         
+
          if (n == 0 .or. growth(1) >= 0d0 .or. num_beyond_blue_edge < 1) then
             write(*,2) 'n', n
             write(*,2) 'num_beyond_blue_edge', num_beyond_blue_edge
@@ -235,7 +235,7 @@ module run_star_extras
             ierr = -1
             return
          end if
-         
+
          Teff_red_edge = -1
          if (growth(2) < 0d0) then
             do i=4,n
@@ -249,7 +249,7 @@ module run_star_extras
                   !write(*,*) 'x_old', x_old(1:4)
                   !write(*,*) 'v_old', v_old(1:4)
                   call interpolate_vector_pm( &
-                     4, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
+                     4, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
                   Teff_red_edge = v_new(1)
                   write(*,'(A)')
@@ -269,7 +269,7 @@ module run_star_extras
             !write(*,*) 'x_old', x_old(1:3)
             !write(*,*) 'v_old', v_old(1:3)
             call interpolate_vector_pm( &
-               3, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)    
+               3, x_old, 1, x_new, v_old, v_new, work1, 'red edge', ierr)
             if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm red edge')
             Teff_red_edge = v_new(1)
             write(*,'(A)')
@@ -278,7 +278,7 @@ module run_star_extras
             write(io_out,'(a20,f20.10)') 'Teff_red_edge', Teff_red_edge
          end if
          if (Teff_red_edge < 0d0) call mesa_error(__FILE__,__LINE__,'failed to find red edge')
-         
+
          Teff_blue_edge = -1
          if (num_beyond_blue_edge == 2) then
             do i=n-3,1,-1
@@ -292,7 +292,7 @@ module run_star_extras
                   !write(*,*) 'x_old', x_old(1:4)
                   !write(*,*) 'v_old', v_old(1:4)
                   call interpolate_vector_pm( &
-                     4, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)    
+                     4, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm blue edge')
                   Teff_blue_edge = v_new(1)
                   write(*,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
@@ -311,7 +311,7 @@ module run_star_extras
                !write(*,*) 'x_old', x_old(1:3)
                !write(*,*) 'v_old', v_old(1:3)
                call interpolate_vector_pm( &
-                  3, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)    
+                  3, x_old, 1, x_new, v_old, v_new, work1, 'blue edge', ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interpolate_vector_pm blue edge')
                Teff_blue_edge = v_new(1)
                write(*,'(a20,f20.10)') 'Teff_blue_edge', Teff_blue_edge
@@ -321,10 +321,10 @@ module run_star_extras
          write(*,'(A)')
          write(io_out,*)
          if (Teff_blue_edge < 0d0) then
-            write(*,*) 'failed to find blue edge'         
+            write(*,*) 'failed to find blue edge'
             return
          end if
-         
+
          f(1:4,1:n) => f1(1:4*n)
          do i=1,n
             f(1,i) = lum(i)
@@ -334,11 +334,11 @@ module run_star_extras
             write(*,*) 'failed in interp_pm Ts'
             return
          end if
-         
+
          offset = 0d0
          write(*,'(a10,2a20)') 'offset', 'Teff', 'L'
          write(io_out,'(a10,2a20)') 'offset', 'Teff', 'L'
-         do 
+         do
             x_new(1) = Teff_blue_edge - offset
             if (x_new(1) < Teff_red_edge) x_new(1) = Teff_red_edge
             call interp_values(temp, n, f1, 1, x_new, v_new, ierr)
@@ -350,31 +350,31 @@ module run_star_extras
          end do
          write(io_out,*)
          write(*,'(A)')
-         
+
          close(io_out)
 
          write(*,*) 'done rsp_check_2nd_crossing'
          write(*,*) TRIM(s% x_character_ctrl(2))
 
          !deallocate(f1, work1, x_new, v_new)
-         
+
          ierr = -1 ! to force termination of run
-         
+
          contains
-         
+
          real(dp) function get_blue_logT(log_L)
             real(dp), intent(in) :: log_L
             get_blue_logT = logT2 + (log_L - logL2)*(logT1 - logT2)/(logL1 - logL2)
          end function get_blue_logT
-         
+
          real(dp) function get_red_logT(log_L)
             real(dp), intent(in) :: log_L
             get_red_logT = logT4 + (log_L - logL4)*(logT3 - logT4)/(logL3 - logL4)
          end function get_red_logT
-         
+
       end subroutine rsp_check_2nd_crossing
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -385,7 +385,7 @@ module run_star_extras
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -420,8 +420,8 @@ module run_star_extras
          write(*,'(A)')
          extras_finish_step = terminate
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -432,7 +432,7 @@ module run_star_extras
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -442,7 +442,7 @@ module run_star_extras
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -455,8 +455,8 @@ module run_star_extras
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -468,7 +468,7 @@ module run_star_extras
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -479,8 +479,8 @@ module run_star_extras
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -494,9 +494,9 @@ module run_star_extras
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
-      
-            
+
+
+
 
       end module run_star_extras
-      
+

@@ -31,10 +31,10 @@
 
       implicit none
 
-      
+
 
       !logical :: plus_co56 ! Must now be passed as an argument
-      
+
       logical, parameter :: reduced_net_for_testing = .true.
       !logical, parameter :: reduced_net_for_testing = .false.
 
@@ -69,14 +69,14 @@
          ini56, &
          ineut, &
          iprot
-      
+
       integer, parameter :: approx21_num_mesa_reactions_21 = 93, approx21_nrat = 116
       integer, parameter :: approx21_num_mesa_reactions_co56 = approx21_num_mesa_reactions_21+1, &
                               approx21_plus_co56_nrat = approx21_nrat+1
-      
-      ! integer :: num_mesa_reactions 
+
+      ! integer :: num_mesa_reactions
       ! integer :: num_reactions
-      
+
       integer :: rate_id(approx21_num_mesa_reactions_co56) ! rate ids for the mesa reactions
          ! e.g., rate_id(ir3a) is reaction id for triple alpha as defined in mesa/rates
          ! Define as largest possible array
@@ -176,7 +176,7 @@
          iropg, &
          irnag, &
 
-         ! for reactions to fe56 
+         ! for reactions to fe56
          ir54ng, &
          ir55gn, &
          ir55ng, &
@@ -232,9 +232,9 @@
             ratraw,dratrawdt,dratrawdd,ierr)
          real(dp), dimension(:) :: ratraw,dratrawdt,dratrawdd
          integer, intent(out) :: ierr
-         
+
          include 'formats'
-         
+
          ierr = 0
 
          call set1(ifa,irn15pg,irn15pa)
@@ -285,7 +285,7 @@
 
       end subroutine approx21_pa_pg_fractions
 
-         
+
          ! call this before screening
          subroutine approx21_weak_rates( &
                y, ratraw, dratrawdt, dratrawdd, &
@@ -293,20 +293,20 @@
                weak_rate_factor,  plus_co56, ierr)
             use rates_lib, only: eval_ecapnuc_rate
             use net_derivs, only: eval_ni56_ec_rate, eval_co56_ec_rate
-            
+
             real(dp), dimension(:) :: y, ratraw, dratrawdt, dratrawdd
             real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
             logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
-            
+
             real(dp) :: rpen, rnep, spen, snep, &
                rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu
             include 'formats'
-            
+
             ierr = 0
-            
+
             call eval_ecapnuc_rate(eta, temp, den, rpen, rnep, spen, snep)
-            
+
             ratraw(irpen) = rpen
             dratrawdt(irpen) = 0
             dratrawdd(irpen) = 0
@@ -315,7 +315,7 @@
             else
                Qneu = 0
             end if
-            
+
             ratraw(irnep) = rnep
             dratrawdt(irnep) = 0
             dratrawdd(irnep) = 0
@@ -324,7 +324,7 @@
             else
                Qneu = 0
             end if
-            
+
             call eval_ni56_ec_rate( &
                temp, den, ye, eta, zbar, weak_rate_factor, &
                rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, &
@@ -334,10 +334,10 @@
                return
             end if
             ratraw(irn56ec) = rate
-            dratrawdt(irn56ec) = 0 
+            dratrawdt(irn56ec) = 0
             dratrawdd(irn56ec) = 0
-            
-            if (plus_co56) then         
+
+            if (plus_co56) then
                call eval_co56_ec_rate( &
                   temp, den, ye, eta, zbar, weak_rate_factor, &
                   rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, &
@@ -347,8 +347,8 @@
                   return
                end if
                ratraw(irco56ec) = rate
-               dratrawdt(irco56ec) = 0 
-               dratrawdd(irco56ec) = 0           
+               dratrawdt(irco56ec) = 0
+               dratrawdd(irco56ec) = 0
             end if
 
          end subroutine approx21_weak_rates
@@ -370,13 +370,13 @@
                ratdum,dratdumdt,dratdumdd,dratdumdy1,dratdumdy2
             logical, intent(in) ::  plus_co56
             integer, intent(out) :: ierr
-            
+
             real(dp) :: denom, denomdt, denomdd, zz, xx, eps, deps_dT, deps_dRho
             real(dp), parameter :: tiny_denom = 1d-50, tiny_y = 1d-30
             integer :: i
             logical :: okay
             include 'formats'
-            
+
             ierr = 0
 
             if (use_3a_FL) then
@@ -392,13 +392,13 @@
                   xx = conv_eps_3a*y(ihe4)*y(ihe4)*y(ihe4)/6d0
                   ratdum(ir3a) = eps/xx
                   dratdumdt(ir3a) = deps_dT/xx
-                  dratdumdd(ir3a) = deps_dRho/xx    
+                  dratdumdd(ir3a) = deps_dRho/xx
                end if
             end if
 
-                        
+
             okay = .true.
-            do i=1,num_mesa_reactions(plus_co56) 
+            do i=1,num_mesa_reactions(plus_co56)
                if (ratdum(i) < 0d0) then
                   write(*,2) 'approx21 missing rate for ' // ratnam(i), i, ratdum(i), &
                      btemp, log10(btemp), bden, log10(bden)
@@ -408,14 +408,14 @@
             if (.not. okay) call mesa_error(__FILE__,__LINE__)
 
             ! for debugging: sum(cat)/eps_nuc
-            
-            if (reduced_net_for_testing) then 
 
-               !if (.true.) then 
-               
+            if (reduced_net_for_testing) then
+
+               !if (.true.) then
+
                !end if
 
-               if (.false.) then 
+               if (.false.) then
 
                   ! turn off PP
                   call turn_off_reaction(irpp)
@@ -441,7 +441,7 @@
 
                   !Ne/O burn
                   call turn_off_reaction(ir1216)
-                  call turn_off_reaction(ir1616) 
+                  call turn_off_reaction(ir1616)
                   call turn_off_reaction(irneag)
                   call turn_off_reaction(irmgga)
 
@@ -496,28 +496,28 @@
                   call turn_off_reaction(irfeag)
 
                   !iron group
-                  call turn_off_reaction(irniga)                                  
+                  call turn_off_reaction(irniga)
                   call turn_off_reaction(irfeap)
                   call turn_off_reaction(ircopa)
-               
+
                   call turn_off_reaction(irnigp)
                   call turn_off_reaction(irfepg)
                   call turn_off_reaction(ircogp)
-               
+
                   call turn_off_reaction(irheng)
                   call turn_off_reaction(irhegn)
-                  
+
                   call turn_off_reaction(irhng)
                   call turn_off_reaction(irdgn)
-                  
+
                   call turn_off_reaction(irdpg)
                   call turn_off_reaction(irhegp)
-                  
+
                   call turn_off_reaction(irpen)
                   call turn_off_reaction(irnep)
-            
+
                   call turn_off_reaction(ircopg)
-               
+
                   call turn_off_reaction(ir54ng)
                   call turn_off_reaction(ir55gn)
                   call turn_off_reaction(ir55ng)
@@ -533,19 +533,19 @@
 
                   call turn_off_reaction(irfe54ap)
                   call turn_off_reaction(irco57pa)
-                  
+
                   call turn_off_reaction(irco56ec)
                   call turn_off_reaction(irn56ec)
-               
+
                end if
 
-               !if (.true.) then 
-                  
+               !if (.true.) then
 
-               !end if 
+
+               !end if
 
             end if
-            
+
    ! fe52(n,g)fe53(n,g)fe54 equilibrium links
          ratdum(ir1f54)     = 0.0d0
          dratdumdy1(ir1f54) = 0.0d0
@@ -618,10 +618,10 @@
          dratdumdd(irfe56_aux2) = dratdumdd(ir54ng)*ratdum(ir55ng)*zz &
                                  + ratdum(ir54ng)*dratdumdd(ir55ng)*zz &
                                  - ratdum(irfe56_aux2)*zz*denomdd
-         
+
          end if
 
-   ! fe54(a,p)co57(g,p)fe56 equilibrium links 
+   ! fe54(a,p)co57(g,p)fe56 equilibrium links
 
          ratdum(irfe56_aux3)     = 0.0d0
          dratdumdy1(irfe56_aux3) = 0.0d0
@@ -766,7 +766,7 @@
          dratdumdd(ir8f54)  = dratdumdd(irnigp) * ratdum(ircopa) * zz &
                   + ratdum(irnigp) * dratdumdd(ircopa) * zz &
                   - ratdum(ir8f54) * zz * denomdd
-                  
+
 
          end if
 
@@ -837,7 +837,7 @@
          denom  = ratdum(irhegp)*ratdum(irdgn) + &
                   y(ineut)*ratdum(irheng)*ratdum(irdgn) + &
                   y(ineut)*y(iprot)*ratdum(irheng)*ratdum(irdpg)
-                                 
+
          if (is_bad(dratdumdy1(iralf2))) then
             write(*,1) 'denom', denom
             write(*,1) 'zz', zz
@@ -854,8 +854,8 @@
             write(*,1) 'y(iprot)', y(iprot)
             stop
          end if
-         
-         
+
+
          dratdumdy2(iralf2) = -ratdum(iralf2) * zz * y(ineut)* &
                               ratdum(irheng) * ratdum(irdpg)
          dratdumdt(iralf2)  = dratdumdt(irheng)*ratdum(irdpg) * &
@@ -912,10 +912,10 @@
             end if
 
          end if
-         
-            
+
+
          contains
-                  
+
          subroutine turn_off_reaction(i)
             integer, intent(in) :: i
             if (i == 0) return
@@ -924,10 +924,10 @@
             dratdumdd(i) = 0
             dratdumdy1(i) = 0
             dratdumdy2(i) = 0
-         end subroutine turn_off_reaction         
+         end subroutine turn_off_reaction
 
          end subroutine approx21_special_reactions
-         
+
 
          subroutine approx21_dydt( &
             y, rate, ratdum, dydt, deriva, &
@@ -949,9 +949,9 @@
          real(qp) :: qray(species(plus_co56))
 
          logical :: okay
-         
+
          include 'formats'
-         
+
          ierr = 0
 
          ! Turn on special fe56ec rate above some temperature
@@ -965,20 +965,20 @@
 
    ! hydrogen reactions
          a1 = -1.5d0 * y(ih1) * y(ih1) * rate(irpp)
-         a2 =  y(ihe3) * y(ihe3) * rate(ir33) 
-         a3 = -y(ihe3) * y(ihe4) * rate(irhe3ag) 
-         a4 = -2.0d0 * y(ic12) * y(ih1) * rate(ircpg) 
-         a5 = -2.0d0 * y(in14) * y(ih1) * rate(irnpg) 
-         a6 = -2.0d0 * y(io16) * y(ih1) * rate(iropg) 
+         a2 =  y(ihe3) * y(ihe3) * rate(ir33)
+         a3 = -y(ihe3) * y(ihe4) * rate(irhe3ag)
+         a4 = -2.0d0 * y(ic12) * y(ih1) * rate(ircpg)
+         a5 = -2.0d0 * y(in14) * y(ih1) * rate(irnpg)
+         a6 = -2.0d0 * y(io16) * y(ih1) * rate(iropg)
          a7 = -3.0d0 * y(ih1) * rate(irpen)
 
-         qray(ih1) = qray(ih1) + a1 + a2 + a3 + a4 + a5 + a6 + a7      
+         qray(ih1) = qray(ih1) + a1 + a2 + a3 + a4 + a5 + a6 + a7
 
    ! he3 reactions
 
-         a1  =  0.5d0 * y(ih1) * y(ih1) * rate(irpp) 
-         a2  = -y(ihe3) * y(ihe3) * rate(ir33) 
-         a3  = -y(ihe3) * y(ihe4) * rate(irhe3ag) 
+         a1  =  0.5d0 * y(ih1) * y(ih1) * rate(irpp)
+         a2  = -y(ihe3) * y(ihe3) * rate(ir33)
+         a3  = -y(ihe3) * y(ihe4) * rate(irhe3ag)
          a4  =  y(ih1) * rate(irpen)
 
          qray(ihe3) = qray(ihe3) + a1 + a2 + a3 + a4
@@ -986,8 +986,8 @@
 
    ! he4 reactions
    ! heavy ion reactions
-         a1  = 0.5d0 * y(ic12) * y(ic12) * rate(ir1212) 
-         a2  = 0.5d0 * y(ic12) * y(io16) * rate(ir1216) 
+         a1  = 0.5d0 * y(ic12) * y(ic12) * rate(ir1212)
+         a2  = 0.5d0 * y(ic12) * y(io16) * rate(ir1216)
          a3  = 0.56d0 * 0.5d0 * y(io16) * y(io16) * rate(ir1616)
          a4 = -y(ihe4) * y(in14) * rate(irnag) * 1.5d0 ! n14 + 1.5 alpha => ne20
          qray(ihe4) =  qray(ihe4) + a1 + a2 + a3 + a4
@@ -995,33 +995,33 @@
 
    ! (a,g) and (g,a) reactions
 
-         a1  = -0.5d0 * y(ihe4) * y(ihe4) * y(ihe4) * rate(ir3a) 
-         a2  =  3.0d0 * y(ic12) * rate(irg3a) 
-         a3  = -y(ihe4) * y(ic12) * rate(ircag) 
-         a4  =  y(io16) * rate(iroga) 
-         a5  = -y(ihe4) * y(io16) * rate(iroag) 
-         a6  =  y(ine20) * rate(irnega) 
-         a7  = -y(ihe4) * y(ine20) * rate(irneag) 
-         a8  =  y(img24) * rate(irmgga) 
-         a9  = -y(ihe4) * y(img24)* rate(irmgag) 
-         a10 =  y(isi28) * rate(irsiga) 
-         a11 = -y(ihe4) * y(isi28)*rate(irsiag) 
+         a1  = -0.5d0 * y(ihe4) * y(ihe4) * y(ihe4) * rate(ir3a)
+         a2  =  3.0d0 * y(ic12) * rate(irg3a)
+         a3  = -y(ihe4) * y(ic12) * rate(ircag)
+         a4  =  y(io16) * rate(iroga)
+         a5  = -y(ihe4) * y(io16) * rate(iroag)
+         a6  =  y(ine20) * rate(irnega)
+         a7  = -y(ihe4) * y(ine20) * rate(irneag)
+         a8  =  y(img24) * rate(irmgga)
+         a9  = -y(ihe4) * y(img24)* rate(irmgag)
+         a10 =  y(isi28) * rate(irsiga)
+         a11 = -y(ihe4) * y(isi28)*rate(irsiag)
          a12 =  y(is32) * rate(irsga)
 
          qray(ihe4) =  qray(ihe4) + &
             a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12
-               
-         a1  = -y(ihe4) * y(is32) * rate(irsag) 
-         a2  =  y(iar36) * rate(irarga) 
-         a3  = -y(ihe4) * y(iar36)*rate(irarag) 
-         a4  =  y(ica40) * rate(ircaga) 
-         a5  = -y(ihe4) * y(ica40)*rate(ircaag) 
-         a6  =  y(iti44) * rate(irtiga) 
-         a7  = -y(ihe4) * y(iti44)*rate(irtiag) 
-         a8  =  y(icr48) * rate(ircrga) 
-         a9  = -y(ihe4) * y(icr48)*rate(ircrag) 
-         a10 =  y(ife52) * rate(irfega) 
-         a11 = -y(ihe4) * y(ife52) * rate(irfeag) 
+
+         a1  = -y(ihe4) * y(is32) * rate(irsag)
+         a2  =  y(iar36) * rate(irarga)
+         a3  = -y(ihe4) * y(iar36)*rate(irarag)
+         a4  =  y(ica40) * rate(ircaga)
+         a5  = -y(ihe4) * y(ica40)*rate(ircaag)
+         a6  =  y(iti44) * rate(irtiga)
+         a7  = -y(ihe4) * y(iti44)*rate(irtiag)
+         a8  =  y(icr48) * rate(ircrga)
+         a9  = -y(ihe4) * y(icr48)*rate(ircrag)
+         a10 =  y(ife52) * rate(irfega)
+         a11 = -y(ihe4) * y(ife52) * rate(irfeag)
          a12 =  y(ini56) * rate(irniga)
 
          qray(ihe4) =  qray(ihe4) + &
@@ -1031,48 +1031,48 @@
    ! (a,p)(p,g) and (g,p)(p,a) reactions
 
          if (.not.deriva) then
-         a1  =  0.34d0*0.5d0*y(io16)*y(io16)*rate(irs1)*rate(ir1616) 
+         a1  =  0.34d0*0.5d0*y(io16)*y(io16)*rate(irs1)*rate(ir1616)
          a2  = -y(ihe4) * y(img24) * rate(irmgap)*(1.0d0-rate(irr1))
-         a3  =  y(isi28) * rate(irsigp) * rate(irr1) 
-         a4  = -y(ihe4) * y(isi28) * rate(irsiap)*(1.0d0-rate(irs1)) 
-         a5  =  y(is32) * rate(irsgp) * rate(irs1) 
-         a6  = -y(ihe4) * y(is32) * rate(irsap)*(1.0d0-rate(irt1)) 
-         a7  =  y(iar36) * rate(irargp) * rate(irt1) 
-         a8  = -y(ihe4) * y(iar36) * rate(irarap)*(1.0d0-rate(iru1)) 
-         a9  =  y(ica40) * rate(ircagp) * rate(iru1) 
-         a10 = -y(ihe4) * y(ica40) * rate(ircaap)*(1.0d0-rate(irv1)) 
+         a3  =  y(isi28) * rate(irsigp) * rate(irr1)
+         a4  = -y(ihe4) * y(isi28) * rate(irsiap)*(1.0d0-rate(irs1))
+         a5  =  y(is32) * rate(irsgp) * rate(irs1)
+         a6  = -y(ihe4) * y(is32) * rate(irsap)*(1.0d0-rate(irt1))
+         a7  =  y(iar36) * rate(irargp) * rate(irt1)
+         a8  = -y(ihe4) * y(iar36) * rate(irarap)*(1.0d0-rate(iru1))
+         a9  =  y(ica40) * rate(ircagp) * rate(iru1)
+         a10 = -y(ihe4) * y(ica40) * rate(ircaap)*(1.0d0-rate(irv1))
          a11 =  y(iti44) * rate(irtigp) * rate(irv1)
-         a12 = -y(ihe4) * y(iti44) * rate(irtiap)*(1.0d0-rate(irw1)) 
-         a13 =  y(icr48) * rate(ircrgp) * rate(irw1) 
-         a14 = -y(ihe4) * y(icr48) * rate(ircrap)*(1.0d0-rate(irx1)) 
-         a15 =  y(ife52) * rate(irfegp) * rate(irx1) 
+         a12 = -y(ihe4) * y(iti44) * rate(irtiap)*(1.0d0-rate(irw1))
+         a13 =  y(icr48) * rate(ircrgp) * rate(irw1)
+         a14 = -y(ihe4) * y(icr48) * rate(ircrap)*(1.0d0-rate(irx1))
+         a15 =  y(ife52) * rate(irfegp) * rate(irx1)
 
          qray(ihe4) = qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + &
             a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15
 
          else
-         a1  =  0.34d0*0.5d0*y(io16)*y(io16) * ratdum(irs1)*rate(ir1616) 
+         a1  =  0.34d0*0.5d0*y(io16)*y(io16) * ratdum(irs1)*rate(ir1616)
          a2  =  0.34d0*0.5d0*y(io16)*y(io16) * rate(irs1) * ratdum(ir1616)
-         a3  = -y(ihe4)*y(img24) * rate(irmgap)*(1.0d0 - ratdum(irr1)) 
+         a3  = -y(ihe4)*y(img24) * rate(irmgap)*(1.0d0 - ratdum(irr1))
          a4  =  y(ihe4)*y(img24) * ratdum(irmgap)*rate(irr1)
-         a5  =  y(isi28) * ratdum(irsigp) * rate(irr1) 
+         a5  =  y(isi28) * ratdum(irsigp) * rate(irr1)
          a6  =  y(isi28) * rate(irsigp) * ratdum(irr1)
-         a7  = -y(ihe4)*y(isi28) * rate(irsiap)*(1.0d0 - ratdum(irs1)) 
+         a7  = -y(ihe4)*y(isi28) * rate(irsiap)*(1.0d0 - ratdum(irs1))
          a8  =  y(ihe4)*y(isi28) * ratdum(irsiap) * rate(irs1)
          a9  =  y(is32) * ratdum(irsgp) * rate(irs1)
          a10 =  y(is32) * rate(irsgp) * ratdum(irs1)
 
          qray(ihe4) =  qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10
 
-         a1  = -y(ihe4)*y(is32) * rate(irsap)*(1.0d0 - ratdum(irt1)) 
+         a1  = -y(ihe4)*y(is32) * rate(irsap)*(1.0d0 - ratdum(irt1))
          a2  =  y(ihe4)*y(is32) * ratdum(irsap)*rate(irt1)
-         a3  =  y(iar36) * ratdum(irargp) * rate(irt1) 
+         a3  =  y(iar36) * ratdum(irargp) * rate(irt1)
          a4  =  y(iar36) * rate(irargp) * ratdum(irt1)
          a5  = -y(ihe4)*y(iar36) * rate(irarap)*(1.0d0 - ratdum(iru1))
          a6  =  y(ihe4)*y(iar36) * ratdum(irarap)*rate(iru1)
          a7  =  y(ica40) * ratdum(ircagp) * rate(iru1)
          a8  =  y(ica40) * rate(ircagp) * ratdum(iru1)
-         a9  = -y(ihe4)*y(ica40) * rate(ircaap)*(1.0d0-ratdum (irv1)) 
+         a9  = -y(ihe4)*y(ica40) * rate(ircaap)*(1.0d0-ratdum (irv1))
          a10 =  y(ihe4)*y(ica40) * ratdum(ircaap)*rate(irv1)
          a11 =  y(iti44) * ratdum(irtigp) * rate(irv1)
          a12 =  y(iti44) * rate(irtigp) * ratdum(irv1)
@@ -1082,11 +1082,11 @@
 
          a1  = -y(ihe4)*y(iti44) * rate(irtiap)*(1.0d0 - ratdum(irw1))
          a2  =  y(ihe4)*y(iti44) * ratdum(irtiap)*rate(irw1)
-         a3  =  y(icr48) * ratdum(ircrgp) * rate(irw1) 
+         a3  =  y(icr48) * ratdum(ircrgp) * rate(irw1)
          a4  =  y(icr48) * rate(ircrgp) * ratdum(irw1)
          a5  = -y(ihe4)*y(icr48) * rate(ircrap)*(1.0d0 - ratdum(irx1))
          a6  =  y(ihe4)*y(icr48) * ratdum(ircrap)*rate(irx1)
-         a7  =  y(ife52) * ratdum(irfegp) * rate(irx1) 
+         a7  =  y(ife52) * ratdum(irfegp) * rate(irx1)
          a8  =  y(ife52) * rate(irfegp) * ratdum(irx1)
 
          qray(ihe4) = qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
@@ -1094,14 +1094,14 @@
 
 
    ! photodisintegration reactions
-         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54) 
-         a2 = -y(ife52) * y(ihe4) * rate(ir6f54) 
-         a3 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54) 
-         a4 =  y(ini56) * y(iprot) * rate(ir8f54) 
-         a5 = -y(ihe4) * rate(iralf1) 
-         a6 =  y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2) 
-         a7 =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3) 
-         a8 = -y(ife54) * y(ihe4) * rate(irfe56_aux4) 
+         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
+         a2 = -y(ife52) * y(ihe4) * rate(ir6f54)
+         a3 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54)
+         a4 =  y(ini56) * y(iprot) * rate(ir8f54)
+         a5 = -y(ihe4) * rate(iralf1)
+         a6 =  y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
+         a7 =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
+         a8 = -y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
          qray(ihe4) =  qray(ihe4) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
 
@@ -1110,97 +1110,97 @@
          a1 = 0.5d0 * y(ihe3) * y(ihe3) * rate(ir33)
          a2 = y(ihe3) * y(ihe4) * rate(irhe3ag)
 
-         qray(ihe4) =  qray(ihe4) + a1 + a2 
+         qray(ihe4) =  qray(ihe4) + a1 + a2
 
 
    ! cno cycles
-         a1 = y(io16) * y(ih1) * rate(iropg) 
+         a1 = y(io16) * y(ih1) * rate(iropg)
 
          qray(ihe4) =  qray(ihe4) + a1 + a2
-         
+
          if (.not. deriva) then
-            a1 = y(in14) * y(ih1) * rate(ifa) * rate(irnpg) 
+            a1 = y(in14) * y(ih1) * rate(ifa) * rate(irnpg)
             qray(ihe4) =  qray(ihe4) + a1
          else
-            a1 = y(in14) * y(ih1) * rate(ifa) * ratdum(irnpg) 
-            a2 = y(in14) * y(ih1) * ratdum(ifa) * rate(irnpg) 
+            a1 = y(in14) * y(ih1) * rate(ifa) * ratdum(irnpg)
+            a2 = y(in14) * y(ih1) * ratdum(ifa) * rate(irnpg)
             qray(ihe4) =  qray(ihe4) + a1 + a2
          end if
 
 
    ! c12 reactions
-         a1 = -y(ic12) * y(ic12) * rate(ir1212) 
-         a2 = -y(ic12) * y(io16) * rate(ir1216) 
-         a3 =  (1d0/6d0) * y(ihe4) * y(ihe4) * y(ihe4) * rate(ir3a) 
-         a4 = -y(ic12) * rate(irg3a) 
-         a5 = -y(ic12) * y(ihe4) * rate(ircag) 
-         a6 =  y(io16) * rate(iroga) 
-         a7 = -y(ic12) * y(ih1) * rate(ircpg) 
+         a1 = -y(ic12) * y(ic12) * rate(ir1212)
+         a2 = -y(ic12) * y(io16) * rate(ir1216)
+         a3 =  (1d0/6d0) * y(ihe4) * y(ihe4) * y(ihe4) * rate(ir3a)
+         a4 = -y(ic12) * rate(irg3a)
+         a5 = -y(ic12) * y(ihe4) * rate(ircag)
+         a6 =  y(io16) * rate(iroga)
+         a7 = -y(ic12) * y(ih1) * rate(ircpg)
 
          qray(ic12) =  qray(ic12) + a1 + a2 + a3 + a4 + a5 + a6 + a7
-               
+
          if (.not. deriva) then
             a1 =  y(in14) * y(ih1) * rate(ifa) * rate(irnpg)
             qray(ic12) =  qray(ic12) + a1
          else
             a1 =  y(in14) * y(ih1) * rate(ifa) * ratdum(irnpg)
             a2 =  y(in14) * y(ih1) * ratdum(ifa) * rate(irnpg)
-            qray(ic12) =  qray(ic12) + a1 + a2         
+            qray(ic12) =  qray(ic12) + a1 + a2
          end if
 
 
    ! n14 reactions
-         a1 =  y(ic12) * y(ih1) * rate(ircpg) 
-         a2 = -y(in14) * y(ih1) * rate(irnpg) 
-         a3 =  y(io16) * y(ih1) * rate(iropg) 
+         a1 =  y(ic12) * y(ih1) * rate(ircpg)
+         a2 = -y(in14) * y(ih1) * rate(irnpg)
+         a3 =  y(io16) * y(ih1) * rate(iropg)
          a4 = -y(ihe4) * y(in14) * rate(irnag) ! n14 + 1.5 alpha => ne20
 
-         qray(in14) =  qray(in14) + a1 + a2 + a3 + a4 
+         qray(in14) =  qray(in14) + a1 + a2 + a3 + a4
 
 
    ! o16 reactions
-         a1 = -y(ic12) * y(io16) * rate(ir1216) 
-         a2 = -y(io16) * y(io16) * rate(ir1616) 
-         a3 =  y(ic12) * y(ihe4) * rate(ircag) 
-         a4 = -y(io16) * y(ihe4) * rate(iroag) 
-         a5 = -y(io16) * rate(iroga) 
-         a6 =  y(ine20) * rate(irnega) 
+         a1 = -y(ic12) * y(io16) * rate(ir1216)
+         a2 = -y(io16) * y(io16) * rate(ir1616)
+         a3 =  y(ic12) * y(ihe4) * rate(ircag)
+         a4 = -y(io16) * y(ihe4) * rate(iroag)
+         a5 = -y(io16) * rate(iroga)
+         a6 =  y(ine20) * rate(irnega)
          a7 = -y(io16) * y(ih1) * rate(iropg)
 
          qray(io16) =  qray(io16) + a1 + a2 + a3 + a4 + a5 + a6 + a7
-         
+
          if (.not. deriva) then
-            a1 =  y(in14) * y(ih1) * rate(ifg) * rate(irnpg) 
+            a1 =  y(in14) * y(ih1) * rate(ifg) * rate(irnpg)
             qray(io16) =  qray(io16) + a1
          else
-            a1 =  y(in14) * y(ih1) * rate(ifg) * ratdum(irnpg) 
-            a2 =  y(in14) * y(ih1) * ratdum(ifg) * rate(irnpg) 
+            a1 =  y(in14) * y(ih1) * rate(ifg) * ratdum(irnpg)
+            a2 =  y(in14) * y(ih1) * ratdum(ifg) * rate(irnpg)
             qray(io16) =  qray(io16) + a1 + a2
          end if
 
 
    ! ne20 reactions
-         a1 =  0.5d0 * y(ic12) * y(ic12) * rate(ir1212) 
-         a2 =  y(io16) * y(ihe4) * rate(iroag) 
-         a3 = -y(ine20) * y(ihe4) * rate(irneag) 
-         a4 = -y(ine20) * rate(irnega) 
-         a5 =  y(img24) * rate(irmgga) 
+         a1 =  0.5d0 * y(ic12) * y(ic12) * rate(ir1212)
+         a2 =  y(io16) * y(ihe4) * rate(iroag)
+         a3 = -y(ine20) * y(ihe4) * rate(irneag)
+         a4 = -y(ine20) * rate(irnega)
+         a5 =  y(img24) * rate(irmgga)
          a6 =  y(in14) * y(ihe4) * rate(irnag) ! n14 + 1.5 alpha => ne20
 
          qray(ine20) =  qray(ine20) + a1 + a2 + a3 + a4 + a5 + a6
 
 
    ! mg24 reactions
-         a1 =  0.5d0 * y(ic12) * y(io16) * rate(ir1216) 
-         a2 =  y(ine20) * y(ihe4) * rate(irneag) 
-         a3 = -y(img24) * y(ihe4) * rate(irmgag) 
-         a4 = -y(img24) * rate(irmgga) 
+         a1 =  0.5d0 * y(ic12) * y(io16) * rate(ir1216)
+         a2 =  y(ine20) * y(ihe4) * rate(irneag)
+         a3 = -y(img24) * y(ihe4) * rate(irmgag)
+         a4 = -y(img24) * rate(irmgga)
          a5 =  y(isi28) * rate(irsiga)
-         
-         qray(img24) =  qray(img24) + a1 + a2 + a3 + a4 + a5 
+
+         qray(img24) =  qray(img24) + a1 + a2 + a3 + a4 + a5
 
          if (.not.deriva) then
-         a1 = -y(img24) * y(ihe4) * rate(irmgap)*(1.0d0-rate(irr1)) 
+         a1 = -y(img24) * y(ihe4) * rate(irmgap)*(1.0d0-rate(irr1))
          a2 =  y(isi28) * rate(irr1) * rate(irsigp)
 
          qray(img24) =  qray(img24) + a1 + a2
@@ -1208,7 +1208,7 @@
          else
          a1 = -y(img24)*y(ihe4) * rate(irmgap)*(1.0d0 - ratdum(irr1))
          a2 =  y(img24)*y(ihe4) * ratdum(irmgap)*rate(irr1)
-         a3 =  y(isi28) * ratdum(irr1) * rate(irsigp) 
+         a3 =  y(isi28) * ratdum(irr1) * rate(irsigp)
          a4 =  y(isi28) * rate(irr1) * ratdum(irsigp)
 
          qray(img24) =  qray(img24) + a1 + a2 + a3 + a4
@@ -1216,31 +1216,31 @@
 
 
    ! si28 reactions
-         a1 =  0.5d0 * y(ic12) * y(io16) * rate(ir1216) 
-         a2 =  0.56d0 * 0.5d0*y(io16) * y(io16) * rate(ir1616) 
-         a3 =  y(img24) * y(ihe4) * rate(irmgag) 
-         a4 = -y(isi28) * y(ihe4) * rate(irsiag) 
-         a5 = -y(isi28) * rate(irsiga) 
+         a1 =  0.5d0 * y(ic12) * y(io16) * rate(ir1216)
+         a2 =  0.56d0 * 0.5d0*y(io16) * y(io16) * rate(ir1616)
+         a3 =  y(img24) * y(ihe4) * rate(irmgag)
+         a4 = -y(isi28) * y(ihe4) * rate(irsiag)
+         a5 = -y(isi28) * rate(irsiga)
          a6 =  y(is32) * rate(irsga)
 
          qray(isi28) =  qray(isi28) + a1 + a2 + a3 + a4 + a5 + a6
 
          if (.not.deriva) then
-         
-         a1 =  0.34d0*0.5d0*y(io16)*y(io16)*rate(irs1)*rate(ir1616) 
-         a2 =  y(img24) * y(ihe4) * rate(irmgap)*(1.0d0-rate(irr1)) 
-         a3 = -y(isi28) * rate(irr1) * rate(irsigp) 
-         a4 = -y(isi28) * y(ihe4) * rate(irsiap)*(1.0d0-rate(irs1)) 
+
+         a1 =  0.34d0*0.5d0*y(io16)*y(io16)*rate(irs1)*rate(ir1616)
+         a2 =  y(img24) * y(ihe4) * rate(irmgap)*(1.0d0-rate(irr1))
+         a3 = -y(isi28) * rate(irr1) * rate(irsigp)
+         a4 = -y(isi28) * y(ihe4) * rate(irsiap)*(1.0d0-rate(irs1))
          a5 =  y(is32) * rate(irs1) * rate(irsgp)
 
          qray(isi28) =  qray(isi28) + a1 + a2 + a3 + a4 + a5
 
          else
-         a1  =  0.34d0*0.5d0*y(io16)*y(io16) * ratdum(irs1)*rate(ir1616) 
+         a1  =  0.34d0*0.5d0*y(io16)*y(io16) * ratdum(irs1)*rate(ir1616)
          a2  =  0.34d0*0.5d0*y(io16)*y(io16) * rate(irs1)*ratdum(ir1616)
          a3  =  y(img24)*y(ihe4) * rate(irmgap)*(1.0d0 - ratdum(irr1))
          a4  = -y(img24)*y(ihe4) * ratdum(irmgap)*rate(irr1)
-         a5  = -y(isi28) * ratdum(irr1) * rate(irsigp) 
+         a5  = -y(isi28) * ratdum(irr1) * rate(irsigp)
          a6  = -y(isi28) * rate(irr1) * ratdum(irsigp)
          a7  = -y(isi28)*y(ihe4) * rate(irsiap)*(1.0d0 - ratdum(irs1))
          a8  =  y(isi28)*y(ihe4) * ratdum(irsiap)*rate(irs1)
@@ -1253,20 +1253,20 @@
 
 
    ! s32 reactions
-         a1 =  0.1d0 * 0.5d0*y(io16) * y(io16) * rate(ir1616) 
-         a2 =  y(isi28) * y(ihe4) * rate(irsiag) 
-         a3 = -y(is32) * y(ihe4) * rate(irsag) 
-         a4 = -y(is32) * rate(irsga) 
+         a1 =  0.1d0 * 0.5d0*y(io16) * y(io16) * rate(ir1616)
+         a2 =  y(isi28) * y(ihe4) * rate(irsiag)
+         a3 = -y(is32) * y(ihe4) * rate(irsag)
+         a4 = -y(is32) * rate(irsga)
          a5 =  y(iar36) * rate(irarga)
 
          qray(is32) =  qray(is32) + a1 + a2 + a3 + a4 + a5
 
          if (.not.deriva) then
 
-         a1 =  0.34d0*0.5d0*y(io16)*y(io16)* rate(ir1616)*(1.0d0-rate(irs1)) 
-         a2 =  y(isi28) * y(ihe4) * rate(irsiap)*(1.0d0-rate(irs1)) 
-         a3 = -y(is32) * rate(irs1) * rate(irsgp) 
-         a4 = -y(is32) * y(ihe4) * rate(irsap)*(1.0d0-rate(irt1)) 
+         a1 =  0.34d0*0.5d0*y(io16)*y(io16)* rate(ir1616)*(1.0d0-rate(irs1))
+         a2 =  y(isi28) * y(ihe4) * rate(irsiap)*(1.0d0-rate(irs1))
+         a3 = -y(is32) * rate(irs1) * rate(irsgp)
+         a4 = -y(is32) * y(ihe4) * rate(irsap)*(1.0d0-rate(irt1))
          a5 =  y(iar36) * rate(irt1) * rate(irargp)
 
          qray(is32) =  qray(is32) + a1 + a2 + a3 + a4 + a5
@@ -1275,8 +1275,8 @@
          a1  =  0.34d0*0.5d0*y(io16)*y(io16) * rate(ir1616)*(1.0d0-ratdum(irs1))
          a2  = -0.34d0*0.5d0*y(io16)*y(io16) * ratdum(ir1616)*rate(irs1)
          a3  =  y(isi28)*y(ihe4) * rate(irsiap)*(1.0d0-ratdum(irs1))
-         a4  = -y(isi28)*y(ihe4) * ratdum(irsiap)*rate(irs1) 
-         a5  = -y(is32) * ratdum(irs1) * rate(irsgp) 
+         a4  = -y(isi28)*y(ihe4) * ratdum(irsiap)*rate(irs1)
+         a5  = -y(is32) * ratdum(irs1) * rate(irsgp)
          a6  = -y(is32) * rate(irs1) * ratdum(irsgp)
          a7  = -y(is32)*y(ihe4) * rate(irsap)*(1.0d0-ratdum(irt1))
          a8  =  y(is32)*y(ihe4) * ratdum(irsap)*rate(irt1)
@@ -1289,32 +1289,32 @@
 
 
    ! ar36 reactions
-         a1 =  y(is32) * y(ihe4) * rate(irsag) 
+         a1 =  y(is32) * y(ihe4) * rate(irsag)
          a2 = -y(iar36) * y(ihe4) * rate(irarag)
-         a3 = -y(iar36) * rate(irarga) 
+         a3 = -y(iar36) * rate(irarga)
          a4 =  y(ica40) * rate(ircaga)
 
          qray(iar36) =  qray(iar36) + a1 + a2 + a3 + a4
 
          if (.not.deriva) then
-         a1 = y(is32) * y(ihe4) * rate(irsap)*(1.0d0-rate(irt1)) 
-         a2 = -y(iar36) * rate(irt1) * rate(irargp) 
-         a3 = -y(iar36) * y(ihe4) * rate(irarap)*(1.0d0-rate(iru1)) 
+         a1 = y(is32) * y(ihe4) * rate(irsap)*(1.0d0-rate(irt1))
+         a2 = -y(iar36) * rate(irt1) * rate(irargp)
+         a3 = -y(iar36) * y(ihe4) * rate(irarap)*(1.0d0-rate(iru1))
          a4 =  y(ica40) * rate(ircagp) * rate(iru1)
 
          qray(iar36) =  qray(iar36) + a1 + a2 + a3 + a4
 
          else
-         a1 =  y(is32)*y(ihe4) * rate(irsap)*(1.0d0 - ratdum(irt1)) 
+         a1 =  y(is32)*y(ihe4) * rate(irsap)*(1.0d0 - ratdum(irt1))
          a2 = -y(is32)*y(ihe4) * ratdum(irsap)*rate(irt1)
-         a3 = -y(iar36) * ratdum(irt1) * rate(irargp) 
+         a3 = -y(iar36) * ratdum(irt1) * rate(irargp)
          a4 = -y(iar36) * rate(irt1) * ratdum(irargp)
          a5 = -y(iar36)*y(ihe4) * rate(irarap)*(1.0d0-ratdum(iru1))
          a6 =  y(iar36)*y(ihe4) * ratdum(irarap)*rate(iru1)
-         a7 =  y(ica40) * ratdum(ircagp) * rate(iru1) 
+         a7 =  y(ica40) * ratdum(ircagp) * rate(iru1)
          a8 =  y(ica40) * rate(ircagp) * ratdum(iru1)
 
-         qray(iar36) =  qray(iar36) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 
+         qray(iar36) =  qray(iar36) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
          end if
 
 
@@ -1328,9 +1328,9 @@
 
          if (.not.deriva) then
 
-         a1 =  y(iar36) * y(ihe4) * rate(irarap)*(1.0d0-rate(iru1)) 
-         a2 = -y(ica40) * rate(ircagp) * rate(iru1) 
-         a3 = -y(ica40) * y(ihe4) * rate(ircaap)*(1.0d0-rate(irv1)) 
+         a1 =  y(iar36) * y(ihe4) * rate(irarap)*(1.0d0-rate(iru1))
+         a2 = -y(ica40) * rate(ircagp) * rate(iru1)
+         a3 = -y(ica40) * y(ihe4) * rate(ircaap)*(1.0d0-rate(irv1))
          a4 =  y(iti44) * rate(irtigp) * rate(irv1)
 
          qray(ica40) =  qray(ica40) + a1 + a2 + a3 + a4
@@ -1338,126 +1338,126 @@
          else
          a1 =  y(iar36)*y(ihe4) * rate(irarap)*(1.0d0-ratdum(iru1))
          a2 = -y(iar36)*y(ihe4) * ratdum(irarap)*rate(iru1)
-         a3 = -y(ica40) * ratdum(ircagp) * rate(iru1) 
+         a3 = -y(ica40) * ratdum(ircagp) * rate(iru1)
          a4 = -y(ica40) * rate(ircagp) * ratdum(iru1)
-         a5 = -y(ica40)*y(ihe4) * rate(ircaap)*(1.0d0-ratdum(irv1)) 
+         a5 = -y(ica40)*y(ihe4) * rate(ircaap)*(1.0d0-ratdum(irv1))
          a6 =  y(ica40)*y(ihe4) * ratdum(ircaap)*rate(irv1)
-         a7 =  y(iti44) * ratdum(irtigp) * rate(irv1) 
+         a7 =  y(iti44) * ratdum(irtigp) * rate(irv1)
          a8 =  y(iti44) * rate(irtigp) * ratdum(irv1)
 
-         qray(ica40) =  qray(ica40) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 
+         qray(ica40) =  qray(ica40) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
          end if
 
 
    ! ti44 reactions
-         a1 =  y(ica40) * y(ihe4) * rate(ircaag) 
-         a2 = -y(iti44) * y(ihe4) * rate(irtiag) 
-         a3 = -y(iti44) * rate(irtiga) 
+         a1 =  y(ica40) * y(ihe4) * rate(ircaag)
+         a2 = -y(iti44) * y(ihe4) * rate(irtiag)
+         a3 = -y(iti44) * rate(irtiga)
          a4 =  y(icr48) * rate(ircrga)
 
          qray(iti44) =  qray(iti44) + a1 + a2 + a3 + a4
 
          if (.not.deriva) then
-         a1 =  y(ica40) * y(ihe4) * rate(ircaap)*(1.0d0-rate(irv1)) 
-         a2 = -y(iti44) * rate(irv1) * rate(irtigp) 
-         a3 = -y(iti44) * y(ihe4) * rate(irtiap)*(1.0d0-rate(irw1)) 
+         a1 =  y(ica40) * y(ihe4) * rate(ircaap)*(1.0d0-rate(irv1))
+         a2 = -y(iti44) * rate(irv1) * rate(irtigp)
+         a3 = -y(iti44) * y(ihe4) * rate(irtiap)*(1.0d0-rate(irw1))
          a4 =  y(icr48) * rate(irw1) * rate(ircrgp)
 
          qray(iti44) =  qray(iti44) + a1 + a2 + a3 + a4
 
          else
-         a1 =  y(ica40)*y(ihe4) * rate(ircaap)*(1.0d0-ratdum(irv1)) 
+         a1 =  y(ica40)*y(ihe4) * rate(ircaap)*(1.0d0-ratdum(irv1))
          a2 = -y(ica40)*y(ihe4) * ratdum(ircaap)*rate(irv1)
-         a3 = -y(iti44) * ratdum(irv1) * rate(irtigp) 
+         a3 = -y(iti44) * ratdum(irv1) * rate(irtigp)
          a4 = -y(iti44) * rate(irv1) * ratdum(irtigp)
          a5 = -y(iti44)*y(ihe4) * rate(irtiap)*(1.0d0-ratdum(irw1))
          a6 =  y(iti44)*y(ihe4) * ratdum(irtiap)*rate(irw1)
          a7 =  y(icr48) * ratdum(irw1) * rate(ircrgp)
          a8 =  y(icr48) * rate(irw1) * ratdum(ircrgp)
 
-         qray(iti44) =  qray(iti44) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 
+         qray(iti44) =  qray(iti44) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
          end if
 
 
    ! cr48 reactions
-         a1 =  y(iti44) * y(ihe4) * rate(irtiag) 
-         a2 = -y(icr48) * y(ihe4) * rate(ircrag) 
-         a3 = -y(icr48) * rate(ircrga) 
+         a1 =  y(iti44) * y(ihe4) * rate(irtiag)
+         a2 = -y(icr48) * y(ihe4) * rate(ircrag)
+         a3 = -y(icr48) * rate(ircrga)
          a4 =  y(ife52) * rate(irfega)
 
          qray(icr48) =  qray(icr48) + a1 + a2 + a3 + a4
 
          if (.not.deriva) then
-         a1 =  y(iti44) * y(ihe4) * rate(irtiap)*(1.0d0-rate(irw1)) 
-         a2 = -y(icr48) * rate(irw1) * rate(ircrgp) 
-         a3 = -y(icr48) * y(ihe4) * rate(ircrap)*(1.0d0-rate(irx1)) 
+         a1 =  y(iti44) * y(ihe4) * rate(irtiap)*(1.0d0-rate(irw1))
+         a2 = -y(icr48) * rate(irw1) * rate(ircrgp)
+         a3 = -y(icr48) * y(ihe4) * rate(ircrap)*(1.0d0-rate(irx1))
          a4 =  y(ife52) * rate(irx1) * rate(irfegp)
 
          qray(icr48) =  qray(icr48) + a1 + a2 + a3 + a4
 
          else
-         a1 =  y(iti44)*y(ihe4) * rate(irtiap)*(1.0d0-ratdum(irw1)) 
+         a1 =  y(iti44)*y(ihe4) * rate(irtiap)*(1.0d0-ratdum(irw1))
          a2 = -y(iti44)*y(ihe4) * ratdum(irtiap)*rate(irw1)
-         a3 = -y(icr48) * ratdum(irw1) * rate(ircrgp) 
+         a3 = -y(icr48) * ratdum(irw1) * rate(ircrgp)
          a4 = -y(icr48) * rate(irw1) * ratdum(ircrgp)
          a5 = -y(icr48)*y(ihe4) * rate(ircrap)*(1.0d0-ratdum(irx1))
          a6 =  y(icr48)*y(ihe4) * ratdum(ircrap)*rate(irx1)
-         a7 =  y(ife52) * ratdum(irx1) * rate(irfegp) 
+         a7 =  y(ife52) * ratdum(irx1) * rate(irfegp)
          a8 =  y(ife52) * rate(irx1) * ratdum(irfegp)
 
-         qray(icr48) =  qray(icr48) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 
+         qray(icr48) =  qray(icr48) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8
          end if
 
 
    ! crx reactions
          a1 = y(ife56) * fe56ec_fake_factor * rate(irn56ec)
-         
+
          qray(icrx) = qray(icrx) + a1
 
    ! fe52 reactions
-         a1 =  y(icr48) * y(ihe4) * rate(ircrag) 
-         a2 = -y(ife52) * y(ihe4) * rate(irfeag) 
-         a3 = -y(ife52) * rate(irfega) 
+         a1 =  y(icr48) * y(ihe4) * rate(ircrag)
+         a2 = -y(ife52) * y(ihe4) * rate(irfeag)
+         a3 = -y(ife52) * rate(irfega)
          a4 =  y(ini56) * rate(irniga)
 
          qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4
 
          if (.not.deriva) then
-         a1 =  y(icr48) * y(ihe4) * rate(ircrap)*(1.0d0-rate(irx1)) 
-         a2 = -y(ife52) * rate(irx1) * rate(irfegp) 
+         a1 =  y(icr48) * y(ihe4) * rate(ircrap)*(1.0d0-rate(irx1))
+         a2 = -y(ife52) * rate(irx1) * rate(irfegp)
 
          qray(ife52) =  qray(ife52) + a1 + a2
 
          else
          a1 =  y(icr48)*y(ihe4) * rate(ircrap)*(1.0d0-ratdum(irx1))
          a2 = -y(icr48)*y(ihe4) * ratdum(ircrap)*rate(irx1)
-         a3 = -y(ife52) * ratdum(irx1) * rate(irfegp) 
+         a3 = -y(ife52) * ratdum(irx1) * rate(irfegp)
          a4 = -y(ife52) * rate(irx1) * ratdum(irfegp)
 
          qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4
          end if
 
-         a1 =  y(ife54) * rate(ir1f54) 
-         a2 = -y(ife52) * y(ineut) * y(ineut) * rate(ir2f54) 
-         a3 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54) 
-         a4 = -y(ife52) * y(ihe4) * rate(ir6f54) 
-         a5 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54) 
-         a6 =  y(ini56) * y(iprot) * rate(ir8f54) 
+         a1 =  y(ife54) * rate(ir1f54)
+         a2 = -y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
+         a3 =  y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
+         a4 = -y(ife52) * y(ihe4) * rate(ir6f54)
+         a5 = -y(ife52) * y(ihe4) * y(iprot) * rate(ir7f54)
+         a6 =  y(ini56) * y(iprot) * rate(ir8f54)
 
-         qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4 + a5 + a6 
+         qray(ife52) =  qray(ife52) + a1 + a2 + a3 + a4 + a5 + a6
 
 
    ! fe54 reactions
          a1  = -y(ife54) * rate(ir1f54)
-         a2  =  y(ife52) * y(ineut) * y(ineut) * rate(ir2f54) 
-         a3  = -y(ife54) * y(iprot) * y(iprot) * rate(ir3f54) 
-         a4  =  y(ini56) * rate(ir4f54) 
-         a5  = -y(ife54) * y(iprot) * y(iprot) * rate(ir5f54) 
-         a6  =  y(ife52) * y(ihe4) * rate(ir6f54) 
-         a7  =  y(ife56) * rate(irfe56_aux1) 
-         a8  = -y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2) 
-         a9  =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3) 
-         a10 = -y(ife54) * y(ihe4) * rate(irfe56_aux4) 
+         a2  =  y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
+         a3  = -y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
+         a4  =  y(ini56) * rate(ir4f54)
+         a5  = -y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
+         a6  =  y(ife52) * y(ihe4) * rate(ir6f54)
+         a7  =  y(ife56) * rate(irfe56_aux1)
+         a8  = -y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
+         a9  =  y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
+         a10 = -y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
          qray(ife54) =  qray(ife54) + &
             a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10
@@ -1465,47 +1465,47 @@
 
    ! fe56 reactions
          if (plus_co56) then
-            a1 =  y(ico56) * rate(irco56ec) 
+            a1 =  y(ico56) * rate(irco56ec)
          else
-            a1 =  y(ini56) * rate(irn56ec)  
+            a1 =  y(ini56) * rate(irn56ec)
          end if
-         a2 = -y(ife56) * fe56ec_fake_factor * rate(irn56ec) 
-         a3 = -y(ife56) * rate(irfe56_aux1) 
-         a4 =  y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)  
-         a5 = -y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3) 
-         a6 =  y(ife54) * y(ihe4) * rate(irfe56_aux4) 
+         a2 = -y(ife56) * fe56ec_fake_factor * rate(irn56ec)
+         a3 = -y(ife56) * rate(irfe56_aux1)
+         a4 =  y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
+         a5 = -y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
+         a6 =  y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
-         qray(ife56) =  qray(ife56) + a1 + a2 + a3 + a4 + a5 + a6 
+         qray(ife56) =  qray(ife56) + a1 + a2 + a3 + a4 + a5 + a6
 
          if (plus_co56) then
       ! co56 reactions
-            a1 =  y(ini56) * rate(irn56ec)  
-            a2 = -y(ico56) * rate(irco56ec) 
-            
+            a1 =  y(ini56) * rate(irn56ec)
+            a2 = -y(ico56) * rate(irco56ec)
+
             qray(ico56) =  qray(ico56) + a1 + a2
          end if
 
    ! ni56 reactions
-         a1 =  y(ife52) * y(ihe4) * rate(irfeag) 
-         a2 = -y(ini56) * rate(irniga) 
-         a3 = -y(ini56) * rate(irn56ec) 
-         
+         a1 =  y(ife52) * y(ihe4) * rate(irfeag)
+         a2 = -y(ini56) * rate(irniga)
+         a3 = -y(ini56) * rate(irn56ec)
+
          qray(ini56) =  qray(ini56) + a1 + a2 + a3
 
-         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir3f54) 
-         a2 = -y(ini56) * rate(ir4f54) 
-         a3 =  y(ife52) * y(ihe4)* y(iprot) * rate(ir7f54) 
+         a1 =  y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
+         a2 = -y(ini56) * rate(ir4f54)
+         a3 =  y(ife52) * y(ihe4)* y(iprot) * rate(ir7f54)
          a4 = -y(ini56) * y(iprot) * rate(ir8f54)
 
          qray(ini56) =  qray(ini56) + a1 + a2 + a3 + a4
 
    ! neutrons
-         a1 =  2.0d0 * y(ife54) * rate(ir1f54) 
-         a2 = -2.0d0 * y(ife52) * y(ineut) * y(ineut) * rate(ir2f54) 
-         a3 =  2.0d0 * y(ihe4) * rate(iralf1) 
-         a4 = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2) 
-         a5 =  y(iprot) * rate(irpen) 
-         a6 = -y(ineut) * rate(irnep) 
+         a1 =  2.0d0 * y(ife54) * rate(ir1f54)
+         a2 = -2.0d0 * y(ife52) * y(ineut) * y(ineut) * rate(ir2f54)
+         a3 =  2.0d0 * y(ihe4) * rate(iralf1)
+         a4 = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
+         a5 =  y(iprot) * rate(irpen)
+         a6 = -y(ineut) * rate(irnep)
          a7 =  2.0d0 * y(ife56) * rate(irfe56_aux1)
          a8 = -2.0d0 * y(ife54) * y(ineut) * y(ineut) * rate(irfe56_aux2)
          a9 = -fe56ec_n_neut * y(ife56) * fe56ec_fake_factor * rate(irn56ec)
@@ -1513,15 +1513,15 @@
          qray(ineut) =  qray(ineut) + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9
 
    ! photodisintegration protons
-         a1  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir3f54) 
-         a2  =  2.0d0 * y(ini56) * rate(ir4f54) 
-         a3  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir5f54) 
-         a4  =  2.0d0 * y(ife52) * y(ihe4) * rate(ir6f54) 
-         a5  =  2.0d0 * y(ihe4) * rate(iralf1) 
-         a6  = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2) 
-         a7  = -y(iprot) * rate(irpen) 
-         a8  =  y(ineut) * rate(irnep)  
-         a9  = -2.0d0 * y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3) 
+         a1  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir3f54)
+         a2  =  2.0d0 * y(ini56) * rate(ir4f54)
+         a3  = -2.0d0 * y(ife54) * y(iprot) * y(iprot) * rate(ir5f54)
+         a4  =  2.0d0 * y(ife52) * y(ihe4) * rate(ir6f54)
+         a5  =  2.0d0 * y(ihe4) * rate(iralf1)
+         a6  = -2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * rate(iralf2)
+         a7  = -y(iprot) * rate(irpen)
+         a8  =  y(ineut) * rate(irnep)
+         a9  = -2.0d0 * y(ife56) * y(iprot) * y(iprot) * rate(irfe56_aux3)
          a10 =  2.0d0 * y(ife54) * y(ihe4) * rate(irfe56_aux4)
 
          qray(iprot) =  qray(iprot) + &
@@ -1548,8 +1548,8 @@
          end if
 
          end subroutine approx21_dydt
-         
-         
+
+
          real(dp) function approx21_eval_PPII_fraction(y, rate) result(fII)
             real(dp), dimension(:), intent(in) :: y, rate
             real(dp) :: rateII, rateIII, rsum
@@ -1561,9 +1561,9 @@
                fII = 0.5d0
             else
                fII = rateII / rsum
-            end if               
+            end if
          end function approx21_eval_PPII_fraction
-               
+
 
          subroutine approx21_eps_info( &
                n, y, mion, dydt, rate, fII, &
@@ -1595,18 +1595,18 @@
                Qrti44ag, &
                Qrcr48ag, &
                Qrfe52ag, &
-               Qrfe52ng, & 
-               Qrfe53ng, & 
-               Qrfe54ng, & 
-               Qrfe55ng, & 
+               Qrfe52ng, &
+               Qrfe53ng, &
+               Qrfe54ng, &
+               Qrfe55ng, &
                Qrfe52neut_to_fe54, &
                Qrfe52aprot_to_fe54, &
                Qrfe54ng_to_fe56, &
                Qrfe54aprot_to_fe56, &
                Qrfe52aprot_to_ni56, &
-               Qrfe54prot_to_ni56, &     
+               Qrfe54prot_to_ni56, &
                Qrhe4_breakup, &
-               Qrhe4_rebuild, &      
+               Qrhe4_rebuild, &
                eps_total, eps_neu, &
                do_eps_nuc_categories, eps_nuc_categories, &
                dbg, &
@@ -1646,17 +1646,17 @@
                Qrca40ag, &
                Qrti44ag, &
                Qrcr48ag, &
-               Qrfe52ag, & 
-               Qrfe52ng, & 
-               Qrfe53ng, & 
-               Qrfe54ng, & 
-               Qrfe55ng, & 
+               Qrfe52ag, &
+               Qrfe52ng, &
+               Qrfe53ng, &
+               Qrfe54ng, &
+               Qrfe55ng, &
                Qrfe52neut_to_fe54, &
                Qrfe52aprot_to_fe54, &
                Qrfe54ng_to_fe56, &
                Qrfe54aprot_to_fe56, &
                Qrfe52aprot_to_ni56, &
-               Qrfe54prot_to_ni56, &           
+               Qrfe54prot_to_ni56, &
                Qrhe4_breakup, &
                Qrhe4_rebuild
             logical, intent(in) :: do_eps_nuc_categories
@@ -1669,26 +1669,26 @@
                eps_nuc_q, sum_categories_q
             real(dp) :: enuc_conv2, sum_categories, eps_nuc, fe56ec_fake_factor
             logical, intent(in) ::  plus_co56
-            
+
             include 'formats'
-               
+
             !write(*,1) 'reaction_Qs(irn14_to_o16) Qrn14_to_o16*Qconv', Qrn14_to_o16*Qconv
-            
+
             ierr = 0
 
             xx = 0.0_qp
             do i=1,species(plus_co56)
-               a1 = dydt(i) 
+               a1 = dydt(i)
                a2 = mion(i)
                xx = xx + a1*a2
             end do
             eps_total_q = -m3(avo,clight,clight) * xx
             eps_total = eps_total_q
-            
+
             fe56ec_fake_factor = eval_fe56ec_fake_factor( &
                n% g% fe56ec_fake_factor, n% g% min_T_for_fe56ec_fake_factor, n% temp)
             fe56ec_n_neut = n% g% fe56ec_n_neut
-            
+
             eps_neu_q = &
                m5(Qneu_rpp, 0.5d0, y(ih1), y(ih1), rate(irpp)) + &
                m5(Qneu_rpp2, y(ihe3), y(ihe4), rate(irhe3ag), fII) + &
@@ -1714,7 +1714,7 @@
 
             eps_nuc_q = eps_total_q - eps_neu_q
             eps_nuc = eps_nuc_q
-            
+
             if (.not. do_eps_nuc_categories) return
 
             do i=1,num_categories
@@ -1748,7 +1748,7 @@
             end if
 
             n% eps_neu_rate = n% eps_neu_rate * Qconv
-        
+
             call set_eps_nuc(Qtotal_rpp - Qneu_rpp,(/0.5d0, y(ih1), y(ih1)/),irpp, ipp)
             call set_eps_nuc(Qr33, (/0.5d0, y(ihe3), y(ihe3)/), ir33, ipp)
             call set_eps_nuc(( &
@@ -1759,7 +1759,7 @@
             call set_eps_nuc(Qtotal_rcpg - Qneu_rcpg, (/y(ic12), y(ih1)/),ircpg,icno)
             call set_eps_nuc(Qtotal_rcpg - Qneu_rnpg, (/y(in14), y(ih1)/),irnpg,icno)
             call set_eps_nuc(Qtotal_ropg - Qneu_ropg, (/y(io16), y(ih1),rate(ifa)/),iropg,icno)
-               
+
             call set_eps_nuc(Qr3alf, (/1d0/6d0,y(ihe4), y(ihe4), y(ihe4)/),ir3a,i3alf)
 
             call set_eps_nuc(Qrc12ag, (/y(ic12), y(ihe4)/),ircag,i_burn_c)
@@ -1770,25 +1770,25 @@
             call set_eps_nuc(Qro16ag, (/y(io16), y(ihe4)/), iroag, i_burn_o)
 
             call set_eps_nuc(Qr1212, (/0.5d0,y(ic12), y(ic12)/),ir1212,icc)
-            
+
             call set_eps_nuc(0.5d0*(Qr1216_to_mg24 + Qr1216_to_si28), (/y(ic12), y(io16)/), ir1216, ico )
 
             ! these make he4 + si28
             call set_eps_nuc( Qr1616a * (0.56d0 + 0.34d0*rate(irs1)), (/0.5d0,y(io16), y(io16)/), ir1616, ioo)
             ! these make s32
             call set_eps_nuc( Qr1616g * (0.1d0 + 0.34d0*(1d0 - rate(irs1))) , (/0.5d0,y(io16), y(io16)/), ir1616, ioo )
-            
+
             call set_eps_nuc(Qrne20ag, (/y(ihe4), y(ine20)/), irneag, i_burn_ne)
-               
+
             call set_eps_nuc(Qrmg24ag, (/y(ihe4), y(img24)/),irmgag,i_burn_mg)
             call set_eps_nuc(Qrmg24ag, (/y(ihe4), y(img24),1.0d0-rate(irr1)/),irmgap,i_burn_mg)
-               
+
             call set_eps_nuc(Qrsi28ag, (/y(ihe4), y(isi28)/),irsiag,i_burn_si)
             call set_eps_nuc(Qrsi28ag, (/y(ihe4), y(isi28),(1.0d0-rate(irs1))/),irsiap,i_burn_si)
 
             call set_eps_nuc(Qrs32ag, (/y(ihe4), y(is32)/), irsag, i_burn_s)
             call set_eps_nuc(Qrs32ag, (/y(ihe4), y(is32),(1.0d0-rate(irt1))/), irsap, i_burn_s)
-               
+
             call set_eps_nuc(Qrar36ag, (/y(ihe4), y(iar36)/), irarag, i_burn_ar)
             call set_eps_nuc(Qrar36ag, (/y(ihe4), y(iar36),(1.0d0-rate(iru1))/), irarap, i_burn_ar)
 
@@ -1853,14 +1853,14 @@
 
             call set_eps_nuc(-Qrfe52aprot_to_ni56,(/ y(ini56), y(iprot)/),ir8f54, iphoto)
             call set_eps_nuc(-Qrfe52aprot_to_fe54,(/ y(ife54), y(iprot), y(iprot)/),ir5f54, iphoto)
-            call set_eps_nuc(-Qrfe52ag,(/ y(ini56)/),irniga, iphoto)        
+            call set_eps_nuc(-Qrfe52ag,(/ y(ini56)/),irniga, iphoto)
             call set_eps_nuc(-Qrfe52neut_to_fe54,(/ y(ife54)/),ir1f54, iphoto)
             call set_eps_nuc(-Qrfe54ng_to_fe56,(/ y(ife56)/),irfe56_aux1, iphoto)
             call set_eps_nuc(-Qrfe54aprot_to_fe56,(/ y(ife56), y(iprot), y(iprot)/),irfe56_aux3, iphoto)
             call set_eps_nuc(-Qrfe54prot_to_ni56,(/ y(ini56)/),ir4f54, iphoto)
 
 
-                        
+
             call set_eps_nuc(Qtotal_rni56ec - Qneu_rni56ec, (/y(ini56)/), irn56ec, i_ni56_co56)
 
             if (plus_co56) then
@@ -1872,16 +1872,16 @@
 
             eps_nuc_cat = eps_nuc_cat * Qconv
             n% eps_nuc_rate = n% eps_nuc_rate * Qconv
-            
+
             do i=1,num_categories
                eps_nuc_categories(i) = eps_nuc_cat(i)
             end do
-            
+
             ! check eps_nuc vs sum(eps_nuc_cat)
-            
+
             sum_categories_q = sum(eps_nuc_cat)
             sum_categories = sum_categories_q
-            
+
             if (.false. .and. &
                abs(eps_nuc) > 1d-10*abs(eps_nuc_cat(iphoto)) .and. abs(eps_nuc) > 1d0 .and. &
                abs(sum_categories - eps_nuc) > 1d-2*min(abs(sum_categories),abs(eps_nuc))) then
@@ -1896,7 +1896,7 @@
                      write(*,1) trim(category_name(i)), eps_nuc_categories(i)
                   end if
                end do
-               write(*,*)         
+               write(*,*)
                write(*,1) 'eps_total', eps_total
                write(*,1) 'eps_neu', eps_neu
                write(*,1) 'eps_nuc', eps_nuc
@@ -1907,7 +1907,7 @@
                call mesa_error(__FILE__,__LINE__)
             !$OMP end critical (net21_crit1)
             end if
-            
+
             ! for debugging use reduced_net_for_testing
 
             if (.false. .and. n% logT >= 9.220336900d0 .and. n% logT <= 9.2203369009d0 .and. &
@@ -1921,7 +1921,7 @@
                do i=1,num_categories
                   write(*,1) trim(category_name(i)), eps_nuc_categories(i)
                end do
-               write(*,*)         
+               write(*,*)
                write(*,1) 'eps_total', eps_total
                write(*,1) 'eps_neu', eps_neu
                write(*,1) 'eps_nuc', eps_nuc
@@ -1930,28 +1930,28 @@
                write(*,1) 'sum(cat)/eps_nuc - 1', (sum_categories_q - eps_nuc_q)/eps_nuc_q
                call mesa_error(__FILE__,__LINE__,'approx21_eps_info')
             end if
-            
-            
+
+
             contains
-            
+
             real(qp) function m2(a1,a2)
                real(dp), intent(in) :: a1, a2
                real(qp) :: q1, q2
                q1 = a1; q2 = a2; m2 = q1*q2
             end function m2
-            
+
             real(qp) function m3(a1,a2,a3)
                real(dp), intent(in) :: a1, a2, a3
                real(qp) :: q1, q2, q3
                q1 = a1; q2 = a2; q3 = a3; m3 = q1*q2*q3
             end function m3
-            
+
             real(qp) function m4(a1,a2,a3,a4)
                real(dp), intent(in) :: a1, a2, a3, a4
                real(qp) :: q1, q2, q3, q4
                q1 = a1; q2 = a2; q3 = a3; q4 = a4; m4 = q1*q2*q3*q4
             end function m4
-            
+
             real(qp) function m5(a1,a2,a3,a4,a5)
                real(dp), intent(in) :: a1, a2, a3, a4, a5
                real(qp) :: q1, q2, q3, q4, q5
@@ -2001,35 +2001,35 @@
             real(dp), intent(inout) :: d_epsneu_dy(:)
             logical, intent(in) ::  plus_co56
             integer, intent(out) :: ierr
-            
+
             real(dp) :: fII
-            
+
             ierr = 0
-            
+
             fII = 0.5d0 ! fix this
-            
+
             d_epsneu_dy(1:species(plus_co56)) = 0d0
-            
+
             d_epsneu_dy(ih1) = Qconv*( &
                Qneu_rpp * y(ih1) * rate(irpp) + & ! rpp_to_he3
                Qneu_rcpg * y(ic12) * rate(ircpg) + & ! C of CNO
                Qneu_rnpg * y(in14) * rate(irnpg) + & ! N of CNO
                Qneu_ropg * y(io16) * rate(iropg)) ! O of CNO
-               
+
             d_epsneu_dy(ihe3) = Qconv*( &
                Qneu_rpp2 * y(ihe4) * rate(irhe3ag) * fII + & ! r34_pp2
                Qneu_rpp3 * y(ihe4) * rate(irhe3ag) * (1d0-fII)) ! r34_pp3
-               
+
             d_epsneu_dy(ihe4) = Qconv*( &
                Qneu_rpp2 * y(ihe3) * rate(irhe3ag) * fII + & ! r34_pp2
                Qneu_rpp3 * y(ihe3) * rate(irhe3ag) * (1d0-fII)) ! r34_pp3
-               
+
             d_epsneu_dy(ic12) = Qconv* &
                Qneu_rcpg * y(ih1) * rate(ircpg) ! C of CNO
-               
+
             d_epsneu_dy(in14) = Qconv* &
                Qneu_rnpg * y(ih1) * rate(irnpg)  ! N of CNO
-               
+
             d_epsneu_dy(io16) = Qconv* &
                Qneu_ropg * y(ih1) * rate(iropg) ! O of CNO
 
@@ -2051,12 +2051,12 @@
          real(dp) abar,zbar,ye,taud,taut, b1, &
                snuda,snudz,enuc,velx,posx,zz
          real(dp) :: fe56ec_fake_factor
-               
+
          ierr = 0
-         
+
          ! Turn on special fe56ec rate above some temperature
          fe56ec_fake_factor=eval_fe56ec_fake_factor(fe56ec_fake_factor_in,min_T,btemp)
-            
+
          ! NOTE: use of quad precision for dfdy doesn't make a difference.
 
          dfdy(1:species(plus_co56),1:species(plus_co56)) = 0.0d0
@@ -2129,8 +2129,8 @@
          dfdy(ihe4,ihe4)  = dfdy(ihe4,ihe4) &
                            - y(ife52) * ratdum(ir6f54) &
                            - y(ife52) * y(iprot) * ratdum(ir7f54) &
-                           - ratdum(iralf1) & 
-                           - y(ife54) * ratdum(irfe56_aux4) 
+                           - ratdum(iralf1) &
+                           - y(ife54) * ratdum(irfe56_aux4)
 
 
          dfdy(ihe4,ihe4)  = dfdy(ihe4,ihe4) &
@@ -2200,7 +2200,7 @@
                            - y(ihe4) * y(iprot) * ratdum(ir7f54)
 
          dfdy(ihe4,ife54) =   y(iprot) * y(iprot) * ratdum(ir5f54) &
-                           - y(ihe4) * ratdum(irfe56_aux4) 
+                           - y(ihe4) * ratdum(irfe56_aux4)
 
          dfdy(ihe4,ife56) =   y(iprot) * y(iprot) * ratdum(irfe56_aux3)
 
@@ -2211,7 +2211,7 @@
          dfdy(ihe4,ineut) = -y(ihe4) * dratdumdy1(iralf1) &
                         + 2.0d0 * y(ineut) * y(iprot)*y(iprot) * ratdum(iralf2) &
                         + y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy1(iralf2)
-                        
+
          include 'formats'
 
          dfdy(ihe4,iprot) =   2.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
@@ -2226,7 +2226,7 @@
                            + y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy2(iralf2) &
                            + 2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
                            + y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
-                           - y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4) 
+                           - y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
 
 
 
@@ -2412,7 +2412,7 @@
 
          dfdy(ica40,iti44)  = ratdum(irtiga) &
                            + ratdum(irtigp) * ratdum(irv1)
-            
+
 
 
    ! ti44 jacobian elements
@@ -2491,19 +2491,19 @@
                         - y(ife52) * y(ihe4) * y(iprot) * dratdumdy1(ir7f54) &
                         + y(ini56) * ratdum(ir8f54) &
                         + y(ini56) * y(iprot) * dratdumdy1(ir8f54)
-                        
+
 
    ! fe54 jacobian elements
-         dfdy(ife54,ihe4)  = y(ife52) * ratdum(ir6f54) & 
+         dfdy(ife54,ihe4)  = y(ife52) * ratdum(ir6f54) &
                            - y(ife54) * ratdum(irfe56_aux4)
-                           
+
          dfdy(ife54,ife52) = &
                               y(ineut) * y(ineut) * ratdum(ir2f54) + &
                               y(ihe4) * ratdum(ir6f54)
 
          dfdy(ife54,ife54) = &
                            - ratdum(ir1f54) &
-                           - y(ineut) * y(ineut) * ratdum(irfe56_aux2) & 
+                           - y(ineut) * y(ineut) * ratdum(irfe56_aux2) &
                            - y(iprot) * y(iprot) * ratdum(ir3f54) &
                            - y(iprot) * y(iprot) * ratdum(ir5f54) &
                            - y(ihe4) * ratdum(irfe56_aux4)
@@ -2511,23 +2511,23 @@
          dfdy(ife54,ife56) = &
                            ratdum(irfe56_aux1) + &
                            y(iprot) * y(iprot) * ratdum(irfe56_aux3)
-   
-         dfdy(ife54,ini56) = ratdum(ir4f54) 
+
+         dfdy(ife54,ini56) = ratdum(ir4f54)
 
          dfdy(ife54,ineut) = &
                            - y(ife54) * dratdumdy1(ir1f54) &
                            + 2.0d0 * y(ife52) * y(ineut) * ratdum(ir2f54) &
                            + y(ife52) * y(ineut) * y(ineut) * dratdumdy1(ir2f54) &
-                           + y(ife56) * dratdumdy1(irfe56_aux1) & 
+                           + y(ife56) * dratdumdy1(irfe56_aux1) &
                            - 2.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
-                           - y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2) 
+                           - y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
 
          dfdy(ife54,iprot) = -2.0d0 * y(ife54) * y(iprot) * ratdum(ir3f54) &
                            - y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir3f54) &
                            + y(ini56) * dratdumdy1(ir4f54) &
                            - 2.0d0 * y(ife54) * y(iprot) * ratdum(ir5f54) &
                            - y(ife54) * y(iprot) * y(iprot) * dratdumdy1(ir5f54) &
-                           + y(ihe4) * y(ife52) * dratdumdy1(ir6f54) & 
+                           + y(ihe4) * y(ife52) * dratdumdy1(ir6f54) &
                            + 2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
                            + y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
                            - y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
@@ -2539,11 +2539,11 @@
 
 
          dfdy(ife56,ife54) = &
-                           y(ineut) * y(ineut) * ratdum(irfe56_aux2) + & 
+                           y(ineut) * y(ineut) * ratdum(irfe56_aux2) + &
                            y(ihe4) * ratdum(irfe56_aux4)
 
          dfdy(ife56,ife56)  = - fe56ec_fake_factor * ratdum(irn56ec) &
-                              - ratdum(irfe56_aux1) & 
+                              - ratdum(irfe56_aux1) &
                               - y(iprot) * y(iprot) * ratdum(irfe56_aux3)
 
          if (plus_co56) then
@@ -2557,14 +2557,14 @@
                            -y(ife56) * dratdumdy1(irfe56_aux1) &
                            + 2.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
                            + y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
-                           
+
 
          dfdy(ife56,iprot) = -2.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
                            - y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
                            + y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
 
          if (plus_co56) then
-   ! co56 jacobian elements      
+   ! co56 jacobian elements
             dfdy(ico56,ini56) =  ratdum(irn56ec)
             dfdy(ico56,ico56) = -ratdum(irco56ec)
          end if
@@ -2596,11 +2596,11 @@
    ! photodisintegration neutrons jacobian elements
          dfdy(ineut,ihe4)  = 2.0d0 * ratdum(iralf1)
 
-         dfdy(ineut,ife52) = -2.0d0 * y(ineut) * y(ineut) * ratdum(ir2f54)                    
-                              
+         dfdy(ineut,ife52) = -2.0d0 * y(ineut) * y(ineut) * ratdum(ir2f54)
+
          dfdy(ineut,ife54) =  2.0d0 * ratdum(ir1f54) &
                            - 2.0d0 * y(ineut) * y(ineut) * ratdum(irfe56_aux2)
-                           
+
          dfdy(ineut,ife56) = 2.0d0 * ratdum(irfe56_aux1) &
                            - fe56ec_n_neut * fe56ec_fake_factor * ratdum(irn56ec)
 
@@ -2612,7 +2612,7 @@
                            - 4.0d0 * y(ineut) * y(iprot)*y(iprot) * ratdum(iralf2) &
                            - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy1(iralf2) &
                            - ratdum(irnep) &
-                           + 2.0d0 * y(ife56) * dratdumdy1(irfe56_aux1) & 
+                           + 2.0d0 * y(ife56) * dratdumdy1(irfe56_aux1) &
                            - 4.0d0 * y(ife54) * y(ineut) * ratdum(irfe56_aux2) &
                            - 2.0d0 * y(ife54) * y(ineut) * y(ineut) * dratdumdy1(irfe56_aux2)
 
@@ -2623,13 +2623,13 @@
 
    ! photodisintegration protons jacobian elements
          dfdy(iprot,ihe4)  = 2.0d0 * y(ife52) * ratdum(ir6f54) &
-                           + 2.0d0 * ratdum(iralf1) & 
+                           + 2.0d0 * ratdum(iralf1) &
                            + 2.0d0 * y(ife54) * ratdum(irfe56_aux4)
 
          dfdy(iprot,ife52) = 2.0d0 * y(ihe4) * ratdum(ir6f54)
 
          dfdy(iprot,ife54) = -2.0d0 * y(iprot) * y(iprot) * ratdum(ir3f54) &
-                           - 2.0d0 * y(iprot) * y(iprot) * ratdum(ir5f54) & 
+                           - 2.0d0 * y(iprot) * y(iprot) * ratdum(ir5f54) &
                            + 2.0d0 * y(ihe4) * ratdum(irfe56_aux4)
 
          dfdy(iprot,ife56) = -2.0d0 * y(iprot) * y(iprot) * ratdum(irfe56_aux3)
@@ -2650,14 +2650,14 @@
                            + 2.0d0 * y(ihe4) * dratdumdy2(iralf1) &
                            - 4.0d0 * y(ineut)*y(ineut) * y(iprot) * ratdum(iralf2) &
                            - 2.0d0 * y(ineut)*y(ineut) * y(iprot)*y(iprot) * dratdumdy2(iralf2) &
-                           - ratdum(irpen) & 
+                           - ratdum(irpen) &
                            - 4.0d0 * y(ife56) * y(iprot) * ratdum(irfe56_aux3) &
                            - 2.0d0 * y(ife56) * y(iprot) * y(iprot) * dratdumdy1(irfe56_aux3) &
                            + 2.0d0 * y(ihe4) * y(ife54) * dratdumdy1(irfe56_aux4)
 
          end subroutine approx21_dfdy
-         
-         
+
+
          subroutine approx21_dfdT_dfdRho( & ! epstotal includes neutrinos
                y, mion, dfdy, ratdum, dratdumdt, dratdumdd, &
                fe56ec_fake_factor, min_T, fe56ec_n_neut, temp, den, &
@@ -2669,12 +2669,12 @@
             real(dp), intent(inout), dimension(:) :: d_epstotal_dy, dfdT, dfdRho
             logical, intent(in) ::  plus_co56
             integer, intent(out) :: ierr
-            
+
             integer :: i, j
             real(dp) :: enuc_conv2
             logical, parameter :: deriva = .true.
-            
-            ! temperature dependence of the rate equations            
+
+            ! temperature dependence of the rate equations
             dfdT(1:species(plus_co56)) = 0d0
             call approx21_dydt( &
                y,dratdumdt,ratdum,dfdT,deriva,&
@@ -2697,10 +2697,10 @@
                enddo
                d_epstotal_dy(j) = d_epstotal_dy(j) * enuc_conv2
             enddo
-         
+
          end subroutine approx21_dfdT_dfdRho
-      
-      
+
+
          subroutine mark_approx21(handle, ierr)
             use net_def, only: Net_General_Info, get_net_ptr
             use chem_def, only: chem_isos
@@ -2749,7 +2749,7 @@
             integer, intent(out) :: ierr
             integer :: i, cid
             ierr = 0
-            
+
             call do1('h1')
             call do1('he3')
             call do1('he4')
@@ -2772,9 +2772,9 @@
             call do1('neut')
             call do1('prot')
             call do1(ye_iso_name)
-         
+
             contains
-         
+
             subroutine do1(str)
                use utils_lib, only: mesa_error
                character (len=*), intent(in) :: str
@@ -2788,9 +2788,9 @@
                itab(cid) = 1
             end subroutine do1
 
-         end subroutine mark_approx21_isos      
-         
-         
+         end subroutine mark_approx21_isos
+
+
          subroutine set_approx21_isos(itab, ye_iso_name, plus_co56, ierr)
             use chem_lib, only: chem_get_iso_id
             use const_def, only: ev2erg, clight
@@ -2800,7 +2800,7 @@
             integer, intent(out) :: ierr
             integer :: i, cid
             ierr = 0
-            
+
             ih1   = do1('h1')
             ihe3  = do1('he3')
             ihe4  = do1('he4')
@@ -2824,9 +2824,9 @@
             iprot = do1('prot')
             icrx = do1(ye_iso_name)
             iso_cid(icrx) = -1 ! different for different approx21 nets
-         
+
             contains
-         
+
             integer function do1(str)
                use chem_def, only: chem_isos
                use utils_lib, only: mesa_error
@@ -2840,10 +2840,10 @@
                do1 = itab(cid)
                iso_cid(do1) = cid
             end function do1
-            
+
          end subroutine set_approx21_isos
-         
-         
+
+
          subroutine mark_approx21_reactions(rtab, plus_co56, ierr)
             use rates_lib, only: rates_reaction_id
             integer :: rtab(:)
@@ -2852,7 +2852,7 @@
             integer :: i, ir
             include 'formats'
             ierr = 0
-            
+
             call do1('r_he4_he4_he4_to_c12')
             call do1('r_c12_to_he4_he4_he4')
             call do1('r_c12_ag_o16')
@@ -2864,7 +2864,7 @@
             call do1('r_ne20_ga_o16')
             call do1('r_ne20_ag_mg24')
             call do1('r_mg24_ga_ne20')
-         
+
             call do1('r_mg24_ag_si28')
             call do1('r_si28_ga_mg24')
             call do1('r_mg24_ap_al27')
@@ -2951,12 +2951,12 @@
             ! cno cycles
             call do1('r_c12_pg_n13')
             call do1('r_n14_pg_o15')
-            call do1('r_o16_pg_f17')      
+            call do1('r_o16_pg_f17')
             call do1('r_n15_pg_o16')
-            call do1('r_n15_pa_c12')      
+            call do1('r_n15_pa_c12')
             call do1('r_n14_ag_f18')
 
-            ! for reactions to fe56 
+            ! for reactions to fe56
             call do1('r_fe54_ng_fe55')
             call do1('r_fe55_gn_fe54')
             call do1('r_fe55_ng_fe56')
@@ -2965,9 +2965,9 @@
             call do1('r_co57_pa_fe54')
             call do1('r_fe56_pg_co57')
             call do1('r_co57_gp_fe56')
-            
+
             contains
-         
+
             subroutine do1(str)
                use utils_lib, only: mesa_error
                character (len=*), intent(in) :: str
@@ -2980,7 +2980,7 @@
                end if
                rtab(ir) = 1
             end subroutine do1
-            
+
          end subroutine mark_approx21_reactions
 
 
@@ -2991,7 +2991,7 @@
             logical, intent(in) :: plus_co56
             integer, intent(out) :: ierr
             ierr = 0
-            
+
             ir3a = do1('r_he4_he4_he4_to_c12')
             irg3a = do1('r_c12_to_he4_he4_he4')
             ircag = do1('r_c12_ag_o16')
@@ -3003,7 +3003,7 @@
             irnega = do1('r_ne20_ga_o16')
             irneag = do1('r_ne20_ag_mg24')
             irmgga = do1('r_mg24_ga_ne20')
-         
+
             irmgag = do1('r_mg24_ag_si28')
             irsiga = do1('r_si28_ga_mg24')
             irmgap = do1('r_mg24_ap_al27')
@@ -3090,12 +3090,12 @@
             ! cno cycles
             ircpg = do1('r_c12_pg_n13')
             irnpg = do1('r_n14_pg_o15')
-            iropg = do1('r_o16_pg_f17')      
+            iropg = do1('r_o16_pg_f17')
             irn15pg = do1('r_n15_pg_o16')
-            irn15pa = do1('r_n15_pa_c12')      
+            irn15pa = do1('r_n15_pa_c12')
             irnag = do1('r_n14_ag_f18')
 
-            ! for reactions to fe56 
+            ! for reactions to fe56
             ir54ng = do1('r_fe54_ng_fe55')
             ir55gn = do1('r_fe55_gn_fe54')
             ir55ng = do1('r_fe55_ng_fe56')
@@ -3133,18 +3133,18 @@
             irfe56_aux2 = irfe56_aux1+1
             irfe56_aux3 = irfe56_aux2+1
             irfe56_aux4 = irfe56_aux3+1
-            
+
             if( (plus_co56 .and. irfe56_aux4 /= num_reactions(plus_co56)) .or. &
                (.not.plus_co56 .and. irfe56_aux4 /= num_reactions(plus_co56))) then
                write(*,*) 'set_approx21_reactions found bad num_reactions'
                write(*,*) plus_co56,irfe56_aux4,num_reactions(plus_co56)
                call mesa_error(__FILE__,__LINE__)
             end if
-            
+
             call init_approx21(plus_co56)
-            
+
             contains
-         
+
             integer function do1(str)
                use utils_lib, only: mesa_error
                character (len=*), intent(in) :: str
@@ -3161,10 +3161,10 @@
                end if
                rate_id(do1) = ir
             end function do1
-                  
+
          end subroutine set_approx21_reactions
-         
-         
+
+
          ! call this after have set rate numbers
          subroutine init_approx21(plus_co56)
             integer :: i
@@ -3277,7 +3277,7 @@
             ratnam(irn15pa) = 'r_n15_pa_c12'
 
             ratnam(irnag)   = 'r_n14_ag_f18'
-            
+
             ratnam(ir54ng)   = 'r_fe54_ng_fe55'
             ratnam(ir55gn)   = 'r_fe55_gn_fe54'
             ratnam(ir55ng)   = 'r_fe55_ng_fe56'
@@ -3317,9 +3317,9 @@
             ratnam(irfe56_aux2) = 'rfe56aux2'
             ratnam(irfe56_aux3) = 'rfe56aux3'
             ratnam(irfe56_aux4) = 'rfe56aux4'
-            
+
             return
-            
+
             do i=1,num_mesa_reactions(plus_co56)
                write(*,2) trim(ratnam(i)), i
             end do
@@ -3330,17 +3330,17 @@
             call mesa_error(__FILE__,__LINE__,'init_approx21')
 
          end subroutine init_approx21
-         
+
          real(dp) function eval_fe56ec_fake_factor(fe56ec_fake_factor,min_T,temp)
             real(dp), intent(in) :: fe56ec_fake_factor,min_T,temp
-         
+
             eval_fe56ec_fake_factor = 0.d0
             if(temp >= min_T)then
                eval_fe56ec_fake_factor = fe56ec_fake_factor
             end if
-      
+
          end function eval_fe56ec_fake_factor
-      
+
 
          pure integer function num_reactions(plus_co56)
             logical, intent(in) :: plus_co56

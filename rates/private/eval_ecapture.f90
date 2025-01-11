@@ -61,7 +61,7 @@ contains
 
     logical, parameter :: dbg = .false.
 
-    integer :: i, ir, in, out, j, lhs, rhs
+    integer :: i, ir, j, lhs, rhs
     integer :: offset, ntrans, lo, hi
     integer :: offset_lhs, nstates_lhs, lo_lhs, hi_lhs
     integer :: offset_rhs, nstates_rhs, lo_rhs, hi_rhs
@@ -105,7 +105,7 @@ contains
     kT = 1d3 * keV * T9 ! in MeV
     kT% d1val1 = kT% val
     kT% d1val2 = 0d0
-    
+
     mec2 = me * clight*clight / mev_to_ergs ! in MeV
     beta = mec2/kT ! dimesionless
 
@@ -151,7 +151,7 @@ contains
        if (ierr /=0) stop "ERROR: ecapture (transitions)"
        if (dbg) write(*,*) ntrans, offset
 
-       ! get nuclide indicies
+       ! get nuclide indices
        lhs = weak_lhs_nuclide_id(ir)
        rhs = weak_rhs_nuclide_id(ir)
 

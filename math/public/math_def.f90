@@ -28,9 +28,9 @@ module math_def
 
    ! Uses
    use const_def
- 
+
    ! No implicit typing
- 
+
    implicit none
 
    integer, parameter :: max_precomp_ints = 1000

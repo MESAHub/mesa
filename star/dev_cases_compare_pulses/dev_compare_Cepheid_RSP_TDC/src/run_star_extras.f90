@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,12 +27,12 @@
       use const_def
       use math_lib
       use run_star_support
-      
+
       implicit none
-      
+
       include 'test_suite_extras_def.inc'
       include 'multi_stars_extras_def.inc'
-            
+
       contains
 
       include 'test_suite_extras.inc'
@@ -49,8 +49,8 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end function extras_start_step
-      
-      
+
+
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
          integer, intent(in) :: id
@@ -64,8 +64,8 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -81,10 +81,10 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
       end subroutine extras_controls
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -94,15 +94,15 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
-         
+
          if (id == 1 .and. .not. s% RSP_flag) then
             write(*,*) 'star id==1, but not RSP_flag'
             call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
 
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -123,7 +123,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -136,8 +136,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 6
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -172,7 +172,7 @@
          vals(6) = s_other% rsp_num_periods
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -183,8 +183,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 27
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -209,38 +209,38 @@
          end if
          call star_ptr(id_other, s_other, ierr)
          if (ierr /= 0) return
-         
+
          i=1
          names(i) = 'v_R'; i=i+1
          names(i) = 'v_drel'; i=i+1
-         
+
          names(i) = 'Y_face_R'; i=i+1
          names(i) = 'Y_drel'; i=i+1
-         
+
          names(i) = 'w_R'; i=i+1
          names(i) = 'w_drel'; i=i+1
-         
+
          names(i) = 'Lc_div_L_R'; i=i+1
          names(i) = 'Lc_drel'; i=i+1
-         
+
          names(i) = 'COUPL_R'; i=i+1
          names(i) = 'CPL_drel'; i=i+1
-         
+
          names(i) = 'SRC_R'; i=i+1
          names(i) = 'SRC_drel'; i=i+1
-         
+
          names(i) = 'DAMP_R'; i=i+1
          names(i) = 'DAMP_drel'; i=i+1
-         
+
          names(i) = 'DAMPR_R'; i=i+1
          names(i) = 'DAMPR_drel'; i=i+1
-         
+
          names(i) = 'Eq_R'; i=i+1
          names(i) = 'Eq_drel'; i=i+1
-         
+
          names(i) = 'Uq_R'; i=i+1
          names(i) = 'Uq_drel'; i=i+1
-         
+
          names(i) = 'Pvsc_R'; i=i+1
          names(i) = 'Pvsc_drel'; i=i+1
 
@@ -256,14 +256,14 @@
             vals(1:nz,:) = 0d0
          else
             do k=1,nz
-            
+
                i = 1
                vals(k,i) = s_other% v(k)*1d-5; i=i+1
                vals(k,i) = rel_diff(s_other% v(k), s% v(k)); i=i+1
-         
+
                vals(k,i) = s_other% Y_face(k); i=i+1
                vals(k,i) = rel_diff(s_other% Y_face(k), s% Y_face(k)); i=i+1
-               
+
                if (s_other% RSP2_flag) then
                   val = s_other% w(k)
                else if (s_other% RSP_flag) then
@@ -273,29 +273,29 @@
                end if
                vals(k,i) = val; i=i+1
                vals(k,i) = rel_diff(val, s% w(k)); i=i+1
-               
+
                val = s_other% Lc(k)/s_other% L(k)
                vals(k,i) = val; i=i+1
                vals(k,i) = rel_diff(val, s% Lc(k)/s% L(k)); i=i+1
-         
+
                vals(k,i) = s_other% COUPL(k); i=i+1
                vals(k,i) = rel_diff(s_other% COUPL(k), s% COUPL(k)); i=i+1
-         
+
                vals(k,i) = s_other% SOURCE(k); i=i+1
                vals(k,i) = rel_diff(s_other% SOURCE(k), s% SOURCE(k)); i=i+1
-         
+
                vals(k,i) = s_other% DAMP(k); i=i+1
                vals(k,i) = rel_diff(s_other% DAMP(k), s% DAMP(k)); i=i+1
-         
+
                vals(k,i) = s_other% DAMPR(k); i=i+1
                vals(k,i) = rel_diff(s_other% DAMPR(k), s% DAMPR(k)); i=i+1
-         
+
                vals(k,i) = s_other% Eq(k); i=i+1
                vals(k,i) = rel_diff(s_other% Eq(k), s% Eq(k)); i=i+1
-         
+
                vals(k,i) = s_other% Uq(k); i=i+1
                vals(k,i) = rel_diff(s_other% Uq(k), s% Uq(k)); i=i+1
-         
+
                vals(k,i) = s_other% Pvsc(k); i=i+1
                vals(k,i) = rel_diff(s_other% Pvsc(k), s% Pvsc(k)); i=i+1
 
@@ -304,12 +304,12 @@
                vals(k,i) = s_other% lnT(k)/ln10; i=i+1
                vals(k,i) = s_other% lnd(k)/ln10; i=i+1
                vals(k,i) = safe_log10(s_other% L(k)/Lsun); i=i+1
-               
+
             end do
          end if
-         
+
          contains
-               
+
          real(dp) function rel_diff(b, a, atol, rtol) result(d)
             real(dp), intent(in) :: a, b
             real(dp), intent(in), optional :: atol, rtol
@@ -326,7 +326,7 @@
             end if
             d = (a - b)/(atl + rtl*max(abs(a),abs(b)))
          end function rel_diff
-      
+
          real(dp) function fix_if_bad(v)
             use utils_lib, only: is_bad
             real(dp), intent(in) :: v
@@ -336,8 +336,8 @@
                fix_if_bad = v
             end if
          end function fix_if_bad
-            
+
       end subroutine data_for_extra_profile_columns
 
       end module run_star_extras
-      
+

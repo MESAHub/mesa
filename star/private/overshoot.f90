@@ -34,7 +34,7 @@ module overshoot
   use overshoot_utils
   use overshoot_exp
   use overshoot_step
-  
+
   ! No implicit typing
 
   implicit none
@@ -54,7 +54,7 @@ contains
     type(star_info), pointer :: s
     integer, intent(out)     :: ierr
 
-    logical, parameter :: DEBUG = .FALSE.
+    logical, parameter :: dbg = .false.
 
     integer  :: i
     integer  :: j
@@ -79,7 +79,7 @@ contains
 
     ierr = 0
 
-    if (DEBUG) then
+    if (dbg) then
        write(*, 3) 'add_overshooting; model, n_conv_bdy=', s%model_number, s%num_conv_boundaries
     end if
 
@@ -90,7 +90,7 @@ contains
        ! Skip this boundary if it's too close to the center
 
        if (s%conv_bdy_q(i) < s%min_overshoot_q) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'skip since s%conv_bdy_q(i) < min_overshoot_q', i
           endif
           cycle conv_bdy_loop
@@ -100,7 +100,7 @@ contains
        ! overshoot there
 
        if (s%conv_bdy_loc(i) == 1) then
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'skip since s%conv_bdy_loc(i) == 1', i
           endif
           cycle conv_bdy_loop
@@ -125,9 +125,9 @@ contains
              match_zone_type = .NOT. ( &
                   s%burn_h_conv_region(i) .OR. &
                   s%burn_he_conv_region(i) .OR. &
-                  s%burn_z_conv_region(i) )              
+                  s%burn_z_conv_region(i) )
           case ('any')
-             match_zone_type = .TRUE.
+             match_zone_type = .true.
           case default
              write(*,*) 'Invalid overshoot_zone_type: j, s%overshoot_zone_type(j)=', j, s%overshoot_zone_type(j)
              ierr = -1
@@ -142,7 +142,7 @@ contains
           case ('shell')
              match_zone_loc = .NOT. is_core
           case ('any')
-             match_zone_loc = .TRUE.
+             match_zone_loc = .true.
           case default
              write(*,*) 'Invalid overshoot_zone_loc: j, s%overshoot_zone_loc(j)=', j, s%overshoot_zone_loc(j)
              ierr = -1
@@ -155,7 +155,7 @@ contains
           case ('top')
              match_bdy_loc = s%top_conv_bdy(i)
           case ('any')
-             match_bdy_loc = .TRUE.
+             match_bdy_loc = .true.
           case default
              write(*,*) 'Invalid overshoot_bdy_loc: j, s%overshoot_bdy_loc(j)=', j, s%overshoot_bdy_loc(j)
              ierr = -1
@@ -164,7 +164,7 @@ contains
 
           if (.NOT. (match_zone_type .AND. match_zone_loc .AND. match_bdy_loc)) cycle criteria_loop
 
-          if (DEBUG) then
+          if (dbg) then
              write(*,*) 'Overshooting at convective boundary: i, j=', i, j
              write(*,*) '  s%overshoot_scheme=', TRIM(s%overshoot_scheme(j))
              write(*,*) '  s%overshoot_zone_type=', TRIM(s%overshoot_zone_type(j))
@@ -212,7 +212,7 @@ contains
              ! Check if the overshoot will be stabilized by the stratification
 
              if (s%overshoot_brunt_B_max > 0._dp .and. s% calculate_Brunt_B) then
-                
+
                 if (.not. s% calculate_Brunt_N2) &
                    call mesa_error(__FILE__,__LINE__,'add_overshooting: when overshoot_brunt_B_max > 0, must have calculate_Brunt_N2 = .true.')
 
@@ -233,7 +233,7 @@ contains
              if (D(k) < s%overshoot_D_min) then
 
                 ! Update conv_bdy_dq to reflect where D drops below the minimum
-                ! Convective regions can happen to be entirely below s%overshoot_D_min, 
+                ! Convective regions can happen to be entirely below s%overshoot_D_min,
                 ! in which case we ignore this correction.
                 if (s%top_conv_bdy(i)) then
                    if (s%D_mix(k+1) > s%overshoot_D_min) then
@@ -277,7 +277,7 @@ contains
              else
                 rho = s%rho(k)
              endif
-       
+
              cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
 
              call eval_conv_bdy_r(s, i, r_cb, ierr)
@@ -310,7 +310,7 @@ contains
           s%D_mix(k:k_cb:dk) = 0._dp
           s%conv_vel(k:k_cb:dk) = 0._dp
           s%mixing_type(k:k_cb:dk) = no_mixing
-          
+
           ! Finish (we apply at most a single overshoot scheme to each boundary)
 
           exit criteria_loop

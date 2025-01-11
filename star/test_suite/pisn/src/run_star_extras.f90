@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,19 +27,19 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
 
       ! (Gamma1 - 4/3) at the center when integral_gamma1-4/3 first drops below 0
-      real(dp) :: gamma1_cntr_pulse_start 
+      real(dp) :: gamma1_cntr_pulse_start
 
       include "test_suite_extras_def.inc"
 
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -55,7 +55,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
          s% other_remove_surface => remove_ejecta_one_cell_per_step
          !s% use_other_remove_surface = .true.
 
@@ -63,8 +63,8 @@
          s% other_photo_write => extras_photo_write
 
       end subroutine extras_controls
-      
-      
+
+
       subroutine remove_ejecta_one_cell_per_step(id, ierr, j)
          integer, intent(in) :: id
          integer, intent(out) :: ierr, j
@@ -72,14 +72,14 @@
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return         
+         if (ierr /= 0) return
          if (star_ejecta_mass(id) > 0.1d0*Msun) then
             call star_remove_surface_at_cell_k(id, 2, ierr)
             write(*,2) 'remove_ejecta_one_cell_per_step', s% model_number
          end if
       end  subroutine remove_ejecta_one_cell_per_step
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -87,16 +87,16 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return         
-         call test_suite_startup(s, restart, ierr)         
-         
+         if (ierr /= 0) return
+         call test_suite_startup(s, restart, ierr)
+
          if(.not.restart) then
             gamma1_cntr_pulse_start = HUGE(gamma1_cntr_pulse_start)
          end if
 
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          use num_lib, only: find0
          integer, intent(in) :: id
@@ -116,9 +116,9 @@
          end select
 
          call test_suite_after_evolve(s, ierr)
-         if (ierr /= 0) return         
+         if (ierr /= 0) return
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -128,7 +128,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -143,8 +143,8 @@
          how_many_extra_history_columns = 1
 
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -179,7 +179,7 @@
 
       end function gamma1_integral
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -190,8 +190,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -209,7 +209,7 @@
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
-         extras_start_step = keep_going    
+         extras_start_step = keep_going
       end function extras_start_step
 
         ! returns either keep_going or terminate.
@@ -246,34 +246,34 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
- 
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
- 
+
          select case (s% x_integer_ctrl(1))
          case(7)
             read(iounit,iostat=ierr) gamma1_cntr_pulse_start
          end select
- 
+
        end subroutine extras_photo_read
- 
+
        subroutine extras_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
          integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
- 
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
- 
+
          select case (s% x_integer_ctrl(1))
          case(7)
             write(iounit) gamma1_cntr_pulse_start
          end select
- 
+
        end subroutine extras_photo_write
 
 
 
    end module run_star_extras
-      
+

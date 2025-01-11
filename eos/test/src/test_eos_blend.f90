@@ -11,7 +11,6 @@ module test_eos_blend
    contains
 
    subroutine do_test_eos_blend()
-      integer :: w
       real(dp) :: coords(4,2)
       type(auto_diff_real_2var_order1) :: p(2), d
 

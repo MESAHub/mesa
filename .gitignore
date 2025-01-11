@@ -32,6 +32,7 @@ vgcore.*
 
 ## Documentation
 /dox/
+docs/source/_tags
 
 
 ## Executables
@@ -44,7 +45,17 @@ vgcore.*
 **/LOGS2/
 **/photos/
 **/png/
-
+**/png1/
+**/png2/
+**/png3/
+**/pgstar_out/
+**/pgstar_out1/
+**/pgstar_out2/
+**/pgstar_out3/
+**/plt_out/
+**/plt_out1/
+**/plt_out2/
+**/plt_out3/
 
 ## Bill
 star_data/public_*

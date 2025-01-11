@@ -37,9 +37,9 @@
       use colors_def, only:  max_num_color_files, max_num_bcs_per_file
       use auto_diff, only: auto_diff_real_star_order1
       use star_pgstar, only: pgstar_controls
-      
-      implicit none      
-      
+
+      implicit none
+
       include "star_data_def.inc"
       include "star_job_controls_params.inc"
       type star_job_controls
@@ -51,22 +51,22 @@
              check_step_loop_timing, check_after_step_timing, check_before_step_timing
          integer(8) :: time0, time1, clock_rate, time0_extra, time1_extra, time0_initial
       end type star_job_controls
-      
+
       type star_info
-         
+
          include "star_data.inc"
-   
+
          ! handles
             integer :: eos_handle
             integer :: kap_handle
             integer :: net_handle
-               
+
          ! star id
             integer :: id ! unique identifier for each star_info instance
-            
+
          ! Name of the main inlist used
             character (len=strlen) :: inlist_fname
-         
+
          ! private
             logical :: in_use
             logical :: do_burn, do_mix
@@ -75,47 +75,47 @@
             type (EoS_General_Info), pointer :: eos_rq ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
             type (Kap_General_Info), pointer :: kap_rq ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
             type (Net_General_Info), pointer :: net_rq ! from call net_ptr(s% net_handle,s% net_rq, ierr)
-            
+
             ! parameters for create pre ms -- set in run_star before calling star_create_pre_ms_model
             real(dp) :: pre_ms_T_c, pre_ms_guess_rho_c, &
                pre_ms_d_log10_P, pre_ms_logT_surf_limit, pre_ms_logP_surf_limit
             integer :: pre_ms_initial_zfracs, pre_ms_relax_num_steps
             logical :: pre_ms_change_net, pre_ms_dump_missing_heaviest
             character (len=net_name_len) :: pre_ms_new_net_name
-            
+
             ! parameters for create initial model
-            real(dp) :: & 
+            real(dp) :: &
                radius_in_cm_for_create_initial_model, &
                mass_in_gm_for_create_initial_model, &
                center_logP_1st_try_for_create_initial_model, &
                entropy_1st_try_for_create_initial_model, &
                abs_e01_tolerance_for_create_initial_model, &
-               abs_e02_tolerance_for_create_initial_model           
+               abs_e02_tolerance_for_create_initial_model
             integer :: initial_zfracs_for_create_initial_model, &
                max_tries_for_create_initial_model
             integer :: initial_model_relax_num_steps
             real(dp) :: initial_model_eps
             logical :: initial_model_change_net, initial_dump_missing_heaviest
             character (len=net_name_len) :: initial_model_new_net_name
-         
+
             ! extra profile entries for developer debugging
             real(dp), dimension(:,:), pointer :: profile_extra ! (nz,max_num_profile_extras)
             character (len=64) :: profile_extra_name(max_num_profile_extras)
-            
+
          ! controls
             type (star_job_controls) :: job ! separate type to avoid name clashes
             include "star_controls.inc"
             include "star_controls_dev.inc"
 
             type(pgstar_controls) :: pg
-         
+
       end type star_info
 
 
 
       logical :: have_initialized_star_handles = .false.
       integer, parameter :: max_star_handles = 10 ! this can be increased as necessary
-      type (star_info), target, save :: star_handles(max_star_handles) 
+      type (star_info), target, save :: star_handles(max_star_handles)
          ! gfortran seems to require "save" here.  at least it did once upon a time.
 
 
@@ -133,7 +133,7 @@
       subroutine get_star_ptr(id,s,ierr)
          integer, intent(in) :: id
          type (star_info), pointer :: s
-         integer, intent(out) :: ierr         
+         integer, intent(out) :: ierr
          if (id < 1 .or. id > max_star_handles) then
             ierr = -1
             return
@@ -141,9 +141,9 @@
          s => star_handles(id)
          ierr = 0
       end subroutine get_star_ptr
-      
-      
-      subroutine result_reason_init         
+
+
+      subroutine result_reason_init
          result_reason_str(result_reason_normal) = 'normal'
          result_reason_str(dt_is_zero) = 'dt_is_zero'
          result_reason_str(nonzero_ierr) = 'nonzero_ierr'
@@ -163,7 +163,7 @@
          result_reason_str(forced_stop) = 'forced_stop'
       end subroutine result_reason_init
 
-      
+
       subroutine do_star_def_init(mesa_dir_init, ierr)
          character (len=*), intent(in) :: mesa_dir_init
          integer, intent(out) :: ierr

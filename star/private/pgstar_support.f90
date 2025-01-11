@@ -72,7 +72,7 @@ contains
    subroutine add_to_pgstar_hist(s, pg_hist_new)
       type (star_info), pointer :: s
       type (pgstar_hist_node), pointer :: pg_hist_new
-      type (pgstar_hist_node), pointer :: pg_hist => null(), next => null()
+      type (pgstar_hist_node), pointer :: next => null()
       integer :: step
       step = pg_hist_new% step
       do
@@ -97,7 +97,7 @@ contains
 
    subroutine pgstar_clear(s)
       type (star_info), pointer :: s
-      integer :: i, id, num
+      integer :: i
       type (pgstar_win_file_data), pointer :: p
       type (pgstar_hist_node), pointer :: pg_hist => null(), next => null()
       pg_hist => s% pg% pgstar_hist
@@ -244,8 +244,8 @@ contains
       integer, intent(out) :: id
       integer, intent(out) :: ierr
 
-      integer :: pgopen, system
-      character (len = strlen) :: dir, cmd
+      integer :: pgopen
+      character (len = strlen) :: dir
       logical :: white_on_black_flag
       real :: width, ratio
 
@@ -922,7 +922,7 @@ contains
       integer, intent(in) :: step_min, step_max, numpts
       real, intent(out) :: vec(:)
       integer, intent(out) :: ierr
-      integer :: i, n
+      integer :: i
       type (pgstar_hist_node), pointer :: pg
       ierr = 0
       if (numpts == 0) return
@@ -969,7 +969,7 @@ contains
       integer, intent(in) :: step_min, step_max, numpts, index
       real, intent(out) :: vec(:)
       integer, intent(out) :: ierr
-      integer :: i, n
+      integer :: i
       type (pgstar_hist_node), pointer :: pg => null()
       include 'formats'
       if (numpts == 0) return
@@ -1187,7 +1187,6 @@ contains
       real, intent(in) :: dymin
       real, intent(out) :: ybot, ytop
 
-      integer :: k
       real :: dy, ymax, ymin, ymargin
       logical :: use_given_ymin, use_given_ymax
       real, parameter :: dymin_min = 1d-34
@@ -1310,7 +1309,6 @@ contains
 
       integer :: k, nz, xaxis_id
       real :: win_xmin, win_xmax
-      real(dp) :: dmsum
 
       include 'formats'
 
@@ -1959,7 +1957,7 @@ contains
       character (len = 32) :: age_str, units_str
       real(dp) :: age
       real :: ch
-      integer :: len, i, j, iE, n
+      integer :: len, i, j, iE
       if (.not. s% pg% pgstar_show_age) return
       age = s% star_age
       if (s% pg% pgstar_show_age_in_seconds) then

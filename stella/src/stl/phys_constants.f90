@@ -1,17 +1,17 @@
 module phys_constants
 
   use kinds,                 only: dp
-  use math_constants,        only: p_pi          
+  use math_constants,        only: p_pi
 
   implicit none
   private
-  
+
 !  public ::  p_h_bar, p_hplanc, p_c_light, p_boltzk, p_avogar, p_atom_m, p_m_e, p_echarg, &
 !              p_cg, p_cms, p_rsol, p_Rgas, &
 !              p_carad, p_csigm, p_ergev, p_gradev, p_radc, p_ctomp, p_ccaps, p_ccapz, p_a_fine
-              
-  public :: write_phys_constants              
-       
+
+  public :: write_phys_constants
+
 
  !   *** Planck constant [J*s] ***
   real (kind=dp), parameter, public :: p_h_bar = 1.0545715960e-27_dp
@@ -68,8 +68,8 @@ module phys_constants
 !   *** T [K] to eV ***
   real (kind=dp), parameter, public :: p_T2ev = p_k * p_erg2ev  !  p_T2ev = 8.61734229583e-5
 !   *** eV to T [K] ***
-  real (kind=dp), parameter, public :: p_ev2T = 1._dp / p_T2ev  ! p_ev2T = 11604.5059563 
-  
+  real (kind=dp), parameter, public :: p_ev2T = 1._dp / p_T2ev  ! p_ev2T = 11604.5059563
+
   contains
 
   SUBROUTINE write_phys_constants(output_unit)
@@ -108,7 +108,7 @@ module phys_constants
   END SUBROUTINE write_phys_constants
 
 ! *****************************************************************************
-  
+
 end module phys_constants
 
 !******************************************************************************

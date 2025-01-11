@@ -6,7 +6,7 @@ News archive
 
 This page contains links to all the news posted on mesa.sourceforge.net
 
-.. From the orignal markdown we can do: cd $MESA_DIR/docs/source/news;for i in $MESA_WEBSITE_PATH/_posts/*.markdown;do pandoc -s -f markdown -t rst $i > $(basename ${i%%markdown}rst);echo $i;done
+.. From the original markdown we can do: cd $MESA_DIR/docs/source/news;for i in $MESA_WEBSITE_PATH/_posts/*.markdown;do pandoc -s -f markdown -t rst $i > $(basename ${i%%markdown}rst);echo $i;done
 
 .. The TOC can be regenerated with: cd $MESA_DIR/docs/source/news;for i in *;do echo "    news/$(basename ${i%%.rst})" ;done | tac
 

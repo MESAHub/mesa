@@ -28,7 +28,6 @@
       use star_private_def
       use utils_lib, only: is_bad
       use const_def
-
       use num_def
 
       implicit none
@@ -43,9 +42,8 @@
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, nz, nvar_hydro
+         integer :: i, k, nz, nvar_hydro
          real(dp), parameter :: xscale_min = 1
-         real(dp) :: var_scale, lum_scale, vel_scale, omega_scale
 
          include 'formats'
 
@@ -71,7 +69,7 @@
          contains
 
          subroutine dump_xscale
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             !write(*,1) 's% xa_scale', s% xa_scale
             do k=1,s% nz
@@ -95,8 +93,7 @@
          integer, intent(out) :: ierr
 
          integer :: cnt, i, j, k, nz
-         integer :: id
-         real(dp) :: dt, theta_dt
+         real(dp) :: dt
          include 'formats'
 
          ierr = 0
@@ -138,7 +135,7 @@
          end if
 
          if (ierr /= 0) return
-         
+
          if (.not. s% stop_for_bad_nums) return
 
          cnt = 0
@@ -157,7 +154,7 @@
                end if
             end do
          end do
-         
+
          if (cnt > 0) then
             ierr = -1
             return
@@ -168,7 +165,7 @@
 
 
          subroutine dump_eval_equ
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -189,26 +186,25 @@
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, &
-            max_loc, skip_eqn1, skip_eqn2, skip_eqn3
-         real(dp) :: sumequ, absq, max_energy_resid, avg_energy_resid
-         
+         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, skip_eqn1, skip_eqn2, skip_eqn3
+         real(dp) :: sumequ, absq
+
          logical :: dbg
 
          include 'formats'
 
          ierr = 0
-         
+
          equ_norm = 0d0
          equ_max = 0d0
          k_max = 0
          j_max = 0
-         
+
          dbg = s% solver_check_everything
 
          nvar_hydro = min(nvar, s% nvar_hydro)
          nvar_chem = s% nvar_chem
-         
+
          nz = s% nz
          n = nz
          num_terms = 0
@@ -290,17 +286,17 @@
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
             k_max, s% solver_iter, s% model_number, equ_max, equ_norm
-         
+
          if (dbg) call dump_equ
-         
+
          return
          call dump_equ
          call mesa_error(__FILE__,__LINE__,'sizequ')
-         
+
          contains
 
          subroutine dump_equ
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -326,7 +322,7 @@
          integer :: k, i, nz, num_terms, j, n, nvar_hydro, jmax, num_xa_terms, &
             skip1, skip2, skip3, skip4, skip5
          real(dp) :: abs_corr, sum_corr, sum_xa_corr, x_limit, &
-            max_abs_correction, max_abs_correction_cv, max_abs_corr_for_k, max_abs_xa_corr_for_k
+            max_abs_correction, max_abs_corr_for_k, max_abs_xa_corr_for_k
          logical :: found_NaN, found_bad_num, report
          real(dp), parameter :: frac = 0.1d0
          logical, parameter :: dbg = .false.
@@ -380,7 +376,7 @@
             skip3 = s% i_w
          end if
          skip4 = s% i_Hp
-                 
+
          skip5 = 0
 
          max_zone = 0
@@ -410,7 +406,7 @@
                    j == skip3 .or. &
                    j == skip4 .or. &
                    j == skip5 .or. &
-                   j == s% i_alpha_RTI) cycle
+                   j == s% i_alpha_RTI) cycle var_loop
                if (check_for_bad_nums) then
                   if (is_bad_num(B(j,k)*s% correction_weight(j,k))) then
                      found_bad_num = .true.
@@ -422,16 +418,16 @@
                            j, k, B(j,k)*s% correction_weight(j,k)
                         call mesa_error(__FILE__,__LINE__,'sizeB')
                      end if
-                     
+
                      max_zone = k
                      max_var = j
                      exit cell_loop
-                     
-                     cycle
+
+                     cycle var_loop
                   end if
                end if
                if (j > nvar_hydro) then
-                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle
+                  if (s% xa_start(j-nvar_hydro,k) < x_limit) cycle var_loop
                end if
 
                abs_corr = abs(B(j,k)*s% correction_weight(j,k))
@@ -604,7 +600,7 @@
 
 
          subroutine dump_B
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -626,18 +622,13 @@
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
-         use rsp_def, only: EFL0
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          real(dp), intent(inout) :: correction_factor
          integer, intent(out) :: ierr
-         integer :: id, i, j, k, nz, species, bad_j, bad_k, &
-            i_alpha_RTI, i_w_div_wc
+         integer :: i, j, k, nz, species, bad_j, bad_k
          real(dp) :: alpha, min_alpha, new_xa, old_xa, dxa, eps, min_xa_hard_limit, &
-            old_E, dE, new_E, old_lnd, dlnd, new_lnd, dw, new_w, &
-            dw_div_wc, old_w_div_wc, new_w_div_wc, dconv_vel, old_conv_vel, new_conv_vel, &
-            dalpha_RTI, new_alpha_RTI, old_alpha_RTI, log_conv_vel_v0, &
             dlum_surf, old_lum_surf, new_lum_surf
          include 'formats'
          ierr = 0
@@ -716,9 +707,9 @@
                trim(chem_isos% name(s% chem_id(bad_j))), bad_k, &
                s% model_number, s% solver_iter, min_alpha
          end if
-         
+
          contains
-         
+
          subroutine clip_so_non_negative(i,minval)
             integer, intent(in) :: i
             real(dp), intent(in) :: minval
@@ -743,7 +734,6 @@
          real(dp), pointer, dimension(:,:) :: B ! (nvar, nz)
          integer, intent(out) :: ierr
 
-         integer :: id
          integer, parameter :: inspectB_iter_stop = -1
          include 'formats'
 
@@ -757,7 +747,7 @@
          contains
 
          subroutine dumpB
-            integer :: k, j, k0, k1
+            integer :: k, j
             include 'formats'
             do k=1,s% nz
                do j=1,nvar
@@ -781,8 +771,6 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iter ! have finished this many iterations and have converged
          integer, intent(in) :: itermin ! this is the requested minimum.  iter may be < itermin.
-
-         integer :: k, res
 
          include 'formats'
 
@@ -846,15 +834,15 @@
             skip_set_cz_bdy_mass = .true., &
             skip_other_cgrav = .true.
          logical :: do_chem, try_again, do_edit_lnR, report_dx
-         integer :: i, j, k, kk, klo, khi, i_var, &
+         integer :: j, k, kk, klo, khi, i_var, &
             i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, i_v, &
             i_u, i_alpha_RTI, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
          integer :: op_err, kbad, &
-            cnt, max_fixes, loc(2), k_lo, k_hi, k_const_mass
-         real(dp) :: r2, xavg, du, u00, um1, dx_for_i_var, x_for_i_var, &
-            dq_sum, xa_err_norm, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
+            cnt, max_fixes, loc(2), k_lo, k_hi
+         real(dp) :: xavg, dx_for_i_var, x_for_i_var, &
+            dq_sum, d_dxdt_dx, min_xa_hard_limit, sum_xa_hard_limit
          logical :: do_lnd, do_lnT, do_lnR, do_lum, do_w, &
             do_u, do_v, do_alpha_RTI, do_w_div_wc, do_j_rot
 
@@ -870,17 +858,17 @@
 
          xh_start => s% xh_start
          xa_start => s% xa_start
-         
+
          report_dx = &
             s% solver_test_partials_dx_0 > 0d0 .and. &
             s% solver_test_partials_k > 0 .and. &
             s% solver_call_number == s% solver_test_partials_call_number .and. &
             s% solver_test_partials_iter_number == s% solver_iter .and. &
             len_trim(s% solver_test_partials_show_dx_var_name) > 0
-            
+
          if (report_dx) then
             k = s% solver_test_partials_k
-            i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)            
+            i_var = lookup_nameofvar(s, s% solver_test_partials_show_dx_var_name)
             if (i_var > 0) then
                if (i_var > nvar_hydro) then
                   dx_for_i_var = s% solver_dx(i_var,k)
@@ -1007,7 +995,7 @@
                end do
             end do
          end if
-         
+
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
@@ -1034,7 +1022,7 @@
             end if
             return
          end if
-         
+
          if (s% solver_test_partials_k > 0 .and. &
              s% solver_test_partials_k <= nz) then
             k = s% solver_test_partials_k
@@ -1122,7 +1110,7 @@
 
 
          subroutine set1(k,report,ierr)
-            use chem_def, only: chem_isos
+            !use chem_def, only: chem_isos
             integer, intent(in) :: k
             logical, intent(in) :: report
             integer, intent(out) :: ierr
@@ -1131,14 +1119,13 @@
             ! setting x = xh_start + dx is necessary because of numerical issues.
             ! we want to ensure that we've calculated the variables using exactly the
             ! same values for x as will be returned as the final result.
-            real(dp) :: r2, sum_xa
-            integer :: j, i, k_below_just_added
-            real(dp) :: del_t, starting_value, alfa, beta, v, theta
+            integer :: j, k_below_just_added
+            real(dp) :: v
 
             include 'formats'
             ierr = 0
             v = 0
-            
+
             k_below_just_added = 1
 
             do j=1,min(nvar, nvar_hydro)
@@ -1147,7 +1134,7 @@
             end do
 
             if (do_lnT) then
-               
+
                s% lnT(k) = x(i_lnT)
                s% T(k) = exp(s% lnT(k))
                s% dxh_lnT(k) = s% solver_dx(i_lnT,k)
@@ -1237,7 +1224,7 @@
                   if (report) write(*,2) 'bad num Hp_face', k, s% Hp_face(k)
                end if
             end if
-            
+
             if (do_v) then
                s% v(k) = x(i_v)
                s% dxh_v(k) = s% solver_dx(i_v,k)
@@ -1401,8 +1388,8 @@
          logical, intent(in) :: report
          integer, intent(out) :: ierr
 
-         integer :: j, species, jmax
-         real(dp) :: sum_xa, xsum
+         integer :: j, species
+         real(dp) :: sum_xa
          logical :: okay
 
          include 'formats'
@@ -1490,7 +1477,7 @@
 
       subroutine dump_struct(s)
          type (star_info), pointer :: s
-         integer :: k, j, i
+         integer :: k, j
 
          include 'formats'
 
@@ -1548,7 +1535,7 @@
       subroutine edit_dlnR_dt_above_k_below_just_added(s, xh_start)
          type (star_info), pointer :: s
          real(dp), dimension(:, :) :: xh_start
-         integer :: k, k_below_just_added
+         integer :: k_below_just_added
          real(dp) :: lnR_start
          k_below_just_added = s% k_below_just_added
          if (k_below_just_added == 1) return

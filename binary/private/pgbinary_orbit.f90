@@ -24,16 +24,16 @@
 ! ***********************************************************************
 
 module pgbinary_orbit
-   
+
    use binary_private_def
    use pgbinary_support
-   
+
    implicit none
 
 
 contains
-   
-   
+
+
    subroutine Orbit_plot(id, device_id, ierr)
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
@@ -51,8 +51,8 @@ contains
       if (ierr /= 0) return
       call pgebuf()
    end subroutine Orbit_plot
-   
-   
+
+
    subroutine do_Orbit_plot(b, id, device_id, &
       winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
       type (binary_info), pointer :: b
@@ -64,14 +64,14 @@ contains
       call orbit_panel(b, device_id, &
          winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
    end subroutine do_Orbit_plot
-   
-   
+
+
    subroutine orbit_panel(b, device_id, &
       winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, ierr)
-      
+
       use num_lib, only : safe_root_with_guess
       use math_lib, only : pow
-      
+
       type (binary_info), pointer :: b
       integer, intent(in) :: device_id
       real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
@@ -88,9 +88,9 @@ contains
       integer, pointer :: ipar(:) ! (lipar)
       real(dp), pointer :: rpar(:) ! (lrpar)
       real(dp) :: cosp, q, this_psi, xl1
-      
+
       include 'formats'
-      
+
       ierr = 0
       call pgsave
       call pgsvp(winxmin, winxmax, winymin, winymax)
@@ -100,17 +100,17 @@ contains
       end if
       call show_title_pgbinary(b, title)
       call pgunsa
-      
+
       a1 = 1 / (1 + b% m(1) / b% m(2))
       a2 = 1 / (1 + b% m(2) / b% m(1))
       e = b% eccentricity
-      
+
       !$OMP PARALLEL DO PRIVATE(i) SCHEDULE(dynamic,2)
       do i = 1, num_points
          thetas(i) = (i - 0.5) * pi / num_points
          r1s(i) = a1 * (1 - e**2) / (1 + e * cos(thetas(i)))
          r2s(i) = a2 / a1 * r1s(i)
-         
+
          x1s(i) = -r1s(i) * cos(thetas(i))  ! minus to flip orbit
          x1s(2 * num_points - i + 1) = x1s(i)
          y1s(i) = -r1s(i) * sin(thetas(i))
@@ -125,11 +125,11 @@ contains
       y1s(2 * num_points + 1) = y1s(1)
       x2s(2 * num_points + 1) = x2s(1)
       y2s(2 * num_points + 1) = y2s(1)
-      
+
       x1max = maxval(abs(x1s))
       x2max = maxval(abs(x2s))
       xmax = max(x1max, x2max)
-      
+
       q = b% m(2) / b% m(1)
       if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          if (b% point_mass_i /= 1) then
@@ -144,7 +144,7 @@ contains
                   50, 100, 1d-6, 1d-8, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
-               
+
                x1s_RL(i) = rs(i) * cosp
                y1s_RL(i) = rs(i) * sin(phis(i))
                y1s_RL(2 * num_points - i + 1) = -y1s_RL(i)
@@ -169,7 +169,7 @@ contains
             x1s_RL = 0d0
             y1s_RL = 0d0
          end if
-         
+
          if (b% point_mass_i /= 2) then
             q = 1d0 / q  ! flip q for other star
             this_psi = Psi_fit(b% r(2) / b% separation, q)
@@ -183,7 +183,7 @@ contains
                   25, 50, 1d-4, 1d-6, & ! i_next, imax, x_tol, y_tol
                   0, rpar, 0, ipar, & ! func_params
                   ierr)
-               
+
                x2s_RL(i) = rs(i) * cosp
                y2s_RL(i) = rs(i) * sin(phis(i))
                y2s_RL(2 * num_points - i + 1) = -y2s_RL(i)
@@ -211,7 +211,7 @@ contains
       else if (b% pg% Orbit_show_stars .and. abs(log10(q)) > 2) then
          write(*, 1) "pgbinary: Not plotting RL, q too extreme: abs(log(q)) = ", abs(log10(q))
       end if
-      
+
       call pgsave
       call pgsci(1)
       call pgscf(1)
@@ -221,7 +221,7 @@ contains
       call show_box_pgbinary(b, 'BCSTN', 'BCSTNMV')
       call show_xaxis_label_pgbinary(b, 'separation')
       call show_left_yaxis_label_pgbinary(b, 'separation')
-      
+
       call pgsci(clr_Goldenrod)
       call pgline(2 * num_points + 1, x1s, y1s)
       call pgslw(1)
@@ -229,7 +229,7 @@ contains
       call pgsci(clr_LightSkyBlue)
       call pgslw(b% pg% pgbinary_lw / 2)
       call pgline(2 * num_points + 1, x2s, y2s)
-      
+
       if (b% pg% Orbit_show_stars .and. abs(log10(q)) <= 2) then
          call pgslw(int(2.0 * b% pg% pgbinary_lw / 3.0))
          call pgsfs(3)
@@ -241,29 +241,29 @@ contains
          call pgline(2 * num_points + 1, x2s_RL, y2s_RL)
          call pgpoly(2 * num_points + 1, x2s_RL, y2s_RL)
       end if
-      
+
       call pgslw(1)
       call pgmtxt('T', -2.0 - 1.3, 0.05, 0.0, 'Star 2')
-      
+
       call pgsci(1)
       call pgpt1(0.0, 0.0, 5)
       call pgunsa
-   
+
    contains
-      
+
       real function xl1_fit(q)
          real(dp), intent(in) :: q
          real(dp) :: logq
-         
+
          logq = log10(q)
          if (q > 1) logq = -logq
          xl1_fit = - 1.72452947 / pi * atan(logq * 0.21625699) + 0.5 &
             + 0.01559149 * logq &
             - 1.3924d-05 * logq * (logq + 1.5) * (logq + 4.0)
          if (q > 1) xl1_fit = 1 - xl1_fit
-      
+
       end function xl1_fit
-      
+
       real(dp) function Psi_fit(req, q)
          ! fit of Roche potential versus q = m_other / m_this and r_eq, the &
          ! dimensionless volume equivalent radius (== r / separation of the model)
@@ -273,15 +273,15 @@ contains
             - 0.3642 * req ** 2 * (req ** 2 - 1) &
             - 1.8693 * req * (req - 0.1) * (req - 0.3) * (req - 0.7) * (req - 1.0414)
       end function Psi_fit
-      
+
       real(dp) function roche(r, cosp)
          real(dp), intent(in) :: r, cosp
-         
+
          roche = -1d0 / r &
             - q * (pow(1 - 2 * r * cosp + r**2, -0.5d0) - r * cosp) &
             - (1 + q) / 2 * r**2
       end function roche
-      
+
       real(dp) function f(r, dfdx, lrpar, rpar, lipar, ipar, ierr)
          real(dp), intent(in) :: r
          integer, intent(in) :: lrpar, lipar
@@ -289,14 +289,14 @@ contains
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(out) :: ierr
-         
+
          f = roche(r, cosp) - this_psi
          dfdx = 1d0 / r**2 &
             + q * (pow(1 - 2 * r * cosp + r**2, -1.5d0) * (r - cosp) + cosp) &
             - (1 + q) * r
          ierr = 0
       end function f
-   
+
    end subroutine orbit_panel
 
 

@@ -13,10 +13,10 @@ This test case has 2 parts. Click to see a larger version of a plot.
 * Part 2 (``inlist_high_z``) continues the evolution until the central helium mass fraction drops below 1e-6:
 
 .. image:: ../../../star/test_suite/high_z/docs/hr000438.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/high_z/docs/kipp000438.svg
-   :scale: 100%
+   :width: 100%
 
 
 

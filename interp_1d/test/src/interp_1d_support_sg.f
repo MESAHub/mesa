@@ -419,8 +419,8 @@
       
       subroutine test_4pt
          integer, parameter :: n = 6
-         real :: x(n), y(n), a(3), dx, result, exact, f(4, n)
-         integer :: ierr, i
+         real :: x(n), y(n), a(3), dx, result, exact
+         integer :: i
          integer, parameter :: nwork = max(pm_work_size, mp_work_size)
          real, target :: work_ary(n*nwork)
          real, pointer :: work(:)

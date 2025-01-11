@@ -77,42 +77,20 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-COMPILE_NC = $(FC) $(FCbasic) $(FCopenmp) $(FCstatic) $(FCopt) $(FCfixed) $(TEST_INCLUDES) -c
-
-COMPILE_LEGACY_NC = $(filter-out -std=f2008, $(COMPILE_NC)) -std=legacy
-TEST_COMPILE_LEGACY = $(filter-out -std=f2008, $(TEST_COMPILE)) -std=legacy
-
-test_brent.o test_simplex.o : %.o : %.f
+%.o : %.f
 ifneq ($(QUIET),)
-	@echo TEST_COMPILE_LEGACY $<
-	@$(TEST_COMPILE_LEGACY) $(FCfree) $<
+	@echo TEST_COMPILE fixed $<
+	@$(TEST_COMPILE) $(FCfixed) -fimplicit-none $<
 else
-	$(TEST_COMPILE_LEGACY) $(FCfree) $<
+	$(TEST_COMPILE) $(FCfixed)-fimplicit-none $<
 endif
 
-test_bobyqa.o test_newuoa.o : %.o : %.f
+%.o: %.f90
 ifneq ($(QUIET),)
-	@echo TEST_COMPILE_LEGACY $<
-	@$(TEST_COMPILE_LEGACY) $(FCfixed) $<
+	@echo TEST_COMPILE free $<
+	@$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
 else
-	$(TEST_COMPILE_LEGACY) $(FCfixed) $<
-endif
-
-bari_vdpol.o bari_vdpol3.o bari_vdpol_x.o bari_vdpol3_x.o bari_medakzo.o bari_hires.o \
-  bari_pollu.o bari_rober.o bari_beam.o bari_chemakzo.o : %.o : %.f
-ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY_NC $<
-	@$(COMPILE_LEGACY_NC) $<
-else
-	$(COMPILE_LEGACY_NC) $<
-endif
-
-%.o: %.f
-ifneq ($(QUIET),)
-	@echo TEST_COMPILE_LEGACY $<
-	@$(TEST_COMPILE_LEGACY) $(FCfree) $<
-else
-	$(TEST_COMPILE_LEGACY) $(FCfree) $<
+	$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
 endif
 
 #################################################################
@@ -122,6 +100,7 @@ endif
 SRC_PATH = $(TEST_SRC_DIR)
 
 vpath %.f $(SRC_PATH)
+vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
 

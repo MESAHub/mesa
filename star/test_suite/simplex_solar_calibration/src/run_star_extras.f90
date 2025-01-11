@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -28,9 +28,9 @@
       use math_lib
       use auto_diff
       use utils_lib
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
       ! you can add your own data declarations here.
@@ -39,8 +39,8 @@
 
 
       include "test_suite_extras.inc"
- 
-      
+
+
       subroutine extras_controls(id, ierr)
          use simplex_search_data
          integer, intent(in) :: id
@@ -54,9 +54,9 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
          star_simplex_procs% set_my_vars => set_my_vars
-         star_simplex_procs% will_set_my_param => will_set_my_param  
+         star_simplex_procs% will_set_my_param => will_set_my_param
          star_simplex_procs% extras_check_model => extras_check_model
          star_simplex_procs% extras_finish_step => extras_finish_step
          star_simplex_procs% extras_after_evolve => extras_after_evolve
@@ -64,8 +64,8 @@
          s% how_many_other_mesh_fcns => how_many_mesh_fcns
          s% other_mesh_fcn_data => gradr_grada_mesh_fcn_data
       end subroutine extras_controls
-      
-      
+
+
       subroutine set_my_vars(id, ierr) ! called from star_simplex code
          use simplex_search_data, only: include_my_var1_in_chi2, my_var1
          integer, intent(in) :: id
@@ -82,8 +82,8 @@
             my_var1 = s% Teff
          end if
       end subroutine set_my_vars
-      
-      
+
+
       subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_simplex code
          use simplex_search_data, only: vary_my_param1
          integer, intent(in) :: id
@@ -102,8 +102,8 @@
             s% mixing_length_alpha = new_value
          end if
       end subroutine will_set_my_param
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -114,7 +114,7 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -135,28 +135,28 @@
          integer, intent(in) :: id
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
-         
+
          !note: do NOT add these names to history_columns.list
          ! the history_columns.list is only for the built-in log column options.
          ! it must not include the new column names you are adding here.
-         
+
          ierr = 0
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          integer, intent(in) :: id
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          integer, intent(in) :: id, n, nz
          character (len=maxlen_profile_column_name) :: names(n)
@@ -164,7 +164,7 @@
          integer, intent(out) :: ierr
          integer :: k
          ierr = 0
-         
+
          !note: do NOT add these names to profile_columns.list
          ! the profile_columns.list is only for the built-in profile column options.
          ! it must not include the new column names you are adding here.
@@ -174,9 +174,9 @@
          !names(1) = 'beta'
          !do k = 1, nz
          !   vals(k,1) = s% Pgas(k)/s% P(k)
-         !end do         
+         !end do
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       ! note: cannot request retry; extras_check_model can do that.
@@ -188,7 +188,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         ! to save a profile, 
+         ! to save a profile,
             ! s% need_to_save_profiles_now = .true.
          ! to update the star log,
             ! s% need_to_update_history_now = .true.
@@ -196,8 +196,8 @@
          ! by default, indicate where (in the code) MESA terminated
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
       end function extras_finish_step
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -210,14 +210,14 @@
          call test_suite_after_evolve(s, ierr)
        end subroutine extras_after_evolve
 
-      
+
       subroutine how_many_mesh_fcns(id, n)
          integer, intent(in) :: id
          integer, intent(out) :: n
          n = 1
       end subroutine how_many_mesh_fcns
-      
-      
+
+
       subroutine gradr_grada_mesh_fcn_data( &
             id, nfcns, names, gval_is_xa_function, vals1, ierr)
          integer, intent(in) :: id
@@ -250,7 +250,7 @@
          do k=1,nz
             vals(k,1) = weight*tanh(min(maxval,(s% gradr(k)-s% grada(k)-center)/width))*width
          end do
-         
+
       end subroutine gradr_grada_mesh_fcn_data
 
       end module run_star_extras

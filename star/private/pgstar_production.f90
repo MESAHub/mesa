@@ -88,17 +88,13 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
-         real, intent(in) :: &
-            winxmin, winxmax, winymin, winymax
+         real, intent(in) :: winxmin, winxmax, winymin, winymax
          character (len=*), intent(in) :: title
          real, intent(in) :: txt_scale
          logical, intent(in) :: subplot
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
-         real :: xmin, xmax, xleft, xright, dx, dylbl, chScale, windy, xmargin, &
-            ymin, ymax
-         integer :: lw, lw_sav, grid_min, grid_max, npts, i, nz
+         real :: xleft, xright, chScale, xmargin
          integer, parameter :: num_colors = 14
          integer :: colors(num_colors)
 
@@ -124,18 +120,16 @@
             use adjust_xyz, only: get_xa_for_standard_metals
             integer, intent(out) :: ierr
 
-            integer :: lw, lw_sav, k,i,j
-            real :: ybot, eps
+            integer :: i, j
 
-            integer :: amin,amax,z,n,a,plot_a,zmin,zmax
-            integer :: min_zone,max_zone,alternate,skip_cnt
-            real :: xhigh,xlow,extra_pad
+            integer :: amin,amax,z,n,a,zmin,zmax
+            integer :: min_zone,max_zone,alternate
+            real :: extra_pad
             real :: min_mass,max_mass,yloc
             real,parameter :: point_size=0.1
-            real :: ymin,ymax,r,g,b,log10_min_abun,log10_max_abun
+            real :: ymin, ymax
             real,parameter :: pad=1.0
-            real :: last_x,last_y,log_sa
-            logical :: z_in_use
+            real :: last_x,last_y
             real(dp),dimension(1:solsiz) :: scaled_abun,scaled_abun_init
             real(dp),dimension(:),allocatable :: init_comp,abun
 
@@ -148,7 +142,7 @@
             call pgsave
             call pgsch(txt_scale)
             call pgsvp(winxmin, winxmax, winymin, winymax)
-            
+
             amax=0
             amin=0.0
             zmax=0
@@ -173,14 +167,14 @@
             max_zone=s%nz
 
             do i=1,s%nz
-               if(s%m(i).le.max_mass) then
+               if(s%m(i)<=max_mass) then
                   min_zone=i-1
                   exit
                end if
             end do
 
             do i=min_zone,s%nz
-               if(s%m(i).le.min_mass) then
+               if(s%m(i)<=min_mass) then
                   max_zone=i-1
                   exit
                end if
@@ -222,23 +216,23 @@
             end do
 
             !Get stable isotope abundances
-            call get_stable_mass_frac(s%chem_id,s%species,dble(abun),scaled_abun) 
-            call get_stable_mass_frac(s%chem_id,s%species,init_comp,scaled_abun_init)           
+            call get_stable_mass_frac(s%chem_id,s%species,dble(abun),scaled_abun)
+            call get_stable_mass_frac(s%chem_id,s%species,init_comp,scaled_abun_init)
 
             do i=1,solsiz
-               
+
                la=safe_log10(scaled_abun(i))
                lac=safe_log10(scaled_abun_init(i))
-   
+
                !Remove low abundance isotopes, low in star and low in solar can lead to large production factor
-               if(la .lt.s% pg%production_min_mass_frac .or. lac .lt.s% pg%production_min_mass_frac) then
+               if(la <s% pg%production_min_mass_frac .or. lac <s% pg%production_min_mass_frac) then
                   scaled_abun(i)=-HUGE(ymin)
                else
                   scaled_abun(i)=real(la-lac)
                   ymax=max(ymax,real(scaled_abun(i),kind=kind(ymax)))
                   ymin=min(ymin,real(scaled_abun(i),kind=kind(ymin)))
                end if
-      
+
                if(zmax==izsol(i)) amax=int(iasol(i))
 
             end do
@@ -285,22 +279,22 @@
                call show_model_number_pgstar(s)
                call show_age_pgstar(s)
             end if
-            call show_title_pgstar(s, title)           
+            call show_title_pgstar(s, title)
 
             alternate=-1
             i=1
-            outer: do 
-               if(i.gt.solsiz) exit outer
-      
+            outer: do
+               if(i>solsiz) exit outer
+
                ! Z is greater than zmax
-               if(izsol(i).gt.zmax) exit outer
+               if(izsol(i)>zmax) exit outer
 
                !Sets color
                call set_line_style(izsol(i))
 
                !Shows element name, alternates between two levels to spread them out
                if (s% pg% Production_show_element_names &
-                  .and.(iasol(i).le.xright).and.(iasol(i).ge.xleft)) THEN
+                  .and.(iasol(i)<=xright).and.(iasol(i)>=xleft)) THEN
                      yloc=(ymax*1.0)+abs(0.75+(alternate)/2.0)
                      call pgtext(iasol(i)*1.0,yloc,el_name(izsol(i)))
                      alternate=alternate*(-1.0)
@@ -312,10 +306,10 @@
                last_y=-HUGE(last_y)
 
                inner: do j=i,solsiz
-               
-                  if(izsol(j).eq.izsol(i))then
-                     if((scaled_abun(j).ge. ymin) .and. (scaled_abun(j) .le. ymax)&
-                        .and.(iasol(j).le.xright).and.(iasol(j).ge.xleft)) then
+
+                  if(izsol(j)==izsol(i))then
+                     if((scaled_abun(j)>= ymin) .and. (scaled_abun(j) <= ymax)&
+                        .and.(iasol(j)<=xright).and.(iasol(j)>=xleft)) then
                         a=iasol(j)
 
                         !Draw point at values
@@ -328,7 +322,7 @@
 
                         !Save last x,y pair we saw
                         last_x=A*1.0
-                        last_y=scaled_abun(j)               
+                        last_y=scaled_abun(j)
                      end if
                   else
                      exit inner
@@ -341,11 +335,11 @@
 
             call pgunsa
             deallocate(abun,init_comp)
-            
+
             call show_pgstar_decorator(id,s% pg% production_use_decorator,&
                   s% pg% production_pgstar_decorator, 0, ierr)
 
-            
+
          end subroutine plot
 
          subroutine set_line_style(cnt)

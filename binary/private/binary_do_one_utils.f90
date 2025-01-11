@@ -24,15 +24,15 @@
 ! ***********************************************************************
 
       module binary_do_one_utils
-      
+
       use binary_def
       use const_def
       use math_lib
 
       implicit none
-      
+
       contains
-      
+
       subroutine write_binary_terminal_header(b)
          type (binary_info), pointer :: b
          if (b% model_number <= b% recent_binary_log_header) return
@@ -41,8 +41,8 @@
          call do_show_binary_terminal_header(b)
          b% just_wrote_binary_terminal_header = .true.
       end subroutine write_binary_terminal_header
-      
-      
+
+
       subroutine do_show_binary_log_description(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -95,16 +95,16 @@
          write(*,'(A)')
          write(*,'(a)') " All this and more can be saved in binary_history.data during the run."
       end subroutine do_show_binary_log_description
-      
-      
+
+
       subroutine do_show_binary_terminal_header(b)
          type (binary_info), pointer :: b
          call output_binary_terminal_header(b,terminal_iounit)
          if (b% extra_binary_terminal_iounit > 0) &
             call output_binary_terminal_header(b,b% extra_binary_terminal_iounit)
       end subroutine do_show_binary_terminal_header
-      
-      
+
+
       subroutine output_binary_terminal_header(b,io)
          type (binary_info), pointer :: b
          integer, intent(in) :: io
@@ -125,10 +125,10 @@
             '_______________________________________________________________________' // &
             '___________________________________________________________________________'
          write(io,'(A)')
-         
+
       end subroutine output_binary_terminal_header
-      
-      
+
+
       subroutine do_binary_terminal_summary(b)
          type (binary_info), pointer :: b
          call output_binary_terminal_summary(b,terminal_iounit)
@@ -137,19 +137,19 @@
             flush(b% extra_binary_terminal_iounit)
          end if
       end subroutine do_binary_terminal_summary
-      
-      
+
+
       subroutine output_binary_terminal_summary(b,io)
          type (binary_info), pointer :: b
          integer, intent(in) :: io
-         
+
          real(dp) :: age, time_step, total_mass
          real(dp) :: Eorb, vorb1, vorb2, dot_M1, dot_M2, eff, dot_Medd, spin1, spin2, P1, P2
          integer :: model, ierr, rlo_iters
          character (len=90) :: fmt, fmt1, fmt2, fmt3, fmt4, fmt5, fmt6
-         
+
          include 'formats'
-         
+
          age = b% binary_age
          time_step = b% time_step
          model = b% model_number
@@ -200,7 +200,7 @@
          end if
 
          P2 = 0d0
-         if (b% point_mass_i /= 2)then 
+         if (b% point_mass_i /= 2)then
             if (b% s2% rotation_flag) then
                if (abs(b% s2% omega_avg_surf) > 0) then
                   P2 = 2*pi/(b% s2% omega_avg_surf*24d0*3600d0)
@@ -214,7 +214,7 @@
             end if
          end if
 
-         ierr = 0         
+         ierr = 0
 
          !make format strings for first line of output
          !step and m1+m2
@@ -254,7 +254,7 @@
             fmt6 = '4(1pe11.3))'
          end if
 
-         
+
          fmt = trim(fmt1) // trim(fmt2) // trim(fmt3) // trim(fmt4) // trim(fmt5) // trim(fmt6)
          write(io,fmt=fmt) &
             'bin', &
@@ -263,7 +263,7 @@
             b% separation / Rsun, &
             b% period / (3600d0*24d0), &
             b% eccentricity, &
-            b% m(2)/b% m(1), &            
+            b% m(2)/b% m(1), &
             b% point_mass_i, &
             b% d_i, &
             b% step_mtransfer_rate/Msun*secyer, &
@@ -303,7 +303,7 @@
          else
             fmt5 = 'f11.6,6(1pe11.3))'
          end if
-         
+
          fmt = trim(fmt1) // trim(fmt2) // trim(fmt3) // trim(fmt4) // trim(fmt5)
          write(io,fmt=fmt) &
             safe_log10(time_step),  &
@@ -351,7 +351,7 @@
          else
             fmt5 = 'f11.6,5(1pe11.3),0p,i11)'
          end if
-         
+
          fmt = trim(fmt1) // trim(fmt2) // trim(fmt3) // trim(fmt4) // trim(fmt5)
          write(io,fmt=fmt) &
             age,  &
@@ -369,11 +369,11 @@
             rlo_iters
 
          write(io,'(A)')
-         
+
          b% just_wrote_binary_terminal_header = .false.
-         
+
       end subroutine output_binary_terminal_summary
 
-      
+
       end module binary_do_one_utils
-      
+

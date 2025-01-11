@@ -40,8 +40,6 @@ c-----------------------------------------------------------------------
       integer ldim,neqn,ierr,ipar(*)
       double precision t,y(neqn),yprime(neqn),dfdy(ldim,neqn),rpar(*)
 
-      integer i,j
-
       dfdy(1,1) = 0d0
       dfdy(1,2) = 1d0
       dfdy(2,1) = (-2.0d0*y(1)*y(2)-1d0)/1.0d-3

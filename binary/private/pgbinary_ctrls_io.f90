@@ -1393,7 +1393,6 @@ contains
       integer, intent(in) :: level
       integer, intent(out) :: ierr
       logical, dimension(max_extra_inlists) :: read_extra
-      character (len=strlen) :: message
       character (len=strlen), dimension(max_extra_inlists) :: extra
       integer :: unit, i
 
@@ -1435,7 +1434,7 @@ contains
             read_extra_pgbinary_inlist(i) = .false.
             extra(i) = extra_pgbinary_inlist_name(i)
             extra_pgbinary_inlist_name(i) = 'undefined'
-            
+
             if (read_extra(i)) then
                call read_pgbinary_file(b, extra(i), level+1, ierr)
                if (ierr /= 0) return

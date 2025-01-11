@@ -635,24 +635,21 @@
          integer, intent(out) :: ierr
          procedure(pgstar_decorator_interface), pointer :: color_pgstar_decorator
 
-         character (len=strlen) :: yname, other_yname
          character (len=strlen) :: yname1,yname2, &
             other_yname1,other_yname2
          real, allocatable, dimension(:) :: xvec1,xvec2, yvec1,yvec2,&
             other_yvec1,other_yvec2
          real, allocatable, dimension(:) :: xvec, yvec, other_yvec
 
-         integer :: i, ii, n, j, k, max_width, step_min, step_max, &
-            y_color, other_y_color, yaxis_id, other_yaxis_id, &
-            clr_sav, npts, yfile_data_len, other_yfile_data_len
-         real :: color_xmin, xmin, xmax, dx, xleft, xright, &
+         integer :: i, n, j, step_min, step_max, &
+            y_color, other_y_color
+         real :: color_xmin, xleft, xright, &
             ymargin, panel_dy, panel_ytop, panel_ybot, &
-            ymin, ymax, dy, ybot, ytop, &
-            other_ymin, other_ymax, other_ybot, other_ytop
+            ybot, ytop, &
+            other_ybot, other_ytop
          logical :: have_yaxis1, have_other_yaxis1,have_yaxis2, have_other_yaxis2,have_xaxis2
          logical :: have_yaxis,have_other_yaxis
 
-         integer :: grid_min,grid_max
          integer :: ix1,ix2
 
          include 'formats'
@@ -867,7 +864,7 @@
             end if
 
             call pgsci(1)
-            
+
             call show_pgstar_decorator(s%id,color_use_decorator,color_pgstar_decorator, j, ierr)
 
          end do
@@ -879,11 +876,11 @@
          end if
 
          call pgunsa
-         
+
          call dealloc
 
          contains
-         
+
          subroutine dealloc
             deallocate(xvec, yvec, other_yvec, yvec1, yvec2, other_yvec1, other_yvec2)
          end subroutine dealloc

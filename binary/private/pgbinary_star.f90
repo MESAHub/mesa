@@ -160,7 +160,6 @@ contains
       integer, intent(out) :: ierr
 
       character (len = strlen) :: title, status, mass
-      real, dimension(5) :: xs, ys
       logical, parameter :: star_subplot = .true.
 
       include 'formats'

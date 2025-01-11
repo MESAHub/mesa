@@ -8,9 +8,9 @@ c        ztab is metal fraction of the EOS5_data tables you are using.
 c           included only for purpose of preventing mismatch
 c        t6=T6=temperature in millions of degrees kelvin
 c        r=rho=Rho=density(g/cm**3)
-c      	iorder=11  ! gives all 1st and 2nd order data. See instructions
+c            iorder=11  ! gives all 1st and 2nd order data. See instructions
 c                  in esac.
-c      	irad=0    ! if 1, then adds radiation corrections
+c            irad=0    ! if 1, then adds radiation corrections
 c        results   ! array of length iorder to hold the results
 c            results(1) is the pressure in megabars (10**12dyne/cm**2)
 c            results(2) is energy in 10**12 ergs/gm. Zero is zero T6
@@ -25,7 +25,7 @@ c            results(8) is gamma1. Eqs. 9.88 Cox and Guili.
 c            results(9) is gamma2/(gamma2-1). Eqs. 9.88 Cox and Guili
 c            results(10) is mu_M
 c            results(11) is log_Ne
-		integer info ! returned = 0 if AOK
+      integer info ! returned = 0 if AOK
       character (len=256) data_dir, filename
       parameter (mx=5,mv=12,nr=169,nt=197)
       common/eeos/esact,eos(mv)
@@ -56,7 +56,7 @@ c            results(11) is log_Ne
       end if
       
       call esac(xh,ztab,t6,r,iorder,irad,filename,pgas_out,prad_out,info)
-		if (info /= 0) return
+      if (info /= 0) return
       do j=1,iorder
          results_out(j) = eos(j)
       end do
@@ -110,7 +110,7 @@ c
 c
       save
       double precision pgas_out, prad_out
-		integer info ! returned = 0 if AOK
+      integer info ! returned = 0 if AOK
       character (len=*) filename
       real moles
       parameter (mx=5,mv=12,nr=169,nt=197)
@@ -127,7 +127,7 @@ c
       dimension frac(7)
       data aprop/83.14511/
 
-		info = 0
+      info = 0
       blank=' '
       if (iorder .gt. mv ) then
          write (*,*) ' iorder cannot exceed ', mv
@@ -158,10 +158,10 @@ c
         call readcoeos(filename)
         z=zz(1)
         if (ztab .ne. z) then
-        		write (*,'("requested z=",f10.6," EOS5_data is for z=",
+              write (*,'("requested z=",f10.6," EOS5_data is for z=",
      x             f10.6)')
-     x    		ztab,z      
-        		stop 1
+     x          ztab,z      
+              stop 1
         endif
 
         if (.false.) then ! report grid
@@ -264,7 +264,7 @@ c
         ipu=3
         if (k4 .gt. nt) ipu=2
       if (k3 .eq. 0) then
-      		write (*,'(" ihi,ilo,imd",3i5)')
+            write (*,'(" ihi,ilo,imd",3i5)')
       endif
 
 c     check to determine if interpolation indices fall within
@@ -412,22 +412,22 @@ c
       return
 
    61 continue
-		info = -61; return
-		write(*,'(" Mass fractions exceed unity (61)")')
+      info = -61; return
+      write(*,'(" Mass fractions exceed unity (61)")')
       stop 1
    62 continue
-		info = -62; return
-		write(*,'(" T6/LogR outside of table range (62)")')
+      info = -62; return
+      write(*,'(" T6/LogR outside of table range (62)")')
       write(*,*) 'T6', t6, 'LogR', log10(r), 'LogT', log10(t6*1d6)
       stop 1
    65 continue
-		info = -65; return
-		write(*,'("T6/log rho in empty region od table (65)")')
+      info = -65; return
+      write(*,'("T6/log rho in empty region od table (65)")')
       write (*,'("xh,t6,r=", 3e12.4)') xh,t6,r
       stop 1
    66 continue
-		info = -66; return
-		write(*,'(" Z does not match Z in EOS5_data* files you are",
+      info = -66; return
+      write(*,'(" Z does not match Z in EOS5_data* files you are",
      . " using (66)")')
       write (*,'("mf,zz(mf)=",i5,e12.4)') mf,zz(mf)
       write (*,'("  iq,ip,k3,l3,xh,t6,r,z= ",4i5,4e12.4)')
@@ -549,9 +549,9 @@ c
 !..... read  tables
 c       call system (' gunzip EOS5_data')
 c       open(2, FILE='EOS5_data')
-		
-		write(*,*) 'read ' // trim(filename)
-		
+      
+      write(*,*) 'read ' // trim(filename)
+      
        open(2, FILE=trim(filename), IOSTAT=ios)
       if (ios .ne. 0) then
          write(*,*) 'failed to open ', trim(filename)

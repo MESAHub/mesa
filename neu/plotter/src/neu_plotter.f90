@@ -83,7 +83,7 @@ program neu_plotter
       write(*,*) 'invalid value of i_var'
       stop
    end if
-   
+
    ! get info from namelist
    open(newunit=iounit, file='inlist_plotter')
    read(iounit, nml=plotter)
@@ -327,7 +327,7 @@ contains
 
       lnT = log10T*ln10
       lnd = log10Rho*ln10
-      
+
       if (doing_d_dlnd) then
          log_var = (lnd + delta_x)/ln10
          var = exp10(log_var)

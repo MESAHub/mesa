@@ -142,7 +142,7 @@
 
       integer, parameter :: p_cell_internal_energy_fraction_start = p_dlogR + 1
       integer, parameter :: p_cell_internal_energy_fraction = p_cell_internal_energy_fraction_start + 1
-      
+
       integer, parameter :: p_log_rel_E_err = p_cell_internal_energy_fraction + 1
       integer, parameter :: p_ergs_error_integral = p_log_rel_E_err + 1
       integer, parameter :: p_ergs_rel_error_integral = p_ergs_error_integral + 1
@@ -211,8 +211,8 @@
       integer, parameter :: p_grada = p_logE + 1
       integer, parameter :: p_dE_dRho = p_grada + 1
       integer, parameter :: p_Cv = p_dE_dRho + 1
-      integer, parameter :: p_cp = p_Cv + 1
-      integer, parameter :: p_thermal_time_to_surface = p_cp + 1
+      integer, parameter :: p_Cp = p_Cv + 1
+      integer, parameter :: p_thermal_time_to_surface = p_Cp + 1
       integer, parameter :: p_log_thermal_time_to_surface = p_thermal_time_to_surface + 1
       integer, parameter :: p_log_CpT = p_log_thermal_time_to_surface + 1
       integer, parameter :: p_log_CpT_absMdot_div_L = p_log_CpT + 1
@@ -277,7 +277,7 @@
 
       integer, parameter :: p_eps_diffusion = p_log_eps_WD_sedimentation + 1
       integer, parameter :: p_log_eps_diffusion = p_eps_diffusion + 1
-      
+
       integer, parameter :: p_log_e_field = p_log_eps_diffusion + 1
       integer, parameter :: p_e_field = p_log_e_field + 1
       integer, parameter :: p_log_g_field_element_diffusion = p_e_field + 1
@@ -348,7 +348,7 @@
       integer, parameter :: p_dkap_dlnrho_face = p_ye + 1
       integer, parameter :: p_dkap_dlnT_face = p_dkap_dlnrho_face + 1
       integer, parameter :: p_opacity = p_dkap_dlnt_face + 1
-      
+
       integer, parameter :: p_deps_dlnd_face = p_opacity + 1
       integer, parameter :: p_deps_dlnT_face = p_deps_dlnd_face + 1
       integer, parameter :: p_d_epsnuc_dlnd = p_deps_dlnT_face + 1
@@ -356,7 +356,7 @@
       integer, parameter :: p_d_lnepsnuc_dlnT = p_d_lnepsnuc_dlnd + 1
       integer, parameter :: p_d_epsnuc_dlnT = p_d_lnepsnuc_dlnT + 1
       integer, parameter :: p_eps_nuc_start = p_d_epsnuc_dlnT + 1
-      integer, parameter :: p_signed_log_eps_nuc = p_eps_nuc_start + 1 
+      integer, parameter :: p_signed_log_eps_nuc = p_eps_nuc_start + 1
 
 
       integer, parameter :: p_log_abs_eps_nuc = p_signed_log_eps_nuc + 1
@@ -380,7 +380,7 @@
       integer, parameter :: p_extra_grav = p_extra_omegadot + 1
       integer, parameter :: p_extra_heat = p_extra_grav + 1
       integer, parameter :: p_div_v = p_extra_heat + 1
-      integer, parameter :: p_d_v_div_r_dm = p_div_v + 1 
+      integer, parameter :: p_d_v_div_r_dm = p_div_v + 1
       integer, parameter :: p_d_v_div_r_dr = p_d_v_div_r_dm + 1
 
       integer, parameter :: p_dvdt_grav = p_d_v_div_r_dr + 1
@@ -407,7 +407,7 @@
       integer, parameter :: p_eps_mdot = p_ergs_mdot + 1
 
       integer, parameter :: p_dm_eps_grav = p_eps_mdot + 1
-      
+
       integer, parameter :: p_log_xm_div_delta_m = p_dm_eps_grav + 1
       integer, parameter :: p_xm_div_delta_m = p_log_xm_div_delta_m + 1
       integer, parameter :: p_eps_grav = p_xm_div_delta_m + 1
@@ -433,7 +433,7 @@
       integer, parameter :: p_log_mlt_Gamma = p_log_gradT_div_gradr + 1
       integer, parameter :: p_log_mlt_vc = p_log_mlt_Gamma + 1
       integer, parameter :: p_conv_vel_div_mlt_vc = p_log_mlt_vc + 1
-      integer, parameter :: p_mlt_vc = p_conv_vel_div_mlt_vc + 1      
+      integer, parameter :: p_mlt_vc = p_conv_vel_div_mlt_vc + 1
       integer, parameter :: p_mlt_D = p_mlt_vc + 1
       integer, parameter :: p_mlt_gradT = p_mlt_D + 1
       integer, parameter :: p_mlt_log_abs_Y = p_mlt_gradT + 1
@@ -466,12 +466,12 @@
       integer, parameter :: p_conv_vel = p_log_D_mix + 1
       integer, parameter :: p_dt_times_conv_vel_div_mixing_length = p_conv_vel + 1
       integer, parameter :: p_log_dt_times_conv_vel_div_mixing_length = p_dt_times_conv_vel_div_mixing_length + 1
-      
+
       integer, parameter :: p_log_lambda_RTI_div_Hrho = p_log_dt_times_conv_vel_div_mixing_length + 1
       integer, parameter :: p_lambda_RTI = p_log_lambda_RTI_div_Hrho + 1
       integer, parameter :: p_dPdr_info = p_lambda_RTI + 1
       integer, parameter :: p_dRhodr_info = p_dPdr_info + 1
-      
+
       integer, parameter :: p_source_plus_alpha_RTI = p_dRhodr_info + 1
       integer, parameter :: p_log_source_RTI = p_source_plus_alpha_RTI + 1
       integer, parameter :: p_log_source_plus_alpha_RTI = p_log_source_RTI + 1
@@ -505,8 +505,8 @@
       integer, parameter :: p_mixing_type = p_mix_type + 1
 
       integer, parameter :: p_log_mlt_D_mix = p_mixing_type + 1
-      integer, parameter :: p_log_cp_T_div_t_sound = p_log_mlt_D_mix + 1
-      integer, parameter :: p_log_t_thermal = p_log_cp_T_div_t_sound + 1
+      integer, parameter :: p_log_Cp_T_div_t_sound = p_log_mlt_D_mix + 1
+      integer, parameter :: p_log_t_thermal = p_log_Cp_T_div_t_sound + 1
       integer, parameter :: p_log_t_sound = p_log_t_thermal + 1
       integer, parameter :: p_pressure_scale_height_cm = p_log_t_sound + 1
       integer, parameter :: p_pressure_scale_height = p_pressure_scale_height_cm + 1
@@ -577,7 +577,7 @@
 
       integer, parameter :: p_total_energy_sign = p_cs_at_cell_bdy + 1
       integer, parameter :: p_total_energy = p_total_energy_sign + 1
-      
+
       integer, parameter :: p_Ptrb = p_total_energy + 1
       integer, parameter :: p_log_Ptrb = p_Ptrb + 1
       integer, parameter :: p_log_w = p_log_Ptrb + 1
@@ -698,7 +698,7 @@
       integer, parameter :: p_tau_qhse = p_tau_conv + 1
       integer, parameter :: p_tau_epsnuc = p_tau_qhse + 1
       integer, parameter :: p_tau_cool = p_tau_epsnuc + 1
-      
+
       integer, parameter :: p_max_abs_xa_corr = p_tau_cool + 1
       integer, parameter :: p_log_zFe = p_max_abs_xa_corr + 1
       integer, parameter :: p_zFe = p_log_zFe + 1
@@ -709,7 +709,7 @@
       integer, parameter :: p_log_du_kick_div_du = p_RTI_du_diffusion_kick + 1
 
       integer, parameter :: p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT = p_log_du_kick_div_du + 1
-      
+
       integer, parameter :: p_col_id_max = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
@@ -758,7 +758,7 @@
          profile_column_name(p_r_div_g) = 'r_div_g'
          profile_column_name(p_g_div_r) = 'g_div_r'
          profile_column_name(p_net_nuclear_energy) = 'net_nuclear_energy'
-         
+
          profile_column_name(p_eps_nuc_plus_nuc_neu) = 'eps_nuc_plus_nuc_neu'
          profile_column_name(p_eps_nuc_minus_non_nuc_neu) = 'eps_nuc_minus_non_nuc_neu'
          profile_column_name(p_net_energy) = 'net_energy'
@@ -904,10 +904,10 @@
          profile_column_name(p_logE) = 'logE'
          profile_column_name(p_grada) = 'grada'
          profile_column_name(p_dE_dRho) = 'dE_dRho'
-         profile_column_name(p_cv) = 'cv'
+         profile_column_name(p_Cv) = 'cv'
          profile_column_name(p_thermal_time_to_surface) = 'thermal_time_to_surface'
          profile_column_name(p_log_thermal_time_to_surface) = 'log_thermal_time_to_surface'
-         profile_column_name(p_cp) = 'cp'
+         profile_column_name(p_Cp) = 'cp'
          profile_column_name(p_log_CpT) = 'log_CpT'
          profile_column_name(p_log_CpT_absMdot_div_L) = 'log_CpT_absMdot_div_L'
          profile_column_name(p_logS) = 'logS'
@@ -930,7 +930,7 @@
          profile_column_name(p_rho_times_r3) = 'rho_times_r3'
          profile_column_name(p_v_times_t_div_r) = 'v_times_t_div_r'
          profile_column_name(p_v_div_r) = 'v_div_r'
-         
+
          profile_column_name(p_log_c_div_tau) = 'log_c_div_tau'
          profile_column_name(p_log_v_escape) = 'log_v_escape'
          profile_column_name(p_v_div_v_escape) = 'v_div_v_escape'
@@ -967,7 +967,7 @@
 
          profile_column_name(p_eps_diffusion) = 'eps_diffusion'
          profile_column_name(p_log_eps_diffusion) = 'log_eps_diffusion'
-         
+
          profile_column_name(p_log_e_field) = 'log_e_field'
          profile_column_name(p_e_field) = 'e_field'
          profile_column_name(p_log_g_field_element_diffusion) = 'log_g_field_element_diffusion'
@@ -1091,7 +1091,7 @@
          profile_column_name(p_ergs_eps_grav_plus_eps_mdot) = 'ergs_eps_grav_plus_eps_mdot'
          profile_column_name(p_ergs_mdot) = 'ergs_mdot'
          profile_column_name(p_eps_mdot) = 'eps_mdot'
-         
+
          profile_column_name(p_log_xm_div_delta_m) = 'log_xm_div_delta_m'
          profile_column_name(p_xm_div_delta_m) = 'xm_div_delta_m'
          profile_column_name(p_eps_grav) = 'eps_grav'
@@ -1152,7 +1152,7 @@
          profile_column_name(p_lambda_RTI) = 'lambda_RTI'
          profile_column_name(p_dPdr_info) = 'dPdr_info'
          profile_column_name(p_dRhodr_info) = 'dRhodr_info'
-         
+
          profile_column_name(p_source_plus_alpha_RTI) = 'source_plus_alpha_RTI'
          profile_column_name(p_source_minus_alpha_RTI) = 'source_minus_alpha_RTI'
          profile_column_name(p_log_source_RTI) = 'log_source_RTI'
@@ -1191,7 +1191,7 @@
          profile_column_name(p_mix_type) = 'mix_type'
          profile_column_name(p_mixing_type) = 'mixing_type'
          profile_column_name(p_log_mlt_D_mix) = 'log_mlt_D_mix'
-         profile_column_name(p_log_cp_T_div_t_sound) = 'log_cp_T_div_t_sound'
+         profile_column_name(p_log_Cp_T_div_t_sound) = 'log_cp_T_div_t_sound'
          profile_column_name(p_log_t_thermal) = 'log_t_thermal'
          profile_column_name(p_log_t_sound) = 'log_t_sound'
          profile_column_name(p_pressure_scale_height_cm) = 'pressure_scale_height_cm'
@@ -1308,7 +1308,7 @@
          profile_column_name(p_cell_ie_div_star_ie) = 'cell_ie_div_star_ie'
          profile_column_name(p_log_cell_specific_IE) = 'log_cell_specific_IE'
          profile_column_name(p_log_cell_ie_div_star_ie) = 'log_cell_ie_div_star_ie'
-         
+
          profile_column_name(p_cell_specific_PE) = 'cell_specific_PE'
          profile_column_name(p_cell_specific_KE) = 'cell_specific_KE'
          profile_column_name(p_cell_IE_div_IE_plus_KE) = 'cell_IE_div_IE_plus_KE'
@@ -1431,7 +1431,7 @@
 
 
       integer function do_get_profile_id(cname)
-         use utils_lib
+         use utils_lib, only: integer_dict_lookup
          character (len=*), intent(in)  :: cname
          ! returns id for the profile column if there is a matching name
          ! returns 0 otherwise.

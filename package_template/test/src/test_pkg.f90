@@ -5,10 +5,10 @@
       contains
 
       subroutine do_test
-         
+
          write(*,*) 'done'
-         
-      end subroutine do_test 
+
+      end subroutine do_test
 
 
       end module test_xxx_mod
@@ -20,4 +20,4 @@
       use test_xxx_mod
       implicit none
       call do_test
-      end program
+      end program test_xxx

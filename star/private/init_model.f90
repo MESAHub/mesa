@@ -273,7 +273,6 @@
             use read_model, only: read_properties
             integer :: year_month_day_when_created, iprop
             real(dp) :: dprop, initial_z, initial_y
-            character (len=net_name_len) :: net_name
             read(iounit, *, iostat=ierr) ! skip blank line before property list
             include 'formats'
             if (ierr /= 0) return
@@ -393,11 +392,11 @@
                write(*,*) 'm_in', m_in
                write(*,*) 'nz_in', nz_in
                ierr = -1
-               exit
+               exit mass_loop
             end if
 
             call get_chem_col_names(s, iounit, species, names, perm, ierr)
-            if (ierr /= 0) exit
+            if (ierr /= 0) exit mass_loop
 
             if (abs(m_in-m_read) > 1d-4) then
 

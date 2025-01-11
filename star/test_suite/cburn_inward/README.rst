@@ -34,10 +34,10 @@ This test case has two parts. Click to see a larger view of a plot.
 * Part 2 (``cburn_inward``) continues the evoluton where an off-center carbon burning front ignites, develops a convective region behind the burning front, and propagates towards the center through oxygen-neon-magnesium rich material.
 
 .. image:: ../../../star/test_suite/cburn_inward/docs/grid_000170.svg
-   :scale: 100%
+   :width: 100%
 
 .. image:: ../../../star/test_suite/cburn_inward/docs/kipp_000170.svg
-   :scale: 100%
+   :width: 100%
 
 pgstar commands used for the plots above:
 

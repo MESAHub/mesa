@@ -1,9 +1,9 @@
- 
+
       module run_star
       implicit none
-      
+
       contains
-      
+
       subroutine do_run_star(inlist_fname_arg)
          use run_star_support, only: run1_star
          use run_star_extras, only: extras_controls
@@ -28,4 +28,4 @@
       end subroutine do_run_star
 
       end module run_star
-      
+

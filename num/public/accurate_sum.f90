@@ -5,7 +5,7 @@
       module accurate_sum
 
       use const_def
- 
+
       implicit none
 
       private

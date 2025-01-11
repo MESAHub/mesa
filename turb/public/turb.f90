@@ -50,7 +50,7 @@ module turb
       gradT = gradr
       Y_face = gradT - grada
       conv_vel = 3d0*D/Lambda
-      mixing_type = thermohaline_mixing 
+      mixing_type = thermohaline_mixing
    end subroutine set_thermohaline
 
    !> Computes the outputs of time-dependent convection theory following the model specified in

@@ -206,7 +206,7 @@
         if(idr(1)>0) n% d_eps_nuc_dy(idr(1)) = n% d_eps_nuc_dy(idr(1)) + d1*(Q-Qneu)
         if(idr(2)>0) n% d_eps_nuc_dy(idr(2)) = n% d_eps_nuc_dy(idr(2)) + d2*(Q-Qneu)
         if(idr(3)>0) n% d_eps_nuc_dy(idr(3)) = n% d_eps_nuc_dy(idr(3)) + d3*(Q-Qneu)
-    
+
         ! for debugging
         if(idr(1)>0) then
             condition = chem_id(idr(1)) == ic12
@@ -215,7 +215,7 @@
                 d, dr(1), d1, Q, d1*Q, n% d_eps_nuc_dy(idr(1)), n% reaction_Qs(reaction_id), &
                 n% reaction_neuQs(reaction_id)
         end if
-    
+
         if(idr(2)>0) then
             condition = chem_id(idr(2)) == ic12
             if (show_d_eps_nuc_dy .and. d2 > 0 .and. condition)  &
@@ -223,7 +223,7 @@
                 d, dr(2), d2, Q, d2*Q, n% d_eps_nuc_dy(idr(2)), n% reaction_Qs(reaction_id), &
                 n% reaction_neuQs(reaction_id)
         end if
-    
+
         if(idr(3)>0) then
             condition = chem_id(idr(3)) == ic12
             if (show_d_eps_nuc_dy .and. d3 > 0 .and. condition)  &

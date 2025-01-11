@@ -31,9 +31,9 @@
       use rates_def
 
       implicit none
-      
+
       real(dp), parameter :: tiny_rate = 1d-50
-      
+
       contains
 
 
@@ -59,16 +59,16 @@
          type (Net_General_Info), pointer  :: g
          real(dp) :: T9, T932, eps_nuc_cancel_factor, eps_factor, &
             old_eps_nuc_categories_val
-         
+
          include 'formats'
-         
+
          ierr = 0
 
          T9 = temp*1d-9
          T932 = T9*sqrt(T9)
-         
+
          g => n% g
-         
+
          if (.true. .or. logtemp <= g% logT_lo_eps_nuc_cancel) then
             eps_nuc_cancel_factor = 1d0
          else if (logtemp >= g% logT_hi_eps_nuc_cancel) then
@@ -78,7 +78,7 @@
                (g% logT_hi_eps_nuc_cancel - logtemp)/&
                (g% logT_hi_eps_nuc_cancel - g% logT_lo_eps_nuc_cancel)
          end if
-         
+
          !write(*,1) 'eps_nuc_cancel_factor', eps_nuc_cancel_factor, logtemp
 
          itab => g% net_iso
@@ -86,21 +86,21 @@
          reaction_kind => g% reaction_reaclib_kind
          reverse_id => g% reverse_id_for_kind_ne_other
          reaction_id => g% reaction_id
-         
+
          show_derivs_dydt = .false.
          if (show_dydt) then
             i = itab(io16)
             if (i > 0) &
                show_derivs_dydt = (abs(n% y(i) - show_dydt_y) < 1d-14)
          end if
-         
-         
+
+
          deriv_flgs => deriv_flgs_data
          if (checking_deriv_flags) deriv_flgs(:) = .false.
 
          dydt = 0
          if (.not. just_dydt) n% d_dydt_dy = 0
-         
+
          ierr = 0
          eps_nuc_MeV = 0d0
 
@@ -109,7 +109,7 @@
          else
             jmax = num_rvs
          end if
-         
+
          ! Update special rates that depend on the composition
          do i=1,num_reactions
             call update_special_rates(n, dydt, eps_nuc_MeV, i, eta, ye, temp, den, abar, zbar, &
@@ -117,14 +117,14 @@
                      deriv_flgs, symbolic, just_dydt, &
                      ierr)
          end do
-         
+
          old_eps_nuc_categories_val = 0
-      
+
          i = 1
          do while (i <= num_reactions)
-      
+
             if (ierr /= 0) exit
-            
+
             ir = reaction_id(i)
             icat_f = reaction_categories(ir)
 
@@ -137,31 +137,31 @@
                r_ir = 0
                icat_r = 0
             end if
-            
 
-            kind = reaction_kind(i)   
+
+            kind = reaction_kind(i)
             if ( &
                 !kind == ng_kind .or. &
                 !kind == pn_kind .or. &
-                !kind == pg_kind .or. &                
-                !kind == ap_kind .or. & 
-                !kind == an_kind .or. &                
-                !kind == ag_kind .or. &                
+                !kind == pg_kind .or. &
+                !kind == ap_kind .or. &
+                !kind == an_kind .or. &
+                !kind == ag_kind .or. &
                 !kind == general_one_one_kind .or. &
                 !kind == general_two_one_kind .or. &
                 !kind == general_two_two_kind .or. &
                 kind == -1 &
                 ) kind = other_kind
-            
+
             !kind = other_kind  ! TESTING
-            
+
             !if (reaction_name(ir) == 'rfe52aprot_to_ni56') then
             !   write(*,2) 'rfe52aprot_to_ni56 kind', kind
             !   stop
             !end if
-            
+
             eps_factor = 1d0
-            !write(*,*) trim(reaction_name(ir)),kind         
+            !write(*,*) trim(reaction_name(ir)),kind
             select case(kind)
                case (other_kind)
                   call get1_derivs( &
@@ -196,7 +196,7 @@
                   call mesa_error(__FILE__,__LINE__,'confusion in net wrt reaction kind')
             end select
             i = i+2
-            
+
             ! icat 16 is burn_fe
             if (.false. .and. icat_f == 16 .and. n% logT >= 9.4864903d0 .and. n% logT <= 9.48649039d0) then
                write(*,1) trim(category_name(icat_f)) // ' ' // trim(reaction_name(ir)), &
@@ -204,8 +204,8 @@
                   Qconv*n% eps_nuc_categories(icat_f)
                old_eps_nuc_categories_val = n% eps_nuc_categories(icat_f)
             end if
-            
-         
+
+
          end do
 
          if(associated(net_other_net_derivs)) then
@@ -214,28 +214,28 @@
                symbolic, just_dydt, ierr)
          end if
 
-         
+
          contains
 
          subroutine get_general_1_to_1_derivs(i,ierr) ! e.g., 2 c12 -> mg24, 3 he4 -> c12
             integer, intent(in) :: i
             integer, intent(out) :: ierr
-            
+
             real(qp) :: b, b_f, b_r, rate
             real(dp) :: d, d_f, d_r, d1, d2, Q, ys_f, ys_r, &
                d_ysf_dy1, d_ysr_dy2
             integer :: c1, c2, i1, i2, o1, o3
-            
+
             include 'formats'
-         
-            ierr = 0            
-            
+
+            ierr = 0
+
             ! forward reaction is c1 i1 -> c2 i2
-            c1 = reaction_inputs(1,ir)  
-            i1 = itab(reaction_inputs(2,ir))    
+            c1 = reaction_inputs(1,ir)
+            i1 = itab(reaction_inputs(2,ir))
             c2 = reaction_outputs(1,ir)
             i2 = itab(reaction_outputs(2,ir))
-            
+
             if (symbolic) then
                n% d_dydt_dy(i1,i1) = 1
                n% d_dydt_dy(i1,i2) = 1
@@ -243,7 +243,7 @@
                n% d_dydt_dy(i2,i2) = 1
                return
             end if
-         
+
             select case(c1)
                case (1)
                   ys_f = n% y(i1)
@@ -259,7 +259,7 @@
                   call mesa_error(__FILE__,__LINE__,'get_general_1_to_1_derivs')
             end select
             d_f = ys_f
-            
+
             select case(c2)
                case (1)
                   ys_r = n% y(i2)
@@ -307,7 +307,7 @@
             n% eps_neu_rate(i) = 0d0
             n% eps_neu_rate(r_i) = 0d0
 
-                        
+
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
             rate = n% rate_screened_dT(r_i)
@@ -319,7 +319,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dT) = eps_nuc_MeV(i_rate_dT) + b
-                        
+
             rate = n% rate_screened_dRho(i)
             b_f = d_f*rate
             rate = n% rate_screened_dRho(r_i)
@@ -331,7 +331,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -341,34 +341,34 @@
             d2 = d_ysr_dy2*n% rate_screened(r_i) ! d(rate_r)/d(y2)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
-            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) - Q*d2  
-            
+            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) - Q*d2
+
             n% d_dydt_dy(i1,i1) = n% d_dydt_dy(i1,i1) - c1*d1
             n% d_dydt_dy(i2,i1) = n% d_dydt_dy(i2,i1) + c2*d1
 
             n% d_dydt_dy(i1,i2) = n% d_dydt_dy(i1,i2) + c1*d2
             n% d_dydt_dy(i2,i2) = n% d_dydt_dy(i2,i2) - c2*d2
-                        
+
          end subroutine get_general_1_to_1_derivs
 
          subroutine get_general_2_to_1_derivs(i,ierr) ! e.g., r_he4_si28_to_o16_o16
             integer, intent(in) :: i
             integer, intent(out) :: ierr
-            
+
             real(qp) :: b, b_f, b_r, rate
             real(dp) :: d, d_f, d_r, d1, d2, d3, Q, ys_f, ys_r, &
                d_ysf_dy1, d_ysf_dy2, d_ysr_dy3, y1, y2, y3
             integer :: c1, c2, c3, i1, i2, i3, o1, o3
-            
+
             include 'formats'
-         
-            ierr = 0            
-            
+
+            ierr = 0
+
             ! forward reaction is c1 i1 + c2 i2 -> c3 i3
             c1 = reaction_inputs(1,ir)
-            i1 = itab(reaction_inputs(2,ir))    
-            c2 = reaction_inputs(3,ir)   
-            i2 = itab(reaction_inputs(4,ir))    
+            i1 = itab(reaction_inputs(2,ir))
+            c2 = reaction_inputs(3,ir)
+            i2 = itab(reaction_inputs(4,ir))
             c3 = reaction_outputs(1,ir)
             i3 = itab(reaction_outputs(2,ir))
 
@@ -384,11 +384,11 @@
                n% d_dydt_dy(i3,i3) = 1
                return
             end if
-            
+
             y1 = n% y(i1)
             y2 = n% y(i2)
             y3 = n% y(i3)
-         
+
             select case(c1)
                case (1)
                   ys_f = y1
@@ -422,7 +422,7 @@
                   write(*,2) 'c1 too big for ' // trim(reaction_name(ir))
                   call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end select
-                        
+
             select case(c3)
                case (1)
                   ys_r = y3
@@ -452,7 +452,7 @@
 
             n% raw_rate(i) = d_f * n% rate_raw(i) * avo
             n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
-            
+
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
@@ -467,7 +467,7 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) + b_r
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-                        
+
             n% eps_nuc_rate(i) = b_f * Qconv
             n% eps_nuc_rate(r_i) = b_r * Qconv
             n% eps_neu_rate(i) = 0d0
@@ -485,7 +485,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dT) = eps_nuc_MeV(i_rate_dT) + b
-                        
+
             rate = n% rate_screened_dRho(i)
             b_f = d_f*rate
             rate = n% rate_screened_dRho(r_i)
@@ -498,7 +498,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -509,8 +509,8 @@
             d3 = d_ysr_dy3*n% rate_screened(r_i) ! d(rate_r)/d(y3)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
-            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2  
-            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3  
+            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
+            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3
 
 !           dydt(1,i1) = dydt(1,i1) - c1*(ys_f*n% rate_screened(i) - ys_r*n% rate_screened(r_i))
             n% d_dydt_dy(i1,i1) = n% d_dydt_dy(i1,i1) - c1*d1
@@ -526,7 +526,7 @@
             n% d_dydt_dy(i3,i1) = n% d_dydt_dy(i3,i1) + c3*d1
             n% d_dydt_dy(i3,i2) = n% d_dydt_dy(i3,i2) + c3*d2
             n% d_dydt_dy(i3,i3) = n% d_dydt_dy(i3,i3) - c3*d3
-            
+
             if (.false. .and. reaction_name(ir) == 'r_he4_si28_to_o16_o16') then ! .and. &
                   !y1 > 1d-20 .and. y2 > 1d-20 .and. y3 > 1d-20) then
                write(*,'(A)')
@@ -564,27 +564,27 @@
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'get_general_2_to_1_derivs')
             end if
-                        
+
          end subroutine get_general_2_to_1_derivs
 
          subroutine get_general_2_to_2_derivs(i,ierr)
             integer, intent(in) :: i
             integer, intent(out) :: ierr
-            
+
             real(qp) :: b, b_f, b_r, rate
             real(dp) :: d, d_f, d_r, d1, d2, d3, d4, Q, ys_f, ys_r, &
                d_ysf_dy1, d_ysf_dy2, d_ysr_dy3, d_ysr_dy4, y1, y2, y3, y4
             integer :: c1, c2, c3, c4, i1, i2, i3, i4
-            
+
             include 'formats'
-         
-            ierr = 0            
-            
+
+            ierr = 0
+
             ! forward reaction is c1 i1 + c2 i2 -> c3 i3 + c4 i4
             c1 = reaction_inputs(1,ir)
-            i1 = itab(reaction_inputs(2,ir))    
-            c2 = reaction_inputs(3,ir)   
-            i2 = itab(reaction_inputs(4,ir))    
+            i1 = itab(reaction_inputs(2,ir))
+            c2 = reaction_inputs(3,ir)
+            i2 = itab(reaction_inputs(4,ir))
             c3 = reaction_outputs(1,ir)
             i3 = itab(reaction_outputs(2,ir))
             c4 = reaction_outputs(3,ir)
@@ -595,29 +595,29 @@
                n% d_dydt_dy(i1,i2) = 1
                n% d_dydt_dy(i1,i3) = 1
                n% d_dydt_dy(i1,i4) = 1
-               
+
                n% d_dydt_dy(i2,i1) = 1
                n% d_dydt_dy(i2,i2) = 1
                n% d_dydt_dy(i2,i3) = 1
                n% d_dydt_dy(i2,i4) = 1
-               
+
                n% d_dydt_dy(i3,i1) = 1
                n% d_dydt_dy(i3,i2) = 1
                n% d_dydt_dy(i3,i3) = 1
                n% d_dydt_dy(i3,i4) = 1
-               
+
                n% d_dydt_dy(i4,i1) = 1
                n% d_dydt_dy(i4,i2) = 1
                n% d_dydt_dy(i4,i3) = 1
                n% d_dydt_dy(i4,i4) = 1
                return
             end if
-            
+
             y1 = n% y(i1)
             y2 = n% y(i2)
             y3 = n% y(i3)
             y4 = n% y(i4)
-         
+
             select case(c1)
                case (1)
                   ys_f = y1
@@ -651,7 +651,7 @@
                   write(*,2) 'c2 too big for ' // trim(reaction_name(ir)), c2
                   call mesa_error(__FILE__,__LINE__,'get_general_2_to_2_derivs')
             end select
-                        
+
             select case(c3)
                case (1)
                   ys_r = y3
@@ -701,7 +701,7 @@
 
             n% raw_rate(i) = d_f * n% rate_raw(i) * avo
             n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
-            
+
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
@@ -735,7 +735,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dT) = eps_nuc_MeV(i_rate_dT) + b
-                        
+
             rate = n% rate_screened_dRho(i)
             b_f = d_f*rate
             rate = n% rate_screened_dRho(r_i)
@@ -749,7 +749,7 @@
             b_r = -Q*b_r
             b = b_f + b_r
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b
-               
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
@@ -761,9 +761,9 @@
             d4 = d_ysr_dy4*n% rate_screened(r_i) ! d(rate_r)/d(y4)
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
-            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2  
-            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3  
-            n% d_eps_nuc_dy(i4) = n% d_eps_nuc_dy(i4) - Q*d4  
+            n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
+            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3
+            n% d_eps_nuc_dy(i4) = n% d_eps_nuc_dy(i4) - Q*d4
 
             n% d_dydt_dy(i1,i1) = n% d_dydt_dy(i1,i1) - c1*d1
             n% d_dydt_dy(i1,i2) = n% d_dydt_dy(i1,i2) - c1*d2
@@ -790,19 +790,19 @@
          subroutine get_basic_2_to_2_derivs(i,ierr)
             integer, intent(in) :: i
             integer, intent(out) :: ierr
-            
+
             real(qp) :: b, b_f, b_r, rate
             real(dp) :: d_f, d_r, e_f, e_r, d1, d2, d3, d4, &
                ys_f, ys_r, Q, y1, y2, y3, y4
             integer :: i1, i2, i3, i4, o1, o2, o3, o4
-            
+
             include 'formats'
-         
-            ierr = 0            
-            
+
+            ierr = 0
+
             ! forward reaction is i1 + i2 -> i3 + i4
-            i1 = itab(reaction_inputs(2,ir))    
-            i2 = itab(reaction_inputs(4,ir))    
+            i1 = itab(reaction_inputs(2,ir))
+            i2 = itab(reaction_inputs(4,ir))
             i3 = itab(reaction_outputs(2,ir))
             i4 = itab(reaction_outputs(4,ir))
 
@@ -825,15 +825,15 @@
                n% d_dydt_dy(i4,i4) = 1
                return
             end if
-            
+
             y1 = n% y(i1)
             y2 = n% y(i2)
             y3 = n% y(i3)
             y4 = n% y(i4)
-         
+
             ys_f = y1*y2
             d_f = ys_f
-            
+
             ys_r = y3*y4
             d_r = ys_r
 
@@ -849,7 +849,7 @@
 
             n% raw_rate(i) = d_f * n% rate_raw(i) * avo
             n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
-            
+
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
 
@@ -861,12 +861,12 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-            
+
             n% eps_nuc_rate(i) = b_f * Q  * Qconv
             n% eps_nuc_rate(r_i) = -b_r * Q  * Qconv
             n% eps_neu_rate(i) = 0d0
             n% eps_neu_rate(r_i) = 0d0
-               
+
 
             rate = n% rate_screened_dT(i)
             b_f = d_f*rate
@@ -878,7 +878,7 @@
             dydt(i_rate_dT,i3) = dydt(i_rate_dT,i3) + b
             dydt(i_rate_dT,i4) = dydt(i_rate_dT,i4) + b
             eps_nuc_MeV(i_rate_dT) = eps_nuc_MeV(i_rate_dT) + b*Q
-                        
+
             rate = n% rate_screened_dRho(i)
             b_f = d_f*rate
             rate = n% rate_screened_dRho(r_i)
@@ -889,12 +889,12 @@
             dydt(i_rate_dRho,i3) = dydt(i_rate_dRho,i3) + b
             dydt(i_rate_dRho,i4) = dydt(i_rate_dRho,i4) + b
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b*Q
-            
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
             end if
-            
+
             e_f = n% rate_screened(i)
             e_r = n% rate_screened(r_i)
 
@@ -905,14 +905,14 @@
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
-            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3      
-            n% d_eps_nuc_dy(i4) = n% d_eps_nuc_dy(i4) - Q*d4     
-            
+            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3
+            n% d_eps_nuc_dy(i4) = n% d_eps_nuc_dy(i4) - Q*d4
+
             n% d_dydt_dy(i1,i1) = n% d_dydt_dy(i1,i1) - d1
             n% d_dydt_dy(i2,i1) = n% d_dydt_dy(i2,i1) - d1
             n% d_dydt_dy(i3,i1) = n% d_dydt_dy(i3,i1) + d1
             n% d_dydt_dy(i4,i1) = n% d_dydt_dy(i4,i1) + d1
-            
+
             n% d_dydt_dy(i1,i2) = n% d_dydt_dy(i1,i2) - d2
             n% d_dydt_dy(i2,i2) = n% d_dydt_dy(i2,i2) - d2
             n% d_dydt_dy(i3,i2) = n% d_dydt_dy(i3,i2) + d2
@@ -927,27 +927,27 @@
             n% d_dydt_dy(i2,i4) = n% d_dydt_dy(i2,i4) + d4
             n% d_dydt_dy(i3,i4) = n% d_dydt_dy(i3,i4) - d4
             n% d_dydt_dy(i4,i4) = n% d_dydt_dy(i4,i4) - d4
-            
+
          end subroutine get_basic_2_to_2_derivs
 
          subroutine get_basic_2_to_1_derivs(i,ierr)
             integer, intent(in) :: i
             integer, intent(out) :: ierr
-            
+
             real(qp) :: b, b_f, b_r, rate
             real(dp) :: d_f, d_r, e_f, e_r, d1, d2, d3, &
                ys_f, ys_r, Q, y1, y2, y3
             integer :: i1, i2, i3, o1, o2, o3, k
-            
+
             include 'formats'
-         
-            ierr = 0            
-            
+
+            ierr = 0
+
             ! forward reaction is i1 + i2 -> i3
-            i1 = itab(reaction_inputs(2,ir))    
-            i2 = itab(reaction_inputs(4,ir))    
+            i1 = itab(reaction_inputs(2,ir))
+            i2 = itab(reaction_inputs(4,ir))
             i3 = itab(reaction_outputs(2,ir))
-            
+
 !            if (reaction_inputs(1,ir) /= 1 .or. &
 !                reaction_inputs(3,ir) /= 1 .or. &
 !                reaction_outputs(1,ir) /= 1 .or. &
@@ -973,10 +973,10 @@
             y1 = n% y(i1)
             y2 = n% y(i2)
             y3 = n% y(i3)
-         
+
             ys_f = y1*y2
             d_f = ys_f
-            
+
             ys_r = y3
             d_r = ys_r
 
@@ -991,10 +991,10 @@
 
             n% raw_rate(i) = d_f * n% rate_raw(i) * avo
             n% raw_rate(r_i) = d_r * n% rate_raw(r_i) * avo
-            
+
             n% screened_rate(i) = d_f * n% rate_screened(i) * avo
             n% screened_rate(r_i) = d_r * n% rate_screened(r_i) * avo
-            
+
             if (just_dydt) return
 
             Q = n% reaction_Qs(ir)*eps_factor
@@ -1003,7 +1003,7 @@
             n% eps_nuc_categories(icat_r) = n% eps_nuc_categories(icat_r) - b_r*Q
             if (show_eps_nuc .and. abs(b) > 1d2) &
                write(*,1) trim(reaction_Name(ir)) // ' eps_nuc',  b, b_f, b_r
-      
+
             n% eps_nuc_rate(i) = b_f * Q  * Qconv
             n% eps_nuc_rate(r_i) = -b_r * Q  * Qconv
             n% eps_neu_rate(i) = 0d0
@@ -1018,7 +1018,7 @@
             dydt(i_rate_dT,i2) = dydt(i_rate_dT,i2) - b
             dydt(i_rate_dT,i3) = dydt(i_rate_dT,i3) + b
             eps_nuc_MeV(i_rate_dT) = eps_nuc_MeV(i_rate_dT) + b*Q
-                        
+
             rate = n% rate_screened_dRho(i)
             b_f = d_f*rate
             rate = n% rate_screened_dRho(r_i)
@@ -1028,12 +1028,12 @@
             dydt(i_rate_dRho,i2) = dydt(i_rate_dRho,i2) - b
             dydt(i_rate_dRho,i3) = dydt(i_rate_dRho,i3) + b
             eps_nuc_MeV(i_rate_dRho) = eps_nuc_MeV(i_rate_dRho) + b*Q
-            
+
             if (checking_deriv_flags) then
                deriv_flgs(i) = .true.
                deriv_flgs(r_i) = .true.
             end if
-            
+
             e_f = n% rate_screened(i)
             e_r = n% rate_screened(r_i)
 
@@ -1043,12 +1043,12 @@
 
             n% d_eps_nuc_dy(i1) = n% d_eps_nuc_dy(i1) + Q*d1
             n% d_eps_nuc_dy(i2) = n% d_eps_nuc_dy(i2) + Q*d2
-            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3   
-            
+            n% d_eps_nuc_dy(i3) = n% d_eps_nuc_dy(i3) - Q*d3
+
             n% d_dydt_dy(i1,i1) = n% d_dydt_dy(i1,i1) - d1
             n% d_dydt_dy(i2,i1) = n% d_dydt_dy(i2,i1) - d1
             n% d_dydt_dy(i3,i1) = n% d_dydt_dy(i3,i1) + d1
-            
+
             n% d_dydt_dy(i1,i2) = n% d_dydt_dy(i1,i2) - d2
             n% d_dydt_dy(i2,i2) = n% d_dydt_dy(i2,i2) - d2
             n% d_dydt_dy(i3,i2) = n% d_dydt_dy(i3,i2) + d2
@@ -1056,13 +1056,13 @@
             n% d_dydt_dy(i1,i3) = n% d_dydt_dy(i1,i3) + d3
             n% d_dydt_dy(i2,i3) = n% d_dydt_dy(i2,i3) + d3
             n% d_dydt_dy(i3,i3) = n% d_dydt_dy(i3,i3) - d3
-               
+
          end subroutine get_basic_2_to_1_derivs
 
          subroutine Check
             integer :: nrates
             nrates = n% g% num_reactions
-            
+
             do ir = 1, nrates
                if (.not. deriv_flgs(ir)) then
                   all_okay = .false.
@@ -1070,10 +1070,10 @@
                         trim(reaction_Name(g% reaction_id(ir)))
                end if
             end do
-         
+
          end subroutine Check
-         
-      
+
+
       end subroutine get_derivs
 
 
@@ -1091,7 +1091,7 @@
          logical, pointer :: deriv_flgs(:)
          logical, intent(in) :: symbolic, just_dydt
          integer, intent(out) :: ierr
-         
+
          integer :: ir, j, prot, neut, h1, he4, c14, n14, ne20, ne22, &
                mg21, mg22, mg23, mg24, al23, al24, si24, si25, si26,  &
                s28, s29, s30, cl31, ar32, ar33, ar34, k35, ca36, ca37, ca38, &
@@ -1113,15 +1113,15 @@
 
          integer, dimension(3) :: i_in, i_out, idr
          real(dp), dimension(3) :: c_in, c_out, dr
-         
+
          logical :: done, has_prot, has_neut, has_h1, switch_to_prot
          integer :: max_Z, Z_plus_N_for_max_Z
          integer, parameter :: min_Z_for_switch_to_prot = 12
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          g => n% g
          reaction_id => g% reaction_id
 
@@ -1131,8 +1131,8 @@
          h1 = itab(ih1)
          he4 = itab(ihe4)
 
-         ir = reaction_id(i)       
-         
+         ir = reaction_id(i)
+
          if (reaction_outputs(1,ir) == 0) then
             n% raw_rate(i) = 0d0
             n% screened_rate(i) = 0d0
@@ -1144,7 +1144,7 @@
 
          if (dbg) &
             write(*,'(/,a,2i6)') ' reaction name <' // trim(reaction_Name(ir)) // '>', i, ir
-         
+
          max_Z = g% reaction_max_Z(i)
          Z_plus_N_for_max_Z = g% reaction_max_Z_plus_N_for_max_Z(i)
 
@@ -1158,27 +1158,27 @@
          dout3 = 0d0
          dout4 = 0d0
          dout5 = 0d0
-         
+
          ! These rates are setup in update_special_rates
          select case(ir)
 
             case(ir_he4_he4_he4_to_c12) ! triple alpha
-               if (g% use_3a_fl87) then 
+               if (g% use_3a_fl87) then
                   return
             end if
 
             case(irn14ag_lite) ! n14 + 1.5 alpha => ne20
                return
-         
+
          end select
 
          num_reaction_inputs = get_num_reaction_inputs(ir)
          num_reaction_outputs = get_num_reaction_outputs(ir)
-         
+
          if (dbg) write(*,*) 'num_reaction_inputs', num_reaction_inputs
          if (dbg) write(*,*) 'num_reaction_outputs', num_reaction_outputs
          if (dbg) write(*,*)
-         
+
          switch_to_prot = .false.
          cout1 = 0; out1 = 0; o1 = 0
          cout2 = 0; out2 = 0; o2 = 0
@@ -1198,7 +1198,7 @@
                call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out1) = 0')
             end if
          end if
-            
+
          if (num_reaction_outputs >= 2) then
             cout2 = reaction_outputs(3,ir); dout2 = cout2
             out2 = reaction_outputs(4,ir)
@@ -1208,7 +1208,7 @@
                call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out2) = 0')
             end if
          end if
-            
+
          if (num_reaction_outputs >= 3) then
             cout3 = reaction_outputs(5,ir); dout3 = cout3
             out3 = reaction_outputs(6,ir)
@@ -1218,30 +1218,30 @@
                call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(out3) = 0')
             end if
          end if
-            
+
          if (num_reaction_outputs >= 4) then
             write(*,*) trim(reaction_Name(ir))
             call mesa_error(__FILE__,__LINE__,'get1_derivs: num_reaction_outputs >= 4')
          end if
-         
-         if (num_reaction_inputs == 1) then            
+
+         if (num_reaction_inputs == 1) then
             cin1 = reaction_inputs(1,ir); din1 = cin1
             in1 = reaction_inputs(2,ir)
-            i1 = itab(in1)            
-         else if (num_reaction_inputs == 2 .or. num_reaction_inputs == 3) then            
+            i1 = itab(in1)
+         else if (num_reaction_inputs == 2 .or. num_reaction_inputs == 3) then
             cin1 = reaction_inputs(1,ir); din1 = cin1
             in1 = reaction_inputs(2,ir)
-            i1 = itab(in1)                        
+            i1 = itab(in1)
             cin2 = reaction_inputs(3,ir); din2 = cin2
             in2 = reaction_inputs(4,ir)
-            i2 = itab(in2)            
+            i2 = itab(in2)
             if (num_reaction_inputs == 3) then
                cin3 = reaction_inputs(5,ir); din3 = cin3
                in3 = reaction_inputs(6,ir)
                i3 = itab(in3)
             end if
          end if
-            
+
          switch_to_prot = (prot /= 0) .and. (max_Z >= min_Z_for_switch_to_prot)
          if (switch_to_prot) then
             if (i1 == h1) then
@@ -1267,13 +1267,13 @@
          end if
 
          if (num_reaction_inputs == 1) then
-            
+
             if (i1 == 0) then
                write(*,*) trim(reaction_Name(ir))
                write(*,2) 'num_reaction_inputs', num_reaction_inputs
                call mesa_error(__FILE__,__LINE__,'get1_derivs: itab(in1) = 0')
             end if
-            
+
             if (cin1 == 1) then
                r = n% y(i1)
                idr1 = i1
@@ -1291,9 +1291,9 @@
                dr1 = n% y(i1)
                !stop
             end if
-            
+
          else if (num_reaction_inputs == 2 .or. num_reaction_inputs == 3) then
-                        
+
             if (reaction_ye_rho_exponents(2,ir) == 0) then
                ! treat as 1 body reaction
                r = n% y(i1)
@@ -1310,20 +1310,20 @@
                idr1 = i2
                dr2 = n% y(i2)
                idr2 = i1
-            else if (cin1 == 2 .and. cin2 == 1) then 
+            else if (cin1 == 2 .and. cin2 == 1) then
                r = 0.5d0*n% y(i1)*n% y(i1)*n% y(i2)
                dr1 = 0.5d0*n% y(i1)*n% y(i1)
                idr1 = i2
                dr2 = n% y(i1)*n% y(i2)
                idr2 = i1
-            else if (cin1 == 1 .and. cin2 == 2) then 
+            else if (cin1 == 1 .and. cin2 == 2) then
                ! e.g., rhe4p, r_neut_he4_he4_to_be9, r_neut_h1_h1_to_h1_h2
                r = n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
                dr1 = n% y(i1)*n% y(i2)
                idr1 = i2
                dr2 = 0.5d0*n% y(i2)*n% y(i2)
                idr2 = i1
-            else if (cin1 == 2 .and. cin2 == 2) then 
+            else if (cin1 == 2 .and. cin2 == 2) then
                ! e.g., r_neut_neut_he4_he4_to_h3_li7, r_h1_h1_he4_he4_to_he3_be7
                r = 0.5d0*n% y(i1)*n% y(i1)*0.5d0*n% y(i2)*n% y(i2)
                dr1 = 0.5d0*n% y(i1)*n% y(i1)*n% y(i2)
@@ -1333,8 +1333,8 @@
             else
                write(*,*) 'get1_derivs: ' // trim(reaction_Name(ir)) // ' invalid coefficient'
                call mesa_error(__FILE__,__LINE__,'get1_derivs')
-            end if            
-            
+            end if
+
             if (num_reaction_inputs == 3) then
                ! we assume that the 3rd kind of input is just "along for the ride"
                ! e.g., some compound reactions such as r34_pp2 are in this category.
@@ -1358,7 +1358,7 @@
 
          i_in(1) = i1; i_in(2) = i2; i_in(3) = i3
          c_in(1) = din1; c_in(2) = din2; c_in(3) = din3
-         
+
          i_out(1) = o1; i_out(2) = o2; i_out(3) = o3
          c_out(1) = dout1; c_out(2) = dout2; c_out(3) = dout3
 
@@ -1369,12 +1369,12 @@
          ! for debugging
 
          if (num_reaction_inputs == 1) then
-         
-            if (num_reaction_outputs == 1) then 
+
+            if (num_reaction_outputs == 1) then
                ! reaction of form din1 in1 -> dout1 out1
                if (dbg) write(*,*) ' do_one_one din1', din1, trim(chem_isos% name(g% chem_id(i1)))
                if (dbg) write(*,*) 'do_one_one dout1', dout1, trim(chem_isos% name(g% chem_id(o1)))
-     
+
             else if (num_reaction_outputs == 2) then
                ! reaction of form cin1 in1 -> dout1 out1 + dout2 out2
                if (dbg) write(*,*) ' do_one_two din1', din1, trim(chem_isos% name(g% chem_id(i1)))
@@ -1404,15 +1404,15 @@
                write(*,*) 'too many reaction_outputs for num_reaction_inputs == 1'
                call mesa_error(__FILE__, __LINE__)
             end if
-            
+
          else if (num_reaction_inputs == 2) then
-         
-            if (num_reaction_outputs == 1) then 
+
+            if (num_reaction_outputs == 1) then
                ! reaction of form din1 in1 + din2 in2 -> dout1 out1
                if (dbg) write(*,*) ' do_two_one din1', din1, trim(chem_isos% name(g% chem_id(i1)))
                if (dbg) write(*,*) ' do_two_one din2', din2, trim(chem_isos% name(g% chem_id(i2)))
                if (dbg) write(*,*) 'do_two_one dout1', dout1, trim(chem_isos% name(g% chem_id(o1)))
-               
+
                if (.false. .and. reaction_Name(ir) == 'r_neut_he4_he4_to_be9' .and. r > 0 .and. &
                      abs(n% y(i1) - 7.7763751756339478D-05) < 1d-20) then
                   write(*,'(i3,3x,a,2x,99e20.10)') i, &
@@ -1423,7 +1423,7 @@
                      r, dr1, dr2, n% y(i1), n% y(i2)
                   !stop
                end if
-               
+
                if (.false. .and. reaction_Name(ir) == 'r_he4_si28_to_o16_o16') then
                   write(*,2) 'n% y(i1)', i1, n% y(i1)
                   write(*,2) 'n% y(i2)', i2, n% y(i2)
@@ -1448,16 +1448,16 @@
                if (dbg) write(*,*) 'do_two_three dout1', dout1, trim(chem_isos% name(g% chem_id(o1)))
                if (dbg) write(*,*) 'do_two_three dout2', dout2, trim(chem_isos% name(g% chem_id(o2)))
                if (dbg) write(*,*) 'do_two_three dout3', dout3, trim(chem_isos% name(g% chem_id(o3)))
-               
+
             else
                write(*,*) trim(reaction_Name(ir))
                write(*,*) 'too many reaction_outputs for num_reaction_inputs == 2'
                call mesa_error(__FILE__, __LINE__)
             end if
-            
+
          else if (num_reaction_inputs == 3) then
 
-            if (num_reaction_outputs == 1) then 
+            if (num_reaction_outputs == 1) then
                ! reaction of form din1 in1 + din2 in2 + din3 in3 -> dout1 out1
                if (dbg) write(*,*) ' do_three_one din1', din1, trim(chem_isos% name(g% chem_id(i1)))
                if (dbg) write(*,*) ' do_three_one din2', din2, trim(chem_isos% name(g% chem_id(i2)))
@@ -1477,7 +1477,7 @@
                write(*,*) 'too many reaction_outputs for num_reaction_inputs == 3'
                call mesa_error(__FILE__, __LINE__)
             end if
-            
+
          else
             write(*,*) 'too many reaction_inputs'
             call mesa_error(__FILE__, __LINE__)
@@ -1548,13 +1548,13 @@
                  deriv_flgs, symbolic, just_dydt)
 
          end if
-         
+
       end subroutine get1_derivs
 
 
       subroutine eval_ni56_ec_rate( &
             temp, den, ye, eta, zbar, weak_rate_factor, &
-            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, ierr)       
+            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu, ierr)
          real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
          real(dp), intent(out) :: rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu
          integer, intent(out) :: ierr
@@ -1571,7 +1571,7 @@
 
       subroutine eval_co56_ec_rate( &
             temp, den, ye, eta, zbar, weak_rate_factor, &
-            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu,  ierr)       
+            rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu,  ierr)
          real(dp), intent(in) :: temp, den, ye, eta, zbar, weak_rate_factor
          real(dp), intent(out) :: rate, d_rate_dlnT, d_rate_dlnRho, Q, Qneu
          integer, intent(out) :: ierr
@@ -1590,7 +1590,7 @@
             id, ir, temp, ye, rho, eta, zbar, weak_rate_factor, &
             rate_out, d_rate_dlnT, d_rate_dlnRho, Q_out, &
             Qneu_out, dQneu_dlnT_out, dQneu_dlnRho_out, &
-            ierr)       
+            ierr)
          use rates_def, only: Coulomb_Info
          use rates_lib, only: eval_weak_reaction_info
          integer, intent(in) :: id, ir
@@ -1599,7 +1599,7 @@
               rate_out, d_rate_dlnT, d_rate_dlnRho, Q_out, &
               Qneu_out, dQneu_dlnT_out, dQneu_dlnRho_out
          integer, intent(out) :: ierr
-         
+
          integer :: ids(1), reaction_id_for_weak_reactions(1)
          type(Coulomb_Info), pointer :: cc
          type(Coulomb_Info), target :: cc_info
@@ -1617,34 +1617,34 @@
             lambda, dlambda_dlnT, dlambda_dlnRho, &
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho
-         
+
          include 'formats'
-         
+
          ierr = 0
          if (id <= 0) then
             ierr = -1
             return
          end if
-         
+
          lambda => lambda_a
          dlambda_dlnT => dlambda_dlnT_a
          dlambda_dlnRho => dlambda_dlnRho_a
-         
+
          Q => Q_a
          dQ_dlnT => dQ_dlnT_a
          dQ_dlnRho => dQ_dlnRho_a
-         
+
          Qneu => Qneu_a
          dQneu_dlnT => dQneu_dlnT_a
          dQneu_dlnRho => dQneu_dlnRho_a
-         
+
          ids(1) = id
          reaction_id_for_weak_reactions(1) = ir
          T9 = temp*1d-9
          YeRho = ye*rho
          d_eta_dlnT = 0
          d_eta_dlnRho = 0
-         cc => cc_info        
+         cc => cc_info
          call eval_weak_reaction_info( &
             1, ids, reaction_id_for_weak_reactions, &
             cc, T9, YeRho, &
@@ -1653,24 +1653,24 @@
             Q, dQ_dlnT, dQ_dlnRho, &
             Qneu, dQneu_dlnT, dQneu_dlnRho, &
             ierr)
-            
+
          if (ierr /= 0) then
             return
-            
+
             write(*,*) 'failed in eval_weak_reaction_info'
             call mesa_error(__FILE__,__LINE__,'eval1_weak_rate')
          end if
-         
+
          rate_out = lambda(1)*weak_rate_factor
          d_rate_dlnT = dlambda_dlnT(1)*weak_rate_factor
          d_rate_dlnRho = dlambda_dlnRho(1)*weak_rate_factor
 
-         
-         Q_out = Q(1) 
+
+         Q_out = Q(1)
          Qneu_out = Qneu(1)
          dQneu_dlnT_out = dQneu_dlnT(1)
          dQneu_dlnRho_out = dQneu_dlnRho(1)
-         
+
       end subroutine eval1_weak_rate
 
 
@@ -1688,7 +1688,7 @@
          logical, pointer :: deriv_flgs(:)
          logical, intent(in) :: symbolic, just_dydt
          integer, intent(out) :: ierr
-         
+
          integer :: ir, j, prot, neut, h1, he4, c14, n14, ne20, ne22, &
                mg21, mg22, mg23, mg24, al23, al24, si24, si25, si26,  &
                s28, s29, s30, cl31, ar32, ar33, ar34, k35, ca36, ca37, ca38, &
@@ -1710,15 +1710,15 @@
 
          integer, dimension(3) :: i_in, i_out, idr
          real(dp), dimension(3) :: c_in, c_out, dr
-         
+
          logical :: done, has_prot, has_neut, has_h1, switch_to_prot
          integer :: max_Z, Z_plus_N_for_max_Z
          integer, parameter :: min_Z_for_switch_to_prot = 12
 
          logical, parameter :: dbg = .false.
-         
+
          include 'formats'
-         
+
          g => n% g
          reaction_id => g% reaction_id
 
@@ -1728,13 +1728,13 @@
          h1 = itab(ih1)
          he4 = itab(ihe4)
 
-         ir = reaction_id(i)       
-         
+         ir = reaction_id(i)
+
          if (reaction_outputs(1,ir) == 0) return ! skip aux reactions
-         
+
          if (dbg) &
             write(*,'(/,a,2i6)') ' reaction name <' // trim(reaction_Name(ir)) // '>', i, ir
-         
+
          max_Z = g% reaction_max_Z(i)
          Z_plus_N_for_max_Z = g% reaction_max_Z_plus_N_for_max_Z(i)
 
@@ -1751,9 +1751,9 @@
 
 
          select case(ir)
-            
+
          case(ir_he4_he4_he4_to_c12) ! triple alpha
-            if (g% use_3a_fl87) then 
+            if (g% use_3a_fl87) then
                call do_FL_3alf(i) ! Fushiki and Lamb, Apj, 317, 368-388, 1987
                return
          end if
@@ -1783,9 +1783,9 @@
                     deriv_flgs, symbolic, just_dydt)
 
                return
-         
+
          end select
-         
+
          contains
 
 
@@ -1815,7 +1815,7 @@
                dr1 = 0.5d0*YHe4*YHe4
                n% rate_screened(i) = FLeps_nuc/r*rate_factors(i)/conv
                n% rate_screened_dT(i) = dFLeps_nuc_dT/r*rate_factors(i)/conv
-               n% rate_screened_dRho(i) = dFLeps_nuc_dRho/r*rate_factors(i)/conv    
+               n% rate_screened_dRho(i) = dFLeps_nuc_dRho/r*rate_factors(i)/conv
             end if
 
             i_in(1) = he4; i_in(2) = 0; i_in(3) = 0
@@ -1835,7 +1835,7 @@
 
          end subroutine do_FL_3alf
 
-          
+
       end subroutine update_special_rates
 
       end module net_derivs

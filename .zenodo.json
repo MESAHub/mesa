@@ -11,18 +11,21 @@
         },
         {
             "affiliation": "Center for Computational Astrophysics",
-            "name": "Bauer, Evan"
+            "name": "Bauer, Evan",
+            "orcid": "0000-0002-4791-6724"
         },
         {
-            "affiliation": "Max Planck Institute for Astrophysics",
-            "name": "Bellinger, Earl"
+            "affiliation": "Yale University",
+            "name": "Bellinger, Earl",
+            "orcid": "0000-0003-4456-4863"
         },
         {
             "affiliation": "Kavli Institute for Theoretical Physics",
-            "name": "Bildsten, Lars"
+            "name": "Bildsten, Lars",
+            "orcid": "0000-0001-8038-6836"
         },
         {
-            "affiliation": "Center for Computational Astrophysics",
+            "affiliation": "Flatiron Institute",
             "name": "Cantiello, Matteo",
             "orcid": "0000-0002-8171-8596"
         },
@@ -47,14 +50,19 @@
             "orcid": "0000-0001-5048-9973"
         },
         {
-            "affiliation": "Space Telescope Science Institute",
-            "name": "Meridith, Joyce",
+            "affiliation": "University of Wyoming",
+            "name": "Joyce, Meridith",
             "orcid": "0000-0002-8717-127X"
         },
         {
             "affiliation": "KU Leuven",
             "name": "Marchant, Pablo",
             "orcid": "0000-0002-0338-8181"
+        },
+        {
+            "affiliation": "Flatiron Institute",
+            "name": "Mocz, Philip",
+            "orcid": "0000-0001-6631-2566"
         },
         {
             "name": "Schwab, Josiah",

@@ -1,0 +1,11 @@
+[default]
+extend-ignore-identifiers-re = [
+    "ACI-*",
+    "gam_*",
+    "plas_*",
+    "2nd",
+]
+
+[default.extend-words]
+# Don't correct the surname "Teh"
+Xwindows = "Xwindows"

@@ -64,15 +64,15 @@
          real(dp), intent(in) :: L_phot, M_phot, T_phot ! photosphere values (cgs)
          integer, intent(out) :: ierr
 
-         integer :: k, j, h1, he4, nz, base
-         real(dp) :: max_ejection_mass, wind_mdot, wind, alfa, total_H, &
+         integer :: h1, he4, nz
+         real(dp) :: wind_mdot, wind, alfa, &
             X, Y, Z, w1, w2, T_high, T_low, L1, M1, R1, T1, &
-            log_dtyr, log_dtyr_full_off, log_dtyr_full_on, beta, divisor, &
+            beta, divisor, &
             center_h1, center_he4, surface_h1, surface_he4, mdot, xfer_ratio, &
             L_div_Ledd, full_off, full_on, max_boost, super_eddington_boost, &
             hot_wind, cool_wind, H_env_mass, H_He_env_mass, He_layer_mass
-         character (len=strlen) :: message, cool_wind_scheme, hot_wind_scheme, scheme
-         logical :: is_infalling, using_wind_scheme_mdot, use_other
+         character (len=strlen) :: scheme
+         logical :: using_wind_scheme_mdot, use_other
          real(dp), parameter :: Zsolar = 0.019d0 ! for Vink et al formula
 
          logical, parameter :: dbg = .false.
@@ -425,7 +425,7 @@
             !       Osurf_crit^2 = (1 - Gamma_edd)*G*M/R_equatorial^3
             !       Gamma_edd = kappa*L/(4 pi c G M), Eddington factor
             real(dp) :: enhancement, wind_mdot, wind_mdot_lim, &
-               kh_timescale, mdot_lim, wind_mdot_prev, dmsfac, dmskhf
+               kh_timescale, wind_mdot_prev, dmsfac, dmskhf
 
             include 'formats'
 

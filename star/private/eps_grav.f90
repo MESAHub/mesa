@@ -89,7 +89,7 @@
          include 'formats'
          ierr = 0
 
-         using_PC = (s% eos_frac_PC(k) .gt. 0)
+         using_PC = (s% eos_frac_PC(k) > 0)
 
          if (using_PC .and. s% gam_start(k) >= s% Gamma_lnS_eps_grav_full_on) then
             call do_lnS_eps_grav(s, k, eps_grav, ierr)
@@ -98,9 +98,9 @@
             alfa = (Gamma - s% Gamma_lnS_eps_grav_full_off) / &
                (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off)
             call do_lnS_eps_grav(s, k, eps_grav_lnS, ierr)
-            if (ierr .ne. 0) return
+            if (ierr /= 0) return
             call do_std_eps_grav(s, k, eps_grav_std, ierr)
-            if (ierr .ne. 0) return
+            if (ierr /= 0) return
             ! the derivative of the blending function is missing
             ! but historically we've been able to get away with that
             ! because the two forms should match in the blend region
@@ -223,7 +223,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: entropy_start
-         type(auto_diff_real_star_order1) :: entropy, T, eps_grav_composition_term
+         type(auto_diff_real_star_order1) :: entropy, T
 
          include 'formats'
          ierr = 0
@@ -274,7 +274,7 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: eps_grav_composition_term
          integer, intent(out) :: ierr
-         real(dp) :: Rho, logRho, &
+         real(dp) :: &
             e, e_start, de, d_de_dlnd, d_de_dlnT, &
             e_with_xa_start, d_e_with_xa_start_dlnd, d_e_with_xa_start_dlnT, &
             e_with_DT_start, Pgas_with_DT_start
@@ -390,10 +390,9 @@
          end if
 
          if (is_bad(eps_grav_composition_term% val)) then
-          if (s% report_ierr) write(*, *) s% retry_message
             if (s% report_ierr) then
+               write(*, *) s% retry_message
                write(*,2) 'eps_grav_composition_term', k, eps_grav_composition_term% val
-               !call mesa_error(__FILE__,__LINE__,'eval_eps_grav_composition')
             end if
             if (s% stop_for_bad_nums) then
                write(*,2) 'include_composition_in_eps_grav -- bad value for eps_grav_composition_term', k, eps_grav_composition_term% val

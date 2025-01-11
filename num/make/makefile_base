@@ -69,26 +69,21 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPULATION RULES
 
-#COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_TEST))
-COMPILE_LEGACY = $(filter-out -std=f2008, $(COMPILE_TO_DEPLOY)) -std=legacy
+COMPILE = $(COMPILE_TO_DEPLOY) $(FCfixed)
 
-COMPILE = $(COMPILE_LEGACY) $(FCfixed)
-
-COMPILE_FREE = $(COMPILE_LEGACY) $(FCfree)
+COMPILE_FREE = $(COMPILE_TO_DEPLOY) $(FCfree)
 
 #COMPILE_XTRA = $(COMPILE_NO_CHECKS) $(FCfixed) -c
 COMPILE_XTRA = $(COMPILE_BASIC) $(FCopt) $(FCfixed) -c
-
-COMPILE_LEGACY_XTRA = $(filter-out -std=f2008, $(COMPILE_XTRA)) -std=legacy
 
 COMPILE_CMD = $(COMPILE)
 
 mod_bobyqa.o mod_newuoa.o mod_dop853.o mod_dopri5.o mod_dc_decsol.o mod_rosenbrock.o : %.o : %.f
 ifneq ($(QUIET),)
-	@echo COMPILE_LEGACY_XTRA $<
-	@$(COMPILE_LEGACY_XTRA) $<
+	@echo COMPILE_XTRA $<
+	@$(COMPILE_XTRA) $<
 else
-	$(COMPILE_LEGACY_XTRA) $<
+	$(COMPILE_XTRA) $<
 endif
 
 %.o : %.mod

@@ -10,4 +10,4 @@ zip archives. A working Subversion installation is therefore no longer a
 pre-requisite for MESA installation.
 
 Future releases will also be offered as zip files (or in another
-similiar archive format).
+similar archive format).

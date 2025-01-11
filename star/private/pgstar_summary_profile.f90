@@ -156,7 +156,7 @@
             use profile_getval, only : get_profile_val,get_profile_id
             integer, intent(out) :: ierr
 
-            integer :: j, ii, jj, i, cnt, k, yaxis_id
+            integer :: j, cnt, k, yaxis_id
             logical :: show(num_lines)
             logical, parameter :: dbg = .false.
             real :: ybot, yvec_min, yvec_max

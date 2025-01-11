@@ -341,7 +341,7 @@
                real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
                integer, intent(out) :: ros_elo
                logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-               character*12, intent(out) :: ros_name
+               character (len=12), intent(out) :: ros_name
             end subroutine coeffs
          end interface
 #include "rodas_args.dek"
@@ -351,6 +351,10 @@
       real(dp), intent(in) :: y_min, y_max
       real(dp), pointer, dimension(:) :: p1, p2, p3, p4, p5
       integer, pointer, dimension(:) :: ip1
+      integer :: i, iedy, iedy1, iecon, ieak
+      integer :: ieia, iefx, iee, iemas, iejac, ieja, ieip, ieynew, iesj, iesa, ierr
+      integer :: ijob, lde, ldjac, ldmas, ldmas2, m1, m2, meth
+      integer :: nm1, njac, nfcn, nerror, ndec, naccpt, nsol, nstep, nmax, nrejct
       mljac = mljac_in; mujac = mujac_in
 ! *** *** *** *** *** *** ***
 !        setting the parameters 
@@ -542,7 +546,7 @@
          end if
       end if
       
-! ------ when a fail has occured, we return with idid=-1
+! ------ when a fail has occurred, we return with idid=-1
       if (arret) then
          idid=-1
          return
@@ -638,6 +642,8 @@
 !         declarations 
 ! ---------------------------------------------------------- 
       implicit real(dp) (a-h,o-z)
+      integer :: n, itol, ijac, isparse, mljac, mujac, idfx, mlmas, mumas, iout, idid, nmax, meth, ijob,
+     &           ldjac, lde, ldmas, m1, m2, nm1, nerror, nfcn, njac, nstep, naccpt, nrejct, ndec, nsol, lout
        interface
          real(dp) function contro(i,x,rwork,iwork,ierr)
             use const_def, only: dp
@@ -656,7 +662,7 @@
             real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
             integer, intent(out) :: ros_elo
             logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-            character*12, intent(out) :: ros_name
+            character (len=12), intent(out) :: ros_name
          end subroutine coeffs
 #include "num_solout.dek"
 #include "num_mas.dek"
@@ -682,7 +688,7 @@
       real(dp) :: ros_alpha(ns), ros_gamma(ns)
       integer :: ros_elo
       logical :: ros_newf(ns)
-      character*12 :: ros_name
+      character (len=12) :: ros_name
       
       ! args
       integer, intent(inout), pointer :: ipar(:) ! (lipar)
@@ -694,7 +700,7 @@
       
       dimension fx(n),fjac(ldjac,n),fmas(ldmas,nm1),atol(*),rtol(*)
      
-      integer iwork(2)
+      integer :: iwork(2)
       real(dp), target :: rwork(2+5*n)
       real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
       integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
@@ -708,8 +714,12 @@
       logical reject,autnms,implct,banded,last,pred,not_stage1,no_aux_in_error,need_free
       real(dp), pointer :: cont(:), dy2(:)
       real(dp) :: hprev, rd32
-      integer :: i, j
-      
+      integer :: i, j, k, l, j1, is
+      integer :: lrc, lbeg, lend, irtrn
+      integer :: mbb, mbdiag, mbjac, md, mdiag, mdiff, mle, mm, mue, mujacj, mujacp
+      integer :: nsing, nn, nn2, nn3, nn4
+      integer :: ierr, ier
+  
       real(dp), pointer :: ak(:,:), e(:,:), p1(:)
       ak(1:n,1:ns) => ak1(1:n*ns)
       e(1:lde,1:nm1) => e1(1:lde*nm1)
@@ -1087,7 +1097,7 @@
 ! --- step is accepted  
          naccpt=naccpt+1
          if (pred) then
-c       --- predictive controller of gustafsson
+!      --- predictive controller of gustafsson
             if (naccpt.gt.1) then
                facgus=(hacc/h)*pow(err**2/erracc,eloi)/safe
                facgus=max(fac2,min(fac1,facgus))
@@ -1230,7 +1240,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       
       real(dp) :: g
        no_aux_in_error = .true.
@@ -1286,7 +1296,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       real(dp) :: g, e32
       real(dp), parameter :: sqrt2 = 1.4142135623731d0 ! sqrt(2d0)
        no_aux_in_error = .true.
@@ -1362,7 +1372,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       no_aux_in_error = .true.
 !~~~> name of the method
       ros_name = 'ros3p'      
@@ -1425,7 +1435,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       no_aux_in_error = .true.
 !~~~> name of the method
       ros_name = 'ros3pl'      
@@ -1509,7 +1519,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       ra = 0
       rc = 0
       rd = 0
@@ -1587,7 +1597,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       
       no_aux_in_error = .false.
       rd = 0
@@ -1705,7 +1715,7 @@ c       --- predictive controller of gustafsson
       real(dp), intent(inout) :: ros_alpha(ns), ros_gamma(ns)
       integer, intent(out) :: ros_elo
       logical, intent(out) :: no_aux_in_error, ros_newf(ns)
-      character*12, intent(out) :: ros_name
+      character (len=12), intent(out) :: ros_name
       no_aux_in_error = .false.
       rd = 0
 !~~~> name of the method

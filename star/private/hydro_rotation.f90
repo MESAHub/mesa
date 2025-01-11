@@ -63,7 +63,7 @@
             end if
          else
             ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly 
+            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
             ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
             wr = max_w
             rphi_lim1 = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
@@ -81,7 +81,7 @@
          wr_high = wr
          wr_low = 0
          do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low) 
+            wr = 0.5d0*(wr_high+wr_low)
             new_dimless_rphi = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
             if (dimless_rphi > new_dimless_rphi) then
                wr_low = wr
@@ -96,7 +96,7 @@
          end if
 
       end function w_div_w_roche_omega
-      
+
       ! compute w_div_w_roche for a known specific angular momentum jrot, rphi, and Mphi
       real(dp) function w_div_w_roche_jrot(rphi,Mphi,jrot,cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
          real(dp), intent(in) :: rphi,Mphi,jrot,cgrav, max_w, max_w2
@@ -126,7 +126,7 @@
             end if
          else
             ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly 
+            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
             ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
             wr = max_w
             A = 1d0-0.1076d0*pow4(wr)-0.2336d0*pow6(wr)-0.5583d0*log(1d0-pow4(wr))
@@ -147,7 +147,7 @@
          wr_high = wr
          wr_low = 0
          do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low) 
+            wr = 0.5d0*(wr_high+wr_low)
             w2 = pow2(wr)
             w4 = pow4(wr)
             w6 = pow6(wr)
@@ -201,7 +201,7 @@
             re = r*(1d0+w2/6d0-0.0002507d0*w4+0.06075d0*w6)
             B = (1d0+w2/5d0-0.2735d0*w4-0.4327d0*w6-3d0/2d0*0.5583d0*lg_one_sub_w4)
             A = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-            
+
             ir =  two_thirds*pow2(re)*B/A
 
             i_rot = 0d0
@@ -216,7 +216,7 @@
       subroutine set_i_rot(s, skip_w_div_w_crit_roche)
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
-         integer :: k, nz
+         integer :: k
          include 'formats'
 
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
@@ -292,7 +292,7 @@
       subroutine update1_i_rot_from_xh(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r00, r003, rp1, rp13, rm1, rm13, r_in, r_out
+         real(dp) :: r00
          include 'formats'
 
          r00 = get_r_from_xh(s,k)
@@ -345,7 +345,7 @@
 
          ierr = 0
          nz = s% nz
-         
+
          allocate(am_nu(nz), am_sig(nz))
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
@@ -477,7 +477,6 @@
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
          integer, intent(out) :: ierr
-         integer :: k
          include 'formats'
          ierr = 0
 
@@ -507,7 +506,7 @@
          real(dp) :: &
             dm, dmsum, omega_sum, omega_crit_sum, omega_div_omega_crit_sum, &
             v_rot_sum, v_crit_sum, v_div_v_crit_sum, Lrad_div_Ledd_sum, &
-            kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
+            gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
          integer :: k, ierr
@@ -528,7 +527,7 @@
             s% logRho_avg_surf = 0
             return
          end if
-         
+
          ierr = 0
          call set_rotation_info(s,.true.,ierr)
          if (ierr /= 0) then
@@ -682,8 +681,7 @@
 
          logical :: dbg
 
-         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, &
-            d_A_omega_dw, d_fp_numerator_dw, d_ft_numerator_dw, fp_temp, ft_temp
+         type(auto_diff_real_1var_order1) :: A_omega,fp_numerator, ft_numerator, w, w2, w3, w4, w5, w6, lg_one_sub_w4, fp_temp, ft_temp
 
          include 'formats'
 

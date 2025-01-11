@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module binary_private_def
-      
+
       use binary_def
 
       implicit none
@@ -103,17 +103,17 @@
       integer, parameter :: bh_CE_Ebind2 =  bh_CE_Ebind1 + 1
       integer, parameter :: bh_CE_num1 =  bh_CE_Ebind2 + 1
       integer, parameter :: bh_CE_num2 =  bh_CE_num1 + 1
-      
+
       integer, parameter :: bh_col_id_max = bh_CE_num2
-      
+
       character (len=maxlen_binary_history_column_name) :: binary_history_column_name(bh_col_id_max)
-      
+
       contains
-      
-      
+
+
       subroutine binary_history_column_names_init(ierr)
          integer, intent(out) :: ierr
-         
+
          integer :: i, cnt
          ierr = 0
          cnt = 0
@@ -191,13 +191,13 @@
          binary_history_column_name(bh_CE_Ebind2) = 'CE_Ebind2'
          binary_history_column_name(bh_CE_num1) = 'CE_num1'
          binary_history_column_name(bh_CE_num2) = 'CE_num2'
-                  
+
          cnt = 0
          do i=1,bh_col_id_max
             if (len_trim(binary_history_column_name(i)) == 0) then
                write(*,*) 'missing name for log column id', i
                if (i > 1) write(*,*) 'following ' // trim(binary_history_column_name(i-1))
-               write(*,*) 
+               write(*,*)
                cnt = cnt+1
             end if
          end do
@@ -207,23 +207,23 @@
             return
          end if
 
-      end subroutine binary_history_column_names_init         
+      end subroutine binary_history_column_names_init
 
       subroutine binary_private_def_init
          use num_def
          use utils_lib, only: get_compiler_version, get_mesasdk_version
 
-         integer :: i      
+         integer :: i
          logical :: okay
          integer :: ierr
-         
+
          include 'formats'
-         
+
          okay = .true.
          ierr = 0
 
          binary_dt_why_str(1:b_numTlim) = ''
-         
+
          binary_dt_why_str(b_Tlim_comp) = 'b_companion'
          binary_dt_why_str(b_Tlim_roche) = 'b_RL'
          binary_dt_why_str(b_Tlim_jorb) = 'b_jorb'
@@ -231,7 +231,7 @@
          binary_dt_why_str(b_Tlim_sep) = 'b_separation'
          binary_dt_why_str(b_Tlim_ecc) = 'b_eccentricity'
          binary_dt_why_str(b_Tlim_dm) = 'b_deltam'
-         
+
          do i=1,b_numTlim
             if (len_trim(binary_dt_why_str(i)) == 0) then
                if (i > 1) then
@@ -242,22 +242,22 @@
                okay = .false.
             end if
          end do
-         
+
          if (.not. okay) call mesa_error(__FILE__,__LINE__,'binary_private_def_init')
 
-         
+
          !here we store useful information about the compiler and SDK
          call get_compiler_version(compiler_name,compiler_version_name)
          call get_mesasdk_version(mesasdk_version_name,ierr)
          call date_and_time(date=date)
-         
-      end subroutine binary_private_def_init         
-      
+
+      end subroutine binary_private_def_init
+
       integer function alloc_binary(ierr)
          integer, intent(out) :: ierr
          integer :: i
          type (binary_info), pointer :: b
-         
+
          ierr = 0
          alloc_binary = -1
 !$omp critical (binary_handle)
@@ -285,15 +285,15 @@
             return
          end if
          b => binary_handles(alloc_binary)
-         
+
       end function alloc_binary
-      
-      
+
+
       subroutine free_binary(b)
          type (binary_info), pointer :: b
          binary_handles(b% binary_id)% in_use = .false.
       end subroutine free_binary
-      
+
 
       end module binary_private_def
 

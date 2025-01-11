@@ -21,13 +21,13 @@
 ! ***********************************************************************
 
       program create_eosDT_files
-		use eos_def
-		use helm
-		use helm_alloc
-		use helm_opal_scvh_driver
-		use const_def
+            use eos_def
+            use helm
+            use helm_alloc
+            use helm_opal_scvh_driver
+            use const_def
       use const_lib
-		
+            
       implicit none
 
 
@@ -45,11 +45,11 @@
       real(dp) :: logT_max
 
 
-		integer, parameter :: version_number = 51 ! update this to force rebuiding of caches
-		! update min_version in eosDT_load_tables to force rebuild of data files
+            integer, parameter :: version_number = 51 ! update this to force rebuiding of caches
+            ! update min_version in eosDT_load_tables to force rebuild of data files
 
       integer :: ix, io_unit, ios, info, irad
-		real(dp) :: whichz
+            real(dp) :: whichz
 
       ! control what is done by saving the Z in whichz.txt and, if necessary, setting the Xs below
       
@@ -57,7 +57,7 @@
       real(dp) :: Xs(num_Xs)
       
       Xs(1:num_Xs) = (/ 0.80d0, 0.00d0, 0.20d0, 0.40d0, 0.60d0 /)
-		
+            
       io_unit = 40
       open(UNIT=io_unit, FILE=trim("whichz.txt"), ACTION='READ', STATUS='OLD', IOSTAT=ios)
       if (ios /= 0) call do_stop('failed to open whichz.txt')
@@ -95,8 +95,8 @@
 
       
       subroutine Make_EoS_Files(Z_in, X_in, include_radiation)
-		use helm_opal_scvh_driver
-		
+            use helm_opal_scvh_driver
+            
       real(dp), intent(in) :: Z_in, X_in
       logical, intent(in) :: include_radiation
       
@@ -110,8 +110,8 @@
      >      mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction
       character (len=64) :: fname_prefix
       
-		logical :: helm_only = .false., opal_scvh_only = .false., 
-     >			opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
+            logical :: helm_only = .false., opal_scvh_only = .false., 
+     >                  opal_only = .false., scvh_only = .false., search_for_SCVH = .true.
       
       !opal_only = .true.
       scvh_only = .true.
@@ -123,7 +123,7 @@
       call get_composition_info(X, Z, abar, zbar, z53bar)
 
 !..other initialization
-		info = 0
+            info = 0
       
       if (opal_only) then
          fname_prefix = '/eosOPAL_data/mesa-OPAL_0'
@@ -155,7 +155,7 @@
          write(fname,'(a,a,i1,a)') trim(dir), trim(fname_prefix), floor(100d0*Z + 0.5d0), 'z00x.data'
       else if (X < 1) then
          write(fname,'(a,a,i1,a,i2,a)') trim(dir), trim(fname_prefix), 
-     >		floor(100d0*Z + 0.5d0), 'z', floor(100d0*X + 0.5d0), 'x.data'
+     >            floor(100d0*Z + 0.5d0), 'z', floor(100d0*X + 0.5d0), 'x.data'
       else
          fname = trim(dir) // trim(fname_prefix) // '0z100x.data'
       end if
@@ -165,11 +165,11 @@
       open(unit=io_unit,file=trim(fname))
       
       write(io_unit,'(99(a14))') 'version', 'X', 'Z', 'num logTs', 'logT min', 'logT max', 'del logT', 
-     1		'num logQs', 'logQ min', 'logQ max', 'del logQ'
+     1            'num logQs', 'logQ min', 'logQ max', 'del logQ'
       
       write(io_unit,'(i14,2f14.4,2(i10,4x,3(f14.4)))') 
      >      version_number, X, Z, num_logTs, logT_min, logT_max, del_logT,
-     >		num_logQs, logQ_min, logQ_max, del_logQ
+     >            num_logQs, logQ_min, logQ_max, del_logQ
 
       do i = 1, num_logQs
          logQ = logQ_min + (i-1) * del_logQ
@@ -189,14 +189,14 @@
             info = 0
             call helm_opal_scvh(
      >            helm_only, opal_scvh_only, opal_only, scvh_only, search_for_SCVH,
-     >				include_radiation, logT, logRho, T, Rho, abar, zbar, z53bar, X, Z,
+     >                        include_radiation, logT, logRho, T, Rho, abar, zbar, z53bar, X, Z,
      >            logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, 
      >            mu, free_e, gamma1, gamma3, grad_ad, eta, HELM_fraction, data_dir, info)
-				if (info /= 0) then
-					write(*,*) 'logT', logT
-					write(*,*) 'logRho', logRho
-					call do_stop('failed in helm_opal_scvh')
-				end if
+                        if (info /= 0) then
+                              write(*,*) 'logT', logT
+                              write(*,*) 'logRho', logRho
+                              call do_stop('failed in helm_opal_scvh')
+                        end if
 
             write(io_unit,'(f4.2,3(f10.5),7(1pe13.5),1(0pf9.5),4(0pf10.5),2(0pf11.5))') 
      >         logT, logPgas, logE, logS, chiRho, chiT, Cp, Cv, dE_dRho, dS_dT, dS_dRho, 

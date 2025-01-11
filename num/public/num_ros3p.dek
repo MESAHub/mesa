@@ -295,7 +295,7 @@
       subroutine ros3p_work_sizes(n, nzmax, imas, mljac, mujac, mlmas, mumas, liwork, lwork)
          integer, intent(in) :: n, nzmax, mljac, mujac, mlmas, mumas, imas
          integer, intent(out) :: liwork, lwork
-         integer :: ljac, lmas, km, km2, le1
+         integer :: ljac, lmas, le1
          
          if (mljac == n) then
             ljac = n

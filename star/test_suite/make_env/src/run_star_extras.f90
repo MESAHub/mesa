@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,12 +27,12 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
-      
-      include "test_suite_extras_def.inc"      
-            
-      
+
+      include "test_suite_extras_def.inc"
+
+
       contains
 
       include "test_suite_extras.inc"
@@ -43,7 +43,7 @@
          type (star_info), pointer :: s
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return         
+         if (ierr /= 0) return
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
@@ -51,15 +51,15 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
-         
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
+
          if (.not. s% x_logical_ctrl(1)) return
-         
+
          call create_env(id, s, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in create_env')
 
       end subroutine extras_controls
-      
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -70,8 +70,8 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -82,7 +82,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -106,8 +106,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -119,7 +119,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -130,8 +130,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -145,7 +145,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -157,15 +157,15 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
-      
+
+
       subroutine create_env(id, s, ierr)
          use eos_lib
          use eos_def, only: i_lnfree_e, num_eos_basic_results, num_eos_d_dxa_results
          use chem_lib, only: basic_composition_info
          use utils_lib, only: is_bad
          use atm_lib, only: atm_Teff
-         
+
          integer, intent(in) :: id
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -191,15 +191,15 @@
          real(dp), allocatable :: dres_dxa(:,:)
          real(dp), parameter :: LOGRHO_TOL = 1d-11
          real(dp), parameter :: LOGPGAS_TOL = 1d-11
-         
+
          include 'formats'
-         
+
          ierr = 0
-         
+
          nz = s% x_integer_ctrl(1)
-         s% nz = nz     
+         s% nz = nz
          max_iters = 100
-          
+
          net_name = s% x_character_ctrl(1)
          s% mstar = s% x_ctrl(1)*Msun
          s% xmstar = s% x_ctrl(2)*s% mstar
@@ -207,17 +207,17 @@
          s% star_mass = s% mstar/Msun
 
          call star_set_net(id, net_name, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_net')    
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_net')
+
          call star_set_var_info(id, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_var_info')     
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_var_info')
+
          call star_set_chem_names(id, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_chem_names')  
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_chem_names')
+
          call star_allocate_arrays(id, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_allocate_arrays') 
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_allocate_arrays')
+
          s% m(1) = s% mstar
          s% m_grav(1) = s% mstar
          s% cgrav(1) = standard_cgrav
@@ -226,7 +226,7 @@
          species = s% species
 
          allocate(dres_dxa(num_eos_d_dxa_results, species))
-         
+
          if (s% x_logical_ctrl(2)) then ! R and L in cgs units
             s% r(1) = s% x_ctrl(3)
             s% L(1:nz) = s% x_ctrl(4)
@@ -246,19 +246,19 @@
                write(*,1) 's% r(1)/r_phot', s% r(1)/r_phot
             end if
          end if
-         
+
          i_lnd = s% i_lnd
          i_lnR = s% i_lnR
          i_lnT = s% i_lnT
          i_lum = s% i_lum
 
          s% L_center = s% L(nz)
-         s% r_start(1) = s% r(1)        
-         
+         s% r_start(1) = s% r(1)
+
          ln_dq1 = s% x_ctrl(5)*ln10
          dq1 = exp(ln_dq1)
          dq_factor = calc_dq_factor(nz,dq1)
-                  
+
          s% q(1) = 1d0
          s% dq(1) = dq1
          do k=2, nz
@@ -267,19 +267,19 @@
          end do
 
          call star_normalize_dqs(s% id, nz, s% dq, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_normalize_dqs')  
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_normalize_dqs')
 
          call star_set_qs(s% id, nz, s% q, s% dq, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')  
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')
+
          call star_set_m_and_dm(s% id, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')  
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_qs')
+
          call star_set_dm_bar(s% id, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_dm_bar') 
-         
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_set_dm_bar')
+
          call change_to_xa_for_accretion(s% id, 1, nz, ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in change_to_xa_for_accretion') 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in change_to_xa_for_accretion')
 
          do k=1,nz
             s% m_grav(k) = s% m(k)
@@ -314,7 +314,7 @@
             s% r(1) = s% r(1)*pow2(s% Teff/Teff)
             write(*,1) 'new r(1)', s% r(1)
          end if
-         
+
          ! do cell k=1 and then redo the atm.
          T_m1 = T_surf
          P_m1 = P_surf
@@ -344,7 +344,7 @@
          T_m1 = T_surf
          P_m1 = P_surf
          logRho_m1 = logRho
-         
+
          do k=1,nz
             call do1_cell(ierr)
             if (ierr /= 0) then
@@ -355,14 +355,14 @@
             P_m1 = P_00
             logRho_m1 = logRho
          end do
-         
+
          s% model_number = 0
          s% star_age = 0
-         s% crystal_core_boundary_mass = -1d0 
-                     
+         s% crystal_core_boundary_mass = -1d0
+
          write(*,2) 'start.mod', nz
          call star_write_model(id, 'start.mod', ierr)
-         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_write_model') 
+         if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in star_write_model')
 
          write(*,'(A)')
          write(*,*) 'finished create_env'
@@ -370,10 +370,10 @@
          !stop
 
          deallocate(dres_dxa)
-         
+
          contains
 
-         
+
          subroutine get_initial_guess_for_atm(ierr)
             integer, intent(out) :: ierr
             skip_partials = .true.
@@ -403,7 +403,7 @@
             end if
          end subroutine get_initial_guess_for_atm
 
-         
+
          subroutine get_atm(ierr)
             integer, intent(out) :: ierr
             logical, parameter :: &
@@ -440,8 +440,8 @@
                stop
             end if
          end subroutine get_atm
-         
-         
+
+
          subroutine do1_cell(ierr) ! uses r(k), T_m1, P_m1, logRho_m1
             use eos_def, only: i_grad_ad
             integer, intent(out) :: ierr
@@ -450,14 +450,14 @@
             r_00 = s% r(k)
             s% cgrav(k) = standard_cgrav
             grav = -s% cgrav(k)*s% m(k)/r_00**2
-            
+
             if (k > 1) then
                dm_face = 0.5d0*(s% dm(k) + s% dm(k-1))
             else ! k == 1
                dm_face = 0.5d0*s% dm(k)
             end if
             area = 4d0*pi*r_00**2
-            
+
             P_00 = P_m1 - grav*dm_face/area
             P_face = 0.5d0*(P_m1 + P_00)
             dlnP_face = (P_m1 - P_00)/P_face
@@ -466,7 +466,7 @@
                Prad = one_third*crad*pow4(T_00)
                Pgas = P_00 - Prad
                logT = log10(T_00)
-               
+
                call star_solve_eos_given_PgasT( &
                   s% id, k, s% xa(:,k), &
                   logT, log10(Pgas), logRho_m1, LOGRHO_TOL, LOGPGAS_TOL, &
@@ -486,7 +486,7 @@
                   write(*, *) 'Call star_do_eos_for_cell failed', k
                   stop
                end if
-               
+
                s% extra_opacity_factor(k) = 1d0
                call star_do_kap_for_cell(s% id, k, ierr)
                if (ierr /= 0) then
@@ -501,16 +501,16 @@
                s% mlt_gradT_fraction = -1d0
                s% adjust_mlt_gradT_fraction(k) = -1d0
                s% gradL_composition_term(k) = 0d0
-               
+
                ! skipping use_other_alpha_mlt and other_gradr_factor
                s% alpha_mlt(k) = s% mixing_length_alpha
-               s% gradr_factor(k) = 1d0               
+               s% gradr_factor(k) = 1d0
                call star_set_mlt_vars(s% id, k, k, ierr)
                if (ierr /= 0) then
                   write(*, *) 'Call set_mlt_vars failed', k
                   stop
                end if
-               
+
                gradT = s% gradT(k)
                d_gradT_dT = s% gradT_ad(k)%d1Array(i_lnT_00)/T_00
                T_face = 0.5d0*(T_m1 + T_00)
@@ -527,7 +527,7 @@
                end if
                T_00 = T_00 + dT
             end do
-            
+
             rho_00 = exp10(logRho)
             vol = four_thirds*pi*pow3(r_00) - s% dm(k)/rho_00
             r_p1 = pow(0.75d0*vol/pi, one_third)
@@ -536,7 +536,7 @@
             else
                s% r(k+1) = r_p1
             end if
-            
+
             s% lnR(k) = log(r_00)
             s% xh(i_lnR, k) = s% lnR(k)
             s% lnd(k) = log(rho_00)
@@ -544,10 +544,10 @@
             s% lnT(k) = log(T_00)
             s% xh(i_lnT, k) = s% lnT(k)
             s% xh(i_lum, k) = s% L(k)
-         
+
          end subroutine do1_cell
-         
-         
+
+
          real(dp) function dq_f(r, dfdr, lrpar, rpar, lipar, ipar, ierr)
             ! returns with ierr = 0 if was able to evaluate f and df/dx at x
             ! if df/dx not available, it is okay to set it to 0
@@ -570,7 +570,7 @@
             ipar(2) = ipar(2) + 1
             !write(*,*) ipar(2), 'r, dq_f, dfdr', r, dq_f, dfdr
          end function dq_f
-         
+
          real(dp) function calc_dq_factor(n,dq1) result(dq_factor)
             use num_lib, only: safe_root_with_guess
             integer, intent(in) :: n
@@ -581,7 +581,7 @@
             integer, target :: ipar_array(lipar)
             integer, pointer :: ipar(:) ! (lipar)
             real(dp), target :: rpar_array(lrpar)
-            real(dp), pointer :: rpar(:) ! (lrpar)            
+            real(dp), pointer :: rpar(:) ! (lrpar)
             include 'formats'
             ierr = 0
             ipar => ipar_array
@@ -605,9 +605,9 @@
             !write(*,*) 'dq_factor', dq_factor
             !stop
          end function calc_dq_factor
-         
+
       end subroutine create_env
-      
+
 
       end module run_star_extras
-      
+

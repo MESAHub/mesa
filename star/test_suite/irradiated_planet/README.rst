@@ -11,12 +11,12 @@ This test case has 2 parts. Click to see a larger version of a plot.
 * Part 1 (``inlist_create``) loads a 1 Mjup model, relaxes the surface to an optical depth of 10, irradiates the surface with a flux of 1e7 erg cm :sup:`-2` s :sup:`-1` to a column depth of 1 g cm :sup:`-2`, and terminates when the inflated envelope reaches a surface pressure of log10 (P/(erg cm :sup:`-3`)) = 6.0  (about 1 bar):
 
 .. image:: ../../../star/test_suite/irradiated_planet/docs/pres_000084.svg
-   :scale: 100%
+   :width: 100%
 
 * Part 2 (``inlist_evolves``) continues the evolution, without irradiation, for 15 Gyr. The irradiated planet model cools and shrinks with time:
 
 .. image:: ../../../star/test_suite/irradiated_planet/docs/track1_000127.svg
-   :scale: 100%
+   :width: 100%
 
 
 

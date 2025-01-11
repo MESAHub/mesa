@@ -53,7 +53,7 @@
          include 'formats'
 
          okay = .true.
-         
+
          auto_diff_star_d1_names(1:auto_diff_star_num_vars) = ''
          auto_diff_star_d1_names(i_lnd_m1) = 'i_lnd_m1'
          auto_diff_star_d1_names(i_lnd_00) = 'i_lnd_00'
@@ -112,10 +112,10 @@
          termination_code_str(t_star_mass_max_limit) = 'star_mass_max_limit'
          termination_code_str(t_remnant_mass_min_limit) = 'remnant_mass_min_limit'
          termination_code_str(t_ejecta_mass_max_limit) = 'ejecta_mass_max_limit'
-         
+
          termination_code_str(t_star_species_mass_min_limit) = 'star_species_mass_min_limit'
          termination_code_str(t_star_species_mass_max_limit) = 'star_species_mass_max_limit'
-         
+
          termination_code_str(t_xmstar_min_limit) = 'xmstar_min_limit'
          termination_code_str(t_xmstar_max_limit) = 'xmstar_max_limit'
          termination_code_str(t_envelope_mass_limit) = 'envelope_mass_limit'
@@ -184,7 +184,7 @@
          termination_code_str(t_phase_IAMS) = 'phase_IAMS'
          termination_code_str(t_phase_TAMS) = 'phase_TAMS'
          termination_code_str(t_phase_He_Burn) = 'phase_He_Burn'
-         termination_code_str(t_phase_ZACHeB) = 'phase_ZACHeB' 
+         termination_code_str(t_phase_ZACHeB) = 'phase_ZACHeB'
          termination_code_str(t_phase_TACHeB) = 'phase_TACHeB'
          termination_code_str(t_phase_TP_AGB) = 'phase_TP_AGB'
          termination_code_str(t_phase_C_Burn) = 'phase_C_Burn'
@@ -352,11 +352,11 @@
          s => star_handles(id)
 
       end subroutine alloc_star
-      
-      
+
+
       subroutine init_star_handles()
          integer :: i
-      
+
          if (.not. have_initialized_star_handles) then
             do i = 1, max_star_handles
                star_handles(i)% id = i
@@ -364,10 +364,10 @@
             end do
             have_initialized_star_handles = .true.
          end if
-      
+
       end subroutine init_star_handles
-      
-      
+
+
       integer function find_next_star_id()
          integer :: id
          id = 0
@@ -377,11 +377,11 @@
                if (star_handles(id)% in_use .eqv. .false.) exit
             end do
          end if
-!$omp end critical (star_handle_next)         
+!$omp end critical (star_handle_next)
          find_next_star_id  = id
       end function find_next_star_id
-      
-      
+
+
       integer function how_many_allocated_star_ids()
          integer :: id
          how_many_allocated_star_ids = 0
@@ -392,7 +392,7 @@
             end do
          end if
       end function how_many_allocated_star_ids
-      
+
 
 
       subroutine free_star(s)
@@ -557,8 +557,8 @@
          call get_compiler_version(compiler_name,compiler_version_name)
          call get_mesasdk_version(mesasdk_version_name,ierr)
          call date_and_time(date=date)
-         
+
       end subroutine stardata_init
-      
+
       end module star_private_def
 

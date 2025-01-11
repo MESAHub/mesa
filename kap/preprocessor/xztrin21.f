@@ -44,7 +44,7 @@ c          An interpolation between overlapping quadratics is used to obtain
 c     smoothed results.  A 4x4 grid in logT6 and logR is used to interpolate
 c     in four different 3x3 sub-grids. Linear interpolation between quadratic
 c     fits in these different sub-grids gives smoothed results in both log T6
-c     and Log R directions. Compared to ealier versions of this code, the
+c     and Log R directions. Compared to earlier versions of this code, the
 c     interpolation in Z is in Kappa vs. Z; not log Kappa vs. Z.
 c     The overlapping quadratic procedure produces results that are  smooth,
 c     similar to bicubic spline interpolation, but require storage of only local
@@ -53,7 +53,7 @@ c
 c          The code OPACGN93 performs interpolation in Z, X, T6, and R. It calls
 c     the subroutine OPAC at each Z.  If you are working with a fixed Z, as
 c     listed above, it is more efficient to call OPAC directly. In this case use
-c     izi=0 and the appropiate value of mzin. The  opacity data will be read
+c     izi=0 and the appropriate value of mzin. The  opacity data will be read
 c     from unit 2 in the subroutine readco.  you will need to have the file
 c     GN93hz available on disk.
 c         Each of the individual tables in the GN93hz file cover 70 temperatures
@@ -230,7 +230,7 @@ c
       subroutine opac (izi,mzin,xh,t6,r,filename)
 c..... The purpose of this subroutine is to interpolate log kappa
 c      in in X, T6, R
-c        izi=0 recalulate table indices to use; =1 keep previous
+c        izi=0 recalculate table indices to use; =1 keep previous
 c        mzin=index of za(i) in block data. za(i) are metallicities
 c        t6=T6=temperature in millions of degrees kelvin
 c        r=R=density(g/cm**3)/T6**3
@@ -287,7 +287,7 @@ c
         do  i=1,mx
           xx(i)=log10(.005+xa(i))
         enddo
-c..... this is the first time throught. Calculate the decadic
+c..... this is the first time through. Calculate the decadic
 c      log of the perimeter points shifted by Z. m refers to
 c      xa(m); the hydrogen table value.
  

@@ -49,9 +49,7 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-#################################################################
-
-%.o: %.f
+%.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE $<
 	@$(TEST_COMPILE) $(FCfree) $<
@@ -59,22 +57,12 @@ else
 	$(TEST_COMPILE) $(FCfree) $<
 endif
 
-%.o: %.f90
-ifneq ($(QUIET),)
-	@echo TEST_COMPILE $<
-	@$(TEST_COMPILE) $<
-else
-	$(TEST_COMPILE) $<
-endif
-
-
 #################################################################
 #
 # DEPENDENCIES
 
 SRC_PATH = $(TEST_SRC_DIR):$(MESA_DIR)/star/job
 
-vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include

@@ -35,7 +35,7 @@ To visualize the data use:
 
     massif-visualizer massif.out.$PID
 
-which is avilable from `<https://github.com/KDE/massif-visualizer>`_ or through your local package manager.
+which is available from `<https://github.com/KDE/massif-visualizer>`_ or through your local package manager.
 
 
 CPU Usage
@@ -68,7 +68,7 @@ To visualize the data use:
 
     kcachegrind callgrind.out.*
 
-which is avilable from `<https://kcachegrind.github.io/html/Home.html>`_ or through your local package manager.
+which is available from `<https://kcachegrind.github.io/html/Home.html>`_ or through your local package manager.
 
 
 An alternative non-interactive visualization can be produced via `gprof2dot.py <https://github.com/jrfonseca/gprof2dot>`_ and `graphviz <https://graphviz.org/>`_.  

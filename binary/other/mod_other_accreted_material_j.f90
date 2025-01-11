@@ -22,18 +22,18 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
       module mod_other_accreted_material_j
-          
+
       ! NOTE: remember to set true:
       ! use_other_accreted_material_j = .true.
-      
+
 ! you can add your own routine for use instead of the default ones
 
 ! here's how to do it.
 
 ! Before doing anything, let's make sure your working copy of run_binary_extras works.
-! edit the extras_binary_controls routine 
+! edit the extras_binary_controls routine
 !      subroutine extras_binary_controls(binary_id, ierr)
 !         integer :: binary_id
 !         integer, intent(out) :: ierr
@@ -76,9 +76,9 @@
 !         end if
 !         b% accretion_mode = 0
 !         b% acc_am_div_kep_am = 0.0d0
-!         
+!
 !      end subroutine my_accreted_material_j
-         
+
       ! NOTE: if you'd like to have some inlist controls for your routine,
       ! you can use the x_ctrl array of real(dp) variables that is in &controls
       ! e.g., in the &controls inlist, you can set
@@ -96,22 +96,22 @@
       !         end if
       !
       ! To get the binary pointer using the provided binary_id, add these lines.
-      !     
+      !
       !      type (binary_info), pointer :: b
       !      call binary_ptr(binary_id, b, ierr)
       !      if (ierr /= 0) then ! failure in  binary_ptr
       !         return
       !      end if
-      ! 
+      !
       ! for integer control values, you can use x_integer_ctrl
       ! for logical control values, you can use x_logical_ctrl
 
 
       implicit none
-      
-            
+
+
       contains
-      
+
       subroutine null_other_accreted_material_j(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
          use const_def, only: dp
@@ -126,7 +126,7 @@
          end if
          b% accretion_mode = 0
          b% acc_am_div_kep_am = 0.0d0
-         
+
       end subroutine null_other_accreted_material_j
 
       end module mod_other_accreted_material_j

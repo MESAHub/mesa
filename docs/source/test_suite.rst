@@ -211,7 +211,7 @@ This test suite example checks the inward propagation of a carbon burning front 
 :ref:`ccsn_IIp`
 ^^^^^^^^^^^^^^^
 
-This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 
 :ref:`check_pulse_atm`
@@ -309,7 +309,7 @@ on the horizontal branch (HB) through core helium burning.
 :ref:`high_mass`
 ^^^^^^^^^^^^^^^^
 
-This test case checks the evolution of a 300 |Msun|, Z = 1e-4 metallicity, model through core hydrogen depletion.
+This test case checks the evolution of a 300 |Msun|, Z = 1e-5 metallicity, model through core hydrogen depletion.
 
 :ref:`high_z`
 ^^^^^^^^^^^^^
@@ -432,7 +432,7 @@ It provides an example of how to include your own physics code into a MESA run.
 :ref:`pisn`
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This test case evolves an initially 200 |Msun| star from ZAMS untill it undergoes a pair instability supernovae (PISN).
+This test case evolves an initially 200 |Msun| star from ZAMS until it undergoes a pair instability supernovae (PISN).
 
 
 :ref:`ppisn`
@@ -526,7 +526,7 @@ This test case exercises the simplex framework with a check of the chi^2 value f
 :ref:`split_burn_big_net`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
+This test case tests MESA's ability to perform a split-burn calculation in a 25 |Msun| star during silicon burning.
 
 :ref:`starspots`
 ^^^^^^^^^^^^^^^^
@@ -713,7 +713,7 @@ optimise model parameters using the ``astero`` module.
 ^^^^^^^^^^^^^^^^^^^
 
 Each of these test cases runs a handful of iterations of a crude
-optimisation, principally to increase test coverage across the
+optimization, principally to increase test coverage across the
 ``astero`` module.
 
 :ref:`surface_effects`

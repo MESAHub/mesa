@@ -30,7 +30,7 @@ module lodders_mod
       use iso_fortran_env, only : iostat_end
       use chem_def
       use utils_lib, only : integer_dict_define
-      
+
       character(len=*), intent(in) :: datafile
       integer, intent(out) :: ierr
       integer, parameter :: lodders_header_length = 5, max_number_isotopes = 500
@@ -42,7 +42,7 @@ module lodders_mod
       character(len=2) :: el
       character(len=iso_name_length), dimension(max_number_isotopes) :: lodders03_isotopes
       character(len=256) :: filename
-      
+
       ierr = 0
       filename = trim(mesa_data_dir)//'/chem_data/'//trim(datafile)
       open(newunit=iounit, file=trim(filename), iostat=ierr, status="old", action="read")
@@ -51,12 +51,12 @@ module lodders_mod
          write(*,*) 'filename ' // trim(filename)
          return
       end if
-      
+
       ! skip the header
       do i = 1, lodders_header_length
          read(iounit,*)
       end do
-      
+
       ! read in the file, setting bookmarks as we go.
       nentries = 0   ! accumulates number of spaces to hold the percentages
       do i = 1, max_number_isotopes
@@ -79,7 +79,7 @@ module lodders_mod
 
       close(iounit)
    end subroutine read_lodders03_data
-   
+
    function get_lodders03_isotopic_abundance(nuclei,ierr) result(percent)
       use chem_def
       use utils_lib, only : integer_dict_lookup
@@ -87,13 +87,13 @@ module lodders_mod
       integer, intent(out) :: ierr
       real(dp) :: percent
       integer :: indx
-      
+
       percent = 0.0d0
       if (.not.chem_has_been_initialized) then
          ierr = -9
          return
       end if
-      
+
       ierr = 0
       call integer_dict_lookup(lodders03_tab6% name_dict, nuclei, indx, ierr)
       if (ierr /= 0) then
@@ -102,5 +102,5 @@ module lodders_mod
       end if
       percent = lodders03_tab6% isotopic_percent(indx)
    end function get_lodders03_isotopic_abundance
-   
+
 end module lodders_mod

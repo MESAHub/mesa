@@ -26,7 +26,7 @@
 module utils_lib
 
   ! Uses
-  
+
   use utils_def, only: max_io_unit
   use const_def, only: dp, qp, strlen
 
@@ -71,8 +71,9 @@ contains
 
   subroutine get_compiler_version(compiler_name,compiler_version_name)
     character(len=*) :: compiler_name, compiler_version_name
-    integer :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
+    integer, save :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
     character(len=3) :: gcc_major_string, gcc_minor_string, gcc_patch_string
+    if (.false.) intel_compiler_build_date = 0
 #ifdef __INTEL_COMPILER
     compiler_name = "ifort"
     intel_compiler_build_date = __INTEL_COMPILER_BUILD_DATE
@@ -180,7 +181,7 @@ contains
   end subroutine realloc_double
 
   !****
-  
+
   subroutine realloc_double2(ptr,new_size1,new_size2,ierr)
     real(dp), pointer :: ptr(:,:)
     integer, intent(in) :: new_size1,new_size2
@@ -208,7 +209,7 @@ contains
   end subroutine realloc_double2
 
   !****
-  
+
   subroutine realloc_quad(ptr,new_size,ierr)
     real(qp), pointer :: ptr(:)
     integer, intent(in) :: new_size
@@ -256,7 +257,7 @@ contains
   end subroutine realloc_quad2
 
   !****
-  
+
   subroutine realloc_double3(ptr,new_size1,new_size2,new_size3,ierr)
     real(dp), pointer :: ptr(:,:,:)
     integer, intent(in) :: new_size1,new_size2,new_size3
@@ -482,7 +483,7 @@ contains
   end subroutine alloc1
 
   !****
-  
+
   subroutine alloc2(sz1,sz2,a,ierr)
     real(dp), dimension(:,:), pointer :: a
     integer, intent(in) :: sz1,sz2
@@ -620,7 +621,6 @@ contains
     integer, intent(inout) :: i ! number of characters already read from buffer
     character (len=*), intent(inout) :: buffer ! line of text from input file
     character (len=*), intent(inout) :: string ! holds string or name for string or name token
-    character (len=1) :: tab_str
 
     integer :: info, j, j1, j2, l, str_len
 
@@ -632,7 +632,7 @@ contains
           read(iounit,fmt='(a)',iostat=info) buffer
           if (info /= 0) then
              token = eof_token
-             return 
+             return
           end if
           n = len_trim(buffer)
           i = 0
@@ -690,11 +690,11 @@ contains
           case default
              j1 = i; j2 = i
              name_loop: do
-                if (i+1 > n) exit
-                if (buffer(i+1:i+1) == ' ') exit
-                if (buffer(i+1:i+1) == '(') exit
-                if (buffer(i+1:i+1) == ')') exit
-                if (buffer(i+1:i+1) == ',') exit
+                if (i+1 > n) exit name_loop
+                if (buffer(i+1:i+1) == ' ') exit name_loop
+                if (buffer(i+1:i+1) == '(') exit name_loop
+                if (buffer(i+1:i+1) == ')') exit name_loop
+                if (buffer(i+1:i+1) == ',') exit name_loop
                 i = i+1
                 j2 = i
              end do name_loop
@@ -776,6 +776,7 @@ contains
     type (integer_dict), pointer :: dict
     interface
        subroutine fcn(key, value, ierr)
+         implicit none
          character (len=*), intent(in) :: key
          integer, intent(in) :: value
          integer, intent(out) :: ierr ! /= 0 means terminate map calls
@@ -862,6 +863,7 @@ contains
     type (integer_idict), pointer :: idict
     interface
        subroutine fcn(key1, key2, value, ierr)
+         implicit none
          integer, intent(in) :: key1, key2, value
          integer, intent(out) :: ierr ! /= 0 means terminate map calls
        end subroutine fcn
@@ -880,7 +882,7 @@ contains
   end subroutine get_idict_entries
 
   !****
-  
+
   subroutine integer_idict_free(idict)
     use utils_idict
     type (integer_idict), pointer :: idict
@@ -919,25 +921,25 @@ contains
     use utils_system, only : mkdir_p
     character(len=*), intent(in) :: folder
     integer :: res
-    
+
     res = mkdir_p(folder)
-    
+
     if(res/=0)then
       write(*,*) "mkdir failed for ",trim(folder)
       write(*,*) "error code ",res
       call mesa_error(__FILE__,__LINE__)
     end if
-    
+
   end subroutine mkdir
-  
+
   subroutine mv(file_in,file_out,skip_errors)
     use utils_system, only: mv_c => mv
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
     integer res
-    
+
     res = mv_c(file_in,file_out)
-    
+
     if(res/=0)then
        if (present(skip_errors))then
           if (skip_errors) then
@@ -949,25 +951,25 @@ contains
           call error()
        end if
     end if
-    
-    contains 
-    
+
+    contains
+
       subroutine error()
             write(*,*) "mv failed for '"//trim(file_in)//"' '"//trim(file_out)//"'"
             write(*,*) "Error code: ",res
             call mesa_error(__FILE__,__LINE__)
       end subroutine error
-  
+
   end subroutine mv
-  
+
   subroutine cp_file(file_in,file_out,skip_errors)
     use utils_system, only: cp_c => cp
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
     integer res
-    
+
     res = cp_c(file_in,file_out)
-    
+
     if(res/=0)then
        if (present(skip_errors))then
           if (skip_errors) then
@@ -979,15 +981,15 @@ contains
           call error()
        end if
     end if
-    
-    contains 
-    
+
+    contains
+
       subroutine error()
             write(*,*) "cp failed for '"//trim(file_in)//"' '"//trim(file_out)//"'"
             write(*,*) "Error code: ",res
             call mesa_error(__FILE__,__LINE__)
       end subroutine error
-  
+
   end subroutine cp_file
 
    logical function folder_exists(folder)
@@ -1159,17 +1161,17 @@ contains
         character(len=*), intent(in) :: str1,str2
         logical, intent(in) :: flag
         logical, parameter :: dbg=.false.
-        
+
         if(flag) then
             switch_str=str1(1:min(len_trim(str1),strlen))
-            if(len_trim(str1) > strlen .and. dbg) & 
+            if(len_trim(str1) > strlen .and. dbg) &
                 write(*,*) "Warning ",trim(str1), "truncated to ",switch_str
         else
             switch_str=str2(1:min(len_trim(str2),strlen))
             if(len_trim(str2) > strlen .and. dbg) &
                 write(*,*) "Warning ",trim(str2), "truncated to ",switch_str
         end if
-    
+
     end function switch_str
 
    subroutine split_line(line, num, out)
@@ -1208,55 +1210,55 @@ contains
 
       end subroutine split_line
 
-      
+
    ! backward compatibility so Bill can debug older versions of files without changing these calls
       logical function is_bad_num(x)
          real(dp), intent(in) :: x
          is_bad_num = is_bad(x)
       end function is_bad_num
-      
-            
+
+
       logical function is_bad_real(x)
          real, intent(in) :: x
          is_bad_real = is_bad(x)
       end function is_bad_real
-      
-            
+
+
       logical function is_bad_quad(x)
          real(qp), intent(in) :: x
          is_bad_quad = is_bad(x)
       end function is_bad_quad
-            
+
       subroutine fill_with_NaNs(ptr)
          real(dp) :: ptr(:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs
-      
-      
+
+
       subroutine fill_with_NaNs_2D(ptr)
          real(dp) :: ptr(:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_2D
-      
-      
+
+
       subroutine fill_with_NaNs_3D(ptr)
          real(dp) :: ptr(:,:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_3D
-      
-      
+
+
       subroutine fill_with_NaNs_4D(ptr)
          real(dp) :: ptr(:,:,:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_4D
-      
+
       subroutine set_to_NaN(x)
          real(dp) :: x
          real(dp) :: xa(1)
          call set_nan(xa)
          x = xa(1)
       end subroutine set_to_NaN
-      
+
 
 end module utils_lib
 

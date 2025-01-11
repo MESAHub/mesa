@@ -52,18 +52,17 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_star_order1()
       type(auto_diff_real_star_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
+      integer :: i
 
       call header('Testing assignment')
       x = 3d0
       x%d1Array(4) = 1d0
       do i=1,15
-         if (i /= 4) then    
+         if (i /= 4) then
             call should_print0('', 0d0, x%d1Array(i))
          else
             call should_print0('', 1d0, x%d1Array(i))
-         end if            
+         end if
       end do
 
       call header('Testing unary operators')
@@ -123,9 +122,6 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_1var_order1()
       type(auto_diff_real_1var_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
-
 
       call header('Testing assignment and comparison')
 
@@ -543,9 +539,6 @@ program test_auto_diff
 
    subroutine do_test_auto_diff_2var_order1()
       type(auto_diff_real_2var_order1) :: x, y, z
-      real(dp) :: a, b, c
-      integer :: i, j, k
-
 
       call header('Testing assignment and comparison')
 

@@ -15,7 +15,6 @@ contains
 
     integer  :: ipar(1)
     real(dp) :: rpar(1)
-    integer  :: retcode
 
     ! Initialize
 
@@ -57,10 +56,6 @@ contains
     integer, intent(inout)   :: ipar(:)
     real(dp), intent(inout)  :: rpar(:)
     integer, intent(out)     :: retcode
-
-    integer :: n_p
-    integer :: n_g
-    integer :: n_pg
 
     ! Print out mode info
 

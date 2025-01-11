@@ -34,11 +34,11 @@ module pre_conditioners
                pre_conditioner(k,j) = pre_conditioner(k,j) + sum(abs(dblk(k,:,j)))
 
                if (j < nblocks) then
-                  pre_conditioner(k,j) = pre_conditioner(k,j) + sum(abs(ublk(k,:,j))) 
+                  pre_conditioner(k,j) = pre_conditioner(k,j) + sum(abs(ublk(k,:,j)))
                end if
 
                if (j > 1) then
-                  pre_conditioner(k,j) = pre_conditioner(k,j) + sum(abs(lblk(k,:,j-1))) 
+                  pre_conditioner(k,j) = pre_conditioner(k,j) + sum(abs(lblk(k,:,j-1)))
                end if
             end do
          end do
@@ -131,6 +131,6 @@ module pre_conditioners
             end do
          end do
 
-      end subroutine compute_band_preconditioner      
+      end subroutine compute_band_preconditioner
 
 end module pre_conditioners

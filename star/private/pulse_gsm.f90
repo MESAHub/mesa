@@ -80,7 +80,7 @@ contains
     call hi%write_attr('M_star', global_data(1))
     call hi%write_attr('R_star', global_data(2))
     call hi%write_attr('L_star', global_data(3))
-    
+
     call hi%write_attr('version', s%gyre_data_schema)
 
     select case(s%gyre_data_schema)
@@ -133,7 +133,7 @@ contains
     ! Close the file
 
     call hi%final()
-    
+
     ! Finish
 
     ierr = 0

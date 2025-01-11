@@ -24,16 +24,16 @@
 ! ***********************************************************************
 
       module net_screen
-      
+
       use const_def,only: dp, pi, ln10
       use math_lib
       use chem_def, only: chem_isos, ih1, num_chem_isos
       use net_def, only: Net_General_Info, Net_Info
       use rates_def
       use utils_lib, only: mesa_error
-      
+
       implicit none
-      
+
 
       contains
 
@@ -50,7 +50,7 @@
             n% screening_mode,  &
              0d0, 0d0, 0d0, 1d0, ierr)
       end subroutine make_screening_tables
-      
+
 
       subroutine screen_net( &
             g, num_isos, y, temp, den, logT, logRho, init,  &
@@ -61,7 +61,7 @@
 
          use rates_def, only: Screen_Info, reaction_name
          use rates_lib, only: screen_set_context
-         
+
          type (Net_General_Info), pointer  :: g
          integer, intent(in) :: num_isos, screening_mode
          real(dp), intent(in) :: y(:), temp, den, logT, logRho, &
@@ -76,9 +76,9 @@
          integer :: num_reactions, i, ir, j, op_err
          real(dp) :: Tfactor, dTfactordt
          logical :: all_okay
-         
+
          include 'formats'
-         
+
          ierr = 0
 
          if (.not. init) then
@@ -88,7 +88,7 @@
          end if
 
          num_reactions = g% num_reactions
-         
+
          do i = 1, num_reactions
             ir = g% reaction_id(i)
             if (ir == 0) then
@@ -104,7 +104,7 @@
                   i, sc, ir, ierr)
                if (ierr /= 0) then
                   write(*,*) 'screen_net failed in eval_screen_triple ' // &
-                     trim(reaction_name(ir))                  
+                     trim(reaction_name(ir))
                   return
                end if
             else if (reaction_screening_info(2,ir) > 0) then
@@ -115,7 +115,7 @@
                   i, sc, ir, ierr)
                if (ierr /= 0) then
                   write(*,*) 'screen_net failed in eval_screen_pair ' // &
-                     trim(reaction_name(ir))                  
+                     trim(reaction_name(ir))
                   return
                end if
             else
@@ -127,13 +127,13 @@
          if (ierr /= 0) return
 
          if(init) return
-         
+
          call set_combo_screen_rates(num_isos, y, sc, ierr)
          if (ierr /= 0) then
             write(*,*) 'screen_net failed in set_combo_screen_rates'
             return
          end if
-               
+
          if (nrattab > 1 .and. (logT < g% logTcut_lim .or. logT <= g% logTcut_lo)) then
             ! strong rates cutoff smoothly for logT < logTcut_lim
             if (logT <= g% logTcut_lo) then
@@ -156,10 +156,10 @@
                end do
             end if
          end if
-         
-         
+
+
          contains
-      
+
          subroutine screening_pair( &
                init, ir, jscr, sc, cid1, a1, z1, cid2, a2, z2, scor, scordt, scordd, ierr)
             use rates_lib, only: screen_init_AZ_info, screen_pair
@@ -183,10 +183,10 @@
                   g% aznut(jscr), g% zs13inv(jscr), &
                   ierr)
                if (ierr /= 0) write(*,*) 'screen_init_AZ_info failed in screening_pair ' // &
-                     trim(reaction_name(ir))    
+                     trim(reaction_name(ir))
             else
                if (cid1 > 0 .and. cid2 > 0) then
-                  i1 = g% net_iso(cid1) 
+                  i1 = g% net_iso(cid1)
                   i2 = g% net_iso(cid2)
                   if (i1 == 0 .or. i2 == 0) then ! not in current net
                      if (g% doing_approx21 .and. &
@@ -200,27 +200,27 @@
                         return
                      end if
                   end if
-               end if 
+               end if
                call screen_pair( &
                   sc, a1, z1, a2, z2, screening_mode, &
                   g% zs13(jscr), g% zhat(jscr), g% zhat2(jscr), g% lzav(jscr), &
                   g% aznut(jscr), g% zs13inv(jscr), g% logTcut_lo, &
-                  scor, scordt, scordd, ierr) 
+                  scor, scordt, scordd, ierr)
                if (ierr /= 0) write(*,*) 'screen_pair failed in screening_pair ' // &
-                     trim(reaction_name(ir)) 
-            end if         
+                     trim(reaction_name(ir))
+            end if
          end subroutine screening_pair
-     
+
          subroutine set_rate_screening(i, sc1a, sc1adt, sc1add)
             integer, intent(in) :: i
             real(dp), intent(in) :: sc1a, sc1adt, sc1add
             include 'formats'
-            if (i == 0) return         
+            if (i == 0) return
             rate_screened(i) = rate_raw(i)*sc1a
             rate_screened_dT(i) = rate_raw_dT(i)*sc1a + rate_raw(i)*sc1adt
             rate_screened_dRho(i) = rate_raw_dRho(i)*sc1a + rate_raw(i)*sc1add
-         end subroutine set_rate_screening      
-      
+         end subroutine set_rate_screening
+
          subroutine eval_screen_pair(init, jscr, i1, i2, i, sc, ir, ierr)
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
@@ -246,9 +246,9 @@
                init, ir, jscr, sc, i1, a1, z1, i2, a2, z2, sc1a, sc1adt, sc1add, ierr)
             if (ierr /= 0) return
             if (init) return
-            call set_rate_screening(i, sc1a, sc1adt, sc1add)         
+            call set_rate_screening(i, sc1a, sc1adt, sc1add)
          end subroutine eval_screen_pair
-      
+
          subroutine eval_screen_triple(init, jscr, i1_in, i2_in, i3_in, i, sc, ir, ierr)
             use rates_def, only: Screen_Info
             logical, intent(in) :: init
@@ -308,13 +308,13 @@
             scordt = sc1*sc2dt + sc1dt*sc2
             scordd = sc1*sc2dd + sc1dd*sc2
             call set_rate_screening(i, scor, scordt, scordd)
-         
+
             if (.false.) write(*,2) 'scr 3 ' // trim(reaction_Name(ir)) &
                      // ' ' // trim(chem_isos% name(i1)) &
                      // ' ' // trim(chem_isos% name(i2)) &
                      // ' ' // trim(chem_isos% name(i3)),  &
                   ir, scor
-         
+
          end subroutine eval_screen_triple
 
          subroutine set_combo_screen_rates(num_isos, y, sc, ierr)
@@ -328,10 +328,10 @@
             real(dp) :: rateII, rateIII, rsum, fII, fIII
 
             include 'formats'
-          
+
             rtab => g% net_reaction
             ierr = 0
-         
+
             if (rtab(ir34_pp2) /= 0 .and. rtab(ir34_pp3) /= 0) then
                if (rate_screened(rtab(ir34_pp2)) /= &
                      rate_screened(rtab(ir34_pp3))) then
@@ -361,7 +361,7 @@
                   fII = rateII / rsum
                end if
                fIII = 1d0 - fII
-               
+
                rate_screened(rtab(ir34_pp2)) = fII*rate_screened(rtab(ir34_pp2))
                rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2))
                rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2))
@@ -375,103 +375,103 @@
             if (rtab(irn14_to_c12) /= 0)  &
                call rate_for_pg_pa_branches( &
                         rtab(irn14pg_aux), rtab(irn15pg_aux), rtab(irn15pa_aux),  &
-                        0, rtab(irn14_to_c12))         
+                        0, rtab(irn14_to_c12))
 
             if (rtab(irn14_to_o16) /= 0) &
                call rate_for_pg_pa_branches( &
                         rtab(irn14pg_aux), rtab(irn15pg_aux), rtab(irn15pa_aux),  &
-                        rtab(irn14_to_o16), 0)               
-      
+                        rtab(irn14_to_o16), 0)
+
             if (rtab(ir1616ppa) /= 0)  &
                call rate_for_pg_pa_branches( &
                         rtab(ir1616p_aux), rtab(irp31pg_aux), rtab(irp31pa_aux),  &
-                        0, rtab(ir1616ppa))         
-      
+                        0, rtab(ir1616ppa))
+
             if (rtab(ir1616ppg) /= 0)  &
                call rate_for_pg_pa_branches( &
                         rtab(ir1616p_aux), rtab(irp31pg_aux), rtab(irp31pa_aux),  &
-                        rtab(ir1616ppg), 0)         
+                        rtab(ir1616ppg), 0)
 
             call rate_for_alpha_ap( &
                         irc12ap_aux, irn15pg_aux, irn15pa_aux,  &
-                        irc12ap_to_o16)    
+                        irc12ap_to_o16)
 
             call rate_for_alpha_gp( &
                         iro16gp_aux, irn15pg_aux, irn15pa_aux,  &
-                        iro16gp_to_c12)         
+                        iro16gp_to_c12)
 
             call rate_for_alpha_ap( &
                         iro16ap_aux, irf19pg_aux, irf19pa_aux,  &
-                        iro16ap_to_ne20)    
+                        iro16ap_to_ne20)
 
             call rate_for_alpha_gp( &
                         irne20gp_aux, irf19pg_aux, irf19pa_aux,  &
-                        irne20gp_to_o16)         
-              
+                        irne20gp_to_o16)
+
             call rate_for_alpha_ap( &
                         irne20ap_aux, irna23pg_aux, irna23pa_aux,  &
-                        irne20ap_to_mg24)         
-                                       
+                        irne20ap_to_mg24)
+
             call rate_for_alpha_gp( &
                         irmg24gp_aux, irna23pg_aux, irna23pa_aux,  &
-                        irmg24gp_to_ne20)               
-      
+                        irmg24gp_to_ne20)
+
             call rate_for_alpha_ap( &
                         irmg24ap_aux, iral27pg_aux, iral27pa_aux,  &
-                        irmg24ap_to_si28)         
-                                       
+                        irmg24ap_to_si28)
+
             call rate_for_alpha_gp( &
                         irsi28gp_aux, iral27pg_aux, iral27pa_aux,  &
-                        irsi28gp_to_mg24)                      
-                           
+                        irsi28gp_to_mg24)
+
             call rate_for_alpha_ap( &
                         irsi28ap_aux, irp31pg_aux, irp31pa_aux,  &
-                        irsi28ap_to_s32)         
+                        irsi28ap_to_s32)
 
             call rate_for_alpha_gp( &
                         irs32gp_aux, irp31pg_aux, irp31pa_aux,  &
-                        irs32gp_to_si28)         
-            
+                        irs32gp_to_si28)
+
             call rate_for_alpha_ap( &
                         irs32ap_aux, ircl35pg_aux, ircl35pa_aux,  &
-                        irs32ap_to_ar36)         
-               
+                        irs32ap_to_ar36)
+
             call rate_for_alpha_gp( &
                         irar36gp_aux, ircl35pg_aux, ircl35pa_aux,  &
-                        irar36gp_to_s32)         
-                    
+                        irar36gp_to_s32)
+
             call rate_for_alpha_ap( &
                         irar36ap_aux, irk39pg_aux, irk39pa_aux,  &
-                        irar36ap_to_ca40)         
+                        irar36ap_to_ca40)
 
             call rate_for_alpha_gp( &
                         irca40gp_aux, irk39pg_aux, irk39pa_aux,  &
-                        irca40gp_to_ar36)         
+                        irca40gp_to_ar36)
 
             call rate_for_alpha_ap( &
                         irca40ap_aux, irsc43pg_aux, irsc43pa_aux,  &
-                        irca40ap_to_ti44)         
+                        irca40ap_to_ti44)
 
             call rate_for_alpha_gp( &
                         irti44gp_aux, irsc43pg_aux, irsc43pa_aux,  &
-                        irti44gp_to_ca40)         
+                        irti44gp_to_ca40)
 
             call rate_for_alpha_ap( &
                         irti44ap_aux, irv47pg_aux, irv47pa_aux,  &
-                        irti44ap_to_cr48)         
-            
+                        irti44ap_to_cr48)
+
             call rate_for_alpha_gp( &
                         ircr48gp_aux, irv47pg_aux, irv47pa_aux,  &
-                        ircr48gp_to_ti44)         
+                        ircr48gp_to_ti44)
 
             call rate_for_alpha_ap( &
                         ircr48ap_aux, irmn51pg_aux, irmn51pa_aux,  &
-                        ircr48ap_to_fe52)         
-            
+                        ircr48ap_to_fe52)
+
             call rate_for_alpha_gp( &
                         irfe52gp_aux, irmn51pg_aux, irmn51pa_aux,  &
-                        irfe52gp_to_cr48)                          
-         
+                        irfe52gp_to_cr48)
+
 
          end subroutine set_combo_screen_rates
 
@@ -487,7 +487,7 @@
          end subroutine rate_for_alpha_ap
 
          subroutine rate_for_alpha_gp(ir_start, irpg, irpa, ir_with_pa)
-            integer, intent(in) :: ir_start, irpg, irpa, ir_with_pa         
+            integer, intent(in) :: ir_start, irpg, irpa, ir_with_pa
             integer, pointer :: rtab(:)
             if (ir_start == 0) return
             rtab => g% net_reaction
@@ -495,14 +495,14 @@
             call rate_for_pg_pa_branches( &
                   rtab(ir_start), rtab(irpg), rtab(irpa), 0, rtab(ir_with_pa))
          end subroutine rate_for_alpha_gp
-         
+
          subroutine rate_for_pg_pa_branches(ir_start, irpg, irpa, ir_with_pg, ir_with_pa)
             integer, intent(in) :: ir_start, irpg, irpa, ir_with_pg, ir_with_pa
-            
+
             real(dp) :: pg_raw_rate, pa_raw_rate, pg_frac, pa_frac
             real(dp) :: d_pg_frac_dT, d_pg_frac_dRho, d_pa_frac_dT, d_pa_frac_dRho
             real(dp) :: r, drdT, drdd, x
-         
+
             if (ir_start == 0) then
                write(*,*) 'ir_start', ir_start
                if (irpg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(irpg))) // ' irpg'
@@ -511,58 +511,58 @@
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
                call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
-         
+
             if (irpg == 0) then
                write(*,*) 'irpg', irpg
                if (ir_with_pg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pg))) // ' ir_with_pg'
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
                call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
-         
+
             if (irpa == 0) then
                write(*,*) 'irpg', irpg
                if (ir_with_pg /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pg))) // ' ir_with_pg'
                if (ir_with_pa /= 0) write(*,*) trim(reaction_Name(g% reaction_id(ir_with_pa))) // ' ir_with_pa'
                call mesa_error(__FILE__,__LINE__,'rate_for_pg_pa_branches')
             end if
-         
+
             pg_raw_rate = rate_raw(irpg)
             pa_raw_rate = rate_raw(irpa)
-         
+
             if (pg_raw_rate + pa_raw_rate < 1d-99) then ! avoid divide by 0
                pg_raw_rate = 1; pa_raw_rate = 1
             end if
-         
+
             pg_frac = pg_raw_rate / (pg_raw_rate + pa_raw_rate)
             pa_frac = 1 - pg_frac
-         
+
             x = pg_raw_rate + pa_raw_rate
             d_pg_frac_dT =  &
                (pa_raw_rate*rate_raw_dT(irpg) - pg_raw_rate*rate_raw_dT(irpa)) / (x*x)
             d_pa_frac_dT = -d_pg_frac_dT
-         
+
             d_pg_frac_dRho =  &
                (pa_raw_rate*rate_raw_dRho(irpg) - pg_raw_rate*rate_raw_dRho(irpa)) / (x*x)
             d_pa_frac_dRho = -d_pg_frac_dRho
-         
+
             r    = rate_screened(ir_start)
             drdT = rate_screened_dT(ir_start)
             drdd = rate_screened_dRho(ir_start)
-         
+
             if (ir_with_pg /= 0) then
                rate_screened(ir_with_pg) = r*pg_frac
                rate_screened_dT(ir_with_pg) = r*d_pg_frac_dT + drdT*pg_frac
                rate_screened_dRho(ir_with_pg) = r*d_pg_frac_dRho + drdd*pg_frac
             end if
-         
+
             if (ir_with_pa /= 0) then
                rate_screened(ir_with_pa)  = r*pa_frac
                rate_screened_dT(ir_with_pa) = r*d_pa_frac_dT + drdT*pa_frac
                rate_screened_dRho(ir_with_pa) = r*d_pa_frac_dRho + drdd*pa_frac
             end if
-               
+
          end subroutine rate_for_pg_pa_branches
-         
+
 
       end subroutine screen_net
 

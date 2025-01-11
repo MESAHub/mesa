@@ -73,7 +73,7 @@
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
 
-         integer :: i, ii, n, step_min, step_max
+         integer :: i, n, step_min, step_max
          real :: xmin, xmax, ymin_L_axis, ymax_L_axis, &
             ymin_mass_axis, ymax_mass_axis, dx, burn_type_cutoff
          real, allocatable, dimension(:) :: xvec, &
@@ -107,7 +107,7 @@
 
          integer :: ix,k
          real :: xleft,xright,now
-         real :: dxmin=-1.d0
+         real, save :: dxmin = -1.d0
 
          include 'formats'
 
@@ -205,7 +205,7 @@
 
          xmin=max(s% pg% kipp_xmin,xvec(1))
          xmax=min(s% pg% kipp_xmax,xvec(n))
-         
+
          burn_type_cutoff = s% pg% Kipp_burn_type_cutoff
 
          call set_xleft_xright( &
@@ -279,12 +279,12 @@
          call finish_Kipp_plot
 
          call pgunsa
-         
+
          call dealloc
 
 
          contains
-         
+
          subroutine dealloc
             deallocate(xvec, &
                log_L, &
@@ -347,10 +347,10 @@
             call show_title_pgstar(s, title)
             call show_mix_legend
             call show_burn_legend
-            
+
             call show_pgstar_decorator(s%id, s% pg% kipp_use_decorator,s% pg% kipp_pgstar_decorator, 0, ierr)
 
-            
+
          end subroutine finish_Kipp_plot
 
 
@@ -517,7 +517,7 @@
 
 
          subroutine plot_L_lines
-            integer :: i, cnt, n
+            integer :: cnt, n
             real :: coords(4), fjusts(4)
 
             logical, parameter :: dbg = .false.
@@ -607,7 +607,6 @@
 
 
          subroutine plot_mass_lines
-            integer :: i
 
             include 'formats'
 

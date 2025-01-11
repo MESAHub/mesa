@@ -47,7 +47,7 @@
          integer :: ierr
 
          include 'formats'
-         
+
          if (s% RSP2_flag) then
             call mesa_error(__FILE__,__LINE__,'need to add mlt_vc and Hp_face to remesh_split_merge')
          end if
@@ -86,20 +86,19 @@
 
 
       subroutine amr(s,ierr)
-         use chem_def, only: ih1
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
          use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall, dr, minE
-         real(dp) :: grad_xa(s% species), cell_time, test_dr, new_xa(s% species), &
+         real(dp) :: TooBig, TooSmall, MaxTooBig, MaxTooSmall
+         real(dp) :: grad_xa(s% species), new_xa(s% species), &
             tau_center, r00
-         integer :: iTooBig, iTooSmall, iter, k, k0, species, &
-            nz, i_h1, num_split, num_merge, nz_old
+         integer :: iTooBig, iTooSmall, iter, k, species, &
+            nz, num_split, num_merge, nz_old
          include 'formats'
          species = s% species
          nz_old = s% nz
-         ierr = 0         
+         ierr = 0
          num_split = 0
          num_merge = 0
          MaxTooSmall = s% split_merge_amr_MaxShort
@@ -180,9 +179,9 @@
             end do
          end if
          if (s% model_number == -6918) call mesa_error(__FILE__,__LINE__,'amr')
-         
+
          contains
-         
+
          subroutine split1 ! ratio of desired/actual is too large
             include 'formats'
             if (s% trace_split_merge_amr) then
@@ -199,7 +198,7 @@
                !write(*,*)
             end if
          end subroutine split1
-         
+
          subroutine merge1  ! ratio of actual/desired is too large
             include 'formats'
             if (s% trace_split_merge_amr) then
@@ -215,7 +214,7 @@
                !write(*,*)
             end if
          end subroutine merge1
-         
+
       end subroutine amr
 
 
@@ -254,23 +253,23 @@
          real(dp), intent(out) :: TooBig, TooSmall
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
-            oversize_ratio, undersize_ratio, abs_du_div_cs, outer_fraction, &
+            oversize_ratio, undersize_ratio, abs_du_div_cs, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_max, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
             du_div_cs_limit_flag
-         integer :: nz, nz_baseline, k, kmin, nz_r_core
+         integer :: nz, nz_baseline, k, nz_r_core
          real(dp), pointer :: v(:), r_for_v(:)
 
          include 'formats'
-         
+
          nz = s% nz
          hydrid_zoning = s% split_merge_amr_hybrid_zoning
          flipped_hydrid_zoning = s% split_merge_amr_flipped_hybrid_zoning
          log_zoning = s% split_merge_amr_log_zoning
          logtau_zoning = s% split_merge_amr_logtau_zoning
-         nz_baseline = s% split_merge_amr_nz_baseline         
+         nz_baseline = s% split_merge_amr_nz_baseline
          nz_r_core = s% split_merge_amr_nz_r_core
          if (s% split_merge_amr_mesh_delta_coeff /= 1d0) then
             nz_baseline = int(dble(nz_baseline)/s% split_merge_amr_mesh_delta_coeff)
@@ -296,7 +295,7 @@
          else
             nullify(v,r_for_v)
          end if
-         
+
          if (hydrid_zoning) then
             target_dr_core = (r_core_cm - s% R_center)/nz_r_core
             target_dlnR_envelope = &
@@ -309,7 +308,7 @@
             xmin = log(tau_center)
             xmax = log(s% tau(1))
             inner_dx_baseline = (xmin - xmax)/nz_baseline ! keep it > 0
-            outer_dx_baseline = inner_dx_baseline 
+            outer_dx_baseline = inner_dx_baseline
          else if (log_zoning) then
             xmin = log(max(1d0,s% R_center))
             xmax = s% lnR(1)
@@ -322,14 +321,14 @@
             outer_dx_baseline = inner_dx_baseline
          end if
          dx_baseline = outer_dx_baseline
-         
+
          TooBig = 0d0
          TooSmall = 0d0
          iTooBig = -1
          iTooSmall = -1
          xR = xmin ! start at center
          do k = nz, 1, -1
-         
+
             xL = xR
             dx_baseline = inner_dx_baseline
             if (hydrid_zoning) then
@@ -375,13 +374,13 @@
             else
                xR = s% r(k)
             end if
-            
+
             if (s% split_merge_amr_avoid_repeated_remesh .and. &
                   (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
             if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
-            
+
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min) then
@@ -391,7 +390,7 @@
                   end if
                end if
             end if
-            
+
             ! next check for cells that are too small and need to be merged
 
             if (s% merge_amr_ignore_surface_cells .and. &
@@ -402,18 +401,18 @@
             else
                undersize_ratio = dq_min/s% dq(k)
             end if
-            
+
             if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
                call check_merge_limits
             else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
                TooSmall = undersize_ratio; iTooSmall = k
             end if
-            
+
          end do
-         
-         
+
+
          contains
-         
+
          subroutine check_merge_limits
             ! Pablo's additions to modify when merge
             ! merge_amr_max_abs_du_div_cs
@@ -438,7 +437,7 @@
             end if
 
             if (du_div_cs_limit_flag .and. associated(v)) then
-               if (k == 1) then 
+               if (k == 1) then
                   abs_du_div_cs = abs(v(k) - v(k+1))/s% csound(k)
                else if (k == nz) then
                   abs_du_div_cs = abs(v(nz-1) - v(nz))/s% csound(nz)
@@ -449,9 +448,9 @@
             else
                abs_du_div_cs = 0d0
             end if
-         
+
             if (du_div_cs_limit_flag) then
-               if (s% merge_amr_inhibit_at_jumps) then 
+               if (s% merge_amr_inhibit_at_jumps) then
                   ! reduce undersize_ratio for large jumps
                   ! i.e. large jumps inhibit merges but don't prohibit completely
                   if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) &
@@ -471,8 +470,8 @@
                end if
             end if
          end subroutine check_merge_limits
-         
-         
+
+
       end subroutine biggest_smallest
 
 
@@ -484,24 +483,21 @@
          real(dp), intent(inout) :: new_xa(species)
          integer, intent(out) :: ierr
          logical :: merge_center
-         integer :: i, ip, i0, im, k, q, nz, qi_max, qim_max, op_err
-         real(dp) :: max_lgT_diff, max_lgrho_diff
+         integer :: i, ip, i0, im, q, nz, qi_max, qim_max
          real(dp) :: &
-            rR, rL, drR, drL, rC, rho, P, v, &
-            dm, dm_i, dm_ip, m_old, star_PE0, star_PE1, &
-            cell_mom, cell_ie, cell_etrb, min_IE, d_IE, d_KE, d_Esum, &
+            drR, drL, v, &
+            dm, dm_i, dm_ip, star_PE0, star_PE1, &
+            cell_ie, cell_etrb, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
-            Esum, KE, PE, IE, Esum1, KE1, PE1, IE1, &
-            Etot0, KEtot0, PEtot0, IEtot0, &
-            Etot1, KEtot1, PEtot1, IEtot1, &
-            vt_i, vt_ip, j_rot_new, j_rot_p1_new, J_old, &
+            KE, &
+            j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
             dmbar_new, dmbar_p1_new
          include 'formats'
 
          ierr = 0
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
@@ -525,7 +521,7 @@
             end if
          end if
 
-         merge_center = (i == nz)         
+         merge_center = (i == nz)
          if (merge_center) i = i-1
          ip = i+1
          if (s% split_merge_amr_avoid_repeated_remesh .and. &
@@ -533,7 +529,7 @@
                   s% amr_split_merge_has_undergone_remesh(ip))) then
             s% amr_split_merge_has_undergone_remesh(i) = .true.
             s% amr_split_merge_has_undergone_remesh(ip) = .true.
-            
+
             return
          end if
 
@@ -611,7 +607,7 @@
 
          cell_ie = IE_i + IE_ip
          s% energy(i) = cell_ie/dm
-         
+
          if (s% RSP2_flag) then
             cell_etrb = Etrb_i + Etrb_ip
             s% w(i) = sqrt(cell_etrb/dm)
@@ -667,15 +663,15 @@
 
          nz = nz - 1
          s% nz = nz
-         
+
          if (s% u_flag) then
             s% xh(s% i_u,i) = s% u(i)
          else if (s% v_flag) then
             s% xh(s% i_v,i) = s% v(i)
          end if
-         
+
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
-         
+
          if (s% RSP2_flag) then
             s% xh(s% i_w,i) = s% w(i)
             s% xh(s% i_Hp,i) = s% Hp_face(i)
@@ -684,7 +680,7 @@
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
          if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
-         
+
          s% rmid_start(i) = -1
          call set_rmid(s, i, i, ierr)
          if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
@@ -693,14 +689,14 @@
          call revise_star_radius(s, star_PE0, star_PE1)
 
       end subroutine do_merge
-      
-      
+
+
       subroutine revise_star_radius(s, star_PE0, star_PE1)
          use star_utils, only: store_r_in_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
          integer :: k
-         real(dp) :: frac, r, star_PE, new_frac
+         real(dp) :: frac
          include 'formats'
          if (star_PE1 == 0d0 .or. star_PE0 == star_PE1) return
          frac = star_PE1/star_PE0
@@ -716,7 +712,7 @@
          s% r_center = frac*s% r_center
       end subroutine revise_star_radius
 
-      
+
       real(dp) function get_star_PE(s) result(totPE)
          type (star_info), pointer :: s
          integer :: k
@@ -821,24 +817,22 @@
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
          integer, intent(out) :: ierr
          integer :: i, ip, j, jp, q, nz, nz_old, &
-            iR, iC, iL, imin, imax, op_err
+            iR, iC, iL
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
             rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
             v, v2, energy, v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
-            sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, got_cell_Esum, &
-            got_cell_Esum_R, got_cell_KE_R, got_cell_PE_R, got_cell_IE_R, &
-            got_cell_Esum_L, got_cell_KE_L, got_cell_PE_L, got_cell_IE_L, &
+            sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
-         logical :: okay, done, use_new_grad_rho
+         logical :: done, use_new_grad_rho
          include 'formats'
 
          ierr = 0
          star_PE0 = get_star_PE(s)
-         s% need_to_setvars = .true.         
+         s% need_to_setvars = .true.
          nz = s% nz
          s% num_hydro_splits = s% num_hydro_splits + 1
          done = .false.
@@ -878,7 +872,7 @@
             mlt_vcL = s% mlt_vc(ip)
             tauL = s% tau(ip)
          end if
-         
+
          tauR = s% tau(i)
          if (i == nz) then
             tauL = tau_center
@@ -891,9 +885,9 @@
             write(*,2) 'tauR', i, tauR
             write(*,2) 'nz', nz
             call mesa_error(__FILE__,__LINE__,'do_split')
-            !$omp end critical (adjust_mesh_split_merge_crit1)         
+            !$omp end critical (adjust_mesh_split_merge_crit1)
          end if
-                 
+
          dr = rR - rL
          dr_old = dr
          rC = 0.5d0*(rR + rL) ! split at center by radius
@@ -904,7 +898,7 @@
 
          dm = s% dm(i)
          rho = dm/dV
-         
+
          if (s% u_flag) then
             v = s% u(i)
             v2 = v*v
@@ -912,7 +906,7 @@
             v = 0
             v2 = 0
          end if
-         
+
          energy = s% energy(i)
          if (s% RSP2_flag) etrb = pow2(s% w(i))
 
@@ -930,16 +924,16 @@
             iC = nz_old-1
             iL = nz_old
          end if
-         
+
          energy_R = s% energy(iR)
          rho_R = s% dm(iR)/get_dV(s,iR)
-         
+
          energy_C = s% energy(iC)
          rho_C = s% dm(iC)/get_dV(s,iC)
-         
+
          energy_L = s% energy(iL)
          rho_L = s% dm(iL)/get_dV(s,iL)
-            
+
          ! get gradients before move cell contents
 
          if (iL == nz_old) then
@@ -965,22 +959,22 @@
          end if
 
          grad_energy = get1_grad(energy_L, energy_C, energy_R, dLeft, dCntr, dRght)
-            
+
          if (s% RTI_flag) grad_alpha = get1_grad( &
             s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
-         
+
          if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
             etrb_C = pow2(s% w(iC))
             etrb_L = pow2(s% w(iL))
             grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
-         
+
          if (s% u_flag) then
             v_R = s% u(iR)
             v2_R = v_R*v_R
             v_C = s% u(iC)
-            v2_C = v_C*v_C         
+            v2_C = v_C*v_C
             v_L = s% u(iL)
             v2_L = v_L*v_L
             if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
@@ -1049,7 +1043,7 @@
          end if
          s% amr_split_merge_has_undergone_remesh(i) = .true.
          s% amr_split_merge_has_undergone_remesh(ip) = .true.
-         
+
          dM = rho*dV
          if (.not. use_new_grad_rho) then ! do it the old way
 
@@ -1076,12 +1070,12 @@
                end if
                dMR = dM - dML
             end if
-            
+
          else
-            
+
             ! at this point, rho_R is the density of the cell iR
             ! we are about to redefine it as the density of the right 1/2 of the split
-            ! similarly for rho_L 
+            ! similarly for rho_L
             rho_iR = rho_R
             dR = -(dRght/4 + (s% r(iR) - s% r(iC))/2)
             rho_R = rho_iR + grad_rho*dR
@@ -1111,11 +1105,11 @@
                write(*,2) 'rho_L', iC, rho_L
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__,'failed in do_split extrapolation of density from above')
-   !$omp end critical  (adjust_mesh_split_merge_crit2)        
+   !$omp end critical  (adjust_mesh_split_merge_crit2)
             end if
-         
+
          end if
-         
+
          min_dm = s% split_merge_amr_dq_min*s% xmstar
          if (dML < min_dm .or. dMR < min_dm) then
             rho_R = rho
@@ -1131,10 +1125,10 @@
             energy_R = energy
             energy_L = energy
          end if
-         
+
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
-         
+
          if (s% RSP2_flag) then
             etrb_R = etrb + grad_etrb*dr/4
             etrb_L = (dm*etrb - dmR*etrb_R)/dmL
@@ -1159,10 +1153,10 @@
                s% u(i) = -s% u(i)
                s% u(ip) = -s% u(ip)
             end if
-         else if (s% v_flag) then ! just make a rough approximation. 
+         else if (s% v_flag) then ! just make a rough approximation.
             s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
          end if
-         
+
          if (s% RTI_flag) then ! set new alpha
             if (i == 1) then
                s% alpha_RTI(ip) = s% alpha_RTI(i)
@@ -1175,13 +1169,13 @@
             end if
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
-         
+
          if (i == 1) then
             s% mlt_vc(ip) = s% mlt_vc(i)
          else
             s% mlt_vc(ip) = (mlt_vcL*dML + mlt_vcR*dMR)/dM
          end if
-         
+
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then
             write(*,2) 'tau', ip, s% tau(ip), tauL, tauR, dMR/dM
@@ -1222,7 +1216,7 @@
                s% xa(q,ip) = s% xa(q,ip)/sumxp
             end do
          end if
-         
+
          if (s% u_flag) s% u_face_ad(ip)%val = 0.5d0*(s% u(i) + s% u(ip))
             ! just for setting u_face_start so don't need partials
 
@@ -1290,7 +1284,7 @@
                   0.5d0*(s% xh(s% i_lum,i) + s% L_center)
             end if
          end if
-         
+
          call store_r_in_xh(s, ip, s% r(ip))
          if (s% u_flag) then
             s% xh(s% i_u,i) = s% u(i)
@@ -1309,7 +1303,7 @@
 
          call update_xh_eos_and_kap(s,ip,species,new_xa,ierr)
          if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
-         
+
          s% rmid_start(i) = -1
          s% rmid_start(ip) = -1
          call set_rmid(s, i, ip, ierr)
@@ -1332,7 +1326,7 @@
          integer, intent(in) :: i, species
          real(dp) :: new_xa(species)
          integer, intent(out) :: ierr
-         real(dp) :: rho, logRho, new_lnT, revised_energy, xsum
+         real(dp) :: rho, logRho, new_lnT, revised_energy
          integer :: q
          include 'formats'
          ierr = 0
@@ -1399,7 +1393,6 @@
       real(dp) function total_KE(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: v0, v1
          include 'formats'
          total_KE = 0
          if (s% u_flag) then
@@ -1437,7 +1430,7 @@
       real(dp) function total_IE(s)
          type (star_info), pointer :: s
          integer :: k
-         real(dp) :: specific_ie, egas
+         real(dp) :: specific_ie
          total_IE = 0
          do k=1,s% nz
             specific_ie = s% energy(k)
@@ -1451,10 +1444,10 @@
          character (len=*), intent(in) :: str
          real(dp) :: KE, IE, PE, Etot
          include 'formats'
-         
+
          return
-         
-         
+
+
          KE = total_KE(s)
          IE = total_IE(s)
          PE = total_PE(s)

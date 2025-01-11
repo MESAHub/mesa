@@ -1,10 +1,10 @@
 #!/bin/bash
 
 function check_okay {
-	if [ $? -ne 0 ]
-	then
-		exit 1
-	fi
+    if [ $? -ne 0 ]
+    then
+        exit 1
+    fi
 }
 
 function do_one {
@@ -24,6 +24,6 @@ DO_ALL=0
 id=0
 curr_id="$1"
 if [ ! "$1" ]; then
-   DO_ALL=1
+    DO_ALL=1
 fi
 source do1_test_source

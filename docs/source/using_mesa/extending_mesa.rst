@@ -464,7 +464,8 @@ run_star_extras.f90.
 
 .. literalinclude:: ../../../star/other/other_neu.f90
    :language: fortran
-   :lines: 41-65
+   :start-at: subroutine null_other_neu
+   :end-at: end subroutine null_other_neu
 
 This template routine illustrates the interface and as is, it will
 produce exactly the same results as the default MESA routine. This is

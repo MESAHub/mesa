@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,25 +19,25 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
       use star_def
       use const_def
       use math_lib
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
-      
+
       ! these routines are called by the standard run_star check_model
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          use astero_def, only: star_astero_procs
          integer, intent(in) :: id
@@ -53,11 +53,11 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
          include 'set_star_astero_procs.inc'
       end subroutine extras_controls
 
-      
+
       subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
@@ -84,8 +84,8 @@
          end select
 
       end subroutine set_constraint_value
-      
-      
+
+
       subroutine set_param(id, name, val, ierr) ! called from star_astero code
          !use astero_search_data, only: vary_param1
          integer, intent(in) :: id
@@ -109,8 +109,8 @@
          ierr = 0
          write(*,*) 'astero called my_other_adipls_mode_info'
       end subroutine my_other_adipls_mode_info
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -121,25 +121,25 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          use astero_lib, only: astero_adipls_is_enabled
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         
+
          real(dp) :: dt, expected_freq, freq
          logical :: okay, store_for_adipls, save_mode_info
          integer :: l_to_match, order_to_match, order_to_save
          character (len=256) :: save_mode_filename
-         
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% x_ctrl(1) > 0d0) then
-         
+
             store_for_adipls = .true.
             l_to_match = 0
             order_to_match = 4
@@ -148,7 +148,7 @@
             save_mode_info = .true.
             order_to_save = 5
             save_mode_filename = 'eigen.data'
-         
+
             if(astero_adipls_is_enabled) then
                call get_adipls_frequency_info( &
                   s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
@@ -162,12 +162,12 @@
             else
                write(*,*) 'not using adipls: pretend got ok match for expected frequency.'
             end if
-         
+
          end if
          call test_suite_after_evolve(s, ierr)
-         
+
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -183,7 +183,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          extras_check_model = keep_going
 
 
@@ -191,12 +191,12 @@
             extras_check_model = terminate
             return
          end if
-         
+
          if (s% x_ctrl(1) > 0d0) then
-         
+
             ! get frequencies for certain models
             if (mod(s% model_number,50) /= 0) return
-         
+
             store_for_adipls = .true.
             l_to_match = 0
             order_to_match = 5
@@ -204,17 +204,17 @@
             save_mode_info = .false.
             order_to_save = 0
             save_mode_filename = ''
-         
+
             call get_adipls_frequency_info( &
                s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
                save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
             if (ierr /= 0) extras_check_model = terminate
-         
+
          end if
-         
+
       end function extras_check_model
-      
-      
+
+
       subroutine get_adipls_frequency_info( &
             s, store_for_adipls, l_to_match, order_to_match, expected_freq, &
             save_mode_info, order_to_save, save_mode_filename, freq, okay, ierr)
@@ -227,7 +227,7 @@
          real(dp), intent(out) :: freq
          logical, intent(out) :: okay ! true if expected_freq is okay
          integer, intent(out) :: ierr
-         
+
          integer :: l, iscan, i, num
          real(dp) :: nu1, nu2, R, G, M
          real(dp), pointer, dimension(:) :: l_freq, l_inertia
@@ -247,7 +247,7 @@
          add_atmosphere = .true.
          do_restribute_mesh = .false.
          l = l_to_match
-         
+
          nullify(l_freq)
          nullify(l_inertia)
          nullify(l_order)
@@ -256,7 +256,7 @@
          nu1 = 50
          nu2 = 1000
          iscan = 200
-         
+
          !write(*,*) 'call adipls_get_one_el_info'
          call adipls_get_one_el_info( &
             s, l, nu1, nu2, iscan, R, G, M, &
@@ -280,7 +280,7 @@
             end if
          end do
          deallocate(l_freq, l_inertia, l_order, l_em)
-      
+
       end subroutine get_adipls_frequency_info
 
 
@@ -293,8 +293,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -306,7 +306,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -317,8 +317,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -332,7 +332,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -345,8 +345,8 @@
          extras_finish_step = keep_going
 
       end function extras_finish_step
-      
-      
+
+
 
       end module run_star_extras
-      
+

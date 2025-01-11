@@ -766,7 +766,6 @@ contains
       logical, intent(in) :: must_write_files
       integer, intent(out) :: ierr
 
-      integer :: i
       integer(8) :: time0, time1, clock_rate
       logical :: pause
 
@@ -826,7 +825,6 @@ contains
       integer :: i
       type (pgbinary_win_file_data), pointer :: p
       logical, parameter :: dbg = .false.
-      real(dp) :: dlgL, dlgTeff, dHR
       logical :: must_write_files, show_plot_now, save_plot_now
 
       include 'formats'
@@ -905,7 +903,7 @@ contains
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
 
-      integer :: iounit, i, n
+      integer :: iounit, n
       character (len = 1024) :: fname
       type (pgbinary_hist_node), pointer :: pg
 
@@ -950,7 +948,7 @@ contains
       integer, intent(out) :: ierr
 
       logical :: fexist
-      integer :: iounit, i, n
+      integer :: iounit, n
       character (len = 1024) :: fname
       type (pgbinary_hist_node), pointer :: pg
 
@@ -1009,7 +1007,7 @@ contains
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
 
-      integer :: num, i
+      integer :: num
       type (pgbinary_hist_node), pointer :: pg
 
       include 'formats'

@@ -52,7 +52,7 @@ module atm_def
   integer, parameter :: ATM_TABLE_PHOTOSPHERE = 104
   integer, parameter :: ATM_TABLE_WD_TAU_25 = 105
   integer, parameter :: ATM_TABLE_DB_WD_TAU_25 = 106
-  
+
   integer, parameter :: table_atm_version = 5
 
   ! Atmosphere structure info
@@ -77,7 +77,7 @@ module atm_def
   integer, parameter :: atm_tau = atm_lnPgas+1
   integer, parameter :: atm_gradr = atm_tau+1
 
-  integer, parameter :: num_results_for_build_atm = atm_gradr 
+  integer, parameter :: num_results_for_build_atm = atm_gradr
 
   ! Derived-type definitions
 
@@ -129,6 +129,7 @@ module atm_def
           lnRho, res, dres_dlnRho, dres_dlnT, &
           ierr)
        use const_def, only: dp
+       implicit none
        real(dp), intent(in)  :: lnP
        real(dp), intent(in)  :: lnT
        real(dp), intent(out) :: lnRho
@@ -139,12 +140,13 @@ module atm_def
      end subroutine atm_eos_iface
 
      ! Callback routine for opacity evaluation
-       
+
      subroutine atm_kap_iface( &
           lnRho, lnT, res, dres_dlnRho, dres_dlnT, &
           kap, dlnkap_dlnRho, dlnkap_dlnT, &
           ierr)
        use const_def, only: dp
+       implicit none
        real(dp), intent(in)  :: lnRho
        real(dp), intent(in)  :: lnT
        real(dp), intent(in)  :: res(:)

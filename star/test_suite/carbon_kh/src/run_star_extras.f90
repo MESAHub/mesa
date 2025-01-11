@@ -180,7 +180,7 @@
          names(6) = 'rel_e_eos_err_run_blend'
          vals(6) = e_eos_err_run_blend / s% total_energy_end
 
-         
+
       end subroutine data_for_extra_history_columns
 
 
@@ -273,8 +273,8 @@
             ((s% eos_frac_PC(k) .gt. 0) .and. (s% eos_frac_PC(k) .lt. 1)) .or. &
             ((s% eos_frac_CMS(k) .gt. 0) .and. (s% eos_frac_CMS(k) .lt. 1)) .or. &
             ((s% eos_frac_FreeEOS(k) .gt. 0) .and. (s% eos_frac_FreeEOS(k) .lt. 1))
-         
+
       end function in_eos_blend
-      
+
 
       end module run_star_extras

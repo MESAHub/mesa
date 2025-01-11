@@ -33,7 +33,7 @@ module utils_nan_qp
   use ISO_C_BINDING
 
   ! No implicit typing
-      
+
   implicit none
 
   ! Parameters
@@ -79,7 +79,7 @@ module utils_nan_qp
   public :: set_nan
 
   ! Procedures
-      
+
 contains
 
   elemental function is_nan_qp (x, signal) result (is_nan)
@@ -99,7 +99,7 @@ contains
     ix = TRANSFER(x, ix)
 
     ! Split out IEEE fields
-    
+
     frac_l = IBITS(ix(1), 0, FRAC_BITS_128_L)
     frac_h = IBITS(ix(2), 0, FRAC_BITS_128_H)
     expn = IBITS(ix(2), FRAC_BITS_128_H, EXPN_BITS_128_H)
@@ -171,7 +171,7 @@ contains
   end function is_bad_qp
 
   !****
-      
+
   subroutine set_nan_qp_0d (x, signal)
 
     real(qp), target, intent(out) :: x

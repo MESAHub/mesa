@@ -100,11 +100,10 @@
             xaxis_reversed, panel_flag, xaxis_numeric_labels_flag
          integer, intent(out) :: ierr
 
-         character (len=strlen) :: str
          real, allocatable, dimension(:) :: xvec, yvec
          real :: xmin, xmax, xleft, xright, dx, dylbl, chScale, windy, xmargin, &
             ymin, ymax, legend_xmin, legend_xmax, legend_ymin, legend_ymax
-         integer :: lw, lw_sav, grid_min, grid_max, npts, i, nz
+         integer :: lw, lw_sav, grid_min, grid_max, npts, nz
          integer, parameter :: num_colors = 14
          integer :: colors(num_colors)
          integer, parameter :: max_num_labels = 30
@@ -153,11 +152,10 @@
             use rates_def
             integer, intent(out) :: ierr
 
-            integer :: ii, jj, i, k, xaxis_id
+            integer :: i, k
             logical, parameter :: dbg = .false.
-            logical :: found_shock
-            real(dp) :: xshock, photosphere_logxm
-            real :: lgz, x, y, ybot
+            real(dp) :: photosphere_logxm
+            real :: lgz, x, ybot
 
             include 'formats'
             ierr = 0
@@ -176,7 +174,7 @@
             end if
 
             num_labels = max(0,min(max_num_labels, s% pg% num_abundance_line_labels))
-            
+
             iloc_abundance_label = -HUGE(grid_min)
             xloc_abundance_label = -HUGE(grid_min)
             do i=1,num_labels
@@ -240,7 +238,7 @@
             end if
 
             call pgunsa
-            
+
             if (s% pg% Abundance_show_photosphere_location .and. &
                   (xaxis_name == 'mass' .or. &
                    xaxis_name == 'logxm' .or. &
@@ -273,7 +271,7 @@
                call pgdraw(dx, 1.0)
                call pgunsa
             end if
-            
+
          call show_pgstar_decorator(s%id,s% pg% Abundance_use_decorator,s% pg% Abundance_pgstar_decorator,0, ierr)
 
          end subroutine plot
@@ -281,7 +279,7 @@
 
          subroutine do_all(legend_flag)
             logical, intent(in) :: legend_flag
-            integer :: cnt, num_to_show, i, j, k, jmax
+            integer :: cnt, num_to_show, i, j, jmax
             real(dp) :: max_abund(s% species)
             include 'formats'
             cnt = 0
@@ -309,7 +307,7 @@
 
 
          integer function do1(cnt, str, legend_flag)
-            use chem_lib
+            use chem_lib, only: chem_get_iso_id
             integer, intent(in) :: cnt
             character (len=*), intent(in) :: str
             logical, intent(in) :: legend_flag
@@ -386,8 +384,8 @@
          integer function abundance_line_legend(cnt, str)
             integer, intent(in) :: cnt
             character (len=*), intent(in) :: str
-            real :: ymx, dx, dyline, ypos, xpts(2), ypts(2)
-            integer :: iclr, max_cnt
+            real :: dx, dyline, ypos, xpts(2), ypts(2)
+            integer :: max_cnt
             max_cnt = min(max_num_labels, s% pg% Abundance_legend_max_cnt)
             if (cnt >= max_cnt) then
                abundance_line_legend = cnt

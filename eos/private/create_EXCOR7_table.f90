@@ -21,20 +21,20 @@
 ! ***********************************************************************
 
       module create_EXCOR7_table
-      
+
       use const_def
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
-      
+
       implicit none
 
       public :: do_create_EXCOR7_table
       private
 
-      
+
    contains
-   
+
    subroutine do_create_EXCOR7_table(fname)
       character (len=*), intent(in) :: fname
       real(dp) :: logRS, logRS_min, logRS_max, dlogRS
@@ -47,19 +47,19 @@
       logRS_max = 0.0d0
       dlogRS = 1d-2
       nlogRS = (logRS_max - logRS_min)/dlogRS + 1
-      
+
       logGAME_min = -2d0
       logGAME_max = 4d0
       dlogGAME = 1d-2
       nlogGAME = (logGAME_max - logGAME_min)/dlogGAME + 1
-                  
+
       !write(*,'(a)') 'create ' // trim(fname)
 
       open(newunit=io_unit,file=trim(fname))
-      
+
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
       		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
-      
+
       write(io_unit,'(2(i10,4x,3(f14.4)),i10)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
          nlogGAME, logGAME_min, logGAME_max, dlogGAME, 0
@@ -67,7 +67,7 @@
       do i = 1, nlogRS
          logRS = logRS_min + (i-1) * dlogRS
          RS = exp10(logRS)
-         write(io_unit,'(/,7x,a)') 'logRS' 
+         write(io_unit,'(/,7x,a)') 'logRS'
          write(io_unit,'(2x,f14.6/)') logRS
          write(io_unit,'(99(a26))') &
             'logGAME', 'FXC', 'UXC', 'PXC', 'CVXC', 'SXC', 'PDTXC', 'PDRXC', 'RS', 'GAME'
@@ -87,7 +87,7 @@
       write(io_unit,*)
       write(io_unit,*)
       close(io_unit)
-         
+
    end subroutine do_create_EXCOR7_table
 
 
@@ -120,11 +120,11 @@
       real(dp) :: S1, S1H, S1DH, S1DHH, S1DG, S1DHG
       real(dp) :: B2, B2DH, B2DHH, SQGE, B3, B3DH, B3DHH
       real(dp) :: S2, S2H, S2DH, S2DHH, S2DG, S2DGG, S2DHG
-      real(dp) :: R3, R3H, R3DH, R3DHH, R3DG, R3DGG, R3DHG
+      real(dp) :: R3, R3DH, R3DHH, R3DG, R3DGG, R3DHG
       real(dp) :: S3, S3DH, S3DHH, S3DG, S3DGG, S3DHG
       real(dp) :: B4, B4DH, B4DHH
       real(dp) :: C4, C4DH, C4DHH, C4DG, C4DGG, C4DHG
-      real(dp) :: S4A, S4AH, S4ADH, S4ADHH, S4ADG, S4ADGG, S4ADHG
+      real(dp) :: S4A, S4AH, S4ADH, S4ADHH
       real(dp) :: S4B, S4BDH, S4BDHH, UP1, DN1, UP2, DN2
       real(dp) :: S4C, S4CDH, S4CDHH, S4CDG, S4CDGG, S4CDHG
       real(dp) :: S4, S4DH, S4DHH, S4DG, S4DGG, S4DHG
@@ -300,6 +300,6 @@
       PDTXC=GAME*(THETA*FXCDHG-GAME*FXCDGG/3.d0)-THETA*(FXCDH/0.75d0+THETA*FXCDHH/1.5d0)
       return
       end subroutine EXCOR7
-      
-      
+
+
       end module create_EXCOR7_table

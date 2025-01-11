@@ -1,0 +1,32 @@
+&pgstar
+
+   ! device
+   file_white_on_black_flag = .true.
+   file_device = 'vcps'      ! postscript
+   file_extension = 'ps'
+   !file_device = 'png'      ! png
+   !file_extension = 'png'
+
+   pgstar_interval = 10
+
+   HR_win_flag = .true.
+   HR_win_width = 12
+   HR_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
+
+   HR_logT_min = 3.5
+   HR_logT_max = 4.5
+   HR_logL_min = 2.7
+   HR_logL_max = 4.4
+
+   ! file output
+   HR_file_flag = .true.
+   HR_file_dir = 'pgstar_out'
+   HR_file_prefix = 'hr'
+   HR_file_interval = 100 ! output when mod(model_number,HR_file_interval)==0
+   HR_file_width = 15 ! negative means use same value as for window
+   HR_file_aspect_ratio = -1 ! negative means use same value as for window
+
+   show_HR_classical_instability_strip = .true.
+   show_HR_Mira_instability_region = .false.
+
+/ ! end of pgstar namelist

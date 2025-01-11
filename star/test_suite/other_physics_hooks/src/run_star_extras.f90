@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,9 +27,9 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
 
@@ -37,14 +37,14 @@
       include 'timestep_limit/timestep_limit_def.inc'
       include 'other_winds/other_winds_def.inc'
       include 'xtrans_mesh_factor/xtrans_mesh_factor_def.inc'
-      
-      
+
+
       ! these routines are called by the standard run_star check_model
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -52,7 +52,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          include 'overshoot_dbl_exp/overshoot_dbl_exp_extras_controls.inc'
          if (ierr /= 0) return
          include 'timestep_limit/timestep_limit_extras_controls.inc'
@@ -61,10 +61,10 @@
          if (ierr /= 0) return
          include 'xtrans_mesh_factor/xtrans_mesh_factor_extras_controls.inc'
          if (ierr /= 0) return
-         
+
          s% use_other_kap = .true.
          s% other_kap_get => my_kap_get
-         
+
          s% eos_rq% use_other_eos_results = .true.
          s% eos_rq% other_eos_results => my_other_eos_results
          s% eos_rq% use_other_eos_component = .false.
@@ -76,7 +76,7 @@
 
          s% use_other_rate_get = .true.
          s% other_rate_get => my_rate_get
-         
+
          s% use_other_close_gaps = .true.
          s% other_close_gaps => my_close_gaps
 
@@ -90,8 +90,8 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns           
-         
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
+
       end subroutine extras_controls
 
 
@@ -99,8 +99,8 @@
       include 'timestep_limit/timestep_limit.inc'
       include 'other_winds/other_winds.inc'
       include 'xtrans_mesh_factor/xtrans_mesh_factor.inc'
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -111,8 +111,8 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -123,7 +123,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -133,7 +133,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
 
 
@@ -146,8 +146,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -159,7 +159,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -170,8 +170,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -185,7 +185,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -197,7 +197,7 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
+
 
       ! eos hook routines
 
@@ -306,8 +306,8 @@
          res(i_lnPgas) = res(i_lnPgas) + 0
 
       end subroutine my_other_eos_results
-      
-      
+
+
       subroutine my_kap_get( &
             id, k, handle, species, chem_id, net_iso, xa, &
             log10_rho, log10_T, &
@@ -317,15 +317,15 @@
 
          use kap_def, only: num_kap_fracs
          use kap_lib
- 
+
          ! INPUT
          integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
          integer, intent(in) :: handle ! from alloc_kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
@@ -345,7 +345,7 @@
          real(dp), intent(out) :: dln_kap_dlnT   ! partial derivative at constant Rho
          real(dp), intent(out) :: dln_kap_dxa(:) ! partial derivative w.r.t. to species
          integer, intent(out) :: ierr ! 0 means AOK.
-                  
+
          call kap_get( &
             handle, species, chem_id, net_iso, xa, log10_rho, log10_T, &
             lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
@@ -357,9 +357,9 @@
 
       subroutine my_screening(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
          use rates_def
-   
+
          implicit none
-   
+
          type (Screen_Info) :: sc ! See rates_def
          ! This contains lots of useful things like temperature, density etc as well as some precomputed
          ! terms that are useful for screening calculations. The derived type is set in do_screen_set_context (screen.f90)
@@ -369,7 +369,7 @@
          real(dp),intent(out) ::   dscreendt     !< on return, temperature derivative of the screening factor
          real(dp),intent(out) ::   dscreendd    !< on return, density derivative of the screening factor
          integer, intent(out) ::   ierr
-   
+
          screen = 1d0
          dscreendt = 0d0
          dscreendd = 0d0
@@ -381,22 +381,22 @@
          use rates_def
          use rates_lib
          implicit none
-   
+
          integer :: ir ! Rate id
          real(dp),intent(in) ::    temp      !< Temperature
          type (T_Factors) :: tf !< Various temperature factors
          real(dp),intent(inout) ::   raw_rate     !< Unscreened reaction_rate, note this will have the default mesa rate on entry
          integer, intent(out) ::   ierr
-      
+
          ierr = 0
-   
+
          if (.false. .and. trim(reaction_name(ir)) == 'r_he4_he4_he4_to_c12') then
             if(temp<1d8) then
                raw_rate = 0d0
             end if
-         
+
          end if
-   
+
       end subroutine my_rate_get
 
 
@@ -412,7 +412,7 @@
          if (ierr /= 0) return
 
          do k=1, 10
-            if (.false. .and. s% mixing_type(k) == mix_type) then 
+            if (.false. .and. s% mixing_type(k) == mix_type) then
                write(*,*) k, s% D_mix(k), s% mixing_type(k)
             end if
          end do
@@ -441,4 +441,4 @@
 
 
       end module run_star_extras
-      
+

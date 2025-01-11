@@ -91,11 +91,11 @@ contains
        j = k+1
 
     end do
-       
+
   end subroutine str_to_vector
 
   !****
-      
+
   subroutine str_to_double (str, x, ierr)
 
     character(*), intent(in) :: str
@@ -105,7 +105,7 @@ contains
     read(str, *, ROUND='COMPATIBLE', IOSTAT=ierr) x
 
   end subroutine str_to_double
-         
+
   !****
 
   subroutine double_to_str (x, str)
@@ -119,5 +119,5 @@ contains
 100 format(1PD26.16)
 
   end subroutine double_to_str
-  
+
 end module math_io

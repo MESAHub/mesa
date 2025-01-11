@@ -28,18 +28,21 @@ module binary_pgbinary
    abstract interface
 
       subroutine pgbinary_plot_interface(id, device_id, ierr)
+         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
       end subroutine pgbinary_plot_interface
 
       subroutine other_do_plot_in_binary_grid_interface(&
          id, device_id, xleft, xright, ybot, ytop, txt_scale, ierr)
+         implicit none
          integer, intent(in) :: id, device_id
          real, intent(in) :: xleft, xright, ybot, ytop, txt_scale
          integer, intent(out) :: ierr
       end subroutine other_do_plot_in_binary_grid_interface
 
       subroutine pgbinary_decorator_interface(id, xmin, xmax, ymin, ymax, plot_num, ierr)
+         implicit none
          integer, intent(in) :: id
          !Not doubles
          real, intent(in) :: xmin, xmax, ymin, ymax

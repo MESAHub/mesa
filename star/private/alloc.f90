@@ -82,10 +82,9 @@
       integer :: num_allocs, num_deallocs
 
 
-
       contains
 
-      
+
       subroutine init_alloc
          integer :: i
          num_calls=0; num_returns=0
@@ -269,7 +268,7 @@
             deallocate(s%op_mono_factors)
             nullify(s%op_mono_factors)
          end if
-            
+
          call dealloc_extras(s)
 
          call free_other(s)
@@ -283,15 +282,15 @@
             deallocate(s%other_star_info)
 
          endif
-         
+
          call dealloc_history(s)
-         
+
          if (ASSOCIATED(s%bcyclic_odd_storage)) call clear_storage(s)
 
          ! Free the star handle itself
 
          call free_star(s)
-         
+
       end subroutine free_arrays
 
 
@@ -372,7 +371,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, species, nvar_hydro
-         
+
          include 'formats'
 
          nz = s% nz_old
@@ -469,8 +468,7 @@
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
 
-         integer :: nz, species, num_reactions, &
-            nvar, nvar_hydro, nvar_chem, sz_new, psz_new, action
+         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -478,8 +476,8 @@
 
          ierr = 0
          null_str = '' ! avoid bogus compiler warnings 'array subscript 1 is above array bounds'
-         
-         
+
+
          species = s% species
          num_reactions = s% num_reactions
          nvar = s% nvar_total
@@ -507,8 +505,8 @@
          do ! just so can exit on failure
 
             if (action /= do_fill_arrays_with_NaNs) then
-               ! these arrays must not be filled with NaNs  
-               ! because they contain the inputs to the step          
+               ! these arrays must not be filled with NaNs
+               ! because they contain the inputs to the step
                call do2(s% xh, c% xh, nvar_hydro, 'xh')
                if (failed('xh')) exit
                call do2(s% xa, c% xa, species, 'xa')
@@ -526,13 +524,13 @@
                call do1(s% omega, c% omega)
                if (failed('omega')) exit
                call do1(s% j_rot, c% j_rot)
-               if (failed('j_rot')) exit               
+               if (failed('j_rot')) exit
                call do1(s% mlt_vc, c% mlt_vc)
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
             end if
-            
+
             call do1(s% q, c% q)
             if (failed('q')) exit
             call do1(s% m, c% m)
@@ -540,8 +538,8 @@
             call do1(s% dm, c% dm)
             if (failed('dm')) exit
             call do1(s% dm_bar, c% dm_bar)
-            if (failed('dm_bar')) exit   
-            
+            if (failed('dm_bar')) exit
+
             call do1(s% am_nu_rot, c% am_nu_rot)
             if (failed('am_nu_rot')) exit
             call do1(s% D_omega, c% D_omega)
@@ -569,11 +567,11 @@
 
             call do2(s% xh_start, c% xh_start, nvar_hydro, 'xh_start')
             if (failed('xh_start')) exit
-            
+
             call do1(s% r_polar, c% r_polar)
             if (failed('r_polar')) exit
             call do1(s% r_equatorial, c% r_equatorial)
-            if (failed('r_equatorial')) exit               
+            if (failed('r_equatorial')) exit
 
             call do1(s% lnd, c% lnd)
             if (failed('lnd')) exit
@@ -597,7 +595,7 @@
             if (failed('w_start')) exit
             call do1(s% Hp_face_start, c% Hp_face_start)
             if (failed('Hp_face_start')) exit
-            
+
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
             call do1(s% dxh_lnd, c% dxh_lnd)
@@ -751,10 +749,10 @@
             if (failed('csound')) exit
             call do1(s% csound_face, c% csound_face)
             if (failed('csound_face')) exit
-            
+
             call do1(s% rho_face, c% rho_face)
             if (failed('rho_face')) exit
-            
+
             call do1(s% scale_height, c% scale_height)
             if (failed('scale_height')) exit
             call do1(s% v_div_csound, c% v_div_csound)
@@ -769,7 +767,7 @@
             if (failed('dr_div_csound')) exit
 
             call do1(s% ergs_error, c% ergs_error)
-            if (failed('ergs_error')) exit            
+            if (failed('ergs_error')) exit
             call do1(s% gradr_factor, c% gradr_factor)
             if (failed('gradr_factor')) exit
             call do1(s% adjust_mlt_gradT_fraction, c% adjust_mlt_gradT_fraction)
@@ -940,7 +938,7 @@
             if (failed('eps_heat')) exit
             call do1(s% irradiation_heat, c% irradiation_heat)
             if (failed('irradiation_heat')) exit
-            
+
             call do1_ad(s% extra_heat, c% extra_heat)
             if (failed('extra_heat')) exit
             call do1_ad(s% extra_grav, c% extra_grav)
@@ -1037,7 +1035,7 @@
 
             call do1_logical(s% fixed_gradr_for_rest_of_solver_iters, c% fixed_gradr_for_rest_of_solver_iters)
             if (failed('fixed_gradr_for_rest_of_solver_iters')) exit
-            
+
             call do1(s% mlt_Gamma, c% mlt_Gamma)
             if (failed('mlt_Gamma')) exit
             call do1(s% L_conv, c% L_conv)
@@ -1067,7 +1065,7 @@
             if (failed('mixing_type')) exit
             call do1(s% cz_bdy_dq, c% cz_bdy_dq)
             if (failed('cz_bdy_dq')) exit
-            
+
             call do1_ad(s% gradT_ad, c% gradT_ad)
             if (failed('gradT_ad')) exit
             call do1_ad(s% gradr_ad, c% gradr_ad)
@@ -1088,7 +1086,7 @@
             if (failed('mlt_D_ad')) exit
             call do1_ad(s% mlt_Gamma_ad, c% mlt_Gamma_ad)
             if (failed('mlt_Gamma_ad')) exit
-            
+
             call do1_ad(s% PII_ad, c% PII_ad)
             if (failed('PII_ad')) exit
             call do1_ad(s% Chi_ad, c% Chi_ad)
@@ -1137,7 +1135,7 @@
             if (failed('unsmoothed_brunt_B')) exit
             call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
             if (failed('smoothed_brunt_B')) exit
-            
+
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
 
@@ -1319,7 +1317,7 @@
 
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
-            
+
             call do1(s% PII, c% PII); if (failed('PII')) exit
 
             call do1(s% Chi, c% Chi); if (failed('Chi')) exit
@@ -1330,7 +1328,7 @@
             call do1(s% Lc_start, c% Lc_start); if (failed('Lc_start')) exit
             call do1(s% Lt, c% Lt); if (failed('Lt')) exit
             call do1(s% Lt_start, c% Lt_start); if (failed('Lt_start')) exit
-            
+
             call do1(s% Fr, c% Fr); if (failed('Fr')) exit
             call do1(s% Fr_start, c% Fr_start); if (failed('Fr_start')) exit
             call do1(s% Pvsc, c% Pvsc); if (failed('Pvsc')) exit
@@ -1416,7 +1414,6 @@
 
          subroutine do1_ad(ptr, other)
             type(auto_diff_real_star_order1), dimension(:), pointer :: ptr, other
-            type(auto_diff_real_star_order1), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_ad_with_NaNs(ptr,1,-1)
             else if (action == do_copy_pointers_and_resize) then
@@ -1444,7 +1441,6 @@
 
          subroutine do1(ptr, other)
             real(dp), dimension(:), pointer :: ptr, other
-            real(dp), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
@@ -1475,7 +1471,6 @@
 
          subroutine do1_neq(ptr, other)
             real(dp), dimension(:), pointer :: ptr, other
-            real(dp), dimension(:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs(ptr)
             else if (action == do_copy_pointers_and_resize) then
@@ -1504,7 +1499,6 @@
 
          subroutine do1_integer(ptr, other)
             integer, dimension(:), pointer :: ptr, other
-            integer, dimension(:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) return
@@ -1522,7 +1516,6 @@
          subroutine do2_integer(ptr, other, sz1)
             integer, dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
-            real(dp), dimension(:,:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
@@ -1539,7 +1532,6 @@
 
          subroutine do1_logical(ptr, other)
             logical, dimension(:), pointer :: ptr, other
-            logical, dimension(:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (nz <= size(ptr,dim=1)) return
@@ -1558,7 +1550,6 @@
             real(dp), dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
             character (len=*), intent(in) :: str
-            real(dp), dimension(:,:), pointer :: tmp
             include 'formats'
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs_2d(ptr)
@@ -1589,7 +1580,6 @@
          subroutine do3(ptr, other, sz1, sz2)
             real(dp), dimension(:,:,:), pointer :: ptr, other
             integer, intent(in) :: sz1, sz2
-            real(dp), dimension(:,:,:), pointer :: tmp
             if (action == do_fill_arrays_with_NaNs) then
                call fill_with_NaNs_3d(ptr)
             elseif (action == do_copy_pointers_and_resize) then
@@ -1622,7 +1612,6 @@
          subroutine do2_quad(ptr, other, sz1)
             real(qp), dimension(:,:), pointer :: ptr, other
             integer, intent(in) :: sz1
-            real(qp), dimension(:,:), pointer :: tmp
             if (action == do_copy_pointers_and_resize) then
                ptr => other
                if (sz1 == size(ptr, dim=1) .and. nz <= size(ptr, dim=2)) return
@@ -1651,8 +1640,8 @@
 
 
       end subroutine star_info_arrays
-         
-         
+
+
       subroutine fill_ad_with_NaNs(ptr, klo, khi_in)
          type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
@@ -1667,8 +1656,8 @@
             call fill_with_NaNs(ptr(k)% d1Array)
          end do
       end subroutine fill_ad_with_NaNs
-      
-      
+
+
       subroutine fill_ad_with_zeros(ptr, klo, khi_in)
          type(auto_diff_real_star_order1), dimension(:), pointer :: ptr
          integer, intent(in) :: klo, khi_in
@@ -1889,7 +1878,6 @@
          integer, intent(in) :: sz1, sz2, action
          integer, intent(out) :: ierr
          real(qp), dimension(:,:), pointer :: ptr2
-         real(qp) :: nan
          integer :: old_sz2, j, i
          ierr = 0
          select case(action)
@@ -2313,23 +2301,23 @@
          integer, intent(out) :: ierr
 
          integer :: i
-         
+
          include 'formats'
 
          ierr = 0
          i = 0
-         
+
          ! first assign variable numbers
          i = i+1; s% i_lnd = i
          i = i+1; s% i_lnT = i
          i = i+1; s% i_lnR = i
-      
+
          if (.not. s% RSP_flag) then
             i = i+1; s% i_lum = i
          else
             s% i_lum = 0
          end if
-      
+
          if (s% v_flag) then
             i = i+1; s% i_v = i
          else
@@ -2357,11 +2345,11 @@
             s% i_erad_RSP = 0
             s% i_Fr_RSP = 0
          end if
-         
+
          if (s% RSP2_flag) then
             i = i+1; s% i_w = i
             i = i+1; s% i_Hp = i
-         else 
+         else
             s% i_w = 0
             s% i_Hp = 0
          end if
@@ -2377,7 +2365,7 @@
          else
             s% i_j_rot = 0
          end if
-         
+
          ! now assign equation numbers
          if (s% i_v /= 0 .or. s% i_u /= 0) then
             s% i_dlnd_dt = s% i_lnd
@@ -2394,7 +2382,7 @@
             s% i_dlnR_dt = 0
             s% i_du_dt = 0
          end if
-      
+
          s% i_detrb_dt = s% i_w
          s% i_equ_Hp = s% i_Hp
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
@@ -2421,7 +2409,7 @@
          if (s% i_Fr_RSP /= 0) s% nameofvar(s% i_Fr_RSP) = 'Fr_RSP'
          if (s% i_w_div_wc /= 0) s% nameofvar(s% i_w_div_wc) = 'w_div_wc'
          if (s% i_j_rot /= 0) s% nameofvar(s% i_j_rot) = 'j_rot'
-         if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u' 
+         if (s% i_u /= 0) s% nameofvar(s% i_u) = 'u'
 
          ! Names of the equations
          if (s% i_dv_dt /= 0) s% nameofequ(s% i_dv_dt) = 'dv_dt'
@@ -2440,7 +2428,7 @@
          if (s% i_du_dt /= 0) s% nameofequ(s% i_du_dt) = 'du_dt'
 
          ! chem names are done later by set_chem_names when have set up the net
-         
+
 
          s% need_to_setvars = .true.
 
@@ -2968,7 +2956,6 @@
 
          logical function return1(itry)
             integer, intent(in) :: itry
-            integer, pointer :: p(:)
             if (associated(int_work_pointers(itry)% p)) then
                return1 = .false.
                return
@@ -3073,7 +3060,6 @@
 
          logical function return1(itry)
             integer, intent(in) :: itry
-            logical, pointer :: p(:)
             if (associated(logical_work_pointers(itry)% p)) then
                return1 = .false.
                return
@@ -3085,16 +3071,14 @@
 
       end subroutine return_logical_work_array
 
-      
-      subroutine shutdown_alloc ()
 
-         integer :: i
+      subroutine shutdown_alloc ()
 
          call free_work_arrays()
 
       end subroutine shutdown_alloc
 
-      
+
       subroutine free_work_arrays ()
 
          integer :: i
@@ -3177,12 +3161,12 @@
          end function get_size_l
 
       end subroutine size_work_arrays
-      
+
       ! Cleans array used by history.f90, cant think of better place?
       subroutine dealloc_history(s)
          use utils_lib, only: integer_dict_free
          type(star_info), pointer :: s
-      
+
          if (associated(s% history_values)) then
             deallocate(s% history_values)
             nullify(s% history_values)
@@ -3230,8 +3214,4 @@
       end subroutine non_crit_return_work_array
 
 
-
-
       end module alloc
-
-
