@@ -866,7 +866,7 @@
          if (.not. in_inlist_pulses .and. .not. s% lxtra(lx_he_zams)) then
             lburn_div_lsurf  = abs(s% L_nuc_burn_total*Lsun/s% L(1))
             if (lburn_div_lsurf > 0d0) then
-               if((abs(log10(lburn_div_lsurf))) < 0.01 .and. &
+               if((abs(log10(lburn_div_lsurf))) < 0.1 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
@@ -1272,9 +1272,13 @@
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
             if (s% xtra(x_time_start_pulse) > 0d0) then
-               s% v_drag = s% u(1)
-               s% v_drag_factor = 1d0
-               write(*,*) 'using drag'
+               !s% v_drag = 2d4 !s% u(1)
+               !s% v_drag_factor = 1d0
+               !s% v_drag = 2d9
+               !s% v_drag_factor = 1d0
+               s% D_mix_rotation_min_tau_full_off = 1d0
+               s% D_mix_rotation_min_tau_full_on = 10d0
+               write(*,*) 'u_flag is on, pulse has begun'
                if (.not. s% lxtra(lx_using_bb_bcs)) then
                   s% max_timestep = max_dt_during_pulse
                else
@@ -1289,13 +1293,17 @@
                end do
                if (k > 1) then
                  s% max_q_for_convection_with_hydro_on = s% q(k)
+                 !if (s% tau(k)> 10d0) then
+                 !s% D_mix_rotation_min_tau_full_off = s% tau(k)
+                 !end if
                end if
             else
+               write (*,*) 'u_flag is on, Pulse has not begun.'
                s% max_timestep = max_dt_before_pulse
                !!this prevents surface from going mad right when hydro is turned on
                !right after a relax
-               s% v_drag = 0d0
-               s% v_drag_factor = 1d0
+               !s% v_drag = 0d0
+               !s% v_drag_factor = 1d0
                !s% max_timestep = 1d99
                s% max_q_for_convection_with_hydro_on = 0.999d0
             end if
@@ -1390,7 +1398,7 @@
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
                s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               s% delta_lgL_power_photo_hard_limit = 10d0*delta_lgLnuc_limit
             else
                s% delta_lgL_power_photo_limit = -1d0
                s% delta_lgL_power_photo_hard_limit = -1d0

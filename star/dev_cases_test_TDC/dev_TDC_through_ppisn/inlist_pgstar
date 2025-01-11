@@ -14,11 +14,12 @@
    Grid2_win_flag = .true.
    !Grid2_win_flag = .false.
    
-   Grid2_win_width = 13 !15
+   Grid2_win_width = 21 !15
    Grid2_win_aspect_ratio = 0.65 ! aspect_ratio = height/width
    
    Grid2_plot_name(4) = 'Mixing'
-   
+   Mixing_show_rotation_details = .true.
+
    Grid2_num_cols = 7 ! divide plotting region into this many equal width cols
    Grid2_num_rows = 8 ! divide plotting region into this many equal height rows
    
@@ -202,7 +203,7 @@
    Grid2_file_dir = 'png'
    Grid2_file_prefix = 'grid_'
    Grid2_file_interval = 10 ! 1 ! output when mod(model_number,Grid2_file_interval)==0
-   Grid2_file_width = -1 ! negative means use same value as for window
+   Grid2_file_width = 27 ! negative means use same value as for window
    Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
 
    !show_TRho_Profile_eos_regions = .true.

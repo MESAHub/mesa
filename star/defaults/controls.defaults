@@ -4135,6 +4135,27 @@
     D_mix_rotation_min_logT_full_off = 9.5d0
 
 
+      ! D_mix_rotation_min_tau_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Drop rotational components of ``D_mix`` for locations where tau <= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+      
+    D_mix_rotation_min_tau_full_off = 0d0
+    
+          ! D_mix_rotation_max_tau_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Use rotational components of ``D_mix`` for locations where tau >= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+      
+    D_mix_rotation_min_tau_full_on = 0d0
+
+
       ! D_omega_max_replacement_fraction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! D_omega_growth_rate
