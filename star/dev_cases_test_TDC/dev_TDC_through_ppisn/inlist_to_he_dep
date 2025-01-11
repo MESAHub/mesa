@@ -15,16 +15,13 @@
    save_model_filename = 'he_dep.mod'
    required_termination_code_string = 'xa_central_lower_limit'
 
-   read_extra_star_job_inlist(1) = .true.
-   extra_star_job_inlist_name(1) = 'inlist_ppisn'
+
 
 / !end of star_job namelist
 
 
 &controls
 
-   read_extra_controls_inlist(1) = .true.
-   extra_controls_inlist_name(1)= 'inlist_ppisn'
 
   ! stop when the center mass fraction of h1 drops below this limit
     xa_central_lower_limit_species(1) = 'he4'

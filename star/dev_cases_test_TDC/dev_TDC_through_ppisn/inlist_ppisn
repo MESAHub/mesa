@@ -32,7 +32,7 @@
    ! this are options for the relaxation of the model in-between pulses
    timescale_for_relax_entropy = 1d-15
    max_dt_for_relax_entropy = 5d-17
-   num_timescales_for_relax_entropy = 30
+   num_timescales_for_relax_entropy = 30 ! probably need 50 or more, takes a while.
    max_steps_to_relax_entropy = 10000
    relax_omega_max_yrs_dt = 1d-5
 
@@ -63,6 +63,12 @@
 
 
 &controls
+
+! remove limits on rotational mixing in the core
+    D_mix_rotation_max_logT_full_on = 1d11
+    D_mix_rotation_max_logT_full_off = 1d12
+
+
 
 ! atmosphere
     !  Pextra_factor = 1 
@@ -117,15 +123,15 @@
 
    !relax_use_gold_tolerances = .false.
    use_gold_tolerances = .true.
-   use_gold2_tolerances = .false.
-   maxT_for_gold_tolerances = 3.7d9 ! this is to ease core-collapse (~logT=9.7)
+   use_gold2_tolerances = .true.
+   maxT_for_gold_tolerances = 1d99!3.7d9 ! this is to ease core-collapse (~logT=9.7)
    gold_iter_for_resid_tol2 = 10
    gold_iter_for_resid_tol3 = 10
    gold_tol_residual_norm3 = 1d-6
    gold_tol_max_residual3 = 1d-3
    gold_solver_iters_timestep_limit = 20
    solver_iters_timestep_limit = 50
-   ignore_too_large_correction = .true.
+   ignore_too_large_correction = .false.
    scale_max_correction = 0.1d0
    !corr_coeff_limit = 0.2d0
    ignore_min_corr_coeff_for_scale_max_correction = .true.
@@ -133,8 +139,8 @@
 
       ! Can be helpful to decrease op_split_burn_min_T 
       ! to 3d9 or even 1d9 for large networks to avoid crashes
-      op_split_burn = .false.
-      op_split_burn_min_T = 3.0d9 
+      op_split_burn = .true.
+      op_split_burn_min_T = 1d9 
       burn_steps_limit = 150
       burn_steps_hard_limit = 250
       op_split_burn_eps = 1d-5
@@ -238,7 +244,7 @@
    ! mesh controls
    okay_to_remesh = .true.
    max_dq = 1d-3 ! RECOMMENDED 1d-3
-   mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
+   mesh_delta_coeff = 1d0 ! RECOMMENDED 0.8d0
    !! this one is turned on in run_star_extras
    !use_split_merge_amr = .true.
    split_merge_amr_log_zoning = .true.

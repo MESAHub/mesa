@@ -279,6 +279,7 @@
     w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
+    D_mix_rotation_min_tau_full_off, D_mix_rotation_min_tau_full_on, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
     set_min_am_nu_non_rot, min_am_nu_non_rot, min_center_Ye_for_min_am_nu_non_rot, &
     set_min_D_mix_below_Tmax, min_D_mix_below_Tmax, set_min_D_mix_in_H_He, min_D_mix_in_H_He, &
@@ -1685,6 +1686,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% D_mix_rotation_max_logT_full_on = D_mix_rotation_max_logT_full_on
  s% D_mix_rotation_min_logT_full_off = D_mix_rotation_min_logT_full_off
+ s% D_mix_rotation_min_tau_full_off = D_mix_rotation_min_tau_full_off
+ s% D_mix_rotation_min_tau_full_on = D_mix_rotation_min_tau_full_on
 
  s% set_uniform_am_nu_non_rot = set_uniform_am_nu_non_rot
  s% uniform_am_nu_non_rot = uniform_am_nu_non_rot
@@ -3369,6 +3372,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  D_mix_rotation_max_logT_full_on = s% D_mix_rotation_max_logT_full_on
  D_mix_rotation_min_logT_full_off = s% D_mix_rotation_min_logT_full_off
+ D_mix_rotation_min_tau_full_off = s% D_mix_rotation_min_tau_full_off
+ D_mix_rotation_min_tau_full_on = s% D_mix_rotation_min_tau_full_on
+
 
  set_uniform_am_nu_non_rot = s% set_uniform_am_nu_non_rot
  uniform_am_nu_non_rot = s% uniform_am_nu_non_rot

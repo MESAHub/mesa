@@ -1035,7 +1035,9 @@
          real(dp) :: fp_min, ft_min, fp_error_limit, ft_error_limit
 
          real(dp) :: D_mix_rotation_max_logT_full_on, &
-            D_mix_rotation_min_logT_full_off
+            D_mix_rotation_min_logT_full_off, &
+            D_mix_rotation_min_tau_full_off, &
+            D_mix_rotation_min_tau_full_on
          
          real(dp) :: D_omega_mixing_rate, max_q_for_D_omega_zero_in_convection_region
          logical :: D_omega_mixing_across_convection_boundary
