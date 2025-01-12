@@ -195,11 +195,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1_sg(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1_sg(s_mid(1), s_mid(2)) ! stablize the ends
+         f(2,1) = minmod1_sg(s_mid(1), s_mid(2)) ! stabilize the ends
 
          ! slope at i=nx
          !f(2,nx) = minmod1_sg(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2,nx) = minmod1_sg(s_mid(nx-2), s_mid(nx-1)) ! stablize the ends
+         f(2,nx) = minmod1_sg(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
 
          if (slope_only) return
 
@@ -368,11 +368,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1_sg(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1_sg(s_mid(1), s_mid(2)) ! stablize the ends
+         f(2,1) = minmod1_sg(s_mid(1), s_mid(2)) ! stabilize the ends
 
          ! slope at i=nx
          !f(2,nx) = minmod1_sg(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2,nx) = minmod1_sg(s_mid(nx-2), s_mid(nx-1)) ! stablize the ends
+         f(2,nx) = minmod1_sg(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
 
          if (slope_only) return
 

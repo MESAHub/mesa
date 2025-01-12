@@ -1198,7 +1198,7 @@
          character (len=*), intent(in) :: eosDT_cache_dir
          ! Remove existing eos data
          call eos_shutdown()
-         ! Re-initliaze eos
+         ! Re-initialize eos
          call eos_init(eosDT_cache_dir,&
                ! After first init this is set in eos_def
                use_cache_for_eos,&

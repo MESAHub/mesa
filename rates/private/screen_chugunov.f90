@@ -182,7 +182,7 @@
             tk = tp1 * tp
             dtkdt = 0d0
             dtkdd = tp1 * dtpdd
-            denom = 0d0 ! Set as zero overwise floating point issues cause small error in the subtraction (tk * dtpdd - tp * dtkdd)
+            denom = 0d0 ! Set as zero otherwise floating point issues cause small error in the subtraction (tk * dtpdd - tp * dtkdd)
 
          else if (tn .gt.tp1 .and. tn .le. tp2) then
 

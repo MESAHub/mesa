@@ -299,7 +299,7 @@
       end subroutine set_profile_columns
 
 
-      integer function do_get_num_standard_profile_columns(s) ! not inluding extra profile columns
+      integer function do_get_num_standard_profile_columns(s) ! not including extra profile columns
          use star_def, only: star_info
          type (star_info), pointer :: s
          integer :: numcols, j, num_specs

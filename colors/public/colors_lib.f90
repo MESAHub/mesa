@@ -38,20 +38,20 @@
       ! The data interface for the library is defined in colors_def
       ! Th easiest way to get output is to add the columns to your history_columns.list file
 
-      ! The prefered way for users (in a run_star_extras routine) for accessing the colors data is to
+      ! The preferred way for users (in a run_star_extras routine) for accessing the colors data is to
       ! call either get_by_by_name, get_abs_mag_by_name or get_abs_bolometric_mag. Other routines are there
       ! to hook into the rest of MESA.
 
-      ! Routines get_bc will return the coefficents from interpolating over log Teff, log g, [M/H]
+      ! Routines get_bc will return the coefficients from interpolating over log Teff, log g, [M/H]
       ! even though the tables are defined as Teff, log g, [M/H]. get_abs_mag routines return
       ! data thats been turned into an absolute magnitude. A color can be computed by taking the difference between
       ! two get_bc or two get_abs_mag calls.
 
-      ! Names for the filters should be unique accross all data files (left to the user to enforce this).
-      ! Name matching is perfomed in a case sensitive manner.
+      ! Names for the filters should be unique across all data files (left to the user to enforce this).
+      ! Name matching is performed in a case sensitive manner.
       ! The names themselves are not important as far as MESA is concerned, you can name each filter (including the
       ! ones MESA ships by defaults) by what ever name you want by editing the data file(s) and changing the names in the header.
-      ! MESA does not rely on any particlaur band exisiting.
+      ! MESA does not rely on any particlaur band existing.
 
       implicit none
 

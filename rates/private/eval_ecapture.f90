@@ -151,7 +151,7 @@ contains
        if (ierr /=0) stop "ERROR: ecapture (transitions)"
        if (dbg) write(*,*) ntrans, offset
 
-       ! get nuclide indicies
+       ! get nuclide indices
        lhs = weak_lhs_nuclide_id(ir)
        rhs = weak_rhs_nuclide_id(ir)
 

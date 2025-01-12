@@ -205,7 +205,7 @@
 
          call check('after add_predictive_mixing')
 
-         ! NB: re-call locate_convection_boundries to take into
+         ! NB: re-call locate_convection_boundaries to take into
          ! account changes from add_predictive_mixing
 
          if (.not. s% RSP_flag) then

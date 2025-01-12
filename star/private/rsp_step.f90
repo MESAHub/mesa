@@ -457,7 +457,7 @@
             a(1,1) = (f1 - f2)/(2d0*hh)
             !write(*,2) 'dfdx', 1, a(1,1), hh
             err = big
-            ! succesive columns in the neville tableu will go to smaller stepsizes
+            ! successive columns in the neville tableu will go to smaller stepsizes
             ! and higher orders of extrapolation
             do i = 2,ntab
                hh = hh/con
@@ -467,7 +467,7 @@
                !write(*,2) 'f2', i, f2
                a(1,i) = (f1 - f2)/(2d0*hh)
                !write(*,2) 'dfdx', i, a(1,i), hh
-               ! compute extrapolations of various orders; the error stratagy is to compare
+               ! compute extrapolations of various orders; the error strategy is to compare
                ! each new extrapolation to one order lower but both at the same stepsize
                ! and at the previous stepsize
                fac = con2

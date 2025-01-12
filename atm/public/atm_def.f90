@@ -129,6 +129,7 @@ module atm_def
           lnRho, res, dres_dlnRho, dres_dlnT, &
           ierr)
        use const_def, only: dp
+       implicit none
        real(dp), intent(in)  :: lnP
        real(dp), intent(in)  :: lnT
        real(dp), intent(out) :: lnRho
@@ -145,6 +146,7 @@ module atm_def
           kap, dlnkap_dlnRho, dlnkap_dlnT, &
           ierr)
        use const_def, only: dp
+       implicit none
        real(dp), intent(in)  :: lnRho
        real(dp), intent(in)  :: lnT
        real(dp), intent(in)  :: res(:)

@@ -57,10 +57,10 @@ Mailing lists
 The mesa-users@lists.mesastar.org and
 mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
 <https://www.mailmanlists.net/>`__.  The account is controlled by
-Frank who pays the hosting fees (through grants at ASU).
+Matteo who pays the hosting fees through Flatiron.
 This costs about $100/year.
 
-New account signups are handled by Frank, Evan, and Rob.
+New account signups are handled by Earl, Eb, and Warrick.
 
 Marketplace
 ^^^^^^^^^^^
@@ -74,7 +74,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Evan, and Joey have access to it).  This is
+<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it).  This is
 currently free for open source software.
 
 
@@ -88,7 +88,7 @@ service.
 Website
 ^^^^^^^
 
-We still use the mesa.sourceforge.net website domian name, but only for a top-level
+We still use the mesa.sourceforge.net website domain name, but only for a top-level
 redirect to docs.mesastar.org.
 
 The source code for the old sourceforge site lives at https://github.com/MESAHub/mesa-website.

@@ -86,7 +86,7 @@
 !..thermodynamic quantities. of prime interest is the pressure [erg/cm**3],
 !..specific thermal energy [erg/gr], the entropy [erg/g/K], along with
 !..their derivatives with respect to temperature, density, abar, and zbar.
-!..other quantites such the normalized chemical potential eta (plus its
+!..other quantities such the normalized chemical potential eta (plus its
 !..derivatives), number density of electrons and positron pair (along
 !..with their derivatives), adiabatic indices, specific heats, and
 !..relativistically correct sound speed are also returned.
@@ -334,7 +334,5 @@
       end subroutine show_h5
 
 
-      end module
-
-
+      end module helm
 

@@ -58,6 +58,7 @@
                skip, ierr)
             use const_def, only: dp
             use eos_def, only: nv
+            implicit none
             integer, intent(in) :: handle
             logical, intent(in) :: dbg
             real(dp), intent(in) :: &

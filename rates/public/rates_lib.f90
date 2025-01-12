@@ -237,7 +237,8 @@
          type(reaction_data),intent(in) :: rates
          type(nuclide_data), intent(in) :: nuclides
          integer, intent(in) :: format
-         integer :: err = 0
+         integer :: err
+         err = 0
          select case (format)
             case(internal_format)
                call write_reaction_data(unitno,rates,err)

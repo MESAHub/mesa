@@ -212,6 +212,7 @@
          abstract interface
             subroutine setup_weak_table(table, ierr)
               import weak_rate_table
+              implicit none
               class(weak_rate_table), intent(inout) :: table
               integer, intent(out) :: ierr
             end subroutine setup_weak_table
@@ -223,6 +224,7 @@
                  Qneu, dQneu_dlnT, dQneu_dlnRho, ierr)
               use const_def, only : dp
               import weak_rate_table
+              implicit none
               class(weak_rate_table), intent(inout) :: table
               real(dp), intent(in) :: T9, lYeRho
               real(dp), intent(out) :: lambda, dlambda_dlnT, dlambda_dlnRho
@@ -810,7 +812,7 @@
          ! NOTE: if change these, must edit raw_rates to match.
 
          ! NACRE = Angulo et al. 1999 Nucl. Phys. A, 656, 3
-            ! This is for reactions that care about thier values beloew 10^7K
+            ! This is for reactions that care about their values below 10^7K
          ! JR = jina reaclib -- (Sakharuk et al. 2006)
             ! This is for everything else
          ! CF88 = Frank Timmes' version of

@@ -1,4 +1,4 @@
-   
+
 
       subroutine debug_decsol(iop,n,ndim,a,ml,mu,b,ip,lrd,rpar,lid,ipar,ier)
          integer, intent(in) :: iop, n, ndim, lrd, lid, ml, mu
@@ -27,7 +27,7 @@
             end if
          end if
       end subroutine debug_decsol
-      
+
 
       subroutine debug_decsolc(iop,n,ndim,ar,ai,ml,mu,br,bi,ip,lcd,cpar_decsol,lrd,rpar_decsol,lid,ipar_decsol,ier)
          integer, intent(in) :: iop, n, ndim, lcd, lrd, lid, ml, mu

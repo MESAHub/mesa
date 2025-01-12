@@ -216,4 +216,4 @@ contains
 
    end subroutine Init_Composition
 
-end
+end program sample_eos

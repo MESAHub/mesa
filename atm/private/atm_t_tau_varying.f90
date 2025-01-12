@@ -490,6 +490,7 @@ contains
       interface
          real(dp) function interp_y(i, s, rwork_y, iwork_y, ierr)
            use const_def, only: dp
+           implicit none
            integer, intent(in) :: i
            real(dp), intent(in) :: s
            real(dp), intent(inout), target :: rwork_y(*)
@@ -587,7 +588,7 @@ contains
 
     g = cgrav*M/(R*R)
 
-    ! Allocte atm_structure at its initial size
+    ! Allocate atm_structure at its initial size
 
     allocate(atm_structure(num_results_for_build_atm,INIT_NUM_PTS))
 
@@ -719,6 +720,7 @@ contains
       interface
          real(dp) function interp_y(i, s, rwork_y, iwork_y, ierr)
            use const_def, only: dp
+           implicit none
            integer, intent(in) :: i
            real(dp), intent(in) :: s
            real(dp), intent(inout), target :: rwork_y(*)

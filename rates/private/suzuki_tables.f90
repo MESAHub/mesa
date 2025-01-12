@@ -201,7 +201,7 @@ contains
 
 
     ! set Qneu
-    ! be careful; you don't want to get in to the situtation where 1d-99/1d-99 = 1...
+    ! be careful; you don't want to get in to the situation where 1d-99/1d-99 = 1...
     if (lambda .gt. 1d-30) then
        nu = capture_nu + decay_nu
        Qneu = nu / lambda

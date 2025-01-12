@@ -421,12 +421,14 @@
       abstract interface
 
          subroutine set_my_vars_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine set_my_vars_interface
 
          subroutine will_set_my_param_interface(id, i, new_value, ierr)
             use const_def, only: dp
+            implicit none
             integer, intent(in) :: id
             integer, intent(in) :: i ! which of my_param's will be set
             real(dp), intent(in) :: new_value
@@ -434,19 +436,23 @@
          end subroutine will_set_my_param_interface
 
          subroutine extras_controls_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine extras_controls_interface
 
          integer function extras_check_model_interface(id)
+            implicit none
             integer, intent(in) :: id
          end function extras_check_model_interface
 
          integer function extras_finish_step_interface(id)
+            implicit none
             integer, intent(in) :: id
          end function extras_finish_step_interface
 
          subroutine extras_after_evolve_interface(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine extras_after_evolve_interface

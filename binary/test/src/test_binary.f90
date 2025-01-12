@@ -83,4 +83,4 @@ program test_binary
    use test_binary_mod
    implicit none
    call do_test
-end program
+end program test_binary

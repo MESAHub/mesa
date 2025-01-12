@@ -1625,7 +1625,7 @@
       BOHR3=BOHR2*BOHR !cleaned 15/6
 
       TEMR=TEMP/BOHR2 ! T in rel.units (=T/mc^2)
-      EF=CHI*TEMR ! Fermi energy in mc^2 - zeroth aprox. = CMU1
+      EF=CHI*TEMR ! Fermi energy in mc^2 - zeroth approx. = CMU1
       DeltaEF=PI2*TEMR*TEMR/6.d0*(1.d0+2.d0*EF*(2.d0+EF)) &
              /(EF*(1.d0+EF)*(2.d0+EF)) ! corr. [page 125, equiv.Eq.(6) of PC'10]]
       EF=EF+DeltaEF ! corrected Fermi energy (14.02.09)

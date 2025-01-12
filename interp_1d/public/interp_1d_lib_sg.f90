@@ -40,6 +40,7 @@
          interface
             subroutine interp_vec_sg(x, nx, f1, nwork, work1, str, ierr) ! make cubic interpolant
                ! e.g., interp_pm, interp_m3a, interp_m3b, or interp_m3q
+               implicit none
                integer, intent(in) :: nx       ! length of x vector
                real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
                real, intent(inout), pointer :: f1(:) ! =(4,nx)  ! data & interpolation coefficients

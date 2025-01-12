@@ -74,7 +74,7 @@
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
          integer, intent(in) :: newt_imax, imax
          real(dp), intent(in) :: epsx, epsy 
-         ! stop seaching when x is determined to within epsx
+         ! stop searching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer, intent(out) :: ierr
          

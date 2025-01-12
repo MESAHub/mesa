@@ -155,7 +155,7 @@ Turbulence (``turb``)
 =====================
 
 The ``turb`` module provides various mixing theories (semiconvection, thermohaline,
-mixing length thoery, time-dependant convection)
+mixing length theory, time-dependant convection)
 
 .. toctree::
    :maxdepth: 1

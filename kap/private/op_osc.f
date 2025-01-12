@@ -291,7 +291,7 @@
 !      + yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)
 !       save /atomdata/
 !
-!  i=temperature inex
+!  i=temperature index
 !  j=density index
 !  k=frequency index
 !  n=element index
