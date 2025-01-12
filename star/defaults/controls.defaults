@@ -7716,7 +7716,7 @@
       ! calculate_Brunt_N2
       ! ~~~~~~~~~~~~~~~~~~
 
-      ! If true calculate B using equation 6 in MESA VI, otherwise use equation 8 
+      ! If true calculate B using equation 6 in MESA II, otherwise use equation 8 
 
 
       ! ::
