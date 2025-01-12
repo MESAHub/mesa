@@ -151,8 +151,8 @@
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
     calculate_Brunt_B, calculate_Brunt_N2, brunt_N2_coefficient, num_cells_for_smooth_brunt_B, &
-    threshold_for_smooth_brunt_B, min_magnitude_brunt_B, RSP_max_dt_times_min_rad_diff_time, &
-    min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
+    threshold_for_smooth_brunt_B, min_magnitude_brunt_B, use_eos_partials_for_Brunt, &
+    RSP_max_dt_times_min_rad_diff_time, min_overshoot_q, overshoot_alpha, RSP_target_steps_per_cycle, &
     RSP_max_num_periods, RSP_min_max_R_for_periods, RSP_min_deltaR_for_periods, &
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
     RSP_v_div_cs_threshold_for_dt_limit, RSP_max_dt_times_min_dr_div_cs, RSP_thetae, &
@@ -1129,6 +1129,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% num_cells_for_smooth_brunt_B = num_cells_for_smooth_brunt_B
  s% threshold_for_smooth_brunt_B = threshold_for_smooth_brunt_B
  s% min_magnitude_brunt_B = min_magnitude_brunt_B
+ s% use_eos_partials_for_Brunt = use_eos_partials_for_Brunt
 
  s% min_overshoot_q = min_overshoot_q
  s% overshoot_alpha = overshoot_alpha
@@ -2815,6 +2816,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  brunt_N2_coefficient = s% brunt_N2_coefficient
  threshold_for_smooth_brunt_B = s% threshold_for_smooth_brunt_B
  min_magnitude_brunt_B = s% min_magnitude_brunt_B
+ use_eos_partials_for_Brunt = s% use_eos_partials_for_Brunt
 
  min_overshoot_q = s% min_overshoot_q
  overshoot_alpha = s% overshoot_alpha
