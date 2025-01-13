@@ -18,9 +18,14 @@ dump_missing_metals_into_heaviest = .false.
 change_D_omega_flag = .true.
 new_D_omega_flag = .true.
 
+! treat w_div_wc as a solver variable
+change_w_div_wc_flag = .true.
+new_w_div_wc_flag = .true.
+
 ! turn on hydrodynamics
 change_v_flag = .true.
 new_v_flag = .true.
+
 
 ! Can be adopted to avoid issues with surface for high Z or during advanced burning
 !relax_to_this_tau_factor = 1.5d6
@@ -129,15 +134,17 @@ smooth_nu_ST                              = 2
 ! mixing_length_alpha = 1.5
 ! MLT_option = 'TDC'
 
-MLT_option                                = 'Henyey'
-use_ledoux_criterion                      = .false.
+MLT_option                                = 'TDC'
+alpha_TDC_DAMPR = 1d0 ! radiative dissipation !0d0 is default for mlt limit of TDC.
 mixing_length_alpha                       = 1.5d0
 ! min_convective_gap                        = 0.1d0
-alpha_semiconvection                      = 0.0d0
 
-! If you would like to be bold, try radiative damping, although it
-! is a departure from the mlt limit of 'TDC'
-alpha_TDC_DAMPR = 0d0 ! 0d0 is default for mlt limit
+use_ledoux_criterion                      = .true.
+alpha_semiconvection                      = 0.1d0
+semiconvection_option = 'Langer_85 mixing; gradT = gradr'
+thermohaline_option = 'Kippenhahn'
+
+thermohaline_coeff = 0
 
 
 use_other_alpha_mlt = .false. ! implemented in run_star_extras
@@ -145,14 +152,6 @@ x_ctrl(21) = 3.0 ! alpha_H
 x_ctrl(22) = 1.5 ! alpha_other
 x_ctrl(23) = 0.5 ! ! use alpha_H if cell X >= H_limit; else use alpha_other
 x_ctrl(24) = 9d0 ! ! use other_alpha_mlt only if star_mass >= this limit.
-
-
-!      use_Ledoux_criterion = .false.
-semiconvection_option = 'Langer_85 mixing; gradT = gradr'
-thermohaline_option = 'Kippenhahn'
-
-!      alpha_semiconvection = 1d-2
-thermohaline_coeff = 0
 
 mlt_make_surface_no_mixing = .true.
 
