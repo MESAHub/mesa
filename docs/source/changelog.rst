@@ -12,6 +12,16 @@ Changelog
 Changes in main
 ===============
 
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+``pgstar`` / ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
+
 .. _New Features main:
 
 New Features

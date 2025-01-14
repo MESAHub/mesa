@@ -438,12 +438,10 @@ PGSTAR has a number of options to control its file output.
 The default output format is PNG::
 
   file_device = 'png'
-  file_extension = 'png'
 
 but you can use PostScript output by setting::
 
   file_device = 'vcps'
-  file_extension = 'ps'
 
 You can change the foreground/background color of your plots between
 black/white and white/black::
