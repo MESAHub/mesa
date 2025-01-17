@@ -32,6 +32,6 @@ module run_star_extras
    ! these routines are called by the standard run_star
 contains
 
-   include '../../job/standard_run_star_extras.inc'
+   include 'standard_run_star_extras.inc'
 
 end module run_star_extras
