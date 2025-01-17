@@ -595,6 +595,10 @@ contains
          val = safe_log10(b% m(2) / Msun)
       case(bh_sum_of_masses)
          val = (b% m(1) + b% m(2)) / Msun
+      case(bh_mass_ratio)
+         val = b% m(2) / b% m(1)
+      case(bh_obs_mass_ratio)
+         val = min(b% m(2) / b% m(1), b% m(1) / b% m(2))
       case(bh_lg_mtransfer_rate)
          val = safe_log10(abs(b% step_mtransfer_rate) / Msun * secyer)
       case(bh_lg_mstar_dot_1)
