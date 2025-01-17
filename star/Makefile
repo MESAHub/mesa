@@ -214,7 +214,7 @@ endif
 SRCS_CHECK = test/src/run.f90 test/src/run_star_extras.f90
 INTERNAL_DEPENDS_ON := const utils math mtx neu num colors kap eos rates net chem interp_1d interp_2d star_data ionization atm turb auto_diff forum
 BINTYPE := static-lib
-INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults
+INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults -Ijob
 CHECK_FILTER_PROG := grep 'stop because star_age >= max_age'
 
 # Testing
@@ -225,6 +225,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := star_lib.mod \
            star_def.mod \
+           run_star.mod \
            run_star_support.mod \
            other_extras.mod \
            pgstar.mod \
@@ -268,5 +269,15 @@ MODULES += pgstar_abundance.mod \
            pgstar_trho.mod \
            pgstar_trho_profile.mod
 endif
+
+INSTALL_INCLUDES := \
+    job/gyre_in_mesa_extras_finish_step.inc \
+    job/gyre_in_mesa_extras_set_velocities.inc \
+    job/multi_stars_extras_def.inc \
+    job/multi_stars_extras.inc \
+    job/standard_run_star_extras.inc \
+    job/test_suite_extras_def.inc \
+    job/test_suite_extras.inc \
+    job/standard_run_star_extras.dek \
 
 include $(MAKE_DIR)/Makefile
