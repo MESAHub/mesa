@@ -127,7 +127,7 @@
          real(dp), allocatable, dimension(:) :: &
             rho_P_chiT_chiRho, rho_P_chiT_chiRho_face
 
-         integer :: nz, k, i
+         integer :: nz, k
 
          include 'formats'
 
