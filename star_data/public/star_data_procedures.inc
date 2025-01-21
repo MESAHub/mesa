@@ -199,3 +199,9 @@
          procedure (binary_other_torque_interface), pointer, nopass :: &
             binary_other_torque => null()
 
+         procedure (binary_other_fp_ft_interface), pointer, nopass :: &
+            binary_other_fp_ft => null()
+         procedure (binary_other_irot_interface), pointer, nopass :: &
+            binary_other_irot => null()
+
+
