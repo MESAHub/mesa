@@ -9,8 +9,8 @@ GitHub
 ------
 
 We have the `MESAHub <https://github.com/MESAHub>`__ GitHub
-organization.  The members of the MTC/MAC all have owner-level
-privileges.  MESAHub is classified as an educational organization and
+organization. The members of the MTC/MAC all have owner-level
+privileges. MESAHub is classified as an educational organization and
 this currently grants us a 100% discount, meaning this costs $0/yr.
 Unsubsidized, it would cost about $1200/yr.
 
@@ -56,7 +56,7 @@ Mailing lists
 
 The mesa-users@lists.mesastar.org and
 mesa-developers@lists.mesastar.org lists are hosted by `MailmanLists
-<https://www.mailmanlists.net/>`__.  The account is controlled by
+<https://www.mailmanlists.net/>`__. The account is controlled by
 Matteo who pays the hosting fees through Flatiron.
 This costs about $100/year.
 
@@ -74,15 +74,15 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs
-<https://readthedocs.org/>`__.  Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it).  This is
+<https://readthedocs.org/>`__. Rich controls the account (and Earl, Joey, Meridith, and Philip have access to it). This is
 currently free for open source software.
 
 
 Sourceforge
 -----------
 
-The original home of MESA development was sourceforge.  Most developers
-involved c. 2015 or earlier have admin privileges.  This is a free
+The original home of MESA development was sourceforge. Most developers
+involved c. 2015 or earlier have admin privileges. This is a free
 service.
 
 Website
@@ -97,33 +97,36 @@ Slack
 -----
 
 Rich controls the Slack and pays for it (through grants at UW
-Madison).  This costs around $130 per year (about $10/user/yr).
+Madison). This costs around $130 per year (about $10/user/yr).
 
 
 TestHub
 -------
 
 The MESA TestHub runs on Heroku and the account is controlled by Bill
-Wolf.  It is funded by Frank and Bill W.  The Heroku account costs
+Wolf. It is funded by Frank and Bill W. The Heroku account costs
 around $600/yr, though its cost has been higher during the GitHub
 transition.
 
 The testing `log archive <https://logs.mesastar.org/>`__ lives on a
-server controlled by Josiah.  The marginal cost is $1/month, which he
+server controlled by Josiah. The marginal cost is $1/month, which he
 covers.
 
 Jenkins
 ^^^^^^^
 
 The Flatiron `Scientific Computing Core <https://www.simonsfoundation.org/flatiron/scientific-computing-core>`__
-provides continuous integration testing for MESA via jenkins.
-This was set up in 2021 by Dylan Simon (Flatiron) and Josiah.  The configuration lives in the ``jenkins`` directory.
-Matteo serves as the point of contact at Flatiron.
+provides continuous integration testing for MESA via Jenkins.
+This was set up in 2021 by Dylan Simon (Flatiron) and Josiah.
+The configuration lives in the ``jenkins`` directory.
+Matteo and Philip serve as the point of contact at Flatiron.
+View the `Jenkins test results <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__
+
 
 Zenodo
 ------
 
-We have multiple resources archived on Zenodo.  This is a free service.
+We have multiple resources archived on Zenodo. This is a free service.
 
 Community
 ^^^^^^^^^
