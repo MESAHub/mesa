@@ -279,6 +279,7 @@
     w_div_wcrit_max, w_div_wcrit_max2, &
     fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
+    D_mix_rotation_min_tau_full_off, D_mix_rotation_min_tau_full_on, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
     set_min_am_nu_non_rot, min_am_nu_non_rot, min_center_Ye_for_min_am_nu_non_rot, &
     set_min_D_mix_below_Tmax, min_D_mix_below_Tmax, set_min_D_mix_in_H_He, min_D_mix_in_H_He, &
@@ -352,6 +353,7 @@
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
     velocity_logT_lower_bound, max_dt_yrs_for_velocity_logT_lower_bound, velocity_tau_lower_bound, velocity_q_upper_bound, &
     use_drag_energy, drag_coefficient, min_q_for_drag, &
+    v_drag_factor, v_drag, q_for_v_drag_full_off, q_for_v_drag_full_on, &
     retry_for_v_above_clight, &
 
     ! hydro solver
@@ -1684,6 +1686,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% D_mix_rotation_max_logT_full_on = D_mix_rotation_max_logT_full_on
  s% D_mix_rotation_min_logT_full_off = D_mix_rotation_min_logT_full_off
+ s% D_mix_rotation_min_tau_full_off = D_mix_rotation_min_tau_full_off
+ s% D_mix_rotation_min_tau_full_on = D_mix_rotation_min_tau_full_on
 
  s% set_uniform_am_nu_non_rot = set_uniform_am_nu_non_rot
  s% uniform_am_nu_non_rot = uniform_am_nu_non_rot
@@ -1870,6 +1874,11 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% use_drag_energy = use_drag_energy
  s% drag_coefficient = drag_coefficient
  s% min_q_for_drag = min_q_for_drag
+ s% v_drag_factor = v_drag_factor
+ s% v_drag = v_drag
+ s% q_for_v_drag_full_off = q_for_v_drag_full_off
+ s% q_for_v_drag_full_on = q_for_v_drag_full_on
+
 
  s% velocity_logT_lower_bound = velocity_logT_lower_bound
  s% max_dt_yrs_for_velocity_logT_lower_bound = max_dt_yrs_for_velocity_logT_lower_bound
@@ -3363,6 +3372,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  D_mix_rotation_max_logT_full_on = s% D_mix_rotation_max_logT_full_on
  D_mix_rotation_min_logT_full_off = s% D_mix_rotation_min_logT_full_off
+ D_mix_rotation_min_tau_full_off = s% D_mix_rotation_min_tau_full_off
+ D_mix_rotation_min_tau_full_on = s% D_mix_rotation_min_tau_full_on
+
 
  set_uniform_am_nu_non_rot = s% set_uniform_am_nu_non_rot
  uniform_am_nu_non_rot = s% uniform_am_nu_non_rot
@@ -3546,6 +3558,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  use_drag_energy = s% use_drag_energy
  drag_coefficient = s% drag_coefficient
  min_q_for_drag = s% min_q_for_drag
+ v_drag_factor = s% v_drag_factor
+ v_drag = s% v_drag
+ q_for_v_drag_full_off = s% q_for_v_drag_full_off
+ q_for_v_drag_full_on = s% q_for_v_drag_full_on
 
  velocity_logT_lower_bound = s% velocity_logT_lower_bound
  max_dt_yrs_for_velocity_logT_lower_bound = s% max_dt_yrs_for_velocity_logT_lower_bound

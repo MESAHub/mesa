@@ -19,6 +19,8 @@ New Features
 
 ``mesa_reader`` can now be installed with ``pip``.
 
+A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spurious shocks.
+
 .. _Bug Fixes main:
 
 Bug Fixes
