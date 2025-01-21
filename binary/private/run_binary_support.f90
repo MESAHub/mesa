@@ -48,6 +48,7 @@ contains
       use binary_job_ctrls_io
       use binary_mdot, only : adjust_mdots, set_accretion_composition
       use binary_tides, only : sync_spin_orbit_torque
+      use binary_roche_deformation, only: roche_fp_ft, roche_irot
       use binary_evolve
       use mod_other_rlo_mdot
       use mod_other_implicit_rlo
@@ -265,6 +266,10 @@ contains
          s% accrete_given_mass_fractions = .true.
          s% accrete_same_as_surface = .false.
          s% binary_other_torque => sync_spin_orbit_torque
+
+         ! settings for roche geometry deformation
+         s% binary_other_fp_ft => roche_fp_ft
+         s% binary_other_irot => roche_irot
 
          s% doing_timing = .false.
 
