@@ -42,17 +42,17 @@
             r_old(nz_max), r_new(nz_max), v_old(nz_max), v_new(nz_max))
          npts(:) = 0
          
-         call gyre_init('gyre.in')
+         call init('gyre.in')
 
-         call gyre_set_constant('G_GRAVITY', standard_cgrav)
-         call gyre_set_constant('C_LIGHT', clight)
-         call gyre_set_constant('A_RADIATION', crad)
+         call set_constant('G_GRAVITY', standard_cgrav)
+         call set_constant('C_LIGHT', clight)
+         call set_constant('A_RADIATION', crad)
 
-         call gyre_set_constant('M_SUN', Msun)
-         call gyre_set_constant('R_SUN', Rsun)
-         call gyre_set_constant('L_SUN', Lsun)
+         call set_constant('M_SUN', Msun)
+         call set_constant('R_SUN', Rsun)
+         call set_constant('L_SUN', Lsun)
 
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+         call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
          
          mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
@@ -74,7 +74,7 @@
          end if
 
          !write(*,*) 'call gyre_set_model'
-         call gyre_set_model(global_data, point_data, s%gyre_data_schema)
+         call set_model(global_data, point_data, s%gyre_data_schema)
 
           write(*, 100) 'order', 'freq (Hz)', &
              'P (sec)', 'P (day)', 'growth', 'cycles to double'
@@ -87,7 +87,7 @@
          ipar(4) = 3 ! max number of modes to output per call
          ipar(5) = 0 ! num_written
 
-         call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
+         call get_modes(mode_l, process_mode_, ipar, rpar)
          
          if (s% x_ctrl(4) == 1d0) then
             mode = 2
