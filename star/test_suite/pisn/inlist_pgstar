@@ -313,7 +313,7 @@ Text_Summary1_name(3,5) = 'CO_core'
 
 Text_Summary1_name(4,1) = 'log_cntr_Rho' 
 Text_Summary1_name(4,2) = 'log_LH'
-Text_Summary1_name(4,3) = 'lg_Lnuc'
+Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
 Text_Summary1_name(4,4) = 'O_cntr'
 Text_Summary1_name(4,5) = 'Fe_core'
 
