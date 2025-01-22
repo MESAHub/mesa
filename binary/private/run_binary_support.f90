@@ -48,7 +48,7 @@ contains
       use binary_job_ctrls_io
       use binary_mdot, only : adjust_mdots, set_accretion_composition
       use binary_tides, only : sync_spin_orbit_torque
-      use binary_roche_deformation, only: roche_fp_ft, roche_irot
+      use binary_roche_deformation, only: build_roche_interpolators,roche_fp_ft, roche_irot
       use binary_evolve
       use mod_other_rlo_mdot
       use mod_other_implicit_rlo
@@ -268,8 +268,12 @@ contains
          s% binary_other_torque => sync_spin_orbit_torque
 
          ! settings for roche geometry deformation
-         s% binary_other_fp_ft => roche_fp_ft
-         s% binary_other_irot => roche_irot
+         if (b% use_tidal_deformation) then
+            call build_roche_interpolators
+            s% binary_other_fp_ft => roche_fp_ft
+            s% binary_other_irot => roche_irot
+         end if
+
 
          s% doing_timing = .false.
 

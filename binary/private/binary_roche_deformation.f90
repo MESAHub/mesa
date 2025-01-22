@@ -29,53 +29,109 @@ module binary_roche_deformation
    ! moment of inertia i_rot assuming shellularity in the Roche potential of
    ! a binary star. Follows Fabry, Marchant and Sana, 2022, A&A 661, A123.
 
+   use interp_2d_lib_db
+   use auto_diff
+   use star_def
+   use binary_def
+   use binary_lib, only : binary_eval_rlobe
+
+
    implicit none
+
+   real(dp), parameter :: nudge = 1d-4
    real(dp), pointer :: xvals(:), yvals(:), yvals_gtr_than_1(:), fpfunc1d(:), ftfunc1d(:), &
          irotfunc1d(:), otherrfunc1d(:), afunc1d(:)
-   logical :: inter_ok = .false.
+   logical :: inter_ok = .false., dbg = .true.
    integer :: num_xpts, num_ypts, num_ypts_gtr_than_1
-   character(len=strlen) :: upstairs = '../../../../../../data_tables/'  ! where fp/ft data lives
+
 
 contains
 
-   ! interpolator data reading
-   subroutine setup_interpolator(filename, xs, num_xs, ys, num_ys, func1d, ierr)
-      integer, intent(out) :: ierr, num_xs, num_ys
-      character(LEN = *) :: filename
-      integer :: k, iounit
-      real(dp), pointer, intent(out) :: xs(:), ys(:), func1d(:)
-      real(dp), pointer :: func(:,:,:)
+   subroutine build_roche_interpolators
+      use const_def, only: mesa_data_dir
+      real(dp) :: xtest, ytest, testval
+      integer :: ierr
+      character(len=strlen) :: upstairs
 
-      write(*, *) 'loading ', filename
-      ! open data to interpolate
-      open(newunit = iounit, file = filename, status = 'old', action = 'read',&
-            iostat = ierr)
+      include 'formats'
 
-      read(iounit, *, iostat = ierr) num_xs
-      allocate(xs(num_xs))
-      do k = 1, num_xs
-         read(iounit, *, iostat = ierr) xs(k)
-      end do
+      if (.not. inter_ok) then
+         upstairs = trim(mesa_data_dir) // 'roche_data/'  ! where fp/ft data lives
+         if (dbg) then
+            write(*, 1) 'starting interpolator setup'
+         end if
+         call setup_interpolator(trim(upstairs) // 'fp_data.txt', xvals, num_xpts, yvals, &
+               num_ypts, fpfunc1d, ierr)
+         call setup_interpolator(trim(upstairs) // 'ft_data.txt', xvals, num_xpts, yvals, &
+               num_ypts, ftfunc1d, ierr)
+         call setup_interpolator(trim(upstairs) // 'irot_data.txt', xvals, num_xpts, &
+               yvals, num_ypts, irotfunc1d, ierr)
+         if (dbg) then
+            xtest = -0.5
+            ytest = 1.35
+            ! test fp interpolator
+            write(*, 11) 'grid size', num_xpts, num_ypts
+            write(*, 1) 'setup interpolators succesful,'
 
-      read(iounit, *, iostat = ierr) num_ys
-      allocate(ys(num_ys))
-      do k = 1, num_ys
-         read(iounit, *, iostat = ierr) ys(k)
-      end do
-
-      ! create a 1d array with all the data, point func to it
-      allocate(func1d(4 * num_xs * num_ys))
-      func(1:4, 1:num_xs, 1:num_ys) => func1d(1:4 * num_xs * num_ys)
-      do k = 1, num_xs
-         read(iounit, *, iostat = ierr) func(1, k, :)
-      end do
-
-      if (ierr /= 0) then
-         close(iounit)
+            call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
+                  fpfunc1d, num_xpts, testval, ierr)
+            write(*, 1) 'fp   test gave should be close to 0.6', testval
+            call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
+                  ftfunc1d, num_xpts, testval, ierr)
+            write(*, 1) 'ft   test gave should be close to 0.8', testval
+            call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
+                  irotfunc1d, num_xpts, testval, ierr)
+            write(*, 1) 'irot test gave should be close to 0.4', testval
+            inter_ok = .true.
+         end if
       end if
-      ! create interpolator
-      call interp_mkbipm_db(xs, num_xs, ys, num_ys, func1d, num_xs, ierr)
-   end subroutine setup_interpolator
+
+      contains
+      ! interpolator data reading
+      subroutine setup_interpolator(filename, xs, num_xs, ys, num_ys, func1d, ierr)
+         integer, intent(out) :: ierr, num_xs, num_ys
+         character(len = *) :: filename
+         integer :: k, iounit
+         real(dp), pointer, intent(out) :: xs(:), ys(:), func1d(:)
+         real(dp), pointer :: func(:,:,:)
+
+         include 'formats'
+
+         if (dbg) then
+            write(*, 1) 'loading ' // filename
+         end if
+         ! open data to interpolate
+         open(newunit = iounit, file = trim(filename), status = 'old', action = 'read',&
+               iostat = ierr)
+
+         read(iounit, *, iostat = ierr) num_xs
+         allocate(xs(num_xs))
+         do k = 1, num_xs
+            read(iounit, *, iostat = ierr) xs(k)
+         end do
+
+         read(iounit, *, iostat = ierr) num_ys
+         allocate(ys(num_ys))
+         do k = 1, num_ys
+            read(iounit, *, iostat = ierr) ys(k)
+         end do
+
+         ! create a 1d array with all the data, point func to it
+         allocate(func1d(4 * num_xs * num_ys))
+         func(1:4, 1:num_xs, 1:num_ys) => func1d(1:4 * num_xs * num_ys)
+         do k = 1, num_xs
+            read(iounit, *, iostat = ierr) func(1, k, :)
+         end do
+
+         if (ierr /= 0) then
+            close(iounit)
+         end if
+         ! create interpolator
+         call interp_mkbipm_db(xs, num_xs, ys, num_ys, func1d, num_xs, ierr)
+      end subroutine setup_interpolator
+
+   end subroutine build_roche_interpolators
+
 
    real(dp) function eval_fp(lq, ar, ierr) result(fp)
       ! evaluates fp of the equipotential shell with equivalent radius

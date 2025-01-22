@@ -152,6 +152,7 @@ real(dp) :: CE_fixed_lambda
 ! miscellaneous controls
 logical :: keep_donor_fixed
 real(dp) :: mdot_limit_donor_switch
+logical :: use_tidal_deformation
 logical :: use_other_rlo_mdot
 logical :: use_other_check_implicit_rlo
 logical :: use_other_implicit_function_to_solve
