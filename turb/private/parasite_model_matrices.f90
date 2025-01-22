@@ -305,16 +305,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_m
+         real(dp) :: k2_diff
 
          ! Evaluate the (m,m-1) 4x4 block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_m = (m-1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m-2)*l_hat**2 - k_z**2 ! l**2 - k[m-1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_m)
+            B(1,1) = l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
             B(1,3) = 0
             B(1,4) = 0
@@ -350,16 +350,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_p
+         real(dp) :: k2_diff
       
          ! Evaluate the (m,m+1) 4x4 matrix block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_p = (m+1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m+2)*l_hat**2 - k_z**2 ! l**2 - k[m+1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = -l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_p)
+            B(1,1) = -l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
             B(1,3) = 0
             B(1,4) = 0
@@ -553,16 +553,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_m
+         real(dp) :: k2_diff
 
          ! Evaluate the (m,m-1) 3x3 block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_m = (m-1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m-2)*l_hat**2 - k_z**2 ! l**2 - k[m-1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_m)
+            B(1,1) = l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
             B(1,3) = 0
 
@@ -590,16 +590,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_p
+         real(dp) :: k2_diff
       
          ! Evaluate the (m,m+1) 3x3 matrix block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_p = (m+1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m+2)*l_hat**2 - k_z**2 ! l**2 - k[m+1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = -l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_p)
+            B(1,1) = -l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
             B(1,3) = 0
 
@@ -764,16 +764,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_m
+         real(dp) :: k2_diff
 
          ! Evaluate the (m,m-1) 2x2 block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_m = (m-1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m-2)*l_hat**2 - k_z**2 ! l**2 - k[m-1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_m)
+            B(1,1) = l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
 
             B(2,1) = l_hat*k_z*E_C
@@ -795,16 +795,16 @@ contains
          real(dp), intent(out) :: B(:,:)
 
          real(dp) :: k2_m
-         real(dp) :: k2_m_p
+         real(dp) :: k2_diff
       
          ! Evaluate the (m,m+1) 2x2 matrix block
 
          k2_m = m**2*l_hat**2 + k_z**2
-         k2_m_p = (m+1)**2*l_hat**2 + k_z**2
+         k2_diff = -m*(m+2)*l_hat**2 - k_z**2 ! l**2 - k[m+1]**2
 
          if (E_psi /= 0._dp) then
 
-            B(1,1) = -l_hat*k_z*E_psi/k2_m*(l_hat**2 - k2_m_p)
+            B(1,1) = -l_hat*k_z*E_psi/k2_m*k2_diff
             B(1,2) = 0
 
             B(2,1) = l_hat*k_z*E_C
