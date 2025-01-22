@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-shopt -u expand_aliases 
+shopt -u expand_aliases
 
 photo_directory=photos
 
@@ -28,6 +28,4 @@ then
     exit 1
 fi
 
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-./star
-date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+make run
