@@ -6,7 +6,7 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     cd "$1" || return
     echo "clean $1"
 
-    ./clean
+    make clean
     rm -f LOGS/*
     rm -f LOGS1/*
     rm -f LOGS2/*
