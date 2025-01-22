@@ -13,8 +13,8 @@ if [ "$DO_ALL" == 1 ] || [ "$curr_id" == "$id" ] ; then
     cd "$1" || return
     echo "clean $1"
 
-    ./clean
-    ./mk
+    make clean
+    make
     check_okay
     cd ..
 fi
