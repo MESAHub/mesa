@@ -156,7 +156,11 @@ contains
       else if (p% win_flag .and. (.not. p% do_win)) then
          if (p% id_win == 0) &
             call open_device(s, p, .false., '/xwin', p% id_win, ierr)
-         if (ierr == 0 .and. p% id_win > 0) p% do_win = .true.
+         if (ierr == 0 .and. p% id_win > 0) then
+            p% do_win = .true.
+         else
+            ierr = 0
+         end if
       end if
       if (p% do_win .and. p% id_win > 0 .and. &
          (p% win_width /= p% prev_win_width .or. &
@@ -260,7 +264,10 @@ contains
       ierr = 0
       id = -1
       id = pgopen(trim(dev))
-      if (id <= 0) return
+      if (id <= 0) then
+         ierr = -1
+         return
+      end if
 
       !write(*,*) 'open device <' // trim(dev) // '> ' // trim(p% name), id
       if (is_file) then
@@ -575,124 +582,15 @@ contains
       end function set_c
 
 
-      integer function setcolour(i, name, ierr)
-         integer :: i
+      integer function setcolour(index, name, ierr)
+         integer :: index
          character (len = *) :: name
          integer, intent(out) :: ierr
-         call Set_Pgplot_Colour(i, name, ierr)
-         setcolour = i + 1
+         call pgscrn(index, name, ierr)
+         setcolour = index + 1
       end function setcolour
 
    end subroutine Set_Colours
-
-
-   subroutine Set_Pgplot_Colour(index, name, ierr)
-      use utils_lib
-
-      integer :: index
-      character (len = *) :: name
-      integer, intent(out) :: ierr
-
-      logical, save :: have_colour_list = .false.
-      real, allocatable, dimension(:), save :: red, green, blue
-      character (len = 64), allocatable, dimension(:), save :: colournames
-      integer, save :: nrgbcolours, low, hi
-      integer :: i
-
-      ierr = 0
-      if (.not.have_colour_list) then
-         call loadRGBtxt(ierr)
-         if (ierr /= 0) return
-         have_colour_list = .true.
-         call pgqcol(low, hi)
-      end if
-
-      if (.not. (low<=index .and. index<=hi)) then
-         write(*, '(a,i4,a,i3,a,i3)') "Set_Pgplot_Colour: requested index of ", index, &
-            " not in ", low, " to ", hi
-         return
-      endif
-
-      do i = 1, nrgbcolours
-         if (colournames(i) == name) exit
-      end do
-      if (i>nrgbcolours) then
-         write(*, *) "Set_Pgplot_Colour: colour ", trim(name), " not found"
-         ierr = -1
-         return
-      end if
-      call pgscr(index, red(i), green(i), blue(i))
-
-
-   contains
-
-
-      subroutine loadRGBtxt(ierr)
-         integer, intent(out) :: ierr
-
-         logical :: fexist
-         integer :: iounit, i, j, r, g, b, len
-         character (len = 1024) :: msg, fname, pgplotdir, line
-         ierr = 0
-
-         call GET_ENVIRONMENT_VARIABLE("PGPLOT_DIR", pgplotdir)
-         if (len_trim(pgplotdir)==0) then
-            write(*, *) "PGPLOT_DIR is not set in your shell"
-            ierr = -1
-            return
-         end if
-
-         fname = trim(pgplotdir) // "/rgb.txt"
-         inquire(file = trim(fname), exist = fexist)
-         if (.not.fexist) then
-            write(*, *) 'loadRGBtxt: pgplot ', trim(fname), " does not exist"
-            write(*, *) 'loadRGBtxt: pgplot rgb.txt file does not exist'
-            ierr = -1
-            return
-         end if
-
-         open(newunit = iounit, file = trim(fname), status = "old", iostat = ierr, iomsg = msg)
-
-         if (ierr/=0) then
-            write(*, *) trim(msg)
-            write(*, *) 'loadRGBtxt: cannot open the pgplot rgb.txt file'
-            ierr = -1
-            return
-         end if
-
-         ! count colours
-         len = 0
-         do while(.true.)
-            read(iounit, *, iostat = ierr) i
-            if (ierr/=0) exit
-            len = len + 1
-         end do
-         nrgbcolours = len
-         close(iounit)
-
-         allocate(red(nrgbcolours), green(nrgbcolours), blue(nrgbcolours))
-         allocate(colournames(nrgbcolours))
-         open(newunit = iounit, file = trim(fname), status = "old", iostat = ierr, iomsg = msg)
-         do i = 1, nrgbcolours
-            read(iounit, '(a)') line
-            read(line, *) r, g, b
-            j = 1
-            do while(line(j:j)==char(32) .or. &
-               (line(j:j)>=char(48) .and. line(j:j)<=char(57)))
-               j = j + 1
-            end do
-            read(line(j:), '(a)') colournames(i)
-            red(i) = r / 255.0
-            green(i) = g / 255.0
-            blue(i) = b / 255.0
-         end do
-         close(iounit)
-
-      end subroutine loadRGBtxt
-
-
-   end subroutine Set_Pgplot_Colour
-
 
    subroutine read_TRho_data(fname, logTs, logRhos, ierr)
       use utils_lib
