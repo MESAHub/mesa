@@ -306,7 +306,7 @@ pgstar commands used for the plots above:
   
   Text_Summary1_name(4,1) = 'log_max_T'
   Text_Summary1_name(4,2) = 'log_LH'
-  Text_Summary1_name(4,3) = 'lg_Lnuc'
+  Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
   Text_Summary1_name(4,4) = 'O_cntr'
   Text_Summary1_name(4,5) = 'Fe_core'
   
