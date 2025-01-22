@@ -13,5 +13,5 @@ Cflags: -I$${prefix}/include
 Libs: -L$${prefix}/lib $(addprefix -l,$(LIB_NAMES))
 endef
 
-$(PKG_CONFIG): | $(BUILD_DIR_MODULE)/lib/pkgconfig/
+$(PKG_CONFIG): | $(BUILD_DIR_MODULE)/lib/pkgconfig/ $(BUILD_DIR_MODULE)/include/
 	$(file > $@,$(PKG_CONFIG_CONTENTS))
