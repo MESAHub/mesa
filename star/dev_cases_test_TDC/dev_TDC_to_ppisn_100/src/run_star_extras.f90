@@ -26,7 +26,7 @@
       use star_def
       use const_def
       use math_lib
-      use gyre_lib
+      use gyre_mesa_m
 
       implicit none
 
