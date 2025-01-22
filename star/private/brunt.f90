@@ -56,12 +56,13 @@
 
          ierr = 0
          nz = s% nz
-
-         if (.not. s% calculate_Brunt_B) then
-            call set_nan(s% brunt_B(1:nz))
-            call set_nan(s% unsmoothed_brunt_B(1:nz))
-            return
+         
+         if (s% fill_arrays_with_nans) then
+            call set_nan(s% brunt_B(nzlo:nzhi))
+            call set_nan(s% unsmoothed_brunt_B(nzlo:nzhi))
          end if
+
+         if (.not. s% calculate_Brunt_B) return 
 
          if (s% use_other_brunt) then
             call s% other_brunt(s% id, ierr)
@@ -88,6 +89,7 @@
          end do
 
          allocate(smoothing_array(nz))
+         if(s% fill_arrays_with_nans) call fill_with_nans(smoothing_array)
          call smooth_brunt_B(smoothing_array)
          if (s% use_other_brunt_smoothing) then
             call s% other_brunt_smoothing(s% id, ierr)
@@ -132,15 +134,20 @@
          ierr = 0
          nz = s% nz
 
-         if (.not. (s% calculate_Brunt_B .and. s% calculate_Brunt_N2)) then
-            call set_nan(s% brunt_N2(1:nz))
-            call set_nan(s% brunt_N2_composition_term(1:nz))
-            return
+         if (s% fill_arrays_with_NaNs) then
+            call set_nan(s% brunt_N2(nzlo:nzhi))
+            call set_nan(s% brunt_N2_composition_term(nzlo:nzhi))
          end if
 
-         allocate(rho_P_chiT_chiRho(nz), rho_P_chiT_chiRho_face(nz))
+         if (.not. (s% calculate_Brunt_B .and. s% calculate_Brunt_N2)) return
 
-         do k=1,nz
+         allocate(rho_P_chiT_chiRho(nz), rho_P_chiT_chiRho_face(nz))
+         if(s% fill_arrays_with_NaNs) then
+            call fill_with_nans(rho_P_chiT_chiRho)
+            call fill_with_nans(rho_P_chiT_chiRho_face)
+         end if
+
+         do k=nzlo,nzhi
             rho_P_chiT_chiRho(k) = (s% rho(k)/s% Peos(k))*(s% chiT(k)/s% chiRho(k))
             ! correct for difference between gravitational mass density and baryonic mass density (rho)
             if (s% use_mass_corrections) then
@@ -156,7 +163,7 @@
             return
          end if
 
-         do k=1,nz ! clip B and calculate N^2 from B
+         do k=nzlo,nzhi ! clip B and calculate N^2 from B
             if (abs(s% brunt_B(k)) < s% min_magnitude_brunt_B .or. &
                   s% gradT(k) == 0 .or. is_bad(s% gradT_sub_grada(k))) then
                s% brunt_B(k) = 0
@@ -178,7 +185,7 @@
          end do
 
          if (s% brunt_N2_coefficient /= 1d0) then
-            do k=1,nz
+            do k=nzlo,nzhi
                s% brunt_N2(k) = s% brunt_N2_coefficient*s% brunt_N2(k)
                s% brunt_N2_composition_term(k) = &
                   s% brunt_N2_coefficient*s% brunt_N2_composition_term(k)
@@ -210,6 +217,12 @@
          species = s% species
 
          allocate(T_face(nz), rho_face(nz), chiT_face(nz), chiRho_face(nz))
+         if(s% fill_arrays_with_nans) then
+            call fill_with_nans(T_face)
+            call fill_with_nans(rho_face)
+            call fill_with_nans(chiT_face)
+            call fill_with_nans(chiRho_face)
+         end if
 
          call get_face_values(s, s% chiT, chiT_face, ierr)
          if (ierr /= 0) return
