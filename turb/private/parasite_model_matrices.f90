@@ -36,7 +36,7 @@ module parasite_model_matrices
 
 contains
 
-   subroutine build_parasite_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity)
+   subroutine build_parasite_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity, reorder)
 
       real(dp), intent(in)               :: w
       real(dp), intent(in)               :: k_z
@@ -50,14 +50,26 @@ contains
       integer, intent(in)                :: N
       real(dp), allocatable, intent(out) :: L(:,:)
       character(*), intent(in), optional :: parity
+      logical, intent(in), optional      :: reorder
 
-      real(dp) :: E_psi
-      real(dp) :: E_T
-      real(dp) :: E_C
-      logical  :: parity_switch
-      integer  :: i
-      integer  :: m
-      real(dp) :: B(4,4)
+      logical :: reorder_
+
+      real(dp)             :: E_psi
+      real(dp)             :: E_T
+      real(dp)             :: E_C
+      integer              :: s
+      logical              :: parity_switch
+      integer              :: i
+      integer              :: m
+      real(dp)             :: B(4,4)
+      integer, allocatable :: j(:)
+      integer              :: k
+
+      if (PRESENT(reorder)) then
+         reorder_ = reorder
+      else
+         reorder_ = .TRUE.
+      end if
 
       ! Build the parasite model matrix
 
@@ -78,7 +90,9 @@ contains
             stop '** invalid parity in build_parasite_matrix'
          end select
 
-         allocate(L(4*N+2,4*N+2))
+         s = 2*(2*N+1)
+
+         allocate(L(s,s))
          L = 0._dp
 
          i = 1
@@ -136,9 +150,46 @@ contains
 
          end do split_block_loop
 
+         ! If necessary, reorder the matrix elements to improve
+         ! numerical stability of the eigenvalue solver
+
+         if (reorder_) then
+
+            if (parity_switch) then
+
+               A = A(s:1:-1,s:1:-1)
+
+            else
+
+               allocate(j(s))
+
+               i = 1
+
+               do k = 1, N
+
+                  j(i) = 4*(N-k) + 3
+                  j(i+1) = j(i) + 1
+                  j(i+2) = j(i) + 2
+                  j(i+3) = j(i) + 3
+
+                  i = i + 4
+
+               end do
+
+               j(i) = 1
+               j(i+1) = j(i) + 1
+
+               A = A(j,j)
+
+            end if
+
+         end if
+
       else
 
-         allocate(L(8*N+4,8*N+4))
+         s = 4*(2*N+1)
+
+         allocate(L(s,s))
          L = 0._dp
 
          i = 1
@@ -158,6 +209,37 @@ contains
             i = i + 4
 
          end do full_block_loop
+
+         ! If necessary, reorder the matrix elements to improve
+         ! numerical stability of the eigenvalue solver
+
+         if (reorder_) then
+
+            allocate(j(s))
+
+            i = 1
+
+            do k = 1, 2*N+1
+
+               if (MOD(k, 2) == 0) then
+                  j(i) = 2*(4*N-k) + 5
+                  j(i+1) = j(i) + 1
+                  j(i+2) = j(i) + 2
+                  j(i+3) = j(i) + 3
+               else
+                  j(i) = 2*(k-1) + 1
+                  j(i+1) = j(i) + 1
+                  j(i+2) = j(i) + 2
+                  j(i+3) = j(i) + 3
+               endif
+
+               i = i + 4
+
+            end do
+
+            A = A(j,j)
+
+         end if
 
       end if
 
