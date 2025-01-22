@@ -176,12 +176,12 @@ contains
    end function eval_irot
 
    ! deformation
-   subroutine roche_fp_ft(id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+   subroutine roche_fp_ft(id, nz, r, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
       integer, intent(in) :: id, nz
-      real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
+      real(dp), intent(in) :: r(:) ! (nz)
       logical, intent(in) :: report_ierr
       real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
-      type (auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)
+      type (auto_diff_real_star_order1), intent(out) :: fp(:), ft(:)
       integer, intent(out) :: ierr
 
       type (star_info), pointer :: s

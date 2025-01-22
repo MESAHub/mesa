@@ -297,7 +297,11 @@
 
          r00 = get_r_from_xh(s,k)
 
-         call eval_i_rot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+         if (associated(s% binary_other_irot)) then
+            call s% binary_other_irot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+         else
+            call eval_i_rot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+         end if
       end subroutine update1_i_rot_from_xh
 
       subroutine use_xh_to_update_i_rot(s)
@@ -485,13 +489,17 @@
          call set_i_rot(s, skip_w_div_w_crit_roche)
          call set_omega(s, 'set_rotation_info')
 
-         if (.not. s% use_other_eval_fp_ft) then
-            call eval_fp_ft( &
-                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
-                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
-         else
+         if (s% use_other_eval_fp_ft) then
             call s% other_eval_fp_ft( &
-                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% ft_rot, s% fp_rot, &
+                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% fp_rot, s% ft_rot, &
+                  s% r_polar, s% r_equatorial, s% report_ierr, ierr)
+         else if (associated(s% binary_other_fp_ft)) then
+            call s% binary_other_fp_ft(&
+                  s% id, s% nz, s% r, s% fp_rot, s% ft_rot, s% r_polar, s% r_equatorial, &
+                  s% report_ierr, ierr)
+         else
+            call eval_fp_ft( &
+                  s% id, s% nz, s% m, s% r, s% rho, s% omega, s% fp_rot, s% ft_rot, &
                   s% r_polar, s% r_equatorial, s% report_ierr, ierr)
          end if
          if (ierr /= 0) then
@@ -661,11 +669,11 @@
       !  RHO   Density [gram/cm^3]
       !  AW    Angular velocity [rad/sec]
       ! Output variables:
-      !  Correction factor FT at each meshpoint
-      !  Correction factor FP at each meshpoint
+      !  Correction factor Fp at each meshpoint
+      !  Correction factor Ft at each meshpoint
       !  r_polar, r_equatorial at each meshpoint
       subroutine eval_fp_ft( &
-            id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+            id, nz, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
          use auto_diff_support
          integer, intent(in) :: id

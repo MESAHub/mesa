@@ -1161,24 +1161,24 @@
             integer, intent(out) :: ierr
          end subroutine binary_other_torque_interface
 
-         subroutine binary_other_fp_ft_interface(id, nz, xm, r, rho, aw, ft, fp, &
+         subroutine binary_other_fp_ft_interface(id, nz, r, fp, ft, &
             r_polar, r_equatorial, report_ierr, ierr)
             use const_def, only: dp
             use auto_diff, only: auto_diff_real_star_order1
 
             integer, intent(in) :: id, nz
-            real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
+            real(dp), intent(in) :: r(:) ! (nz)
             logical, intent(in) :: report_ierr
             real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
-            type (auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)
+            type (auto_diff_real_star_order1), intent(out) :: fp(:), ft(:)
             integer, intent(out) :: ierr
          end subroutine binary_other_fp_ft_interface
 
-         subroutine binary_other_irot_interface(id, k, r00, w_div_w_crit_roche, i_rot)
+         subroutine binary_other_irot_interface(id, k, r, w_div_w_crit_roche, i_rot)
             use const_def, only: dp
             use auto_diff, only: auto_diff_real_star_order1
             integer, intent(in) :: id, k
-            real(dp), intent(in) :: r00, w_div_w_crit_roche
+            real(dp), intent(in) :: r, w_div_w_crit_roche
             type (auto_diff_real_star_order1), intent(out) :: i_rot
          end subroutine binary_other_irot_interface
 
