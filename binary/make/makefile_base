@@ -47,6 +47,7 @@ SRCS = \
    binary_wind.f90 \
    binary_mdot.f90 \
    binary_tides.f90 \
+   binary_roche_deformation.f90 \
    binary_edot.f90 \
    binary_ctrls_io.f90 \
    binary_irradiation.f90 \
