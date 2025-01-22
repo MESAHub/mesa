@@ -36,7 +36,7 @@ module parasite_model_matrices
 
 contains
 
-   subroutine build_parasite_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity, reorder)
+   subroutine build_parasite_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity)
 
       real(dp), intent(in)               :: w
       real(dp), intent(in)               :: k_z
@@ -50,9 +50,8 @@ contains
       integer, intent(in)                :: N
       real(dp), allocatable, intent(out) :: L(:,:)
       character(*), intent(in), optional :: parity
-      logical, intent(in), optional      :: reorder
 
-      logical :: reorder_
+      logical, parameter :: reorder = .TRUE.
 
       real(dp)             :: E_psi
       real(dp)             :: E_T
@@ -64,12 +63,6 @@ contains
       real(dp)             :: B(4,4)
       integer, allocatable :: j(:)
       integer              :: k
-
-      if (PRESENT(reorder)) then
-         reorder_ = reorder
-      else
-         reorder_ = .TRUE.
-      end if
 
       ! Build the parasite model matrix
 
@@ -153,11 +146,11 @@ contains
          ! If necessary, reorder the matrix elements to improve
          ! numerical stability of the eigenvalue solver
 
-         if (reorder_) then
+         if (reorder) then
 
             if (parity_switch) then
 
-               A = A(s:1:-1,s:1:-1)
+               L = L(s:1:-1,s:1:-1)
 
             else
 
@@ -179,7 +172,7 @@ contains
                j(i) = 1
                j(i+1) = j(i) + 1
 
-               A = A(j,j)
+               L = L(j,j)
 
             end if
 
@@ -213,7 +206,7 @@ contains
          ! If necessary, reorder the matrix elements to improve
          ! numerical stability of the eigenvalue solver
 
-         if (reorder_) then
+         if (reorder) then
 
             allocate(j(s))
 
@@ -237,7 +230,7 @@ contains
 
             end do
 
-            A = A(j,j)
+            L = L(j,j)
 
          end if
 
