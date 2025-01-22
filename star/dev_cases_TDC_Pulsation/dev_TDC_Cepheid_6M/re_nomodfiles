@@ -36,6 +36,8 @@ then
     exit 1
 fi
 
+make
+
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
-./star $2
+./build/bin/star $2
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
