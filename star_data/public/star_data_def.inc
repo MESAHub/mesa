@@ -390,9 +390,9 @@
       ! interfaces for procedure pointers
       abstract interface
       
-      
-      
-      
+
+
+
          integer function id_only_function_interface(id)
             integer, intent(in) :: id
          end function id_only_function_interface
@@ -401,7 +401,7 @@
             integer, intent(in) :: id
          end subroutine id_only_subroutine_interface
       
-      
+
          subroutine extras_startup_interface(id,restart,ierr)
             integer, intent(in) :: id
             integer, intent(out) :: ierr
@@ -1160,6 +1160,27 @@
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine binary_other_torque_interface
-                  
+
+         subroutine binary_other_fp_ft_interface(id, nz, xm, r, rho, aw, ft, fp, &
+            r_polar, r_equatorial, report_ierr, ierr)
+            use const_def, only: dp
+            use auto_diff, only: auto_diff_real_star_order1
+
+            integer, intent(in) :: id, nz
+            real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
+            logical, intent(in) :: report_ierr
+            real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
+            type (auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)
+            integer, intent(out) :: ierr
+         end subroutine binary_other_fp_ft_interface
+
+         subroutine binary_other_irot_interface(id, k, r00, w_div_w_crit_roche, i_rot)
+            use const_def, only: dp
+            use auto_diff, only: auto_diff_real_star_order1
+            integer, intent(in) :: id, k
+            real(dp), intent(in) :: r00, w_div_w_crit_roche
+            type (auto_diff_real_star_order1), intent(out) :: i_rot
+         end subroutine binary_other_irot_interface
+
       end interface
 
