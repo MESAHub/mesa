@@ -50,7 +50,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := eos_def.mod eos_lib.mod
 INSTALL_INCLUDES := public/helm_def.dek
-INSTALL_COMMANDS += install-free-eos install-cms install-dt install-pc
+EXTRACT_DATA_COMMANDS += install-free-eos install-cms install-dt install-pc
 
 include $(MAKE_DIR)/Makefile
 
