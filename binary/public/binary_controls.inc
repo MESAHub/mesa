@@ -153,6 +153,9 @@ real(dp) :: CE_fixed_lambda
 logical :: keep_donor_fixed
 real(dp) :: mdot_limit_donor_switch
 logical :: use_tidal_deformation
+real(dp) :: f_sync_switch_from_rot_defor
+real(dp) :: f_sync_switch_width
+real(dp) :: f_sync_switch_lim
 logical :: use_other_rlo_mdot
 logical :: use_other_check_implicit_rlo
 logical :: use_other_implicit_function_to_solve
