@@ -27,7 +27,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := colors_def.mod colors_lib.mod
 INSTALL_INCLUDES :=
-INSTALL_COMMANDS += install-colors-data
+EXTRACT_DATA_COMMANDS += install-colors-data
 
 include $(MAKE_DIR)/Makefile
 

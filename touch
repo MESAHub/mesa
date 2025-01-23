@@ -1,32 +1,8 @@
 #!/usr/bin/env bash
 
-function check_okay {
-	if [ $? -ne 0 ]
-	then
-	  echo "FAILED"
-		exit 1
-	fi
-}
-
-function do_one {
-	cd "$1" || exit
-	check_okay
-	echo "cleaning" "$1"
-	./clean
-	check_okay
-	cd ..
-}
+set -euo pipefail
 
 make clean
-check_okay
-
-echo "cleaning lib directory."
-rm -rf lib
-mkdir lib
-
-echo "cleaning include directory."
-rm -rf include
-mkdir include
 
 echo "cleaning rates_data/cache."
 rm -rf data/rates_data/cache
