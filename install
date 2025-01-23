@@ -258,7 +258,6 @@ then
 fi
 
 # Check mesasdk version
-<<<<<<< HEAD
 if [ ! -z "$MESASDK_ROOT" ]; then
     if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
 	MINIMUM_VERSION=25.12.1
