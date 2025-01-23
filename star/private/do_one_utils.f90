@@ -92,8 +92,8 @@
          write(*,'(a)') "      'lg_LH' is log10 total PP and CNO hydrogen burning power (Lsun),"
          write(*,'(a)') "      'lg_L3a' is log10 total triple-alpha helium burning power (Lsun),"
          write(*,'(a)') "      'lg_gsurf' is log10 surface gravity,"
-         write(*,'(a)') "      'lg_LNuc' is log10 nuclear power (Lsun),"
-         write(*,'(a)') "      'lg_LNeu' is log10 total neutrino power (Lsun),"
+         write(*,'(a)') "      'lg_Lnuc' is log10 nuclear power (Lsun),"
+         write(*,'(a)') "      'lg_Lneu' is log10 total neutrino power (Lsun),"
          write(*,'(a)') "      'lg_Lphoto' is log10 total photodisintegration (Lsun),"
          write(*,'(a)') "      'Mass' is the total stellar baryonic mass (Msun),"
          write(*,'(a)') "      'lg_Mdot' is log10 magnitude of rate of change of mass (Msun/year),"
@@ -151,7 +151,7 @@
             '___________________________________________________________________________'
          write(io,'(A)')
          write(io,'(a)') &
-            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc     Mass       ' // &
+            '       step    lg_Tmax     Teff     lg_LH      lg_Lnuc_tot     Mass       ' // &
             'H_rich     H_cntr     N_cntr     Y_surf   eta_cntr   zones  retry'
 
          ! note that if the age is in days, then the timestep is automatically in seconds.
