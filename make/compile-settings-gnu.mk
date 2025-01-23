@@ -7,7 +7,10 @@ FLAGS_CODE_SANITY := \
   -fstack-clash-protection \
   -fcheck=bounds \
   -D_FORTIFY_SOURCE=2
-FFLAGS_FP_SANITY := -finit-real=snan -finit-derived -ffpe-trap=invalid,overflow,zero
+FFLAGS_FP_SANITY := -finit-real=snan -finit-derived
+ifeq ($(WITH_FPE_CHECKS),yes)
+FFLAGS_FP_SANITY += -ffpe-trap=invalid,overflow,zero
+endif
 FFLAGS_FORTRAN_SANITY := -std=f2008 -ffree-line-length-none -ffixed-line-length-none -Wno-unused-dummy-argument -Wno-compare-reals -Wno-do-subscript
 FLAGS_REPRO := -ffp-contract=off
 FFLAGS_PREPROCESSOR := -cpp
