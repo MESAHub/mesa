@@ -212,7 +212,7 @@ SRCS_CHECK = test/src/run.f90 test/src/run_star_extras.f90
 INTERNAL_DEPENDS_ON := const utils star_data ionization atm turb auto_diff
 BINTYPE := static-lib
 INCLUDE_DIRS := -Iprivate -Ipublic -Idefaults -Ijob
-CHECK_DIFF_PROG := bash -c "diff -b <(grep 'stop because star_age >= max_age' \$$1) \$$2" diff
+CHECK_FILTER_PROG := grep 'stop because star_age >= max_age'
 
 # Testing
 
