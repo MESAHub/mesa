@@ -22,7 +22,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := ionization_def.mod ionization_lib.mod
 INSTALL_INCLUDES :=
-INSTALL_COMMANDS += install-ionization-data
+EXTRACT_DATA_COMMANDS += install-ionization-data
 
 include $(MAKE_DIR)/Makefile
 
