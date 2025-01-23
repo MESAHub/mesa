@@ -202,6 +202,7 @@
          ! miscellaneous controls
          keep_donor_fixed, &
          mdot_limit_donor_switch, &
+         use_tidal_deformation, &
          use_other_rlo_mdot, &
          use_other_check_implicit_rlo, &
          use_other_implicit_function_to_solve, &
@@ -511,6 +512,7 @@
          ! miscellaneous controls
          b% keep_donor_fixed = keep_donor_fixed
          b% mdot_limit_donor_switch = mdot_limit_donor_switch
+         b% use_tidal_deformation = use_tidal_deformation
          b% use_other_rlo_mdot = use_other_rlo_mdot
          b% use_other_check_implicit_rlo = use_other_check_implicit_rlo
          b% use_other_implicit_function_to_solve = use_other_implicit_function_to_solve
@@ -705,6 +707,7 @@
          ! miscellaneous controls
          keep_donor_fixed = b% keep_donor_fixed
          mdot_limit_donor_switch = b% mdot_limit_donor_switch
+         use_tidal_deformation = b% use_tidal_deformation
          use_other_rlo_mdot = b% use_other_rlo_mdot
          use_other_check_implicit_rlo = b% use_other_check_implicit_rlo
          use_other_implicit_function_to_solve = b% use_other_implicit_function_to_solve

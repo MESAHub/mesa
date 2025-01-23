@@ -49,9 +49,9 @@
 
 
 ! initial_eccentricity
-! ~~~~~~~~~~~~~~~~~~~~
 
 ! Initial eccentricity of the system
+! ~~~~~~~~~~~~~~~~~~~~
 
 ! ::
 
@@ -1461,6 +1461,19 @@
 
     mdot_limit_donor_switch = 1d-20
 
+
+! use_tidal_deformation
+! ~~~~~~~~~~~~~~~~~~~~~
+
+! use the tidal deformation corrections fp/ft and the specific moments of inertia irot
+! based on binary Roche geometry integrations of Fabry et al., 2022, A&A 661, A123
+! this uses the methodology of Kippenhahn and Thomas, 1970, and Endal and Sofia, 1976 to represent
+! the stellar stucture on equipotential surfaces. In these coordinates, all radii are volume equivalent
+! radii.
+
+! ::
+
+   use_tidal_deformation = .false.
 
 ! use_other_{hook}
 ! ~~~~~~~~~~~~~~~~
