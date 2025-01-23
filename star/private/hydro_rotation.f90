@@ -168,21 +168,24 @@
 
       end function w_div_w_roche_jrot
 
-      subroutine eval_i_rot(s,k,r00,w_div_w_crit_roche, i_rot)
+      subroutine eval_i_rot(id, r00, w_div_w_crit_roche, i_rot)
          use auto_diff_support
-         type (star_info), pointer :: s
-         integer, intent(in) :: k ! just for debugging
-         real(dp), intent(in) :: r00,w_div_w_crit_roche
-         type(auto_diff_real_star_order1), intent(out) :: i_rot
 
-         type(auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, lg_one_sub_w4, B, A
+         integer, intent(in) :: id
+         real(dp), intent(in) :: r00,w_div_w_crit_roche
+         type (auto_diff_real_star_order1), intent(out) :: i_rot
+
+         type (star_info), pointer :: s
+         type (auto_diff_real_2var_order1) :: ir, r, re, w, w2, w4, w6, lg_one_sub_w4, B, A
+         integer :: ierr
 
          include 'formats'
 
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+
          i_rot = 0d0
-         if (s% use_other_eval_i_rot) then
-            call s% other_eval_i_rot(s% id,k,r00,w_div_w_crit_roche, i_rot)
-         else if (s% simple_i_rot_flag) then
+         if (s% simple_i_rot_flag) then
             i_rot = (2d0/3d0)*r00*r00
             i_rot% d1Array(i_lnR_00) = 2*i_rot% val
             i_rot% d1Array(i_w_div_wc_00) = 0d0
@@ -226,7 +229,11 @@
                   w_div_w_roche_jrot(s% r(k),s% m(k),s% j_rot(k),s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
             end if
-            call eval_i_rot(s, k, s% r(k), s% w_div_w_crit_roche(k), s% i_rot(k))
+            if (associated(s% binary_other_irot)) then
+               call s% binary_other_irot(s% id, s% r(k), s% i_rot(k))
+            else
+               call eval_i_rot(s% id, s% r(k), s% w_div_w_crit_roche(k), s% i_rot(k))
+            end if
          end do
 !$OMP END PARALLEL DO
 
@@ -298,9 +305,9 @@
          r00 = get_r_from_xh(s,k)
 
          if (associated(s% binary_other_irot)) then
-            call s% binary_other_irot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+            call s% binary_other_irot(s% id, r00, s% i_rot(k))
          else
-            call eval_i_rot(s, k, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
+            call eval_i_rot(s% id, r00, s% w_div_w_crit_roche(k), s% i_rot(k))
          end if
       end subroutine update1_i_rot_from_xh
 
@@ -317,7 +324,7 @@
             end if
          end do
          do k=1,s% nz
-            call update1_i_rot_from_xh(s,k)
+            call update1_i_rot_from_xh(s, k)
          end do
       end subroutine use_xh_to_update_i_rot
 

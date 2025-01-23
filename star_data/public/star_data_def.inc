@@ -1174,11 +1174,11 @@
             integer, intent(out) :: ierr
          end subroutine binary_other_fp_ft_interface
 
-         subroutine binary_other_irot_interface(id, k, r, w_div_w_crit_roche, i_rot)
+         subroutine binary_other_irot_interface(id, r, i_rot)
             use const_def, only: dp
             use auto_diff, only: auto_diff_real_star_order1
-            integer, intent(in) :: id, k
-            real(dp), intent(in) :: r, w_div_w_crit_roche
+            integer, intent(in) :: id
+            real(dp), intent(in) :: r
             type (auto_diff_real_star_order1), intent(out) :: i_rot
          end subroutine binary_other_irot_interface
 
