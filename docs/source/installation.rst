@@ -53,11 +53,6 @@ also an option, so long as you use ifort 14 or later. Even if you choose
 to use ifort, you should still visit the MESA SDK website to get a feel
 for the other MESA requirements.
 
-Not using the MESA SDK means you'll need to replace the file
-:file:`$MESA_DIR/utils/makefile_header` with a version customized to your
-system. There's a template to get you started at
-:file:`$MESA_DIR/utils/makefile_header_non_mesasdk`.
-
 Regardless of whether you use the MESA SDK or ifort, and whether your
 machine runs macOS or Linux, the output of MESA should be bit-for-bit
 identical.  If it's not, this is considered to be a bug. (This has
