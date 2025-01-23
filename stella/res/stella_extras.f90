@@ -12,14 +12,14 @@ program main
 
    implicit none
 
-   integer :: i,j,k,zone,denjmax,idum,ierr
+   integer :: i,j,k,zone,idum,ierr
    real(dp), allocatable,dimension(:,:) :: &
       r,v,temp,den,kap,tempr,xm,smooth,tau,lum,n_bar,n_e
    real(dp), allocatable,dimension(:) :: &
       t,m,dm,h,he,c,n,o,ne,na,mg,al,si,s,ar,ca,fe,ni
-   real(dp) :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
-   character*132 runname,filestr,fname,test_str
-   character*256 line, my_mesa_dir
+   real(dp) :: dum,time,sum_tau,tauph,tau_extra,gdepos
+   character(132) filestr,fname,test_str
+   character(256) line, my_mesa_dir
 
    real(dp), parameter :: &
       A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023, Z_div_X_solar = 0.02293d0, &
@@ -30,25 +30,25 @@ program main
    real(dp) :: bcxmin(num_logTs), bcxmax(num_logTs), Ts(num_logTs)
    real(dp) :: bcymin(num_logRhos), bcymax(num_logRhos)
    real(dp) :: time_lbol(max_lbol), logL_lbol(max_lbol), t0, logL_lbol_max
-   real(dp), pointer, dimension(:) :: logRhos, logTs, tau_sob_f1, tau_sob_values
+   real(dp), pointer, dimension(:) :: logRhos, logTs, tau_sob_f1
    real(dp), pointer :: tau_sob_f(:,:,:)
-   real(dp) :: tau_prev, tau_sob_prev, alfa, beta, L_div_Lsun, &
+   real(dp) :: tau_sob_prev, alfa, beta, L_div_Lsun, &
       v_sob_hi_tau, m_sob_hi_tau, r_sob_hi_tau, &
       v_sob_med_tau, m_sob_med_tau, r_sob_med_tau, &
       v_sob_lo_tau, m_sob_lo_tau, r_sob_lo_tau, &
-      m_center, r_center, m_edge, r_edge, v_edge, &
+      m_center, r_center, &
       star_mass, mass_IB, skip, Lbol, logRho, logT, eta, &
       density, temperature, n_Fe, tau_sob, time_sec, fval(6), &
       rphot, mphot, log_g, Xsurf, Ysurf, Zsurf, Fe_H, Z_div_X, &
       bb_magU, bb_magB, bb_magV, bb_magR, bb_magI
-   integer :: nm, num_models, cnt, k_phot, iday
+   integer :: nm, num_models, k_phot, iday
 
    my_mesa_dir = '../..'
    call const_init(my_mesa_dir,ierr)
-	if (ierr /= 0) then
-	   write(*,*) 'const_init failed'
-	   call mesa_error(__FILE__,__LINE__)
-	end if
+   if (ierr /= 0) then
+      write(*,*) 'const_init failed'
+      call mesa_error(__FILE__,__LINE__)
+   end if
 
    call math_init()
 
@@ -57,7 +57,7 @@ program main
       (/ n_colors /), ierr)
    if (ierr /= 0) then
       write(*,*) 'colors_init failed during initialization'
-      return
+      call mesa_error(__FILE__,__LINE__)
    end if
 
    ! setup interpolation table for tau sob eta
@@ -125,8 +125,8 @@ program main
    tauph=2d0/3d0
    tau_extra = 5d0
 
-   if (iargc() > 0) then
-      call GetArg(1,filestr)
+   if (command_argument_count() > 0) then
+      call get_command_argument(1,filestr)
    else
       filestr = 'mesa'
    end if
@@ -198,7 +198,7 @@ program main
          !   call mesa_error(__FILE__,__LINE__)
          !end if
          dum = interp_logLbol(time)
-         write(24,'(99(1pe18.6,x))') time-t0, dum, log10(gdepos*1d50)
+         write(24,'(99(1pe18.6,1x))') time-t0, dum, log10(gdepos*1d50)
       end do
    end do
 
@@ -244,13 +244,13 @@ program main
 
    write(23,'(a)') '# photosphere.  bb_mag* are synthetic color magnitudes from mesa/colors.' &
      // '  see mesa.tt for stella color magnitudes from multiband rad-hydro.'
-   write(23,'(a4,99(a18,x))') 'k', 't post max Lbol', 'radius(cm)', 'v(km/s)', 'mass(Msun)', &
+   write(23,'(a4,99(a18,1x))') 'k', 't post max Lbol', 'radius(cm)', 'v(km/s)', 'mass(Msun)', &
       'logT', 'rho', 'kap', 'h', 'he', 'o', 'fe', 'tau_IB', 'Lbol', &
       'bb_magU', 'bb_magB', 'bb_magV', 'bb_magR', 'bb_magI', 'T_rad'
 
    write(24,'(a,3f8.3)') '# v where tau Sob for FeII 5169 is (low,medium,high) ', &
       tau_sob_lo, tau_sob_med, tau_sob_hi
-   write(24,'(5x,99(a18,x))') &
+   write(24,'(5x,99(a18,1x))') &
       't post max Lbol', 'v_tau_lo', 'v_tau_med', 'v_tau_hi', 'rho', 'T', 'eta', &
       'm_tau_lo', 'r_tau_lo', 'm_tau_med', 'r_tau_med', 'm_tau_hi', 'r_tau_hi'
    write(27,'(99(a13))') 't-t0', 'tau', 'rho', 'T', 'r', 'v'
@@ -363,7 +363,7 @@ program main
                bb_magV = get1_synthetic_color_abs_mag('bb_V')
                bb_magR = get1_synthetic_color_abs_mag('bb_R')
                bb_magI = get1_synthetic_color_abs_mag('bb_I')
-               write(23,'(i5,99(1pe18.6,x))') j, time-t0, &
+               write(23,'(i5,99(1pe18.6,1x))') j, time-t0, &
                   rphot, (alfa*v(j,nm)+beta*v(j-1,nm))*1d3, mphot, logT, &
                   alfa*den(j,nm)+beta*den(j-1,nm), alfa*kap(j,nm)+beta*kap(j-1,nm), &
                   Xsurf, Ysurf, alfa*o(j)+beta*o(j-1), alfa*fe(j)+beta*fe(j-1), &
@@ -438,7 +438,7 @@ program main
             m_sob_hi_tau = star_mass - (alfa*xm(k,nm) + beta*xm(k+1,nm))
             r_sob_hi_tau = alfa*r(k,nm) + beta*r(k+1,nm)
             if (k > k_phot - 10) &
-               write(24,'(i5,99(1pe18.4,x))') k,time-t0, &
+               write(24,'(i5,99(1pe18.4,1x))') k,time-t0, &
                   v_sob_lo_tau*1d3, v_sob_med_tau*1d3, v_sob_hi_tau*1d3, &
                   10**logRho, 10**logT, eta, &
                   m_sob_lo_tau, r_sob_lo_tau, &
@@ -526,7 +526,7 @@ program main
 
       integer, parameter :: io = 26, ncol = 36
       real(dp) :: tnm, t1, t2, alfa, beta, data1(ncol), data2(ncol)
-      integer :: k, i, nm1, nm2
+      integer :: k, nm1, nm2
       character (len=132) :: fname
       include 'formats'
 
