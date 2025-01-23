@@ -42,7 +42,6 @@ You can use this for example to make a grid of models, and e.g. include the outp
 # copy over a new work directory 
 shmesa work "grid_dir"
 cd grid_dir
-./mk
 
 # output asteroseismic quantities in `LOGS/history.data` 
 shmesa defaults delta_nu nu_max
@@ -54,7 +53,7 @@ for M in 1.0 1.5 2.0; do
             initial_mass $M \
             Zbase $Z \
             initial_z $Z
-        ./star inlist_project 
+        ./rn
         mv LOGS "M='$M'_'Z='$Z'" 
     done 
 done 
