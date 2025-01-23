@@ -261,7 +261,7 @@ fi
 if [ ! -z "$MESASDK_ROOT" ]; then
     if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
 	MINIMUM_VERSION=20.3.1
-	VERSION_CHECK=$(echo $($MESA_DIR/utils/check_sdk_version $MINIMUM_VERSION))
+	VERSION_CHECK=$(echo $($MESA_DIR/scripts/check_sdk_version $MINIMUM_VERSION))
 	echo MESASDK version check $VERSION_CHECK
 	if [ $VERSION_CHECK != "passed" ]; then
 	    echo Your MESASDK is too old please update to version $MINIMUM_VERSION or newer
