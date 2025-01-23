@@ -34,7 +34,6 @@ central X of 0.5. To try it yourself,
 ::
 
    cd star/test_suite/high_mass
-   ./mk
    ./rn
 
 You can do the same with any of the ``test_suite`` cases.
