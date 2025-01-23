@@ -29,7 +29,7 @@ SRCS := public/rates_def.f90 \
         private/screen5.f90 \
         private/screen_chugunov.f90 \
         private/screen.f90
-SRCS_CHECK := test/src/test_rates.f90
+SRCS_CHECK := test/src/test_rates.f90 test/src/test_screen.f90 test/src/test_weak.f90 test/src/test_ecapture.f90
 INTERNAL_DEPENDS_ON := const utils math auto_diff interp_1d interp_2d chem eos forum
 EXTERNAL_DEPENDS_ON :=
 BINTYPE := static-lib
