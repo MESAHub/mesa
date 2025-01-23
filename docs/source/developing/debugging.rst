@@ -802,40 +802,6 @@ run to get plot data
 mesh_plan.rb shows input data that was used to form the plan
 
 mesh.rb shows new mesh (with some old values interpolated to the new mesh for comparison)
-   
-
-.. _fpe:
-
-Floating point exceptions
--------------------------
-
-Floating point exceptions (fpe) occur when the code attempts to perform an illegal math operation, for instance x/0, sqrt(-1), or log(0). In these cases any number that uses the result of one of these expressions is also undefined.
-
-To test MESA for floating point exceptions we can turn on the compiler checks that will flag when an issue occurs:
-
-Set the environment variable
-
-.. code-block:: sh
-
-    MESA_FPE_CHECKS_ON=1
-
-Then run ./clean and ./install in MESA_DIR.
-
-This setting adds the following options in ``utils/makefile_header``
-
-.. literalinclude:: ../../../utils/makefile_header
-   :language: makefile
-   :start-after: ifeq ($(MESA_FPE_CHECKS_ON),1)
-   :end-before: endif
-
-and acts as if you set the controls inlist option
-
-.. code-block:: fortran
-
-      fill_arrays_with_nans = .true.
-
-to make sure you catch any uninitialized array accesses.
-
 
 Step -1: Introduce a bug (again)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

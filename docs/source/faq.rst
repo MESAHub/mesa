@@ -633,8 +633,8 @@ install step to give time for the files transferred by git lfs to properly sync.
 
 
 
-Installing Older Versions of MESA
-=================================
+Installing Older (before 25.XX) Versions of MESA
+================================================
 
 Older versions of MESA may fail to compile with more recent versions of
 the MESA SDK. There are a few possible solutions:
@@ -744,9 +744,8 @@ Why don't I see any PGPLOT output when I run MESA?
 --------------------------------------------------
 
 Make sure you have the option pgstar_flag = .TRUE. in the &star_job
-section of your input file. Also, if you're not using the SDK, make sure
-you enabled PGPLOT in your utils/makefile_header file (when using the
-SDK, PGPLOT is enabled by default).
+section of your input file. Also, if you are building without the SDK,
+make sure that you haven't disabled pgplot in ``make/defaults-module.mk``.
 
 How can I make a movie from my pgstar output?
 ---------------------------------------------
