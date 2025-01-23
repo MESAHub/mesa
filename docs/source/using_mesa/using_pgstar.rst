@@ -11,8 +11,7 @@ Devote lots of time watching models evolve. It's a fun way to learn!
 
 If you're using the MESA SDK, you should have everything you need to use
 PGSTAR. Otherwise, you need to have installed PGPLOT, Xwindows, and a
-few libraries that they need. See the ``makefile_header_non_mesasdk`` in
-``$MESA_DIR/utils`` for details. You'll find pgplot.tar.bz2 in
+few libraries that they need. You'll find pgplot.tar.bz2 in
 ``$MESA_DIR/scripts`` in case you need to install PGPLOT (thanks to Tim
 Pearson of CalTech for creating PGPLOT and giving us permission to
 distribute it with MESA).
@@ -180,7 +179,7 @@ I suggest using the test case 1M_pre_ms_to_wd. Go to the directory,
 $MESA_DIR/star/test_suite/1M_pre_ms_to_wd, and open "inlist_1.0" in your
 text editor. In the ``&star_job`` section, set ``pgstar_flag = .true.`` and
 check the ``&pgstar`` section to make sure it starts empty. Then do the
-usual ``./mk`` and ``./rn`` to start the test case.
+usual ``./rn`` to start the test case.
 
 First, open some plot windows and take a look at what's available. Just
 edit your pgstar inlist to set the "win_flag" for the plot; the changes

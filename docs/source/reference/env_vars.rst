@@ -16,10 +16,8 @@ Location of the MESA source code.
 ``GYRE_DIR``
 ~~~~~~~~~~~~
 
-Location of the GYRE source code (only needed if running GYRE).  If
-you haven't moved it from the ``$MESA_DIR`` then set as
-``GYRE_DIR=$MESA_DIR/build/gyre/src``.
-
+Location of the GYRE source code (only needed if running GYRE separately from MESA). If
+you haven't moved it from the ``$MESA_DIR`` then set as ``GYRE_DIR=$MESA_DIR/build/gyre/src``.
 
 
 Recommended
@@ -102,10 +100,10 @@ Useful things that are not environment variables.
 Command line arguments
 ~~~~~~~~~~~~~~~~~~~~~~
 
-``./star`` can accept one argument that overrides the location of the
+``./build/bin/star`` can accept one argument that overrides the location of the
 inlist file. This will also override the environment variable ``$MESA_INLIST``. ::
 
-    ./star some_other_inlist_file
+    ./build/bin/star some_other_inlist_file
 
 ``skip_build``
 ~~~~~~~~~~~~~~
@@ -129,7 +127,7 @@ If you use them and things break then stop using them.
 ``MESA_DIR_INTENTIONALLY_EMPTY``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Bypass checks done at compile time for checking if ``$MESA_DIR`` is set.
+Bypass checks done at compile time for checking if ``$MESA_DIR`` and ``MESAROOT_SDK`` is set.
 
 
 ``MESA_TEMP_CACHES_DISABLE``
@@ -149,8 +147,7 @@ This is mostly helpful on macs, as they don't generate useful backtraces.
 ``MESA_FPE_CHECKS_ON``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When set to 1 this will turn on a series of compile time checks as well as
-certain inlist options designed to catch floating point exceptions.
+When set to 1 this turns on certain inlist options designed to catch floating point exceptions.
 This should not be set during a normal run.
 
 

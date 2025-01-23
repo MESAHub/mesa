@@ -6,7 +6,7 @@ Build system
 
 The MESA build system uses ``make``, with some additional (shell) scripts. All relevant files can be found in the ``make`` subfolder, except for the main ``Makefile`` in the repository root, and the module specific make files (see :ref:`developing/build-system:Module build configuration`).
 
-Running ``make`` in the root folder will build all the modules, install relevant files, and run all the associated module tests (test suite tests will not be run). To build an individual module and all its dependencies, run ``make MODULE_NAME``. Append ``-install`` or ``-test`` to run those steps. If you don't want to try to build the dependencies, ``cd`` to the folder of that module and run ``make`` there.
+Running ``make`` in the root folder will build all the modules, install relevant files, and run all the associated module tests (test suite tests will not be run). To build an individual module and all its dependencies, run ``make MODULE_NAME``. Append ``-install`` or ``-check`` to run those steps. If you don't want to try to build the dependencies, ``cd`` to the folder of that module and run ``make`` there.
 
 Build options
 =============
@@ -19,6 +19,9 @@ The build system exposes several options to control the build process. If you wa
 * **WITH_OPENMP**: Whether to use openmp. Defaults to ``yes`` (any other value will disable openmp).
 * **WITH_CRLIBM**: Whether to use crlibm for certain math operations. Defaults to ``yes`` (any other value will disable crlibm).
 * **WITH_FPE_CHECKS**: Whether to enable FPE checks for NaNs, overflows, and division by zero. Defaults to ``no`` (set to ``yes`` to enable).
+* **WITH_GYRE**: Whether to build GYRE and include support for GYRE in MESA. Defaults to ``yes`` (any other value will disable GYRE).
+* **WITH_ADIPLS**: Whether to build ADIPLS and include support for ADIPLS in MESA. Defaults to ``yes`` (any other value will disable ADIPLS).
+* **WITH_PGSTAR**: Whether to include support for showing and saving plots with pgplot. Defaults to ``yes`` (any other value will disable pgstar/pgplot).
 
 Module build configuration
 ==========================
@@ -40,6 +43,7 @@ The following properties control building and running the tests of the module:
 * **SRCS_CHECK**: Source files that are part of the test binary. Typically, all the .f or .f90 files under ``module-name/test/src``.
 * **CHECK_RESULTS_GOLDEN**: File to compare the output from the test binary against. If this is left empty, no tests will be run.
 * **CHECK_DIFF_PROG**: For setting a different a program to compare the output to the golden output (e.g. ndiff). By default this is `diff -b`.
+* **CHECK_FILTER_PROG**: Filters the output of the executable before running the diff program. By default this uses grep to remove output from caches being initialized.
 
 Finally, we have the install settings, which control what files are made available to other modules:
 
@@ -49,7 +53,7 @@ Finally, we have the install settings, which control what files are made availab
 Conditional compilation
 -----------------------
 
-Sometimes you want to have certain files included in the compilation depending on other variables. This can be done with the usual make file syntax. For example, see the following snippet from ``math/Makefile`` which adds a source file and dependency based on whether the variable ``NOCRLIBM`` is set.
+Sometimes you want to have certain files included in the compilation depending on other variables. This can be done with the usual make file syntax. For example, see the following snippet from ``math/Makefile`` which adds a source file and dependency based on whether the variable ``WITH_CRLIBM`` is set to ``yes``.
 
 .. code-block:: make
 
@@ -66,7 +70,7 @@ All variables mentioned above can be modified in this way.
 Preprocessing
 -------------
 
-Some of the modules require some preprocessing of the FORTRAN source code. This requires setting up a make target for these files, and add the generated files to the ``SRCS_GENERATED`` or ``SRCS_CHECK_GENERATED``. These source files will be automatically prefixed with the path to the build directory, so make sure that the output files from the preprocessing are written to the build directory. The following snippet shows an example from the ``mtx`` module:
+Some of the modules require some preprocessing of the FORTRAN source code. This requires setting up a make target for these files, and add the generated files to the ``SRCS_GENERATED`` or ``SRCS_CHECK_GENERATED``. These source files will be automatically prefixed with the path to the build directory, so make sure that the output files from the preprocessing are written to the build directory. The following snippet shows an example from the ``mtx`` module (currently no longer used, but can serve as inspiration):
 
 .. code-block:: make
 
@@ -128,3 +132,8 @@ Parallel compilation
 --------------------
 
 In order to improve parallelisation, the compilation of each source file is split into two steps: generating the ``.mod`` files, and actually compiling the source code. FORTRAN ``.mod`` files describe the interface of a certain module, but do not contain the actual compiled code. In order to build dependent modules, only this ``.mod`` file is necessary. Since this file is generated much faster than compiling the module, the build system generates them in a separate step, which allows the compilation of the dependent module to start almost immediately.
+
+Work directory
+--------------
+
+Each work directory has its own build directory in the work directory itself to prevent conflicts with other work directories. The setup is similar to a normal MESA module, but does less work. For example, it will not call into the MESA build system to build required modules. Each module is also added to the include and library paths, there is no option to limit this. The details can be found in the ``make/work.mk`` script.
