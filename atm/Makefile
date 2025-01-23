@@ -25,7 +25,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := atm_def.mod atm_lib.mod
 INSTALL_INCLUDES :=
-INSTALL_COMMANDS += install-atm-data
+EXTRACT_DATA_COMMANDS += install-atm-data
 
 include $(MAKE_DIR)/Makefile
 

@@ -6,11 +6,12 @@ MAKEFLAGS += --no-builtin-variables
 .DELETE_ON_ERROR:
 .SHELLFLAGS := -eu -c
 .DEFAULT_GOAL := all
-.PHONY: clean print-mesa-deps install all check
+.PHONY: clean print-mesa-deps install all check extract-data
 
 NOCOMPILE := $(or \
   $(filter clean,$(MAKECMDGOALS)), \
   $(filter print-mesa-deps,$(MAKECMDGOALS)), \
+  $(filter extract-data,$(MAKECMDGOALS)), \
 )
 
 include $(MAKE_DIR)/helpers.mk
@@ -53,6 +54,8 @@ ifeq ($(NOCOMPILE),)
 
   include $(MAKE_DIR)/check.mk
 endif
+
+extract-data: $(EXTRACT_DATA_COMMANDS)
 
 clean:
 	@rm -rf $(BUILD_DIR_MODULE)
