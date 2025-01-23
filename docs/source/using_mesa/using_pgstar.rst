@@ -180,7 +180,7 @@ I suggest using the test case 1M_pre_ms_to_wd. Go to the directory,
 $MESA_DIR/star/test_suite/1M_pre_ms_to_wd, and open "inlist_1.0" in your
 text editor. In the &star_job section, set pgstar_flag = .true. and
 check the &pgstar section to make sure it starts empty. Then do the
-usual ./mk and ./rn to start the test case.
+usual ./rn to start the test case.
 
 First, open some plot windows and take a look at what's available. Just
 edit your pgstar inlist to set the "win_flag" for the plot; the changes

@@ -34,13 +34,16 @@ copy of the star/work directory. Let's do that for this tutorial.
 
    cp -r $MESA_DIR/star/work tutorial
 
-Now that we have our copy of the work directory, we need to compile the
-code that lives in it.
+Now that we have our copy of the work directory, we can check that the
+code that lives in it compiles properly.
 
 ::
 
    cd tutorial
-   ./mk
+   make
+
+This will also be done automatically by the run script, which we will
+encounter below
 
 Set up configuration files
 --------------------------

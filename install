@@ -100,7 +100,7 @@ then
 		echo "****************************************************************"
 		echo "*                                                              *"
 		echo "*                      MESA_DIR is not set                     *"
-		echo "*            Please set MESA_DIR and run ./mk again            *"
+		echo "*         Please set MESA_DIR and run ./install again          *"
 		echo "*                                                              *"
 		echo "*                        Please also read:                     *"
 		echo "*  http://www.astro.wisc.edu/~townsend/static.php?ref=mesasdk  *"
@@ -236,4 +236,4 @@ echo
 echo
 
 # end scope and redirect output
-} 2>&1 | tee -a $BUILD_LOG | { grep -Ev "(Leaving|Entering) directory" || true; }
+} 2>&1 | tee -a $BUILD_LOG | grep -Ev "(Leaving|Entering) directory"
