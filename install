@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -o pipefail
 
 # Create file for TestHub
 # This file will be populated during math/test
@@ -16,63 +16,6 @@ make data/version_number
 # By scoping the code in brackets we only need to write the redirect once
 # at the end of the file
 {
-
-function check_okay {
-	if [ $? -ne 0 ]
-	then
-		exit 1
-	fi
-}
-
-function do_one_parallel {
-	cd $1
-	check_okay
-	echo
-	pwd
-	echo "building $1 package."
-	echo
-	# don't use nice with ./i1 or can miss errors
-	./i1p
-	check_okay
-	cd ..
-	echo
-	if [ -f skip_build ] || [ -f "$1/skip_build" ]
-	then
-		echo "mesa/$1 has been tested and exported."
-	elif [ -f skip_test ] || [ -f "$1/skip_test" ]
-	then
-		echo "mesa/$1 has been built and exported."
-	else
-		echo "mesa/$1 has been built, tested, and exported."
-	fi
-	echo
-	echo "************************************************"
-}
-
-function do_one {
-	cd $1
-	check_okay
-	echo
-	pwd
-	echo "building $1 package."
-	echo
-	# don't use nice with ./i1 or can miss errors
-	./i1
-	check_okay
-	cd ..
-	echo
-	if [ -f skip_build ] || [ -f "$1/skip_build" ]
-	then
-		echo "mesa/$1 has been tested and exported."
-	elif [ -f skip_test ] || [ -f "$1/skip_test" ]
-	then
-		echo "mesa/$1 has been built and exported."
-	else
-		echo "mesa/$1 has been built, tested, and exported."
-	fi
-	echo
-	echo "************************************************"
-}
 
 # Block sudo access, this check should come first as if a user blindly types "sudo ./install" then MESA_DIR wont be set
 # So lets catch this error first rather then forcing them to set MESA_DIR under sudo
@@ -225,41 +168,9 @@ then
 	exit 1
 fi
 
-makedepf90 > /dev/null
-if [ $? -ne 0 ]
-then
-	echo
-	echo "*******************************************************************"
-	echo "*                                                                 *"
-	echo "*    You need to install makedepf90 before you can install mesa.  *"
-	echo "*                                                                 *"
-	echo "*                                                                 *"
-	echo "*    But only if you are not using the SDK. If you see this       *"
-	echo "*            message and are trying to use the sdk                *"
-	echo "*         then please check your environment variables            *"
-	echo "*                        are set first.                           *"
-	echo "*                                                                 *"
-	echo "*                                                                 *"
-	echo "*    The makedepf90 tar file is in the mesa/scripts directory.    *"
-	echo "*    Unpack it anywhere (tar -zxvf makedepf90-2.8.8.tar.gz),      *"
-	echo "*    and cd to the makedepf90-2.8.8 directory.                    *"
-	echo "*    Then do the usual sequence:                                  *"
-	echo "*                                                                 *"
-	echo "*           ./configure                                           *"
-	echo "*           make all                                              *"
-	echo "*           sudo make install                                     *"
-	echo "*                                                                 *"
-	echo "*    Note: 'make test' doesn't seem to work. I suggest skipping   *"
-	echo "*    that step in the makedepf90 installation.                    *"
-	echo "*                                                                 *"
-	echo "******************************************************************"
-	echo
-	exit 1
-fi
-
 # Check mesasdk version
-if [ ! -z "$MESASDK_ROOT" ]; then
-    if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
+if [ -z "$MESA_DIR_INTENTIONALLY_EMPTY" ]; then
+    if [ ! -z "$MESASDK_ROOT" ]; then
 	MINIMUM_VERSION=20.3.1
 	VERSION_CHECK=$(echo $($MESA_DIR/scripts/check_sdk_version $MINIMUM_VERSION))
 	echo MESASDK version check $VERSION_CHECK
@@ -267,6 +178,9 @@ if [ ! -z "$MESASDK_ROOT" ]; then
 	    echo Your MESASDK is too old please update to version $MINIMUM_VERSION or newer
 	    exit 1
         fi
+    else
+	echo MESASDK_ROOT enviroment variable is not set. See https://docs.mesastar.org/en/latest/installation.html#set-your-environment-variables
+	exit 1
     fi
 fi
 
@@ -292,37 +206,13 @@ function enum_procs {
     fi
 }
 
-make -Oline -j$(enum_procs)
-check_okay
-
-if [ ! -r data ]
-then
-	echo
-	echo "******************************************************************"
-	echo "*                                                                *"
-	echo "*    Please setup the current mesa data before doing ./install   *"
-	echo "*    See the mesa README file for details.                       *"
-	echo "*                                                                *"
-	echo "******************************************************************"
-	echo
-	exit 1
+make -w -Oline -j$(enum_procs)
+if [[ $? -ne 0 ]] then
+    echo
+    echo "!! MESA install failed, see above or $BUILD_LOG for details !!"
+    echo
+    exit 1
 fi
-
-function do_input_data {
-	cd $1
-	check_okay
-	echo
-	pwd
-	echo "installing mesa $1 data."
-	echo
-	# don't use nice or can miss errors
-	./build_data_and_export
-	check_okay
-	echo "$1 data successfully installed."
-	echo
-	echo "************************************************"
-	cd ..
-}
 
 echo
 echo
@@ -346,4 +236,4 @@ echo
 echo
 
 # end scope and redirect output
-} 2>&1 | tee -a $BUILD_LOG | grep -Ev "(Leaving|Entering) directory"
+} 2>&1 | tee -a $BUILD_LOG | { grep -Ev "(Leaving|Entering) directory" || true; }
