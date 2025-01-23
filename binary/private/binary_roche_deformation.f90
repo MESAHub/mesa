@@ -33,7 +33,7 @@ module binary_roche_deformation
    use auto_diff
    use star_def
    use binary_def
-   use binary_lib, only : binary_eval_rlobe
+   use binary_utils, only : eval_rlobe
 
 
    implicit none
@@ -44,7 +44,6 @@ module binary_roche_deformation
    logical :: inter_ok = .false., dbg = .true.
    integer :: num_xpts, num_ypts, num_ypts_gtr_than_1
 
-
 contains
 
    subroutine build_roche_interpolators
@@ -52,11 +51,9 @@ contains
       real(dp) :: xtest, ytest, testval
       integer :: ierr
       character(len=strlen) :: upstairs
-
       include 'formats'
-
       if (.not. inter_ok) then
-         upstairs = trim(mesa_data_dir) // 'roche_data/'  ! where fp/ft data lives
+         upstairs = trim(mesa_data_dir) // '/roche_data/'  ! where fp/ft data lives
          if (dbg) then
             write(*, 1) 'starting interpolator setup'
          end if
@@ -98,7 +95,7 @@ contains
          include 'formats'
 
          if (dbg) then
-            write(*, 1) 'loading ' // filename
+            write(*, '(a100)') 'loading ' // filename
          end if
          ! open data to interpolate
          open(newunit = iounit, file = trim(filename), status = 'old', action = 'read',&
@@ -139,12 +136,13 @@ contains
       real(dp), intent(in) :: lq
       real(dp) :: ar
       integer, intent(out) :: ierr
+
+      include 'formats'
+
       if (ar >= yvals(num_ypts)) ar = yvals(num_ypts) - 2 * nudge
       call interp_evbipm_db(lq, ar, xvals, num_xpts, yvals, num_ypts,&
             fpfunc1d, num_xpts, fp, ierr)
-      if (ierr/=0) then
-         write(*, *) "error in eval fp", ar, fp
-      end if
+      if (ierr /= 0) write(*, 1) "error in eval fp", ar, fp
    end function eval_fp
 
    real(dp) function eval_ft(lq, ar, ierr) result(ft)
@@ -153,12 +151,14 @@ contains
       real(dp), intent(in) :: lq
       real(dp) :: ar
       integer, intent(out) :: ierr
+
+      include 'formats'
+
       if (ar >= yvals(num_ypts)) ar = yvals(num_ypts) - 2 * nudge
       call interp_evbipm_db(lq, ar, xvals, num_xpts, yvals, num_ypts,&
             ftfunc1d, num_xpts, ft, ierr)
-      if (ierr/=0) then
-         write(*, *) "error in eval ft", ar, ft
-      end if
+      if (ierr /= 0) write(*, 1) "error in eval ft", ar, ft
+
    end function eval_ft
 
    real(dp) function eval_irot(lq, ar, ierr) result(irot)
@@ -167,12 +167,14 @@ contains
       real(dp), intent(in) :: lq
       real(dp) :: ar
       integer, intent(out) :: ierr
+
+      include 'formats'
+
       if (ar >= yvals(num_ypts)) ar = yvals(num_ypts) - 2 * nudge
       call interp_evbipm_db(lq, ar, xvals, num_xpts, yvals, num_ypts,&
             irotfunc1d, num_xpts, irot, ierr)
-      if (ierr/=0) then
-         write(*, *) "error in eval irot", ar, irot
-      end if
+      if (ierr /= 0) write(*, 1) "error in eval irot", ar, irot
+
    end function eval_irot
 
    ! deformation
@@ -192,7 +194,7 @@ contains
       include 'formats'
 
       if (.not. inter_ok) then
-         write(*, *) "interpolators not setup, should happen in startup"
+         write(*, 1) "interpolators not setup, should happen in startup"
          stop
       end if
 
@@ -213,7 +215,7 @@ contains
       if (m2 <= 0) m2 = b% m2 * Msun
       if (a <= 0) a = pow(standard_cgrav * (m1 + m2) * &
             pow((b% initial_period_in_days) * 86400, 2) / (4 * pi2), one_third)
-      if (r_roche <= 0) r_roche = binary_eval_rlobe(m1, m2, a)
+      if (r_roche <= 0) r_roche = eval_rlobe(m1, m2, a)
       lq = log10(m2 / m1)
 
       !$OMP PARALLEL DO PRIVATE(j, ar) SCHEDULE(dynamic,2)
@@ -233,9 +235,9 @@ contains
       !$OMP END PARALLEL DO
    end subroutine roche_fp_ft
 
-   subroutine roche_irot(id, k, r00, w_div_w_crit_roche, i_rot)
-      integer, intent(in) :: id, k
-      real(dp), intent(in) :: r00, w_div_w_crit_roche
+   subroutine roche_irot(id, r00, i_rot)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: r00
       type (auto_diff_real_star_order1), intent(out) :: i_rot
       type (star_info), pointer :: s
       type (binary_info), pointer :: b
@@ -244,21 +246,21 @@ contains
 
       ierr = 0
       call star_ptr(id, s, ierr)
-      if (ierr/=0) return
+      if (ierr /= 0) return
       call binary_ptr(s% binary_id, b, ierr)
-      if (ierr/=0) return
+      if (ierr /=0 ) return
       call assign_stars(id, this_star, other_star, ierr)
-      if (ierr/=0) return
+      if (ierr /= 0) return
 
       m1 = b% m(this_star)
       m2 = b% m(other_star)
       a = b% separation
       r_roche = b% rl(this_star)
-      if (m1 <= 0) m1 = b% m1 * Msun
-      if (m2 <= 0) m2 = b% m2 * Msun
-      if (a <= 0) a = pow(standard_cgrav * (m1 + m2) * &
-         pow((b% initial_period_in_days) * 86400, 2) / (4 * pi2), one_third)
-      if (r_roche <= 0) r_roche = binary_eval_rlobe(m1, m2, a)
+      if (m1 <= 0d0) m1 = b% m1 * Msun
+      if (m2 <= 0d0) m2 = b% m2 * Msun
+      if (a <= 0d0) a = pow(standard_cgrav * (m1 + m2) * &
+         pow((b% initial_period_in_days) * 86400d0, 2) / (4d0 * pi2), one_third)
+      if (r_roche <= 0d0) r_roche = eval_rlobe(m1, m2, a)
 !
       lq = log10(m2 / m1)
       i_rot = 0d0
@@ -273,4 +275,28 @@ contains
       end if
    end subroutine roche_irot
 
+   subroutine assign_stars(id, this_star, other_star, ierr)
+      ! determine which star is which in the binary
+      integer, intent(in) :: id
+      integer, intent(out) :: this_star, other_star, ierr
+      type (binary_info), pointer :: b
+      type (star_info), pointer :: s
+
+      ierr = 0
+      call star_ptr(id, s, ierr)
+      call binary_ptr(s% binary_id, b, ierr)
+
+      if (ierr /= 0) return
+
+      if (b% s1% id == s% id) then
+         this_star = 1
+         other_star = 2
+      else if (b% s2% id == s% id) then
+         this_star = 2
+         other_star = 1
+      else
+         ierr = 1
+      end if
+
+   end subroutine assign_stars
 end module binary_roche_deformation
