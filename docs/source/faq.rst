@@ -652,7 +652,7 @@ the MESA SDK. There are a few possible solutions:
     handful to work through). The basic workflow is
 
 -  ./install until an error turns up,
--  cd to that module and edit and ./mk until it compiles, then
+-  cd to that module and edit and make until it compiles, then
 -  go back to ./install and repeat until everything works before
 -  a final ./touch and ./install.
 
