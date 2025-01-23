@@ -21,7 +21,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := chem_def.mod chem_lib.mod
 INSTALL_INCLUDES :=
-INSTALL_COMMANDS += install-chem-data
+EXTRACT_DATA_COMMANDS += install-chem-data
 
 include $(MAKE_DIR)/Makefile
 
