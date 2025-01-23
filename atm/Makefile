@@ -12,8 +12,8 @@ SRCS := public/atm_def.f90 \
         private/atm_table.f90 \
         private/atm_utils.f90 \
         private/table_atm.f90
-SRCS_CHECK = test/src/test_atm.f
-INTERNAL_DEPENDS_ON := const math utils chem num auto_diff interp_1d interp_2d eos
+SRCS_CHECK = test/src/test_atm.f90 test/src/test_atm_setup.f90 test/src/test_atm_support.f90
+INTERNAL_DEPENDS_ON := const math utils chem num auto_diff interp_1d interp_2d eos kap
 EXTERNAL_DEPENDS_ON :=
 BINTYPE := static-lib
 

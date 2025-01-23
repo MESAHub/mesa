@@ -9,7 +9,7 @@ SRCS := public/ionization_def.f90 \
         private/ion_tables_eval.f90 \
         private/ion_table_plot.f90 \
         private/mod_ionization.f90
-SRCS_CHECK := test/src/test_ionization.f
+SRCS_CHECK := test/src/test_ionization.f90 test/src/test_ionization_support.f90
 INTERNAL_DEPENDS_ON := const utils math interp_2d chem
 EXTERNAL_DEPENDS_ON :=
 BINTYPE := static-lib
