@@ -51,5 +51,5 @@ $(BUILD_DIR_MODULE)/modules/forum_m.mod: $(BUILD_DIR_FORUM_BUILD)/build-complete
 	cp $(BUILD_DIR_FORUM_BUILD)/build/$(notdir $@) $@
 
 check:
-	pushd test > /dev/null ; ../$(BUILD_DIR_FORUM_BUILD)/build/test_order > ../$(CHECK_RESULTS); popd > /dev/null
+	cd test; ../$(BUILD_DIR_FORUM_BUILD)/build/test_order > ../$(CHECK_RESULTS)
 	diff -b $(CHECK_RESULTS) $(CHECK_RESULTS_GOLDEN)

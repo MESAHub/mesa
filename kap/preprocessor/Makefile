@@ -134,7 +134,7 @@ build-data: $(BUILD_DIR_MODULE)/kap_input_data/ logT_points $(OBJ_OUT) | $(BUILD
 	cp condtable.data $(BUILD_DIR_MODULE)/data/kap_data/
 
 $(BUILD_DIR_MODULE)/AESOPUS_AGSS09.h5: $(BUILD_DIR_MODULE)/ags09/
-	pushd $(BUILD_DIR_MODULE) > /dev/null; python $(CURDIR)/AESOPUS/aesopus.py $(CURDIR)/AESOPUS/AGSS09.yaml ; popd > /dev/null
+	cd $(BUILD_DIR_MODULE); python $(CURDIR)/AESOPUS/aesopus.py $(CURDIR)/AESOPUS/AGSS09.yaml
 
 build-aesopus: $(BUILD_DIR_MODULE)/AESOPUS_AGSS09.h5
 
