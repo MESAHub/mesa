@@ -44,7 +44,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 # Install
 
 MODULES := kap_def.mod kap_lib.mod
-INSTALL_COMMANDS += install-kap
+EXTRACT_DATA_COMMANDS += install-kap
 
 include $(MAKE_DIR)/Makefile
 

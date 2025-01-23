@@ -14,7 +14,10 @@ ${subdir}: ${DEPS} data/version_number
 ${subdir}-install: ${subdir}
 	\$(MAKE) -C ${subdir} install BUILD_DIR=\$(BUILD_DIR)
 
-${subdir}-check: ${subdir}-install \$(addsuffix -install,${DEPS})
+${subdir}-check: ${subdir} ${subdir}-extract-data \$(addsuffix -extract-data,${DEPS})
 	\$(MAKE) -C ${subdir} check BUILD_DIR=\$(BUILD_DIR)
+
+${subdir}-extract-data: ${subdir}
+	\$(MAKE) -C ${subdir} extract-data BUILD_DIR=\$(BUILD_DIR)
 EOF
 done
