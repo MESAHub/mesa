@@ -741,14 +741,20 @@
 
 
          subroutine adjust_correction( &
-               min_corr_coeff_in, max_corr_coeff, grad_f, f, slope, coeff,  &
+               min_corr_coeff_in, max_corr_coeff, grad_f1, f, slope, coeff,  &
                err_msg, ierr)
             real(dp), intent(in) :: min_corr_coeff_in
             real(dp), intent(in) :: max_corr_coeff
-            real(dp), intent(in) :: grad_f(:) ! (neq) ! gradient df/ddx at xold
+            real(dp), intent(inout), pointer :: grad_f1(:) ! (neq) ! gradient df/ddx at xold, updated to the gradient at the proposed step
             real(dp), intent(out) :: f ! 1/2 fvec^2. minimize this.
             real(dp), intent(in) :: slope
             real(dp), intent(out) :: coeff
+
+            ! Line Search Algorithm (More-Thuente, 1994)
+            ! 
+            ! The purpose of this routine is to find a step which satisfies
+            ! 1. a sufficient decrease condition, and 
+            ! 2. a curvature condition (strong Wolfe condition).
 
             ! the new correction is coeff*xscale*soln
             ! with min_corr_coeff <= coeff <= max_corr_coeff
@@ -761,11 +767,11 @@
             logical :: first_time
             real(dp) :: a1, alam, alam2, a2, disc, f2, &
                rhs1, rhs2, tmplam, fold, min_corr_coeff
-            real(dp) :: f_target
+            real(dp) :: f_target, slope_new
             logical :: skip_eval_f, dbg_adjust
 
-            real(dp), parameter :: alf = 1d-2 ! ensures sufficient decrease in f
-
+            real(dp), parameter :: alf = 1d-2  ! ensures sufficient decrease in f
+            real(dp), parameter :: eta = 0.9d0 ! ensures curvature condition (must satisfy alf < eta < 1)
             real(dp), parameter :: alam_factor = 0.2d0
 
             include 'formats'
@@ -864,8 +870,25 @@
                end if
 
                f_target = max(fold/2, fold + alf*coeff*slope)
+               ! Check the Sufficient Decrease condition
                if (f <= f_target) then
-                  return ! sufficient decrease in f
+                  !return ! sufficient decrease in f
+                  ! satisfies the sufficient decrease condition,
+                  ! so now check the curvature condition (strong Wolfe condition).
+
+                  call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+
+                  slope_new = eval_slope(nvar, nz, grad_f, soln)
+
+                  ! Check the Curvature condition
+                  if(.not. is_bad_num(slope_new) .and. slope_new < 0d0) then
+                     if (abs(slope_new) <= eta*abs(slope)) then
+                        ! satisfies the curvature condition.
+                        ! Great, both conditions are satisfied!
+                        return
+                     end if
+                  end if
+                  ! If not satisfied, we keep iterating, so fall through...
                end if
 
                if (alam <= min_corr_coeff) then
