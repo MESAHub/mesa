@@ -302,7 +302,7 @@
          ! matrix debugging.
          write (*,*) 's% model_number', s% model_number
          write (*,*) 's% model_number', s% solver_iter
-         if (.true. .and. s% model_number == 2132 .and. s% solver_iter == 24) then !  .and. .not. s% doing_relax) then
+         if (.false. .and. s% model_number == 2132 .and. s% solver_iter == 24) then !  .and. .not. s% doing_relax) then
            !write(*,*) 'inside print matrix'
 
             ! for debugging velocities.
