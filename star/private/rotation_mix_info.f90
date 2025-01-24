@@ -657,8 +657,8 @@
             Hj(1) = Hj(2); Hj(nz) = Hj(nz-1)
 
             do i = 1, nz
-               N2(i) = s%brunt_N2(i)
-               N2_mu(i) = s%brunt_N2_composition_term(i)
+               N2(i) = s% brunt_N2(i)
+               N2_mu(i) = s% brunt_N2_composition_term(i)
                !old way ( -- 2024)
                !dlnRho_dlnP = s% grad_density(i)
                !dlnT_dlnP = s% grad_temperature(i)
