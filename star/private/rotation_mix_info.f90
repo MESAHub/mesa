@@ -659,7 +659,7 @@
             do i = 1, nz
                N2(i) = s% brunt_N2(i)
                N2_mu(i) = s% brunt_N2_composition_term(i)
-               !old way ( -- 2024)
+               !old way (--2024)
                !dlnRho_dlnP = s% grad_density(i)
                !dlnT_dlnP = s% grad_temperature(i)
                !N2(i) = -grav(i)*(1/gamma1(i) - dlnRho_dlnP)/scale_height(i)
