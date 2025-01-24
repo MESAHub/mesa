@@ -207,7 +207,7 @@ function enum_procs {
 }
 
 make -w -Oline -j$(enum_procs)
-if [[ $? -ne 0 ]] then
+if [[ $? -ne 0 ]]; then
     echo
     echo "!! MESA install failed, see above or $BUILD_LOG for details !!"
     echo
