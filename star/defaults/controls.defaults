@@ -8260,7 +8260,7 @@
       !|     if (use_flux_limiting_with_dPrad_dm_form)
       !|         flxR = 4 * pi * r^2 * abs(dT^4/dm) / kap
       !|         flxLambda = (6 + 3*flxR) / (6 + 3*flxR + flxR^2) (see Levermore & Pomraning 1981)
-      !|         L_rad = flxLambda * L_rad
+      !|         L_rad = L_rad / flxLambda
       !|         
 
       ! With the resulting ``L_rad``, determine the expected dT/dm by
