@@ -710,7 +710,10 @@
 
       integer, parameter :: p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT = p_log_du_kick_div_du + 1
 
-      integer, parameter :: p_col_id_max = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT
+      integer, parameter :: p_flux_limit_R = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT + 1
+      integer, parameter :: p_flux_limit_lambda = p_flux_limit_R + 1
+      
+      integer, parameter :: p_col_id_max = p_flux_limit_lambda
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -1396,6 +1399,9 @@
          profile_column_name(p_tau_cool) = 'tau_cool'
 
          profile_column_name(p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT) = 'lum_rad_div_L_Edd_sub_fourPrad_div_PchiT'
+
+         profile_column_name(p_flux_limit_R) = 'flux_limit_R'
+         profile_column_name(p_flux_limit_lambda) = 'flux_limit_lambda'
 
          cnt = 0
          do i=1,p_col_id_max
