@@ -1683,7 +1683,17 @@
                xx = xx + a1*a2
             end do
             eps_total_q = -m3(avo,clight,clight) * xx
+            ! XXX error here??? eps_total is really negative?
             eps_total = eps_total_q
+!            if (n% zone >= 1816 .and. n% zone <= 1819) then
+!               xx = 0.0_qp
+!               do i=1,species(plus_co56)
+!                  a1 = dydt(i)
+!                  a2 = mion(i)
+!                  xx = xx + a1*a2
+!                  write(*,*) n% zone, eps_total, i, a1, a2, xx
+!               end do
+!            end if
 
             fe56ec_fake_factor = eval_fe56ec_fake_factor( &
                n% g% fe56ec_fake_factor, n% g% min_T_for_fe56ec_fake_factor, n% temp)
