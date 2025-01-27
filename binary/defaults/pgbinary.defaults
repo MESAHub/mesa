@@ -87,15 +87,14 @@
 
       ! file_device
       ! ~~~~~~~~~~~
-      ! file_extension
-      ! ~~~~~~~~~~~~~~
 
-      ! 'png' is Portable Network Graphics format; can also use 'pdf'
+      ! 'png' for Portable Network Graphics format
+      ! 'vcps' for Color PostScript ('ps')
+      ! 'ps' for PostScript
 
       ! ::
 
    file_device = 'png'
-   file_extension = 'png'
 
 
       ! file_digits

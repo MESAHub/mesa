@@ -41,11 +41,8 @@ pgstar commands used for the plots above:
 
    pgstar_interval = 10
 
-  ! device
-
    file_white_on_black_flag = .true. 
-   file_device = 'vcps'
-   file_extension = 'ps'           
+   file_device = 'vcps'      
 
   ! two profile panels
     Profile_Panels1_win_flag = .true.

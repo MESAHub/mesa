@@ -29,10 +29,8 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
         Profile_Panels2_win_flag = .true.
         Profile_Panels2_win_width = 12

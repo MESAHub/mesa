@@ -169,6 +169,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') &
          b% pg% file_digits, b% pg% file_digits
       write(num_str, fstring) b% model_number
@@ -177,7 +178,12 @@ contains
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(b% pg% file_extension)
+      if (b%pg%file_device=='vcps') then
+         file_extension = 'ps'
+      else
+         file_extension = b%pg%file_device
+      end if
+      name = trim(name) // trim(num_str) // '.' // trim(file_extension)
    end subroutine create_file_name
 
 

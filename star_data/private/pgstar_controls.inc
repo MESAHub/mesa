@@ -10,7 +10,6 @@
       ! PGstar controls
       integer :: pgstar_interval
       character (len=32) :: file_device
-      character (len=32) :: file_extension
       integer :: file_digits
 
       real :: delta_HR_limit_for_file_output

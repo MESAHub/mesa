@@ -143,10 +143,8 @@
 
    pgstar_interval = 50
 
-   ! device
    file_white_on_black_flag = .true.
    file_device = 'vcps' ! postscript
-   file_extension = 'ps'
 
    HR_win_flag = .true. ! switch to .true. to visualize in real-time
    HR_file_flag = .true.

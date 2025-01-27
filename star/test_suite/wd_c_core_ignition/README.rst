@@ -37,10 +37,8 @@ pgstar commands used for the Part 1 plot above:
  &pgstar
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
      Abundance_win_flag = .true.
      Abundance_win_width = 12
@@ -74,10 +72,8 @@ pgstar commands used for the Part 2 plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
      TRho_win_flag = .true.
      TRho_win_width = 12
