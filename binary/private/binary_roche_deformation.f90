@@ -29,6 +29,7 @@ module binary_roche_deformation
    ! moment of inertia i_rot assuming shellularity in the Roche potential of
    ! a binary star. Follows Fabry, Marchant and Sana, 2022, A&A 661, A123.
 
+   use ieee_arithmetic, only: ieee_is_nan
    use interp_2d_lib_db
    use auto_diff
    use star_def
@@ -178,12 +179,12 @@ contains
    end function eval_irot
 
    ! deformation
-   subroutine roche_fp_ft(id, nz, r, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
-      integer, intent(in) :: id, nz
-      real(dp), intent(in) :: r(:) ! (nz)
+   subroutine roche_fp_ft(id, r, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
+      integer, intent(in) :: id
+      real(dp), intent(in) :: r
       logical, intent(in) :: report_ierr
-      real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
-      type (auto_diff_real_star_order1), intent(out) :: fp(:), ft(:)
+      real(dp), intent(inout) :: r_polar, r_equatorial
+      type (auto_diff_real_star_order1), intent(out) :: fp, ft
       integer, intent(out) :: ierr
 
       type (star_info), pointer :: s
@@ -218,21 +219,17 @@ contains
       if (r_roche <= 0) r_roche = eval_rlobe(m1, m2, a)
       lq = log10(m2 / m1)
 
-      !$OMP PARALLEL DO PRIVATE(j, ar) SCHEDULE(dynamic,2)
-      do j = 1, s% nz  ! for every cell, compute fp, ft from an interpolating table
-         ar = r(j) / r_roche
-         ! set values
-         fp(j) = eval_fp(lq, ar, ierr)
-         ft(j) = eval_ft(lq, ar, ierr)
-         ! set log derivatives
-         fp(j)% d1Array(i_lnR_00) = (eval_fp(lq, ar + nudge, ierr) - fp(j)% val) / nudge * ar
-         ft(j)% d1Array(i_lnR_00) = (eval_ft(lq, ar + nudge, ierr) - ft(j)% val) / nudge * ar
+      ar = r / r_roche
+      ! set values
+      fp = eval_fp(lq, ar, ierr)
+      ft = eval_ft(lq, ar, ierr)
+      ! set log derivatives
+      fp% d1Array(i_lnR_00) = (eval_fp(lq, ar + nudge, ierr) - fp% val) / nudge * ar
+      ft% d1Array(i_lnR_00) = (eval_ft(lq, ar + nudge, ierr) - ft% val) / nudge * ar
 !            if (fp(j) == 0d0 .or. fp(j) == 0d0) write(*, *) j, ar, fp(j), ft(j), ierr  ! debug
-         ! fix these to the current radius, they're only used for some wind mass loss enhancement
-         r_polar(j) = r(j)
-         r_equatorial(j) = r(j)
-      end do
-      !$OMP END PARALLEL DO
+      ! fix these to the current radius, they're only used for some wind mass loss enhancement
+      r_polar = r
+      r_equatorial = r
    end subroutine roche_fp_ft
 
    subroutine roche_irot(id, r00, i_rot)
@@ -259,7 +256,7 @@ contains
       if (m1 <= 0d0) m1 = b% m1 * Msun
       if (m2 <= 0d0) m2 = b% m2 * Msun
       if (a <= 0d0) a = pow(standard_cgrav * (m1 + m2) * &
-         pow((b% initial_period_in_days) * 86400d0, 2) / (4d0 * pi2), one_third)
+         pow((b% initial_period_in_days) * secday, 2) / (4d0 * pi2), one_third)
       if (r_roche <= 0d0) r_roche = eval_rlobe(m1, m2, a)
 !
       lq = log10(m2 / m1)
@@ -299,4 +296,58 @@ contains
       end if
 
    end subroutine assign_stars
+
+   ! determines by what fraction the tidal deformation corrections should be used
+   ! eg fp = f_switch * fp_tidal + (1-f_switch) * fp_single
+   ! it uses the synchronicity parameter to estimate this. When the shell is quite synchronous,
+   ! you probably want to use the tidal corrections, so f_switch -> 1, when not synchronous, the single
+   ! star rotation deformation is likely more accurate, so f_switch -> 0 in that case.
+   subroutine synchronicity(id, k, omega_in, f_switch, ierr)
+      integer, intent(in) :: id, k
+      real(dp), intent(in) :: omega_in
+      integer, intent(out) :: ierr
+      real(dp), intent(out) :: f_switch
+
+      type (star_info), pointer :: s
+      type (binary_info), pointer :: b
+      real(dp) :: omega, omega_sync, f_sync, p
+
+      include 'formats'
+
+      call star_ptr(id, s, ierr)
+      call binary_ptr(s% binary_id, b, ierr)
+      if (ierr /= 0) return
+
+      if (b% use_other_tidal_deformation_switch_function) then
+         call b% other_tidal_deformation_switch_function(id, k, omega_in, f_switch, ierr)
+         return
+      end if
+
+      p = b% period
+      if (p <= 0d0) p = b% initial_period_in_days * secday
+      omega_sync = 2*pi/p
+      if (ieee_is_nan(omega_in)) then
+         omega = 0d0
+      else if (omega_in < 0d0) then
+         omega = abs(omega_in)
+      else
+         omega = omega_in
+      end if
+      f_sync = omega / omega_sync
+      f_sync = min(f_sync, 1d0 / f_sync)  ! we could be super or sub synchronous
+
+      f_switch = 1d0 / (1d0 + exp(-b% f_sync_switch_width * (f_sync - b% f_sync_switch_from_rot_defor)))
+      ! apply limiting values if f_switch is far up (or down) the sigmoid
+      if (f_switch < b% f_sync_switch_lim) then
+         f_switch = 0d0
+      else if (1d0 - f_switch < b% f_sync_switch_lim) then
+         f_switch = 1d0
+      end if
+
+      if (ieee_is_nan(f_switch) .and. k == 1) then
+         write(*, 1) "error in synchronicity", f_switch, f_sync, omega, omega_sync, p
+         ierr = 1
+      end if
+
+   end subroutine synchronicity
 end module binary_roche_deformation
