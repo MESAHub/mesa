@@ -767,7 +767,15 @@
                val = (s% Prad(k)/s% Pgas(k))/max(1d-12,s% L(k)/get_Ledd(s,k))
             case (p_pgas_div_p)
                val = s% Pgas(k)/s% Peos(k)
-
+            case (p_flux_limit_R)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) &
+                  val = s% flux_limit_R(k)
+            case (p_flux_limit_lambda)
+               if (s% use_dPrad_dm_form_of_T_gradient_eqn .and. k > 1) then
+                  val = s% flux_limit_lambda(k)
+               else
+                  val = 1d0
+               end if
             case (p_cell_collapse_time)
                if (s% v_flag) then
                   if (k == s% nz) then

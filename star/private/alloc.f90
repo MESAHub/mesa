@@ -766,6 +766,11 @@
             call do1(s% dr_div_csound, c% dr_div_csound)
             if (failed('dr_div_csound')) exit
 
+            call do1(s% flux_limit_R, c% flux_limit_R)
+            if (failed('flux_limit_R')) exit
+            call do1(s% flux_limit_lambda, c% flux_limit_lambda)
+            if (failed('flux_limit_lambda')) exit
+
             call do1(s% ergs_error, c% ergs_error)
             if (failed('ergs_error')) exit
             call do1(s% gradr_factor, c% gradr_factor)

@@ -148,6 +148,8 @@
    !pgas ! gas pressure at center of zone (electrons and ions)
    !logPgas ! log10(pgas)
    !pgas_div_ptotal ! pgas/pressure
+   !flux_limit_lambda ! flux limiter defined as in Levermore & Pomraning 1981
+   !flux_limit_R ! flux ratio defined as in Levermore & Pomraning 1981
 
    !eta ! electron degeneracy parameter (eta >> 1 for significant degeneracy)
    !mu ! mean molecular weight per gas particle (ions + free electrons)
