@@ -66,6 +66,7 @@ contains
       use mod_other_binary_photo_write
       use mod_other_e2
       use mod_other_pgbinary_plots
+      use mod_other_tidal_deformation_switch_function
       use binary_timestep
       use binary_history
       use binary_history_specs
@@ -192,6 +193,7 @@ contains
       b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
       b% other_e2 => null_other_e2
       b% other_pgbinary_plots_info => null_other_pgbinary_plots_info
+      b% other_tidal_deformation_switch_function => null_other_tidal_deformation_switch_function
 
       b% extras_binary_startup => null_extras_binary_startup
       b% extras_binary_start_step => null_extras_binary_start_step

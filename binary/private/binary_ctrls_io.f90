@@ -206,6 +206,7 @@
          f_sync_switch_from_rot_defor, &
          f_sync_switch_width, &
          f_sync_switch_lim, &
+         use_other_tidal_deformation_switch_function, &
          use_other_rlo_mdot, &
          use_other_check_implicit_rlo, &
          use_other_implicit_function_to_solve, &
@@ -519,6 +520,7 @@
          b% f_sync_switch_from_rot_defor = f_sync_switch_from_rot_defor
          b% f_sync_switch_width = f_sync_switch_width
          b% f_sync_switch_lim = f_sync_switch_lim
+         b% use_other_tidal_deformation_switch_function = use_other_tidal_deformation_switch_function
          b% use_other_rlo_mdot = use_other_rlo_mdot
          b% use_other_check_implicit_rlo = use_other_check_implicit_rlo
          b% use_other_implicit_function_to_solve = use_other_implicit_function_to_solve
@@ -717,6 +719,7 @@
          f_sync_switch_from_rot_defor = b% f_sync_switch_from_rot_defor
          f_sync_switch_width = b% f_sync_switch_width
          f_sync_switch_lim = b% f_sync_switch_lim
+         use_other_tidal_deformation_switch_function = b% use_other_tidal_deformation_switch_function
          use_other_rlo_mdot = b% use_other_rlo_mdot
          use_other_check_implicit_rlo = b% use_other_check_implicit_rlo
          use_other_implicit_function_to_solve = b% use_other_implicit_function_to_solve

@@ -3,6 +3,6 @@
 # goal of QUIET is to make it easier to spot warnings and/or circular dependency
 # errors.
 
-QUIET = yes
+QUIET = no
 
 include makefile_base

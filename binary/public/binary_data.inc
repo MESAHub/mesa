@@ -249,6 +249,9 @@ procedure(other_e2_interface), pointer, nopass :: &
 procedure(other_pgbinary_plots_info_interface), pointer, nopass :: &
       other_pgbinary_plots_info => null()
 
+procedure(other_tidal_deformation_switch_function_interface), pointer, nopass :: &
+      other_tidal_deformation_switch_function => null()
+
 procedure(other_CE_init_interface), pointer, nopass :: &
       other_CE_init => null()
 
