@@ -1462,8 +1462,8 @@
     mdot_limit_donor_switch = 1d-20
 
 
-! use_tidal_deformation
-! ~~~~~~~~~~~~~~~~~~~~~
+! tidal_deformation
+! ~~~~~~~~~~~~~~~~~
 
 ! use the tidal deformation corrections fp/ft and the specific moments of inertia irot
 ! based on binary Roche geometry integrations of Fabry et al., 2022, A&A 661, A123
@@ -1474,6 +1474,9 @@
 ! ::
 
    use_tidal_deformation = .false.
+   f_sync_switch_from_rot_defor = 8d-1
+   f_sync_switch_width = 1d-1
+   f_sync_switch_lim = 1d-2
 
 ! use_other_{hook}
 ! ~~~~~~~~~~~~~~~~
