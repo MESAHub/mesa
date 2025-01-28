@@ -1,4 +1,0 @@
-#!/bin/bash
-cp private_$1/* private/
-cp public_$1/* public/
-echo star_data $1

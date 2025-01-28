@@ -6,7 +6,7 @@ physical and numerical aspects of MESA.
 In your working copy of run_star_extras, replace 
     include 'standard_run_star_extras.inc'
 by the contents of the included file from star/job or mesa/include.
-In your work directory, do ./mk and ./rn to check that it is okay.
+In your work directory, do ./rn to check that it is okay.
 
 Don't make any edits to any of the files in star/job or mesa/include,
 or to the files in star/other. You do all of this in your private copy

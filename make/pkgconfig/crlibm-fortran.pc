@@ -1,0 +1,5 @@
+Name: crlibm-fortran
+Version: 1.1
+Description: FORTRAN bindings for crlibm
+Cflags: -I${MESASDK_ROOT}/include
+Libs: -L${MESASDK_ROOT}/lib -lcrmath

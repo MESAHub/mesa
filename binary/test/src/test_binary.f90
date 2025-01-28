@@ -46,6 +46,9 @@ contains
       b% fj = -1d0
       b% fm = -1d0
       b% fdm = -1d0
+      b% mtransfer_rate = 0d0
+      b% s_donor% center_h1 = 0.75
+      b% varcontrol_ms = 0d0
 
       ! test for rl
       b% rl_relative_gap_old(b% d_i) = -0.102d0
