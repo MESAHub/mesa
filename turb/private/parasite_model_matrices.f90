@@ -51,18 +51,14 @@ contains
       real(dp), allocatable, intent(out) :: L(:,:)
       character(*), intent(in), optional :: parity
 
-      logical, parameter :: reorder = .TRUE.
-
-      real(dp)             :: E_psi
-      real(dp)             :: E_T
-      real(dp)             :: E_C
-      integer              :: s
-      logical              :: parity_switch
-      integer              :: i
-      integer              :: m
-      real(dp)             :: B(4,4)
-      integer, allocatable :: j(:)
-      integer              :: k
+      real(dp) :: E_psi
+      real(dp) :: E_T
+      real(dp) :: E_C
+      integer  :: s
+      logical  :: parity_switch
+      integer  :: i
+      integer  :: m
+      real(dp) :: B(4,4)
 
       ! Build the parasite model matrix
 
@@ -143,41 +139,6 @@ contains
 
          end do split_block_loop
 
-         ! If necessary, reorder the matrix elements to improve
-         ! numerical stability of the eigenvalue solver
-
-         if (reorder) then
-
-            if (parity_switch) then
-
-               L = L(s:1:-1,s:1:-1)
-
-            else
-
-               allocate(j(s))
-
-               i = 1
-
-               do k = 1, N
-
-                  j(i) = 4*(N-k) + 3
-                  j(i+1) = j(i) + 1
-                  j(i+2) = j(i) + 2
-                  j(i+3) = j(i) + 3
-
-                  i = i + 4
-
-               end do
-
-               j(i) = 1
-               j(i+1) = j(i) + 1
-
-               L = L(j,j)
-
-            end if
-
-         end if
-
       else
 
          s = 4*(2*N+1)
@@ -202,37 +163,6 @@ contains
             i = i + 4
 
          end do full_block_loop
-
-         ! If necessary, reorder the matrix elements to improve
-         ! numerical stability of the eigenvalue solver
-
-         if (reorder) then
-
-            allocate(j(s))
-
-            i = 1
-
-            do k = 1, 2*N+1
-
-               if (MOD(k, 2) == 0) then
-                  j(i) = 2*(4*N-k) + 5
-                  j(i+1) = j(i) + 1
-                  j(i+2) = j(i) + 2
-                  j(i+3) = j(i) + 3
-               else
-                  j(i) = 2*(k-1) + 1
-                  j(i+1) = j(i) + 1
-                  j(i+2) = j(i) + 2
-                  j(i+3) = j(i) + 3
-               endif
-
-               i = i + 4
-
-            end do
-
-            L = L(j,j)
-
-         end if
 
       end if
 

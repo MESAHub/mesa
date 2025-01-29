@@ -330,6 +330,7 @@ contains
          character(*), intent(in), optional :: parity
 
          real(dp), allocatable :: L(:,:)
+         integer               :: s
          real(dp), allocatable :: sigma_r(:)
          real(dp), allocatable :: sigma_i(:)
 
@@ -337,10 +338,16 @@ contains
 
          call build_matrix(w, k_z, Pr, tau, R_0, H_B, D_B, lam_hat, l_hat, N, L, parity)
 
-         allocate(sigma_r(SIZE(L, 1)))
-         allocate(sigma_i(SIZE(L, 1)))
+         ! Reorder elements to improve numerical stability
+
+         s = SIZE(L, 1)
+
+         L = L(s:1:-1,s:1:-1)
 
          ! Calculate its eigenvalues
+
+         allocate(sigma_r(s))
+         allocate(sigma_i(s))
 
          call LA_GEEV(L, sigma_r, sigma_i)
 
