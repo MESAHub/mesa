@@ -20,8 +20,9 @@ sys.path.insert(0, os.path.abspath('./_ext/'))
 project = 'MESA'
 copyright = '2024, The MESA Team'
 author = 'The MESA Team'
-release = 'main'
+language = 'en'
 version = 'main'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,7 +32,12 @@ version = 'main'
 # ones.
 extensions = [
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.extlinks',
     'defaults2rst',
+    'sphinx_copybutton',
+    'sphinx_design',
+    'sphinx_tags',
+    'sphinxemoji.sphinxemoji',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -49,6 +55,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+#html_theme = 'sphinx_book_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,17 +79,54 @@ html_theme_options = {
     'logo_only': True
 }
 
+# sphinx_book_theme options
+#html_theme_options = {
+#    'collapse_navigation': True,
+#    'navigation_depth': 4,
+#    'repository_url': "https://github.com/MESAHub/mesa",
+#    'use_repository_button': True,
+#    'icon_links': [
+#        {
+#            "name": "GitHub",
+#            "url": "https://github.com/MESAHub/mesa",
+#            "icon": "fa-brands fa-github",
+#        },
+#    ],
+#}
+
+# sphinx_tags options
+tags_create_tags = True
+tags_overview_title = "Test Problem tags"
+tags_page_title = "Tags"
+tags_page_header = "Test problems with this tag"
+tags_create_badges = True
+tags_badge_colors = {
+    "star": "primary",
+    "binary": "primary",
+    "high-mass": "secondary",
+    "low-mass": "secondary",
+}
+
 # Set master doc
 master_doc = 'index'
 
 # Set logo
-html_logo = 'mesa-logo-200.png'
+html_logo = 'mesa-logo2-200.png'
+html_favicon = 'mesa-favicon.png'
+
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+html_context = {}
+
+# Tell Jinja2 templates the build is running on Read the Docs
+html_context["READTHEDOCS"] = os.environ.get("READTHEDOCS", "") == "True"
+
 
 # Override theme stylesheet
 html_css_files = [
     'theme_overrides.css',  # overrides for wide tables in RTD theme
 ]
-
 
 # standard substitutions
 rst_prolog = r"""
@@ -91,6 +135,7 @@ rst_prolog = r"""
 .. |MESA III| replace:: `MESA III <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`__
 .. |MESA IV| replace:: `MESA IV <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`__
 .. |MESA V| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`__
+.. |MESA VI| replace:: `MESA V <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`__
 .. |Msun| replace:: :math:`{\rm M}_\odot`
 .. |Lsun| replace:: :math:`{\rm L}_\odot`
 .. |Rsun| replace:: :math:`{\rm R}_\odot`
@@ -103,3 +148,9 @@ rst_prolog = r"""
 
 # set default highlighting language
 highlight_language = 'fortran'
+
+# sphinx.extlinks configuration
+extlinks = {
+    'wiki': ('https://en.wikipedia.org/wiki/%s', None),
+    'git': ('https://github.com/%s', None)
+}

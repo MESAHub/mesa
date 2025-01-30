@@ -30,17 +30,17 @@ module helm_polynomials
 
 !..psi1 and its derivatives
 
-      pure real(dp) function psi1(z)   
+      pure real(dp) function psi1(z)
         real(dp), intent(in) :: z
         psi1 = z* (z*z * ( z * (-3.0d0*z + 8.0d0) - 6.0d0) + 1.0d0)
       end function psi1
 
-      pure real(dp) function dpsi1(z)  
+      pure real(dp) function dpsi1(z)
         real(dp), intent(in) :: z
         dpsi1 = z*z * ( z * (-15.0d0*z + 32.0d0) - 18.0d0) +1.0d0
       end function dpsi1
 
-      pure real(dp) function ddpsi1(z) 
+      pure real(dp) function ddpsi1(z)
         real(dp), intent(in) :: z
         ddpsi1 = z * (z * (-60.0d0*z + 96.0d0) -36.0d0)
       end function ddpsi1
@@ -52,17 +52,17 @@ module helm_polynomials
 
 !..psi2  and its derivatives
 
-      pure real(dp) function psi2(z)   
+      pure real(dp) function psi2(z)
         real(dp), intent(in) :: z
         psi2 = 0.5d0*z*z*( z* ( z * (-z + 3.0d0) - 3.0d0) + 1.0d0)
       end function psi2
 
-      pure real(dp) function dpsi2(z)  
+      pure real(dp) function dpsi2(z)
         real(dp), intent(in) :: z
         dpsi2 = 0.5d0*z*( z*(z*(-5.0d0*z + 12.0d0) - 9.0d0) + 2.0d0)
       end function dpsi2
 
-      pure real(dp) function ddpsi2(z) 
+      pure real(dp) function ddpsi2(z)
         real(dp), intent(in) :: z
         ddpsi2 = 0.5d0*(z*( z * (-20.0d0*z + 36.0d0) - 18.0d0) +2.0d0)
       end function ddpsi2
@@ -105,12 +105,12 @@ module helm_polynomials
 !..cubic hermite polynomial statement functions
 !..psi0 & derivatives
 
-      pure real(dp) function xpsi0(z)  
+      pure real(dp) function xpsi0(z)
         real(dp), intent(in) :: z
         xpsi0 = z * z * (2.0d0*z - 3.0d0) + 1.0d0
       end function xpsi0
 
-      pure real(dp) function xdpsi0(z) 
+      pure real(dp) function xdpsi0(z)
         real(dp), intent(in) :: z
         xdpsi0 = z * (6.0d0*z - 6.0d0)
       end function xdpsi0
@@ -127,12 +127,12 @@ module helm_polynomials
 
 !..psi1 & derivatives
 
-      pure real(dp) function xpsi1(z)  
+      pure real(dp) function xpsi1(z)
         real(dp), intent(in) :: z
         xpsi1 = z * ( z * (z - 2.0d0) + 1.0d0)
       end function xpsi1
 
-      pure real(dp) function xdpsi1(z) 
+      pure real(dp) function xdpsi1(z)
         real(dp), intent(in) :: z
         xdpsi1 = z * (3.0d0*z - 4.0d0) + 1.0d0
       end function xdpsi1

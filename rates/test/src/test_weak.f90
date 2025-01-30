@@ -30,11 +30,11 @@ module test_weak
    use const_def
    use utils_lib, only: mesa_error
    use num_lib, only: dfridr
-   
+
    implicit none
-   
+
    contains
-   
+
    subroutine do_test_weak
       use const_lib
       use chem_lib
@@ -47,20 +47,18 @@ module test_weak
          lambda, dlambda_dlnT, dlambda_dlnRho, &
          Q, dQ_dlnT, dQ_dlnRho, &
          Qneu, dQneu_dlnT, dQneu_dlnRho
-      real(dp) :: logT, T, T9, dT9, dlnT, YeRho, &
-         ye, rho, logRho, dlogRho, eta, d_eta_dlnT, d_eta_dlnRho
+      real(dp) :: logT, T, T9, YeRho, &
+         ye, rho, logRho, eta, d_eta_dlnT, d_eta_dlnRho
       character(len=iso_name_length) :: weak_lhs, weak_rhs
       character(len=2*iso_name_length+1) :: key
 
-      real(dp) :: abar, zbar, z2bar
-
       real(dp) :: dvardx, dvardx_0, dx_0, err, var_0, xdum
       logical :: doing_d_dlnd
-      
+
       include 'formats'
 
       ierr = 0
-               
+
       write(*,*) 'check weak_info_list'
       weak_lhs = 'o14'
       weak_rhs = 'n14'
@@ -74,10 +72,10 @@ module test_weak
       write(*,1) 'halflife', weak_info_list_halflife(i)
       write(*,1) 'Qneu', weak_info_list_Qneu(i)
       write(*,'(A)')
-      
+
       d_eta_dlnT = 0
       d_eta_dlnRho = 0
-      
+
       if (.false.) then ! TESTING
          logT =     7.5904236599874348D+00
          logRho =     1.0657946486820271D+00
@@ -110,7 +108,7 @@ module test_weak
          Ye = 0.5d0
          eta = 0d0
       end if
-      
+
       T = exp10(logT)
       T9 = T*1d-9
       rho = exp10(logRho)
@@ -124,7 +122,7 @@ module test_weak
       write(*,1) 'T9', T9
       write(*,1) 'lYeRho', log10(YeRho)
       write(*,'(A)')
-      
+
       nr = num_weak_reactions
       allocate( &
          ids(nr), reaction_ids(nr), &
@@ -137,11 +135,11 @@ module test_weak
          ids(i) = i
          reaction_ids(i) = i
       end do
-      
+
       write(*,'(A)')
       write(*,2) 'nr', nr
       write(*,'(A)')
-      
+
       call eval_weak_reaction_info( &
          nr, ids, reaction_ids, cc, T9, YeRho, &
          eta, d_eta_dlnT, d_eta_dlnRho, &
@@ -153,7 +151,7 @@ module test_weak
          write(*,*) 'failed in eval_weak_reaction_info'
          call mesa_error(__FILE__,__LINE__)
       end if
-      
+
       if (.true.) then
          write(*,'(30x,99a16)') &
             'halflife', 'Qneu', 'Qtotal'
@@ -185,7 +183,7 @@ module test_weak
                Q(i), Qneu(i), lambda(i)
          end do
          write(*,'(A)')
-         
+
          if (.false.) then
          write(*,'(a30,5a12,a20)') 'd_dT9', 'Q', 'Qneu', 'lambda'
          do i = 1, nr
@@ -197,7 +195,7 @@ module test_weak
          end do
          write(*,'(A)')
          end if
-      
+
          if (.false.) then
          write(*,'(a30,5a12,a20)') 'd_d_rho', 'Q', 'Qneu', 'lambda'
          do i = 1, nr
@@ -211,7 +209,7 @@ module test_weak
          end if
 
       end if
-      
+
       write(*,*) 'done'
 
       if (.false.) then ! dfridr tests for partials
@@ -254,7 +252,7 @@ module test_weak
 
       end if
 
-      
+
       deallocate( &
          ids, reaction_ids, &
          lambda, dlambda_dlnT, dlambda_dlnRho, &

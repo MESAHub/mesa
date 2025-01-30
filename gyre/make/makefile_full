@@ -10,97 +10,43 @@ include $(MESA_DIR)/utils/makefile_header
 
 #################################################################
 #
-# SOURCES
+# Hand off to GYRE build system
 
-SRCS = gyre_lib.f90
+MESA_LIB_DIR = $(MESA_DIR)/lib
+MESA_INC_DIR = $(MESA_DIR)/include
 
+GYRE_DIR = ../gyre
 
+export FRONTENDS = no
+export TOOLS = no
+export FORUM = no
+export IFACES = yes
 
-#################################################################
-#
-# LIBRARIES
+export FORUM_LIB_DIR = ../$(MESA_LIB_DIR)
+export FORUM_INC_DIR = ../$(MESA_INC_DIR)
 
 ifeq ($(USE_SHARED), YES)
-     LIBS_OTHER = $(LIBS_MATRIX)
-     DEPS_OTHER = $(patsubst %,$(MESA_LIB_DIR)/lib%.$(LIB_SUFFIX),$(LIBS_OTHER))
-     LOAD_OTHER = -L$(MESA_LIB_DIR) $(LOAD_MATRIX)
-endif
-
-#################################################################
-#
-# TARGETS
-
-LIB = libgyre.$(LIB_SUFFIX)
-
-OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SRCS)))
-
-$(LIB) : $(OBJS) $(DEPS_OTHER)
-ifneq ($(QUIET),)
-	@echo LIB_TOOL $(LIB)
-	@$(LIB_TOOL) $(LIB) *.o $(LOAD_OTHER)
+   export SHARED = yes
 else
-	$(LIB_TOOL) $(LIB) *.o $(LOAD_OTHER)
+   export SHARED = no
 endif
 
-clean:
-	-@rm -f *.o *.f90 *.fpp *.mod .depend *.so *.a ../public/gyre_lib.f
+ifeq ($(USE_CRMATH), YES)
+   export CRMATH = yes
+else
+   export CRMATH = no
+endif
+
+all :
+	@$(MAKE) --no-print-directory -C $(GYRE_DIR) install
 
 install:
-	@$(CP_IF_NEWER) gyre_lib.f90 ../public/gyre_lib.f
-	@$(CP_IF_NEWER) gyre_lib.mod $(MESA_DIR)/include
-	@$(CP_IF_NEWER) $(LIB) $(MESA_DIR)/lib
+	@$(CP_IF_NEWER) $(GYRE_DIR)/build/gyre_mesa_m.f90 ../public/
+	@$(CP_IF_NEWER) $(GYRE_DIR)/build/gyre_mesa_m.mod $(MESA_INC_DIR)/
+	@$(CP_IF_NEWER) $(GYRE_DIR)/build/libgyre.a $(MESA_LIB_DIR)/
+	@$(CP_IF_NEWER) $(GYRE_DIR)/build/libgyre_mesa.a $(MESA_LIB_DIR)/
 
-#################################################################
-#
-# COMPILATION RULES
+clean:
+	@$(MAKE) --no-print-directory -C $(GYRE_DIR) $@
 
-GYRE_DIRS = $(subst $(eval) ,:,$(shell test -d ../gyre && find ../gyre/src -type d))
-
-COMPILE = $(COMPILE_TO_DEPLOY) $(FCfree) -Wno-uninitialized -L$(MESA_DIR)/lib -lconst $(LOAD_MATRIX)
-#COMPILE = $(COMPILE_TO_TEST) $(FCfree) -Wno-uninitialized
-
-FPX3FLAGS = -DOMP -DHDF5 -DDOUBLE_PRECISION -I.:$(GYRE_DIRS):../gyre/src/mesa
-
-ifeq ($(USE_OPENMP),YES)
-FPX3FLAGS := $(FPX3FLAGS) -DOMP
-endif
-
-.PRECIOUS : %.f90
-
-%.o : %.mod
-
-%.f90 : %.fpp
-	@fpx3 $(FPX3FLAGS) < $< > $@
-
-%.o %.mod : %.f90
-	@echo FC $<
-	@$(COMPILE) -c $<
-	@if [ -e $(basename $@).mod ]; then touch $(basename $@).mod; fi
-
-ifeq ($(USE_CRMATH),yes)
-gyre_math.fpp: gyre_math_crmath.fpp
-	@ln -sf $< $@
-else
-gyre_math.fpp: gyre_math_intrinsic.fpp
-	@ln -sf $< $@
-endif
-
-.INTERMEDIATE: gyre_math.fpp
-
-.depend: gyre_math.fpp
-
-#################################################################
-#
-# DEPENDENCIES
-
-vpath %.fpp $(GYRE_DIRS)
-vpath %.inc $(GYRE_DIRS)
-vpath %.f $(GYRE_DIRS)
-
-ifneq ($(MAKECMDGOALS),clean)
--include .depend
-endif
-
-.depend :
-	@echo FPX3_DEPS
-	@$(shell fpx3_deps $(FPX3FLAGS) gyre_lib > .depend )
+.PHONY: install clean

@@ -34,54 +34,54 @@
 
       contains ! the procedure interface for the library
       ! client programs should only call these routines.
-            
-            
+
+
       subroutine eos_init( &
-            eosDT_cache_dir, use_cache, info)      
+            eosDT_cache_dir, use_cache, info)
          use eos_initialize, only : Init_eos
          character(*), intent(in) :: eosDT_cache_dir ! blank string means use default
          logical, intent(in) :: use_cache
-         integer, intent(out) :: info ! 0 means AOK. 
+         integer, intent(out) :: info ! 0 means AOK.
          info = 0
          call Init_eos( &
             eosDT_cache_dir, use_cache, info)
-         if (info /= 0) return      
-      end subroutine eos_init      
-      
+         if (info /= 0) return
+      end subroutine eos_init
+
       subroutine eos_shutdown
          use eos_def
          use helm_alloc,only:free_helm_table
          if (associated(eos_ht)) call free_helm_table(eos_ht)
          call eos_def_shutdown
       end subroutine eos_shutdown
-      
-      
+
+
       ! after eos_init has finished, you can allocate a "handle"
       ! and set control parameter values using an inlist
-      
+
       integer function alloc_eos_handle(ierr) result(handle)
-         integer, intent(out) :: ierr ! 0 means AOK.  
-         character (len=0) :: inlist 
+         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=0) :: inlist
          handle = alloc_eos_handle_using_inlist(inlist, ierr)
-      end function alloc_eos_handle      
-      
+      end function alloc_eos_handle
+
       integer function alloc_eos_handle_using_inlist(inlist,ierr) result(handle)
          use eos_def, only:do_alloc_eos
          use eos_ctrls_io, only:read_namelist
          character (len=*), intent(in) :: inlist ! empty means just use defaults.
-         integer, intent(out) :: ierr ! 0 means AOK.   
+         integer, intent(out) :: ierr ! 0 means AOK.
          ierr = 0
          handle = do_alloc_eos(ierr)
          if (ierr /= 0) return
          call read_namelist(handle, inlist, ierr)
-      end function alloc_eos_handle_using_inlist      
-      
+      end function alloc_eos_handle_using_inlist
+
       subroutine free_eos_handle(handle)
          ! frees the handle and all associated data
          use eos_def,only:do_free_eos_handle
          integer, intent(in) :: handle
          call do_free_eos_handle(handle)
-      end subroutine free_eos_handle      
+      end subroutine free_eos_handle
 
 
       subroutine eos_ptr(handle,rq,ierr)
@@ -92,29 +92,29 @@
          call get_eos_ptr(handle,rq,ierr)
       end subroutine eos_ptr
 
-      
+
       ! as a convenience
-      
+
       elemental real(dp) function Radiation_Pressure(T)
          use const_def, only: crad
          real(dp), intent(in) :: T
          Radiation_Pressure = crad*T*T*T*T/3d0
       end function Radiation_Pressure
-      
+
       elemental real(dp) function Radiation_Energy(T)
          use const_def, only: crad
          real(dp), intent(in) :: T
          Radiation_Energy = crad*T*T*T*T
       end function Radiation_Energy
-      
-      
-      
+
+
+
       ! eos evaluation
-      
+
       ! you can call these routines after you've allocated a handle.
       ! NOTE: the information referenced via the handle is read-only,
-      ! so you can do multiple evaluations in parallel using the same handle.      
-      
+      ! so you can do multiple evaluations in parallel using the same handle.
+
 
       subroutine eosDT_get( &
                handle, species, chem_id, net_iso, xa, &
@@ -127,11 +127,11 @@
          integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions         
+         real(dp), intent(in) :: xa(:) ! mass fractions
          real(dp), intent(in) :: Rho, logRho ! the density
-         real(dp), intent(in) :: T, logT ! the temperature         
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)         
-         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results) 
+         real(dp), intent(in) :: T, logT ! the temperature
+         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
          integer, intent(out) :: ierr ! 0 means AOK.
@@ -155,7 +155,7 @@
          ! only return 1st two d_dxa results (lnE and lnPgas) to star
          d_dxa(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
       end subroutine eosDT_get
-      
+
 
       subroutine eosDT_get_component( &
                handle, which_eos, &
@@ -169,39 +169,39 @@
          use eosDT_eval, only: Test_one_eosDT_component
 
          ! INPUT
-         
+
          integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
-         
+
          integer, intent(in) :: which_eos ! see eos_def: i_eos_<component>
 
          integer, intent(in) :: species ! number of species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
          real(dp), intent(in) :: xa(:) ! mass fractions
-         
+
          real(dp), intent(in) :: Rho, log10Rho ! the density
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
             ! "arg_not_provided" is defined in mesa const_def
-            
+
          real(dp), intent(in) :: T, log10T ! the temperature
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
-                     
+
          ! OUTPUT
-         
+
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          ! partial derivatives of the basic results wrt lnd and lnT
-         
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results) 
+
+         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
          ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
          ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
          real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
-         
+
          integer, intent(out) :: ierr ! 0 means AOK.
 
          real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
@@ -209,7 +209,7 @@
          type (EoS_General_Info), pointer :: rq
 
          real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
-         
+
          call get_eos_ptr(handle,rq,ierr)
          if (ierr /= 0) then
             write(*,*) 'invalid handle for eos_get -- did you call alloc_eos_handle?'
@@ -230,7 +230,7 @@
 
          ! only return 1st two d_dxa results (lnE and lnPgas)
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
-         
+
       end subroutine eosDT_get_component
 
 
@@ -239,7 +239,7 @@
             coulomb_temp_cut, coulomb_den_cut, helm_res, &
             clip_to_table_boundaries, include_radiation, &
             include_elec_pos, &
-            off_table, ierr)         
+            off_table, ierr)
          use helm
          real(dp), intent(in) :: T, logT, Rho, logRho, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut
@@ -253,8 +253,8 @@
             helm_res, clip_to_table_boundaries, include_radiation, include_elec_pos, &
             off_table, ierr)
       end subroutine helmeos2_eval
-      
-      
+
+
       ! the following routine uses gas pressure and temperature as input variables
       subroutine eosPT_get( &
                handle, &
@@ -337,35 +337,35 @@
          d_dxa_const_TRho(1:num_eos_d_dxa_results,1:species) = d_dxa_eos(1:num_eos_d_dxa_results, 1:species)
 
       end subroutine eosPT_get
-      
-      
+
+
       ! gamma law eos routines -- ignores radiation (e.g.., P = Pgas only)
-      
-      
+
+
       subroutine eos_gamma_DP_get_ET( &
             abar, rho, P, gamma, energy, T, ierr)
          use const_def, only: avo, kerg
          real(dp), intent(in) :: abar, rho, P, gamma
          real(dp), intent(out) :: energy, T
          integer, intent(out) :: ierr
-         ierr = 0      
+         ierr = 0
          energy = (P/rho)/(gamma - 1d0)
          T = (gamma - 1d0)*energy*abar/(avo*kerg)
       end subroutine eos_gamma_DP_get_ET
-      
-      
+
+
       subroutine eos_gamma_DE_get_PT( &
             abar, rho, energy, gamma, P, T, ierr)
          use const_def, only: avo, kerg
          real(dp), intent(in) :: abar, rho, energy, gamma
          real(dp), intent(out) :: P, T
          integer, intent(out) :: ierr
-         ierr = 0         
+         ierr = 0
          P = (gamma - 1d0)*energy*rho
          T = (gamma - 1d0)*energy*abar/(avo*kerg)
       end subroutine eos_gamma_DE_get_PT
-      
-      
+
+
       subroutine eos_gamma_DT_get_P_energy( &
             abar, rho, T, gamma, P, energy, ierr)
          use const_def, only: avo, kerg
@@ -376,8 +376,8 @@
          P = avo*kerg*rho*T/abar
          energy = (P/rho)/(gamma - 1d0)
       end subroutine eos_gamma_DT_get_P_energy
-      
-      
+
+
       subroutine eos_gamma_PRho_get_T_energy( &
             abar, P, rho, gamma, T, energy, ierr)
          use const_def, only: avo, kerg
@@ -388,8 +388,8 @@
          energy = (P/rho)/(gamma - 1d0)
          T = (gamma - 1d0)*energy*abar/(avo*kerg)
       end subroutine eos_gamma_PRho_get_T_energy
-      
-      
+
+
       subroutine eos_gamma_PT_get_rho_energy( &
             abar, P, T, gamma, rho, energy, ierr)
          use const_def, only: avo, kerg
@@ -400,8 +400,8 @@
          rho = (P/T)*abar/(avo*kerg)
          energy = (P/rho)/(gamma - 1d0)
       end subroutine eos_gamma_PT_get_rho_energy
-      
-      
+
+
       subroutine eos_gamma_DE_get( &
             handle, abar, energy, log10E, rho, log10Rho, gamma, &
             T, log10T, res, d_dlnRho_const_T, d_dlnT_const_Rho, &
@@ -409,12 +409,12 @@
             dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E, ierr)
          use eos_def
          use eosDE_eval, only: Get_eos_gamma_DE_Results
-         integer, intent(in) :: handle            
+         integer, intent(in) :: handle
          real(dp), intent(in) :: abar, energy, log10E, Rho, log10Rho, gamma
          real(dp), intent(out) :: T, log10T
          real(dp), intent(inout), dimension(:) :: &
             res, d_dlnRho_const_T, d_dlnT_const_Rho
-         real(dp), intent(out) :: & 
+         real(dp), intent(out) :: &
             dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
             dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
          integer, intent(out) :: ierr
@@ -444,14 +444,14 @@
          use eos_def
          use eosDE_eval, only: Get_eos_gamma_DE_Results
          use math_lib
-         integer, intent(in) :: handle            
+         integer, intent(in) :: handle
          real(dp), intent(in) :: abar, P, log10P, T, log10T, gamma
          real(dp), intent(out) :: rho, log10Rho
          real(dp), intent(inout), dimension(:) :: &
             res, d_dlnRho_const_T, d_dlnT_const_Rho
          integer, intent(out) :: ierr
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: energy, temp, log10temp, & 
+         real(dp) :: energy, temp, log10temp, &
             dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
             dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
          call get_eos_ptr(handle,rq,ierr)
@@ -483,14 +483,14 @@
          use eos_def
          use eosDE_eval, only: Get_eos_gamma_DE_Results
          use math_lib
-         integer, intent(in) :: handle            
+         integer, intent(in) :: handle
          real(dp), intent(in) :: abar, rho, log10Rho, T, log10T, gamma
          real(dp), intent(inout), dimension(:) :: &
             res, d_dlnRho_const_T, d_dlnT_const_Rho
          real(dp), intent(out) :: Pgas, Prad, energy, entropy
          integer, intent(out) :: ierr
          type (EoS_General_Info), pointer :: rq
-         real(dp) :: P, temp, log10temp, & 
+         real(dp) :: P, temp, log10temp, &
             dlnT_dlnE_c_Rho, dlnT_dlnd_c_E, &
             dlnPgas_dlnE_c_Rho, dlnPgas_dlnd_c_E
          call get_eos_ptr(handle,rq,ierr)
@@ -519,16 +519,16 @@
 
 
       ! misc
-      
+
 
       subroutine eos_fermi_dirac_integral(dk, eta, theta, fd, fdeta, fdtheta)
          !..from Frank Timmes' site, http://www.cococubed.com/code_pages/fermi_dirac.shtml
-         !..this routine computes the fermi-dirac integrals of 
+         !..this routine computes the fermi-dirac integrals of
          !..index dk, with degeneracy parameter eta and relativity parameter theta.
          !..input is dk the real(dp) index of the fermi-dirac function,
          !..eta the degeneracy parameter, and theta the relativity parameter.
          !..theta = (k * T)/(mass_electron * c^2), k = Boltzmann const.
-         !..the output is fd is computed by applying three 10-point 
+         !..the output is fd is computed by applying three 10-point
          !..gauss-legendre and one 10-point gauss-laguerre rules over
          !..four appropriate subintervals. the derivative with respect to eta is
          !..output in fdeta, and the derivative with respct to theta is in fdtheta.
@@ -538,7 +538,7 @@
          !..
          !..reference: j.m. aparicio, apjs 117, 632 1998
          use gauss_fermi, only: dfermi
-        
+
          real(dp), intent(in) :: dk
          real(dp), intent(in) :: eta
          real(dp), intent(in) :: theta
@@ -547,14 +547,14 @@
          real(dp), intent(out) :: fdtheta
          call dfermi(dk, eta, theta, fd, fdeta, fdtheta)
       end subroutine eos_fermi_dirac_integral
-      
+
 
       subroutine eos_get_helm_results( &
                X, abar, zbar, Rho, log10Rho, T, log10T, &
                coulomb_temp_cut, coulomb_den_cut, &
                include_radiation, include_elec_pos, &
                res, ierr)
-         ! direct call to the helm eos.  
+         ! direct call to the helm eos.
          ! returns much more info than the standard
 
          use eos_def
@@ -563,29 +563,29 @@
          ! INPUT
 
          real(dp), intent(in) :: X ! the hydrogen mass fraction
-            
+
          real(dp), intent(in) :: abar
             ! mean atomic number (nucleons per nucleus; grams per mole)
          real(dp), intent(in) :: zbar ! mean charge per nucleus
-         
+
          real(dp), intent(in) :: Rho, log10Rho ! the density
-            ! provide both if you have them.  
+            ! provide both if you have them.
             ! else pass one and set the other to arg_not_provided
-            
+
          real(dp), intent(in) :: T, log10T ! the temperature
-            ! provide both if you have them.  
+            ! provide both if you have them.
             ! else pass one and set the other to arg_not_provided
 
          real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
 
          logical, intent(in) :: include_radiation, include_elec_pos
-         
+
          ! OUTPUT
-         
+
          real(dp), intent(inout) :: res(:) ! (num_helm_results)
             ! array to hold the results
-         integer, intent(out) :: ierr ! 0 means AOK.     
-         
+         integer, intent(out) :: ierr ! 0 means AOK.
+
          logical :: off_table
 
          call Get_HELM_Results( &
@@ -593,17 +593,17 @@
             coulomb_temp_cut, coulomb_den_cut, &
             include_radiation, include_elec_pos, &
             res, off_table, ierr)
-              
+
       end subroutine eos_get_helm_results
-      
-      
+
+
       !subroutine eos_convert_helm_results( &
       !      helm_res, Z, X, abar, zbar, Rho, T, res, &
-      !      d_dlnRho_const_T, d_dlnT_const_Rho, ierr)      
+      !      d_dlnRho_const_T, d_dlnT_const_Rho, ierr)
       subroutine eos_convert_helm_results( &
             helm_res, Z, X, abar, zbar, Rho, T, basic_flag, res,  &
             d_dlnRho_const_T, d_dlnT_const_Rho,  &
-            d_dabar_const_TRho, d_dzbar_const_TRho, ierr)      
+            d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
          use eos_def
          use eos_helm_eval, only: do_convert_helm_results
          real(dp), intent(in) :: helm_res(:) ! (num_helm_results)
@@ -612,22 +612,22 @@
          real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
          real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results) 
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results) 
+         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results)
          !real(dp), intent(inout), dimension(:) :: d2_dlnd2, d2_dlnd_dlnT, d2_dlnT2
-         integer, intent(out) :: ierr      
+         integer, intent(out) :: ierr
          d_dabar_const_TRho = 0
          d_dzbar_const_TRho = 0
          call do_convert_helm_results( &
                   helm_res, Z, abar, zbar, Rho, T, &
                   res, d_dlnRho_const_T, d_dlnT_const_Rho, &
                   d_dabar_const_TRho, d_dzbar_const_TRho, &
-                  ierr)      
+                  ierr)
       end subroutine eos_convert_helm_results
 
-      
+
       ! eosDT search routines.  these use num_lib safe_root to find T or Rho.
-      
+
       subroutine eosDT_get_T( &
                handle, &
                species, chem_id, net_iso, xa, &
@@ -880,7 +880,7 @@
          deallocate(d_dxa_eos)
 
       end subroutine eosPT_get_T
-      
+
 
       subroutine num_eos_files_loaded( &
             num_DT, num_FreeEOS)

@@ -44,7 +44,7 @@ shmesa_help () {
  |___/_| |_|_|  |_|_____|____/_/   \_\
                                       
 EOF
-    echo "Usage: shmesa [work|change|defaults|cp|grep|extras|zip|help] [arguments]"
+    echo "Usage: shmesa [work|change|defaults|cp|grep|extras|zip|version|help] [arguments]"
     echo
     echo "Subcommands:"
     echo "  work      copy the work directory to the current location"
@@ -55,6 +55,7 @@ EOF
     echo "  extras    fill in the full run_star_extras.f90 template"
     echo "  zip       prepare a MESA directory for sharing"
     echo "  help      display this helpful message"
+    echo "  version   print the version of MESA"
     echo "  -h        flag for getting additional details about any of the above"
     echo
 }
@@ -113,28 +114,26 @@ shmesa_change () {
     
     # Create a backup of the inlist before making any changes
     backup_copy "$filename" "${filename}.bak"
-    
-    local ESCAPE="s#[^^]#[&]#g; s#\^#\\^#g" # sed escape string
-    # iterate through parameter,value pairs in the supplied input 
+
     while [[ -n $1 && -n $2 ]]; do
         local param=$1
         local newval=$2
         shift 2
         
-        local escapedParam=$(sed "$ESCAPE" <<< "$param")
-        local search="^\s*\!*\s*$escapedParam\s*=.+$" 
+        local search="^\s*\!*\s*\b${param}\b\s*=.*$"
         local replace="    $param = $newval"
         
         # Check if the parameter is present in the inlist
-        if ! grep -q "$param" "$filename"; then
+        if ! grep -qw "$param" "$filename"; then
             echo "Error: Parameter '$param' not found in the inlist '$filename'."
             backup_restore "$filename"
             return 1
         fi
         
         # Update its value
-        sed -r -i -e "s#$search#$replace#g" "$filename"
+        perl -i -pe "s/$search/$replace/" "$filename"
     done
+
 }
 
 
@@ -162,20 +161,17 @@ shmesa_defaults () {
         cp "$MESA_DIR/star/defaults/history_columns.list" .
     fi
     
-    local ESCAPE="s#[^^]#[&]#g; s#\^#\\^#g" # sed escape string
-    # Uncomment the specified parameters
     while [[ -n $1 ]]; do
         local param=$1
         shift
         
-        local escapedParam=$(sed "$ESCAPE" <<< "$param")
-        local search="^\s*\!*\s*$escapedParam\s*.+$"
-        local replace="    $param"
+        local search="^\s*\!${param}\b(\s*.*)?$"
+        local replace="      $param\$1"
         
-        if grep -q "$param" profile_columns.list || \
-           grep -q "$param" history_columns.list; then
-            sed -r -i -e "s#$search#$replace#g" profile_columns.list
-            sed -r -i -e "s#$search#$replace#g" history_columns.list
+        if grep -q -w "$param" profile_columns.list; then
+            perl -i -pe "s/$search/$replace/g" profile_columns.list
+        elif grep -q -w "$param" history_columns.list; then
+            perl -i -pe "s/$search/$replace/g" history_columns.list
         else
             echo "Warning: Parameter '$param' not found in either profile_columns.list or history_columns.list."
         fi
@@ -253,7 +249,25 @@ shmesa_zip () {
         echo "Warning: No inlist files found in the directory '$dir_to_zip'."
     fi
 
-    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "*star" "*binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
+    zip -r "$zip_name" "$dir_to_zip" -x "*/make/*mod" "*/make/*.o" "*.bak" "star" "binary" "*LOGS*" "*photos*" "*png*" "*.mesa_temp_cache"
+}
+
+
+shmesa_version() {
+    if shmesa_check_h_flag "$@"; then
+        echo "Usage: shmesa version"
+        echo "prints the version of MESA"
+        return 0
+    fi
+    if [ -f "$MESA_DIR/data/version_number" ]; then
+        echo "$(cat $MESA_DIR/data/version_number)"
+    elif [ -d ".git" ] || [ -f ".git" ]; then
+        # Limits hashes to 7 characters
+        version=$(git rev-parse HEAD)
+        echo "%s" "${version:0:7}"
+    else
+        echo "Error: Cannot find the version number of MESA."
+    fi
 }
 
 
@@ -274,10 +288,10 @@ shmesa_extras () {
         echo "Cannot find $MESA_DIR/include/standard_run_star_extras.inc"
         return 1
     fi
-    contents=$(sed 's:|:\\|:g' "$MESA_DIR/include/standard_run_star_extras.inc" | sed -z 's:\n:\\n:g')
+    contents=$(perl -pe 's/:/\\:/g; s/\n/\\n/g' "$MESA_DIR/include/standard_run_star_extras.inc")
 
     backup_copy "$rse" "$rse".bak
-    sed -i "s|      include 'standard_run_star_extras.inc'|$contents|" $rse
+    perl -i -pe "s|      include 'standard_run_star_extras.inc'|$contents|g" "$rse"
 }
 
 
@@ -329,7 +343,7 @@ shmesa_test () {
     # since we will be calling shmesa, we need it to be in our path 
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
     
-    # shmesa [work|change|defaults|cp|grep|zip|help]
+    # shmesa [work|change|defaults|cp|grep|zip|version|help]
     rm -rf $MESA_SHMESA_TEST
     rm -rf '$MESA_SHMESA_TEST'_cp
     
@@ -346,7 +360,7 @@ shmesa_test () {
                         pgstar_flag .false. && \
           shmesa change inlist_project \
                         initial_mass 1.2 \
-                        Z 0.01 \
+                        initial_z 0.01 \
                         Zbase 0.01)"
     
     # shmesa defaults
@@ -467,6 +481,9 @@ case "$subcommand" in
         ;;
     zip)
         shmesa_zip "$@"
+        ;;
+    version)
+        shmesa_version "$@"
         ;;
     test)
         shmesa_test "$@"

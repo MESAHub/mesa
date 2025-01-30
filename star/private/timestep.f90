@@ -51,7 +51,7 @@
 
          timestep_controller = do_timestep_limits(s, s% dt)
          if (timestep_controller /= keep_going) s% result_reason = timestep_limits
-         
+
          if (s% force_timestep > 0) then
             s% dt_next = s% force_timestep
             s% why_Tlim = Tlim_force_timestep
@@ -101,7 +101,7 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt ! timestep just completed
 
-         real(dp) :: dt_limit_ratio(numTlim), dt_limit, limit, order, max_timestep_factor
+         real(dp) :: dt_limit_ratio(numTlim), order, max_timestep_factor
          integer :: i_limit, nz, ierr
          logical :: skip_hard_limit
          integer :: num_mix_boundaries ! boundaries of regions with mixing_type /= no_mixing
@@ -136,7 +136,7 @@
          if (return_now(Tlim_struc)) return
 
          if (.not. s% doing_first_model_of_run) then
-         
+
             if (s% use_other_timestep_limit) then
                do_timestep_limits = s% other_timestep_limit( &
                   s% id, skip_hard_limit, dt, dt_limit_ratio(Tlim_other_timestep_limit))
@@ -336,24 +336,24 @@
          end if
 
          i_limit = maxloc(dt_limit_ratio(1:numTlim), dim=1)
-         
+
          order = 1
          call filter_dt_next(s, order, dt_limit_ratio(i_limit)) ! sets s% dt_next
-         
+
          if (s% log_max_temperature > s% min_logT_for_max_timestep_factor_at_high_T) then
             max_timestep_factor = s% max_timestep_factor_at_high_T
          else
             max_timestep_factor = s% max_timestep_factor
          end if
-         
+
          if (max_timestep_factor > 0 .and. s% dt_next > max_timestep_factor*s% dt) then
             s% dt_next = max_timestep_factor*s% dt
             if (s% report_solver_dt_info) then
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'max_timestep_factor', s% model_number, max_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             if (i_limit == Tlim_struc) i_limit = Tlim_max_timestep_factor
          end if
 
@@ -363,8 +363,8 @@
                write(*,2) 's% dt', s% model_number, s% dt
                write(*,2) 'min_timestep_factor', s% model_number, s% min_timestep_factor
                write(*,2) 's% dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             if (i_limit == Tlim_struc) i_limit = Tlim_min_timestep_factor
          end if
 
@@ -375,7 +375,6 @@
 
          logical function return_now(i_limit)
             integer, intent(in) :: i_limit
-            integer :: k
             if (do_timestep_limits == keep_going) then
                return_now = .false.
                return
@@ -420,10 +419,10 @@
          logical, intent(in) :: skip_hard_limit
          real(dp), intent(in) :: dt
          real(dp), intent(inout) :: dt_limit_ratio
-         integer :: max_steps, i
+         integer :: max_steps
          check_burn_steps_limit = keep_going
          if (.not. s% op_split_burn .or. maxval(s% T_start(1:s%nz)) < s% op_split_burn_min_T) return
- 
+
          max_steps = maxval(s% burn_num_iters(1:s% nz),mask=s% T(1:s%nz)>s% op_split_burn_min_T)
          check_burn_steps_limit = check_integer_limit( &
            s, s% burn_steps_limit, s% burn_steps_hard_limit, max_steps,  &
@@ -514,10 +513,10 @@
                 s% dX_div_X_hard_limit(i) >= 1) then
                cycle  ! go to next
             end if
-         
+
             dX_limit = s% dX_limit(i) * s% time_delta_coeff
             dX_hard_limit = s% dX_hard_limit(i) * s% time_delta_coeff
-            
+
             if (s% log_max_temperature > s% dX_div_X_at_high_T_limit_lgT_min(i)) then
                dX_div_X_limit = s% dX_div_X_at_high_T_limit(i)
                dX_div_X_hard_limit = s% dX_div_X_at_high_T_hard_limit(i)
@@ -525,27 +524,27 @@
                dX_div_X_limit = s% dX_div_X_limit(i)
                dX_div_X_hard_limit = s% dX_div_X_hard_limit(i)
             end if
-            
+
             dX_div_X_limit = dX_div_X_limit * s% time_delta_coeff
             dX_div_X_hard_limit = dX_div_X_hard_limit * s% time_delta_coeff
-            
+
             max_dX = -1; max_dX_j = -1; max_dX_k = -1
             max_dX_div_X = -1; max_dX_div_X_j = -1; max_dX_div_X_k = -1
             bdy = 0
             max_dX_bdy_dist_dm = 0
             max_dX_div_X_bdy_dist_dm = 0
             cz_dist_limit = s% dX_mix_dist_limit*Msun
-   
+
             if (s% set_min_D_mix .and. s% ye(s% nz) >= s% min_center_Ye_for_min_D_mix) then
                D_mix_cutoff = s% min_D_mix
             else
                D_mix_cutoff = 0
             end if
-            
+
             sp = s% dX_limit_species(i)
-            
+
             do k = 1, s% nz
-   
+
                if (s% D_mix(k) > D_mix_cutoff) then
                   cycle
                end if
@@ -554,7 +553,7 @@
                      cycle
                   end if
                end if
-   
+
                ! find the nearest mixing boundary
                bdy = binary_search(n_mix_bdy, mix_bdy_q, bdy, s% q(k))
                ! don't check cells near a mixing boundary
@@ -564,9 +563,9 @@
                else
                   bdy_dist_dm = 0
                end if
-               
+
                do j = 1, s% species
-   
+
                   cid = s% chem_id(j)
                   if (sp == 'X') then  ! any hydrogen
                      if (cid /= ih1 .or. cid /= ih2 .or. cid /= ih3) cycle
@@ -577,13 +576,13 @@
                   else  ! single isotope
                      if (trim(chem_isos% name(s% chem_id(j))) /= trim(sp)) cycle
                   end if
-   
+
                   X = s% xa(j,k)
                   X_old = s% xa_old(j,k)
                   delta_X = X_old - X ! decrease in abundance
-   
+
                   if ((.not. s% dX_decreases_only(j)) .and. delta_X < 0) delta_X = -delta_X
-   
+
                   if (X >= s% dX_limit_min_X(i)) then  ! any check for dX_limit_* < 1 is useless since X <= 1 anyway
                      if ((.not. skip_hard_limit) .and. delta_X > dX_hard_limit(i)) then
                         check_dX = retry
@@ -637,7 +636,7 @@
                   end if
                end do
             end do
-            
+
             if (dX_limit(i) > 0) then
                ratio_tmp_dX = max_dX/dX_limit(i)
                if (ratio_tmp_dX > dX_dt_limit_ratio) then
@@ -656,7 +655,7 @@
                   end if
                end if
             end if
-   
+
             if (dX_div_X_limit(i) > 0) then
                ratio_tmp_dX_div_X = max_dX_div_X/dX_div_X_limit(i)
                if (ratio_tmp_dX_div_X > dX_div_X_dt_limit_ratio) then  ! pick out largest culprit only!
@@ -689,7 +688,7 @@
          real(dp) :: L, abs_dL, abs_dL_div_L, max_dL_div_L
          integer :: k, max_dL_div_L_k
          real(dp) :: dL_div_L_limit_min_L, dL_div_L_limit, dL_div_L_hard_limit
-         
+
          include 'formats'
 
          check_dL_div_L = keep_going
@@ -720,7 +719,7 @@
                      write(*,2) 'L_start', s% L_start(k)
                      write(*,2) 'abs_dL_div_L', abs_dL_div_L
                      write(*,2) 'dL_div_L_hard_limit', dL_div_L_hard_limit
-                  end if                  
+                  end if
                   return
                end if
                if (abs_dL_div_L > max_dL_div_L) then
@@ -788,7 +787,7 @@
          do k=1,s% nz
             if (s% lnPeos(k) < lim) cycle
             dlnP = abs(s% lnPeos(k) - s% lnPeos_start(k))
-            if (dlnP > max_dlnP) then               
+            if (dlnP > max_dlnP) then
                max_dlnP = dlnP
                i = k
             end if
@@ -1021,7 +1020,7 @@
          integer :: iso
          include 'formats'
          check_lgL = keep_going
-         
+
          iso = iso_in
          if (iso == iprot) then ! check_lgL_power_photo_change
             if (s% log_max_temperature < s% min_lgT_for_lgL_power_photo_limit) return
@@ -1079,9 +1078,9 @@
          else
             call mesa_error(__FILE__,__LINE__,'bad iso arg for check_lgL')
          end if
-         
+
          if (old_L < 0d0) return
-         
+
          lim = lim*s% time_delta_coeff
          hard_lim = hard_lim*s% time_delta_coeff
 
@@ -2154,7 +2153,7 @@
 
          s% Tlim_dXnuc_drop_cell = max_k
          s% Tlim_dXnuc_drop_species = max_j
-         
+
          hard_limit = s% dX_nuc_drop_hard_limit*s% time_delta_coeff
          if (hard_limit > 0 .and. (.not. skip_hard_limit) .and. &
                max_dx_nuc_drop > hard_limit) then
@@ -2168,7 +2167,7 @@
             check_dX_nuc_drop = retry
             return
          end if
-         
+
          limit = s% dX_nuc_drop_limit*s% time_delta_coeff
          if (s% log_max_temperature >= 9.45d0 .and. s% dX_nuc_drop_limit_at_high_T > 0) &
             limit = s% dX_nuc_drop_limit_at_high_T
@@ -2183,15 +2182,15 @@
 
          s% dX_nuc_drop_max_j = max_j
          s% dX_nuc_drop_max_k = max_k
-         
+
          contains
 
          subroutine do1(k)
             integer, intent(in) :: k
 
-            integer :: j, jj, ii
+            integer :: j
             real(dp) :: dx, dx_drop, dm, dt_dm, dx_burning, dx_inflow, dxdt_nuc
-            real(dp) ::dx00, dxp1, sig00, sigp1, flux00, fluxp1
+            real(dp) :: dx00, dxp1, sig00, sigp1, flux00, fluxp1
 
             include 'formats'
 
@@ -2230,7 +2229,7 @@
                else
                   sigp1 = 0
                end if
-               
+
                if (k > 1) then
                   dx00 = s% xa(j,k-1) - s% xa(j,k)
                   flux00 = -sig00*dx00
@@ -2246,7 +2245,7 @@
                end if
 
                dx_inflow = max(0d0, fluxp1, -flux00)*dt_dm
-               
+
                dx_drop = -(dx_burning + dx_inflow) ! dx_burning < 0 for drop
 
                dx = s% xa_old(j,k) - s% xa(j,k) ! the actual drop
@@ -2286,7 +2285,7 @@
             s% result_reason = nonzero_ierr
             return
          end if
-         
+
          if (s% varcontrol_target < s% min_allowed_varcontrol_target) then
             check_varcontrol_limit = terminate
             write(*, *) 'ERROR: timestep varcontrol_target < min_allowed_varcontrol_target'
@@ -2320,7 +2319,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: j, nterms, nvar_hydro, nz, k, kk
+         integer :: j, nterms, nvar_hydro, nz, k
          real(dp) :: sumj, sumvar, sumscales, sumterm(s% nvar_total)
          real(dp), parameter :: xscale_min = 1
 
@@ -2366,11 +2365,11 @@
             sumterm(j) = sumterm(j) + sumj
             k = nz-1
             sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
-            
+
             if (j == s% i_lnd) then
                sumterm(j) = sumterm(j)/3 ! Seems to help. from Eggleton.
             end if
-            
+
             sumvar = sumvar + sumterm(j)
             sumscales = sumscales + max(xscale_min, abs(s% xh_old(j,1)))
 
@@ -2399,7 +2398,7 @@
          beta1 = 0.25d0/order
          beta2 = 0.25d0/order
          alpha2 = 0.25d0
-         
+
          dt_limit_ratio = max(1d-10, dt_limit_ratio_in)
          s% dt_limit_ratio = dt_limit_ratio
          dt_limit_ratio_target = 1d0
@@ -2431,8 +2430,8 @@
                write(*,2) 'dt_limit_ratio_target', s% model_number, dt_limit_ratio_target
                write(*,2) 'dt_limit_ratio', s% model_number, dt_limit_ratio
                write(*,2) 'filter_dt_next', s% model_number, s% dt_next
-               if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
             end if
+            if (s% dt_next == 0d0) call mesa_error(__FILE__,__LINE__,'filter_dt_next')
          end if
 
 

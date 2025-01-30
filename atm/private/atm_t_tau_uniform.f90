@@ -108,7 +108,7 @@ contains
     real(dp) :: dlnT_dlnR_
     real(dp) :: dlnP_dlnM_
     real(dp) :: dlnT_dlnM_
-    
+
     include 'formats'
 
     ierr = 0
@@ -329,7 +329,7 @@ contains
 
     g = cgrav*M/(R*R)
 
-    ! Allocte atm_structure at its initial size
+    ! Allocate atm_structure at its initial size
 
     allocate(atm_structure(num_results_for_build_atm,INIT_NUM_PTS))
 
@@ -374,11 +374,11 @@ contains
 
     call dopri5( &
          NUM_VARS, build_fcn, lntau_surf, y, lntau_outer, &
-         dlntau, dlntau_max, MAX_STEPS, & 
-         rtol, atol, 1, & 
-         build_solout, IOUT, & 
-         work, lwork, iwork, liwork, & 
-         LRPAR, rpar, LIPAR, ipar, & 
+         dlntau, dlntau_max, MAX_STEPS, &
+         rtol, atol, 1, &
+         build_solout, IOUT, &
+         work, lwork, iwork, liwork, &
+         LRPAR, rpar, LIPAR, ipar, &
          LOUT, idid)
     if (idid < 0) then
        write(*,*) 'atm: Call to dopri5 failed in build_T_tau_uniform: idid=', idid
@@ -454,6 +454,7 @@ contains
       interface
          real(dp) function interp_y(i, s, rwork_y, iwork_y, ierr)
            use const_def, only: dp
+           implicit none
            integer, intent(in) :: i
            real(dp), intent(in) :: s
            real(dp), intent(inout), target :: rwork_y(*)
@@ -638,7 +639,7 @@ contains
     real(dp) :: dlnTeff_dL
     real(dp) :: dlnTeff_dlnR
     real(dp) :: dlnT_dlnTeff
-    
+
     include 'formats'
 
     ierr = 0
@@ -670,7 +671,7 @@ contains
 
     call eval_T_tau(T_tau_id, tau, Teff, lnT, ierr)
     if (ierr /= 0) then
-       write(*,*) 'atm: Call to eval_T_tau failed in eval_data' 
+       write(*,*) 'atm: Call to eval_T_tau failed in eval_data'
        return
     end if
 

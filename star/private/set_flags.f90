@@ -33,7 +33,7 @@
       implicit none
 
       contains
-      
+
 
       subroutine set_v_flag(id, v_flag, ierr)
          integer, intent(in) :: id
@@ -41,7 +41,6 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, nz, i_v, i_u
-         real(dp) :: cs
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -49,7 +48,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% v_flag .eqv. v_flag) return
 
          nz = s% nz
@@ -96,7 +95,7 @@
          end if
 
          call set_chem_names(s)
-         
+
          if (v_flag .and. s% u_flag) then ! turn off u_flag when turn on v_flag
             call set_u_flag(id, .false., ierr)
          end if
@@ -133,7 +132,6 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: nvar_hydro_old, k, nz, i_u, i_v
-         real(dp) :: cs
          logical, parameter :: dbg = .false.
 
          integer :: num_u_vars
@@ -189,7 +187,7 @@
          end if
 
          call set_chem_names(s)
-         
+
          if (u_flag .and. s% v_flag) then ! turn off v_flag when turn on u_flag
             call set_v_flag(id, .false., ierr)
          end if
@@ -232,8 +230,7 @@
          logical, intent(in) :: RTI_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -307,7 +304,7 @@
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, i, k, j, nz, iounit
+         integer :: nvar_hydro_old, i, k, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -315,13 +312,13 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          !write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
          !write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
          if (s% RSP2_flag .eqv. RSP2_flag) return
 
          nz = s% nz
-         
+
          s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
 
@@ -332,14 +329,14 @@
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
-         
+
          write(*,*) 'set_RSP2 variables and equations'
          if (.false.) then
             do i=1,s% nvar_hydro
                write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
             end do
          end if
-         
+
          call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
          if (ierr /= 0) return
 
@@ -347,7 +344,7 @@
          if (ierr /= 0) return
 
          if (RSP2_flag) then
-            call insert1(s% i_w) 
+            call insert1(s% i_w)
             if (s% RSP_flag) then
                do k=1,nz
                   s% xh(s% i_w,k) = sqrt(max(0d0,s% xh(s% i_Et_RSP,k)))
@@ -366,23 +363,23 @@
          end if
 
          call set_chem_names(s)
-         
+
          if (.not. RSP2_flag) return
-         
+
          if (s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
-         
+
          call set_v_flag(s% id, .true., ierr)
          if (ierr /= 0) return
-         
+
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return
 
          call set_RSP2_vars(s,ierr)
          if (ierr /= 0) return
-         
+
          if (s% RSP2_remesh_when_load) then
             write(*,*) 'doing automatic remesh for RSP2'
             call remesh_for_RSP2(s,ierr)
@@ -390,14 +387,14 @@
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) return
             call set_m_and_dm(s)
-            call set_dm_bar(s, nz, s% dm, s% dm_bar)   
+            call set_dm_bar(s, nz, s% dm, s% dm_bar)
             call set_vars(s, s% dt, ierr) ! redo after remesh_for_RSP2
             if (ierr /= 0) return
          end if
-         
-         
-         
-         contains     
+
+
+
+         contains
 
          subroutine insert1(i_var)
             integer, intent(in) :: i_var
@@ -411,7 +408,7 @@
                call insert(s% xh_old,i_var)
             end if
          end subroutine insert1
-             
+
          subroutine remove1(i_remove)
             integer, intent(in) :: i_remove
             call del(s% xh,i_remove)
@@ -497,10 +494,10 @@
          end if
 
          call set_chem_names(s)
-         
+
          if (RSP_flag) call set_v_flag(s% id, .true., ierr)
 
-         contains     
+         contains
 
          subroutine insert1(i_var)
             integer, intent(in) :: i_var
@@ -513,7 +510,7 @@
                call insert(s% xh_old,i_var)
             end if
          end subroutine insert1
-             
+
          subroutine remove1(i_remove)
             integer, intent(in) :: i_remove
             call del(s% xh,i_remove)
@@ -556,8 +553,7 @@
          logical, intent(in) :: w_div_wc_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -565,7 +561,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% w_div_wc_flag .eqv. w_div_wc_flag) return
 
          nz = s% nz
@@ -627,8 +623,7 @@
          logical, intent(in) :: j_rot_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         integer :: nvar_hydro_old, k, nz
-         real(dp) :: cs
+         integer :: nvar_hydro_old, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -636,7 +631,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% j_rot_flag .eqv. j_rot_flag) return
 
          nz = s% nz
@@ -721,7 +716,7 @@
          s% am_nu_rot_flag = am_nu_rot_flag
          s% am_nu_rot(1:s% nz) = 0
       end subroutine set_am_nu_rot_flag
-      
+
 
       subroutine set_rotation_flag(id, rotation_flag, ierr)
          integer, intent(in) :: id

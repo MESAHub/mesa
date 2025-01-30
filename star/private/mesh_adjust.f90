@@ -68,7 +68,7 @@
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, Hp_face_old, &
+            lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, &
             specific_PE_old, specific_KE_old, &
             old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, omega_old, D_omega_old, D_mix_old
@@ -77,11 +77,10 @@
          real(dp), dimension(:,:), pointer :: xh, xa
          integer, intent(out) :: ierr
 
-         real(dp) :: dxa, xmstar, mstar, sumx, remove1, remove2, &
+         real(dp) :: dxa, xmstar, mstar, sumx, &
             total_internal_energy1, total_internal_energy2, err
          character (len=strlen) :: message
-         integer :: k, from_k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
-         logical :: found_bad_one
+         integer :: k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
          real(dp), pointer :: work(:)
          real(dp), dimension(:), allocatable :: &
             dqbar, dqbar_old, new_r, Vol_new, xq_old_plus1, &
@@ -251,12 +250,12 @@
                if (failed('D_omega')) return
             end if
          end if
-         
+
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, s% mlt_vc, mlt_vc_old, &
             0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
          if (failed('mlt_cv')) return
-         
+
          call do_interp_pt_val( &
             s, nz, nz_old, nzlo, nzhi, s% D_mix, D_mix_old, &
             0d0, xq, xq_old_plus1, xq_new, .true., work, tmp1, tmp2, ierr)
@@ -443,7 +442,7 @@
                dqbar(sz), dqbar_old(sz), new_r(sz), Vol_new(sz), xq_old_plus1(sz), &
                xout_old(sz), xout_new(sz), xq_new(sz), energy_new(sz), density_new(sz), &
                tmp1(sz), tmp2(sz), tmp3(sz), tmp4(sz), tmp5(sz), tmp6(sz), tmp7(sz), &
-               xa_c0(sz,species), xa_c1(sz,species), xa_c2(sz,species))            
+               xa_c0(sz,species), xa_c1(sz,species), xa_c2(sz,species))
          end subroutine do_alloc
 
          subroutine dealloc
@@ -895,7 +894,7 @@
 
          real(dp), pointer, dimension(:) :: &
             mid_xq_new, mid_xq_old_plus1
-         integer :: n, i, j, k
+         integer :: n, i, k
 
          ierr = 0
          n = nzhi - nzlo + 1
@@ -942,7 +941,7 @@
          call dealloc
 
          contains
-            
+
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
             call do_work_arrays(.true.,ierr)
@@ -993,7 +992,7 @@
             interp_Vol_new, interp_xq, density_init
          integer, intent(out) :: ierr
 
-         integer :: k, from_k, kk, n, interp_lo, interp_hi, interp_n, num_revise
+         integer :: k, from_k, n, interp_lo, interp_hi, interp_n
          real(dp) :: Vol_min, Vol_max, cell_Vol, Vol_center, Vm1, V00, Vp1
 
          logical, parameter :: dbg = .false., trace_PE_residual = .false.
@@ -1187,7 +1186,7 @@
             end if
             if (density_new(k) == old_rho(from_k)) then
                xh(s%i_lnd,k) = xh_old(s%i_lnd,from_k)
-            else 
+            else
                call store_rho_in_xh(s,k,density_new(k),xh)
             end if
          end do
@@ -1350,13 +1349,12 @@
             specific_PE_old, specific_KE_old, w_old, density_new, energy_new
          integer, intent(out) :: ierr
 
-         integer :: k_old, k_old_last, lnT_order, energy_order
+         integer :: k_old
          real(dp) :: &
             Rho, logRho, xq_outer, cell_dq, avg_energy, avg_PE, avg_KE, &
             new_PE, new_KE, max_delta_energy, delta_energy, revised_energy, &
             sum_lnT, avg_lnT, new_lnT, sum_energy, new_xa(species), &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
-         logical :: dbg_get_integral
 
          include 'formats'
 
@@ -1436,11 +1434,11 @@
             end if
             avg_energy = sum_energy/cell_dq
          end if
-         
+
          if (s% max_rel_delta_IE_for_mesh_total_energy_balance == 0d0) then
-         
+
             energy_new(k) = avg_energy
-         
+
          else
 
             if (cell_type(k) == revised_type) then
@@ -1470,7 +1468,7 @@
                end if
                avg_KE = sum_energy/cell_dq
             end if
-         
+
             if (ierr /= 0) return
             new_PE = cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
             if (s% u_flag) then
@@ -1487,12 +1485,12 @@
                delta_energy = sign(max_delta_energy,delta_energy)
             end if
             energy_new(k) = avg_energy + delta_energy
-            
+
             if (energy_new(k) <= 0d0) then
                write(*,2) 'energy_new(k) <= 0d0', k, energy_new(k), avg_energy
                energy_new(k) = avg_energy
             end if
-            
+
          end if
 
          ! call eos to calculate lnT from new internal energy
@@ -1509,7 +1507,7 @@
             energy_new(k) = energy_old(k_old)
             ierr = 0
          end if
-         
+
          call store_lnT_in_xh(s, k, new_lnT, xh)
 
          if (ierr /= 0) then
@@ -1557,7 +1555,7 @@
          if (dbg) write(*,*)
 
          ierr = 0
-         
+
          k_old = k_old_in
          ! move starting k_old if necessary
          do
@@ -1608,8 +1606,8 @@
 
                if (xq_inner <= old_xq_inner) then
 
-                  if (dbg) write(*,1) 'last part of the new range'                  
-                  
+                  if (dbg) write(*,1) 'last part of the new range'
+
                   integral = integral + val*(dq_range - sum_dqs)
                   sum_dqs = dq_range
 
@@ -1646,8 +1644,8 @@
             s, k, h1, he3, he4, species, xa, 1d-11, &
             Rho, logRho, energy, lnT_guess, lnT, result_energy, ierr)
       end subroutine set_lnT_for_energy
-      
-      
+
+
       subroutine set_lnT_for_energy_with_tol( &
             s, k, h1, he3, he4, species, xa, tol, &
             Rho, logRho, energy, lnT_guess, lnT, result_energy, ierr)
@@ -1661,11 +1659,10 @@
          integer, intent(out) :: ierr
 
          real(dp) :: &
-            X, Y, Z, T, logT, res(num_eos_basic_results), &
+            logT, res(num_eos_basic_results), &
             d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
             d_dxa(num_eos_d_dxa_results, s% species), &
             logT_tol, logE_tol
-         integer :: j
 
          include 'formats'
 
@@ -1681,7 +1678,7 @@
             d_dxa, &
             ierr)
          lnT = logT*ln10
-         
+
          result_energy = exp(res(i_lnE))
 
          if (ierr /= 0 .or. is_bad_num(lnT)) then
@@ -1947,8 +1944,7 @@
             xout_old, xout_new, old_dqbar, new_dqbar
          real(dp), intent(in) :: xh(:,:)
          integer, intent(out) :: ierr
-         integer :: k, op_err, old_k, new_k
-         real(dp) :: old_j_tot, new_j_tot
+         integer :: k, op_err
          include 'formats'
          ierr = 0
 
@@ -1977,7 +1973,7 @@
          integer, intent(out) :: ierr
 
          real(dp) :: xq_outer, xq_inner, j_tot, xq0, xq1, new_point_dqbar, dq_sum, dq, r00
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 
@@ -2139,7 +2135,7 @@
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
-         integer :: k, j, op_err, old_k, new_k, i_v
+         integer :: k, op_err, i_v
          real(dp) :: old_ke_tot, new_ke_tot, xmstar, err
 
          include 'formats'
@@ -2208,7 +2204,7 @@
 
          real(dp) :: xq_outer, xq_inner, ke_sum, &
             xq0, xq1, new_point_dqbar, dq_sum, dq
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 
@@ -2396,7 +2392,7 @@
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
-         integer :: k, j, op_err, old_k, new_k, i_u
+         integer :: k, op_err, i_u
          real(dp) :: old_ke_tot, new_ke_tot, xmstar, err
 
          include 'formats'
@@ -2457,7 +2453,7 @@
 
          real(dp) :: xq_outer, xq_inner, ke_sum, &
             xq0, xq1, new_cell_dq, dq_sum, dq
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 
@@ -2674,7 +2670,7 @@
 
       end subroutine do_Hp_face
 
-      
+
       subroutine do_etrb( & ! same logic as do_u
             s, nz, nz_old, cell_type, comes_from, &
             old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
@@ -2688,7 +2684,7 @@
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
-         integer :: k, j, op_err, old_k, new_k, i_w
+         integer :: k, op_err, i_w
          real(dp) :: old_eturb_tot, new_eturb_tot, xmstar, err
 
          include 'formats'
@@ -2749,7 +2745,7 @@
 
          real(dp) :: xq_outer, xq_inner, eturb_sum, &
             xq0, xq1, new_cell_dq, dq_sum, dq
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 

@@ -112,7 +112,7 @@ controls) are as follows:
 
   - MESA uses pre-computed tables, from separate model atmosphere
     calculations, to interpolate T_surf and P_surf values for the
-    boundary conditions. The interpolations are peformed using the
+    boundary conditions. The interpolations are performed using the
     effective temperature Teff and log10-surface gravity logg as
     independent variables. The choice of table is set by the
     'atm_table' control:

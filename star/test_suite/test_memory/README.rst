@@ -17,7 +17,7 @@ Rather, valgrind must be launched by hand:
 
   valgrind --leak-check=full --error-limit=no  ./test_memory
 
-To hide a number of false positives, due to internal gfortran issues, one can also use the supplied supression file ``mesa.supp``:
+To hide a number of false positives, due to internal gfortran issues, one can also use the supplied suppression file ``mesa.supp``:
 
 .. code-block:: console
 
@@ -27,9 +27,9 @@ Other usefull valgrind options:
 
 .. code-block:: console
 
- --show-leak-kinds=all --track-origins=yes  : To add additonal output
+ --show-leak-kinds=all --track-origins=yes  : To add additional output
  --log-file=valgrind.out : Redirect valgrind's output to the file ``valgrind.out''
- --gen-suppressions=all : Generates supression rules as valgrind runs, helpful when you want to edit mesa.supp
+ --gen-suppressions=all : Generates suppression rules as valgrind runs, helpful when you want to edit mesa.supp
 
 
 Last-Updated: 03Jul2021 (MESA 094ff71) by fxt.

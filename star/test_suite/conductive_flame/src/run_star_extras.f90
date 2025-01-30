@@ -31,7 +31,7 @@
          implicit none
 
          include "test_suite_extras_def.inc"
-         
+
          real(dp) :: constant_lnP, constant_lnT
          real(dp) :: flame_position, flame_width, flame_r0, flame_t0
 

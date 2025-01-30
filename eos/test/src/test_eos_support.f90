@@ -7,12 +7,12 @@
       use const_def
       use eos_support
       use math_lib
-      
+
       implicit none
 
       contains
-      
-      
+
+
       subroutine test1_eosPT_for_ck(quietly)
          logical, intent(in) :: quietly
          real(dp) :: Z, X, logPgas, logT, logRho, logP
@@ -24,7 +24,7 @@
          call test1_eosPT(Z, X, logPgas, logT, .false., quietly, logRho, logP)
       end subroutine test1_eosPT_for_ck
 
-      
+
       subroutine test_eosPT(which)
          integer, intent(in) :: which
          real(dp) :: Z, X, logPgas, logT, logRho, logP
@@ -34,8 +34,8 @@
          logPgas = 5d0
          call test1_eosPT(Z, X, logPgas, logT, .false., .false., logRho, logP)
       end subroutine test_eosPT
-            
-      
+
+
       subroutine test1_eosPT(Z, X, logPgas, logT, do_compare, quietly, logRho, logP)
          logical, intent(in) :: quietly
          real(dp) :: Z, X, logPgas, logT
@@ -45,20 +45,19 @@
                P, Pgas, Prad, T, Rho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dlnT(num_eos_basic_results), &
-               d_dabar(num_eos_basic_results), d_dzbar(num_eos_basic_results), &
                res2(num_eos_basic_results), d_dlnd2(num_eos_basic_results), &
                d_dxa2(num_eos_d_dxa_results, species), &
                d_dlnT2(num_eos_basic_results)
          integer:: ierr, i
          character (len=eos_name_length) :: names(num_eos_basic_results)
-         
-         
+
+
          include 'formats'
- 
+
          ierr = 0
 
          call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
-         
+
          if (.false.) then ! TESTING
             z =     0d0
             x =     0.72d0
@@ -68,7 +67,7 @@
             logPgas  = 4.8066181993619859D+00
             logT  = 3.7569035961895620D+00
          end if
-         
+
          T = exp10(logT)
          Pgas = exp10(logPgas)
 
@@ -95,13 +94,13 @@
             write(*,*) 'ierr in eosPT_get for test1_eosPT'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          Prad = crad*T*T*T*T/3
          P = Pgas + Prad
          logP = log10(P)
-         
+
          if (quietly) return
-         
+
          write(*,'(A)')
          write(*,1) 'rho', rho
          write(*,1) 'logRho', logRho
@@ -110,7 +109,7 @@
          write(*,'(A)')
 
          names = eosDT_result_names
-         
+
          if (.not. do_compare) then ! simple form of output
             write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
             write(*,1) 'dlnRho_dlnT_c_Pgas', dlnRho_dlnT_c_Pgas
@@ -135,9 +134,9 @@
             write(*,*) 'ierr in eosDT_get for test1_eosPT'
             call mesa_error(__FILE__,__LINE__)
          end if
-     
+
          write(*,'(A)')
-         
+
          write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
          write(*,1) 'dlnRho_dlnT_c_Pgas', dlnRho_dlnT_c_Pgas
          do i=1, num_eos_basic_results
@@ -145,33 +144,28 @@
                   (res(i)-res2(i)) / max(1d0, abs(res(i)), abs(res2(i)))
          end do
          write(*,'(A)')
-         
+
          do i=1, num_eos_basic_results
             write(*,1) 'd_dlnd ' // trim(names(i)), d_dlnd(i), d_dlnd2(i), &
                   (d_dlnd(i)-d_dlnd2(i)) / max(1d0, abs(d_dlnd(i)), abs(d_dlnd2(i)))
          end do
          write(*,'(A)')
-         
+
          do i=1, num_eos_basic_results
             write(*,1) 'd_dlnT ' // trim(names(i)), d_dlnT(i), &
                   d_dlnT2(i), (d_dlnT(i)-d_dlnT2(i)) / max(1d0, abs(d_dlnT(i)), abs(d_dlnT2(i)))
          end do
          write(*,'(A)')
-         
+
       end subroutine test1_eosPT
-      
-      
+
+
       subroutine Do_One(quietly)
          logical, intent(in) :: quietly
-         real(dp) :: T, rho, log10_rho, log10_T
-         real(dp), dimension(num_eos_basic_results) :: res, d_dlnd, d_dlnT
-         integer :: info, i
-         real(dp) :: XC, XO, Ah, Zh, Yh, Ahe, Zhe, Yhe, Az, Zz, Yz, ddabar, ddzbar, &
-               helm_ddXh, helm_ddXz, opal_ddXh, opal_ddXz, XC0, XO0, &
-               helm_P, helm_PX, helm_PZ, opal_P, opal_PX, opal_PZ, X1, X2, Z1, Z2, &
-               abar1, zbar1, dXC, dlnP_dabar, dlnP_dzbar, dlnP_dXC, &
-               dabar_dZ, dzbar_dZ, dlnP_dZ, P, logRhoguess
-         
+         real(dp) :: T, rho
+         real(dp), dimension(num_eos_basic_results) :: res
+         real(dp) :: dXC
+
          if (.true.) then
             ! pure Helium
             X = 0.00d0
@@ -198,7 +192,7 @@
             dXC = 0.00d0
             call doit('solar')
          end if
-         
+
          if (.true.) then ! do get_Rho and get_T
             X = 0.70d+00
             Zinit = 0.02d0
@@ -213,22 +207,22 @@
             call test_get_Rho_T
             if (.not. quietly) write(*,*)
          end if
-         
+
          contains
 
-         
+
          subroutine doit(str)
             character (len=*), intent(in) :: str
-            
+
             if (.false.) then
                T = 2d8; rho = 100
                call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! scvh
                stop
             end if
-            
+
             if (.not. quietly) write(*,*) trim(str)
 
-            
+
             T = 1d6; rho = 1d-2
             call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal
             T = 1d4; rho = 1d-1
@@ -237,26 +231,25 @@
             call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal-scvh overlap
             T = 2d8; rho = 1d2
             call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! helm
-            
+
             if (.not. quietly) write(*,*)
-            
-         end subroutine
+
+         end subroutine doit
 
 
          subroutine test_get_Rho_T ! using most recent values from subroutine Do_One_TRho
             real(dp) :: tol, othertol, &
                result, result_log10, log10_T, log10_rho, lnS, Prad, Pgas, logP, &
-               clipped_log10rho, clipped_log10temp, &
                logRho_guess, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
                logT_guess, logT_bnd1, logT_bnd2
-            integer :: i, which_other, max_iter, eos_calls, ierr
+            integer :: max_iter, eos_calls, ierr
             real(dp), dimension(num_eos_basic_results) :: &
                   d_dlnd, d_dlnT
             real(dp), dimension(num_eos_d_dxa_results, species) :: &
                   d_dxa
-            
+
             if (.not. quietly) write(*,*)
-                        
+
             log10_rho = log10(rho)
             log10_T = log10(T)
             lnS = res(i_lnS)
@@ -267,7 +260,7 @@
             othertol = 1d-12
 
  1          format(a30,1pe24.16)
-            
+
             if (.not. quietly) then
                write(*,'(A)')
                write(*,1) ' tolerance', tol
@@ -302,7 +295,7 @@
                write(*,1) '     got logS', res(i_lnS)/ln10
                write(*,'(A)')
             end if
-         
+
             result = T*2d0 ! initial guess
             result_log10 = log10(result)
             res = 0
@@ -372,27 +365,27 @@
          end subroutine test_get_Rho_T
 
       end subroutine Do_One
-      
-      
-      
+
+
+
       subroutine test1_eosPT_get_T
-         
+
          real(dp) :: &
                energy, abar, zbar, X, Z, logPgas, logT_tol, other_tol, other, &
                logT_guess, logT_bnd1, logT_bnd2, other_at_bnd1, other_at_bnd2, &
-               logT_result, new_energy, &
+               logT_result, &
                res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results), &
-               Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas         
+               Rho, log10Rho, dlnRho_dlnPgas_const_T, dlnRho_dlnT_const_Pgas
          integer:: ierr, which_other, eos_calls, max_iter
-         
+
  1       format(a40,1pe26.16)
- 
+
          call Setup_eos
- 
+
          ierr = 0
-         
+
          write(*,*) 'test1_eosPT_get_T'
 
                                      Z =    0.02d0
@@ -450,26 +443,26 @@
          write(*,'(A)')
          write(*,*) 'eos_calls', eos_calls
          write(*,'(A)')
-         
+
       end subroutine test1_eosPT_get_T
-      
+
 
 
       subroutine test_components
          real(dp) :: &
             X_test, Z, XC_test, XO_test, &
-            logT, logRho, Pgas, Prad, energy, entropy
+            logT, logRho, Pgas, energy, entropy
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_dlnd, d_dlnT
          integer:: ierr
          include 'formats'
-         
+
          write(*,*) 'test_components'
-         
+
          call Setup_eos
- 
+
          ierr = 0
-         
+
          X_test = 0.12d0
          Z = 0.03d0
          XC_test = 0d0
@@ -479,7 +472,7 @@
 
          logT = 6.0d0
          logRho = 3.5d0
-         
+
          write(*,1) 'logT', logT
          write(*,1) 'logRho', logRho
          write(*,'(A)')
@@ -505,7 +498,7 @@
          write(*,'(A)')
 
          contains
-         
+
          subroutine test1(which_eos, str)
             integer, intent(in) :: which_eos
             character (len=*), intent(in) :: str
@@ -519,51 +512,51 @@
                write(*,1) trim(str) // ' no results'
             else
                write(*,1) trim(str), Pgas, energy, entropy
-            end if  
+            end if
          end subroutine test1
-         
+
       end subroutine test_components
 
-      
-      
+
+
       subroutine test1_eosDT_get_T_given_egas
-         
+
          real(dp) :: &
                X, Z, abar, zbar, logRho, egas_want, egas_tol, logT_tol, logT_guess, &
                logT_bnd1, logT_bnd2, egas_at_bnd1, egas_at_bnd2, logT_result, erad, egas, energy, &
-               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), Pgas, logPgas, &
+               res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
                d_dxa(num_eos_d_dxa_results, species), &
                d_dlnT(num_eos_basic_results)
          integer:: ierr, eos_calls, max_iter
-         
+
  1       format(a40,1pe26.16)
- 
+
          call Setup_eos
- 
+
          ierr = 0
-         
+
                                      Z =    0.7D-02
                                      X =    7.3D-01
 
          call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
-         
+
          write(*,*) 'test1_eosDT_get_T_given_egas'
 
 
                                   abar =    1.2559567378472252D+00
                                   zbar =    1.0864043570945732D+00
                                   logRho =   -9.4201625429594529D+00
-                                  
+
                               egas_want = 2.0596457989663662D+12
                               egas_tol = egas_want*1d-11
                               logT_tol = 1d-11
                             logT_guess = 3.6962155439999007D+00
-                            
+
                              logT_bnd1 =   arg_not_provided
                              logT_bnd2 =   arg_not_provided
                          egas_at_bnd1 =   arg_not_provided
                          egas_at_bnd2 =   arg_not_provided
-                         
+
 
          max_iter = 100
 
@@ -602,15 +595,15 @@
          write(*,'(A)')
          write(*,*) 'eos_calls', eos_calls
          write(*,'(A)')
-         
-         
+
+
       end subroutine test1_eosDT_get_T_given_egas
 
 
 
 
-         
-      
+
+
       subroutine Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)
          logical, intent(in) :: quietly
          real(dp), intent(in) :: T, Rho, X, Zinit, dXC, dXO
@@ -622,17 +615,17 @@
          real(dp), dimension(num_eos_d_dxa_results, species) :: &
                d_dxa
          integer :: info, i
-         real(dp) :: dlnT, dlnRho, lnRho_2, Prad, Pgas, P
+         real(dp) :: Prad, Pgas, P
 
   101    format(a30,4x,1pe24.16)
   102    format(a30,3x,1pe24.16)
-         
-         
+
+
          Z = Zinit + dXC + dXO
          Y = 1 - (X+Z)
-                        
+
          call Init_Composition(X, Zinit, dXC, dXO)
-         
+
          if (.not. quietly) then
             write(*,'(A)')
             write(*,'(A)')
@@ -646,7 +639,7 @@
             write(*,102) 'T6', T * 1d-6
             write(*,'(A)')
          end if
-         
+
          call eosDT_get( &
                handle, &
                species, chem_id, net_iso, xa, &
@@ -657,9 +650,9 @@
             write(*,*) 'failed in Do_One_TRho'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (.not. quietly) then
-         
+
             write(*,*) 'eosDT_get'
             Prad = crad*T*T*T*T/3
             Pgas = exp(res(i_lnPgas))
@@ -673,7 +666,7 @@
             write(*,101) trim(eos_names(i_gamma1)), res(i_gamma1)
             write(*,101) trim(eos_names(i_gamma3)), res(i_gamma3)
             write(*,101) trim(eos_names(i_eta)), res(i_eta)
-            
+
             if (.false.) then ! debugging
                do i = 1, num_eos_basic_results
                   write(*,101) 'd_dlnd ' // trim(eos_names(i)), d_dlnd(i)
@@ -684,14 +677,14 @@
                end do
                write(*,'(A)')
             end if
-            
+
          end if
 
       end subroutine Do_One_TRho
 
-      
+
       subroutine test_dirac_integrals
-         real(dp) :: dk, T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e
+         real(dp) :: T, eta, theta, fdph, fdmh, fdeta, fdtheta, theta_e
  1       format(a40,1pe26.16)
          eta = 1.46722890948893d0
          T = 11327678.5183021d0
@@ -708,4 +701,4 @@
       end subroutine test_dirac_integrals
 
 
-      end module test_eos_support  
+      end module test_eos_support

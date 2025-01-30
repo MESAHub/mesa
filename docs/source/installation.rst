@@ -22,6 +22,10 @@ The minimum system requirements for MESA are:
 Most laptop or desktop computers built in the last three years will 
 satisfy these requirements.
 
+Ensure you have Python (3.5 or newer) installed on your system
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. warning:: As of r24.08.1, building MESA now requires Python (3.5 or newer) to be installed.
+
 Install the MESA SDK
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -111,6 +115,11 @@ uses export to set variables):
     # add shmesa (the MESA command line tool) to your PATH 
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
+Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `ld: library 'z' not found` on a Mac you may also need to add:
+
+.. code-block:: bash
+
+    export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 
 If your machine uses csh as its shell, use ``setenv`` instead of ``export``.
     

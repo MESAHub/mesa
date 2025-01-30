@@ -12,7 +12,7 @@ To use, simply call: `shmesa`
  \__ \ | | | |  | | |___ ___) / ___ \
  |___/_| |_|_|  |_|_____|____/_/   \_\
 
-Usage: shmesa [work|change|defaults|cp|grep|extras|zip|help] [arguments]
+Usage: shmesa [work|change|defaults|cp|grep|extras|zip|version|help] [arguments]
 
 Subcommands:
   work      copy the work directory to the current location
@@ -22,6 +22,7 @@ Subcommands:
   grep      search the MESA source code for a given string
   extras    fill in the full run_star_extras.f90 template
   zip       prepare a MESA directory for sharing
+  version   print the version of MESA
   help      display this helpful message
   -h        get additional details about any of the above
 ```

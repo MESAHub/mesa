@@ -46,9 +46,8 @@
          integer, intent(out) :: ierr
 
          integer :: iounit, i, j, k, version, part_number, &
-            len_history_col_spec, nz, kk
+            len_history_col_spec, nz
          logical, parameter :: dbg = .false.
-         real(dp) :: xx
 
          include 'formats'
 
@@ -96,10 +95,10 @@
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_Tsurf_factor, s% force_opacity_factor, &
             s% crystal_core_boundary_mass
-         
+
          if (failed('initial_y')) return
          s% nz_old = s% nz ! needed by alloc
-         
+
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &
                s% tau_factor /= s% job% set_to_this_tau_factor) then
             s% tau_factor = s% force_tau_factor
@@ -185,7 +184,7 @@
          if (failed('read_part_number')) return
 
          read(iounit, iostat=ierr) &
-            s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
+            s% num_skipped_setvars, s% num_retries, s% num_setvars, &
             s% total_num_solver_iterations, s% total_num_solver_relax_iterations, &
             s% total_num_solver_calls_made, s% total_num_solver_relax_calls_made, &
             s% total_num_solver_calls_converged, s% total_num_solver_relax_calls_converged, &
@@ -281,7 +280,7 @@
             if (failed('integer_dict_create_hash history_names_dict')) return
 
          end if
-         
+
          if (s% rsp_flag) then
             call rsp_photo_in(s, iounit, ierr)
             if (failed('after rsp_photo_in')) return
@@ -295,7 +294,7 @@
 
          call read_part_number(iounit)
          if (failed('final read_part_number')) return
-         
+
          s% need_to_setvars = .true. ! set this after photo out or photo in
 
          close(iounit)

@@ -78,8 +78,8 @@
                   end if
                end do
             end if
-         end do  
-                
+         end do
+
          if (s% eps_nuc_factor == 0d0) then
             s% power_nuc_burn = 0d0
             s% power_nuc_neutrinos = 0d0
@@ -89,7 +89,7 @@
             s% power_he_burn = 0d0
             s% power_z_burn = 0d0
             s% power_photo = 0d0
-         else            
+         else
             ! better if set power_nuc_burn using eps_nuc instead of categories
             ! categories can be subject to numerical jitters at very high temperatures
             s% power_nuc_burn = 0d0
@@ -101,14 +101,14 @@
                end if
                s% power_nuc_burn = s% power_nuc_burn + eps_nuc*s% dm(k)
             end do
-            s% power_nuc_burn = s% power_nuc_burn/Lsun            
+            s% power_nuc_burn = s% power_nuc_burn/Lsun
             s% power_nuc_neutrinos = dot_product(s% dm(1:nz),s% eps_nuc_neu_total(1:nz))/Lsun
             s% power_h_burn = s% L_by_category(ipp) + s% L_by_category(icno)
             s% power_he_burn = s% L_by_category(i3alf)
             s% power_z_burn = s% power_nuc_burn - (s% power_h_burn + s% power_he_burn)
             s% power_photo = s% L_by_category(iphoto)
          end if
-         
+
          if (s% non_nuc_neu_factor == 0d0) then
             s% power_nonnuc_neutrinos = 0d0
          else
@@ -117,7 +117,7 @@
          end if
          s% power_neutrinos = s% power_nuc_neutrinos + s% power_nonnuc_neutrinos
          s% L_nuc_burn_total = s% power_nuc_burn
-         
+
          contains
 
          real(dp) function center_value_eps_burn(j)
@@ -145,26 +145,20 @@
 
       subroutine do_report(s, ierr)
          use rates_def, only: &
-            i_rate, i_rate_dRho, i_rate_dT, std_reaction_Qs, std_reaction_neuQs
+            i_rate, i_rate_dRho, i_rate_dT
          use star_utils, only: get_phot_info
          use hydro_rotation, only: set_surf_avg_rotation_info
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         integer :: k, i, j, ic, nz, kcore, &
-            h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
-         real(dp) :: w1, radius, dr, dm, hpc, cur_m, cur_r, prev_r, tau_conv, &
-            twoGmrc2, cur_h, prev_h, cur_he, non_fe_core_mass, nu_for_delta_Pg, &
-            prev_he, cur_c, prev_c, v, mstar, pdg, pdg_prev, luminosity, &
-            prev_m, cell_mass, wf, conv_time, mv, bminv, uminb, eps_nuc_sum, eps_cat_sum,&
-            mass_sum
-         logical, parameter :: new_only = .false.
+         integer :: k, nz, h1, h2, he3, he4, c12, n14, o16, ne20, si28, co56, ni56, k_min
+         real(dp) :: radius, dr, non_fe_core_mass, nu_for_delta_Pg, v, mstar, luminosity, mass_sum
          integer, pointer :: net_iso(:)
          real(dp), pointer :: velocity(:) => null()
 
          include 'formats'
 
-         ierr = 0         
+         ierr = 0
          nz = s% nz
          net_iso => s% net_iso
 
@@ -179,7 +173,7 @@
          si28 = net_iso(isi28)
          co56 = net_iso(ico56)
          ni56 = net_iso(ini56)
-         
+
          radius = s% r(1)  !  radius in cm
          s% log_surface_radius = log10(radius/Rsun)
             ! log10(stellar radius in solar units)
@@ -210,7 +204,7 @@
             s% center_omega = center_value(s, s% omega)
             s% center_omega_div_omega_crit = center_omega_div_omega_crit()
          end if
-         
+
          luminosity = s% L(1)
 
          if (s% u_flag) then
@@ -222,7 +216,7 @@
          end if
 
          call set_surf_avg_rotation_info(s)
-         
+
          call set_min_gamma1(s)
 
          ! s% time is in seconds
@@ -234,27 +228,27 @@
             s% time_days = 0d0
             s% time_years = 0d0
          end if
-         
+
          ! s% dt is in seconds
          s% time_step = s% dt/secyer         ! timestep in years
          s% dt_years = s% dt/secyer
          s% dt_days = s% dt/secday
-         
+
          mstar = s% mstar
          s% star_mass = mstar/Msun             ! stellar mass in solar units
 
          s% kh_timescale = eval_kh_timescale(s% cgrav(1), mstar, radius, luminosity)/secyer
          ! kelvin-helmholtz timescale in years (about 1.6x10^7 for the sun)
-         
+
          if (is_bad(s% kh_timescale)) then
             write(*,1) 's% kh_timescale', s% kh_timescale
             write(*,1) 's% cgrav(1)', s% cgrav(1)
             write(*,1) 'mstar', mstar
             write(*,1) 'radius', radius
             write(*,1) 'luminosity', luminosity
-            stop 
+            stop
          end if
-         
+
          if (luminosity > 0d0) then
             s% nuc_timescale = 1d10*s% star_mass/(luminosity/Lsun)
          else
@@ -268,7 +262,7 @@
          end if
 
          ! center_avg_x and surface_avg_x check if the species is not in the net
-         ! and set's the values to 0 if so. So dont check species here. 
+         ! and set's the values to 0 if so. So dont check species here.
          s% center_h1 = center_avg_x(s,h1)
          s% surface_h1 = surface_avg_x(s,h1)
          s% center_he3 = center_avg_x(s,he3)
@@ -310,7 +304,7 @@
                if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
-            
+
             if (s% u_flag) then
                v = s% u(k)
             else if (s% v_flag) then
@@ -325,7 +319,7 @@
                if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'report')
                return
             end if
-            
+
             s% v_div_csound(k) = v/s% csound_face(k)
             if (is_bad(s% v_div_csound(k))) then
                ierr = -1
@@ -336,7 +330,7 @@
             end if
 
          end do
-         
+
          call set_phot_info(s)
 
          if (s% photosphere_r*Rsun >= s% r(1)) then
@@ -359,10 +353,10 @@
                s% delta_nu_sun*sqrt(s% star_mass)*pow3(s% Teff/s% astero_Teff_sun) / &
                   pow(s% L_phot,0.75d0)
          end if
-         
+
          call get_mass_info(s, s% dm, ierr)
          if (failed('get_mass_info')) return
-         
+
          s% nu_max = s% nu_max_sun*s% star_mass/ &
             (pow2(s% photosphere_r)*sqrt(max(0d0,s% Teff)/s% astero_Teff_sun))
          s% acoustic_cutoff = &
@@ -422,12 +416,12 @@
                   if (s% m(k) < Msun * s% fe_core_mass) exit
                   if(-velocity(k) > s% non_fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
-   
+
                if ((mass_sum > s% non_fe_core_infall_mass*msun) .and. &
                    (s%m(k_min) <= s% he_core_mass * msun)) then
                   s% non_fe_core_infall = -velocity(k_min)
                end if
-               
+
                s% non_fe_core_rebound = maxval(velocity(s%he_core_k:s%fe_core_k),dim=1)
 
             end if
@@ -463,7 +457,7 @@
                   do k = j+1, s% n_conv_regions
                      if (s% cz_bot_mass(k) - s% cz_top_mass(k-1) >= dm_limit) exit
                      s% mass_conv_core = s% cz_top_mass(k)/Msun
-                  end do 
+                  end do
                   exit
                end if
             end do
@@ -500,7 +494,6 @@
             use interp_1d_def
             use interp_1d_lib
             real(dp), intent(in) :: q
-            real(dp) :: vp2, vp1, v00, vm1
             integer, parameter :: n_old = 4, n_new = 1, nwork = pm_work_size
             real(dp) :: qlo, x_old(n_old), v_old(n_old), x_new(n_new), v_new(n_new)
             integer :: k, nz, k00, ierr
@@ -767,7 +760,7 @@
          ierr = 0
          bzm_1 = null_zone; bzm_2 = null_zone; bzm_3 = null_zone; bzm_4 = null_zone
          burn_zone = 0 ! haven't entered the zone yet
-         if (i_start .ne. s% nz) then
+         if (i_start /= s% nz) then
             i = i_start+1
             prev_m = s% m(i)
             prev_x = s% eps_nuc(i)
@@ -780,16 +773,16 @@
             cur_x = s% eps_nuc(i)
             select case (burn_zone)
                case (0)
-                  if ( cur_x .gt. burn_min2 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  if ( cur_x > burn_min2 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_2 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      end if
                      bzm_1 = bzm_2
                      burn_zone = 2
-                  elseif ( cur_x .gt. burn_min1 ) then
-                     if ( i .eq. s% nz ) then ! use star center as start of zone
+                  elseif ( cur_x > burn_min1 ) then
+                     if ( i == s% nz ) then ! use star center as start of zone
                         bzm_1 = 0d0
                      else ! interpolate to estimate where rate reached burn_min1
                         bzm_1 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
@@ -797,27 +790,27 @@
                      burn_zone = 1
                   end if
                case (1) ! in the initial eps > burn_min1 region
-                  if ( cur_x .gt. burn_min2 ) then
+                  if ( cur_x > burn_min2 ) then
                      bzm_2 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 2
-                  else if ( cur_x .lt. burn_min1 ) then
+                  else if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return
                   end if
                case (2) ! in the initial eps > burn_min2 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      bzm_3 = bzm_4
                      i_start = i
                      return
                   end if
-                  if ( cur_x .lt. burn_min2 ) then
+                  if ( cur_x < burn_min2 ) then
                      bzm_3 = find0(prev_m, prev_x-burn_min2, cur_m, cur_x-burn_min2)
                      burn_zone = 3
                   end if
                case (3) ! in the final eps > burn_min1 region
-                  if ( cur_x .lt. burn_min1 ) then
+                  if ( cur_x < burn_min1 ) then
                      bzm_4 = find0(prev_m, prev_x-burn_min1, cur_m, cur_x-burn_min1)
                      i_start = i
                      return
@@ -853,7 +846,7 @@
          real(dp), pointer, intent(in) :: cell_masses(:)
          integer, intent(out) :: ierr
 
-         integer :: k, nz, j, nzlo, nzhi, kbdy, nzlo_prev
+         integer :: k, nz, j
          real(dp) :: cell_mass
          integer, pointer :: net_iso(:)
 
@@ -899,7 +892,7 @@
          s% star_mass_n14 = s% star_mass_n14 / Msun
          s% star_mass_o16 = s% star_mass_o16 / Msun
          s% star_mass_ne20 = s% star_mass_ne20 / Msun
-         
+
          call get_core_info(s)
          call get_shock_info(s)
 
@@ -998,7 +991,7 @@
             mach1_k = 0
             return
          end if
-         
+
          mach1_radius = r/Rsun
          mach1_k = k
          if (k < s% nz) then
@@ -1216,7 +1209,7 @@
             core_m, core_r, core_lgT, core_lgRho, core_L, core_v, &
             core_omega, core_omega_div_omega_crit
 
-         integer :: j, jm1, j00
+         integer :: jm1, j00
          real(dp) :: dm1, d00, qm1, q00, core_q, &
             core_lgP, core_g, core_X, core_Y, &
             core_scale_height, core_dlnX_dr, core_dlnY_dr, core_dlnRho_dr
@@ -1271,8 +1264,8 @@
             bdy_scale_height, bdy_dlnX_dr, bdy_dlnY_dr, bdy_dlnRho_dr, &
             bdy_omega, bdy_omega_div_omega_crit
 
-         real(dp) :: x, x0, x1, x2, alfa, beta, bdy_omega_crit
-         integer :: k, ii, klo, khi
+         real(dp) :: x, x0, x1, x2, alfa, bdy_omega_crit
+         integer :: k, klo, khi
 
          include 'formats'
 

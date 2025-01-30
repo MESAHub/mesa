@@ -642,6 +642,7 @@ contains
          show_annotation1, show_annotation2, show_annotation3, use_decorator
       interface
          subroutine decorate(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine decorate
@@ -649,11 +650,10 @@ contains
       integer, intent(out) :: ierr
       procedure(pgbinary_decorator_interface), pointer :: pgbinary_decorator
 
-      real :: xmin, xmax, ymin, ymax, xleft, xright, ybot, ytop
-      integer :: i, j, j_min, j_max
+      real :: xleft, xright, ybot, ytop
+      integer :: j, j_min, j_max
       real :: dx, dy, xplus, xminus, yplus, yminus
       real, dimension(:), pointer :: xvec, yvec
-      character (len = strlen) :: str
       integer :: k, n
       integer :: ix, iy
       integer :: file_data_len

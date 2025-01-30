@@ -36,6 +36,7 @@ module kap_def
         zbar, logRho, logT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        implicit none
         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: zbar ! average ionic charge (for electron conduction)
         real(dp), intent(in) :: logRho ! the density
@@ -52,6 +53,7 @@ module kap_def
         eta, d_eta_dlnRho, d_eta_dlnT, &
         kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        implicit none
         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: Rho, T
         real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
@@ -68,6 +70,7 @@ module kap_def
         X, Z, XC, XN, XO, XNe, logRho, logT, &
         frac_lowT, frac_highT, frac_Type2, kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
         use const_def, only: dp
+        implicit none
         integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
         real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
         real(dp), intent(in) :: logRho ! density
@@ -81,7 +84,7 @@ module kap_def
 
   end interface
 
-  
+
   logical, parameter :: show_allocations = .false.  ! for debugging memory usage
 
   ! for kap output
@@ -93,8 +96,8 @@ module kap_def
 
   ! info about op_mono elements
   integer, parameter :: num_op_mono_elements = 17
-  integer :: op_mono_element_Z(num_op_mono_elements) 
-  character(len=2) :: op_mono_element_name(num_op_mono_elements) 
+  integer :: op_mono_element_Z(num_op_mono_elements)
+  character(len=2) :: op_mono_element_name(num_op_mono_elements)
   real(dp) :: op_mono_element_mass(num_op_mono_elements)
 
 
@@ -158,7 +161,7 @@ module kap_def
   integer, parameter :: max_num_CO_tables = 70
 
   ! standard number of CO tables for each X+Z combo
-  !           X  
+  !           X
   ! Z         0.0   0.1   0.35  0.7
   ! 0.0       58    58    51    32
   ! 0.001     58    58    51    30
@@ -195,11 +198,11 @@ module kap_def
      ! 3) tables with dXC < dXO, ordered by increasing dXC, and by increasing dXO within same dXC.
      ! the spacing of dXC's is the same as dXO's, so there are as many tables in 3) as in 1).
      integer :: num_dXC_gt_dXO ! the number of tables with dXC > dXO
-     integer :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs) 
+     integer :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs)
      ! entry (i,j) is the co_index for table with dXC=Xs(i) and dXO=Xs(j), or -1 if no such table.
-     integer :: next_dXO_table(max_num_CO_tables) 
+     integer :: next_dXO_table(max_num_CO_tables)
      ! entry (i) is the co_index for the table with same dXC and next larger dXO, or -1 if none such.
-     integer :: next_dXC_table(max_num_CO_tables) 
+     integer :: next_dXC_table(max_num_CO_tables)
      ! entry (i) is the co_index for the table with same dXO and next larger dXC, or -1 if none such.
      type (Kap_CO_Table), dimension(:), pointer :: co_tables => null()
 
@@ -208,16 +211,16 @@ module kap_def
   type Kap_General_Info
 
       real(dp) :: Zbase
-     
+
       integer :: kap_option, kap_CO_option, kap_lowT_option
-      
+
       ! blending in T is done between the following limits
       real(dp) :: kap_blend_logT_upper_bdy ! = 3.88d0 ! old value was 4.1d0
       real(dp) :: kap_blend_logT_lower_bdy ! = 3.80d0 ! old value was 4.0d0
       ! last time I looked, the table bottom for the higher T tables was logT = 3.75
       ! while max logT for the lower T Freeman tables was 4.5
       ! so for those, you need to keep kap_blend_logT_upper_bdy < 4.5
-      ! and kap_blend_logT_lower_bdy > 3.75 
+      ! and kap_blend_logT_lower_bdy > 3.75
       ! it is also probably a good idea to keep the blend away from H ionization
       ! logT upper of about 3.9 or a bit less will do that.
 
@@ -273,22 +276,26 @@ module kap_def
       logical :: use_other_radiative_opacity
       procedure (other_radiative_opacity_interface), pointer, nopass :: &
          other_radiative_opacity => null()
-      
+
   end type Kap_General_Info
 
   ! kap_options
   integer, parameter :: &
-     kap_gn93 = 1, & 
-     kap_gs98 = 2, & 
-     kap_a09 = 3, & 
-     kap_OP_gs98 = 4, & 
+     kap_gn93 = 1, &
+     kap_gs98 = 2, &
+     kap_a09 = 3, &
+     kap_OP_gs98 = 4, &
      kap_OP_a09 = 5, &
-     kap_user = 6, &
-     kap_test = 7, &
-     kap_options_max = 7
+     kap_oplib_gs98 = 6, &
+     kap_oplib_agss09 = 7, &
+     kap_oplib_aag21 = 8, &
+     kap_oplib_mb22 = 9, &
+     kap_user = 10, &
+     kap_test = 11, &
+     kap_options_max = 11
 
 
-  integer, parameter :: kap_max_dim = 20 !change this to make even larger grids in X and/or Z
+  integer, parameter :: kap_max_dim = 50 !change this to make even larger grids in X and/or Z
 
   integer, dimension(kap_options_max) :: num_kap_Xs = 0
   real(dp), dimension(kap_max_dim, kap_options_max) :: kap_Xs = -1d0
@@ -301,8 +308,8 @@ module kap_def
 
   ! kap_CO_options
   integer, parameter :: &
-     kap_CO_gn93 = 1, & 
-     kap_CO_gs98 = 2, & 
+     kap_CO_gn93 = 1, &
+     kap_CO_gs98 = 2, &
      kap_CO_a09 = 3, &
      kap_CO_user = 4, &
      kap_CO_test = 5, &
@@ -317,22 +324,24 @@ module kap_def
 
   integer, dimension(kap_max_dim, kap_CO_options_max) :: num_kap_CO_Xs_for_this_Z = 0
 
-  
+
   ! kap_lowT_options
   integer, parameter :: &
-     kap_lowT_Freedman11 = 1, & 
-     kap_lowT_fa05_gs98 = 2, & 
-     kap_lowT_fa05_gn93 = 3, & 
-     kap_lowT_fa05_a09p = 4, & 
-     kap_lowT_af94_gn93 = 5, &
-     kap_lowT_rt14_ag89 = 6, &
-     kap_lowT_kapCN = 7, & 
-     kap_lowT_AESOPUS = 8, &
-     kap_lowT_user = 9, &
-     kap_lowT_test = 10, &
-     kap_lowT_options_max = 10
+     kap_lowT_fa05_mb22= 1, &
+     kap_lowT_fa05_aag21 = 2, &
+     kap_lowT_Freedman11 = 3, &
+     kap_lowT_fa05_gs98 = 4, &
+     kap_lowT_fa05_gn93 = 5, &
+     kap_lowT_fa05_a09p = 6, &
+     kap_lowT_af94_gn93 = 7, &
+     kap_lowT_rt14_ag89 = 8, &
+     kap_lowT_kapCN = 9, &
+     kap_lowT_AESOPUS = 10, &
+     kap_lowT_user = 11, &
+     kap_lowT_test = 12, &
+     kap_lowT_options_max = 12
 
-  
+
   integer, dimension(kap_lowT_options_max) :: num_kap_lowT_Xs = 0
   real(dp), dimension(kap_max_dim, kap_lowT_options_max) :: kap_lowT_Xs = -1d0
 
@@ -341,7 +350,7 @@ module kap_def
 
   integer, dimension(kap_max_dim, kap_lowT_options_max) :: num_kap_lowT_Xs_for_this_Z = 0
 
-  
+
   character (len=256) :: &
      kap_option_str(kap_options_max), &
      kap_CO_option_str(kap_CO_options_max), &
@@ -371,7 +380,7 @@ module kap_def
   ! d(2,i,j) = d2s_dx2(i,j)
   ! d(3,i,j) = d2s_dy2(i,j)
   ! d(4,i,j) = d4s_dx2_dy2(i,j)
-  ! 
+  !
   ! given f(i,j), the spline fitting code can compute the other entries
   !
   ! given d(1:4,i,j), spline interpolation code can compute s(x,y)
@@ -387,7 +396,7 @@ module kap_def
   logical :: clip_to_kap_table_boundaries = .true. ! typically, this should be set true.
    ! if this is set true, then temperature and density args are
    ! clipped to the boundaries of the table.
-  real(dp) :: kap_min_logRho = -40d0
+  real(dp), parameter :: kap_min_logRho = -40d0
    ! below this, clip logRho and set partials wrt logRho to zero
 
 
@@ -404,7 +413,7 @@ module kap_def
   integer, parameter :: kapCN_num_logR = 17
   integer, parameter :: kapCN_tbl_size = kapCN_num_logR*kapCN_num_logT           ! 306
   integer, parameter :: kapCN_num_tbl = num_kapCN_Xs*num_kapCN_fCs*num_kapCN_fNs !  63
-  
+
   real(dp), target :: kapCN_Z(num_kapCN_Zs)
   real(dp), target :: kapCN_fN(num_kapCN_fNs,num_kapCN_Zs)
   real(dp), target :: kapCN_fC(num_kapCN_fCs,num_kapCN_Zs)
@@ -464,10 +473,10 @@ module kap_def
      real(dp), dimension(:), allocatable :: Xs, fCOs, fCs, fNs
 
      type(AESOPUS_Table), dimension(:,:,:,:), allocatable :: t
-     
+
   end type AESOPUS_TableSet
 
-  
+
   type kapAESOPUS
 
      integer :: num_logTs
@@ -477,7 +486,7 @@ module kap_def
 
      real(dp) :: min_logR, max_logR
      real(dp) :: min_logT, max_logT
-     
+
      integer :: num_Zs
      real(dp), dimension(:), allocatable :: Zs, logZs
 
@@ -501,10 +510,10 @@ contains
     use utils_lib, only : mkdir
     use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir, use_mesa_temp_cache
     character (*), intent(in) :: kap_cache_dir_in
-    integer :: ierr, i
-    
+    integer :: i
+
     kap_test_partials = .false.
-    
+
     if (len_trim(kap_cache_dir_in) > 0) then
        kap_cache_dir = kap_cache_dir_in
     else if (len_trim(mesa_caches_dir) > 0) then
@@ -533,19 +542,25 @@ contains
 
     kap_temp_cache_dir=trim(mesa_temp_caches_dir)//'/kap_cache'
     if(use_mesa_temp_cache) call mkdir(kap_temp_cache_dir)
-    
+
     kap_option_str(kap_gn93) = 'gn93'
     kap_option_str(kap_gs98) = 'gs98'
     kap_option_str(kap_a09) = 'a09'
     kap_option_str(kap_OP_gs98) = 'OP_gs98'
     kap_option_str(kap_OP_a09) = 'OP_a09_nans_removed_by_hand'
+    kap_option_str(kap_oplib_gs98) = 'oplib_gs98'
+    kap_option_str(kap_oplib_agss09) = 'oplib_agss09'
+    kap_option_str(kap_oplib_aag21) = 'oplib_aag21'
+    kap_option_str(kap_oplib_mb22) = 'oplib_mb22'
     kap_option_str(kap_test) = 'test'
-    
+
     kap_CO_option_str(kap_CO_gn93) = 'gn93_co'
     kap_CO_option_str(kap_CO_gs98) = 'gs98_co'
     kap_CO_option_str(kap_CO_a09) = 'a09_co'
     kap_CO_option_str(kap_CO_test) = 'test_co'
-    
+
+    kap_lowT_option_str(kap_lowT_fa05_mb22) = 'lowT_fa05_mb22'
+    kap_lowT_option_str(kap_lowT_fa05_aag21) = 'lowT_fa05_aag21'
     kap_lowT_option_str(kap_lowT_Freedman11) = 'lowT_Freedman11'
     kap_lowT_option_str(kap_lowT_fa05_gs98) = 'lowT_fa05_gs98'
     kap_lowT_option_str(kap_lowT_fa05_gn93) = 'lowT_fa05_gn93'
@@ -555,7 +570,7 @@ contains
     kap_lowT_option_str(kap_lowT_kapCN) = 'kapCN'
     kap_lowT_option_str(kap_lowT_AESOPUS) = 'AESOPUS'
     kap_lowT_option_str(kap_lowT_test) = 'lowT_test'
-    
+
     do i=1,kap_options_max
       nullify(kap_z_tables(i)% ar)
     end do
@@ -568,6 +583,27 @@ contains
 
     do i=1, kap_options_max
        select case (i)
+       case (6:9)
+         num_kap_Xs(i) = 30
+         kap_Xs(1:num_kap_Xs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.000d0, 0.001d0, 0.01d0, &
+             0.05d0, 0.1d0, 0.15d0, 0.2d0, 0.25d0, 0.3d0, 0.35d0, 0.4d0, 0.45d0, 0.5d0, 0.55d0, &
+             0.6d0, 0.65d0, 0.7d0, 0.75d0, 0.8d0, 0.85d0, 0.9d0, 0.91d0, 0.92d0, 0.93d0, 0.94d0, &
+             0.95d0,1.0d0]
+         num_kap_Zs(i) = 41
+         kap_Zs(1:num_kap_Zs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.00003d0, 0.00007d0, 0.0001d0, &
+         0.0003d0 ,0.0007d0, 0.001d0, 0.002d0, 0.003d0, 0.004d0, 0.006d0, 0.008d0, 0.01d0, 0.012d0, &
+         0.014d0, 0.015d0, 0.016d0, 0.017d0, 0.018d0, 0.019d0, 0.02d0, 0.021d0, 0.022d0, 0.023d0, &
+         0.024d0, 0.025d0, 0.026d0, 0.028d0, 0.03d0, 0.035d0, 0.04d0, 0.05d0, 0.06d0, 0.07d0, 0.08d0, &
+         0.09d0, 0.1d0, 0.15d0, 0.2d0]
+         num_kap_Xs_for_this_Z(1:num_kap_Zs(i), i) = [ num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), num_kap_Xs(i), &
+            num_kap_Xs(i), num_kap_Xs(i)-1, num_kap_Xs(i)-2, num_kap_Xs(i)-3, num_kap_Xs(i)-4, &
+            num_kap_Xs(i)-5, num_kap_Xs(i)-6, num_kap_Xs(i)-7, num_kap_Xs(i)-8]
        case DEFAULT
           num_kap_Xs(i) = 10
           kap_Xs(1:num_kap_Xs(i), i) = [0.00d0, 0.10d0, 0.20d0, &
@@ -618,7 +654,7 @@ contains
        end select
     end do
 
-    
+
   end subroutine kap_def_init
 
 
@@ -658,7 +694,7 @@ contains
   subroutine get_kap_ptr(handle,rq,ierr)
     integer, intent(in) :: handle
     type (Kap_General_Info), pointer :: rq
-    integer, intent(out):: ierr         
+    integer, intent(out):: ierr
     if (handle < 1 .or. handle > max_kap_handles) then
        ierr = -1
        return
@@ -679,7 +715,7 @@ contains
     if(X < 0d0.or.X>1d0) then
        xstr='bad'
        ierr=-1
-       return     
+       return
     endif
     ierr=0
     write(str,'(f8.6)') X
@@ -690,11 +726,11 @@ contains
     enddo
     xstr=str(1:max(k,3))
   end subroutine get_output_string
-  
+
 
   subroutine do_Free_Kap_Tables
     integer :: i
-    
+
     do i=1,kap_options_max
       if (associated(kap_z_tables(i)% ar)) &
         call free_z_tables(kap_z_tables(i)% ar)
@@ -720,21 +756,21 @@ contains
             call free_x_tables(z_tables(iz)% x_tables, z_tables(iz)% num_Xs)
       end do
       deallocate(z_tables)
-      nullify(z_tables) 
+      nullify(z_tables)
     end subroutine free_z_tables
 
     subroutine free_x_tables(x_tables, num_Xs)
-      type (Kap_X_Table), dimension(:), pointer :: x_tables       
-      integer, intent(in) :: num_Xs      
+      type (Kap_X_Table), dimension(:), pointer :: x_tables
+      integer, intent(in) :: num_Xs
       integer :: ix
-      do ix = 1, num_Xs  
+      do ix = 1, num_Xs
          if (associated(x_tables(ix)% logRs)) then
           deallocate(x_tables(ix)% logRs)
           nullify(x_tables(ix)% logRs)
          end if
          if (associated(x_tables(ix)% logTs)) then
-          deallocate(x_tables(ix)% logTs)       
-          nullify(x_tables(ix)% logTs)    
+          deallocate(x_tables(ix)% logTs)
+          nullify(x_tables(ix)% logTs)
          end if
          if (associated(x_tables(ix)% kap1)) then
           deallocate(x_tables(ix)% kap1)
@@ -758,11 +794,11 @@ contains
          end if
       end do
       deallocate(co_z_tables)
-      nullify(co_z_tables) 
+      nullify(co_z_tables)
     end subroutine free_co_z_tables
 
     subroutine free_co_x_tables(x_tables)
-      type (Kap_CO_X_Table), dimension(:), pointer :: x_tables 
+      type (Kap_CO_X_Table), dimension(:), pointer :: x_tables
       ! stored in order of increasing X
       integer :: num_Xs
       integer :: ix
@@ -774,28 +810,28 @@ contains
           nullify(x_tables(ix)% logRs)
          end if
          if (associated(x_tables(ix)% logTs)) then
-          deallocate(x_tables(ix)% logTs)    
-          nullify(x_tables(ix)% logTs)    
+          deallocate(x_tables(ix)% logTs)
+          nullify(x_tables(ix)% logTs)
          end if
       end do
       if (associated(x_tables))then
-        deallocate(x_tables)    
+        deallocate(x_tables)
         nullify(x_tables)
       end if
     end subroutine free_co_x_tables
 
     subroutine free_co_table(co_tables, num_COs)
-      type (Kap_CO_Table), dimension(:), pointer :: co_tables 
-      integer, intent(in) :: num_COs            
-      integer :: ico            
-      do ico = 1, num_COs               
+      type (Kap_CO_Table), dimension(:), pointer :: co_tables
+      integer, intent(in) :: num_COs
+      integer :: ico
+      do ico = 1, num_COs
          if (associated(co_tables(ico)% kap1)) then
-          deallocate(co_tables(ico)% kap1)    
-          nullify(co_tables(ico)% kap1) 
+          deallocate(co_tables(ico)% kap1)
+          nullify(co_tables(ico)% kap1)
          end if
       end do
       if (associated(co_tables)) then
-        deallocate(co_tables)      
+        deallocate(co_tables)
         nullify(co_tables)
       end if
     end subroutine free_co_table

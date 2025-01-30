@@ -1,0 +1,62 @@
+&kap
+   read_extra_kap_inlist(1) = .true.
+   extra_kap_inlist_name(1) = 'inlist_ppisn'
+/
+
+&eos
+   read_extra_eos_inlist(1) = .true.
+   extra_eos_inlist_name(1) = 'inlist_ppisn'
+/
+
+&star_job
+   create_pre_main_sequence_model = .false.
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+   required_termination_code_string = 'Successful test: evolved 100 days past first relax'
+
+   load_saved_model = .true.
+   load_model_filename = 'he_dep.mod'
+
+   read_extra_star_job_inlist(1) = .true.
+   extra_star_job_inlist_name(1) = 'inlist_ppisn'
+
+   change_initial_v_flag = .true.
+   new_v_flag = .true.
+
+
+/ !end of star_job namelist
+
+
+&controls
+
+   read_extra_controls_inlist(1) = .true.
+   extra_controls_inlist_name(1)= 'inlist_ppisn'
+
+   x_logical_ctrl(2) = .true.
+
+   ! See Farag et al 2022
+   set_min_d_mix=.true.
+   min_d_mix=1d-2
+
+   MLT_option = 'TDC'
+
+
+   !v_drag is set in run_star_extras
+   q_for_v_drag_full_off = 0.98d0
+   q_for_v_drag_full_on = 0.99d0
+   max_surface_cell_dq = 1d0
+
+
+      !drag_coefficient = 0.8d0
+      !min_q_for_drag = 0.98d0
+
+!Pextra_factor = 2
+/ ! end of controls namelist
+
+&pgstar
+
+   read_extra_pgstar_inlist(1) = .true.
+   extra_pgstar_inlist_name(1)= 'inlist_pgstar'
+
+/ ! end of pgstar namelist

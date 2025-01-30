@@ -32,7 +32,7 @@ module utils_nan
   use utils_nan_qp
 
   ! No implicit typing
-      
+
   implicit none
 
   ! Access specifiers

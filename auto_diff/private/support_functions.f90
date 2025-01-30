@@ -12,7 +12,7 @@ module support_functions
       module procedure log_int
    end interface log
 
-   interface max 
+   interface max
       module procedure max_int_real
       module procedure max_real_int
    end interface max
@@ -57,7 +57,6 @@ module support_functions
 
    pure real(dp) function int_int_pow(x, y) result(z)
       integer, intent(in) :: x, y
-      real(dp) :: x_real, y_real
 
       z = x**y
    end function int_int_pow

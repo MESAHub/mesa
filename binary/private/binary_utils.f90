@@ -148,7 +148,7 @@
          b% m(2) = m2*Msun
          call set_separation_eccentricity(binary_id, b% separation, b% eccentricity, ierr)
       end subroutine set_m2
-      
+
       subroutine set_period_eccentricity(binary_id, period, eccentricity, ierr)
          integer, intent(in) :: binary_id
          real(dp) :: period ! in seconds
@@ -165,7 +165,7 @@
          call set_angular_momentum_j(binary_id)
 
       end subroutine set_period_eccentricity
-      
+
       subroutine set_separation_eccentricity(binary_id, separation, eccentricity, ierr)
          integer, intent(in) :: binary_id
          real(dp) :: separation ! in cm
@@ -183,7 +183,7 @@
          call set_angular_momentum_j(binary_id)
 
       end subroutine set_separation_eccentricity
-      
+
       subroutine set_angular_momentum_j(binary_id)
          ! Sets b% angular_momentum_j in terms of the masses, separation and eccentricity
          ! also sets the Roche lobe sizes and relative overflows
@@ -199,7 +199,7 @@
          b% rl(1) = eval_rlobe(b% m(1), b% m(2), b% separation)
          b% rl(2) = eval_rlobe(b% m(2), b% m(1), b% separation)
          b% rl_relative_gap(1) = (b% r(1) - b% rl(1) * (1 - b% eccentricity) ) / &
-             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact 
+             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact
          b% rl_relative_gap(2) = (b% r(2) - b% rl(2) * (1 - b% eccentricity) ) / &
              b% rl(2) / (1 - b% eccentricity) ! gap < 0 means out of contact
 
