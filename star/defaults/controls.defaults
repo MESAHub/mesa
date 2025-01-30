@@ -4067,9 +4067,10 @@
       ! ~~~~~~~~~~~~~~~~
 
       ! When w_div_wc_flag is true, rather than a hard limit on w_div_wcrit
-      ! we use w_div_wcrit_max<w_div_wcrit_max2 to provide a smooth transition.
-      ! In the limit of j_rot->infinity, the resulting w_div_wc will match
-      ! w_div_wcrit_max2, while nothing is done when w_div_wcrit_max<w_div_wcrit_max
+      ! we use two limiting values w_div_wcrit_max < w_div_wcrit_max2 to provide a smooth transition.
+      ! Nothing is done when w_div_wc < w_div_wcrit_max, if w_div_wcrit_max < w_div_wc < w_div_wcrit_max2,
+      ! we apply a sigmoid, and in the limit of j_rot -> infinity, the resulting w_div_wc will match
+      ! w_div_wcrit_max2 (being on the top of the sigmoid)
 
       ! ::
 
