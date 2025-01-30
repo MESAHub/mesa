@@ -132,7 +132,7 @@ contains
 
 
    real(dp) function eval_fp(lq, ar, ierr) result(fp)
-      ! evaluates fp of the equipotential shell with equivalent radius
+      ! evaluates fp of the equipotential shell with fractional equivalent radius
       ! ar = r/rl and lq = log10(m(other)/m(this)), no units (dimensionless)
       real(dp), intent(in) :: lq
       real(dp) :: ar
@@ -147,7 +147,7 @@ contains
    end function eval_fp
 
    real(dp) function eval_ft(lq, ar, ierr) result(ft)
-      ! evaluates ft of the equipotential shell with equivalent radius
+      ! evaluates ft of the equipotential shell with fractional equivalent radius
       ! ar = r/rl and lq = log10(m(other)/m(this)), no units (dimensionless)
       real(dp), intent(in) :: lq
       real(dp) :: ar
@@ -163,8 +163,9 @@ contains
    end function eval_ft
 
    real(dp) function eval_irot(lq, ar, ierr) result(irot)
-      ! evaluates moment of inertia irot of the equipotential shell with equivalent radius
-      ! ar = r/rl and lq = log10(m(other)/m(this)), in units of separation^2
+      ! evaluates moment of inertia irot divided by the spherical equivalent moi (2/3 r_\psi^2)
+      ! of the equipotential shell with fractional equivalent radius
+      ! ar = r/rl and lq = log10(m(other)/m(this)), no units (dimensionless)
       real(dp), intent(in) :: lq
       real(dp) :: ar
       integer, intent(out) :: ierr
@@ -239,7 +240,7 @@ contains
       type (star_info), pointer :: s
       type (binary_info), pointer :: b
       integer :: ierr, j, this_star=0, other_star=0
-      real(dp) :: r_roche, a, m1, m2, ar, lq
+      real(dp) :: r_roche, a, m1, m2, ar, lq, eval, d_eval_d_ar
 
       ierr = 0
       call star_ptr(id, s, ierr)
@@ -265,9 +266,12 @@ contains
       if (inter_ok) then
          ar = r00 / r_roche
          ! set value
-         i_rot = eval_irot(lq, ar, ierr) * a * a
+         eval = eval_irot(lq, ar, ierr)
+         d_eval_d_ar = (eval_irot(lq, ar + nudge, ierr) - eval) / nudge
+         ! scale value with spherical moi (see eval_irot)
+         i_rot = eval * (two_thirds * r00 * r00)
          ! set radius derivative
-         i_rot% d1Array(i_lnR_00) = (eval_irot(lq, ar + nudge, ierr) * a * a - i_rot% val) / nudge * ar
+         i_rot% d1Array(i_lnR_00) = two_thirds * r00 * r00 * (ar * d_eval_d_ar + 2 * eval)
 !         write(*, *) r00, r_roche, i_rot, w_div_w_crit_roche  ! debug
       end if
    end subroutine roche_irot

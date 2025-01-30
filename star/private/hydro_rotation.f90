@@ -232,9 +232,6 @@
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(s% r(k), s% m(k), s% j_rot(k), s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-               if (k == s% nz) then
-                  write(*, *) "in set_i_rot", s% w_div_w_crit_roche(k)
-               end if
             end if
             call set1_i_rot(s, k, s% r(k))
          end do
@@ -328,9 +325,6 @@
          if (s% use_other_eval_i_rot) then
             call s% other_eval_i_rot(s% id, k, r, s% w_div_w_crit_roche(k), s% i_rot(k))
          else
-            if (k == s% nz) then
-               write(*, *) "in set1_i_rot", s% w_div_w_crit_roche(k)
-            end if
             call eval_i_rot(s% id, r, s% w_div_w_crit_roche(k), i_rot_single)
             if (associated(s% binary_other_irot)) then
                call s% binary_other_irot(s% id, r, i_rot_tidal)
@@ -377,13 +371,9 @@
                s% w_div_w_crit_roche(k) = &
                   w_div_w_roche_jrot(r00, s% m(k), s% j_rot(k), s% cgrav(k), &
                      s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-               if (k == s% nz) then
-                  write(*, *) "in use_xh_to_update_i_rot", s% w_div_w_crit_roche(k)
-               end if
             else
                s% w_div_w_crit_roche(k) = 0d0
             end if
-
             call update1_i_rot_from_xh(s, k)
          end do
 !$OMP END PARALLEL DO
