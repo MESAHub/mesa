@@ -56,11 +56,11 @@
          logical, intent(out), dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
 
-         integer :: j, k, other_ierr
+         integer :: j, k
          logical, parameter :: dbg = .false.
          real(dp), allocatable, dimension(:) :: src
          real(dp) :: eps_min_for_delta, &
-               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on, alfa_czb
+               dlog_eps_dlogP_full_off, dlog_eps_dlogP_full_on
          real(dp), dimension(:,:), pointer :: gvals
 
          gvals(1:nz,1:num_gvals) => gvals1(1:nz*num_gvals)
@@ -78,12 +78,12 @@
             s, num_gvals, gval_names, &
             gval_is_xa_function, gval_is_logT_function, gvals1, ierr)
          if (ierr /= 0) return
-         
+
          allocate(src(nz))
 
          call set_delta_gval_max(src, ierr)
          if (ierr /= 0) return
-         
+
          call smooth_gvals(nz,src,num_gvals,gvals)
 
 
@@ -98,7 +98,7 @@
             logical, parameter :: dbg = .false.
 
             include 'formats'
-            
+
             ierr = 0
             delta_gval_max(1:nz) = 1d0
 
@@ -109,7 +109,7 @@
                   delta_gval_max(k) = delta_gval_max(k)*pow(beta,P_exp)
                end do
             end if
-            
+
             if (s% use_other_mesh_delta_coeff_factor) then
                do k=1,nz
                   s% mesh_delta_coeff_factor(k) = delta_gval_max(k)
@@ -156,7 +156,7 @@
             call do1_dlog_eps_dlogP_coef(s% mesh_dlog_other_dlogP_extra, iother)
 
             if (s% mesh_delta_coeff_factor_smooth_iters > 0) then ! smooth delta_gval_max
-            
+
                do k=1,nz
                   src(k) = delta_gval_max(k)
                end do
@@ -175,7 +175,7 @@
                   end do
                   src(nz) = (2*delta_gval_max(nz) + delta_gval_max(nz-1))/3
                end do
-            
+
             end if
 
          end subroutine set_delta_gval_max
@@ -290,7 +290,7 @@
            ! 0.5 < alfa < 1 : linear (coeff_start -> 1)
 
            beta = 2d0 * (alfa - 0.5d0)
-           if (beta .lt. 0d0) then
+           if (beta < 0d0) then
               coef = coef_start
            else
               coef = coef_start*(1d0 - beta) + beta

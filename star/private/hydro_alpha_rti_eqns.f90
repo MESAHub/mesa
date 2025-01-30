@@ -41,7 +41,6 @@
 
       subroutine do1_dalpha_RTI_dt_eqn(s, k, nvar, ierr)
          use star_utils, only: em1, e00, ep1
-         use chem_def, only: ih1, ihe4
 
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
@@ -52,13 +51,12 @@
          type(auto_diff_real_4var_order1) :: source_minus, source_plus, dadt_source, dadt_actual
          type(auto_diff_real_4var_order1) :: dadt_mix, dadt_expected, resid
 
-         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt, j, kk
+         integer :: nz, i_alpha_RTI, i_dalpha_RTI_dt
          real(dp), pointer, dimension(:) :: sig
-         logical :: okay
          real(dp) :: &
-            dq, dm, dr, d_dadt_mix_dap1, sig00, sigp1, &
+            dq, dm, sig00, sigp1, &
             eqn_scale, dPdr_drhodr, instability2, instability, RTI_B, &
-            r00, rp1, drho, rho, rmid, cs, fac
+            r00, rho, rmid, cs, fac
          logical :: test_partials
 
          include 'formats'
@@ -78,9 +76,9 @@
          dq = s% dq(k)
          dm = s% dm(k)
          rho = s% rho_start(k)
-         r00 = s% r_start(k)        
+         r00 = s% r_start(k)
          fac = s% alpha_RTI_diffusion_factor
-          
+
          sig00 = fac*sig(k)
          if (k < nz) then
             sigp1 = fac*sig(k+1)
@@ -117,7 +115,7 @@
          ! Flux divergence
          dadt_mix = (fluxp1 - flux00)/dm
 
-         ! Sources and sink s        
+         ! Sources and sink s
          dPdr_drhodr = s% dPdr_dRhodr_info(k)
 
          if (a_00 <= 0d0 .or. s% RTI_D <= 0d0) then
@@ -132,8 +130,8 @@
             RTI_D = s% RTI_D*max(1d0,a_00/s% RTI_max_alpha)
             source_minus = RTI_D*a_00*cs/rmid
          end if
-         
-         instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable         
+
+         instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable
          if (instability2 <= 0d0 .or. &
                s% q(k) > s% alpha_RTI_src_max_q .or. &
                s% q(k) < s% alpha_RTI_src_min_q) then
@@ -196,7 +194,7 @@
          end if
 
 
-         if (test_partials) then   
+         if (test_partials) then
             s% solver_test_partials_var = i_alpha_RTI
             s% solver_test_partials_dval_dx = resid%d1val2
             write(*,*) 'do1_dalpha_RTI_dt_eqn', s% solver_test_partials_var

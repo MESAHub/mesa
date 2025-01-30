@@ -83,7 +83,7 @@ contains
       character (len = *), intent(out) :: name
       name = ''
    end subroutine do_create_file_name
-   
+
 
 
    subroutine do_write_plot_to_file(b, p, filename, ierr)
@@ -121,7 +121,7 @@ contains
       integer, intent(out) :: ierr
       logical :: fexists
       ierr = 0
-      
+
    end subroutine do_restart_run_for_pgbinary
 
 
@@ -130,7 +130,7 @@ contains
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
       ierr = 0
-     
+
    end subroutine do_read_pgbinary_controls
 
 
@@ -138,7 +138,7 @@ contains
       type (binary_info), pointer :: b
       integer, intent(out) :: ierr
       ierr = 0
-      
+
    end subroutine set_win_file_data
 
 
@@ -190,7 +190,7 @@ contains
       include 'formats'
 
       ierr = 0
-     
+
    end subroutine update_pgbinary_history_file
 
 

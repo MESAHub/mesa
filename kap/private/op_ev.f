@@ -98,7 +98,7 @@ c declare variables in common block (instead of by default: real (a-h, o-z), int
 !      + yy1(33417000),yy2(120000000),nx(19305000),yx(19305000)  
 !       save /atomdata/
 c
-c  i=temperature inex
+c  i=temperature index
 c  j=density index
 c  k=frequency index
 c  n=element index

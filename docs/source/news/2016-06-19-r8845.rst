@@ -15,7 +15,7 @@ post <https://lists.mesastar.org/pipermail/mesa-users/2016-June/006691.html>`__.
    reasons, the option ``photostep`` was renamed to ``photo_interval``.
    A simple find-and-replace will bring your inlists up-to-date. If one
    needs to make the changes in a more automated fashion, a sample
-   migration script is included in the release annoucement to
+   migration script is included in the release announcement to
    mesa-users.
 
 -  In the binary module, adjustments were made to the Eddington mass

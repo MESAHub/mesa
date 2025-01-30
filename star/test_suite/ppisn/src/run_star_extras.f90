@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -33,9 +33,9 @@
 
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interp_pm, interp_values, interp_value
-      
+
       implicit none
-      
+
       include "test_suite_extras_def.inc"
 
       logical :: dbg = .false.
@@ -99,12 +99,12 @@
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
       logical :: stop_100d_after_pulse
-      
+
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -112,7 +112,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_start_step => extras_start_step
          s% extras_check_model => extras_check_model
@@ -121,7 +121,7 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
          ! we turn pgstar on and off at some points, so we store the original setting
          pgstar_flag = s% job% pgstar_flag
@@ -249,7 +249,7 @@
                   alfa = (T1 - (Teff_jump - dT)) / (2*dT)
                end if
             end if
-            
+
             if (alfa > 0) then ! eval hot side wind (eqn 24)
                vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
                vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
@@ -265,7 +265,7 @@
             else
                w1 = 0
             end if
-            
+
             if (alfa < 1) then ! eval cool side wind (eqn 25)
                vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
                vinf_div_vesc = vinf_div_vesc*pow(Z_div_Z_solar,0.13d0) ! corrected for Z
@@ -280,9 +280,9 @@
             else
                w2 = 0
             end if
-            
+
             w = alfa*w1 + (1 - alfa)*w2
-            
+
          end subroutine eval_Vink_wind
 
          subroutine eval_Nieuwenhuijzen_wind(w)
@@ -311,7 +311,7 @@
          end subroutine eval_Hamann_wind
 
       end subroutine brott_wind
-      
+
       subroutine my_adjust_mdot(id, ierr)
          use star_def
          integer, intent(in) :: id
@@ -414,15 +414,15 @@
 
          use kap_def, only: num_kap_fracs
          use kap_lib
- 
+
          ! INPUT
          integer, intent(in) :: id ! star id if available; 0 otherwise
-         integer, intent(in) :: k ! cell number or 0 if not for a particular cell         
+         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
          integer, intent(in) :: handle ! from alloc_kap_handle
          integer, intent(in) :: species
          integer, pointer :: chem_id(:) ! maps species to chem id
             ! index from 1 to species
-            ! value is between 1 and num_chem_isos         
+            ! value is between 1 and num_chem_isos
          integer, pointer :: net_iso(:) ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
@@ -452,7 +452,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-                  
+
          kap = 0; dln_kap_dlnRho = 0; dln_kap_dlnT = 0; dln_kap_dxa = 0
          velocity = 0
          radius = 0
@@ -540,8 +540,8 @@
             end if
          end if
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -553,7 +553,7 @@
          if (ierr /= 0) return
          call test_suite_after_evolve(s, ierr)
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -565,7 +565,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
 
       end function extras_check_model
 
@@ -579,8 +579,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 22
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -655,7 +655,7 @@
          end if
 
          vals(h_yr_since_coll) = s% xtra(x_time_since_first_gamma_zero)/secyer
-         
+
          vals(h_log_R_098) = -100
          vals(h_log_R_095) = -100
          vals(h_log_R_090) = -100
@@ -726,9 +726,9 @@
                   vals(h_T_ejecta) = vals(h_T_ejecta) + 0.5d0*s% dm(k0)*s% u(k0)*s% u(k0)
                end if
                vals(h_Omega_ejecta) = vals(h_Omega_ejecta) - s% dm_bar(k0)*s% cgrav(k0)*s% m(k0)/s% r(k0)
-            end do 
+            end do
          end if
-         
+
          if (s% u_flag) then
             vals(h_u_flag) = 1d0
          else
@@ -737,7 +737,7 @@
 
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -752,8 +752,8 @@
             how_many_extra_profile_columns = 1
          end if
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -776,8 +776,8 @@
             names(5) = "specific_thermal_e"
             names(6) = "total_specific_e"
             names(7) = "mlt_vc"
-            names(8) = "spin_parameter" 
-            
+            names(8) = "spin_parameter"
+
             do k = s% nz, 1, -1
                vals(k,1) = sqrt(2*s% cgrav(k)*s% m(k)/(s% r(k)))
                vals(k,2) = s% u(k)/vals(k,1)
@@ -795,7 +795,7 @@
                end if
             end do
          else
-            names(1) = "spin_parameter" 
+            names(1) = "spin_parameter"
 
             if (s% rotation_flag) then
                do k = s% nz, 1, -1
@@ -806,10 +806,10 @@
                vals(:,1) = 0d0
             end if
          end if
-         
-         
+
+
       end subroutine data_for_extra_profile_columns
-      
+
 
       integer function extras_start_step(id)
          integer, intent(in) :: id
@@ -901,9 +901,9 @@
                   0.5d0*s% dm(k0)*s% u(k0)*s% u(k0) - s% dm(k0)*s% cgrav(k0)*s% m(k0)/s% r(k0) &
                   +s% energy(k0)*s% dm(k0)
             end do
-            ! adjust location of boundary to remove by considering also 
+            ! adjust location of boundary to remove by considering also
             ! material below the escape velocity that has a positive net
-            ! total specific energy. 
+            ! total specific energy.
             if (energy_removed_layers > 0d0) then ! possible to eject material
                if(mod(s%model_number, s%terminal_interval) == 0) then
                   write(*,*) "k, q, energy_removed_layers before adjustment is", k, s% q(k), energy_removed_layers
@@ -920,7 +920,7 @@
                      avg_v_div_vesc = avg_v_div_vesc + &
                         s% dm(k0)*s% u(k0)/sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
                   end if
-               end do 
+               end do
                if(mod(s%model_number, s%terminal_interval) == 0) then
                   write(*,*) "k, q, energy_removed_layers after adjustment is", k, s% q(k), energy_removed_layers
                end if
@@ -962,7 +962,7 @@
                   exit
                end if
             end do
- 
+
             if(mod(s%model_number, s%terminal_interval) == 0) then
                write(*,*) 'Layers above q=', s% q(k), 'will be removed'
                write(*,*) 'checking for conditions inside q=', q_for_relax_check, 'of material that will remain'
@@ -998,7 +998,7 @@
                end if
             else
                ! escape velocity reached within a tiny fraction of the
-               ! core. Before marking as PISN verify if any cell above 
+               ! core. Before marking as PISN verify if any cell above
                ! this is below the escape velocity
                do k0 = k, 1, -1
                   v_esc = sqrt(2*s% cgrav(k0)*s% m(k0)/(s% r(k0)))
@@ -1021,7 +1021,7 @@
                write(*,*) "Relaxing model to lower mass!"
                s% ixtra(ix_num_relaxations) = s% ixtra(ix_num_relaxations) + 1
                s% xtra(x_star_age_at_relax) = s% star_age
-               
+
                !save a profile just before relaxation
                write(fname, fmt="(a18,i0.3,a5)") 'LOGS/prerelax_prof', s% ixtra(ix_num_relaxations), '.data'
                call star_write_profile_info(id, fname, ierr)
@@ -1224,7 +1224,7 @@
 
          extras_start_step = keep_going
       end function extras_start_step
-   
+
       subroutine my_before_struct_burn_mix(id, dt, res)
          use const_def, only: dp
          use star_def
@@ -1261,7 +1261,7 @@
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
-         
+
          !when L_phot exceeds max_Lphoto_for_lgLnuc_limit, the timestep limit is applied
          !to L_phot instead
 
@@ -1314,7 +1314,7 @@
 
          res = keep_going
       end subroutine my_before_struct_burn_mix
-      
+
       subroutine null_binary_controls(id, binary_id, ierr)
          integer, intent(in) :: id, binary_id
          integer, intent(out) :: ierr
@@ -1338,7 +1338,7 @@
          !count time since first collapse
          if (s% lxtra(lx_have_reached_gamma_limit)) then
             s% xtra(x_time_since_first_gamma_zero) = &
-               s% xtra(x_time_since_first_gamma_zero) + s% dt 
+               s% xtra(x_time_since_first_gamma_zero) + s% dt
          end if
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
@@ -1356,6 +1356,6 @@
          if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
 
       end function extras_finish_step
-      
+
       end module run_star_extras
-      
+

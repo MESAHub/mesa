@@ -1897,8 +1897,8 @@
       ! ::
 
    Text_Summary1_win_flag = .false.
-   Text_Summary1_win_width = 10
-   Text_Summary1_win_aspect_ratio = 0.15
+   Text_Summary1_win_width = 7
+   Text_Summary1_win_aspect_ratio = 0.6
 
       ! ::
 
@@ -1906,20 +1906,24 @@
    Text_Summary1_xright = 0.98
    Text_Summary1_ybot = 0.08
    Text_Summary1_ytop = 0.98
-   Text_Summary1_txt_scale = 4.5
+   Text_Summary1_txt_scale = 3.0
    Text_Summary1_title = ''
 
       ! setup default
 
       ! ::
 
-   Text_Summary1_num_rows = 8
-   Text_Summary1_num_cols = 4
+   Text_Summary1_num_rows = 5
+   Text_Summary1_num_cols = 1
    Text_Summary1_name(:, :) = ''
 
       ! ::
 
    Text_Summary1_name(1, 1) = 'model_number'
+   Text_Summary1_name(2, 1) = 'jdot'
+   Text_Summary1_name(3, 1) = 'mass_ratio'
+   Text_Summary1_name(4, 1) = 'period_days'
+   Text_Summary1_name(5, 1) = 'rl_relative_overflow_1'
 
       ! file output
 
@@ -2971,11 +2975,11 @@
    Orbit_title = 'Orbit'
    Orbit_txt_scale_factor = 1.0
 
-      ! show the roche lobe sizes
+      ! show the star sizes
 
       ! ::
 
-   Orbit_show_RL = .true.
+   Orbit_show_stars = .true.
 
       ! file output
 

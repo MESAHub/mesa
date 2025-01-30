@@ -28,7 +28,7 @@ module pulse_gsm
   ! Uses
 
   use star_private_def
-  use hdf5io_lib
+  use forum_m, only: hdf5io_t, CREATE_FILE
 
   ! No implicit typing
 
@@ -80,7 +80,7 @@ contains
     call hi%write_attr('M_star', global_data(1))
     call hi%write_attr('R_star', global_data(2))
     call hi%write_attr('L_star', global_data(3))
-    
+
     call hi%write_attr('version', s%gyre_data_schema)
 
     select case(s%gyre_data_schema)
@@ -133,7 +133,7 @@ contains
     ! Close the file
 
     call hi%final()
-    
+
     ! Finish
 
     ierr = 0

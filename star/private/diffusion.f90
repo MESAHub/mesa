@@ -103,12 +103,12 @@
          integer, intent(inout) ::  nzlo, nzhi !upper and lower bounds on region
 
          integer :: i, j, k, num_iters, idiag, n, neqs, ku, kl, &
-            ldab, ldafb, ldb, ldx, kmax, h1, he4, nbound, bad_j, bad_k, &
+            ldab, ldafb, ldb, ldx, h1, he4, nbound, bad_j, bad_k, &
             retry_count, max_retries, ierr_dealloc
          real(dp) :: &
-            dt, dt_next, min_dt, time, mstar, mtotal, sum_mass_nzlo_nzhi, xtotal_init(nc), &
-            xtotal(nc), mass_init(nc), frac, err, bad_X, bad_sum, bad_Xsum, &
-            dx_max, dx_avg, tol_correction_max, tol_correction_norm, remaining_time, &
+            dt, min_dt, time, mstar, mtotal, sum_mass_nzlo_nzhi, xtotal_init(nc), &
+            mass_init(nc), bad_X, bad_sum, bad_Xsum, &
+            tol_correction_max, tol_correction_norm, remaining_time, &
             sumx, tmp, timescale, min_lambda, upwind_limit, lambda, max_del, avg_del
 
          integer, parameter :: min_nz_lo = 5
@@ -143,16 +143,14 @@
          real(dp), dimension(:,:), pointer :: rhs, del
          real(dp), dimension(:,:,:), pointer :: em1, e00, ep1
          integer, pointer :: ipiv1(:)
-         integer :: lrd, lid, j_bad, k_bad, kmax_rad_accel, min_num_substeps, &
+         integer :: lrd, lid, kmax_rad_accel, min_num_substeps, &
             iter_dbg, j_dbg, k_dbg, k_max
          integer(8) :: time0, time1, clock_rate
          integer, pointer :: ipar_decsol(:)
          real(dp), pointer :: rpar_decsol(:)
-         real(dp), dimension(species) :: xa_total_before, xa_total_after
-         real(dp), dimension(m) :: A, C_face, Z_face
-         real(dp) :: X_total_atol, X_total_rtol, b_bad, flow_out, flow_in, &
-            vc_target, vc, vc_old, dt_old, &
-            max_timestep_factor, min_timestep_factor
+         real(dp), dimension(species) :: xa_total_before
+         real(dp), dimension(m) :: A
+         real(dp) :: X_total_atol, X_total_rtol, vc_old, dt_old
          logical :: have_changed_matrix_coeffs, trace, last_step, &
             solved, do_timing, use_isolve
 
@@ -456,7 +454,7 @@
             integer, intent(out) :: ierr
 
             integer :: &
-               i, k, nsteps, lout, iout, idid, ijac, max_steps, &
+               i, k, lout, iout, idid, ijac, max_steps, &
                imas, mlmas, mumas, itol, &
                nzmax, lrd, lid, isparse, &
                liwork, lwork, caller_id, which_solver, which_decsol
@@ -1231,7 +1229,7 @@
          integer, intent(out) :: i_t, k_t
          real(dp), intent(out) :: dt
          integer :: i, j, k
-         real(dp) :: xdm, f, flow_in, flow_out, dt1, dxdt, coeff, &
+         real(dp) :: f, flow_in, flow_out, dt1, dxdt, coeff, &
             flow_in_GT, flow_out_GT, flow_in_SIG, flow_out_SIG, &
             flow_in_max, flow_out_max, &
             flow_in_GT_max, flow_out_GT_max, &
@@ -1557,7 +1555,7 @@
          real(dp), intent(inout), dimension(:,:) :: dX_dt ! (nc,nz)
          real(dp), intent(inout), dimension(:,:) :: rhs ! (nc,nz)
          real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1 ! (nc,nc,nz)
-         integer :: k, j
+         integer :: k
          ! lhs(i,k) := X(i,k) - (flow(i,k) - flow(i,k-1))*dt/cell_dm(k)
          ! rhs(i,k) := X_prev(i,k)
          ! em1(i,j,k) = d(lhs(i,k))/d(X(j,k-1))
@@ -1591,10 +1589,9 @@
          real(dp), intent(inout), dimension(:) :: dX_dt ! (nc)
          real(dp), intent(inout), dimension(:,:) :: rhs ! (nc,nz)
          real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1 ! (nc,nc,nz)
-         integer :: i, j, jj
+         integer :: i, j
          real(dp) :: alfa, beta, c, coeff, dC_dXj00, dC_dXjm1, dC_dXjp1, &
-            dC, dcoeff_dXjm1, dcoeff_dXj00, dcoeff_dXjp1, max_coeff, &
-            dt_div_dm
+            dC, dcoeff_dXjm1, dcoeff_dXj00, dcoeff_dXjp1, dt_div_dm
 
          include 'formats'
 
@@ -1748,7 +1745,7 @@
          real(dp), pointer :: rpar_decsol(:)
          integer, intent(out) :: ierr
 
-         integer :: i, j, k, caller_id, ierr2
+         integer :: caller_id, ierr2
          integer, pointer :: ipiv1_n(:)
          real(dp), pointer, dimension(:) :: rhs1_n, lblk1_n, dblk1_n, ublk1_n
          real(dp), pointer, dimension(:,:,:) :: lblk, dblk, ublk
@@ -1904,7 +1901,7 @@
          integer, intent(out) :: class_chem_id(:) ! (nc)
          character (len=8), intent(out) :: class_name(:) ! (nc)
          real(dp) :: A
-         integer :: i, j
+         integer :: i
          integer, parameter :: c_h = 1, c_he = 2, c_o = 3, c_fe = 4
          class_name(c_h) = 'c_h'
          class_name(c_he) = 'c_he'

@@ -24,23 +24,20 @@
 !
 ! ***********************************************************************
 
-      module const_lib
-      
-      use const_def
-      
-      implicit none
+module const_lib
 
+   use const_def
 
-      contains
-            
-            
-      subroutine const_init(mesa_dir_init,ierr)
-         character (len=*), intent(in) :: mesa_dir_init
-         integer, intent(out) :: ierr
-         ierr = 0
-         call do_const_init(mesa_dir_init,ierr)
-      end subroutine const_init
+   implicit none
 
+contains
 
-      end module const_lib
+   subroutine const_init(mesa_dir_init, ierr)
+      character(len=*), intent(in) :: mesa_dir_init
+      integer, intent(out) :: ierr
+      ierr = 0
+      call do_const_init(mesa_dir_init, ierr)
+   end subroutine const_init
+
+end module const_lib
 

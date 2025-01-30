@@ -43,9 +43,9 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt_total
 
-         integer :: ierr, nz, i, j, k, max_iters_per_substep, &
+         integer :: ierr, nz, k, max_iters_per_substep, &
             max_iters_total, total_num_iters, num_iters
-         integer(8) :: time0, clock_rate
+         integer(8) :: time0
          integer :: steps_used, max_steps, min_steps
          real(qp) :: remaining_time, total_time, time, dt, &
             J_tot0, J_tot1, max_del, avg_del, &
@@ -332,7 +332,7 @@
 
          subroutine do_alloc(ierr)
             use alloc, only: non_crit_get_quad_array
-            integer, intent(out) :: ierr            
+            integer, intent(out) :: ierr
             call do_work_arrays(.true.,ierr)
 
             call non_crit_get_quad_array(s, du, nz, nz_alloc_extra, 'solve_omega_mix', ierr)
@@ -368,7 +368,7 @@
          subroutine dealloc
             use alloc, only: non_crit_return_quad_array
             call do_work_arrays(.false.,ierr)
-            
+
             call non_crit_return_quad_array(s, du, 'solve_omega_mix')
             call non_crit_return_quad_array(s, d, 'solve_omega_mix')
             call non_crit_return_quad_array(s, dl, 'solve_omega_mix')
@@ -383,10 +383,10 @@
             call non_crit_return_quad_array(s, X_1, 'solve_omega_mix')
             call non_crit_return_quad_array(s, rhs, 'solve_omega_mix')
             call non_crit_return_quad_array(s, del, 'solve_omega_mix')
-            
+
          end subroutine dealloc
-         
-         
+
+
          subroutine do_work_arrays(alloc_flag, ierr)
             use alloc, only: work_array
             logical, intent(in) :: alloc_flag
@@ -418,7 +418,7 @@
             integer, intent(out) :: ierr
 
             real(qp) :: m
-            integer i
+            integer :: i
 
             ierr = 0
 

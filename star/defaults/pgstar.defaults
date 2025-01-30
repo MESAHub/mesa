@@ -87,14 +87,24 @@
 
       ! file_device
       ! ~~~~~~~~~~~
-      ! file_extension
-      ! ~~~~~~~~~~~~~~
 
-      ! 'png' is Portable Network Graphics format; can also use 'pdf'
+      ! 'png' is Portable Network Graphics format
+      ! can also use:
+      ! 'ps' (in combination with file_extension = 'ps') for PostScript
+      ! or:
+      ! 'vcps' (in combination with file_extension = 'eps') for Encapsulated PostScript
 
       ! ::
 
     file_device = 'png'
+
+      ! file_extension
+      ! ~~~~~~~~~~~~~~
+
+      ! Can use: 'png', 'ps', or 'eps' with the appropriate file_device
+
+      ! ::
+
     file_extension = 'png'
 
 
@@ -423,7 +433,7 @@
       ! ``profile_mass_point_color_index`` and ``profile_mass_point_str_clr`` 
       ! set the color of the mass location's symbol and corresponding string, respectively, 
       ! with 1 = foreground color, 2 = Red, 3 = Green, 4 = Blue, etc.
-      ! The full range of available indicies is defined in Set_Colours in pgstar.support.f.
+      ! The full range of available indices is defined in Set_Colours in pgstar.support.f.
       
       ! **Setting symbols and text**
 
@@ -534,7 +544,7 @@
     Abundance_legend_max_cnt = 16
     Abundance_legend_txt_scale_factor = 0.8
 
-      ! **Isotope Selecton**
+      ! **Isotope Selection**
 
       ! ::
 

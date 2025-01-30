@@ -23,13 +23,13 @@
 !
 ! ***********************************************************************
 
-      module interp_2d_lib_sg
-      ! single precision library for 2D interpolation
+module interp_2d_lib_sg
+   ! single precision library for 2D interpolation
 
-      implicit none
+   implicit none
 
-      contains ! the procedure interface for the library
-      ! client programs should only call these routines.
+contains ! the procedure interface for the library
+   ! client programs should only call these routines.
 
 ! Contents
 
@@ -37,15 +37,13 @@
 
    ! interp_RGBI3P_sg -- point interpolation (Akima)
    ! interp_RGSF3P_sg -- surface interpolation (Akima)
-   
+
    ! interp_mkbicub_sg -- bicubic splines
-      
+
 ! Scattered set of data points
 
    ! interp_CS2VAL_sg -- point interpolation (Renka)
    ! interp_CS2GRD_sg -- point interpolation with gradients (Renka)
-
-
 
 ! see the documents in refs directory for more info.
 
@@ -54,180 +52,174 @@
 ! ***********************************************************************
 ! ***********************************************************************
 
+! Rectangular-grid bivariate interpolation and surface fitting
+! from ACM Algorithm 760., ACM Trans. Math. Software (22) 1996, 357-361.
+! Hiroshi Akima
+! U.S. Department of Commerce, NTIA/ITS
+! Version of 1995/08
 
+! NOTE: versions for scattered data follow.
 
-* Rectangular-grid bivariate interpolation and surface fitting
-* from ACM Algorithm 760., ACM Trans. Math. Software (22) 1996, 357-361.
-* Hiroshi Akima
-* U.S. Department of Commerce, NTIA/ITS
-* Version of 1995/08
+! see interp_2d_lib_db for double precision version.
 
-* NOTE: versions for scattered data follow.
+   subroutine interp_RGBI3P_sg(MD, NXD, NYD, XD, YD, ZD, NIP, XI, YI, ZI, ierr, WK)
+      integer, intent(in) :: MD, NXD, NYD, NIP
+      real, intent(in) :: XD(NXD), YD(NYD), ZD(NXD, NYD), XI(NIP), YI(NIP)
+      real, intent(inout) :: ZI(NIP), WK(3, NXD, NYD)
+      integer, intent(out) :: ierr
+!
+! This subroutine performs interpolation of a bivariate function,
+! z(x,y), on a rectangular grid in the x-y plane.  It is based on
+! the revised Akima method.
+!
+! In this subroutine, the interpolating function is a piecewise
+! function composed of a set of bicubic (bivariate third-degree)
+! polynomials, each applicable to a rectangle of the input grid
+! in the x-y plane.  Each polynomial is determined locally.
+!
+! This subroutine has the accuracy of a bicubic polynomial, i.e.,
+! it interpolates accurately when all data points lie on a
+! surface of a bicubic polynomial.
+!
+! The grid lines can be unevenly spaced.
+!
+! The input arguments are
+!   MD  = mode of computation
+!       = 1 for new XD, YD, or ZD data (default)
+!       = 2 for old XD, YD, and ZD data,
+!   NXD = number of the input-grid data points in the x
+!         coordinate (must be 2 or greater),
+!   NYD = number of the input-grid data points in the y
+!         coordinate (must be 2 or greater),
+!   XD  = array of dimension NXD containing the x coordinates
+!         of the input-grid data points (must be in a
+!         monotonic increasing order),
+!   YD  = array of dimension NYD containing the y coordinates
+!         of the input-grid data points (must be in a
+!         monotonic increasing order),
+!   ZD  = two-dimensional array of dimension NXD*NYD
+!         containing the z(x,y) values at the input-grid data
+!         points,
+!   NIP = number of the output points at which interpolation
+!         of the z value is desired (must be 1 or greater),
+!   XI  = array of dimension NIP containing the x coordinates
+!         of the output points,
+!   YI  = array of dimension NIP containing the y coordinates
+!         of the output points.
+!
+! The output arguments are
+!   ZI  = array of dimension NIP where the interpolated z
+!         values at the output points are to be stored,
+!   ierr = error flag
+!       = 0 for no errors
+!       = 1 for NXD = 1 or less
+!       = 2 for NYD = 1 or less
+!       = 3 for identical XD values or
+!               XD values out of sequence
+!       = 4 for identical YD values or
+!               YD values out of sequence
+!       = 5 for NIP = 0 or less.
+!
+! The other argument is
+!   WK  = three dimensional array of dimension 3*NXD*NYD used
+!         internally as a work area.
+!
+! The very first call to this subroutine and the call with a new
+! XD, YD, and ZD array must be made with MD=1.  The call with MD=2
+! must be preceded by another call with the same XD, YD, and ZD
+! arrays.  Between the call with MD=2 and its preceding call, the
+! WK array must not be disturbed.
+!
+      call do_RGBI3P_sg(MD, NXD, NYD, XD, YD, ZD, NIP, XI, YI, ZI, ierr, WK)
+   end subroutine interp_RGBI3P_sg
 
-* see interp_2d_lib_db for double precision version.
+   subroutine interp_RGSF3P_sg(MD, NXD, NYD, XD, YD, ZD, NXI, XI, NYI, YI, ZI, ierr, WK)
+      integer, intent(in) :: MD, NXD, NYD, NXI, NYI
+      real, intent(in) :: XD(NXD), YD(NYD), ZD(NXD, NYD), XI(NXI), YI(NYI)
+      real, intent(inout) :: ZI(NXI, NYI), WK(3, NXD, NYD)
+      integer, intent(out) :: ierr
+!
+! Rectangular-grid surface fitting
+! (a master subroutine of the RGBI3P/RGSF3P_sg subroutine package)
+!
+! Hiroshi Akima
+! U.S. Department of Commerce, NTIA/ITS
+! Version of 1995/08
+!
+! This subroutine performs surface fitting by interpolating
+! values of a bivariate function, z(x,y), on a rectangular grid
+! in the x-y plane.  It is based on the revised Akima method.
+!
+! In this subroutine, the interpolating function is a piecewise
+! function composed of a set of bicubic (bivariate third-degree)
+! polynomials, each applicable to a rectangle of the input grid
+! in the x-y plane.  Each polynomial is determined locally.
+!
+! This subroutine has the accuracy of a bicubic polynomial, i.e.,
+! it fits the surface accurately when all data points lie on a
+! surface of a bicubic polynomial.
+!
+! The grid lines of the input and output data can be unevenly
+! spaced.
+!
+! The input arguments are
+!   MD  = mode of computation
+!       = 1 for new XD, YD, or ZD data (default)
+!       = 2 for old XD, YD, and ZD data,
+!   NXD = number of the input-grid data points in the x
+!         coordinate (must be 2 or greater),
+!   NYD = number of the input-grid data points in the y
+!         coordinate (must be 2 or greater),
+!   XD  = array of dimension NXD containing the x coordinates
+!         of the input-grid data points (must be in a
+!         monotonic increasing order),
+!   YD  = array of dimension NYD containing the y coordinates
+!         of the input-grid data points (must be in a
+!         monotonic increasing order),
+!   ZD  = two-dimensional array of dimension NXD*NYD
+!         containing the z(x,y) values at the input-grid data
+!         points,
+!   NXI = number of output grid points in the x coordinate
+!         (must be 1 or greater),
+!   XI  = array of dimension NXI containing the x coordinates
+!         of the output grid points,
+!   NYI = number of output grid points in the y coordinate
+!         (must be 1 or greater),
+!   YI  = array of dimension NYI containing the y coordinates
+!         of the output grid points.
+!
+! The output arguments are
+!   ZI  = two-dimensional array of dimension NXI*NYI, where
+!         the interpolated z values at the output grid
+!         points are to be stored,
+!   ierr = error flag
+!       = 0 for no error
+!       = 1 for NXD = 1 or less
+!       = 2 for NYD = 1 or less
+!       = 3 for identical XD values or
+!               XD values out of sequence
+!       = 4 for identical YD values or
+!               YD values out of sequence
+!       = 5 for NXI = 0 or less
+!       = 6 for NYI = 0 or less.
+!
+! The other argument is
+!   WK  = three-dimensional array of dimension 3*NXD*NYD used
+!         internally as a work area.
+!
+! The very first call to this subroutine and the call with a new
+! XD, YD, or ZD array must be made with MD=1.  The call with MD=2
+! must be preceded by another call with the same XD, YD, and ZD
+! arrays.  Between the call with MD=2 and its preceding call, the
+! WK array must not be disturbed.
 
-      subroutine interp_RGBI3P_sg(MD,NXD,NYD,XD,YD,ZD,NIP,XI,YI,ZI,IER,WK)
-         integer, intent(in) :: MD, NXD, NYD, NIP
-         real, intent(in) :: XD(NXD), YD(NYD), ZD(NXD,NYD), XI(NIP), YI(NIP)
-         real, intent(inout) :: ZI(NIP), WK(3,NXD,NYD)
-         integer, intent(out) :: IER
-*
-* This subroutine performs interpolation of a bivariate function,
-* z(x,y), on a rectangular grid in the x-y plane.  It is based on
-* the revised Akima method.
-*
-* In this subroutine, the interpolating function is a piecewise
-* function composed of a set of bicubic (bivariate third-degree)
-* polynomials, each applicable to a rectangle of the input grid
-* in the x-y plane.  Each polynomial is determined locally.
-*
-* This subroutine has the accuracy of a bicubic polynomial, i.e.,
-* it interpolates accurately when all data points lie on a
-* surface of a bicubic polynomial.
-*
-* The grid lines can be unevenly spaced.
-*
-* The input arguments are
-*   MD  = mode of computation
-*       = 1 for new XD, YD, or ZD data (default)
-*       = 2 for old XD, YD, and ZD data,
-*   NXD = number of the input-grid data points in the x
-*         coordinate (must be 2 or greater),
-*   NYD = number of the input-grid data points in the y
-*         coordinate (must be 2 or greater),
-*   XD  = array of dimension NXD containing the x coordinates
-*         of the input-grid data points (must be in a
-*         monotonic increasing order),
-*   YD  = array of dimension NYD containing the y coordinates
-*         of the input-grid data points (must be in a
-*         monotonic increasing order),
-*   ZD  = two-dimensional array of dimension NXD*NYD
-*         containing the z(x,y) values at the input-grid data
-*         points,
-*   NIP = number of the output points at which interpolation
-*         of the z value is desired (must be 1 or greater),
-*   XI  = array of dimension NIP containing the x coordinates
-*         of the output points,
-*   YI  = array of dimension NIP containing the y coordinates
-*         of the output points.
-*
-* The output arguments are
-*   ZI  = array of dimension NIP where the interpolated z
-*         values at the output points are to be stored,
-*   IER = error flag
-*       = 0 for no errors
-*       = 1 for NXD = 1 or less
-*       = 2 for NYD = 1 or less
-*       = 3 for identical XD values or
-*               XD values out of sequence
-*       = 4 for identical YD values or
-*               YD values out of sequence
-*       = 5 for NIP = 0 or less.
-*
-* The other argument is
-*   WK  = three dimensional array of dimension 3*NXD*NYD used
-*         internally as a work area.
-*
-* The very first call to this subroutine and the call with a new
-* XD, YD, and ZD array must be made with MD=1.  The call with MD=2
-* must be preceded by another call with the same XD, YD, and ZD
-* arrays.  Between the call with MD=2 and its preceding call, the
-* WK array must not be disturbed.
-*
-         call do_RGBI3P_sg(MD,NXD,NYD,XD,YD,ZD,NIP,XI,YI,ZI,IER,WK)
-      end subroutine interp_RGBI3P_sg
-      
-      
-      subroutine interp_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI,ZI,IER,WK)
-         integer, intent(in) :: MD, NXD, NYD, NXI, NYI
-         real, intent(in) :: XD(NXD), YD(NYD), ZD(NXD,NYD), XI(NXI), YI(NYI)
-         real, intent(inout) :: ZI(NXI,NYI), WK(3,NXD,NYD)
-         integer, intent(out) :: IER
-*
-* Rectangular-grid surface fitting
-* (a master subroutine of the RGBI3P/RGSF3P_sg subroutine package)
-*
-* Hiroshi Akima
-* U.S. Department of Commerce, NTIA/ITS
-* Version of 1995/08
-*
-* This subroutine performs surface fitting by interpolating
-* values of a bivariate function, z(x,y), on a rectangular grid
-* in the x-y plane.  It is based on the revised Akima method.
-*
-* In this subroutine, the interpolating function is a piecewise
-* function composed of a set of bicubic (bivariate third-degree)
-* polynomials, each applicable to a rectangle of the input grid
-* in the x-y plane.  Each polynomial is determined locally.
-*
-* This subroutine has the accuracy of a bicubic polynomial, i.e.,
-* it fits the surface accurately when all data points lie on a
-* surface of a bicubic polynomial.
-*
-* The grid lines of the input and output data can be unevenly
-* spaced.
-*
-* The input arguments are
-*   MD  = mode of computation
-*       = 1 for new XD, YD, or ZD data (default)
-*       = 2 for old XD, YD, and ZD data,
-*   NXD = number of the input-grid data points in the x
-*         coordinate (must be 2 or greater),
-*   NYD = number of the input-grid data points in the y
-*         coordinate (must be 2 or greater),
-*   XD  = array of dimension NXD containing the x coordinates
-*         of the input-grid data points (must be in a
-*         monotonic increasing order),
-*   YD  = array of dimension NYD containing the y coordinates
-*         of the input-grid data points (must be in a
-*         monotonic increasing order),
-*   ZD  = two-dimensional array of dimension NXD*NYD
-*         containing the z(x,y) values at the input-grid data
-*         points,
-*   NXI = number of output grid points in the x coordinate
-*         (must be 1 or greater),
-*   XI  = array of dimension NXI containing the x coordinates
-*         of the output grid points,
-*   NYI = number of output grid points in the y coordinate
-*         (must be 1 or greater),
-*   YI  = array of dimension NYI containing the y coordinates
-*         of the output grid points.
-*
-* The output arguments are
-*   ZI  = two-dimensional array of dimension NXI*NYI, where
-*         the interpolated z values at the output grid
-*         points are to be stored,
-*   IER = error flag
-*       = 0 for no error
-*       = 1 for NXD = 1 or less
-*       = 2 for NYD = 1 or less
-*       = 3 for identical XD values or
-*               XD values out of sequence
-*       = 4 for identical YD values or
-*               YD values out of sequence
-*       = 5 for NXI = 0 or less
-*       = 6 for NYI = 0 or less.
-*
-* The other argument is
-*   WK  = three-dimensional array of dimension 3*NXD*NYD used
-*         internally as a work area.
-*
-* The very first call to this subroutine and the call with a new
-* XD, YD, or ZD array must be made with MD=1.  The call with MD=2
-* must be preceded by another call with the same XD, YD, and ZD
-* arrays.  Between the call with MD=2 and its preceding call, the
-* WK array must not be disturbed.
-
-         call do_RGSF3P_sg(MD,NXD,NYD,XD,YD,ZD,NXI,XI,NYI,YI,ZI,IER,WK)
-      end subroutine interp_RGSF3P_sg
-      
+      call do_RGSF3P_sg(MD, NXD, NYD, XD, YD, ZD, NXI, XI, NYI, YI, ZI, ierr, WK)
+   end subroutine interp_RGSF3P_sg
 
 ! ***********************************************************************
 ! ***********************************************************************
 ! ***********************************************************************
 ! ***********************************************************************
-
-
 
 ! cubic Shepard method for bivariate interpolation of scattered data.
 ! from ACM Algorithm 790., ACM Trans. Math. Software (25) 1999, 70-73.
@@ -240,12 +232,12 @@
 ! use CS2VAL_sg to evaluate it.
 ! use CS2GRD_sg to get value and derivatives.
 ! see interp_2d_lib_db for double precision versions.
-      
-      subroutine interp_CSHEP2_sg(N,X,Y,F,NC,NW,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
-         integer, intent(in) :: N, NC, NW, NR
-         integer, intent(out) :: LCELL(NR,NR), LNEXT(N), IER
-         real, intent(in) :: X(N), Y(N), F(N)
-         real, intent(inout) :: XMIN, YMIN, DX, DY, RMAX, RW(N), A(9,N)
+
+   subroutine interp_CSHEP2_sg(N, X, Y, F, NC, NW, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, ierr)
+      integer, intent(in) :: N, NC, NW, NR
+      integer, intent(out) :: LCELL(NR, NR), LNEXT(N), ierr
+      real, intent(in) :: X(N), Y(N), F(N)
+      real, intent(inout) :: XMIN, YMIN, DX, DY, RMAX, RW(N), A(9, N)
 !
 ! Here's the [slightly edited] documentation.
 !
@@ -351,24 +343,23 @@
 !           cubic nodal function C(k) in column k.
 !
 !   Note that the output parameters described above are not
-! defined unless IER = 0.
+! defined unless ierr = 0.
 !
-!       IER = Error indicator:
-!             IER = 0 if no errors were encountered.
-!             IER = 1 if N, NC, NW, or NR is outside its
+!       ierr = Error indicator:
+!             ierr = 0 if no errors were encountered.
+!             ierr = 1 if N, NC, NW, or NR is outside its
 !                     valid range.
-!             IER = 2 if duplicate nodes were encountered.
-!             IER = 3 if all nodes are collinear.
-   
-         call do_CSHEP2_sg(N,X,Y,F,NC,NW,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
+!             ierr = 2 if duplicate nodes were encountered.
+!             ierr = 3 if all nodes are collinear.
 
-      end subroutine interp_CSHEP2_sg
+      call do_CSHEP2_sg(N, X, Y, F, NC, NW, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, ierr)
 
+   end subroutine interp_CSHEP2_sg
 
-      real function interp_CS2VAL_sg(PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)
-         integer, intent(in) :: N, NR, LCELL(NR,NR), LNEXT(N)
-         real, intent(in) :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN, DX, DY, RMAX, RW(N), A(9,N)
-         integer, intent(out) :: IER
+   real function interp_CS2VAL_sg(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, ierr)
+      integer, intent(in) :: N, NR, LCELL(NR, NR), LNEXT(N)
+      real, intent(in) :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN, DX, DY, RMAX, RW(N), A(9, N)
+      integer, intent(out) :: ierr
 !
 !   This function returns the value C(PX,PY), where C is the
 ! weighted sum of cubic nodal functions defined in Subrou-
@@ -419,21 +410,20 @@
 ! On output:
 !
 !       CS2VAL_sg = Function value C(PX,PY) unless N, NR, DX,
-!                DY, or RMAX is invalid, in which case IER /= 0.
+!                DY, or RMAX is invalid, in which case ierr /= 0.
 !
-!       IER = Error indicator:
-!             IER = 0 if no errors were encountered.
+!       ierr = Error indicator:
+!             ierr = 0 if no errors were encountered.
 !
-         real :: do_CS2VAL_sg         
-         interp_CS2VAL_sg = do_CS2VAL_sg(PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,IER)   
-      end function interp_CS2VAL_sg
-      
+      real :: do_CS2VAL_sg
+      interp_CS2VAL_sg = do_CS2VAL_sg(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, ierr)
+   end function interp_CS2VAL_sg
 
-      subroutine interp_CS2GRD_sg(PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,C,CX,CY,IER)
-         integer, intent(in) :: N, NR, LCELL(NR,NR), LNEXT(N)
-         real, intent(in) :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN, DX, DY, RMAX, RW(N), A(9,N)
-         real, intent(out) :: C, CX, CY
-         integer, intent(out) :: IER
+   subroutine interp_CS2GRD_sg(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, C, CX, CY, ierr)
+      integer, intent(in) :: N, NR, LCELL(NR, NR), LNEXT(N)
+      real, intent(in) :: PX, PY, X(N), Y(N), F(N), XMIN, YMIN, DX, DY, RMAX, RW(N), A(9, N)
+      real, intent(out) :: C, CX, CY
+      integer, intent(out) :: ierr
 !
 !   This subroutine computes the value and gradient at P =
 ! (PX,PY) of the interpolatory function C defined in Sub-
@@ -482,29 +472,26 @@
 !
 ! On output:
 !
-!       C = Value of C at (PX,PY) unless IER .EQ. 1, in
+!       C = Value of C at (PX,PY) unless ierr .EQ. 1, in
 !           which case no values are returned.
 !
 !       CX,CY = First partial derivatives of C at (PX,PY)
-!               unless IER .EQ. 1.
+!               unless ierr .EQ. 1.
 !
-!       IER = Error indicator:
-!             IER = 0 if no errors were encountered.
-!             IER = 1 if N, NR, DX, DY or RMAX is invalid.
-!             IER = 2 if no errors were encountered but
+!       ierr = Error indicator:
+!             ierr = 0 if no errors were encountered.
+!             ierr = 1 if N, NR, DX, DY or RMAX is invalid.
+!             ierr = 2 if no errors were encountered but
 !                     (PX,PY) is not within the radius R(k)
 !                     for any node k (and thus C=CX=CY=0).
 
-         call do_CS2GRD_sg(PX,PY,N,X,Y,F,NR,LCELL,LNEXT,XMIN,YMIN,DX,DY,RMAX,RW,A,C,CX,CY,IER)
-      end subroutine interp_CS2GRD_sg
-
-
+      call do_CS2GRD_sg(PX, PY, N, X, Y, F, NR, LCELL, LNEXT, XMIN, YMIN, DX, DY, RMAX, RW, A, C, CX, CY, ierr)
+   end subroutine interp_CS2GRD_sg
 
 ! ***********************************************************************
 ! ***********************************************************************
 ! ***********************************************************************
 ! ***********************************************************************
-
 
 ! bicubic splines and hermite
 
@@ -513,24 +500,22 @@
 ! http://w3.pppl.gov/NTCC/PSPLINE
 ! Doug McCune, Princeton University
 !     dmccune@pppl.gov
-    
+
 ! use interp_mkbicub_sg to set up the interpolation information
 ! use interp_evbicub_sg to evaluate it
 ! see interp_2d_lib_db for double precision versions.
 
-      subroutine interp_mkbicub_sg(x,nx,y,ny,f1,nf2,
-     >   ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >   ibcymin,bcymin,ibcymax,bcymax,
-     >   ilinx,iliny,ier)
+   subroutine interp_mkbicub_sg(x, nx, y, ny, f1, nf2, &
+                                ibcxmin, bcxmin, ibcxmax, bcxmax, ibcymin, bcymin, ibcymax, bcymax, ilinx, iliny, ierr)
 
-         use bicub_sg
+      use bicub_sg
 
-         integer, intent(in) :: nx                        ! length of x vector
-         integer, intent(in) :: ny                        ! length of y vector
-         real, intent(in) :: x(:) ! (nx)                        ! x vector, strict ascending
-         real, intent(in) :: y(:) ! (ny)                        ! y vector, strict ascending
-         integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
-         real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)               ! data & spline coefficients
+      integer, intent(in) :: nx                        ! length of x vector
+      integer, intent(in) :: ny                        ! length of y vector
+      real, intent(in) :: x(:) ! (nx)                  ! x vector, strict ascending
+      real, intent(in) :: y(:) ! (ny)                  ! y vector, strict ascending
+      integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
+      real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & spline coefficients
 !
 !  on input:  f(1,i,j) = f(x(i),y(j))
 !  on output:  f(1,i,j) unchanged
@@ -564,13 +549,13 @@
 !
 !  input bdy condition data:
       integer, intent(in) :: ibcxmin                   ! bc flag for x=xmin
-      real, intent(in) :: bcxmin(:) ! (ny)                   ! bc data vs. y at x=xmin
+      real, intent(in) :: bcxmin(:) ! (ny)             ! bc data vs. y at x=xmin
       integer, intent(in) :: ibcxmax                   ! bc flag for x=xmax
-      real, intent(in) :: bcxmax(:) ! (ny)                   ! bc data vs. y at x=xmax
+      real, intent(in) :: bcxmax(:) ! (ny)             ! bc data vs. y at x=xmax
       integer, intent(in) :: ibcymin                   ! bc flag for y=ymin
-      real, intent(in) :: bcymin(:) ! (nx)                   ! bc data vs. x at y=ymin
+      real, intent(in) :: bcymin(:) ! (nx)             ! bc data vs. x at y=ymin
       integer, intent(in) :: ibcymax                   ! bc flag for y=ymax
-      real, intent(in) :: bcymax(:) ! (nx)                   ! bc data vs. x at y=ymax
+      real, intent(in) :: bcymax(:) ! (nx)             ! bc data vs. x at y=ymax
 !
 !  with interpretation:
 !   ibcxmin -- indicator for boundary condition at x(1):
@@ -596,16 +581,16 @@
 !  and analogous interpretation for ibcymin,bcymin,ibcymax,bcymax
 !  (df/dy or d2f/dy2 boundary conditions at y=ymin and y=ymax).
 !
-!  output linear grid flags and completion code (ier=0 is normal):
+!  output linear grid flags and completion code (ierr=0 is normal):
 !
       integer, intent(out) :: ilinx                     ! =1: x grid is "nearly" equally spaced
       integer, intent(out) :: iliny                     ! =1: y grid is "nearly" equally spaced
 !  ilinx and iliny are set to zero if corresponding grids are not equally
 !  spaced
 !
-      integer, intent(out) :: ier                       ! =0 on exit if there is no error.
+      integer, intent(out) :: ierr                      ! =0 on exit if there is no error.
 !
-!  if there is an error, ier is set and a message is output on unit 6.
+!  if there is an error, ierr is set and a message is output on unit 6.
 !  these are considered programming errors in the calling routine.
 !
 !  possible errors:
@@ -617,16 +602,11 @@
 !
 !-----------------------
 
-         call do_mkbicub(x,nx,y,ny,f1,nf2,
-     >         ibcxmin,bcxmin,ibcxmax,bcxmax,
-     >         ibcymin,bcymin,ibcymax,bcymax,
-     >         ilinx,iliny,ier)
+      call do_mkbicub(x, nx, y, ny, f1, nf2, ibcxmin, bcxmin, ibcxmax, bcxmax, ibcymin, bcymin, ibcymax, bcymax, ilinx, iliny, ierr)
 
-      end subroutine interp_mkbicub_sg
-      
-      
-      
-      subroutine interp_evbicub_sg(xget,yget,x,nx,y,ny,ilinx,iliny,f1,inf2,ict,fval,ier)
+   end subroutine interp_mkbicub_sg
+
+   subroutine interp_evbicub_sg(xget, yget, x, nx, y, ny, ilinx, iliny, f1, inf2, ict, fval, ierr)
 
       use bicub_sg
 
@@ -640,14 +620,14 @@
 !  this subroutine calls two subroutines:
 !     herm2xy  -- find cell containing (xget,yget)
 !     fvbicub  -- evaluate interpolant function and (optionally) derivatives
-      
+
 !  input arguments:
 !  ================
 !
-      integer, intent(in) :: nx,ny                     ! grid sizes
-      real, intent(in) :: xget,yget                    ! target of this interpolation
-      real, intent(in) :: x(:) ! (nx)                        ! ordered x grid
-      real, intent(in) :: y(:) ! (ny)                        ! ordered y grid
+      integer, intent(in) :: nx, ny                    ! grid sizes
+      real, intent(in) :: xget, yget                   ! target of this interpolation
+      real, intent(in) :: x(:) ! (nx)                  ! ordered x grid
+      real, intent(in) :: y(:) ! (ny)                  ! ordered y grid
       integer, intent(in) :: ilinx                     ! ilinx=1 => assume x evenly spaced
       integer, intent(in) :: iliny                     ! iliny=1 => assume y evenly spaced
 !
@@ -699,8 +679,8 @@
 ! output arguments:
 ! =================
 !
-      real, intent(inout) :: fval(6)                      ! output data
-      integer, intent(out) :: ier                       ! error code =0 ==> no error
+      real, intent(inout) :: fval(6)                     ! output data
+      integer, intent(out) :: ierr                       ! error code =0 ==> no error
 !
 !  fval(1) receives the first output (depends on ict(...) spec)
 !  fval(2) receives the second output (depends on ict(...) spec)
@@ -722,22 +702,19 @@
 !    on input ict = [0,0,1,0,0,0]
 !   on output fval= [df/dy] ... elements 2 -- 6 never referenced.
 !
-!  ier -- completion code:  0 means OK
+!  ierr -- completion code:  0 means OK
 !-------------------
 
-      integer i,j
-      integer ii(1), jj(1) 
-      real xparam(1),yparam(1),hx(1),hxi(1),hy(1),hyi(1)
-      call herm2xy(xget,yget,x,nx,y,ny,ilinx,iliny,i,j,
-     >         xparam(1),yparam(1),hx(1),hxi(1),hy(1),hyi(1),ier)
-      if(ier.ne.0) return
+      integer :: i, j
+      integer :: ii(1), jj(1)
+      real xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1)
+      call herm2xy(xget, yget, x, nx, y, ny, ilinx, iliny, i, j, xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1), ierr)
+      if (ierr /= 0) return
       ii(1) = i
       jj(1) = j
-      call fvbicub(ict,1,1,fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,f1,inf2,ny)
+      call fvbicub(ict, 1, 1, fval, ii, jj, xparam, yparam, hx, hxi, hy, hyi, f1, inf2, ny)
 
-      end subroutine interp_evbicub_sg
-      
-
+   end subroutine interp_evbicub_sg
 
 ! ***********************************************************************
 ! ***********************************************************************
@@ -746,33 +723,30 @@
 ! does 4 1d interpolations in x followed by 1 1d interpolation in y.
 ! use interp_mkbipm_db to set up the interpolation information
 ! use interp_evbipm_db to evaluate it
-      
-      subroutine interp_mkbipm_sg(x,nx,y,ny,f1,nf2,ier)
-         use bipm_sg, only: do_mkbipm_sg
-         integer, intent(in) :: nx                        ! length of x vector
-         integer, intent(in) :: ny                        ! length of y vector
-         real, intent(in), pointer :: x(:) ! (nx)            ! x vector, strict ascending
-         real, intent(in), pointer :: y(:) ! (ny)            ! y vector, strict ascending
-         integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
-         real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & interpolant coefficients
-         integer, intent(out) :: ier                      ! =0 on exit if there is no error.   
-         call do_mkbipm_sg(x,nx,y,ny,f1,nf2,ier)
-      end subroutine interp_mkbipm_sg
 
+   subroutine interp_mkbipm_sg(x, nx, y, ny, f1, nf2, ierr)
+      use bipm_sg, only: do_mkbipm_sg
+      integer, intent(in) :: nx                        ! length of x vector
+      integer, intent(in) :: ny                        ! length of y vector
+      real, intent(in), pointer :: x(:) ! (nx)         ! x vector, strict ascending
+      real, intent(in), pointer :: y(:) ! (ny)         ! y vector, strict ascending
+      integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
+      real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & interpolant coefficients
+      integer, intent(out) :: ierr                     ! =0 on exit if there is no error.
+      call do_mkbipm_sg(x, nx, y, ny, f1, nf2, ierr)
+   end subroutine interp_mkbipm_sg
 
-      subroutine interp_evbipm_sg(xget,yget,x,nx,y,ny,f1,nf2,z,ier)
-         use bipm_sg, only: do_evbipm_sg
-         integer, intent(in) :: nx,ny
-         real, intent(in) :: xget,yget        ! target of this interpolation
-         real, intent(in), pointer :: x(:) ! (nx)            ! ordered x grid
-         real, intent(in), pointer :: y(:) ! (ny)            ! ordered y grid
-         integer, intent(in) :: nf2
-         real, intent(in), pointer :: f1(:) ! =(4,nf2,ny)      ! function data
-         real, intent(out) :: z
-         integer, intent(out) :: ier                      ! error code =0 ==> no error
-         call do_evbipm_sg(xget,yget,x,nx,y,ny,f1,nf2,z,ier)   
-      end subroutine interp_evbipm_sg
+   subroutine interp_evbipm_sg(xget, yget, x, nx, y, ny, f1, nf2, z, ierr)
+      use bipm_sg, only: do_evbipm_sg
+      integer, intent(in) :: nx, ny
+      real, intent(in) :: xget, yget                   ! target of this interpolation
+      real, intent(in), pointer :: x(:) ! (nx)         ! ordered x grid
+      real, intent(in), pointer :: y(:) ! (ny)         ! ordered y grid
+      integer, intent(in) :: nf2
+      real, intent(in), pointer :: f1(:) ! =(4,nf2,ny)   ! function data
+      real, intent(out) :: z
+      integer, intent(out) :: ierr                     ! error code =0 ==> no error
+      call do_evbipm_sg(xget, yget, x, nx, y, ny, f1, nf2, z, ierr)
+   end subroutine interp_evbipm_sg
 
-
-
-      end module interp_2d_lib_sg
+end module interp_2d_lib_sg

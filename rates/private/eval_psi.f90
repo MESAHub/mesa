@@ -52,7 +52,7 @@ contains
   subroutine do_psi_Iec_and_Jec(beta, zeta, eta, I, J)
 
     use auto_diff
-    ! calulate the phase space integral for electron emission (beta-decay)
+    ! calculate the phase space integral for electron emission (beta-decay)
 
     implicit none
 
@@ -98,8 +98,8 @@ contains
   subroutine do_psi_Iee_and_Jee(beta, zeta, eta, I, J)
 
     use auto_diff
-     
-    ! calulate the phase space integral for electron emission (beta-decay)
+
+    ! calculate the phase space integral for electron emission (beta-decay)
 
     implicit none
 

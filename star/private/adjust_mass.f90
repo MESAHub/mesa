@@ -62,17 +62,17 @@
          end if
 
          delta_m = s% dt*s% mstar_dot
-         
+
          if (is_bad(s% dt)) then
             write(*,1) 's% dt', s% dt
             call mesa_error(__FILE__,__LINE__,'compute_delta_m')
          end if
-         
+
          if (is_bad(s% mstar_dot)) then
             write(*,1) 's% mstar_dot', s% mstar_dot
             call mesa_error(__FILE__,__LINE__,'compute_delta_m')
          end if
-         
+
          if (is_bad(delta_m)) then
             write(*,1) 'delta_m', delta_m
             call mesa_error(__FILE__,__LINE__,'compute_delta_m')
@@ -85,7 +85,7 @@
          type (star_info), pointer :: s
 
          integer :: j
-            
+
          call eval_deltaM_total_energy_integrals( &
             s, 1, s% nz, s% mstar, .true., &
             s% total_energy_profile_before_adjust_mass, &
@@ -149,7 +149,7 @@
 
          ! Intermediates
          integer j, nz
-         real(dp) r_new, vol00, volp1, cell_vol         
+         real(dp) r_new, vol00, volp1, cell_vol
 
          nz = s%nz
 
@@ -169,7 +169,7 @@
             call store_r_in_xh(s, j, r_new)
             call get_r_and_lnR_from_xh(s, j, s% r(j), s% lnR(j))
             s% xh_start(s% i_lnR,j) = s% xh(s% i_lnR,j)
-            
+
          end do
 
       end subroutine update_radius
@@ -186,12 +186,11 @@
          integer, intent(out) :: ierr
 
          real(dp) :: &
-            dt, delta_m, old_mstar, new_mstar, old_J, new_J, factor, total, &
-            frac, env_mass, mmax, alfa, new_xmstar, old_xmstar, removed, &
+            dt, delta_m, old_mstar, new_mstar, total, &
+            frac, env_mass, mmax, new_xmstar, old_xmstar, removed, &
             q_for_just_added, xq_for_CpT_absMdot_div_L, sum_dq, dm, sumx
 
-         real(dp), dimension(species) :: &
-            xaccrete, mtot_init, mtot_final
+         real(dp), dimension(species) :: xaccrete, mtot_init
          real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
             oldloc, newloc, oldval, newval, xm_old, xm_new, &
@@ -216,7 +215,7 @@
 
          nz = s% nz
          dt = s% dt
-         
+
 
          s% k_const_mass = 1
 
@@ -233,7 +232,7 @@
          end if
 
          delta_m = compute_delta_m(s)
-         
+
          if (delta_m == 0) then
             return
          end if
@@ -247,7 +246,7 @@
 
          new_mstar = old_mstar + delta_m
          new_xmstar = old_xmstar + delta_m
-         
+
          if (is_bad(new_xmstar)) then
             write(*,1) 'new_xmstar', new_xmstar
             call mesa_error(__FILE__,__LINE__,'do_adjust_mass')
@@ -375,7 +374,7 @@
                end if
             end do
          end if
-         
+
          k_below_just_added = s% k_below_just_added
          k_newval = 1
 
@@ -518,12 +517,12 @@
             end do
          end if
 
-         
+
          call update_radius(s)
-         
+
 
          call dealloc
-         
+
 
          if (s% doing_timing) call update_time(s, time0, total, s% time_adjust_mass)
 
@@ -537,7 +536,7 @@
             ! when call this, s% j_rot is still for old mass
             integer, intent(out) :: ierr
             integer :: k
-            real(dp) :: r2, dmm1, dm00, dm, dm_sum, dm_lost
+            real(dp) :: dmm1, dm00, dm, dm_sum, dm_lost
             include 'formats'
             ierr = 0
             J = 0
@@ -584,7 +583,7 @@
                J = J + dm*s% j_rot(k)
             end do
          end function eval_total_angular_momentum
-            
+
          subroutine do_alloc(ierr)
             integer, intent(out) :: ierr
             allocate(rxm_old(nz), rxm_new(nz), old_cell_mass(nz), new_cell_mass(nz), &
@@ -608,7 +607,7 @@
             call work_array(s, alloc_flag, crit, &
                 work, nz*pm_work_size, nz_alloc_extra, 'adjust_mass work', ierr)
             if (ierr /= 0) return
-         end subroutine do_work_arrays            
+         end subroutine do_work_arrays
 
       end subroutine do_adjust_mass
 
@@ -621,12 +620,12 @@
          real(dp), intent(in) :: old_xmstar, new_xmstar, delta_m
          integer, intent(out) :: k_const_mass, ierr
 
-         integer :: k, kA, kB, j00, jp1, k_check
-         real(dp) :: lnTlim_A, lnTlim_B, sumdq, sumdq1, sumdq2, sumdq3, &
-            min_xq_const_mass, min_q_for_kB, mold_o_mnew, lnTmax, lnT_A, lnT_B, &
+         integer :: k, kA, kB, j00, jp1
+         real(dp) :: lnTlim_A, lnTlim_B, sumdq, &
+            mold_o_mnew, lnTmax, lnT_A, lnT_B, &
             xqA, xqB_old, xqB_new, qfrac, frac, dqacc
          real(dp) :: xq(nz)
-         real(qp) :: qfrac_qp, frac_qp, mold_o_mnew_qp, q1, q2, q3, q4
+         real(qp) :: qfrac_qp, frac_qp, mold_o_mnew_qp, q1, q2
          real(qp) :: adjust_mass_outer_frac, adjust_mass_mid_frac, adjust_mass_inner_frac
          integer, parameter :: min_kA = 5
          logical :: dbg, flag
@@ -637,7 +636,7 @@
          ierr = 0
          dbg = .false.
          flag = .false.
-         
+
          if (is_bad(old_xmstar)) then
             write(*,1) 'old_xmstar', old_xmstar
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
@@ -654,13 +653,13 @@
          end if
 
 
-         
+
 
          okay_to_move_kB_inward = .false.
 
          lnTlim_A = ln10*s% max_logT_for_k_below_const_q
          lnTlim_B = ln10*s% max_logT_for_k_const_mass
-         
+
          q1 = old_xmstar
          q2 = new_xmstar
          mold_o_mnew_qp = q1/q2
@@ -691,11 +690,11 @@
          do k = 2, nz
             xq(k) = xq(k-1) + s% dq(k-1)
          end do
-         
+
          k = maxloc(s% xh(s% i_lnT,1:nz),dim=1)
          lnTmax = get_lnT_from_xh(s, k)
          lnT_A = min(lnTmax, lnTlim_A)
-         
+
          if (is_bad(s% max_q_for_k_below_const_q)) then
             write(*,*) 's% max_q_for_k_below_const_q', s% max_q_for_k_below_const_q
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
@@ -704,7 +703,7 @@
             write(*,*) 's% min_q_for_k_below_const_q', s% min_q_for_k_below_const_q
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
-         
+
          kA = min_kA
          do k = min_kA, nz-1
             kA = k
@@ -715,7 +714,7 @@
          xqA = xq(kA)
 
          lnT_B = min(lnTmax, lnTlim_B)
-         
+
          if (is_bad(s% max_q_for_k_const_mass)) then
             write(*,*) 's% max_q_for_k_const_mass', s% max_q_for_k_const_mass
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
@@ -781,7 +780,7 @@
             call mesa_error(__FILE__,__LINE__,'revise_q_and_dq')
          end if
          s% dq(kB:nz) = s% dq(kB:nz)*frac
-         
+
          adjust_mass_outer_frac = 1d0
          adjust_mass_mid_frac = qfrac_qp
          adjust_mass_inner_frac = frac_qp
@@ -815,7 +814,7 @@
          do k = 1, nz
             s% dq(k) = s% dq(k) * frac
          end do
-         
+
          s% adjust_mass_outer_frac_sub1 = frac_qp*adjust_mass_outer_frac*new_xmstar / old_xmstar - 1.0_qp
          s% adjust_mass_mid_frac_sub1 = frac_qp*adjust_mass_mid_frac*new_xmstar / old_xmstar - 1.0_qp
          s% adjust_mass_inner_frac_sub1 = frac_qp*adjust_mass_inner_frac*new_xmstar / old_xmstar - 1.0_qp
@@ -889,7 +888,6 @@
             old_cell_xbdy, new_cell_xbdy, mmax, old_cell_mass, new_cell_mass, ierr)
          ! set new values for s% xa(:,k)
          use num_lib, only: binary_search
-         use chem_def, only: chem_isos
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, species
          real(dp), intent(in) :: mmax
@@ -1139,11 +1137,10 @@
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot, extra_work
          integer, intent(out) :: ierr
 
-         integer :: k, k0, op_err, old_k, new_k, k_uniform
+         integer :: k, k0, op_err
          logical :: okay
-         real(dp) :: old_j_tot, new_j_tot, goal_total_added, actual_total_added, &
-            f, jtot_bdy, goal_total, bdy_j, bdy_total, inner_total, outer_total, &
-            msum, isum, jsum, omega_uniform
+         real(dp) :: old_j_tot, goal_total_added, actual_total_added, &
+            goal_total, bdy_j, bdy_total, inner_total, outer_total
 
          include 'formats'
 
@@ -1249,7 +1246,7 @@
          integer, intent(in) :: k, k_below_just_added
          logical, intent(in) :: jrot_known
 
-         real(dp) :: r00, r003, ri, ro, rp13, rm13
+         real(dp) :: r00
          real(dp) :: w_div_wcrit_roche
 
          r00 = get_r_from_xh(s,k)
@@ -1284,7 +1281,7 @@
 
          real(dp) :: xm_outer, xm_inner, j_tot, xm0, xm1, new_point_dmbar, &
             dm_sum, dm
-         integer :: kk, k_outer, j
+         integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
 
@@ -1502,7 +1499,10 @@
          ierr = 0
 
          mass_lost = s% mstar_old - s% mstar
-         if (mass_lost <= 0) return
+         if (mass_lost <= 0) then
+            s% adjust_J_q = 1d0  ! nothing to do
+            return
+         end if
 
          ! can use a different j to account for things like wind braking
          if (s% use_other_j_for_adjust_J_lost) then
@@ -1617,7 +1617,7 @@
             newloc(k) = rxm_new(k)
             oldval(k) = D_omega(k)
          end do
-         
+
          call interpolate_vector( &
             n, oldloc, n, newloc, oldval, newval, interp_pm, nwork, work, &
             'adjust_mass set_D_omega', ierr)

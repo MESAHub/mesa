@@ -71,7 +71,7 @@ contains
          XH1, cgrav, m, gradL_composition_term, mixing_length_alpha
       integer, intent(in) :: iso
       real(dp), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
-      integer, intent(out) :: mixing_type, ierr 
+      integer, intent(out) :: mixing_type, ierr
       type(auto_diff_real_star_order1) :: &
          gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
          Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
@@ -101,29 +101,32 @@ contains
       D = D_ad%val
       Gamma = Gamma_ad%val
    end subroutine get_gradT
-   
-      
+
+
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
-         gradr, grada, scale_height, mixing_length_alpha, &
+         gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
+      use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
-      type(auto_diff_real_star_order1), intent(in) :: gradr, grada, scale_height
+      type(auto_diff_real_star_order1), intent(in) :: gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
          gradT, Y_face, mlt_vc, D, Gamma
-      integer, intent(out) :: ierr 
-              
-      real(dp) :: cgrav, m, XH1, gradL_old, grada_face_old
-      integer :: iso, old_mix_type
-      type(auto_diff_real_star_order1) :: r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
+      integer, intent(out) :: ierr
+
+      real(dp) :: cgrav, m, XH1
+      integer :: iso
+      type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
       include 'formats'
       ierr = 0
-      
+
+      gradr = gradr_in
+
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
       L = wrap_L_00(s,k)
@@ -138,14 +141,19 @@ contains
       Cp = get_Cp_face(s,k)
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
-      
+
       if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, k, MLT_option, &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
-      else         
+      else
+         ! starspot YREC routine
+         if (s% do_starspots) then
+            !dV = 0d0 ! dV = 1/rho - 1/rho_start and we assume rho = rho_start.
+            call starspot_tweak_gradr(s, P, gradr_in, gradr)
+         end if
          call Get_results(s, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
             iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
@@ -174,7 +182,7 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
-      
+
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale
 
@@ -183,17 +191,16 @@ contains
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
 
-      character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
 
-      ! Pre-calculate some things. 
+      ! Pre-calculate some things.
       Pr = crad*pow4(T)/3d0
       Pg = P - Pr
       beta = Pg / P
       Lambda = mixing_length_alpha*scale_height
-      grav = cgrav*m/pow2(r)   
+      grav = cgrav*m/pow2(r)
       if (s% use_Ledoux_criterion) then
          gradL = grada + gradL_composition_term ! Ledoux temperature gradient
       else
@@ -206,7 +213,7 @@ contains
       Y_face = gradT - gradL
       conv_vel = 0d0
       D = 0d0
-      Gamma = 0d0  
+      Gamma = 0d0
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
       ! Bail if we asked for no mixing, or if parameters are bad.
@@ -216,7 +223,7 @@ contains
 
       !test_partials = (k == s% solver_test_partials_k)
       test_partials = .false.
-      ierr = 0          
+      ierr = 0
       if (k > 0) then
          s% tdc_num_iters(k) = 0
       end if
@@ -226,7 +233,6 @@ contains
          write(*,4) 'enter Get_results k slvr_itr model gradr grada scale_height ' // trim(MLT_option), &
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
-
 
 
       ! check if this particular k can be done with TDC
@@ -337,8 +343,8 @@ contains
                if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
-         end if         
-      end if 
+         end if
+      end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
       if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
@@ -348,7 +354,7 @@ contains
          Y_face = gradT - gradL
          conv_vel = 0d0
          D = 0d0
-         Gamma = 0d0            
+         Gamma = 0d0
       end if
 
       contains
@@ -397,7 +403,7 @@ contains
                   end if
                   !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
-               
+
                if (Gamma_term > 0d0) then
                   Gamma_factor = Gamma_term/pow(beta,0.5d0)*diff_grads_factor
                   Gamma_factor = Gamma_factor + 1d0
@@ -408,13 +414,13 @@ contains
                   end if
                end if
             end if
-         end if 
+         end if
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
             gradr_scaled = grad_scale*gradr
          end if
-      end
+      end subroutine set_superad_reduction
    end subroutine Get_results
 
 

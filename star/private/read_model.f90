@@ -56,7 +56,7 @@
       integer, parameter :: increment_for_RTI_flag = 1
       integer, parameter :: increment_for_RSP_flag = 3
       integer, parameter :: increment_for_RSP2_flag = 1
-      
+
       integer, parameter :: max_increment = increment_for_rotation_flag &
                                           + increment_for_have_j_rot &
                                           + increment_for_have_mlt_vc &
@@ -88,8 +88,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         integer :: k, i, j,  nz
-         real(dp) :: u00, um1, xm, total_radiation
+         integer :: k, nz
          include 'formats'
          ierr = 0
          nz = s% nz
@@ -101,8 +100,8 @@
          end if
          call set_m_and_dm(s)
          call set_m_grav_and_grav(s)
-         call set_dm_bar(s, nz, s% dm, s% dm_bar)   
-                  
+         call set_dm_bar(s, nz, s% dm, s% dm_bar)
+
          call reset_epsnuc_vectors(s)
 
          s% star_mass = s% mstar/msun
@@ -150,7 +149,7 @@
             call fill_ad_with_zeros(s% u_face_ad,1,-1)
             call fill_ad_with_zeros(s% P_face_ad,1,-1)
          end if
-         
+
          if (s% RSP_flag) then
             call RSP_setup_part1(s, restart, ierr)
             if (ierr /= 0) then
@@ -162,8 +161,8 @@
          if (.not. s% have_mlt_vc) then
             s% okay_to_set_mlt_vc = .true.
          end if
-         
-         s% doing_finish_load_model = .true.  
+
+         s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
          if (ierr == 0 .and. s% RSP2_flag) call set_RSP2_vars(s,ierr)
          s% doing_finish_load_model = .false.
@@ -218,12 +217,12 @@
          character (len=*), intent(in) :: filename
          integer, intent(out) :: ierr
 
-         integer :: iounit, n, i, k, t, file_type, &
+         integer :: iounit, n, i, t, file_type, &
             year_month_day_when_created, nz, species, nvar, count
          logical :: do_read_prev, no_L
          real(dp) :: initial_mass, initial_z, initial_y, &
             tau_factor, Tsurf_factor, opacity_factor, mixing_length_alpha
-         character (len=strlen) :: buffer, string, message
+         character (len=strlen) :: buffer, string
          character (len=net_name_len) :: net_name
          character(len=iso_name_length), pointer :: names(:) ! (species)
          integer, pointer :: perm(:) ! (species)
@@ -273,7 +272,7 @@
          s% model_number = 0
          s% star_age = 0
          s% xmstar = -1
-         
+
          tau_factor = s% tau_factor
          Tsurf_factor = s% Tsurf_factor
          mixing_length_alpha = s% mixing_length_alpha
@@ -301,7 +300,7 @@
             write(*,*) 'species', species
             return
          end if
-         
+
          s% init_model_number = s% model_number
          s% time = s% star_age*secyer
 
@@ -341,7 +340,7 @@
             write(*,1) 'but current setting for mixing_length_alpha =', s% mixing_length_alpha
             write(*,'(A)')
          end if
-         
+
          s% v_flag = BTEST(file_type, bit_for_velocity)
          s% u_flag = BTEST(file_type, bit_for_u)
          s% rotation_flag = BTEST(file_type, bit_for_rotation)
@@ -353,7 +352,7 @@
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
-         
+
          if (BTEST(file_type, bit_for_lnPgas)) then
             write(*,'(A)')
             write(*,*) 'MESA no longer supports models using lnPgas as a structure variable'
@@ -385,7 +384,7 @@
                'do_read_saved_model failed in set_net for net_name = ' // trim(s% net_name)
             return
          end if
-         
+
          call set_var_info(s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_read_saved_model failed in set_var_info'
@@ -417,7 +416,7 @@
                count = count+1
                write(*,*) "Mod file has isotope ",trim(names(i)), " but that is not in the net"
             end if
-         end do 
+         end do
          if (count/=0) call mesa_error(__FILE__,__LINE__)
 
          nvar = s% nvar_total
@@ -469,9 +468,8 @@
          subroutine read_prev_properties
             character (len=132) :: line
             real(dp) :: tmp, skip_val
-            integer :: i
             include 'formats'
-            
+
             ierr = 0
             s% dt = -1
             s% mstar_old = -1
@@ -540,7 +538,6 @@
             i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
-         real(dp) :: r00, rm1
          integer :: nvec
 
          include 'formats'
@@ -552,15 +549,15 @@
          i_lnT = s% i_lnT
          i_lnR = s% i_lnR
          i_lum = s% i_lum
-         i_w = s% i_w         
-         i_Hp = s% i_Hp         
+         i_w = s% i_w
+         i_Hp = s% i_Hp
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
          i_Et_RSP = s% i_Et_RSP
          i_erad_RSP = s% i_erad_RSP
          i_Fr_RSP = s% i_Fr_RSP
-         
+
          n = species + nvar_hydro + 1 ! + 1 is for dq
          if (s% rotation_flag) n = n+increment_for_rotation_flag ! read omega
          if (s% have_j_rot) n = n+increment_for_have_j_rot ! read j_rot
@@ -598,15 +595,15 @@
             j = 1
             j=j+1; xh(i_lnd,k) = vec(j)
             j=j+1; xh(i_lnT,k) = vec(j)
-            j=j+1; xh(i_lnR,k) = vec(j)            
+            j=j+1; xh(i_lnR,k) = vec(j)
             if (s% RSP_flag) then
                j=j+1; xh(i_Et_RSP,k) = vec(j)
                j=j+1; xh(i_erad_RSP,k) = vec(j)
                j=j+1; xh(i_Fr_RSP,k) = vec(j)
-            else if (s% RSP2_flag) then 
+            else if (s% RSP2_flag) then
                j=j+1; xh(i_w,k) = vec(j)
                j=j+1; xh(i_Hp,k) = vec(j)
-            end if   
+            end if
             if (i_lum /= 0) then
                j=j+1; xh(i_lum,k) = vec(j)
             else
@@ -657,10 +654,10 @@
             write(*,*) 'read1_model_loop failed'
             return
          end if
-         
+
          if (s% rotation_flag .and. .not. s% D_omega_flag) &
             s% D_omega(1:nz) = 0d0
-         
+
          if (s% rotation_flag .and. .not. s% am_nu_rot_flag) &
             s% am_nu_rot(1:nz) = 0d0
 
@@ -952,11 +949,11 @@
                case default
                   j1 = i; j2 = i
                   name_loop: do
-                     if (i+1 > n) exit
-                     if (buffer(i+1:i+1) == ' ') exit
-                     if (buffer(i+1:i+1) == '(') exit
-                     if (buffer(i+1:i+1) == ')') exit
-                     if (buffer(i+1:i+1) == ',') exit
+                     if (i+1 > n) exit name_loop
+                     if (buffer(i+1:i+1) == ' ') exit name_loop
+                     if (buffer(i+1:i+1) == '(') exit name_loop
+                     if (buffer(i+1:i+1) == ')') exit name_loop
+                     if (buffer(i+1:i+1) == ',') exit name_loop
                      i = i+1
                      j2 = i
                   end do name_loop

@@ -9,6 +9,8 @@
       real(dp), parameter :: log10_bohr_radius_sqr = -16.55280d0
       real(dp), parameter :: logNa = 23.779750912481397d0 !log10_cr(6.0221409d23) Avogadro's number
 
+      real(dp), parameter :: diff_v = (1.0552976117319748d0 - 0.00010565516589892675d0)   !v(u(1)) - v(u(nptot))
+
       contains
 
 
@@ -39,12 +41,12 @@
       ! eumesh: sigma_i*(1 - exp(-u(v))) - a_k,i, where u=h*nu/(kT). OP mono grid is equally spaced in variable v. a_k,i are the correction factors. (nel,1648,nptot)
 
 
-      integer :: n, ke, nz, id, m, ik, i
+      integer :: ke, id, m, ik, i
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       integer ::  delta_min_idx
@@ -55,7 +57,7 @@
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
       real(dp) :: logT_min, logRho_min, logT_grid(4,4), logRho_grid(4,4)
       integer :: offset1, offset2, tries, missing_point(4,4)
-      real(dp) :: log_amu_mix_cell, lkap_ross_face, gam
+      real(dp) :: log_amu_mix_cell, gam
       integer :: imin, imax
       logical :: retry
 
@@ -291,10 +293,10 @@
 
       integer :: n, ke, nz, id, m, ik, i, j
 
-      !real(dp) :: fk_norm_fac !Local fractional abudance per element and normalization factor.
+      !real(dp) :: fk_norm_fac !Local fractional abundance per element and normalization factor.
       real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
@@ -398,7 +400,7 @@
       real(dp) :: delta(1648)
       integer ::  eid(nel)
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
@@ -617,7 +619,7 @@
       real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
 
@@ -824,7 +826,7 @@
 
       real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
@@ -909,7 +911,7 @@
       real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.

@@ -12,6 +12,9 @@
   !### put kap options here
   ! see kap/defaults/kap.defaults
 
+  ! cubic_interpolation_in_X = .true.
+  ! cubic_interpolation_in_Z = .true.
+
   use_Type2_opacities = .false.
   Zbase = 0
 
@@ -42,9 +45,9 @@
   !### pick number of points
   ! values for non-xname,yname variables are ignored
 
-  nT = 100
-  nRho = 100
-  nX = 100
+  nT = 301
+  nRho = 301
+  nX = 500
   nZ = 150
 
   !### pick plot limits
@@ -52,23 +55,23 @@
   ! center/delta takes precedence over min/max
   ! center is used when var is not xname/yname
 
-  X_center = 0.76
-  Z_center = 0.00
+  X_center = 0.625d0 ! 0.7d0
+  Z_center = 5d-4 ! closest grid points are at Z = 3d-4 and 1d-3
 
-  delta_X = 0.1
-  delta_Z = 0.1
+  delta_X = 0.0
+  delta_Z = 0.0
 
   X_min = 0
   X_max = 1
 
-  Z_min = 0
-  Z_max = 0.1
+  ! Z_min = 0
+  ! Z_max = 0.1
 
-  logT_center = 4.0
-  logRho_center = -8.5
+  logT_center = 6d0
+  logRho_center = -2d0
 
-  delta_logT = 1.0d0
-  delta_logRho = 0.5d0
+  delta_logT = 8d0
+  delta_logRho = 24d0
 
   ! logT_min = 3.8
   ! logT_max = 4.2

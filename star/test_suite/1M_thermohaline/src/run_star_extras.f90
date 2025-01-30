@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -27,16 +27,16 @@
       use const_def
       use math_lib
       use auto_diff
-      
+
       implicit none
 
       include "test_suite_extras_def.inc"
-      
+
       contains
 
       include "test_suite_extras.inc"
-      
-      
+
+
       subroutine extras_controls(id, ierr)
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -44,7 +44,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_finish_step => extras_finish_step
@@ -52,10 +52,10 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns  
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
       end subroutine extras_controls
-      
-      
+
+
       subroutine extras_startup(id, restart, ierr)
          integer, intent(in) :: id
          logical, intent(in) :: restart
@@ -66,15 +66,15 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          use num_lib
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          real(dp) :: dt
          integer :: k, k_cntr, k_surf
-         
+
          logical :: okay
          type (star_info), pointer :: s
          character (len=strlen) :: test
@@ -91,14 +91,14 @@
          call check('log he_core_omega', safe_log10(s% he_core_omega), -6d0, -3d0)
          call check('surface j_rot', safe_log10(s% j_rot(1)),  5d0, 25d0)
          call check('surface v_rot', s% omega(1)*s% r(1)*1d-5, 0d0, 1d0)
-         
+
          k_cntr = 0
          k_surf = 0
          do k = s% nz, 1, -1
             if (s% m(k) > 0.24d0*Msun .and. k_cntr == 0) k_cntr = k
             if (s% m(k) > 0.25d0*Msun .and. k_surf == 0) k_surf = k
          end do
-         
+
          if (k_surf >=1 .and. k_cntr <= s% nz) then
             write(*,'(A)')
             write(*,1) 'avg near 0.245 Msun'
@@ -113,15 +113,15 @@
             if (okay) write(*,'(a)') 'all values are within tolerances'
             end if
          write(*,'(A)')
-         
-         
+
+
          contains
-         
+
          real(dp) function avg_val(v)
             real(dp) :: v(:)
             avg_val = dot_product(v(k_surf:k_cntr), s% dq(k_surf:k_cntr)) / sum(s% dq(k_surf:k_cntr))
          end function avg_val
-         
+
          subroutine check(str, val, low, hi)
             real(dp), intent(in) :: val, low, hi
             character (len=*) :: str
@@ -133,10 +133,10 @@
                okay = .false.
             end if
          end subroutine check
-         
-         
+
+
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -149,7 +149,7 @@
          include 'formats'
 
          extras_check_model = keep_going
-                  
+
       end function extras_check_model
 
 
@@ -162,8 +162,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -175,7 +175,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -186,8 +186,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -201,7 +201,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -213,8 +213,8 @@
          if (ierr /= 0) return
          extras_finish_step = keep_going
       end function extras_finish_step
-      
-      
+
+
 
       end module run_star_extras
-      
+

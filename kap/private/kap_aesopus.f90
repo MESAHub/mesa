@@ -25,7 +25,7 @@
 
 module kap_aesopus
 
-  use hdf5io_lib
+  use forum_m, only: hdf5io_t, OPEN_FILE_RO
   use math_lib
   use kap_def
 
@@ -41,7 +41,6 @@ module kap_aesopus
 contains
 
   subroutine kap_aesopus_init(rq, ierr)
-    use const_def, only: mesa_data_dir
     use kap_def, only: kap_aesopus_is_initialized
     type (Kap_General_Info), pointer :: rq
     integer, intent(out) :: ierr
@@ -74,7 +73,7 @@ contains
     integer, intent(out) :: ierr
 
     character(len=256) :: filename
-    integer :: n, io
+    integer :: n
     integer :: iX, iCO, iC, iN
 
     type(hdf5io_t) :: hi, hi_ts
@@ -84,11 +83,11 @@ contains
 
     character(len=80) :: group_name ! output buffer
 
-    character(len=30) :: efmt = '(A14, 99ES12.3)'
-    character(len=30) :: ffmt = '(A14, 99F8.3)'
-    character(len=30) :: ifmt = '(A14, I4)'
+    character(len=30), parameter :: efmt = '(A14, 99ES12.3)'
+    character(len=30), parameter :: ffmt = '(A14, 99F8.3)'
+    character(len=30), parameter :: ifmt = '(A14, I4)'
 
-    logical :: file_exists 
+    logical :: file_exists
 
     ! get the filename
     filename = trim(aesopus_filename)
@@ -117,7 +116,7 @@ contains
 
     ! open file (read-only)
     hi = hdf5io_t(filename, OPEN_FILE_RO)
-    
+
     if (rq% show_info) write(*,*) 'AESOPUS composition parameters'
 
     ! read composition parameters
@@ -176,7 +175,7 @@ contains
     call hi% alloc_read_dset('Zs', kA% Zs)
     kA% num_Zs = SIZE(kA% Zs)
     if (rq% show_info) write(*,ifmt) "num Zs =", kA% num_Zs
-    
+
     if (debug) write(*,*) 'Zs', kA% Zs
 
     if (rq% show_info) then
@@ -202,7 +201,7 @@ contains
        ! get group name and open group
 
        write(group_name, 100) kA% Zs(n)
-100    format(F8.6)  
+100    format(F8.6)
 
        if (rq% show_info) then
           write(*,'(A)')
@@ -336,7 +335,7 @@ contains
     real(dp), intent(in) :: Zref, X, XC, XN, XO, logR, logT
     real(dp), intent(out) :: res(3)
     integer, intent(out) :: ierr
-    real(dp), pointer :: Z_ary(:), work1(:)
+    real(dp), pointer :: work1(:)
     integer, parameter :: nZ = 3
     integer :: i,iZ
     real(dp) :: my_Z, raw_res(3, nZ), x_new(1), v_new(1)
@@ -524,8 +523,6 @@ contains
       integer,  intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
       real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
       logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
-
-      integer :: i
 
       weights = 0
 

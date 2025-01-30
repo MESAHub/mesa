@@ -11,7 +11,7 @@ This test case has one part. Click to see a larger view of a plot.
 * Part 1 (``inlist_to_end_core_he_burn``) loads a 20 Msun zero-age main-sequence model, relaxes a uniform new_omega_div_omega_crit = 0.75 rotation profile, and evolves the model to the end of core helium burning (mass fraction he4 < 0.0001). At the end of the run:
 
 .. image:: ../../../star/test_suite/20M_z2m2_high_rotation/docs/grid1_000890.svg
-   :scale: 100%
+   :width: 100%
 
 pgstar commands used for the plots above:
 
@@ -306,7 +306,7 @@ pgstar commands used for the plots above:
   
   Text_Summary1_name(4,1) = 'log_max_T'
   Text_Summary1_name(4,2) = 'log_LH'
-  Text_Summary1_name(4,3) = 'lg_Lnuc'
+  Text_Summary1_name(4,3) = 'lg_Lnuc_tot'
   Text_Summary1_name(4,4) = 'O_cntr'
   Text_Summary1_name(4,5) = 'Fe_core'
   

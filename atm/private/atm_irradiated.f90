@@ -25,7 +25,7 @@
 ! ***********************************************************************
 
 module atm_irradiated
-  
+
   ! Uses
 
   use const_def
@@ -99,16 +99,16 @@ contains
     real(dp) :: dlnkap_dlnT_P
 
     include 'formats'
-    
+
     ierr = 0
-    
+
     ! Sanity checks
 
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
        ierr = -1
        return
     endif
-    
+
     ! Evaluate the 'interior' temperature & gravity
 
     call eval_Teff_g(L, R, M, cgrav, T_int, g)
@@ -208,7 +208,7 @@ contains
   !****
 
   ! Evaluate atmosphere data
-  
+
   subroutine eval_data( &
        T_int, g, L, T_eq, P_surf, kap, kap_v, gamma, skip_partials, &
        tau, lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
@@ -265,7 +265,7 @@ contains
     ! Calculate the optical depth corresponding to P_surf
 
     tau = P_surf*kap/g
-    
+
     ! Evaluate irradiation terms [cf. eq. 6 of Guillot & Havel (2011,
     ! A&A 527, A20)]
 
@@ -287,7 +287,7 @@ contains
 
     T4_int = T_int*T_int*T_int*T_int
     T4_eq = T_eq*T_eq*T_eq*T_eq
-    
+
     T4 = 0.75_dp*(T4_int*(tau + 2._dp/3._dp) + T4_eq*(f_1 + f_2 + 2._dp/3._dp))
 
     lnT = 0.25_dp*log(T4)
@@ -305,7 +305,7 @@ contains
        dlnT_dlnT_int = 0.75_dp*(tau + 2._dp/3._dp)*T4_int/T4
        dlnT_dlntau = 0.75_dp*(T4_int + T4_eq*(df_1_dtau + df_2_dtau))*tau/(4._dp*T4)
        dlnT_dlnx = 0.75_dp*T4_eq*(df_1_dx + df_2_dx)*x/(4._dp*T4)
-       
+
        dlnT_int_dlnL = 0.25_dp
        dlnT_int_dlnR = -0.5_dp
        dlnT_int_dlnM = 0._dp

@@ -1,7 +1,7 @@
 module test_gyre_mod
 
   use const_def, only : dp, mesa_dir
-  use gyre_lib
+  use gyre_mesa_m
 
   implicit none
 
@@ -15,22 +15,21 @@ contains
 
     integer  :: ipar(1)
     real(dp) :: rpar(1)
-    integer  :: retcode
 
     ! Initialize
 
-    call gyre_init('gyre.in')
+    call init('gyre.in')
 
-    call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+    call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
     ! Read a model from file
 
-    call gyre_read_model('model.dat')
+    call read_model('model.dat')
 
     ! Find modes
 
-    call gyre_get_modes(0, user_sub, ipar, rpar)
-    call gyre_get_modes(1, user_sub, ipar, rpar)
+    call get_modes(0, user_sub, ipar, rpar)
+    call get_modes(1, user_sub, ipar, rpar)
 
     write(*,*) 'done file model'
 
@@ -38,12 +37,12 @@ contains
 
     call load_model('model.dat', global_data, point_data, version)
 
-    call gyre_set_model(global_data, point_data, version)
+    call set_model(global_data, point_data, version)
 
     ! Find modes
 
-    call gyre_get_modes(0, user_sub, ipar, rpar)
-    call gyre_get_modes(1, user_sub, ipar, rpar)
+    call get_modes(0, user_sub, ipar, rpar)
+    call get_modes(1, user_sub, ipar, rpar)
 
     write(*,*) 'done memory model'
 
@@ -57,10 +56,6 @@ contains
     integer, intent(inout)   :: ipar(:)
     real(dp), intent(inout)  :: rpar(:)
     integer, intent(out)     :: retcode
-
-    integer :: n_p
-    integer :: n_g
-    integer :: n_pg
 
     ! Print out mode info
 

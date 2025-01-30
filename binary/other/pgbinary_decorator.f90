@@ -25,7 +25,7 @@
 
 module pgbinary_decorator
 
-   ! NOTE: remember to set X_use_decorator = .true. to enable this, 
+   ! NOTE: remember to set X_use_decorator = .true. to enable this,
    ! where X is the name of the pgbinary plot
    ! and set s% X_pgbinary_decorator => your_function in your
    ! run_binary_extras.f
@@ -53,7 +53,7 @@ contains
    end subroutine null_pgbinary_decorator
 
 end module pgbinary_decorator
-      
-      
-      
-      
+
+
+
+

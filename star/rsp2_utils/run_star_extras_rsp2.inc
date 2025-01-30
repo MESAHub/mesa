@@ -40,7 +40,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (.not. restart) then     
+         if (.not. restart) then
             num_periods = 0
             run_num_steps_end_prev = 0
             run_num_iters_end_prev = 0
@@ -76,14 +76,14 @@
             best_cycles_to_double = 0                    
          end if
          if (.not. s% x_logical_ctrl(5)) then
-            call gyre_init('gyre.in')
-            call gyre_set_constant('G_GRAVITY', standard_cgrav)
-            call gyre_set_constant('C_LIGHT', clight)
-            call gyre_set_constant('A_RADIATION', crad)
-            call gyre_set_constant('M_SUN', Msun)
-            call gyre_set_constant('R_SUN', Rsun)
-            call gyre_set_constant('L_SUN', Lsun)
-            call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')         
+            call init('gyre.in')
+            call set_constant('G_GRAVITY', standard_cgrav)
+            call set_constant('C_LIGHT', clight)
+            call set_constant('A_RADIATION', crad)
+            call set_constant('M_SUN', Msun)
+            call set_constant('R_SUN', Rsun)
+            call set_constant('L_SUN', Lsun)
+            call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
          else
             call gyre_in_mesa_extras_set_velocities(s,restart,ierr)
          end if        
@@ -300,7 +300,7 @@
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          ierr = 0
-         call gyre_final()
+         call final()
       end subroutine rsp2_extras_after_evolve
 
 

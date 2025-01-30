@@ -59,7 +59,7 @@
             num_gvals, j, cid, cid_max, unchanged, split, merged, revised
          type (star_info), target :: copy_info
          type (star_info), pointer :: c, prv
-         real(dp) :: delta_coeff, LH, sum_L_other, sum_L_other_limit, A_max, &
+         real(dp) :: delta_coeff, sum_L_other, sum_L_other_limit, A_max, &
             mesh_max_allowed_ratio, tmp, J_tot1, J_tot2, center_logT, alfa, beta, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          real(dp), pointer, dimension(:) :: &
@@ -71,7 +71,6 @@
          character (len=32) :: gval_names(max_allowed_gvals)
          logical, dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
-         logical :: changed_mesh
          logical, parameter :: dbg = .false.
 
          real(dp), parameter :: max_sum_abs = 10d0
@@ -140,18 +139,6 @@
          end do
 
          s% mesh_call_number = s% mesh_call_number + 1
-
-         if (.not. associated(s% other_star_info)) then
-            allocate(s% other_star_info)
-            prv => s% other_star_info
-            c => null()
-         else
-            prv => s% other_star_info
-            c => copy_info
-            c = prv
-         end if
-
-         prv = s ! this makes copies of pointers and scalars
 
          sum_L_other = 0
          sum_L_other_limit = Lsun
@@ -319,10 +306,22 @@
             call dealloc
             return
          end if
-         
+
          nz = nz_new
          s% nz = nz
          nvar = s% nvar_total
+
+         if (.not. associated(s% other_star_info)) then
+            allocate(s% other_star_info)
+            prv => s% other_star_info
+            c => null()
+         else
+            prv => s% other_star_info
+            c => copy_info
+            c = prv
+         end if
+
+         prv = s ! this makes copies of pointers and scalars
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)
@@ -412,7 +411,7 @@
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
 
          if (dbg_remesh) write(*,*) 'call do_mesh_adjust'
-         
+
          call do_mesh_adjust( &
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
@@ -528,7 +527,7 @@
          subroutine set_types_of_new_cells(cell_type, ierr)
             integer, pointer :: cell_type(:)
             integer, intent(out) :: ierr
-            integer :: k, k_old, k_old_prev, new_type
+            integer :: k, k_old, new_type
 
             include 'formats'
             ierr = 0
@@ -612,8 +611,8 @@
             call return_integer_work_array(s, which_gval)
             call do_work_arrays1(.false., ierr)
          end subroutine do_dealloc1
-            
-            
+
+
          subroutine do_work_arrays1(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr
@@ -654,8 +653,8 @@
             if (ierr /= 0) return
             call return_logical_work_array(s, do_not_split)
          end subroutine do_dealloc2
-            
-            
+
+
          subroutine do_work_arrays2(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr

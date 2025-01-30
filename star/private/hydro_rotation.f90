@@ -172,7 +172,7 @@
       subroutine set_i_rot(s, skip_w_div_w_crit_roche)
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
-         integer :: k, nz
+         integer :: k
          include 'formats'
 
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
@@ -245,7 +245,7 @@
       subroutine update1_i_rot_from_xh(s, k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: r00, r003, rp1, rp13, rm1, rm13, r_in, r_out
+         real(dp) :: r00
          include 'formats'
 
          r00 = get_r_from_xh(s,k)
@@ -297,7 +297,7 @@
 
          ierr = 0
          nz = s% nz
-         
+
          allocate(am_nu(nz), am_sig(nz))
 
          call get1_am_sig(s, nzlo, nzhi, s% am_nu_j, s% am_sig_j, dt, ierr)
@@ -426,7 +426,6 @@
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
          integer, intent(out) :: ierr
-         integer :: k
          include 'formats'
          ierr = 0
 
@@ -455,7 +454,7 @@
          real(dp) :: &
             dm, dmsum, omega_sum, omega_crit_sum, omega_div_omega_crit_sum, &
             v_rot_sum, v_crit_sum, v_div_v_crit_sum, Lrad_div_Ledd_sum, &
-            kap_face, Ledd, gamma_factor, omega_crit, omega, kap_sum, &
+            gamma_factor, omega_crit, omega, kap_sum, &
             j_rot_sum, j_rot, v_rot, v_crit, Lrad_div_Ledd, dtau, tau, &
             cgrav, kap, mmid, Lmid, rmid, logT_sum, logRho_sum
          integer :: k, ierr
@@ -476,7 +475,7 @@
             s% logRho_avg_surf = 0
             return
          end if
-         
+
          ierr = 0
          call set_rotation_info(s,.true.,ierr)
          if (ierr /= 0) then

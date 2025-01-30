@@ -63,7 +63,7 @@ Text_Summary1_name(3,3) = 'photosphere_L'
 Text_Summary1_name(3,4) = 'photosphere_r'
 Text_Summary1_name(3,5) = 'log_g'
 Text_Summary1_name(3,6) = 'lum_div_Ledd'
-Text_Summary1_name(3,7) = 'lg_Lnuc'
+Text_Summary1_name(3,7) = 'lg_Lnuc_tot'
 Text_Summary1_name(3,8) = 'log_max_T'
 
 Text_Summary1_name(4,1) = 'surf_avg_v_rot'   

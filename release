@@ -1,15 +1,32 @@
 #!/bin/bash
 
 VERSION="$1"
+echo "Preparing to release MESA version ${VERSION}"
 
-if [[ ! -n ${VERSION}} ]]; then
-	echo 'Please specify version number'
+if [[ ! -n ${VERSION} ]]; then
+	echo "Error: Please specify version number. E.g. r2X.YY.Z or r2X.YY.Z-rcA"
 	exit 1
 fi
 
+if [[ ! ${VERSION} == r* ]]; then
+	echo "Error: Version number must start with 'r'. E.g. r2X.YY.Z or r2X.YY.Z-rcA"
+	exit 1
+fi
+
+# check that the changelog has been updated
+if ! grep -q "Changes in ${VERSION}" docs/source/changelog.rst; then
+	echo "Error: Please update the changelog by moving 'Changes in main' to a new section called 'Changes in ${VERSION}' and add a new 'Changes in main' section at the top of the file following 'changelog_template.rst'. Make sure this change is commited in the 'main' development branch of MESA."
+	exit 1
+fi
+
+# strip the r and hypen from version number to create a PEP440 standard tag
+TAG=${VERSION:1}
+TAG=${TAG//-}
+echo "The associated (PEP440) tag version ${VERSION} is: ${TAG}"
+
 cd ${MESA_DIR} || exit 1
 
-# Do the work in a sperate branch
+# Do the work in a seperate branch
 git checkout -b release/${VERSION}
 
 # Add version_number file
@@ -21,16 +38,28 @@ sed -i "s/PROJECT_NUMBER\ \ \ .*/PROJECT_NUMBER\ \ \ \ \ \ \ \ \ =\ ${VERSION}/"
 git add Doxyfile
 
 # Update docs/source/conf.py
-sed -i 's/release\ =.*/release\ =\ '"'${VERSION}'"'/' docs/source/conf.py
-sed -i 's/version\ =.*/version\ =\ '"'${VERSION}'"'/' docs/source/conf.py
+sed -i 's/release\ =.*/release\ =\ '"'${TAG}'"'/' docs/source/conf.py
+sed -i 's/version\ =.*/version\ =\ '"'${TAG}'"'/' docs/source/conf.py
 
 git add docs/source/conf.py
 
+# Update docs/source/changelog.rst
+PATTERN1="This section describes changes present in the development"
+PATTERN2="Before releasing a new version of MESA"
+if grep -q "$PATTERN1" docs/source/changelog.rst; then
+  if grep -q "$PATTERN2" docs/source/changelog.rst; then
+	  sed -i "/$PATTERN1/,/$PATTERN2/d" docs/source/changelog.rst
+	fi
+fi
+
+git add docs/source/changelog.rst
+
+# Commit and tag the changes
 git commit -a -m "Release: ${VERSION}"
-git tag ${VERSION}
+git tag ${TAG}
 
 # Make the archive
-git archive --prefix=mesa-${VERSION}/ --format=zip ${VERSION} > mesa-${VERSION}.zip
+git archive --prefix=mesa-${VERSION}/ --format=zip ${TAG} > mesa-${VERSION}.zip
 
 echo "Now check the archive builds before pushing the changes"
 
@@ -38,5 +67,5 @@ exit 0
 
 # Cleanup when testing
 git checkout main
-git tag -d ${VERSION}
+git tag -d ${TAG}
 git branch -D release/${VERSION}

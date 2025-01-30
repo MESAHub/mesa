@@ -67,7 +67,7 @@ contains
        return
     end if
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     nn = s%nz
 
@@ -191,7 +191,7 @@ contains
     end do
 
     ! Close the file
-    
+
     close(iounit)
 
     ! Finish
