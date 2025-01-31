@@ -25,65 +25,66 @@
 
 
 ! Routine eval_fp_ft for computing rotation corrections to the stellar structure equations.
-! Following Endal & Sofia, 1976, ApJ 210:184.
-
+! Following the method of Kippenhahn & Thomas, 1970; Endal & Sofia 1976, as implemented in
+! Paxton et al., 2019 (MESA V), using the updated fits from Fabry, Marchant & Sana, 2022, A&A 661:A123.
 
 
       module hydro_rotation
 
-      use const_def, only: pi, pi4, ln10, two_thirds, one_third
+      use const_def, only: pi, pi4, ln10, two_thirds, one_third, one_sixth
       use star_utils, only: get_r_from_xh
 
       use star_private_def
 
       implicit none
 
+      real(dp), parameter :: log_term_power = 5.626d0
+
 
       contains
 
-      ! compute w_div_w_roche for a known angular frequency omega, rphi, and Mphi
-      real(dp) function w_div_w_roche_omega(rphi,Mphi,omega,cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
-         real(dp), intent(in) :: rphi,Mphi,omega,cgrav, max_w, max_w2
+      ! compute w_div_w_roche for a known angular frequency omega, rpsi, and Mpsi
+      real(dp) function w_div_w_roche_omega(rpsi, Mphi, omega, cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
+         real(dp), intent(in) :: rpsi, Mphi, omega, cgrav, max_w, max_w2
          logical, intent(in) :: w_div_wc_flag
-         real(dp) :: wr, wr_high, wr_low, dimless_rphi, new_dimless_rphi, rphi_lim1, rphi_lim2
+         real(dp) :: wr, wr_high, wr_low, dimless_rpsi, new_dimless_rpsi, rpsi_lim1, rpsi_lim2
 
          if (omega == 0d0) then
             w_roche = 0d0
             return
          end if
 
-         dimless_rphi = rphi*pow(abs(omega), two_thirds)/pow(cgrav*Mphi,one_third)
+         dimless_rpsi = rpsi * pow(abs(omega), two_thirds) / pow(cgrav * Mphi, one_third)
          if (.not. w_div_wc_flag) then
             ! verify if w_div_w_roche is not above max, otherwise limit it to that
             wr = max_w
-            new_dimless_rphi = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
-            if (dimless_rphi > new_dimless_rphi) then
+            new_dimless_rpsi = pow(wr, two_thirds) * rpsi_from_re_factor(pow2(wr), pow4(wr), pow6(wr))
+            if (dimless_rpsi > new_dimless_rpsi) then
                w_roche = wr
                return
             end if
          else
-            ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
-            ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
+            ! smoothly cap to max_w2 to get a continuous function
+            ! nothing is done when we are below max_w, but between max_w and max_w2 we smoothly
+            ! produce an asymptote that would result in w_div_wc=max_w2 for jrot->infinity
             wr = max_w
-            rphi_lim1 = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
+            rpsi_lim1 = pow(wr, two_thirds) * rpsi_from_re_factor(pow2(wr), pow4(wr), pow6(wr))
 
             wr = max_w2
-            rphi_lim2 = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
+            rpsi_lim2 = pow(wr, two_thirds) * rpsi_from_re_factor(pow2(wr), pow4(wr), pow6(wr))
 
-            if (abs(dimless_rphi) > rphi_lim1) then
-               dimless_rphi = &
-                 2*(rphi_lim2-rphi_lim1)/(1+exp(-2*(abs(dimless_rphi)-rphi_lim1)/(rphi_lim2-rphi_lim1)))-rphi_lim2+2*rphi_lim1
+            if (abs(dimless_rpsi) > rpsi_lim1) then
+               dimless_rpsi = sigmoid(abs(dimless_rpsi), rpsi_lim1, rpsi_lim2)
             end if
          end if
 
          ! otherwise, bisect result
          wr_high = wr
          wr_low = 0
-         do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low)
-            new_dimless_rphi = pow(wr,two_thirds)*(1-pow2(wr)/6d0+0.01726d0*pow4(wr)-0.03569d0*pow6(wr))
-            if (dimless_rphi > new_dimless_rphi) then
+         do while (wr_high - wr_low > 1d-6)
+            wr = 0.5d0 * (wr_high + wr_low)
+            new_dimless_rpsi = pow(wr, two_thirds) * rpsi_from_re_factor(pow2(wr), pow4(wr), pow6(wr))
+            if (dimless_rpsi > new_dimless_rpsi) then
                wr_low = wr
             else
                wr_high = wr
@@ -97,19 +98,19 @@
 
       end function w_div_w_roche_omega
 
-      ! compute w_div_w_roche for a known specific angular momentum jrot, rphi, and Mphi
-      real(dp) function w_div_w_roche_jrot(rphi, Mphi, jrot, cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
-         real(dp), intent(in) :: rphi, Mphi, jrot, cgrav, max_w, max_w2
+      ! compute w_div_w_roche for a known specific angular momentum jrot, rpsi, and Mphi
+      real(dp) function w_div_w_roche_jrot(rpsi, Mphi, jrot, cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
+         real(dp), intent(in) :: rpsi, Mphi, jrot, cgrav, max_w, max_w2
          logical, intent(in) :: w_div_wc_flag
          real(dp) :: wr, wr_high, wr_low, dimless_factor, new_dimless_factor
-         real(dp) :: w2, w4, w6, lg_one_sub_w4, jr_lim1, jr_lim2, A, C
+         real(dp) :: w2, w4, w6, w_log_term, jr_lim1, jr_lim2
 
          if (jrot == 0d0) then
             w_roche = 0d0
             return
          end if
 
-         dimless_factor = abs(jrot)/sqrt(cgrav*Mphi*rphi)
+         dimless_factor = abs(jrot) / sqrt(cgrav * Mphi * rpsi)
 
          if (.not. w_div_wc_flag) then
             ! verify if w_div_w_roche is not above max, otherwise limit it to that
@@ -117,50 +118,50 @@
             w2 = pow2(wr)
             w4 = pow4(wr)
             w6 = pow6(wr)
-            lg_one_sub_w4 = log(1d0-w4)
-            new_dimless_factor = two_thirds*wr*(1+17d0/60d0*w2-0.3436d0*w4-0.4055d0*w6-0.9277d0*lg_one_sub_w4) &
-                     /(1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
+            w_log_term = log(1d0 - pow(wr, log_term_power))
+            new_dimless_factor = two_thirds * wr * C(w2, w4, w6, w_log_term) / A(w4, w6, w_log_term)
             if (dimless_factor > new_dimless_factor) then
                w_roche = wr
                return
             end if
          else
-            ! smoothly cap to max_w to get a continuous function
-            ! nothing is done when we are below max_w2, but between max_w2 and max_w we smoothly
-            ! produce an asymptote that would result in w_div_wc=max_w for jrot->infinity
+            ! smoothly cap to max_w2 to get a continuous function
+            ! nothing is done when we are below max_w, but between max_w and max_w2 we smoothly
+            ! produce an asymptote that would result in w_div_wc=max_w2 for jrot->infinity
             wr = max_w
-            A = 1d0-0.1076d0*pow4(wr)-0.2336d0*pow6(wr)-0.5583d0*log(1d0-pow4(wr))
-            C = 1d0+17d0/60d0*pow2(wr)-0.3436d0*pow4(wr)-0.4055d0*pow6(wr)-0.9277d0*log(1d0-pow4(wr))
-            jr_lim1 = two_thirds*wr*C/A
+            w4 = pow4(wr)
+            w6 = pow6(wr)
+            w_log_term = log(1 - pow(wr, log_term_power))
+            jr_lim1 = two_thirds * wr * C(pow2(wr), w4, w6, w_log_term) / A(w4, w6, w_log_term)
 
             wr = max_w2
-            A = 1d0-0.1076d0*pow4(wr)-0.2336d0*pow6(wr)-0.5583d0*log(1d0-pow4(wr))
-            C = 1d0+17d0/60d0*pow2(wr)-0.3436d0*pow4(wr)-0.4055d0*pow6(wr)-0.9277d0*log(1d0-pow4(wr))
-            jr_lim2 = two_thirds*wr*C/A
+            w4 = pow4(wr)
+            w6 = pow6(wr)
+            w_log_term = log(1 - pow(wr, log_term_power))
+            jr_lim2 = two_thirds * wr * C(pow2(wr), w4, w6, w_log_term) / A(w4, w6, w_log_term)
 
             if (abs(dimless_factor) > jr_lim1) then
-               dimless_factor = 2*(jr_lim2-jr_lim1)/(1+exp(-2*(abs(dimless_factor)-jr_lim1)/(jr_lim2-jr_lim1)))-jr_lim2+2*jr_lim1
+               dimless_factor = sigmoid(abs(dimless_factor), jr_lim1, jr_lim2)
             end if
          end if
 
          ! otherwise, bisect result
          wr_high = wr
          wr_low = 0
-         do while (wr_high-wr_low>1d-6)
-            wr = 0.5d0*(wr_high+wr_low)
+         do while (wr_high - wr_low > 1d-6)
+            wr = 0.5d0 * (wr_high + wr_low)
             w2 = pow2(wr)
             w4 = pow4(wr)
             w6 = pow6(wr)
-            lg_one_sub_w4 = log(1d0-w4)
-            new_dimless_factor = two_thirds*wr*(1+17d0/60d0*w2-0.3436d0*w4-0.4055d0*w6-0.9277d0*lg_one_sub_w4) &
-                     /(1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
+            w_log_term = log(1d0 - pow(wr, log_term_power))
+            new_dimless_factor = two_thirds * wr * C(w2, w4, w6, w_log_term) / A(w4, w6, w_log_term)
             if (dimless_factor > new_dimless_factor) then
                wr_low = wr
             else
                wr_high = wr
             end if
          end do
-         w_roche = 0.5d0*(wr_high+wr_low)
+         w_roche = 0.5d0 * (wr_high + wr_low)
 
          if (jrot < 0d0) then
             w_roche = -w_roche
@@ -221,9 +222,7 @@
 
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
-
          integer :: k
-
          include 'formats'
 
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
@@ -268,19 +267,16 @@
 !$OMP END PARALLEL DO
       end subroutine set_j_rot
 
-
       subroutine set_omega(s, str)
          type (star_info), pointer :: s
          character (len=*) :: str
          integer :: k
          include 'formats'
-!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic, 2)
          do k=1,s% nz
             s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
 !$OMP END PARALLEL DO
       end subroutine set_omega
-
 
       subroutine check_omega(s, str)
          type (star_info), pointer :: s
@@ -301,14 +297,11 @@
          call mesa_error(__FILE__,__LINE__,'check_omega')
       end subroutine check_omega
 
-
       subroutine update1_i_rot_from_xh(s, k)
          use auto_diff
          type (star_info), pointer :: s
          integer, intent(in) :: k
-
          real(dp) :: r00
-
          include 'formats'
          r00 = get_r_from_xh(s, k)
          call set1_i_rot(s, k, r00)
@@ -390,15 +383,11 @@
             s% w_div_w_crit_roche(k) = &
                w_div_w_roche_omega(r00, s% m(k), s% omega(k), s% cgrav(k), &
                   s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-            if (k == s% nz) then
-               write(*, *) "in use_xh_to_update_i_rot_and_j_rot", s% w_div_w_crit_roche(k)
-            end if
             call update1_i_rot_from_xh(s,k)
          end do
 !$OMP END PARALLEL DO
          call set_j_rot(s)
       end subroutine use_xh_to_update_i_rot_and_j_rot
-
 
       subroutine get_rotation_sigmas(s, nzlo, nzhi, dt, ierr)
          type (star_info), pointer :: s
@@ -437,7 +426,6 @@
          end do
 
       end subroutine get_rotation_sigmas
-
 
       subroutine get1_am_sig(s, nzlo, nzhi, am_nu, am_sig, dt, ierr)
          type (star_info), pointer :: s
@@ -494,7 +482,6 @@
 
       end subroutine get1_am_sig
 
-
       subroutine set_uniform_omega(id, omega, ierr)
          use auto_diff_support
          integer, intent(in) :: id
@@ -540,7 +527,6 @@
          s% need_to_setvars = .true.
       end subroutine set_uniform_omega
 
-
       subroutine set_rotation_info(s, skip_w_div_w_crit_roche, ierr)
          use auto_diff
          type (star_info), pointer :: s
@@ -549,9 +535,7 @@
 
          type (auto_diff_real_star_order1) :: fp_single, fp_tidal, ft_single, ft_tidal
          integer :: k
-
          include 'formats'
-
          ierr = 0
 
          if (.not. s% rotation_flag) return
@@ -592,9 +576,7 @@
             end if
          end do
 !$OMP END PARALLEL DO
-
       end subroutine set_rotation_info
-
 
       subroutine set_surf_avg_rotation_info(s)
          use star_utils, only: get_Lrad_div_Ledd
@@ -749,7 +731,6 @@
 
       end subroutine set_surf_avg_rotation_info
 
-
       ! Input variables:
       !  r     Radius coordinate [cm]
       !  aw    fractional critical angular velocity Omega/Omega_crit
@@ -790,20 +771,21 @@
          w2 = pow2(w)
          w4 = pow4(w)
          w6 = pow6(w)
-         lg_one_sub_w4 = log(1d0-w4)
-         A_omega = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-         fp_numerator = (1d0-two_thirds*w2-0.06837d0*w4-0.2495d0*w6)
-         ft_numerator = (1d0+0.2185d0*w4-0.1109d0*w6)
-         !fits for fp, ft
-         fp_temp = fp_numerator/A_omega
-         ft_temp = ft_numerator/A_omega
+         w_log_term = log(1d0 - pow(w, log_term_power))
+         ! cannot use real function below because need derivatives
+         A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
-         !re and rp can be derived analytically from w_div_wcrit
-         r_equatorial = r*(1d0+w2% val/6d0-0.0002507d0*w4% val+0.06075d0*w6% val)
-         r_polar = r_equatorial/(1d0+0.5d0*w2% val)
-         ! Be sure they are consistent with r_Phi
-         r_equatorial = max(r_equatorial,r)
-         r_polar = min(r_polar,r)
+         ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
+         fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
+         ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
+
+         ! re and rp can be derived analytically from w_div_wcrit
+         r_equatorial = r * re_from_rpsi_factor(w2% val, w4% val, w6% val)
+         r_polar = r_equatorial / (1d0 + 0.5d0 * w2% val)
+
+         ! Be sure they are consistent with r_Psi
+         r_equatorial = max(r_equatorial, r)
+         r_polar = min(r_polar, r)
 
          fp = 0d0
          ft = 0d0
@@ -882,6 +864,53 @@
          s% j_flux(s% nz) = 0d0
       end subroutine compute_j_fluxes_and_extra_jdot
 
+      real(dp) function rpsi_from_re_factor(o2, o4, o6)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         ! Fabry+2022, Eq. A.2
+         rpsi_from_re_factor = 1d0 - one_sixth * o2 + 0.02025d0 * o4 - 0.03870d0 * o6
+      end function rpsi_from_re_factor
+
+      real(dp) function re_from_rpsi_factor(o2, o4, o6)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         ! Fabry+2022, Eq. A.3
+         re_from_rpsi_factor = 1d0 + one_sixth * o2 - 0.005124d0 * o4 + 0.06562d0 * o6
+      end function re_from_rpsi_factor
+
+      real(dp) function A(o4, o6, o_log_term)
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         real(dp), intent(in) :: o_log_term
+         ! Fabry+2022, Eq. A.6
+         A = 1d0 + 0.3293d0 * o4 - 0.4926d0 * o6 - 0.5560d0 * o_log_term
+      end function A
+
+      real(dp) function B(o2, o4, o6, o_log_term)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         real(dp), intent(in) :: o_log_term
+         ! Fabry+2022, Eq. A.7
+         B = 1d0 + o2 / 5d0 + 0.4140d0 * o4 - 0.8650d0 * o6 - 0.8370d0 * o_log_term
+      end function B
+
+      real(dp) function C(o2, o4, o6, o_log_term)
+         real(dp), intent(in) :: o2
+         real(dp), intent(in) :: o4
+         real(dp), intent(in) :: o6
+         real(dp), intent(in) :: o_log_term
+         ! Fabry+2022, Eq. A.12
+         C = 1d0 + 17d0 / 60d0 * o2 + 0.4010d0 * o4 - 0.8606d0 * o6 - 0.9305d0 * o_log_term
+      end function C
+
+      real(dp) function sigmoid(x, xmax1, xmax2)
+         real(dp), intent(in) :: x, xmax1, xmax2
+         ! smoothly maps abs(x) = [xmax1, infty] to sigmoid = [xmax1, xmax2]
+         sigmoid = 2d0 * (xmax2 - xmax1) / (1d0 + exp(-2d0 * (abs(x) - xmax1) / (xmax2 - xmax1))) - xmax2 + 2d0 * xmax1
+      end function sigmoid
 
       end module hydro_rotation
 
