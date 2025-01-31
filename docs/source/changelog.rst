@@ -23,6 +23,17 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
+``hydro_rotation`` now supports the use of stellar-structure corrections for tidally deformed stars
+in the Roche potential. Following Fabry+2022, A&A 661, A123, ``binary/private/binary_roche_deformation.f90``
+calculates the corrections ``fp``, ``ft``, and the specific moments of inertial ``i_rot`` as function of
+the mass ratio and fractional radius r/RL.
+The values are interpolated from results of an integration grid (there are no simple analytical fits like in
+the rotating-star potential), with an estimated error lower than 2%.
+Currently, the supported mass-ratio range is -3 < log q < 3, and any radius larger than r/RL > 1.61 is evaluated
+at the edge of the grid.
+To start using tidal deformation corrections, put ``use_tidal_deformation = .true.`` in your ``&binary_controls``
+inlist.
+
 .. _Bug Fixes main:
 
 Bug Fixes
