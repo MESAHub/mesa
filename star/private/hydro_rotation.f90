@@ -272,6 +272,7 @@
          character (len=*) :: str
          integer :: k
          include 'formats'
+!$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic, 2)
          do k=1,s% nz
             s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
@@ -754,7 +755,7 @@
          logical :: dbg
 
          type(auto_diff_real_1var_order1) :: A_omega, fp_numerator, ft_numerator, &
-            w, w2, w3, w4, w5, w6, lg_one_sub_w4, fp_temp, ft_temp
+            w, w2, w3, w4, w5, w6, w_log_term, fp_temp, ft_temp
 
          include 'formats'
 
@@ -772,7 +773,7 @@
          w4 = pow4(w)
          w6 = pow6(w)
          w_log_term = log(1d0 - pow(w, log_term_power))
-         ! cannot use real function below because need derivatives
+         ! cannot use real function below because these are auto_diff variables
          A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
          ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
