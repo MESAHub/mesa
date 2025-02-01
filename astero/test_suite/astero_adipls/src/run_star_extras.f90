@@ -279,7 +279,9 @@
                okay = (abs(freq - expected_freq) < expected_freq*3d-2)
             end if
          end do
-         deallocate(l_freq, l_inertia, l_order, l_em)
+         if (associated(l_freq)) then
+            deallocate(l_freq, l_inertia, l_order, l_em)
+         end if
 
       end subroutine get_adipls_frequency_info
 

@@ -1,5 +1,7 @@
 include ../make/defaults-module.mk
 
+FFLAGS += -fno-check=bounds
+
 # Build
 
 MODULE_NAME := adipls
