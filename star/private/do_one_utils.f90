@@ -749,17 +749,17 @@
             call mesa_error(__FILE__,__LINE__,'test do_one_utils')
          end if
 
-         if (s% fe_core_infall < s% fe_core_infall_limit .and. &
+         if (.not. s% RSP_flag .and. s% fe_core_infall < s% fe_core_infall_limit .and. &
              s% fe_core_infall > 0.99d0*s% fe_core_infall_limit) &
             write(*,1) 'nearing fe_core_infall limit', &
                s% fe_core_infall, s% fe_core_infall_limit
 
-         if (s% non_fe_core_infall < s% non_fe_core_infall_limit .and. &
+         if (.not. s% RSP_flag .and. s% non_fe_core_infall < s% non_fe_core_infall_limit .and. &
              s% non_fe_core_infall > 0.99d0*s% non_fe_core_infall_limit) &
             write(*,1) 'nearing non_fe_core_infall limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit
 
-         if (s% non_fe_core_rebound > 0.99d0*s% non_fe_core_rebound_limit) &
+         if (.not. s% RSP_flag .and. s% non_fe_core_rebound > 0.99d0*s% non_fe_core_rebound_limit) &
             write(*,1) 'nearing non_fe_core_rebound limit', &
                s% non_fe_core_rebound, s% non_fe_core_rebound_limit
 
@@ -1103,7 +1103,7 @@
             call compare_to_target('R_center < center_R_lower_limit', &
                s% R_center, s% center_R_lower_limit, t_center_R_lower_limit)
 
-         else if (s% fe_core_infall > s% fe_core_infall_limit) then
+         else if (.not. s% RSP_flag .and. s% fe_core_infall > s% fe_core_infall_limit) then
             if (abs(s% error_in_energy_conservation/s% total_energy_end) < &
                   s% hard_limit_for_rel_error_in_energy_conservation) then
                do_check_limits = terminate
@@ -1117,11 +1117,11 @@
                   s% model_number, s% error_in_energy_conservation/abs(s% total_energy_end)
             end if
 
-         else if (s% non_fe_core_infall > s% non_fe_core_infall_limit) then
+         else if (.not. s% RSP_flag .and. s% non_fe_core_infall > s% non_fe_core_infall_limit) then
             call compare_to_target('non_fe_core_infall > non_fe_core_infall_limit', &
                s% non_fe_core_infall, s% non_fe_core_infall_limit, t_non_fe_core_infall_limit)
 
-         else if (s% non_fe_core_rebound > s% non_fe_core_rebound_limit) then
+         else if (.not. s% RSP_flag .and. s% non_fe_core_rebound > s% non_fe_core_rebound_limit) then
             call compare_to_target('non_fe_core_rebound > non_fe_core_rebound_limit', &
                s% non_fe_core_rebound, s% non_fe_core_rebound_limit, t_non_fe_core_rebound_limit)
 

@@ -76,7 +76,7 @@
    !## mass change
 
       !star_mdot ! d(star_mass)/dt (in msolar per year)
-      log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
+      !log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
       !Tsurf_factor
