@@ -601,9 +601,10 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_equ_w_div_wc, i_w_div_wc
-         real(dp) :: wwc, wwc4, wwc6, wwc_log_term, dimless_rphi, dimless_rphi_given_wwc, w1, w2, jr_lim1, jr_lim2
+         real(dp) :: wwc
+         real(dp) :: jr_lim1, jr_lim2, A, C
          type(auto_diff_real_star_order1) :: &
-            w_d_wc00, w4_d_wc00, w6_d_wc00, r00, w_log_term_d_wc00, jrot00, resid_ad, A_ad, C_ad, &
+            w_d_wc00, r00, jrot00, resid_ad, A_ad, C_ad, &
             jrot_ratio, sigmoid_jrot_ratio
          logical :: test_partials
          include 'formats'
@@ -617,42 +618,34 @@
          i_w_div_wc = s% i_w_div_wc
 
          wwc = s% w_div_wcrit_max
-         wwc4 = pow4(wwc)
-         wwc6 = pow6(wwc)
-         wwc_log_term = log(1d0 - pow(wwc, log_term_power))
-         jr_lim1 = two_thirds * wwc * C(pow2(wwc), wwc4, wwc6, wwc_log_term) / A(wwc4, wwc6, wwc_log_term)
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim1 = two_thirds*wwc*C/A
 
          wwc = s% w_div_wcrit_max2
-         wwc4 = pow4(wwc)
-         wwc6 = pow6(wwc)
-         wwc_log_term = log(1d0 - pow(wwc, log_term_power))
-         jr_lim2 = two_thirds * wwc * C(pow2(wwc), wwc4, wwc6, wwc_log_term) / A(wwc4, wwc6, wwc_log_term)
+         A = 1d0-0.1076d0*pow4(wwc)-0.2336d0*pow6(wwc)-0.5583d0*log(1d0-pow4(wwc))
+         C = 1d0+17d0/60d0*pow2(wwc)-0.3436d0*pow4(wwc)-0.4055d0*pow6(wwc)-0.9277d0*log(1d0-pow4(wwc))
+         jr_lim2 = two_thirds*wwc*C/A
 
          w_d_wc00 = wrap_w_div_wc_00(s, k)
-         w4_d_wc00 = pow4(w_d_wc00)
-         w6_d_wc00 = pow6(w_d_wc00)
-         w_log_term_d_wc00 = log(1d0 - pow(w_d_wc00, log_term_power))
-         A_ad = 1d0 + 0.3293d0 * w4_d_wc00 - 0.4926d0 * w6_d_wc00 - 0.5560d0 * w_log_term_d_wc00
-         C_ad = 1d0 + 17d0 / 60d0 * pow2(w_d_wc00) + 0.4010d0 * w4_d_wc00 - 0.8606d0 * w6_d_wc00 &
-                                                                           - 0.9305d0 * w_log_term_d_wc00
+         A_ad = 1d0-0.1076d0*pow4(w_d_wc00)-0.2336d0*pow6(w_d_wc00)-0.5583d0*log(1d0-pow4(w_d_wc00))
+         C_ad = 1d0+17d0/60d0*pow2(w_d_wc00)-0.3436d0*pow4(w_d_wc00)-0.4055d0*pow6(w_d_wc00)-0.9277d0*log(1d0-pow4(w_d_wc00))
 
          r00 = wrap_r_00(s, k)
          if (s% j_rot_flag) then
             jrot00 = wrap_jrot_00(s, k)
-            jrot_ratio = jrot00 / sqrt(s% cgrav(k) * s% m(k) * r00)
+            jrot_ratio = jrot00/sqrt(s% cgrav(k)*s% m(k)*r00)
          else
-            jrot_ratio = s% j_rot(k) / sqrt(s% cgrav(k) * s% m(k) * r00)
+            jrot_ratio = s% j_rot(k)/sqrt(s% cgrav(k)*s% m(k)*r00)
          end if
          if (abs(jrot_ratio% val) > jr_lim1) then
-            sigmoid_jrot_ratio = 2d0 * (jr_lim2-jr_lim1) &
-                                   / (1d0 + exp(-2d0 * (abs(jrot_ratio) - jr_lim1) / (jr_lim2 - jr_lim1))) &
-                                 - jr_lim2 + 2 * jr_lim1
+            sigmoid_jrot_ratio = 2*(jr_lim2-jr_lim1)/(1+exp(-2*(abs(jrot_ratio)-jr_lim1)/(jr_lim2-jr_lim1)))-jr_lim2+2*jr_lim1
             if (jrot_ratio% val < 0d0) then
                sigmoid_jrot_ratio = -sigmoid_jrot_ratio
             end if
-            resid_ad = (sigmoid_jrot_ratio - two_thirds * w_d_wc00 * C_ad / A_ad)
+            resid_ad = (sigmoid_jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
          else
-            resid_ad = (jrot_ratio - two_thirds * w_d_wc00 * C_ad / A_ad)
+            resid_ad = (jrot_ratio - two_thirds*w_d_wc00*C_ad/A_ad)
          end if
 
          s% equ(i_equ_w_div_wc, k) = resid_ad% val
