@@ -59,24 +59,3 @@ jobs:
       - name: Allow merge if tests pass
         if: success()
         run: echo "All tests passed. PR is good to merge!"
-
-
-
-        Search for the number in reponse.json in the region that looks like this:
-<p class='card-text'>
-<b>1</b>
-tests where all computers report failing.
-</p>
-
-- name: Check for failing tests
-  id: check_failures
-  run: |
-    FAIL_COUNT=$(grep -oP "(?<=<p class='card-text'>\n<b>)[0-9]+(?=</b>\ntests where all computers report failing.)" response.json)
-    echo "Number of failing tests: $FAIL_COUNT"
-    
-    if [[ "$FAIL_COUNT" -gt 0 ]]; then
-  echo "Some tests are failing!"
-  exit 1
-    else
-  echo "No failing tests found."
-    fi

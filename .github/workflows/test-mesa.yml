@@ -62,7 +62,7 @@ jobs:
           echo "platform: Linux" >> $MESA_TEST_YML
           echo "platform_version: Ubuntu" >> $MESA_TEST_YML
         shell: bash
-        
+
       - name: Check Install
         env:
           OMP_NUM_THREADS: ${{env.OMP_NUM_THREADS}}
