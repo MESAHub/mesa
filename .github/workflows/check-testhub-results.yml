@@ -1,0 +1,82 @@
+name: Check TestHub results
+
+on: [workflow_dispatch, pull_request]
+
+jobs:
+  check_testhub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Get branch name and latest commit SHA
+        id: vars
+        run: |
+          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+
+      - name: Fetch test results
+        id: fetch_results
+        run: |
+          TEST_URL="https://testhub.mesastar.org/${{ env.BRANCH_NAME }}/commits/${{ env.COMMIT_SHA }}"
+          echo "Fetching test results from: $TEST_URL"
+          
+          RESPONSE=$(curl -s -o response.json -w "%{http_code}" "$TEST_URL")
+          
+          if [[ "$RESPONSE" -ne 200 ]]; then
+            echo "Test results not found or server error."
+            exit 1
+          fi
+
+          cat response.json
+
+          PASS_COUNT=$(grep -B 1 "tests where all computers report passing." response.json | sed -n -E -e 's/<b>([0-9]+)<\/b>.*/\1/p')
+          echo "Number of passing tests: $PASS_COUNT"
+
+          FAIL_COUNT=$(grep -B 1 "tests where all computers report failing." response.json | sed -n -E -e 's/<b>([0-9]+)<\/b>.*/\1/p')
+          echo "Number of failing tests: $FAIL_COUNT"
+
+          MIXED_COUNT=$(grep -B 1 "tests where some computers report passing and others report failing." response.json | sed -n -E -e 's/<b>([0-9]+)<\/b>.*/\1/p')
+          echo "Number of mixed tests: $MIXED_COUNT"
+          
+          # Check that there are no failing or mixed tests
+          if [[ "$FAIL_COUNT" -gt 0 || "$MIXED_COUNT" -gt 0 ]]; then
+            echo "Some tests are failing or mixed!"
+            exit 1
+          else
+            echo "All tests are passing!"
+          fi
+          # Check that there are at least 106 passing tests
+          if [[ "$PASS_COUNT" -lt 106 ]]; then
+            echo "Not enough passing tests!"
+            exit 1
+          else
+            echo "Sufficient passing tests."
+          fi
+
+      - name: Allow merge if tests pass
+        if: success()
+        run: echo "All tests passed. PR is good to merge!"
+
+
+
+        Search for the number in reponse.json in the region that looks like this:
+<p class='card-text'>
+<b>1</b>
+tests where all computers report failing.
+</p>
+
+- name: Check for failing tests
+  id: check_failures
+  run: |
+    FAIL_COUNT=$(grep -oP "(?<=<p class='card-text'>\n<b>)[0-9]+(?=</b>\ntests where all computers report failing.)" response.json)
+    echo "Number of failing tests: $FAIL_COUNT"
+    
+    if [[ "$FAIL_COUNT" -gt 0 ]]; then
+  echo "Some tests are failing!"
+  exit 1
+    else
+  echo "No failing tests found."
+    fi
