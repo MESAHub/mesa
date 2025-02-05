@@ -10,7 +10,7 @@ MESA is written primarily in Fortran with a modular, flexible design that facili
 
 📖 Experienced users may find the :ref:`Reference and Defaults<reference:Reference and Defaults>` page most valuable for exploring the code’s features and input parameters.
 
-Or, you can check out the full documentation below.
+Or, check out the full documentation below.
 
 .. toctree::
    :maxdepth: 1
