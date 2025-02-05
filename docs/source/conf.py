@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('./_ext/'))
 # -- Project information -----------------------------------------------------
 
 project = 'MESA'
-copyright = '2024, The MESA Team'
+copyright = '2025, The MESA Team'
 author = 'The MESA Team'
 language = 'en'
 version = 'main'
