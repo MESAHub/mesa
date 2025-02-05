@@ -3,7 +3,7 @@ Modules for Experiments in Stellar Astrophysics
 ###############################################
 
 Modules for Experiments in Stellar Astrophysics (MESA) is an advanced, open-source 1D stellar evolution code.
-The code is developed and maintained by a globally distributed team of researchers studying a range of stellar astrophysical phenomena.
+The code is developed and maintained by a globally distributed team of researchers.
 MESA is written primarily in Fortran with a modular, flexible design that facilitates easy interfacing.
 
 🚀 New to MESA? Start with the :ref:`Quickstart<quickstart:Quickstart>` guide to set up and run your first models.
