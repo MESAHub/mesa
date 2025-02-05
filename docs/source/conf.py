@@ -117,7 +117,13 @@ html_favicon = 'mesa-favicon.png'
 # Set canonical URL from the Read the Docs Domain
 html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
 
-html_context = {}
+html_context = {
+    "display_github": True, # Integrate GitHub
+    "github_user": "MESAHub", # Username
+    "github_repo": "mesa", # Repo name
+    "github_version": "main", # Version
+    "conf_py_path": "/docs/source/", # Path in the checkout to the docs root
+}
 
 # Tell Jinja2 templates the build is running on Read the Docs
 html_context["READTHEDOCS"] = os.environ.get("READTHEDOCS", "") == "True"
