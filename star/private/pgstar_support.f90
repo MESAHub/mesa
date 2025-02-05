@@ -280,7 +280,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call Set_Colours(white_on_black_flag, ierr)
+      call set_device_colors(white_on_black_flag, ierr)
    end subroutine open_device
 
 
@@ -364,7 +364,7 @@ contains
 
    ! remaining routines for setting colours in PGPLOT
    ! by X11 name
-   subroutine Set_Colours(white_on_black_flag, ierr)
+   subroutine set_device_colors(white_on_black_flag, ierr)
       logical, intent(in) :: white_on_black_flag
       integer, intent(out) :: ierr
       integer :: index, i, k
@@ -374,79 +374,79 @@ contains
       index = 0
       ierr = 0
       if (white_on_black_flag) then
-         index = setcolour(index, "black", ierr)
+         index = set_index_to_name(index, "black", ierr)
          if (ierr /= 0) return
-         index = setcolour(index, "white", ierr)
+         index = set_index_to_name(index, "white", ierr)
          if (ierr /= 0) return
       else
-         index = setcolour(index, "white", ierr)
+         index = set_index_to_name(index, "white", ierr)
          if (ierr /= 0) return
-         index = setcolour(index, "black", ierr)
+         index = set_index_to_name(index, "black", ierr)
          if (ierr /= 0) return
       end if
-      index = setcolour(index, "red", ierr)
+      index = set_index_to_name(index, "red", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "green", ierr)
+      index = set_index_to_name(index, "green", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "blue", ierr)
+      index = set_index_to_name(index, "blue", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "cyan", ierr)
+      index = set_index_to_name(index, "cyan", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "magenta", ierr)
+      index = set_index_to_name(index, "magenta", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "yellow", ierr)
+      index = set_index_to_name(index, "yellow", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "orange", ierr)
+      index = set_index_to_name(index, "orange", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "lime green", ierr)
+      index = set_index_to_name(index, "lime green", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "green yellow", ierr)
+      index = set_index_to_name(index, "green yellow", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "dodger blue", ierr)
+      index = set_index_to_name(index, "dodger blue", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "magenta4", ierr)
+      index = set_index_to_name(index, "magenta4", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "plum", ierr)
+      index = set_index_to_name(index, "plum", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "sandy brown", ierr)
+      index = set_index_to_name(index, "sandy brown", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "salmon", ierr)
+      index = set_index_to_name(index, "salmon", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "grey59", ierr)
+      index = set_index_to_name(index, "grey59", ierr)
       if (ierr /= 0) return
-      index = setcolour(index, "grey30", ierr)
+      index = set_index_to_name(index, "grey30", ierr)
       if (ierr /= 0) return
 
       ! Tioga colors
-      index = set_c(index, clr_Black, 0.0, 0.0, 0.0)
-      index = set_c(index, clr_Blue, 0.0, 0.0, 1.0)
-      index = set_c(index, clr_BrightBlue, 0.0, 0.4, 1.0)
-      index = set_c(index, clr_LightSkyBlue, 0.53, 0.808, 0.98)
-      index = set_c(index, clr_LightSkyGreen, 0.125, 0.698, 0.668)
-      index = set_c(index, clr_MediumSpringGreen, 0.0, 0.98, 0.604)
-      index = set_c(index, clr_Goldenrod, 0.855, 0.648, 0.125)
-      index = set_c(index, clr_Lilac, 0.8, 0.6, 1.0)
-      index = set_c(index, clr_Coral, 1.0, 0.498, 0.312)
-      index = set_c(index, clr_FireBrick, 0.698, 0.132, 0.132)
-      index = set_c(index, clr_RoyalPurple, 0.4, 0.0, 0.6)
-      index = set_c(index, clr_Gold, 1.0, 0.844, 0.0)
-      index = set_c(index, clr_Crimson, 0.8, 0.0, 0.2)
-      index = set_c(index, clr_SlateGray, 0.44, 0.5, 0.565)
-      index = set_c(index, clr_SeaGreen, 0.18, 0.545, 0.34)
-      index = set_c(index, clr_Teal, 0.0, 0.5, 0.5)
-      index = set_c(index, clr_LightSteelBlue, 0.69, 0.77, 0.87)
-      index = set_c(index, clr_MediumSlateBlue, 0.484, 0.408, 0.932)
-      index = set_c(index, clr_MediumBlue, 0.0, 0.0, 0.804)
-      index = set_c(index, clr_RoyalBlue, 0.255, 0.41, 0.884)
-      index = set_c(index, clr_LightGray, 0.828, 0.828, 0.828)
-      index = set_c(index, clr_Silver, 0.752, 0.752, 0.752)
-      index = set_c(index, clr_DarkGray, 0.664, 0.664, 0.664)
-      index = set_c(index, clr_Gray, 0.5, 0.5, 0.5)
-      index = set_c(index, clr_IndianRed, 0.804, 0.36, 0.36)
-      index = set_c(index, clr_Tan, 0.824, 0.705, 0.55)
-      index = set_c(index, clr_LightOliveGreen, 0.6, 0.8, 0.6)
-      index = set_c(index, clr_CadetBlue, 0.372, 0.62, 0.628)
-      index = set_c(index, clr_Beige, 0.96, 0.96, 0.864)
+      index = set_index_to_rgb(index, clr_Black, 0.0, 0.0, 0.0)
+      index = set_index_to_rgb(index, clr_Blue, 0.0, 0.0, 1.0)
+      index = set_index_to_rgb(index, clr_BrightBlue, 0.0, 0.4, 1.0)
+      index = set_index_to_rgb(index, clr_LightSkyBlue, 0.53, 0.808, 0.98)
+      index = set_index_to_rgb(index, clr_LightSkyGreen, 0.125, 0.698, 0.668)
+      index = set_index_to_rgb(index, clr_MediumSpringGreen, 0.0, 0.98, 0.604)
+      index = set_index_to_rgb(index, clr_Goldenrod, 0.855, 0.648, 0.125)
+      index = set_index_to_rgb(index, clr_Lilac, 0.8, 0.6, 1.0)
+      index = set_index_to_rgb(index, clr_Coral, 1.0, 0.498, 0.312)
+      index = set_index_to_rgb(index, clr_FireBrick, 0.698, 0.132, 0.132)
+      index = set_index_to_rgb(index, clr_RoyalPurple, 0.4, 0.0, 0.6)
+      index = set_index_to_rgb(index, clr_Gold, 1.0, 0.844, 0.0)
+      index = set_index_to_rgb(index, clr_Crimson, 0.8, 0.0, 0.2)
+      index = set_index_to_rgb(index, clr_SlateGray, 0.44, 0.5, 0.565)
+      index = set_index_to_rgb(index, clr_SeaGreen, 0.18, 0.545, 0.34)
+      index = set_index_to_rgb(index, clr_Teal, 0.0, 0.5, 0.5)
+      index = set_index_to_rgb(index, clr_LightSteelBlue, 0.69, 0.77, 0.87)
+      index = set_index_to_rgb(index, clr_MediumSlateBlue, 0.484, 0.408, 0.932)
+      index = set_index_to_rgb(index, clr_MediumBlue, 0.0, 0.0, 0.804)
+      index = set_index_to_rgb(index, clr_RoyalBlue, 0.255, 0.41, 0.884)
+      index = set_index_to_rgb(index, clr_LightGray, 0.828, 0.828, 0.828)
+      index = set_index_to_rgb(index, clr_Silver, 0.752, 0.752, 0.752)
+      index = set_index_to_rgb(index, clr_DarkGray, 0.664, 0.664, 0.664)
+      index = set_index_to_rgb(index, clr_Gray, 0.5, 0.5, 0.5)
+      index = set_index_to_rgb(index, clr_IndianRed, 0.804, 0.36, 0.36)
+      index = set_index_to_rgb(index, clr_Tan, 0.824, 0.705, 0.55)
+      index = set_index_to_rgb(index, clr_LightOliveGreen, 0.6, 0.8, 0.6)
+      index = set_index_to_rgb(index, clr_CadetBlue, 0.372, 0.62, 0.628)
+      index = set_index_to_rgb(index, clr_Beige, 0.96, 0.96, 0.864)
 
       clr_no_mixing = clr_SeaGreen
       clr_convection = clr_LightSkyBlue
@@ -566,31 +566,31 @@ contains
       do i = 1, 101, 2
          !write(*,3) 'colormap clr', i, &
          !   index, colormap(1,i), colormap(2,i), colormap(3,i)
-         index = set_c(index, k, colormap(1, i), colormap(2, i), colormap(3, i))
+         index = set_index_to_rgb(index, k, colormap(1, i), colormap(2, i), colormap(3, i))
       end do
       colormap_last = index - 1
       colormap_size = colormap_last - colormap_offset
 
    contains
 
-      integer function set_c(index, clr_i, r, g, b)
+      integer function set_index_to_rgb(index, clr_i, r, g, b)
          integer :: index, clr_i
          real :: r, g, b
          call pgscr(index, r, g, b)
          clr_i = index
-         set_c = index + 1
-      end function set_c
+         set_index_to_rgb = index + 1
+      end function set_index_to_rgb
 
 
-      integer function setcolour(index, name, ierr)
+      integer function set_index_to_name(index, name, ierr)
          integer :: index
          character (len = *) :: name
          integer, intent(out) :: ierr
          call pgscrn(index, name, ierr)
-         setcolour = index + 1
-      end function setcolour
+         set_index_to_name = index + 1
+      end function set_index_to_name
 
-   end subroutine Set_Colours
+   end subroutine set_device_colors
 
    subroutine read_TRho_data(fname, logTs, logRhos, ierr)
       use utils_lib

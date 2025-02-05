@@ -29,7 +29,7 @@ module pgbinary_support
    use const_def, only: dp, secyer
    use rates_def, only : i_rate
    use utils_lib
-   use pgstar_support, only : Set_Colours, do1_pgmtxt, &
+   use pgstar_support, only : set_device_colors, do1_pgmtxt, &
       clr_no_mixing, clr_convection, clr_leftover_convection, clr_semiconvection, &
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
       clr_anonymous, colormap_offset, colormap_last, colormap_size, &
@@ -245,7 +245,7 @@ contains
          p% prev_win_width = p% win_width
          p% prev_win_aspect_ratio = p% win_aspect_ratio
       end if
-      call Set_Colours(white_on_black_flag, ierr)
+      call set_device_colors(white_on_black_flag, ierr)
    end subroutine open_device
 
 
