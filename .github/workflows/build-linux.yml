@@ -9,8 +9,9 @@ on:
 jobs:
   build:
     if: |
-      !(github.event_name == 'pull_request' && github.event.pull_request.draft == true) ||
-      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }})
+      !(github.event_name == 'pull_request' && github.event.pull_request.draft == true) &&
+      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }}) &&
+      (github.repository == 'MESAHub/mesa')
     strategy:
       fail-fast: false
       matrix:
