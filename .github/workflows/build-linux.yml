@@ -14,6 +14,13 @@ jobs:
       - name: Build test is not run for draft PRs
         run: exit 1
 
+  fail_if_ci_skip:
+    if: ${{ contains(github.event.commits[0].message, 'ci skip') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build test is not run for [ci skip]
+        run: exit 1
+
   build:
     strategy:
       fail-fast: false
