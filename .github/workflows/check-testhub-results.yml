@@ -2,11 +2,10 @@ name: Check TestHub results
 
 on:
   pull_request:
-  merge_group:
+  workflow_dispatch:
 
 jobs:
   check_testhub:
-    if: ${{ github.event_name == 'merge_group' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
