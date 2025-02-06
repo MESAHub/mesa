@@ -7,21 +7,10 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 jobs:
-  fail_if_pull_request_is_draft:
-    if: github.event.pull_request.draft == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build test is not run for draft PRs
-        run: exit 1
-
-  fail_if_ci_skip:
-    if: ${{ contains(github.event.commits[0].message, 'ci skip') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build test is not run for [ci skip]
-        run: exit 1
-
   build:
+    if: |
+      !(github.event_name == 'pull_request' && github.event.pull_request.draft == true) ||
+      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }})
     strategy:
       fail-fast: false
       matrix:
