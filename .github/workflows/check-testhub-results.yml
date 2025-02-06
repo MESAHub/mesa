@@ -22,6 +22,9 @@ jobs:
         id: fetch_results
         run: |
           TEST_URL="https://testhub.mesastar.org/${{ env.BRANCH_NAME }}/commits/${{ env.COMMIT_SHA }}"
+          if [ -z "$BRANCH_NAME" ]; then
+            TEST_URL="https://testhub.mesastar.org"
+          fi
           echo "Fetching test results from: $TEST_URL"
           
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" "$TEST_URL")
