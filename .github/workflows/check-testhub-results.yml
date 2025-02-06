@@ -45,6 +45,9 @@ jobs:
           MIXED_COUNT=$(grep -B 1 "tests where some computers report passing and others report failing." response.json | sed -n -E -e 's/<b>([0-9]+)<\/b>.*/\1/p')
           echo "Number of mixed tests: $MIXED_COUNT"
 
+          UNTESTED_COUNT=$(grep -B 1 "tests with no submission data." response.json | sed -n -E -e 's/<b>([0-9]+)<\/b>.*/\1/p')
+          echo "Number of untested tests: $UNTESTED_COUNT"
+
           echo ""
           
           # Check that there are no failing or mixed tests
