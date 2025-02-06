@@ -1,16 +1,25 @@
 name: Build on Linux with SDK
 
-on: [pull_request, release]
+on:
+  workflow_dispatch:
+  release:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
 
 jobs:
+  fail_if_pull_request_is_draft:
+    if: github.event.pull_request.draft == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build test is not run for draft PRs
+        run: exit 1
+
   build:
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["22.6.1", "23.7.3", "24.7.1"]
-
+        sdk: ["23.7.3", "24.7.1"]  # pick 2 or 3 most recent. "22.6.1", ...
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
