@@ -15,6 +15,8 @@ jobs:
         id: vars
         run: |
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          # Replace "/" with "%2F" in branch name
+          BRANCH_NAME="${BRANCH_NAME//\//%2F}"
           COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
