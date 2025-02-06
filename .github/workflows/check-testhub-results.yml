@@ -5,11 +5,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  check_testhub:
+  request_status:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
 
       - name: Get branch name and latest commit SHA
         id: vars
