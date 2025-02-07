@@ -120,7 +120,7 @@
    use_other_wind = .true.
 
    ! when using hydro, we reduce the rotational corrections near the surface
-   use_other_eval_fp_ft = .true.
+   use_other_eval_fp_ft = .false.
 
    ! During hydro we use es scaterring opacity on the very outermost cell
    use_other_kap = .true.
