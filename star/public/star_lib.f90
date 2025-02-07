@@ -894,7 +894,7 @@
       ! simply adds or removes; doesn't reconverge the model.
       subroutine star_set_rotation_flag(id, rotation_flag, ierr)
          use set_flags, only: set_rotation_flag
-         use hydro_rotation, only: set_rotation_info, set_i_rot
+         use hydro_rotation, only: set_rotation_info
          integer, intent(in) :: id
          logical, intent(in) :: rotation_flag
          integer, intent(out) :: ierr
