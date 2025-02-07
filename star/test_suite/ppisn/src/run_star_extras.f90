@@ -331,14 +331,12 @@
          end if
       end subroutine my_adjust_mdot
 
-      subroutine my_other_eval_fp_ft( &
-            id, nz, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+      subroutine my_other_eval_fp_ft(id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
          use num_lib
-         integer, intent(in) :: id
-         integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:) ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
+         integer, intent(in) :: id, k
+         real(dp), intent(in) :: aw, r, rho, xm
+         type(auto_diff_real_star_order1), intent(out) :: fp, ft
+         real(dp), intent(inout) :: r_polar, r_equatorial
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
@@ -353,53 +351,48 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-!$OMP PARALLEL DO PRIVATE(j, A_omega, fp_numerator, ft_numerator, fp_temp, ft_temp, w, w2, w3, w4, w5, w6, lg_one_sub_w4) SCHEDULE(dynamic,2)
-            do j=1, s% nz
-               !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
-               !by this point in the code, w_div_w_crit_roche is set
-               w = s% w_div_w_crit_roche(j)
-               w%d1val1 = 1d0
+         !Compute fp, ft, re and rp using fits to the Roche geometry of a single star.
+         w = aw
+         w% d1val1 = 1d0
 
-               w2 = pow2(w)
-               w4 = pow4(w)
-               w6 = pow6(w)
-               lg_one_sub_w4 = log(1d0-w4)
-               A_omega = (1d0-0.1076d0*w4-0.2336d0*w6-0.5583d0*lg_one_sub_w4)
-               fp_numerator = (1d0-two_thirds*w2-0.06837d0*w4-0.2495d0*w6)
-               ft_numerator = (1d0+0.2185d0*w4-0.1109d0*w6)
-               !fits for fp, ft
-               fp_temp = fp_numerator/A_omega
-               ft_temp = ft_numerator/A_omega
-               !re and rp can be derived analytically from w_div_wcrit
-               r_equatorial(j) = r(j)*(1d0+w2% val/6d0-0.0002507d0*w4% val+0.06075d0*w6% val)
-               r_polar(j) = r_equatorial(j)/(1d0+0.5d0*w2% val)
-               ! Be sure they are consistent with r_Phi
-               r_equatorial(j) = max(r_equatorial(j),r(j))
-               r_polar(j) = min(r_polar(j),r(j))
+         w2 = pow2(w)
+         w4 = pow4(w)
+         w6 = pow6(w)
+         w_log_term = log(1d0 - pow(w, log_term_power))
+         ! cannot use real function below because these are auto_diff variables
+         A_omega = 1d0 + 0.3293d0 * w4 - 0.4926d0 * w6 - 0.5560d0 * w_log_term
 
-               fp(j) = 0d0
-               ft(j) = 0d0
-               fp(j)% val = fp_temp% val
-               ft(j)% val = ft_temp% val
-               if (s% w_div_wc_flag) then
-                  fp(j)% d1Array(i_w_div_wc_00) = fp_temp% d1val1
-                  ft(j)% d1Array(i_w_div_wc_00) = ft_temp% d1val1
-               end if
-            end do
-!$OMP END PARALLEL DO
+         ! fits for fp, ft; Fabry+2022, Eqs. A.10, A.11
+         fp_temp = (1d0 - two_thirds * w2 - 0.2133d0 * w4 - 0.1068d0 * w6) / A_omega
+         ft_temp = (1d0 - 0.07955d0 * w4 - 0.2322d0 * w6) / A_omega
+
+         ! re and rp can be derived analytically from w_div_wcrit
+         r_equatorial = r * re_from_rpsi_factor(w2% val, w4% val, w6% val)
+         r_polar = r_equatorial / (1d0 + 0.5d0 * w2% val)
+
+         ! Be sure they are consistent with r_Psi
+         r_equatorial = max(r_equatorial, r)
+         r_polar = min(r_polar, r)
+
+         fp = 0d0
+         ft = 0d0
+         fp% val = fp_temp% val
+         ft% val = ft_temp% val
+         if (s% w_div_wc_flag) then
+            fp% d1Array(i_w_div_wc_00) = fp_temp% d1val1
+            ft% d1Array(i_w_div_wc_00) = ft_temp% d1val1
+         end if
 
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
-            do j=1, s% nz
-               if (s% q(j) > 0.999) then
-                  fp(j) = 1d0
-                  ft(j) = 1d0
-               else if (s% q(j) > 0.998) then
-                  alpha = (1d0-(s% q(j)-0.998)/(0.001))
-                  fp(j) = fp(j)*alpha + 1d0*(1-alpha)
-                  ft(j) = ft(j)*alpha + 1d0*(1-alpha)
-               end if
-            end do
+            if (s% q(k) > 0.999) then
+               fp = 1d0
+               ft = 1d0
+            else if (s% q(j) > 0.998) then
+               alpha = (1d0 - (s% q(k) - 0.998) / 0.001)
+               fp = fp * alpha + 1d0 * (1 - alpha)
+               ft = ft * alpha + 1d0 * (1 - alpha)
+            end if
          end if
 
       end subroutine my_other_eval_fp_ft

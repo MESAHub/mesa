@@ -555,12 +555,12 @@
          end subroutine other_build_initial_model_interface
       
          subroutine other_eval_fp_ft_interface( &
-               id, k, xm, r, rho, aw, ft, fp, r_polar, r_equatorial, report_ierr, ierr)
+               id, k, xm, r, rho, aw, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
             use const_def, only: dp
             use auto_diff
             integer, intent(in) :: id, k
             real(dp), intent(in) :: aw, r, rho, xm
-            type(auto_diff_real_star_order1), intent(out) :: ft, fp
+            type(auto_diff_real_star_order1), intent(out) :: fp, ft
             real(dp), intent(inout) :: r_polar, r_equatorial
             logical, intent(in) :: report_ierr
             integer, intent(out) :: ierr
