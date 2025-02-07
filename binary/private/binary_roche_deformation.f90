@@ -55,9 +55,7 @@ contains
       include 'formats'
       if (.not. inter_ok) then
          upstairs = trim(mesa_data_dir) // '/roche_data/'  ! where fp/ft data lives
-         if (dbg) then
-            write(*, 1) 'starting interpolator setup'
-         end if
+         if (dbg) write(*, 1) 'starting interpolator setup'
          call setup_interpolator(trim(upstairs) // 'fp_data.txt', xvals, num_xpts, yvals, &
                num_ypts, fpfunc1d, ierr)
          call setup_interpolator(trim(upstairs) // 'ft_data.txt', xvals, num_xpts, yvals, &
@@ -80,8 +78,8 @@ contains
             call interp_evbipm_db(xtest, ytest, xvals, num_xpts, yvals, num_ypts,&
                   irotfunc1d, num_xpts, testval, ierr)
             write(*, 1) 'irot test gave should be close to 0.4', testval
-            inter_ok = .true.
          end if
+         inter_ok = .true.
       end if
 
       contains
@@ -129,7 +127,6 @@ contains
       end subroutine setup_interpolator
 
    end subroutine build_roche_interpolators
-
 
    real(dp) function eval_fp(lq, ar, ierr) result(fp)
       ! evaluates fp of the equipotential shell with fractional equivalent radius
@@ -179,7 +176,6 @@ contains
 
    end function eval_irot
 
-   ! deformation
    subroutine roche_fp_ft(id, r, fp, ft, r_polar, r_equatorial, report_ierr, ierr)
       integer, intent(in) :: id
       real(dp), intent(in) :: r
@@ -246,7 +242,7 @@ contains
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
       call binary_ptr(s% binary_id, b, ierr)
-      if (ierr /=0 ) return
+      if (ierr /= 0) return
       call assign_stars(id, this_star, other_star, ierr)
       if (ierr /= 0) return
 
