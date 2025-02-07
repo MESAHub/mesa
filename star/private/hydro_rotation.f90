@@ -187,7 +187,7 @@
 
          i_rot = 0d0
          if (s% simple_i_rot_flag) then
-            i_rot = (2d0/3d0)*r00*r00
+            i_rot = two_thirds*r00*r00
             i_rot% d1Array(i_lnR_00) = 2*i_rot% val
             i_rot% d1Array(i_w_div_wc_00) = 0d0
          else
@@ -218,8 +218,6 @@
 
 
       subroutine set_i_rot(s, skip_w_div_w_crit_roche)
-         use auto_diff
-
          type (star_info), pointer :: s
          logical, intent(in) :: skip_w_div_w_crit_roche
          integer :: k
@@ -299,7 +297,6 @@
       end subroutine check_omega
 
       subroutine update1_i_rot_from_xh(s, k)
-         use auto_diff
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: r00

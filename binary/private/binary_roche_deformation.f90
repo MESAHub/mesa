@@ -42,7 +42,7 @@ module binary_roche_deformation
    real(dp), parameter :: nudge = 1d-4
    real(dp), pointer :: xvals(:), yvals(:), yvals_gtr_than_1(:), fpfunc1d(:), ftfunc1d(:), &
          irotfunc1d(:), otherrfunc1d(:), afunc1d(:)
-   logical :: inter_ok = .false., dbg = .true.
+   logical :: inter_ok = .false., dbg = .false.
    integer :: num_xpts, num_ypts, num_ypts_gtr_than_1
 
 contains
