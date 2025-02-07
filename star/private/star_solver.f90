@@ -741,14 +741,20 @@
 
 
          subroutine adjust_correction( &
-               min_corr_coeff_in, max_corr_coeff, grad_f, f, slope, coeff,  &
+               min_corr_coeff_in, max_corr_coeff, grad_f1, f, slope, coeff,  &
                err_msg, ierr)
             real(dp), intent(in) :: min_corr_coeff_in
             real(dp), intent(in) :: max_corr_coeff
-            real(dp), intent(in) :: grad_f(:) ! (neq) ! gradient df/ddx at xold
+            real(dp), intent(inout), pointer :: grad_f1(:) ! (neq) ! gradient df/ddx at xold, updated to the gradient at the proposed step
             real(dp), intent(out) :: f ! 1/2 fvec^2. minimize this.
             real(dp), intent(in) :: slope
             real(dp), intent(out) :: coeff
+
+            ! Line Search Algorithm (More-Thuente, 1994)
+            ! 
+            ! The purpose of this routine is to find a step which satisfies
+            ! 1. a sufficient decrease condition, and 
+            ! 2. a curvature condition (strong Wolfe condition).
 
             ! the new correction is coeff*xscale*soln
             ! with min_corr_coeff <= coeff <= max_corr_coeff
@@ -761,11 +767,11 @@
             logical :: first_time
             real(dp) :: a1, alam, alam2, a2, disc, f2, &
                rhs1, rhs2, tmplam, fold, min_corr_coeff
-            real(dp) :: f_target
+            real(dp) :: f_target, slope_new
             logical :: skip_eval_f, dbg_adjust
 
             real(dp), parameter :: alf = 1d-2 ! ensures sufficient decrease in f
-
+            real(dp), parameter :: eta = 0.2d0 ! ensures curvature condition (must satisfy alf < eta < 1)
             real(dp), parameter :: alam_factor = 0.2d0
 
             include 'formats'
@@ -864,8 +870,25 @@
                end if
 
                f_target = max(fold/2, fold + alf*coeff*slope)
+               ! Check the Sufficient Decrease condition
                if (f <= f_target) then
-                  return ! sufficient decrease in f
+                  !return ! sufficient decrease in f
+                  ! satisfies the sufficient decrease condition,
+                  ! so now check the curvature condition (strong Wolfe condition).
+
+                  call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+
+                  slope_new = eval_slope(nvar, nz, grad_f, soln)
+
+                  ! Check the Curvature condition
+                  if(.not. is_bad_num(slope_new) .and. slope_new < 0d0) then
+                     if (abs(slope_new) <= eta*abs(slope)) then
+                        ! satisfies the curvature condition.
+                        ! Great, both conditions are satisfied!
+                        return
+                     end if
+                  end if
+                  ! If not satisfied, we keep iterating, so fall through...
                end if
 
                if (alam <= min_corr_coeff) then
@@ -1003,10 +1026,15 @@
             use rsp_def, only: NV, MAX_NZN
             integer ::  i, ierr
             real(dp) :: total_time
+            integer :: n, nnz
+            integer :: colptr(nvar*nz + 1)
+            integer :: rowind(3*nvar*nvar*nz)
+            real(dp) :: nzval(3*nvar*nvar*nz)
 
             include 'formats'
             ierr = 0
             solve_equ = .true.
+            n = nvar * nz
 
             if (s% doing_timing) then
                call start_time(s, time0, total_time)
@@ -1028,8 +1056,65 @@
                !$OMP END PARALLEL DO SIMD
             end if
 
-            call factor_mtx(ierr)
-            if (ierr == 0) call solve_mtx(ierr)
+            ! instead of the following two routines, which are wrappers
+            ! for a bcyclic reduction algorithm, we can directly
+            ! call superLU or another sparse matrix solving library
+            ! here, to see if they can perform better. We just need
+            ! the library to return B, and perhaps ublk1, dblk1, lblk1.
+
+            ! .true. if doing bcyclic reduction to factor and solve the mtx.
+            if (.true.) then
+               call factor_mtx(ierr) ! factor the MESA matrix
+               if (ierr == 0) call solve_mtx(ierr) ! solve MESA matrix
+            else
+                ! Super_LU implementation Here.
+                ! Build CSC format from MESA's lblk1, dblk1, ublk1
+                call build_csc_simple(nvar, nz, lblk1, dblk1, ublk1, &
+                colptr, rowind, nzval, nnz)
+
+                !--------------------------------
+                ! Create SuperMatrix objects
+                !--------------------------------
+                ! Example (names can differ in SuperLU_MT):
+                !   type(SuperMatrix) :: A, B, L, U
+                !   integer :: perm_r(n), perm_c(n)
+                !   integer :: info
+                !
+                !   call d_create_CompCol_Matrix(A, n, n, nnz, nzval, rowind, colptr, &
+                !        SLU_NC, SLU_D, SLU_GE)
+                !
+                !   ! B holds the RHS (which is b1(1..n)) and will be overwritten with the solution
+                !   call d_create_Dense_Matrix(B, n, 1, b1, n, SLU_DN, SLU_D, SLU_GE)
+                !
+                !   ! Typically we set some options, perm arrays, etc.
+                !   call set_default_options(options)   ! or call some SuperLU_MT init
+                !   call StatInit(stat)
+                !
+                !   ! Factor + solve in one step:
+                !   call dgssv(options, A, perm_c, perm_r, L, U, B, info)
+                !
+                !   if (info /= 0) then
+                !      ierr = info
+                !   end if
+                !
+
+                !-------------------------------------------------
+                ! 3) If success => copy solution from b1 => b(:,:)
+                !    i.e. b(1:nvar,1:nz) = b1(1:n)
+                !-------------------------------------------------
+                if (ierr == 0) then
+                !$OMP PARALLEL DO SIMD
+                do i = 1, n
+                ! Convert i => (ivar, izone)
+                !  ivar  = mod(i-1,nvar) + 1
+                !  izone = (i-1)/nvar + 1
+                b( mod(i-1,nvar)+1, (i-1)/nvar+1 ) = b1(i)
+                end do
+                !$OMP END PARALLEL DO SIMD
+                end if
+            
+            end if
+
 
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD
@@ -1940,6 +2025,207 @@
             end do
             eval_f = eval_f/2
          end function eval_f
+
+
+         subroutine build_csc_simple(nvar, nz, lblk, dblk, ublk, colptr, rowind, nzval, nnz)
+         !---------------------------------------------------------------------
+         ! Inputs
+         !---------------------------------------------------------------------
+         integer, intent(in)          :: nvar, nz
+         real(dp), intent(in)         :: lblk(nvar, nvar, nz)
+         real(dp), intent(in)         :: dblk(nvar, nvar, nz)
+         real(dp), intent(in)         :: ublk(nvar, nvar, nz)
+
+         !---------------------------------------------------------------------
+         ! Outputs
+         !---------------------------------------------------------------------
+         ! colptr has dimension n+1  (where n = nvar*nz)
+         integer,         intent(out) :: colptr(nvar*nz + 1)
+         ! rowind, nzval each sized for up to 3*nvar^2*nz entries
+         integer,         intent(out) :: rowind(3*nvar*nvar*nz)
+         real(dp),        intent(out) :: nzval(3*nvar*nvar*nz)
+         integer,         intent(out) :: nnz
+
+         !---------------------------------------------------------------------
+         ! Locals
+         !---------------------------------------------------------------------
+         integer :: n, col, k, j, i
+         integer :: idx, count_in_col
+
+         n = nvar * nz
+         colptr(1) = 1
+         nnz = 0
+
+         do col = 1, n
+        ! Determine which zone => k, and local column => j
+         k = (col - 1)/nvar + 1
+         j = col - (k-1)*nvar
+
+         count_in_col = 0
+
+         !-------------------------------
+         ! Diagonal block from zone k->k
+         !-------------------------------
+         do i = 1, nvar
+         nnz = nnz + 1
+         idx = nnz
+         rowind(idx) = (k-1)*nvar + i
+         nzval(idx)  = dblk(i,j,k)
+         count_in_col = count_in_col + 1
+         end do
+
+         !-------------------------------
+         ! Upper block (k-1)->k if k>1
+         !-------------------------------
+         if (k > 1) then
+         do i = 1, nvar
+         nnz = nnz + 1
+         idx = nnz
+         rowind(idx) = (k-2)*nvar + i
+         nzval(idx)  = ublk(i,j,k-1)
+         count_in_col = count_in_col + 1
+         end do
+         end if
+
+         !-------------------------------
+         ! Lower block (k+1)->k if k<nz
+         !-------------------------------
+         if (k < nz) then
+         do i = 1, nvar
+         nnz = nnz + 1
+         idx = nnz
+         rowind(idx) = (k  )*nvar + i
+         nzval(idx)  = lblk(i,j,k+1)
+         count_in_col = count_in_col + 1
+         end do
+         end if
+
+         colptr(col+1) = colptr(col) + count_in_col
+         end do
+
+         end subroutine build_csc_simple
+
+
+!        subroutine build_csc_simple(nvar, nz, lblk, dblk, ublk,      &
+!        colptr, rowind, nzval, nnz)
+!        !
+!        ! Constructs the CSC (compressed-column) matrix for a block-tridiagonal system:
+!        !
+!        !   - dblk(:,:,k)  = diagonal block for zone k
+!        !   - ublk(:,:,k)  = upper    block for zone k   (connects zone k -> k+1)
+!        !   - lblk(:,:,k)  = lower    block for zone k   (connects zone k -> k-1)
+!        !
+!        ! The final matrix has global dimension n = nvar * nz.
+!        !
+!        ! *No* dynamic allocations are used here. The caller provides
+!        ! arrays (colptr, rowind, nzval) large enough to hold the result.
+!        !
+
+!        !----------------------------------------------------------------------
+!        !  Input Arguments
+!        !----------------------------------------------------------------------
+!        integer, intent(in)           :: nvar          ! # of variables per zone
+!        integer, intent(in)           :: nz            ! # of zones
+!        real(dp), intent(in)          :: lblk(nvar, nvar, nz)
+!        real(dp), intent(in)          :: dblk(nvar, nvar, nz)
+!        real(dp), intent(in)          :: ublk(nvar, nvar, nz)
+!
+!        !----------------------------------------------------------------------
+!        !  Output Arguments
+!        !----------------------------------------------------------------------
+!        !  The dimensions below assume a maximum of 3*nvar*nvar*nz entries.
+!        !  colptr has dimension (nvar*nz + 1).
+!        !
+!        integer, intent(out)          :: colptr(nvar*nz + 1)
+!        integer, intent(out)          :: rowind(3*nvar*nvar*nz)
+!        real(dp), intent(out)         :: nzval (3*nvar*nvar*nz)
+!        integer, intent(out)          :: nnz  ! # of actual filled entries
+!
+!        !----------------------------------------------------------------------
+!        !  Local Variables
+!        !----------------------------------------------------------------------
+!        integer :: n       ! total dimension = nvar*nz
+!        integer :: col     ! loop over global columns [1..n]
+!        integer :: k, j, i ! zone index k, local indices j,i in [1..nvar]
+!        integer :: idx
+!        integer :: count_in_col
+!
+!        ! Compute the total number of equations (global size).
+!        n = nvar * nz
+!
+!        ! Initialize CSC pointers
+!        colptr(1) = 1
+!        nnz = 0
+!
+!        !----------------------------------------------------------------------
+!        !  MAIN LOOP:  Iterate over each global column col = 1..n
+!        !----------------------------------------------------------------------
+!        do col = 1, n
+!
+!        ! Figure out which zone this column belongs to
+!        !   k = integer division of (col-1)/nvar plus 1
+!        k = (col - 1)/nvar + 1
+!        ! Local column within the block
+!        j = col - (k-1)*nvar
+!
+!        ! We'll track how many entries go into this column
+!        count_in_col = 0
+!
+!        !-------------------------------------------------------------------
+!        ! 1) DIAGONAL block from zone k -> k
+!        !    This block contributes to columns in zone k
+!        !-------------------------------------------------------------------
+!        do i = 1, nvar
+!        nnz = nnz + 1
+!        idx = nnz
+!        rowind(idx) = (k-1)*nvar + i    ! global row
+!        nzval(idx)  = dblk(i, j, k)
+!        count_in_col = count_in_col + 1
+!        end do
+!
+!        !-------------------------------------------------------------------
+!        ! 2) UPPER block from zone (k-1) -> k
+!        !    If k>1, zone (k-1)'s upper block contributes to columns of zone k
+!        !-------------------------------------------------------------------
+!        if (k > 1) then
+!        do i = 1, nvar
+!        nnz = nnz + 1
+!        idx = nnz
+!        rowind(idx) = (k-2)*nvar + i
+!        nzval(idx)  = ublk(i, j, k-1)
+!        count_in_col = count_in_col + 1
+!        end do
+!        end if
+!
+!        !-------------------------------------------------------------------
+!        ! 3) LOWER block from zone (k+1) -> k
+!        !    If k<nz, zone (k+1)'s lower block contributes to columns of zone k
+!        !-------------------------------------------------------------------
+!        if (k < nz) then
+!        do i = 1, nvar
+!        nnz = nnz + 1
+!        idx = nnz
+!        rowind(idx) = (k  )*nvar + i
+!        nzval(idx)  = lblk(i, j, k+1)
+!        count_in_col = count_in_col + 1
+!        end do
+!        end if
+!
+!        !-------------------------------------------------------------------
+!        ! Set colptr for the next column
+!        ! colptr(col+1) = colptr(col) + # entries in col
+!        !-------------------------------------------------------------------
+!        colptr(col+1) = colptr(col) + count_in_col
+!
+!        end do
+!
+!        ! nnz now holds the total # of filled entries
+!        !
+!        ! The arrays rowind(1..nnz), nzval(1..nnz) are valid.
+!        ! colptr(n+1) = 1 + nnz (i.e., colptr(n+1) = colptr(n) + count_in_col for last col)
+!
+!        end subroutine build_csc_simple
+
 
       end subroutine do_solver
 

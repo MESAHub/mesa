@@ -384,6 +384,8 @@
 
          if (ierr /= 0) return
          n% eps_nuc = n% eps_total - n% eps_neu_total
+         ! XXX test:
+         !n% eps_nuc = n% eps_total 
 
          do i=1, num_isos
             n% dxdt(i) = chem_isos% Z_plus_N(g% chem_id(i)) * n% dydt1(i)

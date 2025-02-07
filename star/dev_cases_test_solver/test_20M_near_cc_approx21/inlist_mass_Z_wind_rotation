@@ -1,0 +1,18 @@
+! inlist_mass_Z_wind_rotation
+
+&star_job
+   new_Z = 1.42d-2
+   new_omega_div_omega_crit = 0d0
+   initial_zfracs = 6 ! set to asplund 2009 abundance fractions
+/ ! end of star_job namelist
+
+&kap
+   Zbase = 1.42d-2
+/ ! end of kap namelist
+
+&controls
+   initial_mass = 20
+   initial_z = 1.42d-2 ! ! solar
+   initial_y = 0.2703d0 ! from asplund et al. 2009, solar.
+   Dutch_scaling_factor = 0d0
+/ ! end of controls namelist

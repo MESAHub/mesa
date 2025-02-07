@@ -1,0 +1,13 @@
+# this is for generating the photo necessary for restarts. a working photo should be available already though.
+# 1 -execute "./rn" for one timestep to save photo number x00002000. 
+# 2 - Make sure "op_split_burn = .false." in inlist_to_cc. Uncomment the first line of the "./test" script and then execute "./test" until model number 2031 is created
+# 3 - comment out the first line of "./test" again, and then uncomment the "max_num_retries = 0" control in inlist_to_cc.
+# 4 - Comment out first line of "./test", so you are restarting from x00002031 and then execture "./test".
+
+# After the steps above are complete, make sure "export OMP_NUM_THREADS=1" for testing so the data from jacobian populates the "zone_*.txt"files in order.
+
+
+# once "./test" is run in the last step, it generates five files for each zone across all iterations. 
+# After this, the plot_eps_nuc_terms.py file can be run to make the plots in the "plots" folder, however this is a work in progress.
+
+# need more derivatives and information across timesteps. Current output definitions on lines 283+ in  star/private/net.f90 in the do1_net subroutine.

@@ -45,6 +45,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
+         write(*,*) 'XXX calling eval_equ_for_solver'
          call eval_equ_for_solver(s, nvar, 1, s% nz, ierr)
       end subroutine eval_equ
 
@@ -297,8 +298,16 @@
             return
          end if
 
-         if (.false. .and. s% model_number == 2) then !  .and. .not. s% doing_relax) then
+
+         ! matrix debugging.
+         write (*,*) 's% model_number', s% model_number
+         write (*,*) 's% model_number', s% solver_iter
+         if (.false. .and. s% model_number == 2132 .and. s% solver_iter == 24) then !  .and. .not. s% doing_relax) then
+           !write(*,*) 'inside print matrix'
+
+            ! for debugging velocities.
             if (.false.) then
+
                i = s% i_dv_dt
                k = 1
                do j=1,5
@@ -307,14 +316,162 @@
                      s% solver_iter, i, j, k, s% dblk(i,j,k)
                end do
             end if
-            !write(*,*) 'call show_matrix'
-            !call show_matrix(s, s% dblk(1:s% nvar_hydro,1:s% nvar_hydro,1), s% nvar_hydro)
-            call dump_equ ! debugging
-            call mesa_error(__FILE__,__LINE__,'after dump_equ')
+
+           ! for debugging a single zone in the MESA Jacobian
+           if (.true.) then
+                write(*,*) 'call show_matrix for single zone'
+
+               ! output jabobian, the A term in Ax = b
+                call show_matrix(s, s% dblk(1:s% nvar_hydro+22,1:s% nvar_hydro+22,1817), s% nvar_hydro+22)
+
+               ! output residuals, the b term in Ax = b
+                do i = 1, nvar_hydro + 22!80
+                    print *, - s% equ(i, 1817)
+                end do
+            end if
+
+
+            ! for debugging the entire MESA Jacobian, we need
+            ! to understand its structure in detail.
+            ! ------------------------------------------------
+            ! The MESA star jacobian, J, is a represented by a
+            ! sparse block-tridiagonal matrix with
+            ! total shape (1:nz,1:nz,1:nvar,1:nvar), where each
+            ! coordinate zone in the space (1:nz,1:nz) of this
+            ! matrix contains a block with  shape (1:nvar,1:nvar).
+            ! Generally nvar = s% nvar_hydro + #species, I think in most cases.
+            !
+            ! Physically the shape of the MESA jacobian represents the a
+            ! 1D stellar model with nz zones, and nvar variables, where
+            ! zones are coupled to their neighbors. This is what makes
+            ! the matrix sparse.
+            !
+            ! Thankfully, this sparcity means we can neglect
+            ! all the empty blocks in the  off diagonal (1:nz,1:nz) space of J,
+            ! and only include zones k-1, k, k+1 for k in 1:nz.
+            !
+            ! Diagonal blocks come from partials of the structure equations
+            ! in zones and off diagonal blocks represent solutions to
+            ! structure equatons between neighboring zones.
+            ! Many terms in each (1:nvar,1:nvar) block are zero, which
+            ! further adds to the sparsity of the matrix. Typically >95%
+            ! sparcity, so we have many zero terms.
+            !
+            ! Now consider that we can decompose this block-tridiagonal matrix J
+            ! into three individual matrices the lower (lblk), diagonal (dblk),
+            ! and upper (ublk) matrices, each with shape (1:nvar,1:nvar,1:nz)
+            !
+            ! Why is this useful?...
+            ! Remember, we are trying to solve for Jx = -b , identical to Ax = b
+            ! except here J, the jacobian, contains the partial derivatives
+            ! of the structure variables for the residuals to the equations,
+            ! and b represents the residuals of the structure equations solved
+            ! over each cell, where b has shape (1:nvar,1:nz).
+            !
+            ! The total Jacobian J can be represented by J = LU, where
+            ! L and U represent the lblk and ublk matricies. In conjuction
+            ! with the diagonal, these two blocks diagonals can be factored
+            ! with an LU decomposition and then used with dblk to solve
+            ! for x. Then we can find Ax + b = bnew, where bnew
+            ! represents the equation residuals for the next iteration.
+            ! and hopefully bnew << 1, and close to 0.
+
+            ! below we want to print out all three diagonals to three files
+            ! with labels and a structured format.
+
+            ! s% dblk is diagonal block
+            ! s% ublk is upper diagonal block
+            ! s% lblk is lower diagonal block
+
+            write(*,*) 'call show_matrix'
+            write(*,*) 'XXX calling output_block_diagonals'
+            call output_block_diagonals(s)
+            ! output jabobian, the A term in Ax = b
+
+            if (.false.) call dump_equ ! debugging, false for now.
+            ! XXX if (.true.) call mesa_error(__FILE__,__LINE__,'after dump_equ')
+            ! we will let inspect B end the model, so we can have
+            ! ublk,lblk,dblk, -equi = b, for before the solve.
+            ! and the B from after the solve, from inspectB in solver_support.f90
          end if
 
 
          contains
+
+
+        ! Modified code to output block diagonals and residuals to files
+        subroutine output_block_diagonals(s)
+        type(star_info), pointer :: s
+        integer :: nz, nvar
+        integer :: i, j, k
+        character(len=100) :: file_dblk, file_ublk, file_lblk, file_residuals
+        real(dp), allocatable :: dblk(:,:,:), ublk(:,:,:), lblk(:,:,:)
+
+        nz = s% nz
+        nvar = s% nvar_hydro + 22!80
+
+        allocate(dblk(1:nvar, 1:nvar, 1:nz))
+        allocate(ublk(1:nvar, 1:nvar, 1:nz))
+        allocate(lblk(1:nvar, 1:nvar, 1:nz))
+
+        dblk = s% dblk(1:nvar, 1:nvar, 1:nz)
+        ublk = s% ublk(1:nvar, 1:nvar, 1:nz)
+        lblk = s% lblk(1:nvar, 1:nvar, 1:nz)
+
+        ! File names
+        file_dblk = 'dblk_output.txt'
+        file_ublk = 'ublk_output.txt'
+        file_lblk = 'lblk_output.txt'
+        file_residuals = 'residuals_output.txt'
+
+        ! Output diagonal blocks
+        open(unit=10, file=file_dblk, status='replace')
+        write(10, '(A)') 'Diagonal Block (dblk):'
+        do k = 1, nz
+        write(10, '(A, I5)') 'Zone:', k
+        do i = 1, nvar
+        write(10, '(500(es24.16E3, 1x))') dblk(i, :, k)
+        end do
+        end do
+        close(10)
+
+        ! Output upper diagonal blocks
+        open(unit=11, file=file_ublk, status='replace')
+        write(11, '(A)') 'Upper Diagonal Block (ublk):'
+        do k = 1, nz-1
+        write(11, '(A, I5)') 'Zone:', k
+        do i = 1, nvar
+        write(11, '(500(es24.16E3, 1x))') ublk(i, :, k)
+        end do
+        end do
+        close(11)
+
+        ! Output lower diagonal blocks
+        open(unit=12, file=file_lblk, status='replace')
+        write(12, '(A)') 'Lower Diagonal Block (lblk):'
+        do k = 2, nz
+        write(12, '(A, I5)') 'Zone:', k
+        do i = 1, nvar
+        write(12, '(500(es24.16E3, 1x))') lblk(i, :, k)
+        end do
+        end do
+        close(12)
+
+        ! Output residuals
+        open(unit=13, file=file_residuals, status='replace')
+        write(13, '(A)') 'Residuals (-s%equ):'
+        do k = 1, nz
+        write(13, '(A, I5)') 'Zone:', k
+        write(13, '(500(es24.16E3, 1x))') -s% equ(:, k)
+        end do
+        close(13)
+
+        write(*,*) 'XXXXXXXX Block diagonals and residuals output completed.'
+
+        deallocate(dblk, ublk, lblk)
+
+        end subroutine output_block_diagonals
+
 
          subroutine dump_equ
             integer :: k, j
