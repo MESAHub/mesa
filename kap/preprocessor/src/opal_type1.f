@@ -39,11 +39,11 @@
       real :: z, xh, t6, r, logT6
       integer :: i
       logical :: dbg
-      
+
       include 'formats'
 
       dbg = dbg_in
-!      dbg = (abs(Z_in - 0.01d0) < 1d-6 .and. abs(xh_in - 0.7d0) < 1d-6 .and. 
+!      dbg = (abs(Z_in - 0.01d0) < 1d-6 .and. abs(xh_in - 0.7d0) < 1d-6 .and.
 !     >      abs(t6_in - 1d0) < 1d-6 .and. abs(r_in - 1d-6) < 1d-12)
 
 
@@ -51,14 +51,14 @@
       xh = real(xh_in)
       t6 = real(t6_in)
       r = real(r_in)
-      
+
       if (.false.) then ! DEBUG
          z = 0.01d0
          xh = 0.70d0
          t6 = (10d0**5.5d0)*1d-6
          r = 1d-4
       end if
-      
+
       do i=1,10
          !if (dbg) write(*,2) 'z', i, dble(z)
          call opacgn93 (z,xh,t6,r,fname,OP_file,logKap)
@@ -69,15 +69,15 @@
          t6 = 10**logT6
          !if (dbg) write(*,2) 'retry with larger T', i, logT6
       end do
-      
+
       if (dbg) then
 !!!!!! this write statement is to "fix" an uninitialized variable bug.
 !!!!!! disgusting, but I won't dig into the opacgn93 disaster to find the problem.
          write(*,1) 'eval_opal_type1 logKap', logKap
       end if
-      
+
       return
-      
+
       end
 
       subroutine instruct
@@ -85,7 +85,7 @@ c-----VERSION of October 5, 1995-----------------------------------------
 c-----------------------------------------------------------------------
 
 c          This subroutine contains instructions for using the subroutine
-c     OPACGN93( z, xh, t6, R ) and OPAC(izi,mzin,xh,t6,r). 
+c     OPACGN93( z, xh, t6, R ) and OPAC(izi,mzin,xh,t6,r).
 c          The purpose of these subroutines is to perform 3 or 4 variable
 c     interpolation on log10(kappa).  The opacity tables to be interpolated
 c     are known to have somewhat random numerical errors of a few percent.
@@ -116,13 +116,13 @@ c          izi     Keeps or recalculates table indices. The value 0 causes
 c                  the table indices to be recalculated.  A value other than 0
 c                  causes the previous indices to be used.
 
-c          mzin    The integer value of i of the Z value to use.  The 
+c          mzin    The integer value of i of the Z value to use.  The
 c                  choices are:
 c                  1=0.0  2=0.0001 3=0.0003 4=0.001 5=0.002 6=0.004 7=0.01
-c                  8=0.02 9=0.03  10=0.04  11=0.06 12=0.08 13=0.1 
+c                  8=0.02 9=0.03  10=0.04  11=0.06 12=0.08 13=0.1
 c
 c
-c          An interpolation between overlapping quadratics is used to obtain 
+c          An interpolation between overlapping quadratics is used to obtain
 c     smoothed results.  A 4x4 grid in logT6 and logR is used to interpolate
 c     in four different 3x3 sub-grids. Linear interpolation between quadratic
 c     fits in these different sub-grids gives smoothed results in both log T6
@@ -156,21 +156,21 @@ c     should be modified.
 c     ***CAUTION***
 c         As a result of the mixing procedure used to calculate the data a few
 c     X=0.0, low T-small R, table values fell outside the range of T and R accessible
-c     from the X=0.35 data directly calculated for this purpose.  These T-R 
+c     from the X=0.35 data directly calculated for this purpose.  These T-R
 c     locations are filled in with 9.99 (or for diagnostic purposes in some cases
 c     larger values.  At the same locations the derivatives are set to 99.9.  When
-c     T-R falls in this region a message is issued by the interpolation code to 
+c     T-R falls in this region a message is issued by the interpolation code to
 c     inform the user of this situation.  Presumable very few users will have
 c     applications that take them into this region.
-c     
+c
 c          Your routine that performs the call to OPAC should include the
 c      statement:
 c
 c         common/e/ opact,dopact,dopacr,dopactd
 c
 c         These variables have the following meanings:
-c        
-c         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)  
+c
+c         OPACT        Is the Log of the Rosseland mean opacity: Log(kappa)
 c         DOPACT      Is Dlog(kappa)/Dlog(T6)   at constant R
 c         DOPACR      Is Dlog(kappa)/Dlog(R)    at constant T
 c         DOPACTD     Is Dlog(kappa)/Dlog(T6)   at constant Rho
@@ -190,7 +190,7 @@ c     The purpose of this subroutine is to interpolate the data along Z
       logical :: OP_file
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
      . ,ntm=70,ntb=1,nt=ntm+1-ntb)
-      common/a/ mzz, xz(mx,mz,nt,nr),  
+      common/a/ mzz, xz(mx,mz,nt,nr),
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -199,7 +199,7 @@ c      fixed log T6 at three values of log R; followed by quadratic
 c      interpolation along log T6. Results smoothed bt mixing
 c      overlapping quadratics.
 c      DOPACT- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
-c              at fixed R  
+c              at fixed R
 c      DOPACR- is  Dlog(k)/Dlog(R) smoothed by mixing quadratics.
 c      DOPACTD- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
 c               at fixed rho
@@ -233,11 +233,11 @@ c               at fixed rho
       ilo=2
       ihi=mz
     8 if(ihi-ilo .gt. 1) then
-      imd=(ihi+ilo)/2
-      if(z .le. za(imd)+1.e-7) then
-        ihi=imd
-      else
-        ilo=imd
+        imd=(ihi+ilo)/2
+        if(z .le. za(imd)+1.e-7) then
+          ihi=imd
+        else
+          ilo=imd
         endif
         go to 8
       endif
@@ -247,23 +247,24 @@ c               at fixed rho
       m3=i
       m4=i+1
       mfm=m4
-c     check whether Z is near a table limit 
+c     check whether Z is near a table limit
       if((z .le. za(2)+1.e-7) .or. (z .ge. za(mz-1))) mfm=m3
-c       Check if Z+X interpolation sums exceed unity at needed indices.
-c       If so, backup to lower Z indices to perform interpolation.
-c       This should work OK, due to density of Z-grid points and the 
-c       slow Z variation(except at very small Z)
-      if(xh+za(mfm) .gt. 1.) mfm=m3 
-        if(xh+za(mfm) .gt. 1.) then
-            if(m1 .le. 1) then
-              write(*,'("special case: X,Z location not covered by"
-     x                 ," logic")')
-              call mesa_error(__FILE__,__LINE__)
-            endif 
-          m1=m1-1
-          m2=m2-1
-          m3=m3-1
-        endif
+
+c     Check if Z+X interpolation sums exceed unity at needed indices.
+c     If so, backup to lower Z indices to perform interpolation.
+c     This should work OK, due to density of Z-grid points and the
+c     slow Z variation(except at very small Z)
+      if(xh+za(mfm) .gt. 1.) mfm=m3
+      if(xh+za(mfm) .gt. 1.) then
+          if(m1 .le. 1) then
+            write(*,'("special case: X,Z location not covered by"
+     x               ," logic")')
+            call mesa_error(__FILE__,__LINE__)
+          endif
+        m1=m1-1
+        m2=m2-1
+        m3=m3-1
+      endif
 c
       izi=0
       do iz=m1,mfm
@@ -276,6 +277,7 @@ c
         dkapdtr(iz)=dopact
         dkapdrt(iz)=dopacr
       enddo
+
       is=0
       iw=1
       kapz1=quad(is,iw,zzl,kapz(m1),kapz(m2),kapz(m3)
@@ -286,6 +288,11 @@ c
       dkapz3=quad(is,iw,zzl,dkapdrt(m1),dkapdrt(m2),dkapdrt(m3)
      x ,zza(m1),zza(m2),zza(m3))
       if (mfm .eq. m3) then
+        if (kapz1 .le. 0) then
+          write(*,*) kapz1, kapz(m1),kapz(m2),kapz(m3)
+     x ,zza(m1),zza(m2),zza(m3), z, zza(mz)
+          call mesa_error(__FILE__,__LINE__)
+        endif
         opact=log10(kapz1)   ! converts K to logK
         dopact=dkapz1
         dopacr=dkapz3
@@ -311,7 +318,7 @@ c
       dopactd=-3.*dopacr+dopact
       is=0
       logK = opact
-      return 
+      return
       end
 c***********************************************************************
 c
@@ -334,7 +341,7 @@ c
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
      . ,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
+      common/a/ mzz, xz(mx,mz,nt,nr),
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -348,7 +355,7 @@ c      fixed log T6 at three values of log R; followed by quadratic
 c      interpolation along log T6. Results smoothed bt mixing
 c      overlapping quadratics.
 c      DOPACT- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
-c              at fixed R  
+c              at fixed R
 c      DOPACR- is  Dlog(k)/Dlog(R) smoothed by mixing quadratics.
 c      DOPACTD- is Dlog(k)/Dlog(T6) smoothed by mixing quadratics
 c               at fixed rho
@@ -380,16 +387,16 @@ c
 c      this is the first time through. Calculate the decadic
 c      log of the perimeter points shifted by Z. m refers to
 c      xa(m); the hydrogen table value.
- 
+
 c      read the data files
         call readco(filename,OP_file)
         xamx1=xa(mx-1)
         xxmx1=xx(mx-1)
         dfsxmx1=dfsx(mx-1)
       endif
-      
-      
-      
+
+
+
       mxend=mx
       xa(mx)=1.-z
       xa(mx-1)=xamx1
@@ -403,7 +410,7 @@ c      read the data files
           xx(mxend)=log10 (0.005+xa(mxend))
 c         Added 03/03/2016 rjfarmer to fix fpe error
           dfsx(mxend)=0.d0
-          if(xx(mxend).ne.xx(mxend-1))then 
+          if(xx(mxend).ne.xx(mxend-1))then
             dfsx(mxend)=1./(xx(mxend)-xx(mxend-1))
           end if
         endif
@@ -495,12 +502,12 @@ c
 
                if (iadvance .eq. 0) then
                   iadvance=iadvance+1
-                  mf=mf+1 
+                  mf=mf+1
                   mg=mg+1
                   mh=mh+1
                   mi=mi+1
                   mf2=mf2+1
-            
+
                   if((zz(mg,mzin) .ne. zz(mf,mzin)) .or. (zz(mh,mzin) .ne. zz(mf,mzin))) then
                   end if
 
@@ -537,7 +544,7 @@ c
          k4=k3+1
          k3s=k3+ntb-1
       endif
-      
+
       if (.false.) then ! don't need this because did extrapolate during read
         do i=14,18   ! allows jagged edge at high T,rho
           if((l3s .gt. i) .and. (k3s .gt. nta(i+1))) then
@@ -552,13 +559,13 @@ c
           end if
         enddo
       end if
-        
-        
+
+
       if((zz(mg,mzin) .ne. zz(mf,mzin)) .or. (zz(mh,mzin) .ne. zz(mf,mzin))) then
          ! the following crap is an attempt to work around a bug
          ! the standard routine gets confused for gn93, z = 6e-2, x = 0.94
          ! don't have the usual number of z tables for that x
-         ! 
+         !
          do i=1,mx
             if (abs(xh - xa(i)) < 1d-6) then
                mf = i
@@ -569,13 +576,13 @@ c
          ip=3
          iq=3
          ntlimit=nta(l3s)
-         if((k3. eq. ntlimit) .or. (iop .eq. 0)) then 
+         if((k3. eq. ntlimit) .or. (iop .eq. 0)) then
            ip=2
            iq=2
          endif
          if(t6 .le. t6list(2)+1.e-7) ip=2
 
-         if((l3 .eq. nre) .or. (iop .eq. 0)) then 
+         if((l3 .eq. nre) .or. (iop .eq. 0)) then
           iq=2
           ip=2
          endif
@@ -585,7 +592,7 @@ c
          end if
          if(slr .le. alr(2)+1.e-7) iq=2
          is=0
-      
+
          if (ip > ntm-k1) ip = ntm-k1
 
          do ir=l1,l1+iq
@@ -629,18 +636,18 @@ c
             call mesa_error(__FILE__,__LINE__)
          end if
       end if
-        
+
       do m=mf,max(mf,mf2)
          ip=3
          iq=3
          ntlimit=nta(l3s)
-         if((k3. eq. ntlimit) .or. (iop .eq. 0)) then 
+         if((k3. eq. ntlimit) .or. (iop .eq. 0)) then
            ip=2
            iq=2
          endif
          if(t6 .le. t6list(2)+1.e-7) ip=2
 
-         if((l3 .eq. nre) .or. (iop .eq. 0)) then 
+         if((l3 .eq. nre) .or. (iop .eq. 0)) then
           iq=2
           ip=2
          endif
@@ -650,7 +657,7 @@ c
          end if
          if(slr .le. alr(2)+1.e-7) iq=2
          is=0
-      
+
          if (ip > ntm-k1) ip = ntm-k1
 
          do ir=l1,l1+iq
@@ -659,11 +666,11 @@ c
               is=1
            enddo
          enddo
-         
+
       enddo
-  
+
       if((zz(mg,mzin) .ne. zz(mf,mzin)) .or. (zz(mh,mzin) .ne. zz(mf,mzin))) then
-            write(*,'("Z does not match Z in the file you are using")')     
+            write(*,'("Z does not match Z in the file you are using")')
             write(*,*) 'l1', l1
             write(*,*) 'l1+iq', l1+iq
             write(*,*) 'k1', k1
@@ -681,10 +688,10 @@ c
             write(*,*) 'zz(mh,mzin)', mh, zz(mh,mzin)
             write(*,*) 'zz(mi,mzin)', mi, zz(mi,mzin)
             write(*,*)
-            call mesa_error(__FILE__,__LINE__)   
+            call mesa_error(__FILE__,__LINE__)
       endif
-      
-      
+
+
       if(z .ne. zz(mf,mzin)) go to 66
 c                  with return
       is=0
@@ -736,7 +743,7 @@ c                  with a return
 c     write(*,'("slt,alt(1),alt(nt),slr,alr(1),alr(nre),l3s,i,k3s,
 c    x nta(i+1)",6e12.5,4i5)') slt,alt(1),alt(nt),slr,alr(1),
 c    x alr(nre),l3s,i,k3s,nta(i+1)
-c                  with a return 
+c                  with a return
       call mesa_error(__FILE__,__LINE__)
    64 return
       write(*,'(" X not equal to zero: To run this case it
@@ -760,7 +767,7 @@ c     The purpose of this subroutine is to interpolate in logT6 and logR
      . ,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
+      common/a/ mzz, xz(mx,mz,nt,nr),
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -805,7 +812,7 @@ c         k and Dlog(k)/Dlog(T6) smoothed in left 3x4
           opact=opact*dix+opact2*(1.-dix)
         endif
         if(iq .eq. 3) then
- 
+
 c         k and Dlog(k)/Dlog(T6) in upper-right 3x3.
           !write(*,*) 'k2', k2
           !write(*,*) 'k3', k3
@@ -865,7 +872,7 @@ c             Dlog(k)/Dlog(R) smoothed in both log(T6) and Log(R).
       dopactd=dopact-3.*dopacr
         if (opact .gt. 1.e+15) then
           write(*,'("Interpolation indices out of range",
-     x              ";please report conditions.")') 
+     x              ";please report conditions.")')
           call mesa_error(__FILE__,__LINE__)
         endif
           if (opact .gt. 9.) then
@@ -889,7 +896,7 @@ c      The purpose of this subroutine is to read the data tables
       character(len=250) dumarra
       character (len=*) :: filename
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
+      common/a/ mzz, xz(mx,mz,nt,nr),
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -897,7 +904,7 @@ c      The purpose of this subroutine is to read the data tables
      . zz(mx,mz)
       common/e/ opact,dopact,dopacr,dopactd
       common/ee/ opl(mx,nt,nr),xx(mx),zza(mz)
-      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)  
+      common/alink/ NTEMP,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
 
 
@@ -905,7 +912,7 @@ c      The purpose of this subroutine is to read the data tables
         if (itimeco .ne. 12345678) then
            do i=1,mx
              !write(*,*) 'n(i)', i, n(i), xa(i)
-             do j=1,mz 
+             do j=1,mz
                do k=1,nt
                  do l=1,nr
                    xz(i,j,k,l)=1.e+35
@@ -939,7 +946,7 @@ c
       read(2,*)
       read(2,*)
       read(2,*)
-      ! this needed to be changed to match OP data that has an extra space before the R's. 
+      ! this needed to be changed to match OP data that has an extra space before the R's.
       read(2,'(6x)',advance='no')
       read(2,*) (alrf(kk),kk=1,nrm)
       !do k=1,nrm
@@ -976,12 +983,12 @@ c
               exit
             end if
            end do
-           if (ierr == 0) read(2,*) 
+           if (ierr == 0) read(2,*)
            alt(k)=alt(k)-6.
            if (isett6 .ne. 1234567) then
             t6listf(k)=10.**alt(k)
             t6arr(k)=t6listf(k)
-           endif 
+           endif
            do ll=1,nrm   ! modified
              xzff(k,ll)=xzf(k,ll)
            enddo
@@ -992,7 +999,7 @@ c
         tmax=10.   ! modified
         nset=65
         RLS=-8.
-        nsm=1 
+        nsm=1
           RLE=1.
           nrlow=1
           nrhigh=2*(RLE-RLS)+1
@@ -1023,7 +1030,7 @@ c           the X=0  low T data cannot be smoothed
 
     2 continue
     3 continue
- 
+
       do 12 i=2,nt
    12 dfs(i)=1./(alt(i)-alt(i-1))
       do 13 i=2,nr
@@ -1073,7 +1080,7 @@ c***********************************************************************
       parameter (mx=10,mz=13,nrm=19,nrb=1,nre=19,nr=nrm+1-nrb
      . ,ntm=70,ntb=1,nt=ntm+1-ntb)
       common/aa/ q(4),h(4),xxh
-      common/a/ mzz, xz(mx,mz,nt,nr),  
+      common/a/ mzz, xz(mx,mz,nt,nr),
      . t6list(nt),alr(nr),n(mx),alt(nt),opk(nt,nr),opk2(nt,nr),dfsx(mx)
      . ,dfs(nt),dfsr(nr),dfsz(mz),a(3,mx),b(3),m,mf,xa(mx)
      . ,alrf(nrm),xzf(nt,nr),t6listf(ntm),za(mz)
@@ -1096,7 +1103,7 @@ C     WRITTEN BY MIKE SEATON(obtained june 1993)
 C
 C     OPAL DATA.
 C     ASSUMES FIRST T6=0.006, LAST T6=10.OR 0.04). Depending on position
-C     in the table. 
+C     in the table.
 C     USES RECTANGULAR ARRAY FOR VARIABLES T6 AND LOG10(R)
 C
 C     (1) NSM=NUMBER OF PASSES THROUGH SMOOTHING FILTER.
@@ -1130,7 +1137,7 @@ C
       COMMON/CF/F(85,IPR),FX(85,IPR),FY(85,IPR),FXY(85,IPR)
       CHARACTER(len=100) HEAD
       COMMON/CST/NRL,RLS,nset,tmax  ! modified
-      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)  
+      common/alink/ N,NSM,nrlow,nrhigh,RLE,t6arr(100),xzff(100,nr)
       LOGICAL IERR
 
 C
@@ -1575,7 +1582,7 @@ C
      +  0.0277551020,-0.0416326531,-0.0069387755/
 C
 C
-      DO 20 I=3,nset-2 
+      DO 20 I=3,nset-2
 C
          J=1
          FXY(I,J)=

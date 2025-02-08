@@ -54,15 +54,9 @@ Now clean the directory,
 
 .. code-block:: console
 
-   ./clean
+   make clean
 
-build the executable, 
-
-.. code-block:: console
-
-   ./mk
-
-and run the executable
+and run the test case
 
 .. code-block:: console
 

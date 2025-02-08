@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rm -rf gyre
-tar xf gyre-7.2.1.tar.gz
-mv gyre-7.2.1 gyre
-
-../utils/build_and_test_parallel

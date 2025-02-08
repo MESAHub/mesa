@@ -1280,7 +1280,11 @@
 
             s% total_extra_heating = dt*dot_product(s% dm(1:nz), s% extra_heat(1:nz)%val)
 
-            phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
+            if (.not. s% RSP_flag) then
+               phase2_work = dt*(s% work_outward_at_surface - s% work_inward_at_center)
+            else
+               phase2_work = 0d0
+            endif
 
             if (.not. s% RSP_flag) then
                if (s% using_velocity_time_centering .and. &
@@ -1313,9 +1317,13 @@
                total_energy_from_fixed_m_grav = 0
             end if
 
-            phase1_total_energy_from_mdot = &
-                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
-               + s% mdot_adiabatic_surface ! ??
+            if (.not. s% RSP_flag) then
+               phase1_total_energy_from_mdot = &
+                    s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
+                  + s% mdot_adiabatic_surface ! ??
+            else
+               phase1_total_energy_from_mdot = 0
+            endif
 
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &

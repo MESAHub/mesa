@@ -826,6 +826,8 @@
          ierr = 0
          FIRST  = 0
          TT1    = 0.d0
+         EDE_start = 0.d0
+         ULL = 0.d0
          EKMAX  = -10.d50
          EKMIN  = -EKMAX
          EKMAXL = EKMAX

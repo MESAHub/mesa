@@ -51,7 +51,7 @@
 !        write(*,*) 'hello from extra_binary_controls'
 !      end subroutine extras_binary_controls
 
-! then, in your work directory, do ./mk and ./rn to check that it is okay.
+! then, in your work directory, do ./rn to check that it is okay.
 ! assuming that worked, now edit extra_binary_controls to set the procedure pointer to other_wind_transfer
 
 !      subroutine extras_binary_controls(binary_id, ierr)

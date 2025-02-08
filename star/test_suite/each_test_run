@@ -281,11 +281,11 @@ function build_and_run {
 
     start_time=`date +%s`
 
-    if ! ./clean; then
+    if ! make clean; then
         return 1
     fi
 
-    if ! ./mk &> mk.txt; then
+    if ! make &> mk.txt; then
         failure_msg "$1 failed: does not compile"
         testhub_log "failure_type: :compilation"
         testhub_log "outcome: :fail"
