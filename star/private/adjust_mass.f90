@@ -1499,7 +1499,10 @@
          ierr = 0
 
          mass_lost = s% mstar_old - s% mstar
-         if (mass_lost <= 0) return
+         if (mass_lost <= 0) then
+            s% adjust_J_q = 1d0  ! nothing to do
+            return
+         end if
 
          ! can use a different j to account for things like wind braking
          if (s% use_other_j_for_adjust_J_lost) then
