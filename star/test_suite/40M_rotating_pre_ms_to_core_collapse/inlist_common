@@ -135,7 +135,7 @@ smooth_nu_ST                              = 2
 ! MLT_option = 'TDC'
 
 MLT_option                                = 'TDC'
-alpha_TDC_DAMPR = 1d0 ! radiative dissipation !0d0 is default for mlt limit of TDC.
+alpha_TDC_DAMPR = 1d0 ! radiative dissipation !0d0 is default for mlt limit of TDC. 3 ~ Henyey
 mixing_length_alpha                       = 1.5d0
 ! min_convective_gap                        = 0.1d0
 
@@ -181,48 +181,39 @@ D_omega_mixing_across_convection_boundary = .false.
 
 
 ! we use step overshooting in H core
-!     overshoot_scheme(1) = 'step'
-!     overshoot_zone_type(1) = 'burn_H'
-!     overshoot_zone_loc(1) = 'core'
-!     overshoot_bdy_loc(1) = 'top'
-!     overshoot_f(1) = 0.345 ! for M>10
-!     !overshoot_f(1) = 0.21 ! For M<10
-!     overshoot_f0(1) = 0.01
+     overshoot_scheme(1) = 'step'
+     overshoot_zone_type(1) = 'burn_H'
+     overshoot_zone_loc(1) = 'core'
+     overshoot_bdy_loc(1) = 'top'
+     overshoot_f(1) = 0.345 ! for M>10
+     !overshoot_f(1) = 0.21 ! For M<10
+     overshoot_f0(1) = 0.01
 
 ! exponential in the H core
-!      overshoot_scheme(2) = 'exponential'
-!      overshoot_zone_type(2) = 'burn_He'
-!      overshoot_zone_loc(2) = 'core'
-!      overshoot_bdy_loc(2) = 'top'
-!      overshoot_f(2) = 0.01
-!      overshoot_f0(2) = 0.005
+      overshoot_scheme(2) = 'exponential'
+      overshoot_zone_type(2) = 'burn_He'
+      overshoot_zone_loc(2) = 'core'
+      overshoot_bdy_loc(2) = 'top'
+      overshoot_f(2) = 0.01
+      overshoot_f0(2) = 0.005
 
 ! we don't want to deal with He/CO core mergers
 ! and there is reason to believe there is little
 ! inward overshooting in the shell across compositions boundaries
-!      overshoot_scheme(3) = 'none'
-!      overshoot_zone_type(3) = 'burn_He'
-!      overshoot_zone_loc(3) = 'shell'
-!      overshoot_bdy_loc(3) = 'bottom'
+      overshoot_scheme(3) = 'none'
+      overshoot_zone_type(3) = 'burn_He'
+      overshoot_zone_loc(3) = 'shell'
+      overshoot_bdy_loc(3) = 'bottom'
 
 ! a small amount of overshooting on top of any other convective core
 ! avoid spurious numerical behavior
 ! perfect amount for degenerate flames
-!      overshoot_scheme(4) = 'exponential'
-!      overshoot_zone_type(4) = 'any'
-!      overshoot_zone_loc(4) = 'any'
-!      overshoot_bdy_loc(4) = 'any'
-!      overshoot_f(4) = 0.005d0
-!      overshoot_f0(4) = 0.001d0
-
-
-! Brott+11
-overshoot_scheme(1)                       = 'step'
-overshoot_zone_type(1)                    = 'any'
-overshoot_zone_loc(1)                     = 'core'
-overshoot_bdy_loc(1)                      = 'any'
-overshoot_f(1)                            = 0.345d0
-overshoot_f0(1)                           = 0.01d0
+      overshoot_scheme(4) = 'exponential'
+      overshoot_zone_type(4) = 'any'
+      overshoot_zone_loc(4) = 'any'
+      overshoot_bdy_loc(4) = 'any'
+      overshoot_f(4) = 0.005d0
+      overshoot_f0(4) = 0.001d0
 
 ! timesteps
 time_delta_coeff = 1.0
@@ -267,26 +258,6 @@ dX_nuc_drop_limit_at_high_T = 2d-2  ! default = -1 = same as dX_nuc_drop_limit
 dX_nuc_drop_min_X_limit = 1d-3 ! try decreasing to 1d-4 or 1d-5 in a production run
 dX_nuc_drop_max_A_limit = 70   ! try increasing beyond 60 in a big network run
 dX_nuc_drop_hard_limit = 1d99
-
-
-!  delta_XHe_cntr_limit = 0.01d0
-!  delta_XHe_cntr_hard_limit = 0.1d0
-!  delta_lg_XH_cntr_limit = -1
-!  delta_lg_XHe_cntr_limit = -1
-!  delta_lg_XC_cntr_limit = -1
-!  delta_lg_XNe_cntr_limit = -1
-!  delta_lg_XO_cntr_limit = -1
-!  delta_lg_XSi_cntr_limit = -1
-!  delta_XC_cntr_limit = -1
-!  delta_XC_cntr_hard_limit = -1
-!  delta_XNe_cntr_limit = -1
-!  delta_XNe_cntr_hard_limit = -1
-!  delta_XO_cntr_limit = -1
-!  delta_XO_cntr_hard_limit = -1
-!  delta_XSi_cntr_limit = -1
-!  delta_XSi_cntr_hard_limit = -1
-
-
 
 delta_lg_XH_cntr_limit = 0.01d0
 delta_lg_XH_cntr_max   = 0.0d0
@@ -337,10 +308,17 @@ mesh_delta_coeff = 2.5 ! try 1.0 or below in production run
 mesh_delta_coeff_for_highT = 1.5 ! try 1.0 or below in production run
 logT_max_for_standard_mesh_delta_coeff = 9.0
 logT_min_for_highT_mesh_delta_coeff = 9.5
-!min_dq_for_xa = 1d-4 ! avoid over-resolving composition changes, bad for bit for bit convergence
 !remesh_dt_limit = 1728000 ! 20 days. turn off remesh when dt smaller than this
 
 ! solver
+energy_eqn_option = 'dedt'
+max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run
+
+convergence_ignore_equL_residuals = .true.
+make_gradr_sticky_in_solver_iters = .true.
+xa_scale = 1d-5
+iter_for_resid_tol2 = 10
+min_timestep_limit = 1d-12 ! (seconds) ! 1d-20 if things are sticky
 
 ! damped newton and structure only
 scale_max_correction = 0.1d0
@@ -360,32 +338,20 @@ tol_correction_high_T_limit = 1d9 ! Switch to lower tol at high temp for large M
 solver_iters_timestep_limit = 20
 gold_solver_iters_timestep_limit = 20
 iter_for_resid_tol2 = 10
-
 max_abs_rel_run_E_err = 1d-2
 
-energy_eqn_option = 'dedt'
-max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run
-
-convergence_ignore_equL_residuals = .true.
-make_gradr_sticky_in_solver_iters = .true.
-xa_scale = 1d-5
-iter_for_resid_tol2 = 10
-min_timestep_limit = 1d-12 ! (seconds) ! 1d-20 if things are sticky
-
-warn_rates_for_high_temp = .true.
-max_safe_logT_for_rates = 10.5d0
-
+! on stopping conditions
 when_to_stop_rtol = 1d-3
 when_to_stop_atol = 1d-3
 
-sig_min_factor_for_high_Tcenter = 0.01
-Tcenter_min_for_sig_min_factor_full_on = 3.2d9
-Tcenter_max_for_sig_min_factor_full_off = 2.8d9
-
+! Operator splitting (see section 10.2 in MESA VI, Jermyn 2023)
 ! Can be helpful to decrease op_split_burn_min_T
 ! 4d9 has been well tested with the approx21 network
 ! lower to 2.5d9 or worst case 1d9 for large networks to help with
 ! numerical stability and speed, see MESA VI (Jermyn 2023)
+! spikes in Tcore are indicative of splitting errors, meaning you
+! need to tighten these or preferably lower the timestep, which directly
+! reduces stiffness.
 op_split_burn = .true.
 op_split_burn_min_T = 1d9
 burn_steps_limit = 150

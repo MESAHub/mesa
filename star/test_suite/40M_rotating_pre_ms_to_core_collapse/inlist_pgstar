@@ -16,7 +16,7 @@ pgstar_show_age = .false.
 !------------------------------------------------------------------------------------
 
 Grid1_win_flag = .true.
-Grid1_win_width = 21
+Grid1_win_width = 13
 Grid1_win_aspect_ratio = 0.666
 
 ! file output

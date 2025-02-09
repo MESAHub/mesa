@@ -10,11 +10,6 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'fe_core_infall_limit'
  
-      !change_v_flag = .true.
-      !new_v_flag = .false.
-	
-      !change_u_flag = .true.
-      !new_u_flag = .true.
 
 / ! end of star_job namelist
 
@@ -26,60 +21,8 @@
 
 &controls
 
-
-! surface BC, for u_flag. 
-!use_momentum_outer_BC = .true.
-!Pextra_factor = 1 ! soften to 1 u_flag. 2 by default in inlist_common
-
-! meshing options 
-okay_to_remesh = .true.
-use_split_merge_amr = .false. !.true. ! will default to logR zoning unless otherwise set
-!split_merge_amr_log_zoning = .true. ! default is .true.
-split_merge_amr_logtau_zoning = .true. ! default is .false.
-!split_merge_amr_flipped_hybrid_zoning = .true.
-
-split_merge_amr_r_core_cm = 1d8
-split_merge_amr_nz_r_core = 10000
-
-split_merge_amr_max_iters = 50
-split_merge_amr_okay_to_split_nz = .false.
-split_merge_amr_mesh_delta_coeff = 1.0!0.3
-
-merge_amr_ignore_surface_cells = .false.
-merge_amr_k_for_ignore_surface_cells = 10 ! 1500 default
-
-
-split_merge_amr_nz_baseline = 3000!6000 ! RECOMMENDED 6000
-split_merge_amr_MaxLong = 1.25d0
-split_merge_amr_MaxShort = 2.5d0
-
 max_surface_cell_dq = 1d0 ! 1d-12 to resolve.
-split_merge_amr_dq_min = 1d-16
-!use_dPrad_dm_form_of_T_gradient_eqn = .false. ! default is false
 
-
-! timestep limiter for shock capturing
-dt_div_min_dr_div_cs_limit = 3d0! RECOMMENDED 3d0
-
-min_k_for_dt_div_min_dr_div_cs_limit = 1!1500
-min_q_for_dt_div_min_dr_div_cs_limit = 0.005d0
-max_q_for_dt_div_min_dr_div_cs_limit = 0.995d0!0.995d0!1d0!0.995d0
-check_remnant_only_for_dt_div_min_dr_div_cs_limit = .false.
-
-
-max_abs_du_div_cs_for_convection = 0.03d0 !5d-3
-max_v_div_cs_for_convection = 1d2
-max_v_for_convection = 1d4
-
-! meshing controls above for shock capturing.
-
-
-
-
-! for v_flag only, prevent development of radial pulses during advanced burning
-      !drag_coefficient = 1d0
-      !min_q_for_drag = 0.8d0
-! We comment these out as they interefere with CC. We want no drag on short timescales.
 
       set_min_D_mix = .true.
       min_D_mix = 1d-2 
