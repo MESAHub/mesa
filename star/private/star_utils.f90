@@ -793,7 +793,7 @@
          type (star_info), pointer :: s
          real(dp), intent(out) :: delta_Pg ! seconds
          ! g-mode period spacing for l=1
-         real(dp) :: dr, delta_Pg, N2, integral, r
+         real(dp) :: dr, N2, integral, r
          integer :: k
          logical, parameter :: dbg = .false.
          include 'formats'

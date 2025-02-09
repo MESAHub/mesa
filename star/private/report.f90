@@ -362,8 +362,8 @@
          s% acoustic_cutoff = &
             0.25d6/pi*s% grav(1)*sqrt(s% gamma1(1)*s% rho(1)/s% Peos(1))
          nu_for_delta_Pg = s% nu_max
+         if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
          if ( .not. s% delta_Pg_traditional) then
-            if (s% delta_Pg_mode_freq > 0) nu_for_delta_Pg = s% delta_Pg_mode_freq
             call get_delta_Pg_bildsten2012(s, nu_for_delta_Pg, s% delta_Pg)
          else
             call get_delta_Pg_traditional(s, s% delta_Pg)
