@@ -110,21 +110,22 @@
 
          !d_P_rad_expected = d_P_rad_expected*s% gradr_factor(k) !TODO(Pablo): check this
 
-         P_rad_m1 = (crad/3d0)*T4_m1
-         P_rad_00 = (crad/3d0)*T4_00
+         P_rad_m1 = (crad/3._dp)*T4_m1
+         P_rad_00 = (crad/3._dp)*T4_00
          d_P_rad_actual_ad = P_rad_m1 - P_rad_00
 
          ! enable flux-limited radiation transport derived by Levermore & Pomraning 1981
-         s% flux_limit_R(k) = 0d0
+         s% flux_limit_R(k) = 0._dp
+         s% flux_limit_lambda(k) =0._dp
          if (s% use_flux_limiting_with_dPrad_dm_form) then
             ! calculate the flux ratio R
             flxR = area * abs(T4_m1 - T4_00) / dm_bar / &
-                  (kap_face * 0.5d0 * (T4_m1 + T4_00))
+                  (kap_face * 0.5_dp * (T4_m1 + T4_00))
 
             s% flux_limit_R(k) = flxR%val
 
             ! calculate the flux limiter lambda
-            flxLambda = (6d0 + 3d0*flxR) / (6d0 + (3d0 + flxR)*flxR)
+            flxLambda = (6._dp + 3._dp*flxR) / (6._dp + (3._dp + flxR)*flxR)
 
             s% flux_limit_lambda(k) = flxLambda%val
 
