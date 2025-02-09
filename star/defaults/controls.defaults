@@ -7672,6 +7672,21 @@
     delta_nu_sun = 134.91d0 ! μHz
     astero_Teff_sun = 5772d0 ! kelvin
 
+      ! For calculating the asymptotic g-mode period spacing ``delta_Pg``
+      ! ~~~~~~~~~~~~
+      ! delta_Pg_traditional
+      ! ~~~~~~~~~~
+      
+      ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
+      ! asymptotic gravity mode period space by directly integrating
+      ! N2 over the entire stellar model.
+      
+      ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
+      ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
+
+   delta_Pg_traditional = .true.
+      
+      ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
       ! delta_Pg_mode_freq
       ! ~~~~~~~~~~~~~~~~~~
 

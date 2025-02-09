@@ -331,7 +331,8 @@
     include_L_in_correction_limits, include_v_in_correction_limits, include_u_in_correction_limits, include_w_in_correction_limits, &
 
     ! asteroseismology controls
-    get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq, &
+    get_delta_nu_from_scaled_solar, nu_max_sun, delta_nu_sun, astero_Teff_sun, &
+    delta_Pg_mode_freq, delta_Pg_traditional, &
 
     ! hydro parameters
     energy_eqn_option, &
@@ -1815,7 +1816,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% delta_nu_sun = delta_nu_sun
  s% astero_Teff_sun = astero_Teff_sun
  s% delta_Pg_mode_freq = delta_Pg_mode_freq
-
+ s% delta_Pg_traditional = delta_Pg_traditional
 
  ! hydro parameters
  s% energy_eqn_option = energy_eqn_option
@@ -3497,6 +3498,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  delta_nu_sun = s% delta_nu_sun
  astero_Teff_sun = s% astero_Teff_sun
  delta_Pg_mode_freq = s% delta_Pg_mode_freq
+ delta_Pg_traditional = s% delta_Pg_traditional
 
  ! hydro parameters
  energy_eqn_option = s% energy_eqn_option

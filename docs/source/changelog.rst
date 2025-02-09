@@ -23,6 +23,12 @@ A pseudo drag term ``v_drag`` has been reintroduced for ``u_flag`` to damp spuri
 
 ``hydro_rotation`` now contains the more accurate deformation fits from Fabry+2022, A&A 661, A123
 
+For calculations of the asymptotic gravity mode period spacing ``delta_Pg``,
+a new logical control ``delta_Pg_traditional`` has been introduced allowing users decide
+between adopting the traditional integral of N2 over the entire stellar model, or the 
+methods of (`Bildsten et al. 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract>`_).
+Previous MESA versions exlusively adopted the latter.
+
 .. _Bug Fixes main:
 
 Bug Fixes
