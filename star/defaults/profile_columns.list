@@ -456,6 +456,7 @@
    !lum_conv_div_lum_Edd
    !lum_conv_div_L
    !lum_rad_div_L
+   !Frad_div_cUrad ! Frad/(C*Urad), must be < 1 to not violate c.
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
       ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
 

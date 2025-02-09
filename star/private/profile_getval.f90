@@ -420,6 +420,9 @@
             case (p_lum_conv_MLT)
                val = s% L_conv(k)/Lsun
 
+            case(p_Frad_div_cUrad)
+               val = ((s% L(k) - s% L_conv(k)) / (4._dp*pi*pow2(s%r(k)))) &
+                        /(clight * s% Prad(k) *3._dp)
             case (p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT)
                val = get_Lrad_div_Ledd(s,k) - 4*s% Prad(k)/(s% Peos(k)*s% chiT(k))
             case (p_lum_rad_div_L_Edd)
