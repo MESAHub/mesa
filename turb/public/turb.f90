@@ -92,10 +92,10 @@ module turb
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel_div_csound, ierr)
       use tdc
       use tdc_support
-      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+      real(dp), intent(in) :: conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel_div_csound
       type(auto_diff_real_star_order1), intent(in) :: &
          chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, scale_height, gradL, grada
       logical, intent(in) :: report
@@ -145,9 +145,9 @@ module turb
       Zlb = lower_bound_Z
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
 
-      ! Cap at cs
+      ! Cap conv_vel at max_conv_vel_div_csound*cs
       csound = convert(sqrt(P/rho)) ! Approximate
-      if (conv_vel%val > csound%val) then
+      if (conv_vel%val > max_conv_vel_div_csound*csound%val) then
          conv_vel = unconvert(csound)
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y

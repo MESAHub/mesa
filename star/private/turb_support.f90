@@ -184,7 +184,7 @@ contains
       integer, intent(out) :: ierr
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
-      real(dp) :: conv_vel_start, scale
+      real(dp) :: conv_vel_start, scale, max_conv_vel_div_cs, q_temp
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -206,6 +206,14 @@ contains
       else
          gradL = grada
       end if
+
+      ! For limiting the conv_vel coming out of mlt/TDC with Csound.
+      max_conv_vel_div_cs = 1d99
+
+      ! q is not currently set before the first mlt call in build_pms_model() -> look_for_brackets()
+      !if (s% q(k) < s% max_conv_vel_div_csound_maxq ) then
+         max_conv_vel_div_cs = s% max_conv_vel_div_csound
+      !end if ! max_conv_vel_div_cs is 1d99 otherwise.
 
       ! Initialize with no mixing
       mixing_type = no_mixing
@@ -264,7 +272,7 @@ contains
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel_div_cs, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -282,7 +290,7 @@ contains
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel_div_cs, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

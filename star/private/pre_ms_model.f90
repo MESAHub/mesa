@@ -242,11 +242,13 @@
 
          mstar1 = rpar(1)
 
+! these pointers are set, but none of these vars are set.
          xh => s% xh
          q => s% q
          dq => s% dq
          nz = s% nz
 
+! this debug statement will cause a backtrace because the above vars are not set.
          if (dbg) then
             write(*,'(A)')
             write(*,*) 'finished pre-MS model'
