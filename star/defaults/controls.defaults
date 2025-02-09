@@ -2313,7 +2313,7 @@
       ! convection model ``TDC`` with an overshooting model, or combining ``TDC``
       ! with other models for chemical composition gradients
       ! (predictive mixing or convective premixing), rotation, etc. (MESA VI)
-      
+
       ! ::
 
     MLT_option = 'TDC'
@@ -2985,7 +2985,7 @@
     conv_premix_dump_snapshots = .false.
 
 
-   ! Rayleigh Taylor Instability
+   ! Rayleigh-Taylor Instability
    ! ____________________________
 
       ! derived from Paul Duffell's code RT1D.
@@ -4060,57 +4060,21 @@
 
       ! ::
 
-    w_div_wcrit_max = 0.90d0
+    w_div_wcrit_max = 0.89d0
 
 
       ! w_div_wcrit_max2
       ! ~~~~~~~~~~~~~~~~
 
       ! When w_div_wc_flag is true, rather than a hard limit on w_div_wcrit
-      ! we use w_div_wcrit_max2<w_div_wcrit_max to provide a smooth transition.
-      ! In the limit of j_rot->infinity, the resulting w_div_wc will match
-      ! w_div_wcrit_max, while nothing is done when w_div_wcrit_max<w_div_wcrit_max2
+      ! we use two limiting values w_div_wcrit_max < w_div_wcrit_max2 to provide a smooth transition.
+      ! Nothing is done when w_div_wc < w_div_wcrit_max, if w_div_wcrit_max < w_div_wc < w_div_wcrit_max2,
+      ! we apply a sigmoid, and in the limit of j_rot -> infinity, the resulting w_div_wc will match
+      ! w_div_wcrit_max2 (being on the top of the sigmoid)
 
       ! ::
 
-    w_div_wcrit_max2 = 0.89d0
-
-
-      ! FP_min
-      ! ~~~~~~
-      ! FT_min
-      ! ~~~~~~
-
-      ! Lower limits for rotational distortion corrections factors FP and FT.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false., otherwise the
-      ! limits are set using w_div_wcrit_max
-
-      ! ::
-
-    FP_min = 0.75d0
-    FT_min = 0.95d0
-
-
-      ! FP_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an fp < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FP_error_limit = 0d0
-
-
-      ! FT_error_limit
-      ! ~~~~~~~~~~~~~~
-
-      ! If calculate an ft < this, treat it as an error.
-      ! Used for the calculation when fitted_fp_ft_i_rot = .false.
-
-      ! ::
-
-    FT_error_limit = 0d0
+    w_div_wcrit_max2 = 0.90d0
 
 
       ! D_mix_rotation_max_logT_full_on
@@ -4133,6 +4097,27 @@
       ! ::
 
     D_mix_rotation_min_logT_full_off = 9.5d0
+
+
+      ! D_mix_rotation_min_tau_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Drop rotational components of ``D_mix`` for locations where tau <= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+
+    D_mix_rotation_min_tau_full_off = 0d0
+
+          ! D_mix_rotation_max_tau_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Use rotational components of ``D_mix`` for locations where tau >= this.
+      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
+
+      ! ::
+
+    D_mix_rotation_min_tau_full_on = 0d0
 
 
       ! D_omega_max_replacement_fraction
@@ -4652,8 +4637,8 @@
       ! do_starspots
       ! ~~~~~~~~~~~~
 
-      ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots, 
-      ! parameterized in the style of an atmospheric boundary modification. First described by 
+      ! If ``.true.``, switch on impedance of the surface flux due to magnetic pressure from starspots,
+      ! parameterized in the style of an atmospheric boundary modification. First described by
       ! `Somers et al. (2015; ApJ) <https://ui.adsabs.harvard.edu/abs/2015ApJ...807..174S>`__.
       ! Detailed discussion of this functionality can be found in |MESA VI|.
 
@@ -4674,8 +4659,8 @@
       ! xspot
       ! ~~~~~
 
-      ! Temperature contrast between the spotted and unspotted regions. 
-      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5 
+      ! Temperature contrast between the spotted and unspotted regions.
+      ! Valid values are between 1.0 (no contribution from magnetic pressure) and 0.5
       ! (half of the total pressure is due to magnetic pressure)
 
       ! ::
@@ -8241,15 +8226,18 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
 
+
+      ! Hydrodynamic drag
+      ! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
       ! min_q_for_drag
       ! ~~~~~~~~~~~~~~
 
-      ! only when v_flag.  adjusts both v and energy transfer from kinetic to thermal.
+      ! only when v_flag = .true.. Adjusts both v and energy transfer from kinetic to thermal.
       ! only for v(k) when q(k) > min_q_for_drag.
       ! kill off fraction of v = drag_coefficient (i.e. set to 1 to keep v near 0)
       ! useful for preventing the development radial pulsations during advanced
@@ -8274,13 +8262,35 @@
     use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
+    
+
+      ! v_drag_factor
+      ! ~~~~~~~~~~~~~
+      ! v_drag
+      ! ~~~~~~
+      ! q_for_v_drag_full_off
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! q_for_v_drag_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~
 
 
-      ! for hydro comparison tests (e.g., Sedov)
+      ! Only when u_flag = .true.. Adds a pseudo drag term of the form
+      ! -v_drag_factor*(v-v_drag)^2/r, can be used damp velocities in outer layers
+      ! of a star, useful for smoothing out spurious shocks colliding in ejected layers.
+      ! Effect is full on for q>q_for_v_drag_full_on and full off for
+      ! q < q_for_v_drag_full_off.
+
+      ! ::
+
+    v_drag_factor = 0d0
+    v_drag = 0d0
+    q_for_v_drag_full_off = 0.95d0
+    q_for_v_drag_full_on = 0.96d0
 
 
       ! Rayleigh-Taylor Instability
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! for hydro comparison tests (e.g., Sedov)
       ! RTI_A
       ! ~~~~~
       ! RTI_B

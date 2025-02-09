@@ -96,6 +96,7 @@
          type(accurate_auto_diff_real_star_order1) :: sum_ad
          real(dp) :: dt, dm, ie_plus_ke, scal, residual
          logical :: dbg, do_diffusion, test_partials
+         real(dp) :: v_drag, drag_factor, drag_fraction
 
          include 'formats'
          dbg = .false.
@@ -134,6 +135,28 @@
             geometry_source_ad + gravity_source_ad + diffusion_source_ad
          dudt_expected_ad = sum_ad
          dudt_expected_ad = dudt_expected_ad/dm
+         
+         ! implement drag
+         drag_factor = s% v_drag_factor
+         v_drag = s% v_drag
+         if (s% q(k) < s% q_for_v_drag_full_off) then
+            drag_fraction = 0d0
+         else if (s% q(k) > s% q_for_v_drag_full_on) then
+            drag_fraction = 1d0
+         else
+            drag_fraction = (s% q(k) - s% q_for_v_drag_full_off)&
+                               /(s% q_for_v_drag_full_on - s% q_for_v_drag_full_off)
+         end if
+         drag_factor = drag_factor*drag_fraction
+
+         if (drag_factor > 0d0) then
+            if (s% u(k) > v_drag) then
+               dudt_expected_ad = dudt_expected_ad - drag_factor*pow2(s% u(k) - v_drag)/s% r(k)
+            else if (s% u(k) < -v_drag) then
+               dudt_expected_ad = dudt_expected_ad + drag_factor*pow2(s% u(k) + v_drag)/s% r(k)
+            end if
+         end if
+
 
          ! make residual units be relative difference in energy
          ie_plus_ke = s% energy_start(k) + 0.5d0*s% u_start(k)*s% u_start(k)
