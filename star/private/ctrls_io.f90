@@ -277,7 +277,6 @@
     min_q_for_adjust_J_lost, min_J_div_delta_J, max_mdot_redo_cnt, mdot_revise_factor, &
     implicit_mdot_boost, min_years_dt_for_redo_mdot, surf_omega_div_omega_crit_limit, surf_omega_div_omega_crit_tol, &
     w_div_wcrit_max, w_div_wcrit_max2, &
-    fp_min, ft_min, fp_error_limit, ft_error_limit, &
     D_mix_rotation_max_logT_full_on, D_mix_rotation_min_logT_full_off, &
     D_mix_rotation_min_tau_full_off, D_mix_rotation_min_tau_full_on, &
     set_uniform_am_nu_non_rot, uniform_am_nu_non_rot, &
@@ -1679,10 +1678,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% surf_omega_div_omega_crit_tol = surf_omega_div_omega_crit_tol
  s% w_div_wcrit_max = w_div_wcrit_max
  s% w_div_wcrit_max2 = w_div_wcrit_max2
- s% fp_min = fp_min
- s% ft_min = ft_min
- s% fp_error_limit = fp_error_limit
- s% ft_error_limit = ft_error_limit
 
  s% D_mix_rotation_max_logT_full_on = D_mix_rotation_max_logT_full_on
  s% D_mix_rotation_min_logT_full_off = D_mix_rotation_min_logT_full_off
@@ -3366,10 +3361,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  surf_omega_div_omega_crit_tol = s% surf_omega_div_omega_crit_tol
  w_div_wcrit_max = s% w_div_wcrit_max
  w_div_wcrit_max2 = s% w_div_wcrit_max2
- fp_min = s% fp_min
- ft_min = s% ft_min
- fp_error_limit = s% fp_error_limit
- ft_error_limit = s% ft_error_limit
 
  D_mix_rotation_max_logT_full_on = s% D_mix_rotation_max_logT_full_on
  D_mix_rotation_min_logT_full_off = s% D_mix_rotation_min_logT_full_off
