@@ -57,7 +57,7 @@ program test_turb
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, 1d99, ierr)
 
       write(*,1) 'vc at 1d5 Lsun',conv_vel%val
 
@@ -67,7 +67,7 @@ program test_turb
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel2, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel2, D, mixing_type, 1d99, ierr)
 
       write(*,1) 'vc at 1d8 Lsun',conv_vel2%val
 
@@ -145,7 +145,7 @@ program test_turb
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, 1d99, ierr)
 
       write(*,1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel% val, Gamma%val
 

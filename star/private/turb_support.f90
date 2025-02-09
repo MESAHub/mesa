@@ -304,7 +304,7 @@ contains
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel_div_cs, ierr)
 
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'ierr from set_MLT'
@@ -321,7 +321,7 @@ contains
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                               gradr_scaled, grada, gradL, &
-                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel_div_cs, ierr)
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                   return

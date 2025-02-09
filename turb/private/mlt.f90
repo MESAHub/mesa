@@ -60,14 +60,14 @@ contains
    subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel_div_csound, ierr)
       use const_def
       use num_lib
       use utils_lib
       use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
-      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel_div_csound
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
@@ -75,7 +75,7 @@ contains
       type(auto_diff_real_star_order1) :: &
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
-         f, f0, f1, f2, radiative_conductivity, convective_conductivity
+         f, f0, f1, f2, radiative_conductivity, convective_conductivity, csound
       include 'formats'
       if (gradr > gradL) then
          ! Convection zone
@@ -181,6 +181,13 @@ contains
          mixing_type = convective_mixing
       end if
 
+! a simple conv_vel limiter, that is not flux consistent, but probably okay.
+   csound = sqrt(P / rho)  ! approximate local sound speed
+   if (conv_vel %val > max_conv_vel_div_csound * csound %val) then
+      conv_vel %val = max_conv_vel_div_csound * csound %val
+      ! Recompute the diffusion coefficient consistently
+      D = conv_vel * Lambda / 3.0d0
+   end if
    end subroutine calc_MLT
 
 end module MLT
