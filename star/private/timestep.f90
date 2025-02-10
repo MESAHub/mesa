@@ -99,14 +99,14 @@
       integer function do_timestep_limits(s, dt)
          use rates_def, only: i_rate
          type (star_info), pointer :: s
-         real(dp), intent(in) :: dt ! timestep just completed
+         real(dp), intent(in) :: dt  ! timestep just completed
 
          real(dp) :: dt_limit_ratio(numTlim), order, max_timestep_factor
          integer :: i_limit, nz, ierr
          logical :: skip_hard_limit
-         integer :: num_mix_boundaries ! boundaries of regions with mixing_type /= no_mixing
-         real(dp), pointer :: mix_bdy_q(:) ! (num_mix_boundaries)
-         integer, pointer :: mix_bdy_loc(:) ! (num_mix_boundaries)
+         integer :: num_mix_boundaries  ! boundaries of regions with mixing_type /= no_mixing
+         real(dp), pointer :: mix_bdy_q(:)  ! (num_mix_boundaries)
+         integer, pointer :: mix_bdy_loc(:)  ! (num_mix_boundaries)
 
          include 'formats'
 
@@ -338,7 +338,7 @@
          i_limit = maxloc(dt_limit_ratio(1:numTlim), dim=1)
 
          order = 1
-         call filter_dt_next(s, order, dt_limit_ratio(i_limit)) ! sets s% dt_next
+         call filter_dt_next(s, order, dt_limit_ratio(i_limit))  ! sets s% dt_next
 
          if (s% log_max_temperature > s% min_logT_for_max_timestep_factor_at_high_T) then
             max_timestep_factor = s% max_timestep_factor_at_high_T
@@ -508,7 +508,7 @@
 
          do i=1, max_dx_limit_ctrls  ! go over all potential species + XYZ
             if (s% dX_limit(i) >= 1 .and. &      ! as soon as all of these are >= 1
-                s% dX_hard_limit(i) >= 1 .and. & ! we'd have nothing to do
+                s% dX_hard_limit(i) >= 1 .and. &  ! we'd have nothing to do
                 s% dX_div_X_limit(i) >= 1 .and. &
                 s% dX_div_X_hard_limit(i) >= 1) then
                cycle  ! go to next
@@ -579,7 +579,7 @@
 
                   X = s% xa(j,k)
                   X_old = s% xa_old(j,k)
-                  delta_X = X_old - X ! decrease in abundance
+                  delta_X = X_old - X  ! decrease in abundance
 
                   if ((.not. s% dX_decreases_only(j)) .and. delta_X < 0) delta_X = -delta_X
 
@@ -702,7 +702,7 @@
 
          max_dL_div_L = -1
          max_dL_div_L_k = -1
-         abs_dL_div_L = 0; L=0 ! to quiet gfortran
+         abs_dL_div_L = 0; L=0  ! to quiet gfortran
 
          do k = 1, s% nz
             L = s% L(k)
@@ -764,7 +764,7 @@
          end if
          if (lim <= 0) return
          relative_excess = (abs_change - lim) / lim
-         dt_limit_ratio = abs_change/lim ! 1d0/(s% timestep_dt_factor**relative_excess)
+         dt_limit_ratio = abs_change/lim  ! 1d0/(s% timestep_dt_factor**relative_excess)
          if (is_bad(dt_limit_ratio)) then
             write(*,1) trim(msg) // ' dt_limit_ratio', dt_limit_ratio, abs_change, lim
             call mesa_error(__FILE__,__LINE__,'check_change')
@@ -1022,7 +1022,7 @@
          check_lgL = keep_going
 
          iso = iso_in
-         if (iso == iprot) then ! check_lgL_power_photo_change
+         if (iso == iprot) then  ! check_lgL_power_photo_change
             if (s% log_max_temperature < s% min_lgT_for_lgL_power_photo_limit) return
             new_L = abs(s% power_photo)
             max_other_L = 0d0
@@ -1032,7 +1032,7 @@
             lgL_min = s% lgL_power_photo_burn_min
             drop_factor = s% lgL_power_photo_drop_factor
             relative_limit = 0d0
-         else if (iso == ineut) then ! check_lgL_nuc_change
+         else if (iso == ineut) then  ! check_lgL_nuc_change
             if (s% log_max_temperature > s% max_lgT_for_lgL_nuc_limit) return
             new_L = s% power_nuc_burn
             max_other_L = 0d0
@@ -1296,7 +1296,7 @@
 
 
       integer function check_dYe_highT_change( &
-            s, skip_hard_limit, dt_limit_ratio) ! check max change in Ye
+            s, skip_hard_limit, dt_limit_ratio)  ! check max change in Ye
          use const_def, only:ln10
          type (star_info), pointer :: s
          logical, intent(in) :: skip_hard_limit
@@ -1482,7 +1482,7 @@
                do j = 1, s% num_conv_boundaries
                   delta_r = abs(s% r(s% conv_bdy_loc(j)) - s% r(k))
                   if (delta_r <= s% scale_height(k)) then
-                     cycle zoneloop ! skip ones that are too close to convection zone
+                     cycle zoneloop  ! skip ones that are too close to convection zone
                   end if
                end do
                max_ratio = ratio
@@ -2207,7 +2207,7 @@
                end if
 
                if (chem_isos% Z(s% chem_id(j)) <= 2) then
-                  cycle ! skip the little guys
+                  cycle  ! skip the little guys
                end if
 
                if (s% xa(j,k) < X_limit) then
@@ -2246,9 +2246,9 @@
 
                dx_inflow = max(0d0, fluxp1, -flux00)*dt_dm
 
-               dx_drop = -(dx_burning + dx_inflow) ! dx_burning < 0 for drop
+               dx_drop = -(dx_burning + dx_inflow)  ! dx_burning < 0 for drop
 
-               dx = s% xa_old(j,k) - s% xa(j,k) ! the actual drop
+               dx = s% xa_old(j,k) - s% xa(j,k)  ! the actual drop
                if (dx < dx_drop) dx_drop = dx
 
                if (dx_drop > max_dx_nuc_drop) then
@@ -2367,7 +2367,7 @@
             sumj = abs(sum(s% xh(j,k-1:k+1)) - sum(s% xh_old(j,k-1:k+1)))/3
 
             if (j == s% i_lnd) then
-               sumterm(j) = sumterm(j)/3 ! Seems to help. from Eggleton.
+               sumterm(j) = sumterm(j)/3  ! Seems to help. from Eggleton.
             end if
 
             sumvar = sumvar + sumterm(j)
@@ -2404,7 +2404,7 @@
          dt_limit_ratio_target = 1d0
 
          if (s% use_dt_low_pass_controller .and. &
-               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0) then ! use 2 values to do "low pass" controller
+               s% dt_limit_ratio_old > 0 .and. s% dt_old > 0) then  ! use 2 values to do "low pass" controller
             ratio = limiter(dt_limit_ratio_target/dt_limit_ratio)
             ratio_prev = limiter(dt_limit_ratio_target/s% dt_limit_ratio_old)
             limtr = limiter( &
@@ -2423,7 +2423,7 @@
                write(*,'(A)')
             end if
 
-         else ! no history available, so fall back to the 1st order controller
+         else  ! no history available, so fall back to the 1st order controller
             s% dt_next = s% dt*dt_limit_ratio_target/dt_limit_ratio
             if (s% report_solver_dt_info) then
                write(*,2) 's% dt', s% model_number, s% dt
@@ -2440,7 +2440,7 @@
 
          real(dp) function limiter(x)
             real(dp), intent(in) :: x
-            real(dp), parameter :: kappa = 10 ! 2
+            real(dp), parameter :: kappa = 10  ! 2
             ! for x >= 0 and kappa = 2, limiter value is between 0.07 and 4.14
             ! for x >= 0 and kappa = 10, limiter value is between 0.003 and 16.7
             ! for x = 1, limiter = 1

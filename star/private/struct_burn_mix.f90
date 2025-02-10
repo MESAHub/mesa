@@ -144,9 +144,9 @@
          end if
 
          do_chem = (s% do_burn .or. s% do_mix)
-         if (do_chem) then ! include abundances
+         if (do_chem) then  ! include abundances
             nvar = s% nvar_total
-         else ! no chem => just do structure
+         else  ! no chem => just do structure
             nvar = s% nvar_hydro
          end if
 
@@ -211,7 +211,7 @@
          if (s% use_other_after_struct_burn_mix) &
             call s% other_after_struct_burn_mix(s% id, dt, do_struct_burn_mix)
 
-         s% solver_iter = 0 ! to indicate that no longer doing solver iterations
+         s% solver_iter = 0  ! to indicate that no longer doing solver iterations
          s% doing_struct_burn_mix = .false.
          if (s% doing_timing) call update_time(s, time0, total, s% time_struct_burn_mix)
 
@@ -308,8 +308,8 @@
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
-            s% u_face_start(k) = 0d0 ! s% u_face_ad(k)%val
-            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_ad(k)%val
+            s% u_face_start(k) = 0d0  ! s% u_face_ad(k)%val
+            s% P_face_start(k) = -1d0  ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
@@ -404,7 +404,7 @@
       end function do_solver_converge
 
 
-      subroutine set_surf_info(s, nvar) ! set to values at start of step
+      subroutine set_surf_info(s, nvar)  ! set to values at start of step
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          s% surf_lnS = s% lnS(1)
@@ -412,7 +412,7 @@
       end subroutine set_surf_info
 
 
-      subroutine set_xh(s,nvar,ierr) ! set xh using current structure info
+      subroutine set_xh(s,nvar,ierr)  ! set xh using current structure info
          use hydro_rsp2, only: RSP2_adjust_vars_before_call_solver
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
@@ -536,13 +536,13 @@
             if (maxT > s% maxT_for_gold_tolerances) then
                !write(*,2) 'exceed maxT_for_gold_tolerances', &
                !   s% model_number, maxT, s% maxT_for_gold_tolerances
-            else ! okay for maxT, so check if also ok for eosPC_frac
+            else  ! okay for maxT, so check if also ok for eosPC_frac
                s% using_gold_tolerances = .true.
                gold_tolerances_level = 1
             end if
          end if
 
-         call set_xh(s, nvar, ierr) ! set xh using current structure info
+         call set_xh(s, nvar, ierr)  ! set xh using current structure info
          if (ierr /= 0) then
             if (report) then
                write(*, *) 'set_xh returned ierr in struct_burn_mix', ierr
@@ -595,9 +595,9 @@
             return
          end if
 
-         if (converged) then ! sanity checks before accept it
+         if (converged) then  ! sanity checks before accept it
             converged = check_after_converge(s, report, ierr)
-            if (converged .and. s% RTI_flag) & ! special checks
+            if (converged .and. s% RTI_flag) &  ! special checks
                converged = RTI_check_after_converge(s, report, ierr)
          end if
 
@@ -652,7 +652,7 @@
                   s% species, s% xa(:,k), &
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
-               if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
+               if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
                call store_lnT_in_xh(s, k, new_lnT)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
@@ -667,7 +667,7 @@
                   s% u(k) = -new_u
                end if
                s% xh(s% i_u, k) = s% u(k)
-            else if (s% v_flag) then ! only rough approximation possible here
+            else if (s% v_flag) then  ! only rough approximation possible here
                old_KE = 0.5d0*s% dm_bar(k)*s% v(k)*s% v(k)
                new_KE = max(0d0, old_KE + old_IE - new_IE)
                new_v = sqrt(max(0d0,new_KE)/(0.5d0*s% dm_bar(k)))
@@ -711,16 +711,16 @@
             else
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnT(k) < ln10) then
                   if (report) write(*,*) 'after hydro, logT < 1 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnd(k) > ln10*12) then
                   if (report) write(*,*) 'after hydro, logRho > 12 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnd(k) < -ln10*30) then
                   if (report) write(*,*) 'after hydro, logRho < -30 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                end if
             end if
          end do
@@ -859,7 +859,7 @@
             call mesa_error(__FILE__,__LINE__,'do1_net')
          end if
 
-         dbg = .false. ! (s% model_number == 1137)
+         dbg = .false.  ! (s% model_number == 1137)
 
          kmin = nz+1
          do k=1,nz
@@ -1019,7 +1019,7 @@
          eps = s% op_split_burn_eps
          odescal = s% op_split_burn_odescal
          max_steps = s% burn_steps_hard_limit
-         use_pivoting = .false. ! .true.
+         use_pivoting = .false.  ! .true.
          trace = .false.
          burn_dbg = .false.
          starting_log10T = s% lnT(k)/ln10
@@ -1135,7 +1135,7 @@
          ! below, restore eps_nuc_neu to op_split zones.
          s% eps_nuc_neu_total(k) = ending_eps_neu_total
 
-         do i=1,species ! for use by dX_nuc_drop timestep limiter
+         do i=1,species  ! for use by dX_nuc_drop timestep limiter
             s% dxdt_nuc(i,k) = (s% xa(i,k)-xa_start(i))/dt
          end do
 
@@ -1148,8 +1148,8 @@
             use eos_lib, only: eosDT_get
             use eos_def
             integer, intent(in) :: eos_handle, species
-            integer, pointer :: chem_id(:) ! maps species to chem id
-            integer, pointer :: net_iso(:) ! maps chem id to species number
+            integer, pointer :: chem_id(:)  ! maps species to chem id
+            integer, pointer :: net_iso(:)  ! maps chem id to species number
             real(dp), intent(in) :: &
                xa(:), rho, logRho, T, logT
             real(dp), intent(out) :: &

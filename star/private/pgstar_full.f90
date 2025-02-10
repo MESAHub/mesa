@@ -69,7 +69,7 @@ contains
    end subroutine do_show_pgstar_annotations
 
 
-   subroutine do_start_new_run_for_pgstar(s, ierr) ! reset logs
+   subroutine do_start_new_run_for_pgstar(s, ierr)  ! reset logs
       use utils_lib
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -1556,7 +1556,7 @@ contains
       if (ierr /= 0) then
          if (dbg) write(*, *) 'failed read pg_star history ' // trim(fname)
       else
-         do ! keep reading until reach end of file so take care of restarts
+         do  ! keep reading until reach end of file so take care of restarts
             allocate(pg)
             allocate(pg% vals(n))
             read(iounit, iostat = ierr) pg% age, pg% step, pg% vals(1:n)

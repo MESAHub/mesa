@@ -1347,7 +1347,7 @@
          do i=1,h_col_id_max
             if (len_trim(history_column_name(i)) == 0) then
                write(*,*) 'missing name for log column id', i
-               if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1))) ! bp: get rid of bogus compiler warning
+               if (i > 1) write(*,*) 'following ' // trim(history_column_name(max(1,i-1)))  ! bp: get rid of bogus compiler warning
                write(*,'(A)')
                cnt = cnt+1
             end if

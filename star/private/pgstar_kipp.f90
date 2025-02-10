@@ -502,7 +502,7 @@
                      color_frac = 1.0 - max(0.0, min(1.0, burn_type/bmax))
                      colormap_index = &
                         colormap_size - int(0.6*color_frac*(colormap_size - mid_map))
-                  else ! burn_type < 0.0
+                  else  ! burn_type < 0.0
                      color_frac = 1.0 - max(0.0, min(1.0, burn_type/bmin))
                      colormap_index = 1 + int(0.6*color_frac*mid_map)
                   end if

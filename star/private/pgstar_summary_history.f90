@@ -37,7 +37,6 @@
 
 
       subroutine summary_history_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -190,7 +189,7 @@
                   cycle
                end if
 
-               if (s% pg% Summary_History_scaled_value(j)) then ! scale yvec
+               if (s% pg% Summary_History_scaled_value(j)) then  ! scale yvec
 
                   yvec_max = maxval(yvec(1:npts))
                   yvec_min = minval(yvec(1:npts))

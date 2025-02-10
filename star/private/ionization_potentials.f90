@@ -33,12 +33,12 @@
 
       logical :: ionization_tables_okay = .false.
 
-      real(dp) :: ip(30,30) ! ionization_potentials
+      real(dp) :: ip(30,30)  ! ionization_potentials
 
       contains
 
 
-      subroutine set_ionization_potentials ! data from
+      subroutine set_ionization_potentials  ! data from
          ! Allen, C.W., 1973, "Astrophysical Quantities", 3rd edition, pg 37-38.
 
          ! 1 h

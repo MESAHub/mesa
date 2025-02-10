@@ -182,7 +182,7 @@
             else
                dt = min(dt, 0.5d0*remaining_time)
             end if
-            if (steps_used >= max_steps) dt = remaining_time ! just go for it
+            if (steps_used >= max_steps) dt = remaining_time  ! just go for it
             if (dbg) write(*,3) 'mix dt', &
                   s% model_number, steps_used, dt, dt/remaining_time
 
@@ -251,7 +251,7 @@
                   if (dbg) &
                      write(*,3) 'substep converged: iters max_del avg_del dt/total', &
                         steps_used, num_iters, max_del, avg_del, dt/total_time
-                  exit solve_loop ! this substep is done
+                  exit solve_loop  ! this substep is done
                end if
 
                if (num_iters == max_iters_per_substep) then
@@ -301,7 +301,7 @@
                   associated(s% binary_other_torque))) then
 
                ! check conservation for cases with no extra torque
-               J_tot1 = total_angular_momentum(s) ! what we have
+               J_tot1 = total_angular_momentum(s)  ! what we have
 
                if (abs(J_tot0 - J_tot1) > s% angular_momentum_error_retry*abs(J_tot0)) then
                   s% retry_message = 'retry: failed to conserve angular momentum in mixing'
@@ -403,7 +403,6 @@
 
 
          subroutine solve_tridiag(sub, diag, sup, rhs, x, n, ierr)
-            implicit none
             !      sub - sub-diagonal
             !      diag - the main diagonal
             !      sup - sup-diagonal
@@ -443,7 +442,7 @@
 
          real(dp) function min_mixing_timescale() result(dt)
             integer :: k
-            real(dp) :: & ! use dp instead of qp to get same answer in ifort and gfortran
+            real(dp) :: &  ! use dp instead of qp to get same answer in ifort and gfortran
                omega, irot, irot_mid_00, am_sig_omega_00, c_omega_00, del00_omega, &
                omega_mid_00, am_sig_irot_00, c_irot_00, del00_irot, &
                dmbar, irot_mid_m1, am_sig_omega_m1, c_omega_m1, delm1_omega, &

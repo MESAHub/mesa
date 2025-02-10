@@ -38,7 +38,6 @@
 
 
       subroutine Mixing_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -128,7 +127,6 @@
             panel_flag, xaxis_numeric_labels_flag, ierr)
 
          use utils_lib
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: device_id

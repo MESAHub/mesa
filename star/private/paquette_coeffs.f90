@@ -204,8 +204,8 @@
             AA = OMEGA22/(5.D0*OMEGA1(1))
             BB = (5.D0*OMEGA1(2)-OMEGA1(3))/(5.D0*OMEGA1(1))
             CC = 2.D0*OMEGA1(2)/(5.D0*OMEGA1(1))-1.D0
-            Xs = NA1(NREF)/(NA1(I)+NA1(NREF)) !number concentration of reference species NREF
-            Xt = NA1(I)/(NA1(I)+NA1(NREF)) !number concentration of species I
+            Xs = NA1(NREF)/(NA1(I)+NA1(NREF))  !number concentration of reference species NREF
+            Xt = NA1(I)/(NA1(I)+NA1(NREF))  !number concentration of species I
             Ms = CAN1(NREF)/(CAN1(NREF)+CAN1(I))
             Mt = CAN1(I)/(CAN1(NREF)+CAN1(I))
             Pst = 3.0D0*(Ms-Mt)*(Ms-Mt) + 4.D0*Ms*Mt*AA
@@ -230,8 +230,8 @@
             Zdiff1(NREF, I) = -2.D0*BB+2.5D0
             Zdiff2(NREF, I) = 5.D0*AA
 
-         end do !I
-      end do !K
+         end do  !I
+      end do  !K
       return
 
       end subroutine paquette_coefficients
