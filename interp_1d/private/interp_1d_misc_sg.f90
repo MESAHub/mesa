@@ -30,21 +30,21 @@
       contains
 
       subroutine do_integrate_values_sg(init_x, nx, f1, nv, x, vals, ierr)
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real, intent(in) :: x(:) ! (nv)
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real, intent(in) :: x(:)  ! (nv)
             ! strictly monotonic in same way as init_x
-         real, intent(inout) :: vals(:) ! (nv)
+         real, intent(inout) :: vals(:)  ! (nv)
             ! for i > 1, vals(i) = integral of interpolating poly from x(i-1) to x(i)
             ! vals(1) = 0
-         integer, intent(out) :: ierr ! 0 means aok
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real :: xk_old, xkp1_old, xk_new, xk_prev, sum
          logical :: increasing
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          increasing = (init_x(1) < init_x(nx))
@@ -113,20 +113,20 @@
 
 
       subroutine do_interp_values_sg(init_x, nx, f1, nv, x, vals, ierr)
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real, intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real, intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real, intent(inout) :: vals(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real, intent(inout) :: vals(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -151,7 +151,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -182,21 +182,21 @@
 
 
       subroutine do_interp_values_and_slopes_sg(init_x, nx, f1, nv, x, vals, slopes, ierr)
-         real, intent(in) :: init_x(:) ! (nx) ! junction points, strictly monotonic
-         integer, intent(in) :: nx ! length of init_x vector
-         real, intent(in), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
-         integer, intent(in) :: nv ! length of new x vector and vals vector
-         real, intent(in) :: x(:) ! (nv)  ! locations where want interpolated values
+         real, intent(in) :: init_x(:)  ! (nx) ! junction points, strictly monotonic
+         integer, intent(in) :: nx  ! length of init_x vector
+         real, intent(in), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
+         integer, intent(in) :: nv  ! length of new x vector and vals vector
+         real, intent(in) :: x(:)  ! (nv)  ! locations where want interpolated values
             ! strictly monotonic in same way as init_x
             ! values out of range of init_x's are clipped to boundaries of init_x's
-         real, intent(inout) :: vals(:) ! (nv)
-         real, intent(inout) :: slopes(:) ! (nv)
-         integer, intent(out) :: ierr ! 0 means aok
+         real, intent(inout) :: vals(:)  ! (nv)
+         real, intent(inout) :: slopes(:)  ! (nv)
+         integer, intent(out) :: ierr  ! 0 means aok
 
          integer :: k_old, k_new
          real :: xk_old, xkp1_old, xk_new, delta
          logical :: increasing
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -214,7 +214,7 @@
                else if (xk_new < init_x(1)) then
                   xk_new = init_x(1)
                end if
-            else ! decreasing
+            else  ! decreasing
                if (xk_new < init_x(nx)) then
                   xk_new = init_x(nx)
                else if (xk_new > init_x(1)) then
@@ -260,15 +260,15 @@
 
 
       subroutine minmod_sg(z, n, f1, f2)
-         real, intent(inout) :: z(:) ! (n)
+         real, intent(inout) :: z(:)  ! (n)
          integer, intent(in) :: n       ! length of vectors
-         real, intent(in) :: f1(:), f2(:) ! (n)
+         real, intent(in) :: f1(:), f2(:)  ! (n)
          z(1:n) = 0.5 * (sign(1.0, f1(1:n)) + sign(1.0, f2(1:n))) * min(abs(f1(1:n)), abs(f2(1:n)))
       end subroutine minmod_sg
 
 
       subroutine minmod4_sg(z, n, f1, f2, f3, f4)
-         real, intent(inout) :: z(:) ! (n)
+         real, intent(inout) :: z(:)  ! (n)
          integer, intent(in) :: n       ! length of vectors
          real, intent(in) :: f1(:), f2(:), f3(:), f4(:)
          call minmod_sg(z, n, f1, f2)

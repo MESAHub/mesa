@@ -61,12 +61,12 @@
       !
         implicit none
 
-        integer ( kind = 4 ) seed
-        real ( kind = 8 ) temp
-        character ( len = 10 ) time
-        character ( len = 8 ) today
-        integer ( kind = 4 ) values(8)
-        character ( len = 5 ) zone
+        integer ( kind = 4 ) :: seed
+        real ( kind = 8 ) :: temp
+        character ( len = 10 ) :: time
+        character ( len = 8 ) :: today
+        integer ( kind = 4 ) :: values(8)
+        character ( len = 5 ) :: zone
 
         call date_and_time ( today, time, zone, values )
 
@@ -169,14 +169,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) a
-        integer ( kind = 4 ) b
+        integer ( kind = 4 ) :: a
+        integer ( kind = 4 ) :: b
         integer ( kind = 4 ), parameter :: i4_huge = 2147483647
-        integer ( kind = 4 ) i4_uniform
-        integer ( kind = 4 ) k
-        real ( kind = 4 ) r
-        integer ( kind = 4 ) seed
-        integer ( kind = 4 ) value
+        integer ( kind = 4 ) :: i4_uniform
+        integer ( kind = 4 ) :: k
+        real ( kind = 4 ) :: r
+        integer ( kind = 4 ) :: seed
+        integer ( kind = 4 ) :: value
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '
@@ -253,14 +253,14 @@
       !
         implicit none
 
-        integer ( kind = 4 ) n
+        integer ( kind = 4 ) :: n
 
-        integer ( kind = 4 ) base
-        integer ( kind = 4 ) i
-        integer ( kind = 4 ) j
-        integer ( kind = 4 ) k
-        integer ( kind = 4 ) p(n)
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: base
+        integer ( kind = 4 ) :: i
+        integer ( kind = 4 ) :: j
+        integer ( kind = 4 ) :: k
+        integer ( kind = 4 ) :: p(n)
+        integer ( kind = 4 ) :: seed
 
         do i = 1, n
           p(i) = ( i - 1 ) + base
@@ -353,9 +353,9 @@
       !
         implicit none
 
-        integer ( kind = 4 ) k
-        real ( kind = 8 ) r8_uniform_01
-        integer ( kind = 4 ) seed
+        integer ( kind = 4 ) :: k
+        real ( kind = 8 ) :: r8_uniform_01
+        integer ( kind = 4 ) :: seed
 
         if ( seed == 0 ) then
           write ( *, '(a)' ) ' '

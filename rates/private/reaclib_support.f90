@@ -182,7 +182,7 @@
          type(nuclide_data), intent(in) :: winvn
          real(dp) :: mp, mn
          real(dp),  dimension(max_species_per_reaction) :: g   ! statistical weights of nuclides
-         real(dp), dimension(max_species_per_reaction) :: mass ! mass no's of nuclides
+         real(dp), dimension(max_species_per_reaction) :: mass  ! mass no's of nuclides
          integer, dimension(max_species_per_reaction) :: ps
          integer :: Ni,No,Nt,i
          real(dp) :: fac, massfac, sum1, sum2, tmp
@@ -236,11 +236,11 @@
             ! It appears in log form as 1.5d0*rates% inverse_exp(i)*lnT9, where,
             ! rates% inverse_exp(i) = Ni-No, so,
             ! 1.5d0*rates% inverse_exp(i)*lnT9 == ln(T^(3n/2)), where n = Ni-No.
-            rates% inverse_exp(i) = Ni - No ! We use this term in a log() expression in reaclib_eval
+            rates% inverse_exp(i) = Ni - No  ! We use this term in a log() expression in reaclib_eval
 
             ! Ni-No should be 0 for non-photo-disintegration reverse rates
             ! and >=1 for photos's in the reverse channel
-            if (Ni-No .ne. 0) then
+            if (Ni-No /= 0) then
                ! whether endothermic or exothermic,
                ! Ni-No handles the sign of Q from rates% inverse_coefficients(2,i)
                rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) * pow(fac, Ni-No)
@@ -251,9 +251,9 @@
                ! positive values of Q denote exothermic photodisintegrations
                ! We DIVIDE by fac^|Ni-No| as we want to compute
                ! rate_reverse/rate_photo
-            else ! Ni - No = 0
-               rates% inverse_exp(i) = 0 ! ensure this is 0.
-               rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i) ! no point calling pow(fac,0)
+            else  ! Ni - No = 0
+               rates% inverse_exp(i) = 0  ! ensure this is 0.
+               rates% inverse_coefficients(1,i) = rates% inverse_coefficients(1,i)  ! no point calling pow(fac,0)
             end if
             rates% inverse_coefficients(1,i) = log(rates% inverse_coefficients(1,i))
 
@@ -268,8 +268,8 @@
          use chem_lib
          character (len=*), intent(in) :: handle
          integer, intent(out) :: num_in, num_out
-         integer, intent(out) :: iso_ids(:) ! holds chem_ids for input and output species
-         character (len=*), intent(out) :: op ! e.g., 'pg', 'wk', 'to', or ...
+         integer, intent(out) :: iso_ids(:)  ! holds chem_ids for input and output species
+         character (len=*), intent(out) :: op  ! e.g., 'pg', 'wk', 'to', or ...
          integer, intent(out) :: ierr
 
          integer :: len, i, j, cnt, cid, extra_in, extra_out
@@ -283,14 +283,14 @@
          cnt = 0
          doing_inputs = .true.
          do while (i <= len)
-            call nxt ! set j to last char of token
+            call nxt  ! set j to last char of token
             cid = chem_get_iso_id(handle(i:j))
             if (cid == nuclide_not_found) then
                if (doing_inputs) then
                   op = handle(i:j)
                   extra_in = -1
                   extra_out = -1
-                  if (j == i+1) then ! check 2 character ops
+                  if (j == i+1) then  ! check 2 character ops
                      select case (op(1:1))
                         case ('p')
                            extra_in = ih1
@@ -431,7 +431,7 @@
          ec_flag = (reaction_flag == 'e')
          wk_flag = (reaction_flag == 'w')
 
-         if (ec_flag) then ! special cases
+         if (ec_flag) then  ! special cases
             if (reverse) then
                handle = ''
                return
@@ -703,7 +703,7 @@
          end function two_two
 
          subroutine do_n_to_m(n,m)
-            integer, intent(in) :: n, m ! each is either 1 or 2
+            integer, intent(in) :: n, m  ! each is either 1 or 2
             in1 = 0; in2 = 0; out1 = 0; out2 = 0
             if (.not. reverse) then
                in1 = pspecies(1)
@@ -751,11 +751,11 @@
          subroutine switch_if_necessary(iso1,iso2)
             integer, intent(inout) :: iso1, iso2
             integer :: j
-            if (nuclides% Z(iso2) == 1 .and. nuclides% N(iso2) == 0) then ! iso2 is ih1
+            if (nuclides% Z(iso2) == 1 .and. nuclides% N(iso2) == 0) then  ! iso2 is ih1
                j = iso1; iso1 = iso2; iso2 = j; return
             end if
-            if (nuclides% Z(iso2) == 2 .and. nuclides% N(iso2) == 2) then ! iso2 is ihe4
-               if (nuclides% Z(iso1) == 1 .and. nuclides% N(iso1) == 0) return ! iso1 is ih1
+            if (nuclides% Z(iso2) == 2 .and. nuclides% N(iso2) == 2) then  ! iso2 is ihe4
+               if (nuclides% Z(iso1) == 1 .and. nuclides% N(iso1) == 0) return  ! iso1 is ih1
                j = iso1; iso1 = iso2; iso2 = j; return
             end if
          end subroutine switch_if_necessary

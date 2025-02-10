@@ -84,7 +84,7 @@ module skye
          contained = is_contained(num_points, bounds, p)
          dist = min_distance_to_polygon(num_points, bounds, p)
 
-         if (contained) then ! Make distance negative for points inside the polygon
+         if (contained) then  ! Make distance negative for points inside the polygon
             dist = -dist
          end if
 
@@ -355,7 +355,7 @@ module skye
          F_ideal_ion = compute_F_ideal_ion(temp, den, abar, relevant_species, ACMI, ya)
 
          if (use_ion_offsets) then
-            F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id) ! Offset so ion ground state energy is zero.
+            F_ideal_ion = F_ideal_ion + compute_ion_offset(species, xa, chem_id)  ! Offset so ion ground state energy is zero.
          end if
 
          ! Ideal electron-positron thermodynamics (s, e, p)

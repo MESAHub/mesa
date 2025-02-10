@@ -57,8 +57,8 @@ module atm_def
 
   ! Atmosphere structure info
 
-  integer, parameter :: atm_xm = 1 ! mass of atm exterior to this point (g)
-  integer, parameter :: atm_delta_r = atm_xm+1 ! radial distance above base of envelope (cm)
+  integer, parameter :: atm_xm = 1  ! mass of atm exterior to this point (g)
+  integer, parameter :: atm_delta_r = atm_xm+1  ! radial distance above base of envelope (cm)
   integer, parameter :: atm_lnP = atm_delta_r+1
   integer, parameter :: atm_lnd = atm_lnP+1
   integer, parameter :: atm_lnT = atm_lnd+1

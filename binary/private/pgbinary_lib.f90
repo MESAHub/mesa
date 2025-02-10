@@ -177,7 +177,7 @@ contains
    subroutine binary_shutdown_pgbinary(id, ierr)
       use pgbinary, only : shutdown_pgbinary
       use binary_def, only : binary_info, binary_ptr
-      integer, intent(in) :: id ! id for star
+      integer, intent(in) :: id  ! id for star
       integer, intent(out) :: ierr
       type (binary_info), pointer :: b
       ierr = 0

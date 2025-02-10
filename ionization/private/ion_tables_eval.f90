@@ -50,13 +50,13 @@
 
          ! INPUT
 
-         real(dp), intent(in) :: Z_in ! the desired Z
-         real(dp), intent(in) :: X_in ! the desired X
+         real(dp), intent(in) :: Z_in  ! the desired Z
+         real(dp), intent(in) :: X_in  ! the desired X
 
-         real(dp), intent(in) :: arho, alogrho ! the density
+         real(dp), intent(in) :: arho, alogrho  ! the density
             ! provide both if you have them.  else pass one and set the other to = arg_not_provided
 
-         real(dp), intent(in) :: atemp, alogtemp ! the temperature
+         real(dp), intent(in) :: atemp, alogtemp  ! the temperature
             ! provide both if you have them.  else pass one and set the other to = arg_not_provided
 
 
@@ -81,7 +81,7 @@
             lnE, energy, dlnE_dlnRho, dlnE_dlnT, &
             lnS, entropy, dlnS_dlnRho, dlnS_dlnT, &
             d_alfa_dlogT, d_alfa_dlogRho, d_beta_dlogT, d_beta_dlogRho
-         real(dp), parameter :: dZ_transition = 0.01d0 ! must be > 0
+         real(dp), parameter :: dZ_transition = 0.01d0  ! must be > 0
          real(dp), parameter :: logT_margin = 0.1d0
          real(dp), parameter :: tiny = 1d-20
 
@@ -226,7 +226,7 @@
             Z1 = ion_Zs(iz1)
             Z2 = ion_Zs(iz2)
             alfa = (Z - Z1) / (Z2 - Z1)
-            alfa = (1 - cospi(alfa))/2 ! smooth the transitions
+            alfa = (1 - cospi(alfa))/2  ! smooth the transitions
             beta = 1 - alfa
             call Get_ion_for_X(iz1, X, Rho, logRho, T, logT, res_zx(:, 1), ierr)
             if (ierr /= 0) return
@@ -242,7 +242,7 @@
 
 
       subroutine Get_ion_for_X(iz, X, Rho, logRho, T, logT,res, ierr)
-         integer, intent(in) :: iz ! the index in ion_Zs
+         integer, intent(in) :: iz  ! the index in ion_Zs
          real(dp), intent(in) :: X, Rho, logRho, T, logT
          real(dp), intent(inout) :: res(num_ion_vals)
          integer, intent(out) :: ierr
@@ -252,7 +252,7 @@
          character (len=256) :: message
          integer :: ix, ix_lo, ix_hi, j, num_Xs
          real(dp), parameter :: tiny = 1d-6
-         logical, parameter :: dbg_for_X = dbg ! .or. .true.
+         logical, parameter :: dbg_for_X = dbg  ! .or. .true.
 
          ierr = 0
 

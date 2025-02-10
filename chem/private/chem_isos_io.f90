@@ -58,11 +58,11 @@
                write(*,*) 'unable to open '// trim(filename)
                return
             end if
-            read(iounit,'(A)') buf! skip line 1
+            read(iounit,'(A)') buf  ! skip line 1
 
             if (pass == 1) then
 
-               do ! 4 lines per nuclide
+               do  ! 4 lines per nuclide
                   read(iounit, *, iostat=ierr)
                   if (ierr /= 0) exit
                   read(iounit, *, iostat=ierr)
@@ -222,7 +222,7 @@
       subroutine do_create_nuclides_dict(nuclides, nuclides_dict, ierr)
          use utils_lib, only: integer_dict_define, integer_dict_create_hash, integer_dict_lookup
          type(nuclide_data), intent(in) :: nuclides
-         type (integer_dict), pointer :: nuclides_dict ! will be allocated
+         type (integer_dict), pointer :: nuclides_dict  ! will be allocated
          integer, intent(out) :: ierr
          integer :: i
 

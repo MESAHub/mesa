@@ -498,9 +498,9 @@ contains
            integer, intent(out) :: ierr
          end function interp_y
       end interface
-      integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+      integer, intent(out) :: irtrn  ! < 0 causes solver to return to calling program.
 
-      irtrn = 0 ! for ifort
+      irtrn = 0  ! for ifort
 
       ! Dummy routine that's never called
 
@@ -831,12 +831,12 @@ contains
 
       ! Store data
 
-      atm_structure_sgl(atm_xm) = 0._dp ! We assume negligible mass in the atmosphere
+      atm_structure_sgl(atm_xm) = 0._dp  ! We assume negligible mass in the atmosphere
       atm_structure_sgl(atm_delta_r) = delta_r
       atm_structure_sgl(atm_lnP) = lnP
       atm_structure_sgl(atm_lnd) = lnRho
       atm_structure_sgl(atm_lnT) = lnT
-      atm_structure_sgl(atm_gradT) = gradr ! by assumption, atm is radiative
+      atm_structure_sgl(atm_gradT) = gradr  ! by assumption, atm is radiative
       atm_structure_sgl(atm_kap) = kap
       atm_structure_sgl(atm_gamma1) = res(i_gamma1)
       atm_structure_sgl(atm_grada) = res(i_grad_ad)

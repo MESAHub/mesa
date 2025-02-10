@@ -39,9 +39,9 @@
       ! approximation, and for the Potekhin-Cabrier-based fit to the MKB
       ! results for the mean field potential H(r).
       ! hence, here are parameters for smoothly limiting the domain of application
-      real(dp), parameter ::   gamfitlim = 600.0d0 !< upper limit for applicability of fit for h(gamma)
+      real(dp), parameter ::   gamfitlim = 600.0d0  !< upper limit for applicability of fit for h(gamma)
       real(dp), parameter ::   g0 = 590.0d0        !< lower limit to start blending from
-      real(dp), parameter ::   deltagam = gamfitlim - g0 ! How much to blend over the gamma boundaries
+      real(dp), parameter ::   deltagam = gamfitlim - g0  ! How much to blend over the gamma boundaries
       real(dp), parameter ::   tp2 = 0.2d0         !< minimum allowed ratio T/T_p before fading out
       real(dp), parameter ::   tp1 = 0.1d0         !< floor value of T/T_p (T_p = plasma temperature)
       real(dp), parameter ::   deltatp = tp2 - tp1         !< Blend over the tp boundary
@@ -85,12 +85,12 @@
          real(dp) ::   z1z2       !< z1*z2
          real(dp) ::   t1, dt1dt, dt1dd
          real(dp) ::   t2, dt2dt, dt2dd
-         real(dp) ::   t3, dt3dt, dt3dd !< the three terms in the fitting formula for h0fit
-         real(dp) ::   h0fit, dh0fitdt, dh0fitdd !< mean field fit
+         real(dp) ::   t3, dt3dt, dt3dd  !< the three terms in the fitting formula for h0fit
+         real(dp) ::   h0fit, dh0fitdt, dh0fitdd  !< mean field fit
          real(dp) ::   denom, ddenomdt, ddenomdd, denom2
          real(dp) ::   tp, dtpdd, wp, dwpdd     !< plasma temperature and frequency
          real(dp) ::   tn, dtndd, dtndt         !< normalised temperature (tk/tp)
-         real(dp) ::   beta, dbetadt, dbetadd, gama, dgamadt, dgamadd !< coeffs of zeta formula
+         real(dp) ::   beta, dbetadt, dbetadd, gama, dgamadt, dgamadd  !< coeffs of zeta formula
          real(dp) ::   gam, dgamdt, dgamdd
          real(dp) ::   gamtild, dgamtilddt, dgamtilddd    !< "effective" coulomb coupling parameter
          real(dp) ::   gamtild2   !< "effective" coulomb coupling parameter squared
@@ -131,7 +131,7 @@
          temp = sc% temp
          zbar = sc% zbar
          abar = sc% abar
-         rr = sc% rr ! den/abar
+         rr = sc% rr  ! den/abar
 
          ! ion masses and number densities
          mav   = abar * amu
@@ -143,8 +143,8 @@
          !a_e = pow((3.d0 /(pi4 * zbar * ntot)),x13)
          a_e = sc% a_e
 
-         a_1 = a_e * pre_z(int(z1))%z1_3 !pow(z1,x13)
-         a_2 = a_e * pre_z(int(z2))%z1_3 !pow(z2,x13)
+         a_1 = a_e * pre_z(int(z1))%z1_3  !pow(z1,x13)
+         a_2 = a_e * pre_z(int(z2))%z1_3  !pow(z2,x13)
 
          da_1dd = -x13 * a_1/rho
          da_2dd = -x13 * a_2/rho
@@ -178,13 +178,13 @@
          denom = tp * (tk * dtpdd - tp * dtkdd)/(tk * tk * tk)
 
          ! Blend out for low Tp values
-         if ( tn .le. tp1)then
+         if ( tn <= tp1)then
             tk = tp1 * tp
             dtkdt = 0d0
             dtkdd = tp1 * dtpdd
-            denom = 0d0 ! Set as zero otherwise floating point issues cause small error in the subtraction (tk * dtpdd - tp * dtkdd)
+            denom = 0d0  ! Set as zero otherwise floating point issues cause small error in the subtraction (tk * dtpdd - tp * dtkdd)
 
-         else if (tn .gt.tp1 .and. tn .le. tp2) then
+         else if (tn >tp1 .and. tn <= tp2) then
 
             alpha = 0.5d0 * (1d0 - cospi((tn-tp1)/deltatp))
             dalphadtn = 0.5d0 * (pi/deltatp) * sinpi((tn-tp1)/deltatp)
@@ -217,7 +217,7 @@
             dgamdt = 0d0
             dgamdd = 0d0
 
-         else if (gam .le. gamfitlim .and. gam .ge. g0 ) then
+         else if (gam <= gamfitlim .and. gam >= g0 ) then
             alpha = 0.5d0 * (1d0 - cospi((gam-g0)/deltagam))
             dalphadgam = 0.5d0 * pi * sinpi((gam-g0)/deltagam) * (1d0/deltagam)
             beta = 1.d0 - alpha
@@ -247,7 +247,7 @@
 
          U = (1d0 + alfa * zeta + beta * zeta2 + gama * zeta3)
          denom = pow(U,-x13)
-         denom2 = denom/U ! pow(U,-x43)
+         denom2 = denom/U  ! pow(U,-x43)
          ddenomdt = -x13 * denom2 * &
                      ((alfa * dzetadt)  + (zeta2 * dbetadt + 2d0 * dzetadt * beta * zeta) + &
                      (zeta3 * dgamadt + 3d0 * dzetadt * gama * zeta2 ))

@@ -42,25 +42,25 @@
             ierr)
             use const_def, only: dp
             implicit none
-            integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+            integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
             integer, intent(in) :: species
-            integer, pointer :: chem_id(:) ! maps species to chem id
+            integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-            integer, pointer :: net_iso(:) ! maps chem id to species number
+            integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-            real(dp), intent(in) :: xa(:) ! mass fractions
+            real(dp), intent(in) :: xa(:)  ! mass fractions
 
-            real(dp), intent(in) :: Rho, logRho ! the density
-            real(dp), intent(in) :: T, logT ! the temperature
+            real(dp), intent(in) :: Rho, logRho  ! the density
+            real(dp), intent(in) :: T, logT  ! the temperature
 
-            real(dp), intent(out) :: frac ! fraction of other_eos to use
-            real(dp), intent(out) :: dfrac_dlogRho ! its partial derivative at constant T
+            real(dp), intent(out) :: frac  ! fraction of other_eos to use
+            real(dp), intent(out) :: dfrac_dlogRho  ! its partial derivative at constant T
             real(dp), intent(out) :: dfrac_dlogT   ! its partial derivative at constant Rho
 
-            integer, intent(out) :: ierr ! 0 means AOK.
+            integer, intent(out) :: ierr  ! 0 means AOK.
          end subroutine other_eos_frac_interface
 
          subroutine other_eos_interface( &
@@ -70,29 +70,29 @@
             res, d_dlnd, d_dlnT, d_dxa, ierr)
             use const_def, only: dp
             implicit none
-            integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+            integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
             integer, intent(in) :: species
-            integer, pointer :: chem_id(:) ! maps species to chem id
-            integer, pointer :: net_iso(:) ! maps chem id to species number
-            real(dp), intent(in) :: xa(:) ! mass fractions
+            integer, pointer :: chem_id(:)  ! maps species to chem id
+            integer, pointer :: net_iso(:)  ! maps chem id to species number
+            real(dp), intent(in) :: xa(:)  ! mass fractions
 
-            real(dp), intent(in) :: Rho, logRho ! the density
-            real(dp), intent(in) :: T, logT ! the temperature
+            real(dp), intent(in) :: Rho, logRho  ! the density
+            real(dp), intent(in) :: T, logT  ! the temperature
 
-            real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
-            real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_basic_results,species)
+            real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+            real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_basic_results,species)
 
-            integer, intent(out) :: ierr ! 0 means AOK.
+            integer, intent(out) :: ierr  ! 0 means AOK.
          end subroutine other_eos_interface
 
       end interface
 
 
       logical, parameter :: show_allocations = .false.  ! for debugging memory usage
-      integer, parameter :: eos_name_length = 20 ! String length for storing EOS variable names
+      integer, parameter :: eos_name_length = 20  ! String length for storing EOS variable names
 
 
       ! cgs units
@@ -165,7 +165,7 @@
 
       ! eos frac entries correspond to the slice
       ! i_frac:i_frac+num_eos_frac_results-1
-      integer, parameter :: i_frac = i_frac_HELM ! first frac entry
+      integer, parameter :: i_frac = i_frac_HELM  ! first frac entry
       integer, parameter :: num_eos_frac_results = 7
 
       integer, parameter :: num_eos_basic_results = i_frac_ideal
@@ -181,7 +181,7 @@
       ! even though their values are not basic EOS results
 
       integer, parameter :: i_logPtot = 0  ! log10 total pressure (gas + radiation)
-      integer, parameter :: i_egas = -1 ! gas specific energy density (no radiation)
+      integer, parameter :: i_egas = -1  ! gas specific energy density (no radiation)
 
 
       ! NOTE: the calculation of eta is based on the following equation for ne,
@@ -219,26 +219,26 @@
 
       type (DT_XZ_Info), target :: eosDT_XZ_struct, FreeEOS_XZ_struct
 
-      integer, parameter :: sz_per_eos_point = 4 ! for bicubic spline interpolation
+      integer, parameter :: sz_per_eos_point = 4  ! for bicubic spline interpolation
 
       type EoS_General_Info
 
          ! limits for HELM
-         real(dp) :: Z_all_HELM ! all HELM for Z >= this unless eos_use_FreeEOS
-         real(dp) :: logT_all_HELM ! all HELM for lgT >= this
-         real(dp) :: logT_low_all_HELM ! all HELM for lgT <= this
+         real(dp) :: Z_all_HELM  ! all HELM for Z >= this unless eos_use_FreeEOS
+         real(dp) :: logT_all_HELM  ! all HELM for lgT >= this
+         real(dp) :: logT_low_all_HELM  ! all HELM for lgT <= this
          real(dp) :: coulomb_temp_cut_HELM, coulomb_den_cut_HELM
 
          ! limits for OPAL_SCVH
          logical :: use_OPAL_SCVH
-         real(dp) :: logT_low_all_SCVH ! SCVH for lgT >= this
-         real(dp) :: logT_all_OPAL ! OPAL for lgT <= this
-         real(dp) :: logRho1_OPAL_SCVH_limit ! don't use OPAL_SCVH for logRho > this
-         real(dp) :: logRho2_OPAL_SCVH_limit ! full OPAL_SCVH okay for logRho < this
-         real(dp) :: logRho_min_OPAL_SCVH_limit ! no OPAL/SCVH for logRho < this
-         real(dp) :: logQ_max_OPAL_SCVH ! no OPAL/SCVH for logQ > this
-         real(dp) :: logQ_min_OPAL_SCVH ! no OPAL/SCVH for logQ <= this.
-         real(dp) :: Z_all_OPAL ! all OPAL for Z <= this
+         real(dp) :: logT_low_all_SCVH  ! SCVH for lgT >= this
+         real(dp) :: logT_all_OPAL  ! OPAL for lgT <= this
+         real(dp) :: logRho1_OPAL_SCVH_limit  ! don't use OPAL_SCVH for logRho > this
+         real(dp) :: logRho2_OPAL_SCVH_limit  ! full OPAL_SCVH okay for logRho < this
+         real(dp) :: logRho_min_OPAL_SCVH_limit  ! no OPAL/SCVH for logRho < this
+         real(dp) :: logQ_max_OPAL_SCVH  ! no OPAL/SCVH for logQ > this
+         real(dp) :: logQ_min_OPAL_SCVH  ! no OPAL/SCVH for logQ <= this.
+         real(dp) :: Z_all_OPAL  ! all OPAL for Z <= this
 
          ! limits for FreeEOS
          logical :: use_FreeEOS
@@ -267,39 +267,39 @@
 
          ! limits for CMS
          logical :: use_CMS, CMS_use_fixed_composition
-         integer :: CMS_fixed_composition_index ! in [0,10]
-         real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS ! set to -1 to disable CMS
+         integer :: CMS_fixed_composition_index  ! in [0,10]
+         real(dp) :: max_Z_for_any_CMS, max_Z_for_all_CMS  ! set to -1 to disable CMS
          real(dp) :: logQ_max_for_any_CMS, logQ_max_for_all_CMS      ! for upper blend zone in logQ = logRho - 2*logT + 12
          real(dp) :: logQ_min_for_any_CMS, logQ_min_for_all_CMS      ! for lower blend zone in logQ
          real(dp) :: logRho_max_for_all_CMS, logRho_max_for_any_CMS  ! for upper blend zone in logRho
          real(dp) :: logRho_min_for_all_CMS, logRho_min_for_any_CMS  ! for lower blend zone in logRho
          real(dp) :: logT_max_for_all_CMS, logT_max_for_any_CMS      ! for upper blend zone in logT
          real(dp) :: logT_min_for_all_CMS, logT_min_for_any_CMS      ! for lower blend zone in logT
-         real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He ! upper logT blend zone is different for pure He
+         real(dp) :: logT_max_for_all_CMS_pure_He, logT_max_for_any_CMS_pure_He  ! upper logT blend zone is different for pure He
 
          ! limits for PC
          logical :: use_PC
-         real(dp) :: mass_fraction_limit_for_PC ! skip any species with abundance < this
-         real(dp) :: logRho1_PC_limit ! okay for pure PC for logRho > this
-         real(dp) :: logRho2_PC_limit ! don't use PC for logRho < this (>= 2.8)
+         real(dp) :: mass_fraction_limit_for_PC  ! skip any species with abundance < this
+         real(dp) :: logRho1_PC_limit  ! okay for pure PC for logRho > this
+         real(dp) :: logRho2_PC_limit  ! don't use PC for logRho < this (>= 2.8)
          logical :: PC_use_Gamma_limit_instead_of_T
-         real(dp) :: logT1_PC_limit ! okay for pure PC for logT < this (like logT_all_OPAL)
-         real(dp) :: logT2_PC_limit ! don't use PC for logT > this (like logT_all_HELM)
-         real(dp) :: log_Gamma_e_all_HELM ! HELM for log_Gamma_e <= this
-         real(dp) :: Gamma_e_all_HELM ! 10**log_Gamma_e_all_HELM
-         real(dp) :: log_Gamma_e_all_PC ! PC for log_Gamma_e >= this
+         real(dp) :: logT1_PC_limit  ! okay for pure PC for logT < this (like logT_all_OPAL)
+         real(dp) :: logT2_PC_limit  ! don't use PC for logT > this (like logT_all_HELM)
+         real(dp) :: log_Gamma_e_all_HELM  ! HELM for log_Gamma_e <= this
+         real(dp) :: Gamma_e_all_HELM  ! 10**log_Gamma_e_all_HELM
+         real(dp) :: log_Gamma_e_all_PC  ! PC for log_Gamma_e >= this
          real(dp) :: tiny_fuzz
          ! crystallization boundaries
-         real(dp) :: PC_Gamma_start_crystal ! Begin releasing latent heat of crystallization
-         real(dp) :: PC_Gamma_full_crystal ! Fully into the solid phase
+         real(dp) :: PC_Gamma_start_crystal  ! Begin releasing latent heat of crystallization
+         real(dp) :: PC_Gamma_full_crystal  ! Fully into the solid phase
 
          ! limits for Skye
          logical :: use_Skye
          logical :: Skye_use_ion_offsets
          real(dp) :: mass_fraction_limit_for_Skye
-         real(dp) :: Skye_min_gamma_for_solid ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
-         real(dp) :: Skye_max_gamma_for_liquid ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
-         character(len=128) :: Skye_solid_mixing_rule ! Currently support 'Ogata' or 'PC'
+         real(dp) :: Skye_min_gamma_for_solid  ! The minimum Gamma_i at which to use the solid free energy fit (below this, extrapolate).
+         real(dp) :: Skye_max_gamma_for_liquid  ! The maximum Gamma_i at which to use the liquid free energy fit (above this, extrapolate).
+         character(len=128) :: Skye_solid_mixing_rule  ! Currently support 'Ogata' or 'PC'
 
          logical :: use_simple_Skye_blends
          real(dp) :: logRho_min_for_any_Skye, logRho_min_for_all_Skye
@@ -357,13 +357,13 @@
 
       ! for mesa (logQ,logT) tables
       type EosDT_XZ_Info
-         real(dp) :: logQ_min ! logQ = logRho - 2*logT + 12
+         real(dp) :: logQ_min  ! logQ = logRho - 2*logT + 12
          real(dp) :: logQ_max
-         real(dp) :: del_logQ ! spacing for the logQs
+         real(dp) :: del_logQ  ! spacing for the logQs
          integer :: num_logQs
          real(dp) :: logT_min
          real(dp) :: logT_max
-         real(dp) :: del_logT ! spacing for the logTs
+         real(dp) :: del_logT  ! spacing for the logTs
          integer :: num_logTs
          real(dp), pointer :: logQs(:), logTs(:)
          real(dp), pointer :: tbl1(:)
@@ -389,17 +389,17 @@
       integer, parameter :: FITION_vals = 6
       real(dp), pointer :: FITION9_lnGAMIs(:)
       type (FITION_Info), target :: FITION_data(FITION_vals)
-      logical :: FITION9_loaded ! all get created at once
+      logical :: FITION9_loaded  ! all get created at once
 
       ! interpolation info for eosPC support tables, FSCRliq8 and EXCOR7
       type eosPC_Support_Info
          integer :: Zion, nlnRS, nlnGAME, nvals
          real(dp) :: lnRS_min, lnRS_max, dlnRS
          real(dp) :: lnGAME_min, lnGAME_max, dlnGAME
-         real(dp), pointer :: lnRSs(:) ! (nlnRS)
-         real(dp), pointer :: lnGAMEs(:) ! (nlnGAME)
-         real(dp), pointer :: tbl1(:) ! (4,nvals,nlnRS,nlnGAME)
-         real(dp), pointer :: tbl(:,:,:,:) ! => tbl1(:)
+         real(dp), pointer :: lnRSs(:)  ! (nlnRS)
+         real(dp), pointer :: lnGAMEs(:)  ! (nlnGAME)
+         real(dp), pointer :: tbl1(:)  ! (4,nvals,nlnRS,nlnGAME)
+         real(dp), pointer :: tbl(:,:,:,:)  ! => tbl1(:)
       end type eosPC_Support_Info
 
       integer, parameter :: max_FSCRliq8_Zion = max_el_z
@@ -419,7 +419,7 @@
       character(len=1000) :: eosDT_temp_cache_dir
 
       logical :: eos_test_partials
-      real(dp) :: eos_test_partials_val, eos_test_partials_dval_dx ! for dfridr from star
+      real(dp) :: eos_test_partials_val, eos_test_partials_dval_dx  ! for dfridr from star
 
 
       contains
@@ -459,18 +459,18 @@
                0.3d0, 0.4d0, 0.5d0, 0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0 /)
          FreeEOS_XZ_ptr% nXs_for_Z(1:num_FreeEOS_Zs) = &
             (/ 11, 11, 11, 11, 11, 4, 3, 3, 3, 3, 3, 3, 3, 2, 1 /)
-         do i=1,5 ! 0.0 to 0.08
+         do i=1,5  ! 0.0 to 0.08
             FreeEOS_XZ_ptr% Xs_for_Z(1:11,i) = &
                (/ 0.0d0, 0.1d0, 0.2d0, 0.3d0, 0.4d0, 0.5d0, &
                   0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) /)
          end do
-         FreeEOS_XZ_ptr% Xs_for_Z(1:4,6) = (/ 0.0d0, 0.1d0, 0.4d0, 0.9d0 /) ! 0.1
-         do i=7,13 ! 0.2, 0.8
+         FreeEOS_XZ_ptr% Xs_for_Z(1:4,6) = (/ 0.0d0, 0.1d0, 0.4d0, 0.9d0 /)  ! 0.1
+         do i=7,13  ! 0.2, 0.8
             FreeEOS_XZ_ptr% Xs_for_Z(1:3,i) = &
                (/ 0.0d0, 0.1d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) /)
          end do
-         FreeEOS_XZ_ptr% Xs_for_Z(1:2,14) = (/ 0.0d0, 0.1d0 /) ! 0.9
-         FreeEOS_XZ_ptr% Xs_for_Z(1,15) = 0.0d0 ! 1.0
+         FreeEOS_XZ_ptr% Xs_for_Z(1:2,14) = (/ 0.0d0, 0.1d0 /)  ! 0.9
+         FreeEOS_XZ_ptr% Xs_for_Z(1,15) = 0.0d0  ! 1.0
 
          eosDT_XZ_loaded(:,:) = .false.
          eosSCVH_XZ_loaded(:,:)=.false.

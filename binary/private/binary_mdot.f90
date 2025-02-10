@@ -378,7 +378,7 @@
             if (.not. do_cubic) then
                mdot_next = (b% mdot_hi+b% mdot_lo)/2.0d0
             end if
-         else if (b% have_mdot_lo) then ! don't have mdot_hi
+         else if (b% have_mdot_lo) then  ! don't have mdot_hi
             if (new_function_to_solve < 0) then
                b% mdot_hi = mdot_current
                b% implicit_function_hi = new_function_to_solve
@@ -386,12 +386,12 @@
                mdot_next = (b% mdot_hi+b% mdot_lo)/2.0d0
                !mdot_next = find0(b% mdot_lo, b% implicit_function_lo, &
                !    b% mdot_hi, b% implicit_function_hi)
-            else ! still too low
+            else  ! still too low
                b% mdot_lo = mdot_current
                b% implicit_function_lo = new_function_to_solve
                mdot_next = b% mdot_lo*b% change_factor
             end if
-         else if (b% have_mdot_hi) then ! don't have mdot_lo
+         else if (b% have_mdot_hi) then  ! don't have mdot_lo
             if (new_function_to_solve >= 0) then
                b% mdot_lo = mdot_current
                b% implicit_function_lo = new_function_to_solve
@@ -399,7 +399,7 @@
                mdot_next = (b% mdot_hi+b% mdot_lo)/2.0d0
                !mdot_next = find0(b% mdot_lo, b% implicit_function_lo, &
                !    b% mdot_hi, b% implicit_function_hi)
-            else ! mdot still too high
+            else  ! mdot still too high
                b% mdot_hi = mdot_current
                b% implicit_function_hi = new_function_to_solve
                if (use_sum .and. mod(b% num_tries, 2) == 0) then
@@ -408,8 +408,8 @@
                   mdot_next = b% mdot_hi/b% change_factor
                end if
             end if
-         else ! don't have either
-            if (mdot_current > starting_mdot .and. (.not. abs(mdot_current) > 0)) then ! recall that both are negative
+         else  ! don't have either
+            if (mdot_current > starting_mdot .and. (.not. abs(mdot_current) > 0)) then  ! recall that both are negative
                mdot_next = starting_mdot
             else if (new_function_to_solve >= 0) then
                b% mdot_lo = mdot_current
@@ -435,8 +435,8 @@
          use utils_lib, only: is_bad
 
          integer, intent(in) :: binary_id
-         real(dp), intent(out) :: mdot_edd ! eddington accretion rate
-         real(dp), intent(out) :: mdot_edd_eta ! fraction of rest mass energy released as radiation
+         real(dp), intent(out) :: mdot_edd  ! eddington accretion rate
+         real(dp), intent(out) :: mdot_edd_eta  ! fraction of rest mass energy released as radiation
          integer, intent(out) :: ierr
          type(binary_info), pointer :: b
          include 'formats'
@@ -578,17 +578,17 @@
                end if
             end if
 
-            b% accretion_luminosity = 0d0 !only set for point mass
+            b% accretion_luminosity = 0d0  !only set for point mass
 
          else if (.not. b% CE_flag) then
             ! accretor is a point mass
             if (.not. b% model_twins_flag) then
                !combine wind and RLOF mass transfer
-               actual_mtransfer_rate = b% mtransfer_rate*b% fixed_xfer_fraction+b% mdot_wind_transfer(b% d_i) !defined negative
+               actual_mtransfer_rate = b% mtransfer_rate*b% fixed_xfer_fraction+b% mdot_wind_transfer(b% d_i)  !defined negative
                b% component_mdot(b% a_i) = -actual_mtransfer_rate
                ! restrict accretion to the Eddington limit
                if (b% limit_retention_by_mdot_edd .and. b% component_mdot(b% a_i) > b% mdot_edd) then
-                  b% component_mdot(b% a_i) = b% mdot_edd ! remove all accretion above the edd limit
+                  b% component_mdot(b% a_i) = b% mdot_edd  ! remove all accretion above the edd limit
                end if
                b% accretion_luminosity = &
                   b% mdot_edd_eta*b% component_mdot(b% a_i)*clight*clight
@@ -627,7 +627,7 @@
 
       end subroutine adjust_mdots
 
-      subroutine rlo_mdot(binary_id, mdot, ierr) ! Adapted from a routine kindly provided by Anastasios Fragkos
+      subroutine rlo_mdot(binary_id, mdot, ierr)  ! Adapted from a routine kindly provided by Anastasios Fragkos
          integer, intent(in) :: binary_id
          real(dp), intent(out) :: mdot
          integer, intent(out) :: ierr
@@ -696,13 +696,13 @@
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
-         rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
-         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
-         hp = p/(grav*rho) ! pressure scale height
+         rho = b% s_donor% rho(1)  ! density at surface in g/cm^3
+         p = b% s_donor% Peos(1)  ! pressure at surface in dynes/cm^2
+         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i))  ! local gravitational acceleration
+         hp = p/(grav*rho)  ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1)))
 
-         q = b% m(b% a_i)/b% m(b% d_i) ! Mass ratio, as defined in Ritter 1988
+         q = b% m(b% a_i)/b% m(b% d_i)  ! Mass ratio, as defined in Ritter 1988
                                        ! (Kolb & Ritter 1990 use the opposite!)
          ! consider range of validity for F1, do not extrapolate! Eq. A9 of Ritter 1988
          q_temp = min(max(q,0.5d0),10d0)
@@ -758,7 +758,7 @@
             (b% s_donor% r(indexR) - b% s_donor% r(indexR+1)) * (b% s_donor% Peos(i+1)-b% s_donor% Peos(i))
          mdot_thick = mdot_thick + F3*sqrt(kerg * b% s_donor% T(i) / (mp*b% s_donor% mu(i)))*d_P
 
-         q = b% m(b% a_i)/b% m(b% d_i) ! Mass ratio, as defined in Ritter 1988
+         q = b% m(b% a_i)/b% m(b% d_i)  ! Mass ratio, as defined in Ritter 1988
                                        ! (Kolb & Ritter 1990 use the opposite!)
          ! consider range of validity for F1, do not extrapolate! Eq. A9 of Ritter 1988
          q_temp = min(max(q,0.5d0),10d0)
@@ -784,7 +784,7 @@
                i=i+1
             end do
 
-            if (i .eq. 1) then
+            if (i == 1) then
                b% mdot_thick = 0d0
             else
                b% mdot_thick = calculate_kolb_mdot_thick(b, i-1, b% rl(b% d_i))
@@ -803,10 +803,10 @@
          !--------------------- Optically thin MT rate -----------------------------------------------
          ! Ritter 1988 but with better fits for the various formulas that work at extreme q
 
-         rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
-         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
-         hp = p/(grav*rho) ! pressure scale height
+         rho = b% s_donor% rho(1)  ! density at surface in g/cm^3
+         p = b% s_donor% Peos(1)  ! pressure at surface in dynes/cm^2
+         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i))  ! local gravitational acceleration
+         hp = p/(grav*rho)  ! pressure scale height
          v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1)))
 
          q = b% m(b% a_i) / b% m(b% d_i)
@@ -817,7 +817,7 @@
          Omega = 2.d0*pi / b% period
          rvL1 = b% rl(b% d_i)
          rv = b% r(b% d_i)
-         mfac1 = 1d0 + ma/md ! (md+ma)/md
+         mfac1 = 1d0 + ma/md  ! (md+ma)/md
          ! mfac2 = ( (md+ma)**2 + 3d0*ma*(md+ma) + 9d0*ma**2 ) / md**2
          mfac2 = 1d0 + 5d0*ma/md + 13d0*ma*ma/(md*md)
          rfac=rvL1/sep
@@ -846,11 +846,11 @@
          ! Optically thin MT rate adapted for eccentric orbits
          ! As described in H. Ritter 1988, A&A 202,93-100 and U. Kolb and H. Ritter 1990, A&A 236,385-392
 
-         rho = b% s_donor% rho(1) ! density at surface in g/cm^3
-         p = b% s_donor% Peos(1) ! pressure at surface in dynes/cm^2
-         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i)) ! local gravitational acceleration
-         hp = p/(grav*rho) ! pressure scale height
-         v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1))) ! kerg = Boltzmann's constant
+         rho = b% s_donor% rho(1)  ! density at surface in g/cm^3
+         p = b% s_donor% Peos(1)  ! pressure at surface in dynes/cm^2
+         grav = standard_cgrav*b% m(b% d_i)/pow2(b% r(b% d_i))  ! local gravitational acceleration
+         hp = p/(grav*rho)  ! pressure scale height
+         v_th = sqrt(kerg * b% s_donor% T(1) / (mp * b% s_donor% mu(1)))  ! kerg = Boltzmann's constant
 
          ! phase dependant RL radius
          do i = 1, b% anomaly_steps
@@ -858,7 +858,7 @@
                  (1 + b% eccentricity * cos(b% theta_co(i)) )
          end do
 
-         q = b% m(b% a_i)/b% m(b% d_i) ! Mass ratio, as defined in Ritter 1988
+         q = b% m(b% a_i)/b% m(b% d_i)  ! Mass ratio, as defined in Ritter 1988
                                        ! (Kolb & Ritter 1990 use the opposite!)
          q_temp = min(max(q,0.5d0),10d0)
          F1 = (1.23d0  + 0.5D0* log10(q_temp))
@@ -893,7 +893,7 @@
 
          !integrate to get total massloss
          dm = 0d0
-         do i = 2,b% anomaly_steps ! trapezoidal integration
+         do i = 2,b% anomaly_steps  ! trapezoidal integration
             dm = dm + 0.5d0 * (mdot(i-1) + mdot(i)) * (b% time_co(i) - b% time_co(i-1))
          end do
 
@@ -933,7 +933,7 @@
             end do
 
             ! calculate mdot_thick
-            if (j .eq. 1) then
+            if (j == 1) then
                mdot_thick_i(i) = 0d0
             else
                mdot_thick_i(i) = calculate_kolb_mdot_thick(b, j-1, rl_d_i(i))
@@ -944,7 +944,7 @@
 
          ! Integrate mdot_thick over the orbit
          dm = 0d0
-         do i = 2,b% anomaly_steps ! trapezoidal integration
+         do i = 2,b% anomaly_steps  ! trapezoidal integration
             dm = dm + 0.5d0 * (mdot_thick_i(i-1) + mdot_thick_i(i)) * &
                               (b% time_co(i) - b% time_co(i-1))
          end do
@@ -994,9 +994,9 @@
       subroutine set_accretion_composition(b, acc_index)
          use chem_def, only: chem_isos
          type (binary_info), pointer :: b
-         integer, intent(in) :: acc_index ! index of star that gains mass
+         integer, intent(in) :: acc_index  ! index of star that gains mass
 
-         integer j
+         integer :: j
 
          if (acc_index == b% a_i) then
             !set accreted material composition

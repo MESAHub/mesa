@@ -34,15 +34,15 @@
 
       ! args for adipls
       integer :: i_paramset, ierr_param, i_inout, nn
-      real(dp), pointer :: x(:) ! (nn)
-      real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)
+      real(dp), pointer :: x(:)  ! (nn)
+      real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)
       real(dp) :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
 
       integer :: iounit_dev_null = -1
 
-      integer :: nn_redist ! set from redistrb.c input file
+      integer :: nn_redist  ! set from redistrb.c input file
 
 
       real(dp), pointer :: x_arg(:), aa_arg(:,:)
@@ -115,8 +115,8 @@
 
          integer :: i, iriche, iturpr
          integer :: iconst, ivar, ivers
-         real(dp), allocatable :: global_data(:) ! (iconst)
-         real(dp), allocatable :: point_data(:,:) ! (ivar,nn)
+         real(dp), allocatable :: global_data(:)  ! (iconst)
+         real(dp), allocatable :: point_data(:,:)  ! (ivar,nn)
          character (len=2000) :: format_string, num_string, filename
 
          ierr = -1
@@ -185,10 +185,10 @@
          real(dp), intent(in) :: cgrav
          character (len=64) :: fname
          integer :: nn, iconst, ivar, ivers, ierr
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
-         real(dp), pointer :: x(:) ! (nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: x(:)  ! (nn)   will be allocated
          real(dp) :: data(8)
 
 
@@ -201,7 +201,7 @@
          integer, intent(inout) :: iturpr
          real(dp), intent(in) :: data(8)
          real(dp), pointer :: aa(:,:)
-         real(dp), pointer :: x(:) ! (nn)     will be allocated
+         real(dp), pointer :: x(:)  ! (nn)     will be allocated
          ! nn can be less than nn_in
          integer, intent(out) :: nn, ierr
 
@@ -221,10 +221,10 @@
          ! derived from fgong-amdl.d.f
          real(dp), intent(in) :: cgrav
          integer, intent(in) :: nn_in, iconst, ivar, ivers
-         real(dp), intent(inout) :: glob(:) ! (iconst)
-         real(dp), intent(inout) :: var(:,:) ! (ivar,nn_in)
+         real(dp), intent(inout) :: glob(:)  ! (iconst)
+         real(dp), intent(inout) :: var(:,:)  ! (ivar,nn_in)
          real(dp), intent(inout) :: data(8)
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
          integer, intent(out) :: nn, ierr
 
          integer, parameter :: ireset(16) = &
@@ -240,11 +240,11 @@
       subroutine read_fgong_file(fin, nn, iconst, ivar, ivers, glob, var, ierr)
          character (len=*), intent(in) :: fin
          integer, intent(out) :: nn, iconst, ivar, ivers
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)   will be allocated
          integer, intent(out) :: ierr
 
-         real(dp), pointer :: var1(:,:) ! (ivar,nn)
+         real(dp), pointer :: var1(:,:)  ! (ivar,nn)
          integer :: ios, iounit, i, n, ir, nn1
          character(80) :: head
 
@@ -257,8 +257,8 @@
       subroutine dump(filename_for_dump,nn,glob,var,ierr)
          character (len=*), intent(in) :: filename_for_dump
          integer, intent(in) :: nn
-         real(dp), pointer :: glob(:) ! (iconst)
-         real(dp), pointer :: var(:,:) ! (ivar,nn)
+         real(dp), pointer :: glob(:)  ! (iconst)
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
          ierr = -1
