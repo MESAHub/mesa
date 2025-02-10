@@ -2408,7 +2408,7 @@
          dlgm_per_step = rpar(2)
          relax_M_center_dt = rpar(3)
 
-         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0) &
+         if (mod(s% model_number, s% terminal_interval) == 0 .and. s% M_center>0.0d0) &
             write(*,1) 'relax_M_center target/current', new_mass/(s% M_center/Msun)
 
          end_now=.false.

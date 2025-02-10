@@ -406,7 +406,7 @@ contains
       end if
       ! at the centre d²P/dr² = -4πGρ²/3
       d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho(j)**2
-      P(j) = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+      P(j) = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
       T(j) = eval_center(s%rmid, s%T, 1, s%nz)
 
       N2(j) = 0d0
