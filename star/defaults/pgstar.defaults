@@ -88,24 +88,13 @@
       ! file_device
       ! ~~~~~~~~~~~
 
-      ! 'png' is Portable Network Graphics format
-      ! can also use:
-      ! 'ps' (in combination with file_extension = 'ps') for PostScript
-      ! or:
-      ! 'vcps' (in combination with file_extension = 'eps') for Encapsulated PostScript
+      ! 'png' for Portable Network Graphics format
+      ! 'vcps' for Color PostScript ('ps')
+      ! 'ps' for PostScript
 
       ! ::
 
     file_device = 'png'
-
-      ! file_extension
-      ! ~~~~~~~~~~~~~~
-
-      ! Can use: 'png', 'ps', or 'eps' with the appropriate file_device
-
-      ! ::
-
-    file_extension = 'png'
 
 
       ! file_digits
@@ -121,7 +110,7 @@
       ! delta_HR_limit_for_file_output
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! trigger file output by distance travelled on HR diagram
+      ! trigger file output by distance traveled on HR diagram
       ! negative means no limit
       ! HR distance since last file output = sum of dHR
       ! where per step dHR = same definition as used for timestep limits
