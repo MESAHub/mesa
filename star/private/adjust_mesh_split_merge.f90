@@ -168,7 +168,7 @@
             write(*,*) '                 split', num_split
             write(*,*) '                merged', num_merge
          end if
-         if (s% rotation_flag) then !update moments of inertia and omega
+         if (s% rotation_flag) then  !update moments of inertia and omega
             do k=1, s% nz
                r00 = get_r_from_xh(s,k)
                s% w_div_w_crit_roche(k) = &
@@ -182,7 +182,7 @@
 
          contains
 
-         subroutine split1 ! ratio of desired/actual is too large
+         subroutine split1  ! ratio of desired/actual is too large
             include 'formats'
             if (s% trace_split_merge_amr) then
                write(*,4) 'do_merge TooSmall', &
@@ -307,7 +307,7 @@
             k = nz
             xmin = log(tau_center)
             xmax = log(s% tau(1))
-            inner_dx_baseline = (xmin - xmax)/nz_baseline ! keep it > 0
+            inner_dx_baseline = (xmin - xmax)/nz_baseline  ! keep it > 0
             outer_dx_baseline = inner_dx_baseline
          else if (log_zoning) then
             xmin = log(max(1d0,s% R_center))
@@ -326,7 +326,7 @@
          TooSmall = 0d0
          iTooBig = -1
          iTooSmall = -1
-         xR = xmin ! start at center
+         xR = xmin  ! start at center
          do k = nz, 1, -1
 
             xL = xR
@@ -370,7 +370,7 @@
             else if (logtau_zoning) then
                xR = log(s% tau(k))
             else if (log_zoning) then
-               xR = log(s% r(k)) ! s% lnR(k) may not be set since making many changes
+               xR = log(s% r(k))  ! s% lnR(k) may not be set since making many changes
             else
                xR = s% r(k)
             end if
@@ -379,7 +379,7 @@
                   (s% split_merge_amr_avoid_repeated_remesh .and. &
                      s% amr_split_merge_has_undergone_remesh(k))) cycle
             dx_actual = xR - xL
-            if (logtau_zoning) dx_actual = -dx_actual ! make dx_actual > 0
+            if (logtau_zoning) dx_actual = -dx_actual  ! make dx_actual > 0
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
@@ -456,7 +456,7 @@
                   if (abs_du_div_cs > s% merge_amr_max_abs_du_div_cs) &
                      undersize_ratio = undersize_ratio * &
                         s% merge_amr_max_abs_du_div_cs/abs_du_div_cs
-                  if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then ! switch
+                  if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then  ! switch
                      TooSmall = undersize_ratio; iTooSmall = k
                   end if
                else if (TooSmall < undersize_ratio .and. &
@@ -508,7 +508,7 @@
             ! don't merge across change in most abundance species
             qi_max = maxloc(s% xa(1:species,i), dim=1)
             qim_max = maxloc(s% xa(1:species,i-1), dim=1)
-            if (qi_max == qim_max) then ! merge with smaller neighbor
+            if (qi_max == qim_max) then  ! merge with smaller neighbor
                if (i+1 == nz) then
                   drL = s% r(nz) - s% R_center
                else
@@ -679,11 +679,11 @@
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
+         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
 
          s% rmid_start(i) = -1
          call set_rmid(s, i, i, ierr)
-         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
+         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
 
          star_PE1 = get_star_PE(s)
          call revise_star_radius(s, star_PE0, star_PE1)
@@ -890,7 +890,7 @@
 
          dr = rR - rL
          dr_old = dr
-         rC = 0.5d0*(rR + rL) ! split at center by radius
+         rC = 0.5d0*(rR + rL)  ! split at center by radius
 
          dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
          dVR = four_thirds_pi*(rR*rR*rR - rC*rC*rC)
@@ -902,7 +902,7 @@
          if (s% u_flag) then
             v = s% u(i)
             v2 = v*v
-         else ! not used
+         else  ! not used
             v = 0
             v2 = 0
          end if
@@ -919,7 +919,7 @@
             iR = 1
             iC = 2
             iL = 3
-         else ! i == nz_old
+         else  ! i == nz_old
             iR = nz_old-2
             iC = nz_old-1
             iL = nz_old
@@ -944,7 +944,7 @@
          dRght = 0.5d0*(s% r(iR) - s% r(iL))
          dCntr = dLeft + dRght
 
-         if (s% equal_split_density_amr) then ! same density in both parts
+         if (s% equal_split_density_amr) then  ! same density in both parts
             rho_RR = 0
             grad_rho = 0d0
             use_new_grad_rho = .false.
@@ -977,7 +977,7 @@
             v2_C = v_C*v_C
             v_L = s% u(iL)
             v2_L = v_L*v_L
-            if ((v_L - v_C)*(v_C - v_R) <= 0) then ! not strictly monotonic velocities
+            if ((v_L - v_C)*(v_C - v_R) <= 0) then  ! not strictly monotonic velocities
                grad_v2 = 0d0
             else
                grad_v2 = get1_grad(v2_L, v2_C, v2_R, dLeft, dCntr, dRght)
@@ -1006,7 +1006,7 @@
             call mesa_error(__FILE__,__LINE__,'split failed')
          end if
 
-         if (i_split < nz_old) then ! move i_split..nz-1 to i_split+1..nz
+         if (i_split < nz_old) then  ! move i_split..nz-1 to i_split+1..nz
             do j=nz-1,i_split,-1
                jp = j+1
                do q=1,species
@@ -1045,7 +1045,7 @@
          s% amr_split_merge_has_undergone_remesh(ip) = .true.
 
          dM = rho*dV
-         if (.not. use_new_grad_rho) then ! do it the old way
+         if (.not. use_new_grad_rho) then  ! do it the old way
 
             rho_L = rho - grad_rho*dr/4
             rho_R = rho + grad_rho*dr/4
@@ -1055,7 +1055,7 @@
                rho_R = rho
                rho_L = rho
                dML = rho_L*dVL
-               dMR = dM - dML ! should = rhoR*dVR
+               dMR = dM - dML  ! should = rhoR*dVR
             else
                dML = rho_L*dVL
                dMR = rho_R*dVR
@@ -1116,7 +1116,7 @@
             rho_L = rho
             dM = rho*dV
             dML = rho_L*dVL
-            dMR = dM - dML ! should = rhoR*dVR
+            dMR = dM - dML  ! should = rhoR*dVR
          end if
 
          energy_R = energy + grad_energy*dr/4
@@ -1153,11 +1153,11 @@
                s% u(i) = -s% u(i)
                s% u(ip) = -s% u(ip)
             end if
-         else if (s% v_flag) then ! just make a rough approximation.
+         else if (s% v_flag) then  ! just make a rough approximation.
             s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
          end if
 
-         if (s% RTI_flag) then ! set new alpha
+         if (s% RTI_flag) then  ! set new alpha
             if (i == 1) then
                s% alpha_RTI(ip) = s% alpha_RTI(i)
             else
@@ -1186,12 +1186,12 @@
             do q=1,species
                s% xa(q,ip) = s% xa(q,i)
             end do
-         else ! split mass fractions
+         else  ! split mass fractions
             ! check that sum of grads for mass fractions is 0
             sumx = sum(grad_xa)
-            if (sumx > 0) then ! reduce largest grad
+            if (sumx > 0) then  ! reduce largest grad
                j = maxloc(grad_xa, dim=1)
-            else ! increase smallest grad
+            else  ! increase smallest grad
                j = minloc(grad_xa, dim=1)
             end if
             grad_xa(j) = 0
@@ -1227,8 +1227,8 @@
          s% dq(i) = s% dm(i)/s% xmstar
 
          s% r(ip) = rC
-         s% m(ip) = s% m(i) - s% dm(i) ! <<< using new value dm(i)
-         s% q(ip) = s% q(i) - s% dq(i) ! <<< using new value dq(i)
+         s% m(ip) = s% m(i) - s% dm(i)  ! <<< using new value dm(i)
+         s% q(ip) = s% q(i) - s% dq(i)  ! <<< using new value dq(i)
          s% dm(ip) = dmL
          s% dq(ip) = s% dm(ip)/s% xmstar
 
@@ -1244,7 +1244,7 @@
 
          if (s% rotation_flag) then
             ! WARNING! this is designed to conserve angular momentum, but not to explicitly conserve energy
-            j_rot_new = 0d0 ! specific angular momentum for the newly created cell
+            j_rot_new = 0d0  ! specific angular momentum for the newly created cell
             if (i==nz_old) then
                ! simple case, dm_bar contained in cells i and i+1 after merge is conserved,
                ! so use same j_rot
@@ -1299,15 +1299,15 @@
          end if
 
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          call update_xh_eos_and_kap(s,ip,species,new_xa,ierr)
-         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          s% rmid_start(i) = -1
          s% rmid_start(ip) = -1
          call set_rmid(s, i, ip, ierr)
-         if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          star_PE1 = get_star_PE(s)
          call revise_star_radius(s, star_PE0, star_PE1)

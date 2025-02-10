@@ -131,7 +131,7 @@
             case ('diffusion_D')
                call do1_nuclide(diffusion_D_offset)
 
-            case ('log') ! add log of abundance
+            case ('log')  ! add log of abundance
                call do1_nuclide(log_abundance_offset)
 
             case ('eps_neu_rate')
@@ -197,7 +197,7 @@
             ierr = -1
          end subroutine do1_nuclide
 
-         subroutine do1_rate(offset) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+         subroutine do1_rate(offset)  ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_lib, only: rates_reaction_id
             integer, intent(in) :: offset
             integer :: t, id
@@ -206,7 +206,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id
+            id = g% net_reaction(id)  ! Convert to net id not the gloabl rate id
             if (id > 0) then
                spec = offset + id
                return
@@ -254,7 +254,7 @@
          integer, intent(in) :: id, k
          integer :: int_val
          logical :: int_flag
-         if (id > max_profile_offset) then ! get from extras
+         if (id > max_profile_offset) then  ! get from extras
             get_profile_val = s% extra_profile_col_vals(k, id - max_profile_offset)
             return
          end if
@@ -502,7 +502,7 @@
             case (p_gradT_excess_effect)
                val = s% gradT_excess_effect(k)
             case (p_diff_grads)
-               val = s% gradr(k) - s% gradL(k) ! convective if this is > 0
+               val = s% gradr(k) - s% gradL(k)  ! convective if this is > 0
             case (p_log_diff_grads)
                val = safe_log10(abs(s% gradr(k) - s% gradL(k)))
             case (p_v)
@@ -1460,7 +1460,7 @@
             case (p_j_rot)
                val = if_rot(s% j_rot,k)
             case (p_v_rot)
-               val = if_rot(s% omega,k)*if_rot(s% r_equatorial,k)*1d-5 ! km/sec
+               val = if_rot(s% omega,k)*if_rot(s% r_equatorial,k)*1d-5  ! km/sec
             case (p_fp_rot)
                val = if_rot_ad(s% fp_rot,k, alt=1.0d0)
             case (p_ft_rot)
@@ -1547,7 +1547,7 @@
             case (p_am_domega_dlnR)
                val = if_rot(s% domega_dlnR,k)
 
-            case (p_am_log_sig) ! == am_log_sig_omega
+            case (p_am_log_sig)  ! == am_log_sig_omega
                val = safe_log10(if_rot(s% am_sig_omega,k))
             case (p_am_log_sig_omega)
                val = safe_log10(if_rot(s% am_sig_omega,k))
@@ -1943,15 +1943,15 @@
                if (s% rsp_flag) then
                   if (k > 1) then
                      val = s% Y_face(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Y_face(2)
                   end if
                end if
             case(p_rsp_gradT)
                if (s% rsp_flag) then
-                  if (k > 1) then ! Y is superadiabatic gradient
+                  if (k > 1) then  ! Y is superadiabatic gradient
                      val = s% Y_face(k) + 0.5d0*(s% grada(k-1) + s% grada(k))
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Y_face(2) + 0.5d0*(s% grada(1) + s% grada(2))
                   end if
                end if
@@ -1959,7 +1959,7 @@
                if (s% rsp_flag) then
                   if (k > 1) then
                      val = s% Uq(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Uq(2)
                   end if
                end if
@@ -1972,7 +1972,7 @@
                   val = s% Lc(k)
                   if (k > 1) then
                      val = s% Lc(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Lc(2)
                   end if
                end if
@@ -1980,7 +1980,7 @@
                if (s% rsp_flag) then
                   if (k > 1) then
                      val = s% Lc(k)/s% L(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Lc(2)/s% L(2)
                   end if
                end if
@@ -1988,7 +1988,7 @@
                if (s% rsp_flag) then
                   if (k > 1) then
                      val = s% Lt(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Lt(2)
                   end if
                end if
@@ -1996,14 +1996,14 @@
                if (s% rsp_flag) then
                   if (k > 1) then
                      val = s% Lt(k)/s% L(k)
-                  else ! for plotting, use value at k=2
+                  else  ! for plotting, use value at k=2
                      val = s% Lt(2)/s% L(2)
                   end if
                end if
 
-            case (p_total_energy) ! specific total energy at k
+            case (p_total_energy)  ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)/s% dm(k)
-            case (p_total_energy_sign) ! specific total energy at k
+            case (p_total_energy_sign)  ! specific total energy at k
                val = eval_cell_section_total_energy(s,k,k)
                if (val > 0d0) then
                   int_val = 1
@@ -2090,7 +2090,7 @@
                   sqrt(max(0d0,s% brunt_N2(k))/(3*s% cgrav(1)*s% m_grav(1)/pow3(s% r(1))))
             case (p_brunt_N)
                if (s% calculate_Brunt_N2) val = sqrt(max(0d0,s% brunt_N2(k)))
-            case (p_brunt_frequency) ! cycles per day
+            case (p_brunt_frequency)  ! cycles per day
                if (s% calculate_Brunt_N2) val = &
                   (secday/(2*pi))*sqrt(max(0d0,s% brunt_N2(k)))
             case (p_log_brunt_N)
@@ -2098,35 +2098,35 @@
             case (p_log_brunt_N2)
                if (s% calculate_Brunt_N2) val = safe_log10(s% brunt_N2(k))
 
-            case (p_brunt_nu) ! micro Hz
+            case (p_brunt_nu)  ! micro Hz
                if (s% calculate_Brunt_N2) val = s% brunt_N2(k)
                val = (1d6/(2*pi))*sqrt(max(0d0,val))
-            case (p_log_brunt_nu) ! micro Hz
+            case (p_log_brunt_nu)  ! micro Hz
                if (s% calculate_Brunt_N2) &
                   val = safe_log10((1d6/(2*pi))*sqrt(max(0d0,s% brunt_N2(k))))
 
             case (p_lamb_S)
-               val = sqrt(2d0)*s% csound_face(k)/s% r(k) ! for l=1
+               val = sqrt(2d0)*s% csound_face(k)/s% r(k)  ! for l=1
             case (p_lamb_S2)
-               val = 2d0*pow2(s% csound_face(k)/s% r(k)) ! for l=1
+               val = 2d0*pow2(s% csound_face(k)/s% r(k))  ! for l=1
 
             case (p_lamb_Sl1)
-               val = (1d6/(2*pi))*sqrt(2d0)*s% csound_face(k)/s% r(k) ! microHz
+               val = (1d6/(2*pi))*sqrt(2d0)*s% csound_face(k)/s% r(k)  ! microHz
             case (p_lamb_Sl2)
-               val = (1d6/(2*pi))*sqrt(6d0)*s% csound_face(k)/s% r(k) ! microHz
+               val = (1d6/(2*pi))*sqrt(6d0)*s% csound_face(k)/s% r(k)  ! microHz
             case (p_lamb_Sl3)
-               val = (1d6/(2*pi))*sqrt(12d0)*s% csound_face(k)/s% r(k) ! microHz
+               val = (1d6/(2*pi))*sqrt(12d0)*s% csound_face(k)/s% r(k)  ! microHz
             case (p_lamb_Sl10)
-               val = (1d6/(2*pi))*sqrt(110d0)*s% csound_face(k)/s% r(k) ! microHz
+               val = (1d6/(2*pi))*sqrt(110d0)*s% csound_face(k)/s% r(k)  ! microHz
 
             case (p_log_lamb_Sl1)
-               val = safe_log10((1d6/(2*pi))*sqrt(2d0)*s% csound_face(k)/s% r(k)) ! microHz
+               val = safe_log10((1d6/(2*pi))*sqrt(2d0)*s% csound_face(k)/s% r(k))  ! microHz
             case (p_log_lamb_Sl2)
-               val = safe_log10((1d6/(2*pi))*sqrt(6d0)*s% csound_face(k)/s% r(k)) ! microHz
+               val = safe_log10((1d6/(2*pi))*sqrt(6d0)*s% csound_face(k)/s% r(k))  ! microHz
             case (p_log_lamb_Sl3)
-               val = safe_log10((1d6/(2*pi))*sqrt(12d0)*s% csound_face(k)/s% r(k)) ! microHz
+               val = safe_log10((1d6/(2*pi))*sqrt(12d0)*s% csound_face(k)/s% r(k))  ! microHz
             case (p_log_lamb_Sl10)
-               val = safe_log10((1d6/(2*pi))*sqrt(110d0)*s% csound_face(k)/s% r(k)) ! microHz
+               val = safe_log10((1d6/(2*pi))*sqrt(110d0)*s% csound_face(k)/s% r(k))  ! microHz
 
             case (p_brunt_N_div_r_integral)
                if (s% calculate_Brunt_N2) val = get_brunt_N_div_r_integral(k)
@@ -2157,9 +2157,9 @@
 
             case (p_cs_at_cell_bdy)
                val = s% csound_face(k)
-            case (p_log_mdot_cs) ! log10(4 Pi r^2 csound rho / (Msun/year))
+            case (p_log_mdot_cs)  ! log10(4 Pi r^2 csound rho / (Msun/year))
                val = safe_log10(pi4*s% r(k)*s% r(k)*s% csound(k)*s% rho(k)/(Msun/secyer))
-            case (p_log_mdot_v) ! log10(4 Pi r^2 v rho / (Msun/year))
+            case (p_log_mdot_v)  ! log10(4 Pi r^2 v rho / (Msun/year))
                if (s% u_flag) then
                   val = safe_log10(4*pi*s% r(k)*s% r(k)*s% u_face_ad(k)%val*s% rho(k)/(Msun/secyer))
                else if (s% v_flag) then
@@ -2236,7 +2236,7 @@
          contains
 
 
-         real(dp) function get_L_vel(k) result(v) ! velocity if L carried by convection
+         real(dp) function get_L_vel(k) result(v)  ! velocity if L carried by convection
             integer, intent(in) :: k
             real(dp) :: rho_face
             integer :: j

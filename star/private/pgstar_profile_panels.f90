@@ -654,7 +654,7 @@
 
             xmin = get_profile_val(s, xaxis_id, nz)
             xmax = get_profile_val(s, xaxis_id, 1)
-            if (xmin > xmax) then ! switch
+            if (xmin > xmax) then  ! switch
                dx = xmin; xmin = xmax; xmax = dx
             end if
 
@@ -1000,7 +1000,7 @@
          xname = trim(panels_xaxis_name)
          call show_xaxis_label_pgstar(s,xname)
 
-         if (show_mix_regions) then ! show mix regions at bottom of plot
+         if (show_mix_regions) then  ! show mix regions at bottom of plot
             call pgslw(10)
             call show_mix_regions_on_xaxis( &
                s,ybot,ytop,grid_min,grid_max,unshifted_xvec)

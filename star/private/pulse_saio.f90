@@ -293,7 +293,7 @@ contains
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)/kap
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)/kap
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
+        nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         Y = eval_face(s%dq, s%Y, k, k_a, k_b, v_lo=0d0, v_hi=1d0)

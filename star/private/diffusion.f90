@@ -34,7 +34,7 @@
 
       implicit none
 
-      integer, parameter :: diffusion_min_nc = 4 ! minimum number of classes
+      integer, parameter :: diffusion_min_nc = 4  ! minimum number of classes
 
 
       logical, parameter :: use_dcoeff_dX = .true.
@@ -72,8 +72,8 @@
             min_Z_for_radaccel, max_Z_for_radaccel
             ! nc = number of classes of species
             ! m = nc+1
-         integer, intent(in) :: class(:) ! (species)
-         integer, intent(in) :: class_chem_id(:) ! (nc)
+         integer, intent(in) :: class(:)  ! (species)
+         integer, intent(in) :: class_chem_id(:)  ! (nc)
          integer, intent(in) :: net_iso(:), chem_id(:)
             ! class(i) = class number for species i. class numbers from 1 to nc
             ! class_chem_id(j) = isotope id number from chem_def for "typical" member of class j
@@ -91,16 +91,16 @@
             T_full_on, T_full_off, diffusion_factor(nc)
          integer, intent(in) :: max_steps, max_iters_total, max_iters_per_substep
          logical, intent(in) :: calculate_ionization
-         real(dp), intent(inout) :: typical_charge(:,:) ! (nc,nz)
+         real(dp), intent(inout) :: typical_charge(:,:)  ! (nc,nz)
          integer, intent(in) :: nsmooth_typical_charge
-         real(dp), intent(inout) :: xa(:,:) ! (species,nz) ! mass fractions
+         real(dp), intent(inout) :: xa(:,:)  ! (species,nz) ! mass fractions
          real(dp), intent(out), dimension(:,:) :: X_init, X_final, &
             D_self_face, v_advection_face, v_total_face, &
-            vlnP_face, vlnT_face, v_rad_face, g_rad_face ! (nc,nz)
-         real(dp), intent(inout) :: E_field_face(:) ! (nz)
-         real(dp), intent(inout) :: g_field_face(:) ! (nz)
+            vlnP_face, vlnT_face, v_rad_face, g_rad_face  ! (nc,nz)
+         real(dp), intent(inout) :: E_field_face(:)  ! (nz)
+         real(dp), intent(inout) :: g_field_face(:)  ! (nz)
          integer, intent(out) :: steps_used, total_num_iters, total_num_retries, ierr
-         integer, intent(inout) ::  nzlo, nzhi !upper and lower bounds on region
+         integer, intent(inout) ::  nzlo, nzhi  !upper and lower bounds on region
 
          integer :: i, j, k, num_iters, idiag, n, neqs, ku, kl, &
             ldab, ldafb, ldb, ldx, h1, he4, nbound, bad_j, bad_k, &
@@ -229,8 +229,8 @@
          nzlo=nbound
 
          allocate( &
-            e_ap(nz), e_at(nz), e_ar(nz), e_ax(m,nz), & ! for e field
-            g_ap(nz), g_at(nz), g_ar(nz), g_ax(m,nz), & ! for g field
+            e_ap(nz), e_at(nz), e_ar(nz), e_ax(m,nz), &  ! for e field
+            g_ap(nz), g_at(nz), g_ar(nz), g_ax(m,nz), &  ! for g field
             new_mass(nc,nz), starting_dX_dm(nc,nz), starting_mass(nc,nz), &
             ending_mass(nc,nz), ending_dX_dm(nc,nz), GT_face(nc,nz), AD_face(nz), &
             X_theta(nc,nz), X_minus_theta(nc,nz), SIG_face(nc,nc,nz), sigma_lnC(nc,nc,nz), &
@@ -251,7 +251,7 @@
             gamma, T, limit_coeffs_face, k_max)
          if (dbg) write(*,4) 'k_max for limit_coeffs_face /= 0', &
                k_max, nzhi, nzhi - k_max
-         nzhi = k_max ! max k s.t. limit_coeffs_face(k) > 0
+         nzhi = k_max  ! max k s.t. limit_coeffs_face(k) > 0
 
          n = nzhi-nzlo+1
 
@@ -317,15 +317,15 @@
                X(j,k) = X(j,k) / tmp
                X_init(j,k) = X(j,k)
             end do
-            X(m,k) = 0d0 ! this will be set later
+            X(m,k) = 0d0  ! this will be set later
          end do
 
-         if (nzlo > 1) then ! combine cells 1 to nzlo
+         if (nzlo > 1) then  ! combine cells 1 to nzlo
             mtotal = sum(cell_dm(1:nzlo))
-            do j=1,species ! change to species average of 1:nzlo
+            do j=1,species  ! change to species average of 1:nzlo
                xa(j,nzlo) = dot_product(cell_dm(1:nzlo),xa(j,1:nzlo))/mtotal
             end do
-            do j=1,nc ! change to class average
+            do j=1,nc  ! change to class average
                X(j,nzlo) = dot_product(cell_dm(1:nzlo),X(j,1:nzlo))/mtotal
             end do
             cell_dm(nzlo) = mtotal
@@ -337,7 +337,7 @@
          end if
          dm_bar(nzlo+1) = 0.5d0*(cell_dm(nzlo) + cell_dm(nzlo+1))
 
-         do i=1,nc ! save for species conservation checks
+         do i=1,nc  ! save for species conservation checks
             mass_init(i) = dot_product(cell_dm(nzlo:nzhi),X(i,nzlo:nzhi))
          end do
          sum_mass_nzlo_nzhi = sum(cell_dm(nzlo:nzhi))
@@ -405,7 +405,7 @@
          end if
 
          if (total_time - time > 1d-10*total_time .or. steps_used == 0) then
-            ierr = -1 ! failed to finish
+            ierr = -1  ! failed to finish
          end if
 
          if (ierr == 0) then
@@ -418,7 +418,7 @@
                end do
             end do
 
-            do k=1,nzlo-1 ! fully mixed
+            do k=1,nzlo-1  ! fully mixed
                do i=1,species
                   xa(i,k) = xa(i,nzlo)
                end do
@@ -460,14 +460,14 @@
                liwork, lwork, caller_id, which_solver, which_decsol
             real(dp) :: h, max_step_size, x_min, x_max
 
-            integer, pointer :: iwork(:) !(liwork)
-            real(dp), pointer :: work(:) !(lwork)
-            integer, pointer :: ipar_decsol(:) !(lid)
-            real(dp), pointer :: rpar_decsol(:) !(lrd)
+            integer, pointer :: iwork(:)  !(liwork)
+            real(dp), pointer :: work(:)  !(lwork)
+            integer, pointer :: ipar_decsol(:)  !(lid)
+            real(dp), pointer :: rpar_decsol(:)  !(lrd)
 
             real(dp) :: atol(1), rtol(1), t, tend
-            real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nc,nc,n)
-            real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nc,nc,n)
+            real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nc,nc,n)
+            real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk  ! =(nc,nc,n)
 
             integer, parameter :: lrpar = 1, lipar = 1
             real(dp), target :: rpar_ary(lrpar)
@@ -513,7 +513,7 @@
             x_min = s% diffusion_min_X_hard_limit
             x_max = 1d0 - s% diffusion_min_X_hard_limit
 
-            ijac = 1 ! analytic jacobian
+            ijac = 1  ! analytic jacobian
 
             imas = 0
             mlmas = 0
@@ -540,7 +540,7 @@
             allocate(iwork(liwork),work(lwork),ipar_decsol(lid),rpar_decsol(lrd),stat=ierr)
             if (ierr /= 0) then
                write(*,*) 'allocate ierr', ierr
-               call mesa_error(__FILE__,__LINE__) ! test_int_support
+               call mesa_error(__FILE__,__LINE__)  ! test_int_support
             end if
 
             iwork = 0
@@ -548,7 +548,7 @@
 
             t = 0
             tend = total_time
-            h = total_time ! initial step size
+            h = total_time  ! initial step size
             max_step_size = total_time
 
             ! set vars
@@ -602,8 +602,8 @@
             !   write(*,*) 'solver returned ierr /= 0', idid
             !   call mesa_error(__FILE__,__LINE__)
             !end if
-            steps_used = iwork(17) ! number of accepted steps
-            total_num_retries = iwork(16) - iwork(17) ! num computed - num accepted
+            steps_used = iwork(17)  ! number of accepted steps
+            total_num_retries = iwork(16) - iwork(17)  ! num computed - num accepted
             time = tend
 
             do i=1,n
@@ -628,11 +628,11 @@
             integer, intent(in) :: n_blk_dble, caller_id, &
                nvar_blk_dble, nz_blk_dble, lrpar, lipar
             real(dp), intent(in) :: time,h
-            real(dp), intent(inout), pointer :: vars(:) ! (n)
-            real(dp), intent(inout), pointer :: f(:) ! (n) dvars/dt
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+            real(dp), intent(inout), pointer :: vars(:)  ! (n)
+            real(dp), intent(inout), pointer :: f(:)  ! (n) dvars/dt
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+            integer, intent(out) :: ierr  ! nonzero means retry with smaller timestep.
 
             integer :: i, j, k
             real(dp), pointer :: f2(:,:)
@@ -671,12 +671,12 @@
             use const_def,only: dp
             integer,intent(in) :: n_blk_dble,caller_id,nvar_blk_dble,nz_blk_dble,lrpar,lipar
             real(dp),intent(in) :: time,h
-            real(dp),intent(inout), pointer :: vars(:) ! (n)
-            real(dp),intent(inout), pointer :: f(:) ! (n) dvars/dt
+            real(dp),intent(inout), pointer :: vars(:)  ! (n)
+            real(dp),intent(inout), pointer :: f(:)  ! (n) dvars/dt
             real(dp),dimension(:),pointer,intent(inout) :: lblk1,dblk1,ublk1
-            integer,intent(inout),pointer :: ipar(:) ! (lipar)
-            real(dp),intent(inout),pointer :: rpar(:) ! (lrpar)
-            integer,intent(out) :: ierr ! nonzero means terminate integration
+            integer,intent(inout),pointer :: ipar(:)  ! (lipar)
+            real(dp),intent(inout),pointer :: rpar(:)  ! (lrpar)
+            integer,intent(out) :: ierr  ! nonzero means terminate integration
 
             integer :: i, j, jj, k
             real(dp), pointer :: f2(:,:)
@@ -794,10 +794,10 @@
             integer, intent(in) :: n, lrpar, lipar
             real(dp), intent(in) :: x, h
             real(dp), intent(inout) :: y(:)
-            real(dp), intent(inout) :: f(:) ! dy/dx
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+            real(dp), intent(inout) :: f(:)  ! dy/dx
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+            integer, intent(out) :: ierr  ! nonzero means retry with smaller timestep.
             ierr = 0
             f = 0
          end subroutine fcn
@@ -808,7 +808,7 @@
             integer, intent(in) :: n, ldfy, lrpar, lipar
             real(dp), intent(in) :: x, h
             real(dp), intent(inout) :: y(:)
-            real(dp), intent(inout) :: f(:) ! dy/dx
+            real(dp), intent(inout) :: f(:)  ! dy/dx
             real(dp), intent(inout) :: dfdy(:,:)
                ! dense: dfdy(i, j) = partial f(i) / partial y(j)
                ! banded: dfdy(i-j+mujac+1, j) = partial f(i) / partial y(j)
@@ -817,9 +817,9 @@
                   ! array dfdy as follows:
                   ! dfdy(mujac+1+i-j, j) = partial f(i) / partial y(j)
                   ! for max(1, j-mujac)<=i<=min(N, j+mljac)
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-            integer, intent(out) :: ierr ! nonzero means terminate integration
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+            integer, intent(out) :: ierr  ! nonzero means terminate integration
             ierr = 0
             f = 0
             dfdy = 0
@@ -840,12 +840,12 @@
             ! y can be modified if necessary to keep it in valid range of possible solutions.
             real(dp), intent(inout), target :: rwork_y(*)
             integer, intent(inout), target :: iwork_y(*)
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             interface
                include 'num_interp_y.dek'
             end interface
-            integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+            integer, intent(out) :: irtrn  ! < 0 causes solver to return to calling program.
             include 'formats'
             if (s% show_diffusion_substep_info .and. mod(nr,10) == 0) write(*,2) 'nr', nr, time
             irtrn = 0
@@ -915,7 +915,7 @@
                   exit step_loop
                end if
 
-               if (retry_count == 1) then ! save starting X in X_0
+               if (retry_count == 1) then  ! save starting X in X_0
                   if (trace) then
                      write(*,'(A)')
                      write(*,2) '1st try for substep', steps_used
@@ -927,21 +927,21 @@
                         dX(j,k) = 0d0
                      end do
                   end do
-               else ! prepare for retry of solve_loop
+               else  ! prepare for retry of solve_loop
                   if (trace) then
                      write(*,'(A)')
                      write(*,2) 'retry substep', steps_used
                   end if
                   dt = dt*dt_retry_factor
                   total_num_retries = total_num_retries+1
-                  do k=nzlo,nzhi ! restore X from X_0
+                  do k=nzlo,nzhi  ! restore X from X_0
                      do j=1,nc
                         X(j,k) = X_0(j,k)
                         X_1(j,k) = X_0(j,k)
                         dX(j,k) = 0d0
                      end do
                   end do
-                  if (have_changed_matrix_coeffs) then ! must recalculate them
+                  if (have_changed_matrix_coeffs) then  ! must recalculate them
                      if (dbg) write(*,*) 'call get_matrix_coeffs'
                      call get_matrix_coeffs( &
                         s, nz, nc, m, nzlo, nzhi, class(h1), class(he4), &
@@ -966,7 +966,7 @@
                solved = BE_solve(1d0, last_step, ierr)
                if (ierr /= 0) exit step_loop
 
-               if (solved) then ! this step is done
+               if (solved) then  ! this step is done
                   time = time + dt
                   cycle step_loop
                end if
@@ -980,8 +980,8 @@
          end subroutine do_step_loop
 
 
-         logical function BE_solve(theta, do_smooth, ierr) ! Backwards Euler
-            real(dp), intent(in) :: theta ! multiplier for dt
+         logical function BE_solve(theta, do_smooth, ierr)  ! Backwards Euler
+            real(dp), intent(in) :: theta  ! multiplier for dt
             logical, intent(in) :: do_smooth
             integer, intent(out) :: ierr
 
@@ -1024,7 +1024,7 @@
                   if (dbg) write(*,2) 'min lambda', num_iters, lambda
                end if
 
-               do k=nzlo,nzhi ! apply the correction
+               do k=nzlo,nzhi  ! apply the correction
                   do j=1,nc
                      dX(j,k) = dX(j,k) + lambda*del(j,k)
                      X_1(j,k) = X_0(j,k) + dX(j,k)
@@ -1218,11 +1218,11 @@
          integer, intent(in) :: nz, nzlo, nzhi, m, nc
          real(dp), intent(in) :: eps, upwind_limit, total_time
          real(dp), intent(in), dimension(:,:) :: X, X_face, C_div_X, v_advection_face
-         real(dp), intent(in) :: SIG_face(:,:,:) ! (nc,nc,nz)
-         real(dp), intent(in) :: GT_face(:,:) ! (nc,nz)
-         real(dp), intent(in) :: AD_face(:) ! (nz)
-         real(dp), intent(in) :: cell_dm(:) ! (nz)
-         real(dp), intent(in) :: r_face(:) ! (nz)
+         real(dp), intent(in) :: SIG_face(:,:,:)  ! (nc,nc,nz)
+         real(dp), intent(in) :: GT_face(:,:)  ! (nc,nz)
+         real(dp), intent(in) :: AD_face(:)  ! (nz)
+         real(dp), intent(in) :: cell_dm(:)  ! (nz)
+         real(dp), intent(in) :: r_face(:)  ! (nz)
          integer, intent(in) :: steps_used, iter, class_chem_id(:)
          logical, intent(in) :: dbg
          integer, intent(in) :: iter_dbg, i_dbg, k_dbg
@@ -1297,7 +1297,7 @@
                end if
 
                dxdt = (flow_in - flow_out)/cell_dm(k)
-               if (dxdt >= 0d0) cycle ! only consider decreasing abundances
+               if (dxdt >= 0d0) cycle  ! only consider decreasing abundances
                dt1 = (X(i,k) + eps)/max(1d-50,-dxdt)
 
                if (dt1 < dt) then
@@ -1434,12 +1434,12 @@
             nz, nzlo, nzhi, m, nc, X, X_face, C_div_X, GT_face, AD_face, SIG_face, &
             alfa_face, cell_dm, v_advection_face, upwind_limit, dX_dt)
          integer, intent(in) :: nz, nzlo, nzhi, m, nc
-         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X ! (nc,nz)
+         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X  ! (nc,nz)
          real(dp), intent(in) :: upwind_limit
          real(dp), intent(in), dimension(:) :: alfa_face, cell_dm, AD_face
          real(dp), intent(in), dimension(:,:) :: GT_face, v_advection_face
          real(dp), intent(in), dimension(:,:,:) :: SIG_face
-         real(dp), intent(inout), dimension(:,:) :: dX_dt ! (nc,nz)
+         real(dp), intent(inout), dimension(:,:) :: dX_dt  ! (nc,nz)
          integer :: k
 !$OMP PARALLEL DO PRIVATE(k) SCHEDULE(dynamic,2)
          do k=nzlo,nzhi
@@ -1458,19 +1458,19 @@
             upwind_limit, dX_dt)
 
          integer, intent(in) :: k, nz, nzlo, nzhi, m, nc
-         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X ! (nc,nz)
+         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X  ! (nc,nz)
          real(dp), intent(in) :: upwind_limit
          real(dp), intent(in), dimension(:) :: alfa_face, cell_dm, AD_face
          real(dp), intent(in), dimension(:,:) :: GT_face, v_advection_face
          real(dp), intent(in), dimension(:,:,:) :: SIG_face
-         real(dp), intent(inout), dimension(:) :: dX_dt ! (nc)
+         real(dp), intent(inout), dimension(:) :: dX_dt  ! (nc)
          integer :: i, j
          real(dp) :: alfa, beta, c, coeff, dC
          include 'formats'
 
          dX_dt(:) = 0
 
-         if (k > nzlo) then ! do face k
+         if (k > nzlo) then  ! do face k
 
             alfa = alfa_face(k)
             beta = 1d0 - alfa
@@ -1501,7 +1501,7 @@
 
          end if
 
-         if (k < nzhi) then ! do face k+1
+         if (k < nzhi) then  ! do face k+1
 
             alfa = alfa_face(k+1)
             beta = 1d0 - alfa
@@ -1546,15 +1546,15 @@
             tiny_X, dt, dX, dX_dt, rhs, em1, e00, ep1)
          integer, intent(in) :: nz, nzlo, nzhi, m, nc
          logical, intent(in) :: jac_only
-         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X ! (nc,nz)
+         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X  ! (nc,nz)
          real(dp), intent(in) :: upwind_limit, tiny_X, dt
          real(dp), intent(in), dimension(:) :: alfa_face, cell_dm, AD_face
          real(dp), intent(in), dimension(:,:) :: GT_face, v_advection_face
          real(dp), intent(in), dimension(:,:,:) :: SIG_face
-         real(dp), intent(in), dimension(:,:) :: dX ! (nc,nz)
-         real(dp), intent(inout), dimension(:,:) :: dX_dt ! (nc,nz)
-         real(dp), intent(inout), dimension(:,:) :: rhs ! (nc,nz)
-         real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1 ! (nc,nc,nz)
+         real(dp), intent(in), dimension(:,:) :: dX  ! (nc,nz)
+         real(dp), intent(inout), dimension(:,:) :: dX_dt  ! (nc,nz)
+         real(dp), intent(inout), dimension(:,:) :: rhs  ! (nc,nz)
+         real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1  ! (nc,nc,nz)
          integer :: k
          ! lhs(i,k) := X(i,k) - (flow(i,k) - flow(i,k-1))*dt/cell_dm(k)
          ! rhs(i,k) := X_prev(i,k)
@@ -1580,15 +1580,15 @@
 
          integer, intent(in) :: k, nz, nzlo, nzhi, m, nc
          logical, intent(in) :: jac_only
-         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X ! (nc,nz)
+         real(dp), dimension(:,:), intent(in) :: X, X_face, C_div_X  ! (nc,nz)
          real(dp), intent(in) :: upwind_limit, tiny_X, dt
          real(dp), intent(in), dimension(:) :: alfa_face, cell_dm, AD_face
          real(dp), intent(in), dimension(:,:) :: GT_face, v_advection_face
          real(dp), intent(in), dimension(:,:,:) :: SIG_face
-         real(dp), intent(in), dimension(:,:) :: dX ! (nc,nz)
-         real(dp), intent(inout), dimension(:) :: dX_dt ! (nc)
-         real(dp), intent(inout), dimension(:,:) :: rhs ! (nc,nz)
-         real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1 ! (nc,nc,nz)
+         real(dp), intent(in), dimension(:,:) :: dX  ! (nc,nz)
+         real(dp), intent(inout), dimension(:) :: dX_dt  ! (nc)
+         real(dp), intent(inout), dimension(:,:) :: rhs  ! (nc,nz)
+         real(dp), intent(inout), dimension(:,:,:) :: em1, e00, ep1  ! (nc,nc,nz)
          integer :: i, j
          real(dp) :: alfa, beta, c, coeff, dC_dXj00, dC_dXjm1, dC_dXjp1, &
             dC, dcoeff_dXjm1, dcoeff_dXj00, dcoeff_dXjp1, dt_div_dm
@@ -1597,7 +1597,7 @@
 
          dX_dt(:) = 0; em1(:,:,k) = 0; e00(:,:,k) = 0; ep1(:,:,k) = 0
 
-         if (k > nzlo) then ! do face k
+         if (k > nzlo) then  ! do face k
 
             alfa = alfa_face(k)
             beta = 1d0 - alfa
@@ -1649,7 +1649,7 @@
 
          end if
 
-         if (k < nzhi) then ! do face k+1
+         if (k < nzhi) then  ! do face k+1
 
             alfa = alfa_face(k+1)
             beta = 1d0 - alfa
@@ -1818,7 +1818,7 @@
                end if
             end do
          end do
-         if (lambda < 1) lambda = 0.8d0*lambda ! under correct
+         if (lambda < 1) lambda = 0.8d0*lambda  ! under correct
 
       end subroutine positivity
 
@@ -1896,10 +1896,10 @@
          use chem_def
          integer, parameter :: nc = diffusion_min_nc
          integer, intent(in) :: species
-         integer, intent(in) :: chem_id(:) ! (species)
-         integer, intent(out) :: class(:) ! (species)
-         integer, intent(out) :: class_chem_id(:) ! (nc)
-         character (len=8), intent(out) :: class_name(:) ! (nc)
+         integer, intent(in) :: chem_id(:)  ! (species)
+         integer, intent(out) :: class(:)  ! (species)
+         integer, intent(out) :: class_chem_id(:)  ! (nc)
+         character (len=8), intent(out) :: class_name(:)  ! (nc)
          real(dp) :: A
          integer :: i
          integer, parameter :: c_h = 1, c_he = 2, c_o = 3, c_fe = 4
@@ -1930,10 +1930,10 @@
       subroutine get_max_number_of_classes( &
             species, chem_id, class, class_chem_id, class_name)
          use chem_def
-         integer, intent(in) :: species, chem_id(:) ! (species)
-         integer, intent(out) :: class(:) ! (species)
-         integer, intent(out) :: class_chem_id(:) ! (species)
-         character (len=8), intent(out) :: class_name(:) ! (species)
+         integer, intent(in) :: species, chem_id(:)  ! (species)
+         integer, intent(out) :: class(:)  ! (species)
+         integer, intent(out) :: class_chem_id(:)  ! (species)
+         character (len=8), intent(out) :: class_name(:)  ! (species)
          integer :: i, ci
          do i=1,species
             ci = chem_id(i)
@@ -1948,11 +1948,11 @@
             nc, species, chem_id, class_chem_id, class_A_cutoff, &
             class, class_name)
          use chem_def
-         integer, intent(in) :: nc, species, chem_id(:) ! (species)
-         integer, intent(in) :: class_chem_id(:) ! (nc)
-         real(dp), intent(in) :: class_A_cutoff(:) ! (nc)
-         integer, intent(out) :: class(:) ! (species)
-         character (len=8), intent(out) :: class_name(:) ! (nc)
+         integer, intent(in) :: nc, species, chem_id(:)  ! (species)
+         integer, intent(in) :: class_chem_id(:)  ! (nc)
+         real(dp), intent(in) :: class_A_cutoff(:)  ! (nc)
+         integer, intent(out) :: class(:)  ! (species)
+         character (len=8), intent(out) :: class_name(:)  ! (nc)
          real(dp) :: A
          integer :: i, j
          do i=1,species
@@ -1975,12 +1975,12 @@
             nc, species, chem_id, class_chem_id, class_A_max, use_full_net, &
             class, class_name)
          use chem_def
-         integer, intent(in) :: nc, species, chem_id(:) ! (species)
-         integer, intent(in) :: class_chem_id(:) ! (nc)
-         real(dp), intent(in) :: class_A_max(:) ! (nc)
+         integer, intent(in) :: nc, species, chem_id(:)  ! (species)
+         integer, intent(in) :: class_chem_id(:)  ! (nc)
+         real(dp), intent(in) :: class_A_max(:)  ! (nc)
          logical, intent(in) :: use_full_net
-         integer, intent(out) :: class(:) ! (species)
-         character (len=8), intent(out) :: class_name(:) ! (nc)
+         integer, intent(out) :: class(:)  ! (species)
+         character (len=8), intent(out) :: class_name(:)  ! (nc)
          real(dp) :: A
          integer :: i, j
          if(use_full_net) then
@@ -2024,12 +2024,12 @@
 
          dt_next = 1d99
 
-         if (vc_old > 0 .and. dt_old > 0) then ! use 2 values to do "low pass" controller
+         if (vc_old > 0 .and. dt_old > 0) then  ! use 2 values to do "low pass" controller
             vcratio = limiter(vc_target/vc)
             vcratio_prev = limiter(vc_target/vc_old)
             limtr = limiter(pow(vcratio,beta1) * pow(vcratio_prev,beta2) * pow(dt/dt_old,-alpha2))
             dt_next = min(dt_next, dt*limtr)
-         else ! no history available, so fall back to the basic controller
+         else  ! no history available, so fall back to the basic controller
             dt_next = min(dt_next, dt*vc_target/vc)
          end if
 

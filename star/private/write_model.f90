@@ -127,7 +127,7 @@
          end if
          write(iounit,'(A)')
          ! write property list
-         write(iounit, '(a)') ! blank line before start of property list
+         write(iounit, '(a)')  ! blank line before start of property list
          write(iounit, 4) 'version_number', "'" // trim(version_number) // "'"
          write(iounit, 1) 'M/Msun', s% star_mass
          write(iounit, 2) 'model_number', s% model_number
@@ -181,7 +181,7 @@
                'log_rel_run_E_err', &
                safe_log10(abs(s% cumulative_energy_error/s% total_energy))
          write(iounit, 2) 'num_retries', s% num_retries
-         write(iounit, '(a)') ! blank line for end of property list
+         write(iounit, '(a)')  ! blank line for end of property list
 
          call header
          do k=1, nz

@@ -68,7 +68,7 @@ contains
     use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, num_helm_results, i_lnE
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 means not being called for a particular cell
+    integer, intent(in) :: k  ! 0 means not being called for a particular cell
     real(dp), intent(in) :: xa(:), Rho, logRho, T, logT
     real(dp), dimension(num_eos_basic_results), intent(out) :: &
          res, dres_dlnRho, dres_dlnT
@@ -131,7 +131,7 @@ contains
     use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logRho, logE, &
          logT_guess, logT_tol, logE_tol
@@ -174,7 +174,7 @@ contains
     use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logRho, egas, &
          logT_guess, logT_tol, egas_tol
@@ -216,7 +216,7 @@ contains
     use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logRho, logP, &
          logT_guess, logT_tol, logP_tol
@@ -259,7 +259,7 @@ contains
     use eos_lib, only: eosDT_get_T
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logRho, logS, &
          logT_guess, logT_tol, logS_tol
@@ -302,7 +302,7 @@ contains
     use eos_lib, only: eosDT_get_Rho
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logT, logP, &
          logRho_guess, logRho_tol, logP_tol
@@ -345,7 +345,7 @@ contains
     use eos_lib, only: eosDT_get_Rho
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logT, logPgas, &
          logRho_guess, logRho_tol, logPgas_tol
@@ -397,7 +397,7 @@ contains
     use eos_lib, only: eos_gamma_PT_get
 
     type (star_info), pointer :: s
-    integer, intent(in) :: k ! 0 indicates not for a particular cell.
+    integer, intent(in) :: k  ! 0 indicates not for a particular cell.
     real(dp), intent(in) :: &
          xa(:), logT, logPgas, &
          logRho_tol, logPgas_tol

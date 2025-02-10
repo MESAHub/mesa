@@ -42,7 +42,7 @@
          type(auto_diff_real_star_order1), intent(in) :: val_00
          integer :: j
          val_p1%val = val_00%val
-         do j=auto_diff_star_num_vars-2,1,-3 ! p1 gets 00, 00 gets m1, m1 gets 0d0
+         do j=auto_diff_star_num_vars-2,1,-3  ! p1 gets 00, 00 gets m1, m1 gets 0d0
             val_p1%d1Array(j+2) = val_00%d1Array(j+1)
             val_p1%d1Array(j+1) = val_00%d1Array(j)
             val_p1%d1Array(j) = 0d0
@@ -53,7 +53,7 @@
          type(auto_diff_real_star_order1), intent(in) :: val_00
          integer :: j
          val_m1%val = val_00%val
-         do j=1,auto_diff_star_num_vars,3 ! m1 gets 00, 00 gets p1, p1 gets 0d0
+         do j=1,auto_diff_star_num_vars,3  ! m1 gets 00, 00 gets p1, p1 gets 0d0
             val_m1%d1Array(j) = val_00%d1Array(j+1)
             val_m1%d1Array(j+1) = val_00%d1Array(j+2)
             val_m1%d1Array(j+2) = 0d0
@@ -374,7 +374,7 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
 
-      real(dp) function get_RSP2_conv_velocity(s,k) result (cv) ! at face k
+      real(dp) function get_RSP2_conv_velocity(s,k) result (cv)  ! at face k
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp) :: alfa, beta

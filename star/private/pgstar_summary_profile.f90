@@ -37,7 +37,6 @@
 
 
       subroutine summary_profile_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -217,7 +216,7 @@
                   yvec(k) = get_profile_val(s, yaxis_id, k+grid_min-1)
                end do
 
-               if (s% pg% Summary_Profile_scaled_value(j)) then ! scale yvec
+               if (s% pg% Summary_Profile_scaled_value(j)) then  ! scale yvec
 
                   yvec_max = maxval(yvec(1:npts))
                   yvec_min = minval(yvec(1:npts))
@@ -241,10 +240,10 @@
 
             end do
 
-            if (.not. panel_flag) then ! show xaxis info
+            if (.not. panel_flag) then  ! show xaxis info
                call pgsci(1)
                call show_xaxis_name(s,xaxis_name,ierr)
-               if (ierr == 0) then ! show mix regions at bottom of plot
+               if (ierr == 0) then  ! show mix regions at bottom of plot
                   call pgslw(10)
                   call show_mix_regions_on_xaxis( &
                      s,ymin+ybot,ymax,grid_min,grid_max,unshifted_xvec)

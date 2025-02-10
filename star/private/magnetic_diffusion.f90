@@ -107,7 +107,7 @@
          end if
          xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
          etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
-         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
+         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0)))  ! correction: gammae
          sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
       end function sige1
 
