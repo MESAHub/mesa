@@ -189,7 +189,7 @@ contains
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(9) = r_outer**2*d2P_dr2_c/P_c
     global_data(10) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
 

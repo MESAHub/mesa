@@ -132,8 +132,8 @@ contains
          ! Log Lambda for He-dominant chem mixture (equation 10)
          loglambdacy = loglambdah - log(2.d0*chemz)
          ! Calculation of C_ij coeffs (equation 12)
-         ccx = log(exp(1.2d0*loglambdacx)+1.)/1.2d0
-         ccy = log(exp(1.2d0*loglambdacy)+1.)/1.2d0
+         ccx = log(exp(1.2d0*loglambdacx)+1.0d0)/1.2d0
+         ccy = log(exp(1.2d0*loglambdacy)+1.0d0)/1.2d0
          ! Reduced masses (I had to guess, from Bahcall & Loeb 1990), with H and He
          acx = (1.d0*chemA)/(1.d0+chemA)
          acy = 4*chemA/(4.d0+chemA)
@@ -229,7 +229,7 @@ contains
       a_2 = myx1_2*b_2
       myterm = diffratio*prandtl+prandtl+diffratio
       b_1 = 2*myx1_2*myterm
-      a_1 = myx1_4*myterm + prandtl*(1. - (1d0/R0))
+      a_1 = myx1_4*myterm + prandtl*(1.0d0 - (1d0/R0))
       b_0 = 3.d0*myx1_4*diffratio*prandtl + prandtl*(diffratio - (1d0/R0))
       a_0 = myx1_4*myx1_2*diffratio*prandtl + myx1_2*prandtl*(diffratio - (1d0/R0))
 
