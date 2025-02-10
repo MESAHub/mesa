@@ -203,6 +203,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') s% pg% file_digits, s% pg% file_digits
       write(num_str, fstring) s% model_number
       if (len_trim(dir) > 0) then
@@ -210,7 +211,12 @@ contains
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(s% pg% file_extension)
+      if (s%pg%file_device=='vcps') then
+         file_extension = 'ps'
+      else
+         file_extension = s%pg%file_device  ! e.g.: png, ps
+      end if
+      name = trim(name) // trim(num_str) // '.' // trim(file_extension)
    end subroutine create_file_name
 
 
