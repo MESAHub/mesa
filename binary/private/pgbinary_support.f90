@@ -34,7 +34,7 @@ module pgbinary_support
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
       clr_anonymous, colormap_offset, colormap_last, colormap_size, &
       colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
-      Line_Type_Dot ! inherit colors/linetypes + some routines from pgstar
+      Line_Type_Dot  ! inherit colors/linetypes + some routines from pgstar
    use star_pgstar
 
    implicit none
@@ -256,7 +256,7 @@ contains
       include 'formats'
       numpts = 0
       pg => b% pg% pgbinary_hist
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) return
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
@@ -268,7 +268,7 @@ contains
    logical function get1_hist_yvec(b, step_min, step_max, n, name, vec)
       use utils_lib, only : integer_dict_lookup
       type (binary_info), pointer :: b
-      integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
+      integer, intent(in) :: step_min, step_max, n  ! n = count_hist_points
       character (len = *) :: name
       real, dimension(:), pointer :: vec
       integer :: i, ierr, cnt
@@ -287,7 +287,7 @@ contains
          end if
       end do
       call integer_dict_lookup(b% binary_history_names_dict, key_name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) then ! didn't find it
+      if (ierr /= 0 .or. i <= 0) then  ! didn't find it
          get1_hist_yvec = .false.
          return
       end if
@@ -308,7 +308,7 @@ contains
       if (numpts == 0) return
       pg => b% pg% pgbinary_hist
       i = numpts
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) then
             ierr = -1
             return
@@ -355,7 +355,7 @@ contains
       pg => b% pg% pgbinary_hist
       i = numpts
       vec = 0
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) then
             ! this will not happen if have correct numpts

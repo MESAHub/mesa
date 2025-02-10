@@ -28,7 +28,7 @@ module interp_2d_lib_sg
 
    implicit none
 
-contains ! the procedure interface for the library
+contains  ! the procedure interface for the library
    ! client programs should only call these routines.
 
 ! Contents
@@ -512,10 +512,10 @@ contains ! the procedure interface for the library
 
       integer, intent(in) :: nx                        ! length of x vector
       integer, intent(in) :: ny                        ! length of y vector
-      real, intent(in) :: x(:) ! (nx)                  ! x vector, strict ascending
-      real, intent(in) :: y(:) ! (ny)                  ! y vector, strict ascending
+      real, intent(in) :: x(:)  ! (nx)                  ! x vector, strict ascending
+      real, intent(in) :: y(:)  ! (ny)                  ! y vector, strict ascending
       integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
-      real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & spline coefficients
+      real, intent(inout), pointer :: f1(:)  ! =(4,nf2,ny)   ! data & spline coefficients
 !
 !  on input:  f(1,i,j) = f(x(i),y(j))
 !  on output:  f(1,i,j) unchanged
@@ -549,13 +549,13 @@ contains ! the procedure interface for the library
 !
 !  input bdy condition data:
       integer, intent(in) :: ibcxmin                   ! bc flag for x=xmin
-      real, intent(in) :: bcxmin(:) ! (ny)             ! bc data vs. y at x=xmin
+      real, intent(in) :: bcxmin(:)  ! (ny)             ! bc data vs. y at x=xmin
       integer, intent(in) :: ibcxmax                   ! bc flag for x=xmax
-      real, intent(in) :: bcxmax(:) ! (ny)             ! bc data vs. y at x=xmax
+      real, intent(in) :: bcxmax(:)  ! (ny)             ! bc data vs. y at x=xmax
       integer, intent(in) :: ibcymin                   ! bc flag for y=ymin
-      real, intent(in) :: bcymin(:) ! (nx)             ! bc data vs. x at y=ymin
+      real, intent(in) :: bcymin(:)  ! (nx)             ! bc data vs. x at y=ymin
       integer, intent(in) :: ibcymax                   ! bc flag for y=ymax
-      real, intent(in) :: bcymax(:) ! (nx)             ! bc data vs. x at y=ymax
+      real, intent(in) :: bcymax(:)  ! (nx)             ! bc data vs. x at y=ymax
 !
 !  with interpretation:
 !   ibcxmin -- indicator for boundary condition at x(1):
@@ -626,13 +626,13 @@ contains ! the procedure interface for the library
 !
       integer, intent(in) :: nx, ny                    ! grid sizes
       real, intent(in) :: xget, yget                   ! target of this interpolation
-      real, intent(in) :: x(:) ! (nx)                  ! ordered x grid
-      real, intent(in) :: y(:) ! (ny)                  ! ordered y grid
+      real, intent(in) :: x(:)  ! (nx)                  ! ordered x grid
+      real, intent(in) :: y(:)  ! (ny)                  ! ordered y grid
       integer, intent(in) :: ilinx                     ! ilinx=1 => assume x evenly spaced
       integer, intent(in) :: iliny                     ! iliny=1 => assume y evenly spaced
 !
       integer, intent(in) :: inf2
-      real, intent(inout), pointer :: f1(:) ! function data
+      real, intent(inout), pointer :: f1(:)  ! function data
 !
 !       f 2nd dimension inf2 must be .ge. nx
 !       contents of f:
@@ -707,7 +707,7 @@ contains ! the procedure interface for the library
 
       integer :: i, j
       integer :: ii(1), jj(1)
-      real xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1)
+      real :: xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1)
       call herm2xy(xget, yget, x, nx, y, ny, ilinx, iliny, i, j, xparam(1), yparam(1), hx(1), hxi(1), hy(1), hyi(1), ierr)
       if (ierr /= 0) return
       ii(1) = i
@@ -728,10 +728,10 @@ contains ! the procedure interface for the library
       use bipm_sg, only: do_mkbipm_sg
       integer, intent(in) :: nx                        ! length of x vector
       integer, intent(in) :: ny                        ! length of y vector
-      real, intent(in), pointer :: x(:) ! (nx)         ! x vector, strict ascending
-      real, intent(in), pointer :: y(:) ! (ny)         ! y vector, strict ascending
+      real, intent(in), pointer :: x(:)  ! (nx)         ! x vector, strict ascending
+      real, intent(in), pointer :: y(:)  ! (ny)         ! y vector, strict ascending
       integer, intent(in) :: nf2                       ! 2nd dimension of f, nf2.ge.nx
-      real, intent(inout), pointer :: f1(:) ! =(4,nf2,ny)   ! data & interpolant coefficients
+      real, intent(inout), pointer :: f1(:)  ! =(4,nf2,ny)   ! data & interpolant coefficients
       integer, intent(out) :: ierr                     ! =0 on exit if there is no error.
       call do_mkbipm_sg(x, nx, y, ny, f1, nf2, ierr)
    end subroutine interp_mkbipm_sg
@@ -740,10 +740,10 @@ contains ! the procedure interface for the library
       use bipm_sg, only: do_evbipm_sg
       integer, intent(in) :: nx, ny
       real, intent(in) :: xget, yget                   ! target of this interpolation
-      real, intent(in), pointer :: x(:) ! (nx)         ! ordered x grid
-      real, intent(in), pointer :: y(:) ! (ny)         ! ordered y grid
+      real, intent(in), pointer :: x(:)  ! (nx)         ! ordered x grid
+      real, intent(in), pointer :: y(:)  ! (ny)         ! ordered y grid
       integer, intent(in) :: nf2
-      real, intent(in), pointer :: f1(:) ! =(4,nf2,ny)   ! function data
+      real, intent(in), pointer :: f1(:)  ! =(4,nf2,ny)   ! function data
       real, intent(out) :: z
       integer, intent(out) :: ierr                     ! error code =0 ==> no error
       call do_evbipm_sg(xget, yget, x, nx, y, ny, f1, nf2, z, ierr)

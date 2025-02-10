@@ -326,7 +326,7 @@ contains
     if (ierr /= 0) return
     open(unit=iounit, file=trim(save_mode_filename), action='write', iostat=ierr)
     if (ierr /= 0) return
-    write(iounit,'(3a8,99a20)') 'el', 'order', 'em', 'freq (microHz)', 'inertia', 'growth rate (s)'!, 'nn'
+    write(iounit,'(3a8,99a20)') 'el', 'order', 'em', 'freq (microHz)', 'inertia', 'growth rate (s)'  !, 'nn'
     write(iounit,'(3i8,f20.10,2e20.10,i20)') &
          new_el, new_order, new_em, new_cyclic_freq, new_inertia, new_growth_rate
 

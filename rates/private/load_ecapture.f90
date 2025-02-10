@@ -90,15 +90,15 @@ contains
 
     num_ecapture_nuclei = 0
     num_ecapture_states = 0
-    do i = 1, max_num_ecapture_nuclei ! keep reading until end of file or max # nuclei
+    do i = 1, max_num_ecapture_nuclei  ! keep reading until end of file or max # nuclei
 
-       do ! skip any blank or comment lines
+       do  ! skip any blank or comment lines
           read(iounit,'(a)',iostat=ierr) string
           if (ierr /= 0) exit
           if ((index(string,"!") /= 0) .or. (len_trim(string) == 0)) then
-             cycle ! comment or blank line
+             cycle  ! comment or blank line
           else
-             exit ! good line
+             exit  ! good line
           end if
        end do
        if (ierr /= 0) then
@@ -112,7 +112,7 @@ contains
        end if
        num_ecapture_nuclei = i
 
-       if (nstates .gt. max_num_ecapture_states) stop "ecapture: too many states"
+       if (nstates > max_num_ecapture_states) stop "ecapture: too many states"
        call integer_dict_define(ecapture_states_number_dict, iso, nstates, ierr)
 
        id = chem_get_iso_id(iso)
@@ -239,15 +239,15 @@ contains
     num_ecapture_reactions = 0
     num_ecapture_transitions = 0
 
-    do i = 1, max_num_ecapture_reactions ! keep reading until end of file
+    do i = 1, max_num_ecapture_reactions  ! keep reading until end of file
 
-       do ! skip any blank or comment lines
+       do  ! skip any blank or comment lines
           read(iounit,'(a)',iostat=ierr) string
           if (ierr /= 0) exit
           if ((index(string,"!") /= 0) .or. (len_trim(string) == 0)) then
-             cycle ! comment or blank line
+             cycle  ! comment or blank line
           else
-             exit ! good line
+             exit  ! good line
           end if
        end do
        if (ierr /= 0) then

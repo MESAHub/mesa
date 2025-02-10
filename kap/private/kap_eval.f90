@@ -50,10 +50,10 @@
          real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
          real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
          real(dp), intent(out) :: kap_fracs(num_kap_fracs)
-         real(dp), intent(out) :: kap ! opacity
-         real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+         real(dp), intent(out) :: kap  ! opacity
+         real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
          real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          real(dp) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp) :: kap_compton, dlnkap_compton_dlnRho, dlnkap_compton_dlnT
@@ -73,7 +73,7 @@
          include 'formats'
 
          dbg = rq% dbg
-         if (dbg) dbg = & ! check limits
+         if (dbg) dbg = &  ! check limits
             logT >= rq% logT_lo .and. logT <= rq% logT_hi .and. &
             logRho >= rq% logRho_lo .and. logRho <= rq% logRho_hi .and. &
             X >= rq% X_lo .and. X <= rq% X_hi .and. &
@@ -142,7 +142,7 @@
          kap_fracs(i_frac_Compton) = blend% val
 
 
-         if (blend .gt. 0) then ! at least some compton
+         if (blend > 0) then  ! at least some compton
 
             if (rq % use_other_compton_opacity) then
                call rq% other_compton_opacity(rq% handle, Rho, T, &
@@ -158,7 +158,7 @@
 
             if (ierr /= 0) return
 
-         else ! no Compton
+         else  ! no Compton
 
             kap_compton = 1d-30
             dlnkap_compton_dlnRho = 0d0
@@ -172,7 +172,7 @@
          logkap_compton% d1val2 = dlnkap_compton_dlnT
 
 
-         if (blend .lt. 1) then ! at least some tables
+         if (blend < 1) then  ! at least some tables
 
             if (rq% use_other_radiative_opacity) then
                call rq% other_radiative_opacity( &
@@ -194,7 +194,7 @@
             ! the fraction of highT opacities provided by the Type2 tables
             ! frac_Type2 = (1d0 - blend% val) * frac_Type2
 
-         else ! no tables
+         else  ! no tables
 
             kap_rad = 1d-30
             dlnkap_rad_dlnRho = 0d0
@@ -237,16 +237,16 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
-        real(dp), intent(in) :: logRho_in ! density
-        real(dp), intent(in) :: logT_in ! temperature
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe  ! composition
+        real(dp), intent(in) :: logRho_in  ! density
+        real(dp), intent(in) :: logT_in  ! temperature
 
         ! OUTPUT
         real(dp), intent(out) :: frac_lowT, frac_highT, frac_Type2
-        real(dp), intent(out) :: kap ! opacity
-        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: kap  ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
 
         real(dp) :: logRho, Rho, logT, T
         real(dp) :: frac_Type1, dZ, frac_X, frac_dZ, &
@@ -296,7 +296,7 @@
         lower_bdy = max(rq% kap_blend_logT_lower_bdy, logT_min)
         if (dbg) write(*,1) 'Get_kap_blend_logT lower_bdy', lower_bdy, &
              rq% kap_blend_logT_lower_bdy, logT_min
-        if (logT <= lower_bdy) then ! all lowT
+        if (logT <= lower_bdy) then  ! all lowT
            if (dbg) write(*,1) 'all lowT'
            call Get_kap_lowT_Results(rq, &
                 X, Z, XC, XN, XO, XNe, logRho, logT, &
@@ -320,7 +320,7 @@
         upper_bdy = min(rq% kap_blend_logT_upper_bdy, lowT_logT_max)
         if (dbg) write(*,1) 'Get_kap_blend_logT upper_bdy', upper_bdy, &
              rq% kap_blend_logT_upper_bdy, lowT_logT_max
-        if (logT >= upper_bdy) then ! no lowT
+        if (logT >= upper_bdy) then  ! no lowT
            if (dbg) write(*,1) 'no lowT'
            call Get_kap_highT_Results(rq, &
                 X, Z, XC, XN, XO, XNe, logRho, logT, &
@@ -398,17 +398,17 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe ! composition
-        real(dp), intent(in) :: logRho_in ! density
-        real(dp), intent(in) :: logT_in ! temperature
+        real(dp), intent(in) :: X, Z, XC, XN, XO, XNe  ! composition
+        real(dp), intent(in) :: logRho_in  ! density
+        real(dp), intent(in) :: logT_in  ! temperature
         ! free_e := total combined number per nucleon of free electrons and positrons
 
         ! OUTPUT
         real(dp), intent(out) :: frac_Type2
-        real(dp), intent(out) :: kap ! opacity
-        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: kap  ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
 
         real(dp) :: logRho, Rho, logT, T
         real(dp) :: frac_Type1, Zbase, dZ, frac_X, frac_dZ, &
@@ -418,7 +418,7 @@
 
         logical, parameter :: dbg = .false.
 
-        ierr = -1 ! should be set by each case, otherwise something is wrong
+        ierr = -1  ! should be set by each case, otherwise something is wrong
         frac_Type2 = 0d0
 
         logRho = logRho_in; Rho = exp10(logRho)
@@ -489,16 +489,16 @@
 
         ! INPUT
         type (Kap_General_Info), pointer :: rq
-        real(dp), intent(in) :: X, Z, XC_in, XN_in, XO_in, XNe_in ! composition
-        real(dp), intent(in) :: logRho_in ! density
-        real(dp), intent(in) :: logT_in ! temperature
+        real(dp), intent(in) :: X, Z, XC_in, XN_in, XO_in, XNe_in  ! composition
+        real(dp), intent(in) :: logRho_in  ! density
+        real(dp), intent(in) :: logT_in  ! temperature
 
         ! OUTPUT
         real(dp), intent(out) :: frac_Type2
-        real(dp), intent(out) :: kap ! opacity
-        real(dp), intent(out) :: dlnkap_dlnRho ! partial derivative at constant T
+        real(dp), intent(out) :: kap  ! opacity
+        real(dp), intent(out) :: dlnkap_dlnRho  ! partial derivative at constant T
         real(dp), intent(out) :: dlnkap_dlnT   ! partial derivative at constant Rho
-        integer, intent(out) :: ierr ! 0 means AOK.
+        integer, intent(out) :: ierr  ! 0 means AOK.
 
         real(dp) :: logRho, Rho, logT, T
         real(dp) :: XC, XN, XO, XNe
@@ -571,7 +571,7 @@
               frac_X = 0d0
            else if (X <= rq% kap_Type2_full_on_X) then
               frac_X = 1d0
-           else ! blend
+           else  ! blend
               frac_X = (rq% kap_Type2_full_off_X - X) / &
                    (rq% kap_Type2_full_off_X - rq% kap_Type2_full_on_X)
            end if
@@ -581,7 +581,7 @@
               frac_dZ = 0d0
            else if (dZ >= rq% kap_Type2_full_on_dZ) then
               frac_dZ = 1d0
-           else ! blend
+           else  ! blend
               frac_dZ = (rq% kap_Type2_full_off_dZ - dZ) / &
                    (rq% kap_Type2_full_off_dZ - rq% kap_Type2_full_on_dZ)
            end if
@@ -629,7 +629,7 @@
         beta = frac_Type1
         alfa = frac_Type2
 
-        if (beta > 0) then ! get value from fixed metal tables
+        if (beta > 0) then  ! get value from fixed metal tables
            if (rq% use_Type2_opacities .and. rq% use_Zbase_for_Type1) then
               ! when Z > Zbase, use Zbase instead of Z.
               call Get1_kap_fixed_metal_Results( &
@@ -657,7 +657,7 @@
            kap_beta = 0d0; dlnkap_beta_dlnRho = 0d0; dlnkap_beta_dlnT = 0d0
         end if
 
-        if (alfa > 0d0) then ! get value from C/O enhanced tables
+        if (alfa > 0d0) then  ! get value from C/O enhanced tables
            call Get1_kap_CO_Results( &
                 rq, Zbase, X, dXC, dXO, Rho, logRho, T, logT, &
                 logkap_alfa, dlnkap_alfa_dlnRho, dlnkap_alfa_dlnT, ierr)
@@ -709,7 +709,7 @@
          real(dp), intent(in) :: logRho, logT, zbar
          real(dp), intent(inout) :: kap_rad, dlnkap_rad_dlnRho, dlnkap_rad_dlnT
          real(dp), intent(out) :: kap, dlnkap_dlnRho, dlnkap_dlnT
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          real(dp) :: kap_ec, dlnkap_ec_dlnRho, dlnkap_ec_dlnT
          logical, parameter :: dbg = .false.

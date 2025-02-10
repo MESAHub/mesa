@@ -107,9 +107,9 @@
          integer, intent(in) :: net_handle, eos_handle
          integer, intent(in) :: species
          integer, intent(in) :: num_reactions
-         real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (species)
-         integer, intent(in) :: ntimes ! ending time is times(num_times); starting time is 0
-         real(dp), pointer, intent(in) :: times(:) ! (num_times)
+         real(dp), intent(in) :: t_start, t_end, starting_x(:)  ! (species)
+         integer, intent(in) :: ntimes  ! ending time is times(num_times); starting time is 0
+         real(dp), pointer, intent(in) :: times(:)  ! (num_times)
          real(dp), pointer, intent(in) :: log10Ts_f1(:)
             ! =(4,numtimes) interpolant for log10T(time)
          real(dp), pointer, intent(in) :: log10Rhos_f1(:)
@@ -118,14 +118,14 @@
             ! =(4,numtimes) interpolant for eta(time)
          real(dp), pointer, intent(in) :: dxdt_source_term(:)
             ! (species)  or null if no source term.
-         real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+         real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
          real(dp), intent(in) :: weak_rate_factor
-         real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-         real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-         integer, intent(in) :: screening_mode ! see screen_def
+         real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+         real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+         integer, intent(in) :: screening_mode  ! see screen_def
          real(dp), intent(in) :: stptry_in
-         integer, intent(in) :: max_steps ! maximal number of allowed steps.
-         real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
+         integer, intent(in) :: max_steps  ! maximal number of allowed steps.
+         real(dp), intent(in) :: eps, odescal  ! tolerances.  e.g., set both to 1d-6
          logical, intent(in) :: use_pivoting
          logical, intent(in) :: trace, burn_dbg
          interface

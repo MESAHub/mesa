@@ -107,7 +107,7 @@ contains
     integer :: unit, root_len, name_len
 
     ierr = 0
-    version = 'unknown' !set here in case there is a problem below
+    version = 'unknown'  !set here in case there is a problem below
 
     call get_environment_variable(name='MESASDK_VERSION', value=version, length=name_len, status=ierr)
     if (ierr /= 0) then
@@ -617,10 +617,10 @@ contains
   integer function token(iounit, n, i, buffer, string)
     use utils_def
     integer, intent(in) :: iounit
-    integer, intent(inout) :: n ! number of characters currently in buffer
-    integer, intent(inout) :: i ! number of characters already read from buffer
-    character (len=*), intent(inout) :: buffer ! line of text from input file
-    character (len=*), intent(inout) :: string ! holds string or name for string or name token
+    integer, intent(inout) :: n  ! number of characters currently in buffer
+    integer, intent(inout) :: i  ! number of characters already read from buffer
+    character (len=*), intent(inout) :: buffer  ! line of text from input file
+    character (len=*), intent(inout) :: string  ! holds string or name for string or name token
 
     integer :: info, j, j1, j2, l, str_len
 
@@ -638,16 +638,16 @@ contains
           i = 0
           !write(*,'(i6,3x,a)') n, trim(buffer)
        end do
-       token_loop: do while (i < n) ! have non-empty buffer
+       token_loop: do while (i < n)  ! have non-empty buffer
           i = i+1
-          if (buffer(i:i) == char(9)) cycle token_loop ! skip tabs
+          if (buffer(i:i) == char(9)) cycle token_loop  ! skip tabs
           select case(buffer(i:i))
           case ('!')
              i = n
              cycle line_loop
           case (' ')
              cycle token_loop
-          case ('&') ! ignore &'s
+          case ('&')  ! ignore &'s
              cycle token_loop
           case ('(')
              token = left_paren_token; return
@@ -720,12 +720,12 @@ contains
 
   subroutine integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
     use utils_dict
-    type (integer_dict), pointer :: dict ! pass null for empty dict
+    type (integer_dict), pointer :: dict  ! pass null for empty dict
     character (len=*), intent(in) :: key
     integer, intent(in) :: value
-    logical, intent(out) :: duplicate ! true if key was already defined
+    logical, intent(out) :: duplicate  ! true if key was already defined
     ! if already defined, old value is replaced by new one.
-    integer, intent(out) :: ierr ! error if len_trim(key) > maxlen_key_string
+    integer, intent(out) :: ierr  ! error if len_trim(key) > maxlen_key_string
     call do_integer_dict_define(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define_and_report_duplicates
 
@@ -733,10 +733,10 @@ contains
 
   subroutine integer_dict_define(dict, key, value, ierr)
     use utils_def, only: integer_dict
-    type (integer_dict), pointer :: dict ! pass null for empty dict
+    type (integer_dict), pointer :: dict  ! pass null for empty dict
     character (len=*), intent(in) :: key
     integer, intent(in) :: value
-    integer, intent(out) :: ierr ! error if len_trim(key) > maxlen_key_string
+    integer, intent(out) :: ierr  ! error if len_trim(key) > maxlen_key_string
     logical :: duplicate
     call integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define
@@ -757,13 +757,13 @@ contains
     type (integer_dict), pointer :: dict
     character (len=*), intent(in) :: key
     integer, intent(out) :: value
-    integer, intent(out) :: ierr ! 0 if found key in dict, -1 if didn't
+    integer, intent(out) :: ierr  ! 0 if found key in dict, -1 if didn't
     call do_integer_dict_lookup(dict, key, value, ierr)
   end subroutine integer_dict_lookup
 
   !****
 
-  integer function integer_dict_size(dict) ! number of entries
+  integer function integer_dict_size(dict)  ! number of entries
     use utils_dict
     type (integer_dict), pointer :: dict
     integer_dict_size = size_integer_dict(dict)
@@ -779,7 +779,7 @@ contains
          implicit none
          character (len=*), intent(in) :: key
          integer, intent(in) :: value
-         integer, intent(out) :: ierr ! /= 0 means terminate map calls
+         integer, intent(out) :: ierr  ! /= 0 means terminate map calls
        end subroutine fcn
     end interface
     integer :: ierr
@@ -808,9 +808,9 @@ contains
 
   subroutine integer_idict_define_and_report_duplicates(idict, key1, key2, value, duplicate, ierr)
     use utils_idict
-    type (integer_idict), pointer :: idict ! pass null for empty idict
+    type (integer_idict), pointer :: idict  ! pass null for empty idict
     integer, intent(in) :: key1, key2, value
-    logical, intent(out) :: duplicate ! true if key was already defined
+    logical, intent(out) :: duplicate  ! true if key was already defined
     ! if already defined, old value is replaced by new one.
     integer, intent(out) :: ierr
     call do_integer_idict_define(idict, key1, key2, value, duplicate, ierr)
@@ -820,7 +820,7 @@ contains
 
   subroutine integer_idict_define(idict, key1, key2, value, ierr)
     use utils_def, only: integer_idict
-    type (integer_idict), pointer :: idict ! pass null for empty idict
+    type (integer_idict), pointer :: idict  ! pass null for empty idict
     integer, intent(in) :: key1, key2, value
     integer, intent(out) :: ierr
     logical :: duplicate
@@ -844,13 +844,13 @@ contains
     type (integer_idict), pointer :: idict
     integer, intent(in) :: key1, key2
     integer, intent(out) :: value
-    integer, intent(out) :: ierr ! 0 if found key in idict, -1 if didn't
+    integer, intent(out) :: ierr  ! 0 if found key in idict, -1 if didn't
     call do_integer_idict_lookup(idict, key1, key2, value, ierr)
   end subroutine integer_idict_lookup
 
   !****
 
-  integer function integer_idict_size(idict) ! number of entries
+  integer function integer_idict_size(idict)  ! number of entries
     use utils_idict
     type (integer_idict), pointer :: idict
     integer_idict_size = size_integer_idict(idict)
@@ -865,7 +865,7 @@ contains
        subroutine fcn(key1, key2, value, ierr)
          implicit none
          integer, intent(in) :: key1, key2, value
-         integer, intent(out) :: ierr ! /= 0 means terminate map calls
+         integer, intent(out) :: ierr  ! /= 0 means terminate map calls
        end subroutine fcn
     end interface
     integer :: ierr
@@ -936,7 +936,7 @@ contains
     use utils_system, only: mv_c => mv
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
-    integer res
+    integer :: res
 
     res = mv_c(file_in,file_out)
 
@@ -966,7 +966,7 @@ contains
     use utils_system, only: cp_c => cp
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
-    integer res
+    integer :: res
 
     res = cp_c(file_in,file_out)
 

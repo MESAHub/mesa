@@ -62,7 +62,7 @@
             integer :: net_handle
 
          ! star id
-            integer :: id ! unique identifier for each star_info instance
+            integer :: id  ! unique identifier for each star_info instance
 
          ! Name of the main inlist used
             character (len=strlen) :: inlist_fname
@@ -72,9 +72,9 @@
             logical :: do_burn, do_mix
             logical :: used_extra_iter_in_solver_for_accretion
             integer :: retry_cnt, redo_cnt
-            type (EoS_General_Info), pointer :: eos_rq ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
-            type (Kap_General_Info), pointer :: kap_rq ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
-            type (Net_General_Info), pointer :: net_rq ! from call net_ptr(s% net_handle,s% net_rq, ierr)
+            type (EoS_General_Info), pointer :: eos_rq  ! from call eos_ptr(s% eos_handle,s% eos_rq,ierr)
+            type (Kap_General_Info), pointer :: kap_rq  ! from call kap_ptr(s% kap_handle,s% kap_rq,ierr)
+            type (Net_General_Info), pointer :: net_rq  ! from call net_ptr(s% net_handle,s% net_rq, ierr)
 
             ! parameters for create pre ms -- set in run_star before calling star_create_pre_ms_model
             real(dp) :: pre_ms_T_c, pre_ms_guess_rho_c, &
@@ -99,11 +99,11 @@
             character (len=net_name_len) :: initial_model_new_net_name
 
             ! extra profile entries for developer debugging
-            real(dp), dimension(:,:), pointer :: profile_extra ! (nz,max_num_profile_extras)
+            real(dp), dimension(:,:), pointer :: profile_extra  ! (nz,max_num_profile_extras)
             character (len=64) :: profile_extra_name(max_num_profile_extras)
 
          ! controls
-            type (star_job_controls) :: job ! separate type to avoid name clashes
+            type (star_job_controls) :: job  ! separate type to avoid name clashes
             include "star_controls.inc"
             include "star_controls_dev.inc"
 
@@ -114,7 +114,7 @@
 
 
       logical :: have_initialized_star_handles = .false.
-      integer, parameter :: max_star_handles = 10 ! this can be increased as necessary
+      integer, parameter :: max_star_handles = 10  ! this can be increased as necessary
       type (star_info), target, save :: star_handles(max_star_handles)
          ! gfortran seems to require "save" here.  at least it did once upon a time.
 

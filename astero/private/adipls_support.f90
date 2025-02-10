@@ -35,15 +35,15 @@
 
       ! args for adipls
       integer, save :: i_paramset, ierr_param, i_inout, nn
-      real(dp), save, pointer :: x(:) => null() ! (nn)
-      real(dp), save, pointer :: aa(:,:) => null() ! (iaa_arg,nn)
+      real(dp), save, pointer :: x(:) => null()  ! (nn)
+      real(dp), save, pointer :: aa(:,:) => null()  ! (iaa_arg,nn)
       real(dp), save :: data(8)
 
       integer, parameter :: ivarmd = 6, iaa_arg = 10
 
       integer, save :: iounit_dev_null = -1
 
-      integer, save :: nn_redist ! set from redistrb.c input file
+      integer, save :: nn_redist  ! set from redistrb.c input file
 
 
       real(dp), save, pointer :: x_arg(:) => null(), aa_arg(:,:) => null()
@@ -136,28 +136,28 @@
 
          if (.not. associated(l_order)) then
             allocate(l_order(num_results))
-         else if (num_results >= size(l_order,dim=1)) then ! enlarge
+         else if (num_results >= size(l_order,dim=1)) then  ! enlarge
             call realloc_integer(l_order,num_results,ierr)
             if (ierr /= 0) return
          end if
 
          if (.not. associated(l_em)) then
             allocate(l_em(num_results))
-         else if (num_results >= size(l_em,dim=1)) then ! enlarge
+         else if (num_results >= size(l_em,dim=1)) then  ! enlarge
             call realloc_integer(l_em,num_results,ierr)
             if (ierr /= 0) return
          end if
 
          if (.not. associated(l_freq)) then
             allocate(l_freq(num_results))
-         else if (num_results >= size(l_freq,dim=1)) then ! enlarge
+         else if (num_results >= size(l_freq,dim=1)) then  ! enlarge
             call realloc_double(l_freq,num_results,ierr)
             if (ierr /= 0) return
          end if
 
          if (.not. associated(l_inertia)) then
             allocate(l_inertia(num_results))
-         else if (num_results >= size(l_inertia,dim=1)) then ! enlarge
+         else if (num_results >= size(l_inertia,dim=1)) then  ! enlarge
             call realloc_double(l_inertia,num_results,ierr)
             if (ierr /= 0) return
          end if
@@ -237,8 +237,8 @@
 
          integer :: iriche, iturpr
          integer :: iconst, ivar, ivers, nn_in
-         real(dp), allocatable :: global_data(:) ! (iconst)
-         real(dp), allocatable :: point_data(:,:) ! (ivar,nn_in)
+         real(dp), allocatable :: global_data(:)  ! (iconst)
+         real(dp), allocatable :: point_data(:,:)  ! (ivar,nn_in)
          character (len=2000) :: format_string, num_string, filename
 
          ierr = 0
@@ -285,7 +285,7 @@
          ivar = SIZE(point_data, 1)
          nn_in = SIZE(point_data, 2)
 
-         ivers = 0 ! It's not clear what this does in fgong_amdl
+         ivers = 0  ! It's not clear what this does in fgong_amdl
 
          call fgong_amdl(cgrav, nn_in, iconst, ivar, ivers, global_data, point_data, data, aa, nn, ierr)
          deallocate(global_data, point_data)
@@ -319,7 +319,7 @@
             include 'formats'
             ierr = 0
             if (.not. do_redistribute_mesh) return
-            nn_new = nn_redist ! srdist uses nn from input file
+            nn_new = nn_redist  ! srdist uses nn from input file
             allocate(aa_new(iaa_arg,nn_new), x_new(nn_new))
             ierr_param = 0
             !write(*,2) 'call srdist: nn_redist', nn_new
@@ -668,10 +668,10 @@
          real(dp), intent(in) :: cgrav
          character (len=64) :: fname
          integer :: nn, nn_in, iconst, ivar, ivers, ierr
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn_in)   will be allocated
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
-         real(dp), pointer :: x(:) ! (nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn_in)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: x(:)  ! (nn)   will be allocated
          real(dp) :: data(8)
 
          ierr = 0
@@ -702,7 +702,7 @@
          integer, intent(inout) :: iturpr
          real(dp), intent(in) :: data(8)
          real(dp), pointer :: aa(:,:)
-         real(dp), pointer :: x(:) ! (nn)     will be allocated
+         real(dp), pointer :: x(:)  ! (nn)     will be allocated
          ! nn can be less than nn_in
          integer, intent(out) :: nn, ierr
 
@@ -817,10 +817,10 @@
          ! derived from fgong-amdl.d.f
          real(dp), intent(in) :: cgrav
          integer, intent(in) :: nn_in, iconst, ivar, ivers
-         real(dp), intent(inout) :: glob(:) ! (iconst)
-         real(dp), intent(inout) :: var(:,:) ! (ivar,nn_in)
+         real(dp), intent(inout) :: glob(:)  ! (iconst)
+         real(dp), intent(inout) :: var(:,:)  ! (ivar,nn_in)
          real(dp), intent(inout) :: data(8)
-         real(dp), pointer :: aa(:,:) ! (iaa_arg,nn)   will be allocated
+         real(dp), pointer :: aa(:,:)  ! (iaa_arg,nn)   will be allocated
          integer, intent(out) :: nn, ierr
 
          integer, parameter :: ireset(16) = &
@@ -922,8 +922,8 @@
       subroutine read_fgong_file(fin, nn, iconst, ivar, ivers, glob, var, ierr)
          character (len=*), intent(in) :: fin
          integer, intent(out) :: nn, iconst, ivar, ivers
-         real(dp), pointer :: glob(:) ! (iconst)   will be allocated
-         real(dp), pointer :: var(:,:) ! (ivar,nn)   will be allocated
+         real(dp), pointer :: glob(:)  ! (iconst)   will be allocated
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)   will be allocated
          integer, intent(out) :: ierr
 
          integer :: ios, iounit, i, n
@@ -986,8 +986,8 @@
       subroutine dump(filename_for_dump,nn,glob,var,ierr)
          character (len=*), intent(in) :: filename_for_dump
          integer, intent(in) :: nn
-         real(dp), pointer :: glob(:) ! (iconst)
-         real(dp), pointer :: var(:,:) ! (ivar,nn)
+         real(dp), pointer :: glob(:)  ! (iconst)
+         real(dp), pointer :: var(:,:)  ! (ivar,nn)
          integer, intent(out) :: ierr
 
          real(dp), parameter :: Msun = 1.9892d33, Rsun = 6.9598d10, Lsun = 3.8418d33
@@ -1010,7 +1010,7 @@
 
          write(*,*) 'dump fgong data to ' // trim(filename_for_dump)
 
-         if (VAR(1,1) <= 1) then ! skip tny r
+         if (VAR(1,1) <= 1) then  ! skip tny r
             offset = 1
          else
             offset = 0

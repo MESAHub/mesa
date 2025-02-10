@@ -40,7 +40,7 @@
       logical, parameter :: astero_gyre_is_enabled = GYRE_IS_ENABLED
       logical, parameter :: astero_adipls_is_enabled = ADIPLS_IS_ENABLED
 
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
@@ -137,7 +137,7 @@
             nl0, l0_obs, l0_freq, l0_freq_corr, l0_inertia)
          use astero_support, only: get_kjeldsen_radial_freq_corr
          real(dp), intent(in) :: a_div_r, b, nu_max, correction_factor
-         logical, intent(in) :: check_obs ! if false, then l0_obs is not used
+         logical, intent(in) :: check_obs  ! if false, then l0_obs is not used
          integer, intent(in) :: nl0
          real(dp), intent(in), dimension(:) :: &
             l0_obs, l0_freq, l0_inertia

@@ -89,7 +89,7 @@
             write(*,'(A)')
          end if
 
-         do ! skip to line starting with 'from '
+         do  ! skip to line starting with 'from '
             read(iounit,'(a)',iostat=ierr) string
             if (failed('read weak info comments')) return
             if (len_trim(string) > 4) then
@@ -101,7 +101,7 @@
          allocate(weak_info_list_halflife(max_num_weak_info))
          allocate(weak_info_list_Qneu(max_num_weak_info))
          num_weak_info_list_reactions = 0
-         do i = 1, max_num_weak_info ! keep reading until end of file
+         do i = 1, max_num_weak_info  ! keep reading until end of file
             read(iounit,fmt='(a5,a5,a)',iostat=ierr) lhs, rhs, string
             if (ierr == 0) then
                call str_to_vector(string, vec, nvec, ierr)
@@ -188,13 +188,13 @@
             ios = 0
             open(newunit=iounit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
-            if (ios == 0) then ! opened it okay
+            if (ios == 0) then  ! opened it okay
                call read_weak_cache(iounit,ios)
                close(iounit)
             end if
          end if
 
-         if (ios /= 0) then ! need to read data file
+         if (ios /= 0) then  ! need to read data file
 
             filename = trim(weak_data_dir) // '/weakreactions.tables'
             ierr = 0
@@ -210,7 +210,7 @@
                write(*,'(A)')
             end if
 
-            do ! skip to after line starting with '='
+            do  ! skip to after line starting with '='
                read(iounit,'(a)',iostat=ierr) string
                if (failed('read header')) return
                if (len_trim(string) > 0) then
@@ -230,7 +230,7 @@
 
             do i = 1, num_weak_reactions
                if (.not. skip_line()) return
-               if (mod(i,2)==1) then ! first of pair
+               if (mod(i,2)==1) then  ! first of pair
                   if (.not. skip_line()) return
                   if (.not. skip_line()) return
                   read(iounit,fmt='(2a5)',iostat=ierr) lhs1, rhs1
@@ -498,7 +498,7 @@
         dir = rates_table_dir
         filename = trim(dir) // '/weak_rate_list.txt'
         open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-        if (ierr /= 0) then ! if don't find that file, look in rates_dir
+        if (ierr /= 0) then  ! if don't find that file, look in rates_dir
            dir = trim(rates_dir) // '/rate_tables'
            filename = trim(dir) // '/weak_rate_list.txt'
            ierr = 0

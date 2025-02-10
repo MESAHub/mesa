@@ -66,8 +66,8 @@ contains
       integer, intent(out) :: ierr
       real(dp) :: dgrad, K_therm, K_T, K_mu, nu, R0, Pr, tau, r_th
       include 'formats'
-      dgrad = max(1d-40, grada - gradr) ! positive since Schwarzschild stable
-      K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho) ! thermal conductivity
+      dgrad = max(1d-40, grada - gradr)  ! positive since Schwarzschild stable
+      K_therm = 4d0*crad*clight*pow3(T)/(3d0*opacity*rho)  ! thermal conductivity
       if (thermohaline_option == 'Kippenhahn') then
          ! Kippenhahn, R., Ruschenplatt, G., & Thomas, H.-C. 1980, A&A, 91, 175
          D_thrm = -3d0*K_therm/(2*rho*cp)*gradL_composition_term/dgrad
@@ -78,7 +78,7 @@ contains
          Pr = nu/K_T
          tau = K_mu/K_T
          r_th = (R0 - 1d0)/(1d0/tau - 1d0)
-         if (r_th >= 1d0) then ! stable if R0 >= 1/tau
+         if (r_th >= 1d0) then  ! stable if R0 >= 1/tau
             D_thrm = 0d0
          else if (Pr < 0d0) then
             ! Bad results from get_diff_coeffs will just result in NaNs from thermohaline options, so skip
@@ -86,8 +86,8 @@ contains
          else if (thermohaline_option == 'Traxler_Garaud_Stellmach_11') then
             ! Traxler, Garaud, & Stellmach, ApJ Letters, 728:L29 (2011).
             ! also see Denissenkov. ApJ 723:563–579, 2010.
-            D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0) ! eqn 24
-         else ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
+            D_thrm = 101d0*sqrt(K_mu*nu)*exp(-3.6d0*r_th)*pow(1d0 - r_th,1.1d0)  ! eqn 24
+         else  ! if (s% thermohaline_option == 'Brown_Garaud_Stellmach_13') then
             D_thrm = K_mu*(Numu(R0,r_th,pr,tau) - 1d0)
          endif
       else
@@ -112,7 +112,7 @@ contains
 
       ! Log Lambda for pure H (equation 10 from Proffitt Michaud 93)
       loglambdah = -19.26d0 - 0.5d0*log(rho) + 1.5d0*log(T) - 0.5d0*log(1d0 + 0.5d0*(1+XH1))
-      nu_rad = 4d0*crad*pow4(T)/(15d0*clight*opacity*pow2(rho)) ! radiative viscosity
+      nu_rad = 4d0*crad*pow4(T)/(15d0*clight*opacity*pow2(rho))  ! radiative viscosity
       nu_mol = 0.406d0*sqrt(amu)*pow(boltzm*T,2.5d0)/(qe4*loglambdah*rho)
       ! From Spitzer "Physics of Fully Ionized Gases equation 5-54
       ! Assumes pure H. Still trying to work out what it would be for a mixture.
@@ -125,7 +125,7 @@ contains
       chemA = chem_isos%Z_plus_N(iso)
       chemZ = chem_isos%Z(iso)
 
-      if(chemZ.gt.2) then
+      if(chemZ>2) then
       ! This is if the driving chemical is NOT He.
          ! Log Lambda for H-dominant chem mixture (equation 10)
          loglambdacx = loglambdah - log(chemz)
@@ -186,7 +186,7 @@ contains
         !Call relaxation for slightly different Pr, tau, R0.
         call NR(myvars,prandtl*(1d0+iter*1.d-2),diffratio,R0/(1d0+iter*1.d-2),ierr)
         !If it converged this time, call NR for the real parameters.
-        if(ierr.eq.0) call NR(myvars,prandtl,diffratio,R0,ierr)
+        if(ierr==0) call NR(myvars,prandtl,diffratio,R0,ierr)
         !write(*,*) prandtl,diffratio,R0,myvars(1),myvars(2),ierr
         !Otherwise, increase counter and try again.
         iter = iter + 1
@@ -195,7 +195,7 @@ contains
      if((myvars(2)<0).or.(ierr /= 0)) then
         write(*,*) "WARNING: thermohaline Newton relaxation failed to converge, falling back to estimate"
         maxl2 = maxl*maxl
-     else ! NR succeeded, so use results in myvars
+     else  ! NR succeeded, so use results in myvars
         !Plug solution into "l^2" and lambda.
         maxl2 = myvars(1)*myvars(1)
         lambdamax = myvars(2)
@@ -258,8 +258,8 @@ contains
 
       phi = diffratio/prandtl
 
-      if(r_th .lt. 0.5d0) then
-         if(r_th .gt. prandtl) then
+      if(r_th < 0.5d0) then
+         if(r_th > prandtl) then
             maxl = pow((1.d0/(1.d0+phi)) - 2.d0*dsqrt(r_th*phi)/pow(1d0+phi,2.5d0),0.25d0)
                ! Equation (B14)
             maxl4 = maxl*maxl*maxl*maxl
@@ -275,7 +275,7 @@ contains
             ! Equation (B19) carried to next order (doesn't work well otherwise)
          maxl4 = maxl*maxl*maxl*maxl
          maxl6 = maxl4*maxl*maxl
-         lambdamax = 2d0*prandtl*phi*maxl6/(1d0-(1d0+phi)*maxl4) ! Equation (B11)
+         lambdamax = 2d0*prandtl*phi*maxl6/(1d0-(1d0+phi)*maxl4)  ! Equation (B11)
       endif
       if(lambdamax<0) then   ! shouldn't be needed, but just as precaution
          maxl = 0.5d0
@@ -290,7 +290,7 @@ contains
       ! Newton Relaxation routine used to solve cubic & quadratic in thermohaline case.
       ! Written by P. Garaud (2013). Please email pgaraud@ucsc.edu for troubleshooting.
 
-      real(dp), parameter :: acy = 1.d-13 ! accuracy of NR solution.
+      real(dp), parameter :: acy = 1.d-13  ! accuracy of NR solution.
       integer, parameter :: niter = 20  ! max number of iterations allowed before giving up.
       integer, parameter :: &  !array dimension input parameters for dgesvx
             n = 2, &
@@ -301,9 +301,9 @@ contains
             ldx = n
 
       integer :: iter,ierr
-      real(dp) :: xrk(2), f(2) ! Functions f
-      real(dp) :: j(2,2) ! Jacobian
-      real(dp) :: err,errold ! Error at each iteration
+      real(dp) :: xrk(2), f(2)  ! Functions f
+      real(dp) :: j(2,2)  ! Jacobian
+      real(dp) :: err,errold  ! Error at each iteration
       real(dp) :: x1_sav,x2_sav
       real(dp) :: prandtl, diffratio, R0
       real(dp) :: A(lda,n), AF(ldaf,n), R(n), C(n), B(ldb,nrhs), X(ldx,nrhs), &
@@ -323,7 +323,7 @@ contains
       x2_sav = xrk(2)
 
       !While error is too large .and. decreasing, iterate.
-      do while ((err.gt.acy).and.(ierr.eq.0).and.(iter.lt.niter))
+      do while ((err>acy).and.(ierr==0).and.(iter<niter))
          call thermohaline_rhs(xrk,f,j,prandtl,diffratio,R0)
 
          fact = 'E'
@@ -346,17 +346,17 @@ contains
             iter = iter + 1
             f(1) = X(1,1)
             f(2) = X(2,1)
-            err = dsqrt(f(1)*f(1)+f(2)*f(2)) ! Calculate the new error
+            err = dsqrt(f(1)*f(1)+f(2)*f(2))  ! Calculate the new error
             ! If, after a while, the error is still not decreasing, give up and exit NR.
             ! Otherwise, continue.
-            if((iter.gt.5).and.(err.gt.errold)) then
+            if((iter>5).and.(err>errold)) then
                ! Write(*,2) 'Error not decreasing at iter', iter, err, errold
                ierr = 1
                ! Reset xs and exit loop.
                xrk(1) = x1_sav
                xrk(2) = x2_sav
             else
-               xrk = xrk - f ! The solution is now in f, so update x
+               xrk = xrk - f  ! The solution is now in f, so update x
                errold = err
             endif
          endif

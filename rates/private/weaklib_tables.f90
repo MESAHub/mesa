@@ -96,10 +96,10 @@ contains
       integer :: j, m, n
 
       integer :: nx       ! length of x vector (>= 2)
-      real(dp), pointer :: x(:) ! (nx)    ! junction points, strictly monotonic
-      real(dp), pointer :: f1(:), f(:,:) ! (4,nx)  ! data & interpolation coefficients
+      real(dp), pointer :: x(:)  ! (nx)    ! junction points, strictly monotonic
+      real(dp), pointer :: f1(:), f(:,:)  ! (4,nx)  ! data & interpolation coefficients
       integer, parameter :: nwork = pm_work_size
-      real(dp), pointer :: work(:) ! =(nx,nwork)
+      real(dp), pointer :: work(:)  ! =(nx,nwork)
 
       ierr = 0
 
@@ -272,11 +272,11 @@ contains
 
   contains
 
-    subroutine find_location ! set ix, jy; x is T9; y is lYeRho
+    subroutine find_location  ! set ix, jy; x is T9; y is lYeRho
       integer :: i, j
       include 'formats'
       ! x0 <= T9 <= x1
-      ix = table % num_T9-1 ! since weak_num_T9 is small, just do a linear search
+      ix = table % num_T9-1  ! since weak_num_T9 is small, just do a linear search
       do i = 2, table % num_T9-1
          if (T9 > table% T9s(i)) cycle
          ix = i-1
@@ -284,7 +284,7 @@ contains
       end do
 
       ! y0 <= lYeRho <= y1
-      jy = table % num_lYeRho-1 ! since weak_num_lYeRho is small, just do a linear search
+      jy = table % num_lYeRho-1  ! since weak_num_lYeRho is small, just do a linear search
       do j = 2, table % num_lYeRho-1
          if (lYeRho > table % lYeRhos(j)) cycle
          jy = j-1
@@ -346,7 +346,7 @@ contains
 
     subroutine do_bicubic_interpolations(fin, fval, df_dx, df_dy, ierr)
       ! derived from routines in the PSPLINE package written by Doug McCune
-      real(dp), dimension(:,:,:) :: fin ! the spline data array, dimensions (4, nx, ny)
+      real(dp), dimension(:,:,:) :: fin  ! the spline data array, dimensions (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 
@@ -420,8 +420,8 @@ contains
 
       dT9 = T9 - x0
       delta_T9 = x1 - x0
-      x_beta = dT9 / delta_T9 ! fraction of x1 result
-      x_alfa = 1.0d0 - x_beta ! fraction of x0 result
+      x_beta = dT9 / delta_T9  ! fraction of x1 result
+      x_alfa = 1.0d0 - x_beta  ! fraction of x0 result
       if (x_alfa < 0 .or. x_alfa > 1) then
          write(*,1) 'weaklib: x_alfa', x_alfa
          write(*,1) 'T9', T9
@@ -432,8 +432,8 @@ contains
 
       dlYeRho = lYeRho - y0
       delta_lYeRho = y1 - y0
-      y_beta = dlYeRho / delta_lYeRho ! fraction of y1 result
-      y_alfa = 1 - y_beta ! fraction of y0 result
+      y_beta = dlYeRho / delta_lYeRho  ! fraction of y1 result
+      y_alfa = 1 - y_beta  ! fraction of y0 result
       if (is_bad(y_alfa) .or. y_alfa < 0 .or. y_alfa > 1) then
          write(*,1) 'weaklib: y_alfa', y_alfa
          write(*,1) 'T9', T9
@@ -462,7 +462,7 @@ contains
     subroutine do_linear_interp(f, fval, df_dx, df_dy, ierr)
       use interp_1d_lib
       use utils_lib, only: is_bad
-      real(dp), dimension(:,:,:) :: f ! (4, nx, ny)
+      real(dp), dimension(:,:,:) :: f  ! (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 

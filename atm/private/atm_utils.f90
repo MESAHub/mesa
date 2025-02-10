@@ -138,7 +138,7 @@ contains
 
     gradr = P*kap*L / (16._dp*pi*clight*M*cgrav*Prad)
 
-    if (tau < 2._dp/3._dp) then ! Eqn. 8
+    if (tau < 2._dp/3._dp) then  ! Eqn. 8
 
        ! Eqn. 15
 
