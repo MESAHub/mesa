@@ -176,7 +176,10 @@
 
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_grad', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2, imin, imax, log_amu_mix_cell
+        write(*,*) 'Cannot find points for interpolation compute_grad', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, & 
+                    logRho_face, missing_point, ii_min, jj_min, offset1, offset2, & 
+                    imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -544,7 +547,9 @@
             retry = .false.
         else
 
-        write(*,*) 'Cannot find points for interpolation compute_grad_fast', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_grad_fast', & 
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, & 
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         endif
@@ -749,7 +754,9 @@
 
 
       if (tries > 4) THEN  ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_kappa', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
+        write(*,*) 'Cannot find points for interpolation compute_kappa', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -1062,7 +1069,9 @@
              enddo
              retry = .false.
          else
-        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         !stop
