@@ -96,7 +96,7 @@
 !***********************************************************************************
 	nx=size(rgb(1,:,1))
 	ny=size(rgb(1,1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -337,7 +337,7 @@
 !***********************************************************************************
 	nx=size(gray(:,1))
 	ny=size(gray(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -415,8 +415,8 @@
 	write ( file_unit, '(a)' ) 'set yrange ['// trim(yrange1) // ':'// trim(yrange2) //']'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -533,8 +533,8 @@
 	write ( file_unit, '(a)' ) 'unset ytics'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -579,7 +579,7 @@
 !***********************************************************************************
 ! prepare the data
 	nx=size(x)
-	if ((size(x).ne.size(y)).or.(size(x).ne.size(z))) then
+	if ((size(x)/=size(y)).or.(size(x)/=size(z))) then
 		print *,'subroutine plot3d ERROR: incompatible sizes of x(:),y(:) and z(:)'
 		stop
 	end if
@@ -825,7 +825,7 @@
 !***********************************************************************************
 	nx=size(z(:,1))
 	ny=size(z(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		print *,'subroutine surf_3 ERROR: sizes of x(:),y(:), and z(:,:) are incompatible'
 		stop
 	end if
@@ -953,8 +953,8 @@
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -1031,11 +1031,11 @@
 	Nx2=size(x2)
 	Nx3=size(x3)
 	Nx4=size(x4)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3)).or.(size(x4).ne.size(y4))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3)).or.(size(x4)/=size(y4))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.12)) then
+	if (present(style).and.(len(style)/=12)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1237,11 +1237,11 @@
 	Nx1=size(x1)
 	Nx2=size(x2)
 	Nx3=size(x3)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.9)) then
+	if (present(style).and.(len(style)/=9)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1423,11 +1423,11 @@
 !***********************************************************************************
 	Nx1=size(x1)
 	Nx2=size(x2)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.6)) then
+	if (present(style).and.(len(style)/=6)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1589,11 +1589,11 @@
 	end if
 !***********************************************************************************
 	Nx1=size(x1)
-	if ((size(x1).ne.size(y1))) then
+	if ((size(x1)/=size(y1))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.3)) then
+	if (present(style).and.(len(style)/=3)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1724,7 +1724,7 @@
 !***********************************************************************************
 	write (command, *) 'gnuplot ' // trim (command_file_name)
 	status=system(trim(command))
-	if (status.ne.0) then
+	if (status/=0) then
 		print *,'RUN_GNUPLOT - Fatal error!'
 		stop
 	end if

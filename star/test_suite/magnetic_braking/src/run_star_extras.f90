@@ -101,7 +101,7 @@
          ! Calculate total angular momentum
          j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz))  ! g cm^2/s Total Stellar Angular Momentum Content
 
-         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then  ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+         if ((s% mstar_dot /= 0) .and. (j_tot > 1d50) .and. (v_rot  > 0.8d5)) then  ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
            write(*,*) 'j_tot: ', j_tot, s% omega(1), v_rot/1d5
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
           !N.B. This is good for line-driven winds in hot stars. For different types of Vinf = Vesc might be a better choice?
@@ -140,7 +140,7 @@
           j = 0
           do k = 1, s% nz
             s% extra_jdot(k) =  j_dot / (s% nz * s% dm_bar(k))  ! Specific torque cm^2/s^2. Divide by shell mass and total number of shells
-            if (abs(s% extra_jdot(k)) .gt. abs(s% j_rot(k)/ s% dt)) then
+            if (abs(s% extra_jdot(k)) > abs(s% j_rot(k)/ s% dt)) then
               residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k)  ! Residual J_dot cm^2/s^2 * g
               s% extra_jdot(k) = - s% j_rot(k)/ s% dt  ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
               j=j+1
@@ -150,7 +150,7 @@
           ! Redistribute residual J_dot (only to gridpoints that can accomodate more torque)
           ! j number of cells that can not take anymore torque ()
           do k = 1, s% nz
-            if (abs(s% extra_jdot(k)) .lt. abs(s% j_rot(k)/ s% dt)) then
+            if (abs(s% extra_jdot(k)) < abs(s% j_rot(k)/ s% dt)) then
               s% extra_jdot(k) = s% extra_jdot(k) + (residual_jdot / ((s% nz - j) * s% dm_bar(k)))
             endif
           end do
@@ -294,7 +294,7 @@
 
          other_timestep_limit = keep_going
 
-         if ((j_tot .gt. 1d50) .and. (s% v_rot_avg_surf  .gt. 0.8d5) .and. t_spindown > 0d0) then
+         if ((j_tot > 1d50) .and. (s% v_rot_avg_surf  > 0.8d5) .and. t_spindown > 0d0) then
             ! Only limit the timestep when the star is actually spinning fast.
             dt_limit_ratio = s% x_ctrl(2) * s%dt / t_spindown
          end if

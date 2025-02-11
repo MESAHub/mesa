@@ -29,7 +29,7 @@ contains
       alpha = 2d0*(dzeta - 1d0)*dum/c
       beta = dum*dum
 
-      if (t .le. 5d0) then
+      if (t <= 5d0) then
          phi = 2d0
       else
          phi = 0d0

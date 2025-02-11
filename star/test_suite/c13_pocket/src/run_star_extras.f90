@@ -338,14 +338,14 @@
          case (1)
 
             ! measure MS lifetime
-            if (ms_t0 .eq. 0) then
-               if (s% power_h_burn .gt. 0.99 * s% L_surf) then
+            if (ms_t0 == 0) then
+               if (s% power_h_burn > 0.99 * s% L_surf) then
                   ms_t0 = s% star_age
                   write(*,*) 'started MS', ms_t0
                end if
             else
-               if (ms_t1 .eq. 0) then
-                  if (s% center_h1 .lt. 1d-4) then
+               if (ms_t1 == 0) then
+                  if (s% center_h1 < 1d-4) then
                      ms_t1 = s% star_age
                      write(*,*) 'finished MS', ms_t1
                   end if
@@ -353,14 +353,14 @@
             end if
 
             ! measure CHeB lifetime
-            if ((ms_t1 .ne. 0) .and. (cheb_t0 .eq. 0)) then
-               if (s% power_he_burn .gt. 0.01 * s% L_surf) then
+            if ((ms_t1 /= 0) .and. (cheb_t0 == 0)) then
+               if (s% power_he_burn > 0.01 * s% L_surf) then
                   cheb_t0 = s% star_age
                   write(*,*) 'started CHeB', cheb_t0
                end if
             else
-               if (cheb_t1 .eq. 0) then
-                  if (s% center_he4 .lt. 1d-4) then
+               if (cheb_t1 == 0) then
+                  if (s% center_he4 < 1d-4) then
                      cheb_t1 = s% star_age
                      write(*,*) 'finished CHeB', cheb_t1
                      mcore_TACHeB = s% he_core_mass
@@ -369,8 +369,8 @@
             end if
 
             ! measure extent of 1DUP
-            if ((ms_t1 .gt. 0) .and. (cheb_t0 .eq. 0)) then
-               if ((s% conv_mx1_top - s% conv_mx1_bot) .gt. 0.1) then
+            if ((ms_t1 > 0) .and. (cheb_t0 == 0)) then
+               if ((s% conv_mx1_top - s% conv_mx1_bot) > 0.1) then
                   m_1DUP = min(s% conv_mx1_bot * s% star_mass, m_1DUP)
                end if
             end if
@@ -380,7 +380,7 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn .gt. 1e4) then
+               if (s% power_he_burn > 1e4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse', TP_count
@@ -397,7 +397,7 @@
                   end if
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false.  ! pulse over
+               if (s% power_h_burn/s% power_he_burn > 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! checking for 3DUP
@@ -429,14 +429,14 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn .gt. 1e4) then
+               if (s% power_he_burn > 1e4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse'
                   mcore_min_after_TP = mcore_at_TP
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false.  ! pulse over
+               if (s% power_h_burn/s% power_he_burn > 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! stop after one TP
@@ -454,7 +454,7 @@
          if (s% x_integer_ctrl(1) == 4) then
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
-            if (s% xa(c13,k_max_c13) .gt. 0.01) then
+            if (s% xa(c13,k_max_c13) > 0.01) then
                s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001
                s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001
             else

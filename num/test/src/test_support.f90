@@ -265,7 +265,7 @@
          irtrn = 1
          if (ipar(1) /= 1) return  ! no output
 
-         if (nr.eq.1) then
+         if (nr==1) then
             write (6,99) x,y(1),y(2),nr-1
             xout=x+0.2d0
          else
