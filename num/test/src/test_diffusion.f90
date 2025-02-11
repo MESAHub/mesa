@@ -25,8 +25,8 @@
          real(dp), intent(in) :: x, h
          real(dp), intent(inout) :: y(n)
          real(dp), intent(inout) :: f(n), dfdy(ld_dfdy,n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
 
          real(dp) :: sig1, sig2
@@ -67,10 +67,10 @@
       subroutine diffusion_derivs(n, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: f(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: f(:)  ! (n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
 
          real(dp) :: dfdy(0,n)
@@ -87,8 +87,8 @@
          real(dp), intent(in) :: x, h
          real(dp), intent(inout) :: y(:)
          real(dp), intent(inout) :: f(:), dfdy(:,:)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
@@ -113,14 +113,14 @@
          use test_int_support,only:ipar_sparse_format
          integer, intent(in) :: n, nzmax, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: f(:) ! (n) ! dy/dx
-         integer, intent(inout) :: ia(:) ! (n+1)
-         integer, intent(inout) :: ja(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means terminate integration
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: f(:)  ! (n) ! dy/dx
+         integer, intent(inout) :: ia(:)  ! (n+1)
+         integer, intent(inout) :: ja(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+         integer, intent(out) :: ierr  ! nonzero means terminate integration
 
          real(dp) :: dfdy(n,n)
          integer :: ld_dfdy, nz
@@ -144,19 +144,19 @@
          ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
-         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: y(:)  ! (n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             real(dp) function interp_y(i,s,rwork,iwork,ierr)
                use const_def, only: dp
                implicit none
-               integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-               real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+               integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+               real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
@@ -188,8 +188,8 @@
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar_blk_dble, nz_blk_dble
-         real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk  ! =(nvar,nvar,nz)
 
          nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
          caller_id = 0
@@ -205,10 +205,10 @@
          t(0)   = 0d0
          t(1)   = tend
 
-         itol = 0 ! scalar tolerances
+         itol = 0  ! scalar tolerances
          rtol = 1d-6
          atol = 1d-6
-         h0 = atol(1)*1d-1 ! initial step size
+         h0 = atol(1)*1d-1  ! initial step size
 
          matrix_type_spec = banded_matrix_type
          mljac = diff_mljac

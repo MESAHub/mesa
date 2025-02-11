@@ -414,7 +414,7 @@
       integer, parameter :: npts = 79
       real(dp), dimension(npts) :: data_r, data_csound, data_width
 
-      logical, parameter :: scale_simplex_params = .false. ! experimental
+      logical, parameter :: scale_simplex_params = .false.  ! experimental
 
 
       ! interfaces for procedure pointers
@@ -430,7 +430,7 @@
             use const_def, only: dp
             implicit none
             integer, intent(in) :: id
-            integer, intent(in) :: i ! which of my_param's will be set
+            integer, intent(in) :: i  ! which of my_param's will be set
             real(dp), intent(in) :: new_value
             integer, intent(out) :: ierr
          end subroutine will_set_my_param_interface

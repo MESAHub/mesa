@@ -23,7 +23,7 @@
       real(dp) :: xa(species)
 
 
-      real(dp), allocatable :: d_dxa(:,:) ! (num_d_dxa_basic_results,species)
+      real(dp), allocatable :: d_dxa(:,:)  ! (num_d_dxa_basic_results,species)
 
       integer :: handle
       type (EoS_General_Info), pointer :: rq
@@ -66,7 +66,7 @@
          Zinit = Zinit_in
          XC = XC_in; XO = XO_in
          Y = 1 - (X + Zinit + XC + XO)
-         if (Y < 0) then ! adjust XC and XO
+         if (Y < 0) then  ! adjust XC and XO
             if (XC + XO <= 0) then
                write(*,*) 'bad args to Init_Composition'
                call mesa_error(__FILE__,__LINE__)

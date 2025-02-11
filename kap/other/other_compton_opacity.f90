@@ -42,15 +42,15 @@
             eta, d_eta_dlnRho, d_eta_dlnT, &
             kap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
             use const_def, only: dp
-            integer, intent(in) :: handle ! kap handle; from star, pass s% kap_handle
+            integer, intent(in) :: handle  ! kap handle; from star, pass s% kap_handle
             real(dp), intent(in) :: Rho, T
             real(dp), intent(in) :: lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT
             ! free_e := total combined number per nucleon of free electrons and positrons
             real(dp), intent(in) :: eta, d_eta_dlnRho, d_eta_dlnT
             ! eta := electron degeneracy parameter from eos
-            real(dp), intent(out) :: kap ! electron conduction opacity
+            real(dp), intent(out) :: kap  ! electron conduction opacity
             real(dp), intent(out) :: dlnkap_dlnRho, dlnkap_dlnT
-            integer, intent(out) :: ierr ! 0 means AOK.
+            integer, intent(out) :: ierr  ! 0 means AOK.
 
             write(*,*) 'no implementation for other_compton_opacity'
             ierr = -1

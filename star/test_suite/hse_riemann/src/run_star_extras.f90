@@ -151,18 +151,18 @@
 
          !write(*,2) 'Pmax k r*1d-13', k, 0.5d0*(s% r(k)+s% r(k+1))*1d-13
 
-         vals(1) = s% Peos(k) ! Pmax_P
-         vals(2) = 0.5d0*(s% r(k)+s% r(k+1))*1d-13 ! Pmax_r_1m13
-         vals(3) = 0.5d0*(s% v(k)+s% v(k+1)) ! Pmax_v
-         vals(4) = s% rho(k) ! Pmax_rho
-         vals(5) = s% T(k) ! Pmax_T
-         vals(6) = log10(s% Peos(k)) ! Pmax_P
-         vals(7) = log10(0.5d0*(s% r(k)+s% r(k+1))) ! Pmax_r
-         vals(8) = log10(0.5d0*(s% v(k)+s% v(k+1))) ! Pmax_v
-         vals(9) = log10(s% rho(k)) ! Pmax_rho
-         vals(10) = log10(s% T(k)) ! Pmax_T
-         vals(11) = 0.5d0*(s% r(k)+s% r(k+1))/s% time ! Pmax_r_div_t
-         vals(12) = s% m(k)/Msun ! Pmax_m_div_Msun
+         vals(1) = s% Peos(k)  ! Pmax_P
+         vals(2) = 0.5d0*(s% r(k)+s% r(k+1))*1d-13  ! Pmax_r_1m13
+         vals(3) = 0.5d0*(s% v(k)+s% v(k+1))  ! Pmax_v
+         vals(4) = s% rho(k)  ! Pmax_rho
+         vals(5) = s% T(k)  ! Pmax_T
+         vals(6) = log10(s% Peos(k))  ! Pmax_P
+         vals(7) = log10(0.5d0*(s% r(k)+s% r(k+1)))  ! Pmax_r
+         vals(8) = log10(0.5d0*(s% v(k)+s% v(k+1)))  ! Pmax_v
+         vals(9) = log10(s% rho(k))  ! Pmax_rho
+         vals(10) = log10(s% T(k))  ! Pmax_T
+         vals(11) = 0.5d0*(s% r(k)+s% r(k+1))/s% time  ! Pmax_r_div_t
+         vals(12) = s% m(k)/Msun  ! Pmax_m_div_Msun
 
       end subroutine data_for_extra_history_columns
 

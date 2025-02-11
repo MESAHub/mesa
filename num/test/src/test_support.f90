@@ -86,8 +86,8 @@
          integer, intent( in ) :: lrpar, lipar
          real(dp), intent( in ) :: x
          real(dp), intent( out ) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent( out ) :: ierr
          ierr = 0
          f = x-3*sin(1-x)
@@ -97,11 +97,11 @@
       subroutine test_root_with_brackets
          integer, parameter :: lrpar=0, lipar=0
          real(dp) :: x, dfdx
-         real(dp) :: x1, x3 ! bounds for x
+         real(dp) :: x1, x3  ! bounds for x
             ! values of f at x1 and x3 must have opposite sign
             ! return value for safe_root will be bracketed by x1 and x3
-         real(dp) :: y1, y3 ! f(x1) and f(x3)
-         integer :: imax ! max number of iterations for search
+         real(dp) :: y1, y3  ! f(x1) and f(x3)
+         integer :: imax  ! max number of iterations for search
          real(dp) :: epsx, epsy
          ! stop seaching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
@@ -109,8 +109,8 @@
          real(dp), parameter :: expected_root = 0.74800611d0
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
@@ -134,8 +134,8 @@
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
          integer, intent(in) :: lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          test_f = tanh(x) - 0.4621171572600098d0
          dfdx = 1/cosh(x)**2
@@ -144,17 +144,17 @@
 
 
       subroutine test_root2
-         real(dp) :: x ! provide starting guess on input
-         real(dp) :: x1,x3 ! bounds for x
-         real(dp) :: y1,y3 ! f(x1) and f(x3)
+         real(dp) :: x  ! provide starting guess on input
+         real(dp) :: x1,x3  ! bounds for x
+         real(dp) :: y1,y3  ! f(x1) and f(x3)
          integer, parameter :: imax = 50, lipar = 0, lrpar = 0
          real(dp) :: dx
          real(dp), parameter :: epsx = 1d-10, epsy = 1d-10
          integer :: ierr
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
@@ -177,17 +177,17 @@
 
 
       subroutine test_root3
-         real(dp) :: x ! provide starting guess on input
-         real(dp) :: x1, x3 ! bounds for x
-         real(dp) :: y1, y3 ! f(x1) and f(x3)
+         real(dp) :: x  ! provide starting guess on input
+         real(dp) :: x1, x3  ! bounds for x
+         real(dp) :: y1, y3  ! f(x1) and f(x3)
          integer, parameter :: newt_imax = 10, imax = 50, lipar = 0, lrpar = 0
          real(dp) :: dx
          real(dp), parameter :: epsx = 1d-10, epsy = 1d-10
          integer :: ierr
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
@@ -198,13 +198,13 @@
          y3 = arg_not_provided
          ierr = 0
          write(*,*) 'test_root3'
-         x = 0.1d0 ! not too bad initial guess.  newton should find it okay.
+         x = 0.1d0  ! not too bad initial guess.  newton should find it okay.
          x = safe_root_with_guess( &
             test_f, x, dx, x1, x3, y1, y3, &
             newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'first safe_root_with_guess', x
-         x = -1d0 ! really bad guess will make it give up on newton
+         x = -1d0  ! really bad guess will make it give up on newton
          x = safe_root_with_guess( &
             test_f, x, dx, x1, x3, y1, y3, &
             newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
@@ -217,11 +217,11 @@
       subroutine van_der_Pol_derivs(n,x,h,y,f,lrpar,rpar,lipar,ipar,ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x,h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: f(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: f(:)  ! (n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+         integer, intent(out) :: ierr  ! nonzero means retry with smaller timestep.
          include 'formats'
          ierr = 0
          f(1) = y(2)
@@ -238,19 +238,19 @@
          ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
-         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: y(:)  ! (n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             real(dp) function interp_y(i,s,rwork,iwork,ierr)
                use const_def, only: dp
                implicit none
-               integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-               real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+               integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+               real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
@@ -263,7 +263,7 @@
          integer :: ierr
          xout = rpar(2)
          irtrn = 1
-         if (ipar(1) /= 1) return ! no output
+         if (ipar(1) /= 1) return  ! no output
 
          if (nr.eq.1) then
             write (6,99) x,y(1),y(2),nr-1
@@ -291,11 +291,11 @@
       subroutine test_dopri(do_853,show_all)
          logical, intent(in) :: do_853,show_all
          integer, parameter :: nv = 2  ! the number of variables in the van der Pol system of ODEs
-         real(dp), parameter :: eps = 1d-3 ! stiffness parameter for van der Pol
-         real(dp) :: rtol(1) ! relative error tolerance(s)
-         real(dp) :: atol(1) ! absolute error tolerance(s)
-         real(dp) :: x ! starting value for the interval of integration
-         real(dp) :: xend ! ending value for the interval of integration
+         real(dp), parameter :: eps = 1d-3  ! stiffness parameter for van der Pol
+         real(dp) :: rtol(1)  ! relative error tolerance(s)
+         real(dp) :: atol(1)  ! absolute error tolerance(s)
+         real(dp) :: x  ! starting value for the interval of integration
+         real(dp) :: xend  ! ending value for the interval of integration
          real(dp) :: expect(nv)
          integer, parameter :: lrpar = 2, lipar = 1, nrdens = nv
          integer, parameter :: liwork = nrdens+100, lwork = 11*nv+8*nrdens+100
@@ -306,8 +306,8 @@
          real(dp), pointer :: y(:)
          real(dp), target :: rpar_ary(lrpar), work_ary(lwork)
          integer, target :: ipar_ary(lipar), iwork_ary(liwork)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          integer, pointer :: iwork(:)
          real(dp), pointer :: work(:)
 
@@ -334,8 +334,8 @@
          max_steps = 0
          max_step_size = 9
 
-         itol = 0 ! scalar tolerances
-         iout = 2 ! want dense output
+         itol = 0  ! scalar tolerances
+         iout = 2  ! want dense output
 
          rtol(1) = 1d-4
          atol(1) = 1d-4
@@ -352,8 +352,8 @@
          iwork = 0
          work = 0
 
-         iwork(5)=nrdens ! want dense output for all components
-         iwork(4)=1 ! test for stiffness at each step
+         iwork(5)=nrdens  ! want dense output for all components
+         iwork(4)=1  ! test for stiffness at each step
 
          if (do_853) then
             call dopri5_work_sizes(nv,nrdens,check_liwork,check_lwork)
@@ -383,7 +383,7 @@
                   lrpar,rpar,lipar,ipar,lout,idid)
          end if
 
-         if (idid /= 1) then ! trouble
+         if (idid /= 1) then  ! trouble
             write(*,*) 'idid', idid
             call mesa_error(__FILE__,__LINE__)
          end if

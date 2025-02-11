@@ -362,8 +362,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_01 = sin ( x ) - 0.5D+00 * x
          ierr = 0
@@ -374,8 +374,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_02 = 2.0D+00 * x - exp( - x )
          ierr = 0
@@ -386,8 +386,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_03 = x * exp( - x )
          ierr = 0
@@ -398,8 +398,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_04 = exp( x ) - 1.0D+00 / 100.0D+00 / x / x
          ierr = 0
@@ -410,8 +410,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_05 = ( x + 3.0D+00 ) * ( x - 1.0D+00 ) * ( x - 1.0D+00 )
          ierr = 0
@@ -519,7 +519,7 @@
         implicit none
 
        interface
-          include 'num_root_fcn.dek' ! f provides function values
+          include 'num_root_fcn.dek'  ! f provides function values
        end interface
 
         real(dp) a

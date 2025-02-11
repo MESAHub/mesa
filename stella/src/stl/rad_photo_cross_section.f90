@@ -3867,7 +3867,7 @@ contains
         end do
       end do
 
-      sigma(:)=sigma(:)*1.d-18! *1.e-18 transform from Mb to sm^2
+      sigma(:)=sigma(:)*1.d-18  ! *1.e-18 transform from Mb to sm^2
 
       return
  end subroutine ics_full
@@ -3940,7 +3940,7 @@ contains
 !       	call  phfit2( nz, ne, is, e, s)
 !       endif
 !       write(*,*) p_Emax;
-      s=s*1.e-18 ! *1.e-18 transform from Mb to sm^2
+      s=s*1.e-18  ! *1.e-18 transform from Mb to sm^2
 end subroutine photoCrossVerner
 
 !!*** *************************************************************************

@@ -113,7 +113,7 @@
 
          ! Check accretion of angular momentum
          if (s% model_number > 1 .and. s% mstar_dot > 0) then
-            if (.false.) then ! off for now
+            if (.false.) then  ! off for now
                write(*,*) "Total accreted J should be:", s% accreted_material_j*s% mstar_dot*s% dt
                write(*,*) "Current J, old J, delta J:", s% total_angular_momentum, &
                    s% total_angular_momentum_old, &

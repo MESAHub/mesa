@@ -397,7 +397,7 @@
                   end if
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false. ! pulse over
+               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! checking for 3DUP
@@ -414,7 +414,7 @@
             end if
 
             ! stop after 3rd TP after dredge up starts
-            if (.not. in_LHe_peak) then ! pulse is over
+            if (.not. in_LHe_peak) then  ! pulse is over
                if ((TP_with_3DUP > 0) .and. (TP_count - TP_with_3DUP == 2)) then
                   termination_code_str(t_xtra1) = 'third pulse with 3DUP has occurred'
                   s% termination_code = t_xtra1
@@ -436,11 +436,11 @@
                   mcore_min_after_TP = mcore_at_TP
                end if
             else
-               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false. ! pulse over
+               if (s% power_h_burn/s% power_he_burn .gt. 10) in_LHe_peak = .false.  ! pulse over
             end if
 
             ! stop after one TP
-            if (.not. in_LHe_peak) then ! pulse is over
+            if (.not. in_LHe_peak) then  ! pulse is over
                if (TP_count == 1) then
                   termination_code_str(t_xtra1) = 'one thermal pulse cycle complete'
                   s% termination_code = t_xtra1
@@ -530,7 +530,7 @@
                   pocket_mass_c13 = pocket_mass_c13 + s% dq(k)
                end if
             end do
-            pocket_mass_c13 = pocket_mass_c13*s% star_mass ! mass in Msun units
+            pocket_mass_c13 = pocket_mass_c13*s% star_mass  ! mass in Msun units
 
             delta_surface_c12 = s% surface_c12 - initial_surface_c12
 

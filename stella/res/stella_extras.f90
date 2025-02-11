@@ -139,7 +139,7 @@ program main
    write(*,*) 'read ' // trim(filestr)//'.lbol'
    fname = trim(filestr)//'.lbol'
    open(21,file=fname, status='old')
-   read(21,*) ! skip line
+   read(21,*)  ! skip line
    num_lbol = 0
    num_lbol_max = 0
    time_lbol(1) = -1
@@ -304,7 +304,7 @@ program main
          read(20,'(a)') line
          if (line(1:len_trim(test_str)) /= trim(test_str)) cycle
          !write(*,*) 'i', i, line(1:len_trim(test_str))
-         read(20,*) ! skip column headers
+         read(20,*)  ! skip column headers
          do j=1,zone
             read(20,'(a)') line
             !write(*,*) i, j, trim(line)
@@ -335,7 +335,7 @@ program main
          tau(1,nm), den(1,nm), temp(1,nm), r(1,nm), v(1,nm)
 
       k_phot = 0
-      if (sum_tau >= 1d0+tauph) then ! record photosphere information
+      if (sum_tau >= 1d0+tauph) then  ! record photosphere information
          do j=zone,2,-1
             if(tau(j-1,nm) >= tauph) then
                k_phot = j
@@ -495,7 +495,7 @@ program main
    contains
 
    real(dp) function interp_logLbol(time)
-      real(dp), intent(in) :: time ! time since start of run
+      real(dp), intent(in) :: time  ! time since start of run
       integer :: k
       real(dp) :: alfa, beta
       do k=1,num_lbol-1
@@ -532,7 +532,7 @@ program main
 
       if (t0 < 0d0) return
 
-      tnm = day + t0 ! this is the desired run time
+      tnm = day + t0  ! this is the desired run time
       nm1 = 0
       nm2 = 0
       do nm=1,num_models-1
@@ -548,7 +548,7 @@ program main
          return
       end if
 
-      alfa = (t2 - tnm)/(t2 - t1) ! fraction from 1st time
+      alfa = (t2 - tnm)/(t2 - t1)  ! fraction from 1st time
       beta = 1d0 - alfa
 
       if (alfa > 1d0 .or. alfa < 0d0) then

@@ -47,8 +47,8 @@ contains
 
    subroutine null_other_rsp_build_model(id, ierr)
       use star_def
-      integer, intent(in) :: id ! star id if available; 0 otherwise
-      integer, intent(out) :: ierr ! 0 means AOK.
+      integer, intent(in) :: id  ! star id if available; 0 otherwise
+      integer, intent(out) :: ierr  ! 0 means AOK.
       write (*, *) 'no implementation for other_rsp_build_model'
       ierr = -1
    end subroutine null_other_rsp_build_model

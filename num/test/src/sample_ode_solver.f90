@@ -45,9 +45,9 @@
 
          ! args for isolve -- see num_isolve.dek in num/public
 
-         integer, parameter :: which_solver = ros3p_solver ! as defined in num_def.f
+         integer, parameter :: which_solver = ros3p_solver  ! as defined in num_def.f
 
-         integer, parameter :: n = 2 ! the number of variables in the "vdpol" system of ODEs
+         integer, parameter :: n = 2  ! the number of variables in the "vdpol" system of ODEs
 
          real(dp) :: x
             ! input: initial x value
@@ -55,7 +55,7 @@
          real(dp), pointer :: y(:)
             ! input: initial values for y
             ! output: values of y for final value of x.
-         real(dp) :: xend ! desired final x value (positive or negative)
+         real(dp) :: xend  ! desired final x value (positive or negative)
          real(dp) :: h
             ! input: initial step size guess
             ! output: predicted next step size from the last accepted step
@@ -76,18 +76,18 @@
          integer :: iout
 
          integer :: lrd, lid
-         real(dp), pointer :: rpar_decsol(:) ! (lrd)
-         integer, pointer :: ipar_decsol(:) ! (lid)
+         real(dp), pointer :: rpar_decsol(:)  ! (lrd)
+         integer, pointer :: ipar_decsol(:)  ! (lid)
 
          integer :: caller_id, nvar, nz
-         real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk  ! =(nvar,nvar,nz)
 
 
          ! work arrays.
          integer :: lwork, liwork
-         real(dp), pointer :: work(:) ! (lwork)
-         integer, pointer :: iwork(:) ! (liwork)
+         real(dp), pointer :: work(:)  ! (lwork)
+         integer, pointer :: iwork(:)  ! (liwork)
 
          ! parameter arrays.
          integer, parameter :: lrpar = 1, lipar = 3
@@ -137,7 +137,7 @@
          ijac = 1
          nzmax = 0
          isparse = 0
-         mljac = n ! square matrix
+         mljac = n  ! square matrix
          mujac = n
 
          imas = 0
@@ -214,10 +214,10 @@
       subroutine vdpol_derivs(n, x, h, vars, dvars_dx, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: vars(:) ! (n)
-         real(dp), intent(inout) :: dvars_dx(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout) :: vars(:)  ! (n)
+         real(dp), intent(inout) :: dvars_dx(:)  ! (n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
          dvars_dx(1) = vars(2)
@@ -230,8 +230,8 @@
          real(dp), intent(in) :: x, h
          real(dp), intent(inout) :: y(:)
          real(dp), intent(inout) :: f(:), dfdy(:,:)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
          dfdy(1, 1) = 0d0
@@ -245,11 +245,11 @@
       subroutine vdpol_solout(nr, xold, x, n, y, rwork, iwork, interp_y, lrpar, rpar, lipar, ipar, irtrn)
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
-         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: y(:)  ! (n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             real(dp) function interp_y(i, s, rwork, iwork, ierr)
                use const_def, only: dp

@@ -117,7 +117,7 @@
          use rates_def, only: rates_reaction_id_max
 
          character (len=*), intent(in) :: net_file
-         integer, pointer :: chem_id(:), net_iso(:) ! set, but not allocated
+         integer, pointer :: chem_id(:), net_iso(:)  ! set, but not allocated
          integer, intent(out) :: handle, species, num_reactions, ierr
 
          ierr = 0

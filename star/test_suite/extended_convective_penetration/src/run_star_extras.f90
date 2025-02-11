@@ -393,7 +393,7 @@
 
         if(is_bad(s% D_mix(1))) return
 
-        if (s%num_conv_boundaries < 1) then ! Is zero at initialisation of the run
+        if (s%num_conv_boundaries < 1) then  ! Is zero at initialisation of the run
            if (DEBUG) then
               write(*,*) 'runstarex_gradT: skip since there are no convective boundaries'
            end if

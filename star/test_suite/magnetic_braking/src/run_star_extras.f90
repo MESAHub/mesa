@@ -80,7 +80,7 @@
 
          !Parameters
 
-         bfield = s% x_ctrl(1) ! Surface Magnetic Fields in Gauss
+         bfield = s% x_ctrl(1)  ! Surface Magnetic Fields in Gauss
 
          !Initialize variables
 
@@ -93,15 +93,15 @@
          factor = 0d0
          j_average = 0d0
 
-         omega_crit = star_surface_omega_crit(id, ierr) ! this forces a call to set_surf_avg_rotation_info to ensure things are up
+         omega_crit = star_surface_omega_crit(id, ierr)  ! this forces a call to set_surf_avg_rotation_info to ensure things are up
                                                         ! to date with the state
          if (ierr /= 0) return
          v_rot = s% v_rot_avg_surf
 
          ! Calculate total angular momentum
-         j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz)) ! g cm^2/s Total Stellar Angular Momentum Content
+         j_tot = dot_product(s% j_rot(1:s% nz),s% dm_bar(1:s% nz))  ! g cm^2/s Total Stellar Angular Momentum Content
 
-         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
+         if ((s% mstar_dot /= 0) .and. (j_tot .gt. 1d50) .and. (v_rot  .gt. 0.8d5)) then  ! Only 'brake' when mass is lost and star has non-negligible amount of angular momentum
            write(*,*) 'j_tot: ', j_tot, s% omega(1), v_rot/1d5
           !Calculate V_inf of stellar wind (e.g. Vinf = 1.92 Vesc, see Lamers & Cassinelli 2000)
           !N.B. This is good for line-driven winds in hot stars. For different types of Vinf = Vesc might be a better choice?
@@ -110,7 +110,7 @@
           eta = pow2( s% photosphere_r * Rsun * bfield ) / (abs( s% mstar_dot ) * vinf)
           !Calculate Jdot !Eq. 7 in  Ud-Doula et al. 2008
           j_dot = (2d0/3d0) * s% mstar_dot * s% omega_avg_surf*pow2( s% photosphere_r *Rsun)
-          j_dot = j_dot * eta ! This is g*cm^2/s^2
+          j_dot = j_dot * eta  ! This is g*cm^2/s^2
           ! This could be improved using
           ! Eq. 20 in Ud-Doula et al. (2008) MNRAS (Dipole Weber-Davis)
           ! delta_j = delta_j * (0.29 *(eta+0.25)**0.25)**2.0
@@ -124,7 +124,7 @@
 
           ! Check if spindown timescale is shorter than timestep. Print a warning in case.
           ! In other_timestep_limit we enforce timestep controls such that dt << t_spindown.
-          t_spindown = abs(j_tot / j_dot) ! Estimate spindown timescale
+          t_spindown = abs(j_tot / j_dot)  ! Estimate spindown timescale
           if (s% x_logical_ctrl(1)) then
              write(*,1) 'Spindown Timescale (Myr): ', t_spindown / (1d6*secyer)
              write(*,1) 'Spindown Timescale / dt: ', t_spindown / s% dt
@@ -141,8 +141,8 @@
           do k = 1, s% nz
             s% extra_jdot(k) =  j_dot / (s% nz * s% dm_bar(k))  ! Specific torque cm^2/s^2. Divide by shell mass and total number of shells
             if (abs(s% extra_jdot(k)) .gt. abs(s% j_rot(k)/ s% dt)) then
-              residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k) ! Residual J_dot cm^2/s^2 * g
-              s% extra_jdot(k) = - s% j_rot(k)/ s% dt ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
+              residual_jdot = residual_jdot - (abs( s% extra_jdot(k)) - abs( s% j_rot(k) / s% dt )) * s% dm_bar(k)  ! Residual J_dot cm^2/s^2 * g
+              s% extra_jdot(k) = - s% j_rot(k)/ s% dt  ! Set torque = - s% j_rot(k)/ s% dt. Note this way we're not conserving angular momentum, need to distribute residual torque
               j=j+1
             endif
           end do
@@ -155,7 +155,7 @@
             endif
           end do
 
-          torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz)) ! Total applied Torque
+          torque = dot_product(s% extra_jdot(1:s% nz),s% dm_bar(1:s% nz))  ! Total applied Torque
 
           ! Wind Diagnostics
           !write(*,*) 'Rotational Velocity: ',s% omega_avg_surf * s% photosphere_r *Rsun / 1d5, 'km/s' !Rot Vel.

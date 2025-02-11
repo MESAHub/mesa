@@ -684,8 +684,8 @@
 ! this subroutine plots the histogram of data contained in array x, using n bins
 !***********************************************************************************
 	implicit none
-	real(kind=8), intent(in)	:: x(:) !the data to plot
-	integer, intent(in)		:: n !the number of intervals
+	real(kind=8), intent(in)	:: x(:)  !the data to plot
+	integer, intent(in)		:: n  !the number of intervals
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: color, terminal, filename, persist, input
 	integer 			:: i, j, ierror, ios, file_unit, nx
