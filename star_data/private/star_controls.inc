@@ -796,7 +796,7 @@
          logical :: use_simple_es_for_kap, use_starting_composition_for_kap
 
          real(dp) :: min_kap_for_dPrad_dm_eqn
-         real(dp) :: opacity_max, opacity_factor
+         real(dp) :: opacity_min, opacity_max, opacity_factor
          real(dp) :: min_logT_for_opacity_factor_off
          real(dp) :: min_logT_for_opacity_factor_on
          real(dp) :: max_logT_for_opacity_factor_on

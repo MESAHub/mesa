@@ -2833,6 +2833,9 @@
          if (s% opacity_max > 0) &
             write(*,1) 'opacity_max', s% opacity_max
 
+         if (s% opacity_min > 0) &
+            write(*,1) 'opacity_min', s% opacity_min
+
          if (s% job% show_net_reactions_info) then
             write(*,'(a)') ' net reactions '
             call show_net_reactions_and_info(s% net_handle, 6, ierr)

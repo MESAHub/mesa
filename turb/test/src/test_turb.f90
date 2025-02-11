@@ -25,7 +25,7 @@ program test_turb
    subroutine check_efficient_MLT_scaling()
       type(auto_diff_real_star_order1) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=3) :: MLT_option
-      real(dp) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       type(auto_diff_real_star_order1) :: Gamma, gradT, Y_face, conv_vel, conv_vel2, D, r, L
       integer :: mixing_type, ierr
 
@@ -54,10 +54,12 @@ program test_turb
       L = 1d5*Lsun
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
 
+      max_conv_vel = 1.0d99
+
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
       write(*,1) 'vc at 1d5 Lsun',conv_vel%val
 
@@ -67,7 +69,7 @@ program test_turb
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel2, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel2, D, mixing_type, max_conv_vel, ierr)
 
       write(*,1) 'vc at 1d8 Lsun',conv_vel2%val
 
@@ -80,7 +82,7 @@ program test_turb
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL, grav, Lambda
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D, Gamma
-      real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       character(len=3) :: MLT_option
       integer :: mixing_type, ierr, tdc_num_iters
       logical :: report
@@ -126,6 +128,8 @@ program test_turb
       report = .false.
       dt = 1d40 ! Long time-step so we get into equilibrium
 
+      max_conv_vel = 1.0d99
+
       ! MLT
       MLT_option = 'Cox'
       Henyey_MLT_nu_param = 0d0
@@ -143,7 +147,7 @@ program test_turb
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
       write(*,1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel% val, Gamma%val
 

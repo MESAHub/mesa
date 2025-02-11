@@ -335,7 +335,7 @@
 
     ! hydro parameters
     energy_eqn_option, &
-    opacity_factor, opacity_max, min_logT_for_opacity_factor_off, min_logT_for_opacity_factor_on, &
+    opacity_factor, opacity_min, opacity_max, min_logT_for_opacity_factor_off, min_logT_for_opacity_factor_on, &
     max_logT_for_opacity_factor_on, max_logT_for_opacity_factor_off, &
     non_nuc_neu_factor, &
     use_time_centered_eps_grav, &
@@ -1820,6 +1820,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ! hydro parameters
  s% energy_eqn_option = energy_eqn_option
  s% opacity_factor = opacity_factor
+ s% opacity_min = opacity_min
  s% opacity_max = opacity_max
  s% min_logT_for_opacity_factor_off = min_logT_for_opacity_factor_off
  s% min_logT_for_opacity_factor_on = min_logT_for_opacity_factor_on
@@ -3500,6 +3501,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  ! hydro parameters
  energy_eqn_option = s% energy_eqn_option
+ opacity_min = s% opacity_min
  opacity_max = s% opacity_max
  opacity_factor = s% opacity_factor
  min_logT_for_opacity_factor_off = s% min_logT_for_opacity_factor_off

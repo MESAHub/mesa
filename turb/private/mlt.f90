@@ -60,14 +60,14 @@ contains
    subroutine calc_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
-                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, ierr)
+                     Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
       use const_def
       use num_lib
       use utils_lib
       use auto_diff
       type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
-      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param
+      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
@@ -153,6 +153,9 @@ contains
 
          ! average convection velocity   C&G 14.86b
          conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
+
+         if (conv_vel%val > max_conv_vel) conv_vel%val = max_conv_vel
+
          D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
 
          !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
