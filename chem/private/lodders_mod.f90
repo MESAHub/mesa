@@ -25,7 +25,10 @@
 ! ***********************************************************************
 module lodders_mod
    use const_def, only : dp, mesa_data_dir
+   implicit none
+
    contains
+
    subroutine read_lodders03_data(datafile,ierr)
       use iso_fortran_env, only : iostat_end
       use chem_def

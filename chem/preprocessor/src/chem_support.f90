@@ -4,6 +4,8 @@ module chem_support
    use math_lib
    use utils_lib, only: mesa_error
 
+   implicit none
+
    real(dp), parameter :: no_mass_table_entry = -999.d0
    character(len=256) :: data_dir, output_dir, masstable_filename, winvn_filename
    integer :: masstable_header_length

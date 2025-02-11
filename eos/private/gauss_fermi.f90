@@ -232,6 +232,7 @@ contains
       interface
         subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
         end subroutine f
@@ -307,6 +308,7 @@ contains
       interface
         subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
         end subroutine f
@@ -395,6 +397,7 @@ contains
       interface
         subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
         end subroutine f
@@ -502,6 +505,7 @@ contains
       interface
         subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
         end subroutine f
@@ -648,6 +652,7 @@ contains
       interface
         subroutine f(absc, par, n, fval, dfval, ddfval)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc, par(n), fval, dfval, ddfval
         end subroutine f
@@ -727,6 +732,7 @@ contains
       interface
         subroutine f(absc, par, n, fval, dfval, ddfval)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc, par(n), fval, dfval, ddfval
         end subroutine f
@@ -826,6 +832,7 @@ contains
       interface
         subroutine f(absc, par, n, fval, dfval, ddfval)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc, par(n), fval, dfval, ddfval
         end subroutine f
@@ -966,6 +973,7 @@ contains
       interface
         subroutine f(absc, par, n, fval, dfval, ddfval)
             use const_def, only: dp
+            implicit none
             integer :: n
             real(dp) :: absc, par(n), fval, dfval, ddfval
         end subroutine f

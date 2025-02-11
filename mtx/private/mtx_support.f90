@@ -29,6 +29,8 @@
       use const_def, only: dp, qp
       use utils_lib, only: mesa_error
 
+      implicit none
+
       integer, parameter :: num_chunks = 4
 
       contains

@@ -7,7 +7,6 @@
       implicit none
 
       integer :: num_calls
-
       logical, parameter :: show_details = .false.
 
 
@@ -480,7 +479,6 @@
          end do
          num_calls = num_calls + 1
       end function TR
-
 
 
       end module test_simplex

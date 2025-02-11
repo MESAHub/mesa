@@ -1,5 +1,6 @@
       subroutine jac_blk_dble(n,caller_id,nvar,nz,x,h,y,f,lblk,dblk,ublk,lrpar,rpar,lipar,ipar,ierr)
          use const_def,only: dp
+         implicit none
          integer, intent(in) :: n,caller_id,nvar,nz,lrpar,lipar
          real(dp), intent(in) :: x, h
          real(dp), intent(inout), pointer :: y(:) ! (n)

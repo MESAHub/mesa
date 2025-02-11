@@ -23,9 +23,7 @@
 module test_block_tri_dble
       use mtx_lib
       use mtx_def
-
       use const_def, only: dp
-
       use utils_lib, only: is_bad, mesa_error
 
       implicit none

@@ -36,14 +36,11 @@
 
       implicit none
 
-
       !logical, parameter :: use_ludcmp = .true.
       logical, parameter :: use_ludcmp = .false.
 
       !logical, parameter :: show_mesa_rates = .true.
       logical, parameter :: show_mesa_rates = .false.
-
-
 
 
       contains

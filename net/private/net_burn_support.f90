@@ -31,16 +31,11 @@
 
       implicit none
 
-
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
-
-
       logical, parameter :: dbg = .false.
 
 
-
       contains
-
 
 
       subroutine netint( &

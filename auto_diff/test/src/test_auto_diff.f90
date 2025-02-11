@@ -3,6 +3,8 @@ program test_auto_diff
    use auto_diff
    use const_def
 
+   implicit none
+
    call do_test_auto_diff_1var_order1()
    call do_test_auto_diff_2var_order1()
    call do_test_auto_diff_star_order1()

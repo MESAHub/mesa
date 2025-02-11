@@ -35,8 +35,6 @@
       implicit none
 
       integer, parameter :: diffusion_min_nc = 4  ! minimum number of classes
-
-
       logical, parameter :: use_dcoeff_dX = .true.
 
 
