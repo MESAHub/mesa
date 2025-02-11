@@ -40,7 +40,7 @@
          real(dp), intent(in) ::  &
             temp, den, logT, logRho, zbar, abar, z2bar,  &
             y(:), &
-            iso_z158(:) ! Z**1.58
+            iso_z158(:)  ! Z**1.58
          integer, intent(in) :: screening_mode
 
          real(dp), parameter :: x13   = 1.0d0/3.0d0
@@ -48,7 +48,7 @@
          real(dp), parameter :: x53   = 5.0d0/3.0d0
          real(dp), parameter :: x532  = 5.0d0/32.0d0
          real(dp), parameter :: x512  = 5.0d0/12.0d0
-         real(dp), parameter :: fact  = 1.25992104989487d0 ! the cube root of 2
+         real(dp), parameter :: fact  = 1.25992104989487d0  ! the cube root of 2
          real(dp), parameter :: co2   = x13 * 4.248719d3
          real(dp) :: qq
          integer :: j

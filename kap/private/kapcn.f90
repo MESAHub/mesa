@@ -73,8 +73,8 @@ contains
     if(debug) write(*,*) '   parameter file = ', trim(filename)
 
     open(newunit=io,file=trim(filename))
-    read(io,*) !skip first line
-    do i=num_kapCN_Zs,1,-1 !read backwards into array so Z is increasing
+    read(io,*)  !skip first line
+    do i=num_kapCN_Zs,1,-1  !read backwards into array so Z is increasing
        read(io,'(f7.5,11f9.1)') kapCN_Z(i), kapCN_fC(:,i), kapCN_fN(:,i)
     enddo
     close(io)
@@ -154,7 +154,7 @@ contains
     if(ierr/=0) write(*,*) &
          ' read_one_kapCN_table: problem opening ascii file for read'
     do i=1,4
-       read(io,*) !skip header
+       read(io,*)  !skip header
     enddo
     read(io,'(6x,a10)') my_Z
     if(debug) write(*,*) ' has Z = ', my_Z, ' Zbase = ', k% Zbase
@@ -168,11 +168,11 @@ contains
             k% t(i)% fc, k% t(i)% fn, k% t(i)% falpha
     enddo
 
-    read(io,*) !last line of #'s
+    read(io,*)  !last line of #'s
 
     do i=1,kapCN_num_tbl
        do j=1,14
-          read(io,*) !skip individual headers
+          read(io,*)  !skip individual headers
        enddo
        read(io,'(5x,17f7.3)') logR
        do j=1,kapCN_num_logT

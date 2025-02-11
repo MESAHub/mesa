@@ -131,7 +131,7 @@ module binary_pgbinary
    type pgbinary_hist_node
       real(dp) :: age
       integer :: step
-      real(dp), pointer :: vals(:) => null() ! values of items in history_columns list
+      real(dp), pointer :: vals(:) => null()  ! values of items in history_columns list
       type (pgbinary_hist_node), pointer :: next => null()
       ! list kept in strictly decreasing order by age & step
    end type pgbinary_hist_node

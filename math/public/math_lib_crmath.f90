@@ -196,7 +196,7 @@ contains
 
     ix = FLOOR(x)
 
-    if (x == ix) then ! integer power of 10
+    if (x == ix) then  ! integer power of 10
 
        exp10_x = 1._dp
 
@@ -261,7 +261,7 @@ contains
 
        iy = floor(y)
 
-       if (y == iy .AND. ABS(iy) < 100) then ! integer power of x
+       if (y == iy .AND. ABS(iy) < 100) then  ! integer power of x
 
           pow_x = 1._dp
 

@@ -210,10 +210,10 @@
             end do
             if (sum_2 == 0 .or. sum_3 == 0) return
             delta_nu_model = sum_1/sum_2
-            correction_r = & ! K08 eqn 6
+            correction_r = &  ! K08 eqn 6
                (b-1)/(b*avg_nu_model/avg_nu_obs - delta_nu_model/delta_nu)
             if (correction_r <= 0) return
-            correction_a = & ! K08 eqn 10
+            correction_a = &  ! K08 eqn 10
                min(0d0, avg_nu_obs - correction_r*avg_nu_model)*nl(0)/sum_3
             a_div_r = correction_a/correction_r
 
@@ -281,7 +281,7 @@
          end subroutine set_to_closest
 
 
-         integer function find_closest(nu,jprev) ! find closest model frequency
+         integer function find_closest(nu,jprev)  ! find closest model frequency
             real(dp), intent(in) :: nu
             integer, intent(in) :: jprev
             min_dist = 1d99; min_dist_j = -1
@@ -297,7 +297,7 @@
          end function find_closest
 
 
-         integer function find_next_down(j) result(j_down) ! same l, next lower freq
+         integer function find_next_down(j) result(j_down)  ! same l, next lower freq
             integer, intent(in) :: j
             do j_down = j-1, 1, -1
                if (el(j_down) /= l) cycle
@@ -307,7 +307,7 @@
          end function find_next_down
 
 
-         integer function find_next_up(j) result(j_up) ! same l, next higher freq
+         integer function find_next_up(j) result(j_up)  ! same l, next higher freq
             integer, intent(in) :: j
             do j_up = j+1, num_results
                if (el(j_up) /= l) cycle
@@ -351,10 +351,10 @@
          l1_last = l1_first + l1_seq_n - 1
          if (dbg) write(*,4) 'l1_first l1_last l1_seq_n', l1_first, l1_last, l1_seq_n
 
-         do ! trim high end of l0 until < last l1
+         do  ! trim high end of l0 until < last l1
             if (l0(l0_last) < l1(l1_last)) exit
             l0_last = l0_last - 1
-            if (l0_last < l0_first) then ! no overlap
+            if (l0_last < l0_first) then  ! no overlap
                if (dbg) then
                   write(*,*) 'l0_last < l0_first', l0_last, l0_first
                end if
@@ -363,23 +363,23 @@
          end do
          if (dbg) write(*,2) 'l0_last after trim', l0_last
 
-         do ! trim low end of l1 until > first l0
+         do  ! trim low end of l1 until > first l0
             if (l1(l1_first) > l0(l0_first)) exit
             l1_first = l1_first + 1
-            if (l1_first > l1_last) then ! no overlap
+            if (l1_first > l1_last) then  ! no overlap
                return
             end if
          end do
          if (dbg) write(*,2) 'l1_first after trim', l1_first
 
-         do ! trim low end of l0 until only 1 < 1st l1
+         do  ! trim low end of l0 until only 1 < 1st l1
             if (l0_first == l0_last) exit
             if (l0(l0_first+1) >= l1(l1_first)) exit
             l0_first = l0_first + 1
          end do
          if (dbg) write(*,2) 'l0_first after trim', l0_first
 
-         do ! trim high end of l1 until only 1 > last l0
+         do  ! trim high end of l1 until only 1 > last l0
             if (l1_last == l1_first) exit
             if (l1(l1_last-1) <= l0(l0_last)) exit
             l1_last = l1_last - 1
@@ -439,7 +439,7 @@
          dbg = .false.
          call fill_with_NaNs(r02)
 
-         if (init) then ! set i2_for_r02
+         if (init) then  ! set i2_for_r02
             do i = 1, ratios_n
                i0 = i + ratios_l0_first
                i1 = i + ratios_l1_first
@@ -568,12 +568,12 @@
          seq_n = 0
 
          do
-            i = seq_i + seq_n + 1 ! start of next sequence
+            i = seq_i + seq_n + 1  ! start of next sequence
             if (i >= nl) exit
             seq_i = i
             seq_n = 1
-            do j = seq_i, nl-1 ! j is in series; try to add j+1
-               if (l_obs(j+1) - l_obs(j) > 1.5*delta_nu) then ! end of series
+            do j = seq_i, nl-1  ! j is in series; try to add j+1
+               if (l_obs(j+1) - l_obs(j) > 1.5*delta_nu) then  ! end of series
                   if (seq_n > max_seq_n) then
                      max_seq_i = seq_i
                      max_seq_n = seq_n
@@ -733,7 +733,7 @@
             a_div_r, b, nu_max, correction_factor, check_obs, &
             nl0, l0_obs, l0_freq, l0_freq_corr, l0_inertia)
          real(dp), intent(in) :: a_div_r, b, nu_max, correction_factor
-         logical, intent(in) :: check_obs ! if false, then l0_obs is not used
+         logical, intent(in) :: check_obs  ! if false, then l0_obs is not used
          integer, intent(in) :: nl0
          real(dp), intent(in), dimension(:) :: &
             l0_obs, l0_freq, l0_inertia
@@ -757,7 +757,7 @@
             a_div_r, b, nu_max, correction_factor, check_obs, &
             nl1, l1_obs, l1_freq, l1_freq_corr, l1_inertia, l0_inertia)
          real(dp), intent(in) :: a_div_r, b, nu_max, correction_factor
-         logical, intent(in) :: check_obs ! if false, then l1_obs is not used
+         logical, intent(in) :: check_obs  ! if false, then l1_obs is not used
          integer, intent(in) :: nl1
          real(dp), intent(in), dimension(:) :: &
             l1_obs, l1_freq, l1_inertia, l0_inertia

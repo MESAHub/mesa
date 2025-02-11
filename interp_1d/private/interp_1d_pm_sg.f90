@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-      module interp_1d_pm_sg ! piecewise monotonic algorithms
+      module interp_1d_pm_sg  ! piecewise monotonic algorithms
 
       implicit none
 
@@ -40,18 +40,18 @@
          ! make piecewise monotonic cubic interpolant
          use interp_1d_def
          integer, intent(in) :: nx       ! length of x vector (nx >= 2)
-         real, intent(in) :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real, intent(in) :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          real, dimension(:), pointer :: h, s, p
          integer :: i
          logical, parameter :: dbg = .true.
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          include 'formats'
@@ -91,7 +91,7 @@
          end if
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
          end do
          do i = 1, nx-1
             if (h(i) == 0) then
@@ -103,7 +103,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
          do i=2,nx-1
             p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
@@ -152,17 +152,17 @@
       subroutine mk_pmcub4_sg(x, f1, slope_only, nwork, work1, str, ierr)
          use interp_1d_def
          integer, parameter :: nx = 4   ! length of x vector (nx >= 2)
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          real, dimension(:), pointer :: h, s, p
          integer :: i
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -177,7 +177,7 @@
          p(1:nx) => work1(1+2*nx:3*nx)
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
          end do
          do i = 1, nx-1
             if (h(i) == 0) then
@@ -189,7 +189,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
          do i=2,nx-1
             p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
@@ -239,17 +239,17 @@
          ! make piecewise monotonic quadratic interpolant
          use interp_1d_def
          integer, parameter :: nx = 3
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          real, dimension(:), pointer :: h, s, p
          integer :: i
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          if (nwork < pm_work_size) then
@@ -263,7 +263,7 @@
          p(1:nx) => work1(1+2*nx:3*nx)
 
          do i=1,nx-1
-            h(i) = x(i+1) - x(i) ! width of interval
+            h(i) = x(i+1) - x(i)  ! width of interval
             if (h(i) == 0) then
                write(*, '(a,1x,2i5,1x,a)')  &
                   'same interpolation x values at', i, i+1, 'for ' // trim(str)
@@ -273,7 +273,7 @@
          end do
 
          do i=1,nx-1
-            s(i) = (f(1,i+1) - f(1,i)) / h(i) ! slope across interval
+            s(i) = (f(1,i+1) - f(1,i)) / h(i)  ! slope across interval
          end do
          do i=2,nx-1
             p(i) = (s(i-1)*h(i) + s(i)*h(i-1))/(h(i-1)+h(i))
@@ -322,16 +322,16 @@
       subroutine mk_pmlinear_sg(x, f1, slope_only, nwork, work1, str, ierr)
          use interp_1d_def
          integer, parameter :: nx = 2
-         real, intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real, intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real, intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real, intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          real :: h, s
-         real, pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -341,7 +341,7 @@
             return
          end if
 
-         h = x(2) - x(1) ! width of interval
+         h = x(2) - x(1)  ! width of interval
          if (h == 0) then
             write(*, '(a,1x,2i5,1x,a)')  &
                   'same interpolation x values at', 1, 2, 'for ' // trim(str)
@@ -349,7 +349,7 @@
             return
          end if
 
-         s = (f(1, 2) - f(1, 1)) / h ! slope across interval
+         s = (f(1, 2) - f(1, 1)) / h  ! slope across interval
          f(2, 1) = s
          f(2, 2) = 0
 
@@ -366,17 +366,17 @@
          use interp_1d_def
          integer, intent(in) :: n     ! length of vector
          real, intent(in) :: dx
-         real, intent(inout), pointer :: f1(:) ! =(4, n)  ! data & interpolation coefficients
+         real, intent(inout), pointer :: f1(:)  ! =(4, n)  ! data & interpolation coefficients
          logical, intent(in) :: slope_only
-         integer, intent(in) :: nwork ! nwork must be >= pm_work_size (see interp_1d_def)
-         real, intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         integer, intent(in) :: nwork  ! nwork must be >= pm_work_size (see interp_1d_def)
+         real, intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
          real, dimension(:), pointer :: s, p
          real :: x(2)
          integer :: i
-         real, pointer :: f(:,:) ! (4, n)  ! data & interpolation coefficients
+         real, pointer :: f(:,:)  ! (4, n)  ! data & interpolation coefficients
          f(1:4,1:n) => f1(1:4*n)
 
          ierr = 0
@@ -409,7 +409,7 @@
          ierr = 0
 
          do i=1,n-1
-            s(i) = f(1,i+1) - f(1,i) ! slope across interval
+            s(i) = f(1,i+1) - f(1,i)  ! slope across interval
          end do
          do i=2,n-1
             p(i) = 0.5*(s(i-1) + s(i))

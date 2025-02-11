@@ -74,10 +74,8 @@
 
    pgstar_interval = 50
 
-   ! device
    file_white_on_black_flag = .true.
    file_device = 'vcps' ! postscript
-   file_extension = 'ps'
 
    Grid2_win_flag = .false. ! switch to .true. to visualize in real-time
    file_digits = 7

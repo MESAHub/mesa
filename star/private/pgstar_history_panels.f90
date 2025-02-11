@@ -901,11 +901,11 @@
                      return
                   end if
                   read(iounit,*) num_pts
-                  ishape = s% pg% History_Panel_points_marker ! 5
+                  ishape = s% pg% History_Panel_points_marker  ! 5
                   call pgsave
-                  call pgsci(s% pg% History_Panel_points_ci) !1)
-                  call pgslw(s% pg% History_Panel_points_lw) !2)
-                  call pgsch(s% pg% History_Panel_points_ch) !1.0)
+                  call pgsci(s% pg% History_Panel_points_ci)  !1)
+                  call pgslw(s% pg% History_Panel_points_lw)  !2)
+                  call pgsch(s% pg% History_Panel_points_ch)  !1.0)
                   do k = 1, num_pts
                      if (s% pg% History_Panel_points_error_bars) then
                         read(iounit,*) xpt, ypt, errpt

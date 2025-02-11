@@ -37,7 +37,6 @@
 
 
       subroutine abundance_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -88,7 +87,6 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -231,7 +229,7 @@
             call do_all(.false.)
             call pgunsa
 
-            if (.not. panel_flag) then ! show mix regions at bottom of plot
+            if (.not. panel_flag) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
@@ -287,7 +285,7 @@
             do j=1, s% species
                max_abund(j) = maxval(s% xa(j,grid_min:grid_max))
             end do
-            if (num_to_show < 0) then ! show as many as fit
+            if (num_to_show < 0) then  ! show as many as fit
                if (legend_flag) then
                   jmax = min(s% species, max_num_labels)
                else

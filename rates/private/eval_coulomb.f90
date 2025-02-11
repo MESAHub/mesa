@@ -51,9 +51,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     select case (which_mui_coulomb)
     case (None)
@@ -80,9 +80,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     ! calculate the chemical potential of an ion
 
@@ -108,7 +108,7 @@ contains
 
     ! ratios for convenience
     zr = Z/cc% zbar
-    zr_m1o3 = pow(zr,-1d0/3d0) ! zr to the minus 1/3 power
+    zr_m1o3 = pow(zr,-1d0/3d0)  ! zr to the minus 1/3 power
 
     ! evaluate mu(Z); C&L eq. (11)
     mu = -zr * (gamma * (c0 + (c1  + c2 * zr_m1o3) * zr_m1o3) + &
@@ -126,9 +126,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     ! calculate the chemical potential of an ion
 
@@ -167,9 +167,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: mu ! the chemical potential in units of kT
+    type(auto_diff_real_2var_order1) :: mu  ! the chemical potential in units of kT
 
     type(auto_diff_real_2var_order1) :: gamma
 
@@ -274,9 +274,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     select case (which_Vs_coulomb)
     case (None)
@@ -302,9 +302,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     ! this uses the thomas-fermi approximation, in the relativistic limit
     Vs = 2d0 * Z * fine * sqrt(fine/pi)
@@ -321,9 +321,9 @@ contains
     implicit none
 
     type(Coulomb_Info), intent(in) :: cc
-    real(dp), intent(in) :: Z ! nuclear charge
+    real(dp), intent(in) :: Z  ! nuclear charge
 
-    type(auto_diff_real_2var_order1) :: Vs ! the screening potential in units of the fermi energy
+    type(auto_diff_real_2var_order1) :: Vs  ! the screening potential in units of the fermi energy
 
     ! code from Itoh, N., Tomizawa, N., Tamamura, M., Wanajo, S., & Nozawa, S. 2002, ApJ, 579, 380
 
@@ -337,20 +337,20 @@ contains
     rs = cc% rs
 
     rs0=0
-    if(rs.lt.0.00001d0)then
+    if(rs<0.00001d0)then
        rs0=1d0-rs
        rs=0.00001d0
     endif
     s=(log10(rs)+3d0)/2d0
     fj=0
-    if(s.ne.0)then
+    if(s/=0)then
        do i=0,10
           fj=c(i)*pow(s,dble(i))+fj
        enddo
     else
        fj=c(0)
     endif
-    if(rs0.ne.0)then
+    if(rs0/=0)then
        rs=1d0-rs0
     endif
 

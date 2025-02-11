@@ -76,15 +76,15 @@
            deriv_flgs, symbolic, just_dydt)
 
         type (Net_Info) :: n
-        real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
+        real(qp) :: dydt(:,:)  ! (num_rvs, num_isos)
         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
-        integer, intent(in) :: i ! the reaction number
-        real(dp), intent(in) :: r_in ! coefficient of rate for the reaction
-        integer, intent(in) :: n_in, n_out ! number of inputs and outputs
-        integer, dimension(3), intent(in) :: i_in, i_out ! net isotope numbers for the reaction
-        real(dp), dimension(3), intent(in) :: c_in, c_out ! isotope coefficients in reaction equation
-        integer, dimension(3), intent(in) :: idr ! isotope number for dr
-        real(dp), dimension(3), intent(in) :: dr ! coefficient for Jacobian entries d_dydt_dy(idr)
+        integer, intent(in) :: i  ! the reaction number
+        real(dp), intent(in) :: r_in  ! coefficient of rate for the reaction
+        integer, intent(in) :: n_in, n_out  ! number of inputs and outputs
+        integer, dimension(3), intent(in) :: i_in, i_out  ! net isotope numbers for the reaction
+        real(dp), dimension(3), intent(in) :: c_in, c_out  ! isotope coefficients in reaction equation
+        integer, dimension(3), intent(in) :: idr  ! isotope number for dr
+        real(dp), dimension(3), intent(in) :: dr  ! coefficient for Jacobian entries d_dydt_dy(idr)
         logical, pointer :: deriv_flgs(:)
         logical, intent(in) :: symbolic, just_dydt
 
@@ -111,15 +111,15 @@
         ! this function handles reactions with 1-3 inputs going to 1-3 outputs
 
         type (Net_Info) :: n
-        real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
+        real(qp) :: dydt(:,:)  ! (num_rvs, num_isos)
         real(qp), intent(out) :: eps_nuc_MeV(num_rvs)
-        integer, intent(in) :: i ! the reaction number
-        real(dp), intent(in) :: r_in ! coefficient of rate for the reaction
-        integer, intent(in) :: n_in, n_out ! number of inputs and outputs
-        integer, dimension(3), intent(in) :: i_in, i_out ! net isotope numbers for the reaction
-        real(dp), dimension(3), intent(in) :: c_in, c_out ! isotope coefficients in reaction equation
-        integer, dimension(3), intent(in) :: idr ! isotope number for dr
-        real(dp), dimension(3), intent(in) :: dr ! coefficient for Jacobian entries d_dydt_dy(idr)
+        integer, intent(in) :: i  ! the reaction number
+        real(dp), intent(in) :: r_in  ! coefficient of rate for the reaction
+        integer, intent(in) :: n_in, n_out  ! number of inputs and outputs
+        integer, dimension(3), intent(in) :: i_in, i_out  ! net isotope numbers for the reaction
+        real(dp), dimension(3), intent(in) :: c_in, c_out  ! isotope coefficients in reaction equation
+        integer, dimension(3), intent(in) :: idr  ! isotope number for dr
+        real(dp), dimension(3), intent(in) :: dr  ! coefficient for Jacobian entries d_dydt_dy(idr)
         real(dp), intent(in) :: Q, Qneu, dQneu_dT, dQneu_dRho
         logical, pointer :: deriv_flgs(:)
         logical, intent(in) :: symbolic, just_dydt
@@ -129,7 +129,7 @@
         integer, pointer :: chem_id(:)
         integer :: j, cid, icat, reaction_id
 
-        logical :: condition ! for debugging output
+        logical :: condition  ! for debugging output
 
         include 'formats'
 
@@ -271,7 +271,7 @@
       subroutine do_lhs_iso( &
             n, dydt, i, c, i1, rvs, i2, dr2, i3, dr3, i4, dr4, symbolic, just_dydt)
          type (Net_Info) :: n
-         real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
+         real(qp) :: dydt(:,:)  ! (num_rvs, num_isos)
          integer, intent(in) :: i, i1, i2, i3, i4
          real(dp), intent(in) :: c, rvs(:), dr2, dr3, dr4
          logical, intent(in) :: symbolic, just_dydt
@@ -360,7 +360,7 @@
       subroutine do_rhs_iso( &
             n, dydt, i, c, i1, rvs, i2, dr2, i3, dr3, i4, dr4, symbolic, just_dydt)
          type (Net_Info) :: n
-         real(qp) :: dydt(:,:) ! (num_rvs, num_isos)
+         real(qp) :: dydt(:,:)  ! (num_rvs, num_isos)
          integer, intent(in) :: i, i1, i2, i3, i4
          real(dp), intent(in) :: c, rvs(:), dr2, dr3, dr4
          logical, intent(in) :: symbolic, just_dydt
@@ -443,7 +443,7 @@
       end subroutine do_rhs_iso
 
 
-      subroutine check_balance(n, i, lhs, rhs) ! check conservation of nucleons
+      subroutine check_balance(n, i, lhs, rhs)  ! check conservation of nucleons
          type (Net_Info) :: n
          integer, intent(in) :: i
          real(dp), intent(in) :: lhs, rhs

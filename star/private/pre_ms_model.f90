@@ -59,9 +59,9 @@
          integer, parameter :: pre_ms_lipar = 1, imax = 100, rpar_init = 8
          integer, target :: ipar_ary(pre_ms_lipar)
          integer, pointer :: ipar(:)
-         real(dp), target :: rpar_ary(rpar_init+species) ! (pre_ms_lrpar)
+         real(dp), target :: rpar_ary(rpar_init+species)  ! (pre_ms_lrpar)
          real(dp), pointer :: rpar(:)
-         real(dp) :: mu_eff ! effective mean molecular weight for gas particles
+         real(dp) :: mu_eff  ! effective mean molecular weight for gas particles
          real(dp) :: initial_y, initial_h1, initial_h2, initial_he3, initial_he4, &
             xsol_he3, xsol_he4
          integer :: initial_zfracs
@@ -156,10 +156,10 @@
             ! estimate mu_eff assuming complete ionization and Z << 1
 
          guess_rho_c = s% pre_ms_guess_rho_c
-         if (guess_rho_c <= 0) then ! use n=3/2 polytrope
-            rstar = Rsun*7.41d6*(mu_eff/0.6d0)*(mstar/Msun)/T_c ! Ushomirsky et al, 6
-            rho_c = 8.44d0*(mstar/Msun)*pow3(Rsun/rstar) ! Ushomirsky et al, 5
-            rho_c = 1.2d0*rho_c ! polytrope value is usually too small
+         if (guess_rho_c <= 0) then  ! use n=3/2 polytrope
+            rstar = Rsun*7.41d6*(mu_eff/0.6d0)*(mstar/Msun)/T_c  ! Ushomirsky et al, 6
+            rho_c = 8.44d0*(mstar/Msun)*pow3(Rsun/rstar)  ! Ushomirsky et al, 5
+            rho_c = 1.2d0*rho_c  ! polytrope value is usually too small
          else
             rho_c = guess_rho_c
          end if
@@ -194,7 +194,7 @@
 
          d_log10_P = s% pre_ms_d_log10_P
 
-         i = 1 ! rpar(1) for mstar result
+         i = 1  ! rpar(1) for mstar result
          rpar(i+1) = T_c; i = i+1
          rpar(i+1) = eps_grav; i = i+1
          rpar(i+1) = x; i = i+1
@@ -230,8 +230,8 @@
             return
          end if
 
-         epsx = 1d-3 ! limit for variation in lnd
-         epsy = 1d-3 ! limit for matching desired mass as fraction of total mass
+         epsx = 1d-3  ! limit for variation in lnd
+         epsy = 1d-3  ! limit for matching desired mass as fraction of total mass
 
          lnd = safe_root(pre_ms_f, lnd1, lnd3, y1, y3, imax, epsx, epsy, &
                   pre_ms_lrpar, rpar, pre_ms_lipar, ipar, ierr)
@@ -299,8 +299,8 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: lnd
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s
@@ -333,7 +333,7 @@
 
          rho_c = exp(lnd)
 
-         i = 1 ! rpar(1) for mstar result
+         i = 1  ! rpar(1) for mstar result
          T_c = rpar(i+1); i = i+1
          eps_grav = rpar(i+1); i = i+1
          x = rpar(i+1); i = i+1
@@ -349,8 +349,8 @@
             return
          end if
 
-         mstar = s% mstar ! desired value
-         mstar1 = mstar ! to keep gfortran quiet
+         mstar = s% mstar  ! desired value
+         mstar1 = mstar  ! to keep gfortran quiet
 
          call build1_pre_ms_model( &
                s, T_c, rho_c, d_log10_P, eps_grav, &
@@ -363,7 +363,7 @@
 
          s% nz = nz
 
-         rpar(1) = mstar1 ! return the actual mass
+         rpar(1) = mstar1  ! return the actual mass
 
          pre_ms_f = (mstar - mstar1) / mstar
          dfdx = 0
@@ -393,7 +393,7 @@
             T_c, rho_c, d_log10_P_in, eps_grav_in, &
             x, z, abar, zbar, xa(:)
          integer, intent(out) :: nz
-         real(dp), intent(out) :: mstar ! the mass of the constructed model
+         real(dp), intent(out) :: mstar  ! the mass of the constructed model
          integer, intent(out) :: ierr
 
          real(dp), parameter :: LOGRHO_TOL = 1E-6_dp
@@ -413,7 +413,7 @@
             rho0, rho_mid, Pmid, chiRho0, chiRho_mid, chiT0, chiT_mid, Cp0, Cp_mid, &
             grada0, grada_mid, mmid, Tmid, Lmid, &
             chiRho, chiT, Cp, grada, gradT, logT_surf_limit, logP_surf_limit
-         real(dp), pointer :: xh(:,:), q(:), dq(:) ! model structure info
+         real(dp), pointer :: xh(:,:), q(:), dq(:)  ! model structure info
 
          logical, parameter :: dbg = .false.
 
@@ -452,10 +452,10 @@
 
          logPgas = res(i_lnPgas)/ln10
          Pgas = exp10(logPgas)
-         P_c = Pgas + Radiation_Pressure(T_c) ! center pressure
+         P_c = Pgas + Radiation_Pressure(T_c)  ! center pressure
 
-         mstar = s% mstar ! desired total mass
-         m = q_at_nz*mstar ! mass at nz
+         mstar = s% mstar  ! desired total mass
+         m = q_at_nz*mstar  ! mass at nz
          ! pressure at innermost point using K&W 10.6
          P = P_c - 3*cgrav/(8*pi)*pow(pi4*rho_c/3,4d0/3d0)*pow(m,two_thirds)
          logP = log10(P)
@@ -478,13 +478,13 @@
          rho = exp10(logRho)
          call unpack_eos_results
 
-         r = pow(m/(pi4*rho/3),one_third) ! radius at nz
+         r = pow(m/(pi4*rho/3),one_third)  ! radius at nz
 
          y = 1 - (x+z)
 
          do
 
-            L = eps_grav*m ! L at nz
+            L = eps_grav*m  ! L at nz
 
             ! check for convective core
             call eval_gradT( &
@@ -534,7 +534,7 @@
             chiT0 = chiT
             Cp0 = Cp
             grada0 = grada
-            dm = 0 ! for gfortran
+            dm = 0  ! for gfortran
 
             if (dbg) write(*,3) 'step', k, nz, logPgas0
 
@@ -552,17 +552,17 @@
 
                   rho_mid = (rho+rho0)/2
 
-                  do ii = 1, 10 ! repeat to get hydrostatic balance
+                  do ii = 1, 10  ! repeat to get hydrostatic balance
                      rmid = pow((r*r*r + r0*r0*r0)/2,one_third)
                      mmid = (m + m0)/2
                      if (ii == 10) exit
                      dm = -pi4*pow4(rmid)*(P-P0)/(cgrav*mmid)
-                     m = m0 + dm ! mass at point k
+                     m = m0 + dm  ! mass at point k
                      r = pow(r0*r0*r0 + dm/(four_thirds_pi*rho_mid),one_third)
                      if (dbg) write(*,2) 'r', ii, r, m, dm
                   end do
 
-                  L = L0 + dm*eps_grav ! luminosity at point k
+                  L = L0 + dm*eps_grav  ! luminosity at point k
                   Lmid = (L0+L)/2
 
                   Pmid = (P+P0)/2
@@ -630,7 +630,7 @@
 
          end do step_loop
 
-         if (prune > 0) then ! move stuff and reduce nz
+         if (prune > 0) then  ! move stuff and reduce nz
             if (dbg) write(*,*) 'prune', prune
             do k=1,nz-prune
                xh(:,k) = xh(:,k+prune)
@@ -642,7 +642,7 @@
             if (dbg) write(*,*) 'final nz', nz
          end if
 
-         mstar = m ! actual total mass
+         mstar = m  ! actual total mass
 
          if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
             call normalize_dqs(s, nz, dq, ierr)
@@ -701,7 +701,7 @@
          real(dp) :: dlnkap_dlnd, dlnkap_dlnT, gradL_composition_term, &
             opacity, grav, scale_height, scale_height2, gradr, cgrav
          real(dp) :: kap_fracs(num_kap_fracs), dlnkap_dxa(s% species)
-         real(dp) :: Y_face, conv_vel, D, Gamma ! Not used
+         real(dp) :: Y_face, conv_vel, D, Gamma  ! Not used
          integer :: mixing_type
 
          ierr = 0
@@ -726,7 +726,7 @@
          gradL_composition_term = 0d0
          cgrav = standard_cgrav
          grav = cgrav*m/pow2(r)
-         scale_height = P/(grav*rho) ! this assumes HSE
+         scale_height = P/(grav*rho)  ! this assumes HSE
          if (s% alt_scale_height_flag) then
             scale_height2 = sqrt(P/cgrav)/rho
             if (scale_height2 < scale_height) then
@@ -735,7 +735,7 @@
          end if
          gradr = P*opacity*L/(16d0*pi*clight*m*cgrav*crad*pow4(T)/3d0)
 
-         call get_gradT(s, s% MLT_option, & ! used to create models
+         call get_gradT(s, s% MLT_option, &  ! used to create models
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
             s% net_iso(ih1), x, standard_cgrav, m, gradL_composition_term, s% mixing_length_alpha, &
             mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)

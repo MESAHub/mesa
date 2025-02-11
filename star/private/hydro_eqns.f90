@@ -181,7 +181,7 @@
                   ierr = op_err
                end if
             end if
-            if (k > 1) then ! k=1 is surf P BC
+            if (k > 1) then  ! k=1 is surf P BC
                if (do_du_dt) then
                   call do1_Riemann_momentum_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
@@ -263,7 +263,7 @@
                      if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_L_eqn'
                      ierr = op_err
                   end if
-               else if (k > 1) then ! k==1 is done by T_surf BC
+               else if (k > 1) then  ! k==1 is done by T_surf BC
                   call do1_dlnT_dm_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_dlnT_dm_eqn', k
@@ -297,7 +297,7 @@
             return
          end if
 
-         if (.false. .and. s% model_number == 2) then !  .and. .not. s% doing_relax) then
+         if (.false. .and. s% model_number == 2) then  !  .and. .not. s% doing_relax) then
             if (.false.) then
                i = s% i_dv_dt
                k = 1
@@ -309,7 +309,7 @@
             end if
             !write(*,*) 'call show_matrix'
             !call show_matrix(s, s% dblk(1:s% nvar_hydro,1:s% nvar_hydro,1), s% nvar_hydro)
-            call dump_equ ! debugging
+            call dump_equ  ! debugging
             call mesa_error(__FILE__,__LINE__,'after dump_equ')
          end if
 
@@ -482,7 +482,7 @@
 
                      ! fix up derivatives
 
-                     if (debug .and. k == s% solver_test_partials_k) & ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
+                     if (debug .and. k == s% solver_test_partials_k) &  ! .and. s% solver_iter == s% solver_test_partials_iter_number) &
                         write(*,2) 'res(i_lnE) - lnE_with_xa_start', j, res(i_lnE) - lnE_with_xa_start
 
                      s% dlnE_dxa_for_partials(j,k) = dres_dxa(i_lnE, j) + &
@@ -747,7 +747,7 @@
          ierr = 0
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
-         else ! use this even if not v_flag
+         else  ! use this even if not v_flag
             i_P_eqn = s% i_dv_dt
          end if
 
@@ -819,7 +819,7 @@
 
          contains
 
-         subroutine get_PT_bc_ad(ierr) ! set P_bc_ad and T_bc_ad
+         subroutine get_PT_bc_ad(ierr)  ! set P_bc_ad and T_bc_ad
             use hydro_vars, only: set_Teff_info_for_eqns
             use chem_def
             use atm_def
@@ -892,7 +892,7 @@
             end if
 
             dP0_dlnR = 0
-            if (offset_P_to_cell_center) then ! include partials of dP0
+            if (offset_P_to_cell_center) then  ! include partials of dP0
                dP0_dlnR = -4*dP0
             end if
 
@@ -900,7 +900,7 @@
             dT0_dlnT = 0
             dT0_dlnd = 0
             dT0_dL = 0
-            if (offset_T_to_cell_center) then ! include partials of dT0
+            if (offset_T_to_cell_center) then  ! include partials of dT0
                d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
                d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
                d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
@@ -1014,7 +1014,7 @@
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then ! interpolate lnT by mass
+            if (s% RSP2_flag) then  ! interpolate lnT by mass
                T4_p1 = pow4(wrap_T_p1(s,1))
                T4_surf = pow4(T_bc_ad)
                dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
@@ -1094,8 +1094,8 @@
             ierr = 0
             rho1 = wrap_d_00(s,1)
             rho2 = wrap_d_p1(s,1)
-            dlnd1 = wrap_dxh_lnd(s,1) ! lnd(1) - lnd_start(1)
-            dlnd2 = shift_p1(wrap_dxh_lnd(s,2)) ! lnd(2) - lnd_start(2)
+            dlnd1 = wrap_dxh_lnd(s,1)  ! lnd(1) - lnd_start(1)
+            dlnd2 = shift_p1(wrap_dxh_lnd(s,2))  ! lnd(2) - lnd_start(2)
             resid_ad = (rho2*dlnd1 - rho1*dlnd2)/s% dt
             s% equ(i_P_eqn, 1) = resid_ad%val
             call save_eqn_residual_info( &

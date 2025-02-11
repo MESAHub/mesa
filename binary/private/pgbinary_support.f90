@@ -34,7 +34,7 @@ module pgbinary_support
       clr_thermohaline, clr_overshoot, clr_rotation, clr_minimum, clr_rayleigh_taylor, &
       clr_anonymous, colormap_offset, colormap_last, colormap_size, &
       colormap, Line_Type_Solid, Line_Type_Dash, Line_Type_Dash_Dot, Line_Type_Dot_Dash, &
-      Line_Type_Dot ! inherit colors/linetypes + some routines from pgstar
+      Line_Type_Dot  ! inherit colors/linetypes + some routines from pgstar
    use star_pgstar
 
    implicit none
@@ -169,6 +169,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') &
          b% pg% file_digits, b% pg% file_digits
       write(num_str, fstring) b% model_number
@@ -177,7 +178,12 @@ contains
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(b% pg% file_extension)
+      if (b%pg%file_device=='vcps') then
+         file_extension = 'ps'
+      else
+         file_extension = b%pg%file_device
+      end if
+      name = trim(name) // trim(num_str) // '.' // trim(file_extension)
    end subroutine create_file_name
 
 
@@ -250,7 +256,7 @@ contains
       include 'formats'
       numpts = 0
       pg => b% pg% pgbinary_hist
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) return
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
@@ -262,7 +268,7 @@ contains
    logical function get1_hist_yvec(b, step_min, step_max, n, name, vec)
       use utils_lib, only : integer_dict_lookup
       type (binary_info), pointer :: b
-      integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
+      integer, intent(in) :: step_min, step_max, n  ! n = count_hist_points
       character (len = *) :: name
       real, dimension(:), pointer :: vec
       integer :: i, ierr, cnt
@@ -281,7 +287,7 @@ contains
          end if
       end do
       call integer_dict_lookup(b% binary_history_names_dict, key_name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) then ! didn't find it
+      if (ierr /= 0 .or. i <= 0) then  ! didn't find it
          get1_hist_yvec = .false.
          return
       end if
@@ -302,7 +308,7 @@ contains
       if (numpts == 0) return
       pg => b% pg% pgbinary_hist
       i = numpts
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) then
             ierr = -1
             return
@@ -349,7 +355,7 @@ contains
       pg => b% pg% pgbinary_hist
       i = numpts
       vec = 0
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) then
             ! this will not happen if have correct numpts

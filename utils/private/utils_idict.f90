@@ -37,7 +37,7 @@
             subroutine fcn(key1, key2, value, ierr)
                implicit none
                integer, intent(in) :: key1, key2, value
-               integer, intent(out) :: ierr ! /= 0 means terminate map calls
+               integer, intent(out) :: ierr  ! /= 0 means terminate map calls
             end subroutine fcn
          end interface
          type (integer_idict), pointer :: node
@@ -72,7 +72,7 @@
 
          subroutine fcn(key1, key2, value, ierr)
             integer, intent(in) :: key1, key2, value
-            integer, intent(out) :: ierr ! /= 0 means terminate map calls
+            integer, intent(out) :: ierr  ! /= 0 means terminate map calls
             if (cnt >= sz) then
                ierr = -1
                return
@@ -105,7 +105,7 @@
       subroutine find_key1_key2_entry(idict, key1, key2, node)
          type (integer_idict), pointer :: idict
          integer, intent(in) :: key1, key2
-         type (integer_idict), pointer :: node ! set null if cannot find key1, key2 in idict
+         type (integer_idict), pointer :: node  ! set null if cannot find key1, key2 in idict
          type (ihash_entry), pointer :: hash(:)
          integer :: i, hash_size, hashkey
          if (.not. associated(idict)) then
@@ -115,7 +115,7 @@
             hash => idict% hash
             hash_size = size(hash)
             hashkey = idict_hashkey(key1, key2, hash_size)
-            do i=1, hash_size ! find an empty slot
+            do i=1, hash_size  ! find an empty slot
                if (.not. associated(hash(hashkey)% ptr)) exit
                if (hash(hashkey)% ptr% key1 == key1 .and. &
                    hash(hashkey)% ptr% key2 == key2) then
@@ -126,7 +126,7 @@
                if (hashkey > hash_size) hashkey = 1
             end do
             nullify(node)
-            return ! failed to find key1, key2
+            return  ! failed to find key1, key2
          end if
          node => idict
          do
@@ -148,9 +148,9 @@
 
 
       recursive subroutine insert_node(node, root, duplicate)
-         type (integer_idict), pointer :: node ! will be deallocated if a duplicate
+         type (integer_idict), pointer :: node  ! will be deallocated if a duplicate
          type (integer_idict), pointer :: root
-         logical :: duplicate ! true if key was already defined
+         logical :: duplicate  ! true if key was already defined
 
          integer :: height_left, height_right
          logical, parameter :: dbg = .false.
@@ -165,7 +165,7 @@
 
          if (node% key1 > root% key1 .or. &
             (node% key1 == root% key1 .and. &
-             node% key2 > root% key2)) then ! insert on left
+             node% key2 > root% key2)) then  ! insert on left
             if (.not. associated(root% left)) then
                root% left => node
             else
@@ -173,16 +173,16 @@
             end if
             height_left = root% left% height
             height_right = height_of_right_branch(root)
-            if (height_left - height_right == 2) then ! rebalance
+            if (height_left - height_right == 2) then  ! rebalance
                if (node% key1 > root% left% key1 .or. &
                   (node% key1 == root% left% key1 .and. &
-                   node% key2 > root% left% key2)) then ! insert on left
+                   node% key2 > root% left% key2)) then  ! insert on left
                   call single_rotate_with_left(root)
                else
                   call double_rotate_with_left(root)
                end if
             end if
-         else ! insert on right
+         else  ! insert on right
             if (.not. associated(root% right)) then
                root% right => node
             else
@@ -190,7 +190,7 @@
             end if
             height_right = root% right% height
             height_left = height_of_left_branch(root)
-            if (height_right - height_left == 2) then ! rebalance
+            if (height_right - height_left == 2) then  ! rebalance
                if (root% right% key1 > node% key1 .or. &
                   (root% right% key1 == node% key1 .and. &
                    root% right% key2 > node% key2)) then
@@ -279,9 +279,9 @@
 
 
       subroutine do_integer_idict_define(idict, key1, key2, value, duplicate, ierr)
-         type (integer_idict), pointer :: idict ! pass null for empty idict
+         type (integer_idict), pointer :: idict  ! pass null for empty idict
          integer, intent(in) :: key1, key2, value
-         logical, intent(out) :: duplicate ! true if key was already defined
+         logical, intent(out) :: duplicate  ! true if key was already defined
          integer, intent(out) :: ierr
          type (integer_idict), pointer :: node
          logical, parameter :: dbg = .false.
@@ -297,7 +297,7 @@
          nullify(node% left)
          nullify(node% right)
          nullify(node% hash)
-         if (.not. associated(idict)) then ! this is the 1st entry
+         if (.not. associated(idict)) then  ! this is the 1st entry
             idict => node
          else
             if (associated(idict% hash)) then
@@ -307,7 +307,7 @@
             call insert_node(node, idict, duplicate)
          end if
 !$omp end critical (idict_define)
-         if (dbg) then ! check tree
+         if (dbg) then  ! check tree
             write(*,'(A)')
             call check_idict(idict, ierr)
             call show_key1_key2_entries(idict)
@@ -331,7 +331,7 @@
 
 !$omp critical (create_hash)
          if (.not. associated(idict% hash)) then
-            cnt = size_integer_idict(idict) ! number of entries
+            cnt = size_integer_idict(idict)  ! number of entries
             if (cnt > 0) then
                hash_size = 4*cnt
                allocate(idict% hash(hash_size), stat=ierr)
@@ -398,7 +398,7 @@
          type (integer_idict), pointer :: idict
          integer, intent(in) :: key1, key2
          integer, intent(out) :: value
-         integer, intent(out) :: ierr ! 0 if found key1, key2 in idict, -1 if didn't
+         integer, intent(out) :: ierr  ! 0 if found key1, key2 in idict, -1 if didn't
          type (integer_idict), pointer :: node
          logical, parameter :: dbg = .false.
          if (dbg) then
@@ -470,7 +470,7 @@
             ! enter node in hash
             hashkey = idict_hashkey(node% key1, node% key2, hash_size)
             okay = .false.
-            do i=1, hash_size ! find an empty slot
+            do i=1, hash_size  ! find an empty slot
                if (.not. associated(hash(hashkey)% ptr)) then
                   hash(hashkey)% ptr => node
                   okay = .true.
@@ -493,11 +493,11 @@
       end subroutine do_enter_hash
 
 
-      integer function idict_hashkey(key1, key2, hash_size) ! value between 1 and hash_size
+      integer function idict_hashkey(key1, key2, hash_size)  ! value between 1 and hash_size
          integer, intent(in) :: key1, key2, hash_size
          integer:: new, hash, c
          ! source: http://www.partow.net/programming/hashfunctions/#APHashFunction
-         hash = -1431655766 ! Z'AAAAAAAA'
+         hash = -1431655766  ! Z'AAAAAAAA'
          c = key1
          if (iand(c,1)==1) then
             !new = (hash <<  7) ^ (*str) * (hash >> 3)

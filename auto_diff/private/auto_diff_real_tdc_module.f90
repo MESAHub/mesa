@@ -394,210 +394,210 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .eq. other%val)
+      z = (this%val == other%val)
    end function equal_self
 
    function equal_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .eq. other)
+      z = (this%val == other)
    end function equal_auto_diff_real_tdc_real_dp
 
    function equal_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .eq. other%val)
+      z = (this == other%val)
    end function equal_real_dp_auto_diff_real_tdc
 
    function equal_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .eq. other)
+      z = (this%val == other)
    end function equal_auto_diff_real_tdc_int
 
    function equal_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .eq. other%val)
+      z = (this == other%val)
    end function equal_int_auto_diff_real_tdc
 
    function neq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .ne. other%val)
+      z = (this%val /= other%val)
    end function neq_self
 
    function neq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .ne. other)
+      z = (this%val /= other)
    end function neq_auto_diff_real_tdc_real_dp
 
    function neq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ne. other%val)
+      z = (this /= other%val)
    end function neq_real_dp_auto_diff_real_tdc
 
    function neq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .ne. other)
+      z = (this%val /= other)
    end function neq_auto_diff_real_tdc_int
 
    function neq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ne. other%val)
+      z = (this /= other%val)
    end function neq_int_auto_diff_real_tdc
 
    function greater_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .gt. other%val)
+      z = (this%val > other%val)
    end function greater_self
 
    function greater_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .gt. other)
+      z = (this%val > other)
    end function greater_auto_diff_real_tdc_real_dp
 
    function greater_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .gt. other%val)
+      z = (this > other%val)
    end function greater_real_dp_auto_diff_real_tdc
 
    function greater_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .gt. other)
+      z = (this%val > other)
    end function greater_auto_diff_real_tdc_int
 
    function greater_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .gt. other%val)
+      z = (this > other%val)
    end function greater_int_auto_diff_real_tdc
 
    function less_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .lt. other%val)
+      z = (this%val < other%val)
    end function less_self
 
    function less_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .lt. other)
+      z = (this%val < other)
    end function less_auto_diff_real_tdc_real_dp
 
    function less_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .lt. other%val)
+      z = (this < other%val)
    end function less_real_dp_auto_diff_real_tdc
 
    function less_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .lt. other)
+      z = (this%val < other)
    end function less_auto_diff_real_tdc_int
 
    function less_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .lt. other%val)
+      z = (this < other%val)
    end function less_int_auto_diff_real_tdc
 
    function leq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .le. other%val)
+      z = (this%val <= other%val)
    end function leq_self
 
    function leq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .le. other)
+      z = (this%val <= other)
    end function leq_auto_diff_real_tdc_real_dp
 
    function leq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .le. other%val)
+      z = (this <= other%val)
    end function leq_real_dp_auto_diff_real_tdc
 
    function leq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .le. other)
+      z = (this%val <= other)
    end function leq_auto_diff_real_tdc_int
 
    function leq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .le. other%val)
+      z = (this <= other%val)
    end function leq_int_auto_diff_real_tdc
 
    function geq_self(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this%val .ge. other%val)
+      z = (this%val >= other%val)
    end function geq_self
 
    function geq_auto_diff_real_tdc_real_dp(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       real(dp), intent(in) :: other
       logical :: z
-      z = (this%val .ge. other)
+      z = (this%val >= other)
    end function geq_auto_diff_real_tdc_real_dp
 
    function geq_real_dp_auto_diff_real_tdc(this, other) result(z)
       real(dp), intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ge. other%val)
+      z = (this >= other%val)
    end function geq_real_dp_auto_diff_real_tdc
 
    function geq_auto_diff_real_tdc_int(this, other) result(z)
       type(auto_diff_real_tdc), intent(in) :: this
       integer, intent(in) :: other
       logical :: z
-      z = (this%val .ge. other)
+      z = (this%val >= other)
    end function geq_auto_diff_real_tdc_int
 
    function geq_int_auto_diff_real_tdc(this, other) result(z)
       integer, intent(in) :: this
       type(auto_diff_real_tdc), intent(in) :: other
       logical :: z
-      z = (this .ge. other%val)
+      z = (this >= other%val)
    end function geq_int_auto_diff_real_tdc
 
    function make_unary_operator(x, z_val, z_d1x, z_d2x) result(unary)

@@ -37,8 +37,8 @@
 
       subroutine do_dense_to_band(n,ndim,a,ml,mu,ab,ldab,ierr)
          integer, intent(in) :: n,ndim,ml,mu,ldab
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         real(dp), intent(inout) :: ab(:,:) ! (ldab,n)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         real(dp), intent(inout) :: ab(:,:)  ! (ldab,n)
          integer, intent(out) :: ierr
          integer :: i, j
          if (ml+mu+1 > n) then
@@ -57,8 +57,8 @@
 
       subroutine do_band_to_dense(n,ml,mu,ab,ldab,ndim,a,ierr)
          integer, intent(in) :: n,ndim,ml,mu,ldab
-         real(dp), intent(in) :: ab(:,:) ! (ldab,n)
-         real(dp), intent(inout) :: a(:,:) ! (ndim,n)
+         real(dp), intent(in) :: ab(:,:)  ! (ldab,n)
+         real(dp), intent(inout) :: a(:,:)  ! (ndim,n)
          integer, intent(out) :: ierr
          integer :: i, j
          if (ml+mu+1 > n) then
@@ -94,10 +94,10 @@
          ierr = 0
          nz = 0
          do j=1,n
-            colptr(j) = nz+1 ! index in values of first entry in this column
+            colptr(j) = nz+1  ! index in values of first entry in this column
             do i=max(1,j-mu),min(n,j+ml)
                if (ab(ldab-ml+i-j,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -229,7 +229,7 @@
                if (dbg) write(*,2) 'k', k
                if (dbg) write(*,2) 'nz_start(k)', nz_start(k)
                j2 = nz_start(k)
-               do j1 = i+1, i+nz1 ! avoid ifort segfault
+               do j1 = i+1, i+nz1  ! avoid ifort segfault
                   values(j1) = values(j2)
                   colind(j1) = colind(j2)
                   j2 = j2+1
@@ -278,12 +278,12 @@
          ierr = 0
          nz = nz_start(num) - 1
          do i = i_lo(num), i_hi(num)
-            rowptr(i) = nz+1 ! index in values of first entry in this row
+            rowptr(i) = nz+1  ! index in values of first entry in this row
             !write(*,*) 'set rowptr(i)', i, rowptr(i)
             do j = max(1,i-ml), min(n,i+mu)
                val = ab(idiag+i-j,j)
                if (val == 0) then
-                  if (i /= j) cycle ! not a diagonal, so skip if 0
+                  if (i /= j) cycle  ! not a diagonal, so skip if 0
                   if (.not. diags) cycle
                   ! if (diags) then include diagonals even if are == 0
                end if
@@ -299,7 +299,7 @@
                colind(nz) = j
             end do
          end do
-         nz_per_chunk(num) = nz - nz_start(num) + 1 ! number of non-zero values for this chunk
+         nz_per_chunk(num) = nz - nz_start(num) + 1  ! number of non-zero values for this chunk
       end subroutine do_chunk_band_to_row_sparse
 
 
@@ -337,20 +337,20 @@
          !real(dp), intent(in) :: a(ndim,n)
          !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
          !real(dp), intent(inout) :: values(nzmax)
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: rowptr(:) ! (n+1)
-         integer, intent(inout) :: colind(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         integer, intent(inout) :: rowptr(:)  ! (n+1)
+         integer, intent(inout) :: colind(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
          logical, intent(in) :: diags
          integer, intent(out) :: nz,ierr
          integer :: i,j
          ierr = 0
          nz = 0
          do i=1,n
-            rowptr(i) = nz+1 ! index in values of first entry in this row
+            rowptr(i) = nz+1  ! index in values of first entry in this row
             do j=1,n
                if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -373,20 +373,20 @@
          !real(dp), intent(in) :: a(ndim,n)
          !integer, intent(inout) :: rowptr(n+1),colind(nzmax)
          !real(dp), intent(inout) :: values(nzmax)
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: rowptr(:) ! (n+1)
-         integer, intent(inout) :: colind(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         integer, intent(inout) :: rowptr(:)  ! (n+1)
+         integer, intent(inout) :: colind(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
          logical, intent(in) :: diags
          integer, intent(out) :: nz,ierr
          integer :: i,j
          ierr = 0
          nz = 0
          do i=1,n
-            rowptr(i) = nz ! index in values of first entry in this row
+            rowptr(i) = nz  ! index in values of first entry in this row
             do j=1,n
                if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -456,20 +456,20 @@
          !real(dp), intent(in) :: a(ndim,n)
          !integer, intent(inout) :: colptr(n+1),rowind(nzmax)
          !real(dp), intent(inout) :: values(nzmax)
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: colptr(:) ! (n+1)
-         integer, intent(inout) :: rowind(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         integer, intent(inout) :: colptr(:)  ! (n+1)
+         integer, intent(inout) :: rowind(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
          logical, intent(in) :: diags
          integer, intent(out) :: nz,ierr
          integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
-            colptr(j) = nz+1 ! index in values of first entry in this column
+            colptr(j) = nz+1  ! index in values of first entry in this column
             do i=1,n
                if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -492,20 +492,20 @@
          !real(dp), intent(in) :: a(ndim,n)
          !integer, intent(inout) :: colptr(n+1),rowind(nzmax)
          !real(dp), intent(inout) :: values(nzmax)
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: colptr(:) ! (n+1)
-         integer, intent(inout) :: rowind(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         integer, intent(inout) :: colptr(:)  ! (n+1)
+         integer, intent(inout) :: rowind(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
          logical, intent(in) :: diags
          integer, intent(out) :: nz,ierr
          integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
-            colptr(j) = nz ! index in values of first entry in this column
+            colptr(j) = nz  ! index in values of first entry in this column
             do i=1,n
                if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -528,20 +528,20 @@
          !real(dp), intent(in) :: a(ndim,n)
          !integer, intent(inout) :: colptr(n+1),rowind(nzmax)
          !real(dp), intent(inout) :: values(nzmax)
-         real(dp), intent(in) :: a(:,:) ! (ndim,n)
-         integer, intent(inout) :: colptr(:) ! (n+1)
-         integer, intent(inout) :: rowind(:) ! (nzmax)
-         real(qp), intent(out) :: values(:) ! (nzmax)
+         real(dp), intent(in) :: a(:,:)  ! (ndim,n)
+         integer, intent(inout) :: colptr(:)  ! (n+1)
+         integer, intent(inout) :: rowind(:)  ! (nzmax)
+         real(qp), intent(out) :: values(:)  ! (nzmax)
          logical, intent(in) :: diags
          integer, intent(out) :: nz,ierr
          integer :: i,j
          ierr = 0
          nz = 0
          do j=1,n
-            colptr(j) = nz ! index in values of first entry in this column
+            colptr(j) = nz  ! index in values of first entry in this column
             do i=1,n
                if (a(i,j) == 0) then
-                  if (i /= j) cycle ! not a diagonal
+                  if (i /= j) cycle  ! not a diagonal
                   if (.not. diags) cycle
                   ! else include diagonals even if are == 0
                end if
@@ -613,9 +613,9 @@
       subroutine do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
          use my_lapack95, only: my_gemv_p1
          integer, intent(in) :: nvar, nz
-         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
+         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk  ! (nvar,nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(in) :: b  ! (nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod  ! (nvar,nz)
          integer :: k
          do k = 1, nz
             prod(1:nvar,k) = 0
@@ -631,10 +631,10 @@
 
 
       subroutine do_LU_factored_block_dble_mv(lblk, dblk, ublk, b, ipiv, prod)
-         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         integer, intent(in) :: ipiv(:,:) ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
+         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk  ! (nvar,nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(in) :: b  ! (nvar,nz)
+         integer, intent(in) :: ipiv(:,:)  ! (nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod  ! (nvar,nz)
          integer :: nvar, nz, k, incx, incy
          nvar = size(b,dim=1)
          nz = size(b,dim=2)
@@ -654,13 +654,13 @@
       end subroutine do_LU_factored_block_dble_mv
 
 
-      subroutine do_LU_factored_square_mv(m,a,b,ipiv,x) ! set x = A*b
+      subroutine do_LU_factored_square_mv(m,a,b,ipiv,x)  ! set x = A*b
          ! A factored in LU manner = P*L*U.
          integer, intent(in) :: m
-         real(dp), intent(in) :: a(:,:) ! (lda,m), lda >= m
-         real(dp), intent(in) :: b(:) ! (m)
-         integer, intent(in) :: ipiv(:) ! (m)
-         real(dp), intent(inout) :: x(:) ! (m)
+         real(dp), intent(in) :: a(:,:)  ! (lda,m), lda >= m
+         real(dp), intent(in) :: b(:)  ! (m)
+         integer, intent(in) :: ipiv(:)  ! (m)
+         real(dp), intent(inout) :: x(:)  ! (m)
          integer :: i, j
          real(dp), dimension(m) :: y
          include 'formats'
@@ -683,13 +683,13 @@
       end subroutine do_LU_factored_square_mv
 
 
-      subroutine do_LU_factored_square_mm(m,A,B,ipiv,C) ! set C = A*B
+      subroutine do_LU_factored_square_mm(m,A,B,ipiv,C)  ! set C = A*B
          ! A factored in LU manner = P*L*U.
          integer, intent(in) :: m
-         real(dp), intent(in) :: A(:,:) ! (m,m)
-         real(dp), intent(in) :: B(:,:) ! (m,m)
-         integer, intent(in) :: ipiv(:) ! (m)
-         real(dp), intent(inout) :: C(:,:) ! (m,m)
+         real(dp), intent(in) :: A(:,:)  ! (m,m)
+         real(dp), intent(in) :: B(:,:)  ! (m,m)
+         integer, intent(in) :: ipiv(:)  ! (m)
+         real(dp), intent(inout) :: C(:,:)  ! (m,m)
          integer :: i, j, k
          real(dp), dimension(m,m) :: Y
          include 'formats'
@@ -719,11 +719,11 @@
       subroutine do_multiply_xa(n, A1, x, b)
          !  calculates b = x*A
          integer, intent(in) :: n
-         real(dp), pointer, intent(in) :: A1(:) ! =(n, n)
-         real(dp), pointer, intent(in) :: x(:) ! (n)
-         real(dp), pointer, intent(inout) :: b(:) ! (n)
+         real(dp), pointer, intent(in) :: A1(:)  ! =(n, n)
+         real(dp), pointer, intent(in) :: x(:)  ! (n)
+         real(dp), pointer, intent(inout) :: b(:)  ! (n)
          integer :: j
-         real(dp), pointer :: A(:,:) ! (n, n)
+         real(dp), pointer :: A(:,:)  ! (n, n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
             b(j) = dot_product(x(1:n),A(1:n,j))
@@ -734,12 +734,12 @@
       subroutine do_multiply_xa_plus_c(n, A1, x, c, b)
          !  calculates b = x*A + c
          integer, intent(in) :: n
-         real(dp), pointer, intent(in) :: A1(:) ! =(n,n)
-         real(dp), pointer, intent(in) :: x(:) ! (n)
-         real(dp), pointer, intent(in) :: c(:) ! (n)
-         real(dp), pointer, intent(inout) :: b(:) ! (n)
+         real(dp), pointer, intent(in) :: A1(:)  ! =(n,n)
+         real(dp), pointer, intent(in) :: x(:)  ! (n)
+         real(dp), pointer, intent(in) :: c(:)  ! (n)
+         real(dp), pointer, intent(inout) :: b(:)  ! (n)
          integer :: j
-         real(dp), pointer :: A(:,:) ! (n,n)
+         real(dp), pointer :: A(:,:)  ! (n,n)
          A(1:n,1:n) => A1(1:n*n)
          do j = 1, n
             b(j) = dot_product(x(1:n),A(1:n,j)) + c(j)
@@ -750,9 +750,9 @@
       subroutine do_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
          !  calculates b = x*A
          integer, intent(in) :: nvar, nz
-         real(dp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
-         real(dp), intent(in), pointer :: x1(:) ! =(nvar,nz)
-         real(dp), intent(inout), pointer :: b1(:) ! =(nvar,nz)
+         real(dp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1  ! =(nvar,nvar,nz)
+         real(dp), intent(in), pointer :: x1(:)  ! =(nvar,nz)
+         real(dp), intent(inout), pointer :: b1(:)  ! =(nvar,nz)
          integer :: k, shift, shift2, nvar2
          real(dp), pointer, dimension(:) :: p1, p2, p3, p4
          nvar2 = nvar*nvar
@@ -794,14 +794,14 @@
          !          the number of superdiagonals within the band of a.  ku >= 0.
             integer, intent(in) :: ldab
          !          the leading dimension of the array ab.  ldab >= kl+ku+1.
-            real(dp), intent(in), pointer :: ab1(:) ! =(ldab, n)
+            real(dp), intent(in), pointer :: ab1(:)  ! =(ldab, n)
          !          the matrix a in band storage, in rows 1 to kl+ku+1;
          !          the j-th column of a is stored in the j-th column of the
          !          array ab as follows:
          !          ab(ku+1+i-j, j) = a(i, j) for max(1, j-ku)<=i<=min(n, j+kl)
-            real(dp), intent(in), pointer :: x(:) ! (n)
+            real(dp), intent(in), pointer :: x(:)  ! (n)
          !          the input vector to be multiplied by the matrix.
-            real(dp), intent(inout), pointer :: b(:) ! (n)
+            real(dp), intent(inout), pointer :: b(:)  ! (n)
          !          on exit, set to matrix product of x*a = b
          integer ::  i, j, k
          real(dp), pointer :: ab(:,:)
@@ -858,10 +858,10 @@
 
       subroutine read_hbcode1(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
 
-      CHARACTER      TITLE*72 , KEY*8    , MXTYPE*3 , &
+      CHARACTER      :: TITLE*72 , KEY*8    , MXTYPE*3 , &
                      PTRFMT*16, INDFMT*16, VALFMT*20, RHSFMT*20
 
-      INTEGER        TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
+      INTEGER        :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
                      iounit, NROW  , NCOL  , NNZERO, NELTVL
 
       INTEGER, pointer ::        COLPTR (:), ROWIND (:)
@@ -887,7 +887,7 @@
       READ (iounit, INDFMT, iostat=ierr ) ( ROWIND (I), I = 1, NNZERO )
       if (ierr /= 0) return
 
-      IF  ( VALCRD .GT. 0 )  THEN
+      IF  ( VALCRD > 0 )  THEN
 
 !         ----------------------
 !         ... READ MATRIX VALUES
@@ -904,15 +904,15 @@
 
       subroutine write_hbcode1(iounit, nrow, ncol, nnzero, values, rowind, colptr, ierr)
 
-      CHARACTER      TITLE*72 , KEY*8    , MXTYPE*3 , &
+      CHARACTER      :: TITLE*72 , KEY*8    , MXTYPE*3 , &
                      PTRFMT*16, INDFMT*16, use_VALFMT*20, VALFMT*20, RHSFMT*20
 
-      INTEGER        TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
+      INTEGER        :: TOTCRD, PTRCRD, INDCRD, VALCRD, RHSCRD, &
                      iounit, NROW  , NCOL  , NNZERO, NELTVL
 
-      INTEGER        COLPTR (*), ROWIND (*), ierr
+      INTEGER        :: COLPTR (*), ROWIND (*), ierr
 
-      REAL(dp)         VALUES (*)
+      REAL(dp)         :: VALUES (*)
 
       integer :: i
 
@@ -986,9 +986,9 @@
       VALFMT = '(5E27.16)'
       RHSFMT = ''
 
-      PTRCRD = (NCOL+1)/10 + 1 ! number of lines for COLPTR
-      INDCRD = NNZERO/12 + 1 ! number of lines for ROWIND
-      VALCRD = NNZERO/5 + 1 ! number of lines for VALUES
+      PTRCRD = (NCOL+1)/10 + 1  ! number of lines for COLPTR
+      INDCRD = NNZERO/12 + 1  ! number of lines for ROWIND
+      VALCRD = NNZERO/5 + 1  ! number of lines for VALUES
       RHSCRD = 0
       TOTCRD = 3 + PTRCRD + INDCRD + VALCRD + RHSCRD
 
@@ -1009,7 +1009,7 @@
 
       WRITE (iounit, INDFMT ) ( ROWIND (I), I = 1, NNZERO )
 
-      IF  ( VALCRD .GT. 0 )  THEN
+      IF  ( VALCRD > 0 )  THEN
 
 !         ----------------------
 !         ... WRITE MATRIX VALUES
@@ -1026,7 +1026,7 @@
       subroutine read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
          integer, intent(in) :: iounit
          integer, intent(out) :: nvar, nblk
-         real(dp), pointer, dimension(:) :: lblk1,dblk1,ublk1 ! will be allocated
+         real(dp), pointer, dimension(:) :: lblk1,dblk1,ublk1  ! will be allocated
          integer, intent(out) :: ierr
          integer :: k
          real(dp), pointer, dimension(:,:,:) :: lblk,dblk,ublk
@@ -1056,7 +1056,7 @@
 
       subroutine read1_sparse_block(iounit, nvar, blk, ierr)
          integer, intent(in) :: iounit, nvar
-         real(dp) :: blk(:,:) ! (nvar,nvar)
+         real(dp) :: blk(:,:)  ! (nvar,nvar)
          integer, intent(out) :: ierr
          integer :: nnz, nrow, ncol
          integer, pointer :: rowind(:), colptr(:)
@@ -1093,7 +1093,7 @@
 
       subroutine write1_sparse_block(iounit, nvar, blk, ierr)
          integer, intent(in) :: iounit, nvar
-         real(dp), intent(in) :: blk(:,:) ! (nvar,nvar)
+         real(dp), intent(in) :: blk(:,:)  ! (nvar,nvar)
          integer, intent(out) :: ierr
          integer :: nnz, rowind(nvar*nvar), colptr(nvar+1)
          real(dp) :: values(nvar*nvar)

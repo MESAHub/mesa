@@ -370,7 +370,7 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
@@ -380,7 +380,7 @@ contains
           iregion = blend_in_x
        else if (logg > logg3) then
           iregion = pure_table
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_in_x
        end if
@@ -391,11 +391,11 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
-    else ! logTeff <= logTeff4
+    else  ! logTeff <= logTeff4
        iregion = pure_grey
     end if
 

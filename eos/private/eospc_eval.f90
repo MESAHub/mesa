@@ -57,8 +57,8 @@
          d_alfa_dlogT = 0d0
          d_alfa_dlogRho = 0d0
 
-         logRho_lo = rq% logRho2_PC_limit ! don't use PC for logRho < this
-         logRho_hi = rq% logRho1_PC_limit ! okay for pure PC for logRho > this
+         logRho_lo = rq% logRho2_PC_limit  ! don't use PC for logRho < this
+         logRho_hi = rq% logRho1_PC_limit  ! okay for pure PC for logRho > this
 
          if (rq% PC_use_Gamma_limit_instead_of_T) then
             !gamma_e = (qe**2)*(four_thirds_pi*avo*Rho*zbar/abar)**one_third/(kerg*T)
@@ -67,36 +67,36 @@
             logGe0 = log10( &
                  qe*qe*pow(four_thirds_pi*avo*zbar/abar, one_third)/kerg)
             logGe = logGe0 + logRho/3 - logT
-            logGe_lo = rq% log_Gamma_e_all_HELM ! HELM for logGe <= this
-            logGe_hi = rq% log_Gamma_e_all_PC ! PC for logGe >= this
+            logGe_lo = rq% log_Gamma_e_all_HELM  ! HELM for logGe <= this
+            logGe_hi = rq% log_Gamma_e_all_PC  ! PC for logGe >= this
             logT_lo = logGe0 + logRho_lo/3 - logGe_lo
             logT_hi = logGe0 + logRho_hi/3 - logGe_hi
             if (logRho <= logRho_lo .or. logGe <= logGe_lo) then
-               alfa = 1d0 ! no PC
+               alfa = 1d0  ! no PC
             else if (logRho >= logRho_hi .and. logGe >= logGe_hi) then
-               alfa = 0d0 ! pure PC
-            else if (logT >= logT_hi) then ! blend in logGe
+               alfa = 0d0  ! pure PC
+            else if (logT >= logT_hi) then  ! blend in logGe
                alfa = (logGe_hi - logGe)/(logGe_hi - logGe_lo)
                dlogGe_dlogT = -1d0
                dlogGe_dlogRho = 1d0/3d0
                d_alfa_dlogT = -dlogGe_dlogT/(logGe_hi - logGe_lo)
                d_alfa_dlogRho = -dlogGe_dlogRho/(logGe_hi - logGe_lo)
-            else ! blend in logRho
+            else  ! blend in logRho
                if (logT >= logT_lo) logRho_lo = (logT_lo + logGe_lo - logGe0)*3
                alfa = (logRho_hi - logRho)/(logRho_hi - logRho_lo)
                d_alfa_dlogRho = -1d0/(logRho_hi - logRho_lo)
             end if
          else
-            logT_lo = rq% logT1_PC_limit ! okay for pure PC for logT < this (like logT_all_OPAL)
-            logT_hi = rq% logT2_PC_limit ! don't use PC for logT > this (like logT_all_HELM)
+            logT_lo = rq% logT1_PC_limit  ! okay for pure PC for logT < this (like logT_all_OPAL)
+            logT_hi = rq% logT2_PC_limit  ! don't use PC for logT > this (like logT_all_HELM)
             if (logRho <= logRho_lo .or. logT >= logT_hi) then
-               alfa = 1d0 ! no PC
+               alfa = 1d0  ! no PC
             else if (logRho >= logRho_hi .and. logT <= logT_lo) then
-               alfa = 0d0 ! pure PC
-            else if (logT >= logT_lo) then ! blend in logT
+               alfa = 0d0  ! pure PC
+            else if (logT >= logT_lo) then  ! blend in logT
                alfa = (logT - logT_lo)/(logT_hi - logT_lo)
                d_alfa_dlogT = 1/(logT_hi - logT_lo)
-            else ! blend in logRho
+            else  ! blend in logRho
                alfa = (logRho_hi - logRho)/(logRho_hi - logRho_lo)
                d_alfa_dlogRho = -1d0/(logRho_hi - logRho_lo)
             end if
@@ -162,10 +162,10 @@
          integer, pointer :: chem_id(:), net_iso(:)
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: Rho, logRho, T, logT
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (nv, species)
          integer, intent(out) :: ierr
 
          real(dp) :: start_crystal, full_crystal
@@ -176,7 +176,7 @@
 
          ierr = 0
          AZion(1:species) = chem_isos% Z(chem_id(1:species))
-         ACMI(1:species) = chem_isos% W(chem_id(1:species)) ! this really is atomic weight.
+         ACMI(1:species) = chem_isos% W(chem_id(1:species))  ! this really is atomic weight.
          do j=1,species
             if (xa(j) < rq% mass_fraction_limit_for_PC) then
                AY(j) = 0
@@ -207,7 +207,7 @@
             logical, intent(in) :: show
             real(dp), intent(in) :: start_crystal, full_crystal
             real(dp), intent(in) :: RHO_real, T_real
-            real(dp), intent(out) :: res(:), d_dlnT_c_Rho(:), d_dlnRho_c_T(:) ! (nv)
+            real(dp), intent(out) :: res(:), d_dlnT_c_Rho(:), d_dlnRho_c_T(:)  ! (nv)
             integer, intent(out) :: ierr
 
             integer :: j, LIQSOL
@@ -229,7 +229,7 @@
             RHO = RHO_real
             RHO%d1val2 = 1d0
 
-            TEMP=T*1d-6/UN_T6 ! T [au]
+            TEMP=T*1d-6/UN_T6  ! T [au]
 
             if (show) then
                write(*,1) 'RHO', RHO
@@ -249,12 +249,12 @@
                PnkT,UNkT,SNk,CVNkt,CHIR,CHIT,ierr)
 
             ! calculate phase information
-            if (GAMImean.lt.start_crystal) then ! liquid
+            if (GAMImean<start_crystal) then  ! liquid
                phase = 0d0
-            else if (GAMImean.gt.full_crystal) then ! solid
+            else if (GAMImean>full_crystal) then  ! solid
                phase = 1d0
-            else ! blend of liquid and solid
-               phase = (GAMImean - start_crystal)/(full_crystal - start_crystal) ! 1 for solid, 0 for liquid
+            else  ! blend of liquid and solid
+               phase = (GAMImean - start_crystal)/(full_crystal - start_crystal)  ! 1 for solid, 0 for liquid
             end if
 
             if (ierr /= 0) then
@@ -285,7 +285,7 @@
                write(*,'(A)')
             end if
 
-            Tnk=8.31447d7/CMImean*RHO*T ! n_i kT [erg/cc]
+            Tnk=8.31447d7/CMImean*RHO*T  ! n_i kT [erg/cc]
             Pgas = PnkT*Tnk
             if (rq% include_radiation) then
                ! results from MELANGE9 do not include radiation.  add it now.
@@ -307,7 +307,7 @@
             dS_dT = CV/T
             dS_dRho = -P*chiT/(rho*rho * T)
             mu = abar / (1d0 + zbar)
-            lnfree_e = log(zbar/abar) ! for complete ionization
+            lnfree_e = log(zbar/abar)  ! for complete ionization
             lnPgas = log(Pgas)
             lnE = safe_log(UNkt*N*kerg*T)
             lnS = safe_log(SNk*N*kerg)

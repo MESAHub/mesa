@@ -32,16 +32,16 @@
 
       implicit none
 
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
       subroutine eos_init( &
             eosDT_cache_dir, use_cache, info)
          use eos_initialize, only : Init_eos
-         character(*), intent(in) :: eosDT_cache_dir ! blank string means use default
+         character(*), intent(in) :: eosDT_cache_dir  ! blank string means use default
          logical, intent(in) :: use_cache
-         integer, intent(out) :: info ! 0 means AOK.
+         integer, intent(out) :: info  ! 0 means AOK.
          info = 0
          call Init_eos( &
             eosDT_cache_dir, use_cache, info)
@@ -60,7 +60,7 @@
       ! and set control parameter values using an inlist
 
       integer function alloc_eos_handle(ierr) result(handle)
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          character (len=0) :: inlist
          handle = alloc_eos_handle_using_inlist(inlist, ierr)
       end function alloc_eos_handle
@@ -68,8 +68,8 @@
       integer function alloc_eos_handle_using_inlist(inlist,ierr) result(handle)
          use eos_def, only:do_alloc_eos
          use eos_ctrls_io, only:read_namelist
-         character (len=*), intent(in) :: inlist ! empty means just use defaults.
-         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=*), intent(in) :: inlist  ! empty means just use defaults.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          handle = do_alloc_eos(ierr)
          if (ierr /= 0) return
@@ -86,7 +86,7 @@
 
       subroutine eos_ptr(handle,rq,ierr)
          use eos_def,only:EoS_General_Info,get_eos_ptr
-         integer, intent(in) :: handle ! from alloc_eos_handle
+         integer, intent(in) :: handle  ! from alloc_eos_handle
          type (EoS_General_Info), pointer :: rq
          integer, intent(out):: ierr
          call get_eos_ptr(handle,rq,ierr)
@@ -123,19 +123,19 @@
          use eos_def
          use eosDT_eval, only: Get_eosDT_Results
          use chem_lib, only: basic_composition_info
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: Rho, logRho ! the density
-         real(dp), intent(in) :: T, logT ! the temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
-         integer, intent(out) :: ierr ! 0 means AOK.
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_d_dxa_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
          type (EoS_General_Info), pointer :: rq
          real(dp) :: X, Y, Z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)
@@ -170,41 +170,41 @@
 
          ! INPUT
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: which_eos ! see eos_def: i_eos_<component>
+         integer, intent(in) :: which_eos  ! see eos_def: i_eos_<component>
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
             ! "arg_not_provided" is defined in mesa const_def
 
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: T, log10T  ! the temperature
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
 
          ! OUTPUT
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
          ! partial derivatives of the basic results wrt lnd and lnT
 
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          ! d_dlnT(i) = d(res(i))/dlnT|Rho,X where X = composition
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results,species)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results,species)
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
 
          type (EoS_General_Info), pointer :: rq
 
@@ -243,11 +243,11 @@
          use helm
          real(dp), intent(in) :: T, logT, Rho, logRho, abar, zbar, &
             coulomb_temp_cut, coulomb_den_cut
-         real(dp), intent(inout) :: helm_res(:) ! (num_helm_results)
+         real(dp), intent(inout) :: helm_res(:)  ! (num_helm_results)
          logical, intent(in) :: clip_to_table_boundaries, include_radiation, &
             include_elec_pos
          logical, intent(out) :: off_table
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          call helmeos2( &
             T, logT, Rho, logRho, abar, zbar, coulomb_temp_cut, coulomb_den_cut, &
             helm_res, clip_to_table_boundaries, include_radiation, include_elec_pos, &
@@ -270,45 +270,45 @@
 
          ! INPUT
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: Pgas, log10Pgas ! the gas pressure
+         real(dp), intent(in) :: Pgas, log10Pgas  ! the gas pressure
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
             ! "arg_not_provided" is defined in mesa const_def
 
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: T, log10T  ! the temperature
             ! provide both if you have them.  else pass one and set the other to arg_not_provided
 
          ! OUTPUT
 
-         real(dp), intent(out) :: Rho, log10Rho ! density
+         real(dp), intent(out) :: Rho, log10Rho  ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_const_T
          real(dp), intent(out) :: dlnRho_dlnT_const_Pgas
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
 
          ! partial derivatives of the basic results
 
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
          ! d_dlnRho_const_T(i) = d(res(i))/dlnd|T,X where X = composition
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
          ! d_dlnT_const_Rho(i) = d(res(i))/dlnT|Rho,X where X = composition
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
          ! d_dxa_const_TRho(i) = d(res(i))/X|T,Rho,X where X = composition
 
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
 
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          type (EoS_General_Info), pointer :: rq
 
@@ -425,7 +425,7 @@
             return
          end if
          ! require positive density and energy
-         if ((rho .le. 0) .or. (energy .le. 0)) then
+         if ((rho <= 0) .or. (energy <= 0)) then
             ierr = -1
             return
          endif
@@ -460,7 +460,7 @@
             return
          end if
          ! require positive pressure and temperature
-         if ((P .le. 0) .or. (T .le. 0)) then
+         if ((P <= 0) .or. (T <= 0)) then
             ierr = -1
             return
          endif
@@ -499,7 +499,7 @@
             return
          end if
          ! require positive density and temperature
-         if ((rho .le. 0) .or. (T .le. 0)) then
+         if ((rho <= 0) .or. (T <= 0)) then
             ierr = -1
             return
          endif
@@ -562,17 +562,17 @@
 
          ! INPUT
 
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
+         real(dp), intent(in) :: X  ! the hydrogen mass fraction
 
          real(dp), intent(in) :: abar
             ! mean atomic number (nucleons per nucleus; grams per mole)
-         real(dp), intent(in) :: zbar ! mean charge per nucleus
+         real(dp), intent(in) :: zbar  ! mean charge per nucleus
 
-         real(dp), intent(in) :: Rho, log10Rho ! the density
+         real(dp), intent(in) :: Rho, log10Rho  ! the density
             ! provide both if you have them.
             ! else pass one and set the other to arg_not_provided
 
-         real(dp), intent(in) :: T, log10T ! the temperature
+         real(dp), intent(in) :: T, log10T  ! the temperature
             ! provide both if you have them.
             ! else pass one and set the other to arg_not_provided
 
@@ -582,9 +582,9 @@
 
          ! OUTPUT
 
-         real(dp), intent(inout) :: res(:) ! (num_helm_results)
+         real(dp), intent(inout) :: res(:)  ! (num_helm_results)
             ! array to hold the results
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          logical :: off_table
 
@@ -606,14 +606,14 @@
             d_dabar_const_TRho, d_dzbar_const_TRho, ierr)
          use eos_def
          use eos_helm_eval, only: do_convert_helm_results
-         real(dp), intent(in) :: helm_res(:) ! (num_helm_results)
+         real(dp), intent(in) :: helm_res(:)  ! (num_helm_results)
          real(dp), intent(in) :: Z, X, abar, zbar, Rho, T
-         logical, intent(in) :: basic_flag ! if true, then only want basic results
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dabar_const_TRho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dzbar_const_TRho(:) ! (num_eos_basic_results)
+         logical, intent(in) :: basic_flag  ! if true, then only want basic results
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dabar_const_TRho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dzbar_const_TRho(:)  ! (num_eos_basic_results)
          !real(dp), intent(inout), dimension(:) :: d2_dlnd2, d2_dlnd_dlnT, d2_dlnT2
          integer, intent(out) :: ierr
          d_dabar_const_TRho = 0
@@ -647,41 +647,41 @@
          use eos_def
          use eosDT_eval, only : get_T
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: logRho ! log10 of density
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         real(dp), intent(in) :: logRho  ! log10 of density
+         integer, intent(in) :: which_other  ! from eos_def.  e.g., i_lnE
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations
+         integer, intent(in) :: max_iter  ! max number of iterations
 
-         real(dp), intent(in) :: logT_guess ! log10 of temperature
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
+         real(dp), intent(in) :: logT_guess  ! log10 of temperature
+         real(dp), intent(in) :: logT_bnd1, logT_bnd2  ! bounds for logT
             ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in const_def)
 
-         real(dp), intent(inout) :: logT_result ! log10 of temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         real(dp), intent(inout) :: logT_result  ! log10 of temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! compute composition info
          real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
@@ -727,44 +727,44 @@
          use eos_def
          use eosDT_eval, only : get_Rho
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: logT ! log10 of temperature
+         real(dp), intent(in) :: logT  ! log10 of temperature
 
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         integer, intent(in) :: which_other  ! from eos_def.  e.g., i_lnE
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logRho_tol
 
-         integer, intent(in) :: max_iter ! max number of Newton iterations
+         integer, intent(in) :: max_iter  ! max number of Newton iterations
 
-         real(dp), intent(in) :: logRho_guess ! log10 of density
-         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2 ! bounds for logRho
+         real(dp), intent(in) :: logRho_guess  ! log10 of density
+         real(dp), intent(in) :: logRho_bnd1, logRho_bnd2  ! bounds for logRho
             ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in const_def)
 
-         real(dp), intent(out) :: logRho_result ! log10 of density
+         real(dp), intent(out) :: logRho_result  ! log10 of density
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! compute composition info
          real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
@@ -816,45 +816,45 @@
          use eos_def
          use eosPT_eval, only : get_T
 
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
 
-         integer, intent(in) :: species ! number of species
-         integer, pointer :: chem_id(:) ! maps species to chem id
+         integer, intent(in) :: species  ! number of species
+         integer, pointer :: chem_id(:)  ! maps species to chem id
             ! index from 1 to species
             ! value is between 1 and num_chem_isos
-         integer, pointer :: net_iso(:) ! maps chem id to species number
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
             ! index from 1 to num_chem_isos (defined in chem_def)
             ! value is 0 if the iso is not in the current net
             ! else is value between 1 and number of species in current net
-         real(dp), intent(in) :: xa(:) ! mass fractions
+         real(dp), intent(in) :: xa(:)  ! mass fractions
 
-         real(dp), intent(in) :: logPgas ! log10 of gas pressure
-         integer, intent(in) :: which_other ! from eos_def.  e.g., i_lnE
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         real(dp), intent(in) :: logPgas  ! log10 of gas pressure
+         integer, intent(in) :: which_other  ! from eos_def.  e.g., i_lnE
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations
+         integer, intent(in) :: max_iter  ! max number of iterations
 
-         real(dp), intent(in) :: logT_guess ! log10 of temperature
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
+         real(dp), intent(in) :: logT_guess  ! log10 of temperature
+         real(dp), intent(in) :: logT_bnd1, logT_bnd2  ! bounds for logT
             ! if don't know bounds, just set to arg_not_provided (defined in const_def)
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in const_def)
 
-         real(dp), intent(out) :: logT_result ! log10 of temperature
-         real(dp), intent(out) :: Rho, log10Rho ! density
+         real(dp), intent(out) :: logT_result  ! log10 of temperature
+         real(dp), intent(out) :: Rho, log10Rho  ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_const_T
          real(dp), intent(out) :: dlnRho_dlnT_const_Pgas
 
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnRho_const_T(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT_const_Rho(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa_const_TRho(:,:) ! (num_eos_d_dxa_results, species)
-         real(dp), allocatable :: d_dxa_eos(:,:) ! eos internally returns derivs of all quantities
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnRho_const_T(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT_const_Rho(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa_const_TRho(:,:)  ! (num_eos_d_dxa_results, species)
+         real(dp), allocatable :: d_dxa_eos(:,:)  ! eos internally returns derivs of all quantities
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          ! compute composition info
          real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
@@ -895,7 +895,7 @@
       subroutine eos_get_control_namelist(handle, name, val, ierr)
          use eos_def
          use eos_ctrls_io, only: get_eos_controls
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
          character(len=*),intent(in) :: name
          character(len=*),intent(out) :: val
          integer, intent(out) :: ierr
@@ -910,7 +910,7 @@
       subroutine eos_set_control_namelist(handle, name, val, ierr)
          use eos_def
          use eos_ctrls_io, only: set_eos_controls
-         integer, intent(in) :: handle ! eos handle; from star, pass s% eos_handle
+         integer, intent(in) :: handle  ! eos handle; from star, pass s% eos_handle
          character(len=*),intent(in) :: name
          character(len=*),intent(in) :: val
          integer, intent(out) :: ierr

@@ -33,7 +33,7 @@
 
       implicit none
 
-      public ! history.f90 uses most of this
+      public  ! history.f90 uses most of this
 
       ! spacing between these must be larger than max number of nuclides
       integer, parameter :: idel = 10000
@@ -116,7 +116,7 @@
          ! first try local directory
          filename = history_columns_file
 
-         if(level==1) then ! First pass either the user set the file or we load the defaults
+         if(level==1) then  ! First pass either the user set the file or we load the defaults
             if (len_trim(filename) == 0) filename = 'history_columns.list'
 
             exists=.false.
@@ -475,7 +475,7 @@
             end do
          end subroutine do_colors
 
-         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+         subroutine do_rate(offset,prefix,ierr)  ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_def, only: reaction_name
             use net_def, only: get_net_ptr
             integer, intent(in) :: offset
@@ -699,7 +699,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id) ! Convert to net id not the global rate id
+            id = g% net_reaction(id)  ! Convert to net id not the global rate id
             if (ierr/=0) return
             if (id > 0) then
                spec = offset + id
@@ -733,7 +733,7 @@
          old_history_column_spec => null()
          if (associated(s% history_column_spec)) old_history_column_spec => s% history_column_spec
          nullify(s% history_column_spec)
-         capacity = 100 ! will increase if needed
+         capacity = 100  ! will increase if needed
          allocate(s% history_column_spec(capacity), stat=ierr)
          if (ierr /= 0) return
          s% history_column_spec(:) = 0

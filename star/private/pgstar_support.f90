@@ -203,6 +203,7 @@ contains
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
       character (len = strlen) :: num_str, fstring
+      character (len = 32) :: file_extension
       write(fstring, '( "(i",i2.2,".",i2.2,")" )') s% pg% file_digits, s% pg% file_digits
       write(num_str, fstring) s% model_number
       if (len_trim(dir) > 0) then
@@ -210,7 +211,12 @@ contains
       else
          name = prefix
       end if
-      name = trim(name) // trim(num_str) // '.' // trim(s% pg% file_extension)
+      if (s%pg%file_device=='vcps') then
+         file_extension = 'ps'
+      else
+         file_extension = s%pg%file_device  ! e.g.: png, ps
+      end if
+      name = trim(name) // trim(num_str) // '.' // trim(file_extension)
    end subroutine create_file_name
 
 
@@ -357,7 +363,6 @@ contains
    ! remaining routines for setting colours in PGPLOT
    ! by X11 name
    subroutine Set_Colours(white_on_black_flag, ierr)
-      implicit none
       logical, intent(in) :: white_on_black_flag
       integer, intent(out) :: ierr
       integer :: index, i, k
@@ -698,7 +703,7 @@ contains
       use utils_lib
       use const_def, only : mesa_data_dir
       character (len = *), intent(in) :: fname
-      real, dimension(:), allocatable :: logTs, logRhos ! will allocate
+      real, dimension(:), allocatable :: logTs, logRhos  ! will allocate
       integer, intent(out) :: ierr
 
       character (len = strlen) :: filename
@@ -871,7 +876,7 @@ contains
       include 'formats'
       numpts = 0
       pg => s% pg% pgstar_hist
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) return
          if (pg% step <= step_max .or. step_max <= 0) numpts = numpts + 1
@@ -883,7 +888,7 @@ contains
    logical function get1_hist_yvec(s, step_min, step_max, n, name, vec)
       use utils_lib, only : integer_dict_lookup
       type (star_info), pointer :: s
-      integer, intent(in) :: step_min, step_max, n ! n = count_hist_points
+      integer, intent(in) :: step_min, step_max, n  ! n = count_hist_points
       character (len = *) :: name
       real, dimension(:), allocatable :: vec
       integer :: i, cnt, ierr
@@ -903,12 +908,12 @@ contains
          end if
       end do
       call integer_dict_lookup(s% history_names_dict, key_name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) then ! didn't find it
+      if (ierr /= 0 .or. i <= 0) then  ! didn't find it
          get1_hist_yvec = .false.
          return
       end if
       call get_hist_points(s, step_min, step_max, n, i, vec, ierr)
-      if (ierr /= 0) then ! didn't get them
+      if (ierr /= 0) then  ! didn't get them
          get1_hist_yvec = .false.
          return
       end if
@@ -928,7 +933,7 @@ contains
       if (numpts == 0) return
       pg => s% pg% pgstar_hist
       i = numpts
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) then
             ierr = -1
             return
@@ -977,7 +982,7 @@ contains
       i = numpts
       vec = 0
       ierr = 0
-      do ! recall that hist list is decreasing by age (and step)
+      do  ! recall that hist list is decreasing by age (and step)
          if (.not. associated(pg)) return
          if (pg% step < step_min) then
             ! this will not happen if have correct numpts
@@ -1025,7 +1030,7 @@ contains
       end if
       ! search in from surface
       do k = 1, nz - 1
-         cs = s% csound(k) ! cell center
+         cs = s% csound(k)  ! cell center
          if (v(k + 1) >= cs .and. v(k) < cs) then
             found_shock = .true.
             exit
@@ -1034,7 +1039,7 @@ contains
       if (.not. found_shock) then
          ! search out from center
          do k = nz - 1, 1, -1
-            cs = s% csound(k) ! cell center
+            cs = s% csound(k)  ! cell center
             if (v(k + 1) >= -cs .and. v(k) < -cs) then
                found_shock = .true.
                exit
@@ -1127,32 +1132,32 @@ contains
          xright = xmax; xleft = xmin
       end if
 
-      if (xvec(1) < xvec(nz)) then ! increasing xs
+      if (xvec(1) < xvec(nz)) then  ! increasing xs
          grid_max = nz
-         do k = nz - 1, 1, -1 ! in decreasing order
-            if (xvec(k) < xmax) then ! this is the first one < xmax
+         do k = nz - 1, 1, -1  ! in decreasing order
+            if (xvec(k) < xmax) then  ! this is the first one < xmax
                grid_max = k + 1
                exit
             end if
          end do
          grid_min = 1
          do k = grid_max, 1, -1
-            if (xvec(k) <= xmin) then ! this is the first one <= xmin
+            if (xvec(k) <= xmin) then  ! this is the first one <= xmin
                grid_min = k
                exit
             end if
          end do
-      else ! decreasing
+      else  ! decreasing
          grid_min = 1
-         do k = 2, nz ! in decreasing order
-            if (xvec(k) < xmax) then ! this is the first one < xmax
+         do k = 2, nz  ! in decreasing order
+            if (xvec(k) < xmax) then  ! this is the first one < xmax
                grid_min = k - 1
                exit
             end if
          end do
          grid_max = nz
          do k = grid_min, nz
-            if (xvec(k) <= xmin) then ! this is the first one <= xmin
+            if (xvec(k) <= xmin) then  ! this is the first one <= xmin
                grid_max = k
                exit
             end if
@@ -1236,7 +1241,7 @@ contains
          ymax = ymax + max(1.0, ymargin) / 2
       end if
 
-      if (ymin == ymax) then ! round off problems
+      if (ymin == ymax) then  ! round off problems
          dy = 1e-6 * abs(ymax)
          ymin = ymin - dy
          ymax = ymax + dy
@@ -1488,14 +1493,14 @@ contains
       inside = (s% mixing_type(grid_min) == mixing_type)
       first = grid_min
       call pgsci(clr)
-      do k = grid_min, grid_max ! 2,s% nz
+      do k = grid_min, grid_max  ! 2,s% nz
          if (.not. inside) then
-            if (s% mixing_type(k) == mixing_type) then ! starting
+            if (s% mixing_type(k) == mixing_type) then  ! starting
                inside = .true.
                first = k
             end if
-         else ! inside
-            if (s% mixing_type(k) /= mixing_type) then ! ending
+         else  ! inside
+            if (s% mixing_type(k) /= mixing_type) then  ! ending
                last = k - 1
                call pgmove(xvec(first), ybot)
                call pgdraw(xvec(last), ybot)
@@ -1623,12 +1628,12 @@ contains
          if (inside) first = 1
          do k = 2, s% nz
             if (.not. inside) then
-               if (s% eps_nuc(k) > eps) then ! starting
+               if (s% eps_nuc(k) > eps) then  ! starting
                   inside = .true.
                   first = k
                end if
-            else ! inside
-               if (s% eps_nuc(k) <= eps) then ! ending
+            else  ! inside
+               if (s% eps_nuc(k) <= eps) then  ! ending
                   last = k - 1
                   call pgline(k - first, xvec(first:last), yvec(first:last))
                   inside = .false.
@@ -1684,12 +1689,12 @@ contains
          do_show_mixing_section = .false.
          do k = 2, s% nz
             if (.not. inside) then
-               if (s% mixing_type(k) == mixing_type) then ! starting
+               if (s% mixing_type(k) == mixing_type) then  ! starting
                   inside = .true.
                   first = k
                end if
-            else ! inside
-               if (s% mixing_type(k) /= mixing_type) then ! ending
+            else  ! inside
+               if (s% mixing_type(k) /= mixing_type) then  ! ending
                   last = k - 1
                   call pgline(k - first, xvec(first:last), yvec(first:last))
                   do_show_mixing_section = .true.

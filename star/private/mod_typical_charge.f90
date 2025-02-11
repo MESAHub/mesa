@@ -59,8 +59,8 @@
 
       real(dp) function eval_typical_charge( &
             cid, abar, free_e, T, log10_T, rho, log10_rho)
-         integer, intent(in) :: cid ! chem id such as ihe4.  defined in chem_def.
-         real(dp), intent(in) :: abar ! average atomic weight (from chem_lib)
+         integer, intent(in) :: cid  ! chem id such as ihe4.  defined in chem_def.
+         real(dp), intent(in) :: abar  ! average atomic weight (from chem_lib)
          real(dp), intent(in) :: free_e
             ! mean number of free electrons per nucleon (from eos_lib)
             ! abar*free_e = (nucleons/particle)*(charge/nucleon) = charge/particle = z1
@@ -73,7 +73,7 @@
       subroutine chi_info(a1, z1, T, log_T, rho, log_rho, chi, c0, c1, c2)
          real(dp), intent(in) :: a1, z1, T, log_T, rho, log_rho
          real(dp), intent(out) :: chi, c0, c1, c2
-         chi = 1.987d-4*T*(-8.392d0 - log_rho + 1.5d0*log_T - log10(z1/a1)) ! eqn 20
+         chi = 1.987d-4*T*(-8.392d0 - log_rho + 1.5d0*log_T - log10(z1/a1))  ! eqn 20
          ! coef's used in eqn 21
          c0 = 1.085d-4*rho*T/a1
          c1 = 1.617d4*sqrt(rho*(z1*z1 + z1)/(T*a1))

@@ -189,7 +189,7 @@ contains
                cycle
             end if
 
-            if (b% pg% Summary_History_scaled_value(j)) then ! scale yvec
+            if (b% pg% Summary_History_scaled_value(j)) then  ! scale yvec
 
                yvec_max = maxval(yvec(1:npts))
                yvec_min = minval(yvec(1:npts))
