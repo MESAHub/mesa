@@ -98,7 +98,7 @@
       first = .true.
       epsold = -1d0
       nvold = -1
-      nseq = (/ 2, 6, 10, 14, 22, 34, 50, 70 /)
+      nseq = [ 2, 6, 10, 14, 22, 34, 50, 70 ]
       x      = start
       h      = sign(stptry,stopp-start)
       nok    = 0

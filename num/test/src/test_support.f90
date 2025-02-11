@@ -388,7 +388,7 @@
             call mesa_error(__FILE__,__LINE__)
          end if
 
-         expect(1:2) = (/ 1.7632345401889102d+00, -8.3568868191466206d-01 /)
+         expect(1:2) = [ 1.7632345401889102d+00, -8.3568868191466206d-01 ]
 
          call show_results(nv,y,expect,show_all)
          if (.not. show_all) return

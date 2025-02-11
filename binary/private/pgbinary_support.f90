@@ -419,8 +419,8 @@ contains
       real, dimension(5) :: xs, ys
       call pgsave
       call pgsci(1)
-      xs = (/0.0, 0.0, 1.0, 1.0, 0.0/)
-      ys = (/0.0, 1.0, 1.0, 0.0, 0.0/)
+      xs = [0.0, 0.0, 1.0, 1.0, 0.0]
+      ys = [0.0, 1.0, 1.0, 0.0, 0.0]
       call pgswin(0.0, 1.0, 0.0, 1.0)
       call pgmove(0.0, 0.0)
       call pgline(5, xs, ys)

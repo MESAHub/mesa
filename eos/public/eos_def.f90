@@ -445,31 +445,31 @@
 
          eosDT_XZ_ptr => eosDT_XZ_struct
          eosDT_XZ_ptr% nZs = num_eosDT_Zs
-         eosDT_XZ_ptr% Zs(1:num_eosDT_Zs) = (/ 0.00d0, 0.02d0, 0.04d0 /)
-         eosDT_XZ_ptr% nXs_for_Z(1:num_eosDT_Zs) = (/ 6, 5, 5 /)
+         eosDT_XZ_ptr% Zs(1:num_eosDT_Zs) = [ 0.00d0, 0.02d0, 0.04d0 ]
+         eosDT_XZ_ptr% nXs_for_Z(1:num_eosDT_Zs) = [ 6, 5, 5 ]
          do i=1,num_eosDT_Zs
             eosDT_XZ_ptr% Xs_for_Z(1:num_eosDT_Xs,i) = &
-               (/ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 /)
+               [ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 ]
          end do
 
          FreeEOS_XZ_ptr => FreeEOS_XZ_struct
          FreeEOS_XZ_ptr% nZs = num_FreeEOS_Zs
          FreeEOS_XZ_ptr% Zs(1:num_FreeEOS_Zs) = &
-            (/ 0.00d0, 0.02d0, 0.04d0, 0.06d0, 0.08d0, 0.1d0, 0.2d0, &
-               0.3d0, 0.4d0, 0.5d0, 0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0 /)
+            [ 0.00d0, 0.02d0, 0.04d0, 0.06d0, 0.08d0, 0.1d0, 0.2d0, &
+               0.3d0, 0.4d0, 0.5d0, 0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0 ]
          FreeEOS_XZ_ptr% nXs_for_Z(1:num_FreeEOS_Zs) = &
-            (/ 11, 11, 11, 11, 11, 4, 3, 3, 3, 3, 3, 3, 3, 2, 1 /)
+            [ 11, 11, 11, 11, 11, 4, 3, 3, 3, 3, 3, 3, 3, 2, 1 ]
          do i=1,5  ! 0.0 to 0.08
             FreeEOS_XZ_ptr% Xs_for_Z(1:11,i) = &
-               (/ 0.0d0, 0.1d0, 0.2d0, 0.3d0, 0.4d0, 0.5d0, &
-                  0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) /)
+               [ 0.0d0, 0.1d0, 0.2d0, 0.3d0, 0.4d0, 0.5d0, &
+                  0.6d0, 0.7d0, 0.8d0, 0.9d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) ]
          end do
-         FreeEOS_XZ_ptr% Xs_for_Z(1:4,6) = (/ 0.0d0, 0.1d0, 0.4d0, 0.9d0 /)  ! 0.1
+         FreeEOS_XZ_ptr% Xs_for_Z(1:4,6) = [ 0.0d0, 0.1d0, 0.4d0, 0.9d0 ]  ! 0.1
          do i=7,13  ! 0.2, 0.8
             FreeEOS_XZ_ptr% Xs_for_Z(1:3,i) = &
-               (/ 0.0d0, 0.1d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) /)
+               [ 0.0d0, 0.1d0, 1.0d0-FreeEOS_XZ_ptr% Zs(i) ]
          end do
-         FreeEOS_XZ_ptr% Xs_for_Z(1:2,14) = (/ 0.0d0, 0.1d0 /)  ! 0.9
+         FreeEOS_XZ_ptr% Xs_for_Z(1:2,14) = [ 0.0d0, 0.1d0 ]  ! 0.9
          FreeEOS_XZ_ptr% Xs_for_Z(1,15) = 0.0d0  ! 1.0
 
          eosDT_XZ_loaded(:,:) = .false.

@@ -320,10 +320,10 @@ contains
 
     integer :: i
     type(auto_diff_real_2var_order1) :: rs, rs0, s, fj
-    real(dp), dimension(11), parameter :: c(0:10) = (/ &
+    real(dp), dimension(11), parameter :: c(0:10) = [ &
         0.450861D-01, 0.113078D-02, 0.312104D-02, 0.864302D-03, &
         0.157214D-01, 0.816962D-01, 0.784921D-01,-0.680863D-01, &
-       -0.979967D-01, 0.204907D-01, 0.366713D-01 /)
+       -0.979967D-01, 0.204907D-01, 0.366713D-01 ]
 
     rs = cc% rs
 

@@ -339,7 +339,7 @@
          !do 2D Teff,logg interpolation on each of 4 Z tables (Zlo-Zhi)
                  !  P(g,T) dP_dg, dP_dT, d2P_dg2, d2P_dT2, d2P_dg_dT
                  !    1      2      3       4        5         6
-         ict(:) = (/  1,     1,     1,      0,       0,        0  /)
+         ict(:) = [  1,     1,     1,      0,       0,        0  ]
 
          if (gtv_dbg) write(*,*) 'do_interp for Pgas', id
          call do_interp(ai% Pgas_interp1, newPgas, dPgas_dlogg, dPgas_dTeff, ierr)

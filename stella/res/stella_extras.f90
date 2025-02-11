@@ -53,8 +53,8 @@ program main
    call math_init()
 
    call colors_init(1, &
-      (/ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' /), &
-      (/ n_colors /), ierr)
+      [ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' ], &
+      [ n_colors ], ierr)
    if (ierr /= 0) then
       write(*,*) 'colors_init failed during initialization'
       return
@@ -645,13 +645,13 @@ program main
          r_edge = r(j,nm)
          v_edge = v(j,nm)*1d8
       end if
-      d(1:ncol) = (/ &
+      d(1:ncol) = [ &
          dm(j)*msun, m(j)*msun, r(j,nm), v_edge, den(j,nm), &
          crad*tempr(j,nm)**4/3, temp(j,nm), tempr(j,nm), kap(j,nm), tau(j,nm), &
          m_edge, r_edge, &
          h(j),0d0,he(j),c(j),n(j),o(j),ne(j),na(j),mg(j),si(j),s(j),ar(j), ca(j), &
          0d0, 0d0, 0d0, 0d0, 0d0, fe(j), 0d0, ni(j), lum(j,nm), n_bar(j,nm), n_e(j,nm) &
-         /)
+         ]
    end subroutine get1_data
 
 
