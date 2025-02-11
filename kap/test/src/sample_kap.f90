@@ -156,7 +156,7 @@
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init
 
-      logRho(:) = lnRho(:)/ln10 !convert ln's to log10's
+      logRho(:) = lnRho(:)/ln10  !convert ln's to log10's
       logT(:)   = lnT(:)  /ln10
 
       ! these should come from an eos call

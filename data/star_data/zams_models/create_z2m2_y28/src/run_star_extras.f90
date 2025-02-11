@@ -207,8 +207,8 @@
          end do mass_loop
 
          11 format(3x, f15.8, i15)
-         write(io_ms_index, 11) -1d0, -1 ! marks end of index
-         write(io_ms_index, *) ! blank line at end of index
+         write(io_ms_index, 11) -1d0, -1  ! marks end of index
+         write(io_ms_index, *)  ! blank line at end of index
 
          close ( io_ms_mod )
          open(newunit=io_ms_mod, file=trim(ms_file), action='read', status='old', iostat=ierr)
@@ -268,7 +268,7 @@
             write(io_ms_index, 2) 'species', 8
             write(io_ms_index, 1) 'initial_z', create_z
             write(io_ms_index, 1) 'initial_y', create_y
-            write(io_ms_index, *) ! blank line for end of property list
+            write(io_ms_index, *)  ! blank line for end of property list
             write(io_ms_index, '(a)') '          M/Msun           n_shells'
          end subroutine write_index_head
 
@@ -311,7 +311,7 @@
          ! write property list
          write(io_ms_mod, 1) 'M/Msun', s% star_mass
          write(io_ms_mod, 2) 'n_shells', nz
-         write(io_ms_mod, *) ! blank line for end of property list
+         write(io_ms_mod, *)  ! blank line for end of property list
 
          write(io_ms_mod, fmt='(7x, a9, 1x, 99(a24, 1x))', advance='no') &
             'lnd', 'lnT', 'lnR', 'L', 'dq'
@@ -356,8 +356,8 @@
          use star_def, only:star_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
       end subroutine before_evolve_to_zams
@@ -366,8 +366,8 @@
          use star_def, only:star_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          evolve_to_zams_adjust_model = keep_going
       end function evolve_to_zams_adjust_model
 
@@ -375,8 +375,8 @@
          use star_def, only:star_info
          type (star_info), pointer :: s
          integer, intent(in) :: id, lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          evolve_to_zams_check_model = bare_bones_check_model(id)
          if (evolve_to_zams_check_model /= keep_going) return
          if (s% X(s% nz) < s% x_ctrl(1)) then

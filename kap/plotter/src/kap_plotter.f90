@@ -242,8 +242,8 @@ program kap_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')

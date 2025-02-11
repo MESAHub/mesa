@@ -12,8 +12,8 @@
          double precision, intent(in) :: x, h
          double precision, intent(inout) :: vars(n)
          double precision, intent(out) :: dvars_dx(n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          double precision :: yprime(n)
          integer, intent(out) :: ierr
          ierr = 0
@@ -27,8 +27,8 @@
          double precision, intent(in) :: x,h
          double precision, intent(inout) :: y(n)
          double precision, intent(out) :: f(n), dfdy(ld_dfdy,n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          integer :: nzo, i, j
          double precision :: yprime(n)
@@ -48,9 +48,9 @@
          double precision, intent(inout) :: y(n)
          integer, intent(out) :: ia(n+1), ja(nzmax)
          double precision, intent(out) :: f(n), values(nzmax)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means terminate integration
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+         integer, intent(out) :: ierr  ! nonzero means terminate integration
          double precision :: dfdy(n,n)
          integer :: ld_dfdy, nz
          ld_dfdy = n
@@ -76,15 +76,15 @@
          double precision, intent(inout) :: y(n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             double precision function interp_y(i,s,rwork,iwork,ierr)
                implicit none
-               integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-               double precision, intent(in) :: s ! interpolation x value (between xold and x).
+               integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+               double precision, intent(in) :: s  ! interpolation x value (between xold and x).
                double precision, intent(inout), target :: rwork(*)
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
@@ -102,7 +102,7 @@
          integer, intent(in) :: which_solver,which_decsol
          logical, intent(in) :: numerical_jacobian,show_all,quiet
 
-         integer, parameter :: n = 20 ! the number of variables in the "pollu" system of ODEs
+         integer, parameter :: n = 20  ! the number of variables in the "pollu" system of ODEs
          integer, parameter :: ndisc = 0, nzo = 86
          double precision :: y(n), yprime(n), yexact(n)
          integer, parameter :: lrpar = 1, lipar = 3, iout=1
@@ -116,7 +116,7 @@
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar, nz
-         real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
 
          nullify(lblk, dblk, ublk)
          caller_id = 0
@@ -131,14 +131,14 @@
          t(0)   = 0
          t(1)   = 60d0
 
-         itol = 0 ! scalar tolerances
+         itol = 0  ! scalar tolerances
          rtol(1) = 1d-5
          atol(1) = 1d-5
-         h0 = 1d-7 ! initial step size
+         h0 = 1d-7  ! initial step size
 
          call pollu_init(n,y,yprime,consis)
          nstep=0
-         mljac = n ! square matrix
+         mljac = n  ! square matrix
          mujac = n
          matrix_type_spec = square_matrix_type
 
@@ -164,7 +164,7 @@
          call check_results(n,y,yexact,rtol(1)*2,ierr)
          if (ierr /= 0) then
             write(*,*) 'check results ierr', ierr
-            call mesa_error(__FILE__,__LINE__) ! do_test_vdpol
+            call mesa_error(__FILE__,__LINE__)  ! do_test_vdpol
          end if
 
          if (quiet) return

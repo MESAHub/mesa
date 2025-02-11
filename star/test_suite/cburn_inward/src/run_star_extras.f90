@@ -94,7 +94,7 @@
 
          select case (s% x_integer_ctrl(1))
 
-         case(2) ! inlist_cburn_inward
+         case(2)  ! inlist_cburn_inward
 
             ! Information for testhub
             testhub_extras_names(1) = 'ign_mass'
@@ -199,7 +199,7 @@
          ! Store initial flame location
          select case (s% x_integer_ctrl(1))
 
-         case(2) ! inlist_cburn_inward
+         case(2)  ! inlist_cburn_inward
             flame_cell = -1
             ! Check to see if carbon has ignited
              do k=s%nz, 1, -1

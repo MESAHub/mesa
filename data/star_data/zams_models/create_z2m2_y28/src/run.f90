@@ -3,6 +3,6 @@
 
       implicit none
 
-      call do_run ! create zams
+      call do_run  ! create zams
 
       end program run

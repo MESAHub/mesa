@@ -76,14 +76,14 @@ module test_weak
       d_eta_dlnT = 0
       d_eta_dlnRho = 0
 
-      if (.false.) then ! TESTING
+      if (.false.) then  ! TESTING
          logT =     7.5904236599874348D+00
          logRho =     1.0657946486820271D+00
          ye =     8.2724691280321605D-01
          eta =    -5.3262903257381922D+00
          d_eta_dlnT =    -1.5299344982339016D+00
          d_eta_dlnRho =     9.9482489248846617D-01
-      else if (.true.) then ! TESTING
+      else if (.true.) then  ! TESTING
          logT =  log10(9.0d8)
          ye =    0.5d0
          logRho =  log10(4.5d5)
@@ -212,7 +212,7 @@ module test_weak
 
       write(*,*) 'done'
 
-      if (.false.) then ! dfridr tests for partials
+      if (.false.) then  ! dfridr tests for partials
 
          do i=1, num_weak_reactions
 
@@ -240,7 +240,7 @@ module test_weak
                dvardx_0, dvardx, err, xdum
          if (doing_d_dlnd) then
             write(*,*) 'doing dlnd'
-         else ! doing d_dlnT
+         else  ! doing d_dlnT
             write(*,*) 'doing dlnT'
          end if
          write(*,*) 'test net'

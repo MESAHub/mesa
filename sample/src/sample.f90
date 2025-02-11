@@ -53,7 +53,7 @@ contains
 
       ierr = 0
 
-      my_mesa_dir = '..' ! if empty string, uses environment variable MESA_DIR
+      my_mesa_dir = '..'  ! if empty string, uses environment variable MESA_DIR
       call const_init(my_mesa_dir, ierr)
       if (ierr /= 0) then
          write (*, *) 'const_init failed'

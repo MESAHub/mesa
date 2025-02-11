@@ -96,16 +96,16 @@
 
       real(dp) :: weak_rate_factor
 
-      integer :: max_steps ! maximal number of allowed steps.
+      integer :: max_steps  ! maximal number of allowed steps.
 
-      real(dp), pointer :: x_initial(:) ! (species)
+      real(dp), pointer :: x_initial(:)  ! (species)
 
       real(dp) :: burn_lnE, burn_lnS
       real(dp) :: burn_logT, burn_logRho, &
          burn_eta, burn_deta_dlnT, burn_Cv, burn_d_Cv_dlnT
 
       real(dp) :: T_prev, time_prev, eps_nuc_prev, eps_neu_prev, cp_prev
-      real(dp), pointer :: x_previous(:) ! (species)
+      real(dp), pointer :: x_previous(:)  ! (species)
 
       real(dp), dimension(:), pointer :: peak_abundance, peak_time
 
@@ -119,9 +119,9 @@
          burn_at_constant_density
       real(dp) :: starting_temp, pressure
 
-      real(dp) :: max_step_size ! maximal step size.
+      real(dp) :: max_step_size  ! maximal step size.
 
-      real(dp), pointer :: rate_factors(:) ! (num_reactions)
+      real(dp), pointer :: rate_factors(:)  ! (num_reactions)
       integer, pointer :: net_reaction_ptr(:)
 
       integer, parameter :: max_num_reactions_to_track = 100
@@ -192,11 +192,11 @@
          ! args to control the solver -- see num/public/num_isolve.dek
          real(dp) :: h
          ! absolute and relative error tolerances
-         real(dp), pointer :: rtol(:) ! relative error tolerance (species)
-         real(dp), pointer :: atol(:) ! absolute error tolerance (species)
-         integer :: itol ! switch for rtol and atol
+         real(dp), pointer :: rtol(:)  ! relative error tolerance (species)
+         real(dp), pointer :: atol(:)  ! absolute error tolerance (species)
+         integer :: itol  ! switch for rtol and atol
 
-         real(dp), pointer :: ending_x(:) ! (species)
+         real(dp), pointer :: ending_x(:)  ! (species)
          integer :: nfcn    ! number of function evaluations
          integer :: njac    ! number of jacobian evaluations
          integer :: nstep   ! number of computed steps
@@ -372,7 +372,7 @@
          end if
          starting_logT = logT
 
-         h = 1d-2*burn_tend ! 1d-14
+         h = 1d-2*burn_tend  ! 1d-14
          !write(*,1) 'h', h
          !stop
 
@@ -561,7 +561,7 @@
                write(*,1) 'pressure', pressure
                write(*,1) 'starting_temp', starting_temp
             end if
-            if (num_times > 1) then ! create interpolant
+            if (num_times > 1) then  ! create interpolant
                allocate(pm_work(num_times*nwork))
                call interp_pm(times, num_times, log10Ps_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logTs')
@@ -588,7 +588,7 @@
                write(*,1) 'ending_entropy', exp(ending_lnS)/(avo*kerg)
             end if
          else
-            if (num_times > 1) then ! create interpolants
+            if (num_times > 1) then  ! create interpolants
                allocate(pm_work(num_times*nwork))
                call interp_pm(times, num_times, log10Ts_f1, nwork, pm_work, 'net_1_zone_burn', ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed in interp for logTs')
@@ -736,8 +736,8 @@
             use eos_lib, only: eosDT_get
             use eos_def
             integer, intent(in) :: eos_handle, species
-            integer, pointer :: chem_id(:) ! maps species to chem id
-            integer, pointer :: net_iso(:) ! maps chem id to species number
+            integer, pointer :: chem_id(:)  ! maps species to chem id
+            integer, pointer :: net_iso(:)  ! maps chem id to species number
             real(dp), intent(in) :: &
                xa(:), rho, logRho, T, logT
             real(dp), intent(out) :: &
@@ -808,8 +808,8 @@
 
          real(dp) function interp_y(i, s, rwork_y, iwork_y, ierr)
             use const_def, only: dp
-            integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-            real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+            integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+            real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
             real(dp), intent(inout), target :: rwork_y(*)
             integer, intent(inout), target :: iwork_y(*)
             integer, intent(out) :: ierr
@@ -1009,14 +1009,14 @@
             real(dp), intent(inout) :: x(:)
             real(dp), intent(inout), target :: rwork_y(*)
             integer, intent(inout), target :: iwork_y(*)
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             real(dp) :: lgt, lgrho
             integer :: i, cid
             interface
                include 'num_interp_y.dek'
             end interface
-            integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+            integer, intent(out) :: irtrn  ! < 0 causes solver to return to calling program.
 
             if(size(rpar)==burn_lrpar) then
                lgt = rpar(r_burn_prev_lgT)
@@ -1041,7 +1041,7 @@
             integer, intent(in) :: step, n
             real(dp), intent(in) :: told, time, logT_in, logRho_in
             real(dp), intent(in) :: x(:)
-            integer, intent(out) :: irtrn ! < 0 causes solver to return to calling program.
+            integer, intent(out) :: irtrn  ! < 0 causes solver to return to calling program.
 
             real(dp) :: logT, logRho, lgPgas, Pgas, Prad, lgP, avg_eps_nuc
             real(dp) :: eps_neu_total, eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, &
@@ -1122,7 +1122,7 @@
 
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
 
-            else ! this is okay for burn_at_constant_density as well as constant T and Rho
+            else  ! this is okay for burn_at_constant_density as well as constant T and Rho
 
               ! logT = rpar(r_burn_prev_lgT)
               ! logRho = rpar(r_burn_prev_lgRho)
@@ -1436,7 +1436,7 @@
       read_initial_abundances = .false.
       read_T_Rho_history = .false.
       T_Rho_history_filename = ''
-      burn_tend = 10 ! seconds
+      burn_tend = 10  ! seconds
       burn_rho = -1d99
       burn_temp = -1d99
       burn_logT = -1d99
@@ -1472,7 +1472,7 @@
       burn_at_constant_density = .false.
       starting_temp = -1
       pressure = -1
-      num_times_for_burn = 0 ! <= 0 means don't use the arrays
+      num_times_for_burn = 0  ! <= 0 means don't use the arrays
       times_for_burn = 0
       log10Ts_for_burn = 0
       log10Rhos_for_burn = 0
@@ -1480,7 +1480,7 @@
       log10Ps_for_burn = 0
       max_step_size = 0
 
-      min_for_show_peak_abundances = 1d-3 ! show if peak is > this
+      min_for_show_peak_abundances = 1d-3  ! show if peak is > this
       max_num_for_show_peak_abundances = 21
       show_peak_x_and_time = .true.
 
@@ -1497,7 +1497,7 @@
 
       screening_mode = extended_screening
 
-      num_special_rate_factors = 0 ! must be <= max_num_special_rate_factors
+      num_special_rate_factors = 0  ! must be <= max_num_special_rate_factors
       reaction_for_special_factor(:) = ''
       special_rate_factor(:) = 1
 

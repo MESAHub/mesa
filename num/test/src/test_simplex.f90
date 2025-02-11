@@ -16,13 +16,13 @@
 
       subroutine do_test_simplex
          !call test_FR2 ! okay -- escapes from local min
-         call test_FR4 ! okay -- escapes from local min
+         call test_FR4  ! okay -- escapes from local min
          !call test_FR6 ! okay -- escapes from local min
-         call test_ER ! okay
-         call test_WD ! okay
-         call test_BLE ! okay
-         call test_PS ! okay
-         call test_TR ! okay
+         call test_ER  ! okay
+         call test_WD  ! okay
+         call test_BLE  ! okay
+         call test_PS  ! okay
+         call test_TR  ! okay
       end subroutine do_test_simplex
 
 
@@ -30,7 +30,7 @@
             n, x_first, x_lower, x_upper, simplex, &
             centroid_weight_power, enforce_bounds, &
             adaptive_random_search, fcn, str)
-         integer, intent(in) :: n ! number of dimensions
+         integer, intent(in) :: n  ! number of dimensions
          real(dp), dimension(:) :: x_first, x_lower, x_upper
          real(dp) :: simplex(:,:), centroid_weight_power
          logical, intent(in) :: enforce_bounds, adaptive_random_search
@@ -136,10 +136,10 @@
       real(dp) function fcn_WD(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -147,7 +147,7 @@
       end function fcn_WD
 
 
-      real(dp) function WD ( x ) ! Wood function
+      real(dp) function WD ( x )  ! Wood function
          real(dp), intent(in) :: x(:)
          integer :: i, n
          n = size(x,dim=1)
@@ -188,10 +188,10 @@
       real(dp) function fcn_ER(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -199,7 +199,7 @@
       end function fcn_ER
 
 
-      real(dp) function ER ( x ) ! extended Rosenbrock
+      real(dp) function ER ( x )  ! extended Rosenbrock
          real(dp), intent(in) :: x(:)
          integer :: i, n
          n = size(x,dim=1)
@@ -298,10 +298,10 @@
       real(dp) function fcn_FR(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -309,7 +309,7 @@
       end function fcn_FR
 
 
-      real(dp) function FR ( x ) ! Freudenstein and Roth function
+      real(dp) function FR ( x )  ! Freudenstein and Roth function
          real(dp), intent(in) :: x(:)
          integer :: i, n
          n = size(x,dim=1)
@@ -349,10 +349,10 @@
       real(dp) function fcn_BLE(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -360,7 +360,7 @@
       end function fcn_BLE
 
 
-      real(dp) function BLE ( x ) ! Beale function
+      real(dp) function BLE ( x )  ! Beale function
          real(dp), intent(in) :: x(:)
          integer :: i, n
          n = size(x,dim=1)
@@ -401,10 +401,10 @@
       real(dp) function fcn_PS(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -412,7 +412,7 @@
       end function fcn_PS
 
 
-      real(dp) function PS ( x ) ! Powell singular function
+      real(dp) function PS ( x )  ! Powell singular function
          real(dp), intent(in) :: x(:)
          integer :: i, n
          n = size(x,dim=1)
@@ -454,10 +454,10 @@
       real(dp) function fcn_TR(n, x, lrpar, rpar, lipar, ipar, op_code, ierr)
          use const_def, only: dp
          integer, intent(in) :: n
-         real(dp), intent(in) :: x(:) ! (n)
+         real(dp), intent(in) :: x(:)  ! (n)
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(in) :: op_code
          integer, intent(out) :: ierr
          ierr = 0
@@ -465,7 +465,7 @@
       end function fcn_TR
 
 
-      real(dp) function TR ( x ) ! Trigonometric function
+      real(dp) function TR ( x )  ! Trigonometric function
          real(dp), intent(in) :: x(:)
          integer :: j, i, n
          real(dp) :: sum_cos

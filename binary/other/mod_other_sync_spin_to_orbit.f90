@@ -130,14 +130,14 @@
          use star_def, only : star_info, star_ptr
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(in) :: osep ! orbital separation (cm)
-         real(dp), intent(in) :: qratio ! mass_other_star/mass_this_star
-         real(dp), intent(in) :: rl ! roche lobe radius (cm)
-         real(dp), intent(in) :: dt_next ! next timestep
-         real(dp), intent(in) :: Ftid ! efficiency of tidal synchronization. (time scale / Ftid ).
+         real(dp), intent(in) :: osep  ! orbital separation (cm)
+         real(dp), intent(in) :: qratio  ! mass_other_star/mass_this_star
+         real(dp), intent(in) :: rl  ! roche lobe radius (cm)
+         real(dp), intent(in) :: dt_next  ! next timestep
+         real(dp), intent(in) :: Ftid  ! efficiency of tidal synchronization. (time scale / Ftid ).
 
-         character (len=strlen), intent(in) :: sync_type ! synchronization timescale
-         character (len=strlen), intent(in) :: sync_mode ! where to put/take angular momentum
+         character (len=strlen), intent(in) :: sync_type  ! synchronization timescale
+         character (len=strlen), intent(in) :: sync_mode  ! where to put/take angular momentum
          integer, intent(out) :: ierr
 
          type (star_info), pointer :: s

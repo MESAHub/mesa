@@ -12,9 +12,9 @@ program neu_plotter
    integer :: ierr
    character (len=32) :: my_mesa_dir
 
-   real(dp), parameter :: log10_Tlim = 7.5d0 ! this is what the neu/test uses?
-   logical :: flags(num_neu_types) ! true if should include the type of loss
-   real(dp) :: loss(num_neu_rvs) ! total from all sources
+   real(dp), parameter :: log10_Tlim = 7.5d0  ! this is what the neu/test uses?
+   logical :: flags(num_neu_types)  ! true if should include the type of loss
+   real(dp) :: loss(num_neu_rvs)  ! total from all sources
    real(dp) :: sources(num_neu_types, num_neu_rvs)
 
    real(dp) :: res1
@@ -214,8 +214,8 @@ program neu_plotter
    Zbar = Zbar_center
    Abar = Abar_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')

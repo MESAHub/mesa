@@ -51,8 +51,8 @@ contains
       integer, intent(in) :: id
       integer, intent(in) :: nfcns
       character(len=*) :: names(:)
-      logical, intent(out) :: gval_is_xa_function(:) ! (nfcns)
-      real(dp), pointer :: vals1(:) ! =(nz, nfcns)
+      logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
+      real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
       integer, intent(out) :: ierr
       gval_is_xa_function(1:nfcns) = .false.
       ierr = 0
@@ -73,8 +73,8 @@ contains
       integer, intent(in) :: id
       integer, intent(in) :: nfcns
       character(len=*) :: names(:)
-      logical, intent(out) :: gval_is_xa_function(:) ! (nfcns)
-      real(dp), pointer :: vals1(:) ! =(nz, nfcns)
+      logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
+      real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
       integer, intent(out) :: ierr
       integer :: nz, k
       real(dp), pointer :: vals(:, :)

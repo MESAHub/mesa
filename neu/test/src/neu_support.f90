@@ -21,9 +21,9 @@ module neu_support
 
       integer :: i,j,k,l, info
 
-      logical :: flags(num_neu_types) ! true if should include the type
+      logical :: flags(num_neu_types)  ! true if should include the type
 
-      real(dp) :: loss(num_neu_rvs) ! total from all sources
+      real(dp) :: loss(num_neu_rvs)  ! total from all sources
       real(dp) :: sources(num_neu_types, num_neu_rvs)
 
       flags = .true.

@@ -45,15 +45,15 @@ module test_block_tri_dble
          integer, intent(in) :: which_decsol_option
          logical, intent(in) :: for_release
 
-         real(fltp), pointer :: lblk1(:), dblk1(:), ublk1(:) ! (nvar,nvar,nz)
-         real(fltp), pointer :: lblk(:, :, :), dblk(:, :, :), ublk(:, :, :) ! (nvar,nvar,nz)
-         real(fltp), pointer :: x(:, :), xcorrect(:, :), brhs(:, :), work(:, :) ! (nvar,nz)
-         real(fltp), pointer :: x1(:) ! =(nvar,nz)
-         integer, pointer :: ipiv1(:) ! =(nvar,nz)
-         integer, pointer :: ipiv(:, :) ! (nvar,nz)
+         real(fltp), pointer :: lblk1(:), dblk1(:), ublk1(:)  ! (nvar,nvar,nz)
+         real(fltp), pointer :: lblk(:, :, :), dblk(:, :, :), ublk(:, :, :)  ! (nvar,nvar,nz)
+         real(fltp), pointer :: x(:, :), xcorrect(:, :), brhs(:, :), work(:, :)  ! (nvar,nz)
+         real(fltp), pointer :: x1(:)  ! =(nvar,nz)
+         integer, pointer :: ipiv1(:)  ! =(nvar,nz)
+         integer, pointer :: ipiv(:, :)  ! (nvar,nz)
 
-         real(dp), pointer :: rpar_decsol(:) ! (lrd)
-         integer, pointer :: ipar_decsol(:) ! (lid)
+         real(dp), pointer :: rpar_decsol(:)  ! (lrd)
+         integer, pointer :: ipar_decsol(:)  ! (lid)
          real(fltp) :: time_factor, time_solve, time_refine, time_dealloc
 
          integer :: ierr, lid, lrd, nvar, nz
@@ -139,7 +139,7 @@ module test_block_tri_dble
 
             do rep = 1, 1
 
-               iop = 1 ! solve A*x = b
+               iop = 1  ! solve A*x = b
 
                do k = 1, nz
                   do j = 1, nvar
@@ -155,7 +155,7 @@ module test_block_tri_dble
 
             end do
 
-            iop = 2 ! deallocate
+            iop = 2  ! deallocate
             call decsolblk( &
                iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
             if (ierr /= 0) then
@@ -203,7 +203,7 @@ module test_block_tri_dble
             call block_dble_mv(nvar, nz, lblk, dblk, ublk, xcorrect, brhs)
 
             return
-            do k = 1, 2 !nz
+            do k = 1, 2  !nz
                do j = 1, nvar
                   if (brhs(j, k) /= 0) write (*, 3) 'brhs xcorrect', j, k, brhs(j, k), xcorrect(j, k)
                end do

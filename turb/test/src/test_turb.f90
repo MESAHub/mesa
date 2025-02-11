@@ -121,10 +121,10 @@ program test_turb
       alpha_TDC_DAMPR=0.0000000000000000
       alpha_TDC_PtdVdt=0.0000000000000000
       dV = 0d0
-      conv_vel_start = 0d0!1d10
+      conv_vel_start = 0d0  !1d10
       scale = L%val*1d-3
       report = .false.
-      dt = 1d40 ! Long time-step so we get into equilibrium
+      dt = 1d40  ! Long time-step so we get into equilibrium
 
       ! MLT
       MLT_option = 'Cox'

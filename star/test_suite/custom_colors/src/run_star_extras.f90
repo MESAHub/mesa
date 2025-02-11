@@ -172,7 +172,7 @@
 
 
          !Here we get the fake av data
-         names(1)='av_v' ! Same name as used in the fake_av_v.txt file for the column
+         names(1)='av_v'  ! Same name as used in the fake_av_v.txt file for the column
 
          vals(1)=get_bc_by_name(names(1),safe_log10(s% T(1)),&
                                 safe_log10(s% grav(1)),&

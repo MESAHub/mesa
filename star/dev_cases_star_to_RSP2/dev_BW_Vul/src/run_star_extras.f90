@@ -224,7 +224,7 @@
 
          call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
-         mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         mode_l = 0  ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
 
          !write(*,*) 'call star_get_pulse_data'
@@ -247,18 +247,18 @@
            'P (min)', 'P (day)', 'growth (day)', 'growth/P'
 100      format(A8,A16,A16,A14,A12,A16,A14)
 
-         rpar(1) = 0.5d-6 ! freq < this (Hz)
+         rpar(1) = 0.5d-6  ! freq < this (Hz)
          ipar(1) = s% model_number
-         ipar(2) = 1 ! order_target
-         ipar(3) = 1 ! 1 means output eigenfunction files
-         ipar(4) = 3 ! max number of modes to output per call
-         ipar(5) = 0 ! num_written
+         ipar(2) = 1  ! order_target
+         ipar(3) = 1  ! 1 means output eigenfunction files
+         ipar(4) = 3  ! max number of modes to output per call
+         ipar(5) = 0  ! num_written
 
          !write(*,*) 'call gyre_get_modes'
          call gyre_get_modes(mode_l, process_mode_, ipar, rpar)
 
-         amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
-         amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
+         amix1 = s% x_ctrl(4)  ! s% RSP_fraction_1st_overtone
+         amix2 = s% x_ctrl(5)  ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT'
             call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
@@ -307,7 +307,7 @@
          end if
 
          do i=nz-1,1,-1
-            k = nz+1-i ! v(1) from gyre => vel(nz) in star
+            k = nz+1-i  ! v(1) from gyre => vel(nz) in star
             vel(k) = v1*(amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
             write(*,2) 'vel', k, vel(k)
          end do
@@ -368,12 +368,12 @@
             cfreq = md% freq('HZ')
             freq = REAL(cfreq)
 
-            if (AIMAG(cfreq) > 0._dp) then ! unstable
+            if (AIMAG(cfreq) > 0._dp) then  ! unstable
                growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
                write(*, 100)  md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), &
                   growth, growth*freq*24*3600
 100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,E14.4)
-            else ! stable
+            else  ! stable
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
             end if
@@ -431,7 +431,7 @@
          if (s% x_integer_ctrl(1) > 0) then
              if (MOD(s% model_number, s% x_integer_ctrl(1)) == 0) then
                extras_finish_step = gyre_in_mesa_extras_finish_step(id)
-               if (s% ixtra3_array(1) > 0) then ! get the GYRE results
+               if (s% ixtra3_array(1) > 0) then  ! get the GYRE results
                   do i=1,s% ixtra3_array(1)
                      if (s% xtra1_array(i) == 0d0 .or. s% ixtra1_array(i) /= s% x_integer_ctrl(4)) cycle
                      if (best_G_div_P == 0d0 .or. s% xtra1_array(i)/s% xtra2_array(i) < best_G_div_P) then
@@ -455,7 +455,7 @@
             return
          end if
          if (.not. s% x_logical_ctrl(7)) return
-         if (s% x_ctrl(7) <= 0d0) return ! must give expected period > 0
+         if (s% x_ctrl(7) <= 0d0) return  ! must give expected period > 0
          if (s% v_flag) then
             v_surf = s% v(1)
             v_surf_start = s% v_start(1)
@@ -486,19 +486,19 @@
             return
          end if
          time_ended = s% time
-         if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
+         if (abs(v_surf - v_surf_start) > 1d-10) &  ! tweak the end time to match when v_surf == 0
             time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
          period = time_ended - time_started
-         if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return ! reject as bogus if < 10% expected
+         if (period/(24*3600) < 0.1d0*s% x_ctrl(7)) return  ! reject as bogus if < 10% expected
          num_periods = num_periods + 1
 
          period_delta_r = period_r_max - period_r_min
          if (period_delta_r > 0d0 .and. prev_period_delta_r > 0d0) then
-            growth = period/log(period_delta_r/prev_period_delta_r) ! seconds
+            growth = period/log(period_delta_r/prev_period_delta_r)  ! seconds
          else
             growth = 0d0
          end if
-         prev_growth = 0.1d0*growth + 0.9d0*prev_growth ! smoothing
+         prev_growth = 0.1d0*growth + 0.9d0*prev_growth  ! smoothing
          write(*,'(i4,a12,f9.4,a12,e13.4,a14,f9.4,a14,f9.4,a9,i3,a7,i6,a16,f8.3,a6,i7,a9,f10.3)')  &
             num_periods,'period (d)',  period/(24*3600), &
             'growth (d)', prev_growth/(24*3600), &
@@ -609,7 +609,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_profile_columns = 0 ! 6
+         how_many_extra_profile_columns = 0  ! 6
       end function how_many_extra_profile_columns
 
 

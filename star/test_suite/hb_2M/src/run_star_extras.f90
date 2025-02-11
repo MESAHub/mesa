@@ -124,7 +124,7 @@
          include 'formats'
 
          select case (s% x_integer_ctrl(1))
-         case (3) ! inlist_hb_2M
+         case (3)  ! inlist_hb_2M
 
             ! put target info in TestHub output
             testhub_extras_names(1) = 'mass_conv_core_y050'; testhub_extras_vals(1) = mass_conv_core_y050

@@ -265,8 +265,8 @@ program eos_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')
@@ -543,16 +543,16 @@ contains
          use eos_lib
          use chem_lib, only: basic_composition_info
          integer, intent(in) :: handle, i_eos, species
-         integer, pointer :: chem_id(:) ! maps species to chem id
-         integer, pointer :: net_iso(:) ! maps chem id to species number
-         real(dp), intent(in) :: xa(:) ! mass fractions
-         real(dp), intent(in) :: Rho, logRho ! the density
-         real(dp), intent(in) :: T, logT ! the temperature
-         real(dp), intent(inout) :: res(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnd(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dlnT(:) ! (num_eos_basic_results)
-         real(dp), intent(inout) :: d_dxa(:,:) ! (num_eos_d_dxa_results,species)
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, pointer :: chem_id(:)  ! maps species to chem id
+         integer, pointer :: net_iso(:)  ! maps chem id to species number
+         real(dp), intent(in) :: xa(:)  ! mass fractions
+         real(dp), intent(in) :: Rho, logRho  ! the density
+         real(dp), intent(in) :: T, logT  ! the temperature
+         real(dp), intent(inout) :: res(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnd(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dlnT(:)  ! (num_eos_basic_results)
+         real(dp), intent(inout) :: d_dxa(:,:)  ! (num_eos_d_dxa_results,species)
+         integer, intent(out) :: ierr  ! 0 means AOK.
          type (EoS_General_Info), pointer :: rq
          real(dp) :: Y, Z, X, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          call get_eos_ptr(handle,rq,ierr)

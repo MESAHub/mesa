@@ -50,10 +50,10 @@
       subroutine do_one_colors
 
          integer, parameter :: num_results=16
-         real(dp) :: log_teff ! log10 of surface temp
-         real(dp) :: log_l ! log10 of luminosity in solar units
-         real(dp) :: mass ! mass in solar units
-         real(dp) :: M_div_h ! [M/h], or as an approximation, log10[z/zsun]
+         real(dp) :: log_teff  ! log10 of surface temp
+         real(dp) :: log_l  ! log10 of luminosity in solar units
+         real(dp) :: mass  ! mass in solar units
+         real(dp) :: M_div_h  ! [M/h], or as an approximation, log10[z/zsun]
          real(dp) :: boloMag
          real(dp), dimension(num_results) :: results
          real(dp) ::log_g, x
@@ -182,7 +182,7 @@
                exit
             end if
          end do
-         read_junk = read_junk; iread_junk = iread_junk ! to keep g95 quiet
+         read_junk = read_junk; iread_junk = iread_junk  ! to keep g95 quiet
 
          close(io_unit)
 

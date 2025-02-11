@@ -12,10 +12,10 @@
       subroutine beam_derivs(n, x, h, vars, dvars_dx, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: vars(:) ! (n)
-         real(dp), intent(inout) :: dvars_dx(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout) :: vars(:)  ! (n)
+         real(dp), intent(inout) :: dvars_dx(:)  ! (n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          ierr = 0
          ipar(i_nfcn) = ipar(i_nfcn) + 1
@@ -26,11 +26,11 @@
       subroutine beam_jacob(n,x,h,y,f,dfdy,ld_dfdy,lrpar,rpar,lipar,ipar,ierr)
          integer, intent(in) :: n, ld_dfdy, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: dfdy(:,:) !(ld_dfdy,n)
-         real(dp), intent(inout) :: f(:) !(n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: dfdy(:,:)  !(ld_dfdy,n)
+         real(dp), intent(inout) :: f(:)  !(n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          real(dp) :: yprime(n)
          integer, intent(out) :: ierr
          ierr = 0
@@ -46,14 +46,14 @@
          use test_int_support,only:ipar_sparse_format
          integer, intent(in) :: n, nzmax, lrpar, lipar
          real(dp), intent(in) :: x, h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: f(:) ! (n) ! dy/dx
-         integer, intent(inout) :: ia(:) ! (n+1)
-         integer, intent(inout) :: ja(:) ! (nzmax)
-         real(dp), intent(inout) :: values(:) ! (nzmax)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means terminate integration
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: f(:)  ! (n) ! dy/dx
+         integer, intent(inout) :: ia(:)  ! (n+1)
+         integer, intent(inout) :: ja(:)  ! (nzmax)
+         real(dp), intent(inout) :: values(:)  ! (nzmax)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+         integer, intent(out) :: ierr  ! nonzero means terminate integration
          real(dp) :: dfdy(n,n)
          integer :: ld_dfdy, nz
          ld_dfdy = n
@@ -76,19 +76,19 @@
          ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
-         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: y(:)  ! (n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             real(dp) function interp_y(i,s,rwork,iwork,ierr)
                use const_def, only: dp
                implicit none
-               integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-               real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+               integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+               real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
@@ -105,7 +105,7 @@
          integer, intent(in) :: which_solver,which_decsol
          logical, intent(in) :: numerical_jacobian,show_all,quiet
 
-         integer, parameter :: n = 80 ! the number of variables in the "beam" system of ODEs
+         integer, parameter :: n = 80  ! the number of variables in the "beam" system of ODEs
          real(dp), target :: y_ary(n), yprime(n), yexact(n)
          real(dp), pointer :: y(:)
          integer, parameter :: lrpar = 1, lipar = 3, iout=1
@@ -119,8 +119,8 @@
          real(dp), pointer :: rpar(:)
          integer, pointer :: ipar(:)
          integer :: caller_id, nvar, nz
-         real(dp), dimension(:), pointer :: lblk, dblk, ublk ! =(nvar,nvar,nz)
-         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: lblk, dblk, ublk  ! =(nvar,nvar,nz)
+         real(dp), dimension(:), pointer :: uf_lblk, uf_dblk, uf_ublk  ! =(nvar,nvar,nz)
 
          nullify(lblk, dblk, ublk, uf_lblk, uf_dblk, uf_ublk)
          caller_id = 0
@@ -136,10 +136,10 @@
          t(0)   = 0
          t(1)   = 5d0
 
-         itol = 0 ! scalar tolerances
+         itol = 0  ! scalar tolerances
          rtol(1) = 1d-3
          atol(1) = 1d-3
-         h0 = 1d-4 ! initial step size
+         h0 = 1d-4  ! initial step size
 
          m1 = n/2
          m2 = 0
@@ -180,7 +180,7 @@
          call check_results(n,y,yexact,rtol(1)*1d2,ierr)
          if (ierr /= 0) then
             write(*,*) 'check results ierr', ierr
-            call mesa_error(__FILE__,__LINE__) ! do_test_vdpol
+            call mesa_error(__FILE__,__LINE__)  ! do_test_vdpol
          end if
 
          if (quiet) return
