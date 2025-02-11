@@ -25,5 +25,6 @@ jobs:
 
       - name: Apply Fortran linter, fortitude
         run: |
+          cd ${{ github.workspace }}
           fortitude check
         

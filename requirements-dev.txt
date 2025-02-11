@@ -1,1 +1,1 @@
-fortitude
+fortitude-lint
