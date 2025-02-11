@@ -219,7 +219,7 @@
 
                !Plot box centered on the (N,Z)
                call pgsci(1)
-               call pgline(5,(/n-step,n+step,n+step,n-step,n-step/),(/z-step,z-step,z+step,z+step,z-step/))
+               call pgline(5,[n-step,n+step,n+step,n-step,n-step],[z-step,z-step,z+step,z+step,z-step])
             end do
 
             call pgunsa

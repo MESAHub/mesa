@@ -90,8 +90,8 @@
         !Add stuff to the top panel in color_magnitude1
         if(plot_num==1) Then
             a = 0.1d0
-            call pgline(5, (/xcenter-a*dx,xcenter-a*dx,xcenter+a*dx,xcenter+a*dx,xcenter-a*dx/),&
-                            (/ycenter-a*dy,ycenter+a*dy,ycenter+a*dy,ycenter-a*dy,ycenter-a*dy/))
+            call pgline(5, [xcenter-a*dx,xcenter-a*dx,xcenter+a*dx,xcenter+a*dx,xcenter-a*dx],&
+                            [ycenter-a*dy,ycenter+a*dy,ycenter+a*dy,ycenter-a*dy,ycenter-a*dy])
 
         else
         ! Second or higher panel, this function gets called once per panel for the color_magnitude1 plot, so

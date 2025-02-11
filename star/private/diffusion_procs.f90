@@ -1250,7 +1250,7 @@
 
          include 'formats'
 
-         blend_fac =  (/(1._dp - FLOAT(i)/31._dp, i=1,31)/)
+         blend_fac =  [(1._dp - FLOAT(i)/31._dp, i=1,31)]
          ierr = 0
 
          kmax = kmax_rad_accel
@@ -1405,7 +1405,7 @@
          include 'formats'
 
          ierr = 0
-         iZ_rad2 = (/1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28/)
+         iZ_rad2 = [1,2,6,7,8,10,11,12,13,14,16,18,20,24,25,26,28]
 
          if (dbg) write(*,*) 'call op_mono_get_radacc'
 
