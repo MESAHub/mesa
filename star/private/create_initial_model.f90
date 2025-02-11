@@ -309,7 +309,7 @@
          m1 = four_thirds_pi * rhoc * r1*r1*r1
          P = Pc - two_thirds*pi * G*rhoc*rhoc*r1*r1
          intdmT1=m1*Tc
-         y=(/r1,m1,intdmT1/)
+         y=[r1,m1,intdmT1]
          call get_TRho_from_PS(cs,P,S,T,rho)
 
          ! record first point off center

@@ -3031,7 +3031,7 @@
          logical :: is_int_value(num_rows)
          logical :: failed_to_find_value(num_rows)
          if (present(ierr)) ierr = 0
-         call get_history_specs(s, num_rows, (/name/), specs, .false.)
+         call get_history_specs(s, num_rows, [name], specs, .false.)
          call get_history_values( &
             s, num_rows, specs, &
             is_int_value, int_values, values, failed_to_find_value)
