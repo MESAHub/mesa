@@ -803,8 +803,8 @@
         if (ierr /= 0) return
 
 
-        eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
-        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
+        eid = [ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
+        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 ]
 
         if (initialize_fk_old) then
         fk_old = 0

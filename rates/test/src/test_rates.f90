@@ -104,7 +104,7 @@
 
       write(*,'(A)')
 
-      temps = (/6.0d0,6.5d0,7.0d0,7.5d0,8.0d0,8.5d0,9.0d0,9.5d0,10.0d0/)
+      temps = [6.0d0,6.5d0,7.0d0,7.5d0,8.0d0,8.5d0,9.0d0,9.5d0,10.0d0]
 
       tf => tf_rec
 
@@ -113,9 +113,9 @@
          nrates_to_eval = 1
          allocate(irs(nrates_to_eval),raw_rates(nrates_to_eval))
 
-         irs(1:nrates_to_eval) = (/ &
+         irs(1:nrates_to_eval) = [ &
             ir_s32_ga_si28     &
-            /)
+            ]
 
       else
 

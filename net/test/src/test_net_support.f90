@@ -872,9 +872,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                ir_ar36_ag_ca40, &
-               ir_ca40_ga_ar36  /)
+               ir_ca40_ga_ar36  ]
 
                                   xin(net_iso(ife56))=     6.3551174304779179D-01
                                   xin(net_iso(icr52))=     1.0518849309100423D-01
@@ -1097,9 +1097,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                  irco56ec_to_fe56, &
-                 irni56ec_to_co56 /)
+                 irni56ec_to_co56 ]
 
                                     xin(net_iso(ineut))=    1.9615092621881698D-06
                                       xin(net_iso(ih1))=    0.0000000000000000D+00
@@ -1144,9 +1144,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                  irco56ec_to_fe56, &
-                 irni56ec_to_co56 /)
+                 irni56ec_to_co56 ]
 
                                    xin(net_iso(ihe4))=     3.4555392534813939D-01
                                    xin(net_iso(io16))=     1.9367778420430937D-01
@@ -1196,8 +1196,8 @@
             if (rates_reaction_id('rc12_to_n14') <= 0) call mesa_error(__FILE__,__LINE__,'bad reaction')
             write(*,*) 'rc12_to_n14', rates_reaction_id('rc12_to_n14')
 
-            rates_to_show(1:nrates_to_show) = (/  &
-            rates_reaction_id('rc12_to_n14') /)
+            rates_to_show(1:nrates_to_show) = [  &
+            rates_reaction_id('rc12_to_n14') ]
 
                                    xin(net_iso(ihe4))=     9.8119124177708650D-01
                                    xin(net_iso(in14))=     9.8369547495994036D-03
@@ -1233,11 +1233,11 @@
 
             nrates_to_show = 4
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             ir_h1_h1_wk_h2, &
             ir_c13_an_o16, &
             ir_f19_ap_ne22, &
-            ir_he3_ag_be7 /)
+            ir_he3_ag_be7 ]
 
                      xin(net_iso(ih1))= 1
 
@@ -1278,7 +1278,7 @@
 
             nrates_to_show = 8
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             rates_reaction_id('r_n13_wk_c13'),                &
             rates_reaction_id('r_o15_wk_n15'),                &
             rates_reaction_id('r_f17_wk_o17'),                &
@@ -1286,7 +1286,7 @@
             rates_reaction_id('r_o14_wk_n14'),                &
             rates_reaction_id('r_ne18_wk_f18'),                &
             rates_reaction_id('r_ne19_wk_f19'),                &
-            ir_he4_he4_he4_to_c12 /)
+            ir_he4_he4_he4_to_c12 ]
 
          xin = 0
                      xin(net_iso(ih1))=     7.2265805432969643D-01
@@ -1322,13 +1322,13 @@
 
             nrates_to_show = 5
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             ir_v47_pa_ti44,            &
             ir_mn51_pa_cr48, &
             ir_ar36_ap_k39, &
             ir_co55_pa_fe52,            &
             ir_s32_ap_cl35             &
-            /)
+            ]
                      xin = 0
 
                                   xin(net_iso(ife54))=     7.8234742556602999D-01

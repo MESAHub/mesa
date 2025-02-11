@@ -1490,10 +1490,10 @@
       num_names_of_isos_to_show = -1
 
       num_isos_for_Xinit = 4
-      names_of_isos_for_Xinit(1:num_isos_for_Xinit) = (/ &
-         'he4', 'c12', 'n14', 'o16' /)
-      values_for_Xinit(1:num_isos_for_Xinit) = (/ &
-         0.95d0, 0.005d0, 0.035d0, 0.010d0 /)
+      names_of_isos_for_Xinit(1:num_isos_for_Xinit) = [ &
+         'he4', 'c12', 'n14', 'o16' ]
+      values_for_Xinit(1:num_isos_for_Xinit) = [ &
+         0.95d0, 0.005d0, 0.035d0, 0.010d0 ]
 
       screening_mode = extended_screening
 

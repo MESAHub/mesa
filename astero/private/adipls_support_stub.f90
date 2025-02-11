@@ -228,7 +228,7 @@
          integer, intent(out) :: nn, ierr
 
          integer, parameter :: ireset(16) = &
-            (/3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20/)
+            [3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20]
          integer :: nn1, i, n, ir
          real(dp) :: d2amax, var1(ivar,nn_in+100), q(nn_in+100), x(nn_in+100)
 

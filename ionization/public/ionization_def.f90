@@ -76,12 +76,12 @@
 
 
       integer, parameter :: num_ion_Zs = 5
-      real(dp), parameter :: ion_Zs(num_ion_Zs) = (/ 0.00d0, 0.02d0, 0.04d0, 0.20d0, 1.00d0 /)
-      integer, parameter :: num_ion_Xs_for_Z(num_ion_Zs) = (/ 6, 5, 5, 5, 1 /)
+      real(dp), parameter :: ion_Zs(num_ion_Zs) = [ 0.00d0, 0.02d0, 0.04d0, 0.20d0, 1.00d0 ]
+      integer, parameter :: num_ion_Xs_for_Z(num_ion_Zs) = [ 6, 5, 5, 5, 1 ]
 
       integer, parameter :: num_ion_Xs = 6
       real(dp), parameter :: ion_Xs(num_ion_Xs) = &
-            (/ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 /)
+            [ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 ]
 
       integer, parameter :: sz_per_ion_point = 4  ! for bicubic spline interpolation
 

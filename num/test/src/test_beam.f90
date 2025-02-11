@@ -171,7 +171,7 @@
          end if
 
          call beam_solut(n,0d0,yexact)
-         indsol(1:n_soln) = (/ 1, 10, 20, 30, 40, 50, 60, 70, 80 /)
+         indsol(1:n_soln) = [ 1, 10, 20, 30, 40, 50, 60, 70, 80 ]
          do i=1,n_soln
             result(i) = y(indsol(i))
             soln(i) = yexact(indsol(i))

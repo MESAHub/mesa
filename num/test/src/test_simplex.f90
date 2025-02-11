@@ -117,9 +117,9 @@
          real(dp) :: simplex(n,n+1), centroid_weight_power
          logical :: enforce_bounds, adaptive_random_search
 
-         x_first(1:n) = (/ -3d0, -1d0, -3d0, -1d0 /)
-         x_lower(1:n) = (/ -4d0, -2d0, -4d0, -2d0 /)
-         x_upper(1:n) = (/ 2d0, 2d0, 2d0, 2d0 /)
+         x_first(1:n) = [ -3d0, -1d0, -3d0, -1d0 ]
+         x_lower(1:n) = [ -4d0, -2d0, -4d0, -2d0 ]
+         x_upper(1:n) = [ 2d0, 2d0, 2d0, 2d0 ]
 
          enforce_bounds = .true.
          adaptive_random_search = .true.
@@ -225,7 +225,7 @@
          ! false min = 48.98... at (11.41..., -0.8968...)
          ! starting at (0.5, -2) leads to the local min.
 
-         x_first(1:n) = (/ 0.5d0, -2d0 /)
+         x_first(1:n) = [ 0.5d0, -2d0 ]
          x_lower(1:n) = -2d0
          x_upper(1:n) = 6d0
 
@@ -252,7 +252,7 @@
          ! = 48.98... at (11.41..., -0.8968...)
          ! starting at (0.5, -2) leads to the bad local min.
 
-         x_first(1:n) = (/ 0.5d0, -2d0, 0.5d0, -2d0 /)
+         x_first(1:n) = [ 0.5d0, -2d0, 0.5d0, -2d0 ]
          x_lower(1:n) = -2d0
          x_upper(1:n) = 6d0
 
@@ -279,7 +279,7 @@
          ! = 48.98... at (11.41..., -0.8968...)
          ! starting at (0.5, -2) leads to the bad local min.
 
-         x_first(1:n) = (/ 0.5d0, -2d0, 0.5d0, -2d0, 0.5d0, -2d0 /)
+         x_first(1:n) = [ 0.5d0, -2d0, 0.5d0, -2d0, 0.5d0, -2d0 ]
          x_lower(1:n) = -2d0
          x_upper(1:n) = 6d0
 
@@ -382,7 +382,7 @@
          real(dp) :: simplex(n,n+1), centroid_weight_power
          logical :: enforce_bounds, adaptive_random_search
 
-         x_first(1:n) = (/ 3d0, -1d0, 0d0, 1d0 /)
+         x_first(1:n) = [ 3d0, -1d0, 0d0, 1d0 ]
          x_lower(1:n) = -1d0
          x_upper(1:n) = 3d0
 

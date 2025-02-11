@@ -27,7 +27,7 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(linear, xlow, xhigh, (/1d0/), 1d-3, 1d-3, 10, ierr)
+            res = integrate(linear, xlow, xhigh, [1d0], 1d-3, 1d-3, 10, ierr)
 
             call check_result('linear', expected, res, ierr)
 
@@ -50,11 +50,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(sine, 0d0, pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
+            res = integrate(sine, 0d0, pi, [1d0], 1d-8, 1d-8, 10, ierr)
 
             call check_result('sine', 2d0, res, ierr)
 
-            res = integrate(sine, 0d0, 2*pi, (/1d0/), 1d-8, 1d-8, 10, ierr)
+            res = integrate(sine, 0d0, 2*pi, [1d0], 1d-8, 1d-8, 10, ierr)
 
             call check_result('sine', 0d0, res, ierr)
 
@@ -78,11 +78,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(iexp, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 2d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
             call check_result('exp', exp(2d0)-1d0, res, ierr)
 
-            res = integrate(iexp, 0d0, 10d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+            res = integrate(iexp, 0d0, 10d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
             call check_result('exp', exp(10d0)-1d0, res, ierr)
 
@@ -106,11 +106,11 @@
             real(dp) :: res
             integer :: ierr
 
-            res = integrate(box, 0d0, 2d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+            res = integrate(box, 0d0, 2d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
             call check_result('box', 1d0, res, ierr)
 
-            res = integrate(box, 0.99d0, 1.5d0, (/1d0/), 1d-8, 1d-8, 50, ierr)
+            res = integrate(box, 0.99d0, 1.5d0, [1d0], 1d-8, 1d-8, 50, ierr)
 
             call check_result('box', 0.5d0, res, ierr)
 

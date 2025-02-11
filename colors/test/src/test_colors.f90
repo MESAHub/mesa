@@ -30,7 +30,7 @@
          end if
          call math_init()
 
-         call colors_init(1,(/'../data/lcb98cor.dat'/),(/n_colors/),info)
+         call colors_init(1,['../data/lcb98cor.dat'],[n_colors],info)
 
          if (info /= 0) then
             write(*,*) 'colors_init failed during initialization'
@@ -61,9 +61,9 @@
          character (len=8) :: vname
          character(len=strlen),dimension(num_results):: colors_name
          logical, parameter :: doing_solar = .true.
-         real(dp), dimension(num_results), parameter :: solar_expected_results = (/ &
+         real(dp), dimension(num_results), parameter :: solar_expected_results = [ &
          4.75d0, -0.11510d0, -0.14211d0, -0.61768d0, -0.36199d0, -0.68894d0, -1.46926d0, -0.32695d0, -0.78032d0, -0.39024d0, &
-         0.05223d0, -0.10512d0,  -0.33801d0, -0.44312d0, -0.44123d0, -0.43080d0 /)
+         0.05223d0, -0.10512d0,  -0.33801d0, -0.44312d0, -0.44123d0, -0.43080d0 ]
 
 
          ! solar values
@@ -108,8 +108,8 @@
          write(*,'(A)')
 
          !call get_all_bc_names(colors_name,total_num_colors,info)
-         colors_name=(/'bol ','bcv ','U-B ','B-V ','V-R ','V-I ','V-K ','R-I ',&
-                        'I-K ','J-H ','H-K ','K-L ','J-K ','J-L ','J-Lp','K-M '/)
+         colors_name=['bol ','bcv ','U-B ','B-V ','V-R ','V-I ','V-K ','R-I ',&
+                        'I-K ','J-H ','H-K ','K-L ','J-K ','J-L ','J-Lp','K-M ']
 
          do i=1,num_results
             write(*,'(9x,a8,f10.5)') colors_name(i), results(i)
