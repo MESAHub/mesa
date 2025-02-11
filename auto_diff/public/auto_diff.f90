@@ -7,4 +7,5 @@ module auto_diff
    use auto_diff_real_2var_order1_module
    use auto_diff_real_star_order1_module
    use auto_diff_real_2var_order3_module
+   implicit none
 end module auto_diff

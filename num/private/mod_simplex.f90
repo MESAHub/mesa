@@ -29,6 +29,8 @@
       use math_lib
       use num_def
 
+      implicit none
+
 
       contains
 

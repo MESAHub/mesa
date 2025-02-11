@@ -4,6 +4,8 @@ program test_turb
    use const_def
    use turb
 
+   implicit none
+
    call check_efficient_MLT_scaling()
    call check_TDC()
    call compare_TDC_and_Cox_MLT()

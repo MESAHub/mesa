@@ -151,6 +151,7 @@ contains
         subroutine user_sub (md, ipar, rpar, retcode)
            import mode_t
            import RD
+           implicit none
            type(mode_t), intent(in) :: md
            integer, intent(inout)   :: ipar(:)
            real(RD), intent(inout)  :: rpar(:)
@@ -181,4 +182,3 @@ contains
   end subroutine set_constant_c_
 
 end module gyre_mesa_m  ! stub
-

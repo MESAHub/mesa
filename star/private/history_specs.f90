@@ -622,6 +622,7 @@
             integer :: offset, k
             interface
             subroutine func(offset)
+               implicit none
                integer, intent(in) :: offset
             end subroutine func
             end interface
