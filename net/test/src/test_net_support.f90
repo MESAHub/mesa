@@ -486,7 +486,7 @@
       integer function Open_Files(io_start, dir)
          integer, intent(in) :: io_start
          character (len=256), intent(in) :: dir
-         character (len=256) fname
+         character (len=256) :: fname
          integer :: io
          io = io_start
 

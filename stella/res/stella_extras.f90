@@ -18,8 +18,8 @@ program main
    real(dp), allocatable,dimension(:) :: &
       t,m,dm,h,he,c,n,o,ne,na,mg,al,si,s,ar,ca,fe,ni
    real(dp) :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
-   character*132 runname,filestr,fname,test_str
-   character*256 line, my_mesa_dir
+   character*132 :: runname,filestr,fname,test_str
+   character*256 :: line, my_mesa_dir
 
    real(dp), parameter :: &
       A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023, Z_div_X_solar = 0.02293d0, &

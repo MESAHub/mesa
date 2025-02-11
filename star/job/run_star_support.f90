@@ -3702,7 +3702,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         character(len=1) fpe_check
+         character(len=1) :: fpe_check
          integer :: status
 
          include 'formats'

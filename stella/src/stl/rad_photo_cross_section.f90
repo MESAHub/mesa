@@ -14,7 +14,7 @@ module rad_photo_cross_section
     end interface
 
     real (kind=sp), parameter, private :: p_e_max = 5.d4
- 	integer i
+ 	integer :: i
     integer, dimension(7) :: L, IS2Ne
     integer, dimension(30) :: NINN, NFULL, NTOT
     real (kind=sp), dimension(6,30,30,7) :: PH1
@@ -3752,8 +3752,8 @@ contains
       real (kind=dp), dimension(npts), intent(out)  :: sigma
       character(len=*), parameter ::  subrtn_name = 'ics_full'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
-      integer k, is, nint, nout
-      real(dp) a,b,e,einn,p1,q,s,x,y,z
+      integer :: k, is, nint, nout
+      real(dp) :: a,b,e,einn,p1,q,s,x,y,z
 !       common/l/l(7)
 !       common/ninn/ninn(30)
 !       common/ntot/ntot(30)
@@ -3906,8 +3906,8 @@ contains
       real (kind=dp), intent(out)  :: s
       character(len=*), parameter ::  subrtn_name = 'photoCrossVerner'&
                                        , fullPathSubrtn = mdl_name//'.'//subrtn_name
-      integer i, is_max, nint,tmpne
-      real (kind=dp) e_max, tmps
+      integer :: i, is_max, nint,tmpne
+      real (kind=dp) :: e_max, tmps
 
       if(nz < 1.or.nz > 30)return
       if(ne < 1.or.ne > nz)return
