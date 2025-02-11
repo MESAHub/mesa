@@ -157,7 +157,7 @@
 
       subroutine create_plot_files
 
-         character (len=256) fname, dir
+         character (len=256) :: fname, dir
          integer, parameter :: max_num_masses = 100
          integer, parameter :: num_results=16
          real(dp), dimension(max_num_masses) :: mass, logl, logteff

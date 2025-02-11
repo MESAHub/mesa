@@ -13,11 +13,11 @@ module test_medakzo
 contains
 
    subroutine medakzo_feval_for_blk_dble(neqn, t, y, yprime, f, ierr, rpar, ipar)
-      integer neqn, ierr, ipar(:)
-      double precision t, y(:), yprime(:), f(:), rpar(:)
+      integer :: neqn, ierr, ipar(:)
+      double precision :: t, y(:), yprime(:), f(:), rpar(:)
 
-      integer N, i, j
-      double precision zeta, dzeta, dzeta2, k, c, phi, alpha, beta, gama, dum
+      integer :: N, i, j
+      double precision :: zeta, dzeta, dzeta2, k, c, phi, alpha, beta, gama, dum
       parameter(k=100d0, c=4d0)
 
       include 'formats'
@@ -57,11 +57,11 @@ contains
    end subroutine medakzo_feval_for_blk_dble
 
    subroutine medakzo_jeval_for_blk_dble(ldim, neqn, t, y, yprime, dfdy, ierr, rpar, ipar)
-      integer ldim, neqn, ierr, ipar(:)
-      double precision t, y(:), yprime(:), dfdy(:, :), rpar(:)
+      integer :: ldim, neqn, ierr, ipar(:)
+      double precision :: t, y(:), yprime(:), dfdy(:, :), rpar(:)
 
-      integer N, i, j
-      double precision zeta, dzeta, dzeta2, alpha, beta, k, c, dum, bz
+      integer :: N, i, j
+      double precision :: zeta, dzeta, dzeta2, alpha, beta, k, c, dum, bz
       parameter(k=100d0, c=4d0)
 
       do j = 1, neqn

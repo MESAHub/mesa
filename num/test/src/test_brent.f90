@@ -46,13 +46,13 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) c
-        real(dp) e
-        real(dp) m
-        real(dp) machep
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: c
+        real(dp) :: e
+        real(dp) :: m
+        real(dp) :: machep
+        real(dp) :: t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_GLOMIN_ALL'
@@ -143,11 +143,11 @@
             end function f
          end interface
 
-        real      (dp) fa
-        real      (dp) fb
-        real      (dp) fx
-        character ( len = *  ) title
-        real      (dp) x
+        real      (dp) :: fa
+        real      (dp) :: fb
+        real      (dp) :: fx
+        character ( len = *  ) :: title
+        real      (dp) :: x
         integer :: max_tries, ierr
         include 'formats'
 
@@ -216,10 +216,10 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) eps
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: eps
+        real(dp) :: t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_LOCAL_MIN_ALL'
@@ -307,10 +307,10 @@
          end interface
          character (len=*) :: title
 
-        real      (dp) fa
-        real      (dp) fb
-        real      (dp) fx
-        real      (dp) x
+        real      (dp) :: fa
+        real      (dp) :: fb
+        real      (dp) :: fx
+        real      (dp) :: x
         integer :: max_tries, ierr
         include 'formats'
 
@@ -439,10 +439,10 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) machep
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: machep
+        real(dp) :: t
 
         machep = epsilon ( machep )
         t = machep

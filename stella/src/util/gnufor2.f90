@@ -1714,10 +1714,10 @@
 	subroutine run_gnuplot(command_file_name)
 !***********************************************************************************
 	implicit none
-	character (len = 100) command
-	character (len = *) command_file_name
-	integer status
-	integer system
+	character (len = 100) :: command
+	character (len = *) :: command_file_name
+	integer :: status
+	integer :: system
 !***********************************************************************************
 !  Issue a command to the system that will startup GNUPLOT, using
 !  the file we just wrote as input.
@@ -1737,10 +1737,10 @@
 	subroutine get_unit(iunit)
 !***********************************************************************************
 	implicit none
-	integer i
-	integer ios
-	integer iunit
-	logical lopen
+	integer :: i
+	integer :: ios
+	integer :: iunit
+	logical :: lopen
 !***********************************************************************************
 	iunit=0
 	do i=1,99
