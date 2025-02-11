@@ -358,7 +358,6 @@
       subroutine my_screening(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
          use rates_def
 
-         implicit none
 
          type (Screen_Info) :: sc  ! See rates_def
          ! This contains lots of useful things like temperature, density etc as well as some precomputed
@@ -380,7 +379,6 @@
       subroutine my_rate_get(ir, temp, tf, raw_rate, ierr)
          use rates_def
          use rates_lib
-         implicit none
 
          integer :: ir  ! Rate id
          real(dp),intent(in) ::    temp      !< Temperature

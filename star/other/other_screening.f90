@@ -37,7 +37,6 @@ contains
    subroutine default_other_screening(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
       use rates_def
 
-      implicit none
 
       type(Screen_Info) :: sc  ! See rates_def
       ! This contains lots of useful things like temperature, density etc as well as some precomputed

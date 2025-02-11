@@ -54,7 +54,6 @@ contains
     use auto_diff
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -101,7 +100,6 @@ contains
 
     ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT

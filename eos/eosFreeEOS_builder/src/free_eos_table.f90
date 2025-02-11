@@ -104,7 +104,6 @@ contains
    end subroutine free_eos_set_options
 
    subroutine free_eos_eval(logRho,logT,mass_frac,result)
-      implicit none
       real(dp), intent(inout) :: logRho
       real(dp), intent(in)  :: logT,mass_frac(Neps)
       real(dp), intent(out) :: result(num_results)

@@ -620,7 +620,11 @@
          logical function do1(string, name, offset, func)
             character(len=*) :: string, name
             integer :: offset, k
-            external :: func
+            interface
+            subroutine func(offset)
+               integer, intent(in) :: offset
+            end subroutine func
+            end interface
 
             if(string == name) then
                ! We have string value (i.e total_mass c12)

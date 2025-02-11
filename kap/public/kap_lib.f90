@@ -589,7 +589,6 @@
             umesh, semesh, ff, rs, ierr)
          use kap_def
          use op_eval, only: eval_alt_op
-         implicit none
          integer, intent(in) :: nel
          integer, intent(in) :: izzp(nel)
          real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements

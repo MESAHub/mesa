@@ -150,7 +150,6 @@
       use eos_def
       use utils_lib, only: mv, switch_str
 
-      implicit none
 
       type (Helm_Table), pointer :: h
       character(*), intent(IN) :: data_dir, cache_dir, temp_cache_dir

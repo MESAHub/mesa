@@ -49,7 +49,6 @@
 ! this function creates a string with current date and time
 ! it is a default method to name output files
 !***********************************************************************************
-	implicit none
         character(len=8)  :: date
         character(len=10) :: time
         character(len=33) :: f_result
@@ -63,7 +62,6 @@
 !***********************************************************************************
 	function output_terminal(terminal) result(f_result)
 !***********************************************************************************
-	implicit none
 	character(len=*),intent(in)	:: terminal
 	integer, parameter		:: Nc=35
 	character(len=Nc)		:: f_result
@@ -84,7 +82,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:)
 	integer,intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
@@ -210,7 +207,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	integer, intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: terminal, filename, persist, input
@@ -326,7 +322,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:), gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -453,7 +448,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -570,7 +564,6 @@
 !***********************************************************************************
 ! this subroutine plots 3D curve, given by three arrays x,y,z
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:)
 	real(kind=4), optional		:: pause, linewidth
 	character(len=*),optional	:: color, terminal, filename, persist, input
@@ -683,7 +676,6 @@
 !***********************************************************************************
 ! this subroutine plots the histogram of data contained in array x, using n bins
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:)  !the data to plot
 	integer, intent(in)		:: n  !the number of intervals
 	real(kind=4), optional		:: pause
@@ -815,7 +807,6 @@
 ! this subroutine plots a surface. x and y are arrays needed to generate the x-y grid
 ! z(:,:) is a 2D array
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -848,7 +839,6 @@
 ! this subroutine plots a surface. The only input is a 2D array z(:,:), the x-y grid
 ! is generated automatically
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -876,7 +866,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: xyz(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, pm3d, contour, persist, input
@@ -1008,7 +997,6 @@
 !***********************************************************************************
 ! this subroutine plots 4 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:), x4(:), y4(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, color4, terminal, filename, polar,&
@@ -1216,7 +1204,6 @@
 !***********************************************************************************
 ! this subroutine plots 3 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, terminal, filename, polar, persist, input
@@ -1404,7 +1391,6 @@
 !***********************************************************************************
 ! this subroutine plots 2 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, terminal, filename, polar, persist, input
@@ -1571,7 +1557,6 @@
 !***********************************************************************************
 ! this subroutine plots a two-dimensional graph
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, terminal, filename, polar, persist, input
@@ -1713,7 +1698,6 @@
 !***********************************************************************************
 	subroutine run_gnuplot(command_file_name)
 !***********************************************************************************
-	implicit none
 	character (len = 100) :: command
 	character (len = *) :: command_file_name
 	integer :: status
@@ -1736,7 +1720,6 @@
 !***********************************************************************************
 	subroutine get_unit(iunit)
 !***********************************************************************************
-	implicit none
 	integer :: i
 	integer :: ios
 	integer :: iunit

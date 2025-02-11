@@ -36,7 +36,6 @@ contains
 
 
    subroutine summary_history_plot(id, device_id, ierr)
-      implicit none
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
 

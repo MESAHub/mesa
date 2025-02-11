@@ -76,8 +76,8 @@ contains
       end interface
 
       ! These should be set for the output
-      real(dp), intent(inout) :: ending_x(:) ! (num_isos)
-      real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
+      real(dp), intent(inout) :: ending_x(:)  ! (num_isos)
+      real(dp), intent(inout) :: eps_nuc_categories(:)  ! (num_categories)
       real(dp), intent(out) :: avg_eps_nuc, eps_neu_total
       integer, intent(out) :: nfcn    ! number of function evaluations
       integer, intent(out) :: njac    ! number of jacobian evaluations

@@ -236,7 +236,6 @@
          use net_def
          use chem_def
          use chem_lib
-         implicit none
          type (star_info), pointer,intent(in) :: s
          integer,intent(in) :: k
          real(dp) :: neAbun,naAbun,mgAbun,heAbun
