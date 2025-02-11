@@ -139,7 +139,7 @@
             max_mass_conv_core = s% x_ctrl(2)
 
             ! check if value is outside of the target range
-            if ((mass_conv_core_y050 .lt. min_mass_conv_core) .or. (mass_conv_core_y050 .gt. max_mass_conv_core)) then
+            if ((mass_conv_core_y050 < min_mass_conv_core) .or. (mass_conv_core_y050 > max_mass_conv_core)) then
                write(*,*) 'bad value for mass_conv_core_y050'
                write(*,1) 'min allowed value', min_mass_conv_core
                write(*,1) 'mass_conv_core_y050', mass_conv_core_y050
@@ -234,7 +234,7 @@
          ! during part 3: CHeB
          if (s% x_integer_ctrl(1) == 3) then
             ! save core mass the first time Yc < 0.5
-            if (s% center_he4 .lt. 0.5d0 .and. mass_conv_core_y050 .lt. 0) then
+            if (s% center_he4 < 0.5d0 .and. mass_conv_core_y050 < 0) then
                mass_conv_core_y050 = s% mass_conv_core
             end if
          end if

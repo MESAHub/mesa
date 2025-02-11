@@ -3771,16 +3771,16 @@ contains
 
 ! *** some test to find an error
 
-      if(nz.lt.1.or.nz.gt.30)return
-      if(ne.lt.1.or.ne.gt.nz)return
+      if(nz<1.or.nz>30)return
+      if(ne<1.or.ne>nz)return
 
 
 ! *** define a number of atomic system's outer shell
 
       nout=ntot(ne)
-      if(nz.eq.ne.and.nz.gt.18) nout=7
-      if(nz.eq.(ne+1).and.(nz.eq.20.or.nz.eq.21.or.nz.eq.22.or. &
-          nz.eq.25.or.nz.eq.26)) nout=7
+      if(nz==ne.and.nz>18) nout=7
+      if(nz==(ne+1).and.(nz==20.or.nz==21.or.nz==22.or. &
+          nz==25.or.nz==26)) nout=7
 
 
 ! *** do-cycle, over the frequency grid
@@ -3796,7 +3796,7 @@ contains
 
 ! ***    some preperations to choose between fits
 
-          if(e.gt.ph1(1,nz,ne,is))then
+          if(e>ph1(1,nz,ne,is))then
 
 ! ***      if current energy is higher than ionization threshold then
 ! ***      define shell numbers for which "old" (VernerYakovlev-95)
@@ -3807,10 +3807,10 @@ contains
 ! ***      also we should to specify an energy separating "outer" and
 ! ***      "new" fits, because first ones are appliable only for low energies.
 
-            if(nz.eq.15.or.nz.eq.17.or.nz.eq.19.or. (nz.gt.20.and.nz.ne.26)) then
+            if(nz==15.or.nz==17.or.nz==19.or. (nz>20.and.nz/=26)) then
               einn=0.d+00
             else
-              if(ne.lt.3)then
+              if(ne<3)then
                 einn=1.0d+30
               else
                 einn=ph1(1,nz,ne,nint)
@@ -3820,7 +3820,7 @@ contains
 ! ***      if the current shell is treated as inner one
 ! ***      or the current energy is high enough, then use "old" fit
 
-            if(is.le.nint.or.e.ge.einn)then
+            if(is<=nint.or.e>=einn)then
               p1=-ph1(5,nz,ne,is)
               y=e/ph1(2,nz,ne,is)
               q=-0.5*p1-l(is)-5.5
@@ -3840,9 +3840,9 @@ contains
 ! ***        2) the same thing is for FeI and FeII with (3d+4s);
 ! ***        3)calcium has no 3d electrons, i.e. has no shell with number is=6
 
-              if(((nout.eq.3).and.(is.eq.2)).or.((nout.eq.5) &
-                   .and.(is.eq.4)).or.(((nz.eq.26).and.((ne.eq.26).or.(ne.eq.25))) &
-                   .and.(is.eq.6)).or.((nz.eq.20).and.(is.eq.6)))  then
+              if(((nout==3).and.(is==2)).or.((nout==5) &
+                   .and.(is==4)).or.(((nz==26).and.((ne==26).or.(ne==25))) &
+                   .and.(is==6)).or.((nz==20).and.(is==6)))  then
                 s=0
 
 ! ***        after all this checkings we can finally use the "new" fit
@@ -4006,7 +4006,7 @@ end subroutine photoCrossVerner
       if(is > nout)return
       if(e < ph1(1,nz,ne,is))return
       nint=ninn(ne)
-      if( nz == 15.or.nz == 17.or.nz == 19.or. (nz > 20.and.nz.ne.26) )then
+      if( nz == 15.or.nz == 17.or.nz == 19.or. (nz > 20.and.nz/=26) )then
          einn=0.0
       else
          if(ne < 3)then
@@ -4016,7 +4016,7 @@ end subroutine photoCrossVerner
          endif
       endif
       if(is < nout.and.is > nint.and.e < einn)return
-      if(is.le.nint.or.e.ge.einn)then
+      if(is<=nint.or.e>=einn)then
          p1=-ph1(5,nz,ne,is)
          y=e/ph1(2,nz,ne,is)
          q=-0.5*p1-l(is)-5.5

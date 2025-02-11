@@ -180,25 +180,25 @@ program neu_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nZbar .gt. 1) then
+   if (nZbar > 1) then
       Zbar_step = delta_Zbar / (nZbar-1d0)
    else
       Zbar_step = 0
    end if
 
-   if (nAbar .gt. 1) then
+   if (nAbar > 1) then
       Abar_step = delta_Abar / (nAbar-1d0)
    else
       Abar_step = 0

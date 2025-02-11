@@ -698,7 +698,7 @@
             return
          end if
 
-         if(s% total_energy_end .ne. 0d0) then
+         if(s% total_energy_end /= 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
                   s% warn_when_large_rel_run_E_err) then
                write(*,2) 'WARNING: rel_run_E_err', &
@@ -2900,7 +2900,7 @@
                   trim(s% job% relax_composition_filename)
                return
             end if
-            if(num_species .ne. s% species) then
+            if(num_species /= s% species) then
                write(*,*) 'Error in ',trim(s% job% relax_composition_filename)
                write(*,'(a,I4,a)') 'got ',num_species,' species'
                write(*,'(a,I4,a)') 'expected ', s% species,' species'
@@ -3737,7 +3737,7 @@
             test_suite_resolution_factor_str, STATUS=status)
          if (status /= 0) return
 
-         if (test_suite_resolution_factor_str .ne. "") then
+         if (test_suite_resolution_factor_str /= "") then
             read(test_suite_resolution_factor_str, *) test_suite_res_factor
             write(*,*) ""
             write(*,*) "***"

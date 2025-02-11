@@ -269,7 +269,7 @@
          ierr = 0
          irtrn = 0
          xout = rpar(1)
-         if (nr.eq.1) then
+         if (nr==1) then
             write (6, 99) x, y(1), y(2), nr-1
             xout=0.2d0
          else

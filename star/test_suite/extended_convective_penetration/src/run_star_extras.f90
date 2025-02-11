@@ -407,7 +407,7 @@
 
             if (Peclet_number >= 100.0_dp) then
                 fraction = 1.0_dp
-            else if (Peclet_number .le. 0.01_dp) then
+            else if (Peclet_number <= 0.01_dp) then
                 fraction = 0.0_dp
             else
                 fraction = (safe_log10(Peclet_number)+2.0_dp)/4.0_dp

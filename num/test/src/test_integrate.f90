@@ -126,7 +126,7 @@
 
                if(x<1) then
                   box = 0d0
-               else if(x.ge.1d0 .and. x.le.2d0) then
+               else if(x>=1d0 .and. x<=2d0) then
                   box = 1d0
                else
                   box = 0d0

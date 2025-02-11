@@ -215,12 +215,12 @@
       read(5,'(a)') string
 
 ! stop
-      if (string(1:2) .eq. '-1') then
+      if (string(1:2) == '-1') then
        call mesa_error(__FILE__,__LINE__,'normal termination')
 
 ! read the conditions
       else
-       if (string(1:6) .ne. '      ') then
+       if (string(1:6) /= '      ') then
         read(string,*) T,Rho, xa(net_iso(ih1)), xa(net_iso(ihe4)), xa(net_iso(ic12)), &
                        xa(net_iso(in14)), xa(net_iso(io16)), xa(net_iso(ine20)), xa(net_iso(img24))
 ! or set some defaults
