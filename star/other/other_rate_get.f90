@@ -49,7 +49,6 @@ contains
    subroutine default_other_rate_get(ir, temp, tf, raw_rate, ierr)
       use rates_def
       use rates_lib
-      implicit none
 
       integer :: ir  ! Rate id
       real(dp), intent(in) ::    temp      !< Temperature

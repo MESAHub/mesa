@@ -72,7 +72,6 @@
 
 
       subroutine eval_screen_chugunov(sc, z1, z2, a1, a2, screen, dscreendt, dscreendd, ierr)
-         implicit none
 
          type (Screen_Info)  :: sc
          real(dp),intent(in) ::    z1, z2      !< charge numbers of reactants

@@ -42,7 +42,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
@@ -93,7 +92,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)
@@ -143,7 +141,6 @@
 
          ! circular shift-right by one:
            subroutine rshift(left,right)
-             implicit none
              integer, intent(in) :: left, right
              integer :: hold, i
              hold=index(right)

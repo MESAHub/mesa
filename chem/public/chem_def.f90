@@ -1043,8 +1043,7 @@
          element_atomic_weight(:) = 0d0
 
          do i = e_h, e_cn
-            call integer_dict_lookup(chem_isos_dict, \
-               chem_element_main_iso_name(i), isotope_index, ierr)
+            call integer_dict_lookup(chem_isos_dict, chem_element_main_iso_name(i), isotope_index, ierr)
             if (ierr /= 0) then
                call mesa_error(__FILE__,__LINE__,'init_element_atomic_weights')
                return

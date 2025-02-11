@@ -1290,7 +1290,7 @@ contains
       integer, intent(out) :: ierr
 
       integer(8) :: time0, time1, clock_rate
-      logical :: pause
+      logical :: do_pause
 
       include 'formats'
 
@@ -1308,15 +1308,15 @@ contains
       if (failed('save_text_data')) return
 
       if (s% pg% pause_interval > 0) then
-         pause = (mod(s% model_number, s% pg% pause_interval) == 0)
+         do_pause = (mod(s% model_number, s% pg% pause_interval) == 0)
       else
-         pause = s% pg% pause
+         do_pause = s% pg% pause
       end if
 
-      if (pause .and. s% pg% pgstar_interval > 0) &
-         pause = (mod(s% model_number, s% pg% pgstar_interval) == 0)
+      if (do_pause .and. s% pg% pgstar_interval > 0) &
+         do_pause = (mod(s% model_number, s% pg% pgstar_interval) == 0)
 
-      if (pause) then
+      if (do_pause) then
          write(*, '(A)')
          write(*, *) 'model_number', s% model_number
          write(*, *) 'PGSTAR: paused -- hit RETURN to continue'

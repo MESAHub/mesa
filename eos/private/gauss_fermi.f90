@@ -229,7 +229,13 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j, n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(5),xg(5)
@@ -298,7 +304,13 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(10),xg(10)
@@ -380,7 +392,13 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(20),xg(20)
@@ -481,7 +499,13 @@ contains
 !..note: since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc1, par, n, fval1, dfval1, ddfval1)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc1, par(n), fval1, dfval1, ddfval1
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc1,absc2,center,hlfrun,wg(40),xg(40)
@@ -621,7 +645,13 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(10),xg(10),fval,dfval,ddfval
@@ -694,7 +724,13 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(20),xg(20),fval,dfval,ddfval
@@ -787,7 +823,13 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(40),xg(40),fval,dfval,ddfval
@@ -921,7 +963,13 @@ contains
 !..since the number of nodes is even, zero is not an abscissa.
 !..
 !..declare
-      external f
+      interface
+        subroutine f(absc, par, n, fval, dfval, ddfval)
+            use const_def, only: dp
+            integer :: n
+            real(dp) :: absc, par(n), fval, dfval, ddfval
+        end subroutine f
+      end interface
       integer :: j,n
       real(dp) :: a,b,res,dres,ddres,par(n)
       real(dp) :: absc,wg(80),xg(80),fval,dfval,ddfval

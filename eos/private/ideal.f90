@@ -99,7 +99,6 @@ module ideal
       use skye_thermodynamics
       use auto_diff
 
-      implicit none
       integer :: j
       integer, intent(in) :: species
       integer, pointer :: chem_id(:)

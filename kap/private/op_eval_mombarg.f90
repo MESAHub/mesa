@@ -177,8 +177,8 @@
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
         write(*,*) 'Cannot find points for interpolation compute_grad', &
-                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, & 
-                    logRho_face, missing_point, ii_min, jj_min, offset1, offset2, & 
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, &
+                    logRho_face, missing_point, ii_min, jj_min, offset1, offset2, &
                     imin, imax, log_amu_mix_cell
         ierr = 1
         return
@@ -547,8 +547,8 @@
             retry = .false.
         else
 
-        write(*,*) 'Cannot find points for interpolation compute_grad_fast', & 
-                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, & 
+        write(*,*) 'Cannot find points for interpolation compute_grad_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, &
                     missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return

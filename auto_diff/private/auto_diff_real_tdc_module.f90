@@ -625,8 +625,8 @@ module auto_diff_real_tdc_module
       binary%val = z_val
       binary%d1val1 = x%d1val1*z_d1x + y%d1val1*z_d1y
       binary%d1Array(1:33) = x%d1Array(1:33)*z_d1x + y%d1Array(1:33)*z_d1y
-      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1Array(1:33)*y%d1val1*z_d1x_d1y & 
-                                    + x%d1val1*y%d1Array(1:33)*z_d1x_d1y + x%d1val1_d1Array(1:33)*z_d1x & 
+      binary%d1val1_d1Array(1:33) = x%d1Array(1:33)*x%d1val1*z_d2x + x%d1Array(1:33)*y%d1val1*z_d1x_d1y &
+                                    + x%d1val1*y%d1Array(1:33)*z_d1x_d1y + x%d1val1_d1Array(1:33)*z_d1x &
                                     + y%d1Array(1:33)*y%d1val1*z_d2y + y%d1val1_d1Array(1:33)*z_d1y
    end function make_binary_operator
 
@@ -1389,7 +1389,7 @@ module auto_diff_real_tdc_module
       binary%val = pow(x%val, y%val)
       binary%d1val1 = q0*q4
       binary%d1Array(1:33) = q0*q5
-      binary%d1val1_d1Array(1:33) = (-q1*x%d1Array(1:33) + q2*y%d1val1_d1Array(1:33)*pow2(x%val) & 
+      binary%d1val1_d1Array(1:33) = (-q1*x%d1Array(1:33) + q2*y%d1val1_d1Array(1:33)*pow2(x%val) &
                                     + q4*q5 + x%val*(x%d1Array(1:33)*y%d1val1 + x%d1val1*y%d1Array(1:33) &
                                     + x%d1val1_d1Array(1:33)*y%val))*pow(x%val, 3.0_dp + y%val)*powm1(pow5(x%val))
    end function pow_self

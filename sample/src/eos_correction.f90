@@ -95,7 +95,6 @@
       end subroutine setup
 
       subroutine make_correction_table(X,Z,Ecorr,Ytab,Etab)
-         implicit none
          real(dp), intent(in) :: X, Z
          real(dp), dimension(num_lgTs, num_lgRhos) :: Ecorr,Ytab,Etab
          real(dp) :: Rho, T, log10Rho, log10T

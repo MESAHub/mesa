@@ -767,7 +767,7 @@ contains
       integer, intent(out) :: ierr
 
       integer(8) :: time0, time1, clock_rate
-      logical :: pause
+      logical ::do_pause
 
       include 'formats'
 
@@ -781,10 +781,10 @@ contains
       if (failed('onScreen_Plots')) return
       call update_pgbinary_history_file(b, ierr)
       if (failed('save_text_data')) return
-      pause = b% pg% pause
-      if ((.not. pause) .and. b% pg% pause_interval > 0) &
-         pause = (mod(b% model_number, b% pg% pause_interval) == 0)
-      if (pause) then
+      do_pause = b% pg% pause
+      if ((.not. do_pause) .and. b% pg% pause_interval > 0) &
+      do_pause = (mod(b% model_number, b% pg% pause_interval) == 0)
+      if (do_pause) then
          write(*, *)
          write(*, *) 'model_number', b% model_number
          write(*, *) 'pgbinary: paused -- hit RETURN to continue'
