@@ -102,6 +102,10 @@
       real(dp), pointer :: chiT(:) ! dlnPeos_dlnT at constant Rho
       real(dp), pointer :: QQ(:) ! thermal expansion coefficient
 
+      ! flux-limited radiation transport
+      real(dp), pointer :: flux_limit_lambda(:) ! flux limiter defined as in Levermore & Pomraning 1981
+      real(dp), pointer :: flux_limit_R(:) ! flux ratio defined as in Levermore & Pomraning 1981
+
       ! eos blend information
       real(dp), pointer :: eos_frac_OPAL_SCVH(:)
       real(dp), pointer :: eos_frac_HELM(:)
