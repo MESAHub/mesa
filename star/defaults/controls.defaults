@@ -216,7 +216,7 @@
       ! log_directory
       ! ~~~~~~~~~~~~~
 
-      ! for data files about the run
+      ! directory for data files about the run
 
       ! ::
 
@@ -226,7 +226,7 @@
       ! do_history_file
       ! ~~~~~~~~~~~~~~~
 
-      ! history file is created if this is true
+      ! a history file is created if this is true
 
       ! ::
 
@@ -1115,7 +1115,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the center entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1129,7 +1129,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when the max entropy is above/below the upper/lower limit.
-      ! in kerg per baryon
+      ! in kerg per baryon, where kerg = (erg K^-1)
 
       ! ::
 
@@ -1183,7 +1183,7 @@
       ! Lower limits on surface mass fractions.
       ! Stop when surface abundance drops below this limit.
       ! Can have up to ``num_xa_surface_limits`` of these (see ``star_def`` for value)
-      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f``
+      ! ``xa_surface_lower_limit_species`` contains an isotope name as defined in ``chem_def.f90``
       ! ``xa_surface_lower_limit`` contains the lower limit value
 
       ! ::
@@ -1246,7 +1246,7 @@
       ! HB_limit
       ! ~~~~~~~~
 
-      ! For detecting horizontal branch.
+      ! For detecting when the model has completed the horizontal branch.
       ! Only applies when center abundance by mass of h1 is < 1d-4.
       ! Stop when the center abundance by mass of he4 drops below this limit.
 
@@ -1298,6 +1298,8 @@
       ! star_species_mass_max_limit_iso
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+      ! Stop when a particular species mass in units of Msun exceeds these limits.
+      
       ! ::
 
     star_species_mass_min_limit = 0
@@ -1972,6 +1974,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is greater than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -1982,6 +1987,9 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! stop when Lnuc/L is less than this limit.
+      ! Here, Lnuc refers to the total thermal power from all burning, including photodisintegrations,
+      ! ``power_nuc_burn`` in the history_columns.list file.
+      ! L is the luminosity at the photosphere.
 
       ! ::
 
@@ -2022,7 +2030,7 @@
       ! Pgas_div_P_limit
       ! ~~~~~~~~~~~~~~~~
 
-      ! criteria for stopping on Pgas/P
+      ! criteria for stopping when Pgas/P <= Pgas_div_P_limit
 
       ! ::
 
@@ -2032,7 +2040,7 @@
       ! Pgas_div_P_limit_max_q
       ! ~~~~~~~~~~~~~~~~~~~~~~
 
-      ! stop if Pgas/P < this limit at any location with ``q <= Pgas_div_P_limit_max_q``
+      ! stop if Pgas/P < Pgas_div_P_limit at any location with ``q <= Pgas_div_P_limit_max_q``
       ! values near unity skip the outer envelope
 
       ! ::
