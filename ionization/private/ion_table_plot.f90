@@ -51,8 +51,8 @@
          lgT_min = 2.1
          lgQ_min = -10
          lgQ_max = 5.69
-         lgRho_min = -9 ! lgQ_min + 2*lgT_min - 12
-         lgRho_max = 8 ! lgQ_max + 2*lgT_max - 12
+         lgRho_min = -9  ! lgQ_min + 2*lgT_min - 12
+         lgRho_max = 8  ! lgQ_max + 2*lgT_max - 12
 
          ! test
          lgT_max = 7.5d0

@@ -87,7 +87,7 @@
             alfa = 0d0
             d_alfa_dlnT = 0d0
          end if
-         beta = 1d0 - alfa ! beta is fraction for low T
+         beta = 1d0 - alfa  ! beta is fraction for low T
 
          if (T9 >= T9_weaklib_full_on_hi_Z) then
             alfa_hi_Z = 1d0
@@ -282,11 +282,11 @@
           ! these terms are now handled elsewhere, so Q is just the change in rest mass.
           ! since Qx is made from atomic mass excesses, it includes the electron rest mass.
 
-          if (neg) then ! electron capture and positron emission
+          if (neg) then  ! electron capture and positron emission
              Q(i) = Qx
              dQ_dlnT(i) = 0
              dQ_dlnRho(i) = 0
-          else ! positron capture and electron emission
+          else  ! positron capture and electron emission
              Q(i) = Qx
              dQ_dlnT(i) = 0
              dQ_dlnRho(i) = 0

@@ -120,7 +120,7 @@
 
          call dealloc
 
-         if (.not. in_range) then ! have revised s% initial_mass
+         if (.not. in_range) then  ! have revised s% initial_mass
             s% mstar = s% initial_mass*Msun
             s% xmstar = s% mstar
             s% M_center = 0
@@ -187,7 +187,7 @@
          initial_mass = s% initial_mass
          nvar_hydro = s% nvar_hydro
 
-         call read_zams_header ! sets net_name
+         call read_zams_header  ! sets net_name
          if (ierr /= 0) then
             close(iounit)
             write(*,*) 'failed in read_zams_header'
@@ -209,13 +209,13 @@
          okay = .false.
          in_range = .true.
 
-         read(iounit, *, iostat=ierr) ! this is the 'M/Msun n_shells' header line
+         read(iounit, *, iostat=ierr)  ! this is the 'M/Msun n_shells' header line
          if (ierr == 0) then
             index_loop: do
                read(iounit, *, iostat=ierr) m2, nz2
                if (ierr /= 0) exit index_loop
-               if (m2 <= 0) then ! end of list
-                  read(iounit, *, iostat=ierr) ! blank line
+               if (m2 <= 0) then  ! end of list
+                  read(iounit, *, iostat=ierr)  ! blank line
                   m2 = m1
                   nz2 = nz1
                   in_range = .false.
@@ -234,7 +234,7 @@
                   ! skip to end of index
                   skip_loop: do
                      read(iounit, fmt='(a)', iostat=ierr) line
-                     if (len_trim(line) == 0) then ! blank line indicates end of index
+                     if (len_trim(line) == 0) then  ! blank line indicates end of index
                         okay = .true.
                         exit index_loop
                      end if
@@ -273,7 +273,7 @@
             use read_model, only: read_properties
             integer :: year_month_day_when_created, iprop
             real(dp) :: dprop, initial_z, initial_y
-            read(iounit, *, iostat=ierr) ! skip blank line before property list
+            read(iounit, *, iostat=ierr)  ! skip blank line before property list
             include 'formats'
             if (ierr /= 0) return
             year_month_day_when_created = -1
@@ -349,10 +349,10 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iounit, nz1, nz2, nvar_hydro, species
          real(dp), intent(in) :: m1, m2, initial_mass
-         real(dp), intent(inout) :: xh(:,:) ! (nvar_hydro,nz1)
-         real(dp), intent(inout) :: xa(:,:) ! (species,nz1)
+         real(dp), intent(inout) :: xh(:,:)  ! (nvar_hydro,nz1)
+         real(dp), intent(inout) :: xa(:,:)  ! (species,nz1)
          real(dp), intent(inout), dimension(:) :: &
-            q, dq, omega, j_rot ! (nz1)
+            q, dq, omega, j_rot  ! (nz1)
          integer, intent(out) :: ierr
 
          integer :: i, k, nz, nz_in, iprop
@@ -363,8 +363,8 @@
          real(dp) :: alfa, struct(nvar_hydro), comp(species)
          logical :: okay
          character (len=net_name_len) :: net_name
-         character(len=iso_name_length), pointer :: names(:) ! (species)
-         integer, pointer :: perm(:) ! (species)
+         character(len=iso_name_length), pointer :: names(:)  ! (species)
+         integer, pointer :: perm(:)  ! (species)
 
          include 'formats'
 
@@ -377,7 +377,7 @@
             names(species), perm(species), stat=ierr)
          if (ierr /= 0) return
          okay = .false.
-         mass_loop: do ! loop until find desired mass
+         mass_loop: do  ! loop until find desired mass
 
             m_in = -1; nz_in = -1; net_name = ''
             call read_properties(iounit, &
@@ -400,12 +400,12 @@
 
             if (abs(m_in-m_read) > 1d-4) then
 
-               do i = 1, nz_in ! skip this one
+               do i = 1, nz_in  ! skip this one
                   read(iounit, *, iostat=ierr)
                   if (ierr /= 0) exit mass_loop
                end do
 
-            else ! store this one
+            else  ! store this one
 
                if (nz /= nz_in) then
                   write(*, '(a, 2i6)') &
@@ -434,7 +434,7 @@
                end if
 
             end if
-            read(iounit, *, iostat=ierr) ! skip line following the last zone
+            read(iounit, *, iostat=ierr)  ! skip line following the last zone
             if (ierr /= 0) exit mass_loop
 
          end do mass_loop
@@ -445,7 +445,7 @@
             return
          end if
 
-         if (m1 /= m2) then ! interpolate linearly in log(m)
+         if (m1 /= m2) then  ! interpolate linearly in log(m)
             lnm1 = log(m1)
             lnm2 = log(m2)
             alfa = (log(initial_mass) - lnm2) / (lnm1 - lnm2)

@@ -295,7 +295,7 @@ contains
       ! point_data array at position j
 
       r(j) = s%r(1) + s%atm_structure(atm_delta_r,k)
-      m(j) = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
+      m(j) = s%m_grav(1)  !+ s%atm_structure(atm_delta_m,k)
       L(j) = s%L(1)
 
       P(j) = exp(s%atm_structure(atm_lnP,k))
@@ -359,7 +359,7 @@ contains
       Gamma_1(j) = eval_face(s%dq, s%gamma1, k, k_a, k_b)
       nabla_ad(j) = eval_face(s%dq, s%grada, k, k_a, k_b)
       delta(j) = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
-      nabla(j) = s%gradT(k) ! Not quite right; gradT can be discontinuous
+      nabla(j) = s%gradT(k)  ! Not quite right; gradT can be discontinuous
 
       kap(j) = eval_face(s%dq, s%opacity, k, k_a, k_b)
       kap_kap_T(j) = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)
@@ -371,7 +371,7 @@ contains
       if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
 
       if (s%rotation_flag) then
-         Omega_rot(j) = s%omega(k) ! Not quite right; omega can be discontinuous
+         Omega_rot(j) = s%omega(k)  ! Not quite right; omega can be discontinuous
       else
          Omega_rot = 0d0
       end if
@@ -406,7 +406,7 @@ contains
       end if
       ! at the centre d²P/dr² = -4πGρ²/3
       d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho(j)**2
-      P(j) = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+      P(j) = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
       T(j) = eval_center(s%rmid, s%T, 1, s%nz)
 
       N2(j) = 0d0

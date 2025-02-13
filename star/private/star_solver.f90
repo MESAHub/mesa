@@ -51,11 +51,11 @@
 
          type (star_info), pointer :: s
          ! the primary variables
-         integer, intent(in) :: nvar ! number of variables per zone
+         integer, intent(in) :: nvar  ! number of variables per zone
          logical, intent(in) :: skip_global_corr_coeff_limit
 
          ! convergence criteria
-         integer, intent(in) :: gold_tolerances_level ! 0, 1, or 2
+         integer, intent(in) :: gold_tolerances_level  ! 0, 1, or 2
          real(dp), intent(in) :: tol_max_correction, tol_correction_norm
             ! a trial solution is considered to have converged if
             ! max_correction <= tol_max_correction and
@@ -72,7 +72,7 @@
 
          ! output
          logical, intent(out) :: convergence_failure
-         integer, intent(out) :: ierr ! 0 means okay.
+         integer, intent(out) :: ierr  ! 0 means okay.
 
          integer :: ldAF, neqns
 
@@ -106,7 +106,7 @@
          integer, intent(in) :: nvar, ldAF, neq
          logical, intent(in) :: skip_global_corr_coeff_limit
 
-         real(dp), pointer, dimension(:) :: AF1 ! =(ldAF, neq)
+         real(dp), pointer, dimension(:) :: AF1  ! =(ldAF, neq)
 
          ! controls
          integer, intent(in) :: gold_tolerances_level
@@ -155,10 +155,10 @@
          character (len=64) :: message
 
          real(dp), pointer, dimension(:) :: equ1=>null()
-         real(dp), pointer, dimension(:,:) :: equ=>null() ! (nvar,nz)
-         real(dp), pointer, dimension(:,:) :: AF=>null() ! (ldAF,neq)
-         real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null() ! (nvar,nvar,nz)
-         real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null() ! (nvar,nvar,nz)
+         real(dp), pointer, dimension(:,:) :: equ=>null()  ! (nvar,nz)
+         real(dp), pointer, dimension(:,:) :: AF=>null()  ! (ldAF,neq)
+         real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null()  ! (nvar,nvar,nz)
+         real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null()  ! (nvar,nvar,nz)
 
          call do_solver_work()
          ! Split it this way so we can guarantee cleanup() gets called once do_solver_work finishes
@@ -222,8 +222,8 @@
                tol_max_residual3 = s% tol_max_residual3
             end if
 
-            tol_abs_slope_min = -1 ! unused
-            tol_corr_resid_product = -1 ! unused
+            tol_abs_slope_min = -1  ! unused
+            tol_corr_resid_product = -1  ! unused
             if (skip_global_corr_coeff_limit) then
                min_corr_coeff = 1
             else
@@ -247,8 +247,8 @@
             end if
 
             doing_extra = .false.
-            passed_tol_tests = .false. ! goes true when pass the tests
-            convergence_failure = .false. ! goes true when time to give up
+            passed_tol_tests = .false.  ! goes true when pass the tests
+            convergence_failure = .false.  ! goes true when time to give up
             coeff = 1.d0
 
             residual_norm=0
@@ -349,7 +349,7 @@
                      write(*,*) 'first model is slow to converge: num tries', &
                         s% num_solver_iterations
 
-               if (.not. solve_equ()) then ! either singular or horribly ill-conditioned
+               if (.not. solve_equ()) then  ! either singular or horribly ill-conditioned
                   write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
                   call oops(err_msg)
                   exit iter_loop
@@ -420,7 +420,7 @@
 
                ! fix B if out of definition domain
                call Bdomain(s, nvar, soln, correction_factor, ierr)
-               if (ierr /= 0) then ! correction cannot be fixed
+               if (ierr /= 0) then  ! correction cannot be fixed
                   call oops('correction rejected by Bdomain')
                   exit iter_loop
                end if
@@ -431,7 +431,7 @@
                   call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
 
                   slope = eval_slope(nvar, nz, grad_f, soln)
-                  if (is_bad_num(slope) .or. slope > 0d0) then ! a very bad sign
+                  if (is_bad_num(slope) .or. slope > 0d0) then  ! a very bad sign
                      if (is_bad_num(slope) .and. s% stop_for_bad_nums) then
                         write(*,1) 'slope', slope
                         call mesa_error(__FILE__,__LINE__,'solver')
@@ -528,14 +528,14 @@
                            write(*,2) 'max_residual > tol_max_residual', &
                               s% model_number, max_residual, tol_max_residual
                      end if
-                     if (disabled_resid_tests) then ! no coeff for corrections
+                     if (disabled_resid_tests) then  ! no coeff for corrections
                         if (correction_norm > tol_correction_norm) &
                            write(*,2) 'correction_norm > tol_correction_norm', &
                               s% model_number, correction_norm, tol_correction_norm, coeff
                         if (max_abs_correction > tol_max_correction) &
                            write(*,2) 'max_abs_correction > tol_max_correction', &
                               s% model_number, max_abs_correction, tol_max_correction, coeff
-                     else ! include coeff for corrections
+                     else  ! include coeff for corrections
                         if (correction_norm > tol_correction_norm*coeff) &
                            write(*,2) 'correction_norm > tol_correction_norm*coeff', &
                               s% model_number, correction_norm, tol_correction_norm*coeff, coeff
@@ -588,13 +588,13 @@
                   ! about to declare victory... but may want to do another iteration
                   force_iter_value = force_another_iteration(s, iter, s% solver_itermin)
                   if (force_iter_value > 0) then
-                     passed_tol_tests = .false. ! force another
-                     tiny_corr_cnt = 0 ! reset the counter
+                     passed_tol_tests = .false.  ! force another
+                     tiny_corr_cnt = 0  ! reset the counter
                      corr_norm_min = 1d99
                      resid_norm_min = 1d99
                      max_corr_min = 1d99
                      max_resid_min = 1d99
-                  else if (force_iter_value < 0) then ! failure
+                  else if (force_iter_value < 0) then  ! failure
                      call oops('force iter')
                      exit iter_loop
                   end if
@@ -628,7 +628,7 @@
          subroutine solver_test_partials(nvar, xder, ierr)
             ! create jacobian by using numerical differences for partial derivatives
             integer, intent(in) :: nvar
-            real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
+            real(dp), pointer, dimension(:,:) :: xder  ! (nvar, nz)
             integer, intent(out) :: ierr
 
             integer :: j, k, k_lo, k_hi
@@ -638,7 +638,7 @@
             include 'formats'
 
             ierr = 0
-            testing_partial = & ! check inlist parameters
+            testing_partial = &  ! check inlist parameters
                s% solver_test_partials_dx_0 > 0d0 .and. &
                s% solver_test_partials_k > 0 .and. &
                s% solver_call_number == s% solver_test_partials_call_number .and. &
@@ -657,7 +657,7 @@
                end do
             end do
 
-            s% doing_check_partials = .true. ! let set_vars_for_solver know
+            s% doing_check_partials = .true.  ! let set_vars_for_solver know
             k_lo = s% solver_test_partials_k_low
             if (k_lo > 0 .and. k_lo <= s% nz) then
                k_hi = s% solver_test_partials_k_high
@@ -727,7 +727,7 @@
 
          subroutine prepare_solver_matrix(nvar, xder, ierr)
             integer, intent(in) :: nvar
-            real(dp), pointer, dimension(:,:) :: xder ! (nvar, nz)
+            real(dp), pointer, dimension(:,:) :: xder  ! (nvar, nz)
             integer, intent(out) :: ierr
             integer :: nz, neqns
             include 'formats'
@@ -745,8 +745,8 @@
                err_msg, ierr)
             real(dp), intent(in) :: min_corr_coeff_in
             real(dp), intent(in) :: max_corr_coeff
-            real(dp), intent(in) :: grad_f(:) ! (neq) ! gradient df/ddx at xold
-            real(dp), intent(out) :: f ! 1/2 fvec^2. minimize this.
+            real(dp), intent(in) :: grad_f(:)  ! (neq) ! gradient df/ddx at xold
+            real(dp), intent(out) :: f  ! 1/2 fvec^2. minimize this.
             real(dp), intent(in) :: slope
             real(dp), intent(out) :: coeff
 
@@ -764,7 +764,7 @@
             real(dp) :: f_target
             logical :: skip_eval_f, dbg_adjust
 
-            real(dp), parameter :: alf = 1d-2 ! ensures sufficient decrease in f
+            real(dp), parameter :: alf = 1d-2  ! ensures sufficient decrease in f
 
             real(dp), parameter :: alam_factor = 0.2d0
 
@@ -799,7 +799,7 @@
                end if
             end if
             fold = f
-            min_corr_coeff = min(min_corr_coeff_in, max_corr_coeff) ! make sure min <= max
+            min_corr_coeff = min(min_corr_coeff_in, max_corr_coeff)  ! make sure min <= max
             alam = max_corr_coeff
             first_time = .true.
             f2 = 0
@@ -865,11 +865,11 @@
 
                f_target = max(fold/2, fold + alf*coeff*slope)
                if (f <= f_target) then
-                  return ! sufficient decrease in f
+                  return  ! sufficient decrease in f
                end if
 
                if (alam <= min_corr_coeff) then
-                  return ! time to give up
+                  return  ! time to give up
                end if
 
                ! reduce alam and try again
@@ -886,7 +886,7 @@
                      write(*,5) '2*(f-fold-slope)', k, iter, s% solver_iter, &
                         s% model_number, 2*(f-fold-slope)
                   end if
-               else ! have two prior f values to work with
+               else  ! have two prior f values to work with
                   rhs1 = f - fold - alam*slope
                   rhs2 = f2 - fold - alam2*slope
                   a1 = (rhs1/(alam*alam) - rhs2/(alam2*alam2))/(alam - alam2)
@@ -1084,7 +1084,7 @@
             write(*,'(A)')
             i_equ = lookup_nameofequ(s, s% solver_test_partials_equ_name)
             if (i_equ == 0 .and. len_trim(s% solver_test_partials_equ_name) > 0) then
-               if (s% solver_test_partials_equ_name == 'lnE') then ! testing eos
+               if (s% solver_test_partials_equ_name == 'lnE') then  ! testing eos
                   i_equ = -1
                else if (s% solver_test_partials_equ_name == 'eps_nuc') then
                   i_equ = -2
@@ -1106,7 +1106,7 @@
             end if
             i_var = lookup_nameofvar(s, s% solver_test_partials_var_name)
             if (i_var /= 0) write(*,1) 'var name ' // trim(s% solver_test_partials_var_name)
-            if (i_var > s% nvar_hydro) then ! get index in xa
+            if (i_var > s% nvar_hydro) then  ! get index in xa
                i_var_xa_index = i_var - s% nvar_hydro
             else
                i_var_xa_index = 0
@@ -1115,7 +1115,7 @@
             i_var_sink_xa_index  = 0
             if (i_var_sink > 0 .and. i_var > s% nvar_hydro) then
                write(*,1) 'sink name ' // trim(s% solver_test_partials_sink_name)
-               if (i_var_sink > s% nvar_hydro) then ! get index in xa
+               if (i_var_sink > s% nvar_hydro) then  ! get index in xa
                   i_var_sink_xa_index = i_var_sink - s% nvar_hydro
                else
                   write(*,*) 'ERROR: sink name must be a chem name for the current net'
@@ -1166,12 +1166,12 @@
                      k, save_dx, save_equ, ierr)
                   if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'failed solver_test_partials')
                end if
-            else ! i_equ == 0
+            else  ! i_equ == 0
                if (i_var /= 0) then
                   call test1_partial(s, &
                      i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                      k, 0, s% solver_test_partials_dval_dx, save_dx, save_equ, ierr)
-               else ! i_var == 0
+               else  ! i_var == 0
                   if (s% solver_test_partials_var <= 0) then
                      write(*,2) 'need to set solver_test_partials_var', s% solver_test_partials_var
                      write(*,2) 'for solver_test_partials_k', s% solver_test_partials_k
@@ -1348,7 +1348,7 @@
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var > s% nvar_hydro) then
-               dvardx0_00 = 0d0 ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
+               dvardx0_00 = 0d0  ! s% d_opacity_dx(i_var_xa_index,k) - s% d_opacity_dx(i_var_sink_xa_index,k)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_opacity_dlnd(k)
             else if (i_var == s% i_lnT) then
@@ -1370,7 +1370,7 @@
             dvardx0_00 = 0d0
             dvardx0_p1 = 0d0
             if (i_equ > 0) then
-               if (i_var > s% nvar_hydro) then ! testing abundance
+               if (i_var > s% nvar_hydro) then  ! testing abundance
                   if (k > 1) dvardx0_m1 = &
                      s% lblk(i_equ,i_var,k)/s% x_scale(i_var,k-1) - s% lblk(i_equ,i_var_sink,k)/s% x_scale(i_var_sink,k-1)
                   dvardx0_00 = &
@@ -1382,35 +1382,35 @@
                   dvardx0_00 = s% dblk(i_equ,i_var,k)/s% x_scale(i_var,k)
                   if (k < s% nz) dvardx0_p1 = s% ublk(i_equ,i_var,k)/s% x_scale(i_var,k+1)
                end if
-            else if (i_equ == -1) then ! 'lnE'
+            else if (i_equ == -1) then  ! 'lnE'
                call get_lnE_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            elseif (i_equ == -2) then ! 'eps_nuc'
+            elseif (i_equ == -2) then  ! 'eps_nuc'
                call get_eps_nuc_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -3) then ! 'opacity'
+            else if (i_equ == -3) then  ! 'opacity'
                call get_opacity_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -4) then ! 'lnP'
+            else if (i_equ == -4) then  ! 'lnP'
                call get_lnP_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -5) then ! 'non_nuc_neu'
+            else if (i_equ == -5) then  ! 'non_nuc_neu'
                call get_non_nuc_neu_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -6) then ! 'gradT'
+            else if (i_equ == -6) then  ! 'gradT'
                call get_gradT_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -7) then ! 'mlt_vc'
+            else if (i_equ == -7) then  ! 'mlt_vc'
                call get_mlt_vc_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
-            else if (i_equ == -8) then ! 'grad_ad'
+            else if (i_equ == -8) then  ! 'grad_ad'
                call get_grad_ad_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
                   dvardx0_m1, dvardx0_00, dvardx0_p1)
@@ -1450,7 +1450,7 @@
             include 'formats'
             ierr = 0
 
-            if (i_var > s% nvar_hydro) then ! testing abundance
+            if (i_var > s% nvar_hydro) then  ! testing abundance
                dx_0 = s% solver_test_partials_dx_0 * &
                   max(abs(s% xa_start(i_var_xa_index,k) + s% solver_dx(i_var,k)), &
                       abs(s% xa_start(i_var_xa_index,k)), &
@@ -1553,7 +1553,7 @@
             real(dp), pointer, dimension(:,:) :: save_dx
             include 'formats'
             s% solver_dx(i_var,k+k_off) = save_dx(i_var,k+k_off) + delta_x
-            if (i_var_xa_index > 0) then ! changing abundance
+            if (i_var_xa_index > 0) then  ! changing abundance
                !write(*,2) 'new dx, x for abundance', i_var, &
                !     dx(i_var,k+k_off), s% xa(i_var - s% nvar_hydro,k+k_off)
                if (i_var_sink_xa_index <= 0 .or. i_var_sink_xa_index > s% species) then
@@ -1569,7 +1569,7 @@
                call mesa_error(__FILE__,__LINE__,'setmatrix')
             end if
             if (i_equ > 0) then
-               val = equ(i_equ,k) ! testing partial of residual for cell k equation
+               val = equ(i_equ,k)  ! testing partial of residual for cell k equation
             else if (i_equ == 0) then
                val = s% solver_test_partials_val
             else if (i_equ == -1) then
@@ -1592,7 +1592,7 @@
                val = 0d0
             end if
             s% solver_dx(i_var,k+k_off) = save_dx(i_var,k+k_off)
-            if (i_var_sink > 0) & ! restore sink abundance
+            if (i_var_sink > 0) &  ! restore sink abundance
                s% solver_dx(i_var_sink,k+k_off) = save_dx(i_var_sink,k+k_off)
          end function dfridr_func
 

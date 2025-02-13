@@ -55,8 +55,8 @@
          character (len=*), intent(in) :: reactionlist_filename, jina_reaclib_filename, rates_table_dir_in
          logical, intent(in) :: use_special_weak_rates, use_suzuki_weak_rates
          character (len=*), intent(in) :: special_weak_states_file, special_weak_transitions_file
-         character (len=*), intent(in) :: cache_dir ! '' means use default
-         integer, intent(out) :: ierr ! 0 means AOK.
+         character (len=*), intent(in) :: cache_dir  ! '' means use default
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -115,7 +115,7 @@
 
       subroutine read_raw_rates_records(ierr)
          use rates_initialize, only: init_raw_rates_records
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          call init_raw_rates_records(ierr)
          if (ierr /= 0) then
@@ -178,9 +178,9 @@
 
       subroutine add_reaction_from_reaclib(reaction_handle, reverse_handle, indx, ierr)
          use rates_initialize, only: do_add_reaction_from_reaclib
-         character (len=*), intent(in) :: reaction_handle ! to be added
-         character (len=*), intent(in) :: reverse_handle ! = '' if not a reverse
-         integer, intent(in) :: indx ! index in reaclib rates
+         character (len=*), intent(in) :: reaction_handle  ! to be added
+         character (len=*), intent(in) :: reverse_handle  ! = '' if not a reverse
+         integer, intent(in) :: indx  ! index in reaclib rates
          integer, intent(out) :: ierr
          call do_add_reaction_from_reaclib(reaction_handle, reverse_handle, indx, ierr)
       end subroutine add_reaction_from_reaclib
@@ -188,7 +188,7 @@
 
       subroutine add_reaction_for_handle(handle, ierr)
          use rates_initialize, only: do_add_reaction_for_handle
-         character (len=*), intent(in) :: handle ! to be added
+         character (len=*), intent(in) :: handle  ! to be added
          integer, intent(out) :: ierr
          call do_add_reaction_for_handle(handle, ierr)
       end subroutine add_reaction_for_handle
@@ -266,7 +266,7 @@
       subroutine eval_tfactors(tf, logT, temp)
          use rates_def, only : T_Factors
          use ratelib, only: tfactors
-         type (T_Factors), pointer :: tf ! allocate this before calling
+         type (T_Factors), pointer :: tf  ! allocate this before calling
          real(dp), intent(in) :: logT, temp
          call tfactors(tf, logT, temp)
       end subroutine eval_tfactors
@@ -288,7 +288,7 @@
          use rates_def, only : T_Factors
          use raw_rates, only: set_raw_rates
          integer, intent(in) :: n
-         integer, intent(in) :: irs(:) ! (n) maps 1..n to reaction id
+         integer, intent(in) :: irs(:)  ! (n) maps 1..n to reaction id
          real(dp), intent(in) :: temp
          type (T_Factors), pointer :: tf
          real(dp), intent(inout) :: rates(:)
@@ -298,7 +298,7 @@
 
       integer function rates_reaction_id(rname)
          use rates_def, only: get_rates_reaction_id
-         character (len=*), intent(in)  :: rname ! reaction name such as 'rpp'
+         character (len=*), intent(in)  :: rname  ! reaction name such as 'rpp'
          ! returns id for the reaction if there is a matching entry in reaction_Name
          ! returns 0 otherwise.
          rates_reaction_id = get_rates_reaction_id(rname)
@@ -320,7 +320,7 @@
       subroutine rates_eval_reaclib_21( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use rates_support, only: do_eval_reaclib_21
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
@@ -332,7 +332,7 @@
       subroutine rates_eval_reaclib_22( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use rates_support, only: do_eval_reaclib_22
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
@@ -370,7 +370,7 @@
       ! note: assumes ground state spins and requires Q > 0.
       ! i.e., A + B -> C exothermic
       subroutine rates_two_to_one_reverse_factor( &
-            Q, T9, T932, iso_A, iso_B, iso_C, rev, d_rev_dT, ierr) ! A + B <-> C
+            Q, T9, T932, iso_A, iso_B, iso_C, rev, d_rev_dT, ierr)  ! A + B <-> C
          use math_lib
          real(dp), intent(in) :: Q, T9, T932
          integer, intent(in) :: iso_A, iso_B, iso_C
@@ -416,7 +416,7 @@
       ! note: assumes ground state spins and requires Q > 0.
       ! i.e., A + B -> C + D exothermic
       subroutine rates_two_to_two_reverse_factor( &
-            Q, T9, iso_A, iso_B, iso_C, iso_D, rev, d_rev_dT, ierr) ! A + B <-> C + D
+            Q, T9, iso_A, iso_B, iso_C, iso_D, rev, d_rev_dT, ierr)  ! A + B <-> C + D
          use math_lib
          real(dp), intent(in) :: Q, T9
          integer, intent(in) :: iso_A, iso_B, iso_C, iso_D
@@ -431,9 +431,9 @@
       end subroutine rates_two_to_two_reverse_factor
 
 
-      logical function is_weak_reaction(ir) ! not just weaklib.  any weak reaction.
+      logical function is_weak_reaction(ir)  ! not just weaklib.  any weak reaction.
          use rates_def, only: weak_reaction_info, std_reaction_neuQs
-         integer, intent(in) :: ir ! reaction index
+         integer, intent(in) :: ir  ! reaction index
          is_weak_reaction = &
             (weak_reaction_info(1,ir) > 0 .and. weak_reaction_info(2,ir) > 0) .or. &
             (std_reaction_neuQs(ir) > 0)
@@ -445,23 +445,23 @@
       !   OHMT: Oda, Hino, Muto, Takahara, and Sato. Atomic Data and Nuclear Data Tables, 1994.
       !   LMP: K. Langanke, G. Martínez-Pinedo / Nuclear Physics A 673 (2000) 481–508
 
-      integer function get_weak_rate_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function get_weak_rate_id(lhs, rhs)  ! returns 0 if reaction not found
          use rates_def, only: do_get_weak_rate_id
          character (len=*), intent(in)  :: lhs, rhs
          get_weak_rate_id = do_get_weak_rate_id(lhs, rhs)
       end function get_weak_rate_id
 
-      integer function get_weak_info_list_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function get_weak_info_list_id(lhs, rhs)  ! returns 0 if reaction not found
          ! value can be used to index weak_info_list_halflife and weak_info_list_Qneu
          use rates_def, only: do_get_weak_info_list_id
-         character (len=*), intent(in)  :: lhs, rhs ! names as in weak_info.list file
+         character (len=*), intent(in)  :: lhs, rhs  ! names as in weak_info.list file
          get_weak_info_list_id = do_get_weak_info_list_id(lhs, rhs)
       end function get_weak_info_list_id
 
 
       ! ecapture
 
-      integer function get_ecapture_rate_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function get_ecapture_rate_id(lhs, rhs)  ! returns 0 if reaction not found
          use rates_def
          use utils_lib
          character (len=*), intent(in)   :: lhs, rhs
@@ -482,11 +482,11 @@
          get_ecapture_rate_id = i
       end function get_ecapture_rate_id
 
-      integer function get_ecapture_info_list_id(lhs, rhs) ! returns 0 if reaction not found
+      integer function get_ecapture_info_list_id(lhs, rhs)  ! returns 0 if reaction not found
          ! value can be used to index ecapture_info_life_halflife and ecapture_info_list_Qneu
          use rates_def
          use utils_lib
-         character (len=*), intent(in)   :: lhs, rhs ! names as in ecapture_info.list file
+         character (len=*), intent(in)   :: lhs, rhs  ! names as in ecapture_info.list file
          integer :: ierr, i
          character (len=2*iso_name_length+1) :: key
          character (len=iso_name_length) :: lhs_name, rhs_name
@@ -509,8 +509,8 @@
          use reaclib_support, only: do_parse_reaction_handle
          character (len=*), intent(in) :: handle
          integer, intent(out) :: num_in, num_out
-         integer, intent(out) :: iso_ids(:) ! holds chem_ids for input and output species
-         character (len=*), intent(out) :: op ! e.g., 'pg', 'wk', 'to', or ...
+         integer, intent(out) :: iso_ids(:)  ! holds chem_ids for input and output species
+         character (len=*), intent(out) :: op  ! e.g., 'pg', 'wk', 'to', or ...
          integer, intent(out) :: ierr
          call do_parse_reaction_handle(handle, num_in, num_out, iso_ids, op, ierr)
       end subroutine reaclib_parse_handle
@@ -518,7 +518,7 @@
       subroutine reaclib_create_handle(num_in, num_out, iso_ids, handle)
          use reaclib_support, only: reaction_handle
          integer, intent(in) :: num_in, num_out
-         integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
+         integer, intent(in) :: iso_ids(:)  ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
          character (len=1), parameter :: reaction_flag = '-'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)
@@ -527,7 +527,7 @@
       subroutine reaclib_create_ec_handle(num_in, num_out, iso_ids, handle)
          use reaclib_support, only: reaction_handle
          integer, intent(in) :: num_in, num_out
-         integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
+         integer, intent(in) :: iso_ids(:)  ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
          character (len=1), parameter :: reaction_flag = 'e'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)
@@ -536,7 +536,7 @@
       subroutine reaclib_create_wk_handle(num_in, num_out, iso_ids, handle)
          use reaclib_support, only: reaction_handle
          integer, intent(in) :: num_in, num_out
-         integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
+         integer, intent(in) :: iso_ids(:)  ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
          character (len=1), parameter :: reaction_flag = 'w'
          call reaction_handle(num_in, num_out, iso_ids, reaction_flag, handle)
@@ -545,7 +545,7 @@
       subroutine reaclib_create_reverse_handle(num_in, num_out, iso_ids, handle)
          use reaclib_support, only: reverse_reaction_handle
          integer, intent(in) :: num_in, num_out
-         integer, intent(in) :: iso_ids(:) ! holds chem_ids for input and output species
+         integer, intent(in) :: iso_ids(:)  ! holds chem_ids for input and output species
          character (len=*), intent(out) :: handle
          call reverse_reaction_handle(num_in, num_out, iso_ids, handle)
       end subroutine reaclib_create_reverse_handle
@@ -557,8 +557,8 @@
          ! returns 0 if handle doesn't match any of the reactions
          use rates_def
          use reaclib_eval, only: do_reaclib_lookup
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
-         type (integer_dict), pointer :: rates_dict ! from create_reaclib_rates_dict
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
+         type (integer_dict), pointer :: rates_dict  ! from create_reaclib_rates_dict
          indx = do_reaclib_lookup(handle, rates_dict)
       end function reaclib_lookup
 
@@ -580,7 +580,7 @@
       subroutine reaclib_indices_for_reaction(handle, rates, lo, hi, ierr)
          use reaclib_eval, only: do_reaclib_indices_for_reaction
          use rates_def
-         character(len=*), intent(in) :: handle ! as in rates% reaction_handle
+         character(len=*), intent(in) :: handle  ! as in rates% reaction_handle
          type(reaction_data), intent(in) :: rates
          integer, intent(out) :: lo, hi
          integer, intent(out) :: ierr
@@ -595,7 +595,7 @@
             ierr)
          use rates_def
          use reaclib_eval, only: do_reaclib_reaction_rates
-         integer, intent(in) :: lo, hi ! from reaclib_indices_for_reaction
+         integer, intent(in) :: lo, hi  ! from reaclib_indices_for_reaction
          real(dp), intent(in) :: T9
          type(reaction_data), intent(in) :: rates
          type(nuclide_data), intent(in) :: nuclides
@@ -713,11 +713,11 @@
          ! with equations (4-215) and (4-221) of Clayton (1968).
          use rates_def
          use math_lib
-         type (Screen_Info) :: sc ! previously setup
+         type (Screen_Info) :: sc  ! previously setup
          real(dp), intent(in) :: z1, z2
-         real(dp), intent(out) :: scor ! screening factor
-         real(dp), intent(out) :: scordt ! partial wrt temperature
-         real(dp), intent(out) :: scordd ! partial wrt density
+         real(dp), intent(out) :: scor  ! screening factor
+         real(dp), intent(out) :: scordt  ! partial wrt temperature
+         real(dp), intent(out) :: scordd  ! partial wrt density
          integer, intent(out) :: ierr
          real(dp) :: zeta, lnf, rho, T, dlnf_dd, dlnf_dt
          ierr = 0
@@ -821,16 +821,16 @@
          use screen5, only: fxt_screen5
          use screening_chugunov, only: eval_screen_chugunov
 
-         type (Screen_Info) :: sc ! previously setup
+         type (Screen_Info) :: sc  ! previously setup
          real(dp), intent(in) :: a1, z1, a2, z2
-         integer, intent(in) :: screening_mode ! see screen_def.
+         integer, intent(in) :: screening_mode  ! see screen_def.
          ! cached info
          real(dp), intent(in) :: zs13, zhat, zhat2, lzav, aznut, zs13inv
-         real(dp), intent(in) :: low_logT_lim ! scor==0 for T < low_logT_lim
+         real(dp), intent(in) :: low_logT_lim  ! scor==0 for T < low_logT_lim
          ! outputs
-         real(dp), intent(out) :: scor ! screening factor
-         real(dp), intent(out) :: scordt ! partial wrt temperature
-         real(dp), intent(out) :: scordd ! partial wrt density
+         real(dp), intent(out) :: scor  ! screening factor
+         real(dp), intent(out) :: scordt  ! partial wrt temperature
+         real(dp), intent(out) :: scordd  ! partial wrt density
          integer, intent(out) :: ierr
 
          if(sc% logT < low_logT_lim ) then
@@ -898,22 +898,22 @@
          ! need to add transition region in U instead of having an abrupt change at U = 1
 
          use pycno, only: FL_epsnuc_3alf
-         real(dp), intent(in) :: T ! temperature
-         real(dp), intent(in) :: Rho ! density
-         real(dp), intent(in) :: Y ! helium mass fraction
-         real(dp), intent(in) :: UE ! electron molecular weight
-         real(dp), intent(out) :: eps_nuc ! eps_nuc in ergs/g/sec
-         real(dp), intent(out) :: deps_nuc_dT ! partial wrt temperature
-         real(dp), intent(out) :: deps_nuc_dRho ! partial wrt density
+         real(dp), intent(in) :: T  ! temperature
+         real(dp), intent(in) :: Rho  ! density
+         real(dp), intent(in) :: Y  ! helium mass fraction
+         real(dp), intent(in) :: UE  ! electron molecular weight
+         real(dp), intent(out) :: eps_nuc  ! eps_nuc in ergs/g/sec
+         real(dp), intent(out) :: deps_nuc_dT  ! partial wrt temperature
+         real(dp), intent(out) :: deps_nuc_dRho  ! partial wrt density
          call FL_epsnuc_3alf(T, Rho, Y, UE, eps_nuc, deps_nuc_dT, deps_nuc_dRho)
       end subroutine eval_FL_epsnuc_3alf
 
       subroutine eval_n14_electron_capture_rate(T,Rho,UE,rate)
          use ratelib, only: n14_electron_capture_rate
-         real(dp), intent(in) :: T ! temperature
-         real(dp), intent(in) :: Rho ! density
-         real(dp), intent(in) :: UE ! electron molecular weight
-         real(dp), intent(out) :: rate ! (s^-1)
+         real(dp), intent(in) :: T  ! temperature
+         real(dp), intent(in) :: Rho  ! density
+         real(dp), intent(in) :: UE  ! electron molecular weight
+         real(dp), intent(out) :: rate  ! (s^-1)
          call n14_electron_capture_rate(T,Rho,UE,rate)
       end subroutine eval_n14_electron_capture_rate
 

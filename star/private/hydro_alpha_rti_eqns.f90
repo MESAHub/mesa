@@ -131,7 +131,7 @@
             source_minus = RTI_D*a_00*cs/rmid
          end if
 
-         instability2 = -dPdr_drhodr ! > 0 means Rayleigh-Taylor unstable
+         instability2 = -dPdr_drhodr  ! > 0 means Rayleigh-Taylor unstable
          if (instability2 <= 0d0 .or. &
                s% q(k) > s% alpha_RTI_src_max_q .or. &
                s% q(k) < s% alpha_RTI_src_min_q) then
@@ -144,7 +144,7 @@
             instability = sqrt(instability2)
             if (s% alpha_RTI_start(k) < s% RTI_max_alpha) then
                A_plus_B_div_rho = (s% RTI_A + RTI_B*a_00)/rho
-            else ! turn off source when reach max
+            else  ! turn off source when reach max
                A_plus_B_div_rho = 0d0
             end if
             source_plus = A_plus_B_div_rho*instability

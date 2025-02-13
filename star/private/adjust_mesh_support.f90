@@ -155,7 +155,7 @@
             call do1_dlog_eps_dlogP_coef(s% mesh_dlog_photo_dlogP_extra, iphoto)
             call do1_dlog_eps_dlogP_coef(s% mesh_dlog_other_dlogP_extra, iother)
 
-            if (s% mesh_delta_coeff_factor_smooth_iters > 0) then ! smooth delta_gval_max
+            if (s% mesh_delta_coeff_factor_smooth_iters > 0) then  ! smooth delta_gval_max
 
                do k=1,nz
                   src(k) = delta_gval_max(k)

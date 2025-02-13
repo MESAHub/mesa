@@ -12,6 +12,16 @@ Changelog
 Changes in main
 ===============
 
+.. _Backwards-incompatible changes main:
+
+Backwards-incompatible changes
+------------------------------
+
+``pgstar`` / ``pgbinary``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Removed `file_extension` option because it is redundant with `file_device`. Delete `file_extension` from your inlists.
+
 .. _New Features main:
 
 New Features
@@ -46,7 +56,7 @@ New Features
 **Update to starspots**
 
 Star spot parameters ``fspot``, and ``xspot`` have been added as general controls
-and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default. 
+and are now accessible outside of ``test_suite/starspots/``. Star spots are off by default.
 
 **Replacement of HDF5io by ForUM**
 
@@ -96,7 +106,7 @@ dramatic increase in table density (in the X--Z plane) over the standard
 126 individual tables provided in previous opacity releases. These tables
 are available for four solar-scaled abundance mixtures constructed from photospheric estimates of the solar heavy element abundance:
 (`GS98, Grevesse & Sauval 1998 <https://ui.adsabs.harvard.edu/abs/1998SSRv...85..161G/abstract>`_),
-(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),  
+(`AGSS09(a09p), Asplund et al. 2009 <https://ui.adsabs.harvard.edu/abs/2009ARA%26A..47..481A/abstract>`_),
 (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
 and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_). Users can
 adopt this new set of tables by selecting one of the following
@@ -106,10 +116,10 @@ options for ``kap_file_prefix``:
 + ``'oplib_agss09'``
 + ``'oplib_aag21'``
 + ``'oplib_mb22'``
- 
+
 See :ref:`kap/overview:Overview of kap module` and
 :ref:`kap/defaults:kap_file_prefix` for more details on the
-implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with 
+implementation of these tables. For further details on these new OPLIB opacity tables, a direct comparison with
 the Type 1 OPAL/OP tables as well as their effect on solar models can be found in
 in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 
@@ -117,7 +127,7 @@ in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
 **Low Temperature Opacity Tables**
 
 Low temperature Rosseland-mean opacity tables for both (`AAG21, Asplund et al. 2021 <https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.141A/abstract>`_),
-and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_) 
+and (`MB22, Magg et al. 2022 <https://doi.org/10.1051/0004-6361/202142971>`_)
 solar-scaled abundance mixtures have been privately communicated by Jason Ferguson. These opacity tables were
 computed following the approach of `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`_. Users can
 adopt this new set of tables by selecting one of the following
@@ -131,7 +141,7 @@ options for :ref:`kap/defaults:kap_lowT_prefix`:
 We have updated the opacity interpolation scheme to provide much higher quality derivatives when doing cubic interpolation in composition.
 
 MESA interpolates across opacity tables in the :math:`X–Z` plane through the use of two consecutive 1D splines.
-MESA offers users the ability to choose linear or cubic interpolation for these splines, 
+MESA offers users the ability to choose linear or cubic interpolation for these splines,
 while leaving the default as linear interpolation::
 
   cubic_interpolation_in_X = .false.
@@ -154,12 +164,12 @@ derivatives and blue indicates high quality derivatives.
 
 
 While the opacity derivatives do not directly appear in the canonical equations of stellar structure, they do appear in the Jacobian matrix for MESA's implicit solver.
-Numerically unstable opacity derivatives can halt the progress of the solver and ultimately crash a calculation. 
+Numerically unstable opacity derivatives can halt the progress of the solver and ultimately crash a calculation.
 
 To improve the numerical stability of MESA's cubic opacity interpolation routines, we have implemented
 automatic differentiation into the opacity interpolating functions. Now, when using cubic interpolation, the opacity derivatives for an arbitrary mixture
 in the :math:`X–Z` plane are computed by taking the derivative of the interpolating function as opposed to the interpolant of the derivatives. This improvement
-has led to a significant reduction in the relative derivative error and an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation. 
+has led to a significant reduction in the relative derivative error and an increase in the numerical accuracy of opacity derivatives computed with cubic interpolation.
 
 .. figure:: changelog_plots/cubic_dfridr_dkapdT_ad.png
    :alt: new cubic relative kap derivative error
@@ -178,9 +188,9 @@ option (shown below), while also providing more accurate opacity physics between
 
 For this MESA release, linear interpolation remains the default method for interpolating in composition between opacity tables
 while we continue to investigate the residual areas where cubic interpolation appears to occasionally produce lower quality derivatives.
-However, adopting cubic interpolation has been shown to consistently increase the overall 
+However, adopting cubic interpolation has been shown to consistently increase the overall
 opacity of a model, and can directly effect the structure of solar models, see Appendix B & C in `Farag et al. 2024 <https://doi.org/10.3847/1538-4357/ad4355>`_.
-We anticipate making cubic interpolation the default in a future MESA release version. 
+We anticipate making cubic interpolation the default in a future MESA release version.
 We encourage users to experiment with these different opacity interpolation routines and be mindful of the effect they can have on their stellar models.
 
 
@@ -198,9 +208,9 @@ Rates
 ~~~~~
 
 There has been a bug present in the rates module due to the incorrect
-phase space factors for reverse reaction rates involving greater than 2 reactants or 
+phase space factors for reverse reaction rates involving greater than 2 reactants or
 products. This bug resulted in inconsistent equilibrium compositions when the network
-evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK. 
+evolves into nuclear statistical equilibrium (NSE), at temperatures exceeding 4 GK.
 This bug effects users who evolve models into NSE using large reaction networks. This
 includes evolving massive stars to core-collapse. Smaller networks such as the ``approx21``
 networks are less affected. We strongly recommend that users update to the latest MESA release.
@@ -218,7 +228,7 @@ the number of cells beyond ``max_allowed_nz``.
 A bug in the `pgbinary` axes definitions resulted in models crashing when running in single star mode and has been corrected.
 Another bug inhibited the mass of the not modeled star from being displayed in the `pgbinary` panel and has also been corrected.
 
-See `gh-634 <https://github.com/MESAHub/mesa/issues/634>`_ 
+See `gh-634 <https://github.com/MESAHub/mesa/issues/634>`_
 
 
 Changes in r24.03.1
@@ -257,7 +267,7 @@ default value has been set to 5772 K, as in `IAU 2015 Resolution B3 <https://ui.
 stash.py
 ~~~~~~~~
 The script ``stash.py`` for storing MESA runs has been moved out of ``$MESA_DIR/star/work``
-and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path. 
+and into the ``$MESA_DIR/scripts``. Consider adding this directory to your path.
 
 
 .. _New Features r24.03.1:
@@ -268,13 +278,13 @@ New Features
 shmesa
 ~~~~~~
 
-We have introduced a new set of command line utilities for interacting with MESA. 
-See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__. 
+We have introduced a new set of command line utilities for interacting with MESA.
+See the README in ``$MESA_DIR/scripts/shmesa``, or online `here <https://github.com/MESAHub/mesa/tree/main/scripts/shmesa>`__.
 
-These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full 
-``run_star_extras.f90`` template (``shmesa extras``). 
+These utilities provide functionality such as changing inlist parameters (``shmesa change``) or filling in the full
+``run_star_extras.f90`` template (``shmesa extras``).
 
-We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``). 
+We recommend adding ``shmesa`` to your ``PATH`` (via, e.g., placing ``PATH=$PATH:$MESA_DIR/scripts/shmesa`` in your ``~/.bash_profile``).
 
 
 Rates
@@ -282,9 +292,9 @@ Rates
 
 In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship thirteen C12(a,g)O16
 rates spanning the uncertainty range of -3 to +3 sigma from `Deboer et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017RvMP...89c5007D/abstract>`_
-with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_. 
+with updated numerical resolution from `Mehta et al. 2022 <https://ui.adsabs.harvard.edu/abs/2022ApJ...924...39M/abstract>`_.
 
-These rates can be accessed through the rate selection mechanism. 
+These rates can be accessed through the rate selection mechanism.
 These can be loaded, either by the normal mechanism of adding the filename
 to a ``rates_list`` file, or by using the option ``filename_of_special_rate``.
 Several examples in the test suite now make use of these rates, such as
@@ -345,7 +355,7 @@ The option to apply a drag term to the velocities in the outer envelope
 with the control ``drag_coefficient`` and ``min_q_for_drag`` was removed after
 version 15140, but has now been reintroduced. The logical control ``use_drag_energy``
 has been introduced as well, so users can decide whether the drag energy is included
-in the energy equation. We also provide an additional option to turn off the 
+in the energy equation. We also provide an additional option to turn off the
 velocities above a desired optical depth with the control ``velocity_tau_lower_bound``.
 
 .. _Bug Fixes r24.03.1:
@@ -355,10 +365,10 @@ Bug Fixes
 
 The ZAMS model data used to generate the initial model for simulations with
 ``create_pre_main_sequence_model = .false.`` and ``load_saved_model = .false.``
-had an issue where stars between 1.0 and 1.58 Msun would have a starting 
-central hydrogen mass fraction markedly lower than other masses. The grid of 
-starting models has been recalculated with a more stringent stopping condition, 
-and now all pre-computed ZAMS models have a central hydrogen mass fraction very 
+had an issue where stars between 1.0 and 1.58 Msun would have a starting
+central hydrogen mass fraction markedly lower than other masses. The grid of
+starting models has been recalculated with a more stringent stopping condition,
+and now all pre-computed ZAMS models have a central hydrogen mass fraction very
 near 0.697.
 
 The ``fixed_Teff``, ``fixed_Tsurf``, ``fixed_Psurf``,  and ``fixed_Psurf_and_Tsurf``
@@ -370,7 +380,7 @@ previously covered by HELM where it returned unphysical floor values of ``1e-20`
 for pressure, energy, and entropy. The most up-to-date EOS coverage plots can
 be found in the EOS documentation: :ref:`eos/overview:Overview of eos module`.
 
-A bug in the implementation of the ``fe_core_infall_limit`` sometimes resulted 
+A bug in the implementation of the ``fe_core_infall_limit`` sometimes resulted
 in the premature termination of a model due to large negative velocities outside
 the fe core.
 
@@ -426,7 +436,7 @@ where you want to update every inlist by invoking ::
 
 This script will save the previous versions of your inlists to a directory named
 ``backup_inlists``.
-  
+
 Renamed controls for upper limits
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -564,8 +574,8 @@ Bug Fixes
 Rates
 ~~~~~
 
-There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1. 
-This causes an excessive amount of C12 to be burnt during core helium burning. 
+There has been a bug present in the rate ``r_c12_to_he4_he4_he4`` in r22.05.1 and r22.11.1.
+This causes an excessive amount of C12 to be burnt during core helium burning.
 We strongly recommend that users update to the latest MESA.
 
 See `gh-526 <https://github.com/MESAHub/mesa/issues/526>`_
@@ -678,7 +688,7 @@ test_suite
 
 All test cases have now had the inlist option, makefile variable, and shell script variable, ``MESA_DIR`` removed.
 This means that you no longer need to do anything to make a ``MESA`` test case work outside of the test suite.
-Test cases now infer their ``MESA_DIR`` variable entirely by the environment variable ``$MESA_DIR``. 
+Test cases now infer their ``MESA_DIR`` variable entirely by the environment variable ``$MESA_DIR``.
 
 The history output option ``tri_alfa`` (and other quantities that relate to the triple-alpha nuclear reaction) have been renamed to ``tri_alpha`` for better consistency with other ``_alpha`` reactions.
 
@@ -742,13 +752,13 @@ due to the fact that the REACLIB rate does not take into account the neutral ion
 
 The ability to set the rates preferences has been removed. This added alot of complexity to the rates code handling NACRE and REACLIB and made it difficult to reason about where a rate actually came from.
 From now on we excusivily use NACRE for any rate that cares about temperatures below 10^7K (for all temperatures), REACLIB for almost all other rates, and a small number of rates
-from CF88 (if they aren't in REACLIB or NACRE). 
+from CF88 (if they aren't in REACLIB or NACRE).
 
 Of note is that the default C12(a,g)O16 rate has thus changed from NACRE to that of REACLIB.
 
 The options ``set_rates_preferences``, ``new_rates_preference``, and ``set_rate_c1212`` have been removed without replacements.
 
-The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access thorugh a new 
+The options ``set_rate_c12ag``, ``set_rate_n14pg``, and ``set_rate_3a`` have been removed. However, those rates can now be access thorugh a new
 rate selection mechanism. In ``$MESA_DIR/data/rates_data/rate_tables`` we now ship a number of MESA provided rate tables. These can be loaded,
 either by the normal mechanism of adding the filename to a ``rates_list`` file, or by using the new option ``filename_of_special_rate``.
 This option sets the filename to load the rate from for the rate specified by ``reaction_for_special_factor``.
@@ -794,8 +804,8 @@ net
 ---
 
 There is a new hook ``other_net_derivs`` that allows for modifying the ``dydt`` term MESA computes for each zone inside ``net/``.
-This allows adding changes in composition due to nuclear reactions that MESA could otherwise not handle or does not know about. 
-This hook only works with soft networks (thus no ``approx`` nets). This hook requires many derivatives to be set, 
+This allows adding changes in composition due to nuclear reactions that MESA could otherwise not handle or does not know about.
+This hook only works with soft networks (thus no ``approx`` nets). This hook requires many derivatives to be set,
 thus users should look at ``net_derivs.f90`` for reference to what needs setting.
 
 There is now a hook ``other_split_burn`` for replacing MESA's split burn routine.
@@ -882,7 +892,7 @@ Name changes
 
 * The history and profile columns ``burn_*`` where replace with ``*_alpha``.
 
-* History, profile, and binary history column files are now case insensitive. 
+* History, profile, and binary history column files are now case insensitive.
 
 
 Removed options
@@ -925,7 +935,7 @@ in your ``run_star_extras.f90`` then you will need to add ``use auto_diff`` to t
 If you see errors such as:
 
 .. code-block:: fortran
-  
+
   Error: Cannot convert REAL(8) to TYPE(auto_diff_real_star_order1) at (1)
 
 
@@ -1121,7 +1131,7 @@ the blended opacity.
 The Compton scattering opacity routine has been updated to use the prescription of
 `Poutanen (2017) <https://ui.adsabs.harvard.edu/abs/2017ApJ...835..119P/abstract>`_.
 
-The conductive opacity routine has been updated to include the corrections from 
+The conductive opacity routine has been updated to include the corrections from
 `Blouin et al. (2020) <https://ui.adsabs.harvard.edu/abs/2020ApJ...899...46B/abstract>`_
 for H and He in the regime of moderate coupling and moderate degeneracy.
 These are on by default, controlled by the kap option ``use_blouin_conductive_opacities``.
@@ -1361,7 +1371,7 @@ resulted in the removal of the ``&controls`` options
 + ``fix_eps_grav_transition_to_grid``
 
 the history columns
-  
+
 + ``k_below_Eulerian_eps_grav``
 + ``q_below_Eulerian_eps_grav``
 + ``logxq_below_Eulerian_eps_grav``
@@ -1370,7 +1380,7 @@ the history columns
 + ``logxq_Lagrangian_eps_grav``
 
 and the profile columns
-  
+
 + ``eps_grav_h_effective``
 + ``eps_mdot_sub_eps_grav_h_effective``
 + ``eps_mdot_rel_diff_eps_grav_h_effective``
@@ -1448,7 +1458,7 @@ This affects the options
 - ``stella_v_wind``
 - ``stella_show_headers``
 
-  
+
 Removal of mesh adjustment parameters around convective boundaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1560,7 +1570,7 @@ to ``outputs/sample_#.{profile,fgong}``.
          basename = trim(sample_results_prefix) // trim(num_string)
          call mv(best_model_fgong_filename, trim(basename) // trim('.fgong'), skip_errors=.true.)
          call mv(best_model_profile_filename, trim(basename) // trim('.profile'), skip_errors=.true.)
-         
+
       end subroutine extras_after_evolve
 
 turb
@@ -1573,7 +1583,7 @@ now the recommended method for situations where the time dependence of
 convection must be taken into account. Other methods for time dependent
 convection present in the code have been removed, including the options
 min_T_for_acceleration_limited_conv_velocity and set_conv_vel_flag.
-TDC can be turned on with the option ``MLT_option = "TDC"`` in the 
+TDC can be turned on with the option ``MLT_option = "TDC"`` in the
 ``controls`` section of an inlist.
 
 Users will not generally
@@ -1607,13 +1617,13 @@ as they would be on a ``real(dp)`` variable. auto_diff variables also interopera
 
 So for instance in the following ``f%d1val1`` stores df/dx and ``f%d1val2`` stores df/dy.
 ::
-   
+
     x = 3d0
     x%d1val1 = 1d0
-    
+
     y = 2d0
     y%d1val2 = 1d0
-    
+
     f = exp(x) * y + x + 4
 
 Similar types are included supporting higher-order and mixed-partial
@@ -1698,7 +1708,7 @@ A number of rates have had their defaults switched to using JINA's REACLIB.
 When using a custom user rate (i.e from a rate table) the reverse rate is now computed in detailed
 balance from the user rate. Previously the reverse rate was computed using the default rate choice.
 
-A bug with burning li7 at low temperatures rate has been fixed. Users stuck using previous versions of MESA and 
+A bug with burning li7 at low temperatures rate has been fixed. Users stuck using previous versions of MESA and
 a soft network (something that is not an approx net) should add these lines to their nuclear network as a fix until they
 can update to a newer MESA:
 ::
@@ -1861,7 +1871,7 @@ The following ``controls`` options have been deleted:
 The following ``star_job`` options have been renamed:
 
   * ``eosDT2PTEH_use_linear_interp_for_X`` to ``eosPTEH_use_linear_interp_for_X``
-  
+
 The following ``controls`` options have been renamed/removed, as well
 as moved to ``star_job`` (see next entry):
 
@@ -1982,7 +1992,7 @@ These "new" controls replace the following "old" controls:
   * ``step_overshoot_D``
   * ``step_overshoot_D0_coeff``
 
-   
+
 The "new" control ``overshoot_D_min`` replaces the "old"  control  ``D_mix_ov_limit``.
 
 The "new" control ``overshoot_brunt_B_max`` replaces the "old"  control  ``max_brunt_B_for_overshoot``.
@@ -2201,7 +2211,7 @@ Copies of the inlist can now be found in the following test cases:
 
 Other changes
 -------------
-  
+
 * The routines ``{alloc,move,store,unpack}_extra_info`` were removed
   from ``standard_run_star_extras.inc``.  (These routines were used to
   store/retrieve information from photos.)  If you have existing
@@ -2232,11 +2242,11 @@ Other changes
 
 * Added star_control pre_ms_relax_to_start_radiative_core to existing
   star_control pre_ms_relax_num_steps to provide option for creating a
-  pre-main sequence model just after the end of the fully convective period.   
+  pre-main sequence model just after the end of the fully convective period.
   The relaxation steps from raw pre-ms model to end of fully convective are
   done using simple control setting selected for robustness.  After the
   relaxation is complete, the actual inlist parameter settings are used.
-  
+
 * Added a new hook other_accreting_state to allow the user to specify the
   specific total energy, pressure, and density of the accreting material.
   These properties are used by eps_mdot to compute the contribution of
@@ -2612,9 +2622,9 @@ Added options to include gravity darkening, in the form of projected (surface-av
 
 ::
 
-      grav_dark_L_polar !Lsun 
+      grav_dark_L_polar !Lsun
       grav_dark_Teff_polar !K
-      grav_dark_L_equatorial !Lsun 
+      grav_dark_L_equatorial !Lsun
       grav_dark_Teff_equatorial !K
 
 

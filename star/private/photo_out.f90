@@ -51,13 +51,13 @@
          ierr = 0
          nz = s% nz
 
-         part_number = 0 ! part_numbers are just a consistency check on the data file
+         part_number = 0  ! part_numbers are just a consistency check on the data file
 
          write(iounit) star_def_version
 
          call write_part_number(iounit)
          write(iounit) &
-            s% initial_z, & ! need this since read_model can change what is in the inlist
+            s% initial_z, &  ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
@@ -150,7 +150,7 @@
             write(iounit) len_history_col_spec
             write(iounit) s% history_column_spec(1:len_history_col_spec)
          else
-            write(iounit) 0 ! len_log_col_spec
+            write(iounit) 0  ! len_log_col_spec
          end if
 
          write(iounit)  &

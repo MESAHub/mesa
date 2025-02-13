@@ -120,7 +120,7 @@ conductive opacities.
 Nuclear reaction networks (``net``)
 ===================================
 
-The ``net`` module implements nuclear reaction networks.  
+The ``net`` module implements nuclear reaction networks.
 
 .. toctree::
    :maxdepth: 1

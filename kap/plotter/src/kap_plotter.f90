@@ -208,25 +208,25 @@ program kap_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nX .gt. 1) then
+   if (nX > 1) then
       X_step = delta_X / (nX-1d0)
    else
       X_step = 0
    end if
 
-   if (nZ .gt. 1) then
+   if (nZ > 1) then
       Z_step = delta_Z / (nZ-1d0)
    else
       Z_step = 0
@@ -242,8 +242,8 @@ program kap_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')

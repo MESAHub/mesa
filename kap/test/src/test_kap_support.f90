@@ -12,7 +12,7 @@
 
       implicit none
 
-      logical, parameter :: use_shared_data_dir = .true. ! if false, then test using local version data
+      logical, parameter :: use_shared_data_dir = .true.  ! if false, then test using local version data
       !logical, parameter :: use_shared_data_dir = .false.
       logical, parameter :: use_cache = .true.
       logical, parameter :: show_info = .false.
@@ -106,7 +106,7 @@
 
          !call get_composition_info(Z, xh, abar, zbar, chem_id, xmass)
 
-         chem_factors(:) = 1d0 ! scale factors for element opacity
+         chem_factors(:) = 1d0  ! scale factors for element opacity
 
          frac_Type2 = 0d0
          call test_op_mono(0,ierr)
@@ -329,9 +329,9 @@
          X = 0; Z = 0; xc = 0; xn = 0; xo = 0; xne = 0
 
          select case(which)
-         case (0) ! special test
+         case (0)  ! special test
 
-         case (1) ! fixed
+         case (1)  ! fixed
 
             inlist = 'inlist_test_fixed'
 
@@ -345,7 +345,7 @@
             xa(he4) = 1d0 - X - Z
             xa(fe56) = Z
 
-         case (2) ! co
+         case (2)  ! co
 
             inlist = 'inlist_test_co'
 
@@ -373,11 +373,11 @@
             xa(o16) = xo
             xa(ne20) = xne
 
-         case (3) ! OP
+         case (3)  ! OP
 
             call mesa_error(__FILE__,__LINE__)
 
-         case (4) ! AESOPUS
+         case (4)  ! AESOPUS
 
             inlist = 'inlist_aesopus'
             CO_enhanced = .true.

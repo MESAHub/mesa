@@ -227,13 +227,13 @@
 
          allocate(dres_dxa(num_eos_d_dxa_results, species))
 
-         if (s% x_logical_ctrl(2)) then ! R and L in cgs units
+         if (s% x_logical_ctrl(2)) then  ! R and L in cgs units
             s% r(1) = s% x_ctrl(3)
             s% L(1:nz) = s% x_ctrl(4)
-         else ! x_ctrl(3) = Teff; x_ctrl(4) = L/Lsun
+         else  ! x_ctrl(3) = Teff; x_ctrl(4) = L/Lsun
             s% L(1:nz) = s% x_ctrl(4)*Lsun
             ! L = 4*pi*R^2*boltz_sigma*Tsurf**4
-            tau_base = two_thirds ! just use Eddington for this
+            tau_base = two_thirds  ! just use Eddington for this
             tau_surf = s% tau_factor*tau_base
             Teff = s% x_ctrl(3)
             Teff4 = pow4(Teff)
@@ -307,7 +307,7 @@
          end if
 
          if (.not. s% x_logical_ctrl(2) .and. &
-             abs(Teff - s% Teff) > 1d-5*Teff) then ! report Teff
+             abs(Teff - s% Teff) > 1d-5*Teff) then  ! report Teff
             write(*,1) 'desired Teff', Teff
             write(*,1) '1st actual s% Teff', s% Teff
             write(*,1) 'old r(1)', s% r(1)
@@ -336,7 +336,7 @@
          end if
 
          if (.not. s% x_logical_ctrl(2) .and. &
-             abs(Teff - s% Teff) > 1d-5*Teff) then ! report Teff
+             abs(Teff - s% Teff) > 1d-5*Teff) then  ! report Teff
             write(*,1) 'final actual s% Teff', s% Teff
          end if
 
@@ -377,7 +377,7 @@
          subroutine get_initial_guess_for_atm(ierr)
             integer, intent(out) :: ierr
             skip_partials = .true.
-            s% opacity(1) = 1d-2 ! kap_guess
+            s% opacity(1) = 1d-2  ! kap_guess
             call star_get_atm_PT( &
                 s% id, tau_surf, s% L(1), s% r(1), s% m(1), s% cgrav(1), skip_partials, &
                 s% Teff, &
@@ -442,7 +442,7 @@
          end subroutine get_atm
 
 
-         subroutine do1_cell(ierr) ! uses r(k), T_m1, P_m1, logRho_m1
+         subroutine do1_cell(ierr)  ! uses r(k), T_m1, P_m1, logRho_m1
             use eos_def, only: i_grad_ad
             integer, intent(out) :: ierr
             include 'formats'
@@ -453,7 +453,7 @@
 
             if (k > 1) then
                dm_face = 0.5d0*(s% dm(k) + s% dm(k-1))
-            else ! k == 1
+            else  ! k == 1
                dm_face = 0.5d0*s% dm(k)
             end if
             area = 4d0*pi*r_00**2
@@ -461,8 +461,8 @@
             P_00 = P_m1 - grav*dm_face/area
             P_face = 0.5d0*(P_m1 + P_00)
             dlnP_face = (P_m1 - P_00)/P_face
-            T_00 = T_m1 ! initialize for loop
-            do iter = 1,max_iters ! solve implicit eqn for T_00
+            T_00 = T_m1  ! initialize for loop
+            do iter = 1,max_iters  ! solve implicit eqn for T_00
                Prad = one_third*crad*pow4(T_00)
                Pgas = P_00 - Prad
                logT = log10(T_00)
@@ -555,8 +555,8 @@
             integer, intent(in) :: lrpar, lipar
             real(dp), intent(in) :: r
             real(dp), intent(out) :: dfdr
-            integer, intent(inout), pointer :: ipar(:) ! (lipar)
-            real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+            integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+            real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
             integer, intent(out) :: ierr
             integer :: n
             real(dp) :: r_to_n, a1, Sn
@@ -579,9 +579,9 @@
             integer :: newt_imax, imax
             integer, parameter :: lipar = 2, lrpar = 1
             integer, target :: ipar_array(lipar)
-            integer, pointer :: ipar(:) ! (lipar)
+            integer, pointer :: ipar(:)  ! (lipar)
             real(dp), target :: rpar_array(lrpar)
-            real(dp), pointer :: rpar(:) ! (lrpar)
+            real(dp), pointer :: rpar(:)  ! (lrpar)
             include 'formats'
             ierr = 0
             ipar => ipar_array
@@ -590,12 +590,12 @@
             ipar(2) = 0
             rpar(1) = dq1
             x_guess = 1.08d0
-            dx = 0d0 ! not used since give x1 and x3
+            dx = 0d0  ! not used since give x1 and x3
             x1 = 1.01d0
             x3 = 1.05d0
             y1 = arg_not_provided
             y3 = arg_not_provided
-            newt_imax = 0 ! 10
+            newt_imax = 0  ! 10
             imax = 100
             epsx = 1d-10
             epsy = 1d-10

@@ -9,13 +9,11 @@ on:
 jobs:
   build:
     if: |
-      !(github.event_name == 'pull_request' && github.event.pull_request.draft == true) &&
-      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }}) &&
-      (github.repository == 'MESAHub/mesa')
+      !(github.event_name == 'pull_request' && ${{ contains(github.event.commits[0].message, 'ci skip') }})
     strategy:
       fail-fast: false
       matrix:
-        sdk: ["23.7.3", "24.7.1"]  # pick 2 or 3 most recent. "22.6.1", ...
+        sdk: ["22.6.1", "23.7.3", "24.7.1"]  # pick 2 or 3 most recent.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

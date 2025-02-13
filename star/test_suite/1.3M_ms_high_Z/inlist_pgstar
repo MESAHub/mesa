@@ -3,12 +3,9 @@
    ! MESA uses PGPLOT for live plotting and gives the user a tremendous
    ! amount of control of the presentation of the information.
 
-   ! device
    file_white_on_black_flag = .true.
    file_device = 'vcps'      ! postscript
-   file_extension = 'ps'
    !file_device = 'png'      ! png
-   !file_extension = 'png'
 
    pgstar_interval = 10
 

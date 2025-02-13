@@ -32,7 +32,7 @@
 
       ! ionization results
 
-      integer, parameter :: ion_ilogPgas = 1 ! log10 Pgas
+      integer, parameter :: ion_ilogPgas = 1  ! log10 Pgas
       ! log10 of partial pressures
       integer, parameter :: ion_ilogpp_H = ion_ilogPgas + 1
       integer, parameter :: ion_ilogpp_He = ion_ilogpp_H + 1
@@ -76,22 +76,22 @@
 
 
       integer, parameter :: num_ion_Zs = 5
-      real(dp), parameter :: ion_Zs(num_ion_Zs) = (/ 0.00d0, 0.02d0, 0.04d0, 0.20d0, 1.00d0 /)
-      integer, parameter :: num_ion_Xs_for_Z(num_ion_Zs) = (/ 6, 5, 5, 5, 1 /)
+      real(dp), parameter :: ion_Zs(num_ion_Zs) = [ 0.00d0, 0.02d0, 0.04d0, 0.20d0, 1.00d0 ]
+      integer, parameter :: num_ion_Xs_for_Z(num_ion_Zs) = [ 6, 5, 5, 5, 1 ]
 
       integer, parameter :: num_ion_Xs = 6
       real(dp), parameter :: ion_Xs(num_ion_Xs) = &
-            (/ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 /)
+            [ 0.0d0, 0.2d0, 0.4d0, 0.6d0, 0.8d0, 1.0d0 ]
 
-      integer, parameter :: sz_per_ion_point = 4 ! for bicubic spline interpolation
+      integer, parameter :: sz_per_ion_point = 4  ! for bicubic spline interpolation
 
-      real(dp) :: ion_logQ_min ! logQ = logRho - 2*logT + 12
+      real(dp) :: ion_logQ_min  ! logQ = logRho - 2*logT + 12
       real(dp) :: ion_logQ_max
-      real(dp) :: ion_del_logQ ! spacing for the logQs
+      real(dp) :: ion_del_logQ  ! spacing for the logQs
       integer :: ion_num_logQs
       real(dp) :: ion_logT_min
       real(dp) :: ion_logT_max
-      real(dp) :: ion_del_logT ! spacing for the logTs
+      real(dp) :: ion_del_logT  ! spacing for the logTs
       integer :: ion_num_logTs
       real(dp), dimension(:), pointer :: ion_logQs, ion_logTs
       real(dp), dimension(:), pointer :: ion_tbl1

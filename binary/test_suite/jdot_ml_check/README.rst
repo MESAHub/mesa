@@ -7,7 +7,7 @@ jdot_ml_check
 This test case checks the evolution of one star plus a point mass, including mass transfer to the point mass.
 Using pre-specified efficiency options, verifies that the binary evolution, including mass transfer to the point mass,
 follows the analytical result of `Tauris & van den Heuvel (2006)
-<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_. 
+<https://ui.adsabs.harvard.edu/abs/2006csxs.book..623T>`_.
 
 This test case has 1 part. Click to see a larger version of a plot.
 
@@ -43,10 +43,7 @@ pgstar commands used for the binary and star1 plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 1
 
@@ -210,7 +207,7 @@ pgstar commands used for the binary and star1 plots above:
  Grid1_file_prefix = 'grid_'
  Grid1_file_interval = 10000
  Grid1_file_width = -1
- Grid1_file_aspect_ratio = -1         
+ Grid1_file_aspect_ratio = -1
 
 
   Profile_Panels2_win_flag = .true.

@@ -339,7 +339,7 @@ contains
            chi_T => point_data(33,j), &
            c_2 => point_data(35,j))
 
-        m = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
+        m = s%m_grav(1)  !+ s%atm_structure(atm_delta_m,k)
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
         l = s%L(1)
 
@@ -356,7 +356,7 @@ contains
         C_P = s%atm_structure(atm_cp,k)
         delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
         Gamma_1 = s%atm_structure(atm_gamma1,k)
-        entropy = 0d0 ! No entropy data in surface layers
+        entropy = 0d0  ! No entropy data in surface layers
         chi_rho = s%atm_structure(atm_chiRho,k)
         chi_T = s%atm_structure(atm_chiT,k)
 
@@ -383,7 +383,7 @@ contains
         l_rad(j) = l
 
         c_1 = (r/R_star)**3*(M_star/m)
-        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
+        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla  ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
         c_3 = 0d0
         c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
 
@@ -505,7 +505,7 @@ contains
         l_rad(j) = 16d0*pi*r*crad*clight*T**4*nabla*V/(3d0*kap*rho)
 
         c_1 = (r/R_star)**3*(M_star/m)
-        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
+        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla  ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
         c_3 = pi4*r**3*rho*eps/l_rad(j)
         c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
 

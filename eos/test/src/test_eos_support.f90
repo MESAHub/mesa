@@ -56,12 +56,12 @@
 
          ierr = 0
 
-         call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
+         call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
 
-         if (.false.) then ! TESTING
+         if (.false.) then  ! TESTING
             z =     0d0
             x =     0.72d0
-            call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
+            call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
             abar =     1.2966413082679851D+00
             zbar =     1.1021433867453336D+00
             logPgas  = 4.8066181993619859D+00
@@ -110,7 +110,7 @@
 
          names = eosDT_result_names
 
-         if (.not. do_compare) then ! simple form of output
+         if (.not. do_compare) then  ! simple form of output
             write(*,1) 'dlnRho_dlnPgas_c_T', dlnRho_dlnPgas_c_T
             write(*,1) 'dlnRho_dlnT_c_Pgas', dlnRho_dlnT_c_Pgas
             write(*,'(A)')
@@ -193,7 +193,7 @@
             call doit('solar')
          end if
 
-         if (.true.) then ! do get_Rho and get_T
+         if (.true.) then  ! do get_Rho and get_T
             X = 0.70d+00
             Zinit = 0.02d0
             dXO = 0.00d0
@@ -216,7 +216,7 @@
 
             if (.false.) then
                T = 2d8; rho = 100
-               call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! scvh
+               call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! scvh
                stop
             end if
 
@@ -224,11 +224,11 @@
 
 
             T = 1d6; rho = 1d-2
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal
+            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! opal
             T = 1d4; rho = 1d-1
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! scvh
+            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! scvh
             T = 1d5; rho = 1d-1
-            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res) ! opal-scvh overlap
+            call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! opal-scvh overlap
             T = 2d8; rho = 1d2
             call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! helm
 
@@ -237,7 +237,7 @@
          end subroutine doit
 
 
-         subroutine test_get_Rho_T ! using most recent values from subroutine Do_One_TRho
+         subroutine test_get_Rho_T  ! using most recent values from subroutine Do_One_TRho
             real(dp) :: tol, othertol, &
                result, result_log10, log10_T, log10_rho, lnS, Prad, Pgas, logP, &
                logRho_guess, logRho_bnd1, logRho_bnd2, other_at_bnd1, other_at_bnd2, &
@@ -266,7 +266,7 @@
                write(*,1) ' tolerance', tol
             end if
             if (.not. quietly) write(*,*)
-            result = rho*0.5d0 ! initial guess
+            result = rho*0.5d0  ! initial guess
             result_log10 = log10(result)
             res = 0
             logRho_guess = result_log10
@@ -296,7 +296,7 @@
                write(*,'(A)')
             end if
 
-            result = T*2d0 ! initial guess
+            result = T*2d0  ! initial guess
             result_log10 = log10(result)
             res = 0
             logT_guess = result_log10
@@ -329,7 +329,7 @@
             Prad = crad*T*T*T*T/3
             Pgas = exp(res(i_lnPgas))
             logP = log10(Prad + Pgas)
-            result = T*2d0 ! initial guess
+            result = T*2d0  ! initial guess
             result_log10 = log10(result)
             res = 0
             logT_guess = result_log10
@@ -538,7 +538,7 @@
                                      Z =    0.7D-02
                                      X =    7.3D-01
 
-         call Init_Composition(X, Z, 0d0, 0d0) ! sets abar and zbar
+         call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
 
          write(*,*) 'test1_eosDT_get_T_given_egas'
 
@@ -667,7 +667,7 @@
             write(*,101) trim(eos_names(i_gamma3)), res(i_gamma3)
             write(*,101) trim(eos_names(i_eta)), res(i_eta)
 
-            if (.false.) then ! debugging
+            if (.false.) then  ! debugging
                do i = 1, num_eos_basic_results
                   write(*,101) 'd_dlnd ' // trim(eos_names(i)), d_dlnd(i)
                end do

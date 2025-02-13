@@ -51,11 +51,11 @@ module nag_sub
 
     call d01gaf(X,y,N,ans,err,ifail)
     if(ifail > 0)  then
-        if (ifail.eq.1) then
+        if (ifail==1) then
             call stop_program(subrtn_name,mdl_name,__LINE__, 'less than 4 points supplied');
-        else if (ifail.eq.2) then
+        else if (ifail==2) then
             call stop_program(subrtn_name,mdl_name,__LINE__, 'points not in increasing or decreasing order');
-        else if (ifail.eq.3) then
+        else if (ifail==3) then
             call stop_program(subrtn_name,mdl_name,__LINE__, 'points not all distinct');
         end if
     endif

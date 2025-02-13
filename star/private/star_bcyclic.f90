@@ -43,14 +43,14 @@
             B1, row_scale_factors1, col_scale_factors1, &
             equed1, iter, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: nvar ! linear size of each block
-         integer, intent(in) :: nz ! number of block rows
+         integer, intent(in) :: nvar  ! linear size of each block
+         integer, intent(in) :: nz  ! number of block rows
          real(dp), pointer, dimension(:) :: &
             lblk1, dblk1, ublk1, lblkF1, dblkF1, ublkF1, &
             B1, row_scale_factors1, col_scale_factors1
          integer, pointer :: ipivot1(:)
          character (len=nz) :: equed1
-         integer, intent(in) :: iter ! solver iteration number for debugging output
+         integer, intent(in) :: iter  ! solver iteration number for debugging output
          integer, intent(out) :: ierr
 
          integer, pointer :: nslevel(:), ipivot(:)
@@ -124,7 +124,7 @@
          if (dbg) write(*,*) 'start factor_cycle'
 
          !call cali_begin_phase('factor_cycle')
-         factor_cycle: do ! perform cyclic-reduction factorization
+         factor_cycle: do  ! perform cyclic-reduction factorization
 
             nslevel(nlevel) = nstemp
 
@@ -172,7 +172,7 @@
             return
          end if
 
-         do k=1,nz ! check that every cell factored exactly once
+         do k=1,nz  ! check that every cell factored exactly once
             if (factored(k) /= 1) then
                write(*,3) 'factored /= 1', k, factored(k)
                call mesa_error(__FILE__,__LINE__,'bcyclic_factor')
@@ -635,11 +635,11 @@
             end do
 
             if (s% use_equilibration_in_DGESVX) then
-               fact = 'E' ! matrix A will be equilibrated, then copied to AF and factored
+               fact = 'E'  ! matrix A will be equilibrated, then copied to AF and factored
             else
-               fact = 'N' ! matrix A will be copied to AF and factored
+               fact = 'N'  ! matrix A will be copied to AF and factored
             end if
-            trans = 'N' ! no transpose
+            trans = 'N'  ! no transpose
 
 !      SUBROUTINE DGESVX( FACT, TRANS, N, NRHS, A, LDA, AF, LDAF, IPIV,
 !     $                   EQUED, R, C, B, LDB, X, LDX, RCOND, FERR, BERR,
@@ -649,11 +649,11 @@
                         equed, r, c, b, nvar, x, nvar, rcond, ferr, berr, &
                         work, iwork, ierr)
 
-            if (ierr > 0 .and. ierr <= nvar) then ! singular
+            if (ierr > 0 .and. ierr <= nvar) then  ! singular
                write(*,3) 'singular matrix for DGESVX', k, ierr
                call mesa_error(__FILE__,__LINE__,'factor_with_DGESVX')
             end if
-            if (ierr == nvar+1) then ! means bad rcond, but may not be fatal
+            if (ierr == nvar+1) then  ! means bad rcond, but may not be fatal
                write(*,2) 'DGESVX reports bad matrix conditioning: k, rcond', k, rcond
                ierr = 0
             end if
@@ -868,8 +868,8 @@
                ipiv(i) = ipivot(i)
             end do
 
-            fact = 'F' ! factored
-            trans = 'N' ! no transpose
+            fact = 'F'  ! factored
+            trans = 'N'  ! no transpose
 
 !      SUBROUTINE DGESVX( FACT, TRANS, N, NRHS, A, LDA, AF, LDAF, IPIV,
 !     $                   EQUED, R, C, B, LDB, X, LDX, RCOND, FERR, BERR,
@@ -946,8 +946,8 @@
                ipiv(i) = ipivot(i)
             end do
 
-            fact = 'F' ! factored
-            trans = 'N' ! no transpose
+            fact = 'F'  ! factored
+            trans = 'N'  ! no transpose
 
 !      SUBROUTINE DGESVX( FACT, TRANS, N, NRHS, A, LDA, AF, LDAF, IPIV,
 !     $                   EQUED, R, C, B, LDB, X, LDX, RCOND, FERR, BERR,

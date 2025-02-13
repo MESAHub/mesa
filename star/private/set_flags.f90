@@ -55,7 +55,7 @@
          s% v_flag = v_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. v_flag) then ! remove i_v's
+         if (.not. v_flag) then  ! remove i_v's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -70,7 +70,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (v_flag) then ! insert i_v's
+         if (v_flag) then  ! insert i_v's
             i_v = s% i_v
             s% v_center = 0d0
             call insert(s% xh)
@@ -96,7 +96,7 @@
 
          call set_chem_names(s)
 
-         if (v_flag .and. s% u_flag) then ! turn off u_flag when turn on v_flag
+         if (v_flag .and. s% u_flag) then  ! turn off u_flag when turn on v_flag
             call set_u_flag(id, .false., ierr)
          end if
 
@@ -150,7 +150,7 @@
 
          num_u_vars = 1
 
-         if (.not. u_flag) then ! remove
+         if (.not. u_flag) then  ! remove
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -165,11 +165,11 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (u_flag) then ! insert
+         if (u_flag) then  ! insert
             i_u = s% i_u
             call insert(s% xh)
             call insert(s% xh_start)
-            if (s% v_flag) then ! use v to initialize u
+            if (s% v_flag) then  ! use v to initialize u
                i_v = s% i_v
                do k=1,nz-1
                   s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% xh(i_v,k+1))
@@ -188,7 +188,7 @@
 
          call set_chem_names(s)
 
-         if (u_flag .and. s% v_flag) then ! turn off v_flag when turn on u_flag
+         if (u_flag .and. s% v_flag) then  ! turn off v_flag when turn on u_flag
             call set_v_flag(id, .false., ierr)
          end if
 
@@ -244,7 +244,7 @@
          s% RTI_flag = RTI_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. RTI_flag) then ! remove i_alpha_RTI's
+         if (.not. RTI_flag) then  ! remove i_alpha_RTI's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -259,7 +259,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (RTI_flag) then ! insert i_alpha_RTI's
+         if (RTI_flag) then  ! insert i_alpha_RTI's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_alpha_RTI,1:nz) = 0d0
@@ -359,14 +359,14 @@
                ierr = -1
                return
             end if
-            call insert1(s% i_Hp) ! will be initialized by set_RSP2_vars
+            call insert1(s% i_Hp)  ! will be initialized by set_RSP2_vars
          end if
 
          call set_chem_names(s)
 
          if (.not. RSP2_flag) return
 
-         if (s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
+         if (s% RSP_flag) then  ! turn off RSP_flag when turn on RSP2_flag
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
@@ -388,7 +388,7 @@
             if (ierr /= 0) return
             call set_m_and_dm(s)
             call set_dm_bar(s, nz, s% dm, s% dm_bar)
-            call set_vars(s, s% dt, ierr) ! redo after remesh_for_RSP2
+            call set_vars(s, s% dt, ierr)  ! redo after remesh_for_RSP2
             if (ierr /= 0) return
          end if
 
@@ -568,7 +568,7 @@
          s% w_div_wc_flag = w_div_wc_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. w_div_wc_flag) then ! remove i_w_div_wc's
+         if (.not. w_div_wc_flag) then  ! remove i_w_div_wc's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -583,7 +583,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (w_div_wc_flag) then ! insert i_w_div_w's
+         if (w_div_wc_flag) then  ! insert i_w_div_w's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_w_div_wc,1:nz) = 0d0
@@ -638,7 +638,7 @@
          s% j_rot_flag = j_rot_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. j_rot_flag) then ! remove i_j_rot's
+         if (.not. j_rot_flag) then  ! remove i_j_rot's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -653,7 +653,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (j_rot_flag) then ! insert i_j_rot's
+         if (j_rot_flag) then  ! insert i_j_rot's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_j_rot,1:nz) = 0d0

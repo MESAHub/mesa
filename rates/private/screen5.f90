@@ -113,7 +113,7 @@
       integer, intent(out) :: ierr
 
 !..local variables
-      real(dp) aa, daadt, daadd, bb, cc, dccdt, dccdd,  &
+      real(dp) :: aa, daadt, daadd, bb, cc, dccdt, dccdd,  &
                        qq, dqqdt, dqqdd, rr, drrdt, drrdd,  &
                        ss, dssdt, dssdd, tt, dttdt, dttdd, uu, duudt, duudd,  &
                        vv, dvvdt, dvvdd, a3, da3, &
@@ -135,14 +135,14 @@
 !..aznut   = combination of a1, z1, a2, z2 raised to 1/3 power
 
 
-      real(dp), parameter :: alph12_lim = 1.6d0 ! ln(10)
+      real(dp), parameter :: alph12_lim = 1.6d0  ! ln(10)
       real(dp), parameter :: h12_max = 300d0
       real(dp), parameter :: x13   = 1.0d0/3.0d0
       real(dp), parameter :: x14   = 1.0d0/4.0d0
       real(dp), parameter :: x53   = 5.0d0/3.0d0
       real(dp), parameter :: x532  = 5.0d0/32.0d0
       real(dp), parameter :: x512  = 5.0d0/12.0d0
-      real(dp), parameter :: fact  = two_13 ! the cube root of 2
+      real(dp), parameter :: fact  = two_13  ! the cube root of 2
       real(dp), parameter :: co2   = x13 * 4.248719d3
 
       logical, parameter :: debug = .false.
@@ -215,7 +215,7 @@
 
 !..limit alph12 to alph12_lim to prevent unphysical behavior.
 !..this should really be replaced by a pycnonuclear reaction rate formula
-      if (alph12 .gt. alph12_lim) then
+      if (alph12 > alph12_lim) then
 
          alph12   = alph12_lim
          alph12dt = 0.0d0
@@ -254,7 +254,7 @@
       if (debug) write(*, 1) 'sc% xni', sc% xni
 
       gamefx = 0.3d0
-      if (gamef .gt. gamefx) then
+      if (gamef > gamefx) then
          if (debug) write(*,1) 'intermediate and strong sceening regime'
 
          gamp14   = pow(gamp,x14)
@@ -316,7 +316,7 @@
 
          if (debug) write(*, 1) 'rr', rr
 
-         if (rr .ge. 0.77d0) then
+         if (rr >= 0.77d0) then
             xlgfac    = rr
             dxlgfacdt = drrdt
             dxlgfacdd = drrdd
@@ -336,7 +336,7 @@
          if (debug) write(*, 1) 'gamef', gamef
 
          gamefs = 0.8d0
-         if (gamef .le. gamefs) then
+         if (gamef <= gamefs) then
              dgamma  = 1.0d0/(gamefs - gamefx)
 
              rr     =  dgamma*(gamefs - gamef)
@@ -381,7 +381,7 @@
       !..machine limit the output
       h12    = max(min(h12, h12_max), 0.0d0)
       scor   = exp(h12)
-      if (h12 .eq. h12_max) then
+      if (h12 == h12_max) then
          scordt = 0.0d0
          scordd = 0.0d0
       else

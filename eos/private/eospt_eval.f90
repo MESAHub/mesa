@@ -54,8 +54,8 @@
          real(dp), intent(in) :: xa(:)
          real(dp), intent(in) :: aPgas, alogPgas, atemp, alogtemp
          real(dp), intent(out) :: Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas
-         real(dp), intent(inout) :: res(:), d_dlnRho_c_T(:), d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:), d_dlnRho_c_T(:), d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (nv, species)
          integer, intent(out) :: ierr
 
          real(dp) :: X, Z, T, logT
@@ -160,7 +160,7 @@
          use eosDT_eval, only: get_Rho
          use utils_lib, only: is_bad
 
-         type (EoS_General_Info), pointer :: rq ! general information about the request
+         type (EoS_General_Info), pointer :: rq  ! general information about the request
          real(dp), intent(in) :: Z, X, abar, zbar
          integer, intent(in) :: species
          integer, pointer :: chem_id(:)
@@ -168,10 +168,10 @@
          real(dp), intent(in) :: xa(:)
          real(dp), intent(inout) :: Pgas, logPgas, T, logT
          real(dp), intent(out) :: Rho, logRho, dlnRho_dlnPgas_c_T, dlnRho_dlnT_c_Pgas
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (nv, species)
          integer, intent(out) :: ierr
 
          integer:: i, eos_calls, max_iter, which_other
@@ -249,7 +249,7 @@
 
          contains
 
-         subroutine do_partials ! dlnRho_dlnPgas_c_T and dlnRho_dlnT_c_Pgas
+         subroutine do_partials  ! dlnRho_dlnPgas_c_T and dlnRho_dlnT_c_Pgas
             real(dp) :: Prad, P, dP_dRho, dPgas_dRho, &
                   dP_dT, dPrad_dT, dPgas_dT, dRho_dPgas, dRho_dT
             include 'formats'
@@ -257,14 +257,14 @@
             Prad = crad*T*T*T*T/3
             P = Pgas + Prad
             dP_dRho = res(i_chiRho)*P/Rho
-            dPgas_dRho = dP_dRho ! const T, so dP_dRho = dPgas_dRho
-            dRho_dPgas = 1/dPgas_dRho ! const T
-            dlnRho_dlnPgas_c_T = dRho_dPgas*Pgas/Rho ! const T
+            dPgas_dRho = dP_dRho  ! const T, so dP_dRho = dPgas_dRho
+            dRho_dPgas = 1/dPgas_dRho  ! const T
+            dlnRho_dlnPgas_c_T = dRho_dPgas*Pgas/Rho  ! const T
 
             dPrad_dT = 4*crad*T*T*T/3
             dP_dT = res(i_chiT)*P/T
-            dPgas_dT = dP_dT - dPrad_dT ! const Rho
-            dRho_dT = -dPgas_dT/dPgas_dRho ! const Pgas
+            dPgas_dT = dP_dT - dPrad_dT  ! const Rho
+            dRho_dT = -dPgas_dT/dPgas_dRho  ! const Pgas
             dlnRho_dlnT_c_Pgas = dRho_dT*T/Rho
 
          end subroutine do_partials
@@ -284,8 +284,8 @@
 
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
+         real(dp), intent(in) :: Z  ! the metals mass fraction
+         real(dp), intent(in) :: X  ! the hydrogen mass fraction
 
          real(dp), intent(in) :: abar, zbar
 
@@ -294,32 +294,32 @@
          integer, pointer :: net_iso(:)
          real(dp), intent(in) :: xa(:)
 
-         real(dp), intent(in) :: logPgas ! log10 of density
+         real(dp), intent(in) :: logPgas  ! log10 of density
          integer, intent(in) :: which_other
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logT_tol
-         integer, intent(in) :: max_iter ! max number of iterations
+         integer, intent(in) :: max_iter  ! max number of iterations
 
          real(dp), intent(in) :: logT_guess
-         real(dp), intent(in) :: logT_bnd1, logT_bnd2 ! bounds for logT
+         real(dp), intent(in) :: logT_bnd1, logT_bnd2  ! bounds for logT
             ! set to arg_not_provided if do not know bounds
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in c_def)
 
          real(dp), intent(out) :: logT_result
-         real(dp), intent(out) :: Rho, logRho ! density
+         real(dp), intent(out) :: Rho, logRho  ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_c_T
          real(dp), intent(out) :: dlnRho_dlnT_c_Pgas
 
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (nv, species)
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          call do_safe_get_Pgas_T( &
                handle, Z, X, abar, zbar, &
@@ -348,8 +348,8 @@
 
          integer, intent(in) :: handle
 
-         real(dp), intent(in) :: Z ! the metals mass fraction
-         real(dp), intent(in) :: X ! the hydrogen mass fraction
+         real(dp), intent(in) :: Z  ! the metals mass fraction
+         real(dp), intent(in) :: X  ! the hydrogen mass fraction
 
          real(dp), intent(in) :: abar, zbar
 
@@ -358,34 +358,34 @@
          integer, pointer :: net_iso(:)
          real(dp), intent(in) :: xa(:)
 
-         real(dp), intent(in) :: logT ! log10 of temperature
+         real(dp), intent(in) :: logT  ! log10 of temperature
 
          integer, intent(in) :: which_other
-         real(dp), intent(in) :: other_value ! desired value for the other variable
+         real(dp), intent(in) :: other_value  ! desired value for the other variable
          real(dp), intent(in) :: other_tol
 
          real(dp), intent(in) :: logPgas_tol
 
-         integer, intent(in) :: max_iter ! max number of Newton iterations
+         integer, intent(in) :: max_iter  ! max number of Newton iterations
 
          real(dp), intent(in) :: logPgas_guess
-         real(dp), intent(in) :: logPgas_bnd1, logPgas_bnd2 ! bounds for logPgas
+         real(dp), intent(in) :: logPgas_bnd1, logPgas_bnd2  ! bounds for logPgas
             ! set to arg_not_provided if do not know bounds
-         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2 ! values at bounds
+         real(dp), intent(in) :: other_at_bnd1, other_at_bnd2  ! values at bounds
             ! if don't know these values, just set to arg_not_provided (defined in c_def)
 
          real(dp), intent(out) :: logPgas_result
-         real(dp), intent(out) :: Rho, logRho ! density
+         real(dp), intent(out) :: Rho, logRho  ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_c_T
          real(dp), intent(out) :: dlnRho_dlnT_c_Pgas
 
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (nv, species)
 
          integer, intent(out) :: eos_calls
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          call do_safe_get_Pgas_T( &
                handle, Z, X, abar, zbar, &
@@ -422,19 +422,19 @@
          integer, intent(in) :: which_other
          real(dp), intent(in) :: other_value
          integer, intent(in) :: doing_which
-         real(dp), intent(in) :: initial_guess ! for x
-         real(dp), intent(out) :: x ! if doing_Pgas, then logPgas, else logT
+         real(dp), intent(in) :: initial_guess  ! for x
+         real(dp), intent(out) :: x  ! if doing_Pgas, then logPgas, else logT
          real(dp), intent(in) :: the_other_log
          real(dp), intent(in) :: xbnd1, xbnd2, other_at_bnd1, other_at_bnd2
-         real(dp), intent(in) :: xacc, yacc ! tolerances
-         integer, intent(in) :: ntry ! max number of iterations
-         real(dp), intent(out) :: Rho, logRho ! density
+         real(dp), intent(in) :: xacc, yacc  ! tolerances
+         integer, intent(in) :: ntry  ! max number of iterations
+         real(dp), intent(out) :: Rho, logRho  ! density
          real(dp), intent(out) :: dlnRho_dlnPgas_c_T
          real(dp), intent(out) :: dlnRho_dlnT_c_Pgas
-         real(dp), intent(inout) :: res(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnRho_c_T(:) ! (nv)
-         real(dp), intent(inout) :: d_dlnT_c_Rho(:) ! (nv)
-         real(dp), intent(inout) :: d_dxa_c_TRho(:,:) ! (nv, species)
+         real(dp), intent(inout) :: res(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnRho_c_T(:)  ! (nv)
+         real(dp), intent(inout) :: d_dlnT_c_Rho(:)  ! (nv)
+         real(dp), intent(inout) :: d_dxa_c_TRho(:,:)  ! (nv, species)
          integer, intent(out) :: eos_calls, ierr
 
          integer :: i, j, lrpar, lipar, max_iter, irho, ix, iz
@@ -546,8 +546,8 @@
                integer, intent(in) :: lrpar, lipar
                real(dp), intent(in) :: x
                real(dp), intent(out) :: dfdx
-               integer, intent(inout), pointer :: ipar(:) ! (lipar)
-               real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+               integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+               real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
                integer, intent(out) :: ierr
 
                real(dp) :: new, logT, logPgas
@@ -596,7 +596,7 @@
                   return
                end if
 
-               eos_calls = eos_calls+1 ! count eos calls
+               eos_calls = eos_calls+1  ! count eos calls
 
                new = res(which_other)
                get_f_df = new - other_value

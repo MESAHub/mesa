@@ -109,7 +109,7 @@
                end if
             end if
 
-            if (b% initial_period_in_days <= 0) then ! calculate from initial_separation_in_Rsuns
+            if (b% initial_period_in_days <= 0) then  ! calculate from initial_separation_in_Rsuns
                call set_separation_eccentricity(b% binary_id, &
                   b% initial_separation_in_Rsuns*Rsun, b% initial_eccentricity, ierr)
                   if (ierr /= 0) then
@@ -130,7 +130,7 @@
             end do
             ! 2) time between periastron and polar angle theta 0 -> 1 (fraction of the
             !    orbital period)
-            do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
+            do i = 1,b% anomaly_steps  ! time between periastron and polar angle theta
                b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
                                tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
                                sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
@@ -346,7 +346,7 @@
          end if
 
          !use new eccentricity to calculate new time coordinate
-         do i = 1,b% anomaly_steps ! time between periastron and polar angle theta
+         do i = 1,b% anomaly_steps  ! time between periastron and polar angle theta
             b% time_co(i) = ( 2 * atan( sqrt( (1-b% eccentricity)/(1 + b% eccentricity) ) * &
                             tan(b% theta_co(i)/2d0) ) - b% eccentricity * &
                             sqrt(1 - pow2(b% eccentricity)) * sin(b% theta_co(i)) / &
@@ -371,9 +371,9 @@
          b% rl(1) = eval_rlobe(b% m(1), b% m(2), b% separation)
          b% rl(2) = eval_rlobe(b% m(2), b% m(1), b% separation)
          b% rl_relative_gap(1) = (b% r(1) - b% rl(1) * (1 - b% eccentricity) ) / &
-             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(1) / (1 - b% eccentricity)  ! gap < 0 means out of contact
          b% rl_relative_gap(2) = (b% r(2) - b% rl(2) * (1 - b% eccentricity) ) / &
-             b% rl(2) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(2) / (1 - b% eccentricity)  ! gap < 0 means out of contact
 
          if (is_bad(b% rl_relative_gap(1)) .or. is_bad(b% rl_relative_gap(2))) then
             write(*,*) "rl_relative_gap for each component", b% rl_relative_gap(1), b% rl_relative_gap(2)
@@ -415,7 +415,7 @@
          binary_check_model = keep_going
 
          if (.not. b% ignore_rlof_flag) then
-            if (implicit_rlo) then ! check agreement between new r and new rl
+            if (implicit_rlo) then  ! check agreement between new r and new rl
                if (.not. b% use_other_check_implicit_rlo) then
                   binary_check_model = check_implicit_rlo(b% binary_id, new_mdot)
                else
@@ -428,7 +428,7 @@
                   b% s_donor% was_in_implicit_wind_limit
             else
                if (.not. b% use_other_rlo_mdot) then
-                  call rlo_mdot(b% binary_id, new_mdot, ierr) ! grams per second
+                  call rlo_mdot(b% binary_id, new_mdot, ierr)  ! grams per second
                   if (ierr /= 0) then
                      write(*,*) 'failed in rlo_mdot'
                      binary_check_model = retry

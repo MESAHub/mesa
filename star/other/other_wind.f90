@@ -41,13 +41,13 @@ contains
    subroutine null_other_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
       use star_def
       integer, intent(in) :: id
-      real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
+      real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
       ! NOTE: surface is outermost cell. not necessarily at photosphere.
       ! NOTE: don't assume that vars are set at this point.
       ! so if you want values other than those given as args,
       ! you should use values from s% xh(:,:) and s% xa(:,:) only.
       ! rather than things like s% Teff or s% lnT(:) which have not been set yet.
-      real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+      real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
       integer, intent(out) :: ierr
       w = 0
       ierr = 0

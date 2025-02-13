@@ -40,8 +40,8 @@ module ion_offset
          ! Get basic species info
          norm = 0d0
          do k=1,species
-            A(k) = chem_isos% Z_plus_N(chem_id(k)) ! baryon number
-            Z(k) = chem_isos% Z(chem_id(k)) ! charge
+            A(k) = chem_isos% Z_plus_N(chem_id(k))  ! baryon number
+            Z(k) = chem_isos% Z(chem_id(k))  ! charge
             ya(k) = xa(k) / A(k)            ! number fraction (not normalized)
             norm = norm + ya(k)             ! accumulate number fraction normalization
          end do

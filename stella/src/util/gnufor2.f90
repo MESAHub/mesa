@@ -49,7 +49,6 @@
 ! this function creates a string with current date and time
 ! it is a default method to name output files
 !***********************************************************************************
-	implicit none
         character(len=8)  :: date
         character(len=10) :: time
         character(len=33) :: f_result
@@ -63,7 +62,6 @@
 !***********************************************************************************
 	function output_terminal(terminal) result(f_result)
 !***********************************************************************************
-	implicit none
 	character(len=*),intent(in)	:: terminal
 	integer, parameter		:: Nc=35
 	character(len=Nc)		:: f_result
@@ -84,7 +82,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:)
 	integer,intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
@@ -96,7 +93,7 @@
 !***********************************************************************************
 	nx=size(rgb(1,:,1))
 	ny=size(rgb(1,1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -210,7 +207,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	integer, intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: terminal, filename, persist, input
@@ -326,7 +322,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:), gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -337,7 +332,7 @@
 !***********************************************************************************
 	nx=size(gray(:,1))
 	ny=size(gray(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -415,8 +410,8 @@
 	write ( file_unit, '(a)' ) 'set yrange ['// trim(yrange1) // ':'// trim(yrange2) //']'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -453,7 +448,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -533,8 +527,8 @@
 	write ( file_unit, '(a)' ) 'unset ytics'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -570,7 +564,6 @@
 !***********************************************************************************
 ! this subroutine plots 3D curve, given by three arrays x,y,z
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:)
 	real(kind=4), optional		:: pause, linewidth
 	character(len=*),optional	:: color, terminal, filename, persist, input
@@ -579,7 +572,7 @@
 !***********************************************************************************
 ! prepare the data
 	nx=size(x)
-	if ((size(x).ne.size(y)).or.(size(x).ne.size(z))) then
+	if ((size(x)/=size(y)).or.(size(x)/=size(z))) then
 		print *,'subroutine plot3d ERROR: incompatible sizes of x(:),y(:) and z(:)'
 		stop
 	end if
@@ -683,9 +676,8 @@
 !***********************************************************************************
 ! this subroutine plots the histogram of data contained in array x, using n bins
 !***********************************************************************************
-	implicit none
-	real(kind=8), intent(in)	:: x(:) !the data to plot
-	integer, intent(in)		:: n !the number of intervals
+	real(kind=8), intent(in)	:: x(:)  !the data to plot
+	integer, intent(in)		:: n  !the number of intervals
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: color, terminal, filename, persist, input
 	integer 			:: i, j, ierror, ios, file_unit, nx
@@ -815,7 +807,6 @@
 ! this subroutine plots a surface. x and y are arrays needed to generate the x-y grid
 ! z(:,:) is a 2D array
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -825,7 +816,7 @@
 !***********************************************************************************
 	nx=size(z(:,1))
 	ny=size(z(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		print *,'subroutine surf_3 ERROR: sizes of x(:),y(:), and z(:,:) are incompatible'
 		stop
 	end if
@@ -848,7 +839,6 @@
 ! this subroutine plots a surface. The only input is a 2D array z(:,:), the x-y grid
 ! is generated automatically
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -876,7 +866,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: xyz(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, pm3d, contour, persist, input
@@ -953,8 +942,8 @@
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -1008,7 +997,6 @@
 !***********************************************************************************
 ! this subroutine plots 4 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:), x4(:), y4(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, color4, terminal, filename, polar,&
@@ -1031,11 +1019,11 @@
 	Nx2=size(x2)
 	Nx3=size(x3)
 	Nx4=size(x4)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3)).or.(size(x4).ne.size(y4))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3)).or.(size(x4)/=size(y4))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.12)) then
+	if (present(style).and.(len(style)/=12)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1216,7 +1204,6 @@
 !***********************************************************************************
 ! this subroutine plots 3 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, terminal, filename, polar, persist, input
@@ -1237,11 +1224,11 @@
 	Nx1=size(x1)
 	Nx2=size(x2)
 	Nx3=size(x3)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.9)) then
+	if (present(style).and.(len(style)/=9)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1404,7 +1391,6 @@
 !***********************************************************************************
 ! this subroutine plots 2 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, terminal, filename, polar, persist, input
@@ -1423,11 +1409,11 @@
 !***********************************************************************************
 	Nx1=size(x1)
 	Nx2=size(x2)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.6)) then
+	if (present(style).and.(len(style)/=6)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1571,7 +1557,6 @@
 !***********************************************************************************
 ! this subroutine plots a two-dimensional graph
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, terminal, filename, polar, persist, input
@@ -1589,11 +1574,11 @@
 	end if
 !***********************************************************************************
 	Nx1=size(x1)
-	if ((size(x1).ne.size(y1))) then
+	if ((size(x1)/=size(y1))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.3)) then
+	if (present(style).and.(len(style)/=3)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
@@ -1713,18 +1698,17 @@
 !***********************************************************************************
 	subroutine run_gnuplot(command_file_name)
 !***********************************************************************************
-	implicit none
-	character (len = 100) command
-	character (len = *) command_file_name
-	integer status
-	integer system
+	character (len = 100) :: command
+	character (len = *) :: command_file_name
+	integer :: status
+	integer :: system
 !***********************************************************************************
 !  Issue a command to the system that will startup GNUPLOT, using
 !  the file we just wrote as input.
 !***********************************************************************************
 	write (command, *) 'gnuplot ' // trim (command_file_name)
 	status=system(trim(command))
-	if (status.ne.0) then
+	if (status/=0) then
 		print *,'RUN_GNUPLOT - Fatal error!'
 		stop
 	end if
@@ -1736,11 +1720,10 @@
 !***********************************************************************************
 	subroutine get_unit(iunit)
 !***********************************************************************************
-	implicit none
-	integer i
-	integer ios
-	integer iunit
-	logical lopen
+	integer :: i
+	integer :: ios
+	integer :: iunit
+	logical :: lopen
 !***********************************************************************************
 	iunit=0
 	do i=1,99

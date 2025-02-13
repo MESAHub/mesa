@@ -95,8 +95,8 @@
       ! arrays for LAPACK must be declared at compile time. legacy fortran issue.
       integer, parameter :: NV=5
       integer, parameter :: HD_DIAG=2*NV+1, LD_HD=4*NV+1, LD_ABB=6*NV+1, LPSZ=NV*MAX_NZN+1
-      real(dp) DX(LPSZ), HR(LPSZ), HD(LD_HD, LPSZ), ABB(LD_ABB, LPSZ)
-      integer IPVT(LPSZ)
+      real(dp) :: DX(LPSZ), HR(LPSZ), HD(LD_HD, LPSZ), ABB(LD_ABB, LPSZ)
+      integer :: IPVT(LPSZ)
 
       integer, parameter :: LD_LLL = 4*MAX_NZN
       real(dp), dimension(LD_LLL, LD_LLL) :: LLL, VLx, VRx
@@ -182,8 +182,8 @@
          CQ = s% RSP_cq
          ZSH = s% RSP_zsh
          EFL0 = s% RSP_efl0
-         kapE_factor = 1d0 ! s% RSP_kapE_factor
-         kapP_factor = 1d0 ! s% RSP_kapP_factor
+         kapE_factor = 1d0  ! s% RSP_kapE_factor
+         kapP_factor = 1d0  ! s% RSP_kapP_factor
 
          if (ALFA == 0.d0) EFL0=0.d0
 
@@ -251,7 +251,7 @@
             call mesa_error(__FILE__,__LINE__,'rsp init_allocate')
          end if
          IBOTOM = NZN/s% RSP_nz_div_IBOTOM
-         n = NZN + 1 ! room for ghost cell
+         n = NZN + 1  ! room for ghost cell
          allocate(xa(s% species), &
             dVol_dr_00(n), dVol_dr_in(n), &
             d_egas_dVol(n), d_egas_dT(n), d_egas_dr_00(n), d_egas_dr_in(n), &
@@ -587,7 +587,7 @@
       end subroutine set_star_vars
 
 
-      subroutine copy_from_xh_to_rsp(s, nz_new) ! do this when load a file
+      subroutine copy_from_xh_to_rsp(s, nz_new)  ! do this when load a file
          use star_utils, only: get_T_and_lnT_from_xh, get_r_and_lnR_from_xh
          type (star_info), pointer :: s
          integer, intent(in) :: nz_new
@@ -603,7 +603,7 @@
             s% RSP_w(k) = sqrt(s% RSP_Et(k))
             s% Fr(k) = s% xh(s% i_Fr_RSP,k)
             s% v(k) = s% xh(s% i_v,k)
-            if (k == NZN) then ! center
+            if (k == NZN) then  ! center
                s% Vol(k)=P43/s% dm(k)*(s% r(k)**3 - s% R_center**3)
                s% rmid(k) = 0.5d0*(s% r(k) + s% R_center)
                if (s% Vol(k) <= 0d0 .or. is_bad(s% Vol(k))) then
@@ -844,7 +844,7 @@
             call get_rho_and_lnd_from_xh(s, k, s% rho(k), s% lnd(k))
             s% Vol(k) = 1d0/s% rho(k)
             s% L(k) = 4d0*pi*s% r(k)**2*s% Fr(k) + s% Lc(k) + s% Lt(k)
-            if (s% RSP_w(k) > 1d4) then ! arbitrary cut
+            if (s% RSP_w(k) > 1d4) then  ! arbitrary cut
                s% mixing_type(k) = convective_mixing
             else
                s% mixing_type(k) = no_mixing

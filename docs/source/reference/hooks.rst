@@ -50,7 +50,7 @@ other_gradr_factor               hydro_vars
 other_opacity_factor             micro
 other_cgrav                      hydro_vars
 ===============================  =============
-   
+
 atm
 ---
 ===============================  =============
@@ -193,7 +193,7 @@ logs
 Hook name                              Code Location
 =====================================  =============
 how_many_extra_history_columns         history
-data_for_extra_history_columns         
+data_for_extra_history_columns
 how_many_extra_profile_columns         profile
 data_for_extra_profile_columns
 how_many_extra_history_header_items
@@ -224,10 +224,10 @@ solver
 ===============================  =============
 Hook name                        Code Location
 ===============================  =============
-other_after_enter_setmatrix      hydro_mtx		
-other_after_struct_burn_mix	 struct_burn_mix
-other_before_struct_burn_mix	 struct_burn_mix
-other_solver_monitor		 star_solver
+other_after_enter_setmatrix      hydro_mtx
+other_after_struct_burn_mix      struct_burn_mix
+other_before_struct_burn_mix     struct_burn_mix
+other_solver_monitor             star_solver
 other_new_generation             evolve_support
 other_set_current_to_old         evolve_support
 ===============================  =============

@@ -189,7 +189,7 @@
          names(5) = 'log_tot_KE_R'
          names(6) = 'num_periods'
          vals(1) = s_other% r(1)/Rsun
-         vals(2) = s_other% v(1)/1d5 ! kms
+         vals(2) = s_other% v(1)/1d5  ! kms
          vals(3) = s_other% Teff
          vals(4) = s_other% L(1)/Lsun
          vals(5) = safe_log10(s_other% total_radial_kinetic_energy_end)

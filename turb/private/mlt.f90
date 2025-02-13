@@ -80,14 +80,14 @@ contains
       if (gradr > gradL) then
          ! Convection zone
 
-         Q = chiT/chiRho ! 'Q' param  C&G 14.24
-         if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then ! this assumes optically thick
+         Q = chiT/chiRho  ! 'Q' param  C&G 14.24
+         if (MLT_option == 'Cox' .or. MLT_option == 'TDC') then  ! this assumes optically thick
             a0 = 9d0/4d0
             convective_conductivity = &
-               Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0 ! erg / (K cm sec)
+               Cp*grav*pow2(Lambda)*rho*(sqrt(Q*rho/(2d0*P)))/9d0  ! erg / (K cm sec)
             radiative_conductivity = &
-               (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho) ! erg / (K cm sec)
-            A = convective_conductivity / radiative_conductivity !  unitless.
+               (4d0/3d0*crad*clight)*pow3(T)/(opacity*rho)  ! erg / (K cm sec)
+            A = convective_conductivity / radiative_conductivity  !  unitless.
          else
             select case(trim(MLT_option))
             case ('Henyey')
@@ -156,7 +156,7 @@ contains
          D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
 
          !Zeta = pow3(Gamma)/Bcubed  ! C&G 14.80
-         Zeta = exp(3d0*log(Gamma) - log(Bcubed)) ! write it this way to avoid overflow problems
+         Zeta = exp(3d0*log(Gamma) - log(Bcubed))  ! write it this way to avoid overflow problems
       else
          ! Radiative zone, because this means that gradr < gradL
          Gamma = -1d99
@@ -174,7 +174,7 @@ contains
          Zeta = 1d0
       end if
 
-      gradT = (1d0 - Zeta)*gradr + Zeta*gradL ! C&G 14.79
+      gradT = (1d0 - Zeta)*gradr + Zeta*gradL  ! C&G 14.79
       Y_face = gradT - gradL
 
       if (Y_face > 0d0) then

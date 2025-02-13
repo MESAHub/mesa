@@ -52,7 +52,7 @@
          include 'formats'
 
          ierr = 0
-         part_number = 0 ! part_numbers are just a consistency check
+         part_number = 0  ! part_numbers are just a consistency check
 
          write(*, *) 'read ', trim(fname)
          open(newunit=iounit, file=trim(fname), action='read', &
@@ -75,7 +75,7 @@
          if (failed('initial_z')) return
 
          read(iounit, iostat=ierr) &
-            s% initial_z, & ! need this since read_model can change what is in the inlist
+            s% initial_z, &  ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
@@ -97,7 +97,7 @@
             s% crystal_core_boundary_mass
 
          if (failed('initial_y')) return
-         s% nz_old = s% nz ! needed by alloc
+         s% nz_old = s% nz  ! needed by alloc
 
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &
                s% tau_factor /= s% job% set_to_this_tau_factor) then
@@ -295,7 +295,7 @@
          call read_part_number(iounit)
          if (failed('final read_part_number')) return
 
-         s% need_to_setvars = .true. ! set this after photo out or photo in
+         s% need_to_setvars = .true.  ! set this after photo out or photo in
 
          close(iounit)
 

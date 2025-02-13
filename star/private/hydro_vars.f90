@@ -414,7 +414,7 @@
          s% P_surf = s% Peos(1)
          s% T_surf = s% T(1)
 
-         call set_phot_info(s) ! sets Teff using L_phot and R_phot
+         call set_phot_info(s)  ! sets Teff using L_phot and R_phot
          Teff = s% Teff
 
          if (s% RSP_flag) then
@@ -463,7 +463,7 @@
          s% T_surf = exp(lnT_surf)
          s% P_surf = exp(lnP_surf)
 
-         call set_phot_info(s) ! s% T_surf might have changed so call again
+         call set_phot_info(s)  ! s% T_surf might have changed so call again
 
       end subroutine set_Teff_info_for_eqns
 
@@ -542,12 +542,12 @@
 
          if (.not. skip_grads) then
             if (dbg) write(*,*) 'call do_brunt_B'
-            call do_brunt_B(s, nzlo, nzhi, ierr) ! for unsmoothed_brunt_B
+            call do_brunt_B(s, nzlo, nzhi, ierr)  ! for unsmoothed_brunt_B
             if (failed('do_brunt_B')) return
             if (dbg) write(*,*) 'call set_grads'
             call set_grads(s, ierr)
             if (failed('set_grads')) return
-            call set_conv_time_scales(s) ! uses brunt_B
+            call set_conv_time_scales(s)  ! uses brunt_B
          end if
 
          if (.not. skip_mixing_info) then
@@ -606,7 +606,7 @@
 
          end if
 
-         if (.not. skip_brunt) then ! skip_brunt during solver iterations
+         if (.not. skip_brunt) then  ! skip_brunt during solver iterations
             if (dbg) write(*,*) 'call do_brunt_N2'
             call do_brunt_N2(s, nzlo, nzhi, ierr)
             if (failed('do_brunt_N2')) return
@@ -813,7 +813,7 @@
 
          ! Evaluate the surface optical depth
 
-         tau_surf = s% tau_factor*s% tau_base ! tau at outer edge of cell 1
+         tau_surf = s% tau_factor*s% tau_base  ! tau at outer edge of cell 1
          if (is_bad(tau_surf)) then
             write(*,1) 's% tau_factor', s% tau_factor
             write(*,1) 's% tau_base', s% tau_base

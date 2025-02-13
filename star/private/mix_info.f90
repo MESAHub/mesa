@@ -71,7 +71,7 @@
          ierr = 0
          nz = s% nz
 
-         min_conv_vel_for_convective_mixing_type = 1d0 ! make this a control parameter
+         min_conv_vel_for_convective_mixing_type = 1d0  ! make this a control parameter
 
          RSP2_or_RSP = s% RSP_flag .or. s% RSP2_flag
 
@@ -84,8 +84,8 @@
             if (failed('set_dPdr_dRhodr_info')) return
          end if
 
-         max_conv_bdy = 10 ! will automatically be increased if necessary
-         max_mix_bdy = 10 ! will automatically be increased if necessary
+         max_conv_bdy = 10  ! will automatically be increased if necessary
+         max_mix_bdy = 10  ! will automatically be increased if necessary
 
          s% num_conv_boundaries = 0
          if (.not. associated(s% conv_bdy_loc)) allocate(s% conv_bdy_loc(max_conv_bdy))
@@ -309,7 +309,7 @@
             if (i_h1 > 0 .and. i_he4 > 0) then
                do k=2,nz
                   if (s% xa(i_h1,k-1) > s% xa(i_he4,k-1) .and. &
-                      s% xa(i_h1,k) <= s% xa(i_he4,k)) then ! crossover
+                      s% xa(i_h1,k) <= s% xa(i_he4,k)) then  ! crossover
                      region_bottom_q = &
                         s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_He_crossover
                      region_top_q = &
@@ -337,7 +337,7 @@
             if (i_h1 > 0 .and. i_c12 > 0) then
                do k=2,nz
                   if (s% xa(i_h1,k-1) > s% xa(i_c12,k-1) .and. &
-                      s% xa(i_h1,k) <= s% xa(i_c12,k)) then ! crossover
+                      s% xa(i_h1,k) <= s% xa(i_c12,k)) then  ! crossover
                      region_bottom_q = &
                         s% q(k) - 0.5d0*s% dq_D_mix_zero_at_H_C_crossover
                      region_top_q = &
@@ -492,13 +492,13 @@
 
          do k=nz-1, 2, -1
             if (in_convective_region) then
-               if (s% mixing_type(k) /= convective_mixing) then ! top of convective region
+               if (s% mixing_type(k) /= convective_mixing) then  ! top of convective region
                   s% cz_top_mass(s% n_conv_regions) = &
                      s% M_center + (s% q(k) - s% cz_bdy_dq(k))*s% xmstar
                   in_convective_region = .false.
                end if
             else
-               if (s% mixing_type(k) == convective_mixing) then ! bottom of convective region
+               if (s% mixing_type(k) == convective_mixing) then  ! bottom of convective region
                   if (s% n_conv_regions < max_num_mixing_regions) then
                      s% n_conv_regions = s% n_conv_regions + 1
                      s% cz_bot_mass(s% n_conv_regions) = &
@@ -586,8 +586,8 @@
                else if(s% conv_vel(k) /= 0d0) then
                   turnover_time = turnover_time + (s% rmid(k-1) - s% rmid(k))/s% conv_vel(k)
                end if
-            else ! in non-convective region
-               if (s% mixing_type(k) == convective_mixing) then ! start of a convective region
+            else  ! in non-convective region
+               if (s% mixing_type(k) == convective_mixing) then  ! start of a convective region
                   if (s% num_conv_boundaries == max_conv_bdy) then
                      call realloc(ierr)
                      if (ierr /= 0) then
@@ -599,7 +599,7 @@
                   k_bot = k+1
                   if (k == 1) then
                      s% conv_bdy_q(i) = 1
-                  else ! bottom of region is between k+1 and k
+                  else  ! bottom of region is between k+1 and k
                      s% conv_bdy_q(i) = s% q(k) - s% cz_bdy_dq(k)
                   end if
                   s% top_conv_bdy(i) = .false.
@@ -615,7 +615,7 @@
          end do
 
          if (in_convective_region) then
-            k = 1 ! end at top
+            k = 1  ! end at top
             call end_of_convective_region
          end if
 
@@ -675,7 +675,7 @@
                   exp10(s% prune_bad_cz_min_log_eps_nuc)
                if (max_eps < exp10(s% prune_bad_cz_min_log_eps_nuc) &
                      .and. all(s% mixing_type(k+1:k_bot-1) /= thermohaline_mixing)) then
-                  do kk = k, k_bot ! this includes the radiative points at boundaries
+                  do kk = k, k_bot  ! this includes the radiative points at boundaries
                      call set_use_gradr(s,kk)
                      s% cdc(kk) = 0
                      s% D_mix(kk) = 0
@@ -823,8 +823,8 @@
          do k=nz-1, 2, -1
             if (in_mixing_region) then
                if (s% mixing_type(k) == no_mixing) call end_of_mixing_region
-            else ! in non-mixing region
-               if (s% mixing_type(k) /= no_mixing) then ! start of a mixing region
+            else  ! in non-mixing region
+               if (s% mixing_type(k) /= no_mixing) then  ! start of a mixing region
                   if (s% num_mix_boundaries == max_mix_bdy) then
                      call realloc(ierr)
                      if (ierr /= 0) return
@@ -834,7 +834,7 @@
                   k_bot = k+1
                   if (k == 1) then
                      s% mix_bdy_q(i) = 1
-                  else ! bottom of region is between k+1 and k
+                  else  ! bottom of region is between k+1 and k
                      s% mix_bdy_q(i) = s% q(k) - s% cz_bdy_dq(k)
                   end if
                   s% top_mix_bdy(i) = .false.
@@ -845,7 +845,7 @@
          end do
 
          if (in_mixing_region) then
-            k = 1 ! end at top
+            k = 1  ! end at top
             call end_of_mixing_region
          end if
 
@@ -1115,7 +1115,7 @@
          integer :: k, nz
          logical :: in_region, dbg
          real(dp) :: rtop, rbot, Hp
-         integer :: ktop, kbot ! k's for gap
+         integer :: ktop, kbot  ! k's for gap
          include 'formats'
 
          dbg = .false.
@@ -1130,14 +1130,14 @@
          kbot = nz
          do k=nz-1, 2, -1
             if (in_region) then
-               if (s% mixing_type(k) /= mix_type) then ! end of region
+               if (s% mixing_type(k) /= mix_type) then  ! end of region
                   kbot = k+1
                   rbot = s% r(kbot)
                   in_region = .false.
                   if (dbg) write(*,2) 'end of region', kbot, rbot
                end if
             else
-               if (s% mixing_type(k) == mix_type) then ! start of region
+               if (s% mixing_type(k) == mix_type) then  ! start of region
                   ktop = k
                   rtop = s% r(ktop)
                   Hp = s% Peos(ktop)/(s% rho(ktop)*s% grav(ktop))
@@ -1184,7 +1184,7 @@
          integer :: k, nz, j
          logical :: in_region
          real(dp) :: rtop, rbot, Hp, q_upper, q_lower, alfa, beta
-         integer :: ktop, kbot ! k's for gap
+         integer :: ktop, kbot  ! k's for gap
          logical :: all_small
          logical, parameter :: dbg = .false.
          include 'formats'
@@ -1196,10 +1196,10 @@
          all_small = .false.
          do k=nz-2, 2, -1
             if (in_region) then
-               if (s% mixing_type(k) == no_mixing) then ! check if okay
+               if (s% mixing_type(k) == no_mixing) then  ! check if okay
                   if (s% gradL(k) - s% grada_face(k) > s% max_dropout_gradL_sub_grada) &
                      all_small = .false.
-               else ! end of radiative region
+               else  ! end of radiative region
                   ktop = k+1
                   rtop = s% r(ktop)
                   Hp = s% Peos(ktop)/(s% rho(ktop)*s% grav(ktop))
@@ -1209,7 +1209,7 @@
                       s% mixing_type(ktop-1) == thermohaline_mixing .and. &
                       s% mixing_type(kbot+1) == thermohaline_mixing .and. &
                       q_upper - q_lower > 1d-20 .and. all_small) then
-                     do j = ktop, kbot ! interpolate in q
+                     do j = ktop, kbot  ! interpolate in q
                         alfa = (s% q(j) - q_lower)/(q_upper - q_lower)
                         beta = 1 - alfa
                         s% cdc(j) = alfa*s% cdc(ktop-1) + beta*s% cdc(kbot+1)
@@ -1221,7 +1221,7 @@
                   in_region = .false.
                end if
             else
-               if (s% mixing_type(k) == no_mixing) then ! start of region
+               if (s% mixing_type(k) == no_mixing) then  ! start of region
                   kbot = k
                   rbot = s% r(kbot)
                   in_region = .true.
@@ -1255,13 +1255,13 @@
          kbot = nz
          do k=nz-1, 2, -1
             if (in_region) then
-               if (.not. check(k)) then ! end of region
+               if (.not. check(k)) then  ! end of region
                   ktop = k+1
                   in_region = .false.
                   call clean_region
                end if
-            else ! not in region
-               if (check(k)) then ! start of region
+            else  ! not in region
+               if (check(k)) then  ! start of region
                   kbot = k
                   in_region = .true.
                end if
@@ -1350,12 +1350,12 @@
          if (T_mix_limit <= 0) return
          nz = s% nz
          j = 0
-         do k = 1, nz ! search inward until find T >= T_mix_limit
+         do k = 1, nz  ! search inward until find T >= T_mix_limit
             if (s% T(k) >= T_mix_limit) then
                j = k; exit
             end if
          end do
-         if (j==0) j=nz ! all T < T_mix_limit
+         if (j==0) j=nz  ! all T < T_mix_limit
          ! find base of innermost convection that has T < T_mix_limit
          i = 0
          do k = j, 1, -1
@@ -1364,7 +1364,7 @@
             end if
          end do
          if (i == 0) then
-            return ! no convection in region with T < T_mix_limit
+            return  ! no convection in region with T < T_mix_limit
          end if
          ! extend convection region to surface
          j = maxloc(s% cdc(1:i), dim=1)
@@ -1384,7 +1384,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, k, j, species, ktop, kbot, bdy
-         real(dp) :: sig_term_limit ! sig_term_limit is used to help convergence
+         real(dp) :: sig_term_limit  ! sig_term_limit is used to help convergence
 
          real(dp) :: siglim, xmstar, dq00, dqm1, cdcterm, dmavg, rho_face, &
             cdc, max_sig, D, xm1, x00, dm, dX, X, cushion, limit, &
@@ -1523,7 +1523,7 @@
             if (siglim == 0d0) return
             ! okay to increase limit up to max_lim
             max_delta_m_to_bdy = s% max_delta_m_to_bdy_for_sig_min_factor
-            if (delta_m_to_bdy >= max_delta_m_to_bdy) return ! no change in sig
+            if (delta_m_to_bdy >= max_delta_m_to_bdy) return  ! no change in sig
             lim = limit + (max_lim - limit)*delta_m_to_bdy/max_delta_m_to_bdy
             if (lim >= 1d0) return
             do j=1,species
@@ -1572,7 +1572,7 @@
             am_nu_ST_factor, &
             f, lgT, full_off, full_on, &
             full_off_tau, full_on_tau
-         real(dp), dimension(:), allocatable :: & ! work vectors for tridiagonal solve
+         real(dp), dimension(:), allocatable :: &  ! work vectors for tridiagonal solve
             sig, rhs, d, du, dl, bp, vp, xp, x
 
          include 'formats'
@@ -1603,16 +1603,16 @@
                f = 1d0
             else if (lgT >= full_off) then
                f = 0d0
-            else ! lgT > full_on and < full_off
+            else  ! lgT > full_on and < full_off
                f = (lgT - full_on) / (full_off - full_on)
             end if
-            
+
             ! using tau to limit D_mix rotation in surface regions
             if (s% tau(k) >= full_on_tau) then
                f = 1d0
             else if (s% tau(k) <= full_off_tau) then
                f = 0d0
-            else ! tau > full_off_tau and < full_on_tau
+            else  ! tau > full_off_tau and < full_on_tau
                f = (lgT - full_on) / (full_off - full_on)
             end if
 
@@ -1845,7 +1845,7 @@
                      call smooth_for_rotation(s, s% am_nu_rot, s% smooth_am_nu_rot, sig)
                   end if
 
-                  if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then ! mix am_nu_rot
+                  if (s% nu_omega_mixing_rate > 0d0 .and. s% dt > 0) then  ! mix am_nu_rot
 
                      rate = min(s% nu_omega_mixing_rate, 1d0/dt)
                      do k=2,nz-1
@@ -1938,7 +1938,7 @@
 
             end if
 
-            if (s% am_nu_rot_flag) then ! check
+            if (s% am_nu_rot_flag) then  ! check
                do k=1,nz
                   if (is_bad(s% am_nu_rot(k))) then
                      write(*,2) 'before return s% am_nu_rot(k)', k, s% am_nu_rot(k)
@@ -1988,7 +1988,7 @@
                v = s% v(k)
             end if
             if (v > s% csound(k)) then
-               if (k > 1) shock_mass_start = s% m(k) ! skip this after breakout
+               if (k > 1) shock_mass_start = s% m(k)  ! skip this after breakout
                exit
             end if
          end do
@@ -2026,7 +2026,7 @@
                cs = s% csound_face(k)
                r = s% r(k)
                s% eta_RTI(k) = C*alpha_face*cs*r
-               
+
                if (is_bad(s% eta_RTI(k)) .and. s% q(k) <= s% alpha_RTI_src_max_q) then
                   ierr = -1
                   return
@@ -2136,7 +2136,7 @@
          if (.not. s% RTI_flag) return
          if (s% dPdr_dRhodr_info(1) >= 0d0) then
             if (is_bad(s% dPdr_dRhodr_info(1))) call mesa_error(__FILE__,__LINE__,'set_dPdr_dRhodr_info')
-            return ! already set this step
+            return  ! already set this step
          end if
 
          nz = s% nz
@@ -2173,7 +2173,7 @@
             else
                !dr_00 = s% r(k) - s% r(k+1)
                rmid = 0.5d0*(s% r(k) + s% r(k+1))
-               dr_00 = s% dm(k)/(pi4*rmid*rmid*s% rho(k)) ! don't subtract r's to get dr
+               dr_00 = s% dm(k)/(pi4*rmid*rmid*s% rho(k))  ! don't subtract r's to get dr
                dPdr(k) = (P_face(k) - P_face(k+1))/dr_00
                drhodr(k) = (rho_face(k) - rho_face(k+1))/dr_00
             end if
@@ -2417,7 +2417,7 @@
             P_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
             r_face = s% r(k)
             q_face = s% q(k)
-            cdc = pow2(pi4*s% r(k)*s% r(k)*rho_face)*D ! gm^2/sec
+            cdc = pow2(pi4*s% r(k)*s% r(k)*rho_face)*D  ! gm^2/sec
             if (s% cgrav(k) <= 0) then
                Hp = s% r(k)
             else

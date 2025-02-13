@@ -55,7 +55,7 @@
             write(*,*) 'len_trim(species)', len_trim(species)
             return
          end if
-         get_net_iso = s% net_iso(j) ! 0 if species not in current net
+         get_net_iso = s% net_iso(j)  ! 0 if species not in current net
       end function get_net_iso
 
 
@@ -106,7 +106,7 @@
          character (len=32), intent(out) :: names(max_allowed_gvals)
          logical, intent(out), dimension(max_allowed_gvals) :: &
             gval_is_xa_function, gval_is_logT_function
-         real(dp), pointer :: vals1(:) ! =(nz, nfcns)
+         real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
          integer, intent(out) :: ierr
 
          integer :: i, nz, j, k, i_other
