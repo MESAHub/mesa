@@ -4,7 +4,7 @@
 rsp_BLAP
 ********
 
-This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model - 
+This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
 a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
 
 This test case has 1 part. Click to see a larger version of a plot.

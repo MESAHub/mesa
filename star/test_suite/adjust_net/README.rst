@@ -71,7 +71,7 @@ pgstar commands used for the plots above:
 
     History_Track1_win_flag = .true.
     History_Track1_win_width = 12
-    History_Track1_title = 'adjust_net'                                                                                                                                                                                   
+    History_Track1_title = 'adjust_net'
     History_Track1_xname = 'model_number'
     History_Track1_xaxis_label = 'model number'
 

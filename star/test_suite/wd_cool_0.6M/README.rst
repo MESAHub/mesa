@@ -14,7 +14,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 
-|br| 
+|br|
 The evolution then commences with element diffusion activated, and the run terminates when the central temperature drops below 1e6 K:
 
 .. image:: ../../../star/test_suite/wd_cool_0.6M/docs/Grid2000578.svg

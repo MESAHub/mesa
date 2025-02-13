@@ -29,7 +29,7 @@ pgstar commands used for the plot above:
   pgstar_interval = 10
   pgstar_grid_title_disp = 1.8
 
-  Abundance_xaxis_name = 'logxm' 
+  Abundance_xaxis_name = 'logxm'
   Abundance_xaxis_reversed = .true.
   Abundance_xmin = -12.0
   Abundance_xmax = -8.0
@@ -148,13 +148,13 @@ pgstar commands used for the plot above:
   Grid2_num_cols = 7
   Grid2_num_rows = 8
   Grid2_num_plots = 5
-  
+
   Grid2_win_flag = .true.
   Grid2_win_width = 16
   Grid2_win_aspect_ratio = 0.6
-  
+
   Grid2_file_flag = .true.
-  Grid2_file_dir = 'pgstar_out' 
+  Grid2_file_dir = 'pgstar_out'
   Grid2_file_prefix = 'grid_'
   Grid2_file_interval = 10000
   Grid2_file_width = 20

@@ -55,12 +55,12 @@ pgstar commands used for the plots above:
   Kipp_win_width = 12
   Kipp_win_aspect_ratio = 0.75
   Kipp_txt_scale = 0.9
-  Kipp_title = ''      
+  Kipp_title = ''
 
   Kipp_mass_max = 7.0
   Kipp_mass_min = 0.0
   Kipp_xmax = -101
-  Kipp_xmin = 0   
+  Kipp_xmin = 0
 
   Kipp_show_mass_boundaries = .true.
   Kipp_show_mixing = .true.

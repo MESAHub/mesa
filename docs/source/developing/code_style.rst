@@ -1,7 +1,7 @@
 Coding style
 ============
 
-MESA has been developed over many years, thus there many different styles of code in use. We do not 
+MESA has been developed over many years, thus there many different styles of code in use. We do not
 require old code to be ported to the new style. However, new code should be written following these guidelines.
 
 
@@ -48,10 +48,10 @@ Doing otherwise will result in a compiler error.
 Errors
 ------
 
-In general a subroutine should return as its last argument a integer ``ierr`` which denotes whether the 
-subroutine succeeded or not. A value of ``ierr=0`` is to be used to show the subroutine succeeded, 
-any other value of ierr denotes an error. Any meaning in different non-zero values of ``ierr`` 
-can only be determined by inspecting the subroutine that set the ``ierr``. 
+In general a subroutine should return as its last argument a integer ``ierr`` which denotes whether the
+subroutine succeeded or not. A value of ``ierr=0`` is to be used to show the subroutine succeeded,
+any other value of ierr denotes an error. Any meaning in different non-zero values of ``ierr``
+can only be determined by inspecting the subroutine that set the ``ierr``.
 
 The typical way to handle things is:
 
@@ -109,7 +109,7 @@ The preferred manner to declare a double precision variable is:
 
     real(dp) :: x
 
-instead of 
+instead of
 
 .. code-block:: fortran
 
@@ -130,7 +130,7 @@ Do not leave values as a bare float:
 
     y3 = 1.1 * x
 
-As the ``1.1`` gets interpreted as a single precision value, and will lead ``y3`` to have a different value 
+As the ``1.1`` gets interpreted as a single precision value, and will lead ``y3`` to have a different value
 to ``y1`` or ``y2``.
 
 
@@ -148,7 +148,7 @@ and this name should differ from any other code entities (e.g. subroutines).
 
 Each named critical block will be executed by one thread at a time. Different named critical blocks can be executed
 at the same time. However, all unnamed critical blocks act like one block and thus can not be executed in parallel.
-Therefore you should always named your OMP critical blocks to ensure the best performance.  
+Therefore you should always named your OMP critical blocks to ensure the best performance.
 
 Do not name your OMP critical block with a name that has already been used for a variable, procedure, module or any other object.
 
@@ -181,7 +181,7 @@ Unformatted reads
 Should be avoided when the variables that are strings. This is because if the string contains a / (forward-slash) then when doing a unformatted
 read Fortran will stop reading the line.
 
-Either build a full format statement or read the line into one string and split on whitespace. There is also a function ``split_line`` in 
+Either build a full format statement or read the line into one string and split on whitespace. There is also a function ``split_line`` in
 ``utils_lib.f90`` that can be used to split a line up based on whitespace.
 
 

@@ -4,7 +4,7 @@
 rsp_Delta_Scuti
 ***************
 
-This test case checks the non-linear pulsation evolution of a 2 Msun, Teff = 6900 K, L = 30 Lsun, Z = 0.02 metallicity - 
+This test case checks the non-linear pulsation evolution of a 2 Msun, Teff = 6900 K, L = 30 Lsun, Z = 0.02 metallicity -
 a double-mode delta Scuti variable leaving the main-sequence phase originally contributed by Alfred Gautschy.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -14,9 +14,9 @@ This test case has 1 part. Click to see a larger version of a plot.
 .. code-block:: console
 
  rel_run_E_err  -7.2889211517560327E-011
- good match for period  0.14674260955972285       0.14715000000000000     
+ good match for period  0.14674260955972285       0.14715000000000000
 
-This test case also exercises the ability of the RSP module to write a file suitable for post-processing 
+This test case also exercises the ability of the RSP module to write a file suitable for post-processing
 with gnuplot's pm3d. See the ``RSP_map_*`` inlist controls, with the output file being put in the ``LOGS`` directory.
 
 .. image:: ../../../star/test_suite/rsp_Delta_Scuti/docs/grid_0007973.svg

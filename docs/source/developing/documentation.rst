@@ -4,7 +4,7 @@ Documentation
 
 The main MESA documentation lives in ``$MESA_DIR/docs`` and is generated using `Sphinx <https://www.sphinx-doc.org/en/master/>`__.
 
-Once you have `installed Sphinx <https://www.sphinx-doc.org/en/master/usage/installation.html>`__, 
+Once you have `installed Sphinx <https://www.sphinx-doc.org/en/master/usage/installation.html>`__,
 you can generate the docs by doing
 
 .. code-block:: console
