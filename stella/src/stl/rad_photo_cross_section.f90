@@ -3823,9 +3823,9 @@ contains
             if(is<=nint.or.e>=einn)then
               p1=-ph1(5,nz,ne,is)
               y=e/ph1(2,nz,ne,is)
-              q=-0.5*p1-l(is)-5.5
-              a=ph1(3,nz,ne,is)*((y-1.0)**2+ph1(6,nz,ne,is)**2)
-              b=sqrt(y/ph1(4,nz,ne,is))+1.0
+              q=-0.5d0*p1-l(is)-5.5d0
+              a=ph1(3,nz,ne,is)*((y-1.0d0)**2+ph1(6,nz,ne,is)**2)
+              b=sqrt(y/ph1(4,nz,ne,is))+1.0d0
 
 ! ***        s -- partial cross section for current shell and current energy
 
@@ -3849,11 +3849,11 @@ contains
 
               else
                 p1=-ph2(4,nz,ne)
-                q=-0.5*p1-5.5
+                q=-0.5d0*p1-5.5d0
                 x=e/ph2(1,nz,ne)-ph2(6,nz,ne)
                 z=sqrt(x*x+ph2(7,nz,ne)**2)
-                a=ph2(2,nz,ne)*((x-1.0)**2+ph2(5,nz,ne)**2)
-                b=1.0+sqrt(z/ph2(3,nz,ne))
+                a=ph2(2,nz,ne)*((x-1.0d0)**2+ph2(5,nz,ne)**2)
+                b=1.0d0+sqrt(z/ph2(3,nz,ne))
                 s=a*z**q*b**p1
               endif
             endif
@@ -4019,17 +4019,17 @@ end subroutine photoCrossVerner
       if(is<=nint.or.e>=einn)then
          p1=-ph1(5,nz,ne,is)
          y=e/ph1(2,nz,ne,is)
-         q=-0.5*p1-l(is)-5.5
-         a=ph1(3,nz,ne,is)*((y-1.0)**2+ph1(6,nz,ne,is)**2)
-         b=sqrt(y/ph1(4,nz,ne,is))+1.0
+         q=-0.5d0*p1-l(is)-5.5d0
+         a=ph1(3,nz,ne,is)*((y-1.0d0)**2+ph1(6,nz,ne,is)**2)
+         b=sqrt(y/ph1(4,nz,ne,is))+1.0d0
          s=a*y**q*b**p1
       else
          p1=-ph2(4,nz,ne)
-         q=-0.5*p1-5.5
+         q=-0.5d0*p1-5.5d0
          x=e/ph2(1,nz,ne)-ph2(6,nz,ne)
          z=sqrt(x*x+ph2(7,nz,ne)**2)
-         a=ph2(2,nz,ne)*((x-1.0)**2+ph2(5,nz,ne)**2)
-         b=1.0+sqrt(z/ph2(3,nz,ne))
+         a=ph2(2,nz,ne)*((x-1.0d0)**2+ph2(5,nz,ne)**2)
+         b=1.0d0+sqrt(z/ph2(3,nz,ne))
          s=a*z**q*b**p1
       endif
       return

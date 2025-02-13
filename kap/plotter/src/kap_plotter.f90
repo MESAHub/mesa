@@ -478,8 +478,8 @@ contains
 
       xa = 0d0
       xa(h1) = X
-      xa(c12) = 0.5*Z
-      xa(o16) = 0.5*Z
+      xa(c12) = 0.5d0*Z
+      xa(o16) = 0.5d0*Z
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 

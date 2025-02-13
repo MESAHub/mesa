@@ -2662,7 +2662,7 @@
       type(auto_diff_real_2var_order1) :: FJ2, FJ2DX, FJ2DT, FJ2DXX, FJ2DXT, FJ2DTT
 
       integer :: J, K
-      real(dp), parameter :: PI26=PI*PI/6.
+      real(dp), parameter :: PI26=PI*PI/6.d0
 
       if (CHI*TEMP<.1d0) then
         do K=0,2

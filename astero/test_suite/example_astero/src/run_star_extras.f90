@@ -100,7 +100,7 @@
                do i = 1, s% nz-1  ! locate bottom of solar convective zone
                   if (s% mixing_type(i+1) /= convective_mixing &
                         .and. s% mixing_type(i) == convective_mixing) then
-                     if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                     if (s% r(i+1) > 0.25d0*Rsun .and. s% r(i) < 0.9d0*Rsun) then
                         val = s% r(i)/Rsun
                         exit
                      end if
