@@ -24,8 +24,13 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :alt: GitHub
     :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
 .. image:: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml/badge.svg
+    :title: BuildLinux
     :alt: BuildLinux
     :target: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml
+.. image:: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml/badge.svg
+    :title: StaticAnalysis
+    :alt: StaticAnalysis
+    :target: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml
 
 |
 
