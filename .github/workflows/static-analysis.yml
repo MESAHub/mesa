@@ -34,3 +34,7 @@ jobs:
           cd ${{ github.workspace }}
           black --check .
         
+      - name: Apply RST linter, sphinx-lint
+        run: |
+          cd ${{ github.workspace }}
+          sphinx-lint --ignore=gyre/gyre

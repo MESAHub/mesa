@@ -42,7 +42,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 Overview
 ========
 
-MESA is a powerful and versatile open-source software suite built to 
+MESA is a powerful and versatile open-source software suite built to
 allow users to run experiments in stellar evolution.
 Stellar evolution calculations (i.e., stellar evolution tracks and
 detailed information about the evolution of internal and global
@@ -71,7 +71,7 @@ Links
 * `Landing page <https://mesastar.org/>`__ for links to all things MESA.
 * `Code repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
-* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA. 
+* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA.
 * `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `MESA Users Mailing List <https://lists.mesastar.org/mailman/listinfo/mesa-users>`__ for info about new releases, news items, and requests for help/bug reports.
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.

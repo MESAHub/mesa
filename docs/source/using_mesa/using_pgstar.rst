@@ -222,7 +222,7 @@ previous ones.::
   Grid1_win_flag = .true.
   Grid2_win_flag = .true.
 
-  
+
 When you're finished admiring these beauties, delete the "win_flag"
 lines from your inlist, and we'll take a look at how you can modify
 plots.
@@ -399,13 +399,13 @@ After that, fix the padding between the plots and adjust the text sizes.::
   Grid1_plot_pad_left(2) = 0.05 ! fraction of full window width for padding on left
   Grid1_plot_pad_right(2) = 0.1 ! fraction of full window width for padding on right
   Grid1_txt_scale_factor(2) = 0.6 ! multiply txt_scale for subplot by this
-  
+
   Grid1_plot_pad_top(3) = 0.01 ! fraction of full window height for padding at top
   Grid1_plot_pad_bot(3) = 0.1 ! fraction of full window height for padding at bottom
   Grid1_plot_pad_left(3) = 0.1 ! fraction of full window width for padding on left
   Grid1_plot_pad_right(3) = 0.05 ! fraction of full window width for padding on right
   Grid1_txt_scale_factor(3) = 0.6 ! multiply txt_scale for subplot by this
-  
+
   Grid1_plot_pad_top(4) = 0.00 ! fraction of full window height for padding at top
   Grid1_plot_pad_bot(4) = 0.05 ! fraction of full window height for padding at bottom
 
@@ -450,7 +450,7 @@ black/white and white/black::
   file_white_on_black_flag = .true.
 
 and control the number of digits that appear in the filenames::
-  
+
   file_digits = 5 ! number of digits for model_number in filenames
 
 In addition, each plot has controls for its own file output similar to

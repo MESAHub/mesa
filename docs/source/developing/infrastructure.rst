@@ -36,7 +36,7 @@ This is currently tied to Rob's account.
 mesastar.org
 ------------
 
-This is a long-standing domain name used by MESA. 
+This is a long-standing domain name used by MESA.
 The main website redirects to a landing page hosted on `GitHub Pages <https://mesastar.org>`__
 
 Domain Name

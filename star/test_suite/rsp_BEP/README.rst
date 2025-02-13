@@ -4,7 +4,7 @@
 rsp_BEP
 *******
 
-This test case checks the non-linear pulsation evolution of a 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar 
+This test case checks the non-linear pulsation evolution of a 0.26 Msun, Teff = 6968 K, L = 33 Lsun, Z = 0.01 metallicity model - a binary evolution pulsator similar
 the one shown in |Smolec2013|.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -14,7 +14,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 .. code-block:: console
 
  rel_run_E_err   4.0689950095995592E-009
- good match for period  0.62459621363634887       0.62072799999999995 
+ good match for period  0.62459621363634887       0.62072799999999995
 
 .. image:: ../../../star/test_suite/rsp_BEP/docs/grid_0007255.svg
    :width: 100%
