@@ -387,8 +387,8 @@
          real(dp), intent(out) :: other
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: extra_ad, v_00, &
-            drag
-         real(dp) :: accel, d_accel_dv
+            drag, implicit_v_new, implicit_drag_accel
+         real(dp) :: accel, d_accel_dv, activation_factor, delta
          logical :: test_partials, local_v_flag
 
          include 'formats'
@@ -400,9 +400,14 @@
             extra_ad = s% extra_grav(k)
          end if
 
+         ! define variables for v_flag
+         implicit_v_new =0d0
+         implicit_drag_accel = 0d0
          accel_ad = 0d0
          drag = 0d0
          s% dvdt_drag(k) = 0d0
+         delta = 0d0
+         activation_factor = 0d0
          if (s% v_flag) then
 
             if (s% i_lnT == 0) then
@@ -426,11 +431,51 @@
             accel_ad%val = accel
             accel_ad%d1Array(i_v_00) = d_accel_dv
 
-            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
-               v_00 = wrap_v_00(s,k)
-               drag = -s% drag_coefficient*v_00/s% dt
-               s% dvdt_drag(k) = drag%val
-            end if
+!            if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+!               v_00 = wrap_v_00(s,k)
+!               drag = -s% drag_coefficient*v_00/s% dt
+!               s% dvdt_drag(k) = drag%val
+!            end if
+
+
+
+         ! Compute a smooth activation factor based on q(k)
+         ! delta controls the smoothness.
+         ! When q(k) is below s%min_q_for_drag, factor ~ 0;
+         ! when q(k) is well above, factor ~ 1.
+         if ((s% q(k) > s% min_q_for_drag) .and. s% drag_coefficient > 0 .and. s% use_drag_energy) then
+                     delta = 0.1d0  ! folding scale is 1% by mass
+                     activation_factor = tanh((s% q(k) - s% min_q_for_drag) / delta)
+         else
+            delta = 0d0
+            activation_factor = 0d0
+         end if
+
+         ! Compute a backward euler drag term.
+         ! The drag force is modeled by the ODE:
+         !     dv/dt = -s%drag_coefficient * v.
+         !
+         ! In backward Euler, we approximate the time derivative as:
+         !     (v^{n+1} - v^n)/dt = -s%drag_coefficient * v^{n+1}.
+         !
+         ! Solving for v^{n+1} gives:
+         !     v^{n+1} = v^n / (1 + s%drag_coefficient*dt).
+         !
+         ! Then the drag acceleration used in the momentum update is:
+         !    implicit_drag_accel = a_drag = (v^{n+1} - v^n)/dt
+         !     = - (s%drag_coefficient * v^n)/(1 + s%drag_coefficient*dt).
+
+         if (s% q(k) > s% min_q_for_drag .and. s% drag_coefficient > 0) then
+            ! Get the face velocity.
+            v_00 = wrap_v_00(s,k)
+            ! Compute the new velocity for drag using backward Euler:
+            implicit_v_new = v_00 / (1d0 + s% drag_coefficient * s% dt)
+            ! Compute the effective drag acceleration:
+            implicit_drag_accel = (implicit_v_new - v_00) / s% dt
+            drag = activation_factor * implicit_drag_accel
+            s% dvdt_drag(k) = activation_factor * drag%val
+         end if
+
 
          end if  ! v_flag
 

@@ -225,7 +225,8 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, RTI_diffusion_ad, &
-               v_00, v_p1, drag_force, drag_energy
+               v_00, v_p1, drag_force, drag_energy, implicit_v_new, implicit_drag_accel
+            real(dp) :: activation_factor, delta
             include 'formats'
             ierr = 0
 
@@ -273,28 +274,92 @@
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
+!            drag_energy = 0d0
+!            s% FdotV_drag_energy(k) = 0
+!            if (k /= s% nz) then
+!               if ((s% q(k) > s% min_q_for_drag) .and. &
+!                    (s% drag_coefficient > 0) .and. &
+!                    s% use_drag_energy) then
+!                  v_00 = wrap_v_00(s,k)
+!                  drag_force = s% drag_coefficient*v_00/s% dt
+!                  drag_energy = 0.5d0*v_00*drag_force
+!                  s% FdotV_drag_energy(k) = drag_energy%val
+!               ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
+!               end if
+!               if ((s% q(k+1) > s% min_q_for_drag) .and. &
+!                    (s% drag_coefficient > 0) .and. &
+!                    s% use_drag_energy) then
+!                  v_p1 = wrap_v_p1(s,k)
+!                  drag_force = s% drag_coefficient*v_p1/s% dt
+!                  drag_energy = drag_energy + 0.5d0*v_p1*drag_force
+!                  s% FdotV_drag_energy(k) = drag_energy%val
+!               ! drag energy for inner half-cell.   the 0.5d0 is for dm/2
+!               end if
+!            end if
+
+! should be apply a check for v_flag in hydro energy? so we aren't checking for drag if
+! we already know v_flag is off?
+!implicit_v_new = 0d0
+!implicit_drag_accel = 0d0
+!drag_energy = 0d0
+!s% FdotV_drag_energy(k) = 0
+!delta = 0d0
+!activation_factor = 0d0
+
+            ! Compute a smooth activation factor based on q(k)
+            ! delta controls the smoothness.
+            ! When q(k) is below s%min_q_for_drag, factor ~ 0;
+            ! when q(k) is well above, factor ~ 1.
+
+            if ((s% q(k) > s% min_q_for_drag) .and. s% drag_coefficient > 0 .and. s% use_drag_energy) then
+                        delta = 0.01d0  ! folding scale is 1% by mass
+                        activation_factor = tanh((s% q(k) - s% min_q_for_drag) / delta)
+            else
+               delta = 0d0
+               activation_factor = 0d0
+            end if
+
+            ! Compute a backward euler drag energy term.
+            ! The drag force is modeled by the ODE:
+            !     dv/dt = -s%drag_coefficient * v.
+            !
+            ! In backward Euler, we approximate the time derivative as:
+            !     (v^{n+1} - v^n)/dt = -s%drag_coefficient * v^{n+1}.
+            !
+            ! Solving for v^{n+1} gives:
+            !     v^{n+1} = v^n / (1 + s%drag_coefficient*dt).
+            !
+            ! Then the drag acceleration used in the momentum update is:
+            !    implicit_drag_accel = a_drag = (v^{n+1} - v^n)/dt
+            !     = - (s%drag_coefficient * v^n)/(1 + s%drag_coefficient*dt).
+            implicit_v_new = 0d0
+            implicit_drag_accel = 0d0
             drag_energy = 0d0
             s% FdotV_drag_energy(k) = 0
             if (k /= s% nz) then
-               if ((s% q(k) > s% min_q_for_drag) .and. &
-                    (s% drag_coefficient > 0) .and. &
-                    s% use_drag_energy) then
-                  v_00 = wrap_v_00(s,k)
-                  drag_force = s% drag_coefficient*v_00/s% dt
-                  drag_energy = 0.5d0*v_00*drag_force
-                  s% FdotV_drag_energy(k) = drag_energy%val
-               ! drag energy for outer half-cell.   the 0.5d0 is for dm/2
-               end if
-               if ((s% q(k+1) > s% min_q_for_drag) .and. &
-                    (s% drag_coefficient > 0) .and. &
-                    s% use_drag_energy) then
-                  v_p1 = wrap_v_p1(s,k)
-                  drag_force = s% drag_coefficient*v_p1/s% dt
-                  drag_energy = drag_energy + 0.5d0*v_p1*drag_force
-                  s% FdotV_drag_energy(k) = drag_energy%val
-               ! drag energy for inner half-cell.   the 0.5d0 is for dm/2
-               end if
+             ! Compute drag energy for the outer half-cell:
+             if ((s% q(k) > s% min_q_for_drag) .and. s% drag_coefficient > 0 .and. s% use_drag_energy) then
+                v_00 = wrap_v_00(s,k)
+                implicit_v_new = v_00 / (1d0 + s% drag_coefficient * s% dt)
+                implicit_drag_accel = (implicit_v_new - v_00) / s% dt
+                drag_force = implicit_drag_accel
+                drag_energy = 0.5d0 * v_00 * drag_force
+                s% FdotV_drag_energy(k) = drag_energy%val
+             end if
+             ! Compute drag energy for the inner half-cell:
+             if ((s% q(k+1) > s% min_q_for_drag) .and. s% drag_coefficient > 0 .and. s% use_drag_energy) then
+                v_p1 = wrap_v_p1(s,k)
+                implicit_v_new = v_p1 / (1d0 + s% drag_coefficient * s% dt)
+                implicit_drag_accel = (implicit_v_new - v_p1) / s% dt
+                drag_force = implicit_drag_accel
+                drag_energy = drag_energy + 0.5d0 * v_p1 * drag_force
+                s% FdotV_drag_energy(k) = drag_energy%val
+             end if
+            ! apply smooth activation factor
+            s% FdotV_drag_energy(k) = activation_factor*s% FdotV_drag_energy(k)
+            drag_energy = activation_factor*drag_energy
             end if
+         
 
             sources_ad = eps_nuc_ad - non_nuc_neu_ad + extra_heat_ad + Eq_ad + RTI_diffusion_ad + drag_energy
 
