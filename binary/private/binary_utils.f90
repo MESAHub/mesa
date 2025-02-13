@@ -151,7 +151,7 @@
 
       subroutine set_period_eccentricity(binary_id, period, eccentricity, ierr)
          integer, intent(in) :: binary_id
-         real(dp) :: period ! in seconds
+         real(dp) :: period  ! in seconds
          real(dp) :: eccentricity
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr
@@ -168,7 +168,7 @@
 
       subroutine set_separation_eccentricity(binary_id, separation, eccentricity, ierr)
          integer, intent(in) :: binary_id
-         real(dp) :: separation ! in cm
+         real(dp) :: separation  ! in cm
          real(dp) :: eccentricity
          type (binary_info), pointer :: b
          integer, intent(out) :: ierr
@@ -199,9 +199,9 @@
          b% rl(1) = eval_rlobe(b% m(1), b% m(2), b% separation)
          b% rl(2) = eval_rlobe(b% m(2), b% m(1), b% separation)
          b% rl_relative_gap(1) = (b% r(1) - b% rl(1) * (1 - b% eccentricity) ) / &
-             b% rl(1) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(1) / (1 - b% eccentricity)  ! gap < 0 means out of contact
          b% rl_relative_gap(2) = (b% r(2) - b% rl(2) * (1 - b% eccentricity) ) / &
-             b% rl(2) / (1 - b% eccentricity) ! gap < 0 means out of contact
+             b% rl(2) / (1 - b% eccentricity)  ! gap < 0 means out of contact
 
          b% ignore_hard_limits_this_step = .true.
 

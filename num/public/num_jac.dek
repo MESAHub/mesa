@@ -1,5 +1,6 @@
       subroutine jac(n, x, h, y, f, dfdy, ldfy, lrpar, rpar, lipar, ipar, ierr)
          use const_def, only: dp
+         implicit none
          integer, intent(in) :: n, ldfy, lrpar, lipar
          real(dp), intent(in) :: x, h
          real(dp), intent(inout) :: y(:) ! (n)

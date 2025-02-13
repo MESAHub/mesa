@@ -107,7 +107,7 @@
          end if
          xlambda = sqrt(3d0*z*z*z)*pow(xgamma,-1.5d0)*f + 1d0
          etan = 3.d11*z*log(xlambda)*pow(t,-1.5d0)             ! magnetic diffusivity
-         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0))) ! correction: gammae
+         etan = etan/(1.d0-1.20487d0*exp(-1.0576d0*pow(z,0.347044d0)))  ! correction: gammae
          sige1 = clight*clight/(pi4*etan)                    ! sigma = c^2/(4pi*eta)
       end function sige1
 
@@ -136,7 +136,7 @@
          rme = 8.5646d-23*t*t*t*xgamma*xgamma*xgamma/pow5(z)  ! rme = rho6/mue
          rm23 = pow(rme,2d0/3d0)
          ctmp = 1d0 + 1.018d0*rm23
-         xi= sqrt(3.14159d0/3.)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
+         xi= sqrt(3.14159d0/3.0d0)*log(z)/3.d0 + 2.d0*log(1.32d0+2.33d0/sqrt(xgamma))/3.d0-0.484d0*rm23/ctmp
          sige3 = 8.630d21*rme/(z*ctmp*xi)
       end function sige3
 

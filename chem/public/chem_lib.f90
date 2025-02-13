@@ -140,8 +140,8 @@
             num_isos, chem_id, x, xh, xhe, z, &
             abar, zbar, z2bar, z53bar, ye, mass_correction, sumx)
          integer, intent(in) :: num_isos
-         integer, intent(in) :: chem_id(:) ! (num_isos) ! the nuclide indices for the entries in x
-         real(dp), intent(in)  :: x(:) ! (num_isos) ! baryon fractions.  should sum to 1.0
+         integer, intent(in) :: chem_id(:)  ! (num_isos) ! the nuclide indices for the entries in x
+         real(dp), intent(in)  :: x(:)  ! (num_isos) ! baryon fractions.  should sum to 1.0
          real(dp), intent(out) ::  &
                xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          real(dp), dimension(0) :: dabar_dx, dzbar_dx, dmc_dx
@@ -157,8 +157,8 @@
             abar, zbar, z2bar, z53bar, ye, mass_correction, &
             sumx, dabar_dx, dzbar_dx, dmc_dx)
          integer, intent(in) :: num_isos
-         integer, intent(in) :: chem_id(:) ! (num_isos) ! the nuclide indices for the entries in x
-         real(dp), intent(in)  :: x(:) ! (num_isos) ! baryon fractions.  should sum to 1.0
+         integer, intent(in) :: chem_id(:)  ! (num_isos) ! the nuclide indices for the entries in x
+         real(dp), intent(in)  :: x(:)  ! (num_isos) ! baryon fractions.  should sum to 1.0
          real(dp), intent(out) ::  &
                xh, xhe, z, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          real(dp), dimension(:) :: dabar_dx, dzbar_dx, dmc_dx
@@ -195,8 +195,8 @@
 
          use chem_def
          integer, intent(in) :: num_isos
-         integer, intent(in) :: chem_id(:) ! (num_isos) ! the nuclide indices for the entries in x
-         real(dp), intent(in)  :: x(:) ! (num_isos) ! baryon fractions.  should sum to 1.0
+         integer, intent(in) :: chem_id(:)  ! (num_isos) ! the nuclide indices for the entries in x
+         real(dp), intent(in)  :: x(:)  ! (num_isos) ! baryon fractions.  should sum to 1.0
          real(dp), intent(out) ::  &
                xh, xhe, xz, abar, zbar, z2bar, z53bar, ye, mass_correction, sumx
          logical, intent(in) :: skip_partials
@@ -231,7 +231,7 @@
          zbar = sum(y(1:num_isos)*z(1:num_isos)) * abar
          z2bar = sum(y(1:num_isos)*z(1:num_isos)*z(1:num_isos)) * abar
          z53bar = sum(y(1:num_isos)*z(1:num_isos)*z(1:num_isos)) * abar
-         ye = zbar/abar ! assume complete ionization
+         ye = zbar/abar  ! assume complete ionization
          mass_correction = sum(y(1:num_isos)*w(1:num_isos))
 
          z53bar = 0d0
@@ -375,10 +375,10 @@
             ! note that these names match those in the nuclear net library iso_Names array
             ! but some net isotopes are not here (ex/ be7, n13, o14, o15, f17, f18, ... fe52, ni56 )
             ! and some isotopes are here that are not in the nets (ex/ hf176)
-         real(dp), intent(out) :: z ! charge
-         real(dp), intent(out) :: a ! number of nucleons (protons and neutrons)
-         real(dp), intent(out) :: xelem ! elemental mass fraction associated with this isotope
-         integer, intent(out) :: ierr ! == 0 means AOK; == -1 means did not find the requested name
+         real(dp), intent(out) :: z  ! charge
+         real(dp), intent(out) :: a  ! number of nucleons (protons and neutrons)
+         real(dp), intent(out) :: xelem  ! elemental mass fraction associated with this isotope
+         integer, intent(out) :: ierr  ! == 0 means AOK; == -1 means did not find the requested name
          integer :: i
          ierr = 0
          if (.not. chem_has_been_initialized) then
@@ -450,7 +450,7 @@
          count_isomer = 1
          do i = 1, size(Z)
             select case(Z(i))
-            case (0) ! neutrons are special?
+            case (0)  ! neutrons are special?
                long_names(i) = el_long_name(Z(i))
             case (1:max_el_z)
                write(long_names(i), '(a, "-", i0)') trim(el_long_name(Z(i))), A(i)
@@ -504,7 +504,7 @@
                end do
             end if
          end do iso_loop
-         lookup_ZN_isomeric_state = 0 ! indicating failure
+         lookup_ZN_isomeric_state = 0  ! indicating failure
       end function lookup_ZN_isomeric_state
 
 
@@ -625,33 +625,33 @@
             found =.false.
 
             ! special case of be8 to he4
-            if (Z == 4 .and. A==8) then ! be8
-               j = 2 ! he4
+            if (Z == 4 .and. A==8) then  ! be8
+               j = 2  ! he4
                abun_out(j) = abun_out(j) + 2*abun_in(i)
                found = .true.
             end if
 
             inner: do j=1,solsiz
-               if (a .ne. iasol(j)) then
+               if (a /= iasol(j)) then
                   cycle inner
                end if
-               if ((jcode(j) .eq. 0) .or. &
-                   (z.ge.izsol(j) .and. jcode(j).eq.1) .or. &
-                   (z.le.izsol(j) .and. jcode(j).eq.2) .or. &
-                   (z.eq.izsol(j) .and. jcode(j).eq.3) .or. &
-                   (Z==17 .and. A==36 .and. izsol(j) == 18 .and. iasol(j) == 36)  .or. & ! cl36 -> ar36 special case
-                   (Z==21 .and. A==46 .and. izsol(j) == 22 .and. iasol(j) == 46)  .or. & ! sc46 -> ti46 special case
-                   (Z==21 .and. A==48 .and. izsol(j) == 22 .and. iasol(j) == 48)  .or. & ! sc48 -> ti48 special case
-                   (Z==25 .and. A==54 .and. izsol(j) == 24 .and. iasol(j) == 54)  .or. & ! mn54 -> cr54 special case
-                   (Z==27 .and. A==58 .and. izsol(j) == 26 .and. iasol(j) == 58)  .or. & ! co58-> fe58 special case
-                   (Z==29 .and. A==64 .and. izsol(j) == 28 .and. iasol(j) == 64)  .or. & ! cu64 -> ni64 special case
-                   (Z==31 .and. A==70 .and. izsol(j) == 32 .and. iasol(j) == 70)  .or. & ! ga70 -> ge70 special case
-                   (Z==33 .and. A==74 .and. izsol(j) == 32 .and. iasol(j) == 74)  .or. & ! as74 -> ge74 special case
-                   (Z==33 .and. A==76 .and. izsol(j) == 34 .and. iasol(j) == 76)  .or. & ! as76 -> se76 special case
-                   (Z==35 .and. A==78 .and. izsol(j) == 34 .and. iasol(j) == 78)  .or. & ! br78 -> se78 special case
-                   (Z==35 .and. A==80 .and. izsol(j) == 36 .and. iasol(j) == 80)  .or. & ! br80 -> kr80 special case
-                   (Z==35 .and. A==82 .and. izsol(j) == 36 .and. iasol(j) == 82)  .or. & ! br82 -> kr82 special case
-                   (Z==37 .and. A==84 .and. izsol(j) == 36 .and. iasol(j) == 84)   & ! rb84 -> kr84 special case
+               if ((jcode(j) == 0) .or. &
+                   (z>=izsol(j) .and. jcode(j)==1) .or. &
+                   (z<=izsol(j) .and. jcode(j)==2) .or. &
+                   (z==izsol(j) .and. jcode(j)==3) .or. &
+                   (Z==17 .and. A==36 .and. izsol(j) == 18 .and. iasol(j) == 36)  .or. &  ! cl36 -> ar36 special case
+                   (Z==21 .and. A==46 .and. izsol(j) == 22 .and. iasol(j) == 46)  .or. &  ! sc46 -> ti46 special case
+                   (Z==21 .and. A==48 .and. izsol(j) == 22 .and. iasol(j) == 48)  .or. &  ! sc48 -> ti48 special case
+                   (Z==25 .and. A==54 .and. izsol(j) == 24 .and. iasol(j) == 54)  .or. &  ! mn54 -> cr54 special case
+                   (Z==27 .and. A==58 .and. izsol(j) == 26 .and. iasol(j) == 58)  .or. &  ! co58-> fe58 special case
+                   (Z==29 .and. A==64 .and. izsol(j) == 28 .and. iasol(j) == 64)  .or. &  ! cu64 -> ni64 special case
+                   (Z==31 .and. A==70 .and. izsol(j) == 32 .and. iasol(j) == 70)  .or. &  ! ga70 -> ge70 special case
+                   (Z==33 .and. A==74 .and. izsol(j) == 32 .and. iasol(j) == 74)  .or. &  ! as74 -> ge74 special case
+                   (Z==33 .and. A==76 .and. izsol(j) == 34 .and. iasol(j) == 76)  .or. &  ! as76 -> se76 special case
+                   (Z==35 .and. A==78 .and. izsol(j) == 34 .and. iasol(j) == 78)  .or. &  ! br78 -> se78 special case
+                   (Z==35 .and. A==80 .and. izsol(j) == 36 .and. iasol(j) == 80)  .or. &  ! br80 -> kr80 special case
+                   (Z==35 .and. A==82 .and. izsol(j) == 36 .and. iasol(j) == 82)  .or. &  ! br82 -> kr82 special case
+                   (Z==37 .and. A==84 .and. izsol(j) == 36 .and. iasol(j) == 84)   &  ! rb84 -> kr84 special case
                    ) then
                      abun_out(j) = abun_out(j) + abun_in(i)
                      found = .true.
@@ -670,12 +670,12 @@
       end subroutine get_stable_mass_frac
 
 
-      real(dp) function chem_M_div_h(x,z,zfrac_choice) ! Returns [M/H]
+      real(dp) function chem_M_div_h(x,z,zfrac_choice)  ! Returns [M/H]
          use chem_def
          use utils_lib, only: mesa_error
-         real(dp), intent(in) :: x ! Hydrogen fraction
-         real(dp), intent(in) :: z ! metal fraction
-         integer, intent(in) :: zfrac_choice ! See chem_def, *_zfracs options
+         real(dp), intent(in) :: x  ! Hydrogen fraction
+         real(dp), intent(in) :: z  ! metal fraction
+         integer, intent(in) :: zfrac_choice  ! See chem_def, *_zfracs options
 
          real(dp) :: zsolar,ysolar
 

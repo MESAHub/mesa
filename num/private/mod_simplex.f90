@@ -29,6 +29,8 @@
       use math_lib
       use num_def
 
+      implicit none
+
 
       contains
 
@@ -43,11 +45,11 @@
             lrpar, rpar, lipar, ipar, &
             num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr)
-         integer, intent(in) :: n ! number of dimensions
-         real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:) ! (n)
-         real(dp), intent(inout) :: x_final(:) ! (n)
-         real(dp), intent(inout) :: simplex(:,:) ! (n,n+1)
-         real(dp), intent(inout) :: f(:) ! (n+1)
+         integer, intent(in) :: n  ! number of dimensions
+         real(dp), intent(in) :: x_lower(:), x_upper(:), x_first(:)  ! (n)
+         real(dp), intent(inout) :: x_final(:)  ! (n)
+         real(dp), intent(inout) :: simplex(:,:)  ! (n,n+1)
+         real(dp), intent(inout) :: f(:)  ! (n+1)
          logical, intent(in) :: start_from_given_simplex_and_f
          interface
 #include "num_simplex_fcn.dek"
@@ -58,8 +60,8 @@
          integer, intent(in) :: iter_max, fcn_calls_max
          logical, intent(in) :: enforce_bounds, adaptive_random_search
          integer, intent(in) :: lrpar, lipar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          real(dp), intent(out) :: f_final
          integer, intent(out) :: num_iters, num_fcn_calls, &
             num_fcn_calls_for_ars, num_accepted_for_ars, ierr
@@ -160,17 +162,17 @@
             if (ierr /= 0) return
             if (dbg) write(*,1) 'reflect', f_reflect, x_reflect(1:n)
 
-            if (f_reflect < f(s)) then ! accept reflect
+            if (f_reflect < f(s)) then  ! accept reflect
                if (dbg) write(*,2) 'accept reflect', num_iters
                do i=1,n
                   simplex(i,h) = x_reflect(i)
                end do
                f(h) = f_reflect
-               if (f_reflect < f(l)) then ! try to expand
+               if (f_reflect < f(l)) then  ! try to expand
                   call expand(ierr)
                   if (ierr /= 0) return
                   if (dbg) write(*,1) 'expand', f_expand, x_expand(1:n)
-                  if (f_expand < f(l)) then ! accept expand
+                  if (f_expand < f(l)) then  ! accept expand
                      ! note: to keep the simplex large in a good direction,
                      ! we take x_expand even if f_expand > f_reflect
                      do i=1,n
@@ -180,11 +182,11 @@
                      if (dbg) write(*,2) 'accept expand', num_iters
                   end if
                end if
-            else ! try to contract
+            else  ! try to contract
                call contract(ierr)
                if (ierr /= 0) return
                if (dbg) write(*,1) 'contract', f_contract, x_contract(1:n)
-               if (f_contract < min(f(h),f_reflect)) then ! accept contraction
+               if (f_contract < min(f(h),f_reflect)) then  ! accept contraction
                   if (dbg) write(*,2) 'accept contraction', num_iters
                   do i=1,n
                      simplex(i,h) = x_contract(i)
@@ -265,7 +267,7 @@
 
          real(dp) function get_val(x, op_code, ierr) result(f)
             real(dp), intent(in) :: x(:)
-            integer, intent(in) :: op_code ! what nelder-mead is doing for this call
+            integer, intent(in) :: op_code  ! what nelder-mead is doing for this call
             integer, intent(out) :: ierr
             integer :: i
             include 'formats'
@@ -314,13 +316,13 @@
             integer :: i, op_code
             include 'formats'
             ierr = 0
-            if (f_reflect < f(h)) then ! outside contraction
+            if (f_reflect < f(h)) then  ! outside contraction
                if (dbg) write(*,1) 'outside contraction'
                op_code = simplex_outside
                do i=1,n
                   x_contract(i) = c(i) + gamma*(x_reflect(i) - c(i))
                end do
-            else ! inside contraction
+            else  ! inside contraction
                if (dbg) write(*,1) 'inside contraction'
                op_code = simplex_inside
                do i=1,n
@@ -337,12 +339,12 @@
             include 'formats'
             ierr = 0
             k_max = 100
-            do k=1,k_max ! keep trying until find a better random point
+            do k=1,k_max  ! keep trying until find a better random point
                if (num_fcn_calls > fcn_calls_max) exit
                call get_point_for_ars(ierr)
                if (ierr /= 0) return
                if (dbg) write(*,2) 'adaptive_random_search', num_iters, f_ars, x_ars(1:n)
-               if (f_ars <= f(h)) then ! accept adaptive random search
+               if (f_ars <= f(h)) then  ! accept adaptive random search
                   if (dbg) write(*,2) 'accept adaptive random search', num_iters, f_ars, x_ars(1:n)
                   do i=1,n
                      simplex(i,h) = x_ars(i)
@@ -373,7 +375,7 @@
          end subroutine get_point_for_ars
 
 
-         subroutine shrink ! shrink the simplex towards the best point
+         subroutine shrink  ! shrink the simplex towards the best point
             integer :: j, i
             include 'formats'
             do j=1,n+1

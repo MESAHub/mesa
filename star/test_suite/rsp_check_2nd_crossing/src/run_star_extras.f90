@@ -158,7 +158,7 @@ module run_star_extras
          write(io_out,'(99a20)') 'model_number', 'period(d)', 'growth', &
             'Teff', 'L', 'star_age'
 
-         s% RSP_nmodes = 1 ! just F
+         s% RSP_nmodes = 1  ! just F
          finished_1st_crossing = .false.
          in_2nd_crossing = .false.
          have_first = .false.
@@ -180,18 +180,18 @@ module run_star_extras
             if (s% RSP_Teff < prev_Teff) then
                !write(*,2) 'still going to lower T', modnums(model_cnt), s% RSP_Teff, prev_Teff
                prev_Teff = s% RSP_Teff
-               cycle search_loop ! still going to lower Ts
+               cycle search_loop  ! still going to lower Ts
             end if
             max_T = exp10(get_blue_logT(log_L))
             min_T = exp10(get_red_logT(log_L))
             if (s% RSP_Teff < min_T - 4*delta_Teff) then
                !write(*,2) 'too far from red edge', modnums(model_cnt), s% RSP_Teff, min_T
                prev_Teff = s% RSP_Teff
-               cycle search_loop ! too far from red edge
+               cycle search_loop  ! too far from red edge
             end if
             if (have_first .and. s% RSP_Teff - delta_Teff < prev_Teff) then
                !write(*,2) 'too close to prev', modnums(model_cnt), s% RSP_Teff - delta_Teff - prev_Teff
-               cycle search_loop ! too close to prev
+               cycle search_loop  ! too close to prev
             end if
             !if (s% RSP_Teff < 0.5d0*(min_T + max_T)) cycle search_loop ! too far from blue edge
             write(*,*) 'call star_do1_rsp_build model Teff L', &
@@ -358,7 +358,7 @@ module run_star_extras
 
          !deallocate(f1, work1, x_new, v_new)
 
-         ierr = -1 ! to force termination of run
+         ierr = -1  ! to force termination of run
 
          contains
 

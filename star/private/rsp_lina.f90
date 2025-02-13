@@ -46,7 +46,7 @@
       type (star_info), pointer :: s
       real(dp), intent(in) :: L0
       integer, intent(in) :: NMODES, NZN
-      real(dp), intent(out) :: VEL(:,:) ! (NZN+1,15)
+      real(dp), intent(out) :: VEL(:,:)  ! (NZN+1,15)
       real(dp), intent(out), dimension(15) :: PERS, ETO
       real(dp), intent(inout), dimension(:) :: &
          M, DM, DM_BAR, R, Vol, T, Et, Lr
@@ -107,9 +107,9 @@
       real(dp) :: T4,POM3,POM2,POM,POM4
       integer :: I,J,NZN3,IG,IE,IR,IC,INFO,IMI,LD_VL,LD_VR,n,op_err
       real(dp) :: VRRS(15),Q(15)
-      character (len=250) FILENAME
-      character (len=1) NUMER1
-      character (len=2) NUMER2
+      character (len=250) :: FILENAME
+      character (len=1) :: NUMER1
+      character (len=2) :: NUMER2
       complex(8):: DP_0,DV_0,VTTS(15),SCALE(15),DPEV,dP_dT_00URB
       real(dp) :: SGRP,SGRM
       real(dp) :: PSIG,TEMI,TEMM,TEM1
@@ -688,7 +688,7 @@
       DLRM =  0.d0
       DLT  =  0.d0
       DLTP =  0.d0
-      DLR  =  0.d0!-1.d0
+      DLR  =  0.d0  !-1.d0
 
       DFCX0 = 0.d0
       DFCXM = 0.d0
@@ -722,8 +722,8 @@
          T1=-CL*R(I)**4/dm_bar(I)
          T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
          T3=T1/(BW-BK)
-         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
-         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
+         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2)  !dL(i)/dK(i)
+         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2)  !dL(i)/dK(i+1)
          DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
          DLRM= DLK *dK_dV_00(I)  *DVRM(I)
          DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
@@ -991,7 +991,7 @@
          endif
 !        VRRS(J) IS THE MODULI OF THE SUTFACE R-EIGENVECTOR OF THE MODE J
          VRRS(J)=sqrt(VRx(4*NZN-3,ISORTx(IMI+J-1))**2+ &
-                       VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2) !surface value
+                       VRx(4*NZN-3,ISORTx(IMI+J-1)+1)**2)  !surface value
          VTTS(J)=VRx(4*NZN-3,ISORTx(IMI+J-1))+(0.d0,1.d0)* &
                        VRx(4*NZN-3,ISORTx(IMI+J-1)+1)
 
@@ -1179,7 +1179,6 @@
                P,PV,PT,E,EV,ET,CP,CPV,dCp_dT_00, &
                Q,QV,QT,OP,OPV,OPT,ierr)
       use rsp_eval_eos_and_kap, only : eval_mesa_eos_and_kap
-      implicit none
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j
@@ -1220,7 +1219,6 @@
 ! NAMELY ELEMENT I OF SORTED RA (AND REARRANGED RB) WAS ISORT(I) ELEMENT
 ! OF UNSORTED RA (AND NOT REARANGED RB)
       subroutine SORT(N,RA,RB,ISORT)
-      implicit none
       integer :: N,ISORT(N)
       real(dp) :: RA(N),RB(N)
       integer :: L,IR,I,J,RRI

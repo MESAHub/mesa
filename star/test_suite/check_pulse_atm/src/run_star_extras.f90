@@ -152,9 +152,9 @@
                call mesa_error(__FILE__,__LINE__)
             end if
 
-            read(iounit, *, iostat=ierr) row ! M, R, L, ...
-            read(iounit, *, iostat=ierr) row !
-            read(iounit, *, iostat=ierr) row ! ..., Teff, G
+            read(iounit, *, iostat=ierr) row  ! M, R, L, ...
+            read(iounit, *, iostat=ierr) row  !
+            read(iounit, *, iostat=ierr) row  ! ..., Teff, G
 
             Teff = row(4)
 

@@ -30,7 +30,7 @@
       implicit none
 
       real(dp) :: expected_freq, actual_freq
-      integer :: i, l_to_match !, order_to_match
+      integer :: i, l_to_match  !, order_to_match
 
 
       include "test_suite_extras_def.inc"
@@ -63,7 +63,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
@@ -91,9 +91,9 @@
       end subroutine set_constraint_value
 
 
-      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of param's will be set
+         character(len=strlen), intent(in) :: name  ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -209,7 +209,7 @@
          ! store_model must be .true. since this is the 1st call on gyre for this model.
          store_model = .true.
 
-         num_results = 0 ! initialize this counter before calling gyre
+         num_results = 0  ! initialize this counter before calling gyre
 
          call astero_gyre_get_modes( &
             s% id, l_to_match, store_model, ierr)

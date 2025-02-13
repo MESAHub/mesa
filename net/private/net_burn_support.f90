@@ -31,16 +31,11 @@
 
       implicit none
 
-
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
-
-
       logical, parameter :: dbg = .false.
 
 
-
       contains
-
 
 
       subroutine netint( &
@@ -98,7 +93,7 @@
       first = .true.
       epsold = -1d0
       nvold = -1
-      nseq = (/ 2, 6, 10, 14, 22, 34, 50, 70 /)
+      nseq = [ 2, 6, 10, 14, 22, 34, 50, 70 ]
       x      = start
       h      = sign(stptry,stopp-start)
       nok    = 0
@@ -138,7 +133,7 @@
       end do
 
 ! if the step can overshoot the stop point cut it
-       if ((x+h-stopp)*(x+h-start) .gt. 0.0d0) h = stopp - x
+       if ((x+h-stopp)*(x+h-start) > 0.0d0) h = stopp - x
 
 ! do an integration step
         call stifbs(y,dydx,nvar,x,h,eps,yscal,hdid,hnext, &
@@ -150,15 +145,15 @@
         end if
 
 ! tally if we did or did not do the step
-       if (hdid.eq.h) then
+       if (hdid==h) then
         nok = nok+1
        else
         nbad = nbad+1
        end if
 
 ! this is the normal exit point
-       if ( (nstp .eq. max_steps) .or. &
-            (x-stopp)*(stopp-start).ge. 0.0d0) then
+       if ( (nstp == max_steps) .or. &
+            (x-stopp)*(stopp-start)>= 0.0d0) then
         call burner_finish_substep(nstp, x, y, ierr)
         return
        end if
@@ -167,7 +162,7 @@
        h = hnext
 
 ! die
-       if (abs(h).lt.stpmin) then
+       if (abs(h)<stpmin) then
         write(*,*) 'netint failed: abs(h).lt.stpmin', abs(h), stpmin
         ierr = -1
         return
@@ -232,10 +227,10 @@
          include 'burner_jakob.inc'
       end interface
 
-      logical          reduct
-      integer          nvar
-      integer          i,iq,j,k,kk,km,i_errmax
-      real(dp) y(:),dydx(:),x,htry,eps,yscal(:),hdid,hnext, &
+      logical          :: reduct
+      integer          :: nvar
+      integer          :: i,iq,j,k,kk,km,i_errmax
+      real(dp) :: y(:),dydx(:),x,htry,eps,yscal(:),hdid,hnext, &
                        eps1,errmax,fact,h,work,wrkmin,xest,err(kmaxx), &
                        yerr(nvar),ysav(nvar),yseq(nvar),safe1,safe2,dum, &
                        redmax,redmin,tiny,scalmx,qcol(nvar,qcol_imax),x_pzextr(qcol_imax)
@@ -243,12 +238,12 @@
                         redmin = 0.7d0, tiny = 1.0d-30, &
                         scalmx = 0.1d0)
 
-      integer          nstp, ierr2
+      integer          :: nstp, ierr2
 
       ierr = 0
 
 ! a new tolerance or a new number, so reinitialize
-      if (eps .ne. epsold  .or.  nvar .ne. nvold) then
+      if (eps /= epsold  .or.  nvar /= nvold) then
        hnext = -1.0d29
        xnew  = -1.0d29
        eps1  = safe1 * eps
@@ -277,7 +272,7 @@
 
 ! determine optimal row number for convergence
        do kopt=2,kmaxx-1
-        if (a(kopt+1) .gt. a(kopt)*alf(kopt-1,kopt)) go to 01
+        if (a(kopt+1) > a(kopt)*alf(kopt-1,kopt)) go to 01
        enddo
 01     kmax = kopt
       end if
@@ -296,7 +291,7 @@
        end if
 
 ! a new stepsize or a new integration, re-establish the order window
-      if (h .ne. hnext  .or.  x .ne. xnew) then
+      if (h /= hnext  .or.  x /= xnew) then
        first = .true.
        kopt = kmax
       end if
@@ -313,7 +308,7 @@
 !       write(6,119) 'xnew x and h',xnew,x,h
 !       read(5,*)
 
-       if (xnew .eq. x) then
+       if (xnew == x) then
          ierr = -1
          if (dbg) write(*,*) 'ierr: stepsize too small in routine stiffbs'
          return
@@ -344,13 +339,13 @@
        call net_pzextr(k,xest,yseq,y,yerr,nvar,qcol,x_pzextr)
 
 ! compute normalized error estimate
-       if (k .ne. 1) then
+       if (k /= 1) then
         errmax = tiny
         i_errmax   = 0
         do i=1,nvar
 !        errmax = max(errmax,abs(yerr(i)/yscal(i)))
          dum = abs(yerr(i)/yscal(i))
-         if (dum .ge. errmax) then
+         if (dum >= errmax) then
           errmax = dum
           i_errmax = i
          end if
@@ -362,26 +357,26 @@
        end if
 
 ! in order window
-       if (k .ne. 1  .and. (k .ge. kopt-1  .or. first)) then
+       if (k /= 1  .and. (k >= kopt-1  .or. first)) then
 
 ! converged
-        if (errmax .lt. 1.0d0) go to 04
+        if (errmax < 1.0d0) go to 04
 
 ! possible step size reductions
-        if (k .eq. kmax  .or.  k .eq. kopt + 1) then
+        if (k == kmax  .or.  k == kopt + 1) then
          red = safe2/err(km)
          go to 03
-        else if (k .eq. kopt) then
-         if (alf(kopt-1,kopt) .lt. err(km)) then
+        else if (k == kopt) then
+         if (alf(kopt-1,kopt) < err(km)) then
           red = 1.0d0/err(km)
           go to 03
          end if
-        else if (kopt .eq. kmax) then
-         if (alf(km,kmax-1) .lt. err(km)) then
+        else if (kopt == kmax) then
+         if (alf(km,kmax-1) < err(km)) then
           red = alf(km,kmax-1) * safe2/err(km)
           go to 03
          end if
-        else if (alf(km,kopt) .lt. err(km)) then
+        else if (alf(km,kopt) < err(km)) then
          red = alf(km,kopt-1)/err(km)
          go to 03
         end if
@@ -407,7 +402,7 @@
       do kk=1,km
        fact = max(err(kk),scalmx)
        work = fact * a(kk+1)
-       if (work .lt. wrkmin) then
+       if (work < wrkmin) then
         scale  = fact
         wrkmin = work
         kopt   = kk + 1
@@ -416,9 +411,9 @@
 !
 ! check for possible order increase, but not if stepsize was just reduced
       hnext = h/scale
-      if (kopt .ge. k  .and.  kopt .ne. kmax  .and.  .not.reduct) then
+      if (kopt >= k  .and.  kopt /= kmax  .and.  .not.reduct) then
        fact = max(scale/alf(kopt-1,kopt),scalmx)
-       if (a(kopt+1)*fact .le. wrkmin) then
+       if (a(kopt+1)*fact <= wrkmin) then
         hnext = h/fact
         kopt = kopt + 1
        end if
@@ -439,9 +434,9 @@
 
       integer, intent(out) :: ierr
 
-      integer          nvar,nstep
-      integer          i,j,nn,ii
-      real(dp) y(:),dydx(:),xs,htot, &
+      integer          :: nvar,nstep
+      integer          :: i,j,nn,ii
+      real(dp) :: y(:),dydx(:),xs,htot, &
                        yout(:),h,x,del(nvar),ytemp(nvar)
 
 !..for the linear algebra
@@ -613,7 +608,7 @@
 
 ! sanity checks
 
-      if (iest .gt. qcol_imax) call mesa_error(__FILE__,__LINE__,'iest > qcol_imax in net_pzextr')
+      if (iest > qcol_imax) call mesa_error(__FILE__,__LINE__,'iest > qcol_imax in net_pzextr')
 
 ! save current independent variables
       x(iest) = xest
@@ -623,7 +618,7 @@
       enddo
 
 ! store first estimate in first column
-      if (iest .eq. 1) then
+      if (iest == 1) then
        do j=1,nvar
         qcol(j,1) = yest(j)
        enddo

@@ -111,7 +111,7 @@ contains
     type (Kap_CO_Z_Table), dimension(:), pointer :: co_z_tables
     type (Kap_CO_X_Table), dimension(:), pointer :: x_tables
     integer, intent(in) :: iz, ix
-    real(dp), intent(in) :: X_in, Z_in ! expected contents of the Kap file
+    real(dp), intent(in) :: X_in, Z_in  ! expected contents of the Kap file
     logical, intent(in) :: read_later
     character (len=*), intent(in) :: fname, filename, cache_filename, temp_cache_filename
     integer, intent(out) :: ierr
@@ -123,7 +123,7 @@ contains
     real(dp) :: xin, zz, Zfrac_C, Zfrac_N, Zfrac_O, Zfrac_Ne, &
          logR_min, logR_max, logT_min, logT_max, xErr, zErr
     type (Kap_CO_Table), dimension(:), pointer :: co_tables
-    integer :: num_dXC_gt_dXO ! the number of tables with dXC > dXO
+    integer :: num_dXC_gt_dXO  ! the number of tables with dXC > dXO
     integer :: CO_table_numbers(num_kap_CO_dXs,num_kap_CO_dXs)
     integer :: next_dXO_table(max_num_CO_tables)
     integer :: next_dXC_table(max_num_CO_tables)
@@ -169,9 +169,9 @@ contains
     end if
 
     version = -1
-    read(io_unit,*,iostat=ierr) ! skip the 1st line
+    read(io_unit,*,iostat=ierr)  ! skip the 1st line
     if (ierr == 0) then
-       read(io_unit,*,iostat=ierr) ! skip the 2nd line
+       read(io_unit,*,iostat=ierr)  ! skip the 2nd line
        if (ierr == 0) then
           read(io_unit,'(a)',iostat=ierr) message
           if (ierr == 0) call str_to_vector(message, vec, nvec, ierr)
@@ -242,7 +242,7 @@ contains
     if (kap_use_cache) then
        open(newunit=cache_io_unit,file=trim(cache_filename),action='read', &
             status='old',iostat=ios,form='unformatted')
-       if (ios == 0) then ! try reading the cached data
+       if (ios == 0) then  ! try reading the cached data
           call Read_Kap_CO_X_Table(cache_io_unit, .true., ierr)
           close(cache_io_unit)
           if (ierr == 0) then
@@ -327,7 +327,7 @@ contains
 
       if (show_allocations) write(*,2) 'co_tables', num_tables
       allocate(co_tables(num_tables), STAT=status)
-      if (status .ne. 0) then
+      if (status /= 0) then
          ierr = -1
          if (CO_dbg) write(*,*) 'InsufficientMemory for Prepare_Kap_CO_X_Table', iz, ix
          return
@@ -338,14 +338,14 @@ contains
            associated(x_tables(ix)% co_tables), associated(co_tables), ix
 
       do i=1,num_tables
-         nullify(co_tables(i)% kap1) ! allocate when read the data
+         nullify(co_tables(i)% kap1)  ! allocate when read the data
       end do
 
     end subroutine Setup_Kap_CO_X_Table
 
 
     subroutine Read_Kap_CO_X_Table(io_unit, reading_cache, ierr)
-      integer, intent(in) :: io_unit ! use this for file access
+      integer, intent(in) :: io_unit  ! use this for file access
       logical, intent(in) :: reading_cache
       integer, intent(out) :: ierr
 
@@ -410,7 +410,7 @@ contains
       if (show_allocations) write(*,2) 'Read_Kap_CO_X_Table logRs logTs', &
           num_logRs + num_logTs
       allocate(x_tables(ix)% logRs(num_logRs), x_tables(ix)% logTs(num_logTs), STAT=status)
-      if (status .ne. 0) then
+      if (status /= 0) then
          ierr = -1
          write(*,*) 'InsufficientMemory for Read_Kap_CO_X_Table'
          return
@@ -418,17 +418,17 @@ contains
 
       if (.not. reading_cache) then
 
-         read(io_unit,*,iostat=ierr) ! skip line
+         read(io_unit,*,iostat=ierr)  ! skip line
          if (ierr /= 0) return
          read(io_unit,'(i3)',iostat=ierr) num_dXC_gt_dXO
          if (ierr /= 0) return
          x_tables(ix)% num_dXC_gt_dXO = num_dXC_gt_dXO
-         do ! skip to the start of the first table
+         do  ! skip to the start of the first table
             read(io_unit,'(a1)',iostat=ierr) char
             if (ierr /= 0) return
             if (char == '-') exit
          end do
-         read(io_unit,*,iostat=ierr) ! skip line
+         read(io_unit,*,iostat=ierr)  ! skip line
          if (ierr /= 0) return
          x_tables(ix)% CO_table_numbers = -1
          x_tables(ix)% next_dXC_table = -1
@@ -510,18 +510,18 @@ contains
   subroutine Read_Kap_CO_Table( &
        x_tables, ix, n, X_in, Z_in, num_logRs, num_logTs, io_unit, reading_cache, ierr)
     type (Kap_CO_X_Table), dimension(:), pointer :: x_tables
-    integer, intent(in) :: ix ! index in x_tables
-    integer, intent(in) :: n ! index in co_tables
+    integer, intent(in) :: ix  ! index in x_tables
+    integer, intent(in) :: n  ! index in co_tables
     real(dp), intent(in) :: X_in, Z_in
-    integer, intent(in) :: io_unit ! use this for file access
+    integer, intent(in) :: io_unit  ! use this for file access
     logical, intent(in) :: reading_cache
     integer, intent(in) :: num_logRs, num_logTs
-    integer, intent(out) :: ierr ! return nonzero if had trouble
+    integer, intent(out) :: ierr  ! return nonzero if had trouble
 
     type (Kap_CO_Table), pointer :: co_tables(:)
     integer :: table_num, i, j, ios, status, iXC, iXO
     real(dp) :: X, Z, xin, zz, Y, dXC, dXO, err, logT
-    real(dp), allocatable, target :: kap_table(:) ! data & spline coefficients
+    real(dp), allocatable, target :: kap_table(:)  ! data & spline coefficients
     real(dp), pointer :: kap(:,:,:)
     real(dp) :: logKs(num_logRs), logRs(num_logRs)
     character (len=1000) :: message
@@ -567,7 +567,7 @@ contains
           ierr = -1
           return
        end if
-    else ! reading_cache
+    else  ! reading_cache
        read(io_unit, iostat=ios) table_num, xin, Y, zz, dXC, dXO
        if (ios /= 0) then
           ierr = 1
@@ -584,7 +584,7 @@ contains
        ierr = -1
        return
     end if
-    X = xin; Z = zz ! use the values from the file
+    X = xin; Z = zz  ! use the values from the file
 
     err = abs(1d0 - (X + Y + Z + dXC + dXO))
     if (err > tiny) then
@@ -608,7 +608,7 @@ contains
     if (show_allocations) write(*,2) 'co_tables', &
        sz_per_Kap_point*num_logRs*num_logTs
     allocate(co_tables(n)% kap1(sz_per_Kap_point*num_logRs*num_logTs), STAT=status)
-    if (status .ne. 0) then
+    if (status /= 0) then
        ierr = -1
        return
     end if
@@ -654,7 +654,7 @@ contains
 
        if (n == 1) then
           x_tables(ix)% logRs(:) = logRs(:)
-       else ! check
+       else  ! check
           do i=1, num_logRs
              if (abs(logRs(i) - x_tables(ix)% logRs(i)) > 1d-7) then
                 write(*,*) 'problem with inconsistent logRs'
@@ -686,7 +686,7 @@ contains
 
           if (n == 1) then
              x_tables(ix)% logTs(i) = logT
-          else ! check
+          else  ! check
              if (abs(logT - x_tables(ix)% logTs(i)) > 1d-7) then
                 write(*,*) 'problem with inconsistent logTs'
                 call mesa_error(__FILE__,__LINE__)
@@ -719,8 +719,8 @@ contains
     use interp_2d_lib_db
     type (Kap_CO_Table), dimension(:), pointer :: co_tables
     integer, intent(in) :: n, num_logRs, num_logTs
-    real(dp), intent(in), pointer :: logRs(:) ! =(num_logRs)
-    real(dp), intent(in), pointer :: logTs(:) ! =(num_logTs)
+    real(dp), intent(in), pointer :: logRs(:)  ! =(num_logRs)
+    real(dp), intent(in), pointer :: logTs(:)  ! =(num_logTs)
     integer, intent(out) :: ili_logRs, ili_logTs, ierr
 
     real(dp), target :: table_ary(sz_per_kap_point*num_logRs*num_logTs)
@@ -815,7 +815,7 @@ contains
 
     integer :: num_tables, n, i
     real(dp) :: X, Z, Y, dXC, dXO
-    real(dp), allocatable, target :: kap_table(:) ! data & spline coefficients
+    real(dp), allocatable, target :: kap_table(:)  ! data & spline coefficients
     include 'formats'
 
     if (show_allocations) write(*,2) 'Write_Kap_CO_X_Table_Cache', &

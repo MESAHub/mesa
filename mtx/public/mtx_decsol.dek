@@ -1,5 +1,6 @@
       subroutine decsol(iop,n,ndim,a,ml,mu,b,ip,lrd,rpar_decsol,lid,ipar_decsol,ier)
          use const_def, only: dp
+         implicit none
          integer, intent(in) :: iop, n, ndim, lrd, lid
             ! iop = 0 means factor
             ! iop = 1 means solve

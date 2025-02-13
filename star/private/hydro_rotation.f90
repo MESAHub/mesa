@@ -97,7 +97,7 @@
          end if
 
       end function w_div_w_roche_omega
-      
+
       ! compute w_div_w_roche for a known specific angular momentum jrot, rpsi, and Mphi
       real(dp) function w_div_w_roche_jrot(rpsi, Mphi, jrot, cgrav, max_w, max_w2, w_div_wc_flag) result(w_roche)
          real(dp), intent(in) :: rpsi,Mphi,jrot,cgrav, max_w, max_w2
@@ -355,7 +355,7 @@
             am_nu_Ep1 = max(0d0, am_nu(k+1))
             ! Meynet, Maeder, & Mowlavi, A&A 416, 1023-1036, 2004, eqn 51 with f = 1/2.
             D = 2*(am_nu_E00*am_nu_Ep1)/max(1d-99, am_nu_E00 + am_nu_Ep1)
-            r = 0.5d0*(s% r(k) + s% r(k+1)) ! consistent with f = 1/2
+            r = 0.5d0*(s% r(k) + s% r(k+1))  ! consistent with f = 1/2
             s1 = pi4*r*r*s% rho(k)
             am_sig(k) = s1*s1*D/s% dm(k)
          end do
@@ -506,9 +506,9 @@
             ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
             ! equal or larger to surf_avg_tau. In that case we just use the values of the surface cell.
             if (tau < s% surf_avg_tau) then
-               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+               if (tau < s% surf_avg_tau_min) then  ! only use part of this cell
                   dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
-               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+               else if (tau + dtau > s% surf_avg_tau) then  ! only use part of this cell
                   dm = dm*(s% surf_avg_tau - tau)/dtau
                   !write(*,2) 'tau limit', k, (s% surf_avg_tau - tau)/dtau
                end if
@@ -554,9 +554,9 @@
             ! the tau < s% surf_avg_tau is meant for the case in which the surface tau is set
             ! equal or larger to surf_avg_tau. In this case we just use the values of the surface cell.
             if (tau < s% surf_avg_tau) then
-               if (tau < s% surf_avg_tau_min) then ! only use part of this cell
+               if (tau < s% surf_avg_tau_min) then  ! only use part of this cell
                   dm = dm*(tau + dtau - s% surf_avg_tau_min)/dtau
-               else if (tau + dtau > s% surf_avg_tau) then ! only use part of this cell
+               else if (tau + dtau > s% surf_avg_tau) then  ! only use part of this cell
                   dm = dm*(s% surf_avg_tau - tau)/dtau
                end if
             end if
@@ -616,9 +616,9 @@
          use auto_diff_support
          integer, intent(in) :: id
          integer, intent(in) :: nz
-         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:) ! (nz)
-         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:) ! (nz)
-         real(dp), intent(inout) :: r_polar(:), r_equatorial(:) ! (nz)
+         real(dp), intent(in) :: aw(:), r(:), rho(:), xm(:)  ! (nz)
+         type(auto_diff_real_star_order1), intent(out) :: ft(:), fp(:)  ! (nz)
+         real(dp), intent(inout) :: r_polar(:), r_equatorial(:)  ! (nz)
          logical, intent(in) :: report_ierr
          integer, intent(out) :: ierr
 
@@ -635,7 +635,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         dbg = .false. ! (s% model_number >= 5)
+         dbg = .false.  ! (s% model_number >= 5)
 
 !$OMP PARALLEL DO PRIVATE(j, A_omega, fp_temp, ft_temp, w, w2, w4, w6, w_log_term) SCHEDULE(dynamic,2)
          do j=1, s% nz

@@ -79,8 +79,8 @@
 !..maximum error is 4.19d-9.   reference: antia apjs 84,101 1993
 
 !..declare
-      integer          i,m1,k1,m2,k2
-      real(dp) f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
+      integer          :: i,m1,k1,m2,k2
+      real(dp) :: f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
 
 
 !..load the coefficients of the expansion
@@ -99,7 +99,7 @@
                           -1.145531476975d0,  -6.067091689181d-2/
 
 
-      if (f .lt. 4.0d0) then
+      if (f < 4.0d0) then
          rn  = f + a1(m1)
          do i=m1-1,1,-1
             rn  = rn*f + a1(i)
@@ -137,8 +137,8 @@
 !..reference: antia apjs 84,101 1993
 
 !..declare
-      integer          i,m1,k1,m2,k2
-      real(dp) x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
+      integer          :: i,m1,k1,m2,k2
+      real(dp) :: x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
 
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /-0.5d0, 7, 7, 11, 11/
@@ -164,7 +164,7 @@
                            1.86795964993052d0,    4.16485970495288d-1/
 
 
-      if (x .lt. 2.0d0) then
+      if (x < 2.0d0) then
          xx = exp(x)
          rn = xx + a1(m1)
          do i=m1-1,1,-1
@@ -203,20 +203,20 @@
       ! provide T or logT or both (the code needs both, so pass 'em if you've got 'em!)
       ! same for Rho and logRho
 
-      real(dp), intent(in) :: T ! temperature
-      real(dp), intent(in) :: logT ! log10 of temperature
-      real(dp), intent(in) :: Rho ! density
-      real(dp), intent(in) :: logRho ! log10 of density
-      real(dp), intent(in) :: abar ! mean atomic weight
-      real(dp), intent(in) :: zbar ! mean charge
-      real(dp), intent(in) :: log10_Tlim ! start to cutoff at this temperature
-      logical, intent(in) :: flags(num_neu_types) ! true if should include the type
+      real(dp), intent(in) :: T  ! temperature
+      real(dp), intent(in) :: logT  ! log10 of temperature
+      real(dp), intent(in) :: Rho  ! density
+      real(dp), intent(in) :: logRho  ! log10 of density
+      real(dp), intent(in) :: abar  ! mean atomic weight
+      real(dp), intent(in) :: zbar  ! mean charge
+      real(dp), intent(in) :: log10_Tlim  ! start to cutoff at this temperature
+      logical, intent(in) :: flags(num_neu_types)  ! true if should include the type
       ! in most cases for stellar evolution, you may want to include brem, plas, pair, and phot
       ! but skip reco.  it is fairly expensive to compute and typically makes only a small contribution.
 
-      real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
+      real(dp), intent(inout) :: loss(num_neu_rvs)  ! total from all sources
       real(dp), intent(inout) :: sources(num_neu_types, num_neu_rvs)
-      integer, intent(out) :: info ! 0 means AOK.
+      integer, intent(out) :: info  ! 0 means AOK.
 
 !..local variables
       type(inputs) ::  input
@@ -224,7 +224,7 @@
       real(dp) :: temp,logtemp,den,logden,tcutoff_factor
 
       real(dp) :: snu, dsnudt, dsnudd, dsnuda, dsnudz, dtcutoff_factordt, dtlim
-      real(dp) spair,spairdt,spairdd,spairda,spairdz, &
+      real(dp) :: spair,spairdt,spairdd,spairda,spairdz, &
                        splas,splasdt,splasdd,splasda,splasdz, &
                        sphot,sphotdt,sphotdd,sphotda,sphotdz, &
                        sbrem,sbremdt,sbremdd,sbremda,sbremdz, &
@@ -233,8 +233,8 @@
 
       info = 0
 
-      if ((T /= arg_not_provided .and. T .le. Tmin_neu) .or. &
-            (logT /= arg_not_provided .and. logT .le. log10Tmin_neu)) then
+      if ((T /= arg_not_provided .and. T <= Tmin_neu) .or. &
+            (logT /= arg_not_provided .and. logT <= log10Tmin_neu)) then
          loss = 0d0
          sources(1:num_neu_types, 1:num_neu_rvs) = 0d0
          return
@@ -534,7 +534,7 @@
          real(dp), intent(out) :: sphot,sphotdt,sphotdd,sphotda,sphotdz
          type(inputs), intent(in) :: input
 
-         real(dp) tau,taudt,cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
+         real(dp) :: tau,taudt,cos1,cos2,cos3,cos4,cos5,sin1,sin2, &
             sin3,sin4,sin5,last,xast, &
             fphot,fphotdt,fphotdd,fphotda,fphotdz, &
             qphot,qphotdt,qphotdd,qphotda,qphotdz
@@ -563,9 +563,9 @@
          sphotda = 0.0d0
          sphotdz = 0.0d0
 
-         if(input% temp .le.1.0d7) then
+         if(input% temp <=1.0d7) then
             return
-         else if (input% temp .ge. 1.0d7  .and. input% temp .lt. 1.0d8) then
+         else if (input% temp >= 1.0d7  .and. input% temp < 1.0d8) then
             tau  =  input% logtemp - 7d0
             cc   =  0.5654d0 + tau
             dccdt = 1d0/(ln10*input% temp)
@@ -606,7 +606,7 @@
             dd24 = -4.222d9
             dd25 = -1.560d9
 
-         else if (input% temp .ge. 1.0d8  .and. input% temp .lt. 1.0d9) then
+         else if (input% temp >= 1.0d8  .and. input% temp < 1.0d9) then
             tau   =  input% logtemp - 8d0
             cc   =  1.5654d0
             dccdt = 0d0
@@ -647,7 +647,7 @@
             dd24 = -3.035d9
             dd25 = -1.598d9
 
-         else if (input% temp .ge. 1.0d9) then
+         else if (input% temp >= 1.0d9) then
             tau  =  input% logtemp - 9d0
             cc   =  1.5654d0
             dccdt = 0d0
@@ -835,7 +835,7 @@
             write(*,*)
          end if
 
-         if (sphot .le. 0.0d0) then
+         if (sphot <= 0.0d0) then
             sphot   = 0.0d0
             sphotdt = 0.0d0
             sphotdd = 0.0d0
@@ -1223,15 +1223,15 @@
          U = pow(input% den6*input% ye,two_thirds)
          tfermi = A * (sqrt(U) - D)
 
-         if (input% temp .ge. tfhi * tfermi) then
+         if (input% temp >= tfhi * tfermi) then
 
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
 
-         else if (input% temp .le. tflo * tfermi) then
+         else if (input% temp <= tflo * tfermi) then
 
             call brem_neu_liquid_metal(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
 
-         else ! blend
+         else  ! blend
 
             call brem_neu_weak_degen(sbrem,sbremdt,sbremdd,sbremda,sbremdz,t8, input)
             sb   = sbrem
@@ -1343,7 +1343,7 @@
          nu3  = nu2 * nu
 
    !..table 12
-         if (nu .ge. -20.0d0  .and. nu .lt. 0.0d0) then
+         if (nu >= -20.0d0  .and. nu < 0.0d0) then
             a1 = 1.51d-2
             a2 = 2.42d-1
             a3 = 1.21d0
@@ -1353,7 +1353,7 @@
             f1 = 0.0d0
             f2 = 0.0d0
             f3 = 0.0d0
-         else if (nu .ge. 0.0d0  .and. nu .le. 10.0d0) then
+         else if (nu >= 0.0d0  .and. nu <= 10.0d0) then
             a1 = 1.23d-2
             a2 = 2.66d-1
             a3 = 1.30d0
@@ -1367,7 +1367,7 @@
 
 
    !..equation 6.7, 6.13 and 6.14
-         if (nu .ge. -20.0d0  .and.  nu .le. 10.0d0) then
+         if (nu >= -20.0d0  .and.  nu <= 10.0d0) then
 
             zeta   = 1.579d5*input% zbar*input% zbar*input% tempi
             zetadt = -zeta*input% tempi
@@ -1519,7 +1519,7 @@
 
 
    !..equation 4.11
-         if (abs(xnum) .gt. 0.7d0  .or.  xden .lt. 0.0d0) then
+         if (abs(xnum) > 0.7d0  .or.  xden < 0.0d0) then
             fxy   = 1.0d0
             fxydt = 0.0d0
             fxydd = 0.0d0
@@ -1535,7 +1535,7 @@
             b2  = -b1*2.0d0*(4.5d0*xnum + 0.9d0)*4.5d0
 
             c   = min(0.0d0, xden - 1.6d0 + 1.25d0*xnum)
-         if (c .eq. 0.0d0) then
+         if (c == 0.0d0) then
             dumdt = 0.0d0
             dumdd = 0.0d0
             dumda = 0.0d0
@@ -1634,7 +1634,7 @@
          a1     = 6.002d19 + 2.084d20*input% zeta + 1.872d21*input% zeta2
          a2     = 2.084d20 + 2.0d0*1.872d21*input% zeta
 
-         if (input% t9 .lt. 10.0d0) then
+         if (input% t9 < 10.0d0) then
             b1     = exp(-5.5924d0*input% zeta)
             b2     = -b1*5.5924d0
          else
@@ -1649,7 +1649,7 @@
          xnumda = c*input% zetada
          xnumdz = c*input% zetadz
 
-         if (input% t9 .lt. 10.0d0) then
+         if (input% t9 < 10.0d0) then
             a1   = 9.383d-1*input% xlm1 - 4.141d-1*input% xlm2 + 5.829d-2*input% xlm3
             a2   = -9.383d-1*input% xlm2 + 2.0d0*4.141d-1*input% xlm3 - 3.0d0*5.829d-2*input% xlm4
          else

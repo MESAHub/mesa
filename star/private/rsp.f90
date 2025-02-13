@@ -483,7 +483,7 @@
 
          end if
 
-         s% do_history_file = s% RSP_have_set_velocities ! don't write history entries until set velocities
+         s% do_history_file = s% RSP_have_set_velocities  ! don't write history entries until set velocities
          !call turn_on_time_weighting(s)
 
          if (s% dt > s% RSP_max_dt .and. s% RSP_max_dt > 0d0) then
@@ -540,7 +540,7 @@
                endif
                FASE=(s% time-FASE0)/s% rsp_period
                !write(*,4) 'add to map', s% model_number, IP, NPCH2, FASE
-               do k=1,NZN,s% RSP_map_zone_interval ! gnuplot pm3d map
+               do k=1,NZN,s% RSP_map_zone_interval  ! gnuplot pm3d map
                   I = NZN+1 - k
                   if(I>IBOTOM.and.I<NZN) then
                      write(io,'(d18.10,1x,i4)',advance='no') FASE, k
@@ -685,7 +685,7 @@
             s% dt = max_dt
          end if
 
-         if (s% force_timestep > 0d0) s% dt = s% force_timestep ! overrides everything else
+         if (s% force_timestep > 0d0) s% dt = s% force_timestep  ! overrides everything else
 
          if (is_bad(s% dt) .or. s% dt <= 0d0) then
             write(*,1) 'dt', s% dt
@@ -700,7 +700,7 @@
          if (ierr /= 0) return
          ! s% dt might have been reduced by retries in HYD
          s% time = s% time_old + s% dt
-         s% rsp_dt = s% dt ! will be used to set dt for next step
+         s% rsp_dt = s% dt  ! will be used to set dt for next step
 
          ! set this here for use in next step. to avoid restart problems.
          rsp_min_dr_div_cs = 1d99
@@ -744,8 +744,8 @@
             k_min_dt = -1
             i_min_rad_diff_time = -1
             do k=1,nz
-               l = s% V(k)/s% opacity(k) ! photon mean free path
-               D = clight*l/3d0 ! diffusion coefficient, clight/(3*opacity*rho)
+               l = s% V(k)/s% opacity(k)  ! photon mean free path
+               D = clight*l/3d0  ! diffusion coefficient, clight/(3*opacity*rho)
                if (k < nz) then
                   dr = s% r(k) - s% r(k+1)
                else
@@ -765,7 +765,7 @@
       end subroutine do1_step
 
 
-      subroutine gather_pulse_statistics(s) ! assumes have set EKMAX and EKMIN
+      subroutine gather_pulse_statistics(s)  ! assumes have set EKMAX and EKMIN
          ! updates LMAX, LMIN, RMAX, RMIN,
          !     s% rsp_GREKM, s% rsp_GREKM_avg_abs, s% rsp_DeltaR, s% rsp_DeltaMAG
          type (star_info), pointer :: s
@@ -831,7 +831,7 @@
          EKMAXL = EKMAX
          s% rsp_num_periods =-1
          ID = 0   !number of timesteps done in one period
-         INSIDE = 1 ! for initial call
+         INSIDE = 1  ! for initial call
          !s% mstar = M(1)
          call set_star_vars(s,ierr)
          if(s% rsp_num_periods==1)s% rsp_GREKM=0.d0
@@ -1001,7 +1001,7 @@
                write(*,2) 'TT1', s% model_number, TT1
                call mesa_error(__FILE__,__LINE__,'check_cycle_completed')
             end if
-            RMAX=s% r(1)/SUNR !(NOT INTERPOLATED)
+            RMAX=s% r(1)/SUNR  !(NOT INTERPOLATED)
             write(*,'(a7,i7,f11.5,a9,f11.5,a14,f9.5,a9,i3,a7,i6,a16,f9.5,a6,i10,a6,f10.3)')  &
                'period', s% rsp_num_periods, s% rsp_period/(24*3600), &
                'delta R', RMAX - RMIN, &

@@ -110,7 +110,7 @@ contains
       call system_clock(time0, clock_rate)
 
       call resolve_inlist_fname(inlist_fname, inlist_fname_arg)
-      MESA_INLIST_RESOLVED = .true. ! Now any call to resolve_inlist_fname will only return inlist_fname_arg or 'inlist'
+      MESA_INLIST_RESOLVED = .true.  ! Now any call to resolve_inlist_fname will only return inlist_fname_arg or 'inlist'
 
       ! Find out if this is a restart
       open(newunit = iounit, file = '.restart', status = 'old', action = 'read', iostat = ierr)
@@ -347,7 +347,7 @@ contains
          call ce_init(b, doing_restart, ierr)
       end if
 
-      evolve_loop : do while(continue_evolve_loop) ! evolve one step per loop
+      evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
 
          if (b% point_mass_i /= 0) then
             num_stars = 1
@@ -384,7 +384,7 @@ contains
             write(*, *) "CE flag is on!!"
          end if
 
-         step_loop : do ! may need to repeat this loop
+         step_loop : do  ! may need to repeat this loop
 
             result = b% extras_binary_start_step(b% binary_id, ierr)
             if (ierr /= 0) then

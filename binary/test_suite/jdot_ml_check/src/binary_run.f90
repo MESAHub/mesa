@@ -1,6 +1,8 @@
-      program binary_run
-      use run_binary, only: do_run_binary
+program binary_run
+   use run_binary, only: do_run_binary
 
-      call do_run_binary(.true.)
+   implicit none
 
-      end program binary_run
+   call do_run_binary(.true.)
+
+end program binary_run

@@ -749,7 +749,7 @@
 
  subroutine store_controls(s, ierr)
  use star_private_def
- use chem_def ! categories
+ use chem_def  ! categories
  use utils_lib, only: mkdir
  type (star_info), pointer :: s
  integer, intent(out) :: ierr
@@ -2440,7 +2440,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  subroutine set_controls_for_writing(s, ierr)
  use star_private_def
- use chem_def ! categories
+ use chem_def  ! categories
  type (star_info), pointer :: s
  integer, intent(out) :: ierr
 
@@ -4152,7 +4152,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1)  ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do

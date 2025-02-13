@@ -64,7 +64,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_constraint_value(id, name, val, ierr) ! called from star_astero code
+      subroutine set_constraint_value(id, name, val, ierr)  ! called from star_astero code
          integer, intent(in) :: id
          character(len=strlen), intent(in) :: name
          real(dp), intent(out) :: val
@@ -92,10 +92,10 @@
       end subroutine set_constraint_value
 
 
-      subroutine set_param(id, name, val, ierr) ! called from star_astero code
+      subroutine set_param(id, name, val, ierr)  ! called from star_astero code
          !use astero_search_data, only: vary_param1
          integer, intent(in) :: id
-         character(len=strlen), intent(in) :: name ! which of param's will be set
+         character(len=strlen), intent(in) :: name  ! which of param's will be set
          real(dp), intent(in) :: val
          integer, intent(out) :: ierr
          type (star_info), pointer :: s

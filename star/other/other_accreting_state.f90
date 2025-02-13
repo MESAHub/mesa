@@ -41,9 +41,9 @@ contains
       integer, intent(in) :: id
       real(dp), intent(out) :: total_specific_energy, accretion_pressure, accretion_density
       integer, intent(out) :: ierr
-      total_specific_energy = 0d0 ! erg/g
-      accretion_pressure = 0d0 ! erg/cm^3
-      accretion_density = 0d0 ! g/cm^3
+      total_specific_energy = 0d0  ! erg/g
+      accretion_pressure = 0d0  ! erg/cm^3
+      accretion_density = 0d0  ! g/cm^3
       ierr = 0
    end subroutine null_other_accreting_state
 

@@ -43,7 +43,7 @@
 
       ! subroutines for dense and banded matrix decompositions and solves
 
-      include "mtx_dble_decsol.dek" ! dble versions
+      include "mtx_dble_decsol.dek"  ! dble versions
 
       !> Wraps the lapack DGBSVX routine for banded matrices to be used with block tridiagonal matrices.
       !!
@@ -212,9 +212,9 @@
       subroutine mtx_write_hbcode1(iounit, n, nnzero, values, rowind, colptr, ierr)
          use mtx_support, only: write_hbcode1
          integer, intent(in) :: iounit, n, nnzero
-         integer :: rowind(:) ! (nnzero)
-         integer :: colptr(:) ! (n+1)
-         real(dp) :: values(:) ! (nnzero)
+         integer :: rowind(:)  ! (nnzero)
+         integer :: colptr(:)  ! (n+1)
+         real(dp) :: values(:)  ! (nnzero)
          integer, intent(out) :: ierr
          call write_hbcode1(iounit, n, n, nnzero, values, rowind, colptr, ierr)
       end subroutine mtx_write_hbcode1
@@ -232,7 +232,7 @@
          use mtx_support, only: read_block_tridiagonal
          integer, intent(in) :: iounit
          integer, intent(out) :: nvar, nblk
-         real(dp), pointer, dimension(:) :: lblk1,dblk1,ublk1 ! =(nvar,nvar,nblk) will be allocated
+         real(dp), pointer, dimension(:) :: lblk1,dblk1,ublk1  ! =(nvar,nvar,nblk) will be allocated
          integer, intent(out) :: ierr
          call read_block_tridiagonal(iounit,nvar,nblk,lblk1,dblk1,ublk1,ierr)
       end subroutine mtx_read_block_tridiagonal
@@ -248,9 +248,9 @@
          ! set prod = A*b with A = block tridiagonal given by lblk, dblk, ublk
          use mtx_support, only: do_block_dble_mv
          integer, intent(in) :: nvar, nz
-         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk ! (nvar,nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(in) :: b ! (nvar,nz)
-         real(dp), pointer, dimension(:,:), intent(inout) :: prod ! (nvar,nz)
+         real(dp), pointer, dimension(:,:,:), intent(in) :: lblk, dblk, ublk  ! (nvar,nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(in) :: b  ! (nvar,nz)
+         real(dp), pointer, dimension(:,:), intent(inout) :: prod  ! (nvar,nz)
          call do_block_dble_mv(nvar, nz, lblk, dblk, ublk, b, prod)
       end subroutine block_dble_mv
 
@@ -259,9 +259,9 @@
          !  calculates b = x*A
          use mtx_support, only: do_multiply_xa
          integer, intent(in) :: n
-         real(dp), pointer, intent(in) :: A1(:) ! =(n, n)
-         real(dp), pointer, intent(in) :: x(:) ! (n)
-         real(dp), pointer, intent(inout) :: b(:) ! (n)
+         real(dp), pointer, intent(in) :: A1(:)  ! =(n, n)
+         real(dp), pointer, intent(in) :: x(:)  ! (n)
+         real(dp), pointer, intent(inout) :: b(:)  ! (n)
          call do_multiply_xa(n, A1, x, b)
       end subroutine multiply_xa
 
@@ -270,9 +270,9 @@
          !  calculates b = x*A
          use mtx_support, only: do_block_multiply_xa
          integer, intent(in) :: nvar, nz
-         real(dp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1 ! =(nvar,nvar,nz)
-         real(dp), intent(in), pointer :: x1(:) ! =(nvar,nz)
-         real(dp), intent(inout), pointer :: b1(:) ! =(nvar,nz)
+         real(dp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1  ! =(nvar,nvar,nz)
+         real(dp), intent(in), pointer :: x1(:)  ! =(nvar,nz)
+         real(dp), intent(inout), pointer :: b1(:)  ! =(nvar,nz)
          call do_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
       end subroutine block_multiply_xa
 
@@ -288,14 +288,14 @@
          !          the number of superdiagonals within the band of a.  ku >= 0.
          integer, intent(in) :: ldab
          !          the leading dimension of the array ab.  ldab >= kl+ku+1.
-         real(dp), intent(in), pointer :: ab1(:) ! =(ldab, n)
+         real(dp), intent(in), pointer :: ab1(:)  ! =(ldab, n)
          !          the matrix a in band storage, in rows 1 to kl+ku+1;
          !          the j-th column of a is stored in the j-th column of the
          !          array ab as follows:
          !          ab(ku+1+i-j, j) = a(i, j) for max(1, j-ku)<=i<=min(n, j+kl)
-         real(dp), intent(in), pointer :: x(:) ! (n)
+         real(dp), intent(in), pointer :: x(:)  ! (n)
          !          the input vector to be multiplied by the matrix.
-         real(dp), intent(inout), pointer :: b(:) ! (n)
+         real(dp), intent(inout), pointer :: b(:)  ! (n)
          !          on exit, set to matrix product of x*a = b
          call do_band_multiply_xa(n, kl, ku, ab1, ldab, x, b)
       end subroutine band_multiply_xa

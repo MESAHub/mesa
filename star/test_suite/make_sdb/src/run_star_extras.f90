@@ -112,7 +112,7 @@
             write(*,*) "M_env/target =", h_env_mass/h_lower_limit
             write(*,*) "Envelope mass outside tolerance, retrying."
             extras_check_model = retry
-         else ! Turn off winds and finish the run
+         else  ! Turn off winds and finish the run
             s% Reimers_scaling_factor = 0d0
             s% Blocker_scaling_factor = 0d0
             extras_check_model = keep_going

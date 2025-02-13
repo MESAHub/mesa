@@ -40,7 +40,7 @@
          use const_def, only: mesa_data_dir, mesa_caches_dir, mesa_temp_caches_dir
          character(*), intent(IN) :: eosDT_cache_dir_in
          logical, intent(in) :: use_cache
-         integer, intent(OUT) :: ierr ! 0 means AOK.
+         integer, intent(OUT) :: ierr  ! 0 means AOK.
          !integer, parameter :: imax = 261, jmax = 101
             ! dimensions of small version of helm table
          !integer, parameter :: imax = 1081, jmax = 401

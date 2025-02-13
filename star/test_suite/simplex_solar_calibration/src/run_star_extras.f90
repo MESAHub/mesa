@@ -66,7 +66,7 @@
       end subroutine extras_controls
 
 
-      subroutine set_my_vars(id, ierr) ! called from star_simplex code
+      subroutine set_my_vars(id, ierr)  ! called from star_simplex code
          use simplex_search_data, only: include_my_var1_in_chi2, my_var1
          integer, intent(in) :: id
          integer, intent(out) :: ierr
@@ -84,10 +84,10 @@
       end subroutine set_my_vars
 
 
-      subroutine will_set_my_param(id, i, new_value, ierr) ! called from star_simplex code
+      subroutine will_set_my_param(id, i, new_value, ierr)  ! called from star_simplex code
          use simplex_search_data, only: vary_my_param1
          integer, intent(in) :: id
-         integer, intent(in) :: i ! which of my_param's will be set
+         integer, intent(in) :: i  ! which of my_param's will be set
          real(dp), intent(in) :: new_value
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
@@ -223,15 +223,15 @@
          integer, intent(in) :: id
          integer, intent(in) :: nfcns
          character (len=*) :: names(:)
-         logical, intent(out) :: gval_is_xa_function(:) ! (nfcns)
-         real(dp), pointer :: vals1(:) ! =(nz, nfcns)
+         logical, intent(out) :: gval_is_xa_function(:)  ! (nfcns)
+         real(dp), pointer :: vals1(:)  ! =(nz, nfcns)
          integer, intent(out) :: ierr
 
          real(dp), pointer :: vals(:,:)
          type (star_info), pointer :: s
          integer :: nz, k
          real(dp) :: weight, width, center
-         real(dp), parameter :: maxval = 700d0 ! max value for tanh from crlibm
+         real(dp), parameter :: maxval = 700d0  ! max value for tanh from crlibm
 
          ierr = 0
          call star_ptr(id, s, ierr)

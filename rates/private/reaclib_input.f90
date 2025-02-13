@@ -112,10 +112,10 @@
             ios = 0
             open(newunit=cache_io_unit,file=trim(cache_filename),action='read', &
                status='old',iostat=ios,form='unformatted')
-            if (ios == 0) then ! opened it okay
+            if (ios == 0) then  ! opened it okay
                call read_reaclib_cache(cache_io_unit,ios)
                close(cache_io_unit)
-               if (ios == 0) then ! read it okay
+               if (ios == 0) then  ! read it okay
                   close(reaclib_unitno)
                   return
                end if
@@ -125,7 +125,7 @@
          count = 0
          do i = 1, max_nreaclib
             read(unit=reaclib_unitno, fmt=line0, iostat=ierr) reaclib% chapter(i)
-            if (ierr /= 0 ) then ! assume end of file
+            if (ierr /= 0 ) then  ! assume end of file
                ierr = 0; exit
             end if
             read(unit=reaclib_unitno,fmt=line1,iostat=ierr,err=100) &
@@ -244,7 +244,7 @@
          type(nuclide_set), dimension(:), intent(in) :: set
          logical, intent(in) :: use_weaklib
          integer, intent(out) :: ierr
-         type(reaction_data) :: r ! temporary storage
+         type(reaction_data) :: r  ! temporary storage
          integer :: i,j,l,count,loc_count,nt,indx,cat, &
             weaklib_count,chapter,num_in,num_out,num_skip_for_weaklib,num_from_reaclib, &
             max_lhs_Z, min_Z
@@ -270,7 +270,7 @@
          end if
 
          count = 0
-         if (use_weaklib) then ! add weaklib rates first
+         if (use_weaklib) then  ! add weaklib rates first
             if (dbg) write(*,*) 'add weaklib rates'
             do i = 1, nuclides% nnuclides
                do j = 1, nuclides% nnuclides
@@ -354,7 +354,7 @@
                         already_included_from_weaklib = .true.
                      end if
                   end if
-                  if (already_included_from_weaklib) then ! find it and store coefficients
+                  if (already_included_from_weaklib) then  ! find it and store coefficients
                      found_it = .false.
                      do j=1,weaklib_count
                         if (r% weaklib_ids(j) == indx) then
@@ -420,9 +420,9 @@
                   r% Qneu(count) = 0.2668D0
 
                else if (handle == 'r_he3_ec_h3') then
-                  r% Qneu(count) = 10D0 ! who knows?  who cares?
+                  r% Qneu(count) = 10D0  ! who knows?  who cares?
 
-               else if (adjustl(reaclib% reaction_flag(i)) == 'w') then ! check weak_info list
+               else if (adjustl(reaclib% reaction_flag(i)) == 'w') then  ! check weak_info list
                   name1 = reaclib% species(1,i)
                   if (num_out == 1) then
                      name2 = reaclib% species(2,i)

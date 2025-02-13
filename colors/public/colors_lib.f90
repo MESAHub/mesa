@@ -56,7 +56,7 @@
       implicit none
 
 
-      contains ! the procedure interface for the library
+      contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
 
@@ -100,8 +100,8 @@
       subroutine get_bcs_one(log_Teff, log_g, M_div_h, results, thead,n_colors, ierr)
          use mod_colors, only : Eval_Colors
          ! input
-         real(dp), intent(in) :: log_Teff ! log10 of surface temp
-         real(dp), intent(in) :: M_div_H ! [M/H]
+         real(dp), intent(in) :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in) :: M_div_H  ! [M/H]
          ! output
          real(dp), dimension(:), intent(out) :: results
          real(dp), intent(in) :: log_g
@@ -124,9 +124,9 @@
       real(dp) function get_bc_by_name(name,log_Teff,log_g, M_div_h, ierr)
          ! input
          character(len=*),intent(in) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          real(dp), dimension(max_num_bcs_per_file) :: results
          type (lgt_list), pointer :: thead => null()
          integer, intent(inout) :: ierr
@@ -168,9 +168,9 @@
       real(dp) function get_bc_by_id(id,log_Teff,log_g, M_div_h, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          integer, intent(inout) :: ierr
          character(len=strlen) :: name
 
@@ -247,7 +247,7 @@
 
       real(dp) function get_abs_bolometric_mag(lum)
          use const_def
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
 
          get_abs_bolometric_mag = mbolsun - 2.5d0*log10(lum)
 
@@ -256,10 +256,10 @@
       real(dp) function get_abs_mag_by_name(name,log_Teff,log_g, M_div_h,lum, ierr)
          ! input
          character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
          integer, intent(inout) :: ierr
 
          ierr=0
@@ -278,10 +278,10 @@
       real(dp) function get_abs_mag_by_id(id,log_Teff,log_g, M_div_h,lum, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in) :: lum ! Luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in) :: lum  ! Luminsoity in lsun units
          integer, intent(inout) :: ierr
          character(len=strlen) :: name
 
@@ -324,8 +324,8 @@
 
       subroutine get_bcs_all(log_Teff, log_g, M_div_h, results, ierr)
          ! input
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
          ! output
          real(dp),dimension(:), intent(out) :: results
          real(dp), intent(in) :: log_g
@@ -355,10 +355,10 @@
       real(dp) function get_lum_band_by_name(name,log_Teff,log_g, M_div_h, lum, ierr)
          ! input
          character(len=*) :: name
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
          real(dp) :: solar_abs_mag, star_abs_mag
          integer, intent(inout) :: ierr
 
@@ -385,10 +385,10 @@
       real(dp) function get_lum_band_by_id(id,log_Teff,log_g, M_div_h, lum, ierr)
          ! input
          integer, intent(in) :: id
-         real(dp), intent(in)  :: log_Teff ! log10 of surface temp
-         real(dp), intent(in)  :: log_g ! log_10 of surface gravity
-         real(dp), intent(in)  :: M_div_h ! [M/H]
-         real(dp), intent(in) :: lum ! Total luminsoity in lsun units
+         real(dp), intent(in)  :: log_Teff  ! log10 of surface temp
+         real(dp), intent(in)  :: log_g  ! log_10 of surface gravity
+         real(dp), intent(in)  :: M_div_h  ! [M/H]
+         real(dp), intent(in) :: lum  ! Total luminsoity in lsun units
          real(dp) :: solar_abs_mag, star_abs_mag
          integer, intent(inout) :: ierr
 

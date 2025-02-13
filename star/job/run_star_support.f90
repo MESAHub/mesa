@@ -71,8 +71,8 @@
             inlist_fname_arg)
 
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
-         integer, intent(inout) :: id ! input if not do_alloc_star
-         logical, intent(inout) :: restart ! input if not do_alloc_star
+         integer, intent(inout) :: id  ! input if not do_alloc_star
+         logical, intent(inout) :: restart  ! input if not do_alloc_star
          character (len=*) :: inlist_fname_arg
          integer, intent(out) :: ierr
          optional inlist_fname_arg
@@ -114,7 +114,7 @@
          continue_evolve_loop = .true.
 
          if (dbg) write(*,*) 'start evolve_loop'
-         evolve_loop: do while(continue_evolve_loop) ! evolve one step per loop
+         evolve_loop: do while(continue_evolve_loop)  ! evolve one step per loop
 
             continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)
             if (failed('do_evolve_one_step',ierr)) return
@@ -133,8 +133,8 @@
             extras_controls, ierr, inlist_fname_arg)
 
          logical, intent(in) :: do_alloc_star, do_free_star, okay_to_restart
-         integer, intent(inout) :: id ! input if not do_alloc_star
-         logical, intent(inout) :: restart ! input if not do_alloc_star
+         integer, intent(inout) :: id  ! input if not do_alloc_star
+         logical, intent(inout) :: restart  ! input if not do_alloc_star
          logical, intent(in) :: pgstar_ok, dbg
          character (len=*) :: restart_filename, inlist_fname_arg
          optional inlist_fname_arg
@@ -205,7 +205,7 @@
 
          first_try = .true.
 
-         step_loop: do ! may need to repeat this loop
+         step_loop: do  ! may need to repeat this loop
 
             if (stop_is_requested(s)) then
                continue_evolve_loop = .false.
@@ -374,7 +374,7 @@
          s% inlist_fname = inlist_fname
 
          if (dbg) write(*,*) 'call starlib_init'
-         call starlib_init(s, ierr) ! okay to do extra calls on this
+         call starlib_init(s, ierr)  ! okay to do extra calls on this
          if (failed('star_init',ierr)) return
 
          if (dbg) write(*,*) 'call star_set_kap_and_eos_handles'
@@ -495,7 +495,7 @@
             write(*, '(a, i12)') 'write initial model ', s% model_number
             call star_write_model(id, 'initial.mod', ierr)
             if (failed('star_write_model',ierr)) return
-            write(*, *) 'saved to ' // 'initial.mod' ! trim(s% job% save_model_filename)
+            write(*, *) 'saved to ' // 'initial.mod'  ! trim(s% job% save_model_filename)
          end if
 
          if (len_trim(s% job% echo_at_start) > 0) then
@@ -698,7 +698,7 @@
             return
          end if
 
-         if(s% total_energy_end .ne. 0d0) then
+         if(s% total_energy_end /= 0d0) then
             if (abs(s% cumulative_energy_error/s% total_energy_end) > &
                   s% warn_when_large_rel_run_E_err) then
                write(*,2) 'WARNING: rel_run_E_err', &
@@ -780,7 +780,7 @@
          if (ierr/=0) return
 
          if (dbg) write(*,*) 'call star_pick_next_timestep'
-         result = star_pick_next_timestep(id) ! for saved model if any
+         result = star_pick_next_timestep(id)  ! for saved model if any
          if (dbg) write(*,*) 'call save_profile'
          call save_profile(id, 3, ierr)
          s% need_to_save_profiles_now = .false.
@@ -1310,10 +1310,10 @@
 
          integer :: io, i, j
          character (len=strlen) :: fname
-         real(dp)  :: log_Teff ! log10 of surface temp
-         real(dp)  :: log_L ! log10 of luminosity in solar units
-         real(dp)  :: mass ! mass in solar units
-         real(dp)  :: Fe_H ! [Fe/H]
+         real(dp)  :: log_Teff  ! log10 of surface temp
+         real(dp)  :: log_L  ! log10 of luminosity in solar units
+         real(dp)  :: mass  ! mass in solar units
+         real(dp)  :: Fe_H  ! [Fe/H]
          ! output
          real(dp),dimension(bc_total_num_colors) :: results
          real(dp) :: log_g
@@ -1447,7 +1447,7 @@
                      if (ierr /= 0) then
                         return
                      end if
-                     exit ! for now, nothing else to be read
+                     exit  ! for now, nothing else to be read
                   end if
                   call error; return
                case(eof_token)
@@ -1632,7 +1632,7 @@
 
          ierr = 0
 
-         s% set_rate_factors => set_rate_factors ! will be called after net is defined
+         s% set_rate_factors => set_rate_factors  ! will be called after net is defined
 
          call get_atm_tau_base(s, s% tau_base, ierr)
          if (failed('atm_tau_base',ierr)) return
@@ -2048,7 +2048,7 @@
          end if
 
          if (s% job% set_initial_age .and. .not. restart) then
-            write(*,1) 'set_initial_age', s% job% initial_age ! in years
+            write(*,1) 'set_initial_age', s% job% initial_age  ! in years
             call star_set_age(id, s% job% initial_age, ierr)
             if (failed('star_set_age',ierr)) return
          end if
@@ -2747,7 +2747,7 @@
          end if
 
         if (s% job% set_max_dt_to_frac_lifetime) then
-           log_m = log10(s% star_mass) ! in Msun units
+           log_m = log10(s% star_mass)  ! in Msun units
            log_lifetime = 9.921d0 - (3.6648d0 + (1.9697d0 - 0.9369d0*log_m)*log_m)*log_m
            ! Iben & Laughlin (1989) as quoted in H&K (eqn 2.3)
            max_dt = s% job% max_frac_of_lifetime_per_step*secyer*exp10(log_lifetime)
@@ -2900,7 +2900,7 @@
                   trim(s% job% relax_composition_filename)
                return
             end if
-            if(num_species .ne. s% species) then
+            if(num_species /= s% species) then
                write(*,*) 'Error in ',trim(s% job% relax_composition_filename)
                write(*,'(a,I4,a)') 'got ',num_species,' species'
                write(*,'(a,I4,a)') 'expected ', s% species,' species'
@@ -3060,7 +3060,7 @@
                      end if
                      entropy(i) = exp(res(i_lnS))
                   else
-                     T_guess_gas = 2*var2*s% abar(k)*mp/(3*kerg*(1+s% zbar(k))) ! ideal gas (var2=energy)
+                     T_guess_gas = 2*var2*s% abar(k)*mp/(3*kerg*(1+s% zbar(k)))  ! ideal gas (var2=energy)
                      T_guess_rad = pow(var2/crad,0.25d0)
                      logT_guess = log10(min(T_guess_gas,T_guess_rad))
                      call eosDT_get_T( &
@@ -3702,7 +3702,7 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
 
-         character(len=1) fpe_check
+         character(len=1) :: fpe_check
          integer :: status
 
          include 'formats'
@@ -3737,7 +3737,7 @@
             test_suite_resolution_factor_str, STATUS=status)
          if (status /= 0) return
 
-         if (test_suite_resolution_factor_str .ne. "") then
+         if (test_suite_resolution_factor_str /= "") then
             read(test_suite_resolution_factor_str, *) test_suite_res_factor
             write(*,*) ""
             write(*,*) "***"

@@ -75,13 +75,13 @@
          call include_iso(6,7)   ! c13
          call include_iso(7,7)   ! n14
          call include_iso(8,8)   ! o16
-         call include_iso(10,10) ! ne20
-         call include_iso(10,12) ! ne22
-         call include_iso(12,12) ! mg24
-         call include_iso(12,14) ! mg26
-         call include_iso(14,14) ! si28
-         call include_iso(16,16) ! s32
-         call include_iso(26,30) ! fe56
+         call include_iso(10,10)  ! ne20
+         call include_iso(10,12)  ! ne22
+         call include_iso(12,12)  ! mg24
+         call include_iso(12,14)  ! mg26
+         call include_iso(14,14)  ! si28
+         call include_iso(16,16)  ! s32
+         call include_iso(26,30)  ! fe56
 
          do j=1,species
             max_x = maxval(s% xa(j,1:nz))
@@ -102,24 +102,24 @@
                   call include_iso(Z-1,N)   ! (g,p)
                end if
                if (Z+2 <= max_Z_for_add .and. N+2 <= max_N_for_add .and. A+4 <= max_A_for_add) then
-                  call include_iso(Z+2,N+2) ! (a,g)
-                  call include_iso(Z-2,N-2) ! (g,a)
+                  call include_iso(Z+2,N+2)  ! (a,g)
+                  call include_iso(Z-2,N-2)  ! (g,a)
                end if
                if (Z+2 <= max_Z_for_add .and. N+1 <= max_N_for_add .and. A+3 <= max_A_for_add) then
-                  call include_iso(Z+2,N+1) ! (a,n)
-                  call include_iso(Z-2,N-1) ! (n,a)
+                  call include_iso(Z+2,N+1)  ! (a,n)
+                  call include_iso(Z-2,N-1)  ! (n,a)
                end if
                if (Z+1 <= max_Z_for_add .and. N+2 <= max_N_for_add .and. A+3 <= max_A_for_add) then
-                  call include_iso(Z+1,N+2) ! (a,p)
-                  call include_iso(Z-1,N-2) ! (p,a)
+                  call include_iso(Z+1,N+2)  ! (a,p)
+                  call include_iso(Z-1,N-2)  ! (p,a)
                end if
                if (Z+1 <= max_Z_for_add .and. N+1 <= max_N_for_add .and. A+2 <= max_A_for_add) then
-                  call include_iso(Z+1,N-1) ! (p,n)
-                  call include_iso(Z-1,N+1) ! (n,p)
+                  call include_iso(Z+1,N-1)  ! (p,n)
+                  call include_iso(Z-1,N+1)  ! (n,p)
                end if
                if (Z+4 <= max_Z_for_add .and. N+4 <= max_N_for_add .and. A+8 <= max_A_for_add) then
-                  call include_iso(Z+4,N+4) ! (2a,g) ! extend alpha chain by 2
-                  call include_iso(Z+3,N+4) ! (2a,p) ! extend alpha chain by 2
+                  call include_iso(Z+4,N+4)  ! (2a,g) ! extend alpha chain by 2
+                  call include_iso(Z+3,N+4)  ! (2a,p) ! extend alpha chain by 2
                end if
             end if
          end do
