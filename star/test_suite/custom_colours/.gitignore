@@ -1,0 +1,28 @@
+# Ignore the data directory
+data/
+
+# Ignore compiled files (e.g., executables, object files, binaries)
+*.o
+*.out
+*.so
+*.a
+*.dll
+*.exe
+*.pyc
+*.pyo
+*.swp
+*.jpg
+*.png
+*.log
+*.tmp
+*.txz
+*.zip
+*.yml
+*.mod
+
+# Ignore other files you don't want to track
+fort.20
+LOGS/
+star
+photos/
+data/

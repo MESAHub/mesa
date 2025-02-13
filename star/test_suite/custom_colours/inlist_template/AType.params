@@ -1,0 +1,8 @@
+Intermediate-Mass Star (A-Type, ~2.5 M☉)
+    Hotter, shorter-lived, can become a white dwarf after helium burning
+
+&controls
+    initial_mass = 1.9d0
+    initial_z = 0.02d0
+    max_age = 5d9       ! 1 Gyr, shorter lifespan than Sun
+/ ! end of controls namelist
