@@ -54,12 +54,13 @@ program test_turb
       L = 1d5*Lsun
       gradr = 3d0 * P * opacity * L / (64 * pi * boltz_sigma * pow4(T) * grav * pow2(r))
 
-      max_conv_vel = 1.0d99
+      max_conv_vel = 1d99
 
       call set_MLT(MLT_option, mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
 
       write(*,1) 'vc at 1d5 Lsun',conv_vel%val
 
@@ -70,6 +71,7 @@ program test_turb
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel2, D, mixing_type, max_conv_vel, ierr)
+
 
       write(*,1) 'vc at 1d8 Lsun',conv_vel2%val
 
@@ -91,6 +93,8 @@ program test_turb
 
       call header('Compare TDC with MLT Cox')
 
+      ! For limiting the conv_vel coming out of mlt/TDC with Csound.
+      max_conv_vel = 1d99 ! we don't limit the conv_vel for testing.
 
       ! General
       mixing_length_alpha=2.0000000000000000
@@ -128,7 +132,6 @@ program test_turb
       report = .false.
       dt = 1d40 ! Long time-step so we get into equilibrium
 
-      max_conv_vel = 1.0d99
 
       ! MLT
       MLT_option = 'Cox'
@@ -140,7 +143,7 @@ program test_turb
       call set_TDC(&
          conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
          mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+         scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
 
       write(*,1) 'TDC: Y, conv_vel_start, conv_vel, dt   ', Y_face%val, conv_vel_start, conv_vel% val, dt
 
@@ -149,13 +152,14 @@ program test_turb
                         gradr, grada, gradL, &
                         Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
 
+
       write(*,1) 'MLT: Y, conv_vel_start, conv_vel, Gamma', Y_face%val, conv_vel_start, conv_vel% val, Gamma%val
 
 
    end subroutine compare_TDC_and_Cox_MLT
 
    subroutine check_TDC()
-      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale
+      real(dp) :: mixing_length_alpha, conv_vel_start, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, scale, max_conv_vel
       type(auto_diff_real_star_order1) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, gradL
       type(auto_diff_real_star_order1) :: gradT, Y_face, conv_vel, D
@@ -166,6 +170,9 @@ program test_turb
       include 'formats'
 
       call header('Test TDC')
+
+      ! For limiting the conv_vel coming out of mlt/TDC with Csound.
+      max_conv_vel = 1d99 ! we don't limit the conv_vel for testing.
 
       conv_vel_start = 52320587.415154047
 
@@ -200,7 +207,7 @@ program test_turb
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, alpha_TDC_DAMP, alpha_TDC_DAMPR, alpha_TDC_PtdVdt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, max_conv_vel, ierr)
 
          write(*,1) 'dt, gradT, conv_vel_start, conv_vel', dt, gradT%val, conv_vel_start, conv_vel% val
          if (report) stop

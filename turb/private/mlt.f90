@@ -61,6 +61,7 @@ contains
                      chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                      gradr, grada, gradL, &
                      Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
       use const_def
       use num_lib
       use utils_lib
@@ -75,7 +76,7 @@ contains
       type(auto_diff_real_star_order1) :: &
          Q, omega, a0, ff4_omega2_plus_1, A_1, A_2, &
          A_numerator, A_denom, A, Bcubed, delta, Zeta, &
-         f, f0, f1, f2, radiative_conductivity, convective_conductivity
+         f, f0, f1, f2, radiative_conductivity, convective_conductivity, csound
       include 'formats'
       if (gradr > gradL) then
          ! Convection zone
@@ -154,6 +155,7 @@ contains
          ! average convection velocity   C&G 14.86b
          conv_vel = mixing_length_alpha*sqrt(Q*P/(8d0*rho))*Gamma / A
 
+         ! convective velocity limiter
          if (conv_vel%val > max_conv_vel) conv_vel%val = max_conv_vel
 
          D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
