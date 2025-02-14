@@ -63,7 +63,7 @@ pgstar commands used for the first 7 plots:
          Color_magnitude1_yaxis1_name(1) = 'bc_B'
          Color_magnitude1_yaxis2_name(1) = 'bc_U'
          Color_magnitude1_yaxis_reversed(1) = .false.
-         
+
          ! Plots `other_yaxis1-other_yaxis2` leave `other_yaxis2` blank if you only want to plot `other_yaxis1`.
          Color_magnitude1_other_yaxis1_name(1) = 'abs_mag_V'
          Color_magnitude1_other_yaxis2_name(1) = ''
@@ -72,7 +72,7 @@ pgstar commands used for the first 7 plots:
 
          Color_magnitude1_yaxis1_name(2) = 'bc_B'
          Color_magnitude1_other_yaxis1_name(2) = 'bc_U'
-         
+
          ! Enables calling a subroutine to add extra information to a plot
          ! see `$MESA_DIR/star/other/pgstar_decorator.f90`
          Color_magnitude1_use_decorator = .true.
@@ -139,9 +139,9 @@ pgstar commands used for the first 7 plots:
 
          ! Plots yaxis1-yaxis2 leave yaxis2 blank if you only want to plot yaxis1.
          Color_magnitude3_yaxis1_name(1) = 'bc_v_bb'
-         
+
          Color_magnitude3_other_yaxis1_name(1) = 'av_v'
-         
+
          ! setup default
          Color_magnitude3_num_panels = 1
          ! file output

@@ -12,7 +12,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 
 .. code-block:: console
 
- Core eE/mg =    2.0005029376686494     
+ Core eE/mg =    2.0005029376686494
  passed test for electric field in the core
 
 
@@ -53,7 +53,7 @@ pgstar commands used for the plots above:
         Profile_Panels2_file_flag = .true.
         Profile_Panels2_file_dir = 'pgstar_out'
         Profile_Panels2_file_prefix = 'profile_'
-        Profile_Panels2_file_interval = 100000     
+        Profile_Panels2_file_interval = 100000
         Profile_Panels2_file_width = -1
         Profile_Panels2_file_aspect_ratio = -1
 

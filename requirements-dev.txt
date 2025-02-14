@@ -1,1 +1,4 @@
 fortitude-lint
+fprettify
+black
+sphinx-lint

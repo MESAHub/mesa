@@ -5,7 +5,7 @@
 ! .. warning::
 !
 !  CONTAINS OPTIONS THAT HAVE NOT YET BEEN THE GIVEN A GREEN LIGHT FOR GENERAL USE.
-!  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.      
+!  IN PARTICULAR, THESE ARE NOT YET FOR USE IN RESEARCH TO BE PUBLISHED.
 
       ! TDC options
       ! ~~~~~~~~~~~
@@ -15,13 +15,13 @@
 
       ! RSP2 parameters
       ! ~~~~~~~~~~~~~~~
-         
-      !|   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad    
-      !|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
+
+      !|   RSP2_alfad =     1.0d0         ! turbulent dissipation; damp ~ RSP2_alfad
+      !|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap
       !|   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
       !|   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-      !|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar    
-      !      
+      !|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar
+      !
       ! RSP2 time weighting is determined by the velocity_time_centering controls.
       !
       !     + for Pt and Lt in turbulent energy equation
@@ -31,7 +31,7 @@
       !
       ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
       ! RSP2_use_Stellingwerf_Lr as in RSP
-      !   
+      !
 
       ! ::
 
@@ -40,35 +40,35 @@
     RSP2_alfat = 0.0d0
     RSP2_alfam = 0.25d0
     RSP2_alfar = 0.0d0
-    
+
     RSP2_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
     RSP2_min_Lc_div_L_for_convective_mixing_type = 1d-4
 
     RSP2_Lsurf_factor = 0.5d0
-    
+
     RSP2_report_adjust_w = .false.
     RSP2_use_L_eqn_at_surface = .true.
     RSP2_assume_HSE = .true.
     RSP2_use_RSP_eqn_for_Y_face = .true.
     RSP2_use_mass_interp_face_values = .false.
     RSP2_use_Stellingwerf_Lr = .true.
-    
+
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0
 
    RSP2_w_fix_if_neg = 5d-5
    RSP2_w_min_for_damping = 1d2
    RSP2_source_seed = 0d0
-     
+
    RSP2_remesh_when_load = .true.
-     
+
    RSP2_nz = 150
    RSP2_nz_outer = 40
    RSP2_T_anchor = 11d3
    RSP2_dq_1_factor = 2d0
-     
+
    RSP2_nz_div_IBOTOM = 30d0
-     
+
 
       ! period controls
 
@@ -171,6 +171,6 @@
       ! use variable T, constant density solver for op_split_burn in cells with T >= this limit at start of step.
       ! only adopted in cells with T >= op_split_burn_min_T at start of step.
 
-      ! ::  
+      ! ::
 
     op_split_burn_min_T_for_variable_T_solver = 1d99

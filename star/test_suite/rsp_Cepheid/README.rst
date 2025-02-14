@@ -13,7 +13,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 .. code-block:: console
 
   rel_run_E_err   3.8990079261471820E-010
-  good match for period   3.9239601593741478        3.9230499999999999  
+  good match for period   3.9239601593741478        3.9230499999999999
 
 .. image:: ../../../star/test_suite/rsp_Cepheid/docs/grid_0007266.svg
    :width: 100%

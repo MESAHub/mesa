@@ -116,18 +116,18 @@ to read in the contents of a typical ``LOGS`` directory. These three
 classes are called ``MesaData``, which corresponds to data in profiles
 or history files, ``MesaProfileIndex``, which corresponds to data found
 in ``profiles.index``, and ``MesaLogDir``, which ties together data in
-profiles, the profile index, and the history file. 
+profiles, the profile index, and the history file.
 Full documentation for how MESA Reader is installed and how to use the
 three classes can be found at the project's `GitHub
 repository <https://github.com/wmwolf/py_mesa_reader>`__ and
 accompanying
-`documentation <https://wmwolf.github.io/py_mesa_reader>`__. 
+`documentation <https://wmwolf.github.io/py_mesa_reader>`__.
 
 How to install MESA Reader?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The most stable release of `mesa_reader` can be installed
-through 
+through
 `pip <https://pip.pypa.io/en/stable>`__
 via
 

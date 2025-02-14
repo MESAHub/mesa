@@ -4,15 +4,15 @@ Building inlists
 
 Inlists for MESA are composed of five main sections labeled ``&star_job``, ``&controls``.
 ``&eos``,  ``&skap`` and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified. The ``&kap`` and ``&eos`` sections are where you specify controls for the opacity and the equation of state respectively.
-The ``&pgstar`` section contains the commands for creating pgstar plots. 
+The ``&pgstar`` section contains the commands for creating pgstar plots.
 
 &star_job
 =========
 
 The main modules of MESA (other than **star**) are the :ref:`eos`, the :ref:`kap`, the :ref:`atm`, the nuclear reactions.
-In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use. 
+In this section of the inlist, you'll have to make choices for which atmosphere and nuclear reactions network you want to use, as well as which nuclear reactions rates you want to use.
 You will also specify here some information about your starting model, and about the output of the evolution.
-Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`. 
+Here we describe only some of the most commonly used controls. For a complete list of available controls see :ref:`reference/star_job:star_job`.
 
 Starting model
 --------------
@@ -51,7 +51,7 @@ You may want to save the final model of your evolution. In that case you have to
 Initial composition
 -------------------
 
-There are several ways to specify the initial composition. 
+There are several ways to specify the initial composition.
 (to be filled in).
 
 You can also use pre-defined chemical compositions based on published data. These are set using the control ``ìnitial_zfracs``.
@@ -83,8 +83,8 @@ For example when evolving a stellar model on the horizontal branch (helium burni
 Energy equation
 ---------------
 
-The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation. 
-The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist. 
+The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation.
+The dLdm form is currently the default in MESA. If the dEdt form is preferred it has to be specified in the inlist.
 
 .. literalinclude:: inlist_example
    :start-after:  ! energy
@@ -117,7 +117,7 @@ If the evolution includes helium burning, type2 opacities should be used.
 
 .. literalinclude:: inlist_example
    :start-after:  ! opacity controls
-   :end-before: ! convection 
+   :end-before: ! convection
 
 Convection and Convective boundaries
 ------------------------------------
@@ -127,11 +127,11 @@ Convection in MESA is treated using the MLT theory of convection, and provides d
 If you want to use another formalism, for example the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__ it can be specified using the ``MLT_option`` control. Several parameters can be specified for this option. The main one is the mixing length parameter. Note that the default value for this parameter in MESA is ``mixing_length_alpha=2``. This value does not come from any calibration.
 
 .. literalinclude:: inlist_example
-   :start-after:  ! convection 
-   :end-before: ! convective boundaries 
+   :start-after:  ! convection
+   :end-before: ! convective boundaries
 
-There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzchild and Ledoux criteria. By default MESA uses the Schwarzchild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzchild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers. 
-Two new algorithms have been introduced in MESA, called **Predictive mixing** (described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ )and **Convective PreMixing**, described in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). By default, none of these are used in MESA, which can lead to very incorrectly determined convective boundaries, with important consequences on the evolution of the stellar model. It is therefore highly recommended to use one of these algorithms. 
+There are two possible criteria that can be used to determine the position of the convective boundaries: the Schwarzchild and Ledoux criteria. By default MESA uses the Schwarzchild criterion. If determined correctly, the position of the convective boundaries should not depend on which criterion is used. But using the Schwarzchild or the Ledoux criterion can lead to different abundance profiles outside the convective region. There are extensive discussions about this topic in the `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ and `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__ papers.
+Two new algorithms have been introduced in MESA, called **Predictive mixing** (described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ )and **Convective PreMixing**, described in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). By default, none of these are used in MESA, which can lead to very incorrectly determined convective boundaries, with important consequences on the evolution of the stellar model. It is therefore highly recommended to use one of these algorithms.
 
 If using **Convective premixing**, there is no additional parameter to specify.
 
@@ -143,7 +143,7 @@ If using **Predictive mixing**, there are additional controls. They are describe
 
 .. literalinclude:: inlist_example
    :start-after: ! Predictive
-   :end-before: ! temp 
+   :end-before: ! temp
 
 
 

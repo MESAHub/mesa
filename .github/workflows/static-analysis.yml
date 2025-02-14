@@ -3,6 +3,7 @@ name: Static Analysis
 on:
   workflow_dispatch:
   release:
+  push:
   pull_request:
     types: [opened, synchronize, reopened, closed]
 
@@ -27,4 +28,13 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           fortitude check
+
+      - name: Apply Python linter, black
+        run: |
+          cd ${{ github.workspace }}
+          black --check .
         
+      - name: Apply RST linter, sphinx-lint
+        run: |
+          cd ${{ github.workspace }}
+          sphinx-lint --ignore=gyre/gyre
