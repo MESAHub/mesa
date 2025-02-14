@@ -188,7 +188,7 @@
             b% CE_lambda2 = 0d0
             b% CE_Ebind1 = 0d0
             b% CE_Ebind2 = 0d0
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
 
             b% num_tries = 0
 
@@ -453,7 +453,7 @@
             end if
             b% mtransfer_rate = new_mdot
          else
-            b% mtransfer_rate = 0
+            b% mtransfer_rate = 0d0
          end if
          call adjust_irradiation(b)
 
