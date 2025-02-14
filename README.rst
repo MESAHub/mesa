@@ -36,7 +36,7 @@ Modules for Experiments in Stellar Astrophysics (MESA)
 
    **WARNING**: The default ``main`` branch is the development version of
    MESA and is not guaranteed to function correctly.  If you are using
-   MESA, you should use an official release version.
+   MESA, you should use an `official release version <https://zenodo.org/records/13353788>`__.
 
 
 Overview
