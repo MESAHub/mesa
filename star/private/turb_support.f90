@@ -184,7 +184,7 @@ contains
       integer, intent(out) :: ierr
 
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel_div_cs, q_temp
+      real(dp) :: conv_vel_start, scale, max_conv_vel
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -207,13 +207,13 @@ contains
          gradL = grada
       end if
 
-      ! For limiting the conv_vel coming out of mlt/TDC with Csound.
-      max_conv_vel_div_cs = 1d99
+      ! maximum convection velocity allowed, not available for TDC
+      if (associated(s% csound_face)) then
+         max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
+      else
+         max_conv_vel = 1.0d99
+      end if
 
-      ! q is not currently set before the first mlt call in build_pms_model() -> look_for_brackets()
-      !if (s% q(k) < s% max_conv_vel_div_csound_maxq ) then
-         max_conv_vel_div_cs = s% max_conv_vel_div_csound
-      !end if ! max_conv_vel_div_cs is 1d99 otherwise.
 
       ! Initialize with no mixing
       mixing_type = no_mixing
@@ -304,7 +304,8 @@ contains
          call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                         chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                         gradr, grada, gradL, &
-                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel_div_cs, ierr)
+                        Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
 
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'ierr from set_MLT'
@@ -321,7 +322,8 @@ contains
                call set_MLT(MLT_option, mixing_length_alpha, s% Henyey_MLT_nu_param, s% Henyey_MLT_y_param, &
                               chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, &
                               gradr_scaled, grada, gradL, &
-                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel_div_cs, ierr)
+                              Gamma, gradT, Y_face, conv_vel, D, mixing_type, max_conv_vel, ierr)
+
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_MLT when using superad_reduction'
                   return
