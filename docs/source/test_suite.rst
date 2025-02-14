@@ -1,7 +1,7 @@
 .. highlight:: console
 
 **********
-Test suite
+Test Suite
 **********
 
 MESA includes a comprehensive test suite.
