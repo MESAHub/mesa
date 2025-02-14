@@ -444,8 +444,8 @@
          ! When q(k) is below s%min_q_for_drag, factor ~ 0;
          ! when q(k) is well above, factor ~ 1.
          if ((s% q(k) > s% min_q_for_drag) .and. s% drag_coefficient > 0 .and. s% use_drag_energy) then
-                     delta = 0.1d0  ! folding scale is 1% by mass
-                     activation_factor = tanh((s% q(k) - s% min_q_for_drag) / delta)
+            delta = 0.01d0  ! folding scale is 1% by mass
+            activation_factor = tanh((s% q(k) - s% min_q_for_drag) / delta)
          else
             delta = 0d0
             activation_factor = 0d0
