@@ -148,7 +148,7 @@ module turb
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       csound = convert(sqrt(P/rho)) ! Approximate
-      if (conv_vel%val > max_conv_vel_div_csound*csound%val) then
+      if (conv_vel%val > max_conv_vel) then
          conv_vel = unconvert(csound)
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
