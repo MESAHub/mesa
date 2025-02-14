@@ -122,7 +122,7 @@
          integer, intent(out) :: ierr
          logical, intent(in) :: restart
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -138,7 +138,7 @@
 
          extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
@@ -150,7 +150,7 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
          extras_binary_check_model = keep_going
@@ -166,17 +166,17 @@
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
 
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 
          if (b% ignore_rlof_flag .and. &
-            abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) < 0.005 .and. &
+            abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) < 0.005d0 .and. &
             b% s1% star_age > 1d2) then
             ! if here, primary reached thermal equilibrium (reached ZAMS), so activate RLOF
             ! this is the amount of overflow of a q=1 system at L2, anything more than this
             ! is too much
-            if (b% rl_relative_gap(1) > 0.320819224) then
+            if (b% rl_relative_gap(1) > 0.320819224d0) then
                extras_binary_finish_step = terminate
                write(*,*) "Terminate due to overflow of L2 at ZAMS"
                return
@@ -197,7 +197,7 @@
             b% terminate_if_L2_overflow = .true.
             write(*,*) "Engage RLOF!"
          else if (b% ignore_rlof_flag .and. &
-            (abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) > 0.005 .or. &
+            (abs(log10(abs(b% s1% L_nuc_burn_total * Lsun / b% s1% L(1)))) > 0.005d0 .or. &
             b% s1% star_age < 1d2)) then
             ! if here, still not in ZAMS, keep period fixed
             call binary_set_period_eccentricity(b% binary_id, &
@@ -209,14 +209,14 @@
 
          ! check if stars are evolving homogeneously
          if (b% s1% center_h1 > 1d-3) then
-            if (b% s1% center_he4 - b% s1% surface_he4 > 0.2) then
+            if (b% s1% center_he4 - b% s1% surface_he4 > 0.2d0) then
                extras_binary_finish_step = terminate
                write(*,*) "Terminate due to primary not evolving homogeneously"
                return
             end if
          end if
          if (b% s2% center_h1 > 1d-3) then
-            if (b% s2% center_he4 - b% s2% surface_he4 > 0.2) then
+            if (b% s2% center_he4 - b% s2% surface_he4 > 0.2d0) then
                extras_binary_finish_step = terminate
                write(*,*) "Terminate due to secondary not evolving homogeneously"
                return
@@ -265,7 +265,7 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
 

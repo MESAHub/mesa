@@ -111,13 +111,13 @@
          ierr = 0
          nz = s% nz
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_MediumSlateBlue, clr_LightSkyBlue, clr_Goldenrod, clr_Lilac, &
                clr_Coral, clr_Crimson, clr_LightSkyGreen, clr_DarkGray, &
                clr_Tan, clr_IndianRed, clr_Gold, &
                clr_Teal, clr_Silver, clr_BrightBlue, clr_FireBrick, &
                clr_RoyalPurple, clr_SlateGray, clr_LightSteelBlue, &
-               clr_Gray, clr_RoyalBlue /)
+               clr_Gray, clr_RoyalBlue ]
 
          chScale = txt_scale
 

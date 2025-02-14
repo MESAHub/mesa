@@ -589,7 +589,6 @@
             umesh, semesh, ff, rs, ierr)
          use kap_def
          use op_eval, only: eval_alt_op
-         implicit none
          integer, intent(in) :: nel
          integer, intent(in) :: izzp(nel)
          real(dp), intent(in) :: fap(:)  ! (nel) number fractions of elements
@@ -804,8 +803,8 @@
         if (ierr /= 0) return
 
 
-        eid = (/ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
-        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 /)
+        eid = [ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
+        img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 ]
 
         if (initialize_fk_old) then
         fk_old = 0
@@ -822,8 +821,8 @@
 
 
         if (delta > 1d-4) then
-          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01 &
-          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1) then
+          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01d0 &
+          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1d0) then
             call compute_kappa(k,&
               fk, logT_cntr, logRho_cntr, &
               log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&

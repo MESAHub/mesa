@@ -31,7 +31,7 @@
 
       include "test_suite_extras_def.inc"
 
-      integer, parameter :: I_INLIST_PART = 1 ! inlist part number
+      integer, parameter :: I_INLIST_PART = 1  ! inlist part number
 
 
       contains

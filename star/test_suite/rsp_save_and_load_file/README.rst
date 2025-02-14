@@ -15,13 +15,13 @@ This test case has 2 parts. Click to see a larger version of a plot.
 .. code-block:: console
 
  rel_run_E_err   3.8996254433032474E-010
- good match for period   3.9239601147325960        3.9239600000000001 
+ good match for period   3.9239601147325960        3.9239600000000001
 
 .. image:: ../../../star/test_suite/rsp_save_and_load_file/docs/grid_0007216.svg
    :width: 100%
 
 
-pgstar commands, in addition to those in ``inlist_rsp_common`` and modifcations to ``how_many_extra_history_columns`` and 
+pgstar commands, in addition to those in ``inlist_rsp_common`` and modifcations to ``how_many_extra_history_columns`` and
 ``data_for_extra_history_columns`` in the ``run_star_extras.f90``, used for the plot above:
 
 .. code-block:: console

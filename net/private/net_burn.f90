@@ -28,14 +28,11 @@
       use math_lib
       use chem_def
       use net_def
-
       use utils_lib, only: is_bad,fill_with_NaNs,fill_with_NaNs_2D
-
       use net_burn_support, only: netint
       use net_approx21, only : num_reactions_func => num_reactions
 
       implicit none
-
 
       !logical, parameter :: use_ludcmp = .true.
       logical, parameter :: use_ludcmp = .false.
@@ -45,8 +42,6 @@
 
       !logical, parameter :: report_ierr = .true.
       logical, parameter :: report_ierr = .false.
-
-
 
 
       contains

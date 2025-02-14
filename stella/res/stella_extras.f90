@@ -18,11 +18,11 @@ program main
    real(dp), allocatable,dimension(:) :: &
       t,m,dm,h,he,c,n,o,ne,na,mg,al,si,s,ar,ca,fe,ni
    real(dp) :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
-   character*132 runname,filestr,fname,test_str
-   character*256 line, my_mesa_dir
+   character*132 :: runname,filestr,fname,test_str
+   character*256 :: line, my_mesa_dir
 
    real(dp), parameter :: &
-      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023, Z_div_X_solar = 0.02293d0, &
+      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023d0, Z_div_X_solar = 0.02293d0, &
       tau_sob_hi = 2d0, tau_sob_med = 1d0, tau_sob_lo = 0.2d0
    integer, parameter :: num_logRhos = 41, num_logTs = 117, iounit = 33, &
       max_lbol = 10000, n_colors = 5
@@ -53,8 +53,8 @@ program main
    call math_init()
 
    call colors_init(1, &
-      (/ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' /), &
-      (/ n_colors /), ierr)
+      [ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' ], &
+      [ n_colors ], ierr)
    if (ierr /= 0) then
       write(*,*) 'colors_init failed during initialization'
       return
@@ -139,7 +139,7 @@ program main
    write(*,*) 'read ' // trim(filestr)//'.lbol'
    fname = trim(filestr)//'.lbol'
    open(21,file=fname, status='old')
-   read(21,*) ! skip line
+   read(21,*)  ! skip line
    num_lbol = 0
    num_lbol_max = 0
    time_lbol(1) = -1
@@ -304,7 +304,7 @@ program main
          read(20,'(a)') line
          if (line(1:len_trim(test_str)) /= trim(test_str)) cycle
          !write(*,*) 'i', i, line(1:len_trim(test_str))
-         read(20,*) ! skip column headers
+         read(20,*)  ! skip column headers
          do j=1,zone
             read(20,'(a)') line
             !write(*,*) i, j, trim(line)
@@ -335,7 +335,7 @@ program main
          tau(1,nm), den(1,nm), temp(1,nm), r(1,nm), v(1,nm)
 
       k_phot = 0
-      if (sum_tau >= 1d0+tauph) then ! record photosphere information
+      if (sum_tau >= 1d0+tauph) then  ! record photosphere information
          do j=zone,2,-1
             if(tau(j-1,nm) >= tauph) then
                k_phot = j
@@ -495,7 +495,7 @@ program main
    contains
 
    real(dp) function interp_logLbol(time)
-      real(dp), intent(in) :: time ! time since start of run
+      real(dp), intent(in) :: time  ! time since start of run
       integer :: k
       real(dp) :: alfa, beta
       do k=1,num_lbol-1
@@ -532,7 +532,7 @@ program main
 
       if (t0 < 0d0) return
 
-      tnm = day + t0 ! this is the desired run time
+      tnm = day + t0  ! this is the desired run time
       nm1 = 0
       nm2 = 0
       do nm=1,num_models-1
@@ -548,7 +548,7 @@ program main
          return
       end if
 
-      alfa = (t2 - tnm)/(t2 - t1) ! fraction from 1st time
+      alfa = (t2 - tnm)/(t2 - t1)  ! fraction from 1st time
       beta = 1d0 - alfa
 
       if (alfa > 1d0 .or. alfa < 0d0) then
@@ -645,13 +645,13 @@ program main
          r_edge = r(j,nm)
          v_edge = v(j,nm)*1d8
       end if
-      d(1:ncol) = (/ &
+      d(1:ncol) = [ &
          dm(j)*msun, m(j)*msun, r(j,nm), v_edge, den(j,nm), &
          crad*tempr(j,nm)**4/3, temp(j,nm), tempr(j,nm), kap(j,nm), tau(j,nm), &
          m_edge, r_edge, &
          h(j),0d0,he(j),c(j),n(j),o(j),ne(j),na(j),mg(j),si(j),s(j),ar(j), ca(j), &
          0d0, 0d0, 0d0, 0d0, 0d0, fe(j), 0d0, ni(j), lum(j,nm), n_bar(j,nm), n_e(j,nm) &
-         /)
+         ]
    end subroutine get1_data
 
 

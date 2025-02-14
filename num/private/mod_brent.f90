@@ -566,7 +566,6 @@
    !    Output, real ( kind = 8 ) ZERO, the estimated value of a zero of
    !    the function F.
    !
-     implicit none
 
      interface
 #include "num_root_fcn.dek"

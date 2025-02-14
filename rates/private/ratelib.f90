@@ -4334,8 +4334,8 @@
          use rates_def, only: tv,rv,rfdm,rfd0,rfd1,rfd2,tfdm,tfd0,tfd1,tfd2
          integer, intent(out) :: ierr
          integer :: k,j
-         rv(:) = (/ 6D0, 7D0, 8D0, 9D0, 10D0, 11D0 /)
-         tv(:) = (/ 2D0, 4D0, 6D0, 8D0, 10D0, 12D0, 14D0 /)
+         rv(:) = [ 6D0, 7D0, 8D0, 9D0, 10D0, 11D0 ]
+         tv(:) = [ 2D0, 4D0, 6D0, 8D0, 10D0, 12D0, 14D0 ]
          ierr = 0
          do k=2,4
             rfdm(k)=1.d0/((rv(k-1)-rv(k))*(rv(k-1)-rv(k+1))*(rv(k-1)-rv(k+2)))

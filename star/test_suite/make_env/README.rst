@@ -63,7 +63,7 @@ pgstar commands used for the plots above:
    Profile_Panels1_file_dir = 'pgstar_out'
    Profile_Panels1_file_prefix = 'profile1_'
    Profile_Panels1_file_interval = 1000
-   Profile_Panels1_file_width = -1     
+   Profile_Panels1_file_width = -1
    Profile_Panels1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist

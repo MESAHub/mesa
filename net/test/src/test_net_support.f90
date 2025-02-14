@@ -486,7 +486,7 @@
       integer function Open_Files(io_start, dir)
          integer, intent(in) :: io_start
          character (len=256), intent(in) :: dir
-         character (len=256) fname
+         character (len=256) :: fname
          integer :: io
          io = io_start
 
@@ -529,14 +529,14 @@
             adjustment_iso = net_iso(img24)
 
             xin = 0
-            xin(net_iso(ih1))  =   0.655186E+00 ! h1
-            xin(net_iso(ihe4)) =   0.31002164D+00 ! he4
-            xin(net_iso(ic12)) =   0.002725D-01 ! c12
+            xin(net_iso(ih1))  =   0.655186E+00  ! h1
+            xin(net_iso(ihe4)) =   0.31002164D+00  ! he4
+            xin(net_iso(ic12)) =   0.002725D-01  ! c12
             xin(net_iso(in14)) =   0.203101D-01 + 0.612124D-06  + 0.109305D-02  + 0.356004D-04
-            xin(net_iso(io16)) =   0.094000D-01 ! o16
-            xin(net_iso(ine20)) =  0.162163D-02 ! ne20
-            xin(net_iso(img24)) =  0.658226D-25 ! mg24
-            xin(net_iso(ihe3)) =   0.201852D-02 ! he3
+            xin(net_iso(io16)) =   0.094000D-01  ! o16
+            xin(net_iso(ine20)) =  0.162163D-02  ! ne20
+            xin(net_iso(img24)) =  0.658226D-25  ! mg24
+            xin(net_iso(ihe3)) =   0.201852D-02  ! he3
 
          else if (net_file == 'o18_and_ne22.net') then
 
@@ -558,64 +558,64 @@
             adjustment_iso = net_iso(img24)
 
             xin = 0
-            xin(net_iso(ih1))  =   0.655186E+00 ! h1
-            xin(net_iso(ihe4)) =   0.31002164D+00 ! he4
-            xin(net_iso(ic12)) =   0.002725D-01 ! c12
+            xin(net_iso(ih1))  =   0.655186E+00  ! h1
+            xin(net_iso(ihe4)) =   0.31002164D+00  ! he4
+            xin(net_iso(ic12)) =   0.002725D-01  ! c12
             xin(net_iso(in14)) =   0.203101D-01 + 0.612124D-06  + 0.109305D-02  + 0.356004D-04
-            xin(net_iso(io16)) =   0.094000D-01 ! o16
-            xin(net_iso(ine20)) =  0.162163D-02 ! ne20
-            xin(net_iso(img24)) =  0.658226D-25 ! mg24
+            xin(net_iso(io16)) =   0.094000D-01  ! o16
+            xin(net_iso(ine20)) =  0.162163D-02  ! ne20
+            xin(net_iso(img24)) =  0.658226D-25  ! mg24
 
-            xin(net_iso(ih2))  =   0.632956D-17 ! h2
-            xin(net_iso(ihe3)) =   0.201852D-02 ! he3
-            xin(net_iso(ili7)) =   0.664160D-15 ! li7
-            xin(net_iso(ibe7)) =   0.103866D-15 ! be7
+            xin(net_iso(ih2))  =   0.632956D-17  ! h2
+            xin(net_iso(ihe3)) =   0.201852D-02  ! he3
+            xin(net_iso(ili7)) =   0.664160D-15  ! li7
+            xin(net_iso(ibe7)) =   0.103866D-15  ! be7
 
          else if (net_file == 'cno_extras.net') then
 
             adjustment_iso = net_iso(img24)
             xin = 0
-            xin(net_iso(ih1))   =   0.173891680788D-01 ! h1
-            xin(net_iso(ihe4))  =   0.963245225401D+00 ! he4
-            xin(net_iso(ic12))  =   0.238935745993D-03 ! c12
-            xin(net_iso(in14))  =   0.134050688300D-01 ! n14
-            xin(net_iso(io16))  =   0.268791618452D-03 ! o16
-            xin(net_iso(ine20)) =   0.180001692845D-02 ! ne20
-            xin(net_iso(img24)) =   0.353667702698D-02 ! mg24
+            xin(net_iso(ih1))   =   0.173891680788D-01  ! h1
+            xin(net_iso(ihe4))  =   0.963245225401D+00  ! he4
+            xin(net_iso(ic12))  =   0.238935745993D-03  ! c12
+            xin(net_iso(in14))  =   0.134050688300D-01  ! n14
+            xin(net_iso(io16))  =   0.268791618452D-03  ! o16
+            xin(net_iso(ine20)) =   0.180001692845D-02  ! ne20
+            xin(net_iso(img24)) =   0.353667702698D-02  ! mg24
 
-            xin(net_iso(ic13))  =   0.717642727071D-04 ! c13
-            xin(net_iso(in13))  =   0.370732258156D-09 ! n13
-            xin(net_iso(in15))  =   0.450484708137D-06 ! n15
-            xin(net_iso(io14))  =   0.100000000000D-49 ! o14
-            xin(net_iso(io15))  =   0.874815374966D-10 ! o15
-            xin(net_iso(if17))  =   0.100000000000D-49 ! f17
-            xin(net_iso(if18))  =   0.100000000000D-49 ! f18
-            xin(net_iso(ine18)) =   0.100000000000D-49 ! ne18
-            xin(net_iso(ine19)) =   0.100000000000D-49 ! ne19
-            xin(net_iso(img22)) =   0.439011547696D-04 ! mg22
+            xin(net_iso(ic13))  =   0.717642727071D-04  ! c13
+            xin(net_iso(in13))  =   0.370732258156D-09  ! n13
+            xin(net_iso(in15))  =   0.450484708137D-06  ! n15
+            xin(net_iso(io14))  =   0.100000000000D-49  ! o14
+            xin(net_iso(io15))  =   0.874815374966D-10  ! o15
+            xin(net_iso(if17))  =   0.100000000000D-49  ! f17
+            xin(net_iso(if18))  =   0.100000000000D-49  ! f18
+            xin(net_iso(ine18)) =   0.100000000000D-49  ! ne18
+            xin(net_iso(ine19)) =   0.100000000000D-49  ! ne19
+            xin(net_iso(img22)) =   0.439011547696D-04  ! mg22
 
          else if (net_file == 'pp_cno_extras_o18_ne22.net') then
 
             adjustment_iso = net_iso(img24)
             xin = 0
-            xin(net_iso(ih1))   =   0.173891680788D-01 ! h1
-            xin(net_iso(ihe4))  =   0.963245225401D+00 ! he4
-            xin(net_iso(ic12))  =   0.238935745993D-03 ! c12
-            xin(net_iso(in14))  =   0.134050688300D-01 ! n14
-            xin(net_iso(io16))  =   0.268791618452D-03 ! o16
-            xin(net_iso(ine20)) =   0.180001692845D-02 ! ne20
-            xin(net_iso(img24)) =   0.353667702698D-02 ! mg24
+            xin(net_iso(ih1))   =   0.173891680788D-01  ! h1
+            xin(net_iso(ihe4))  =   0.963245225401D+00  ! he4
+            xin(net_iso(ic12))  =   0.238935745993D-03  ! c12
+            xin(net_iso(in14))  =   0.134050688300D-01  ! n14
+            xin(net_iso(io16))  =   0.268791618452D-03  ! o16
+            xin(net_iso(ine20)) =   0.180001692845D-02  ! ne20
+            xin(net_iso(img24)) =   0.353667702698D-02  ! mg24
 
-            xin(net_iso(ic13))  =   0.717642727071D-04 ! c13
-            xin(net_iso(in13))  =   0.370732258156D-09 ! n13
-            xin(net_iso(in15))  =   0.450484708137D-06 ! n15
-            xin(net_iso(io14))  =   0.100000000000D-49 ! o14
-            xin(net_iso(io15))  =   0.874815374966D-10 ! o15
-            xin(net_iso(if17))  =   0.100000000000D-49 ! f17
-            xin(net_iso(if18))  =   0.100000000000D-49 ! f18
-            xin(net_iso(ine18)) =   0.100000000000D-49 ! ne18
-            xin(net_iso(ine19)) =   0.100000000000D-49 ! ne19
-            xin(net_iso(img22)) =   0.439011547696D-04 ! mg22
+            xin(net_iso(ic13))  =   0.717642727071D-04  ! c13
+            xin(net_iso(in13))  =   0.370732258156D-09  ! n13
+            xin(net_iso(in15))  =   0.450484708137D-06  ! n15
+            xin(net_iso(io14))  =   0.100000000000D-49  ! o14
+            xin(net_iso(io15))  =   0.874815374966D-10  ! o15
+            xin(net_iso(if17))  =   0.100000000000D-49  ! f17
+            xin(net_iso(if18))  =   0.100000000000D-49  ! f18
+            xin(net_iso(ine18)) =   0.100000000000D-49  ! ne18
+            xin(net_iso(ine19)) =   0.100000000000D-49  ! ne19
+            xin(net_iso(img22)) =   0.439011547696D-04  ! mg22
 
          else if (net_file == 'approx21_cr60_plus_co56.net') then
 
@@ -725,7 +725,7 @@
          use utils_lib
          character (len=*), intent(in) :: filename
          integer, intent(out) :: n
-         real(dp), dimension(:), pointer :: rho_vec, T_vec ! to be allocated and filled
+         real(dp), dimension(:), pointer :: rho_vec, T_vec  ! to be allocated and filled
          integer, intent(out) :: ierr
 
          integer :: iounit, i
@@ -788,7 +788,7 @@
          real(dp) :: logRho, logT, Rho, T, xsum, Q1, &
            eps_nuc, d_eps_nuc_dRho, d_eps_nuc_dT, weak_rate_factor, &
             dvardx, dvardx_0, dx_0, err, var_0, xdum, &
-           eps_nuc_categories(num_categories), xh, xhe, mass_correction !approx_abar, approx_zbar
+           eps_nuc_categories(num_categories), xh, xhe, mass_correction  !approx_abar, approx_zbar
          integer :: i, j, info, ierr
          integer :: j_dx, j_dx_sink
          real(dp), dimension(:), pointer :: d_eps_nuc_dx, dabar_dx, dzbar_dx, dmc_dx
@@ -829,7 +829,7 @@
          rate_factors(:) = 1
          weak_rate_factor = 1
 
-         if (.false.) then ! get neutrino Q
+         if (.false.) then  ! get neutrino Q
 
             Q1 = eval_neutrino_Q(img22, is30)
             write(*,1) 'Qneu mg22->s30', Q1
@@ -858,7 +858,7 @@
             stop
          end if
 
-         if (.false.) then ! get reaction Q
+         if (.false.) then  ! get reaction Q
  ! co55 -> fe55
             Q1 = isoB(ife55) - isoB(ico55)
             write(*,1) 'Q co55->fe55', Q1
@@ -872,9 +872,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                ir_ar36_ag_ca40, &
-               ir_ca40_ga_ar36  /)
+               ir_ca40_ga_ar36  ]
 
                                   xin(net_iso(ife56))=     6.3551174304779179D-01
                                   xin(net_iso(icr52))=     1.0518849309100423D-01
@@ -1097,9 +1097,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                  irco56ec_to_fe56, &
-                 irni56ec_to_co56 /)
+                 irni56ec_to_co56 ]
 
                                     xin(net_iso(ineut))=    1.9615092621881698D-06
                                       xin(net_iso(ih1))=    0.0000000000000000D+00
@@ -1144,9 +1144,9 @@
 
             nrates_to_show = 2
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
                  irco56ec_to_fe56, &
-                 irni56ec_to_co56 /)
+                 irni56ec_to_co56 ]
 
                                    xin(net_iso(ihe4))=     3.4555392534813939D-01
                                    xin(net_iso(io16))=     1.9367778420430937D-01
@@ -1196,8 +1196,8 @@
             if (rates_reaction_id('rc12_to_n14') <= 0) call mesa_error(__FILE__,__LINE__,'bad reaction')
             write(*,*) 'rc12_to_n14', rates_reaction_id('rc12_to_n14')
 
-            rates_to_show(1:nrates_to_show) = (/  &
-            rates_reaction_id('rc12_to_n14') /)
+            rates_to_show(1:nrates_to_show) = [  &
+            rates_reaction_id('rc12_to_n14') ]
 
                                    xin(net_iso(ihe4))=     9.8119124177708650D-01
                                    xin(net_iso(in14))=     9.8369547495994036D-03
@@ -1207,8 +1207,8 @@
                                     xin(net_iso(ih1))=     0.0000000000000000D+00
 
                                     write(*,*) 'when 1st'
-                                   xin(net_iso(ic12))=     2.3551202768735954D-04 ! 2.3551179217556737D-04
-                                  xin(net_iso(img24))=     3.7802763872225075D-03 ! 3.7802766227342998D-03
+                                   xin(net_iso(ic12))=     2.3551202768735954D-04  ! 2.3551179217556737D-04
+                                  xin(net_iso(img24))=     3.7802763872225075D-03  ! 3.7802766227342998D-03
 
                                     !write(*,*) 'when 2nd'
                                    !xin(net_iso(ic12))=     2.3551179217556737D-04
@@ -1233,11 +1233,11 @@
 
             nrates_to_show = 4
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             ir_h1_h1_wk_h2, &
             ir_c13_an_o16, &
             ir_f19_ap_ne22, &
-            ir_he3_ag_be7 /)
+            ir_he3_ag_be7 ]
 
                      xin(net_iso(ih1))= 1
 
@@ -1278,7 +1278,7 @@
 
             nrates_to_show = 8
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             rates_reaction_id('r_n13_wk_c13'),                &
             rates_reaction_id('r_o15_wk_n15'),                &
             rates_reaction_id('r_f17_wk_o17'),                &
@@ -1286,7 +1286,7 @@
             rates_reaction_id('r_o14_wk_n14'),                &
             rates_reaction_id('r_ne18_wk_f18'),                &
             rates_reaction_id('r_ne19_wk_f19'),                &
-            ir_he4_he4_he4_to_c12 /)
+            ir_he4_he4_he4_to_c12 ]
 
          xin = 0
                      xin(net_iso(ih1))=     7.2265805432969643D-01
@@ -1322,13 +1322,13 @@
 
             nrates_to_show = 5
 
-            rates_to_show(1:nrates_to_show) = (/  &
+            rates_to_show(1:nrates_to_show) = [  &
             ir_v47_pa_ti44,            &
             ir_mn51_pa_cr48, &
             ir_ar36_ap_k39, &
             ir_co55_pa_fe52,            &
             ir_s32_ap_cl35             &
-            /)
+            ]
                      xin = 0
 
                                   xin(net_iso(ife54))=     7.8234742556602999D-01
@@ -1438,7 +1438,7 @@
 
 
 
-         if (.true.) then ! dfridr tests for partials
+         if (.true.) then  ! dfridr tests for partials
 
 
             !doing_d_dlnd = .true.
@@ -1449,8 +1449,8 @@
             var_0 = dxdt(j_dx)
 
             if (doing_dx) then
-               j_dx = 20 ! fe56
-               j_dx_sink = 17 ! cr56
+               j_dx = 20  ! fe56
+               j_dx_sink = 17  ! cr56
                dx_0 = xin(j_dx)*1d-6
                dvardx_0 = d_eps_nuc_dx(j_dx)
                write(*,1) 'xin(fe56)', xin(j_dx)
@@ -1460,7 +1460,7 @@
                !call mesa_error(__FILE__,__LINE__,'testing')
             else if (doing_d_dlnd) then
                dx_0 = max(1d-14, abs(logRho*ln10*1d-6))
-               dvardx_0 = d_eps_nuc_dRho*Rho ! d_dxdt_dRho(1)*Rho ! analytic value of partial
+               dvardx_0 = d_eps_nuc_dRho*Rho  ! d_dxdt_dRho(1)*Rho ! analytic value of partial
             else
                dx_0 = max(1d-14, abs(logT*ln10*1d-6))
                !dvardx_0 = d_eps_nuc_dT*T
@@ -1475,7 +1475,7 @@
                write(*,*) 'doing d_dx ' // trim(chem_isos% name(chem_id(j_dx)))
             else if (doing_d_dlnd) then
                write(*,*) 'doing dlnd'
-            else ! doing d_dlnT
+            else  ! doing d_dlnT
                write(*,*) 'doing dlnT'
             end if
             write(*,*) 'test net'
@@ -1780,7 +1780,7 @@
          end function dfridr_func
 
 
-         real(dp) function dfridr(hx,err) ! from Frank
+         real(dp) function dfridr(hx,err)  ! from Frank
             real(dp), intent(in) :: hx
             real(dp), intent(out) :: err
             !  this routine returns the first derivative of a function func(x)
@@ -1833,15 +1833,15 @@
 
 
       subroutine test_neutrino_Q
-         real(dp), parameter :: Qnu_n13 = 0.714440d0 !..13n(e+nu)13c
-         real(dp), parameter :: Qnu_o15 = 1.005513d0 !..15o(e+nu)15n
-         real(dp), parameter :: Qnu_f17 = 1.009145d0 !..17f(e+nu)17o
-         real(dp), parameter :: Qnu_f18 = 0.393075d0 !..18f(e+nu)18o
-         real(dp), parameter :: Qnu_o14 = 2.22d0 !..14o(e+nu)14n
-         real(dp), parameter :: Qnu_ne18 = 1.87d0 !..18ne(e+nu)18f
-         real(dp), parameter :: Qnu_ne19 = 1.25d0 !..19ne(e+nu)19f
+         real(dp), parameter :: Qnu_n13 = 0.714440d0  !..13n(e+nu)13c
+         real(dp), parameter :: Qnu_o15 = 1.005513d0  !..15o(e+nu)15n
+         real(dp), parameter :: Qnu_f17 = 1.009145d0  !..17f(e+nu)17o
+         real(dp), parameter :: Qnu_f18 = 0.393075d0  !..18f(e+nu)18o
+         real(dp), parameter :: Qnu_o14 = 2.22d0  !..14o(e+nu)14n
+         real(dp), parameter :: Qnu_ne18 = 1.87d0  !..18ne(e+nu)18f
+         real(dp), parameter :: Qnu_ne19 = 1.25d0  !..19ne(e+nu)19f
  !real(dp), parameter :: Qnu_mg21 = 6.2d0 !..mg21(e+nu)na21
-         real(dp), parameter :: Qnu_mg22 = 2.1d0 !..mg22(e+nu)na22
+         real(dp), parameter :: Qnu_mg22 = 2.1d0  !..mg22(e+nu)na22
 
  1       format(a40, 1pd26.16)
 

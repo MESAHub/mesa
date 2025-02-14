@@ -39,17 +39,17 @@ contains
       use star_def
       use neu_lib, only: neu_get
       use neu_def
-      integer, intent(in) :: id ! id for star
-      integer, intent(in) :: k ! cell number or 0 if not for a particular cell
-      real(dp), intent(in) :: T ! temperature
-      real(dp), intent(in) :: log10_T ! log10 of temperature
-      real(dp), intent(in) :: Rho ! density
-      real(dp), intent(in) :: log10_Rho ! log10 of density
-      real(dp), intent(in) :: abar ! mean atomic weight
-      real(dp), intent(in) :: zbar ! mean charge
+      integer, intent(in) :: id  ! id for star
+      integer, intent(in) :: k  ! cell number or 0 if not for a particular cell
+      real(dp), intent(in) :: T  ! temperature
+      real(dp), intent(in) :: log10_T  ! log10 of temperature
+      real(dp), intent(in) :: Rho  ! density
+      real(dp), intent(in) :: log10_Rho  ! log10 of density
+      real(dp), intent(in) :: abar  ! mean atomic weight
+      real(dp), intent(in) :: zbar  ! mean charge
       real(dp), intent(in) :: log10_Tlim
-      logical, intent(inout) :: flags(num_neu_types) ! true if should include the type of loss
-      real(dp), intent(inout) :: loss(num_neu_rvs) ! total from all sources
+      logical, intent(inout) :: flags(num_neu_types)  ! true if should include the type of loss
+      real(dp), intent(inout) :: loss(num_neu_rvs)  ! total from all sources
       real(dp), intent(inout) :: sources(num_neu_types, num_neu_rvs)
       integer, intent(out) :: ierr
       call neu_get( &

@@ -788,10 +788,10 @@
 
          if (iturpr == 1) then
             do n=1,nn
-               if (x(n) < 0.999) then
+               if (x(n) < 0.999d0) then
                   ggt=1
                else
-                  ggt=1./(x(n)*x(n)*x(n)*aa(1,n))
+                  ggt=1.0d0/(x(n)*x(n)*x(n)*aa(1,n))
                end if
                aa(10,n)=ggt
             end do
@@ -824,7 +824,7 @@
          integer, intent(out) :: nn, ierr
 
          integer, parameter :: ireset(16) = &
-            (/3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20/)
+            [3,4,5,6,8,9,10,11,12,13,14,16,17,18,19,20]
          integer :: nn1, i, n, ir
          real(dp) :: d2amax, var1(ivar,nn_in+100), q(nn_in+100), x(nn_in+100)
 

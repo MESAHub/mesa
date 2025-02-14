@@ -36,7 +36,6 @@ contains
 
 
    subroutine summary_history_plot(id, device_id, ierr)
-      implicit none
       integer, intent(in) :: id, device_id
       integer, intent(out) :: ierr
 
@@ -106,13 +105,13 @@ contains
 
       num_lines = b% pg% Summary_History_num_lines
 
-      colors(:) = (/ &
+      colors(:) = [ &
          clr_MediumSlateBlue, clr_Goldenrod, clr_LightSkyBlue, clr_Lilac, &
             clr_Coral, clr_Crimson, clr_LightSkyGreen, clr_DarkGray, &
             clr_Tan, clr_IndianRed, clr_Gold, &
             clr_Teal, clr_Silver, clr_BrightBlue, clr_FireBrick, &
             clr_RoyalPurple, clr_SlateGray, clr_LightSteelBlue, &
-            clr_Gray, clr_RoyalBlue /)
+            clr_Gray, clr_RoyalBlue ]
 
       windy = winymax - winymin
 

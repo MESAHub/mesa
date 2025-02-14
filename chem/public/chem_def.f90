@@ -293,8 +293,8 @@
       real(dp), parameter :: AGSS09_ysol = 0.2485d0
       real(dp), parameter :: L09_ysol    = 0.2751d0
       real(dp), parameter :: A09_Prz_ysol = 0.276d0
-      real(dp), parameter :: MB22_photospheric_ysol = 0.2485
-      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485
+      real(dp), parameter :: MB22_photospheric_ysol = 0.2485d0
+      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485d0
 
       character(len=iso_name_length) :: chem_element_main_iso_name(num_chem_elements)
       integer, parameter :: chem_element_name_len = iso_name_length
@@ -536,11 +536,11 @@
 
          integer :: i, ierr
 
-         Tpart = (/  &
+         Tpart = [  &
             0.10d0, 0.15d0, 0.20d0, 0.30d0, 0.40d0, 0.50d0, &
             0.60d0, 0.70d0, 0.80d0, 0.90d0, 1.00d0, 1.50d0, &
             2.00d0, 2.50d0, 3.00d0, 3.50d0, 4.00d0, 4.50d0, &
-            5.00d0, 6.00d0, 7.00d0, 8.00d0, 9.00d0, 10.0d0 /)
+            5.00d0, 6.00d0, 7.00d0, 8.00d0, 9.00d0, 10.0d0 ]
 
          call init_ag_data
 
@@ -613,7 +613,7 @@
          integer :: i, j, ierr
 
 !..names of the stable isotopes
-         namsol(1:120) = (/ &
+         namsol(1:120) = [ &
        'h1   ','h2   ','he3  ','he4  ','li6  ','li7  ','be9  ','b10  ', &
        'b11  ','c12  ','c13  ','n14  ','n15  ','o16  ','o17  ','o18  ', &
        'f19  ','ne20 ','ne21 ','ne22 ','na23 ','mg24 ','mg25 ','mg26 ', &
@@ -628,9 +628,9 @@
        'se78 ','se80 ','se82 ','br79 ','br81 ','kr78 ','kr80 ','kr82 ', &
        'kr83 ','kr84 ','kr86 ','rb85 ','rb87 ','sr84 ','sr86 ','sr87 ', &
        'sr88 ','y89  ','zr90 ','zr91 ','zr92 ','zr94 ','zr96 ','nb93 ', &
-       'mo92 ','mo94 ','mo95 ','mo96 ','mo97 ','mo98 ','mo100','ru96 '  /)
+       'mo92 ','mo94 ','mo95 ','mo96 ','mo97 ','mo98 ','mo100','ru96 '  ]
 
-         namsol(121:240) = (/ &
+         namsol(121:240) = [ &
        'ru98 ','ru99 ','ru100','ru101','ru102','ru104','rh103','pd102', &
        'pd104','pd105','pd106','pd108','pd110','ag107','ag109','cd106', &
        'cd108','cd110','cd111','cd112','cd113','cd114','cd116','in113', &
@@ -645,19 +645,19 @@
        'gd155','gd156','gd157','gd158','gd160','tb159','dy156','dy158', &
        'dy160','dy161','dy162','dy163','dy164','ho165','er162','er164', &
        'er166','er167','er168','er170','tm169','yb168','yb170','yb171', &
-       'yb172','yb173','yb174','yb176','lu175','lu176','hf174','hf176' /)
+       'yb172','yb173','yb174','yb176','lu175','lu176','hf174','hf176' ]
 
-         namsol(241:286) = (/ &
+         namsol(241:286) = [ &
        'hf177','hf178','hf179','hf180','ta180','ta181','w180 ','w182 ', &
        'w183 ','w184 ','w186 ','re185','re187','os184','os186','os187', &
        'os188','os189','os190','os192','ir191','ir193','pt190','pt192', &
        'pt194','pt195','pt196','pt198','au197','hg196','hg198','hg199', &
        'hg200','hg201','hg202','hg204','tl203','tl205','pb204','pb206', &
-       'pb207','pb208','bi209','th232','u235 ','u238 ' /)
+       'pb207','pb208','bi209','th232','u235 ','u238 ' ]
 
 
 !..anders & grevesse 1989 solar mass fractions
-         solx(1:45) = (/ &
+         solx(1:45) = [ &
            7.0573D-01, 4.8010D-05, 2.9291D-05, 2.7521D-01, 6.4957D-10, &
            9.3490D-09, 1.6619D-10, 1.0674D-09, 4.7301D-09, 3.0324D-03, &
            3.6501D-05, 1.1049D-03, 4.3634D-06, 9.5918D-03, 3.8873D-06, &
@@ -666,9 +666,9 @@
            6.5301D-04, 3.4257D-05, 2.3524D-05, 8.1551D-06, 3.9581D-04, &
            3.2221D-06, 1.8663D-05, 9.3793D-08, 2.5320D-06, 8.5449D-07, &
            7.7402D-05, 1.5379D-05, 2.6307D-08, 3.4725D-06, 4.4519D-10, &
-           2.6342D-07, 5.9898D-05, 4.1964D-07, 8.9734D-07, 1.4135D-06 /)
+           2.6342D-07, 5.9898D-05, 4.1964D-07, 8.9734D-07, 1.4135D-06 ]
 
-         solx(46:90)  = (/ &
+         solx(46:90)  = [ &
              2.7926D-09, 1.3841D-07, 3.8929D-08, 2.2340D-07, 2.0805D-07, &
              2.1491D-06, 1.6361D-07, 1.6442D-07, 9.2579D-10, 3.7669D-07, &
              7.4240D-07, 1.4863D-05, 1.7160D-06, 4.3573D-07, 1.3286D-05, &
@@ -677,9 +677,9 @@
              5.7528D-07, 2.6471D-07, 9.9237D-07, 5.8765D-07, 8.7619D-08, &
              4.0593D-07, 1.3811D-08, 3.9619D-08, 2.7119D-08, 4.3204D-08, &
              5.9372D-08, 1.7136D-08, 8.1237D-08, 1.7840D-08, 1.2445D-08, &
-             1.0295D-09, 1.0766D-08, 9.1542D-09, 2.9003D-08, 6.2529D-08 /)
+             1.0295D-09, 1.0766D-08, 9.1542D-09, 2.9003D-08, 6.2529D-08 ]
 
-         solx(91:135)  = (/ &
+         solx(91:135)  = [ &
              1.1823D-08, 1.1950D-08, 1.2006D-08, 3.0187D-10, 2.0216D-09, &
              1.0682D-08, 1.0833D-08, 5.4607D-08, 1.7055D-08, 1.1008D-08, &
              4.3353D-09, 2.8047D-10, 5.0468D-09, 3.6091D-09, 4.3183D-08, &
@@ -688,9 +688,9 @@
              1.0320D-09, 5.9868D-10, 1.5245D-09, 6.2225D-10, 2.5012D-10, &
              8.6761D-11, 5.9099D-10, 5.9190D-10, 8.0731D-10, 1.5171D-09, &
              9.1547D-10, 8.9625D-10, 3.6637D-11, 4.0775D-10, 8.2335D-10, &
-             1.0189D-09, 1.0053D-09, 4.5354D-10, 6.8205D-10, 6.4517D-10 /)
+             1.0189D-09, 1.0053D-09, 4.5354D-10, 6.8205D-10, 6.4517D-10 ]
 
-         solx(136:180)  = (/ &
+         solx(136:180)  = [ &
              5.3893D-11, 3.9065D-11, 5.5927D-10, 5.7839D-10, 1.0992D-09, &
              5.6309D-10, 1.3351D-09, 3.5504D-10, 2.2581D-11, 5.1197D-10, &
              1.0539D-10, 7.1802D-11, 3.9852D-11, 1.6285D-09, 8.6713D-10, &
@@ -699,9 +699,9 @@
              7.1827D-10, 1.0814D-09, 3.1553D-09, 4.9538D-09, 5.3600D-09, &
              2.8912D-09, 1.7910D-11, 1.6223D-11, 3.3349D-10, 4.1767D-09, &
              6.7411D-10, 3.3799D-09, 4.1403D-09, 1.5558D-09, 1.2832D-09, &
-             1.2515D-09, 1.5652D-11, 1.5125D-11, 3.6946D-10, 1.0108D-09 /)
+             1.2515D-09, 1.5652D-11, 1.5125D-11, 3.6946D-10, 1.0108D-09 ]
 
-         solx(181:225)  = (/ &
+         solx(181:225)  = [ &
              1.2144D-09, 1.7466D-09, 1.1240D-08, 1.3858D-12, 1.5681D-09, &
              7.4306D-12, 9.9136D-12, 3.5767D-09, 4.5258D-10, 5.9562D-10, &
              8.0817D-10, 3.6533D-10, 7.1757D-10, 2.5198D-10, 5.2441D-10, &
@@ -710,9 +710,9 @@
              1.9660D-10, 2.5376D-12, 2.8008D-11, 1.9133D-10, 2.6675D-10, &
              2.0492D-10, 3.2772D-10, 2.9180D-10, 2.8274D-10, 8.6812D-13, &
              1.4787D-12, 3.7315D-11, 3.0340D-10, 4.1387D-10, 4.0489D-10, &
-             4.6047D-10, 3.7104D-10, 1.4342D-12, 1.6759D-11, 3.5397D-10 /)
+             4.6047D-10, 3.7104D-10, 1.4342D-12, 1.6759D-11, 3.5397D-10 ]
 
-         solx(226:270)  = (/ &
+         solx(226:270)  = [ &
              2.4332D-10, 2.8557D-10, 1.6082D-10, 1.6159D-10, 1.3599D-12, &
              3.2509D-11, 1.5312D-10, 2.3624D-10, 1.7504D-10, 3.4682D-10, &
              1.4023D-10, 1.5803D-10, 4.2293D-12, 1.0783D-12, 3.4992D-11, &
@@ -721,18 +721,18 @@
              1.7878D-10, 9.0315D-11, 1.5326D-10, 5.6782D-13, 5.0342D-11, &
              5.1086D-11, 4.2704D-10, 5.2110D-10, 8.5547D-10, 1.3453D-09, &
              1.1933D-09, 2.0211D-09, 8.1702D-13, 5.0994D-11, 2.1641D-09, &
-             2.2344D-09, 1.6757D-09, 4.8231D-10, 9.3184D-10, 2.3797D-12 /)
+             2.2344D-09, 1.6757D-09, 4.8231D-10, 9.3184D-10, 2.3797D-12 ]
 
-         solx(271:286)  = (/ &
+         solx(271:286)  = [ &
              1.7079D-10, 2.8843D-10, 3.9764D-10, 2.2828D-10, 5.1607D-10, &
              1.2023D-10, 2.7882D-10, 6.7411D-10, 3.1529D-10, 3.1369D-09, &
              3.4034D-09, 9.6809D-09, 7.6127D-10, 1.9659D-10, 3.8519D-13, &
-             5.3760D-11 /)
+             5.3760D-11 ]
 
 
 !..charge of the stable isotopes
 
-         izsol(1:117)  = (/ &
+         izsol(1:117)  = [ &
          1,   1,   2,   2,   3,   3,   4,   5,   5,   6,   6,   7,   7, &
          8,   8,   8,   9,  10,  10,  10,  11,  12,  12,  12,  13,  14, &
         14,  14,  15,  16,  16,  16,  16,  17,  17,  18,  18,  18,  19, &
@@ -741,9 +741,9 @@
         28,  28,  28,  28,  28,  29,  29,  30,  30,  30,  30,  30,  31, &
         31,  32,  32,  32,  32,  32,  33,  34,  34,  34,  34,  34,  34, &
         35,  35,  36,  36,  36,  36,  36,  36,  37,  37,  38,  38,  38, &
-        38,  39,  40,  40,  40,  40,  40,  41,  42,  42,  42,  42,  42 /)
+        38,  39,  40,  40,  40,  40,  40,  41,  42,  42,  42,  42,  42 ]
 
-         izsol(118:234)  = (/ &
+         izsol(118:234)  = [ &
         42,  42,  44,  44,  44,  44,  44,  44,  44,  45,  46,  46,  46, &
         46,  46,  46,  47,  47,  48,  48,  48,  48,  48,  48,  48,  48, &
         49,  49,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  51, &
@@ -752,18 +752,18 @@
         56,  57,  57,  58,  58,  58,  58,  59,  60,  60,  60,  60,  60, &
         60,  60,  62,  62,  62,  62,  62,  62,  62,  63,  63,  64,  64, &
         64,  64,  64,  64,  64,  65,  66,  66,  66,  66,  66,  66,  66, &
-        67,  68,  68,  68,  68,  68,  68,  69,  70,  70,  70,  70,  70 /)
+        67,  68,  68,  68,  68,  68,  68,  69,  70,  70,  70,  70,  70 ]
 
-         izsol(235:286)  = (/ &
+         izsol(235:286)  = [ &
         70,  70,  71,  71,  72,  72,  72,  72,  72,  72,  73,  73,  74, &
         74,  74,  74,  74,  75,  75,  76,  76,  76,  76,  76,  76,  76, &
         77,  77,  78,  78,  78,  78,  78,  78,  79,  80,  80,  80,  80, &
-        80,  80,  80,  81,  81,  82,  82,  82,  82,  83,  90,  92,  92 /)
+        80,  80,  80,  81,  81,  82,  82,  82,  82,  83,  90,  92,  92 ]
 
 
 !..number of nucleons (protons and neutrons) in the stable isotopes
 
-         iasol(1:117)  = (/ &
+         iasol(1:117)  = [ &
          1,   2,   3,   4,   6,   7,   9,  10,  11,  12,  13,  14,  15, &
         16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28, &
         29,  30,  31,  32,  33,  34,  36,  35,  37,  36,  38,  40,  39, &
@@ -772,9 +772,9 @@
         58,  60,  61,  62,  64,  63,  65,  64,  66,  67,  68,  70,  69, &
         71,  70,  72,  73,  74,  76,  75,  74,  76,  77,  78,  80,  82, &
         79,  81,  78,  80,  82,  83,  84,  86,  85,  87,  84,  86,  87, &
-        88,  89,  90,  91,  92,  94,  96,  93,  92,  94,  95,  96,  97 /)
+        88,  89,  90,  91,  92,  94,  96,  93,  92,  94,  95,  96,  97 ]
 
-         iasol(118:234)  = (/ &
+         iasol(118:234)  = [ &
         98, 100,  96,  98,  99, 100, 101, 102, 104, 103, 102, 104, 105, &
        106, 108, 110, 107, 109, 106, 108, 110, 111, 112, 113, 114, 116, &
        113, 115, 112, 114, 115, 116, 117, 118, 119, 120, 122, 124, 121, &
@@ -783,13 +783,13 @@
        138, 138, 139, 136, 138, 140, 142, 141, 142, 143, 144, 145, 146, &
        148, 150, 144, 147, 148, 149, 150, 152, 154, 151, 153, 152, 154, &
        155, 156, 157, 158, 160, 159, 156, 158, 160, 161, 162, 163, 164, &
-       165, 162, 164, 166, 167, 168, 170, 169, 168, 170, 171, 172, 173 /)
+       165, 162, 164, 166, 167, 168, 170, 169, 168, 170, 171, 172, 173 ]
 
-         iasol(235:286)  = (/ &
+         iasol(235:286)  = [ &
        174, 176, 175, 176, 174, 176, 177, 178, 179, 180, 180, 181, 180, &
        182, 183, 184, 186, 185, 187, 184, 186, 187, 188, 189, 190, 192, &
        191, 193, 190, 192, 194, 195, 196, 198, 197, 196, 198, 199, 200, &
-       201, 202, 204, 203, 205, 204, 206, 207, 208, 209, 232, 235, 238 /)
+       201, 202, 204, 203, 205, 204, 206, 207, 208, 209, 232, 235, 238 ]
 
 
 ! jcode tells the type progenitors each stable species can have.
@@ -798,7 +798,7 @@
 !       = 2 if the species can have neutron-rich progenitors
 !       = 3 if the species can only be made as itself (eg k40)
 
-        jcode(1:286) = (/ &
+        jcode(1:286) = [ &
          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, &
          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, &
          0,   0,   0,   0,   0,   0,   2,   0,   0,   1,   0,   2,   0, &
@@ -820,7 +820,7 @@
          2,   2,   0,   3,   1,   1,   0,   0,   0,   2,   3,   0,   1, &
          0,   0,   2,   2,   0,   2,   1,   1,   1,   0,   0,   2,   2, &
          0,   0,   1,   1,   0,   0,   2,   2,   0,   1,   1,   0,   0, &
-         0,   0,   2,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0/)
+         0,   0,   2,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0]
 
 
    ! get sum and stuff residual into hydrogen
@@ -1043,8 +1043,7 @@
          element_atomic_weight(:) = 0d0
 
          do i = e_h, e_cn
-            call integer_dict_lookup(chem_isos_dict, \
-               chem_element_main_iso_name(i), isotope_index, ierr)
+            call integer_dict_lookup(chem_isos_dict, chem_element_main_iso_name(i), isotope_index, ierr)
             if (ierr /= 0) then
                call mesa_error(__FILE__,__LINE__,'init_element_atomic_weights')
                return
@@ -1854,87 +1853,87 @@
        AAG21_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
-         AAG21_photospheric_element_zfrac(e_li) = 0.96  !± 0.013
-         AAG21_photospheric_element_zfrac(e_be) = 1.38  !± 0.09
-         AAG21_photospheric_element_zfrac(e_b ) = 2.70  !± 0.20
-         AAG21_photospheric_element_zfrac(e_c ) = 8.46  !± 0.04
-         AAG21_photospheric_element_zfrac(e_n ) = 7.83  !± 0.07
-         AAG21_photospheric_element_zfrac(e_o ) = 8.69  !± 0.04
-         AAG21_photospheric_element_zfrac(e_f ) = 4.40  !± 0.25
-         AAG21_photospheric_element_zfrac(e_ne) = 8.06  !± 0.05
-         AAG21_photospheric_element_zfrac(e_na) = 6.22  !± 0.03
-         AAG21_photospheric_element_zfrac(e_mg) = 7.55  !± 0.03
-         AAG21_photospheric_element_zfrac(e_al) = 6.43  !± 0.03
-         AAG21_photospheric_element_zfrac(e_si) = 7.51  !± 0.03
-         AAG21_photospheric_element_zfrac(e_p ) = 5.41  !± 0.03
-         AAG21_photospheric_element_zfrac(e_s ) = 7.12  !± 0.03
-         AAG21_photospheric_element_zfrac(e_cl) = 5.31  !± 0.20
-         AAG21_photospheric_element_zfrac(e_ar) = 6.38  !± 0.10
-         AAG21_photospheric_element_zfrac(e_k ) = 5.07  !± 0.03
-         AAG21_photospheric_element_zfrac(e_ca) = 6.30  !± 0.03
-         AAG21_photospheric_element_zfrac(e_sc) = 3.14  !± 0.04
-         AAG21_photospheric_element_zfrac(e_ti) = 4.97  !± 0.05
-         AAG21_photospheric_element_zfrac(e_v ) = 3.90  !± 0.08
-         AAG21_photospheric_element_zfrac(e_cr) = 5.62  !± 0.04
-         AAG21_photospheric_element_zfrac(e_mn) = 5.42  !± 0.06
-         AAG21_photospheric_element_zfrac(e_fe) = 7.46  !± 0.04
-         AAG21_photospheric_element_zfrac(e_co) = 4.94  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ni) = 6.20  !± 0.04
-         AAG21_photospheric_element_zfrac(e_cu) = 4.18  !± 0.05
-         AAG21_photospheric_element_zfrac(e_zn) = 4.56  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ga) = 3.02  !± 0.05
-         AAG21_photospheric_element_zfrac(e_ge) = 3.62  !± 0.10
-         AAG21_photospheric_element_zfrac(e_as) = 2.30  !± 0.04  meteorites
-         AAG21_photospheric_element_zfrac(e_se) = 3.34  !± 0.03  meteorites
-         AAG21_photospheric_element_zfrac(e_br) = 2.54  !± 0.06  meteorites
-         AAG21_photospheric_element_zfrac(e_kr) = 3.12  !± 0.10
-         AAG21_photospheric_element_zfrac(e_rb) = 2.32  !± 0.08
-         AAG21_photospheric_element_zfrac(e_sr) = 2.83  !± 0.06
-         AAG21_photospheric_element_zfrac(e_y ) = 2.21  !± 0.05
-         AAG21_photospheric_element_zfrac(e_zr) = 2.59  !± 0.04
-         AAG21_photospheric_element_zfrac(e_nb) = 1.47  !± 0.06
-         AAG21_photospheric_element_zfrac(e_mo) = 1.88  !± 0.09
-         AAG21_photospheric_element_zfrac(e_Ru) = 1.75  !± 0.08
-         AAG21_photospheric_element_zfrac(e_Rh) = 0.78  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Pd) = 1.57  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Ag) = 0.96  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Cd) = 1.71  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_In) = 0.80  !± 0.20
-         AAG21_photospheric_element_zfrac(e_Sn) = 2.02  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Sb) = 1.01  !± 0.06 meteorites
-         AAG21_photospheric_element_zfrac(e_Te) = 2.18  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_I ) = 1.55  !± 0.08 meteorites
-         AAG21_photospheric_element_zfrac(e_Xe) = 2.22  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Cs) = 1.08  !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_Ba) = 2.27  !± 0.05
-         AAG21_photospheric_element_zfrac(e_La) = 1.11  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ce) = 1.58  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Pr) = 0.75  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Nd) = 1.42  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Sm) = 0.95  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Eu) = 0.52  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Gd) = 1.08  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Tb) = 0.31  !± 0.10
-         AAG21_photospheric_element_zfrac(e_Dy) = 1.10  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ho) = 0.48  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Er) = 0.93  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Tm) = 0.11  !± 0.04
-         AAG21_photospheric_element_zfrac(e_Yb) = 0.85  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Lu) = 0.10  !± 0.09
-         AAG21_photospheric_element_zfrac(e_Hf) = 0.85  !± 0.05
-         AAG21_photospheric_element_zfrac(e_Ta) = -0.15  !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_W ) = 0.79  !± 0.11
-         AAG21_photospheric_element_zfrac(e_Re) = 0.26  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Os) = 1.35  !± 0.12
-         AAG21_photospheric_element_zfrac(e_Ir) = 1.32  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Pt) = 1.61  !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Au) = 0.91  !± 0.12
-         AAG21_photospheric_element_zfrac(e_Hg) = 1.17  !± 0.18 meteorites
-         AAG21_photospheric_element_zfrac(e_Tl) = 0.92  !± 0.17
-         AAG21_photospheric_element_zfrac(e_Pb) = 1.95  !± 0.08
-         AAG21_photospheric_element_zfrac(e_Bi) = 0.65  !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_Th) = 0.03  !± 0.10
-         AAG21_photospheric_element_zfrac(e_U) = -0.54  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_li) = 0.96d0  !± 0.013
+         AAG21_photospheric_element_zfrac(e_be) = 1.38d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_b ) = 2.70d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_c ) = 8.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_n ) = 7.83d0  !± 0.07
+         AAG21_photospheric_element_zfrac(e_o ) = 8.69d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_f ) = 4.40d0  !± 0.25
+         AAG21_photospheric_element_zfrac(e_ne) = 8.06d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_na) = 6.22d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_mg) = 7.55d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_al) = 6.43d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_si) = 7.51d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_p ) = 5.41d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_s ) = 7.12d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_cl) = 5.31d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_ar) = 6.38d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_k ) = 5.07d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_ca) = 6.30d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_sc) = 3.14d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_ti) = 4.97d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_v ) = 3.90d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_cr) = 5.62d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_mn) = 5.42d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_fe) = 7.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_co) = 4.94d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ni) = 6.20d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_cu) = 4.18d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zn) = 4.56d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ga) = 3.02d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ge) = 3.62d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_as) = 2.30d0  !± 0.04  meteorites
+         AAG21_photospheric_element_zfrac(e_se) = 3.34d0  !± 0.03  meteorites
+         AAG21_photospheric_element_zfrac(e_br) = 2.54d0  !± 0.06  meteorites
+         AAG21_photospheric_element_zfrac(e_kr) = 3.12d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_rb) = 2.32d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_sr) = 2.83d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_y ) = 2.21d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zr) = 2.59d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_nb) = 1.47d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_mo) = 1.88d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Ru) = 1.75d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Rh) = 0.78d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Pd) = 1.57d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Ag) = 0.96d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Cd) = 1.71d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_In) = 0.80d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_Sn) = 2.02d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Sb) = 1.01d0  !± 0.06 meteorites
+         AAG21_photospheric_element_zfrac(e_Te) = 2.18d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_I ) = 1.55d0  !± 0.08 meteorites
+         AAG21_photospheric_element_zfrac(e_Xe) = 2.22d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Cs) = 1.08d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_Ba) = 2.27d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_La) = 1.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ce) = 1.58d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Pr) = 0.75d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Nd) = 1.42d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Sm) = 0.95d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Eu) = 0.52d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Gd) = 1.08d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Tb) = 0.31d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Dy) = 1.10d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ho) = 0.48d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Er) = 0.93d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Tm) = 0.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Yb) = 0.85d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Lu) = 0.10d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Hf) = 0.85d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Ta) =-0.15d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_W ) = 0.79d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Re) = 0.26d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Os) = 1.35d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Ir) = 1.32d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Pt) = 1.61d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Au) = 0.91d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Hg) = 1.17d0  !± 0.18 meteorites
+         AAG21_photospheric_element_zfrac(e_Tl) = 0.92d0  !± 0.17
+         AAG21_photospheric_element_zfrac(e_Pb) = 1.95d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Bi) = 0.65d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_Th) = 0.03d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_U)  =-0.54d0  !± 0.03 meteorites
 
          ! convert to fraction of Z by mass
          z_sum = 0

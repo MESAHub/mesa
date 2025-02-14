@@ -4,7 +4,7 @@
 rsp_Type_II_Cepheid
 *******************
 
-This test case checks the non-linear pulsation evolution of a 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model - 
+This test case checks the non-linear pulsation evolution of a 0.55 Msun, Teff = 6410 K, L = 136 Lsun, Z = 0.0001 metallicity model -
 type-II Cepheid of BL Her type based on |Smolec14|.
 
 This test case has 1 part. Click to see a larger version of a plot.

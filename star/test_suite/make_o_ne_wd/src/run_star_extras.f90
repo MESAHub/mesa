@@ -170,7 +170,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_finish_step = keep_going
-         if (s% x_integer_ctrl(1) == 2) then ! part2
+         if (s% x_integer_ctrl(1) == 2) then  ! part2
             if (s% L(1)/Lsun < s% x_ctrl(1) .and. &
                 s% Teff > s% x_ctrl(2) .and. &
                 safe_log10(s% power_he_burn) < s% x_ctrl(3)) then

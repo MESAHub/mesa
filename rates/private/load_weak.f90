@@ -170,9 +170,9 @@
 
          integer, parameter :: weak_num_T9 = 12, weak_num_lYeRho = 11
          real(dp), parameter :: weak_reaction_T9s(weak_num_T9) = &
-            (/ 0.01d0, 0.1d0, 0.2d0, 0.4d0, 0.7d0, 1.0d0, 1.5d0, 2.0d0, 3.0d0, 5.0d0, 10.0d0, 30.0d0 /)
+            [ 0.01d0, 0.1d0, 0.2d0, 0.4d0, 0.7d0, 1.0d0, 1.5d0, 2.0d0, 3.0d0, 5.0d0, 10.0d0, 30.0d0 ]
          real(dp), parameter :: weak_reaction_lYeRhos(weak_num_lYeRho) = &
-            (/ 1.0d0, 2.0d0, 3.0d0, 4.0d0, 5.0d0, 6.0d0, 7.0d0, 8.0d0, 9.0d0, 10.0d0, 11.0d0 /)
+            [ 1.0d0, 2.0d0, 3.0d0, 4.0d0, 5.0d0, 6.0d0, 7.0d0, 8.0d0, 9.0d0, 10.0d0, 11.0d0 ]
 
          integer, parameter :: i_ldecay = 1, i_lcapture = 2, i_lneutrino = 3
 

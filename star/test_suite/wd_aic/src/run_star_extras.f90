@@ -132,7 +132,7 @@
          extras_check_model = keep_going
 
          ! if not in test, keep going
-         if (s% x_integer_ctrl(1) .le. 0) return
+         if (s% x_integer_ctrl(1) <= 0) return
 
          ! get isotopes
          mg24 = s% net_iso(img24)

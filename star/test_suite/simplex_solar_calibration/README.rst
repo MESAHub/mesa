@@ -111,9 +111,9 @@ pgstar commands used for the plot above:
   HR_file_flag = .true.
   HR_file_dir = 'pgstar_out'
   HR_file_prefix = 'hr'
-  HR_file_interval = 10000 
+  HR_file_interval = 10000
   HR_file_width = 12
-  HR_file_aspect_ratio = -1 
+  HR_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 

@@ -231,13 +231,13 @@
          do k=1,s% nz
             r = s% r(k)
             G = standard_cgrav
-            m = s% m(k) ! m_grav hasn't been set when other_cgrav is called
-            if (k > 1) then ! get approximate P and rho at face
+            m = s% m(k)  ! m_grav hasn't been set when other_cgrav is called
+            if (k > 1) then  ! get approximate P and rho at face
                rho = 0.5d0*(s% rho(k-1) + s% rho(k))
                P = 0.5d0*(s% Peos(k-1) + s% Peos(k))
                f1 = 1d0 + P/(rho*clight**2)
                f2 = 1d0 + 4d0*pi*r**3*P/(m*clight**2)
-            else ! k == 1
+            else  ! k == 1
                f1 = 1d0
                f2 = 1d0
             end if

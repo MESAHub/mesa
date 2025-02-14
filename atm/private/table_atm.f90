@@ -43,7 +43,6 @@
       !reads in table_summary file from atm_data, initializes logZ, Teff_array,
       ! logg_array, and Teff_bound arrays; sets some flags
       subroutine table_atm_init(use_cache, ierr)
-         implicit none
          logical, intent(in) :: use_cache
          integer, intent(out) :: ierr
 
@@ -215,7 +214,6 @@
          use interp_2d_lib_db, only: interp_evbicub_db
          use utils_lib, only: is_bad
 
-         implicit none
 
          integer, intent(in) :: id
          real(dp), intent(in) :: newZ, newlogg_in, newTeff_in
@@ -341,7 +339,7 @@
          !do 2D Teff,logg interpolation on each of 4 Z tables (Zlo-Zhi)
                  !  P(g,T) dP_dg, dP_dT, d2P_dg2, d2P_dT2, d2P_dg_dT
                  !    1      2      3       4        5         6
-         ict(:) = (/  1,     1,     1,      0,       0,        0  /)
+         ict(:) = [  1,     1,     1,      0,       0,        0  ]
 
          if (gtv_dbg) write(*,*) 'do_interp for Pgas', id
          call do_interp(ai% Pgas_interp1, newPgas, dPgas_dlogg, dPgas_dTeff, ierr)
@@ -499,7 +497,6 @@
             use utils_lib
             use interp_2D_lib_db, only: interp_mkbicub_db
             use const_def, only: mesa_data_dir
-            implicit none
             integer, intent(in)  :: iZ  !index of Z table to be loaded
             integer, intent(out) :: ierr
             integer :: iounit, i, j, ibound_tmp(ng), ibcTmin, ibcTmax, ibcgmin, ibcgmax

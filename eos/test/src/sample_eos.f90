@@ -88,7 +88,7 @@ program sample_eos
             read (5, '(a)') string
 
             ! stop
-            if (string(1:2) .eq. '-1') then
+            if (string(1:2) == '-1') then
                call Shutdown_eos(handle)
                deallocate (net_iso, chem_id)
                if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
@@ -97,7 +97,7 @@ program sample_eos
 
                ! read the conditions
             else
-               if (string(1:6) .ne. '      ') then
+               if (string(1:6) /= '      ') then
                   read (string, *) T, Rho, xa(h1), xa(he4), xa(c12), xa(n14), xa(o16), xa(ne20), xa(mg24)
 
                   ! or set some defaults

@@ -25,6 +25,8 @@ module binary_pgbinary
    use const_def
    use star_pgstar
 
+   implicit none
+
    abstract interface
 
       subroutine pgbinary_plot_interface(id, device_id, ierr)

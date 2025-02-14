@@ -100,7 +100,6 @@ contains
 
   subroutine get_mesasdk_version(version, ierr)
     use iso_fortran_env
-    implicit none
     character(len=*), intent(out) :: version
     integer, intent(out) :: ierr
     character(len=strlen) :: mesasdk_root, filename

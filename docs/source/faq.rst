@@ -468,7 +468,7 @@ Why is my MESA zipfile download taking forever?
 -----------------------------------------------
 
 The MESA zipfiles are large (~1GB), so if you're on a slow connection,
-there's nothing to be done. 
+there's nothing to be done.
 
 How do I obtain a non-release MESA version?
 -------------------------------------------
@@ -480,7 +480,7 @@ obtained by using standard git operations after cloning the repository.
 
 Previously (2010-2020), MESA was developed using SVN.  An archival
 version of the MESA SVN repository containing the complete development
-history is available at `Zenodo <https://zenodo.org/record/4745225>`__.  
+history is available at `Zenodo <https://zenodo.org/record/4745225>`__.
 Follow the
 instructions there and then use standard SVN operations to access any
 desired commit.
@@ -600,7 +600,7 @@ are using with WSL2.
 Using file explorer navigate to the folder ``C:\Users\USERNAME\AppData\Local\Packages\``,
 where ``USERNAME`` is your windows username. If you installed Ubuntu, then you need to find the folder
 ``CanonicalGroupLimited.Ubuntu``, other distributions will have different names. Once you find this folder
-right click on its name to open it properties, go to ``Advanced`` and unclick ``Compress contents to save disk space`` 
+right click on its name to open it properties, go to ``Advanced`` and unclick ``Compress contents to save disk space``
 
 `More information can be found here <https://github.com/microsoft/WSL/issues/4299>`__
 
@@ -650,7 +650,7 @@ the MESA SDK. There are a few possible solutions:
     `NuDocker project <https://github.com/NuGrid/NuDocker>`__
     provides a convenient interface for MESA versions as far back
     as 4942.
-    
+
 (3) Fix the individual compilation errors (there are typically only a
     handful to work through). The basic workflow is
 
@@ -701,14 +701,14 @@ later).
 
 ::
 
-   Program received signal SIGSEGV: Segmentation fault - invalid memory reference. 
+   Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
 
-   Backtrace for this error: 
-   #0  0x7f28c0a93a7f in ??? 
-   #1  0x54313f in do_history_info 
-          at ../private/history.f90:383 
+   Backtrace for this error:
+   #0  0x7f28c0a93a7f in ???
+   #1  0x54313f in do_history_info
+          at ../private/history.f90:383
    ...
-      
+
 
 To work around this, edit ``$MESA_DIR/star/private/history.f90`` and
 replace the line

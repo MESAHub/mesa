@@ -31,16 +31,11 @@
 
       implicit none
 
-
       integer, parameter :: qcol_imax=13, kmaxx = 7, stifbs_imax  = kmaxx+1
-
-
       logical, parameter :: dbg = .false.
 
 
-
       contains
-
 
 
       subroutine netint( &
@@ -98,7 +93,7 @@
       first = .true.
       epsold = -1d0
       nvold = -1
-      nseq = (/ 2, 6, 10, 14, 22, 34, 50, 70 /)
+      nseq = [ 2, 6, 10, 14, 22, 34, 50, 70 ]
       x      = start
       h      = sign(stptry,stopp-start)
       nok    = 0

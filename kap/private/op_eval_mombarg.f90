@@ -176,7 +176,10 @@
 
 
       if (tries > 2) THEN  ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_grad', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2, imin, imax, log_amu_mix_cell
+        write(*,*) 'Cannot find points for interpolation compute_grad', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, &
+                    logRho_face, missing_point, ii_min, jj_min, offset1, offset2, &
+                    imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -200,9 +203,9 @@
       sig_Ross = 0d0
       do jj=1,4
         do ii=1,4
-           sig_int(1:nptot-1) = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2. * dv
+           sig_int(1:nptot-1) = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv
            do m=1, nptot-1
-                !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2. * dv
+                !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2.0d0 * dv
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
            enddo
         enddo
@@ -231,14 +234,14 @@
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,ik,m)/ sig_mix_cell(ii,jj,m)) +(eumesh(ke,ik,m+1)/ sig_mix_cell(ii,jj,m+1)))
             enddo
-           gamma_k(ii,jj,ke) = gam/2. * dv
+           gamma_k(ii,jj,ke) = gam/2.0d0 * dv
           enddo
         enddo
       enddo
 
       deallocate(sig_mix_cell,sig_int)
 
-      where (gamma_k < 0.)
+      where (gamma_k < 0.0d0)
         gamma_k = 10d-30
       endwhere
       lgamm = log10(gamma_k)
@@ -343,7 +346,7 @@
       sig_Ross = 0d0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2. * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
               enddo
@@ -362,12 +365,12 @@
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,i,m)/ sig_mix_cell(i,m))+(eumesh(ke,i,m+1)/ sig_mix_cell(i,m+1)))
             enddo
-           gamma_k(ke,i) = gam/2. * dv
+           gamma_k(ke,i) = gam/2.0d0 * dv
           enddo
         enddo
 !$OMP END PARALLEL DO
 
-        where (gamma_k < 0.)
+        where (gamma_k < 0.0d0)
           gamma_k = 10d-30
         endwhere
 
@@ -544,7 +547,9 @@
             retry = .false.
         else
 
-        write(*,*) 'Cannot find points for interpolation compute_grad_fast', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_grad_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         endif
@@ -749,7 +754,9 @@
 
 
       if (tries > 4) THEN  ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_kappa', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
+        write(*,*) 'Cannot find points for interpolation compute_kappa', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -775,7 +782,7 @@
       sig_Ross = 0d0
       do jj=1,4
         do ii=1,4
-              sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2. * dv  !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv  !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
               enddo
@@ -872,7 +879,7 @@
       sig_Ross = 0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2. * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
               enddo
@@ -1062,7 +1069,9 @@
              enddo
              retry = .false.
          else
-        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         !stop

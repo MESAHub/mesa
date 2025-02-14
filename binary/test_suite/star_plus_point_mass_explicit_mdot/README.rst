@@ -96,7 +96,7 @@ pgstar commands used for the plots above:
   History_Track2_file_interval = 100
   History_Track2_file_width = -1
   History_Track2_file_aspect_ratio = -1
-         
+
 
   Kipp_win_flag = .true.
   Kipp_win_width = 12

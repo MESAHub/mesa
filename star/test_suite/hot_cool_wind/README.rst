@@ -55,7 +55,7 @@ pgstar commands used for the plots above:
   Kipp_win_width = 12
   Kipp_win_aspect_ratio = 0.75
   Kipp_txt_scale = 0.9
-  Kipp_title = 'inlist_hot_cool_wind'      
+  Kipp_title = 'inlist_hot_cool_wind'
 
   Kipp_mass_max = 7.0
   Kipp_mass_min = 0.0

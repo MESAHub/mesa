@@ -26,7 +26,6 @@
       use eos_def
       use const_def, only: pi, avo
       use utils_lib, only: is_bad
-      implicit none
       real(dp), intent(in) :: T, logT, Rho, logRho
       real(dp), intent(in) :: abar_in, zbar_in
       real(dp), intent(in) :: coulomb_temp_cut, coulomb_den_cut
@@ -64,7 +63,6 @@
       use const_def, asol => crad
       use utils_lib, only: is_bad
 
-      implicit none
 
       real(dp), intent(in) :: temp_in, logtemp_in, den_in, logden_in
       real(dp), intent(in) :: abar_in, zbar_in, coulomb_temp_cut, coulomb_den_cut

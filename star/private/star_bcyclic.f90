@@ -237,7 +237,7 @@
                deallocate( &
                   s% bcyclic_odd_storage(nlevel)% umat1, &
                   s% bcyclic_odd_storage(nlevel)% lmat1)
-            new_sz = min_sz*1.1 + 100
+            new_sz = min_sz*1.1d0 + 100
             s% bcyclic_odd_storage(nlevel)% ul_size = new_sz
             allocate (s% bcyclic_odd_storage(nlevel)% umat1(new_sz), &
                       s% bcyclic_odd_storage(nlevel)% lmat1(new_sz), stat=ierr)

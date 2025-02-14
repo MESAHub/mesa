@@ -48,7 +48,6 @@ contains
 
     use rates_def, only: Coulomb_Info, which_mui_coulomb
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -77,7 +76,6 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -123,7 +121,6 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -164,7 +161,6 @@ contains
 
     ! calculate the chemical potential of an ion
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -195,7 +191,6 @@ contains
 
     function fii(gamma) result(f)
 
-      implicit none
 
       type(auto_diff_real_2var_order1), intent(in) :: gamma
       type(auto_diff_real_2var_order1) :: f
@@ -221,7 +216,6 @@ contains
 
     function fie(rs, gamma_e, Z) result(f)
 
-      implicit none
 
       type(auto_diff_real_2var_order1), intent(in) :: rs
       type(auto_diff_real_2var_order1), intent(in) :: gamma_e
@@ -271,7 +265,6 @@ contains
 
     use rates_def, only: Coulomb_Info, which_Vs_coulomb
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -299,7 +292,6 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -318,7 +310,6 @@ contains
     use math_lib
     use rates_def, only: Coulomb_Info
 
-    implicit none
 
     type(Coulomb_Info), intent(in) :: cc
     real(dp), intent(in) :: Z  ! nuclear charge
@@ -329,10 +320,10 @@ contains
 
     integer :: i
     type(auto_diff_real_2var_order1) :: rs, rs0, s, fj
-    real(dp), dimension(11), parameter :: c(0:10) = (/ &
+    real(dp), dimension(11), parameter :: c(0:10) = [ &
         0.450861D-01, 0.113078D-02, 0.312104D-02, 0.864302D-03, &
         0.157214D-01, 0.816962D-01, 0.784921D-01,-0.680863D-01, &
-       -0.979967D-01, 0.204907D-01, 0.366713D-01 /)
+       -0.979967D-01, 0.204907D-01, 0.366713D-01 ]
 
     rs = cc% rs
 

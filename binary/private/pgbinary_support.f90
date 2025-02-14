@@ -419,8 +419,8 @@ contains
       real, dimension(5) :: xs, ys
       call pgsave
       call pgsci(1)
-      xs = (/0.0, 0.0, 1.0, 1.0, 0.0/)
-      ys = (/0.0, 1.0, 1.0, 0.0, 0.0/)
+      xs = [0.0, 0.0, 1.0, 1.0, 0.0]
+      ys = [0.0, 1.0, 1.0, 0.0, 0.0]
       call pgswin(0.0, 1.0, 0.0, 1.0)
       call pgmove(0.0, 0.0)
       call pgline(5, xs, ys)
@@ -619,7 +619,7 @@ contains
          !age = age
          units_str = 'yrs'
       end if
-      if (abs(age) > 1e-3 .and. abs(age) < 1e3) then
+      if (abs(age) > 1d-3 .and. abs(age) < 1d3) then
          write(age_str, '(f14.6)') age
       else
          write(age_str, '(1pe14.6)') age

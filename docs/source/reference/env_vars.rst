@@ -17,7 +17,7 @@ GYRE_DIR
 ~~~~~~~~
 
 Location of the GYRE source code (only needed if running GYRE).  If
-you haven't moved it from the ``$MESA_DIR`` then set as 
+you haven't moved it from the ``$MESA_DIR`` then set as
 ``GYRE_DIR=$MESA_DIR/gyre/gyre``.
 
 
@@ -45,10 +45,10 @@ MESA_CACHES_DIR
 ~~~~~~~~~~~~~~~
 
 Location where MESA will store and read cache files.
-See :ref:`star_job.defaults cache directories 
+See :ref:`star_job.defaults cache directories
 <reference/star_job:cache directories>` for more details.
-Beware when using this and changing MESA versions; 
-best practice would be to remove its contents upon changing versions. 
+Beware when using this and changing MESA versions;
+best practice would be to remove its contents upon changing versions.
 
 
 MESA_TEMP_CACHES_DIR
@@ -63,7 +63,7 @@ MESA_OP_MONO_DATA_PATH
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Location of the OP_MONO data files.
-See the :ref:`radiative levitation <radiative_levitation>` test suite 
+See the :ref:`radiative levitation <radiative_levitation>` test suite
 (located in ``$MESA_DIR/star/test_suite/radiative_levitation/inlist_radiative_levitation``)
 for more details.
 
@@ -89,7 +89,7 @@ If set to anything else (or not set at all) MESA will use the value as set in th
 MESA_SKIP_OPTIONAL
 ~~~~~~~~~~~~~~~~~~
 
-If set then when running a test_suite case, then certain optional inlists will be skipped. 
+If set then when running a test_suite case, then certain optional inlists will be skipped.
 If not set, then all inlists will be run.
 
 
@@ -117,7 +117,7 @@ skip_test
 ~~~~~~~~~
 
 Empty file.  Similar to ``skip_build``, but this will skip the compile time tests.
-If placed in a sub-folder, then only the tests in that folder are skipped. 
+If placed in a sub-folder, then only the tests in that folder are skipped.
 
 
 Private
@@ -157,9 +157,9 @@ This should not be set during a normal run.
 MESA_TEST_SUITE_RESOLUTION_FACTOR
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If set to a value other than 1, then ``mesh_delta_coeff`` and 
-``time_delta_coeff`` will be multiplied by its value, and 
-``max_model_number`` will be multiplied by its inverse. 
-For example, this can be set to 0.5 to double the space and time resolution 
-as well as the maximum model number. 
-During a normal run, this should be either set to 1, or not set. 
+If set to a value other than 1, then ``mesh_delta_coeff`` and
+``time_delta_coeff`` will be multiplied by its value, and
+``max_model_number`` will be multiplied by its inverse.
+For example, this can be set to 0.5 to double the space and time resolution
+as well as the maximum model number.
+During a normal run, this should be either set to 1, or not set.

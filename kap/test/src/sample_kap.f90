@@ -156,7 +156,7 @@
       rq1% Zbase = Z_init
       rq2% Zbase = Z_init
 
-      logRho(:) = lnRho(:)/ln10 !convert ln's to log10's
+      logRho(:) = lnRho(:)/ln10  !convert ln's to log10's
       logT(:)   = lnT(:)  /ln10
 
       ! these should come from an eos call
@@ -168,10 +168,10 @@
       d_eta_dlnT = 0d0
 
       allocate(chem_id(NSpec), net_iso(num_chem_isos))
-      chem_id(:) = (/ ih1, ih2, ihe3, ihe4, ili7, ibe7, ib8, ic12, &
+      chem_id(:) = [ ih1, ih2, ihe3, ihe4, ili7, ibe7, ib8, ic12, &
          ic13, in13, in14, in15, io16, io17, io18, if19, ine20, ine21, &
          ine22, ina22, ina23, img24, img25, img26, ial26, ial27, &
-         isi28, isi29, isi30, ip31, is32 /)
+         isi28, isi29, isi30, ip31, is32 ]
       net_iso(:) = 0
       do i = 1, Nspec
          net_iso(chem_id(i)) = i

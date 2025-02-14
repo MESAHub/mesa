@@ -109,7 +109,7 @@ module run_star_extras
 
          call set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
 
-         mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
+         mode_l = 0  ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
 
          call star_get_pulse_data(s%id, 'GYRE', &
@@ -129,24 +129,24 @@ module run_star_extras
            'P (min)', 'P (day)', 'growth (day)', '(4pi*im/re)'
 100      format(A8,A16,A16,A14,A12,A16,A14)
 
-         rpar(1) = 0.2d-3 ! freq < this (Hz)
+         rpar(1) = 0.2d-3  ! freq < this (Hz)
          ipar(1) = s% model_number
-         ipar(2) = 1 ! order_target
-         ipar(3) = 1 ! 1 means output eigenfunction files
-         ipar(4) = 3 ! max number of modes to output per call
-         ipar(5) = 0 ! num_written
+         ipar(2) = 1  ! order_target
+         ipar(3) = 1  ! 1 means output eigenfunction files
+         ipar(4) = 3  ! max number of modes to output per call
+         ipar(5) = 0  ! num_written
 
          call get_modes(mode_l, process_mode_, ipar, rpar)
 
          call final()
 
-         amix1 = s% x_ctrl(4) ! s% RSP_fraction_1st_overtone
-         amix2 = s% x_ctrl(5) ! s% RSP_fraction_2nd_overtone
+         amix1 = s% x_ctrl(4)  ! s% RSP_fraction_1st_overtone
+         amix2 = s% x_ctrl(5)  ! s% RSP_fraction_2nd_overtone
          if((amix1+amix2) > 1d0) then
             write(*,*) 'AMIX DO NOT ADD UP RIGHT'
             call mesa_error(__FILE__,__LINE__,'set_gyre_linear_analysis')
          end if
-         velkm = s% x_ctrl(6) ! s% RSP_kick_vsurf_km_per_sec
+         velkm = s% x_ctrl(6)  ! s% RSP_kick_vsurf_km_per_sec
          amixF = 1d0 - (amix1 + amix2)
 
          if (amixF > 0d0 .and. npts(1) /= nz-1) then
@@ -179,7 +179,7 @@ module run_star_extras
          v_surf = amixF*v(1,nz-1) + AMIX1*v(2,nz-1) + AMIX2*v(3,nz-1)
 
          do i=1,nz-1
-            k = nz+1-i ! v(1) from gyre => s% v(nz) in star
+            k = nz+1-i  ! v(1) from gyre => s% v(nz) in star
             s% v(k)=1.0d5*VELKM/v_surf* &
                 (amixF*v(1,i) + AMIX1*v(2,i) + AMIX2*v(3,i))
          end do
@@ -223,12 +223,12 @@ module run_star_extras
             cfreq = md% freq('HZ')
             freq = REAL(cfreq)
 
-            if (AIMAG(cfreq) > 0._dp) then ! unstable
+            if (AIMAG(cfreq) > 0._dp) then  ! unstable
                growth = 1d0/(2*pi*24*3600*AIMAG(cfreq))
                write(*, 100)  md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), &
                   growth, 4*pi*AIMAG(cfreq)/freq
 100               format(I8,E16.4,F16.4,F14.4,F12.4,E16.4,E14.4)
-            else ! stable
+            else  ! stable
                write(*, 110) md%n_pg, freq, 1d0/freq, 1d0/(freq*60), 1d0/(freq*24*3600), 'stable'
 110         format(I8,E16.4,F16.4,F14.4,F12.4,A16)
             end if
