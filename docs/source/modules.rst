@@ -1,6 +1,6 @@
-********************
-Module documentation
-********************
+*******
+Modules
+*******
 
 This page lists the MESA modules alphabetically by name and briefly
 summarizes their purpose.
