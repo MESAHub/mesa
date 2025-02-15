@@ -400,6 +400,7 @@
             extra_ad = s% extra_grav(k)
          end if
 
+         Uq_ad = 0d0
          accel_ad = 0d0
          drag = 0d0
          s% dvdt_drag(k) = 0d0
@@ -432,21 +433,19 @@
                s% dvdt_drag(k) = drag%val
             end if
 
+            if (s% RSP2_flag) then  ! Uq(k) is turbulent viscosity drag at face k
+               Uq_ad = compute_Uq_face(s, k, ierr)
+               if (ierr /= 0) return
+            end if
+
+            ! need to add check for v_flag.
+            if (s% alpha_TDC_DampM > 0 .and. s% MLT_option == 'TDC') then ! Uq(k) is turbulent viscosity drag at face k
+               Uq_ad = compute_Uq_face(s, k, ierr)
+               !write (*,*) Uq_ad %val, 'Uq_ad %val'
+               if (ierr /= 0) return
+            end if
+
          end if  ! v_flag
-
-
-         Uq_ad = 0d0
-         if (s% RSP2_flag) then  ! Uq(k) is turbulent viscosity drag at face k
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-         end if
-
-         ! need to add check for v_flag.
-         if (s% alpha_TDC_DampM > 0 .and. s% MLT_option == 'TDC') then ! Uq(k) is turbulent viscosity drag at face k
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            !write (*,*) Uq_ad %val, 'Uq_ad %val'
-            if (ierr /= 0) return
-         end if
          
          other_ad = extra_ad - accel_ad + drag + Uq_ad
          other = other_ad%val

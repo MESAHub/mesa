@@ -143,18 +143,21 @@
               if (op_err /= 0) ierr = op_err
               x = compute_Eq_cell(s, k, op_err)
               if (op_err /= 0) ierr = op_err
-             ! x = compute_Uq_face(s, k, op_err)
-              !if (op_err /= 0) ierr = op_err
+              x = compute_Uq_face(s, k, op_err)
+              if (op_err /= 0) ierr = op_err
            end do
            !$OMP END PARALLEL DO
            if (ierr /= 0) then
               if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 2', s% model_number
               return
            end if
-           do k = 1, s% nz
-              s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
-              s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
-           end do
+           if (.not. s% v_flag) then ! set values 0 if not using v_flag.
+              do k = 1, s% nz
+                 s% Eq(k) = 0d0; s% Eq_ad(k) = 0d0
+                 s% Chi(k) = 0d0; s% Chi_ad(k) = 0d0
+                 s% Uq(k) = 0d0
+              end do
+           end if
         end subroutine set_viscosity_vars_TDC
 
 
