@@ -3378,7 +3378,7 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor, not used for ``MLT_option = TDC``
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
@@ -7411,7 +7411,7 @@
       ! opacity_min
       ! ~~~~~~~~~~~
 
-      ! limit minimum opacities to this value (ignore this is value is < 0)
+      ! limit minimum opacities to this value (ignore this if value is < 0)
 
       ! ::
 
@@ -7420,7 +7420,7 @@
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 

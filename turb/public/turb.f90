@@ -107,7 +107,7 @@ module turb
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
       real(dp), parameter :: eps = 1d-2 ! Threshold in logY for separating multiple solutions.
-      type(auto_diff_real_tdc) :: Zub, Zlb, csound
+      type(auto_diff_real_tdc) :: Zub, Zlb
       include 'formats'
 
       ! Do a call to MLT
@@ -147,13 +147,13 @@ module turb
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
-      csound = convert(sqrt(P/rho)) ! Approximate
       if (conv_vel%val > max_conv_vel) then
-         conv_vel = unconvert(csound)
+         conv_vel = max_conv_vel
+         ! if max_conv_vel = csound,
          ! L = L0 * (gradL + Y) + c0 * Af * Y_env
          ! L = L0 * (gradL + Y) + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)) * Y
          ! L - L0 * gradL = Y * (L0 + c0 * sqrt_2_div_3 * csound * (Gamma / (1 + Gamma)))
-         Y_face = unconvert(info%L - info%L0 * info%gradL) / (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * unconvert(csound) * (info%Gamma / (1d0 + info%Gamma)))
+         Y_face = unconvert(info%L - info%L0 * info%gradL) / (unconvert(info%L0) + unconvert(info%c0) * sqrt_2_div_3 * max_conv_vel * (info%Gamma / (1d0 + info%Gamma)))
       end if
 
       ! Unpack output
