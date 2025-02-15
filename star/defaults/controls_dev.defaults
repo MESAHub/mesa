@@ -174,3 +174,24 @@
       ! ::
 
     op_split_burn_min_T_for_variable_T_solver = 1d99
+
+
+! TDC
+! ================
+
+
+      ! alpha_TDC_DampM
+      ! ~~~~~~~~~~~~~~~
+
+      ! If alpha_TDC_DampM >0, then include eddy viscous damping in TDC alpha_TDC_DampM
+      ! This control is analogous to `RSP_alfam`, where the default is `RSP_alfam` = 0.25d0. 
+     
+      ! This control is only supported when v_flag = .true.
+      ! If hydrostatic (v_flag = .false. , v = 0 ) there are no velocity gradients,
+      ! and thus no shear to drive turbulence. Without shear, the eddy viscosity term becomes zero.
+      
+      ! ::  
+
+    alpha_TDC_DampM = 0d0 
+
+

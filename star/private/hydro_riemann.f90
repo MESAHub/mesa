@@ -440,6 +440,16 @@
             s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
          end if
 
+        if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC') then ! include Uq in u_face
+            call mesa_error(__FILE__,__LINE__,'Uq is not currently supported by u_flag')
+!           Uq_ad = compute_Uq_face(s, k, ierr)
+!           if (k==63) then
+!               write(*,*) 'test Uq, k', Uq_ad %val, k
+!           end if
+!           if (ierr /= 0) return
+!           s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
+        end if
+
          s% u_face_val(k) = s% u_face_ad(k)%val
 
          if (s% P_face_start(k) < 0d0) then

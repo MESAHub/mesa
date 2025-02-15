@@ -191,7 +191,7 @@ contains
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq
-     
+      character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
@@ -205,12 +205,20 @@ contains
 
       ! Pre-calculate some things. 
       Eq_div_w = 0d0
-      if (using_TDC) then
-         if (s% mlt_vc_old(k) > 0d0) then
-            check_Eq = compute_Eq_cell(s, k, ierr)
-            Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3) ! maybe should be using conv_vel???
-         end if
+      if (using_TDC .and. s% include_alfam) then
+        if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
+            if (s% mlt_vc_old(k) > 0) then ! calculate using mlt_vc from previous timestep.
+                check_Eq = compute_Eq_cell(s, k, ierr)
+                Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3)
+            end if
+        else ! if mlt_vc_old is not set, i.e. when building a new model.
+            if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
+                check_Eq = compute_Eq_cell(s, k, ierr)
+                Eq_div_w = check_Eq/(s% mlt_vc(k)/sqrt_2_div_3)
+            end if
+        end if
       end if
+
       Pr = crad*pow4(T)/3d0
       Pg = P - Pr
       beta = Pg / P

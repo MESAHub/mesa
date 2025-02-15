@@ -273,6 +273,17 @@
                if (ierr /= 0) return
             end if
 
+! we do not need this term for tdc, because Eq is included
+! in the turbulent energy equation solved inside TDC. It's effects
+! are seen in hydro_momentum
+!            if (s% alpha_TDC_DampM >0d0 .and. s% MLT_option == 'TDC') then
+!                Eq_ad = s% Eq_ad(k) !compute_Eq_cell(s, k, ierr)
+!!                if (k==91) then
+!!                write(*,*) 'test Eq, k', Eq_ad %val , k
+!!                end if
+!                if (ierr /= 0) return
+!            end if
+
             call setup_RTI_diffusion(RTI_diffusion_ad)
 
             drag_energy = 0d0
