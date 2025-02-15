@@ -75,7 +75,7 @@
 
          real(dp), parameter :: max_sum_abs = 10d0
          real(dp), parameter :: xsum_tol = 1d-2
-         real(dp), parameter :: h_cntr_limit = 0.5d0 ! for pre-MS decision
+         real(dp), parameter :: h_cntr_limit = 0.5d0  ! for pre-MS decision
 
          include 'formats'
 
@@ -94,7 +94,7 @@
             return
          end if
 
-         if (s% remesh_max_allowed_logT < 1d2) then ! check it
+         if (s% remesh_max_allowed_logT < 1d2) then  ! check it
             if (maxval(s% lnT(1:s% nz))/ln10 > s% remesh_max_allowed_logT) then
                if (dbg_remesh) write(*,2) &
                   's% remesh_max_allowed_logT', s% model_number, s% remesh_max_allowed_logT
@@ -321,7 +321,7 @@
             c = prv
          end if
 
-         prv = s ! this makes copies of pointers and scalars
+         prv = s  ! this makes copies of pointers and scalars
 
          if (dbg_remesh .or. dbg) write(*,*) 'call resize_star_info_arrays'
          call resize_star_info_arrays(s, c, ierr)
@@ -411,7 +411,7 @@
          call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
 
          if (dbg_remesh) write(*,*) 'call do_mesh_adjust'
-         
+
          call do_mesh_adjust( &
             s, nz, nz_old, prv% xh, prv% xa, &
             prv% energy, prv% eta, prv% lnd, prv% lnPgas, &
@@ -553,7 +553,7 @@
                   end if
                else if (k == nz_new) then
                   new_type = split_type
-               else ! k_old < nz_old .and. k < nz .and. xq_new(k) == xq_old(k_old)
+               else  ! k_old < nz_old .and. k < nz .and. xq_new(k) == xq_old(k_old)
                   if (xq_new(k+1) == xq_old(k_old+1)) then
                      new_type = unchanged_type
                   else if (xq_new(k+1) > xq_old(k_old+1)) then
@@ -611,8 +611,8 @@
             call return_integer_work_array(s, which_gval)
             call do_work_arrays1(.false., ierr)
          end subroutine do_dealloc1
-            
-            
+
+
          subroutine do_work_arrays1(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr
@@ -653,8 +653,8 @@
             if (ierr /= 0) return
             call return_logical_work_array(s, do_not_split)
          end subroutine do_dealloc2
-            
-            
+
+
          subroutine do_work_arrays2(alloc_flag, ierr)
             logical, intent(in) :: alloc_flag
             integer, intent(out) :: ierr

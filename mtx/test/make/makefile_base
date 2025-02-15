@@ -9,8 +9,8 @@ MESA_DIR = ../../..
 include $(MESA_DIR)/utils/makefile_header
 
 SRCS = \
-   test_mtx_support.f90 test_block_tri_dble.f90 test_block_tri_quad.f90 \
-   test_square.f90 test_square_quad.f90 test_mtx.f90
+   test_mtx_support.f90 test_block_tridiagonal.f90 \
+   test_square.f90 test_mtx.f90
 
 #################################################################
 #
@@ -47,7 +47,7 @@ else
 endif
 
 clean:
-	-@rm -f *.o *.mod .depend $(TEST) test_block_tri_dble.f90 test_block_tri_quad.f90
+	-@rm -f *.o *.mod .depend $(TEST)
 
 nodeps : $(.DEFAULT_GOAL)
 
@@ -56,22 +56,6 @@ nodeps : $(.DEFAULT_GOAL)
 # COMPILATION RULES
 
 PREPROCESS = $(FC) $(FCfree) $(FC_free_preprocess) -E
-
-test_block_tri_dble.f90: test_block_tridiagonal.f90
-ifneq ($(QUIET),)
-	@echo PREPROCESS $<
-	@$(PREPROCESS) -E -DDBLE $< > $@
-else
-	$(PREPROCESS) -E -DDBLE $< > $@
-endif
-
-test_block_tri_quad.f90: test_block_tridiagonal.f90
-ifneq ($(QUIET),)
-	@echo PREPROCESS $<
-	@$(PREPROCESS) -E $< > $@
-else
-	$(PREPROCESS) -E $< > $@
-endif
 
 %.o: %.f90
 ifneq ($(QUIET),)

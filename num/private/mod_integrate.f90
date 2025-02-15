@@ -35,11 +35,11 @@
 
       recursive function integrator(func, minx, maxx, args, atol, rtol, max_steps, ierr) result(res)
          procedure(integrand) :: func
-         real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
-         real(dp), intent(in) :: args(:) ! Extra args passed to func
-         real(dp), intent(in) :: atol, rtol ! Absolute and relative tolerances
-         integer, intent(in) :: max_steps ! Max number of sub-steps
-         integer, intent(inout) :: ierr ! Error code
+         real(dp),intent(in) :: minx,maxx  ! Min and max values to integrate over
+         real(dp), intent(in) :: args(:)  ! Extra args passed to func
+         real(dp), intent(in) :: atol, rtol  ! Absolute and relative tolerances
+         integer, intent(in) :: max_steps  ! Max number of sub-steps
+         integer, intent(inout) :: ierr  ! Error code
          real(dp) :: res
 
          real(dp) :: val1, val2
@@ -75,8 +75,8 @@
          if(abs(val1-val2) < atol .or. abs(val1-val2)/val1 < rtol ) then
             res = val2
          else
-            val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr) 
-            val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr) 
+            val1 = integrator(func, xlow, xmid, args, atol, rtol, max_steps-1, ierr)
+            val2 = integrator(func, xmid, xhigh, args, atol, rtol, max_steps-1, ierr)
 
             res = val1+val2
             if(ierr/=0) return
@@ -88,8 +88,8 @@
       real(dp) function simp38(func, minx, maxx, args, ierr)
          ! Simpsons 3/8 rule
          procedure(integrand) :: func
-         real(dp),intent(in) :: minx,maxx ! Min and max values to integrate over
-         real(dp), intent(in) :: args(:) ! Extra args passed to func
+         real(dp),intent(in) :: minx,maxx  ! Min and max values to integrate over
+         real(dp), intent(in) :: args(:)  ! Extra args passed to func
          integer, intent(inout) :: ierr
 
          real(dp) :: x

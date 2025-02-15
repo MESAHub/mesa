@@ -641,6 +641,7 @@
             show_annotation1, show_annotation2, show_annotation3, use_decorator
          interface
             subroutine decorate(id, ierr)
+               implicit none
                integer, intent(in) :: id
                integer, intent(out) :: ierr
             end subroutine decorate
@@ -807,7 +808,7 @@
          call pgunsa
 
          call show_pgstar_decorator(s%id, use_decorator, pgstar_decorator, 0, ierr)
-            
+
          deallocate(xvec, yvec)
 
          contains

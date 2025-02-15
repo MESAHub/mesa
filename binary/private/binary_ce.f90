@@ -109,13 +109,13 @@
                ! the following lines compute the fractions of HI, HII, HeI, HeII and HeIII
                ! things like ion_ifneut_H are defined in $MESA_DIR/ionization/public/ionization.def
                ! this file can be checked for additional ionization output available
-               frac_HI = 0d0!get_ion_info(s,ion_ifneut_H,k)
+               frac_HI = 0d0  !get_ion_info(s,ion_ifneut_H,k)
                frac_HII = 1 - frac_HI
 
                ! ionization module provides neutral fraction and average charge of He.
                ! use these two to compute the mass fractions of HeI and HeII
-               frac_HeI = 0d0!get_ion_info(s,ion_ifneut_He,k)
-               avg_charge_He = 2d0!get_ion_info(s,ion_iZ_He,k)
+               frac_HeI = 0d0  !get_ion_info(s,ion_ifneut_He,k)
+               avg_charge_He = 2d0  !get_ion_info(s,ion_iZ_He,k)
                ! the following is the solution to the equations
                !   avg_charge_He = 2*fracHeIII + 1*fracHeII
                !               1 = fracHeI + fracHeII + fracHeIII
@@ -200,8 +200,8 @@
             end if
             deallocate(adjusted_energy,interp_work)
          end if
-          
-      end subroutine
+
+      end subroutine CE_init
 
       subroutine CE_rlo_mdot(binary_id, rlo_mdot, ierr)
          use const_def, only: dp
@@ -293,7 +293,7 @@
             b% CE_Ebind2 = Ebind
             b% CE_lambda2 = lambda
          end if
-         
+
          initial_Eorb = -standard_cgrav*b% CE_initial_Mdonor*b% CE_initial_Maccretor/(2*b% CE_initial_separation)
 
          separation = -b% CE_alpha*standard_cgrav*s% m(1)*b% CE_initial_Maccretor &
@@ -304,7 +304,7 @@
          if (b% point_mass_i == 0) then
             b% m(b% a_i) = b% s_accretor% mstar
          end if
-         
+
          if (b% point_mass_i /= 1) then
             b% r(1) = Rsun*b% s1% photosphere_r
          else

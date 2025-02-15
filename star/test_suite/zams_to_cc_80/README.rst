@@ -4,8 +4,8 @@
 ZAMS_to_core_collapse_80
 ***************************
 
-This test suite evolves a solar metalicity 80 |MSun| model from the pre-ms to core collapse with mass loss. 
-A strong mass loss rate is adopted to make a Wolf-rayet star that is ~37 Msun, below the threshold for pair instability. 
+This test suite evolves a solar metalicity 80 |MSun| model from the pre-ms to core collapse with mass loss.
+A strong mass loss rate is adopted to make a Wolf-rayet star that is ~37 Msun, below the threshold for pair instability.
 For bit for bit convergence, we recomended to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.
 

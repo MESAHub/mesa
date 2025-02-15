@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,7 +19,7 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
+
       module run_star_extras
 
       use star_lib
@@ -28,60 +28,60 @@
       use math_lib
       use auto_diff
       use utils_lib, only: mesa_error, is_bad
-            
+
       implicit none
 
-      integer, parameter :: X_VEL_FRAC_C = 1 ! fraction of c to limit v_center to 
-      integer, parameter :: X_STOP_M = 2 ! stop_m
+      integer, parameter :: X_VEL_FRAC_C = 1  ! fraction of c to limit v_center to
+      integer, parameter :: X_STOP_M = 2  ! stop_m
 
-      integer, parameter :: X_STOP_M_FRAC_HE = 7 !for setting stop_m in part2, fraction of He layer.
+      integer, parameter :: X_STOP_M_FRAC_HE = 7  !for setting stop_m in part2, fraction of He layer.
 
-      integer, parameter :: X_NI_MASS = 12 ! Amount of Ni mass to add Msun
+      integer, parameter :: X_NI_MASS = 12  ! Amount of Ni mass to add Msun
 
-      integer, parameter :: X_RTI_DAYS_OFF = 14 ! days afterwhich to turn off rti if >0
-      integer, parameter :: X_MASS_BELOW_SURF = 16 ! mass below surface for stop_m Msun
+      integer, parameter :: X_RTI_DAYS_OFF = 14  ! days afterwhich to turn off rti if >0
+      integer, parameter :: X_MASS_BELOW_SURF = 16  ! mass below surface for stop_m Msun
 
-      integer, parameter :: X_CSM_MDOT = 18 ! mass of csm to add if >0 - part 5 only
-      integer, parameter :: X_CSM_MASS = 19 ! mass of csm to add if >0 - part 5 only
-      
-      integer, parameter :: X_MLT_ALPHA = 21 ! use this mlta_alpha when h1>x_ctrl(X_MLT_H_LIM)
-      integer, parameter :: X_MLT_OTHER = 22 ! else use this mlt alpha
-      integer, parameter :: X_MLT_H_LIM = 23 ! h limit to switch mlt alpha's
+      integer, parameter :: X_CSM_MDOT = 18  ! mass of csm to add if >0 - part 5 only
+      integer, parameter :: X_CSM_MASS = 19  ! mass of csm to add if >0 - part 5 only
+
+      integer, parameter :: X_MLT_ALPHA = 21  ! use this mlta_alpha when h1>x_ctrl(X_MLT_H_LIM)
+      integer, parameter :: X_MLT_OTHER = 22  ! else use this mlt alpha
+      integer, parameter :: X_MLT_H_LIM = 23  ! h limit to switch mlt alpha's
 
       integer, parameter :: X_CSM_RHO0 = 28
       integer, parameter :: X_CSM_T0 = 29
 
-      integer, parameter :: X_DELTA_LGL_AGE = 32 ! when to change delta_lgL options
-      integer, parameter :: X_DELTA_LGL_LIM = 33 ! s% delta_lgL_limit
-      integer, parameter :: X_DELTA_LGL_HARD_LIM = 34 ! s% delta_lgL_hard_limit
-      
-      integer, parameter :: X_NI_MASS_START = 35 ! where to put Ni above M_center
-      integer, parameter :: X_NI_MASS_END = 36 ! where to stop putting Ni56 above he core 
+      integer, parameter :: X_DELTA_LGL_AGE = 32  ! when to change delta_lgL options
+      integer, parameter :: X_DELTA_LGL_LIM = 33  ! s% delta_lgL_limit
+      integer, parameter :: X_DELTA_LGL_HARD_LIM = 34  ! s% delta_lgL_hard_limit
 
-      integer, parameter :: X_STELLA_MIN_CNTR_U = 37 !min center velocity for stella.
-      
-      integer, parameter :: X_SMOOTH_XA_1_START = 45 ! boxcar smooth start mass above M_center
-      integer, parameter :: X_SMOOTH_XA_1_END = 46 ! boxcar smooth end mass above he core
-      integer, parameter :: X_SMOOTH_XA_1_BOXCAR_MASS = 47 ! boxcar smooth boxcar size
+      integer, parameter :: X_NI_MASS_START = 35  ! where to put Ni above M_center
+      integer, parameter :: X_NI_MASS_END = 36  ! where to stop putting Ni56 above he core
 
-      integer, parameter :: X_SMOOTH_XA_2_START = 48 ! boxcar smooth start mass above M_center
-      integer, parameter :: X_SMOOTH_XA_2_END = 49 ! boxcar smooth end mass above he core
-      integer, parameter :: X_SMOOTH_XA_2_BOXCAR_MASS = 50 ! boxcar smooth boxcar size
+      integer, parameter :: X_STELLA_MIN_CNTR_U = 37  !min center velocity for stella.
 
-      integer, parameter :: X_MAGNETAR_L_CNTR = 55 ! L_center - Magnetar is only enabled if this is greater than 0
-      integer, parameter :: X_MAGNETAR_START_UP = 56 ! start ramping up magnetar at this time in days 
-      integer, parameter :: X_MAGNETAR_END_UP = 57 ! stop ramping up magnetar at this time  in days 
-      integer, parameter :: X_MAGNETAR_START_DOWN = 58 ! start ramping down magnetar at this time  in days 
-      integer, parameter :: X_MAGNETAR_END_DOWN = 59 ! stop ramping down magnetar at this time  in days 
+      integer, parameter :: X_SMOOTH_XA_1_START = 45  ! boxcar smooth start mass above M_center
+      integer, parameter :: X_SMOOTH_XA_1_END = 46  ! boxcar smooth end mass above he core
+      integer, parameter :: X_SMOOTH_XA_1_BOXCAR_MASS = 47  ! boxcar smooth boxcar size
+
+      integer, parameter :: X_SMOOTH_XA_2_START = 48  ! boxcar smooth start mass above M_center
+      integer, parameter :: X_SMOOTH_XA_2_END = 49  ! boxcar smooth end mass above he core
+      integer, parameter :: X_SMOOTH_XA_2_BOXCAR_MASS = 50  ! boxcar smooth boxcar size
+
+      integer, parameter :: X_MAGNETAR_L_CNTR = 55  ! L_center - Magnetar is only enabled if this is greater than 0
+      integer, parameter :: X_MAGNETAR_START_UP = 56  ! start ramping up magnetar at this time in days
+      integer, parameter :: X_MAGNETAR_END_UP = 57  ! stop ramping up magnetar at this time  in days
+      integer, parameter :: X_MAGNETAR_START_DOWN = 58  ! start ramping down magnetar at this time  in days
+      integer, parameter :: X_MAGNETAR_END_DOWN = 59  ! stop ramping down magnetar at this time  in days
 
       integer, parameter :: X_FORCE_STOP_M = 98
       integer, parameter :: X_DEFAULT_STOP_M = 99
 
-      integer, parameter :: I_INLIST_PART = 1 ! inlist part number
-      integer, parameter :: I_SMOOTH_XA_1_NUM_ITERS = 3 ! boxcar smooth num iters
-      integer, parameter :: I_SMOOTH_XA_2_NUM_ITERS = 4 ! boxcar smooth num iters
+      integer, parameter :: I_INLIST_PART = 1  ! inlist part number
+      integer, parameter :: I_SMOOTH_XA_1_NUM_ITERS = 3  ! boxcar smooth num iters
+      integer, parameter :: I_SMOOTH_XA_2_NUM_ITERS = 4  ! boxcar smooth num iters
 
-      integer, parameter :: L_V_CNTR = 1 ! Whether to allow v_center to change
+      integer, parameter :: L_V_CNTR = 1  ! Whether to allow v_center to change
 
       integer, parameter :: INLIST_INFALL=-1, INLIST_END_INFALL=-2, INLIST_EDEP=-3
       integer, parameter :: INLIST_SHOCK_PART1=1, INLIST_SHOCK_PART2=2, INLIST_SHOCK_PART3=3
@@ -91,14 +91,14 @@
       include "test_suite_extras_def.inc"
       include 'stella/stella_def.inc'
 
-      
+
       real(dp) :: &
          initial_time, &
          initial_nico, initial_M_center, initial_he_core_mass, initial_mass, &
          start_m, stop_m
-         
-      real(dp), parameter :: h1_limit = 0.1 ! We use this to check that RTI mixing worked
-      real(dp) :: max_mass_h ! Mass co-ordinate where h1< h1_limit
+
+      real(dp), parameter :: h1_limit = 0.1  ! We use this to check that RTI mixing worked
+      real(dp) :: max_mass_h  ! Mass co-ordinate where h1< h1_limit
 
       contains
 
@@ -112,11 +112,11 @@
          include 'formats'
          ierr = 0
          call star_ptr(id, s, ierr)
-         if (ierr /= 0) return         
-         
+         if (ierr /= 0) return
+
          include 'stella/stella_controls.inc'
          if (ierr /= 0) return
-         
+
          s% extras_startup => extras_startup
          s% extras_check_model => extras_check_model
          s% extras_start_step => extras_start_step
@@ -167,8 +167,8 @@
       subroutine low_density_wind_routine(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
          use star_def
          integer, intent(in) :: id
-         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z ! surface values (cgs)
-         real(dp), intent(out) :: w ! wind in units of Msun/year (value is >= 0)
+         real(dp), intent(in) :: Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z  ! surface values (cgs)
+         real(dp), intent(out) :: w  ! wind in units of Msun/year (value is >= 0)
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp) :: msum, lgrho_limit, lnd_limit
@@ -180,7 +180,7 @@
          if (ierr /= 0) return
          i_lnd = s% i_lnd
          if (i_lnd <= 0) return
-         lgrho_limit = -14.5d0 ! remove material from surface with density below this
+         lgrho_limit = -14.5d0  ! remove material from surface with density below this
          lnd_limit = ln10*lgrho_limit
          msum = 0d0
          do k=1, s% nz
@@ -191,8 +191,8 @@
          w = (msum/Msun)/(s% dt/secyer)
          write(*,1) 'low_density_wind_routine lg(Mdot) msum/Msun', safe_log10(w), msum/Msun
       end subroutine low_density_wind_routine
-      
-      
+
+
       subroutine set_nico_mass(s, i_ni56, i_co56, new_ni, final_call, mass_ni56, ierr)
          use chem_def, only: io16
          type (star_info), pointer :: s
@@ -201,7 +201,7 @@
          real(dp), intent(in) :: new_ni
          real(dp), intent(out) :: mass_ni56
          integer, intent(out) :: ierr
-         
+
          integer :: i_o16, k, j, n, nz, species, jmax, kcut
          real(dp) :: old_nico, nico_change, &
             old_o16, new_o16, alfa_o16, alfa_nico, sum_dm, &
@@ -216,7 +216,7 @@
          end if
          nz = s% nz
          species = s% species
-         do k=1,nz ! fixup abundances before revise
+         do k=1,nz  ! fixup abundances before revise
             do j=1,species
                s% xa(j,k) = max(0d0, min(1d0, s% xa(j,k)))
             end do
@@ -229,10 +229,10 @@
          end do
          min_m = s% x_ctrl(X_NI_MASS_START)*Msun + s% M_center
          max_m = s% x_ctrl(X_NI_MASS_END)*Msun + s% he_core_mass*Msun
-         
+
          if (s% u_flag) then
             do k=nz,1,-1
-               if (s% u(k) > s% x_ctrl(X_STELLA_MIN_CNTR_U)) then 
+               if (s% u(k) > s% x_ctrl(X_STELLA_MIN_CNTR_U)) then
                   ! prepare for removal before give to Stella
                   if (s% m(k) > min_m) then
                      min_m = s% m(k)
@@ -240,13 +240,13 @@
                      exit
                   end if
                end if
-            end do 
-         end if        
-         
+            end do
+         end if
+
          write(*,1) 'max_m min_m he_core_mass new_ni', &
             max_m/Msun, min_m/Msun, s% he_core_mass, new_ni
          if (max_m > 0d0) then
-            do k=1,nz ! replace ni56 + co56 by o16
+            do k=1,nz  ! replace ni56 + co56 by o16
                s% xa(i_o16,k) = s% xa(i_o16,k) + s% xa(i_ni56,k) + s% xa(i_co56,k)
                s% xa(i_co56,k) = 0d0
                s% xa(i_ni56,k) = 0d0
@@ -255,7 +255,7 @@
             if (min_m < 0) then
                min_m = max_m - new_ni*Msun
                mp1 = s% m(1)
-               do k=1,nz ! add ni56 from max_m to min_m
+               do k=1,nz  ! add ni56 from max_m to min_m
                   m00 = mp1
                   mp1 = m00 - s% dm(k)
                   if (mp1 >= max_m) cycle
@@ -272,7 +272,7 @@
                      s% xa(i_ni56,k) = 1d0 - sum(s% xa(1:species,k))
                   end if
                end do
-            else ! min_m >= 0
+            else  ! min_m >= 0
                min_m = max(min_m, s% M_center)
                if (min_m >= max_m) then
                   write(*,1) 'min_m >= max_m', min_m/Msun, max_m/Msun, s% M_center/Msun
@@ -281,7 +281,7 @@
                new_ni_frac = new_ni*Msun/(max_m - min_m)
                write(*,1) 'new_ni_frac min_m/Msun max_m/Msun', new_ni_frac, min_m/Msun, max_m/Msun
                mp1 = s% m(1)
-               do k=1,nz ! add ni56 from max_m to min_m
+               do k=1,nz  ! add ni56 from max_m to min_m
                   m00 = mp1
                   mp1 = m00 - s% dm(k)
                   if (m00 <= min_m) exit
@@ -313,7 +313,7 @@
             !call mesa_error(__FILE__,__LINE__,'set_nico_mass')
             return
          end if
-         
+
          write(*,*) 'rescale Ni profile'
          do k=1,nz
             do j=1,species
@@ -326,7 +326,7 @@
                end do
             end if
          end do
-         
+
          kcut = nz
          if (final_call .and. stella_skip_inner_dm > 0d0) then
             mcut = s% M_center + stella_skip_inner_dm*Msun
@@ -340,7 +340,7 @@
             end do
          end if
 
-         do k=1,nz ! replace co56 by ni56
+         do k=1,nz  ! replace co56 by ni56
             s% xa(i_ni56,k) = s% xa(i_ni56,k) + s% xa(i_co56,k)
             s% xa(i_co56,k) = 0d0
          end do
@@ -382,7 +382,7 @@
          mass_ni56 = new_ni
          write(*,1) 'revised mass Ni56', check_ni56
       end subroutine set_nico_mass
-            
+
       subroutine extras_startup(id, restart, ierr)
          use chem_def, only: ini56, ico56, ih1, ihe4, io16
          use interp_2d_lib_db, only: interp_mkbicub_db
@@ -410,7 +410,7 @@
          he4 = s% net_iso(ihe4)
          h1 = s% net_iso(ih1)
          if (o16 <= 0 .or. he4 <= 0 .or. h1 <= 0) call mesa_error(__FILE__,__LINE__,'missing o16, he4, or h1')
-         
+
          if (s% eos_rq% logRho_min_OPAL_SCVH_limit > -12d0) then
             write(*,'(A)')
             write(*,*)'FIX: have set_logRho_OPAL_SCVH_limits too large'
@@ -418,7 +418,7 @@
             write(*,'(A)')
             call mesa_error(__FILE__,__LINE__,'extras_startup')
          end if
-         
+
          if (.not. restart) then
             initial_nico = 0
             stop_m = 0
@@ -427,9 +427,9 @@
             initial_time = s% time
             initial_he_core_mass = s% he_core_mass
             max_mass_h = -1
-         
+
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_EDEP) then
-               if (s% total_mass_for_inject_extra_ergs_sec > 0) then ! doing edep
+               if (s% total_mass_for_inject_extra_ergs_sec > 0) then  ! doing edep
                   if (s% v_flag) then
                      do k=1,s% nz
                         s% xh(s% i_v,k) = 0d0
@@ -453,8 +453,8 @@
             end if
 
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART5 .and. &
-                s% x_ctrl(X_CSM_MASS) > 0) call add_csm ! part 5, add csm
-            
+                s% x_ctrl(X_CSM_MASS) > 0) call add_csm  ! part 5, add csm
+
             if (s% x_ctrl(X_SMOOTH_XA_1_BOXCAR_MASS) > 0d0 .and. s% x_integer_ctrl(I_SMOOTH_XA_1_NUM_ITERS) > 0) then
                min_mass = s% x_ctrl(X_SMOOTH_XA_1_START) + s% M_center/Msun
                max_mass = s% x_ctrl(X_SMOOTH_XA_1_END) + s% he_core_mass
@@ -471,7 +471,7 @@
                end if
                initial_nico = xni56
             end if
-            
+
             if (s% x_ctrl(X_SMOOTH_XA_2_BOXCAR_MASS) > 0d0 .and. s% x_integer_ctrl(I_SMOOTH_XA_2_NUM_ITERS) > 0) then
                min_mass = s% x_ctrl(X_SMOOTH_XA_2_START) + s% M_center/Msun
                max_mass = s% x_ctrl(X_SMOOTH_XA_2_END) + s% he_core_mass
@@ -480,12 +480,12 @@
                   s% id, min_mass, max_mass, boxcar_mass, s% x_integer_ctrl(I_SMOOTH_XA_2_NUM_ITERS), ierr)
                if (ierr /= 0) return
             end if
-         
+
             if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART1) &
-               s% cumulative_energy_error = 0d0 ! set to 0 at start of part1
-               
+               s% cumulative_energy_error = 0d0  ! set to 0 at start of part1
+
             start_m = s% shock_mass
-            if (start_m == 0d0) then ! use max v
+            if (start_m == 0d0) then  ! use max v
                k_max_v = maxloc(s% u(1:s% nz),dim=1)
                start_m = s% m(k_max_v)/Msun
                if (start_m < 2d0*s% M_center/Msun) then
@@ -498,10 +498,10 @@
                write(*,2) 'use shock for start_m', s% shock_k, s% shock_mass
             end if
             write(*,2) 'M_center', s% nz, s% M_center/Msun
-            
+
             write(*,1) 's% x_ctrl(X_FORCE_STOP_M)', s% x_ctrl(X_FORCE_STOP_M)
             write(*,2) 's% x_integer_ctrl(I_INLIST_PART)', s% x_integer_ctrl(I_INLIST_PART)
-         
+
             if (s% x_ctrl(X_FORCE_STOP_M) > 0d0) then
                stop_m = s% x_ctrl(X_FORCE_STOP_M)
             else
@@ -520,17 +520,17 @@
                      stop_m = s% star_mass - s% x_ctrl(X_MASS_BELOW_SURF)
                end select
             end if
-            
-         end if ! not restart
-         
+
+         end if  ! not restart
+
          write(*,1) 's% x_ctrl(X_MASS_BELOW_SURF)', s% x_ctrl(X_MASS_BELOW_SURF)
          write(*,1) 's% star_mass', s% star_mass
          write(*,1) 'start_m', start_m
          write(*,1) 'stop_m', stop_m
-                  
+
          if (s% x_ctrl(X_MASS_BELOW_SURF) > 0d0) &
                stop_m = min(stop_m, s% star_mass - s% x_ctrl(X_MASS_BELOW_SURF))
-         
+
          if (start_m > stop_m .and. stop_m > 0d0) then
             write(*,1) 'start_m > stop_m', start_m, stop_m
             call mesa_error(__FILE__,__LINE__,'extras_startup')
@@ -546,7 +546,7 @@
             write(*,'(A)')
             !stop
          end if
-                  
+
          contains
 
          subroutine find_inlist_part1_stop_m()
@@ -615,7 +615,7 @@
             if (stop_m == 0d0) call mesa_error(__FILE__,__LINE__,'failed to find stop_m')
 
          end subroutine find_inlist_part3_stop_m
-         
+
          subroutine add_csm
             real(dp) :: xni56, xmax, &
             logT, P_hse, Z, &
@@ -646,12 +646,12 @@
                   T0 = s% T(kk)
                end if
                L0 = s% L(1)
-               windv = csm_mdot/(4*pi*r0*r0*rho0) ! mdot velocity
+               windv = csm_mdot/(4*pi*r0*r0*rho0)  ! mdot velocity
                !windv = sqrt(2*s% cgrav(kk)*s% m(kk)/r0) ! escape velocity
                write(*,1) 'old log(r(1)/Rsun), R/Rsun', log10(s% r(1)/Rsun), s% r(1)/Rsun
                write(*,2) 'rho0, T0, r0, csm mass, csm v', &
                   kk, rho0, T0, r0/Rsun, (s% m(1) - s% m(kk))/Msun, windv
-               dm = sum(s% dm(1:kk-1))/(kk-1) 
+               dm = sum(s% dm(1:kk-1))/(kk-1)
                dq = dm/s% xmstar
                do k = 1, kk-1
                   s% dq(k) = dq
@@ -673,7 +673,7 @@
                do k = kk-1, 1, -1
                   r = s% r(k+1) + 0.5d0*(s% r(k+1) - s% r(k+2))
                   f = r0/r; f = f*f
-                  rho = rho0*f ! rho proportional to 1/r^2
+                  rho = rho0*f  ! rho proportional to 1/r^2
                   dV = dm/rho
                   r = s% r(k+1)
                   r = pow(dV/(4d0*pi/3d0) + r*r*r, 1d0/3d0)
@@ -683,15 +683,15 @@
                   s% rho(k) = rho
                   s% lnd(k) = log(s% rho(k))
                   s% xh(s% i_lnd,k) = s% lnd(k)
-         
-         
-                  s% u(k) = windv !* r/r0
-         
-         
+
+
+                  s% u(k) = windv  !* r/r0
+
+
                   s% xh(s% i_u,k) = s% u(k)
-         
-         
-                  if (.true.) then ! set T to give P for HSE
+
+
+                  if (.true.) then  ! set T to give P for HSE
                      r = s% r(k+1)
                      P_hse = s% Peos(k+1) - &
                         s% cgrav(k+1)*s% m(k+1)*(s% dm(k+1)+s% dm(k))/(8*pi*r*r*r*r)
@@ -708,7 +708,7 @@
                      if (ierr /= 0) return
                      s% lnT(k) = logT_result*ln10
                      s% T(k) = exp(s% lnT(k))
-                     if (.false. .and. s% T(k) > s% T(k+1)) then ! can happen at base
+                     if (.false. .and. s% T(k) > s% T(k+1)) then  ! can happen at base
                         s% T(k) = s% T(k+1)
                         s% lnT(k) = s% lnT(k+1)
                      end if
@@ -717,8 +717,8 @@
                      s% lnT(k) = log(s% T(k))
                   end if
                   s% xh(s% i_lnT,k) = s% lnT(k)
-         
-                  if (.true.) then ! set to black body L
+
+                  if (.true.) then  ! set to black body L
                      s% L(k) = atm_L(s% T(k), s% r(k))
                   else
                      s% L(k) = L0
@@ -736,8 +736,8 @@
          end subroutine add_csm
 
       end subroutine extras_startup
-      
-      
+
+
       subroutine extras_after_evolve(id, ierr)
          use chem_def, only: ini56, ico56, ih1
          integer, intent(in) :: id
@@ -753,7 +753,7 @@
             call write_stella_data(s, ierr)
             if (ierr /= 0) return
          end if
-         
+
          ! Check that RTI worked
          if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART4 .and. s% rti_flag) then
             ! This is only needed for the test suite and can be removed if doing science
@@ -793,7 +793,7 @@
 
 
       end subroutine extras_after_evolve
-      
+
 
       ! returns either keep_going, retry, or terminate.
       integer function extras_check_model(id)
@@ -819,8 +819,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -831,9 +831,9 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
       end subroutine data_for_extra_history_columns
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -847,8 +847,8 @@
          if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART3) &
             how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -869,12 +869,12 @@
             names(1) = 'du'
             vals(1,1) = 0
             do k=2,s% nz
-               vals(k,1) = 0 ! s% xtra1_array(k)
+               vals(k,1) = 0  ! s% xtra1_array(k)
             end do
             return
          end if
       end subroutine data_for_extra_profile_columns
-      
+
 
       ! returns either keep_going or terminate.
       integer function extras_start_step(id)
@@ -890,23 +890,23 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART1 .and. s% model_number >= 1000) &
-            s% max_timestep = 0 ! turn off limit
-            
+            s% max_timestep = 0  ! turn off limit
+
          age_days = s% star_age*365.25d0
-         
+
          if (s% x_ctrl(X_RTI_DAYS_OFF) > 0 .and. age_days >= s% x_ctrl(X_RTI_DAYS_OFF) .and. &
                s% RTI_C > 0d0) then
             call turn_off_rti()
          end if
-         
+
          call enable_magnetar(s)
-                           
+
          if (age_days >= s% x_ctrl(X_DELTA_LGL_AGE)) then
             call adjust_delta_lgL()
          end if
-         
+
          if (s% x_logical_ctrl(L_V_CNTR) .and. s% dt > 0d0) then
             call adjust_v_center()
          end if
@@ -917,7 +917,7 @@
          subroutine turn_off_rti()
             include 'formats'
             s% RTI_C = 0d0
-            s% RTI_log_max_boost = 0d0 
+            s% RTI_log_max_boost = 0d0
             s% RTI_m_full_boost = -1d0
             s% RTI_m_no_boost = 0d0
             s% dedt_RTI_diffusion_factor = 1d0
@@ -949,7 +949,7 @@
          end subroutine adjust_delta_lgL
 
       end function extras_start_step
-         
+
 
       ! returns either keep_going or terminate.
       integer function extras_finish_step(id)
@@ -964,7 +964,7 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% x_ctrl(X_STOP_M) <= 0) return
          shock_mass = s% shock_mass
          if (shock_mass >= s% x_ctrl(X_STOP_M)) then
@@ -977,7 +977,7 @@
                write(*,1) 'shock has reached this fraction of target', &
                   shock_mass/s% x_ctrl(X_STOP_M)
          end if
-         
+
          if (s% x_integer_ctrl(I_INLIST_PART) == INLIST_SHOCK_PART5 .and. &
              s% model_number == save_stella_data_for_model_number) then
             call write_stella_data(s, ierr)
@@ -1000,19 +1000,19 @@
          end subroutine restore_nico_mass
 
 
-         
+
       end function extras_finish_step
-           
+
       subroutine extras_photo_read(id, iounit, ierr)
          integer, intent(in) :: id, iounit
          integer, intent(out) :: ierr
          integer :: inlist_part
          type (star_info), pointer :: s
          ierr = 0
-   
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-   
+
          read(iounit,iostat=ierr) initial_nico, initial_M_center, initial_mass, initial_time, initial_he_core_mass
          read(iounit,iostat=ierr) start_m, stop_m, inlist_part, max_mass_h
 
@@ -1023,19 +1023,19 @@
          end if
 
          end subroutine extras_photo_read
-   
+
          subroutine extras_photo_write(id, iounit)
          integer, intent(in) :: id, iounit
          integer :: ierr
          type (star_info), pointer :: s
          ierr = 0
-   
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-   
+
          write(iounit) initial_nico, initial_M_center, initial_mass, initial_time, initial_he_core_mass
          write(iounit) start_m, stop_m, s% x_integer_ctrl(I_INLIST_PART), max_mass_h
-   
+
          end subroutine extras_photo_write
 
 
@@ -1069,4 +1069,3 @@
          end subroutine enable_magnetar
 
       end module run_star_extras
-      

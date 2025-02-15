@@ -58,7 +58,7 @@
          dt = s% dt
 
          if (s% rsp_flag) then
-            do_struct_burn_mix = do_rsp_step(s,dt)    
+            do_struct_burn_mix = do_rsp_step(s,dt)
             s% total_num_solver_iterations = &
                s% total_num_solver_iterations + s% num_solver_iterations
             s% total_num_solver_calls_made = s% total_num_solver_calls_made + 1
@@ -66,7 +66,7 @@
                s% total_num_solver_calls_converged = &
                   s% total_num_solver_calls_converged + 1
             return
-         end if        
+         end if
 
          if (s% use_other_before_struct_burn_mix) then
             call s% other_before_struct_burn_mix(s% id, dt, do_struct_burn_mix)
@@ -82,10 +82,10 @@
          s% num_solver_iterations = 0
 
          do_struct_burn_mix = retry
-         
+
          s% do_burn = (s% dxdt_nuc_factor > 0d0)
          s% do_mix = (s% mix_factor > 0d0)
-         
+
          if (s% op_split_burn) then
             do k=1,nz
                s% burn_num_iters(k) = 0
@@ -103,7 +103,7 @@
                end if
             end do
          end if
-         
+
          if (s% do_burn .and. s% op_split_burn) then
             total = 0
             do k=1,s% nz
@@ -115,16 +115,16 @@
                write(*,2) 'failed in do_burn', s% model_number
                call mesa_error(__FILE__,__LINE__,'do_struct_burn_mix')
                return
-            end if            
+            end if
             call set_vars_if_needed(s, s% dt, 'after do_burn', ierr)
-            if (ierr /= 0) return            
+            if (ierr /= 0) return
             do k=1,s% nz
                total = total + s% energy(k)*s% dm(k)
             end do
             s% non_epsnuc_energy_change_from_split_burn = total
             if (s% trace_evolve) write(*,*) 'done do_burn'
          end if
-         
+
          if (s% doing_first_model_of_run) then
             if (s% i_lum /= 0) then
                s% L_phot_old = s% xh(s% i_lum,1)/Lsun
@@ -144,9 +144,9 @@
          end if
 
          do_chem = (s% do_burn .or. s% do_mix)
-         if (do_chem) then ! include abundances
+         if (do_chem) then  ! include abundances
             nvar = s% nvar_total
-         else ! no chem => just do structure
+         else  ! no chem => just do structure
             nvar = s% nvar_hydro
          end if
 
@@ -157,7 +157,7 @@
          if (s% w_div_wc_flag) then
             s% xh(s% i_w_div_wc,:s% nz) = s% w_div_w_crit_roche(:s% nz)
          end if
-         
+
          if (s% j_rot_flag) then
             s% xh(s% i_j_rot,:s% nz) = s% j_rot(:s% nz)
             s% j_rot_start(:s% nz) = s% j_rot(:s% nz)
@@ -172,7 +172,7 @@
             if (s% report_ierr) write(*,*) 'save_start_values failed'
             return
          end if
-                     
+
          if (s% trace_evolve) write(*,*) 'call solver'
          do_struct_burn_mix = do_solver_converge( &
             s, nvar, skip_global_corr_coeff_limit, &
@@ -211,12 +211,12 @@
          if (s% use_other_after_struct_burn_mix) &
             call s% other_after_struct_burn_mix(s% id, dt, do_struct_burn_mix)
 
-         s% solver_iter = 0 ! to indicate that no longer doing solver iterations
+         s% solver_iter = 0  ! to indicate that no longer doing solver iterations
          s% doing_struct_burn_mix = .false.
          if (s% doing_timing) call update_time(s, time0, total, s% time_struct_burn_mix)
-         
+
          contains
-         
+
          subroutine test(str)
             use chem_def, only: category_name
             character (len=*), intent(in) :: str
@@ -308,8 +308,8 @@
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
-            s% u_face_start(k) = 0d0 ! s% u_face_ad(k)%val
-            s% P_face_start(k) = -1d0 ! mark as unset s% P_face_ad(k)%val
+            s% u_face_start(k) = 0d0  ! s% u_face_ad(k)%val
+            s% P_face_start(k) = -1d0  ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
             s% omega_start(k) = s% omega(k)
             s% ye_start(k) = s% ye(k)
@@ -334,7 +334,7 @@
             s% opacity_start(k) = s% opacity(k)
             s% m_grav_start(k) = s% m_grav(k)
          end do
-         
+
          if (s% RSP2_flag) then
             call set_etrb_start_vars(s,ierr)
          end if
@@ -344,7 +344,7 @@
                s% xh_start(j,k) = s% xh(j,k)
             end do
          end do
-         
+
          do k=1,s% nz
             do j=1,s% species
                s% xa_start(j,k) = s% xa(j,k)
@@ -358,7 +358,7 @@
             s% total_rotational_kinetic_energy_start, &
             s% total_turbulent_energy_start, &
             s% total_energy_start)
-         
+
       end subroutine save_start_values
 
 
@@ -392,7 +392,7 @@
 
          nz = s% nz
          n = nz*nvar
-         
+
          s% solver_call_number = s% solver_call_number + 1
 
          do_solver_converge = do_solver( &
@@ -404,7 +404,7 @@
       end function do_solver_converge
 
 
-      subroutine set_surf_info(s, nvar) ! set to values at start of step
+      subroutine set_surf_info(s, nvar)  ! set to values at start of step
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          s% surf_lnS = s% lnS(1)
@@ -412,7 +412,7 @@
       end subroutine set_surf_info
 
 
-      subroutine set_xh(s,nvar,ierr) ! set xh using current structure info
+      subroutine set_xh(s,nvar,ierr)  ! set xh using current structure info
          use hydro_rsp2, only: RSP2_adjust_vars_before_call_solver
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
@@ -519,7 +519,7 @@
          do_solver = keep_going
          s% using_gold_tolerances = .false.
          gold_tolerances_level = 0
-         
+
          if ((s% use_gold2_tolerances .and. s% steps_before_use_gold2_tolerances < 0) .or. &
              (s% steps_before_use_gold2_tolerances >= 0 .and. &
                 s% model_number > s% steps_before_use_gold2_tolerances + max(0,s% init_model_number))) then
@@ -533,16 +533,16 @@
             else
                maxT = -1d0
             end if
-            if (maxT > s% maxT_for_gold_tolerances) then 
+            if (maxT > s% maxT_for_gold_tolerances) then
                !write(*,2) 'exceed maxT_for_gold_tolerances', &
                !   s% model_number, maxT, s% maxT_for_gold_tolerances
-            else ! okay for maxT, so check if also ok for eosPC_frac
+            else  ! okay for maxT, so check if also ok for eosPC_frac
                s% using_gold_tolerances = .true.
                gold_tolerances_level = 1
             end if
          end if
 
-         call set_xh(s, nvar, ierr) ! set xh using current structure info
+         call set_xh(s, nvar, ierr)  ! set xh using current structure info
          if (ierr /= 0) then
             if (report) then
                write(*, *) 'set_xh returned ierr in struct_burn_mix', ierr
@@ -595,9 +595,9 @@
             return
          end if
 
-         if (converged) then ! sanity checks before accept it
+         if (converged) then  ! sanity checks before accept it
             converged = check_after_converge(s, report, ierr)
-            if (converged .and. s% RTI_flag) & ! special checks
+            if (converged .and. s% RTI_flag) &  ! special checks
                converged = RTI_check_after_converge(s, report, ierr)
          end if
 
@@ -652,7 +652,7 @@
                   s% species, s% xa(:,k), &
                   s% rho(k), s% lnd(k)/ln10, s% energy(k), s% lnT(k), &
                   new_lnT, revised_energy, ierr)
-               if (ierr /= 0) return ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
+               if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'do_merge failed in set_lnT_for_energy')
                call store_lnT_in_xh(s, k, new_lnT)
                call get_T_and_lnT_from_xh(s, k, s% T(k), s% lnT(k))
             end if
@@ -667,7 +667,7 @@
                   s% u(k) = -new_u
                end if
                s% xh(s% i_u, k) = s% u(k)
-            else if (s% v_flag) then ! only rough approximation possible here
+            else if (s% v_flag) then  ! only rough approximation possible here
                old_KE = 0.5d0*s% dm_bar(k)*s% v(k)*s% v(k)
                new_KE = max(0d0, old_KE + old_IE - new_IE)
                new_v = sqrt(max(0d0,new_KE)/(0.5d0*s% dm_bar(k)))
@@ -711,16 +711,16 @@
             else
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnT(k) < ln10) then
                   if (report) write(*,*) 'after hydro, logT < 1 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnd(k) > ln10*12) then
                   if (report) write(*,*) 'after hydro, logRho > 12 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                else if (s% lnd(k) < -ln10*30) then
                   if (report) write(*,*) 'after hydro, logRho < -30 in cell k', k
-                  converged = .false.!; exit
+                  converged = .false.  !; exit
                end if
             end if
          end do
@@ -793,7 +793,7 @@
             include 'formats'
             s% doing_solver_iterations = .true.
             save_warn_rates_flag = warn_rates_for_high_temp
-            warn_rates_for_high_temp = .false.        
+            warn_rates_for_high_temp = .false.
             call solver( &
                s, nvar, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
@@ -827,7 +827,7 @@
          include 'formats'
 
          trace = .false.
-         
+
          min_T_for_const_density_solver = s% op_split_burn_min_T_for_variable_T_solver
 
          do_burn = keep_going
@@ -846,11 +846,11 @@
          end if
 
          if (dt <= 0d0) return
-                  
+
          max_num_iters_used = 0
          max_num_iters_k = 0
          k_bad = 0
-         
+
          screening_mode = get_screening_mode(s,ierr)
          if (ierr /= 0) then
             if (s% report_ierr) &
@@ -859,13 +859,13 @@
             call mesa_error(__FILE__,__LINE__,'do1_net')
          end if
 
-         dbg = .false. ! (s% model_number == 1137)
+         dbg = .false.  ! (s% model_number == 1137)
 
          kmin = nz+1
          do k=1,nz
             if (s% T_start(k) < s% op_split_burn_min_T) then
                 ! We get here if we have an off center ignition,
-                ! the arrays wont have been initialised earlier as they stop at the 
+                ! the arrays wont have been initialised earlier as they stop at the
                 ! first temperature that exceeds op_split_burn_min_T
                s% burn_num_iters(k) = 0
                s% burn_avg_epsnuc(k) = 0d0
@@ -874,7 +874,7 @@
             kmin = k
             exit
          end do
-         
+
          if (kmin > nz) return
 
          !skip_burn = s% fe_core_infall > s% op_split_burn_eps_nuc_infall_limit
@@ -887,7 +887,7 @@
             if (k_bad /= 0) cycle
             if (s% T_start(k) < s% op_split_burn_min_T) then
                ! We get here if we have an off center ignition,
-               ! the arrays wont have been initialised earlier as they stop at the 
+               ! the arrays wont have been initialised earlier as they stop at the
                ! first temperature that exceeds op_split_burn_min_T
                s% burn_num_iters(k) = 0
                s% burn_avg_epsnuc(k) = 0d0
@@ -910,7 +910,7 @@
                ierr = -1
                k_bad = k
                cycle
-            end if        
+            end if
             !write(*,3) 'num_iters', k, num_iters
             s% burn_num_iters(k) = num_iters
             s% burn_avg_epsnuc(k) = avg_epsnuc
@@ -920,18 +920,18 @@
             end if
          end do
 !$OMP END PARALLEL DO
-         
+
          s% need_to_setvars = .true.
-         
+
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_solve_burn)
-            
+
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'do_burn failed', k_bad
             return
             call mesa_error(__FILE__,__LINE__,'do_burn')
-         
-         
+
+
             do_burn = retry
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
@@ -973,10 +973,10 @@
          logical, intent(in) :: skip_burn, dbg_in
          real(dp), intent(out) :: avg_epsnuc
          integer, intent(out) :: num_iters_out, ierr
-         
+
          real(dp), target :: xa_start_ary(species)
          real(dp), pointer :: xa_start(:)
-         
+
          real(dp) :: stptry, eps, odescal, &
             starting_log10T, ending_log10T, ending_eps_neu_total, &
             Cv0, eta0, substep_start_time
@@ -986,12 +986,12 @@
          real(dp), pointer, dimension(:) :: log10Ts_f1, log10Rhos_f1, etas_f1, &
             dxdt_source_term, times
          logical :: use_pivoting, trace, burn_dbg
-         
+
          include 'formats'
 
          ierr = 0
          num_iters_out = 0
-         
+
          if (skip_burn) then
             avg_epsnuc = 0d0
             s% eps_nuc(k) = 0d0
@@ -1006,30 +1006,30 @@
             s% eps_nuc_neu_total(k) = 0d0
             return
          end if
-         
+
          log10Ts_f1 => log10Ts_ary
          log10Rhos_f1 => log10Rhos_ary
          etas_f1 => etas_ary
-         
+
          nullify(dxdt_source_term, times)
-         
+
          xa_start => xa_start_ary
 
          stptry = 0d0
          eps = s% op_split_burn_eps
-         odescal = s% op_split_burn_odescal         
-         max_steps = s% burn_steps_hard_limit         
-         use_pivoting = .false. ! .true.
+         odescal = s% op_split_burn_odescal
+         max_steps = s% burn_steps_hard_limit
+         use_pivoting = .false.  ! .true.
          trace = .false.
          burn_dbg = .false.
          starting_log10T = s% lnT(k)/ln10
-         
+
          do i=1,species
             xa_start(i) = s% xa(i,k)
          end do
-         
+
          substep_start_time = 0d0
-         
+
          if (s% use_other_split_burn) then
             log10Ts_f1 => log10Ts_ary
             log10Rhos_f1 => log10Rhos_ary
@@ -1055,7 +1055,7 @@
                return
                call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
-            
+
          else if (s% T(k) >= min_T_for_const_density_solver) then
             Cv0 = s% Cv(k)
             eta0 = s% eta(k)
@@ -1106,14 +1106,14 @@
                call mesa_error(__FILE__,__LINE__,'burn1_zone')
             end if
          end if
-         
+
          s% raw_rate(:,k) = 0d0
          s% screened_rate(:,k) = 0d0
          s% eps_nuc_rate(:,k) = 0d0
          s% eps_neu_rate(:,k) = 0d0
 
          num_iters_out = naccpt
-         
+
          ! make extra call to get eps_nuc_categories
          call do1_net(s, k, s% species, s% num_reactions, .false., ierr)
          if (ierr /= 0) then
@@ -1122,7 +1122,7 @@
             return
             call mesa_error(__FILE__,__LINE__,'burn1_zone')
          end if
-               
+
          s% eps_nuc(k) = 0d0
          s% d_epsnuc_dlnd(k) = 0d0
          s% d_epsnuc_dlnT(k) = 0d0
@@ -1133,14 +1133,14 @@
          s% d_dxdt_nuc_dT(:,k) =  0d0
          s% d_dxdt_nuc_dx(:,:,k) =  0d0
          ! below, restore eps_nuc_neu to op_split zones.
-         s% eps_nuc_neu_total(k) = ending_eps_neu_total 
-         
-         do i=1,species ! for use by dX_nuc_drop timestep limiter
+         s% eps_nuc_neu_total(k) = ending_eps_neu_total
+
+         do i=1,species  ! for use by dX_nuc_drop timestep limiter
             s% dxdt_nuc(i,k) = (s% xa(i,k)-xa_start(i))/dt
          end do
-         
+
          contains
-         
+
          subroutine get_eos_info_for_burn_at_const_density( &
                eos_handle, species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
@@ -1148,8 +1148,8 @@
             use eos_lib, only: eosDT_get
             use eos_def
             integer, intent(in) :: eos_handle, species
-            integer, pointer :: chem_id(:) ! maps species to chem id
-            integer, pointer :: net_iso(:) ! maps chem id to species number
+            integer, pointer :: chem_id(:)  ! maps species to chem id
+            integer, pointer :: net_iso(:)  ! maps chem id to species number
             real(dp), intent(in) :: &
                xa(:), rho, logRho, T, logT
             real(dp), intent(out) :: &
@@ -1161,7 +1161,7 @@
 
             include 'formats'
             ierr = 0
-            
+
             call eosDT_get( &
                eos_handle, species, chem_id, net_iso, xa, &
                Rho, logRho, T, logT, &
@@ -1177,7 +1177,7 @@
 
             eta = res(i_eta)
             d_eta_dlnT = d_dlnT(i_eta)
-         
+
          end subroutine get_eos_info_for_burn_at_const_density
 
 

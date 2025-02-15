@@ -33,7 +33,7 @@
       implicit none
 
       contains
-      
+
 
       subroutine set_v_flag(id, v_flag, ierr)
          integer, intent(in) :: id
@@ -48,14 +48,14 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% v_flag .eqv. v_flag) return
 
          nz = s% nz
          s% v_flag = v_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. v_flag) then ! remove i_v's
+         if (.not. v_flag) then  ! remove i_v's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -70,7 +70,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (v_flag) then ! insert i_v's
+         if (v_flag) then  ! insert i_v's
             i_v = s% i_v
             s% v_center = 0d0
             call insert(s% xh)
@@ -95,8 +95,8 @@
          end if
 
          call set_chem_names(s)
-         
-         if (v_flag .and. s% u_flag) then ! turn off u_flag when turn on v_flag
+
+         if (v_flag .and. s% u_flag) then  ! turn off u_flag when turn on v_flag
             call set_u_flag(id, .false., ierr)
          end if
 
@@ -150,7 +150,7 @@
 
          num_u_vars = 1
 
-         if (.not. u_flag) then ! remove
+         if (.not. u_flag) then  ! remove
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -165,11 +165,11 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (u_flag) then ! insert
+         if (u_flag) then  ! insert
             i_u = s% i_u
             call insert(s% xh)
             call insert(s% xh_start)
-            if (s% v_flag) then ! use v to initialize u
+            if (s% v_flag) then  ! use v to initialize u
                i_v = s% i_v
                do k=1,nz-1
                   s% xh(i_u,k) = 0.5d0*(s% xh(i_v,k) + s% xh(i_v,k+1))
@@ -187,8 +187,8 @@
          end if
 
          call set_chem_names(s)
-         
-         if (u_flag .and. s% v_flag) then ! turn off v_flag when turn on u_flag
+
+         if (u_flag .and. s% v_flag) then  ! turn off v_flag when turn on u_flag
             call set_v_flag(id, .false., ierr)
          end if
 
@@ -244,7 +244,7 @@
          s% RTI_flag = RTI_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. RTI_flag) then ! remove i_alpha_RTI's
+         if (.not. RTI_flag) then  ! remove i_alpha_RTI's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -259,7 +259,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (RTI_flag) then ! insert i_alpha_RTI's
+         if (RTI_flag) then  ! insert i_alpha_RTI's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_alpha_RTI,1:nz) = 0d0
@@ -312,13 +312,13 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          !write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
          !write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
          if (s% RSP2_flag .eqv. RSP2_flag) return
 
          nz = s% nz
-         
+
          s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
 
@@ -329,14 +329,14 @@
 
          call set_var_info(s, ierr)
          if (ierr /= 0) return
-         
+
          write(*,*) 'set_RSP2 variables and equations'
          if (.false.) then
             do i=1,s% nvar_hydro
                write(*,'(i3,2a20)') i, trim(s% nameofequ(i)), trim(s% nameofvar(i))
             end do
          end if
-         
+
          call update_nvar_allocs(s, nvar_hydro_old, s% nvar_chem, ierr)
          if (ierr /= 0) return
 
@@ -344,7 +344,7 @@
          if (ierr /= 0) return
 
          if (RSP2_flag) then
-            call insert1(s% i_w) 
+            call insert1(s% i_w)
             if (s% RSP_flag) then
                do k=1,nz
                   s% xh(s% i_w,k) = sqrt(max(0d0,s% xh(s% i_Et_RSP,k)))
@@ -359,27 +359,27 @@
                ierr = -1
                return
             end if
-            call insert1(s% i_Hp) ! will be initialized by set_RSP2_vars
+            call insert1(s% i_Hp)  ! will be initialized by set_RSP2_vars
          end if
 
          call set_chem_names(s)
-         
+
          if (.not. RSP2_flag) return
-         
-         if (s% RSP_flag) then ! turn off RSP_flag when turn on RSP2_flag
+
+         if (s% RSP_flag) then  ! turn off RSP_flag when turn on RSP2_flag
             call set_RSP_flag(id, .false., ierr)
             if (ierr /= 0) return
          end if
-         
+
          call set_v_flag(s% id, .true., ierr)
          if (ierr /= 0) return
-         
+
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return
 
          call set_RSP2_vars(s,ierr)
          if (ierr /= 0) return
-         
+
          if (s% RSP2_remesh_when_load) then
             write(*,*) 'doing automatic remesh for RSP2'
             call remesh_for_RSP2(s,ierr)
@@ -387,14 +387,14 @@
             call set_qs(s, nz, s% q, s% dq, ierr)
             if (ierr /= 0) return
             call set_m_and_dm(s)
-            call set_dm_bar(s, nz, s% dm, s% dm_bar)   
-            call set_vars(s, s% dt, ierr) ! redo after remesh_for_RSP2
+            call set_dm_bar(s, nz, s% dm, s% dm_bar)
+            call set_vars(s, s% dt, ierr)  ! redo after remesh_for_RSP2
             if (ierr /= 0) return
          end if
-         
-         
-         
-         contains     
+
+
+
+         contains
 
          subroutine insert1(i_var)
             integer, intent(in) :: i_var
@@ -408,7 +408,7 @@
                call insert(s% xh_old,i_var)
             end if
          end subroutine insert1
-             
+
          subroutine remove1(i_remove)
             integer, intent(in) :: i_remove
             call del(s% xh,i_remove)
@@ -494,10 +494,10 @@
          end if
 
          call set_chem_names(s)
-         
+
          if (RSP_flag) call set_v_flag(s% id, .true., ierr)
 
-         contains     
+         contains
 
          subroutine insert1(i_var)
             integer, intent(in) :: i_var
@@ -510,7 +510,7 @@
                call insert(s% xh_old,i_var)
             end if
          end subroutine insert1
-             
+
          subroutine remove1(i_remove)
             integer, intent(in) :: i_remove
             call del(s% xh,i_remove)
@@ -561,14 +561,14 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% w_div_wc_flag .eqv. w_div_wc_flag) return
 
          nz = s% nz
          s% w_div_wc_flag = w_div_wc_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. w_div_wc_flag) then ! remove i_w_div_wc's
+         if (.not. w_div_wc_flag) then  ! remove i_w_div_wc's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -583,7 +583,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (w_div_wc_flag) then ! insert i_w_div_w's
+         if (w_div_wc_flag) then  ! insert i_w_div_w's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_w_div_wc,1:nz) = 0d0
@@ -631,14 +631,14 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         
+
          if (s% j_rot_flag .eqv. j_rot_flag) return
 
          nz = s% nz
          s% j_rot_flag = j_rot_flag
          nvar_hydro_old = s% nvar_hydro
 
-         if (.not. j_rot_flag) then ! remove i_j_rot's
+         if (.not. j_rot_flag) then  ! remove i_j_rot's
             call del(s% xh)
             call del(s% xh_start)
             if (associated(s% xh_old) .and. s% generations > 1) call del(s% xh_old)
@@ -653,7 +653,7 @@
          call check_sizes(s, ierr)
          if (ierr /= 0) return
 
-         if (j_rot_flag) then ! insert i_j_rot's
+         if (j_rot_flag) then  ! insert i_j_rot's
             call insert(s% xh)
             call insert(s% xh_start)
             s% xh(s% i_j_rot,1:nz) = 0d0
@@ -716,7 +716,7 @@
          s% am_nu_rot_flag = am_nu_rot_flag
          s% am_nu_rot(1:s% nz) = 0
       end subroutine set_am_nu_rot_flag
-      
+
 
       subroutine set_rotation_flag(id, rotation_flag, ierr)
          integer, intent(in) :: id

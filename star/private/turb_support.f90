@@ -60,7 +60,7 @@ contains
       end if
    end function check_if_must_fall_back_to_MLT
 
-   subroutine get_gradT(s, MLT_option, & ! used to create models
+   subroutine get_gradT(s, MLT_option, &  ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
          iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
@@ -71,7 +71,7 @@ contains
          XH1, cgrav, m, gradL_composition_term, mixing_length_alpha
       integer, intent(in) :: iso
       real(dp), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
-      integer, intent(out) :: mixing_type, ierr 
+      integer, intent(out) :: mixing_type, ierr
       type(auto_diff_real_star_order1) :: &
          gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
          Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad
@@ -101,8 +101,8 @@ contains
       D = D_ad%val
       Gamma = Gamma_ad%val
    end subroutine get_gradT
-   
-      
+
+
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
          gradr_in, grada, scale_height, mixing_length_alpha, &
@@ -117,8 +117,8 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
          gradT, Y_face, mlt_vc, D, Gamma
-      integer, intent(out) :: ierr 
-              
+      integer, intent(out) :: ierr
+
       real(dp) :: cgrav, m, XH1
       integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp
@@ -126,7 +126,7 @@ contains
       ierr = 0
 
       gradr = gradr_in
-      
+
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
       L = wrap_L_00(s,k)
@@ -141,7 +141,7 @@ contains
       Cp = get_Cp_face(s,k)
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
-      
+
       if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, k, MLT_option, &
             r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
@@ -183,7 +183,7 @@ contains
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
-      
+
       type(auto_diff_real_star_order1) :: Pr, Pg, grav, Lambda, gradL, beta
       real(dp) :: conv_vel_start, scale
 
@@ -215,9 +215,9 @@ contains
       Pg = P - Pr
       beta = Pg / P
       Lambda = mixing_length_alpha*scale_height
-      grav = cgrav*m/pow2(r)   
+      grav = cgrav*m/pow2(r)
       if (s% use_Ledoux_criterion) then
-         gradL = grada + gradL_composition_term ! Ledoux temperature gradient
+         gradL = grada + gradL_composition_term  ! Ledoux temperature gradient
       else
          gradL = grada
       end if
@@ -228,7 +228,7 @@ contains
       Y_face = gradT - gradL
       conv_vel = 0d0
       D = 0d0
-      Gamma = 0d0  
+      Gamma = 0d0
       if (k /= 0) s% superad_reduction_factor(k) = 1d0
 
       ! Bail if we asked for no mixing, or if parameters are bad.
@@ -351,7 +351,7 @@ contains
                return
             end if
          end if
-      end if 
+      end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.
       if (D%val < s% remove_small_D_limit .or. is_bad(D%val)) then
@@ -410,7 +410,7 @@ contains
                   end if
                   !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
-               
+
                if (Gamma_term > 0d0) then
                   Gamma_factor = Gamma_term/pow(beta,0.5d0)*diff_grads_factor
                   Gamma_factor = Gamma_factor + 1d0
@@ -421,13 +421,13 @@ contains
                   end if
                end if
             end if
-         end if 
+         end if
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
             grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
             gradr_scaled = grad_scale*gradr
          end if
-      end
+      end subroutine set_superad_reduction
    end subroutine Get_results
 
 

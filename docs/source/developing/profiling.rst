@@ -22,10 +22,10 @@ valgrind must be launched by hand, for instance via
 Other useful options:
 
 .. code-block:: bash
-                
+
     --stacks=yes # Makes it run slower but will include information about the stack usage
 
-Once finished the tool will write a file massif.out.$PID where $PID is the PID of the 
+Once finished the tool will write a file massif.out.$PID where $PID is the PID of the
 ./star run. If you ctrl-c the run you will still get the output up to that point, but
 otherwise you will need to wait till the run finishes before being able to view the output.
 
@@ -35,7 +35,7 @@ To visualize the data use:
 
     massif-visualizer massif.out.$PID
 
-which is avilable from `<https://github.com/KDE/massif-visualizer>`_ or through your local package manager.
+which is available from `<https://github.com/KDE/massif-visualizer>`_ or through your local package manager.
 
 
 CPU Usage
@@ -55,11 +55,11 @@ valgrind must be launched by hand, for instance via
 Other useful options:
 
 .. code-block:: bash
-                
+
     --dump-instr=yes --collect-jumps=yes #  Dump extra information about the run into the output
     --dump-every-bb=1000000000 # How often to output a file with the profile information, this will output maybe once every few steps. This lets you start profiling while the run is still going.
 
-Once finished the tool will write a file callgrind.out.$PID.$NUM where $PID is the PID of the 
+Once finished the tool will write a file callgrind.out.$PID.$NUM where $PID is the PID of the
 ./star run. $NUM is a seqeuential output number for the each output file.
 
 To visualize the data use:
@@ -68,10 +68,10 @@ To visualize the data use:
 
     kcachegrind callgrind.out.*
 
-which is avilable from `<https://kcachegrind.github.io/html/Home.html>`_ or through your local package manager.
+which is available from `<https://kcachegrind.github.io/html/Home.html>`_ or through your local package manager.
 
 
-An alternative non-interactive visualization can be produced via `gprof2dot.py <https://github.com/jrfonseca/gprof2dot>`_ and `graphviz <https://graphviz.org/>`_.  
+An alternative non-interactive visualization can be produced via `gprof2dot.py <https://github.com/jrfonseca/gprof2dot>`_ and `graphviz <https://graphviz.org/>`_.
 
 .. code-block:: console
 

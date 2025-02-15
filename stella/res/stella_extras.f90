@@ -18,11 +18,11 @@ program main
    real(dp), allocatable,dimension(:) :: &
       t,m,dm,h,he,c,n,o,ne,na,mg,al,si,s,ar,ca,fe,ni
    real(dp) :: dum,time,X,sum_tau,tauph,tau_extra,denmax,gdepos
-   character*132 runname,filestr,fname,test_str
-   character*256 line, my_mesa_dir
+   character*132 :: runname,filestr,fname,test_str
+   character*256 :: line, my_mesa_dir
 
    real(dp), parameter :: &
-      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023, Z_div_X_solar = 0.02293d0, &
+      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023d0, Z_div_X_solar = 0.02293d0, &
       tau_sob_hi = 2d0, tau_sob_med = 1d0, tau_sob_lo = 0.2d0
    integer, parameter :: num_logRhos = 41, num_logTs = 117, iounit = 33, &
       max_lbol = 10000, n_colors = 5
@@ -44,17 +44,17 @@ program main
    integer :: nm, num_models, cnt, k_phot, iday
 
    my_mesa_dir = '../..'
-   call const_init(my_mesa_dir,ierr)     
+   call const_init(my_mesa_dir,ierr)
 	if (ierr /= 0) then
 	   write(*,*) 'const_init failed'
 	   call mesa_error(__FILE__,__LINE__)
-	end if        
+	end if
 
    call math_init()
 
    call colors_init(1, &
-      (/ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' /), &
-      (/ n_colors /), ierr)
+      [ trim(my_mesa_dir) // '/data/colors_data/blackbody_johnson.dat' ], &
+      [ n_colors ], ierr)
    if (ierr /= 0) then
       write(*,*) 'colors_init failed during initialization'
       return
@@ -130,7 +130,7 @@ program main
    else
       filestr = 'mesa'
    end if
-      
+
    fname = '../modmake/'//trim(filestr)//'.hyd'
    open(25,file=fname, status='old')
    write(*,*) 'read ' // trim(filestr)//'.hyd'
@@ -139,7 +139,7 @@ program main
    write(*,*) 'read ' // trim(filestr)//'.lbol'
    fname = trim(filestr)//'.lbol'
    open(21,file=fname, status='old')
-   read(21,*) ! skip line
+   read(21,*)  ! skip line
    num_lbol = 0
    num_lbol_max = 0
    time_lbol(1) = -1
@@ -156,7 +156,7 @@ program main
          t0 = time_lbol(num_lbol)
          num_lbol_max = num_lbol
       end if
-   end do  
+   end do
 
 334 continue
 
@@ -179,10 +179,10 @@ program main
    write(*,*) 'read ' // trim(filestr)//'.tt'
    fname = trim(filestr)//'.tt'
    open(21,file=fname, status='old')
-  
+
    fname = trim(filestr)//'.lbol_lnuc.txt'
    open(24,file=fname, status='unknown')
-  
+
    do i=1,1000
       read(21,'(a)',end=335) line
       if (len_trim(line) < 7) cycle
@@ -200,7 +200,7 @@ program main
          dum = interp_logLbol(time)
          write(24,'(99(1pe18.6,x))') time-t0, dum, log10(gdepos*1d50)
       end do
-   end do  
+   end do
 
 335 continue
    close(21)
@@ -256,10 +256,10 @@ program main
    write(27,'(99(a13))') 't-t0', 'tau', 'rho', 'T', 'r', 'v'
 
    write(*,*) 'read ' // trim(filestr)//'.swd'
-   
+
    ! read data
    open(20,file=trim(filestr)//'.res', status='old')
-   
+
    do nm=1,num_models
 
       do j=1,zone
@@ -279,7 +279,7 @@ program main
          end if
          den(j,nm)=10**den(j,nm)*1d-6
       end do
-      
+
       time = t(nm)
       if (time < 0.1d0) then
          iday = int(time*1d2 + 1d-6)
@@ -304,7 +304,7 @@ program main
          read(20,'(a)') line
          if (line(1:len_trim(test_str)) /= trim(test_str)) cycle
          !write(*,*) 'i', i, line(1:len_trim(test_str))
-         read(20,*) ! skip column headers
+         read(20,*)  ! skip column headers
          do j=1,zone
             read(20,'(a)') line
             !write(*,*) i, j, trim(line)
@@ -314,12 +314,12 @@ program main
          end do
          exit
       end do
-      
+
    end do
-   
+
    close(20)
    close(21)
-   
+
    ! write results
    do nm=1,num_models
       time = t(nm)
@@ -330,12 +330,12 @@ program main
          sum_tau=sum_tau+kap(j,nm)*den(j,nm)*(r(j,nm)-r(j-1,nm))
          tau(j-1,nm) = sum_tau
       end do
-      
+
       write(27,'(99(1pd13.4))') time-t0, &
          tau(1,nm), den(1,nm), temp(1,nm), r(1,nm), v(1,nm)
 
       k_phot = 0
-      if (sum_tau >= 1d0+tauph) then ! record photosphere information
+      if (sum_tau >= 1d0+tauph) then  ! record photosphere information
          do j=zone,2,-1
             if(tau(j-1,nm) >= tauph) then
                k_phot = j
@@ -347,7 +347,7 @@ program main
                !   call mesa_error(__FILE__,__LINE__)
                !end if
                dum = interp_logLbol(time)
-               Lbol = exp10(dum) 
+               Lbol = exp10(dum)
                L_div_Lsun = Lbol/Lsun
                rphot = alfa*r(j,nm)+beta*r(j-1,nm)
                mphot = star_mass-(alfa*xm(j,nm)+beta*xm(j-1,nm))
@@ -394,7 +394,7 @@ program main
             call mesa_error(__FILE__,__LINE__)
          end if
          logRho = log10(density)
-         logRho = min(logRhos(num_logRhos), max(logRhos(1), logRho))  
+         logRho = min(logRhos(num_logRhos), max(logRhos(1), logRho))
          logT = log10(temp(k,nm))
          logT = min(logTs(num_logTs), max(logTs(1), logT))
          ierr = 0
@@ -414,7 +414,7 @@ program main
          end if
          time_sec = time*secday
          tau_sob = pi*qe*qe/(me*clight)*n_Fe*eta*f*time_sec*lambda0
-         
+
          if ((tau_sob > tau_sob_lo .or. k==2) .and. v_sob_lo_tau == 0d0) then
             alfa = (tau_sob_lo - tau_sob_prev)/(tau_sob - tau_sob_prev)
             beta = 1d0 - alfa
@@ -422,7 +422,7 @@ program main
             m_sob_lo_tau = star_mass - (alfa*xm(k,nm) + beta*xm(k+1,nm))
             r_sob_lo_tau = alfa*r(k,nm) + beta*r(k+1,nm)
          end if
-         
+
          if ((tau_sob > tau_sob_med .or. k==2) .and. v_sob_med_tau == 0d0) then
             alfa = (tau_sob_med - tau_sob_prev)/(tau_sob - tau_sob_prev)
             beta = 1d0 - alfa
@@ -430,7 +430,7 @@ program main
             m_sob_med_tau = star_mass - (alfa*xm(k,nm) + beta*xm(k+1,nm))
             r_sob_med_tau = alfa*r(k,nm) + beta*r(k+1,nm)
          end if
-         
+
          if (tau_sob > tau_sob_hi .or. k==2) then
             alfa = (tau_sob_hi - tau_sob_prev)/(tau_sob - tau_sob_prev)
             beta = 1d0 - alfa
@@ -445,9 +445,9 @@ program main
                   m_sob_med_tau, r_sob_med_tau, &
                   m_sob_hi_tau, r_sob_hi_tau
             exit
-         end if 
-               
-         tau_sob_prev = tau_sob                
+         end if
+
+         tau_sob_prev = tau_sob
       end do
 
    end do
@@ -468,7 +468,7 @@ program main
    call save_day_post_Lbol_max(3d0,t0,zone,star_mass,mass_IB,'003')
    call save_day_post_Lbol_max(4d0,t0,zone,star_mass,mass_IB,'004')
    call save_day_post_Lbol_max(5d0,t0,zone,star_mass,mass_IB,'005')
-   
+
    call save_day_post_Lbol_max(10d0,t0,zone,star_mass,mass_IB,'010')
    call save_day_post_Lbol_max(20d0,t0,zone,star_mass,mass_IB,'020')
    call save_day_post_Lbol_max(30d0,t0,zone,star_mass,mass_IB,'030')
@@ -495,7 +495,7 @@ program main
    contains
 
    real(dp) function interp_logLbol(time)
-      real(dp), intent(in) :: time ! time since start of run
+      real(dp), intent(in) :: time  ! time since start of run
       integer :: k
       real(dp) :: alfa, beta
       do k=1,num_lbol-1
@@ -508,7 +508,7 @@ program main
       end do
       interp_logLbol = logL_lbol(num_lbol)
    end function interp_logLbol
-   
+
    real(dp) function get1_synthetic_color_abs_mag(name) result(mag)
       character (len=*) :: name
       mag = get_abs_mag_by_name(name, logT, log_g, Fe_H, L_div_Lsun, ierr)
@@ -523,16 +523,16 @@ program main
       real(dp), intent(in) :: day, t0, star_mass, mass_IB
       integer, intent(in) :: zone
       character (len=*), intent(in) :: daystr
-      
+
       integer, parameter :: io = 26, ncol = 36
       real(dp) :: tnm, t1, t2, alfa, beta, data1(ncol), data2(ncol)
       integer :: k, i, nm1, nm2
       character (len=132) :: fname
       include 'formats'
-      
+
       if (t0 < 0d0) return
-      
-      tnm = day + t0 ! this is the desired run time
+
+      tnm = day + t0  ! this is the desired run time
       nm1 = 0
       nm2 = 0
       do nm=1,num_models-1
@@ -542,20 +542,20 @@ program main
             exit
          end if
       end do
-      
+
       if (nm1 == 0 .or. nm2 == 0) then
          write(*,*) 'save_day_post_Lbol_max failed to find models for', day
          return
       end if
 
-      alfa = (t2 - tnm)/(t2 - t1) ! fraction from 1st time
+      alfa = (t2 - tnm)/(t2 - t1)  ! fraction from 1st time
       beta = 1d0 - alfa
-      
+
       if (alfa > 1d0 .or. alfa < 0d0) then
          write(*,*) 'save_day_post_Lbol_max failed for', day
          return
       end if
-      
+
       write(fname,'(a)') trim(filestr)// '.day' // trim(daystr) // '_post_Lbol_max.data'
       open(io,file=trim(fname), status='unknown')
 
@@ -565,44 +565,44 @@ program main
       write(io,'(a20,2(1p,e25.15))') 'total mass', star_mass*msun, star_mass
       write(io,'(A)')
       write(io,'(99a25)') '', &
-         'mass of cell (g)', & 
-         'cell center m (g)', & 
-         'cell center R (cm)', & 
+         'mass of cell (g)', &
+         'cell center m (g)', &
+         'cell center R (cm)', &
          'cell center v (cm/s)', &
-         'avg density', & 
-         'radiation pressure', & 
-         'avg temperature', & 
-         'radiation temperature', & 
-         'avg opacity', & 
-         'tau', & 
-         'outer edge m (g)', & 
-         'outer edge r (cm)', & 
-         'h1', & 
-         'he3', & 
-         'he4', & 
-         'c12', & 
-         'n14', & 
-         'o16', & 
-         'ne20', & 
-         'na23', & 
-         'mg24', & 
-         'si28', & 
-         's32', & 
-         'ar36', & 
-         'ca40', & 
-         'ti44', & 
-         'cr48', & 
-         'cr60', & 
-         'fe52', & 
-         'fe54', & 
-         'fe56', & 
-         'co56', & 
+         'avg density', &
+         'radiation pressure', &
+         'avg temperature', &
+         'radiation temperature', &
+         'avg opacity', &
+         'tau', &
+         'outer edge m (g)', &
+         'outer edge r (cm)', &
+         'h1', &
+         'he3', &
+         'he4', &
+         'c12', &
+         'n14', &
+         'o16', &
+         'ne20', &
+         'na23', &
+         'mg24', &
+         'si28', &
+         's32', &
+         'ar36', &
+         'ca40', &
+         'ti44', &
+         'cr48', &
+         'cr60', &
+         'fe52', &
+         'fe54', &
+         'fe56', &
+         'co56', &
          'ni56', &
          'luminosity', &
          'n_bar', &
-         'n_e' 
+         'n_e'
       write(io,'(A)')
-      do j=1,zone  
+      do j=1,zone
          !read(io1,*) i1, data1(1:ncol)
          !read(io2,*) i2, data2(1:ncol)
          call get1_data(j,nm1,data1)
@@ -628,9 +628,9 @@ program main
 333    continue
       write(*,*) 'failed in save_day_post_Lbol_max'
       call mesa_error(__FILE__,__LINE__)
-      
+
    end subroutine save_day_post_Lbol_max
-      
+
    subroutine get1_data(j,nm,d)
       integer, parameter :: ncol = 36
       integer, intent(in) :: j,nm
@@ -645,13 +645,13 @@ program main
          r_edge = r(j,nm)
          v_edge = v(j,nm)*1d8
       end if
-      d(1:ncol) = (/ &
+      d(1:ncol) = [ &
          dm(j)*msun, m(j)*msun, r(j,nm), v_edge, den(j,nm), &
          crad*tempr(j,nm)**4/3, temp(j,nm), tempr(j,nm), kap(j,nm), tau(j,nm), &
          m_edge, r_edge, &
          h(j),0d0,he(j),c(j),n(j),o(j),ne(j),na(j),mg(j),si(j),s(j),ar(j), ca(j), &
          0d0, 0d0, 0d0, 0d0, 0d0, fe(j), 0d0, ni(j), lum(j,nm), n_bar(j,nm), n_e(j,nm) &
-         /)
+         ]
    end subroutine get1_data
 
 

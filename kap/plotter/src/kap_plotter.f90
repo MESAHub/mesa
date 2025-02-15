@@ -208,25 +208,25 @@ program kap_plotter
    end if
 
 
-   if (nT .gt. 1) then
+   if (nT > 1) then
       logT_step = delta_logT / (nT-1d0)
    else
       logT_step = 0
    end if
 
-   if (nRho .gt. 1) then
+   if (nRho > 1) then
       logRho_step = delta_logRho / (nRho-1d0)
    else
       logRho_step = 0
    end if
 
-   if (nX .gt. 1) then
+   if (nX > 1) then
       X_step = delta_X / (nX-1d0)
    else
       X_step = 0
    end if
 
-   if (nZ .gt. 1) then
+   if (nZ > 1) then
       Z_step = delta_Z / (nZ-1d0)
    else
       Z_step = 0
@@ -242,8 +242,8 @@ program kap_plotter
    X = X_center
    Z = Z_center
 
-   do j=1,njs !x
-      do k=1,nks !y
+   do j=1,njs  !x
+      do k=1,nks  !y
 
          select case(xname)
          case('T')
@@ -312,7 +312,7 @@ program kap_plotter
          call set_nan(dlnkap_dlnRho)
          call set_nan(dlnkap_dlnT)
          call set_nan(dlnkap_dxa)
-         
+
          call kap_get( &
               kap_handle, species, chem_id, net_iso, xa, log10Rho, log10T, &
               res(i_lnfree_e), d_dlnd(i_lnfree_e), d_dlnT(i_lnfree_e), &
@@ -478,8 +478,8 @@ contains
 
       xa = 0d0
       xa(h1) = X
-      xa(c12) = 0.5*Z
-      xa(o16) = 0.5*Z
+      xa(c12) = 0.5d0*Z
+      xa(o16) = 0.5d0*Z
       xa(fe56) = 0.0
       xa(he4) = 1d0 - xa(h1) - xa(c12) - xa(o16) - xa(fe56)
 
@@ -500,7 +500,7 @@ contains
       lnd = log10Rho*ln10
 
       ! must call eos to get new lnfree_e info
-      
+
       if (doing_d_dlnd) then
          log_var = (lnd + delta_x)/ln10
          var = exp10(log_var)

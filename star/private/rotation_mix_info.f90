@@ -37,8 +37,8 @@
       private
       public :: set_rotation_mixing_info, smooth_for_rotation
 
-      real(dp), parameter :: Ri_crit = 0.25d0 ! critical Richardson number
-      real(dp), parameter :: R_crit = 2500d0 ! critical Reynolds number
+      real(dp), parameter :: Ri_crit = 0.25d0  ! critical Richardson number
+      real(dp), parameter :: R_crit = 2500d0  ! critical Reynolds number
 
       integer, parameter :: i_DSI = 1
       integer, parameter :: i_SH = i_DSI + 1
@@ -60,9 +60,9 @@
 
          real(dp) :: f_mu, q, D_ST_old, nu_ST_old
          ! the following are all defined at cell boundaries
-         real(dp), dimension(:), pointer :: & ! just copies of pointers
+         real(dp), dimension(:), pointer :: &  ! just copies of pointers
             r, m, L, j_rot, gradT, grada, grav, visc, Ri
-         real(dp), dimension(:), allocatable :: & ! allocated temporary storage
+         real(dp), dimension(:), allocatable :: &  ! allocated temporary storage
             csound, rho, T, P, cp, cv, chiRho, abar, zbar, gradT_sub_grada, &
             opacity, kap_cond, gamma1, mu_alt, eps_nuc, enu, L_neu, delta, &
             scale_height, omega, cell_dr, &
@@ -77,7 +77,7 @@
             v_gsf, H_gsf, &
             N2, N2_mu
          real(dp), allocatable :: smooth_work(:,:), saved(:,:)
-         logical, allocatable :: unstable(:,:) ! (num_instabilities, nz)
+         logical, allocatable :: unstable(:,:)  ! (num_instabilities, nz)
 
          integer :: nz, k, k0, which, op_err
          real(dp) :: alfa, growth_limit, age_fraction, &
@@ -205,7 +205,7 @@
                         angsmt = s% ST_angsmt
                         prev_out_q = 0d0
                         prev_q = 1d0
-                        do k=2, nz-1 ! ignore k=1 or nz edge case
+                        do k=2, nz-1  ! ignore k=1 or nz edge case
                            if (s% m(k) > s% mstar_old) cycle
                            do while (k0 < s% prev_mesh_nz)
                               if (s% m(k)/s% mstar_old > prev_q) exit
@@ -232,9 +232,9 @@
                      ! calculate B_r and B_phi
                      do k = 1, nz
                         q = s% omega_shear(k)
-                        s% dynamo_B_r(k) = & ! eqn 11, Heger et al. 2005
+                        s% dynamo_B_r(k) = &  ! eqn 11, Heger et al. 2005
                            pow(pow2(pi4*rho(k)*s% nu_ST(k)*q/r(k))*abs(omega(k))*s% nu_ST(k),0.25D0)
-                        s% dynamo_B_phi(k) = & ! eqn 12, Heger et al. 2005
+                        s% dynamo_B_phi(k) = &  ! eqn 12, Heger et al. 2005
                            pow(pow2(pi4*rho(k)*omega(k)*q*r(k))*abs(omega(k))*s% nu_ST(k),0.25d0)
                      end do
 
@@ -259,13 +259,13 @@
          end do
 !$OMP END PARALLEL DO
          if (failed('set_rotation_mixing_info instabilities', ierr)) return
-         
+
          if (s% D_omega_flag .and. s% doing_finish_load_model) then
             do k=1,nz
                s% D_omega(k) = 0d0
             end do
          else if (s% D_omega_flag) then
-                     
+
             do k=1,nz
                if (s% q(k) <= s% max_q_for_D_omega_zero_in_convection_region .and. &
                    s% mixing_type(k) == convective_mixing) then
@@ -302,7 +302,7 @@
                   call mesa_error(__FILE__,__LINE__,'rotation mix')
                end if
             end do
-            
+
             if (s% smooth_D_omega > 0) then
                call smooth_for_rotation(s, s% D_omega, s% smooth_D_omega, smooth_work(1:nz,1))
                do k=1,nz
@@ -312,9 +312,9 @@
                   end if
                end do
             end if
-            
+
             if (s% D_omega_mixing_rate > 0d0 .and. s% dt > 0) then
-               call mix_D_omega 
+               call mix_D_omega
                do k=1,nz
                   if (is_bad(s% D_omega(k))) then
                      write(*,2) 'after mix_D_omega s% D_omega(k)', k, s% D_omega(k)
@@ -322,9 +322,9 @@
                   end if
                end do
             end if
-            
+
          end if
-         
+
          if (s% D_omega_flag) then
             do k=1,nz
                if (is_bad(s% D_omega(k))) then
@@ -337,23 +337,23 @@
 
 
          contains
-         
-         
+
+
          subroutine mix_D_omega
             integer :: i, k, nz
-            real(dp), dimension(:), allocatable :: & ! work vectors
+            real(dp), dimension(:), allocatable :: &  ! work vectors
                sig, rhs, d, du, dl, bp, vp, xp, x
             real(dp) :: &
                dt, rate, d_ddt_dm1, d_ddt_d00, d_ddt_dp1, m, &
                d_dt, d_dt_in, d_dt_out
             include 'formats'
-            
+
             nz = s% nz
             dt = s% dt
             if (dt == 0) return
-            
+
             allocate(sig(nz), rhs(nz), d(nz), du(nz), dl(nz), bp(nz), vp(nz), xp(nz), x(nz))
-            
+
             rate = min(s% D_omega_mixing_rate, 1d0/dt)
             do k=2,nz-1
                if (s% D_omega(k) == 0 .or. s% D_omega(k+1) == 0) then
@@ -365,11 +365,11 @@
                    sig(k) = 0
                else
                   sig(k) = rate*dt
-               end if               
+               end if
             end do
             sig(1) = 0
             sig(nz) = 0
-            
+
             do k=1,nz
                if (k < nz) then
                   d_dt_in = sig(k)*(s% D_omega(k+1) - s% D_omega(k))
@@ -394,10 +394,10 @@
                else
                   du(k) = 0
                end if
-               if (k > 1) dl(k-1) = -d_ddt_dm1               
+               if (k > 1) dl(k-1) = -d_ddt_dm1
             end do
             dl(nz) = 0
-            
+
             ! solve tridiagonal
             bp(1) = d(1)
             vp(1) = rhs(1)
@@ -412,7 +412,7 @@
                xp(i) = (vp(i) - du(i)*xp(i+1))/bp(i)
                x(i) = xp(i)
             end do
-            
+
             do k=2,nz
                if (is_bad(x(k))) then
                   return
@@ -420,9 +420,9 @@
                   call mesa_error(__FILE__,__LINE__,'mix_D_omega')
                end if
             end do
-            
+
             ! update D_omega
-            
+
             do k=2,nz
                s% D_omega(k) = s% D_omega(k) + x(k)
                if (is_bad(s% D_omega(k))) then
@@ -432,7 +432,7 @@
                if (s% D_omega(k) < 0d0) s% D_omega(k) = 0d0
             end do
             s% D_omega(1) = 0d0
-         
+
          end subroutine mix_D_omega
 
 
@@ -465,7 +465,7 @@
             grav => s% grav
             visc => s% D_visc
             Ri => s% richardson_number
-            
+
             allocate( &
                csound(nz), rho(nz), T(nz), P(nz), cp(nz), cv(nz), chiRho(nz), abar(nz), zbar(nz), &
                opacity(nz), kap_cond(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
@@ -527,7 +527,7 @@
 
             do i = 1, nz
                gradT_sub_grada(i) = s% gradT(i) - s% grada_face(i)
-               gradT_sub_grada(i) = & ! make sure it isn't too close to 0
+               gradT_sub_grada(i) = &  ! make sure it isn't too close to 0
                   sign(max(abs(gradT_sub_grada(i)),1d-99),gradT_sub_grada(i))
                scale_height(i) = P(i)*r(i)*r(i)/(s% cgrav(i)*m(i)*rho(i))
                scale_height2 = sqrt(P(i)/s% cgrav(i))/rho(i)
@@ -566,10 +566,10 @@
             do i = 2, nz-1
                dRho_dr(i) = dRho(i)/dr(i)
                dRho_dr_ad(i) = rho(i)*dPressure(i)/(P(i)*gamma1(i)*dr(i))
-               dr2omega(i) = 4.5d0*j_rot(i)*d_j_rot(i)/dr(i) ! d(r^2 omega)^2/dr using i = (2/3)*r^2
+               dr2omega(i) = 4.5d0*j_rot(i)*d_j_rot(i)/dr(i)  ! d(r^2 omega)^2/dr using i = (2/3)*r^2
                domega_dlnR(i) = domega(i)*r(i)/dr(i)
                if (gradT(i) > 1d-20) then
-                  H_T(i) = scale_height(i)/gradT(i) ! -dr/dlnT, scale height of temperature
+                  H_T(i) = scale_height(i)/gradT(i)  ! -dr/dlnT, scale height of temperature
                else
                   H_T(i) = scale_height(i)
                endif
@@ -605,7 +605,7 @@
             end do
             dlnR_domega(1) = 0; dlnR_domega(nz) = 0
 
-            do k = 2, nz - 1 ! shear
+            do k = 2, nz - 1  ! shear
                s% omega_shear(k) = &
                   (omega(k-1) - omega(k+1))/(r(k-1) - r(k+1))*(r(k)/omega(k))
                s% omega_shear(k) = max(1d-30,min(1d30,abs(s% omega_shear(k))))
@@ -622,14 +622,14 @@
             ! Richardson numbers (Heger 2000, eqn 20)
             do i = 2, nz-1
                ri0 = (rho(i)*delta(i)/P(i))*pow2(dlnR_domega(i)*grav(i))
-               Ri_T(i) = ri0*max(0d0,-gradT_sub_grada(i)) ! turn off Ri_T in convection zones
+               Ri_T(i) = ri0*max(0d0,-gradT_sub_grada(i))  ! turn off Ri_T in convection zones
                Ri_mu(i) = ri0*f_mu*s% smoothed_brunt_B(i)
             end do
             Ri_T(1) = 0; Ri_T(nz) = 0
             Ri_mu(1) = 0; Ri_mu(nz) = 0
             do i=1,nz
                if (N2(i) < 0d0) then
-                  Ri(i) = 1d0 ! disable in convective region
+                  Ri(i) = 1d0  ! disable in convective region
                else
                   Ri(i) = Ri_T(i) + Ri_mu(i)
                end if
@@ -653,9 +653,9 @@
                        0.024113535d0*pow(gamma,0.49999098d0)
                ! dynamic shear viscosity
                dynvisc = 5.53d3*zbar(i)*pow(rho6,5d0/6d0)*ctmp/pow(abar(i),one_third)
-               ! add contibution of radiation
+               ! add contribution of radiation
                dynvisc = dynvisc + 4.D0*crad*pow4(T(i))/(15.D0*clight*opacity(i)*rho(i))
-               ! add contibution of electrons
+               ! add contribution of electrons
                dynvisc = dynvisc + 1.893d6*pow(rm23,2.5d0)/(zbar(i)*ctmp*xi2)
                ! kinematic shear viscosity
                visc(i) = dynvisc/rho(i)
@@ -663,7 +663,7 @@
 
             ! velocities for ES and GSF
             if (s% D_ES_factor > 0 .or. s% D_GSF_factor > 0) then
-               do i = 1, nz ! Heger 2000, eqns 35 and 36
+               do i = 1, nz  ! Heger 2000, eqns 35 and 36
                   ! the bracket_term blows up at center since r^2/L and r^2/m can both -> Inf
                   ! so bullet proof by including lower bounds
                   bracket_term = &
@@ -789,7 +789,7 @@
          end subroutine set_D_DSI
 
 
-         subroutine set_D_SH(ierr) ! comment in Langer code says "DO NOT USE"
+         subroutine set_D_SH(ierr)  ! comment in Langer code says "DO NOT USE"
             integer, intent(out) :: ierr
             integer :: i, k, kbot, ktop
             real(dp) :: instability_height, height, D
@@ -799,7 +799,7 @@
                D = grav(i)/rho(i)*(dRho_dr_ad(i)-dRho_dr(i))+dr2omega(i)/(r(i)*r(i)*r(i))
                if (D < 0) then
                   unstable(i_SH,i) = .true.
-                  s% D_SH(i) = D ! save for later
+                  s% D_SH(i) = D  ! save for later
                else
                   s% D_SH(i) = 0
                end if
@@ -845,7 +845,7 @@
             do i=1,nz
                unstable(i_SSI,i) = .false.
                ! thermal conductivity
-               radcon = 4.D0*crad*clight*T(i)*T(i)*T(i)/(3.D0*opacity(i)*rho(i)) ! erg / (K cm sec)
+               radcon = 4.D0*crad*clight*T(i)*T(i)*T(i)/(3.D0*opacity(i)*rho(i))  ! erg / (K cm sec)
                ! Prandtl-number according to Tassoul
                dynvisc = visc(i)*rho(i)
                Prandtl = dynvisc*Cv(i)/radcon
@@ -873,7 +873,7 @@
 
                   if (ktop >= kbot) cycle
 
-                  do k = ktop, kbot ! Heger 2000, eqn 31
+                  do k = ktop, kbot  ! Heger 2000, eqn 31
                      v_ssi(k)=sqrt(visc(k)/R_crit*abs(domega_dlnR(k)))
                   end do
 
@@ -886,14 +886,14 @@
                   H_ssi(ktop) = v_ssi(ktop)*(r(ktop) - r(ktop+1))/ &
                                  max(1d-99,abs(v_ssi(ktop) - v_ssi(ktop+1)))
 
-                  do k = ktop, kbot ! Heger 2000, eqn 34
+                  do k = ktop, kbot  ! Heger 2000, eqn 34
                      H_ssi(k) = min(H_ssi(k),scale_height(k))
                      v_ssi(k) = min(v_ssi(k),csound(k))
                      D = H_ssi(k)*v_ssi(k)* &
                            pow2(1d0-max(0d0,max(Ris_1(k),Ris_2(k))/Ri_crit))
                      s% D_SSI(k) = min(D, scale_height(k)*csound(k))
 
-                     if (s% D_SSI(k) > 1d100) then ! bug
+                     if (s% D_SSI(k) > 1d100) then  ! bug
                         write(*,2) 's% D_SSI(k)', k, s% D_SSI(k)
                         write(*,2) 'D', k, D
                         write(*,2) 'scale_height(k)', k, scale_height(k)
@@ -925,7 +925,7 @@
             ierr = 0
 
             do i = 1, nz
-               v = abs(ve0(i)) - abs(ve_mu(i)) ! heger 2000, eqn 38
+               v = abs(ve0(i)) - abs(ve_mu(i))  ! heger 2000, eqn 38
                if (v > 0) then
                   unstable(i_ES,i) = .true.
                   v_es(i) = v
@@ -1001,7 +1001,7 @@
                   call mesa_error(__FILE__,__LINE__,'set_D_GSF')
                   v = 0
                end if
-               v_diff = abs(v) - abs(ve_mu(i)) ! heger 2000, eqn 43
+               v_diff = abs(v) - abs(ve_mu(i))  ! heger 2000, eqn 43
                if (v_diff > 0) then
                   unstable(i_GSF,i) = .true.
                   v_gsf(i) = v_diff
@@ -1148,7 +1148,7 @@
             ierr)
          ! with modifications by S.-C. Yoon, July 2003
          type (star_info), pointer :: s
-         real(dp), dimension(:) :: & ! allocated temporary storage
+         real(dp), dimension(:) :: &  ! allocated temporary storage
             rho, T, r, L, omega, Cp, abar, zbar, delta, grav, &
             N2, N2_mu, opacity, kap_cond, scale_height
          integer, intent(out) :: ierr
@@ -1185,14 +1185,14 @@
          do k = 2, nz-1
 
             xkap = 16d0*boltz_sigma*T(k)*T(k)*T(k)/ &
-               (3d0*opacity(k)*rho(k)*rho(k)*Cp(k)) ! thermal diffusivity
+               (3d0*opacity(k)*rho(k)*rho(k)*Cp(k))  ! thermal diffusivity
 
             xsig = calc_sige(abar(k), zbar(k), rho(k), T(k), Cp(k), kap_cond(k), opacity(k))
             xeta = calc_eta(xsig)  ! magnetic diffusivity
 
             xmagn = N2(k)
             xmagnmu = N2_mu(k)
-            xmagnt = xmagn - xmagnmu ! N2_T
+            xmagnt = xmagn - xmagnmu  ! N2_T
             xmagw = abs(omega(k))
             xmagdn = rho(k)
             xmagtn = T(k)
@@ -1201,16 +1201,16 @@
 
             dlnomega_dlnr = &
                (omega(k-1) - omega(k+1))/(r(k-1) - r(k+1))*(r(k)/omega(k))
-            xmagq = max(1d-30,min(1d30,abs(dlnomega_dlnr))) ! shear
+            xmagq = max(1d-30,min(1d30,abs(dlnomega_dlnr)))  ! shear
             xmager2w = xeta/(r(k)*r(k)*abs(omega(k)))
 
             ! magnetic quantities
             if (xmagnmu > 0.0D0) then
-               xmagnn = xmagnmu*xmagfmu ! N^2
-               xmagwn = xmagw/sqrt(xmagnn) ! omega/N
-               xmagq0 = pow(xmagwn,-1.5D0)*pow(xmager2w,0.25D0) ! q0
-               xmagwa0 = xmagq*xmagwn*xmagw ! omega_A
-               xmags0 = xmagdn*xmagw*xmagw*xmagrn*xmagrn*pow3(xmagq)*pow4(xmagwn) ! S_0
+               xmagnn = xmagnmu*xmagfmu  ! N^2
+               xmagwn = xmagw/sqrt(xmagnn)  ! omega/N
+               xmagq0 = pow(xmagwn,-1.5D0)*pow(xmager2w,0.25D0)  ! q0
+               xmagwa0 = xmagq*xmagwn*xmagw  ! omega_A
+               xmags0 = xmagdn*xmagw*xmagw*xmagrn*xmagrn*pow3(xmagq)*pow4(xmagwn)  ! S_0
                if (is_bad(xmags0)) then
                   do kk=1,s% nz
                      write(*,2) 'omega(kk)', kk, omega(kk)
@@ -1227,36 +1227,36 @@
                   write(*,2) 'xmags0', k, xmags0
                   call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
-               xmagbphi0 = xmagwa0*xmag4pd*xmagrn ! B_\phi
-               xmagbr0 = xmagbphi0*xmagq*xmagwn*xmagwn ! B_r
-               xmageta0 = pow4(xmagq)*pow6(xmagwn)*xmagrn*xmagrn*xmagw ! eta_e
+               xmagbphi0 = xmagwa0*xmag4pd*xmagrn  ! B_\phi
+               xmagbr0 = xmagbphi0*xmagq*xmagwn*xmagwn  ! B_r
+               xmageta0 = pow4(xmagq)*pow6(xmagwn)*xmagrn*xmagrn*xmagw  ! eta_e
             end if
 
             if (xmagnt > 0.0D0) then
-               xmagnn = xmagnt*xmagft ! N^2
-               xmagwn = xmagw/sqrt(xmagnn) ! omega/N
-               xmagkr2n = xkap/(xmagrn*xmagrn*sqrt(xmagnn)) ! kappa/(r^2 N)
-               
+               xmagnn = xmagnt*xmagft  ! N^2
+               xmagwn = xmagw/sqrt(xmagnn)  ! omega/N
+               xmagkr2n = xkap/(xmagrn*xmagrn*sqrt(xmagnn))  ! kappa/(r^2 N)
+
                !xmagq1 = pow(xmager2w*xmagwn*pow3(xeta/xkap)/pow7(xmagwn),0.25D0) ! q_1
-               if(xmagwn > 1d-42) then ! fix from rob
-                  xmagq1 = pow(xmager2w*xmagwn*pow3(xeta/xkap)/pow7(xmagwn),0.25D0) ! q_1
+               if(xmagwn > 1d-42) then  ! fix from rob
+                  xmagq1 = pow(xmager2w*xmagwn*pow3(xeta/xkap)/pow7(xmagwn),0.25D0)  ! q_1
                else
                   xmagq1 = 0d0
                end if
-               
-               xmagwa1 = sqrt(xmagq)*xmagw*pow(xmagwn*xmagkr2n,0.125D0) ! \omega_A
-               xmags1a = xmagdn*pow2(xmagw*xmagrn)*xmagq*sqrt(xmagwn*xmagkr2n) ! S_1a
-               xmags1b = xmagdn*pow2(xmagw)*pow2(xmagrn)*pow3(xmagq)*pow4(xmagwn) ! S_1b
-               xmags1 = max(xmags1a,xmags1b) ! S_1
-               xmagbphi1 = xmagwa1*xmag4pd*xmagrn ! B_\phi
-               xmagbr1 = xmagbphi1*pow(xmagwn*xmagkr2n,0.25D0) ! B_r
-               xmageta1a = xmagrn*xmagrn*xmagw*xmagq*pow(xmagwn*xmagkr2n,0.75D0) ! eta_e1a
-               xmageta1b = pow4(xmagq)*pow6(xmagwn)*pow2(xmagrn)*xmagw ! eta_e1b
-               xmageta1 = max(xmageta1a,xmageta1b) ! eta_e
+
+               xmagwa1 = sqrt(xmagq)*xmagw*pow(xmagwn*xmagkr2n,0.125D0)  ! \omega_A
+               xmags1a = xmagdn*pow2(xmagw*xmagrn)*xmagq*sqrt(xmagwn*xmagkr2n)  ! S_1a
+               xmags1b = xmagdn*pow2(xmagw)*pow2(xmagrn)*pow3(xmagq)*pow4(xmagwn)  ! S_1b
+               xmags1 = max(xmags1a,xmags1b)  ! S_1
+               xmagbphi1 = xmagwa1*xmag4pd*xmagrn  ! B_\phi
+               xmagbr1 = xmagbphi1*pow(xmagwn*xmagkr2n,0.25D0)  ! B_r
+               xmageta1a = xmagrn*xmagrn*xmagw*xmagq*pow(xmagwn*xmagkr2n,0.75D0)  ! eta_e1a
+               xmageta1b = pow4(xmagq)*pow6(xmagwn)*pow2(xmagrn)*xmagw  ! eta_e1b
+               xmageta1 = max(xmageta1a,xmageta1b)  ! eta_e
             end if
 
             if ((xmagnt > 0.D0) .and. (xmagnmu > 0.D0) .and. xmags0+xmags1 /= 0d0) then
-               xmagsm=xmags0*xmags1/(xmags0+xmags1) ! S_m
+               xmagsm=xmags0*xmags1/(xmags0+xmags1)  ! S_m
                if (is_bad(xmagsm)) then
                   write(*,2) 'xmags0', k, xmags0
                   write(*,2) 'xmags1', k, xmags1
@@ -1266,8 +1266,8 @@
                   write(*,2) 'xmagsm', k, xmagsm
                   call mesa_error(__FILE__,__LINE__,'set_ST')
                end if
-               xmagqm=xmagq0+xmagq1 ! q_m
-               xmagetam=xmageta0*xmageta1/(xmageta0+xmageta1) ! eta_m
+               xmagqm=xmagq0+xmagq1  ! q_m
+               xmagetam=xmageta0*xmageta1/(xmageta0+xmageta1)  ! eta_m
             else if ((xmagnt <= 0.D0) .and. (xmagnmu > 0.D0)) then
                xmagsm=xmags0
                xmagqm=xmagq0
@@ -1301,9 +1301,9 @@
             end if
 
             xmagsf=1.D0-MIN(1.D0,xmagqm/xmagq)
-            xmags=xmagsf*xmagsm ! S
-            xmagnu=xmags/(xmagw*xmagq*xmagdn) ! \nu_e
-            xmagdif=xmagsf*xmagetam ! \kappa_c (molecular diffusion)
+            xmags=xmagsf*xmagsm  ! S
+            xmagnu=xmags/(xmagw*xmagq*xmagdn)  ! \nu_e
+            xmagdif=xmagsf*xmagetam  ! \kappa_c (molecular diffusion)
                ! (set equal to eta_e and compute "mean")
 
             !..... Special treatment for semiconvective regions:

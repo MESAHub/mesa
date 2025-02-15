@@ -33,7 +33,7 @@
 
       implicit none
 
-      public ! history.f90 uses most of this
+      public  ! history.f90 uses most of this
 
       ! spacing between these must be larger than max number of nuclides
       integer, parameter :: idel = 10000
@@ -56,7 +56,7 @@
       integer, parameter :: abs_mag_offset = bc_offset + idel
       integer, parameter :: lum_band_offset = abs_mag_offset + idel
       integer, parameter :: log_lum_band_offset = lum_band_offset + idel
-      
+
       integer, parameter :: raw_rate_offset = log_lum_band_offset + idel
       integer, parameter :: screened_rate_offset = raw_rate_offset + idel
       integer, parameter :: eps_nuc_rate_offset = screened_rate_offset + idel
@@ -116,7 +116,7 @@
          ! first try local directory
          filename = history_columns_file
 
-         if(level==1) then ! First pass either the user set the file or we load the defaults
+         if(level==1) then  ! First pass either the user set the file or we load the defaults
             if (len_trim(filename) == 0) filename = 'history_columns.list'
 
             exists=.false.
@@ -131,7 +131,7 @@
 
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(history_columns_file)
             return
          end if
@@ -224,7 +224,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_total_mass') then
                call do_abundances(total_mass_offset, spec_err)
                if (spec_err /= 0) then
@@ -260,7 +260,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_lum_band') then
                call do_colors(lum_band_offset,'lum_band_', spec_err)
                if (spec_err /= 0) then
@@ -269,7 +269,7 @@
                call count_specs
                cycle
             end if
-            
+
             if (string == 'add_log_lum_band') then
                call do_colors(log_lum_band_offset,'log_lum_band_', spec_err)
                if (spec_err /= 0) then
@@ -475,7 +475,7 @@
             end do
          end subroutine do_colors
 
-         subroutine do_rate(offset,prefix,ierr) ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
+         subroutine do_rate(offset,prefix,ierr)  ! raw_rate, screened_rate, eps_nuc_rate, eps_neu_rate
             use rates_def, only: reaction_name
             use net_def, only: get_net_ptr
             integer, intent(in) :: offset
@@ -531,7 +531,7 @@
          if(ierr/=0) return
 
          ! These must come first otherwise things like center_mu will be caught by the
-         ! center abundaces check
+         ! center abundances check
          id = do_get_history_id(string)
          if (id > 0) then
             spec = id
@@ -620,14 +620,19 @@
          logical function do1(string, name, offset, func)
             character(len=*) :: string, name
             integer :: offset, k
-            external :: func
+            interface
+            subroutine func(offset)
+               implicit none
+               integer, intent(in) :: offset
+            end subroutine func
+            end interface
 
             if(string == name) then
                ! We have string value (i.e total_mass c12)
                call func(offset)
                do1 = .true.
-            else if(string(1:len_trim(name)+1) == trim(name)//'_') then  
-               ! We have string_value (i.e total_mass_c12) 
+            else if(string(1:len_trim(name)+1) == trim(name)//'_') then
+               ! We have string_value (i.e total_mass_c12)
                ! Rewrite string so its in the form string value (i.e total_mass c12)
                ! By finding the last _ and replacing with a space
                k = index(string,'_',.true.)
@@ -699,7 +704,7 @@
                ierr = -1; return
             end if
             id = rates_reaction_id(string)
-            id = g% net_reaction(id) ! Convert to net id not the gloabl rate id
+            id = g% net_reaction(id)  ! Convert to net id not the global rate id
             if (ierr/=0) return
             if (id > 0) then
                spec = offset + id
@@ -733,7 +738,7 @@
          old_history_column_spec => null()
          if (associated(s% history_column_spec)) old_history_column_spec => s% history_column_spec
          nullify(s% history_column_spec)
-         capacity = 100 ! will increase if needed
+         capacity = 100  ! will increase if needed
          allocate(s% history_column_spec(capacity), stat=ierr)
          if (ierr /= 0) return
          s% history_column_spec(:) = 0

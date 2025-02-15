@@ -6,7 +6,7 @@
       implicit none
 
       private
-      
+
       public :: paquette_coefficients
       public :: initialise_collision_integrals
       public :: free_collision_integrals
@@ -34,7 +34,7 @@
 ! KZN1:            charge [e]
 ! NA1:            number density [cm^-3]
 ! The output are the resistance coefficients in Burgers equations K_ij, z_ij, z'_ij and z''_ij
-! It is also possible to output diffusion coefficients D_ij and thermal diffusion coeffcient
+! It is also possible to output diffusion coefficients D_ij and thermal diffusion coefficient
 !  A_th used in Cowling&Chapman formalism, note Ath(NN,i) is Ath_ei
 
       subroutine paquette_coefficients(rho, T, NN, CAN1, KZN1, NA1, Ddiff, Kdiff, Zdiff, Zdiff1, Zdiff2, Ath)
@@ -122,7 +122,7 @@
                F22   = 1.99016D0*E_PSI_ST - 4.56958D0
             endif
          elseif (PSI_ST >= 4.0D0) then
-! repulsive and attractive coeffcients are the same in this range
+! repulsive and attractive coefficients are the same in this range
             F22   = 1.99016D0*E_PSI_ST - 4.56958D0
          endif
          OMEGA2(I)   = EPS_ST*F22
@@ -189,7 +189,7 @@
                   F22   = 1.99016D0*E_PSI_ST - 4.56958D0
                endif
             elseif (PSI_ST>=4.0D0) then
-! repulsive and attractive coeffcients are the same in this range
+! repulsive and attractive coefficients are the same in this range
                F1(1) = 1.00141D0*E_PSI_ST - 3.18209D0
                F1(2) = 0.99559D0*E_PSI_ST - 1.29553D0
                F1(3) = 1.99814D0*E_PSI_ST - 0.64413D0
@@ -204,8 +204,8 @@
             AA = OMEGA22/(5.D0*OMEGA1(1))
             BB = (5.D0*OMEGA1(2)-OMEGA1(3))/(5.D0*OMEGA1(1))
             CC = 2.D0*OMEGA1(2)/(5.D0*OMEGA1(1))-1.D0
-            Xs = NA1(NREF)/(NA1(I)+NA1(NREF)) !number concentration of reference species NREF
-            Xt = NA1(I)/(NA1(I)+NA1(NREF)) !number concentration of species I
+            Xs = NA1(NREF)/(NA1(I)+NA1(NREF))  !number concentration of reference species NREF
+            Xt = NA1(I)/(NA1(I)+NA1(NREF))  !number concentration of species I
             Ms = CAN1(NREF)/(CAN1(NREF)+CAN1(I))
             Mt = CAN1(I)/(CAN1(NREF)+CAN1(I))
             Pst = 3.0D0*(Ms-Mt)*(Ms-Mt) + 4.D0*Ms*Mt*AA
@@ -230,8 +230,8 @@
             Zdiff1(NREF, I) = -2.D0*BB+2.5D0
             Zdiff2(NREF, I) = 5.D0*AA
 
-         end do !I
-      end do !K
+         end do  !I
+      end do  !K
       return
 
       end subroutine paquette_coefficients
@@ -252,7 +252,7 @@
       DCAT(1:4,1:50,1:3) => DCAT1(1:4*50*3)
       DDAT(1:4,1:50) => DDAT1(1:4*50)
 
-      DC1 = (/ &
+      DC1 = [ &
          +1.19599D-02,-2.39198D-02,-3.02547D+01,-2.94860D+01, &
          -2.39198D-02,-1.48010D-02,-2.94860D+01,-2.87231D+01, &
          -1.48010D-02,-1.77390D-02,-2.87231D+01,-2.79637D+01, &
@@ -405,9 +405,9 @@
          -1.12670D-01,-1.25510D-01,+1.52998D+01,+1.63436D+01, &
          -1.25510D-01,+4.14471D-02,+1.63436D+01,+1.73573D+01, &
          +4.14471D-02,-2.07236D-02,+1.73573D+01,+1.83810D+01 &
-      /)
+      ]
 
-      DD1 = (/ &
+      DD1 = [ &
          +1.18229D-02,-2.36458D-02,-2.55112D+01,-2.47319D+01, &
          -2.36458D-02,-1.46794D-02,-2.47319D+01,-2.39583D+01, &
          -1.46794D-02,-1.76226D-02,-2.39583D+01,-2.31882D+01, &
@@ -458,9 +458,9 @@
          -3.51796D-01,-2.86379D-01,+1.42538D+01,+1.55127D+01, &
          -2.86379D-01,-2.68214D-01,+1.55127D+01,+1.67029D+01, &
          -2.68214D-01,+1.34107D-01,+1.67029D+01,+1.78287D+01 &
-      /)
+      ]
 
-      DCAT1 = (/ &
+      DCAT1 = [ &
          -4.85605D+00,+9.71211D+00,-2.44778D+01,-2.50688D+01, &
          +9.71211D+00,-9.31384D+00,-2.50688D+01,-2.33288D+01, &
          -9.31384D+00,+9.24600D+00,-2.33288D+01,-2.38242D+01, &
@@ -613,9 +613,9 @@
          +1.33750D-01,-1.00279D-01,+1.53496D+01,+1.63664D+01, &
          -1.00279D-01,+7.07988D-01,+1.63664D+01,+1.73591D+01, &
          +7.07988D-01,-3.53994D-01,+1.73591D+01,+1.85217D+01 &
-      /)
+      ]
 
-      DDAT1 = (/ &
+      DDAT1 = [ &
          -1.70341D+00,+3.40681D+00,-2.30677D+01,-2.36179D+01, &
          +3.40681D+00,-1.49538D-01,-2.36179D+01,-2.33505D+01, &
          -1.49538D-01,+5.36125D+00,-2.33505D+01,-2.31190D+01, &
@@ -666,7 +666,7 @@
          -5.81893D-02,-1.82463D-01,+1.43423D+01,+1.55481D+01, &
          -1.82463D-01,+2.72096D-01,+1.55481D+01,+1.67101D+01, &
          +2.72096D-01,-1.36048D-01,+1.67101D+01,+1.79374D+01 &
-      /)
+      ]
 
       have_initialized = .true.
 
@@ -674,7 +674,7 @@
 !$omp end critical (collision_integrals)
       end subroutine initialise_collision_integrals
 
-      
+
       subroutine free_collision_integrals
 
 !$omp critical (collision_integrals_shutdown)
@@ -700,5 +700,5 @@
 !$omp end critical (collision_integrals_shutdown)
       end subroutine free_collision_integrals
 
-      
+
       end module paquette_coeffs

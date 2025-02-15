@@ -182,7 +182,7 @@
             else
                dt = min(dt, 0.5d0*remaining_time)
             end if
-            if (steps_used >= max_steps) dt = remaining_time ! just go for it
+            if (steps_used >= max_steps) dt = remaining_time  ! just go for it
             if (dbg) write(*,3) 'mix dt', &
                   s% model_number, steps_used, dt, dt/remaining_time
 
@@ -251,7 +251,7 @@
                   if (dbg) &
                      write(*,3) 'substep converged: iters max_del avg_del dt/total', &
                         steps_used, num_iters, max_del, avg_del, dt/total_time
-                  exit solve_loop ! this substep is done
+                  exit solve_loop  ! this substep is done
                end if
 
                if (num_iters == max_iters_per_substep) then
@@ -301,7 +301,7 @@
                   associated(s% binary_other_torque))) then
 
                ! check conservation for cases with no extra torque
-               J_tot1 = total_angular_momentum(s) ! what we have
+               J_tot1 = total_angular_momentum(s)  ! what we have
 
                if (abs(J_tot0 - J_tot1) > s% angular_momentum_error_retry*abs(J_tot0)) then
                   s% retry_message = 'retry: failed to conserve angular momentum in mixing'
@@ -332,7 +332,7 @@
 
          subroutine do_alloc(ierr)
             use alloc, only: non_crit_get_quad_array
-            integer, intent(out) :: ierr            
+            integer, intent(out) :: ierr
             call do_work_arrays(.true.,ierr)
 
             call non_crit_get_quad_array(s, du, nz, nz_alloc_extra, 'solve_omega_mix', ierr)
@@ -368,7 +368,7 @@
          subroutine dealloc
             use alloc, only: non_crit_return_quad_array
             call do_work_arrays(.false.,ierr)
-            
+
             call non_crit_return_quad_array(s, du, 'solve_omega_mix')
             call non_crit_return_quad_array(s, d, 'solve_omega_mix')
             call non_crit_return_quad_array(s, dl, 'solve_omega_mix')
@@ -383,10 +383,10 @@
             call non_crit_return_quad_array(s, X_1, 'solve_omega_mix')
             call non_crit_return_quad_array(s, rhs, 'solve_omega_mix')
             call non_crit_return_quad_array(s, del, 'solve_omega_mix')
-            
+
          end subroutine dealloc
-         
-         
+
+
          subroutine do_work_arrays(alloc_flag, ierr)
             use alloc, only: work_array
             logical, intent(in) :: alloc_flag
@@ -403,7 +403,6 @@
 
 
          subroutine solve_tridiag(sub, diag, sup, rhs, x, n, ierr)
-            implicit none
             !      sub - sub-diagonal
             !      diag - the main diagonal
             !      sup - sup-diagonal
@@ -443,7 +442,7 @@
 
          real(dp) function min_mixing_timescale() result(dt)
             integer :: k
-            real(dp) :: & ! use dp instead of qp to get same answer in ifort and gfortran
+            real(dp) :: &  ! use dp instead of qp to get same answer in ifort and gfortran
                omega, irot, irot_mid_00, am_sig_omega_00, c_omega_00, del00_omega, &
                omega_mid_00, am_sig_irot_00, c_irot_00, del00_irot, &
                dmbar, irot_mid_m1, am_sig_omega_m1, c_omega_m1, delm1_omega, &

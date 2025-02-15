@@ -9,10 +9,10 @@ module suzuki_tables
 
   integer :: num_suzuki_reactions
 
-  integer, pointer, dimension(:) :: & ! (num_suzuki_reactions)
+  integer, pointer, dimension(:) :: &  ! (num_suzuki_reactions)
        suzuki_lhs_nuclide_id, suzuki_rhs_nuclide_id, suzuki_reaclib_id
   character(len=iso_name_length), dimension(:), pointer :: &
-       suzuki_lhs_nuclide_name, suzuki_rhs_nuclide_name ! (num_suzuki_reactions)
+       suzuki_lhs_nuclide_name, suzuki_rhs_nuclide_name  ! (num_suzuki_reactions)
   type (integer_dict), pointer :: suzuki_reactions_dict
 
   type(table_c), dimension(:), allocatable :: suzuki_reactions_tables
@@ -124,15 +124,15 @@ contains
 
     ! clip small values to edge of table
     if (logT < table % logTs(1)) &
-         ierr = -1 !return !logT = table % logTs(1)
+         ierr = -1  !return !logT = table % logTs(1)
     if (lYeRho < table % lYeRhos(1)) &
-         ierr = -1 !return !lYeRho = table % lYeRhos(1)
+         ierr = -1  !return !lYeRho = table % lYeRhos(1)
 
     ! clip large values to edge of table
     if (logT > table % logTs(table % num_T)) &
-         ierr = -1 !return !logT = table % logTs(table % num_T)
+         ierr = -1  !return !logT = table % logTs(table % num_T)
     if (lYeRho > table % lYeRhos(table % num_lYeRho)) &
-         ierr = -1 !return !lYeRho = table % lYeRhos(table % num_lYeRho)
+         ierr = -1  !return !lYeRho = table % lYeRhos(table % num_lYeRho)
 
     if (ierr /=0) return
 
@@ -201,15 +201,15 @@ contains
 
 
     ! set Qneu
-    ! be careful; you don't want to get in to the situtation where 1d-99/1d-99 = 1...
-    if (lambda .gt. 1d-30) then
+    ! be careful; you don't want to get in to the situation where 1d-99/1d-99 = 1...
+    if (lambda > 1d-30) then
        nu = capture_nu + decay_nu
        Qneu = nu / lambda
 
        dQneu_dlnT = 0d0
        dQneu_dlnRho = 0d0
 
-       if (nu .gt. 1d-30) then
+       if (nu > 1d-30) then
 
           if (table % has_decay_data) then
              dQneu_dlnT = dQneu_dlnT + Qneu * ((decay_nu/nu)*d_ldecay_nu_dlogT - (decay/lambda)*d_ldecay_dlogT)
@@ -231,11 +231,11 @@ contains
 
   contains
 
-    subroutine find_location ! set ix, jy; x is logT; y is lYeRho
+    subroutine find_location  ! set ix, jy; x is logT; y is lYeRho
       integer :: i, j
       include 'formats'
       ! x0 <= logT <= x1
-      ix = table % num_T-1 ! since weak_num_logT is small, just do a linear search
+      ix = table % num_T-1  ! since weak_num_logT is small, just do a linear search
       do i = 2, table % num_T-1
          if (logT > table% logTs(i)) cycle
          ix = i-1
@@ -243,7 +243,7 @@ contains
       end do
 
       ! y0 <= lYeRho <= y1
-      jy = table % num_lYeRho-1 ! since weak_num_lYeRho is small, just do a linear search
+      jy = table % num_lYeRho-1  ! since weak_num_lYeRho is small, just do a linear search
       do j = 2, table % num_lYeRho-1
          if (lYeRho > table % lYeRhos(j)) cycle
          jy = j-1
@@ -264,8 +264,8 @@ contains
 
       dlogT = logT - x0
       delta_logT = x1 - x0
-      x_beta = dlogT / delta_logT ! fraction of x1 result
-      x_alfa = 1 - x_beta ! fraction of x0 result
+      x_beta = dlogT / delta_logT  ! fraction of x1 result
+      x_alfa = 1 - x_beta  ! fraction of x0 result
       if (x_alfa < 0 .or. x_alfa > 1) then
          write(*,1) 'suzuki: x_alfa', x_alfa
          write(*,1) 'logT', logT
@@ -276,8 +276,8 @@ contains
 
       dlYeRho = lYeRho - y0
       delta_lYeRho = y1 - y0
-      y_beta = dlYeRho / delta_lYeRho ! fraction of y1 result
-      y_alfa = 1 - y_beta ! fraction of y0 result
+      y_beta = dlYeRho / delta_lYeRho  ! fraction of y1 result
+      y_alfa = 1 - y_beta  ! fraction of y0 result
       if (is_bad(y_alfa) .or. y_alfa < 0 .or. y_alfa > 1) then
          write(*,1) 'suzuki: y_alfa', y_alfa
          write(*,1) 'logT', logT
@@ -306,7 +306,7 @@ contains
     subroutine do_linear_interp(f, fval, df_dx, df_dy, ierr)
       use interp_1d_lib
       use utils_lib, only: is_bad
-      real(dp), dimension(:,:,:) :: f ! (4, nx, ny)
+      real(dp), dimension(:,:,:) :: f  ! (4, nx, ny)
       real(dp), intent(out) :: fval, df_dx, df_dy
       integer, intent(out) :: ierr
 

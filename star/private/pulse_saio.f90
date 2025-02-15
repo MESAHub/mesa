@@ -87,7 +87,7 @@ contains
 
     n_sg = SIZE(k_a)
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
@@ -115,7 +115,7 @@ contains
     ! Store global data
 
     allocate(global_data(4))
- 
+
     r_outer = Rsun*s%photosphere_r
     m_outer = s%m_grav(1)
 
@@ -123,11 +123,11 @@ contains
     global_data(2) = log10(s%L(1)/Lsun)
     global_data(3) = log10(r_outer/Rsun)
     global_data(4) = s%star_age
-               
+
     ! Store point data
 
     allocate(point_data(20,nn))
-    
+
     j = 1
 
     ! Atmosphere (we skip the point at the base of the atm to
@@ -137,7 +137,7 @@ contains
        call store_saio_data_atm(j, k, k_a(1), k_b(1))
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     sg = 1
@@ -155,7 +155,7 @@ contains
 
           call store_saio_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
-             
+
        endif
 
     end do env_loop
@@ -293,7 +293,7 @@ contains
         eps_T = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
         kap_rho = eval_face(s%dq, s%d_opacity_dlnd, k, k_a, k_b)/kap
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, k_a, k_b)/kap
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
+        nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         X = eval_face(s%dq, s%X, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
         Y = eval_face(s%dq, s%Y, k, k_a, k_b, v_lo=0d0, v_hi=1d0)
@@ -347,7 +347,7 @@ contains
     end if
 
     ! Write the data
- 
+
     nn = SIZE(point_data, 2)
 
     write(iounit, 100) nn, global_data

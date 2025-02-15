@@ -24,20 +24,25 @@ Modules for Experiments in Stellar Astrophysics (MESA)
     :alt: GitHub
     :target: https://github.com/MESAHub/mesa/blob/master/LICENSE
 .. image:: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml/badge.svg
+    :title: BuildLinux
     :alt: BuildLinux
     :target: https://github.com/MESAHub/mesa/actions/workflows/build-linux.yml
+.. image:: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml/badge.svg
+    :title: StaticAnalysis
+    :alt: StaticAnalysis
+    :target: https://github.com/MESAHub/mesa/actions/workflows/static-analysis.yml
 
 |
 
    **WARNING**: The default ``main`` branch is the development version of
    MESA and is not guaranteed to function correctly.  If you are using
-   MESA, you should use an official release version.
+   MESA, you should use an `official release version <https://zenodo.org/records/13353788>`__.
 
 
 Overview
 ========
 
-MESA is a powerful and versatile open-source software suite built to 
+MESA is a powerful and versatile open-source software suite built to
 allow users to run experiments in stellar evolution.
 Stellar evolution calculations (i.e., stellar evolution tracks and
 detailed information about the evolution of internal and global
@@ -66,10 +71,12 @@ Links
 * `Landing page <https://mesastar.org/>`__ for links to all things MESA.
 * `Code repository <https://github.com/MESAHub/mesa>`__ on GitHub (this page).
 * `Documentation <https://docs.mesastar.org/>`__ for up-to-date information about installing and running MESA.
-* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA. 
+* `MESA Marketplace <http://cococubed.com/mesa_market/>`__ for resources for published papers using MESA.
 * `MESA Zenodo Community <https://zenodo.org/communities/mesa/records?q=&l=list&p=1&s=10>`__ for downloading official release versions, SDKs, and MESA project inlists.
 * `MESA Users Mailing List <https://lists.mesastar.org/mailman/listinfo/mesa-users>`__ for info about new releases, news items, and requests for help/bug reports.
 * `mesa_reader <https://github.com/wmwolf/py_mesa_reader>`__ to interact and plot data from MESA in Python.
 * `MESA Test Hub <https://testhub.mesastar.org/>`__ to view results of regression testing (for Developers).
+* `MESA Jenkins <https://jenkins.flatironinstitute.org/job/mesa/job/main/>`__ to view nightly Jenkins test runs (for Developers).
 * `mesa_test <https://github.com/MESAHub/mesa_test>`__ tool to run the test suite and upload results to the MESA Test Hub (for Developers).
+* `mesa-dev yt channel <https://www.youtube.com/@mesa-dev>`__ youtube channel for recorded dev meetings (for Developers).
 

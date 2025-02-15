@@ -29,7 +29,7 @@
       use const_def, only: dp
       use math_lib
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
 
@@ -40,23 +40,22 @@
 
 
 
-      !reads in table_summary file from atm_data, initializes logZ, Teff_array, 
+      !reads in table_summary file from atm_data, initializes logZ, Teff_array,
       ! logg_array, and Teff_bound arrays; sets some flags
       subroutine table_atm_init(use_cache, ierr)
-         implicit none
          logical, intent(in) :: use_cache
          integer, intent(out) :: ierr
-      
+
          integer :: nZ, ng, nT, i, j, iounit
          integer, pointer :: ibound(:,:), tmp_version(:)
          character(len=256) :: filename
-      
+
          if (table_atm_is_initialized) call table_atm_shutdown()
-         
+
          ierr = 0
 
          call load_table_summary(ATM_TABLE_PHOTOSPHERE, 'table_summary.txt', ai_two_thirds, ierr)
-         if (ierr /= 0) return         
+         if (ierr /= 0) return
          call load_table_summary(ATM_TABLE_TAU_100, 'table100_summary.txt', ai_100, ierr)
          if (ierr /= 0) return
          call load_table_summary(ATM_TABLE_TAU_10, 'table10_summary.txt', ai_10, ierr)
@@ -69,29 +68,29 @@
          if (ierr /= 0) return
          call load_table_summary(ATM_TABLE_DB_WD_TAU_25, 'table_db_wd_25_summary.txt', ai_db_wd_25, ierr)
          if (ierr /= 0) return
-         
+
          table_atm_is_initialized = .true.
-         
-         
+
+
          contains
-      
-      
+
+
          subroutine load_table_summary(id, fname, ai, ierr)
             use const_def, only: mesa_data_dir
             integer, intent(in) :: id
             character(len=*), intent(in) :: fname
             type(atm_info), intent(inout) :: ai
             integer, intent(out) :: ierr
-            
+
             real(dp), target :: vec_ary(20)
             real(dp), pointer :: vec(:)
 
             vec => vec_ary
-      
+
             filename = trim(mesa_data_dir)//'/atm_data/' // trim(fname)
-            
+
             if (dbg) write(*,*) 'read ' // trim(filename)
-            
+
             open(newunit=iounit,file=trim(filename),action='read',status='old',iostat=ierr)
             if (ierr/= 0) then
                write(*,*) 'table_atm_init: missing atm data'
@@ -111,7 +110,7 @@
             !read first line and (nZ, nT, ng)
             read(iounit,*)            !first line is text, skip it
             read(iounit,*) nZ, nT, ng
-      
+
             ai% nZ = nZ
             ai% nT = nT
             ai% ng = ng
@@ -122,7 +121,7 @@
                ai% logZ(nZ), ai% alphaFe(nZ), &
                ai% Pgas_interp1(4*ng*nT*nZ), ai% T_interp1(4*ng*nT*nZ), &
                ai% have_atm_table(nZ), ai% atm_mix(nZ), ai% table_atm_files(nZ))
-            
+
             ai% Pgas_interp(1:4,1:ng,1:nT,1:nZ) => ai% Pgas_interp1(1:4*ng*nT*nZ)
             ai% T_interp(1:4,1:ng,1:nT,1:nZ) => ai% T_interp1(1:4*ng*nT*nZ)
 
@@ -145,7 +144,7 @@
             !read logg_array
             read(iounit,*)            !text
             read(iounit,3) ai% logg_array(:)
-            
+
             close(iounit)
 
  1          format(13x,f5.2,8x,f4.1,1x,a8,1x,15x,99i4)
@@ -159,13 +158,13 @@
                   ai% Teff_bound(i) = min( ai% Teff_bound(i) , ai% Teff_array(ibound(i,j)) )
                enddo
             enddo
-            
-            
+
+
             if (dbg) write(*,*) 'ai% logg_array(:)', ai% logg_array(:)
 
 
             deallocate(ibound, tmp_version)
-         
+
          end subroutine load_table_summary
 
 
@@ -175,7 +174,7 @@
       subroutine table_atm_shutdown()
 
          if (.NOT. table_atm_is_initialized) return
-      
+
          call free_table_summary(ai_two_thirds)
          call free_table_summary(ai_100)
          call free_table_summary(ai_10)
@@ -197,12 +196,12 @@
                ai% logZ, ai% alphaFe, &
                ai% Pgas_interp1, ai% T_interp1, &
                ai% have_atm_table, ai% atm_mix, ai% table_atm_files)
-            
+
           end subroutine free_table_summary
 
       end subroutine table_atm_shutdown
 
-      
+
       !interpolate in Z, logg, & Teff: 4pt in Z; bicubic spline in Teff,logg
       subroutine get_table_values( &
             id, newZ, newlogg_in, newTeff_in, &
@@ -214,16 +213,15 @@
          use interp_1d_def
          use interp_2d_lib_db, only: interp_evbicub_db
          use utils_lib, only: is_bad
-         
-         implicit none
-      
+
+
          integer, intent(in) :: id
          real(dp), intent(in) :: newZ, newlogg_in, newTeff_in
          real(dp), intent(out) :: newPgas, dPgas_dTeff, dPgas_dlogg
          real(dp), intent(out) :: newT, dT_dTeff, dT_dlogg
          integer, intent(out) :: ierr
          integer :: i, j, numZs, nZ, ng, nT, ict(6), Zindex, Zlo, Zhi
-         integer, parameter :: num_res = 3 !number of results (Pgas, dPgas_dTeff, dPgas_dlogg)
+         integer, parameter :: num_res = 3  !number of results (Pgas, dPgas_dTeff, dPgas_dlogg)
          real(dp) :: newlogg, newTeff, newlogZ(1), result_Z(1)
          real(dp), target :: fZ1_ary(4*4)
          real(dp), pointer :: fZ1(:), fZ(:,:)
@@ -233,14 +231,14 @@
          logical :: clip_Teff, clip_logg, gtv_dbg
 
          type (Atm_Info), pointer :: ai
-         
+
          include 'formats'
-         
+
          gtv_dbg = dbg
-         
+
          fZ1 => fZ1_ary
          fZ(1:4,1:4) => fZ1(1:4*4)
-         
+
          ierr = 0
          work => work_ary
 
@@ -273,28 +271,28 @@
             ierr = -1
             return
          end select
-         
+
          nZ = ai% nZ
          nT = ai% nT
          ng = ai% ng
-         
+
          clip_Teff = .false.
          if (newTeff_in < ai% Teff_array(1)) then
-            newTeff = ai% Teff_array(1) ! clip to table in T
+            newTeff = ai% Teff_array(1)  ! clip to table in T
             clip_Teff = .true.
          else if (newTeff_in > ai% Teff_array(nT)) then
-            newTeff = ai% Teff_array(nT) ! clip to table in T
+            newTeff = ai% Teff_array(nT)  ! clip to table in T
             clip_Teff = .true.
          else
             newTeff = newTeff_in
          end if
-         
+
          clip_logg = .false.
          if (newlogg_in < ai% logg_array(1)) then
-            newlogg = ai% logg_array(1) ! clip to table in logg
+            newlogg = ai% logg_array(1)  ! clip to table in logg
             clip_logg = .true.
          else if (newlogg_in > ai% logg_array(ng)) then
-            newlogg = ai% logg_array(ng) ! clip to table in logg
+            newlogg = ai% logg_array(ng)  ! clip to table in logg
             clip_logg = .true.
          else
             newlogg = newlogg_in
@@ -304,7 +302,7 @@
 
          if (gtv_dbg) write(*,*) 'loaded tables: ', ai% have_atm_table(:)
 
-         if (.false.) then !check for Z within range of tables
+         if (.false.) then  !check for Z within range of tables
             if (nz > 1 .and. (newlogZ(1) < ai% logZ(1) .or. newlogZ(1) > ai% logZ(nZ))) then
                write(*,*) 'get_table_values: Z outside range of atm tables'
                ierr=-1
@@ -341,7 +339,7 @@
          !do 2D Teff,logg interpolation on each of 4 Z tables (Zlo-Zhi)
                  !  P(g,T) dP_dg, dP_dT, d2P_dg2, d2P_dT2, d2P_dg_dT
                  !    1      2      3       4        5         6
-         ict(:) = (/  1,     1,     1,      0,       0,        0  /)
+         ict(:) = [  1,     1,     1,      0,       0,        0  ]
 
          if (gtv_dbg) write(*,*) 'do_interp for Pgas', id
          call do_interp(ai% Pgas_interp1, newPgas, dPgas_dlogg, dPgas_dTeff, ierr)
@@ -351,7 +349,7 @@
          end if
          if (clip_logg) dPgas_dlogg = 0
          if (clip_Teff) dPgas_dTeff = 0
-         
+
          if (id == ATM_TABLE_PHOTOSPHERE) then
             newT = newTeff
             if (clip_Teff) then
@@ -360,7 +358,7 @@
                dT_dTeff = 1
             end if
             dT_dlogg = 0
-            return 
+            return
          end if
 
          if (gtv_dbg) write(*,*) 'do_interp for Temp', id
@@ -371,7 +369,7 @@
          end if
          if (clip_logg) dT_dlogg = 0
          if (clip_Teff) dT_dTeff = 0
-         
+
          if (dbg .or. is_bad(newPgas) .or. is_bad(newT)) then
             write(*,1) 'newPgas', newPgas
             write(*,1) 'dPgas_dTeff', dPgas_dTeff
@@ -385,9 +383,9 @@
             return
             !if (is_bad(newPgas) .or. is_bad(newT)) call mesa_error(__FILE__,__LINE__,'get_table_values')
          end if
-         
+
          !if (dbg) write(*,*) 'loaded tables: ', ai% have_atm_table(:)
-      
+
          deallocate(result_2D)
 
          contains
@@ -396,28 +394,28 @@
             real(dp), dimension(:), pointer :: f1
             real(dp), intent(out) :: newval, dval_dlogg, dval_dTeff
             integer, intent(out) :: ierr
-            
+
             real(dp) :: res(6)
             integer :: j
             real(dp), pointer :: f(:)
-            
+
             include 'formats'
-            
+
             ierr = 0
-            
+
             do i = Zlo, Zhi
                if (.not. ai% have_atm_table(i)) then
-                  call load_atm_table(i,ierr) !<-load on demand
+                  call load_atm_table(i,ierr)  !<-load on demand
                end if
                if (ierr /= 0) then
                   if (gtv_dbg) write(*,*) 'load_atm_table failed'
                   return
                end if
-               
+
                f(1:4*ng*nT) => f1(1+4*ng*nT*(i-1):4*ng*nT*i)
                call interp_evbicub_db(newlogg, newTeff, ai% logg_array, ng, ai% Teff_array, nT, &
                   ai% iling, ai% ilinT, f, ng, ict, res, ierr)
-               do j=1,6 
+               do j=1,6
                   result_2D(j,i) = res(j)
                end do
                if (ierr /= 0) then
@@ -439,14 +437,14 @@
             enddo
 
             ! now we have val, dval_dTeff, and dval_dlogg in result_2D for each Z
-         
+
             if (numZs == 1) then
-               
+
                newval = result_2D(1,Zlo)
                dval_dlogg = result_2D(2,Zlo)
                dval_dTeff = result_2D(3,Zlo)
-            
-            else ! Z interpolation
+
+            else  ! Z interpolation
 
                fZ(1,1:numZs) = result_2D(1,Zlo:Zhi)
                call interp_pm(ai% logZ(Zlo:Zhi),numZs,fZ1,mp_work_size,work,'atm',ierr)
@@ -486,9 +484,9 @@
                   return
                end if
                dval_dTeff = result_Z(1)
-            
+
             end if
-            
+
          end subroutine do_interp
 
 
@@ -499,8 +497,7 @@
             use utils_lib
             use interp_2D_lib_db, only: interp_mkbicub_db
             use const_def, only: mesa_data_dir
-            implicit none
-            integer, intent(in)  :: iZ !index of Z table to be loaded
+            integer, intent(in)  :: iZ  !index of Z table to be loaded
             integer, intent(out) :: ierr
             integer :: iounit, i, j, ibound_tmp(ng), ibcTmin, ibcTmax, ibcgmin, ibcgmax
             integer :: text_file_version, nvec
@@ -530,7 +527,7 @@
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             endif
-            
+
             read(iounit,'(14x,i4)',iostat=ierr) text_file_version
             if (failed(1)) return
             if (text_file_version /= table_atm_version) then
@@ -543,14 +540,14 @@
                write(*,'(A)')
                write(*,'(A)')
                write(*,'(A)')
-               write(*,*) 'FATAL ERROR: out-of-date verion of atm data.'
+               write(*,*) 'FATAL ERROR: out-of-date version of atm data.'
                write(*,*) 'Please update by removing the directory mesa/data/atm_data,'
                write(*,*) 'and rerunning the mesa ./install script.'
                write(*,'(A)')
                write(*,'(A)')
                call mesa_error(__FILE__,__LINE__)
             endif
-            
+
             ibound_tmp = -1
             read(iounit,1,iostat=ierr) ai% logZ(iZ), ai% alphaFe(iZ), ai% atm_mix(iZ), ibound_tmp(1:ng)
             if (ierr /= 0) then
@@ -589,12 +586,12 @@
                Teff_tmp(j) = vec(1)
                do i=1,ng
                   data_tmp(i,j) = vec(i+1)
-               end do               
+               end do
             enddo
             ai% Pgas_interp(1,:,:,iZ) = data_tmp(:,:)
-            
-            if (ai% id /= ATM_TABLE_PHOTOSPHERE) then ! read T
-               read(iounit,2,iostat=ierr) ! skip line
+
+            if (ai% id /= ATM_TABLE_PHOTOSPHERE) then  ! read T
+               read(iounit,2,iostat=ierr)  ! skip line
                if (failed(5)) return
                do j=1,nT
                   read(iounit,'(a)',iostat=ierr) buf
@@ -609,10 +606,10 @@
                   Teff_tmp(j) = vec(1)
                   do i=1,ng
                      data_tmp(i,j) = vec(i+1)
-                  end do 
+                  end do
                enddo
                ai% T_interp(1,:,:,iZ) = data_tmp(:,:)
-            end if            
+            end if
 
             close(iounit)
 
@@ -649,7 +646,7 @@
             do i=1,ng
                ai% Teff_bound(i) = min( ai% Teff_bound(i), Teff_tmp(ibound_tmp(i)) )
             enddo
-         
+
             ! use "not a knot" bc's
             ibcTmin = 0; bcTmin(:) = 0d0
             ibcTmax = 0; bcTmax(:) = 0d0
@@ -665,7 +662,7 @@
                if (gtv_dbg) write(*,*) 'interp_mkbicub_db failed for Pgas_interp'
                return
             end if
-            
+
             if (ai% id /= ATM_TABLE_PHOTOSPHERE) then
                f1(1:4*ng*nT) => ai% T_interp1(1+4*ng*nT*(iZ-1):4*ng*nT*iZ)
                call interp_mkbicub_db(ai% logg_array, ng, ai% Teff_array, nT, &
@@ -679,10 +676,10 @@
 
             !this file has been loaded and processed
             ai% have_atm_table(iZ) = .true.
-         
+
          end subroutine load_atm_table
-         
-         
+
+
          logical function failed(i)
             integer, intent(in) :: i
             failed = (ierr /= 0)
@@ -692,7 +689,7 @@
                !call mesa_error(__FILE__,__LINE__,'get_table_values')
             end if
          end function failed
-         
+
 
       end subroutine get_table_values
 

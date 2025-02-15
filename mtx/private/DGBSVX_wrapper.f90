@@ -46,14 +46,14 @@
 
          ! Fixed arguments
 
-         FACT = 'N' ! We've already equilibrated the matrix            
-         TRANS = 'N' ! This argument is irrelevant if FACT == 'N'
-         EQUED = 'N' ! No equilibration
+         FACT = 'N'  ! We've already equilibrated the matrix
+         TRANS = 'N'  ! This argument is irrelevant if FACT == 'N'
+         EQUED = 'N'  ! No equilibration
          NRHS = 1                ! Number of columns in equ for A.x=b.
          LDX = matrix_size       ! Number of rows in flattened x
          LDB = matrix_size       ! Number of rows in flattened b
-         LDAB = n_lower_bands+n_upper_bands+1 ! Number of rows in AB format of banded matrix
-         LDAFB = 2*n_lower_bands+n_upper_bands+1 ! Number of rows in AB format of LU-factored matrix
+         LDAB = n_lower_bands+n_upper_bands+1  ! Number of rows in AB format of banded matrix
+         LDAFB = 2*n_lower_bands+n_upper_bands+1  ! Number of rows in AB format of LU-factored matrix
 
          ! Compute preconditioner
          call compute_band_preconditioner(matrix_size, n_upper_bands, n_lower_bands, bands, pre_conditioner)
@@ -70,7 +70,7 @@
          ! (k,j) -> (n_upper_bands+1+k-j,j)
          AB = 0d0
 
-         ! In the upper bands, upper band i at index j (bands(i,j)) corresponds to 
+         ! In the upper bands, upper band i at index j (bands(i,j)) corresponds to
          ! position (j, n_upper_bands - i + j + 1) in the matrix. This is then
          ! position (i, n_upper_bands - i + j + 1) in AB.
          do i=1,n_upper_bands
@@ -79,7 +79,7 @@
             end do
          end do
 
-         ! In the lower bands, lower band i+1+n_upper_bands at index j corresponds to 
+         ! In the lower bands, lower band i+1+n_upper_bands at index j corresponds to
          ! position (i+j, j) in the matrix. This is then
          ! position (n_upper_bands+1+i, j) in AB.
          do i=1,n_lower_bands
@@ -106,7 +106,7 @@
             write(*,*) 'ierr = ', ierr
             write(*,*) 'N = ', matrix_size
 
-            open(unit=10, file="bands.data")            
+            open(unit=10, file="bands.data")
             do j=1,LDAB
                do i=1,matrix_size
                   write(10,*) bands(j,i)
@@ -144,7 +144,7 @@
          integer, intent(in) :: nblocks, nvar
 
          ! Intermediates
-         integer counter, i, j, k, k1, k2
+         integer :: counter, i, j, k, k1, k2
          character(len=1) :: FACT, TRANS, EQUED
          integer :: N, KL, KU, NRHS, LDAB, LDAFB, LDB, LDX
          integer :: IWORK(nvar * nblocks),  IPIV(nvar * nblocks)
@@ -163,23 +163,23 @@
 
          ! Fixed arguments
 
-         FACT = 'N' ! We've already equilibrated the matrix            
-         TRANS = 'N' ! This argument is irrelevant if FACT == 'N'
-         EQUED = 'N' ! No equilibration
-         N = nblocks * nvar ! Number of equations
-         KL = 2 * nvar ! Number of lower bands. We round up to the max number 
+         FACT = 'N'  ! We've already equilibrated the matrix
+         TRANS = 'N'  ! This argument is irrelevant if FACT == 'N'
+         EQUED = 'N'  ! No equilibration
+         N = nblocks * nvar  ! Number of equations
+         KL = 2 * nvar  ! Number of lower bands. We round up to the max number
                        ! which could be held by the block triadiagonal matrix.
                        ! If performance is ever an issue this solve can be sped
                        ! up by tightening KL.
-         KU = 2 * nvar ! Number of upper bands. We round up to the max number 
+         KU = 2 * nvar  ! Number of upper bands. We round up to the max number
                        ! which could be held by the block triadiagonal matrix.
                        ! If performance is ever an issue this solve can be sped
                        ! up by tightening KU.
          NRHS = 1      ! Number of columns in equ for A.x=b.
          LDX = N       ! Number of rows in flattened x
          LDB = N       ! Number of rows in flattened b
-         LDAB = KL+KU+1 ! Number of rows in AB format of banded matrix
-         LDAFB = 2*KL+KU+1 ! Number of rows in AB format of LU-factored matrix
+         LDAB = KL+KU+1  ! Number of rows in AB format of banded matrix
+         LDAFB = 2*KL+KU+1  ! Number of rows in AB format of LU-factored matrix
 
          ! Compute preconditioners
          call compute_block_preconditioner(ublk, lblk, dblk, nblocks, nvar, pre_conditioner)

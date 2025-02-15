@@ -1,7 +1,7 @@
 .. highlight:: console
 
 **********
-Test suite
+Test Suite
 **********
 
 MESA includes a comprehensive test suite.
@@ -99,13 +99,13 @@ Star tests
 :ref:`1.3M_ms_high_Z`
 ^^^^^^^^^^^^^^^^^^^^^
 
-The test checks the evolution of metal-rich low-mass stars by evolving 
+The test checks the evolution of metal-rich low-mass stars by evolving
 a 1.3 |Msun|, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 
 :ref:`1.4M_ms_op_mono`
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The test checks the functionality of OP mono opacities. 
+The test checks the functionality of OP mono opacities.
 The test vehicle is a 1.4 |Msun| solar metallicity model.
 
 :ref:`1.5M_with_diffusion`
@@ -211,7 +211,7 @@ This test suite example checks the inward propagation of a carbon burning front 
 :ref:`ccsn_IIp`
 ^^^^^^^^^^^^^^^
 
-This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsquent use in STELLA.
+This test suite example builds a Type IIp supernova model, including Rayleigh-Taylor Instability mixing, for subsequent use in STELLA.
 
 
 :ref:`check_pulse_atm`
@@ -221,7 +221,7 @@ This test checks that the atmosphere structure written to the
 pulsation output closely matches what is expected for the
 :math:`T(\tau)` relation specified by ``atm_T_tau_relation``.
 
-   
+
 :ref:`conductive_flame`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -292,7 +292,7 @@ This test case checks the implementation of GYRE in MESA for a 21 |Msun|, Z=0.02
 :ref:`gyre_in_mesa_spb`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; 
+This test case checks the implementation of GYRE in MESA for a 5 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion;
 a slowly pulsating B-type star (SPB) stellar model.
 
 :ref:`gyre_in_mesa_wd`
@@ -526,7 +526,7 @@ This test case exercises the simplex framework with a check of the chi^2 value f
 :ref:`split_burn_big_net`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test case tests MESA's ability to perfom a split-burn calculation in a 25 |Msun| star during silicon burning.
+This test case tests MESA's ability to perform a split-burn calculation in a 25 |Msun| star during silicon burning.
 
 :ref:`starspots`
 ^^^^^^^^^^^^^^^^
@@ -579,7 +579,7 @@ This test case shows an accreting ONeMg white dwarf (WD) evolving
 towards accretion induced collapse (AIC).  It also illustrates use of
 the special weak rate implementation described in Section 8 of |MESA
 III|.
-   
+
 
 :ref:`wd_c_core_ignition`
 ^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -3,6 +3,8 @@ program test_auto_diff
    use auto_diff
    use const_def
 
+   implicit none
+
    call do_test_auto_diff_1var_order1()
    call do_test_auto_diff_2var_order1()
    call do_test_auto_diff_star_order1()
@@ -21,7 +23,7 @@ program test_auto_diff
    end subroutine header
 
    subroutine should_print0(affix, a, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, z
 
       write(*,'(2(a),1(1pd26.16),a,99(1pd26.16))') &
@@ -30,7 +32,7 @@ program test_auto_diff
    end subroutine should_print0
 
    subroutine should_print1(affix, a, b, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, b
       type(auto_diff_real_1var_order1), intent(in) :: z
 
@@ -41,7 +43,7 @@ program test_auto_diff
 
 
    subroutine should_print2(affix, a, b, c, z)
-      character(len=*), intent(in) :: affix ! to insert ' approximately'
+      character(len=*), intent(in) :: affix  ! to insert ' approximately'
       real(dp), intent(in) :: a, b, c
       type(auto_diff_real_2var_order1) :: z
       write(*,'(2(a),3(1pd26.16),a,99(1pd26.16))') &
@@ -58,11 +60,11 @@ program test_auto_diff
       x = 3d0
       x%d1Array(4) = 1d0
       do i=1,15
-         if (i /= 4) then    
+         if (i /= 4) then
             call should_print0('', 0d0, x%d1Array(i))
          else
             call should_print0('', 1d0, x%d1Array(i))
-         end if            
+         end if
       end do
 
       call header('Testing unary operators')

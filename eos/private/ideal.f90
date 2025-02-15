@@ -12,7 +12,7 @@ module ideal
 
    contains
 
-   subroutine get_ideal_alfa( & 
+   subroutine get_ideal_alfa( &
             rq, logRho, logT, Z, abar, zbar, &
             alfa, d_alfa_dlogT, d_alfa_dlogRho, &
             ierr)
@@ -62,7 +62,7 @@ module ideal
 
    subroutine get_ideal_eos_results( &
          rq, Z, X, abar, zbar, Rho, logRho, T, logT, &
-         species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)   
+         species, chem_id, xa, res, d_dlnd, d_dlnT, d_dxa, ierr)
    type (EoS_General_Info), pointer :: rq
    real(dp), intent(in) :: Z, X, abar, zbar
    real(dp), intent(in) :: Rho, logRho, T, logT
@@ -99,7 +99,6 @@ module ideal
       use skye_thermodynamics
       use auto_diff
 
-      implicit none
       integer :: j
       integer, intent(in) :: species
       integer, pointer :: chem_id(:)
@@ -110,7 +109,7 @@ module ideal
       real(dp), intent(out), dimension(nv) :: res, d_dlnd, d_dlnT
       real(dp), intent(out), dimension(nv, species) :: d_dxa
       real(dp), parameter :: mass_fraction_limit = 1d-10
-      
+
       integer :: relevant_species
       type(auto_diff_real_2var_order3) :: temp, den
       real(dp) :: ACMI(species), A(species), ya(species), select_xa(species), norm
@@ -121,7 +120,7 @@ module ideal
       ierr = 0
       F_ele = 0d0
       F_coul = 0d0
-      
+
       ! No electrons, so extreme negative chemical potential
       etaele = -1d99
       xnefer = 1d-20
@@ -135,7 +134,7 @@ module ideal
       temp = temp_in
       temp%d1val1 = 1d0
       den = den_in
-      den%d1val2 = 1d0      
+      den%d1val2 = 1d0
 
       ! Count and pack relevant species for Coulomb corrections. Relevant means mass fraction above limit.
       relevant_species = 0
@@ -180,8 +179,8 @@ module ideal
       call  pack_for_export(F_ideal_ion, F_coul, F_rad, F_ele, temp, den, xnefer, etaele, abar, zbar, &
                         phase, latent_ddlnT, latent_ddlnRho, res, d_dlnd, d_dlnT, ierr)
       if(ierr/=0) return
-      
-      res(i_mu) = abar ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
+
+      res(i_mu) = abar  ! ideal assumes neutral matter, whereas pack_for_export assumes ionized matter. So we patch it up here.
 
    end subroutine ideal_eos
 

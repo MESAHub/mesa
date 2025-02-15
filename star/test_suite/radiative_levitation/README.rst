@@ -15,7 +15,7 @@ This test case requires the OP_mono data. See the section ``OP mono opacities`` 
 
  found expected effects of radiative levitation
 
-.. image:: ../../../star/test_suite/radiative_levitation/docs/profile_000077.svg 
+.. image:: ../../../star/test_suite/radiative_levitation/docs/profile_000077.svg
    :width: 100%
 
 
@@ -27,14 +27,12 @@ pgstar commands used for the plot above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 
-         Profile_Panels3_win_flag = .true. 
+         Profile_Panels3_win_flag = .true.
          Profile_Panels3_win_width = 10
          Profile_Panels3_title = 'radiative_levitation'
 
@@ -47,12 +45,12 @@ pgstar commands used for the plot above:
          Profile_Panels3_yaxis_name(2) = 'opacity'
          Profile_Panels3_other_yaxis_name(2) = 'gradr'
 
-         Profile_Panels3_file_flag = .true. 
+         Profile_Panels3_file_flag = .true.
          Profile_Panels3_file_dir = 'pgstar_out'
          Profile_Panels3_file_prefix = 'profile_'
          Profile_Panels3_file_interval = 10000
          Profile_Panels3_file_width = 10
-         Profile_Panels3_file_aspect_ratio = -1 
+         Profile_Panels3_file_aspect_ratio = -1
 
 
  / ! end of pgstar namelist

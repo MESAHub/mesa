@@ -67,7 +67,7 @@ contains
 
     ye = zbar / abar
 
-    ! calculate key plasma paramters
+    ! calculate key plasma parameters
     cc% gamma_e = 2.275d5 * pow(ye * den, one_third) / temp
     cc% rs = 1.388_dp * pow(ye * den, -one_third)
 

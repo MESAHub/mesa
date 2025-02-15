@@ -25,12 +25,12 @@
 ! ***********************************************************************
 
       module chem_def
-      
+
       use utils_def, only: integer_dict
       use const_def, only: dp
       use math_lib, only: exp10
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
       ! Some notes on solar abundance scales:
@@ -67,17 +67,17 @@
       type(isotopic_abundance_table_type) :: lodders03_tab6
 
 
-      integer, parameter :: iso_name_length = 8 ! no. characters in an nuclide name
+      integer, parameter :: iso_name_length = 8  ! no. characters in an nuclide name
          ! 2 for element, 3 for A, and 3 for isomeric state as '_' + 1 or 2 digit integer 0 to 99)
-      integer, parameter :: long_name_length = 16 ! no. characters in a long name
-      integer, parameter :: npart = 24 ! no. entries in partition fcn table
+      integer, parameter :: long_name_length = 16  ! no. characters in a long name
+      integer, parameter :: npart = 24  ! no. entries in partition fcn table
       integer, parameter :: max_el_z = 112   ! max. Z in the winvn database
-      integer, parameter :: nhname = 3 ! no. isotopes for h in the winvn database
+      integer, parameter :: nhname = 3  ! no. isotopes for h in the winvn database
 
       logical, parameter :: convert_mass_excess_to_binding_energy = .true.
-      integer, parameter :: nuclide_not_found = -1 ! warning flag
+      integer, parameter :: nuclide_not_found = -1  ! warning flag
 
-      integer, dimension(0:max_el_z) :: element_min_N, element_max_N 
+      integer, dimension(0:max_el_z) :: element_min_N, element_max_N
          ! for isos included in chem_isos
 
       ! element names
@@ -94,7 +94,7 @@
             'tl','pb','bi','po','at','rn','fr','ra','ac','th', &
             'pa','u','np','pu','am','cm','bk','cf','es','fm','md', &
             'no','lr','rf','db','sg','bh','hs','mt','ds','rg','cn']
-            
+
       character(len=long_name_length), dimension(0:max_el_z) ::  &
             el_long_name = [character(len=long_name_length) ::  &
             'neutron','hydrogen','helium','lithium','beryllium', &
@@ -127,8 +127,8 @@
       character(len=long_name_length), dimension(2:3) :: &
          long_al_isomers = [character(len=long_name_length) ::  &
             'Aluminum-gs','Aluminum-ex']
-      
-      
+
+
       ! chem element id numbers (up to Cn)
       ! note: for isotope i, the element id number = chem_Z(i)
 
@@ -175,7 +175,7 @@
       integer, parameter :: e_se = 34
       integer, parameter :: e_br = 35
       integer, parameter :: e_kr = 36
-      
+
       !periodic table, row 5
       integer, parameter :: e_rb = 37
       integer, parameter :: e_sr = 38
@@ -198,7 +198,7 @@
 
       !periodic table, row 6
       integer, parameter :: e_cs = 55
-      integer, parameter :: e_ba = 56      
+      integer, parameter :: e_ba = 56
       integer, parameter :: e_la = 57
       integer, parameter :: e_ce = 58
       integer, parameter :: e_pr = 59
@@ -229,7 +229,7 @@
       integer, parameter :: e_po = 84
       integer, parameter :: e_at = 85
       integer, parameter :: e_rn = 86
-      
+
       !periodic table, row 7
       integer, parameter :: e_fr = 87
       integer, parameter :: e_ra = 88
@@ -257,19 +257,19 @@
       integer, parameter :: e_ds = 110
       integer, parameter :: e_rg = 111
       integer, parameter :: e_cn = 112
-         
+
       integer, parameter :: num_chem_elements = max_el_z
 
-      
+
       ! anders & grevesse 1989
       integer, parameter :: solsiz = 286
       integer, parameter :: solnamelen = 5
       character (len=solnamelen) :: namsol(solsiz)
       integer :: izsol(solsiz),iasol(solsiz),jcode(solsiz)
-      real(dp) :: solx(solsiz), zsol, yesol ! according to AG89
+      real(dp) :: solx(solsiz), zsol, yesol  ! according to AG89
       type (integer_dict), pointer :: Xsol_names_dict
-      
-      
+
+
       ! various values for current solar Z and Y (at photosphere)
       ! note that these have been reduced by diffusion from pre-MS values.
       ! values updated from Asplund et al. ARAA, 2009, 47, 481
@@ -284,7 +284,7 @@
       real(dp), parameter :: A09_Prz_zsol = 0.014d0
       real(dp), parameter :: MB22_photospheric_zsol = 0.0169d0
       real(dp), parameter :: AAG21_photospheric_zsol = 0.0139d0
-      
+
       real(dp), parameter :: AG89_ysol   = 0.2485d0
       real(dp), parameter :: GN93_ysol   = 0.2485d0
       real(dp), parameter :: GS98_ysol   = 0.2485d0
@@ -293,15 +293,15 @@
       real(dp), parameter :: AGSS09_ysol = 0.2485d0
       real(dp), parameter :: L09_ysol    = 0.2751d0
       real(dp), parameter :: A09_Prz_ysol = 0.276d0
-      real(dp), parameter :: MB22_photospheric_ysol = 0.2485
-      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485
-      
+      real(dp), parameter :: MB22_photospheric_ysol = 0.2485d0
+      real(dp), parameter :: AAG21_photospheric_ysol = 0.2485d0
+
       character(len=iso_name_length) :: chem_element_main_iso_name(num_chem_elements)
       integer, parameter :: chem_element_name_len = iso_name_length
-      character (len=chem_element_name_len)  :: chem_element_Name(num_chem_elements) 
+      character (len=chem_element_name_len)  :: chem_element_Name(num_chem_elements)
          ! names for elements
-      
-      
+
+
       ! identifiers for different Z fractions.
       integer, parameter :: Custom_zfracs = 0
       integer, parameter :: AG89_zfracs = 1
@@ -314,40 +314,40 @@
       integer, parameter :: A09_Prz_zfracs = 8
       integer, parameter :: MB22_photospheric_zfracs = 9
       integer, parameter :: AAG21_photospheric_zfracs = 10
-      
-         
-      real(dp) :: AG89_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+
+      real(dp) :: AG89_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Anders & Grevesse 1989
-         
-      real(dp) :: GN93_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: GN93_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Grevesse and Noels 1993 abundances
-         
-      real(dp) :: GS98_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: GS98_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Grevesse and Sauval 1998 abundances
-         
-      real(dp) :: L03_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: L03_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Lodders 2003 abundances
-         
-      real(dp) :: AGS05_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: AGS05_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Asplund, Grevesse, and Sauval 2005 abundances
-         
-      real(dp) :: AGSS09_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: AGSS09_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Asplund, Grevesse, Sauval, and Scott 2009 abundances
          ! Annu. Rev. Astron. Astrophys. 2009. 47:481–522
-         
-      real(dp) :: L09_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+
+      real(dp) :: L09_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
          ! Lodders and Palme, 2009.  (http://adsabs.harvard.edu/abs/2009M%26PSA..72.5154L)
-         
+
       real(dp) :: A09_Prz_zfrac(num_chem_elements)  ! fraction by mass of the total Z
          ! Abundances are abased on Asplund, Grevesse, Sauval, and Scott 2009, ARA&A, 47:481–522
          ! but that of the some key elements are updated based on:
-         ! "Present-day cosmic abundances ..." 
-            ! by Nieva, M.-F. & Przybilla, N. 2012, A&A, 539, 143 
+         ! "Present-day cosmic abundances ..."
+            ! by Nieva, M.-F. & Przybilla, N. 2012, A&A, 539, 143
          ! and the proceeding paper
             ! "Hot Stars and Cosmic Abundances" by
             ! Przybilla N. Nieva M. F., Irrgang A. and Butler K. 2013, EAS Publ. Ser.
             ! in preparation
-         ! The modified abundances w.r.t. A09 are (eps_El = log(El/H)+12.0) 
+         ! The modified abundances w.r.t. A09 are (eps_El = log(El/H)+12.0)
             ! eps_He = 10.99
             ! eps_C  = 8.33
             ! eps_N  = 7.79
@@ -358,26 +358,26 @@
             ! eps_Si = 7.50
             ! eps_S  = 7.14
             ! eps_Ar = 6.50
-            ! eps_Fe = 7.52   
+            ! eps_Fe = 7.52
 
-      real(dp) :: MB22_photospheric_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+      real(dp) :: MB22_photospheric_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
           ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
 
-      real(dp) :: AAG21_photospheric_element_zfrac(num_chem_elements) ! fraction by mass of total Z
+      real(dp) :: AAG21_photospheric_element_zfrac(num_chem_elements)  ! fraction by mass of total Z
           ! Asplund et al. A&A 653, A141 (2021) photospheric abundance.
 
       type (integer_dict), pointer :: chem_element_names_dict
 
-         
+
       real(dp) :: element_atomic_weight(num_chem_elements)
          ! de Laeter et al, Pure and Applied Chemistry 75(6), 683–799, 2003.
          ! (IUPAC Technical Report)
-      
+
 
 
       ! temperature values at which partition function is defined
       real(dp), dimension(npart) :: Tpart
-         
+
 
       ! mass excess of proton, neutron in MeV (for calculating binding energies)
       ! should be consistent with the mass excess of the prot and neut from the isotopes.data file
@@ -387,24 +387,24 @@
       type nuclide_data
          integer :: nnuclides
          character(len=iso_name_length), dimension(:), pointer :: name  ! name of nuclide
-         integer, dimension(:), pointer :: chem_id ! (nnuclides)
+         integer, dimension(:), pointer :: chem_id  ! (nnuclides)
             ! gives chem_id for member of nuclide_data
-         integer, dimension(:), pointer :: nuclide ! (num_chem_isos)
+         integer, dimension(:), pointer :: nuclide  ! (num_chem_isos)
             ! gives index in nuclide_data 1 .. nnuclides or 0 if not included
-         real(dp), dimension(:), pointer :: W ! atomic weight (mass in amu units)
-         integer, dimension(:), pointer :: Z ! number of protons
-         integer, dimension(:), pointer :: N ! number of neutrons
-         integer, dimension(:), pointer :: Z_plus_N ! number of baryons
-         integer, dimension(:), pointer :: isomeric_state ! 0 is default
+         real(dp), dimension(:), pointer :: W  ! atomic weight (mass in amu units)
+         integer, dimension(:), pointer :: Z  ! number of protons
+         integer, dimension(:), pointer :: N  ! number of neutrons
+         integer, dimension(:), pointer :: Z_plus_N  ! number of baryons
+         integer, dimension(:), pointer :: isomeric_state  ! 0 is default
          real(dp), dimension(:), pointer :: spin   ! ground-state spin
          real(dp), dimension(:), pointer :: binding_energy
             ! the binding energy is B = Z*del_Mp + N*del_Mn - mass_excess
-         real(dp), dimension(:,:), pointer :: pfcn ! table of partition function
+         real(dp), dimension(:,:), pointer :: pfcn  ! table of partition function
          real(dp), dimension(:), pointer :: mass_excess
-         real(dp), dimension(:), pointer :: Z53 ! cache expensive Z^5/3 result
-      end type nuclide_data      
+         real(dp), dimension(:), pointer :: Z53  ! cache expensive Z^5/3 result
+      end type nuclide_data
 
-      type (nuclide_data) :: chem_isos ! from winvn
+      type (nuclide_data) :: chem_isos  ! from winvn
       type (integer_dict), pointer :: chem_isos_dict
       integer :: num_chem_isos   ! no. entries in isotopes database
 
@@ -415,14 +415,14 @@
          character(len=iso_name_length) :: nuclide
          integer :: rank
       end type nuclide_set
-               
-      
+
+
       ! reaction categories
 
-      integer, parameter :: ipp = 1 ! pp chains
-      integer, parameter :: icno = 2 ! cno cycles
-      integer, parameter :: i3alf = 3 ! triple alpha  
-      
+      integer, parameter :: ipp = 1  ! pp chains
+      integer, parameter :: icno = 2  ! cno cycles
+      integer, parameter :: i3alf = 3  ! triple alpha
+
       ! "burn" in the following means decays or captures of protons, alphas, or neutrons
       integer, parameter :: i_burn_c = 4
       integer, parameter :: i_burn_n = 5
@@ -437,28 +437,28 @@
       integer, parameter :: i_burn_ti = 14
       integer, parameter :: i_burn_cr = 15
       integer, parameter :: i_burn_fe = 16
-      
-      integer, parameter :: icc = 17 ! c12 + c12
-      integer, parameter :: ico = 18 ! c12 + o16
-      integer, parameter :: ioo = 19 ! o16 + o16
-      
-      integer, parameter :: ipnhe4 = 20 ! 2prot + 2neut -> he4
-      
-      integer, parameter :: iphoto = 21 ! photodisintegration
+
+      integer, parameter :: icc = 17  ! c12 + c12
+      integer, parameter :: ico = 18  ! c12 + o16
+      integer, parameter :: ioo = 19  ! o16 + o16
+
+      integer, parameter :: ipnhe4 = 20  ! 2prot + 2neut -> he4
+
+      integer, parameter :: iphoto = 21  ! photodisintegration
          ! note: for photodisintegrations, eps_nuc will be negative.
-         
-      integer, parameter :: i_ni56_co56 = 22 ! ni56 -> co56
-      integer, parameter :: i_co56_fe56 = 23 ! co56 -> fe56
-      integer, parameter :: iother = 24 ! misc.
-   
+
+      integer, parameter :: i_ni56_co56 = 22  ! ni56 -> co56
+      integer, parameter :: i_co56_fe56 = 23  ! co56 -> fe56
+      integer, parameter :: iother = 24  ! misc.
+
       integer, parameter :: num_categories = iother
 
       integer, parameter :: maxlen_category_name = 16
-      character (len=maxlen_category_name) :: category_name(num_categories)      
+      character (len=maxlen_category_name) :: category_name(num_categories)
       type (integer_dict), pointer :: category_names_dict
 
-      
-      ! some commonly used values of get_nuclide_index      
+
+      ! some commonly used values of get_nuclide_index
       integer :: &
          ih1, ih2, ih3,  &
          ihe3, ihe4,  &
@@ -527,49 +527,49 @@
       logical :: chem_has_been_initialized = .false.
 
 
-      
+
       contains
-      
-      
+
+
       subroutine init_chem_tables
          use utils_lib, only: integer_dict_define, integer_dict_create_hash
-      
+
          integer :: i, ierr
-         
-         Tpart = (/  &
+
+         Tpart = [  &
             0.10d0, 0.15d0, 0.20d0, 0.30d0, 0.40d0, 0.50d0, &
             0.60d0, 0.70d0, 0.80d0, 0.90d0, 1.00d0, 1.50d0, &
             2.00d0, 2.50d0, 3.00d0, 3.50d0, 4.00d0, 4.50d0, &
-            5.00d0, 6.00d0, 7.00d0, 8.00d0, 9.00d0, 10.0d0 /)
-            
+            5.00d0, 6.00d0, 7.00d0, 8.00d0, 9.00d0, 10.0d0 ]
+
          call init_ag_data
-      
+
          call init_chem_element_names
-      
+
          call init_chem_element_main_iso_names
-      
+
          call init_element_atomic_weights
-         
+
          call init_AG89_data
-         
+
          call init_GN93_data
-         
+
          call init_GS98_data
-         
+
          call init_L03_data
-         
+
          call init_AGS05_data
-         
+
          call init_AGSS09_data
-         
+
          call init_A09_Przybilla_data
 
          call init_MB22_photospheric_data
 
          call init_AAG21_photospheric_data
-         
+
          call init_L09_data
-         
+
          nullify(chem_element_names_dict)
          do i=1,num_chem_elements
             call integer_dict_define(chem_element_names_dict, chem_element_Name(i), i, ierr)
@@ -585,7 +585,7 @@
             flush(6)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          call set_category_names
          nullify(category_names_dict)
          do i=1,num_categories
@@ -602,18 +602,18 @@
             flush(6)
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
       end subroutine init_chem_tables
-      
-      
+
+
       subroutine init_ag_data
          use utils_lib
-      
+
          real(dp) :: sum
          integer :: i, j, ierr
 
 !..names of the stable isotopes
-         namsol(1:120) = (/ &
+         namsol(1:120) = [ &
        'h1   ','h2   ','he3  ','he4  ','li6  ','li7  ','be9  ','b10  ', &
        'b11  ','c12  ','c13  ','n14  ','n15  ','o16  ','o17  ','o18  ', &
        'f19  ','ne20 ','ne21 ','ne22 ','na23 ','mg24 ','mg25 ','mg26 ', &
@@ -628,9 +628,9 @@
        'se78 ','se80 ','se82 ','br79 ','br81 ','kr78 ','kr80 ','kr82 ', &
        'kr83 ','kr84 ','kr86 ','rb85 ','rb87 ','sr84 ','sr86 ','sr87 ', &
        'sr88 ','y89  ','zr90 ','zr91 ','zr92 ','zr94 ','zr96 ','nb93 ', &
-       'mo92 ','mo94 ','mo95 ','mo96 ','mo97 ','mo98 ','mo100','ru96 '  /)
+       'mo92 ','mo94 ','mo95 ','mo96 ','mo97 ','mo98 ','mo100','ru96 '  ]
 
-         namsol(121:240) = (/ &
+         namsol(121:240) = [ &
        'ru98 ','ru99 ','ru100','ru101','ru102','ru104','rh103','pd102', &
        'pd104','pd105','pd106','pd108','pd110','ag107','ag109','cd106', &
        'cd108','cd110','cd111','cd112','cd113','cd114','cd116','in113', &
@@ -645,19 +645,19 @@
        'gd155','gd156','gd157','gd158','gd160','tb159','dy156','dy158', &
        'dy160','dy161','dy162','dy163','dy164','ho165','er162','er164', &
        'er166','er167','er168','er170','tm169','yb168','yb170','yb171', &
-       'yb172','yb173','yb174','yb176','lu175','lu176','hf174','hf176' /)
+       'yb172','yb173','yb174','yb176','lu175','lu176','hf174','hf176' ]
 
-         namsol(241:286) = (/ &
+         namsol(241:286) = [ &
        'hf177','hf178','hf179','hf180','ta180','ta181','w180 ','w182 ', &
        'w183 ','w184 ','w186 ','re185','re187','os184','os186','os187', &
        'os188','os189','os190','os192','ir191','ir193','pt190','pt192', &
        'pt194','pt195','pt196','pt198','au197','hg196','hg198','hg199', &
        'hg200','hg201','hg202','hg204','tl203','tl205','pb204','pb206', &
-       'pb207','pb208','bi209','th232','u235 ','u238 ' /)
+       'pb207','pb208','bi209','th232','u235 ','u238 ' ]
 
 
 !..anders & grevesse 1989 solar mass fractions
-         solx(1:45) = (/ &
+         solx(1:45) = [ &
            7.0573D-01, 4.8010D-05, 2.9291D-05, 2.7521D-01, 6.4957D-10, &
            9.3490D-09, 1.6619D-10, 1.0674D-09, 4.7301D-09, 3.0324D-03, &
            3.6501D-05, 1.1049D-03, 4.3634D-06, 9.5918D-03, 3.8873D-06, &
@@ -666,9 +666,9 @@
            6.5301D-04, 3.4257D-05, 2.3524D-05, 8.1551D-06, 3.9581D-04, &
            3.2221D-06, 1.8663D-05, 9.3793D-08, 2.5320D-06, 8.5449D-07, &
            7.7402D-05, 1.5379D-05, 2.6307D-08, 3.4725D-06, 4.4519D-10, &
-           2.6342D-07, 5.9898D-05, 4.1964D-07, 8.9734D-07, 1.4135D-06 /)
+           2.6342D-07, 5.9898D-05, 4.1964D-07, 8.9734D-07, 1.4135D-06 ]
 
-         solx(46:90)  = (/ &
+         solx(46:90)  = [ &
              2.7926D-09, 1.3841D-07, 3.8929D-08, 2.2340D-07, 2.0805D-07, &
              2.1491D-06, 1.6361D-07, 1.6442D-07, 9.2579D-10, 3.7669D-07, &
              7.4240D-07, 1.4863D-05, 1.7160D-06, 4.3573D-07, 1.3286D-05, &
@@ -677,9 +677,9 @@
              5.7528D-07, 2.6471D-07, 9.9237D-07, 5.8765D-07, 8.7619D-08, &
              4.0593D-07, 1.3811D-08, 3.9619D-08, 2.7119D-08, 4.3204D-08, &
              5.9372D-08, 1.7136D-08, 8.1237D-08, 1.7840D-08, 1.2445D-08, &
-             1.0295D-09, 1.0766D-08, 9.1542D-09, 2.9003D-08, 6.2529D-08 /)
+             1.0295D-09, 1.0766D-08, 9.1542D-09, 2.9003D-08, 6.2529D-08 ]
 
-         solx(91:135)  = (/ &
+         solx(91:135)  = [ &
              1.1823D-08, 1.1950D-08, 1.2006D-08, 3.0187D-10, 2.0216D-09, &
              1.0682D-08, 1.0833D-08, 5.4607D-08, 1.7055D-08, 1.1008D-08, &
              4.3353D-09, 2.8047D-10, 5.0468D-09, 3.6091D-09, 4.3183D-08, &
@@ -688,9 +688,9 @@
              1.0320D-09, 5.9868D-10, 1.5245D-09, 6.2225D-10, 2.5012D-10, &
              8.6761D-11, 5.9099D-10, 5.9190D-10, 8.0731D-10, 1.5171D-09, &
              9.1547D-10, 8.9625D-10, 3.6637D-11, 4.0775D-10, 8.2335D-10, &
-             1.0189D-09, 1.0053D-09, 4.5354D-10, 6.8205D-10, 6.4517D-10 /)
+             1.0189D-09, 1.0053D-09, 4.5354D-10, 6.8205D-10, 6.4517D-10 ]
 
-         solx(136:180)  = (/ &
+         solx(136:180)  = [ &
              5.3893D-11, 3.9065D-11, 5.5927D-10, 5.7839D-10, 1.0992D-09, &
              5.6309D-10, 1.3351D-09, 3.5504D-10, 2.2581D-11, 5.1197D-10, &
              1.0539D-10, 7.1802D-11, 3.9852D-11, 1.6285D-09, 8.6713D-10, &
@@ -699,9 +699,9 @@
              7.1827D-10, 1.0814D-09, 3.1553D-09, 4.9538D-09, 5.3600D-09, &
              2.8912D-09, 1.7910D-11, 1.6223D-11, 3.3349D-10, 4.1767D-09, &
              6.7411D-10, 3.3799D-09, 4.1403D-09, 1.5558D-09, 1.2832D-09, &
-             1.2515D-09, 1.5652D-11, 1.5125D-11, 3.6946D-10, 1.0108D-09 /)
+             1.2515D-09, 1.5652D-11, 1.5125D-11, 3.6946D-10, 1.0108D-09 ]
 
-         solx(181:225)  = (/ &
+         solx(181:225)  = [ &
              1.2144D-09, 1.7466D-09, 1.1240D-08, 1.3858D-12, 1.5681D-09, &
              7.4306D-12, 9.9136D-12, 3.5767D-09, 4.5258D-10, 5.9562D-10, &
              8.0817D-10, 3.6533D-10, 7.1757D-10, 2.5198D-10, 5.2441D-10, &
@@ -710,9 +710,9 @@
              1.9660D-10, 2.5376D-12, 2.8008D-11, 1.9133D-10, 2.6675D-10, &
              2.0492D-10, 3.2772D-10, 2.9180D-10, 2.8274D-10, 8.6812D-13, &
              1.4787D-12, 3.7315D-11, 3.0340D-10, 4.1387D-10, 4.0489D-10, &
-             4.6047D-10, 3.7104D-10, 1.4342D-12, 1.6759D-11, 3.5397D-10 /)
+             4.6047D-10, 3.7104D-10, 1.4342D-12, 1.6759D-11, 3.5397D-10 ]
 
-         solx(226:270)  = (/ &
+         solx(226:270)  = [ &
              2.4332D-10, 2.8557D-10, 1.6082D-10, 1.6159D-10, 1.3599D-12, &
              3.2509D-11, 1.5312D-10, 2.3624D-10, 1.7504D-10, 3.4682D-10, &
              1.4023D-10, 1.5803D-10, 4.2293D-12, 1.0783D-12, 3.4992D-11, &
@@ -721,18 +721,18 @@
              1.7878D-10, 9.0315D-11, 1.5326D-10, 5.6782D-13, 5.0342D-11, &
              5.1086D-11, 4.2704D-10, 5.2110D-10, 8.5547D-10, 1.3453D-09, &
              1.1933D-09, 2.0211D-09, 8.1702D-13, 5.0994D-11, 2.1641D-09, &
-             2.2344D-09, 1.6757D-09, 4.8231D-10, 9.3184D-10, 2.3797D-12 /)
+             2.2344D-09, 1.6757D-09, 4.8231D-10, 9.3184D-10, 2.3797D-12 ]
 
-         solx(271:286)  = (/ &
+         solx(271:286)  = [ &
              1.7079D-10, 2.8843D-10, 3.9764D-10, 2.2828D-10, 5.1607D-10, &
              1.2023D-10, 2.7882D-10, 6.7411D-10, 3.1529D-10, 3.1369D-09, &
              3.4034D-09, 9.6809D-09, 7.6127D-10, 1.9659D-10, 3.8519D-13, &
-             5.3760D-11 /)
-                                                          
+             5.3760D-11 ]
+
 
 !..charge of the stable isotopes
 
-         izsol(1:117)  = (/ &
+         izsol(1:117)  = [ &
          1,   1,   2,   2,   3,   3,   4,   5,   5,   6,   6,   7,   7, &
          8,   8,   8,   9,  10,  10,  10,  11,  12,  12,  12,  13,  14, &
         14,  14,  15,  16,  16,  16,  16,  17,  17,  18,  18,  18,  19, &
@@ -741,9 +741,9 @@
         28,  28,  28,  28,  28,  29,  29,  30,  30,  30,  30,  30,  31, &
         31,  32,  32,  32,  32,  32,  33,  34,  34,  34,  34,  34,  34, &
         35,  35,  36,  36,  36,  36,  36,  36,  37,  37,  38,  38,  38, &
-        38,  39,  40,  40,  40,  40,  40,  41,  42,  42,  42,  42,  42 /)
- 
-         izsol(118:234)  = (/ &
+        38,  39,  40,  40,  40,  40,  40,  41,  42,  42,  42,  42,  42 ]
+
+         izsol(118:234)  = [ &
         42,  42,  44,  44,  44,  44,  44,  44,  44,  45,  46,  46,  46, &
         46,  46,  46,  47,  47,  48,  48,  48,  48,  48,  48,  48,  48, &
         49,  49,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  51, &
@@ -752,18 +752,18 @@
         56,  57,  57,  58,  58,  58,  58,  59,  60,  60,  60,  60,  60, &
         60,  60,  62,  62,  62,  62,  62,  62,  62,  63,  63,  64,  64, &
         64,  64,  64,  64,  64,  65,  66,  66,  66,  66,  66,  66,  66, &
-        67,  68,  68,  68,  68,  68,  68,  69,  70,  70,  70,  70,  70 /)
+        67,  68,  68,  68,  68,  68,  68,  69,  70,  70,  70,  70,  70 ]
 
-         izsol(235:286)  = (/ &
+         izsol(235:286)  = [ &
         70,  70,  71,  71,  72,  72,  72,  72,  72,  72,  73,  73,  74, &
         74,  74,  74,  74,  75,  75,  76,  76,  76,  76,  76,  76,  76, &
         77,  77,  78,  78,  78,  78,  78,  78,  79,  80,  80,  80,  80, &
-        80,  80,  80,  81,  81,  82,  82,  82,  82,  83,  90,  92,  92 /)
+        80,  80,  80,  81,  81,  82,  82,  82,  82,  83,  90,  92,  92 ]
 
 
 !..number of nucleons (protons and neutrons) in the stable isotopes
 
-         iasol(1:117)  = (/ &
+         iasol(1:117)  = [ &
          1,   2,   3,   4,   6,   7,   9,  10,  11,  12,  13,  14,  15, &
         16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28, &
         29,  30,  31,  32,  33,  34,  36,  35,  37,  36,  38,  40,  39, &
@@ -772,9 +772,9 @@
         58,  60,  61,  62,  64,  63,  65,  64,  66,  67,  68,  70,  69, &
         71,  70,  72,  73,  74,  76,  75,  74,  76,  77,  78,  80,  82, &
         79,  81,  78,  80,  82,  83,  84,  86,  85,  87,  84,  86,  87, &
-        88,  89,  90,  91,  92,  94,  96,  93,  92,  94,  95,  96,  97 /)
+        88,  89,  90,  91,  92,  94,  96,  93,  92,  94,  95,  96,  97 ]
 
-         iasol(118:234)  = (/ &
+         iasol(118:234)  = [ &
         98, 100,  96,  98,  99, 100, 101, 102, 104, 103, 102, 104, 105, &
        106, 108, 110, 107, 109, 106, 108, 110, 111, 112, 113, 114, 116, &
        113, 115, 112, 114, 115, 116, 117, 118, 119, 120, 122, 124, 121, &
@@ -783,13 +783,13 @@
        138, 138, 139, 136, 138, 140, 142, 141, 142, 143, 144, 145, 146, &
        148, 150, 144, 147, 148, 149, 150, 152, 154, 151, 153, 152, 154, &
        155, 156, 157, 158, 160, 159, 156, 158, 160, 161, 162, 163, 164, &
-       165, 162, 164, 166, 167, 168, 170, 169, 168, 170, 171, 172, 173 /)
+       165, 162, 164, 166, 167, 168, 170, 169, 168, 170, 171, 172, 173 ]
 
-         iasol(235:286)  = (/ &
+         iasol(235:286)  = [ &
        174, 176, 175, 176, 174, 176, 177, 178, 179, 180, 180, 181, 180, &
        182, 183, 184, 186, 185, 187, 184, 186, 187, 188, 189, 190, 192, &
        191, 193, 190, 192, 194, 195, 196, 198, 197, 196, 198, 199, 200, &
-       201, 202, 204, 203, 205, 204, 206, 207, 208, 209, 232, 235, 238 /)
+       201, 202, 204, 203, 205, 204, 206, 207, 208, 209, 232, 235, 238 ]
 
 
 ! jcode tells the type progenitors each stable species can have.
@@ -798,7 +798,7 @@
 !       = 2 if the species can have neutron-rich progenitors
 !       = 3 if the species can only be made as itself (eg k40)
 
-        jcode(1:286) = (/ &
+        jcode(1:286) = [ &
          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, &
          0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, &
          0,   0,   0,   0,   0,   0,   2,   0,   0,   1,   0,   2,   0, &
@@ -820,9 +820,9 @@
          2,   2,   0,   3,   1,   1,   0,   0,   0,   2,   3,   0,   1, &
          0,   0,   2,   2,   0,   2,   1,   1,   1,   0,   0,   2,   2, &
          0,   0,   1,   1,   0,   0,   2,   2,   0,   1,   1,   0,   0, &
-         0,   0,   2,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0/)
+         0,   0,   2,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0]
 
-      
+
    ! get sum and stuff residual into hydrogen
         sum = 0.0d0
         do j=1,solsiz
@@ -830,21 +830,21 @@
         enddo
         sum = 1.0d0 - sum
         solx(1) = solx(1) + sum
-        
+
         sum  = 0.0d0
         do j=1,solsiz
-           if (izsol(j) .ge. 3) then
+           if (izsol(j) >= 3) then
               sum  = sum + solx(j)
            endif
         enddo
         zsol = sum
-        
+
         sum = 0.0d0
         do j=1,solsiz
            sum = sum + dble(izsol(j))/dble(iasol(j))*solx(j)
         enddo
         yesol = sum
-        
+
         nullify(Xsol_names_dict)
         ierr = 0
         do i=1,solsiz
@@ -873,10 +873,10 @@
            flush(6)
            call mesa_error(__FILE__,__LINE__)
         end if
-         
+
       end subroutine init_ag_data
-            
-      
+
+
       subroutine init_chem_element_names
          integer :: i
          chem_element_name(:) = ''
@@ -887,14 +887,14 @@
             if (len_trim(chem_element_name(i)) == 0) then
                write(*,*)'missing chem_element_name(i)', i
                flush(6)
-               call mesa_error(__FILE__,__LINE__) 
+               call mesa_error(__FILE__,__LINE__)
             end if
          end do
 
       end subroutine init_chem_element_names
 
-      
-      
+
+
       subroutine init_chem_element_main_iso_names
          ! the iso with the largest number abundance according to Lodders03
          integer :: i
@@ -913,7 +913,7 @@
          chem_element_main_iso_name(e_o) = 'o16'
          chem_element_main_iso_name(e_f) = 'f19'
          chem_element_main_iso_name(e_ne) = 'ne20'
-         
+
          !periodic table, row 3
          chem_element_main_iso_name(e_na) = 'na23'
          chem_element_main_iso_name(e_mg) = 'mg24'
@@ -1030,21 +1030,20 @@
             if (len_trim(chem_element_main_iso_name(i)) == 0) then
                write(*,*)'missing chem_element_main_iso_name', i
                flush(6)
-               call mesa_error(__FILE__,__LINE__) 
+               call mesa_error(__FILE__,__LINE__)
             end if
          end do
-         
+
       end subroutine init_chem_element_main_iso_names
-      
-      
+
+
       subroutine init_element_atomic_weights
          use utils_lib, only: integer_dict_lookup
          integer :: i, isotope_index, ierr
          element_atomic_weight(:) = 0d0
 
          do i = e_h, e_cn
-            call integer_dict_lookup(chem_isos_dict, \
-               chem_element_main_iso_name(i), isotope_index, ierr)
+            call integer_dict_lookup(chem_isos_dict, chem_element_main_iso_name(i), isotope_index, ierr)
             if (ierr /= 0) then
                call mesa_error(__FILE__,__LINE__,'init_element_atomic_weights')
                return
@@ -1052,15 +1051,15 @@
             element_atomic_weight(i) = chem_isos% W(isotope_index)
          end do
       end subroutine init_element_atomic_weights
-      
-      
-      subroutine init_AG89_data ! fraction by mass of total Z
+
+
+      subroutine init_AG89_data  ! fraction by mass of total Z
          ! anders & grevesse 1989, paper not available on ADS
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
 
          AG89_element_zfrac(:) = 0d0
-         
+
          AG89_element_zfrac(e_li) =     5.2663415161043120D-07
          AG89_element_zfrac(e_be) =     8.7533846996258026D-09
          AG89_element_zfrac(e_b)  =     3.0535981584981396D-07
@@ -1089,27 +1088,27 @@
          AG89_element_zfrac(e_ni) =     3.8650578305194534D-03
          AG89_element_zfrac(e_cu) =     4.4243068859971588D-05
          AG89_element_zfrac(e_zn) =     1.0994428157112287D-04
-         
+
          z_sum = sum(AG89_element_zfrac(:))
          do i = e_li, e_zn
             AG89_element_zfrac(i) = AG89_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AG89_data
 
 
-      subroutine init_GN93_data ! fraction by mass of total Z
+      subroutine init_GN93_data  ! fraction by mass of total Z
          ! Grevesse and Noels 1993
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          GN93_element_zfrac(:) = -20.0d0
-         
+
         !GN93_element_zfrac(e_H)=12.00d0
         !GN93_element_zfrac(e_He)=10.99d0
-         GN93_element_zfrac(e_Li)=3.31d0 !meteor
-         GN93_element_zfrac(e_Be)=1.42d0 !meteor
+         GN93_element_zfrac(e_Li)=3.31d0  !meteor
+         GN93_element_zfrac(e_Be)=1.42d0  !meteor
          GN93_element_zfrac(e_B )=2.79d0  !meteor
          GN93_element_zfrac(e_C )=8.55d0
          GN93_element_zfrac(e_N )=7.97d0
@@ -1202,20 +1201,20 @@
          end do
 
       end subroutine init_GN93_data
-      
-      
-      subroutine init_GS98_data ! fraction by mass of total Z
+
+
+      subroutine init_GS98_data  ! fraction by mass of total Z
          ! Grevesse and Sauval 1998, Table 1
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          GS98_element_zfrac(:) = -20.0d0
 
          !GS98_element_zfrac(e_H)=12.00d0
          !GS98_element_zfrac(e_He)=10.93d0
-         GS98_element_zfrac(e_Li)=3.31d0 !meteor
-         GS98_element_zfrac(e_Be)=1.42d0 !meteor
+         GS98_element_zfrac(e_Li)=3.31d0  !meteor
+         GS98_element_zfrac(e_Be)=1.42d0  !meteor
          GS98_element_zfrac(e_B)=2.79d0  !meteor
          GS98_element_zfrac(e_C)=8.52d0
          GS98_element_zfrac(e_N)=7.92d0
@@ -1295,7 +1294,7 @@
          GS98_element_zfrac(e_Bi)=0.71d0
          GS98_element_zfrac(e_Th)=0.09d0
          GS98_element_zfrac(e_U)=-0.50d0
-         
+
          ! convert to fraction of Z by mass
          z_sum = 0d0
          do i = e_li, e_u
@@ -1306,17 +1305,17 @@
          do i = e_li, e_u
             GS98_element_zfrac(i) = GS98_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_GS98_data
-            
-      subroutine init_L03_data ! fraction by mass of total Z
+
+      subroutine init_L03_data  ! fraction by mass of total Z
          ! Lodders 2003, ApJ, Table 1 recommended abundance
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          L03_element_zfrac(:) = -20.0d0
-         
+
         !L03_element_zfrac(e_H)=12d0
         !L03_element_zfrac(e_He)=10.89d0
         L03_element_zfrac(e_Li)=3.28d0
@@ -1411,28 +1410,28 @@
          do i = e_li, e_u
             L03_element_zfrac(i) = L03_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_L03_data
-      
-      
-      subroutine init_AGS05_data ! fraction by mass of total Z
-         ! Asplund, Grevesse and Sauval 2005      
+
+
+      subroutine init_AGS05_data  ! fraction by mass of total Z
+         ! Asplund, Grevesse and Sauval 2005
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
 
          AGS05_element_zfrac(:) = -20.0d0
-                  
+
          ! first store log abundances from the paper (photosphere unless otherwise noted)
          ! relative to log abundance of H = 12.00d0
-         AGS05_element_zfrac(e_li) = 3.25d0 !meteor
+         AGS05_element_zfrac(e_li) = 3.25d0  !meteor
          AGS05_element_zfrac(e_be) = 1.38d0
          AGS05_element_zfrac(e_b ) = 2.70d0
          AGS05_element_zfrac(e_c ) = 8.39d0
          AGS05_element_zfrac(e_n ) = 7.78d0
          AGS05_element_zfrac(e_o ) = 8.66d0
          AGS05_element_zfrac(e_f ) = 4.56d0
-         AGS05_element_zfrac(e_ne) = 7.84d0 !indirect
+         AGS05_element_zfrac(e_ne) = 7.84d0  !indirect
          AGS05_element_zfrac(e_na) = 6.17d0
          AGS05_element_zfrac(e_mg) = 7.53d0
          AGS05_element_zfrac(e_al) = 6.37d0
@@ -1440,7 +1439,7 @@
          AGS05_element_zfrac(e_p ) = 5.36d0
          AGS05_element_zfrac(e_s ) = 7.14d0
          AGS05_element_zfrac(e_cl) = 5.50d0
-         AGS05_element_zfrac(e_ar) = 6.18d0 !indirect
+         AGS05_element_zfrac(e_ar) = 6.18d0  !indirect
          AGS05_element_zfrac(e_k ) = 5.08d0
          AGS05_element_zfrac(e_ca) = 6.31d0
          AGS05_element_zfrac(e_sc) = 3.05d0
@@ -1455,10 +1454,10 @@
          AGS05_element_zfrac(e_zn) = 4.60d0
          AGS05_element_zfrac(e_ga) = 2.88d0
          AGS05_element_zfrac(e_ge) = 3.58d0
-         AGS05_element_zfrac(e_as) = 2.29d0 !meteor
-         AGS05_element_zfrac(e_se) = 3.33d0 !meteor
-         AGS05_element_zfrac(e_br) = 2.56d0 !meteor
-         AGS05_element_zfrac(e_kr) = 3.28d0 !indirect
+         AGS05_element_zfrac(e_as) = 2.29d0  !meteor
+         AGS05_element_zfrac(e_se) = 3.33d0  !meteor
+         AGS05_element_zfrac(e_br) = 2.56d0  !meteor
+         AGS05_element_zfrac(e_kr) = 3.28d0  !indirect
          AGS05_element_zfrac(e_rb) = 2.60d0
          AGS05_element_zfrac(e_sr) = 2.92d0
          AGS05_element_zfrac(e_y ) = 2.21d0
@@ -1473,10 +1472,10 @@
          AGS05_element_zfrac(e_In) = 1.60d0
          AGS05_element_zfrac(e_Sn) = 2.00d0
          AGS05_element_zfrac(e_Sb) = 1.00d0
-         AGS05_element_zfrac(e_Te) = 2.19d0 !meteor
-         AGS05_element_zfrac(e_I ) = 1.51d0 !meteor
-         AGS05_element_zfrac(e_Xe) = 2.27d0 !indirect
-         AGS05_element_zfrac(e_Cs) = 1.07d0 !meteor
+         AGS05_element_zfrac(e_Te) = 2.19d0  !meteor
+         AGS05_element_zfrac(e_I ) = 1.51d0  !meteor
+         AGS05_element_zfrac(e_Xe) = 2.27d0  !indirect
+         AGS05_element_zfrac(e_Cs) = 1.07d0  !meteor
          AGS05_element_zfrac(e_Ba) = 2.17d0
          AGS05_element_zfrac(e_La) = 1.13d0
          AGS05_element_zfrac(e_Ce) = 1.58d0
@@ -1493,18 +1492,18 @@
          AGS05_element_zfrac(e_Yb) = 1.08d0
          AGS05_element_zfrac(e_Lu) = 0.06d0
          AGS05_element_zfrac(e_Hf) = 0.88d0
-         AGS05_element_zfrac(e_Ta) = -0.17d0 !meteor
+         AGS05_element_zfrac(e_Ta) = -0.17d0  !meteor
          AGS05_element_zfrac(e_W ) = 1.11d0
-         AGS05_element_zfrac(e_Re) = 0.23d0 !meteor
+         AGS05_element_zfrac(e_Re) = 0.23d0  !meteor
          AGS05_element_zfrac(e_Os) = 1.45d0
          AGS05_element_zfrac(e_Ir) = 1.38d0
-         AGS05_element_zfrac(e_Pt) = 1.64d0 !meteor
+         AGS05_element_zfrac(e_Pt) = 1.64d0  !meteor
          AGS05_element_zfrac(e_Au) = 1.01d0
-         AGS05_element_zfrac(e_Hg) = 1.13d0 !meteor
+         AGS05_element_zfrac(e_Hg) = 1.13d0  !meteor
          AGS05_element_zfrac(e_Tl) = 0.90d0
          AGS05_element_zfrac(e_Pb) = 2.00d0
-         AGS05_element_zfrac(e_Bi) = 0.65d0 !meteor
-         AGS05_element_zfrac(e_Th) = 0.06d0 !meteor
+         AGS05_element_zfrac(e_Bi) = 0.65d0  !meteor
+         AGS05_element_zfrac(e_Th) = 0.06d0  !meteor
          AGS05_element_zfrac(e_U) = -0.52d0
 
          ! convert to fraction of Z by mass
@@ -1517,19 +1516,19 @@
          do i = e_li, e_u
             AGS05_element_zfrac(i) = AGS05_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AGS05_data
-      
-      
-      subroutine init_AGSS09_data ! fraction by mass of total Z
+
+
+      subroutine init_AGSS09_data  ! fraction by mass of total Z
          ! Asplund, Grevesse, Sauval, and Scott 2009 abundances
          ! Annu. Rev. Astron. Astrophys. 2009. 47:481–522
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          AGSS09_element_zfrac(:) = -20.0d0
-         
+
          ! first store log abundances from the paper
          AGSS09_element_zfrac(e_li) = 3.26d0
          AGSS09_element_zfrac(e_be) = 1.38d0
@@ -1561,10 +1560,10 @@
          AGSS09_element_zfrac(e_zn) = 4.56d0
          AGSS09_element_zfrac(e_ga) = 3.04d0
          AGSS09_element_zfrac(e_ge) = 3.65d0
-         AGSS09_element_zfrac(e_as) = 2.30d0 !meteor
-         AGSS09_element_zfrac(e_se) = 3.34d0 !meteor
-         AGSS09_element_zfrac(e_br) = 2.54d0 !meteor
-         AGSS09_element_zfrac(e_kr) = 3.25d0 !indirect
+         AGSS09_element_zfrac(e_as) = 2.30d0  !meteor
+         AGSS09_element_zfrac(e_se) = 3.34d0  !meteor
+         AGSS09_element_zfrac(e_br) = 2.54d0  !meteor
+         AGSS09_element_zfrac(e_kr) = 3.25d0  !indirect
          AGSS09_element_zfrac(e_rb) = 2.52d0
          AGSS09_element_zfrac(e_sr) = 2.87d0
          AGSS09_element_zfrac(e_y ) = 2.21d0
@@ -1612,7 +1611,7 @@
          AGSS09_element_zfrac(e_Bi) = 0.65d0
          AGSS09_element_zfrac(e_Th) = 0.02d0
          AGSS09_element_zfrac(e_U) = -0.54d0
-         
+
          ! convert to fraction of Z by mass
          z_sum = 0
          do i = e_li, e_u
@@ -1623,20 +1622,20 @@
          do i = e_li, e_u
             AGSS09_element_zfrac(i) = AGSS09_element_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_AGSS09_data
 
 
-      subroutine init_A09_Przybilla_data ! fraction by mass of total Z
+      subroutine init_A09_Przybilla_data  ! fraction by mass of total Z
          ! provided by Ehsan Moravveji, Oct 12, 2013.
          ! The mass fraction is taken from Asplund et al. (2009), and modified by the
          ! B-star measurement of Nieva & Przybilla 2012, A&A, 539, 143 and
          ! Przybilla et al. (2013), EAS proceeding to be published
          ! The modified elements are: he, c, n, o, ne, mg, al, si, s, ar, fe
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          A09_Prz_zfrac(:)  = -20.0d0
 
 !         A09_Prz_zfrac(e_h ) = 12.00d0
@@ -1722,7 +1721,7 @@
          A09_Prz_zfrac(e_bi) = 0.65d0
          A09_Prz_zfrac(e_th) = 0.02d0
          A09_Prz_zfrac(e_u ) = -0.54d0
-                           
+
          ! convert to fraction of Z by mass
          z_sum = 0d0
          do i = e_li, e_u
@@ -1733,22 +1732,22 @@
          do i = e_li, e_u
             A09_Prz_zfrac(i) = A09_Prz_zfrac(i) / z_sum
          end do
-         
+
       end subroutine init_A09_Przybilla_data
-    
-    subroutine init_MB22_photospheric_data ! fraction by mass of total Z
+
+    subroutine init_MB22_photospheric_data  ! fraction by mass of total Z
        ! Ekaterina Magg et al. , A&A 661, A140 (2022) photospheric abundance.
        ! supplimented with Asplund, Grevesse, Sauval, and Scott 2009 abundances
        integer :: i
        real(dp) :: z_sum
        include 'formats'
-       
+
        MB22_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
-         MB22_photospheric_element_zfrac(e_li) = 3.26d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_be) = 1.38d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_b ) = 2.70d0 ! AGSS09
+         MB22_photospheric_element_zfrac(e_li) = 3.26d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_be) = 1.38d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_b ) = 2.70d0  ! AGSS09
          MB22_photospheric_element_zfrac(e_c ) = 8.56d0
          MB22_photospheric_element_zfrac(e_n ) = 7.98d0
          MB22_photospheric_element_zfrac(e_o ) = 8.77d0
@@ -1772,61 +1771,61 @@
          MB22_photospheric_element_zfrac(e_fe) = 7.50d0
          MB22_photospheric_element_zfrac(e_co) = 4.95d0
          MB22_photospheric_element_zfrac(e_ni) = 6.24d0
-         MB22_photospheric_element_zfrac(e_cu) = 4.19d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_zn) = 4.56d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_ga) = 3.04d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_ge) = 3.65d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_as) = 2.30d0 !meteor AGSS09
-         MB22_photospheric_element_zfrac(e_se) = 3.34d0 !meteor AGSS09
-         MB22_photospheric_element_zfrac(e_br) = 2.54d0 !meteor AGSS09
-         MB22_photospheric_element_zfrac(e_kr) = 3.25d0 !indirect AGSS09
-         MB22_photospheric_element_zfrac(e_rb) = 2.52d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_sr) = 2.87d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_y ) = 2.21d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_zr) = 2.58d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_nb) = 1.46d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_mo) = 1.88d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ru) = 1.75d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Rh) = 0.91d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Pd) = 1.57d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ag) = 0.94d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Cd) = 1.71d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_In) = 0.80d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Sn) = 2.04d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Sb) = 1.01d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Te) = 2.18d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_I ) = 1.55d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Xe) = 2.24d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Cs) = 1.08d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ba) = 2.18d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_La) = 1.10d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ce) = 1.58d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Pr) = 0.72d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Nd) = 1.42d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Sm) = 0.96d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Eu) = 0.52d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Gd) = 1.07d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Tb) = 0.30d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Dy) = 1.10d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ho) = 0.48d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Er) = 0.92d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Tm) = 0.10d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Yb) = 0.84d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Lu) = 0.10d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Hf) = 0.85d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ta) = -0.12d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_W ) = 0.85d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Re) = 0.26d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Os) = 1.40d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Ir) = 1.38d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Pt) = 1.62d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Au) = 0.92d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Hg) = 1.17d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Tl) = 0.90d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Pb) = 1.75d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Bi) = 0.65d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_Th) = 0.02d0 ! AGSS09
-         MB22_photospheric_element_zfrac(e_U) = -0.54d0 ! AGSS09
+         MB22_photospheric_element_zfrac(e_cu) = 4.19d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_zn) = 4.56d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_ga) = 3.04d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_ge) = 3.65d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_as) = 2.30d0  !meteor AGSS09
+         MB22_photospheric_element_zfrac(e_se) = 3.34d0  !meteor AGSS09
+         MB22_photospheric_element_zfrac(e_br) = 2.54d0  !meteor AGSS09
+         MB22_photospheric_element_zfrac(e_kr) = 3.25d0  !indirect AGSS09
+         MB22_photospheric_element_zfrac(e_rb) = 2.52d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_sr) = 2.87d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_y ) = 2.21d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_zr) = 2.58d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_nb) = 1.46d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_mo) = 1.88d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ru) = 1.75d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Rh) = 0.91d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Pd) = 1.57d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ag) = 0.94d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Cd) = 1.71d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_In) = 0.80d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Sn) = 2.04d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Sb) = 1.01d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Te) = 2.18d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_I ) = 1.55d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Xe) = 2.24d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Cs) = 1.08d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ba) = 2.18d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_La) = 1.10d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ce) = 1.58d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Pr) = 0.72d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Nd) = 1.42d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Sm) = 0.96d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Eu) = 0.52d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Gd) = 1.07d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Tb) = 0.30d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Dy) = 1.10d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ho) = 0.48d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Er) = 0.92d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Tm) = 0.10d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Yb) = 0.84d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Lu) = 0.10d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Hf) = 0.85d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ta) = -0.12d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_W ) = 0.85d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Re) = 0.26d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Os) = 1.40d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Ir) = 1.38d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Pt) = 1.62d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Au) = 0.92d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Hg) = 1.17d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Tl) = 0.90d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Pb) = 1.75d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Bi) = 0.65d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_Th) = 0.02d0  ! AGSS09
+         MB22_photospheric_element_zfrac(e_U) = -0.54d0  ! AGSS09
 
          ! convert to fraction of Z by mass
          z_sum = 0
@@ -1838,103 +1837,103 @@
          do i = e_li, e_u
             MB22_photospheric_element_zfrac(i) = MB22_photospheric_element_zfrac(i) / z_sum
          end do
-       
+
       end subroutine init_MB22_photospheric_data
 
 
 
 
-    subroutine init_AAG21_photospheric_data ! fraction by mass of total Z
+    subroutine init_AAG21_photospheric_data  ! fraction by mass of total Z
        ! Asplund et al. A&A 653, A141 (2021) photospheric abundance.
        ! Supplimented with meteoric values
        integer :: i
        real(dp) :: z_sum
        include 'formats'
-       
+
        AAG21_photospheric_element_zfrac(:) = -20.0d0
 
     ! first store log abundances from the paper
-         AAG21_photospheric_element_zfrac(e_li) = 0.96 !± 0.013
-         AAG21_photospheric_element_zfrac(e_be) = 1.38 !± 0.09
-         AAG21_photospheric_element_zfrac(e_b ) = 2.70 !± 0.20
-         AAG21_photospheric_element_zfrac(e_c ) = 8.46 !± 0.04
-         AAG21_photospheric_element_zfrac(e_n ) = 7.83 !± 0.07
-         AAG21_photospheric_element_zfrac(e_o ) = 8.69 !± 0.04
-         AAG21_photospheric_element_zfrac(e_f ) = 4.40 !± 0.25
-         AAG21_photospheric_element_zfrac(e_ne) = 8.06 !± 0.05
-         AAG21_photospheric_element_zfrac(e_na) = 6.22 !± 0.03
-         AAG21_photospheric_element_zfrac(e_mg) = 7.55 !± 0.03
-         AAG21_photospheric_element_zfrac(e_al) = 6.43 !± 0.03
-         AAG21_photospheric_element_zfrac(e_si) = 7.51 !± 0.03
-         AAG21_photospheric_element_zfrac(e_p ) = 5.41 !± 0.03
-         AAG21_photospheric_element_zfrac(e_s ) = 7.12 !± 0.03
-         AAG21_photospheric_element_zfrac(e_cl) = 5.31 !± 0.20
-         AAG21_photospheric_element_zfrac(e_ar) = 6.38 !± 0.10
-         AAG21_photospheric_element_zfrac(e_k ) = 5.07 !± 0.03
-         AAG21_photospheric_element_zfrac(e_ca) = 6.30 !± 0.03
-         AAG21_photospheric_element_zfrac(e_sc) = 3.14 !± 0.04
-         AAG21_photospheric_element_zfrac(e_ti) = 4.97 !± 0.05
-         AAG21_photospheric_element_zfrac(e_v ) = 3.90 !± 0.08
-         AAG21_photospheric_element_zfrac(e_cr) = 5.62 !± 0.04
-         AAG21_photospheric_element_zfrac(e_mn) = 5.42 !± 0.06
-         AAG21_photospheric_element_zfrac(e_fe) = 7.46 !± 0.04
-         AAG21_photospheric_element_zfrac(e_co) = 4.94 !± 0.05
-         AAG21_photospheric_element_zfrac(e_ni) = 6.20 !± 0.04
-         AAG21_photospheric_element_zfrac(e_cu) = 4.18 !± 0.05
-         AAG21_photospheric_element_zfrac(e_zn) = 4.56 !± 0.05
-         AAG21_photospheric_element_zfrac(e_ga) = 3.02 !± 0.05
-         AAG21_photospheric_element_zfrac(e_ge) = 3.62 !± 0.10
-         AAG21_photospheric_element_zfrac(e_as) = 2.30 !± 0.04  meteorites
-         AAG21_photospheric_element_zfrac(e_se) = 3.34 !± 0.03  meteorites
-         AAG21_photospheric_element_zfrac(e_br) = 2.54 !± 0.06  meteorites
-         AAG21_photospheric_element_zfrac(e_kr) = 3.12 !± 0.10
-         AAG21_photospheric_element_zfrac(e_rb) = 2.32 !± 0.08
-         AAG21_photospheric_element_zfrac(e_sr) = 2.83 !± 0.06
-         AAG21_photospheric_element_zfrac(e_y ) = 2.21 !± 0.05
-         AAG21_photospheric_element_zfrac(e_zr) = 2.59 !± 0.04
-         AAG21_photospheric_element_zfrac(e_nb) = 1.47 !± 0.06
-         AAG21_photospheric_element_zfrac(e_mo) = 1.88 !± 0.09
-         AAG21_photospheric_element_zfrac(e_Ru) = 1.75 !± 0.08
-         AAG21_photospheric_element_zfrac(e_Rh) = 0.78 !± 0.11
-         AAG21_photospheric_element_zfrac(e_Pd) = 1.57 !± 0.10
-         AAG21_photospheric_element_zfrac(e_Ag) = 0.96 !± 0.10
-         AAG21_photospheric_element_zfrac(e_Cd) = 1.71 !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_In) = 0.80 !± 0.20
-         AAG21_photospheric_element_zfrac(e_Sn) = 2.02 !± 0.10
-         AAG21_photospheric_element_zfrac(e_Sb) = 1.01 !± 0.06 meteorites
-         AAG21_photospheric_element_zfrac(e_Te) = 2.18 !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_I ) = 1.55 !± 0.08 meteorites
-         AAG21_photospheric_element_zfrac(e_Xe) = 2.22 !± 0.05
-         AAG21_photospheric_element_zfrac(e_Cs) = 1.08 !± 0.03 meteorites
-         AAG21_photospheric_element_zfrac(e_Ba) = 2.27 !± 0.05
-         AAG21_photospheric_element_zfrac(e_La) = 1.11 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ce) = 1.58 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Pr) = 0.75 !± 0.05
-         AAG21_photospheric_element_zfrac(e_Nd) = 1.42 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Sm) = 0.95 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Eu) = 0.52 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Gd) = 1.08 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Tb) = 0.31 !± 0.10
-         AAG21_photospheric_element_zfrac(e_Dy) = 1.10 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Ho) = 0.48 !± 0.11
-         AAG21_photospheric_element_zfrac(e_Er) = 0.93 !± 0.05
-         AAG21_photospheric_element_zfrac(e_Tm) = 0.11 !± 0.04
-         AAG21_photospheric_element_zfrac(e_Yb) = 0.85 !± 0.11
-         AAG21_photospheric_element_zfrac(e_Lu) = 0.10 !± 0.09
-         AAG21_photospheric_element_zfrac(e_Hf) = 0.85 !± 0.05
-         AAG21_photospheric_element_zfrac(e_Ta) = -0.15 !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_W ) = 0.79 !± 0.11
-         AAG21_photospheric_element_zfrac(e_Re) = 0.26 !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Os) = 1.35 !± 0.12
-         AAG21_photospheric_element_zfrac(e_Ir) = 1.32 !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Pt) = 1.61 !± 0.02 meteorites
-         AAG21_photospheric_element_zfrac(e_Au) = 0.91 !± 0.12
-         AAG21_photospheric_element_zfrac(e_Hg) = 1.17 !± 0.18 meteorites
-         AAG21_photospheric_element_zfrac(e_Tl) = 0.92 !± 0.17
-         AAG21_photospheric_element_zfrac(e_Pb) = 1.95 !± 0.08
-         AAG21_photospheric_element_zfrac(e_Bi) = 0.65 !± 0.04 meteorites
-         AAG21_photospheric_element_zfrac(e_Th) = 0.03 !± 0.10
-         AAG21_photospheric_element_zfrac(e_U) = -0.54 !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_li) = 0.96d0  !± 0.013
+         AAG21_photospheric_element_zfrac(e_be) = 1.38d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_b ) = 2.70d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_c ) = 8.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_n ) = 7.83d0  !± 0.07
+         AAG21_photospheric_element_zfrac(e_o ) = 8.69d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_f ) = 4.40d0  !± 0.25
+         AAG21_photospheric_element_zfrac(e_ne) = 8.06d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_na) = 6.22d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_mg) = 7.55d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_al) = 6.43d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_si) = 7.51d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_p ) = 5.41d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_s ) = 7.12d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_cl) = 5.31d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_ar) = 6.38d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_k ) = 5.07d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_ca) = 6.30d0  !± 0.03
+         AAG21_photospheric_element_zfrac(e_sc) = 3.14d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_ti) = 4.97d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_v ) = 3.90d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_cr) = 5.62d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_mn) = 5.42d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_fe) = 7.46d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_co) = 4.94d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ni) = 6.20d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_cu) = 4.18d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zn) = 4.56d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ga) = 3.02d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_ge) = 3.62d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_as) = 2.30d0  !± 0.04  meteorites
+         AAG21_photospheric_element_zfrac(e_se) = 3.34d0  !± 0.03  meteorites
+         AAG21_photospheric_element_zfrac(e_br) = 2.54d0  !± 0.06  meteorites
+         AAG21_photospheric_element_zfrac(e_kr) = 3.12d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_rb) = 2.32d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_sr) = 2.83d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_y ) = 2.21d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_zr) = 2.59d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_nb) = 1.47d0  !± 0.06
+         AAG21_photospheric_element_zfrac(e_mo) = 1.88d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Ru) = 1.75d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Rh) = 0.78d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Pd) = 1.57d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Ag) = 0.96d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Cd) = 1.71d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_In) = 0.80d0  !± 0.20
+         AAG21_photospheric_element_zfrac(e_Sn) = 2.02d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Sb) = 1.01d0  !± 0.06 meteorites
+         AAG21_photospheric_element_zfrac(e_Te) = 2.18d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_I ) = 1.55d0  !± 0.08 meteorites
+         AAG21_photospheric_element_zfrac(e_Xe) = 2.22d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Cs) = 1.08d0  !± 0.03 meteorites
+         AAG21_photospheric_element_zfrac(e_Ba) = 2.27d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_La) = 1.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ce) = 1.58d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Pr) = 0.75d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Nd) = 1.42d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Sm) = 0.95d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Eu) = 0.52d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Gd) = 1.08d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Tb) = 0.31d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_Dy) = 1.10d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Ho) = 0.48d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Er) = 0.93d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Tm) = 0.11d0  !± 0.04
+         AAG21_photospheric_element_zfrac(e_Yb) = 0.85d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Lu) = 0.10d0  !± 0.09
+         AAG21_photospheric_element_zfrac(e_Hf) = 0.85d0  !± 0.05
+         AAG21_photospheric_element_zfrac(e_Ta) =-0.15d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_W ) = 0.79d0  !± 0.11
+         AAG21_photospheric_element_zfrac(e_Re) = 0.26d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Os) = 1.35d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Ir) = 1.32d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Pt) = 1.61d0  !± 0.02 meteorites
+         AAG21_photospheric_element_zfrac(e_Au) = 0.91d0  !± 0.12
+         AAG21_photospheric_element_zfrac(e_Hg) = 1.17d0  !± 0.18 meteorites
+         AAG21_photospheric_element_zfrac(e_Tl) = 0.92d0  !± 0.17
+         AAG21_photospheric_element_zfrac(e_Pb) = 1.95d0  !± 0.08
+         AAG21_photospheric_element_zfrac(e_Bi) = 0.65d0  !± 0.04 meteorites
+         AAG21_photospheric_element_zfrac(e_Th) = 0.03d0  !± 0.10
+         AAG21_photospheric_element_zfrac(e_U)  =-0.54d0  !± 0.03 meteorites
 
          ! convert to fraction of Z by mass
          z_sum = 0
@@ -1946,17 +1945,17 @@
          do i = e_li, e_u
             AAG21_photospheric_element_zfrac(i) = AAG21_photospheric_element_zfrac(i) / z_sum
          end do
-       
+
       end subroutine init_AAG21_photospheric_data
-      
-      subroutine init_L09_data ! fraction by mass of total Z
+
+      subroutine init_L09_data  ! fraction by mass of total Z
          ! Lodders 09
          integer :: i
-         real(dp) :: z_sum  
+         real(dp) :: z_sum
          include 'formats'
-         
+
          L09_element_zfrac(:) = 0
-         
+
          ! mass fractions
          L09_element_zfrac(e_li) = 1.054594933683d-08
          L09_element_zfrac(e_be) = 1.5087555571d-10
@@ -2039,20 +2038,20 @@
          L09_element_zfrac(e_Bi) = 7.9004226175D-10
          L09_element_zfrac(e_Th) = 2.7961831384D-10
          L09_element_zfrac(e_U) = 1.546830543D-10
-         
+
          ! convert from mass fraction to fraction of Z by mass
          z_sum = sum(L09_element_zfrac(e_li:e_u))
          do i = e_li, e_u
             L09_element_zfrac(i) = L09_element_zfrac(i) / z_sum
          end do
-                  
+
       end subroutine init_L09_data
 
 
       subroutine allocate_nuclide_data(d,n,ierr)
          type(nuclide_data), intent(out) :: d
          integer, intent(in) :: n
-         integer, intent(out) :: ierr  
+         integer, intent(out) :: ierr
          ierr = 0
          allocate(d% name(n), d% W(n), d% Z(n), d% N(n), d% Z_plus_N(n),  &
                d% spin(N), d% binding_energy(n), d% Z53(n), &
@@ -2061,7 +2060,7 @@
          if (ierr /= 0) return
          d% nnuclides = n
       end subroutine allocate_nuclide_data
-      
+
 
       subroutine free_nuclide_data(n)
          type(nuclide_data), intent(inout) :: n
@@ -2071,8 +2070,8 @@
                n% isomeric_state, n% mass_excess, n% pfcn, n% chem_id, n% nuclide)
          n% nnuclides = 0
       end subroutine free_nuclide_data
-      
-      
+
+
       subroutine free_lodders03_table()
             use utils_lib, only : integer_dict_free
             deallocate(lodders03_tab6% isotopic_percent)
@@ -2097,7 +2096,7 @@
          if (ierr /= 0) indx = nuclide_not_found
       end function get_nuclide_index
 
-      
+
       subroutine set_some_isos
          ih1 = get_nuclide_index('h1')
          ih2 = get_nuclide_index('h2')
@@ -2505,7 +2504,7 @@
          izn72 = get_nuclide_index('zn72')
          izn73 = get_nuclide_index('zn73')
          izn74 = get_nuclide_index('zn74')
-         
+
          iga60 = get_nuclide_index('ga60')
          iga61 = get_nuclide_index('ga61')
          iga62 = get_nuclide_index('ga62')
@@ -2522,7 +2521,7 @@
          iga73 = get_nuclide_index('ga73')
          iga74 = get_nuclide_index('ga74')
          iga75 = get_nuclide_index('ga75')
-         
+
          ige59 = get_nuclide_index('ge59')
          ige60 = get_nuclide_index('ge60')
          ige61 = get_nuclide_index('ge61')
@@ -2541,7 +2540,7 @@
          ige74 = get_nuclide_index('ge74')
          ige75 = get_nuclide_index('ge75')
          ige76 = get_nuclide_index('ge76')
-         
+
          ias71 = get_nuclide_index('as71')
          ias72 = get_nuclide_index('as72')
          ias73 = get_nuclide_index('as73')
@@ -2551,7 +2550,7 @@
          ias77 = get_nuclide_index('as77')
          ias78 = get_nuclide_index('as78')
          ias79 = get_nuclide_index('as79')
-         
+
          ise68 = get_nuclide_index('se68')
          ise69 = get_nuclide_index('se69')
          ise70 = get_nuclide_index('se70')
@@ -2585,12 +2584,12 @@
          isn104 = get_nuclide_index('sn104')
          ineut = get_nuclide_index('neut')
          iprot = get_nuclide_index('prot')
-         
+
       end subroutine set_some_isos
-         
-         
+
+
       integer function category_id(cname)
-         character (len=*), intent(in)  :: cname 
+         character (len=*), intent(in)  :: cname
          ! returns id for the category if there is a matching name
          ! returns 0 otherwise.
          integer :: i, len
@@ -2611,8 +2610,8 @@
          end do
          category_id = 0
       end function category_id
-      
-      
+
+
       subroutine set_category_names
          integer :: i
          category_name(:) = ''
@@ -2641,13 +2640,13 @@
 
          category_name(iphoto) = 'photo'
          category_name(ipnhe4) = 'pnhe4'
-         
+
          category_name(i_ni56_co56) = 'ni56_co56'
          category_name(i_co56_fe56) = 'co56_fe56'
 
          category_name(iother) = 'other'
-         
-         i=1 ! write it this way to avoid stupid compiler warning.
+
+         i=1  ! write it this way to avoid stupid compiler warning.
          if (len_trim(category_name(i)) == 0) then
             write(*,*) 'missing name for category', i
             flush(6)
@@ -2661,7 +2660,7 @@
                call mesa_error(__FILE__,__LINE__,'set_category_names')
             end if
          end do
-         
+
       end subroutine set_category_names
 
 

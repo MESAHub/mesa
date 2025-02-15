@@ -72,6 +72,8 @@
       star_2_mass ! mass of second star in msun
       !lg_star_2_mass ! log10 mass of second star in msun
       !sum_of_masses ! star_1_mass + star_2_mass
+      !mass_ratio ! star_2_mass / star_1_mass
+      !obs_mass_ratio ! min(m2/m1, m2/m1)
       lg_mtransfer_rate ! log10 of abs(mass transfer rate) in Msun/yr
                      ! this considers the amount of mass lost from the donor due to RLOF
                      ! not the actual mass that ends up accreted
@@ -135,10 +137,10 @@
       !        ! happens, and is updated when each CE phase finishes
       !CE_lambda2 ! same for star 2
       !CE_Ebind1 ! similar to CE_lambda1, but specifies the binding energy down to the mass
-      !          ! coordinate of layers that we're ejected. Includes adjustements to Ebind from
+      !          ! coordinate of layers that we're ejected. Includes adjustments to Ebind from
       !          ! alpha_th and other options.
       !CE_Ebind2 ! similar to CE_lambda1, but specifies the binding energy down to the mass
-      !          ! coordinate of layers that we're ejected. Includes adjustements to Ebind from
+      !          ! coordinate of layers that we're ejected. Includes adjustments to Ebind from
       !          ! alpha_th and other options.
       !CE_num1 ! number of times star 1 has initiated a CE phase
       !CE_num2 ! number of times star 2 has initiated a CE phase

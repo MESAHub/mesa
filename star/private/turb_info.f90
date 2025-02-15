@@ -36,11 +36,11 @@
 
       private
       public :: &
-         set_mlt_vars, & ! for hydro_vars and conv_premix
-         do1_mlt_2, & ! for predictive_mix
-         switch_to_radiative, & ! mix_info
-         check_for_redo_MLT, & ! for hydro_vars
-         set_gradT_excess_alpha ! for evolve
+         set_mlt_vars, &  ! for hydro_vars and conv_premix
+         do1_mlt_2, &  ! for predictive_mix
+         switch_to_radiative, &  ! mix_info
+         check_for_redo_MLT, &  ! for hydro_vars
+         set_gradT_excess_alpha  ! for evolve
 
 
       contains
@@ -68,7 +68,7 @@
                      (s% mlt_mixing_type(k) == no_mixing)
                end if
             end if
-            if (op_err /= 0) ierr = op_err            
+            if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
@@ -105,14 +105,14 @@
 
          ierr = 0
          nz = s% nz
-         
+
          if (k < 1 .or. k > nz) then
             write(*,3) 'bad k for do1_mlt', k, nz
             ierr = -1
             return
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          if (present(mixing_length_alpha_in)) then
             mixing_length_alpha = mixing_length_alpha_in
          else
@@ -120,7 +120,7 @@
          end if
 
          if (present(gradL_composition_term_in)) then
-            gradL_composition_term = gradL_composition_term_in      
+            gradL_composition_term = gradL_composition_term_in
          else if (s% use_Ledoux_criterion) then
             gradL_composition_term = s% gradL_composition_term(k)
          else
@@ -141,9 +141,9 @@
             return
          end if
          gradr_ad = gradr_ad*gradr_factor
-         
+
          ! now can call set_no_mixing if necessary
-         
+
          if (k == 1 .and. s% mlt_make_surface_no_mixing) then
             call set_no_mixing('surface_no_mixing')
             return
@@ -166,13 +166,13 @@
             s% mlt_mixing_type(k) = phase_separation_mixing
             return
          end if
-         
+
          if (s% lnT_start(k)/ln10 > s% max_logT_for_mlt) then
             call set_no_mixing('max_logT')
             return
          end if
 
-         if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then ! check for outward shock above k
+         if (s% no_MLT_below_shock .and. (s%u_flag .or. s%v_flag)) then  ! check for outward shock above k
             if (s% u_flag) then
                vel => s% u
             else
@@ -201,7 +201,7 @@
                no_mix = .true.
             else if ((abs(vel(k))) >= &
                   s% csound_start(k)*s% max_v_div_cs_for_convection) then
-               no_mix = .true.              
+               no_mix = .true.
             else if (s% u_flag) then
                if (k == 1) then
                   abs_du_div_cs = 1d99
@@ -218,7 +218,7 @@
                return
             end if
          end if
-         
+
          make_gradr_sticky_in_solver_iters = s% make_gradr_sticky_in_solver_iters
          if (.not. make_gradr_sticky_in_solver_iters .and. &
                s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) then
@@ -230,7 +230,7 @@
             call set_no_mixing('gradr_sticky')
             return
          end if
-            
+
          call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
@@ -240,7 +240,7 @@
             end if
             return
          end if
-         
+
          call store_results
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
@@ -249,95 +249,95 @@
             f = s% adjust_mlt_gradT_fraction(k)
          end if
          call adjust_gradT_fraction(s, k, f)
-         
+
          if (s% mlt_mixing_type(k) == no_mixing .or. abs(s% gradr(k)) < 1d-20) then
             s% L_conv(k) = 0d0
          else
-            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k)) ! C&G 14.109            
+            s% L_conv(k) = s% L(k) * (1d0 - s% gradT(k)/s% gradr(k))  ! C&G 14.109
          end if
 
-         contains         
-         
+         contains
+
          subroutine store_results
             s% mlt_mixing_type(k) = mixing_type
-         
+
             s% grada_face_ad(k) = grada_face_ad
             s% grada_face(k) = grada_face_ad%val
-         
+
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
-            s% mlt_gradT(k) = s% gradT(k) ! prior to adjustments
-         
+            s% mlt_gradT(k) = s% gradT(k)  ! prior to adjustments
+
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val
-         
+
             s% mlt_vc_ad(k) = mlt_vc_ad
-            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val  
-         
+            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val
+
             s% mlt_D_ad(k) = D_ad
             s% mlt_D(k) = D_ad%val
 
             rho_face_ad = get_rho_face(s,k)
             s% mlt_cdc(k) = s% mlt_D(k)*pow2(pi4*pow2(s%r(k))*rho_face_ad%val)
-         
+
             s% mlt_Gamma_ad(k) = Gamma_ad
             s% mlt_Gamma(k) = Gamma_ad%val
-         
+
             s% gradr_ad(k) = gradr_ad
             s% gradr(k) = s% gradr_ad(k)%val
-         
+
             s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term
             s% gradL(k) = s% gradL_ad(k)%val
-         
+
             s% scale_height_ad(k) = scale_height_ad
-            s% scale_height(k) = scale_height_ad%val     
-                 
+            s% scale_height(k) = scale_height_ad%val
+
             s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
-            
+
          end subroutine store_results
 
          subroutine set_no_mixing(str)
             character (len=*) :: str
             include 'formats'
-            
+
             s% mlt_mixing_type(k) = no_mixing
-            
+
             s% grada_face_ad(k) = grada_face_ad
             s% grada_face(k) = grada_face_ad%val
-            
+
             gradT_ad = gradr_ad
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
-            
+
             Y_face_ad = gradT_ad - grada_face_ad
             s% Y_face_ad(k) = Y_face_ad
             s% Y_face(k) = s% Y_face_ad(k)%val
-            
+
             s% mlt_vc_ad(k) = 0d0
             if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
-            
+
             s% mlt_D_ad(k) = 0d0
             s% mlt_D(k) = 0d0
             s% mlt_cdc(k) = 0d0
-            
+
             s% mlt_Gamma_ad(k) = 0d0
             s% mlt_Gamma(k) = 0d0
-            
+
             s% gradr_ad(k) = gradr_ad
             s% gradr(k) = s% gradr_ad(k)%val
-               
+
             s% gradL_ad(k) = 0d0
             s% gradL(k) = 0d0
-            
+
             s% scale_height_ad(k) = scale_height_ad
-            s% scale_height(k) = scale_height_ad%val    
-                     
+            s% scale_height(k) = scale_height_ad%val
+
             s% Lambda_ad(k) = mixing_length_alpha*scale_height_ad
             s% mlt_mixing_length(k) = s% Lambda_ad(k)%val
 
             s% L_conv(k) = 0d0
-            
+
          end subroutine set_no_mixing
 
       end subroutine do1_mlt_2
@@ -350,16 +350,16 @@
          type (star_info), pointer :: s
          real(dp), intent(in) :: f
          integer, intent(in) :: k
-         include 'formats'         
-         if (f >= 0.0 .and. f <= 1.0) then
+         include 'formats'
+         if (f >= 0.0d0 .and. f <= 1.0d0) then
             if (f == 0d0) then
                s% gradT_ad(k) = s% gradr_ad(k)
-            else ! mix
+            else  ! mix
                s% gradT_ad(k) = f*s% grada_face_ad(k) + (1.0d0 - f)*s% gradr_ad(k)
             end if
             s% gradT(k) = s% gradT_ad(k)%val
          end if
-         call adjust_gradT_excess(s, k)         
+         call adjust_gradT_excess(s, k)
          s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k)
       end subroutine adjust_gradT_fraction
 
@@ -373,9 +373,9 @@
          !s% gradT_excess_alpha is calculated at start of step and held constant during iterations
          ! gradT_excess_alpha = 0 means no efficiency boost; = 1 means full efficiency boost
          gradT_excess_alpha = s% gradT_excess_alpha
-         s% gradT_excess_effect(k) = 0.0d0         
+         s% gradT_excess_effect(k) = 0.0d0
          gradT_sub_grada = s% gradT(k) - s% grada_face(k)
-         if (gradT_excess_alpha <= 0.0  .or. &
+         if (gradT_excess_alpha <= 0.0d0  .or. &
              gradT_sub_grada <= s% gradT_excess_f1) return
          if (s% lnT(k)/ln10 > s% gradT_excess_max_logT) return
          log_tau = log10(s% tau(k))
@@ -384,8 +384,8 @@
             gradT_excess_alpha = gradT_excess_alpha* &
                (log_tau - s% gradT_excess_max_log_tau_full_off)/ &
                (s% gradT_excess_min_log_tau_full_on - s% gradT_excess_max_log_tau_full_off)
-         alfa = s% gradT_excess_f2 ! for full boost, use this fraction of gradT
-         if (gradT_excess_alpha < 1) & ! only partial boost, so increase alfa
+         alfa = s% gradT_excess_f2  ! for full boost, use this fraction of gradT
+         if (gradT_excess_alpha < 1) &  ! only partial boost, so increase alfa
             ! alfa goes to 1 as gradT_excess_alpha goes to 0
             ! alfa unchanged as gradT_excess_alpha goes to 1
             alfa = alfa + (1d0 - alfa)*(1d0 - gradT_excess_alpha)
@@ -447,7 +447,7 @@
                return
             end if
          end if
-         beta = 1d0 ! beta = min over k of Pgas(k)/Peos(k)
+         beta = 1d0  ! beta = min over k of Pgas(k)/Peos(k)
          k_beta = 0
          do k=1,nz
             tmp = s% Pgas(k)/s% Peos(k)
@@ -458,7 +458,7 @@
          end do
          beta = beta*(1d0 + s% xa(1,nz))
          s% gradT_excess_min_beta = beta
-         lambda = 0d0 ! lambda = max over k of Lrad(k)/Ledd(k)
+         lambda = 0d0  ! lambda = max over k of Lrad(k)/Ledd(k)
          do k=2,k_beta
             tmp = get_Lrad_div_Ledd(s,k)
             if (tmp > lambda) then
@@ -483,7 +483,7 @@
                alpha = 1
             else if (beta < beta1 + dbeta) then
                alpha = (beta1 + dbeta - beta)/dbeta
-            else ! beta >= beta1 + dbeta
+            else  ! beta >= beta1 + dbeta
                alpha = 0
             end if
          else if (lambda >= lambda2) then
@@ -501,13 +501,13 @@
                alpha = 1
             else if (beta < beta2 + dbeta) then
                alpha = (lambda - (lambda2 - dlambda))/dlambda
-            else ! beta >= beta2 + dbeta
+            else  ! beta >= beta2 + dbeta
                alpha = 0
             end if
-         else ! lambda <= lambda2 - dlambda
+         else  ! lambda <= lambda2 - dlambda
             alpha = 0
          end if
-         if (s% generations > 1 .and. lambda1 >= 0) then ! time smoothing
+         if (s% generations > 1 .and. lambda1 >= 0) then  ! time smoothing
             s% gradT_excess_alpha = &
                (1d0 - s% gradT_excess_age_fraction)*alpha + &
                s% gradT_excess_age_fraction*s% gradT_excess_alpha_old
@@ -555,8 +555,8 @@
                if (s% mlt_mixing_type(k) /= convective_mixing) then
                   call end_of_convective_region
                end if
-            else ! in non-convective region
-               if (s% mlt_mixing_type(k) == convective_mixing) then 
+            else  ! in non-convective region
+               if (s% mlt_mixing_type(k) == convective_mixing) then
                   ! start of a convective region
                   k_bot = k+1
                   in_convective_region = .true.
@@ -566,7 +566,7 @@
             end if
          end do
          if (in_convective_region) then
-            k = 1 ! end at top
+            k = 1  ! end at top
             call end_of_convective_region
          end if
 

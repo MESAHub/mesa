@@ -37,7 +37,6 @@
 
 
       subroutine power_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -87,7 +86,6 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -113,13 +111,13 @@
          ierr = 0
          nz = s% nz
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_MediumSlateBlue, clr_LightSkyBlue, clr_Goldenrod, clr_Lilac, &
                clr_Coral, clr_Crimson, clr_LightSkyGreen, clr_DarkGray, &
                clr_Tan, clr_IndianRed, clr_Gold, &
                clr_Teal, clr_Silver, clr_BrightBlue, clr_FireBrick, &
                clr_RoyalPurple, clr_SlateGray, clr_LightSteelBlue, &
-               clr_Gray, clr_RoyalBlue /)
+               clr_Gray, clr_RoyalBlue ]
 
          chScale = txt_scale
 
@@ -226,7 +224,7 @@
             end do
             call pgslw(lw_sav)
 
-            if (.not. panel_flag) then ! show mix regions at bottom of plot
+            if (.not. panel_flag) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)

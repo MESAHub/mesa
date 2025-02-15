@@ -43,9 +43,9 @@ module free_eos_table
    integer, parameter :: i_dse = i_dsp + 1
    integer, parameter :: num_results = i_dse
 
-   integer, parameter :: kif = 2 !for P(Rho,T)
+   integer, parameter :: kif = 2  !for P(Rho,T)
 
-   !for MESA 
+   !for MESA
    integer, parameter ::   h1 =  1
    integer, parameter ::  he4 =  2
    integer, parameter ::  c12 =  3
@@ -69,7 +69,7 @@ module free_eos_table
 
 !!!!!
 
-contains 
+contains
 
    !for the 4 basic EOS options
    subroutine free_eos_set_version(eos_version)
@@ -81,17 +81,17 @@ contains
       integer, intent(in) :: eos_version
       integer :: my_ifopt, my_ifmod, my_ifion
       select case (eos_version)
-      case (1) !EOS1 could also try EOS1a with ifion=-1
+      case (1)  !EOS1 could also try EOS1a with ifion=-1
          my_ifopt = 3; my_ifmod = 1; my_ifion = -2
-      case (2) !EOS2
+      case (2)  !EOS2
          my_ifopt = 2; my_ifmod = 1; my_ifion = -1
-      case (3) !EOS3
+      case (3)  !EOS3
          my_ifopt = 1; my_ifmod = 1; my_ifion =  0
-      case (4) !EOS4
+      case (4)  !EOS4
          my_ifopt = 1; my_ifmod=101; my_ifion =  0
-      case (5) !EOS1a
+      case (5)  !EOS1a
          my_ifopt = 3; my_ifmod = 1; my_ifion = -1
-      case default !default to EOS4
+      case default  !default to EOS4
          my_ifopt = 1; my_ifmod=101; my_ifion =  0
       end select
       call free_eos_set_options(my_ifopt,my_ifmod,my_ifion)
@@ -104,7 +104,6 @@ contains
    end subroutine free_eos_set_options
 
    subroutine free_eos_eval(logRho,logT,mass_frac,result)
-      implicit none
       real(dp), intent(inout) :: logRho
       real(dp), intent(in)  :: logT,mass_frac(Neps)
       real(dp), intent(out) :: result(num_results)
@@ -117,9 +116,9 @@ contains
 
       ! FreeEOS uses an abundance array called eps:
       ! EPS(:) = ( H,He,C,N,O,Ne,Na,Mg,Al,Si,P,S,Cl,Ar,Ca,Ti,Cr,Mn,Fe,Ni)
-      ! consisting of 20 elements, each entry of eps is the mass fraction 
+      ! consisting of 20 elements, each entry of eps is the mass fraction
       ! of that element divided by its atomic weight
-      
+
       !these are FreeEOS masses, not MESA values
       atom_wgt = [ 1.007825_dp, 4.0026_dp,  12.0111_dp, 14.0067_dp, 15.9994_dp, &
          20.179_dp,   22.98977_dp, 24.305_dp,  26.9815_dp, 28.086_dp, &
@@ -137,7 +136,7 @@ contains
 
       chiRho = pressure(2)
       chiT   = pressure(3)
-      Prad  = radiation_pressure(T) !mesa/eos function
+      Prad  = radiation_pressure(T)  !mesa/eos function
 
       if(entropy(1) < 0._dp) then
          if(debug) write(*,*) 'T, Rho, S', T, Rho, entropy(1)
@@ -146,11 +145,11 @@ contains
 
       dP_dT_constRho = (p/T)*pressure(3)
       dS_dRho_constT = entropy(2)/Rho
-      
+
       dpe = (rho/p)*energy(2) + chiT - 1._dp         !good
       dse = T*(entropy(3)/energy(3)) - 1._dp         !good
-      dsp = -rho*rho*(dS_dRho_constT/dP_dT_constRho) - 1._dp !good
-      
+      dsp = -rho*rho*(dS_dRho_constT/dP_dT_constRho) - 1._dp  !good
+
       result(i_lnPgas) = log10(P - Prad)
       result(i_lnE)    = log10(energy(1))
       result(i_lnS)    = log10(entropy(1))
@@ -158,10 +157,10 @@ contains
       result(i_chiRho) = chiRho
       result(i_chiT)   = chiT
       result(i_Cp)     = Cp
-      result(i_Cv)     = energy(3)/T !(1/T)*dE/dlnT
-      result(i_dE_dRho)= energy(2)/Rho !(1/Rho)*dE/dlnRho
-      result(i_dS_dT)  = entropy(3)/T !(1/T)*dS/dlnT
-      result(i_dS_dRho)= entropy(2)/Rho !(1/Rho)*dS/dlnRho
+      result(i_Cv)     = energy(3)/T  !(1/T)*dE/dlnT
+      result(i_dE_dRho)= energy(2)/Rho  !(1/Rho)*dE/dlnRho
+      result(i_dS_dT)  = entropy(3)/T  !(1/T)*dS/dlnT
+      result(i_dS_dRho)= entropy(2)/Rho  !(1/Rho)*dS/dlnRho
       result(i_mu)     = 1_dp/xmu1
       result(i_lnfree_e)= log(xmu3)
       result(i_gamma1) = gamma1
@@ -247,7 +246,7 @@ program make_free_eos_table
    write(*,*) ' final counts: '
    write(*,*) ' num DT tables loaded = ', num_DT
    write(*,*) ' num FreeEOS tables loaded = ', num_FreeEOS
-   
+
 contains
 
    subroutine read_namelist
@@ -271,12 +270,12 @@ contains
       !now, read namelist
       open(newunit=io_unit,file='inlist',action='read',delim='quote',status='old',iostat=ierr)
       if(ierr/=0) stop 'free_eos_table: problem opening inlist file'
-      read(io_unit, nml=eos_table, iostat=ierr) !'
+      read(io_unit, nml=eos_table, iostat=ierr)  !'
       if(ierr/=0) stop 'free_eos_table: problem reading inlist file'
       close(io_unit)
 
       num_logTs = 1 + int( (log10Tmax - log10Tmin) / dlog10T )
-      num_logQs = 1 + int( (log10Qmax - log10Qmin) / dlog10Q )      
+      num_logQs = 1 + int( (log10Qmax - log10Qmin) / dlog10Q )
 
       if(debug)then
          write(*,*) 'dlog10T = ', dlog10T
@@ -289,19 +288,19 @@ contains
    subroutine set_mass_fractions
       character(len=2) :: element
       integer :: io_unit
-      mass_frac(1) = 1d0 !H
-      mass_frac(2) = 1d0 !He
+      mass_frac(1) = 1d0  !H
+      mass_frac(2) = 1d0  !He
       open(newunit=io_unit,file=trim(mass_list),action='read',status='old',iostat=ierr)
-      if(ierr/=0) then 
+      if(ierr/=0) then
          write(*,*) 'free_eos_table: problem opening mass fractions list: ', trim(mass_list)
          stop
       endif
-      read(io_unit,*,iostat=ierr) !header line
+      read(io_unit,*,iostat=ierr)  !header line
       if(ierr/=0) then
          write(*,*) 'free_eos_table: problem reading mass fractions list: ', trim(mass_list)
          stop
       endif
-      do i=3,Neps !read mass fractions of C - Ni
+      do i=3,Neps  !read mass fractions of C - Ni
          read(io_unit,*,iostat=ierr) element, mass_frac(i)
          if(ierr/=0) then
             write(*,*) 'free_eos_table: problem reading mass fractions list: ', trim(mass_list)
@@ -339,8 +338,8 @@ contains
       logTs=0._dp
       logRhos=0._dp
       mesa_fracs=0._dp
-      
-      !write header      
+
+      !write header
       write(io_unit,'(99(a14))') 'version', 'X', 'Z', 'num logTs', 'logT min', &
          'logT max', 'del logT', 'num logQs', 'logQ min', 'logQ max', 'del logQ'
 
@@ -352,9 +351,9 @@ contains
       do while (log10Q <= log10Qmax)
          log10T = log10Tmax
          iT = num_logTs
-         
+
          !write sub-header
-         write(io_unit,'(/,7x,a)') 'logQ = logRho - 2*logT + 12'            
+         write(io_unit,'(/,7x,a)') 'logQ = logRho - 2*logT + 12'
          write(io_unit,'(2x,f14.6/)') log10Q
 
          !original  '(99(a40,1x))'
@@ -362,9 +361,9 @@ contains
             'logPgas', 'logE', 'logS', 'chiRho', 'chiT', 'Cp', 'Cv', 'dE_dRho', &
             'dS_dT', 'dS_dRho', 'mu', 'log10_free_e', 'gamma1', 'gamma3', 'grad_ad', &
             'eta', 'MESA', 'logRho', 'dpe', 'dsp', 'dse'
-         
+
          do while (log10T >= log10Tmin)
-                  
+
             if(debug) write(*,*) 'log10Q, log10T=', log10Q, log10T
 
             log10Rho = log10Q + 2d0*log10T - 12.0d0
@@ -397,7 +396,7 @@ contains
             mesa_fracs(iT) = mesa_frac
             logTs(iT) = log10T
             logRhos(iT) = log10Rho
-                        
+
             log10T = log10T - dlog10T
             iT = iT - 1
 
@@ -421,8 +420,8 @@ contains
                results(i_mu,iT),       &
                results(i_lnfree_e,iT)/ln10, &  !MESA tables are based on OPAL tables, which
                results(i_gamma1,iT),        &  !list  log10(free_e) rather than ln(free_e)
-               results(i_gamma3,iT),        & 
-               results(i_grad_ad,iT),  &       
+               results(i_gamma3,iT),        &
+               results(i_grad_ad,iT),  &
                results(i_eta,iT),      &
                mesa_fracs(iT),         &
                logRhos(iT),            &
@@ -531,8 +530,8 @@ contains
          res, d_dlnRho_const_T, d_dlnT_const_Rho
       real(dp) :: d_dxa_const_TRho(num_eos_d_dxa_results,neps)
       logical :: off_table
-      real(dp), parameter :: logRho_min = -32.23619130191664_dp !-14 * ln10
-      integer :: ierr      
+      real(dp), parameter :: logRho_min = -32.23619130191664_dp  !-14 * ln10
+      integer :: ierr
 
       T = exp(logT)
       log10T = logT/ln10
@@ -540,19 +539,19 @@ contains
       logRho = max(logRho_min, logRho0)
       Rho = exp(logRho)
       log10Rho = logRho/ln10
-         
+
       call eosDT_get(eos_handle, &
          Neps, chem_id, net_iso, mass_frac, &
          Rho, log10Rho, T, log10T, &
          res, d_dlnRho_const_T, d_dlnT_const_Rho, &
          d_dxa_const_TRho, ierr)
 
-      if (ierr/=0) then !bail to HELM
+      if (ierr/=0) then  !bail to HELM
 
          logRho = max(logRho_min, logRho0)
          Rho = exp(logRho)
          log10Rho = logRho/ln10
-         
+
          call eosDT_get_component(eos_handle, i_eos_HELM, &
             Neps, chem_id, net_iso, mass_frac, &
             Rho, log10Rho, T, log10T, &
@@ -569,7 +568,7 @@ contains
          write(*,*) 'ierr= ', ierr
          stop
       endif
-         
+
       eos_result(1:num_eos_basic_results) = res
       eos_result(i_lnRho) = logRho
       eos_result(i_dpe) = 0._dp

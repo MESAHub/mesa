@@ -228,7 +228,7 @@ contains
       integer :: k, j
       include 'formats'
       k = 1469
-      do j=1,1 !s% species
+      do j=1,1  !s% species
          if (.true. .or. s% xa(j,k) > 1d-9) &
               write(*,1) trim(str) // ' xin(net_iso(i' // &
               trim(chem_isos% name(s% chem_id(j))) // '))= ', s% xa(j,k)
@@ -527,7 +527,7 @@ contains
        s% dlnPeos_dxa_for_partials(j,k) = s% Pgas(k)*d_dxa(i_lnPgas,j)/s% Peos(k)
     end do
 
-    s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k)) ! thermal expansion coefficient
+    s% QQ(k) = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))  ! thermal expansion coefficient
     s% csound(k) = eval_csound(s,k,ierr)
 
     ! check some key values

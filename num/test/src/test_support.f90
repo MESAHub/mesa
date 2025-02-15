@@ -4,12 +4,12 @@
       use math_lib
       use const_def, only: dp, arg_not_provided
       use utils_lib, only: mesa_error
-      
+
       implicit none
 
       contains
 
-      
+
       subroutine show_results(nv,y,expect,show_all)
          integer, intent(in) :: nv
          real(dp), dimension(nv), intent(in) :: y, expect
@@ -35,8 +35,8 @@
          end if
          write(*,*)
       end subroutine show_results
-      
-      
+
+
       subroutine show_statistics(nfcn,njac,nstep,show_all)
          integer, intent(in) :: nfcn,njac,nstep
          logical, intent(in) :: show_all
@@ -48,7 +48,7 @@
          write(*,*)
       end subroutine show_statistics
 
-      
+
       subroutine check_results(nv,y,expect,tol,ierr)
          integer, intent(in) :: nv
          real(dp), dimension(nv), intent(in) :: y, expect
@@ -86,31 +86,31 @@
          integer, intent( in ) :: lrpar, lipar
          real(dp), intent( in ) :: x
          real(dp), intent( out ) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent( out ) :: ierr
          ierr = 0
          f = x-3*sin(1-x)
          dfdx = 1+3*cos(1-x)
       end function f
-      
+
       subroutine test_root_with_brackets
          integer, parameter :: lrpar=0, lipar=0
          real(dp) :: x, dfdx
-         real(dp) :: x1, x3 ! bounds for x
+         real(dp) :: x1, x3  ! bounds for x
             ! values of f at x1 and x3 must have opposite sign
             ! return value for safe_root will be bracketed by x1 and x3
-         real(dp) :: y1, y3 ! f(x1) and f(x3)
-         integer :: imax ! max number of iterations for search
-         real(dp) :: epsx, epsy 
+         real(dp) :: y1, y3  ! f(x1) and f(x3)
+         integer :: imax  ! max number of iterations for search
+         real(dp) :: epsx, epsy
          ! stop seaching when x is determined to within epsx
          ! or when abs(f(x)) is less than epsy
          integer :: ierr
          real(dp), parameter :: expected_root = 0.74800611d0
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
@@ -127,67 +127,67 @@
          if (abs(x-expected_root) > 1d-6) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'root', x
       end subroutine test_root_with_brackets
-      
+
 
       real(dp) function test_f(x,dfdx,lrpar,rpar,lipar,ipar,ierr)
          ! returns with ierr = 0 if was able to evaluate f and df/dx at x
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
          integer, intent(in) :: lipar, lrpar
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          test_f = tanh(x) - 0.4621171572600098d0
          dfdx = 1/cosh(x)**2
-         ierr = 0       
+         ierr = 0
       end function test_f
-      
-      
+
+
       subroutine test_root2
-         real(dp) :: x ! provide starting guess on input
-         real(dp) :: x1,x3 ! bounds for x
-         real(dp) :: y1,y3 ! f(x1) and f(x3)
+         real(dp) :: x  ! provide starting guess on input
+         real(dp) :: x1,x3  ! bounds for x
+         real(dp) :: y1,y3  ! f(x1) and f(x3)
          integer, parameter :: imax = 50, lipar = 0, lrpar = 0
          real(dp) :: dx
          real(dp), parameter :: epsx = 1d-10, epsy = 1d-10
-         integer :: ierr      
+         integer :: ierr
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
          x = -1d0
          dx = 0.1d0
-         ierr = 0      
-         write(*,*) 'test_root2'         
+         ierr = 0
+         write(*,*) 'test_root2'
          call look_for_brackets(x,dx,x1,x3,test_f,y1,y3,imax,lrpar,rpar,lipar,ipar,ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'x1', x1
-         write(*,1) 'x3', x3         
+         write(*,1) 'x3', x3
          write(*,1) 'y1', y1
          write(*,1) 'y3', y3
          x = safe_root_with_brackets( &
-            test_f,x1,x3,y1,y3,imax,epsx,epsy,lrpar,rpar,lipar,ipar,ierr)   
+            test_f,x1,x3,y1,y3,imax,epsx,epsy,lrpar,rpar,lipar,ipar,ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'safe_root', x
-         write(*,*)         
+         write(*,*)
       end subroutine test_root2
-      
-      
+
+
       subroutine test_root3
-         real(dp) :: x ! provide starting guess on input
-         real(dp) :: x1, x3 ! bounds for x
-         real(dp) :: y1, y3 ! f(x1) and f(x3)
+         real(dp) :: x  ! provide starting guess on input
+         real(dp) :: x1, x3  ! bounds for x
+         real(dp) :: y1, y3  ! f(x1) and f(x3)
          integer, parameter :: newt_imax = 10, imax = 50, lipar = 0, lrpar = 0
          real(dp) :: dx
          real(dp), parameter :: epsx = 1d-10, epsy = 1d-10
-         integer :: ierr      
+         integer :: ierr
          real(dp), target :: rpar_ary(lrpar)
          integer, target :: ipar_ary(lipar)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          include 'formats'
          ipar => ipar_ary
          rpar => rpar_ary
@@ -196,37 +196,37 @@
          x3 = arg_not_provided
          y1 = arg_not_provided
          y3 = arg_not_provided
-         ierr = 0      
-         write(*,*) 'test_root3'         
-         x = 0.1d0 ! not too bad initial guess.  newton should find it okay.
+         ierr = 0
+         write(*,*) 'test_root3'
+         x = 0.1d0  ! not too bad initial guess.  newton should find it okay.
          x = safe_root_with_guess( &
             test_f, x, dx, x1, x3, y1, y3, &
-            newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)   
+            newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'first safe_root_with_guess', x
-         x = -1d0 ! really bad guess will make it give up on newton
+         x = -1d0  ! really bad guess will make it give up on newton
          x = safe_root_with_guess( &
             test_f, x, dx, x1, x3, y1, y3, &
-            newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)   
+            newt_imax, imax, epsx, epsy, lrpar, rpar, lipar, ipar, ierr)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
          write(*,1) 'second safe_root_with_guess', x
-         write(*,*)         
+         write(*,*)
       end subroutine test_root3
 
 
       subroutine van_der_Pol_derivs(n,x,h,y,f,lrpar,rpar,lipar,ipar,ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x,h
-         real(dp), intent(inout) :: y(:) ! (n)
-         real(dp), intent(inout) :: f(:) ! (n)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
-         integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
+         real(dp), intent(inout) :: y(:)  ! (n)
+         real(dp), intent(inout) :: f(:)  ! (n)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
+         integer, intent(out) :: ierr  ! nonzero means retry with smaller timestep.
          include 'formats'
          ierr = 0
          f(1) = y(2)
          f(2) = ((1 - y(1)*y(1))*y(2) - y(1))/rpar(1)
-         ! the derivatives do not depend on x         
+         ! the derivatives do not depend on x
       end subroutine van_der_Pol_derivs
 
 
@@ -235,21 +235,22 @@
          ! x is the current x value; xold is the previous x value.
          ! y is the current y value.
          ! irtrn negative means terminate integration.
-         ! rwork and iwork hold info for 
+         ! rwork and iwork hold info for
          integer, intent(in) :: nr, n, lrpar, lipar
          real(dp), intent(in) :: xold, x
-         real(dp), intent(inout) :: y(:) ! (n)
+         real(dp), intent(inout) :: y(:)  ! (n)
          real(dp), intent(inout), target :: rwork(*)
          integer, intent(inout), target :: iwork(*)
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          interface
             ! this subroutine can be called from your solout routine.
             ! it computes interpolated values for y components during the just completed step.
             real(dp) function interp_y(i,s,rwork,iwork,ierr)
                use const_def, only: dp
-               integer, intent(in) :: i ! result is interpolated approximation of y(i) at x=s.
-               real(dp), intent(in) :: s ! interpolation x value (between xold and x).
+               implicit none
+               integer, intent(in) :: i  ! result is interpolated approximation of y(i) at x=s.
+               real(dp), intent(in) :: s  ! interpolation x value (between xold and x).
                real(dp), intent(inout), target :: rwork(*)
                integer, intent(inout), target :: iwork(*)
                integer, intent(out) :: ierr
@@ -262,13 +263,13 @@
          integer :: ierr
          xout = rpar(2)
          irtrn = 1
-         if (ipar(1) /= 1) return ! no output
-        
-         if (nr.eq.1) then
+         if (ipar(1) /= 1) return  ! no output
+
+         if (nr==1) then
             write (6,99) x,y(1),y(2),nr-1
             xout=x+0.2d0
          else
-            do 
+            do
                if (x >= xout-1d-10) then
                   ierr = 0
                   y1 = interp_y(1,xout,rwork,iwork,ierr)
@@ -290,11 +291,11 @@
       subroutine test_dopri(do_853,show_all)
          logical, intent(in) :: do_853,show_all
          integer, parameter :: nv = 2  ! the number of variables in the van der Pol system of ODEs
-         real(dp), parameter :: eps = 1d-3 ! stiffness parameter for van der Pol
-         real(dp) :: rtol(1) ! relative error tolerance(s)
-         real(dp) :: atol(1) ! absolute error tolerance(s)
-         real(dp) :: x ! starting value for the interval of integration
-         real(dp) :: xend ! ending value for the interval of integration
+         real(dp), parameter :: eps = 1d-3  ! stiffness parameter for van der Pol
+         real(dp) :: rtol(1)  ! relative error tolerance(s)
+         real(dp) :: atol(1)  ! absolute error tolerance(s)
+         real(dp) :: x  ! starting value for the interval of integration
+         real(dp) :: xend  ! ending value for the interval of integration
          real(dp) :: expect(nv)
          integer, parameter :: lrpar = 2, lipar = 1, nrdens = nv
          integer, parameter :: liwork = nrdens+100, lwork = 11*nv+8*nrdens+100
@@ -305,18 +306,18 @@
          real(dp), pointer :: y(:)
          real(dp), target :: rpar_ary(lrpar), work_ary(lwork)
          integer, target :: ipar_ary(lipar), iwork_ary(liwork)
-         integer, pointer :: ipar(:) ! (lipar)
-         real(dp), pointer :: rpar(:) ! (lrpar)
+         integer, pointer :: ipar(:)  ! (lipar)
+         real(dp), pointer :: rpar(:)  ! (lrpar)
          integer, pointer :: iwork(:)
          real(dp), pointer :: work(:)
-         
+
          ipar => ipar_ary
          rpar => rpar_ary
          work => work_ary
          iwork => iwork_ary
          y => y_ary
-         
-         write(*,*)        
+
+         write(*,*)
          write(*,*) 'vdpol'
          if (do_853) then
             write(*,*) 'dop853'
@@ -328,18 +329,18 @@
          xend = 2.0
          y(1) = 2
          y(2) = 0
-         
+
          lout = 0
          max_steps = 0
          max_step_size = 9
 
-         itol = 0 ! scalar tolerances
-         iout = 2 ! want dense output
-         
+         itol = 0  ! scalar tolerances
+         iout = 2  ! want dense output
+
          rtol(1) = 1d-4
          atol(1) = 1d-4
          h = 1d-6
-         
+
          rpar(1) = eps
          rpar(2) = 0
          if (show_all) then
@@ -347,24 +348,24 @@
          else
             ipar(1) = 0
          end if
-         
+
          iwork = 0
          work = 0
 
-         iwork(5)=nrdens ! want dense output for all components
-         iwork(4)=1 ! test for stiffness at each step
-         
+         iwork(5)=nrdens  ! want dense output for all components
+         iwork(4)=1  ! test for stiffness at each step
+
          if (do_853) then
             call dopri5_work_sizes(nv,nrdens,check_liwork,check_lwork)
          else
             call dop853_work_sizes(nv,nrdens,check_liwork,check_lwork)
          end if
-         
+
          if (check_liwork > liwork .or. check_lwork > lwork) then
             write(*,*) 'need to enlarge work arrays for dopri5'
             call mesa_error(__FILE__,__LINE__)
          end if
-         
+
          ierr = 0
          if (do_853) then
             call dop853( &
@@ -382,42 +383,42 @@
                   lrpar,rpar,lipar,ipar,lout,idid)
          end if
 
-         if (idid /= 1) then ! trouble
+         if (idid /= 1) then  ! trouble
             write(*,*) 'idid', idid
             call mesa_error(__FILE__,__LINE__)
          end if
-         
-         expect(1:2) = (/ 1.7632345401889102d+00, -8.3568868191466206d-01 /)
-         
+
+         expect(1:2) = [ 1.7632345401889102d+00, -8.3568868191466206d-01 ]
+
          call show_results(nv,y,expect,show_all)
          if (.not. show_all) return
-         
+
          ! typical: fcn=   21530     step=  1468     accpt=  1345     rejct=  122
          write (6,91) (iwork(j),j=17,20)
  91      format(' fcn=',i8,'     step=',i6,'     accpt=',i6,'     rejct=',i5)
- 
+
          write(*,*)
-      
+
       end subroutine test_dopri
 
-      
+
       subroutine test_binary_search
          integer, parameter :: n = 100
          integer :: k, loc(3)
-         
+
          real(dp) :: val(3)
          real(dp), target :: vec_ary(n)
          real(dp), pointer :: vec(:)
          include 'formats'
          vec => vec_ary
-         
+
          do k=1,n
             vec(k) = dble(k)*dble(k)
          end do
 
-         write(*,*) 
+         write(*,*)
          write(*,*) 'binary_search, increasing values'
-         
+
          loc = -1
          val = [0d0, FLOOR(n/3d0)**2+2d0, vec(n)+1d0]
          do k=1,3
@@ -436,7 +437,7 @@
             end if
             write(*,*) 'okay'
          enddo
-         
+
          ! test decreasing values
          loc = -1
          where(vec /= 0d0) vec = -vec
@@ -459,12 +460,12 @@
                call mesa_error(__FILE__,__LINE__)
             end if
             write(*,*) 'okay'
-         enddo         
+         enddo
          write(*,*)
-      
+
       end subroutine test_binary_search
-      
-      
+
+
       subroutine test_qsort
          use const_def
          integer, parameter :: n = 100
@@ -482,14 +483,14 @@
          end do
          write(*,*)
       end subroutine test_qsort
-      
-      
+
+
       real(dp) function g(x) result(y)
          real(dp), intent(in) :: x
          y = (x-3)*(x-8)
       end function g
-      
-      
+
+
       subroutine test_find0_quadratic
          real(dp) :: xx1, yy1, xx2, yy2, xx3, yy3, x, y
          integer :: ierr
@@ -522,10 +523,10 @@
          y = g(x)
          write(*,1) 'x', x
          write(*,1) 'y', y
-         write(*,*)         
+         write(*,*)
       end subroutine test_find0_quadratic
-      
-      
+
+
       subroutine test_find_max_quadratic
          real(dp) :: x1, y1, x2, y2, x3, y3, dx1, dx2, xmax, ymax
          integer :: ierr
@@ -540,9 +541,9 @@
          end if
          write(*,1) 'xmax', xmax, 1.85d0
          write(*,1) 'ymax', ymax, 12.4083d0
-         write(*,*)         
+         write(*,*)
       end subroutine test_find_max_quadratic
 
-      
-            
+
+
       end module test_support

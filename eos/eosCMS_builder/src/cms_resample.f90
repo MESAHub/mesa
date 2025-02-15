@@ -27,25 +27,25 @@
 !also calculates extra quantities wanted by MESA EOS
 
 program cms_resample
-   
+
    use const_def
    use const_lib
    use interp_1d_def
    use interp_1d_lib
    use math_lib
-   
+
    implicit none
-   
+
    integer, parameter :: version = 1
    integer, parameter :: NT = 121
    integer, parameter :: NP = 441
-   integer, parameter :: NRho = 281 ! -8 <= logRho <= +6 by 0.05
+   integer, parameter :: NRho = 281  ! -8 <= logRho <= +6 by 0.05
    integer :: ierr, i, j, io
-   
+
    character(len=256) :: input, output
 
    real(dp) :: H_mass_fraction, He_mass_fraction
-   
+
    !old EOS table
    real(dp), dimension(NP,NT) :: logT(NP,NT)
    real(dp), dimension(NP,NT) :: logRho, logP, logU, logS, dlnRho_dlnT_P, &
@@ -60,15 +60,15 @@ program cms_resample
    real(dp) :: new_logT, new_logRho, new_logP, new_logU, new_logS, new_dlnS_dlnT, new_dlnS_dlnP
    real(dp) :: new_dlnRho_dlnT, new_dlnRho_dlnP, new_grad_ad, dU_dP_T, dU_dT_P, dS_dRho, mu, dP_dT
    real(dp) :: dS_dT, dU_dRho, Cv, Cp, gamma1, gamma3, eta, P, U, S, T, Rho, chiRho, chiT, lnfree_e
-   real(dp) :: dS_dP_T, dS_dT_P, dse, dsp, dpe !for consistency check
+   real(dp) :: dS_dP_T, dS_dT_P, dse, dsp, dpe  !for consistency check
 
    ierr=0
-   
+
    if(command_argument_count()<2)then
       write(*,*) './cms_resample [input] [output]'
       stop
    endif
-   
+
    call get_command_argument(1,input)
    call get_command_argument(2,output)
 
@@ -76,7 +76,7 @@ program cms_resample
 
    open(newunit=io,file=trim(input),action='read',status='old',iostat=ierr)
    read(io,'(2x,f5.3)') H_mass_fraction
-   read(io,*) !header
+   read(io,*)  !header
    do i=1,NT
       do j=1,NP
          read(io,'(1p99e15.6)') logT(j,i), logP(j,i), logRho(j,i), logU(j,i), logS(j,i), &
@@ -106,9 +106,9 @@ program cms_resample
       new_logT = logT(1,i)
       do j=1,NRho
          new_logRho = logRho_min + real(j-1,kind=dp)*delta_logRho
-         
+
          call do_stuff(i, new_logRho, new_logP, new_logU, new_logS, &
-            new_dlnRho_dlnT, new_dlnRho_dlnP, new_dlnS_dlnT, new_dlnS_dlnP, new_grad_ad)  
+            new_dlnRho_dlnT, new_dlnRho_dlnP, new_dlnS_dlnT, new_dlnS_dlnP, new_grad_ad)
 
          P = exp10(new_logP)
          U = exp10(new_logU)
@@ -117,23 +117,23 @@ program cms_resample
          Rho = exp10(new_logRho)
 
          !CMS eqn 5
-         chiRho = 1.0_dp / new_dlnRho_dlnP ! dlnP/dlnRho at const T
-         chiT   = -new_dlnRho_dlnT / new_dlnRho_dlnP !dlnP/dlnT at const Rho
-         Cp = S * new_dlnS_dlnT ! at const P
-         Cv = Cp - (P*chiT*chiT)/(Rho*T*chiRho) ! at const Rho (V)
+         chiRho = 1.0_dp / new_dlnRho_dlnP  ! dlnP/dlnRho at const T
+         chiT   = -new_dlnRho_dlnT / new_dlnRho_dlnP  !dlnP/dlnT at const Rho
+         Cp = S * new_dlnS_dlnT  ! at const P
+         Cv = Cp - (P*chiT*chiT)/(Rho*T*chiRho)  ! at const Rho (V)
 
          dU_dP_T = new_dlnRho_dlnP/Rho + T*S*new_dlnS_dlnP/P
          dU_dT_P = (P/(rho*T))*new_dlnRho_dlnT + S*new_dlnS_dlnT
 
          dS_dP_T = (S/P) * new_dlnS_dlnP
          dS_dT_P = (S/T) * new_dlnS_dlnT
-         
+
          dU_dRho = dU_dP_T /( (rho/P) * new_dlnRho_dlnP)
-         
+
          mu = 4.0_dp / (6.0_dp*H_mass_fraction + He_mass_fraction + 2.0_dp)
          lnfree_e = log(0.5_dp*(1.0_dp + H_mass_fraction))
 
-         dS_dT = (S/T)*new_dlnS_dlnP * chiT !dS/dT_|Rho
+         dS_dT = (S/T)*new_dlnS_dlnP * chiT  !dS/dT_|Rho
          dS_dRho = new_dlnS_dlnT / new_dlnRho_dlnT * (S/Rho)
 
          !gamma3 = (P*chiT)/(rho*T*Cv) + 1.0_dp
@@ -148,7 +148,7 @@ program cms_resample
          !dpe
          dse = T*(dS_dT/Cv) - 1.0_dp
          dsp = -rho*rho*(dS_dRho/dP_dT) - 1.0_dp
-         dpe = 0.0_dp !not avaiable as yet...
+         dpe = 0.0_dp  !not avaiable as yet...
 
          write(io,'(1p99e15.6)') new_logT, new_logRho, new_logP, new_logU, new_logS, &
             chiRho, chiT, Cp, Cv, dU_dRho, dS_dT, dS_dRho, mu, lnfree_e, gamma1, gamma3, &
@@ -156,18 +156,18 @@ program cms_resample
       enddo
    enddo
    close(io)
-   
+
 contains
 
    subroutine mesa_init
-      call const_init(' ',ierr)     
+      call const_init(' ',ierr)
       if (ierr /= 0) then
          write(0,*) 'const_init failed'
          stop 1
       end if
-      
+
       call math_init()
-      
+
    end subroutine mesa_init
 
    subroutine do_stuff(iT, new_logRho, new_logP, new_logU, new_logS, new_dlnRho_dlnT, &
@@ -188,7 +188,7 @@ contains
       real(dp), pointer :: work(:)
 
       work => work_ary
-      
+
       count = 0
       do j=1,NP
          if(logRho(j,iT) >= logRho_min_for_interp)then
@@ -206,10 +206,10 @@ contains
             endif
          endif
       enddo
-      
+
       num_pts = count
       allocate(x_old(num_pts), y_old(num_pts))
-      
+
       !get logP for logRho input
       x_old(1:num_pts) = tmp_logRho(1:num_pts)
       y_old(1:num_pts) = tmp_logP(1:num_pts)
@@ -233,7 +233,7 @@ contains
       x_new(1) = new_logP
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
-      new_logS = y_new(1)      
+      new_logS = y_new(1)
 
       !dlnRho_dlnT_constP
       x_old(1:num_pts) = tmp_logP(1:num_pts)
@@ -241,7 +241,7 @@ contains
       x_new(1) = new_logP
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
-      new_dlnRho_dlnT = y_new(1)      
+      new_dlnRho_dlnT = y_new(1)
 
       !dlnRho_dlnP_constT
       x_old(1:num_pts) = tmp_logP(1:num_pts)
@@ -249,15 +249,15 @@ contains
       x_new(1) = new_logP
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
-      new_dlnRho_dlnP = y_new(1)      
-      
+      new_dlnRho_dlnP = y_new(1)
+
       !dlnS_dlnT_constP
       x_old(1:num_pts) = tmp_logP(1:num_pts)
       y_old(1:num_pts) = tmp_dlnS_dlnT(1:num_pts)
       x_new(1) = new_logP
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
-      new_dlnS_dlnT = y_new(1)      
+      new_dlnS_dlnT = y_new(1)
 
       !dlnS_dlnP_constT
       x_old(1:num_pts) = tmp_logP(1:num_pts)
@@ -265,7 +265,7 @@ contains
       x_new(1) = new_logP
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
-      new_dlnS_dlnP = y_new(1)      
+      new_dlnS_dlnP = y_new(1)
 
       !grad_ad
       x_old(1:num_pts) = tmp_logP(1:num_pts)
@@ -274,7 +274,7 @@ contains
       call interpolate_vector(num_pts, x_old, 1, x_new, y_old, y_new, &
          interp_m3a, nwork, work, 'sigh', ierr)
       new_grad_ad = min(0.5_dp, max(0.1_dp, y_new(1)))
-      
+
    end subroutine do_stuff
-   
+
 end program cms_resample

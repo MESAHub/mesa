@@ -1,28 +1,28 @@
 module phys_constants
 
   use kinds,                 only: dp
-  use math_constants,        only: p_pi          
+  use math_constants,        only: p_pi
 
   implicit none
   private
-  
+
 !  public ::  p_h_bar, p_hplanc, p_c_light, p_boltzk, p_avogar, p_atom_m, p_m_e, p_echarg, &
 !              p_cg, p_cms, p_rsol, p_Rgas, &
 !              p_carad, p_csigm, p_ergev, p_gradev, p_radc, p_ctomp, p_ccaps, p_ccapz, p_a_fine
-              
-  public :: write_phys_constants              
-       
+
+  public :: write_phys_constants
+
 
  !   *** Planck constant [J*s] ***
   real (kind=dp), parameter, public :: p_h_bar = 1.0545715960e-27_dp
-  real (kind=dp), parameter, public :: p_h= p_h_bar * (2.0_dp*p_pi) ! p_h = 6.62606875735612676959e-27
+  real (kind=dp), parameter, public :: p_h= p_h_bar * (2.0_dp*p_pi)  ! p_h = 6.62606875735612676959e-27
 !   *** Speed of light in vacuum [cm/s] ***
   real (kind=dp), parameter, public :: p_c= 2.9979245800e+10_dp
 !   *** Boltzmann constant [erg/K] ***
   real (kind=dp), parameter, public :: p_boltzk= 1.3806503000e-16_dp
-  real (kind=dp), parameter, public :: p_k= p_boltzk ! alias
+  real (kind=dp), parameter, public :: p_k= p_boltzk  ! alias
 !   *** Avogadro's Constant  [1/mol] ***
-  real (kind=dp), parameter, public :: p_avogar= 6.0221419900e+23_dp ! p_avogar= 6.0221419900e+17_dp p_avogar= 6.0221419900e+23_dp
+  real (kind=dp), parameter, public :: p_avogar= 6.0221419900e+23_dp  ! p_avogar= 6.0221419900e+17_dp p_avogar= 6.0221419900e+23_dp
 !   *** Atomic mass unit [g]       ***
   real (kind=dp), parameter, public :: p_atom_m= 1.6605387280e-24_dp
  !   *** Electron mass [g] ***
@@ -52,7 +52,7 @@ module phys_constants
  !   ***   ***
   real (kind=dp), parameter, public :: p_ccapz = 9.8964056126e+00_dp
  !   *** Molar gas constant [??] { [erg/K mol] => 8.3144721451e+07_dp }  ***
-  real (kind=dp), parameter, public :: p_Rgas = p_boltzk * p_avogar ! stella => 8.3144721451e-01_dp
+  real (kind=dp), parameter, public :: p_Rgas = p_boltzk * p_avogar  ! stella => 8.3144721451e-01_dp
 !   *** Fine-structure constant ***
   real (kind=dp), parameter, public :: p_a_fine= 7.2973525330e-03_dp
 
@@ -60,16 +60,16 @@ module phys_constants
 !   *** eV to erg ***
   real (kind=dp), parameter, public :: p_ev2erg = p_ergev  ! p_ev2erg = 1.6021764630e-12_dp
 !   *** erg to ev ***
-  real (kind=dp), parameter, public :: p_erg2ev =  1._dp /  p_ev2erg !  p_erg2ev = 6.24150974061588121083e11
+  real (kind=dp), parameter, public :: p_erg2ev =  1._dp /  p_ev2erg  !  p_erg2ev = 6.24150974061588121083e11
 !   *** freq to eV ***
-  real (kind=dp), parameter, public :: p_freq2ev = p_h * p_erg2ev !     p_freq2ev = 4.1356672691e-15
+  real (kind=dp), parameter, public :: p_freq2ev = p_h * p_erg2ev  !     p_freq2ev = 4.1356672691e-15
 !   *** eV to freq ***
-  real (kind=dp), parameter, public :: p_ev2freq = 1._dp / p_freq2ev ! p_ev2freq = 2.4179894922e14
+  real (kind=dp), parameter, public :: p_ev2freq = 1._dp / p_freq2ev  ! p_ev2freq = 2.4179894922e14
 !   *** T [K] to eV ***
   real (kind=dp), parameter, public :: p_T2ev = p_k * p_erg2ev  !  p_T2ev = 8.61734229583e-5
 !   *** eV to T [K] ***
-  real (kind=dp), parameter, public :: p_ev2T = 1._dp / p_T2ev  ! p_ev2T = 11604.5059563 
-  
+  real (kind=dp), parameter, public :: p_ev2T = 1._dp / p_T2ev  ! p_ev2T = 11604.5059563
+
   contains
 
   SUBROUTINE write_phys_constants(output_unit)
@@ -108,7 +108,7 @@ module phys_constants
   END SUBROUTINE write_phys_constants
 
 ! *****************************************************************************
-  
+
 end module phys_constants
 
 !******************************************************************************

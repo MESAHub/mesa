@@ -17,7 +17,7 @@
 !!     Adapted for use in CP2K (JGH)
 !!     JGH (16-06-2002) : Added Gamma functions
 !!     JGH (10-08-2004) : Added Euler constant (gamma)
-!!     Baklanov (13-07-2006) : change module name 
+!!     Baklanov (13-07-2006) : change module name
 !!   SOURCE
 !******************************************************************************
 
@@ -32,7 +32,7 @@ module math_constants
        p_zero, p_one, p_half, p_degree, p_radians
   public :: deq,dgt,dne,dle,dlt,dge
   public :: dNeqZero, dEqZero, dLtZero, dGtZero
- 
+
   real(kind=dp), parameter, public :: one=1.0_dp,  eps=2*epsilon(one)
 
   real (kind=dp), parameter :: p_pi = 3.14159265358979323846264338_dp
@@ -85,30 +85,30 @@ contains
     logical :: test
     test = dgt(x,y) .or. deq(x,y)
   end function dge
-  
-! compare with 0  
+
+! compare with 0
    logical function dGtZero(x)
     real(kind=dp), intent(in) :: x
     dGtZero =  dgt(x, 0._dp)
   end function dGtZero
- 
+
    logical function dLtZero(x)
     real(kind=dp), intent(in) :: x
     dLtZero =  dlt(x, 0._dp)
   end function dLtZero
- 
+
    logical function dEqZero(x)
     real(kind=dp), intent(in) :: x
 write(*,*) ' eps=',eps
     dEqZero =  deq(x, 0._dp)
   end function dEqZero
-  
+
    logical function dNeqZero(x)
     real(kind=dp), intent(in) :: x
     dNeqZero =  dne(x, 0._dp)
   end function dNeqZero
-  
-  
+
+
 end module math_constants
 
 !******************************************************************************

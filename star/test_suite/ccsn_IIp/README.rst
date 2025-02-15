@@ -59,10 +59,7 @@ pgstar commands used for the first 7 plots:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
-
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -201,13 +198,13 @@ pgstar commands used for the first 7 plots:
   Grid2_num_cols = 7
   Grid2_num_rows = 8
   Grid2_num_plots = 5
-  
+
   Grid2_win_flag = .true.
   Grid2_win_width = 15
   Grid2_win_aspect_ratio = 0.6
-  
+
   Grid2_file_flag = .true.
-  Grid2_file_dir = 'png' 
+  Grid2_file_dir = 'png'
   Grid2_file_prefix = 'test_'
   Grid2_file_interval = 100
   Grid2_file_width = 15
@@ -245,10 +242,8 @@ pgstar commands used for the 8th plot:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 1
 
@@ -333,7 +328,7 @@ pgstar commands used for the 8th plot:
    Grid2_win_flag = .true.
 
   Grid2_file_flag = .true.
-  Grid2_file_dir = 'png' 
+  Grid2_file_dir = 'png'
   Grid2_file_prefix = 'test_'
   Grid2_file_interval = 100
   Grid2_file_width = 15

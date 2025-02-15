@@ -91,7 +91,7 @@ contains
        return
     end if
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
@@ -173,7 +173,7 @@ contains
        call store_point_data_atm(j, k)
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     env_loop : do k = 1, n_env
@@ -211,7 +211,7 @@ contains
          V => point_data(14,:), &
          nabla_ad => point_data(15,:), &
          c_2_fit => point_data(22,:), &
-         dlnLr_dlnr => point_data(25,:), & 
+         dlnLr_dlnr => point_data(25,:), &
          surf_r_rad_beg => point_data(27,:), &
          surf_r_rad_end => point_data(28,:), &
          U_U_surf => point_data(34,:), &
@@ -339,7 +339,7 @@ contains
            chi_T => point_data(33,j), &
            c_2 => point_data(35,j))
 
-        m = s%m_grav(1) !+ s%atm_structure(atm_delta_m,k)
+        m = s%m_grav(1)  !+ s%atm_structure(atm_delta_m,k)
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
         l = s%L(1)
 
@@ -356,7 +356,7 @@ contains
         C_P = s%atm_structure(atm_cp,k)
         delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
         Gamma_1 = s%atm_structure(atm_gamma1,k)
-        entropy = 0d0 ! No entropy data in surface layers
+        entropy = 0d0  ! No entropy data in surface layers
         chi_rho = s%atm_structure(atm_chiRho,k)
         chi_T = s%atm_structure(atm_chiT,k)
 
@@ -365,7 +365,7 @@ contains
         kap_T = s%atm_structure(atm_dlnkap_dlnT,k)
         kap_ad = nabla_ad*kap_T + kap_rho/Gamma_1
         kap_S = kap_T - delta*kap_rho
-        
+
         eps = 0d0
         eps_ad = 0d0
         eps_S = 0d0
@@ -383,7 +383,7 @@ contains
         l_rad(j) = l
 
         c_1 = (r/R_star)**3*(M_star/m)
-        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
+        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla  ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
         c_3 = 0d0
         c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
 
@@ -453,7 +453,7 @@ contains
         m = s%m_grav(k)
         r = s%r(k)
         l = s%L(k)
-        
+
         if (s%interpolate_rho_for_pulse_data) then
            rho = eval_face(s%dq, s%rho, k, 1, s%nz)
         else
@@ -480,7 +480,7 @@ contains
         kap_T = eval_face(s%dq, s%d_opacity_dlnT, k, 1, s%nz)/kap
         kap_ad = nabla_ad*kap_T + kap_rho/Gamma_1
         kap_S = kap_T - delta*kap_rho
-        
+
         eps = eval_face(s%dq, s%eps_nuc, k, 1, s%nz)
          if (ABS(eps) > 1D-99) then
            eps_rho = eval_face(s%dq, s%d_epsnuc_dlnd, k, 1, s%nz)/eps
@@ -496,7 +496,7 @@ contains
         N2 = eval_face_A_ast(s, k, 1, s%nz)*g/r
         L2_ll1 = Gamma_1*P/(rho*r**2)
         P_scale = s%scale_height(k)
-        
+
         V = rho*g*r/P
         V_g = V/Gamma_1
         As = N2*r/g
@@ -505,10 +505,10 @@ contains
         l_rad(j) = 16d0*pi*r*crad*clight*T**4*nabla*V/(3d0*kap*rho)
 
         c_1 = (r/R_star)**3*(M_star/m)
-        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
+        c_2 = (kap_ad - 4d0*nabla_ad)*V*nabla  ! Note -- we omit the nabla_ad*(dnabla_ad + V) term for now
         c_3 = pi4*r**3*rho*eps/l_rad(j)
         c_4 = pi4*r**3*rho*T*c_P/l_rad(j)*SQRT(s%cgrav(1)*M_star/R_star**3)
-        
+
       end associate
 
       ! Finish
@@ -592,7 +592,7 @@ contains
         entropy = exp(eval_center(s%rmid, s%lnS, 1, s%nz))
         chi_rho = eval_center(s%rmid, s%chiRho, 1, s%nz)
         chi_T = eval_center(s%rmid, s%chiT, 1, s%nz)
-        
+
         kap = eval_center(s%rmid, s%opacity, 1, s%nz)
         kap_rho = eval_center(s%rmid, s%d_opacity_dlnd, 1, s%nz)/kap
         kap_T = eval_center(s%rmid, s%d_opacity_dlnT, 1, s%nz)/kap
@@ -609,12 +609,12 @@ contains
         endif
         eps_ad = nabla_ad*eps_T + eps_rho/Gamma_1
         eps_S = eps_T - delta*eps_rho
- 
+
         g = 0d0
         N2 = 0d0
         L2_ll1 = HUGE(0d0)
         P_scale = eval_center(s%r, s%scale_height, 1, s%nz)
-        
+
         V = 0d0
         V_g = 0d0
         As = 0d0
@@ -676,7 +676,7 @@ contains
       return
 
     end function log_deriv
-    
+
   end subroutine get_cafein_data
 
   !****
@@ -741,7 +741,7 @@ contains
     ! Finish
 
     ! Close the file
-    
+
     close(iounit)
 
     ! Finish

@@ -63,7 +63,7 @@
 *   WK  = three dimensional array of dimension 3*NXD*NYD used
 *         internally as a work area.
 *
-* The very fisrt call to this subroutine and the call with a new
+* The very first call to this subroutine and the call with a new
 * XD, YD, and ZD array must be made with MD=1.  The call with MD=2
 * must be preceded by another call with the same XD, YD, and ZD
 * arrays.  Between the call with MD=2 and its preceding call, the

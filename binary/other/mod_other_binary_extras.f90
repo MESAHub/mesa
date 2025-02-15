@@ -22,17 +22,17 @@
 !   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 !
 ! ***********************************************************************
- 
+
    module mod_other_binary_extras
-      
-   
+
+
       implicit none
-      
+
       private warn_run_star_extras
       public
-      
+
       contains
-      
+
       integer function null_extras_binary_startup(binary_id,restart,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
@@ -44,12 +44,12 @@
 
          null_extras_binary_startup = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
-      
+
       end function  null_extras_binary_startup
-      
+
       integer function null_extras_binary_start_step(binary_id,ierr)
          use binary_def, only : binary_info, binary_ptr
          use star_def, only : keep_going
@@ -60,12 +60,12 @@
 
          null_extras_binary_start_step = keep_going
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
          end if
-      
+
       end function  null_extras_binary_start_step
-      
+
       !Return either keep_going, retry or terminate
       integer function null_extras_binary_check_model(binary_id)
          use binary_def, only : binary_info, binary_ptr
@@ -75,14 +75,14 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
-         end if  
+         end if
          null_extras_binary_check_model = keep_going
-        
+
       end function null_extras_binary_check_model
-      
-      
+
+
       ! returns either keep_going or terminate.
       ! note: cannot request retry; extras_binary_check_model can do that.
       integer function null_extras_binary_finish_step(binary_id)
@@ -93,15 +93,15 @@
          integer, intent(in) :: binary_id
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
-         end if  
+         end if
          null_extras_binary_finish_step = keep_going
 
       end function null_extras_binary_finish_step
-      
-      
-      
+
+
+
       subroutine null_extras_binary_after_evolve(binary_id, ierr)
          use binary_def, only : binary_info, binary_ptr
          use const_def
@@ -109,12 +109,12 @@
          integer, intent(in) :: binary_id
          integer, intent(out) :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
-         end if  
-         
+         end if
+
       end subroutine null_extras_binary_after_evolve
-      
+
       integer function null_how_many_extra_binary_history_columns(binary_id)
          use binary_def, only : binary_info, binary_ptr
          use const_def
@@ -122,15 +122,15 @@
          type (binary_info), pointer :: b
          integer :: ierr
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
-         end if 
+         end if
          null_how_many_extra_binary_history_columns=0
-         
-         call warn_run_star_extras(b% warn_binary_extra) 
-         
+
+         call warn_run_star_extras(b% warn_binary_extra)
+
       end function null_how_many_extra_binary_history_columns
-      
+
       subroutine null_data_for_extra_binary_history_columns(binary_id, n, extra_names, vals, ierr)
          use binary_def, only : binary_info, binary_ptr, maxlen_binary_history_column_name
          use const_def
@@ -141,15 +141,15 @@
          integer, intent(out) :: ierr
          type (binary_info), pointer :: b
          call binary_ptr(binary_id, b, ierr)
-         if (ierr /= 0) then ! failure in  binary_ptr
+         if (ierr /= 0) then  ! failure in  binary_ptr
             return
-         end if 
-         
+         end if
+
          call warn_run_star_extras(b% warn_binary_extra)
-         
-      end subroutine null_data_for_extra_binary_history_columns  
-      
-      
+
+      end subroutine null_data_for_extra_binary_history_columns
+
+
       integer function null_how_many_extra_binary_history_header_items(binary_id)
          use const_def
          integer, intent(in) :: binary_id
@@ -172,11 +172,11 @@
             return
          end if
       end subroutine null_data_for_extra_binary_history_header_items
-          
-      
+
+
        subroutine warn_run_star_extras(warn)
          logical, intent(in) :: warn
-      
+
          if(warn) then
             write(*,*) "WARNING: run_binary_extras has changed"
             write(*,*) "and you are calling a null version of this routine"
@@ -187,9 +187,9 @@
             write(*,*) "MESA exited due to run_binary_extras warning."
             stop
          end if
-         
+
       end subroutine warn_run_star_extras
-      
-      
+
+
    end module mod_other_binary_extras
-      
+

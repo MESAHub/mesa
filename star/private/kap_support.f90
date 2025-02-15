@@ -79,7 +79,7 @@ contains
     include 'formats'
 
     ierr = 0
-    if (s% op_mono_n > 0) return ! already setup
+    if (s% op_mono_n > 0) return  ! already setup
 
     if (check_if_need) then
        if (s% high_logT_op_mono_full_off < 0d0 .or. &
@@ -142,11 +142,11 @@ contains
     type(auto_diff_real_2var_order1) :: frac
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        frac = frac_op_mono(s, s% lnd(k)/ln10, s% lnT(k)/ln10)
     end if
-    
+
     beta = frac% val
 
   end function fraction_of_op_mono
@@ -197,13 +197,13 @@ contains
        alfa = 1d0
     else if (log10_T <= high_full_on .and. log10_T >= low_full_on) then
        alfa = 0d0
-    else if (log10_T > high_full_on) then ! between high_on and high_off
+    else if (log10_T > high_full_on) then  ! between high_on and high_off
        if (high_full_off - high_full_on > 1d-10) then
           alfa = (log10_T - high_full_on) / (high_full_off - high_full_on)
        else
           alfa = 1d0
        end if
-    else ! between low_off and low_on
+    else  ! between low_off and low_on
        if (low_full_on - low_full_off > 1d-10) then
           alfa = (log10_T - low_full_on) / (low_full_off - low_full_on)
        else
@@ -326,11 +326,11 @@ contains
     end if
 
     if (s% op_mono_method == 'mombarg' .and. k < 2) then
-       beta = 0d0 ! don't use 'mombarg' op mono method for atmospheres
+       beta = 0d0  ! don't use 'mombarg' op mono method for atmospheres
     else
        beta = frac_op_mono(s, logRho, logT)
     end if
-    
+
     if (k > 0 .and. k <= s% nz) s% kap_frac_op_mono(k) = beta % val
 
     if (beta > 0d0) then
@@ -346,7 +346,7 @@ contains
 
          if (associated(s% op_mono_umesh1)) then
 
-            thread_num = utils_OMP_GET_THREAD_NUM() ! in range 0 to op_mono_n-1
+            thread_num = utils_OMP_GET_THREAD_NUM()  ! in range 0 to op_mono_n-1
             if (thread_num < 0) then
                write(*,3) 'thread_num < 0', thread_num, s% op_mono_n
                ierr = -1
@@ -360,7 +360,7 @@ contains
             nptot = s% op_mono_nptot
             ipe = s% op_mono_ipe
             nrad = s% op_mono_nrad
-            
+
             sz = nptot; offset = thread_num*sz
             umesh(1:nptot) => s% op_mono_umesh1(offset+1:offset+sz)
             semesh(1:nptot) => s% op_mono_semesh1(offset+1:offset+sz)
@@ -377,16 +377,16 @@ contains
                rs(1:nptot,1:4,1:4) => s% op_mono_rs1(offset+1:offset+sz)
                sz = nptot*nrad*4*4; offset = thread_num*sz
             end if
-            
+
          else
-            
+
             call load_op_mono_data( &
                  s% op_mono_data_path, s% op_mono_data_cache_filename, ierr)
             if (ierr /= 0) then
                write(*,*) 'error while loading OP data, ierr = ',ierr
                return
             end if
-            
+
             call get_op_mono_params(nptot, ipe, nrad)
             if (s% use_op_mono_alt_get_kap) then
                allocate( &
@@ -398,15 +398,15 @@ contains
                     rs(nptot,4,4), stat=ierr)
             end if
             if (ierr /= 0) return
-            
+
          end if
-         
+
          if (s% solver_test_kap_partials) then
             kap_test_partials = (k == s% solver_test_partials_k .and. &
                  s% solver_call_number == s% solver_test_partials_call_number .and. &
                  s% solver_iter == s% solver_test_partials_iter_number )
          end if
-       
+
          screening = .true.
          if (s% use_other_kap) then
             call s% other_kap_get_op_mono( &
@@ -428,10 +428,10 @@ contains
          end if
 
          if (.not. associated(s% op_mono_umesh1)) deallocate(umesh, semesh, ff, rs)
-         
+
       else if (s% op_mono_method == 'mombarg') then
          fk = 0
-         if (logT > 3.5 .and. logT < 8.0) then
+         if (logT > 3.5d0 .and. logT < 8.0d0) then
             do i=1, s% species
                e_name = chem_isos% name(s% chem_id(i))
                if (e_name == 'h1')  fk(1)  =  xa(i)/ chem_isos% W(s% chem_id(i))

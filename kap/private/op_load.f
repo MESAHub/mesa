@@ -631,7 +631,7 @@ c8000  FORMAT(5X,I5,F10.4/5X,3I5/2E10.2/2I10/10X,E10.2)
 !***********************************************************************
       FUNCTION FMH(W)
 !
-!  CALCULATES FD INTERGAL I_(-1/2)(ETA). INCLUDES FACTOR 1/GAMMA(1/2).
+!  CALCULATES FD INTEGRAL I_(-1/2)(ETA). INCLUDES FACTOR 1/GAMMA(1/2).
 !  ETA=LOG(W)
 !
       if (W <= 2.718282) then

@@ -6,9 +6,9 @@ module neu_support
    use utils_lib, only: mkdir, mesa_error
 
    implicit none
-   
+
    contains
-   
+
    subroutine do_test_neutrinos()
       real(dp),parameter :: logT_start=6.d0,logT_end=10.5d0
       real(dp),parameter :: logRho_start=6.d0,logRho_end=10.5d0
@@ -21,9 +21,9 @@ module neu_support
 
       integer :: i,j,k,l, info
 
-      logical :: flags(num_neu_types) ! true if should include the type
+      logical :: flags(num_neu_types)  ! true if should include the type
 
-      real(dp) :: loss(num_neu_rvs) ! total from all sources
+      real(dp) :: loss(num_neu_rvs)  ! total from all sources
       real(dp) :: sources(num_neu_types, num_neu_rvs)
 
       flags = .true.

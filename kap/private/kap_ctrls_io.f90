@@ -88,7 +88,7 @@
 
    logical, dimension(max_extra_inlists) :: read_extra_kap_inlist
    character (len=strlen), dimension(max_extra_inlists) :: extra_kap_inlist_name
-   
+
    ! User supplied inputs
    real(dp) :: kap_ctrl(10)
    integer :: kap_integer_ctrl(10)
@@ -97,7 +97,7 @@
 
    namelist /kap/ &
 
-      Zbase, & 
+      Zbase, &
 
       kap_file_prefix, kap_CO_prefix, kap_lowT_prefix, aesopus_filename, &
 
@@ -142,7 +142,7 @@
    subroutine read_namelist(handle, inlist, ierr)
       integer, intent(in) :: handle
       character (len=*), intent(in) :: inlist
-      integer, intent(out) :: ierr ! 0 means AOK.
+      integer, intent(out) :: ierr  ! 0 means AOK.
       type (Kap_General_Info), pointer :: rq
       include 'formats'
       call get_kap_ptr(handle,rq,ierr)
@@ -175,7 +175,7 @@
             action='read', delim='quote', status='old', iostat=ierr)
          if (ierr /= 0) then
             if (level == 1) then
-               ierr = 0 ! no inlist file so just use defaults
+               ierr = 0  ! no inlist file so just use defaults
                call store_controls(rq, ierr)
             else
                write(*, *) 'Failed to open kap namelist file ', trim(filename)
@@ -184,7 +184,7 @@
          end if
          read(unit, nml=kap, iostat=ierr)
          close(unit)
-         if (ierr == IOSTAT_END) then ! end-of-file means didn't find an &kap namelist
+         if (ierr == IOSTAT_END) then  ! end-of-file means didn't find an &kap namelist
             ierr = 0
             write(*, *) 'WARNING: Failed to find kap namelist in file: ', trim(filename)
             call store_controls(rq, ierr)
@@ -215,7 +215,7 @@
          read_extra_kap_inlist(i) = .false.
          extra(i) = extra_kap_inlist_name(i)
          extra_kap_inlist_name(i) = 'undefined'
-   
+
          if (read_extra(i)) then
             call read_controls_file(rq, extra(i), level+1, ierr)
             if (ierr /= 0) return
@@ -477,27 +477,27 @@
       ! First save current controls
       call set_controls_for_writing(rq)
 
-      ! Write namelist to temporay file
+      ! Write namelist to temporary file
       open(newunit=iounit,status='scratch')
       write(iounit,nml=kap)
       rewind(iounit)
 
-      ! Namelists get written in captials
+      ! Namelists get written in capitals
       upper_name = trim(StrUpCase(name))//'='
       val = ''
       ! Search for name inside namelist
-      do 
+      do
          read(iounit,'(A)',iostat=iostat) str
          ind = index(trim(str),trim(upper_name))
          if( ind /= 0 ) then
-            val = str(ind+len_trim(upper_name):len_trim(str)-1) ! Remove final comma and starting =
+            val = str(ind+len_trim(upper_name):len_trim(str)-1)  ! Remove final comma and starting =
             do i=1,len(val)
                if(val(i:i)=='"') val(i:i) = ' '
             end do
             exit
          end if
          if(is_iostat_end(iostat)) exit
-      end do   
+      end do
 
       if(len_trim(val) == 0 .and. ind==0 ) ierr = -1
 

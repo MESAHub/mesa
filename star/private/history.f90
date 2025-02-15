@@ -84,9 +84,9 @@ contains
          extra_col_vals, binary_col_vals, extra_binary_col_vals, extra_header_item_vals
 
       character (len = maxlen_history_column_name), pointer :: &
-         names(:) ! (num_history_columns)
-      real(dp), pointer :: vals(:) ! (num_history_columns)
-      logical, pointer :: is_int(:) ! (num_history_columns)
+         names(:)  ! (num_history_columns)
+      real(dp), pointer :: vals(:)  ! (num_history_columns)
+      logical, pointer :: is_int(:)  ! (num_history_columns)
       type(net_general_info), pointer :: g => null()
 
       logical :: history_file_exists
@@ -297,7 +297,7 @@ contains
          envelope_fraction_left = 1
       end if
 
-      if (write_flag .and. i0 == 1) then ! write values at start of log
+      if (write_flag .and. i0 == 1) then  ! write values at start of log
 
          num_extra_header_items = s% how_many_extra_history_header_items(s% id)
          if (num_extra_header_items > 0) then
@@ -364,7 +364,7 @@ contains
       mix_relr_regions = 0
       burn_relr_regions = 0
 
-      do i = i0, 3 ! add a row to the log
+      do i = i0, 3  ! add a row to the log
 
          col = 0
          if (i==3) then
@@ -747,9 +747,9 @@ contains
             write(*, 2) 'q bot', min_kbot, s% q(min_kbot)
             write(*, 2) 'dq', min_kbot, s% q(min_ktop) - s% q(min_kbot)
          end if
-         if (min_ktop > 1) then ! merge with above
+         if (min_ktop > 1) then  ! merge with above
             new_type = mx_type(min_ktop - 1)
-         else if (min_kbot < nz) then ! merge with below
+         else if (min_kbot < nz) then  ! merge with below
             new_type = mx_type(min_kbot + 1)
          else
             write(*, *) 'confusion in args for remove_region', min_ktop, min_kbot
@@ -846,7 +846,7 @@ contains
       end subroutine do_col
 
 
-      subroutine do_col_pass1 ! write the column number
+      subroutine do_col_pass1  ! write the column number
          col = col + 1
          if (write_flag) write(io, fmt = int_fmt, advance = 'no') col
       end subroutine do_col_pass1
@@ -854,7 +854,7 @@ contains
 
       ! The order of if statements matter, they should be in reverse order
       ! to the order in history_specs
-      subroutine do_col_pass2(j) ! get the column name
+      subroutine do_col_pass2(j)  ! get the column name
          use colors_lib, only : get_bc_name_by_id
          use rates_def, only : reaction_name
          integer, intent(in) :: j
@@ -865,7 +865,7 @@ contains
          if (c > burn_relr_offset) then
             i = c - burn_relr_offset
             ii = (i + 1) / 2
-            if (ii > burn_relr_regions) burn_relr_regions = ii ! count the regions in pass2
+            if (ii > burn_relr_regions) burn_relr_regions = ii  ! count the regions in pass2
             if (ii < 10) then
                write(str, '(i1)') ii
             else if (ii < 100) then
@@ -873,15 +873,15 @@ contains
             else
                write(str, '(i3)') ii
             end if
-            if (mod(i, 2)==1) then ! burning type
+            if (mod(i, 2)==1) then  ! burning type
                col_name = 'burn_relr_type_' // trim(str)
-            else ! location of top
+            else  ! location of top
                col_name = 'burn_relr_top_' // trim(str)
             end if
          else if (c > burning_offset) then
             i = c - burning_offset
             ii = (i + 1) / 2
-            if (ii > burning_regions) burning_regions = ii ! count the regions in pass2
+            if (ii > burning_regions) burning_regions = ii  ! count the regions in pass2
             if (ii < 10) then
                write(str, '(i1)') ii
             else if (ii < 100) then
@@ -889,15 +889,15 @@ contains
             else
                write(str, '(i3)') ii
             end if
-            if (mod(i, 2)==1) then ! burning type
+            if (mod(i, 2)==1) then  ! burning type
                col_name = 'burn_type_' // trim(str)
-            else ! location of top
+            else  ! location of top
                col_name = 'burn_qtop_' // trim(str)
             end if
          else if (c > mix_relr_offset) then
             i = c - mix_relr_offset
             ii = (i + 1) / 2
-            if (ii > mix_relr_regions) mix_relr_regions = ii ! count the regions in pass2
+            if (ii > mix_relr_regions) mix_relr_regions = ii  ! count the regions in pass2
             if (ii < 10) then
                write(str, '(i1)') ii
             else if (ii < 100) then
@@ -907,13 +907,13 @@ contains
             end if
             if (mod(i, 2)==1) then
                col_name = 'mix_relr_type_' // trim(str)
-            else ! location of top
+            else  ! location of top
                col_name = 'mix_relr_top_' // trim(str)
             end if
          else if (c > mixing_offset) then
             i = c - mixing_offset
             ii = (i + 1) / 2
-            if (ii > mixing_regions) mixing_regions = ii ! count the regions in pass2
+            if (ii > mixing_regions) mixing_regions = ii  ! count the regions in pass2
             if (ii < 10) then
                write(str, '(i1)') ii
             else if (ii < 100) then
@@ -921,9 +921,9 @@ contains
             else
                write(str, '(i3)') ii
             end if
-            if (mod(i, 2)==1) then ! mixing type
+            if (mod(i, 2)==1) then  ! mixing type
                col_name = 'mix_type_' // trim(str)
-            else ! location of top
+            else  ! location of top
                col_name = 'mix_qtop_' // trim(str)
             end if
          else if (c > eps_neu_rate_offset) then
@@ -1000,7 +1000,7 @@ contains
       end subroutine do_col_pass2
 
 
-      subroutine do_col_pass3(c) ! get the column value
+      subroutine do_col_pass3(c)  ! get the column value
          use rates_def
          integer, intent(in) :: c
          integer :: i, ii, k, int_val
@@ -1012,42 +1012,42 @@ contains
             i = c - burn_relr_offset
             ii = (i + 1) / 2
             k = region_top(burn_relr_type, ii)
-            if (mod(i, 2)==1) then ! burning type
+            if (mod(i, 2)==1) then  ! burning type
                is_int_val = .true.
                if (k > 0) then
                   int_val = burn_relr_type(k)
                else
                   int_val = -9999
                end if
-            else ! location of top
+            else  ! location of top
                val = interpolate_burn_bdy_r(k)
             end if
          else if (c > burning_offset) then
             i = c - burning_offset
             ii = (i + 1) / 2
             k = region_top(burning_type, ii)
-            if (mod(i, 2)==1) then ! burning type
+            if (mod(i, 2)==1) then  ! burning type
                is_int_val = .true.
                if (k > 0) then
                   int_val = burning_type(k)
                else
                   int_val = -9999
                end if
-            else ! location of top
+            else  ! location of top
                val = interpolate_burn_bdy_q(k)
             end if
          else if (c > mix_relr_offset) then
             i = c - mix_relr_offset
             ii = (i + 1) / 2
             k = region_top(mix_relr_type, ii)
-            if (mod(i, 2)==1) then ! mixing type
+            if (mod(i, 2)==1) then  ! mixing type
                is_int_val = .true.
                if (k > 0) then
                   int_val = mix_relr_type(k)
                else
                   int_val = -1
                end if
-            else ! r/rstar location of boundary
+            else  ! r/rstar location of boundary
                if (k <= 1) then
                   val = 1d0
                else
@@ -1060,14 +1060,14 @@ contains
             i = c - mixing_offset
             ii = (i + 1) / 2
             k = region_top(mixing_type, ii)
-            if (mod(i, 2)==1) then ! mixing type
+            if (mod(i, 2)==1) then  ! mixing type
                is_int_val = .true.
                if (k > 0) then
                   int_val = mixing_type(k)
                else
                   int_val = -1
                end if
-            else ! q location of boundary
+            else  ! q location of boundary
                if (k <= 1) then
                   val = 1d0
                else
@@ -1116,7 +1116,7 @@ contains
          if (associated(is_int)) is_int(j) = .true.
       end subroutine do_int_val
 
-      subroutine write_string(io, col, pass, name, val) !for header items only
+      subroutine write_string(io, col, pass, name, val)  !for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character(len = *), intent(in) :: name, val
@@ -1134,7 +1134,7 @@ contains
       end subroutine write_string
 
 
-      subroutine write_integer(io, col, pass, name, val) ! for header items only
+      subroutine write_integer(io, col, pass, name, val)  ! for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character (len = *), intent(in) :: name
@@ -1150,7 +1150,7 @@ contains
       end subroutine write_integer
 
 
-      subroutine write_val(io, col, pass, name, val) ! for header items only
+      subroutine write_val(io, col, pass, name, val)  ! for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character (len = *), intent(in) :: name
@@ -1277,7 +1277,7 @@ contains
          end if
       else if (c > c_log_eps_burn_offset) then
          i = c - c_log_eps_burn_offset
-         val = safe_log10(abs(s% center_eps_burn(i))) ! abs is for photo
+         val = safe_log10(abs(s% center_eps_burn(i)))  ! abs is for photo
       else if (c > max_eps_nuc_offset) then
          i = c - max_eps_nuc_offset
          val = safe_log10(max_eps_nuc_log_x(s% net_iso(i)))
@@ -1955,9 +1955,9 @@ contains
             val = if_rot(s% w_div_w_crit_avg_surf)
 
          case(h_surf_avg_v_rot)
-            val = if_rot(s% v_rot_avg_surf) * 1d-5 ! km/sec
+            val = if_rot(s% v_rot_avg_surf) * 1d-5  ! km/sec
          case(h_surf_avg_v_crit)
-            val = if_rot(s% v_crit_avg_surf) * 1d-5 ! km/sec
+            val = if_rot(s% v_crit_avg_surf) * 1d-5  ! km/sec
          case(h_surf_avg_v_div_v_crit)
             val = if_rot(s% v_div_v_crit_avg_surf)
 
@@ -2033,8 +2033,8 @@ contains
                val = 2.5d0 / (r / 1d8)
             end if
          case(h_mu4)
-            deltam = 0.3d0 * msun ! Ertl et al 2016
-            if (s% entropy(1) > 4.0) then
+            deltam = 0.3d0 * msun  ! Ertl et al 2016
+            if (s% entropy(1) > 4.0d0) then
                do k = nz - 1, 1, -1
                   if (s% entropy(k) > 4.d0) exit
                end do
@@ -2045,7 +2045,7 @@ contains
                val = (deltam / msun) / ((s% r(k2) - s% r(k)) / 1d8)
             end if
          case(h_m4)
-            if (s% entropy(1) > 4.0) then
+            if (s% entropy(1) > 4.0d0) then
                do k = nz - 1, 1, -1
                   if (s% entropy(k) > 4.d0) exit
                end do
@@ -2053,16 +2053,16 @@ contains
             end if
          case(h_max_infall_speed)
             if (s% u_flag) then
-               val = -minval(s% u(1:s% nz)) * 1d-5 ! convert to km/sec
+               val = -minval(s% u(1:s% nz)) * 1d-5  ! convert to km/sec
             else if (s% v_flag) then
-               val = -minval(s% v(1:s% nz)) * 1d-5 ! convert to km/sec
+               val = -minval(s% v(1:s% nz)) * 1d-5  ! convert to km/sec
             end if
          case(h_fe_core_infall)
-            val = s% fe_core_infall * 1d-5 ! convert to km/sec
+            val = s% fe_core_infall * 1d-5  ! convert to km/sec
          case(h_non_fe_core_infall)
-            val = s% non_fe_core_infall * 1d-5 ! convert to km/sec
+            val = s% non_fe_core_infall * 1d-5  ! convert to km/sec
          case(h_non_fe_core_rebound)
-            val = s% non_fe_core_rebound * 1d-5 ! convert to km/sec
+            val = s% non_fe_core_rebound * 1d-5  ! convert to km/sec
          case(h_center_omega)
             val = if_rot(s% center_omega)
          case(h_center_omega_div_omega_crit)
@@ -2228,11 +2228,16 @@ contains
          case(h_log_Lnuc)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
+         case(h_Lnuc)
+            power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
+            val = s% power_nuc_burn - power_photo
          case(h_log_Lnuc_ergs_s)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz))
             val = safe_log10(s% power_nuc_burn * Lsun - power_photo)
          case(h_log_power_nuc_burn)
             val = safe_log10(s% power_nuc_burn)
+         case(h_power_nuc_burn)
+            val = s% power_nuc_burn
          case(h_log_Lnuc_sub_log_L)
             power_photo = dot_product(s% dm(1:nz), s% eps_nuc_categories(iphoto, 1:nz)) / Lsun
             val = safe_log10(s% power_nuc_burn - power_photo)
@@ -2668,7 +2673,7 @@ contains
 
          case(h_delta_nu)
             if (.not. s% get_delta_nu_from_scaled_solar) then
-               val = 1d6 / (2 * s% photosphere_acoustic_r) ! microHz
+               val = 1d6 / (2 * s% photosphere_acoustic_r)  ! microHz
             else
                val = &
                   s% delta_nu_sun * sqrt(s% star_mass) * pow3(s% Teff / s% astero_Teff_sun) / &
@@ -2688,7 +2693,7 @@ contains
             val = s% photosphere_acoustic_r
          case(h_gs_per_delta_nu)
             if (s% calculate_Brunt_N2 .and. s% nu_max > 0 .and. s% delta_Pg >= 0) then
-               val = 1d6 / (2 * s% photosphere_acoustic_r) ! delta_nu
+               val = 1d6 / (2 * s% photosphere_acoustic_r)  ! delta_nu
                val = 1d6 * val / (s% nu_max * s% nu_max * s% delta_Pg)
             end if
          case(h_ng_for_nu_max)
@@ -2818,12 +2823,12 @@ contains
          case(h_RSP_phase)
             if (s% RSP_flag) val = (s% time - rsp_phase_time0()) / s% RSP_period
          case(h_RSP_period_in_days)
-            if (s% RSP_flag) val = s% RSP_period / secday ! days
+            if (s% RSP_flag) val = s% RSP_period / secday  ! days
          case(h_RSP_num_periods)
             if (s% RSP_flag) int_val = s% RSP_num_periods
             is_int_val = .true.
 
-         case(h_grav_dark_L_polar) ! pole is at inclination = 0
+         case(h_grav_dark_L_polar)  ! pole is at inclination = 0
             if(s% rotation_flag) then
                w_div_w_Kep = if_rot(s% omega(1) * sqrt(pow3(s% r_equatorial(1)) / (s% cgrav(1) * s% m(1))))
                val = gravity_darkening_L_coeff(w_div_w_Kep, 0.0d0) * s% L_surf
@@ -2837,7 +2842,7 @@ contains
             else
                val = 0d0
             end if
-         case(h_grav_dark_L_equatorial) ! equator is at inclination = pi/2
+         case(h_grav_dark_L_equatorial)  ! equator is at inclination = pi/2
             if(s% rotation_flag) then
                w_div_w_Kep = if_rot(s% omega(1) * sqrt(pow3(s% r_equatorial(1)) / (s% cgrav(1) * s% m(1))))
                val = gravity_darkening_L_coeff(w_div_w_Kep, 0.5d0 * pi) * s% L_surf
@@ -2857,7 +2862,7 @@ contains
 
             ! following items correspond to names on terminal output lines
 
-         case(h_lg_Lnuc)
+         case(h_lg_Lnuc_tot)  ! _tot indicates the inclusion of photodisintegations
             val = safe_log10(s% power_nuc_burn)
 
          case(h_H_rich)
@@ -3023,7 +3028,7 @@ contains
 
       include 'formats'
 
-      dbg = .false. !(el == 1 .and. nu_factor == 1d0)
+      dbg = .false.  !(el == 1 .and. nu_factor == 1d0)
 
       get_int_k_r_dr = 0
       L2 = el * (el + 1)
@@ -3113,12 +3118,12 @@ contains
       real(dp) :: y, dy, rho_bar, dr_div_r, fprmid3
       integer :: k
 
-      y = j - 2 ! value at r = 0
+      y = j - 2  ! value at r = 0
       do k = s% nz, 1, -1
          fprmid3 = pi4 * pow(s% rmid(k), 3)
          rho_bar = 3d0 * s% m(k) / fprmid3
          if (k == s% nz) then
-            dr_div_r = s% r(k) / s% rmid(k) ! r(nz+1) would be zero
+            dr_div_r = s% r(k) / s% rmid(k)  ! r(nz+1) would be zero
          else
             dr_div_r = (s% r(k) - s% r(k + 1)) / s% rmid(k)
          end if
@@ -3204,7 +3209,7 @@ contains
       get1_hist_value = .false.
 
       call integer_dict_lookup(s% history_names_dict, name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) return ! didn't find it
+      if (ierr /= 0 .or. i <= 0) return  ! didn't find it
       if (associated(s% pg% pgstar_hist)) then
          if (associated(s% pg% pgstar_hist% vals)) then
             if (size(s% pg% pgstar_hist% vals, dim = 1) >= i) then
@@ -3339,12 +3344,12 @@ contains
             exit
          end if
       end do
-      if (split <= 1 .or. split >= n) then ! no interior space to split str
+      if (split <= 1 .or. split >= n) then  ! no interior space to split str
          ierr = -1
          return
       end if
       id = chem_get_iso_id(str(split + 1:n))
-      if (id <= 0) then ! not a valid iso name
+      if (id <= 0) then  ! not a valid iso name
          ierr = -1
          return
       end if

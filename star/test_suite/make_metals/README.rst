@@ -33,10 +33,8 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 10
 
@@ -88,18 +86,18 @@ pgstar commands used for the plots above:
   Abundance_file_dir = 'pgstar_out'
   Abundance_file_prefix = 'abund_'
   Abundance_file_interval = 10000
-      
+
   TRho_win_flag = .true.
   TRho_win_width = 12
   TRho_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-         
-  TRho_txt_scale = 1.0
-  TRho_title = 'make_metals'      
 
-  TRho_logT_min = 6.0 
-  TRho_logT_max = 8.5 
-  TRho_logRho_min = -1.0 
-  TRho_logRho_max = 5.0 
+  TRho_txt_scale = 1.0
+  TRho_title = 'make_metals'
+
+  TRho_logT_min = 6.0
+  TRho_logT_max = 8.5
+  TRho_logRho_min = -1.0
+  TRho_logRho_max = 5.0
 
   show_TRho_degeneracy_line = .true.
 

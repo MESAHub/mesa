@@ -3,7 +3,7 @@
 ! this Fortran90 module contains a collection of subroutines for plotting data,
 ! including 2D, 3D plots, surfaces, polar coordinates, histograms
 ! it is a modification of the GNUFOR interface written by John Burkardt:
-! http://orion.math.iastate.edu/burkardt/g_src/gnufor/gnufor.html 
+! http://orion.math.iastate.edu/burkardt/g_src/gnufor/gnufor.html
 !***********************************************************************************
 	module gnufor2
 	implicit none
@@ -49,7 +49,6 @@
 ! this function creates a string with current date and time
 ! it is a default method to name output files
 !***********************************************************************************
-	implicit none
         character(len=8)  :: date
         character(len=10) :: time
         character(len=33) :: f_result
@@ -63,7 +62,6 @@
 !***********************************************************************************
 	function output_terminal(terminal) result(f_result)
 !***********************************************************************************
-	implicit none
 	character(len=*),intent(in)	:: terminal
 	integer, parameter		:: Nc=35
 	character(len=Nc)		:: f_result
@@ -84,7 +82,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:)
 	integer,intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
@@ -96,7 +93,7 @@
 !***********************************************************************************
 	nx=size(rgb(1,:,1))
 	ny=size(rgb(1,1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -116,35 +113,35 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do j=1,ny
 		do i=1,nx
 			write (file_unit,'(2E12.4,3I5)') x(i),y(j),rgb(1,i,j),rgb(2,i,j),rgb(3,i,j)
 		end do
 		write (file_unit,'(a)')
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -159,38 +156,38 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
 	write ( file_unit, '(a)' ) 'set xrange ['// trim(xrange1) // ':'// trim(xrange2) //']'
 	write ( file_unit, '(a)' ) 'set yrange ['// trim(yrange1) // ':'// trim(yrange2) //']'
 	write ( file_unit, '(a)' ) 'unset colorbox'
-!***********************************************************************************	
+!***********************************************************************************
 	write ( file_unit, '(a)' ) 'plot "' // trim ( data_file_name ) // &
 	& '" with rgbimage'
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -210,7 +207,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	integer, intent(in)		:: rgb(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: terminal, filename, persist, input
@@ -231,35 +227,35 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do j=1,ny
 		do i=1,nx
 			write (file_unit,'(5I5)') i,j,rgb(1,i,j),rgb(2,i,j),rgb(3,i,j)
 		end do
 		write (file_unit,'(a)')
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -274,22 +270,22 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
@@ -297,16 +293,16 @@
 	write ( file_unit, '(a)' ) 'unset xtics'
 	write ( file_unit, '(a)' ) 'unset ytics'
 	write ( file_unit, '(a)' ) 'unset colorbox'
-!***********************************************************************************	
+!***********************************************************************************
 	write ( file_unit, '(a)' ) 'plot "' // trim ( data_file_name ) // &
 	& '" with rgbimage'
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -326,7 +322,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: x(:), y(:), gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -337,7 +332,7 @@
 !***********************************************************************************
 	nx=size(gray(:,1))
 	ny=size(gray(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		ierror=1
 		print *,'image2 ERROR: sizes of x(:),y(:) and gray(:,:) are not compatible'
 		stop
@@ -349,35 +344,35 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do j=1,ny
 		do i=1,nx
 			write (file_unit,'(3E12.4)') x(i), y(j), gray(i,j)
 		end do
 		write (file_unit,'(a)')
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -392,22 +387,22 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
@@ -415,8 +410,8 @@
 	write ( file_unit, '(a)' ) 'set yrange ['// trim(yrange1) // ':'// trim(yrange2) //']'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -424,16 +419,16 @@
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(default_palette)
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 	write ( file_unit, '(a)' ) 'plot "' // trim ( data_file_name ) // &
 	& '" with image'
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -453,7 +448,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=4), intent(in)	:: gray(:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, persist, input
@@ -466,35 +460,35 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do j=1,ny
 		do i=1,nx
 			write (file_unit,'(I5,I5,E15.7)') i,j,gray(i,j)
 		end do
 		write (file_unit,'(a)')
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -509,22 +503,22 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
@@ -533,8 +527,8 @@
 	write ( file_unit, '(a)' ) 'unset ytics'
 	write ( file_unit, '(a)' ) 'unset colorbox'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -542,16 +536,16 @@
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(default_palette)
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 	write ( file_unit, '(a)' ) 'plot "' // trim ( data_file_name ) // &
 	& '" with image'
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -570,7 +564,6 @@
 !***********************************************************************************
 ! this subroutine plots 3D curve, given by three arrays x,y,z
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:)
 	real(kind=4), optional		:: pause, linewidth
 	character(len=*),optional	:: color, terminal, filename, persist, input
@@ -579,39 +572,39 @@
 !***********************************************************************************
 ! prepare the data
 	nx=size(x)
-	if ((size(x).ne.size(y)).or.(size(x).ne.size(z))) then
+	if ((size(x)/=size(y)).or.(size(x)/=size(z))) then
 		print *,'subroutine plot3d ERROR: incompatible sizes of x(:),y(:) and z(:)'
 		stop
 	end if
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do i=1,nx
 		write (file_unit,'(3E15.7)') x(i), y(i), z(i)
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -626,22 +619,22 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist'
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-		&// trim(my_persist) // ' title "Gnuplot"' 
+		&// trim(my_persist) // ' title "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
@@ -650,21 +643,21 @@
 		write (	my_linewidth,'(e9.3)') linewidth
 	else
 		my_linewidth=trim(default_linewidth)
-	end if	
+	end if
 	if (present(color)) then
 		my_color='"'//trim(color)//'"'
 	else
 		my_color='"'//trim(default_color1)//'"'
-	end if	
+	end if
 	write ( file_unit, '(a)' ) 'splot "' // trim ( data_file_name ) // &
 	'" using 1:2:3 with lines linecolor rgb' // my_color //' linewidth ' // my_linewidth
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -683,9 +676,8 @@
 !***********************************************************************************
 ! this subroutine plots the histogram of data contained in array x, using n bins
 !***********************************************************************************
-	implicit none
-	real(kind=8), intent(in)	:: x(:) !the data to plot
-	integer, intent(in)		:: n !the number of intervals
+	real(kind=8), intent(in)	:: x(:)  !the data to plot
+	integer, intent(in)		:: n  !the number of intervals
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: color, terminal, filename, persist, input
 	integer 			:: i, j, ierror, ios, file_unit, nx
@@ -716,32 +708,32 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do i=1,n
 		write (file_unit,'(2E15.7)') (xhist(i-1)+0.5*dx), yhist(i)
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -756,22 +748,22 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist'
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
@@ -786,16 +778,16 @@
 		my_color='"'//color//'"'
 	else
 		my_color='"'//trim(default_color1)//'"'
-	end if	
+	end if
 	write ( file_unit, '(a)' ) 'plot "' // trim ( data_file_name ) // &
 	'" using 1:2 with boxes linecolor rgb' // trim(my_color)
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -815,7 +807,6 @@
 ! this subroutine plots a surface. x and y are arrays needed to generate the x-y grid
 ! z(:,:) is a 2D array
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x(:),y(:),z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -825,10 +816,10 @@
 !***********************************************************************************
 	nx=size(z(:,1))
 	ny=size(z(1,:))
-	if ((size(x).ne.nx).or.(size(y).ne.ny)) then
+	if ((size(x)/=nx).or.(size(y)/=ny)) then
 		print *,'subroutine surf_3 ERROR: sizes of x(:),y(:), and z(:,:) are incompatible'
 		stop
-	end if 
+	end if
 !***********************************************************************************
 	do i=1,nx
 		do j=1,ny
@@ -838,17 +829,16 @@
 		end do
 	end do
 	call surf_1(xyz,pause,palette,terminal,filename,pm3d,contour,persist,input)
-!***********************************************************************************	
+!***********************************************************************************
 	end subroutine surf_3
 !***********************************************************************************
 !***********************************************************************************
 !***********************************************************************************
 	subroutine surf_2(z,pause,palette,terminal,filename,pm3d,contour,persist,input)
 !***********************************************************************************
-! this subroutine plots a surface. The only input is a 2D array z(:,:), the x-y grid 
+! this subroutine plots a surface. The only input is a 2D array z(:,:), the x-y grid
 ! is generated automatically
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: z(:,:)
 	real(kind=4), optional		:: pause
 	real(kind=8)			:: xyz(3,size(z(:,1)),size(z(1,:)))
@@ -866,7 +856,7 @@
 		end do
 	end do
 	call surf_1(xyz,pause,palette,terminal,filename,pm3d,contour,persist,input)
-!***********************************************************************************	
+!***********************************************************************************
 	end subroutine surf_2
 !***********************************************************************************
 !***********************************************************************************
@@ -876,7 +866,6 @@
 ! this is the most general subroutine for generating 3D plots.
 ! The data is contained in a 3D array z(:,:,:)
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: xyz(:,:,:)
 	real(kind=4), optional		:: pause
 	character(len=*),optional	:: palette, terminal, filename, pm3d, contour, persist, input
@@ -890,35 +879,35 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_date - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do j=1,ny
 		do i=1,nx
 			write (file_unit,'(3E15.7)') xyz(1:3,i,j)
 		end do
 		write (file_unit,'(a)')
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -933,28 +922,28 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'set nokey'
 	if (present(palette)) then
-	if ((trim(palette).ne.'RGB').and.(trim(palette).ne.'HSV').and.(trim(palette).ne.'CMY').and.&
-		& (trim(palette).ne.'YIQ').and.(trim(palette).ne.'XYZ')) then
+	if ((trim(palette)/='RGB').and.(trim(palette)/='HSV').and.(trim(palette)/='CMY').and.&
+		& (trim(palette)/='YIQ').and.(trim(palette)/='XYZ')) then
 		write ( file_unit, '(a)' ) 'set palette '// trim(palette)
 	else
 		write ( file_unit, '(a)' ) 'set palette model '// trim(palette)
@@ -964,31 +953,31 @@
 	end if
 !***********************************************************************************
 	if (present(pm3d)) then
-		write ( file_unit, '(a)' ) 'set '// pm3d	
+		write ( file_unit, '(a)' ) 'set '// pm3d
 	else
 		write ( file_unit, '(a)' ) 'set surface'
 		if (present(contour)) then
-			if (contour=='surface') then 
+			if (contour=='surface') then
 				write ( file_unit, '(a)' ) 'set contour surface'
 			elseif (contour=='both') then
 				write ( file_unit, '(a)' ) 'set contour both'
-			else 
+			else
 				write ( file_unit, '(a)' ) 'set contour'
 			end if
 		end if
 	end if
 	write ( file_unit, '(a)' ) 'set hidden3d'
 	write ( file_unit, '(a)' ) 'set parametric'
-!***********************************************************************************	
+!***********************************************************************************
 	write ( file_unit, '(a)' ) 'splot "' // trim ( data_file_name ) // &
 	& '" using 1:2:3 with lines palette'
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -1008,7 +997,6 @@
 !***********************************************************************************
 ! this subroutine plots 4 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:), x4(:), y4(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, color4, terminal, filename, polar,&
@@ -1021,7 +1009,7 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
@@ -1031,37 +1019,37 @@
 	Nx2=size(x2)
 	Nx3=size(x3)
 	Nx4=size(x4)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3)).or.(size(x4).ne.size(y4))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3)).or.(size(x4)/=size(y4))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.12)) then
+	if (present(style).and.(len(style)/=12)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_data - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
 !***********************************************************************************
-	Nmax=max(Nx1,Nx2,Nx3,Nx4)	
+	Nmax=max(Nx1,Nx2,Nx3,Nx4)
 	do i=1,Nmax
 		write (file_unit,'(8E15.7)') x1(min(i,Nx1)), y1(min(i,Nx1)), x2(min(i,Nx2)), y2(min(i,Nx2)), &
 		& x3(min(i,Nx3)), y3(min(i,Nx3)), x4(min(i,Nx4)), y4(min(i,Nx4))
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -1076,7 +1064,7 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
@@ -1116,7 +1104,7 @@
 		write (	my_linewidth,'(e9.3)') linewidth
 	else
 		my_linewidth=trim(default_linewidth)
-	end if	
+	end if
 	if (present(color1)) then
 		my_color1='"'//trim(color1)//'"'
 	else
@@ -1141,15 +1129,15 @@
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'unset key'
@@ -1167,37 +1155,37 @@
 	if (present(style)) then
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		&//'" using 1:2 with ' // trim(my_line_type1) // ' pointtype ' // &
-		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 3:4 with ' // trim(my_line_type2) // ' pointtype ' &
-		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth) //',\' 
+		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth) //',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 5:6 with ' // trim(my_line_type3) // ' pointtype ' &
-		&// style(7:8) // ' linecolor rgb ' // trim(my_color3) // ' linewidth '// trim(my_linewidth) // ',\' 
+		&// style(7:8) // ' linecolor rgb ' // trim(my_color3) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 7:8 with ' // trim(my_line_type4) // ' pointtype ' &
-		&// style(10:11) // ' linecolor rgb '// trim(my_color4)// ' linewidth '// trim(my_linewidth) 
-	else 
+		&// style(10:11) // ' linecolor rgb '// trim(my_color4)// ' linewidth '// trim(my_linewidth)
+	else
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		& //'" using 1:2 with ' // trim(my_line_type1)  // ' linecolor rgb '&
-		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 3:4 with ' // trim(my_line_type2)  // ' linecolor rgb '&
-		& // trim(my_color2) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color2) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 5:6 with ' // trim(my_line_type3)  // ' linecolor rgb '&
-		& // trim(my_color3) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color3) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 7:8 with ' // trim(my_line_type4)  // ' linecolor rgb '&
-		& // trim(my_color4) // ' linewidth '// trim(my_linewidth) 
+		& // trim(my_color4) // ' linewidth '// trim(my_linewidth)
 	end if
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -1216,7 +1204,6 @@
 !***********************************************************************************
 ! this subroutine plots 3 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:), x3(:), y3(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, color3, terminal, filename, polar, persist, input
@@ -1228,7 +1215,7 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
@@ -1237,37 +1224,37 @@
 	Nx1=size(x1)
 	Nx2=size(x2)
 	Nx3=size(x3)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2)).or.(size(x3).ne.size(y3))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2)).or.(size(x3)/=size(y3))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.9)) then
+	if (present(style).and.(len(style)/=9)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_data - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
 !***********************************************************************************
-	Nmax=max(Nx1,Nx2,Nx3)	
+	Nmax=max(Nx1,Nx2,Nx3)
 	do i=1,Nmax
 		write (file_unit,'(6E15.7)') x1(min(i,Nx1)), y1(min(i,Nx1)), x2(min(i,Nx2)), y2(min(i,Nx2)), &
 		& x3(min(i,Nx3)), y3(min(i,Nx3))
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -1282,7 +1269,7 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
@@ -1314,7 +1301,7 @@
 		write (	my_linewidth,'(e9.3)') linewidth
 	else
 		my_linewidth=trim(default_linewidth)
-	end if	
+	end if
 	if (present(color1)) then
 		my_color1='"'//trim(color1)//'"'
 	else
@@ -1334,15 +1321,15 @@
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
-		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' & 
-			&//trim(my_persist) // ' title  "Gnuplot"' 
+		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
+			&//trim(my_persist) // ' title  "Gnuplot"'
 	end if
 
 !***********************************************************************************
@@ -1356,36 +1343,36 @@
 		write ( file_unit, '(a)' ) 'set grid polar'
 	else
 		write ( file_unit, '(a)' ) 'set grid'
-	end if	
+	end if
 !***********************************************************************************
 	if (present(style)) then
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		&//'" using 1:2 with ' // trim(my_line_type1) // ' pointtype ' // &
-		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 3:4 with ' // trim(my_line_type2) // ' pointtype ' &
-		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth) //',\' 
+		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth) //',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 5:6 with ' // trim(my_line_type3) // ' pointtype ' &
-		&// style(7:8) // ' linecolor rgb ' // trim(my_color3) // ' linewidth '// trim(my_linewidth) 
-	else 
+		&// style(7:8) // ' linecolor rgb ' // trim(my_color3) // ' linewidth '// trim(my_linewidth)
+	else
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		& //'" using 1:2 with ' // trim(my_line_type1)  // ' linecolor rgb '&
-		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 3:4 with ' // trim(my_line_type2)  // ' linecolor rgb '&
-		& // trim(my_color2) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color2) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 5:6 with ' // trim(my_line_type3)  // ' linecolor rgb '&
-		& // trim(my_color3) // ' linewidth '// trim(my_linewidth) 
+		& // trim(my_color3) // ' linewidth '// trim(my_linewidth)
 	end if
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -1404,7 +1391,6 @@
 !***********************************************************************************
 ! this subroutine plots 2 two-dimensional graphs in the same coordinate system
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:), x2(:), y2(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, color2, terminal, filename, polar, persist, input
@@ -1415,7 +1401,7 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
@@ -1423,36 +1409,36 @@
 !***********************************************************************************
 	Nx1=size(x1)
 	Nx2=size(x2)
-	if ((size(x1).ne.size(y1)).or.(size(x2).ne.size(y2))) then
+	if ((size(x1)/=size(y1)).or.(size(x2)/=size(y2))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.6)) then
+	if (present(style).and.(len(style)/=6)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_data - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
 !***********************************************************************************
-	Nmax=max(Nx1,Nx2)	
+	Nmax=max(Nx1,Nx2)
 	do i=1,Nmax
 		write (file_unit,'(4E15.7)') x1(min(i,Nx1)), y1(min(i,Nx1)), x2(min(i,Nx2)), y2(min(i,Nx2))
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -1467,7 +1453,7 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
@@ -1491,7 +1477,7 @@
 		write (	my_linewidth,'(e9.3)') linewidth
 	else
 		my_linewidth=trim(default_linewidth)
-	end if	
+	end if
 	if (present(color1)) then
 		my_color1='"'//trim(color1)//'"'
 	else
@@ -1506,15 +1492,15 @@
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) // ' title  "Gnuplot"' 
+			& //trim(my_persist) // ' title  "Gnuplot"'
 	end if
 
 !***********************************************************************************
@@ -1529,30 +1515,30 @@
 		write ( file_unit, '(a)' ) 'set grid polar'
 	else
 		write ( file_unit, '(a)' ) 'set grid'
-	end if		
+	end if
 !***********************************************************************************
 	if (present(style)) then
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		&//'" using 1:2 with ' // trim(my_line_type1) // ' pointtype ' // &
-		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		&//'" using 3:4 with ' // trim(my_line_type2) // ' pointtype ' &
-		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth) 
-	else 
+		&// style(4:5) // ' linecolor rgb ' // trim(my_color2) // ' linewidth '// trim(my_linewidth)
+	else
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		& //'" using 1:2 with ' // trim(my_line_type1)  // ' linecolor rgb '&
-		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\' 
+		& // trim(my_color1) // ' linewidth '// trim(my_linewidth) // ',\'
 		write ( file_unit, '(a,i2,a)' ) '     "'// trim (data_file_name) &
 		& //'" using 3:4 with ' // trim(my_line_type2)  // ' linecolor rgb '&
-		& // trim(my_color2) // ' linewidth '// trim(my_linewidth) 
+		& // trim(my_color2) // ' linewidth '// trim(my_linewidth)
 	end if
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -1571,7 +1557,6 @@
 !***********************************************************************************
 ! this subroutine plots a two-dimensional graph
 !***********************************************************************************
-	implicit none
 	real(kind=8), intent(in)	:: x1(:), y1(:)
 	real(kind=4), optional		:: pause,linewidth
 	character(len=*),optional	:: style, color1, terminal, filename, polar, persist, input
@@ -1582,42 +1567,42 @@
 !***********************************************************************************
 	if (present(input)) then
 		data_file_name='data_file_'//input//'.txt'
-		command_file_name='command_file_'//input//'.txt'		
+		command_file_name='command_file_'//input//'.txt'
 	else
 		data_file_name='data_file.txt'
 		command_file_name='command_file.txt'
 	end if
 !***********************************************************************************
 	Nx1=size(x1)
-	if ((size(x1).ne.size(y1))) then
+	if ((size(x1)/=size(y1))) then
 		print *,'subroutine plot ERROR: size(x) is not equal to size(y)'
 		stop
 	end if
-	if (present(style).and.(len(style).ne.3)) then
+	if (present(style).and.(len(style)/=3)) then
 		print *,'subroutine plot ERROR: argument "style" has wrong number of characters'
 		stop
 	end if
 !***********************************************************************************
-	ierror=0	
-	call get_unit(file_unit)	
+	ierror=0
+	call get_unit(file_unit)
 	if (file_unit==0) then
 		ierror=1
 		print *,'write_vector_data - fatal error! Could not get a free FORTRAN unit.'
 		stop
 	end if
-	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)	
+	open (unit=file_unit, file=data_file_name, status='replace', iostat=ios)
 	if (ios/=0) then
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal data file.'
 		stop
 	end if
-!***********************************************************************************	
+!***********************************************************************************
 ! here we write the date to the data_file - the gnuplot will read this data later
-!***********************************************************************************	
+!***********************************************************************************
 	do i=1,Nx1
 		write (file_unit,'(2E15.7)') x1(i), y1(i)
 	end do
-!***********************************************************************************	
+!***********************************************************************************
 	close (unit=file_unit)
 !***********************************************************************************
 	ierror = 0
@@ -1632,7 +1617,7 @@
 		ierror=2
 		print *,'write_vector_data - fatal error! Could not open the terminal command file.'
 		stop
-	end if	
+	end if
 !***********************************************************************************
 ! here we write the commands to the commands file which gnuplot will execute
 !***********************************************************************************
@@ -1648,7 +1633,7 @@
 		write (	my_linewidth,'(e9.3)') linewidth
 	else
 		my_linewidth=trim(default_linewidth)
-	end if	
+	end if
 	if (present(color1)) then
 		my_color1='"'//trim(color1)//'"'
 	else
@@ -1658,15 +1643,15 @@
 	my_persist='persist '
 	if (present(persist).and.(persist=='no')) my_persist=' '
 	if (present(terminal)) then
-		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal)) 
+		write ( file_unit, '(a)' ) 'set terminal '// trim(output_terminal(terminal))
 	if (present(filename)) then
-		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"' 
+		write ( file_unit, '(a)' ) 'set output "'// trim(filename) //'"'
 	else
-		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"' 
+		write ( file_unit, '(a)' ) 'set output "'//my_date_and_time()//'"'
 	end if
 	else
 		write ( file_unit, '(a)' ) 'set terminal ' // trim(default_terminal) // ' ' &
-			& //trim(my_persist) //' title  "Gnuplot"' 
+			& //trim(my_persist) //' title  "Gnuplot"'
 	end if
 !***********************************************************************************
 	write ( file_unit, '(a)' ) 'unset key'
@@ -1679,24 +1664,24 @@
 		write ( file_unit, '(a)' ) 'set grid polar'
 	else
 		write ( file_unit, '(a)' ) 'set grid'
-	end if	
+	end if
 !***********************************************************************************
 	if (present(style)) then
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		&//'" using 1:2 with ' // trim(my_line_type1) // ' pointtype ' // &
-		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth) 
-	else 
+		& style(1:2) // ' linecolor rgb ' // trim(my_color1) // ' linewidth '// trim(my_linewidth)
+	else
 		write ( file_unit, '(a,i2,a)' ) 'plot "' // trim (data_file_name) &
 		& //'" using 1:2 with ' // trim(my_line_type1)  // ' linecolor rgb '&
-		& // trim(my_color1) // ' linewidth '// trim(my_linewidth)  
+		& // trim(my_color1) // ' linewidth '// trim(my_linewidth)
 	end if
 !***********************************************************************************
 	if (present(pause)) then
 		if (pause<0.0) then
 			write ( file_unit, '(a)' ) 'pause -1 "press RETURN to continue"'
-		else 
+		else
 			write (	my_pause,'(e9.3)') pause
-			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause) 
+			write ( file_unit, '(a)' ) 'pause ' // trim(my_pause)
 		end if
 	else
 		write ( file_unit, '(a)' ) 'pause 0'
@@ -1705,7 +1690,7 @@
 	write ( file_unit, '(a)' ) 'q'
 	close ( unit = file_unit )
 !***********************************************************************************
-	call run_gnuplot (command_file_name) 
+	call run_gnuplot (command_file_name)
 !***********************************************************************************
 	end subroutine plot_1
 !***********************************************************************************
@@ -1713,21 +1698,20 @@
 !***********************************************************************************
 	subroutine run_gnuplot(command_file_name)
 !***********************************************************************************
-	implicit none
-	character (len = 100) command
-	character (len = *) command_file_name
-	integer status
-	integer system
+	character (len = 100) :: command
+	character (len = *) :: command_file_name
+	integer :: status
+	integer :: system
 !***********************************************************************************
 !  Issue a command to the system that will startup GNUPLOT, using
 !  the file we just wrote as input.
 !***********************************************************************************
-	write (command, *) 'gnuplot ' // trim (command_file_name)		
-	status=system(trim(command))	
-	if (status.ne.0) then
+	write (command, *) 'gnuplot ' // trim (command_file_name)
+	status=system(trim(command))
+	if (status/=0) then
 		print *,'RUN_GNUPLOT - Fatal error!'
 		stop
-	end if	
+	end if
 	return
 !***********************************************************************************
 	end subroutine run_gnuplot
@@ -1736,15 +1720,14 @@
 !***********************************************************************************
 	subroutine get_unit(iunit)
 !***********************************************************************************
-	implicit none
-	integer i
-	integer ios
-	integer iunit
-	logical lopen
-!***********************************************************************************	
+	integer :: i
+	integer :: ios
+	integer :: iunit
+	logical :: lopen
+!***********************************************************************************
 	iunit=0
 	do i=1,99
-		if (i/= 5 .and. i/=6) then	
+		if (i/= 5 .and. i/=6) then
 			inquire (unit=i, opened=lopen, iostat=ios)
 			if (ios==0) then
 				if (.not.lopen) then
@@ -1752,9 +1735,9 @@
 					return
 				end if
 			end if
-		
+
 		end if
-	end do	
+	end do
 	return
 	end subroutine get_unit
 !***********************************************************************************

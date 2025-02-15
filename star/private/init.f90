@@ -44,7 +44,7 @@
       integer, parameter :: do_create_initial_model = 3
       integer, parameter :: do_create_RSP_model = 4
       integer, parameter :: do_create_RSP2_model = 5
-      
+
 
       logical :: have_done_starlib_init = .false.
 
@@ -55,7 +55,7 @@
          use kap_lib, only: alloc_kap_handle_using_inlist, kap_ptr
          use eos_lib, only: alloc_eos_handle_using_inlist, eos_ptr
          integer, intent(in) :: id
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          type (star_info), pointer :: s
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
@@ -72,7 +72,7 @@
             if (ierr /= 0) then
                write(*,*) 'eos_ptr failed in alloc_eos_handle'
                return
-            end if            
+            end if
          end if
          if (s% kap_handle == 0) then
             s% kap_handle = alloc_kap_handle_using_inlist(s% inlist_fname, ierr)
@@ -203,7 +203,7 @@
          nullify(s% dq)
          nullify(s% xa)
          nullify(s% xh)
-         
+
          nullify( &
             s% op_mono_umesh1, s% op_mono_semesh1, s% op_mono_ff1, &
             s% op_mono_rs1)
@@ -329,7 +329,7 @@
 
          s% using_revised_max_yr_dt = .false.
          s% revised_max_yr_dt = 0
- 
+
          s% astero_using_revised_max_yr_dt = .false.
          s% astero_revised_max_yr_dt = 0
 
@@ -338,7 +338,7 @@
 
          s% have_initial_energy_integrals = .false.
 
-         s% num_solver_iterations = 0         
+         s% num_solver_iterations = 0
          s% mesh_call_number = 0
          s% solver_call_number = 0
          s% diffusion_call_number = 0
@@ -346,7 +346,7 @@
          s% RSP_have_set_velocities = .false.
          s% RSP_just_set_velocities = .false.
          s% rsp_period = 0d0
-         
+
          s% dt = 0d0
          s% mstar_dot = 0d0
 
@@ -462,14 +462,14 @@
          s% model_number = 0
          s% time = 0
          s% dt = 0
-         
+
          s% total_num_solver_iterations = 0
          s% total_num_solver_relax_iterations = 0
          s% total_num_solver_calls_made = 0
          s% total_num_solver_relax_calls_made = 0
          s% total_num_solver_calls_converged = 0
          s% total_num_solver_relax_calls_converged = 0
-         
+
          s% num_solver_iterations = 0
          s% num_skipped_setvars = 0
          s% num_setvars = 0
@@ -478,7 +478,7 @@
          s% num_hydro_merges = 0
          s% num_hydro_splits = 0
          s% timestep_hold = -1
-         
+
          s% mesh_call_number = 0
          s% solver_call_number = 0
          s% diffusion_call_number = 0
@@ -510,12 +510,12 @@
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% RSP2_flag = .false.
-         
+
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
+         s% okay_to_set_mlt_vc = .false.  ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
 
          s% have_ST_start_info = .false.
@@ -638,7 +638,7 @@
          s% data_for_binary_history_columns => null_data_for_binary_history_columns
          s% how_many_extra_binary_history_columns => null_how_many_extra_binary_history_columns
          s% data_for_extra_binary_history_columns => null_data_for_extra_binary_history_columns
-         
+
          s% generations = 0
 
          s% nz = 0
@@ -674,7 +674,7 @@
          s% L_phot = 0
          s% T_surf = 0
          s% P_surf = 0
-         
+
          s% gradT_excess_alpha = 0
          s% gradT_excess_alpha_old = 0
 
@@ -682,10 +682,10 @@
 
          s% he_core_mass = 0
          s% co_core_mass = 0
-         s% Teff = -1 ! need to calculate it
+         s% Teff = -1  ! need to calculate it
          s% center_eps_nuc = 0
          s% Lrad_div_Ledd_avg_surf = 0
-         s% w_div_w_crit_avg_surf = 0         
+         s% w_div_w_crit_avg_surf = 0
          s% total_internal_energy = 0d0
          s% total_gravitational_energy = 0d0
          s% total_radial_kinetic_energy = 0d0
@@ -744,6 +744,7 @@
          s% len_extra_iwork = 0
          s% len_extra_work = 0
 
+         s% crystal_core_boundary_mass = -1
          s% phase_sep_mixing_mass = -1
 
          call init_random(s)
@@ -847,7 +848,7 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z
-         real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
+         real(dp), parameter :: lg_max_abs_mdot = -1000  ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
          real(dp) :: total_radiation, warning_limit_for_max_residual
@@ -881,7 +882,7 @@
             call set_net(s, s% net_name, ierr)
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
-            call init_def(s) ! RSP
+            call init_def(s)  ! RSP
             call finish_load_model(s, restart, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
@@ -890,13 +891,13 @@
 
          num_trace_history_values = s% num_trace_history_values
          s% num_trace_history_values = 0
-         
+
          warning_limit_for_max_residual = s% warning_limit_for_max_residual
          s% warning_limit_for_max_residual = 1d0
-         
+
          s% doing_first_model_of_run = .true.
          s% doing_first_model_after_restart = .false.
-         
+
          if (do_which == do_load_saved_model) then
             s% dt_next = -1
             call do_read_saved_model(s, model_info, ierr)
@@ -992,7 +993,7 @@
                      s% dt_next = yrs_for_init_timestep(s)*secyer
                   end if
                case (do_create_RSP_model)
-                  call build_rsp_model(s, ierr) ! like build_pre_ms_model
+                  call build_rsp_model(s, ierr)  ! like build_pre_ms_model
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp_model'
                      return
@@ -1014,7 +1015,7 @@
                   return
             end select
          end if
-         
+
          do k=1,s% nz
             s% extra_heat(k) = 0
          end do
@@ -1024,7 +1025,7 @@
             write(*,*) 'failed in finish_load_model'
             return
          end if
-         
+
          if (s% max_years_for_timestep > 0) &
             s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
          call set_phase_of_evolution(s)
@@ -1052,14 +1053,14 @@
 
          if (do_which == do_create_pre_ms_model) then
             call setup_for_relax_after_create_pre_ms_model
-            if (s% mstar > s% initial_mass*Msun) then ! need to reduce mass
+            if (s% mstar > s% initial_mass*Msun) then  ! need to reduce mass
                write(*,1) 'reduce mass to', s% initial_mass
                call do_relax_mass(s% id, s% initial_mass, lg_max_abs_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
                   return
                end if
-            else if (s% mstar < s% initial_mass*Msun) then ! need to increase mass
+            else if (s% mstar < s% initial_mass*Msun) then  ! need to increase mass
                write(*,1) 'increase mass to', s% initial_mass
                call do_relax_mass_scale( &
                   s% id, s% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)
@@ -1074,8 +1075,8 @@
                write(*,*) 'failed in do_relax_num_steps'
                return
             end if
-            
-            if (s% job% pre_ms_relax_to_start_radiative_core) then               
+
+            if (s% job% pre_ms_relax_to_start_radiative_core) then
                call do_relax_to_radiative_core(s% id, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_to_radiative_core'
@@ -1098,7 +1099,7 @@
          s% warning_limit_for_max_residual = warning_limit_for_max_residual
 
          contains
-         
+
          subroutine setup_for_relax_after_create_pre_ms_model
             save_atm_option = s% atm_option
             save_atm_T_tau_relation = s% atm_T_tau_relation
@@ -1172,8 +1173,8 @@
          integer, intent(out) :: ierr
          ierr = 0
       end subroutine null_data_for_binary_history_columns
-      
-      
+
+
       integer function null_how_many_extra_binary_history_columns(binary_id)
          integer, intent(in) :: binary_id
          null_how_many_extra_binary_history_columns = 0
@@ -1196,14 +1197,14 @@
          use eos_def, only: use_cache_for_eos
          integer, intent(inout) :: ierr
          character (len=*), intent(in) :: eosDT_cache_dir
-         ! Remove existing eos data 
+         ! Remove existing eos data
          call eos_shutdown()
-         ! Re-initliaze eos
+         ! Re-initialize eos
          call eos_init(eosDT_cache_dir,&
                ! After first init this is set in eos_def
                use_cache_for_eos,&
                ierr)
       end subroutine do_garbage_collection
-      
-      
+
+
       end module init

@@ -25,7 +25,7 @@
 ! ***********************************************************************
 
 module atm_table
-  
+
   ! Uses
 
   use const_def
@@ -147,7 +147,7 @@ contains
     ! Set up partials
 
     if (.NOT. skip_partials) then
-       
+
        dlnTeff_dlnR = -0.5_dp
        dlnTeff_dL = 0.25_dp/L
        dTeff_dlnR = Teff*dlnTeff_dlnR
@@ -183,7 +183,7 @@ contains
        dlnP_dlnR = 0._dp
        dlnP_dlnM = 0._dp
        dlnP_dlnkap = 0._dp
-       
+
        dlnT_dL = 0._dp
        dlnT_dlnR = 0._dp
        dlnT_dlnM = 0._dp
@@ -210,7 +210,7 @@ contains
   end subroutine eval_table
 
   !****
-  
+
   subroutine get_table_alfa_beta( &
        L, Teff, R, M, cgrav, id, alfa, beta, ierr)
 
@@ -370,7 +370,7 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
@@ -380,7 +380,7 @@ contains
           iregion = blend_in_x
        else if (logg > logg3) then
           iregion = pure_table
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_in_x
        end if
@@ -391,11 +391,11 @@ contains
           iregion = blend_corner_out
        else if (logg > logg3) then
           iregion = blend_in_y
-       else ! logg > logg4
+       else  ! logg > logg4
           c_dx = (logg - logg3) / (logg4 - logg3)
           iregion = blend_corner_out
        end if
-    else ! logTeff <= logTeff4
+    else  ! logTeff <= logTeff4
        iregion = pure_grey
     end if
 
@@ -418,7 +418,7 @@ contains
        alfa = min(1d0, sqrt(c_dx*c_dx + c_dy*c_dy))
        beta = 1 - alfa
     case default
-       write(*,*) 'Invalid iregion in get_table_alfa_beta:', iregion 
+       write(*,*) 'Invalid iregion in get_table_alfa_beta:', iregion
        call mesa_error(__FILE__,__LINE__)
     end select
 

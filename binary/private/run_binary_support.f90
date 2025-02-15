@@ -77,11 +77,13 @@ contains
       interface
 
          subroutine extras_controls(id, ierr)
+            implicit none
             integer, intent(in) :: id
             integer, intent(out) :: ierr
          end subroutine extras_controls
 
          subroutine extras_binary_controls(binary_id, ierr)
+            implicit none
             integer :: binary_id
             integer, intent(out) :: ierr
          end subroutine extras_binary_controls
@@ -108,7 +110,7 @@ contains
       call system_clock(time0, clock_rate)
 
       call resolve_inlist_fname(inlist_fname, inlist_fname_arg)
-      MESA_INLIST_RESOLVED = .true. ! Now any call to resolve_inlist_fname will only return inlist_fname_arg or 'inlist'
+      MESA_INLIST_RESOLVED = .true.  ! Now any call to resolve_inlist_fname will only return inlist_fname_arg or 'inlist'
 
       ! Find out if this is a restart
       open(newunit = iounit, file = '.restart', status = 'old', action = 'read', iostat = ierr)
@@ -290,7 +292,7 @@ contains
       call binarydata_init(b, doing_restart)
       call binary_private_def_init
       call binary_history_column_names_init(ierr)
-      call set_binary_history_columns(b, b% job% binary_history_columns_file, ierr)
+      call set_binary_history_columns(b, b% job% binary_history_columns_file, .true., ierr)
 
       ! setup pgbinary
       if (.not. doing_restart) then
@@ -345,7 +347,7 @@ contains
          call ce_init(b, doing_restart, ierr)
       end if
 
-      evolve_loop : do while(continue_evolve_loop) ! evolve one step per loop
+      evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
 
          if (b% point_mass_i /= 0) then
             num_stars = 1
@@ -382,7 +384,7 @@ contains
             write(*, *) "CE flag is on!!"
          end if
 
-         step_loop : do ! may need to repeat this loop
+         step_loop : do  ! may need to repeat this loop
 
             result = b% extras_binary_start_step(b% binary_id, ierr)
             if (ierr /= 0) then
@@ -429,7 +431,7 @@ contains
 
                id = b% star_ids(j)
 
-               ! Avoid repeting the accretor when using the implicit scheme plus
+               ! Avoid repeating the accretor when using the implicit scheme plus
                ! rotation and implicit winds. When this happens the accretor won't
                ! usually care about the result of the evolution of the donor.
                if (j == b% a_i .and. b% num_tries >0 .and. s% was_in_implicit_wind_limit) &
@@ -496,7 +498,7 @@ contains
                end do
             end if
 
-            ! do not evolve binary step on failure, its unnecesary and some variables are not properly
+            ! do not evolve binary step on failure, its unnecessary and some variables are not properly
             ! set when the newton solver fails.
             if (result == keep_going) then
                if (.not. b% CE_flag) then
@@ -582,7 +584,7 @@ contains
                   end if
                   id = b% star_ids(i)
 
-                  ! Avoid repeting the accretor when using the implicit scheme plus
+                  ! Avoid repeating the accretor when using the implicit scheme plus
                   ! rotation and implicit winds. When this happens the accretor won't
                   ! usually care about the result of the evolution of the donor.
 
@@ -1002,6 +1004,6 @@ contains
          end if
       end if
 
-   end subroutine
+   end subroutine do_binary_job_controls_after
 
 end module run_binary_support

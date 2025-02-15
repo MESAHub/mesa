@@ -7,14 +7,14 @@ General steps
 -------------
 
 - Pick someone to be a release manager
-- Pick a release date 
+- Pick a release date
 - Pick a RC1 (release candidate) date which should be ~1 month before the release
 
 Prior to generating a release
 -----------------------------
 
 - Update the ZAMS model file by running the work directory found in ``data/star_data/zams_models/create_z2m2_y28``. This may take up to an hour or so. This will generate the file ``data/star_data/zams_models/zams_z2m2_y28.data``. Use the ZAMS model plotting script to verify that the HR diagram and central compositions look reasonable, and commit the new data file.
-
+- Update figures in the docs by running the ``update_docs_figures`` script in the ``star/test_suite/`` folder. These figures should be checked to make sure they look reasonable. Currently not all test suite problems autogenerate figures. Pay special attention if the model numbers in the filenames of saved figures have changed (script will print an ERROR message) -- this indicates some commit to MESA has slightly changed the results of these problems, and currently the README.rst file needs to be manually updated with the new image filename and the test as to be re-run (e.g. ``./each_test_run -u 13``). A new release should not be made if one of the figures degrade in quality.
 
 Removing files
 --------------
@@ -101,7 +101,7 @@ This script will also make zip archive, which can be used for local testing to m
 .. note::
     Once the script has generated the new release branch, update the changelog headings from "Changes in main" to "Changes in rXX.YY.Z" etc,
     and delete the note near the top of the changelog about changes in ``main`` relative to the most recent release.
-    
+
 The release script does not push any changes to Github. Once you are ready to push the release branch, this must be done manually with a ``git push``. (This is a separate step from pushing the tag in the next step.)
 
 
@@ -176,7 +176,7 @@ needs fixes to simply push a new release, and flag the current release as not wo
 
 New readthedocs version
 -----------------------
- 
+
 First gain access to the readthedocs account (that is currently accessible by Rich, Evan, Joey, Earl, Meridith, and Philip). Then:
 
 - Go to the ``Versions`` page

@@ -81,7 +81,7 @@
          ! first try local directory
          filename = profile_columns_file
 
-         if(level==1) then ! First pass either the user set the file or we load the defaults
+         if(level==1) then  ! First pass either the user set the file or we load the defaults
             if (len_trim(filename) == 0) filename = 'profile_columns.list'
 
             exists=.false.
@@ -94,7 +94,7 @@
          end if
 
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then 
+         if (ierr /= 0) then
             write(*,*) 'failed to open ' // trim(profile_columns_file)
             return
          end if
@@ -137,25 +137,25 @@
                   ierr = -1; call error; return
                end if
                call count_specs
-               
+
             case ('add_eps_neu_rates')
                call insert_spec(eps_neu_rate_offset, 'add_eps_neu_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_eps_nuc_rates')
                call insert_spec(eps_nuc_rate_offset, 'add_eps_nuc_rate', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_screened_rates')
                call insert_spec(screened_rate_offset, 'add_screened_rates', spec_err)
                if (spec_err /= 0) then
                   ierr = -1; call error; return
                end if
-               
+
             case ('add_raw_rates')
                call insert_spec(raw_rate_offset, 'add_raw_rates', spec_err)
                if (spec_err /= 0) then
@@ -176,7 +176,7 @@
                   ierr = -1; call error; return
                end if
 
-            case ('add_reaction_categories') ! add all the reaction categories
+            case ('add_reaction_categories')  ! add all the reaction categories
                do k = 1, num_categories
                   call insert_spec(category_offset + k, category_name(k), spec_err)
                   if (spec_err /= 0) then
@@ -278,7 +278,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (associated(s% profile_column_spec)) deallocate(s% profile_column_spec)
-         capacity = 100 ! will increase if needed
+         capacity = 100  ! will increase if needed
          allocate(s% profile_column_spec(capacity), stat=ierr)
          if (ierr /= 0) return
          s% profile_column_spec(:) = 0
@@ -297,9 +297,9 @@
          if (dbg) write(*,*) 'num profile columns', cnt-1
          if (dbg) call mesa_error(__FILE__,__LINE__,'debug: set_profile_columns')
       end subroutine set_profile_columns
-      
-      
-      integer function do_get_num_standard_profile_columns(s) ! not inluding extra profile columns
+
+
+      integer function do_get_num_standard_profile_columns(s)  ! not including extra profile columns
          use star_def, only: star_info
          type (star_info), pointer :: s
          integer :: numcols, j, num_specs
@@ -314,8 +314,8 @@
                 s% profile_column_spec(j) == add_log_abundances) then
                numcols = numcols + s% species
             else if (s% profile_column_spec(j) == raw_rate_offset .or. &
-                     s% profile_column_spec(j) == screened_rate_offset .or. & 
-                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. & 
+                     s% profile_column_spec(j) == screened_rate_offset .or. &
+                     s% profile_column_spec(j) == eps_nuc_rate_offset .or. &
                      s% profile_column_spec(j) == eps_neu_rate_offset) then
                numcols = numcols + s% num_reactions
             else
@@ -330,9 +330,9 @@
             names, vals, is_int, ierr)
          type (star_info), pointer :: s
          integer, intent(in) :: nz
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
-         logical, pointer :: is_int(:) ! (num_profile_columns) true iff the values in the column are integers
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
+         logical, pointer :: is_int(:)  ! (num_profile_columns) true iff the values in the column are integers
          integer, intent(out) :: ierr
          character (len=0) :: fname
          logical, parameter :: write_flag = .false.
@@ -343,13 +343,13 @@
 
       subroutine write_profile_info(s, fname, ierr)
          use chem_def
-         use net_def ! categories
+         use net_def  ! categories
          use rates_def, only: i_rate
          type (star_info), pointer :: s
          character (len=*) :: fname
          integer, intent(out) :: ierr
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
          logical, pointer :: is_int(:)
          logical, parameter :: write_flag = .true.
          names => null()
@@ -363,19 +363,19 @@
       subroutine do_profile_info(s, fname, &
             write_flag, names, vals, is_int, ierr)
          use chem_def
-         use net_def ! categories
+         use net_def  ! categories
          use rates_def, only: i_rate
          use ctrls_io, only: write_controls
          use write_model, only: do_write_model
          use pulse, only: export_pulse_data
          use math_lib, only: math_backend
          use utils_lib, only: mkdir, folder_exists
-         
+
          type (star_info), pointer :: s
          character (len=*) :: fname
          logical, intent(in) :: write_flag
-         character (len=maxlen_profile_column_name), pointer :: names(:) ! (num_profile_columns)
-         real(dp), pointer :: vals(:,:) ! (nz,num_profile_columns)
+         character (len=maxlen_profile_column_name), pointer :: names(:)  ! (num_profile_columns)
+         real(dp), pointer :: vals(:,:)  ! (nz,num_profile_columns)
          logical, pointer :: is_int(:)
          integer, intent(out) :: ierr
 
@@ -417,7 +417,7 @@
             write(*,*) 'WARNING: do not have any output specified for profiles.'
             return
          end if
-      
+
          numcols = do_get_num_standard_profile_columns(s)
 
          num_extra_cols = s% how_many_extra_profile_columns(s% id)
@@ -579,8 +579,8 @@
                call do_val(i, 'time_seconds', s% time)
 
                call do_string(i, 'version_number', version_number)
-               
-               if (s% profile_header_include_sys_details) then ! make this optional
+
+               if (s% profile_header_include_sys_details) then  ! make this optional
                   call do_string(i, 'compiler', compiler_name)
                   call do_string(i, 'build', compiler_version_name)
                   call do_string(i, 'MESA_SDK_version', mesasdk_version_name)
@@ -711,7 +711,7 @@
                   s% most_recent_controls_filename = trim(fname_out)
                end if
                   write(*,'(a)', advance='no') ' ' // trim(fname_out)
-            end if ! write_controls_info_with_profile
+            end if  ! write_controls_info_with_profile
 
             num_digits = 1 + log10(dble(max(1,s% model_number)))
             write(fstring,'( "(a,i",i2.2,".",i2.2,")" )') num_digits, num_digits
@@ -725,7 +725,7 @@
 
          contains
 
-           
+
            subroutine do_string(pass, col_name, val)
              integer, intent(in) :: pass
              character (len=*), intent(in) :: col_name, val
@@ -999,7 +999,7 @@
          model_priorities(num_models) = model_priority
          model_logs(num_models) = model_profile_number
 
-         s% save_profiles_model_priority = delta_priority ! reset it to the default value
+         s% save_profiles_model_priority = delta_priority  ! reset it to the default value
 
          ! write the profiles before adding them to the list
          ! so if user interrupts during write, the index is still okay.
@@ -1106,7 +1106,7 @@
             end if
          end do
          num_models = j
-         if (num_models == max_num_mods) then ! pick one to delete
+         if (num_models == max_num_mods) then  ! pick one to delete
             j = 1
             do i=2, num_models
                if (dbg) then
@@ -1150,7 +1150,7 @@
          num_models = 0
          ierr = 0
          open(newunit=iounit, file=trim(fname), action='read', status='old', iostat=ierr)
-         if (ierr == 0) then ! file exists
+         if (ierr == 0) then  ! file exists
             read(iounit, *, iostat=ierr) num_models
             if (ierr == 0) then
                if (num_models > max_num_mods) num_models = max_num_mods

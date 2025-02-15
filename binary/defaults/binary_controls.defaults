@@ -265,7 +265,7 @@
 ! Limits to timestep controls give by fm, fr and fe.
 ! As these three quantities evolve naturally to zero,
 ! following strictly the timestep limit given by fX would
-! reduce timesteps infinetely. These fX_limit avoid this problem
+! reduce timesteps indefinitely. These fX_limit avoid this problem
 ! by computing the limit to the timestep as
 
 ! ::
@@ -537,7 +537,7 @@
 ! explicit mass transfer computation.
 ! ___________________________________
 
-! MESA can compute mass transfer rates either explicitly (at the beggining
+! MESA can compute mass transfer rates either explicitly (at the beginning
 ! of the step) or implicitly (iterating the solution until the mass transfer
 ! rate matches the value computed at the end of the step). The explicit method
 ! is used if ``max_tries_to_achieve <= 0``.
@@ -607,7 +607,7 @@
 
 ! Tolerance for which a solution is considered valid. For the Ritter and Kolb
 ! schemes if we call mdot the mass transfer rate used for the step, and mdot_end
-! the one computed at the end of it, a solution is valid if :: 
+! the one computed at the end of it, a solution is valid if ::
 
 !     abs((mdot-mdot_end)/mdot_end) < b% implicit_scheme_tolerance
 
@@ -863,7 +863,7 @@
 ! ~~~~~~~~~~
 
 ! Include loss of angular momentum via mass loss. The parameters
-! ``mass_transfer_*`` determine the fractions of mass lost from the vincinity
+! ``mass_transfer_*`` determine the fractions of mass lost from the vicinity
 ! of the donor, the accretor, or a circumbinary coplanar toroid.
 
 ! ::
@@ -1004,7 +1004,7 @@
 ! do_j_accretion
 ! ~~~~~~~~~~~~~~
 
-! If true, compute accretion of angular momentum following A.3.3 of 
+! If true, compute accretion of angular momentum following A.3.3 of
 ! de Mink et al. 2013, ApJ, 764, 166. Otherwise, incoming  material is
 ! assumed to have the specific angular momentum of the surface of the accretor.
 
@@ -1210,7 +1210,7 @@
 ! col_depth_for_eps_extra
 ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-! Energy from irradiation will be deposited in the outer 
+! Energy from irradiation will be deposited in the outer
 ! ``4*Pi*R^2*col_depth_for_eps_extra`` grams of the star.
 
 ! ::
@@ -1330,7 +1330,7 @@
 
 ! During CE, if the star spends this amount of time detached, terminate CE even if
 ! CE_rel_rlo_for_detachment has not been reached.
-! If set to a large number mass loss will only stop when the star definetely wants
+! If set to a large number mass loss will only stop when the star definitely wants
 ! to detach. If set to a low number system will likely switch to stable mass transfer.
 
 ! ::

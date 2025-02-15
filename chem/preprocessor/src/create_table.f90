@@ -1,9 +1,12 @@
 program create_table
    use chem_support
    use iso_fortran_env, only : error_unit
+
+   implicit none
+
    character(len=64) :: inlist_fname
    integer :: ios
-   
+
    ios = 0
    call get_command_argument(1,inlist_fname,status=ios)
    if (ios /= 0) then

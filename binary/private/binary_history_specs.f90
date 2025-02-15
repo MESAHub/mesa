@@ -41,7 +41,7 @@ module binary_history_specs
 contains
 
    recursive subroutine add_binary_history_columns(&
-      b, level, capacity, spec, history_columns_file, ierr)
+      b, level, capacity, spec, history_columns_file, report, ierr)
       use utils_lib
       use utils_def
       use const_def, only : mesa_dir
@@ -49,6 +49,7 @@ contains
       integer, intent(in) :: level
       integer, intent(inout) :: capacity
       integer, pointer :: spec(:)
+      logical, intent(in) :: report
       character (len = *), intent(in) :: history_columns_file
       integer, intent(out) :: ierr
 
@@ -72,11 +73,11 @@ contains
       filename = history_columns_file
       if (len_trim(filename) == 0) filename = 'binary_history_columns.list'
       open(newunit = iounit, file = trim(filename), action = 'read', status = 'old', iostat = ierr)
-      if (ierr /= 0) then ! if don't find that file, look in binary/defaults
+      if (ierr /= 0) then  ! if don't find that file, look in binary/defaults
          filename = trim(mesa_dir) // '/binary/defaults/' // trim(filename)
          ierr = 0
          open(newunit = iounit, file = trim(filename), action = 'read', status = 'old', iostat = ierr)
-         if (ierr /= 0) then ! fail
+         if (ierr /= 0) then  ! fail
             write(*, *) 'failed to open ' // trim(history_columns_file)
             return
          end if
@@ -107,7 +108,7 @@ contains
             if (t /= string_token) then
                call error; return
             end if
-            call add_binary_history_columns(b, level + 1, capacity, spec, string, ierr)
+            call add_binary_history_columns(b, level + 1, capacity, spec, string, report, ierr)
             if (ierr /= 0) then
                write(*, *) 'failed for included log columns list ' // trim(string)
                bad_item = .true.
@@ -116,7 +117,7 @@ contains
             cycle
          end if
 
-         nxt_spec = do1_binary_history_spec(iounit, t, n, i, string, buffer, ierr)
+         nxt_spec = do1_binary_history_spec(iounit, t, n, i, string, buffer, report, ierr)
          if (ierr /= 0) bad_item = .true.
          if (.not. bad_item) then
             call insert_spec(nxt_spec, string, ierr)
@@ -190,13 +191,14 @@ contains
 
 
    integer function do1_binary_history_spec(&
-      iounit, t, n, i, string, buffer, ierr) result(spec)
+      iounit, t, n, i, string, buffer, report, ierr) result(spec)
       use utils_lib
       use utils_def
       use chem_lib
 
       integer :: iounit, t, n, i, j
       character (len = *) :: string, buffer
+      logical, intent(in) :: report
       integer, intent(out) :: ierr
 
       ierr = 0
@@ -209,15 +211,16 @@ contains
          end if
       end do
 
-      write(*, *) 'bad history list name: ' // trim(string)
+      if (report) write(*, *) 'bad history list name: ' // trim(string)
       ierr = -1
 
    end function do1_binary_history_spec
 
-   subroutine set_binary_history_columns(b, binary_history_columns_file, ierr)
+   subroutine set_binary_history_columns(b, binary_history_columns_file, report, ierr)
       use utils_lib, only : realloc_integer
       type(binary_info), pointer :: b
       character (len = *), intent(in) :: binary_history_columns_file
+      logical, intent(in) :: report
       integer, intent(out) :: ierr
       integer :: capacity, cnt, i
       logical, parameter :: dbg = .false.
@@ -230,12 +233,12 @@ contains
       if (associated(b% binary_history_column_spec)) &
          old_binary_history_column_spec => b% binary_history_column_spec
       nullify(b% binary_history_column_spec)
-      capacity = 100 ! will increase if needed
+      capacity = 100  ! will increase if needed
       allocate(b% binary_history_column_spec(capacity), stat = ierr)
       if (ierr /= 0) return
       b% binary_history_column_spec(:) = 0
       call add_binary_history_columns(b, 1, capacity, &
-         b% binary_history_column_spec, binary_history_columns_file, ierr)
+         b% binary_history_column_spec, binary_history_columns_file, report, ierr)
       if (ierr /= 0) then
          if (associated(old_binary_history_column_spec)) &
             deallocate(old_binary_history_column_spec)

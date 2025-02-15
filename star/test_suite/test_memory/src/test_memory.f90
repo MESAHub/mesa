@@ -7,6 +7,7 @@ program test_memory
   use net_def
   use kap_def
 
+  implicit none
   integer :: id, ierr, i
   type(star_info), pointer :: s
 
