@@ -165,7 +165,7 @@
          s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
          if (ierr == 0 .and. s% RSP2_flag) call set_RSP2_vars(s,ierr)
-         if (ierr == 0 .and. s% include_alfam) call set_viscosity_vars_TDC(s,ierr)
+         if (ierr == 0 .and. s% alpha_TDC_DampM > 0) call set_viscosity_vars_TDC(s,ierr)
          s% doing_finish_load_model = .false.
          if (ierr /= 0) then
             write(*,*) 'finish_load_model: failed in set_vars'

@@ -205,7 +205,7 @@ contains
 
       ! Pre-calculate some things. 
       Eq_div_w = 0d0
-      if (using_TDC .and. s% include_alfam) then
+      if (using_TDC .and. s% alpha_TDC_DampM > 0) then
         if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
             if (s% mlt_vc_old(k) > 0) then ! calculate using mlt_vc from previous timestep.
                 check_Eq = compute_Eq_cell(s, k, ierr)

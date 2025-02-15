@@ -597,7 +597,7 @@
                s% gradr_factor(nzlo:nzhi) = 1d0
             end if
             
-            if (s% include_alfam) then
+            if (s% alpha_TDC_DampM > 0) then
                call set_viscosity_vars_TDC(s,ierr)
                if (ierr /= 0) then
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'set_viscosity_vars_TDC failed'
