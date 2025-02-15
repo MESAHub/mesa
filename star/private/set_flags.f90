@@ -127,7 +127,6 @@
 
 
       subroutine set_u_flag(id, u_flag, ierr)
- !        use hydro_rsp2, only: set_viscosity_vars_TDC
          integer, intent(in) :: id
          logical, intent(in) :: u_flag
          integer, intent(out) :: ierr
@@ -193,8 +192,6 @@
             call set_v_flag(id, .false., ierr)
          end if
 
-!        call set_viscosity_vars_TDC(s,ierr)
-!        if (ierr /= 0) return
 
          contains
 
