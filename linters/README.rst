@@ -2,6 +2,50 @@
 Linters
 =======
 
+Code Linters
+============
+
+We use a variety of linters to check the MESA codebase for style and
+correctness. These linters are run automatically via GitHub actions
+on pushes and pull requests, and will fail if there are any issues.
+
+Fortran linter
+--------------
+
+We use `fortitude <https://github.com/PlasmaFAIR/fortitude>`__ to
+lint the Fortran files in the MESA codebase for style and correctness.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  fortitude check
+
+Python linter
+-------------
+
+We use `black <https://black.readthedocs.io/en/stable>`__ to lint
+Python files.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  black --check .
+
+reStructuredText linter
+-----------------------
+
+We use `sphinx-lint <https://pypi.org/project/sphinx-lint/>`__ to lint
+reStructuredText files.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  sphinx-lint --ignore=gyre/gyre
+
+
+MESA Linters
+============
+
 These scripts help check MESA for common problems.
 The linters must be run from ``$MESA_DIR/linters``.
 
@@ -10,7 +54,6 @@ check_photos.py
 
 This script makes sure that all of the values included in
 ``star_data_step_input.inc`` are saved in photos.
-
 
 check_columns.py
 ----------------
@@ -23,7 +66,7 @@ check_defaults.py
 -----------------
 
 This script checks that the controls and star_job defaults, the
-``*_controls.inc``, and ``*_io.f90`` files are in sync. 
+``*_controls.inc``, and ``*_io.f90`` files are in sync.
 
 check_pgstar.py
 ----------------
@@ -40,22 +83,25 @@ fix_underlines.py
 This script checks that the ~-level underlines in the defaults files
 are the correct lengths and fixes any problems it finds.
 
-
 mesa_linter.py
 --------------
 
 Checks fortran files for consistency with MESA's style guide.
 
-Run over files and provide details of failures::
+Run over files and provide details of failures
 
-  python3 mesa-linter.py *.f90
-	 
-Provides only a count per file of the number of issues found::
+.. code-block:: console
 
-  python3 mesa-linter.py -s *.f90
+  python mesa-linter.py *.f90
 
-chek_test_suite_onwers.py
--------------------------
+Provides only a count per file of the number of issues found
+
+.. code-block:: console
+
+  python mesa-linter.py -s *.f90
+
+check_test_suite_onwers.py
+--------------------------
 
 This script checks that each test suite case is listed in CODEOWNERS and
 checks whether each test case has 0 owners (very bad) or just 1 owner
@@ -73,20 +119,17 @@ Checks all .f90 files for stop 1 or stop 'string' and replaces them with a call
 to mesa_error(__FILE__,__LINE__) . This way we can always find where an error
 occurs rather than the non-unique stop 1 location.
 
-
 check_empty_writes.py
 ---------------------
 
-Checks all .f90 files for writes thats are both empty and unformatted (i.e write (*,*) ) (it also handles if the 
-write is to a unit). Unformatted writes are non-portable and can cause issues with ifort.
+Checks all .f90 files for writes thats are both empty and unformatted (i.e write (*,*) ) (it also handles if the write is to a unit).
+Unformatted writes are non-portable and can cause issues with ifort.
 
 check_omp_critical.py
 ---------------------
 
 Checks all .f90 files for unamed critical blocks. When critical blocks are unnamed they acts as one block
-thus each must be run seperatly. When critical blocks are named they can each be run in parrallel improving 
-perfomance.
-
+thus each must be run separately. When critical blocks are named they can each be run in parallel improving performance.
 
 update_columns.py
 -----------------
@@ -94,12 +137,10 @@ update_columns.py
 Copies the history and profile default columns file into each test case while preserving enabled
 options in each test case
 
-
 fix_inlists.py
 --------------
 
 Fixes various controls in the test_suite inlists that should not be enabled by default.
-
 
 update_ctrls.py
 ---------------

@@ -44,7 +44,7 @@ module pulse_fgong
 
   implicit none
 
-  ! Parameter definitions (these values are for FGONG format verions
+  ! Parameter definitions (these values are for FGONG format versions
   ! 300 & 1300)
 
   integer, parameter :: ICONST = 15
@@ -110,7 +110,7 @@ contains
     ! ∂lnΓ₁/∂… blocks in each region can probably be refactored.
     real(dp), allocatable :: dres_dxa(:,:)
     real(dp), allocatable :: xa(:)
-    real(dp), parameter :: dxa = 1d-3 ! perturbation of abundances for ∂lnΓ₁/∂Y
+    real(dp), parameter :: dxa = 1d-3  ! perturbation of abundances for ∂lnΓ₁/∂Y
 
     ! Get FGONG data
 
@@ -143,7 +143,7 @@ contains
     o18 = s%net_iso(io18)
     ne20 = s%net_iso(ine20)
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     allocate(dres_dxa(num_eos_basic_results, s% species))
     allocate(xa(s% species))
@@ -200,7 +200,7 @@ contains
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(11) = r_outer**2*d2P_dr2_c/P_c
     global_data(12) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
     global_data(13) = s%star_age
@@ -211,7 +211,7 @@ contains
 
     allocate(point_data(IVAR,nn))
     point_data = 0d0
-    
+
     j = 1
 
     ! Atmosphere (we skip the point at the base of the atm to smooth
@@ -221,7 +221,7 @@ contains
        call store_point_data_atm(j, k, k_a(1), k_b(1))
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     sg = 1
@@ -239,7 +239,7 @@ contains
 
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
-             
+
        endif
 
     end do env_loop
@@ -329,13 +329,13 @@ contains
         nabla_ad = s%atm_structure(atm_grada,k)
         delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
         c_P = s%atm_structure(atm_cp,k)
-        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k)) ! check
+        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k))  ! check
 
         grav = s%cgrav(1)*s%m_grav(1)/(r*r)
         N2 = grav*grav*(rho/P)*delta*(nabla_ad - s%atm_structure(atm_gradT,k))
         A_ast = N2*r/grav
 
-        r_X = 0d0 ! dxdt_nuc_h1
+        r_X = 0d0  ! dxdt_nuc_h1
         Z = MIN(1d0, MAX(0d0, 1d0 - &
              eval_face(s%dq, s%X, 1, k_a, k_b) - &
              eval_face(s%dq, s%Y, 1, k_a, k_b)))
@@ -387,7 +387,7 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
 
@@ -445,7 +445,7 @@ contains
            X_O17 => point_data(34,j), &
            X_O18 => point_data(35,j), &
            X_Ne20 => point_data(36,j))
-           
+
         r = s%r(k)
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
@@ -520,7 +520,7 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
 
@@ -537,7 +537,7 @@ contains
       integer, intent(in) :: j
       integer, intent(in) :: k_a
       integer, intent(in) :: k_b
-      
+
       ! Store data for the center into the point_data array at position j
 
       associate ( &
@@ -576,7 +576,7 @@ contains
            X_O17 => point_data(34,j), &
            X_O18 => point_data(35,j), &
            X_Ne20 => point_data(36,j))
-           
+
         r = 0d0
         lnq = log(TINY(0d0))
         T = eval_center(s%rmid, s%T, 1, s%nz)
@@ -645,7 +645,7 @@ contains
 
         dlnGamma1_dY = dres_dxa(i_Gamma1,1) &
            - dres_dlnT(i_Gamma1)*dres_dxa(i_lnPgas,1)/res(i_chiT)
-        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1) ! d/dY ~ -d/dX
+        dlnGamma1_dY = -dlnGamma1_dY/res(i_Gamma1)  ! d/dY ~ -d/dX
 
       end associate
 

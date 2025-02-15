@@ -81,13 +81,13 @@ contains
     real(dp), allocatable :: table_data(:,:,:,:,:,:)
     integer :: table_size
 
-    character(len=80) :: group_name ! output buffer
+    character(len=80) :: group_name  ! output buffer
 
     character(len=30), parameter :: efmt = '(A14, 99ES12.3)'
     character(len=30), parameter :: ffmt = '(A14, 99F8.3)'
     character(len=30), parameter :: ifmt = '(A14, I4)'
 
-    logical :: file_exists 
+    logical :: file_exists
 
     ! get the filename
     filename = trim(aesopus_filename)
@@ -116,7 +116,7 @@ contains
 
     ! open file (read-only)
     hi = hdf5io_t(filename, OPEN_FILE_RO)
-    
+
     if (rq% show_info) write(*,*) 'AESOPUS composition parameters'
 
     ! read composition parameters
@@ -175,7 +175,7 @@ contains
     call hi% alloc_read_dset('Zs', kA% Zs)
     kA% num_Zs = SIZE(kA% Zs)
     if (rq% show_info) write(*,ifmt) "num Zs =", kA% num_Zs
-    
+
     if (debug) write(*,*) 'Zs', kA% Zs
 
     if (rq% show_info) then
@@ -201,7 +201,7 @@ contains
        ! get group name and open group
 
        write(group_name, 100) kA% Zs(n)
-100    format(F8.6)  
+100    format(F8.6)
 
        if (rq% show_info) then
           write(*,'(A)')
@@ -352,11 +352,11 @@ contains
 
     ! restrict to range
     clipped = .false.
-    if (Zref .le. kA% Zs(1)) then
+    if (Zref <= kA% Zs(1)) then
        my_Z = kA% Zs(1)
        iZ = 1
        clipped = .true.
-    else if (Zref .ge. kA% Zs(kA% num_Zs)) then
+    else if (Zref >= kA% Zs(kA% num_Zs)) then
        my_Z = kA% Zs(kA% num_Zs)
        iZ = kA% num_Zs
        clipped = .true.
@@ -374,7 +374,7 @@ contains
     ! but for now, we use an adapted version of what kapCN does
 
     ! require at least 3 Zs for interpolation
-    if (nZ .gt. kA% num_Zs) then
+    if (nZ > kA% num_Zs) then
        write(*,*) 'AESOPUS_interp: insufficient number of Z values for interpolation'
        write(*,'(I2, A, I2, A)') nZ, ' values are required; ', kA% num_Zs, ' were provided'
        ierr = -1
@@ -477,13 +477,13 @@ contains
 
       ! cycles prevent wastefully calling interp_RT with zero weights
       do i = 1, npts
-         if (wX(i) .eq. 0) cycle
+         if (wX(i) == 0) cycle
          do j = 1, npts
-            if (wfCO(j) .eq. 0) cycle
+            if (wfCO(j) == 0) cycle
             do k = 1, npts
-               if (wfC(k) .eq. 0) cycle
+               if (wfC(k) == 0) cycle
                do l = 1, npts
-                  if (wfN(l) .eq. 0) cycle
+                  if (wfN(l) == 0) cycle
 
                   if (debug) then
                      write(*,*) 'call to AESOPUS_interp_RT'
@@ -497,7 +497,7 @@ contains
                   ! now do the call and collect the results
 
                   call AESOPUS_interp_RT(ts% t(iX+i-1,ifCO+j-1,ifC+k-1,ifN+l-1), logR, logT, raw_res, ierr)
-                  if (ierr .ne. 0) return
+                  if (ierr /= 0) return
 
                   res = res + wX(i)*wfCO(j)*wfC(k)*wfN(l) * raw_res
 
@@ -517,23 +517,23 @@ contains
 
       use num_lib, only: binary_search
 
-      real(dp), intent(in) :: val ! value
-      integer, intent(in) :: len ! number of tabulated values
-      real(dp), dimension(:), intent(in) :: vec ! tabulated values
-      integer,  intent(out) :: loc ! vec(loc) <= val <= vec(loc+1)
-      real(dp), dimension(2), intent(out) :: weights ! for linear interpolation
-      logical, intent(out) :: clipped ! did we clip? if so, only locs(1)/weights(1) matter
+      real(dp), intent(in) :: val  ! value
+      integer, intent(in) :: len  ! number of tabulated values
+      real(dp), dimension(:), intent(in) :: vec  ! tabulated values
+      integer,  intent(out) :: loc  ! vec(loc) <= val <= vec(loc+1)
+      real(dp), dimension(2), intent(out) :: weights  ! for linear interpolation
+      logical, intent(out) :: clipped  ! did we clip? if so, only locs(1)/weights(1) matter
 
       weights = 0
 
       ! clip to range, if needed
       clipped = .false.
-      if (val .le. vec(1)) then
+      if (val <= vec(1)) then
          loc = 1
          weights(1) = 1d0
          weights(2) = 0d0
          clipped = .true.
-      else if (val .ge. vec(len)) then
+      else if (val >= vec(len)) then
          loc = len
          weights(1) = 1d0
          weights(2) = 0d0

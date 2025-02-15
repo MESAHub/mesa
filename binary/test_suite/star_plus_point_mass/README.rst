@@ -41,10 +41,7 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 1
 
@@ -100,7 +97,7 @@ pgstar commands used for the plots above:
   History_Track2_file_interval = 100
   History_Track2_file_width = -1
   History_Track2_file_aspect_ratio = -1
-         
+
 
   Kipp_win_flag = .true.
   Kipp_win_width = 12

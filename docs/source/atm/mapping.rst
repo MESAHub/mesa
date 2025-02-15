@@ -32,7 +32,7 @@ to the new one described here, the mapping is as follows:
 
    * - ``which_atm_option == 'grey_irradiated'``
      - | ``atm_option == 'irradiated_grey'``
-       | ``atm_irradiated_opacity == 'fixed | varying'`` 
+       | ``atm_irradiated_opacity == 'fixed | varying'``
 
 .. note::
    If MESA is run using one of the old options, it will print out the

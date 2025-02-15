@@ -31,7 +31,7 @@
          implicit none
 
          include "test_suite_extras_def.inc"
-         
+
          real(dp) :: constant_lnP, constant_lnT
          real(dp) :: flame_position, flame_width, flame_r0, flame_t0
 
@@ -270,7 +270,7 @@
 
             rtop = 0d0
             do k = kmax, 1, -1
-               if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
+               if (s% eps_nuc(k) < 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
                   rtop = s% r(k)
                   exit
                end if
@@ -278,7 +278,7 @@
 
             rbot = 0d0
             do k = kmax, s% nz
-               if (s% eps_nuc(k) .lt. 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
+               if (s% eps_nuc(k) < 0.1d0 * maxval(s% eps_nuc(1:s% nz))) then
                   rbot = s% r(k)
                   exit
                end if
@@ -478,15 +478,15 @@
 
             ! when flame first is 30% through domain, record properties
             ! will be used to calculate flame speed
-            if (flame_r0 .lt. 0) then
-               if (flame_position .gt. 0.3d0 * s%r (1)) then
+            if (flame_r0 < 0) then
+               if (flame_position > 0.3d0 * s%r (1)) then
                   flame_r0 = flame_position
                   flame_t0 = s% star_age
                end if
             end if
 
             ! stop once flame is halfway through domain
-            if (flame_position .gt. 0.5d0 * s%r (1)) then
+            if (flame_position > 0.5d0 * s%r (1)) then
                extras_finish_step = terminate
                s% termination_code = t_xtra1
                termination_code_str(t_xtra1) = 'flame reached halfway point'

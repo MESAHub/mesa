@@ -3,6 +3,7 @@
            Rho, logRho, T, logT, &
            Cv, d_Cv_dlnT, eta, d_eta_dlnT, ierr)
          use const_def, only: dp
+         implicit none
          integer, intent(in) :: eos_handle, species
          integer, pointer :: chem_id(:) ! maps species to chem id
          integer, pointer :: net_iso(:) ! maps chem id to species number

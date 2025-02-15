@@ -15,7 +15,7 @@ This test case has 1 part. Click to see a larger version of a plot.
    :width: 100%
 
 |br|
-The initial hydrogen burns as its pushed deeper into the model by accreretion. The initial helium layer and the accreted helium 
+The initial hydrogen burns as its pushed deeper into the model by accreretion. The initial helium layer and the accreted helium
 thus merge to form a single helium layer. This single helium layer ignites at it is pushed to higher densities and temperatures
 by the continued accretion:
 
@@ -38,11 +38,7 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
-
 
     Profile_Panels2_win_flag = .true.
     Profile_Panels2_win_width = 10
@@ -67,7 +63,7 @@ pgstar commands used for the plots above:
     Profile_Panels2_file_flag = .true.
     Profile_Panels2_file_dir = 'pgstar_out'
     Profile_Panels2_file_prefix = 'profile_'
-    Profile_Panels2_file_interval = 100000     
+    Profile_Panels2_file_interval = 100000
     Profile_Panels2_file_width = -1
     Profile_Panels2_file_aspect_ratio = -1
 
@@ -100,19 +96,19 @@ pgstar commands used for the plots above:
     TRho_Profile_win_flag = .true.
     TRho_Profile_win_width = 10
     TRho_Profile_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-    TRho_Profile_title = 'wd_he_shell_ignition'      
+    TRho_Profile_title = 'wd_he_shell_ignition'
 
     TRho_Profile_xmin = -6.0
     TRho_Profile_xmax = 10.0
     TRho_Profile_ymin = 5.0
-    TRho_Profile_ymax = 9.0        
-         
+    TRho_Profile_ymax = 9.0
+
     TRho_Profile_xleft = 0.10
     TRho_Profile_xright = 0.93
     TRho_Profile_ybot = 0.10
     TRho_Profile_ytop = 0.90
     TRho_Profile_txt_scale = 0.9
-         
+
     show_TRho_Profile_legend = .true.
     TRho_Profile_legend_coord = 0.07
     TRho_Profile_legend_fjust = 0.0
@@ -125,9 +121,9 @@ pgstar commands used for the plots above:
     show_TRho_Profile_Pgas_Prad_line = .true.
     show_TRho_Profile_burn_lines = .true.
     show_TRho_Profile_burn_labels = .true.
-      
+
     show_TRho_Profile_mass_locs = .true.
-    num_profile_mass_points = 2 
+    num_profile_mass_points = 2
 
     profile_mass_point_q(1) = 0.5
     profile_mass_point_color_index(1) = 1
@@ -136,7 +132,7 @@ pgstar commands used for the plots above:
     profile_mass_point_str(1) = '  q=0.5'
     profile_mass_point_str_clr(1) = 1
     profile_mass_point_str_scale(1) = 0.8
-         
+
     profile_mass_point_q(2) = 0.99
     profile_mass_point_color_index(2) = 1
     profile_mass_point_symbol(2) = -6
@@ -144,13 +140,13 @@ pgstar commands used for the plots above:
     profile_mass_point_str(2) = '  q=0.99'
     profile_mass_point_str_clr(2) = 1
     profile_mass_point_str_scale(2) = 0.8
-         
+
     TRho_Profile_file_flag = .true.
     TRho_Profile_file_dir = 'pgstar_out'
     TRho_Profile_file_prefix = 'trho_'
     TRho_Profile_file_interval = 10000
-    TRho_Profile_file_width = -1 
-    TRho_Profile_file_aspect_ratio = -1 
+    TRho_Profile_file_width = -1
+    TRho_Profile_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 

@@ -20,70 +20,41 @@
 !
 ! ***********************************************************************
 
-#ifdef DBLE
 module test_block_tri_dble
-#else
-   module test_block_tri_quad
-#endif
-
       use mtx_lib
       use mtx_def
-
-#ifdef DBLE
       use const_def, only: dp
-#else
-      use const_def, only: qp
-#endif
-
       use utils_lib, only: is_bad, mesa_error
 
       implicit none
 
-#ifdef DBLE
       integer, parameter :: fltp = dp
-#else
-      integer, parameter :: fltp = qp
-#endif
-
       integer, parameter :: caller_id = 0
 
    contains
-
-#ifdef DBLE
 
       subroutine do_test_block_tri_dble
          call test_block(bcyclic_dble, .true.)
          call test_block(block_thomas_dble, .true.)
       end subroutine do_test_block_tri_dble
 
-#else
-
-      subroutine do_test_block_tri_quad
-         call test_block(block_thomas_quad, .true.)
-      end subroutine do_test_block_tri_quad
-
-#endif
-
       subroutine test_block(which_decsol_option, for_release)
 
          integer, intent(in) :: which_decsol_option
          logical, intent(in) :: for_release
 
-         integer :: nrep
-         real(fltp), pointer :: lblk1(:), dblk1(:), ublk1(:) ! (nvar,nvar,nz)
-         real(fltp), pointer :: lblk(:, :, :), dblk(:, :, :), ublk(:, :, :) ! (nvar,nvar,nz)
-         real(fltp), pointer :: l_init(:, :, :), d_init(:, :, :), u_init(:, :, :) ! (nvar,nvar,nz)
-         real(fltp), pointer :: x(:, :), xcorrect(:, :), brhs(:, :), work(:, :) ! (nvar,nz)
-         real(fltp), pointer :: x1(:) ! =(nvar,nz)
-         integer, pointer :: ipiv1(:) ! =(nvar,nz)
-         integer, pointer :: ipiv(:, :) ! (nvar,nz)
+         real(fltp), pointer :: lblk1(:), dblk1(:), ublk1(:)  ! (nvar,nvar,nz)
+         real(fltp), pointer :: lblk(:, :, :), dblk(:, :, :), ublk(:, :, :)  ! (nvar,nvar,nz)
+         real(fltp), pointer :: x(:, :), xcorrect(:, :), brhs(:, :), work(:, :)  ! (nvar,nz)
+         real(fltp), pointer :: x1(:)  ! =(nvar,nz)
+         integer, pointer :: ipiv1(:)  ! =(nvar,nz)
+         integer, pointer :: ipiv(:, :)  ! (nvar,nz)
 
-         real(dp), pointer :: rpar_decsol(:) ! (lrd)
-         integer, pointer :: ipar_decsol(:) ! (lid)
+         real(dp), pointer :: rpar_decsol(:)  ! (lrd)
+         integer, pointer :: ipar_decsol(:)  ! (lid)
          real(fltp) :: time_factor, time_solve, time_refine, time_dealloc
 
-         integer :: i, j, k, ierr, lid, lrd, nvar, nz, rep
-         logical :: use_given_weights
+         integer :: ierr, lid, lrd, nvar, nz
          character(len=255) :: fname, which_decsol_str
 
          include 'formats'
@@ -98,14 +69,11 @@ module test_block_tri_dble
          else
             fname = 'block_tri_12.data'
          end if
-         nrep = 1
 
          time_factor = 0; time_solve = 0; time_refine = 0; time_dealloc = 0
 
          call read_testfile(fname)
-         !call xread_testfile(fname)
 
-#ifdef DBLE
          if (which_decsol_option == bcyclic_dble) then
             write (*, *) 'bcyclic_dble'
             call bcyclic_dble_work_sizes(nvar, nz, lrd, lid)
@@ -113,12 +81,10 @@ module test_block_tri_dble
             write (*, *) 'bad value for which_decsol_option in test_block'
             call mesa_error(__FILE__, __LINE__)
          end if
-#endif
 
          allocate ( &
             rpar_decsol(lrd), ipar_decsol(lid), x1(nvar*nz), xcorrect(nvar, nz), &
-            brhs(nvar, nz), ipiv1(nvar*nz), work(nvar, nz), &
-            l_init(nvar, nvar, nz), d_init(nvar, nvar, nz), u_init(nvar, nvar, nz), stat=ierr)
+            brhs(nvar, nz), ipiv1(nvar*nz), work(nvar, nz), stat=ierr)
          if (ierr /= 0) then
             write (*, *) 'failed in alloc'
             call mesa_error(__FILE__, __LINE__)
@@ -126,87 +92,34 @@ module test_block_tri_dble
          ipiv(1:nvar, 1:nz) => ipiv1(1:nvar*nz)
          x(1:nvar, 1:nz) => x1(1:nvar*nz)
 
-         do k = 1, nz
-            do i = 1, nvar
-               do j = 1, nvar
-                  l_init(j, i, k) = lblk(j, i, k)
-                  d_init(j, i, k) = dblk(j, i, k)
-                  u_init(j, i, k) = ublk(j, i, k)
-               end do
-            end do
-         end do
-
          call set_xcorrect
          call set_brhs(lblk, dblk, ublk)
 
-         if (.false.) then ! check data
-            write (*, *) trim(fname)
-            write (*, 3) 'nvar nz', nvar, nz
-            do k = 1, nz
-               do i = 1, nvar
-                  write (*, 3) 'sol-xcorrect', i, k, brhs(i, k), xcorrect(i, k)
-                  do j = 1, nvar
-                     write (*, 4) 'u-d-l', i, j, k, &
-                        ublk(i, j, k), dblk(i, j, k), lblk(i, j, k)
-                  end do
-               end do
-            end do
-            stop 'test_block_tridiagonal'
+         if (which_decsol_option == bcyclic_dble) then
+            call solve_blocks(bcyclic_dble_decsolblk)
+         else
+            write (*, *) 'missing case for which_decsol_option', which_decsol_option
+            call mesa_error(__FILE__, __LINE__)
          end if
-
-         do rep = 1, nrep
-
-            do k = 1, nz
-               do i = 1, nvar
-                  do j = 1, nvar
-                     lblk(j, i, k) = l_init(j, i, k)
-                     dblk(j, i, k) = d_init(j, i, k)
-                     ublk(j, i, k) = u_init(j, i, k)
-                  end do
-               end do
-            end do
-
-            use_given_weights = (rep > 1)
-
-#ifdef DBLE
-            if (which_decsol_option == bcyclic_dble) then
-               call solve_blocks( &
-                  use_given_weights, bcyclic_dble_decsolblk, null_decsolblk_quad)
-            else
-               write (*, *) 'missing case for which_decsol_option', which_decsol_option
-               call mesa_error(__FILE__, __LINE__)
-            end if
-
-#endif
-
-         end do
 
          call check_x
 
-#ifdef DBLE
          if (which_decsol_option == bcyclic_dble) then
             write (*, *) 'done bcyclic_dble'
          else if (which_decsol_option == block_thomas_dble) then
             write (*, *) 'done block_thomas_dble'
          end if
-#else
-         if (which_decsol_option == block_thomas_quad) then
-            write (*, *) 'done block_thomas_quad'
-         end if
-#endif
 
          write (*, *)
 
          deallocate (rpar_decsol, ipar_decsol, x1, xcorrect, work, &
-                     brhs, ipiv1, lblk1, dblk1, ublk1, l_init, d_init, u_init)
+                     brhs, ipiv1, lblk1, dblk1, ublk1)
 
       contains
 
-         subroutine solve_blocks(use_given_weights, decsolblk, decsolblk_quad)
-            logical, intent(in) :: use_given_weights
+         subroutine solve_blocks(decsolblk)
             interface
                include 'mtx_decsolblk_dble.dek'
-               include 'mtx_decsolblk_quad.dek'
             end interface
 
             integer :: iop, rep
@@ -215,13 +128,8 @@ module test_block_tri_dble
             include 'formats'
 
             iop = 0 ! factor A
-#ifdef DBLE
             call decsolblk( &
                iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#else
-            call decsolblk_quad( &
-               iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#endif
             if (ierr /= 0) then
                write (*, *) 'decsolblk failed for factor'
                call mesa_error(__FILE__, __LINE__)
@@ -229,20 +137,15 @@ module test_block_tri_dble
 
             do rep = 1, 1
 
-               iop = 1 ! solve A*x = b
+               iop = 1  ! solve A*x = b
 
                do k = 1, nz
                   do j = 1, nvar
                      x(j, k) = brhs(j, k)
                   end do
                end do
-#ifdef DBLE
                call decsolblk( &
                   iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#else
-               call decsolblk_quad( &
-                  iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#endif
                if (ierr /= 0) then
                   write (*, *) 'decsolblk failed for solve'
                   call mesa_error(__FILE__, __LINE__)
@@ -250,14 +153,9 @@ module test_block_tri_dble
 
             end do
 
-            iop = 2 ! deallocate
-#ifdef DBLE
+            iop = 2  ! deallocate
             call decsolblk( &
                iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#else
-            call decsolblk_quad( &
-               iop, caller_id, nvar, nz, lblk1, dblk1, ublk1, x1, ipiv1, lrd, rpar_decsol, lid, ipar_decsol, ierr)
-#endif
             if (ierr /= 0) then
                write (*, *) 'decsolblk failed for deallocate'
                call mesa_error(__FILE__, __LINE__)
@@ -275,11 +173,9 @@ module test_block_tri_dble
                write (*, *) 'failed to open '//trim(fname)
                call mesa_error(__FILE__, __LINE__)
             end if
-#ifdef DBLE
+
             call mtx_read_block_tridiagonal(iounit, nvar, nz, lblk1, dblk1, ublk1, ierr)
-#else
-            call mtx_read_quad_block_tridiagonal(iounit, nvar, nz, lblk1, dblk1, ublk1, ierr)
-#endif
+
             if (ierr /= 0) then
                write (*, *) 'failed to read '//trim(fname)
                call mesa_error(__FILE__, __LINE__)
@@ -301,13 +197,11 @@ module test_block_tri_dble
             integer :: k, j
             include 'formats'
             ! set brhs = A*xcorrect
-#ifdef DBLE
+
             call block_dble_mv(nvar, nz, lblk, dblk, ublk, xcorrect, brhs)
-#else
-            call block_quad_mv(lblk, dblk, ublk, xcorrect, brhs)
-#endif
+
             return
-            do k = 1, 2 !nz
+            do k = 1, 2  !nz
                do j = 1, nvar
                   if (brhs(j, k) /= 0) write (*, 3) 'brhs xcorrect', j, k, brhs(j, k), xcorrect(j, k)
                end do
@@ -369,9 +263,4 @@ module test_block_tri_dble
          end subroutine set_xcorrect
 
       end subroutine test_block
-
-#ifdef DBLE
-   end module test_block_tri_dble
-#else
-end module test_block_tri_quad
-#endif
+end module test_block_tri_dble

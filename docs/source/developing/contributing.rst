@@ -26,7 +26,7 @@ Non-MESA developer
 For those who do not have commit access to the main MESA repository you will need to `fork <https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/about-forks>`__
 MESA and make your changes in your fork. Once you are happy with your changes you can submit a pull request
 against the main MESA repository. At this point your contributions will be reviewed by a MESA
-developer who may or may not accept the pull request. If they accept it then it will be merged 
+developer who may or may not accept the pull request. If they accept it then it will be merged
 into MESA.
 
 More details can be found in the `contribution documentation <../contributing.html>`__
@@ -42,7 +42,7 @@ When instructed to install git, it is likely simplest to do so using your system
 .. note::
    This documentation will mainly describe command line use of git.  However, there are many graphical git clients available.  For example, GitHub has its own `desktop app <https://desktop.github.com/>`__.  (See also :ref:`git-guis`).
 
-   
+
 Install Git LFS
 ---------------
 
@@ -162,7 +162,7 @@ Once you are ready to share your changes::
 The first argument is the remote repository (``origin`` = GitHub).
 The second argument is the branch name.  If you are making changes in
 the non-default branch (i.e., not ``main``), see :ref:`Branching`.
-  
+
 Fetching others changes
 -----------------------
 
@@ -224,7 +224,7 @@ characters, you only need enough of the hash to be unique. This is usually only 
 This will return your local repository to the state is was in the commit given by ``37cbee26``, but with your current uncommitted changes
 on top.
 
-  
+
 Restoring a file
 ----------------
 
@@ -246,7 +246,7 @@ directory (``.``) or a list of files (``*.f90``).
 ``git restore`` can also be used to restore a file from another commit::
 
   git restore --source=37cbee26 path/to/file
-  
+
 
 .. _branching:
 
@@ -313,7 +313,7 @@ Stashing changes
 ----------------
 
 Lets say you are working on the code and suddenly a bug report comes in and you decide to fix that code first before you finish your current work.
-Because your initial work is still in progress you want to save it but do not want to commit it yet. This is where 
+Because your initial work is still in progress you want to save it but do not want to commit it yet. This is where
 git stash comes in::
 
   git stash
@@ -329,7 +329,7 @@ it once you no longer need it::
 
   git stash drop
 
-You may have multiple stashes at once, in which case they are indexed by:: 
+You may have multiple stashes at once, in which case they are indexed by::
 
   git stash ${X}
 
@@ -341,13 +341,13 @@ Graphical interfaces
 --------------------
 
 Not everything needs to be done by command line. There are at least two GUI tools that are usually shipped with git,
-``git gui`` and ``gitk``. 
+``git gui`` and ``gitk``.
 ::
 
   git gui
 
 This provides a convenient interface for making commits. You can select which files to commit, which lines of which
-files, set the commit message, and make the commit. 
+files, set the commit message, and make the commit.
 ::
 
   gitk
@@ -397,12 +397,12 @@ have occurred on ``main``, it is recommended that you merge ``main`` into your
 branch (or rebase your branch to the tip of ``main``) before issuing the
 PR. This allows you to handle conflicts in advance and ensure that the
 test suite will remain passing after you merge your branch back into
-``main``. 
+``main``.
 
 When you merge ``main`` into your branch, it is also advisable to add ``[ci optional]`` to the commit message.
 That way the optional inlists will be tested when the commit is tested.
 
-     
+
 
 Making a pull request
 ---------------------

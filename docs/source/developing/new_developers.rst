@@ -90,3 +90,4 @@ Changelog
 ---------
 
 * Initial document approved December 5, 2022
+* "Infrastructure Access for Collaborators" section adopted March 1, 2024

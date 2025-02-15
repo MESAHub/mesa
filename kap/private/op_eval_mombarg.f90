@@ -5,9 +5,11 @@
 
       implicit none
 
-      real(dp), parameter :: log_c = 10.476820702927927d0 !log10_cr(dble(299792458e2)) c = speed of light
+      real(dp), parameter :: log_c = 10.476820702927927d0  !log10_cr(dble(299792458e2)) c = speed of light
       real(dp), parameter :: log10_bohr_radius_sqr = -16.55280d0
-      real(dp), parameter :: logNa = 23.779750912481397d0 !log10_cr(6.0221409d23) Avogadro's number
+      real(dp), parameter :: logNa = 23.779750912481397d0  !log10_cr(6.0221409d23) Avogadro's number
+
+      real(dp), parameter :: diff_v = (1.0552976117319748d0 - 0.00010565516589892675d0)   !v(u(1)) - v(u(nptot))
 
       contains
 
@@ -23,7 +25,7 @@
       integer, intent(in) :: k
       real(dp), intent(in) :: fk(:), logT_face, logRho_face, l, r
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
       real(dp), intent(out) :: lkap_ross_cell, lgrad_cell(nel)
 
       integer , pointer :: ite(:),jne(:)
@@ -41,15 +43,15 @@
 
       integer :: ke, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       integer ::  delta_min_idx
-      real(dp) :: lkap_Ross(4,4),gamma_k(4,4,nel),lgamm(4,4,nel),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
-      real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
+      real(dp) :: lkap_Ross(4,4),gamma_k(4,4,nel),lgamm(4,4,nel),sig_Ross(4,4)  ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sf, flux  !'scale factor' for g_rad, local flux.
       real, allocatable :: sig_mix_cell(:,:,:),sig_int(:)
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -65,8 +67,8 @@
       ierr = 0
 
 
-      imin = 1 !-1
-      imax = 1648 !-1
+      imin = 1  !-1
+      imax = 1648  !-1
       ite_step = 2
       jne_step = 2
 
@@ -100,8 +102,8 @@
         ii_min = 2
         jj_min = 2
       else if (logT_min < logT_face .and. logRho_min > logRho_face) then
-        ii_min = 2!3
-        jj_min = 3!2
+        ii_min = 2  !3
+        jj_min = 3  !2
       else if (logT_min > logT_face .and. logRho_min < logRho_face) then
         ii_min = 3
         jj_min = 2
@@ -117,18 +119,18 @@
       tries = 0
       retry = .true.
       !do while (point_not_found .ne. 0) !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
-      do while (retry) !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
+      do while (retry)  !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
       missing_point = 1
       retry = .false.
       do jj=1,4
             do ii=1,4
-              dite = (ii - ii_min + offset1)*ite_step !(ii - ii_min)*ite_step + offset2
-              djne = (jj - jj_min + offset2)*jne_step !(jj - jj_min)*jne_step + offset1
+              dite = (ii - ii_min + offset1)*ite_step  !(ii - ii_min)*ite_step + offset2
+              djne = (jj - jj_min + offset2)*jne_step  !(jj - jj_min)*jne_step + offset1
              do i =imin,imax
                ite_i = ite(i)
                jne_i = jne(i)
 
-                if (ite_i .eq. ite_min +  dite .and. jne_i .eq. jne_min + djne) THEN
+                if (ite_i == ite_min +  dite .and. jne_i == jne_min + djne) THEN
                   logT_grid(ii,jj) = logT(i)
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
@@ -173,8 +175,11 @@
       endif
 
 
-      if (tries > 2) THEN ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_grad', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2, imin, imax, log_amu_mix_cell
+      if (tries > 2) THEN  ! To prevent loop from getting stuck.
+        write(*,*) 'Cannot find points for interpolation compute_grad', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, &
+                    logRho_face, missing_point, ii_min, jj_min, offset1, offset2, &
+                    imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -187,7 +192,7 @@
       sig_mix_cell = 0d0
       do jj=1,4
           do ii=1,4
-            ik = i_grid(ii,jj)!+ 1648*(ke-1)
+            ik = i_grid(ii,jj)  !+ 1648*(ke-1)
             do m=1,nptot
               sig_mix_cell(ii,jj,m) = dot_product(fk,sig(:,ik,m))
             enddo
@@ -198,9 +203,9 @@
       sig_Ross = 0d0
       do jj=1,4
         do ii=1,4
-           sig_int(1:nptot-1) = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2. * dv
+           sig_int(1:nptot-1) = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv
            do m=1, nptot-1
-                !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2. * dv
+                !sig_Ross(ii,jj) = sig_Ross(ii,jj) + (1/sig_mix_cell(ii,jj,m) + 1/sig_mix_cell(ii,jj,m+1))/2.0d0 * dv
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
            enddo
         enddo
@@ -223,20 +228,20 @@
 
       do jj=1,4
         do ii=1,4
-          ik = i_grid(ii,jj)! + 1648*(ke-1)
+          ik = i_grid(ii,jj)  ! + 1648*(ke-1)
           do ke=3,nel
             gam = 0
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,ik,m)/ sig_mix_cell(ii,jj,m)) +(eumesh(ke,ik,m+1)/ sig_mix_cell(ii,jj,m+1)))
             enddo
-           gamma_k(ii,jj,ke) = gam/2. * dv
+           gamma_k(ii,jj,ke) = gam/2.0d0 * dv
           enddo
         enddo
       enddo
 
       deallocate(sig_mix_cell,sig_int)
 
-      where (gamma_k < 0.)
+      where (gamma_k < 0.0d0)
         gamma_k = 10d-30
       endwhere
       lgamm = log10(gamma_k)
@@ -249,7 +254,7 @@
             enddo
          enddo
 
-        lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face) !cell
+        lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
       enddo
       lgamm_cell(1) = -30.
       lgamm_cell(2) = -30.
@@ -278,29 +283,29 @@
       integer, intent(in) :: ngp
       real(dp), intent(in) :: fk_all(:)
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
       !real(dp), pointer, intent(out)::lgamm_pcg(:,:,:),lkap_face_pcg(:,:)
       real(dp), intent(out)::lgamm_pcg(nel,1648),lkap_face_pcg(1648)
 
       real(dp), intent(out) :: logT_pcg(1648), logRho_pcg(1648)
 
       integer , pointer :: ite(:),jne(:)
-      real(dp), pointer :: sig(:,:,:)!, ak_f(:,:)
+      real(dp), pointer :: sig(:,:,:)  !, ak_f(:,:)
       real(dp), pointer :: epatom(:,:),amamu(:),eumesh(:,:,:)
       integer :: imin, imax
 
       integer :: n, ke, nz, id, m, ik, i, j
 
-      !real(dp) :: fk_norm_fac !Local fractional abudance per element and normalization factor.
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      !real(dp) :: fk_norm_fac !Local fractional abundance per element and normalization factor.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, fk(nel)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       !integer ::  eid(nel)
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
 
 
-      real(dp) :: sig_Ross(1648), gamma_k(nel,1648)!, lgamm(nel,1648) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sig_Ross(1648), gamma_k(nel,1648)  !, lgamm(nel,1648) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
 
 
       real, allocatable :: sig_mix_cell(:,:),sig_int(:)
@@ -310,10 +315,10 @@
       ierr = 0
 
       !!! Compute an estimated temperature range.
-      imin = 1 !-1
-      imax = 1648 !-1
+      imin = 1  !-1
+      imax = 1648  !-1
 
-      fk = fk_all!(j,:)
+      fk = fk_all  !(j,:)
       !!! Compute the number of electrons per atom for the local mixture.
       epa_mix_cell = 0d0
         do i=imin,imax
@@ -341,7 +346,7 @@
       sig_Ross = 0d0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2. * dv !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
               enddo
@@ -360,12 +365,12 @@
             do m=1, nptot-1
             gam = gam + ((eumesh(ke,i,m)/ sig_mix_cell(i,m))+(eumesh(ke,i,m+1)/ sig_mix_cell(i,m+1)))
             enddo
-           gamma_k(ke,i) = gam/2. * dv
+           gamma_k(ke,i) = gam/2.0d0 * dv
           enddo
         enddo
 !$OMP END PARALLEL DO
 
-        where (gamma_k < 0.)
+        where (gamma_k < 0.0d0)
           gamma_k = 10d-30
         endwhere
 
@@ -383,9 +388,9 @@
       integer, intent(inout) :: ierr
       integer, intent(in) :: k
       real(dp), intent(in) :: fk(:), logT_face, logRho_face, l, r
-      real(dp), intent(in) :: logT_pcg(1648), logRho_pcg(1648)!, lgamm_pcg(:,:), lkap_face_pcg(:)
+      real(dp), intent(in) :: logT_pcg(1648), logRho_pcg(1648)  !, lgamm_pcg(:,:), lkap_face_pcg(:)
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
       real(dp), intent(in) :: lgamm_pcg(nel,1648), lkap_face_pcg(1648)
       real(dp), intent(out) :: lgrad_cell(nel)
 
@@ -394,17 +399,17 @@
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
       integer ::  eid(nel)
-      real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
-      real(dp) :: lkap_Ross(4,4),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
-      real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
+      real(dp) :: lkap_Ross(4,4),sig_Ross(4,4)  ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sf, flux  !'scale factor' for g_rad, local flux.
 
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -412,7 +417,7 @@
       integer ::  offset1, offset2, tries, missing_point(4,4)
       real(dp) :: log_amu_mix_cell, lkap_ross_cell
       integer :: imin, imax
-      real(dp) :: logT(1648), logRho(1648)!, ite_grid(4,4), jne_grid(4,4)
+      real(dp) :: logT(1648), logRho(1648)  !, ite_grid(4,4), jne_grid(4,4)
       logical :: retry, do_difficult_point
       type(interpolator) :: rossl_interpolator
       type(interpolator) :: gaml_interpolators(nel)
@@ -426,8 +431,8 @@
 
       amu_mix_cell = dot_product(fk,amamu)
 
-      logT   = logT_pcg !0.025d0*ite
-      logRho = logRho_pcg !0.25d0*jne + log10_cr(amu_mix_cell) - log10(epa_mix_cell) - logNa
+      logT   = logT_pcg  !0.025d0*ite
+      logRho = logRho_pcg  !0.25d0*jne + log10_cr(amu_mix_cell) - log10(epa_mix_cell) - logNa
 
       !!! Compute an estimated temperature range.
       imin = 1
@@ -462,7 +467,7 @@
       missing_point = 1
       tries = 0
       retry = .true.
-      do while (retry) !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
+      do while (retry)  !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
       missing_point = 1
       retry = .false.
       do jj=1,4
@@ -473,7 +478,7 @@
                ite_i = ite(i)
                jne_i = jne(i)
 
-                if (ite_i .eq. ite_min +  dite .and. jne_i .eq. jne_min + djne) THEN
+                if (ite_i == ite_min +  dite .and. jne_i == jne_min + djne) THEN
                   logT_grid(ii,jj) = logT(i)
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
@@ -515,7 +520,7 @@
         endif
       endif
 
-      if (tries > 2) THEN ! To prevent loop from getting stuck.
+      if (tries > 2) THEN  ! To prevent loop from getting stuck.
        do_difficult_point = .false.
        if (ite_min == 226 .and. jne_min == 90 .and. ii_min == 2 .and. jj_min == 3) do_difficult_point = .true.
        if (ite_min == 226 .and. jne_min == 88 .and. ii_min == 2 .and. jj_min == 2) do_difficult_point = .true.
@@ -542,7 +547,9 @@
             retry = .false.
         else
 
-        write(*,*) 'Cannot find points for interpolation compute_grad_fast', k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_grad_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min, logT_face, logRho_face, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         endif
@@ -578,7 +585,7 @@
             enddo
          enddo
 
-        lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face) !cell
+        lgamm_cell(ke) = gaml_interpolators(ke)% evaluate(logT_face, logRho_face)  !cell
       enddo
       lgamm_cell(1) = -30d0
       lgamm_cell(2) = -30d0
@@ -603,7 +610,7 @@
       integer, intent(in) :: k
       real(dp), intent(in) :: fk(:), logT_cntr, logRho_cntr
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
       real(dp), intent(out) :: lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho
       real(dp), intent(out), dimension(4,4) :: logT_grid, logRho_grid, lkap_Ross
 
@@ -614,21 +621,21 @@
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648) ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell, logRho(1648),logT(1648)  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
 
       integer ::  delta_min_idx
-      real(dp) :: sig_Ross(4,4)!,lkap_Ross(4,4), ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
-      real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
+      real(dp) :: sig_Ross(4,4)  !,lkap_Ross(4,4), ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sf, flux  !'scale factor' for g_rad, local flux.
 
       real, allocatable :: sig_mix_cell(:,:,:),sig_int(:)
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
-      real(dp) :: logT_min, logRho_min!, logT_grid(4,4), logRho_grid(4,4)
+      real(dp) :: logT_min, logRho_min  !, logT_grid(4,4), logRho_grid(4,4)
       integer :: offset1, offset2, tries, missing_point(4,4)
       real(dp) :: log_amu_mix_cell
       integer :: imin, imax
@@ -639,8 +646,8 @@
 
       ierr = 0
 
-      imin = 1 !-1
-      imax = 1648 !-1
+      imin = 1  !-1
+      imax = 1648  !-1
       ite_step = 2
       jne_step = 2
 
@@ -676,8 +683,8 @@
         ii_min = 2
         jj_min = 2
       else if (logT_min < logT_cntr .and. logRho_min > logRho_cntr) then
-        ii_min = 2!3
-        jj_min = 3!2
+        ii_min = 2  !3
+        jj_min = 3  !2
       else if (logT_min > logT_cntr .and. logRho_min < logRho_cntr) then
         ii_min = 3
         jj_min = 2
@@ -691,7 +698,7 @@
       missing_point = 1
       tries = 0
       retry = .true.
-      do while (retry) !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
+      do while (retry)  !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
       missing_point = 1
       retry = .false.
       do jj=1,4
@@ -702,7 +709,7 @@
                ite_i = ite(i)
                jne_i = jne(i)
 
-                if (ite_i .eq. ite_min +  dite .and. jne_i .eq. jne_min + djne) THEN
+                if (ite_i == ite_min +  dite .and. jne_i == jne_min + djne) THEN
                   logT_grid(ii,jj) = logT(i)
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
@@ -746,8 +753,10 @@
 
 
 
-      if (tries > 4) THEN ! To prevent loop from getting stuck.
-        write(*,*) 'Cannot find points for interpolation compute_kappa', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
+      if (tries > 4) THEN  ! To prevent loop from getting stuck.
+        write(*,*) 'Cannot find points for interpolation compute_kappa', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax, log_amu_mix_cell
         ierr = 1
         return
       endif
@@ -773,7 +782,7 @@
       sig_Ross = 0d0
       do jj=1,4
         do ii=1,4
-              sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2. * dv !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int = (1/sig_mix_cell(ii,jj,1:nptot-1) + 1/sig_mix_cell(ii,jj,2:nptot))/2.0d0 * dv  !(1:nptot-1) inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(ii,jj) = sig_Ross(ii,jj) + sig_int(m)
               enddo
@@ -811,26 +820,26 @@
       integer, intent(inout) :: ierr
       real(dp), intent(in) :: fk(:)
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
-      real(dp), pointer, intent(out) :: lkap_ross_pcg(:)!, fk_pcg(:)
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
+      real(dp), pointer, intent(out) :: lkap_ross_pcg(:)  !, fk_pcg(:)
       real(dp) :: logT_pcg(1648), logRho_pcg(1648)
 
       integer , pointer :: ite(:),jne(:)
-      real(dp), pointer :: sig(:,:,:)!, ak_f(:,:)
+      real(dp), pointer :: sig(:,:,:)  !, ak_f(:,:)
       real(dp), pointer :: epatom(:,:),amamu(:)
       integer :: imin, imax
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
-      real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp):: epa_mix_cell(1648), amu_mix_cell  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
 
-      real(dp) :: sig_Ross(1648) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sig_Ross(1648)  ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
 
       real, allocatable :: sig_mix_cell(:,:),sig_int(:)
       real(dp) :: log_amu_mix_cell
@@ -870,7 +879,7 @@
       sig_Ross = 0
 !$OMP PARALLEL DO PRIVATE(i,m,sig_int) SCHEDULE(guided)
         do i=1,1648
-              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2. * dv !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
+              sig_int(1:nptot-1) = (1/sig_mix_cell(i,1:nptot-1) + 1/sig_mix_cell(i,2:nptot))/2.0d0 * dv  !inv_sig_mix_cell(ii,jj,1:nptot-1) + inv_sig_mix_cell(ii,jj,2:nptot)
               do m=1, nptot-1
                 sig_Ross(i) = sig_Ross(i) + sig_int(m)
               enddo
@@ -898,7 +907,7 @@
       real(dp), intent(in) :: fk(:), logT_cntr, logRho_cntr
       real(dp), pointer, intent(in) :: lkap_ross_pcg(:)
       integer :: nel, nptot
-      parameter(nel = 17, nptot = 10000) !number of elements and number of u-mesh points.
+      parameter(nel = 17, nptot = 10000)  !number of elements and number of u-mesh points.
       real(dp), intent(out) :: lkap_ross_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho
       integer , pointer :: ite(:),jne(:)
       real(dp), pointer :: sig(:,:,:)
@@ -906,16 +915,16 @@
 
       integer :: n, ke, nz, id, m, ik, i
 
-      real(dp):: epa_mix_cell(1648), amu_mix_cell ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
+      real(dp):: epa_mix_cell(1648), amu_mix_cell  ! Number of electrons per atom, mean molecular weight, density and temperature as a function of ite (temp index) and jne (density index) from the OP mono data.
       real(dp) :: delta(1648)
-      real(dp) :: lgamm_cell(nel) !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
-      real(dp) :: dv = (1.0552976117319748d0 - 0.00010565516589892675d0)/nptot !v(u(1)) - v(u(nptot))/nptot
+      real(dp) :: lgamm_cell(nel)  !interpolated log kappa Rossland and log gamma_k in each cell (k = element index).
+      real(dp), parameter :: dv = diff_v/nptot  !v(u(1)) - v(u(nptot))/nptot
       real(dp) :: mH
 
       !!!! For interpolator.
       integer ::  delta_min_idx
-      real(dp) :: lkap_Ross(4,4),sig_Ross(4,4) ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
-      real(dp) :: sf, flux !'scale factor' for g_rad, local flux.
+      real(dp) :: lkap_Ross(4,4),sig_Ross(4,4)  ! Rossland cross section, log kappa, gamma_k, log gamma_k for interpolation.
+      real(dp) :: sf, flux  !'scale factor' for g_rad, local flux.
 
       integer :: ii, jj, ite_min, jne_min, ii_min, jj_min, ite_step, jne_step
       integer :: ite_i, jne_i, dite, djne, i_grid(4,4)
@@ -923,7 +932,7 @@
       integer ::  offset1, offset2, tries, missing_point(4,4)
       real(dp) :: log_amu_mix_cell
       integer :: imin, imax
-      real(dp) :: logT(1648), logRho(1648)!, ite_grid(4,4), jne_grid(4,4)
+      real(dp) :: logT(1648), logRho(1648)  !, ite_grid(4,4), jne_grid(4,4)
       logical :: retry, do_difficult_point
 
       type(interpolator) :: rossl_interpolator
@@ -965,8 +974,8 @@
         ii_min = 2
         jj_min = 2
       else if (logT_min < logT_cntr .and. logRho_min > logRho_cntr) then
-        ii_min = 2!3
-        jj_min = 3!2
+        ii_min = 2  !3
+        jj_min = 3  !2
       else if (logT_min > logT_cntr .and. logRho_min < logRho_cntr) then
         ii_min = 3
         jj_min = 2
@@ -981,18 +990,18 @@
       missing_point = 1
       tries = 0
       retry = .true.
-      do while (retry) !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
+      do while (retry)  !If (T,Rho)_cell lies to close to the edge of the OP mono grid (in Rho), shift the 4x4 grid up/down by 1 in jne.
       missing_point = 1
       retry = .false.
       do jj=1,4
             do ii=1,4
-              dite = (ii - ii_min + offset1)*ite_step !(ii - ii_min)*ite_step + offset2
-              djne = (jj - jj_min + offset2)*jne_step !(jj - jj_min)*jne_step + offset1
+              dite = (ii - ii_min + offset1)*ite_step  !(ii - ii_min)*ite_step + offset2
+              djne = (jj - jj_min + offset2)*jne_step  !(jj - jj_min)*jne_step + offset1
              do i =imin,imax
                ite_i = ite(i)
                jne_i = jne(i)
 
-                if (ite_i .eq. ite_min +  dite .and. jne_i .eq. jne_min + djne) THEN
+                if (ite_i == ite_min +  dite .and. jne_i == jne_min + djne) THEN
                   logT_grid(ii,jj) = logT(i)
                   logRho_grid(ii,jj) = logRho(i)
                   i_grid(ii,jj) = i
@@ -1035,7 +1044,7 @@
         endif
       endif
 
-      if (tries > 2) THEN ! To prevent loop from getting stuck.
+      if (tries > 2) THEN  ! To prevent loop from getting stuck.
         do_difficult_point = .false.
         if (ite_min == 226 .and. jne_min == 90 .and. ii_min == 2 .and. jj_min == 3) do_difficult_point = .true.
         if (ite_min == 226 .and. jne_min == 88 .and. ii_min == 2 .and. jj_min == 2) do_difficult_point = .true.
@@ -1060,7 +1069,9 @@
              enddo
              retry = .false.
          else
-        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, missing_point, ii_min, jj_min, offset1, offset2,imin, imax
+        write(*,*) 'Cannot find points for interpolation compute_kappa_fast', &
+                    k, ite_min, jne_min, logT_min, logRho_min,logT_cntr, logRho_cntr, &
+                    missing_point, ii_min, jj_min, offset1, offset2,imin, imax
         ierr = 1
         return
         !stop

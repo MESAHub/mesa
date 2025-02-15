@@ -31,15 +31,15 @@ module skye_coulomb_solid
       real(dp), parameter :: A1 = 10.9d0
       real(dp), parameter :: A2 = 247d0
       real(dp), parameter :: A3 = 1.765d5
-      real(dp), parameter :: B1 = 0.12d0 ! coefficient of \eta^2/\Gamma at T=0
+      real(dp), parameter :: B1 = 0.12d0  ! coefficient of \eta^2/\Gamma at T=0
 
       type(auto_diff_real_2var_order3) :: TPT2
 
       TPT2=TPT*TPT
 
       F = -(A1 / GAMI + A2 / (2d0 * pow2(GAMI)) + A3 / (3d0 * pow3(GAMI)))
-      F = F * exp(-(B1 / A1) * TPT2) ! suppress.factor of classical anharmonicity
-      F = F - B1 * TPT2 / GAMI ! Quantum correction
+      F = F * exp(-(B1 / A1) * TPT2)  ! suppress.factor of classical anharmonicity
+      F = F - B1 * TPT2 / GAMI  ! Quantum correction
    end function ocp_solid_anharmonic_free_energy
 
    !> Computes the harmonic non-ideal free energy of a
@@ -62,11 +62,11 @@ module skye_coulomb_solid
       ! Intermediates
       type(auto_diff_real_2var_order3) :: TPT, UP, DN, EA, EB, EG, E0
       type(auto_diff_real_2var_order3) :: Fth, U0
-      
+
       ! Output
       type(auto_diff_real_2var_order3) :: F
 
-      real(dp), parameter :: CM = .895929256d0 ! Madelung
+      real(dp), parameter :: CM = .895929256d0  ! Madelung
       real(dp), parameter :: EPS=1d-5
 
       ! BCC lattice.
@@ -74,7 +74,7 @@ module skye_coulomb_solid
       ! a lower free energy than their fit to the FCC lattice in all cases of
       ! interest (and no cases of which I am aware), so we can specialize
       ! to the BCC case.
-      real(dp), parameter :: CLM=-2.49389d0 ! 3*ln<\omega/\omega_p>
+      real(dp), parameter :: CLM=-2.49389d0  ! 3*ln<\omega/\omega_p>
       real(dp), parameter :: U1=0.5113875d0
       real(dp), parameter :: ALPHA=0.265764d0
       real(dp), parameter :: BETA=0.334547d0
@@ -99,9 +99,9 @@ module skye_coulomb_solid
 
       TPT = TPT_in
 
-      if (TPT > 1d0/EPS) then ! asymptote of Eq.(13) of BPY'01
+      if (TPT > 1d0/EPS) then  ! asymptote of Eq.(13) of BPY'01
          F=-1d0 / (C11*TPT*TPT*TPT)
-      else if (TPT < EPS) then ! Eq.(17) of BPY'01
+      else if (TPT < EPS) then  ! Eq.(17) of BPY'01
          F=3d0*log(TPT)+CLM-1.5d0*U1*TPT+TPT*TPT/24.d0
       else
          UP=1d0+TPT*(A1+TPT*(A2+TPT*(A3+TPT*(A4+TPT*TPT*(A6+TPT*TPT*A8)))))
@@ -111,7 +111,7 @@ module skye_coulomb_solid
          EB=exp(-BETA*TPT)
          EG=exp(-GAMMA*TPT)
 
-         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN ! F_{thermal}/NT
+         F=log(1.d0-EA)+log(1.d0-EB)+log(1.d0-EG)-UP/DN  ! F_{thermal}/NT
       end if
 
       U0=-CM*GAMI       ! perfect lattice
@@ -239,13 +239,13 @@ module skye_coulomb_solid
    !> Calculates the correction to the linear mixing rule for a Coulomb solid mixture
    !! by extending a two-component deltaG prescription to the multi-component case, using the
    !! prescription of Medin & Cumming 2010.
-   !! 
+   !!
    !! @param n Number of species
    !! @param AY Array of length NMIX holding the masses of species
    !! @param AZion Array of length NMIX holding the charges of species
    !! @param GAME election interaction parameter
    !! @param F mixing free energy correction per ion per kT.
-   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)      
+   function solid_mixing_rule_correction(Skye_solid_mixing_rule, n, AY, AZion, GAME) result(F)
       ! Inputs
       character(len=128), intent(in) :: Skye_solid_mixing_rule
       integer, intent(in) :: n
@@ -301,12 +301,12 @@ module skye_coulomb_solid
             ! We extend to the case of equality by grouping equal-charge species together, as above.
             if (unique_charges(j) < unique_charges(i)) cycle
 
-            RZ = unique_charges(j)/unique_charges(i) ! Charge ratio
-         
+            RZ = unique_charges(j)/unique_charges(i)  ! Charge ratio
+
             ! max avoids divergence.
             ! The contribution to F scales as abundance_sum^2, so in cases where the max returns eps
             ! we don't care much about the error this incurs.
-            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))! = x2 / (x1 + x2) in MC10's language
+            aj = charge_abundances(j) / max(eps, charge_abundances(i) + charge_abundances(j))  ! = x2 / (x1 + x2) in MC10's language
             if (Skye_solid_mixing_rule == 'Ogata') then
                dG = deltaG_Ogata93(aj, RZ)
             else if (Skye_solid_mixing_rule == 'PC') then

@@ -58,11 +58,11 @@ Use of MESA requires:
 
 1. That all publications and presentations (research, educational,
    or outreach) deriving from the use of MESA acknowledge the MESA
-   instrument papers (Paxton et al. 
-   `2011 <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`_, 
-   `2013 <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`_, 
-   `2015 <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`_, 
-   `2018 <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`_, 
+   instrument papers (Paxton et al.
+   `2011 <https://ui.adsabs.harvard.edu/abs/2011ApJS..192....3P/abstract>`_,
+   `2013 <https://ui.adsabs.harvard.edu/abs/2013ApJS..208....4P/abstract>`_,
+   `2015 <https://ui.adsabs.harvard.edu/abs/2015ApJS..220...15P/abstract>`_,
+   `2018 <https://ui.adsabs.harvard.edu/abs/2018ApJS..234...34P/abstract>`_,
    `2019 <https://ui.adsabs.harvard.edu/abs/2019ApJS..243...10P/abstract>`_,
    Jermyn et al.
    `2023 <https://ui.adsabs.harvard.edu/abs/2023ApJS..265...15J/abstract>`_)
@@ -112,10 +112,12 @@ Developers
 * Matthias Fabry
 * Ebraheem Farag
 * Eoin Farrell
+* `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
 * `Meridith Joyce <http://www.meridithjoyce.com/>`__
-* Pablo Marchant
+* `Pablo Marchant <https://orlox.github.io/>`__
 * `Philip Mocz <https://pmocz.github.io/>`__
 * `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
+* `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * Anne Thoul
 * `Frank Timmes <http://cococubed.com/>`__

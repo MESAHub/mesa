@@ -132,7 +132,7 @@ contains
     o18 = s%net_iso(io18)
     si28 = s%net_iso(isi28)
 
-    ! Determine data dimensiones
+    ! Determine data dimensions
 
     if (add_atmosphere) then
        call build_atm(s, s%L(1), s%r(1), s%Teff, s%m_grav(1), s%cgrav(1), ierr)
@@ -189,7 +189,7 @@ contains
 
     ! at the centre d²P/dr² = -4πGρ²/3
     d2P_dr2_c = -four_thirds*pi*s% cgrav(s% nz)*rho_c**2
-    P_c = s%Peos(s% nz) - 0.5*d2P_dr2_c*s% rmid(s% nz)**2
+    P_c = s%Peos(s% nz) - 0.5d0*d2P_dr2_c*s% rmid(s% nz)**2
     global_data(9) = r_outer**2*d2P_dr2_c/P_c
     global_data(10) = r_outer**2*eval_center_d2(s%rmid, s%rho, k_a(n_sg), k_b(n_sg)) / rho_c
 
@@ -202,12 +202,12 @@ contains
 
     ! global_data(13) should be the initial rotation rate, but we lack
     ! that datum
-    
+
     ! Store point data
 
     allocate(point_data(IVAR+IABUND,nn))
     point_data = 0d0
-    
+
     j = 1
 
     ! Atmosphere (we skip the point at the base of the atm to
@@ -217,7 +217,7 @@ contains
        call store_point_data_atm(j, k, k_a(1), k_b(1))
        j = j + 1
     end do atm_loop
-    
+
     ! Envelope
 
     sg = 1
@@ -235,7 +235,7 @@ contains
 
           call store_point_data_env(j, k, k_a(sg), k_b(sg))
           j = j + 1
-             
+
        endif
 
     end do env_loop
@@ -309,7 +309,7 @@ contains
            X_O17 => point_data(34,j), &
            X_Be9 => point_data(35,j), &
            X_Si28 => point_data(36,j))
-      
+
         r = s%r(1) + s%atm_structure(atm_delta_r,k)
         lnq = log(s%m_grav(1)/m_outer)
         T = exp(s%atm_structure(atm_lnT,k))
@@ -323,7 +323,7 @@ contains
         nabla_ad = s%atm_structure(atm_grada,k)
         delta = s%atm_structure(atm_chiT,k)/s%atm_structure(atm_chiRho,k)
         c_P = s%atm_structure(atm_cp,k)
-        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k)) ! check
+        rec_mu_e = exp(s%atm_structure(atm_lnfree_e,k))  ! check
 
         grav = s%cgrav(1)*s%m_grav(1)/(r*r)
         N2 = grav*grav*(rho/P)*delta*(nabla_ad - nabla)
@@ -412,7 +412,7 @@ contains
            X_O17 => point_data(34,j), &
            X_Be9 => point_data(35,j), &
            X_Si28 => point_data(36,j))
-      
+
         r = s%r(k)
         lnq = log(s%m_grav(k)/m_outer)
         T = eval_face(s%dq, s%T, k, 1, s%nz)
@@ -422,7 +422,7 @@ contains
         else
            rho = eval_face_rho(s, k, k_a, k_b)
         endif
-        nabla = s%gradT(k) ! Not quite right; gradT can be discontinuous
+        nabla = s%gradT(k)  ! Not quite right; gradT can be discontinuous
         L = s%L(k)
         kap = eval_face(s%dq, s%opacity, k, k_a, k_b)
         eps = eval_face(s%dq, s%eps_nuc, k, k_a, k_b) + eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
@@ -430,10 +430,10 @@ contains
         nabla_ad = eval_face(s%dq, s%grada, k, k_a, k_b)
         delta = eval_face(s%dq, s%chiT, k, k_a, k_b)/eval_face(s%dq, s%chiRho, k, k_a, k_b)
         c_P = eval_face(s%dq, s%cp, k, k_a, k_b)
-        rec_mu_e = exp(eval_face(s%dq, s%lnfree_e, k, k_a, k_b)) ! check
+        rec_mu_e = exp(eval_face(s%dq, s%lnfree_e, k, k_a, k_b))  ! check
         A_ast = eval_face_A_ast(s, k, k_a, k_b)
         if (s%rotation_flag) then
-           omega = s%omega(k) ! Not quite right; omega can be discontinuous
+           omega = s%omega(k)  ! Not quite right; omega can be discontinuous
         else
            omega = 0d0
         endif
@@ -527,7 +527,7 @@ contains
         nabla_ad = eval_center(s%rmid, s%grada, k_a, k_b)
         delta = eval_center(s%rmid, s%chiT, k_a, k_b)/eval_center(s%rmid, s%chiRho, k_a, k_b)
         c_P = eval_center(s%rmid, s%cp, k_a, k_b)
-        rec_mu_e = exp(eval_center(s%rmid, s%lnfree_e, k_a, k_b)) ! check
+        rec_mu_e = exp(eval_center(s%rmid, s%lnfree_e, k_a, k_b))  ! check
         A_ast = point_data(15,j)
         if (s%rotation_flag) then
            omega = eval_center(s%r, s%omega, k_a, k_b)

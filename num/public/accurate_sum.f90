@@ -5,7 +5,7 @@
       module accurate_sum
 
       use const_def
- 
+
       implicit none
 
       private
@@ -71,7 +71,7 @@
       function value(this) result(res)
         ! Inputs
         class(accurate_real), intent(in) :: this
-        real(qp) res
+        real(qp) :: res
 
         res = this % sum + this % compensator
       end function value
@@ -83,10 +83,10 @@
       ! accuracy.
       subroutine neumaier_sum(sum, compensator, summand)
          ! Inputs
-         real(qp) sum, compensator, summand
+         real(qp) :: sum, compensator, summand
 
          ! Intermediates
-         real(qp) provisional
+         real(qp) :: provisional
 
          provisional = sum + summand
          if (abs(sum) >= abs(summand)) then

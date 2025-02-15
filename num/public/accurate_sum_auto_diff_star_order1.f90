@@ -6,7 +6,7 @@
 
       use const_def
       use auto_diff
- 
+
       implicit none
 
       private
@@ -87,10 +87,10 @@
       ! accuracy.
       subroutine neumaier_sum(sum, compensator, summand)
          ! Inputs
-         type(auto_diff_real_star_order1) sum, compensator, summand
+         type(auto_diff_real_star_order1) :: sum, compensator, summand
 
          ! Intermediates
-         type(auto_diff_real_star_order1) provisional
+         type(auto_diff_real_star_order1) :: provisional
 
          provisional = sum + summand
          if (abs(sum) >= abs(summand)) then
@@ -139,7 +139,7 @@
       type(accurate_auto_diff_real_star_order1) function mult_acc_rdp(op1, op2) result (ret)
          type(accurate_auto_diff_real_star_order1), intent(in) :: op1
          real(dp), intent(in) :: op2
-         
+
          ret%sum = op1%sum * op1
          ret%compensator = op1%compensator * op1
 
@@ -148,7 +148,7 @@
       type(accurate_auto_diff_real_star_order1) function mult_rdp_acc(op1, op2) result (ret)
          real(dp), intent(in) :: op1
          type(accurate_auto_diff_real_star_order1), intent(in) :: op2
-         
+
          ret%sum = op2%sum * op1
          ret%compensator = op2%compensator * op1
 

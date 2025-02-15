@@ -4,7 +4,7 @@ Table Atmospheres
 When the ``atm_option`` control is set to ``'table'``, MESA uses
 pre-computed tables from separate model atmosphere calculations to
 interpolate :math:`T_{\rm surf}` and :math:`P_{\rm surf}` values for
-the boundary conditions. The interpolations are peformed using
+the boundary conditions. The interpolations are performed using
 :math:`T_{\rm eff}` and :math:`\log g` as independent variables. The
 ``atm_table`` control determines the choice of table, as follows:
 
@@ -30,15 +30,15 @@ the boundary conditions. The interpolations are peformed using
    * - ``'tau_10'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 10`.
-  
+
    * - ``'tau_1'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 1`.
-  
+
    * - ``'tau_1m1'``
      - Same as ``'tau_100'``, except that surface optical depth is
        :math:`\tau_{\rm surf} = 0.1`.
-  
+
    * - ``'WD_tau_25'``
      - Use model atmospheres for cool white dwarfs, via Rohrmann et
        al. (2011, MNRAS, 411, 781) treatment. Surface optical depth

@@ -21,20 +21,20 @@
 ! ***********************************************************************
 
       module create_EXCOR7_table
-      
+
       use const_def
       use chem_def
       use utils_lib, only: is_bad
       use math_lib
-      
+
       implicit none
 
       public :: do_create_EXCOR7_table
       private
 
-      
+
    contains
-   
+
    subroutine do_create_EXCOR7_table(fname)
       character (len=*), intent(in) :: fname
       real(dp) :: logRS, logRS_min, logRS_max, dlogRS
@@ -47,19 +47,19 @@
       logRS_max = 0.0d0
       dlogRS = 1d-2
       nlogRS = (logRS_max - logRS_min)/dlogRS + 1
-      
+
       logGAME_min = -2d0
       logGAME_max = 4d0
       dlogGAME = 1d-2
       nlogGAME = (logGAME_max - logGAME_min)/dlogGAME + 1
-                  
+
       !write(*,'(a)') 'create ' // trim(fname)
 
       open(newunit=io_unit,file=trim(fname))
-      
+
       write(io_unit,'(99(a14))') 'num logRS', 'logRS min', 'logRS max', 'del logRS', &
       		'num logGAME', 'logGAME min', 'logGAME max', 'del logGAME'
-      
+
       write(io_unit,'(2(i10,4x,3(f14.4)),i10)') &
          nlogRS, logRS_min, logRS_max, dlogRS, &
          nlogGAME, logGAME_min, logGAME_max, dlogGAME, 0
@@ -67,7 +67,7 @@
       do i = 1, nlogRS
          logRS = logRS_min + (i-1) * dlogRS
          RS = exp10(logRS)
-         write(io_unit,'(/,7x,a)') 'logRS' 
+         write(io_unit,'(/,7x,a)') 'logRS'
          write(io_unit,'(2x,f14.6/)') logRS
          write(io_unit,'(99(a26))') &
             'logGAME', 'FXC', 'UXC', 'PXC', 'CVXC', 'SXC', 'PDTXC', 'PDRXC', 'RS', 'GAME'
@@ -87,7 +87,7 @@
       write(io_unit,*)
       write(io_unit,*)
       close(io_unit)
-         
+
    end subroutine do_create_EXCOR7_table
 
 
@@ -131,19 +131,19 @@
       real(dp) :: FXCDH, FXCDHH, FXCDG, FXCDGG, FXCDHG
       real(dp) :: PDLH, PDLG
       include 'formats'
-      THETA=0.543d0*RS/GAME ! non-relativistic degeneracy parameter
+      THETA=0.543d0*RS/GAME  ! non-relativistic degeneracy parameter
       SQTH=sqrt(THETA)
       THETA2=THETA*THETA
       THETA3=THETA2*THETA
       THETA4=THETA3*THETA
-      if (THETA.gt..005d0) then
+      if (THETA>.005d0) then
          CHT1=cosh(1.d0/THETA)
          SHT1=sinh(1.d0/THETA)
          CHT2=cosh(1.d0/SQTH)
          SHT2=sinh(1.d0/SQTH)
-         T1=SHT1/CHT1 ! dtanh(1.d0/THETA)
-         T2=SHT2/CHT2 ! dtanh(1./sqrt(THETA))
-         T1DH=-1.d0/((THETA*CHT1)*(THETA*CHT1)) ! d T1 / d\theta
+         T1=SHT1/CHT1  ! dtanh(1.d0/THETA)
+         T2=SHT2/CHT2  ! dtanh(1./sqrt(THETA))
+         T1DH=-1.d0/((THETA*CHT1)*(THETA*CHT1))  ! d T1 / d\theta
          T1DHH=2.d0/pow3(THETA*CHT1)*(CHT1-SHT1/THETA)
          T2DH=-0.5d0*SQTH/((THETA*CHT2)*(THETA*CHT2))
          T2DHH=(0.75d0*SQTH*CHT2-0.5d0*SHT2)/pow3(THETA*CHT2)
@@ -161,7 +161,7 @@
       A1=1d0+8.31051d0*THETA2+5.1105d0*THETA4
       A1DH=16.62102d0*THETA+20.442d0*THETA3
       A1DHH=16.62102d0+61.326d0*THETA2
-      A=0.610887d0*A0/A1*T1 ! HF fit of Perrot and Dharma-wardana
+      A=0.610887d0*A0/A1*T1  ! HF fit of Perrot and Dharma-wardana
       AH=A0DH/A0-A1DH/A1+T1DH/T1
       ADH=A*AH
       ADHH=ADH*AH+A*(A0DHH/A0-pow2(A0DH/A0)-A1DHH/A1+pow2(A1DH/A1) &
@@ -211,7 +211,7 @@
       S1H=CDH/C-EDH/E
       S1DH=S1*S1H
       S1DHH=S1DH*S1H+S1*(CDHH/C-pow2(CDH/C)-EDHH/E+pow2(EDH/E))
-      S1DG=-C/E ! => S1DGG=0
+      S1DG=-C/E  ! => S1DGG=0
       S1DHG=S1DG*(CDH/C-EDH/E)
       B2=B-C*D/E
       B2DH=BDH-(CDH*D+C*DDH)/E+C*D*EDH/(E*E)
@@ -291,15 +291,15 @@
       PXC=(GAME*FXCDG-2d0*THETA*FXCDH)/3.d0
       UXC=GAME*FXCDG-THETA*FXCDH
       SXC=(GAME*S2DG-S2+GAME*S3DG-S3+S4A*S4B*(GAME*S4CDG-S4C))-THETA*FXCDH
-      if (abs(SXC).lt.1.d-9*abs(THETA*FXCDH)) SXC=0.d0 ! accuracy loss
+      if (abs(SXC)<1.d-9*abs(THETA*FXCDH)) SXC=0.d0  ! accuracy loss
       CVXC=2d0*THETA*(GAME*FXCDHG-FXCDH)-THETA*THETA*FXCDHH-GAME*GAME*FXCDGG
-      if (abs(CVXC).lt.1.d-9*abs(GAME*GAME*FXCDGG)) CVXC=0.d0 ! accuracy
+      if (abs(CVXC)<1.d-9*abs(GAME*GAME*FXCDGG)) CVXC=0.d0  ! accuracy
       PDLH=THETA*(GAME*FXCDHG-2d0*FXCDH-2d0*THETA*FXCDHH)/3.d0
       PDLG=GAME*(FXCDG+GAME*FXCDGG-2d0*THETA*FXCDHG)/3.d0
       PDRXC=PXC+(PDLG-2d0*PDLH)/3.d0
       PDTXC=GAME*(THETA*FXCDHG-GAME*FXCDGG/3.d0)-THETA*(FXCDH/0.75d0+THETA*FXCDHH/1.5d0)
       return
       end subroutine EXCOR7
-      
-      
+
+
       end module create_EXCOR7_table

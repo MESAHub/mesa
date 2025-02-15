@@ -81,7 +81,7 @@
          nz = s% nz
 
          s% num_diffusion_solver_steps = 0
-         
+
          s% eps_diffusion(1:nz) = 0d0
          do k = 1, nz
             s% energy_start(k) = s% energy(k)
@@ -90,7 +90,7 @@
          end do
 
          if ((.not. s% do_element_diffusion) .or. dt < s% diffusion_dt_limit) then
-            s% num_diffusion_solver_iters = 0 ! Flush diff iters to avoid crashing the timestep.
+            s% num_diffusion_solver_iters = 0  ! Flush diff iters to avoid crashing the timestep.
             s% edv(:,1:nz) = 0
             s% eps_WD_sedimentation(1:nz) = 0d0
             if (s% do_element_diffusion .and. s% report_ierr .and. dt < s% diffusion_dt_limit) &
@@ -98,7 +98,7 @@
                   s% model_number, dt, s% diffusion_dt_limit
             return
          end if
-                         
+
          s% need_to_setvars = .true.
 
          if (s% use_other_diffusion_factor) then
@@ -115,8 +115,8 @@
                write(*,*) 'do_element_diffusion failed in other_diffusion_factor'
             return
          end if
-         
-         if (s% doing_timing) call start_time(s, time0, total)  
+
+         if (s% doing_timing) call start_time(s, time0, total)
 
          nz = s% nz
          nzlo = 1
@@ -199,7 +199,7 @@
                   nzlo=k; exit
                endif
             end do
-            nzlo = kk + (nzlo - kk)*4/5 ! back up into the convection zone
+            nzlo = kk + (nzlo - kk)*4/5  ! back up into the convection zone
          end if
 
          !write(*,3) 'nzlo mixing_type', nzlo, s% mixing_type(nzlo)
@@ -214,7 +214,7 @@
                   nzhi=k; exit
                end if
             end do
-            nzhi = (3*nzhi+nz)/4 ! back up some into the convection zone
+            nzhi = (3*nzhi+nz)/4  ! back up some into the convection zone
          end if
 
          if (s% do_phase_separation .and. s% phase_separation_no_diffusion) then
@@ -229,7 +229,7 @@
 
          if(s% diffusion_use_full_net) then
             do j=1,nc
-               class_chem_id(j) = s% chem_id(j) ! Just a 1-1 map between classes and chem_ids.
+               class_chem_id(j) = s% chem_id(j)  ! Just a 1-1 map between classes and chem_ids.
             end do
          else
             do j=1,nc
@@ -251,9 +251,9 @@
          dumping = (s% diffusion_call_number == s% diffusion_dump_call_number)
 
          if ( s% diffusion_use_full_net ) then
-            s% diffusion_calculates_ionization = .true. ! class_typical_charges can't be used, so make sure they aren't.
+            s% diffusion_calculates_ionization = .true.  ! class_typical_charges can't be used, so make sure they aren't.
          end if
-         
+
          if (.not. s% diffusion_calculates_ionization) then
             do j=1,nc
                typical_charge(j,1:nz) = s% diffusion_class_typical_charge(j)
@@ -306,7 +306,7 @@
          ! print *, "class_chem_id:  ", class_chem_id
          ! print *, "class:          ", class
          ! print *, "class name:     ", class_name
-         
+
          ! args are at cell center points.
          !if (s% show_diffusion_info) write(*,*) 'call solve_diffusion'
          !write(*,4) 'call do_solve_diffusion nzlo nzhi nz', nzlo, nzhi, nz, &
@@ -368,7 +368,7 @@
          end if
 
          if (dumping) call mesa_error(__FILE__,__LINE__,'debug: dump_diffusion_info')
-         
+
          do k=nzlo+1,nzhi
             do j=1,species
                i = class(j)
@@ -385,7 +385,7 @@
             write(*,*) "do_diffusion_heating is incompatible with do_WD_sedimentation_heating"
             write(*,*) "at least one of these options must be set to .false."
             call mesa_error(__FILE__,__LINE__,'do_element_diffusion')
-         end if         
+         end if
 
          s% eps_WD_sedimentation(1:nz) = 0d0
 
@@ -415,31 +415,31 @@
             end do
          end if
 
-         
+
          do k=1,nzlo
             do j=1,species
                s% diffusion_D_self(j,k) = s% diffusion_D_self(j,nzlo+1)
-               s% edv(j,k) = 0d0 ! s% edv(j,nzlo+1)
+               s% edv(j,k) = 0d0  ! s% edv(j,nzlo+1)
                s% v_rad(j,k) = s% v_rad(j,nzlo+1)
                s% g_rad(j,k) = s% g_rad(j,nzlo+1)
                s% typical_charge(j,k) = s% typical_charge(j,nzlo+1)
                s% diffusion_dX(j,k) = s% xa(j,k) - xa_save(j,k)
             end do
-            s% E_field(k) = 0d0 ! s% E_field(nzlo+1)
-            s% g_field_element_diffusion(k) = 0d0 ! s% g_field_element_diffusion(nzlo+1)
+            s% E_field(k) = 0d0  ! s% E_field(nzlo+1)
+            s% g_field_element_diffusion(k) = 0d0  ! s% g_field_element_diffusion(nzlo+1)
          end do
 
          do k=nzhi+1,nz
             do j=1,species
                s% diffusion_D_self(j,k) = s% diffusion_D_self(j,nzhi)
-               s% edv(j,k) = 0d0 ! s% edv(j,nzhi)
+               s% edv(j,k) = 0d0  ! s% edv(j,nzhi)
                s% v_rad(j,k) = s% v_rad(j,nzhi)
                s% g_rad(j,k) = s% g_rad(j,nzhi)
                s% typical_charge(j,k) = s% typical_charge(j,nzhi)
                s% diffusion_dX(j,k) = s% xa(j,k) - xa_save(j,k)
             end do
-            s% E_field(k) = 0d0 ! s% E_field(nzhi)
-            s% g_field_element_diffusion(k) = 0d0 ! s% g_field_element_diffusion(nzhi)
+            s% E_field(k) = 0d0  ! s% E_field(nzhi)
+            s% g_field_element_diffusion(k) = 0d0  ! s% g_field_element_diffusion(nzhi)
          end do
 
          if (s% doing_timing) call update_time(s, time0, total, s% time_element_diffusion)
@@ -570,22 +570,22 @@
             grav = -s% cgrav(k)*s% m(k)/s% r(k)**2
             area = pi4*s% r(k)**2
             P_face = 0.5d0*(s% Peos(k) + s% Peos(k-1))
-            dlnPdm(k) = grav/(area*P_face) ! estimate based on QHSE
+            dlnPdm(k) = grav/(area*P_face)  ! estimate based on QHSE
             dlnT_dm(k) = s% gradT(k)*dlnPdm(k)
          end subroutine set1_extras
 
 
       end subroutine do_element_diffusion
-      
+
       subroutine finish_element_diffusion(s,dt)
         type (star_info), pointer :: s
         real(dp), intent(in) :: dt
         integer :: k
-        
+
         do k=1,s% nz
            s% eps_diffusion(k) = (s% energy_start(k) - s% energy(k))/dt
         end do
-        
+
       end subroutine finish_element_diffusion
 
       end module element_diffusion

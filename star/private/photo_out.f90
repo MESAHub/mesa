@@ -51,13 +51,13 @@
          ierr = 0
          nz = s% nz
 
-         part_number = 0 ! part_numbers are just a consistency check on the data file
+         part_number = 0  ! part_numbers are just a consistency check on the data file
 
          write(iounit) star_def_version
-         
+
          call write_part_number(iounit)
          write(iounit) &
-            s% initial_z, & ! need this since read_model can change what is in the inlist
+            s% initial_z, &  ! need this since read_model can change what is in the inlist
             s% total_num_solver_iterations, &
             s% nz, s% nvar_hydro, s% nvar_chem, s% nvar_total, &
             s% v_flag, s% u_flag, s% rotation_flag, s% RSP2_flag, s% RSP_flag, &
@@ -84,7 +84,7 @@
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
             s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz), &
-            s% D_ST_start(1:nz), s% nu_ST_start(1:nz), & ! needed for ST time smoothing
+            s% D_ST_start(1:nz), s% nu_ST_start(1:nz), &  ! needed for ST time smoothing
             s% have_ST_start_info
 
          call write_part_number(iounit)
@@ -108,12 +108,12 @@
          write(iounit) &
             s% recent_log_header, s% phase_of_evolution, s% dt_next, s% dt_next_unclipped
 
-         call write_part_number(iounit) 
+         call write_part_number(iounit)
          write(iounit) &
-            s% num_skipped_setvars, s% num_retries, s% num_setvars, &  
+            s% num_skipped_setvars, s% num_retries, s% num_setvars, &
             s% total_num_solver_iterations, &
             s% total_num_solver_relax_iterations, &
-            s% total_num_solver_calls_made, &            
+            s% total_num_solver_calls_made, &
             s% total_num_solver_relax_calls_made, &
             s% total_num_solver_calls_converged, &
             s% total_num_solver_relax_calls_converged, &
@@ -150,7 +150,7 @@
             write(iounit) len_history_col_spec
             write(iounit) s% history_column_spec(1:len_history_col_spec)
          else
-            write(iounit) 0 ! len_log_col_spec
+            write(iounit) 0  ! len_log_col_spec
          end if
 
          write(iounit)  &
@@ -162,7 +162,7 @@
                write(iounit) s% history_names(k)
             end do
          end if
-         
+
          if (s% rsp_flag) call rsp_photo_out(s, iounit)
 
          call write_part_number(iounit)
@@ -170,7 +170,7 @@
          call s% other_photo_write(s% id, iounit)
 
          call write_part_number(iounit)
-         
+
          s% need_to_setvars = .true.
 
          contains

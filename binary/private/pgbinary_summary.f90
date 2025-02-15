@@ -403,7 +403,7 @@ contains
          real(dp) :: val
 
          call get_binary_history_specs(&
-            b, num_rows, Text_Summary_name(:, col), specs)
+            b, num_rows, Text_Summary_name(:, col), specs, .false.)
          call get_binary_history_values(&
             b, num_rows, specs, &
             is_int_value, int_values, values, failed_to_find_value)

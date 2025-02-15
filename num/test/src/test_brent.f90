@@ -1,31 +1,31 @@
       module test_brent
-      
+
       use num_def
       use num_lib
       use math_lib
       use utils_lib, only: mesa_error
       use const_def, only: dp
-      
+
       implicit none
-      
+
       logical, parameter :: dbg = .false.
 
 
       contains
 
-      
+
       subroutine do_test_brent
          write(*,*) 'test brent'
-         
+
          call test_global_min_all
-         
+
          call test_local_min_all
 
          call test_brent_zero
 
       end subroutine do_test_brent
-      
-      
+
+
       subroutine test_global_min_all
 
       !*****************************************************************************80
@@ -34,7 +34,7 @@
       !
       !  Licensing:
       !
-      !    This code is distributed under the GNU LGPL license. 
+      !    This code is distributed under the GNU LGPL license.
       !
       !  Modified:
       !
@@ -46,13 +46,13 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) c
-        real(dp) e
-        real(dp) m
-        real(dp) machep
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: c
+        real(dp) :: e
+        real(dp) :: m
+        real(dp) :: machep
+        real(dp) :: t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_GLOMIN_ALL'
@@ -138,18 +138,19 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
 
-        real      (dp) fa
-        real      (dp) fb
-        real      (dp) fx
-        character ( len = *  ) title
-        real      (dp) x
+        real      (dp) :: fa
+        real      (dp) :: fb
+        real      (dp) :: fx
+        character ( len = *  ) :: title
+        real      (dp) :: x
         integer :: max_tries, ierr
         include 'formats'
-        
+
         max_tries = 10000
         ierr = 0
         fx = brent_global_min ( max_tries, a, b, c, m, machep, e, t, f, x, ierr )
@@ -173,27 +174,27 @@
          real(dp), intent(in) :: x
          h_01 = 2.0D+00 - x
       end function h_01
-      
+
       real(dp) function h_02 ( x )
          real(dp), intent(in) :: x
          h_02 = x * x
       end function h_02
-      
+
       real(dp) function h_03 ( x )
          real(dp), intent(in) :: x
          h_03 = x * x * ( x + 1.0D+00 )
       end function h_03
-      
+
       real(dp) function h_04 ( x )
          real(dp), intent(in) :: x
          h_04 = ( x + sin ( x ) ) * exp( - x * x )
       end function h_04
-      
+
       real(dp) function h_05 ( x )
          real(dp), intent(in) :: x
          h_05 = ( x - sin ( x ) ) * exp( - x * x )
       end function h_05
-      
+
 
       subroutine test_local_min_all
 
@@ -203,7 +204,7 @@
       !
       !  Licensing:
       !
-      !    This code is distributed under the GNU LGPL license. 
+      !    This code is distributed under the GNU LGPL license.
       !
       !  Modified:
       !
@@ -215,10 +216,10 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) eps
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: eps
+        real(dp) :: t
 
         write ( *, '(a)' ) ' '
         write ( *, '(a)' ) 'TEST_LOCAL_MIN_ALL'
@@ -271,7 +272,7 @@
       !
       !  Licensing:
       !
-      !    This code is distributed under the GNU LGPL license. 
+      !    This code is distributed under the GNU LGPL license.
       !
       !  Modified:
       !
@@ -300,18 +301,19 @@
          interface
             real(dp) function f(x)
                use const_def, only: dp
+               implicit none
                real(dp), intent(in) :: x
             end function f
          end interface
          character (len=*) :: title
 
-        real      (dp) fa
-        real      (dp) fb
-        real      (dp) fx
-        real      (dp) x
+        real      (dp) :: fa
+        real      (dp) :: fb
+        real      (dp) :: fx
+        real      (dp) :: x
         integer :: max_tries, ierr
         include 'formats'
-        
+
         max_tries = 10000
         ierr = 0
         fx = brent_local_min(max_tries, a, b, eps, t, f, x, ierr)
@@ -334,22 +336,22 @@
          real(dp), intent(in) :: x
          g_01 = ( x - 2.0D+00 ) * ( x - 2.0D+00 ) + 1.0D+00
       end function g_01
-      
+
       real(dp) function g_02 ( x )
          real(dp), intent(in) :: x
          g_02 = x * x + exp( - x )
       end function g_02
-      
+
       real(dp) function g_03 ( x )
          real(dp), intent(in) :: x
          g_03 = ( ( x * x + 2.0D+00 ) * x + 1.0D+00 ) * x + 3.0D+00
       end function g_03
-      
+
       real(dp) function g_04 ( x )
          real(dp), intent(in) :: x
          g_04 = exp( x ) + 0.01D+00 / x
       end function g_04
-      
+
       real(dp) function g_05 ( x )
          real(dp), intent(in) :: x
          g_05 = exp( x ) - 2.0D+00 * x + 0.01D+00 / x - 0.000001D+00 / x / x
@@ -360,56 +362,56 @@
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_01 = sin ( x ) - 0.5D+00 * x
          ierr = 0
          dfdx = 0
       end function f_01
-      
+
       real(dp) function f_02 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_02 = 2.0D+00 * x - exp( - x )
          ierr = 0
          dfdx = 0
       end function f_02
-      
+
       real(dp) function f_03 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_03 = x * exp( - x )
          ierr = 0
          dfdx = 0
       end function f_03
-      
+
       real(dp) function f_04 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_04 = exp( x ) - 1.0D+00 / 100.0D+00 / x / x
          ierr = 0
          dfdx = 0
       end function f_04
-      
+
       real(dp) function f_05 ( x, dfdx, lrpar, rpar, lipar, ipar, ierr )
          integer, intent(in) :: lrpar, lipar
          real(dp), intent(in) :: x
          real(dp), intent(out) :: dfdx
-         integer, intent(inout), pointer :: ipar(:) ! (lipar)
-         real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
+         integer, intent(inout), pointer :: ipar(:)  ! (lipar)
+         real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          integer, intent(out) :: ierr
          f_05 = ( x + 3.0D+00 ) * ( x - 1.0D+00 ) * ( x - 1.0D+00 )
          ierr = 0
@@ -425,7 +427,7 @@
       !
       !  Licensing:
       !
-      !    This code is distributed under the GNU LGPL license. 
+      !    This code is distributed under the GNU LGPL license.
       !
       !  Modified:
       !
@@ -437,10 +439,10 @@
       !
         implicit none
 
-        real(dp) a
-        real(dp) b
-        real(dp) machep
-        real(dp) t
+        real(dp) :: a
+        real(dp) :: b
+        real(dp) :: machep
+        real(dp) :: t
 
         machep = epsilon ( machep )
         t = machep
@@ -488,7 +490,7 @@
       !
       !  Licensing:
       !
-      !    This code is distributed under the GNU LGPL license. 
+      !    This code is distributed under the GNU LGPL license.
       !
       !  Modified:
       !
@@ -517,7 +519,7 @@
         implicit none
 
        interface
-          include 'num_root_fcn.dek' ! f provides function values
+          include 'num_root_fcn.dek'  ! f provides function values
        end interface
 
         real(dp) a
@@ -530,20 +532,20 @@
         character ( len = *  ) title
         real(dp) z
         real(dp) dfdx
-        
+
         integer, parameter :: lrpar = 0, lipar = 0
         integer :: ierr
-        real(dp), target :: rpar_ary(lrpar) 
+        real(dp), target :: rpar_ary(lrpar)
         integer, target :: ipar_ary(lipar)
         real(dp), pointer :: rpar(:)
         integer, pointer :: ipar(:)
-        
+
         include 'formats'
-         
+
          rpar => rpar_ary
          ipar => ipar_ary
-            
-        
+
+
         ierr = 0
         fa = f ( a, dfdx, lrpar, rpar, lipar, ipar, ierr )
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
@@ -553,7 +555,7 @@
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
         fz = f ( z, dfdx, lrpar, rpar, lipar, ipar, ierr )
         if (ierr /= 0) call mesa_error(__FILE__,__LINE__)
-        
+
         if (abs(fz) < 1d-14) return
 
         write ( *, '(a)' ) ' '
@@ -564,6 +566,6 @@
 
         return
       end subroutine test_zero_one
-      
+
 
       end module test_brent

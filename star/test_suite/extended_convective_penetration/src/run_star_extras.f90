@@ -53,13 +53,13 @@
          s% how_many_extra_history_columns => how_many_extra_history_columns
          s% data_for_extra_history_columns => data_for_extra_history_columns
          s% how_many_extra_profile_columns => how_many_extra_profile_columns
-         s% data_for_extra_profile_columns => data_for_extra_profile_columns           
-        
+         s% data_for_extra_profile_columns => data_for_extra_profile_columns
+
         if (s% job% create_pre_main_sequence_model) return
-        
+
         s% other_adjust_mlt_gradT_fraction => other_adjust_mlt_gradT_fraction_Peclet
         s% other_overshooting_scheme => extended_convective_penetration
-        
+
     end subroutine extras_controls
 
     subroutine extras_startup(id, restart, ierr)
@@ -93,8 +93,8 @@
          if (ierr /= 0) return
          how_many_extra_history_columns = 0
       end function how_many_extra_history_columns
-      
-      
+
+
       subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
          integer, intent(in) :: id, n
          character (len=maxlen_history_column_name) :: names(n)
@@ -106,7 +106,7 @@
          if (ierr /= 0) return
       end subroutine data_for_extra_history_columns
 
-      
+
       integer function how_many_extra_profile_columns(id)
          use star_def, only: star_info
          integer, intent(in) :: id
@@ -117,8 +117,8 @@
          if (ierr /= 0) return
          how_many_extra_profile_columns = 0
       end function how_many_extra_profile_columns
-      
-      
+
+
       subroutine data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
          use star_def, only: star_info, maxlen_profile_column_name
          use const_def, only: dp
@@ -132,7 +132,7 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
       end subroutine data_for_extra_profile_columns
-      
+
 
       integer function extras_check_model(id)
          integer, intent(in) :: id
@@ -141,10 +141,10 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_check_model = keep_going         
+         extras_check_model = keep_going
       end function extras_check_model
-      
-      
+
+
     subroutine extras_after_evolve(id, ierr)
         use num_lib
         integer, intent(in) :: id
@@ -164,7 +164,7 @@
         if (ierr /= 0) return
 
         call test_suite_after_evolve(s, ierr)
-        
+
         if (s% job% create_pre_main_sequence_model) return
 
         write(*,'(A)')
@@ -172,7 +172,7 @@
         k2 = 0
         k3 = 0
         k4 = 0
-        
+
         do k = s% nz, 1, -1
            if (s% m(k) > 0.8_dp*Msun .and. k1 == 0) k1 = k
            if (s% m(k) > 0.95_dp*Msun .and. k2 == 0) k2 = k
@@ -231,7 +231,7 @@
                 okay = .false.
             end if
         end subroutine check_int
-      
+
     end subroutine extras_after_evolve
 
 
@@ -393,7 +393,7 @@
 
         if(is_bad(s% D_mix(1))) return
 
-        if (s%num_conv_boundaries < 1) then ! Is zero at initialisation of the run
+        if (s%num_conv_boundaries < 1) then  ! Is zero at initialisation of the run
            if (DEBUG) then
               write(*,*) 'runstarex_gradT: skip since there are no convective boundaries'
            end if
@@ -407,7 +407,7 @@
 
             if (Peclet_number >= 100.0_dp) then
                 fraction = 1.0_dp
-            else if (Peclet_number .le. 0.01_dp) then
+            else if (Peclet_number <= 0.01_dp) then
                 fraction = 0.0_dp
             else
                 fraction = (safe_log10(Peclet_number)+2.0_dp)/4.0_dp

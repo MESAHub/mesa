@@ -32,14 +32,14 @@ module eoscms_eval
    use math_lib
    use interp_2d_lib_db
 
-   implicit none      
+   implicit none
 
    logical, parameter :: CMS_cubic_in_X = .false.
-   
+
    integer, parameter :: CMS_num_Xs = 11
    integer, parameter :: min_for_cubic = 2
    integer, parameter :: max_for_cubic = CMS_num_Xs - 2
-   
+
    character(len=3) :: CMS_Xstr(CMS_num_Xs) = ['000','010','020','030','040','050','060','070','080','090','100']
 
    real(dp) :: CMS_Xvals(CMS_num_Xs) = [ 0.0_dp, 0.1_dp, 0.2_dp, 0.3_dp, 0.4_dp, 0.5_dp, 0.6_dp, 0.7_dp, 0.8_dp, 0.9_dp, 1.0_dp]
@@ -61,7 +61,7 @@ module eoscms_eval
 
    type(eosCMS_X_Info), target :: eosCMS_X_data(CMS_num_Xs)
    logical :: eosCMS_X_loaded(CMS_num_Xs) = .false.
-   
+
 contains
 
    subroutine eosCMS_init(ierr)
@@ -70,7 +70,7 @@ contains
       ierr=0
    end subroutine eosCMS_init
 
-   
+
    subroutine Get_CMS_alfa( &
       rq, logRho, logT, Z, abar, zbar, &
       alfa, d_alfa_dlogT, d_alfa_dlogRho, &
@@ -184,14 +184,14 @@ contains
       real(dp) :: alfa, beta, dbeta_dX, dalfa_dX, xx(4), y(4), a(3), dX
       rq => eos_handles(handle)
 
-      if(rq% CMS_use_fixed_composition)then !do fixed composition (one table only)
+      if(rq% CMS_use_fixed_composition)then  !do fixed composition (one table only)
 
          if(rq% CMS_fixed_composition_index < 0 .or. rq% CMS_fixed_composition_index > 10)then
             write(*,*) 'invalid value for CMS_fixed_composition_index.  See eos.defaults.'
             ierr=-1
             return
          endif
-         
+
          iX = rq% CMS_fixed_composition_index + 1
 
          call eval_eosCMS_fixed_X(iX,logRho,logT,res,d_dlnT,d_dlnd,ierr)
@@ -204,8 +204,8 @@ contains
          ! composition derivatives; here composition is constant so no change
          d_dxa = 0
 
-         
-      else !do full composition
+
+      else  !do full composition
          !locate X values in the tables such that Xvals(iX) <= X < Xvals(iX+1)
          if (X <= CMS_Xvals(1)) then
             iX = 1
@@ -233,7 +233,7 @@ contains
                return
             endif
             XX(1:4) = CMS_Xvals(iX-1:iX+2)
-            dX=X-CMS_Xvals(iX) ! assumes fixed dX spacing
+            dX=X-CMS_Xvals(iX)  ! assumes fixed dX spacing
             do i=1,nv
                !result
                y(1:4) = [res1(i), res2(i), res3(i), res4(i)]
@@ -250,7 +250,7 @@ contains
                call interp_4pt_pm(XX,y,a)
                d_dlnd(i) = y(2) + dX*(a(1) + dX*(a(2) + dX*a(3)))
             enddo
-         else !linear interpolation in X
+         else  !linear interpolation in X
             call eval_eosCMS_fixed_X(iX  ,logRho,logT,res1,dres1_dlnT,dres1_dlnRho,ierr)
             call eval_eosCMS_fixed_X(iX+1,logRho,logT,res2,dres2_dlnT,dres2_dlnRho,ierr)
             if(ierr/=0) then
@@ -269,12 +269,12 @@ contains
 
          ! composition derivatives
          do i=1,species
-            select case(chem_isos% Z(chem_id(i))) ! charge
-            case (1) ! X
+            select case(chem_isos% Z(chem_id(i)))  ! charge
+            case (1)  ! X
                d_dxa(:,i) = d_dX
-            case (2) ! Y
+            case (2)  ! Y
                d_dxa(:,i) = 0
-            case default ! Z
+            case default  ! Z
                d_dxa(:,i) = 0
             end select
          end do
@@ -302,7 +302,7 @@ contains
 
       ! mark this one
       res(i_frac_CMS) = 1.0
-      
+
    end subroutine get_CMS_for_eosdt
 
 
@@ -461,7 +461,7 @@ contains
 
    end subroutine include_radiation
 
-  
+
    subroutine eval_eosCMS_fixed_X(iX,logRho,logT,res,dres_dlnT,dres_dlnRho,ierr)
       use eosdt_support, only: Do_EoS_Interpolations
       integer, intent(in) :: iX
@@ -472,14 +472,14 @@ contains
       integer :: iRho, iT
       real(dp) :: fval(nv), df_dx(nv), df_dy(nv)
       real(dp) :: logT0, logRho0, logT1, logRho1, my_logT, my_logRho
-      ierr = 0 
+      ierr = 0
 !$OMP CRITICAL(OMP_CRITICAL_IX)
       if(.not.eosCMS_X_loaded(iX)) call load_eosCMS_table(iX,ierr)
 !$OMP END CRITICAL(OMP_CRITICAL_IX)
 
       my_logT = logT
       my_logRho = logRho
-      
+
       c => eosCMS_X_data(iX)
 
       call locate_logRho(c, my_logRho, iRho, logRho0, logRho1)
@@ -534,7 +534,7 @@ contains
       endif
    end subroutine locate_logT
 
-   
+
    subroutine locate_logRho(c,logRho, iRho, logRho0, logRho1)
       type(eosCMS_X_info), pointer :: c
       real(dp), intent(inout) :: logRho
@@ -558,7 +558,7 @@ contains
          logRho1 = logRho0 + c% delta_logRho
       endif
    end subroutine locate_logRho
-   
+
    subroutine load_eosCMS_table(iX, ierr)
       integer, intent(in) :: iX
       integer, intent(out) :: ierr
@@ -573,7 +573,7 @@ contains
       real(dp) :: X_in, Z_in
 
       ierr=0
-      c => eosCMS_X_data(iX) 
+      c => eosCMS_X_data(iX)
       vec => vec_ary
 
       data_sub_dir = '/eosCMS_data/'
@@ -588,7 +588,7 @@ contains
          return
       endif
 
-      read(io,*) !header
+      read(io,*)  !header
       read(io,'(a)') message
       call str_to_vector(message, vec, n, ierr)
       if(ierr/=0) return
@@ -607,7 +607,7 @@ contains
 
       allocate(c% logTs(c% num_logTs))
       allocate(c% logRhos(c% num_logRhos))
-      
+
       c% logTs(1) = c% logT_min
       do i = 2, c% num_logTs
          c% logTs(i) = c% logTs(i-1) + c% delta_logT
@@ -627,9 +627,9 @@ contains
          ierr=-1
          return
       endif
-      
-      read(io,*) !header
-      read(io,*) !header
+
+      read(io,*)  !header
+      read(io,*)  !header
 
       allocate(c% tbl1(sz_per_eos_point * nv * c% num_logRhos * c% num_logTs))
       tbl(1:sz_per_eos_point, 1:nv, 1:c% num_logTs, 1:c% num_logRhos) => &
@@ -639,7 +639,7 @@ contains
       f1 => f1_ary
       f(1:sz_per_eos_point,1:c% num_logTs,1:c% num_logRhos) => &
          f1(1:sz_per_eos_point*c% num_logTs*c% num_logRhos)
-            
+
       do i=1,c% num_logTs
          do j=1,c% num_logRhos
             read(io,'(a)') message
@@ -666,7 +666,7 @@ contains
             tbl(1,i_eta,i,j)      = vec(18)
          enddo
       enddo
-      
+
       close(io)
 
       ! logT is "x"
@@ -679,7 +679,7 @@ contains
       ibcxmax = 0; bcxmax(:) = 0
       ibcymin = 0; bcymin(:) = 0
       ibcymax = 0; bcymax(:) = 0
-      
+
       !create table for bicubic spline
       do v = 1, nv
          do j = 1, c% num_logRhos
@@ -687,7 +687,7 @@ contains
                f(1,i,j) = tbl(1,v,i,j)
             enddo
          enddo
-      
+
          call interp_mkbicub_db( &
             c% logTs, c% num_logTs, c% logRhos, c% num_logRhos, f1, c% num_logTs, &
             ibcxmin, bcxmin, ibcxmax, bcxmax, ibcymin, bcymin, ibcymax, bcymax, &
@@ -703,7 +703,7 @@ contains
       enddo
 
       if(ierr==0) eosCMS_X_loaded(iX) = .true.
-      
+
    end subroutine load_eosCMS_table
 
 end module eoscms_eval

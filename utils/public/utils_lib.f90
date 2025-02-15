@@ -26,7 +26,7 @@
 module utils_lib
 
   ! Uses
-  
+
   use utils_def, only: max_io_unit
   use const_def, only: dp, qp, strlen
 
@@ -71,7 +71,7 @@ contains
 
   subroutine get_compiler_version(compiler_name,compiler_version_name)
     character(len=*) :: compiler_name, compiler_version_name
-    integer :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
+    integer, save :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
     character(len=3) :: gcc_major_string, gcc_minor_string, gcc_patch_string
     if (.false.) intel_compiler_build_date = 0
 #ifdef __INTEL_COMPILER
@@ -100,14 +100,13 @@ contains
 
   subroutine get_mesasdk_version(version, ierr)
     use iso_fortran_env
-    implicit none
     character(len=*), intent(out) :: version
     integer, intent(out) :: ierr
     character(len=strlen) :: mesasdk_root, filename
     integer :: unit, root_len, name_len
 
     ierr = 0
-    version = 'unknown' !set here in case there is a problem below
+    version = 'unknown'  !set here in case there is a problem below
 
     call get_environment_variable(name='MESASDK_VERSION', value=version, length=name_len, status=ierr)
     if (ierr /= 0) then
@@ -181,7 +180,7 @@ contains
   end subroutine realloc_double
 
   !****
-  
+
   subroutine realloc_double2(ptr,new_size1,new_size2,ierr)
     real(dp), pointer :: ptr(:,:)
     integer, intent(in) :: new_size1,new_size2
@@ -209,7 +208,7 @@ contains
   end subroutine realloc_double2
 
   !****
-  
+
   subroutine realloc_quad(ptr,new_size,ierr)
     real(qp), pointer :: ptr(:)
     integer, intent(in) :: new_size
@@ -257,7 +256,7 @@ contains
   end subroutine realloc_quad2
 
   !****
-  
+
   subroutine realloc_double3(ptr,new_size1,new_size2,new_size3,ierr)
     real(dp), pointer :: ptr(:,:,:)
     integer, intent(in) :: new_size1,new_size2,new_size3
@@ -483,7 +482,7 @@ contains
   end subroutine alloc1
 
   !****
-  
+
   subroutine alloc2(sz1,sz2,a,ierr)
     real(dp), dimension(:,:), pointer :: a
     integer, intent(in) :: sz1,sz2
@@ -617,10 +616,10 @@ contains
   integer function token(iounit, n, i, buffer, string)
     use utils_def
     integer, intent(in) :: iounit
-    integer, intent(inout) :: n ! number of characters currently in buffer
-    integer, intent(inout) :: i ! number of characters already read from buffer
-    character (len=*), intent(inout) :: buffer ! line of text from input file
-    character (len=*), intent(inout) :: string ! holds string or name for string or name token
+    integer, intent(inout) :: n  ! number of characters currently in buffer
+    integer, intent(inout) :: i  ! number of characters already read from buffer
+    character (len=*), intent(inout) :: buffer  ! line of text from input file
+    character (len=*), intent(inout) :: string  ! holds string or name for string or name token
 
     integer :: info, j, j1, j2, l, str_len
 
@@ -632,22 +631,22 @@ contains
           read(iounit,fmt='(a)',iostat=info) buffer
           if (info /= 0) then
              token = eof_token
-             return 
+             return
           end if
           n = len_trim(buffer)
           i = 0
           !write(*,'(i6,3x,a)') n, trim(buffer)
        end do
-       token_loop: do while (i < n) ! have non-empty buffer
+       token_loop: do while (i < n)  ! have non-empty buffer
           i = i+1
-          if (buffer(i:i) == char(9)) cycle token_loop ! skip tabs
+          if (buffer(i:i) == char(9)) cycle token_loop  ! skip tabs
           select case(buffer(i:i))
           case ('!')
              i = n
              cycle line_loop
           case (' ')
              cycle token_loop
-          case ('&') ! ignore &'s
+          case ('&')  ! ignore &'s
              cycle token_loop
           case ('(')
              token = left_paren_token; return
@@ -690,11 +689,11 @@ contains
           case default
              j1 = i; j2 = i
              name_loop: do
-                if (i+1 > n) exit
-                if (buffer(i+1:i+1) == ' ') exit
-                if (buffer(i+1:i+1) == '(') exit
-                if (buffer(i+1:i+1) == ')') exit
-                if (buffer(i+1:i+1) == ',') exit
+                if (i+1 > n) exit name_loop
+                if (buffer(i+1:i+1) == ' ') exit name_loop
+                if (buffer(i+1:i+1) == '(') exit name_loop
+                if (buffer(i+1:i+1) == ')') exit name_loop
+                if (buffer(i+1:i+1) == ',') exit name_loop
                 i = i+1
                 j2 = i
              end do name_loop
@@ -720,12 +719,12 @@ contains
 
   subroutine integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
     use utils_dict
-    type (integer_dict), pointer :: dict ! pass null for empty dict
+    type (integer_dict), pointer :: dict  ! pass null for empty dict
     character (len=*), intent(in) :: key
     integer, intent(in) :: value
-    logical, intent(out) :: duplicate ! true if key was already defined
+    logical, intent(out) :: duplicate  ! true if key was already defined
     ! if already defined, old value is replaced by new one.
-    integer, intent(out) :: ierr ! error if len_trim(key) > maxlen_key_string
+    integer, intent(out) :: ierr  ! error if len_trim(key) > maxlen_key_string
     call do_integer_dict_define(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define_and_report_duplicates
 
@@ -733,10 +732,10 @@ contains
 
   subroutine integer_dict_define(dict, key, value, ierr)
     use utils_def, only: integer_dict
-    type (integer_dict), pointer :: dict ! pass null for empty dict
+    type (integer_dict), pointer :: dict  ! pass null for empty dict
     character (len=*), intent(in) :: key
     integer, intent(in) :: value
-    integer, intent(out) :: ierr ! error if len_trim(key) > maxlen_key_string
+    integer, intent(out) :: ierr  ! error if len_trim(key) > maxlen_key_string
     logical :: duplicate
     call integer_dict_define_and_report_duplicates(dict, key, value, duplicate, ierr)
   end subroutine integer_dict_define
@@ -757,13 +756,13 @@ contains
     type (integer_dict), pointer :: dict
     character (len=*), intent(in) :: key
     integer, intent(out) :: value
-    integer, intent(out) :: ierr ! 0 if found key in dict, -1 if didn't
+    integer, intent(out) :: ierr  ! 0 if found key in dict, -1 if didn't
     call do_integer_dict_lookup(dict, key, value, ierr)
   end subroutine integer_dict_lookup
 
   !****
 
-  integer function integer_dict_size(dict) ! number of entries
+  integer function integer_dict_size(dict)  ! number of entries
     use utils_dict
     type (integer_dict), pointer :: dict
     integer_dict_size = size_integer_dict(dict)
@@ -776,9 +775,10 @@ contains
     type (integer_dict), pointer :: dict
     interface
        subroutine fcn(key, value, ierr)
+         implicit none
          character (len=*), intent(in) :: key
          integer, intent(in) :: value
-         integer, intent(out) :: ierr ! /= 0 means terminate map calls
+         integer, intent(out) :: ierr  ! /= 0 means terminate map calls
        end subroutine fcn
     end interface
     integer :: ierr
@@ -807,9 +807,9 @@ contains
 
   subroutine integer_idict_define_and_report_duplicates(idict, key1, key2, value, duplicate, ierr)
     use utils_idict
-    type (integer_idict), pointer :: idict ! pass null for empty idict
+    type (integer_idict), pointer :: idict  ! pass null for empty idict
     integer, intent(in) :: key1, key2, value
-    logical, intent(out) :: duplicate ! true if key was already defined
+    logical, intent(out) :: duplicate  ! true if key was already defined
     ! if already defined, old value is replaced by new one.
     integer, intent(out) :: ierr
     call do_integer_idict_define(idict, key1, key2, value, duplicate, ierr)
@@ -819,7 +819,7 @@ contains
 
   subroutine integer_idict_define(idict, key1, key2, value, ierr)
     use utils_def, only: integer_idict
-    type (integer_idict), pointer :: idict ! pass null for empty idict
+    type (integer_idict), pointer :: idict  ! pass null for empty idict
     integer, intent(in) :: key1, key2, value
     integer, intent(out) :: ierr
     logical :: duplicate
@@ -843,13 +843,13 @@ contains
     type (integer_idict), pointer :: idict
     integer, intent(in) :: key1, key2
     integer, intent(out) :: value
-    integer, intent(out) :: ierr ! 0 if found key in idict, -1 if didn't
+    integer, intent(out) :: ierr  ! 0 if found key in idict, -1 if didn't
     call do_integer_idict_lookup(idict, key1, key2, value, ierr)
   end subroutine integer_idict_lookup
 
   !****
 
-  integer function integer_idict_size(idict) ! number of entries
+  integer function integer_idict_size(idict)  ! number of entries
     use utils_idict
     type (integer_idict), pointer :: idict
     integer_idict_size = size_integer_idict(idict)
@@ -862,8 +862,9 @@ contains
     type (integer_idict), pointer :: idict
     interface
        subroutine fcn(key1, key2, value, ierr)
+         implicit none
          integer, intent(in) :: key1, key2, value
-         integer, intent(out) :: ierr ! /= 0 means terminate map calls
+         integer, intent(out) :: ierr  ! /= 0 means terminate map calls
        end subroutine fcn
     end interface
     integer :: ierr
@@ -880,7 +881,7 @@ contains
   end subroutine get_idict_entries
 
   !****
-  
+
   subroutine integer_idict_free(idict)
     use utils_idict
     type (integer_idict), pointer :: idict
@@ -919,25 +920,25 @@ contains
     use utils_system, only : mkdir_p
     character(len=*), intent(in) :: folder
     integer :: res
-    
+
     res = mkdir_p(folder)
-    
+
     if(res/=0)then
       write(*,*) "mkdir failed for ",trim(folder)
       write(*,*) "error code ",res
       call mesa_error(__FILE__,__LINE__)
     end if
-    
+
   end subroutine mkdir
-  
+
   subroutine mv(file_in,file_out,skip_errors)
     use utils_system, only: mv_c => mv
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
-    integer res
-    
+    integer :: res
+
     res = mv_c(file_in,file_out)
-    
+
     if(res/=0)then
        if (present(skip_errors))then
           if (skip_errors) then
@@ -949,25 +950,25 @@ contains
           call error()
        end if
     end if
-    
-    contains 
-    
+
+    contains
+
       subroutine error()
             write(*,*) "mv failed for '"//trim(file_in)//"' '"//trim(file_out)//"'"
             write(*,*) "Error code: ",res
             call mesa_error(__FILE__,__LINE__)
       end subroutine error
-  
+
   end subroutine mv
-  
+
   subroutine cp_file(file_in,file_out,skip_errors)
     use utils_system, only: cp_c => cp
     character(len=*),intent(in) :: file_in,file_out
     logical, optional, intent(in) :: skip_errors
-    integer res
-    
+    integer :: res
+
     res = cp_c(file_in,file_out)
-    
+
     if(res/=0)then
        if (present(skip_errors))then
           if (skip_errors) then
@@ -979,15 +980,15 @@ contains
           call error()
        end if
     end if
-    
-    contains 
-    
+
+    contains
+
       subroutine error()
             write(*,*) "cp failed for '"//trim(file_in)//"' '"//trim(file_out)//"'"
             write(*,*) "Error code: ",res
             call mesa_error(__FILE__,__LINE__)
       end subroutine error
-  
+
   end subroutine cp_file
 
    logical function folder_exists(folder)
@@ -1159,17 +1160,17 @@ contains
         character(len=*), intent(in) :: str1,str2
         logical, intent(in) :: flag
         logical, parameter :: dbg=.false.
-        
+
         if(flag) then
             switch_str=str1(1:min(len_trim(str1),strlen))
-            if(len_trim(str1) > strlen .and. dbg) & 
+            if(len_trim(str1) > strlen .and. dbg) &
                 write(*,*) "Warning ",trim(str1), "truncated to ",switch_str
         else
             switch_str=str2(1:min(len_trim(str2),strlen))
             if(len_trim(str2) > strlen .and. dbg) &
                 write(*,*) "Warning ",trim(str2), "truncated to ",switch_str
         end if
-    
+
     end function switch_str
 
    subroutine split_line(line, num, out)
@@ -1208,55 +1209,55 @@ contains
 
       end subroutine split_line
 
-      
+
    ! backward compatibility so Bill can debug older versions of files without changing these calls
       logical function is_bad_num(x)
          real(dp), intent(in) :: x
          is_bad_num = is_bad(x)
       end function is_bad_num
-      
-            
+
+
       logical function is_bad_real(x)
          real, intent(in) :: x
          is_bad_real = is_bad(x)
       end function is_bad_real
-      
-            
+
+
       logical function is_bad_quad(x)
          real(qp), intent(in) :: x
          is_bad_quad = is_bad(x)
       end function is_bad_quad
-            
+
       subroutine fill_with_NaNs(ptr)
          real(dp) :: ptr(:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs
-      
-      
+
+
       subroutine fill_with_NaNs_2D(ptr)
          real(dp) :: ptr(:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_2D
-      
-      
+
+
       subroutine fill_with_NaNs_3D(ptr)
          real(dp) :: ptr(:,:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_3D
-      
-      
+
+
       subroutine fill_with_NaNs_4D(ptr)
          real(dp) :: ptr(:,:,:,:)
          call set_nan(ptr)
       end subroutine fill_with_NaNs_4D
-      
+
       subroutine set_to_NaN(x)
          real(dp) :: x
          real(dp) :: xa(1)
          call set_nan(xa)
          x = xa(1)
       end subroutine set_to_NaN
-      
+
 
 end module utils_lib
 

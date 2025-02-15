@@ -42,7 +42,7 @@
       subroutine set_mdot(s, L_phot, M_phot, T_phot, ierr)
          use chem_def
          type (star_info), pointer :: s
-         real(dp), intent(in) :: L_phot, M_phot, T_phot ! photosphere values (cgs)
+         real(dp), intent(in) :: L_phot, M_phot, T_phot  ! photosphere values (cgs)
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
@@ -61,7 +61,7 @@
       subroutine do_set_mdot(s, L_phot, M_phot, T_phot, ierr)
          use chem_def
          type (star_info), pointer :: s
-         real(dp), intent(in) :: L_phot, M_phot, T_phot ! photosphere values (cgs)
+         real(dp), intent(in) :: L_phot, M_phot, T_phot  ! photosphere values (cgs)
          integer, intent(out) :: ierr
 
          integer :: h1, he4, nz
@@ -73,7 +73,7 @@
             hot_wind, cool_wind, H_env_mass, H_He_env_mass, He_layer_mass
          character (len=strlen) :: scheme
          logical :: using_wind_scheme_mdot, use_other
-         real(dp), parameter :: Zsolar = 0.019d0 ! for Vink et al formula
+         real(dp), parameter :: Zsolar = 0.019d0  ! for Vink et al formula
 
          logical, parameter :: dbg = .false.
 
@@ -88,7 +88,7 @@
          L1 = L_phot
          M1 = M_phot
          T1 = T_phot
-         R1 = sqrt(L1/(pi*crad*clight*T1*T1*T1*T1)) ! assume L1 and T1 for photosphere
+         R1 = sqrt(L1/(pi*crad*clight*T1*T1*T1*T1))  ! assume L1 and T1 for photosphere
 
          h1 = s% net_iso(ih1)
          he4 = s% net_iso(ihe4)
@@ -108,7 +108,7 @@
                log10(s% super_eddington_wind_mdot/(Msun/secyer))
          end if
 
-         mdot = eval_rlo_wind(s, L1/Lsun, R1/Rsun, T1, xfer_ratio, ierr) ! Msun/year
+         mdot = eval_rlo_wind(s, L1/Lsun, R1/Rsun, T1, xfer_ratio, ierr)  ! Msun/year
          mdot = mdot*Msun/secyer
          if (ierr /= 0) then
             if (dbg .or. s% report_ierr) write(*, *) 'set_mdot: eval_rlo_wind ierr'
@@ -154,7 +154,7 @@
             return
          endif
 
-         if(T1 >= s% cool_wind_full_on_T)then !do hot_wind calculation
+         if(T1 >= s% cool_wind_full_on_T)then  !do hot_wind calculation
             call eval_wind_for_scheme(s% hot_wind_scheme,hot_wind)
          else
             hot_wind = 0d0
@@ -183,7 +183,7 @@
             wind = cool_wind
          else if(s% hot_wind_full_on_T == s% cool_wind_full_on_T)then
             wind = 0.5d0*(hot_wind + cool_wind)
-         else ! blend
+         else  ! blend
             divisor = s% hot_wind_full_on_T - s% cool_wind_full_on_T
             beta = min( (s% hot_wind_full_on_T - T1) / divisor, 1d0)
             alfa = 1d0 - beta
@@ -327,7 +327,7 @@
              if ((.not. use_other) .and. len_trim(scheme) == 0) then
                 wind = 0
              else
-                wind = 4d-13*(L1*R1/M1)/(Lsun*Rsun/Msun) ! in Msun/year
+                wind = 4d-13*(L1*R1/M1)/(Lsun*Rsun/Msun)  ! in Msun/year
                 if (dbg) write(*,1) 'wind', wind
                 if (wind <= 0 .or. is_bad_num(wind)) then
                    ierr = -1
@@ -360,7 +360,7 @@
                       call eval_lowT_Dutch(wind)
                    else if (T1 >= T_high) then
                       call eval_highT_Dutch(wind)
-                   else ! transition
+                   else  ! transition
                       call eval_lowT_Dutch(w1)
                       call eval_highT_Dutch(w2)
                       alfa = (T1 - T_low)/(T_high - T_low)
@@ -510,7 +510,7 @@
                alfa = 1
             else if (T1 < 22500d0) then
                alfa = 0
-            else ! use Vink et al 2001, eqns 14 and 15 to set "jump" temperature
+            else  ! use Vink et al 2001, eqns 14 and 15 to set "jump" temperature
                Teff_jump = 1d3*(61.2d0 + 2.59d0*(-13.636d0 + 0.889d0*log10(Z/Zsolar)))
                dT = 100d0
                if (T1 > Teff_jump + dT) then
@@ -522,9 +522,9 @@
                end if
             end if
 
-            if (alfa > 0) then ! eval hot side wind (eqn 24)
-               vinf_div_vesc = 2.6d0 ! this is the hot side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z/Zsolar,0.13d0) ! corrected for Z
+            if (alfa > 0) then  ! eval hot side wind (eqn 24)
+               vinf_div_vesc = 2.6d0  ! this is the hot side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z/Zsolar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.697d0 &
                   + 2.194d0*log10(L1/Lsun/1d5) &
@@ -538,9 +538,9 @@
                w1 = 0
             end if
 
-            if (alfa < 1) then ! eval cool side wind (eqn 25)
-               vinf_div_vesc = 1.3d0 ! this is the cool side galactic value
-               vinf_div_vesc = vinf_div_vesc*pow(Z/Zsolar,0.13d0) ! corrected for Z
+            if (alfa < 1) then  ! eval cool side wind (eqn 25)
+               vinf_div_vesc = 1.3d0  ! this is the cool side galactic value
+               vinf_div_vesc = vinf_div_vesc*pow(Z/Zsolar,0.13d0)  ! corrected for Z
                logMdot = &
                   - 6.688d0 &
                   + 2.210d0*log10(L1/Lsun/1d5) &
@@ -571,7 +571,7 @@
          subroutine eval_highT_Dutch(w)
             real(dp), intent(out) :: w
             include 'formats'
-            if (surface_h1 < 0.4d0) then ! helium rich Wolf-Rayet star: Nugis & Lamers
+            if (surface_h1 < 0.4d0) then  ! helium rich Wolf-Rayet star: Nugis & Lamers
                w = 1d-11 * pow(L1/Lsun,1.29d0) * pow(Y,1.7d0) * sqrt(Z)
                if (dbg) write(*,1) 'Dutch_wind = Nugis & Lamers', log10(wind)
             else
@@ -665,12 +665,12 @@
       end subroutine eval_super_eddington_wind
 
 
-      real(dp) function eval_rlo_wind(s, L_surf, R, Teff, xfer_ratio, ierr) ! value in Msun/year
+      real(dp) function eval_rlo_wind(s, L_surf, R, Teff, xfer_ratio, ierr)  ! value in Msun/year
          type (star_info), pointer :: s
-         real(dp), intent(in) :: L_surf, R, Teff ! Lsun, Rsun, K
+         real(dp), intent(in) :: L_surf, R, Teff  ! Lsun, Rsun, K
          real(dp), intent(inout) :: xfer_ratio
          integer, intent(out) :: ierr
-         real(dp) :: roche_lobe_radius ! Rsun
+         real(dp) :: roche_lobe_radius  ! Rsun
          real(dp) :: ratio, scale_height, mdot
          include 'formats'
          ierr = 0
@@ -699,7 +699,7 @@
          end if
          mdot = s% rlo_wind_base_mdot* &
             exp(min(6*ln10,(R - roche_lobe_radius)/scale_height))
-         eval_rlo_wind = s% rlo_scaling_factor*mdot ! Msun/year
+         eval_rlo_wind = s% rlo_scaling_factor*mdot  ! Msun/year
 
          !write(*,1) 's% rlo_wind_base_mdot', s% rlo_wind_base_mdot
          !write(*,1) 'R - roche_lobe_radius', R - roche_lobe_radius, R, roche_lobe_radius

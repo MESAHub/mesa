@@ -37,7 +37,7 @@ module overshoot_utils
   ! Access specifiers
 
   private
-  
+
   public :: eval_conv_bdy_k
   public :: eval_conv_bdy_r
   public :: eval_conv_bdy_Hp
@@ -58,7 +58,7 @@ contains
     ! boundary
 
     ierr = 0
-    
+
     if (s%top_conv_bdy(i)) then
        k = s%conv_bdy_loc(i)
     else
@@ -229,7 +229,7 @@ contains
           endif
 
        endif
-          
+
        dr = r_top - r_bot
 
        ! Apply the limit
@@ -339,7 +339,7 @@ contains
     end if
 
     ! Interpolate mixing parameters
- 
+
     w = (s%r(k)*s%r(k)*s%r(k) - r*r*r)/ &
         (s%r(k)*s%r(k)*s%r(k) - s%r(k+1)*s%r(k+1)*s%r(k+1))
 

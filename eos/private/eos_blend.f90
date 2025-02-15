@@ -30,7 +30,7 @@ module eos_blend
       end function quadrant
 
       !! Determines the winding number of a polygon around the origin.
-      !! 
+      !!
       !! Implements the winding number algorithm of
       !! Moscato, Titolo, Feliu, and Munoz (https://shemesh.larc.nasa.gov/people/cam/publications/FM2019-draft.pdf)
       !!
@@ -107,14 +107,14 @@ module eos_blend
       end function is_contained
 
       !! Computes the minimum distance from a given point to a given line segment.
-      !! 
+      !!
       !! @param line_start The coordinates of the start of the line segment (x,y).
       !! @param line_end The coordinates of the end of the line segment (x,y).
       !! @param p The point whose distance to compute.
       type(auto_diff_real_2var_order1) function min_distance_from_point_to_line_segment(line_start, line_end, p) result(d)
          real(dp), intent(in) :: line_start(2), line_end(2)
          type(auto_diff_real_2var_order1), intent(in) :: p(2)
-         real(dp), parameter :: eps = 1e-10 ! To avoid singularity in the derivatives near edges and corners.
+         real(dp), parameter :: eps = 1e-10  ! To avoid singularity in the derivatives near edges and corners.
 
          type(auto_diff_real_2var_order1) :: diff_line(2), diff_start(2), diff_end(2)
          type(auto_diff_real_2var_order1) :: length_squared, lambda, nearest_point_on_line(2)
@@ -137,11 +137,11 @@ module eos_blend
          ! We can then pretend the line is infinite, solve for lambda, and then restrict it to lie in [0,1].
          lambda = (diff_start(1) * diff_line(1) + diff_start(2) * diff_line(2)) / length_squared
 
-         if (lambda < 0d0) then ! Nearest point is line_start
+         if (lambda < 0d0) then  ! Nearest point is line_start
             d = sqrt(pow2(diff_start(1)) + pow2(diff_start(2)))
-         else if (lambda > 1d0) then ! Nearest point is line_end
+         else if (lambda > 1d0) then  ! Nearest point is line_end
             d = sqrt(pow2(diff_end(1)) + pow2(diff_end(2)))
-         else ! Nearest point is interior to the line segment
+         else  ! Nearest point is interior to the line segment
             nearest_point_on_line(1) = line_start(1) + lambda * diff_line(1)
             nearest_point_on_line(2) = line_start(2) + lambda * diff_line(2)
             nearest_point_on_line(1) = nearest_point_on_line(1) - p(1)
@@ -152,9 +152,9 @@ module eos_blend
       end function min_distance_from_point_to_line_segment
 
       !! Computes the distance to the nearest line segment.
-      !! This is done by looping over segments, computing the minimum distance to each, and 
+      !! This is done by looping over segments, computing the minimum distance to each, and
       !! returning the smallest of those differences.
-      !! 
+      !!
       !! @param num_points The number of points specifying the polygon.
       !! @param coords The coordinates of the polygon. An array of shape (num_points, 2) storing (x,y) pairs.
       !! @param p The point whose distance to compute.

@@ -132,9 +132,9 @@ contains
 
       logical :: binary_history_file_exists
       character (len = maxlen_history_column_name), pointer :: &
-         names(:) ! (num_history_columns)
-      real(dp), pointer :: vals(:) ! (num_history_columns)
-      logical, pointer :: is_int(:) ! (num_history_columns)
+         names(:)  ! (num_history_columns)
+      real(dp), pointer :: vals(:)  ! (num_history_columns)
+      logical, pointer :: is_int(:)  ! (num_history_columns)
 
       include 'formats'
 
@@ -269,7 +269,7 @@ contains
          end if
       end if
 
-      if (write_flag .and. i0 == 1) then ! write parameters at start of log
+      if (write_flag .and. i0 == 1) then  ! write parameters at start of log
 
          num_extra_header_items = b% how_many_extra_binary_history_header_items(b% binary_id)
 
@@ -320,7 +320,7 @@ contains
          write(io, *)
       end if
 
-      do i = i0, 3 ! add a row to the log
+      do i = i0, 3  ! add a row to the log
          col = 0
 !         write(*, *) "doing cols pass", i
          do j = 1, numcols
@@ -399,13 +399,13 @@ contains
       end subroutine do_col
 
 
-      subroutine do_col_pass1 ! write the column number
+      subroutine do_col_pass1  ! write the column number
          col = col + 1
          if (write_flag) write(io, fmt = int_fmt, advance = 'no') col
       end subroutine do_col_pass1
 
 
-      subroutine do_col_pass2(j) ! get the column name
+      subroutine do_col_pass2(j)  ! get the column name
          integer, intent(in) :: j
          character (len = 100) :: col_name
          integer :: c
@@ -415,7 +415,7 @@ contains
       end subroutine do_col_pass2
 
 
-      subroutine do_col_pass3(c) ! get the column value
+      subroutine do_col_pass3(c)  ! get the column value
          integer, intent(in) :: c
          integer :: k, int_val
          logical :: is_int_val
@@ -476,7 +476,7 @@ contains
       end subroutine write_integer
 
 
-      subroutine write_val(io, col, pass, name, val) ! for header items only
+      subroutine write_val(io, col, pass, name, val)  ! for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character (len = *), intent(in) :: name
@@ -492,7 +492,7 @@ contains
       end subroutine write_val
 
 
-      subroutine write_string(io, col, pass, name, val) !for header items only
+      subroutine write_string(io, col, pass, name, val)  !for header items only
          integer, intent(in) :: io, pass
          integer, intent(inout) :: col
          character(len = *), intent(in) :: name, val
@@ -595,6 +595,10 @@ contains
          val = safe_log10(b% m(2) / Msun)
       case(bh_sum_of_masses)
          val = (b% m(1) + b% m(2)) / Msun
+      case(bh_mass_ratio)
+         val = b% m(2) / b% m(1)
+      case(bh_obs_mass_ratio)
+         val = min(b% m(2) / b% m(1), b% m(1) / b% m(2))
       case(bh_lg_mtransfer_rate)
          val = safe_log10(abs(b% step_mtransfer_rate) / Msun * secyer)
       case(bh_lg_mstar_dot_1)
@@ -753,7 +757,7 @@ contains
 
    end subroutine binary_history_getval
 
-   subroutine get_binary_history_specs(b, num, names, specs)
+   subroutine get_binary_history_specs(b, num, names, specs, report)
 
       use utils_lib
       use utils_def
@@ -762,6 +766,7 @@ contains
       integer, intent(in) :: num
       character (len = *), intent(in) :: names(:)
       integer, intent(out) :: specs(:)
+      logical, intent(in) :: report
 
       integer :: i, ierr, n, j, iounit, t
       character (len = strlen) :: buffer, string
@@ -778,15 +783,16 @@ contains
          j = 0
          t = token(iounit, n, j, buffer, string)
          if (t /= name_token) then
-            if (len_trim(names(i)) > 0) &
+            if (len_trim(names(i)) > 0 .and. report) &
                write(*, *) 'bad value for name of history item ' // trim(names(i))
             specs(i) = -1
             ierr = 0
             cycle
          end if
          specs(i) = do1_binary_history_spec(&
-            iounit, t, n, j, string, buffer, ierr)
+            iounit, t, n, j, string, buffer, report, ierr)
          if (ierr /= 0) then
+            if (report) write(*, *) 'get_binary_history_specs failed for ' // trim(names(i))
             specs(i) = -1
             ierr = 0
          end if
@@ -833,7 +839,7 @@ contains
    end subroutine get_binary_history_values
 
    logical function get1_binary_hist_value(b, name, val)
-      ! includes other_history_columns from run_star_extras
+      ! includes other_history_columns from run_binary_extras
       use utils_lib, only : integer_dict_lookup
       type (binary_info), pointer :: b
       character (len = *) :: name
@@ -845,7 +851,7 @@ contains
 
       get1_binary_hist_value = .false.
       call integer_dict_lookup(b% binary_history_names_dict, name, i, ierr)
-      if (ierr /= 0 .or. i <= 0) return ! didn't find it
+      if (ierr /= 0 .or. i <= 0) return  ! didn't find it
       if (associated(b% pg% pgbinary_hist)) then
          if (associated(b% pg% pgbinary_hist% vals)) then
             if (size(b% pg% pgbinary_hist% vals, dim = 1) >= i) then

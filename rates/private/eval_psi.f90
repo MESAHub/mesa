@@ -52,9 +52,8 @@ contains
   subroutine do_psi_Iec_and_Jec(beta, zeta, eta, I, J)
 
     use auto_diff
-    ! calulate the phase space integral for electron emission (beta-decay)
+    ! calculate the phase space integral for electron emission (beta-decay)
 
-    implicit none
 
     ! auto_diff variables have
     ! var1: lnT
@@ -72,7 +71,7 @@ contains
     type(auto_diff_real_2var_order1) :: c2, c3
 
     ! check that assumptions are met
-    if (zeta.gt.-beta) stop "ECAPTURE:  zeta > -beta"
+    if (zeta>-beta) stop "ECAPTURE:  zeta > -beta"
 
     y = zeta+eta
 
@@ -98,10 +97,9 @@ contains
   subroutine do_psi_Iee_and_Jee(beta, zeta, eta, I, J)
 
     use auto_diff
-     
-    ! calulate the phase space integral for electron emission (beta-decay)
 
-    implicit none
+    ! calculate the phase space integral for electron emission (beta-decay)
+
 
     ! auto_diff variables have
     ! var1: lnT
@@ -119,7 +117,7 @@ contains
     type(auto_diff_real_2var_order1) :: c0, c1, c2, c3, c4
 
     ! check that assumptions are met
-    if (zeta.lt.beta) stop "ECAPTURE:  zeta < beta"
+    if (zeta<beta) stop "ECAPTURE:  zeta < beta"
 
 
     y = zeta-eta

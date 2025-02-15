@@ -37,7 +37,6 @@
 
 
       subroutine abundance_plot(id, device_id, ierr)
-         implicit none
          integer, intent(in) :: id, device_id
          integer, intent(out) :: ierr
 
@@ -88,7 +87,6 @@
          use chem_def
          use net_def
          use const_def, only: Msun, Rsun
-         implicit none
 
          type (star_info), pointer :: s
          integer, intent(in) :: id, device_id
@@ -114,10 +112,10 @@
          ierr = 0
          nz = s% nz
 
-         colors(:) = (/ &
+         colors(:) = [ &
                clr_Gold, clr_LightSkyBlue, clr_Crimson, clr_Goldenrod, clr_MediumSlateBlue, &
                clr_Coral, clr_LightSkyGreen, clr_DarkGray, clr_Lilac, &
-               clr_Tan, clr_IndianRed, clr_Teal, clr_Silver, clr_BrightBlue /)
+               clr_Tan, clr_IndianRed, clr_Teal, clr_Silver, clr_BrightBlue ]
 
          chScale = txt_scale
 
@@ -174,7 +172,7 @@
             end if
 
             num_labels = max(0,min(max_num_labels, s% pg% num_abundance_line_labels))
-            
+
             iloc_abundance_label = -HUGE(grid_min)
             xloc_abundance_label = -HUGE(grid_min)
             do i=1,num_labels
@@ -231,14 +229,14 @@
             call do_all(.false.)
             call pgunsa
 
-            if (.not. panel_flag) then ! show mix regions at bottom of plot
+            if (.not. panel_flag) then  ! show mix regions at bottom of plot
                call pgslw(10)
                call show_mix_regions_on_xaxis( &
                   s,ymin+ybot,ymax,grid_min,grid_max,xvec)
             end if
 
             call pgunsa
-            
+
             if (s% pg% Abundance_show_photosphere_location .and. &
                   (xaxis_name == 'mass' .or. &
                    xaxis_name == 'logxm' .or. &
@@ -271,7 +269,7 @@
                call pgdraw(dx, 1.0)
                call pgunsa
             end if
-            
+
          call show_pgstar_decorator(s%id,s% pg% Abundance_use_decorator,s% pg% Abundance_pgstar_decorator,0, ierr)
 
          end subroutine plot
@@ -287,7 +285,7 @@
             do j=1, s% species
                max_abund(j) = maxval(s% xa(j,grid_min:grid_max))
             end do
-            if (num_to_show < 0) then ! show as many as fit
+            if (num_to_show < 0) then  ! show as many as fit
                if (legend_flag) then
                   jmax = min(s% species, max_num_labels)
                else

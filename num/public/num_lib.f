@@ -34,8 +34,57 @@
       ! NOTE: because of copyright restrictions, 
       !       mesa doesn't use any routines from Numerical Recipes.
 
-      
       implicit none
+
+      private
+      public :: find0
+      public :: find0_quadratic
+      public :: binary_search
+      public :: binary_search_sg
+      public :: safe_root
+      public :: safe_root_with_guess
+      public :: safe_root_with_brackets
+      public :: safe_root_without_brackets
+      public :: null_mas
+      public :: null_fcn
+      public :: null_jac
+      public :: null_sjac
+      public :: null_fcn_blk_dble
+      public :: null_jac_blk_dble
+      public :: brent_safe_zero
+      public :: brent_local_min
+      public :: brent_global_min
+      public :: default_bdomain 
+      public :: default_force_another_iter
+      public :: default_inspectb 
+      public :: default_set_primaries
+      public :: default_set_secondaries
+      public :: default_size_equ
+      public :: default_sizeb
+      public :: default_xdomain
+      public :: integrate
+      public :: bobyqa
+      public :: dop853
+      public :: dop853_work_sizes
+      public :: isolve
+      public :: isolve_work_sizes
+      public :: dopri5
+      public :: dopri5_work_sizes
+      public :: newton
+      public :: newton_work_sizes
+      public :: newuoa
+      public :: find_max_quadratic
+      public :: look_for_brackets
+      public :: nm_simplex
+      public :: qsort
+      public :: qsort_string_index
+      public :: iln10
+      public :: dfridr
+      public :: solver_option
+      public :: linear_interp
+      public :: two_piece_linear_coeffs
+      public :: simplex_info_str
+      public :: simplex_op_code
 
 
       contains ! the procedure interface for the library
@@ -47,7 +96,7 @@
       ! safe root finding
       ! uses alternating bisection and inverse parabolic interpolation
       ! also have option to use derivative as accelerator (newton method)
-      include "num_safe_root.dek"
+         include "num_safe_root.dek"
 
       
       ! solvers for ODEs and DAEs.
@@ -59,7 +108,7 @@
          
       
       ! but there are lots of fancier options too.
-      
+
 
       ! selections from the Hairer family of ODE/DAE integrators.
       ! from Ernst Hairer's website: http://www.unige.ch/~hairer/
@@ -75,16 +124,16 @@
          include "num_dop853.dek" !  "DOramand Prince order 8(5, 3)"
          
          ! both integrators have automatic step size control and monitoring for stiffness.
-      
+
          ! For a description see:
          ! Hairer, Norsett and Wanner (1993): 
          ! Solving Ordinary Differential Equations. Nonstiff Problems. 2nd edition. 
          ! Springer Series in Comput. Math., vol. 8.
          ! http://www.unige.ch/~hairer/books.html
-      
-      
+
+
       ! implicit solvers (for stiff problems)
-      
+
          ! there are a bunch of implicit solvers to pick from (listed below), 
          ! but they all have pretty much the same arguments, 
          ! so I've provided a general routine, called "isolve", that let's you
@@ -96,10 +145,10 @@
          ! rather than calling one of the particular solvers.
          ! only call a specific solver if you need a feature it provides
          ! that isn't supported by isolve.
-         
+
          ! you can find an example program using isolve in num/test/src/sample_ode_solver.f
-         
-         
+
+
       ! the implicit solver routines
       
          ! for detailed descriptions of these routines see: 
@@ -139,15 +188,15 @@
          ! that work well at high tolerances will fail with low
          ! tolerances and vice-versa.  so you need to match
          ! the solver to the problem.
-      
+
          ! your best bet is to try them all on some typical cases.
          ! happily this isn't too hard to do since they all
          ! use the same function arguments and have (almost)
          ! identical calling sequences and options.
-      
-      
+
+
       ! flexible choice of linear algebra routines
-      
+
          ! the solvers need to solve linear systems.
          ! this is typically done by first factoring the matrix A
          ! and then repeatedly using the factored form to solve
@@ -158,10 +207,10 @@
          ! routines to perform these tasks.  the mesa/mtx package
          ! includes several choices for implementations of the
          ! required routines.
-         
-      
+
+
       ! dense, banded, or sparse matrix
-      
+
          ! All the packages allow the matrix to be in dense or banded form.
          ! the choice of sparse matrix package is not fixed by the solvers.
          ! the only constraint is the the sparse format must be either
@@ -171,10 +220,10 @@
          ! Since the sparse routines are passed as arguments to the solvers, 
          ! it is possible to experiment with different linear algebra
          ! packages without a great deal of effort.
-         
-         
+
+
       ! analytical or numerical jacobian
-      
+
          ! to solve M*y' = f(y), the solvers need to have the jacobian matrix, df/dy.
          ! the jacobian can either be calculated analytically by a user supplied routine, 
          ! or the solver can form a numerical difference estimate by repeatedly
@@ -192,7 +241,7 @@
       
       
       ! explicit or implicit ODE systems
-      
+
          ! systems of the form y' = f(y) are called "explicit ODE systems".
          
          ! systems of the form M*y' = f(y), with M not equal to the identity matrix, 
@@ -204,16 +253,16 @@
          ! even including the case of M singular.
          
          ! for M non-constant, see the discussion of "problems with special structure"
-      
-      
+
+
       ! problems with special structure
-      
+
          ! 3 special cases can be handled easily
-         
+
             ! case 1, second derivatives: y'' = f(t, y, y')
             ! case 2, nonconstant matrix: C(x, y)*y' = f(t, y)
             ! case 3, both of the above: C(x, y)*y'' = f(t, y, y')
-            
+
          ! these all work by adding auxiliary variables to the problem and
          ! converting back to the standard form with a constant matrix M.
          
@@ -221,27 +270,27 @@
                ! after add auxiliary variables z, this becomes
                ! y' = z
                ! z' = f(t, y, z)
-               
+
             ! case 2: C(x, y)*y' = f(t, y)
                ! after add auxiliary variables z, this becomes
                ! y' = z
                ! 0 = C(x, y)*z - f(t, y)
-               
+
             ! case 3: C(x, y)*y'' = f(t, y, y')
                ! after add auxiliary variables z and u, this becomes
                ! y' = z
                ! z' = u
                ! 0 = C(x, y)*u - f(t, y, z)
-         
+
          ! The last two cases take advantage of the ability to have M singular.
-         
+
          ! If the matrix for df/dy is dense in these special cases, all the solvers
          ! can reduce the cost of the linear algebra operations by special treatment
          ! of the auxiliary variables.
-         
-      
+
+
       ! "projection" of solution to valid range of values.
-      
+
          ! it is often the case that the n-dimensional solution
          ! is actually constrained to a subspace of full n dimensional
          ! space of numbers.  The proposed solutions at each step
@@ -250,10 +299,10 @@
          ! option by calling a "solout" routine, supplied by the user, 
          ! after every accepted step.  The user's solout routine can modify
          ! the solution y before returning to continue the integration.
-      
-         
+
+
       ! "dense output"
-      
+
          ! the routines provide estimates of the solution over entire step.
          ! useful for tabulating the solution at prescribed points
          ! or for smooth graphical presentation of the solution.
@@ -301,7 +350,7 @@
          integer, intent(out) :: ierr ! nonzero means retry with smaller timestep.
          f=0; ierr=0
       end subroutine null_fcn_blk_dble
-      
+
 
       subroutine null_jac(n, x, h, y, f, dfy, ldfy, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, ldfy, lrpar, lipar
@@ -376,8 +425,8 @@
          integer, intent(out) :: irtrn
          irtrn = 0
       end subroutine null_solout
-      
-      
+
+
       subroutine null_dfx(n, x, y, fx, lrpar, rpar, lipar, ipar, ierr)
          integer, intent(in) :: n, lrpar, lipar
          real(dp), intent(in) :: x, y(:) ! (n)
@@ -388,15 +437,14 @@
          ierr = 0
          fx = 0
       end subroutine null_dfx
-      
-      
+
+
       ! Newton-Raphson iterative solver for nonlinear systems
       ! square or banded   
       ! analytic or numerical difference jacobian      
       ! where possible, reuses jacobian to improve efficiency      
       ! uses line search method to improve "global" convergence
       include "num_newton.dek"            
-      
 
 
       ! minimize scalar function of many variables without using derivatives.
@@ -430,13 +478,11 @@
          ! "A Simplex Method for Function Minimization."
          ! Comput. J. 7, 308-313, 1965.
 
-      
-      
+
       ! global or local minimum of scalar function of 1 variable
       include "num_brent.dek"
 
 
-      
       ! QuickSort. ACM Algorithm 402, van Emden, 1970
       ! mesa's implementation from Joseph M. Krahn
       ! http://fortranwiki.org/fortran/show/qsort_inline
@@ -447,14 +493,14 @@
          real(dp) :: vals(:)
          call sortp_dp(n,index,vals)
       end subroutine qsort
-      
+
       subroutine qsort_strings(index,n,strings)
          use mod_qsort, only: sortp_string
          integer :: index(:), n
          character(len=*), intent(in) :: strings(:)
          call sortp_string(n,index,strings)
       end subroutine qsort_strings
-      
+
       subroutine qsort_string_index(index,n,string_index,strings)
          use mod_qsort, only: sortp_string_index
          integer :: index(:), n
@@ -462,8 +508,8 @@
          character(len=*), intent(in) :: strings(:) ! 1..maxval(string_index)
          call sortp_string_index(n,index,string_index,strings)
       end subroutine qsort_string_index
-      
-      
+
+
       ! random numbers
       real(dp) function get_dp_uniform_01(seed)
          ! returns a unit pseudorandom real(dp)
@@ -480,8 +526,8 @@
          integer ( kind = 4 ) a, b, seed, get_i4_uniform
          get_i4_uniform = i4_uniform(a, b, seed)
       end function get_i4_uniform
-      
-      
+
+
       subroutine get_perm_uniform ( n, base, seed, p )
          ! selects a random permutation of n integers
          use mod_random, only: perm_uniform
@@ -491,8 +537,8 @@
          integer ( kind = 4 ) seed
          call perm_uniform ( n, base, seed, p )
       end subroutine get_perm_uniform
-      
-      
+
+
       subroutine get_seed_for_random(seed)
          ! returns a seed for the random number generator
          use mod_random, only: get_seed
@@ -500,11 +546,11 @@
          call get_seed(seed)
       end subroutine get_seed_for_random
 
-      
+
       ! binary search
       include "num_binary_search.dek"
 
-      
+
       real(dp) function linear_interp(x1, y1, x2, y2, x)
          real(dp), intent(in) :: x1, y1, x2, y2, x
          if (x2 == x1) then
@@ -582,8 +628,8 @@
          if (y2 < max(y1,y2)) ierr = -1
          if (.not. ((x1 < x2 .and. x2 < x3) .or. (x1 > x2 .and. x2 > x3))) ierr = -1
       end subroutine find_max_quadratic
-      
-      
+
+
       subroutine two_piece_linear_coeffs(x, x0, x1, x2, a0, a1, a2, ierr)
          ! interpolation value at x is a0*f(x0) + a1*f(x1) + a2*f(x2)
          real(dp), intent(in) :: x, x0, x1, x2

@@ -30,7 +30,6 @@ use const_def
 use num_lib
 use utils_lib
 use auto_diff
-use star_data_def
 
 implicit none
 
@@ -92,7 +91,7 @@ contains
    !! The search continues until the domain is narrowed to less than a width of bracket_tolerance,
    !! or until more than max_iter iterations have been taken. Because this is just used to get us in
    !! the right ballpark, bracket_tolerance is set quite wide, to 1.
-   !! 
+   !!
    !! There is a check at the start to verify that Q takes on opposite signs on either end of the
    !! domain. This is allows us to bail early if there is no root in the domain.
    !!
@@ -189,7 +188,7 @@ contains
    !!
    !! The search continues until the domain is narrowed to less than a width of bracket_tolerance (1d-4),
    !! or until more than max_iter iterations have been taken.
-   !! 
+   !!
    !! There is a check at the start to verify that dQ/dZ takes on opposite signs on either end of the
    !! domain. This is allows us to bail early if there is no root in the domain.
    !!
@@ -217,7 +216,7 @@ contains
       integer :: iter
 
       ! Set up
-      lower_bound_Z = lower_bound_Z_in!lower_bound_Z_in
+      lower_bound_Z = lower_bound_Z_in  !lower_bound_Z_in
       lower_bound_Z%d1val1 = 1d0
       upper_bound_Z = upper_bound_Z_in
       upper_bound_Z%d1val1 = 1d0
@@ -297,7 +296,7 @@ contains
          if (upper_bound_Z - lower_bound_Z < bracket_tolerance) then
             Z = (upper_bound_Z + lower_bound_Z) / 2d0
             call compute_Q(info, Y, Q, Af)
-            return         
+            return
          end if
       end do
 
@@ -314,7 +313,7 @@ contains
    !!
    !! The search continues until the domain is narrowed to less than a width of bracket_tolerance (1d-4),
    !! or until more than max_iter iterations have been taken.
-   !! 
+   !!
    !! There is a check at the start to verify that Af == 0 at the most-negative end of the domain.
    !! This is allows us to bail early if there is no root in the domain.
    !!
@@ -349,7 +348,7 @@ contains
 
       Y = set_Y(.false., upper_bound_Z)
       call compute_Q(info, Y, Q, Af)
-      if (Af > 0) then ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
+      if (Af > 0) then  ! d(Af)/dZ < 0, so if Af(upper_bound_Z) > 0 there's no solution in this interval.
          ierr = 1
          return
       end if
@@ -375,7 +374,7 @@ contains
          ! Y < 0 so increasing Y means decreasing Z.
          ! d(Af)/dY > 0 so d(Af)/dZ < 0.
 
-         if (Af > 0d0) then ! Means we are at too-low Z.
+         if (Af > 0d0) then  ! Means we are at too-low Z.
             lower_bound_Z = Z
          else
             upper_bound_Z = Z
@@ -423,9 +422,9 @@ contains
    type(auto_diff_real_tdc) function convert(K_in) result(K)
       type(auto_diff_real_star_order1), intent(in) :: K_in
       K%val = K_in%val
-      K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
+      K%d1Array(1:SIZE(K_in%d1Array)) = K_in%d1Array
       K%d1val1 = 0d0
-      K%d1val1_d1Array(1:auto_diff_star_num_vars) = 0d0
+      K%d1val1_d1Array(1:SIZE(K_in%d1Array)) = 0d0
    end function convert
 
    !> The TDC newton solver needs higher-order partial derivatives than
@@ -438,11 +437,11 @@ contains
    !! no longer needed. This allows the output of the TDC solver to be passed back to the star solver.
    !!
    !! @param K_in, input, an auto_diff_real_tdc variable
-   !! @param K, output, an auto_diff_real_star_order1 variable.      
+   !! @param K, output, an auto_diff_real_star_order1 variable.
    type(auto_diff_real_star_order1) function unconvert(K_in) result(K)
       type(auto_diff_real_tdc), intent(in) :: K_in
       K%val = K_in%val
-      K%d1Array(1:auto_diff_star_num_vars) = K_in%d1Array(1:auto_diff_star_num_vars)
+      K%d1Array = K_in%d1Array(1:SIZE(K%d1Array))
    end function unconvert
 
    !> Q is the residual in the TDC equation, namely:
@@ -475,7 +474,7 @@ contains
       end if
 
       ! Y_env sets the acceleration of blobs.
-      call eval_xis(info, Y_env, xi0, xi1, xi2)          
+      call eval_xis(info, Y_env, xi0, xi1, xi2)
       Af = eval_Af(info%dt, info%A0, xi0, xi1, xi2)
 
       ! Y_env sets the convective flux but not the radiative flux.
@@ -508,7 +507,7 @@ contains
    !! @param xi0 Output, the constant term in the convective velocity equation.
    !! @param xi1 Output, the prefactor of the linear term in the convective velocity equation.
    !! @param xi2 Output, the prefactor of the quadratic term in the convective velocity equation.
-   subroutine eval_xis(info, Y, xi0, xi1, xi2) 
+   subroutine eval_xis(info, Y, xi0, xi1, xi2)
       ! eval_xis sets up Y with partial wrt Z
       ! so results come back with partials wrt Z
       type(tdc_info), intent(in) :: info
@@ -543,7 +542,7 @@ contains
    !! The xi0/1/2 variables are constants for purposes of solving this equation.
    !!
    !! An important related parameter is J:
-   !! 
+   !!
    !! J^2 = xi1^2 - 4 * xi0 * xi2
    !!
    !! When J^2 > 0 the solution for w is hyperbolic in time.
@@ -560,26 +559,26 @@ contains
    !! @param A0 convection speed from the start of the step (cm/s)
    !! @param xi0 The constant term in the convective velocity equation.
    !! @param xi1 The prefactor of the linear term in the convective velocity equation.
-   !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.            
+   !! @param xi2 The prefactor of the quadratic term in the convective velocity equation.
    !! @param Af Output, the convection speed at the end of the step (cm/s)
    function eval_Af(dt, A0, xi0, xi1, xi2) result(Af)
-      real(dp), intent(in) :: dt    
+      real(dp), intent(in) :: dt
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
-      type(auto_diff_real_tdc) :: Af ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root 
+      type(auto_diff_real_tdc) :: Af  ! output
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 
-      if (J2 > 0d0) then ! Hyperbolic branch
-         J = sqrt(abs(J2)) ! Only compute once we know J2 is not 0
+      if (J2 > 0d0) then  ! Hyperbolic branch
+         J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
          Jt4 = 0.25d0 * dt * J
          num = safe_tanh(Jt4) * (2d0 * xi0 + A0 * xi1) + A0 * J
          den = safe_tanh(Jt4) * (xi1 + 2d0 * A0 * xi2) - J
-         Af = num / den 
+         Af = num / den
          if (Af < 0d0) then
             Af = -Af
          end if
-      else if (J2 < 0d0) then ! Trigonometric branch
+      else if (J2 < 0d0) then  ! Trigonometric branch
          J = sqrt(abs(J2))  ! Only compute once we know J2 is not 0
          Jt4 = 0.25d0 * dt * J
 
@@ -602,14 +601,14 @@ contains
          end if
 
          if (Jt4 < root) then
-            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J)) 
+            num = -xi1 + J * tan(Jt4 + atan(y_for_atan / J))
             den = 2d0 * xi2
             Af = num / den
          else
             Af = 0d0
          end if
-      else ! if (J2 == 0d0) then         
-         Af = A0            
+      else  ! if (J2 == 0d0) then
+         Af = A0
       end if
 
    end function eval_Af

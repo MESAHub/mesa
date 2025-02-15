@@ -30,7 +30,6 @@ use const_def
 use num_lib
 use utils_lib
 use auto_diff
-use star_data_def
 use tdc_support
 
 implicit none
@@ -61,7 +60,7 @@ contains
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
-      
+
       logical :: Y_is_positive
       type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
       type(auto_diff_real_tdc) :: Q, Q0
@@ -72,7 +71,7 @@ contains
       ierr = 0
       if (info%mixing_length_alpha == 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
-      end if         
+      end if
 
       ! Determine the sign of the solution.
       !
@@ -166,7 +165,7 @@ contains
                   ! ierr /= 0 should be impossible, because we checked the necessary conditions
                   ! for the bisection search above. Nonetheless, bugs can crop up, so we leave this
                   ! check in here and leave the checks in Af_bisection_search.
-                  if (ierr /= 0) return 
+                  if (ierr /= 0) return
                   Y0 = set_Y(.false., Z0)
                   call compute_Q(info, Y0, Q, Af)
                   if (info%report) write(*,*) 'Bisected Af. Y0=',Y0%val,'Af(Y0)=',Af%val
@@ -180,7 +179,7 @@ contains
                   Y1 = set_Y(.false., Z1)
                   if (info%report) write(*,*) 'Bisected dQdZ, found root, ',Y1%val
                   call compute_Q(info, Y1, Q, Af)
-                  if (Q < 0) then ! Means there are no roots with Af > 0.
+                  if (Q < 0) then  ! Means there are no roots with Af > 0.
                      if (info%report) write(*,*) 'Root has Q<0, Q=',Q%val,'Y=',radY%val
                      Y = radY
                   else
@@ -202,11 +201,11 @@ contains
                else
                   if (info%report) write(*,*) 'Bisected dQdZ, no root found.'
                   call compute_Q(info, Y0, Q, Af)
-                  if (Q > 0) then ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
+                  if (Q > 0) then  ! Means there's a root in [Y0,0] so we bracket search from [lower_bound,Z0]
                      call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z0, Y_face, Af, tdc_num_iters, ierr)
                      Y = convert(Y_face)
                      if (info%report) write(*,*) 'Q(Y0) > 0, bisected and found Y=',Y%val
-                  else ! Means there's no root in [Y0,0] so the only root is radY.
+                  else  ! Means there's no root in [Y0,0] so the only root is radY.
                      if (info%report) write(*,*) 'Q(Y0) < 0, Y=',radY%val
                      Y = radY
                   end if
@@ -219,7 +218,7 @@ contains
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
       Y_face = unconvert(Y)
-      conv_vel = sqrt_2_div_3*unconvert(Af)   
+      conv_vel = sqrt_2_div_3*unconvert(Af)
 
    end subroutine get_TDC_solution
 
@@ -244,7 +243,7 @@ contains
       type(auto_diff_real_tdc), intent(out) :: Af
       integer, intent(out) :: tdc_num_iters
       integer, intent(out) :: ierr
-      
+
       type(auto_diff_real_tdc) :: Y, Z, Q, Qc, Z_new, correction, lower_bound_Z, upper_bound_Z
       type(auto_diff_real_tdc) :: dQdZ
       integer :: iter, line_iter
@@ -266,7 +265,7 @@ contains
       if (ierr /= 0) return
 
       ! Set up Z from bisection search
-      Z%d1val1 = 1d0 ! Set derivative dZ/dZ=1 for Newton iterations.
+      Z%d1val1 = 1d0  ! Set derivative dZ/dZ=1 for Newton iterations.
       if (info%report) write(*,*) 'Z from bisection search', Z%val
       if (info%report) write(*,*) 'lower_bound_Z, upper_bound_Z',lower_bound_Z%val,upper_bound_Z%val
 
@@ -276,7 +275,7 @@ contains
       ! Initialize starting values for TDC Newton iterations.
       dQdz = 0d0
       converged = .false.
-      have_derivatives = .false. ! Tracks if we've done at least one Newton iteration.
+      have_derivatives = .false.  ! Tracks if we've done at least one Newton iteration.
                                  ! Need to do this before returning to endow Y with partials
                                  ! with respect to the structure variables.
       do iter = 1, max_iter
@@ -346,7 +345,7 @@ contains
 
          if (info%report) write(*,3) 'i, li, Z_new, Z, low_bnd, upr_bnd, Q, dQdZ, corr', iter, line_iter, &
             Z_new%val, Z%val, lower_bound_Z%val, upper_bound_Z%val, Q%val, dQdZ%val, correction%val
-         Z_new%d1val1 = 1d0 ! Ensures that dZ/dZ = 1.
+         Z_new%d1val1 = 1d0  ! Ensures that dZ/dZ = 1.
          Z = Z_new
 
          Y = set_Y(Y_is_positive,Z)
@@ -383,7 +382,7 @@ contains
 
       ! Unpack output
       Y_face = unconvert(Y)
-      tdc_num_iters = iter          
+      tdc_num_iters = iter
    end subroutine bracket_plus_Newton_search
 
 end module tdc

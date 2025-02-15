@@ -206,7 +206,7 @@
    ! typical white dwarf charge ratios (R = Z2 / Z1 ~ 4/3 for C/O), see e.g. Blouin+2020. The latter gives better
    ! agreement with analytic expectations at large charge ratios R > 2.
    ! Select between these choices by specifying either ``"Ogata"`` or ``"PC"``.
-   ! :: 
+   ! ::
 
    Skye_solid_mixing_rule = "PC"
 
@@ -245,7 +245,7 @@
    ! table while a value of 10 corresponds the the pure Hydrogen table.
 
    !| to use table
-   !|                set index 
+   !|                set index
    !| mesa-CMS_000x.data ->  0
    !| mesa-CMS_010x.data ->  1
    !| mesa-CMS_020x.data ->  2

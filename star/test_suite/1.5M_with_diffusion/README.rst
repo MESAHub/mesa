@@ -4,13 +4,13 @@
 1.5M_with_diffusion
 *******************
 
-The test checks the functionality of element diffusion. 
+The test checks the functionality of element diffusion.
 The test vehicle is a 1.5 |Msun| solar metallicity model.
 
 
 This test case has two parts. Click to see a larger view of a plot.
 
-* Part 1 (``inlist_to_ZAMS``) creates the pre-main-sequence model and evolves it to the main sequence. In the mass fraction plot, note the roughness of the 12C mass fraction profile (orange curve) from convection and that the surface hydrogen profile is flat (yellow curve). 
+* Part 1 (``inlist_to_ZAMS``) creates the pre-main-sequence model and evolves it to the main sequence. In the mass fraction plot, note the roughness of the 12C mass fraction profile (orange curve) from convection and that the surface hydrogen profile is flat (yellow curve).
 
 .. image:: ../../../star/test_suite/1.5M_with_diffusion/docs/abund_zams_0000181.svg
    :width: 100%
@@ -31,4 +31,4 @@ pgstar commands used for the plots above, e.g.:
 
 Last-Updated: 27May2021 (MESA ebecc10) by fxt
 
-Last-Run: 17Jul2024 (MESA 0cc374fa) by pmocz on C916PXT6XW in 423 seconds using 8 threads.
+Last-Run: 22Oct2024 (MESA 9b2017ca) by pmocz on C916PXT6XW in 426 seconds using 8 threads.
