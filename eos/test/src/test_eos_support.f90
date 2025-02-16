@@ -38,7 +38,7 @@
 
       subroutine test1_eosPT(Z, X, logPgas, logT, do_compare, quietly, logRho, logP)
          logical, intent(in) :: quietly
-         real(dp) :: Z, X, logPgas, logT
+         real(dp), intent(in) :: Z, X, logPgas, logT
          real(dp), intent(out) :: logRho, logP
          logical, intent(in) :: do_compare
          real(dp) :: &
@@ -58,15 +58,15 @@
 
          call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
 
-         if (.false.) then  ! TESTING
-            z =     0d0
-            x =     0.72d0
-            call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
-            abar =     1.2966413082679851D+00
-            zbar =     1.1021433867453336D+00
-            logPgas  = 4.8066181993619859D+00
-            logT  = 3.7569035961895620D+00
-         end if
+         !if (.false.) then  ! TESTING
+         !   Z = 0d0
+         !   X = 0.72d0
+         !   call Init_Composition(X, Z, 0d0, 0d0)  ! sets abar and zbar
+         !   abar    = 1.2966413082679851D+00
+         !   zbar    = 1.1021433867453336D+00
+         !   logPgas = 4.8066181993619859D+00
+         !   logT    = 3.7569035961895620D+00
+         !end if
 
          T = exp10(logT)
          Pgas = exp10(logPgas)
@@ -215,7 +215,7 @@
             character (len=*), intent(in) :: str
 
             if (.false.) then
-               T = 2d8; rho = 100
+               T = 2d8; rho = 100d0
                call Do_One_TRho(quietly,T,Rho,X,Zinit,dXC,dXO,Y,Z,res)  ! scvh
                stop
             end if
