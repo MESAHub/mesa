@@ -23,10 +23,7 @@ pgstar commands used for the plot above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
-
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 1
 
@@ -191,7 +188,7 @@ pgstar commands used for the plot above:
  Grid1_file_prefix = 'grid_'
  Grid1_file_interval = 10000
  Grid1_file_width = -1
- Grid1_file_aspect_ratio = -1         
+ Grid1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 

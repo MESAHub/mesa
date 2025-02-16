@@ -20,7 +20,7 @@ The ``&pgstar`` section contains the commands for creating pgstar plots. See Jos
 ---------
 
 In the ``&star_job`` section of ``inlist_to_TAMS`` we start by specifying the starting model:
-We do not start from a previously saved model; rather, we start the evolution from a pre-main sequence model, which is recommended. 
+We do not start from a previously saved model; rather, we start the evolution from a pre-main sequence model, which is recommended.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-after: &star_job
@@ -30,13 +30,13 @@ Then we specify the output. We save the final model, which will be the starting 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-after: load_saved_model = .false.
-   :end-before: initial_zfracs = 6 
+   :end-before: initial_zfracs = 6
 
 Next, we specify the initial composition. There is no consensus yet on which is "the best" solar composition. By default, the initial composition in MESA is ``initial_zfracs = 3`` which corresponds to the `GS98 <https://link.springer.com/article/10.1023%2FA%3A1005161325181>`__ metal fraction. Here we want to use the more recent available solar composition given in `AGSS09 <https://www.annualreviews.org/doi/pdf/10.1146/annurev.astro.46.060407.145222>`__ , therefore we set ``initial_zfracs = 6``.
 Since it is very important to use the opacity tables which are built using the solar composition we use, we also have to set the ``kap_file_prefix`` to the 2009 solar composition (the default table corresponds to the gs98 composition).
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
-   :start-after: history_columns_file = 'history_columns.list' 
+   :start-after: history_columns_file = 'history_columns.list'
    :end-before: change_initial_net
 
 We also have to choose a network of nuclear reactions. This network should be chosen according to the physics you want to study. Choosing a very comprehensive set of nuclear reactions when studying main sequence evolution is not necessary and will slow down the computation considerably. It would however be essential when studying advanced burning stages of evolution. The description of the available nuclear reactions networks in MESA is given in the README file in ``$MESA_DIR/data/net_data``. The default reactions network used by MESA is ``basic.net``.
@@ -50,27 +50,27 @@ We do not specify anything about the eos, which means we use the default one.
 
 &controls
 ---------
-The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation. This is what we use here. Note that the default is dLdm. 
+The energy equation can be written in the dLdm or the dedt form in MESA (see `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__). As explained in `MESAV <https://arxiv.org/pdf/1903.01426.pdf>`__, using the dedt form leads to much better energy conservation. This is what we use here. Note that the default is dLdm.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-after:  &controls
    :end-before: initial_mass
 
 
-Next we specify the starting model, i.e., its initial mass, metallicity, and helium  mass fraction. Here we only specify M and Z; the helium content is by default 0.24 + 2Z. 
+Next we specify the starting model, i.e., its initial mass, metallicity, and helium  mass fraction. Here we only specify M and Z; the helium content is by default 0.24 + 2Z.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-at:  initial_mass
    :end-at: initial_z
 
-Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Zbase`` which gives the metal abundances previous to any CO enhancement. 
+Because we will evolve the star through core helium burning, we want to use the Type2 opacities because they take into account extra C/O, important for this stage of stellar evolution. As explained in the controls_default file, when using Type 2 opacities you need to specify a base metallicity ``Zbase`` which gives the metal abundances previous to any CO enhancement.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-at: kap
    :end-at: ! end of kap namelist
 
 We now specify the non-default mixing parameters we want to use.
-We will use the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__  with ``mixing_length_alpha=1.8``. We will use the Ledoux criterion and the "predictive mixing" scheme described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ to find the convective boundaries at the core and at the surface. 
+We will use the `Henyey theory of convection <http://articles.adsabs.harvard.edu/pdf/1965ApJ...142..841H>`__  with ``mixing_length_alpha=1.8``. We will use the Ledoux criterion and the "predictive mixing" scheme described in `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__ to find the convective boundaries at the core and at the surface.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
    :start-after:  mixing controls
@@ -87,7 +87,7 @@ For the purpose of this test_suite case we use a maximum limit on the timestep o
    :start-after:  timestep and grid
    :end-before: When to
 
-In order to stop at the TAMS, which we here define as the time when the central hydrogen mass fraction drops below 1d-4, we use the following controls: 
+In order to stop at the TAMS, which we here define as the time when the central hydrogen mass fraction drops below 1d-4, we use the following controls:
 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_TAMS
@@ -126,21 +126,21 @@ We use the same metal fraction, opacity tables, and nuclear reactions network as
 ---------
 
 As before, we use the dedt form of the energy equation for good energy conservation.
-In addition, our model will go through helium flash, which is very difficult to model. In order for MESA to pass the helium flash without going to extremely small timesteps, it is sometimes useful to relax some of the very strict convergence controls. This is in particular true when using the mixing controls we choose to use in this case. 
+In addition, our model will go through helium flash, which is very difficult to model. In order for MESA to pass the helium flash without going to extremely small timesteps, it is sometimes useful to relax some of the very strict convergence controls. This is in particular true when using the mixing controls we choose to use in this case.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-after: &controls
    :end-before: initial_mass
 
 The ``ìnitial_mass`` and ``ìnitial_z`` controls are not used when loading a saved model, but are reported in output as the inital values.
-Again we specify that we use the Type 2 opacities with a base metallicity of 0.02. 
+Again we specify that we use the Type 2 opacities with a base metallicity of 0.02.
 We use the same mixing controls as for the PMS-to-TAMS part of the evolution.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-after: flash
    :end-before: num_
 
-We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (our ZACheB model). 
+We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (our ZACheB model).
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-at: HB_limit
@@ -220,7 +220,7 @@ The following figures show the evolutionary track of the stellar model, from pre
 
 .. image:: ../../../star/test_suite/hb_2M/docs/HRzoom.png
 
-We also show the evolution of the luminosity as a function of time for those two cases. Even though the lifetime on the CHeB is almost identical in the two cases, the value of the luminosity at the TACHeB is clearly different, proving that using ``max_years_for_timestep=1d6`` does not produce converged results. In order to verify whether using ``max_years_for_timestep=1d5`` produces converged results, it is necessary to try with an even smaller timestep, but also using more mesh points by reducing "mesh_delta_coeff" and so on until nothing changes in the evolution. 
+We also show the evolution of the luminosity as a function of time for those two cases. Even though the lifetime on the CHeB is almost identical in the two cases, the value of the luminosity at the TACHeB is clearly different, proving that using ``max_years_for_timestep=1d6`` does not produce converged results. In order to verify whether using ``max_years_for_timestep=1d5`` produces converged results, it is necessary to try with an even smaller timestep, but also using more mesh points by reducing "mesh_delta_coeff" and so on until nothing changes in the evolution.
 
 .. image:: ../../../star/test_suite/hb_2M/docs/LCHeB.png
 

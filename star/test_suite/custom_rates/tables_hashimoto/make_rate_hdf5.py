@@ -6,7 +6,7 @@ import numpy as np
 
 class GMPTable:
 
-    _columns = ('uf', 'lbeta+', 'leps-', 'lrnu', 'lbeta-', 'leps+', 'lrnubar')
+    _columns = ("uf", "lbeta+", "leps-", "lrnu", "lbeta-", "leps+", "lrnubar")
 
     def __init__(self, filename):
 
@@ -20,10 +20,10 @@ class GMPTable:
 
         self.data = {}
         for i, col in enumerate(self._columns):
-            self.data[col] = data1d[:, i+2].reshape((nYeRhos, nTs))
+            self.data[col] = data1d[:, i + 2].reshape((nYeRhos, nTs))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     filename = "n14c-hr.dat"
     table = GMPTable(filename)
@@ -36,9 +36,9 @@ if __name__ == '__main__':
         h5file.create_dataset("T9s", data=table.T9s)
 
         # the 2D data sets
-        h5file.create_dataset("ldecay", data=table.data['lbeta+'])
-        h5file.create_dataset("lcapture", data=table.data['leps-'])
-        h5file.create_dataset("lneutrino", data=table.data['lrnu'])
+        h5file.create_dataset("ldecay", data=table.data["lbeta+"])
+        h5file.create_dataset("lcapture", data=table.data["leps-"])
+        h5file.create_dataset("lneutrino", data=table.data["lrnu"])
 
     # open hdf5 file
     with h5py.File("GMP_r_c14_wk-minus_n14.h5", "w") as h5file:
@@ -48,6 +48,6 @@ if __name__ == '__main__':
         h5file.create_dataset("T9s", data=table.T9s)
 
         # the 2D data sets
-        h5file.create_dataset("ldecay", data=table.data['lbeta-'])
-        h5file.create_dataset("lcapture", data=table.data['leps+'])
-        h5file.create_dataset("lneutrino", data=table.data['lrnubar'])
+        h5file.create_dataset("ldecay", data=table.data["lbeta-"])
+        h5file.create_dataset("lcapture", data=table.data["leps+"])
+        h5file.create_dataset("lneutrino", data=table.data["lrnubar"])

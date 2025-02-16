@@ -72,7 +72,7 @@
          integer :: ierr
 
          ierr = 0
-         my_mesa_dir = '..' ! if empty string, uses environment variable MESA_DIR
+         my_mesa_dir = '..'  ! if empty string, uses environment variable MESA_DIR
          call const_init(my_mesa_dir,ierr)
          if (ierr /= 0) then
             write(*,*) 'const_init failed'
@@ -95,7 +95,6 @@
       end subroutine setup
 
       subroutine make_correction_table(X,Z,Ecorr,Ytab,Etab)
-         implicit none
          real(dp), intent(in) :: X, Z
          real(dp), dimension(num_lgTs, num_lgRhos) :: Ecorr,Ytab,Etab
          real(dp) :: Rho, T, log10Rho, log10T

@@ -23,7 +23,7 @@
 !
 ! ***********************************************************************
 
-      module interp_1d_mp ! high accuracy monotonicity preserving algorithms
+      module interp_1d_mp  ! high accuracy monotonicity preserving algorithms
 
       use const_lib, only: dp
 
@@ -39,12 +39,12 @@
          use interp_1d_misc
          use interp_1d_pm, only: mk_pmlinear, mk_pmquad
          integer, intent(in) :: nx       ! length of x vector
-         real(dp), intent(in)    :: x(:) ! (nx)    ! junction points, strictly monotonic
-         real(dp), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real(dp), intent(in)    :: x(:)  ! (nx)    ! junction points, strictly monotonic
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          integer, intent(in) :: which
          logical, intent(in) :: slope_only
          integer, intent(in) :: nwork
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
@@ -52,7 +52,7 @@
                spL, spR, t, tmax, tmp, tmp1, tmp2
          real(dp), parameter :: tiny = 1d-20
          integer :: i
-         real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -107,10 +107,10 @@
 
          ! divided differences
          do i=1,nx-1
-            s_mid(i) = (f(1,i+1) - f(1,i)) / h(i) ! eqn 2.1
+            s_mid(i) = (f(1,i+1) - f(1,i)) / h(i)  ! eqn 2.1
          end do
          do i=2,nx-1
-            d(i) = (s_mid(i) - s_mid(i-1)) / (x(i+1) - x(i-1)) ! eqn 3.1
+            d(i) = (s_mid(i) - s_mid(i-1)) / (x(i+1) - x(i-1))  ! eqn 3.1
          end do
          ! need to extend d to full range. simplest way is just to copy from neighbor
          d(1) = d(2)
@@ -137,7 +137,7 @@
             spR(i) = s_mid(i) - hd_mid(i)
          end do
 
-         call minmod(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1)) ! eqn (2.8)
+         call minmod(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1))  ! eqn (2.8)
          call minmod(t(2:nx-1), nx-2, spL(2:nx-1), spR(2:nx-1))
 
          if (which == average) then
@@ -186,7 +186,7 @@
                f(2,i) = tmp2(i)
             end do
 
-         else !if (which == super_bee) then
+         else  !if (which == super_bee) then
 
             do i=2,nx-1
                f(2,i) = sign(1d0, t(i))* &
@@ -198,11 +198,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1(s_mid(1), s_mid(2)) ! stabilize the ends
+         f(2,1) = minmod1(s_mid(1), s_mid(2))  ! stabilize the ends
 
          ! slope at i=nx
          !f(2, nx) = minmod1(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2,nx) = minmod1(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
+         f(2,nx) = minmod1(s_mid(nx-2), s_mid(nx-1))  ! stabilize the ends
 
          if (slope_only) return
 
@@ -222,13 +222,13 @@
          use interp_1d_misc
          use interp_1d_pm, only: mk_pmlinear, mk_pmquad
          ! make piecewise monotonic cubic interpolant
-         real(dp), intent(in) :: dx ! the grid spacing
+         real(dp), intent(in) :: dx  ! the grid spacing
          integer, intent(in) :: nx       ! length of x vector
-         real(dp), intent(inout), pointer :: f1(:) ! =(4, nx)  ! data & interpolation coefficients
+         real(dp), intent(inout), pointer :: f1(:)  ! =(4, nx)  ! data & interpolation coefficients
          integer, intent(in) :: which
          logical, intent(in) :: slope_only
          integer, intent(in) :: nwork
-         real(dp), intent(inout), pointer :: work1(:) ! =(nx, nwork)
+         real(dp), intent(inout), pointer :: work1(:)  ! =(nx, nwork)
          character (len=*) :: str
          integer, intent(out) :: ierr
 
@@ -237,7 +237,7 @@
          real(dp), parameter :: tiny = 1d-20
          real(dp) :: x(3)
          integer :: i
-         real(dp), pointer :: f(:,:) ! (4, nx)  ! data & interpolation coefficients
+         real(dp), pointer :: f(:,:)  ! (4, nx)  ! data & interpolation coefficients
          f(1:4,1:nx) => f1(1:4*nx)
 
          ierr = 0
@@ -287,10 +287,10 @@
 
          ! divided differences
          do i=1,nx-1
-            s_mid(i) = (f(1,i+1) - f(1,i)) / dx ! eqn 2.1
+            s_mid(i) = (f(1,i+1) - f(1,i)) / dx  ! eqn 2.1
          end do
          do i=2,nx-1
-            d(i) = (s_mid(i) - s_mid(i-1)) / (2*dx) ! eqn 3.1
+            d(i) = (s_mid(i) - s_mid(i-1)) / (2*dx)  ! eqn 3.1
          end do
          ! need to extend d to full range. simplest way is just to copy from neighbor
          d(1) = d(2)
@@ -313,7 +313,7 @@
             spR(i) = s_mid(i) - dx*d_mid(i)
          end do
 
-         call minmod(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1)) ! eqn (2.8)
+         call minmod(s(2:nx-1), nx-2, s_mid(1:nx-2), s_mid(2:nx-1))  ! eqn (2.8)
          call minmod(t(2:nx-1), nx-2, spL(2:nx-1), spR(2:nx-1))
 
          if (which == average) then
@@ -360,7 +360,7 @@
                f(2,i) = tmp2(i)
             end do
 
-         else !if (which == super_bee) then
+         else  !if (which == super_bee) then
 
             do i=2,nx-1
                f(2,i) = sign(1d0, t(i))* &
@@ -372,11 +372,11 @@
 
          ! slope at i=1
          !f(2, 1) = minmod1(spR(1), 3*s_mid(1)) ! eqn (5.2)
-         f(2,1) = minmod1(s_mid(1), s_mid(2)) ! stabilize the ends
+         f(2,1) = minmod1(s_mid(1), s_mid(2))  ! stabilize the ends
 
          ! slope at i=nx
          !f(2, nx) = minmod1(spL(nx), 3*s_mid(nx-1)) ! eqn (5.2)
-         f(2, nx) = minmod1(s_mid(nx-2), s_mid(nx-1)) ! stabilize the ends
+         f(2, nx) = minmod1(s_mid(nx-2), s_mid(nx-1))  ! stabilize the ends
 
          if (slope_only) return
 

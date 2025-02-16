@@ -4,7 +4,7 @@
 1.3M_ms_high_Z
 **************
 
-The test checks the evolution of metal-rich low-mass stars by evolving 
+The test checks the evolution of metal-rich low-mass stars by evolving
 a 1.3 |Msun|, metal-rich Z=0.04 model from the pre-main sequence to core hydrogen depletion.
 
 
@@ -20,9 +20,9 @@ The final model, click on the image for a larger version, shows
 .. image:: ../../../star/test_suite/1.3M_ms_high_Z/docs/grid1000219.svg
   :width: 100%
 
-The left plot shows the HR diagram. The yellow curve is a precalculated 
+The left plot shows the HR diagram. The yellow curve is a precalculated
 HR track loaded  from ``HR_OPAL.dat``, while the green curve is the model calculated.
-The right plot shows a profile of the metal mass fraction. The curve rises above the 
+The right plot shows a profile of the metal mass fraction. The curve rises above the
 background metallicity as hydrogen burns to helium and goes below the background metallicity
 as core hydrogen depletes.
 

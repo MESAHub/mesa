@@ -127,7 +127,7 @@
 
          select case (s% x_integer_ctrl(1))
 
-         case(1) ! inlist_big_net
+         case(1)  ! inlist_big_net
 
             ! Information for testhub
             testhub_extras_names(1) = 'total_burn_solver_steps'

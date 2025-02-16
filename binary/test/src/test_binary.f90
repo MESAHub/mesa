@@ -37,6 +37,7 @@ contains
       ! these are dummy vals so function doesn't give nans
       s% star_mass = 1d0
       s% he_core_mass = 1d0
+      b% mtransfer_rate = 0d0
       b% env_old(b% d_i) = 0d0
       b% angular_momentum_j_old = 0d0
       b% separation_old = 0d0
@@ -46,6 +47,8 @@ contains
       b% fj = -1d0
       b% fm = -1d0
       b% fdm = -1d0
+      b% s_donor% center_h1 = 0d0
+      b% varcontrol_post_ms = 0d0
 
       ! test for rl
       b% rl_relative_gap_old(b% d_i) = -0.102d0

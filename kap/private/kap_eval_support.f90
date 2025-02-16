@@ -41,9 +41,9 @@
          type (Kap_General_Info), pointer :: rq
          integer, intent(in) :: num_logs, ili_logs
          real(dp), intent(in) :: log_min_in, log_max_in
-         real(dp), intent(in), pointer :: logs(:) ! (num_logs)
-         real(dp), intent(inout) :: log_find ! can change log_find if clipping to table boundaries
-         integer, intent(out) :: i ! index in logs s.t. logs(i) <= log_find < logs(i+1)
+         real(dp), intent(in), pointer :: logs(:)  ! (num_logs)
+         real(dp), intent(inout) :: log_find  ! can change log_find if clipping to table boundaries
+         integer, intent(out) :: i  ! index in logs s.t. logs(i) <= log_find < logs(i+1)
             ! one exception: if log_find == log_max then will get i = num_logs-1
          real(dp), intent(out) :: log0, log1
          integer, intent(out) :: ierr
@@ -74,7 +74,7 @@
          else if (abs(log_find-log_max) < 1d-7) then
             i = num_logs-1
             log_find = log_max
-         else if (ili_logs == 1) then ! logs equally spaced
+         else if (ili_logs == 1) then  ! logs equally spaced
             dlog = (log_max-log_min)/(num_logs-1)
             i = int((log_find-log_min) / dlog) + 1
             ! might not be exactly evenly spaced, so minor fixup if necessary
@@ -145,9 +145,9 @@
          type (Kap_General_Info), pointer :: rq
          integer, intent(in) :: num_logTs, ili_logTs
          real(dp), intent(in) :: logT_min, logT_max
-         real(dp), intent(in), pointer :: logTs(:) ! (num_logTs)
-         real(dp), intent(inout) :: logT ! can change logT if clipping to table boundaries
-         integer, intent(out) :: iT ! index in logTs s.t. logTs(i) <= logT < logTs(i+1)
+         real(dp), intent(in), pointer :: logTs(:)  ! (num_logTs)
+         real(dp), intent(inout) :: logT  ! can change logT if clipping to table boundaries
+         integer, intent(out) :: iT  ! index in logTs s.t. logTs(i) <= logT < logTs(i+1)
          real(dp), intent(out) :: logT0, logT1
          integer, intent(out) :: ierr
          call Locate_log( &
@@ -161,9 +161,9 @@
          type (Kap_General_Info), pointer :: rq
          integer, intent(in) :: num_logRs, ili_logRs
          real(dp), intent(in) :: logR_min, logR_max
-         real(dp), intent(in), pointer :: logRs(:) ! (num_logRs)
-         real(dp), intent(inout) :: logR ! can change logR if clipping to table boundaries
-         integer, intent(out) :: iR ! index in logRs s.t. logRs(i) <= logR < logRs(i+1)
+         real(dp), intent(in), pointer :: logRs(:)  ! (num_logRs)
+         real(dp), intent(inout) :: logR  ! can change logR if clipping to table boundaries
+         integer, intent(out) :: iR  ! index in logRs s.t. logRs(i) <= logR < logRs(i+1)
          real(dp), intent(out) :: logR0, logR1
          integer, intent(out) :: ierr
          call Locate_log( &
@@ -175,7 +175,7 @@
             fin1, nx, ny, i, j, x0, xget, x1, y0, yget, y1, fval, df_dx, df_dy)
          ! derived from routines in the PSPLINE package written by Doug McCune
 
-         real(dp), dimension(:), pointer :: fin1 ! the spline data array, dimensions (4, nx, ny)
+         real(dp), dimension(:), pointer :: fin1  ! the spline data array, dimensions (4, nx, ny)
          integer, intent(in) :: nx, ny, i, j           ! target cell in the spline data
          real(dp), intent(in) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(i), x1 = xs(i+1)
          real(dp), intent(in) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(j), y1 = ys(j+1)

@@ -46,12 +46,12 @@
          integer, intent(in) :: num_Zs
          type (Kap_General_Info), pointer :: rq
          real(dp), intent(in) :: Z, X
-         real(dp), intent(inout) :: Rho, logRho ! can be modified to clip to table boundaries
+         real(dp), intent(inout) :: Rho, logRho  ! can be modified to clip to table boundaries
          real(dp), intent(inout) :: T, logT
 
          ! OUTPUT
          real(dp), intent(out) :: logKap, dlnkap_dlnRho, dlnkap_dlnT
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
 
          integer :: iz, i
          real(dp) :: Z0, Z1, alfa, beta, lnZ, lnZ0, lnZ1
@@ -79,7 +79,7 @@
             end if
          end if
 
-         if (num_Zs == 1 .or. Z >= z_tables(num_Zs)% Z) then ! use the largest Z
+         if (num_Zs == 1 .or. Z >= z_tables(num_Zs)% Z) then  ! use the largest Z
             call Get_Kap_for_X( &
                z_tables, rq, num_Zs, X, logRho, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -87,7 +87,7 @@
             return
          end if
 
-         if (Z <= z_tables(1)% Z) then ! use the smallest Z
+         if (Z <= z_tables(1)% Z) then  ! use the smallest Z
             if (dbg) then
                write(*,*) 'use the smallest Z'
                write(*,*) 'Z', Z
@@ -123,7 +123,7 @@
             return
          end if
 
-         if (Z <= Z0) then ! use the Z0 table
+         if (Z <= Z0) then  ! use the Z0 table
             if (dbg) then
                write(*,*) 'use the Z0 table', iz, Z0, Z, Z-Z0
                do i = 1, z_tables(iz)% num_Xs
@@ -136,7 +136,7 @@
             return
          end if
 
-         if (Z >= Z1) then ! use the Z1 table
+         if (Z >= Z1) then  ! use the Z1 table
             if (dbg) write(*,*) 'use the Z1 table', Z1
             call Get_Kap_for_X( &
                z_tables, rq, iz+1, X, logRho, logT, &
@@ -152,7 +152,7 @@
                if (dbg) write(*,*) 'failed in Get_Kap_for_Z_cubic'
                return
             end if
-         else ! linear
+         else  ! linear
             if (dbg) write(*,*) 'call Get_Kap_for_Z_linear'
             call Get_Kap_for_Z_linear(z_tables, rq, iz, Z, Z0, Z1, X, logRho, logT, &
                logKap, dlnkap_dlnRho, dlnkap_dlnT, ierr)
@@ -326,7 +326,7 @@
          if (dbg) write(*,*) 'logK1', logK1
 
          ! Z0 result in logK0, Z1 result in logK1
-         beta = (Z - Z1) / (Z0 - Z1) ! beta -> 1 as Z -> Z0
+         beta = (Z - Z1) / (Z0 - Z1)  ! beta -> 1 as Z -> Z0
          alfa = 1d0 - beta
 
          logKap = beta * logK0 + alfa * logK1
@@ -382,14 +382,14 @@
             end if
          end if
 
-         if (num_Xs == 1 .or. X <= x_tables(1)% X) then ! use the first X
+         if (num_Xs == 1 .or. X <= x_tables(1)% X) then  ! use the first X
             call Get_Kap_for_logRho_logT( &
                   z_tables, rq, iz, x_tables, 1, &
                   logRho, logT, logK, dlogK_dlogRho, dlogK_dlogT, ierr)
             return
          end if
 
-         if (X >= x_tables(num_Xs)% X) then ! use the last X
+         if (X >= x_tables(num_Xs)% X) then  ! use the last X
             if (dbg) write(*,*) 'use the last X: call Get_Kap_for_logRho_logT'
             call Get_Kap_for_logRho_logT( &
                   z_tables, rq, iz, x_tables, num_Xs, &
@@ -422,7 +422,7 @@
             return
          end if
 
-         if (X0 >= X) then ! use the X0 table
+         if (X0 >= X) then  ! use the X0 table
             if (dbg) write(*,*) 'use the X0 table'
             call Get_Kap_for_logRho_logT( &
                   z_tables, rq, iz, x_tables, ix, &
@@ -430,7 +430,7 @@
             return
          end if
 
-         if (X1 <= X) then ! use the X1 table
+         if (X1 <= X) then  ! use the X1 table
             if (dbg) write(*,*) 'use the X1 table'
             call Get_Kap_for_logRho_logT( &
                   z_tables, rq, iz, x_tables, ix+1, &
@@ -447,7 +447,7 @@
                !write(*,*) 'failed in Get_Kap_for_X_cubic'
                return
             end if
-         else ! linear
+         else  ! linear
             !write(*,*) 'call Get_Kap_for_X_linear'
             call Get_Kap_for_X_linear( &
                z_tables, rq, iz, ix, x_tables, X, X0, X1, logRho, logT, &
@@ -623,7 +623,7 @@
          if (ierr /= 0) return
 
          ! X0 result in logK0, X1 result in logK1
-         beta = (X - X1) / (X0 - X1) ! beta -> 1 as X -> X0
+         beta = (X - X1) / (X0 - X1)  ! beta -> 1 as X -> X0
          alfa = 1d0 - beta
 
          logK = beta * logK0 + alfa * logK1
@@ -657,7 +657,7 @@
          include 'formats'
 
          ierr = 0
-         if (x_tables(ix)% not_loaded_yet) then ! avoid doing critical section if possible
+         if (x_tables(ix)% not_loaded_yet) then  ! avoid doing critical section if possible
 !$omp critical (load_kap_x_table)
             if (x_tables(ix)% not_loaded_yet) then
                call load_one(rq, &

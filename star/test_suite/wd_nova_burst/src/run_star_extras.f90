@@ -34,7 +34,7 @@
 
       integer :: num_bursts
       logical :: waiting_for_burst
-      real(dp) :: L_burst = 1d4, L_between = 1d3 ! Lsun units
+      real(dp) :: L_burst = 1d4, L_between = 1d3  ! Lsun units
 
 
       contains

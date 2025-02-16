@@ -43,7 +43,6 @@
       !reads in table_summary file from atm_data, initializes logZ, Teff_array,
       ! logg_array, and Teff_bound arrays; sets some flags
       subroutine table_atm_init(use_cache, ierr)
-         implicit none
          logical, intent(in) :: use_cache
          integer, intent(out) :: ierr
 
@@ -215,7 +214,6 @@
          use interp_2d_lib_db, only: interp_evbicub_db
          use utils_lib, only: is_bad
 
-         implicit none
 
          integer, intent(in) :: id
          real(dp), intent(in) :: newZ, newlogg_in, newTeff_in
@@ -223,7 +221,7 @@
          real(dp), intent(out) :: newT, dT_dTeff, dT_dlogg
          integer, intent(out) :: ierr
          integer :: i, j, numZs, nZ, ng, nT, ict(6), Zindex, Zlo, Zhi
-         integer, parameter :: num_res = 3 !number of results (Pgas, dPgas_dTeff, dPgas_dlogg)
+         integer, parameter :: num_res = 3  !number of results (Pgas, dPgas_dTeff, dPgas_dlogg)
          real(dp) :: newlogg, newTeff, newlogZ(1), result_Z(1)
          real(dp), target :: fZ1_ary(4*4)
          real(dp), pointer :: fZ1(:), fZ(:,:)
@@ -280,10 +278,10 @@
 
          clip_Teff = .false.
          if (newTeff_in < ai% Teff_array(1)) then
-            newTeff = ai% Teff_array(1) ! clip to table in T
+            newTeff = ai% Teff_array(1)  ! clip to table in T
             clip_Teff = .true.
          else if (newTeff_in > ai% Teff_array(nT)) then
-            newTeff = ai% Teff_array(nT) ! clip to table in T
+            newTeff = ai% Teff_array(nT)  ! clip to table in T
             clip_Teff = .true.
          else
             newTeff = newTeff_in
@@ -291,10 +289,10 @@
 
          clip_logg = .false.
          if (newlogg_in < ai% logg_array(1)) then
-            newlogg = ai% logg_array(1) ! clip to table in logg
+            newlogg = ai% logg_array(1)  ! clip to table in logg
             clip_logg = .true.
          else if (newlogg_in > ai% logg_array(ng)) then
-            newlogg = ai% logg_array(ng) ! clip to table in logg
+            newlogg = ai% logg_array(ng)  ! clip to table in logg
             clip_logg = .true.
          else
             newlogg = newlogg_in
@@ -304,7 +302,7 @@
 
          if (gtv_dbg) write(*,*) 'loaded tables: ', ai% have_atm_table(:)
 
-         if (.false.) then !check for Z within range of tables
+         if (.false.) then  !check for Z within range of tables
             if (nz > 1 .and. (newlogZ(1) < ai% logZ(1) .or. newlogZ(1) > ai% logZ(nZ))) then
                write(*,*) 'get_table_values: Z outside range of atm tables'
                ierr=-1
@@ -341,7 +339,7 @@
          !do 2D Teff,logg interpolation on each of 4 Z tables (Zlo-Zhi)
                  !  P(g,T) dP_dg, dP_dT, d2P_dg2, d2P_dT2, d2P_dg_dT
                  !    1      2      3       4        5         6
-         ict(:) = (/  1,     1,     1,      0,       0,        0  /)
+         ict(:) = [  1,     1,     1,      0,       0,        0  ]
 
          if (gtv_dbg) write(*,*) 'do_interp for Pgas', id
          call do_interp(ai% Pgas_interp1, newPgas, dPgas_dlogg, dPgas_dTeff, ierr)
@@ -407,7 +405,7 @@
 
             do i = Zlo, Zhi
                if (.not. ai% have_atm_table(i)) then
-                  call load_atm_table(i,ierr) !<-load on demand
+                  call load_atm_table(i,ierr)  !<-load on demand
                end if
                if (ierr /= 0) then
                   if (gtv_dbg) write(*,*) 'load_atm_table failed'
@@ -446,7 +444,7 @@
                dval_dlogg = result_2D(2,Zlo)
                dval_dTeff = result_2D(3,Zlo)
 
-            else ! Z interpolation
+            else  ! Z interpolation
 
                fZ(1,1:numZs) = result_2D(1,Zlo:Zhi)
                call interp_pm(ai% logZ(Zlo:Zhi),numZs,fZ1,mp_work_size,work,'atm',ierr)
@@ -499,8 +497,7 @@
             use utils_lib
             use interp_2D_lib_db, only: interp_mkbicub_db
             use const_def, only: mesa_data_dir
-            implicit none
-            integer, intent(in)  :: iZ !index of Z table to be loaded
+            integer, intent(in)  :: iZ  !index of Z table to be loaded
             integer, intent(out) :: ierr
             integer :: iounit, i, j, ibound_tmp(ng), ibcTmin, ibcTmax, ibcgmin, ibcgmax
             integer :: text_file_version, nvec
@@ -593,8 +590,8 @@
             enddo
             ai% Pgas_interp(1,:,:,iZ) = data_tmp(:,:)
 
-            if (ai% id /= ATM_TABLE_PHOTOSPHERE) then ! read T
-               read(iounit,2,iostat=ierr) ! skip line
+            if (ai% id /= ATM_TABLE_PHOTOSPHERE) then  ! read T
+               read(iounit,2,iostat=ierr)  ! skip line
                if (failed(5)) return
                do j=1,nT
                   read(iounit,'(a)',iostat=ierr) buf

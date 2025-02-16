@@ -40,7 +40,7 @@ contains
       use star_def
       integer, intent(in) :: id
       real(dp), intent(in) :: dt
-      integer, intent(out) :: res ! keep_going, redo, retry, terminate
+      integer, intent(out) :: res  ! keep_going, redo, retry, terminate
       res = keep_going
    end subroutine null_other_after_struct_burn_mix
 

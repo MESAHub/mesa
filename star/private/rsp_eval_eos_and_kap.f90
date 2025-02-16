@@ -244,7 +244,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             call get_eos( &
                s, 0, xa, &
                Rho, logRho, T, logT, &
@@ -290,7 +290,7 @@
          Prad = crad*T**4/3d0  ! erg/cm^2
          d_Pr_dT = 4d0*Prad/T
 
-         erad = 3d0*Prad/rho ! 3*Prad*V   erg/gm
+         erad = 3d0*Prad/rho  ! 3*Prad*V   erg/gm
          d_erad_dT = 3d0*d_Pr_dT/rho
          d_erad_dV = 3d0*Prad
 
@@ -317,7 +317,7 @@
          dchiRho_dlnd = d_dlnd(i_chiRho)
          dchiRho_dlnT = d_dlnT(i_chiRho)
 
-         Q = chiT/(rho*T*chiRho) ! thermal expansion coefficient
+         Q = chiT/(rho*T*chiRho)  ! thermal expansion coefficient
          dQ_dlnd = Q*(dchiT_dlnd/chiT - dchiRho_dlnd/chiRho - 1d0)
          dQ_dlnT = Q*(dchiT_dlnT/chiT - dchiRho_dlnT/chiRho - 1d0)
          QV = dQ_dlnd*dlnd_dV
@@ -429,7 +429,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             write(*,*) 'cannot call eval1_mesa_eosDEgas_and_kap with k <= 0 or k > nz'
             ierr = -1
             return
@@ -464,7 +464,7 @@
 
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
+         Q = res(i_chiT)/(rho*T*res(i_chiRho))  ! thermal expansion coefficient
 
       end subroutine eval1_mesa_eosDEgas_and_kap
 
@@ -561,7 +561,7 @@
                call store_eos_for_cell(s, k, res, d_dlnd, d_dlnT, d_dxa, ierr)
                CSND = s% csound(k)
             end if
-         else ! k <= 0 or k > nz
+         else  ! k <= 0 or k > nz
             write(*,*) 'cannot call eval1_mesa_eosDE_and_kap with k <= 0 or k > nz'
             ierr = -1
             return
@@ -595,7 +595,7 @@
 
          Pgas = exp(res(i_lnPgas))
          CP = res(i_Cp)
-         Q = res(i_chiT)/(rho*T*res(i_chiRho)) ! thermal expansion coefficient
+         Q = res(i_chiT)/(rho*T*res(i_chiRho))  ! thermal expansion coefficient
 
       end subroutine eval1_mesa_eosDE_and_kap
 

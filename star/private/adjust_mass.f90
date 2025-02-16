@@ -148,8 +148,8 @@
          type (star_info), pointer :: s
 
          ! Intermediates
-         integer j, nz
-         real(dp) r_new, vol00, volp1, cell_vol
+         integer :: j, nz
+         real(dp) :: r_new, vol00, volp1, cell_vol
 
          nz = s%nz
 
@@ -332,7 +332,7 @@
          end if
 
          mtot_init(1:species) = 0
-         do k=1,k_const_mass ! save total mass by species down to where constant
+         do k=1,k_const_mass  ! save total mass by species down to where constant
             sumx = 0
             do j=1,species
                s% xa(j,k) = max(0d0, min(1d0, s% xa(j,k)))
@@ -385,8 +385,8 @@
          end do
 
          if (delta_m < 0) then
-            xaccrete(1:species) = 0 ! xaccrete not used when removing mass
-         else ! set xaccrete for composition of added material
+            xaccrete(1:species) = 0  ! xaccrete not used when removing mass
+         else  ! set xaccrete for composition of added material
             if (s% accrete_same_as_surface) then
                do j=1,species
                   xaccrete(j) = xa_old(j,1)
@@ -411,7 +411,7 @@
          ! that makes rxm_new = rxm_old for k >= k_const_mass.
          if (delta_m < 0) then
             rxm_old(1) = 0
-            rxm_new(1) = -delta_m ! note that rxm_new(1) > 0 since delta_m < 0
+            rxm_new(1) = -delta_m  ! note that rxm_new(1) > 0 since delta_m < 0
          else
             rxm_old(1) = delta_m
             rxm_new(1) = 0
@@ -471,7 +471,7 @@
                end if
             end if
             if (s% am_nu_rot_flag) then
-               call set_D_omega( & ! reuse the set_D_omega routine to set am_nu_rot
+               call set_D_omega( &  ! reuse the set_D_omega routine to set am_nu_rot
                   s, nz, k_const_mass, k_newval, &
                   rxm_old, rxm_new, delta_m, old_xmstar, new_xmstar, &
                   s% am_nu_rot, oldloc, newloc, oldval, newval, work, ierr)
@@ -747,7 +747,7 @@
          xqB_new = dqacc + xqB_old*mold_o_mnew  ! in order to keep m interior to kB constant
          ! same as  qB_new = qB_old*mold/mnew, but without the truncation problems
 
-         do ! make sure qfrac is not too far from 1 by moving kB inward
+         do  ! make sure qfrac is not too far from 1 by moving kB inward
             q1 = xqB_new - xqA
             q2 = max(1d-99,xqB_old - xqA)
             qfrac_qp = q1/q2
@@ -756,9 +756,9 @@
             if (kB-kA > 10) then
                if (qfrac > 0.67d0 .and. qfrac < 1.5d0) exit
                if (qfrac > 0.50d0 .and. qfrac < 2.0d0) then
-                  j00 = maxloc(s% xa(:,kB),dim=1) ! most abundant species at kB
-                  jp1 = maxloc(s% xa(:,kB+1),dim=1) ! most abundant species at kB+1
-                  if (j00 /= jp1) then ! change in composition.
+                  j00 = maxloc(s% xa(:,kB),dim=1)  ! most abundant species at kB
+                  jp1 = maxloc(s% xa(:,kB+1),dim=1)  ! most abundant species at kB+1
+                  if (j00 /= jp1) then  ! change in composition.
                      if (dbg) write(*,*) 'change in composition.  back up kB.'
                      kB = max(1,kB-5)
                      exit
@@ -851,7 +851,7 @@
          real(dp), intent(in) :: mmax
          real(dp), intent(in) :: xa_old(:, :), xaccrete(:)
          real(dp), dimension(:), intent(in) :: &
-            old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
+            old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass  ! (nz)
          integer, intent(out) :: ierr
          integer :: k, j, op_err
          real(dp), parameter :: max_sum_abs = 10d0
@@ -910,7 +910,7 @@
          include 'formats'
 
          ierr = 0
-         msum(:) = -1 ! for testing
+         msum(:) = -1  ! for testing
 
          xm_outer = new_cell_xbdy(k)
          if (k == nz) then
@@ -923,7 +923,7 @@
          dm_sum = 0d0
 
          partially_accreted_cell = .false.
-         if (xm_outer < old_cell_xbdy(1)) then ! there is some accreted material in new cell
+         if (xm_outer < old_cell_xbdy(1)) then  ! there is some accreted material in new cell
             if (do_not_mix_accretion .or. xm_inner <= old_cell_xbdy(1)) then
                ! new cell is entirely accreted material
                !write(*,2) 'new cell is entirely accreted material', k, new_cell_dm
@@ -940,7 +940,7 @@
             partially_accreted_cell = .true.
             xm_outer = old_cell_xbdy(1)
             k_outer = 1
-         else ! new cell entirely composed of old material
+         else  ! new cell entirely composed of old material
             msum(:) = 0
             if (xm_outer >= old_cell_xbdy(nz)) then
                ! new cell contained entirely in old cell nz
@@ -1006,7 +1006,7 @@
             write(*,1) 'xm_inner', xm_inner
          end if
 
-         do kk = k_outer, nz ! loop until reach m_inner
+         do kk = k_outer, nz  ! loop until reach m_inner
             xm0 = old_cell_xbdy(kk)
 
             if (xm0 >= xm_inner) then
@@ -1068,14 +1068,14 @@
                   msum(j) = msum(j) + xa_old(j,kk)*dm
                end do
 
-            else ! only use the part of old cell kk that is in new cell k
+            else  ! only use the part of old cell kk that is in new cell k
 
-               if (xm_inner <= xm1) then ! this is the last part of new cell k
+               if (xm_inner <= xm1) then  ! this is the last part of new cell k
 
                   dm = new_cell_dm - dm_sum
                   dm_sum = new_cell_dm
 
-               else ! notice that we avoid this case if possible because of numerical roundoff
+               else  ! notice that we avoid this case if possible because of numerical roundoff
 
                   dm = max(0d0, xm1 - xm_outer)
                   if (dm_sum + dm > new_cell_dm) dm = new_cell_dm - dm_sum
@@ -1132,7 +1132,7 @@
          integer, intent(in) :: nz, k_const_mass, k_below_just_added
          real(dp), intent(in) :: mmax, delta_m
          real(dp), dimension(:), intent(in) :: &
-            old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass ! (nz)
+            old_cell_xbdy, new_cell_xbdy, old_cell_mass, new_cell_mass  ! (nz)
          real(dp), dimension(:) :: &
             old_xout, new_xout, old_dmbar, new_dmbar, old_j_rot, extra_work
          integer, intent(out) :: ierr
@@ -1184,7 +1184,7 @@
             ! set omega in cells with newly added material
             if (s% use_accreted_material_j) then
                actual_total_added = 0d0
-               do k=1,k_below_just_added-2 ! remaining 2 done below
+               do k=1,k_below_just_added-2  ! remaining 2 done below
                   s% j_rot(k) = s% accreted_material_j
                   call set1_irot(s, k, k_below_just_added, .true.)
                   s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
@@ -1206,7 +1206,7 @@
                   call set1_irot(s, k, k_below_just_added, .true.)
                   s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
                end do
-            else ! use old surface omega in all the new material
+            else  ! use old surface omega in all the new material
                do k=1,k_below_just_added-1
                   s% omega(k) = s% omega(k_below_just_added)
                   call set1_irot(s, k, k_below_just_added, .false.)
@@ -1239,7 +1239,7 @@
       end subroutine set_omega_adjust_mass
 
 
-      subroutine set1_irot(s, k, k_below_just_added, jrot_known) ! using lnR_for_d_dt_const_m
+      subroutine set1_irot(s, k, k_below_just_added, jrot_known)  ! using lnR_for_d_dt_const_m
          use hydro_rotation, only: eval_i_rot, w_div_w_roche_jrot, w_div_w_roche_omega
          use star_utils, only: get_r_from_xh
          type (star_info), pointer :: s
@@ -1308,7 +1308,7 @@
 
          dm_sum = 0d0
 
-         if (xm_outer < old_xout(1)) then ! there is some accreted material in new
+         if (xm_outer < old_xout(1)) then  ! there is some accreted material in new
             if (xm_inner <= old_xout(1)) then
                ! new is entirely accreted material
                !write(*,2) 'new is entirely accreted material', k, new_point_dmbar
@@ -1320,7 +1320,7 @@
             j_tot = 0
             xm_outer = old_xout(1)
             k_outer = 1
-         else ! new entirely composed of old material
+         else  ! new entirely composed of old material
             if (k == k_dbg) write(*,*) 'new entirely composed of old material'
             j_tot = 0
             if (xm_outer >= old_xout(nz)) then
@@ -1361,7 +1361,7 @@
             return
          end if
 
-         do kk = k_outer, nz ! loop until reach xm_inner
+         do kk = k_outer, nz  ! loop until reach xm_inner
             xm0 = old_xout(kk)
 
             if (k == k_dbg) write(*,2) 'kk', kk, old_xout(kk), old_xout(kk+1)
@@ -1387,7 +1387,7 @@
                return
             end if
 
-            if (xm0 >= xm_outer .and. xm1 <= xm_inner) then ! entire old kk is in new k
+            if (xm0 >= xm_outer .and. xm1 <= xm_inner) then  ! entire old kk is in new k
 
                dm = old_dmbar(kk)
                dm_sum = dm_sum + dm
@@ -1400,13 +1400,13 @@
 
                j_tot = j_tot + old_j_rot(kk)*dm
 
-            else if (xm0 <= xm_outer .and. xm1 >= xm_inner) then ! entire new k is in old kk
+            else if (xm0 <= xm_outer .and. xm1 >= xm_inner) then  ! entire new k is in old kk
 
                dm = new_dmbar(k)
                dm_sum = dm_sum + dm
                j_tot = j_tot + old_j_rot(kk)*dm
 
-            else ! only use the part of old kk that is in new k
+            else  ! only use the part of old kk that is in new k
 
                if (k == k_dbg) then
                   write(*,*) 'only use the part of old kk that is in new k', xm_inner <= xm1
@@ -1419,7 +1419,7 @@
                   write(*,1) 'new_point_dmbar - dm_sum', new_point_dmbar - dm_sum
                end if
 
-               if (xm_inner <= xm1) then ! this is the last part of new k
+               if (xm_inner <= xm1) then  ! this is the last part of new k
 
                   if (k == k_dbg) write(*,3) 'this is the last part of new k', k, kk
 
@@ -1589,7 +1589,7 @@
          use interp_1d_def
          type (star_info), pointer :: s
          integer, intent(in) :: nz, k_const_mass, k_newval
-         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new ! (nz)
+         real(dp), dimension(:), intent(in) :: rxm_old, rxm_new  ! (nz)
          real(dp), intent(in) :: delta_m, old_xmstar, new_xmstar
          real(dp), dimension(:) :: &
             D_omega, oldloc, newloc, oldval, newval
@@ -1606,7 +1606,7 @@
          ierr = 0
 
          dbg = .false.
-         n = nz! k_const_mass
+         n = nz  ! k_const_mass
          nwork = pm_work_size
 
          oldloc(1) = 0

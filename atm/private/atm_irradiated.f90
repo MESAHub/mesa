@@ -158,7 +158,7 @@ contains
 
        if (err < 1._dp) exit iterate_loop
 
-       kap = kap_prev + 0.5_dp*(kap - kap_prev) ! under correct
+       kap = kap_prev + 0.5_dp*(kap - kap_prev)  ! under correct
 
        ! Re-evaluate atmosphere data
 

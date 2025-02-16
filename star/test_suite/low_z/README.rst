@@ -30,10 +30,8 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
    pgstar_interval = 10
 
@@ -58,14 +56,14 @@ pgstar commands used for the plots above:
   Kipp_win_width = 12
   Kipp_win_aspect_ratio = 0.75
   Kipp_txt_scale = 1.0
-  Kipp_title = 'inlist_low_z'      
+  Kipp_title = 'inlist_low_z'
 
   Kipp_mass_max = 0.8
   Kipp_mass_min = 0.0
   Kipp_show_mass_boundaries = .true.
 
-  Kipp_xmax = -101 
-  Kipp_xmin = 0    
+  Kipp_xmax = -101
+  Kipp_xmin = 0
 
   Kipp_show_mixing = .true.
   Kipp_show_burn = .true.

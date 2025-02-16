@@ -236,7 +236,7 @@ contains
 
     ix = FLOOR(x)
 
-    if (x == ix) then ! integer power of 10
+    if (x == ix) then  ! integer power of 10
 
        exp10_x = 1._dp
 

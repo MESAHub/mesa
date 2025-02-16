@@ -267,12 +267,12 @@
          integer, intent(in) :: k
 
          in_eos_blend = &
-            ((s% eos_frac_OPAL_SCVH(k) .gt. 0) .and. (s% eos_frac_OPAL_SCVH(k) .lt. 1)) .or. &
-            ((s% eos_frac_HELM(k) .gt. 0) .and. (s% eos_frac_HELM(k) .lt. 1)) .or. &
-            ((s% eos_frac_Skye(k) .gt. 0) .and. (s% eos_frac_Skye(k) .lt. 1)) .or. &
-            ((s% eos_frac_PC(k) .gt. 0) .and. (s% eos_frac_PC(k) .lt. 1)) .or. &
-            ((s% eos_frac_CMS(k) .gt. 0) .and. (s% eos_frac_CMS(k) .lt. 1)) .or. &
-            ((s% eos_frac_FreeEOS(k) .gt. 0) .and. (s% eos_frac_FreeEOS(k) .lt. 1))
+            ((s% eos_frac_OPAL_SCVH(k) > 0) .and. (s% eos_frac_OPAL_SCVH(k) < 1)) .or. &
+            ((s% eos_frac_HELM(k) > 0) .and. (s% eos_frac_HELM(k) < 1)) .or. &
+            ((s% eos_frac_Skye(k) > 0) .and. (s% eos_frac_Skye(k) < 1)) .or. &
+            ((s% eos_frac_PC(k) > 0) .and. (s% eos_frac_PC(k) < 1)) .or. &
+            ((s% eos_frac_CMS(k) > 0) .and. (s% eos_frac_CMS(k) < 1)) .or. &
+            ((s% eos_frac_FreeEOS(k) > 0) .and. (s% eos_frac_FreeEOS(k) < 1))
 
       end function in_eos_blend
 

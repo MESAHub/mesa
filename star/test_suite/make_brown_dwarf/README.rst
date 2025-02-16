@@ -22,18 +22,16 @@ pgstar commands used for the plots above:
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
    pgstar_interval = 10
 
   Grid1_win_flag = .true.
   Grid1_win_width = 14
   Grid1_win_aspect_ratio = 0.75
-  Grid1_title = 'inlist_make_brown_dwarf' 
-      
+  Grid1_title = 'inlist_make_brown_dwarf'
+
   TRho_Profile_xmin = -8
   TRho_Profile_xmax = 4
   TRho_Profile_ymin = 2

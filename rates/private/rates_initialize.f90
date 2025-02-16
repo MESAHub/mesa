@@ -73,7 +73,7 @@
 
       subroutine do_add_reaction_for_handle(reaction_handle, ierr)
          use reaclib_support, only: do_parse_reaction_handle
-         character (len=*), intent(in) :: reaction_handle ! to be added
+         character (len=*), intent(in) :: reaction_handle  ! to be added
          integer, intent(out) :: ierr
 
          integer :: ir, num_in, num_out
@@ -81,7 +81,7 @@
          logical :: already_defined
          integer :: iso_ids(max_num_reaction_inputs+max_num_reaction_outputs)
          integer :: cin(max_num_reaction_inputs), cout(max_num_reaction_outputs)
-         character (len=16) :: op ! e.g., 'pg', 'wk', 'to', or ...
+         character (len=16) :: op  ! e.g., 'pg', 'wk', 'to', or ...
 
          logical, parameter :: weak = .false.
          logical, parameter :: dbg = .false.
@@ -150,9 +150,9 @@
 
       subroutine do_add_reaction_from_reaclib(reaction_handle, reverse_handle, indx, ierr)
 
-         character (len=*), intent(in) :: reaction_handle ! to be added
-         character (len=*), intent(in) :: reverse_handle ! = '' if not a reverse
-         integer, intent(in) :: indx ! index in reaclib rates
+         character (len=*), intent(in) :: reaction_handle  ! to be added
+         character (len=*), intent(in) :: reverse_handle  ! = '' if not a reverse
+         integer, intent(in) :: indx  ! index in reaclib rates
          integer, intent(out) :: ierr
 
          integer :: i, ir, chapter, num_in, num_out
@@ -337,7 +337,7 @@
             weak_reaction_info(1:2,ir) = 0
          end if
 
-         reaction_ye_rho_exponents(1,ir) = 0 ! 1 for electron captures, 0 for rest.
+         reaction_ye_rho_exponents(1,ir) = 0  ! 1 for electron captures, 0 for rest.
 
          if (particles_in > 1) then
             reaction_screening_info(1,ir) = reaction_inputs(2,ir)
@@ -429,7 +429,7 @@
 
          call do_reaclib_indices_for_reaction( &
             reaction_Name(ir), reaclib_rates, lo, hi, ierr)
-         if (ierr /= 0) then ! not in reaclib
+         if (ierr /= 0) then  ! not in reaclib
             ierr = 0
             i = do_get_weak_info_list_id( &
                chem_isos% name(weak_reaction_info(1,ir)), &
@@ -548,7 +548,7 @@
          dir = rates_table_dir
          filename = trim(dir) // '/rate_list.txt'
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in rates_dir
+         if (ierr /= 0) then  ! if don't find that file, look in rates_dir
             dir = trim(rates_dir) // '/rate_tables'
             filename = trim(dir) // '/rate_list.txt'
             ierr = 0
@@ -623,7 +623,7 @@
             if (ierr == 0) return
             if (len_trim(str) > 0) then
                write(*,*) trim(str) // ' failed in reading ' // trim(filename)
-            else ! non-fatal error, so just quietly stop reading
+            else  ! non-fatal error, so just quietly stop reading
                ierr = 0
             end if
             failed = .true.
@@ -695,7 +695,7 @@
          ! first try the reaction_filename alone
          filename = trim(reactionlist_filename)
          open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
-         if (ierr /= 0) then ! if don't find that file, look in rates_data
+         if (ierr /= 0) then  ! if don't find that file, look in rates_data
             filename = trim(mesa_data_dir) // '/rates_data/' // trim(reactionlist_filename)
             ierr = 0
             open(newunit=iounit, file=trim(filename), action='read', status='old', iostat=ierr)
@@ -707,7 +707,7 @@
          end if
 
          num_reactions = 0
-         do cnt = 1, rates_reaction_id_max*10 ! will stop when reach end of file
+         do cnt = 1, rates_reaction_id_max*10  ! will stop when reach end of file
             if (dbg) write(*, *) 'cnt', cnt
 
             read(iounit,'(a)',iostat=ierr) line
@@ -917,7 +917,7 @@
 
 
          subroutine read_Q
-            if (missing_dbl()) then ! use standard Q from chem_lib
+            if (missing_dbl()) then  ! use standard Q from chem_lib
                std_reaction_Qs(ir) = get_Qtotal(ir)
             else
                std_reaction_Qs(ir) = read_dbl()
@@ -1254,7 +1254,7 @@
 
       subroutine init_rates_info(reactionlist_filename, ierr)
          character (len=*), intent(in) :: reactionlist_filename
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          include 'formats'
 
          ierr = 0
@@ -1302,7 +1302,7 @@
       end subroutine init1_rates_info
 
 
-      integer function lookup_rate_name(str) ! -1 if not found
+      integer function lookup_rate_name(str)  ! -1 if not found
          use rates_def
          character (len=*), intent(in) :: str
          integer :: i

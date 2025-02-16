@@ -42,9 +42,9 @@
              x0, xget, x1, y0, yget, y1, &
              fval, df_dx, df_dy, ierr)
          integer, intent(in) :: nvlo, nvhi, n, nx, ny
-         real(dp), intent(in) :: x(:) ! (nx)
-         real(dp), intent(in) :: y(:) ! (ny)
-         real(dp), intent(in), pointer :: fin1(:) ! =(4,n,nx,ny)
+         real(dp), intent(in) :: x(:)  ! (nx)
+         real(dp), intent(in) :: y(:)  ! (ny)
+         real(dp), intent(in), pointer :: fin1(:)  ! =(4,n,nx,ny)
          integer, intent(in) :: i, j           ! target cell in f
          real(dp), intent(in) :: x0, xget, x1      ! x0 <= xget <= x1;  x0 = xs(i), x1 = xs(i+1)
          real(dp), intent(in) :: y0, yget, y1      ! y0 <= yget <= y1;  y0 = ys(j), y1 = ys(j+1)
@@ -240,7 +240,7 @@
          do k = 1, species
             do j = 1, nv
                d_dxa(j,k) = &
-                  alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k) ! ignores blend derivatives
+                  alfa*d_dxa_1(j,k) + beta*d_dxa_2(j,k)  ! ignores blend derivatives
             end do
          end do
 

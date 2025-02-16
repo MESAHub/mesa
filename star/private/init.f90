@@ -55,7 +55,7 @@
          use kap_lib, only: alloc_kap_handle_using_inlist, kap_ptr
          use eos_lib, only: alloc_eos_handle_using_inlist, eos_ptr
          integer, intent(in) :: id
-         integer, intent(out) :: ierr ! 0 means AOK.
+         integer, intent(out) :: ierr  ! 0 means AOK.
          type (star_info), pointer :: s
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) then
@@ -515,7 +515,7 @@
          s% doing_solver_iterations = .false.
          s% need_to_setvars = .true.
          s% okay_to_set_mixing_info = .true.
-         s% okay_to_set_mlt_vc = .false. ! not until have set mlt_cv_old
+         s% okay_to_set_mlt_vc = .false.  ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
 
          s% have_ST_start_info = .false.
@@ -682,7 +682,7 @@
 
          s% he_core_mass = 0
          s% co_core_mass = 0
-         s% Teff = -1 ! need to calculate it
+         s% Teff = -1  ! need to calculate it
          s% center_eps_nuc = 0
          s% Lrad_div_Ledd_avg_surf = 0
          s% w_div_w_crit_avg_surf = 0
@@ -848,7 +848,7 @@
 
          type (star_info), pointer :: s
          real(dp) :: initial_mass, initial_z
-         real(dp), parameter :: lg_max_abs_mdot = -1000 ! use default
+         real(dp), parameter :: lg_max_abs_mdot = -1000  ! use default
          real(dp), parameter :: change_mass_years_for_dt = 1
          real(dp), parameter :: min_mass_for_create_pre_ms = 0.03d0
          real(dp) :: total_radiation, warning_limit_for_max_residual
@@ -882,7 +882,7 @@
             call set_net(s, s% net_name, ierr)
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
-            call init_def(s) ! RSP
+            call init_def(s)  ! RSP
             call finish_load_model(s, restart, ierr)
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
@@ -993,7 +993,7 @@
                      s% dt_next = yrs_for_init_timestep(s)*secyer
                   end if
                case (do_create_RSP_model)
-                  call build_rsp_model(s, ierr) ! like build_pre_ms_model
+                  call build_rsp_model(s, ierr)  ! like build_pre_ms_model
                   if (ierr /= 0) then
                      write(*,*) 'failed in build_rsp_model'
                      return
@@ -1053,14 +1053,14 @@
 
          if (do_which == do_create_pre_ms_model) then
             call setup_for_relax_after_create_pre_ms_model
-            if (s% mstar > s% initial_mass*Msun) then ! need to reduce mass
+            if (s% mstar > s% initial_mass*Msun) then  ! need to reduce mass
                write(*,1) 'reduce mass to', s% initial_mass
                call do_relax_mass(s% id, s% initial_mass, lg_max_abs_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
                   return
                end if
-            else if (s% mstar < s% initial_mass*Msun) then ! need to increase mass
+            else if (s% mstar < s% initial_mass*Msun) then  ! need to increase mass
                write(*,1) 'increase mass to', s% initial_mass
                call do_relax_mass_scale( &
                   s% id, s% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)

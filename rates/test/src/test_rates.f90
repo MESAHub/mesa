@@ -104,7 +104,7 @@
 
       write(*,'(A)')
 
-      temps = (/6.0d0,6.5d0,7.0d0,7.5d0,8.0d0,8.5d0,9.0d0,9.5d0,10.0d0/)
+      temps = [6.0d0,6.5d0,7.0d0,7.5d0,8.0d0,8.5d0,9.0d0,9.5d0,10.0d0]
 
       tf => tf_rec
 
@@ -113,9 +113,9 @@
          nrates_to_eval = 1
          allocate(irs(nrates_to_eval),raw_rates(nrates_to_eval))
 
-         irs(1:nrates_to_eval) = (/ &
+         irs(1:nrates_to_eval) = [ &
             ir_s32_ga_si28     &
-            /)
+            ]
 
       else
 
@@ -223,13 +223,13 @@
    end subroutine test1
 
    subroutine do_test_FL_epsnuc_3alf
-      real(dp) :: T ! temperature
-      real(dp) :: Rho ! density
-      real(dp) :: Y ! helium mass fraction
-      real(dp) :: UE ! electron molecular weight
-      real(dp) :: eps_nuc ! eps_nuc in ergs/g/sec
-      real(dp) :: deps_nuc_dT ! partial wrt temperature
-      real(dp) :: deps_nuc_dRho ! partial wrt density
+      real(dp) :: T  ! temperature
+      real(dp) :: Rho  ! density
+      real(dp) :: Y  ! helium mass fraction
+      real(dp) :: UE  ! electron molecular weight
+      real(dp) :: eps_nuc  ! eps_nuc in ergs/g/sec
+      real(dp) :: deps_nuc_dT  ! partial wrt temperature
+      real(dp) :: deps_nuc_dRho  ! partial wrt density
       include 'formats'
       T = 1d7
       Rho = 1d10
@@ -283,13 +283,13 @@
    end subroutine do_test_rate_table
 
    subroutine do_test2_FL_epsnuc_3alf
-      real(dp) :: T ! temperature
-      real(dp) :: Rho ! density
-      real(dp) :: Y ! helium mass fraction
-      real(dp) :: UE ! electron molecular weight
-      real(dp) :: eps_nuc1, eps_nuc2 ! eps_nuc in ergs/g/sec
-      real(dp) :: deps_nuc_dT ! partial wrt temperature
-      real(dp) :: deps_nuc_dRho ! partial wrt density
+      real(dp) :: T  ! temperature
+      real(dp) :: Rho  ! density
+      real(dp) :: Y  ! helium mass fraction
+      real(dp) :: UE  ! electron molecular weight
+      real(dp) :: eps_nuc1, eps_nuc2  ! eps_nuc in ergs/g/sec
+      real(dp) :: deps_nuc_dT  ! partial wrt temperature
+      real(dp) :: deps_nuc_dRho  ! partial wrt density
       real(dp) :: dT, dRho
       include 'formats'
       T = 7.9432823472428218d+07

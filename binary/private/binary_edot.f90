@@ -217,15 +217,15 @@
        end do
 
 !        xfer = min(b% wind_xfer_fraction, b% xfer_fraction)
-       Mtot = b% m(1) + b% m(2) ! total mass in gr
+       Mtot = b% m(1) + b% m(2)  ! total mass in gr
 
-       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1 !-&
+       b% edot_theta = - b% mdot_donor_theta / Mtot * b% e1  !-&
 !               b% mdot_donor_theta * xfer / b% m(b% a_i) * (b% m(b% d_i) / Mtot *&
 !               ((b% m(b% a_i)**2 / b% m(b% d_i)**2 - 1 ) * e2 - e3 ))
 
        !integrate to get total eccentricity enhancement
        de = 0d0
-       do i = 2,b% anomaly_steps ! trapezoidal integration
+       do i = 2,b% anomaly_steps  ! trapezoidal integration
           de = de + 0.5d0 * (b% edot_theta(i-1) + b% edot_theta(i)) * (b% time_co(i) - b% time_co(i-1))
        end do
 

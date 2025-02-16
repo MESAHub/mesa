@@ -353,7 +353,7 @@
                   end if
                end do
                if (jmx <= 0) exit
-               if (mx < 1) exit ! FOR TEST OUTPUT
+               if (mx < 1) exit  ! FOR TEST OUTPUT
                flgs(jmx) = .true.
             end if
             write(*, '(a40, 2x, f15.6, e15.6)')  &

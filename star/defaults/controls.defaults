@@ -4343,7 +4343,7 @@
       ! ~~~~~~~~~~~~~~~~
 
       ! Error tolerance for iterations and integrations when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'`` or
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'`` or
       ! ``'varying'``.
 
       ! ::
@@ -4355,7 +4355,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when
-      ! ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'iterated'``.
+      ! ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -4366,7 +4366,7 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of steps for integrating the hydrostatic equilibrium
-      ! equation when ``atm_option`` = ``'T_tau' and ``atm_T_tau_opacity`` = ``'varying'``.
+      ! equation when ``atm_option`` = ``'T_tau'`` and ``atm_T_tau_opacity`` = ``'varying'``.
 
       ! ::
 
@@ -4442,7 +4442,7 @@
       ! atm_irradiated_errtol
       ! ~~~~~~~~~~~~~~~~~~~~~
 
-      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'
+      ! Error tolerance for iterations when ``atm_option`` = ``'irradiated_grey'``
       ! and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
@@ -4454,7 +4454,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Maximum number of iterations for the opacity when ``atm_option`` =
-      ! ``'irradiated_grey' and ``atm_irradiated_opacity`` = ``'iterated'``.
+      ! ``'irradiated_grey'`` and ``atm_irradiated_opacity`` = ``'iterated'``.
 
       ! ::
 
@@ -8234,7 +8234,7 @@
       ! ::
 
     use_dPrad_dm_form_of_T_gradient_eqn = .false.
-    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.    
+    use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 
       ! Hydrodynamic drag
@@ -8270,7 +8270,7 @@
     use_drag_energy = .true.
     drag_coefficient = 0d0
     min_q_for_drag = 0d0
-    
+
 
       ! v_drag_factor
       ! ~~~~~~~~~~~~~

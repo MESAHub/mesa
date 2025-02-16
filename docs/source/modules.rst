@@ -1,6 +1,6 @@
-****************
-Modules Overview
-****************
+*******
+Modules
+*******
 
 This page lists the MESA modules alphabetically by name and briefly
 summarizes their purpose.
@@ -120,7 +120,7 @@ conductive opacities.
 Nuclear reaction networks (``net``)
 ===================================
 
-The ``net`` module implements nuclear reaction networks.  
+The ``net`` module implements nuclear reaction networks.
 
 .. toctree::
    :maxdepth: 1

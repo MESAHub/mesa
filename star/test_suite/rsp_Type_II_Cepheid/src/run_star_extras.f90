@@ -68,7 +68,7 @@ module run_star_extras
          call test_suite_startup(s, restart, ierr)
          if (.not. restart) then
             need_to_write_LINA_data = len_trim(s% x_character_ctrl(10)) > 0
-         else ! it is a restart
+         else  ! it is a restart
             need_to_write_LINA_data = .false.
          end if
       end subroutine extras_startup

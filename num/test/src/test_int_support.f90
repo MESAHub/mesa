@@ -40,7 +40,7 @@
          integer, intent(in) :: n, ndisc, mljac, mujac, matrix_type_spec, lrpar, lipar, itol
          logical, intent(in) :: numerical_jacobian, quiet
          real(dp), intent(inout) :: t(0:ndisc+1), rtol(*), atol(*), h0
-         real(dp), pointer :: y(:) ! (n)
+         real(dp), pointer :: y(:)  ! (n)
          integer, intent(inout) :: nstep
          integer, intent(inout), pointer :: ipar(:) ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:) ! (lrpar)
@@ -50,8 +50,8 @@
             nzmax, lrd, lid, isparse, liwork, lwork
          real(dp) :: h, eps, max_step_size, y_min, y_max
 
-         integer, pointer :: iwork(:) !(liwork)
-         real(dp), pointer :: work(:) !(lwork)
+         integer, pointer :: iwork(:)  !(liwork)
+         real(dp), pointer :: work(:)  !(lwork)
          integer, pointer :: ipar_decsol(:) !(lid)
          real(dp), pointer :: rpar_decsol(:) !(lrd)
 
@@ -75,7 +75,7 @@
          rpar = 0
 
          nrdens = n
-         max_cols_exptrap = 0 ! use default
+         max_cols_exptrap = 0  ! use default
 
          lid = 0; lrd = 0
          if (which_decsol == lapack) then
@@ -88,7 +88,7 @@
                nzmax = n*(mljac + mujac + 1)
             end if
             write(*,*) 'test_int_support: bad which_decsol', which_decsol
-            call mesa_error(__FILE__,__LINE__) ! test_int_support
+            call mesa_error(__FILE__,__LINE__)  ! test_int_support
          end if
 
          call isolve_work_sizes(n,nzmax,imas,mljac,mujac,mlmas,mumas,liwork,lwork)
@@ -96,7 +96,7 @@
          allocate(iwork(liwork),work(lwork),ipar_decsol(lid),rpar_decsol(lrd),stat=ierr)
          if (ierr /= 0) then
             write(*,*) 'allocate ierr', ierr
-            call mesa_error(__FILE__,__LINE__) ! test_int_support
+            call mesa_error(__FILE__,__LINE__)  ! test_int_support
          end if
 
          iwork = 0
@@ -143,7 +143,7 @@
                write(*,*) 'solver returned ierr /= 0', idid
                call mesa_error(__FILE__,__LINE__)
             end if
-            nstep = nstep + iwork(16) ! nsteps
+            nstep = nstep + iwork(16)  ! nsteps
          end do
 
          deallocate(iwork,work,ipar_decsol,rpar_decsol)

@@ -52,32 +52,32 @@ contains
       integer, intent(in) :: net_handle, eos_handle, id
       integer, intent(in) :: num_isos
       integer, intent(in) :: num_reactions
-      real(dp), intent(in) :: t_start, t_end, starting_x(:) ! (num_isos)
+      real(dp), intent(in) :: t_start, t_end, starting_x(:)  ! (num_isos)
 
       integer, intent(in) :: num_times_for_interpolation
       ! ending time is times(num_times); starting time is 0
-      real(dp), pointer, intent(in) :: times(:) ! (num_times)
-      real(dp), pointer, intent(in) :: log10Ts_f1(:) ! =(4,numtimes) interpolant for log10T(time)
-      real(dp), pointer, intent(in) :: log10Rhos_f1(:) ! =(4,numtimes) interpolant for log10Rho(time)
-      real(dp), pointer, intent(in) :: etas_f1(:) ! =(4,numtimes) interpolant for eta(time)
-      real(dp), pointer, intent(in) :: dxdt_source_term(:) ! (num_isos)  or null if no source term.
-      real(dp), intent(in), pointer :: rate_factors(:) ! (num_reactions)
+      real(dp), pointer, intent(in) :: times(:)  ! (num_times)
+      real(dp), pointer, intent(in) :: log10Ts_f1(:)  ! =(4,numtimes) interpolant for log10T(time)
+      real(dp), pointer, intent(in) :: log10Rhos_f1(:)  ! =(4,numtimes) interpolant for log10Rho(time)
+      real(dp), pointer, intent(in) :: etas_f1(:)  ! =(4,numtimes) interpolant for eta(time)
+      real(dp), pointer, intent(in) :: dxdt_source_term(:)  ! (num_isos)  or null if no source term.
+      real(dp), intent(in), pointer :: rate_factors(:)  ! (num_reactions)
       real(dp), intent(in) :: weak_rate_factor
-      real(dp), pointer, intent(in) :: reaction_Qs(:) ! (rates_reaction_id_max)
-      real(dp), pointer, intent(in) :: reaction_neuQs(:) ! (rates_reaction_id_max)
-      integer, intent(in) :: screening_mode ! see screen_def
-      real(dp), intent(in) :: stptry ! try this for 1st step.  0 means try in 1 step.
-      integer, intent(in) :: max_steps ! maximal number of allowed steps.
-      real(dp), intent(in) :: eps, odescal ! tolerances.  e.g., set both to 1d-6
-      logical, intent(in) :: use_pivoting ! for matrix solves
+      real(dp), pointer, intent(in) :: reaction_Qs(:)  ! (rates_reaction_id_max)
+      real(dp), pointer, intent(in) :: reaction_neuQs(:)  ! (rates_reaction_id_max)
+      integer, intent(in) :: screening_mode  ! see screen_def
+      real(dp), intent(in) :: stptry  ! try this for 1st step.  0 means try in 1 step.
+      integer, intent(in) :: max_steps  ! maximal number of allowed steps.
+      real(dp), intent(in) :: eps, odescal  ! tolerances.  e.g., set both to 1d-6
+      logical, intent(in) :: use_pivoting  ! for matrix solves
       logical, intent(in) :: trace, dbg
       interface
          include 'burner_finish_substep.inc'
       end interface
 
       ! These should be set for the output
-      real(dp), intent(inout) :: ending_x(:) ! (num_isos)
-      real(dp), intent(inout) :: eps_nuc_categories(:) ! (num_categories)
+      real(dp), intent(inout) :: ending_x(:)  ! (num_isos)
+      real(dp), intent(inout) :: eps_nuc_categories(:)  ! (num_categories)
       real(dp), intent(out) :: avg_eps_nuc, eps_neu_total
       integer, intent(out) :: nfcn    ! number of function evaluations
       integer, intent(out) :: njac    ! number of jacobian evaluations

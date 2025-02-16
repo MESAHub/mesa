@@ -13,7 +13,7 @@ This test case has 1 part. Click to see a larger version of a plot.
 .. code-block:: console
 
   rel_run_E_err   3.8990079261471820E-010
-  good match for period   3.9239601593741478        3.9230499999999999  
+  good match for period   3.9239601593741478        3.9230499999999999
 
 .. image:: ../../../star/test_suite/rsp_Cepheid/docs/grid_0007266.svg
    :width: 100%
@@ -27,10 +27,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

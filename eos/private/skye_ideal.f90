@@ -35,8 +35,8 @@ module skye_ideal
 
       ! Helper quantity
       kt = kerg * temp
-      n = den / (amu * abar) ! Number density of ions
-      nQ = pow(kT, 1.5d0) / sifac ! Quantum density for a 1-amu species
+      n = den / (amu * abar)  ! Number density of ions
+      nQ = pow(kT, 1.5d0) / sifac  ! Quantum density for a 1-amu species
 
       F_ideal_ion = 0d0
       do j=1,species
@@ -72,8 +72,8 @@ module skye_ideal
       integer :: k
 
       !..for the interpolations
-      integer          iat, jat
-      real(dp) dth, dt2, dti, dt2i, dt3i, dd, &
+      integer          :: iat, jat
+      real(dp) :: dth, dt2, dti, dt2i, dt3i, dd, &
                        xt, xd, mxt, mxd, fi(36), &
                        dindd, dinda, dindz, dindda, dinddz, dindaa, &
                        dindaz, dindzz, dinddaa, dinddaz, &
@@ -81,7 +81,7 @@ module skye_ideal
                        w0d, w1d, w2d, w0md, w1md, w2md, &
                        dpepdd_in, dpepddd_in, dpepddt_in
 
-      real(dp) si0t, si1t, si2t, si0mt, si1mt, si2mt, &
+      real(dp) :: si0t, si1t, si2t, si0mt, si1mt, si2mt, &
                        si0d, si1d, si2d, si0md, si1md, si2md, &
                        dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt, &
                        dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md, &
@@ -469,7 +469,7 @@ module skye_ideal
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
                     dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
-        detadddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
+        detadddd = ye * ye * ye * y  ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         detadttt = h3(iat,jat,fi, &
@@ -479,13 +479,13 @@ module skye_ideal
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
                     ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        detadddt = ye * ye * y ! d/drho^2 d/dT
+        detadddt = ye * ye * y  ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
-        detaddtt = ye * y ! d/drho d/dT^2
+        detaddtt = ye * y  ! d/drho d/dT^2
 
         ! dg/da = dg/d(din) d(din)/da = dg/d(din) d(ye*rho)/da
         ! = dg/d(din) d(z rho / a)/da = -(z rho / a^2) dg/d(din)
@@ -566,7 +566,7 @@ module skye_ideal
         y       = h3(iat,jat,fi, &
                     si0t,   si1t,  si0mt,  si1mt, &
                     dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
-        dxneferdddd = ye * ye * ye * y ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
+        dxneferdddd = ye * ye * ye * y  ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
                                     !  ! d/drho^3
 
         dxneferdttt = h3(iat,jat,fi, &
@@ -577,13 +577,13 @@ module skye_ideal
         y       = h3(iat,jat,fi, &
                     dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
                     ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        dxneferdddt = ye * ye * y ! d/drho^2 d/dT
+        dxneferdddt = ye * ye * y  ! d/drho^2 d/dT
 
         y       = h3(iat,jat,fi, &
                     ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
                     dsi0d,  dsi1d,  dsi0md,  dsi1md)
 
-        dxneferddtt = ye * y ! d/drho d/dT^2
+        dxneferddtt = ye * y  ! d/drho d/dT^2
 
 
         ! dg/da = dg/d(din) d(din)/da = dg/d(din) d(ye*rho)/da

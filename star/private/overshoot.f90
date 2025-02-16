@@ -278,7 +278,7 @@ contains
                 rho = s%rho(k)
              endif
 
-             cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k) ! gm^2/sec
+             cdc = (pi4*s%r(k)*s%r(k)*rho)*(pi4*s%r(k)*s%r(k)*rho)*D(k)  ! gm^2/sec
 
              call eval_conv_bdy_r(s, i, r_cb, ierr)
              if (ierr /= 0) then

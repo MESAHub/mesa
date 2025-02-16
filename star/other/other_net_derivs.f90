@@ -46,7 +46,6 @@ contains
       symbolic, just_dydt, ierr)
       use net_def
 
-      implicit none
 
       type(Net_Info) :: n
       real(qp), pointer, intent(inout) :: dydt(:, :)

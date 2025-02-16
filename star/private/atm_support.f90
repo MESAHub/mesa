@@ -355,7 +355,7 @@ contains
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
             ierr)
 
-       kap = 0._dp ! This value is not used
+       kap = 0._dp  ! This value is not used
 
     case default
 
@@ -581,7 +581,7 @@ contains
           write(*,*) "setting T_tau value for tau_base =", tau_base
           s% tau_base = tau_base
        end if
-    else ! check to see if need to switch back to table value for tau_base
+    else  ! check to see if need to switch back to table value for tau_base
        call atm_get_table_base(table_id, tau_base, ierr)
        if (ierr /= 0) then
           if (s% report_ierr) then
@@ -1031,7 +1031,7 @@ contains
 
     ! Stop because we can't continue
 
-    ierr = -1 ! ifort complains if this isn't set
+    ierr = -1  ! ifort complains if this isn't set
     call mesa_error(__FILE__,__LINE__,'Please amend your inlist file to correct this problem')
 
     ! Finish

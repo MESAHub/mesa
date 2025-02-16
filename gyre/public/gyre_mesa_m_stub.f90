@@ -2,7 +2,7 @@
 ! optionally use GYRE without failing to compile on systems built with
 ! USE_GYRE=NO in utils/makefile_header.
 
-module gyre_mesa_m ! stub
+module gyre_mesa_m  ! stub
 
    use forum_m, only: RD
 
@@ -151,6 +151,7 @@ contains
         subroutine user_sub (md, ipar, rpar, retcode)
            import mode_t
            import RD
+           implicit none
            type(mode_t), intent(in) :: md
            integer, intent(inout)   :: ipar(:)
            real(RD), intent(inout)  :: rpar(:)
@@ -180,5 +181,4 @@ contains
 
   end subroutine set_constant_c_
 
-end module gyre_mesa_m ! stub
-
+end module gyre_mesa_m  ! stub

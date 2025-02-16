@@ -4,7 +4,7 @@
 rsp_BLAP
 ********
 
-This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model - 
+This test case checks the non-linear pulsation evolution of a 0.36 Msun, Teff = 26,000 K, L = 320 Lsun, Z = 0.05 metallicity model -
 a blue large-amplitude pulsator model originally contributed by Alfred Gautschy.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -28,10 +28,8 @@ pgstar commands, in addition to those in ``inlist_rsp_pgstar_default``, used for
 
   file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
   !file_device = 'png'            ! png
-  !file_extension = 'png'
 
   file_device = 'vcps'          ! postscript
-  file_extension = 'ps'
 
   pgstar_interval = 100
 

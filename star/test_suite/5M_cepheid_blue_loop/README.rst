@@ -24,10 +24,8 @@ pgstar commands used:
 
    file_white_on_black_flag = .true. ! white_on_black flags -- true means white foreground color on black background
    file_device = 'png'            ! png
-   file_extension = 'png'
 
    !file_device = 'vcps'          ! postscript
-   !file_extension = 'ps'
 
     pgstar_interval = 10
 
@@ -35,10 +33,10 @@ pgstar commands used:
    HR_win_width = 12
    HR_win_aspect_ratio = 1.2 ! aspect_ratio = height/width
 
-   HR_logT_min = 3.6 
-   HR_logT_max = 4.3 
-   HR_logL_min = 2.0 
-   HR_logL_max = 3.4 
+   HR_logT_min = 3.6
+   HR_logT_max = 4.3
+   HR_logL_min = 2.0
+   HR_logL_max = 3.4
 
    ! file output
    HR_file_flag = .true.

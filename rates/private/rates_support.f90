@@ -94,13 +94,13 @@
 
          end do
 
-         if(warn_rates_for_high_temp .and. logtemp_in .ge. max_safe_logT_for_rates) then
+         if(warn_rates_for_high_temp .and. logtemp_in >= max_safe_logT_for_rates) then
             write(*,'(A,F0.6,A,F0.6,A)') "WARNING: evaluating rates with lgT=",logtemp_in," which is above lgT=",&
                                     max_safe_logT_for_rates,", rates have been truncated"
          end if
 
 
-         if(logtemp_in .ge. max_safe_logT_for_rates) then
+         if(logtemp_in >= max_safe_logT_for_rates) then
             logtemp = max_safe_logT_for_rates
          else
             logtemp = logtemp_in
@@ -115,7 +115,7 @@
             iat0 = int((logtemp - rattab_tlo)/rattab_tstp) + 1
             iat = max(1, min(iat0 - mp/2 + 1, imax - mp + 1))
             call get_rates_from_table(1, num_reactions)
-         else ! table only has a single temperature
+         else  ! table only has a single temperature
             do i=1,num_reactions
                rate_raw(i) = rattab(i,1)*dtab(i)
                rate_raw_dT(i) = 0
@@ -124,7 +124,7 @@
          end if
 
          do i=1,num_reactions
-            if(raw_rate_factor(i).gt. max_safe_rate_for_any_temp) then
+            if(raw_rate_factor(i)> max_safe_rate_for_any_temp) then
                write(*,*) "Rate has exceeded any sensible limit for a reaction rate"
                write(*,*) trim(reaction_Name(reaction_id(i)))
                write(*,*) raw_rate_factor(i),max_safe_rate_for_any_temp,raw_rate_factor(i)/max_safe_rate_for_any_temp
@@ -139,7 +139,7 @@
             rate_raw_dRho(i) = rate_raw_dRho(i)*fac
          end do
 
-         if(logtemp .ge. max_safe_logT_for_rates) then
+         if(logtemp >= max_safe_logT_for_rates) then
             rate_raw_dT(1:num_reactions) = 0d0
          end if
 
@@ -156,7 +156,7 @@
 
             include 'formats'
 
-            k = iat+1 ! starting guess for search
+            k = iat+1  ! starting guess for search
             do while (logtemp < logttab(k) .and. k > 1)
                k = k-1
             end do
@@ -264,7 +264,7 @@
                logttab(i) = logT
                do j=1, num_reactions
                   if (reaction_id(j) <= 0) cycle
-                  rattab(j, i) = missing_value ! so can check
+                  rattab(j, i) = missing_value  ! so can check
                end do
                operr = 0
                !write(*,2) 'logT', i, logT
@@ -295,7 +295,7 @@
             end if
          end if
 
-         if (nrattab > 1) then ! create interpolants
+         if (nrattab > 1) then  ! create interpolants
             allocate(work(nrattab*mp_work_size,utils_OMP_GET_MAX_THREADS()), stat=ierr)
             call fill_with_NaNs_2D(work)
             if (ierr /= 0) return
@@ -611,7 +611,7 @@
       subroutine do_eval_reaclib_21( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr
@@ -662,7 +662,7 @@
       subroutine do_eval_reaclib_22( &
             ir, temp, den, rate_raw, reverse_rate_raw, ierr)
          use raw_rates, only: get_reaclib_rate_and_dlnT
-         integer, intent(in) :: ir ! reaction_id
+         integer, intent(in) :: ir  ! reaction_id
          real(dp), intent(in) :: temp, den
          real(dp), intent(inout) :: rate_raw(:), reverse_rate_raw(:)
          integer, intent(out) :: ierr

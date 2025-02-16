@@ -53,7 +53,7 @@
       data R,A/8.317d7,7.5641d-15/
       data PRECEQ/5.d-13/
 
-      if(P<=0.d0) goto 100 !negative pressure, stop
+      if(P<=0.d0) goto 100  !negative pressure, stop
 
       ierr = 0
       Prad = Radiation_Pressure(T)
@@ -82,7 +82,7 @@
          return
          call mesa_error(__FILE__,__LINE__,'EOP')
       end if
-      V = 1d0/rho ! initial guess to be improved below
+      V = 1d0/rho  ! initial guess to be improved below
 
          !write(*,*) 'eval1_mesa_Rho_given_PT', k
          !write(*,*) 'P', P
@@ -97,7 +97,7 @@
         T,V,P1,DPV,DU1,E,DU2,DU3,CP,DU4,DU5,QQ,DU6,DU7,OP &
            ,DU8,DU9,ierr)
       if (ierr /= 0) return
-      if(I>25) goto 2 !no convergence, stop
+      if(I>25) goto 2  !no convergence, stop
       F2=P1/P-1.d0
       V=V-F2*P/DPV
       if (is_bad(V)) then
@@ -141,7 +141,7 @@
          M, DM, DM_BAR, R, Vol, T, Et
       integer, intent(out) :: ierr
 
-      logical, parameter :: RSP_eddi = .true. ! use Eddington approx at surface
+      logical, parameter :: RSP_eddi = .true.  ! use Eddington approx at surface
 
       real(dp), allocatable, dimension(:) :: &
          E, P, Lr, Lc, Hp_face, Y_face, K, CPS, QQS, &
@@ -191,7 +191,7 @@
       real(dp) :: TT,dmN,dmNL,TNL,DDT,MSTAR,PRECR
       real(dp) :: RINNER,ROUTER,TINNER,MENVEL
       integer :: IOP,NEGFLU
-      logical ending
+      logical :: ending
 
       real(dp) :: SUMM,AONE,HAHA
       real(dp) :: AAA(100),AAP(100),AAT(100)
@@ -243,17 +243,17 @@
 !     STORE SOME VALUES FOR FURTHER COMPARISON
       MSTAR  = M(NZN)
       TINNER = T(1)
-      RINNER = s% R_center ! R0
+      RINNER = s% R_center  ! R0
       ROUTER = R(NZN)
       MENVEL = MSTAR-M(1)+dm(1)
 
       TNL = 0d0
 
       if (s% RSP_use_Prad_for_Psurf) then
-         if(.not.RSP_eddi) then !     EXACT GREY RELATION
-            T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE !0.811194802d0*TE
-         else !     EDDINGTON APPROXIMATION
-            T_0= pow(0.5d0, 0.25d0)*TE ! T_0= pow(1.0d0/2.d0,0.25d0)*TE
+         if(.not.RSP_eddi) then  !     EXACT GREY RELATION
+            T_0= pow(sqrt(3.d0)/4.d0,0.25d0)*TE  !0.811194802d0*TE
+         else  !     EDDINGTON APPROXIMATION
+            T_0= pow(0.5d0, 0.25d0)*TE  ! T_0= pow(1.0d0/2.d0,0.25d0)*TE
          endif
          Psurf = crad*T_0*T_0*T_0*T_0/3d0
       else
@@ -265,11 +265,11 @@
          write(*,*) '*** relax envelope ***'
 
       NEGFLU=0
-      NDIVAA = 20 ! s% RSP_NDIVAA
-      NDIVAP = 20 ! s% RSP_NDIVAP
-      NDIVAT = 20 ! s% RSP_NDIVAT
-      ok_to_adjust_mass = .true. ! s% RSP_ok_to_adjust_mass
-      ok_to_adjust_Tsurf = .true. ! s% RSP_ok_to_adjust_Tsurf
+      NDIVAA = 20  ! s% RSP_NDIVAA
+      NDIVAP = 20  ! s% RSP_NDIVAP
+      NDIVAT = 20  ! s% RSP_NDIVAT
+      ok_to_adjust_mass = .true.  ! s% RSP_ok_to_adjust_mass
+      ok_to_adjust_Tsurf = .true.  ! s% RSP_ok_to_adjust_Tsurf
       dmN_cnt = 0
       max_dmN_cnt = s% RSP_relax_max_tries
       PREC1 = s% RSP_relax_dm_tolerance
@@ -284,7 +284,7 @@
 !     IF BOTH ALFAP NAD ALFAT /= 0, IT IS NECESSARY TO ITERATE WITHOUT
 !     TURBULENT FLUX, WITH TURBULENT PRESSURE ONLY, AND AFTER
 !     CONVERGENCE TURBULENT FLUX IS ITERATED
-      AALFA = -1 ! turn off ALFA relax
+      AALFA = -1  ! turn off ALFA relax
       if (AALFA <= 0d0) AALFA = ALFA
       AALFAT = ALFAT
       AALFAP = ALFAP
@@ -315,7 +315,7 @@
 !-
       PRECR = 1.d-10  !PRECISION FOR NEWTON-RHAPSON ITERATIONS
       DXH = 0.01d0   !UNDERCORRECTION FOR NEWTON-RHAPSON CORRECTIONS
-      DDT = -dm(NZN)/1000.d0 !INITIAL CHANGE IN OUTER ZONE MASS
+      DDT = -dm(NZN)/1000.d0  !INITIAL CHANGE IN OUTER ZONE MASS
 
       IOP = 0
 
@@ -326,7 +326,7 @@
 
 !------ MASS TRICKS ---
 !     dmN = dm(NZN) ! THIS IS NOT WORKING IF FSUB/=1
-      dmN = dm(NZN-1) !THIS IS WORKING FOR ALL FSUB VALUES
+      dmN = dm(NZN-1)  !THIS IS WORKING FOR ALL FSUB VALUES
 
       TT  = T(NZN-NZT+1)-TH0
 
@@ -491,7 +491,7 @@
                   dm(I)=dmN*FSUB
                   dm_bar(I)=dm(I)*0.5d0
                else
-                  if(I>=NZN-NZT+1) dm(I)=dmN !DEFINITION DOWN TO ANCHOR
+                  if(I>=NZN-NZT+1) dm(I)=dmN  !DEFINITION DOWN TO ANCHOR
                   if(I<NZN-NZT+1.and.ok_to_adjust_mass)  &
                                      dm(I)=AONE*pow(HAHA,(NZN-NZT+1)-I)
                   dm_bar(I)=(dm(I)+dm(I+1))*0.5d0
@@ -1007,7 +1007,7 @@
       DLRM =  0.d0
       DLT  =  0.d0
       DLTP =  0.d0
-      DLR  =  0.d0 !!-1.d0
+      DLR  =  0.d0  !!-1.d0
       do 5 I=1,NZN
          IR = 3+3*(I-1)
          IC = 2+3*(I-1)
@@ -1029,8 +1029,8 @@
          T2=(W_out/K(I+1)-W_00/K(I))/(1.d0-BK/BW)
          Lr(I)=T1*T2
          T3=T1/(BW-BK)
-         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2) !dL(i)/dK(i)
-         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2) !dL(i)/dK(i+1)
+         DLK=  (T3/K(I))  *(W_00*BW/K(I)  -T2)  !dL(i)/dK(i)
+         DLKP=-(T3/K(I+1))*(W_out*BW/K(I+1)-T2)  !dL(i)/dK(i+1)
          DLRP= DLKP*dK_dV_00(I+1)*DVR(I+1)
          DLRM= DLK *dK_dV_00(I)  *DVRM(I)
          DLR= 4.d0*T1*T2/R(I)+DLK*dK_dV_00(I)*DVR(I)+DLKP*dK_dV_00(I+1)*DVRM(I+1)
@@ -1082,7 +1082,7 @@
          HD(6,IR) = +T1*(dP_dr_in(I+1)-dP_dr_00(I)+dPtrb_dr_in(I+1)-dPtrb_dr_00(I))+ &
                     4.d0*G*M(I)/(R(I)**3)    !X(i)
          HD(7,IR) = +T1*(dP_dT_00(I+1))           !Y(i+1)
-         HD(9,IR) = +T1*(dP_dr_00(I+1)+dPtrb_dr_00(I+1))!X(i+1)
+         HD(9,IR) = +T1*(dP_dr_00(I+1)+dPtrb_dr_00(I+1))  !X(i+1)
          goto 112
  111     HD(7,IR)=  0.d0
          HD(9,IR)=  0.d0
@@ -1150,8 +1150,8 @@
       enddo
       do J=1,5
          do I=1,3*NZN+1-J
-            ABB(11-J,I+J)=HD(6+J,I) !upper diagonals
-            ABB(11+J,I)=HD(6-J,I+J) !lower diagonals
+            ABB(11-J,I+J)=HD(6+J,I)  !upper diagonals
+            ABB(11+J,I)=HD(6-J,I+J)  !lower diagonals
          enddo
       enddo
       do I=1,3*NZN+1
