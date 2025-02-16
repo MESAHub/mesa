@@ -24,7 +24,7 @@
 ! ***********************************************************************
 
       module utils_idict
-      use utils_def
+      use utils_def, only: integer_idict, ihash_entry
 
       implicit none
 
