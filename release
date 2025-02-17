@@ -3,7 +3,7 @@
 VERSION="$1"
 echo "Preparing to release MESA version ${VERSION}"
 
-if [[ ! -n ${VERSION} ]]; then
+if [[ -z ${VERSION} ]]; then
 	echo "Error: Please specify version number. E.g. r2X.YY.Z or r2X.YY.Z-rcA"
 	exit 1
 fi
@@ -24,13 +24,13 @@ TAG=${VERSION:1}
 TAG=${TAG//-}
 echo "The associated (PEP440) tag version ${VERSION} is: ${TAG}"
 
-cd ${MESA_DIR} || exit 1
+cd "${MESA_DIR}" || exit 1
 
 # Do the work in a seperate branch
-git checkout -b release/${VERSION}
+git checkout -b release/"${VERSION}"
 
 # Add version_number file
-echo ${VERSION} > data/version_number
+echo "${VERSION}" > data/version_number
 git add -f data/version_number
 
 # Update dox
@@ -56,10 +56,10 @@ git add docs/source/changelog.rst
 
 # Commit and tag the changes
 git commit -a -m "Release: ${VERSION}"
-git tag ${TAG}
+git tag "${TAG}"
 
 # Make the archive
-git archive --prefix=mesa-${VERSION}/ --format=zip ${TAG} > mesa-${VERSION}.zip
+git archive --prefix=mesa-"${VERSION}"/ --format=zip "${TAG}" > mesa-"${VERSION}".zip
 
 echo "Now check the archive builds before pushing the changes"
 
@@ -67,5 +67,5 @@ exit 0
 
 # Cleanup when testing
 git checkout main
-git tag -d ${TAG}
-git branch -D release/${VERSION}
+git tag -d "${TAG}"
+git branch -D release/"${VERSION}"
