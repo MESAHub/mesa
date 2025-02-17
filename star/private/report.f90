@@ -401,8 +401,7 @@
                   if(-velocity(k) > s% fe_core_infall) mass_sum = mass_sum + s% dm(k)
                end do
 
-               if ((mass_sum > s% fe_core_infall_mass*msun) .and. &
-                   (s%m(k_min) <= s%fe_core_mass*msun)) then
+               if (mass_sum > s% fe_core_infall_mass*msun) then
                   s% fe_core_infall = -velocity(k_min)
                end if
             end if
