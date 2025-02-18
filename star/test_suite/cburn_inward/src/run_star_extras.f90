@@ -246,7 +246,7 @@
             if(s%m(k)/Msun < s%co_core_mass)THEN
                netEng = star_get_profile_output(s,'net_nuclear_energy',k)
 
-               if(netEng >= 0.0)THEN
+               if(netEng >= 0.0d0)THEN
                   neAbun = s%xa(s%net_iso(chem_get_iso_id('ne20')),k)
                   naAbun = s%xa(s%net_iso(chem_get_iso_id('na23')),k)
                   mgAbun = s%xa(s%net_iso(chem_get_iso_id('mg24')),k)

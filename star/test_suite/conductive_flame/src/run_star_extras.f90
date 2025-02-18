@@ -527,12 +527,12 @@
             flame_speed_expected = s% x_ctrl(9)
             flame_width_expected = s% x_ctrl(10)
 
-            if (abs(flame_speed - flame_speed_expected) > 0.1 * flame_speed_expected) then
+            if (abs(flame_speed - flame_speed_expected) > 0.1d0 * flame_speed_expected) then
                write(*,*) 'bad value for flame_speed'
                write(*,1) 'flame_speed', flame_speed
                write(*,1) 'expected', flame_speed_expected
                write(*,1) 'flame_speed-expected', flame_speed-flame_speed_expected
-            else if (abs(flame_width - flame_width_expected) > 0.1 * flame_width_expected) then
+            else if (abs(flame_width - flame_width_expected) > 0.1d0 * flame_width_expected) then
                write(*,*) 'bad value for flame_width'
                write(*,1) 'flame_width', flame_width
                write(*,1) 'expected', flame_width_expected

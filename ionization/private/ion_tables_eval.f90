@@ -481,44 +481,44 @@
 
          ierr = 0
          hx=x1-x0
-         hxi=1.0/hx
+         hxi=1.0d0/hx
          hx2=hx*hx
 
          xp=(xget-x0)*hxi
-         xpi=1.0-xp
+         xpi=1.0d0-xp
          xp2=xp*xp
          xpi2=xpi*xpi
 
-         ax=xp2*(3.0-2.0*xp)
-         axbar=1.0-ax
+         ax=xp2*(3.0d0-2.0d0*xp)
+         axbar=1.0d0-ax
 
          bx=-xp2*xpi
          bxbar=xpi2*xp
 
-         cx=xp*(xp2-1.0)
-         cxi=xpi*(xpi2-1.0)
-         cxd=3.0*xp2-1.0
-         cxdi=-3.0*xpi2+1.0
+         cx=xp*(xp2-1.0d0)
+         cxi=xpi*(xpi2-1.0d0)
+         cxd=3.0d0*xp2-1.0d0
+         cxdi=-3.0d0*xpi2+1.0d0
 
          hy=y1-y0
-         hyi=1.0/hy
+         hyi=1.0d0/hy
          hy2=hy*hy
 
          yp=(yget-y0)*hyi
-         ypi=1.0-yp
+         ypi=1.0d0-yp
          yp2=yp*yp
          ypi2=ypi*ypi
 
-         ay=yp2*(3.0-2.0*yp)
-         aybar=1.0-ay
+         ay=yp2*(3.0d0-2.0d0*yp)
+         aybar=1.0d0-ay
 
          by=-yp2*ypi
          bybar=ypi2*yp
 
-         cy=yp*(yp2-1.0)
-         cyi=ypi*(ypi2-1.0)
-         cyd=3.0*yp2-1.0
-         cydi=-3.0*ypi2+1.0
+         cy=yp*(yp2-1.0d0)
+         cyi=ypi*(ypi2-1.0d0)
+         cyd=3.0d0*yp2-1.0d0
+         cydi=-3.0d0*ypi2+1.0d0
 
          sixth_hx2 = one_sixth*hx2
          sixth_hy2 = one_sixth*hy2
