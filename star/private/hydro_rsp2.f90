@@ -784,7 +784,7 @@
                 write(*,*) 'r_00',  r_00 %val
                 write(*,*) 'r_p1 ',  r_p1 %val
                 write(*,*) 'r6_cell',  r6_cell %val
-        end if
+         end if
       end function compute_Chi_cell
 
 
