@@ -124,15 +124,15 @@
            ierr = 0
            op_err = 0
 
-            !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
-            do k=1,s%nz
-               ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-               if (s% Hp_face(k) <= 0) then
-                   ! this scale height for face is already calculated in TDC
-                   s% Hp_face(k) = s% scale_height(k) !get_scale_height_face_val(s,k)
-               end if
-            end do
-            !$OMP END PARALLEL DO
+           !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+           do k=1,s%nz
+              ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
+              if (s% Hp_face(k) <= 0) then
+                 ! this scale height for face is already calculated in TDC
+                 s% Hp_face(k) = s% scale_height(k) !get_scale_height_face_val(s,k)
+              end if
+           end do
+           !$OMP END PARALLEL DO
            if (ierr /= 0) then
               if (s% report_ierr) write(*,2) 'failed in set_viscosity_vars_TDC loop 1', s% model_number
               return
