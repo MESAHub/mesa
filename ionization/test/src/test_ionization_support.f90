@@ -43,7 +43,7 @@ contains
 
       if (.false.) then
          in_dir = 'eos_macdonald'
-         out_dir_ion = '' ! 'ionization_data'
+         out_dir_ion = ''  ! 'ionization_data'
          out_dir_eosDT = 'eosDT_data'
          out_dir_eosPT = 'eosPT_data'
          call create_ion_table_files( &

@@ -412,11 +412,11 @@
          if (s% u_flag) then
             !make fp and ft 1 in the outer 0.001 mass fraction of the star. softly turn to zero from the outer 0.002
             do j=1, s% nz
-               if (s% q(j) > 0.999) then
+               if (s% q(j) > 0.999d0) then
                   fp(j) = 1d0
                   ft(j) = 1d0
-               else if (s% q(j) > 0.998) then
-                  alpha = (1d0-(s% q(j)-0.998)/(0.001))
+               else if (s% q(j) > 0.998d0) then
+                  alpha = (1d0-(s% q(j)-0.998d0)/(0.001))
                   fp(j) = fp(j)*alpha + 1d0*(1-alpha)
                   ft(j) = ft(j)*alpha + 1d0*(1-alpha)
                end if

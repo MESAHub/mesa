@@ -233,7 +233,7 @@
 
          select case (s% x_integer_ctrl(1))
          case(7)
-            if(gamma1_cntr_pulse_start > 1d50 .and. gamma1_integral(s) < 0.0) then
+            if(gamma1_cntr_pulse_start > 1d50 .and. gamma1_integral(s) < 0.0d0) then
                gamma1_cntr_pulse_start = s% gamma1(s% nz)-4.d0/3.d0
             end if
          end select

@@ -1190,7 +1190,7 @@
             do i = 1, s% nz-1  ! locate bottom of solar convective zone
                if (s% mixing_type(i+1) /= convective_mixing &
                      .and. s% mixing_type(i) == convective_mixing) then
-                  if (s% r(i+1) > 0.25*Rsun .and. s% r(i) < 0.9*Rsun) then
+                  if (s% r(i+1) > 0.25d0*Rsun .and. s% r(i) < 0.9d0*Rsun) then
                      Rcz = s% r(i)/Rsun
                      exit
                   end if
@@ -1608,7 +1608,7 @@
             real(dp), target :: calc_rms_f1_ary(4*nz)
             real(dp), pointer :: calc_rms_f1(:), calc_rms_f(:,:)
             real(dp) :: sumy2, sumdr, dr, y2, cs
-            real(dp), parameter :: min_R = 0.094, max_R = 0.94
+            real(dp), parameter :: min_R = 0.094d0, max_R = 0.94d0
             real(dp), target :: pm_work_ary(nz*pm_work_size)
             real(dp), pointer :: pm_work(:)
             integer :: k, i, ierr
@@ -1884,7 +1884,7 @@
          use utils_lib
          integer, intent(out) :: ierr
          ierr = 0
-         max_num_samples = 1.5*max_num_samples + 200
+         max_num_samples = 1.5d0*max_num_samples + 200
 
          call realloc_double(sample_chi2,max_num_samples,ierr); if (ierr /= 0) return
          call realloc_double(sample_age,max_num_samples,ierr); if (ierr /= 0) return

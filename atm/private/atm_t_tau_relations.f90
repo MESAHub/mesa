@@ -247,7 +247,7 @@ contains
 
     x = log10(tau)
 
-    if (x >= 0.07407427) then
+    if (x >= 0.07407427_dp) then
        write(*,*) 'WARNING: evaluating Trampedach_solar T-tau relation beyond valid region (log10(tau) < 0.0741):', x
     end if
 

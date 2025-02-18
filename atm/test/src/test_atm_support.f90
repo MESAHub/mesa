@@ -86,7 +86,7 @@ contains
       if (table_id == ATM_TABLE_WD_TAU_25) then
          logg = 7.1d0
          Teff = 5000
-         M = 0.8*Msun
+         M = 0.8d0*Msun
          R = sqrt(cgrav*M/exp10(logg))
          !write(*,*) 'R/Rsun', R/Rsun
          L = pi*crad*clight*R*R*Teff*Teff*Teff*Teff
@@ -94,7 +94,7 @@ contains
       elseif (table_id == ATM_TABLE_DB_WD_TAU_25) then
          logg = 8.0d0
          Teff = 25000
-         M = 0.8*Msun
+         M = 0.8d0*Msun
          R = sqrt(cgrav*M/exp10(logg))
          !write(*,*) 'R/Rsun', R/Rsun
          L = pi*crad*clight*R*R*Teff*Teff*Teff*Teff
@@ -344,8 +344,8 @@ contains
       gamma = 0._dp
       P = 1d6
       M = 1.5d0*M_jupiter
-      tau = 10 ! just a guess for use in getting R
-      R = sqrt(cgrav*M*tau/(P*kap_guess)) ! g = P*kap/tau = G*M/R^2
+      tau = 10  ! just a guess for use in getting R
+      R = sqrt(cgrav*M*tau/(P*kap_guess))  ! g = P*kap/tau = G*M/R^2
       T_int = 900
       L = pi*crad*clight*R*R*T_int*T_int*T_int*T_int
 
