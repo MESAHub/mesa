@@ -170,6 +170,7 @@ contains
          alpha_semiconvection, thermohaline_coeff, &
          mixing_type, gradT, Y_face, conv_vel, D, Gamma, ierr)
       use star_utils
+      use hydro_rsp2, only: compute_Eq_cell
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
@@ -189,13 +190,37 @@ contains
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
       type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled
-
+         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq
+      character (len=256) :: message        
       logical ::  test_partials, using_TDC
       logical, parameter :: report = .false.
       include 'formats'
 
-      ! Pre-calculate some things.
+      ! check if this particular k can be done with TDC
+      using_TDC = .false.
+      if (s% MLT_option == 'TDC') using_TDC = .true.
+      if (.not. s% have_mlt_vc) using_TDC = .false.
+      if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
+      if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
+
+      ! Pre-calculate some things. 
+      Eq_div_w = 0d0
+      if (s% v_flag) then ! only include Eq_div_w if v_flag is true.
+         if (using_TDC .and. s% alpha_TDC_DampM > 0) then
+           if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc) then
+               if (s% mlt_vc_old(k) > 0) then ! calculate using mlt_vc from previous timestep.
+                   check_Eq = compute_Eq_cell(s, k, ierr)
+                   Eq_div_w = check_Eq/(s% mlt_vc_old(k)/sqrt_2_div_3)
+               end if
+           else ! if mlt_vc_old is not set, i.e. when building a new model.
+               if (s% mlt_vc(k) > 0) then ! calculate using mlt_vc from current timestep.
+                   check_Eq = compute_Eq_cell(s, k, ierr)
+                   Eq_div_w = check_Eq/(s% mlt_vc(k)/sqrt_2_div_3)
+               end if
+           end if
+         end if
+      end if
+
       Pr = crad*pow4(T)/3d0
       Pg = P - Pr
       beta = Pg / P
@@ -234,14 +259,6 @@ contains
             k, s% solver_iter, s% model_number, gradr%val, grada%val, scale_height%val
       end if
 
-
-      ! check if this particular k can be done with TDC
-      using_TDC = .false.
-      if (s% MLT_option == 'TDC') using_TDC = .true.
-      if (.not. s% have_mlt_vc) using_TDC = .false.
-      if (k <= 0 .or. s%dt <= 0d0) using_TDC = .false.
-      if (using_TDC) using_TDC = .not. check_if_must_fall_back_to_MLT(s, k)
-
       if (k >= 1) then
          s% dvc_dt_TDC(k) = 0d0
       end if
@@ -264,7 +281,7 @@ contains
          call set_TDC(&
             conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
-            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+            scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, ierr)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -282,7 +299,7 @@ contains
                call set_TDC(&
                   conv_vel_start, mixing_length_alpha, s% alpha_TDC_DAMP, s%alpha_TDC_DAMPR, s%alpha_TDC_PtdVdt, s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, P, T, rho, dV, Cp, opacity, &
-                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), ierr)
+                  scale_height, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), Eq_div_w, ierr)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
