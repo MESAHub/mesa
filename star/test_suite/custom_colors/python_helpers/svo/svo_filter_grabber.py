@@ -74,7 +74,7 @@ for idx, row in filters_df.iterrows():
     instrument = row.get("Instrument", "UnknownInstrument")
     filter_name = row.get("Band", filter_id)
 
-    if filter_name is "":
+    if filter_name == "":
         filter_name = filter_id.split(".")[-1]
 
     # Print progress
