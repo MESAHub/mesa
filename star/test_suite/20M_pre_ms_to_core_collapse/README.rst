@@ -4,7 +4,7 @@
 20M_pre_ms_to_core_collapse
 ***************************
 
-This test suite evolves a solar metalicity 20 |MSun| model from the pre-ms to core collapse. 
+This test suite evolves a solar metalicity 20 |MSun| model from the pre-ms to core collapse.
 For bit for bit convergence, we recomended to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.
 

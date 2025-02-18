@@ -619,7 +619,7 @@ contains
          !age = age
          units_str = 'yrs'
       end if
-      if (abs(age) > 1e-3 .and. abs(age) < 1e3) then
+      if (abs(age) > 1d-3 .and. abs(age) < 1d3) then
          write(age_str, '(f14.6)') age
       else
          write(age_str, '(1pe14.6)') age

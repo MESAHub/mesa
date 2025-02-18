@@ -93,7 +93,7 @@ program test_turb
 
 
       ! General
-      mixing_length_alpha=2.0000000000000000
+      mixing_length_alpha=2.0d0
       chiT = 1d0
       chiRho = 1d0
       T = 1d5
@@ -119,9 +119,9 @@ program test_turb
 
 
       ! TDC
-      alpha_TDC_DAMP=1.0000000000000000
-      alpha_TDC_DAMPR=0.0000000000000000
-      alpha_TDC_PtdVdt=0.0000000000000000
+      alpha_TDC_DAMP=1.0d0
+      alpha_TDC_DAMPR=0.0d0
+      alpha_TDC_PtdVdt=0.0d0
       dV = 0d0
       conv_vel_start = 0d0  !1d10
       scale = L%val*1d-3
@@ -165,12 +165,12 @@ program test_turb
 
       call header('Test TDC')
 
-      conv_vel_start = 52320587.415154047
+      conv_vel_start = 52320587.415154047d0
 
-      mixing_length_alpha=2.0000000000000000
-      alpha_TDC_DAMP=1.0000000000000000
-      alpha_TDC_DAMPR=0.0000000000000000
-      alpha_TDC_PtdVdt=0.0000000000000000
+      mixing_length_alpha=2.0d0
+      alpha_TDC_DAMP=1.0d0
+      alpha_TDC_DAMPR=0.0d0
+      alpha_TDC_PtdVdt=0.0d0
       cgrav=6.6743000000000004d-8
       m=5.8707400456875664d34
       scale=5.0386519362246294d45

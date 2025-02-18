@@ -19,7 +19,7 @@ The minimum system requirements for MESA are:
 -  20 GB free disk space
 -  Windows users should :ref:`follow the instructions here <windows-install:Installing MESA on Windows>`.
 
-Most laptop or desktop computers built in the last three years will 
+Most laptop or desktop computers built in the last three years will
 satisfy these requirements.
 
 Ensure you have Python (3.5 or newer) installed on your system
@@ -62,7 +62,7 @@ The simplest way to get the MESA software is to download a zip file of
 the `latest MESA release <https://doi.org/10.5281/zenodo.2602941>`__.
 
 The compressed file is about 2GB, so don't worry if it takes a little
-while to download.  
+while to download.
 
 The unzipped and installed package will be large, so make sure you have
 at least 20 GB free on your disk.
@@ -112,7 +112,7 @@ uses export to set variables):
     export MESASDK_ROOT=/Applications/mesasdk
     source $MESASDK_ROOT/bin/mesasdk_init.sh
 
-    # add shmesa (the MESA command line tool) to your PATH 
+    # add shmesa (the MESA command line tool) to your PATH
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
 
 Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `ld: library 'z' not found` on a Mac you may also need to add:
@@ -122,7 +122,7 @@ Note (Jan 2025): due to some changes in MacOS 15.2/15.3, if you see the error `l
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 
 If your machine uses csh as its shell, use ``setenv`` instead of ``export``.
-    
+
 One caveat is that if you initialize the MESA SDK in your shell
 profile, you'll always be using the MESA SDK supplied version of gcc
 which may be a compatibility issue if you work with other other codes.

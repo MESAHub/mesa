@@ -22,7 +22,7 @@ program main
    character*256 :: line, my_mesa_dir
 
    real(dp), parameter :: &
-      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023, Z_div_X_solar = 0.02293d0, &
+      A_Fe56 = 56d0, lambda0 = 5169.02d-8, f = 0.023d0, Z_div_X_solar = 0.02293d0, &
       tau_sob_hi = 2d0, tau_sob_med = 1d0, tau_sob_lo = 0.2d0
    integer, parameter :: num_logRhos = 41, num_logTs = 117, iounit = 33, &
       max_lbol = 10000, n_colors = 5

@@ -30,8 +30,8 @@ pgstar commands used for the plots above:
   Grid1_win_flag = .true.
   Grid1_win_width = 14
   Grid1_win_aspect_ratio = 0.75
-  Grid1_title = 'inlist_make_brown_dwarf' 
-      
+  Grid1_title = 'inlist_make_brown_dwarf'
+
   TRho_Profile_xmin = -8
   TRho_Profile_xmax = 4
   TRho_Profile_ymin = 2

@@ -90,12 +90,12 @@ pgstar commands used for the binary and star1 plots above:
 
   Text_Summary1_name(4,1) = 'Jdot'
   Text_Summary1_name(4,2) = 'jdot_gr'
-  Text_Summary1_name(4,3) = 'jdot_mb' 
+  Text_Summary1_name(4,3) = 'jdot_mb'
   Text_Summary1_name(4,4) = 'jdot_ls'
   Text_Summary1_name(4,5) = 'jdot_ml'
-  Text_Summary1_name(4,6) = '' 
-  Text_Summary1_name(4,7) = '' 
-  Text_Summary1_name(4,8) = '' 
+  Text_Summary1_name(4,6) = ''
+  Text_Summary1_name(4,7) = ''
+  Text_Summary1_name(4,8) = ''
 
   History_Track1_win_flag = .false.
   History_Track1_win_width = 12
@@ -228,8 +228,8 @@ pgstar commands used for the binary and star1 plots above:
   Grid1_file_dir = 'pgstar_out'
   Grid1_file_prefix = 'grid_'
   Grid1_file_interval = 10000
-  Grid1_file_width = -1      
-  Grid1_file_aspect_ratio = -1 
+  Grid1_file_width = -1
+  Grid1_file_aspect_ratio = -1
 
  / ! end of pgstar namelist
 

@@ -821,8 +821,8 @@
 
 
         if (delta > 1d-4) then
-          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01 &
-          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1) then
+          if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01d0 &
+          .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1d0) then
             call compute_kappa(k,&
               fk, logT_cntr, logRho_cntr, &
               log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&

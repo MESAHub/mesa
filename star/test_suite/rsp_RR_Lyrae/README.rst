@@ -4,7 +4,7 @@
 rsp_RR_Lyrae
 ************
 
-This test case checks the non-linear pulsation evolution of a 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity - 
+This test case checks the non-linear pulsation evolution of a 0.65 Msun, Teff = 6500 K, L = 60 Lsun, Z = 0.004 metallicity -
 a long-period RR Lyrae model contributed by Radek Smolec.
 
 This test case has 1 part. Click to see a larger version of a plot.

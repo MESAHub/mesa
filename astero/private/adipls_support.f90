@@ -788,10 +788,10 @@
 
          if (iturpr == 1) then
             do n=1,nn
-               if (x(n) < 0.999) then
+               if (x(n) < 0.999d0) then
                   ggt=1
                else
-                  ggt=1./(x(n)*x(n)*x(n)*aa(1,n))
+                  ggt=1.0d0/(x(n)*x(n)*x(n)*aa(1,n))
                end if
                aa(10,n)=ggt
             end do

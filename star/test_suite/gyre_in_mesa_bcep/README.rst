@@ -4,7 +4,7 @@
 gyre_in_mesa_bcep
 *****************
 
-This test case checks the implementation of GYRE in MESA for a 12 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion; 
+This test case checks the implementation of GYRE in MESA for a 12 Msun, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion;
 a beta Cephei stellar model.
 
 
