@@ -773,7 +773,7 @@
          s% Chi(k) = Chi_cell%val
          s% Chi_ad(k) = Chi_cell
 
-        if (dbg .and. k==-100) then
+         if (dbg .and. k==-100) then
                 write(*,*) ' s% ALFAM_ALFA', ALFAM_ALFA
                 write(*,*) 'Hp_cell', Hp_cell %val
                 write(*,*) 'd_v_div_r', d_v_div_r %val
