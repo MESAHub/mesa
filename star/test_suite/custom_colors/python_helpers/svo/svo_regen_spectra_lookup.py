@@ -14,7 +14,9 @@ def clean_metadata_values(metadata):
             cleaned_metadata[key] = value
         else:
             match = re.search(r"[-+]?\d*\.\d+|\d+", value)  # Matches floats or integers
-            cleaned_metadata[key] = match.group() if match else "999.9"  # Default to 999.9 if no match
+            cleaned_metadata[key] = (
+                match.group() if match else "999.9"
+            )  # Default to 999.9 if no match
     return cleaned_metadata
 
 
@@ -24,14 +26,14 @@ def parse_metadata(file_path):
     """
     metadata = {}
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             for line in file:
                 line = line.strip()
-                if line.startswith('#') and '=' in line:
+                if line.startswith("#") and "=" in line:
                     try:
-                        key, value = line.split('=', 1)
-                        key = key.strip('#').strip()
-                        value = value.split('(')[0].strip()
+                        key, value = line.split("=", 1)
+                        key = key.strip("#").strip()
+                        value = value.split("(")[0].strip()
                         metadata[key] = value
                     except ValueError:
                         continue
@@ -79,10 +81,12 @@ def regenerate_lookup_table(model, files, output_dir):
         all_keys.update(metadata.keys())
 
     if metadata_rows:
-        with open(lookup_table_path, mode='w', newline='') as csv_file:
+        with open(lookup_table_path, mode="w", newline="") as csv_file:
             # Generate a header dynamically with #
             header = ["file_name"] + sorted(all_keys - {"file_name"})
-            csv_file.write("#" + ", ".join(header) + "\n")  # Write the header prefixed with #
+            csv_file.write(
+                "#" + ", ".join(header) + "\n"
+            )  # Write the header prefixed with #
             writer = csv.DictWriter(csv_file, fieldnames=header)
             writer.writerows(metadata_rows)
 
@@ -106,4 +110,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

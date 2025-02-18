@@ -16,11 +16,11 @@ HISTORY_FILE = os.path.join(MESA_DIR, "LOGS/history.data")  # Default history fi
 param_options = [
     "MDwarf.params",
     "PopIII.params",
-    "PopII.params"
-    "OType.params",
+    "PopII.params" "OType.params",
     "BType.params",
     "AType.params",
 ]
+
 
 def update_inlist(selected_param, reset=False):
     """Modify the inlist file:
@@ -54,6 +54,7 @@ def update_inlist(selected_param, reset=False):
     with open(INLIST_PATH, "w") as f:
         f.writelines(new_content)
 
+
 def run_mesa():
     """Runs the MESA simulation in the correct directory and handles normal termination cases."""
     original_cwd = os.getcwd()  # Save original working directory
@@ -62,18 +63,23 @@ def run_mesa():
         subprocess.run(["./clean"], check=True)
         subprocess.run(["./mk"], check=True)
         result = subprocess.run(["./rn"], check=True)
-        
+
         # Check MESA output for normal termination cases
-        if "termination code: max_age" in result.stdout or "required_termination_code_string" in result.stdout or "1" in result.stdout:
+        if (
+            "termination code: max_age" in result.stdout
+            or "required_termination_code_string" in result.stdout
+            or "1" in result.stdout
+        ):
             print("✅ MESA completed successfully (reached termination criterion).")
         else:
             print("❌ Unexpected MESA failure.")
             print(result.stdout)
             print(result.stderr)
-            #raise subprocess.CalledProcessError(result.returncode, result.args)
-    
+            # raise subprocess.CalledProcessError(result.returncode, result.args)
+
     finally:
         os.chdir(original_cwd)  # Restore original directory
+
 
 def rename_history(param_file):
     """Rename the history file to prevent overwrites."""
@@ -84,6 +90,7 @@ def rename_history(param_file):
         print(f"Saved history as {new_history_file}")
     else:
         print(f"Warning: {HISTORY_FILE} not found after simulation.")
+
 
 # Re-comment all entries before running batch
 update_inlist("", reset=True)

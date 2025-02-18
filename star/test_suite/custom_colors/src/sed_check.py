@@ -9,19 +9,32 @@ print(data)
 plt.figure(figsize=(10, 6))
 
 # Plot each column (other than 'Index') on the same plot
-plt.plot(data['Index'], data['Wavelengths'], label='Wavelengths', linestyle='-', marker='o')
-plt.plot(data['Index'], data['Fluxes'], label='Fluxes', linestyle='--', marker='x')
-plt.plot(data['Index'], data['Convolved Fluxes'], label='Convolved Fluxes', linestyle='-.', marker='^')
-plt.plot(data['Index'], data['Interpolated Filter'], label='Interpolated Filter', linestyle=':', marker='s')
+plt.plot(
+    data["Index"], data["Wavelengths"], label="Wavelengths", linestyle="-", marker="o"
+)
+plt.plot(data["Index"], data["Fluxes"], label="Fluxes", linestyle="--", marker="x")
+plt.plot(
+    data["Index"],
+    data["Convolved Fluxes"],
+    label="Convolved Fluxes",
+    linestyle="-.",
+    marker="^",
+)
+plt.plot(
+    data["Index"],
+    data["Interpolated Filter"],
+    label="Interpolated Filter",
+    linestyle=":",
+    marker="s",
+)
 
 # Add labels, legend, and grid
-plt.xlabel('Index')
-plt.ylabel('Values')
-plt.title('Array Data Visualization')
+plt.xlabel("Index")
+plt.ylabel("Values")
+plt.title("Array Data Visualization")
 plt.legend()
 plt.grid(True)
 
 # Display the plot
 plt.tight_layout()
 plt.show()
-

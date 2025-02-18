@@ -4,21 +4,22 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
 # Physical constants
-h = 6.62607015e-27   # Planck constant (erg·s)
-c = 2.99792458e10    # Speed of light (cm/s)
-k_B = 1.380649e-16   # Boltzmann constant (erg/K)
+h = 6.62607015e-27  # Planck constant (erg·s)
+c = 2.99792458e10  # Speed of light (cm/s)
+k_B = 1.380649e-16  # Boltzmann constant (erg/K)
+
 
 def read_mesa_history(filename):
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         lines = f.readlines()
 
     # Find the index where the column headers start
     for idx, line in enumerate(lines):
-        if line.strip().startswith('model_number'):
+        if line.strip().startswith("model_number"):
             header_line_idx = idx
             break
     else:
-        raise ValueError('Header line with column names not found.')
+        raise ValueError("Header line with column names not found.")
 
     # Extract the header line
     headers = lines[header_line_idx].strip().split()
@@ -32,11 +33,12 @@ def read_mesa_history(filename):
         skiprows=data_start_idx,
         delim_whitespace=True,
         names=headers,
-        comment='#',
-        engine='python'
+        comment="#",
+        engine="python",
     )
 
     return data
+
 
 def load_stellar_spectrum(T_eff, log_g, metallicity, wavelength_min, wavelength_max):
     """
@@ -44,7 +46,9 @@ def load_stellar_spectrum(T_eff, log_g, metallicity, wavelength_min, wavelength_
     Currently uses a blackbody approximation.
     """
     # Adjust the wavelength range to cover the filter's range (~5.6 microns)
-    wavelength_angstrom = np.linspace(wavelength_min, wavelength_max, 10000)  # 3 to 8 microns in Å
+    wavelength_angstrom = np.linspace(
+        wavelength_min, wavelength_max, 10000
+    )  # 3 to 8 microns in Å
     wavelength_cm = wavelength_angstrom * 1e-8  # Convert Å to cm
 
     # Calculate blackbody spectral radiance (erg/s/cm^2/Å)
@@ -55,16 +59,17 @@ def load_stellar_spectrum(T_eff, log_g, metallicity, wavelength_min, wavelength_
 
     return wavelength_angstrom, flux_lambda
 
+
 # Read MESA history data
-history = read_mesa_history('LOGS/history.data')
+history = read_mesa_history("LOGS/history.data")
 
 # Display available columns
 print("Available columns:", history.columns.tolist())
 
 # Extract stellar parameters
-T_eff = history['Teff'].iloc[-1]
-log_g = history['log_g'].iloc[-1]
-metallicity = history.get('initial_feh', 0.0)
+T_eff = history["Teff"].iloc[-1]
+log_g = history["log_g"].iloc[-1]
+metallicity = history.get("initial_feh", 0.0)
 
 print(f"Effective Temperature: {T_eff} K")
 print(f"log(g): {log_g}")
@@ -72,9 +77,9 @@ print(f"Metallicity [Fe/H]: {metallicity}")
 
 
 # Load filter transmission data
-filterloc = 'filters/JWST/MIRI/F560W.dat'
+filterloc = "filters/JWST/MIRI/F560W.dat"
 filter_wavelength_micron, filter_transmission = np.loadtxt(
-    filterloc, skiprows=1, delimiter=',', unpack=True
+    filterloc, skiprows=1, delimiter=",", unpack=True
 )
 print(filter_wavelength_micron)
 
@@ -85,7 +90,9 @@ filter_wavelength_angstrom = filter_wavelength_micron * 1e4  # microns to Å
 # Load stellar atmosphere spectrum
 wavelength_min = np.min(filter_wavelength_angstrom)
 wavelength_max = np.max(filter_wavelength_angstrom)
-wavelength_angstrom, flux_lambda = load_stellar_spectrum(T_eff, log_g, metallicity, wavelength_min, wavelength_max)
+wavelength_angstrom, flux_lambda = load_stellar_spectrum(
+    T_eff, log_g, metallicity, wavelength_min, wavelength_max
+)
 # Interpolate filter response onto the stellar spectrum wavelength grid
 filter_interp = interp1d(
     filter_wavelength_angstrom, filter_transmission, bounds_error=False, fill_value=0
@@ -113,16 +120,14 @@ print(f"Absolute Magnitude ({filterloc}): {M_filter}")
 
 # Plotting the spectrum, filter response, and convolved spectrum
 plt.figure(figsize=(10, 6))
-plt.plot(wavelength_angstrom, flux_lambda, label='Stellar Spectrum')
+plt.plot(wavelength_angstrom, flux_lambda, label="Stellar Spectrum")
 plt.plot(
     filter_wavelength_angstrom,
     filter_transmission * np.max(flux_lambda),
-    label='Filter Transmission'
+    label="Filter Transmission",
 )
-plt.plot(wavelength_angstrom, observed_flux_lambda, label='Convolved Spectrum')
-plt.xlabel('Wavelength (Å)')
-plt.ylabel('Flux (erg/s/cm²/Å)')
+plt.plot(wavelength_angstrom, observed_flux_lambda, label="Convolved Spectrum")
+plt.xlabel("Wavelength (Å)")
+plt.ylabel("Flux (erg/s/cm²/Å)")
 plt.legend()
 plt.show()
-
-

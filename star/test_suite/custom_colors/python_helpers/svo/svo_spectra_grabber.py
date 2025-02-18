@@ -18,8 +18,11 @@ def clean_metadata_values(metadata):
         else:
             # Use regex to extract the numerical part (e.g., remove units like 'log' or 'K')
             match = re.search(r"[-+]?\d*\.\d+|\d+", value)  # Matches floats or integers
-            cleaned_metadata[key] = match.group() if match else "999.9"  # Default to 999.9 if no match
+            cleaned_metadata[key] = (
+                match.group() if match else "999.9"
+            )  # Default to 999.9 if no match
     return cleaned_metadata
+
 
 def parse_metadata(file_path):
     """
@@ -27,14 +30,14 @@ def parse_metadata(file_path):
     """
     metadata = {}
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             for line in file:
                 line = line.strip()
-                if line.startswith('#') and '=' in line:
+                if line.startswith("#") and "=" in line:
                     try:
-                        key, value = line.split('=', 1)
-                        key = key.strip('#').strip()
-                        value = value.split('(')[0].strip()
+                        key, value = line.split("=", 1)
+                        key = key.strip("#").strip()
+                        value = value.split("(")[0].strip()
                         metadata[key] = value
                     except ValueError:
                         continue
@@ -53,21 +56,21 @@ def generate_lookup_header(file_path):
     Returns:
         str: Header string prefixed by a hash (e.g., '#filename, log(g), teff, me/h').
     """
-    
+
     keys = []
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             for line in file:
                 line = line.strip()
-                if line.startswith('#') and '=' in line:
+                if line.startswith("#") and "=" in line:
                     try:
-                        key, value = line.split('=', 1)
-                        key = key.strip('#').strip()
+                        key, value = line.split("=", 1)
+                        key = key.strip("#").strip()
                         keys.append(key)
                     except ValueError:
                         continue
     except Exception as e:
-        print(f"Error parsing metadata in {file_path}: {e}")    
+        print(f"Error parsing metadata in {file_path}: {e}")
     header = "#filename, " + ", ".join(keys)
     return header
 
@@ -82,7 +85,11 @@ def fetch_model_links(base_url):
         return []
 
     soup = BeautifulSoup(response.text, "html.parser")
-    model_links = [a["href"].split("=")[1] for a in soup.find_all("a", href=True) if "models=" in a["href"]]
+    model_links = [
+        a["href"].split("=")[1]
+        for a in soup.find_all("a", href=True)
+        if "models=" in a["href"]
+    ]
 
     if not model_links:
         print("No models found.")
@@ -94,15 +101,20 @@ def fetch_model_links(base_url):
         print(f"{idx}. {model}")
 
     # Ask the user to select models
-    user_input = input("Enter the numbers of the models you want to select, separated by commas: ")
+    user_input = input(
+        "Enter the numbers of the models you want to select, separated by commas: "
+    )
 
     try:
         selected_indices = [int(num.strip()) - 1 for num in user_input.split(",")]
-        selected_models = [model_links[i] for i in selected_indices if 0 <= i < len(model_links)]
+        selected_models = [
+            model_links[i] for i in selected_indices if 0 <= i < len(model_links)
+        ]
         return selected_models
     except (ValueError, IndexError):
         print("Invalid input. Please enter valid numbers separated by commas.")
         return []
+
 
 def download_spectrum(session, spectra_url, params, output_fp):
     """
@@ -110,7 +122,9 @@ def download_spectrum(session, spectra_url, params, output_fp):
     """
     try:
         response = session.get(spectra_url, params=params, stream=True)
-        if response.status_code == 200 and len(response.content) > 1024:  # Ensure valid content
+        if (
+            response.status_code == 200 and len(response.content) > 1024
+        ):  # Ensure valid content
             with open(output_fp, "wb") as file:
                 file.write(response.content)
             return True
@@ -174,25 +188,24 @@ def main():
             else:
                 print(f"No more spectra for model {model}. Last fid: {fid - 1}")
                 if found_spectra > 0:
-                    
+
                     found_spectra = found_spectra + 1
                     if found_spectra == 20:
                         break
-    
-    
-
 
         # Write lookup table to CSV
         if metadata_rows:
-            with open(lookup_table_path, mode='w', newline='') as csv_file:
+            with open(lookup_table_path, mode="w", newline="") as csv_file:
                 # Generate a header dynamically with #
                 header = ["file_name"] + sorted(all_keys - {"file_name"})
-                csv_file.write("#" + ", ".join(header) + "\n")  # Write the header prefixed with #
+                csv_file.write(
+                    "#" + ", ".join(header) + "\n"
+                )  # Write the header prefixed with #
                 writer = csv.DictWriter(csv_file, fieldnames=header)
                 writer.writerows(metadata_rows)
 
             print(f"Lookup table saved: {lookup_table_path}")
 
+
 if __name__ == "__main__":
     main()
-
