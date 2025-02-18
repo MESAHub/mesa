@@ -1299,7 +1299,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Stop when a particular species mass in units of Msun exceeds these limits.
-      
+
       ! ::
 
     star_species_mass_min_limit = 0

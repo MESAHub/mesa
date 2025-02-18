@@ -8,9 +8,9 @@ MESA is written primarily in Fortran with a modular, flexible design that facili
 
 🚀 New to MESA? Start with the :ref:`Quickstart<quickstart:Quickstart>` guide to set up and run your first models.
 
-📖 Experienced users may find the :ref:`Reference and Defaults<reference:Reference and Defaults>` 
-   page most useful for exploring the code’s features and input parameters. 
-   The :ref:`Test Suite<test_suite:Test Suite>` provides example problems for testing and showcasing MESA, 
+📖 Experienced users may find the :ref:`Reference and Defaults<reference:Reference and Defaults>`
+   page most useful for exploring the code’s features and input parameters.
+   The :ref:`Test Suite<test_suite:Test Suite>` provides example problems for testing and showcasing MESA,
    serving as a project starting point but often requiring modifications for science-grade accuracy.
 
 Check out the full documentation below.

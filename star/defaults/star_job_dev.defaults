@@ -117,7 +117,7 @@
 
     save_photo_number = -1
     save_photo_filename = ''
-    
+
 !   ! save_photo_when_terminate = .true.
 
       ! create_merger_model !!! EXPERIMENTAL
