@@ -1,0 +1,7 @@
+High-Mass Star (B-Type, ~10 M☉)
+    Lives a few Myr, evolves into a supernova, possibly a neutron star
+&controls
+    initial_mass = 10.0d0
+    initial_z = 0.02d0
+    max_age = 1d9      ! 30 Myr, shorter lifespan due to rapid fusion
+/ ! end of controls namelist
