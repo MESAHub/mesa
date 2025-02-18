@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,11 +19,11 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
- 
 
- 
- 
+
+
+
+
 module run_star_extras
 
   use star_lib
@@ -56,7 +56,7 @@ module run_star_extras
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
        print *, "Extras startup routine"
-           
+
     call process_color_files(id, ierr)
     s% extras_startup => extras_startup
     s% extras_check_model => extras_check_model
@@ -68,18 +68,18 @@ module run_star_extras
     s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
     print *, "Sellar atmosphere:", s% x_character_ctrl(1)
-    print *, "Instrument:", s% x_character_ctrl(2)         
+    print *, "Instrument:", s% x_character_ctrl(2)
 
   end subroutine extras_controls
 
-                
-      
-  
+
+
+
 
 !###########################################################
 !## THINGS I HAVE NOT TOUCHED
 !###########################################################
-  
+
   subroutine process_color_files(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
@@ -115,9 +115,9 @@ module run_star_extras
      if (ierr /= 0) return
 
      write(*,'(a)') 'finished custom colors'
-     
+
      call test_suite_after_evolve(s, ierr)
-     
+
   end subroutine extras_after_evolve
 
 
@@ -129,13 +129,12 @@ module run_star_extras
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-     extras_check_model = keep_going         
+     extras_check_model = keep_going
   end function extras_check_model
 
 
   INTEGER FUNCTION how_many_extra_profile_columns(id)
      USE star_def, ONLY: star_info
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -152,7 +151,6 @@ module run_star_extras
   SUBROUTINE data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
      USE star_def, ONLY: star_info, maxlen_profile_column_name
      USE const_def, ONLY: DP
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id, n, nz
      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
      REAL(DP) :: vals(nz, n)
@@ -170,7 +168,6 @@ module run_star_extras
   ! Returns either keep_going, retry, or terminate
   INTEGER FUNCTION extras_finish_step(id)
      USE chem_def
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -191,9 +188,8 @@ module run_star_extras
 !###########################################################
 !## MESA STUFF
 !###########################################################
-  
+
 SUBROUTINE read_strings_from_file(strings, values, n, id)
-    IMPLICIT NONE
     INTEGER, INTENT(IN) :: id
     CHARACTER(LEN=512) :: filename
     CHARACTER(LEN=100), ALLOCATABLE :: strings(:)
@@ -282,7 +278,6 @@ SUBROUTINE read_strings_from_file(strings, values, n, id)
 END SUBROUTINE read_strings_from_file
 
 SUBROUTINE SplitLine(line, delimiter, tokens, num_tokens)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: line, delimiter
     CHARACTER(LEN=100), ALLOCATABLE, INTENT(OUT) :: tokens(:)
     INTEGER, INTENT(OUT) :: num_tokens
@@ -374,7 +369,6 @@ END SUBROUTINE SplitLine
 
 
 SUBROUTINE data_for_extra_history_columns(id, n, names, vals, ierr)
-    IMPLICIT NONE
     INTEGER, INTENT(IN) :: id, n
     CHARACTER(LEN=maxlen_history_column_name) :: names(n)
     REAL(dp) :: vals(n)
@@ -442,7 +436,6 @@ END SUBROUTINE data_for_extra_history_columns
   !###########################################################
 
 SUBROUTINE CalculateSyntheticMagnitude(teff, log_g, metallicity, filter_data, ierr)
-    IMPLICIT NONE
     REAL(8), INTENT(IN) :: teff, log_g, metallicity
     REAL(DP), INTENT(IN) :: filter_data
     INTEGER, INTENT(OUT) :: ierr
@@ -462,7 +455,6 @@ END SUBROUTINE CalculateSyntheticMagnitude
 
 
 SUBROUTINE LoadMISTLookupTable(lookup_file, out_teff, out_logg, out_meta, n_rows)
-  IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: lookup_file
   REAL, ALLOCATABLE, INTENT(OUT) :: out_teff(:), out_logg(:), out_meta(:)
   INTEGER, INTENT(OUT) :: n_rows
@@ -601,9 +593,8 @@ END SUBROUTINE LoadMISTLookupTable
 
 
 
-  
+
 SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
-  IMPLICIT NONE
   REAL(8), INTENT(IN) :: teff, log_g, metallicity
   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
@@ -672,7 +663,6 @@ END SUBROUTINE GetClosestStellarModels
 
 
   SUBROUTINE LinearInterpolate(x, y, x_val, y_val)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x(:), y(:), x_val
     REAL(DP), INTENT(OUT) :: y_val
     INTEGER :: i
@@ -714,7 +704,6 @@ END SUBROUTINE GetClosestStellarModels
 
 
   SUBROUTINE InterpolateArray(x_in, y_in, x_out, y_out)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
     REAL(DP), INTENT(OUT) :: y_out(:)
     INTEGER :: i

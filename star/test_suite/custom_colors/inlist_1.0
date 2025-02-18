@@ -32,7 +32,7 @@
 
 
 &controls
-!##############################################################
+!==============================================================
 !#                      MESA controls test Setup              #
 !#                                                            #
 !# Choose ONE of the following setups:                        #
@@ -43,7 +43,7 @@
 !#                                                            #
 !# 2. Manually define initial mass, metallicity, and age      #
 !#    (Set 'read_extra_controls_inlist' to .false.)           #
-!##############################################################
+!==============================================================
 
     ! Option 1: Use predefined parameter files
     read_extra_controls_inlist(1) = .true.
@@ -56,19 +56,19 @@
     !extra_controls_inlist_name(1) = 'inlist_template/AType.params'
     !extra_controls_inlist_name(1) = 'inlist_template/MDwarf.params'
 
-    !# -------------------------------------------------------
-    !# OR
-    !# -------------------------------------------------------
+    !-------------------------------------------------------
+    ! OR
+    !-------------------------------------------------------
 
     !# Option 2: Manually define stellar properties
     !read_extra_controls_inlist(1) = .false.
-    initial_mass = 1.0d0   # Default: Sun-like star
-    initial_z = 0.02d0     # Solar metallicity
-    max_age = 13d9        # 13 Gyr (entire stellar evolution)
+    initial_mass = 1.0d0   ! Default: Sun-like star
+    initial_z = 0.02d0     ! Solar metallicity
+    max_age = 13d9         ! 13 Gyr (entire stellar evolution)
 
-    !##############################################################
-    !# Note: Ensure only ONE setup is active at a time!          #
-    !##############################################################
+    !==============================================================
+    !# Note: Ensure only ONE setup is active at a time!          
+    !==============================================================
 
 
     x_character_ctrl(1) = 'data/stellar_models/Kurucz2003all/'   !Stellar atmosphere model - http://svo2.cab.inta-csic.es/theory/newov2/

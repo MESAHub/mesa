@@ -1,0 +1,1451 @@
+./src/photometric_run_star_extras.f90:29:3: M011 'use' statement missing 'only' clause
+   |
+27 | module run_star_extras
+28 |
+29 |   use star_lib
+   |   ^^^^^^^^^^^^ M011
+30 |   use star_def
+31 |   use const_def
+   |
+
+./src/photometric_run_star_extras.f90:30:3: M011 'use' statement missing 'only' clause
+   |
+29 |   use star_lib
+30 |   use star_def
+   |   ^^^^^^^^^^^^ M011
+31 |   use const_def
+32 |   use math_lib
+   |
+
+./src/photometric_run_star_extras.f90:31:3: M011 'use' statement missing 'only' clause
+   |
+29 |   use star_lib
+30 |   use star_def
+31 |   use const_def
+   |   ^^^^^^^^^^^^^ M011
+32 |   use math_lib
+33 |   use auto_diff
+   |
+
+./src/photometric_run_star_extras.f90:32:3: M011 'use' statement missing 'only' clause
+   |
+30 |   use star_def
+31 |   use const_def
+32 |   use math_lib
+   |   ^^^^^^^^^^^^ M011
+33 |   use auto_diff
+34 |   use colors_lib
+   |
+
+./src/photometric_run_star_extras.f90:33:3: M011 'use' statement missing 'only' clause
+   |
+31 |   use const_def
+32 |   use math_lib
+33 |   use auto_diff
+   |   ^^^^^^^^^^^^^ M011
+34 |   use colors_lib
+   |
+
+./src/photometric_run_star_extras.f90:34:3: M011 'use' statement missing 'only' clause
+   |
+32 |   use math_lib
+33 |   use auto_diff
+34 |   use colors_lib
+   |   ^^^^^^^^^^^^^^ M011
+35 |
+36 |   implicit none
+   |
+
+./src/photometric_run_star_extras.f90:155:51: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+153 |      USE const_def, ONLY: DP
+154 |      INTEGER, INTENT(IN) :: id, n, nz
+155 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+    |                                                   ^^^^^^^^ T031
+156 |      REAL(DP) :: vals(nz, n)
+157 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/photometric_run_star_extras.f90:156:18: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+154 |      INTEGER, INTENT(IN) :: id, n, nz
+155 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+156 |      REAL(DP) :: vals(nz, n)
+    |                  ^^^^^^^^^^^ T031
+157 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/photometric_run_star_extras.f90:170:6: M011 'use' statement missing 'only' clause
+    |
+168 |   ! Returns either keep_going, retry, or terminate
+169 |   INTEGER FUNCTION extras_finish_step(id)
+170 |      USE chem_def
+    |      ^^^^^^^^^^^^ M011
+171 |      INTEGER, INTENT(IN) :: id
+    |
+
+./src/photometric_run_star_extras.f90:195:40: T031 subroutine argument 'strings' missing 'intent' attribute
+    |
+193 |     INTEGER, INTENT(IN) :: id
+194 |     CHARACTER(LEN=512) :: filename
+195 |     CHARACTER(LEN=100), ALLOCATABLE :: strings(:)
+    |                                        ^^^^^^^^^^ T031
+196 |     REAL(DP), ALLOCATABLE, INTENT(OUT) :: values(:,:)
+197 |     INTEGER, INTENT(OUT) :: n
+    |
+
+./src/photometric_run_star_extras.f90:373:50: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+371 | SUBROUTINE data_for_extra_history_columns(id, n, names, vals, ierr)
+372 |     INTEGER, INTENT(IN) :: id, n
+373 |     CHARACTER(LEN=maxlen_history_column_name) :: names(n)
+    |                                                  ^^^^^^^^ T031
+374 |     REAL(dp) :: vals(n)
+375 |     INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/photometric_run_star_extras.f90:374:17: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+372 |     INTEGER, INTENT(IN) :: id, n
+373 |     CHARACTER(LEN=maxlen_history_column_name) :: names(n)
+374 |     REAL(dp) :: vals(n)
+    |                 ^^^^^^^ T031
+375 |     INTEGER, INTENT(OUT) :: ierr
+376 |     TYPE(star_info), POINTER :: s
+    |
+
+./src/photometric_run_star_extras.f90:439:10: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+438 | SUBROUTINE CalculateSyntheticMagnitude(teff, log_g, metallicity, filter_data, ierr)
+439 |     REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |          ^ T011
+440 |     REAL(DP), INTENT(IN) :: filter_data
+441 |     INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/photometric_run_star_extras.f90:459:3: P021 real has implicit kind
+    |
+457 | SUBROUTINE LoadMISTLookupTable(lookup_file, out_teff, out_logg, out_meta, n_rows)
+458 |   CHARACTER(LEN=*), INTENT(IN) :: lookup_file
+459 |   REAL, ALLOCATABLE, INTENT(OUT) :: out_teff(:), out_logg(:), out_meta(:)
+    |   ^^^^ P021
+460 |   INTEGER, INTENT(OUT) :: n_rows
+    |
+
+./src/photometric_run_star_extras.f90:597:101: S001 line length of 104, exceeds maximum 100
+    |
+597 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+    |                                                                                                     ^^^^ S001
+598 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+599 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |
+
+./src/photometric_run_star_extras.f90:598:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+597 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+598 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |        ^ T011
+599 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+600 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/photometric_run_star_extras.f90:599:3: P021 real has implicit kind
+    |
+597 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+598 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+599 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |   ^^^^ P021
+600 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/photometric_run_star_extras.f90:603:3: P021 real has implicit kind
+    |
+602 |   INTEGER :: i, n, j
+603 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+    |   ^^^^ P021
+604 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+605 |   REAL, DIMENSION(4) :: min_distances
+    |
+
+./src/photometric_run_star_extras.f90:604:3: P021 real has implicit kind
+    |
+602 |   INTEGER :: i, n, j
+603 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+604 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+    |   ^^^^ P021
+605 |   REAL, DIMENSION(4) :: min_distances
+606 |   INTEGER, DIMENSION(4) :: indices
+    |
+
+./src/photometric_run_star_extras.f90:605:3: P021 real has implicit kind
+    |
+603 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+604 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+605 |   REAL, DIMENSION(4) :: min_distances
+    |   ^^^^ P021
+606 |   INTEGER, DIMENSION(4) :: indices
+607 |   REAL :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+    |
+
+./src/photometric_run_star_extras.f90:607:3: P021 real has implicit kind
+    |
+605 |   REAL, DIMENSION(4) :: min_distances
+606 |   INTEGER, DIMENSION(4) :: indices
+607 |   REAL :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+    |   ^^^^ P021
+608 |
+609 |   n = SIZE(lu_teff)
+    |
+
+./src/photometric_run_star_extras.f90:610:24: P001 real literal 1.0 missing kind suffix
+    |
+609 |   n = SIZE(lu_teff)
+610 |   min_distances = HUGE(1.0)
+    |                        ^^^ P001
+611 |   indices = -1
+    |
+
+./src/run_star_extras.f90:30:3: M011 'use' statement missing 'only' clause
+   |
+28 | module run_star_extras
+29 |
+30 |   use star_lib
+   |   ^^^^^^^^^^^^ M011
+31 |   use star_def
+32 |   use const_def
+   |
+
+./src/run_star_extras.f90:31:3: M011 'use' statement missing 'only' clause
+   |
+30 |   use star_lib
+31 |   use star_def
+   |   ^^^^^^^^^^^^ M011
+32 |   use const_def
+33 |   use math_lib
+   |
+
+./src/run_star_extras.f90:32:3: M011 'use' statement missing 'only' clause
+   |
+30 |   use star_lib
+31 |   use star_def
+32 |   use const_def
+   |   ^^^^^^^^^^^^^ M011
+33 |   use math_lib
+34 |   use auto_diff
+   |
+
+./src/run_star_extras.f90:33:3: M011 'use' statement missing 'only' clause
+   |
+31 |   use star_def
+32 |   use const_def
+33 |   use math_lib
+   |   ^^^^^^^^^^^^ M011
+34 |   use auto_diff
+35 |   use colors_lib
+   |
+
+./src/run_star_extras.f90:34:3: M011 'use' statement missing 'only' clause
+   |
+32 |   use const_def
+33 |   use math_lib
+34 |   use auto_diff
+   |   ^^^^^^^^^^^^^ M011
+35 |   use colors_lib
+   |
+
+./src/run_star_extras.f90:35:3: M011 'use' statement missing 'only' clause
+   |
+33 |   use math_lib
+34 |   use auto_diff
+35 |   use colors_lib
+   |   ^^^^^^^^^^^^^^ M011
+36 |
+37 |   implicit none
+   |
+
+./src/run_star_extras.f90:156:51: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+154 |      USE const_def, ONLY: DP
+155 |      INTEGER, INTENT(IN) :: id, n, nz
+156 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+    |                                                   ^^^^^^^^ T031
+157 |      REAL(DP) :: vals(nz, n)
+158 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/run_star_extras.f90:157:18: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+155 |      INTEGER, INTENT(IN) :: id, n, nz
+156 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+157 |      REAL(DP) :: vals(nz, n)
+    |                  ^^^^^^^^^^^ T031
+158 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/run_star_extras.f90:171:6: M011 'use' statement missing 'only' clause
+    |
+169 |   ! Returns either keep_going, retry, or terminate
+170 |   INTEGER FUNCTION extras_finish_step(id)
+171 |      USE chem_def
+    |      ^^^^^^^^^^^^ M011
+172 |      INTEGER, INTENT(IN) :: id
+    |
+
+./src/run_star_extras.f90:263:42: T031 subroutine argument 'strings' missing 'intent' attribute
+    |
+261 |       integer, intent(in) :: id
+262 |       character(len=512) :: filename
+263 |       character(len=100), allocatable :: strings(:)
+    |                                          ^^^^^^^^^^ T031
+264 |       integer, intent(out) :: n
+265 |       integer :: unit, i, status
+    |
+
+./src/run_star_extras.f90:312:52: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+310 |       integer, intent(in) :: id, n
+311 |       integer, intent(out) :: ierr
+312 |       character(len=maxlen_history_column_name) :: names(n)
+    |                                                    ^^^^^^^^ T031
+313 |       real(dp) :: vals(n)
+314 |       type(star_info), pointer :: s
+    |
+
+./src/run_star_extras.f90:313:19: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+311 |       integer, intent(out) :: ierr
+312 |       character(len=maxlen_history_column_name) :: names(n)
+313 |       real(dp) :: vals(n)
+    |                   ^^^^^^^ T031
+314 |       type(star_info), pointer :: s
+315 |       integer :: i, num_strings
+    |
+
+./src/run_star_extras.f90:346:101: S001 line length of 137, exceeds maximum 100
+    |
+345 | ...
+346 | ...R, d,  bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+347 | ...
+348 | ...
+    |
+
+./src/run_star_extras.f90:361:101: S001 line length of 200, exceeds maximum 100
+    |
+360 | ...
+361 | ...s, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, array_of_strings(i - 2), make_sed)
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+362 | ...
+363 | ...
+    |
+
+./src/run_star_extras.f90:387:101: S001 line length of 138, exceeds maximum 100
+    |
+385 | ...
+386 | ...
+387 | ... R, d, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+388 | ...
+389 | ...
+    |
+
+./src/run_star_extras.f90:388:10: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+387 |   SUBROUTINE CalculateBolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_fi...
+388 |     REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+    |          ^ T011
+389 |     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
+390 |     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
+    |
+
+./src/run_star_extras.f90:392:11: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+390 |     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
+391 |
+392 |     REAL (8), ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
+    |           ^ T011
+393 |     CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
+394 |     REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
+    |
+
+./src/run_star_extras.f90:394:5: P021 real has implicit kind
+    |
+392 |     REAL (8), ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
+393 |     CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
+394 |     REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
+    |     ^^^^ P021
+395 |     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
+396 |     CHARACTER(LEN=256) :: lookup_file
+    |
+
+./src/run_star_extras.f90:407:101: S001 line length of 127, exceeds maximum 100
+    |
+405 | ...
+406 | ...allicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+407 | ..., file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+    |                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+408 | ...
+409 | ...
+    |
+
+./src/run_star_extras.f90:419:101: S001 line length of 134, exceeds maximum 100
+    |
+417 | !****************************
+418 |
+419 | SUBROUTINE ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+420 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+421 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |
+
+./src/run_star_extras.f90:420:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+419 | SUBROUTINE ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+420 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+    |        ^ T011
+421 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+422 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+    |
+
+./src/run_star_extras.f90:421:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+419 | SUBROUTINE ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+420 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+421 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |        ^ T011
+422 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+423 |   CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
+    |
+
+./src/run_star_extras.f90:438:101: S001 line length of 128, exceeds maximum 100
+    |
+437 |   ! Load the first SED to define the wavelength grid
+438 |   CALL LoadSED(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), closest_indices(1), temp_wavelengths, temp_flux)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+439 |   n_points = SIZE(temp_wavelengths)
+440 |   ALLOCATE(common_wavelengths(n_points))
+    |
+
+./src/run_star_extras.f90:449:101: S001 line length of 130, exceeds maximum 100
+    |
+447 |   ! Load and interpolate remaining SEDs
+448 |   DO i = 2, 4
+449 |     CALL LoadSED(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), closest_indices(i), temp_wavelengths, temp_flux)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+450 |     CALL InterpolateArray(temp_wavelengths, temp_flux, common_wavelengths, model_fluxes(i, :))
+451 |   END DO
+    |
+
+./src/run_star_extras.f90:458:25: P001 real literal 0.0 missing kind suffix
+    |
+456 |                         (lu_logg(closest_indices(i)) - log_g)**2 + &
+457 |                         (lu_meta(closest_indices(i)) - metallicity)**2)
+458 |     IF (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+    |                         ^^^ P001
+459 |     weights(i) = 1.0 / distances(i)
+460 |   END DO
+    |
+
+./src/run_star_extras.f90:459:18: P001 real literal 1.0 missing kind suffix
+    |
+457 |                         (lu_meta(closest_indices(i)) - metallicity)**2)
+458 |     IF (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+459 |     weights(i) = 1.0 / distances(i)
+    |                  ^^^ P001
+460 |   END DO
+    |
+
+./src/run_star_extras.f90:522:101: S001 line length of 104, exceeds maximum 100
+    |
+520 | !****************************
+521 |
+522 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+    |                                                                                                     ^^^^ S001
+523 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+524 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |
+
+./src/run_star_extras.f90:523:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+522 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+523 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |        ^ T011
+524 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+525 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/run_star_extras.f90:524:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+522 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+523 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+524 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |        ^ T011
+525 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/run_star_extras.f90:532:101: S001 line length of 105, exceeds maximum 100
+    |
+530 |   REAL(DP), DIMENSION(4) :: min_distances
+531 |   INTEGER, DIMENSION(4) :: indices
+532 |   REAL(DP) :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max, teff_dist, logg_dist, meta_dist
+    |                                                                                                     ^^^^^ S001
+533 |
+534 |   n = SIZE(lu_teff)
+    |
+
+./src/run_star_extras.f90:535:24: P001 real literal 1.0 missing kind suffix
+    |
+534 |   n = SIZE(lu_teff)
+535 |   min_distances = HUGE(1.0)
+    |                        ^^^ P001
+536 |   indices = -1
+    |
+
+./src/run_star_extras.f90:549:29: P001 real literal 0.00 missing kind suffix
+    |
+547 |   ALLOCATE(scaled_lu_teff(n), scaled_lu_logg(n), scaled_lu_meta(n))
+548 |
+549 |   IF (teff_max - teff_min > 0.00) THEN
+    |                             ^^^^ P001
+550 |     scaled_lu_teff = (lu_teff - teff_min) / (teff_max - teff_min)
+551 |   END IF
+    |
+
+./src/run_star_extras.f90:553:29: P001 real literal 0.00 missing kind suffix
+    |
+551 |   END IF
+552 |
+553 |   IF (logg_max - logg_min > 0.00) THEN
+    |                             ^^^^ P001
+554 |     scaled_lu_logg = (lu_logg - logg_min) / (logg_max - logg_min)
+555 |   END IF
+    |
+
+./src/run_star_extras.f90:557:29: P001 real literal 0.00 missing kind suffix
+    |
+555 |   END IF
+556 |
+557 |   IF (meta_max - meta_min > 0.00) THEN
+    |                             ^^^^ P001
+558 |     scaled_lu_meta = (lu_meta - meta_min) / (meta_max - meta_min)
+559 |   END IF
+    |
+
+./src/run_star_extras.f90:577:31: P001 real literal 0.00 missing kind suffix
+    |
+575 |     meta_dist = 0.0
+576 |
+577 |     IF (teff_max - teff_min > 0.00) THEN
+    |                               ^^^^ P001
+578 |       teff_dist = scaled_lu_teff(i) - norm_teff
+579 |     END IF
+    |
+
+./src/run_star_extras.f90:581:31: P001 real literal 0.00 missing kind suffix
+    |
+579 |     END IF
+580 |
+581 |     IF (logg_max - logg_min > 0.00) THEN
+    |                               ^^^^ P001
+582 |       logg_dist = scaled_lu_logg(i) - norm_logg
+583 |     END IF
+    |
+
+./src/run_star_extras.f90:585:31: P001 real literal 0.00 missing kind suffix
+    |
+583 |     END IF
+584 |
+585 |     IF (meta_max - meta_min > 0.00) THEN
+    |                               ^^^^ P001
+586 |       meta_dist = scaled_lu_meta(i) - norm_meta
+587 |     END IF
+    |
+
+./src/run_star_extras.f90:634:29: P001 real literal 0.0 missing kind suffix
+    |
+632 |     ! Validate inputs and replace invalid wavelengths with 0
+633 |     DO i = 1, SIZE(wavelengths) - 1
+634 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                             ^^^ P001
+635 |         PRINT *, "bolometric Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+636 |         fluxes(i) = 0.0  ! Replace invalid wavelength with 0
+    |
+
+./src/run_star_extras.f90:634:50: P001 real literal 0.0 missing kind suffix
+    |
+632 |     ! Validate inputs and replace invalid wavelengths with 0
+633 |     DO i = 1, SIZE(wavelengths) - 1
+634 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                                                  ^^^ P001
+635 |         PRINT *, "bolometric Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+636 |         fluxes(i) = 0.0  ! Replace invalid wavelength with 0
+    |
+
+./src/run_star_extras.f90:653:28: P001 real literal 0.0 missing kind suffix
+    |
+652 |     ! Validate integration result
+653 |     IF (bolometric_flux <= 0.0) THEN
+    |                            ^^^ P001
+654 |       PRINT *, "Error: Flux integration resulted in non-positive value."
+655 |       bolometric_magnitude = 99.0
+    |
+
+./src/run_star_extras.f90:660:28: P001 real literal 0.0 missing kind suffix
+    |
+659 |         ! Calculate bolometric magnitude
+660 |     IF (bolometric_flux <= 0.0) THEN
+    |                            ^^^ P001
+661 |       PRINT *, "Error: Flux integration resulted in non-positive value."
+662 |       bolometric_magnitude = 99.0
+    |
+
+./src/run_star_extras.f90:693:101: S001 line length of 187, exceeds maximum 100
+    |
+693 | ...lengths, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, filter_name, make_sed)
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+694 | ...
+695 | ...
+    |
+
+./src/run_star_extras.f90:739:101: S001 line length of 115, exceeds maximum 100
+    |
+737 |   IF (make_sed) THEN
+738 | ! Determine the maximum size among all arrays
+739 | max_size = MAX(SIZE(wavelengths), SIZE(filter_wavelengths), SIZE(fluxes), SIZE(convolved_flux), SIZE(filter_trans))
+    |                                                                                                     ^^^^^^^^^^^^^^^ S001
+740 |
+741 | ! Open the CSV file for writing
+    |
+
+./src/run_star_extras.f90:780:101: S001 line length of 105, exceeds maximum 100
+    |
+778 |     ! Inform the user of successful writing
+779 |     !PRINT *, "Data written to ", csv_file
+780 |     vega_flux = CalculateVegaFlux(vega_filepath, filter_wavelengths, filter_trans, filter_name, make_sed)
+    |                                                                                                     ^^^^^ S001
+781 |
+782 |     ! Calculate synthetic flux and magnitude
+    |
+
+./src/run_star_extras.f90:783:101: S001 line length of 110, exceeds maximum 100
+    |
+782 |     ! Calculate synthetic flux and magnitude
+783 |     CALL CalculateSyntheticFlux(wavelengths, convolved_flux, synthetic_flux, filter_wavelengths, filter_trans)
+    |                                                                                                     ^^^^^^^^^^ S001
+784 |
+785 |     !PRINT *, "VEGA zero point:", vega_flux
+    |
+
+./src/run_star_extras.f90:788:29: P001 real literal 2.5 missing kind suffix
+    |
+787 |     IF (vega_flux > 0.0_DP) THEN
+788 |       CalculateSynthetic = -2.5 * LOG10(synthetic_flux / vega_flux)
+    |                             ^^^ P001
+789 |     ELSE
+790 |       PRINT *, "Error: Vega flux is zero, magnitude calculation is invalid."
+    |
+
+./src/run_star_extras.f90:806:44: T031 subroutine argument 'convolved_flux' missing 'intent' attribute
+    |
+804 |     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
+805 |     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
+806 |     REAL(DP), DIMENSION(:), ALLOCATABLE :: convolved_flux
+    |                                            ^^^^^^^^^^^^^^ T031
+807 |     REAL(DP), DIMENSION(:), ALLOCATABLE :: interpolated_filter
+808 |     INTEGER :: n
+    |
+
+./src/run_star_extras.f90:831:101: S001 line length of 106, exceeds maximum 100
+    |
+829 | !Calculate Synthetic Flux and Magnitude
+830 | !****************************
+831 |   SUBROUTINE CalculateSyntheticFlux(wavelengths, fluxes, synthetic_flux, filter_wavelengths, filter_trans)
+    |                                                                                                     ^^^^^^ S001
+832 |     REAL(DP), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
+833 |     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
+    |
+
+./src/run_star_extras.f90:843:29: P001 real literal 0.0 missing kind suffix
+    |
+841 |     ! Validate inputs
+842 |     DO i = 1, SIZE(wavelengths) - 1
+843 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                             ^^^ P001
+844 |         PRINT *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+845 |         STOP
+    |
+
+./src/run_star_extras.f90:843:50: P001 real literal 0.0 missing kind suffix
+    |
+841 |     ! Validate inputs
+842 |     DO i = 1, SIZE(wavelengths) - 1
+843 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                                                  ^^^ P001
+844 |         PRINT *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+845 |         STOP
+    |
+
+./src/run_star_extras.f90:850:101: S001 line length of 101, exceeds maximum 100
+    |
+849 |     CALL RombergIntegration(wavelengths, fluxes* wavelengths, integrated_flux)
+850 |     CALL RombergIntegration(filter_wavelengths, filter_trans * filter_wavelengths, integrated_filter)
+    |                                                                                                     ^ S001
+851 |
+852 |     ! Store the total flux
+    |
+
+./src/run_star_extras.f90:853:29: P001 real literal 0.0 missing kind suffix
+    |
+852 |     ! Store the total flux
+853 |     IF (integrated_filter > 0.0) THEN
+    |                             ^^^ P001
+854 |         synthetic_flux = integrated_flux / integrated_filter
+855 |     ELSE
+    |
+
+./src/run_star_extras.f90:868:17: P001 real literal 0.0 missing kind suffix
+    |
+866 |     REAL(DP), INTENT(IN) :: flux
+867 |     !print *, 'flux:', flux
+868 |     IF (flux <= 0.0) THEN
+    |                 ^^^ P001
+869 |       PRINT *, "Error: Flux must be positive to calculate magnitude."
+870 |       FluxToMagnitude = 99.0  ! Return an error value
+    |
+
+./src/run_star_extras.f90:872:26: P001 real literal 2.5 missing kind suffix
+    |
+870 |       FluxToMagnitude = 99.0  ! Return an error value
+871 |     ELSE
+872 |       FluxToMagnitude = -2.5 * LOG10(flux)
+    |                          ^^^ P001
+873 |     END IF
+874 |   END FUNCTION FluxToMagnitude
+    |
+
+./src/run_star_extras.f90:881:101: S001 line length of 105, exceeds maximum 100
+    |
+881 | FUNCTION CalculateVegaFlux(vega_filepath, filt_wave, filt_trans, filter_name, make_sed) RESULT(vega_flux)
+    |                                                                                                     ^^^^^ S001
+882 |   CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name
+883 |   CHARACTER(len = 100) :: output_csv
+    |
+
+./src/run_star_extras.f90:915:101: S001 line length of 108, exceeds maximum 100
+    |
+913 |   IF (make_sed) THEN
+914 |     ! Determine the maximum size among all arrays
+915 |     max_size = MAX(SIZE(vega_wave), SIZE(vega_flux_arr), SIZE(conv_flux), SIZE(filt_wave), SIZE(filt_trans))
+    |                                                                                                     ^^^^^^^^ S001
+    |
+
+./src/run_star_extras.f90:1040:5: P021 real has implicit kind
+     |
+1038 |     CHARACTER(LEN=512) :: line
+1039 |     INTEGER :: unit, n_rows, status, i
+1040 |     REAL :: temp_wavelength, temp_flux
+     |     ^^^^ P021
+1041 |
+1042 |     ! Open the file
+     |
+
+./src/run_star_extras.f90:1109:5: P021 real has implicit kind
+     |
+1107 |     CHARACTER(LEN=512) :: line
+1108 |     INTEGER :: unit, n_rows, status, i
+1109 |     REAL :: temp_wavelength, temp_trans
+     |     ^^^^ P021
+1110 |
+1111 |     ! Open the file
+     |
+
+./src/run_star_extras.f90:1169:101: S001 line length of 101, exceeds maximum 100
+     |
+1169 |   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+     |                                                                                                     ^ S001
+1170 |     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
+1171 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+     |
+
+./src/run_star_extras.f90:1171:5: P021 real has implicit kind
+     |
+1169 |   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+1170 |     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
+1171 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+     |     ^^^^ P021
+1172 |     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
+1173 |     REAL(8), ALLOCATABLE, INTENT(INOUT) :: out_logg(:), out_meta(:), out_teff(:)
+     |
+
+./src/run_star_extras.f90:1173:10: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+     |
+1171 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+1172 |     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
+1173 |     REAL(8), ALLOCATABLE, INTENT(INOUT) :: out_logg(:), out_meta(:), out_teff(:)
+     |          ^ T011
+1174 |
+1175 |     INTEGER :: i, n_rows, status, unit
+     |
+
+./src/run_star_extras.f90:1353:5: P021 real has implicit kind
+     |
+1352 |     INTEGER :: i, n
+1353 |     REAL :: sum
+     |     ^^^^ P021
+1354 |
+1355 |     n = SIZE(x)
+     |
+
+./src/run_star_extras.f90:1371:19: P001 real literal 0.5 missing kind suffix
+     |
+1369 |     ! Perform trapezoidal integration
+1370 |     DO i = 1, n - 1
+1371 |       sum = sum + 0.5 * (x(i + 1) - x(i)) * (y(i + 1) + y(i))
+     |                   ^^^ P001
+1372 |     END DO
+     |
+
+./src/run_star_extras.f90:1454:101: S001 line length of 113, exceeds maximum 100
+     |
+1453 |     ! Boole's Rule: (2h/45) * (7f0 + 32f1 + 12f2 + 32f3 + 7f4)
+1454 |     sum = sum + (2.0_DP * h / 45.0_DP) * (7.0_DP * f0 + 32.0_DP * f1 + 12.0_DP * f2 + 32.0_DP * f3 + 7.0_DP * f4)
+     |                                                                                                     ^^^^^^^^^^^^^ S001
+1455 |   END DO
+     |
+
+./src/run_star_extras.f90:1605:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+     |
+1603 |      &         wavelengths, fluxes)
+1604 |   ! Inputs:
+1605 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+     |        ^ T011
+1606 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+1607 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+     |
+
+./src/run_star_extras.f90:1606:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+     |
+1604 |   ! Inputs:
+1605 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
+1606 |   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+     |        ^ T011
+1607 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+1608 |   CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
+     |
+
+./src/run_star_extras.f90:1651:101: S001 line length of 118, exceeds maximum 100
+     |
+1649 |   ! For brevity, we assume a helper subroutine "LoadAndInterpolateSED" that loads an SED
+1650 |   ! from a given file (using LoadSED) and then interpolates it onto common_wavelengths (using InterpolateArray).
+1651 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i0)), i0, common_wavelengths, sed_grid(1,1,1,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1652 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i1)), i1, common_wavelengths, sed_grid(2,1,1,:))
+1653 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j0)), j0, common_wavelengths, sed_grid(1,2,1,:))
+     |
+
+./src/run_star_extras.f90:1652:101: S001 line length of 118, exceeds maximum 100
+     |
+1650 |   ! from a given file (using LoadSED) and then interpolates it onto common_wavelengths (using InterpolateArray).
+1651 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i0)), i0, common_wavelengths, sed_grid(1,1,1,:))
+1652 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i1)), i1, common_wavelengths, sed_grid(2,1,1,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1653 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j0)), j0, common_wavelengths, sed_grid(1,2,1,:))
+1654 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j1)), j1, common_wavelengths, sed_grid(2,2,1,:))
+     |
+
+./src/run_star_extras.f90:1653:101: S001 line length of 118, exceeds maximum 100
+     |
+1651 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i0)), i0, common_wavelengths, sed_grid(1,1,1,:))
+1652 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i1)), i1, common_wavelengths, sed_grid(2,1,1,:))
+1653 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j0)), j0, common_wavelengths, sed_grid(1,2,1,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1654 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j1)), j1, common_wavelengths, sed_grid(2,2,1,:))
+1655 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0)), k0, common_wavelengths, sed_grid(1,1,2,:))
+     |
+
+./src/run_star_extras.f90:1654:101: S001 line length of 118, exceeds maximum 100
+     |
+1652 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(i1)), i1, common_wavelengths, sed_grid(2,1,1,:))
+1653 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j0)), j0, common_wavelengths, sed_grid(1,2,1,:))
+1654 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j1)), j1, common_wavelengths, sed_grid(2,2,1,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1655 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0)), k0, common_wavelengths, sed_grid(1,1,2,:))
+1656 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1)), k1, common_wavelengths, sed_grid(2,1,2,:))
+     |
+
+./src/run_star_extras.f90:1655:101: S001 line length of 118, exceeds maximum 100
+     |
+1653 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j0)), j0, common_wavelengths, sed_grid(1,2,1,:))
+1654 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j1)), j1, common_wavelengths, sed_grid(2,2,1,:))
+1655 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0)), k0, common_wavelengths, sed_grid(1,1,2,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1656 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1)), k1, common_wavelengths, sed_grid(2,1,2,:))
+1657 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0+1)), k0+1, common_wavelengths, sed_grid(1,2,2,:))
+     |
+
+./src/run_star_extras.f90:1656:101: S001 line length of 118, exceeds maximum 100
+     |
+1654 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(j1)), j1, common_wavelengths, sed_grid(2,2,1,:))
+1655 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0)), k0, common_wavelengths, sed_grid(1,1,2,:))
+1656 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1)), k1, common_wavelengths, sed_grid(2,1,2,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^ S001
+1657 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0+1)), k0+1, common_wavelengths, sed_grid(1,2,2,:))
+1658 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1+1)), k1+1, common_wavelengths, sed_grid(2,2,2,:))
+     |
+
+./src/run_star_extras.f90:1657:101: S001 line length of 122, exceeds maximum 100
+     |
+1655 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0)), k0, common_wavelengths, sed_grid(1,1,2,:))
+1656 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1)), k1, common_wavelengths, sed_grid(2,1,2,:))
+1657 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0+1)), k0+1, common_wavelengths, sed_grid(1,2,2,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^ S001
+1658 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1+1)), k1+1, common_wavelengths, sed_grid(2,2,2,:))
+1659 |   !--------------------------------------------------------------------
+     |
+
+./src/run_star_extras.f90:1658:101: S001 line length of 122, exceeds maximum 100
+     |
+1656 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1)), k1, common_wavelengths, sed_grid(2,1,2,:))
+1657 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k0+1)), k0+1, common_wavelengths, sed_grid(1,2,2,:))
+1658 |   CALL LoadAndInterpolateSED(TRIM(stellar_model_dir)//TRIM(file_names(k1+1)), k1+1, common_wavelengths, sed_grid(2,2,2,:))
+     |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^ S001
+1659 |   !--------------------------------------------------------------------
+1660 |   ! Note: The mapping of indices in file_names to (teff, logg, meta) grid coordinates
+     |
+
+./src/run_star_extras.f90:1708:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+     |
+1706 | SUBROUTINE FindBoundingIndices(target, grid, i0, i1)
+1707 |   INTEGER, PARAMETER :: DP = KIND(1.0D0)
+1708 |   REAL(8), INTENT(IN) :: target
+     |        ^ T011
+1709 |   REAL(8), INTENT(IN) :: grid(:)
+1710 |   INTEGER, INTENT(OUT) :: i0, i1
+     |
+
+./src/run_star_extras.f90:1709:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+     |
+1707 |   INTEGER, PARAMETER :: DP = KIND(1.0D0)
+1708 |   REAL(8), INTENT(IN) :: target
+1709 |   REAL(8), INTENT(IN) :: grid(:)
+     |        ^ T011
+1710 |   INTEGER, INTENT(OUT) :: i0, i1
+1711 |   INTEGER :: i, n
+     |
+
+./src/spectra_run_star_extras.f90:29:3: M011 'use' statement missing 'only' clause
+   |
+27 | module run_star_extras
+28 |
+29 |   use star_lib
+   |   ^^^^^^^^^^^^ M011
+30 |   use star_def
+31 |   use const_def
+   |
+
+./src/spectra_run_star_extras.f90:30:3: M011 'use' statement missing 'only' clause
+   |
+29 |   use star_lib
+30 |   use star_def
+   |   ^^^^^^^^^^^^ M011
+31 |   use const_def
+32 |   use math_lib
+   |
+
+./src/spectra_run_star_extras.f90:31:3: M011 'use' statement missing 'only' clause
+   |
+29 |   use star_lib
+30 |   use star_def
+31 |   use const_def
+   |   ^^^^^^^^^^^^^ M011
+32 |   use math_lib
+33 |   use auto_diff
+   |
+
+./src/spectra_run_star_extras.f90:32:3: M011 'use' statement missing 'only' clause
+   |
+30 |   use star_def
+31 |   use const_def
+32 |   use math_lib
+   |   ^^^^^^^^^^^^ M011
+33 |   use auto_diff
+34 |   use colors_lib
+   |
+
+./src/spectra_run_star_extras.f90:33:3: M011 'use' statement missing 'only' clause
+   |
+31 |   use const_def
+32 |   use math_lib
+33 |   use auto_diff
+   |   ^^^^^^^^^^^^^ M011
+34 |   use colors_lib
+   |
+
+./src/spectra_run_star_extras.f90:34:3: M011 'use' statement missing 'only' clause
+   |
+32 |   use math_lib
+33 |   use auto_diff
+34 |   use colors_lib
+   |   ^^^^^^^^^^^^^^ M011
+35 |
+36 |   implicit none
+   |
+
+./src/spectra_run_star_extras.f90:155:51: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+153 |      USE const_def, ONLY: DP
+154 |      INTEGER, INTENT(IN) :: id, n, nz
+155 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+    |                                                   ^^^^^^^^ T031
+156 |      REAL(DP) :: vals(nz, n)
+157 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/spectra_run_star_extras.f90:156:18: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+154 |      INTEGER, INTENT(IN) :: id, n, nz
+155 |      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
+156 |      REAL(DP) :: vals(nz, n)
+    |                  ^^^^^^^^^^^ T031
+157 |      INTEGER, INTENT(OUT) :: ierr
+    |
+
+./src/spectra_run_star_extras.f90:170:6: M011 'use' statement missing 'only' clause
+    |
+168 |   ! Returns either keep_going, retry, or terminate
+169 |   INTEGER FUNCTION extras_finish_step(id)
+170 |      USE chem_def
+    |      ^^^^^^^^^^^^ M011
+171 |      INTEGER, INTENT(IN) :: id
+    |
+
+./src/spectra_run_star_extras.f90:262:42: T031 subroutine argument 'strings' missing 'intent' attribute
+    |
+260 |       integer, intent(in) :: id
+261 |       character(len=512) :: filename
+262 |       character(len=100), allocatable :: strings(:)
+    |                                          ^^^^^^^^^^ T031
+263 |       integer, intent(out) :: n
+264 |       integer :: unit, i, status
+    |
+
+./src/spectra_run_star_extras.f90:310:52: T031 subroutine argument 'names' missing 'intent' attribute
+    |
+308 |       ! Populates data for the extra history columns
+309 |       integer, intent(in) :: id, n
+310 |       character(len=maxlen_history_column_name) :: names(n)
+    |                                                    ^^^^^^^^ T031
+311 |       real(dp) :: vals(n)
+312 |       integer, intent(out) :: ierr
+    |
+
+./src/spectra_run_star_extras.f90:311:19: T031 subroutine argument 'vals' missing 'intent' attribute
+    |
+309 |       integer, intent(in) :: id, n
+310 |       character(len=maxlen_history_column_name) :: names(n)
+311 |       real(dp) :: vals(n)
+    |                   ^^^^^^^ T031
+312 |       integer, intent(out) :: ierr
+313 |       type(star_info), pointer :: s
+    |
+
+./src/spectra_run_star_extras.f90:340:101: S001 line length of 138, exceeds maximum 100
+    |
+338 | ...
+339 | ...
+340 | ...licity, bolometric_magnitude, bolometric_flux,wavelengths, fluxes, sed_filepath)
+    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+341 | ...
+342 | ...
+    |
+
+./src/spectra_run_star_extras.f90:365:101: S001 line length of 157, exceeds maximum 100
+    |
+364 | ...) then
+365 | ...metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath)
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+366 | ...
+367 | ...
+    |
+
+./src/spectra_run_star_extras.f90:391:44: T031 subroutine argument 'convolved_flux' missing 'intent' attribute
+    |
+389 |     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
+390 |     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
+391 |     REAL(DP), DIMENSION(:), ALLOCATABLE :: convolved_flux
+    |                                            ^^^^^^^^^^^^^^ T031
+392 |     REAL(DP), DIMENSION(:), ALLOCATABLE :: interpolated_filter
+393 |     INTEGER :: n
+    |
+
+./src/spectra_run_star_extras.f90:418:29: P001 real literal 0.0 missing kind suffix
+    |
+416 |     ! Validate inputs
+417 |     DO i = 1, SIZE(wavelengths) - 1
+418 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                             ^^^ P001
+419 |         PRINT *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+420 |         STOP
+    |
+
+./src/spectra_run_star_extras.f90:418:50: P001 real literal 0.0 missing kind suffix
+    |
+416 |     ! Validate inputs
+417 |     DO i = 1, SIZE(wavelengths) - 1
+418 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+    |                                                  ^^^ P001
+419 |         PRINT *, "synthetic Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+420 |         STOP
+    |
+
+./src/spectra_run_star_extras.f90:429:27: P001 real literal 0.0 missing kind suffix
+    |
+427 |     print *, fluxes
+428 |     ! Validate integration result
+429 |     IF (synthetic_flux <= 0.0) THEN
+    |                           ^^^ P001
+430 |       PRINT *, "Error: Flux integration resulted in non-positive value."
+431 |       synthetic_magnitude = 99.0
+    |
+
+./src/spectra_run_star_extras.f90:438:28: P001 real literal 2.5 missing kind suffix
+    |
+436 |     ! Calculate synthetic magnitude
+437 |     print *, synthetic_flux
+438 |     synthetic_magnitude = -2.5 * LOG10(synthetic_flux) - 4.74  !48.6
+    |                            ^^^ P001
+439 |     !print *, synthetic_magnitude
+    |
+
+./src/spectra_run_star_extras.f90:438:58: P001 real literal 4.74 missing kind suffix
+    |
+436 |     ! Calculate synthetic magnitude
+437 |     print *, synthetic_flux
+438 |     synthetic_magnitude = -2.5 * LOG10(synthetic_flux) - 4.74  !48.6
+    |                                                          ^^^^ P001
+439 |     !print *, synthetic_magnitude
+    |
+
+./src/spectra_run_star_extras.f90:451:101: S001 line length of 158, exceeds maximum 100
+    |
+451 | ...metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath)
+    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+452 | ...
+453 | ...
+    |
+
+./src/spectra_run_star_extras.f90:535:101: S001 line length of 141, exceeds maximum 100
+    |
+535 | ...llicity, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
+    |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+536 | ...
+537 | ...
+    |
+
+./src/spectra_run_star_extras.f90:536:10: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+535 |   SUBROUTINE CalculateBolometricMagnitude(teff, log_g, metallicity, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed...
+536 |     REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |          ^ T011
+537 |     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
+538 |     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
+    |
+
+./src/spectra_run_star_extras.f90:540:5: P021 real has implicit kind
+    |
+538 |     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
+539 |
+540 |     REAL, ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
+    |     ^^^^ P021
+541 |     CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
+542 |     REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
+    |
+
+./src/spectra_run_star_extras.f90:542:5: P021 real has implicit kind
+    |
+540 |     REAL, ALLOCATABLE :: lu_logg(:), lu_meta(:), lu_teff(:)
+541 |     CHARACTER(LEN=100), ALLOCATABLE :: file_names(:)
+542 |     REAL, DIMENSION(:,:), ALLOCATABLE :: lookup_table
+    |     ^^^^ P021
+543 |     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, fluxes
+544 |     CHARACTER(LEN=256) :: lookup_file
+    |
+
+./src/spectra_run_star_extras.f90:552:101: S001 line length of 123, exceeds maximum 100
+    |
+551 |     ! Interpolate Spectral Energy Distribution
+552 |     CALL InterpolateSED(teff, log_g, metallicity, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^ S001
+553 |
+554 |     ! Calculate bolometric flux and magnitude
+    |
+
+./src/spectra_run_star_extras.f90:566:101: S001 line length of 101, exceeds maximum 100
+    |
+564 |   !****************************
+565 |
+566 |   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+    |                                                                                                     ^ S001
+567 |     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
+568 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+    |
+
+./src/spectra_run_star_extras.f90:568:5: P021 real has implicit kind
+    |
+566 |   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
+567 |     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
+568 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+    |     ^^^^ P021
+569 |     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
+570 |     REAL, ALLOCATABLE, INTENT(INOUT) :: out_logg(:), out_meta(:), out_teff(:)
+    |
+
+./src/spectra_run_star_extras.f90:570:5: P021 real has implicit kind
+    |
+568 |     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
+569 |     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
+570 |     REAL, ALLOCATABLE, INTENT(INOUT) :: out_logg(:), out_meta(:), out_teff(:)
+    |     ^^^^ P021
+571 |
+572 |     INTEGER :: i, n_rows, status, unit
+    |
+
+./src/spectra_run_star_extras.f90:716:101: S001 line length of 104, exceeds maximum 100
+    |
+716 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+    |                                                                                                     ^^^^ S001
+717 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+718 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |
+
+./src/spectra_run_star_extras.f90:717:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+716 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+717 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |        ^ T011
+718 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+719 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/spectra_run_star_extras.f90:718:3: P021 real has implicit kind
+    |
+716 | SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
+717 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+718 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |   ^^^^ P021
+719 |   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
+    |
+
+./src/spectra_run_star_extras.f90:722:3: P021 real has implicit kind
+    |
+721 |   INTEGER :: i, n, j
+722 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+    |   ^^^^ P021
+723 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+724 |   REAL, DIMENSION(4) :: min_distances
+    |
+
+./src/spectra_run_star_extras.f90:723:3: P021 real has implicit kind
+    |
+721 |   INTEGER :: i, n, j
+722 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+723 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+    |   ^^^^ P021
+724 |   REAL, DIMENSION(4) :: min_distances
+725 |   INTEGER, DIMENSION(4) :: indices
+    |
+
+./src/spectra_run_star_extras.f90:724:3: P021 real has implicit kind
+    |
+722 |   REAL :: distance, norm_teff, norm_logg, norm_meta
+723 |   REAL, DIMENSION(:), ALLOCATABLE :: scaled_lu_teff, scaled_lu_logg, scaled_lu_meta
+724 |   REAL, DIMENSION(4) :: min_distances
+    |   ^^^^ P021
+725 |   INTEGER, DIMENSION(4) :: indices
+726 |   REAL :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+    |
+
+./src/spectra_run_star_extras.f90:726:3: P021 real has implicit kind
+    |
+724 |   REAL, DIMENSION(4) :: min_distances
+725 |   INTEGER, DIMENSION(4) :: indices
+726 |   REAL :: teff_min, teff_max, logg_min, logg_max, meta_min, meta_max
+    |   ^^^^ P021
+727 |
+728 |   n = SIZE(lu_teff)
+    |
+
+./src/spectra_run_star_extras.f90:729:24: P001 real literal 1.0 missing kind suffix
+    |
+728 |   n = SIZE(lu_teff)
+729 |   min_distances = HUGE(1.0)
+    |                        ^^^ P001
+730 |   indices = -1
+    |
+
+./src/spectra_run_star_extras.f90:797:101: S001 line length of 130, exceeds maximum 100
+    |
+797 | SUBROUTINE InterpolateSED(teff, log_g, metallicity, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S001
+798 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+799 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |
+
+./src/spectra_run_star_extras.f90:798:8: T011 real kind set with number literal '8', use 'iso_fortran_env' parameter
+    |
+797 | SUBROUTINE InterpolateSED(teff, log_g, metallicity, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+798 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+    |        ^ T011
+799 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+800 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+    |
+
+./src/spectra_run_star_extras.f90:799:3: P021 real has implicit kind
+    |
+797 | SUBROUTINE InterpolateSED(teff, log_g, metallicity, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
+798 |   REAL(8), INTENT(IN) :: teff, log_g, metallicity
+799 |   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
+    |   ^^^^ P021
+800 |   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
+801 |   CHARACTER(LEN=100), INTENT(IN) :: file_names(:)
+    |
+
+./src/spectra_run_star_extras.f90:825:101: S001 line length of 101, exceeds maximum 100
+    |
+824 |   ! Load the first SED to determine the wavelength grid
+825 |   CALL LoadSED(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(1))), closest_indices(1), &
+    |                                                                                                     ^ S001
+826 |                temp_wavelengths, temp_flux)
+    |
+
+./src/spectra_run_star_extras.f90:847:101: S001 line length of 103, exceeds maximum 100
+    |
+845 |   ! Load and interpolate the remaining SEDs
+846 |   DO i = 1, 4
+847 |     CALL LoadSED(TRIM(stellar_model_dir) // TRIM(file_names(closest_indices(i))), closest_indices(i), &
+    |                                                                                                     ^^^ S001
+848 |                  temp_wavelengths, temp_flux)
+    |
+
+./src/spectra_run_star_extras.f90:865:25: P001 real literal 0.0 missing kind suffix
+    |
+863 |                         (lu_logg(closest_indices(i)) - log_g)**2 + &
+864 |                         (lu_meta(closest_indices(i)) - metallicity)**2)
+865 |     IF (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+    |                         ^^^ P001
+866 |     weights(i) = 1.0 / distances(i)
+    |
+
+./src/spectra_run_star_extras.f90:866:18: P001 real literal 1.0 missing kind suffix
+    |
+864 |                         (lu_meta(closest_indices(i)) - metallicity)**2)
+865 |     IF (distances(i) == 0.0) distances(i) = 1.0E-10  ! Prevent division by zero
+866 |     weights(i) = 1.0 / distances(i)
+    |                  ^^^ P001
+867 |
+868 |     ! Debug !PRINT: Distance and weight for each model
+    |
+
+./src/spectra_run_star_extras.f90:914:5: P021 real has implicit kind
+    |
+912 |     CHARACTER(LEN=512) :: line
+913 |     INTEGER :: unit, n_rows, status, i
+914 |     REAL :: temp_wavelength, temp_flux
+    |     ^^^^ P021
+915 |
+916 |     ! Open the file
+    |
+
+./src/spectra_run_star_extras.f90:979:5: P021 real has implicit kind
+    |
+977 |     CHARACTER(LEN=512) :: line
+978 |     INTEGER :: unit, n_rows, status, i
+979 |     REAL :: temp_wavelength, temp_trans
+    |     ^^^^ P021
+980 |
+981 |     ! Open the file
+    |
+
+./src/spectra_run_star_extras.f90:1041:29: P001 real literal 0.0 missing kind suffix
+     |
+1039 |     ! Validate inputs and replace invalid wavelengths with 0
+1040 |     DO i = 1, SIZE(wavelengths) - 1
+1041 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+     |                             ^^^ P001
+1042 |         PRINT *, "bolometric Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+1043 |         fluxes(i) = 0.0  ! Replace invalid wavelength with 0
+     |
+
+./src/spectra_run_star_extras.f90:1041:50: P001 real literal 0.0 missing kind suffix
+     |
+1039 |     ! Validate inputs and replace invalid wavelengths with 0
+1040 |     DO i = 1, SIZE(wavelengths) - 1
+1041 |       IF (wavelengths(i) <= 0.0 .OR. fluxes(i) < 0.0) THEN
+     |                                                  ^^^ P001
+1042 |         PRINT *, "bolometric Invalid input at index", i, ":", wavelengths(i), fluxes(i)
+1043 |         fluxes(i) = 0.0  ! Replace invalid wavelength with 0
+     |
+
+./src/spectra_run_star_extras.f90:1052:28: P001 real literal 0.0 missing kind suffix
+     |
+1051 |     ! Validate integration result
+1052 |     IF (bolometric_flux <= 0.0) THEN
+     |                            ^^^ P001
+1053 |       PRINT *, "Error: Flux integration resulted in non-positive value."
+1054 |       bolometric_magnitude = 99.0
+     |
+
+./src/spectra_run_star_extras.f90:1059:28: P001 real literal 0.0 missing kind suffix
+     |
+1058 |         ! Calculate bolometric magnitude
+1059 |     IF (bolometric_flux <= 0.0) THEN
+     |                            ^^^ P001
+1060 |       PRINT *, "Error: Flux integration resulted in non-positive value."
+1061 |       bolometric_magnitude = 99.0
+     |
+
+./src/spectra_run_star_extras.f90:1067:29: P001 real literal 2.5 missing kind suffix
+     |
+1065 |     END IF
+1066 |
+1067 |     bolometric_magnitude = -2.5 * LOG10(bolometric_flux) + 12.5775
+     |                             ^^^ P001
+1068 |
+1069 |   END SUBROUTINE CalculateBolometricFlux
+     |
+
+./src/spectra_run_star_extras.f90:1067:60: P001 real literal 12.5775 missing kind suffix
+     |
+1065 |     END IF
+1066 |
+1067 |     bolometric_magnitude = -2.5 * LOG10(bolometric_flux) + 12.5775
+     |                                                            ^^^^^^^ P001
+1068 |
+1069 |   END SUBROUTINE CalculateBolometricFlux
+     |
+
+./src/spectra_run_star_extras.f90:1077:5: P021 real has implicit kind
+     |
+1076 |     INTEGER :: i, n
+1077 |     REAL :: sum
+     |     ^^^^ P021
+1078 |
+1079 |     n = SIZE(x)
+     |
+
+./src/spectra_run_star_extras.f90:1095:19: P001 real literal 0.5 missing kind suffix
+     |
+1093 |     ! Perform trapezoidal integration
+1094 |     DO i = 1, n - 1
+1095 |       sum = sum + 0.5 * (x(i + 1) - x(i)) * (y(i + 1) + y(i))
+     |                   ^^^ P001
+1096 |     END DO
+     |
+
+fortitude: 4 files scanned.
+Number of errors: 152
+
+For more information about specific rules, run:
+
+    fortitude explain X001,Y002,...
+

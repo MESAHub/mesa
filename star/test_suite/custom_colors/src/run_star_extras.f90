@@ -10,7 +10,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -20,11 +20,11 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
- 
 
- 
- 
+
+
+
+
 module run_star_extras
 
   use star_lib
@@ -57,7 +57,7 @@ module run_star_extras
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
        print *, "Extras startup routine"
-           
+
     call process_color_files(id, ierr)
     s% extras_startup => extras_startup
     s% extras_check_model => extras_check_model
@@ -69,18 +69,18 @@ module run_star_extras
     s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
     print *, "Sellar atmosphere:", s% x_character_ctrl(1)
-    print *, "Instrument:", s% x_character_ctrl(2)         
+    print *, "Instrument:", s% x_character_ctrl(2)
 
   end subroutine extras_controls
 
-                
-      
-  
+
+
+
 
 !###########################################################
 !## THINGS I HAVE NOT TOUCHED
 !###########################################################
-  
+
   subroutine process_color_files(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
@@ -116,9 +116,9 @@ module run_star_extras
      if (ierr /= 0) return
 
      write(*,'(a)') 'finished custom colors'
-     
+
      call test_suite_after_evolve(s, ierr)
-     
+
   end subroutine extras_after_evolve
 
 
@@ -130,13 +130,12 @@ module run_star_extras
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-     extras_check_model = keep_going         
+     extras_check_model = keep_going
   end function extras_check_model
 
 
   INTEGER FUNCTION how_many_extra_profile_columns(id)
      USE star_def, ONLY: star_info
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -153,7 +152,6 @@ module run_star_extras
   SUBROUTINE data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
      USE star_def, ONLY: star_info, maxlen_profile_column_name
      USE const_def, ONLY: DP
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id, n, nz
      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
      REAL(DP) :: vals(nz, n)
@@ -171,7 +169,6 @@ module run_star_extras
   ! Returns either keep_going, retry, or terminate
   INTEGER FUNCTION extras_finish_step(id)
      USE chem_def
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -192,7 +189,7 @@ module run_star_extras
 !###########################################################
 !## MESA STUFF
 !###########################################################
-  
+
   !FUNCTIONS FOR OPENING LOOKUP FILE AND FINDING THE NUMBER OF FILES AND THIER FILE PATHS
   integer function how_many_extra_history_columns(id)
       ! Determines how many extra history columns are added based on a file
@@ -261,7 +258,6 @@ module run_star_extras
 
   subroutine read_strings_from_file(strings, n, id)
       ! Reads strings from a file into an allocatable array
-      implicit none
       integer, intent(in) :: id
       character(len=512) :: filename
       character(len=100), allocatable :: strings(:)
@@ -293,7 +289,7 @@ module run_star_extras
       do
           read(unit, '(A)', iostat=status) line
           if (status /= 0) exit
-          n = n + 1 ! for bolometric correctionms
+          n = n + 1  ! for bolometric correctionms
       end do
       rewind(unit)
 
@@ -322,7 +318,7 @@ module run_star_extras
       character(len=256) :: sed_filepath, filter_filepath, filter_name, filter_dir, vega_filepath
       real(dp), dimension(:), allocatable :: wavelengths, fluxes, filter_wavelengths, filter_trans
       logical :: make_sed
-      
+
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -330,29 +326,29 @@ module run_star_extras
       ! Extract input parameters
       teff = s%T(1)
       log_g = LOG10(s%grav(1))
-      R = s%R(1)! * 1d3
+      R = s%R(1)  ! * 1d3
       metallicity = s%job%extras_rpar(1)
-      d = s%job%extras_rpar(2)      
+      d = s%job%extras_rpar(2)
 
       sed_filepath = s%x_character_ctrl(1)
       filter_dir = s%x_character_ctrl(2)
       vega_filepath = s%x_character_ctrl(3)
       make_sed = trim(adjustl(s%x_character_ctrl(4))) == 'true'
-      
+
       ! Read filters from file
       if (allocated(array_of_strings)) deallocate(array_of_strings)
       allocate(array_of_strings(n))
       call read_strings_from_file(array_of_strings, num_strings, id)
 
       !PRINT *, "################################################"
-      
+
       ! Compute bolometric values
       CALL CalculateBolometric(teff, log_g, metallicity, R, d,  bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude
       names(2) = "Flux_bol"
       vals(2) = bolometric_flux
-      
+
       ! Populate history columns
       if (allocated(array_of_strings)) then
           do i = 3, how_many_extra_history_columns(id)
@@ -360,7 +356,7 @@ module run_star_extras
               if (i <= num_strings + 2) filter_name = trim(remove_dat(array_of_strings(i - 2)))
               names(i) = filter_name
               filter_filepath = trim(filter_dir) // "/" // array_of_strings(i - 2)
-              
+
               if (teff >= 0 .and. log_g >= 0 .and. metallicity >= 0) then
                   vals(i) = CalculateSynthetic(teff, log_g, metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, array_of_strings(i - 2), make_sed)
                   if (ierr /= 0) vals(i) = -1.0_dp
@@ -371,9 +367,9 @@ module run_star_extras
               !PRINT *, names(i), vals(i)
           end do
       else
-          ierr = 1 ! Indicate an error if array_of_strings is not allocated
+          ierr = 1  ! Indicate an error if array_of_strings is not allocated
       end if
-      
+
       if (allocated(array_of_strings)) deallocate(array_of_strings)
   end subroutine data_for_extra_history_columns
 
@@ -389,7 +385,6 @@ module run_star_extras
 !****************************
 
   SUBROUTINE CalculateBolometric(teff, log_g, metallicity, R, d, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
-    IMPLICIT NONE
     REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
@@ -409,7 +404,7 @@ module run_star_extras
     !print *, 'teff', lu_teff
     ! Interpolate Spectral Energy Distribution
     !CALL ConstructSED_Interpolated(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
-    CALL ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)    
+    CALL ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, sed_filepath, wavelengths, fluxes)
 
     ! Calculate bolometric flux and magnitude
     CALL CalculateBolometricPhot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
@@ -422,7 +417,6 @@ module run_star_extras
 !****************************
 
 SUBROUTINE ConstructSED(teff, log_g, metallicity, R, d, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
-  IMPLICIT NONE
   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
@@ -495,26 +489,25 @@ END SUBROUTINE ConstructSED
 
 
 SUBROUTINE dilute_flux(surface_flux, R, d, calibrated_flux)
-  IMPLICIT NONE
   ! Define the double precision kind if not already defined
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
-  
+
   ! Input: surface_flux is an array of flux values at the stellar surface
   REAL(DP), INTENT(IN)  :: surface_flux(:)
   REAL(DP), INTENT(IN)  :: R, d  ! R = stellar radius, d = distance (both in the same units, e.g., cm)
-  
+
   ! Output: calibrated_flux will be the flux observed at Earth
   REAL(DP), INTENT(OUT) :: calibrated_flux(:)
-  
+
   ! Check that the output array has the same size as the input
   IF (SIZE(calibrated_flux) /= SIZE(surface_flux)) THEN
     PRINT *, "Error in dilute_flux: Output array must have the same size as input array."
     STOP 1
   END IF
-  
+
   ! Apply the dilution factor (R/d)^2 to each element
   calibrated_flux = surface_flux * ( (R / d)**2 )
-  
+
 END SUBROUTINE dilute_flux
 
 
@@ -527,7 +520,6 @@ END SUBROUTINE dilute_flux
 !****************************
 
 SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
-  IMPLICIT NONE
   REAL(8), INTENT(IN) :: teff, log_g, metallicity
   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
@@ -562,7 +554,7 @@ SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, l
     scaled_lu_logg = (lu_logg - logg_min) / (logg_max - logg_min)
   END IF
 
-  IF (meta_max - meta_min > 0.00) THEN    
+  IF (meta_max - meta_min > 0.00) THEN
     scaled_lu_meta = (lu_meta - meta_min) / (meta_max - meta_min)
   END IF
 
@@ -590,7 +582,7 @@ SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, l
       logg_dist = scaled_lu_logg(i) - norm_logg
     END IF
 
-    IF (meta_max - meta_min > 0.00) THEN    
+    IF (meta_max - meta_min > 0.00) THEN
       meta_dist = scaled_lu_meta(i) - norm_meta
     END IF
 
@@ -633,7 +625,6 @@ END SUBROUTINE GetClosestStellarModels
 !****************************
 
   SUBROUTINE CalculateBolometricPhot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
     INTEGER :: i
@@ -700,7 +691,6 @@ END SUBROUTINE GetClosestStellarModels
 
 
 REAL(DP) FUNCTION CalculateSynthetic(temperature, gravity, metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath, vega_filepath, filter_name, make_sed)
-    IMPLICIT NONE
 
     ! Input arguments
     REAL(DP), INTENT(IN) :: temperature, gravity, metallicity
@@ -811,7 +801,6 @@ END FUNCTION CalculateSynthetic
 !****************************
 
   SUBROUTINE ConvolveSED(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(DP), DIMENSION(:), ALLOCATABLE :: convolved_flux
@@ -840,7 +829,6 @@ END FUNCTION CalculateSynthetic
 !Calculate Synthetic Flux and Magnitude
 !****************************
   SUBROUTINE CalculateSyntheticFlux(wavelengths, fluxes, synthetic_flux, filter_wavelengths, filter_trans)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(DP), INTENT(OUT) :: synthetic_flux
@@ -875,14 +863,13 @@ END FUNCTION CalculateSynthetic
 
 
   REAL(DP) FUNCTION FluxToMagnitude(flux)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: flux
     !print *, 'flux:', flux
     IF (flux <= 0.0) THEN
       PRINT *, "Error: Flux must be positive to calculate magnitude."
       FluxToMagnitude = 99.0  ! Return an error value
     ELSE
-      FluxToMagnitude = -2.5 * LOG10(flux) 
+      FluxToMagnitude = -2.5 * LOG10(flux)
     END IF
   END FUNCTION FluxToMagnitude
 
@@ -892,7 +879,6 @@ END FUNCTION CalculateSynthetic
 
 
 FUNCTION CalculateVegaFlux(vega_filepath, filt_wave, filt_trans, filter_name, make_sed) RESULT(vega_flux)
-  IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: vega_filepath, filter_name
   CHARACTER(len = 100) :: output_csv
   REAL(DP), DIMENSION(:), INTENT(INOUT) :: filt_wave, filt_trans
@@ -987,7 +973,6 @@ END FUNCTION CalculateVegaFlux
 
 
 SUBROUTINE LoadVegaSED(filepath, wavelengths, flux)
-  IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: filepath
   REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
   CHARACTER(LEN=512) :: line
@@ -1021,7 +1006,7 @@ SUBROUTINE LoadVegaSED(filepath, wavelengths, flux)
 
   ALLOCATE(wavelengths(n_rows))
   ALLOCATE(flux(n_rows))
-  
+
   i = 0
   DO
     READ(unit, *, IOSTAT=status) temp_wave, temp_flux  ! Ignore any extra columns.
@@ -1034,7 +1019,7 @@ SUBROUTINE LoadVegaSED(filepath, wavelengths, flux)
   CLOSE(unit)
 END SUBROUTINE LoadVegaSED
 
-                          
+
 
 
 !###########################################################
@@ -1046,7 +1031,6 @@ END SUBROUTINE LoadVegaSED
 !****************************
 
   SUBROUTINE LoadSED(directory, index, wavelengths, flux)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: directory
     INTEGER, INTENT(IN) :: index
     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
@@ -1117,7 +1101,6 @@ END SUBROUTINE LoadVegaSED
 !****************************
 
   SUBROUTINE LoadFilter(directory, filter_wavelengths, filter_trans)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: directory
     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: filter_wavelengths, filter_trans
 
@@ -1169,7 +1152,7 @@ END SUBROUTINE LoadVegaSED
       READ(unit, *, IOSTAT=status) temp_wavelength, temp_trans
       IF (status /= 0) EXIT
       i = i + 1
-      
+
       filter_wavelengths(i) = temp_wavelength
       filter_trans(i) = temp_trans
     END DO
@@ -1184,7 +1167,6 @@ END SUBROUTINE LoadVegaSED
 
 
   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
@@ -1220,7 +1202,7 @@ END SUBROUTINE LoadVegaSED
     meta_col = GetColumnIndex(headers, "meta")
     IF (meta_col < 0) THEN
       meta_col = GetColumnIndex(headers, "feh")
-    END IF 
+    END IF
 
     n_rows = 0
     DO
@@ -1349,7 +1331,7 @@ END SUBROUTINE LoadVegaSED
     END SUBROUTINE AppendToken
 
   END SUBROUTINE LoadLookupTable
-  
+
 
 
 
@@ -1364,7 +1346,6 @@ END SUBROUTINE LoadVegaSED
 !****************************
 
   SUBROUTINE TrapezoidalIntegration(x, y, result)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
     REAL(DP), INTENT(OUT) :: result
 
@@ -1395,7 +1376,6 @@ END SUBROUTINE LoadVegaSED
 
 
 SUBROUTINE SimpsonIntegration(x, y, result)
-  IMPLICIT NONE
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
   REAL(DP), INTENT(OUT) :: result
@@ -1439,7 +1419,6 @@ SUBROUTINE SimpsonIntegration(x, y, result)
 END SUBROUTINE SimpsonIntegration
 
 SUBROUTINE BooleIntegration(x, y, result)
-  IMPLICIT NONE
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
   REAL(DP), INTENT(OUT) :: result
@@ -1485,7 +1464,6 @@ SUBROUTINE BooleIntegration(x, y, result)
 END SUBROUTINE BooleIntegration
 
 SUBROUTINE RombergIntegration(x, y, result)
-  IMPLICIT NONE
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
   REAL(DP), INTENT(OUT) :: result
@@ -1541,7 +1519,6 @@ END SUBROUTINE RombergIntegration
 !****************************
 
   SUBROUTINE LinearInterpolate(x, y, x_val, y_val)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x(:), y(:), x_val
     REAL(DP), INTENT(OUT) :: y_val
     INTEGER :: i
@@ -1587,7 +1564,6 @@ END SUBROUTINE RombergIntegration
 !****************************
 
   SUBROUTINE InterpolateArray(x_in, y_in, x_out, y_out)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
     REAL(DP), INTENT(OUT) :: y_out(:)
     INTEGER :: i
@@ -1625,7 +1601,6 @@ END SUBROUTINE RombergIntegration
 SUBROUTINE ConstructSED_Interpolated(teff, log_g, metallicity, R, d,   &
      &         file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir,  &
      &         wavelengths, fluxes)
-  IMPLICIT NONE
   ! Inputs:
   REAL(8), INTENT(IN) :: teff, log_g, metallicity, R, d
   REAL(8), INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
@@ -1724,12 +1699,11 @@ SUBROUTINE ConstructSED_Interpolated(teff, log_g, metallicity, R, d,   &
   ! Deallocate temporary arrays.
   DEALLOCATE(common_wavelengths, interp_surface_flux, diluted_flux)
   ! (Also deallocate sed_grid when done, if appropriate.)
-  
+
 END SUBROUTINE ConstructSED_Interpolated
 
 
 SUBROUTINE FindBoundingIndices(target, grid, i0, i1)
-  IMPLICIT NONE
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   REAL(8), INTENT(IN) :: target
   REAL(8), INTENT(IN) :: grid(:)
@@ -1765,21 +1739,20 @@ END SUBROUTINE FindBoundingIndices
 
 
 SUBROUTINE LoadAndInterpolateSED(filename, index, common_wavelengths, flux_out)
-  IMPLICIT NONE
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   CHARACTER(LEN=*), INTENT(IN) :: filename
   INTEGER, INTENT(IN) :: index
   REAL(DP), INTENT(IN) :: common_wavelengths(:)
   REAL(DP), INTENT(OUT) :: flux_out(:)
-  
+
   REAL(DP), DIMENSION(:), ALLOCATABLE :: temp_wavelengths, temp_flux
 
   ! Use your existing LoadSED subroutine to load the SED from the file.
   CALL LoadSED(TRIM(filename), index, temp_wavelengths, temp_flux)
-  
+
   ! Use your existing InterpolateArray to re-grid the loaded SED onto common_wavelengths.
   CALL InterpolateArray(temp_wavelengths, temp_flux, common_wavelengths, flux_out)
-  
+
   ! Clean up temporary arrays.
   DEALLOCATE(temp_wavelengths, temp_flux)
 END SUBROUTINE LoadAndInterpolateSED

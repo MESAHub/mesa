@@ -9,7 +9,7 @@
 !   by the free software foundation; either version 2 of the license, or
 !   (at your option) any later version.
 !
-!   mesa is distributed in the hope that it will be useful, 
+!   mesa is distributed in the hope that it will be useful,
 !   but without any warranty; without even the implied warranty of
 !   merchantability or fitness for a particular purpose.  see the
 !   gnu library general public license for more details.
@@ -19,11 +19,11 @@
 !   foundation, inc., 59 temple place, suite 330, boston, ma 02111-1307 usa
 !
 ! ***********************************************************************
- 
- 
 
- 
- 
+
+
+
+
 module run_star_extras
 
   use star_lib
@@ -56,7 +56,7 @@ module run_star_extras
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
        print *, "Extras startup routine"
-           
+
     call process_color_files(id, ierr)
     s% extras_startup => extras_startup
     s% extras_check_model => extras_check_model
@@ -68,18 +68,18 @@ module run_star_extras
     s% data_for_extra_profile_columns => data_for_extra_profile_columns
 
     print *, "Sellar atmosphere:", s% x_character_ctrl(1)
-    print *, "Instrument:", s% x_character_ctrl(2)         
+    print *, "Instrument:", s% x_character_ctrl(2)
 
   end subroutine extras_controls
 
-                
-      
-  
+
+
+
 
 !###########################################################
 !## THINGS I HAVE NOT TOUCHED
 !###########################################################
-  
+
   subroutine process_color_files(id, ierr)
     integer, intent(in) :: id
     integer, intent(out) :: ierr
@@ -115,9 +115,9 @@ module run_star_extras
      if (ierr /= 0) return
 
      write(*,'(a)') 'finished custom colors'
-     
+
      call test_suite_after_evolve(s, ierr)
-     
+
   end subroutine extras_after_evolve
 
 
@@ -129,13 +129,12 @@ module run_star_extras
      ierr = 0
      call star_ptr(id, s, ierr)
      if (ierr /= 0) return
-     extras_check_model = keep_going         
+     extras_check_model = keep_going
   end function extras_check_model
 
 
   INTEGER FUNCTION how_many_extra_profile_columns(id)
      USE star_def, ONLY: star_info
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -152,7 +151,6 @@ module run_star_extras
   SUBROUTINE data_for_extra_profile_columns(id, n, nz, names, vals, ierr)
      USE star_def, ONLY: star_info, maxlen_profile_column_name
      USE const_def, ONLY: DP
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id, n, nz
      CHARACTER(LEN=maxlen_profile_column_name) :: names(n)
      REAL(DP) :: vals(nz, n)
@@ -170,7 +168,6 @@ module run_star_extras
   ! Returns either keep_going, retry, or terminate
   INTEGER FUNCTION extras_finish_step(id)
      USE chem_def
-     IMPLICIT NONE
      INTEGER, INTENT(IN) :: id
 
      INTEGER :: ierr
@@ -191,7 +188,7 @@ module run_star_extras
 !###########################################################
 !## MESA STUFF
 !###########################################################
-  
+
   !FUNCTIONS FOR OPENING LOOKUP FILE AND FINDING THE NUMBER OF FILES AND THIER FILE PATHS
   integer function how_many_extra_history_columns(id)
       ! Determines how many extra history columns are added based on a file
@@ -260,7 +257,6 @@ module run_star_extras
 
   subroutine read_strings_from_file(strings, n, id)
       ! Reads strings from a file into an allocatable array
-      implicit none
       integer, intent(in) :: id
       character(len=512) :: filename
       character(len=100), allocatable :: strings(:)
@@ -292,7 +288,7 @@ module run_star_extras
       do
           read(unit, '(A)', iostat=status) line
           if (status /= 0) exit
-          n = n + 1 ! for bolometric correctionms
+          n = n + 1  ! for bolometric correctionms
       end do
       rewind(unit)
 
@@ -331,7 +327,7 @@ module run_star_extras
       log_g = LOG10(s%grav(1))
       metallicity = s%job%extras_rpar(1)
       sed_filepath = s%x_character_ctrl(1)
-      filter_dir = s%x_character_ctrl(2)      
+      filter_dir = s%x_character_ctrl(2)
 
 
       ! Populate array_of_strings
@@ -343,10 +339,10 @@ module run_star_extras
 
       CALL CalculateBolometricMagnitude(teff, log_g, metallicity, bolometric_magnitude, bolometric_flux,wavelengths, fluxes, sed_filepath)
       names(1) = "Mag_bol"
-      vals(1) = bolometric_magnitude 
+      vals(1) = bolometric_magnitude
 
       names(2) = "Flux_bol"
-      vals(2) = bolometric_flux 
+      vals(2) = bolometric_flux
       !PRINT *, 'teff', teff, 'log_g', log_g, 'metallicity',metallicity
 
       !print *, "################################################"
@@ -376,7 +372,7 @@ module run_star_extras
             !STOP
           end do
       else
-          ierr = 1 ! Indicate an error if array_of_strings is not allocated
+          ierr = 1  ! Indicate an error if array_of_strings is not allocated
       end if
 
       if (allocated(array_of_strings)) deallocate(array_of_strings)
@@ -390,7 +386,6 @@ module run_star_extras
   !###########################################################
 
   SUBROUTINE ConvolveSED(wavelengths, fluxes, filter_wavelengths, filter_trans, convolved_flux)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: filter_wavelengths, filter_trans
     REAL(DP), DIMENSION(:), ALLOCATABLE :: convolved_flux
@@ -414,7 +409,6 @@ module run_star_extras
   END SUBROUTINE ConvolveSED
 
   SUBROUTINE CalculateSyntheticFlux(wavelengths, fluxes, synthetic_magnitude, synthetic_flux)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(IN) :: wavelengths, fluxes
     REAL(DP), INTENT(OUT) :: synthetic_magnitude, synthetic_flux
     INTEGER :: i
@@ -441,7 +435,7 @@ module run_star_extras
 
     ! Calculate synthetic magnitude
     print *, synthetic_flux
-    synthetic_magnitude = -2.5 * LOG10(synthetic_flux) - 4.74!48.6
+    synthetic_magnitude = -2.5 * LOG10(synthetic_flux) - 4.74  !48.6
     !print *, synthetic_magnitude
 
   END SUBROUTINE CalculateSyntheticFlux
@@ -455,7 +449,6 @@ module run_star_extras
 
 
 REAL(DP) FUNCTION CalculateSyntheticMagnitude(temperature, gravity, metallicity, ierr, wavelengths, fluxes, filter_wavelengths, filter_trans, filter_filepath)
-    IMPLICIT NONE
 
     ! Input arguments
     REAL(DP), INTENT(IN) :: temperature, gravity, metallicity
@@ -540,7 +533,6 @@ END FUNCTION CalculateSyntheticMagnitude
 
 
   SUBROUTINE CalculateBolometricMagnitude(teff, log_g, metallicity, bolometric_magnitude, bolometric_flux, wavelengths, fluxes, sed_filepath)
-    IMPLICIT NONE
     REAL(8), INTENT(IN) :: teff, log_g, metallicity
     CHARACTER(LEN=*), INTENT(IN) :: sed_filepath
     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
@@ -572,7 +564,6 @@ END FUNCTION CalculateSyntheticMagnitude
   !****************************
 
   SUBROUTINE LoadLookupTable(lookup_file, lookup_table, out_file_names, out_logg, out_meta, out_teff)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: lookup_file
     REAL, DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: lookup_table
     CHARACTER(LEN=100), ALLOCATABLE, INTENT(INOUT) :: out_file_names(:)
@@ -720,10 +711,9 @@ END FUNCTION CalculateSyntheticMagnitude
     END SUBROUTINE AppendToken
 
   END SUBROUTINE LoadLookupTable
-  
-  
+
+
 SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, lu_meta, closest_indices)
-  IMPLICIT NONE
   REAL(8), INTENT(IN) :: teff, log_g, metallicity
   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
   INTEGER, DIMENSION(4), INTENT(OUT) :: closest_indices
@@ -805,7 +795,6 @@ END SUBROUTINE GetClosestStellarModels
 
 
 SUBROUTINE InterpolateSED(teff, log_g, metallicity, file_names, lu_teff, lu_logg, lu_meta, stellar_model_dir, wavelengths, fluxes)
-  IMPLICIT NONE
   REAL(8), INTENT(IN) :: teff, log_g, metallicity
   REAL, INTENT(IN) :: lu_teff(:), lu_logg(:), lu_meta(:)
   CHARACTER(LEN=*), INTENT(IN) :: stellar_model_dir
@@ -916,7 +905,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE LoadSED(directory, index, wavelengths, flux)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: directory
     INTEGER, INTENT(IN) :: index
     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: wavelengths, flux
@@ -975,7 +963,7 @@ END SUBROUTINE InterpolateSED
       !=======================================================================================================================================================
       ! Convert f_lambda to f_nu
       wavelengths(i) = temp_wavelength * 1.0e-8
-      flux(i) = temp_flux !* (temp_wavelength * 1.0e-8)**2 / (2.998e10)
+      flux(i) = temp_flux  !* (temp_wavelength * 1.0e-8)**2 / (2.998e10)
     END DO
 
     CLOSE(unit)
@@ -983,7 +971,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE LoadFilter(directory, filter_wavelengths, filter_trans)
-    IMPLICIT NONE
     CHARACTER(LEN=*), INTENT(IN) :: directory
     REAL(DP), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: filter_wavelengths, filter_trans
 
@@ -1035,7 +1022,7 @@ END SUBROUTINE InterpolateSED
       READ(unit, *, IOSTAT=status) temp_wavelength, temp_trans
       IF (status /= 0) EXIT
       i = i + 1
-      
+
       filter_wavelengths(i) = temp_wavelength * 1.0e-8
       filter_trans(i) = temp_trans
     END DO
@@ -1045,7 +1032,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE CalculateBolometricFlux(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(INOUT) :: wavelengths, fluxes
     REAL(DP), INTENT(OUT) :: bolometric_magnitude, bolometric_flux
     INTEGER :: i
@@ -1084,7 +1070,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE TrapezoidalIntegration(x, y, result)
-    IMPLICIT NONE
     REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
     REAL(DP), INTENT(OUT) :: result
 
@@ -1115,7 +1100,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE LinearInterpolate(x, y, x_val, y_val)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x(:), y(:), x_val
     REAL(DP), INTENT(OUT) :: y_val
     INTEGER :: i
@@ -1157,7 +1141,6 @@ END SUBROUTINE InterpolateSED
 
 
   SUBROUTINE InterpolateArray(x_in, y_in, x_out, y_out)
-    IMPLICIT NONE
     REAL(DP), INTENT(IN) :: x_in(:), y_in(:), x_out(:)
     REAL(DP), INTENT(OUT) :: y_out(:)
     INTEGER :: i
