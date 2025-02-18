@@ -157,7 +157,7 @@ We specify the output. We define a LOG directory for this part of the evolution,
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-after: output controls
-   :end-before: ! FOR DEBUGGING
+   :end-before: end of
 
 
 Evolution along the CHeB
