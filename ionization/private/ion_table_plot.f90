@@ -49,7 +49,7 @@
          ! table full range
          lgT_max = 8.2d0
          lgT_min = 2.1d0
-         lgQ_min = -10d9
+         lgQ_min = -10d0
          lgQ_max = 5.69d0
          lgRho_min = -9d0  ! lgQ_min + 2*lgT_min - 12
          lgRho_max = 8d0  ! lgQ_max + 2*lgT_max - 12
