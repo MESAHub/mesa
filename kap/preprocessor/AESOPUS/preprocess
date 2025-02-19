@@ -15,4 +15,4 @@ do
 done
 
 # run python script
-./aesopus.py AGSS09.yaml
+./aesopus.py AGSS09.yml

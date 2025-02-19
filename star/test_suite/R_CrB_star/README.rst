@@ -20,7 +20,7 @@ obtained from the webform.  The preprocessing steps
 .. code-block:: sh
 
     tar xf RCrB_GS98.tar.xz
-    $MESA_DIR/kap/preprocessor/AESOPUS/aesopus.py RCrB_GS98.yaml
+    $MESA_DIR/kap/preprocessor/AESOPUS/aesopus.py RCrB_GS98.yml
 
 generated the AESOPUS_GS98_RCrB.h5 file.  This is the opacity file
 that is read by MESA.  The .dat files in the RCrB_GS98 tarball are

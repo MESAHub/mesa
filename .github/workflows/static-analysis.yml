@@ -1,3 +1,4 @@
+---
 name: Static Analysis
 
 on:
@@ -33,7 +34,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           black --check .
-        
+
       - name: Apply RST linter, sphinx-lint
         run: |
           cd ${{ github.workspace }}
