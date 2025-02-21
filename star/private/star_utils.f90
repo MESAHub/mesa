@@ -789,7 +789,47 @@
       end function find_cell_for_mass
 
 
-      subroutine get_delta_Pg(s, nu_max, delta_Pg)
+      subroutine get_delta_Pg_traditional(s, delta_Pg)
+         type (star_info), pointer :: s
+         real(dp), intent(out) :: delta_Pg ! seconds
+         ! g-mode period spacing for l=1
+         real(dp) :: dr, N2, integral, r
+         integer :: k
+         logical, parameter :: dbg = .false.
+         include 'formats'
+         if (dbg) then
+            write(*,2) 's% star_mass', s% model_number, s% star_mass
+            write(*,2) 's% photosphere_r', s% model_number, s% photosphere_r
+            write(*,2) 's% Teff', s% model_number, s% Teff
+         end if
+         delta_Pg = 0._dp
+         if (.not. s% calculate_Brunt_N2) return
+         k = 0
+         r = 0._dp
+         N2 = 0._dp
+         dr = 0._dp
+         integral = 0._dp
+
+         ! we integrate at cell edges.
+         do k = 2, s% nz
+         N2 = s% brunt_N2(k) ! brunt_N2 at cell_face
+         r  = s% r(k) ! r evalulated at cell_face
+         dr = s% rmid(k-1) - s% rmid(k) ! dr evalulated at cell face.
+         if (N2 > 0d0) integral = integral + sqrt(N2)*dr/r
+         end do
+
+         if (dbg) write(*,2) ' integral ', &
+            s% model_number,integral
+
+         if (integral == 0) return
+         delta_Pg = sqrt(2._dp)*pi*pi/integral
+         if (is_bad(delta_Pg)) delta_Pg = 0._dp
+
+         if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
+
+      end subroutine get_delta_Pg_traditional
+
+      subroutine get_delta_Pg_bildsten2012(s, nu_max, delta_Pg)
          type (star_info), pointer :: s
          real(dp), intent(in) :: nu_max  ! microHz
          real(dp), intent(out) :: delta_Pg  ! seconds
@@ -851,7 +891,7 @@
 
          if (dbg) write(*,2) 'delta_Pg', s% model_number, delta_Pg
 
-      end subroutine get_delta_Pg
+      end subroutine get_delta_Pg_bildsten2012
 
 
       subroutine set_rmid(s, nzlo, nzhi, ierr)

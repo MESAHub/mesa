@@ -812,6 +812,7 @@
 
          logical :: get_delta_nu_from_scaled_solar
          real(dp) :: nu_max_sun, delta_nu_sun, astero_Teff_sun, delta_Pg_mode_freq
+         logical :: delta_Pg_traditional
 
 
       ! hydro parameters
