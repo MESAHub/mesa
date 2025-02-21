@@ -7682,10 +7682,10 @@
       ! if ``delta_Pg_traditional`` = ``.true.``, then calculate the
       ! asymptotic gravity mode period space by directly integrating
       ! N2 over the entire stellar model.
-      
+
       ! if ``delta_Pg_traditional`` = ``.false.`` use the method of
       ! Bildsten et al. (2012): //ui.adsabs.harvard.edu/abs/2012ApJ...744L...6B/abstract
-      
+
       ! ``delta_Pg_mode_freq`` is only used when ``delta_Pg_traditional`` = ``.false.``
       ! it is provided in units of uHz. if <=0, use nu_max from scaled solar value
 
