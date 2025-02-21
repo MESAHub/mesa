@@ -320,7 +320,7 @@ contains
 
     ! Sanity check
 
-    if (dlogtau <= 0.) then
+    if (dlogtau <= 0._dp) then
        write(*,*) 'atm: Invalid dlogtau in build_T_tau_uniform:', dlogtau
        call mesa_error(__FILE__,__LINE__)
     end if

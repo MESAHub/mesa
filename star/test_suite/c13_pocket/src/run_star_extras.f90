@@ -339,7 +339,7 @@
 
             ! measure MS lifetime
             if (ms_t0 == 0) then
-               if (s% power_h_burn > 0.99 * s% L_surf) then
+               if (s% power_h_burn > 0.99d0 * s% L_surf) then
                   ms_t0 = s% star_age
                   write(*,*) 'started MS', ms_t0
                end if
@@ -354,7 +354,7 @@
 
             ! measure CHeB lifetime
             if ((ms_t1 /= 0) .and. (cheb_t0 == 0)) then
-               if (s% power_he_burn > 0.01 * s% L_surf) then
+               if (s% power_he_burn > 0.01d0 * s% L_surf) then
                   cheb_t0 = s% star_age
                   write(*,*) 'started CHeB', cheb_t0
                end if
@@ -370,7 +370,7 @@
 
             ! measure extent of 1DUP
             if ((ms_t1 > 0) .and. (cheb_t0 == 0)) then
-               if ((s% conv_mx1_top - s% conv_mx1_bot) > 0.1) then
+               if ((s% conv_mx1_top - s% conv_mx1_bot) > 0.1d0) then
                   m_1DUP = min(s% conv_mx1_bot * s% star_mass, m_1DUP)
                end if
             end if
@@ -380,7 +380,7 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn > 1e4) then
+               if (s% power_he_burn > 1d4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse', TP_count
@@ -429,7 +429,7 @@
             ! record thermal pulses
             if (.not. in_LHe_peak) then
                ! check for peak
-               if (s% power_he_burn > 1e4) then
+               if (s% power_he_burn > 1d4) then
                   in_LHe_peak = .true.
                   TP_count = TP_count + 1
                   write(*,*) 'starting thermal pulse'
@@ -454,12 +454,12 @@
          if (s% x_integer_ctrl(1) == 4) then
             c13 = s% net_iso(ic13)
             k_max_c13 = maxloc(s% xa(c13,1:s% nz),dim=1)
-            if (s% xa(c13,k_max_c13) > 0.01) then
-               s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001
-               s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001
+            if (s% xa(c13,k_max_c13) > 0.01d0) then
+               s% pg% Abundance_xmin = s% m(k_max_c13)/Msun - 0.0001d0
+               s% pg% Abundance_xmax = s% m(k_max_c13)/Msun + 0.0001d0
             else
-               s% pg% Abundance_xmin = s% he_core_mass - 0.0125
-               s% pg% Abundance_xmax = s% he_core_mass + 0.0025
+               s% pg% Abundance_xmin = s% he_core_mass - 0.0125d0
+               s% pg% Abundance_xmax = s% he_core_mass + 0.0025d0
             end if
          end if
 
@@ -499,7 +499,7 @@
             write(*,'(A70, F8.3)') '[TestHub] Core mass at first thermal pulse (Msun): ', mcore_1TP
             write(*,'(A70, F8.3)') '[TestHub] Age at first thermal pulse (Gyr): ', age_1TP / 1d9
             write(*,'(A70, F8.3)') '[TestHub] Core mass at second thermal pulse with 3DUP (Msun): ', mcore_2TP_with_3DUP
-            write(*,'(A70, F8.3)') '[TestHub] Following interpulse time (kyr): ', (age_at_TP - age_2TP_with_3DUP) / 1e3
+            write(*,'(A70, F8.3)') '[TestHub] Following interpulse time (kyr): ', (age_at_TP - age_2TP_with_3DUP) / 1d3
             write(*,'(A70, F8.3)') '[TestHub] Following pulse-to-pulse core growth (1e-3 Msun): ', (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
             write(*,'(A70, F8.3)') '[TestHub] Dredge up mass at following pulse (1e-3 Msun): ', (mcore_at_TP - mcore_min_after_TP) / 1d-3
 
@@ -507,7 +507,7 @@
             testhub_extras_names(1) = 'mcore_1TP'; testhub_extras_vals(1) = mcore_1TP
             testhub_extras_names(2) = 'age_1TP' ; testhub_extras_vals(2) = age_1TP / 1d9
             testhub_extras_names(3) = 'mcore_2TP_with_3DUP'; testhub_extras_vals(3) = mcore_2TP_with_3DUP
-            testhub_extras_names(4) = 'interpulse_time'; testhub_extras_vals(4) = (age_at_TP - age_2TP_with_3DUP) / 1e3
+            testhub_extras_names(4) = 'interpulse_time'; testhub_extras_vals(4) = (age_at_TP - age_2TP_with_3DUP) / 1d3
             testhub_extras_names(5) = 'delta_mcore_TP'; testhub_extras_vals(5) = (mcore_at_TP - mcore_2TP_with_3DUP) / 1d-3
             testhub_extras_names(6) = 'mass_DUP'; testhub_extras_vals(6) = (mcore_at_TP - mcore_min_after_TP) / 1d-3
 

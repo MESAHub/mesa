@@ -579,7 +579,7 @@ contains
        return
     end if
 
-    if (dlntau <= 0.) then
+    if (dlntau <= 0._dp) then
        write(*,*) 'Invalid dlntau in build_atm_uniform:', dlntau
        call mesa_error(__FILE__,__LINE__)
     end if
