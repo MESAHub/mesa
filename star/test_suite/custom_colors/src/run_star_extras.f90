@@ -587,16 +587,8 @@ SUBROUTINE GetClosestStellarModels(teff, log_g, metallicity, lu_teff, lu_logg, l
     END IF
 
 
-    distance = SQRT(teff_dist**2 + logg_dist**2 + meta_dist**2)
-
-    ! Check if this distance is smaller than any in the current top 4
-    !PRINT *, distance
-    !PRINT *, scaled_lu_teff(i)
-    !PRINT *, norm_teff
-    !PRINT *, scaled_lu_logg(i)
-    !PRINT *, norm_logg
-    !PRINT *, scaled_lu_meta(i)
-    !PRINT *, norm_meta
+    !distance = SQRT(teff_dist**2 + logg_dist**2 + meta_dist**2)
+    distance = teff_dist**2 + logg_dist**2 + meta_dist**2   !SQRT is a monotonic transform so pointless?
 
     DO j = 1, 4
       IF (distance < min_distances(j)) THEN
@@ -1418,51 +1410,6 @@ SUBROUTINE SimpsonIntegration(x, y, result)
   result = sum
 END SUBROUTINE SimpsonIntegration
 
-SUBROUTINE BooleIntegration(x, y, result)
-  INTEGER, PARAMETER :: DP = KIND(1.0D0)
-  REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
-  REAL(DP), INTENT(OUT) :: result
-
-  INTEGER :: i, n
-  REAL(DP) :: sum, h, f0, f1, f2, f3, f4
-
-  n = SIZE(x)
-  sum = 0.0_DP
-
-  ! Validate input sizes
-  IF (SIZE(x) /= SIZE(y)) THEN
-    PRINT *, "Error: x and y arrays must have the same size."
-    STOP
-  END IF
-
-  IF (SIZE(x) < 5) THEN
-    PRINT *, "Error: x and y arrays must have at least 5 elements."
-    STOP
-  END IF
-
-  ! Apply Boole's rule
-  DO i = 1, n - 4, 4
-    h = (x(i+4) - x(i)) / 4.0_DP   ! Step size
-
-    f0 = y(i)
-    f1 = y(i+1)
-    f2 = y(i+2)
-    f3 = y(i+3)
-    f4 = y(i+4)
-
-    ! Boole's Rule: (2h/45) * (7f0 + 32f1 + 12f2 + 32f3 + 7f4)
-    sum = sum + (2.0_DP * h / 45.0_DP) * (7.0_DP * f0 + 32.0_DP * f1 + 12.0_DP * f2 + 32.0_DP * f3 + 7.0_DP * f4)
-  END DO
-
-  ! Handle leftover intervals
-  IF (MOD(n, 4) /= 1) THEN
-    PRINT *, "Warning: Remaining points not fitting Boole's rule. Applying Simpson's rule for last interval."
-    sum = sum + (x(n) - x(n-1)) / 6.0_DP * (y(n-1) + 4.0_DP * y(n-1) + y(n))
-  END IF
-
-  result = sum
-END SUBROUTINE BooleIntegration
-
 SUBROUTINE RombergIntegration(x, y, result)
   INTEGER, PARAMETER :: DP = KIND(1.0D0)
   REAL(DP), DIMENSION(:), INTENT(IN) :: x, y
@@ -1518,7 +1465,8 @@ END SUBROUTINE RombergIntegration
 !Linear Interpolation For SED Construction
 !****************************
 
-  SUBROUTINE LinearInterpolate(x, y, x_val, y_val)
+!will be removed in the future so long as binary search proves consistently faster
+  SUBROUTINE LinearInterpolate_linearsearch(x, y, x_val, y_val)
     REAL(DP), INTENT(IN) :: x(:), y(:), x_val
     REAL(DP), INTENT(OUT) :: y_val
     INTEGER :: i
@@ -1556,7 +1504,53 @@ END SUBROUTINE RombergIntegration
     END DO
 
     y_val = 0.0_DP
-  END SUBROUTINE LinearInterpolate
+  END SUBROUTINE LinearInterpolate_linearsearch
+
+
+SUBROUTINE LinearInterpolate(x, y, x_val, y_val)
+  REAL(DP), INTENT(IN) :: x(:), y(:), x_val
+  REAL(DP), INTENT(OUT) :: y_val
+  INTEGER :: low, high, mid
+
+  ! Validate input sizes
+  IF (SIZE(x) < 2) THEN
+    PRINT *, "Error: x array has fewer than 2 points."
+    y_val = 0.0_DP
+    RETURN
+  END IF
+
+  IF (SIZE(x) /= SIZE(y)) THEN
+    PRINT *, "Error: x and y arrays have different sizes."
+    y_val = 0.0_DP
+    RETURN
+  END IF
+
+  ! Handle out-of-bounds cases
+  IF (x_val <= x(1)) THEN
+    y_val = y(1)
+    RETURN
+  ELSE IF (x_val >= x(SIZE(x))) THEN
+    y_val = y(SIZE(y))
+    RETURN
+  END IF
+
+  ! Binary search to find the proper interval [x(low), x(low+1)]
+  low = 1
+  high = SIZE(x)
+  DO WHILE (high - low > 1)
+    mid = (low + high) / 2
+    IF (x(mid) <= x_val) THEN
+      low = mid
+    ELSE
+      high = mid
+    END IF
+  END DO
+
+  ! Linear interpolation between x(low) and x(low+1)
+  y_val = y(low) + (y(low+1) - y(low)) / (x(low+1) - x(low)) * (x_val - x(low))
+END SUBROUTINE LinearInterpolate
+
+
 
 
 !****************************
