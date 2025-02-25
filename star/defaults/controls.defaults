@@ -8242,8 +8242,8 @@
     use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn = .false.
 
 
-      ! Hydrodynamic drag
-      ! =================
+! Hydrodynamic drag
+! =================
 
       ! drag_coefficient
       ! ~~~~~~~~~~~~~~~~
@@ -8301,9 +8301,11 @@
     q_for_v_drag_full_on = 0.96d0
 
 
-      ! Rayleigh-Taylor Instability
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Rayleigh-Taylor Instability: hydro drag terms
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       ! for hydro comparison tests (e.g., Sedov)
+
       ! RTI_A
       ! ~~~~~
       ! RTI_B

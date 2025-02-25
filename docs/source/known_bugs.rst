@@ -26,7 +26,8 @@ in this grid of models will impact the central H abundance for initial masses be
 This bug affects versions r15140 through r23.05.1, and will be fixed in the next release.
 For current MESA releases impacted by this bug, the following steps provide a workaround with a patched ZAMS file:
 
-- Download this updated ZAMS model file: :download:`zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`_
+- Download this updated ZAMS model file:
+  `zams_z2m2_y28_patched.data <https://github.com/MESAHub/mesa/raw/main/docs/source/assets/zams_z2m2_y28_patched.data>`__
 - Copy the file into ``$MESA_DIR/data/star_data/zams_models``
 - Use the following setting in the ``&controls`` section of your inlists for models where
   you want to use the patched ZAMS file:

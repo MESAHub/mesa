@@ -2,46 +2,6 @@
 Linters
 =======
 
-Code Linters
-============
-
-We use a variety of linters to check the MESA codebase for style and
-correctness. These linters are run automatically via GitHub actions
-on pushes and pull requests, and will fail if there are any issues.
-
-Fortran linter
---------------
-
-We use `fortitude <https://github.com/PlasmaFAIR/fortitude>`__ to
-lint the Fortran files in the MESA codebase for style and correctness.
-The linter can be run in the commandline with
-
-.. code-block:: console
-
-  fortitude check
-
-Python linter
--------------
-
-We use `black <https://black.readthedocs.io/en/stable>`__ to lint
-Python files.
-The linter can be run in the commandline with
-
-.. code-block:: console
-
-  black --check .
-
-reStructuredText linter
------------------------
-
-We use `sphinx-lint <https://pypi.org/project/sphinx-lint/>`__ to lint
-reStructuredText files.
-The linter can be run in the commandline with
-
-.. code-block:: console
-
-  sphinx-lint --ignore=gyre/gyre
-
 
 MESA Linters
 ============
@@ -146,3 +106,44 @@ update_ctrls.py
 ---------------
 
 This handles the replacement of ``s%`` with ``s% ctrl%`` while being smart about only doing that to controls.
+
+
+Code Linters
+============
+
+We use a variety of linters to check the MESA codebase for style and
+correctness. These linters are run automatically via GitHub actions
+on pushes and pull requests, and will fail if there are any issues.
+
+Fortran linter
+--------------
+
+We use `fortitude <https://github.com/PlasmaFAIR/fortitude>`__ to
+lint the Fortran files in the MESA codebase for style and correctness.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  fortitude check
+
+Python linter
+-------------
+
+We use `black <https://black.readthedocs.io/en/stable>`__ to lint
+Python files.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  black --check .
+
+reStructuredText linter
+-----------------------
+
+We use `sphinx-lint <https://pypi.org/project/sphinx-lint/>`__ to lint
+reStructuredText files.
+The linter can be run in the commandline with
+
+.. code-block:: console
+
+  sphinx-lint --ignore=gyre/gyre
