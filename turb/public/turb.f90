@@ -145,6 +145,15 @@ module turb
       Zlb = lower_bound_Z
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, ierr)
 
+!  current_gradr = grada + Y_face
+!  grav_val = cgrav * m / (r%val**2)
+!  L_rad = 64d0 * pi * boltz_sigma * T%val**4 * grav_val * r%val**2 * current_gradr / (3d0 * P%val * opacity%val)
+!  L_Edd = 4d0 * pi * clight * cgrav * m / (opacity%val)
+!  if (L_rad > L_Edd) then
+!     gradr_new = (3d0 * P%val * opacity%val * L_Edd) / (64d0 * pi * boltz_sigma * T%val**4 * grav_val * r%val**2)
+!     Y_face = gradr_new - grada
+!  end if
+
       ! Unpack output
       gradT = Y_face + gradL
       D = conv_vel*scale_height*mixing_length_alpha/3d0     ! diffusion coefficient [cm^2/sec]
