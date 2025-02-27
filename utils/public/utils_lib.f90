@@ -1137,6 +1137,7 @@ contains
 
    subroutine mesa_error(file, line,msg)
       use iso_fortran_env, only: error_unit
+      !GCC$ ATTRIBUTES NORETURN :: mesa_error
       character(len=*), intent(in) :: file
       character(len=*), optional,intent(in) :: msg
       integer, intent(in) :: line
