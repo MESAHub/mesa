@@ -44,10 +44,12 @@ Previous MESA versions exlusively adopted the latter.
 Bug Fixes
 ---------
 
-fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
-fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
+Fixed small bug in star/private/create_initial_model.f90 that will have a small effect on creating initial models
+
+Fixed bug in ``star/private/hydro_rotation.f90`` where the sigmoid function to cap ``w_div_w_crit`` was incorrectly implemented. This only influences models with `w_div_wc_flag = .true.`
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ```changelog_template.rst```).
+
 
 Changes in r24.08.1
 ===================
