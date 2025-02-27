@@ -3378,7 +3378,7 @@
       ! max_conv_vel_div_csound
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! convective velocities are limited to local sound speed times this factor
+      ! convective velocities are limited to local sound speed times this factor.
 
       ! ::
 
@@ -7408,10 +7408,19 @@
     use_starting_composition_for_kap = .false.
 
 
+      ! opacity_min
+      ! ~~~~~~~~~~~
+
+      ! limit minimum opacities to this value (ignore this if value is < 0)
+
+      ! ::
+
+    opacity_min = -1
+
       ! opacity_max
       ! ~~~~~~~~~~~
 
-      ! limit opacities to this value (ignore this is value is < 0)
+      ! limit opacities to this value (ignore this if value is < 0)
 
       ! ::
 
