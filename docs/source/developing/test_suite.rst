@@ -224,7 +224,7 @@ When a test is run through ``each_test_run``, a file ``testhub.yml``
 will be produced.  This is the information that will be reported to
 the TestHub by ``mesa_test``.  The file will look similar to this:
 
-.. code-block:: none
+.. code-block:: yaml
 
     ---
     test_case: make_co_wd
@@ -346,7 +346,7 @@ For example, in ``c13_pocket``, the ``run_star_extras`` sets::
 
 which results in the additional output
 
-.. code-block:: none
+.. code-block:: yaml
 
     - inlist: inlist_c13_pocket_header
       ...
