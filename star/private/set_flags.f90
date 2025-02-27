@@ -192,6 +192,7 @@
             call set_v_flag(id, .false., ierr)
          end if
 
+
          contains
 
          subroutine del(xs)
