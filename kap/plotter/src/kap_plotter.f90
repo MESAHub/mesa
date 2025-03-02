@@ -328,10 +328,14 @@ program kap_plotter
                res1 = dlnkap_dlnT
             end if
          else
-            res1 = log(kap)
+            if (is_nan(kap) .OR. kap <= 0) then
+               call set_nan(res1)
+            else
+               res1 = log(kap)
+            end if
          end if
 
-         if (doing_dfridr) then
+         if (doing_dfridr .and. is_nan(kap)) then
             var = log(kap)
             if (doing_d_dlnd) then
                dvardx_0 = dlnkap_dlnRho
@@ -347,7 +351,11 @@ program kap_plotter
          end if
 
 
-         write(iounit,*) kval, jval, res1
+         if (is_nan(kap)) then
+            write(iounit,*) kval, jval, "NaN"
+         else
+            write(iounit,*) kval, jval, res1
+         end if
       end do
    end do
 

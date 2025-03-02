@@ -19,12 +19,13 @@
 !  Modified 11/10/10, correcting the use of aa(i,.), replacing 
 !  aa(i,.) by aa(i-1,.) and aa(1,.) by x(.).
 !
+      use iso_fortran_env
       IMPLICIT NONE
       integer iaa,iord,iordg,iordp,iy,k,n,nn,iasn,nnmax,ns,
      *        istdin,istdou,istdpr,istder,icount
 c..      parameter (nnmax=10000)
       include 'adipls.c.d.incl'
-      real*8 aa(iaa,nn),data(*),dfyy,G,J(nnmax),phx1,phx2,
+      real(REAL64) aa(iaa,nn),data(*),dfyy,G,J(nnmax),phx1,phx2,
      *       phy1,phy2,phy2m,pi,rho(nnmax),sig,T2(nnmax),x(nn),
      *       y(iy,nn),yy(2,nnmax),gr(nnmax),dphipdr(nnmax), cgrav
       common/ccgrav/ cgrav

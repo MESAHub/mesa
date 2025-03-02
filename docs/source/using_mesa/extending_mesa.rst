@@ -53,7 +53,7 @@ Before we make any changes, we should check that the code compiles.
 ::
 
    cd ..
-   ./mk
+   make
 
 If it doesn't compile, make sure that you cleanly inserted the file and
 removed the include line.
@@ -554,8 +554,4 @@ the other_neu at the routine you want to be executed.
 
   end subroutine extras_controls
 
-Now, recompile your working directory::
-
-   ./mk
-
-and run MESA as usual.
+Now, run MESA as usual. This will first recompile the code and then start the simulation.

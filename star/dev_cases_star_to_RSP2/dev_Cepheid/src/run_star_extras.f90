@@ -197,7 +197,7 @@
             call gyre_set_constant('M_SUN', Msun)
             call gyre_set_constant('R_SUN', Rsun)
             call gyre_set_constant('L_SUN', Lsun)
-            call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
+            call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/build/gyre/src')
          else
             call gyre_linear_analysis_and_set_velocities(s,restart,ierr)
          end if
@@ -551,9 +551,8 @@
          call gyre_set_constant('R_SUN', Rsun)
          call gyre_set_constant('L_SUN', Lsun)
 
-         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/gyre/gyre')
-
-         mode_l = 0  ! mode l (e.g. 0 for p modes, 1 for g modes)
+         call gyre_set_constant('GYRE_DIR', TRIM(mesa_dir)//'/build/gyre/src')
+         mode_l = 0 ! mode l (e.g. 0 for p modes, 1 for g modes)
                         ! should match gyre.in mode l
 
          !write(*,*) 'call star_get_pulse_data'

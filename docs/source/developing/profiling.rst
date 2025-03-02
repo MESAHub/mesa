@@ -17,7 +17,7 @@ valgrind must be launched by hand, for instance via
 
 .. code-block:: console
 
-    valgrind --tool=massif ./star
+    valgrind --tool=massif ./build/bin/star
 
 Other useful options:
 
@@ -25,8 +25,8 @@ Other useful options:
 
     --stacks=yes # Makes it run slower but will include information about the stack usage
 
-Once finished the tool will write a file massif.out.$PID where $PID is the PID of the
-./star run. If you ctrl-c the run you will still get the output up to that point, but
+Once finished the tool will write a file massif.out.$PID where $PID is the PID of the 
+``star`` run. If you ctrl-c the run you will still get the output up to that point, but
 otherwise you will need to wait till the run finishes before being able to view the output.
 
 To visualize the data use:
@@ -49,7 +49,7 @@ valgrind must be launched by hand, for instance via
 
 .. code-block:: console
 
-    valgrind --tool=callgrind ./star
+    valgrind --tool=callgrind ./build/bin/star
 
 
 Other useful options:
@@ -59,8 +59,8 @@ Other useful options:
     --dump-instr=yes --collect-jumps=yes #  Dump extra information about the run into the output
     --dump-every-bb=1000000000 # How often to output a file with the profile information, this will output maybe once every few steps. This lets you start profiling while the run is still going.
 
-Once finished the tool will write a file callgrind.out.$PID.$NUM where $PID is the PID of the
-./star run. $NUM is a seqeuential output number for the each output file.
+Once finished the tool will write a file callgrind.out.$PID.$NUM where $PID is the PID of the 
+``star`` run. $NUM is a sequential output number for each output file.
 
 To visualize the data use:
 

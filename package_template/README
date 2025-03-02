@@ -1,0 +1,1 @@
+This folder containts a template one can use to start creating a new module. To do that, copy this folder and change all occurences of `pkg` to the name of the new module. To ensure that the module is built and made available to other modules, add the location of the module to `make/subdirs.mk`.

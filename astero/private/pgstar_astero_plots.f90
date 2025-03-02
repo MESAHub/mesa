@@ -147,7 +147,7 @@
          if (ierr /= 0) return
 
          plot_delta_nu = echelle_delta_nu
-         if (plot_delta_nu <= 0) plot_delta_nu = delta_nu
+         if (plot_delta_nu <= 0) plot_delta_nu = real(delta_nu, kind=sp)
          if (plot_delta_nu <= 0) then
             write(*,*) 'must supply value for echelle_delta_nu'
             ierr = -1
@@ -161,10 +161,10 @@
 
          do l = 0, 3
             if (nl(l) > 0) then
-               ymin = min(ymin,minval(freq_target(l,1:nl(l))))
-               ymax = max(ymax,maxval(freq_target(l,1:nl(l))))
-               xpt_min = min(xpt_min,minval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
-               xpt_max = max(xpt_max,maxval(mod(freq_target(l,1:nl(l)),plot_delta_nu)))
+               ymin = min(real(ymin, kind=dp), minval(freq_target(l,1:nl(l))))
+               ymax = max(real(ymax, kind=dp), maxval(freq_target(l,1:nl(l))))
+               xpt_min = min(real(xpt_min, kind=dp), minval(mod(freq_target(l,1:nl(l)), real(plot_delta_nu, kind=dp))))
+               xpt_max = max(real(xpt_max, kind=dp), maxval(mod(freq_target(l,1:nl(l)), real(plot_delta_nu, kind=dp))))
             end if
          end do
 
@@ -314,7 +314,7 @@
             real(dp), intent(in) :: freq
             integer, intent(in) :: color, shape
             y_obs = freq
-            x_obs = mod(freq,plot_delta_nu)
+            x_obs = mod(freq, real(plot_delta_nu, kind=dp))
             call pgsci(color)
             call pgpt1(x_obs, y_obs, shape)
             call pgpt1(x_obs + plot_delta_nu, y_obs, shape)
@@ -333,7 +333,7 @@
             y_model_alt_shift = echelle_model_alt_y_shift
             call pgsci(color)
             y_model = freq
-            x_obs = mod(freq_obs, plot_delta_nu)
+            x_obs = mod(freq_obs, real(plot_delta_nu, kind=dp))
             x_model = (freq - freq_obs) + x_obs
             call pgpt1(x_model, y_model, model_shape)
             call pgmove(x_obs, y_obs)

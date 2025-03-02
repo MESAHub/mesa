@@ -1,0 +1,4 @@
+Name: pgplot
+Version: 5.2
+Description: pgplot
+Libs: -L${MESASDK_ROOT}/pgplot -lpgplot

@@ -36,7 +36,6 @@
       ! mesa includes sources for a subset of BLAS and dble.
       ! you can use those, or, better yet, you can use a package optimized
       ! for your machine such as GotoBLAS or Intel's MKL.
-      ! see utils/makefile_header for details.
 
       ! see mtx/blas_src for the subset of BLAS routines included in mtx_lib
       ! see mtx/dble_src for the subset of dble routines included in mtx_lib

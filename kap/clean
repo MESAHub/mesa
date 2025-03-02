@@ -1,3 +1,0 @@
-cd make; make clean
-cd ../preprocessor; ./clean
-cd ../test/make; make clean

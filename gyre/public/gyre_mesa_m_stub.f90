@@ -1,6 +1,6 @@
 ! This stub fakes enough of GYRE to make sure that test cases can
 ! optionally use GYRE without failing to compile on systems built with
-! USE_GYRE=NO in utils/makefile_header.
+! WITH_GYRE=NO in make/defaults-module.mk.
 
 module gyre_mesa_m  ! stub
 

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rm -rf forum
-tar xf forum-1.0.3.tar.gz
-mv forum-1.0.3 forum
-
-../utils/build_and_test

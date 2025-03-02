@@ -2,6 +2,7 @@
 data/version_number
 
 ## Compilation
+build/
 build.log
 .depend
 .order
