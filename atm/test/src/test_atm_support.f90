@@ -397,10 +397,10 @@ contains
        write(*,*) 'allocate failed'
        call mesa_error(__FILE__,__LINE__)
     end if
-    chem_id(:) = (/ ih1, ihe4, ic12, in14, io16, ine20, img24 /)
+    chem_id(:) = [ ih1, ihe4, ic12, in14, io16, ine20, img24 ]
     net_iso(:) = 0
     forall (i=1:species) net_iso(chem_id(i)) = i
-    xa(:) = (/ X, Y, xc, xn, xo, 0d0, 0d0 /)
+    xa(:) = [ X, Y, xc, xn, xo, 0d0, 0d0 ]
     xa(species) = 1 - sum(xa(:))
     call composition_info( &
          species, chem_id, xa, X, Y, xz, abar, zbar, z2bar, z53bar, ye, &

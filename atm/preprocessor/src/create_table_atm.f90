@@ -90,7 +90,7 @@ program create_table_atm
   !for table creation:
   M = Msun
 
-  logg_array(:) = (/ -1d0, -0.5d0, 0d0, 0.5d0, 1d0, 1.5d0, 2d0, 2.5d0, 3d0, 3.5d0, 4d0, 4.5d0, 5d0, 5.5d0, 6d0 /)
+  logg_array(:) = [ -1d0, -0.5d0, 0d0, 0.5d0, 1d0, 1.5d0, 2d0, 2.5d0, 3d0, 3.5d0, 4d0, 4.5d0, 5d0, 5.5d0, 6d0 ]
 
   Teff_array(1) = 2.0d3
   do i_Teff = 2, num_Teff
@@ -210,12 +210,12 @@ contains
 
     allocate(xa(num_isos), chem_id(num_isos), net_iso(num_chem_isos))
 
-    chem_id(:) = (/ ih1, ihe4, ic12, in14, io16, ine20, img24 /)
+    chem_id(:) = [ ih1, ihe4, ic12, in14, io16, ine20, img24 ]
     net_iso(:) = 0
     do i=1,num_isos
        net_iso(chem_id(i)) = i
     end do
-    xa(:) = (/ X, Y, xc, xn, xo, xne, xmg /)
+    xa(:) = [ X, Y, xc, xn, xo, xne, xmg ]
     
     call basic_composition_info( &
        num_isos, chem_id, xa, X, Y, Z, &

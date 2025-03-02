@@ -89,7 +89,7 @@
          Z = Z_in
          if (which_x < 0) then
             Xs(1:max_num_Xs-1) = &
-               (/ 0.00d0, 0.10d0, 0.20d0, 0.35d0, 0.50d0, 0.70d0, 0.80d0, 0.90d0, 0.95d0 /)
+               [ 0.00d0, 0.10d0, 0.20d0, 0.35d0, 0.50d0, 0.70d0, 0.80d0, 0.90d0, 0.95d0 ]
                num_Xs = max_num_Xs
          else
             Xs(1) = which_x

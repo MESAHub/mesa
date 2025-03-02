@@ -98,8 +98,8 @@
             ierr = 0
             io = 33 ! for reading
             
-            loggs(1:ng) = (/ &
-               -0.5d0, 0.0d0, 0.5d0, 1.0d0, 1.5d0, 2.0d0, 2.5d0, 3.0d0, 3.5d0, 4.0d0, 4.5d0, 5.0d0, 5.5d0 /)
+            loggs(1:ng) = [ &
+               -0.5d0, 0.0d0, 0.5d0, 1.0d0, 1.5d0, 2.0d0, 2.5d0, 3.0d0, 3.5d0, 4.0d0, 4.5d0, 5.0d0, 5.5d0 ]
                
             Teffs(1:nT) = BT_Settl_Ts(1:nT)
 
@@ -245,7 +245,8 @@
             subroutine read_file(i,j,ierr)
                integer, intent(in) :: i, j
                integer, intent(out) :: ierr
-               integer :: layers, base_layer=1
+               integer :: layers
+               integer, save :: base_layer=1
                real(dp) :: Pg, Pe, interp_factor(2)
                ierr = 0
                read(io,*) !skip header info
@@ -403,8 +404,8 @@
       
       ierr = 0
 
-      MH = (/ -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.3, 0.5 /)
-      MH_Str = (/ '-4.0', '-3.5', '-3.0', '-2.5', '-2.0', '-1.5', '-1.0', '-0.5', '-0.0', '+0.3', '+0.5' /)
+      MH = [ -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.3, 0.5 ]
+      MH_Str = [ '-4.0', '-3.5', '-3.0', '-2.5', '-2.0', '-1.5', '-1.0', '-0.5', '-0.0', '+0.3', '+0.5' ]
 
       data_dir = '../../data'
 

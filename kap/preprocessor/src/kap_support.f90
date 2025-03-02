@@ -176,7 +176,7 @@
          character (len=*), intent(in) :: data_dir, type1_table
          real(dp), intent(in) :: Zbase, X, dXC, dXO
          real(dp) :: zalf, ztemp, w(6)
-         integer i,iz
+         integer :: i,iz
          
          include 'formats'
          

@@ -31,9 +31,9 @@
 
          character (len=256) :: filename
          integer, parameter :: nZ=8, ng=13, nT=82
-         integer :: table_atm_version = 1
+         integer, save :: table_atm_version = 1
          character(len=40) :: table_atm_files(nZ)
-         character(len=8):: atm_mix(nZ) !not used currently -- nor is alphaFe
+         character(len=8):: atm_mix(nZ)  !not used currently -- nor is alphaFe
 
          real(dp) :: Teff_array(nT), logg_array(ng), Teff_bound(ng)
          real(dp) :: logZ(nZ), alphaFe(nZ), Pgas(ng,nT,nZ)
@@ -41,7 +41,7 @@
          integer :: ierr, iounit, i, j, ibound_tmp(ng), nZ_tmp, nT_tmp, ng_tmp, &
             tmp_version(nZ), ibound(ng,nZ), iZ, text_file_version
 
-         real(dp), parameter :: Pfill = 1d2 !used for interpolation in filling missing values
+         real(dp), parameter :: Pfill = 1d2  !used for interpolation in filling missing values
 
          logical, parameter :: dbg = .false.
 

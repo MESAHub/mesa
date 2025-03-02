@@ -18,5 +18,5 @@
       call do_test_atm( &
          test_verbosely, cgrav, eos_handle, kap_handle)
          
-      end program
+      end program test_atm
 

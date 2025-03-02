@@ -84,7 +84,7 @@
          
          if (which_x < 0) then
             num_Xs = 5
-            Xs(1:num_Xs) = (/ 0.00d0, 0.03d0, 0.10d0, 0.35d0, 0.70d0 /)
+            Xs(1:num_Xs) = [ 0.00d0, 0.03d0, 0.10d0, 0.35d0, 0.70d0 ]
          else
             num_Xs = 1
             Xs(1) = which_x
@@ -142,7 +142,7 @@
          end if      
          write(*,*) 'creating ', trim(fname)
          
-         dXCOs(1:num_dXCOs) = (/ 0.00d0, 0.01d0, 0.03d0, 0.10d0, 0.20d0, 0.40d0, 0.60d0, 1.0d0 /)
+         dXCOs(1:num_dXCOs) = [ 0.00d0, 0.01d0, 0.03d0, 0.10d0, 0.20d0, 0.40d0, 0.60d0, 1.0d0 ]
          Y = 1 - (X + Zbase)    ! this sets upper limit on sum of dXC + dXO         
          mid = Y * 0.5d0
          
@@ -236,7 +236,7 @@
          integer, intent(in) :: table_num, io_unit
          character (len=*), intent(in) :: data_dir, type1_table
          
-         integer i,j,info
+         integer :: i,j,info
          real(dp) :: opac_rad, logR, logT, T, logRho, Rho, logK
          logical, parameter :: co_enhanced = .true.
          

@@ -79,24 +79,24 @@ Some of the modules require some preprocessing of the FORTRAN source code. This 
     SRCS_CHECK_GENERATED := \
             test/src/test_block_tridiagonal_dble.f90 \
             test/src/test_block_tridiagonal_quad.f90
-    
+
     include ../make/Makefile
-    
+
     # Custom build steps (this needs to come after the include statement,
     #  otherwise the BUILD_DIR_MODULE variable is not set)
-    
+
     $(BUILD_DIR_MODULE)/private/my_lapack95_dble.f90: private/my_lapack95.F90 | $(BUILD_DIR_MODULE)/private/
         # Note: PREPROCESS just calls the C preprocessor, and is set in compile-settings-*.mk
-    	$(PREPROCESS) -DDBLE $^ > $@
-    
+        $(PREPROCESS) -DDBLE $^ > $@
+
     $(BUILD_DIR_MODULE)/private/my_lapack95_quad.f90: private/my_lapack95.F90 | $(BUILD_DIR_MODULE)/private/
-    	$(PREPROCESS) $^ > $@
-    
+        $(PREPROCESS) $^ > $@
+
     $(BUILD_DIR_MODULE)/test/src/test_block_tridiagonal_dble.f90: test/src/test_block_tridiagonal.f90 | $(BUILD_DIR_MODULE)/test/src/
-    	$(PREPROCESS) -DDBLE $^ > $@
-    
+        $(PREPROCESS) -DDBLE $^ > $@
+
     $(BUILD_DIR_MODULE)/test/src/test_block_tridiagonal_quad.f90: test/src/test_block_tridiagonal.f90 | $(BUILD_DIR_MODULE)/test/src/
-    	$(PREPROCESS) $^ > $@
+        $(PREPROCESS) $^ > $@
 
 Integrating modules in another piece of software
 ================================================

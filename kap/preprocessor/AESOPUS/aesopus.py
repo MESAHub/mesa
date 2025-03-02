@@ -61,7 +61,11 @@ class AesopusTable:
     def _read_table(self, table):
         """Extract opacities into array"""
 
-        data = np.loadtxt([r.replace("-250.0000", " -99.0000") for r in table], comments='#', dtype='float32')
+        data = np.loadtxt(
+            [r.replace("-250.0000", " -99.0000") for r in table],
+            comments="#",
+            dtype="float32",
+        )
 
         # data has temperatures in decreasing order; reverse
         self.data = np.flipud(data[:, 1:])

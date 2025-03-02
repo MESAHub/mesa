@@ -318,9 +318,9 @@
 
 
       subroutine eval_ferg_logP (z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap)
-         double precision z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap
-         real z,xh,xxc,xxo,t6,r
-         real logT, logR, logP
+         double precision :: z_in,xh_in,xxc_in,xxo_in,t6_in,r_in,logKap
+         real :: z,xh,xxc,xxo,t6,r
+         real :: logT, logR, logP
 
          z = real(z_in); xh = real(xh_in); xxc = real(xxc_in)
          xxo = real(xxo_in); t6 = real(t6_in); r = real(r_in)

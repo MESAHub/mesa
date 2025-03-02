@@ -552,7 +552,6 @@ analytic derivative.
          write(*,*) 'set_Psurf_BC', s% solver_test_partials_var
       end if
 
-      
 We changed code in star, so we need to do ``make`` in
 ``star`` and then in the work directory also recompile before we
 restart ``make clean && ./re``.  We will repeat this recompilation/restart

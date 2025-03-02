@@ -141,8 +141,8 @@ contains
 
       real(dp) :: log_ne_min, log_ne_max, logT_min, logT_max, dlog_ne, dlogT, log_ne, logT
 
-      integer log_ne_points, logT_points
-      integer i, j, k, info, io, io_first, io_last, io_log_ne, io_logT, num_vals
+      integer :: log_ne_points, logT_points
+      integer :: i, j, k, info, io, io_first, io_last, io_log_ne, io_logT, num_vals
 
       integer, parameter :: io_unit0 = 40
 

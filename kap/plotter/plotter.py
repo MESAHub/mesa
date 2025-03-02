@@ -32,8 +32,8 @@ ax.set_ylim(Yran.min(), Yran.max())
 
 # set up color map
 cmap = copy.copy(plt.get_cmap("coolwarm"))
-cmap.set_over('tab:red')
-cmap.set_under('black')
+cmap.set_over("tab:red")
+cmap.set_under("black")
 
 # set color bar limits
 # None will auto-set limits

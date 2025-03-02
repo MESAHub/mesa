@@ -71,6 +71,7 @@ def smooth_opac(table_path: Path):
             output.write(row)
             output.write("\n")
 
+
 opacity_file_dir = Path(sys.argv[1])
 output_file_dir = Path(sys.argv[2])
 

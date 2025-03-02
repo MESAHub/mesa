@@ -96,8 +96,8 @@ contains
     ! setup for T(tau) calculations
     call set_table_composition
 
-    loggs(1:ng) = (/ &
-         0d0, 0.5d0, 1d0, 1.5d0, 2d0, 2.5d0, 3d0, 3.5d0, 4d0, 4.5d0, 5d0, 5.5d0, 6d0 /)
+    loggs(1:ng) = [ &
+         0d0, 0.5d0, 1d0, 1.5d0, 2d0, 2.5d0, 3d0, 3.5d0, 4d0, 4.5d0, 5d0, 5.5d0, 6d0 ]
     Teffs(1:nT) = tau100_Ts(1:nT)
 
     Pgas = -1
@@ -548,13 +548,13 @@ contains
 
       allocate(xa(num_isos), chem_id(num_isos), net_iso(num_chem_isos))
 
-      chem_id(:) = (/ ih1, ihe4, ic12, in14, io16, ine20, img24 /)
+      chem_id(:) = [ ih1, ihe4, ic12, in14, io16, ine20, img24 ]
       net_iso(:) = 0
       do i=1,num_isos
          net_iso(chem_id(i)) = i
       end do
 
-      xa(:) = (/ X, Y, xc, xn, xo, xne, xmg /)
+      xa(:) = [ X, Y, xc, xn, xo, xne, xmg ]
       xa(num_isos) = 1 - sum(xa(:))
       call basic_composition_info( &
            num_isos, chem_id, xa, xh, xhe, xz, abar, zbar, z2bar, z53bar, ye, &
