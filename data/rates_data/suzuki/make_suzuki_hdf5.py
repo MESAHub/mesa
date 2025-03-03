@@ -3,9 +3,7 @@
 import io
 import lzma
 import re
-
 import h5py
-
 import numpy as np
 
 
@@ -67,6 +65,8 @@ class SuzukiData:
         with lzma.open(self.filename, "rt") as f:
             block = []
             description = None
+            rxn_id = None
+            process = None
             for line in f:
                 if not line.strip():
                     pass
