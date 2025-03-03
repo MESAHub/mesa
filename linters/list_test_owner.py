@@ -9,7 +9,6 @@ codeowner = cc.parse_codeowners(cc.CODEOWNERS)
 
 
 def list_by_author(codeowner):
-
     result = defaultdict(list)
 
     for module in ["star", "binary", "astero"]:

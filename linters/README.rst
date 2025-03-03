@@ -129,13 +129,14 @@ The linter can be run in the commandline with
 Python linter
 -------------
 
-We use `black <https://black.readthedocs.io/en/stable>`__ to lint
+We use `ruff <https://docs.astral.sh/ruff/>`__ to lint and check
 Python files.
 The linter can be run in the commandline with
 
 .. code-block:: console
 
-  black --check .
+  ruff format --check
+  ruff check
 
 reStructuredText linter
 -----------------------

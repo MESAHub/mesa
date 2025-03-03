@@ -53,7 +53,7 @@ class AutoDiffType:
 
     def declare_name(self, ref=None):
         if (not self.array) or (
-            not self.array_length is None
+            self.array_length is not None
         ):  # Either no array type or else it's a fixed length.
             return "type(" + str(self.name) + ")"
         else:

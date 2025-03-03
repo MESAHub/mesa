@@ -3,7 +3,6 @@
 import io
 import lzma
 import re
-import string
 
 import h5py
 
@@ -19,14 +18,12 @@ def make_mesa_rxn_id(isos, wk_str):
 
 
 class SuzukiTable:
-
     _columns = ("mu", "dQ", "Vs", "rate", "nu", "gamma")
     _compression_opts = {
         "compression": "gzip",
     }
 
     def __init__(self, description, data):
-
         self.description = description
 
         data1d = np.loadtxt(io.BytesIO(data))
@@ -47,28 +44,23 @@ class SuzukiTable:
             )
 
     def add_1D_datasets(self, hdf5_group):
-
         hdf5_group.create_dataset(
             "lYeRhos", data=self.logRhoYs, **self._compression_opts
         )
         hdf5_group.create_dataset("logTs", data=self.logTs, **self._compression_opts)
 
     def add_2D_datasets(self, hdf5_group):
-
         for k, v in self.data.items():
             hdf5_group.create_dataset(k, data=v, **self._compression_opts)
 
 
 class SuzukiData:
-
     def __init__(self, filename):
-
         self.filename = filename
 
         self._read()
 
     def _read(self):
-
         # dictionary to store data tables
         self._tables = {}
 
@@ -125,13 +117,11 @@ class SuzukiData:
 
 
 def add_data(h5file, filename):
-
     # read suzuki datafile
     print(f"reading {filename}")
     data = SuzukiData(filename)
 
     for rxn_id in data.reactions():
-
         # make one group per MESA reaction
         print(f"..created sub-group {rxn_id}")
         rxn_grp = h5file.create_group(rxn_id)
@@ -140,17 +130,15 @@ def add_data(h5file, filename):
         rxn_data = data.get_reaction_data(rxn_id)
 
         for process, table in rxn_data.items():
-
             # make one group per process
             print(f"....created sub-sub-group {process}")
             process_grp = rxn_grp.create_group(process)
 
-            print(f"......added 2D datasets")
+            print("......added 2D datasets")
             table.add_2D_datasets(process_grp)
 
         else:
-
-            print(f"....added 1D datasets")
+            print("....added 1D datasets")
             table.add_1D_datasets(rxn_grp)
 
 
@@ -170,10 +158,8 @@ suzuki_files = (
 )
 
 if __name__ == "__main__":
-
     # open hdf5 file
     with h5py.File("Suzuki2016.h5", "w") as h5file:
-
         # add the data
         for filename in suzuki_files:
             add_data(h5file, filename)

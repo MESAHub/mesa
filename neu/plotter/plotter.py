@@ -4,7 +4,6 @@ import copy
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
 
 
 def parse(fname):

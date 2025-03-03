@@ -1,5 +1,5 @@
 from sympy import symbols, factorial, diff, DiracDelta, simplify, sign, Derivative
-from utils import wrap_element, fortran_substitutions, ddelta, zero_function, sgn
+from utils import wrap_element, fortran_substitutions, zero_function, sgn
 from sympy.simplify.cse_main import cse
 from sympy.utilities.iterables import numbered_symbols
 from measure import weighted_count_ops

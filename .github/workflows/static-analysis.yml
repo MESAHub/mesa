@@ -30,10 +30,11 @@ jobs:
           cd ${{ github.workspace }}
           fortitude check
 
-      - name: Apply Python linter, black
+      - name: Apply Python linter, ruff
         run: |
           cd ${{ github.workspace }}
-          black --check .
+          ruff format --check
+          ruff check
 
       - name: Apply RST linter, sphinx-lint
         run: |

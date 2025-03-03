@@ -45,7 +45,6 @@ lgmmin = -1.0
 lgmmax = math.log10(80.0)
 imax = 100
 for i in range(1, imax + 1, 1):
-
     mp = math.pow(10.0, lgmmin + (lgmmax - lgmmin) * i / imax)
     mp_wo_core = mp - mcore * mearth / mjup
 

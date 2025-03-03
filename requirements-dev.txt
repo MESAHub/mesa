@@ -1,4 +1,4 @@
 fortitude-lint
 fprettify
-black
+ruff
 sphinx-lint

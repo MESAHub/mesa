@@ -29,7 +29,6 @@ def set_flag(line, new_flag=".false.", old_flag=".true."):
 
 
 def fix_line(line):
-
     # Turn off solver
     if "report_solver_progress" in line:
         line = set_flag(line)
