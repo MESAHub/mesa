@@ -12,13 +12,13 @@ include $(MESA_DIR)/utils/makefile_header
 #
 # SOURCES
 
-COMMON_SRCS = test_support.o test_int_support.o \
-   bari_beam.o test_beam.o \
-   bari_chemakzo.o test_chemakzo.o \
-   bari_medakzo.o test_medakzo.o \
-   bari_vdpol.o test_vdpol.o \
-   test_diffusion.o test_brent.o test_bobyqa.o test_newuoa.o \
-   test_simplex.o test_newton.o test_integrate.f
+COMMON_SRCS = test_support.f90 test_int_support.f90 \
+   bari_beam.f90 test_beam.f90 \
+   bari_chemakzo.f90 test_chemakzo.f90 \
+   bari_medakzo.f90 test_medakzo.f90 \
+   bari_vdpol.f90 test_vdpol.f90 \
+   test_diffusion.f90 test_brent.f90 test_bobyqa.f90 test_newuoa.f90 \
+   test_simplex.f90 test_newton.f90 test_integrate.f90
 
 TEST_SRCS = $(COMMON_SRCS) test_num.o
 
@@ -46,9 +46,9 @@ TEST = $(TEST_DIR)/tester
 TEST_MPI = $(TEST_DIR)/test_mpi
 SAMPLE = $(TEST_DIR)/sample
 
-TEST_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_SRCS)))
-TEST_MPI_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(TEST_MPI_SRCS)))
-SAMPLE_OBJS = $(patsubst %.f,%.o,$(patsubst %.f90,%.o,$(SAMPLE_SRCS)))
+TEST_OBJS = $(patsubst %.f90,%.o,$(TEST_SRCS))
+TEST_MPI_OBJS = $(patsubst %.f90,%.o,$(TEST_MPI_SRCS))
+SAMPLE_OBJS = $(patsubst %.f90,%.o,$(SAMPLE_SRCS))
 
 all : $(TEST) $(SAMPLE)
 
@@ -77,14 +77,6 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
-%.o : %.f
-ifneq ($(QUIET),)
-	@echo TEST_COMPILE fixed $<
-	@$(TEST_COMPILE) $(FCfixed) -fimplicit-none $<
-else
-	$(TEST_COMPILE) $(FCfixed)-fimplicit-none $<
-endif
-
 %.o: %.f90
 ifneq ($(QUIET),)
 	@echo TEST_COMPILE free $<
@@ -99,7 +91,6 @@ endif
 
 SRC_PATH = $(TEST_SRC_DIR)
 
-vpath %.f $(SRC_PATH)
 vpath %.f90 $(SRC_PATH)
 
 vpath %.mod $(LOCAL_LIB_DIR):$(MESA_DIR)/include
