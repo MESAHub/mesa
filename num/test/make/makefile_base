@@ -77,12 +77,14 @@ nodeps : $(.DEFAULT_GOAL)
 #
 # COMPILATION RULES
 
+COMPILE = $(FCbasic) $(FCopenmp) $(FCopt) $(FCfree)
+
 %.o: %.f90
 ifneq ($(QUIET),)
-	@echo TEST_COMPILE free $<
-	@$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
+	@echo TEST_COMPILE $<
+	@$(TEST_COMPILE) $(COMPILE) $<
 else
-	$(TEST_COMPILE) $(FCfree) -fimplicit-none $<
+	$(TEST_COMPILE) $(COMPILE) $<
 endif
 
 #################################################################
