@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # a script to test that compiling and linking
 # produces a code that works as expected..
 

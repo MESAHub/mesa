@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  script to call  $aprgdir/adipls/adipls.c.d.x
 if [ $# -eq 0 ] 
 then
